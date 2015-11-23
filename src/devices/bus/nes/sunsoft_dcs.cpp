@@ -53,7 +53,7 @@ const device_type NES_NTB_SLOT = &device_creator<nes_ntb_slot_device>;
 nes_ntb_slot_device::nes_ntb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, NES_NTB_SLOT, "NES NTB Cartridge Slot", tag, owner, clock, "nes_ntb_slot", __FILE__),
 						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this)
+						device_slot_interface(mconfig, *this), m_cart(nullptr)
 {
 }
 
@@ -163,9 +163,9 @@ const device_type NES_SUNSOFT_DCS = &device_creator<nes_sunsoft_dcs_device>;
 
 
 nes_sunsoft_dcs_device::nes_sunsoft_dcs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_sunsoft_4_device(mconfig, NES_SUNSOFT_DCS, "NES Cart Sunsoft DCS PCB", tag, owner, clock, "nes_dcs", __FILE__),
-						m_subslot(*this, "ntb_slot")
-{
+					: nes_sunsoft_4_device(mconfig, NES_SUNSOFT_DCS, "NES Cart Sunsoft DCS PCB", tag, owner, clock, "nes_dcs", __FILE__), m_timer_on(0), m_exrom_enable(0),
+						m_subslot(*this, "ntb_slot"), ntb_enable_timer(nullptr)
+				{
 }
 
 

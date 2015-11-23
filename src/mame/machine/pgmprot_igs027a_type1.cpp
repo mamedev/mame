@@ -1846,8 +1846,6 @@ int pgm_arm_type1_state::puzzli2_take_leveldata_value(UINT8 datvalue)
 {
 	if (stage==-1)
 	{
-		tableoffs = 0;
-		tableoffs2 = 0;
 		entries_left = 0;
 		currentcolumn = 0;
 		currentrow = 0;
@@ -2113,7 +2111,6 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,puzzli2)
 	hackcount = 0;
 	hackcount2 = 0;
 	hack_47_value = 0;
-	hack_31_table_offset = 0;
 	hack_31_table_offset = 0;
 
 //#define PUZZLI2_LEVEL_STRUCTURE_LOG

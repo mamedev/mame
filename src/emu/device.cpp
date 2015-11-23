@@ -14,51 +14,6 @@
 #include "debug/debugcpu.h"
 
 
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define TEMP_STRING_POOL_ENTRIES        16
-#define MAX_STRING_LENGTH               256
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-static char temp_string_pool[TEMP_STRING_POOL_ENTRIES][MAX_STRING_LENGTH];
-static int temp_string_pool_index;
-
-
-
-//**************************************************************************
-//  INLINE FUNCTIONS
-//**************************************************************************
-
-//-------------------------------------------------
-//  get_temp_string_buffer - return a pointer to
-//  a temporary string buffer
-//-------------------------------------------------
-
-char *get_temp_string_buffer(void)
-{
-	char *string = &temp_string_pool[temp_string_pool_index++ % TEMP_STRING_POOL_ENTRIES][0];
-	string[0] = 0;
-	return string;
-}
-
-
-resource_pool &machine_get_pool(running_machine &machine)
-{
-	// temporary to get around include dependencies, until CPUs
-	// get a proper device class
-	return machine.respool();
-}
-
-
-
 //**************************************************************************
 //  LIVE DEVICE MANAGEMENT
 //**************************************************************************
@@ -898,7 +853,7 @@ device_interface::device_interface(device_t &device, const char *type)
 		m_type(type)
 {
 	device_interface **tailptr;
-	for (tailptr = &device.m_interface_list; *tailptr != NULL; tailptr = &(*tailptr)->m_interface_next) ;
+	for (tailptr = &device.m_interface_list; *tailptr != NULL; tailptr = &(*tailptr)->m_interface_next) { }
 	*tailptr = this;
 }
 

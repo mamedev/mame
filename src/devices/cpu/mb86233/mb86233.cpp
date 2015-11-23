@@ -26,12 +26,13 @@ const device_type MB86233 = &device_creator<mb86233_cpu_device>;
 mb86233_cpu_device::mb86233_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, MB86233, "MB86233", tag, owner, clock, "mb86233", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, -2)
-	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, 0)
-	, m_fifo_read_cb(*this)
+	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, 0), m_pc(0), m_reps(0), m_pcsp(0), m_eb(0), m_shift(0), m_repcnt(0), m_sr(0), 
+	m_fpucontrol(0), m_program(nullptr), m_direct(nullptr), m_icount(0), m_fifo_wait(0)
+	  , m_fifo_read_cb(*this)
 	, m_fifo_read_ok_cb(*this)
 	, m_fifo_write_cb(*this)
-	, m_tablergn(NULL)
-	, m_Tables(NULL)
+	, m_tablergn(nullptr), m_ARAM(nullptr), m_BRAM(nullptr)
+	  , m_Tables(nullptr)
 {
 }
 

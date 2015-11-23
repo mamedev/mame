@@ -29,8 +29,8 @@ ym2148_device::ym2148_device(const machine_config &mconfig, const char *tag, dev
 	, m_data_out(0)
 	, m_data_in(0)
 	, m_control(0)
-	, m_status(0)
-	, m_rxd(1)
+	, m_status(0), m_timer(nullptr)
+	  , m_rxd(1)
 	, m_tx_busy(false)
 {
 }

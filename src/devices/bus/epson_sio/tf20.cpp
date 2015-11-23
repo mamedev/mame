@@ -133,8 +133,8 @@ epson_tf20_device::epson_tf20_device(const machine_config &mconfig, const char *
 	m_ram(*this, "ram"),
 	m_fdc(*this, "5a"),
 	m_mpsc(*this, "3a"),
-	m_sio_output(*this, "sio"),
-	m_rxc(1)
+	m_sio_output(*this, "sio"), m_fd0(nullptr), m_fd1(nullptr), m_timer_serial(nullptr), m_timer_tc(nullptr),
+	m_rxc(1), m_txda(0), m_dtra(0), m_pinc(0)
 {
 	m_sio_input = dynamic_cast<epson_sio_device *>(owner);
 }

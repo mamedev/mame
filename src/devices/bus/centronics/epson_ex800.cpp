@@ -361,7 +361,7 @@ epson_ex800_t::epson_ex800_t(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, EPSON_EX800, "Epson EX-800", tag, owner, clock, "ex800", __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
-	m_beeper(*this, "beeper")
+	m_beeper(*this, "beeper"), m_irq_state(0)
 {
 }
 

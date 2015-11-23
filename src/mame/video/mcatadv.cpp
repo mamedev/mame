@@ -21,6 +21,8 @@ TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info1)
 	int colour = (m_videoram1[tile_index * 2] & 0x3f00) >> 8;
 	int pri = (m_videoram1[tile_index * 2] & 0xc000) >> 14;
 
+	pri |= 0x8;
+
 	SET_TILE_INFO_MEMBER(0,tileno,colour + m_palette_bank1 * 0x40, 0);
 	tileinfo.category = pri;
 }
@@ -37,6 +39,8 @@ TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info2)
 	int colour = (m_videoram2[tile_index * 2] & 0x3f00) >> 8;
 	int pri = (m_videoram2[tile_index * 2] & 0xc000) >> 14;
 
+	pri |= 0x8;
+
 	SET_TILE_INFO_MEMBER(1, tileno, colour + m_palette_bank2 * 0x40, 0);
 	tileinfo.category = pri;
 }
@@ -50,8 +54,9 @@ WRITE16_MEMBER(mcatadv_state::mcatadv_videoram2_w)
 
 void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT16 *source = m_spriteram_old;
-	UINT16 *finish = source + (m_spriteram.bytes() / 2) /2;
+	UINT16 *source = (m_spriteram_old + (m_spriteram.bytes() / 2) /2);
+	source -= 4;
+	UINT16 *finish = m_spriteram_old;
 	int global_x = m_vidregs[0] - 0x184;
 	int global_y = m_vidregs[1] - 0x1f1;
 
@@ -73,11 +78,14 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 		logerror("Spritebank != 0/1\n");
 	}
 
-	while (source < finish)
+	while (source >= finish)
 	{
 		int pen = (source[0] & 0x3f00) >> 8;
 		int tileno = source[1] & 0xffff;
 		int pri = (source[0] & 0xc000) >> 14;
+
+		pri |= 0x8;
+
 		int x = source[2] & 0x3ff;
 		int y = source[3] & 0x3ff;
 		int flipy = source[0] & 0x0040;
@@ -127,8 +135,11 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 
 						if ((drawxpos >= cliprect.min_x) && (drawxpos <= cliprect.max_x))
 						{
-							if((priline[drawxpos] < pri))
-							{
+							int pridata = priline[drawxpos];
+
+
+							if (!(pridata & 0x10)) // if we haven't already drawn a sprite pixel here (sprite masking)
+							{				
 								pix = sprdata[(offset / 2)&sprmask];
 
 								if (offset & 1)
@@ -136,7 +147,13 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 								pix &= 0x0f;
 
 								if (pix)
-									destline[drawxpos] = (pix + (pen << 4));
+								{
+									if ((priline[drawxpos] < pri))
+										destline[drawxpos] = (pix + (pen << 4));
+
+									priline[drawxpos] |= 0x10;
+								}
+								
 							}
 						}
 
@@ -149,7 +166,7 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 				}
 			}
 		}
-		source += 4;
+		source -= 4;
 	}
 }
 
@@ -229,12 +246,12 @@ UINT32 mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind16 
 	#ifdef MAME_DEBUG
 			if (!machine().input().code_pressed(KEYCODE_Q))
 	#endif
-			mcatadv_draw_tilemap_part(screen, m_scroll1,  m_videoram1, i, m_tilemap1, bitmap, cliprect);
+			mcatadv_draw_tilemap_part(screen, m_scroll1,  m_videoram1, i|0x8, m_tilemap1, bitmap, cliprect);
 
 	#ifdef MAME_DEBUG
 			if (!machine().input().code_pressed(KEYCODE_W))
 	#endif
-				mcatadv_draw_tilemap_part(screen, m_scroll2, m_videoram2, i, m_tilemap2, bitmap, cliprect);
+				mcatadv_draw_tilemap_part(screen, m_scroll2, m_videoram2, i|0x8, m_tilemap2, bitmap, cliprect);
 	}
 
 	g_profiler.start(PROFILER_USER1);

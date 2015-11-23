@@ -94,5 +94,5 @@ void c64_kingsoft_cartridge_device::c64_cd_w(address_space &space, offs_t offset
 
 int c64_kingsoft_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 {
-	return m_exrom & !(ba & rw & ((offset >= 0x8000 && offset < 0xc000) || (offset >= 0xe000)));
+	return m_exrom & ((ba & rw & ((offset >= 0x8000 && offset < 0xc000) || (offset >= 0xe000))) ? 0 : 1);
 }

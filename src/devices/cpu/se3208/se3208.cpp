@@ -44,7 +44,7 @@ const device_type SE3208 = &device_creator<se3208_device>;
 
 se3208_device::se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SE3208, "SE3208", tag, owner, clock, "se3208", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0), m_PC(0), m_SR(0), m_SP(0), m_ER(0), m_PPC(0), m_program(nullptr), m_direct(nullptr), m_IRQ(0), m_NMI(0), m_icount(0)
 {
 }
 
@@ -550,7 +550,7 @@ INST(LEATOSP)
 	else
 		Offset=SEX(4,Offset);
 
-	m_SP=Index+Offset;
+	m_SP=(Index+Offset) & (~3);
 
 	CLRFLAG(FLAG_E);
 }
@@ -581,7 +581,7 @@ INST(LEASPTOSP)
 	else
 		Offset=SEX(10,Offset);
 
-	m_SP=m_SP+Offset;
+	m_SP=(m_SP+Offset) & (~3);
 
 	CLRFLAG(FLAG_E);
 }

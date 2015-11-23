@@ -110,7 +110,7 @@ device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconf
 						m_vrom(NULL),
 						m_ciram(NULL),
 						m_prg_size(0),
-						m_vrom_size(0),
+						m_vrom_size(0), m_maincpu(nullptr),
 						m_mapper_sram(NULL),
 						m_mapper_sram_size(0),
 						m_ce_mask(0),
@@ -746,7 +746,7 @@ nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const 
 						device_t(mconfig, NES_CART_SLOT, "NES Cartridge Slot", tag, owner, clock, "nes_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
-						m_crc_hack(0),
+						m_crc_hack(0), m_cart(nullptr),
 						m_pcb_id(NO_BOARD),
 						m_must_be_loaded(1)
 {

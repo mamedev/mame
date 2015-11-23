@@ -183,6 +183,10 @@ MC6845_UPDATE_ROW( isa8_cga_device::crtc_update_row )
 	if (m_update_row_type == -1)
 		return;
 
+	y = m_y;
+	if(m_y >= bitmap.height())
+		return;
+
 	switch (m_update_row_type)
 	{
 		case CGA_TEXT_INTEN:
@@ -253,6 +257,8 @@ static MACHINE_CONFIG_FRAGMENT( cga )
 	MCFG_MC6845_UPDATE_ROW_CB(isa8_cga_device, crtc_update_row)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(isa8_cga_device, hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_cga_device, vsync_changed))
+	MCFG_MC6845_RECONFIGURE_CB(isa8_cga_device, reconfigure)
+	MCFG_VIDEO_SET_SCREEN(NULL)
 MACHINE_CONFIG_END
 
 
@@ -301,10 +307,11 @@ const rom_entry *isa8_cga_device::device_rom_region() const
 isa8_cga_device::isa8_cga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_CGA, "IBM Color/Graphics Monitor Adapter", tag, owner, clock, "cga", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
-		m_cga_config(*this, "cga_config"),
-		m_update_row_type(-1),
-		m_vram_size( 0x4000 ),
-		m_palette(*this, "palette")
+		m_cga_config(*this, "cga_config"), m_framecnt(0), m_mode_control(0), m_color_select(0),
+		m_update_row_type(-1), m_y(0), m_chr_gen_base(nullptr), m_chr_gen(nullptr), m_vsync(0), m_hsync(0),
+		m_vram_size( 0x4000 ), m_plantronics(0),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen")
 {
 	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x1800;
 	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x1000;
@@ -316,10 +323,11 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, const char *tag,
 isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this),
-		m_cga_config(*this, "cga_config"),
-		m_update_row_type(-1),
-		m_vram_size( 0x4000 ),
-		m_palette(*this, "palette")
+		m_cga_config(*this, "cga_config"), m_framecnt(0), m_mode_control(0), m_color_select(0),
+		m_update_row_type(-1), m_y(0), m_chr_gen_base(nullptr), m_chr_gen(nullptr), m_vsync(0), m_hsync(0),
+		m_vram_size( 0x4000 ), m_plantronics(0),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen")
 {
 	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x1800;
 	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x1000;
@@ -345,6 +353,7 @@ void isa8_cga_device::device_start()
 
 	/* Initialise the cga palette */
 	int i;
+
 
 	for ( i = 0; i < CGA_PALETTE_SETS * 16; i++ )
 	{
@@ -376,6 +385,7 @@ void isa8_cga_device::device_start()
 	save_item(NAME(m_hsync));
 	save_item(NAME(m_vram));
 	save_item(NAME(m_plantronics));
+	save_item(NAME(m_y));
 }
 
 
@@ -390,6 +400,7 @@ void isa8_cga_device::device_reset()
 	m_vsync = 0;
 	m_hsync = 0;
 	m_color_select = 0;
+	m_y = 0;
 	memset(m_palette_lut_2bpp, 0, sizeof(m_palette_lut_2bpp));
 }
 
@@ -911,18 +922,33 @@ MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_1bpp_update_row )
 WRITE_LINE_MEMBER( isa8_cga_device::hsync_changed )
 {
 	m_hsync = state ? 1 : 0;
+	if(state && !m_vsync)
+	{
+		m_screen->update_now();
+		m_y++;
+	}
 }
 
 
 WRITE_LINE_MEMBER( isa8_cga_device::vsync_changed )
 {
-	m_vsync = state ? 9 : 0;
 	if ( state )
 	{
 		m_framecnt++;
 	}
+	else
+	{
+		m_screen->reset_origin();
+		m_y = 0;
+	}
+	m_vsync = state ? 9 : 0;
 }
 
+MC6845_RECONFIGURE( isa8_cga_device::reconfigure )
+{
+	rectangle curvisarea = m_screen->visible_area();
+	m_screen->set_visible_area(visarea.min_x, visarea.max_x, curvisarea.min_y, curvisarea.max_y);
+}
 
 void isa8_cga_device::set_palette_luts(void)
 {
@@ -1523,7 +1549,7 @@ const UINT8 isa8_cga_pc1512_device::mc6845_writeonce_register[31] =
 //-------------------------------------------------
 
 isa8_cga_pc1512_device::isa8_cga_pc1512_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_PC1512, "ISA8_CGA_PC1512", tag, owner, clock, "cga_pc1512", __FILE__)
+		isa8_cga_device( mconfig, ISA8_CGA_PC1512, "ISA8_CGA_PC1512", tag, owner, clock, "cga_pc1512", __FILE__), m_write(0), m_read(0), m_mc6845_address(0)
 {
 	m_vram_size = 0x10000;
 	m_chr_gen_offset[0] = 0x0000;
@@ -1652,7 +1678,7 @@ const device_type ISA8_WYSE700 = &device_creator<isa8_wyse700_device>;
 //-------------------------------------------------
 
 isa8_wyse700_device::isa8_wyse700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_cga_device( mconfig, ISA8_WYSE700, "Wyse 700", tag, owner, clock, "wyse700", __FILE__)
+		isa8_cga_device( mconfig, ISA8_WYSE700, "Wyse 700", tag, owner, clock, "wyse700", __FILE__), m_bank_offset(0), m_bank_base(0), m_control(0)
 {
 	m_vram_size = 0x20000;
 	m_start_offset = 0x18000;
@@ -1740,7 +1766,7 @@ const device_type ISA8_EC1841_0002 = &device_creator<isa8_ec1841_0002_device>;
 //-------------------------------------------------
 
 isa8_ec1841_0002_device::isa8_ec1841_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_cga_device( mconfig, ISA8_EC1841_0002, "EC 1841.0002 (CGA)", tag, owner, clock, "ec1841_0002", __FILE__)
+		isa8_cga_device( mconfig, ISA8_EC1841_0002, "EC 1841.0002 (CGA)", tag, owner, clock, "ec1841_0002", __FILE__), m_p3df(0)
 {
 }
 
@@ -1893,8 +1919,19 @@ const rom_entry *isa8_cga_mc1502_device::device_rom_region() const
 
 const device_type ISA8_CGA_M24 = &device_creator<isa8_cga_m24_device>;
 
+static MACHINE_CONFIG_DERIVED( m24, cga )
+	MCFG_DEVICE_MODIFY(CGA_SCREEN_NAME)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,462,0,400)
+	MCFG_DEVICE_MODIFY(CGA_MC6845_NAME)
+	MCFG_MC6845_RECONFIGURE_CB(isa8_cga_m24_device, reconfigure)
+MACHINE_CONFIG_END
+
+machine_config_constructor isa8_cga_m24_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( m24 );
+}
 isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_M24, "Olivetti M24 CGA", tag, owner, clock, "cga_m24", __FILE__)
+		isa8_cga_device( mconfig, ISA8_CGA_M24, "Olivetti M24 CGA", tag, owner, clock, "cga_m24", __FILE__), m_mode2(0), m_index(0)
 {
 	m_vram_size = 0x8000;
 }
@@ -1904,6 +1941,12 @@ void isa8_cga_m24_device::device_reset()
 	isa8_cga_device::device_reset();
 	m_mode2 = 0;
 	m_start_offset = 0;
+}
+
+MC6845_RECONFIGURE( isa8_cga_m24_device::reconfigure )
+{
+	// just reconfigure the screen, the apb sets it to 256 lines rather than 400
+	m_screen->configure(width, height, visarea, frame_period);
 }
 
 WRITE8_MEMBER( isa8_cga_m24_device::io_write )

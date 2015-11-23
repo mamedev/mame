@@ -539,8 +539,8 @@ const char *extra_info = NULL;
 
 bool read_hash_config(device_image_interface &image, const char *sysname, std::string &result)
 {
-	hash_file *hashfile = NULL;
-	const hash_info *info = NULL;
+	hash_file *hashfile;
+	const hash_info *info;
 
 	/* open the hash file */
 	hashfile = hashfile_open(image.device().mconfig().options(), sysname, FALSE, NULL);

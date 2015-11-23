@@ -28,7 +28,8 @@ const device_type C64_COMAL80 = &device_creator<c64_comal80_cartridge_device>;
 
 c64_comal80_cartridge_device::c64_comal80_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_COMAL80, "C64 COMAL 80 cartridge", tag, owner, clock, "c64_comal80", __FILE__),
-	device_c64_expansion_card_interface(mconfig, *this)
+	device_c64_expansion_card_interface(mconfig, *this),
+	m_bank(0)
 {
 }
 

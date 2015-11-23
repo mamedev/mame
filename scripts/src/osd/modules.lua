@@ -1,6 +1,14 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
+---------------------------------------------------------------------------
+--
+--   modules.lua
+--
+--   Rules for the building of modules
+--
+---------------------------------------------------------------------------
+
 function string.starts(String,Start)
    return string.sub(String,1,string.len(Start))==Start
 end
@@ -35,7 +43,14 @@ function osdmodulesbuild()
 
 	files {
 		MAME_DIR .. "src/osd/osdnet.cpp",
+		MAME_DIR .. "src/osd/osdnet.h",
+		MAME_DIR .. "src/osd/modules/debugger/debug_module.h",
+		MAME_DIR .. "src/osd/modules/font/font_module.h",
+		MAME_DIR .. "src/osd/modules/midi/midi_module.h",
+		MAME_DIR .. "src/osd/modules/netdev/netdev_module.h",
+		MAME_DIR .. "src/osd/modules/sound/sound_module.h",
 		MAME_DIR .. "src/osd/modules/lib/osdobj_common.cpp",
+		MAME_DIR .. "src/osd/modules/lib/osdobj_common.h",
 		MAME_DIR .. "src/osd/modules/debugger/none.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/debugint.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/debugwin.cpp",
@@ -71,6 +86,10 @@ function osdmodulesbuild()
 			MAME_DIR .. "src/osd/modules/render/drawogl.cpp",
 			MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.cpp",
 			MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.cpp",
+			MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.h",
+			MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.h",
+			MAME_DIR .. "src/osd/modules/opengl/osd_opengl.h",
+			MAME_DIR .. "src/osd/modules/opengl/SDL1211_opengl.h",
 		}
 		defines {
 			"USE_OPENGL=1",
@@ -104,14 +123,23 @@ function osdmodulesbuild()
 	if _OPTIONS["USE_QTDEBUG"]=="1" then
 		files {
 			MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.cpp",
+			MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.h",
 			MAME_DIR .. "src/osd/modules/debugger/qt/windowqt.cpp",
+			MAME_DIR .. "src/osd/modules/debugger/qt/windowqt.h",
 			MAME_DIR .. "src/osd/modules/debugger/qt/logwindow.cpp",
+			MAME_DIR .. "src/osd/modules/debugger/qt/logwindow.h",
 			MAME_DIR .. "src/osd/modules/debugger/qt/dasmwindow.cpp",
+			MAME_DIR .. "src/osd/modules/debugger/qt/dasmwindow.h",
 			MAME_DIR .. "src/osd/modules/debugger/qt/mainwindow.cpp",
+			MAME_DIR .. "src/osd/modules/debugger/qt/mainwindow.h",
 			MAME_DIR .. "src/osd/modules/debugger/qt/memorywindow.cpp",
+			MAME_DIR .. "src/osd/modules/debugger/qt/memorywindow.h",
 			MAME_DIR .. "src/osd/modules/debugger/qt/breakpointswindow.cpp",
+			MAME_DIR .. "src/osd/modules/debugger/qt/breakpointswindow.h",
 			MAME_DIR .. "src/osd/modules/debugger/qt/deviceswindow.cpp",
 			MAME_DIR .. "src/osd/modules/debugger/qt/deviceinformationwindow.cpp",
+			MAME_DIR .. "src/osd/modules/debugger/qt/deviceinformationwindow.h",
+			MAME_DIR .. "src/osd/modules/debugger/qt/deviceswindow.h",
 			GEN_DIR .. "osd/modules/debugger/qt/debuggerview.moc.cpp",
 			GEN_DIR .. "osd/modules/debugger/qt/windowqt.moc.cpp",
 			GEN_DIR .. "osd/modules/debugger/qt/logwindow.moc.cpp",
@@ -328,7 +356,7 @@ newoption {
 }
 
 if not _OPTIONS["NO_USE_MIDI"] then
-	if _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="openbsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="solaris" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"] == "emscripten" or _OPTIONS["targetos"] == "os2" then
+	if _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="openbsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="solaris" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"] == "asmjs" or _OPTIONS["targetos"] == "os2" then
 		_OPTIONS["NO_USE_MIDI"] = "1"
 	else
 		_OPTIONS["NO_USE_MIDI"] = "0"
@@ -351,7 +379,7 @@ newoption {
 
 
 if not _OPTIONS["USE_QTDEBUG"] then
-	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="solaris" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"] == "emscripten" or _OPTIONS["targetos"] == "os2" then
+	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="solaris" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"] == "asmjs" or _OPTIONS["targetos"] == "os2" then
 		_OPTIONS["USE_QTDEBUG"] = "0"
 	else
 		_OPTIONS["USE_QTDEBUG"] = "1"

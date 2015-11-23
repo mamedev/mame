@@ -12,6 +12,7 @@
 
     TODO:
 
+    - interlace, use CRS to output odd/even fields
     - remote controller input
     - boxing
 
@@ -535,7 +536,7 @@ WRITE_LINE_MEMBER( saa5050_device::lose_w )
 		m_ra++;
 		m_ra %= 20;
 
-		if (m_ra == 19)
+		if (!m_ra)
 		{
 			if (m_double_height_bottom_row)
 				m_double_height_bottom_row = false;

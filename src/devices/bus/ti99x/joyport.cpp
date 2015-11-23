@@ -42,7 +42,7 @@
 joyport_device::joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:   device_t(mconfig, JOYPORT, "Joystick port", tag, owner, clock, "ti99_joyport", __FILE__),
 		device_slot_interface(mconfig, *this),
-		m_interrupt(*this)
+		m_interrupt(*this), m_connected(nullptr)
 {
 }
 

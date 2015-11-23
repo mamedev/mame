@@ -14,8 +14,6 @@
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "zippath.h"
-#include "ui/filesel.h"
-#include "ui/swlist.h"
 #include "ui/imgcntrl.h"
 #include "softlist.h"
 #include "image.h"
@@ -57,12 +55,18 @@ const image_device_type_info device_image_interface::m_device_info_array[] =
 
 device_image_interface::device_image_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "image"),
+		m_err(),
 		m_file(NULL),
 		m_mame_file(NULL),
 		m_software_info_ptr(NULL),
-		m_software_part_ptr(NULL),
+		m_software_part_ptr(NULL), 
+	    m_supported(0),
 		m_readonly(false),
-		m_created(false),
+		m_created(false), 
+	    m_init_phase(false), 
+	    m_from_swlist(false), 
+	    m_create_format(0), 
+	    m_create_args(NULL),
 		m_is_loading(FALSE)
 {
 }
@@ -575,8 +579,8 @@ bool device_image_interface::is_loaded()
 
 image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, const char *path)
 {
-	file_error filerr = FILERR_NOT_FOUND;
-	image_error_t err = IMAGE_ERROR_FILENOTFOUND;
+	file_error filerr;
+	image_error_t err;
 	std::string revised_path;
 
 	/* attempt to read the file */
@@ -629,8 +633,8 @@ int device_image_interface::reopen_for_write(const char *path)
 	if(m_file)
 		core_fclose(m_file);
 
-	file_error filerr = FILERR_NOT_FOUND;
-	image_error_t err = IMAGE_ERROR_FILENOTFOUND;
+	file_error filerr;
+	image_error_t err;
 	std::string revised_path;
 
 	/* attempt to open the file for writing*/

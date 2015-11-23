@@ -54,7 +54,7 @@ class attached_device
 
 public:
 	attached_device(device_t *busdevice, const dmux_device_list_entry &entry)
-	:   m_device(busdevice), m_config(&entry) { };
+	: m_next(nullptr), m_device(busdevice), m_config(&entry) { };
 
 private:
 	attached_device                 *m_next;

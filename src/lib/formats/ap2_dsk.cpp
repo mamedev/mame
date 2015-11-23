@@ -249,7 +249,7 @@ static FLOPPY_IDENTIFY(apple2_nib_identify)
 {
 	UINT64 size;
 	size = floppy_image_size(floppy);
-	*vote = (size == APPLE2_TRACK_COUNT * APPLE2_SECTOR_COUNT * APPLE2_NIBBLE_SIZE) ? 100 : 0;
+	*vote = ((size == APPLE2_TRACK_COUNT * APPLE2_SECTOR_COUNT * APPLE2_NIBBLE_SIZE) || (size == (APPLE2_TRACK_COUNT + 1) * APPLE2_SECTOR_COUNT * APPLE2_NIBBLE_SIZE)) ? 100 : 0;
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -264,7 +264,7 @@ static FLOPPY_CONSTRUCT(apple2_nib_construct)
 
 static floperr_t apple2_nib_read_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
-	if ((head != 0) || (track < 0) || (track >= APPLE2_TRACK_COUNT))
+	if ((head != 0) || (track < 0) || (track > APPLE2_TRACK_COUNT))
 		return FLOPPY_ERROR_SEEKERROR;
 	if (offset != 0)
 		return FLOPPY_ERROR_UNSUPPORTED;
@@ -276,7 +276,7 @@ static floperr_t apple2_nib_read_track(floppy_image_legacy *floppy, int head, in
 
 static floperr_t apple2_nib_write_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
 {
-	if ((head != 0) || (track < 0) || (track >= APPLE2_TRACK_COUNT))
+	if ((head != 0) || (track < 0) || (track > APPLE2_TRACK_COUNT))
 		return FLOPPY_ERROR_SEEKERROR;
 	if (offset != 0)
 		return FLOPPY_ERROR_UNSUPPORTED;

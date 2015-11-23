@@ -217,7 +217,7 @@ void timer_device::device_reset()
 		case TIMER_TYPE_PERIODIC:
 		{
 			// convert the period into attotime
-			attotime period = attotime::never;
+			attotime period;
 			if (m_period > attotime::zero)
 			{
 				period = m_period;

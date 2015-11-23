@@ -532,6 +532,11 @@ else
 	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.cpp")
 end
 configuration { "gmake" }
+if _OPTIONS["CPP11"]~="1" then
+	defines {
+		"nullptr=NULL" -- getting ready for C++11
+	}
+end
 	flags {
 		"SingleOutputDir",
 	}
@@ -618,6 +623,7 @@ if _OPTIONS["BIGENDIAN"]=="1" then
 		}
 		buildoptions {
 			"-Wno-unused-label",
+			"-flax-vector-conversions",
 		}
 		if _OPTIONS["SYMBOLS"] then
 			buildoptions {
@@ -1254,9 +1260,12 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd1478", 			-- warning #1478: function "xxx" (declared at line yyy of "zzz") was declared deprecated
 			"/Qwd1879", 			-- warning #1879: unimplemented pragma ignored
 			"/Qwd3291", 			-- warning #3291: invalid narrowing conversion from "double" to "int"
-			"/Qwd1195",
-			"/Qwd1786",
-			"/Qwd592", -- For lua, false positive?
+			"/Qwd1195", 			-- error #1195: conversion from integer to smaller pointer
+			"/Qwd47",				-- error #47: incompatible redefinition of macro "xxx"
+			"/Qwd265",				-- error #265: floating-point operation result is out of range
+			-- these occur on a release build, while we can increase the size limits instead some of the files do require extreme amounts
+			"/Qwd11074",			-- remark #11074: Inlining inhibited by limit max-size  / remark #11074: Inlining inhibited by limit max-total-size
+			"/Qwd11075",			-- remark #11075: To get full report use -Qopt-report:4 -Qopt-report-phase ipo
 		}
 end
 

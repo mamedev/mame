@@ -174,7 +174,7 @@ private:
 				memcpy(m_bytes2, (UINT8 const *)data + m_locked1, bytes - m_locked1);
 			}
 
-			result = unlock();
+			unlock();
 			return DS_OK;
 		}
 		HRESULT clear()
@@ -189,7 +189,7 @@ private:
 			assert(0U == m_locked2);
 			memset(m_bytes1, 0, m_locked1);
 
-			result = unlock();
+			unlock();
 			return DS_OK;
 		}
 

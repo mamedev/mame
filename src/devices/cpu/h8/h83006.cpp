@@ -28,7 +28,7 @@ h83006_device::h83006_device(const machine_config &mconfig, device_type type, co
 	timer16_2(*this, "timer16:2"),
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
-	sci2(*this, "sci2")
+	sci2(*this, "sci2"), syscr(0), ram_start(0)
 {
 }
 
@@ -53,7 +53,7 @@ h83006_device::h83006_device(const machine_config &mconfig, const char *tag, dev
 	timer16_2(*this, "timer16:2"),
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
-	sci2(*this, "sci2")
+	sci2(*this, "sci2"), syscr(0)
 {
 	ram_start = 0xfff720;
 }

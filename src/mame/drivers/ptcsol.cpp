@@ -654,7 +654,7 @@ UINT32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				chr = m_p_videoram[x & 0x3ff];
 
 				// cursor
-				if (BIT(chr, 7) & cursor_inv)
+				if (BIT(chr, 7) && cursor_inv)
 					inv ^= 0xff;
 
 				chr &= 0x7f;

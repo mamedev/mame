@@ -156,7 +156,7 @@ UINT8 aussiebyte_state::crt8002(UINT8 ac_ra, UINT8 ac_chr, UINT8 ac_attr, UINT16
 		gfx = 0;
 	if BIT(ac_attr, 5) // blank
 		gfx = 0;
-	if (ac_curs & BIT(ac_cnt, 14)) // cursor
+	if (ac_curs && BIT(ac_cnt, 14)) // cursor
 		gfx ^= 0xff;
 	if BIT(ac_attr, 4) // reverse video
 		gfx ^= 0xff;

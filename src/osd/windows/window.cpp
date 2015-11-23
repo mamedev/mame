@@ -23,7 +23,6 @@
 
 // MAME headers
 #include "emu.h"
-#include "emuopts.h"
 #include "uiinput.h"
 
 // MAMEOS headers
@@ -31,8 +30,6 @@
 #include "window.h"
 #include "video.h"
 #include "input.h"
-#include "strconv.h"
-#include "config.h"
 #include "winutf8.h"
 
 #include "winutil.h"
@@ -617,7 +614,7 @@ void winwindow_update_cursor_state(running_machine &machine)
 		RECT bounds;
 
 		// hide cursor
-		while (ShowCursor(FALSE) >= -1) ;
+		while (ShowCursor(FALSE) >= -1) { };
 		ShowCursor(TRUE);
 
 		// store the cursor position
@@ -632,7 +629,7 @@ void winwindow_update_cursor_state(running_machine &machine)
 	else
 	{
 		// show cursor
-		while (ShowCursor(TRUE) < 1) ;
+		while (ShowCursor(TRUE) < 1) { };
 		ShowCursor(FALSE);
 
 		// allow cursor to move freely
@@ -967,7 +964,7 @@ void winwindow_ui_pause_from_main_thread(running_machine &machine, int pause)
 	}
 
 	if (LOG_TEMP_PAUSE)
-		machine.logerror("winwindow_ui_pause_from_main_thread(): %d --> %d\n", old_temp_pause, ui_temp_pause);
+		osd_printf_verbose("winwindow_ui_pause_from_main_thread(): %d --> %d\n", old_temp_pause, ui_temp_pause);
 }
 
 
@@ -1858,7 +1855,7 @@ void win_window_info::adjust_window_position_after_major_change()
 	{
 		win_physical_width = newrect.width();
 		win_physical_height = newrect.height();
-		machine().logerror("Physical width %d, height %d\n",win_physical_width,win_physical_height);
+		osd_printf_verbose("Physical width %d, height %d\n",win_physical_width,win_physical_height);
 	}
 }
 

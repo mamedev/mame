@@ -86,7 +86,7 @@ void config_register(running_machine &machine, const char *nodename, config_save
 	newtype->save = save;
 
 	/* add us to the end */
-	for (ptype = &typelist; *ptype; ptype = &(*ptype)->next) ;
+	for (ptype = &typelist; *ptype; ptype = &(*ptype)->next) { }
 	*ptype = newtype;
 }
 

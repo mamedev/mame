@@ -6,10 +6,10 @@
  *
  */
 
-	#include "doubler.h"
-	#include "includes/amstrad.h"
+#include "doubler.h"
+#include "includes/amstrad.h"
 
-	//**************************************************************************
+//**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
@@ -38,7 +38,7 @@ machine_config_constructor cpc_doubler_device::device_mconfig_additions() const
 
 cpc_doubler_device::cpc_doubler_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CPC_DOUBLER, "Draysoft Doubler", tag, owner, clock, "cpc_doubler", __FILE__),
-	device_cpc_expansion_card_interface(mconfig, *this),
+	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_tape(*this,"doubler_tape")
 {
 }

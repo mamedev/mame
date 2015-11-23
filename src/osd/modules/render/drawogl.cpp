@@ -19,7 +19,6 @@
 // MAME headers
 #include "osdcomm.h"
 #include "emu.h"
-#include "options.h"
 #include "emuopts.h"
 
 #ifndef OSD_WINDOWS

@@ -601,10 +601,10 @@ static void init_chip_tables(YM2151 *chip)
 
 	for (i=0; i<768; i++)
 	{
+#if 0
 		/* 3.4375 Hz is note A; C# is 4 semitones higher */
 		Hz = 1000;
-#if 0
-/* Hz is close, but not perfect */
+		/* Hz is close, but not perfect */
 		//Hz = scaler * 3.4375 * pow (2, (i + 4 * 64 ) / 768.0 );
 		/* calculate phase increment */
 		phaseinc = (Hz*SIN_LEN) / (double)chip->sampfreq;
@@ -687,7 +687,9 @@ static void init_chip_tables(YM2151 *chip)
 
 	/* calculate timers' deltas */
 	/* User's Manual pages 15,16  */
-	mult = (1<<TIMER_SH);
+	#ifndef USE_MAME_TIMERS
+		mult = (1<<TIMER_SH);
+	#endif
 	for (i=0; i<1024; i++)
 	{
 		/* ASG 980324: changed to compute both tim_A_tab and timer_A_time */

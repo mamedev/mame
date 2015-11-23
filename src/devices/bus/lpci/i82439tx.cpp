@@ -20,7 +20,9 @@ i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag,
 	: northbridge_device(mconfig, I82439TX, "Intel 82439TX", tag, owner, clock, "i82439tx", __FILE__),
 	pci_device_interface( mconfig, *this ),
 	m_cpu_tag( NULL ),
-	m_region_tag( NULL )
+	m_region_tag( NULL ), 
+	m_space(nullptr), 
+	m_rom(nullptr)
 {
 }
 

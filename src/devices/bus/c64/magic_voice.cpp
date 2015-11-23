@@ -266,7 +266,7 @@ c64_magic_voice_cartridge_device::c64_magic_voice_cartridge_device(const machine
 	m_vslsi(*this, T6721A_TAG),
 	m_tpi(*this, MOS6525_TAG),
 	m_fifo(*this, CMOS40105_TAG),
-	m_exp(*this, C64_EXPANSION_SLOT_TAG),
+	m_exp(*this, C64_EXPANSION_SLOT_TAG), m_ca(0),
 	m_tpi_pb(0x60),
 	m_tpi_pc6(1),
 	m_pd(0)

@@ -63,18 +63,18 @@ nes_ks7058_device::nes_ks7058_device(const machine_config &mconfig, const char *
 }
 
 nes_ks7022_device::nes_ks7022_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_KS7022, "NES Cart Kaiser KS-7022 PCB", tag, owner, clock, "nes_ks7022", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_KS7022, "NES Cart Kaiser KS-7022 PCB", tag, owner, clock, "nes_ks7022", __FILE__), m_latch(0)
+				{
 }
 
 nes_ks7032_device::nes_ks7032_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
-{
+					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_latch(0), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+				{
 }
 
 nes_ks7032_device::nes_ks7032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_KS7032, "NES Cart Kaiser KS-7032 PCB", tag, owner, clock, "nes_ks7032", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_KS7032, "NES Cart Kaiser KS-7032 PCB", tag, owner, clock, "nes_ks7032", __FILE__), m_latch(0), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+				{
 }
 
 nes_ks202_device::nes_ks202_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -83,8 +83,8 @@ nes_ks202_device::nes_ks202_device(const machine_config &mconfig, const char *ta
 }
 
 nes_ks7017_device::nes_ks7017_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_KS7017, "NES Cart Kaiser KS-7017 PCB", tag, owner, clock, "nes_ks7017", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_KS7017, "NES Cart Kaiser KS-7017 PCB", tag, owner, clock, "nes_ks7017", __FILE__), m_latch(0), m_irq_count(0), m_irq_status(0), m_irq_enable(0), irq_timer(nullptr)
+				{
 }
 
 nes_ks7012_device::nes_ks7012_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

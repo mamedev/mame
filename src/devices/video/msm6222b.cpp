@@ -22,12 +22,12 @@ ROM_START( msm6222b_01 )
 ROM_END
 
 msm6222b_device::msm6222b_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source), cursor_direction(false), cursor_blinking(false), two_line(false), shift_on_write(false), double_height(false), cursor_on(false), display_on(false), adc(0), shift(0), cgrom(nullptr)
 {
 }
 
 msm6222b_device::msm6222b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, MSM6222B, "msm6222b-xx", tag, owner, clock, "msm6222b", __FILE__)
+	device_t(mconfig, MSM6222B, "msm6222b-xx", tag, owner, clock, "msm6222b", __FILE__), cursor_direction(false), cursor_blinking(false), two_line(false), shift_on_write(false), double_height(false), cursor_on(false), display_on(false), adc(0), shift(0), cgrom(nullptr)
 {
 }
 

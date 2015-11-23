@@ -10,9 +10,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "drivenum.h"
-#include "png.h"
 #include "chd.h"
-#include "config.h"
 #include "softlist.h"
 #include "ui/ui.h"
 

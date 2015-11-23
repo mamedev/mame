@@ -29,8 +29,8 @@ public:
 
 		bool is_open(void) const;
 
-		ssize_t read(UINT8 *rx_chars , size_t count);
-		void write(UINT8 tx_char);
+		ssize_t read(UINT8 *rx_chars , size_t count) const;
+		void write(UINT8 tx_char) const;
 
 		bool is_slave_connected(void) const;
 

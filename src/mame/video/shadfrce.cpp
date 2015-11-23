@@ -101,7 +101,7 @@ WRITE16_MEMBER(shadfrce_state::bg1scrolly_w)
 
 
 
-void shadfrce_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offset )
+void shadfrce_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/* | ---- ---- hhhf Fe-Y | ---- ---- yyyy yyyy | ---- ---- TTTT TTTT | ---- ---- tttt tttt |
 	   | ---- ---- -pCc cccX | ---- ---- xxxx xxxx | ---- ---- ---- ---- | ---- ---- ---- ---- | */
@@ -121,42 +121,29 @@ void shadfrce_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	UINT16 *finish = m_spvideoram_old;
 	UINT16 *source = finish + 0x2000/2 - 8;
 	int hcount;
-	while (source >= finish)
+	while( source>=finish )
 	{
+		int ypos = 0x100 - (((source[0] & 0x0003) << 8) | (source[1] & 0x00ff));
+		int xpos = (((source[4] & 0x0001) << 8) | (source[5] & 0x00ff)) + 1;
+		int tile = ((source[2] & 0x00ff) << 8) | (source[3] & 0x00ff);
+		int height = (source[0] & 0x00e0) >> 5;
 		int enable = ((source[0] & 0x0004));
+		int flipx = ((source[0] & 0x0010) >> 4);
+		int flipy = ((source[0] & 0x0008) >> 3);
+		int pal = ((source[4] & 0x003e));
+		int pri_mask = (source[4] & 0x0040) ? 0x02 : 0x00;
 
-		if (enable)
-		{
-			int ypos = 0x100 - (((source[0] & 0x0003) << 8) | (source[1] & 0x00ff));
-			int height = ((source[0] & 0x00e0) >> 5) ;
-			height += 1;
+		if (pal & 0x20) pal ^= 0x60;    /* skip hole */
 
-			int bottom = ypos + y_offset;
-			int top = bottom - height * 16;
-
-			if (top > cliprect.max_y || bottom <= cliprect.min_y)
-			{
-				source -= 8;
-				continue;
-			}
-
-			int xpos = (((source[4] & 0x0001) << 8) | (source[5] & 0x00ff)) + 1;
-			int tile = ((source[2] & 0x00ff) << 8) | (source[3] & 0x00ff);
-			int flipx = ((source[0] & 0x0010) >> 4);
-			int flipy = ((source[0] & 0x0008) >> 3);
-			int pal = ((source[4] & 0x003e));
-			int pri_mask = (source[4] & 0x0040) ? 0x02 : 0x00;
-
-			if (pal & 0x20) pal ^= 0x60;    /* skip hole */
-
-
-			for (hcount = 0; hcount < height; hcount++) {
-				gfx->prio_transpen(bitmap, cliprect, tile + hcount, pal, flipx, flipy, xpos, bottom-16, screen.priority(), pri_mask, 0);
-				gfx->prio_transpen(bitmap, cliprect, tile + hcount, pal, flipx, flipy, xpos - 0x200, bottom-16, screen.priority(), pri_mask, 0); // x wraparound
-				bottom -= 16;
+		height++;
+		if (enable) {
+			for (hcount=0;hcount<height;hcount++) {
+				gfx->prio_transpen(bitmap,cliprect,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16,screen.priority(),pri_mask,0);
+				gfx->prio_transpen(bitmap,cliprect,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16,screen.priority(),pri_mask,0);
+				gfx->prio_transpen(bitmap,cliprect,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16+0x200,screen.priority(),pri_mask,0);
+				gfx->prio_transpen(bitmap,cliprect,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16+0x200,screen.priority(),pri_mask,0);
 			}
 		}
-
 		source-=8;
 	}
 }
@@ -169,8 +156,7 @@ UINT32 shadfrce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	{
 		m_bg1tilemap->draw(screen, bitmap, cliprect, 0,0);
 		m_bg0tilemap->draw(screen, bitmap, cliprect, 0,1);
-		draw_sprites(screen,bitmap,cliprect, 0);
-		draw_sprites(screen,bitmap,cliprect, 0x200); // y-wrap
+		draw_sprites(screen,bitmap,cliprect);
 		m_fgtilemap->draw(screen, bitmap, cliprect, 0,0);
 	}
 	else

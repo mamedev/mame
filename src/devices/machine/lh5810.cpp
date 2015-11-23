@@ -34,7 +34,7 @@ lh5810_device::lh5810_device(const machine_config &mconfig, const char *tag, dev
 	m_portb_r_cb(*this),
 	m_portb_w_cb(*this),
 	m_portc_w_cb(*this),
-	m_out_int_cb(*this)
+	m_out_int_cb(*this), m_irq(0)
 {
 }
 

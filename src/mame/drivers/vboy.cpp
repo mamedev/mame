@@ -627,7 +627,7 @@ READ32_MEMBER( vboy_state::io_r )
 //              attotime new_time = machine().time();
 
 //              if((new_time - m_input_latch_time) < m_maincpu->cycles_to_attotime(640))
-					value |= machine().rand() & 2;
+//                  value |= machine().rand() & 2;
 
 				value = m_vboy_regs.kcr | 0x4c;
 			}

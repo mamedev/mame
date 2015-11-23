@@ -12,7 +12,8 @@ const device_type H8_ADC_2655 = &device_creator<h8_adc_2655_device>;
 
 h8_adc_device::h8_adc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	cpu(*this, DEVICE_SELF_OWNER)
+	cpu(*this, DEVICE_SELF_OWNER), intc(nullptr), io(nullptr), intc_tag(nullptr), intc_vector(0), adcsr(0), adcr(0), register_mask(0), trigger(0), start_mode(0), start_channel(0), 
+	end_channel(0), start_count(0), mode(0), channel(0), count(0), analog_powered(false), adtrg(false), next_event(0)
 {
 	suspend_on_interrupt = false;
 	analog_power_control = false;

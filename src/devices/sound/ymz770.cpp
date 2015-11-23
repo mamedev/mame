@@ -32,13 +32,13 @@ const device_type YMZ770 = &device_creator<ymz770_device>;
 
 ymz770_device::ymz770_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YMZ770, "Yamaha YMZ770", tag, owner, clock, "ymz770", __FILE__),
-		device_sound_interface(mconfig, *this),
+		device_sound_interface(mconfig, *this), m_stream(nullptr),
 		m_cur_reg(0),
 		m_mute(0),
 		m_doen(0),
 		m_vlma(0),
 		m_bsl(0),
-		m_cpl(0)
+		m_cpl(0), m_rom_base(nullptr), m_rom_limit(0)
 {
 }
 

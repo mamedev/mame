@@ -91,7 +91,7 @@
 
 # QT_HOME = /usr/lib64/qt48/
 
-# SOURCES = src/mame/drivers/asteroid.c,src/mame/audio/llander.c
+# SOURCES = src/mame/drivers/asteroid.cpp,src/mame/audio/llander.cpp
 
 # FORCE_VERSION_COMPILE = 1
 
@@ -325,6 +325,10 @@ OSD := sdl
 endif
 
 ifeq ($(TARGETOS),os2)
+OSD := sdl
+endif
+
+ifeq ($(TARGETOS),asmjs)
 OSD := sdl
 endif
 endif
@@ -674,6 +678,11 @@ SCRIPTS = scripts/genie.lua \
 	$(wildcard src/osd/$(OSD)/$(OSD).mak) \
 	$(wildcard src/$(TARGET)/$(SUBTARGET).mak)
 
+ifeq ($(SUBTARGET),mame)
+SCRIPTS += scripts/target/$(TARGET)/arcade.lua
+SCRIPTS += scripts/target/$(TARGET)/mess.lua
+endif
+
 ifndef SOURCES
 SCRIPTS += scripts/target/$(TARGET)/$(SUBTARGET).lua
 endif
@@ -840,6 +849,18 @@ vs2013_winrt: generate
 
 vs2015: generate
 	$(SILENT) $(GENIE) $(PARAMS) vs2015
+
+vs2015_intel: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=intel-15 vs2015
+
+vs2015_xp: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2013-xp vs2015
+
+vs2015_clang: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2013-clang vs2015
+
+vs2015_winrt: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=winstore81 vs2015
 
 android-arm: generate
 ifndef ANDROID_NDK_ARM
@@ -1173,7 +1194,7 @@ endif
 
 doxygen:
 	@echo Generate Doxygen documentation
-	doxygen mame.doxygen
+	doxygen doxygen/doxygen.config
 
 #-------------------------------------------------
 # CppCheck analysis

@@ -45,7 +45,7 @@ device_comx_expansion_card_interface::device_comx_expansion_card_interface(const
 comx_expansion_slot_device::comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COMX_EXPANSION_SLOT, "COMX-35 expansion slot", tag, owner, clock, "comx_expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
-	m_write_irq(*this)
+	m_write_irq(*this), m_card(nullptr)
 {
 }
 

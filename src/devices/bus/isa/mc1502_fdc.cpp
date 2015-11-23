@@ -192,7 +192,7 @@ WRITE8_MEMBER( mc1502_fdc_device::mc1502_fdc_w )
 mc1502_fdc_device::mc1502_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MC1502_FDC, "MC-1502 floppy", tag, owner, clock, "mc1502_fdc", __FILE__),
 	device_isa8_card_interface( mconfig, *this ),
-	m_fdc(*this, "fdc")
+	m_fdc(*this, "fdc"), motor_on(0), motor_timer(nullptr)
 {
 }
 

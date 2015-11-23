@@ -45,8 +45,8 @@
 datach_cart_interface::datach_cart_interface(const machine_config &mconfig, device_t &device)
 					: device_slot_card_interface(mconfig, device),
 						m_i2cmem(*this, "i2cmem"),
-						m_rom(NULL)
-{
+						m_rom(nullptr), m_bank(0)
+				{
 }
 
 datach_cart_interface::~datach_cart_interface()
@@ -70,7 +70,7 @@ const device_type NES_DATACH_SLOT = &device_creator<nes_datach_slot_device>;
 nes_datach_slot_device::nes_datach_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, NES_DATACH_SLOT, "NES Datach Cartridge Slot", tag, owner, clock, "nes_datach_slot", __FILE__),
 						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this)
+						device_slot_interface(mconfig, *this), m_cart(nullptr)
 {
 }
 
@@ -228,11 +228,11 @@ const device_type NES_DATACH = &device_creator<nes_datach_device>;
 
 
 nes_datach_device::nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_lz93d50_device(mconfig, NES_DATACH, "NES Cart Bandai Datach PCB", tag, owner, clock, "nes_datach", __FILE__),
+					: nes_lz93d50_device(mconfig, NES_DATACH, "NES Cart Bandai Datach PCB", tag, owner, clock, "nes_datach", __FILE__), m_datach_latch(0),
 						m_i2cmem(*this, "i2cmem"),
 						m_reader(*this, "datach"),
-						m_subslot(*this, "datach_slot")
-{
+						m_subslot(*this, "datach_slot"), m_i2c_dir(0), m_i2c_in_use(0), serial_timer(nullptr)
+				{
 }
 
 

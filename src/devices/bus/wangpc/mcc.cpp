@@ -106,7 +106,7 @@ wangpc_mcc_device::wangpc_mcc_device(const machine_config &mconfig, const char *
 	device_t(mconfig, WANGPC_MCC, "Wang PC-PM043", tag, owner, clock, "wangpc_mcc", __FILE__),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_sio(*this, Z80SIO2_TAG),
-	m_dart(*this, Z80DART_TAG)
+	m_dart(*this, Z80DART_TAG), m_option(0), m_irq(0)
 {
 }
 

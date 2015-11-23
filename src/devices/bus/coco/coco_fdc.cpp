@@ -179,22 +179,22 @@ const device_type COCO_FDC = &device_creator<coco_fdc_device>;
 //-------------------------------------------------
 coco_fdc_device::coco_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_cococart_interface( mconfig, *this ),
+		device_cococart_interface( mconfig, *this ), m_owner(nullptr), m_dskreg(0), m_drq(0), m_intrq(0),
 		m_wd17xx(*this, WD_TAG),
 		m_wd2797(*this, WD2797_TAG),
 		m_ds1315(*this, CLOUD9_TAG),
-		m_disto_msm6242(*this, DISTO_TAG)
+		m_disto_msm6242(*this, DISTO_TAG), m_msm6242_rtc_address(0)
 {
 }
 
 coco_fdc_device::coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, COCO_FDC, "CoCo FDC", tag, owner, clock, "coco_fdc", __FILE__),
-		device_cococart_interface( mconfig, *this ),
+		device_cococart_interface( mconfig, *this ), m_owner(nullptr), m_dskreg(0), m_drq(0), m_intrq(0),
 		m_wd17xx(*this, WD_TAG),
 		m_wd2797(*this, WD2797_TAG),
 		m_ds1315(*this, CLOUD9_TAG),
-		m_disto_msm6242(*this, DISTO_TAG)
-{
+		m_disto_msm6242(*this, DISTO_TAG), m_msm6242_rtc_address(0)
+	{
 }
 
 //-------------------------------------------------

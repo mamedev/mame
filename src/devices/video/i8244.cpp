@@ -746,7 +746,6 @@ void i8244_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 	{
 		for( ii = 0; ii < samples; ii++, buffer++ )
 		{
-			*buffer = 0;
 			*buffer = signal & 0x1;
 			period = (m_vdc.s.sound & 0x20) ? 1 : 4;
 			if( ++m_sh_count >= period )

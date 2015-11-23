@@ -176,7 +176,7 @@ void io_generic_write(struct io_generic *generic, const void *buffer, UINT64 off
 
 	if (filler_size)
 	{
-		memset(filler_buffer, generic->filler, sizeof(buffer));
+		memset(filler_buffer, generic->filler, sizeof(filler_buffer));
 		do
 		{
 			bytes_to_write = (filler_size > sizeof(filler_buffer)) ? sizeof(filler_buffer) : (size_t) filler_size;

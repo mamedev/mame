@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "ui/ui.h"
-#include "ui/menu.h"
 #include "uiinput.h"
 #include "render.h"
 #include "rendfont.h"
@@ -193,7 +192,7 @@ static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 				i < tempcount && state.gfxset.devcount < MAX_GFX_DECODERS;
 				i++, interface = gfx_iter.next())
 		{
-			for (count = 0; count < MAX_GFX_ELEMENTS && interface->gfx(count) != NULL; count++);
+			for (count = 0; count < MAX_GFX_ELEMENTS && interface->gfx(count) != NULL; count++) { }
 
 			// count = index of first NULL
 			if (count > 0)
@@ -1007,8 +1006,8 @@ static void tilemap_handler(running_machine &machine, render_container *containe
 	pixelscale = state.tilemap.zoom;
 	if (pixelscale == 0)
 	{
-		for (maxxscale = 1; mapwidth * (maxxscale + 1) < mapboxwidth; maxxscale++) ;
-		for (maxyscale = 1; mapheight * (maxyscale + 1) < mapboxheight; maxyscale++) ;
+		for (maxxscale = 1; mapwidth * (maxxscale + 1) < mapboxwidth; maxxscale++) { }
+		for (maxyscale = 1; mapheight * (maxyscale + 1) < mapboxheight; maxyscale++) { }
 		pixelscale = MIN(maxxscale, maxyscale);
 	}
 

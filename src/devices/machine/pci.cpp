@@ -2,13 +2,6 @@
 // copyright-holders:Olivier Galibert
 #include "pci.h"
 
-// for now, make buggy GCC/Mingw STFU about I64FMT
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat"
-#pragma GCC diagnostic ignored "-Wformat-extra-args"
-#endif
-
 const device_type PCI_ROOT   = &device_creator<pci_root_device>;
 const device_type PCI_BRIDGE = &device_creator<pci_bridge_device>;
 
@@ -902,7 +895,3 @@ void pci_root_device::device_start()
 void pci_root_device::device_reset()
 {
 }
-
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic pop
-#endif

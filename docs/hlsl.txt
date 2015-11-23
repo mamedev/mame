@@ -10,10 +10,9 @@ yiq_enable              0/1             Enables YIQ-colorspace post-processing. 
 hlslpath                [path]          Path to the .fx files that are in use.  (default: hlsl)
 hlsl_prescale_x         [horizontal]    HLSL pre-scale override factor for X.  (0 for auto)
 hlsl_prescale_y         [vertical]      HLSL pre-scale override factor for Y.  (0 for auto)
-hlsl_preset             -1 through 3    HLSL preset to use.  (default: -1)
-hlsl_write              [filename]      Enable HLSL AVI writing.   (huge disk bandwidth suggested)
+hlsl_write              [filename]      Enables HLSL AVI writing.  (huge disk bandwidth suggested)
 hlsl_snap_width         [width]         HLSL upscaled-snapshot width.  (default: 2048)
-hlsl_snap_height    	[height]        HLSL upscaled-snapshot height.  (default: 1536)
+hlsl_snap_height        [height]        HLSL upscaled-snapshot height.  (default: 1536)
 
 
 Surface/Color Processing Parameters
@@ -22,12 +21,17 @@ Surface/Color Processing Parameters
 Name                    Values		Description
 shadow_mask_alpha       0.0 to 1.0      The ovearll darkness of each shadow mask pixel.
 shadow_mask_texture     [filename]      A PNG that defines the shadow mask for each pixel.
-shadow_mask_x_count     1+              The count of shadow mask elements, X (usually 640-ish).
-shadow_mask_y_count     1+              The count of shadow mask elements, Y (usually 480-ish).
-shadow_mask_usize       0.0 to 1.0      These parameters define the *in-use* pixel count on the
-shadow_mask_vsize       0.0 to 1.0      X and Y axes of the shadow mask texture.
-curvature               0.0 to 1.0      Screen curvature. Affects borders and shadow mask.
-pincushion              0.0 to 1.0      Image curvature. Affects the source image only.
+shadow_mask_x_count     1+              The number of pixels one shadow mask tile uses on screen.
+shadow_mask_y_count     1+              This stretches the shadow mask tiles on X and Y axis.
+shadow_mask_usize       0.0 to 1.0      The size of one shadow mask tile in U/V coordinate.
+shadow_mask_vsize       0.0 to 1.0      The shadow mask textures always has a size of power-of-two.
+shadow_mask_voffset    -1.0 to 1.0      The offset of the shadow mask texture in U/V coordinates.
+shadow_mask_voffset    -1.0 to 1.0      An offset of 1.0 repressents one pixel on screen.
+curvature               0.0 to 1.0      Curvature amount of the screen.
+round_corner            0.0 to 1.0      Rounded corners amount of the screen.
+smooth_border           0.0 to 1.0      Smooth borders amount of the screen.
+reflection              0.0 to 1.0      Refelection amount of the screen highlight.
+vignetting              0.0 to 1.0      Vignetting amount of the image.
 scanline_alpha          0.0 to 1.0      The overall darkness of each scanline furrow.
 scanline_size           0.0 to 4.0      The overall height of each scanline.
 scanline_height         [height]        Individual height scaling value for scanlines.
@@ -97,8 +101,8 @@ vector_length_ratio     500.0           Vector fade length (4.0 - vectors fade t
 Bloom Post-Processing Options
 -----------------------------
 Name                    Default Values  Description
-vector_bloom_scale      0.300           Intensity factor for vector bloom.  (0.000-1.000)
-raster_bloom_scale      0.225           Intensity factor for raster bloom.  (0.000-1.000)
+bloom_scale             0.500           Bloom intensity factor.  (0.000-2.000)
+bloom_overdrive         0.00,0.00,0.00  Bloom overdrive factor to bright full saturated colors.  (0.000-2.000)
 bloom_lvl0_weight       1.00            Bloom level 0  (full-size target) weight.  (0.00-1.00)
 bloom_lvl1_weight       0.21            Bloom level 1  (half-size target) weight.  (0.00-1.00)
 bloom_lvl2_weight       0.19            Bloom level 2  (quarter-size target) weight.  (0.00-1.00)

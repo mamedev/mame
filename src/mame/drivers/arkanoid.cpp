@@ -811,13 +811,13 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(arkanoid_state::hexaa_f000_r)
 {
-//  return hexaa_from_sub;
+//  return m_hexaa_from_sub;
 	return rand();
 }
 
 WRITE8_MEMBER(arkanoid_state::hexaa_f000_w)
 {
-	hexaa_from_main = data;
+	m_hexaa_from_main = data;
 }
 
 static ADDRESS_MAP_START( hexaa_map, AS_PROGRAM, 8, arkanoid_state )
@@ -840,12 +840,12 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(arkanoid_state::hexaa_sub_80_w)
 {
-	hexaa_from_sub = data;
+	m_hexaa_from_sub = data;
 }
 
 READ8_MEMBER(arkanoid_state::hexaa_sub_90_r)
 {
-	return hexaa_from_main;
+	return m_hexaa_from_main;
 //  return rand();
 }
 
@@ -1183,7 +1183,7 @@ GFXDECODE_END
 
 /* Machine Drivers */
 
-MACHINE_START_MEMBER(arkanoid_state,arkanoid)
+void arkanoid_state::machine_start()
 {
 	save_item(NAME(m_bootleg_cmd));
 
@@ -1204,7 +1204,7 @@ MACHINE_START_MEMBER(arkanoid_state,arkanoid)
 	save_item(NAME(m_palettebank));
 }
 
-MACHINE_RESET_MEMBER(arkanoid_state,arkanoid)
+void arkanoid_state::machine_reset()
 {
 	m_port_a_in = 0;
 	m_port_a_out = 0;
@@ -1245,9 +1245,6 @@ static MACHINE_CONFIG_START( arkanoid, arkanoid_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))                  // 100 CPU slices per second to synchronize between the MCU and the main CPU
 
-	MCFG_MACHINE_START_OVERRIDE(arkanoid_state,arkanoid)
-	MCFG_MACHINE_RESET_OVERRIDE(arkanoid_state,arkanoid)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)
@@ -1260,7 +1257,6 @@ static MACHINE_CONFIG_START( arkanoid, arkanoid_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arkanoid)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 512)
-	MCFG_VIDEO_START_OVERRIDE(arkanoid_state,arkanoid)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1279,9 +1275,6 @@ static MACHINE_CONFIG_START( hexa, arkanoid_state )
 	MCFG_CPU_PROGRAM_MAP(hexa_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
-	MCFG_MACHINE_START_OVERRIDE(arkanoid_state,arkanoid)
-	MCFG_MACHINE_RESET_OVERRIDE(arkanoid_state,arkanoid)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)
@@ -1294,7 +1287,6 @@ static MACHINE_CONFIG_START( hexa, arkanoid_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hexa)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
-	MCFG_VIDEO_START_OVERRIDE(arkanoid_state,arkanoid)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1335,9 +1327,6 @@ static MACHINE_CONFIG_START( brixian, arkanoid_state )
 	/* there is a 68705 but it's only role appears to be to copy data to RAM at startup */
 	/* the RAM is also battery backed, making the 68705 almost reundant as long as the battery doesn't die(!) */
 
-	MCFG_MACHINE_START_OVERRIDE(arkanoid_state,arkanoid)
-	MCFG_MACHINE_RESET_OVERRIDE(arkanoid_state,arkanoid)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)
@@ -1350,7 +1339,6 @@ static MACHINE_CONFIG_START( brixian, arkanoid_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arkanoid)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 512)
-	MCFG_VIDEO_START_OVERRIDE(arkanoid_state,arkanoid)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2037,6 +2025,17 @@ DRIVER_INIT_MEMBER(arkanoid_state,hexa)
 	membank("bank1")->configure_entries(0, 2, &RAM[0x10000], 0x4000);
 }
 
+DRIVER_INIT_MEMBER(arkanoid_state,hexaa)
+{
+	DRIVER_INIT_CALL(hexa);
+	
+	m_hexaa_from_main = 0;
+	m_hexaa_from_sub = 0;
+	
+	save_item(NAME(m_hexaa_from_main));
+	save_item(NAME(m_hexaa_from_sub));
+}
+
 DRIVER_INIT_MEMBER(arkanoid_state,brixian)
 {
 	UINT8 *RAM = memregion("protdata")->base();
@@ -2076,6 +2075,6 @@ GAME( 1987, arkatour,   0,        arkanoid, arkanoid, driver_device, 0,        R
 GAME( 19??, tetrsark,   0,        bootleg,  tetrsark, arkanoid_state, tetrsark, ROT0,  "D.R. Korea", "Tetris (D.R. Korea)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 199?, hexa,       0,        hexa,     hexa, arkanoid_state,     hexa,     ROT0,  "D.R. Korea", "Hexa", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, hexaa,      hexa,     hexaa,    hexa, arkanoid_state,     hexa,     ROT0,  "D.R. Korea", "Hexa (with 2xZ80, protected)", MACHINE_NOT_WORKING )
+GAME( 199?, hexaa,      hexa,     hexaa,    hexa, arkanoid_state,     hexaa,     ROT0,  "D.R. Korea", "Hexa (with 2xZ80, protected)", MACHINE_NOT_WORKING )
 
 GAME( 1993, brixian,    0,        brixian,  brixian, arkanoid_state,  brixian,        ROT0,  "Cheil Computer System", "Brixian", MACHINE_SUPPORTS_SAVE )

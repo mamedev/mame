@@ -51,26 +51,26 @@ a800_rom_bbsb_device::a800_rom_bbsb_device(const machine_config &mconfig, const 
 
 
 xegs_rom_device::xegs_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a800_rom_device(mconfig, XEGS_ROM, "Atari XEGS 64K ROM Carts", tag, owner, clock, "a800_xegs", __FILE__)
-{
+					: a800_rom_device(mconfig, XEGS_ROM, "Atari XEGS 64K ROM Carts", tag, owner, clock, "a800_xegs", __FILE__), m_bank(0)
+				{
 }
 
 
 a800_rom_williams_device::a800_rom_williams_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a800_rom_device(mconfig, A800_ROM_WILLIAMS, "Atari 800 64K ROM Carts Williams", tag, owner, clock, "a800_williams", __FILE__)
-{
+					: a800_rom_device(mconfig, A800_ROM_WILLIAMS, "Atari 800 64K ROM Carts Williams", tag, owner, clock, "a800_williams", __FILE__), m_bank(0)
+				{
 }
 
 
 a800_rom_express_device::a800_rom_express_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a800_rom_device(mconfig, A800_ROM_EXPRESS, "Atari 800 64K ROM Carts Express/Diamond", tag, owner, clock, "a800_express", __FILE__)
-{
+					: a800_rom_device(mconfig, A800_ROM_EXPRESS, "Atari 800 64K ROM Carts Express/Diamond", tag, owner, clock, "a800_express", __FILE__), m_bank(0)
+				{
 }
 
 
 a800_rom_turbo_device::a800_rom_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a800_rom_device(mconfig, A800_ROM_TURBO, "Atari 800 64K ROM Carts Turbosoft", tag, owner, clock, "a800_turbo", __FILE__)
-{
+					: a800_rom_device(mconfig, A800_ROM_TURBO, "Atari 800 64K ROM Carts Turbosoft", tag, owner, clock, "a800_turbo", __FILE__), m_bank(0)
+				{
 }
 
 
@@ -81,8 +81,8 @@ a800_rom_telelink2_device::a800_rom_telelink2_device(const machine_config &mconf
 
 
 a800_rom_microcalc_device::a800_rom_microcalc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a800_rom_device(mconfig, A800_ROM_MICROCALC, "Atari 800 64K ROM Cart SITSA MicroCalc", tag, owner, clock, "a800_sitsa", __FILE__)
-{
+					: a800_rom_device(mconfig, A800_ROM_MICROCALC, "Atari 800 64K ROM Cart SITSA MicroCalc", tag, owner, clock, "a800_sitsa", __FILE__), m_bank(0)
+				{
 }
 
 

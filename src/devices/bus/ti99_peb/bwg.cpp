@@ -85,9 +85,10 @@
 */
 
 snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-			: ti_expansion_card_device(mconfig, TI99_BWG, "SNUG BwG Floppy Controller", tag, owner, clock, "ti99_bwg", __FILE__),
+			: ti_expansion_card_device(mconfig, TI99_BWG, "SNUG BwG Floppy Controller", tag, owner, clock, "ti99_bwg", __FILE__), m_DRQ(), m_IRQ(), m_dip1(0), m_dip2(0), m_dip34(0), m_ram_page(0), m_rom_page(0), m_WAITena(false), m_inDsrArea(false), m_WDsel(false), m_WDsel0(false), m_RTCsel(false), m_lastK(false), m_dataregLB(false), m_rtc_enabled(false), m_MOTOR_ON(), m_lastval(0), m_address(0), m_DSEL(0), m_SIDSEL(), m_motor_on_timer(nullptr), m_dsrrom(nullptr), m_buffer_ram(nullptr), m_current_floppy(nullptr),
 				m_wd1773(*this, FDC_TAG),
-				m_clock(*this, CLOCK_TAG) { }
+				m_clock(*this, CLOCK_TAG), m_debug_dataout(false)
+		{ }
 
 /*
     Operate the wait state logic.

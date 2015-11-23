@@ -9,7 +9,7 @@
 //============================================================
 
 #ifdef SDLMAME_WIN32
-#include "../windows/winsocket.c"
+#include "../windows/winsocket.cpp"
 #else
 
 #include <stdio.h>

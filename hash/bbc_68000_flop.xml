@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- BBC Micro - 68000 Co-Processor Discs -->
+
+<!-- Loading Instructions:
+
+      Hold down the SHIFT key and press and release the BREAK key.
+-->
+
+<softwarelist name="bbc_68000_flop" description="68000 Co-Processor Discs">
+
+	<software name="casper" supported="no">
+		<description>Casper Support Discs</description>
+		<year>1986</year>
+		<publisher>Delcomm</publisher>
+		<info name="format" value="DFS" />
+		<info name="compatibility" value="68000 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Casper Control C Version 0.1"/>
+			<dataarea name="flop" size="204800">
+				<rom name="casper control c version 0_1.ssd" size="204800" crc="f92958ef" sha1="3b68a54befb002e26c7a30a1d8f42dfae2b2f501" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Casper System Disc Version 2.2"/>
+			<dataarea name="flop" size="204800">
+				<rom name="casper system disc version 2_2.ssd" size="204800" crc="fa48e7e1" sha1="a3dffefdc13e4a44ec4e57b1cad27e912abdcd15" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Casper Test Disc Version 2.2"/>
+			<dataarea name="flop" size="204800">
+				<rom name="casper test disc version 2_2.ssd" size="204800" crc="67c43659" sha1="83b0361ab7908584aaedb9f5a42e9cf5c3cc6c1d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

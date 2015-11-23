@@ -151,7 +151,7 @@ inline void am9517a_device::dma_request(int channel, int state)
 
 inline bool am9517a_device::is_request_active(int channel)
 {
-	return (BIT(m_status, channel + 4) & !BIT(m_mask, channel)) ? true : false;
+	return (BIT(m_status, channel + 4) & ~BIT(m_mask, channel)) ? true : false;
 }
 
 

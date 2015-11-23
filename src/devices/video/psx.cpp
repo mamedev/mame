@@ -2312,9 +2312,9 @@ void psxgpu_device::GouraudLine( void )
 
 	n_xend = SINT11( COORD_X( m_packet.GouraudLine.vertex[ 1 ].n_coord ) );
 	n_yend = SINT11( COORD_Y( m_packet.GouraudLine.vertex[ 1 ].n_coord ) );
-	n_cr2.w.h = BGR_R( m_packet.GouraudLine.vertex[ 1 ].n_bgr ); n_cr1.w.l = 0;
-	n_cg2.w.h = BGR_G( m_packet.GouraudLine.vertex[ 1 ].n_bgr ); n_cg1.w.l = 0;
-	n_cb2.w.h = BGR_B( m_packet.GouraudLine.vertex[ 1 ].n_bgr ); n_cb1.w.l = 0;
+	n_cr2.w.h = BGR_R( m_packet.GouraudLine.vertex[ 1 ].n_bgr ); n_cr2.w.l = 0;
+	n_cg2.w.h = BGR_G( m_packet.GouraudLine.vertex[ 1 ].n_bgr ); n_cg2.w.l = 0;
+	n_cb2.w.h = BGR_B( m_packet.GouraudLine.vertex[ 1 ].n_bgr ); n_cb2.w.l = 0;
 
 	n_x.sw.h = n_xstart; n_x.sw.l = 0;
 	n_y.sw.h = n_ystart; n_y.sw.l = 0;

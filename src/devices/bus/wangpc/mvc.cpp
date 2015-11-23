@@ -111,7 +111,7 @@ MC6845_UPDATE_ROW( wangpc_mvc_device::crtc_update_row )
 		for (int bit = 0; bit < 10; bit++)
 		{
 			int x = (column * 10) + bit;
-			int color = ((BIT(data, 9) & !ATTR_BLANK) ^ ATTR_REVERSE);
+			int color = ((BIT(data, 9) & ~ATTR_BLANK) ^ ATTR_REVERSE);
 
 			if ((color | bitmap.pix32(vbp + y, hbp + x)) & ATTR_BOLD) color = 2;
 			if (color) bitmap.pix32(vbp + y, hbp + x) = de ? PALETTE_MVC[color] : rgb_t::black;

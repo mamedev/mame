@@ -76,7 +76,7 @@ scv_cart_slot_device::scv_cart_slot_device(const machine_config &mconfig, const 
 						device_t(mconfig, SCV_CART_SLOT, "SCV Cartridge Slot", tag, owner, clock, "scv_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
-						m_type(SCV_8K)
+						m_type(SCV_8K), m_cart(nullptr)
 {
 }
 

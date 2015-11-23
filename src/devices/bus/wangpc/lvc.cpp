@@ -171,7 +171,7 @@ wangpc_lvc_device::wangpc_lvc_device(const machine_config &mconfig, const char *
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_TAG),
 	m_video_ram(*this, "video_ram"),
-	m_option(0),
+	m_option(0), m_scroll(0),
 	m_irq(CLEAR_LINE)
 {
 }

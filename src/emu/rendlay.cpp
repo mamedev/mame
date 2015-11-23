@@ -53,8 +53,6 @@
 #include "rendlay.h"
 #include "rendutil.h"
 #include "xmlfile.h"
-#include "png.h"
-#include "ui/ui.h"
 
 
 
@@ -632,7 +630,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 		std::string symbollist = xml_get_attribute_string_with_subst(machine, compnode, "symbollist", "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
 
 		// split out position names from string and figure out our number of symbols
-		int location = -1;
+		int location;
 		m_numstops = 0;
 		location=symbollist.find(",");
 		while (location!=-1)
@@ -2218,7 +2216,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 	// loop over all layers
 	bool first = true;
 	bool scrfirst = true;
-	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; layer++)
+	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
 	{
 		// determine if this layer should be visible
 		switch (layer)
@@ -2293,7 +2291,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 	float yscale = (target_bounds.y1 - target_bounds.y0) / (m_bounds.y1 - m_bounds.y0);
 
 	// normalize all the item bounds
-	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; layer++)
+	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
 		for (item *curitem = first_item(layer); curitem != NULL; curitem = curitem->next())
 		{
 			curitem->m_bounds.x0 = target_bounds.x0 + (curitem->m_rawbounds.x0 - xoffs) * xscale;
@@ -2310,7 +2308,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 
 void layout_view::resolve_tags()
 {
-	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; layer++)
+	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
 	{
 		for (item *curitem = first_item(layer); curitem != NULL; curitem = curitem->next())
 		{

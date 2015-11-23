@@ -63,7 +63,7 @@ vic10_expansion_slot_device::vic10_expansion_slot_device(const machine_config &m
 		m_write_irq(*this),
 		m_write_res(*this),
 		m_write_cnt(*this),
-		m_write_sp(*this)
+		m_write_sp(*this), m_card(nullptr)
 {
 }
 

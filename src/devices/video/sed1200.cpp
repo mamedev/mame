@@ -32,7 +32,7 @@ ROM_START( sed1200x0b )
 ROM_END
 
 sed1200_device::sed1200_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source), cursor_direction(false), cursor_blinking(false), cursor_full(false), cursor_on(false), display_on(false), cursor_address(0), cgram_address(0), cgrom(nullptr)
 {
 }
 
@@ -83,7 +83,7 @@ void sed1200_device::device_start()
 	if(memregion("cgrom"))
 		cgrom = memregion("cgrom")->base();
 	else
-		cgrom = NULL;
+		cgrom = nullptr;
 
 	soft_reset();
 }

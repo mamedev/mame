@@ -34,14 +34,14 @@ const device_type Z88_1024K_RAM = &device_creator<z88_1024k_ram_device>;
 
 z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, Z88_32K_RAM, "Z88 32KB RAM", tag, owner, clock, "z88_32k_ram", __FILE__),
-		device_z88cart_interface( mconfig, *this )
-{
+		device_z88cart_interface( mconfig, *this ), m_ram(nullptr)
+	{
 }
 
 z88_32k_ram_device::z88_32k_ram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_z88cart_interface( mconfig, *this )
-{
+		device_z88cart_interface( mconfig, *this ), m_ram(nullptr)
+	{
 }
 
 //-------------------------------------------------

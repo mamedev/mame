@@ -117,7 +117,7 @@ a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, de
 	m_con1(*this, FDC01_FDC_TAG":0"),
 	m_con2(*this, FDC01_FDC_TAG":1"),
 	m_con3(*this, FDC01_FDC_TAG":2"),
-	m_con4(*this, FDC01_FDC_TAG":3")
+	m_con4(*this, FDC01_FDC_TAG":3"), m_rom(nullptr), m_fdc_local_status(0), m_fdc_local_command(0), m_curfloppy(nullptr)
 {
 }
 
@@ -128,7 +128,7 @@ a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, co
 	m_con1(*this, FDC01_FDC_TAG":0"),
 	m_con2(*this, FDC01_FDC_TAG":1"),
 	m_con3(*this, FDC01_FDC_TAG":2"),
-	m_con4(*this, FDC01_FDC_TAG":3")
+	m_con4(*this, FDC01_FDC_TAG":3"), m_rom(nullptr), m_fdc_local_status(0), m_fdc_local_command(0), m_curfloppy(nullptr)
 {
 }
 

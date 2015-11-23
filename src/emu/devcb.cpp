@@ -108,7 +108,8 @@ void devcb_base::resolve_space()
 //-------------------------------------------------
 
 devcb_read_base::devcb_read_base(device_t &device, UINT64 defmask)
-	: devcb_base(device, defmask)
+	: devcb_base(device, defmask), 
+	  m_adapter(NULL)
 {
 }
 
@@ -335,7 +336,8 @@ UINT64 devcb_read_base::read_constant_adapter(address_space &space, offs_t offse
 //-------------------------------------------------
 
 devcb_write_base::devcb_write_base(device_t &device, UINT64 defmask)
-	: devcb_base(device, defmask)
+	: devcb_base(device, defmask), 
+	  m_adapter(NULL)
 {
 }
 

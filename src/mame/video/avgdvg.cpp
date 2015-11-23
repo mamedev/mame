@@ -22,8 +22,6 @@
  *
  *************************************/
 
-#define MASTER_CLOCK (12096000)
-#define VGSLICE      (10000)
 #define VGVECTOR 0
 #define VGCLIP 1
 
@@ -43,20 +41,20 @@
 
 void avgdvg_device::set_flip_x(int flip)
 {
-	flip_x = flip;
+	m_flipx = flip;
 }
 
 void avgdvg_device::set_flip_y(int flip)
 {
-	flip_y = flip;
+	m_flipy = flip;
 }
 
 void avgdvg_device::apply_flipping(int *x, int *y)
 {
-	if (flip_x)
-		*x += (xcenter - *x) << 1;
-	if (flip_y)
-		*y += (ycenter - *y) << 1;
+	if (m_flipx)
+		*x += (m_xcenter - *x) << 1;
+	if (m_flipy)
+		*y += (m_ycenter - *y) << 1;
 }
 
 
@@ -74,7 +72,7 @@ void avgdvg_device::vg_flush()
 		i++;
 	m_vector->add_point(vectbuf[i].x, vectbuf[i].y, vectbuf[i].color, 0);
 
-	for (i = 0; i < nvect; i++)
+	for (i = 0; i < m_nvect; i++)
 	{
 		if (vectbuf[i].status == VGVECTOR)
 			m_vector->add_point(vectbuf[i].x, vectbuf[i].y, vectbuf[i].color, vectbuf[i].intensity);
@@ -83,32 +81,32 @@ void avgdvg_device::vg_flush()
 			m_vector->add_clip(vectbuf[i].x, vectbuf[i].y, vectbuf[i].arg1, vectbuf[i].arg2);
 	}
 
-	nvect=0;
+	m_nvect=0;
 }
 
 void avgdvg_device::vg_add_point_buf(int x, int y, rgb_t color, int intensity)
 {
-	if (nvect < MAXVECT)
+	if (m_nvect < MAXVECT)
 	{
-		vectbuf[nvect].status = VGVECTOR;
-		vectbuf[nvect].x = x;
-		vectbuf[nvect].y = y;
-		vectbuf[nvect].color = color;
-		vectbuf[nvect].intensity = intensity;
-		nvect++;
+		vectbuf[m_nvect].status = VGVECTOR;
+		vectbuf[m_nvect].x = x;
+		vectbuf[m_nvect].y = y;
+		vectbuf[m_nvect].color = color;
+		vectbuf[m_nvect].intensity = intensity;
+		m_nvect++;
 	}
 }
 
-void avgdvg_device::vg_add_clip (int xmin, int ymin, int xmax, int ymax)
+void avgdvg_device::vg_add_clip(int xmin, int ymin, int xmax, int ymax)
 {
-	if (nvect < MAXVECT)
+	if (m_nvect < MAXVECT)
 	{
-		vectbuf[nvect].status = VGCLIP;
-		vectbuf[nvect].x = xmin;
-		vectbuf[nvect].y = ymin;
-		vectbuf[nvect].arg1 = xmax;
-		vectbuf[nvect].arg2 = ymax;
-		nvect++;
+		vectbuf[m_nvect].status = VGCLIP;
+		vectbuf[m_nvect].x = xmin;
+		vectbuf[m_nvect].y = ymin;
+		vectbuf[m_nvect].arg1 = xmax;
+		vectbuf[m_nvect].arg2 = ymax;
+		m_nvect++;
 	}
 }
 
@@ -121,9 +119,7 @@ void avgdvg_device::vg_add_clip (int xmin, int ymin, int xmax, int ymax)
 
 void dvg_device::update_databus() // dvg_data
 {
-	/*
-	 * DVG uses low bit of state for address
-	 */
+	// DVG uses low bit of state for address
 	m_data = avgdvg_vectorram[(m_pc << 1) | (m_state_latch & 1)];
 }
 
@@ -167,8 +163,8 @@ int dvg_device::handler_1() // dvg_dmald
 void dvg_device::dvg_draw_to(int x, int y, int intensity)
 {
 	if (((x | y) & 0x400) == 0)
-		vg_add_point_buf((xmin + x - 512) << 16,
-							(ymin + 512 - y) << 16,
+		vg_add_point_buf((m_xmin + x - 512) << 16,
+							(m_ymin + 512 - y) << 16,
 							VECTOR_COLOR111(7), intensity << 4);
 }
 
@@ -594,8 +590,8 @@ int avg_device::avg_common_strobe3()
 	{
 		cycles = 0x8000 - m_timer;
 		m_timer = 0;
-		m_xpos = xcenter;
-		m_ypos = ycenter;
+		m_xpos = m_xcenter;
+		m_ypos = m_ycenter;
 		vg_add_point_buf(m_xpos, m_ypos, 0, 0);
 	}
 
@@ -627,8 +623,7 @@ int avg_tempest_device::handler_6() // tempest_strobe2
 {
 	if ((OP2 == 0) && (m_dvy12 == 0))
 	{
-		/* Contrary to previous documentation in MAME,
-		Tempest does not have the m_enspkl bit. */
+		/* Contrary to previous documentation in MAME, Tempest does not have the m_enspkl bit. */
 		if (m_dvy & 0x800)
 			m_color = m_dvy & 0xf;
 		else
@@ -662,8 +657,8 @@ int avg_tempest_device::handler_7() // tempest_strobe3
 
 		apply_flipping(&x, &y);
 
-		vg_add_point_buf(y - ycenter + xcenter,
-							x - xcenter + ycenter, rgb_t(r, g, b),
+		vg_add_point_buf(y - m_ycenter + m_xcenter,
+							x - m_xcenter + m_ycenter, rgb_t(r, g, b),
 							(((m_int_latch >> 1) == 1)? m_intensity: m_int_latch & 0xe) << 4);
 	}
 
@@ -681,7 +676,7 @@ void avg_tempest_device::vggo() // tempest_vggo
 	 * avg_common_strobe2). If we don't discard all vectors in the
 	 * current buffer at this point, the screen starts flickering.
 	 */
-	nvect = 0;
+	m_nvect = 0;
 }
 #endif
 
@@ -699,7 +694,7 @@ void avg_tempest_device::vggo() // tempest_vggo
 
 	if (m_lst == 0)
 	{
-		vg_add_clip(0, m_ypos, xmax << 16, ymax << 16);
+		vg_add_clip(0, m_ypos, m_xmax << 16, m_ymax << 16);
 	}
 	m_lst = 1;
 
@@ -822,8 +817,8 @@ int avg_mhavoc_device::handler_7()  // mhavoc_strobe3
 	{
 		cycles = 0x8000 - m_timer;
 		m_timer = 0;
-		m_xpos = xcenter;
-		m_ypos = ycenter;
+		m_xpos = m_xcenter;
+		m_ypos = m_ycenter;
 		vg_add_point_buf(m_xpos, m_ypos, 0, 0);
 	}
 
@@ -910,7 +905,7 @@ void avg_quantum_device::vggo() // tempest_vggo
 	 * avg_common_strobe2). If we don't discard all vectors in the
 	 * current buffer at this point, the screen starts flickering.
 	 */
-	nvect = 0;
+	m_nvect = 0;
 }
 
 int avg_quantum_device::handler_0() // quantum_st2st3
@@ -1040,16 +1035,16 @@ int avg_quantum_device::handler_7() // quantum_strobe3
 
 		apply_flipping(&x, &y);
 
-		vg_add_point_buf(y - ycenter + xcenter,
-							x - xcenter + ycenter, rgb_t(r, g, b),
-							((m_int_latch == 2)? m_intensity: m_int_latch) << 4);
+		vg_add_point_buf(y - m_ycenter + m_xcenter, x - m_xcenter + m_ycenter, 
+                         rgb_t(r, g, b),
+						 ((m_int_latch == 2)? m_intensity: m_int_latch) << 4);
 	}
 	if (OP2)
 	{
 		cycles = 0x4000 - m_timer;
 		m_timer = 0;
-		m_xpos = xcenter;
-		m_ypos = ycenter;
+		m_xpos = m_xcenter;
+		m_ypos = m_ycenter;
 		vg_add_point_buf(m_xpos, m_ypos, 0, 0);
 	}
 
@@ -1165,7 +1160,7 @@ int avg_tomcat_device::handler_7() // starwars_strobe3
 
 /*************************************
  *
- *  halt functions
+ *  halt function
  *
  *************************************/
 
@@ -1173,11 +1168,6 @@ void avgdvg_device::vg_set_halt(int dummy)
 {
 	m_halt = dummy;
 	m_sync_halt = dummy;
-}
-
-TIMER_CALLBACK_MEMBER( avgdvg_device::vg_set_halt_callback )
-{
-	vg_set_halt(param);
 }
 
 
@@ -1194,12 +1184,17 @@ TIMER_CALLBACK_MEMBER( avgdvg_device::vg_set_halt_callback )
  *
  *******************************************************************/
 
-TIMER_CALLBACK_MEMBER( avgdvg_device::run_state_machine )
+void avgdvg_device::execute_run()
 {
-	int cycles = 0;
+    if (m_halt)
+    {
+        m_icount = 0;
+        return;
+    }
+    
 	UINT8 *state_prom = machine().root_device().memregion("user1")->base();
 
-	while (cycles < VGSLICE)
+	while (m_icount > 0)
 	{
 		/* Get next state */
 		m_state_latch = (m_state_latch & 0x10)
@@ -1212,26 +1207,26 @@ TIMER_CALLBACK_MEMBER( avgdvg_device::run_state_machine )
 
 			/* Decode state and call the corresponding handler */
 			switch(m_state_latch & 7) {
-				case 0 : cycles += handler_0(); break;
-				case 1 : cycles += handler_1(); break;
-				case 2 : cycles += handler_2(); break;
-				case 3 : cycles += handler_3(); break;
-				case 4 : cycles += handler_4(); break;
-				case 5 : cycles += handler_5(); break;
-				case 6 : cycles += handler_6(); break;
-				case 7 : cycles += handler_7(); break;
+				case 0 : m_icount -= handler_0(); break;
+				case 1 : m_icount -= handler_1(); break;
+				case 2 : m_icount -= handler_2(); break;
+				case 3 : m_icount -= handler_3(); break;
+				case 4 : m_icount -= handler_4(); break;
+				case 5 : m_icount -= handler_5(); break;
+				case 6 : m_icount -= handler_6(); break;
+				case 7 : m_icount -= handler_7(); break;
 			}
 		}
 
-		/* If halt flag was set, let CPU catch up before we make halt visible */
-		if (m_halt && !(m_state_latch & 0x10))
-			vg_halt_timer->adjust(attotime::from_hz(MASTER_CLOCK) * cycles, 1);
+		// Halt if flag was set
+        if (m_halt && !(m_state_latch & 0x10))
+        {
+            vg_set_halt(1);
+        }
 
 		m_state_latch = (m_halt << 4) | (m_state_latch & 0xf);
-		cycles += 8;
+		m_icount -= 8;
 	}
-
-	vg_run_timer->adjust(attotime::from_hz(MASTER_CLOCK) * cycles);
 }
 
 
@@ -1250,7 +1245,7 @@ WRITE8_MEMBER( avgdvg_device::go_w )
 {
 	vggo();
 
-	if (m_sync_halt && (nvect > 10))
+	if (m_sync_halt && (m_nvect > 10))
 	{
 		/*
 		 * This is a good time to start a new frame. Major Havoc
@@ -1262,7 +1257,6 @@ WRITE8_MEMBER( avgdvg_device::go_w )
 	vg_flush();
 
 	vg_set_halt(0);
-	vg_run_timer->adjust(attotime::zero);
 }
 
 WRITE16_MEMBER( avgdvg_device::go_word_w )
@@ -1285,7 +1279,7 @@ WRITE8_MEMBER( avgdvg_device::reset_w )
 
 WRITE16_MEMBER( avgdvg_device::reset_word_w )
 {
-	reset_w (space,0,0);
+	reset_w(space,0,0);
 }
 
 /*************************************
@@ -1328,8 +1322,8 @@ void avgdvg_device::register_state()
 	save_item(NAME(m_clipx_max));
 	save_item(NAME(m_clipy_max));
 
-	save_item(NAME(flip_x));
-	save_item(NAME(flip_y));
+	save_item(NAME(m_flipx));
+	save_item(NAME(m_flipy));
 	save_pointer(NAME(avgdvg_vectorram), avgdvg_vectorram_size);
 }
 
@@ -1345,18 +1339,15 @@ void avg_device::device_start()
 
 	avgdvg_colorram = reinterpret_cast<UINT8 *>(machine().root_device().memshare("colorram")->ptr());
 
-	xmin = visarea.min_x;
-	ymin = visarea.min_y;
-	xmax = visarea.max_x;
-	ymax = visarea.max_y;
+	m_xmin = visarea.min_x;
+	m_ymin = visarea.min_y;
+	m_xmax = visarea.max_x;
+	m_ymax = visarea.max_y;
 
-	xcenter = ((xmax - xmin) / 2) << 16;
-	ycenter = ((ymax - ymin) / 2) << 16;
+	m_xcenter = ((m_xmax - m_xmin) / 2) << 16;
+	m_ycenter = ((m_ymax - m_ymin) / 2) << 16;
 
-	flip_x = flip_y = 0;
-
-	vg_halt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avgdvg_device::vg_set_halt_callback),this));
-	vg_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avgdvg_device::run_state_machine),this));
+	m_flipx = m_flipy = 0;
 
 	/*
 	 * The x and y DACs use 10 bit of the counter values which are in
@@ -1366,6 +1357,8 @@ void avg_device::device_start()
 	m_xdac_xor = 0x200;
 	m_ydac_xor = 0x200;
 
+    m_icountptr = &m_icount;
+    
 	register_state();
 }
 
@@ -1381,12 +1374,11 @@ void dvg_device::device_start()
 
 	avgdvg_colorram = reinterpret_cast<UINT8 *>(machine().root_device().memshare("colorram")->ptr());
 
-	xmin = visarea.min_x;
-	ymin = visarea.min_y;
+	m_xmin = visarea.min_x;
+	m_ymin = visarea.min_y;
 
-	vg_halt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avgdvg_device::vg_set_halt_callback),this));
-	vg_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avgdvg_device::run_state_machine),this));
-
+    m_icountptr = &m_icount;
+    
 	register_state();
 }
 
@@ -1395,9 +1387,10 @@ void avgdvg_device::static_set_vector_tag(device_t &device, const char *tag)
 	downcast<avgdvg_device &>(device).m_vector.set_tag(tag);
 }
 
-avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_vector(*this)
+avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) 
+    : device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+    , device_execute_interface(mconfig, *this)
+	, m_vector(*this)
 {
 	m_pc = 0;
 	m_sp = 0;
@@ -1440,15 +1433,15 @@ avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, co
 	m_clipx_max = 0;
 	m_clipy_max = 0;
 
-	xmin = 0;
-	xmax = 0;
-	ymin = 0;
-	ymax = 0;
-	xcenter = 0;
-	ycenter = 0;
-	flip_x = 0;
-	flip_y = 0;
-	nvect = 0;
+	m_xmin = 0;
+	m_xmax = 0;
+	m_ymin = 0;
+	m_ymax = 0;
+	m_xcenter = 0;
+	m_ycenter = 0;
+	m_flipx = 0;
+	m_flipy = 0;
+	m_nvect = 0;
 }
 
 dvg_device::dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :

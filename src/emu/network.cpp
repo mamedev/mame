@@ -9,7 +9,6 @@
 #include <ctype.h>
 
 #include "emu.h"
-#include "emuopts.h"
 #include "network.h"
 #include "config.h"
 #include "xmlfile.h"

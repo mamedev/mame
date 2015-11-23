@@ -43,7 +43,7 @@ cdp1852_device::cdp1852_device(const machine_config &mconfig, const char *tag, d
 	m_read_mode(*this),
 	m_write_sr(*this),
 	m_read_data(*this),
-	m_write_data(*this)
+	m_write_data(*this), m_new_data(0), m_data(0), m_next_data(0), m_sr(0), m_next_sr(0), m_scan_timer(nullptr)
 {
 }
 

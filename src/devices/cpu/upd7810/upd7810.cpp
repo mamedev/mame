@@ -1735,20 +1735,20 @@ void upd7810_device::device_reset()
 	m_tm.d = 0;
 	m_ecnt.d = 0;
 	m_etm.d = 0;
-	m_ma = 0;
-	m_mb = 0;
+	MA = 0xff;
+	MB = 0xff;
 	m_mcc = 0;
-	m_mc = 0;
+	MC = 0xff;
 	m_mm = 0;
-	m_mf = 0;
-	m_tmm = 0;
-	m_etmm = 0;
+	MF = 0xff;
+	TMM = 0xff;
+	ETMM = 0xff;
 	m_eom = 0;
 	m_sml = 0;
 	m_smh = 0;
 	m_anm = 0;
-	m_mkl = 0;
-	m_mkh = 0;
+	MKL = 0xFF;
+	MKH = 0xFF; // ??
 	m_zcm = 0;
 	m_pa_in = 0;
 	m_pb_in = 0;
@@ -1802,14 +1802,6 @@ void upd7810_device::device_reset()
 	m_adrange = 0;
 
 	PANM = 0xff;
-	ETMM = 0xff;
-	TMM = 0xff;
-	MA = 0xff;
-	MB = 0xff;
-	MC = 0xff;
-	MF = 0xff;
-	MKL = 0xff;
-	MKH = 0xff; //?
 }
 
 void upd7801_device::device_reset()

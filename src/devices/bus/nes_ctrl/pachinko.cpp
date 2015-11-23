@@ -51,7 +51,7 @@ nes_pachinko_device::nes_pachinko_device(const machine_config &mconfig, const ch
 					device_t(mconfig, NES_PACHINKO, "Famicom Pachinko Controller", tag, owner, clock, "nes_pachinko", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_joypad(*this, "JOYPAD"),
-					m_trigger(*this, "TRIGGER")
+					m_trigger(*this, "TRIGGER"), m_latch(0)
 {
 }
 

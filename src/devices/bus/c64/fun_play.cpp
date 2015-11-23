@@ -28,7 +28,8 @@ const device_type C64_FUN_PLAY = &device_creator<c64_fun_play_cartridge_device>;
 
 c64_fun_play_cartridge_device::c64_fun_play_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_FUN_PLAY, "C64 Fun Play cartridge", tag, owner, clock, "c64_fun_play", __FILE__),
-	device_c64_expansion_card_interface(mconfig, *this)
+	device_c64_expansion_card_interface(mconfig, *this), 
+	m_bank(0)
 {
 }
 

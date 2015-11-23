@@ -47,10 +47,10 @@ public:
 	static void set_output_index(device_t &device, int index) { dynamic_cast<device_output_interface &>(device).m_output_index = index; }
 	static void set_output_name(device_t &device, const char *name) { dynamic_cast<device_output_interface &>(device).m_output_name = name; }
 
-	void set_output_value(int value);
-	void set_led_value(int value);
-	void set_lamp_value(int value);
-	void set_digit_value(int value);
+	void set_output_value(int value) const;
+	void set_led_value(int value) const;
+	void set_lamp_value(int value) const;
+	void set_digit_value(int value) const;
 
 protected:
 	int m_output_index;

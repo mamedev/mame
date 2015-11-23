@@ -39,7 +39,7 @@ const device_type ECONET_SLOT = &device_creator<econet_slot_device>;
 //-------------------------------------------------
 
 device_econet_interface::device_econet_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_slot_card_interface(mconfig, device), m_next(nullptr), m_econet(nullptr), m_address(0)
 {
 }
 
@@ -55,7 +55,7 @@ device_econet_interface::device_econet_interface(const machine_config &mconfig, 
 
 econet_slot_device::econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ECONET_SLOT, "Econet station", tag, owner, clock, "econet_slot", __FILE__),
-	device_slot_interface(mconfig, *this)
+	device_slot_interface(mconfig, *this), m_address(0), m_econet(nullptr)
 {
 }
 

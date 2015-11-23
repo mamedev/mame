@@ -36,8 +36,8 @@ const device_type GF4500 = &device_creator<gf4500_device>;
 
 
 gf4500_device::gf4500_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, GF4500, "NVIDIA GoForce 4500", tag, owner, clock, "gf4500", __FILE__)
-{
+				: device_t(mconfig, GF4500, "NVIDIA GoForce 4500", tag, owner, clock, "gf4500", __FILE__), m_data(nullptr), m_screen_x(0), m_screen_y(0), m_screen_x_max(0), m_screen_y_max(0), m_screen_x_min(0), m_screen_y_min(0)
+			{
 }
 
 

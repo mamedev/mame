@@ -6,7 +6,7 @@
 const device_type SEGA_315_5641_PCM = &device_creator<sega_315_5641_pcm_device>;
 
 sega_315_5641_pcm_device::sega_315_5641_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: upd7759_device(mconfig, SEGA_315_5641_PCM, "315-5641 PCM", tag, owner, clock, "315-5641_pcm", __FILE__)
+	: upd7759_device(mconfig, SEGA_315_5641_PCM, "315-5641 PCM", tag, owner, clock, "315-5641_pcm", __FILE__), m_fifo_read(0), m_fifo_write(0)
 {
 }
 

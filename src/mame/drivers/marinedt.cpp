@@ -3,62 +3,117 @@
 /*
 ---------------------------
 Marine Date by TAITO (1981)
----------------------------
-
-Location     Device      File ID     Checksum
----------------------------------------------
-LB 3D         2716        MG01         BB4B
-LB 4D         2716        MG02         89B3
-LB 5D         2716        MG03         A5CE
-LB 6D         2716        MG04         CE20
-LB 7D         2716        MG05         16B9
-LB 9D         2716        MG06         39A9
-LB 10D        2716        MG07         B7F1
-LB 1F         2716        MG09         9934
-LB 3F         2716        MG10         F185
-LB 4F         2716        MG11         1603
-MB 6C         2532        MG12         66C3
-MB 6H         2532        MG13         23E2
-MB 2A       82S123        MG14.BPR     1CB1
-MB 1A       82S123        MG15.BPR     1471
-MB 4E       82S123        MG16.BPR     0570
-TB 5F       82S123        MG17.BPR     129B
-
-
-Notes:     TB - Top PCB        MG070001  MGN00001
-           MB - Middle PCB     MG070002  MGN00002
-           LB - Lower PCB      AA017779  MGN00002
-
-
-Brief Hardware Overview
------------------------
-
-Main processor    -  Z80  2.5MHz
-
-Sound             - Discrete audio, like Space Invaders
-
--------------------------------------------------------------------------
-
-a static underwater scence with obstacles in it, like seaweed,
+MAME driver by insideoutboy
+---------------------------   
+a static underwater scene with obstacles in it, like seaweed,
 crabs and other stuff.  You have a limited number of "strokes"
 per screen as well as a timer to work against.  Your goal is
 to *bounce* yourself around the screen using *Strokes* on the
-trackball to try to reach a *female* octopus before your run out
+trackball to try to reach a *female* octopus before you run out
 of strokes or time.  You sort of bounce yourself around the screen
 like a billiard ball would bounce, but once in a while bubbles
 and other stuff will come up from underneath you and carry you
 away from where you are trying to get.  When you reach your goal
 you get another more difficult screen, etc.
 
-I think it was manufactured by Taito, I'm not sure but I seem to
-recall that it was a full blown Japanese machine.
+-------------------------------------------------------------------------
 
+Marine Date
+Taito 1981
+
+PCB Layout
+----------
+
+Top board
+
+MGO70001
+MGN00001
+ |---------------------------------------------|
+ | VOL   VR1  VR2  VR3  VR4  VR5  VR6  VR7     |
+ |  LM3900 LM3900 LM3900 LM3900 LM3900 LM3900 |-|
+ |MB3712                                      |P|
+ |   4006  LM3900 LM3900 LM3900               | |
+ |2  4030                                     |-|
+ |2                                            | 
+ |W                                  DSW(8)    |
+ |A                                           |-|
+ |Y   HD14584     NE555       MG17   DSW(8)   |Q|
+ |                                            | |
+ |    HD14584                                 |-|
+ |          HD14584                            |
+ |---------------------------------------------|
+Notes: (PCB contains lots of resistors/caps/transistors etc)
+      MG17    - 82S123 bipolar PROM (no location on PCB)
+      MB3712  - Hitachi MB3712 Audio Power Amplifier
+      LM3900  - Texas Instruments LM3900 Quad Operational Amplifier
+      HD14584 - Hitachi HD14584 Hex schmitt Trigger
+      NE555   - NE555 Timer
+      4006    - RCA CD4006 18-Stage Static Register
+      4030    - RCA CD4030 Quad Exclusive-Or Gate
+      VR*     - Volume pots for each sound
+      VOL     - Master Volume pot
+      
+
+Middle board
+
+MGO70002  
+MGN00002
+ |---------------------------------------------|
+ |                                    MG15.1A  |
+|-|                                   MG14.2A |-|
+|S|                                           |Q|
+| |                                           | |
+|-|               MG16.4E                     |-|
+ |                                             | 
+ |                                             |
+|-|    MG13.6H              MG12.6C           |-|
+|R|                                           |P|
+| |                                   PC3259  | |
+|-|                                   PC3259  |-|
+ |                                             |
+ |---------------------------------------------|
+Notes:
+      MG12/13    - Hitachi HN462532 4kx8 EPROM
+      MG14/15/16 - 82S123 bipolar PROM
+      PC3259     - PC3259 8025 H08 unknown DIP24 IC. Package design indicates it was manufactured by Fujitsu
+      
+      
+Lower board
+
+AA017779  
+sticker: MGN00003
+sticker: CLN00002
+ |---------------------------------------------|
+ | 9.987MHz               2114                 |
+|-|                       2114                 |
+|R|             MG07.10D       2114            |
+| |             MG06.9D        2114            |
+|-|                            2114           1|
+ |              MG05.7D                       8|Edge 
+ |              MG04.6D                       W|Connector 'T'
+|-|             MG03.5D                       A|
+|S|             MG02.4D                       Y|
+| |             MG01.3D  MG09.4F               |
+|-|                      MG10.3F               |
+ |              Z80      MG11.1F               |
+ |---------------------------------------------|
+Notes:
+      Z80  - Clock 2.49675MHz [9.987/4]
+      2114 - 1kx4 SRAM
+      All EPROMs are 2716
+      Wire jumpers for ROM configuration - J1 open
+                                           J2 1-2, 3-9, 4-8, 5-7
+                                           J4 1-2, 4-5, 7-8, 10-11
+
+Top and Middle PCBs are plugged in with the solder-sides together.
+Lower PCB is plugged in with components facing up.
+-------------------------------------------------------------------------
 
 todo:
 in cocktail mopde p1 is flipped
 after inking the shark on the far right octi was moved to goal?
 for the colours, goal has to be black otherwise it would register
-    qas a hit, is goal pen 0 or 6?
+    as a hit, is goal pen 0 or 6?
 rom writes when finishing a game
     worth looking at before the collision is correct?
 playing dot hit when eaten by a shark?
@@ -67,7 +122,7 @@ enemy sprite not disabled at end of game
 tilemap
 palette may only be around 4 colours
     is 14 the palette?
-how do you know if you've got an ink left?
+how do you know if you've got any ink left?
 prom 14 is the top bits? 4 bpp? or so?
 why is level 37 chosen?
 should it be 30fps?
@@ -89,8 +144,8 @@ flip/cocktail issues
 done:
 timer?
     you get 200 for each shot, don't think it's actually a timer
-have i been using x/y consistently, ie non rotated or rotated origin?
-    yes, seems to be best using xy raw (ie non-rotated)
+have I been using x/y consistently, i.e. non rotated or rotated origin?
+    yes, seems to be best using xy raw (i.e. non-rotated)
 p2 ink doesn't always light up in test mode
     after p1 ink pressed, p2 ink doesn't light up
     this is correct behavior if DSW set as Upright mode
@@ -190,8 +245,8 @@ READ8_MEMBER(marinedt_state::marinedt_coll_r)
 }
 
 //are these returning only during a collision?
-//id imagine they are returning the pf char where the collission took place?
-//what about where there is lots of colls?
+//I'd imagine they are returning the pf char where the collision took place?
+//what about where there is lots of collisions?
 //maybe the first on a scanline basis
 READ8_MEMBER(marinedt_state::marinedt_obj1_x_r)
 {
@@ -398,11 +453,11 @@ static INPUT_PORTS_START( marinedt )
 	PORT_DIPSETTING(    0x01, "5000" )
 	PORT_DIPSETTING(    0x00, "10000" )
 //cheat?
-	PORT_DIPNAME( 0x02, 0x00, "ignore internal bounce?" )   //maybe die/bounce of rocks/coral?
+	PORT_DIPNAME( 0x02, 0x00, "ignore internal bounce?" )   //maybe die / bounce off rocks & coral?
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 //freezes the game before the reset
-//doesn't seem to be done as a dip, but what about mixing with diops like this?
+//doesn't seem to be done as a dip, but what about mixing with dips like this?
 	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
@@ -706,29 +761,29 @@ MACHINE_CONFIG_END
 
 ROM_START( marinedt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "mg01",     0x0000, 0x0800, CRC(ad09f04d) SHA1(932fc973b4a2fbbebd7e6437ed30c8444e3d4afb))
-	ROM_LOAD( "mg02",     0x0800, 0x0800, CRC(555a2b0f) SHA1(143a8953ce5070c31dc4c1f623833b2a5a2cf657))
-	ROM_LOAD( "mg03",     0x1000, 0x0800, CRC(2abc79b3) SHA1(1afb331a2c0e320b6d026bc5cb47a53ac3356c2a))
-	ROM_LOAD( "mg04",     0x1800, 0x0800, CRC(be928364) SHA1(8d9ae71e2751c009187e41d84fbad9519ab551e1) )
-	ROM_LOAD( "mg05",     0x2000, 0x0800, CRC(44cd114a) SHA1(833165c5c00c6e505acf29fef4a3ae3f9647b443) )
-	ROM_LOAD( "mg06",     0x2800, 0x0800, CRC(a7e2c69b) SHA1(614fc479d13c1726382fe7b4b0379c1dd4915af0) )
-	ROM_LOAD( "mg07",     0x3000, 0x0800, CRC(b85d1f9a) SHA1(4fd3e76b1816912df84477dba4655d395f5e7072) )
+	ROM_LOAD( "mg01.3d",     0x0000, 0x0800, CRC(ad09f04d) SHA1(932fc973b4a2fbbebd7e6437ed30c8444e3d4afb))
+	ROM_LOAD( "mg02.4d",     0x0800, 0x0800, CRC(555a2b0f) SHA1(143a8953ce5070c31dc4c1f623833b2a5a2cf657))
+	ROM_LOAD( "mg03.5d",     0x1000, 0x0800, CRC(2abc79b3) SHA1(1afb331a2c0e320b6d026bc5cb47a53ac3356c2a))
+	ROM_LOAD( "mg04.6d",     0x1800, 0x0800, CRC(be928364) SHA1(8d9ae71e2751c009187e41d84fbad9519ab551e1) )
+	ROM_LOAD( "mg05.7d",     0x2000, 0x0800, CRC(44cd114a) SHA1(833165c5c00c6e505acf29fef4a3ae3f9647b443) )
+	ROM_LOAD( "mg06.9d",     0x2800, 0x0800, CRC(a7e2c69b) SHA1(614fc479d13c1726382fe7b4b0379c1dd4915af0) )
+	ROM_LOAD( "mg07.10d",    0x3000, 0x0800, CRC(b85d1f9a) SHA1(4fd3e76b1816912df84477dba4655d395f5e7072) )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_LOAD( "mg09",     0x0000, 0x0800, CRC(f4c349ca) SHA1(077f65eeac616a778d6c42bb95677fa2892ab697) )
-	ROM_LOAD( "mg10",     0x0800, 0x0800, CRC(b41251e3) SHA1(e125a971b401c78efeb4b03d0fab43e392d3fc14) )
-	ROM_LOAD( "mg11",     0x1000, 0x0800, CRC(50d66dd7) SHA1(858d1d2a75e091b0e382d964c5e4ddcd8e6f07dd))
+	ROM_LOAD( "mg09.4f",     0x0000, 0x0800, CRC(f4c349ca) SHA1(077f65eeac616a778d6c42bb95677fa2892ab697) )
+	ROM_LOAD( "mg10.3f",     0x0800, 0x0800, CRC(b41251e3) SHA1(e125a971b401c78efeb4b03d0fab43e392d3fc14) )
+	ROM_LOAD( "mg11.1f",     0x1000, 0x0800, CRC(50d66dd7) SHA1(858d1d2a75e091b0e382d964c5e4ddcd8e6f07dd))
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "mg12",     0x0000, 0x1000, CRC(7c6486d5) SHA1(a7f17a803937937f05fc90621883a0fd44b297a0) )
+	ROM_LOAD( "mg12.6c",     0x0000, 0x1000, CRC(7c6486d5) SHA1(a7f17a803937937f05fc90621883a0fd44b297a0) )
 
 	ROM_REGION( 0x1000, "gfx3", 0 )
-	ROM_LOAD( "mg13",     0x0000, 0x1000, CRC(17817044) SHA1(8c9b96620e3c414952e6d85c6e81b0df85c88e7a) )
+	ROM_LOAD( "mg13.6h",     0x0000, 0x1000, CRC(17817044) SHA1(8c9b96620e3c414952e6d85c6e81b0df85c88e7a) )
 
 	ROM_REGION( 0x0080, "proms", 0 )
-	ROM_LOAD( "mg14.bpr", 0x0000, 0x0020, CRC(f75f4e3a) SHA1(36e665987f475c57435fa8c224a2a3ce0c5e672b) )    //char clr
-	ROM_LOAD( "mg15.bpr", 0x0020, 0x0020, CRC(cd3ab489) SHA1(a77478fb94d0cf8f4317f89cc9579def7c294b4f) )    //obj clr
-	ROM_LOAD( "mg16.bpr", 0x0040, 0x0020, CRC(92c868bc) SHA1(483ae6f47845ddacb701528e82bd388d7d66a0fb) )    //?? collisions
+	ROM_LOAD( "mg14.2a",  0x0000, 0x0020, CRC(f75f4e3a) SHA1(36e665987f475c57435fa8c224a2a3ce0c5e672b) )    //char clr
+	ROM_LOAD( "mg15.1a",  0x0020, 0x0020, CRC(cd3ab489) SHA1(a77478fb94d0cf8f4317f89cc9579def7c294b4f) )    //obj clr
+	ROM_LOAD( "mg16.4e",  0x0040, 0x0020, CRC(92c868bc) SHA1(483ae6f47845ddacb701528e82bd388d7d66a0fb) )    //?? collisions
 	ROM_LOAD( "mg17.bpr", 0x0060, 0x0020, CRC(13261a02) SHA1(050edd18e4f79d19d5206f55f329340432fd4099) )    //?? table of increasing values
 ROM_END
 

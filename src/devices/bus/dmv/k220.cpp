@@ -138,8 +138,8 @@ dmv_k220_device::dmv_k220_device(const machine_config &mconfig, const char *tag,
 		m_pit(*this, "pit8253"),
 		m_ppi(*this, "ppi8255"),
 		m_ram(*this, "ram"),
-		m_rom(*this, "rom")
-{
+		m_rom(*this, "rom"), m_portc(0)
+	{
 }
 
 //-------------------------------------------------

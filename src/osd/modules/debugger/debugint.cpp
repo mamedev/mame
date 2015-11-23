@@ -17,7 +17,6 @@
 #include "debug/debugvw.h"
 #include "debug/dvdisasm.h"
 #include "debug/dvmemory.h"
-#include "debug/dvstate.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
@@ -151,10 +150,8 @@ class DView_edit
 	DISABLE_COPYING(DView_edit);
 
 public:
-	DView_edit()
-	{ }
-	~DView_edit()
-	{ }
+	DView_edit(): active(0), container(NULL) { }
+	~DView_edit() { }
 	int                 active;
 	render_container *  container;
 	std::string         str;
@@ -1131,7 +1128,6 @@ static void render_editor(DView_edit *editor)
 	x1 += UI_BOX_LR_BORDER;
 	x2 -= UI_BOX_LR_BORDER;
 	y1 += UI_BOX_TB_BORDER;
-	y2 -= UI_BOX_TB_BORDER;
 
 	/* draw the text within it */
 	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
@@ -1437,22 +1433,21 @@ void debug_internal::wait_for_debugger(device_t &device, bool firststop)
 {
 	if (firststop && list == NULL)
 	{
-		DView *dv;
-		render_target *target;
-
-		target = &device.machine().render().ui_target();
+		render_target *target = &device.machine().render().ui_target();
 
 		//set_view_by_name(target, "Debug");
 
-		dv = dview_alloc(target, device.machine(), DVT_DISASSEMBLY, VIEW_STATE_FOLLOW_CPU);
-		dv->editor.active = TRUE;
-		dv->editor.container = &device.machine().render().ui_container();
-		dv = dview_alloc(target, device.machine(), DVT_STATE, VIEW_STATE_FOLLOW_CPU);
-		dv = dview_alloc(target, device.machine(), DVT_CONSOLE, VIEW_STATE_FOLLOW_CPU);
-		dview_set_title(dv, "Console");
-		dv->editor.active = TRUE;
-		dv->editor.container = &device.machine().render().ui_container();
-		set_focus_view(dv);
+		DView *disassembly = dview_alloc(target, device.machine(), DVT_DISASSEMBLY, VIEW_STATE_FOLLOW_CPU);
+		disassembly->editor.active = TRUE;
+		disassembly->editor.container = &device.machine().render().ui_container();
+		
+        dview_alloc(target, device.machine(), DVT_STATE, VIEW_STATE_FOLLOW_CPU);
+		
+        DView *console = dview_alloc(target, device.machine(), DVT_CONSOLE, VIEW_STATE_FOLLOW_CPU);
+		dview_set_title(console, "Console");
+		console->editor.active = TRUE;
+		console->editor.container = &device.machine().render().ui_container();
+		set_focus_view(console);
 	}
 
 	followers_set_cpu(&device);

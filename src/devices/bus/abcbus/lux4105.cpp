@@ -31,7 +31,7 @@ WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_bsy )
 {
 	m_sasi_bsy = state;
 
-	if (state)
+	if (m_sasi_bsy)
 	{
 		m_sasibus->write_sel(0);
 	}
@@ -141,9 +141,9 @@ ioport_constructor luxor_4105_device::device_input_ports() const
 
 inline void luxor_4105_device::update_trrq_int()
 {
-	int cd = !m_sasi_cd;
-	int req = !m_sasi_req;
-	int trrq = !(cd & !req);
+	bool cd = !m_sasi_cd;
+	bool req = !m_sasi_req;
+	int trrq = (cd & !req) ? 0 : 1;
 
 	if (BIT(m_dma, 5))
 	{
@@ -185,10 +185,10 @@ luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *
 	m_cs(false),
 	m_data(0),
 	m_dma(0),
-	m_sasi_bsy(0),
-	m_sasi_req(0),
-	m_sasi_cd(0),
-	m_sasi_io(0)
+	m_sasi_bsy(false),
+	m_sasi_req(false),
+	m_sasi_cd(false),
+	m_sasi_io(false)
 {
 }
 
@@ -268,10 +268,10 @@ UINT8 luxor_4105_device::abcbus_stat()
 
 		*/
 
-		data = !m_sasi_bsy;
-		data |= !m_sasi_req << 2;
-		data |= !m_sasi_cd << 3;
-		data |= !m_sasi_io << 6;
+		data = m_sasi_bsy ? 0 : (1 << 0);
+		data |= m_sasi_req ? 0 : (1 << 2);
+		data |= m_sasi_cd ? 0 : (1 << 3);
+		data |= m_sasi_io ? 0 : (1 << 6);
 	}
 
 	return data;

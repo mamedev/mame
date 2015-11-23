@@ -193,8 +193,8 @@ class ti_expansion_card_device : public bus8z_device, public device_slot_card_in
 public:
 	ti_expansion_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	device_slot_card_interface(mconfig, *this)
-	{
+	device_slot_card_interface(mconfig, *this), m_selected(false), m_cru_base(0), m_select_mask(0), m_select_value(0)
+{
 		m_slot = static_cast<peribox_slot_device*>(owner);
 		m_senila = CLEAR_LINE;
 		m_senilb = CLEAR_LINE;

@@ -39,7 +39,7 @@ ADDRESS_MAP_END
 
 microdisc_device::microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	oricext_device(mconfig, MICRODISC, "Microdisc floppy drive interface", tag, owner, clock, "microdisc", __FILE__),
-	fdc(*this, "fdc")
+	fdc(*this, "fdc"), microdisc_rom(nullptr), port_314(0), intrq_state(false), drq_state(false), hld_state(false)
 {
 }
 

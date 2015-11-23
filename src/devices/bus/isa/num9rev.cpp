@@ -83,7 +83,7 @@ isa8_number_9_rev_device::isa8_number_9_rev_device(const machine_config &mconfig
 		m_upd7220(*this, "upd7220"),
 		m_palette(*this, "palette"),
 		m_ram(1024*1024),
-		m_overlay(1024)
+		m_overlay(1024), m_bank(0), m_mode(0), m_1024(false)
 {
 }
 

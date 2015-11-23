@@ -13,14 +13,6 @@
 #include "sh2.h"
 #include "sh2comn.h"
 
-
-// for now, make buggy GCC/Mingw STFU about I64FMT
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat"
-#pragma GCC diagnostic ignored "-Wformat-extra-args"
-#endif
-
 #define VERBOSE 0
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
@@ -1022,6 +1014,3 @@ WRITE16_MEMBER(sh2a_device::sh7021_w)
 {
 	COMBINE_DATA(&m_sh7021_regs[offset]);
 }
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic pop
-#endif

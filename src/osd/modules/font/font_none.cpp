@@ -21,7 +21,6 @@ public:
 	virtual bool open(const char *font_path, const char *name, int &height);
 	virtual void close();
 	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
-private:
 };
 
 bool osd_font_none::open(const char *font_path, const char *_name, int &height)

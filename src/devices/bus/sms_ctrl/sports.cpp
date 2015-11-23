@@ -154,7 +154,7 @@ sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, cons
 	m_last_data(0),
 	m_x_axis_reset_value(0x80), // value 0x80 helps when start playing paddle games.
 	m_y_axis_reset_value(0x80),
-	m_interval(SPORTS_PAD_INTERVAL)
+	m_interval(SPORTS_PAD_INTERVAL), m_sportspad_timer(nullptr)
 {
 }
 

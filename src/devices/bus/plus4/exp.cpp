@@ -74,7 +74,7 @@ plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &m
 		m_write_irq(*this),
 		m_read_dma_cd(*this),
 		m_write_dma_cd(*this),
-		m_write_aec(*this)
+		m_write_aec(*this), m_card(nullptr)
 {
 }
 

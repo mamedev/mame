@@ -439,10 +439,10 @@ abc77_device::abc77_device(const machine_config &mconfig, const char *tag, devic
 	m_x10(*this, "X10"),
 	m_x11(*this, "X11"),
 	m_dsw(*this, "DSW"),
-	m_txd(1),
+	m_txd(1), m_keylatch(0),
 	m_keydown(1),
-	m_clock(0),
-	m_stb(1)
+	m_clock(0), m_hys(0), m_reset(0),
+	m_stb(1), m_j3(0), m_serial_timer(nullptr), m_reset_timer(nullptr)
 {
 }
 
@@ -464,10 +464,10 @@ abc77_device::abc77_device(const machine_config &mconfig, device_type type, cons
 	m_x10(*this, "X10"),
 	m_x11(*this, "X11"),
 	m_dsw(*this, "DSW"),
-	m_txd(1),
+	m_txd(1), m_keylatch(0),
 	m_keydown(1),
-	m_clock(0),
-	m_stb(1)
+	m_clock(0), m_hys(0), m_reset(0),
+	m_stb(1), m_j3(0), m_serial_timer(nullptr), m_reset_timer(nullptr)
 {
 }
 

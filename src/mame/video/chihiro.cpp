@@ -1240,7 +1240,7 @@ UINT32 nv2a_renderer::texture_get_texel(int number, int x, int y)
 	}
 }
 
-inline UINT8 *nv2a_renderer::read_pixel(int x, int y, UINT32 c[4])
+inline UINT8 *nv2a_renderer::read_pixel(int x, int y, INT32 c[4])
 {
 	UINT32 offset;
 	UINT32 color;
@@ -1261,8 +1261,8 @@ inline UINT8 *nv2a_renderer::read_pixel(int x, int y, UINT32 c[4])
 		c[1] = pal6bit((color & 0x07e0) >> 5);
 		c[0] = pal5bit(color & 0x1f);
 		return (UINT8 *)addr16;
-	case NV2A_COLOR_FORMAT_UNKNOWN4:
-	case NV2A_COLOR_FORMAT_X8R8G8B8:
+	case NV2A_COLOR_FORMAT_X8R8G8B8_Z8R8G8B8:
+	case NV2A_COLOR_FORMAT_X8R8G8B8_X8R8G8B8:
 		addr = (UINT32 *)((UINT8 *)rendertarget + offset);
 		color = *addr;
 
@@ -1295,7 +1295,7 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 	UINT32 *daddr32;
 	UINT16 *daddr16;
 	UINT32 deptsten;
-	UINT32 c[4], fb[4], s[4], d[4], cc[4];
+	INT32 c[4], fb[4], s[4], d[4], cc[4];
 	UINT32 dep, sten, stenc, stenv;
 	bool stencil_passed;
 	bool depth_passed;
@@ -1854,16 +1854,16 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 	if (color_mask != 0) {
 		UINT32 ct,ft,w;
 
-		ct = (c[3] << 24) | (c[2] << 16) | (c[1] << 8) | c[0];
-		ft = (fb[3] << 24) | (fb[2] << 16) | (fb[1] << 8) | fb[0];
+		ct = ((UINT32)c[3] << 24) | ((UINT32)c[2] << 16) | ((UINT32)c[1] << 8) | (UINT32)c[0];
+		ft = ((UINT32)fb[3] << 24) | ((UINT32)fb[2] << 16) | ((UINT32)fb[1] << 8) | (UINT32)fb[0];
 		w = (ft & ~color_mask) | (ct & color_mask);
 		switch (colorformat_rendertarget) {
 		case NV2A_COLOR_FORMAT_R5G6B5:
 			w = ((w >> 8) & 0xf800) + ((w >> 5) & 0x7e0) + ((w >> 3) & 0x1f);
 			*((UINT16 *)addr) = (UINT16)w;
 			break;
-		case NV2A_COLOR_FORMAT_UNKNOWN4:
-		case NV2A_COLOR_FORMAT_X8R8G8B8:
+		case NV2A_COLOR_FORMAT_X8R8G8B8_Z8R8G8B8:
+		case NV2A_COLOR_FORMAT_X8R8G8B8_X8R8G8B8:
 			*((UINT32 *)addr) = w;
 			break;
 		case NV2A_COLOR_FORMAT_A8R8G8B8:
@@ -2862,7 +2862,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			m = 1;
 		// possible buffers: color, depth, stencil
 		// clear framebuffer
-		if (data & 0xf0) {
+		if ((data & 0xf0) == 0xf0) {
 			if (bytespixel_rendertarget == 4) {
 				bitmap_rgb32 bm(rendertarget, (limits_rendertarget.right() + 1) * m, (limits_rendertarget.bottom() + 1) * m, pitch_rendertarget / 4);
 
@@ -2913,8 +2913,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		case NV2A_COLOR_FORMAT_R5G6B5:
 			bytespixel_rendertarget = 2;
 			break;
-		case NV2A_COLOR_FORMAT_UNKNOWN4:
-		case NV2A_COLOR_FORMAT_X8R8G8B8:
+		case NV2A_COLOR_FORMAT_X8R8G8B8_Z8R8G8B8:
+		case NV2A_COLOR_FORMAT_X8R8G8B8_X8R8G8B8:
 		case NV2A_COLOR_FORMAT_A8R8G8B8:
 			bytespixel_rendertarget = 4;
 			break;
@@ -4018,10 +4018,28 @@ UINT32 nv2a_renderer::screen_update_callback(screen_device &screen, bitmap_rgb32
 	return 0;
 }
 
+void nv2a_renderer::geforce_assign_object(address_space & space, UINT32 chanel, UINT32 subchannel, UINT32 address)
+{
+	int handle, objclass;
+
+	handle = space.read_dword(address);
+	handle = geforce_object_offset(handle);
+#ifdef LOG_NV2A
+	machine().logerror("  assign to subchannel %d object at %d", subch, handle);
+#endif
+	channel[chanel][subchannel].object.objhandle = handle;
+	handle = ramin[handle / 4];
+	objclass = handle & 0xff;
+#ifdef LOG_NV2A
+	machine().logerror(" class %03X\n", objclass);
+#endif
+	channel[chanel][subchannel].object.objclass = objclass;
+}
+
 TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 {
-	int chanel, subchannel;
-	int method, count, handle, objclass;
+	int chanel;
+	int method, count;
 	UINT32 *dmaput, *dmaget;
 	UINT32 cmd, cmdtype;
 	int countlen;
@@ -4030,9 +4048,8 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 	UINT32 subch;
 
 	chanel = puller_channel;
-	subchannel = puller_subchannel;
-	dmaput = &channel[chanel][subchannel].regs[0x40 / 4];
-	dmaget = &channel[chanel][subchannel].regs[0x44 / 4];
+	dmaput = &channel[chanel][0].regs[0x40 / 4];
+	dmaget = &channel[chanel][0].regs[0x44 / 4];
 	while (*dmaget != *dmaput) {
 		cmd = space->read_dword(*dmaget);
 		*dmaget += 4;
@@ -4041,11 +4058,11 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 		{
 		case 6: // jump
 #ifdef LOG_NV2A
-			printf("jump dmaget %08X", *dmaget);
+			machine().logerror("jump dmaget %08X", *dmaget);
 #endif
 			*dmaget = cmd & 0xfffffffc;
 #ifdef LOG_NV2A
-			printf(" -> %08X\n\r", *dmaget);
+			machine().logerror(" -> %08X\n\r", *dmaget);
 #endif
 			break;
 		case 0: // increasing method
@@ -4053,18 +4070,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 			subch = (cmd >> 13) & 7;
 			count = (cmd >> 18) & 2047;
 			if ((method == 0) && (count == 1)) {
-				handle = space->read_dword(*dmaget);
-				handle = geforce_object_offset(handle);
-#ifdef LOG_NV2A
-				machine().logerror("  assign to subchannel %d object at %d", subch, handle);
-#endif
-				channel[chanel][subch].object.objhandle = handle;
-				handle = ramin[handle / 4];
-				objclass = handle & 0xff;
-#ifdef LOG_NV2A
-				machine().logerror(" class %03X\n", objclass);
-#endif
-				channel[chanel][subch].object.objclass = objclass;
+				geforce_assign_object(*space, chanel, subch, *dmaget);
 				*dmaget += 4;
 			}
 			else {
@@ -4093,18 +4099,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 			subch = (cmd >> 13) & 7;
 			count = (cmd >> 18) & 2047;
 			if ((method == 0) && (count == 1)) {
-				handle = space->read_dword(*dmaget);
-				handle = geforce_object_offset(handle);
-#ifdef LOG_NV2A
-				machine().logerror("  assign to subchannel %d object at %d", subch, handle);
-#endif
-				channel[chanel][subch].object.objhandle = handle;
-				handle = ramin[handle / 4];
-				objclass = handle & 0xff;
-#ifdef LOG_NV2A
-				machine().logerror(" class %03X\n", objclass);
-#endif
-				channel[chanel][subch].object.objclass = objclass;
+				geforce_assign_object(*space, chanel, subch, *dmaget);
 				*dmaget += 4;
 			}
 			else {
@@ -4125,18 +4120,7 @@ TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
 			count = space->read_dword(*dmaget);
 			*dmaget += 4;
 			if ((method == 0) && (count == 1)) {
-				handle = space->read_dword(*dmaget);
-				handle = geforce_object_offset(handle);
-#ifdef LOG_NV2A
-				machine().logerror("  assign to subchannel %d object at %d", subch, handle);
-#endif
-				channel[chanel][subch].object.objhandle = handle;
-				handle = ramin[handle / 4];
-				objclass = handle & 0xff;
-#ifdef LOG_NV2A
-				machine().logerror(" class %03X\n", objclass);
-#endif
-				channel[chanel][subch].object.objclass = objclass;
+				geforce_assign_object(*space, chanel, subch, *dmaget);
 				*dmaget += 4;
 			}
 			else {
@@ -4294,16 +4278,16 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 		subchannel = (suboffset >> (13 - 2)) & 7;
 		suboffset = suboffset & 0x7ff;
 		//machine().logerror("NV_2A: write channel[%02X,%d,%04X]=%08X\n",chanel,subchannel,suboffset*4,data & mem_mask);
+		COMBINE_DATA(&channel[chanel][subchannel].regs[suboffset]);
 		if (suboffset >= 0x80 / 4)
 			return;
-		COMBINE_DATA(&channel[chanel][subchannel].regs[suboffset]);
 		if ((suboffset == 0x40 / 4) || (suboffset == 0x44 / 4)) { // DMA_PUT or DMA_GET
 			UINT32 *dmaput, *dmaget;
 
-			dmaput = &channel[chanel][subchannel].regs[0x40 / 4];
-			dmaget = &channel[chanel][subchannel].regs[0x44 / 4];
+			dmaput = &channel[chanel][0].regs[0x40 / 4];
+			dmaget = &channel[chanel][0].regs[0x44 / 4];
 			//printf("dmaget %08X dmaput %08X\n\r",*dmaget,*dmaput);
-			if ((*dmaput == 0x048cf000) && (*dmaget == 0x07f4d000)) {
+			if ((*dmaput == 0x048cf000) && (*dmaget == 0x07f4d000)) { // only for outr2
 				*dmaget = *dmaput;
 				puller_waiting = 0;
 				puller_timer->enable(false);
@@ -4312,7 +4296,6 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 			if (*dmaget != *dmaput) {
 				if (puller_waiting == 0) {
 					puller_channel = chanel;
-					puller_subchannel = subchannel;
 					puller_space = &space;
 					puller_timer->enable();
 					puller_timer->adjust(attotime::zero);

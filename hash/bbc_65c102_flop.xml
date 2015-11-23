@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- BBC Master 65C102 Co-Processor Support Disc -->
+<!-- BBC Micro - 65C102 Co-Processor Discs -->
 
 <!-- Loading Instructions:
 
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbc_65c102_flop" description="BBC Master 65C102 Co-Processor Support Disc">
+<softwarelist name="bbc_65c102_flop" description="65C102 Co-Processor Discs">
 
 	<software name="coprosup" supported="no">
-		<description>65C102 Co-Processor Support Disc</description>
+		<description>BBC Master 65C102 Co-Processor Support Disc</description>
 		<year>1983</year>
 		<publisher>Acorn Computers</publisher>
 		<info name="format" value="DFS" />

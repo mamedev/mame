@@ -194,7 +194,7 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 save_error save_manager::check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
 {
 	// if we want to validate the signature, compute it
-	UINT32 sig = 0;
+	UINT32 sig;
 	sig = machine.save().signature();
 
 	// seek to the beginning and read the header

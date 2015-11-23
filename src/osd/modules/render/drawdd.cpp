@@ -17,13 +17,11 @@
 #include "emu.h"
 #include "render.h"
 #include "rendutil.h"
-#include "options.h"
 #include "rendersw.inc"
 
 // MAMEOS headers
 #include "winmain.h"
 #include "window.h"
-#include "config.h"
 
 
 
@@ -40,7 +38,10 @@ class renderer_dd : public osd_renderer
 {
 public:
 	renderer_dd(osd_window *window)
-	: osd_renderer(window, FLAG_NONE),
+	: osd_renderer(window, FLAG_NONE), 
+		width(0), 
+		height(0), 
+		refresh(0),
 		//adapter(0),
 		adapter_ptr(NULL),
 		clearouter(0),

@@ -38,8 +38,8 @@ vectrex_rom_device::vectrex_rom_device(const machine_config &mconfig, const char
 }
 
 vectrex_rom64k_device::vectrex_rom64k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: vectrex_rom_device(mconfig, VECTREX_ROM_64K, "Vectrex Carts w/ Bankswitch", tag, owner, clock, "vectrex_64k", __FILE__)
-{
+					: vectrex_rom_device(mconfig, VECTREX_ROM_64K, "Vectrex Carts w/ Bankswitch", tag, owner, clock, "vectrex_64k", __FILE__), m_bank(0)
+				{
 }
 
 vectrex_sram_device::vectrex_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

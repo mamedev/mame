@@ -58,13 +58,13 @@ nes_tam_s1_device::nes_tam_s1_device(const machine_config &mconfig, const char *
 }
 
 nes_g101_device::nes_g101_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_G101, "NES Cart Irem G-101 PCB", tag, owner, clock, "nes_g101", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_G101, "NES Cart Irem G-101 PCB", tag, owner, clock, "nes_g101", __FILE__), m_latch(0)
+				{
 }
 
 nes_h3001_device::nes_h3001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_H3001, "NES Cart Irem H-3001 PCB", tag, owner, clock, "nes_h3001", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_H3001, "NES Cart Irem H-3001 PCB", tag, owner, clock, "nes_h3001", __FILE__), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), irq_timer(nullptr)
+				{
 }
 
 

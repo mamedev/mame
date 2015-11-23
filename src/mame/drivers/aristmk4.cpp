@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Palindrome, FraSher, Roberto Fresca
-/*
+/***********************************************************************************************************************************************
+
     Driver: aristmk4
 
     Manufacturer: Aristocrat Leisure Industries ( aka Ainsworth Nominees P.L. )
@@ -8,6 +9,7 @@
     Driver by Palindrome & FraSher
 
     original 86lions.c driver by Chris Hardy, Angelo Salese & Roberto Fresca
+
 
     ***************** INITIALISATION *********************************************************************
 
@@ -17,7 +19,6 @@
     * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
     * A value (displayed below) will appear next to RF/AMT on the right of the screen
     * Key out both the Jackpot and Audit Keys
-
 
     This method works with the following games:
     3bagflnz 200
@@ -29,6 +30,7 @@
     eforesta 200
     eforestb 200
     ffortune 200
+    fvrpitch 200
     gldnpkr  400
     goldenc  200
     gtroppo  500
@@ -43,19 +45,21 @@
     Method 2 :
     * Key in with the Jackpot Key followed by the Audit Key
     * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
-    * This will enter the cashcade screen and increment $100 to the maximum
-    * Press PLAY 2 LINES [listed as BET 2 on the screen] to increment the minimum cashcade value by $5
-      - (optionally, you can decrement with the PLAY 1 LINE [BET 1] button, but you must first increment the $5 to start with above or the game won't initialise)
-    * A value (displayed below) will appear on the right as RF/AMT when you key in again (not visible until you key out and back in again with the Audit Key)
+    * This will enter the cashcade screen and increment $100 to the maximum.
+    * Press PLAY 2 LINES [listed as BET 2 on the screen] to increment the minimum cashcade value by $5.
+      - (optionally, you can decrement with the PLAY 1 LINE [BET 1] button, but you must first increment
+        the $5 to start with above or the game won't initialise)
+    * A value (displayed below) will appear on the right as RF/AMT when you key in again (not visible
+       until you key out and back in again with the Audit Key)
     * Key out both the Jackpot and Audit Keys
 
     This method works with the following games:
     topgear  500
 
     Method 3 :
-    * cgold2, fhunter and fhuntera ONLY:
-      DIP labeled "5201-5" switch to ON
-      This allows setup procedure to complete properly and game to play (if disabled, it acts as a 'freeze' switch and the games don't accept inputs).
+    * cgold2, fhunter and fhuntera ONLY: DIP labeled "5201-5" switch to ON
+       This allows setup procedure to complete properly and game to play (if disabled, it acts as a
+       'freeze' switch and the games don't accept inputs).
     * Key in with the Jackpot Key followed by the Audit Key.
     * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
     * Press Service (default A) 4 times until you are in the Setup Screen, with Printer Pay Limit.
@@ -68,6 +72,9 @@
     eforest
     fhunter
     fhuntera
+
+
+**********************************************************************************************************
 
     Technical Notes:
 
@@ -92,6 +99,11 @@
 
     The AY8910 named ay1 has writes on PORT B to the ZN434 DA convertor.
     The AY8910 named ay2 has writes to lamps and the light tower on Port A and B. these are implemented via the layout
+
+
+**********************************************************************************************************
+
+    Updates....
 
     27/04/10 - FrasheR
     2 x Sound Chips connected to the 6522 VIA.
@@ -119,7 +131,8 @@
     - day of week is incorrect
     - day of month is incorrect ( code is using day instead of mday ).
     - hours are not showing up correct in PM and 12 hour mode
-    - rtc causes game to freeze if the game is left in audit mode with continuous writes to 0xA reg - 0x80 data )
+    - rtc causes game to freeze if the game is left in audit mode with continuous writes
+       to 0xA reg - 0x80 data )
 
     9/7/2010 - Palindrome
     Robot Test added
@@ -133,7 +146,8 @@
 
     12/12/2010 - Palindrome and Heihachi_73
     Updated source to 0.140u2 standards
-    Disabled real time clock to stop games from hanging. This causes a graphics glitch on the month display but makes the games more reliable in audit mode.
+    Disabled real time clock to stop games from hanging. This causes a graphics glitch
+     on the month display but makes the games more reliable in audit mode.
     Fixed ROM names
     Added new game Arctic Wins
     Added new game Caribbean Gold 2 (missing 2 gfx roms, still boots)
@@ -141,7 +155,8 @@
     Added new game Fortune Hunter (2 sets)
 
     06/06/2011 - Heihachi_73
-    Added button panel artwork for all games, and renamed the in-game buttons to match the artwork and/or Robot Test description.
+    Added button panel artwork for all games, and renamed the in-game buttons to match
+     the artwork and/or Robot Test description.
     Remapped Jackpot Key to 'L'
     Remapped 'power fail' key to ',' (comma)
     Remapped the video poker buttons; holds are now keys S,D,F,G,H
@@ -166,13 +181,20 @@
 
     21/02/2013 - Heihachi_73
     Added new game Caribbean Gold (cgold), however it is not a straight swap as it has slightly different input locations:
-     - With unmodified 0.148 source, game complains about logic door being open, which is seemingly tied to the current coin input.
-     - When HOPCO2 is toggled off/on quickly (default is on otherwise it will cause a note acceptor error), the note acceptor works, adding 4 credits ($1?) - this is seemingly a quarter slot (25c). Not sure if other notes are possible.
-     - Same gameplay as Gone Troppo, one interesting thing about this game is that the KQJ symbols have actual faces instead of plain letters.
+     - With unmodified 0.148 source, game complains about logic door being open,
+        which is seemingly tied to the current coin input.
+     - When HOPCO2 is toggled off/on quickly (default is on otherwise it will
+        cause a note acceptor error), the note acceptor works, adding 4 credits ($1?).
+        This is seemingly a quarter slot (25c). Not sure if other notes are possible.
+     - Same gameplay as Gone Troppo, one interesting thing about this game is that
+	    the KQJ symbols have actual faces instead of plain letters.
 
     08/03/2013 - Heihachi_73
     Cleaned up comments and erroneous ROM names (e.g. graphics ROMs named after the program ROM).
-    Caribbean Gold II - copied cgold graphics ROMs u8+u11 (aka u20+u45) to cgold2, game now playable. Tiles 0x64 and 0x65 are used to show the game's denomination (credit value), however cgold does not use these tiles (there are seemingly unused line/bet/number tiles in this location), this causes a minor glitch on the $/c sign. Tiles 0x277-0x288 also differ but are unused.
+    Caribbean Gold II - copied cgold graphics ROMs u8+u11 (aka u20+u45) to cgold2, game now playable.
+     Tiles 0x64 and 0x65 are used to show the game's denomination (credit value), however cgold does
+     not use these tiles (there are seemingly unused line/bet/number tiles in this location), this
+     causes a minor glitch on the $/c sign. Tiles 0x277-0x288 also differ but are unused.
     Promoted Fortune Hunter and clone to working status, as they were in fact working for quite a while.
     Fixed ROM names for kgbird/kgbirda; 5c and 10c variants were mixed up.
 
@@ -182,36 +204,67 @@
     27/03/2014
     Added new game: Gun's and Roses Poker - gunnrose
 
-    ****************************************************************************
+    13/11/2015 - Roberto Fresca
+    Added new game: Fever Pitch? (2VXEC534, NSW, 90.36%).
+	Need to confirm the title.
 
-    When the games first power on (or when reset), they will display a TILT message on the screen. This doesn't affect gameplay, and if there are no pending errors the game should coin up and/or play immediately.
-    The tilt message will also appear when an error code is displayed, such as the main door being opened/closed, or a hardware error/fault (such as hopper empty, coin yoyo, printer errors; none of which should happen in MAME however).
+
+*************************************************************************************************************
+
+    When the games first power on (or when reset), they will display a TILT message on the screen.
+    This doesn't affect gameplay, and if there are no pending errors the game should coin up and/or play immediately.
+
+    The tilt message will also appear when an error code is displayed, such as the main door being opened/closed, or
+    a hardware error/fault (such as hopper empty, coin yoyo, printer errors; none of which should happen in MAME however).
+
     The tilt message will disappear if you turn the Audit Key on and off, or after you start playing.
-    Despite the name, there is no 'tilt' mechanism in the machine and there is nothing to worry about. The first Aristocrat system to have a tilt mechanism was the MK5, which will cause the machine to reset abruptly if the player is too rough (e.g. hitting the screen or bumping the machine).
+    Despite the name, there is no 'tilt' mechanism in the machine and there is nothing to worry about.
+    The first Aristocrat system to have a tilt mechanism was the MK5, which will cause the machine to reset abruptly
+    if the player is too rough (e.g. hitting the screen or bumping the machine).
 
-    These games do not feature a backup mechanism in case of power faults or system crashes requiring a reboot; if the player was in the middle of a spin or watching a win count up, any credits won on that spin will be voided.
-    On the machine's artwork, this is reflected with text reading 'Malfunction voids all pays and plays', of which the text has also been carried onto later machines. The Aristocrat MK5 and later systems however feature backup mechanisms and will repeat the last game (including free game features and/or gamble selection) when powered on, to where the player had left off.
+    These games do not feature a backup mechanism in case of power faults or system crashes requiring a reboot;
+    if the player was in the middle of a spin or watching a win count up, any credits won on that spin will be voided.
+    On the machine's artwork, this is reflected with text reading 'Malfunction voids all pays and plays', of which
+    the text has also been carried onto later machines. The Aristocrat MK5 and later systems however feature backup
+    mechanisms and will repeat the last game (including free game features and/or gamble selection) when powered on,
+    to where the player had left off.
 
-    Gone Troppo and Caribbean Gold 1 and 2 require DIP SW7 to be set to off/off or else the second screen will be broken. This is possibly true to the original machine.
+    Gone Troppo and Caribbean Gold 1 and 2 require DIP SW7 to be set to off/off or else the second screen will be broken.
+    This is possibly true to the original machine.
+
     A similar thing happens with Top Gear, the drag cars' tyres will only be the correct colour (grey) if SW7 is off/off.
-    In Wild One, the dollar sign on the Insert $2 graphic is the wrong colour on other settings as well. It only appears correct when SW7 is off/off. This is probably a bug in the original game, where the graphic designers have used the wrong palette for the background of the dollar sign.
+
+    In Wild One, the dollar sign on the Insert $2 graphic is the wrong colour on other settings as well. It only appears
+    correct when SW7 is off/off. This is probably a bug in the original game, where the graphic designers have used the
+    wrong palette for the background of the dollar sign.
+
     From these findings, it is noted that the off/off setting may in fact be the default background setting of all games.
 
     cgold, gtroppo and topgear are non-multiplier, 5 payline games, therefore, you cannot bet higher than 5 credits on these machines.
 
-    cgold can be set to credit play or coin play by toggling SW1-5. If SW1-5 is on, game is in credit mode; if SW1-5 is off, wins and remaining credits will be automatically paid out as coins.
+    cgold can be set to credit play or coin play by toggling SW1-5. If SW1-5 is on, game is in credit mode; if SW1-5 is off,
+    wins and remaining credits will be automatically paid out as coins.
 
-    Non-US games can enable/disable the double up (gamble) option by toggling the SW1-8 switch. Turning SW1 off will enable the double up option (default); turning SW1-8 on will disable double up and enable auto-spin on some games (so far, only eforesta and 3bagflvt allow this; other games simply ignore the buttons). The games respond slightly faster between games with double up disabled.
-    3 Bags Full, Fortune Hunter, Caribbean Gold 1 and 2, Gone Troppo and Top Gear do not have a double up option, and US-based games ignore this switch setting (double up is always enabled on US games which support it).
+    Non-US games can enable/disable the double up (gamble) option by toggling the SW1-8 switch. Turning SW1 off will enable
+    the double up option (default); turning SW1-8 on will disable double up and enable auto-spin on some games (so far, only
+    eforesta and 3bagflvt allow this; other games simply ignore the buttons). The games respond slightly faster between games
+    with double up disabled.
+
+    3 Bags Full, Fortune Hunter, Caribbean Gold 1 and 2, Gone Troppo and Top Gear do not have a double up option, and US-based
+    games ignore this switch setting (double up is always enabled on US games which support it).
+
 
     TODO:
+
     1. ROMs need redumping for the following games:
      - White Tiger has bad graphics ROMs.
      - Caribbean Gold 2 is missing two graphics chips.
      - Clockwise needs its program ROM redumped, original dump was 32K of 0xFF's. Graphics and video/sound ROM are OK.
-     - PROM dumps needed for Top Gear (2CM33), Caribbean Gold (1CM12), Caribbean Gold 2 (unknown), Clockwise (2CM18) and Golden Poker (unknown).
+     - PROM dumps needed for Top Gear (2CM33), Caribbean Gold (1CM12), Caribbean Gold 2 (unknown), Clockwise (2CM18),
+        Golden Poker (unknown), and Fever Pitch (unknown).
 
-    2. Video poker and Keno button panels needed. 06/06/11: Video poker panels done, however they need confirmation with a real machine.
+    2. Video poker and Keno button panels needed. 06/06/11: Video poker panels done, however they need confirmation
+       with a real machine.
 
     3. Extend the driver to use the keno keyboard input for keno games (no MK2.5/MKIV Keno games dumped yet as of 28/02/2010).
 
@@ -229,6 +282,7 @@
 
     10. fix 86 Lions (pre-Aristocrat Mk-4 HW, without prom and dunno what else)
 
+
     ***************** POKER GAMES ************************************************************************
 
     Wild One & Golden Poker have a problem where the second branch condition is always true, see assembler below for
@@ -244,11 +298,13 @@
 
     Bug in the 6845 crtc core ? Seems like some kind of logic there not working.
 
-    EDIT: it's a vblank check, BITA opcode checks bit 5 in A register and compares it with the contents of 0x1800 (that is vblank in
-    mc6845_status_r). Checking if a bit goes low then high it usually means that is moaning for a vblank. ;-)
-    But now there is a new question: what kind of mc6845 clone this HW uses? It's clearly not standard mc6845, since that version doesn't
-    support vblank reading. The vblank bit can be read only on C6545-1, R6545-1, SY6545-1 and SY6845E subvariants, so it all lies to
-    those. -AS
+    EDIT: it's a vblank check, BITA opcode checks bit 5 in A register and compares it with the contents of 0x1800
+    (that is vblank in mc6845_status_r). Checking if a bit goes low then high it usually means that is moaning for
+    a vblank. ;-)
+    But now there is a new question: what kind of mc6845 clone this HW uses? It's clearly not standard mc6845,
+    since that version doesn't support vblank reading. The vblank bit can be read only on C6545-1, R6545-1, SY6545-1
+    and SY6845E subvariants, so it all lies to those. -AS
+
 
 ***********************************************************************************************************************************************/
 
@@ -280,6 +336,7 @@
 #include "wildone.lh"  // Video poker
 #include "gunnrose.lh" // Video poker
 #include "gldnpkr.lh"  // Video poker
+#include "fvrpitch.lh"  // 5 line without gamble
 
 UINT8 crtc_cursor_index = 0;
 UINT8 crtc_reg = 0;
@@ -1520,6 +1577,20 @@ static INPUT_PORTS_START(gldnpkr)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw") PORT_CODE(KEYCODE_R)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(fvrpitch)
+	PORT_INCLUDE(arcwins)
+
+	PORT_MODIFY("500d")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Play 5 Lines") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Reserve") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-5 UNUSED")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("0-6 UNUSED")
+
+	PORT_MODIFY("500e")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Play 1 Line") PORT_CODE(KEYCODE_W)
+INPUT_PORTS_END
+
+
 static const gfx_layout layout8x8x6 =
 {
 	8,8,
@@ -2317,6 +2388,33 @@ ROM_START( gldnpkr ) // MK2.5
 	ROM_LOAD("2cm07.u40", 0x0000, 0x0200, CRC(1e3f402a) SHA1(f38da1ad6607df38add10c69febf7f5f8cd21744)) // Using 2CM07 until a correct PROM is confirmed
 ROM_END
 
+/* Fever Pitch? (2VXEC534, 90.36%)
+   Need some proof about the real name.
+   Unhandled Mechanical meter 2 pulse: 04 --> Payout pulse.
+*/
+ROM_START( fvrpitch ) // MK2.5
+	ROM_REGION(0x10000, "maincpu", 0 )
+		/* VIDEO AND SOUND EPROM */
+	ROM_LOAD("vidsnd.u7", 0x06000, 0x2000, BAD_DUMP CRC(568bd63f) SHA1(128b0b085c8b97d1c90baeab4886c522c0bc9a0e)) // unknown EPROM name
+
+		/* GAME EPROMS */
+	ROM_LOAD("2vxec534_fever_pitch_90.36%.u9", 0x08000, 0x8000, CRC(6f8780e8) SHA1(ebf1bfdf2ad727caa2fee34a6ae645ddba42f1cb))  // 90.36%
+
+		/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("1vlbh1299_fever_pitch.u8",  0x00000, 0x2000, CRC(8d6294d2) SHA1(819ab872a3ea99801350dd7bdf07011cbc7689e0)) // unknown EPROM names, should contain VLSH or VL/SH letters on sticker
+	ROM_LOAD("1vlbh1299_fever_pitch.u10", 0x02000, 0x2000, CRC(939b30af) SHA1(0253c6b1d336ad589322ee9058c1da68ac1e714a))
+	ROM_LOAD("1vlbh1299_fever_pitch.u12", 0x04000, 0x2000, CRC(81913322) SHA1(4ed8b678e38784a41c1a46809a5ecb14256b4c75))
+	ROM_LOAD("1vlbh1299_fever_pitch.u9",  0x06000, 0x2000, CRC(e0937d74) SHA1(19f567620e095b10f1d4f2a524331737bfa628b7))
+	ROM_LOAD("1vlbh1299_fever_pitch.u11", 0x08000, 0x2000, CRC(bfa3bb9e) SHA1(610de284004906af5a5b594256e7d7ec846afff2))
+	ROM_LOAD("1vlbh1299_fever_pitch.u13", 0x0a000, 0x2000, CRC(6d8fb9a6) SHA1(1d8b667eea57f5a4ce173af55f58b9bf56aaa05e))
+
+		/* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 ) // Using kgbird's 1CM29 PROM (colors seems correct) until original PROM is dumped.
+	ROM_LOAD("1cm29.u71", 0x0000, 0x0200, BAD_DUMP CRC(ef25f5cc) SHA1(51d12f4b8b8712cbd18ec97ec04e1340cd85fc67))
+ROM_END
+
+
 /* 86 Lions */
 
 ROM_START( 86lions )
@@ -2376,13 +2474,14 @@ GAMEL( 1998, swtht2nz, 0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, R
 GAMEL( 1996, goldenc,  0,        aristmk4, goldenc,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Golden Canaries (1VXFC5462, New Zealand)",  0, layout_goldenc  ) // 2c, $2 = 100 credits
 GAMEL( 1999, autmoon,  0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Autumn Moon (1VXFC5488, New Zealand)",      0, layout_arimk4nz ) // 5c, $2 = 40 credits
 GAMEL( 2000, coralr2,  0,        aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Coral Riches II (1VXFC5472, New Zealand)",  0, layout_arimk4nz ) // 2c, $2 = 100 credits
-GAMEL( 1986, gtroppo,  0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Gone Troppo (1VXEC542, New Zealand)", 0, layout_topgear ) // possibly 20c, 1 coin = 1 credit
-GAMEL( 1986, clkwise,  0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Clockwise (1VXEC534, New Zealand)", MACHINE_NOT_WORKING, layout_topgear ) // 20c, 1 coin = 1 credit
-GAMEL( 1986, cgold,    0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Caribbean Gold (3VXEC449, USA)", 0, layout_topgear  ) // 25c, 1 coin = 1 credit
 GAMEL( 1995, cgold2,   0,        aristmk4, cgold2,   aristmk4_state, aristmk4, ROT0, "Aristocrat", "Caribbean Gold II (3XF5182H04, USA)",       0, layout_cgold2   )
 GAMEL( 1996, fhunter,  0,        aristmk4, fhunter,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I01, USA)",          0, layout_fhunter  )
 GAMEL( 1996, fhuntera, fhunter,  aristmk4, fhunter,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I02, USA)",          0, layout_fhunter  )
 GAMEL( 1996, arcwins,  0,        aristmk4, arcwins,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Arctic Wins (4XF5227H03, USA)",             0, layout_arcwins  )
 GAMEL( 1997, wildone,  0,  aristmk4_poker, wildone,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Wild One (4VXEC5357, New Zealand)",         0, layout_wildone  ) // 20c, $2 = 10 credits, video poker
+GAMEL( 1993, gunnrose, 0,  aristmk4_poker, wildone,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Guns and Roses (C606191SMP, Australia)",    MACHINE_WRONG_COLORS, layout_topgear  )
 GAMEL( 1986, gldnpkr,  0,  aristmk4_poker, gldnpkr,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Golden Poker (8VXEC037, New Zealand)", 0, layout_gldnpkr ) // possibly 20c, 1 coin = 1 credit, video poker
-GAMEL( 1993, gunnrose, 0,  aristmk4_poker, wildone,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Guns and Roses (C606191SMP, Australia)",    MACHINE_WRONG_COLORS, layout_gunnrose  )
+GAMEL( 1986, gtroppo,  0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Gone Troppo (1VXEC542, New Zealand)",  0, layout_topgear ) // possibly 20c, 1 coin = 1 credit
+GAMEL( 1986, clkwise,  0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Clockwise (1VXEC534, New Zealand)",    MACHINE_NOT_WORKING, layout_topgear ) // 20c, 1 coin = 1 credit
+GAMEL( 1986, cgold,    0,        aristmk4, topgear,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Caribbean Gold (3VXEC449, USA)",       0, layout_topgear ) // 25c, 1 coin = 1 credit
+GAMEL( 1986, fvrpitch, 0,        aristmk4, fvrpitch, aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Fever Pitch? (2VXEC534, NSW, 90.36%)", 0, layout_fvrpitch  ) // 5c, $1 = 20 credits

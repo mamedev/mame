@@ -304,7 +304,7 @@ bool upd765_format::save(io_generic *io, floppy_image *image)
 			// Handling enough tracks is better than not
 			if(cn.track_count >= tracks && cc.track_count < tracks)
 				goto change;
-			else if(cn.track_count >= tracks && cc.track_count < tracks)
+			else if(cc.track_count >= tracks && cn.track_count < tracks)
 				goto dont_change;
 
 			// Both are on the same side of the track count, so closest is best

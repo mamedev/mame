@@ -1,6 +1,14 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
+---------------------------------------------------------------------------
+--
+--   main.lua
+--
+--   Rules for building main binary
+--
+---------------------------------------------------------------------------
+
 function mainProject(_target, _subtarget)
 if (_OPTIONS["SOURCES"] == nil) then 
 	if (_target == _subtarget) then

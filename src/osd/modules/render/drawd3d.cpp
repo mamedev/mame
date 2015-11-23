@@ -27,19 +27,15 @@
 // MAME headers
 #include "emu.h"
 #include "render.h"
-#include "ui/ui.h"
+
 #include "rendutil.h"
-#include "options.h"
 #include "emuopts.h"
 #include "aviio.h"
-#include "png.h"
 
 // MAMEOS headers
 #include "modules/render/d3d/d3dintf.h"
 #include "winmain.h"
 #include "window.h"
-#include "config.h"
-#include "strconv.h"
 #include "modules/render/d3d/d3dcomm.h"
 #include "drawd3d.h"
 
@@ -248,6 +244,10 @@ render_primitive_list *d3d::renderer::get_primitives()
 	{
 		window().target()->set_bounds(rect_width(&client), rect_height(&client), window().aspect());
 		window().target()->set_max_update_rate((get_refresh() == 0) ? get_origmode().RefreshRate : get_refresh());
+	}
+	if (m_shaders != NULL)
+	{
+		window().target()->set_transform_primitives(!m_shaders->enabled());
 	}
 	return &window().target()->get_primitives();
 }
@@ -616,19 +616,11 @@ texture_info *texture_manager::find_texinfo(const render_texinfo *texinfo, UINT3
 }
 
 renderer::renderer(osd_window *window)
-	: osd_renderer(window, FLAG_NONE)
+	: osd_renderer(window, FLAG_NONE), m_adapter(0), m_width(0), m_height(0), m_refresh(0), m_create_error_count(0), m_device(NULL), m_gamma_supported(0), m_pixformat(), 
+	m_vertexbuf(NULL), m_lockedbuf(NULL), m_numverts(0), m_vectorbatch(NULL), m_batchindex(0), m_numpolys(0), m_restarting(false), m_mod2x_supported(0), m_mod4x_supported(0), 
+	m_screen_format(), m_last_texture(NULL), m_last_texture_flags(0), m_last_blendenable(0), m_last_blendop(0), m_last_blendsrc(0), m_last_blenddst(0), m_last_filter(0),
+	m_last_wrap(), m_last_modmode(0), m_hlsl_buf(NULL), m_shaders(NULL), m_shaders_options(NULL), m_texture_manager(NULL), m_line_count(0)
 {
-	m_device = NULL;
-	m_restarting = false;
-	m_shaders = NULL;
-	m_numverts = 0;
-	m_numpolys = 0;
-	m_vertexbuf = NULL;
-	m_lockedbuf = NULL;
-	m_vectorbatch = NULL;
-	m_last_texture = NULL;
-	m_hlsl_buf = NULL;
-	m_texture_manager = NULL;
 }
 
 int renderer::initialize()
@@ -654,10 +646,6 @@ int renderer::pre_window_draw_check()
 	if (m_restarting)
 	{
 		m_shaders->toggle();
-
-		// free all existing resources and re-create
-		device_delete_resources();
-		device_create_resources();
 
 		m_restarting = false;
 	}
@@ -808,7 +796,9 @@ int renderer::device_create(HWND device_hwnd)
 {
 	// if a device exists, free it
 	if (m_device != NULL)
+	{
 		device_delete();
+	}
 
 	// verify the caps
 	int verify = device_verify_caps();
@@ -818,7 +808,9 @@ int renderer::device_create(HWND device_hwnd)
 		return 1;
 	}
 	if (verify == 1)
+	{
 		osd_printf_warning("Warning: Device may not perform well for Direct3D rendering\n");
+	}
 
 	// verify texture formats
 	HRESULT result = (*d3dintf->d3d.check_device_format)(d3dintf, m_adapter, D3DDEVTYPE_HAL, m_pixformat, 0, D3DRTYPE_TEXTURE, D3DFMT_A8R8G8B8);
@@ -920,9 +912,21 @@ try_again:
 		}
 	}
 
-	int ret = m_shaders->create_resources(false);
-	if (ret != 0)
-		return ret;
+	// create shader options only once
+	if (m_shaders_options == NULL)
+	{
+		m_shaders_options = (hlsl_options*)global_alloc_clear(hlsl_options);
+		m_shaders_options->params_init = false;
+	}
+
+	m_shaders = (shaders*)global_alloc_clear(shaders);
+	m_shaders->init(d3dintf, &window().machine(), this);
+
+	int failed = m_shaders->create_resources(false);
+	if (failed)
+	{
+		return failed;
+	}
 
 	return device_create_resources();
 }
@@ -1000,6 +1004,12 @@ int renderer::device_create_resources()
 renderer::~renderer()
 {
 	device_delete();
+
+	if (m_shaders_options != NULL)
+	{
+		global_free(m_shaders_options);
+		m_shaders_options = NULL;
+	}
 }
 
 void renderer::device_delete()
@@ -1019,16 +1029,16 @@ void renderer::device_delete()
 	if (m_texture_manager != NULL)
 	{
 		global_free(m_texture_manager);
+		m_texture_manager = NULL;
 	}
-	m_texture_manager = NULL;
 
 	// free the device itself
 	if (m_device != NULL)
 	{
 		(*d3dintf->device.reset)(m_device, &m_presentation);
 		(*d3dintf->device.release)(m_device);
+		m_device = NULL;
 	}
-	m_device = NULL;
 }
 
 
@@ -1039,11 +1049,16 @@ void renderer::device_delete()
 void renderer::device_delete_resources()
 {
 	if (m_texture_manager != NULL)
+	{
 		m_texture_manager->delete_resources();
+	}
+
 	// free the vertex buffer
 	if (m_vertexbuf != NULL)
+	{
 		(*d3dintf->vertexbuf.release)(m_vertexbuf);
-	m_vertexbuf = NULL;
+		m_vertexbuf = NULL;
+	}
 }
 
 
@@ -1054,10 +1069,6 @@ void renderer::device_delete_resources()
 int renderer::device_verify_caps()
 {
 	int retval = 0;
-
-	m_shaders = global_alloc_clear(shaders);
-	// FIXME: Dynamic cast
-	m_shaders->init(d3dintf, &window().machine(), this);
 
 	DWORD tempcaps;
 	HRESULT result = (*d3dintf->d3d.get_caps_dword)(d3dintf, m_adapter, D3DDEVTYPE_HAL, CAPS_MAX_PS30_INSN_SLOTS, &tempcaps);
@@ -1134,9 +1145,8 @@ int renderer::device_test_cooperative()
 		osd_printf_verbose("Direct3D: resetting device\n");
 
 		// free all existing resources and call reset on the device
-		//device_delete();
-		device_delete_resources();
 		m_shaders->delete_resources(true);
+		device_delete_resources();
 		result = (*d3dintf->device.reset)(m_device, &m_presentation);
 
 		// if it didn't work, punt to GDI

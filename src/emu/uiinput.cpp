@@ -97,7 +97,7 @@ void ui_input_frame_update(running_machine &machine)
 	ui_input_private *uidata = machine.ui_input_data;
 
 	/* update the state of all the UI keys */
-	for (ioport_type code = ioport_type(IPT_UI_FIRST + 1); code < IPT_UI_LAST; code++)
+	for (ioport_type code = ioport_type(IPT_UI_FIRST + 1); code < IPT_UI_LAST; ++code)
 	{
 		bool pressed = machine.ioport().type_pressed(code);
 		if (!pressed || uidata->seqpressed[code] != SEQ_PRESSED_RESET)
@@ -249,7 +249,7 @@ bool ui_input_pressed(running_machine &machine, int code)
 bool ui_input_pressed_repeat(running_machine &machine, int code, int speed)
 {
 	ui_input_private *uidata = machine.ui_input_data;
-	int pressed = FALSE;
+	int pressed;
 
 g_profiler.start(PROFILER_INPUT);
 

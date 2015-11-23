@@ -12,6 +12,7 @@
 !/scripts/
 !/src/
 !/tests/
+!/doxygen/
 !/web/
 !/.gitattributes
 !/.gitignore

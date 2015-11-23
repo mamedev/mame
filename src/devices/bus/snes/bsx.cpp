@@ -25,13 +25,27 @@ const device_type SNS_BSMEMPAK = &device_creator<sns_rom_bsmempak_device>;
 
 
 sns_rom_bsx_device::sns_rom_bsx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: sns_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
-						m_slot(*this, "bs_slot")
+					: sns_rom_device(mconfig, type, name, tag, owner, clock, shortname, source), 
+	m_base_unit(nullptr), 
+	access_00_1f(0),
+	access_80_9f(0), 
+	access_40_4f(0), 
+	access_50_5f(0), 
+	access_60_6f(0), 
+	rom_access(0),
+	m_slot(*this, "bs_slot")
 {
 }
 
 sns_rom_bsx_device::sns_rom_bsx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: sns_rom_device(mconfig, SNS_ROM_BSX, "SNES BS-X Cart", tag, owner, clock, "sns_rom_bsx", __FILE__),
+	m_base_unit(nullptr),
+	access_00_1f(0),
+	access_80_9f(0),
+	access_40_4f(0),
+	access_50_5f(0),
+	access_60_6f(0),
+	rom_access(0),
 						m_slot(*this, "bs_slot")
 {
 }
@@ -49,8 +63,8 @@ sns_rom_bsxhi_device::sns_rom_bsxhi_device(const machine_config &mconfig, const 
 }
 
 sns_rom_bsmempak_device::sns_rom_bsmempak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: sns_rom_device(mconfig, SNS_BSMEMPAK, "SNES BS-X Memory packs", tag, owner, clock, "sns_bsmempak", __FILE__)
-{
+					: sns_rom_device(mconfig, SNS_BSMEMPAK, "SNES BS-X Memory packs", tag, owner, clock, "sns_bsmempak", __FILE__), m_command(0), m_write_old(0), m_write_new(0), m_flash_enable(0), m_read_enable(0), m_write_enable(0)
+				{
 }
 
 
@@ -113,7 +127,7 @@ void sns_rom_bsmempak_device::device_reset()
 // BS-X Base Unit emulation, to be device-fied ?
 
 BSX_base::BSX_base(running_machine &machine)
-			: m_machine(machine)
+			: r2192_minute(0), m_machine(machine)
 {
 	m_machine.save().save_item(regs, "SNES_BSX/regs");
 	m_machine.save().save_item(r2192_counter, "SNES_BSX/r2192_counter");

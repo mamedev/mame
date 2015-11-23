@@ -582,7 +582,7 @@ void cclimber_state::toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 
 	/* draw the sprites -- note that it is important to draw them exactly in this
 	   order, to have the correct priorities. */
-	for (offs = 0x1c; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int x = m_spriteram[offs + 3];
 		int y = 240 - m_spriteram[offs + 2];

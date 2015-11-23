@@ -167,7 +167,7 @@ public:
 	void set_hpixels_per_column(int hpixels_per_column);
 
 	/* updates the screen -- this will call begin_update(),
-	   followed by update_row() reapeatedly and after all row
+	   followed by update_row() repeatedly and after all row
 	   updating is complete, end_update() */
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -283,7 +283,8 @@ protected:
 	 ************************/
 
 	bool m_show_border_area;        /* visible screen area (false) active display (true) active display + blanking */
-	int m_interlace_adjust; /* adjust max ras in interlace mode */
+	int m_noninterlace_adjust;      /* adjust max ras in non-interlace mode */
+	int m_interlace_adjust;         /* adjust max ras in interlace mode */
 
 	/* visible screen area adjustment */
 	int m_visarea_adjust_min_x;
@@ -314,7 +315,7 @@ protected:
 	 * vblank/hblank timing not supported yet! */
 	mc6845_on_update_addr_changed_delegate m_on_update_addr_changed_cb;
 
-	/* if specified, this gets called for every change of the disply enable pin (pin 18) */
+	/* if specified, this gets called for every change of the display enable pin (pin 18) */
 	devcb_write_line            m_out_de_cb;
 
 	/* if specified, this gets called for every change of the cursor pin (pin 19) */

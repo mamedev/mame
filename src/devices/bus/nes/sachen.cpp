@@ -96,18 +96,18 @@ nes_sachen_tcu01_device::nes_sachen_tcu01_device(const machine_config &mconfig, 
 }
 
 nes_sachen_tcu02_device::nes_sachen_tcu02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_SACHEN_TCU02, "NES Cart Sachen TCU-02 PCB", tag, owner, clock, "nes_tcu02", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_SACHEN_TCU02, "NES Cart Sachen TCU-02 PCB", tag, owner, clock, "nes_tcu02", __FILE__), m_latch(0)
+				{
 }
 
 nes_sachen_74x374_device::nes_sachen_74x374_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
-{
+					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_latch(0), m_mmc_vrom_bank(0)
+				{
 }
 
 nes_sachen_74x374_device::nes_sachen_74x374_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_SACHEN_74X374, "NES Cart Sachen 74*374 PCB", tag, owner, clock, "nes_s74x34", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_SACHEN_74X374, "NES Cart Sachen 74*374 PCB", tag, owner, clock, "nes_s74x34", __FILE__), m_latch(0), m_mmc_vrom_bank(0)
+				{
 }
 
 nes_sachen_74x374_alt_device::nes_sachen_74x374_alt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

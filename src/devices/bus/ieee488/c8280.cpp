@@ -392,10 +392,10 @@ c8280_t::c8280_t(const machine_config &mconfig, const char *tag, device_t *owner
 	m_fdc(*this, WD1797_TAG),
 	m_floppy0(*this, WD1797_TAG ":0"),
 	m_floppy1(*this, WD1797_TAG ":1"),
-	m_address(*this, "ADDRESS"),
+	m_address(*this, "ADDRESS"), m_floppy(nullptr),
 	m_rfdo(1),
 	m_daco(1),
-	m_atna(1)
+	m_atna(1), m_ifc(0), m_fk5(0)
 {
 }
 

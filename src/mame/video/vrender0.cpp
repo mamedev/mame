@@ -296,7 +296,6 @@ TILENAME(bpp, t, a)\
 			else if (bpp == 8)\
 			{\
 				UINT8 Texel = Quad->u.Imageb[Offset];\
-				Texel = Quad->u.Imageb[Offset];\
 				Color = Quad->Pal[Texel];\
 			}\
 			else if (bpp == 16)\
@@ -485,7 +484,7 @@ int vr0video_device::vrender0_ProcessPacket(UINT32 PacketPtr, UINT16 *Dest, UINT
 	{
 		QuadInfo Quad;
 
-		Quad.Pitch = 512;
+		Quad.Pitch = 1024;
 
 //      assert(Endx >= Dx && Endy >= Dy);
 

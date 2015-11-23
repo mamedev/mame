@@ -61,7 +61,7 @@ const device_type C64_SILVERROCK = &device_creator<c64_silverrock_cartridge_devi
 
 c64_silverrock_cartridge_device::c64_silverrock_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_SILVERROCK, "C64 SilverRock cartridge", tag, owner, clock, "c64_silverrock", __FILE__),
-	device_c64_expansion_card_interface(mconfig, *this)
+	device_c64_expansion_card_interface(mconfig, *this), m_bank(0)
 {
 }
 

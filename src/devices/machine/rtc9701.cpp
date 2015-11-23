@@ -37,7 +37,7 @@ rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, d
 		device_nvram_interface(mconfig, *this),
 		m_latch(0),
 		m_reset_line(CLEAR_LINE),
-		m_clock_line(CLEAR_LINE)
+		m_clock_line(CLEAR_LINE), rtc_state(), cmd_stream_pos(0), current_cmd(0), rtc9701_address_pos(0), rtc9701_current_address(0), rtc9701_current_data(0), rtc9701_data_pos(0)
 {
 }
 

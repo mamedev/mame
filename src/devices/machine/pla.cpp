@@ -24,7 +24,7 @@ pla_device::pla_device(const machine_config &mconfig, const char *tag, device_t 
 		m_outputs(0),
 		m_terms(0),
 		m_input_mask(0),
-		m_xor(0)
+		m_xor(0), m_cache_size(0), m_cache2_ptr(0)
 {
 }
 

@@ -38,11 +38,11 @@ const device_type MEGADUCK_CART_SLOT = &device_creator<megaduck_cart_slot_device
 
 device_gb_cart_interface::device_gb_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
-		m_rom_size(0),
-		has_rumble(false),
-		has_timer(false),
-		has_battery(false)
+	  m_rom(NULL),
+	  m_rom_size(0), m_ram_bank(0), m_latch_bank(0), m_latch_bank2(0),
+	  has_rumble(false),
+	  has_timer(false),
+	  has_battery(false)
 {
 }
 
@@ -142,7 +142,7 @@ base_gb_cart_slot_device::base_gb_cart_slot_device(const machine_config &mconfig
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
 						m_sgb_hack(0),
-						m_type(GB_MBC_UNKNOWN)
+						m_type(GB_MBC_UNKNOWN), m_cart(nullptr)
 {
 }
 

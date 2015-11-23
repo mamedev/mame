@@ -97,7 +97,6 @@
 #include "profiler.h"
 #include "ui/ui.h"
 #include "uiinput.h"
-#include "debug/debugcon.h"
 
 #include "osdepend.h"
 
@@ -713,7 +712,7 @@ void input_type_entry::configure_osd(const char *token, const char *name)
 
 void input_type_entry::restore_default_seq()
 {
-	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 		m_seq[seqtype] = defseq(seqtype);
 }
 
@@ -727,7 +726,8 @@ void input_type_entry::restore_default_seq()
 //-------------------------------------------------
 
 digital_joystick::digital_joystick(int player, int number)
-	: m_player(player),
+	:   m_next(NULL), 
+		m_player(player),
 		m_number(number),
 		m_current(0),
 		m_current4way(0),
@@ -763,7 +763,7 @@ void digital_joystick::frame_update()
 
 	// read all the associated ports
 	running_machine *machine = NULL;
-	for (direction_t direction = JOYDIR_UP; direction < JOYDIR_COUNT; direction++)
+	for (direction_t direction = JOYDIR_UP; direction < JOYDIR_COUNT; ++direction)
 		for (const simple_list_wrapper<ioport_field> *i = m_field[direction].first(); i != NULL; i = i->next())
 		{
 			machine = &i->object()->machine();
@@ -1477,7 +1477,7 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 		m_way(0)
 {
 	// reset sequences and chars
-	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 		m_seq[seqtype].set_default();
 	m_chars[0] = m_chars[1] = m_chars[2] = m_chars[3] = unicode_char(0);
 
@@ -1679,7 +1679,7 @@ void ioport_field::get_user_settings(user_settings &settings)
 	memset(&settings, 0, sizeof(settings));
 
 	// copy the basics
-	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 		settings.seq[seqtype] = seq(seqtype);
 
 	// if there's a list of settings or we're an adjuster, copy the current value
@@ -1711,7 +1711,7 @@ void ioport_field::get_user_settings(user_settings &settings)
 void ioport_field::set_user_settings(const user_settings &settings)
 {
 	// copy the basics
-	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 	{
 		const input_seq &defseq = manager().type_seq(m_type, m_player, input_seq_type(seqtype));
 		if (defseq == settings.seq[seqtype])
@@ -2159,7 +2159,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 		joydir(digital_joystick::JOYDIR_COUNT)
 {
 	// fill in the basic values
-	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 		seq[seqtype] = field.defseq_unresolved(seqtype);
 
 	// if this is a digital joystick field, make a note of it
@@ -2454,7 +2454,11 @@ ioport_manager::ioport_manager(running_machine &machine)
 		m_record_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS),
 		m_playback_file(machine.options().input_directory(), OPEN_FLAG_READ),
 		m_playback_accumulated_speed(0),
-		m_playback_accumulated_frames(0)
+		m_playback_accumulated_frames(0), 
+		m_has_configs(false), 
+		m_has_analog(false), 
+		m_has_dips(false), 
+		m_has_bioses(false)
 {
 	memset(m_type_to_entry, 0, sizeof(m_type_to_entry));
 }
@@ -2980,7 +2984,7 @@ void ioport_manager::load_config(int config_type, xml_data_node *parentnode)
 
 		// initialize sequences to invalid defaults
 		input_seq newseq[SEQ_TYPE_TOTAL];
-		for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+		for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 			newseq[seqtype].set(INPUT_CODE_INVALID);
 
 		// loop over new sequences
@@ -3008,7 +3012,7 @@ void ioport_manager::load_config(int config_type, xml_data_node *parentnode)
 	// what we will diff against
 	if (config_type == CONFIG_TYPE_CONTROLLER)
 		for (input_type_entry *entry = m_typelist.first(); entry != NULL; entry = entry->next())
-			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				entry->defseq(seqtype) = entry->seq(seqtype);
 }
 
@@ -3049,7 +3053,7 @@ void ioport_manager::load_remap_table(xml_data_node *parentnode)
 		// loop over the remapping table, then over default ports, replacing old with new
 		for (int remapnum = 0; remapnum < count; remapnum++)
 			for (input_type_entry *entry = m_typelist.first(); entry != NULL; entry = entry->next())
-				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 					entry->m_seq[seqtype].replace(oldtable[remapnum], newtable[remapnum]);
 	}
 }
@@ -3066,7 +3070,7 @@ bool ioport_manager::load_default_config(xml_data_node *portnode, int type, int 
 	for (input_type_entry *entry = m_typelist.first(); entry != NULL; entry = entry->next())
 		if (entry->type() == type && entry->player() == player)
 		{
-			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				if (newseq[seqtype][0] != INPUT_CODE_INVALID)
 					entry->m_seq[seqtype] = newseq[seqtype];
 			return true;
@@ -3098,7 +3102,7 @@ bool ioport_manager::load_game_config(xml_data_node *portnode, int type, int pla
 					field->mask() == mask && (field->defvalue() & mask) == (defvalue & mask))
 				{
 					// if a sequence was specified, copy it in
-					for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+					for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 						if (newseq[seqtype][0] != INPUT_CODE_INVALID)
 							field->live().seq[seqtype] = newseq[seqtype];
 
@@ -3217,7 +3221,7 @@ void ioport_manager::save_default_inputs(xml_data_node *parentnode)
 		{
 			// see if any of the sequences have changed
 			input_seq_type seqtype;
-			for (seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+			for (seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				if (entry->seq(seqtype) != entry->defseq(seqtype))
 					break;
 
@@ -3233,9 +3237,9 @@ void ioport_manager::save_default_inputs(xml_data_node *parentnode)
 					xml_set_attribute(portnode, "type", input_type_to_token(tempstr, entry->type(), entry->player()));
 
 					// add only the sequences that have changed from the defaults
-					for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
-						if (entry->seq(seqtype) != entry->defseq(seqtype))
-							save_sequence(portnode, seqtype, entry->type(), entry->seq(seqtype));
+					for (input_seq_type type = SEQ_TYPE_STANDARD; type < SEQ_TYPE_TOTAL; ++type)
+						if (entry->seq(type) != entry->defseq(type))
+							save_sequence(portnode, type, entry->type(), entry->seq(type));
 				}
 			}
 		}
@@ -3257,7 +3261,7 @@ void ioport_manager::save_game_inputs(xml_data_node *parentnode)
 			{
 				// determine if we changed
 				bool changed = false;
-				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 					changed |= (field->seq(seqtype) != field->defseq(seqtype));
 
 				// non-analog changes
@@ -3291,7 +3295,7 @@ void ioport_manager::save_game_inputs(xml_data_node *parentnode)
 						xml_set_attribute_int(portnode, "defvalue", field->defvalue() & field->mask());
 
 						// add sequences if changed
-						for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+						for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 							if (field->seq(seqtype) != field->defseq(seqtype))
 								save_sequence(portnode, seqtype, field->type(), field->seq(seqtype));
 

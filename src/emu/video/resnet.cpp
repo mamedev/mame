@@ -346,7 +346,7 @@ double compute_resistor_net_outputs(
 	max = minval;
 	for( i = 0; i < networks_no; i++ )
 	{
-		double val = 0.0;
+		double val;
 		double max_tmp = minval;
 		double min_tmp = maxval;
 

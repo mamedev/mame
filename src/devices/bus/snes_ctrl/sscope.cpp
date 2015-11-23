@@ -58,7 +58,7 @@ snes_sscope_device::snes_sscope_device(const machine_config &mconfig, const char
 					device_snes_control_port_interface(mconfig, *this),
 					m_buttons(*this, "BUTTONS"),
 					m_xaxis(*this, "SSX"),
-					m_yaxis(*this, "SSY")
+					m_yaxis(*this, "SSY"), m_strobe(0), m_idx(0), m_latch(0), m_x(0), m_y(0), m_turbo_lock(0), m_pause_lock(0), m_fire_lock(0)
 {
 }
 

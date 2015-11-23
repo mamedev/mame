@@ -377,6 +377,8 @@ void tms5220_device::register_for_save_states()
 	save_item(NAME(m_old_frame_energy_idx));
 	save_item(NAME(m_old_frame_pitch_idx));
 	save_item(NAME(m_old_frame_k_idx));
+	save_item(NAME(m_old_zpar));
+	save_item(NAME(m_old_uv_zpar));
 #endif
 	save_item(NAME(m_current_energy));
 	save_item(NAME(m_current_pitch));
@@ -788,11 +790,11 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 				 * Old frame was unvoiced, new is voiced
 				 * Old frame was unvoiced, new frame is silence/zero energy (non-existent on tms51xx rev D and F (present and working on tms52xx, present but buggy on tms51xx rev A and B))
 				 */
-				if ( ((OLD_FRAME_UNVOICED_FLAG == 0) && (NEW_FRAME_UNVOICED_FLAG == 1))
-					|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0))
-					|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 0))
+				if ( ((OLD_FRAME_UNVOICED_FLAG == 0) && NEW_FRAME_UNVOICED_FLAG)
+					|| ((OLD_FRAME_UNVOICED_FLAG == 1) && !NEW_FRAME_UNVOICED_FLAG)
+					|| ((OLD_FRAME_SILENCE_FLAG == 1) && !NEW_FRAME_SILENCE_FLAG)
 					//|| ((m_inhibit == 1) && (OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 1)) ) //TMS51xx INTERP BUG1
-					|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 1)) )
+					|| ((OLD_FRAME_UNVOICED_FLAG == 1) && NEW_FRAME_SILENCE_FLAG) )
 					m_inhibit = 1;
 				else // normal frame, normal interpolation
 					m_inhibit = 0;
@@ -1129,6 +1131,9 @@ INT32 tms5220_device::lattice_filter()
 		m_u[2] = m_u[3] - matrix_multiply(m_current_k[2], m_x[2]);
 		m_u[1] = m_u[2] - matrix_multiply(m_current_k[1], m_x[1]);
 		m_u[0] = m_u[1] - matrix_multiply(m_current_k[0], m_x[0]);
+#ifdef DEBUG_LATTICE
+		INT32 err = m_x[9] + matrix_multiply(m_current_k[9], m_u[9]); //x_10, real chip doesn't use or calculate this
+#endif
 		m_x[9] = m_x[8] + matrix_multiply(m_current_k[8], m_u[8]);
 		m_x[8] = m_x[7] + matrix_multiply(m_current_k[7], m_u[7]);
 		m_x[7] = m_x[6] + matrix_multiply(m_current_k[6], m_u[6]);
@@ -1146,9 +1151,14 @@ INT32 tms5220_device::lattice_filter()
 		for (i = 9; i >= 0; i--)
 		{
 			fprintf(stderr,"Y%d:%04d ", i+1, m_u[i]);
-			fprintf(stderr,"b%d:%04d ", i+1, m_x[i]);
-			if ((i % 5) == 0) fprintf(stderr,"\n");
 		}
+		fprintf(stderr,"\n");
+		fprintf(stderr,"E:%04d ", err);
+		for (i = 9; i >= 0; i--)
+		{
+			fprintf(stderr,"b%d:%04d ", i+1, m_x[i]);
+		}
+		fprintf(stderr,"\n");
 #endif
 		return m_u[0];
 }

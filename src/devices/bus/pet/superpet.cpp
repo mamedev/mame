@@ -185,7 +185,7 @@ superpet_device::superpet_device(const machine_config &mconfig, const char *tag,
 	m_io_sw1(*this, "SW1"),
 	m_io_sw2(*this, "SW2"),
 	m_system(0),
-	m_bank(0),
+	m_bank(0), m_sw1(0), m_sw2(0),
 	m_sel9_rom(0),
 	m_pet_irq(CLEAR_LINE),
 	m_acia_irq(CLEAR_LINE)

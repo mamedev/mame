@@ -118,8 +118,8 @@ WRITE8_MEMBER( e05a03_device::write )
 		break;
 
 	/* printhead */
-	case 0x04: m_printhead = (m_printhead & 0x100) | !data; break;
-	case 0x05: m_printhead = (m_printhead & 0x0ff) | (!(BIT(data, 7) << 8)); break;
+    case 0x04: m_printhead = (m_printhead & 0x100) | (data == 0 ? 0xff : 0); break;
+    case 0x05: m_printhead = (m_printhead & 0x0ff) | (BIT(data, 7) ? (1 << 8) : 0); break;
 
 	/* paper feed and carriage motor phase data*/
 	case 0x06: m_pf_motor = (data & 0xf0) >> 4; break;

@@ -112,8 +112,8 @@ ioport_constructor nes_4score_p2p4_device::device_input_ports() const
 
 nes_4score_device::nes_4score_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_nes_control_port_interface(mconfig, *this)
-{
+						device_nes_control_port_interface(mconfig, *this), m_latch(0)
+				{
 }
 
 nes_4score_p1p3_device::nes_4score_p1p3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :

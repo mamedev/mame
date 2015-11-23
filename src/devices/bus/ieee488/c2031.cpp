@@ -408,7 +408,7 @@ c2031_device::c2031_device(const machine_config &mconfig, const char *tag, devic
 		m_address(*this, "ADDRESS"),
 		m_nrfd_out(1),
 		m_ndac_out(1),
-		m_atna(1),
+		m_atna(1), m_ifc(0),
 		m_via0_irq(0),
 		m_via1_irq(0)
 {

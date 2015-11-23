@@ -66,7 +66,7 @@ astrocade_cart_slot_device::astrocade_cart_slot_device(const machine_config &mco
 						device_t(mconfig, ASTROCADE_CART_SLOT, "Bally Astrocade Cartridge Slot", tag, owner, clock, "astrocade_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
-						m_type(ASTROCADE_STD)
+						m_type(ASTROCADE_STD), m_cart(nullptr)
 {
 }
 

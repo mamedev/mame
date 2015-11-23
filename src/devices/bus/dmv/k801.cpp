@@ -115,16 +115,16 @@ dmv_k801_device::dmv_k801_device(const machine_config &mconfig, const char *tag,
 		: device_t(mconfig, DMV_K801, "K801 RS-232 Switchable Interface", tag, owner, clock, "dmv_k801", __FILE__),
 		device_dmvslot_interface( mconfig, *this ),
 		m_epci(*this, "epci"),
-		m_dsw(*this, "DSW")
-{
+		m_dsw(*this, "DSW"), m_bus(nullptr)
+	{
 }
 
 dmv_k801_device::dmv_k801_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_dmvslot_interface( mconfig, *this ),
 		m_epci(*this, "epci"),
-		m_dsw(*this, "DSW")
-{
+		m_dsw(*this, "DSW"), m_bus(nullptr)
+	{
 }
 
 //-------------------------------------------------

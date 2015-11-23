@@ -10,7 +10,7 @@ void jvs_device::static_set_jvs_host_tag(device_t &device, const char *jvs_host_
 }
 
 jvs_device::jvs_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source), jvs_outputs(0), jvs_address(0), jvs_reset_counter(0)
 {
 	jvs_host_tag = 0;
 	next_device = 0;

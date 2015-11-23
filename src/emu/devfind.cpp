@@ -40,7 +40,7 @@ finder_base::~finder_base()
 //  find_memregion - find memory region
 //-------------------------------------------------
 
-void *finder_base::find_memregion(UINT8 width, size_t &length, bool required)
+void *finder_base::find_memregion(UINT8 width, size_t &length, bool required) const
 {
 	// look up the region and return NULL if not found
 	memory_region *region = m_base.memregion(m_tag);

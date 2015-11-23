@@ -60,7 +60,7 @@ z88cart_slot_device::z88cart_slot_device(const machine_config &mconfig, const ch
 		device_t(mconfig, Z88CART_SLOT, "Z88 Cartridge Slot", tag, owner, clock, "z88cart_slot", __FILE__),
 		device_image_interface(mconfig, *this),
 		device_slot_interface(mconfig, *this),
-		m_out_flp_cb(*this)
+		m_out_flp_cb(*this), m_cart(nullptr), m_flp_timer(nullptr)
 {
 }
 

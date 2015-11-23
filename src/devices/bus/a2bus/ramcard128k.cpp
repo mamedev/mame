@@ -30,13 +30,13 @@ const device_type A2BUS_RAMCARD128K = &device_creator<a2bus_ssramcard_device>;
 
 a2bus_ssramcard_device::a2bus_ssramcard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	device_a2bus_card_interface(mconfig, *this)
+	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_last_offset(0), m_dxxx_bank(0), m_main_bank(0)
 {
 }
 
 a2bus_ssramcard_device::a2bus_ssramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, A2BUS_RAMCARD128K, "Saturn Systems 128K Extended Language Card", tag, owner, clock, "ssram128", __FILE__),
-	device_a2bus_card_interface(mconfig, *this)
+	device_a2bus_card_interface(mconfig, *this), m_inh_state(0), m_last_offset(0), m_dxxx_bank(0), m_main_bank(0)
 {
 }
 

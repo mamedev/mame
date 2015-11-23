@@ -472,12 +472,12 @@ WRITE_LINE_MEMBER( spinb_state::ic5m_w )
 
 READ8_MEMBER( spinb_state::ppia_c_r )
 {
-	return m_pc0a | m_portc_a;
+	return (m_pc0a ? 1 : 0) | m_portc_a;
 }
 
 READ8_MEMBER( spinb_state::ppim_c_r )
 {
-	return m_pc0m | m_portc_m;
+	return (m_pc0m ? 1 : 0) | m_portc_m;
 }
 
 WRITE8_MEMBER( spinb_state::ppia_b_w )

@@ -11,14 +11,6 @@
 #include "emu.h"
 #include "debugger.h"
 
-// for now, make buggy GCC/Mingw STFU about I64FMT
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat"
-#pragma GCC diagnostic ignored "-Wformat-extra-args"
-#endif
-
-
 //**************************************************************************
 //  DEBUGGING
 //**************************************************************************
@@ -498,9 +490,9 @@ void device_scheduler::timeslice()
 					exec->m_totalcycles += ran;
 
 					// update the local time for this CPU
-					attotime delta(0, exec->m_attoseconds_per_cycle * ran);
-					assert(delta >= attotime::zero);
-					exec->m_localtime += delta;
+					attotime deltatime(0, exec->m_attoseconds_per_cycle * ran);
+					assert(deltatime >= attotime::zero);
+					exec->m_localtime += deltatime;
 					LOG(("         %d ran, %d total, time = %s\n", ran, (INT32)exec->m_totalcycles, exec->m_localtime.as_string(PRECISION)));
 
 					// if the new local CPU time is less than our target, move the target up, but not before the base
@@ -990,7 +982,3 @@ void device_scheduler::dump_timers() const
 		timer->dump();
 	machine().logerror("=============================================\n");
 }
-
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic pop
-#endif

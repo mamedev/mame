@@ -1,6 +1,14 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
+---------------------------------------------------------------------------
+--
+--   netlist.lua
+--
+--   Rules for building netlist cores
+--
+---------------------------------------------------------------------------
+
 project "netlist"
 	uuid "665ef8ac-2a4c-4c3e-a05f-fd1e5db11de9"
 	kind (LIBTYPE)
@@ -34,8 +42,8 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/pconfig.h",
 		MAME_DIR .. "src/lib/netlist/plib/palloc.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/palloc.h",
-    MAME_DIR .. "src/lib/netlist/plib/pfmtlog.cpp",
-    MAME_DIR .. "src/lib/netlist/plib/pfmtlog.h",
+		MAME_DIR .. "src/lib/netlist/plib/pfmtlog.cpp",
+		MAME_DIR .. "src/lib/netlist/plib/pfmtlog.h",
 		MAME_DIR .. "src/lib/netlist/plib/plists.h",
 		MAME_DIR .. "src/lib/netlist/plib/poptions.h",
 		MAME_DIR .. "src/lib/netlist/plib/pparser.cpp",
@@ -48,7 +56,7 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/pstring.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstream.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pstream.h",
-    MAME_DIR .. "src/lib/netlist/plib/ptypes.h",
+		MAME_DIR .. "src/lib/netlist/plib/ptypes.h",
 		MAME_DIR .. "src/lib/netlist/tools/nl_convert.cpp",
 		MAME_DIR .. "src/lib/netlist/tools/nl_convert.h",
 		MAME_DIR .. "src/lib/netlist/analog/nld_bjt.cpp",
@@ -69,6 +77,9 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_sor.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_sor_mat.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_gmres.h",
+		MAME_DIR .. "src/lib/netlist/solver/mat_cr.h",
+		MAME_DIR .. "src/lib/netlist/solver/nld_ms_direct_lu.h",
+		MAME_DIR .. "src/lib/netlist/solver/vector_base.h",		
 		MAME_DIR .. "src/lib/netlist/devices/nld_4020.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4020.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4066.cpp",
@@ -160,5 +171,5 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/macro/nlm_opamp.cpp",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_opamp.h",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_other.cpp",
-		MAME_DIR .. "src/lib/netlist/macro/nlm_other.h",
+		MAME_DIR .. "src/lib/netlist/macro/nlm_other.h",		
 }

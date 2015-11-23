@@ -287,12 +287,12 @@ void validity_checker::validate_one(const game_driver &driver)
 		validate_roms();
 		validate_inputs();
 		validate_devices();
+	    m_current_config = NULL;
 	}
 	catch (emu_fatalerror &err)
 	{
 		osd_printf_error("Fatal error %s", err.string());
 	}
-	m_current_config = NULL;
 
 	// if we had warnings or errors, output
 	if (m_errors > start_errors || m_warnings > start_warnings)
@@ -719,11 +719,11 @@ void validity_checker::validate_analog_input_field(ioport_field &field)
 	if (field.type() == IPT_POSITIONAL || field.type() == IPT_POSITIONAL_V)
 	{
 		int shift;
-		for (shift = 0; shift <= 31 && (~field.mask() & (1 << shift)) != 0; shift++) ;
+		for (shift = 0; shift <= 31 && (~field.mask() & (1 << shift)) != 0; shift++) { }
 
 		// convert the positional max value to be in the bitmask for testing
-		INT32 analog_max = field.maxval();
-		analog_max = (analog_max - 1) << shift;
+		//INT32 analog_max = field.maxval();
+		//analog_max = (analog_max - 1) << shift;
 
 		// positional port size must fit in bits used
 		if ((field.mask() >> shift) + 1 < field.maxval())

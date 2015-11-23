@@ -72,7 +72,7 @@ floppy_controller_device::floppy_controller_device(const machine_config &mconfig
 	device_memexp_interface(mconfig, *this),
 	m_memexp(*this, "mem"),
 	m_floppy0(*this, "0"),
-	m_floppy1(*this, "1")
+	m_floppy1(*this, "1"), m_floppy(nullptr), m_latch(0), m_shifter(0), m_latching_inverter(false), m_current_cyl(0), m_write_position(0)
 {
 }
 

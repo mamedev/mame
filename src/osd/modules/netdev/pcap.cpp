@@ -168,7 +168,7 @@ netdev_pcap::netdev_pcap(const char *name, class device_network_interface *ifdev
 		m_p = NULL;
 		return;
 	}
-	set_mac(get_mac());
+	netdev_pcap::set_mac(get_mac());
 
 #ifdef SDLMAME_MACOSX
 	m_ctx.head = 0;
@@ -206,7 +206,7 @@ int netdev_pcap::send(UINT8 *buf, int len)
 	ret = pcap_sendpacket_dl(m_p, buf, len);
 	printf("sent packet length %d, returned %d\n", len, ret);
 	return ret ? len : 0;
-	return (!pcap_sendpacket_dl(m_p, buf, len))?len:0;
+	//return (!pcap_sendpacket_dl(m_p, buf, len))?len:0;
 }
 
 int netdev_pcap::recv_dev(UINT8 **buf)

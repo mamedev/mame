@@ -11,9 +11,6 @@
 #include "debugviewinfo.h"
 
 #include "debug/debugcpu.h"
-#include "imagedev/cassette.h"
-
-#include "strconv.h"
 #include "window.h"
 #include "winutf8.h"
 

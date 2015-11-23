@@ -36,11 +36,11 @@ const device_type TMS34020 = &device_creator<tms34020_device>;
 tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, device_video_interface(mconfig, *this)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 32, 3)
-	, m_halt_on_reset(FALSE)
-	, m_pixclock(0)
-	, m_pixperclock(0)
-	, m_output_int_cb(*this)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 32, 3), m_pc(0), m_ppc(0), m_st(0), m_pixel_write(nullptr), m_pixel_read(nullptr), m_raster_op(nullptr), m_pixel_op(nullptr), m_pixel_op_timing(0), m_convsp(0), m_convdp(0), m_convmp(0), m_gfxcycles(0), m_pixelshift(0), m_is_34020(0), m_reset_deferred(false)
+	  , m_halt_on_reset(FALSE), m_hblank_stable(0), m_external_host_access(0), m_executing(0), m_program(nullptr), m_direct(nullptr)
+	  , m_pixclock(0)
+	, m_pixperclock(0), m_scantimer(nullptr), m_icount(0)
+	  , m_output_int_cb(*this)
 {
 }
 
@@ -458,14 +458,14 @@ UINT32 tms340x0_device::raster_op_21(UINT32 newpix, UINT32 oldpix) { return (old
     OPCODE TABLE & IMPLEMENTATIONS
 ***************************************************************************/
 
-#include "34010fld.cpp"
+#include "34010fld.inc"
 
 /* includes the static function prototypes and the master opcode table */
-#include "34010tbl.cpp"
+#include "34010tbl.inc"
 
 /* includes the actual opcode implementations */
-#include "34010ops.cpp"
-#include "34010gfx.cpp"
+#include "34010ops.inc"
+#include "34010gfx.inc"
 
 
 

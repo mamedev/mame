@@ -154,7 +154,6 @@ private:
 	mfmhd_trackimage_cache* m_cache;
 	mfmhd_image_format_t*   m_format;
 
-	void        prepare_track(int cylinder, int head);
 	void        head_move();
 	void        recalibrate();
 

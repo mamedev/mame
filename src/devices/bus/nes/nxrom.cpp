@@ -92,13 +92,13 @@ nes_bxrom_device::nes_bxrom_device(const machine_config &mconfig, const char *ta
 }
 
 nes_cnrom_device::nes_cnrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
-{
+					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_chr_open_bus(0)
+				{
 }
 
 nes_cnrom_device::nes_cnrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_CNROM, "NES Cart CNROM PCB", tag, owner, clock, "nes_cnrom", __FILE__)
-{
+					: nes_nrom_device(mconfig, NES_CNROM, "NES Cart CNROM PCB", tag, owner, clock, "nes_cnrom", __FILE__), m_chr_open_bus(0)
+				{
 }
 
 nes_cprom_device::nes_cprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

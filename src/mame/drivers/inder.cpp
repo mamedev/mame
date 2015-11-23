@@ -1272,7 +1272,7 @@ WRITE_LINE_MEMBER( inder_state::qc9b_w )
 
 READ8_MEMBER( inder_state::ppic_r )
 {
-	return m_pc0 | m_portc;
+	return (m_pc0 ? 1 : 0) | m_portc;
 }
 
 WRITE8_MEMBER( inder_state::ppia_w )

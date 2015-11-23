@@ -15,11 +15,16 @@
 const device_type SEGA315_5313 = &device_creator<sega315_5313_device>;
 
 sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega315_5124_device(mconfig, SEGA315_5313, "Sega 315-5313 Megadrive VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5313", __FILE__),
+	: sega315_5124_device(mconfig, SEGA315_5313, "Sega 315-5313 Megadrive VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5313", __FILE__), m_render_bitmap(nullptr), 
+	m_render_line(nullptr), m_render_line_raw(nullptr), m_megadriv_scanline_timer(nullptr),
 	m_sndirqline_callback(*this),
 	m_lv6irqline_callback(*this),
-	m_lv4irqline_callback(*this),
-	m_dma_delay(0)
+	m_lv4irqline_callback(*this), m_command_pending(0), m_command_part1(0), m_command_part2(0), m_vdp_code(0), m_vdp_address(0), m_vram_fill_pending(0), m_vram_fill_length(0), m_irq4counter(0), 
+	m_imode_odd_frame(0), m_sprite_collision(0), m_irq6_pending(0), m_irq4_pending(0), m_scanline_counter(0), m_vblank_flag(0), m_imode(0), m_visible_scanlines(0), m_irq6_scanline(0), 
+	m_z80irq_scanline(0), m_total_scanlines(0), m_base_total_scanlines(0), m_framerate(0), m_vdp_pal(0), m_use_cram(0),
+	m_dma_delay(0), m_regs(nullptr), m_vram(nullptr), m_cram(nullptr), m_vsram(nullptr), m_internal_sprite_attribute_table(nullptr), m_irq6_on_timer(nullptr), m_irq4_on_timer(nullptr), 
+	m_render_timer(nullptr), m_sprite_renderline(nullptr), m_highpri_renderline(nullptr), m_video_renderline(nullptr), m_palette_lookup(nullptr), m_palette_lookup_sprite(nullptr), 
+	m_palette_lookup_shadow(nullptr), m_palette_lookup_highlight(nullptr), m_space68k(nullptr), m_cpu68k(nullptr)
 {
 	m_use_alt_timing = 0;
 	m_palwrite_base = -1;

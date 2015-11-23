@@ -11,7 +11,8 @@ address_map_bank_device::address_map_bank_device( const machine_config &mconfig,
 		m_endianness(ENDIANNESS_NATIVE),
 		m_databus_width(0),
 		m_addrbus_width(32),
-		m_stride(1),
+		m_stride(1), 
+		m_program(NULL),
 		m_offset(0)
 {
 }

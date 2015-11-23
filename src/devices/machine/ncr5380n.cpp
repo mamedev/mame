@@ -31,7 +31,9 @@ DEVICE_ADDRESS_MAP_START(map, 8, ncr5380n_device)
 ADDRESS_MAP_END
 
 ncr5380n_device::ncr5380n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: nscsi_device(mconfig, NCR5380N, "5380 SCSI (new)", tag, owner, clock, "ncr5380", __FILE__),
+		: nscsi_device(mconfig, NCR5380N, "5380 SCSI (new)", tag, owner, clock, "ncr5380", __FILE__), tm(nullptr), status(0), istatus(0), m_mode(0), 
+	m_outdata(0), m_busstatus(0), m_dmalatch(0), m_icommand(0), m_tcommand(0), clock_conv(0), sync_offset(0), sync_period(0), bus_id(0), select_timeout(0), 
+	seq(0), tcount(0), mode(0), state(0), irq(false), drq(false),
 	m_irq_handler(*this),
 	m_drq_handler(*this)
 {

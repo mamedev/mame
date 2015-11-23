@@ -31,6 +31,7 @@
 #include "bus/cpc/hd20.h"
 #include "bus/cpc/magicsound.h"
 #include "bus/cpc/doubler.h"
+#include "bus/cpc/transtape.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"
@@ -100,6 +101,8 @@ struct asic_t
 	UINT8   horiz_disp;
 	UINT8   hscroll;
 	UINT8   de_start;           /* flag to check if DE is been enabled this frame yet */
+	bool    hsync_first_tick;   /* flag to check in first CRTC tick, used for knowing when to cover left side of screen to cover horizontal softscroll mess */
+	UINT8   hsync_tick_count;
 
 	/* DMA */
 	UINT8   dma_status;

@@ -16,9 +16,7 @@
 #include "ui/ui.h"
 #include "ui/menu.h"
 #include "zippath.h"
-#include "ui/menu.h"
 #include "ui/filesel.h"
-#include "ui/swlist.h"
 #include "imagedev/floppy.h"
 
 
@@ -100,9 +98,7 @@ static void extra_text_draw_box(render_container *container, float origx1, float
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
 	y1 += UI_BOX_TB_BORDER;
-	y2 -= UI_BOX_TB_BORDER;
 
 	// draw the text within it
 	container->manager().machine().ui().draw_text_full(container,text, x1, y1, text_width, JUSTIFY_LEFT, WRAP_WORD,
@@ -222,7 +218,8 @@ static int is_valid_filename_char(unicode_char unichar)
 ui_menu_file_create::ui_menu_file_create(running_machine &machine, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool *ok)
 	: ui_menu(machine, container),
 		m_current_directory(current_directory),
-		m_current_file(current_file)
+		m_current_file(current_file), 
+		m_current_format(NULL)
 {
 	m_image = image;
 	m_ok = ok;
@@ -274,7 +271,7 @@ void ui_menu_file_create::populate()
 	item_append("New Image Name:", new_image_name, 0, ITEMREF_NEW_IMAGE_NAME);
 
 	// do we support multiple formats?
-	format = m_image->formatlist();
+	if (ENABLE_FORMATS) format = m_image->formatlist();
 	if (ENABLE_FORMATS && (format != NULL))
 	{
 		item_append("Image Format:", m_current_format->description(), 0, ITEMREF_FORMAT);
@@ -347,7 +344,8 @@ void ui_menu_file_create::handle()
 ui_menu_file_selector::ui_menu_file_selector(running_machine &machine, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, int *result)
 	: ui_menu(machine, container),
 		m_current_directory(current_directory),
-		m_current_file(current_file)
+		m_current_file(current_file), 
+		m_entrylist(NULL)
 {
 	m_image = image;
 	m_has_empty = has_empty;
@@ -538,7 +536,7 @@ void ui_menu_file_selector::append_entry_menu_item(const file_selector_entry *en
 void ui_menu_file_selector::populate()
 {
 	zippath_directory *directory = NULL;
-	file_error err = FILERR_NONE;
+	file_error err;
 	const osd_directory_entry *dirent;
 	const file_selector_entry *entry;
 	const file_selector_entry *selected_entry = NULL;

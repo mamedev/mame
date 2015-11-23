@@ -13,11 +13,7 @@
 // MAME headers
 #include "emu.h"
 #include "emuopts.h"
-#include "osdepend.h"
-#include "video/vector.h"
 #include "render.h"
-#include "rendutil.h"
-#include "ui/ui.h"
 #include "uiinput.h"
 
 // MAMEOS headers
@@ -26,7 +22,6 @@
 #include "window.h"
 #include "input.h"
 #include "strconv.h"
-#include "config.h"
 
 //============================================================
 //  CONSTANTS
@@ -113,7 +108,7 @@ void windows_osd_interface::video_exit()
 win_monitor_info::win_monitor_info(const HMONITOR handle, const char *monitor_device, float aspect)
 	: osd_monitor_info(&m_handle, monitor_device, aspect), m_handle(handle)
 {
-	refresh();
+	win_monitor_info::refresh();
 }
 
 win_monitor_info::~win_monitor_info()

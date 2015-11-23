@@ -68,7 +68,7 @@ const device_type C64_VW64 = &device_creator<c64_vizawrite_cartridge_device>;
 
 c64_vizawrite_cartridge_device::c64_vizawrite_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_VW64, "VizaWrite 64", tag, owner, clock, "c64_vizawrite", __FILE__),
-	device_c64_expansion_card_interface(mconfig, *this)
+	device_c64_expansion_card_interface(mconfig, *this), m_game_timer(nullptr)
 {
 }
 

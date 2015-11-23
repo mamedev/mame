@@ -28,13 +28,15 @@ const device_type NUBUS_SLOT = &device_creator<nubus_slot_device>;
 //-------------------------------------------------
 nubus_slot_device::nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, NUBUS_SLOT, "NUBUS_SLOT", tag, owner, clock, "nubus_slot", __FILE__),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this), 
+	m_nubus_tag(nullptr), 
+	m_nubus_slottag(nullptr)
 {
 }
 
 nubus_slot_device::nubus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this), m_nubus_tag(nullptr), m_nubus_slottag(nullptr)
 {
 }
 
@@ -77,24 +79,24 @@ void nubus_device::static_set_cputag(device_t &device, const char *tag)
 //-------------------------------------------------
 
 nubus_device::nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, NUBUS, "NUBUS", tag, owner, clock, "nubus", __FILE__),
+		device_t(mconfig, NUBUS, "NUBUS", tag, owner, clock, "nubus", __FILE__), m_maincpu(nullptr),
 		m_out_irq9_cb(*this),
 		m_out_irqa_cb(*this),
 		m_out_irqb_cb(*this),
 		m_out_irqc_cb(*this),
 		m_out_irqd_cb(*this),
-		m_out_irqe_cb(*this)
+		m_out_irqe_cb(*this), m_cputag(nullptr)
 {
 }
 
 nubus_device::nubus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr),
 		m_out_irq9_cb(*this),
 		m_out_irqa_cb(*this),
 		m_out_irqb_cb(*this),
 		m_out_irqc_cb(*this),
 		m_out_irqd_cb(*this),
-		m_out_irqe_cb(*this)
+		m_out_irqe_cb(*this), m_cputag(nullptr)
 {
 }
 //-------------------------------------------------
@@ -256,8 +258,8 @@ WRITE_LINE_MEMBER( nubus_device::irqe_w ) { m_out_irqe_cb(state); }
 
 device_nubus_card_interface::device_nubus_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_nubus(NULL),
-		m_nubus_tag(NULL)
+		m_nubus(nullptr),
+		m_nubus_tag(nullptr), m_nubus_slottag(nullptr), m_slot(0), m_next(nullptr)
 {
 }
 

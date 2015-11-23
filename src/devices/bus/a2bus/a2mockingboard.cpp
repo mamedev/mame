@@ -128,7 +128,7 @@ a2bus_ayboard_device::a2bus_ayboard_device(const machine_config &mconfig, device
 	m_ay1(*this, AY1_TAG),
 	m_ay2(*this, AY2_TAG),
 	m_ay3(*this, AY3_TAG),
-	m_ay4(*this, AY4_TAG)
+	m_ay4(*this, AY4_TAG), m_isPhasor(false), m_PhasorNative(false), m_porta1(0), m_porta2(0)
 {
 }
 

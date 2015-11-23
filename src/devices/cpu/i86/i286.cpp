@@ -1292,7 +1292,7 @@ m_limit[sreg] = LIMIT(desc); }
 							LOADDESC(0x848, DS);
 #undef LOADDESC
 							// void cast supresses warning
-#define LOADDESC(addr, reg, r) { desc[1] = read_word(addr); desc[2] = read_word(addr+2); desc[0] = read_word(addr+4); \
+#define LOADDESC(addr, reg, r) { desc[1] = read_word(addr); desc[2] = read_word(addr + 2); desc[0] = read_word(addr + 4); \
 reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 							LOADDESC(0x84e, m_gdtr, 1);
 							LOADDESC(0x854, m_ldtr, m_ldtr.rights = RIGHTS(desc));

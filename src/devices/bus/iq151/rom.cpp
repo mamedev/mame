@@ -43,7 +43,7 @@ const device_type IQ151_AMOS3 = &device_creator<iq151_amos3_device>;
 
 iq151_rom_device::iq151_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_iq151cart_interface(mconfig, *this)
+		device_iq151cart_interface(mconfig, *this), m_rom(nullptr)
 {
 }
 

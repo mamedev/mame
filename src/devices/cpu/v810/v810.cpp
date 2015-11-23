@@ -1247,16 +1247,13 @@ const v810_device::opcode_func v810_device::s_OpCodeTable[64] =
 
 void v810_device::device_start()
 {
-	m_irq_state = CLEAR_LINE;
-	m_irq_line = 0;
-	m_nmi_line = CLEAR_LINE;
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_io = &space(AS_IO);
 
 	m_irq_line = 0;
-	m_irq_state = 0;
-	m_nmi_line = 0;
+	m_irq_state = CLEAR_LINE;
+	m_nmi_line = CLEAR_LINE;
 	memset(m_reg, 0x00, sizeof(m_reg));
 
 	save_item(NAME(m_reg));

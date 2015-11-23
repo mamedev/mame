@@ -13,7 +13,6 @@
 
 // MAMEOS headers
 #include "strconv.h"
-#include "unicode.h"
 
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
 //============================================================
@@ -120,7 +119,7 @@ int osd_uchar_from_osdchar(UINT32 *uchar, const char *osdchar, size_t count)
 }
 
 #else
-
+#include "unicode.h"
 //============================================================
 //  osd_uchar_from_osdchar
 //============================================================

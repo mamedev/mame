@@ -41,7 +41,7 @@ cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const 
 		device_image_interface(mconfig, *this),
 		m_cart_callback(*this),
 		m_nmi_callback(*this),
-		m_halt_callback(*this)
+		m_halt_callback(*this), m_cart(nullptr)
 {
 }
 

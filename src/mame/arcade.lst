@@ -148,6 +148,7 @@ galaxiani       // (c) Irem
 galaxrf         // bootleg (Recreativos Franco)
 galaxrfgg       // bootleg (Recreativos Franco)
 superg          // hack
+supergs         // Silver Systems hack
 galapx          // hack
 moonaln         // [Nichibutsu] (Karateco license) or hack
 galap1          // hack
@@ -847,6 +848,7 @@ rthunder        // (c) 1986
 rthunder2       // (c) 1986
 rthunder1       // (c) 1986
 rthunder0       // (c) 1986
+rthundera
 wndrmomo        // (c) 1987
 
 // Thunder Ceptor HW
@@ -3074,6 +3076,7 @@ bioniccbl       //  bootleg
 supduck         // (c) Comad
 1943            //  6/1987 (c) 1987 (Euro)
 1943u           //  6/1987 (c) 1987 (US) Rev C
+1943ua          //  6/1987 (c) 1987 (US)
 1943j           //  6/1987 (c) 1987 (Japan) Rev B
 1943ja          //  6/1987 (c) 1987 (Japan)
 1943b           // bootleg
@@ -5149,7 +5152,8 @@ micrombc        // 1999.03 Microman Battle Charge
 pclub2v3        // 1999.03 Print Club 2 Vol. 3
 sanjeon         // 1999.04 Sanjun Sujun (Sega / Deniam)
 danchih         // 1999.06 Danchi de Hanafuda Okusan Komeya Desuyo! (Altron (Tecmo License))
-ffreveng        // 1999.09 Final Fight Revenge (Capcom)
+ffrevng10       // 1999.09 Final Fight Revenge (Capcom) (V1.000)
+ffreveng        // 1999.09 Final Fight Revenge (Capcom) (V1.100)
 pclubpok        // 1999.11 Print Club Pokemon
 pclubor         // 1999.11 Print Club Goukakenran
 danchiq         // 2000.12 Danchi de Quiz Okusan Yontaku Desuyo! (Altron)
@@ -5516,6 +5520,7 @@ spawn           // 1999.?? Spawn In the Demon's Hand
 				// 1999.?? Tokio Bus Guide
 				// 1999.?? Tokio Bus Guide (Rev A)
 vtennisg        // 1999.?? Virtua Tennis / Power Smash (GD-ROM)
+totdo           // 1999.?? The Typing of the Dead
 18wheelr        // 2000.01 18 Wheeler Deluxe (Rev A)
 18wheels        // 2000.01 18 Wheeler (Standard)
 18wheelu        // 2000.01 18 Wheeler (Upright)
@@ -8138,9 +8143,9 @@ wwfwfesta       // TA-0031 (c) 1991 + Tecmo license (US)
 wwfwfestb       // bootleg
 wwfwfestj       // TA-0031 (c) 1991 (Japan)
 wwfwfestk       // TA-0031 (c) 1991 (Korea)
-shadfrce        // TA-0032 (c) 1993 (US)
+shadfrce        // TA-0032 (c) 1993 (World)
+shadfrceu       // TA-0032 (c) 1993 (US)
 shadfrcej       // TA-0032 (c) 1993 (Japan)
-shadfrcejv2     // TA-0032 (c) 1993 (Japan)
 
 // Stern "Berzerk hardware" games
 berzerk         // (c) 1980
@@ -9006,6 +9011,7 @@ inufuku         // (c) 1998 Video System Co. (Japan)
 // 68020 board
 samuraia        // (c) 1993 (World)
 sngkace         // (c) 1993 (Japan)
+sngkacea        // (c) 1993 (Japan)
 gunbird         // (c) 1994
 gunbirdk        // (c) 1994
 gunbirdj        // (c) 1994
@@ -10472,6 +10478,7 @@ evosocc         // 2001 Evoga. Evolution Soccer
 topbladv        // 2002 Sonokong. Top Blade V
 officeye
 donghaer
+trivrus         // 2009 AGT. Trivia R Us
 
 ddz             // (c) 200?
 
@@ -10722,6 +10729,7 @@ hostinv         // (c) 1998 The Game Room
 calchase        // (c) 1999 The Game Room
 eggsplc         // (c) 2002 The Game Room
 ripribit        // (c) 1997 LAI Games
+ripribita       // (c) 1997 LAI Games
 cfarm           // (c) 1999 LAI Games
 cclownz         // (c) 1999 LAI Games
 rotaryf
@@ -11170,7 +11178,8 @@ victor21        // (c) 1990 Subsino
 crsbingo        // (c) 1991 Subsino
 tisub           // (c) 1992 Subsino
 tisuba          // (c) 1992 Subsino
-stisub          // (c) 1995 Subsino (Alpha license)
+stbsub          // (c) 1995 Subsino (Alpha license)
+stisub          // (c) 1995 Subsino
 tesorone        // (c) 1995 Subsino
 tesorone240     // (c) 1995 Subsino
 tesorone230     // (c) 1995 Subsino
@@ -11231,11 +11240,37 @@ potnpkrd        // Bootleg
 potnpkre        // Bootleg
 potnpkrf        // Bootleg
 potnpkrg        // Bootleg
-goodluck        // Unknown
-superdbl        // 198? Karateco
+potnpkrh        // Bootleg
 ngold           // 198? Unknown
 ngolda          // 198? Unknown
 ngoldb          // 198? Unknown
+goodluck        // Unknown
+bsuerte         // 1990, Unknown
+bsuertea        // 1991, Unknown
+bsuerteb        // 1991, Unknown
+bsuertec        // 1991, Unknown
+bsuerted        // 1991, Unknown
+bsuertee        // 1991, Unknown
+bsuertef        // 1991, Unknown
+bsuerteg        // 1991, Unknown
+bsuerteh        // 1991, Unknown
+bsuertei        // 1991, Unknown
+bsuertej        // 1991, Unknown
+bsuertek        // 1991, Unknown
+bsuertel        // 1991, Unknown
+bsuertem        // 1991, Unknown
+bsuerten        // 1991, Unknown
+bsuerteo        // 1991, Unknown
+bsuertep        // 1991, Unknown
+bsuerteq        // 1991, Unknown
+bsuerter        // 1991, Unknown
+bsuertes        // 1991, Unknown
+bsuertet        // 1991, Unknown
+bsuerteu        // 1991, Unknown
+falcnwld        // 1991, TVG
+falcnwlda       // (c) 1990, Video Klein
+falcnwldb       // (c) 1990, Video Klein
+falcnwldc       // (c) 1983, Falcon
 witchcrd        // (c) 1991, Video Klein
 witchcda        // 1991, Unknown
 witchcdb        // 1991, Unknown
@@ -11279,43 +11314,17 @@ wupndownc       // (c) 1998, Video Klein
 wupndownd       // (c) 1998, Video Klein
 wstrike         // (c) 1992, Video Klein
 wstrikea        // (c) 1992, Video Klein
-wtchjack        // (c) 1992-1996, Video Klein
-wtchjacka       // (c) 1992-1996, Video Klein
-wtchjackb       // (c) 1992-1996, Video Klein
-wtchjackc       // (c) 1992-1996, Video Klein
-wtchjackd       // (c) 1992-1996, Video Klein
-wtchjacke       // (c) 1992-1996, Video Klein
-wtchjackf       // (c) 1992-1996, Video Klein
-wtchjackg       // (c) 1992-1996, Video Klein
-wtchjackh       // (c) 1992-1996, Video Klein
-wtchjacki       // (c) 1992-1996, Video Klein
-wtchjackj       // (c) 1992-1996, Video Klein
-falcnwld        // 1991, TVG
-falcnwlda       // (c) 1990, Video Klein
-falcnwldb       // (c) 1990, Video Klein
-falcnwldc       // (c) 1983, Falcon
-bsuerte         // 1990, Unknown
-bsuertea        // 1991, Unknown
-bsuerteb        // 1991, Unknown
-bsuertec        // 1991, Unknown
-bsuerted        // 1991, Unknown
-bsuertee        // 1991, Unknown
-bsuertef        // 1991, Unknown
-bsuerteg        // 1991, Unknown
-bsuerteh        // 1991, Unknown
-bsuertei        // 1991, Unknown
-bsuertej        // 1991, Unknown
-bsuertek        // 1991, Unknown
-bsuertel        // 1991, Unknown
-bsuertem        // 1991, Unknown
-bsuerten        // 1991, Unknown
-bsuerteo        // 1991, Unknown
-bsuertep        // 1991, Unknown
-bsuerteq        // 1991, Unknown
-bsuerter        // 1991, Unknown
-bsuertes        // 1991, Unknown
-bsuertet        // 1991, Unknown
-bsuerteu        // 1991, Unknown
+wtchjack        // (c) 1996, Video Klein
+wtchjacka       // (c) 1996, Video Klein
+wtchjackb       // (c) 1996, Video Klein
+wtchjackc       // (c) 1996, Video Klein
+wtchjackd       // (c) 1996, Video Klein
+wtchjacke       // (c) 1995, Video Klein
+wtchjackf       // (c) 1995, Video Klein
+wtchjackg       // (c) 1995, Video Klein
+wtchjackh       // (c) 1995, Video Klein
+wtchjacki       // (c) 1995, Video Klein
+wtchjackj       // (c) 1994, Video Klein
 pmpoker         // (c) 1981 PlayMan
 royale          // Unknown
 royalea         // Unknown
@@ -11331,9 +11340,11 @@ poker91         // 1991, Unknown
 genie           // (c) 198? Video Fun Games Ltd.
 geniea          // 198?, Unknown
 silverga        // 1983, Unknown
+superdbl        // 198? Karateco
 pokerdub        // 198?, Unknown
 pokerduc        // 198?, Unknown
 bchancep        // 198?, Unknown
+bchanceq        // 198?, Unknown
 pokermon        // 1987, Unknown
 pokersis        // 198?, Sisteme France.
 super98         // 199?, Unknown
@@ -12063,6 +12074,7 @@ gtroppo         // (c) 1986 Ainsworth Nominees P.L.
 clkwise         // (c) 1986 Ainsworth Nominees P.L.
 gldnpkr         // (c) 1986 Ainsworth Nominees P.L.
 cgold           // (c) 1986 Ainsworth Nominees P.L.
+fvrpitch        // (c) 1986 Ainsworth Nominees P.L.
 gunnrose        // (c) 1993
 3bagflvt        // (c) 1994
 3bagflnz        // (c) 1994
@@ -13312,8 +13324,10 @@ attckexd2     // (c) 1977 Exidy
 deathrac      // (c) 1976 Exidy
 biplane4      // (c) 1976 Fun Games
 take5         // (c) 1975 Fun Games
-dpatrol       // (c) 1977 PSE
 //knightar    // (c) 1976 PSE
+bazooka       // (c) 1976 PSE
+bazookabr     // (c) 1977 Taito do Brasil
+dpatrol       // (c) 1977 PSE
 //gametree    // (c) 1978 PSE
 vollyrmt      // (c) 1973 Ramtek
 hockyrmt      // (c) 1973 Ramtek
@@ -13325,8 +13339,6 @@ trivia        // (c) 1976 Ramtek
 monacogp      // (c) 1980 Sega
 monacogpa     // (c) 1980 Sega
 gunman        // (c) 1977 Taito
-bazooka       // (c) 1977 PSE
-bazookabr     // (c) 1977 Taito do Brasil
 missilex      // (c) 1977 Taito
 ttblock       // (c) 1977 Taito
 zzblock       // (c) 1979 Taito

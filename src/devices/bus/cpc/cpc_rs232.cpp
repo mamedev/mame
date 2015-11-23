@@ -85,7 +85,7 @@ cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, const char *ta
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_pit(*this,"pit"),
 	m_dart(*this,"dart"),
-	m_rs232(*this,"rs232")
+	m_rs232(*this,"rs232"), m_slot(nullptr)
 {
 }
 
@@ -94,7 +94,7 @@ cpc_rs232_device::cpc_rs232_device(const machine_config &mconfig, device_type ty
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_pit(*this,"pit"),
 	m_dart(*this,"dart"),
-	m_rs232(*this,"rs232")
+	m_rs232(*this,"rs232"), m_slot(nullptr)
 {
 }
 

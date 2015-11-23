@@ -68,13 +68,13 @@ a78_rom_pokey_device::a78_rom_pokey_device(const machine_config &mconfig, const 
 
 
 a78_rom_sg_device::a78_rom_sg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: a78_rom_device(mconfig, type, name, tag, owner, clock, shortname, source)
-{
+					: a78_rom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_bank(0)
+				{
 }
 
 a78_rom_sg_device::a78_rom_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a78_rom_device(mconfig, A78_ROM_SG, "Atari 7800 ROM Carts w/SuperGame Bankswitch", tag, owner, clock, "a78_rom_sg", __FILE__)
-{
+					: a78_rom_device(mconfig, A78_ROM_SG, "Atari 7800 ROM Carts w/SuperGame Bankswitch", tag, owner, clock, "a78_rom_sg", __FILE__), m_bank(0)
+				{
 }
 
 a78_rom_sg_pokey_device::a78_rom_sg_pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -107,14 +107,14 @@ a78_rom_sg9_device::a78_rom_sg9_device(const machine_config &mconfig, const char
 
 
 a78_rom_abs_device::a78_rom_abs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a78_rom_device(mconfig, A78_ROM_ABSOLUTE, "Atari 7800 ROM Carts w/Absolute Bankswitch", tag, owner, clock, "a78_rom_abs", __FILE__)
-{
+					: a78_rom_device(mconfig, A78_ROM_ABSOLUTE, "Atari 7800 ROM Carts w/Absolute Bankswitch", tag, owner, clock, "a78_rom_abs", __FILE__), m_bank(0)
+				{
 }
 
 
 a78_rom_act_device::a78_rom_act_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a78_rom_device(mconfig, A78_ROM_ACTIVISION, "Atari 7800 ROM Carts w/Activision Bankswitch", tag, owner, clock, "a78_rom_act", __FILE__)
-{
+					: a78_rom_device(mconfig, A78_ROM_ACTIVISION, "Atari 7800 ROM Carts w/Activision Bankswitch", tag, owner, clock, "a78_rom_act", __FILE__), m_bank(0)
+				{
 }
 
 

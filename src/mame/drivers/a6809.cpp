@@ -148,10 +148,6 @@ WRITE8_MEMBER( a6809_state::a6809_register_w )
 	UINT16 temp = m_start_address;
 	UINT16 temq = m_cursor_address;
 
-	// data is 18, but we need 19, to give the 20 rows needed by the SAA5050
-	if (m_video_index == 9)
-		data++;
-
 	m_crtc->register_w( space, 0, data );
 
 	// Get start address
@@ -247,7 +243,7 @@ static MACHINE_CONFIG_START( a6809, a6809_state )
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(a6809_state, cass_w))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL_4MHz / 2)
+	MCFG_MC6845_ADD("mc6845", HD6845, "screen", XTAL_4MHz / 2)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(12)
 

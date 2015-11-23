@@ -24,8 +24,8 @@ ADDRESS_MAP_END
 
 es1373_device::es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, ES1373, "Creative Labs Ensoniq AudioPCI97 ES1373", tag, owner, clock, "es1373", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_eslog(NULL),
+		device_sound_interface(mconfig, *this), m_stream(nullptr),
+		m_eslog(nullptr), m_tempCount(0), m_timer(nullptr), m_memory_space(nullptr), m_cpu_tag(nullptr), m_cpu(nullptr),
 		m_irq_num(-1)
 {
 }

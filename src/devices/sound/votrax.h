@@ -98,10 +98,10 @@ private:
 	UINT8                       m_latch_92;             // 2-bit latch @ 92
 
 	// low parameter clocking
-	UINT8                       m_srff_132;             // S/R flip-flop @ 132
-	UINT8                       m_srff_114;             // S/R flip-flop @ 114
-	UINT8                       m_srff_112;             // S/R flip-flop @ 112
-	UINT8                       m_srff_142;             // S/R flip-flop @ 142
+	bool                        m_srff_132;             // S/R flip-flop @ 132
+	bool                        m_srff_114;             // S/R flip-flop @ 114
+	bool                        m_srff_112;             // S/R flip-flop @ 112
+	bool                        m_srff_142;             // S/R flip-flop @ 142
 	UINT8                       m_latch_80;             // phoneme timing latch @ 80
 
 	// glottal circuit

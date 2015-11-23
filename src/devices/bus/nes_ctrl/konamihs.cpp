@@ -46,7 +46,7 @@ nes_konamihs_device::nes_konamihs_device(const machine_config &mconfig, const ch
 					device_t(mconfig, NES_KONAMIHS, "Konami Hyper Shot Controller", tag, owner, clock, "nes_konamihs", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_ipt_p1(*this, "P1"),
-					m_ipt_p2(*this, "P2")
+					m_ipt_p2(*this, "P2"), m_latch_p1(0), m_latch_p2(0)
 {
 }
 

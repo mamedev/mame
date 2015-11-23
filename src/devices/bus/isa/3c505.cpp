@@ -309,7 +309,7 @@ threecom3c505_device::threecom3c505_device(const machine_config &mconfig, const 
 	device_isa16_card_interface(mconfig, *this),
 	m_iobase(*this, "IO_BASE"),
 	m_irqdrq(*this, "IRQ_DRQ"),
-	m_romopts(*this, "ROM_OPTS")
+	m_romopts(*this, "ROM_OPTS"), m_status(0), m_control(0), m_command_index(0), m_command_pending(0), m_wait_for_ack(0), m_wait_for_nak(0), m_rx_data_index(0), m_rx_pending(0), m_tx_data_length(0), m_program_length(0), m_response_length(0), m_response_index(0), m_microcode_version(0), m_microcode_running(0), m_i82586_config(0), irq_state(), m_do_command_timer(nullptr), m_installed(false), m_irq(0), m_drq(0)
 {
 }
 
@@ -319,7 +319,7 @@ threecom3c505_device::threecom3c505_device(const machine_config &mconfig, device
 	device_isa16_card_interface(mconfig, *this),
 	m_iobase(*this, "IO_BASE"),
 	m_irqdrq(*this, "IRQ_DRQ"),
-	m_romopts(*this, "ROM_OPTS")
+	m_romopts(*this, "ROM_OPTS"), m_status(0), m_control(0), m_command_index(0), m_command_pending(0), m_wait_for_ack(0), m_wait_for_nak(0), m_rx_data_index(0), m_rx_pending(0), m_tx_data_length(0), m_program_length(0), m_response_length(0), m_response_index(0), m_microcode_version(0), m_microcode_running(0), m_i82586_config(0), irq_state(), m_do_command_timer(nullptr), m_installed(false), m_irq(0), m_drq(0)
 {
 }
 
@@ -447,7 +447,7 @@ const char *threecom3c505_device::cpu_context()
 //**************************************************************************
 
 threecom3c505_device::data_buffer::data_buffer() :
-	m_device(NULL)
+	m_device(nullptr), m_length(0)
 {
 }
 
@@ -508,8 +508,8 @@ void threecom3c505_device::data_buffer::log(const char * title) const
 //**************************************************************************
 
 threecom3c505_device::data_buffer_fifo::data_buffer_fifo() :
-	m_device(NULL),
-	m_size(0)
+	m_device(nullptr),
+	m_size(0), m_count(0), m_get_index(0), m_put_index(0)
 {
 }
 

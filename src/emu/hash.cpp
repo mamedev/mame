@@ -292,8 +292,6 @@ bool hash_collection::from_internal_string(const char *string)
 		// non-hex alpha values specify a hash type
 		if (uc >= 'G' && uc <= 'Z')
 		{
-			if (skip_digits != 0)
-				errors = true;
 			skip_digits = 0;
 			if (uc == HASH_CRC)
 			{

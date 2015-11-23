@@ -90,6 +90,7 @@
 // types of delegates supported
 #define DELEGATE_TYPE_COMPATIBLE 0
 #define DELEGATE_TYPE_INTERNAL 1
+#define DELEGATE_TYPE_MSVC 2
 
 // select which one we will be using
 #if defined(__GNUC__)
@@ -110,6 +111,10 @@
 		#define MEMBER_ABI
 		#define HAS_DIFFERENT_ABI 0
 	#endif
+#elif defined(_MSC_VER) && defined (PTR64)
+#define MEMBER_ABI 
+#define HAS_DIFFERENT_ABI 0
+#define USE_DELEGATE_TYPE DELEGATE_TYPE_MSVC
 #else
 #define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
 #endif
@@ -539,6 +544,64 @@ private:
 												//    if even, it's a pointer to the function
 												//    if odd, it's the byte offset into the vtable
 	int                     m_this_delta;       // delta to apply to the 'this' pointer
+};
+
+#elif (USE_DELEGATE_TYPE == DELEGATE_TYPE_MSVC)
+
+// ======================> delegate_mfp
+const int SINGLE_MEMFUNCPTR_SIZE = sizeof(void (delegate_generic_class::*)());
+
+// struct describing the contents of a member function pointer
+class delegate_mfp
+{
+public:
+	// default constructor
+	delegate_mfp()
+		: m_function(0) { }
+
+	// copy constructor
+	delegate_mfp(const delegate_mfp &src)
+		: m_function(src.m_function) { }
+
+	// construct from any member function pointer
+	template<typename _MemberFunctionType, class _MemberFunctionClass, typename _ReturnType, typename _StaticFunctionType>
+	delegate_mfp(_MemberFunctionType mfp, _MemberFunctionClass *, _ReturnType *, _StaticFunctionType)
+	{
+		//assert(sizeof(mfp) == 12 || sizeof(mfp) == 16);
+		m_size = sizeof(mfp);
+		*reinterpret_cast<_MemberFunctionType *>(this) = mfp;
+	}
+
+	// comparison helpers
+	bool operator==(const delegate_mfp &rhs) const { return (m_function == rhs.m_function); }
+	bool isnull() const { return (m_function == 0); }
+
+	// getters
+	delegate_generic_class *real_object(delegate_generic_class *original) const { return original; }
+
+	// binding helper
+	template<typename _FunctionType>
+	void update_after_bind(_FunctionType &funcptr, delegate_generic_class *&object)
+	{
+		funcptr = reinterpret_cast<_FunctionType>(m_function);
+		if (m_size == SINGLE_MEMFUNCPTR_SIZE + sizeof(int))
+			object = reinterpret_cast<delegate_generic_class *>(reinterpret_cast<UINT8 *>(object) + m_this_delta);
+	}
+
+private:
+	// extract the generic function and adjust the object pointer
+	delegate_generic_function convert_to_generic(delegate_generic_class *&object) const;
+
+	// actual state
+	FPTR                    m_function;         // first item can be one of two things:
+												//    if even, it's a pointer to the function
+												//    if odd, it's the byte offset into the vtable
+	int                     m_this_delta;       // delta to apply to the 'this' pointer
+
+	int						m_dummy1;
+	int						m_dummy2;
+
+	int						m_size;    
 };
 
 #endif

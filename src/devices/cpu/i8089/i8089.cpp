@@ -38,14 +38,14 @@ i8089_device::i8089_device(const machine_config &mconfig, const char *tag, devic
 	m_ch1(*this, "1"),
 	m_ch2(*this, "2"),
 	m_write_sintr1(*this),
-	m_write_sintr2(*this),
+	m_write_sintr2(*this), m_databus_width(0), m_mem(nullptr), m_io(nullptr),
 	m_sysbus(0),
 	m_scb(0),
-	m_soc(0),
+	m_soc(0), m_initialized(false),
 	m_master(false),
 	m_current_tp(0),
 	m_ca(0),
-	m_sel(0)
+	m_sel(0), m_last_chan(false)
 {
 }
 

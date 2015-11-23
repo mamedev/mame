@@ -39,14 +39,6 @@
 #include "sound/wavwrite.h"
 #include "discrete.h"
 
-// for now, make buggy GCC/Mingw STFU about I64FMT
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat"
-#pragma GCC diagnostic ignored "-Wformat-extra-args"
-#endif
-
-
 /* for_each collides with c++ standard libraries - include it here */
 #define for_each(_T, _e, _l) for (_T _e = (_l)->begin_ptr() ;  _e <= (_l)->end_ptr(); _e++)
 
@@ -135,8 +127,8 @@ public:
 
 protected:
 	discrete_task(discrete_device &pdev)
-	: task_group(0), m_device(pdev), m_threadid(-1)
-	{
+	: task_group(0), m_device(pdev), m_threadid(-1), m_samples(0)
+{
 		source_list.clear();
 		step_list.clear();
 		m_buffers.clear();
@@ -332,7 +324,7 @@ void discrete_task::check(discrete_task *dest_task)
 							buf.source = dest_node->m_input[inputnum];
 							buf.node_num = inputnode_num;
 							//buf.node = device->discrete_find_node(inputnode);
-							i = m_buffers.count();
+							m_buffers.count();
 							pbuf = m_buffers.add(buf);
 						}
 						m_device.discrete_log("dso_task_start - buffering %d(%d) in task %p group %d referenced by %d group %d", NODE_INDEX(inputnode_num), NODE_CHILD_NODE_NUM(inputnode_num), this, task_group, dest_node->index(), dest_task->task_group);
@@ -362,9 +354,15 @@ void discrete_task::check(discrete_task *dest_task)
  *
  *************************************/
 
-discrete_base_node::discrete_base_node() :
+discrete_base_node::discrete_base_node() : 
+	m_device(NULL),
+	m_block(NULL),
+	m_active_inputs(0), 
+	m_custom(NULL),
+	m_input_is_node(0),
 	m_step_intf(NULL),
-	m_input_intf(NULL)
+	m_input_intf(NULL), 
+	m_output_intf(NULL)
 {
 	m_output[0] = 0.0;
 }
@@ -853,7 +851,8 @@ discrete_device::discrete_device(const machine_config &mconfig, device_type type
 
 discrete_sound_device::discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: discrete_device(mconfig, DISCRETE, "DISCRETE", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this), 
+		m_stream(NULL)
 {
 }
 
@@ -1104,7 +1103,7 @@ READ8_MEMBER( discrete_device::read )
 {
 	const discrete_base_node *node = discrete_find_node(offset);
 
-	UINT8 data = 0;
+	UINT8 data;
 
 	/* Read the node input value if allowed */
 	if (node)
@@ -1142,7 +1141,3 @@ WRITE8_MEMBER( discrete_device::write )
 		discrete_log("discrete_sound_w write to non-existent NODE_%02d\n", offset-NODE_00);
 	}
 }
-
-#if (defined(__MINGW32__) && (__GNUC__ >= 5))
-#pragma GCC diagnostic pop
-#endif
