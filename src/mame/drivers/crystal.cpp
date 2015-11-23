@@ -116,6 +116,71 @@ Notes:
       3x Intel E28F128J3A 128MBit surface mounted FlashROMs (TSOP56, labelled 'BREZZASOFT BCSV0004Fxx', xx=01, 02, 03)
          Note: there are 8 spaces total for FlashROMs. Only U1, U2 & U3 are populated in this cart.
 
+
+
+P's Attack (c) 2004 Uniana Co., Ltd
+
++----------1||||---1|||||--1|||||---------------------------+
+|VOL       TICKET  GUN_1P  GUN_2P                 +---------|
+|                                                 |         |
++-+                                               |  256MB  |
+  |       CC-DAC                                  | Compact |
++-+                                  EMUL*        |  Flash  |
+|                                                 |         |
+|J          +---+                                 +---------|
+|A          |   |                                           |
+|M          | R |   25.1750MHz              +--------------+|
+|M          | A |                           |     42Pin*   ||
+|A          | M |                           +--------------+|
+|           |   |                           +--------------+|
+|C          +---+       +------------+      |     SYS      ||
+|O                      |            |      +--------------+|
+|N          +---+       |            |                      |
+|N          |   |       |VRenderZERO+|                      |
+|E SERVICE  | R |       | MagicEyes  |  +-------+    62256* |
+|C          | A |       |            |  |  RAM  |           |
+|T TEST     | M |       |            |  +-------+    62256* |
+|O          |   |       +------------+                      |
+|R RESET    +---+                                           |
+|                                   14.31818MHz             |
++-+                                                         |
+  |                                EEPROM                   |
++-+                GAL                                 DSW  |
+|                                                           |
+|  VGA                           PIC               BAT3.6V* |
++-----------------------------------------------------------+
+
+* denotes unpopulated device
+
+RAM are Samsung K4S641632H-TC75
+VGA is a standard PC 15 pin VGA connection
+DSW is 2 switch dipswitch (switches 3-8 are unpopulated)
+PIC is a Microchip PIC16C711-041/P (silkscreened on the PCB as COSTOM)
+SYS is a ST M27C160 EPROM (silkscreened on the PCB as SYSTEM_ROM_32M)
+GAL is a GAL16V8B (not dumped)
+EMUL is an unpopulated 8 pin connector
+EEPROM is a 93C86 16K 5.0v Serial EEPROM (2048x8-bit or 1024x16-bit)
+CC-DAC is a TDA1311A Stereo Continuous Calibration DAC
+
+TICKET is a 5 pin connector:
+
+  1| +12v
+  2| IN
+  3| OUT
+  4| GND
+  5| LED
+
+GUN_xP are 6 pin gun connectors (pins 1-4 match the UNICO sytle guns):
+
+  1| GND
+  2| SW
+  3| +5v
+  4| SENS
+  5| SOL
+  6| GND
+
+
+
 */
 
 #include "emu.h"
@@ -199,6 +264,7 @@ public:
 	DECLARE_DRIVER_INIT(crysking);
 	DECLARE_DRIVER_INIT(evosocc);
 	DECLARE_DRIVER_INIT(donghaer);
+	DECLARE_DRIVER_INIT(psattack);
 
 	DECLARE_READ32_MEMBER(trivrus_input_r);
 	DECLARE_WRITE32_MEMBER(trivrus_input_w);
@@ -1193,6 +1259,23 @@ ROM_START( trivrus )
 	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
+ROM_START( psattack )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD("5.sys",  0x000000, 0x200000, CRC(f09878e4) SHA1(25b8dbac47d3911615c8874746e420ece13e7181) )
+
+	ROM_REGION( 0x4010, "pic16c711", 0 )
+	ROM_LOAD("16c711.pic",  0x0000, 0x137b, CRC(617d8292) SHA1(d32d6054ce9db2e31efaf41015afcc78ed32f6aa) ) // raw dump
+	ROM_LOAD("16c711.bin",  0x0000, 0x4010, CRC(b316693f) SHA1(eba1f75043bd415268eedfdb95c475e73c14ff86) ) // converted to binary
+
+	DISK_REGION( "cfcard" )
+	DISK_IMAGE_READONLY( "psattack", 0, SHA1(e99cd0dafc33ec13bf56061f81dc7c0a181594ee) )
+
+	// keep driver happy
+	ROM_REGION32_LE( 0x3000000, "user1", 0 )
+	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF )
+ROM_END
+
+
 
 DRIVER_INIT_MEMBER(crystal_state,crysking)
 {
@@ -1311,6 +1394,10 @@ DRIVER_INIT_MEMBER(crystal_state, donghaer)
 	Rom[WORD_XOR_LE(0x19C72 / 2)] = 0x9001; // PUSH %R0
 }
 
+DRIVER_INIT_MEMBER(crystal_state,psattack)
+{
+}
+
 
 GAME( 2001, crysbios,        0, crystal,  crystal, driver_device,         0, ROT0, "BrezzaSoft",          "Crystal System BIOS",                  MACHINE_IS_BIOS_ROOT )
 GAME( 2001, crysking, crysbios, crystal,  crystal, crystal_state,  crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings",                 0 )
@@ -1319,3 +1406,6 @@ GAME( 2003, topbladv, crysbios, crystal,  crystal, crystal_state,  topbladv, ROT
 GAME( 2001, officeye,        0, crystal,  officeye,crystal_state,  officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING ) // still has some instability issues
 GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING )
 GAME( 2009, trivrus,         0, trivrus,  trivrus, driver_device,         0, ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 )
+// has a CF card instead of flash roms
+GAME( 2004, psattack, 0, crystal, crystal, crystal_state, psattack, ROT0, "Uniana", "P's Attack", MACHINE_IS_SKELETON )
+

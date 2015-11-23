@@ -4431,7 +4431,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/poker72.cpp",
 	MAME_DIR .. "src/mame/drivers/potgoldu.cpp",
 	MAME_DIR .. "src/mame/drivers/proconn.cpp",
-	MAME_DIR .. "src/mame/drivers/psattack.cpp",
 	MAME_DIR .. "src/mame/drivers/pse.cpp",
 	MAME_DIR .. "src/mame/drivers/quizo.cpp",
 	MAME_DIR .. "src/mame/drivers/quizpun2.cpp",
