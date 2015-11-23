@@ -221,13 +221,13 @@ UINT32 mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind16 
 
 	if (m_scroll1[2] != m_palette_bank1)
 	{
-		m_palette_bank1 = m_scroll1[2];
+		m_palette_bank1 = m_scroll1[2]&0xf;
 		m_tilemap1->mark_all_dirty();
 	}
 
 	if (m_scroll2[2] != m_palette_bank2)
 	{
-		m_palette_bank2 = m_scroll2[2];
+		m_palette_bank2 = m_scroll2[2]&0xf;
 		m_tilemap2->mark_all_dirty();
 	}
 
@@ -244,11 +244,13 @@ UINT32 mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind16 
 	#ifdef MAME_DEBUG
 			if (!machine().input().code_pressed(KEYCODE_Q))
 	#endif
-			mcatadv_draw_tilemap_part(screen, m_scroll1,  m_videoram1, i|0x8, m_tilemap1, bitmap, cliprect);
+			if (!(m_scroll1[2]&0x10))
+				mcatadv_draw_tilemap_part(screen, m_scroll1,  m_videoram1, i|0x8, m_tilemap1, bitmap, cliprect);
 
 	#ifdef MAME_DEBUG
 			if (!machine().input().code_pressed(KEYCODE_W))
 	#endif
+			if (!(m_scroll2[2]&0x10)) // tilemap flicker effect on large shadow, nost level 7
 				mcatadv_draw_tilemap_part(screen, m_scroll2, m_videoram2, i|0x8, m_tilemap2, bitmap, cliprect);
 	}
 
