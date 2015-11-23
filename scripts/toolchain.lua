@@ -44,8 +44,10 @@ newoption {
 		{ "intel-15",	   "Intel C++ Compiler XE 15.0" },
 		{ "vs2012-clang",  "Clang 3.6"         },
 		{ "vs2013-clang",  "Clang 3.6"         },
+		{ "vs2015-clang",  "Clang 3.6"         },
 		{ "vs2012-xp", 	   "Visual Studio 2012 targeting XP" },
 		{ "vs2013-xp", 	   "Visual Studio 2013 targeting XP" },
+		{ "vs2015-xp", 	   "Visual Studio 2015 targeting XP" },
 		{ "winphone8",     "Windows Phone 8.0" },
 		{ "winphone81",    "Windows Phone 8.1" },
 		{ "winstore81",    "Windows Store 8.1" },
@@ -374,6 +376,11 @@ function toolchain(_buildDir, _subDir)
 
 		if ("vs2013-xp") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("v120_xp")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
+		end
+		
+		if ("vs2015-xp") == _OPTIONS["vs"] then
+			premake.vstudio.toolset = ("v140_xp")
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
 		end
 	elseif _ACTION == "xcode4" then
