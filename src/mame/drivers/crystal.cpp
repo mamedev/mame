@@ -140,7 +140,9 @@ public:
 		m_reset_patch(*this, "reset_patch"),
 		m_maincpu(*this, "maincpu"),
 		m_vr0(*this, "vr0"),
-		m_ds1302(*this, "rtc") { }
+		m_ds1302(*this, "rtc"),
+		m_screen(*this, "screen")
+		{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_sysregs;
@@ -155,6 +157,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<vr0video_device> m_vr0;
 	required_device<ds1302_device> m_ds1302;
+	required_device<screen_device> m_screen;
 
 #ifdef IDLE_LOOP_SPEEDUP
 	UINT8     m_FlipCntRead;
@@ -215,6 +218,8 @@ public:
 	void PatchReset(  );
 	UINT16 GetVidReg( address_space &space, UINT16 reg );
 	void SetVidReg( address_space &space, UINT16 reg, UINT16 val );
+
+
 };
 
 void crystal_state::IntReq( int num )
@@ -722,6 +727,24 @@ void crystal_state::SetVidReg( address_space &space, UINT16 reg, UINT16 val )
 
 UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	int xres = 320;
+	int yres = 240;
+
+	// probably more registers around here control height / interlace enable etc.
+	// 0x341c looks like height, but doesn't change for interlace mode.
+	xres = m_sysregs[0x340c / 4]+1;
+	if (xres > 640) xres = 640;
+
+	// force double height if 640 wide (probably a reg for this)
+	if (xres == 640) yres = 480;
+
+
+	rectangle visarea;
+	visarea.set(0, xres-1, 0, yres-1);
+	m_screen->configure(xres, yres, visarea, m_screen->frame_period().attoseconds() );
+
+
+
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int DoFlip;
 
@@ -1056,8 +1079,8 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(crystal_state, screen_update_crystal)
 	MCFG_SCREEN_VBLANK_DRIVER(crystal_state, screen_eof_crystal)
 	MCFG_SCREEN_PALETTE("palette")
@@ -1077,24 +1100,10 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-/*
-    Top blade screen is 32 pixels wider
-*/
-static MACHINE_CONFIG_DERIVED( topbladv, crystal )
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(320+32, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319+32, 0, 239)
-
-MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( trivrus, crystal )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trivrus_mem)
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 MACHINE_CONFIG_END
 
 
@@ -1306,7 +1315,7 @@ DRIVER_INIT_MEMBER(crystal_state, donghaer)
 GAME( 2001, crysbios,        0, crystal,  crystal, driver_device,         0, ROT0, "BrezzaSoft",          "Crystal System BIOS",                  MACHINE_IS_BIOS_ROOT )
 GAME( 2001, crysking, crysbios, crystal,  crystal, crystal_state,  crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings",                 0 )
 GAME( 2001, evosocc,  crysbios, crystal,  crystal, crystal_state,  evosocc,  ROT0, "Evoga",               "Evolution Soccer",                     0 )
-GAME( 2003, topbladv, crysbios, topbladv, crystal, crystal_state,  topbladv, ROT0, "SonoKong / Expotato", "Top Blade V",                          0 )
+GAME( 2003, topbladv, crysbios, crystal,  crystal, crystal_state,  topbladv, ROT0, "SonoKong / Expotato", "Top Blade V",                          0 )
 GAME( 2001, officeye,        0, crystal,  officeye,crystal_state,  officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING ) // still has some instability issues
 GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING )
 GAME( 2009, trivrus,         0, trivrus,  trivrus, driver_device,         0, ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 )
