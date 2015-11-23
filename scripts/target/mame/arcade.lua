@@ -1792,7 +1792,6 @@ files {
 createMAMEProjects(_target, _subtarget, "igs")
 files {
 	MAME_DIR .. "src/mame/drivers/cabaret.cpp",
-	MAME_DIR .. "src/mame/drivers/ddz.cpp",
 	MAME_DIR .. "src/mame/drivers/dunhuang.cpp",
 	MAME_DIR .. "src/mame/drivers/goldstar.cpp",
 	MAME_DIR .. "src/mame/includes/goldstar.h",

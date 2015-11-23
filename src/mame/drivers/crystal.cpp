@@ -1271,9 +1271,21 @@ ROM_START( psattack )
 	DISK_IMAGE_READONLY( "psattack", 0, SHA1(e99cd0dafc33ec13bf56061f81dc7c0a181594ee) )
 
 	// keep driver happy
-	ROM_REGION32_LE( 0x3000000, "user1", 0 )
+	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF )
 ROM_END
+
+ROM_START( ddz )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD("ddz.001.rom",  0x000000, 0x400000, CRC(b379f823) SHA1(531885b35d668d22c75a9759994f4aca6eacb046) )
+	ROM_LOAD("ddz.002.rom",  0x000000, 0x400000, CRC(285c744d) SHA1(2f8bc70825e55e3114015cb263e786df35cde275) )
+	ROM_LOAD("ddz.003.rom",  0x000000, 0x400000, CRC(61c9b5c9) SHA1(0438417398403456a1c49408881797a94aa86f49) )
+
+	// keep driver happy
+	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF )
+ROM_END
+
 
 
 
@@ -1408,4 +1420,5 @@ GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  donghaer, ROT
 GAME( 2009, trivrus,         0, trivrus,  trivrus, driver_device,         0, ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 )
 // has a CF card instead of flash roms
 GAME( 2004, psattack, 0, crystal, crystal, crystal_state, psattack, ROT0, "Uniana", "P's Attack", MACHINE_IS_SKELETON )
-
+// looks like the same kind of hw from strings in the ROM, but scrambled / encrypted? 
+GAME( 200?, ddz,    0,  crystal, crystal, driver_device, 0, ROT0, "IGS?", "Dou Di Zhu", MACHINE_IS_SKELETON )
