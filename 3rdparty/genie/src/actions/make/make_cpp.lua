@@ -228,6 +228,9 @@
 		_p('ifeq (/bin,$(findstring /bin,$(SHELL)))')
 		_p('  SHELLTYPE := posix')
 		_p('endif')
+		_p('ifeq (/bin,$(findstring /bin,$(MAKESHELL)))')
+		_p('  SHELLTYPE := posix')
+		_p('endif')
 		_p('')
 
 		_p('ifeq (posix,$(SHELLTYPE))')
