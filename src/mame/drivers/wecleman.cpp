@@ -756,7 +756,7 @@ static ADDRESS_MAP_START( hotchase_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x4000, 0x4007) AM_WRITE(hotchase_sound_control_w) // Sound volume, banking, etc.
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP   // 0 at start of IRQ service, 1 at end (irq mask?)
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r) // From main CPU (Read on IRQ)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(hotchase_sound_hs_w)    // Command acknowledge ?
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(hotchase_sound_hs_w)    // ACK signal to main CPU
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1044,7 +1044,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::wecleman_scanline)
 
 	if(scanline == 232) // vblank irq
 		m_maincpu->set_input_line(4, HOLD_LINE);
-	else if(((scanline % 64) == 0)) // timer irq TODO: timings (and actually I believe it's from the blitter device)
+	else if(((scanline % 64) == 0)) // timer irq TODO: wrong place maybe? Could do with 007645 blitter or "V-CNT" signal.
 		m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
