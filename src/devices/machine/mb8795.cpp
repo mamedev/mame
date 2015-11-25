@@ -20,7 +20,7 @@ ADDRESS_MAP_END
 
 mb8795_device::mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MB8795, "Fujitsu MB8795", tag, owner, clock, "mb8795", __FILE__),
-	device_network_interface(mconfig, *this, 10), txstat(0), txmask(0), rxstat(0), rxmask(0), txmode(0), rxmode(0), txlen(0), rxlen(0), txcount(0), drq_tx(false), 
+	device_network_interface(mconfig, *this, 10), txstat(0), txmask(0), rxstat(0), rxmask(0), txmode(0), rxmode(0), txlen(0), rxlen(0), txcount(0), drq_tx(false),
 	drq_rx(false), irq_tx(false), irq_rx(false), timer_tx(nullptr), timer_rx(nullptr),
 	irq_tx_cb(*this),
 	irq_rx_cb(*this),

@@ -26,10 +26,10 @@
 
 snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : ti_expansion_card_device(mconfig, TI99_EVPC, "SNUG Enhanced Video Processor Card", tag, owner, clock, "ti99_evpc", __FILE__),
-	device_nvram_interface(mconfig, *this), 
-	m_dsrrom(nullptr), 
-	m_RAMEN(false), 
-	m_dsr_page(0), 
+	device_nvram_interface(mconfig, *this),
+	m_dsrrom(nullptr),
+	m_RAMEN(false),
+	m_dsr_page(0),
 	m_novram(nullptr)
 {
 }

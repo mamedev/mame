@@ -34,9 +34,9 @@ const device_type NES_NANJING = &device_creator<nes_nanjing_device>;
 
 
 nes_nanjing_device::nes_nanjing_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_NANJING, "NES Cart Nanjing PCB", tag, owner, clock, "nes_nanjing", __FILE__), 
-	m_count(0), 
-	m_latch1(0), 
+					: nes_nrom_device(mconfig, NES_NANJING, "NES Cart Nanjing PCB", tag, owner, clock, "nes_nanjing", __FILE__),
+	m_count(0),
+	m_latch1(0),
 	m_latch2(0)
 				{
 }
@@ -128,9 +128,9 @@ WRITE8_MEMBER(nes_nanjing_device::write_l)
 		m_count = data;
 
 		if ((temp & ~data) & 1)
-        {
-            m_latch2 ^= 0xff;
-        }
+		{
+			m_latch2 ^= 0xff;
+		}
 	}
 
 	switch (offset & 0x300)

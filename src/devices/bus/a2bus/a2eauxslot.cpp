@@ -28,8 +28,8 @@ const device_type A2EAUXSLOT_SLOT = &device_creator<a2eauxslot_slot_device>;
 //-------------------------------------------------
 a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, A2EAUXSLOT_SLOT, "Apple IIe AUX Slot", tag, owner, clock, "a2eauxslot_slot", __FILE__),
-		device_slot_interface(mconfig, *this), 
-	m_a2eauxslot_tag(nullptr), 
+		device_slot_interface(mconfig, *this),
+	m_a2eauxslot_tag(nullptr),
 	m_a2eauxslot_slottag(nullptr)
 {
 }

@@ -52,7 +52,7 @@ saturn_device::saturn_device(const machine_config &mconfig, const char *tag, dev
 	, m_unconfig_func(*this)
 	, m_id_func(*this)
 	, m_crc_func(*this)
-	, m_rsi_func(*this), m_pc(0), m_oldpc(0), m_p(0), m_out(0), m_carry(0), m_decimal(0), m_st(0), m_hst(0), m_nmi_state(0), m_irq_state(0), m_irq_enable(0), m_in_irq(0), 
+	, m_rsi_func(*this), m_pc(0), m_oldpc(0), m_p(0), m_out(0), m_carry(0), m_decimal(0), m_st(0), m_hst(0), m_nmi_state(0), m_irq_state(0), m_irq_enable(0), m_in_irq(0),
 	m_pending_irq(0), m_sleeping(0), m_monitor_id(0), m_monitor_in(0), m_program(nullptr), m_direct(nullptr), m_icount(0), m_debugger_temp(0)
 {
 }

@@ -28,8 +28,8 @@ const device_type NUBUS_SLOT = &device_creator<nubus_slot_device>;
 //-------------------------------------------------
 nubus_slot_device::nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, NUBUS_SLOT, "NUBUS_SLOT", tag, owner, clock, "nubus_slot", __FILE__),
-		device_slot_interface(mconfig, *this), 
-	m_nubus_tag(nullptr), 
+		device_slot_interface(mconfig, *this),
+	m_nubus_tag(nullptr),
 	m_nubus_slottag(nullptr)
 {
 }

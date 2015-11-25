@@ -59,14 +59,14 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 		m_file(NULL),
 		m_mame_file(NULL),
 		m_software_info_ptr(NULL),
-		m_software_part_ptr(NULL), 
-	    m_supported(0),
+		m_software_part_ptr(NULL),
+		m_supported(0),
 		m_readonly(false),
-		m_created(false), 
-	    m_init_phase(false), 
-	    m_from_swlist(false), 
-	    m_create_format(0), 
-	    m_create_args(NULL),
+		m_created(false),
+		m_init_phase(false),
+		m_from_swlist(false),
+		m_create_format(0),
+		m_create_args(NULL),
 		m_is_loading(FALSE)
 {
 }

@@ -2422,8 +2422,8 @@ struct YM2610
 
 	UINT8       flagmask;           /* YM2608 only */
 	UINT8       irqmask;            /* YM2608 only */
-	
-	device_t	*device;
+
+	device_t    *device;
 };
 
 /* here is the virtual YM2608 */

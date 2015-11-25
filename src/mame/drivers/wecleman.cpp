@@ -337,7 +337,7 @@ WRITE16_MEMBER(wecleman_state::irqctrl_w)
 
 		// Bit 1 : NSUBRST
 		m_subcpu->set_input_line(INPUT_LINE_RESET,  (data & 2) ? CLEAR_LINE : ASSERT_LINE);
-		
+
 		// Bit 2 : SOUND-ON: send a interrupt to sound CPU, 0 -> 1 transition
 		if ( (m_irqctrl & 4) && (!(data & 4)) )
 		{

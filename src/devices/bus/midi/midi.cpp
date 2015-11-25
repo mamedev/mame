@@ -6,7 +6,7 @@ const device_type MIDI_PORT = &device_creator<midi_port_device>;
 
 midi_port_device::midi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MIDI_PORT, "Midi Port", tag, owner, clock, "midi_port", __FILE__),
-	device_slot_interface(mconfig, *this), 
+	device_slot_interface(mconfig, *this),
 	m_rxd(0),
 	m_rxd_handler(*this),
 	m_dev(NULL)

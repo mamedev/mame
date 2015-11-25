@@ -10,8 +10,8 @@ const device_type SUPERFX = &device_creator<superfx_device>;
 superfx_device::superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, SUPERFX, "SuperFX", tag, owner, clock, "superfx", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 32, 0)
-	, m_out_irq_func(*this), m_pipeline(0), m_ramaddr(0), m_sfr(0), m_pbr(0), m_rombr(0), m_rambr(0), m_cbr(0), m_scbr(0), m_scmr(0), m_colr(0), m_por(0), 
-	m_bramr(0), m_vcr(0), m_cfgr(0), m_clsr(0), m_romcl(0), m_romdr(0), m_ramcl(0), m_ramar(0), m_ramdr(0), m_sreg(nullptr), m_sreg_idx(0), m_dreg(nullptr), 
+	, m_out_irq_func(*this), m_pipeline(0), m_ramaddr(0), m_sfr(0), m_pbr(0), m_rombr(0), m_rambr(0), m_cbr(0), m_scbr(0), m_scmr(0), m_colr(0), m_por(0),
+	m_bramr(0), m_vcr(0), m_cfgr(0), m_clsr(0), m_romcl(0), m_romdr(0), m_ramcl(0), m_ramar(0), m_ramdr(0), m_sreg(nullptr), m_sreg_idx(0), m_dreg(nullptr),
 	m_dreg_idx(0), m_r15_modified(0), m_irq(0), m_cache_access_speed(0), m_memory_access_speed(0), m_program(nullptr), m_icount(0), m_debugger_temp(0)
 {
 }

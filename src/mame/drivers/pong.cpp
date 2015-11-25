@@ -10,13 +10,13 @@ driver by Couriersud
 
 
  Atari Pong Games List - Data based, in part from:
- 
+
  - "Andy's collection of Bronzeage Atari Video Arcade PCBs"
  http://www.andysarcade.net/personal/bronzeage/index.htm
- 
+
  - "Atari's Technical Manual Log"
  http://www.atarigames.com/manuals.txt
- 
+
  Suspected "same games" are grouped together.  These are usually the exact same game but different cabinet/name.
 
  Technical Manual #s  Game Name(s)                                               Atari Part #'s                     Data
@@ -28,7 +28,7 @@ driver by Couriersud
  422                  Superpong (1974)                                           A000423                            NO
  TM-014               Pong Doubles/Coupe Davis (1973)                            A000785                            NO
  TM-058               Breakout/Breakout Cocktail/Consolette (1976)               A004533                            NO
- 
+
 Notes:
 
 TODO: Please see netlist include files
@@ -525,43 +525,43 @@ ROM_END
 /*   // 100% TTL - NO ROMS
 
 ROM_START( pongbarl ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( coupedav ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( coupfran ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( cktpong ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( drpong ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( pupppong ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( snoopong ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( suprpong ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( breakckt ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( consolet ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 */
 

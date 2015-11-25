@@ -44,7 +44,7 @@ public:
 private:
 	mfm_harddisk_device*        m_mfmhd;
 	mfmhd_trackimage*           m_tracks;
-	running_machine &			m_machine;
+	running_machine &           m_machine;
 };
 
 class mfm_harddisk_device : public harddisk_image_device,

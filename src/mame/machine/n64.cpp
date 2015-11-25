@@ -1669,10 +1669,10 @@ READ32_MEMBER( n64_periphs::ri_reg_r )
 {
 	if(offset == 0x0C/4) // RI_SELECT
 	{
-		/* This is to 'simulate' the time that RDRAM initialization 
+		/* This is to 'simulate' the time that RDRAM initialization
 		would take if the RI registers were not set to skip the RDRAM
 		testing during device reset.  Proper simulation would require
-		emulating the RDRAM modules and bus stalls for the mips cpu. 
+		emulating the RDRAM modules and bus stalls for the mips cpu.
 		The cycle amount chosen represents 1/2 second, which is not
 		necessarily the time for RDRAM initialization, but rather the
 		time recommended for letting the SI devices settle after startup.

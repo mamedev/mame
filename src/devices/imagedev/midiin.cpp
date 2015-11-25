@@ -24,14 +24,14 @@ const device_type MIDIIN = &device_creator<midiin_device>;
 
 midiin_device::midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MIDIIN, "MIDI In image device", tag, owner, clock, "midiin", __FILE__),
-	  device_image_interface(mconfig, *this),
-	  device_serial_interface(mconfig, *this),
-	  m_midi(NULL),
-	  m_timer(NULL),
-	  m_input_cb(*this),
-	  m_xmit_read(0),
-	  m_xmit_write(0),
-	  m_tx_busy(false)
+		device_image_interface(mconfig, *this),
+		device_serial_interface(mconfig, *this),
+		m_midi(NULL),
+		m_timer(NULL),
+		m_input_cb(*this),
+		m_xmit_read(0),
+		m_xmit_write(0),
+		m_tx_busy(false)
 {
 }
 

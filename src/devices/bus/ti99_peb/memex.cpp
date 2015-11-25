@@ -33,9 +33,9 @@ enum
 };
 
 geneve_memex_device::geneve_memex_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: ti_expansion_card_device(mconfig, TI99_MEMEX, "Geneve memory expansion card", tag, owner, clock, "ti99_memex", __FILE__), 
-  m_ram(nullptr), 
-  m_genmod(0)
+: ti_expansion_card_device(mconfig, TI99_MEMEX, "Geneve memory expansion card", tag, owner, clock, "ti99_memex", __FILE__),
+	m_ram(nullptr),
+	m_genmod(0)
 {
 }
 

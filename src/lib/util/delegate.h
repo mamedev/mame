@@ -112,7 +112,7 @@
 		#define HAS_DIFFERENT_ABI 0
 	#endif
 #elif defined(_MSC_VER) && defined (PTR64)
-#define MEMBER_ABI 
+#define MEMBER_ABI
 #define HAS_DIFFERENT_ABI 0
 #define USE_DELEGATE_TYPE DELEGATE_TYPE_MSVC
 #else
@@ -598,10 +598,10 @@ private:
 												//    if odd, it's the byte offset into the vtable
 	int                     m_this_delta;       // delta to apply to the 'this' pointer
 
-	int						m_dummy1;
-	int						m_dummy2;
+	int                     m_dummy1;
+	int                     m_dummy2;
 
-	int						m_size;    
+	int                     m_size;
 };
 
 #endif

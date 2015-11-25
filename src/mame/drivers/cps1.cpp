@@ -3367,7 +3367,7 @@ ROM_END
    LW-07 @ 10G
 
    Also known to have LW-13 @ 10D instead of LW_25.10C, LW_26.10E, LW_27.11C & LW_28.11E
-   
+
    OTHER:
    2 PALs labeled LW621 (near LW_1.2A) and LWI0 (near LW_00.13C)
    Custom chip -   CAPCOM CPS-B-01 (QFP160)

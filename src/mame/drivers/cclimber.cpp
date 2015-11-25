@@ -186,7 +186,7 @@ JALECO MADE IN JAPAN
 |HA1388 VOL    AY-3-8910                 7611.9S |
 |------------------------------------------------|
 Notes:
- ENCR_Z80 - Encrypted Z80 CPU. Clock 3.00MHz [12/4]. No markings on 
+ ENCR_Z80 - Encrypted Z80 CPU. Clock 3.00MHz [12/4]. No markings on
             the chip but likely made by Sega (possibly 315-5018)
  AY3-8910 - Clock 1.50MHz [12/8]
      7603 - Harris M3-7603 32 bytes x8-bit (256 bits) bipolar PROM

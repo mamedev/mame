@@ -131,7 +131,7 @@ private:
 	// Processor states
 	bool    m_idle_state;
 	bool    m_nmi_state;
-//	bool    m_irq_state;
+//  bool    m_irq_state;
 	bool    m_hold_state;
 
 	// READY handling. The READY line is operated before the clock
@@ -382,7 +382,7 @@ private:
 	void alu_lst_lwp();
 	void alu_mov();
 	void alu_multiply();
-//	void alu_multiply_signed();
+//  void alu_multiply_signed();
 	void alu_rtwp();
 	void alu_sbo_sbz();
 	void alu_shift();

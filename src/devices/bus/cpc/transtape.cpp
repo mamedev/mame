@@ -91,7 +91,7 @@ void cpc_transtape_device::map_enable()
 		membank(":bank7")->set_base(m_ram);
 		membank(":bank15")->set_base(m_ram);
 		membank(":bank8")->set_base(m_ram);  // repeats in second 8kB
-		membank(":bank16")->set_base(m_ram); 
+		membank(":bank16")->set_base(m_ram);
 	}
 }
 
@@ -136,5 +136,3 @@ void cpc_transtape_device::set_mapping(UINT8 type)
 		return;
 	map_enable();
 }
-
-

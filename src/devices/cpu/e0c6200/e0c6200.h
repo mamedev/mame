@@ -19,7 +19,7 @@ public:
 	e0c6200_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor program, address_map_constructor data, const char *shortname, const char *source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_BIG, 16, 13, -1, program)
-		, m_data_config("data", ENDIANNESS_BIG, 8, 12, 0, data), m_program(nullptr), m_data(nullptr), m_op(0), m_prev_op(0), m_irq_vector(0), m_irq_id(0), m_possible_irq(false), m_halt(false), 
+		, m_data_config("data", ENDIANNESS_BIG, 8, 12, 0, data), m_program(nullptr), m_data(nullptr), m_op(0), m_prev_op(0), m_irq_vector(0), m_irq_id(0), m_possible_irq(false), m_halt(false),
 		m_sleep(false), m_icount(0), m_pc(0), m_prev_pc(0), m_npc(0), m_jpc(0), m_a(0), m_b(0), m_xp(0), m_xh(0), m_xl(0), m_yp(0), m_yh(0), m_yl(0), m_sp(0), m_f(0)
 	{ }
 

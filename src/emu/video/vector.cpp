@@ -130,7 +130,7 @@ const device_type VECTOR = &device_creator<vector_device>;
 
 vector_device::vector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this), 
+		device_video_interface(mconfig, *this),
 		m_vector_list(NULL),
 		m_min_intensity(255),
 		m_max_intensity(0)

@@ -413,7 +413,7 @@ value:   START, REC, MEMDAT, REPEAT, SPOFF, x,x,RESET   meaning:
 
 void YM_DELTAT_ADPCM_Reset(YM_DELTAT *DELTAT,int pan,int emulation_mode,device_t *device)
 {
-	DELTAT->device 	  = device;
+	DELTAT->device    = device;
 	DELTAT->now_addr  = 0;
 	DELTAT->now_step  = 0;
 	DELTAT->step      = 0;

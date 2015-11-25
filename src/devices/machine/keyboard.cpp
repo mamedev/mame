@@ -43,9 +43,9 @@ generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, 
 	m_io_kbd7(*this, "TERM_LINE7"),
 	m_io_kbd8(*this, "TERM_LINE8"),
 	m_io_kbd9(*this, "TERM_LINE9"),
-	m_io_kbdc(*this, "TERM_LINEC"), 
-	m_timer(NULL), 
-	m_last_code(0), 
+	m_io_kbdc(*this, "TERM_LINEC"),
+	m_timer(NULL),
+	m_last_code(0),
 	m_scan_line(0),
 	m_keyboard_cb(*this)
 {

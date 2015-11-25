@@ -23,9 +23,9 @@ const device_type YM2151 = &device_creator<ym2151_device>;
 
 ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM2151, "YM2151", tag, owner, clock, "ym2151", __FILE__),
-		device_sound_interface(mconfig, *this), 
-		m_stream(NULL), 
-		m_chip(NULL), 
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
+		m_chip(NULL),
 		m_lastreg(0),
 		m_irqhandler(*this),
 		m_portwritehandler(*this)

@@ -38,8 +38,8 @@ sm8500_cpu_device::sm8500_cpu_device(const machine_config &mconfig, const char *
 	, m_dma_func(*this)
 	, m_timer_func(*this)
 	, m_PC(0), m_IE0(0), m_IE1(0), m_IR0(0), m_IR1(0)
-	  , m_SYS(0), m_CKC(0), m_clock_changed(0)
-	  , m_SP(0)
+		, m_SYS(0), m_CKC(0), m_clock_changed(0)
+		, m_SP(0)
 	, m_PS0(0)
 	, m_PS1(0), m_IFLAGS(0), m_CheckInterrupts(0), m_halted(0), m_icount(0), m_program(nullptr), m_oldpc(0)
 {

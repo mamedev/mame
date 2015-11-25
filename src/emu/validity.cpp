@@ -287,7 +287,7 @@ void validity_checker::validate_one(const game_driver &driver)
 		validate_roms();
 		validate_inputs();
 		validate_devices();
-	    m_current_config = NULL;
+		m_current_config = NULL;
 	}
 	catch (emu_fatalerror &err)
 	{

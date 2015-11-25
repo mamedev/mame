@@ -709,7 +709,7 @@ void amstrad_state::amstrad_plus_gate_array_get_video_data()
 	{
 		ma += m_asic.horiz_disp;
 	}
-	
+
 	m_gate_array.address = ( ( ma & 0x3000 ) << 2 ) | ( ( ra & 0x07 ) << 11 ) | ( ( ma & 0x3ff ) << 1 );
 	m_gate_array.data = m_ram->pointer()[ m_gate_array.address ];
 	if((m_asic.ram[0x2804] & 0x80) && m_asic.hsync_first_tick)

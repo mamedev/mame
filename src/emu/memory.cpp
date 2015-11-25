@@ -335,8 +335,8 @@ public:
 
 	// construction/destruction
 	handler_entry_read(UINT8 width, endianness_t endianness, UINT8 **rambaseptr)
-		: handler_entry(width, endianness, rambaseptr), 
-		  m_ioport(NULL)
+		: handler_entry(width, endianness, rambaseptr),
+			m_ioport(NULL)
 	{
 	}
 
@@ -398,8 +398,8 @@ public:
 
 	// construction/destruction
 	handler_entry_write(UINT8 width, endianness_t endianness, UINT8 **rambaseptr)
-		: handler_entry(width, endianness, rambaseptr), 
-		  m_ioport(NULL)
+		: handler_entry(width, endianness, rambaseptr),
+			m_ioport(NULL)
 	{
 	}
 
@@ -4081,8 +4081,8 @@ handler_entry::handler_entry(UINT8 width, endianness_t endianness, UINT8 **ramba
 		m_byteend(0),
 		m_bytemask(~0),
 		m_rambaseptr(rambaseptr),
-		m_subunits(0), 
-	    m_invsubmask(0)
+		m_subunits(0),
+		m_invsubmask(0)
 {
 }
 

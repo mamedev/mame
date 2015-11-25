@@ -38,9 +38,9 @@ DRIVER_INIT_MEMBER(adder5_state,ad5)
 	// find it.
 	int found = find_project_string(machine(), 3, 0);
 	if (!found)
-    {
+	{
 		printf("Normal rom pair string not found, checking mismatched / missing rom string\n");
-    }
+	}
 
 	// help identify roms where one of the pair is missing too
 	if (!found)
@@ -48,15 +48,15 @@ DRIVER_INIT_MEMBER(adder5_state,ad5)
 		found = find_project_string(machine(), 3, 1);
 	}
 
-    if (!found)
-    {
+	if (!found)
+	{
 		found = find_project_string(machine(), 3, 2);
-    }
-	
-    if (!found)
-    {
+	}
+
+	if (!found)
+	{
 		printf("No suitable string found\n");
-    }
+	}
 
 }
 

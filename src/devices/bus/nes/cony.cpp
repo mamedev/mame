@@ -40,12 +40,12 @@ const device_type NES_YOKO = &device_creator<nes_yoko_device>;
 
 
 nes_cony_device::nes_cony_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), 
-	m_irq_count(0), 
-	m_irq_enable(0), 
-	irq_timer(nullptr), 
-	m_latch1(0), 
-	m_latch2(0), 
+					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_irq_count(0),
+	m_irq_enable(0),
+	irq_timer(nullptr),
+	m_latch1(0),
+	m_latch2(0),
 	m_extra1(0)
 				{
 }

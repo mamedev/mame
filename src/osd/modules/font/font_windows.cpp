@@ -34,7 +34,7 @@
 //-------------------------------------------------
 
 class osd_font_windows : public osd_font
-{	
+{
 public:
 	osd_font_windows(): m_font(NULL) { }
 	virtual ~osd_font_windows() { }

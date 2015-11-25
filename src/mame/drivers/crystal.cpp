@@ -607,12 +607,12 @@ READ32_MEMBER(crystal_state::trivrus_input_r)
 {
 	switch (m_trivrus_input)
 	{
-		case 1:	return ioport("IN1")->read();
-		case 2:	return ioport("IN2")->read();
-		case 3:	return ioport("IN3")->read();
-		case 4:	return ioport("IN4")->read();
-		case 5:	return ioport("IN5")->read();
-		case 6:	return ioport("DSW")->read();
+		case 1: return ioport("IN1")->read();
+		case 2: return ioport("IN2")->read();
+		case 3: return ioport("IN3")->read();
+		case 4: return ioport("IN4")->read();
+		case 5: return ioport("IN5")->read();
+		case 6: return ioport("DSW")->read();
 	}
 	logerror("%s: unknown input %02x read\n", machine().describe_context(), m_trivrus_input);
 	return 0xffffffff;
@@ -627,14 +627,14 @@ WRITE32_MEMBER(crystal_state::trivrus_input_w)
 static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_WRITENOP
 
-//	0x01280000 & 0x0000ffff (written at boot)
+//  0x01280000 & 0x0000ffff (written at boot)
 	AM_RANGE(0x01500000, 0x01500003) AM_READWRITE(trivrus_input_r, trivrus_input_w)
-//	0x01500010 & 0x000000ff = sec
-//	0x01500010 & 0x00ff0000 = min
-//	0x01500014 & 0x000000ff = hour
-//	0x01500014 & 0x00ff0000 = day
-//	0x01500018 & 0x000000ff = month
-//	0x0150001c & 0x000000ff = year - 2000
+//  0x01500010 & 0x000000ff = sec
+//  0x01500010 & 0x00ff0000 = min
+//  0x01500014 & 0x000000ff = hour
+//  0x01500014 & 0x00ff0000 = day
+//  0x01500018 & 0x000000ff = month
+//  0x0150001c & 0x000000ff = year - 2000
 	AM_RANGE(0x01600000, 0x01607fff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE(Timer0_r, Timer0_w)
@@ -660,7 +660,7 @@ static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
 
-//	AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
+//  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
 
 ADDRESS_MAP_END
 
@@ -1003,11 +1003,11 @@ static INPUT_PORTS_START(officeye)
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Red")  // RED
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Red") 
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Red")
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Green")  // GREEN
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 Green") 
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 Green")
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Blue") // BLUE
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Blue") 
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Blue")
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1095,10 +1095,10 @@ static INPUT_PORTS_START(trivrus)
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN5")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_SERVICE1 )	// Free Game
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_SERVICE1 ) // Free Game
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )	// Setup
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   // Setup
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1111,7 +1111,7 @@ static INPUT_PORTS_START(trivrus)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Serial?" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )		// hangs at boot
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )       // hangs at boot
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1421,5 +1421,5 @@ GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  donghaer, ROT
 GAME( 2009, trivrus,         0, trivrus,  trivrus, driver_device,         0, ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 )
 // has a CF card instead of flash roms
 GAME( 2004, psattack, 0, crystal, crystal, crystal_state, psattack, ROT0, "Uniana", "P's Attack", MACHINE_IS_SKELETON )
-// looks like the same kind of hw from strings in the ROM, but scrambled / encrypted? 
+// looks like the same kind of hw from strings in the ROM, but scrambled / encrypted?
 GAME( 200?, ddz,    0,  crystal, crystal, driver_device, 0, ROT0, "IGS?", "Dou Di Zhu", MACHINE_IS_SKELETON )

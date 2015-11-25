@@ -270,7 +270,7 @@ WRITE8_MEMBER(shougi_state::control_w)
 			// 7: nothing? connected to +5v via resistor
 			break;
 	}
-	
+
 	m_control[offset] = data;
 }
 

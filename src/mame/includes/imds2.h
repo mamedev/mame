@@ -78,8 +78,8 @@ class imds2_state : public driver_device
 	required_device<pic8259_device> m_ipcsyspic;
 	required_device<pic8259_device> m_ipclocpic;
 	required_device<pit8253_device> m_ipctimer;
-        required_device<i8251_device> m_ipcusart0;
-        required_device<i8251_device> m_ipcusart1;
+		required_device<i8251_device> m_ipcusart0;
+		required_device<i8251_device> m_ipcusart1;
 	required_device<rs232_port_device> m_serial0;
 	required_device<rs232_port_device> m_serial1;
 	required_device<i8080a_cpu_device> m_ioccpu;

@@ -27,8 +27,8 @@ const device_type S100_SLOT = &device_creator<s100_slot_t>;
 //-------------------------------------------------
 
 device_s100_card_interface::device_s100_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device), 
-	m_bus(nullptr), 
+	: device_slot_card_interface(mconfig, device),
+	m_bus(nullptr),
 	m_next(nullptr)
 {
 }

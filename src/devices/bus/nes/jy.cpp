@@ -50,7 +50,7 @@ nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, device_t
 
 nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_JY_TYPEA, "NES Cart JY Company Type A PCB", tag, owner, clock, "nes_jya", __FILE__), m_latch(0), m_extra_chr_bank(0),
-	m_extra_chr_mask(0), m_bank_6000(0), m_irq_mode(0), m_irq_count(0), m_irq_prescale(0), m_irq_prescale_mask(0), m_irq_flip(0), m_irq_enable(0), m_irq_up(0), 
+	m_extra_chr_mask(0), m_bank_6000(0), m_irq_mode(0), m_irq_count(0), m_irq_prescale(0), m_irq_prescale_mask(0), m_irq_flip(0), m_irq_enable(0), m_irq_up(0),
 	m_irq_down(0), irq_timer(nullptr)
 {
 }

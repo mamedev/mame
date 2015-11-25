@@ -23,10 +23,10 @@ public:
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual ioport_constructor device_input_ports() const;
-	
+
 	virtual void set_mapping(UINT8 type);
 	virtual WRITE_LINE_MEMBER( romen_w ) { m_romen = state; }
-	
+
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_INPUT_CHANGED_MEMBER(button_red_w);
@@ -45,7 +45,7 @@ private:
 	bool m_rom_active;
 	bool m_romen;
 	UINT8 m_output;
-	
+
 	void map_enable();
 };
 

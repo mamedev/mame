@@ -4895,8 +4895,8 @@ toutrun3d       // bootleg
 toutrunj1d      // bootleg
 toutrun2d       // bootleg
 shangon3d       // bootleg
-outrundxeh		// hack
-outruneh		// hack
+outrundxeh      // hack
+outruneh        // hack
 
 // X Board
 aburner         // 1987.07 After Burner (Japan)
@@ -5740,7 +5740,7 @@ initdexpo       // 2002.?? Initial D Arcade Stage (Export)
 				// 2003.05 Initial D Arcade Stage Ver. 2 (Japan) (Rev A)
 initdv2j        // 2003.05.27 Initial D Arcade Stage Ver. 2 (Japan) (Rev B)
 				// 2003.09 World Club Champion Football Serie A 2002-2003
-clubkcyc  		// 2003.?? Club Kart Cycraft Edition (Rev A)
+clubkcyc        // 2003.?? Club Kart Cycraft Edition (Rev A)
 clubk2k3        // 2003.?? Club Kart: European Session (2003, Rev A)
 clubk2kp        // 2003.?? Club Kart: European Session (2003, prototype)
 clubkprz        // 2003.?? Club Kart Prize

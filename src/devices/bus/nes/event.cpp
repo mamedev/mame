@@ -37,11 +37,11 @@ const device_type NES_EVENT = &device_creator<nes_event_device>;
 
 nes_event_device::nes_event_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_sxrom_device(mconfig, NES_EVENT, "NES Cart Event PCB", tag, owner, clock, "nes_event", __FILE__),
-						m_dsw(*this, "DIPSW"), 
-	m_nwc_init(0), 
-	event_timer(nullptr), 
-	m_timer_count(0), 
-	m_timer_on(0), 
+						m_dsw(*this, "DIPSW"),
+	m_nwc_init(0),
+	event_timer(nullptr),
+	m_timer_count(0),
+	m_timer_on(0),
 	m_timer_enabled(0)
 				{
 }

@@ -11,8 +11,8 @@ h8_sci_device::h8_sci_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, H8_SCI, "H8 Serial Communications Interface", tag, owner, clock, "h8_sci", __FILE__),
 	cpu(*this, DEVICE_SELF_OWNER),
 	tx_cb(*this),
-	clk_cb(*this), intc(nullptr), intc_tag(nullptr), external_to_internal_ratio(0), internal_to_external_ratio(0), sync_timer(nullptr), eri_int(0), rxi_int(0), txi_int(0), tei_int(0), 
-	tx_state(0), rx_state(0), tx_bit(0), rx_bit(0), clock_state(0), clock_mode(0), tx_parity(0), rx_parity(0), ext_clock_counter(0), clock_value(false), ext_clock_value(false), rx_value(false), 
+	clk_cb(*this), intc(nullptr), intc_tag(nullptr), external_to_internal_ratio(0), internal_to_external_ratio(0), sync_timer(nullptr), eri_int(0), rxi_int(0), txi_int(0), tei_int(0),
+	tx_state(0), rx_state(0), tx_bit(0), rx_bit(0), clock_state(0), clock_mode(0), tx_parity(0), rx_parity(0), ext_clock_counter(0), clock_value(false), ext_clock_value(false), rx_value(false),
 	rdr(0), tdr(0), smr(0), scr(0), ssr(0), brr(0), rsr(0), tsr(0), clock_base(0), divider(0)
 {
 	external_clock_period = attotime::never;

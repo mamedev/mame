@@ -38,18 +38,18 @@ http://atariage.com/forums/blog/148/entry-11964-dpcarm-part-10-score-timer-displ
 http://atariage.com/forums/blog/148/entry-11988-dpcarm-part-12-gamepad-support/
 
 map:
-	Bankswitching uses addresses $FFF6-$FFFB
+    Bankswitching uses addresses $FFF6-$FFFB
 
-	* ARM RAM mapped at $40000000 in this area
-	$0000-$0BFF: HARMONY/MELODY driver (not accessible by 2600 itself) (copied to $40000000 - $40000bff on startup by ARM)
-	$0C00-$1BFF: Bank 0 (each bank can map to 0x1000 - 0x1fff in 6507 space, like other carts)
-	$1C00-$2BFF: Bank 1
-	$2C00-$3BFF: Bank 2
-	$3C00-$4BFF: Bank 3
-	$4C00-$5BFF: Bank 4
-	$5C00-$6BFF: Bank 5 (default bank is bank 5)
-	$6C00-$7BFF: Display Data (indirect access) (copied to $40000C00 - $40001bff on startup by ARM)
-	$7C00-$7FFF: Synth Frequency Data (not accessible by 2600 itself) (copied to $40001C00 - $40001fff on startup by ARM)
+    * ARM RAM mapped at $40000000 in this area
+    $0000-$0BFF: HARMONY/MELODY driver (not accessible by 2600 itself) (copied to $40000000 - $40000bff on startup by ARM)
+    $0C00-$1BFF: Bank 0 (each bank can map to 0x1000 - 0x1fff in 6507 space, like other carts)
+    $1C00-$2BFF: Bank 1
+    $2C00-$3BFF: Bank 2
+    $3C00-$4BFF: Bank 3
+    $4C00-$5BFF: Bank 4
+    $5C00-$6BFF: Bank 5 (default bank is bank 5)
+    $6C00-$7BFF: Display Data (indirect access) (copied to $40000C00 - $40001bff on startup by ARM)
+    $7C00-$7FFF: Synth Frequency Data (not accessible by 2600 itself) (copied to $40001C00 - $40001fff on startup by ARM)
 
 ***************************************************************************/
 
@@ -142,5 +142,5 @@ READ8_MEMBER(a26_rom_harmony_device::read_rom)
 WRITE8_MEMBER(a26_rom_harmony_device::write_bank)
 {
 	check_bankswitch(offset);
-//	a26_rom_f8_device::write_bank(space, offset, data);
+//  a26_rom_f8_device::write_bank(space, offset, data);
 }

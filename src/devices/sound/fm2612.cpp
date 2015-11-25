@@ -693,7 +693,7 @@ struct YM2612
 	/* dac output (YM2612) */
 	int         dacen;
 	INT32       dacout;
-	device_t	*device;
+	device_t    *device;
 };
 
 /* log output level */

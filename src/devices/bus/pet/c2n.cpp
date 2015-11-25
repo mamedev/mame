@@ -55,7 +55,7 @@ c2n_device::c2n_device(const machine_config &mconfig, device_type type, const ch
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_pet_datassette_port_interface(mconfig, *this),
 		m_cassette(*this, "cassette"),
-		m_motor(false), 
+		m_motor(false),
 	m_read_timer(nullptr)
 {
 }

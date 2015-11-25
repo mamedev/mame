@@ -61,7 +61,7 @@ DEVICE_ADDRESS_MAP_START( io_map, 8, mos6532_t )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_READWRITE(pa_data_r, pa_data_w)  // SWCHA
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_READWRITE(pa_ddr_r, pa_ddr_w)    // SWACNT
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_READWRITE(pb_data_r, pb_data_w)  // SWCHB
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_READWRITE(pb_ddr_r, pb_ddr_w)    // SWBCNT 
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_READWRITE(pb_ddr_r, pb_ddr_w)    // SWBCNT
 	AM_RANGE(0x14, 0x17) AM_WRITE(timer_off_w)
 	AM_RANGE(0x1c, 0x1f) AM_WRITE(timer_on_w)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x12) AM_READ(timer_off_r)

@@ -10,7 +10,7 @@ i8271_device::i8271_device(const machine_config &mconfig, const char *tag, devic
 	intrq_cb(*this),
 	drq_cb(*this),
 	hdl_cb(*this),
-	opt_cb(*this), irq(false), drq(false), scan_done(false), scan_match(false), command_pos(0), sectors_read(0), scan_len(0), dma_data(0), oport(0), rr(0), scan_sec(0), moder(0), 
+	opt_cb(*this), irq(false), drq(false), scan_done(false), scan_match(false), command_pos(0), sectors_read(0), scan_len(0), dma_data(0), oport(0), rr(0), scan_sec(0), moder(0),
 	precomp(0), perpmode(0), srate(0), hset(0), icnt(0), hload(0), sector_size(0), cur_rate(0)
 {
 	select_connected = true;

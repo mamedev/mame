@@ -1184,7 +1184,7 @@ struct geo_state
 	texture_parameter   texture_parameters[32]; /* Texture parameters */
 	UINT32          polygon_ram0[0x8000];           /* Fast Polygon RAM pointer */
 	UINT32          polygon_ram1[0x8000];           /* Slow Polygon RAM pointer */
-	model2_state	*state;
+	model2_state    *state;
 };
 
 

@@ -1003,4 +1003,3 @@ void device_interface::interface_debug_setup()
 {
 	// do nothing by default
 }
-

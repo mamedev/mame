@@ -2028,10 +2028,10 @@ DRIVER_INIT_MEMBER(arkanoid_state,hexa)
 DRIVER_INIT_MEMBER(arkanoid_state,hexaa)
 {
 	DRIVER_INIT_CALL(hexa);
-	
+
 	m_hexaa_from_main = 0;
 	m_hexaa_from_sub = 0;
-	
+
 	save_item(NAME(m_hexaa_from_main));
 	save_item(NAME(m_hexaa_from_sub));
 }

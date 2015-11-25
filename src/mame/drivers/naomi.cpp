@@ -9373,7 +9373,7 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 // 0037? Puyo Puyo Fever (Export)
 // 0038
 // 0039  Initial D Arcade Stage Ver. 3 Cycraft Edition
-/* 0039A */ GAME( 2006, inidv3ca, inidv3cy,naomigd,  naomi,   naomi_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev A) (GDS-0039A)", GAME_FLAGS ) 
+/* 0039A */ GAME( 2006, inidv3ca, inidv3cy,naomigd,  naomi,   naomi_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev A) (GDS-0039A)", GAME_FLAGS )
 /* 0039B */ GAME( 2006, inidv3cy, naomi2,  naomigd,  naomi,   naomi_state, naomi2,  ROT0, "Sega", "Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev B) (GDS-0039B)", GAME_FLAGS )
 // 0040
 // 0041  Dragon Treasure 3

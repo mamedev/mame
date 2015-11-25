@@ -273,7 +273,7 @@ static ADDRESS_MAP_START( exctsccr_sound_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xc009, 0xc009) AM_WRITE(dac2_w)
 	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(soundlatch_clear_byte_w)
 	AM_RANGE(0xc00d, 0xc00d) AM_READ(soundlatch_byte_r)
-//	AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ?
+//  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exctsccr_sound_io_map, AS_IO, 8, champbas_state )

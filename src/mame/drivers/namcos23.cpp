@@ -1897,7 +1897,7 @@ void namcos23_state::c435_render() // 8
 	re->model.scaling = use_scaling ? m_scaling / 16384.0 : 1.0;
 	memcpy(re->model.m, m, sizeof(re->model.m));
 	memcpy(re->model.v, v, sizeof(re->model.v));
-	//	re->model.v[2] *= 768/420.0;
+	//  re->model.v[2] *= 768/420.0;
 
 	if(0)
 		logerror("Render %04x (%f %f %f %f %f %f %f %f %f) (%f %f %f) %f\n",
@@ -3385,20 +3385,20 @@ static INPUT_PORTS_START( downhill )
 	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN01")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3)		// brake left
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1)		// start
-	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_SERVICE) PORT_TOGGLE	// test switch
-	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)		// select up
-	PORT_BIT(0x400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)	// select down
-	PORT_BIT(0x800, IP_ACTIVE_LOW, IPT_BUTTON1)	// enter
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3)      // brake left
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1)       // start
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_SERVICE) PORT_TOGGLE // test switch
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)     // select up
+	PORT_BIT(0x400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)   // select down
+	PORT_BIT(0x800, IP_ACTIVE_LOW, IPT_BUTTON1) // enter
 	PORT_BIT(0xf00c, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
 	PORT_START("IN23")
-	PORT_BIT(0x400, IP_ACTIVE_LOW, IPT_BUTTON4)		// brake right
+	PORT_BIT(0x400, IP_ACTIVE_LOW, IPT_BUTTON4)     // brake right
 	PORT_BIT(0xfbff, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )	// service coin
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )   // service coin
 
 	PORT_START("DSW")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
