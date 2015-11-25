@@ -1044,7 +1044,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::wecleman_scanline)
 
 	if(scanline == 232) // vblank irq
 		m_maincpu->set_input_line(4, HOLD_LINE);
-	else if(((scanline % 64) == 0)) // timer irq TODO: wrong place maybe? Could do with 007645 blitter or "V-CNT" signal.
+	else if(((scanline % 64) == 0)) // timer irq TODO: wrong place maybe? Could do with blitter chip irq (007643/007645?) or "V-CNT" signal.
 		m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
