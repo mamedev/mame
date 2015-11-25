@@ -1090,11 +1090,6 @@ configuration { "asmjs" }
 		"-std=gnu++98",
 	}
 	archivesplit_size "20"
-	if os.getenv("EMSCRIPTEN") then
-		includedirs {
-			os.getenv("EMSCRIPTEN") .. "/system/lib/libcxxabi/include"
-		}
-	end
 
 configuration { "android*" }
 	buildoptions {
