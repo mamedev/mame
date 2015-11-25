@@ -9452,8 +9452,7 @@ Designed and co-created by Best Bet Products
 	ROM_LOAD( "mxo-cg2325.u80",  0x18000, 0x8000, CRC(afae8fd5) SHA1(7c6380f21fe8444234ada8d88a46d3a4f1623b29) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "capx2325.u43", 0x0000, 0x0200, NO_DUMP )
-	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) ) /* Wrong!! Should be CAPX2325 */
+	ROM_LOAD( "cap2325x.u43", 0x0000, 0x0200, CRC(c9b4f1da) SHA1(c911da564cfb33218441de0f91e67a02191d76c2) ) /* It is actually CAP2325X and the same data as CAPX2172 */
 ROM_END
 
 ROM_START( pex2284p ) /* Superboard : Barbaric Deuces Wild / Dealt Deuces Wild Bonus Poker (X002284P+XP000057) */
@@ -9488,8 +9487,7 @@ Designed and co-created by Best Bet Products
 	ROM_LOAD( "mxo-cg2325.u80",  0x18000, 0x8000, CRC(afae8fd5) SHA1(7c6380f21fe8444234ada8d88a46d3a4f1623b29) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "capx2325.u43", 0x0000, 0x0200, NO_DUMP )
-	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) ) /* Wrong!! Should be CAPX2325 */
+	ROM_LOAD( "cap2325x.u43", 0x0000, 0x0200, CRC(c9b4f1da) SHA1(c911da564cfb33218441de0f91e67a02191d76c2) ) /* It is actually CAP2325X and the same data as CAPX2172 */
 ROM_END
 
 ROM_START( pex2287p ) /* Superboard : No Faces Pay the Aces (X002287P+XP000057) */
@@ -9525,8 +9523,7 @@ Designed and co-created by Best Bet Products
 	ROM_LOAD( "mxo-cg2325.u80",  0x18000, 0x8000, CRC(afae8fd5) SHA1(7c6380f21fe8444234ada8d88a46d3a4f1623b29) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "capx2325.u43", 0x0000, 0x0200, NO_DUMP )
-	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) ) /* Wrong!! Should be CAPX2325 */
+	ROM_LOAD( "cap2325x.u43", 0x0000, 0x0200, CRC(c9b4f1da) SHA1(c911da564cfb33218441de0f91e67a02191d76c2) ) /* It is actually CAP2325X and the same data as CAPX2172 */
 ROM_END
 
 ROM_START( pex2297p ) /* Superboard : Jackpot Poker (X002297P+XP000053) */
@@ -11412,9 +11409,9 @@ GAMEL(1995, pex2251p,  0,         peplus,  peplus_poker, peplus_state, peplussb,
 GAMEL(1995, pex2272p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002272P+XP000055) Black Jack Bonus Poker", 0, layout_pe_poker )
 GAMEL(1995, pex2275p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002275P+XP000055) Black Jack Bonus Poker", 0, layout_pe_poker )
 GAMEL(1995, pex2276p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002276P+XP000055) Black Jack Bonus Poker", 0, layout_pe_poker )
-GAMEL(1995, pex2283p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002283P+XP000057) Barbaric Decues Wild Poker", 0, layout_pe_poker ) /* Undumped color CAPX2325 but should have correct colors anyways */
-GAMEL(1995, pex2284p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002284P+XP000057) Barbaric Decues Wild Poker", 0, layout_pe_poker ) /* Undumped color CAPX2325 but should have correct colors anyways */
-GAMEL(1995, pex2287p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002287P+XP000057) No Faces Pay the Aces Poker", 0, layout_pe_poker ) /* Undumped color CAPX2325 but should have correct colors anyways */
+GAMEL(1995, pex2283p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002283P+XP000057) Barbaric Decues Wild Poker", 0, layout_pe_poker )
+GAMEL(1995, pex2284p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002284P+XP000057) Barbaric Decues Wild Poker", 0, layout_pe_poker )
+GAMEL(1995, pex2287p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002287P+XP000057) No Faces Pay the Aces Poker", 0, layout_pe_poker )
 GAMEL(1995, pex2297p,  0,         peplus,  peplus_poker, peplus_state, pepluss64,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002297P+XP000053) Jackpot Poker",       0, layout_pe_poker )
 GAMEL(1995, pex2302p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002302P+XP000038) Bonus Poker Deluxe",  0, layout_pe_poker )
 GAMEL(1995, pex2303p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002303P+XP000112) White Hot Aces Poker", 0, layout_pe_poker )
