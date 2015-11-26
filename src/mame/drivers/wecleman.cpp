@@ -1710,6 +1710,7 @@ DRIVER_INIT_MEMBER(wecleman_state,hotchase)
 GAMEL( 1986, wecleman,  0,        wecleman, wecleman, wecleman_state, wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.00, set 1)", 0, layout_wecleman )
 GAMEL( 1986, weclemana, wecleman, wecleman, wecleman, wecleman_state, wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.00, set 2)", 0, layout_wecleman ) // 1988 release (maybe date hacked?)
 GAMEL( 1986, weclemanb, wecleman, wecleman, wecleman, wecleman_state, wecleman, ROT0, "Konami", "WEC Le Mans 24 (v1.26)", 0, layout_wecleman )
+// a version 1.21 is known to exist too, see https://www.youtube.com/watch?v=4l8vYJi1OeU
 
 GAMEL( 1988, hotchase,  0,        hotchase, hotchase, wecleman_state, hotchase, ROT0, "Konami", "Hot Chase (set 1)", 0, layout_wecleman )
 GAMEL( 1988, hotchasea, hotchase, hotchase, hotchase, wecleman_state, hotchase, ROT0, "Konami", "Hot Chase (set 2)", 0, layout_wecleman )
