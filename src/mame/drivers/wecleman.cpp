@@ -13,12 +13,14 @@
                                 TODO list
 ---------------------------------------------------------------------------
 WEC Le Mans 24:
-- The parallactic scrolling is sometimes wrong
+- The parallactic scrolling is sometimes wrong (related to v-cnt bit enabled?)
 Hot Chase:
-- gameplay speed is VERY erratic
-- Samples pitch is too low
-- No zoom and rotation of the layers
+- Sound BGMs are regressed (hiccups badly);
+- Samples pitch is too low, for instance game over speech;
 Common Issues:
+- Too many hacks with protection/blitter/colors. 
+  Additionally, there's a bug report that claims that current arrangement is broken for later levels in WEC Le Mans.
+  007643 / 007645 could do with a rewrite, in short.
 - One ROM unused (32K in hotchase, 16K in wecleman)
 - Incomplete DSWs
 - Sprite ram is not cleared by the game and no sprite list end-marker
