@@ -1,0 +1,66 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
+/******************************************************************************
+
+    arcade.lst
+
+    List of all enabled drivers in the system. This file is parsed by
+    makelist.exe, sorted, and output as C code describing the drivers.
+
+******************************************************************************/
+
+
+// Atari vector games
+llander         // 0345xx           no copyright notice
+llander1        // 0345xx           no copyright notice
+llandert        // (test)           no copyright notice
+asteroid        // 035127-035145    (c) 1979
+asteroid2       // 035127-035145    (c) 1979
+asteroid1       // 035127-035145    no copyright notice
+asteroidb       // (bootleg)
+aerolitos       // Rodmar Elec. bootleg
+asterock        // Sidam bootleg    (c) 1979
+asterockv       // Videotron bootleg(c) 1979
+hyperspc        // Rumiano bootleg  (c) 1979
+meteorts        // VCC bootleg      (c) 1979
+meteorho        // Hoei? bootleg    (c) 1980
+astdelux        // 0351xx           (c) 1980
+astdelux2       // 0351xx           (c) 1980
+astdelux1       // 0351xx           (c) 1980
+bzone           // 0364xx           (c) 1980
+bzonea          // 0364xx           (c) 1980
+bzonec          // 0364xx           (c) 1980
+bradley         //     ??           (c) 1980
+redbaron        // 036995-037007    (c) 1980
+redbarona       // 036995-037007    (c) 1980
+tempest         // 136002           (c) 1980
+tempest3        // 136002           (c) 1980
+tempest2        // 136002           (c) 1980
+tempest1        // 136002           (c) 1980
+tempest1r       // 136002           (c) 1980
+temptube        // (hack)
+spacduel        // 136006           (c) 1980
+spacduel1       // 136006           (c) 1980
+spacduel0       // 136006           (c) 1980
+gravitar        // 136010           (c) 1982
+gravitar2       // 136010           (c) 1982
+gravitar1       // 136010           (c) 1982
+lunarbat        // (proto)          (c) 1982
+lunarba1        // (proto)          (c) 1982
+quantum         // 136016           (c) 1982        // made by Gencomp
+quantum1        // 136016           (c) 1982        // made by Gencomp
+quantump        // 136016           (c) 1982        // made by Gencomp
+bwidow          // 136017           (c) 1982
+bwidowp         // (proto)          (c) 1982
+starwars        // 136021           (c) 1983
+starwars1       // 136021           (c) 1983
+starwarso       // 136021           (c) 1983
+tomcatsw        // (proto)          (c) 1983
+mhavoc          // 136025           (c) 1983
+mhavoc2         // 136025           (c) 1983
+mhavocp         // 136025           (c) 1983
+mhavocrv        // (hack)
+alphaone        // (proto)          (c) 1983
+alphaonea       // (proto)          (c) 1983
+esb             // 136031           (c) 1985
+tomcat          // (proto)          (c) 1985

@@ -70,6 +70,38 @@ private:
 	int m_min_intensity;
 	int m_max_intensity;
 
+	// Serial output option for driving vector display hardware
+	const char * m_serial;
+	int m_serial_fd;
+	float m_serial_scale;
+	int m_serial_rotate;
+	int m_serial_bright;
+	int m_serial_drop_frame;
+	unsigned m_vector_transit[3];
+	unsigned char * m_serial_buf;
+	size_t m_serial_offset;
+
+	void serial_reset();
+
+	void
+	serial_draw_point(
+		unsigned x,
+		unsigned y,
+		int intensity
+	);
+
+	void
+	serial_draw_line(
+		float x0,
+		float y0,
+		float x1,
+		float y1,
+		int intensity
+	);
+
+	void
+	serial_send();
+
 	float normalized_sigmoid(float n, float k);
 };
 
