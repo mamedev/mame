@@ -1910,6 +1910,11 @@ void mac_state::machine_reset()
 		this->set_memory_overlay(1);
 	}
 
+	if (m_overlay_timeout != (emu_timer *)NULL)
+	{
+		m_overlay_timeout->adjust(m_maincpu->cycles_to_attotime(8));
+	}
+
 	/* setup videoram */
 	this->m_screen_buffer = 1;
 
@@ -1985,41 +1990,15 @@ void mac_state::mac_state_load()
 }
 
 
-DIRECT_UPDATE_MEMBER(mac_state::overlay_opbaseoverride)
+TIMER_CALLBACK_MEMBER(mac_state::overlay_timeout_func)
 {
 	if (m_overlay != -1)
 	{
-		if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100))
-		{
-			if ((address >= 0x900000) && (address <= 0x9fffff))
-			{
-				set_memory_overlay(0);      // kill the overlay
-			}
-		}
-		else if ((m_model == MODEL_MAC_SE) || (m_model == MODEL_MAC_CLASSIC))
-		{
-			if ((address >= 0x400000) && (address <= 0x4fffff))
-			{
-				set_memory_overlay(0);      // kill the overlay
-			}
-		}
-		else if ((m_model == MODEL_MAC_LC) || (m_model == MODEL_MAC_LC_II) || (m_model == MODEL_MAC_CLASSIC_II) || (m_model == MODEL_MAC_COLOR_CLASSIC))
-		{
-			if (((address >= 0xa00000) && (address <= 0xafffff)) || ((address >= 0x40a00000) && (address <= 0x40afffff)))
-			{
-				set_memory_overlay(0);      // kill the overlay
-			}
-		}
-		else
-		{
-			if ((address >= 0x40000000) && (address <= 0x4fffffff))
-			{
-				set_memory_overlay(0);      // kill the overlay
-			}
-		}
+		set_memory_overlay(0);      // kill the overlay
 	}
 
-	return address;
+	// we're a one-time-only thing
+	m_overlay_timeout->adjust(attotime::never);
 }
 
 READ32_MEMBER(mac_state::mac_read_id)
@@ -2109,7 +2088,11 @@ void mac_state::mac_driver_init(model_t model)
 		(model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30)) ||
 		(model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100) || (model == MODEL_MAC_PB140) || (model == MODEL_MAC_PB160) || (model == MODEL_MAC_PBDUO_210) || (model >= MODEL_MAC_QUADRA_700 && model <= MODEL_MAC_QUADRA_800))
 	{
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(mac_state::overlay_opbaseoverride), this));
+		m_overlay_timeout = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::overlay_timeout_func),this));
+	}
+	else
+	{
+		m_overlay_timeout = (emu_timer *)NULL;
 	}
 
 	/* setup keyboard */
