@@ -557,7 +557,7 @@ bool emu_options::parse_one_ini(const char *basename, int priority, std::string 
 	// parse the file
 	osd_printf_verbose("Parsing %s.ini\n", basename);
 	std::string error;
-	bool result = parse_ini_file(file, priority, OPTION_PRIORITY_DRIVER_INI, error);
+	bool result = parse_ini_file((core_file&)file, priority, OPTION_PRIORITY_DRIVER_INI, error);
 
 	// append errors if requested
 	if (!error.empty() && error_string != NULL)
