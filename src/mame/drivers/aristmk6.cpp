@@ -3,17 +3,24 @@
 /*
 
 Aristocrat MK6 (2000)
+Product numbers: 410480, 410481, 410556, 410557
 
 Hitachi SH4 7750
 NEC PowerVR Neon 250 (PMX1-LC)
-Altera Flex EPF10K100E
+Altera FLEX EPF10K100E
 PCI PLX9054
 16C554 4xUART
 
 Aristocrat MK6 XP (2002)
+Product numbers: 410540, 410541
+
 same as above except:
-- Altera Apex instead of Flex
+- Altera APEX instead of FLEX
 - doesnt have PCI controller
+
+notes:
+0x0001CA1E - critical error handler in BIOS, R4 - pointer to error message
+
 */
 
 #include "emu.h"
@@ -36,6 +43,7 @@ public:
 	UINT8 m_type;
 	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_WRITE64_MEMBER(eeprom_w);
+	DECLARE_READ64_MEMBER(hwver_r);
 	virtual void video_start();
 	UINT32 screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -155,6 +163,15 @@ WRITE64_MEMBER(aristmk6_state::eeprom_w)
 	m_eeprom0->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 }
 
+READ64_MEMBER(aristmk6_state::hwver_r)
+{
+	// hardware version/revison register
+	// bit 0-3: acceptable values 0-2 (deadloop otherwise), if > 0 - add 4 to unk B3800000 registers offsets
+	// bit 4:   1 - to B24xxxxxx UARTs registers offsets will be added E0
+	// bit 5-8: unk, checked for (bit4 == 1 && bit5-8 == 1), if true set flag at C406E20
+	return 0;
+}
+
 static ADDRESS_MAP_START( aristmk6_map, AS_PROGRAM, 64, aristmk6_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x04000000, 0x05ffffff) AM_RAM // VRAM 32MB
@@ -166,6 +183,8 @@ static ADDRESS_MAP_START( aristmk6_map, AS_PROGRAM, 64, aristmk6_state )
 // 12000xxx main control registers area
 	AM_RANGE(0x12000010, 0x12000017) AM_WRITE(eeprom_w)
 	AM_RANGE(0x12000078, 0x1200007f) AM_WRITENOP // watchdog ??
+	AM_RANGE(0x12000080, 0x12000087) AM_WRITENOP // 0-1-2 written here repeatedly, diag LED or smth ?
+	AM_RANGE(0x120000E0, 0x120000E7) AM_READ(hwver_r)
 	AM_RANGE(0x12400010, 0x12400017) AM_DEVREADWRITE8("uart1", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x12400018, 0x1240001f) AM_DEVREADWRITE8("uart0", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x13800000, 0x13800007) AM_READ8(test_r, U64(0xffffffffffffffff))
@@ -222,11 +241,11 @@ MACHINE_CONFIG_END
 #define ARISTMK6_BIOS \
 	ROM_REGION( 0x0400000, "maincpu", ROMREGION_ERASEFF) \
 	ROM_SYSTEM_BIOS( 0, "bios0",   "Aristocrat MK6 Base (15011025, Malaysia)" ) \
-	ROM_LOAD32_WORD_BIOS( 0, "15011025.right", 0x0000000, 0x0200000, CRC(bf21a975) SHA1(a251b1a7342387300689cd50fe4ce7975b903ac5) ) \
-	ROM_LOAD32_WORD_BIOS( 0, "15011025.left",  0x0000002, 0x0200000, CRC(c02e14b0) SHA1(6bf98927813519dfe60e582dbe5be3ccd87f7c91) ) \
+	ROM_LOAD32_WORD_BIOS( 0, "15011025.u83", 0x0000000, 0x0200000, CRC(bf21a975) SHA1(a251b1a7342387300689cd50fe4ce7975b903ac5) ) \
+	ROM_LOAD32_WORD_BIOS( 0, "15011025.u70", 0x0000002, 0x0200000, CRC(c02e14b0) SHA1(6bf98927813519dfe60e582dbe5be3ccd87f7c91) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1",   "Aristocrat MK6 Base (11011901, NSW/ACT)" ) \
-	ROM_LOAD32_WORD_BIOS( 1, "11011901.right", 0x0000000, 0x0200000, CRC(73dcb11c) SHA1(69ae4f32a0c9141b2a82ff3935b0cd20333d2964) ) \
-	ROM_LOAD32_WORD_BIOS( 1, "11011901.left",  0x0000002, 0x0200000, CRC(d3dd2210) SHA1(3548f8cc39859d3f44a55f6bae48966a2d48e0eb) )
+	ROM_LOAD32_WORD_BIOS( 1, "11011901.u83", 0x0000000, 0x0200000, CRC(73dcb11c) SHA1(69ae4f32a0c9141b2a82ff3935b0cd20333d2964) ) \
+	ROM_LOAD32_WORD_BIOS( 1, "11011901.u70", 0x0000002, 0x0200000, CRC(d3dd2210) SHA1(3548f8cc39859d3f44a55f6bae48966a2d48e0eb) )
 
 ROM_START( aristmk6 )
 	ARISTMK6_BIOS
