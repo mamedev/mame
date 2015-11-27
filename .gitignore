@@ -8,6 +8,7 @@
 !/hlsl/
 !/keymaps/
 !/nl_examples/
+!/regtests/
 !/samples/
 !/scripts/
 !/src/
@@ -21,7 +22,7 @@
 !/mame.doxygen
 !/*.md
 /.idea
-src/regtests/chdman/temp
-src/regtests/jedutil/output
+regtests/chdman/temp
+regtests/jedutil/output
 *.pyc
-/CMakeLists.txt 
+/CMakeLists.txt
