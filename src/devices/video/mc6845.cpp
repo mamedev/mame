@@ -55,6 +55,7 @@ const device_type SY6545_1 = &device_creator<sy6545_1_device>;
 const device_type SY6845E = &device_creator<sy6845e_device>;
 const device_type HD6345 = &device_creator<hd6345_device>;
 const device_type AMS40041 = &device_creator<ams40041_device>;
+const device_type AMS40489 = &device_creator<ams40489_device>;
 const device_type MOS8563 = &device_creator<mos8563_device>;
 const device_type MOS8568 = &device_creator<mos8568_device>;
 
@@ -1244,6 +1245,18 @@ void ams40041_device::device_start()
 	m_supports_transparent = false;
 }
 
+void ams40489_device::device_start()
+{
+	mc6845_device::device_start();
+
+	m_supports_disp_start_addr_r = true;
+	m_supports_vert_sync_width = false;
+	m_supports_status_reg_d5 = false;
+	m_supports_status_reg_d6 = false;
+	m_supports_status_reg_d7 = false;
+	m_supports_transparent = false;
+}
+
 
 void mos8563_device::device_start()
 {
@@ -1350,6 +1363,7 @@ void sy6545_1_device::device_reset() { mc6845_device::device_reset(); }
 void sy6845e_device::device_reset() { mc6845_device::device_reset(); }
 void hd6345_device::device_reset() { mc6845_device::device_reset(); }
 void ams40041_device::device_reset() { mc6845_device::device_reset(); }
+void ams40489_device::device_reset() { mc6845_device::device_reset(); }
 
 void mos8563_device::device_reset()
 {
@@ -1431,6 +1445,11 @@ hd6345_device::hd6345_device(const machine_config &mconfig, const char *tag, dev
 
 ams40041_device::ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, AMS40041, "AMS40041 CRTC", tag, owner, clock, "ams40041", __FILE__)
+{
+}
+
+ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: mc6845_device(mconfig, AMS40489, "AMS40489 ASIC (CRTC)", tag, owner, clock, "ams40489", __FILE__)
 {
 }
 
