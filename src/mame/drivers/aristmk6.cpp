@@ -18,6 +18,8 @@ same as above except:
 
 #include "emu.h"
 #include "cpu/sh4/sh4.h"
+#include "machine/ins8250.h"
+#include "machine/eepromser.h"
 
 class aristmk6_state : public driver_device
 {
@@ -25,14 +27,21 @@ public:
 	aristmk6_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_uart0(*this, "uart0"),
+		m_uart1(*this, "uart1"),
+		m_eeprom0(*this, "eeprom0"),
 		m_palette(*this, "palette")  { }
 
 	UINT32 m_test_x,m_test_y,m_start_offs;
 	UINT8 m_type;
-	DECLARE_READ64_MEMBER(test_r);
+	DECLARE_READ8_MEMBER(test_r);
+	DECLARE_WRITE64_MEMBER(eeprom_w);
 	virtual void video_start();
 	UINT32 screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<ns16550_device> m_uart0;
+	required_device<ns16550_device> m_uart1;
+	required_device<eeprom_serial_93cxx_device> m_eeprom0;
 	required_device<palette_device> m_palette;
 };
 
@@ -120,23 +129,46 @@ UINT32 aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-READ64_MEMBER(aristmk6_state::test_r)
+READ8_MEMBER(aristmk6_state::test_r)
 {
 	static int flip;
-	flip ^= 2;
-	// bit 1 read in various places, status for something ...
-	return flip;
+
+	switch (offset)
+	{
+	case 0:
+		flip ^= 2;
+		// bit 1 read in various places, status for something ...
+		return flip;
+	case 1:
+		return (m_eeprom0->do_read() << 5);
+	default:
+		logerror("Unmapped read %08x\n", 0x13800000 + offset);
+	}
+	
+	return 0;
+}
+
+WRITE64_MEMBER(aristmk6_state::eeprom_w)
+{
+	m_eeprom0->di_write((data & 0x01) >> 0);
+	m_eeprom0->cs_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom0->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( aristmk6_map, AS_PROGRAM, 64, aristmk6_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x04000000, 0x05ffffff) AM_RAM // VRAM 32MB
-	AM_RANGE(0x08000000, 0x08ffffff) AM_ROM AM_REGION("game_rom", 0)
+	AM_RANGE(0x08000000, 0x097fffff) AM_ROM AM_REGION("game_rom", 0)
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM // Main RAM 16MB
 	AM_RANGE(0x10800000, 0x1087ffff) AM_RAM // SRAM0 512KB
 	AM_RANGE(0x11000000, 0x1107ffff) AM_RAM // SRAM1 512KB
 	AM_RANGE(0x11800000, 0x1187ffff) AM_RAM // SRAM2 512KB
-	AM_RANGE(0x13800000, 0x13800007) AM_READ(test_r)
+// 12000xxx main control registers area
+	AM_RANGE(0x12000010, 0x12000017) AM_WRITE(eeprom_w)
+	AM_RANGE(0x12000078, 0x1200007f) AM_WRITENOP // watchdog ??
+	AM_RANGE(0x12400010, 0x12400017) AM_DEVREADWRITE8("uart1", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x12400018, 0x1240001f) AM_DEVREADWRITE8("uart0", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x13800000, 0x13800007) AM_READ8(test_r, U64(0xffffffffffffffff))
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aristmk6_port, AS_IO, 64, aristmk6_state )
@@ -166,6 +198,12 @@ static MACHINE_CONFIG_START( aristmk6, aristmk6_state )
 	MCFG_CPU_IO_MAP(aristmk6_port)
 //  MCFG_DEVICE_DISABLE()
 
+	MCFG_DEVICE_ADD( "uart0", NS16550, XTAL_8MHz )
+	MCFG_DEVICE_ADD( "uart1", NS16550, XTAL_8MHz )
+
+	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom0")
+	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0xFF)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -193,13 +231,13 @@ MACHINE_CONFIG_END
 ROM_START( aristmk6 )
 	ARISTMK6_BIOS
 
-	ROM_REGION( 0x1000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x1800000, "game_rom", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( antcleo )
 	ARISTMK6_BIOS
 
-	ROM_REGION( 0x1000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x1800000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10177211.u86", 0x0000000, 0x0400000, CRC(4897f4ed) SHA1(0a071528b0c2cb4c42d4535bed406849a6187d9d) )
 	ROM_LOAD32_WORD("10177211.u73", 0x0000002, 0x0400000, CRC(41b7d75d) SHA1(5c25e0bc65560b17b80c4430ae9d925a0f245e6c) )
 	ROM_LOAD32_WORD("10177211.u85", 0x0800000, 0x0400000, CRC(909a5a6c) SHA1(abb86f82184f32fad578d5c3a6d034afaa78e3c3) )
@@ -209,7 +247,7 @@ ROM_END
 ROM_START( 50lions )
 	ARISTMK6_BIOS
 
-	ROM_REGION( 0x1000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x1800000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10120511.u86", 0x0000000, 0x0400000, CRC(0e5c86f1) SHA1(84e329e664ace697f9ea4ace08612089e0964732) )
 	ROM_LOAD32_WORD("10120511.u73", 0x0000002, 0x0400000, CRC(1c1f2297) SHA1(13fb8c83d8ce2340ef554490c21a38da7b47c666) )
 ROM_END
@@ -217,7 +255,7 @@ ROM_END
 ROM_START( 50lionsa )
 	ARISTMK6_BIOS
 
-	ROM_REGION( 0x1000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x1800000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10156111.u86", 0x0000000, 0x0400000, CRC(c3791531) SHA1(b9c60be9624463eb591f2baf421ff90b8763449b) )
 	ROM_LOAD32_WORD("10156111.u73", 0x0000002, 0x0400000, CRC(ec1b699b) SHA1(5a6ad7c7eb02443e42ee6a88525ae95a2b0a3195) )
 ROM_END
@@ -225,7 +263,7 @@ ROM_END
 ROM_START( choysun )
 	ARISTMK6_BIOS
 
-	ROM_REGION( 0x1000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x1800000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("20131511.u86", 0x0000000, 0x0400000, CRC(06f78c92) SHA1(e8bd3f18831dfb5c644321541fa9e75ae9e83688) )
 	ROM_LOAD32_WORD("20131511.u73", 0x0000002, 0x0400000, CRC(5b2468b6) SHA1(085aa44343f11fdf5ab7cc1ca56ddb0ba5cafc36) )
 	ROM_LOAD32_WORD("20131511.u85", 0x0800000, 0x0400000, CRC(6973dffd) SHA1(4350e0cdfeb9135e708f15bf2de325b8412c1434) )
@@ -235,7 +273,7 @@ ROM_END
 ROM_START( crystals )
 	ARISTMK6_BIOS
 
-	ROM_REGION( 0x1000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x1800000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10155811.u86", 0x0000000, 0x0400000, CRC(b046ea06) SHA1(0c0310bc0afb8bac630ac0570d5b9df6a992cfdb) )
 	ROM_LOAD32_WORD("10155811.u73", 0x0000002, 0x0400000, CRC(b52cac8a) SHA1(65bb5d73933df6d53a079e4efe00ea29649e3201) )
 ROM_END
@@ -243,7 +281,7 @@ ROM_END
 ROM_START( indianmm )
 	ARISTMK6_BIOS
 
-	ROM_REGION( 0x1000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x1800000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10130711.u86", 0x0000000, 0x0400000, CRC(db13eaf5) SHA1(c2e743b72c2a280266d55642e40c3a7a740052db) )
 	ROM_LOAD32_WORD("10130711.u73", 0x0000002, 0x0400000, CRC(a5e3dca5) SHA1(e585841064dc98398169bcd0cd04269bbcfaf77c) )
 	ROM_LOAD32_WORD("10130711.u85", 0x0800000, 0x0400000, CRC(988f10da) SHA1(9c21cb8ebebcd603b25329331de89e9aaa36368a) )
@@ -265,7 +303,7 @@ ROM_END
 ROM_START( whalecsh )
 	ARISTMK6_BIOS
 
-	ROM_REGION( 0x1000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x1800000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("20155711.u86", 0x0000000, 0x0400000, CRC(11bcb378) SHA1(56de7fee7631c2e468a1f1845ff9d74db56051f0) )
 	ROM_LOAD32_WORD("20155711.u73", 0x0000002, 0x0400000, CRC(3b6d2292) SHA1(87e50f3ed6629c697cff59ec425b098704450993) )
 	ROM_LOAD32_WORD("20155711.u85", 0x0800000, 0x0400000, CRC(50afc633) SHA1(ee237d806044bbab3f17210e4e668a8f0961ad92) )
@@ -275,7 +313,7 @@ ROM_END
 ROM_START( wildways )
 	ARISTMK6_BIOS
 
-	ROM_REGION( 0x1000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x1800000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("10130111.u86", 0x0000000, 0x0400000, CRC(2968765c) SHA1(ba2c67c4be4063d8506cc8127c31b4df2609650b) )
 	ROM_LOAD32_WORD("10130111.u73", 0x0000002, 0x0400000, CRC(a1e0d77e) SHA1(df4d45d8c4dcfdb1fae4b5d5a0adfa0464c61828) )
 	ROM_LOAD32_WORD("10130111.u85", 0x0800000, 0x0400000, CRC(d87426d5) SHA1(ba755f8fc426dcd8abf4f6ccee423ae0504bf6fe) )
@@ -285,7 +323,7 @@ ROM_END
 ROM_START( thaiprin )
 	ARISTMK6_BIOS
 
-	ROM_REGION( 0x1000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_REGION( 0x1800000, "game_rom", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("30127721.u86", 0x0000000, 0x0400000, CRC(3cb5124b) SHA1(70f6d66793c433054557da4c9f2f033bbb640bd6) )
 	ROM_LOAD32_WORD("30127721.u73", 0x0000002, 0x0400000, CRC(531f05ab) SHA1(929285de219c033bdee5f8011e9a0a07b344375e) )
 	ROM_LOAD32_WORD("30127721.u85", 0x0800000, 0x0400000, CRC(90c345e0) SHA1(1cf5b237eca68749a7baa147b9b15b3e139d7951) )
