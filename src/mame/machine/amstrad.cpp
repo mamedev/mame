@@ -1863,6 +1863,9 @@ READ8_MEMBER(amstrad_state::amstrad_cpc_io_r)
 		}
 	}
 
+	if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )  // Plus systems return 0 when attempting to read the gate array (and any other unreadable space too?)
+		data = 0;
+
 	/* if b14 = 0 : CRTC Read selected */
 	if ((offset & (1<<14)) == 0)
 	{
