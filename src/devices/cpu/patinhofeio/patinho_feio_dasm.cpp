@@ -1,4 +1,4 @@
-// license:GPL2+
+// license:GPL-2.0+
 // copyright-holders:Felipe Sanches
 #include "emu.h"
 #include "cpu/patinhofeio/patinho_feio.h"

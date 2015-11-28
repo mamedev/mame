@@ -1774,6 +1774,9 @@ tmc600s2
 //osc1000b
 nano
 
+// Escola Politecnica da USP (Brazil)
+patinho // 1972 Patinho Feio
+
 // MIT
 tx0_64kw  // April 1956 MIT TX-0 (64kw RAM)
 tx0_8kw   // 1962 MIT TX-0 (8kw RAM)
