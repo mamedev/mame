@@ -36,8 +36,8 @@ TODO: Breakout Cocktail and Consolette are believed to use the Breakout PCB with
       cabinet designs, this needs to be verified.
 TODO: Coupe Davis is believed to use the Pong Doubles PCB, just a different cabinet design,
       this needs to be verified.
-TODO: Dr. Pong, Pong In-A-Barrel, Puppy Pong, Snoopy Pong, Cocktail Pong and Coup Franc are
-      all believed to use the Pong (Rev E) PCB, but different cabinet designs; this needs to
+TODO: Dr. Pong, Pong In-A-Barrel, Puppy Pong, Snoopy Pong, and Cocktail Pong are all
+      believed to use the Pong (Rev E) PCB, but different cabinet designs; this needs to
       be verified.
 TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifications, this
       needs to be verified.
