@@ -317,7 +317,7 @@ void vector_device::serial_send()
 
 	size_t offset = 0;
 
-	printf("%zu vectors: off=%zu on=%zu bright=%zu%s\n",
+	printf("%zu vectors: off=%u on=%u bright=%u%s\n",
 		m_serial_offset/3,
 		m_vector_transit[0],
 		m_vector_transit[1],
