@@ -7938,7 +7938,9 @@ PayTable   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
   % Range: 93.2-95.2%  Optimum: 97.2%  Hit Frequency: 30.1%
      Programs Available: PP0550, X000550P
 
-Internally the program erroneously reports a 95.50% return. Superseded by X002338P
+Internally the program erroneously reports a 95.50% return.
+
+NOTE: Same as X002338P, except MAX Coin (set to 5) CANNOT be changed - NJ jurisdiction
 
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7964,6 +7966,8 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
    WA       1    2    3    4    5   7  20  50 300    800
   % Range: 91.0-93.0%  Optimum: 95.0%  Hit Frequency: 45.5%
      Programs Available: X000557P
+	 
+NOTE: Same as X000040P, except MAX Coin (set to 5) CANNOT be changed - NJ jurisdiction
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
