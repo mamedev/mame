@@ -19,15 +19,15 @@ driver by Couriersud
 
  Suspected "same games" are grouped together.  These are usually the exact same game but different cabinet/name.
 
- Technical Manual #s  Game Name(s)                                               Atari Part #'s                     Data
- -------------------+----------------------------------------------------------+----------------------------------+---------+
- TM-013               Pong (1972)                                                A001433                            NO
- TM-0??               Pong In-A-Barrel (1973)                                    A001433?                           NO
- TM-015               Cocktail Pong/Coup Franc (1974)                            A001433?                           NO
- TM-0??               Dr. Pong/Puppy Pong/Snoopy Pong (1974)                     A001433?                           NO
- 422                  Superpong (1974)                                           A000423                            NO
- TM-014               Pong Doubles/Coupe Davis (1973)                            A000785                            NO
- TM-058               Breakout/Breakout Cocktail/Consolette (1976)               A004533                            NO
+ Technical Manual #s      Game Name(s)                                                    Atari Part #'s                     Data
+ -----------------------+---------------------------------------------------------------+----------------------------------+---------+
+ TM-013,029               Pong (1972)                                                     A001433                            NO
+ TM-0??                   Pong In-A-Barrel (1973)                                         A001433?                           NO
+ TM-015                   Cocktail Pong (1974)                                            A001433?                           NO
+ TM-0??                   Dr. Pong/Puppy Pong/Snoopy Pong (1974)                          A001433?                           NO
+ 422,TM-029               Superpong (1974)                                                A000423                            NO
+ TM-014,029               Pong Doubles/Coupe Davis (1973)                                 A000785                            NO
+ TM-058                   Breakout/Breakout Cocktail/Consolette (1976)                    A004533                            NO
 
 Notes:
 
@@ -532,10 +532,6 @@ ROM_START( coupedav ) // dummy to satisfy game entry
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( coupfran ) // dummy to satisfy game entry
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-ROM_END
-
 ROM_START( cktpong ) // dummy to satisfy game entry
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
@@ -573,7 +569,6 @@ GAMEL( 1976, breakout,  0, breakout, breakout,  driver_device,  0, ROT90, "Atari
 // 100% TTL
 //GAME( 1973, coupedav,   pongd,    pongd,    pongd,     driver_device,  0, ROT0,  "Atari France", "Coupe Davis [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1973, pongbarl,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Pong In-A-Barrel [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1974, coupfran,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari Europe", "Coup Franc [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, cktpong,    pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari / National Entertainment Co.", "Cocktail Pong [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, drpong,     pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Dr. Pong [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, pupppong,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Puppy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
