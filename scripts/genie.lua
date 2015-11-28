@@ -1001,10 +1001,6 @@ end
 			if (version >= 30000) then
 				buildoptions {
 					"-Wno-unused-value",
-				}
-			end
-			if (version >= 30400) then
-				buildoptions {
 					"-Wno-inline-new-delete",
 					"-Wno-constant-logical-operand",
 				}

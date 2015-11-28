@@ -858,7 +858,6 @@ function toolchain(_buildDir, _subDir)
 		objdir (_buildDir .. "osx_clang" .. "/obj")
 		buildoptions {
 			"-m64",
-			"-Wno-constant-logical-operand",
 		}
 
 	configuration { "osx*", "x64", "Release" }
