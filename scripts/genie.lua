@@ -998,7 +998,7 @@ end
 				"-Wno-tautological-compare",
 				"-Wno-dynamic-class-memaccess",
 			}
-			if (version >= 30200) then
+			if (version >= 30000) then
 				buildoptions {
 					"-Wno-unused-value",
 				}
