@@ -34,6 +34,17 @@
 #include "rendutil.h"
 #include "vector.h"
 
+// Serial port related includes
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <termios.h>
+#include <errno.h>
+
+#include <inttypes.h>
+#include <sys/time.h>
+ 
 
 #define FLT_EPSILON 1E-5
 
@@ -152,6 +163,195 @@ float vector_device::m_beam_width_max = 0.0f;
 float vector_device::m_beam_intensity_weight = 0.0f;
 int vector_device::m_vector_index;
 
+int
+serial_open(
+        const char * const dev
+)
+{
+        const int fd = open(dev, O_RDWR | O_NONBLOCK | O_NOCTTY, 0666);
+        if (fd < 0)
+                return -1;
+
+        // Disable modem control signals
+        struct termios attr;
+        tcgetattr(fd, &attr);
+        attr.c_cflag |= CLOCAL | CREAD;
+        attr.c_oflag &= ~OPOST;
+        tcsetattr(fd, TCSANOW, &attr);
+
+        return fd;
+}
+
+void vector_device::serial_draw_point(
+	unsigned x,
+	unsigned y,
+	int intensity
+)
+{
+	// always flip the Y, since the vectorscope measures
+	// 0,0 at the bottom left corner, but this coord uses
+	// the top left corner.
+	y = 2047 - y;
+
+	// make sure that we are in range; should always be
+	// due to clipping on the window, but just in case
+	if (x < 0) x = 0;
+	if (y < 0) y = 0;
+
+	if (x > 2047) x = 2047;
+	if (y > 2047) y = 2047;
+
+	unsigned bright;
+	if (intensity > m_serial_bright)
+		bright = 3;
+	else
+	if (intensity > 0)
+		bright = 2;
+	else
+		bright = 1;
+
+	if (m_serial_rotate == 1)
+	{
+		// +90
+		unsigned tmp = x;
+		x = 2047 - y;
+		y = tmp;
+	} else
+	if (m_serial_rotate == 2)
+	{
+		// +180
+		x = 2047 - x;
+		y = 2047 - y;
+	} else
+	if (m_serial_rotate == 3)
+	{
+		// -90
+		unsigned t = x;
+		x = y;
+		y = 2047 - t;
+	}
+
+	uint32_t cmd = 0
+		| (bright << 22)
+		| (x & 0x7FF) << 11
+		| (y & 0x7FF) <<  0
+		;
+
+	m_serial_buf[m_serial_offset++] = cmd >> 16;
+	m_serial_buf[m_serial_offset++] = cmd >>  8;
+	m_serial_buf[m_serial_offset++] = cmd >>  0;
+
+	// todo: check for overflow;
+	// should always have enough points
+}
+
+
+void vector_device::serial_draw_line(
+	float xf0,
+	float yf0,
+	float xf1,
+	float yf1,
+	int intensity
+)
+{
+	if (m_serial_fd < 0)
+		return;
+
+	static int last_x;
+	static int last_y;
+
+	const int x0 = (xf0 * 2048 - 1024) * m_serial_scale + 1024;
+	const int y0 = (yf0 * 2048 - 1024) * m_serial_scale + 1024;
+	const int x1 = (xf1 * 2048 - 1024) * m_serial_scale + 1024;
+	const int y1 = (yf1 * 2048 - 1024) * m_serial_scale + 1024;
+
+	// if this is not a continuous segment,
+	// we must add a transit command
+	if (last_x != x0 || last_y != y0)
+	{
+		serial_draw_point(x0, y0, 0);
+		int dx = x0 - last_x;
+		int dy = y0 - last_y;
+		m_vector_transit[0] += sqrt(dx*dx + dy*dy);
+	}
+
+	// transit to the new point
+	int dx = x1 - x0;
+	int dy = y1 - y0;
+	int dist = sqrt(dx*dx + dy*dy);
+
+	serial_draw_point(x1, y1, intensity);
+	if (intensity > m_serial_bright)
+		m_vector_transit[2] += dist;
+	else
+		m_vector_transit[1] += dist;
+
+	last_x = x1;
+	last_y = y1;
+}
+
+
+void vector_device::serial_reset()
+{
+	m_serial_offset = 0;
+	m_serial_buf[m_serial_offset++] = 0;
+	m_serial_buf[m_serial_offset++] = 0;
+	m_serial_buf[m_serial_offset++] = 0;
+	m_serial_buf[m_serial_offset++] = 0;
+
+	m_vector_transit[0] = 0;
+	m_vector_transit[1] = 0;
+	m_vector_transit[2] = 0;
+}
+
+
+void vector_device::serial_send()
+{
+	if (m_serial_fd < 0)
+		return;
+
+	// add the "done" command to the message
+	m_serial_buf[m_serial_offset++] = 1;
+	m_serial_buf[m_serial_offset++] = 1;
+	m_serial_buf[m_serial_offset++] = 1;
+
+	size_t offset = 0;
+
+	printf("%zu vectors: off=%u on=%u bright=%u%s\n",
+		m_serial_offset/3,
+		m_vector_transit[0],
+		m_vector_transit[1],
+		m_vector_transit[2],
+		m_serial_drop_frame ? " !" : ""
+	);
+
+	if (m_serial_drop_frame)
+	{
+		// we skipped a frame, don't skip the next one
+		m_serial_drop_frame = 0;
+	} else
+	while (offset < m_serial_offset)
+	{
+		ssize_t rc = write(m_serial_fd, m_serial_buf + offset, m_serial_offset - offset);
+		if (rc <= 0)
+		{
+			m_serial_drop_frame = 1;
+			if (errno == EAGAIN)
+				continue;
+			perror(m_serial);
+			close(m_serial_fd);
+			m_serial_fd = -1;
+			break;
+		}
+
+		offset += rc;
+	}
+
+	serial_reset();
+}
+
+
+
 void vector_device::device_start()
 {
 	/* Grab the settings for this session */
@@ -164,6 +364,31 @@ void vector_device::device_start()
 
 	/* allocate memory for tables */
 	m_vector_list = auto_alloc_array_clear(machine(), point, MAX_POINTS);
+
+	/* Setup the serial output of the XY coords if configured */
+	m_serial = machine().options().vector_serial();
+	m_serial_scale = machine().options().vector_scale();
+	m_serial_rotate = machine().options().vector_rotate();
+	m_serial_bright = machine().options().vector_bright();
+	m_serial_drop_frame = 0;
+
+	// allocate enough buffer space, although we should never use this much
+	m_serial_buf = auto_alloc_array_clear(machine(), unsigned char, (MAX_POINTS+2) * 3);
+	if (!m_serial_buf)
+	{
+		// todo: how to signal an error?
+	}
+
+	serial_reset();
+
+	if (!m_serial || strcmp(m_serial,"") == 0)
+	{
+		fprintf(stderr, "no serial vector display configured\n");
+		m_serial_fd = -1;
+	} else {
+		m_serial_fd = serial_open(m_serial);
+		fprintf(stderr, "serial dev='%s' fd=%d\n", m_serial, m_serial_fd);
+	}
 }
 
 void vector_device::set_flicker(float newval)
@@ -367,6 +592,11 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 					beam_width,
 					(curpoint->intensity << 24) | (curpoint->col & 0xffffff),
 					flags);
+
+				serial_draw_line(
+					coords.x0, coords.y0,
+					coords.x1, coords.y1,
+					curpoint->intensity);
 			}
 
 			lastx = curpoint->x;
@@ -375,6 +605,8 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		curpoint++;
 	}
+
+	serial_send();
 
 	return 0;
 }

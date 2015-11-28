@@ -571,7 +571,7 @@ bool samples_device::read_flac_sample(emu_file &file, sample_t &sample)
 	file.seek(0, SEEK_SET);
 
 	// create the FLAC decoder and fill in the sample data
-	flac_decoder decoder(file);
+	flac_decoder decoder((core_file&) file);
 	sample.frequency = decoder.sample_rate();
 
 	// error if more than 1 channel or not 16bpp

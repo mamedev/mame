@@ -116,6 +116,10 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_BEAM_WIDTH_MAX,                             "1.0",       OPTION_FLOAT,      "set vector beam width maximum" },
 	{ OPTION_BEAM_INTENSITY_WEIGHT,                      "0",         OPTION_FLOAT,      "set vector beam intensity weight " },
 	{ OPTION_FLICKER,                                    "0",         OPTION_FLOAT,      "set vector flicker effect" },
+	{ OPTION_VECTOR_SERIAL,                              "",          OPTION_STRING,      "set vector serial device" },
+	{ OPTION_VECTOR_SCALE,                               "1.0",       OPTION_FLOAT,      "set vector serial output scale" },
+	{ OPTION_VECTOR_ROTATE,                              "0",         OPTION_INTEGER,    "set vector serial rotation (0,1,2,3)" },
+	{ OPTION_VECTOR_BRIGHT,                              "200",       OPTION_INTEGER,    "set vector threshold for bright lines (0-255)" },
 
 	// sound options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE SOUND OPTIONS" },
@@ -557,7 +561,7 @@ bool emu_options::parse_one_ini(const char *basename, int priority, std::string 
 	// parse the file
 	osd_printf_verbose("Parsing %s.ini\n", basename);
 	std::string error;
-	bool result = parse_ini_file(file, priority, OPTION_PRIORITY_DRIVER_INI, error);
+	bool result = parse_ini_file((core_file&) file, priority, OPTION_PRIORITY_DRIVER_INI, error);
 
 	// append errors if requested
 	if (!error.empty() && error_string != NULL)

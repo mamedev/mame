@@ -123,6 +123,10 @@ enum
 #define OPTION_BEAM_WIDTH_MAX       "beam_width_max"
 #define OPTION_BEAM_INTENSITY_WEIGHT   "beam_intensity_weight"
 #define OPTION_FLICKER              "flicker"
+#define OPTION_VECTOR_SERIAL        "vector_serial"
+#define OPTION_VECTOR_ROTATE        "vector_rotate"
+#define OPTION_VECTOR_BRIGHT        "vector_bright"
+#define OPTION_VECTOR_SCALE         "vector_scale"
 
 // core sound options
 #define OPTION_SAMPLERATE           "samplerate"
@@ -297,6 +301,10 @@ public:
 	float beam_width_max() const { return float_value(OPTION_BEAM_WIDTH_MAX); }
 	float beam_intensity_weight() const { return float_value(OPTION_BEAM_INTENSITY_WEIGHT); }
 	float flicker() const { return float_value(OPTION_FLICKER); }
+	float vector_scale() const { return float_value(OPTION_VECTOR_SCALE); }
+	const char * vector_serial() const { return value(OPTION_VECTOR_SERIAL); }
+	int vector_rotate() const { return int_value(OPTION_VECTOR_ROTATE); }
+	int vector_bright() const { return int_value(OPTION_VECTOR_BRIGHT); }
 
 	// core sound options
 	int sample_rate() const { return int_value(OPTION_SAMPLERATE); }
