@@ -106,15 +106,22 @@ WRITE16_MEMBER(rungun_state::rng_sysregs_w)
 			    bit0  : eeprom_di_write
 			    bit1  : eeprom_cs_write
 			    bit2  : eeprom_clk_write
-			    bit3  : coin counter?
-			    bit7  : set before massive memory writes
+				bit3  : coin counter #1
+				bit4  : coin counter #2 (when coin slot "common" is selected)
+			    bit7  : set before massive memory writes (video chip select?)
 			    bit10 : IRQ5 ACK
+				bit14 : (0) sprite on top of PSAC2 layer (1) other way around (title screen) 
 			*/
 			if (ACCESSING_BITS_0_7)
+			{
 				ioport("EEPROMOUT")->write(data, 0xff);
-
-			if (!(data & 0x40))
-				m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
+			}
+			if (ACCESSING_BITS_8_15)
+			{
+				m_video_priority_mode = (data & 0x4000) == 0x4000;
+				if (!(data & 0x400)) // actually a 0 -> 1 transition
+					m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
+			}
 		break;
 
 		case 0x0c/2:
@@ -266,7 +273,9 @@ static INPUT_PORTS_START( rng )
 	PORT_DIPNAME( 0x0100, 0x0000, "Freeze" )
 	PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x0100, DEF_STR( On ) )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x0200, 0x0200, "Field Bit (DEBUG)" )
+	PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x0200, DEF_STR( On ) )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
