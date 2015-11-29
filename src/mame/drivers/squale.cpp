@@ -6,7 +6,7 @@
 
     The following hardware description is an extract of the Squale hardware analysis
     presented on this page : http://hxc2001.free.fr/Squale.
-    This is a work in progress and is subject to changes 
+    This is a work in progress and is subject to changes
 
     PCB Ref Qty Manufacturer Ref    Description / Datasheet
     ============================================================================================
@@ -56,6 +56,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "video/ef9365.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "sound/ay8910.h"
@@ -73,6 +74,7 @@ public:
 		, m_ay8910(*this,  "ay8910")
 		, m_pia_u72(*this, "pia_u72")
 		, m_pia_u75(*this, "pia_u75")
+		, m_ef9365(*this, "ef9365")
 		, m_maincpu(*this, "maincpu")
 	{ }
 
@@ -81,11 +83,14 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
+	TIMER_DEVICE_CALLBACK_MEMBER(squale_scanline);
+
 private:
 	required_device<acia6850_device> m_acia;
 	required_device<ay8910_device> m_ay8910;
 	required_device<pia6821_device> m_pia_u72;
 	required_device<pia6821_device> m_pia_u75;
+	required_device<ef9365_device> m_ef9365;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -93,14 +98,26 @@ private:
 *      Misc Handlers     *
 *************************/
 
-WRITE8_MEMBER(squale_state::ctrl_w)
+WRITE8_MEMBER( squale_state::ctrl_w )
 {
+	#ifdef DBGMODE
+	printf("write ctrl reg : 0x%X\n",data);
+	#endif
+
 	membank("rom_bank")->set_entry(data >> 7);
+
+	m_ef9365->static_set_color_filler(data & 0xF);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( squale_state::squale_scanline )
+{
+	m_ef9365->update_scanline((UINT16)param);
 }
 
 static ADDRESS_MAP_START(squale_mem, AS_PROGRAM, 8, squale_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0xefff) AM_RAM
+	AM_RANGE(0xf000,0xf00f) AM_DEVREADWRITE("ef9365", ef9365_device, data_r, data_w)
 	AM_RANGE(0xf010,0xf01f) AM_WRITE( ctrl_w )
 	AM_RANGE(0xf044,0xf047) AM_DEVREADWRITE("pia_u75", pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xf048,0xf04b) AM_DEVREADWRITE("pia_u72", pia6821_device, read_alt, write_alt)
@@ -147,8 +164,22 @@ static MACHINE_CONFIG_START( squale, squale_state )
 	MCFG_SOUND_ADD("ay8910", AY8910, AY_CLOCK)
 	// TODO : Add port I/O handler
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	
+
 	MCFG_DEVICE_ADD ("ef6850", ACIA6850, 0)
+
+	/* screen */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE_DEVICE("ef9365", ef9365_device, screen_update)
+
+	MCFG_SCREEN_SIZE(336, 270)
+	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
+	MCFG_PALETTE_ADD("palette", 8)
+
+	MCFG_DEVICE_ADD("ef9365", EF9365, 0)
+	MCFG_EF9365_PALETTE("palette")
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("squale_sl", squale_state, squale_scanline, "screen", 0, 10)
+
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -160,6 +191,9 @@ ROM_START( squale )
 	ROM_RELOAD( 0x1000, 0x1000 )
 	ROM_SYSTEM_BIOS(1, "v201", "Version 2.1")
 	ROMX_LOAD( "sqmon_2r1.bin", 0x0000, 0x2000, CRC(ed57c707) SHA1(c8bd33a6fb07fe7f881f2605ad867b7e82366bfc), ROM_BIOS(2) )
+
+	ROM_REGION( 0x1E0, "ef9365", 0 )
+	ROM_LOAD( "charset_ef9365.rom", 0x0000, 0x01E0, CRC(22BE2908) SHA1(3920ee887b8ca2887b3e0471bea7c1045a87fc10) )
 ROM_END
 
 /* Driver */
