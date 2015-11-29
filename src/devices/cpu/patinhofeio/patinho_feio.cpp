@@ -131,6 +131,29 @@ void patinho_feio_cpu_device::execute_instruction()
             ACC = ~ACC + 1;
             FLAGS = 0; //TODO: fix-me (I'm not sure yet how to compute the flags here)
             return;
+        case 0x84:
+            //LIM="Limpa":
+            // Clear flags
+            FLAGS = 0;
+            return;
+        case 0x85:
+            //INC:
+            // Increment accumulator
+            ACC++;
+            FLAGS = 0; //TODO: fix-me (I'm not sure yet how to compute the flags here)
+            return;
+        case 0x86:
+            //UNEG="Um Negativo":
+            // Load -1 into accumulator and clear flags
+            ACC = -1;
+            FLAGS = 0;
+            return;
+        case 0x87:
+            //LIMP1:
+            //    Clear accumulator and sets V=1
+            ACC = 0;
+            FLAGS = V;
+            return;
         case 0x9A:
             //INIB="Inibe"
             //     disables interrupts
