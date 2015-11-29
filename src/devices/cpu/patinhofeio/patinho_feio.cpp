@@ -15,7 +15,7 @@
 #define WRITE_BYTE_PATINHO(A,V) (m_program->write_byte(A,V))
 
 #define READ_INDEX_REG() READ_BYTE_PATINHO(0x000)
-#define WRITE_INDEX_REG(V) WRITE_BYTE_PATINHO(0x000, V)
+#define WRITE_INDEX_REG(V) { WRITE_BYTE_PATINHO(0x000, V); m_idx = V; }
 
 #define ADDRESS_MASK_4K    0xFFF
 #define INCREMENT_PC_4K    (PC = (PC+1) & ADDRESS_MASK_4K)
@@ -45,6 +45,7 @@ void patinho_feio_cpu_device::device_start()
 	// Register state for debugger
 	state_add( PATINHO_FEIO_CI,         "CI",       m_pc         ).mask(0xFFF);
     state_add( PATINHO_FEIO_ACC,        "ACC",      m_acc        ).mask(0xFF);
+    state_add( PATINHO_FEIO_IDX,        "IDX",      m_idx        ).mask(0xFF);
     state_add(STATE_GENPC, "GENPC", m_pc).formatstr("0%06O").noshow();
 
     m_icountptr = &m_icount;
@@ -55,6 +56,7 @@ void patinho_feio_cpu_device::device_reset()
 {
     m_pc = 0xE00;
     m_acc = 0;
+    m_idx = READ_INDEX_REG();
     m_run = true;
 }
 
@@ -78,7 +80,7 @@ void patinho_feio_cpu_device::execute_instruction()
 {
     debugger_instruction_hook(this, PC);
     offs_t addr;
-    unsigned char tmp;
+    unsigned char value;
     unsigned char opcode = READ_BYTE_PATINHO(PC);
     INCREMENT_PC_4K;
 
@@ -116,9 +118,29 @@ void patinho_feio_cpu_device::execute_instruction()
         case 0x9E:
             //TRI="Troca com Indexador":
             //     Exchange the value of the accumulator with the index register
-            tmp = ACC;
+            value = ACC;
             ACC = READ_INDEX_REG();
-            WRITE_INDEX_REG(tmp);
+            WRITE_INDEX_REG(value);
+            return;
+        case 0xCB:
+            //Executes I/O functions
+            //TODO: Implement-me!
+            value = READ_BYTE_PATINHO(PC);
+            switch(value & 0xF0){
+                case 0x10:
+                    printf("Unimplemented FNC /%X%X instruction\n", opcode & 0x0F, value & 0x0F);
+                    break;
+                case 0x20:
+                    printf("Unimplemented SAL /%X%X instruction\n", opcode & 0x0F, value & 0x0F);
+                    break;
+                case 0x40:
+                    printf("Unimplemented ENTR /%X0 instruction\n", opcode & 0x0F);
+                    break;
+                case 0x80:
+                    printf("Unimplemented SAI /%X0 instruction\n", opcode & 0x0F);
+                    break;
+            }
+            INCREMENT_PC_4K;
             return;
     }
 
@@ -135,8 +157,8 @@ void patinho_feio_cpu_device::execute_instruction()
             //      And then jumps to addr+2
             addr = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
             INCREMENT_PC_4K;
-            WRITE_BYTE_PATINHO(addr, 0x12);//(PC >> 8) & 0x0F);
-            WRITE_BYTE_PATINHO(addr+1, 0x34);//PC & 0xFF);
+            WRITE_BYTE_PATINHO(addr, (PC >> 8) & 0x0F);
+            WRITE_BYTE_PATINHO(addr+1, PC & 0xFF);
             PC = addr+2;
             return;
     }

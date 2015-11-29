@@ -8,7 +8,7 @@
 /* register IDs */
 enum
 {
-	PATINHO_FEIO_CI=1, PATINHO_FEIO_ACC
+	PATINHO_FEIO_CI=1, PATINHO_FEIO_ACC, PATINHO_FEIO_IDX
 };
 
 class patinho_feio_cpu_device : public cpu_device
@@ -27,6 +27,7 @@ protected:
     int m_acc;        /* accumulator (8 bits) */
     int m_pc;         /* program counter (12 bits)
                          (CI stands for "Contador de Instrucao") */
+    int m_idx;
 
     /* processor state flip-flops */
     bool m_run;       /* processor is running */
