@@ -127,6 +127,7 @@ WRITE16_MEMBER(rungun_state::rng_sysregs_w)
 			    bit 3 : enable IRQ 5
 			*/
 			m_k055673->k053246_set_objcha_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+			m_roz_rombase = (data & 0xf0) >> 4;
 		break;
 	}
 }
@@ -163,16 +164,25 @@ INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
 		device.execute().set_input_line(M68K_IRQ_5, ASSERT_LINE);
 }
 
+READ8_MEMBER(rungun_state::rng_53936_rom_r)
+{
+	UINT32 rom_addr = offset;
+	rom_addr+= (m_roz_rombase)*0x20000;
+	return m_roz_rom[rom_addr];
+}
+
 static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM                                         // main program + data
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x380000, 0x39ffff) AM_RAM                                         // work RAM
-	AM_RANGE(0x400000, 0x43ffff) AM_READNOP // AM_READ(K053936_0_rom_r )       // '936 ROM readback window
+	AM_RANGE(0x400000, 0x43ffff) AM_READ8(rng_53936_rom_r,0x00ff)					    // '936 ROM readback window
 	AM_RANGE(0x480000, 0x48001f) AM_READWRITE(rng_sysregs_r, rng_sysregs_w) AM_SHARE("sysreg")
 	AM_RANGE(0x4c0000, 0x4c001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                        // CCU (for scanline and vblank polling)
 	AM_RANGE(0x540000, 0x540001) AM_WRITE(sound_irq_w)
+	// 0x580006 written at POST.
 	AM_RANGE(0x58000c, 0x58000d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x58000e, 0x58000f) AM_WRITE(sound_cmd2_w)
+	// 0x580010 status for $580006 writes at POST
 	AM_RANGE(0x580014, 0x580015) AM_READ(sound_status_msb_r)
 	AM_RANGE(0x580000, 0x58001f) AM_RAM                                         // sound regs read/write fall-through
 	AM_RANGE(0x5c0000, 0x5c000f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)                       // 246A ROM readback window
@@ -263,6 +273,9 @@ static INPUT_PORTS_START( rng )
 	PORT_START("DSW")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_DIPNAME( 0x04, 0x04, "Bit2 (Unknown)" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x10, 0x00, "Monitors" )
 	PORT_DIPSETTING(    0x00, "1" )
@@ -273,9 +286,6 @@ static INPUT_PORTS_START( rng )
 	PORT_DIPNAME( 0x40, 0x00, "Sound Output" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Mono ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bit2 (Unknown)" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Bit7 (Unknown)" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -324,6 +334,7 @@ void rungun_state::machine_start()
 {
 	UINT8 *ROM = memregion("soundcpu")->base();
 
+	m_roz_rom = memregion("gfx1")->base();
 	membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 	save_item(NAME(m_sound_ctrl));
@@ -421,7 +432,7 @@ ROM_START( rungun )
 
 	/* '936 tiles */
 	ROM_REGION( 0x400000, "gfx1", 0)
-	ROM_LOAD( "247-a13", 0x000000, 0x200000, CRC(cc194089) SHA1(b5af94f5f583d282ac1499b371bbaac8b2fedc03) )
+	ROM_LOAD( "247-a13", 0x000000, 0x200000, BAD_DUMP CRC(cc194089) SHA1(b5af94f5f583d282ac1499b371bbaac8b2fedc03) )
 
 	/* sprites */
 	ROM_REGION( 0x800000, "gfx2", 0)
@@ -462,7 +473,7 @@ ROM_START( runguna )
 
 	/* '936 tiles */
 	ROM_REGION( 0x400000, "gfx1", 0)
-	ROM_LOAD( "247-a13", 0x000000, 0x200000, CRC(cc194089) SHA1(b5af94f5f583d282ac1499b371bbaac8b2fedc03) )
+	ROM_LOAD( "247-a13", 0x000000, 0x200000, BAD_DUMP CRC(cc194089) SHA1(b5af94f5f583d282ac1499b371bbaac8b2fedc03) )
 
 	/* sprites */
 	ROM_REGION( 0x800000, "gfx2", 0)
@@ -508,7 +519,7 @@ ROM_START( rungunb )
 
 	/* '936 tiles */
 	ROM_REGION( 0x400000, "gfx1", 0)
-	ROM_LOAD( "247-a13", 0x000000, 0x200000, CRC(cc194089) SHA1(b5af94f5f583d282ac1499b371bbaac8b2fedc03) )
+	ROM_LOAD( "247-a13", 0x000000, 0x200000, BAD_DUMP CRC(cc194089) SHA1(b5af94f5f583d282ac1499b371bbaac8b2fedc03) )
 
 	/* sprites */
 	ROM_REGION( 0x800000, "gfx2", 0)
@@ -629,7 +640,7 @@ ROM_START( slmdunkj )
 
 	/* '936 tiles */
 	ROM_REGION( 0x400000, "gfx1", 0)
-	ROM_LOAD( "247-a13", 0x000000, 0x200000, CRC(cc194089) SHA1(b5af94f5f583d282ac1499b371bbaac8b2fedc03) )
+	ROM_LOAD( "247-a13", 0x000000, 0x200000, BAD_DUMP CRC(cc194089) SHA1(b5af94f5f583d282ac1499b371bbaac8b2fedc03) )
 
 	/* sprites */
 	ROM_REGION( 0x800000, "gfx2", 0)

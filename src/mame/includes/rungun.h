@@ -51,6 +51,9 @@ public:
 	int         m_ttl_gfx_index;
 	int         m_sprite_colorbase;
 
+	UINT8 		*m_roz_rom;
+	UINT8		m_roz_rombase;
+	
 	/* sound */
 	UINT8       m_sound_ctrl;
 	UINT8       m_sound_status;
@@ -67,6 +70,7 @@ public:
 	DECLARE_READ16_MEMBER(rng_ttl_ram_r);
 	DECLARE_WRITE16_MEMBER(rng_ttl_ram_w);
 	DECLARE_WRITE16_MEMBER(rng_936_videoram_w);
+	DECLARE_READ8_MEMBER(rng_53936_rom_r);
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_rng_936_tile_info);
 	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
