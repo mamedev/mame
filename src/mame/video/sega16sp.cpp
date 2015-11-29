@@ -826,7 +826,7 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 
 sega_sys16b_sprite_device::sega_sys16b_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_16bit_sprite_device(mconfig, SEGA_SYS16B_SPRITES, "Sega System 16B Sprites", tag, owner, "sega_16bit_sprite", __FILE__)
-	, m_sprite_region(*this, tag)
+	, m_sprite_region(*this, this->tag())
 {
 	set_local_origin(184, 0x00, -184, 0);
 }

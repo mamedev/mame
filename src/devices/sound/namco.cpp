@@ -38,7 +38,7 @@ const device_type NAMCO_CUS30 = &device_creator<namco_cus30_device>;
 namco_audio_device::namco_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	, device_sound_interface(mconfig, *this)
-	, m_wave_region(*this, tag)
+	, m_wave_region(*this, this->tag())
 	, m_last_channel(nullptr)
 	, m_soundregs(nullptr)
 	, m_wavedata(nullptr)
@@ -110,11 +110,7 @@ void namco_audio_device::device_start()
 	/* register with the save state system */
 	save_pointer(NAME(m_soundregs), 0x400);
 
-<<<<<<< HEAD
-	if (region() == nullptr)
-=======
-	if (m_wave_region == NULL)
->>>>>>> Yet more this==NULL fixes
+	if (m_wave_region == nullptr)
 		save_pointer(NAME(m_wavedata), 0x400);
 
 	save_item(NAME(m_voices));

@@ -95,7 +95,7 @@ c140_device::c140_device(const machine_config &mconfig, const char *tag, device_
 	, m_mixer_buffer_left(nullptr),
 	, m_mixer_buffer_right(nullptr),
 	, m_baserate(0),
-	, m_rom_region(*this, tag)
+	, m_rom_region(*this, this->tag())
 	, m_pRom(nullptr)
 {
 	memset(m_REG, 0, sizeof(UINT8)*0x200);

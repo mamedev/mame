@@ -1749,7 +1749,6 @@ void ymf271_device::device_reset()
 
 const device_type YMF271 = &device_creator<ymf271_device>;
 
-<<<<<<< HEAD
 ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YMF271, "YMF271", tag, owner, clock, "ymf271", __FILE__)
 	, device_sound_interface(mconfig, *this)
@@ -1766,7 +1765,7 @@ ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, dev
 	, m_irq_handler(*this)
 	, m_ext_read_handler(*this)
 	, m_ext_write_handler(*this)
-	, m_mem_region(*this, tag)
+	, m_mem_region(*this, this->tag())
 	, m_clock(0)
 	, m_timA(nullptr)
 	, m_timB(nullptr)

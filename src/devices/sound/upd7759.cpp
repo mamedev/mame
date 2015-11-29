@@ -171,7 +171,7 @@ upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, 
 	, m_adpcm_state(0)
 	, m_adpcm_data(0)
 	, m_sample(0)
-	, m_rom_region(*this, tag)
+	, m_rom_region(*this, this->tag())
 	, m_rom(nullptr)
 	, m_rombase(nullptr)
 	, m_romoffset(0)

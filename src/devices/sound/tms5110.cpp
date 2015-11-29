@@ -1537,7 +1537,7 @@ const device_type TMS5110 = &device_creator<tms5110_device>;
 tms5110_device::tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS5110, "TMS5110", tag, owner, clock, "tms5110", __FILE__),
 	, device_sound_interface(mconfig, *this)
-	, m_table_region(*this, tag)
+	, m_table_region(*this, this->tag())
 	, m_m0_cb(*this)
 	, m_m1_cb(*this)
 	, m_addr_cb(*this)
@@ -1549,7 +1549,7 @@ tms5110_device::tms5110_device(const machine_config &mconfig, const char *tag, d
 tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_sound_interface(mconfig, *this)
-	, m_table_region(*this, tag)
+	, m_table_region(*this, this->tag())
 	, m_m0_cb(*this)
 	, m_m1_cb(*this)
 	, m_addr_cb(*this)
