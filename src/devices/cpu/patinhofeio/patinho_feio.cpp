@@ -10,6 +10,10 @@
 
 #define PC       m_pc //The program counter is called "contador de instrucoes" in portuguese
 #define ACC      m_acc
+#define FLAGS    m_flags
+
+#define V 0x01 // V = "Vai um" (Carry)
+#define T 0x02 // T = "Transbordo" (Overflow)
 
 #define READ_BYTE_PATINHO(A) ((signed)m_program->read_byte(A))
 #define WRITE_BYTE_PATINHO(A,V) (m_program->write_byte(A,V))
@@ -47,6 +51,7 @@ void patinho_feio_cpu_device::device_start()
     state_add( PATINHO_FEIO_ACC,        "ACC",      m_acc        ).mask(0xFF);
     state_add( PATINHO_FEIO_IDX,        "IDX",      m_idx        ).mask(0xFF);
     state_add(STATE_GENPC, "GENPC", m_pc).formatstr("0%06O").noshow();
+    state_add(STATE_GENFLAGS,  "GENFLAGS",  m_flags).noshow().formatstr("%8s");
 
     m_icountptr = &m_icount;
 }
@@ -56,6 +61,7 @@ void patinho_feio_cpu_device::device_reset()
     m_pc = 0xE00;
     m_acc = 0;
     m_idx = READ_INDEX_REG();
+    m_flags = 0;
     m_run = true;
     
     for (int c=0; c<16; c++) {
@@ -97,6 +103,33 @@ void patinho_feio_cpu_device::execute_instruction()
             //     Load an immediate into the accumulator
             ACC = READ_BYTE_PATINHO(PC);
             INCREMENT_PC_4K;
+            return;
+        case 0x80:
+            //LIMPO:
+            //    Clear accumulator and flags
+            ACC = 0;
+            FLAGS = 0;
+            return;
+        case 0x81:
+            //UM="One":
+            //    Load 1 into accumulator
+            //    and clear the flags
+            ACC = 1;
+            FLAGS = 0;
+            return;
+        case 0x82:
+            //CMP1:
+            // Compute One's complement of the accumulator
+            //    and clear the flags
+            ACC = ~ACC;
+            FLAGS = 0;
+            return;
+        case 0x83:
+            //CMP2:
+            // Compute Two's complement of the accumulator
+            //    and updates flags according to the result of the operation
+            ACC = ~ACC + 1;
+            FLAGS = 0; //TODO: fix-me (I'm not sure yet how to compute the flags here)
             return;
         case 0x9A:
             //INIB="Inibe"

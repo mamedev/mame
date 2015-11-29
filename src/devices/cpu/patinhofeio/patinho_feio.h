@@ -39,6 +39,10 @@ protected:
     bool m_wait_for_interrupt;
     bool m_interrupts_enabled;
 
+    bool m_flags;
+    // V = "Vai um" (Carry flag)
+    // T = "Transbordo" (Overflow flag)
+    
     int m_io_status[16];
     bool m_device_is_ok[16];
     bool m_IRQ_request[16];
