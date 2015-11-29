@@ -30,9 +30,6 @@
 #define MCFG_MC6845_SHOW_BORDER_AREA(_show) \
 	mc6845_device::set_show_border_area(*device, _show);
 
-#define MCFG_MC6845_INTERLACE_ADJUST(_value) \
-	mc6845_device::set_interlace_adjust(*device, _value);
-
 #define MCFG_MC6845_VISAREA_ADJUST(_minx, _maxx, _miny, _maxy) \
 	mc6845_device::set_visarea_adjust(*device, _minx, _maxx, _miny, _maxy);
 
@@ -106,7 +103,6 @@ public:
 	mc6845_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	static void set_show_border_area(device_t &device, bool show) { downcast<mc6845_device &>(device).m_show_border_area = show; }
-	static void set_interlace_adjust(device_t &device, int value) { downcast<mc6845_device &>(device).m_interlace_adjust = value; }
 	static void set_visarea_adjust(device_t &device, int min_x, int max_x, int min_y, int max_y)
 	{
 		mc6845_device &dev = downcast<mc6845_device &>(device);
