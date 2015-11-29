@@ -143,7 +143,7 @@ void MemoryWindow::memoryRegionChanged(int index)
 
 	// Update the chunk size radio buttons to the memory region's default
 	debug_view_memory* memView = downcast<debug_view_memory*>(m_memTable->view());
-	switch(memView->bytes_per_chunk())
+	switch(memView->get_data_format())
 	{
 		case 1: chunkSizeMenuItem("chunkActOne")->setChecked(true); break;
 		case 2: chunkSizeMenuItem("chunkActTwo")->setChecked(true); break;
@@ -176,15 +176,15 @@ void MemoryWindow::chunkChanged(QAction* changedTo)
 	debug_view_memory* memView = downcast<debug_view_memory*>(m_memTable->view());
 	if (changedTo->text() == "1-byte chunks")
 	{
-		memView->set_bytes_per_chunk(1);
+		memView->set_data_format(1);
 	}
 	else if (changedTo->text() == "2-byte chunks")
 	{
-		memView->set_bytes_per_chunk(2);
+		memView->set_data_format(2);
 	}
 	else if (changedTo->text() == "4-byte chunks")
 	{
-		memView->set_bytes_per_chunk(4);
+		memView->set_data_format(4);
 	}
 	m_memTable->viewport()->update();
 }
