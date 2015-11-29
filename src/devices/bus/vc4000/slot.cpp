@@ -16,6 +16,7 @@
 //**************************************************************************
 
 const device_type VC4000_CART_SLOT = &device_creator<vc4000_cart_slot_device>;
+const device_type H21_CART_SLOT = &device_creator<h21_cart_slot_device>;
 
 //**************************************************************************
 //    VC4000 Cartridges Interface
@@ -110,6 +111,18 @@ void vc4000_cart_slot_device::device_config_complete()
 	update_names();
 }
 
+//-------------------------------------------------
+//  trq h-21 slot
+//-------------------------------------------------
+
+h21_cart_slot_device::h21_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	vc4000_cart_slot_device(mconfig, tag, owner, clock)
+{
+}
+
+h21_cart_slot_device::~h21_cart_slot_device()
+{
+}
 
 //-------------------------------------------------
 //  VC4000 PCB

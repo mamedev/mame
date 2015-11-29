@@ -557,30 +557,33 @@ static MACHINE_CONFIG_START( vc4000, vc4000_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vc4000")
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_DERIVED( cx3000tc, vc4000 )
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cx3000tc")
 MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_DERIVED( mpu1000, vc4000 )
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "mpu1000")
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_DERIVED( database, vc4000 )
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "database")
 MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_DERIVED( rwtrntcs, vc4000 )
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "rwtrntcs")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( h21, vc4000 )
+	MCFG_DEVICE_REMOVE("cartslot")
+	MCFG_H21_CARTRIDGE_ADD("cartslot", vc4000_cart, NULL)
+
+	MCFG_DEVICE_REMOVE("cart_list")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "h21")
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( elektor, vc4000 )
 	MCFG_CPU_MODIFY("maincpu")
@@ -589,6 +592,7 @@ static MACHINE_CONFIG_DERIVED( elektor, vc4000 )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
+
 
 ROM_START( vc4000 )
 	ROM_REGION( 0x2000,"maincpu", ROMREGION_ERASEFF )
@@ -682,6 +686,10 @@ ROM_START( mpt05 )
 	ROM_REGION( 0x2000,"maincpu", ROMREGION_ERASEFF )
 ROM_END
 
+ROM_START( h21 )
+	ROM_REGION( 0x2000,"maincpu", ROMREGION_ERASEFF )
+ROM_END
+
 ROM_START( elektor )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "elektor.rom", 0x0000, 0x0800, CRC(e6ef1ee1) SHA1(6823b5a22582344016415f2a37f9f3a2dc75d2a7))
@@ -713,4 +721,5 @@ CONS(1979, telngtcs, rwtrntcs,  0,        rwtrntcs,  vc4000, driver_device,     
 CONS(1979, krvnjvtv, 0,         vc4000,   vc4000,    vc4000, driver_device,      0,        "SOE",              "OC Jeu Video TV Karvan", MACHINE_IMPERFECT_GRAPHICS )    /* France */
 CONS(1979, oc2000,   krvnjvtv,  0,        vc4000,    vc4000, driver_device,      0,        "SOE",              "OC-2000",          MACHINE_IMPERFECT_GRAPHICS )          /* France */
 CONS(1980, mpt05,    0,         vc4000,   vc4000,    vc4000, driver_device,      0,        "ITMC",             "MPT-05",           MACHINE_IMPERFECT_GRAPHICS )          /* France */
+CONS(1982, h21,      0,         0,        h21,       vc4000, driver_device,      0,        "TRQ",              "Video Computer H-21", MACHINE_IMPERFECT_GRAPHICS) // Spain
 CONS(1979, elektor,  0,         0,        elektor,   elektor, driver_device,     0,        "Elektor",          "Elektor TV Games Computer", MACHINE_IMPERFECT_GRAPHICS )
