@@ -25,11 +25,13 @@ protected:
 
     /* processor registers */
     int m_acc;        /* accumulator (8 bits) */
-    int m_ci;         /* program counter (12 bits)
+    int m_pc;         /* program counter (12 bits)
                          (CI stands for "Contador de Instrucao") */
 
     /* processor state flip-flops */
     bool m_run;       /* processor is running */
+    bool m_wait_for_interrupt;
+    bool m_interrupts_enabled;
 
     int m_address_mask;       /* address mask */
     int m_icount;
