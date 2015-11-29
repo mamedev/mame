@@ -4162,6 +4162,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/adp.cpp",
 	MAME_DIR .. "src/mame/drivers/alinvade.cpp",
 	MAME_DIR .. "src/mame/drivers/amaticmg.cpp",
+	MAME_DIR .. "src/mame/drivers/amerihok.cpp",
 	MAME_DIR .. "src/mame/drivers/ampoker2.cpp",
 	MAME_DIR .. "src/mame/includes/ampoker2.h",
 	MAME_DIR .. "src/mame/video/ampoker2.cpp",
