@@ -11,6 +11,11 @@ enum
 	PATINHO_FEIO_CI=1, PATINHO_FEIO_ACC, PATINHO_FEIO_IDX
 };
 
+enum {
+    DEVICE_BUSY=0,
+    DEVICE_READY=1
+};
+
 class patinho_feio_cpu_device : public cpu_device
 {
 public:
@@ -33,6 +38,10 @@ protected:
     bool m_run;       /* processor is running */
     bool m_wait_for_interrupt;
     bool m_interrupts_enabled;
+
+    int m_io_status[16];
+    bool m_device_is_ok[16];
+    bool m_IRQ_request[16];
 
     int m_address_mask;       /* address mask */
     int m_icount;

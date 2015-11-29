@@ -51,13 +51,19 @@ void patinho_feio_cpu_device::device_start()
     m_icountptr = &m_icount;
 }
 
-
 void patinho_feio_cpu_device::device_reset()
 {
     m_pc = 0xE00;
     m_acc = 0;
     m_idx = READ_INDEX_REG();
     m_run = true;
+    
+    for (int c=0; c<16; c++) {
+        m_device_is_ok[c] = true;
+        m_io_status[c] = DEVICE_READY;
+        m_IRQ_request[c] = false;
+    }
+    
 }
 
 /* execute instructions on this CPU until icount expires */
@@ -80,7 +86,8 @@ void patinho_feio_cpu_device::execute_instruction()
 {
     debugger_instruction_hook(this, PC);
     offs_t addr;
-    unsigned char value;
+    bool skip;
+    unsigned char value, channel, function;
     unsigned char opcode = READ_BYTE_PATINHO(PC);
     INCREMENT_PC_4K;
 
@@ -126,18 +133,42 @@ void patinho_feio_cpu_device::execute_instruction()
             //Executes I/O functions
             //TODO: Implement-me!
             value = READ_BYTE_PATINHO(PC);
+            channel = opcode & 0x0F;
+            function = value & 0x0F;
             switch(value & 0xF0){
                 case 0x10:
-                    printf("Unimplemented FNC /%X%X instruction\n", opcode & 0x0F, value & 0x0F);
+                    printf("Unimplemented FNC /%X%X instruction\n", channel, function);
                     break;
                 case 0x20:
-                    printf("Unimplemented SAL /%X%X instruction\n", opcode & 0x0F, value & 0x0F);
+                    //SAL="Salta"
+                    //    Skips a couple bytes if a condition is met
+                    skip = false;
+                    switch(function)
+                    {
+                        case 1:
+                            if (m_io_status[channel] == DEVICE_READY)
+                                skip = true;
+                            break;
+                        case 2:
+                            if (m_device_is_ok[channel])
+                                skip = true;
+                            break;
+                        case 4:
+                            if (m_IRQ_request[channel] == true)
+                                skip = true;
+                            break;
+                    }
+
+                    if (skip){
+                        INCREMENT_PC_4K;
+                        INCREMENT_PC_4K;
+                    }
                     break;
                 case 0x40:
-                    printf("Unimplemented ENTR /%X0 instruction\n", opcode & 0x0F);
+                    printf("Unimplemented ENTR /%X0 instruction\n", channel);
                     break;
                 case 0x80:
-                    printf("Unimplemented SAI /%X0 instruction\n", opcode & 0x0F);
+                    printf("Unimplemented SAI /%X0 instruction\n", channel);
                     break;
             }
             INCREMENT_PC_4K;
