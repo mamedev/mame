@@ -125,9 +125,19 @@ void patinho_feio_cpu_device::execute_instruction()
     switch (opcode & 0xF0){
         case 0x00:
             //PLA = "Pula": Jump to address
-            addr = READ_BYTE_PATINHO(PC) & 0xFFF;
+            addr = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
             INCREMENT_PC_4K;
             PC = addr;
+            return;
+        case 0xF0:
+            //PUG = "Pula e guarda": Jump and store.
+            //      It stores the return address to addr and addr+1
+            //      And then jumps to addr+2
+            addr = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+            INCREMENT_PC_4K;
+            WRITE_BYTE_PATINHO(addr, 0x12);//(PC >> 8) & 0x0F);
+            WRITE_BYTE_PATINHO(addr+1, 0x34);//PC & 0xFF);
+            PC = addr+2;
             return;
     }
     printf("unimplemented opcode: 0x%02X\n", opcode);
