@@ -28,16 +28,14 @@
      - missing sprites and priority
 
    Known Issues:
-     - no dual monitor support is broken
-        - games seem to think they're in dual-monitor mode when they're not
-        - speed in some sets is incorrect (for dual monitors I'm guessing it should
-          output alternate frames to alternate monitors, but due to other bugs it
-          just causes the game to run twice as fast as it should?)
-        - synchronization and other oddities (rungunu doesn't show attract mode)
-        - swapped P12 and P34 controls in 4-player mode team selectet (real puzzler)
-        - P3 and P4 coin chutes not working in 4-player mode
-
-
+     - no dual monitor support
+     - games seem to think they're in dual-monitor mode when they're not
+     - speed in some sets is incorrect (for dual monitors I'm guessing it should
+       output alternate frames to alternate monitors, but due to other bugs it
+       just causes the game to run twice as fast as it should?)
+     - synchronization and other oddities (rungunu doesn't show attract mode)
+     - swapped P12 and P34 controls in 4-player mode team selectet (real puzzler)
+     - P3 and P4 coin chutes not working in 4-player mode
      - sprite palettes are not entirely right
 
 *************************************************************************/
@@ -121,10 +119,11 @@ WRITE16_MEMBER(rungun_state::rng_sysregs_w)
 
 		case 0x0c/2:
 			/*
-			    bit 0 : also enables IRQ???
-			    bit 1 : disable PSAC2 input?
-			    bit 2 : OBJCHA
-			    bit 3 : enable IRQ 5
+			    bit 0  : also enables IRQ???
+			    bit 1  : disable PSAC2 input?
+			    bit 2  : OBJCHA
+			    bit 3  : enable IRQ 5
+				bit 7-4: base address for 53936 ROM readback.
 			*/
 			m_k055673->k053246_set_objcha_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 			m_roz_rombase = (data & 0xf0) >> 4;
@@ -166,6 +165,7 @@ INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
 
 READ8_MEMBER(rungun_state::rng_53936_rom_r)
 {
+	// TODO: odd addresses returns ...?
 	UINT32 rom_addr = offset;
 	rom_addr+= (m_roz_rombase)*0x20000;
 	return m_roz_rom[rom_addr];
@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM                                         // main program + data
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x380000, 0x39ffff) AM_RAM                                         // work RAM
-	AM_RANGE(0x400000, 0x43ffff) AM_READ8(rng_53936_rom_r,0x00ff)					    // '936 ROM readback window
+	AM_RANGE(0x400000, 0x43ffff) AM_READ8(rng_53936_rom_r,0x00ff)			    // '936 ROM readback window
 	AM_RANGE(0x480000, 0x48001f) AM_READWRITE(rng_sysregs_r, rng_sysregs_w) AM_SHARE("sysreg")
 	AM_RANGE(0x4c0000, 0x4c001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                        // CCU (for scanline and vblank polling)
 	AM_RANGE(0x540000, 0x540001) AM_WRITE(sound_irq_w)
@@ -412,6 +412,8 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+// Older non-US 53936/A13 roms were all returning bad from the mask ROM check. Using the US ROM on non-US reports good therefore I guess that data matches for that
+// across all sets.
 
 ROM_START( rungun )
 	/* main program Europe Version AA  1993, 10.8 */
