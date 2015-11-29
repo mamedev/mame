@@ -332,6 +332,7 @@ Soul Surfer (Rev A)                           840-0095C  23838C  21 (64Mb)   pre
 Star Horse (server)                           840-0055C  23626   17 (64Mb)   present  315-6206  not present   requires 837-13785 ARCNET&IO BD
 The King of Route 66 (Rev A)                  840-0087C  23819A  20 (64Mb)   present  315-6206  not present   content is the same as regular 171-8132A cart
 The Maze of the Kings (prototype)               no cart  *       21 (64Mb)   present  315-6206  FRI           * flash-PCB, not dumped but known to exist
+Tokyo Bus Guide (Rev A)                       840-0045C  23468A  18 (64Mb)   present  315-6206  317-0290-COM
 Virtua NBA (prototype)                          no cart  *       21 (64Mb)   present  315-6206  317-0271-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
 Virtua Tennis / Power Smash (prototype)         no cart  *       21 (64Mb)   present  315-6206  317-0263-COM  * flash-PCB, title screen have label "SOFT R&D Dept.#3", not dumped but known to exist
 
@@ -4636,6 +4637,39 @@ ROM_START( toyfight )
 
 	// 840-0011    1999     317-0257-COM   Naomi
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2802ca85" )
+ROM_END
+
+ROM_START( tokyobus )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x9800000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD("epr-23468a.ic22", 0x0000000,  0x0400000, CRC(678c3d50) SHA1(9f66cfc84b8404cb36ce7ac4fd36354cde4d7287) )
+
+	ROM_LOAD("rom1.ic1s",   0x0800000, 0x0800000, CRC(b1745bef) SHA1(c1da146c47e9f087fff10dc3e9fdac75ac47b036) )
+	ROM_LOAD("rom2.ic2s",   0x1000000, 0x0800000, CRC(46f870d4) SHA1(1595cdc81dfeb244bf76624bb98c838f177069c6) )
+	ROM_LOAD("rom3.ic3s",   0x1800000, 0x0800000, CRC(c1c23455) SHA1(80d71d0c6fddcef22ec6f3be2487309b3ebd6472) )
+	ROM_LOAD("rom4.ic4s",   0x2000000, 0x0800000, CRC(aade3bd2) SHA1(4f56cbabe97b97ad0168875d7d2000f9fefc6249) )
+	ROM_LOAD("rom5.ic5s",   0x2800000, 0x0800000, CRC(67d5388e) SHA1(20ba85a74cf76636809f244d2cbf2f4c2fbecc46) )
+	ROM_LOAD("rom6.ic6s",   0x3000000, 0x0800000, CRC(afe87482) SHA1(b5f5dc0efcd318b24dec3222a3af6086db859126) )
+	ROM_LOAD("rom7.ic7s",   0x3800000, 0x0800000, CRC(085dc934) SHA1(6ecd787e3c03c083597ea2eedd2cb01ea721b32c) )
+	ROM_LOAD("rom8.ic8s",   0x4000000, 0x0800000, CRC(b97c5c92) SHA1(666aee8a59d2cd4707fb6a3020c5e0f4405ec7e3) )
+	ROM_LOAD("rom9.ic9s",   0x4800000, 0x0800000, CRC(6fe3bb9b) SHA1(b01f7223f87f948994abbc35c04b1a60d29feba5) )
+	ROM_LOAD("rom10.ic10s", 0x5000000, 0x0800000, CRC(de1e94a3) SHA1(515d1a4ffc1951027ef64c47bd961d8be7664bce) )
+	ROM_LOAD("rom11.ic11s", 0x5800000, 0x0800000, CRC(75ed80cf) SHA1(29ce9958b1c8acbd6c7539ac94e00f398b48c0dd) )
+	ROM_LOAD("rom12.ic12s", 0x6000000, 0x0800000, CRC(cc51375e) SHA1(39b5de47c5dca5590c6b49bf2c8220791f4183a2) )
+	ROM_LOAD("rom13.ic13s", 0x6800000, 0x0800000, CRC(f0b0e433) SHA1(e0560aed1a1aab1052f2ce9a01f57d951e2935ab) )
+	ROM_LOAD("rom14.ic14s", 0x7000000, 0x0800000, CRC(55075270) SHA1(94908dd535e48eb21d230a4d3043e84584b5776a) )
+	ROM_LOAD("rom15.ic15s", 0x7800000, 0x0800000, CRC(1e76ed6c) SHA1(99624ceca7866cb3c38c27427a9790610b2713b9) )
+	ROM_LOAD("rom16.ic16s", 0x8000000, 0x0800000, CRC(4a397889) SHA1(1b1b10b5911d2260d84e46f6336eaaf2ab55e159) )
+	ROM_LOAD("rom17.ic17s", 0x8800000, 0x0800000, CRC(7101f0f4) SHA1(c2b7ae2b397a8e2ef21833f7e73c0ab4a5350cb7) )
+	ROM_LOAD("rom18.ic18s", 0x9000000, 0x0800000, CRC(9ef1d214) SHA1(b4ea13fe52aff3440f66361c44bda988eafcd783) )
+
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "sflash.ic37",   0x000000, 0x000084, CRC(4013005e) SHA1(c38eb9d4118d7fd74dc01b6f251a277c5a837e37) )
+
+	// 840-0045    1999     317-0290-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "281e1242" )
 ROM_END
 
 /* Crazy Taxi */
@@ -9203,8 +9237,8 @@ ROM_END
 /* 0043 */ GAME( 2000, crackndj, naomi,    naomim2, crackndj,naomi_state, naomi,   ROT0, "Sega", "Crackin' DJ", GAME_FLAGS )
 /* 0044 */ GAME( 2000, csmasho,  csmash,   naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Cosmic Smash (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
 /* 0044 */ GAME( 2000, csmash,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_FLAGS )
-// 0045 1999, "FortyFive / Sega", "Tokio Bus Guide"
-// 0045 1999, "FortyFive / Sega", "Tokio Bus Guide (Rev A)"
+// 0045 1999, "FortyFive / Sega", "Tokyo Bus Guide"
+/* 0045 */ GAME( 1999, tokyobus, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Fortyfive", "Tokyo Bus Guide (Rev A)", GAME_FLAGS )
 /* 0047 */ GAME( 2000, samba2k,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Samba de Amigo ver. 2000", GAME_FLAGS )
 /* 0048 */ GAME( 2001, alienfnt, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Alien Front (Rev T)", GAME_FLAGS )
 /* 0048 */ GAME( 2001, alienfnta,alienfnt, naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Alien Front (Rev A)", GAME_FLAGS )
