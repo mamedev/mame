@@ -2143,6 +2143,7 @@ files {
 	MAME_DIR .. "src/mame/machine/mm1kb.cpp",
 	MAME_DIR .. "src/mame/machine/mm1kb.h",
 	MAME_DIR .. "src/mame/video/mikromik.cpp",
+	MAME_DIR .. "src/mame/drivers/nokia_3310.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "northstar")
