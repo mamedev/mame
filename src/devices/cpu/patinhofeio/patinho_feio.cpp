@@ -121,6 +121,25 @@ void patinho_feio_cpu_device::execute_instruction()
         m_scheduled_IND_bit_reset = true;
 
     switch (opcode){
+        case 0xD2:
+            //XOR: Computes the bitwise XOR of an immediate into the accumulator
+            ACC ^= READ_BYTE_PATINHO(PC);
+            INCREMENT_PC_4K;
+            //TODO: update T and V flags
+            return;
+        case 0xD4:
+            //NAND: Computes the bitwise XOR of an immediate into the accumulator
+            ACC = ~(ACC & READ_BYTE_PATINHO(PC));
+            INCREMENT_PC_4K;
+            //TODO: update T and V flags
+            return;
+        case 0xD8:
+            //SOMI="Soma Imediato":
+            //     Add an immediate into the accumulator
+            ACC += READ_BYTE_PATINHO(PC);
+            INCREMENT_PC_4K;
+            //TODO: update T and V flags
+            return;
         case 0xDA:
             //CARI="Carrega Imediato":
             //     Load an immediate into the accumulator

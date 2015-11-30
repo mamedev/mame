@@ -128,10 +128,10 @@ CPU_DISASSEMBLE( patinho_feio )
                         case 0x80: sprintf (buffer, "DDS     /%01X", value); return 2; //DDS = "Deslocamento para a direita com duplicacao de sinal": Shift right with sign duplication
                     }
                     break;
-                case 0x02: sprintf (buffer, "XOR     /%02X", value); return 2; //Logical XOR
-                case 0x04: sprintf (buffer, "NAND    /%02X", value); return 2; //Logical NAND
-                case 0x08: sprintf (buffer, "SOMI    /%02X", value); return 2; //SOMI = "Soma imediata": Add immediate value into accumulator
-                case 0x0A: sprintf (buffer, "CARI    /%02X", value); return 2; //CARI = "Carrega imediato": Loads an immediate value into the accumulator
+                case 0x02: sprintf (buffer, "XOR     /%02X", oprom[1]); return 2; //Logical XOR
+                case 0x04: sprintf (buffer, "NAND    /%02X", oprom[1]); return 2; //Logical NAND
+                case 0x08: sprintf (buffer, "SOMI    /%02X", oprom[1]); return 2; //SOMI = "Soma imediata": Add immediate value into accumulator
+                case 0x0A: sprintf (buffer, "CARI    /%02X", oprom[1]); return 2; //CARI = "Carrega imediato": Loads an immediate value into the accumulator
             }
             break;
         case 0xE0:
