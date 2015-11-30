@@ -38,6 +38,8 @@ protected:
     bool m_run;       /* processor is running */
     bool m_wait_for_interrupt;
     bool m_interrupts_enabled;
+    bool m_scheduled_IND_bit_reset;
+    bool m_indirect_addressing;
 
     bool m_flags;
     // V = "Vai um" (Carry flag)
@@ -68,7 +70,8 @@ protected:
     virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
 
 private:
-	void execute_instruction();
+    void execute_instruction();
+    unsigned int compute_effective_address(unsigned int addr);
 };
 
 

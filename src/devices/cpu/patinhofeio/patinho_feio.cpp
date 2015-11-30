@@ -15,14 +15,27 @@
 #define V 0x01 // V = "Vai um" (Carry)
 #define T 0x02 // T = "Transbordo" (Overflow)
 
-#define READ_BYTE_PATINHO(A) ((signed)m_program->read_byte(A))
+#define READ_BYTE_PATINHO(A) (m_program->read_byte(A))
 #define WRITE_BYTE_PATINHO(A,V) (m_program->write_byte(A,V))
+
+#define READ_WORD_PATINHO(A) (READ_BYTE_PATINHO(A+1)*256 + READ_BYTE_PATINHO(A))
 
 #define READ_INDEX_REG() READ_BYTE_PATINHO(0x000)
 #define WRITE_INDEX_REG(V) { WRITE_BYTE_PATINHO(0x000, V); m_idx = V; }
 
 #define ADDRESS_MASK_4K    0xFFF
 #define INCREMENT_PC_4K    (PC = (PC+1) & ADDRESS_MASK_4K)
+
+unsigned int patinho_feio_cpu_device::compute_effective_address(unsigned int addr){
+    unsigned int retval = addr;
+    if (m_indirect_addressing){
+        retval = READ_WORD_PATINHO(addr);
+        if (retval & 0x1000)
+            return compute_effective_address(retval & 0xFFF);
+    }
+
+    return retval;
+}
 
 const device_type PATINHO_FEIO  = &device_creator<patinho_feio_cpu_device>;
 
@@ -70,6 +83,8 @@ void patinho_feio_cpu_device::device_reset()
         m_IRQ_request[c] = false;
     }
     
+    m_scheduled_IND_bit_reset = false;
+    m_indirect_addressing = false;
 }
 
 /* execute instructions on this CPU until icount expires */
@@ -97,6 +112,12 @@ void patinho_feio_cpu_device::execute_instruction()
     unsigned char value, channel, function;
     unsigned char opcode = READ_BYTE_PATINHO(PC);
     INCREMENT_PC_4K;
+
+    if (m_scheduled_IND_bit_reset)
+        m_indirect_addressing = false;
+
+    if (m_indirect_addressing)
+        m_scheduled_IND_bit_reset = true;
 
     switch (opcode){
         case 0xDA:
@@ -185,6 +206,12 @@ void patinho_feio_cpu_device::execute_instruction()
             value = ACC;
             ACC = READ_INDEX_REG();
             WRITE_INDEX_REG(value);
+            return;
+        case 0x9F:
+            //IND="Enderecamento indireto":
+            //     Sets memory addressing for the next instruction to be indirect.
+            m_indirect_addressing = true;
+            m_scheduled_IND_bit_reset = false; //the next instruction execution will schedule it.
             return;
         case 0xCB:
             //Executes I/O functions
@@ -328,28 +355,29 @@ void patinho_feio_cpu_device::execute_instruction()
     switch (opcode & 0xF0){
         case 0x00:
             //PLA = "Pula": Jump to address
-            addr = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+            addr = compute_effective_address((opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
             INCREMENT_PC_4K;
             PC = addr;
             return;
         case 0x20:
             //ARM = "Armazena": Store the value of the accumulator into a given memory position
-            addr = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+            addr = compute_effective_address((opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
             INCREMENT_PC_4K;
             WRITE_BYTE_PATINHO(addr, ACC);
             return;
         case 0x30:
             //ARMX = "Armazena indexado": Store the value of the accumulator into a given indexed memory position
-            addr = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+            value = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
             INCREMENT_PC_4K;
             m_idx = READ_INDEX_REG();
-            WRITE_BYTE_PATINHO(m_idx + addr, ACC);
+            addr = compute_effective_address(m_idx + value);
+            WRITE_BYTE_PATINHO(addr, ACC);
             return;
         case 0xF0:
             //PUG = "Pula e guarda": Jump and store.
             //      It stores the return address to addr and addr+1
             //      And then jumps to addr+2
-            addr = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+            addr = compute_effective_address((opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
             INCREMENT_PC_4K;
             WRITE_BYTE_PATINHO(addr, (PC >> 8) & 0x0F);
             WRITE_BYTE_PATINHO(addr+1, PC & 0xFF);
