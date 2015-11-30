@@ -80,10 +80,14 @@ READ16_MEMBER(rungun_state::rng_sysregs_r)
 			/*
 			    bit0-7: coin mechs and services
 			    bit8 : freeze
-			    bit9 : joysticks layout(auto detect???)
+			    bit9 : screen output select
 			*/
-			return ioport("SYSTEM")->read();
-
+			{
+				UINT8 field_bit = machine().first_screen()->frame_number() & 1; 
+				if(m_single_screen_mode == true)
+					field_bit = 1;
+				return (ioport("SYSTEM")->read() & 0xfdff) | (field_bit << 9);
+			}
 		case 0x06/2:
 			if (ACCESSING_BITS_0_7)
 			{
@@ -110,14 +114,17 @@ WRITE16_MEMBER(rungun_state::rng_sysregs_w)
 				bit4  : coin counter #2 (when coin slot "common" is selected)
 			    bit7  : set before massive memory writes (video chip select?)
 			    bit10 : IRQ5 ACK
+				bit12 : if set, forces screen output to 1 monitor.
 				bit14 : (0) sprite on top of PSAC2 layer (1) other way around (title screen) 
 			*/
 			if (ACCESSING_BITS_0_7)
 			{
+				membank("spriteram_bank")->set_entry((data & 0x80) >> 7);
 				ioport("EEPROMOUT")->write(data, 0xff);
 			}
 			if (ACCESSING_BITS_8_15)
 			{
+				m_single_screen_mode = (data & 0x1000) == 0x1000;
 				m_video_priority_mode = (data & 0x4000) == 0x4000;
 				if (!(data & 0x400)) // actually a 0 -> 1 transition
 					m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
@@ -195,7 +202,7 @@ static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
 	AM_RANGE(0x5c0000, 0x5c000f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)                       // 246A ROM readback window
 	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVWRITE("k055673", k055673_device, k055673_reg_word_w)
 	AM_RANGE(0x600000, 0x600fff) AM_DEVREADWRITE("k055673", k055673_device, k053247_word_r, k053247_word_w)  // OBJ RAM
-	AM_RANGE(0x601000, 0x601fff) AM_RAM                                         // communication? second monitor buffer?
+	AM_RANGE(0x601000, 0x601fff) AM_RAMBANK("spriteram_bank")                                        	     // OBJ RAM, actually used as work RAM banked buffer 
 	AM_RANGE(0x640000, 0x640007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)                      // '246A registers
 	AM_RANGE(0x680000, 0x68001f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)          // '936 registers
 	AM_RANGE(0x6c0000, 0x6cffff) AM_RAM_WRITE(rng_936_videoram_w) AM_SHARE("936_videoram")  // PSAC2 ('936) RAM (34v + 35v)
@@ -346,6 +353,10 @@ void rungun_state::machine_start()
 	m_roz_rom = memregion("gfx1")->base();
 	membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
+	m_banked_ram = auto_alloc_array_clear(machine(), UINT16, 0x2000);
+	membank("spriteram_bank")->configure_entries(0,2,&m_banked_ram[0],0x1000);
+
+	
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_status));
 	save_item(NAME(m_sound_nmi_clk));
@@ -402,9 +413,11 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	MCFG_K055673_CONFIG("gfx2", 1, K055673_LAYOUT_RNG, -8, 15)
 	MCFG_K055673_GFXDECODE("gfxdecode")
 	MCFG_K055673_PALETTE("palette")
+	MCFG_K055673_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("k053252", K053252, 16000000/2)
 	MCFG_K053252_OFFSETS(9*8, 24)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -419,6 +432,24 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	MCFG_K054539_REGION_OVERRRIDE("shared")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
+// for dual-screen output Run and Gun requires the video de-multiplexer board connected to the Jamma output, this gives you 2 Jamma connectors, one for each screen.
+// this means when operated as a single dedicated cabinet the game runs at 60fps, and has smoother animations than when operated as a twin setup where each
+// screen only gets an update every other frame.
+static MACHINE_CONFIG_DERIVED( rng_dual, rng )
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_left)
+
+	MCFG_SCREEN_ADD("screen2", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(88, 88+384-1, 24, 24+224-1)
+	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_right)
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 // Older non-US 53936/A13 roms were all returning bad from the mask ROM check. Using the US ROM on non-US reports good therefore I guess that data matches for that
@@ -678,9 +709,12 @@ ROM_START( slmdunkj )
 ROM_END
 
 
+// these sets operate as single screen / dual screen depending on if you have the video de-multiplexer plugged in, and the dipswitch set to 1 or 2 monitors
 GAME( 1993, rungun,   0,      rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, runguna,  rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.4)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, rungunb,  rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 9.10, prototype?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, rungunu,  rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UAB 1993 10.12)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // runs twice as fast as it should, broken inputs!
-GAME( 1993, rungunua, rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UBA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )  // runs twice as fast as it should, broken inputs! broken attract!
+GAME( 1993, rungunua, rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UBA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, slmdunkj, rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Slam Dunk (ver JAA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
+// this set has no dipswitches to select single screen mode (they're not even displayed in test menu) it's twin cabinet ONLY
+GAME( 1993, rungunu,  rungun, rng_dual, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UAB 1993 10.12, dedicated twin cabinet)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) 

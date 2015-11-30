@@ -96,6 +96,9 @@ void rungun_state::video_start()
 	m_ttl_tilemap->set_transparent_pen(0);
 
 	m_sprite_colorbase = 0x20;
+
+	m_screen->register_screen_bitmap(m_rng_dual_demultiplex_left_temp);
+	m_screen->register_screen_bitmap(m_rng_dual_demultiplex_right_temp);
 }
 
 UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -116,5 +119,32 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 	
 	m_ttl_tilemap->mark_all_dirty();
 	m_ttl_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+
+// the 60hz signal gets split between 2 screens
+UINT32 rungun_state::screen_update_rng_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	UINT32 ret = 0;
+
+	if (machine().first_screen()->frame_number() & 1)
+	{
+		ret = screen_update_rng(screen, m_rng_dual_demultiplex_left_temp, cliprect);
+	}
+	else
+	{
+		// render every other frame to a temp bitmap
+		ret = screen_update_rng(screen, m_rng_dual_demultiplex_right_temp, cliprect);
+	}
+
+	copybitmap( bitmap, m_rng_dual_demultiplex_left_temp, 0, 0, 0, 0, cliprect);
+
+	return ret;
+}
+
+UINT32 rungun_state::screen_update_rng_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap( bitmap, m_rng_dual_demultiplex_right_temp, 0, 0, 0, 0, cliprect);
 	return 0;
 }
