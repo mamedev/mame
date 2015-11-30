@@ -424,6 +424,19 @@ void patinho_feio_cpu_device::execute_instruction()
             if (ACC == 0)
                 PC = addr;
             return;
+        case 0xE0:
+            //SUS = "Subtrai um ou Salta": Subtract one from the data in the given address
+            //                             or, if the data is zero, then simply skip a couple bytes.
+            addr = compute_effective_address((opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
+            INCREMENT_PC_4K;
+            value = READ_BYTE_PATINHO(addr);
+            if (value > 0){
+                WRITE_BYTE_PATINHO(addr, value-1);
+            } else {
+                INCREMENT_PC_4K;
+                INCREMENT_PC_4K;
+            }
+            return;
         case 0xF0:
             //PUG = "Pula e guarda": Jump and store.
             //      It stores the return address to addr and addr+1
