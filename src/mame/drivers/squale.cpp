@@ -186,11 +186,11 @@ MACHINE_CONFIG_END
 ROM_START( squale )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("v201")
-	ROM_SYSTEM_BIOS(0, "v102", "Version 1.2")
-	ROMX_LOAD( "sqmon_1v2.bin", 0x0000, 0x1000, CRC(c8635598) SHA1(fd944be3c17ec2be2de91c705e90214ca55aa63c), ROM_BIOS(1) )
-	ROM_RELOAD( 0x1000, 0x1000 )
-	ROM_SYSTEM_BIOS(1, "v201", "Version 2.1")
-	ROMX_LOAD( "sqmon_2r1.bin", 0x0000, 0x2000, CRC(ed57c707) SHA1(c8bd33a6fb07fe7f881f2605ad867b7e82366bfc), ROM_BIOS(2) )
+
+	ROM_SYSTEM_BIOS(0, "v201", "Version 2.1")
+	ROMX_LOAD( "sqmon_2r1.bin", 0x0000, 0x2000, CRC(ed57c707) SHA1(c8bd33a6fb07fe7f881f2605ad867b7e82366bfc), ROM_BIOS(1) )
+
+	// place ROM v1.2 signature here.
 
 	ROM_REGION( 0x1E0, "ef9365", 0 )
 	ROM_LOAD( "charset_ef9365.rom", 0x0000, 0x01E0, CRC(22BE2908) SHA1(3920ee887b8ca2887b3e0471bea7c1045a87fc10) )
