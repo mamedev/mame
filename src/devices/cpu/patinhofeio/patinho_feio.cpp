@@ -95,6 +95,7 @@ void patinho_feio_cpu_device::execute_run()
         if ((! m_run)){
             m_icount = 0;   /* if processor is stopped, just burn cycles */
         } else {
+            m_idx = READ_INDEX_REG();
             execute_instruction();
             m_icount --;
         }
