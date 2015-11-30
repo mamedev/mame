@@ -5,10 +5,10 @@
 
 CPU_DISASSEMBLE( patinho_feio )
 {
-	int addr, value, n, f;
+    int addr, value, n, f;
 
-	switch (oprom[0] & 0xF0)
-	{
+    switch (oprom[0] & 0xF0)
+    {
         case 0x00:
             //PLA = "Pula": Unconditionally JUMP to effective address
             addr = (oprom[0] & 0x0F) << 8 | oprom[1];
@@ -144,7 +144,7 @@ CPU_DISASSEMBLE( patinho_feio )
             addr = (oprom[0] & 0x0F) << 8 | oprom[1];
             sprintf (buffer, "PUG     /%03X", addr);
             return 2;
-	}
+    }
     sprintf (buffer, "illegal instruction");
-	return 1;
+    return 1;
 }

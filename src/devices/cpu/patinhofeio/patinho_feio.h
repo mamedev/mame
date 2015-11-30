@@ -8,7 +8,7 @@
 /* register IDs */
 enum
 {
-	PATINHO_FEIO_CI=1, PATINHO_FEIO_ACC, PATINHO_FEIO_IDX
+    PATINHO_FEIO_CI=1, PATINHO_FEIO_ACC, PATINHO_FEIO_IDX
 };
 
 enum {
@@ -19,23 +19,26 @@ enum {
 class patinho_feio_cpu_device : public cpu_device
 {
 public:
-	// construction/destruction
-	patinho_feio_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+    // construction/destruction
+    patinho_feio_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
 protected:
-	virtual void execute_run();
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+    virtual void execute_run();
+    virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
     address_space_config m_program_config;
 
     /* processor registers */
     unsigned char m_acc; /* accumulator (8 bits) */
     unsigned int m_pc;         /* program counter (12 bits)
-                         (CI stands for "Contador de Instrucao") */
+                                *  Actual register name is CI, which
+                                *  stands for "Contador de Instrucao"
+                                *  or "instructions counter".
+                                */
     unsigned char m_idx;
 
     /* processor state flip-flops */
-    bool m_run;       /* processor is running */
+    bool m_run;                /* processor is running */
     bool m_wait_for_interrupt;
     bool m_interrupts_enabled;
     bool m_scheduled_IND_bit_reset;
@@ -49,7 +52,7 @@ protected:
     bool m_device_is_ok[16];
     bool m_IRQ_request[16];
 
-    int m_address_mask;       /* address mask */
+    int m_address_mask;        /* address mask */
     int m_icount;
 
     address_space *m_program;

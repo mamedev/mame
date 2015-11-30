@@ -46,7 +46,7 @@ static ADDRESS_MAP_START(prog_8bit, AS_PROGRAM, 8, patinho_feio_cpu_device)
 ADDRESS_MAP_END
 
 patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, PATINHO_FEIO, "PATINHO FEIO", tag, owner, clock, "patinho_feio_cpu", __FILE__),
+    : cpu_device(mconfig, PATINHO_FEIO, "PATINHO FEIO", tag, owner, clock, "patinho_feio_cpu", __FILE__),
         m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, ADDRESS_MAP_NAME(prog_8bit)),
         m_icount(0)
 {
@@ -56,11 +56,11 @@ void patinho_feio_cpu_device::device_start()
 {
     m_program = &space(AS_PROGRAM);
 
-	save_item(NAME(m_pc));
-	save_item(NAME(m_acc));
+    save_item(NAME(m_pc));
+    save_item(NAME(m_acc));
 
-	// Register state for debugger
-	state_add( PATINHO_FEIO_CI,         "CI",       m_pc         ).mask(0xFFF);
+    // Register state for debugger
+    state_add( PATINHO_FEIO_CI,         "CI",       m_pc         ).mask(0xFFF);
     state_add( PATINHO_FEIO_ACC,        "ACC",      m_acc        ).mask(0xFF);
     state_add( PATINHO_FEIO_IDX,        "IDX",      m_idx        ).mask(0xFF);
     state_add(STATE_GENPC, "GENPC", m_pc).formatstr("0%06O").noshow();
@@ -90,16 +90,16 @@ void patinho_feio_cpu_device::device_reset()
 /* execute instructions on this CPU until icount expires */
 void patinho_feio_cpu_device::execute_run()
 {
-	do
-	{
-		if ((! m_run)){
-			m_icount = 0;   /* if processor is stopped, just burn cycles */
+    do
+    {
+        if ((! m_run)){
+            m_icount = 0;   /* if processor is stopped, just burn cycles */
         } else {
             execute_instruction();
-			m_icount --;
-		}
-	}
-	while (m_icount > 0);
+            m_icount --;
+        }
+    }
+    while (m_icount > 0);
 }
 
 /* execute one instruction */
@@ -389,7 +389,7 @@ void patinho_feio_cpu_device::execute_instruction()
 
 offs_t patinho_feio_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	extern CPU_DISASSEMBLE( patinho_feio );
-	return CPU_DISASSEMBLE_NAME(patinho_feio)(this, buffer, pc, oprom, opram, options);
+    extern CPU_DISASSEMBLE( patinho_feio );
+    return CPU_DISASSEMBLE_NAME(patinho_feio)(this, buffer, pc, oprom, opram, options);
 }
 
