@@ -332,6 +332,19 @@ void patinho_feio_cpu_device::execute_instruction()
             INCREMENT_PC_4K;
             PC = addr;
             return;
+        case 0x20:
+            //ARM = "Armazena": Store the value of the accumulator into a given memory position
+            addr = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+            INCREMENT_PC_4K;
+            WRITE_BYTE_PATINHO(addr, ACC);
+            return;
+        case 0x30:
+            //ARMX = "Armazena indexado": Store the value of the accumulator into a given indexed memory position
+            addr = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+            INCREMENT_PC_4K;
+            m_idx = READ_INDEX_REG();
+            WRITE_BYTE_PATINHO(m_idx + addr, ACC);
+            return;
         case 0xF0:
             //PUG = "Pula e guarda": Jump and store.
             //      It stores the return address to addr and addr+1
