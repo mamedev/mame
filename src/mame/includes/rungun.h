@@ -62,8 +62,6 @@ public:
 	bool		m_video_priority_mode;
 	UINT16		*m_banked_ram;
 	bool		m_single_screen_mode;
-	DECLARE_READ16_MEMBER(test_r);
-	DECLARE_WRITE16_MEMBER(test_w);
 	
 	DECLARE_READ16_MEMBER(rng_sysregs_r);
 	DECLARE_WRITE16_MEMBER(rng_sysregs_w);
