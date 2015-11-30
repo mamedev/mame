@@ -155,6 +155,18 @@ if (VIDEOS["EF9345"]~=null) then
 end
 
 --------------------------------------------------
+--
+--@src/devices/video/ef9365.h,VIDEOS["EF9365"] = true
+--------------------------------------------------
+
+if (VIDEOS["EF9365"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ef9365.cpp",
+		MAME_DIR .. "src/devices/video/ef9365.h",
+	}
+end
+
+--------------------------------------------------
 --@src/devices/video/epic12.h,VIDEOS["EPIC12"] = true
 --------------------------------------------------
 
