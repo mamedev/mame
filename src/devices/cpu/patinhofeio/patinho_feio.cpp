@@ -361,10 +361,10 @@ void patinho_feio_cpu_device::execute_instruction()
             return;
         case 0x10:
             //PLAX = "Pula indexado": Jump to indexed address
-            value = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+            tmp = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
             INCREMENT_PC_4K;
             m_idx = READ_INDEX_REG();
-            PC = compute_effective_address(m_idx + value);
+            PC = compute_effective_address(m_idx + tmp);
             return;
         case 0x20:
             //ARM = "Armazena": Store the value of the accumulator into a given memory position
@@ -374,10 +374,10 @@ void patinho_feio_cpu_device::execute_instruction()
             return;
         case 0x30:
             //ARMX = "Armazena indexado": Store the value of the accumulator into a given indexed memory position
-            value = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+            tmp = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
             INCREMENT_PC_4K;
             m_idx = READ_INDEX_REG();
-            addr = compute_effective_address(m_idx + value);
+            addr = compute_effective_address(m_idx + tmp);
             WRITE_BYTE_PATINHO(addr, ACC);
             return;
         case 0x40:
@@ -388,10 +388,10 @@ void patinho_feio_cpu_device::execute_instruction()
             return;
         case 0x50:
             //CARX = "Carga indexada": Load a value from a given indexed memory position into the accumulator
-            value = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+            tmp = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
             INCREMENT_PC_4K;
             m_idx = READ_INDEX_REG();
-            addr = compute_effective_address(m_idx + value);
+            addr = compute_effective_address(m_idx + tmp);
             ACC = READ_BYTE_PATINHO(addr);
             return;
         case 0x60:
@@ -403,12 +403,26 @@ void patinho_feio_cpu_device::execute_instruction()
             return;
         case 0x70:
             //SOMX = "Soma indexada": Add a value from a given indexed memory position into the accumulator
-            value = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+            tmp = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
             INCREMENT_PC_4K;
             m_idx = READ_INDEX_REG();
-            addr = compute_effective_address(m_idx + value);
+            addr = compute_effective_address(m_idx + tmp);
             ACC += READ_BYTE_PATINHO(addr);
             //TODO: update V and T flags
+            return;
+        case 0xA0:
+            //PLAN = "Pula se ACC negativo": Jump to a given address if ACC is negative
+            addr = compute_effective_address((opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
+            INCREMENT_PC_4K;
+            if ((signed char) ACC < 0)
+                PC = addr;
+            return;
+        case 0xB0:
+            //PLAZ = "Pula se ACC for zero": Jump to a given address if ACC is zero
+            addr = compute_effective_address((opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
+            INCREMENT_PC_4K;
+            if (ACC == 0)
+                PC = addr;
             return;
         case 0xF0:
             //PUG = "Pula e guarda": Jump and store.
