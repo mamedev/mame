@@ -5274,7 +5274,7 @@ PayTable   Js+  2P  3K  STR  FL  FH  4K  ?? SF  RF  (Bonus)
      Programs Available: PP0467
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pp0467_823-851.u68",   0x00000, 0x10000, CRC(b19d48ae) SHA1(8a27a791e6f132d70d1ea02860e11fedb8515989) ) /* Game Version: 823, Library Version: 851 */
+	ROM_LOAD( "pp0467_823-854.u68",   0x00000, 0x10000, CRC(b19d48ae) SHA1(8a27a791e6f132d70d1ea02860e11fedb8515989) ) /* Game Version: 823, Library Version: 854 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
