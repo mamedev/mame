@@ -26,7 +26,9 @@ public:
 		m_sysreg(*this, "sysreg"),
 		m_936_videoram(*this, "936_videoram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen")
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -43,6 +45,7 @@ public:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 
 	/* video-related */
 	tilemap_t   *m_ttl_tilemap;
@@ -84,6 +87,12 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	UINT32 screen_update_rng_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_rng_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	bitmap_ind16 m_rng_dual_demultiplex_left_temp;
+	bitmap_ind16 m_rng_dual_demultiplex_right_temp;
+
 	INTERRUPT_GEN_MEMBER(rng_interrupt);
 	INTERRUPT_GEN_MEMBER(audio_interrupt);
 };
