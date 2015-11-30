@@ -439,6 +439,9 @@ MACHINE_CONFIG_END
 // this means when operated as a single dedicated cabinet the game runs at 60fps, and has smoother animations than when operated as a twin setup where each
 // screen only gets an update every other frame.
 static MACHINE_CONFIG_DERIVED( rng_dual, rng )
+	MCFG_SCREEN_MODIFY("screen") // this needs to always render as we demux from the output of it
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+
 	MCFG_SCREEN_ADD("demultiplex1", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
