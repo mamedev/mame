@@ -359,6 +359,13 @@ void patinho_feio_cpu_device::execute_instruction()
             INCREMENT_PC_4K;
             PC = addr;
             return;
+        case 0x10:
+            //PLAX = "Pula indexado": Jump to indexed address
+            value = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+            INCREMENT_PC_4K;
+            m_idx = READ_INDEX_REG();
+            PC = compute_effective_address(m_idx + value);
+            return;
         case 0x20:
             //ARM = "Armazena": Store the value of the accumulator into a given memory position
             addr = compute_effective_address((opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
