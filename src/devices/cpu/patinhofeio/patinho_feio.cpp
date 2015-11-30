@@ -380,6 +380,20 @@ void patinho_feio_cpu_device::execute_instruction()
             addr = compute_effective_address(m_idx + value);
             WRITE_BYTE_PATINHO(addr, ACC);
             return;
+        case 0x40:
+            //CAR = "Carrega": Load a value from a given memory position into the accumulator
+            addr = compute_effective_address((opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC));
+            INCREMENT_PC_4K;
+            ACC = READ_BYTE_PATINHO(addr);
+            return;
+        case 0x50:
+            //CARX = "Carga indexada": Load a value from a given indexed memory position into the accumulator
+            value = (opcode & 0x0F) << 8 | READ_BYTE_PATINHO(PC);
+            INCREMENT_PC_4K;
+            m_idx = READ_INDEX_REG();
+            addr = compute_effective_address(m_idx + value);
+            ACC = READ_BYTE_PATINHO(addr);
+            return;
         case 0xF0:
             //PUG = "Pula e guarda": Jump and store.
             //      It stores the return address to addr and addr+1
