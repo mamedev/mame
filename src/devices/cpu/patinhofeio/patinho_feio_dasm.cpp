@@ -111,21 +111,21 @@ CPU_DISASSEMBLE( patinho_feio )
             }
             break;
         case 0xD0:
-            value = oprom[1];
+            value = oprom[1] & 0x0F;
             switch (oprom[0] & 0x0F)
             {
                 case 0x01:
                     switch (oprom[1] & 0xF0)
                     {
-                        case 0x00: sprintf (buffer, "DD      /%02X", value); return 2; //DD = "Deslocamento para a direita": Shift right
-                        case 0x10: sprintf (buffer, "DDV     /%02X", value); return 2; //DDV = "Deslocamento para a direita c/ V": Shift right with carry
-                        case 0x20: sprintf (buffer, "GD      /%02X", value); return 2; //GD = "Giro para a direita": Rotate right
-                        case 0x30: sprintf (buffer, "GDV     /%02X", value); return 2; //GDV = "Giro para a direita c/ V": Rotate right with carry
-                        case 0x40: sprintf (buffer, "DE      /%02X", value); return 2; //DE = "Deslocamento para a esquerda": Shift right
-                        case 0x50: sprintf (buffer, "DEV     /%02X", value); return 2; //DEV = "Deslocamento para a esquerda c/ V": Shift right with carry
-                        case 0x60: sprintf (buffer, "GE      /%02X", value); return 2; //GE = "Giro para a esquerda": Rotate right
-                        case 0x70: sprintf (buffer, "GEV     /%02X", value); return 2; //GEV = "Giro para a esquerda c/ V": Rotate right with carry
-                        case 0x80: sprintf (buffer, "DDS     /%02X", value); return 2; //DDS = "Deslocamento para a direita com duplicacao de sinal": Shift right with sign duplication
+                        case 0x00: sprintf (buffer, "DD      /%01X", value); return 2; //DD = "Deslocamento para a direita": Shift right
+                        case 0x10: sprintf (buffer, "DDV     /%01X", value); return 2; //DDV = "Deslocamento para a direita c/ V": Shift right with carry
+                        case 0x20: sprintf (buffer, "GD      /%01X", value); return 2; //GD = "Giro para a direita": Rotate right
+                        case 0x30: sprintf (buffer, "GDV     /%01X", value); return 2; //GDV = "Giro para a direita c/ V": Rotate right with carry
+                        case 0x40: sprintf (buffer, "DE      /%01X", value); return 2; //DE = "Deslocamento para a esquerda": Shift right
+                        case 0x50: sprintf (buffer, "DEV     /%01X", value); return 2; //DEV = "Deslocamento para a esquerda c/ V": Shift right with carry
+                        case 0x60: sprintf (buffer, "GE      /%01X", value); return 2; //GE = "Giro para a esquerda": Rotate right
+                        case 0x70: sprintf (buffer, "GEV     /%01X", value); return 2; //GEV = "Giro para a esquerda c/ V": Rotate right with carry
+                        case 0x80: sprintf (buffer, "DDS     /%01X", value); return 2; //DDS = "Deslocamento para a direita com duplicacao de sinal": Shift right with sign duplication
                     }
                     break;
                 case 0x02: sprintf (buffer, "XOR     /%02X", value); return 2; //Logical XOR

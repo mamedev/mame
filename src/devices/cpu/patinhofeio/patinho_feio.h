@@ -29,10 +29,10 @@ protected:
     address_space_config m_program_config;
 
     /* processor registers */
-    int m_acc;        /* accumulator (8 bits) */
-    int m_pc;         /* program counter (12 bits)
+    unsigned char m_acc; /* accumulator (8 bits) */
+    unsigned int m_pc;         /* program counter (12 bits)
                          (CI stands for "Contador de Instrucao") */
-    int m_idx;
+    unsigned char m_idx;
 
     /* processor state flip-flops */
     bool m_run;       /* processor is running */

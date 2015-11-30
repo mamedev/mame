@@ -93,6 +93,7 @@ void patinho_feio_cpu_device::execute_instruction()
     debugger_instruction_hook(this, PC);
     offs_t addr;
     bool skip;
+    unsigned int tmp;
     unsigned char value, channel, function;
     unsigned char opcode = READ_BYTE_PATINHO(PC);
     INCREMENT_PC_4K;
@@ -150,7 +151,7 @@ void patinho_feio_cpu_device::execute_instruction()
             return;
         case 0x87:
             //LIMP1:
-            //    Clear accumulator and sets V=1
+            //    Clear accumulator, reset T and set V
             ACC = 0;
             FLAGS = V;
             return;
@@ -189,6 +190,7 @@ void patinho_feio_cpu_device::execute_instruction()
             //Executes I/O functions
             //TODO: Implement-me!
             value = READ_BYTE_PATINHO(PC);
+            INCREMENT_PC_4K;
             channel = opcode & 0x0F;
             function = value & 0x0F;
             switch(value & 0xF0){
@@ -227,7 +229,99 @@ void patinho_feio_cpu_device::execute_instruction()
                     printf("Unimplemented SAI /%X0 instruction\n", channel);
                     break;
             }
+            return;
+        case 0xD1:
+            //Bit-Shift/Bit-Rotate instructions
+            value = READ_BYTE_PATINHO(PC);
             INCREMENT_PC_4K;
+            for (int i=0; i<4; i++){
+                if (value & (1<<i)){
+                    /* The number of shifts or rotations is determined by the
+                       ammount of 1 bits in the lower 4 bits of 'value' */
+                    switch(value & 0xF0)
+                    {
+                        case 0x00:
+                            //DD="Deslocamento para a Direita"
+                            //    Shift right
+                            FLAGS &= ~V;
+                            if (ACC & 1)
+                                FLAGS |= V;
+
+                            ACC >>= 1;
+                            break;
+                        case 0x20:
+                            //GD="Giro para a Direita"
+                            //    Rotate right
+                            FLAGS &= ~V;
+                            if (ACC & 1)
+                                FLAGS |= V;
+
+                            ACC = ((ACC & 1) << 7) | (ACC >> 1);
+                            break;
+                        case 0x10: //DDV="Deslocamento para a Direita com Vai-um"
+                                //     Shift right with Carry
+                        case 0x30: //GDV="Giro para a Direita com Vai-um"
+                                //     Rotate right with Carry
+
+                            //both instructions are equivalent
+                            if (FLAGS & V)
+                                tmp = 0x100 | ACC;
+                            else
+                                tmp = ACC;
+
+                            FLAGS &= ~V;
+                            if (ACC & 1)
+                                FLAGS |= V;
+
+                            ACC = tmp >> 1;
+                            break;
+                        case 0x40: //DE="Deslocamento para a Esquerda"
+                                //    Shift left
+                            FLAGS &= ~V;
+                            if (ACC & (1<<7))
+                                FLAGS |= V;
+
+                            ACC <<= 1;
+                            break;
+                        case 0x60: //GE="Giro para a Esquerda"
+                                //    Rotate left
+                            FLAGS &= ~V;
+                            if (ACC & (1<<7))
+                                FLAGS |= V;
+
+                            ACC = (ACC << 1) | ((ACC >> 7) & 1);
+                            break;
+                        case 0x50: //DEV="Deslocamento para a Esquerda com Vai-um"
+                                //     Shift left with Carry
+                        case 0x70: //GEV="Giro para a Esquerda com Vai-um"
+                                //     Rotate left with Carry
+
+                            //both instructions are equivalent
+                            if (FLAGS & V)
+                                tmp = (ACC << 1) | 1;
+                            else
+                                tmp = (ACC << 1);
+
+                            FLAGS &= ~V;
+                            if (tmp & (1<<8))
+                                FLAGS |= V;
+
+                            ACC = tmp & 0xFF;
+                            break;
+                        case 0x80: //DDS="Deslocamento para a Direita com duplicacao de Sinal"
+                                //     Rotate right with signal duplication
+                            FLAGS &= ~V;
+                            if (ACC & 1)
+                                FLAGS |= V;
+
+                            ACC = (ACC & (1 << 7)) | ACC >> 1;
+                            break;
+                        default:
+                            printf("Illegal instruction: %02X %02X\n", opcode, value);
+                            return;
+                    }
+                }
+            }
             return;
     }
 
