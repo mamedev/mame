@@ -49,6 +49,7 @@
 #include "sound/k054539.h"
 #include "includes/konamipt.h"
 #include "includes/rungun.h"
+#include "rungun_dual.lh"
 
 
 
@@ -438,11 +439,16 @@ MACHINE_CONFIG_END
 // this means when operated as a single dedicated cabinet the game runs at 60fps, and has smoother animations than when operated as a twin setup where each
 // screen only gets an update every other frame.
 static MACHINE_CONFIG_DERIVED( rng_dual, rng )
-
-	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_ADD("demultiplex1", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(88, 88+384-1, 24, 24+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_left)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SCREEN_ADD("screen2", RASTER)
+	MCFG_SCREEN_ADD("demultiplex2", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -717,4 +723,4 @@ GAME( 1993, rungunua, rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run a
 GAME( 1993, slmdunkj, rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Slam Dunk (ver JAA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // this set has no dipswitches to select single screen mode (they're not even displayed in test menu) it's twin cabinet ONLY
-GAME( 1993, rungunu,  rungun, rng_dual, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UAB 1993 10.12, dedicated twin cabinet)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) 
+GAMEL( 1993, rungunu,  rungun, rng_dual, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UAB 1993 10.12, dedicated twin cabinet)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING, layout_rungun_dual ) 
