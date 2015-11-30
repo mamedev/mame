@@ -32,7 +32,9 @@
 
 
     Known issues:
-        * mystery items in Ali Baba don't work correctly because of protection
+        * Mystery items in Ali Baba don't work correctly because of protection.
+		* Pacman Club controls need to be demultiplexed for 2-players simultaneous mode.
+		  Also need 4-players extra inputs.
 
     Known to exist but dumps needed
         * Eeeek!
