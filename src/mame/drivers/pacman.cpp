@@ -3994,7 +3994,6 @@ ROM_END
 
 /*
 
-
   Double Command Pac-Man game.
   ----------------------------
 
@@ -4117,7 +4116,6 @@ ROM_END
   82S27                                                          27S11
 
 
-
   Dumps and docs by Robbie.
   Credits: Roberto Fresca, ytsejam
 
@@ -4134,15 +4132,16 @@ ROM_START( clubpacm )
 	ROM_LOAD( "13.5f",   0x1000, 0x0800, CRC(22b0188a) SHA1(a9ed9ca8b36a60081fd364abc9bc23963932cc0b) )
 	ROM_LOAD( "15.5j",   0x1800, 0x0800, CRC(50c7477d) SHA1(c04ec282a8cb528df5e38ad750d12ee71612695d) )
 
-	// proms have not been dumped
+	// proms have been dumped, except for 82s123 @ 7f...
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, BAD_DUMP CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
-	ROM_LOAD( "82s129.4a",    0x0020, 0x0100, BAD_DUMP CRC(63efb927) SHA1(5c144a613fc4960a1dfd7ead89e7fee258a63171) )
+	ROM_LOAD( "m7611.4a",     0x0020, 0x0100, CRC(63efb927) SHA1(5c144a613fc4960a1dfd7ead89e7fee258a63171) )
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
-	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
+	ROM_LOAD( "m7611.1m",     0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "m7611.3m",     0x0100, 0x0100, CRC(0e307106) SHA1(6140b5339008dd3110cd5be2e2fb4813779dfe28) )    /* timing - not used */
 ROM_END
+
 
 ROM_START( hangly )
 	ROM_REGION( 0x10000, "maincpu", 0 )
