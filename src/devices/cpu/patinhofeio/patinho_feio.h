@@ -16,6 +16,20 @@ enum {
     DEVICE_READY=1
 };
 
+class patinho_feio_peripheral
+{
+public:
+    patinho_feio_peripheral()
+    : io_status(DEVICE_READY)
+    , device_is_ok(true)
+    , IRQ_request(false)
+    { };
+
+    int io_status;
+    bool device_is_ok;
+    bool IRQ_request;
+};
+
 class patinho_feio_cpu_device : public cpu_device
 {
 public:
@@ -48,9 +62,7 @@ protected:
     // V = "Vai um" (Carry flag)
     // T = "Transbordo" (Overflow flag)
     
-    int m_io_status[16];
-    bool m_device_is_ok[16];
-    bool m_IRQ_request[16];
+    patinho_feio_peripheral m_peripherals[16];
 
     int m_address_mask;        /* address mask */
     int m_icount;

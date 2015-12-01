@@ -76,13 +76,6 @@ void patinho_feio_cpu_device::device_reset()
     m_idx = READ_INDEX_REG();
     m_flags = 0;
     m_run = true;
-    
-    for (int c=0; c<16; c++) {
-        m_device_is_ok[c] = true;
-        m_io_status[c] = DEVICE_READY;
-        m_IRQ_request[c] = false;
-    }
-    
     m_scheduled_IND_bit_reset = false;
     m_indirect_addressing = false;
 }
@@ -251,15 +244,15 @@ void patinho_feio_cpu_device::execute_instruction()
                     switch(function)
                     {
                         case 1:
-                            if (m_io_status[channel] == DEVICE_READY)
+                            if (m_peripherals[channel].io_status == DEVICE_READY)
                                 skip = true;
                             break;
                         case 2:
-                            if (m_device_is_ok[channel])
+                            if (m_peripherals[channel].device_is_ok)
                                 skip = true;
                             break;
                         case 4:
-                            if (m_IRQ_request[channel] == true)
+                            if (m_peripherals[channel].IRQ_request == true)
                                 skip = true;
                             break;
                     }
