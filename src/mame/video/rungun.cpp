@@ -18,8 +18,10 @@
 /* TTL text plane stuff */
 TILE_GET_INFO_MEMBER(rungun_state::ttl_get_tile_info)
 {
-	UINT8 *lvram = (UINT8 *)m_ttl_vram;
+	UINT8 *lvram = (UINT8 *)m_ttl_vram + (m_current_frame_number * 0x2000);
 	int attr, code;
+	
+	//tile_index += 1 * 0x1000;
 
 	attr = (lvram[BYTE_XOR_LE(tile_index<<2)] & 0xf0) >> 4;
 	code = ((lvram[BYTE_XOR_LE(tile_index<<2)] & 0x0f) << 8) | (lvram[BYTE_XOR_LE((tile_index<<2)+2)]);
@@ -34,12 +36,12 @@ K055673_CB_MEMBER(rungun_state::sprite_callback)
 
 READ16_MEMBER(rungun_state::rng_ttl_ram_r)
 {
-	return m_ttl_vram[offset];
+	return m_ttl_vram[offset+(m_video_mux_bank*0x1000)];
 }
 
 WRITE16_MEMBER(rungun_state::rng_ttl_ram_w)
 {
-	COMBINE_DATA(&m_ttl_vram[offset]);
+	COMBINE_DATA(&m_ttl_vram[offset+(m_video_mux_bank*0x1000)]);
 }
 
 /* 53936 (PSAC2) rotation/zoom plane */
@@ -76,6 +78,7 @@ void rungun_state::video_start()
 
 	int gfx_index;
 
+	m_ttl_vram = auto_alloc_array(machine(), UINT16, 0x1000*2);
 	m_936_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(rungun_state::get_rng_936_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
 	m_936_tilemap->set_transparent_pen(0);
 
@@ -105,6 +108,8 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
+	m_current_frame_number = machine().first_screen()->frame_number() & 1;
+	m_ttl_tilemap->mark_all_dirty();
 
 	if(m_video_priority_mode == false)
 	{
@@ -117,7 +122,6 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 		m_k053936->zoom_draw(screen, bitmap, cliprect, m_936_tilemap, 0, 0, 1);
 	}
 	
-	m_ttl_tilemap->mark_all_dirty();
 	m_ttl_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// copy frame output to temp buffers so we can demultiplex it for the dual screen output

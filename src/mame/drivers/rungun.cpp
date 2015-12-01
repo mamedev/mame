@@ -121,6 +121,7 @@ WRITE16_MEMBER(rungun_state::rng_sysregs_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				membank("spriteram_bank")->set_entry((data & 0x80) >> 7);
+				m_video_mux_bank = ((data & 0x80) >> 7) ^ 1;
 				ioport("EEPROMOUT")->write(data, 0xff);
 			}
 			if (ACCESSING_BITS_8_15)
@@ -186,9 +187,24 @@ READ8_MEMBER(rungun_state::rng_53936_rom_r)
 	return m_roz_rom[rom_addr];
 }
 
+READ16_MEMBER(rungun_state::palette_read)
+{
+	return m_video_mux_bank == 0 ? m_palette->read(space,offset,mem_mask) : m_palette2->read(space,offset,mem_mask);
+}
+
+WRITE16_MEMBER(rungun_state::palette_write)
+{
+	if(m_video_mux_bank == 0)
+		m_palette->write(space,offset,data,mem_mask);
+	else
+		m_palette2->write(space,offset,data,mem_mask);
+
+}
+
 static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM                                         // main program + data
-	AM_RANGE(0x300000, 0x3007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x300000, 0x3007ff) AM_READWRITE(palette_read,palette_write) AM_SHARE("palette")
+	AM_RANGE(0x300800, 0x300fff) AM_RAM AM_SHARE("palette2") // TODO: paletteram declaration
 	AM_RANGE(0x380000, 0x39ffff) AM_RAM                                         // work RAM
 	AM_RANGE(0x400000, 0x43ffff) AM_READ8(rng_53936_rom_r,0x00ff)			    // '936 ROM readback window
 	AM_RANGE(0x480000, 0x48001f) AM_READWRITE(rng_sysregs_r, rng_sysregs_w) AM_SHARE("sysreg")
@@ -361,7 +377,7 @@ void rungun_state::machine_start()
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_status));
 	save_item(NAME(m_sound_nmi_clk));
-	save_item(NAME(m_ttl_vram));
+	//save_item(NAME(m_ttl_vram));
 }
 
 void rungun_state::machine_reset()
@@ -369,7 +385,7 @@ void rungun_state::machine_reset()
 	m_k054539_1->init_flags(k054539_device::REVERSE_STEREO);
 
 	memset(m_sysreg, 0, 0x20);
-	memset(m_ttl_vram, 0, 0x1000 * sizeof(UINT16));
+	//memset(m_ttl_vram, 0, 0x1000 * sizeof(UINT16));
 
 	m_sound_ctrl = 0;
 	m_sound_status = 0;
@@ -451,6 +467,11 @@ static MACHINE_CONFIG_DERIVED( rng_dual, rng )
 	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_left)
 	MCFG_SCREEN_PALETTE("palette")
 
+	MCFG_PALETTE_ADD("palette2", 1024)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
+	
 	MCFG_SCREEN_ADD("demultiplex2", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -458,7 +479,7 @@ static MACHINE_CONFIG_DERIVED( rng_dual, rng )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(88, 88+384-1, 24, 24+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_right)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE("palette2")
 MACHINE_CONFIG_END
 
 // Older non-US 53936/A13 roms were all returning bad from the mask ROM check. Using the US ROM on non-US reports good therefore I guess that data matches for that
