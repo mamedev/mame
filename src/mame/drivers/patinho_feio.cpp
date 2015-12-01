@@ -16,6 +16,8 @@ public:
     { }
 
     DECLARE_DRIVER_INIT(patinho_feio);
+    void load_tape(const char* name);
+    void load_raw_data(const char* name, unsigned int start_address, unsigned int data_length);
     virtual void machine_start();
 //    virtual void machine_reset();
 //    required_device<patinho_feio_cpu_device> m_maincpu;
@@ -28,24 +30,47 @@ DRIVER_INIT_MEMBER(patinho_feio_state, patinho_feio)
 {
 }
 
+void patinho_feio_state::load_tape(const char* name){
+    UINT8 *RAM = (UINT8 *) memshare("maincpu:internalram")->ptr();
+    UINT8 *data = memregion(name)->base();
+    unsigned int data_length = data[0];
+    unsigned int start_address = data[1]*256 + data[2];
+    INT8 expected_checksum = data[data_length + 3];
+    INT8 checksum = 0;
+
+    for (int i = 0; i < data_length + 3; i++){
+        checksum -= (INT8) data[i];
+    }
+
+    if (checksum != expected_checksum){
+        printf("[WARNING] Tape \"%s\": checksum = 0x%02X (expected 0x%02X)\n",
+               name, (unsigned char) checksum, (unsigned char) expected_checksum);
+    }
+
+    memcpy(&RAM[start_address], &data[3], data_length);
+}
+
+void patinho_feio_state::load_raw_data(const char* name, unsigned int start_address, unsigned int data_length){
+    UINT8 *RAM = (UINT8 *) memshare("maincpu:internalram")->ptr();
+    UINT8 *data = memregion(name)->base();
+
+    memcpy(&RAM[start_address], data, data_length);
+}
+
 void patinho_feio_state::machine_start(){
     // Copy some programs directly into RAM.
     // This is a hack for setting up the computer
     // while we don't support loading programs
     // from punched tape rolls...
-    UINT8 *RAM = (UINT8 *) memshare("maincpu:internalram")->ptr();
-    UINT8 *program;
 
     //"absolute program example" from page 16.7
     //    Prints "PATINHO FEIO" on the DECWRITER:
-    program = memregion("exemplo_16.7")->base();
-    memcpy(&RAM[0x003], program, 0x028);
+    load_tape("exemplo_16.7");
 
     //"absolute program example" from appendix G:
     //    Allows users to load programs from the
     //    console into the computer memory.
-    program = memregion("hexam")->base();
-    memcpy(&RAM[0xE00], program, 0x0D5);
+    load_raw_data("hexam", 0xE00, 0x0D5);
 }
 
 static INPUT_PORTS_START( patinho_feio )
