@@ -208,6 +208,13 @@
 		[chunkItem setTag:tag];
 	}
 
+	NSMenuItem	*chunkItem = [menu insertItemWithTitle:@"32-bit floats"
+		action:@selector(showChunkSize:)
+		keyEquivalent:@"F"
+		atIndex:index++];
+	[chunkItem setTarget:self];
+	[chunkItem setTag:tag];
+
 	[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
 
 	NSMenuItem *logicalItem = [menu insertItemWithTitle:@"Logical Addresses"
