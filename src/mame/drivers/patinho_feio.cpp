@@ -29,11 +29,22 @@ DRIVER_INIT_MEMBER(patinho_feio_state, patinho_feio)
 }
 
 void patinho_feio_state::machine_start(){
-    //copy the "absolute program example" from appendix G directly into RAM
+    // Copy some programs directly into RAM.
     // This is a hack for setting up the computer
-    // while we don't support loading programs from punched tape rolls...
+    // while we don't support loading programs
+    // from punched tape rolls...
     UINT8 *RAM = (UINT8 *) memshare("maincpu:internalram")->ptr();
-    UINT8 *program = memregion("example_program")->base();
+    UINT8 *program;
+
+    //"absolute program example" from page 16.7
+    //    Prints "PATINHO FEIO" on the DECWRITER:
+    program = memregion("exemplo_16.7")->base();
+    memcpy(&RAM[0x003], program, 0x028);
+
+    //"absolute program example" from appendix G:
+    //    Allows users to load programs from the
+    //    console into the computer memory.
+    program = memregion("hexam")->base();
     memcpy(&RAM[0xE00], program, 0x0D5);
 }
 
@@ -56,8 +67,11 @@ static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 MACHINE_CONFIG_END
 
 ROM_START( patinho )
-    ROM_REGION( 0x0d5, "example_program", 0 )
+    ROM_REGION( 0x0d5, "hexam", 0 )
     ROM_LOAD( "apendice_g__hexam.bin", 0x000, 0x0d5, CRC(c6addc59) SHA1(126bc97247eac45c58708eaac216c2438e9e4af9) )
+
+    ROM_REGION( 0x0d5, "exemplo_16.7", 0 )
+    ROM_LOAD( "exemplo_16.7.bin", 0x000, 0x028, CRC(0a87ac8d) SHA1(7c35ac3eed9ed239f2ef56c26e6f0c59f635e1ac) )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE        INPUT         INIT                              COMPANY                                           FULLNAME */

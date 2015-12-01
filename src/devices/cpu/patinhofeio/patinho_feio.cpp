@@ -71,7 +71,7 @@ void patinho_feio_cpu_device::device_start()
 
 void patinho_feio_cpu_device::device_reset()
 {
-    m_pc = 0xE00;
+    m_pc = 0x006;
     m_acc = 0;
     m_idx = READ_INDEX_REG();
     m_flags = 0;
@@ -225,50 +225,6 @@ void patinho_feio_cpu_device::execute_instruction()
             //     Sets memory addressing for the next instruction to be indirect.
             m_indirect_addressing = true;
             m_scheduled_IND_bit_reset = false; //the next instruction execution will schedule it.
-            return;
-        case 0xCB:
-            //Executes I/O functions
-            //TODO: Implement-me!
-            value = READ_BYTE_PATINHO(PC);
-            INCREMENT_PC_4K;
-            channel = opcode & 0x0F;
-            function = value & 0x0F;
-            switch(value & 0xF0){
-                case 0x10:
-                    printf("Unimplemented FNC /%X%X instruction\n", channel, function);
-                    break;
-                case 0x20:
-                    //SAL="Salta"
-                    //    Skips a couple bytes if a condition is met
-                    skip = false;
-                    switch(function)
-                    {
-                        case 1:
-                            if (m_peripherals[channel].io_status == DEVICE_READY)
-                                skip = true;
-                            break;
-                        case 2:
-                            if (m_peripherals[channel].device_is_ok)
-                                skip = true;
-                            break;
-                        case 4:
-                            if (m_peripherals[channel].IRQ_request == true)
-                                skip = true;
-                            break;
-                    }
-
-                    if (skip){
-                        INCREMENT_PC_4K;
-                        INCREMENT_PC_4K;
-                    }
-                    break;
-                case 0x40:
-                    printf("Unimplemented ENTR /%X0 instruction\n", channel);
-                    break;
-                case 0x80:
-                    printf("Unimplemented SAI /%X0 instruction\n", channel);
-                    break;
-            }
             return;
         case 0xD1:
             //Bit-Shift/Bit-Rotate instructions
@@ -436,6 +392,50 @@ void patinho_feio_cpu_device::execute_instruction()
             INCREMENT_PC_4K;
             if (ACC == 0)
                 PC = addr;
+            return;
+        case 0xC0:
+            //Executes I/O functions
+            //TODO: Implement-me!
+            value = READ_BYTE_PATINHO(PC);
+            INCREMENT_PC_4K;
+            channel = opcode & 0x0F;
+            function = value & 0x0F;
+            switch(value & 0xF0){
+                case 0x10:
+                    printf("Unimplemented FNC /%X%X instruction\n", channel, function);
+                    break;
+                case 0x20:
+                    //SAL="Salta"
+                    //    Skips a couple bytes if a condition is met
+                    skip = false;
+                    switch(function)
+                    {
+                        case 1:
+                            if (m_peripherals[channel].io_status == DEVICE_READY)
+                                skip = true;
+                            break;
+                        case 2:
+                            if (m_peripherals[channel].device_is_ok)
+                                skip = true;
+                            break;
+                        case 4:
+                            if (m_peripherals[channel].IRQ_request == true)
+                                skip = true;
+                            break;
+                    }
+
+                    if (skip){
+                        INCREMENT_PC_4K;
+                        INCREMENT_PC_4K;
+                    }
+                    break;
+                case 0x40:
+                    printf("Unimplemented ENTR /%X0 instruction\n", channel);
+                    break;
+                case 0x80:
+                    printf("Unimplemented SAI /%X0 instruction\n", channel);
+                    break;
+            }
             return;
         case 0xE0:
             //SUS = "Subtrai um ou Salta": Subtract one from the data in the given address
