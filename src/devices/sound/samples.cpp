@@ -84,7 +84,7 @@ void samples_device::start(UINT8 channel, UINT32 samplenum, bool loop)
 	chan.stream->update();
 
 	// update the parameters
-	sample_t &sample = m_sample[samplenum];	
+	sample_t &sample = m_sample[samplenum];
 	chan.source = (sample.data.size() > 0) ? &sample.data[0] : NULL;
 	chan.source_length = sample.data.size();
 	chan.source_num = (chan.source_length > 0) ? samplenum : -1;
@@ -571,7 +571,7 @@ bool samples_device::read_flac_sample(emu_file &file, sample_t &sample)
 	file.seek(0, SEEK_SET);
 
 	// create the FLAC decoder and fill in the sample data
-	flac_decoder decoder(file);
+	flac_decoder decoder((core_file&) file);
 	sample.frequency = decoder.sample_rate();
 
 	// error if more than 1 channel or not 16bpp

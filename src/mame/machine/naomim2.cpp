@@ -12,9 +12,9 @@ Naomi cartridge type M2/3 mapping
 NAOMI_ROM_OFFSET bit29: ROM size/mapping selection, 0 - 4MB ROM mode, 1 - 8MB ROM mode
 
 bit28: Bank selection.
-	in the case of flash-based 171-7885A ROM boards two of them can be stacked at once
-	onto main board. each must be configured as Bank 0 or 1 via some (currently unknown) jumper.
-	this bit selects which one ROM board will be accessed.
+    in the case of flash-based 171-7885A ROM boards two of them can be stacked at once
+    onto main board. each must be configured as Bank 0 or 1 via some (currently unknown) jumper.
+    this bit selects which one ROM board will be accessed.
 
 note: if ROM is not mounted its area readed as 0xFF
 

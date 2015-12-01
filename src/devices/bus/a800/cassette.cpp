@@ -48,7 +48,7 @@ a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, cons
 	: device_t(mconfig, A8SIO_CASSETTE, "Atari 8 bit cassette", tag, owner, clock, "a8sio_cass", __FILE__)
 	, device_a8sio_card_interface(mconfig, *this)
 	, m_cassette(*this, "cassette"), m_read_timer(nullptr)
-	  , m_old_cass_signal(0)
+		, m_old_cass_signal(0)
 	, m_signal_count(0)
 {
 }
@@ -57,7 +57,7 @@ a8sio_cassette_device::a8sio_cassette_device(const machine_config &mconfig, devi
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_a8sio_card_interface(mconfig, *this)
 	, m_cassette(*this, "cassette"), m_read_timer(nullptr)
-	  , m_old_cass_signal(0)
+		, m_old_cass_signal(0)
 	, m_signal_count(0)
 {
 }

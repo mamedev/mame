@@ -1440,10 +1440,10 @@ void debug_internal::wait_for_debugger(device_t &device, bool firststop)
 		DView *disassembly = dview_alloc(target, device.machine(), DVT_DISASSEMBLY, VIEW_STATE_FOLLOW_CPU);
 		disassembly->editor.active = TRUE;
 		disassembly->editor.container = &device.machine().render().ui_container();
-		
-        dview_alloc(target, device.machine(), DVT_STATE, VIEW_STATE_FOLLOW_CPU);
-		
-        DView *console = dview_alloc(target, device.machine(), DVT_CONSOLE, VIEW_STATE_FOLLOW_CPU);
+
+		dview_alloc(target, device.machine(), DVT_STATE, VIEW_STATE_FOLLOW_CPU);
+
+		DView *console = dview_alloc(target, device.machine(), DVT_CONSOLE, VIEW_STATE_FOLLOW_CPU);
 		dview_set_title(console, "Console");
 		console->editor.active = TRUE;
 		console->editor.container = &device.machine().render().ui_container();

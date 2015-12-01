@@ -439,33 +439,33 @@ WRITE8_MEMBER( st_mp200_state::u11_a_w )
 	if (!m_u10_ca2)
 	{
 		if (m_7d && BIT(data, 1))
-        {
-            m_digit = 6;
-        }
+		{
+			m_digit = 6;
+		}
 		else if BIT(data, 2)
-        {
+		{
 			m_digit = 5;
-        }
+		}
 		else if BIT(data, 3)
-        {
+		{
 			m_digit = 4;
-        }
+		}
 		else if BIT(data, 4)
-        {
+		{
 			m_digit = 3;
-        }
+		}
 		else if BIT(data, 5)
-        {
+		{
 			m_digit = 2;
-        }
+		}
 		else if BIT(data, 6)
-        {
+		{
 			m_digit = 1;
-        }
+		}
 		else if BIT(data, 7)
-        {
+		{
 			m_digit = 0;
-        }
+		}
 
 		if (BIT(data, 0) && (m_counter > 8))
 		{

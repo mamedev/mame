@@ -354,14 +354,14 @@ void discrete_task::check(discrete_task *dest_task)
  *
  *************************************/
 
-discrete_base_node::discrete_base_node() : 
+discrete_base_node::discrete_base_node() :
 	m_device(NULL),
 	m_block(NULL),
-	m_active_inputs(0), 
+	m_active_inputs(0),
 	m_custom(NULL),
 	m_input_is_node(0),
 	m_step_intf(NULL),
-	m_input_intf(NULL), 
+	m_input_intf(NULL),
 	m_output_intf(NULL)
 {
 	m_output[0] = 0.0;
@@ -851,7 +851,7 @@ discrete_device::discrete_device(const machine_config &mconfig, device_type type
 
 discrete_sound_device::discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: discrete_device(mconfig, DISCRETE, "DISCRETE", tag, owner, clock),
-		device_sound_interface(mconfig, *this), 
+		device_sound_interface(mconfig, *this),
 		m_stream(NULL)
 {
 }

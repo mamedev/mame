@@ -26,7 +26,7 @@ public:
 private slots:
 	void memoryRegionChanged(int index);
 	void expressionSubmitted();
-	void chunkChanged(QAction* changedTo);
+	void formatChanged(QAction* changedTo);
 	void addressChanged(QAction* changedTo);
 	void reverseChanged(bool changedTo);
 	void increaseBytesPerLine(bool changedTo);
@@ -36,7 +36,7 @@ private slots:
 private:
 	void populateComboBox();
 	void setToCurrentCpu();
-	QAction* chunkSizeMenuItem(const QString& itemName);
+	QAction* dataFormatMenuItem(const QString& itemName);
 
 
 private:
@@ -75,7 +75,7 @@ public:
 		WindowQtConfig(WIN_TYPE_MEMORY),
 		m_reverse(0),
 		m_addressMode(0),
-		m_chunkSize(0),
+		m_dataFormat(0),
 		m_memoryRegion(0)
 	{
 	}
@@ -85,7 +85,7 @@ public:
 	// Settings
 	int m_reverse;
 	int m_addressMode;
-	int m_chunkSize;
+	int m_dataFormat;
 	int m_memoryRegion;
 
 	void buildFromQWidget(QWidget* widget);

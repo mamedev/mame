@@ -19,12 +19,12 @@
     Captain America & Fighter's History - reset with both start buttons
     held down for test mode.  Reset with player 1 start held in Fighter's
     History for 'Pattern Editor'.
-	
-	For version information:
-	 Captain America   - Reset with Player 1 start held
-	 Fighter's History - Reset with Player 1 button 1 & 2 held
-	 Night Slashers    - Reset with Player 1 & 2 start held
-	 Locked 'N Loaded  - Reset with Player 1 & 2 start held
+
+    For version information:
+     Captain America   - Reset with Player 1 start held
+     Fighter's History - Reset with Player 1 button 1 & 2 held
+     Night Slashers    - Reset with Player 1 & 2 start held
+     Locked 'N Loaded  - Reset with Player 1 & 2 start held
 
     Tattoo Assassins is a prototype, it is thought only 25 test units
     were manufactured and distributed to test arcades before the game

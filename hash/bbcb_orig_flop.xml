@@ -13,9 +13,9 @@
 <!-- All images in this list were created from original discs, most contain copy protection. -->
 
 <softwarelist name="bbcb_orig_flop" description="BBC Micro Model B Original disks">
-		
+
 	<!-- Games -->
-	
+
 	<software name="magicmus">
 		<description>Magic Mushrooms</description>
 		<year>1985</year>
@@ -27,7 +27,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="arcadian">
 		<description>Arcadians</description>
 		<year>1982</year>
@@ -39,7 +39,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="arcadian48" cloneof="arcadian">
 		<description>Arcadians (40/80t)</description>
 		<year>1982</year>
@@ -51,7 +51,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="boxer48">
 		<description>Boxer (40/80t)</description>
 		<year>1984</year>
@@ -63,7 +63,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="hopper48">
 		<description>Hopper (40/80t)</description>
 		<year>1983</year>
@@ -75,7 +75,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="volcano">
 		<description>Volcano</description>
 		<year>1984</year>
@@ -87,7 +87,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="meteors">
 		<description>Meteors</description>
 		<year>1982</year>
@@ -99,7 +99,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="labyrint">
 		<description>Labyrinth</description>
 		<year>1984</year>
@@ -111,7 +111,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="bboxgamb">
 		<description>Black Box and Gambit</description>
 		<year>198?</year>
@@ -123,7 +123,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="metmissn">
 		<description>Meteor Mission</description>
 		<year>1983</year>
@@ -135,7 +135,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="tetrapod">
 		<description>Tetrapod</description>
 		<year>1984</year>
@@ -147,7 +147,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="firebug">
 		<description>Firebug</description>
 		<year>1984</year>
@@ -159,7 +159,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="snapper">
 		<description>Snapper</description>
 		<year>1982</year>
@@ -171,7 +171,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="drogna">
 		<description>Drogna</description>
 		<year>1983</year>
@@ -183,7 +183,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="go">
 		<description>Go</description>
 		<year>1984</year>
@@ -195,7 +195,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="maze">
 		<description>Maze</description>
 		<year>1982</year>
@@ -207,7 +207,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="quondam">
 		<description>Quondam</description>
 		<year>1984</year>
@@ -219,7 +219,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="bouncer">
 		<description>Bouncer</description>
 		<year>1984</year>
@@ -231,7 +231,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="revs">
 		<description>Revs</description>
 		<year>1984</year>
@@ -243,7 +243,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="revs4tra">
 		<description>Revs 4 Tracks</description>
 		<year>1985</year>
@@ -255,7 +255,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="acheton" cloneof="achetont">
 		<description>Acheton</description>
 		<year>1984</year>
@@ -274,7 +274,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="monsters">
 		<description>Monsters</description>
 		<year>1982</year>
@@ -286,7 +286,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="monsters4" cloneof="monsters">
 		<description>Monsters (40t)</description>
 		<year>1982</year>
@@ -298,7 +298,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="snookera">
 		<description>Snooker</description>
 		<year>1983</year>
@@ -310,7 +310,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="carousel">
 		<description>Carousel</description>
 		<year>1983</year>
@@ -322,7 +322,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="freefall">
 		<description>Free Fall</description>
 		<year>1983</year>
@@ -334,7 +334,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="crtracer">
 		<description>Crazy Tracer</description>
 		<year>1983</year>
@@ -346,7 +346,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="kofhamil" cloneof="kohamilt">
 		<description>Kingdom of Hamil</description>
 		<year>1983</year>
@@ -358,7 +358,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="sshipcom">
 		<description>Starship Command</description>
 		<year>1983</year>
@@ -382,7 +382,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="missbase">
 		<description>Missile Base</description>
 		<year>1982</year>
@@ -394,7 +394,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="phquest" cloneof="phquestt">
 		<description>Philosopher's Quest</description>
 		<year>1984</year>
@@ -406,7 +406,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="aviator">
 		<description>Aviator</description>
 		<year>1983</year>
@@ -418,7 +418,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="sphinx">
 		<description>Sphinx Adventure</description>
 		<year>1983</year>
@@ -430,7 +430,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="plantoid">
 		<description>Planetoid</description>
 		<year>1982</year>
@@ -442,7 +442,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="plantoid4" cloneof="plantoid">
 		<description>Planetoid (40t)</description>
 		<year>1982</year>
@@ -454,7 +454,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="superinv">
 		<description>Super Invaders</description>
 		<year>1982</year>
@@ -466,7 +466,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="superinv4" cloneof="superinv">
 		<description>Super Invaders (40t)</description>
 		<year>1982</year>
@@ -478,7 +478,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="rocketra">
 		<description>Rocket Raid</description>
 		<year>1982</year>
@@ -490,7 +490,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="sconrans">
 		<description>Shirley Conran's Magic Garden</description>
 		<year>1983</year>
@@ -502,7 +502,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="spooky">
 		<description>Spooky Manor</description>
 		<year>1984</year>
@@ -514,7 +514,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="peekoc">
 		<description>Peeko-Computer</description>
 		<year>198?</year>
@@ -526,7 +526,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="busgames">
 		<description>Business Games</description>
 		<year>198?</year>
@@ -538,7 +538,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="microtxt">
 		<description>Microtext</description>
 		<year>1983</year>
@@ -550,7 +550,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="elitedem">
 		<description>Elite (Demo)</description>
 		<year>1984</year>
@@ -561,7 +561,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="prtdrvgn">
 		<description>Printer Driver Generator</description>
 		<year>198?</year>
@@ -573,7 +573,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="forth">
 		<description>FORTH</description>
 		<year>1982</year>
@@ -585,7 +585,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="jars">
 		<description>Jars</description>
 		<year>198?</year>
@@ -597,7 +597,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="chemanal">
 		<description>Chemical Analysis</description>
 		<year>198?</year>
@@ -609,7 +609,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="jcbdiggr">
 		<description>JCB Digger</description>
 		<year>1983</year>
@@ -621,7 +621,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="homeedu">
 		<description>Home Education</description>
 		<year>1985</year>
@@ -633,7 +633,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="omegaorb">
 		<description>Omega Orb</description>
 		<year>1986</year>
@@ -644,7 +644,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="tstruck2">
 		<description>Thunderstruck 2: Mind Master</description>
 		<year>1986</year>
@@ -655,7 +655,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="blast">
 		<description>Blast!</description>
 		<year>1989</year>
@@ -666,7 +666,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="psycast">
 		<description>Psycastria</description>
 		<year>1986</year>
@@ -677,7 +677,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="breakthr">
 		<description>Breakthrough</description>
 		<year>1990</year>
@@ -688,7 +688,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="shark">
 		<description>Shark</description>
 		<year>1988</year>
@@ -699,7 +699,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="impact">
 		<description>Impact</description>
 		<year>1987</year>
@@ -710,7 +710,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="ziggy">
 		<description>Ziggy</description>
 		<year>1987</year>
@@ -721,7 +721,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="ransack">
 		<description>Ransack!</description>
 		<year>1987</year>
@@ -732,7 +732,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="despride">
 		<description>Despatch Rider</description>
 		<year>1987</year>
@@ -743,7 +743,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="heltersk">
 		<description>Helter Skelter</description>
 		<year>1990</year>
@@ -754,7 +754,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="fabfour1">
 		<description>Fab Four Vol.1</description>
 		<year>1990</year>
@@ -772,7 +772,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="bbcbonz">
 		<description>BBC Bonanza</description>
 		<year>1987</year>
@@ -790,7 +790,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="emlynqz">
 		<description>Emlyn Hughes Arcade Quiz</description>
 		<year>1991</year>
@@ -801,7 +801,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="loopz">
 		<description>Loopz</description>
 		<year>1990</year>
@@ -812,7 +812,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="sphdest">
 		<description>Sphere of Destiny</description>
 		<year>1986</year>
@@ -823,7 +823,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="colos4ch">
 		<description>Colossus 4 Chess</description>
 		<year>1988</year>
@@ -841,7 +841,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="infinity">
 		<description>Infinity</description>
 		<year>1989</year>
@@ -852,7 +852,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="starquak">
 		<description>Star Quake</description>
 		<year>1987</year>
@@ -863,7 +863,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="wknight">
 		<description>White Knight Mk12</description>
 		<year>1985</year>
@@ -874,7 +874,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="firetrak">
 		<description>Fire Track</description>
 		<year>1987</year>
@@ -885,7 +885,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="fortress">
 		<description>Fortress</description>
 		<year>1984</year>
@@ -896,7 +896,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="xoraba" cloneof="xor">
 		<description>XOR (A&amp;B Computing) (alt)</description>
 		<year>1987</year>
@@ -907,7 +907,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="xorab" cloneof="xor">
 		<description>XOR (A&amp;B Computing)</description>
 		<year>1987</year>
@@ -918,7 +918,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="xor">
 		<description>XOR</description>
 		<year>1987</year>
@@ -929,7 +929,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="xordesgn">
 		<description>XOR Designer</description>
 		<year>1987</year>
@@ -940,7 +940,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="sinkbism">
 		<description>Sink the Bismarck</description>
 		<year>1986</year>
@@ -951,7 +951,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="tsentinl">
 		<description>The Sentinel</description>
 		<year>1986</year>
@@ -962,7 +962,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="evenstar">
 		<description>Evening Star</description>
 		<year>1987</year>
@@ -973,7 +973,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="beachead">
 		<description>Beach Head</description>
 		<year>1984</year>
@@ -984,7 +984,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="apocalyc">
 		<description>Apocalypse (Command)</description>
 		<year>1987</year>
@@ -995,7 +995,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="villsoul">
 		<description>Village of Lost Souls</description>
 		<year>1987</year>
@@ -1006,7 +1006,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="huntshau">
 		<description>The Hunt: Search for Shauna</description>
 		<year>1987</year>
@@ -1017,7 +1017,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="vutype">
 		<description>Vu-Type</description>
 		<year>1984</year>
@@ -1028,7 +1028,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="battbrit">
 		<description>Battle of Britain</description>
 		<year>1987</year>
@@ -1039,7 +1039,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="rhansont">
 		<description>The Rick Hanson Trilogy - Saga of a Spy</description>
 		<year>1986</year>
@@ -1050,7 +1050,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="bribbon1">
 		<description>Blue Ribbon Games Disk No.1</description>
 		<year>1985</year>
@@ -1061,7 +1061,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="bribbon2">
 		<description>Blue Ribbon Games Disk No.2</description>
 		<year>1985</year>
@@ -1072,7 +1072,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="bribbon3">
 		<description>Blue Ribbon Games Disk No.3</description>
 		<year>1985</year>
@@ -1083,7 +1083,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="jumpjeta">
 		<description>Jump Jet</description>
 		<year>1985</year>
@@ -1094,7 +1094,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="war">
 		<description>W.A.R.</description>
 		<year>1986</year>
@@ -1105,7 +1105,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="yiear">
 		<description>Yie Ar Kung Fu</description>
 		<year>1984</year>
@@ -1116,7 +1116,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="dambustr">
 		<description>The Dam Busters</description>
 		<year>1985</year>
@@ -1127,7 +1127,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="impmiss">
 		<description>Impossible Mission</description>
 		<year>1985</year>
@@ -1138,7 +1138,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="brucelee">
 		<description>Bruce Lee</description>
 		<year>1985</year>
@@ -1149,7 +1149,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="hyperspo">
 		<description>Hyper Sports</description>
 		<year>1985</year>
@@ -1160,7 +1160,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="paperboy">
 		<description>Paperboy</description>
 		<year>1984</year>
@@ -1171,7 +1171,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="airwolf">
 		<description>Airwolf</description>
 		<year>1985</year>
@@ -1182,7 +1182,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="commando">
 		<description>Commando</description>
 		<year>1985</year>
@@ -1193,7 +1193,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="arkanoid">
 		<description>Arkanoid</description>
 		<year>1987</year>
@@ -1204,7 +1204,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="raidmosc">
 		<description>Raid Over Moscow</description>
 		<year>1986</year>
@@ -1215,7 +1215,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="wayotef">
 		<description>The Way of the Exploding Fist</description>
 		<year>1985</year>
@@ -1226,7 +1226,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="sharrier">
 		<description>Strike Force Harrier</description>
 		<year>1986</year>
@@ -1237,7 +1237,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="tetrism">
 		<description>Tetris</description>
 		<year>1987</year>
@@ -1248,7 +1248,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="pipemani">
 		<description>Pipe Mania</description>
 		<year>1989</year>
@@ -1259,7 +1259,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="tarzanm">
 		<description>Tarzan (Martech)</description>
 		<year>1987</year>
@@ -1270,7 +1270,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="samfoxsp">
 		<description>Samantha Fox Strip Poker</description>
 		<year>1986</year>
@@ -1281,7 +1281,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="kayleth">
 		<description>Kayleth</description>
 		<year>1986</year>
@@ -1292,7 +1292,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="skirmish">
 		<description>Skirmish</description>
 		<year>1988</year>
@@ -1303,7 +1303,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="kourtyd">
 		<description>Kourtyard</description>
 		<year>1988</year>
@@ -1314,7 +1314,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="strandgr">
 		<description>Stranger Danger</description>
 		<year>1988</year>
@@ -1325,7 +1325,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="megapoca">
 		<description>Mega-Apocalypse</description>
 		<year>1988</year>
@@ -1336,7 +1336,7 @@
 				</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cholo">
 		<description>Cholo</description>
 		<year>1986</year>
@@ -1347,7 +1347,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="icarus">
 		<description>Icarus</description>
 		<year>1988</year>
@@ -1358,7 +1358,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="musicoll">
 		<description>The Musicsoft Collection</description>
 		<year>1986</year>
@@ -1369,7 +1369,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="midway">
 		<description>Midway</description>
 		<year>1988</year>
@@ -1380,7 +1380,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="ckeypodd">
 		<description>Concept Keyboard Podd</description>
 		<year>1988</year>
@@ -1391,7 +1391,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="gradvcre">
 		<description>The Graphic Adventure Creator</description>
 		<year>1986</year>
@@ -1402,7 +1402,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="buffers">
 		<description>Buffers</description>
 		<year>1986</year>
@@ -1413,7 +1413,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="musicmak">
 		<description>Music Maker</description>
 		<year>1983</year>
@@ -1424,7 +1424,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="krakout">
 		<description>Krakout</description>
 		<year>1988</year>
@@ -1435,7 +1435,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="3dpool">
 		<description>3D Pool</description>
 		<year>1989</year>
@@ -1446,7 +1446,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="redarrow">
 		<description>Red Arrows</description>
 		<year>1985</year>
@@ -1457,7 +1457,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="phancomb">
 		<description>Phantom Combat (BBC Series)</description>
 		<year>1985</year>
@@ -1468,7 +1468,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="phancombb" cloneof="phancomb">
 		<description>Phantom Combat (BBC 'B' 32K)</description>
 		<year>1985</year>
@@ -1479,7 +1479,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="phancombbp" cloneof="phancomb">
 		<description>Phantom Combat (BBC B &amp; 'Plus')</description>
 		<year>1985</year>
@@ -1490,7 +1490,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="ccastles">
 		<description>Crystal Castles</description>
 		<year>1986</year>
@@ -1501,7 +1501,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="daleytst">
 		<description>Daley Thompson's Super-Test</description>
 		<year>1985</year>
@@ -1512,7 +1512,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="3dgraphd">
 		<description>3D Graphics Development System</description>
 		<year>1985</year>
@@ -1530,7 +1530,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="wediag">
 		<description>Diagnostics Disc</description>
 		<year>1985</year>
@@ -1541,7 +1541,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="discdebg">
 		<description>Disc Debug and Copy All</description>
 		<year>198?</year>
@@ -1552,7 +1552,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="discexec">
 		<description>Disc Executor</description>
 		<year>198?</year>
@@ -1563,7 +1563,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="mooncrstl" cloneof="mooncrst">
 		<description>Moon Cresta (no Lenslok)</description>
 		<year>1986</year>
@@ -1574,7 +1574,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="mooncrst">
 		<description>Moon Cresta</description>
 		<year>1986</year>
@@ -1585,7 +1585,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="mmindqm">
 		<description>BBC Mastermind Quizmaster</description>
 		<year>1984</year>
@@ -1596,7 +1596,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="mmind">
 		<description>BBC Mastermind</description>
 		<year>1984</year>
@@ -1607,7 +1607,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="tcrosswd">
 		<description>The Times Crosswords Vol.1</description>
 		<year>1988</year>
@@ -1625,7 +1625,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="amxpagem">
 		<description>AMX Pagemaker</description>
 		<year>1986</year>
@@ -1636,7 +1636,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="tessalat">
 		<description>Tesselator</description>
 		<year>1984</year>
@@ -1647,7 +1647,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="dlogic">
 		<description>D-Logic</description>
 		<year>1983</year>
@@ -1658,7 +1658,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="uridium">
 		<description>Uridium</description>
 		<year>1987</year>
@@ -1669,7 +1669,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="tmsys86" cloneof="tmsys">
 		<description>The Music System (1986)</description>
 		<year>1986</year>
@@ -1680,7 +1680,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="tmsys">
 		<description>The Music System</description>
 		<year>1984</year>
@@ -1704,7 +1704,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sprtspec">
 		<description>Sport Spectacular</description>
 		<year>198?</year>
@@ -1722,7 +1722,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="mexico86">
 		<description>Mexico 86</description>
 		<year>1986</year>
@@ -1733,7 +1733,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="notapenn">
 		<description>Not a Penny More, Not a Penny Less</description>
 		<year>1987</year>
@@ -1751,7 +1751,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="discdup2">
 		<description>Disc Duplicator II</description>
 		<year>1984</year>
@@ -1762,7 +1762,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="starseek">
 		<description>Star Seeker</description>
 		<year>1985</year>
@@ -1773,7 +1773,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="dunjunz">
 		<description>Dunjunz</description>
 		<year>1987</year>
@@ -1791,7 +1791,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="keybplay">
 		<description>Keyboard Player</description>
 		<year>1986</year>
@@ -1802,7 +1802,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="v2140dd">
 		<description>Vector 2 v1.40 (Acorn 1770)</description>
 		<year>1985</year>
@@ -1813,7 +1813,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="v2140sd">
 		<description>Vector 2 v1.40 (Single Density)</description>
 		<year>1985</year>
@@ -1824,7 +1824,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="v1120">
 		<description>Vector 1 v1.20</description>
 		<year>1985</year>
@@ -1835,7 +1835,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="v1120b">
 		<description>Vector 1 v1.20b</description>
 		<year>1985</year>
@@ -1846,7 +1846,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="doscopy">
 		<description>DOSCOPY</description>
 		<year>1986</year>
@@ -1857,7 +1857,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="puff">
 		<description>Puff</description>
 		<year>1986</year>
@@ -1868,7 +1868,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="spshuttm">
 		<description>Space Shuttle</description>
 		<year>1983</year>
@@ -1879,7 +1879,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="dddcalc">
 		<description>DDD-calc</description>
 		<year>1985</year>
@@ -1890,7 +1890,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="olympdec">
 		<description>Olympic Decathlon</description>
 		<year>1984</year>
@@ -1901,7 +1901,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="egyptadv">
 		<description>Egyptian Adventure</description>
 		<year>1987</year>
@@ -1912,7 +1912,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="akhdisku">
 		<description>Akhter BBC Disk Utilities</description>
 		<year>198?</year>
@@ -1923,7 +1923,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="discdup3m" cloneof="discdup3">
 		<description>Disc Duplicator 3 (modified to copy itself)</description>
 		<year>1985</year>
@@ -1934,7 +1934,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="discdup3">
 		<description>Disc Duplicator 3</description>
 		<year>1985</year>
@@ -1945,7 +1945,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="lotr">
 		<description>The Lord of the Rings</description>
 		<year>1986</year>
@@ -1963,7 +1963,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="offcmate">
 		<description>Office Mate</description>
 		<year>1986</year>
@@ -1974,7 +1974,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="offcmast">
 		<description>Office Master</description>
 		<year>1986</year>
@@ -1985,7 +1985,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="hobbit">
 		<description>The Hobbit</description>
 		<year>1983</year>
@@ -2021,7 +2021,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="mrtmeasr">
 		<description>Mr T's Measuring Games</description>
 		<year>1983</year>
@@ -2032,7 +2032,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="clone">
 		<description>Clone</description>
 		<year>1983</year>
@@ -2043,7 +2043,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="enthar7">
 		<description>Enthar Seven</description>
 		<year>1985</year>
@@ -2061,7 +2061,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="story">
 		<description>Story</description>
 		<year>1983</year>
@@ -2072,7 +2072,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="crosswds">
 		<description>Crosswords</description>
 		<year>1986</year>
@@ -2083,7 +2083,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="readrigh">
 		<description>Read-Right-Away</description>
 		<year>1986</year>
@@ -2094,7 +2094,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="goldcoll">
 		<description>The Gold Collection</description>
 		<year>1987</year>
@@ -2112,7 +2112,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="bismarck">
 		<description>Bismarck Death of a Battleship</description>
 		<year>1987</year>
@@ -2123,7 +2123,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="stdsnook">
 		<description>Steve Davis Snooker</description>
 		<year>1986</year>
@@ -2134,7 +2134,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="bbcomp2">
 		<description>The Bug-Byte Compilation II</description>
 		<year>1987</year>
@@ -2145,7 +2145,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="replica2">
 		<description>Replica II</description>
 		<year>1983</year>
@@ -2156,7 +2156,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="replica3">
 		<description>Replica III</description>
 		<year>1985</year>
@@ -2167,7 +2167,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="thekey">
 		<description>The Key</description>
 		<year>1983</year>
@@ -2178,7 +2178,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="funhous">
 		<description>Fun House</description>
 		<year>1984</year>
@@ -2189,7 +2189,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="grafdisk">
 		<description>Grafdisk</description>
 		<year>1983</year>
@@ -2200,7 +2200,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="fwplus">
 		<description>Fontwise Plus</description>
 		<year>198?</year>
@@ -2211,7 +2211,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="fwfonted">
 		<description>Fontwise Font Editor</description>
 		<year>198?</year>
@@ -2222,7 +2222,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="profile">
 		<description>Profile</description>
 		<year>1985</year>
@@ -2233,7 +2233,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="bbase">
 		<description>Beta-Base</description>
 		<year>1983</year>
@@ -2244,7 +2244,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="bbaseutl">
 		<description>Beta-Base Utilities 1</description>
 		<year>198?</year>
@@ -2255,7 +2255,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="klax">
 		<description>Klax</description>
 		<year>1990</year>
@@ -2266,7 +2266,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="starwars">
 		<description>Star Wars</description>
 		<year>1987</year>
@@ -2277,7 +2277,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="esb">
 		<description>The Empire Strikes Back</description>
 		<year>1988</year>
@@ -2288,7 +2288,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="jedi">
 		<description>Return of the Jedi</description>
 		<year>1988</year>
@@ -2299,7 +2299,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="lickill">
 		<description>License to Kill</description>
 		<year>1989</year>
@@ -2310,7 +2310,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="livdayl">
 		<description>The Living Daylights</description>
 		<year>1983</year>
@@ -2321,7 +2321,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="holedout">
 		<description>Holed Out</description>
 		<year>1989</year>
@@ -2332,7 +2332,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="whimagi2">
 		<description>White Magic 2</description>
 		<year>1989</year>
@@ -2343,7 +2343,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="nevryon">
 		<description>Nevyron</description>
 		<year>1991</year>
@@ -2354,7 +2354,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="uim">
 		<description>U.I.M.</description>
 		<year>1989</year>
@@ -2365,7 +2365,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="etype">
 		<description>E-Type</description>
 		<year>1990</year>
@@ -2376,7 +2376,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="whimagic">
 		<description>White Magic</description>
 		<year>1989</year>
@@ -2387,7 +2387,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="arsoccer">
 		<description>Arcade Soccer</description>
 		<year>1989</year>
@@ -2398,7 +2398,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="zenon">
 		<description>Zenon</description>
 		<year>1989</year>
@@ -2409,7 +2409,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="clogger">
 		<description>Clogger</description>
 		<year>1988</year>
@@ -2420,7 +2420,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="orbital">
 		<description>Orbital</description>
 		<year>1989</year>
@@ -2431,7 +2431,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="artstudi">
 		<description>The Art Studio</description>
 		<year>1989</year>
@@ -2442,7 +2442,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="cheatj1">
 		<description>Cheat It Again Joe Vol.1</description>
 		<year>1988</year>
@@ -2453,7 +2453,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="cheatj2">
 		<description>Cheat It Again Joe Vol.2</description>
 		<year>1988</year>
@@ -2464,7 +2464,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="cheatj4">
 		<description>Cheat It Again Joe Vol.4</description>
 		<year>1988</year>
@@ -2475,7 +2475,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="holedoc1">
 		<description>Holed Out Extra Courses Vol.1</description>
 		<year>1990</year>
@@ -2486,7 +2486,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="holedoc2">
 		<description>Holed Out Extra Courses Vol.2</description>
 		<year>1990</year>
@@ -2497,7 +2497,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="reteden">
 		<description>Return to Eden</description>
 		<year>1984</year>
@@ -2508,7 +2508,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="colossal">
 		<description>Colossal Adventure</description>
 		<year>1983</year>
@@ -2519,7 +2519,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="snowball">
 		<description>Snowball</description>
 		<year>1983</year>
@@ -2530,7 +2530,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="lordstme">
 		<description>Lords of Time</description>
 		<year>1983</year>
@@ -2541,7 +2541,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="advquest">
 		<description>Adventure Quest</description>
 		<year>1983</year>
@@ -2552,7 +2552,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="timemagk">
 		<description>Time and Magik - The Trilogy</description>
 		<year>1988</year>
@@ -2570,7 +2570,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="lancelot">
 		<description>Lancelot</description>
 		<year>1988</year>
@@ -2588,7 +2588,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="imogen">
 		<description>Imogen</description>
 		<year>1986</year>
@@ -2599,7 +2599,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="castleq">
 		<description>Castle Quest</description>
 		<year>1985</year>
@@ -2610,7 +2610,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="stockcar">
 		<description>Stock Car</description>
 		<year>1983</year>
@@ -2621,7 +2621,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="cybermis">
 		<description>Cybertron Mission</description>
 		<year>1984</year>
@@ -2632,7 +2632,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="duneridr">
 		<description>Dune Rider</description>
 		<year>1984</year>
@@ -2643,7 +2643,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="intergal">
 		<description>Intergalactic Trader</description>
 		<year>1983</year>
@@ -2654,7 +2654,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="starflen">
 		<description>Starfleet Encounter</description>
 		<year>1984</year>
@@ -2665,7 +2665,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="drwhomin">
 		<description>Doctor Who and the Mines of Terror (Master/B+)</description>
 		<year>1986</year>
@@ -2676,7 +2676,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="drwhominb" cloneof="drwhomin">
 		<description>Doctor Who and the Mines of Terror (with ROM)</description>
 		<year>1985</year>
@@ -2692,7 +2692,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="blockbus">
 		<description>Blockbuster</description>
 		<year>1984</year>
@@ -2703,7 +2703,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="mree">
 		<description>Mr Ee!</description>
 		<year>1984</year>
@@ -2714,7 +2714,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="frenzy">
 		<description>Frenzy</description>
 		<year>1983</year>
@@ -2725,7 +2725,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="killergo">
 		<description>Killer Gorilla</description>
 		<year>1984</year>
@@ -2736,7 +2736,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="ghouls">
 		<description>Ghouls</description>
 		<year>1984</year>
@@ -2747,7 +2747,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="themine">
 		<description>The Mine</description>
 		<year>1984</year>
@@ -2758,7 +2758,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="felixfac">
 		<description>Felix in the Factory</description>
 		<year>1982</year>
@@ -2769,7 +2769,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="felixwee">
 		<description>Felix Meets the Evil Weevils</description>
 		<year>1984</year>
@@ -2780,7 +2780,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="rubbletr">
 		<description>Rubble Trouble</description>
 		<year>1983</year>
@@ -2809,7 +2809,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="mpmagic2">
 		<description>Micro Power Magic II</description>
 		<year>1986</year>
@@ -2827,7 +2827,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="mpmagic3">
 		<description>Micro Power Magic III</description>
 		<year>1986</year>
@@ -2856,7 +2856,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="citadel">
 		<description>Citadel</description>
 		<year>1985</year>
@@ -2867,7 +2867,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="karatec">
 		<description>Karate Combat</description>
 		<year>1986</year>
@@ -2878,7 +2878,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="tempest">
 		<description>Tempest</description>
 		<year>1985</year>
@@ -2889,7 +2889,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="deathsta">
 		<description>Death Star</description>
 		<year>1985</year>
@@ -2900,7 +2900,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="repton2">
 		<description>Repton 2</description>
 		<year>1985</year>
@@ -2911,7 +2911,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="thrust">
 		<description>Thrust</description>
 		<year>1986</year>
@@ -2922,7 +2922,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="galaforc">
 		<description>Galaforce</description>
 		<year>1986</year>
@@ -2933,7 +2933,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="strykrun">
 		<description>Stryker's Run</description>
 		<year>1986</year>
@@ -2944,7 +2944,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="repton3">
 		<description>Repton 3</description>
 		<year>1986</year>
@@ -2955,7 +2955,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="speech">
 		<description>Speech!</description>
 		<year>1985</year>
@@ -2966,7 +2966,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="overdriv">
 		<description>Overdrive</description>
 		<year>1984</year>
@@ -2977,7 +2977,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="froggys">
 		<description>Froggy</description>
 		<year>1982</year>
@@ -2988,7 +2988,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="exilev1" cloneof="exilev3">
 		<description>Exile (Version 1)</description>
 		<year>1988</year>
@@ -2999,7 +2999,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="exilev2" cloneof="exilev3">
 		<description>Exile (Version 2)</description>
 		<year>1988</year>
@@ -3010,7 +3010,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="exilev3">
 		<description>Exile (Version 3)</description>
 		<year>1988</year>
@@ -3021,7 +3021,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="exilerc" cloneof="exilev3">
 		<description>Exile (Review Copy)</description>
 		<year>1988</year>
@@ -3033,7 +3033,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="ravskull">
 		<description>Ravenskull</description>
 		<year>1987</year>
@@ -3044,7 +3044,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="retdoom">
 		<description>Return to Doom</description>
 		<year>1988</year>
@@ -3062,7 +3062,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="gkiller">
 		<description>Giant Killer</description>
 		<year>1987</year>
@@ -3073,7 +3073,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="ctodoomt">
 		<description>Countdown to Doom (Topologika)</description>
 		<year>1987</year>
@@ -3084,7 +3084,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="phquestt">
 		<description>Philosopher's Quest (Topologika)</description>
 		<year>1987</year>
@@ -3095,7 +3095,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="ldaydoom">
 		<description>Last Days of Doom</description>
 		<year>1990</year>
@@ -3106,7 +3106,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="achetont">
 		<description>Acheton (Topologika)</description>
 		<year>1987</year>
@@ -3117,7 +3117,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="avon">
 		<description>Avon</description>
 		<year>1989</year>
@@ -3128,7 +3128,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="kohamilt">
 		<description>Kingdom of Hamil (Topologika)</description>
 		<year>1987</year>
@@ -3139,7 +3139,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="murdac">
 		<description>Murdac</description>
 		<year>1989</year>
@@ -3150,7 +3150,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="wolympia">
 		<description>Winter Olympiad 88</description>
 		<year>1988</year>
@@ -3161,7 +3161,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="indoorsp">
 		<description>Indoor Sports</description>
 		<year>1988</year>
@@ -3172,7 +3172,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="bdash">
 		<description>Boulder Dash</description>
 		<year>1988</year>
@@ -3183,7 +3183,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="saigon">
 		<description>Saigon</description>
 		<year>1988</year>
@@ -3194,7 +3194,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="solympid">
 		<description>Summer Olympiad</description>
 		<year>1988</year>
@@ -3205,7 +3205,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="spyvsspy">
 		<description>Spy vs Spy</description>
 		<year>1984</year>
@@ -3216,7 +3216,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="circusga">
 		<description>Circus Games</description>
 		<year>1988</year>
@@ -3227,7 +3227,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="phantom">
 		<description>Phantom</description>
 		<year>1987</year>
@@ -3238,7 +3238,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="futuresh">
 		<description>Future Shock</description>
 		<year>1986</year>
@@ -3249,7 +3249,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="bhillcop">
 		<description>Beverly Hills Cop</description>
 		<year>1990</year>
@@ -3279,7 +3279,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="goal">
 		<description>Goal!</description>
 		<year>1986</year>
@@ -3290,7 +3290,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="cwgames">
 		<description>Commonwealth Games</description>
 		<year>1986</year>
@@ -3308,7 +3308,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="wolympic">
 		<description>Winter Olympics</description>
 		<year>1986</year>
@@ -3319,7 +3319,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="superman">
 		<description>Superman: The Man of Steel</description>
 		<year>1989</year>
@@ -3337,7 +3337,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="jetsetw2">
 		<description>Jet Set Willy II</description>
 		<year>1985</year>
@@ -3348,9 +3348,9 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Business -->
-	
+
 	<software name="mailsys">
 		<description>Mailing System</description>
 		<year>1984</year>
@@ -3362,7 +3362,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="database">
 		<description>Database</description>
 		<year>1983</year>
@@ -3374,7 +3374,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="acctrecv">
 		<description>Accounts Receivable</description>
 		<year>1984</year>
@@ -3386,7 +3386,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="acctpay">
 		<description>Accounts Payable</description>
 		<year>1984</year>
@@ -3398,7 +3398,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="purchsng">
 		<description>Purchasing</description>
 		<year>1984</year>
@@ -3410,7 +3410,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="invoicng">
 		<description>Invoicing</description>
 		<year>1984</year>
@@ -3422,7 +3422,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="farmcash">
 		<description>FarmCash Setup v1.12</description>
 		<year>198?</year>
@@ -3434,7 +3434,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="fieldfil">
 		<description>FieldFile Setup v1.11</description>
 		<year>198?</year>
@@ -3446,7 +3446,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="capcost">
 		<description>CapCost Setup v1.11</description>
 		<year>1983</year>
@@ -3458,7 +3458,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="farmplan">
 		<description>FarmPlanner Setup v1.01</description>
 		<year>1983</year>
@@ -3470,7 +3470,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="moffice">
 		<description>Mini Office</description>
 		<year>1984</year>
@@ -3481,7 +3481,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="moffice2">
 		<description>Mini Office II</description>
 		<year>1986</year>
@@ -3492,9 +3492,9 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Educational -->
-	
+
 	<software name="flowercr">
 		<description>Flowers of Crystal</description>
 		<year>198?</year>
@@ -3505,7 +3505,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dragonwb">
 		<description>Dragon World (BBC Only)</description>
 		<year>198?</year>
@@ -3516,7 +3516,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="dragonw">
 		<description>Dragon World</description>
 		<year>198?</year>
@@ -3527,7 +3527,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="dinodisc">
 		<description>Dinosaur Discovery</description>
 		<year>198?</year>
@@ -3538,7 +3538,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="wrldword">
 		<description>World Without Words</description>
 		<year>198?</year>
@@ -3549,7 +3549,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="boxtresc">
 		<description>Box of Treasures Create</description>
 		<year>198?</year>
@@ -3560,7 +3560,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="boxtres">
 		<description>Box of Treasures</description>
 		<year>1983</year>
@@ -3571,7 +3571,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ggarden">
 		<description>Granny's Garden</description>
 		<year>1984</year>
@@ -3583,7 +3583,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="childspc">
 		<description>Children from Space</description>
 		<year>1984</year>
@@ -3594,7 +3594,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="hideseek">
 		<description>Hide &amp; Seek</description>
 		<year>1984</year>
@@ -3605,7 +3605,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="facemake">
 		<description>Facemaker</description>
 		<year>1984</year>
@@ -3616,7 +3616,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="squeeze">
 		<description>Squeeze</description>
 		<year>1984</year>
@@ -3627,7 +3627,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="numbergu">
 		<description>Number Gulper</description>
 		<year>1984</year>
@@ -3638,7 +3638,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="cranky">
 		<description>Cranky</description>
 		<year>1984</year>
@@ -3649,7 +3649,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="tableadv">
 		<description>Table Adventures</description>
 		<year>1984</year>
@@ -3660,7 +3660,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="jugglepu">
 		<description>Juggle Puzzle</description>
 		<year>1984</year>
@@ -3671,7 +3671,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="pazazz">
 		<description>Pazazz</description>
 		<year>1985</year>
@@ -3682,7 +3682,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="letscoun">
 		<description>Let's Count</description>
 		<year>1984</year>
@@ -3693,7 +3693,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="wrdswrds">
 		<description>Words Words Words</description>
 		<year>1984</year>
@@ -3704,7 +3704,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="podd">
 		<description>Podd</description>
 		<year>1984</year>
@@ -3715,7 +3715,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="timeman1">
 		<description>Timeman One</description>
 		<year>1983</year>
@@ -3726,7 +3726,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="happynum">
 		<description>Happy Numbers</description>
 		<year>198?</year>
@@ -3737,7 +3737,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="fs2-68">
 		<description>Fun School 2 (For 6-8 year olds)</description>
 		<year>1989</year>
@@ -3748,7 +3748,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="fs2-ov8">
 		<description>Fun School 2 (For the Over-8s)</description>
 		<year>1989</year>
@@ -3759,7 +3759,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="symbmole">
 		<description>Symbols to Moles</description>
 		<year>198?</year>
@@ -3770,7 +3770,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="longwave">
 		<description>Longitudinal Waves</description>
 		<year>198?</year>
@@ -3781,7 +3781,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bertboot">
 		<description>Bert Boot</description>
 		<year>1984</year>
@@ -3792,7 +3792,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="roadcft1">
 		<description>Roadcraft 1</description>
 		<year>1984</year>
@@ -3803,7 +3803,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="frmistra">
 		<description>The French Mistress Level A</description>
 		<year>1983</year>
@@ -3814,7 +3814,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="frmistrb">
 		<description>The French Mistress Level B</description>
 		<year>1983</year>
@@ -3825,7 +3825,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tpicnic">
 		<description>The Teddy Bears' Picnic</description>
 		<year>1989</year>
@@ -3843,7 +3843,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="connectn">
 		<description>Connections</description>
 		<year>1990</year>
@@ -3854,7 +3854,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="vowlsnd2">
 		<description>Short Vowel Sounds v2</description>
 		<year>1983</year>
@@ -3865,7 +3865,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="vowlsnd" cloneof="vowlsnd2">
 		<description>Short Vowel Sounds</description>
 		<year>1983</year>
@@ -3876,7 +3876,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="tcircus">
 		<description>The Circus</description>
 		<year>1985</year>
@@ -3894,7 +3894,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="mathsnap">
 		<description>Maths Snap</description>
 		<year>198?</year>
@@ -3905,7 +3905,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="wbuild2">
 		<description>Word Builder MkII</description>
 		<year>1985</year>
@@ -3916,7 +3916,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="wbuild2a" cloneof="wbuild2">
 		<description>Word Builder MkII (alt)</description>
 		<year>1985</year>
@@ -3927,7 +3927,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="wbuild">
 		<description>Word Builder</description>
 		<year>198?</year>
@@ -3949,7 +3949,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="gbuild">
 		<description>Graph Builder</description>
 		<year>1986</year>
@@ -3960,7 +3960,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="gbuilda" cloneof="gbuild">
 		<description>Graph Builder (alt)</description>
 		<year>1986</year>
@@ -3971,7 +3971,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="wizretna" cloneof="wizretn">
 		<description>The Wizard's Return (alt)</description>
 		<year>1989</year>
@@ -3989,7 +3989,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="wizretn">
 		<description>The Wizard's Return</description>
 		<year>1985</year>
@@ -4007,7 +4007,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="uareaa" cloneof="uarea">
 		<description>Understanding Area (alt)</description>
 		<year>1986</year>
@@ -4018,7 +4018,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="uarea">
 		<description>Understanding Area</description>
 		<year>1986</year>
@@ -4029,7 +4029,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="dreamtim">
 		<description>Dream Time</description>
 		<year>1989</year>
@@ -4047,7 +4047,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="teachcup">
 		<description>The Teachers Cupboard</description>
 		<year>198?</year>
@@ -4065,7 +4065,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="easytype">
 		<description>Easy Type</description>
 		<year>1984</year>
@@ -4076,7 +4076,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="magice">
 		<description>Magic E</description>
 		<year>198?</year>
@@ -4087,7 +4087,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="storysta">
 		<description>Story Starts</description>
 		<year>198?</year>
@@ -4117,7 +4117,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="wizrevng">
 		<description>The Wizard's Revenge</description>
 		<year>1989</year>
@@ -4135,7 +4135,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="zillion">
 		<description>Zillion</description>
 		<year>1990</year>
@@ -4159,7 +4159,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="animresc">
 		<description>Animal Rescue</description>
 		<year>1986</year>
@@ -4189,7 +4189,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="naturadv">
 		<description>The Nature Park Adventure</description>
 		<year>1987</year>
@@ -4219,7 +4219,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="naturadvb" cloneof="naturadv">
 		<description>The Nature Park Adventure (alt)</description>
 		<year>1987</year>
@@ -4249,7 +4249,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="tobybeac">
 		<description>Toby at the Beach</description>
 		<year>1990</year>
@@ -4279,7 +4279,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="anialpha">
 		<description>The Animated Alphabet</description>
 		<year>198?</year>
@@ -4297,7 +4297,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="sellador">
 		<description>Selladore Tales</description>
 		<year>1991</year>
@@ -4315,7 +4315,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="thefarm">
 		<description>The Farm</description>
 		<year>1987</year>
@@ -4333,7 +4333,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="mryog">
 		<description>Mr Yog and the Nippet</description>
 		<year>1984</year>
@@ -4344,7 +4344,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="mapventu">
 		<description>Mapventure</description>
 		<year>1988</year>
@@ -4362,7 +4362,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="aninumbr">
 		<description>Animated Numbers</description>
 		<year>198?</year>
@@ -4373,7 +4373,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="typesett">
 		<description>Typesetter!</description>
 		<year>198?</year>
@@ -4414,7 +4414,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="gtverbs">
 		<description>The Grammar Tree - Verbs &amp; Adverbs</description>
 		<year>1983</year>
@@ -4425,7 +4425,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="gtsenten">
 		<description>The Grammar Tree - Sentences</description>
 		<year>1983</year>
@@ -4436,7 +4436,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="gtnouns">
 		<description>The Grammar Tree - Nouns &amp; Adjectives</description>
 		<year>1983</year>
@@ -4447,7 +4447,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="timetrav">
 		<description>Time Traveller</description>
 		<year>1983</year>
@@ -4458,5 +4458,5 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>

@@ -28,10 +28,13 @@
         * Porky
         * MTV Rock-N-Roll Trivia (Part 2)
         * Woodpecker
+		* Pacman Club / Club Lambada
 
 
     Known issues:
-        * mystery items in Ali Baba don't work correctly because of protection
+        * Mystery items in Ali Baba don't work correctly because of protection.
+		* Pacman Club controls need to be demultiplexed for 2-players simultaneous mode.
+		  Also need 4-players extra inputs.
 
     Known to exist but dumps needed
         * Eeeek!
@@ -3994,7 +3997,6 @@ ROM_END
 
 /*
 
-
   Double Command Pac-Man game.
   ----------------------------
 
@@ -4117,7 +4119,6 @@ ROM_END
   82S27                                                          27S11
 
 
-
   Dumps and docs by Robbie.
   Credits: Roberto Fresca, ytsejam
 
@@ -4134,15 +4135,16 @@ ROM_START( clubpacm )
 	ROM_LOAD( "13.5f",   0x1000, 0x0800, CRC(22b0188a) SHA1(a9ed9ca8b36a60081fd364abc9bc23963932cc0b) )
 	ROM_LOAD( "15.5j",   0x1800, 0x0800, CRC(50c7477d) SHA1(c04ec282a8cb528df5e38ad750d12ee71612695d) )
 
-	// proms have not been dumped
+	// Color PROMs have been dumped. They match the pacman/mspacman ones 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, BAD_DUMP CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
-	ROM_LOAD( "82s129.4a",    0x0020, 0x0100, BAD_DUMP CRC(63efb927) SHA1(5c144a613fc4960a1dfd7ead89e7fee258a63171) )
+	ROM_LOAD( "n82s123n.7f",  0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "m7611.4a",     0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
-	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
+	ROM_LOAD( "m7611.1m",     0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "m7611.3m",     0x0100, 0x0100, CRC(0e307106) SHA1(6140b5339008dd3110cd5be2e2fb4813779dfe28) )    /* timing - not used */
 ROM_END
+
 
 ROM_START( hangly )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -6899,7 +6901,7 @@ GAME( 1992, mspacmanblt,mspacman,woodpek, mspacman, driver_device, 0,        ROT
 GAME( 1991, mspacmanbcc,mspacman,woodpek, mspacman, driver_device, 0,        ROT90,  "bootleg (Tecnausa)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Tecnausa bootleg)", MACHINE_SUPPORTS_SAVE ) // ^ same PCB, also dated 1991, distributed by Tecnausa
 GAME( 198?, pacmansp,   puckman, pacman,  pacmansp, driver_device, 0,        ROT90,  "bootleg",            "Puck Man (Spanish, 'Made in Greece' bootleg)", MACHINE_SUPPORTS_SAVE ) // probably a further conversion of the mspacmanbg bootleg, still has some MS Pacman code + extra features
 
-GAME( 1991, clubpacm,  0,       woodpek, mspacman, driver_device, 0,        ROT90,  "Miky SRL", "Club Pacman / Lambada (Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1989, clubpacm,  0,       woodpek,  mspacman, driver_device, 0,        ROT90,  "Miky SRL", "Pacman Club / Club Lambada (Argentina)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 GAME( 1985, jumpshot, 0,        pacman,   jumpshot, pacman_state,  jumpshot, ROT90,  "Bally Midway", "Jump Shot", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, jumpshotp,jumpshot, pacman,   jumpshotp,pacman_state,  jumpshot, ROT90,  "Bally Midway", "Jump Shot Engineering Sample", MACHINE_SUPPORTS_SAVE )

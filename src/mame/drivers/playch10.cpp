@@ -681,7 +681,7 @@ static MACHINE_CONFIG_START( playch10, playch10_state )
 	MCFG_PPU2C0X_CPU("cart")
 	MCFG_PPU2C0X_COLORBASE(256)
 	MCFG_PPU2C0X_SET_NMI(playch10_state, ppu_irq)
-	
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_RP5H01_ADD("rp5h01")

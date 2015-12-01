@@ -126,7 +126,7 @@ const floppy_format_type floppy_image_device::default_floppy_formats[] = {
 
 floppy_connector::floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, FLOPPY_CONNECTOR, "Floppy drive connector abstraction", tag, owner, clock, "floppy_connector", __FILE__),
-	device_slot_interface(mconfig, *this), 
+	device_slot_interface(mconfig, *this),
 	formats(NULL),
 	m_enable_sound(false)
 {
@@ -167,26 +167,26 @@ floppy_image_device *floppy_connector::get_device()
 floppy_image_device::floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_image_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this), 
-		input_format(NULL), 
+		device_slot_card_interface(mconfig, *this),
+		input_format(NULL),
 		output_format(NULL),
 		image(NULL),
-		fif_list(NULL), 
-		index_timer(NULL), 
-		tracks(0), 
-		sides(0), 
-		form_factor(0), 
-		motor_always_on(false), 
-		dir(0), stp(0), wtg(0), mon(0), ss(0), idx(0), wpt(0), rdy(0), dskchg(0), 
-		ready(false), 
-		rpm(0), 
-		floppy_ratio_1(0), 
-		revolution_count(0), 
-		cyl(0), 
-		subcyl(0), 
-		image_dirty(false), 
+		fif_list(NULL),
+		index_timer(NULL),
+		tracks(0),
+		sides(0),
+		form_factor(0),
+		motor_always_on(false),
+		dir(0), stp(0), wtg(0), mon(0), ss(0), idx(0), wpt(0), rdy(0), dskchg(0),
+		ready(false),
+		rpm(0),
+		floppy_ratio_1(0),
+		revolution_count(0),
+		cyl(0),
+		subcyl(0),
+		image_dirty(false),
 		ready_counter(0),
-		m_make_sound(false), 
+		m_make_sound(false),
 		m_sound_out(NULL)
 {
 	extension_list[0] = '\0';
@@ -1103,22 +1103,22 @@ void ui_menu_control_floppy_image::handle()
 //===================================================================
 
 floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: samples_device(mconfig, FLOPPYSOUND, "Floppy sound", tag, owner, clock, "flopsnd", __FILE__), 
-	  m_sound(NULL), 
-	  m_is525(false), 
-	  m_sampleindex_motor_start(0), 
-	  m_sampleindex_motor_loop(0), 
-	  m_sampleindex_motor_end(0), 
-	  m_samplesize_motor_start(0), 
-	  m_samplesize_motor_loop(0), 
-	  m_samplesize_motor_end(0), 
-	  m_samplepos_motor(0), 
-	  m_motor_playback_state(0), 
-	  m_motor_on(false), 
-	  m_step_samples(0), 
-	  m_sampleindex_step1(0), 
-	  m_samplepos_step(0), 
-	  m_step_playback_state(0)
+	: samples_device(mconfig, FLOPPYSOUND, "Floppy sound", tag, owner, clock, "flopsnd", __FILE__),
+		m_sound(NULL),
+		m_is525(false),
+		m_sampleindex_motor_start(0),
+		m_sampleindex_motor_loop(0),
+		m_sampleindex_motor_end(0),
+		m_samplesize_motor_start(0),
+		m_samplesize_motor_loop(0),
+		m_samplesize_motor_end(0),
+		m_samplepos_motor(0),
+		m_motor_playback_state(0),
+		m_motor_on(false),
+		m_step_samples(0),
+		m_sampleindex_step1(0),
+		m_samplepos_step(0),
+		m_step_playback_state(0)
 {
 	m_loaded = false;
 }

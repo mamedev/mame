@@ -230,10 +230,10 @@ SED1520_UPDATE_CB(gl3000s_screen_update_left)
 		{
 			UINT8 data = vram[(y*0x50 + x) % 0x140];
 			INT32 dpos = (x - 74) / 2;
-            if (dpos < 0)
-            {
-                dpos = 0;
-            }
+			if (dpos < 0)
+			{
+				dpos = 0;
+			}
 
 			for (int yi=0; yi<8; yi++)
 			{

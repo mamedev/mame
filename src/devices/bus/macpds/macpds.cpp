@@ -28,8 +28,8 @@ const device_type MACPDS_SLOT = &device_creator<macpds_slot_device>;
 //-------------------------------------------------
 macpds_slot_device::macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, MACPDS_SLOT, "Mac 68000 Processor-Direct Slot", tag, owner, clock, "macpds_slot", __FILE__),
-		device_slot_interface(mconfig, *this), 
-	m_macpds_tag(nullptr), 
+		device_slot_interface(mconfig, *this),
+	m_macpds_tag(nullptr),
 	m_macpds_slottag(nullptr)
 {
 }

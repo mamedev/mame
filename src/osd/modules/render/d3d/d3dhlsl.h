@@ -325,7 +325,7 @@ public:
 		int                 defval;
 		int                 maxval;
 		int                 step;
-		int                 screen_type;              
+		int                 screen_type;
 		INT32(*adjustor)(running_machine &, void *, std::string *, INT32);
 	};
 

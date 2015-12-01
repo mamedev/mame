@@ -709,7 +709,7 @@ void amstrad_state::amstrad_plus_gate_array_get_video_data()
 	{
 		ma += m_asic.horiz_disp;
 	}
-	
+
 	m_gate_array.address = ( ( ma & 0x3000 ) << 2 ) | ( ( ra & 0x07 ) << 11 ) | ( ( ma & 0x3ff ) << 1 );
 	m_gate_array.data = m_ram->pointer()[ m_gate_array.address ];
 	if((m_asic.ram[0x2804] & 0x80) && m_asic.hsync_first_tick)
@@ -1863,6 +1863,9 @@ READ8_MEMBER(amstrad_state::amstrad_cpc_io_r)
 		}
 	}
 
+	if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )  // Plus systems return 0x78 (464+) or 0x79 (6128+) when attempting to read the gate array (and any other unreadable space too?)
+		data = 0x79;
+
 	/* if b14 = 0 : CRTC Read selected */
 	if ((offset & (1<<14)) == 0)
 	{
@@ -1910,6 +1913,9 @@ b9 b8 | PPI Function Read/Write status
 	{
 		if (r1r0 < 0x03 )
 			data = m_ppi->read(space, r1r0);
+		if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )  // Plus systems return the data written to port C (I/O status is ignored)
+			if(r1r0 == 0x02)
+				data = m_last_write;
 	}
 
 /* if b10 = 0 : Expansion Peripherals Read selected
@@ -2101,9 +2107,11 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 	*/
 	if ((offset & (1<<11)) == 0)
 	{
-		unsigned int Index = ((offset & 0x0300) >> 8);
+		unsigned int idx = ((offset & 0x0300) >> 8);
 
-		m_ppi->write(space, Index, data);
+		m_ppi->write(space, idx, data);
+		if(idx == 0x02)
+			m_last_write = data;
 	}
 
 	/* if b10 = 0 : Expansion Peripherals Write selected */
@@ -2332,6 +2340,8 @@ Once all tables and jumpblocks have been set up,
 control is passed to the default entry in rom 0*/
 void amstrad_state::amstrad_reset_machine()
 {
+	m_last_write = 0xff;
+	
 	/* enable lower rom (OS rom) */
 	amstrad_GateArray_write(0x089);
 

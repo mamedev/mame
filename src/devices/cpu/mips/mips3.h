@@ -282,7 +282,7 @@ public:
 	void mips3drc_set_options(UINT32 options);
 	void mips3drc_add_hotspot(offs_t pc, UINT32 opcode, UINT32 cycles);
 	void burn_cycles(INT32 cycles);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();

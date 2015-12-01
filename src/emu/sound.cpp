@@ -791,9 +791,9 @@ sound_stream::stream_input::stream_input()
 //-------------------------------------------------
 
 sound_stream::stream_output::stream_output()
-	: m_stream(NULL), 
-	  m_dependents(0),
-	  m_gain(0x100)
+	: m_stream(NULL),
+		m_dependents(0),
+		m_gain(0x100)
 {
 }
 

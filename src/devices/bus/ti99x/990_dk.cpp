@@ -43,7 +43,7 @@ enum
 const device_type FD800 = &device_creator<fd800_legacy_device>;
 
 fd800_legacy_device::fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, FD800, "TI FD800 Diablo floppy disk controller", tag, owner, clock, "fd800", __FILE__), 
+	: device_t(mconfig, FD800, "TI FD800 Diablo floppy disk controller", tag, owner, clock, "fd800", __FILE__),
 	m_recv_buf(0), m_stat_reg(0), m_xmit_buf(0), m_cmd_reg(0), m_interrupt_f_f(0),
 	m_int_line(*this), m_buf_pos(0), m_buf_mode(), m_unit(0), m_sector(0)
 {

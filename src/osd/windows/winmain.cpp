@@ -1348,7 +1348,7 @@ FPTR symbol_manager::get_text_section_base()
 //-------------------------------------------------
 
 sampling_profiler::sampling_profiler(UINT32 max_seconds, UINT8 stack_depth = 0)
-	:   m_target_thread(NULL), 
+	:   m_target_thread(NULL),
 		m_thread(NULL),
 		m_thread_id(0),
 		m_thread_exit(false),

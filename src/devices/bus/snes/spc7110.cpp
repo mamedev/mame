@@ -25,10 +25,10 @@ const device_type SNS_HIROM_SPC7110_RTC = &device_creator<sns_rom_spc7110rtc_dev
 
 
 sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-			: sns_rom21_device(mconfig, type, name, tag, owner, clock, shortname, source), m_r4801(0), m_r4802(0), m_r4803(0), m_r4804(0), m_r4805(0), m_r4806(0), m_r4807(0), 
-	m_r4808(0), m_r4809(0), m_r480a(0), m_r480b(0), m_r480c(0), m_decomp(nullptr), m_r4811(0), m_r4812(0), m_r4813(0), m_r4814(0), m_r4815(0), m_r4816(0), m_r4817(0), m_r4818(0), 
-	m_r481x(0), m_r4814_latch(0), m_r4815_latch(0), m_r4820(0), m_r4821(0), m_r4822(0), m_r4823(0), m_r4824(0), m_r4825(0), m_r4826(0), m_r4827(0), m_r4828(0), m_r4829(0), m_r482a(0), 
-	m_r482b(0), m_r482c(0), m_r482d(0), m_r482e(0), m_r482f(0), m_r4830(0), m_r4831(0), m_r4832(0), m_r4833(0), m_r4834(0), m_dx_offset(0), m_ex_offset(0), m_fx_offset(0), m_r4840(0), 
+			: sns_rom21_device(mconfig, type, name, tag, owner, clock, shortname, source), m_r4801(0), m_r4802(0), m_r4803(0), m_r4804(0), m_r4805(0), m_r4806(0), m_r4807(0),
+	m_r4808(0), m_r4809(0), m_r480a(0), m_r480b(0), m_r480c(0), m_decomp(nullptr), m_r4811(0), m_r4812(0), m_r4813(0), m_r4814(0), m_r4815(0), m_r4816(0), m_r4817(0), m_r4818(0),
+	m_r481x(0), m_r4814_latch(0), m_r4815_latch(0), m_r4820(0), m_r4821(0), m_r4822(0), m_r4823(0), m_r4824(0), m_r4825(0), m_r4826(0), m_r4827(0), m_r4828(0), m_r4829(0), m_r482a(0),
+	m_r482b(0), m_r482c(0), m_r482d(0), m_r482e(0), m_r482f(0), m_r4830(0), m_r4831(0), m_r4832(0), m_r4833(0), m_r4834(0), m_dx_offset(0), m_ex_offset(0), m_fx_offset(0), m_r4840(0),
 	m_r4841(0), m_r4842(0), m_rtc_state(0), m_rtc_mode(0), m_rtc_index(0), m_rtc_offset(0)
 		{
 }

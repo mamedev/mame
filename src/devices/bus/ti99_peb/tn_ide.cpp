@@ -50,9 +50,9 @@ enum
 };
 
 nouspikel_ide_interface_device::nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ti_expansion_card_device(mconfig, TI99_IDE, "Nouspikel IDE interface card", tag, owner, clock, "ti99_ide", __FILE__), m_ata_irq(false), 
+	: ti_expansion_card_device(mconfig, TI99_IDE, "Nouspikel IDE interface card", tag, owner, clock, "ti99_ide", __FILE__), m_ata_irq(false),
 	m_cru_register(0), m_rtc(nullptr),
-	m_ata(*this, "ata"), m_clk_irq(false), m_sram_enable(false), m_sram_enable_dip(false), m_cur_page(0), m_tms9995_mode(false), 
+	m_ata(*this, "ata"), m_clk_irq(false), m_sram_enable(false), m_sram_enable_dip(false), m_cur_page(0), m_tms9995_mode(false),
 	m_input_latch(0), m_output_latch(0), m_ram(nullptr)
 {
 }

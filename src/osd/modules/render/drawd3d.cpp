@@ -616,8 +616,8 @@ texture_info *texture_manager::find_texinfo(const render_texinfo *texinfo, UINT3
 }
 
 renderer::renderer(osd_window *window)
-	: osd_renderer(window, FLAG_NONE), m_adapter(0), m_width(0), m_height(0), m_refresh(0), m_create_error_count(0), m_device(NULL), m_gamma_supported(0), m_pixformat(), 
-	m_vertexbuf(NULL), m_lockedbuf(NULL), m_numverts(0), m_vectorbatch(NULL), m_batchindex(0), m_numpolys(0), m_restarting(false), m_mod2x_supported(0), m_mod4x_supported(0), 
+	: osd_renderer(window, FLAG_NONE), m_adapter(0), m_width(0), m_height(0), m_refresh(0), m_create_error_count(0), m_device(NULL), m_gamma_supported(0), m_pixformat(),
+	m_vertexbuf(NULL), m_lockedbuf(NULL), m_numverts(0), m_vectorbatch(NULL), m_batchindex(0), m_numpolys(0), m_restarting(false), m_mod2x_supported(0), m_mod4x_supported(0),
 	m_screen_format(), m_last_texture(NULL), m_last_texture_flags(0), m_last_blendenable(0), m_last_blendop(0), m_last_blendsrc(0), m_last_blenddst(0), m_last_filter(0),
 	m_last_wrap(), m_last_modmode(0), m_hlsl_buf(NULL), m_shaders(NULL), m_shaders_options(NULL), m_texture_manager(NULL), m_line_count(0)
 {

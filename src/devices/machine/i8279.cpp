@@ -374,9 +374,9 @@ READ8_MEMBER( i8279_device::data_r )
 	// read the display ram
 		data = m_d_ram[m_d_ram_ptr];
 		if (m_autoinc)
-        {
+		{
 			m_d_ram_ptr++;
-        }
+		}
 	}
 	else
 	if (sensor_mode)
@@ -385,13 +385,13 @@ READ8_MEMBER( i8279_device::data_r )
 		assert(m_s_ram_ptr < ARRAY_LENGTH(m_s_ram));
 		data = m_s_ram[m_s_ram_ptr];
 		if (m_autoinc)
-        {
+		{
 			m_s_ram_ptr++;
-        }
+		}
 		else
-        {
+		{
 			set_irq(0);
-        }
+		}
 	}
 	else
 	{

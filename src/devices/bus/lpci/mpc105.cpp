@@ -33,9 +33,9 @@ mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, MPC105, "MPC105", tag, owner, clock, "mpc105", __FILE__),
 	pci_device_interface( mconfig, *this ),
 	m_cpu_tag(nullptr),
-	m_bank_base_default(0), 
-	m_bank_base(0), 
-	m_bank_enable(0), 
+	m_bank_base_default(0),
+	m_bank_base(0),
+	m_bank_enable(0),
 	m_maincpu(nullptr)
 {
 }

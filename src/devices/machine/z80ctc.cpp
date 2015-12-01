@@ -85,7 +85,7 @@ z80ctc_device::z80ctc_device(const machine_config &mconfig, const char *tag, dev
 		m_zc0_cb(*this),
 		m_zc1_cb(*this),
 		m_zc2_cb(*this),
-		m_zc3_cb(*this), 
+		m_zc3_cb(*this),
 		m_vector(0)
 {
 }
@@ -284,8 +284,8 @@ void z80ctc_device::interrupt_check()
 //-------------------------------------------------
 
 z80ctc_device::ctc_channel::ctc_channel()
-	: m_device(NULL), 
-		m_index(0), 
+	: m_device(NULL),
+		m_index(0),
 		m_mode(0),
 		m_tconst(0),
 		m_down(0),

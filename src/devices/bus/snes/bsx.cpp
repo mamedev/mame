@@ -25,13 +25,13 @@ const device_type SNS_BSMEMPAK = &device_creator<sns_rom_bsmempak_device>;
 
 
 sns_rom_bsx_device::sns_rom_bsx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: sns_rom_device(mconfig, type, name, tag, owner, clock, shortname, source), 
-	m_base_unit(nullptr), 
+					: sns_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_base_unit(nullptr),
 	access_00_1f(0),
-	access_80_9f(0), 
-	access_40_4f(0), 
-	access_50_5f(0), 
-	access_60_6f(0), 
+	access_80_9f(0),
+	access_40_4f(0),
+	access_50_5f(0),
+	access_60_6f(0),
 	rom_access(0),
 	m_slot(*this, "bs_slot")
 {

@@ -20,7 +20,7 @@ public:
 	DECLARE_READ8_MEMBER(mcu_data_r);
 	DECLARE_WRITE8_MEMBER(mcu_data_w);
 	DECLARE_WRITE16_MEMBER(mcu_d_w);
-	
+
 	// external I/O
 	DECLARE_WRITE_LINE_MEMBER(bus_dir_w);
 	DECLARE_WRITE_LINE_MEMBER(mcu_start_w);

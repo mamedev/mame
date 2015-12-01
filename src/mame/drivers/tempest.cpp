@@ -603,7 +603,7 @@ static MACHINE_CONFIG_START( tempest, tempest_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 570)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_DEVICE_ADD("avg", AVG_TEMPEST, MASTER_CLOCK)
+	MCFG_DEVICE_ADD("avg", AVG_TEMPEST, 0)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* Drivers */

@@ -255,6 +255,9 @@ public:
 	UINT32 m_se30_vbl_enable;
 	UINT8 m_nubus_irq_state;
 
+	emu_timer *m_overlay_timeout;
+	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
+
 #ifndef MAC_USE_EMULATED_KBD
 	/* used to store the reply to most keyboard commands */
 	int m_keyboard_reply;
@@ -419,7 +422,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(mac_asc_irq);
 
-	DECLARE_DIRECT_UPDATE_MEMBER(overlay_opbaseoverride);
 private:
 	int has_adb();
 	void adb_reset();

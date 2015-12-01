@@ -187,7 +187,7 @@
         cause a note acceptor error), the note acceptor works, adding 4 credits ($1?).
         This is seemingly a quarter slot (25c). Not sure if other notes are possible.
      - Same gameplay as Gone Troppo, one interesting thing about this game is that
-	    the KQJ symbols have actual faces instead of plain letters.
+        the KQJ symbols have actual faces instead of plain letters.
 
     08/03/2013 - Heihachi_73
     Cleaned up comments and erroneous ROM names (e.g. graphics ROMs named after the program ROM).
@@ -206,7 +206,7 @@
 
     13/11/2015 - Roberto Fresca
     Added new game: Fever Pitch? (2VXEC534, NSW, 90.36%).
-	Need to confirm the title.
+    Need to confirm the title.
 
 
 *************************************************************************************************************

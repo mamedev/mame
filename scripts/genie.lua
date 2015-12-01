@@ -998,13 +998,9 @@ end
 				"-Wno-tautological-compare",
 				"-Wno-dynamic-class-memaccess",
 			}
-			if (version >= 30200) then
+			if (version >= 30000) then
 				buildoptions {
 					"-Wno-unused-value",
-				}
-			end
-			if (version >= 30400) then
-				buildoptions {
 					"-Wno-inline-new-delete",
 					"-Wno-constant-logical-operand",
 				}
@@ -1090,11 +1086,6 @@ configuration { "asmjs" }
 		"-std=gnu++98",
 	}
 	archivesplit_size "20"
-	if os.getenv("EMSCRIPTEN") then
-		includedirs {
-			os.getenv("EMSCRIPTEN") .. "/system/lib/libcxxabi/include"
-		}
-	end
 
 configuration { "android*" }
 	buildoptions {

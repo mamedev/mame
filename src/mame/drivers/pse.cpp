@@ -79,8 +79,8 @@ static NETLIST_START(pse)
 	// schematics
 	//...
 
-        //  NETDEV_ANALOG_CALLBACK(sound_cb, sound, psettl_state, sound_cb, "")
-        //  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
+		//  NETDEV_ANALOG_CALLBACK(sound_cb, sound, psettl_state, sound_cb, "")
+		//  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
 NETLIST_END()
 
 

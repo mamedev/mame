@@ -96,6 +96,9 @@ void rungun_state::video_start()
 	m_ttl_tilemap->set_transparent_pen(0);
 
 	m_sprite_colorbase = 0x20;
+
+	m_screen->register_screen_bitmap(m_rng_dual_demultiplex_left_temp);
+	m_screen->register_screen_bitmap(m_rng_dual_demultiplex_right_temp);
 }
 
 UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -103,11 +106,43 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
-	m_k053936->zoom_draw(screen, bitmap, cliprect, m_936_tilemap, 0, 0, 1);
-
-	m_k055673->k053247_sprites_draw(bitmap, cliprect);
-
+	if(m_video_priority_mode == false)
+	{
+		m_k053936->zoom_draw(screen, bitmap, cliprect, m_936_tilemap, 0, 0, 1);
+		m_k055673->k053247_sprites_draw(bitmap, cliprect);
+	}
+	else
+	{
+		m_k055673->k053247_sprites_draw(bitmap, cliprect);
+		m_k053936->zoom_draw(screen, bitmap, cliprect, m_936_tilemap, 0, 0, 1);
+	}
+	
 	m_ttl_tilemap->mark_all_dirty();
 	m_ttl_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	// copy frame output to temp buffers so we can demultiplex it for the dual screen output
+	// (really only need to do this for dual setup)
+	if (machine().first_screen()->frame_number() & 1)
+	{
+		copybitmap(m_rng_dual_demultiplex_right_temp, bitmap, 0, 0, 0, 0, cliprect);
+	}
+	else
+	{
+		copybitmap(m_rng_dual_demultiplex_left_temp, bitmap, 0, 0, 0, 0, cliprect);		
+	}
+	return 0;
+}
+
+
+// the 60hz signal gets split between 2 screens
+UINT32 rungun_state::screen_update_rng_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap( bitmap, m_rng_dual_demultiplex_left_temp, 0, 0, 0, 0, cliprect);
+	return 0;
+}
+
+UINT32 rungun_state::screen_update_rng_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap( bitmap, m_rng_dual_demultiplex_right_temp, 0, 0, 0, 0, cliprect);
 	return 0;
 }

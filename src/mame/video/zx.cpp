@@ -86,7 +86,7 @@ void zx_state::recalc_hsync()
 			delta = 192 - step;
 		else
 			delta = 399 - step;
-	}	
+	}
 
 	m_ula_hsync->adjust(m_maincpu->cycles_to_attotime(delta));
 }

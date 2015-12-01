@@ -278,7 +278,7 @@ software_list_device::software_list_device(const machine_config &mconfig, const 
 		m_list_type(SOFTWARE_LIST_ORIGINAL_SYSTEM),
 		m_filter(NULL),
 		m_parsed(false),
-		m_file(mconfig.options().hash_path(), OPEN_FLAG_READ), 
+		m_file(mconfig.options().hash_path(), OPEN_FLAG_READ),
 		m_description(NULL)
 {
 }

@@ -3,7 +3,7 @@
 <softwarelist name="psx" description="Sony Playstation CD-ROMs">
 
 <!-- Interactive CD Sampler Discs-->
-	
+
 	<software name="intcdv1m">
 		<description>Interactive CD Sampler Disc - Volume 01 (M Rated)</description>
 		<year>1995</year>

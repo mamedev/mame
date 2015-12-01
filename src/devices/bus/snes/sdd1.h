@@ -10,8 +10,8 @@
 class SDD1_IM //Input Manager
 {
 public:
-	SDD1_IM(): 
-		m_byte_ptr(0), 
+	SDD1_IM():
+		m_byte_ptr(0),
 		m_bit_count(0)
 	{ }
 
@@ -38,9 +38,9 @@ class SDD1_BG // Bits Generator
 public:
 	SDD1_BG(SDD1_GCD* associatedGCD, UINT8 code)
 		: m_code_num(code),
-		  m_MPScount(0),
-		  m_LPSind(0),
-		  m_GCD(associatedGCD)
+			m_MPScount(0),
+			m_LPSind(0),
+			m_GCD(associatedGCD)
 	{
 	}
 

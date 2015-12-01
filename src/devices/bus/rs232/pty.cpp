@@ -18,7 +18,7 @@ pseudo_terminal_device::pseudo_terminal_device(const machine_config &mconfig, co
 		m_rs232_parity(*this, "RS232_PARITY"),
 		m_rs232_stopbits(*this, "RS232_STOPBITS"),
 		m_input_count(0),
-		m_input_index(0), 
+		m_input_index(0),
 		m_timer_poll(NULL)
 {
 }

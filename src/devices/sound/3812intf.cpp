@@ -154,8 +154,8 @@ const device_type YM3812 = &device_creator<ym3812_device>;
 
 ym3812_device::ym3812_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM3812, "YM3812", tag, owner, clock, "ym3812", __FILE__),
-		device_sound_interface(mconfig, *this), 
-		m_stream(NULL), 
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
 		m_chip(NULL),
 		m_irq_handler(*this)
 {

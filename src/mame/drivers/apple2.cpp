@@ -1469,13 +1469,13 @@ ROM_START(uniap2ti) /* "Teclado Inteligente" means "smart keyboard" in brazilian
 ROM_END
 
 ROM_START(microeng)
-    ROM_REGION(0x0800,"gfx1",0)
-    ROM_LOAD ( "microengenho_6c.bin", 0x0000, 0x0800, CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659))
+	ROM_REGION(0x0800,"gfx1",0)
+	ROM_LOAD ( "microengenho_6c.bin", 0x0000, 0x0800, CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659))
 
-    ROM_REGION(0x4000,"maincpu",0)
-    ROM_LOAD ( "microengenho_d0_d8.bin", 0x1000, 0x1000, CRC(834eabf4) SHA1(9a2385c6df16e5f5d15b79da17d21bf0f99dbd08))
-    ROM_LOAD ( "microengenho_e0_e8.bin", 0x2000, 0x1000, CRC(0d494efd) SHA1(a2fd1223a3ca0cfee24a6afe66ea3c4c144dd98e))
-    ROM_LOAD ( "microengenho_f0_f8.bin", 0x3000, 0x1000, CRC(588717cf) SHA1(e2a867c4a390d65e5ea181a4f933abb9992e4a63))
+	ROM_REGION(0x4000,"maincpu",0)
+	ROM_LOAD ( "microengenho_d0_d8.bin", 0x1000, 0x1000, CRC(834eabf4) SHA1(9a2385c6df16e5f5d15b79da17d21bf0f99dbd08))
+	ROM_LOAD ( "microengenho_e0_e8.bin", 0x2000, 0x1000, CRC(0d494efd) SHA1(a2fd1223a3ca0cfee24a6afe66ea3c4c144dd98e))
+	ROM_LOAD ( "microengenho_f0_f8.bin", 0x3000, 0x1000, CRC(588717cf) SHA1(e2a867c4a390d65e5ea181a4f933abb9992e4a63))
 ROM_END
 
 /*

@@ -13,12 +13,14 @@
                                 TODO list
 ---------------------------------------------------------------------------
 WEC Le Mans 24:
-- The parallactic scrolling is sometimes wrong
+- The parallactic scrolling is sometimes wrong (related to v-cnt bit enabled?)
 Hot Chase:
-- gameplay speed is VERY erratic
-- Samples pitch is too low
-- No zoom and rotation of the layers
+- Sound BGMs are regressed (hiccups badly);
+- Samples pitch is too low, for instance game over speech;
 Common Issues:
+- Too many hacks with protection/blitter/colors. 
+  Additionally, there's a bug report that claims that current arrangement is broken for later levels in WEC Le Mans.
+  007643 / 007645 could do with a rewrite, in short.
 - One ROM unused (32K in hotchase, 16K in wecleman)
 - Incomplete DSWs
 - Sprite ram is not cleared by the game and no sprite list end-marker
@@ -336,16 +338,25 @@ WRITE16_MEMBER(wecleman_state::irqctrl_w)
 			m_subcpu->set_input_line(4, HOLD_LINE);
 
 		// Bit 1 : NSUBRST
-		if (data & 2)
-			m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		else
-			m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_RESET,  (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 
-		// Bit 2 : SOUND-ON
-		// Bit 3 : SOUNDRST
+		// Bit 2 : SOUND-ON: send a interrupt to sound CPU, 0 -> 1 transition
+		if ( (m_irqctrl & 4) && (!(data & 4)) )
+		{
+			if(m_sound_hw_type == 0) // wec le mans
+				m_audiocpu->set_input_line(0, HOLD_LINE);
+			else // hot chase
+			{
+				m_hotchase_sound_hs = false;
+				// TODO: ASSERT_LINE here?
+				m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+			}
+		}
+		// Bit 3 : SOUNDRST, pc=0x18ea in Hot Chase POST, 1 -> 0 -> 1
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 8) ? CLEAR_LINE : ASSERT_LINE);
 		// Bit 4 : SCR-HCNT
-		// Bit 5 : SCR-VCNT
-		// Bit 6 : TV-KILL
+		// Bit 5 : SCR-VCNT: active in WEC Le Mans, disabled in Hot Chase (where's the latch anyway?)
+		// Bit 6 : TV-KILL: active low, disables screen.
 		m_irqctrl = data;   // latch the value
 	}
 }
@@ -545,7 +556,7 @@ static ADDRESS_MAP_START( hotchase_map, AS_PROGRAM, 16, wecleman_state )
 	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSW2")   // DSW 2
 	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSW1")   // DSW 1
 	AM_RANGE(0x140020, 0x140021) AM_READ(selected_ip_r) AM_WRITENOP // Paired with writes to $140003
-	AM_RANGE(0x140022, 0x140023) AM_READNOP // ??
+	AM_RANGE(0x140022, 0x140023) AM_READNOP // read and written at $601c0, unknown purpose
 	AM_RANGE(0x140030, 0x140031) AM_WRITENOP    // signal to cabinet vibration motors?
 ADDRESS_MAP_END
 
@@ -584,7 +595,6 @@ WRITE16_MEMBER(wecleman_state::wecleman_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xFF);
-		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -650,7 +660,6 @@ WRITE16_MEMBER(wecleman_state::hotchase_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xFF);
-		m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -663,19 +672,21 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_control_w)
 
 	switch (offset)
 	{
+		/* change volume
+		    offset 00000xxx----- channel select (0:channel 0, 1:channel 1)
+		    ++------ chip select ( 0:chip 1, 1:chip2, 2:chip3)
+		    data&0x0f left volume  (data>>4)&0x0f right volume
+			*/
 		case 0x0:
 		case 0x1:
+			m_k007232_1->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
+			break;
 		case 0x2:
 		case 0x3:
+			m_k007232_2->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
+			break;
 		case 0x4:
 		case 0x5:
-			/* change volume
-			    offset 00000xxx----- channel select (0:channel 0, 1:channel 1)
-			    ++------ chip select ( 0:chip 1, 1:chip2, 2:chip3)
-			    data&0x0f left volume  (data>>4)&0x0f right volume
-			*/
-			m_k007232_1->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
-			m_k007232_2->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
 			m_k007232_3->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
 			break;
 
@@ -702,6 +713,11 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_control_w)
 		}
 		break;
 	}
+}
+
+WRITE8_MEMBER(wecleman_state::hotchase_sound_hs_w)
+{
+	m_hotchase_sound_hs = true;
 }
 
 /* Read and write handlers for one K007232 chip:
@@ -742,9 +758,9 @@ static ADDRESS_MAP_START( hotchase_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x2000, 0x200d) AM_READWRITE(hotchase_2_k007232_r, hotchase_2_k007232_w)
 	AM_RANGE(0x3000, 0x300d) AM_READWRITE(hotchase_3_k007232_r, hotchase_3_k007232_w)
 	AM_RANGE(0x4000, 0x4007) AM_WRITE(hotchase_sound_control_w) // Sound volume, banking, etc.
-	AM_RANGE(0x5000, 0x5000) AM_WRITENOP    // ? (written with 0 on IRQ, 1 on FIRQ)
+	AM_RANGE(0x5000, 0x5000) AM_WRITENOP   // 0 at start of IRQ service, 1 at end (irq mask?)
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r) // From main CPU (Read on IRQ)
-	AM_RANGE(0x7000, 0x7000) AM_WRITENOP    // Command acknowledge ?
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(hotchase_sound_hs_w)    // ACK signal to main CPU
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -765,9 +781,9 @@ static INPUT_PORTS_START( wecleman )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")   /* Motor? - $140013.b */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )   // right sw
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // left sw
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 )   // thermo
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Right SW")  // right sw
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Left SW")  // left sw
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Thermo SW")  // thermo
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   // from sound cpu ?
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -845,6 +861,11 @@ INPUT_PORTS_END
                             Hot Chase Input Ports
 ***************************************************************************/
 
+CUSTOM_INPUT_MEMBER(wecleman_state::hotchase_sound_status_r)
+{
+	return m_hotchase_sound_hs;
+}
+
 static INPUT_PORTS_START( hotchase )
 	PORT_START("IN0")   /* $140011.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -857,11 +878,12 @@ static INPUT_PORTS_START( hotchase )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")   /* Motor? - $140013.b */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )   // right sw
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // left sw
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 )   // thermo
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   // from sound cpu ?
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Right SW")   // right sw
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Left SW")  // left sw
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Thermo SW")  // thermo
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) // from sound cpu
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wecleman_state,hotchase_sound_status_r, NULL)
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW2")  /* $140015.b */
 	PORT_DIPNAME( 0x01, 0x01, "Speed Unit" )
@@ -1026,7 +1048,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::wecleman_scanline)
 
 	if(scanline == 232) // vblank irq
 		m_maincpu->set_input_line(4, HOLD_LINE);
-	else if(((scanline % 64) == 0)) // timer irq TODO: timings
+	else if(((scanline % 64) == 0)) // timer irq TODO: wrong place maybe? Could do with blitter chip irq (007643/007645?) or "V-CNT" signal.
 		m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
@@ -1036,8 +1058,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::hotchase_scanline)
 
 	if(scanline == 224) // vblank irq
 		m_maincpu->set_input_line(4, HOLD_LINE);
-	else if(((scanline % 64) == 0)) // timer irq TODO: timings
-		m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 
@@ -1403,6 +1423,7 @@ DRIVER_INIT_MEMBER(wecleman_state,wecleman)
 			20,19,18,17,16,15,14,7,12,4,2,5,6,13,8,9,11,3,10,1,0);
 
 	m_spr_color_offs = 0x40;
+	m_sound_hw_type = 0;
 }
 
 
@@ -1680,6 +1701,7 @@ DRIVER_INIT_MEMBER(wecleman_state,hotchase)
 	hotchase_sprite_decode(3,0x80000*2);  // num banks, bank len
 
 	m_spr_color_offs = 0;
+	m_sound_hw_type = 1;
 }
 
 
@@ -1690,6 +1712,7 @@ DRIVER_INIT_MEMBER(wecleman_state,hotchase)
 GAMEL( 1986, wecleman,  0,        wecleman, wecleman, wecleman_state, wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.00, set 1)", 0, layout_wecleman )
 GAMEL( 1986, weclemana, wecleman, wecleman, wecleman, wecleman_state, wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.00, set 2)", 0, layout_wecleman ) // 1988 release (maybe date hacked?)
 GAMEL( 1986, weclemanb, wecleman, wecleman, wecleman, wecleman_state, wecleman, ROT0, "Konami", "WEC Le Mans 24 (v1.26)", 0, layout_wecleman )
+// a version 1.21 is known to exist too, see https://www.youtube.com/watch?v=4l8vYJi1OeU
 
 GAMEL( 1988, hotchase,  0,        hotchase, hotchase, wecleman_state, hotchase, ROT0, "Konami", "Hot Chase (set 1)", 0, layout_wecleman )
 GAMEL( 1988, hotchasea, hotchase, hotchase, hotchase, wecleman_state, hotchase, ROT0, "Konami", "Hot Chase (set 2)", 0, layout_wecleman )

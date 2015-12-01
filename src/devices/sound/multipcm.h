@@ -98,7 +98,7 @@ private:
 
 	// internal state
 	sound_stream *m_stream;
-	sample_t *m_samples;        	// Max 512 samples
+	sample_t *m_samples;            // Max 512 samples
 	slot_t *m_slots;
 	UINT32 m_cur_slot;
 	UINT32 m_address;
@@ -107,8 +107,8 @@ private:
 	float m_rate;
 
 	UINT32 *m_attack_step;
-	UINT32 *m_decay_release_step;	// Envelope step tables
-	UINT32 *m_freq_step_table;		// Frequency step table
+	UINT32 *m_decay_release_step;   // Envelope step tables
+	UINT32 *m_freq_step_table;      // Frequency step table
 
 	direct_read_data *m_direct;
 

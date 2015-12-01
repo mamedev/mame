@@ -615,7 +615,7 @@ int device_execute_interface::standard_irq_callback(int irqline)
 {
 	// get the default vector and acknowledge the interrupt if needed
 	int vector = m_input[irqline].default_irq_callback();
-	
+
 	if (VERBOSE) device().logerror("standard_irq_callback('%s', %d) $%04x\n", device().tag(), irqline, vector);
 
 	// if there's a driver callback, run it to get the vector

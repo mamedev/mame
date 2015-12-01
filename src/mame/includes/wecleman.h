@@ -59,6 +59,8 @@ public:
 	int m_cloud_blend;
 	int m_cloud_ds;
 	int m_cloud_visible;
+	int m_sound_hw_type;
+	bool m_hotchase_sound_hs;
 	pen_t m_black_pen;
 	struct sprite *m_sprite_list;
 	struct sprite **m_spr_ptr_list;
@@ -112,6 +114,8 @@ public:
 	void hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K051316_CB_MEMBER(hotchase_zoom_callback_1);
 	K051316_CB_MEMBER(hotchase_zoom_callback_2);
+	DECLARE_CUSTOM_INPUT_MEMBER(hotchase_sound_status_r);
+	DECLARE_WRITE8_MEMBER(hotchase_sound_hs_w);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

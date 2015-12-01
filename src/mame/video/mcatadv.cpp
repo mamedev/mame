@@ -7,8 +7,6 @@ Notes:
 Tilemap drawing is a killer on the first level of Nost due to the whole tilemap being dirty every frame.
 Sprite drawing is quite fast (See USER1 in the profiler)
 
-Nost final boss, the priority of the arms is under the tilemaps, everything else is above. Should it be blended? i.e. Shadow.
-
 ToDo: Fix Sprites & Rowscroll/Select for Cocktail
 */
 
@@ -139,7 +137,7 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 
 
 							if (!(pridata & 0x10)) // if we haven't already drawn a sprite pixel here (sprite masking)
-							{				
+							{
 								pix = sprdata[(offset / 2)&sprmask];
 
 								if (offset & 1)
@@ -153,7 +151,7 @@ void mcatadv_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 
 									priline[drawxpos] |= 0x10;
 								}
-								
+
 							}
 						}
 
@@ -218,18 +216,18 @@ UINT32 mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind16 
 {
 	int i;
 
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(0x3f0, cliprect);
 	screen.priority().fill(0, cliprect);
 
 	if (m_scroll1[2] != m_palette_bank1)
 	{
-		m_palette_bank1 = m_scroll1[2];
+		m_palette_bank1 = m_scroll1[2]&0xf;
 		m_tilemap1->mark_all_dirty();
 	}
 
 	if (m_scroll2[2] != m_palette_bank2)
 	{
-		m_palette_bank2 = m_scroll2[2];
+		m_palette_bank2 = m_scroll2[2]&0xf;
 		m_tilemap2->mark_all_dirty();
 	}
 
@@ -246,11 +244,13 @@ UINT32 mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind16 
 	#ifdef MAME_DEBUG
 			if (!machine().input().code_pressed(KEYCODE_Q))
 	#endif
-			mcatadv_draw_tilemap_part(screen, m_scroll1,  m_videoram1, i|0x8, m_tilemap1, bitmap, cliprect);
+			if (!(m_scroll1[2]&0x10))
+				mcatadv_draw_tilemap_part(screen, m_scroll1,  m_videoram1, i|0x8, m_tilemap1, bitmap, cliprect);
 
 	#ifdef MAME_DEBUG
 			if (!machine().input().code_pressed(KEYCODE_W))
 	#endif
+			if (!(m_scroll2[2]&0x10)) // tilemap flicker effect on large shadow, nost level 7
 				mcatadv_draw_tilemap_part(screen, m_scroll2, m_videoram2, i|0x8, m_tilemap2, bitmap, cliprect);
 	}
 

@@ -20,7 +20,7 @@
 
 // class representing a single dirty region
 class sparse_dirty_rect : public rectangle
-{	
+{
 	friend class simple_list<sparse_dirty_rect>;
 
 public:

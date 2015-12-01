@@ -218,7 +218,7 @@ static int is_valid_filename_char(unicode_char unichar)
 ui_menu_file_create::ui_menu_file_create(running_machine &machine, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool *ok)
 	: ui_menu(machine, container),
 		m_current_directory(current_directory),
-		m_current_file(current_file), 
+		m_current_file(current_file),
 		m_current_format(NULL)
 {
 	m_image = image;
@@ -344,7 +344,7 @@ void ui_menu_file_create::handle()
 ui_menu_file_selector::ui_menu_file_selector(running_machine &machine, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, int *result)
 	: ui_menu(machine, container),
 		m_current_directory(current_directory),
-		m_current_file(current_file), 
+		m_current_file(current_file),
 		m_entrylist(NULL)
 {
 	m_image = image;

@@ -304,11 +304,11 @@ class render_primitive
 	friend class simple_list<render_primitive>;
 
 public:
-	render_primitive(): 
-		type(), 
-		flags(0), 
-		width(0), 
-		container(NULL), 
+	render_primitive():
+		type(),
+		flags(0),
+		width(0),
+		container(NULL),
 		m_next(NULL)
 	{}
 
@@ -998,7 +998,7 @@ private:
 	INT32                   m_clear_extent_count;       // number of clear extents
 	INT32                   m_clear_extents[MAX_CLEAR_EXTENTS]; // array of clear extents
 	bool                    m_transform_primitives;     // determines if the primitives shall be scaled/offset by screen settings,
-	                                                    // otherwise the respective render API will handle it (default is true)
+														// otherwise the respective render API will handle it (default is true)
 
 	static render_screen_list s_empty_screen_list;
 };

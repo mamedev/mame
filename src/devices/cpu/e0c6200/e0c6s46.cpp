@@ -49,11 +49,11 @@ e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, d
 	: e0c6200_cpu_device(mconfig, E0C6S46, "E0C6S46", tag, owner, clock, ADDRESS_MAP_NAME(e0c6s46_program), ADDRESS_MAP_NAME(e0c6s46_data), "e0c6s46", __FILE__)
 	, m_vram1(*this, "vram1")
 	, m_vram2(*this, "vram2"), m_osc(0), m_svd(0), m_lcd_control(0), m_lcd_contrast(0)
-	  , m_pixel_update_handler(nullptr)
+		, m_pixel_update_handler(nullptr)
 	, m_write_r0(*this), m_write_r1(*this), m_write_r2(*this), m_write_r3(*this), m_write_r4(*this)
 	, m_read_p0(*this), m_read_p1(*this), m_read_p2(*this), m_read_p3(*this)
-	, m_write_p0(*this), m_write_p1(*this), m_write_p2(*this), m_write_p3(*this), m_r_dir(0), m_p_dir(0), m_p_pullup(0), m_dfk0(0), m_256_src_pulse(0), m_core_256_handle(nullptr), 
-	m_watchdog_count(0), m_clktimer_count(0), m_stopwatch_on(0), m_swl_cur_pulse(0), m_swl_slice(0), m_swl_count(0), m_swh_count(0), m_prgtimer_select(0), m_prgtimer_on(0), m_prgtimer_src_pulse(0), 
+	, m_write_p0(*this), m_write_p1(*this), m_write_p2(*this), m_write_p3(*this), m_r_dir(0), m_p_dir(0), m_p_pullup(0), m_dfk0(0), m_256_src_pulse(0), m_core_256_handle(nullptr),
+	m_watchdog_count(0), m_clktimer_count(0), m_stopwatch_on(0), m_swl_cur_pulse(0), m_swl_slice(0), m_swl_count(0), m_swh_count(0), m_prgtimer_select(0), m_prgtimer_on(0), m_prgtimer_src_pulse(0),
 	m_prgtimer_cur_pulse(0), m_prgtimer_count(0), m_prgtimer_reload(0), m_prgtimer_handle(nullptr), m_bz_43_on(0), m_bz_freq(0), m_bz_envelope(0), m_bz_duty_ratio(0), m_bz_1shot_on(0), m_bz_1shot_running(false), m_bz_1shot_count(0), m_bz_pulse(0), m_buzzer_handle(nullptr)
 { }
 

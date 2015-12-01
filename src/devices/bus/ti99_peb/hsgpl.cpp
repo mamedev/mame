@@ -140,8 +140,8 @@
 #define ROM6_EEPROM "u6_rom6"
 
 snug_high_speed_gpl_device::snug_high_speed_gpl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: ti_expansion_card_device(mconfig, TI99_HSGPL, "SNUG High-speed GPL card", tag, owner, clock, "ti99_hsgpl", __FILE__), m_dsr_eeprom(nullptr), 
-m_rom6_eeprom(nullptr), m_grom_a_eeprom(nullptr), m_grom_b_eeprom(nullptr), m_ram6_memory(nullptr), m_gram_memory(nullptr), m_dsr_enabled(false), 
+: ti_expansion_card_device(mconfig, TI99_HSGPL, "SNUG High-speed GPL card", tag, owner, clock, "ti99_hsgpl", __FILE__), m_dsr_eeprom(nullptr),
+m_rom6_eeprom(nullptr), m_grom_a_eeprom(nullptr), m_grom_b_eeprom(nullptr), m_ram6_memory(nullptr), m_gram_memory(nullptr), m_dsr_enabled(false),
 m_gram_enabled(false), m_bank_inhibit(false), m_dsr_page(0), m_card_enabled(false), m_write_enabled(false), m_supercart_enabled(false), m_led_on(false),
 m_mbx_enabled(false), m_ram_enabled(false), m_flash_mode(false), m_current_grom_port(0), m_current_bank(0), m_module_bank(0), m_waddr_LSB(false), m_raddr_LSB(false), m_grom_address(0)
 {

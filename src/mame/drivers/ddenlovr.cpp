@@ -697,7 +697,7 @@ INLINE int fetch_bit( UINT8 *src_data, int src_len, int *bit_addr )
 	if (baddr / 8 >= src_len)
 	{
 #ifdef MAME_DEBUG
-//		popmessage("GFX ROM OVER %06x", baddr / 8);
+//      popmessage("GFX ROM OVER %06x", baddr / 8);
 #endif
 		return 1;
 	}

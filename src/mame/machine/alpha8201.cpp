@@ -296,7 +296,7 @@ alpha_8201_device::alpha_8201_device(const machine_config &mconfig, const char *
 void alpha_8201_device::device_start()
 {
 	m_shared_ram = auto_alloc_array_clear(machine(), UINT8, 0x400);
-	
+
 	// zerofill
 	m_bus = 0;
 	m_mcu_address = 0;
@@ -365,12 +365,12 @@ void alpha_8201_device::mcu_update_address()
 READ8_MEMBER(alpha_8201_device::mcu_data_r)
 {
 	UINT8 ret = 0;
-	
+
 	if (m_bus && ~m_mcu_d & 4)
 		ret = m_shared_ram[m_mcu_address];
 	else
 		logerror("%s: MCU side invalid read\n", tag());
-	
+
 	if (offset == HMCS40_PORT_R0X)
 		ret >>= 4;
 	return ret & 0xf;

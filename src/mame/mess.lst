@@ -259,6 +259,7 @@ telngtcs
 krvnjvtv
 oc2000
 mpt05
+h21		// TRQ Video Computer H-21
 
 
 // Game Park
@@ -2016,6 +2017,8 @@ newbrainmd
 mm1m6
 mm1m7
 
+noki3310
+
 // Nuova Elettronica
 z80ne    // 1980 - Z80NE
 z80net  // 1980 - Z80NE + LX388 Video Interface
@@ -2599,6 +2602,7 @@ tek4052a
 //tek4054
 tek4107a
 tek4109a
+tekxp330
 phunsy
 ob68k1a
 vta2000

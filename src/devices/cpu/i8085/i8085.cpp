@@ -1005,24 +1005,24 @@ void i8085a_cpu_device::state_import(const device_state_entry &entry)
 	{
 		case I8085_SID:
 			if (m_ietemp)
-            {
-                m_IM |= IM_SID;
-            }
+			{
+				m_IM |= IM_SID;
+			}
 			else
-            {
+			{
 				m_IM &= ~IM_SID;
-            }
+			}
 			break;
 
 		case I8085_INTE:
 			if (m_ietemp)
-            {
+			{
 				m_IM |= IM_IE;
-            }
+			}
 			else
-            {
+			{
 				m_IM &= ~IM_IE;
-            }
+			}
 			break;
 
 		default:

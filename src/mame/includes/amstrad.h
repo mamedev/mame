@@ -317,6 +317,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	int m_centronics_busy;
+	UINT8 m_last_write;
 };
 
 

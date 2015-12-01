@@ -273,7 +273,7 @@ static ADDRESS_MAP_START( vsnes_bootleg_z80_map, AS_PROGRAM, 8, vsnes_state )
 	AM_RANGE(0x60FA, 0x60FA) AM_DEVWRITE("sn1", sn76489_device, write)
 	AM_RANGE(0x60F9, 0x60F9) AM_DEVWRITE("sn2", sn76489_device, write)
 	AM_RANGE(0x60FF, 0x60FF) AM_DEVWRITE("sn3", sn76489_device, write)
-	
+
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -1824,7 +1824,7 @@ static MACHINE_CONFIG_START( vsnes_bootleg, vsnes_state )
 	MCFG_CPU_ADD("sub", Z80,XTAL_16MHz/4)         /* ? MHz */ // Z8400APS-Z80CPU
 	MCFG_CPU_PROGRAM_MAP(vsnes_bootleg_z80_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen1", vsnes_state,  irq0_line_hold)
-//	MCFG_CPU_PERIODIC_INT_DRIVER(vsnes_state, nmi_line_pulse) 
+//  MCFG_CPU_PERIODIC_INT_DRIVER(vsnes_state, nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen1", RASTER)

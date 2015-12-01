@@ -731,13 +731,41 @@ ROM_START( lethalenj )  // Japan version JAD
 	ROM_LOAD( "lethalenj.nv", 0x0000, 0x0080, CRC(20b28f2f) SHA1(53d212f2c006729a01dfdb49cb36b67b9425172e) )
 ROM_END
 
+ROM_START( lethaleneaa )    // Euro ver. EAA  
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* main program */
+	ROM_LOAD( "191_a01.u4", 0x00000, 0x40000, CRC(c6f4d712) SHA1(92938b823f057b5185a2ada7878efa4bf7e6c682) ) // handwritten label
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
+	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* tilemaps */
+	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
+	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
+	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
+	ROM_LOAD32_WORD( "191a09", 0x200000, 0x100000, CRC(e2028531) SHA1(63ccce7855d829763e9e248a6c3eb6ea89ab17ee) )
+
+	ROM_REGION( 0x400000, "k053244", ROMREGION_ERASE00 )   /* sprites */
+	ROM_LOAD32_WORD( "191a05", 0x000000, 0x100000, CRC(f2e3b58b) SHA1(0bbc2fe87a4fd00b5073a884bcfebcf9c2c402ad) )
+	ROM_LOAD32_WORD( "191a04", 0x000002, 0x100000, CRC(5c3eeb2b) SHA1(33ea8b3968b78806334b5a0aab3a2c24e45c604e) )
+	ROM_LOAD32_WORD( "191a06", 0x200000, 0x100000, CRC(ee11fc08) SHA1(ec6dd684e8261b181d65b8bf1b9e97da5c4468f7) )
+
+	ROM_REGION( 0x200000, "k054539", 0 )    /* K054539 samples */
+	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "lethaleneaa.nv", 0x0000, 0x0080, CRC(a85d64ee) SHA1(68ab906c46c6a7dee2a7673d1d516e34d56c9ae3) )
+ROM_END
+
+// date strings are at 0x3fd00 in the main program rom
 
 GAME( 1992, lethalen,   0,        lethalen, lethalen,  driver_device, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAE, 11/19/92 15:04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes UE to eeprom
 GAME( 1992, lethalenub, lethalen, lethalen, lethalen,  driver_device, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAB, 09/01/92 11:12)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes UB to eeprom
 GAME( 1992, lethalenua, lethalen, lethalen, lethalen,  driver_device, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAA, 08/17/92 21:38)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes UA to eeprom
 GAME( 1992, lethalenux, lethalen, lethalen, lethalen,  driver_device, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver unknown, US, 08/06/92 15:11, hacked/proto?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes UA to eeprom but earlier than suspected UAA set, might be a proto, might be hacked, fails rom test, definitely a good dump, another identical set was found in Italy
+
 GAME( 1992, lethaleneae,lethalen, lethalen, lethalene, driver_device, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAE, 11/19/92 16:24)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes EE to eeprom
-GAME( 1992, lethaleneab,lethalen, lethalen, lethalene, driver_device, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAB, 10/14/92 19:53)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes EC to eeprom?!
+GAME( 1992, lethaleneab,lethalen, lethalen, lethalene, driver_device, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAB, 10/14/92 19:53)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes EC to eeprom, so might actually be EC
+GAME( 1992, lethaleneaa,lethalen, lethalen, lethalene, driver_device, 0, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAA, 09/09/92 09:44)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes EA to eeprom
 
 // different mirror / display setup
 GAME( 1992, lethalenj,  lethalen, lethalej, lethalenj, driver_device, 0, ORIENTATION_FLIP_X, "Konami", "Lethal Enforcers (ver JAD, 12/04/92 17:16)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes JC to eeprom?!

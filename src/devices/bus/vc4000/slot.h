@@ -99,10 +99,19 @@ protected:
 	device_vc4000_cart_interface*       m_cart;
 };
 
+class h21_cart_slot_device : public vc4000_cart_slot_device
+{
+public:
+	// construction/destruction
+	h21_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~h21_cart_slot_device();
 
+	virtual const char *image_interface() const { return "h21_cart"; }
+};
 
 // device type definition
 extern const device_type VC4000_CART_SLOT;
+extern const device_type H21_CART_SLOT;
 
 
 /***************************************************************************
@@ -114,4 +123,9 @@ extern const device_type VC4000_CART_SLOT;
 #define MCFG_VC4000_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, VC4000_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
+#define MCFG_H21_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
+	MCFG_DEVICE_ADD(_tag, H21_CART_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
 #endif

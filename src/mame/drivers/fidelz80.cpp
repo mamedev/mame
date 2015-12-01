@@ -974,7 +974,7 @@ void fidelz80_state::machine_start()
 	m_digit_data = 0;
 	m_led_data = 0;
 	memset(m_digit_line_status, 0, sizeof(m_digit_line_status));
-	
+
 	// register for savestates
 	save_item(NAME(m_led_selected));
 	save_item(NAME(m_kp_matrix));

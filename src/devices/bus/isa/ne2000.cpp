@@ -19,9 +19,9 @@ machine_config_constructor ne2000_device::device_mconfig_additions() const {
 
 ne2000_device::ne2000_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock)
 	: device_t(mconfig, NE2000, "NE2000 Network Adapter", tag, owner, clock, "ne2000", __FILE__),
-	  device_isa16_card_interface(mconfig, *this),
-	  m_dp8390(*this, "dp8390d"),
-	  m_irq(0)
+		device_isa16_card_interface(mconfig, *this),
+		m_dp8390(*this, "dp8390d"),
+		m_irq(0)
 {
 }
 

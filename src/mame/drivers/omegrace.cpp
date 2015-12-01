@@ -521,7 +521,7 @@ static MACHINE_CONFIG_START( omegrace, omegrace_state )
 	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 522, 1566)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_DEVICE_ADD("dvg", DVG, XTAL_12MHz)
+	MCFG_DEVICE_ADD("dvg", DVG, 0)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */

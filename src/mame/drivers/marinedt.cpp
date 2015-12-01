@@ -4,7 +4,7 @@
 ---------------------------
 Marine Date by TAITO (1981)
 MAME driver by insideoutboy
----------------------------   
+---------------------------
 a static underwater scene with obstacles in it, like seaweed,
 crabs and other stuff.  You have a limited number of "strokes"
 per screen as well as a timer to work against.  Your goal is
@@ -34,7 +34,7 @@ MGN00001
  |MB3712                                      |P|
  |   4006  LM3900 LM3900 LM3900               | |
  |2  4030                                     |-|
- |2                                            | 
+ |2                                            |
  |W                                  DSW(8)    |
  |A                                           |-|
  |Y   HD14584     NE555       MG17   DSW(8)   |Q|
@@ -52,11 +52,11 @@ Notes: (PCB contains lots of resistors/caps/transistors etc)
       4030    - RCA CD4030 Quad Exclusive-Or Gate
       VR*     - Volume pots for each sound
       VOL     - Master Volume pot
-      
+
 
 Middle board
 
-MGO70002  
+MGO70002
 MGN00002
  |---------------------------------------------|
  |                                    MG15.1A  |
@@ -64,7 +64,7 @@ MGN00002
 |S|                                           |Q|
 | |                                           | |
 |-|               MG16.4E                     |-|
- |                                             | 
+ |                                             |
  |                                             |
 |-|    MG13.6H              MG12.6C           |-|
 |R|                                           |P|
@@ -76,11 +76,11 @@ Notes:
       MG12/13    - Hitachi HN462532 4kx8 EPROM
       MG14/15/16 - 82S123 bipolar PROM
       PC3259     - PC3259 8025 H08 unknown DIP24 IC. Package design indicates it was manufactured by Fujitsu
-      
-      
+
+
 Lower board
 
-AA017779  
+AA017779
 sticker: MGN00003
 sticker: CLN00002
  |---------------------------------------------|
@@ -89,7 +89,7 @@ sticker: CLN00002
 |R|             MG07.10D       2114            |
 | |             MG06.9D        2114            |
 |-|                            2114           1|
- |              MG05.7D                       8|Edge 
+ |              MG05.7D                       8|Edge
  |              MG04.6D                       W|Connector 'T'
 |-|             MG03.5D                       A|
 |S|             MG02.4D                       Y|

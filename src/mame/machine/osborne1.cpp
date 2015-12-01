@@ -437,7 +437,7 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 
 	// Check reset key if necessary - it affects NMI
 	if (!m_ub6a_q)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, (m_btn_reset->read() && 0x80) ? CLEAR_LINE : ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, (m_btn_reset->read() & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_video_timer->adjust(machine().first_screen()->time_until_pos(y + 1, 0));
 }

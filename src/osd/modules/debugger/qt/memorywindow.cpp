@@ -59,26 +59,37 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 	//
 	// Menu bars
 	//
-	// Create a byte-chunk group
-	QActionGroup* chunkGroup = new QActionGroup(this);
-	chunkGroup->setObjectName("chunkgroup");
-	QAction* chunkActOne  = new QAction("1-byte chunks", this);
-	chunkActOne->setObjectName("chunkActOne");
-	QAction* chunkActTwo  = new QAction("2-byte chunks", this);
-	chunkActTwo->setObjectName("chunkActTwo");
-	QAction* chunkActFour = new QAction("4-byte chunks", this);
-	chunkActFour->setObjectName("chunkActFour");
-	chunkActOne->setCheckable(true);
-	chunkActTwo->setCheckable(true);
-	chunkActFour->setCheckable(true);
-	chunkActOne->setActionGroup(chunkGroup);
-	chunkActTwo->setActionGroup(chunkGroup);
-	chunkActFour->setActionGroup(chunkGroup);
-	chunkActOne->setShortcut(QKeySequence("Ctrl+1"));
-	chunkActTwo->setShortcut(QKeySequence("Ctrl+2"));
-	chunkActFour->setShortcut(QKeySequence("Ctrl+4"));
-	chunkActOne->setChecked(true);
-	connect(chunkGroup, SIGNAL(triggered(QAction*)), this, SLOT(chunkChanged(QAction*)));
+
+	// Create a data format group
+	QActionGroup* dataFormat = new QActionGroup(this);
+	dataFormat->setObjectName("dataformat");
+	QAction* formatActOne  = new QAction("1-byte chunks", this);
+	QAction* formatActTwo  = new QAction("2-byte chunks", this);
+	QAction* formatActFour = new QAction("4-byte chunks", this);
+	QAction* formatActEight = new QAction("8-byte chunks", this);
+	QAction* formatAct32bitFloat = new QAction("32 bit floating point", this);
+	formatActOne->setObjectName("formatActOne");
+	formatActTwo->setObjectName("formatActTwo");
+	formatActFour->setObjectName("formatActFour");
+	formatActEight->setObjectName("formatActEight");
+	formatAct32bitFloat->setObjectName("formatAct32bitFloat");
+	formatActOne->setCheckable(true);
+	formatActTwo->setCheckable(true);
+	formatActFour->setCheckable(true);
+	formatActEight->setCheckable(true);
+	formatAct32bitFloat->setCheckable(true);
+	formatActOne->setActionGroup(dataFormat);
+	formatActTwo->setActionGroup(dataFormat);
+	formatActFour->setActionGroup(dataFormat);
+	formatActEight->setActionGroup(dataFormat);
+	formatAct32bitFloat->setActionGroup(dataFormat);
+	formatActOne->setShortcut(QKeySequence("Ctrl+1"));
+	formatActTwo->setShortcut(QKeySequence("Ctrl+2"));
+	formatActFour->setShortcut(QKeySequence("Ctrl+4"));
+	formatActEight->setShortcut(QKeySequence("Ctrl+8"));
+	formatAct32bitFloat->setShortcut(QKeySequence("Ctrl+9"));
+	formatActOne->setChecked(true);
+	connect(dataFormat, SIGNAL(triggered(QAction*)), this, SLOT(formatChanged(QAction*)));
 
 	// Create a address display group
 	QActionGroup* addressGroup = new QActionGroup(this);
@@ -111,7 +122,7 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 
 	// Assemble the options menu
 	QMenu* optionsMenu = menuBar()->addMenu("&Options");
-	optionsMenu->addActions(chunkGroup->actions());
+	optionsMenu->addActions(dataFormat->actions());
 	optionsMenu->addSeparator();
 	optionsMenu->addActions(addressGroup->actions());
 	optionsMenu->addSeparator();
@@ -141,13 +152,15 @@ void MemoryWindow::memoryRegionChanged(int index)
 	m_memTable->view()->set_source(*m_memTable->view()->source_list().find(index));
 	m_memTable->viewport()->update();
 
-	// Update the chunk size radio buttons to the memory region's default
+	// Update the data format radio buttons to the memory region's default
 	debug_view_memory* memView = downcast<debug_view_memory*>(m_memTable->view());
-	switch(memView->bytes_per_chunk())
+	switch(memView->get_data_format())
 	{
-		case 1: chunkSizeMenuItem("chunkActOne")->setChecked(true); break;
-		case 2: chunkSizeMenuItem("chunkActTwo")->setChecked(true); break;
-		case 4: chunkSizeMenuItem("chunkActFour")->setChecked(true); break;
+		case 1: dataFormatMenuItem("formatActOne")->setChecked(true); break;
+		case 2: dataFormatMenuItem("formatActTwo")->setChecked(true); break;
+		case 4: dataFormatMenuItem("formatActFour")->setChecked(true); break;
+		case 8: dataFormatMenuItem("formatActEight")->setChecked(true); break;
+		case 9: dataFormatMenuItem("formatAct32bitFloat")->setChecked(true); break;
 		default: break;
 	}
 }
@@ -171,20 +184,28 @@ void MemoryWindow::expressionSubmitted()
 }
 
 
-void MemoryWindow::chunkChanged(QAction* changedTo)
+void MemoryWindow::formatChanged(QAction* changedTo)
 {
 	debug_view_memory* memView = downcast<debug_view_memory*>(m_memTable->view());
 	if (changedTo->text() == "1-byte chunks")
 	{
-		memView->set_bytes_per_chunk(1);
+		memView->set_data_format(1);
 	}
 	else if (changedTo->text() == "2-byte chunks")
 	{
-		memView->set_bytes_per_chunk(2);
+		memView->set_data_format(2);
 	}
 	else if (changedTo->text() == "4-byte chunks")
 	{
-		memView->set_bytes_per_chunk(4);
+		memView->set_data_format(4);
+	}
+	else if (changedTo->text() == "8-byte chunks")
+	{
+		memView->set_data_format(8);
+	}
+	else if (changedTo->text() == "32 bit floating point")
+	{
+		memView->set_data_format(9);
 	}
 	m_memTable->viewport()->update();
 }
@@ -254,7 +275,7 @@ void MemoryWindow::setToCurrentCpu()
 
 
 // I have a hard time storing QActions as class members.  This is a substitute.
-QAction* MemoryWindow::chunkSizeMenuItem(const QString& itemName)
+QAction* MemoryWindow::dataFormatMenuItem(const QString& itemName)
 {
 	QList<QMenu*> menus = menuBar()->findChildren<QMenu*>();
 	for (int i = 0; i < menus.length(); i++)
@@ -349,13 +370,17 @@ void MemoryWindowQtConfig::buildFromQWidget(QWidget* widget)
 	else if (addressGroup->checkedAction()->text() == "Physical Addresses")
 		m_addressMode = 1;
 
-	QActionGroup* chunkGroup = window->findChild<QActionGroup*>("chunkgroup");
-	if (chunkGroup->checkedAction()->text() == "1-byte chunks")
-		m_chunkSize = 0;
-	else if (chunkGroup->checkedAction()->text() == "2-byte chunks")
-		m_chunkSize = 1;
-	else if (chunkGroup->checkedAction()->text() == "4-byte chunks")
-		m_chunkSize = 2;
+	QActionGroup* dataFormat = window->findChild<QActionGroup*>("dataformat");
+	if (dataFormat->checkedAction()->text() == "1-byte chunks")
+		m_dataFormat = 0;
+	else if (dataFormat->checkedAction()->text() == "2-byte chunks")
+		m_dataFormat = 1;
+	else if (dataFormat->checkedAction()->text() == "4-byte chunks")
+		m_dataFormat = 2;
+	else if (dataFormat->checkedAction()->text() == "8-byte chunks")
+		m_dataFormat = 3;
+	else if (dataFormat->checkedAction()->text() == "32 bit floating point")
+		m_dataFormat = 4;
 }
 
 
@@ -372,8 +397,8 @@ void MemoryWindowQtConfig::applyToQWidget(QWidget* widget)
 	QActionGroup* addressGroup = window->findChild<QActionGroup*>("addressgroup");
 	addressGroup->actions()[m_addressMode]->trigger();
 
-	QActionGroup* chunkGroup = window->findChild<QActionGroup*>("chunkgroup");
-	chunkGroup->actions()[m_chunkSize]->trigger();
+	QActionGroup* dataFormat = window->findChild<QActionGroup*>("dataformat");
+	dataFormat->actions()[m_dataFormat]->trigger();
 }
 
 
@@ -383,7 +408,7 @@ void MemoryWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
 	xml_set_attribute_int(node, "memoryregion", m_memoryRegion);
 	xml_set_attribute_int(node, "reverse", m_reverse);
 	xml_set_attribute_int(node, "addressmode", m_addressMode);
-	xml_set_attribute_int(node, "chunksize", m_chunkSize);
+	xml_set_attribute_int(node, "dataformat", m_dataFormat);
 }
 
 
@@ -393,5 +418,5 @@ void MemoryWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
 	m_memoryRegion = xml_get_attribute_int(node, "memoryregion", m_memoryRegion);
 	m_reverse = xml_get_attribute_int(node, "reverse", m_reverse);
 	m_addressMode = xml_get_attribute_int(node, "addressmode", m_addressMode);
-	m_chunkSize = xml_get_attribute_int(node, "chunksize", m_chunkSize);
+	m_dataFormat = xml_get_attribute_int(node, "dataformat", m_dataFormat);
 }

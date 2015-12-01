@@ -342,7 +342,7 @@ INLINE int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol
 
 	UINT8 starttype = cursymb[0];
 
-//	printf("start polarity %01x (max number of symbols is %d)\n", starttype, maxp);
+//  printf("start polarity %01x (max number of symbols is %d)\n", starttype, maxp);
 
 	switch (starttype)
 	{
@@ -371,13 +371,11 @@ INLINE int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol
 	for (int i = 0; i < maxp; i++)
 	{
 		UINT16 pulse_length = cursymb[1 + (i*2)] | (cursymb[2 + (i*2)] << 8);
-	//	printf("pulse_length %04x\n", pulse_length);
+	//  printf("pulse_length %04x\n", pulse_length);
 
 		// shorter lists can be terminated with a pulse_length of 0
 		if (pulse_length != 0)
 		{
-			
-
 			int samples = tcycles_to_samplecount(pulse_length);
 			tzx_output_wave(buffer, samples);
 			size += samples;
@@ -425,7 +423,7 @@ static int tzx_handle_generalized(INT16 **buffer, const UINT8 *bytes, int pause,
 
 	if (totp > 0)
 	{
-	//	printf("pilot block table %04x\n", totp);
+	//  printf("pilot block table %04x\n", totp);
 
 		const UINT8 *symtable = bytes;
 		const UINT8 *table2 = symtable + (2 * npp + 1)*asp;
@@ -440,7 +438,7 @@ static int tzx_handle_generalized(INT16 **buffer, const UINT8 *bytes, int pause,
 			for (int j = 0; j < repetitions; j++)
 			{
 				size += tzx_handle_symbol(buffer, symtable, symbol, npp);
-			//	toggle_wave_data();
+			//  toggle_wave_data();
 			}
 
 
@@ -470,7 +468,7 @@ static int tzx_handle_generalized(INT16 **buffer, const UINT8 *bytes, int pause,
 		for (int i = 0; i < totd; i++)
 		{
 			UINT8 symbol = 0;
-			
+
 			for (int j = 0; j < NB; j++)
 			{
 				symbol |= stream_get_bit(table2, stream_bit, stream_byte) << j;
@@ -750,12 +748,12 @@ static int tzx_cas_do_work( INT16 **buffer )
 
 				data_size = cur_block[1] + (cur_block[2] << 8) + (cur_block[3] << 16) + (cur_block[4] << 24);
 				pause_time= cur_block[5] + (cur_block[6] << 8);
-				
+
 				UINT32 totp = cur_block[7] + (cur_block[8] << 8) + (cur_block[9] << 16) + (cur_block[10] << 24);
 				int npp = cur_block[11];
 				int asp = cur_block[12];
 				if (asp == 0) asp = 256;
-				
+
 				UINT32 totd = cur_block[13] + (cur_block[14] << 8) + (cur_block[15] << 16) + (cur_block[16] << 24);
 				int npd = cur_block[17];
 				int asd = cur_block[18];

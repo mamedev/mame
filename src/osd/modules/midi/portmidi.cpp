@@ -44,7 +44,7 @@ static const int RX_EVENT_BUF_SIZE = 512;
 #define MIDI_EOX    0xf7
 
 class osd_midi_device_pm : public osd_midi_device
-{	
+{
 public:
 	osd_midi_device_pm(): pmStream(NULL), xmit_cnt(0), last_status(0), rx_sysex(false) { }
 	virtual ~osd_midi_device_pm() { }

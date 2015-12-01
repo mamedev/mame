@@ -29,7 +29,7 @@ const device_type SED1520 = &device_creator<sed1520_device>;
 //-------------------------------------------------
 
 sed1520_device::sed1520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, SED1520, "SED1520", tag, owner, clock, "sed1520", __FILE__), m_lcd_on(0), m_busy(0), m_page(0), m_column(0), m_old_column(0), m_start_line(0), 
+	device_t(mconfig, SED1520, "SED1520", tag, owner, clock, "sed1520", __FILE__), m_lcd_on(0), m_busy(0), m_page(0), m_column(0), m_old_column(0), m_start_line(0),
 	m_adc(0), m_static_drive(0), m_modify_write(false),
 	m_screen_update_func(nullptr)
 {

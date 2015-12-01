@@ -115,11 +115,11 @@ static ADDRESS_MAP_START(ipc_io_map , AS_IO , 8 , imds2_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0xc0 , 0xc0) AM_READWRITE(imds2_ipc_dbbout_r , imds2_ipc_dbbin_data_w)
 	AM_RANGE(0xc1 , 0xc1) AM_READWRITE(imds2_ipc_status_r , imds2_ipc_dbbin_cmd_w)
-        AM_RANGE(0xf0 , 0xf3) AM_DEVREADWRITE("ipctimer" , pit8253_device , read , write)
-        AM_RANGE(0xf4 , 0xf4) AM_DEVREADWRITE("ipcusart0" , i8251_device , data_r , data_w)
-        AM_RANGE(0xf5 , 0xf5) AM_DEVREADWRITE("ipcusart0" , i8251_device , status_r , control_w)
-        AM_RANGE(0xf6 , 0xf6) AM_DEVREADWRITE("ipcusart1" , i8251_device , data_r , data_w)
-        AM_RANGE(0xf7 , 0xf7) AM_DEVREADWRITE("ipcusart1" , i8251_device , status_r , control_w)
+		AM_RANGE(0xf0 , 0xf3) AM_DEVREADWRITE("ipctimer" , pit8253_device , read , write)
+		AM_RANGE(0xf4 , 0xf4) AM_DEVREADWRITE("ipcusart0" , i8251_device , data_r , data_w)
+		AM_RANGE(0xf5 , 0xf5) AM_DEVREADWRITE("ipcusart0" , i8251_device , status_r , control_w)
+		AM_RANGE(0xf6 , 0xf6) AM_DEVREADWRITE("ipcusart1" , i8251_device , data_r , data_w)
+		AM_RANGE(0xf7 , 0xf7) AM_DEVREADWRITE("ipcusart1" , i8251_device , status_r , control_w)
 	AM_RANGE(0xf8 , 0xf9) AM_DEVREADWRITE("iocpio" , i8041_device , upi41_master_r , upi41_master_w)
 	AM_RANGE(0xfa , 0xfb) AM_READWRITE(imds2_ipclocpic_r , imds2_ipclocpic_w)
 	AM_RANGE(0xfc , 0xfd) AM_READWRITE(imds2_ipcsyspic_r , imds2_ipcsyspic_w)
@@ -169,11 +169,11 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
 	m_ipccpu(*this , "ipccpu"),
 	m_ipcsyspic(*this , "ipcsyspic"),
 	m_ipclocpic(*this , "ipclocpic"),
-        m_ipctimer(*this , "ipctimer"),
-        m_ipcusart0(*this , "ipcusart0"),
-        m_ipcusart1(*this , "ipcusart1"),
-        m_serial0(*this , "serial0"),
-        m_serial1(*this , "serial1"),
+		m_ipctimer(*this , "ipctimer"),
+		m_ipcusart0(*this , "ipcusart0"),
+		m_ipcusart1(*this , "ipcusart1"),
+		m_serial0(*this , "serial0"),
+		m_serial1(*this , "serial1"),
 	m_ioccpu(*this , "ioccpu"),
 	m_iocdma(*this , "iocdma"),
 	m_ioccrtc(*this , "ioccrtc"),
@@ -256,14 +256,14 @@ WRITE8_MEMBER(imds2_state::imds2_ipclocpic_w)
 
 WRITE_LINE_MEMBER(imds2_state::imds2_baud_clk_0_w)
 {
-        m_ipcusart0->write_txc(state);
-        m_ipcusart0->write_rxc(state);
+		m_ipcusart0->write_txc(state);
+		m_ipcusart0->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER(imds2_state::imds2_baud_clk_1_w)
 {
-        m_ipcusart1->write_txc(state);
-        m_ipcusart1->write_rxc(state);
+		m_ipcusart1->write_txc(state);
+		m_ipcusart1->write_rxc(state);
 }
 
 WRITE8_MEMBER(imds2_state::imds2_miscout_w)
@@ -781,27 +781,27 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_PIT8253_OUT1_HANDLER(WRITELINE(imds2_state , imds2_baud_clk_1_w))
 		MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir4_w))
 
-                MCFG_DEVICE_ADD("ipcusart0" , I8251 , 0)
-                MCFG_I8251_RTS_HANDLER(DEVWRITELINE("ipcusart0" , i8251_device , write_cts))
-                MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir0_w))
-                MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir1_w))
-                MCFG_I8251_TXD_HANDLER(DEVWRITELINE("serial0" , rs232_port_device , write_txd))
+				MCFG_DEVICE_ADD("ipcusart0" , I8251 , 0)
+				MCFG_I8251_RTS_HANDLER(DEVWRITELINE("ipcusart0" , i8251_device , write_cts))
+				MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir0_w))
+				MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir1_w))
+				MCFG_I8251_TXD_HANDLER(DEVWRITELINE("serial0" , rs232_port_device , write_txd))
 
-                MCFG_DEVICE_ADD("ipcusart1" , I8251 , 0)
-                MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir2_w))
-                MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir3_w))
-                MCFG_I8251_TXD_HANDLER(DEVWRITELINE("serial1" , rs232_port_device , write_txd))
-                MCFG_I8251_RTS_HANDLER(DEVWRITELINE("serial1" , rs232_port_device , write_rts))
-                MCFG_I8251_DTR_HANDLER(DEVWRITELINE("serial1" , rs232_port_device , write_dtr))
+				MCFG_DEVICE_ADD("ipcusart1" , I8251 , 0)
+				MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir2_w))
+				MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("ipclocpic" , pic8259_device , ir3_w))
+				MCFG_I8251_TXD_HANDLER(DEVWRITELINE("serial1" , rs232_port_device , write_txd))
+				MCFG_I8251_RTS_HANDLER(DEVWRITELINE("serial1" , rs232_port_device , write_rts))
+				MCFG_I8251_DTR_HANDLER(DEVWRITELINE("serial1" , rs232_port_device , write_dtr))
 
 		MCFG_RS232_PORT_ADD("serial0" , default_rs232_devices , NULL)
-                MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ipcusart0" , i8251_device , write_rxd))
-                MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ipcusart0" , i8251_device , write_dsr))
+				MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ipcusart0" , i8251_device , write_rxd))
+				MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ipcusart0" , i8251_device , write_dsr))
 
 		MCFG_RS232_PORT_ADD("serial1" , default_rs232_devices , NULL)
-                MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ipcusart1" , i8251_device , write_rxd))
-                MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ipcusart1" , i8251_device , write_cts))
-                MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ipcusart1" , i8251_device , write_dsr))
+				MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ipcusart1" , i8251_device , write_rxd))
+				MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ipcusart1" , i8251_device , write_cts))
+				MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ipcusart1" , i8251_device , write_dsr))
 
 		MCFG_CPU_ADD("ioccpu" , I8080A , IOC_XTAL_Y2 / 18)     // 2.448 MHz but running at 50% (due to wait states & DMA usage of bus)
 		MCFG_CPU_PROGRAM_MAP(ioc_mem_map)

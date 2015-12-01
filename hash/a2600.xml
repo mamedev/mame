@@ -18048,7 +18048,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-  <software name="harmbios" supported="no">  <!-- I think these are the bios roms if you're using it as a multi-game cart? -->
+	<software name="harmbios" supported="no">  <!-- I think these are the bios roms if you're using it as a multi-game cart? -->
 		<description>Harmony Bios Updater</description>
 		<year>2014</year>
 		<publisher>Harmony</publisher>

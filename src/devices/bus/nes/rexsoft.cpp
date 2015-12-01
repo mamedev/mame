@@ -40,7 +40,7 @@ const device_type NES_REX_SL1632 = &device_creator<nes_rex_sl1632_device>;
 
 
 nes_rex_dbz5_device::nes_rex_dbz5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_txrom_device(mconfig, NES_REX_DBZ5, "NES Cart Rex Soft DragonBall Z V PCB", tag, owner, clock, "nes_rex_dbz5", __FILE__), 
+					: nes_txrom_device(mconfig, NES_REX_DBZ5, "NES Cart Rex Soft DragonBall Z V PCB", tag, owner, clock, "nes_rex_dbz5", __FILE__),
 	m_extra(0)
 				{
 }

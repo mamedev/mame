@@ -607,11 +607,11 @@ void alto2_cpu_device::f2_late_idisp()
 		LOG((this,LOG_EMU,2,"    IDISP<-; branch on SH^3 (%#o|%#o)\n", m_next2, r));
 	} else {
 		//int addr = CTL2K_U3(f2_emu_idisp) + X_RDBITS(m_emu.ir,16,1,7);
-        // The above line triggers the following warning in PVS-Studio:
-        // V501: There are identical sub-expressions to the left and to the right of the '==' operator: f2_emu_idisp == f2_emu_idisp
-        // This is because CTL2K_U3(f2) checks f2 == f2_emu_idisp, and so will always evaluate to true in this case.
-        // Consider checking if this is a typo or if it is correct.
-        int addr = 0x80 + X_RDBITS(m_emu.ir,16,1,7);
+		// The above line triggers the following warning in PVS-Studio:
+		// V501: There are identical sub-expressions to the left and to the right of the '==' operator: f2_emu_idisp == f2_emu_idisp
+		// This is because CTL2K_U3(f2) checks f2 == f2_emu_idisp, and so will always evaluate to true in this case.
+		// Consider checking if this is a typo or if it is correct.
+		int addr = 0x80 + X_RDBITS(m_emu.ir,16,1,7);
 		/* 0???????xxxxxxxx */
 		r = m_ctl2k_u3[addr];
 		LOG((this,LOG_EMU,2,"    IDISP<-; IR (%#o) branch on PROM ctl2k_u3[%03o] (%#o|%#o)\n", m_emu.ir, addr, m_next2, r));

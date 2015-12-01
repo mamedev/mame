@@ -24,7 +24,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
 
-	
+
 	DECLARE_READ8_MEMBER(read8_r);
 
 	void check_bankswitch(offs_t offset);

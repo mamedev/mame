@@ -6,11 +6,11 @@ const device_type RS232_PORT = &device_creator<rs232_port_device>;
 
 rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, RS232_PORT, "RS232 Port", tag, owner, clock, "rs232", __FILE__),
-	device_slot_interface(mconfig, *this), 
-	m_rxd(0), 
-	m_dcd(0), 
-	m_dsr(0), 
-	m_ri(0), 
+	device_slot_interface(mconfig, *this),
+	m_rxd(0),
+	m_dcd(0),
+	m_dsr(0),
+	m_ri(0),
 	m_cts(0),
 	m_rxd_handler(*this),
 	m_dcd_handler(*this),
@@ -23,11 +23,11 @@ rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *
 
 rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	device_slot_interface(mconfig, *this), 
+	device_slot_interface(mconfig, *this),
 	m_rxd(0),
-	m_dcd(0), 
-	m_dsr(0), 
-	m_ri(0), 
+	m_dcd(0),
+	m_dsr(0),
+	m_ri(0),
 	m_cts(0),
 	m_rxd_handler(*this),
 	m_dcd_handler(*this),
