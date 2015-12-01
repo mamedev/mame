@@ -3126,10 +3126,13 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 //  m_has_opna = ioport("SOUND_CONFIG")->read() & 1;
 	m_maincpu->set_input_line(INPUT_LINE_A20, m_gate_a20);
 
-	if(!(ioport("ROM_LOAD")->read() & 4))
-		m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base());
-	else
-		m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base() + 0x2000);
+	if(memregion("ide"))
+	{
+		if(!(ioport("ROM_LOAD")->read() & 4))
+			m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base());
+		else
+			m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base() + 0x2000);
+	}
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9821)
