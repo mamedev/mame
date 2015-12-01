@@ -26,6 +26,10 @@ Notes:
 - A bug in the program code causes the OKI to be reset on the very
   first coin inserted.
 
+// Sound banking + video references 
+// https://www.youtube.com/watch?v=nyAQPrkt_a4
+// https://www.youtube.com/watch?v=0gn2Kj2M46Q
+
 */
 
 
@@ -62,10 +66,6 @@ WRITE16_MEMBER(aquarium_state::aquarium_sound_w)
 
 WRITE8_MEMBER(aquarium_state::aquarium_z80_bank_w)
 {
-	// banking reference 
-	// https://www.youtube.com/watch?v=nyAQPrkt_a4
-	// (video also shows our video priority is incorrect)
-
 	// uses bits ---x --xx
 	data = BITSWAP8(data, 7, 6, 5, 2, 3,      1, 4, 0);
 
@@ -402,5 +402,5 @@ ROM_START( aquariumj )
 	ROM_LOAD( "aquar4",  0x000000, 0x80000, CRC(9a4af531) SHA1(bb201b7a6c9fd5924a0d79090257efffd8d4aba1) )
 ROM_END
 
-GAME( 1996, aquarium, 0,        aquarium, aquarium, aquarium_state, aquarium, ROT0, "Excellent System", "Aquarium (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, aquariumj,aquarium, aquarium, aquarium, aquarium_state, aquarium, ROT0, "Excellent System", "Aquarium (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, aquarium, 0,        aquarium, aquarium, aquarium_state, aquarium, ROT0, "Excellent System", "Aquarium (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, aquariumj,aquarium, aquarium, aquarium, aquarium_state, aquarium, ROT0, "Excellent System", "Aquarium (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

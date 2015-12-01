@@ -17,14 +17,16 @@ public:
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_sprgen(*this, "spritegen"){ }
+		m_sprgen(*this, "spritegen"),
+		m_screen(*this, "screen")
+		{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_mid_videoram;
 	required_shared_ptr<UINT16> m_bak_videoram;
 	required_shared_ptr<UINT16> m_txt_videoram;
 	required_shared_ptr<UINT16> m_scroll;
-
+	
 	/* video-related */
 	tilemap_t  *m_txt_tilemap;
 	tilemap_t  *m_mid_tilemap;
@@ -59,5 +61,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<excellent_spr_device> m_sprgen;
+	required_device<screen_device> m_screen;
 
+	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_mask, int priority_value);
+	bitmap_ind16 m_temp_sprite_bitmap;
 };
