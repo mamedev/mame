@@ -393,7 +393,9 @@ UINT32 device_image_interface::get_software_region_length(const char *tag)
 	char full_tag[256];
 
 	sprintf( full_tag, "%s:%s", device().tag(), tag );
-	return device().machine().root_device().memregion( full_tag )->bytes();
+
+	memory_region *region = device().machine().root_device().memregion(full_tag);
+	return region != NULL ? region->bytes() : 0;
 }
 
 

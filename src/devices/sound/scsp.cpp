@@ -516,16 +516,13 @@ void scsp_device::init()
 		m_Master = 0;
 	}
 
-	if (m_ram_region)
+	if (m_ram_region != NULL)
 	{
 		m_SCSPRAM = m_ram_region->base();
-		if (m_SCSPRAM)
-		{
-			m_SCSPRAM_LENGTH = m_ram_region->bytes();
-			m_DSP.SCSPRAM = (UINT16 *)m_SCSPRAM;
-			m_DSP.SCSPRAM_LENGTH = m_SCSPRAM_LENGTH/2;
-			m_SCSPRAM += m_roffset;
-		}
+		m_SCSPRAM_LENGTH = m_ram_region->bytes();
+		m_DSP.SCSPRAM = (UINT16 *)m_SCSPRAM;
+		m_DSP.SCSPRAM_LENGTH = m_SCSPRAM_LENGTH / 2;
+		m_SCSPRAM += m_roffset;
 	}
 
 	m_timerA = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scsp_device::timerA_cb), this));

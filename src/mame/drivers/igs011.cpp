@@ -84,14 +84,18 @@ class igs011_state : public driver_device
 {
 public:
 	igs011_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_priority_ram(*this, "priority_ram"),
-		m_vbowl_trackball(*this, "vbowl_trackball"),
-		m_generic_paletteram_16(*this, "paletteram") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_oki(*this, "oki")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_priority_ram(*this, "priority_ram")
+		, m_vbowl_trackball(*this, "vbowl_trackball")
+		, m_generic_paletteram_16(*this, "paletteram")
+		, m_gfx_region(*this, "blitter")
+		, m_gfx2_region(*this, "blitter_hi")
+	{
+	}
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -105,6 +109,11 @@ public:
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 
 	std::unique_ptr<UINT8[]> m_layer[8];
+	/* memory regions */
+	required_memory_region m_gfx_region;
+	optional_memory_region m_gfx2_region;
+
+	UINT8 *m_layer[8];
 	UINT16 m_priority;
 	UINT8 m_lhb2_pen_hi;
 	UINT16 m_igs_dips_sel;
@@ -484,10 +493,11 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 	UINT8 trans_pen, clear_pen, pen_hi, *dest;
 	UINT8 pen = 0;
 
-	UINT8 *gfx      =   memregion("blitter")->base();
-	UINT8 *gfx2     =   memregion("blitter_hi")->base();
-	int gfx_size    =   memregion("blitter")->bytes();
-	int gfx2_size   =   memregion("blitter_hi")->bytes();
+	UINT8 *gfx      =   m_gfx_region->base();
+	int gfx_size    =   m_gfx_region->bytes();
+
+	UINT8 *gfx2     =   (m_gfx2_region != NULL) ? m_gfx2_region->base() : NULL;
+	int gfx2_size   =   (m_gfx2_region != NULL) ? m_gfx2_region->bytes() : 0;
 
 	const rectangle &clip = m_screen->visible_area();
 

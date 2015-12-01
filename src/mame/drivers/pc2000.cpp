@@ -747,9 +747,8 @@ void pc2000_state::machine_start()
 {
 	std::string region_tag;
 	UINT8 *bios = memregion("bios")->base();
-	UINT8 *cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base();
-	if (!cart)
-		cart = memregion("bios")->base();
+	memory_region *cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	UINT8 *cart = (cart_region != NULL) ? cart_region->base() : memregion("bios")->base();
 
 	m_bank0->configure_entries(0, 0x10, bios, 0x4000);
 	m_bank1->configure_entries(0, 0x10, bios, 0x4000);
@@ -761,9 +760,8 @@ void gl4004_state::machine_start()
 {
 	std::string region_tag;
 	UINT8 *bios = memregion("bios")->base();
-	UINT8 *cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base();
-	if (!cart)
-		cart = memregion("bios")->base();
+	memory_region *cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	UINT8 *cart = (cart_region != NULL) ? cart_region->base() : memregion("bios")->base();
 
 	m_bank0->configure_entries(0, 0x20, bios, 0x4000);
 	m_bank1->configure_entries(0, 0x20, bios, 0x4000);

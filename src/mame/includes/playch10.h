@@ -13,16 +13,18 @@ class playch10_state : public driver_device
 {
 public:
 	playch10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_ppu(*this, "ppu"),
-		m_rp5h01(*this, "rp5h01"),
-		m_ram_8w(*this, "ram_8w"),
-		m_videoram(*this, "videoram"),
-		m_timedata(*this, "timedata"),
-		m_work_ram(*this, "work_ram"),
-		m_gfxdecode(*this, "gfxdecode")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ppu(*this, "ppu")
+		, m_rp5h01(*this, "rp5h01")
+		, m_ram_8w(*this, "ram_8w")
+		, m_videoram(*this, "videoram")
+		, m_timedata(*this, "timedata")
+		, m_work_ram(*this, "work_ram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_vrom_region(*this, "gfx2")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
@@ -33,6 +35,8 @@ public:
 	required_shared_ptr<UINT8> m_timedata;
 	required_shared_ptr<UINT8> m_work_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
+
+	optional_memory_region m_vrom_region;
 
 	int m_up_8w;
 	int m_pc10_nmi_enable;

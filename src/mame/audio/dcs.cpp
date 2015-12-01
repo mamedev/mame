@@ -945,8 +945,12 @@ void dcs2_audio_device::device_start()
 	m_dmadac[1] = subdevice<dmadac_sound_device>("dac2");
 
 	/* always boot from the base of "dcs" */
-	m_bootrom = (UINT16 *)machine().root_device().memregion("dcs")->base();
-	m_bootrom_words = machine().root_device().memregion("dcs")->bytes() / 2;
+	memory_region *bootrom_region = machine().root_device().memregion("dcs");
+	if (bootrom_region != NULL)
+	{
+		m_bootrom = (UINT16 *)bootrom_region->base();
+		m_bootrom_words = bootrom_region->bytes() / 2;
+	}
 
 	/* supports both RAM and ROM variants */
 	if (m_dram_in_mb != 0)
