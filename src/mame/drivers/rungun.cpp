@@ -175,6 +175,13 @@ READ16_MEMBER(rungun_state::sound_status_msb_r)
 
 INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
 {
+	// TODO: in EOF
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	//for(int i=0;i<0x2000;i+=2)
+	for(int i=0;i<0x1000;i+=2)
+		m_k055673->k053247_word_w(space,i/2,m_banked_ram[(i + m_current_frame_number*0x2000) /2],0xffff);
+	
 	if (m_sysreg[0x0c / 2] & 0x09)
 		device.execute().set_input_line(M68K_IRQ_5, ASSERT_LINE);
 }
@@ -218,11 +225,11 @@ static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
 	AM_RANGE(0x580000, 0x58001f) AM_RAM                                         // sound regs read/write fall-through
 	AM_RANGE(0x5c0000, 0x5c000f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)                       // 246A ROM readback window
 	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVWRITE("k055673", k055673_device, k055673_reg_word_w)
-	AM_RANGE(0x600000, 0x600fff) AM_DEVREADWRITE("k055673", k055673_device, k053247_word_r, k053247_word_w)  // OBJ RAM
-	AM_RANGE(0x601000, 0x601fff) AM_RAMBANK("spriteram_bank")                                        	     // OBJ RAM, actually used as work RAM banked buffer 
+	AM_RANGE(0x600000, 0x601fff) AM_RAMBANK("spriteram_bank")                                        	     // OBJ RAM 
+//	AM_RANGE(0x602000, 0x603fff) AM_DEVWRITE("k055673", k055673_device, k053247_word_w)
 	AM_RANGE(0x640000, 0x640007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)                      // '246A registers
 	AM_RANGE(0x680000, 0x68001f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)          // '936 registers
-	AM_RANGE(0x6c0000, 0x6cffff) AM_RAM_WRITE(rng_936_videoram_w) AM_SHARE("936_videoram")  // PSAC2 ('936) RAM (34v + 35v)
+	AM_RANGE(0x6c0000, 0x6cffff) AM_READWRITE(rng_psac2_videoram_r,rng_psac2_videoram_w) // PSAC2 ('936) RAM (34v + 35v)
 	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE("k053936", k053936_device, linectrl_r, linectrl_w)          // PSAC "Line RAM"
 	AM_RANGE(0x740000, 0x741fff) AM_READWRITE(rng_ttl_ram_r, rng_ttl_ram_w)     // text plane RAM
 	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITENOP                                    // watchdog
@@ -371,7 +378,7 @@ void rungun_state::machine_start()
 	membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 	m_banked_ram = auto_alloc_array_clear(machine(), UINT16, 0x2000);
-	membank("spriteram_bank")->configure_entries(0,2,&m_banked_ram[0],0x1000);
+	membank("spriteram_bank")->configure_entries(0,2,&m_banked_ram[0],0x2000);
 
 	
 	save_item(NAME(m_sound_ctrl));
