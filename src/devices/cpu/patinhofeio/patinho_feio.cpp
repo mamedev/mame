@@ -10,6 +10,7 @@
 
 #define PC       m_pc //The program counter is called "contador de instrucoes" in portuguese
 #define ACC      m_acc
+#define RC       read_panel_keys_register()
 #define FLAGS    m_flags
 
 #define V 0x01 // V = "Vai um" (Carry)
@@ -48,8 +49,18 @@ ADDRESS_MAP_END
 patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : cpu_device(mconfig, PATINHO_FEIO, "PATINHO FEIO", tag, owner, clock, "patinho_feio_cpu", __FILE__),
         m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, ADDRESS_MAP_NAME(prog_8bit)),
-        m_icount(0)
+        m_icount(0),
+        m_rc_read_cb(*this)
 {
+}
+
+UINT16 patinho_feio_cpu_device::read_panel_keys_register(){
+    if (!m_rc_read_cb.isnull())
+        m_rc = m_rc_read_cb(0);
+    else
+        m_rc = 0;
+
+    return m_rc;
 }
 
 void patinho_feio_cpu_device::device_start()
@@ -58,13 +69,23 @@ void patinho_feio_cpu_device::device_start()
 
     save_item(NAME(m_pc));
     save_item(NAME(m_acc));
+    save_item(NAME(m_rc));
+    save_item(NAME(m_idx));
+    save_item(NAME(m_flags));
 
     // Register state for debugger
     state_add( PATINHO_FEIO_CI,         "CI",       m_pc         ).mask(0xFFF);
+    state_add( PATINHO_FEIO_RC,         "RC",       m_rc         ).mask(0xFFF);
     state_add( PATINHO_FEIO_ACC,        "ACC",      m_acc        ).mask(0xFF);
     state_add( PATINHO_FEIO_IDX,        "IDX",      m_idx        ).mask(0xFF);
     state_add(STATE_GENPC, "GENPC", m_pc).formatstr("0%06O").noshow();
     state_add(STATE_GENFLAGS,  "GENFLAGS",  m_flags).noshow().formatstr("%8s");
+
+    if (m_rc_read_cb.isnull()){
+        fatalerror("Panel keys register not found!");
+    } else {
+        m_rc_read_cb.resolve();
+    }
 
     m_icountptr = &m_icount;
 }
@@ -73,6 +94,7 @@ void patinho_feio_cpu_device::device_reset()
 {
     m_pc = 0x006;
     m_acc = 0;
+    m_rc = 0;
     m_idx = READ_INDEX_REG();
     m_flags = 0;
     m_run = true;
@@ -89,6 +111,8 @@ void patinho_feio_cpu_device::execute_run()
             m_icount = 0;   /* if processor is stopped, just burn cycles */
         } else {
             m_idx = READ_INDEX_REG();
+            read_panel_keys_register();
+            
             execute_instruction();
             m_icount --;
         }
@@ -187,6 +211,46 @@ void patinho_feio_cpu_device::execute_instruction()
             //LIMP1:
             //    Clear accumulator, reset T and set V
             ACC = 0;
+            FLAGS = V;
+            return;
+        case 0x88:
+            //PNL 0:
+            ACC = (RC & 0xFF);
+            FLAGS = 0;
+            return;
+        case 0x89:
+            //PNL 1:
+            ACC = (RC & 0xFF) + 1;
+            //TODO: FLAGS = ?;
+            return;
+        case 0x8A:
+            //PNL 2:
+            ACC = (RC & 0xFF) - ACC - 1;
+            //TODO: FLAGS = ?;
+            return;
+        case 0x8B:
+            //PNL 3:
+            ACC = (RC & 0xFF) - ACC;
+            //TODO: FLAGS = ?;
+            return;
+        case 0x8C:
+            //PNL 4:
+            ACC = (RC & 0xFF) + ACC;
+            //TODO: FLAGS = ?;
+            return;
+        case 0x8D:
+            //PNL 5:
+            ACC = (RC & 0xFF) + ACC + 1;
+            //TODO: FLAGS = ?;
+            return;
+        case 0x8E:
+            //PNL 6:
+            ACC = (RC & 0xFF) - 1;
+            //TODO: FLAGS = ?;
+            return;
+        case 0x8F:
+            //PNL 7:
+            ACC = (RC & 0xFF);
             FLAGS = V;
             return;
         case 0x9A:

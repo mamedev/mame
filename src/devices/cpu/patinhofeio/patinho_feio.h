@@ -5,10 +5,13 @@
 #ifndef __PATINHOFEIO_H__
 #define __PATINHOFEIO_H__
 
+#define MCFG_PATINHO_RC_READ_CB(_devcb) \
+    devcb = &patinho_feio_cpu_device::set_rc_read_callback(*device, DEVCB_##_devcb);
+
 /* register IDs */
 enum
 {
-    PATINHO_FEIO_CI=1, PATINHO_FEIO_ACC, PATINHO_FEIO_IDX
+    PATINHO_FEIO_CI=1, PATINHO_FEIO_ACC, PATINHO_FEIO_IDX, PATINHO_FEIO_RC
 };
 
 enum {
@@ -36,7 +39,10 @@ public:
     // construction/destruction
     patinho_feio_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
+    template<class _Object> static devcb_base &set_rc_read_callback(device_t &device, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_rc_read_cb.set_callback(object); }
+
 protected:
+    
     virtual void execute_run();
     virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
@@ -49,6 +55,10 @@ protected:
                                 *  stands for "Contador de Instrucao"
                                 *  or "instructions counter".
                                 */
+    unsigned int m_rc; /* RC = "Registrador de Chaves" (Keys Register)
+                        *       It represents the 12 bits of input data
+                        *       from toggle switches in the computer panel
+                        */
     unsigned char m_idx;
 
     /* processor state flip-flops */
@@ -87,6 +97,8 @@ protected:
 private:
     void execute_instruction();
     unsigned int compute_effective_address(unsigned int addr);
+    UINT16 read_panel_keys_register();
+    devcb_read16 m_rc_read_cb;
 };
 
 

@@ -16,6 +16,7 @@ public:
     { }
 
     DECLARE_DRIVER_INIT(patinho_feio);
+    DECLARE_READ16_MEMBER(rc_r);
     void load_tape(const char* name);
     void load_raw_data(const char* name, unsigned int start_address, unsigned int data_length);
     virtual void machine_start();
@@ -28,6 +29,11 @@ public:
 */
 DRIVER_INIT_MEMBER(patinho_feio_state, patinho_feio)
 {
+}
+
+READ16_MEMBER(patinho_feio_state::rc_r)
+{
+    return ioport("RC_HIGH")->read() << 8 | ioport("RC_LOW")->read();
 }
 
 void patinho_feio_state::load_tape(const char* name){
@@ -74,21 +80,28 @@ void patinho_feio_state::machine_start(){
 }
 
 static INPUT_PORTS_START( patinho_feio )
-    //  PORT_START("PANEL")       /* various operator control panel switches */
-    //  PORT_BIT(?, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("control panel key") PORT_CODE(KEYCODE_?)
-    //  PORT_BIT(?, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("control panel key") PORT_CODE(KEYCODE_?)
-    //  PORT_BIT(?, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("control panel key") PORT_CODE(KEYCODE_?)
-    //  PORT_BIT(?, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("control panel key") PORT_CODE(KEYCODE_?)
-    //  PORT_BIT(?, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("control panel key") PORT_CODE(KEYCODE_?)
-    //  PORT_BIT(?, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("control panel key") PORT_CODE(KEYCODE_?)
-    //  PORT_BIT(?, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("control panel key") PORT_CODE(KEYCODE_?)
-    //  PORT_BIT(?, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("control panel key") PORT_CODE(KEYCODE_?)
+      PORT_START("RC_LOW")
+      PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 0") PORT_CODE(KEYCODE_EQUALS) PORT_TOGGLE
+      PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 1") PORT_CODE(KEYCODE_MINUS) PORT_TOGGLE
+      PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 2") PORT_CODE(KEYCODE_0) PORT_TOGGLE
+      PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 3") PORT_CODE(KEYCODE_9) PORT_TOGGLE
+      PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 4") PORT_CODE(KEYCODE_8) PORT_TOGGLE
+      PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 5") PORT_CODE(KEYCODE_7) PORT_TOGGLE
+      PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 6") PORT_CODE(KEYCODE_6) PORT_TOGGLE
+      PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 7") PORT_CODE(KEYCODE_5) PORT_TOGGLE
+      
+      PORT_START("RC_HIGH")
+      PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 8") PORT_CODE(KEYCODE_4) PORT_TOGGLE
+      PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 7") PORT_CODE(KEYCODE_3) PORT_TOGGLE
+      PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 10") PORT_CODE(KEYCODE_2) PORT_TOGGLE
+      PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 11") PORT_CODE(KEYCODE_1) PORT_TOGGLE
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
     /* basic machine hardware */
     /* CPU @ approx. 500 kHz (memory cycle time is 2usec) */
     MCFG_CPU_ADD("maincpu", PATINHO_FEIO, 500000)
+    MCFG_PATINHO_RC_READ_CB(READ16(patinho_feio_state, rc_r))
 MACHINE_CONFIG_END
 
 ROM_START( patinho )

@@ -55,36 +55,6 @@ CPU_DISASSEMBLE( patinho_feio )
             addr = (oprom[0] & 0x0F) << 8 | oprom[1];
             sprintf (buffer, "SOMX    (IDX) + /%03X", addr);
             return 2;
-        case 0x80:
-        case 0x90:
-            switch (oprom[0])
-            {
-                case 0x80: sprintf (buffer, "LIMPO");       return 1;
-                case 0x81: sprintf (buffer, "UM");          return 1;
-                case 0x82: sprintf (buffer, "CMP1");        return 1;
-                case 0x83: sprintf (buffer, "CMP2");        return 1;
-                case 0x84: sprintf (buffer, "LIN");         return 1;
-                case 0x85: sprintf (buffer, "INC");         return 1;
-                case 0x86: sprintf (buffer, "UNEG");        return 1;
-                case 0x87: sprintf (buffer, "LIMP1");       return 1;
-                case 0x90: sprintf (buffer, "ST      0");   return 1;
-                case 0x91: sprintf (buffer, "STM     0");   return 1;
-                case 0x92: sprintf (buffer, "ST      1");   return 1;
-                case 0x93: sprintf (buffer, "STM     1");   return 1;
-                case 0x94: sprintf (buffer, "SV      0");   return 1;
-                case 0x95: sprintf (buffer, "SVM     0");   return 1;
-                case 0x96: sprintf (buffer, "SV      1");   return 1;
-                case 0x97: sprintf (buffer, "SVM     1");   return 1;
-                case 0x98: sprintf (buffer, "PUL");         return 1;
-                case 0x99: sprintf (buffer, "TRE");         return 1;
-                case 0x9A: sprintf (buffer, "INIB");        return 1;
-                case 0x9B: sprintf (buffer, "PERM");        return 1;
-                case 0x9C: sprintf (buffer, "ESP");         return 1;
-                case 0x9D: sprintf (buffer, "PARE");        return 1;
-                case 0x9E: sprintf (buffer, "TRI");         return 1;
-                case 0x9F: sprintf (buffer, "IND");         return 1;
-            }
-            break;
         case 0xA0:
             //PLAN = "Pula se ACC for negativo": Jumps to the 12bit address
             //                                   if the accumulator is negative
@@ -145,6 +115,43 @@ CPU_DISASSEMBLE( patinho_feio )
             sprintf (buffer, "PUG     /%03X", addr);
             return 2;
     }
+
+    switch (oprom[0])
+    {
+        case 0x80: sprintf (buffer, "LIMPO");       return 1;
+        case 0x81: sprintf (buffer, "UM");          return 1;
+        case 0x82: sprintf (buffer, "CMP1");        return 1;
+        case 0x83: sprintf (buffer, "CMP2");        return 1;
+        case 0x84: sprintf (buffer, "LIN");         return 1;
+        case 0x85: sprintf (buffer, "INC");         return 1;
+        case 0x86: sprintf (buffer, "UNEG");        return 1;
+        case 0x87: sprintf (buffer, "LIMP1");       return 1;
+        case 0x88: sprintf (buffer, "PNL     0");   return 1;
+        case 0x89: sprintf (buffer, "PNL     1");   return 1;
+        case 0x8A: sprintf (buffer, "PNL     2");   return 1;
+        case 0x8B: sprintf (buffer, "PNL     3");   return 1;
+        case 0x8C: sprintf (buffer, "PNL     4");   return 1;
+        case 0x8D: sprintf (buffer, "PNL     5");   return 1;
+        case 0x8E: sprintf (buffer, "PNL     6");   return 1;
+        case 0x8F: sprintf (buffer, "PNL     7");   return 1;
+        case 0x90: sprintf (buffer, "ST      0");   return 1;
+        case 0x91: sprintf (buffer, "STM     0");   return 1;
+        case 0x92: sprintf (buffer, "ST      1");   return 1;
+        case 0x93: sprintf (buffer, "STM     1");   return 1;
+        case 0x94: sprintf (buffer, "SV      0");   return 1;
+        case 0x95: sprintf (buffer, "SVM     0");   return 1;
+        case 0x96: sprintf (buffer, "SV      1");   return 1;
+        case 0x97: sprintf (buffer, "SVM     1");   return 1;
+        case 0x98: sprintf (buffer, "PUL");         return 1;
+        case 0x99: sprintf (buffer, "TRE");         return 1;
+        case 0x9A: sprintf (buffer, "INIB");        return 1;
+        case 0x9B: sprintf (buffer, "PERM");        return 1;
+        case 0x9C: sprintf (buffer, "ESP");         return 1;
+        case 0x9D: sprintf (buffer, "PARE");        return 1;
+        case 0x9E: sprintf (buffer, "TRI");         return 1;
+        case 0x9F: sprintf (buffer, "IND");         return 1;
+    }
+
     sprintf (buffer, "illegal instruction");
     return 1;
 }
