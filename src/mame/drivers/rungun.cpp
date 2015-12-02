@@ -423,6 +423,7 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	MCFG_SCREEN_VISIBLE_AREA(88, 88+384-1, 24, 24+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -443,6 +444,28 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	MCFG_K053252_OFFSETS(9*8, 24)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
+	MCFG_SCREEN_ADD("demultiplex1", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(59.185606)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(88, 88+384-1, 24, 24+224-1)
+	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_left)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette2", 1024)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
+	
+	MCFG_SCREEN_ADD("demultiplex2", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(59.185606)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(88, 88+384-1, 24, 24+224-1)
+	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_right)
+	MCFG_SCREEN_PALETTE("palette2")
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -461,33 +484,7 @@ MACHINE_CONFIG_END
 // for dual-screen output Run and Gun requires the video de-multiplexer board connected to the Jamma output, this gives you 2 Jamma connectors, one for each screen.
 // this means when operated as a single dedicated cabinet the game runs at 60fps, and has smoother animations than when operated as a twin setup where each
 // screen only gets an update every other frame.
-static MACHINE_CONFIG_DERIVED( rng_dual, rng )
-	MCFG_SCREEN_MODIFY("screen") // this needs to always render as we demux from the output of it
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
-	MCFG_SCREEN_ADD("demultiplex1", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(88, 88+384-1, 24, 24+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_left)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette2", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
-	
-	MCFG_SCREEN_ADD("demultiplex2", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(88, 88+384-1, 24, 24+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_right)
-	MCFG_SCREEN_PALETTE("palette2")
-MACHINE_CONFIG_END
 
 // Older non-US 53936/A13 roms were all returning bad from the mask ROM check. Using the US ROM on non-US reports good therefore I guess that data matches for that
 // across all sets.
@@ -747,11 +744,11 @@ ROM_END
 
 
 // these sets operate as single screen / dual screen depending on if you have the video de-multiplexer plugged in, and the dipswitch set to 1 or 2 monitors
-GAME( 1993, rungun,   0,      rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, runguna,  rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.4)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, rungunb,  rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 9.10, prototype?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, rungunua, rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UBA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, slmdunkj, rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Slam Dunk (ver JAA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1993, rungun,   0,      rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
+GAMEL( 1993, runguna,  rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.4)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
+GAMEL( 1993, rungunb,  rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 9.10, prototype?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
+GAMEL( 1993, rungunua, rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UBA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
+GAMEL( 1993, slmdunkj, rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Slam Dunk (ver JAA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
 
 // this set has no dipswitches to select single screen mode (they're not even displayed in test menu) it's twin cabinet ONLY
-GAMEL( 1993, rungunu,  rungun, rng_dual, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UAB 1993 10.12, dedicated twin cabinet)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING, layout_rungun_dual ) 
+GAMEL( 1993, rungunu,  rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UAB 1993 10.12, dedicated twin cabinet)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual ) 

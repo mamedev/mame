@@ -119,7 +119,6 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 		m_936_tilemap->mark_all_dirty();
 
 	}	
-	//	AM_RANGE(0x600000, 0x600fff) AM_DEVREADWRITE("k055673", k055673_device, k053247_word_r, k053247_word_w)  // OBJ RAM
 
 
 	if(m_video_priority_mode == false)
@@ -137,7 +136,7 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 
 	// copy frame output to temp buffers so we can demultiplex it for the dual screen output
 	// (really only need to do this for dual setup)
-	if (machine().first_screen()->frame_number() & 1)
+	if (m_current_frame_number)
 	{
 		copybitmap(m_rng_dual_demultiplex_right_temp, bitmap, 0, 0, 0, 0, cliprect);
 	}
