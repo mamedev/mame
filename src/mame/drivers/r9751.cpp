@@ -60,6 +60,9 @@ public:
 	DECLARE_READ32_MEMBER(r9751_mmio_fff8_r);
 	DECLARE_WRITE32_MEMBER(r9751_mmio_fff8_w);
 
+	DECLARE_READ8_MEMBER(pdc_dma_r);
+	DECLARE_WRITE8_MEMBER(pdc_dma_w);
+
 	DECLARE_DRIVER_INIT(r9751);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
@@ -93,6 +96,16 @@ UINT32 r9751_state::swap_uint32( UINT32 val )
 {
     val = ((val << 8) & 0xFF00FF00 ) | ((val >> 8) & 0xFF00FF ); 
     return (val << 16) | (val >> 16);
+}
+
+READ8_MEMBER(r9751_state::pdc_dma_r)
+{
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+WRITE8_MEMBER(r9751_state::pdc_dma_w)
+{
+	m_maincpu->space(AS_PROGRAM).write_byte(offset,data);
 }
 
 DRIVER_INIT_MEMBER(r9751_state,r9751)
@@ -392,6 +405,8 @@ static MACHINE_CONFIG_START( r9751, r9751_state )
 
 	/* disk hardware */
 	MCFG_DEVICE_ADD("pdc", PDC, 0)
+	MCFG_PDC_R_CB(READ8(r9751_state, pdc_dma_r))
+	MCFG_PDC_W_CB(WRITE8(r9751_state, pdc_dma_w))
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	//MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_1)
 	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
