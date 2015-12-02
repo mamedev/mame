@@ -10158,7 +10158,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: X002127P
 
 Bonus "Dealt" payouts per Coin In are:
- Dealt Royal Flush .. 2400
+ Dealt Royal Flush - 2400
 
 Designed and co-created by Best Bet Products
 
@@ -10190,7 +10190,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  4D  SF  RF  (Bonus)
      Programs Available: X002134P
 
 Bonus "Dealt" payouts per Coin In are:
- Dealt 4 Deuces with Face .. 800
+ Dealt 4 Deuces with Face - 800
 
 Designed and co-created by Best Bet Products
 
@@ -10246,9 +10246,9 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: X002152P
 
 Bonus "Dealt" payouts per Coin In are:
- Dealt A/J Spades ..............   1
- Dealt A/J Clubs  ..............   1
- Dealt A/J Spades & A/J Clubs ..  50
+ Dealt A/J Spades ...........   1
+ Dealt A/J Clubs  ...........   1
+ Dealt A/J Spades & A/J Clubs  50
 
 Designed and co-created by Best Bet Products
 
@@ -10447,7 +10447,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  A,2-4  2-4  SF  RF  (Bonus)
      Programs Available: X002211P
 
 Bonus "Dealt" payouts per Coin In are:
- Dealt 3 or more Jacks .....    3
+ Dealt 3 or more Jacks - 3
 
 Designed and co-created by Best Bet Products
 
@@ -10480,7 +10480,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  A,2-4  2-4  SF  RF  (Bonus)
      Programs Available: X002236P
 
 Bonus "Dealt" payouts per Coin In are:
- Dealt 3 or more Aces .....    3
+ Dealt 3 or more Aces - 3
 
 Designed and co-created by Best Bet Products
 
@@ -10798,7 +10798,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SA$  SF  RF  (Bonus)
 SA$ - Sequential ACE$ pays the same as RF
 
 Bonus "Dealt" payouts per Coin In are:
-Sequential ACE$ ... ????
+Sequential ACE$ - 12000
 
 Designed and co-created by Best Bet Products
 
@@ -10829,9 +10829,9 @@ PayTable   3K  STR  FL  FH  4K  SF  RF  5K  5K  5A  4D  4D  RF  (Bonus)
      Programs Available: X002283P
 
 Bonus "Dealt" payouts per Coin In are:
- Dealt 3 Deuces .....    3
- Dealt 4 Deuces .....  300
- Dealt 4 Deuces + Ace 1600
+ Dealt 3 Deuces .....     3
+ Dealt 4 Deuces .....   300
+ Dealt 4 Deuces + Ace  1600
 
 Belly glass could be ordered as either Barbaric Deuces Wild or Dealt Deuces Wild Bonus Poker
 
@@ -10864,9 +10864,9 @@ PayTable   3K  STR  FL  FH  4K  SF  RF  5K  5K  5A  4D  4D  RF  (Bonus)
      Programs Available: X002284P
 
 Bonus "Dealt" payouts per Coin In are:
- Dealt 3 Deuces .....    3
- Dealt 4 Deuces .....  300
- Dealt 4 Deuces + Ace 1600
+ Dealt 3 Deuces .....     3
+ Dealt 4 Deuces .....   300
+ Dealt 4 Deuces + Ace  1600
 
 Belly glass could be ordered as either Barbaric Deuces Wild or Dealt Deuces Wild Bonus Poker
 
@@ -10900,11 +10900,11 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: X002287P
 
 Bonus "Dealt" payouts per Coin In are:
- Dealt Royal Flush     ..... 1000
- Dealt 1 Ace no Faces  .....    1
- Dealt 2 Aces no Faces .....    2
- Dealt 3 Aces no Faces .....   50
- Dealt 4 Aces no Faces ..... 1500
+ Dealt Royal Flush....  1000
+ Dealt 1 Ace no Faces.     1
+ Dealt 2 Aces no Faces     2
+ Dealt 3 Aces no Faces    50
+ Dealt 4 Aces no Faces  1500
 
 Designed and co-created by Best Bet Products
 
