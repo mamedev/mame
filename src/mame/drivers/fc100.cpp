@@ -79,7 +79,7 @@ public:
 
 	MC6847_GET_CHARROM_MEMBER(get_char_rom)
 	{
-		return m_p_chargen[ch * 16 + line];
+		return m_p_chargen[(ch * 16 + line) & 0xfff];
 	}
 private:
 	virtual void machine_start();
