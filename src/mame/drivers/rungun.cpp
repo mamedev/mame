@@ -28,16 +28,11 @@
      - missing sprites and priority
 
    Known Issues:
-     - no dual monitor support
-     - games seem to think they're in dual-monitor mode when they're not
-     - speed in some sets is incorrect (for dual monitors I'm guessing it should
-       output alternate frames to alternate monitors, but due to other bugs it
-       just causes the game to run twice as fast as it should?)
-     - synchronization and other oddities (rungunu doesn't show attract mode)
-     - swapped P12 and P34 controls in 4-player mode team selectet (real puzzler)
-     - P3 and P4 coin chutes not working in 4-player mode
-     - sprite palettes are not entirely right
-
+     - CRTC and video registers needs syncronization with current video draw state, it's very noticeable if for example scroll values are in very different states between screens.
+	 - Current draw state could be improved optimization-wise (for example by supporting it in the core in some way).
+	 - sprite palettes are not entirely right
+	 
+	 
 *************************************************************************/
 
 #include "emu.h"
@@ -164,7 +159,8 @@ READ16_MEMBER(rungun_state::sound_status_msb_r)
 
 INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
 {
-	// TODO: in screen update causes sprites to desync badly ...
+	// send to sprite device current state (i.e. bread & butter sprite DMA)
+	// TODO: firing this in screen update causes sprites to desync badly ...
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	for(int i=0;i<0x1000;i+=2)
@@ -219,7 +215,6 @@ static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
 	AM_RANGE(0x5c0000, 0x5c000f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)                       // 246A ROM readback window
 	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVWRITE("k055673", k055673_device, k055673_reg_word_w)
 	AM_RANGE(0x600000, 0x601fff) AM_RAMBANK("spriteram_bank")                                        	     // OBJ RAM 
-//	AM_RANGE(0x602000, 0x603fff) AM_DEVWRITE("k055673", k055673_device, k053247_word_w)
 	AM_RANGE(0x640000, 0x640007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)                      // '246A registers
 	AM_RANGE(0x680000, 0x68001f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)          // '936 registers
 	AM_RANGE(0x6c0000, 0x6cffff) AM_READWRITE(rng_psac2_videoram_r,rng_psac2_videoram_w) // PSAC2 ('936) RAM (34v + 35v)
