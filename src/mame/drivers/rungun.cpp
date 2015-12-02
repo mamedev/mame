@@ -60,22 +60,11 @@ READ16_MEMBER(rungun_state::rng_sysregs_r)
 	switch (offset)
 	{
 		case 0x00/2:
-			if (ioport("DSW")->read() & 0x20)
-				return (ioport("P1")->read() | ioport("P3")->read() << 8);
-			else
-			{
-				data = ioport("P1")->read() & ioport("P3")->read();
-				return (data << 8 | data);
-			}
+			return (ioport("P1")->read() | ioport("P3")->read() << 8);
 
 		case 0x02/2:
-			if (ioport("DSW")->read() & 0x20)
-				return (ioport("P2")->read() | ioport("P4")->read() << 8);
-			else
-			{
-				data = ioport("P2")->read() & ioport("P4")->read();
-				return (data << 8 | data);
-			}
+			return (ioport("P2")->read() | ioport("P4")->read() << 8);
+
 
 		case 0x04/2:
 			/*

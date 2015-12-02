@@ -117,7 +117,6 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 	{
 		m_ttl_tilemap->mark_all_dirty();
 		m_936_tilemap->mark_all_dirty();
-
 	}	
 
 
