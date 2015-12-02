@@ -164,10 +164,9 @@ READ16_MEMBER(rungun_state::sound_status_msb_r)
 
 INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
 {
-	// TODO: in EOF
+	// TODO: in screen update causes sprites to desync badly ...
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	//for(int i=0;i<0x2000;i+=2)
 	for(int i=0;i<0x1000;i+=2)
 		m_k055673->k053247_word_w(space,i/2,m_banked_ram[(i + m_current_frame_number*0x2000) /2],0xffff);
 	
@@ -185,22 +184,27 @@ READ8_MEMBER(rungun_state::rng_53936_rom_r)
 
 READ16_MEMBER(rungun_state::palette_read)
 {
-	return m_video_mux_bank == 0 ? m_palette->read(space,offset,mem_mask) : m_palette2->read(space,offset,mem_mask);
+	return m_pal_ram[offset + m_video_mux_bank*0x800/2];
 }
 
 WRITE16_MEMBER(rungun_state::palette_write)
 {
-	if(m_video_mux_bank == 0)
-		m_palette->write(space,offset,data,mem_mask);
-	else
-		m_palette2->write(space,offset,data,mem_mask);
-
+	palette_device *cur_paldevice = m_video_mux_bank == 0 ? m_palette : m_palette2;
+	UINT32 addr = offset + m_video_mux_bank*0x800/2;
+	COMBINE_DATA(&m_pal_ram[addr]);
+	
+	UINT8 r,g,b;
+	
+	r = m_pal_ram[addr] & 0x1f;
+	g = (m_pal_ram[addr] & 0x3e0) >> 5;
+	b = (m_pal_ram[addr] & 0x7e00) >> 10;
+	
+	cur_paldevice->set_pen_color(offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM                                         // main program + data
 	AM_RANGE(0x300000, 0x3007ff) AM_READWRITE(palette_read,palette_write) AM_SHARE("palette")
-	AM_RANGE(0x300800, 0x300fff) AM_RAM AM_SHARE("palette2") // TODO: paletteram declaration
 	AM_RANGE(0x380000, 0x39ffff) AM_RAM                                         // work RAM
 	AM_RANGE(0x400000, 0x43ffff) AM_READ8(rng_53936_rom_r,0x00ff)			    // '936 ROM readback window
 	AM_RANGE(0x480000, 0x48001f) AM_READWRITE(rng_sysregs_r, rng_sysregs_w) AM_SHARE("sysreg")
@@ -367,8 +371,9 @@ void rungun_state::machine_start()
 	membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 	m_banked_ram = auto_alloc_array_clear(machine(), UINT16, 0x2000);
+	m_pal_ram = auto_alloc_array_clear(machine(), UINT16, 0x800*2);
 	membank("spriteram_bank")->configure_entries(0,2,&m_banked_ram[0],0x2000);
-
+	
 	
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_status));
