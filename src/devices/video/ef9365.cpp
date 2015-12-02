@@ -19,11 +19,12 @@
 const device_type EF9365 = &device_creator<ef9365_device>;
 
 // default address map
+// Up to 4 bitplans @ 256*256
 static ADDRESS_MAP_START( ef9365, AS_0, 8, ef9365_device )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM // BLUE
-	AM_RANGE(0x2000, 0x3fff) AM_RAM // GREEN
-	AM_RANGE(0x4000, 0x5fff) AM_RAM // RED
-	AM_RANGE(0x6000, 0x7fff) AM_RAM // INTENSITY
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM
+	AM_RANGE(0x4000, 0x5fff) AM_RAM
+	AM_RANGE(0x6000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -79,16 +80,38 @@ void ef9365_device::static_set_color_filler( UINT8 color )
 }
 
 //-------------------------------------------------
+//  static_set_color_entry: Set the color value
+//  into the palette
+//-------------------------------------------------
+
+void ef9365_device::static_set_color_entry( int index, UINT8 r, UINT8 g, UINT8 b )
+{
+	if( index < 16 )
+	{
+		palette[index] = rgb_t(r, g, b);
+	}
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void ef9365_device::device_start()
 {
+	int i;
+
 	m_busy_timer = timer_alloc(BUSY_TIMER);
 
 	m_videoram = &space(0);
 	m_charset = region();
 	m_current_color = 0x0F;
+
+	// Default palette : Black and white
+	palette[0] = rgb_t(0, 0, 0);
+	for( i = 1; i < 16 ; i++ )
+	{
+		palette[i] = rgb_t(255, 255, 255);
+	}
 
 	m_screen_out.allocate(496, m_screen->height());
 
@@ -162,7 +185,7 @@ void ef9365_device::draw_character( unsigned char c )
 {
 	int x_char,y_char;
 	int char_base,char_pix;
-	unsigned int x, y;
+	unsigned int x, y, p;
 
 	x = ( (m_registers[EF9365_REG_X_MSB]<<8) | m_registers[EF9365_REG_X_LSB]);
 	y = ( (m_registers[EF9365_REG_Y_MSB]<<8) | m_registers[EF9365_REG_Y_LSB]);
@@ -182,17 +205,13 @@ void ef9365_device::draw_character( unsigned char c )
 				{
 					if ( m_charset->u8(char_base + (char_pix>>3) ) & ( 0x80 >> (char_pix&7)))
 					{
-						if( m_current_color & 0x01)
-							m_videoram->write_byte ( 0x0000 + ((((y_char+y)*256) + (x_char+x))>>3), m_videoram->read_byte( 0x0000 + ((((y_char+y)*256) + (x_char+x))>>3)) | (0x80 >> ((((y_char+y)*256) + (x_char+x))&7) ) );
-
-						if( m_current_color & 0x02)
-							m_videoram->write_byte ( 0x2000 + ((((y_char+y)*256) + (x_char+x))>>3), m_videoram->read_byte( 0x2000 + ((((y_char+y)*256) + (x_char+x))>>3)) | (0x80 >> ((((y_char+y)*256) + (x_char+x))&7) ) );
-
-						if( m_current_color & 0x04)
-							m_videoram->write_byte ( 0x4000 + ((((y_char+y)*256) + (x_char+x))>>3), m_videoram->read_byte( 0x4000 + ((((y_char+y)*256) + (x_char+x))>>3)) | (0x80 >> ((((y_char+y)*256) + (x_char+x))&7) ) );
-
-						if( m_current_color & 0x08)
-							m_videoram->write_byte ( 0x6000 + ((((y_char+y)*256) + (x_char+x))>>3), m_videoram->read_byte( 0x6000 + ((((y_char+y)*256) + (x_char+x))>>3)) | (0x80 >> ((((y_char+y)*256) + (x_char+x))&7) ) );
+						for(p = 0 ; p < 4 ; p++)
+						{
+							if( m_current_color & (0x01 << p) )
+								m_videoram->write_byte ( (0x2000*p) + ((((y_char+y)*256) + (x_char+x))>>3), m_videoram->read_byte( (0x2000*p) + ((((y_char+y)*256) + (x_char+x))>>3)) |  (0x80 >> ((((y_char+y)*256) + (x_char+x))&7) ) );
+							else
+								m_videoram->write_byte ( (0x2000*p) + ((((y_char+y)*256) + (x_char+x))>>3), m_videoram->read_byte( (0x2000*p) + ((((y_char+y)*256) + (x_char+x))>>3)) & ~(0x80 >> ((((y_char+y)*256) + (x_char+x))&7) ) );
+						}
 					}
 
 					char_pix++;
@@ -203,6 +222,41 @@ void ef9365_device::draw_character( unsigned char c )
 
 			m_registers[EF9365_REG_X_MSB] = x >> 8;
 			m_registers[EF9365_REG_X_LSB] = x & 0xFF;
+		}
+	}
+}
+
+void ef9365_device::screen_scanning( int force_clear )
+{
+	int x,y,p;
+
+	if( (m_registers[EF9365_REG_CTRL1] & 0x02) && !force_clear )
+	{
+		for( y = 0; y < 256; y++ )
+		{
+			for( x = 0; x < 256; x++ )
+			{
+				for( p = 0 ; p < 4 ; p++ )
+				{
+					if( m_current_color & (0x01 << p) )
+						m_videoram->write_byte ( (0x2000*p) + (((y*256) + x)>>3), m_videoram->read_byte( (0x2000*p) + (((y*256) + x)>>3)) |  (0x80 >> (((y*256) + x)&7) ) );
+					else
+						m_videoram->write_byte ( (0x2000*p) + (((y*256) + x)>>3), m_videoram->read_byte( (0x2000*p) + (((y*256) + x)>>3)) & ~(0x80 >> (((y*256) + x)&7) ) );
+				}
+			}
+		}
+	}
+	else
+	{
+		for( y = 0; y < 256; y++)
+		{
+			for( x = 0; x < 256; x++)
+			{
+				for( p = 0 ; p < 4 ; p++ )
+				{
+					m_videoram->write_byte ( (0x2000*p) + (((y*256) + x)>>3), m_videoram->read_byte( (0x2000*p) + (((y*256) + x)>>3)) & ~(0x80 >> (((y*256) + x)&7) ) );
+				}
+			}
 		}
 	}
 }
@@ -246,6 +300,7 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 			#ifdef DBGMODE
 				printf("Clear screen\n");
 			#endif
+				screen_scanning(1);
 			break;
 			case 0x5: // X and Y registers reset to 0
 			#ifdef DBGMODE
@@ -271,6 +326,7 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 			#ifdef DBGMODE
 				printf("Clear screen, set CSIZE to code \"minsize\". All other registers reset to 0\n");
 			#endif
+				screen_scanning(1);
 			break;
 			case 0x8: // Light-pen initialization (/White forced low)
 			#ifdef DBGMODE
@@ -296,6 +352,7 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 			#ifdef DBGMODE
 				printf("Screen scanning : pen or Eraser as defined by CTRL1\n");
 			#endif
+				screen_scanning(0);
 			break;
 			case 0xD: // X  reset to 0
 			#ifdef DBGMODE
@@ -368,37 +425,36 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 UINT32 ef9365_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i,j,k;
-	unsigned long r,v,b;
+	unsigned char color_index;
+
 	k = 0;
 	for(i=0;i<256;i++)
 	{
 		for(j=0;j<256;j++)
 		{
-			r = v = b = 0;
+			color_index = 0x00;
 
 			if( m_videoram->read_byte(0x0000 + (k>>3)) & (0x80>>(k&7)))
 			{
-				b = 0xFF;
+				color_index |= 0x01;
 			}
 
 			if( m_videoram->read_byte(0x2000 + (k>>3)) & (0x80>>(k&7)))
 			{
-				v = 0xFF;
+				color_index |= 0x02;
 			}
 
 			if( m_videoram->read_byte(0x4000 + (k>>3)) & (0x80>>(k&7)))
 			{
-				r = 0xFF;
+				color_index |= 0x04;
 			}
 
 			if( m_videoram->read_byte(0x6000 + (k>>3)) & (0x80>>(k&7)))
 			{
-				r = r / 2;
-				v = v / 2;
-				b = b / 2;
+				color_index |= 0x08;
 			}
 
-			m_screen_out.pix32(i, j)  =  ( r<<16 ) | ( v<<8 ) | b;
+			m_screen_out.pix32(i, j) = palette[ color_index&0xF ];
 
 			k++;
 		}

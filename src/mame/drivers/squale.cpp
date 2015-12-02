@@ -136,9 +136,22 @@ INPUT_PORTS_END
 
 void squale_state::machine_start()
 {
+	int i;
+
 	membank("rom_bank")->configure_entry(0, memregion("maincpu")->base() + 0x100);
 	membank("rom_bank")->configure_entry(1, memregion("maincpu")->base() + 0x1100);
 	membank("rom_bank")->set_entry( 0 );
+
+	// Generate Squale hardware palette
+	for(i=0;i<8;i++)
+	{
+		m_ef9365->static_set_color_entry(i,(((i&4)>>2)^1) * 255,(((i&2)>>1)^1) * 255, ((i&1)^1) * 255 );
+	}
+
+	for(i=0;i<8;i++)
+	{
+		m_ef9365->static_set_color_entry(i + 8,(((i&4)>>2)^1) * 127,(((i&2)>>1)^1) * 127, ((i&1)^1) * 127 );
+	}
 }
 
 void squale_state::machine_reset()
@@ -174,7 +187,7 @@ static MACHINE_CONFIG_START( squale, squale_state )
 
 	MCFG_SCREEN_SIZE(336, 270)
 	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
-	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_ADD("palette", 16)
 
 	MCFG_DEVICE_ADD("ef9365", EF9365, 0)
 	MCFG_EF9365_PALETTE("palette")
@@ -193,7 +206,7 @@ ROM_START( squale )
 	// place ROM v1.2 signature here.
 
 	ROM_REGION( 0x1E0, "ef9365", 0 )
-	ROM_LOAD( "charset_ef9365.rom", 0x0000, 0x01E0, CRC(22BE2908) SHA1(3920ee887b8ca2887b3e0471bea7c1045a87fc10) )
+	ROM_LOAD( "charset_ef9365.rom", 0x0000, 0x01E0, CRC(8d3053be) SHA1(0f9a64d217a0f7f04ee0720d49c5b680ad0ae359) )
 ROM_END
 
 /* Driver */
