@@ -7287,7 +7287,7 @@ ROM_START( peps0308 ) /* Normal board : Double Jackpot Slots (PS0308) - Payout 9
 	ROM_LOAD( "cap911.u50", 0x0000, 0x0100, CRC(f117e781) SHA1(ba9d850c93e5f3abc26b0ba51f67fa7c07e05f59) )
 ROM_END
 
-ROM_START( peps0358 ) /* Normal board : Red White & Blue Wild Star Slots (PS0364) - Payout 94.98% */
+ROM_START( peps0358 ) /* Normal board : Red White & Blue Wild Star Slots (PS0358) - Payout 94.98% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0358_569-a2c.u68",   0x00000, 0x10000, CRC(5db2884f) SHA1(9a493c096d362c11498fec13bc2df1516ec8d967) ) /* 2 Coins Max / 1 Line */
 
@@ -7428,7 +7428,7 @@ ROM_START( peps0615 ) /* Normal board : Chaos Slots (PS0615) - Payout 90.02% */
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) ) /* WRONG!! - Should be CAP2246 here */
 ROM_END
 
-ROM_START( peps0628 ) /* Normal board : Double Black Jack (PS0615) - Payout 92.54% */
+ROM_START( peps0628 ) /* Normal board : Double Black Jack (PS0628) - Payout 92.54% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0628_586-a6c.u68",   0x00000, 0x10000, CRC(b0f4e78e) SHA1(51de1007aad132c8a155d492248459cab2fd17ee) ) /* 2 Coins Max / 1 Line */
 
@@ -7457,7 +7457,7 @@ ROM_START( peps0631 ) /* Normal board : Red White & Blue Wild Star Slots (PS0631
 	ROM_LOAD( "cap1301.u50", 0x0000, 0x0100, CRC(4135261f) SHA1(0920a9522d818ab7e43e4f13e7b184b956ee75cf) )
 ROM_END
 
-ROM_START( peps0708 ) /* Normal board : Double Cherry Slots (PS0716) - Payout 94.99% */
+ROM_START( peps0708 ) /* Normal board : Double Cherry Slots (PS0708) - Payout 94.99% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0708_589-a6x.u68",   0x00000, 0x10000, CRC(24aea5cd) SHA1(88f2065ce8509b79f36eb20a48217d9086b1fee4) ) /* 2 Coins Max / 1 Line */
 
