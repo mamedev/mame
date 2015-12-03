@@ -307,7 +307,7 @@ public:
 	operator core_file *() { return m_file; }
 
 	// getters
-	bool opened() const { return (m_file != NULL); }
+	bool opened() const { return (m_file != nullptr); }
 	UINT32 version() const { return m_version; }
 	UINT64 logical_bytes() const { return m_logicalbytes; }
 	UINT32 hunk_bytes() const { return m_hunkbytes; }
@@ -333,8 +333,8 @@ public:
 	chd_error create(core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, chd_codec_type compression[4], chd_file &parent);
 
 	// file open
-	chd_error open(const char *filename, bool writeable = false, chd_file *parent = NULL);
-	chd_error open(core_file &file, bool writeable = false, chd_file *parent = NULL);
+	chd_error open(const char *filename, bool writeable = false, chd_file *parent = nullptr);
+	chd_error open(core_file &file, bool writeable = false, chd_file *parent = nullptr);
 
 	// file close
 	void close();
@@ -519,14 +519,14 @@ private:
 	struct work_item
 	{
 		work_item()
-			: m_osd(NULL)
-			, m_compressor(NULL)
+			: m_osd(nullptr)
+			, m_compressor(nullptr)
 			, m_status(WS_READY)
-			, m_data(NULL)
-			, m_compressed(NULL)
+			, m_data(nullptr)
+			, m_compressed(nullptr)
 			, m_complen(0)
 			, m_compression(0)
-			, m_codecs(NULL)
+			, m_codecs(nullptr)
 		{ }
 
 		osd_work_item *     m_osd;              // OSD work item running on this block

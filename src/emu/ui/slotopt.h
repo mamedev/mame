@@ -19,8 +19,8 @@ class ui_menu_slot_devices : public ui_menu {
 public:
 	ui_menu_slot_devices(running_machine &machine, render_container *container);
 	virtual ~ui_menu_slot_devices();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	device_slot_option *slot_get_current_option(device_slot_interface *slot);

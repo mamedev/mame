@@ -56,7 +56,7 @@ static void input_character(char *buffer, size_t buffer_length, unicode_char uni
 	{
 		*(char *)utf8_previous_char(&buffer[buflen]) = 0;
 	}
-	else if ((unichar > ' ') && ((filter == NULL) || (*filter)(unichar)))
+	else if ((unichar > ' ') && ((filter == nullptr) || (*filter)(unichar)))
 	{
 		buflen += utf8_from_uchar(&buffer[buflen], buffer_length - buflen, unichar);
 		buffer[buflen] = 0;
@@ -102,7 +102,7 @@ static void extra_text_draw_box(render_container *container, float origx1, float
 
 	// draw the text within it
 	container->manager().machine().ui().draw_text_full(container,text, x1, y1, text_width, JUSTIFY_LEFT, WRAP_WORD,
-						DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+						DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
 }
 
 
@@ -115,12 +115,12 @@ void extra_text_render(render_container *container, float top, float bottom,
 	float origx1, float origy1, float origx2, float origy2,
 	const char *header, const char *footer)
 {
-	header = ((header != NULL) && (header[0] != '\0')) ? header : NULL;
-	footer = ((footer != NULL) && (footer[0] != '\0')) ? footer : NULL;
+	header = ((header != nullptr) && (header[0] != '\0')) ? header : nullptr;
+	footer = ((footer != nullptr) && (footer[0] != '\0')) ? footer : nullptr;
 
-	if (header != NULL)
+	if (header != nullptr)
 		extra_text_draw_box(container, origx1, origx2, origy1, top, header, -1);
-	if (footer != NULL)
+	if (footer != nullptr)
 		extra_text_draw_box(container, origx1, origx2, origy2, bottom, footer, +1);
 }
 
@@ -156,10 +156,10 @@ ui_menu_confirm_save_as::~ui_menu_confirm_save_as()
 
 void ui_menu_confirm_save_as::populate()
 {
-	item_append("File Already Exists - Override?", NULL, MENU_FLAG_DISABLE, NULL);
-	item_append(MENU_SEPARATOR_ITEM, NULL, MENU_FLAG_DISABLE, NULL);
-	item_append("No", NULL, 0, ITEMREF_NO);
-	item_append("Yes", NULL, 0, ITEMREF_YES);
+	item_append("File Already Exists - Override?", nullptr, MENU_FLAG_DISABLE, nullptr);
+	item_append(MENU_SEPARATOR_ITEM, nullptr, MENU_FLAG_DISABLE, nullptr);
+	item_append("No", nullptr, 0, ITEMREF_NO);
+	item_append("Yes", nullptr, 0, ITEMREF_YES);
 }
 
 //-------------------------------------------------
@@ -172,7 +172,7 @@ void ui_menu_confirm_save_as::handle()
 	const ui_menu_event *event = process(0);
 
 	// process the event
-	if ((event != NULL) && (event->iptkey == IPT_UI_SELECT))
+	if ((event != nullptr) && (event->iptkey == IPT_UI_SELECT))
 	{
 		if (event->itemref == ITEMREF_YES)
 			*m_yes = true;
@@ -219,7 +219,7 @@ ui_menu_file_create::ui_menu_file_create(running_machine &machine, render_contai
 	: ui_menu(machine, container),
 		m_current_directory(current_directory),
 		m_current_file(current_file),
-		m_current_format(NULL)
+		m_current_format(nullptr)
 {
 	m_image = image;
 	m_ok = ok;
@@ -244,7 +244,7 @@ void ui_menu_file_create::custom_render(void *selectedref, float top, float bott
 {
 	extra_text_render(container, top, bottom, origx1, origy1, origx2, origy2,
 		m_current_directory.c_str(),
-		NULL);
+		nullptr);
 }
 
 
@@ -272,15 +272,15 @@ void ui_menu_file_create::populate()
 
 	// do we support multiple formats?
 	if (ENABLE_FORMATS) format = m_image->formatlist();
-	if (ENABLE_FORMATS && (format != NULL))
+	if (ENABLE_FORMATS && (format != nullptr))
 	{
 		item_append("Image Format:", m_current_format->description(), 0, ITEMREF_FORMAT);
 		m_current_format = format;
 	}
 
 	// finish up the menu
-	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-	item_append("Create", NULL, 0, ITEMREF_CREATE);
+	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append("Create", nullptr, 0, ITEMREF_CREATE);
 
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
@@ -296,7 +296,7 @@ void ui_menu_file_create::handle()
 	const ui_menu_event *event = process(0);
 
 	// process the event
-	if (event != NULL)
+	if (event != nullptr)
 	{
 		// handle selections
 		switch(event->iptkey)
@@ -345,7 +345,7 @@ ui_menu_file_selector::ui_menu_file_selector(running_machine &machine, render_co
 	: ui_menu(machine, container),
 		m_current_directory(current_directory),
 		m_current_file(current_file),
-		m_entrylist(NULL)
+		m_entrylist(nullptr)
 {
 	m_image = image;
 	m_has_empty = has_empty;
@@ -373,7 +373,7 @@ void ui_menu_file_selector::custom_render(void *selectedref, float top, float bo
 	extra_text_render(container, top, bottom,
 		origx1, origy1, origx2, origy2,
 		m_current_directory.c_str(),
-		NULL);
+		nullptr);
 }
 
 
@@ -386,8 +386,8 @@ void ui_menu_file_selector::custom_render(void *selectedref, float top, float bo
 int ui_menu_file_selector::compare_entries(const file_selector_entry *e1, const file_selector_entry *e2)
 {
 	int result;
-	const char *e1_basename = (e1->basename != NULL) ? e1->basename : "";
-	const char *e2_basename = (e2->basename != NULL) ? e2->basename : "";
+	const char *e1_basename = (e1->basename != nullptr) ? e1->basename : "";
+	const char *e2_basename = (e2->basename != nullptr) ? e2->basename : "";
 
 	if (e1->type < e2->type)
 	{
@@ -432,12 +432,12 @@ ui_menu_file_selector::file_selector_entry *ui_menu_file_selector::append_entry(
 	entry = (file_selector_entry *) m_pool_alloc(sizeof(*entry));
 	memset(entry, 0, sizeof(*entry));
 	entry->type = entry_type;
-	entry->basename = (entry_basename != NULL) ? pool_strdup(entry_basename) : entry_basename;
-	entry->fullpath = (entry_fullpath != NULL) ? pool_strdup(entry_fullpath) : entry_fullpath;
+	entry->basename = (entry_basename != nullptr) ? pool_strdup(entry_basename) : entry_basename;
+	entry->fullpath = (entry_fullpath != nullptr) ? pool_strdup(entry_fullpath) : entry_fullpath;
 
 	// find the end of the list
 	entryptr = &m_entrylist;
-	while ((*entryptr != NULL) && (compare_entries(entry, *entryptr) >= 0))
+	while ((*entryptr != nullptr) && (compare_entries(entry, *entryptr) >= 0))
 		entryptr = &(*entryptr)->next;
 
 	// insert the entry
@@ -470,7 +470,7 @@ ui_menu_file_selector::file_selector_entry *ui_menu_file_selector::append_dirent
 
 		default:
 			// exceptional case; do not add a menu item
-			return NULL;
+			return nullptr;
 	}
 
 	// determine the full path
@@ -493,8 +493,8 @@ ui_menu_file_selector::file_selector_entry *ui_menu_file_selector::append_dirent
 
 void ui_menu_file_selector::append_entry_menu_item(const file_selector_entry *entry)
 {
-	const char *text = NULL;
-	const char *subtext = NULL;
+	const char *text = nullptr;
+	const char *subtext = nullptr;
 
 	switch(entry->type)
 	{
@@ -535,11 +535,11 @@ void ui_menu_file_selector::append_entry_menu_item(const file_selector_entry *en
 
 void ui_menu_file_selector::populate()
 {
-	zippath_directory *directory = NULL;
+	zippath_directory *directory = nullptr;
 	file_error err;
 	const osd_directory_entry *dirent;
 	const file_selector_entry *entry;
-	const file_selector_entry *selected_entry = NULL;
+	const file_selector_entry *selected_entry = nullptr;
 	int i;
 	const char *volume_name;
 	const char *path = m_current_directory.c_str();
@@ -548,30 +548,30 @@ void ui_menu_file_selector::populate()
 	err = zippath_opendir(path, &directory);
 
 	// clear out the menu entries
-	m_entrylist = NULL;
+	m_entrylist = nullptr;
 
 	if (m_has_empty)
 	{
 		// add the "[empty slot]" entry
-		append_entry(SELECTOR_ENTRY_TYPE_EMPTY, NULL, NULL);
+		append_entry(SELECTOR_ENTRY_TYPE_EMPTY, nullptr, nullptr);
 	}
 
 	if (m_has_create)
 	{
 		// add the "[create]" entry
-		append_entry(SELECTOR_ENTRY_TYPE_CREATE, NULL, NULL);
+		append_entry(SELECTOR_ENTRY_TYPE_CREATE, nullptr, nullptr);
 	}
 
 	if (m_has_softlist)
 	{
 		// add the "[software list]" entry
-		entry = append_entry(SELECTOR_ENTRY_TYPE_SOFTWARE_LIST, NULL, NULL);
+		entry = append_entry(SELECTOR_ENTRY_TYPE_SOFTWARE_LIST, nullptr, nullptr);
 		selected_entry = entry;
 	}
 
 	// add the drives
 	i = 0;
-	while((volume_name = osd_get_volume_name(i))!=NULL)
+	while((volume_name = osd_get_volume_name(i))!=nullptr)
 	{
 		append_entry(SELECTOR_ENTRY_TYPE_DRIVE,
 			volume_name, volume_name);
@@ -581,15 +581,15 @@ void ui_menu_file_selector::populate()
 	// build the menu for each item
 	if (err == FILERR_NONE)
 	{
-		while((dirent = zippath_readdir(directory)) != NULL)
+		while((dirent = zippath_readdir(directory)) != nullptr)
 		{
 			// append a dirent entry
 			entry = append_dirent_entry(dirent);
 
-			if (entry != NULL)
+			if (entry != nullptr)
 			{
 				// set the selected item to be the first non-parent directory or file
-				if ((selected_entry == NULL) && strcmp(dirent->name, ".."))
+				if ((selected_entry == nullptr) && strcmp(dirent->name, ".."))
 					selected_entry = entry;
 
 				// do we have to select this file?
@@ -600,17 +600,17 @@ void ui_menu_file_selector::populate()
 	}
 
 	// append all of the menu entries
-	for (entry = m_entrylist; entry != NULL; entry = entry->next)
+	for (entry = m_entrylist; entry != nullptr; entry = entry->next)
 		append_entry_menu_item(entry);
 
 	// set the selection (if we have one)
-	if (selected_entry != NULL)
+	if (selected_entry != nullptr)
 		set_selection((void *) selected_entry);
 
 	// set up custom render proc
 	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 
-	if (directory != NULL)
+	if (directory != nullptr)
 		zippath_closedir(directory);
 }
 
@@ -623,12 +623,12 @@ void ui_menu_file_selector::handle()
 {
 	file_error err;
 	const file_selector_entry *entry;
-	const file_selector_entry *selected_entry = NULL;
+	const file_selector_entry *selected_entry = nullptr;
 	int bestmatch = 0;
 
 	// process the menu
 	const ui_menu_event *event = process(0);
-	if (event != NULL && event->itemref != NULL)
+	if (event != nullptr && event->itemref != nullptr)
 	{
 		// handle selections
 		if (event->iptkey == IPT_UI_SELECT)
@@ -656,7 +656,7 @@ void ui_menu_file_selector::handle()
 				case SELECTOR_ENTRY_TYPE_DRIVE:
 				case SELECTOR_ENTRY_TYPE_DIRECTORY:
 					// drive/directory - first check the path
-					err = zippath_opendir(entry->fullpath, NULL);
+					err = zippath_opendir(entry->fullpath, nullptr);
 					if (err != FILERR_NONE)
 					{
 						// this path is problematic; present the user with an error and bail
@@ -710,9 +710,9 @@ void ui_menu_file_selector::handle()
 
 				// check for entries which matches our m_filename_buffer:
 				// from current entry to the end
-				for (entry = cur_selected; entry != NULL; entry = entry->next)
+				for (entry = cur_selected; entry != nullptr; entry = entry->next)
 				{
-					if (entry->basename != NULL && m_filename_buffer != NULL)
+					if (entry->basename != nullptr && m_filename_buffer != nullptr)
 					{
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
@@ -731,7 +731,7 @@ void ui_menu_file_selector::handle()
 				// and from the first entry to current one
 				for (entry = m_entrylist; entry != cur_selected; entry = entry->next)
 				{
-					if (entry->basename != NULL && m_filename_buffer != NULL)
+					if (entry->basename != nullptr && m_filename_buffer != nullptr)
 					{
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
@@ -748,7 +748,7 @@ void ui_menu_file_selector::handle()
 					}
 				}
 
-				if (selected_entry != NULL && selected_entry != cur_selected)
+				if (selected_entry != nullptr && selected_entry != cur_selected)
 					set_selection((void *) selected_entry);
 			}
 		}
@@ -796,13 +796,13 @@ ui_menu_select_format::~ui_menu_select_format()
 
 void ui_menu_select_format::populate()
 {
-	item_append("Select image format", NULL, MENU_FLAG_DISABLE, NULL);
+	item_append("Select image format", nullptr, MENU_FLAG_DISABLE, nullptr);
 	for (int i = 0; i < m_total_usable; i++)
 	{
 		const floppy_image_format_t *fmt = m_formats[i];
 
 		if (i && i == m_ext_match)
-			item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+			item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 		item_append(fmt->description(), fmt->name(), 0, (void *)(FPTR)i);
 	}
 }
@@ -816,7 +816,7 @@ void ui_menu_select_format::handle()
 {
 	// process the menu
 	const ui_menu_event *event = process(0);
-	if (event != NULL && event->iptkey == IPT_UI_SELECT)
+	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
 	{
 		*m_result = int(FPTR(event->itemref));
 		ui_menu::stack_pop(machine());
@@ -856,12 +856,12 @@ ui_menu_select_rw::~ui_menu_select_rw()
 
 void ui_menu_select_rw::populate()
 {
-	item_append("Select access mode", NULL, MENU_FLAG_DISABLE, NULL);
-	item_append("Read-only", 0, 0, (void *)READONLY);
+	item_append("Select access mode", nullptr, MENU_FLAG_DISABLE, nullptr);
+	item_append("Read-only", nullptr, 0, (void *)READONLY);
 	if (m_can_in_place)
-		item_append("Read-write", 0, 0, (void *)READWRITE);
-	item_append("Read this image, write to another image", 0, 0, (void *)WRITE_OTHER);
-	item_append("Read this image, write to diff", 0, 0, (void *)WRITE_DIFF);
+		item_append("Read-write", nullptr, 0, (void *)READWRITE);
+	item_append("Read this image, write to another image", nullptr, 0, (void *)WRITE_OTHER);
+	item_append("Read this image, write to diff", nullptr, 0, (void *)WRITE_DIFF);
 }
 
 
@@ -873,7 +873,7 @@ void ui_menu_select_rw::handle()
 {
 	// process the menu
 	const ui_menu_event *event = process(0);
-	if (event != NULL && event->iptkey == IPT_UI_SELECT)
+	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
 	{
 		*m_result = int(FPTR(event->itemref));
 		ui_menu::stack_pop(machine());

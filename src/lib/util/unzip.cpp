@@ -185,7 +185,7 @@ zip_error zip_file_open(const char *filename, zip_file **zip)
 	int cachenum;
 
 	/* ensure we start with a NULL result */
-	*zip = NULL;
+	*zip = nullptr;
 
 	/* see if we are in the cache, and reopen if so */
 	for (cachenum = 0; cachenum < ARRAY_LENGTH(zip_cache); cachenum++)
@@ -193,17 +193,17 @@ zip_error zip_file_open(const char *filename, zip_file **zip)
 		zip_file *cached = zip_cache[cachenum];
 
 		/* if we have a valid entry and it matches our filename, use it and remove from the cache */
-		if (cached != NULL && cached->filename != NULL && strcmp(filename, cached->filename) == 0)
+		if (cached != nullptr && cached->filename != nullptr && strcmp(filename, cached->filename) == 0)
 		{
 			*zip = cached;
-			zip_cache[cachenum] = NULL;
+			zip_cache[cachenum] = nullptr;
 			return ZIPERR_NONE;
 		}
 	}
 
 	/* allocate memory for the zip_file structure */
 	newzip = (zip_file *)malloc(sizeof(*newzip));
-	if (newzip == NULL)
+	if (newzip == nullptr)
 		return ZIPERR_OUT_OF_MEMORY;
 	memset(newzip, 0, sizeof(*newzip));
 
@@ -229,7 +229,7 @@ zip_error zip_file_open(const char *filename, zip_file **zip)
 
 	/* allocate memory for the central directory */
 	newzip->cd = (UINT8 *)malloc(newzip->ecd.cd_size + 1);
-	if (newzip->cd == NULL)
+	if (newzip->cd == nullptr)
 	{
 		ziperr = ZIPERR_OUT_OF_MEMORY;
 		goto error;
@@ -245,7 +245,7 @@ zip_error zip_file_open(const char *filename, zip_file **zip)
 
 	/* make a copy of the filename for caching purposes */
 	string = (char *)malloc(strlen(filename) + 1);
-	if (string == NULL)
+	if (string == nullptr)
 	{
 		ziperr = ZIPERR_OUT_OF_MEMORY;
 		goto error;
@@ -279,13 +279,13 @@ void zip_file_close(zip_file *zip)
 	int cachenum;
 
 	/* close the open files */
-	if (zip->file != NULL)
+	if (zip->file != nullptr)
 		osd_close(zip->file);
-	zip->file = NULL;
+	zip->file = nullptr;
 
 	/* find the first NULL entry in the cache */
 	for (cachenum = 0; cachenum < ARRAY_LENGTH(zip_cache); cachenum++)
-		if (zip_cache[cachenum] == NULL)
+		if (zip_cache[cachenum] == nullptr)
 			break;
 
 	/* if no room left in the cache, free the bottommost entry */
@@ -316,10 +316,10 @@ void zip_file_cache_clear(void)
 
 	/* clear call cache entries */
 	for (cachenum = 0; cachenum < ARRAY_LENGTH(zip_cache); cachenum++)
-		if (zip_cache[cachenum] != NULL)
+		if (zip_cache[cachenum] != nullptr)
 		{
 			free_zip_file(zip_cache[cachenum]);
-			zip_cache[cachenum] = NULL;
+			zip_cache[cachenum] = nullptr;
 		}
 }
 
@@ -370,15 +370,15 @@ const zip_file_header *zip_file_first_file(zip_file *zip)
 const zip_file_header *zip_file_next_file(zip_file *zip)
 {
 	/* fix up any modified data */
-	if (zip->header.raw != NULL)
+	if (zip->header.raw != nullptr)
 	{
 		zip->header.raw[ZIPCFN + zip->header.filename_length] = zip->header.saved;
-		zip->header.raw = NULL;
+		zip->header.raw = nullptr;
 	}
 
 	/* if we're at or past the end, we're done */
 	if (zip->cd_pos >= zip->ecd.cd_size)
-		return NULL;
+		return nullptr;
 
 	/* extract file header info */
 	zip->header.raw                 = zip->cd + zip->cd_pos;
@@ -407,7 +407,7 @@ const zip_file_header *zip_file_next_file(zip_file *zip)
 	zip->header.rawlength += zip->header.extra_field_length;
 	zip->header.rawlength += zip->header.file_comment_length;
 	if (zip->cd_pos + zip->header.rawlength > zip->ecd.cd_size)
-		return NULL;
+		return nullptr;
 
 	/* NULL terminate the filename */
 	zip->header.saved = zip->header.raw[ZIPCFN + zip->header.filename_length];
@@ -493,15 +493,15 @@ zip_error zip_file_decompress(zip_file *zip, void *buffer, UINT32 length)
 
 static void free_zip_file(zip_file *zip)
 {
-	if (zip != NULL)
+	if (zip != nullptr)
 	{
-		if (zip->file != NULL)
+		if (zip->file != nullptr)
 			osd_close(zip->file);
-		if (zip->filename != NULL)
+		if (zip->filename != nullptr)
 			free((void *)zip->filename);
-		if (zip->ecd.raw != NULL)
+		if (zip->ecd.raw != nullptr)
 			free(zip->ecd.raw);
-		if (zip->cd != NULL)
+		if (zip->cd != nullptr)
 			free(zip->cd);
 		free(zip);
 	}
@@ -545,7 +545,7 @@ static zip_error read_ecd(zip_file *zip)
 
 		/* allocate buffer */
 		buffer = (UINT8 *)malloc(buflen + 1);
-		if (buffer == NULL)
+		if (buffer == nullptr)
 			return ZIPERR_OUT_OF_MEMORY;
 
 		/* read in one buffers' worth of data */
@@ -618,7 +618,7 @@ static zip_error get_compressed_data_offset(zip_file *zip, UINT64 *offset)
 	UINT32 read_length;
 
 	/* make sure the file handle is open */
-	if (zip->file == NULL)
+	if (zip->file == nullptr)
 	{
 		int filerr = osd_open(zip->filename, OPEN_FLAG_READ, &zip->file, &zip->length);
 		if (filerr != FILERR_NONE)

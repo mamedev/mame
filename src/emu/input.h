@@ -558,7 +558,7 @@ public:
 	bool lightgun_reload_button() const { return m_lightgun_reload_button; }
 
 	// item management
-	input_item_id add_item(const char *name, input_item_id itemid, item_get_state_func getstate, void *internal = NULL);
+	input_item_id add_item(const char *name, input_item_id itemid, item_get_state_func getstate, void *internal = nullptr);
 	void set_joystick_map(const joystick_map &map) { m_joymap = map; }
 
 	// helpers
@@ -595,7 +595,7 @@ public:
 	// getters
 	input_manager &manager() const { return m_manager; }
 	running_machine &machine() const;
-	input_device *device(int index) const { return (index <= m_maxindex) ? m_device[index].get() : NULL; }
+	input_device *device(int index) const { return (index <= m_maxindex) ? m_device[index].get() : nullptr; }
 	input_device_class devclass() const { return m_devclass; }
 	int maxindex() const { return m_maxindex; }
 	bool enabled() const { return m_enabled; }
@@ -606,8 +606,8 @@ public:
 	void set_multi(bool multi = true) { m_multi = multi; }
 
 	// device management
-	input_device *add_device(const char *name, void *internal = NULL);
-	input_device *add_device(int devindex, const char *name, void *internal = NULL);
+	input_device *add_device(const char *name, void *internal = nullptr);
+	input_device *add_device(int devindex, const char *name, void *internal = nullptr);
 
 	// misc helpers
 	input_item_class standard_item_class(input_item_id itemid);
@@ -637,7 +637,7 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	input_class &device_class(input_device_class devclass) { assert(devclass < ARRAY_LENGTH(m_class)); assert(m_class[devclass] != NULL); return *m_class[devclass]; }
+	input_class &device_class(input_device_class devclass) { assert(devclass < ARRAY_LENGTH(m_class)); assert(m_class[devclass] != nullptr); return *m_class[devclass]; }
 
 	// input code readers
 	INT32 code_value(input_code code);
@@ -663,7 +663,7 @@ public:
 	INT32 seq_axis_value(const input_seq &seq, input_item_class &itemclass);
 
 	// input sequence polling
-	void seq_poll_start(input_item_class itemclass, const input_seq *startseq = NULL);
+	void seq_poll_start(input_item_class itemclass, const input_seq *startseq = nullptr);
 	bool seq_poll();
 	const input_seq &seq_poll_final() const { return m_poll_seq; }
 

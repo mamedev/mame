@@ -88,7 +88,7 @@ void validity_checker::validate_tag(const char *tag)
 			osd_printf_error("Tag '%s' contains spaces\n", tag);
 			break;
 		}
-		if (strchr(validchars, *p) == NULL)
+		if (strchr(validchars, *p) == nullptr)
 		{
 			osd_printf_error("Tag '%s' contains invalid character '%c'\n",  tag, *p);
 			break;
@@ -97,7 +97,7 @@ void validity_checker::validate_tag(const char *tag)
 
 	// find the start of the final tag
 	const char *begin = strrchr(tag, ':');
-	if (begin == NULL)
+	if (begin == nullptr)
 		begin = tag;
 	else
 		begin += 1;
@@ -125,16 +125,16 @@ validity_checker::validity_checker(emu_options &options)
 	: m_drivlist(options),
 		m_errors(0),
 		m_warnings(0),
-		m_current_driver(NULL),
-		m_current_config(NULL),
-		m_current_device(NULL),
-		m_current_ioport(NULL)
+		m_current_driver(nullptr),
+		m_current_config(nullptr),
+		m_current_device(nullptr),
+		m_current_ioport(nullptr)
 {
 	// pre-populate the defstr map with all the default strings
 	for (int strnum = 1; strnum < INPUT_STRING_COUNT; strnum++)
 	{
 		const char *string = ioport_string_from_index(strnum);
-		if (string != NULL)
+		if (string != nullptr)
 			m_defstr_map.add(string, strnum, false);
 	}
 }
@@ -267,9 +267,9 @@ void validity_checker::validate_one(const game_driver &driver)
 {
 	// set the current driver
 	m_current_driver = &driver;
-	m_current_config = NULL;
-	m_current_device = NULL;
-	m_current_ioport = NULL;
+	m_current_config = nullptr;
+	m_current_device = nullptr;
+	m_current_ioport = nullptr;
 	m_region_map.reset();
 
 	// reset error/warning state
@@ -287,7 +287,7 @@ void validity_checker::validate_one(const game_driver &driver)
 		validate_roms();
 		validate_inputs();
 		validate_devices();
-		m_current_config = NULL;
+		m_current_config = nullptr;
 	}
 	catch (emu_fatalerror &err)
 	{
@@ -313,10 +313,10 @@ void validity_checker::validate_one(const game_driver &driver)
 	}
 
 	// reset the driver/device
-	m_current_driver = NULL;
-	m_current_config = NULL;
-	m_current_device = NULL;
-	m_current_ioport = NULL;
+	m_current_driver = nullptr;
+	m_current_config = nullptr;
+	m_current_device = nullptr;
+	m_current_ioport = nullptr;
 }
 
 
@@ -579,15 +579,15 @@ void validity_checker::validate_driver()
 
 	// normalize driver->compatible_with
 	const char *compatible_with = m_current_driver->compatible_with;
-	if (compatible_with != NULL && strcmp(compatible_with, "0") == 0)
-		compatible_with = NULL;
+	if (compatible_with != nullptr && strcmp(compatible_with, "0") == 0)
+		compatible_with = nullptr;
 
 	// check for this driver being compatible with a non-existant driver
-	if (compatible_with != NULL && m_drivlist.find(m_current_driver->compatible_with) == -1)
+	if (compatible_with != nullptr && m_drivlist.find(m_current_driver->compatible_with) == -1)
 		osd_printf_error("Driver is listed as compatible with nonexistant driver %s\n", m_current_driver->compatible_with);
 
 	// check for clone_of and compatible_with being specified at the same time
-	if (m_drivlist.clone(*m_current_driver) != -1 && compatible_with != NULL)
+	if (m_drivlist.clone(*m_current_driver) != -1 && compatible_with != nullptr)
 		osd_printf_error("Driver cannot be both a clone and listed as compatible with another system\n");
 
 	// find any recursive dependencies on the current driver
@@ -600,7 +600,7 @@ void validity_checker::validate_driver()
 
 	// make sure sound-less drivers are flagged
 	sound_interface_iterator iter(m_current_config->root_device());
-	if ((m_current_driver->flags & MACHINE_IS_BIOS_ROOT) == 0 && iter.first() == NULL && (m_current_driver->flags & MACHINE_NO_SOUND) == 0 && (m_current_driver->flags & MACHINE_NO_SOUND_HW) == 0)
+	if ((m_current_driver->flags & MACHINE_IS_BIOS_ROOT) == 0 && iter.first() == nullptr && (m_current_driver->flags & MACHINE_NO_SOUND) == 0 && (m_current_driver->flags & MACHINE_NO_SOUND_HW) == 0)
 		osd_printf_error("Driver is missing MACHINE_NO_SOUND flag\n");
 }
 
@@ -613,10 +613,10 @@ void validity_checker::validate_roms()
 {
 	// iterate, starting with the driver's ROMs and continuing with device ROMs
 	device_iterator deviter(m_current_config->root_device());
-	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
 	{
 		// for non-root devices, track the current device
-		m_current_device = (device->owner() == NULL) ? NULL : device;
+		m_current_device = (device->owner() == nullptr) ? nullptr : device;
 
 		// scan the ROM entries for this device
 		const char *last_region_name = "???";
@@ -625,7 +625,7 @@ void validity_checker::validate_roms()
 		int items_since_region = 1;
 		int last_bios = 0;
 		int total_files = 0;
-		for (const rom_entry *romp = rom_first_region(*device); romp != NULL && !ROMENTRY_ISEND(romp); romp++)
+		for (const rom_entry *romp = rom_first_region(*device); romp != nullptr && !ROMENTRY_ISEND(romp); romp++)
 		{
 			// if this is a region, make sure it's valid, and record the length
 			if (ROMENTRY_ISREGION(romp))
@@ -640,7 +640,7 @@ void validity_checker::validate_roms()
 				last_region_name = basetag;
 
 				// check for a valid tag
-				if (basetag == NULL)
+				if (basetag == nullptr)
 				{
 					osd_printf_error("ROM_REGION tag with NULL name\n");
 					continue;
@@ -695,7 +695,7 @@ void validity_checker::validate_roms()
 
 
 		// reset the current device
-		m_current_device = NULL;
+		m_current_device = nullptr;
 	}
 }
 
@@ -794,7 +794,7 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 	bool coin_error = false;
 
 	// iterate through the settings
-	for (ioport_setting *setting = field.first_setting(); setting != NULL; setting = setting->next())
+	for (ioport_setting *setting = field.first_setting(); setting != nullptr; setting = setting->next())
 	{
 		// note any coinage strings
 		int strindex = get_defstr_index(setting->name());
@@ -814,7 +814,7 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 			osd_printf_error("Flip Screen option must be Off/On, not %s\n", setting->name());
 
 		// if we have a neighbor, compare ourselves to him
-		if (setting->next() != NULL)
+		if (setting->next() != nullptr)
 		{
 			// check for inverted off/on dispswitch order
 			int next_strindex = get_defstr_index(setting->next()->name(), true);
@@ -874,14 +874,14 @@ void validity_checker::validate_inputs()
 
 	// iterate over devices
 	device_iterator iter(m_current_config->root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 	{
 		// see if this device has ports; if not continue
-		if (device->input_ports() == NULL)
+		if (device->input_ports() == nullptr)
 			continue;
 
 		// for non-root devices, track the current device
-		m_current_device = (device == &m_current_config->root_device()) ? NULL : device;
+		m_current_device = (device == &m_current_config->root_device()) ? nullptr : device;
 
 		// allocate the input ports
 		ioport_list portlist;
@@ -893,17 +893,17 @@ void validity_checker::validate_inputs()
 			osd_printf_error("I/O port error during construction:\n%s\n", errorbuf.c_str());
 
 		// do a first pass over ports to add their names and find duplicates
-		for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
+		for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
 			if (port_map.add(port->tag(), 1, false) == TMERR_DUPLICATE)
 				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port->tag());
 
 		// iterate over ports
-		for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
+		for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
 		{
 			m_current_ioport = port->tag();
 
 			// iterate through the fields on this port
-			for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+			for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 			{
 				// verify analog inputs
 				if (field->is_analog())
@@ -917,7 +917,7 @@ void validity_checker::validate_inputs()
 				if (field->type() == IPT_DIPSWITCH)
 				{
 					// dip switch fields must have a name
-					if (field->name() == NULL)
+					if (field->name() == nullptr)
 						osd_printf_error("DIP switch has a NULL name\n");
 
 					// verify the settings list
@@ -926,7 +926,7 @@ void validity_checker::validate_inputs()
 
 				// verify names
 				const char *name = field->specific_name();
-				if (name != NULL)
+				if (name != nullptr)
 				{
 					// check for empty string
 					if (name[0] == 0)
@@ -949,17 +949,17 @@ void validity_checker::validate_inputs()
 					validate_condition(field->condition(), *device, port_map);
 
 				// verify conditions on the settings
-				for (ioport_setting *setting = field->first_setting(); setting != NULL; setting = setting->next())
+				for (ioport_setting *setting = field->first_setting(); setting != nullptr; setting = setting->next())
 					if (!setting->condition().none())
 						validate_condition(setting->condition(), *device, port_map);
 			}
 
 			// done with this port
-			m_current_ioport = NULL;
+			m_current_ioport = nullptr;
 		}
 
 		// done with this device
-		m_current_device = NULL;
+		m_current_device = nullptr;
 	}
 }
 
@@ -974,17 +974,17 @@ void validity_checker::validate_devices()
 	int_map device_map;
 
 	device_iterator iter_find(m_current_config->root_device());
-	for (const device_t *device = iter_find.first(); device != NULL; device = iter_find.next())
+	for (const device_t *device = iter_find.first(); device != nullptr; device = iter_find.next())
 	{
 		device->findit(true);
 	}
 
 	// iterate over devices
 	device_iterator iter(m_current_config->root_device());
-	for (const device_t *device = iter.first(); device != NULL; device = iter.next())
+	for (const device_t *device = iter.first(); device != nullptr; device = iter.next())
 	{
 		// for non-root devices, track the current device
-		m_current_device = (device == &m_current_config->root_device()) ? NULL : device;
+		m_current_device = (device == &m_current_config->root_device()) ? nullptr : device;
 
 		// validate the device tag
 		validate_tag(device->basetag());
@@ -1005,15 +1005,15 @@ void validity_checker::validate_devices()
 		device->validity_check(*this);
 
 		// done with this device
-		m_current_device = NULL;
+		m_current_device = nullptr;
 	}
 
 	// if device is slot cart device, we must have a shortname
 	int_map slot_device_map;
 	slot_interface_iterator slotiter(m_current_config->root_device());
-	for (const device_slot_interface *slot = slotiter.first(); slot != NULL; slot = slotiter.next())
+	for (const device_slot_interface *slot = slotiter.first(); slot != nullptr; slot = slotiter.next())
 	{
-		for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
+		for (const device_slot_option *option = slot->first_option(); option != nullptr; option = option->next())
 		{
 			std::string temptag("_");
 			temptag.append(option->name());
@@ -1021,7 +1021,7 @@ void validity_checker::validate_devices()
 
 			// notify this device and all its subdevices that they are now configured
 			device_iterator subiter(*dev);
-			for (device_t *device = subiter.first(); device != NULL; device = subiter.next())
+			for (device_t *device = subiter.first(); device != nullptr; device = subiter.next())
 				if (!device->configured())
 					device->config_complete();
 
@@ -1049,11 +1049,11 @@ void validity_checker::build_output_prefix(std::string &str)
 	str.clear();
 
 	// if we have a current device, indicate that
-	if (m_current_device != NULL)
+	if (m_current_device != nullptr)
 		str.append(m_current_device->name()).append(" device '").append(m_current_device->tag()).append("': ");
 
 	// if we have a current port, indicate that as well
-	if (m_current_ioport != NULL)
+	if (m_current_ioport != nullptr)
 		str.append("ioport '").append(m_current_ioport).append("': ");
 }
 

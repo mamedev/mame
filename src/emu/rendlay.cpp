@@ -164,7 +164,7 @@ static int get_variable_value(running_machine &machine, const char *string, char
 	// screen 0 parameters
 	screen_device_iterator iter(machine.root_device());
 	int scrnum = 0;
-	for (const screen_device *device = iter.first(); device != NULL; device = iter.next(), scrnum++)
+	for (const screen_device *device = iter.first(); device != nullptr; device = iter.next(), scrnum++)
 	{
 		// native X aspect factor
 		sprintf(temp, "~scr%dnativexaspect~", scrnum);
@@ -220,15 +220,15 @@ static int get_variable_value(running_machine &machine, const char *string, char
 
 static const char *xml_get_attribute_string_with_subst(running_machine &machine, xml_data_node &node, const char *attribute, const char *defvalue)
 {
-	const char *str = xml_get_attribute_string(&node, attribute, NULL);
+	const char *str = xml_get_attribute_string(&node, attribute, nullptr);
 	static char buffer[1000];
 
 	// if nothing, just return the default
-	if (str == NULL)
+	if (str == nullptr)
 		return defvalue;
 
 	// if no tildes, don't worry
-	if (strchr(str, '~') == NULL)
+	if (strchr(str, '~') == nullptr)
 		return str;
 
 	// make a copy of the string, doing substitutions along the way
@@ -257,11 +257,11 @@ static const char *xml_get_attribute_string_with_subst(running_machine &machine,
 
 static int xml_get_attribute_int_with_subst(running_machine &machine, xml_data_node &node, const char *attribute, int defvalue)
 {
-	const char *string = xml_get_attribute_string_with_subst(machine, node, attribute, NULL);
+	const char *string = xml_get_attribute_string_with_subst(machine, node, attribute, nullptr);
 	int value;
 	unsigned int uvalue;
 
-	if (string == NULL)
+	if (string == nullptr)
 		return defvalue;
 	if (string[0] == '$')
 		return (sscanf(&string[1], "%X", &uvalue) == 1) ? uvalue : defvalue;
@@ -281,10 +281,10 @@ static int xml_get_attribute_int_with_subst(running_machine &machine, xml_data_n
 
 static float xml_get_attribute_float_with_subst(running_machine &machine, xml_data_node &node, const char *attribute, float defvalue)
 {
-	const char *string = xml_get_attribute_string_with_subst(machine, node, attribute, NULL);
+	const char *string = xml_get_attribute_string_with_subst(machine, node, attribute, nullptr);
 	float value;
 
-	if (string == NULL || sscanf(string, "%f", &value) != 1)
+	if (string == nullptr || sscanf(string, "%f", &value) != 1)
 		return defvalue;
 	return value;
 }
@@ -297,7 +297,7 @@ static float xml_get_attribute_float_with_subst(running_machine &machine, xml_da
 void parse_bounds(running_machine &machine, xml_data_node *boundsnode, render_bounds &bounds)
 {
 	// skip if nothing
-	if (boundsnode == NULL)
+	if (boundsnode == nullptr)
 	{
 		bounds.x0 = bounds.y0 = 0.0f;
 		bounds.x1 = bounds.y1 = 1.0f;
@@ -305,7 +305,7 @@ void parse_bounds(running_machine &machine, xml_data_node *boundsnode, render_bo
 	}
 
 	// parse out the data
-	if (xml_get_attribute(boundsnode, "left") != NULL)
+	if (xml_get_attribute(boundsnode, "left") != nullptr)
 	{
 		// left/right/top/bottom format
 		bounds.x0 = xml_get_attribute_float_with_subst(machine, *boundsnode, "left", 0.0f);
@@ -313,7 +313,7 @@ void parse_bounds(running_machine &machine, xml_data_node *boundsnode, render_bo
 		bounds.y0 = xml_get_attribute_float_with_subst(machine, *boundsnode, "top", 0.0f);
 		bounds.y1 = xml_get_attribute_float_with_subst(machine, *boundsnode, "bottom", 1.0f);
 	}
-	else if (xml_get_attribute(boundsnode, "x") != NULL)
+	else if (xml_get_attribute(boundsnode, "x") != nullptr)
 	{
 		// x/y/width/height format
 		bounds.x0 = xml_get_attribute_float_with_subst(machine, *boundsnode, "x", 0.0f);
@@ -338,7 +338,7 @@ void parse_bounds(running_machine &machine, xml_data_node *boundsnode, render_bo
 void parse_color(running_machine &machine, xml_data_node *colornode, render_color &color)
 {
 	// skip if nothing
-	if (colornode == NULL)
+	if (colornode == nullptr)
 	{
 		color.r = color.g = color.b = color.a = 1.0f;
 		return;
@@ -366,7 +366,7 @@ void parse_color(running_machine &machine, xml_data_node *colornode, render_colo
 static void parse_orientation(running_machine &machine, xml_data_node *orientnode, int &orientation)
 {
 	// skip if nothing
-	if (orientnode == NULL)
+	if (orientnode == nullptr)
 	{
 		orientation = ROT0;
 		return;
@@ -401,14 +401,14 @@ static void parse_orientation(running_machine &machine, xml_data_node *orientnod
 //-------------------------------------------------
 
 layout_element::layout_element(running_machine &machine, xml_data_node &elemnode, const char *dirname)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_machine(machine),
 		m_defstate(0),
 		m_maxstate(0)
 {
 	// extract the name
-	const char *name = xml_get_attribute_string_with_subst(machine, elemnode, "name", NULL);
-	if (name == NULL)
+	const char *name = xml_get_attribute_string_with_subst(machine, elemnode, "name", nullptr);
+	if (name == nullptr)
 		throw emu_fatalerror("All layout elements must have a name!\n");
 	m_name = name;
 
@@ -418,7 +418,7 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 	// parse components in order
 	bool first = true;
 	render_bounds bounds = { 0 };
-	for (xml_data_node *compnode = elemnode.child; compnode != NULL; compnode = compnode->next)
+	for (xml_data_node *compnode = elemnode.child; compnode != nullptr; compnode = compnode->next)
 	{
 		// allocate a new component
 		component &newcomp = m_complist.append(*global_alloc(component(machine, *compnode, dirname)));
@@ -453,7 +453,7 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 			m_maxstate = 65536;
 	}
 
-	if (m_complist.first() != NULL)
+	if (m_complist.first() != nullptr)
 	{
 		// determine the scale/offset for normalization
 		float xoffs = bounds.x0;
@@ -462,7 +462,7 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 		float yscale = 1.0f / (bounds.y1 - bounds.y0);
 
 		// normalize all the component bounds
-		for (component *curcomp = m_complist.first(); curcomp != NULL; curcomp = curcomp->next())
+		for (component *curcomp = m_complist.first(); curcomp != nullptr; curcomp = curcomp->next())
 		{
 			curcomp->m_bounds.x0 = (curcomp->m_bounds.x0 - xoffs) * xscale;
 			curcomp->m_bounds.x1 = (curcomp->m_bounds.x1 - xoffs) * xscale;
@@ -494,7 +494,7 @@ layout_element::~layout_element()
 render_texture *layout_element::state_texture(int state)
 {
 	assert(state <= m_maxstate);
-	if (m_elemtex[state].m_texture == NULL)
+	if (m_elemtex[state].m_texture == nullptr)
 	{
 		m_elemtex[state].m_element = this;
 		m_elemtex[state].m_state = state;
@@ -515,7 +515,7 @@ void layout_element::element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, c
 	texture *elemtex = (texture *)param;
 
 	// iterate over components that are part of the current state
-	for (component *curcomp = elemtex->m_element->m_complist.first(); curcomp != NULL; curcomp = curcomp->next())
+	for (component *curcomp = elemtex->m_element->m_complist.first(); curcomp != nullptr; curcomp = curcomp->next())
 		if (curcomp->m_state == -1 || curcomp->m_state == elemtex->m_state)
 		{
 			// get the local scaled bounds
@@ -541,8 +541,8 @@ void layout_element::element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, c
 //-------------------------------------------------
 
 layout_element::texture::texture()
-	: m_element(NULL),
-		m_texture(NULL),
+	: m_element(nullptr),
+		m_texture(nullptr),
 		m_state(0)
 {
 }
@@ -554,7 +554,7 @@ layout_element::texture::texture()
 
 layout_element::texture::~texture()
 {
-	if (m_element != NULL)
+	if (m_element != nullptr)
 		m_element->machine().render().texture_free(m_texture);
 }
 
@@ -569,12 +569,12 @@ layout_element::texture::~texture()
 //-------------------------------------------------
 
 layout_element::component::component(running_machine &machine, xml_data_node &compnode, const char *dirname)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_type(CTYPE_INVALID),
 		m_state(0)
 {
-	for (int i=0;i<MAX_BITMAPS;i++)
-		m_hasalpha[i] = false;
+	for (auto & elem : m_hasalpha)
+		elem = false;
 
 	// fetch common data
 	m_state = xml_get_attribute_int_with_subst(machine, compnode, "state", -1);
@@ -585,7 +585,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 	if (strcmp(compnode.name, "image") == 0)
 	{
 		m_type = CTYPE_IMAGE;
-		if (dirname != NULL)
+		if (dirname != nullptr)
 			m_dirname = dirname;
 		m_imagefile[0] = xml_get_attribute_string_with_subst(machine, compnode, "file", "");
 		m_alphafile[0] = xml_get_attribute_string_with_subst(machine, compnode, "alphafile", "");
@@ -644,7 +644,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 		m_stopnames[m_numstops++] = symbollist;
 
 		// careful, dirname is NULL if we're coming from internal layout, and our string assignment doesn't like that
-		if (dirname != NULL)
+		if (dirname != nullptr)
 			m_dirname = dirname;
 
 		for (int i=0;i<m_numstops;i++)
@@ -1310,7 +1310,7 @@ void layout_element::component::draw_beltreel(running_machine &machine, bitmap_a
 void layout_element::component::load_bitmap()
 {
 	// load the basic bitmap
-	assert(m_file[0] != NULL);
+	assert(m_file[0] != nullptr);
 	m_hasalpha[0] = render_load_png(m_bitmap[0], *m_file[0], m_dirname.c_str(), m_imagefile[0].c_str());
 
 	// load the alpha bitmap if specified
@@ -1339,7 +1339,7 @@ void layout_element::component::load_bitmap()
 void layout_element::component::load_reel_bitmap(int number)
 {
 	// load the basic bitmap
-	assert(m_file != NULL);
+	assert(m_file != nullptr);
 	/*m_hasalpha[number] = */ render_load_png(m_bitmap[number], *m_file[number], m_dirname.c_str(), m_imagefile[number].c_str());
 
 	// load the alpha bitmap if specified
@@ -2130,7 +2130,7 @@ void layout_element::component::apply_skew(bitmap_argb32 &dest, int skewwidth)
 //-------------------------------------------------
 
 layout_view::layout_view(running_machine &machine, xml_data_node &viewnode, simple_list<layout_element> &elemlist)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_aspect(1.0f),
 		m_scraspect(1.0f)
 {
@@ -2140,31 +2140,31 @@ layout_view::layout_view(running_machine &machine, xml_data_node &viewnode, simp
 	// if we have a bounds item, load it
 	xml_data_node *boundsnode = xml_get_sibling(viewnode.child, "bounds");
 	m_expbounds.x0 = m_expbounds.y0 = m_expbounds.x1 = m_expbounds.y1 = 0;
-	if (boundsnode != NULL)
+	if (boundsnode != nullptr)
 		parse_bounds(machine, xml_get_sibling(boundsnode, "bounds"), m_expbounds);
 
 	// load backdrop items
-	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "backdrop"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "backdrop"))
+	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "backdrop"); itemnode != nullptr; itemnode = xml_get_sibling(itemnode->next, "backdrop"))
 		m_backdrop_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load screen items
-	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "screen"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "screen"))
+	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "screen"); itemnode != nullptr; itemnode = xml_get_sibling(itemnode->next, "screen"))
 		m_screen_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load overlay items
-	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "overlay"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "overlay"))
+	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "overlay"); itemnode != nullptr; itemnode = xml_get_sibling(itemnode->next, "overlay"))
 		m_overlay_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load bezel items
-	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "bezel"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "bezel"))
+	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "bezel"); itemnode != nullptr; itemnode = xml_get_sibling(itemnode->next, "bezel"))
 		m_bezel_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load cpanel items
-	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "cpanel"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "cpanel"))
+	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "cpanel"); itemnode != nullptr; itemnode = xml_get_sibling(itemnode->next, "cpanel"))
 		m_cpanel_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load marquee items
-	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "marquee"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "marquee"))
+	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "marquee"); itemnode != nullptr; itemnode = xml_get_sibling(itemnode->next, "marquee"))
 		m_marquee_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// recompute the data for the view based on a default layer config
@@ -2196,7 +2196,7 @@ layout_view::item *layout_view::first_item(item_layer layer) const
 		case ITEM_LAYER_BEZEL:      return m_bezel_list.first();
 		case ITEM_LAYER_CPANEL:     return m_cpanel_list.first();
 		case ITEM_LAYER_MARQUEE:    return m_marquee_list.first();
-		default:                    return NULL;
+		default:                    return nullptr;
 	}
 }
 
@@ -2231,7 +2231,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 
 		// only do it if requested
 		if (m_layenabled[layer])
-			for (item *curitem = first_item(layer); curitem != NULL; curitem = curitem->next())
+			for (item *curitem = first_item(layer); curitem != nullptr; curitem = curitem->next())
 			{
 				// accumulate bounds
 				if (first)
@@ -2241,7 +2241,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 				first = false;
 
 				// accumulate screen bounds
-				if (curitem->m_screen != NULL)
+				if (curitem->m_screen != nullptr)
 				{
 					if (scrfirst)
 						m_scrbounds = curitem->m_rawbounds;
@@ -2292,7 +2292,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 
 	// normalize all the item bounds
 	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
-		for (item *curitem = first_item(layer); curitem != NULL; curitem = curitem->next())
+		for (item *curitem = first_item(layer); curitem != nullptr; curitem = curitem->next())
 		{
 			curitem->m_bounds.x0 = target_bounds.x0 + (curitem->m_rawbounds.x0 - xoffs) * xscale;
 			curitem->m_bounds.x1 = target_bounds.x0 + (curitem->m_rawbounds.x1 - xoffs) * xscale;
@@ -2310,7 +2310,7 @@ void layout_view::resolve_tags()
 {
 	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
 	{
-		for (item *curitem = first_item(layer); curitem != NULL; curitem = curitem->next())
+		for (item *curitem = first_item(layer); curitem != nullptr; curitem = curitem->next())
 		{
 			curitem->resolve_tags();
 		}
@@ -2328,11 +2328,11 @@ void layout_view::resolve_tags()
 //-------------------------------------------------
 
 layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simple_list<layout_element> &elemlist)
-	: m_next(NULL),
-		m_element(NULL),
-		m_input_port(NULL),
+	: m_next(nullptr),
+		m_element(nullptr),
+		m_input_port(nullptr),
 		m_input_mask(0),
-		m_screen(NULL),
+		m_screen(nullptr),
 		m_orientation(ROT0)
 {
 	// allocate a copy of the output name
@@ -2342,16 +2342,16 @@ layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simpl
 	m_input_tag = xml_get_attribute_string_with_subst(machine, itemnode, "inputtag", "");
 
 	// find the associated element
-	const char *name = xml_get_attribute_string_with_subst(machine, itemnode, "element", NULL);
-	if (name != NULL)
+	const char *name = xml_get_attribute_string_with_subst(machine, itemnode, "element", nullptr);
+	if (name != nullptr)
 	{
 		// search the list of elements for a match
-		for (m_element = elemlist.first(); m_element != NULL; m_element = m_element->next())
+		for (m_element = elemlist.first(); m_element != nullptr; m_element = m_element->next())
 			if (strcmp(name, m_element->name()) == 0)
 				break;
 
 		// error if not found
-		if (m_element == NULL)
+		if (m_element == nullptr)
 			throw emu_fatalerror("Unable to find layout element %s", name);
 	}
 
@@ -2363,7 +2363,7 @@ layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simpl
 		m_screen = iter.byindex(index);
 	}
 	m_input_mask = xml_get_attribute_int_with_subst(machine, itemnode, "inputmask", 0);
-	if (m_output_name[0] != 0 && m_element != NULL)
+	if (m_output_name[0] != 0 && m_element != nullptr)
 		output_set_value(m_output_name.c_str(), m_element->default_state());
 	parse_bounds(machine, xml_get_sibling(itemnode.child, "bounds"), m_rawbounds);
 	parse_color(machine, xml_get_sibling(itemnode.child, "color"), m_color);
@@ -2372,12 +2372,12 @@ layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simpl
 	// sanity checks
 	if (strcmp(itemnode.name, "screen") == 0)
 	{
-		if (m_screen == NULL)
+		if (m_screen == nullptr)
 			throw emu_fatalerror("Layout references invalid screen index %d", index);
 	}
 	else
 	{
-		if (m_element == NULL)
+		if (m_element == nullptr)
 			throw emu_fatalerror("Layout item of type %s require an element tag", itemnode.name);
 	}
 
@@ -2404,7 +2404,7 @@ layout_view::item::~item()
 
 render_container *layout_view::item::screen_container(running_machine &machine) const
 {
-	return (m_screen != NULL) ? &m_screen->container() : NULL;
+	return (m_screen != nullptr) ? &m_screen->container() : nullptr;
 }
 
 
@@ -2416,7 +2416,7 @@ int layout_view::item::state() const
 {
 	int state = 0;
 
-	assert(m_element != NULL);
+	assert(m_element != nullptr);
 
 	// if configured to an output, fetch the output value
 	if (m_output_name[0] != 0)
@@ -2425,10 +2425,10 @@ int layout_view::item::state() const
 	// if configured to an input, fetch the input value
 	else if (m_input_tag[0] != 0)
 	{
-		if (m_input_port != NULL)
+		if (m_input_port != nullptr)
 		{
 			ioport_field *field = m_input_port->field(m_input_mask);
-			if (field != NULL)
+			if (field != nullptr)
 				state = ((m_input_port->read() ^ field->defvalue()) & m_input_mask) ? 1 : 0;
 		}
 	}
@@ -2460,11 +2460,11 @@ void layout_view::item::resolve_tags()
 //-------------------------------------------------
 
 layout_file::layout_file(running_machine &machine, xml_data_node &rootnode, const char *dirname)
-	: m_next(NULL)
+	: m_next(nullptr)
 {
 	// find the layout node
 	xml_data_node *mamelayoutnode = xml_get_sibling(rootnode.child, "mamelayout");
-	if (mamelayoutnode == NULL)
+	if (mamelayoutnode == nullptr)
 		throw emu_fatalerror("Invalid XML file: missing mamelayout node");
 
 	// validate the config data version
@@ -2473,11 +2473,11 @@ layout_file::layout_file(running_machine &machine, xml_data_node &rootnode, cons
 		throw emu_fatalerror("Invalid XML file: unsupported version");
 
 	// parse all the elements
-	for (xml_data_node *elemnode = xml_get_sibling(mamelayoutnode->child, "element"); elemnode != NULL; elemnode = xml_get_sibling(elemnode->next, "element"))
+	for (xml_data_node *elemnode = xml_get_sibling(mamelayoutnode->child, "element"); elemnode != nullptr; elemnode = xml_get_sibling(elemnode->next, "element"))
 		m_elemlist.append(*global_alloc(layout_element(machine, *elemnode, dirname)));
 
 	// parse all the views
-	for (xml_data_node *viewnode = xml_get_sibling(mamelayoutnode->child, "view"); viewnode != NULL; viewnode = xml_get_sibling(viewnode->next, "view"))
+	for (xml_data_node *viewnode = xml_get_sibling(mamelayoutnode->child, "view"); viewnode != nullptr; viewnode = xml_get_sibling(viewnode->next, "view"))
 		m_viewlist.append(*global_alloc(layout_view(machine, *viewnode, m_elemlist)));
 }
 

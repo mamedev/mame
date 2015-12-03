@@ -148,7 +148,7 @@ public:
 
 	// global memory registration
 	template<typename _ItemType>
-	void save_item(_ItemType &value, const char *valname, int index = 0) { save_item(NULL, "global", NULL, index, value, valname); }
+	void save_item(_ItemType &value, const char *valname, int index = 0) { save_item(nullptr, "global", nullptr, index, value, valname); }
 	template<typename _ItemType>
 	void save_pointer(_ItemType *value, const char *valname, UINT32 count, int index = 0) { save_pointer(NULL, "global", NULL, index, value, valname, count); }
 

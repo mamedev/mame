@@ -79,7 +79,7 @@ void debug_view_textbuf::view_update()
 		UINT32 col = 0;
 
 		// if this visible row is valid, add it to the buffer
-		if (line != NULL)
+		if (line != nullptr)
 		{
 			size_t len = strlen(line);
 			UINT32 effcol = m_topleft.x;

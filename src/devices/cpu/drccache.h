@@ -53,7 +53,7 @@ public:
 	// pointer checking
 	bool contains_pointer(const void *ptr) const { return ((const drccodeptr)ptr >= m_near && (const drccodeptr)ptr < m_near + m_size); }
 	bool contains_near_pointer(const void *ptr) const { return ((const drccodeptr)ptr >= m_near && (const drccodeptr)ptr < m_neartop); }
-	bool generating_code() const { return (m_codegen != NULL); }
+	bool generating_code() const { return (m_codegen != nullptr); }
 
 	// memory management
 	void flush();
@@ -65,7 +65,7 @@ public:
 	// codegen helpers
 	drccodeptr *begin_codegen(UINT32 reserve_bytes);
 	drccodeptr end_codegen();
-	void request_oob_codegen(drc_oob_delegate callback, void *param1 = NULL, void *param2 = NULL);
+	void request_oob_codegen(drc_oob_delegate callback, void *param1 = nullptr, void *param2 = nullptr);
 
 private:
 	// largest block of code that can be generated at once

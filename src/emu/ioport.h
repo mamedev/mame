@@ -900,7 +900,7 @@ public:
 	bool none() const { return (m_condition == ALWAYS); }
 
 	// configuration
-	void reset() { set(ALWAYS, NULL, 0, 0); }
+	void reset() { set(ALWAYS, nullptr, 0, 0); }
 	void set(condition_t condition, const char *tag, ioport_value mask, ioport_value value)
 	{
 		m_condition = condition;
@@ -1003,7 +1003,7 @@ class ioport_field
 
 public:
 	// construction/destruction
-	ioport_field(ioport_port &port, ioport_type type, ioport_value defvalue, ioport_value maskbits, const char *name = NULL);
+	ioport_field(ioport_port &port, ioport_type type, ioport_value defvalue, ioport_value maskbits, const char *name = nullptr);
 	~ioport_field();
 
 	// getters
@@ -1225,7 +1225,7 @@ private:
 	std::unique_ptr<ioport_port_live> m_live;      // live state of port (NULL if not live)
 };
 
-inline ioport_value read_safe(ioport_port *port, ioport_value defval) { return (port == NULL) ? defval : port->read(); }
+inline ioport_value read_safe(ioport_port *port, ioport_value defval) { return (port == nullptr) ? defval : port->read(); }
 
 
 
@@ -1424,13 +1424,13 @@ private:
 
 	template<typename _Type> _Type playback_read(_Type &result);
 	time_t playback_init();
-	void playback_end(const char *message = NULL);
+	void playback_end(const char *message = nullptr);
 	void playback_frame(const attotime &curtime);
 	void playback_port(ioport_port &port);
 
 	template<typename _Type> void record_write(_Type value);
 	void record_init();
-	void record_end(const char *message = NULL);
+	void record_end(const char *message = nullptr);
 	void record_frame(const attotime &curtime);
 	void record_port(ioport_port &port);
 
@@ -1482,7 +1482,7 @@ public:
 	void port_modify(const char *tag);
 
 	// field helpers
-	void field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name = NULL);
+	void field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name = nullptr);
 	void field_add_char(unicode_char ch);
 	void field_add_code(input_seq_type which, input_code code);
 	void field_set_way(int way) const { m_curfield->m_way = way; }
@@ -1505,8 +1505,8 @@ public:
 	void field_set_analog_wraps() const { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_WRAPS; }
 	void field_set_remap_table(const ioport_value *table) { m_curfield->m_remap_table = table; }
 	void field_set_analog_invert() const { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_INVERT; }
-	void field_set_dynamic_read(ioport_field_read_delegate delegate, void *param = NULL) const { m_curfield->m_read = delegate; m_curfield->m_read_param = param; }
-	void field_set_dynamic_write(ioport_field_write_delegate delegate, void *param = NULL) const { m_curfield->m_write = delegate; m_curfield->m_write_param = param; }
+	void field_set_dynamic_read(ioport_field_read_delegate delegate, void *param = nullptr) const { m_curfield->m_read = delegate; m_curfield->m_read_param = param; }
+	void field_set_dynamic_write(ioport_field_write_delegate delegate, void *param = nullptr) const { m_curfield->m_write = delegate; m_curfield->m_write_param = param; }
 	void field_set_diplocation(const char *location) const { m_curfield->expand_diplocation(location, m_errorbuf); }
 
 	// setting helpers

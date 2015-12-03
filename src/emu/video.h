@@ -64,7 +64,7 @@ public:
 	bool throttled() const { return m_throttled; }
 	float throttle_rate() const { return m_throttle_rate; }
 	bool fastforward() const { return m_fastforward; }
-	bool is_recording() const { return (m_mng_file != nullptr || m_avi_file != NULL); }
+	bool is_recording() const { return (m_mng_file != nullptr || m_avi_file != nullptr); }
 
 	// setters
 	void set_frameskip(int frameskip);

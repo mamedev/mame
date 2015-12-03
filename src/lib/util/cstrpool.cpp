@@ -37,16 +37,16 @@ const char *const_string_pool::add(const char *string)
 		return string;
 
 	// scan to find space
-	for (pool_chunk *chunk = m_chunklist.first(); chunk != NULL; chunk = chunk->next())
+	for (pool_chunk *chunk = m_chunklist.first(); chunk != nullptr; chunk = chunk->next())
 	{
 		const char *result = chunk->add(string);
-		if (result != NULL)
+		if (result != nullptr)
 			return result;
 	}
 
 	// no space anywhere, create a new pool and prepend it (so it gets used first)
 	const char *result = m_chunklist.prepend(*global_alloc(pool_chunk)).add(string);
-	assert(result != NULL);
+	assert(result != nullptr);
 	return result;
 }
 
@@ -63,7 +63,7 @@ bool const_string_pool::contains(const char *string)
 		return true;
 
 	// scan to find it
-	for (pool_chunk *chunk = m_chunklist.first(); chunk != NULL; chunk = chunk->next())
+	for (pool_chunk *chunk = m_chunklist.first(); chunk != nullptr; chunk = chunk->next())
 		if (chunk->contains(string))
 			return true;
 
@@ -79,7 +79,7 @@ bool const_string_pool::contains(const char *string)
  */
 
 const_string_pool::pool_chunk::pool_chunk()
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_used(0)
 {
 }
@@ -104,7 +104,7 @@ const char *const_string_pool::pool_chunk::add(const char *string)
 
 	// if too big, return NULL
 	if (m_used + bytes > POOL_SIZE)
-		return NULL;
+		return nullptr;
 
 	// allocate, copy, and return the memory
 	char *dest = &m_buffer[m_used];

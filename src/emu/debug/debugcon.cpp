@@ -110,14 +110,14 @@ static void debug_console_exit(running_machine &machine)
 	/* free allocated memory */
 	if (console_textbuf)
 		text_buffer_free(console_textbuf);
-	console_textbuf = NULL;
+	console_textbuf = nullptr;
 
 	if (errorlog_textbuf)
 		text_buffer_free(errorlog_textbuf);
-	errorlog_textbuf = NULL;
+	errorlog_textbuf = nullptr;
 
 	/* free the command list */
-	commandlist = NULL;
+	commandlist = nullptr;
 }
 
 
@@ -192,7 +192,7 @@ static void trim_parameter(char **paramptr, int keep_quotes)
 
 static CMDERR internal_execute_command(running_machine &machine, int execute, int params, char **param)
 {
-	debug_command *cmd, *found = NULL;
+	debug_command *cmd, *found = nullptr;
 	int i, foundcount = 0;
 	char *p, *command;
 	size_t len;
@@ -216,12 +216,12 @@ static CMDERR internal_execute_command(running_machine &machine, int execute, in
 	else
 	{
 		params = 0;
-		param[0] = NULL;
+		param[0] = nullptr;
 	}
 
 	/* search the command list */
 	len = strlen(command);
-	for (cmd = commandlist; cmd != NULL; cmd = cmd->next)
+	for (cmd = commandlist; cmd != nullptr; cmd = cmd->next)
 		if (!strncmp(command, cmd->command, len))
 		{
 			foundcount++;
@@ -268,7 +268,7 @@ static CMDERR internal_execute_command(running_machine &machine, int execute, in
 static CMDERR internal_parse_command(running_machine &machine, const char *original_command, int execute)
 {
 	char command[MAX_COMMAND_LENGTH], parens[MAX_COMMAND_LENGTH];
-	char *params[MAX_COMMAND_PARAMS] = { 0 };
+	char *params[MAX_COMMAND_PARAMS] = { nullptr };
 	CMDERR result;
 	char *command_start;
 	char *p, c = 0;

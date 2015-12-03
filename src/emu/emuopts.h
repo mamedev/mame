@@ -374,7 +374,7 @@ private:
 	void update_slot_options();
 
 	// INI parsing helper
-	bool parse_one_ini(const char *basename, int priority, std::string *error_string = NULL);
+	bool parse_one_ini(const char *basename, int priority, std::string *error_string = nullptr);
 
 	// cache frequently used options in members
 	void update_cached_options();

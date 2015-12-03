@@ -50,8 +50,8 @@ class debug_view_state : public debug_view
 
 protected:
 	// view overrides
-	virtual void view_update();
-	virtual void view_notify(debug_view_notification type);
+	virtual void view_update() override;
+	virtual void view_notify(debug_view_notification type) override;
 
 private:
 	struct state_item

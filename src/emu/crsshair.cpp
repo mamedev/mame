@@ -152,7 +152,7 @@ static void create_bitmap(running_machine &machine, int player)
 	rgb_t color = crosshair_colors[player];
 
 	/* if we have a bitmap and texture for this player, kill it */
-	if (global.bitmap[player] == NULL) {
+	if (global.bitmap[player] == nullptr) {
 		global.bitmap[player] = global_alloc(bitmap_argb32);
 		global.texture[player] = machine.render().texture_alloc(render_texture::hq_scale);
 	}
@@ -162,7 +162,7 @@ static void create_bitmap(running_machine &machine, int player)
 	{
 		/* look for user specified file */
 		sprintf(filename, "%s.png", global.name[player]);
-		render_load_png(*global.bitmap[player], crossfile, NULL, filename);
+		render_load_png(*global.bitmap[player], crossfile, nullptr, filename);
 	}
 	else
 	{
@@ -172,7 +172,7 @@ static void create_bitmap(running_machine &machine, int player)
 
 		/* look for default cross?.png in crsshair dir */
 		if (!global.bitmap[player]->valid())
-			render_load_png(*global.bitmap[player], crossfile, NULL, filename);
+			render_load_png(*global.bitmap[player], crossfile, nullptr, filename);
 	}
 
 	/* if that didn't work, use the built-in one */
@@ -218,8 +218,8 @@ void crosshair_init(running_machine &machine)
 	global.auto_time = CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT;
 
 	/* determine who needs crosshairs */
-	for (ioport_port *port = machine.ioport().first_port(); port != NULL; port = port->next())
-		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+	for (ioport_port *port = machine.ioport().first_port(); port != nullptr; port = port->next())
+		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 			if (field->crosshair_axis() != CROSSHAIR_AXIS_NONE)
 			{
 				int player = field->player();
@@ -243,7 +243,7 @@ void crosshair_init(running_machine &machine)
 		config_register(machine, "crosshairs", config_saveload_delegate(FUNC(crosshair_load), &machine), config_saveload_delegate(FUNC(crosshair_save), &machine));
 
 	/* register the animation callback */
-	if (machine.first_screen() != NULL)
+	if (machine.first_screen() != nullptr)
 		machine.first_screen()->register_vblank_callback(vblank_state_delegate(FUNC(animate), &machine));
 }
 
@@ -259,10 +259,10 @@ static void crosshair_exit(running_machine &machine)
 	for (int player = 0; player < MAX_PLAYERS; player++)
 	{
 		machine.render().texture_free(global.texture[player]);
-		global.texture[player] = NULL;
+		global.texture[player] = nullptr;
 
 		global_free(global.bitmap[player]);
-		global.bitmap[player] = NULL;
+		global.bitmap[player] = nullptr;
 	}
 }
 
@@ -424,7 +424,7 @@ static void crosshair_load(running_machine &machine, int config_type, xml_data_n
 		return;
 
 	/* might not have any data */
-	if (parentnode == NULL)
+	if (parentnode == nullptr)
 		return;
 
 	/* loop and get player crosshair info */
@@ -457,7 +457,7 @@ static void crosshair_load(running_machine &machine, int config_type, xml_data_n
 
 	/* get, check, and store auto visibility time */
 	crosshairnode = xml_get_sibling(parentnode->child, "autotime");
-	if (crosshairnode != NULL)
+	if (crosshairnode != nullptr)
 	{
 		auto_time = xml_get_attribute_int(crosshairnode, "val", CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT);
 		if ((auto_time >= CROSSHAIR_VISIBILITY_AUTOTIME_MIN) && (auto_time <= CROSSHAIR_VISIBILITY_AUTOTIME_MAX))
@@ -487,9 +487,9 @@ static void crosshair_save(running_machine &machine, int config_type, xml_data_n
 		if (global.used[player])
 		{
 			/* create a node */
-			crosshairnode = xml_add_child(parentnode, "crosshair", NULL);
+			crosshairnode = xml_add_child(parentnode, "crosshair", nullptr);
 
-			if (crosshairnode != NULL)
+			if (crosshairnode != nullptr)
 			{
 				int changed = FALSE;
 
@@ -519,9 +519,9 @@ static void crosshair_save(running_machine &machine, int config_type, xml_data_n
 	if (global.auto_time != CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT)
 	{
 		/* create a node */
-		crosshairnode = xml_add_child(parentnode, "autotime", NULL);
+		crosshairnode = xml_add_child(parentnode, "autotime", nullptr);
 
-		if (crosshairnode != NULL)
+		if (crosshairnode != nullptr)
 			xml_set_attribute_int(crosshairnode, "val", global.auto_time);
 	}
 

@@ -20,18 +20,18 @@
 //-------------------------------------------------
 
 address_map_entry::address_map_entry(device_t &device, address_map &map, offs_t start, offs_t end)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_map(map),
 		m_devbase(device),
 		m_addrstart((map.m_globalmask == 0) ? start : start & map.m_globalmask),
 		m_addrend((map.m_globalmask == 0) ? end : end & map.m_globalmask),
 		m_addrmirror(0),
 		m_addrmask(0),
-		m_share(NULL),
-		m_region(NULL),
+		m_share(nullptr),
+		m_region(nullptr),
 		m_rgnoffs(0),
 		m_submap_bits(0),
-		m_memory(NULL),
+		m_memory(nullptr),
 		m_bytestart(0),
 		m_byteend(0),
 		m_bytemirror(0),
@@ -336,18 +336,18 @@ address_map::address_map(device_t &device, address_spacenum spacenum)
 		throw emu_fatalerror("No memory address space configuration found for device '%s', space %d\n", device.tag(), spacenum);
 
 	// construct the internal device map (first so it takes priority)
-	if (spaceconfig->m_internal_map != NULL)
+	if (spaceconfig->m_internal_map != nullptr)
 		(*spaceconfig->m_internal_map)(*this, device);
 	if (!spaceconfig->m_internal_map_delegate.isnull())
 		spaceconfig->m_internal_map_delegate(*this, device);
 
 	// append the map provided by the owner
-	if (memintf->address_map(spacenum) != NULL)
+	if (memintf->address_map(spacenum) != nullptr)
 		(*memintf->address_map(spacenum))(*this, *device.owner());
 	else
 	{
 		// if the owner didn't provide a map, use the default device map
-		if (spaceconfig->m_default_map != NULL)
+		if (spaceconfig->m_default_map != nullptr)
 			(*spaceconfig->m_default_map)(*this, device);
 		if (!spaceconfig->m_default_map_delegate.isnull())
 			spaceconfig->m_default_map_delegate(*this, device);
@@ -386,16 +386,16 @@ address_map::address_map(const address_space &space, offs_t start, offs_t end, i
 	address_map_entry *e;
 	switch(m_databits) {
 	case 8:
-		e = add(device, start, end, (address_map_entry8 *)NULL);
+		e = add(device, start, end, (address_map_entry8 *)nullptr);
 		break;
 	case 16:
-		e = add(device, start, end, (address_map_entry16 *)NULL);
+		e = add(device, start, end, (address_map_entry16 *)nullptr);
 		break;
 	case 32:
-		e = add(device, start, end, (address_map_entry32 *)NULL);
+		e = add(device, start, end, (address_map_entry32 *)nullptr);
 		break;
 	case 64:
-		e = add(device, start, end, (address_map_entry64 *)NULL);
+		e = add(device, start, end, (address_map_entry64 *)nullptr);
 		break;
 	default:
 		throw emu_fatalerror("Trying to dynamically map a device on a space with a corrupt databits width");
@@ -485,7 +485,7 @@ address_map_entry64 *address_map::add(device_t &device, offs_t start, offs_t end
 
 void address_map::uplift_submaps(running_machine &machine, device_t &device, device_t &owner, endianness_t endian)
 {
-	address_map_entry *prev = 0;
+	address_map_entry *prev = nullptr;
 	address_map_entry *entry = m_entrylist.first();
 	while (entry)
 	{
@@ -493,7 +493,7 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device, dev
 		{
 			std::string tag = owner.subtag(entry->m_read.m_tag);
 			device_t *mapdevice = machine.device(tag.c_str());
-			if (mapdevice == NULL) {
+			if (mapdevice == nullptr) {
 				throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", tag.c_str(), m_spacenum, device.basetag());
 			}
 			// Grab the submap

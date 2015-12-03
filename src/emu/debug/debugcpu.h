@@ -58,8 +58,8 @@ public:
 					symbol_table &symbols,
 					int index,
 					offs_t address,
-					const char *condition = NULL,
-					const char *action = NULL);
+					const char *condition = nullptr,
+					const char *action = nullptr);
 
 		// getters
 		const device_debug *debugInterface() const { return m_debugInterface; }
@@ -100,8 +100,8 @@ public:
 					int type,
 					offs_t address,
 					offs_t length,
-					const char *condition = NULL,
-					const char *action = NULL);
+					const char *condition = nullptr,
+					const char *action = nullptr);
 
 		// getters
 		const device_debug *debugInterface() const { return m_debugInterface; }
@@ -141,7 +141,7 @@ public:
 
 	public:
 		// construction/destruction
-		registerpoint(symbol_table &symbols, int index, const char *condition, const char *action = NULL);
+		registerpoint(symbol_table &symbols, int index, const char *condition, const char *action = nullptr);
 
 		// getters
 		registerpoint *next() const { return m_next; }
@@ -170,10 +170,10 @@ public:
 	symbol_table &symtable() { return m_symtable; }
 
 	// commonly-used pass-throughs
-	offs_t pc() const { return (m_state != NULL) ? m_state->pc() : 0; }
-	int logaddrchars(address_spacenum spacenum = AS_0) const { return (m_memory != NULL && m_memory->has_space(spacenum)) ? m_memory->space(spacenum).logaddrchars() : 8; }
-	int min_opcode_bytes() const { return (m_disasm != NULL) ? m_disasm->max_opcode_bytes() : 1; }
-	int max_opcode_bytes() const { return (m_disasm != NULL) ? m_disasm->max_opcode_bytes() : 1; }
+	offs_t pc() const { return (m_state != nullptr) ? m_state->pc() : 0; }
+	int logaddrchars(address_spacenum spacenum = AS_0) const { return (m_memory != nullptr && m_memory->has_space(spacenum)) ? m_memory->space(spacenum).logaddrchars() : 8; }
+	int min_opcode_bytes() const { return (m_disasm != nullptr) ? m_disasm->max_opcode_bytes() : 1; }
+	int max_opcode_bytes() const { return (m_disasm != nullptr) ? m_disasm->max_opcode_bytes() : 1; }
 	device_t& device() const { return m_device; }
 
 
@@ -213,7 +213,7 @@ public:
 
 	// breakpoints
 	breakpoint *breakpoint_first() const { return m_bplist; }
-	int breakpoint_set(offs_t address, const char *condition = NULL, const char *action = NULL);
+	int breakpoint_set(offs_t address, const char *condition = nullptr, const char *action = nullptr);
 	bool breakpoint_clear(int index);
 	void breakpoint_clear_all();
 	bool breakpoint_enable(int index, bool enable = true);
@@ -229,7 +229,7 @@ public:
 
 	// registerpoints
 	registerpoint *registerpoint_first() const { return m_rplist; }
-	int registerpoint_set(const char *condition, const char *action = NULL);
+	int registerpoint_set(const char *condition, const char *action = nullptr);
 	bool registerpoint_clear(int index);
 	void registerpoint_clear_all();
 	bool registerpoint_enable(int index, bool enable = true);
@@ -268,7 +268,7 @@ public:
 	// tracing
 	void trace(FILE *file, bool trace_over, const char *action);
 	void trace_printf(const char *fmt, ...) ATTR_PRINTF(2,3);
-	void trace_flush() { if (m_trace != NULL) m_trace->flush(); }
+	void trace_flush() { if (m_trace != nullptr) m_trace->flush(); }
 
 	void reset_transient_flag() { m_flags &= ~DEBUG_FLAG_TRANSIENT; }
 

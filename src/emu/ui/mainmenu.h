@@ -19,8 +19,8 @@ class ui_menu_main : public ui_menu {
 public:
 	ui_menu_main(running_machine &machine, render_container *container);
 	virtual ~ui_menu_main();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	enum {

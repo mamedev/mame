@@ -28,13 +28,13 @@ public:
 	devcb_line_dispatch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void init_fwd() {
-		for(int i=0; i<N; i++)
-			fwd_cb[i] = new devcb_write_line(*this);
+		for(auto & elem : fwd_cb)
+			elem = new devcb_write_line(*this);
 	}
 
 	virtual ~devcb_line_dispatch_device() {
-		for(int i=0; i<N; i++)
-			delete fwd_cb[i];
+		for(auto & elem : fwd_cb)
+			delete elem;
 	}
 
 	template<class _Object> static devcb_base &set_fwd_cb(device_t &device, int entry, _Object object) { return downcast<devcb_line_dispatch_device<N> &>(device).fwd_cb[entry]->set_callback(object); }
@@ -45,9 +45,9 @@ public:
 	}
 
 protected:
-	virtual void device_start() {
-		for(int i=0; i<N; i++)
-			fwd_cb[i]->resolve_safe();
+	virtual void device_start() override {
+		for(auto & elem : fwd_cb)
+			elem->resolve_safe();
 	}
 
 private:

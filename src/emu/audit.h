@@ -149,12 +149,12 @@ public:
 	summary audit_device(device_t *device, const char *validation = AUDIT_VALIDATE_FULL);
 	summary audit_software(const char *list_name, software_info *swinfo, const char *validation = AUDIT_VALIDATE_FULL);
 	summary audit_samples();
-	summary summarize(const char *name,std::string *output = NULL);
+	summary summarize(const char *name,std::string *output = nullptr);
 
 private:
 	// internal helpers
 	audit_record *audit_one_rom(const rom_entry *rom);
-	audit_record *audit_one_disk(const rom_entry *rom, const char *locationtag = NULL);
+	audit_record *audit_one_disk(const rom_entry *rom, const char *locationtag = nullptr);
 	void compute_status(audit_record &record, const rom_entry *rom, bool found);
 	device_t *find_shared_device(device_t &device, const char *name, const hash_collection &romhashes, UINT64 romlength);
 

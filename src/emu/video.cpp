@@ -72,7 +72,7 @@ static void video_notifier_callback(const char *outname, INT32 value, void *para
 
 video_manager::video_manager(running_machine &machine)
 	: m_machine(machine),
-		m_screenless_frame_timer(NULL),
+		m_screenless_frame_timer(nullptr),
 		m_output_changed(false),
 		m_throttle_last_ticks(0),
 		m_throttle_realtime(attotime::zero),
@@ -97,14 +97,14 @@ video_manager::video_manager(running_machine &machine)
 		m_frameskip_adjust(0),
 		m_skipping_this_frame(false),
 		m_average_oversleep(0),
-		m_snap_target(NULL),
+		m_snap_target(nullptr),
 		m_snap_native(true),
 		m_snap_width(0),
 		m_snap_height(0),
 		m_mng_frame_period(attotime::zero),
 		m_mng_next_frame_time(attotime::zero),
 		m_mng_frame(0),
-		m_avi_file(NULL),
+		m_avi_file(nullptr),
 		m_avi_frame_period(attotime::zero),
 		m_avi_next_frame_time(attotime::zero),
 		m_avi_frame(0),
@@ -119,7 +119,7 @@ video_manager::video_manager(running_machine &machine)
 
 	// create a render target for snapshots
 	const char *viewname = machine.options().snap_view();
-	m_snap_native = (machine.first_screen() != NULL && (viewname[0] == 0 || strcmp(viewname, "native") == 0));
+	m_snap_native = (machine.first_screen() != nullptr && (viewname[0] == 0 || strcmp(viewname, "native") == 0));
 
 	// the native target is hard-coded to our internal layout and has all options disabled
 	if (m_snap_native)
@@ -137,7 +137,7 @@ video_manager::video_manager(running_machine &machine)
 	// other targets select the specified view and turn off effects
 	else
 	{
-		m_snap_target = machine.render().target_alloc(NULL, RENDER_CREATE_HIDDEN);
+		m_snap_target = machine.render().target_alloc(nullptr, RENDER_CREATE_HIDDEN);
 		m_snap_target->set_view(m_snap_target->configured_view(viewname, 0, 1));
 		m_snap_target->set_screen_overlay_enabled(false);
 	}
@@ -160,11 +160,11 @@ video_manager::video_manager(running_machine &machine)
 #endif
 
 	// if no screens, create a periodic timer to drive updates
-	if (machine.first_screen() == NULL)
+	if (machine.first_screen() == nullptr)
 	{
 		m_screenless_frame_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(video_manager::screenless_update_callback), this));
 		m_screenless_frame_timer->adjust(screen_device::DEFAULT_FRAME_PERIOD, 0, screen_device::DEFAULT_FRAME_PERIOD);
-		output_set_notifier(NULL, video_notifier_callback, this);
+		output_set_notifier(nullptr, video_notifier_callback, this);
 	}
 }
 
@@ -247,7 +247,7 @@ void video_manager::frame_update(bool debug)
 	if (phase == MACHINE_PHASE_RUNNING)
 	{
 		// reset partial updates if we're paused or if the debugger is active
-		if (machine().first_screen() != NULL && (machine().paused() || debug || debugger_within_instruction_hook(machine())))
+		if (machine().first_screen() != nullptr && (machine().paused() || debug || debugger_within_instruction_hook(machine())))
 			machine().first_screen()->reset_partial_updates();
 	}
 }
@@ -286,7 +286,7 @@ std::string &video_manager::speed_text(std::string &str)
 	// display the number of partial updates as well
 	int partials = 0;
 	screen_device_iterator iter(machine().root_device());
-	for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
+	for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
 		partials += screen->partial_updates();
 	if (partials > 1)
 		strcatprintf(str, "\n%d partial updates", partials);
@@ -303,7 +303,7 @@ std::string &video_manager::speed_text(std::string &str)
 void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 {
 	// validate
-	assert(!m_snap_native || screen != NULL);
+	assert(!m_snap_native || screen != nullptr);
 
 	// create the bitmap to pass in
 	create_snapshot_bitmap(screen);
@@ -311,13 +311,13 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 	// add two text entries describing the image
 	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(build_version);
 	std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().description);
-	png_info pnginfo = { 0 };
+	png_info pnginfo = { nullptr };
 	png_add_text(&pnginfo, "Software", text1.c_str());
 	png_add_text(&pnginfo, "System", text2.c_str());
 
 	// now do the actual work
-	const rgb_t *palette = (screen !=NULL && screen->palette() != NULL) ? screen->palette()->palette()->entry_list_adjusted() : NULL;
-	int entries = (screen !=NULL && screen->palette() != NULL) ? screen->palette()->entries() : 0;
+	const rgb_t *palette = (screen !=nullptr && screen->palette() != nullptr) ? screen->palette()->palette()->entry_list_adjusted() : nullptr;
+	int entries = (screen !=nullptr && screen->palette() != nullptr) ? screen->palette()->entries() : 0;
 	png_error error = png_write_bitmap(file, &pnginfo, m_snap_bitmap, entries, palette);
 	if (error != PNGERR_NONE)
 		osd_printf_error("Error generating PNG for snapshot: png_error = %d\n", error);
@@ -339,7 +339,7 @@ void video_manager::save_active_screen_snapshots()
 	{
 		// write one snapshot per visible screen
 		screen_device_iterator iter(machine().root_device());
-		for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
+		for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
 			if (machine().render().is_live(*screen))
 			{
 				emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -355,7 +355,7 @@ void video_manager::save_active_screen_snapshots()
 		emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		file_error filerr = open_next(file, "png");
 		if (filerr == FILERR_NONE)
-			save_snapshot(NULL, file);
+			save_snapshot(nullptr, file);
 	}
 }
 
@@ -367,7 +367,7 @@ void video_manager::save_active_screen_snapshots()
 void video_manager::begin_recording(const char *name, movie_format format)
 {
 	// create a snapshot bitmap so we know what the target size is
-	create_snapshot_bitmap(NULL);
+	create_snapshot_bitmap(nullptr);
 
 	// start up an AVI recording
 	if (format == MF_AVI)
@@ -382,7 +382,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		// build up information about this new movie
 		avi_movie_info info;
 		info.video_format = 0;
-		info.video_timescale = 1000 * ((machine().first_screen() != NULL) ? ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds()) : screen_device::DEFAULT_FRAME_RATE);
+		info.video_timescale = 1000 * ((machine().first_screen() != nullptr) ? ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds()) : screen_device::DEFAULT_FRAME_RATE);
 		info.video_sampletime = 1000;
 		info.video_numsamples = 0;
 		info.video_width = m_snap_bitmap.width();
@@ -402,7 +402,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		std::string fullpath;
 		{
 			emu_file tempfile(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			if (name != NULL)
+			if (name != nullptr)
 				filerr = tempfile.open(name);
 			else
 				filerr = open_next(tempfile, "avi");
@@ -440,7 +440,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		// create a new movie file and start recording
 		m_mng_file = std::make_unique<emu_file>(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		file_error filerr;
-		if (name != NULL)
+		if (name != nullptr)
 			filerr = m_mng_file->open(name);
 		else
 			filerr = open_next(*m_mng_file, "mng");
@@ -448,7 +448,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		if (filerr == FILERR_NONE)
 		{
 			// start the capture
-			int rate = (machine().first_screen() != NULL) ? ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds()) : screen_device::DEFAULT_FRAME_RATE;
+			int rate = (machine().first_screen() != nullptr) ? ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds()) : screen_device::DEFAULT_FRAME_RATE;
 			png_error pngerr = mng_capture_start(*m_mng_file, m_snap_bitmap, rate);
 			if (pngerr != PNGERR_NONE)
 			{
@@ -477,10 +477,10 @@ void video_manager::end_recording(movie_format format)
 	if (format == MF_AVI)
 	{
 		// close the file if it exists
-		if (m_avi_file != NULL)
+		if (m_avi_file != nullptr)
 		{
 			avi_close(m_avi_file);
-			m_avi_file = NULL;
+			m_avi_file = nullptr;
 
 			// reset the state
 			m_avi_frame = 0;
@@ -489,7 +489,7 @@ void video_manager::end_recording(movie_format format)
 	else if (format == MF_MNG)
 	{
 		// close the file if it exists
-		if (m_mng_file != NULL)
+		if (m_mng_file != nullptr)
 		{
 			mng_capture_stop(*m_mng_file);
 			m_mng_file.reset();
@@ -509,7 +509,7 @@ void video_manager::end_recording(movie_format format)
 void video_manager::add_sound_to_recording(const INT16 *sound, int numsamples)
 {
 	// only record if we have a file
-	if (m_avi_file != NULL)
+	if (m_avi_file != nullptr)
 	{
 		g_profiler.start(PROFILER_MOVIE_REC);
 
@@ -651,13 +651,13 @@ bool video_manager::finish_screen_updates()
 	// finish updating the screens
 	screen_device_iterator iter(machine().root_device());
 
-	for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
+	for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
 		screen->update_partial(screen->visible_area().max_y);
 
 	// now add the quads for all the screens
 	bool anything_changed = m_output_changed;
 	m_output_changed = false;
-	for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
+	for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
 		if (screen->update_quads())
 			anything_changed = true;
 
@@ -670,12 +670,12 @@ bool video_manager::finish_screen_updates()
 		record_frame();
 
 		// iterate over screens and update the burnin for the ones that care
-		for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
+		for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
 			screen->update_burnin();
 	}
 
 	// draw any crosshairs
-	for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
+	for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
 		crosshair_render(*screen);
 
 	return anything_changed;
@@ -961,7 +961,7 @@ void video_manager::update_refresh_speed()
 			// note that we first check the token since this can get called before all screens are created
 			attoseconds_t min_frame_period = ATTOSECONDS_PER_SECOND;
 			screen_device_iterator iter(machine().root_device());
-			for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
+			for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
 			{
 				attoseconds_t period = screen->frame_period().attoseconds();
 				if (period != 0)
@@ -1046,7 +1046,7 @@ void video_manager::recompute_speed(const attotime &emutime)
 		}
 #endif
 
-		if (machine().first_screen() != NULL)
+		if (machine().first_screen() != nullptr)
 		{
 			// create a final screenshot
 			emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -1073,7 +1073,7 @@ typedef software_renderer<UINT32, 0,0,0, 16,8,0, false, false> snap_renderer;
 void video_manager::create_snapshot_bitmap(screen_device *screen)
 {
 	// select the appropriate view in our dummy target
-	if (m_snap_native && screen != NULL)
+	if (m_snap_native && screen != nullptr)
 	{
 		screen_device_iterator iter(machine().root_device());
 		int view_index = iter.indexof(*screen);
@@ -1116,7 +1116,7 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 	// handle defaults
 	const char *snapname = machine().options().snap_name();
 
-	if (snapname == NULL || snapname[0] == 0)
+	if (snapname == nullptr || snapname[0] == 0)
 		snapname = "%g/%i";
 	std::string snapstr(snapname);
 
@@ -1163,7 +1163,7 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 
 			// verify that there is such a device for this system
 			image_interface_iterator iter(machine().root_device());
-			for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
+			for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 			{
 				// get the device name
 				std::string tempdevname(image->brief_instance_name());
@@ -1172,7 +1172,7 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 				if (snapdevname.compare(tempdevname) == 0)
 				{
 					// verify that such a device has an image mounted
-					if (image->basename() != NULL)
+					if (image->basename() != nullptr)
 					{
 						std::string filename(image->basename());
 
@@ -1240,7 +1240,7 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 void video_manager::record_frame()
 {
 	// ignore if nothing to do
-	if (m_mng_file == NULL && m_avi_file == NULL && !m_dummy_recording)
+	if (m_mng_file == nullptr && m_avi_file == nullptr && !m_dummy_recording)
 		return;
 
 	// start the profiler and get the current time
@@ -1248,10 +1248,10 @@ void video_manager::record_frame()
 	attotime curtime = machine().time();
 
 	// create the bitmap
-	create_snapshot_bitmap(NULL);
+	create_snapshot_bitmap(nullptr);
 
 	// handle an AVI recording
-	if (m_avi_file != NULL)
+	if (m_avi_file != nullptr)
 	{
 		// loop until we hit the right time
 		while (m_avi_next_frame_time <= curtime)
@@ -1272,13 +1272,13 @@ void video_manager::record_frame()
 	}
 
 	// handle a MNG recording
-	if (m_mng_file != NULL)
+	if (m_mng_file != nullptr)
 	{
 		// loop until we hit the right time
 		while (m_mng_next_frame_time <= curtime)
 		{
 			// set up the text fields in the movie info
-			png_info pnginfo = { 0 };
+			png_info pnginfo = { nullptr };
 			if (m_mng_frame == 0)
 			{
 				std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(build_version);
@@ -1288,8 +1288,8 @@ void video_manager::record_frame()
 			}
 
 			// write the next frame
-			const rgb_t *palette = (machine().first_screen() !=NULL && machine().first_screen()->palette() != NULL) ? machine().first_screen()->palette()->palette()->entry_list_adjusted() : NULL;
-			int entries = (machine().first_screen() !=NULL && machine().first_screen()->palette() != NULL) ? machine().first_screen()->palette()->entries() : 0;
+			const rgb_t *palette = (machine().first_screen() !=nullptr && machine().first_screen()->palette() != nullptr) ? machine().first_screen()->palette()->palette()->entry_list_adjusted() : nullptr;
+			int entries = (machine().first_screen() !=nullptr && machine().first_screen()->palette() != nullptr) ? machine().first_screen()->palette()->entries() : 0;
 			png_error error = mng_capture_frame(*m_mng_file, &pnginfo, m_snap_bitmap, entries, palette);
 			png_free(&pnginfo);
 			if (error != PNGERR_NONE)
@@ -1326,7 +1326,7 @@ void video_manager::toggle_record_movie()
 {
 	if (!is_recording())
 	{
-		begin_recording(NULL, MF_MNG);
+		begin_recording(nullptr, MF_MNG);
 		machine().popmessage("REC START");
 	}
 	else

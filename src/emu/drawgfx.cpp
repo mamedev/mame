@@ -87,7 +87,7 @@ gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 gfx_element::gfx_element()
-	: m_palette(NULL),
+	: m_palette(nullptr),
 		m_width(0),
 		m_height(0),
 		m_startx(0),
@@ -101,9 +101,9 @@ gfx_element::gfx_element()
 		m_total_colors(0),
 		m_line_modulo(0),
 		m_char_modulo(0),
-		m_srcdata(NULL),
+		m_srcdata(nullptr),
 		m_dirtyseq(1),
-		m_gfxdata(NULL),
+		m_gfxdata(nullptr),
 		m_layout_is_raw(false),
 		m_layout_planes(0),
 		m_layout_xormask(0),
@@ -151,9 +151,9 @@ gfx_element::gfx_element(palette_device *palette, const gfx_layout &gl, const UI
 		m_total_colors(total_colors),
 		m_line_modulo(0),
 		m_char_modulo(0),
-		m_srcdata(NULL),
+		m_srcdata(nullptr),
 		m_dirtyseq(1),
-		m_gfxdata(NULL),
+		m_gfxdata(nullptr),
 		m_layout_is_raw(false),
 		m_layout_planes(0),
 		m_layout_xormask(xormask),
@@ -198,7 +198,7 @@ void gfx_element::set_layout(const gfx_layout &gl, const UINT8 *srcdata)
 		m_char_modulo = gl.charincrement / 8;
 
 		// RAW graphics must have a pointer up front
-		assert(srcdata != NULL);
+		assert(srcdata != nullptr);
 		m_gfxdata = const_cast<UINT8 *>(srcdata);
 	}
 
@@ -573,7 +573,7 @@ void gfx_element::transtable(bitmap_ind16 &dest, const rectangle &cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		const UINT8 *pentable)
 {
-	assert(pentable != NULL);
+	assert(pentable != nullptr);
 
 	// render
 	color = colorbase() + granularity() * (color % colors());
@@ -587,7 +587,7 @@ void gfx_element::transtable(bitmap_rgb32 &dest, const rectangle &cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		const UINT8 *pentable)
 {
-	assert(pentable != NULL);
+	assert(pentable != nullptr);
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
@@ -859,7 +859,7 @@ void gfx_element::zoom_transtable(bitmap_ind16 &dest, const rectangle &cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, const UINT8 *pentable)
 {
-	assert(pentable != NULL);
+	assert(pentable != nullptr);
 
 	// non-zoom case
 	if (scalex == 0x10000 && scaley == 0x10000)
@@ -877,7 +877,7 @@ void gfx_element::zoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, const UINT8 *pentable)
 {
-	assert(pentable != NULL);
+	assert(pentable != nullptr);
 
 	// non-zoom case
 	if (scalex == 0x10000 && scaley == 0x10000)
@@ -1144,7 +1144,7 @@ void gfx_element::prio_transtable(bitmap_ind16 &dest, const rectangle &cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_ind8 &priority, UINT32 pmask, const UINT8 *pentable)
 {
-	assert(pentable != NULL);
+	assert(pentable != nullptr);
 
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
@@ -1160,7 +1160,7 @@ void gfx_element::prio_transtable(bitmap_rgb32 &dest, const rectangle &cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_ind8 &priority, UINT32 pmask, const UINT8 *pentable)
 {
-	assert(pentable != NULL);
+	assert(pentable != nullptr);
 
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
@@ -1465,7 +1465,7 @@ void gfx_element::prio_zoom_transtable(bitmap_ind16 &dest, const rectangle &clip
 		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,
 		const UINT8 *pentable)
 {
-	assert(pentable != NULL);
+	assert(pentable != nullptr);
 
 	// non-zoom case
 	if (scalex == 0x10000 && scaley == 0x10000)
@@ -1486,7 +1486,7 @@ void gfx_element::prio_zoom_transtable(bitmap_rgb32 &dest, const rectangle &clip
 		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,
 		const UINT8 *pentable)
 {
-	assert(pentable != NULL);
+	assert(pentable != nullptr);
 
 	// non-zoom case
 	if (scalex == 0x10000 && scaley == 0x10000)
@@ -1680,7 +1680,7 @@ void gfx_element::alphastore(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 	assert(dest.bpp() == 32);
 	assert(dest.format() == BITMAP_FORMAT_ARGB32);
-	assert(alphatable != NULL);
+	assert(alphatable != nullptr);
 
 	/* if we have a fixed alpha, call the standard drawgfx_transpen */
 	if (fixedalpha == 0xff)
@@ -1730,7 +1730,7 @@ void gfx_element::alphatable(bitmap_rgb32 &dest, const rectangle &cliprect,
 	}
 
 	assert(dest.bpp() == 32);
-	assert(alphatable != NULL);
+	assert(alphatable != nullptr);
 
 	/* get final code and color, and grab lookup tables */
 	code %= elements();
@@ -1759,7 +1759,7 @@ void draw_scanline8(bitmap_ind16 &bitmap, INT32 destx, INT32 desty, INT32 length
 	DECLARE_NO_PRIORITY;
 
 	// palette lookup case
-	if (paldata != NULL)
+	if (paldata != nullptr)
 		DRAWSCANLINE_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 
 	// raw copy case
@@ -1772,7 +1772,7 @@ void draw_scanline8(bitmap_rgb32 &bitmap, INT32 destx, INT32 desty, INT32 length
 	DECLARE_NO_PRIORITY;
 
 	// palette lookup case
-	if (paldata != NULL)
+	if (paldata != nullptr)
 		DRAWSCANLINE_CORE(UINT32, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 
 	// raw copy case
@@ -1791,7 +1791,7 @@ void draw_scanline16(bitmap_ind16 &bitmap, INT32 destx, INT32 desty, INT32 lengt
 	DECLARE_NO_PRIORITY;
 
 	// palette lookup case
-	if (paldata != NULL)
+	if (paldata != nullptr)
 		DRAWSCANLINE_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 
 	// raw copy case
@@ -1804,7 +1804,7 @@ void draw_scanline16(bitmap_rgb32 &bitmap, INT32 destx, INT32 desty, INT32 lengt
 	DECLARE_NO_PRIORITY;
 
 	// palette lookup case
-	if (paldata != NULL)
+	if (paldata != nullptr)
 		DRAWSCANLINE_CORE(UINT32, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 
 	// raw copy case
@@ -1823,7 +1823,7 @@ void draw_scanline32(bitmap_ind16 &bitmap, INT32 destx, INT32 desty, INT32 lengt
 	DECLARE_NO_PRIORITY;
 
 	// palette lookup case
-	if (paldata != NULL)
+	if (paldata != nullptr)
 		DRAWSCANLINE_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 
 	// raw copy case
@@ -1836,7 +1836,7 @@ void draw_scanline32(bitmap_rgb32 &bitmap, INT32 destx, INT32 desty, INT32 lengt
 	DECLARE_NO_PRIORITY;
 
 	// palette lookup case
-	if (paldata != NULL)
+	if (paldata != nullptr)
 		DRAWSCANLINE_CORE(UINT32, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 
 	// raw copy case
@@ -1986,10 +1986,10 @@ static inline void copyscrollbitmap_trans_common(_BitmapClass &dest, _BitmapClas
 	if (numrows == 0 && numcols == 0)
 		return copybitmap_trans(dest, src, 0, 0, 0, 0, cliprect, trans_pen);
 
-	assert(numrows != 0 || rowscroll == NULL);
-	assert(numrows == 0 || rowscroll != NULL);
-	assert(numcols != 0 || colscroll == NULL);
-	assert(numcols == 0 || colscroll != NULL);
+	assert(numrows != 0 || rowscroll == nullptr);
+	assert(numrows == 0 || rowscroll != nullptr);
+	assert(numcols != 0 || colscroll == nullptr);
+	assert(numcols == 0 || colscroll != nullptr);
 
 	// fully scrolling X,Y playfield
 	if (numrows <= 1 && numcols <= 1)

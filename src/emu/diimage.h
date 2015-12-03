@@ -73,7 +73,7 @@ class image_device_format
 
 public:
 	image_device_format(const char *name, const char *description, const char *extensions, const char *optspec)
-		: m_next(NULL),
+		: m_next(nullptr),
 			m_name(name),
 			m_description(description),
 			m_extensions(extensions),
@@ -149,7 +149,7 @@ public:
 	virtual bool call_create(int format_type, option_resolution *format_options) { return FALSE; }
 	virtual void call_unload() { }
 	virtual void call_display() { }
-	virtual device_image_partialhash_func get_partial_hash() const { return NULL; }
+	virtual device_image_partialhash_func get_partial_hash() const { return nullptr; }
 	virtual bool core_opens_image_file() const { return TRUE; }
 	virtual iodevice_t image_type()  const = 0;
 	virtual bool is_readable()  const = 0;
@@ -157,7 +157,7 @@ public:
 	virtual bool is_creatable() const = 0;
 	virtual bool must_be_loaded() const = 0;
 	virtual bool is_reset_on_load() const = 0;
-	virtual const char *image_interface() const { return NULL; }
+	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const = 0;
 	virtual const option_guide *create_option_guide() const = 0;
 
@@ -172,10 +172,10 @@ public:
 	void message(const char *format, ...) ATTR_PRINTF(2,3);
 
 	bool exists() { return !m_image_name.empty(); }
-	const char *filename() { if (m_image_name.empty()) return NULL; else return m_image_name.c_str(); }
-	const char *basename() { if (m_basename.empty()) return NULL; else return m_basename.c_str(); }
-	const char *basename_noext()  { if (m_basename_noext.empty()) return NULL; else return m_basename_noext.c_str(); }
-	const char *filetype()  { if (m_filetype.empty()) return NULL; else return m_filetype.c_str(); }
+	const char *filename() { if (m_image_name.empty()) return nullptr; else return m_image_name.c_str(); }
+	const char *basename() { if (m_basename.empty()) return nullptr; else return m_basename.c_str(); }
+	const char *basename_noext()  { if (m_basename_noext.empty()) return nullptr; else return m_basename_noext.c_str(); }
+	const char *filetype()  { if (m_filetype.empty()) return nullptr; else return m_filetype.c_str(); }
 	core_file *image_core_file() { return m_file; }
 	UINT64 length() { check_for_file(); return core_fsize(m_file); }
 	bool is_readonly() { return m_readonly; }
@@ -248,14 +248,14 @@ protected:
 
 	void clear_error();
 
-	void check_for_file() { assert_always(m_file != NULL, "Illegal operation on unmounted image"); }
+	void check_for_file() { assert_always(m_file != nullptr, "Illegal operation on unmounted image"); }
 
 	void setup_working_directory();
 	bool try_change_working_directory(const char *subdir);
 
 	void run_hash(void (*partialhash)(hash_collection &, const unsigned char *, unsigned long, const char *), hash_collection &hashes, const char *types);
 	void image_checkhash();
-	void update_names(const device_type device_type = NULL, const char *inst = NULL, const char *brief = NULL);
+	void update_names(const device_type device_type = nullptr, const char *inst = nullptr, const char *brief = nullptr);
 
 	software_part *find_software_item(const char *path, bool restrict_to_interface);
 	bool load_software_part(const char *path, software_part *&swpart);

@@ -77,7 +77,7 @@ void ui_menu_tape_control::populate()
 					tapeflags |= MENU_FLAG_RIGHT_ARROW;
 			}
 
-			get_time_string(timepos, current_device(), NULL, NULL);
+			get_time_string(timepos, current_device(), nullptr, nullptr);
 			state = current_device()->get_state();
 			item_append(
 						(state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED
@@ -91,19 +91,19 @@ void ui_menu_tape_control::populate()
 						TAPECMD_SLIDER);
 
 			// pause or stop
-			item_append("Pause/Stop", NULL, 0, TAPECMD_STOP);
+			item_append("Pause/Stop", nullptr, 0, TAPECMD_STOP);
 
 			// play
-			item_append("Play", NULL, 0, TAPECMD_PLAY);
+			item_append("Play", nullptr, 0, TAPECMD_PLAY);
 
 			// record
-			item_append("Record", NULL, 0, TAPECMD_RECORD);
+			item_append("Record", nullptr, 0, TAPECMD_RECORD);
 
 			// rewind
-			item_append("Rewind", NULL, 0, TAPECMD_REWIND);
+			item_append("Rewind", nullptr, 0, TAPECMD_REWIND);
 
 			// fast forward
-			item_append("Fast Forward", NULL, 0, TAPECMD_FAST_FORWARD);
+			item_append("Fast Forward", nullptr, 0, TAPECMD_FAST_FORWARD);
 		}
 	}
 }
@@ -121,7 +121,7 @@ void ui_menu_tape_control::handle()
 
 	// process the menu
 	const ui_menu_event *event = process(UI_MENU_PROCESS_LR_REPEAT);
-	if (event != NULL)
+	if (event != nullptr)
 	{
 		switch(event->iptkey)
 		{
@@ -175,8 +175,8 @@ void ui_menu_tape_control::get_time_string(std::string &dest, cassette_image_dev
 	else
 		strprintf(dest, "%04d/%04d", 0, (int)t1);
 
-	if (curpos != NULL)
+	if (curpos != nullptr)
 		*curpos = t0;
-	if (endpos != NULL)
+	if (endpos != nullptr)
 		*endpos = t1;
 }

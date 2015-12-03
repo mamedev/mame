@@ -110,7 +110,7 @@ static void debugger_exit(running_machine &machine)
 	machine_entry **entryptr;
 
 	/* remove this machine from the list; it came down cleanly */
-	for (entryptr = &machine_list; *entryptr != NULL; entryptr = &(*entryptr)->next)
+	for (entryptr = &machine_list; *entryptr != nullptr; entryptr = &(*entryptr)->next)
 		if ((*entryptr)->machine == &machine)
 		{
 			machine_entry *deleteme = *entryptr;
@@ -130,7 +130,7 @@ static void debugger_exit(running_machine &machine)
 void debugger_flush_all_traces_on_abnormal_exit(void)
 {
 	/* clear out the machine list and flush traces on each one */
-	while (machine_list != NULL)
+	while (machine_list != nullptr)
 	{
 		machine_entry *deleteme = machine_list;
 		debug_cpu_flush_traces(*deleteme->machine);

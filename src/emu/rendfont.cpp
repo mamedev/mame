@@ -33,7 +33,7 @@ inline const char *next_line(const char *ptr)
 
 	// if we hit the end, return NULL
 	if (*ptr == 0)
-		return NULL;
+		return nullptr;
 
 	// eat the trailing linefeed if present
 	if (*++ptr == 10)
@@ -83,15 +83,15 @@ render_font::render_font(render_manager &manager, const char *filename)
 		m_yoffs(0),
 		m_scale(1.0f),
 		m_rawsize(0),
-		m_osdfont(NULL)
+		m_osdfont(nullptr)
 {
 	memset(m_glyphs, 0, sizeof(m_glyphs));
 
 	// if this is an OSD font, we're done
-	if (filename != NULL)
+	if (filename != nullptr)
 	{
 		m_osdfont = manager.machine().osd().font_alloc();
-		if (m_osdfont != NULL)
+		if (m_osdfont != nullptr)
 		{
 			if (m_osdfont->open(manager.machine().options().font_path(), filename, m_height))
 			{
@@ -100,16 +100,16 @@ render_font::render_font(render_manager &manager, const char *filename)
 				return;
 			}
 			global_free(m_osdfont);
-			m_osdfont = NULL;
+			m_osdfont = nullptr;
 		}
 	}
 
 	// if the filename is 'default' default to 'ui.bdf' for backwards compatibility
-	if (filename != NULL && core_stricmp(filename, "default") == 0)
+	if (filename != nullptr && core_stricmp(filename, "default") == 0)
 		filename = "ui.bdf";
 
 	// attempt to load the cached version of the font first
-	if (filename != NULL && load_cached_bdf(filename))
+	if (filename != nullptr && load_cached_bdf(filename))
 		return;
 
 	// load the raw data instead
@@ -127,19 +127,19 @@ render_font::render_font(render_manager &manager, const char *filename)
 render_font::~render_font()
 {
 	// free all the subtables
-	for (int tablenum = 0; tablenum < 256; tablenum++)
-		if (m_glyphs[tablenum])
+	for (auto & elem : m_glyphs)
+		if (elem)
 		{
 			for (unsigned int charnum = 0; charnum < 256; charnum++)
 			{
-				glyph &gl = m_glyphs[tablenum][charnum];
+				glyph &gl = elem[charnum];
 				m_manager.texture_free(gl.texture);
 			}
-			delete[] m_glyphs[tablenum];
+			delete[] elem;
 		}
 
 	// release the OSD font
-	if (m_osdfont != NULL)
+	if (m_osdfont != nullptr)
 	{
 		m_osdfont->close();
 		global_free(m_osdfont);
@@ -178,7 +178,7 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 	else
 	{
 		// punt if nothing there
-		if (gl.bmwidth == 0 || gl.bmheight == 0 || gl.rawdata == NULL)
+		if (gl.bmwidth == 0 || gl.bmheight == 0 || gl.rawdata == nullptr)
 			return;
 
 		// allocate a new bitmap of the size we need
@@ -191,7 +191,7 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 		for (int y = 0; y < gl.bmheight; y++)
 		{
 			int desty = y + m_height + m_yoffs - gl.yoffs - gl.bmheight;
-			UINT32 *dest = (desty >= 0 && desty < m_height) ? &gl.bitmap.pix32(desty) : NULL;
+			UINT32 *dest = (desty >= 0 && desty < m_height) ? &gl.bitmap.pix32(desty) : nullptr;
 
 			// text format
 			if (m_format == FF_TEXT)
@@ -214,7 +214,7 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 					}
 
 					// expand the four bits
-					if (dest != NULL)
+					if (dest != nullptr)
 					{
 						*dest++ = (bits & 8) ? rgb_t(0xff,0xff,0xff,0xff) : rgb_t(0x00,0xff,0xff,0xff);
 						*dest++ = (bits & 4) ? rgb_t(0xff,0xff,0xff,0xff) : rgb_t(0x00,0xff,0xff,0xff);
@@ -234,7 +234,7 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 				{
 					if (accumbit == 7)
 						accum = *ptr++;
-					if (dest != NULL)
+					if (dest != nullptr)
 						*dest++ = (accum & (1 << accumbit)) ? rgb_t(0xff,0xff,0xff,0xff) : rgb_t(0x00,0xff,0xff,0xff);
 					accumbit = (accumbit - 1) & 7;
 				}
@@ -296,7 +296,7 @@ void render_font::get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height
 		return;
 
 	// if no texture, fill the target
-	if (gl.texture == NULL)
+	if (gl.texture == nullptr)
 	{
 		dest.fill(0);
 		return;
@@ -304,7 +304,7 @@ void render_font::get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height
 
 	// scale the font
 	bitmap_argb32 tempbitmap(&dest.pix(0), bounds.width(), bounds.height(), dest.rowpixels());
-	render_texture::hq_scale(tempbitmap, gl.bitmap, gl.bitmap.cliprect(), NULL);
+	render_texture::hq_scale(tempbitmap, gl.bitmap, gl.bitmap.cliprect(), nullptr);
 }
 
 
@@ -450,7 +450,7 @@ bool render_font::load_bdf()
 
 	// first find the FONTBOUNDINGBOX tag
 	const char *ptr;
-	for (ptr = &m_rawdata[0]; ptr != NULL; ptr = next_line(ptr))
+	for (ptr = &m_rawdata[0]; ptr != nullptr; ptr = next_line(ptr))
 	{
 		// we only care about a tiny few fields
 		if (strncmp(ptr, "FONTBOUNDINGBOX ", 16) == 0)
@@ -467,7 +467,7 @@ bool render_font::load_bdf()
 
 	// now scan for characters
 	int charcount = 0;
-	for ( ; ptr != NULL; ptr = next_line(ptr))
+	for ( ; ptr != nullptr; ptr = next_line(ptr))
 	{
 		// stop at ENDFONT
 		if (strncmp(ptr, "ENDFONT", 7) == 0)
@@ -477,12 +477,12 @@ bool render_font::load_bdf()
 		if (strncmp(ptr, "STARTCHAR ", 10) == 0)
 		{
 			int bmwidth = -1, bmheight = -1, xoffs = -1, yoffs = -1;
-			const char *rawdata = NULL;
+			const char *rawdata = nullptr;
 			int charnum = -1;
 			int width = -1;
 
 			// scan for interesting per-character tags
-			for ( ; ptr != NULL; ptr = next_line(ptr))
+			for ( ; ptr != nullptr; ptr = next_line(ptr))
 			{
 				// ENCODING tells us which character
 				if (strncmp(ptr, "ENCODING ", 9) == 0)
@@ -510,13 +510,13 @@ bool render_font::load_bdf()
 				else if (strncmp(ptr, "BITMAP", 6) == 0)
 				{
 					// stash the raw pointer and scan for the end of the character
-					for (rawdata = ptr = next_line(ptr); ptr != NULL && strncmp(ptr, "ENDCHAR", 7) != 0; ptr = next_line(ptr)) { }
+					for (rawdata = ptr = next_line(ptr); ptr != nullptr && strncmp(ptr, "ENDCHAR", 7) != 0; ptr = next_line(ptr)) { }
 					break;
 				}
 			}
 
 			// if we have everything, allocate a new character
-			if (charnum >= 0 && charnum < 65536 && rawdata != NULL && bmwidth >= 0 && bmheight >= 0)
+			if (charnum >= 0 && charnum < 65536 && rawdata != nullptr && bmwidth >= 0 && bmheight >= 0)
 			{
 				// if we don't have a subtable yet, make one
 				if (!m_glyphs[charnum / 256])
@@ -705,10 +705,10 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 					for (int y = 0; y < gl.bmheight; y++)
 					{
 						int desty = y + m_height + m_yoffs - gl.yoffs - gl.bmheight;
-						const UINT32 *src = (desty >= 0 && desty < m_height) ? &gl.bitmap.pix32(desty) : NULL;
+						const UINT32 *src = (desty >= 0 && desty < m_height) ? &gl.bitmap.pix32(desty) : nullptr;
 						for (int x = 0; x < gl.bmwidth; x++)
 						{
-							if (src != NULL && rgb_t(src[x]).a() != 0)
+							if (src != nullptr && rgb_t(src[x]).a() != 0)
 								accum |= 1 << accbit;
 							if (accbit-- == 0)
 							{
@@ -731,7 +731,7 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 					// free the bitmap and texture
 					m_manager.texture_free(gl.texture);
 					gl.bitmap.reset();
-					gl.texture = NULL;
+					gl.texture = nullptr;
 				}
 
 				// compute the table entry

@@ -16,6 +16,7 @@
 #include "osdcore.h"
 #include "coretmpl.h"
 #include <string>
+#include <utility>
 #ifdef MAME_DEBUG
 #include "eminline.h"
 #endif
@@ -61,10 +62,10 @@ public:
 	public:
 		// construction/destruction
 		entry_t(const char *tag, UINT32 fullhash, _ElementType object)
-			: m_next(NULL),
+			: m_next(nullptr),
 				m_fullhash(fullhash),
 				m_tag(tag),
-				m_object(object) { }
+				m_object(std::move(object)) { }
 
 		// accessors
 		const std::string &tag() const { return m_tag; }
@@ -101,9 +102,9 @@ public:
 	// empty the list
 	void reset()
 	{
-		for (UINT32 hashindex = 0; hashindex < ARRAY_LENGTH(m_table); hashindex++)
-			while (m_table[hashindex] != NULL)
-				remove_common(&m_table[hashindex]);
+		for (auto & elem : m_table)
+			while (elem != nullptr)
+				remove_common(&elem);
 	}
 
 	// add/remove
@@ -114,7 +115,7 @@ public:
 	void remove(const char *tag)
 	{
 		UINT32 fullhash = hash(tag);
-		for (entry_t **entryptr = &m_table[fullhash % ARRAY_LENGTH(m_table)]; *entryptr != NULL; entryptr = &(*entryptr)->m_next)
+		for (entry_t **entryptr = &m_table[fullhash % ARRAY_LENGTH(m_table)]; *entryptr != nullptr; entryptr = &(*entryptr)->m_next)
 			if ((*entryptr)->fullhash() == fullhash && (*entryptr)->tag() == tag)
 				return remove_common(entryptr);
 	}
@@ -122,8 +123,8 @@ public:
 	// remove by object
 	void remove(_ElementType object)
 	{
-		for (UINT32 hashindex = 0; hashindex < ARRAY_LENGTH(m_table); hashindex++)
-			for (entry_t **entryptr = &m_table[hashindex]; *entryptr != NULL; entryptr = &(*entryptr)->m_next)
+		for (auto & elem : m_table)
+			for (entry_t **entryptr = &elem; *entryptr != nullptr; entryptr = &(*entryptr)->m_next)
 				if ((*entryptr)->object() == object)
 					return remove_common(entryptr);
 	}
@@ -138,10 +139,10 @@ public:
 		if (g_tagmap_counter_enabled)
 			atomic_increment32(&g_tagmap_finds);
 #endif
-		for (entry_t *entry = m_table[fullhash % ARRAY_LENGTH(m_table)]; entry != NULL; entry = entry->next())
+		for (entry_t *entry = m_table[fullhash % ARRAY_LENGTH(m_table)]; entry != nullptr; entry = entry->next())
 			if (entry->fullhash() == fullhash && entry->tag() == tag)
 				return entry->object();
-		return _ElementType(NULL);
+		return _ElementType(nullptr);
 	}
 
 	// find by tag without checking anything but the hash
@@ -152,10 +153,10 @@ public:
 			atomic_increment32(&g_tagmap_finds);
 #endif
 		UINT32 fullhash = hash(tag);
-		for (entry_t *entry = m_table[fullhash % ARRAY_LENGTH(m_table)]; entry != NULL; entry = entry->next())
+		for (entry_t *entry = m_table[fullhash % ARRAY_LENGTH(m_table)]; entry != nullptr; entry = entry->next())
 			if (entry->fullhash() == fullhash)
 				return entry->object();
-		return NULL;
+		return nullptr;
 	}
 
 	// return first object in the table
@@ -288,7 +289,7 @@ public:
 
 	// operations by tag
 	_ElementType &replace_and_remove(const char *tag, _ElementType &object) { _ElementType *existing = find(tag); return (existing == NULL) ? append(tag, object) : replace_and_remove(tag, object, *existing); }
-	void remove(const char *tag) { _ElementType *object = find(tag); if (object != NULL) remove(*object); }
+	void remove(const char *tag) { _ElementType *object = find(tag); if (object != nullptr) remove(*object); }
 	_ElementType *find(const char *tag) const { return m_map.find_hash_only(tag); }
 	int indexof(const char *tag) const { _ElementType *object = find(tag); return (object != NULL) ? m_list.indexof(*object) : NULL; }
 
@@ -316,7 +317,7 @@ tagmap_error tagmap_t<_ElementType, _HashSize>::add_common(const char *tag, _Ele
 	UINT32 hashindex = fullhash % ARRAY_LENGTH(m_table);
 
 	// first make sure we don't have a duplicate
-	for (entry_t *entry = m_table[hashindex]; entry != NULL; entry = entry->next())
+	for (entry_t *entry = m_table[hashindex]; entry != nullptr; entry = entry->next())
 		if (entry->fullhash() == fullhash)
 			if (unique_hash || entry->tag() == tag)
 			{
@@ -326,7 +327,7 @@ tagmap_error tagmap_t<_ElementType, _HashSize>::add_common(const char *tag, _Ele
 			}
 
 	// now allocate a new entry and add to the head of the list
-	entry_t *entry = global_alloc(entry_t(tag, fullhash, object));
+	auto                 entry = global_alloc(entry_t(tag, fullhash, object));
 	entry->m_next = m_table[hashindex];
 	m_table[hashindex] = entry;
 	return TMERR_NONE;

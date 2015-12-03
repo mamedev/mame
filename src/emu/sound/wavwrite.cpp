@@ -20,14 +20,14 @@ wav_file *wav_open(const char *filename, int sample_rate, int channels)
 	/* allocate memory for the wav struct */
 	wav = (wav_file *) global_alloc(wav_file);
 	if (!wav)
-		return NULL;
+		return nullptr;
 
 	/* create the file */
 	wav->file = fopen(filename, "wb");
 	if (!wav->file)
 	{
 		global_free(wav);
-		return NULL;
+		return nullptr;
 	}
 
 	/* write the 'RIFF' header */

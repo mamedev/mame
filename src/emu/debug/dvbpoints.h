@@ -40,8 +40,8 @@ public:
 
 protected:
 	// view overrides
-	virtual void view_update();
-	virtual void view_click(const int button, const debug_view_xy& pos);
+	virtual void view_update() override;
+	virtual void view_click(const int button, const debug_view_xy& pos) override;
 
 private:
 	// internal helpers

@@ -563,7 +563,7 @@ int huffman_context_base::build_tree(UINT32 totaldata, UINT32 totalweight)
 
 		// create new node
 		node_t &newnode = m_huffnode[nextalloc++];
-		newnode.m_parent = NULL;
+		newnode.m_parent = nullptr;
 		node0.m_parent = node1.m_parent = &newnode;
 		newnode.m_weight = node0.m_weight + node1.m_weight;
 
@@ -591,7 +591,7 @@ int huffman_context_base::build_tree(UINT32 totaldata, UINT32 totalweight)
 		if (node.m_weight > 0)
 		{
 			// determine the number of bits for this node
-			for (node_t *curnode = &node; curnode->m_parent != NULL; curnode = curnode->m_parent)
+			for (node_t *curnode = &node; curnode->m_parent != nullptr; curnode = curnode->m_parent)
 				node.m_numbits++;
 			if (node.m_numbits == 0)
 				node.m_numbits = 1;

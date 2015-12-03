@@ -309,7 +309,7 @@ class raw_to_rgb_converter
 
 public:
 	// constructor
-	raw_to_rgb_converter(int bytes_per_entry = 0, raw_to_rgb_func func = NULL)
+	raw_to_rgb_converter(int bytes_per_entry = 0, raw_to_rgb_func func = nullptr)
 		: m_bytes_per_entry(bytes_per_entry),
 			m_func(func) { }
 
@@ -458,11 +458,11 @@ public:
 	void update() { if (!m_init.isnull()) m_init(*this); }
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_pre_save();
-	virtual void device_post_load();
-	virtual void device_stop();
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_pre_save() override;
+	virtual void device_post_load() override;
+	virtual void device_stop() override;
 
 	void allocate_palette();
 	void allocate_color_tables();

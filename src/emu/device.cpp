@@ -31,12 +31,12 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 		m_searchpath(shortname),
 		m_source(source),
 		m_owner(owner),
-		m_next(NULL),
+		m_next(nullptr),
 
-		m_interface_list(NULL),
-		m_execute(NULL),
-		m_memory(NULL),
-		m_state(NULL),
+		m_interface_list(nullptr),
+		m_execute(nullptr),
+		m_memory(nullptr),
+		m_state(nullptr),
 
 		m_configured_clock(clock),
 		m_unscaled_clock(clock),
@@ -44,21 +44,21 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 		m_clock_scale(1.0),
 		m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock)),
 
-		m_region(NULL),
+		m_region(nullptr),
 		m_machine_config(mconfig),
-		m_static_config(NULL),
-		m_input_defaults(NULL),
+		m_static_config(nullptr),
+		m_input_defaults(nullptr),
 		m_default_bios_tag(""),
 
-		m_machine(NULL),
-		m_save(NULL),
+		m_machine(nullptr),
+		m_save(nullptr),
 		m_basetag(tag),
 		m_config_complete(false),
 		m_started(false),
-		m_auto_finder_list(NULL)
+		m_auto_finder_list(nullptr)
 {
-	if (owner != NULL)
-		m_tag.assign((owner->owner() == NULL) ? "" : owner->tag()).append(":").append(tag);
+	if (owner != nullptr)
+		m_tag.assign((owner->owner() == nullptr) ? "" : owner->tag()).append(":").append(tag);
 	else
 		m_tag.assign(":");
 	static_set_clock(*this, clock);
@@ -85,8 +85,8 @@ device_t::~device_t()
 memory_region *device_t::memregion(const char *_tag) const
 {
 	// safety first
-	if (this == NULL)
-		return NULL;
+	if (this == nullptr)
+		return nullptr;
 
 	// build a fully-qualified name and look it up
 	return machine().memory().region(subtag(_tag).c_str());
@@ -101,8 +101,8 @@ memory_region *device_t::memregion(const char *_tag) const
 memory_share *device_t::memshare(const char *_tag) const
 {
 	// safety first
-	if (this == NULL)
-		return NULL;
+	if (this == nullptr)
+		return nullptr;
 
 	// build a fully-qualified name and look it up
 	return machine().memory().shared(subtag(_tag).c_str());
@@ -117,8 +117,8 @@ memory_share *device_t::memshare(const char *_tag) const
 memory_bank *device_t::membank(const char *_tag) const
 {
 	// safety first
-	if (this == NULL)
-		return NULL;
+	if (this == nullptr)
+		return nullptr;
 
 	// build a fully-qualified name and look it up
 	return machine().memory().bank(subtag(_tag).c_str());
@@ -133,8 +133,8 @@ memory_bank *device_t::membank(const char *_tag) const
 ioport_port *device_t::ioport(const char *tag) const
 {
 	// safety first
-	if (this == NULL)
-		return NULL;
+	if (this == nullptr)
+		return nullptr;
 
 	// build a fully-qualified name and look it up
 	return machine().ioport().port(subtag(tag).c_str());
@@ -149,8 +149,8 @@ ioport_port *device_t::ioport(const char *tag) const
 std::string device_t::parameter(const char *tag) const
 {
 	// safety first
-	if (this == NULL)
-		return NULL;
+	if (this == nullptr)
+		return nullptr;
 
 	// build a fully-qualified name and look it up
 	return machine().parameters().lookup(subtag(tag));
@@ -167,7 +167,7 @@ void device_t::static_set_clock(device_t &device, UINT32 clock)
 	// derive the clock from our owner if requested
 	if ((clock & 0xff000000) == 0xff000000)
 	{
-		assert(device.m_owner != NULL);
+		assert(device.m_owner != nullptr);
 		clock = device.m_owner->m_configured_clock * ((clock >> 12) & 0xfff) / ((clock >> 0) & 0xfff);
 	}
 
@@ -184,7 +184,7 @@ void device_t::static_set_clock(device_t &device, UINT32 clock)
 void device_t::config_complete()
 {
 	// first notify the interfaces
-	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+	for (device_interface *intf = m_interface_list; intf != nullptr; intf = intf->interface_next())
 		intf->interface_config_complete();
 
 	// then notify the device itself
@@ -203,7 +203,7 @@ void device_t::config_complete()
 void device_t::validity_check(validity_checker &valid) const
 {
 	// validate via the interfaces
-	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+	for (device_interface *intf = m_interface_list; intf != nullptr; intf = intf->interface_next())
 		intf->interface_validity_check(valid);
 
 	// let the device itself validate
@@ -218,21 +218,21 @@ void device_t::validity_check(validity_checker &valid) const
 void device_t::reset()
 {
 	// let the interfaces do their pre-work
-	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+	for (device_interface *intf = m_interface_list; intf != nullptr; intf = intf->interface_next())
 		intf->interface_pre_reset();
 
 	// reset the device
 	device_reset();
 
 	// reset all child devices
-	for (device_t *child = m_subdevice_list.first(); child != NULL; child = child->next())
+	for (device_t *child = m_subdevice_list.first(); child != nullptr; child = child->next())
 		child->reset();
 
 	// now allow for some post-child reset action
 	device_reset_after_children();
 
 	// let the interfaces do their post-work
-	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+	for (device_interface *intf = m_interface_list; intf != nullptr; intf = intf->interface_next())
 		intf->interface_post_reset();
 }
 
@@ -335,7 +335,7 @@ void device_t::set_machine(running_machine &machine)
 bool device_t::findit(bool isvalidation) const
 {
 	bool allfound = true;
-	for (finder_base *autodev = m_auto_finder_list; autodev != NULL; autodev = autodev->m_next)
+	for (finder_base *autodev = m_auto_finder_list; autodev != nullptr; autodev = autodev->m_next)
 		allfound &= autodev->findit(isvalidation);
 	return allfound;
 }
@@ -354,7 +354,7 @@ void device_t::start()
 		throw emu_fatalerror("Missing some required objects, unable to proceed");
 
 	// let the interfaces do their pre-work
-	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+	for (device_interface *intf = m_interface_list; intf != nullptr; intf = intf->interface_next())
 		intf->interface_pre_start();
 
 	// remember the number of state registrations
@@ -375,7 +375,7 @@ void device_t::start()
 	}
 
 	// let the interfaces do their post-work
-	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+	for (device_interface *intf = m_interface_list; intf != nullptr; intf = intf->interface_next())
 		intf->interface_post_start();
 
 	// force an update of the clock
@@ -405,14 +405,14 @@ void device_t::start()
 void device_t::stop()
 {
 	// let the interfaces do their pre-work
-	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+	for (device_interface *intf = m_interface_list; intf != nullptr; intf = intf->interface_next())
 		intf->interface_pre_stop();
 
 	// stop the device
 	device_stop();
 
 	// let the interfaces do their post-work
-	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+	for (device_interface *intf = m_interface_list; intf != nullptr; intf = intf->interface_next())
 		intf->interface_post_stop();
 
 	// free any debugging info
@@ -420,7 +420,7 @@ void device_t::stop()
 
 	// we're now officially stopped, and the machine is off-limits
 	m_started = false;
-	m_machine = NULL;
+	m_machine = nullptr;
 }
 
 
@@ -431,7 +431,7 @@ void device_t::stop()
 void device_t::debug_setup()
 {
 	// notify the interface
-	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+	for (device_interface *intf = m_interface_list; intf != nullptr; intf = intf->interface_next())
 		intf->interface_debug_setup();
 
 	// notify the device
@@ -447,7 +447,7 @@ void device_t::debug_setup()
 void device_t::pre_save()
 {
 	// notify the interface
-	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+	for (device_interface *intf = m_interface_list; intf != nullptr; intf = intf->interface_next())
 		intf->interface_pre_save();
 
 	// notify the device
@@ -463,7 +463,7 @@ void device_t::pre_save()
 void device_t::post_load()
 {
 	// notify the interface
-	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+	for (device_interface *intf = m_interface_list; intf != nullptr; intf = intf->interface_next())
 		intf->interface_post_load();
 
 	// notify the device
@@ -479,7 +479,7 @@ void device_t::post_load()
 void device_t::notify_clock_changed()
 {
 	// first notify interfaces
-	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+	for (device_interface *intf = m_interface_list; intf != nullptr; intf = intf->interface_next())
 		intf->interface_clock_changed();
 
 	// then notify the device
@@ -518,7 +518,7 @@ void device_t::device_validity_check(validity_checker &valid) const
 const rom_entry *device_t::device_rom_region() const
 {
 	// none by default
-	return NULL;
+	return nullptr;
 }
 
 
@@ -531,7 +531,7 @@ const rom_entry *device_t::device_rom_region() const
 machine_config_constructor device_t::device_mconfig_additions() const
 {
 	// none by default
-	return NULL;
+	return nullptr;
 }
 
 
@@ -543,7 +543,7 @@ machine_config_constructor device_t::device_mconfig_additions() const
 ioport_constructor device_t::device_input_ports() const
 {
 	// none by default
-	return NULL;
+	return nullptr;
 }
 
 
@@ -660,16 +660,16 @@ device_t *device_t::subdevice_slow(const char *tag) const
 	// walk the device list to the final path
 	device_t *curdevice = &mconfig().root_device();
 	if (fulltag.length() > 1)
-		for (int start = 1, end = fulltag.find_first_of(':', start); start != 0 && curdevice != NULL; start = end + 1, end = fulltag.find_first_of(':', start))
+		for (int start = 1, end = fulltag.find_first_of(':', start); start != 0 && curdevice != nullptr; start = end + 1, end = fulltag.find_first_of(':', start))
 		{
 			std::string part(fulltag, start, (end == -1) ? -1 : end - start);
-			for (curdevice = curdevice->m_subdevice_list.first(); curdevice != NULL; curdevice = curdevice->next())
+			for (curdevice = curdevice->m_subdevice_list.first(); curdevice != nullptr; curdevice = curdevice->next())
 				if (part.compare(curdevice->m_basetag)==0)
 					break;
 		}
 
 	// if we got a match, add to the fast map
-	if (curdevice != NULL)
+	if (curdevice != nullptr)
 		m_device_map.add(tag, curdevice);
 	return curdevice;
 }
@@ -700,7 +700,7 @@ std::string device_t::subtag(const char *tag) const
 
 	// iterate over the tag, look for special path characters to resolve
 	const char *caret;
-	while ((caret = strchr(tag, '^')) != NULL)
+	while ((caret = strchr(tag, '^')) != nullptr)
 	{
 		// copy everything up to there
 		result.append(tag, caret - tag);
@@ -744,8 +744,8 @@ device_t *device_t::add_subdevice(device_type type, const char *tag, UINT32 cloc
 
 	// apply any machine configuration owned by the device now
 	machine_config_constructor additions = device->machine_config_additions();
-	if (additions != NULL)
-		(*additions)(const_cast<machine_config &>(mconfig()), device, NULL);
+	if (additions != nullptr)
+		(*additions)(const_cast<machine_config &>(mconfig()), device, nullptr);
 	return device;
 }
 
@@ -759,7 +759,7 @@ device_t *device_t::replace_subdevice(device_t &old, device_type type, const cha
 {
 	// iterate over all devices and remove any references to the old device
 	device_iterator iter(mconfig().root_device());
-	for (device_t *scan = iter.first(); scan != NULL; scan = iter.next())
+	for (device_t *scan = iter.first(); scan != nullptr; scan = iter.next())
 		scan->m_device_map.reset(); //remove(&old);
 
 	// create a new device, and substitute it for the old one
@@ -768,8 +768,8 @@ device_t *device_t::replace_subdevice(device_t &old, device_type type, const cha
 
 	// apply any machine configuration owned by the device now
 	machine_config_constructor additions = device->machine_config_additions();
-	if (additions != NULL)
-		(*additions)(const_cast<machine_config &>(mconfig()), device, NULL);
+	if (additions != nullptr)
+		(*additions)(const_cast<machine_config &>(mconfig()), device, nullptr);
 	return device;
 }
 
@@ -782,7 +782,7 @@ void device_t::remove_subdevice(device_t &device)
 {
 	// iterate over all devices and remove any references
 	device_iterator iter(mconfig().root_device());
-	for (device_t *scan = iter.first(); scan != NULL; scan = iter.next())
+	for (device_t *scan = iter.first(); scan != nullptr; scan = iter.next())
 		scan->m_device_map.reset(); //remove(&device);
 
 	// remove from our list
@@ -806,7 +806,7 @@ finder_base *device_t::register_auto_finder(finder_base &autodev)
 void device_t::popmessage(const char *format, ...) const
 {
 	// if the format is NULL, it is a signal to clear the popmessage
-	if (format == NULL)
+	if (format == nullptr)
 		machine().ui().popup_time(0, " ");
 
 	// otherwise, generate the buffer and call the UI to display the message
@@ -821,7 +821,7 @@ void device_t::popmessage(const char *format, ...) const
 		va_end(arg);
 
 		// pop it in the UI
-		if (m_machine!=NULL) machine().ui().popup_time(temp.length() / 40 + 2, "%s", temp.c_str());
+		if (m_machine!=nullptr) machine().ui().popup_time(temp.length() / 40 + 2, "%s", temp.c_str());
 	}
 }
 
@@ -836,7 +836,7 @@ void device_t::vlogerror(const char *format, va_list args) const
 {
 	std::string fmt("[");
 	fmt += tag() + std::string("] ") + format;
-	if (m_machine!=NULL) machine().vlogerror(fmt.c_str(), args);
+	if (m_machine!=nullptr) machine().vlogerror(fmt.c_str(), args);
 }
 
 //**************************************************************************
@@ -848,12 +848,12 @@ void device_t::vlogerror(const char *format, va_list args) const
 //-------------------------------------------------
 
 device_interface::device_interface(device_t &device, const char *type)
-	: m_interface_next(NULL),
+	: m_interface_next(nullptr),
 		m_device(device),
 		m_type(type)
 {
 	device_interface **tailptr;
-	for (tailptr = &device.m_interface_list; *tailptr != NULL; tailptr = &(*tailptr)->m_interface_next) { }
+	for (tailptr = &device.m_interface_list; *tailptr != nullptr; tailptr = &(*tailptr)->m_interface_next) { }
 	*tailptr = this;
 }
 

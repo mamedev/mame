@@ -13,7 +13,7 @@
 
 device_pty_interface::device_pty_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "pty"),
-		m_pty_master(NULL),
+		m_pty_master(nullptr),
 		m_slave_name(),
 		m_opened(false)
 {
@@ -33,7 +33,7 @@ bool device_pty_interface::open(void)
 			m_slave_name.assign(buffer);
 		} else {
 			m_opened = false;
-			m_pty_master = NULL;
+			m_pty_master = nullptr;
 		}
 	}
 

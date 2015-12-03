@@ -76,12 +76,12 @@ public:
 	// construction/destruction
 	object_finder_base(device_t &base, const char *tag)
 		: finder_base(base, tag),
-			m_target(NULL) { }
+			m_target(nullptr) { }
 
 	// operators to make use transparent
 	operator _ObjectClass *() const { return m_target; }
 
-	virtual _ObjectClass *operator->() const { assert(m_target != NULL); return m_target; }
+	virtual _ObjectClass *operator->() const { assert(m_target != nullptr); return m_target; }
 
 	// getter for explicit fetching
 	_ObjectClass *target() const { return m_target; }
@@ -107,18 +107,18 @@ public:
 		: object_finder_base<_DeviceClass>(base, tag) { }
 
 	// make reference use transparent as well
-	operator _DeviceClass &() { assert(object_finder_base<_DeviceClass>::m_target != NULL); return *object_finder_base<_DeviceClass>::m_target; }
+	operator _DeviceClass &() { assert(object_finder_base<_DeviceClass>::m_target != nullptr); return *object_finder_base<_DeviceClass>::m_target; }
 
 	// finder
 	virtual bool findit(bool isvalidation = false)
 	{
 		device_t *device = this->m_base.subdevice(this->m_tag);
 		this->m_target = dynamic_cast<_DeviceClass *>(device);
-		if (device != NULL && this->m_target == NULL)
+		if (device != nullptr && this->m_target == nullptr)
 		{
 			this->printf_warning("Device '%s' found but is of incorrect type (actual type is %s)\n", this->m_tag, device->name());
 		}
-		return this->report_missing(this->m_target != NULL, "device", _Required);
+		return this->report_missing(this->m_target != nullptr, "device", _Required);
 	}
 };
 
@@ -154,11 +154,11 @@ public:
 	operator memory_region &() { assert(object_finder_base<memory_region>::m_target != NULL); return *object_finder_base<memory_region>::m_target; }
 
 	// finder
-	virtual bool findit(bool isvalidation = false)
+	virtual bool findit(bool isvalidation = false) override
 	{
 		if (isvalidation) return true;
 		m_target = m_base.memregion(m_tag);
-		return this->report_missing(m_target != NULL, "memory region", _Required);
+		return this->report_missing(m_target != nullptr, "memory region", _Required);
 	}
 };
 
@@ -192,11 +192,11 @@ public:
 	operator memory_bank &() { assert(object_finder_base<memory_bank>::m_target != NULL); return *object_finder_base<memory_bank>::m_target; }
 
 	// finder
-	virtual bool findit(bool isvalidation = false)
+	virtual bool findit(bool isvalidation = false) override
 	{
 		if (isvalidation) return true;
 		m_target = m_base.membank(m_tag);
-		return this->report_missing(m_target != NULL, "memory bank", _Required);
+		return this->report_missing(m_target != nullptr, "memory bank", _Required);
 	}
 };
 
@@ -230,14 +230,14 @@ public:
 	operator ioport_port &() { assert(object_finder_base<ioport_port>::m_target != NULL); return *object_finder_base<ioport_port>::m_target; }
 
 	// allow dereference even when target is NULL so read_safe() can be used
-	ioport_port *operator->() const { return object_finder_base<ioport_port>::m_target; }
+	ioport_port *operator->() const override { return object_finder_base<ioport_port>::m_target; }
 
 	// finder
-	virtual bool findit(bool isvalidation = false)
+	virtual bool findit(bool isvalidation = false) override
 	{
 		if (isvalidation) return true;
 		m_target = m_base.ioport(m_tag);
-		return this->report_missing(m_target != NULL, "I/O port", _Required);
+		return this->report_missing(m_target != nullptr, "I/O port", _Required);
 	}
 };
 
@@ -400,7 +400,7 @@ public:
 	{
 		if (isvalidation) return true;
 		this->m_target = reinterpret_cast<_PointerType *>(this->find_memshare(m_width, m_bytes, _Required));
-		return this->report_missing(this->m_target != NULL, "shared pointer", _Required);
+		return this->report_missing(this->m_target != nullptr, "shared pointer", _Required);
 	}
 
 protected:

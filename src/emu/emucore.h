@@ -321,7 +321,7 @@ inline _Dest downcast(_Source *src)
 	try {
 		if (dynamic_cast<_Dest>(src) != src)
 		{
-			if (dynamic_cast<const device_t *>(src) != NULL)
+			if (dynamic_cast<const device_t *>(src) != nullptr)
 				report_bad_device_cast(dynamic_cast<const device_t *>(src), typeid(src), typeid(_Dest));
 			else
 				report_bad_cast(typeid(src), typeid(_Dest));
@@ -342,7 +342,7 @@ inline _Dest downcast(_Source &src)
 	try {
 		if (&dynamic_cast<_Dest>(src) != &src)
 		{
-			if (dynamic_cast<const device_t *>(&src) != NULL)
+			if (dynamic_cast<const device_t *>(&src) != nullptr)
 				report_bad_device_cast(dynamic_cast<const device_t *>(&src), typeid(src), typeid(_Dest));
 			else
 				report_bad_cast(typeid(src), typeid(_Dest));

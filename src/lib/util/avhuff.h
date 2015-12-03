@@ -57,10 +57,10 @@ class avhuff_decompress_config
 public:
 	avhuff_decompress_config()
 		: maxsamples(0),
-			actsamples(NULL),
+			actsamples(nullptr),
 			maxmetalength(0),
-			actmetalength(NULL),
-			metadata(NULL)
+			actmetalength(nullptr),
+			metadata(nullptr)
 	{
 		memset(audio, 0, sizeof(audio));
 	}
@@ -90,7 +90,7 @@ public:
 	// static helpers
 	static UINT32 raw_data_size(const UINT8 *data);
 	static UINT32 raw_data_size(UINT32 width, UINT32 height, UINT8 channels, UINT32 numsamples, UINT32 metadatasize = 0) { return 12 + channels * numsamples * 2 + width * height * 2; }
-	static avhuff_error assemble_data(dynamic_buffer &buffer, bitmap_yuy16 &bitmap, UINT8 channels, UINT32 numsamples, INT16 **samples, UINT8 *metadata = NULL, UINT32 metadatasize = 0);
+	static avhuff_error assemble_data(dynamic_buffer &buffer, bitmap_yuy16 &bitmap, UINT8 channels, UINT32 numsamples, INT16 **samples, UINT8 *metadata = nullptr, UINT32 metadatasize = 0);
 
 private:
 	// delta-RLE Huffman encoder
