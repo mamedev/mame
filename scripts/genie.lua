@@ -977,6 +977,7 @@ end
 				"-Wno-c++11-narrowing",
 				"-Wno-inline-new-delete",
 				"-Wno-constant-logical-operand",
+				"-Wno-deprecated-register",
 			}
 			if (version >= 30500) then
 				buildoptions {
@@ -985,12 +986,7 @@ end
 					"-Wno-extern-c-compat",
 				}
 			end
-			if (version >= 30700) then
-				buildoptions {
-					"-Wno-deprecated-register",
-				}
-			end
- 			if (version >= 70000) then
+			if (version >= 70000) then
 				buildoptions {
 					"-Wno-tautological-undefined-compare",
 				}
