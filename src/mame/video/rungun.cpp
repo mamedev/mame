@@ -18,7 +18,8 @@
 /* TTL text plane stuff */
 TILE_GET_INFO_MEMBER(rungun_state::ttl_get_tile_info)
 {
-	UINT8 *lvram = (UINT8 *)m_ttl_vram + (m_current_display_bank * 0x2000);
+	UINT32 base_addr = (FPTR)tilemap.user_data();
+	UINT8 *lvram = (UINT8 *)m_ttl_vram + base_addr;
 	int attr, code;
 	
 	attr = (lvram[BYTE_XOR_LE(tile_index<<2)] & 0xf0) >> 4;
@@ -40,6 +41,7 @@ READ16_MEMBER(rungun_state::rng_ttl_ram_r)
 WRITE16_MEMBER(rungun_state::rng_ttl_ram_w)
 {
 	COMBINE_DATA(&m_ttl_vram[offset+(m_video_mux_bank*0x1000)]);
+	m_ttl_tilemap[m_video_mux_bank]->mark_tile_dirty(offset / 2);
 }
 
 /* 53936 (PSAC2) rotation/zoom plane */
@@ -47,17 +49,20 @@ READ16_MEMBER(rungun_state::rng_psac2_videoram_r)
 {
 	return m_psac2_vram[offset+(m_video_mux_bank*0x80000)];
 }
-
+/*
+		//m_ttl_tilemap[m_current_display_bank]->mark_all_dirty();
+		//m_936_tilemap[m_current_display_bank]->mark_all_dirty();
+*/
 WRITE16_MEMBER(rungun_state::rng_psac2_videoram_w)
 {
 	COMBINE_DATA(&m_psac2_vram[offset+(m_video_mux_bank*0x80000)]);
-	//m_936_tilemap->mark_tile_dirty(offset / 2);
+	m_936_tilemap[m_video_mux_bank]->mark_tile_dirty(offset / 2);
 }
 
 TILE_GET_INFO_MEMBER(rungun_state::get_rng_936_tile_info)
 {
+	UINT32 base_addr = (FPTR)tilemap.user_data();
 	int tileno, colour, flipx;
-	UINT32 base_addr = (m_current_display_bank * 0x80000);
 	
 	tileno = m_psac2_vram[tile_index * 2 + 1 + base_addr] & 0x3fff;
 	flipx = (m_psac2_vram[tile_index * 2 + 1 + base_addr] & 0xc000) >> 14;
@@ -84,8 +89,6 @@ void rungun_state::video_start()
 
 	m_ttl_vram = auto_alloc_array(machine(), UINT16, 0x1000*2);
 	m_psac2_vram = auto_alloc_array(machine(), UINT16, 0x80000*2);
-	m_936_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(rungun_state::get_rng_936_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
-	m_936_tilemap->set_transparent_pen(0);
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -98,11 +101,18 @@ void rungun_state::video_start()
 	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_palette, charlayout, memregion("gfx3")->base(), 0, m_palette->entries() / 16, 0)));
 	m_ttl_gfx_index = gfx_index;
 
-	// create the tilemap
-	m_ttl_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(rungun_state::ttl_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	// create the tilemaps
+	for(UINT32 screen_num = 0;screen_num < 2;screen_num++)
+	{
+		m_ttl_tilemap[screen_num] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(rungun_state::ttl_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+		m_ttl_tilemap[screen_num]->set_user_data((void *)(FPTR)(screen_num * 0x2000));
+		m_ttl_tilemap[screen_num]->set_transparent_pen(0);
 
-	m_ttl_tilemap->set_transparent_pen(0);
-
+		m_936_tilemap[screen_num] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(rungun_state::get_rng_936_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
+		m_936_tilemap[screen_num]->set_user_data((void *)(FPTR)(screen_num * 0x80000));
+		m_936_tilemap[screen_num]->set_transparent_pen(0);
+		
+	}
 	m_sprite_colorbase = 0x20;
 
 	m_screen->register_screen_bitmap(m_rng_dual_demultiplex_left_temp);
@@ -114,24 +124,19 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 	m_current_display_bank = machine().first_screen()->frame_number() & 1;
-	{
-		m_ttl_tilemap->mark_all_dirty();
-		m_936_tilemap->mark_all_dirty();
-	}	
-
 
 	if(m_video_priority_mode == false)
 	{
-		m_k053936->zoom_draw(screen, bitmap, cliprect, m_936_tilemap, 0, 0, 1);
+		m_k053936->zoom_draw(screen, bitmap, cliprect, m_936_tilemap[m_current_display_bank], 0, 0, 1);
 		m_k055673->k053247_sprites_draw(bitmap, cliprect);
 	}
 	else
 	{
 		m_k055673->k053247_sprites_draw(bitmap, cliprect);
-		m_k053936->zoom_draw(screen, bitmap, cliprect, m_936_tilemap, 0, 0, 1);
+		m_k053936->zoom_draw(screen, bitmap, cliprect, m_936_tilemap[m_current_display_bank], 0, 0, 1);
 	}
 	
-	m_ttl_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_ttl_tilemap[m_current_display_bank]->draw(screen, bitmap, cliprect, 0, 0);
 
 	// copy frame output to temp buffers so we can demultiplex it for the dual screen output
 	// (really only need to do this for dual setup)

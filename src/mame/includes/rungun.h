@@ -48,8 +48,8 @@ public:
 	required_device<screen_device> m_screen;
 
 	/* video-related */
-	tilemap_t   *m_ttl_tilemap;
-	tilemap_t   *m_936_tilemap;
+	tilemap_t   *m_ttl_tilemap[2];
+	tilemap_t   *m_936_tilemap[2];
 	UINT16		*m_psac2_vram;
 	UINT16      *m_ttl_vram;
 	UINT16		*m_pal_ram;
