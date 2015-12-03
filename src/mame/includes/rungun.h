@@ -24,9 +24,9 @@ public:
 		m_k055673(*this, "k055673"),
 		m_k053252(*this, "k053252"),
 		m_sysreg(*this, "sysreg"),
-		m_936_videoram(*this, "936_videoram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_palette2(*this, "palette2"),
 		m_screen(*this, "screen")
 	{ }
 
@@ -41,16 +41,19 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_sysreg;
-	required_shared_ptr<UINT16> m_936_videoram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<palette_device> m_palette2;
 	required_device<screen_device> m_screen;
 
 	/* video-related */
 	tilemap_t   *m_ttl_tilemap;
 	tilemap_t   *m_936_tilemap;
-	UINT16      m_ttl_vram[0x1000];
+	UINT16		*m_psac2_vram;
+	UINT16      *m_ttl_vram;
+	UINT16		*m_pal_ram;
+	UINT8		m_current_frame_number;
 	int         m_ttl_gfx_index;
 	int         m_sprite_colorbase;
 
@@ -65,6 +68,7 @@ public:
 	bool		m_video_priority_mode;
 	UINT16		*m_banked_ram;
 	bool		m_single_screen_mode;
+	UINT8		m_video_mux_bank;
 	
 	DECLARE_READ16_MEMBER(rng_sysregs_r);
 	DECLARE_WRITE16_MEMBER(rng_sysregs_w);
@@ -76,11 +80,16 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_ctrl_w);
 	DECLARE_READ16_MEMBER(rng_ttl_ram_r);
 	DECLARE_WRITE16_MEMBER(rng_ttl_ram_w);
-	DECLARE_WRITE16_MEMBER(rng_936_videoram_w);
+	DECLARE_READ16_MEMBER(rng_psac2_videoram_r);
+	DECLARE_WRITE16_MEMBER(rng_psac2_videoram_w);
 	DECLARE_READ8_MEMBER(rng_53936_rom_r);
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_rng_936_tile_info);
 	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
+	DECLARE_READ16_MEMBER(palette_read);
+	DECLARE_WRITE16_MEMBER(palette_write);
+
+	
 	K055673_CB_MEMBER(sprite_callback);
 
 	virtual void machine_start();
