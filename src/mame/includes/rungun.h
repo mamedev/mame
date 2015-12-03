@@ -53,7 +53,7 @@ public:
 	UINT16		*m_psac2_vram;
 	UINT16      *m_ttl_vram;
 	UINT16		*m_pal_ram;
-	UINT8		m_current_frame_number;
+	UINT8		m_current_display_bank;
 	int         m_ttl_gfx_index;
 	int         m_sprite_colorbase;
 

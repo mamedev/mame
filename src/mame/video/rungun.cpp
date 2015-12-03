@@ -18,7 +18,7 @@
 /* TTL text plane stuff */
 TILE_GET_INFO_MEMBER(rungun_state::ttl_get_tile_info)
 {
-	UINT8 *lvram = (UINT8 *)m_ttl_vram + (m_current_frame_number * 0x2000);
+	UINT8 *lvram = (UINT8 *)m_ttl_vram + (m_current_display_bank * 0x2000);
 	int attr, code;
 	
 	attr = (lvram[BYTE_XOR_LE(tile_index<<2)] & 0xf0) >> 4;
@@ -57,7 +57,7 @@ WRITE16_MEMBER(rungun_state::rng_psac2_videoram_w)
 TILE_GET_INFO_MEMBER(rungun_state::get_rng_936_tile_info)
 {
 	int tileno, colour, flipx;
-	UINT32 base_addr = (m_current_frame_number * 0x80000);
+	UINT32 base_addr = (m_current_display_bank * 0x80000);
 	
 	tileno = m_psac2_vram[tile_index * 2 + 1 + base_addr] & 0x3fff;
 	flipx = (m_psac2_vram[tile_index * 2 + 1 + base_addr] & 0xc000) >> 14;
@@ -113,7 +113,7 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
-	m_current_frame_number = machine().first_screen()->frame_number() & 1;
+	m_current_display_bank = machine().first_screen()->frame_number() & 1;
 	{
 		m_ttl_tilemap->mark_all_dirty();
 		m_936_tilemap->mark_all_dirty();
@@ -135,7 +135,7 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 
 	// copy frame output to temp buffers so we can demultiplex it for the dual screen output
 	// (really only need to do this for dual setup)
-	if (m_current_frame_number)
+	if (m_current_display_bank)
 	{
 		copybitmap(m_rng_dual_demultiplex_right_temp, bitmap, 0, 0, 0, 0, cliprect);
 	}

@@ -164,7 +164,7 @@ INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	for(int i=0;i<0x1000;i+=2)
-		m_k055673->k053247_word_w(space,i/2,m_banked_ram[(i + m_current_frame_number*0x2000) /2],0xffff);
+		m_k055673->k053247_word_w(space,i/2,m_banked_ram[(i + m_current_display_bank*0x2000) /2],0xffff);
 	
 	if (m_sysreg[0x0c / 2] & 0x09)
 		device.execute().set_input_line(M68K_IRQ_5, ASSERT_LINE);
