@@ -682,10 +682,6 @@ void cheat_script::script_entry::output_argument::save(emu_file &cheatfile) cons
 cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, const char *filename, xml_data_node &cheatnode)
 	: m_manager(manager),
 		m_next(NULL),
-		m_on_script(NULL),
-		m_off_script(NULL),
-		m_change_script(NULL),
-		m_run_script(NULL),
 		m_symbols(&manager.machine(), &globaltable),
 		m_state(SCRIPT_STATE_OFF),
 		m_numtemp(DEFAULT_TEMP_VARIABLES),
@@ -750,8 +746,8 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 			cheat_script *curscript = global_alloc(cheat_script(manager, m_symbols, filename, *scriptnode));
 
 			// if we have a script already for this slot, it is an error
-			auto_pointer<cheat_script> &slot = script_for_state(curscript->state());
-			if (slot != NULL)
+			std::unique_ptr<cheat_script> &slot = script_for_state(curscript->state());
+			if (slot != nullptr)
 				osd_printf_warning("%s.xml(%d): only one on script allowed; ignoring additional scripts\n", filename, scriptnode->line);
 			else
 				slot.reset(curscript);
@@ -1028,7 +1024,7 @@ bool cheat_entry::set_state(script_state newstate)
 //  given script pointer
 //-------------------------------------------------
 
-auto_pointer<cheat_script> &cheat_entry::script_for_state(script_state state)
+std::unique_ptr<cheat_script> &cheat_entry::script_for_state(script_state state)
 {
 	switch (state)
 	{

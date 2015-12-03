@@ -306,15 +306,6 @@ newoption {
 }
 
 newoption {
-	trigger = "CPP11",
-	description = "Compile c++ code as C++11.",
-	allowed = {
-		{ "0",   "Disabled" 	},
-		{ "1",   "Enabled"      },
-	}
-}
-
-newoption {
 	trigger = "FASTDEBUG",
 	description = "Fast DEBUG.",
 	allowed = {
@@ -532,11 +523,6 @@ else
 	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.cpp")
 end
 configuration { "gmake" }
-if _OPTIONS["CPP11"]~="1" then
-	defines {
-		"nullptr=NULL" -- getting ready for C++11
-	}
-end
 	flags {
 		"SingleOutputDir",
 	}
@@ -743,33 +729,14 @@ else
 end
 
 
-if _OPTIONS["CPP11"]=="1" then
 	buildoptions_cpp {
 		"-x c++",
-		"-std=gnu++11",
---		"-std=c++11",
---		"-Wpedantic",
---		"-pedantic",
---		"-Wno-variadic-macros",
---		"-Wno-long-long",
-
+		"-std=c++14",
 	}
-else
-	--we compile C++ code to C++98 standard with GNU extensions
-	buildoptions_cpp {
-		"-x c++",
---		"-Wpedantic",
---		"-pedantic",
-		"-std=gnu++98",
-		"-Wno-variadic-macros",
-		"-Wno-long-long",
-		"-Wno-variadic-macros",
---		"-std=c++98",
-	}
-end
 
 	buildoptions_objc {
 		"-x objective-c++",
+		"-std=c++14",
 	}
 
 
@@ -993,18 +960,19 @@ end
 
 		local version = str_to_version(_OPTIONS["gcc_version"])
 		if string.find(_OPTIONS["gcc"], "clang") then
+			if (version < 30400) then
+				print("Clang version 3.4 or later needed")
+				os.exit(-1)
+			end
 			buildoptions {
 				"-Wno-cast-align",
 				"-Wno-tautological-compare",
 				"-Wno-dynamic-class-memaccess",
+				"-Wno-unused-value",
+				"-Wno-c++11-narrowing",
+				"-Wno-inline-new-delete",
+				"-Wno-constant-logical-operand",
 			}
-			if (version >= 30000) then
-				buildoptions {
-					"-Wno-unused-value",
-					"-Wno-inline-new-delete",
-					"-Wno-constant-logical-operand",
-				}
-			end
 			if (version >= 30500) then
 				buildoptions {
 					"-Wno-absolute-value",
@@ -1018,6 +986,10 @@ end
 				}
 			end
 		else
+			if (version < 40900) then
+				print("GCC version 4.9 or later needed")
+				os.exit(-1)
+			end
 			if (version == 40201) then
 				buildoptions {
 					"-Wno-cast-align"
@@ -1043,21 +1015,6 @@ end
 						"-Wno-array-bounds"
 					}
 --				end
-			end
-			if (version >= 50000) then
-				buildoptions {
---					"-D__USE_MINGW_ANSI_STDIO=1", -- required or lua won't compile linux ignores this but Windows needs it
-					"-freport-bug",
-					"-D_GLIBCXX_USE_CXX11_ABI=0", -- does not seem to matter in linux, mingw needs to link printf,etc
---					"-DNO_MEM_TRACKING",          -- must comment out for mingw GCC 5.2 pedantic or get new/delete redef error
--- next two should work, but compiler complains about end conditions that are int when loop variable is unsigned. maybe these can be fixed
---					"-funsafe-loop-optimizations",
---					"-Wunsafe-loop-optimizations",
--- this six flag combo lets MAME compile with LTO=1 on linux with no errors and ~2% speed boost, but compile time is much longer
---					"-fdevirtualize-at-ltrans","-fgcse-sm","-fgcse-las",
---					"-fipa-pta","-fipa-icf","-fvariable-expansion-in-unroller",
-
-				}
 			end
 		end
 	end
@@ -1278,11 +1235,6 @@ configuration { "vs2015" }
 			"/wd4297", -- warning C4297: 'xxx::~xxx': function assumed not to throw an exception but does
 			"/wd4319", -- warning C4319: 'operator' : zero extending 'type' to 'type' of greater size
 		}
-configuration { "vs2010" }
-		buildoptions {
-			"/wd4481", -- warning C4481: nonstandard extension used: override specifier 'override'
-		}
-
 configuration { "winphone8* or winstore8*" }
 	removelinks {
 		"DelayImp",

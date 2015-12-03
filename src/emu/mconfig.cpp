@@ -115,7 +115,7 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 	if (tag[0] == ':')
 	{
 		tag++;
-		owner = m_root_device;
+		owner = m_root_device.get();
 	}
 
 	// go down the path until we're done with it
@@ -147,8 +147,8 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 	// apply any machine configuration owned by the device now
 	machine_config_constructor additions = m_root_device->machine_config_additions();
 	if (additions != NULL)
-		(*additions)(*this, m_root_device, NULL);
-	return m_root_device;
+		(*additions)(*this, m_root_device.get(), NULL);
+	return m_root_device.get();
 }
 
 

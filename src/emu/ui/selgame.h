@@ -35,7 +35,7 @@ private:
 	char                    m_search[40];
 	int                     m_matchlist[VISIBLE_GAMES_IN_LIST];
 	std::vector<const game_driver *> m_driverlist;
-	auto_pointer<driver_enumerator> m_drivlist;
+	std::unique_ptr<driver_enumerator> m_drivlist;
 
 	// internal methods
 	void build_driver_list();

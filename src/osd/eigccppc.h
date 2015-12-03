@@ -44,7 +44,7 @@
 INLINE INT32 ATTR_CONST ATTR_FORCE_INLINE
 _mul_32x32_hi(INT32 val1, INT32 val2)
 {
-	register INT32 result;
+	INT32 result;
 
 	__asm__ (
 		" mulhw  %[result], %[val1], %[val2] \n"
@@ -67,7 +67,7 @@ _mul_32x32_hi(INT32 val1, INT32 val2)
 INLINE UINT32 ATTR_CONST ATTR_FORCE_INLINE
 _mulu_32x32_hi(UINT32 val1, UINT32 val2)
 {
-	register UINT32 result;
+	UINT32 result;
 
 	__asm__ (
 		" mulhwu  %[result], %[val1], %[val2] \n"
@@ -92,7 +92,7 @@ _mulu_32x32_hi(UINT32 val1, UINT32 val2)
 INLINE INT32 ATTR_CONST ATTR_FORCE_INLINE
 _mul_32x32_shift(INT32 val1, INT32 val2, UINT8 shift)
 {
-	register INT32 result;
+	INT32 result;
 
 	/* Valid for (0 <= shift <= 32) */
 	__asm__ (
@@ -126,7 +126,7 @@ _mul_32x32_shift(INT32 val1, INT32 val2, UINT8 shift)
 INLINE UINT32 ATTR_CONST ATTR_FORCE_INLINE
 _mulu_32x32_shift(UINT32 val1, UINT32 val2, UINT8 shift)
 {
-	register UINT32 result;
+	UINT32 result;
 
 	/* Valid for (0 <= shift <= 32) */
 	__asm__ (
@@ -225,7 +225,7 @@ _mulu_32x32_shift(UINT32 val1, UINT32 val2, UINT8 shift)
 INLINE float ATTR_CONST ATTR_FORCE_INLINE
 _recip_approx(float value)
 {
-	register float result;
+	float result;
 
 	__asm__ (
 		" fres  %[result], %[value] \n"
@@ -251,7 +251,7 @@ _recip_approx(float value)
 INLINE UINT8 ATTR_CONST ATTR_FORCE_INLINE
 _count_leading_zeros(UINT32 value)
 {
-	register UINT32 result;
+	UINT32 result;
 
 	__asm__ (
 		" cntlzw  %[result], %[value] \n"
@@ -272,7 +272,7 @@ _count_leading_zeros(UINT32 value)
 INLINE UINT8 ATTR_CONST ATTR_FORCE_INLINE
 _count_leading_ones(UINT32 value)
 {
-	register UINT32 result;
+	UINT32 result;
 
 	__asm__ (
 		" not     %[result], %[value]  \n"
@@ -301,7 +301,7 @@ _count_leading_ones(UINT32 value)
 INLINE INT32 ATTR_NONNULL(1) ATTR_FORCE_INLINE
 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 {
-	register INT32 result;
+	INT32 result;
 
 	__asm__ __volatile__ (
 		"1: lwarx  %[result], 0, %[ptr]   \n"
@@ -335,7 +335,7 @@ _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 INLINE INT64 ATTR_NONNULL(1) ATTR_FORCE_INLINE
 _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 {
-	register INT64 result;
+	INT64 result;
 
 	__asm__ __volatile__ (
 		"1: ldarx  %[result], 0, %[ptr]   \n"
@@ -368,7 +368,7 @@ _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 INLINE INT32 ATTR_NONNULL(1) ATTR_FORCE_INLINE
 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 {
-	register INT32 result;
+	INT32 result;
 
 	__asm__ __volatile__ (
 		"1: lwarx  %[result], 0, %[ptr]   \n"
@@ -396,7 +396,7 @@ _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 INLINE INT32 ATTR_NONNULL(1) ATTR_FORCE_INLINE
 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 {
-	register INT32 result;
+	INT32 result;
 
 	__asm__ __volatile__ (
 		"1: lwarx  %[result], 0, %[ptr]           \n"
@@ -425,7 +425,7 @@ _atomic_add32(INT32 volatile *ptr, INT32 delta)
 INLINE INT32 ATTR_NONNULL(1) ATTR_FORCE_INLINE
 _atomic_increment32(INT32 volatile *ptr)
 {
-	register INT32 result;
+	INT32 result;
 
 	__asm__ __volatile__ (
 		"1: lwarx   %[result], 0, %[ptr]    \n"
@@ -453,7 +453,7 @@ _atomic_increment32(INT32 volatile *ptr)
 INLINE INT32 ATTR_NONNULL(1) ATTR_FORCE_INLINE
 _atomic_decrement32(INT32 volatile *ptr)
 {
-	register INT32 result;
+	INT32 result;
 
 	__asm__ __volatile__ (
 		"1: lwarx   %[result], 0, %[ptr]     \n"

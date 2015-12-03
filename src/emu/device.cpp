@@ -384,7 +384,7 @@ void device_t::start()
 	// if we're debugging, create a device_debug object
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		m_debug.reset(global_alloc(device_debug(*this)));
+		m_debug = std::make_unique<device_debug>(*this);
 		debug_setup();
 	}
 

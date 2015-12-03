@@ -438,7 +438,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		m_mng_next_frame_time = machine().time();
 
 		// create a new movie file and start recording
-		m_mng_file.reset(global_alloc(emu_file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)));
+		m_mng_file = std::make_unique<emu_file>(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		file_error filerr;
 		if (name != NULL)
 			filerr = m_mng_file->open(name);

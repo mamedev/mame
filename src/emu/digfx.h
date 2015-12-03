@@ -200,7 +200,7 @@ public:
 
 	// getters
 	palette_device *palette() const { return m_palette; }
-	gfx_element *gfx(int index) const { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index]; }
+	gfx_element *gfx(int index) const { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index].get(); }
 
 	// decoding
 	void decode_gfx(const gfx_decode_entry *gfxdecodeinfo);
@@ -215,7 +215,7 @@ protected:
 	virtual void interface_post_start();
 
 	palette_device *            m_palette;                  // pointer to the palette device
-	auto_pointer<gfx_element>   m_gfx[MAX_GFX_ELEMENTS];    // array of pointers to graphic sets
+	std::unique_ptr<gfx_element>  m_gfx[MAX_GFX_ELEMENTS];    // array of pointers to graphic sets
 
 private:
 	// configuration

@@ -218,9 +218,9 @@ void running_machine::start()
 {
 	// initialize basic can't-fail systems here
 	config_init(*this);
-	m_input.reset(global_alloc(input_manager(*this)));
+	m_input = std::make_unique<input_manager>(*this);
 	output_init(*this);
-	m_render.reset(global_alloc(render_manager(*this)));
+	m_render = std::make_unique<render_manager>(*this);
 	generic_machine_init(*this);
 
 	// allocate a soft_reset timer
@@ -230,8 +230,8 @@ void running_machine::start()
 	m_manager.osd().init(*this);
 
 	// create the video manager
-	m_video.reset(global_alloc(video_manager(*this)));
-	m_ui.reset(global_alloc(ui_manager(*this)));
+	m_video = std::make_unique<video_manager>(*this);
+	m_ui = std::make_unique<ui_manager>(*this);
 
 	// initialize the base time (needed for doing record/playback)
 	::time(&m_base_time);
@@ -247,7 +247,7 @@ void running_machine::start()
 	ui_input_init(*this);
 
 	// initialize the streams engine before the sound devices start
-	m_sound.reset(global_alloc(sound_manager(*this)));
+	m_sound = std::make_unique<sound_manager>(*this);
 
 	// first load ROMs, then populate memory, and finally initialize CPUs
 	// these operations must proceed in this order
@@ -267,7 +267,7 @@ void running_machine::start()
 
 	// initialize image devices
 	image_init(*this);
-	m_tilemap.reset(global_alloc(tilemap_manager(*this)));
+	m_tilemap = std::make_unique<tilemap_manager>(*this);
 	crosshair_init(*this);
 	network_init(*this);
 
@@ -299,7 +299,7 @@ void running_machine::start()
 		schedule_load("auto");
 
 	// set up the cheat engine
-	m_cheat.reset(global_alloc(cheat_manager(*this)));
+	m_cheat = std::make_unique<cheat_manager>(*this);
 
 	// allocate autoboot timer
 	m_autoboot_timer = scheduler().timer_alloc(timer_expired_delegate(FUNC(running_machine::autoboot_callback), this));
@@ -325,7 +325,7 @@ int running_machine::run(bool firstrun)
 		// if we have a logfile, set up the callback
 		if (options().log() && &system() != &GAME_NAME(___empty))
 		{
-			m_logfile.reset(global_alloc(emu_file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)));
+			m_logfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			file_error filerr = m_logfile->open("error.log");
 			assert_always(filerr == FILERR_NONE, "unable to open log file");
 			add_logerror_callback(logfile_callback);
@@ -768,11 +768,11 @@ void running_machine::add_notifier(machine_notification event, machine_notify_de
 
 	// exit notifiers are added to the head, and executed in reverse order
 	if (event == MACHINE_NOTIFY_EXIT)
-		m_notifier_list[event].prepend(*global_alloc(notifier_callback_item(callback)));
+		m_notifier_list[event].push_front(std::make_unique<notifier_callback_item>(callback));
 
 	// all other notifiers are added to the tail, and executed in the order registered
 	else
-		m_notifier_list[event].append(*global_alloc(notifier_callback_item(callback)));
+		m_notifier_list[event].push_back(std::make_unique<notifier_callback_item>(callback));
 }
 
 
@@ -784,7 +784,7 @@ void running_machine::add_notifier(machine_notification event, machine_notify_de
 void running_machine::add_logerror_callback(logerror_callback callback)
 {
 	assert_always(m_current_phase == MACHINE_PHASE_INIT, "Can only call add_logerror_callback at init time!");
-	m_logerror_list.append(*global_alloc(logerror_callback_item(callback)));
+	m_logerror_list.push_back(std::make_unique<logerror_callback_item>(callback));
 }
 
 /*-------------------------------------------------
@@ -835,7 +835,7 @@ void running_machine::logerror(const char *format, ...) const
 void running_machine::vlogerror(const char *format, va_list args) const
 {
 	// process only if there is a target
-	if (m_logerror_list.first() != NULL)
+	if (!m_logerror_list.empty())
 	{
 		g_profiler.start(PROFILER_LOGERROR);
 
@@ -843,8 +843,8 @@ void running_machine::vlogerror(const char *format, va_list args) const
 		vsnprintf(giant_string_buffer, ARRAY_LENGTH(giant_string_buffer), format, args);
 
 		// log to all callbacks
-		for (logerror_callback_item *cb = m_logerror_list.first(); cb != NULL; cb = cb->next())
-			(*cb->m_func)(*this, giant_string_buffer);
+		for (auto& cb : m_logerror_list)
+			(cb->m_func)(*this, giant_string_buffer);
 
 		g_profiler.stop();
 	}
@@ -895,7 +895,7 @@ UINT32 running_machine::rand()
 
 void running_machine::call_notifiers(machine_notification which)
 {
-	for (notifier_callback_item *cb = m_notifier_list[which].first(); cb != NULL; cb = cb->next())
+	for (auto& cb : m_notifier_list[which])
 		cb->m_func();
 }
 
@@ -1298,8 +1298,7 @@ void running_machine::nvram_save()
 //-------------------------------------------------
 
 running_machine::notifier_callback_item::notifier_callback_item(machine_notify_delegate func)
-	: m_next(NULL),
-		m_func(func)
+	: m_func(func)
 {
 }
 
@@ -1309,8 +1308,7 @@ running_machine::notifier_callback_item::notifier_callback_item(machine_notify_d
 //-------------------------------------------------
 
 running_machine::logerror_callback_item::logerror_callback_item(logerror_callback func)
-	: m_next(NULL),
-		m_func(func)
+	: m_func(func)
 {
 }
 

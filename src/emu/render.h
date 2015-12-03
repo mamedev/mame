@@ -572,7 +572,7 @@ private:
 	user_settings           m_user;                 // user settings
 	bitmap_argb32 *         m_overlaybitmap;        // overlay bitmap
 	render_texture *        m_overlaytexture;       // overlay texture
-	auto_pointer<palette_client> m_palclient;       // client to the screen palette
+	std::unique_ptr<palette_client> m_palclient;       // client to the screen palette
 	std::vector<rgb_t>           m_bcglookup;            // copy of screen palette with bcg adjustment
 	rgb_t                   m_bcglookup256[0x400];  // lookup table for brightness/contrast/gamma
 };
@@ -704,7 +704,7 @@ private:
 		int                 m_textalign;                // text alignment to box
 		bitmap_argb32       m_bitmap[MAX_BITMAPS];      // source bitmap for images
 		std::string         m_dirname;                  // directory name of image file (for lazy loading)
-		auto_pointer<emu_file> m_file[MAX_BITMAPS];        // file object for reading image/alpha files
+		std::unique_ptr<emu_file> m_file[MAX_BITMAPS];        // file object for reading image/alpha files
 		std::string         m_imagefile[MAX_BITMAPS];   // name of the image file (for lazy loading)
 		std::string         m_alphafile[MAX_BITMAPS];   // name of the alpha file (for lazy loading)
 		bool                m_hasalpha[MAX_BITMAPS];    // is there any alpha component present?

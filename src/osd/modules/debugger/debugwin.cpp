@@ -72,7 +72,7 @@ private:
 	template <typename T> T *create_window();
 
 	running_machine             *m_machine;
-	auto_pointer<ui_metrics>    m_metrics;
+	std::unique_ptr<ui_metrics>    m_metrics;
 	bool                        m_waiting_for_debugger;
 	simple_list<debugwin_info>  m_window_list;
 	consolewin_info             *m_main_console;
@@ -94,7 +94,7 @@ void debugger_windows::exit()
 void debugger_windows::init_debugger(running_machine &machine)
 {
 	m_machine = &machine;
-	m_metrics.reset(global_alloc(ui_metrics(downcast<osd_options &>(m_machine->options()))));
+	m_metrics = std::make_unique<ui_metrics>(downcast<osd_options &>(m_machine->options()));
 }
 
 

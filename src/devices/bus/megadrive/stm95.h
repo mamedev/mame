@@ -76,7 +76,7 @@ private:
 	UINT8 m_bank[3];
 	int m_rdcnt;
 
-	auto_pointer<stm95_eeprom_device> m_stm95;
+	std::unique_ptr<stm95_eeprom_device> m_stm95;
 };
 
 

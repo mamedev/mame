@@ -152,7 +152,7 @@ private:
 		UINT8 *                 m_srcptr;
 		fd1089_base_device *    m_fd1089;
 		std::vector<UINT16>   m_fd1089_decrypted;
-		auto_pointer<fd1094_decryption_cache> m_fd1094_cache;
+		std::unique_ptr<fd1094_decryption_cache> m_fd1094_cache;
 	};
 
 	// internal helpers

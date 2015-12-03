@@ -197,7 +197,7 @@ public:
 	void ATTR_COLD save_pointer(_ItemType *value, const char *valname, UINT32 count, int index = 0) { assert(m_save != NULL); m_save->save_pointer(this, name(), tag(), index, value, valname, count); }
 
 	// debugging
-	device_debug *debug() const { return m_debug; }
+	device_debug *debug() const { return m_debug.get(); }
 	offs_t safe_pc() const;
 	offs_t safe_pcbase() const;
 
@@ -267,7 +267,7 @@ protected:
 	double                  m_clock_scale;          // clock scale factor
 	attoseconds_t           m_attoseconds_per_clock;// period in attoseconds
 
-	auto_pointer<device_debug> m_debug;
+	std::unique_ptr<device_debug> m_debug;
 	memory_region *         m_region;               // our device-local region
 	const machine_config &  m_machine_config;       // reference to the machine's configuration
 	const void *            m_static_config;        // static device configuration

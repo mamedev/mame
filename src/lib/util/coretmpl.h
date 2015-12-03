@@ -25,41 +25,6 @@
 #endif
 
 
-// ======================> auto_pointer
-
-// an object that transparently wraps a pointer and auto-frees it upon destruction
-template<class _ElementType>
-class auto_pointer
-{
-private:
-	// we don't support deep copying
-	auto_pointer(const auto_pointer &);
-	auto_pointer &operator=(const auto_pointer &);
-
-public:
-	// construction/destruction
-	auto_pointer(_ElementType *value = NULL)
-		: m_ptr(value) { }
-	virtual ~auto_pointer() { reset(); }
-
-	// operators
-	operator _ElementType *() const { return m_ptr; }
-	_ElementType &operator*() const { assert(m_ptr != NULL); return *m_ptr; }
-	_ElementType *operator->() const { return m_ptr; }
-
-	// simple getters
-	_ElementType *get() const { return m_ptr; }
-
-	// core operations
-	void reset(_ElementType *ptr = NULL) { if (m_ptr != ptr) { global_free(m_ptr); m_ptr = ptr; } }
-
-private:
-	// internal state
-	_ElementType *  m_ptr;          // pointer we are tracking
-};
-
-
-
 typedef std::vector<UINT8> dynamic_buffer;
 
 

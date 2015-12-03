@@ -35,7 +35,7 @@ osd_yield_processor(void)
 INLINE INT64 ATTR_UNUSED ATTR_NONNULL(1) ATTR_FORCE_INLINE
 _osd_exchange64(INT64 volatile *ptr, INT64 exchange)
 {
-	register INT64 ret;
+	INT64 ret;
 	__asm__ __volatile__ (
 		" lock ; xchg %[exchange], %[ptr] ;"
 		: [ptr]      "+m" (*ptr)
@@ -69,7 +69,7 @@ osd_yield_processor(void)
 INLINE INT64 ATTR_UNUSED ATTR_NONNULL(1) ATTR_FORCE_INLINE
 _osd_exchange64(INT64 volatile *ptr, INT64 exchange)
 {
-	register INT64 ret;
+	INT64 ret;
 	__asm__ __volatile__ (
 		"1: ldarx  %[ret], 0, %[ptr]      \n"
 		"   stdcx. %[exchange], 0, %[ptr] \n"

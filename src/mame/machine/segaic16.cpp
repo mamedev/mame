@@ -641,7 +641,7 @@ void sega_315_5195_mapper_device::decrypt_bank::set_decrypt(fd1089_base_device *
 void sega_315_5195_mapper_device::decrypt_bank::set_decrypt(fd1094_device *fd1094)
 {
 	// set the fd1094 pointer and allocate a decryption cache
-	m_fd1094_cache.reset(global_alloc(fd1094_decryption_cache(*fd1094)));
+	m_fd1094_cache = std::make_unique<fd1094_decryption_cache>(*fd1094);
 
 	// clear out all fd1089 stuff
 	m_fd1089 = NULL;

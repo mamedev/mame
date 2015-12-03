@@ -24,7 +24,7 @@ public:
 	virtual void disassemble(std::string& retString) const = 0;
 	virtual void evaluate() = 0;
 
-	static ParallelMove* decodeParallelMove(const Opcode* opc, const UINT16 word0, const UINT16 word1);
+	static std::unique_ptr<ParallelMove> decodeParallelMove(const Opcode* opc, const UINT16 word0, const UINT16 word1);
 
 	bool valid() const { return m_valid; }
 

@@ -226,7 +226,7 @@ void osd_lock_acquire(osd_lock *lock)
 
 	current = pthread_self();
 	prev = osd_compare_exchange_pthread_t(&lock->holder, 0, current);
-	if (prev != (size_t)NULL && prev != current)
+	if (prev != nullptr && prev != current)
 	{
 		do {
 			register INT32 spin = 10000; // Convenient spin count
@@ -281,7 +281,7 @@ void osd_lock_acquire(osd_lock *lock)
 				nanosleep(&sleep, &remaining); // sleep for 100us
 			}
 #endif
-		} while (osd_compare_exchange_pthread_t(&lock->holder, 0, current) != (size_t)NULL);
+		} while (osd_compare_exchange_pthread_t(&lock->holder, 0, current) != nullptr);
 	}
 	lock->count++;
 }
@@ -296,7 +296,7 @@ int osd_lock_try(osd_lock *lock)
 
 	current = pthread_self();
 	prev = osd_compare_exchange_pthread_t(&lock->holder, 0, current);
-	if (prev == (size_t)NULL || prev == current)
+	if (prev == nullptr || prev == current)
 	{
 		lock->count++;
 		return 1;

@@ -51,7 +51,7 @@ ui_menu_select_game::~ui_menu_select_game()
 void ui_menu_select_game::build_driver_list()
 {
 	// start with an empty list
-	m_drivlist.reset(global_alloc(driver_enumerator(machine().options())));
+	m_drivlist = std::make_unique<driver_enumerator>(machine().options());
 	m_drivlist->exclude_all();
 
 	// open a path to the ROMs and find them in the array

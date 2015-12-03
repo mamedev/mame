@@ -116,7 +116,7 @@ protected:
 	void draw_border(HDC dc, RECT &bounds);
 	void draw_border(HDC dc, HWND child);
 
-	auto_pointer<debugview_info>    m_views[MAX_VIEWS];
+	std::unique_ptr<debugview_info>    m_views[MAX_VIEWS];
 
 private:
 	LRESULT window_proc(UINT message, WPARAM wparam, LPARAM lparam);

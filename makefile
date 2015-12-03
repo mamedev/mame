@@ -80,7 +80,6 @@
 # LTO = 1
 # SSE2 = 1
 # OPENMP = 1
-# CPP11 = 1
 # FASTDEBUG = 1
 
 # FILTER_DEPS = 1
@@ -615,10 +614,6 @@ ifdef OPENMP
 PARAMS += --OPENMP='$(OPENMP)'
 endif
 
-ifdef CPP11
-PARAMS += --CPP11='$(CPP11)'
-endif
-
 ifdef FASTDEBUG
 PARAMS += --FASTDEBUG='$(FASTDEBUG)'
 endif
@@ -839,18 +834,6 @@ windows_x64_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
 .PHONY: windows_x86_clang
 windows_x86_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
-
-vs2010: generate
-	$(SILENT) $(GENIE) $(PARAMS) vs2010
-
-vs2012: generate
-	$(SILENT) $(GENIE) $(PARAMS) vs2012
-
-vs2012_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) --vs=intel-15 vs2012
-
-vs2012_xp: generate
-	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2012-xp vs2012
 
 vs2013: generate
 	$(SILENT) $(GENIE) $(PARAMS) vs2013

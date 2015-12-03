@@ -275,7 +275,7 @@ public:
 	running_machine &machine() const { return m_machine; }
 	const char *name() const { return m_name; }
 	address_spacenum spacenum() const { return m_spacenum; }
-	address_map *map() const { return m_map; }
+	address_map *map() const { return m_map.get(); }
 
 	direct_read_data &direct() const { return *m_direct; }
 
@@ -463,7 +463,7 @@ protected:
 	address_space *         m_next;             // next address space in the global list
 	const address_space_config &m_config;       // configuration of this space
 	device_t &              m_device;           // reference to the owning device
-	auto_pointer<address_map> m_map;            // original memory map
+	std::unique_ptr<address_map> m_map;            // original memory map
 	offs_t                  m_addrmask;         // physical address mask
 	offs_t                  m_bytemask;         // byte-converted physical address mask
 	offs_t                  m_logaddrmask;      // logical address mask
@@ -472,7 +472,7 @@ protected:
 	address_spacenum        m_spacenum;         // address space index
 	bool                    m_debugger_access;  // treat accesses as coming from the debugger
 	bool                    m_log_unmap;        // log unmapped accesses in this space?
-	auto_pointer<direct_read_data> m_direct;    // fast direct-access read info
+	std::unique_ptr<direct_read_data> m_direct;    // fast direct-access read info
 	const char *            m_name;             // friendly name of the address space
 	UINT8                   m_addrchars;        // number of characters to use for physical addresses
 	UINT8                   m_logaddrchars;     // number of characters to use for logical addresses

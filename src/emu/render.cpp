@@ -722,9 +722,9 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 	{
 		case TEXFORMAT_PALETTE16:
 		case TEXFORMAT_PALETTEA16:
-			if (m_palclient == NULL) // if adjusted palette hasn't been created yet, create it
+			if (m_palclient == nullptr) // if adjusted palette hasn't been created yet, create it
 			{
-				m_palclient.reset(global_alloc(palette_client(*palette)));
+				m_palclient = std::make_unique<palette_client>(*palette);
 				m_bcglookup.resize(palette->max_index());
 				recompute_lookups();
 			}
@@ -813,7 +813,7 @@ void render_container::recompute_lookups()
 	}
 
 	// recompute the palette entries
-	if (m_palclient != NULL)
+	if (m_palclient != nullptr)
 	{
 		palette_t &palette = m_palclient->palette();
 		const rgb_t *adjusted_palette = palette.entry_list_adjusted();

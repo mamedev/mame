@@ -119,36 +119,12 @@ private:
 	// internal helpers
 	void release_current() const;
 
-	// entry in the config cache
-	struct config_entry
-	{
-		friend class simple_list<config_entry>;
-
-	public:
-		// construction/destruction
-		config_entry(machine_config &config, int index) : m_next(NULL), m_config(&config), m_index(index) { }
-
-		// getters
-		config_entry *next() const { return m_next; }
-		int index() const { return m_index; }
-		machine_config *config() const { return m_config; }
-
-	private:
-		// internal state
-		config_entry *      m_next;
-		auto_pointer<machine_config> m_config;
-		int                 m_index;
-	};
-
-	static const int CONFIG_CACHE_COUNT = 100;
-
 	// internal state
 	int                 m_current;
 	int                 m_filtered_count;
 	emu_options &       m_options;
 	std::vector<UINT8> m_included;
-	mutable std::vector<machine_config *> m_config;
-	mutable simple_list<config_entry> m_config_cache;
+	mutable std::vector<std::unique_ptr<machine_config>> m_config;
 };
 
 #endif

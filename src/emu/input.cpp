@@ -843,28 +843,26 @@ input_item_id input_device::add_item(const char *name, input_item_id itemid, ite
 	assert(m_item[itemid] == NULL);
 
 	// determine the class and create the appropriate item class
-	input_device_item *item;
 	switch (m_class.standard_item_class(originalid))
 	{
 		case ITEM_CLASS_SWITCH:
-			item = global_alloc(input_device_switch_item(*this, name, internal, itemid, getstate));
+			m_item[itemid] = std::make_unique<input_device_switch_item>(*this, name, internal, itemid, getstate);
 			break;
 
 		case ITEM_CLASS_RELATIVE:
-			item = global_alloc(input_device_relative_item(*this, name, internal, itemid, getstate));
+			m_item[itemid] = std::make_unique<input_device_relative_item>(*this, name, internal, itemid, getstate);
 			break;
 
 		case ITEM_CLASS_ABSOLUTE:
-			item = global_alloc(input_device_absolute_item(*this, name, internal, itemid, getstate));
+			m_item[itemid] = std::make_unique<input_device_absolute_item>(*this, name, internal, itemid, getstate);
 			break;
 
 		default:
-			item = NULL;
+			m_item[itemid] = nullptr;
 			assert(false);
 	}
 
 	// assign the new slot and update the maximum
-	m_item[itemid].reset(item);
 	m_maxitem = MAX(m_maxitem, itemid);
 	return itemid;
 }
@@ -922,7 +920,7 @@ void input_device::apply_steadykey() const
 	bool anything_changed = false;
 	for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= m_maxitem; ++itemid)
 	{
-		input_device_item *item = m_item[itemid];
+		input_device_item *item = m_item[itemid].get();
 		if (item != NULL && item->itemclass() == ITEM_CLASS_SWITCH)
 			if (downcast<input_device_switch_item *>(item)->steadykey_changed())
 				anything_changed = true;
@@ -932,7 +930,7 @@ void input_device::apply_steadykey() const
 	if (!anything_changed)
 		for (input_item_id itemid = ITEM_ID_FIRST_VALID; itemid <= m_maxitem; ++itemid)
 		{
-			input_device_item *item = m_item[itemid];
+			input_device_item *item = m_item[itemid].get();
 			if (item != NULL && item->itemclass() == ITEM_CLASS_SWITCH)
 				downcast<input_device_switch_item *>(item)->steadykey_update_to_current();
 		}
@@ -985,13 +983,13 @@ input_device *input_class::add_device(int devindex, const char *name, void *inte
 	assert(m_device[devindex] == NULL);
 
 	// allocate a new device
-	m_device[devindex].reset(global_alloc(input_device(*this, devindex, name, internal)));
+	m_device[devindex] = std::make_unique<input_device>(*this, devindex, name, internal);
 
 	// update the maximum index found
 	m_maxindex = MAX(m_maxindex, devindex);
 
 	osd_printf_verbose("Input: Adding %s #%d: %s\n", (*devclass_string_table)[m_devclass], devindex, name);
-	return m_device[devindex];
+	return m_device[devindex].get();
 }
 
 

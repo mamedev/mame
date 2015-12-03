@@ -711,7 +711,7 @@ private:
 	}
 
 	// internal state
-	auto_pointer<handler_entry_read> m_handlers[TOTAL_MEMORY_BANKS];        // array of user-installed handlers
+	std::unique_ptr<handler_entry_read> m_handlers[TOTAL_MEMORY_BANKS];        // array of user-installed handlers
 };
 
 
@@ -779,7 +779,7 @@ private:
 	}
 
 	// internal state
-	auto_pointer<handler_entry_write> m_handlers[TOTAL_MEMORY_BANKS];        // array of user-installed handlers
+	std::unique_ptr<handler_entry_write> m_handlers[TOTAL_MEMORY_BANKS];        // array of user-installed handlers
 };
 
 // ======================> address_table_setoffset
@@ -793,7 +793,7 @@ public:
 	{
 		// allocate handlers for each entry, prepopulating the bankptrs for banks
 		for (int entrynum = 0; entrynum < ARRAY_LENGTH(m_handlers); entrynum++)
-			m_handlers[entrynum].reset(global_alloc(handler_entry_setoffset()));
+			m_handlers[entrynum] = std::make_unique<handler_entry_setoffset>();
 
 		// Watchpoints and unmap states do not make sense for setoffset
 		m_handlers[STATIC_NOP]->set_delegate(setoffset_delegate(FUNC(address_table_setoffset::nop_so), this));
@@ -829,7 +829,7 @@ private:
 	}
 
 	// internal state
-	auto_pointer<handler_entry_setoffset> m_handlers[TOTAL_MEMORY_BANKS];        // array of user-installed handlers
+	std::unique_ptr<handler_entry_setoffset> m_handlers[TOTAL_MEMORY_BANKS];        // array of user-installed handlers
 };
 
 
@@ -1674,7 +1674,7 @@ address_space::address_space(memory_manager &manager, device_memory_interface &m
 		m_spacenum(spacenum),
 		m_debugger_access(false),
 		m_log_unmap(true),
-		m_direct(global_alloc(direct_read_data(*this))),
+		m_direct(std::make_unique<direct_read_data>(*this)),
 		m_name(memory.space_config(spacenum)->name()),
 		m_addrchars((m_config.m_addrbus_width + 3) / 4),
 		m_logaddrchars((m_config.m_logaddr_width + 3) / 4),
@@ -1809,7 +1809,7 @@ void address_space::prepare_map()
 	UINT32 devregionsize = (devregion != NULL) ? devregion->bytes() : 0;
 
 	// allocate the address map
-	m_map.reset(global_alloc(address_map(m_device, m_spacenum)));
+	m_map = std::make_unique<address_map>(m_device, m_spacenum);
 
 	// merge in the submaps
 	m_map->uplift_submaps(machine(), m_device, m_device.owner() ? *m_device.owner() : m_device, endianness());
@@ -1899,7 +1899,7 @@ void address_space::populate_from_map(address_map *map)
 {
 	// no map specified, use the space-specific one
 	if (map == NULL)
-		map = m_map;
+		map = m_map.get();
 
 	// no map, nothing to do
 	if (map == NULL)
@@ -3506,7 +3506,7 @@ address_table_read::address_table_read(address_space &space, bool large)
 	for (int entrynum = 0; entrynum < ARRAY_LENGTH(m_handlers); entrynum++)
 	{
 		UINT8 **bankptr = (entrynum >= STATIC_BANK1 && entrynum <= STATIC_BANKMAX) ? space.manager().bank_pointer_addr(entrynum) : NULL;
-		m_handlers[entrynum].reset(global_alloc(handler_entry_read(space.data_width(), space.endianness(), bankptr)));
+		m_handlers[entrynum] = std::make_unique<handler_entry_read>(space.data_width(), space.endianness(), bankptr);
 	}
 
 	// we have to allocate different object types based on the data bus width
@@ -3580,7 +3580,7 @@ address_table_write::address_table_write(address_space &space, bool large)
 	for (int entrynum = 0; entrynum < ARRAY_LENGTH(m_handlers); entrynum++)
 	{
 		UINT8 **bankptr = (entrynum >= STATIC_BANK1 && entrynum <= STATIC_BANKMAX) ? space.manager().bank_pointer_addr(entrynum) : NULL;
-		m_handlers[entrynum].reset(global_alloc(handler_entry_write(space.data_width(), space.endianness(), bankptr)));
+		m_handlers[entrynum] = std::make_unique<handler_entry_write>(space.data_width(), space.endianness(), bankptr);
 	}
 
 	// we have to allocate different object types based on the data bus width

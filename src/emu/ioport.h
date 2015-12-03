@@ -1054,7 +1054,7 @@ public:
 
 	UINT8 way() const { return m_way; }
 	unicode_char keyboard_code(int which) const;
-	ioport_field_live &live() const { assert(m_live != NULL); return *m_live; }
+	ioport_field_live &live() const { assert(m_live != nullptr); return *m_live; }
 
 	// setters
 	void set_crosshair_scale(double scale) { m_crosshair_scale = scale; }
@@ -1098,7 +1098,7 @@ private:
 	// internal state
 	ioport_field *              m_next;             // pointer to next field in sequence
 	ioport_port &               m_port;             // reference to the port that owns us
-	auto_pointer<ioport_field_live> m_live;         // live state of field (NULL if not live)
+	std::unique_ptr<ioport_field_live> m_live;         // live state of field (NULL if not live)
 	int                         m_modcount;         // modification count
 	simple_list<ioport_setting> m_settinglist;      // list of input_setting_configs
 	simple_list<ioport_diplocation> m_diploclist;   // list of locations for various bits
@@ -1200,7 +1200,7 @@ public:
 	const char *tag() const { return m_tag.c_str(); }
 	int modcount() const { return m_modcount; }
 	ioport_value active() const { return m_active; }
-	ioport_port_live &live() const { assert(m_live != NULL); return *m_live; }
+	ioport_port_live &live() const { assert(m_live != nullptr); return *m_live; }
 
 	// read/write to the port
 	ioport_value read();
@@ -1222,7 +1222,7 @@ private:
 	std::string                 m_tag;          // copy of this port's tag
 	int                         m_modcount;     // modification count
 	ioport_value                m_active;       // mask of active bits in the port
-	auto_pointer<ioport_port_live> m_live;      // live state of port (NULL if not live)
+	std::unique_ptr<ioport_port_live> m_live;      // live state of port (NULL if not live)
 };
 
 inline ioport_value read_safe(ioport_port *port, ioport_value defval) { return (port == NULL) ? defval : port->read(); }

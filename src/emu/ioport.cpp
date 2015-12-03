@@ -2131,7 +2131,7 @@ void ioport_field::init_live_state(analog_field *analog)
 	m_crosshair_mapper.bind_relative_to(device());
 
 	// allocate live state
-	m_live.reset(global_alloc(ioport_field_live(*this, analog)));
+	m_live = std::make_unique<ioport_field_live>(*this, analog);
 
 	m_condition.initialize(device());
 
@@ -2396,7 +2396,7 @@ void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedb
 
 void ioport_port::init_live_state()
 {
-	m_live.reset(global_alloc(ioport_port_live(*this)));
+	m_live = std::make_unique<ioport_port_live>(*this);
 }
 
 

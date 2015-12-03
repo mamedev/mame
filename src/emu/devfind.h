@@ -271,14 +271,14 @@ public:
 		for (int index = 0; index < _Count; index++)
 		{
 			strformat(m_tag[index], "%s.%d", basetag, index);
-			m_array[index].reset(global_alloc(ioport_finder_type(base, m_tag[index].c_str())));
+			m_array[index] = std::make_unique<ioport_finder_type>(base, m_tag[index].c_str());
 		}
 	}
 
 	ioport_array_finder(device_t &base, const char * const *tags)
 	{
 		for (int index = 0; index < _Count; index++)
-			m_array[index].reset(global_alloc(ioport_finder_type(base, tags[index])));
+			m_array[index] = std::make_unique<ioport_finder_type>(base, tags[index]);
 	}
 
 	// array accessors
@@ -287,7 +287,7 @@ public:
 
 protected:
 	// internal state
-	auto_pointer<ioport_finder_type> m_array[_Count];
+	std::unique_ptr<ioport_finder_type> m_array[_Count];
 	std::string m_tag[_Count];
 };
 
@@ -442,7 +442,7 @@ public:
 		for (int index = 0; index < _Count; index++)
 		{
 			strformat(m_tag[index],"%s.%d", basetag, index);
-			m_array[index].reset(global_alloc(shared_ptr_type(base, m_tag[index].c_str(), width)));
+			m_array[index] = std::make_unique<shared_ptr_type>(base, m_tag[index].c_str(), width);
 		}
 	}
 
@@ -452,7 +452,7 @@ public:
 
 protected:
 	// internal state
-	auto_pointer<shared_ptr_type> m_array[_Count];
+	std::unique_ptr<shared_ptr_type> m_array[_Count];
 	std::string m_tag[_Count];
 };
 

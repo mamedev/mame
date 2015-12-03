@@ -9,7 +9,7 @@ const reg_id& ParallelMove::opDestination() const { return m_oco->instDestinatio
 size_t ParallelMove::opAccumulatorBitsModified() const { return m_oco->instAccumulatorBitsModified(); }
 
 
-ParallelMove* ParallelMove::decodeParallelMove(const Opcode* opc, const UINT16 word0, const UINT16 word1)
+std::unique_ptr<ParallelMove> ParallelMove::decodeParallelMove(const Opcode* opc, const UINT16 word0, const UINT16 word1)
 {
 	const UINT16 w0 = word0;
 	const UINT16 w1 = word1;
@@ -17,12 +17,12 @@ ParallelMove* ParallelMove::decodeParallelMove(const Opcode* opc, const UINT16 w
 	/* Dual X Memory Data Read : 011m mKKK .rr. .... : A-142*/
 	if ((w0 & 0xe000) == 0x6000)
 	{
-		return global_alloc(DualXMemoryDataRead(opc, w0, w1));
+		return std::make_unique<DualXMemoryDataRead>(opc, w0, w1);
 	}
 	/* X Memory Data Write and Register Data Move : 0001 011k RRDD .... : A-140 */
 	else if ((w0 & 0xfe00) == 0x1600)
 	{
-		return global_alloc(XMemoryDataWriteAndRegisterDataMove(opc, w0, w1));
+		return std::make_unique<XMemoryDataWriteAndRegisterDataMove>(opc, w0, w1);
 	}
 	else
 	{
@@ -37,22 +37,22 @@ ParallelMove* ParallelMove::decodeParallelMove(const Opcode* opc, const UINT16 w
 		/* Register to Register Data Move : 0100 IIII .... .... : A-133 */
 		else if ((w0 & 0xf000) == 0x4000)
 		{
-			return global_alloc(RegisterToRegisterDataMove(opc, w0, w1));
+			return std::make_unique<RegisterToRegisterDataMove>(opc, w0, w1);
 		}
 		/* Address Register Update : 0011 0zRR .... .... : A-135 */
 		else if ((w0 & 0xf800) == 0x3000)
 		{
-			return global_alloc(AddressRegisterUpdate(opc, w0, w1));
+			return std::make_unique<AddressRegisterUpdate>(opc, w0, w1);
 		}
 		/* X Memory Data Move : 1mRR HHHW .... .... : A-137 */
 		else if ((w0 & 0x8000) == 0x8000)
 		{
-			return global_alloc(XMemoryDataMove(opc, w0, w1));
+			return std::make_unique<XMemoryDataMove>(opc, w0, w1);
 		}
 		/* X Memory Data Move : 0101 HHHW .... .... : A-137 */
 		else if ((w0 & 0xf000) == 0x5000)
 		{
-			return global_alloc(XMemoryDataMove_2(opc, w0, w1));
+			return std::make_unique<XMemoryDataMove_2>(opc, w0, w1);
 		}
 		/* X Memory Data Move with short displacement : 0000 0101 BBBB BBBB ---- HHHW .... .... : A-139 */
 		else if ((w0 & 0xff00) == 0x0500)
@@ -68,12 +68,12 @@ ParallelMove* ParallelMove::decodeParallelMove(const Opcode* opc, const UINT16 w
 				((w1 & 0xf810) != 0x3800) &&
 				((w1 & 0x00ff) != 0x0011))
 			{
-				return global_alloc(XMemoryDataMoveWithShortDisplacement(opc, w0, w1));
+				return std::make_unique<XMemoryDataMoveWithShortDisplacement>(opc, w0, w1);
 			}
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 }

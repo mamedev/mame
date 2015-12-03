@@ -39,7 +39,7 @@ public:
 	virtual size_t accumulatorBitsModified() const = 0;   // Potentially make this always return ALL (like flags)
 	virtual size_t flags() const { return 0; }
 
-	static Instruction* decodeInstruction(const Opcode* opc,
+	static std::unique_ptr<Instruction> decodeInstruction(const Opcode* opc,
 											const UINT16 word0,
 											const UINT16 word1,
 											bool shifted=false);
