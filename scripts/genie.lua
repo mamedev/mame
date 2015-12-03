@@ -724,7 +724,7 @@ else
 end
 
 local version = str_to_version(_OPTIONS["gcc_version"])
-if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["targetos"]=="macosx" and (version <= 30500))) then
+if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["targetos"]=="macosx" and (version <= 60000))) then
 	buildoptions_cpp {
 		"-x c++",
 		"-std=c++1y",
