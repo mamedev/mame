@@ -49,10 +49,7 @@ READ16_MEMBER(rungun_state::rng_psac2_videoram_r)
 {
 	return m_psac2_vram[offset+(m_video_mux_bank*0x80000)];
 }
-/*
-		//m_ttl_tilemap[m_current_display_bank]->mark_all_dirty();
-		//m_936_tilemap[m_current_display_bank]->mark_all_dirty();
-*/
+
 WRITE16_MEMBER(rungun_state::rng_psac2_videoram_w)
 {
 	COMBINE_DATA(&m_psac2_vram[offset+(m_video_mux_bank*0x80000)]);
