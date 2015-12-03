@@ -803,12 +803,19 @@ void amstrad_state::amstrad_plus_update_video()
 
 void amstrad_state::amstrad_plus_update_video_sprites()
 {
-	UINT16  *p = &m_gate_array.bitmap->pix16(m_gate_array.y, m_asic.h_start );
+	UINT16  *p;
 	int i;
+	UINT16 horiz;
 
 	if ( m_gate_array.y < 0 )
 		return;
 
+	if(m_asic.h_end < m_asic.h_start)
+		horiz = 0;
+	else
+		horiz = m_asic.h_start;
+
+	p = &m_gate_array.bitmap->pix16(m_gate_array.y, horiz );
 	for ( i = 15 * 8; i >= 0; i -= 8 )
 	{
 		UINT8   xmag = ( m_asic.ram[ 0x2000 + i + 4 ] >> 2 ) & 0x03;
@@ -824,21 +831,19 @@ void amstrad_state::amstrad_plus_update_video_sprites()
 			ymag -= 1;
 
 			/* Check if sprite would appear on this scanline */
-			if ( spr_y <= m_asic.vpos && m_asic.vpos < spr_y + ( 16 << ymag ) && spr_x < ( m_asic.h_end - m_asic.h_start ) && spr_x + ( 16 << xmag ) > 0 )
+//if(i == 0) printf("%i <= %i, %i < %i, %i < %i, %i > 0\n", spr_y,m_asic.vpos,m_asic.vpos,spr_y+(16<<ymag),spr_x,(m_asic.h_end - horiz),spr_x+(16<<xmag));
+			if ( spr_y <= m_asic.vpos && m_asic.vpos < spr_y + ( 16 << ymag ) && spr_x < (m_asic.h_end - horiz) && spr_x + ( 16 << xmag ) > 0 )
 			{
 				UINT16  spr_addr = i * 32 + ( ( ( m_asic.vpos - spr_y ) >> ymag ) * 16 );
 				int     j, k;
-
 				for ( j = 0; j < 16; j++ )
 				{
 					for ( k = 0; k < ( 1 << xmag ); k++ )
 					{
 						INT16 x = spr_x + ( j << xmag ) + k;
-
-						if ( x >= 0 && x < ( m_asic.h_end - m_asic.h_start ) )
+						if ( x >= 0 && x < (m_asic.h_end - horiz))
 						{
 							UINT8   spr_col = ( m_asic.ram[ spr_addr + j ] & 0x0f ) * 2;
-
 							if ( spr_col )
 								p[x] = m_asic.ram[ 0x2420 + spr_col ] + ( m_asic.ram[ 0x2421 + spr_col ] << 8 );
 						}
