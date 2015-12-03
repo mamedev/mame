@@ -31,5 +31,18 @@
       <bounds x="0" y="0" width="4" height="3" />
     </screen>
   </view>
+  
+  <view name="First Screen">
+    <screen index="1">
+      <bounds x="4.03" y="0" width="4" height="3" />
+    </screen>
+  </view>
+
+  <view name="Second Screen">
+	<screen index="2">
+      <bounds x="8.06" y="0" width="4" height="3" />
+    </screen>
+  </view>
+
 
 </mamelayout>
