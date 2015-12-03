@@ -719,12 +719,7 @@ if (_OPTIONS["targetos"]=="solaris") then
 	}
 else
 	buildoptions_c {
---		"-std=gnu99",
 		"-std=gnu89",
---		"-Wpedantic",
---		"-pedantic",
---		"-Wno-variadic-macros",
---		"-Wno-long-long",
 	}
 end
 
@@ -990,32 +985,13 @@ end
 				print("GCC version 4.9 or later needed")
 				os.exit(-1)
 			end
-			if (version == 40201) then
-				buildoptions {
-					"-Wno-cast-align"
-				}
-			end
-			if (version >= 40400) then
 				buildoptions {
 					"-Wno-unused-result",
-				}
-			end
-
-			if (version >= 40700) then
-				buildoptions {
 					"-Wno-narrowing",
-					"-Wno-attributes"
+					"-Wno-attributes",
+					-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
+					"-Wno-array-bounds",
 				}
-			end
-			if (version >= 40800) then
--- grr.. array-bounds works on GCC5.2 linux, but fails in sqllite3.c on MingW GCC 5.1.1 for now
---				if (version < 50000) then
---					-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
-					buildoptions {
-						"-Wno-array-bounds"
-					}
---				end
-			end
 		end
 	end
 --ifeq ($(findstring arm,$(UNAME)),arm)
@@ -1040,7 +1016,7 @@ configuration { "asmjs" }
 	}
 	buildoptions_cpp {
 		"-x c++",
-		"-std=gnu++98",
+		"-std=c++14",
 	}
 	archivesplit_size "20"
 
@@ -1050,7 +1026,7 @@ configuration { "android*" }
 	}
 	buildoptions_cpp {
 		"-x c++",
-		"-std=gnu++98",
+		"-std=c++14",
 	}
 	archivesplit_size "20"
 
@@ -1061,14 +1037,14 @@ configuration { "pnacl" }
 	}
 	buildoptions_cpp {
 		"-x c++",
-		"-std=gnu++98",
+		"-std=c++14",
 	}
 	archivesplit_size "20"
 
 configuration { "nacl*" }
 	buildoptions_cpp {
 		"-x c++",
-		"-std=gnu++98",
+		"-std=c++14",
 	}
 	archivesplit_size "20"
 
