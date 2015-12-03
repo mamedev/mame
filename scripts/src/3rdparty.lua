@@ -674,11 +674,6 @@ end
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
 		}
-if _OPTIONS["CPP11"]~="1" then		
-		defines {
-			"nullptr=NULL" -- not used but needed for C++11 code
-		}
-end
 
 	configuration { "osx*" }
 		includedirs {
@@ -745,7 +740,7 @@ end
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/text_buffer_manager.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/text_metrics.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/utf8.cpp",
-		--MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp",
 	}
