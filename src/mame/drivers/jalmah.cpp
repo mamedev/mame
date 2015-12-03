@@ -37,6 +37,8 @@ TODO:
  a match in particular circumstances because there's a write in the 94000-9bfff region;
 -Massive clean-ups needed for the MCU snippet programs and the input-ports, also check if
  the programs are actually into the m68k program itself (like hachamf/tdragon/ddealer);
+-Video code could be optimized too (for example by calling the priority function only when 
+ priority number is updated), might also need a merging with Jaleco Mega System 1/NMK16 drivers;
 
 Notes (1st MCU ver.):
 -$f000e is bogus,maybe the program snippets can modify this value,or the MCU itself can
