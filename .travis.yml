@@ -19,9 +19,8 @@ matrix:
     - os: osx
       compiler: gcc
 env:
-  - SUBTARGET=tiny   MAME=mametiny64
-#  - SUBTARGET=arcade MAME=mamearcade64 LDOPTS="-Wl,-no-keep-memory"
-#  - SUBTARGET=mess   MAME=mess64
+  - SUBTARGET=arcade MAME=mamearcade64 LDOPTS="-Wl,-no-keep-memory"
+  - SUBTARGET=mess   MAME=mess64
 script:
   - if [ $TRAVIS_OS_NAME == 'linux' ]; then
     if [ $CC == 'clang' ]; then
