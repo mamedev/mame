@@ -296,6 +296,16 @@ project "7z"
 	uuid "ad573d62-e76a-4b11-ae34-5110a6789a42"
 	kind "StaticLib"
 
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+		configuration { "gmake" }
+		if (version >= 30700) then
+			buildoptions {
+				"-Wno-shift-negative-value",
+			}
+		end	
+	end
+
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
