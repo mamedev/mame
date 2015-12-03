@@ -58,6 +58,16 @@ project "zlib"
 	uuid "3d78bd2a-2bd0-4449-8087-42ddfaef7ec9"
 	kind "StaticLib"
 
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+		configuration { "gmake" }
+		if (version >= 30700) then
+			buildoptions {
+				"-Wno-shift-negative-value",
+			}
+		end	
+	end
+
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4131", -- warning C4131: 'xxx' : uses old-style declarator
@@ -295,16 +305,6 @@ end
 project "7z"
 	uuid "ad573d62-e76a-4b11-ae34-5110a6789a42"
 	kind "StaticLib"
-
-	local version = str_to_version(_OPTIONS["gcc_version"])
-	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
-		configuration { "gmake" }
-		if (version >= 30700) then
-			buildoptions {
-				"-Wno-shift-negative-value",
-			}
-		end	
-	end
 
 	configuration { "vs*" }
 		buildoptions {
