@@ -966,7 +966,7 @@ end
 		local version = str_to_version(_OPTIONS["gcc_version"])
 		if string.find(_OPTIONS["gcc"], "clang") then
 			if (version < 30400) then
-				print("Clang version 3.5 or later needed")
+				print("Clang version 3.4 or later needed")
 				os.exit(-1)
 			end
 			buildoptions {
