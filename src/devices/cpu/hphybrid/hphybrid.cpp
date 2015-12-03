@@ -18,6 +18,7 @@ enum {
 				HPHYBRID_DMAMA,
 				HPHYBRID_DMAC,
 				HPHYBRID_I,
+                                HPHYBRID_W,
                                 HPHYBRID_AR2,
                                 HPHYBRID_AR2_2,
                                 HPHYBRID_AR2_3,
@@ -127,6 +128,7 @@ void hp_hybrid_cpu_device::device_start()
 				m_reg_PA[ 0 ] = 0;
 				m_reg_PA[ 1 ] = 0;
 				m_reg_PA[ 2 ] = 0;
+                                m_reg_W = 0;
 				m_flags = 0;
 				m_dmapa = 0;
 				m_dmama = 0;
@@ -144,6 +146,7 @@ void hp_hybrid_cpu_device::device_start()
 								state_add(STATE_GENSP, "GENSP", m_reg_R).noshow();
 								state_add(HPHYBRID_IV, "IV", m_reg_IV);
 								state_add(HPHYBRID_PA, "PA", m_reg_PA[ 0 ]);
+                                                                state_add(HPHYBRID_W, "W", m_reg_W).noshow();
 								state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).noshow().formatstr("%9s");
 								state_add(HPHYBRID_DMAPA , "DMAPA" , m_dmapa).noshow();
 								state_add(HPHYBRID_DMAMA , "DMAMA" , m_dmama).noshow();
@@ -165,6 +168,7 @@ void hp_hybrid_cpu_device::device_start()
 				save_item(NAME(m_reg_PA[0]));
 				save_item(NAME(m_reg_PA[1]));
 				save_item(NAME(m_reg_PA[2]));
+                                save_item(NAME(m_reg_W));
 				save_item(NAME(m_flags));
 				save_item(NAME(m_dmapa));
 				save_item(NAME(m_dmama));
@@ -669,6 +673,9 @@ UINT16 hp_hybrid_cpu_device::RM(UINT32 addr)
                 case HP_REG_PA_ADDR:
                         return CURRENT_PA;
 
+                case HP_REG_W_ADDR:
+                        return m_reg_W;
+
                 case HP_REG_DMAPA_ADDR:
                         tmp = m_dmapa & HP_REG_PA_MASK;
                         if (BIT(m_flags , HPHYBRID_CB_BIT)) {
@@ -740,6 +747,10 @@ void hp_hybrid_cpu_device::WM(UINT32 addr , UINT16 v)
 
                 case HP_REG_PA_ADDR:
                         CURRENT_PA = v & HP_REG_PA_MASK;
+                        break;
+
+                case HP_REG_W_ADDR:
+                        m_reg_W = v;
                         break;
 
                 case HP_REG_DMAPA_ADDR:

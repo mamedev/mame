@@ -52,6 +52,7 @@
 #define HP_REG_R7_ADDR  0x0007
 #define HP_REG_IV_ADDR  0x0008
 #define HP_REG_PA_ADDR  0x0009
+#define HP_REG_W_ADDR   0x000A
 #define HP_REG_DMAPA_ADDR       0x000B
 #define HP_REG_DMAMA_ADDR       0x000C
 #define HP_REG_DMAC_ADDR        0x000D
@@ -146,6 +147,7 @@ protected:
                 UINT16 m_reg_C;     // Register C
                 UINT16 m_reg_D;     // Register D
                 UINT16 m_reg_IV;    // Register IV
+        UINT16 m_reg_W; // Register W
                 UINT8  m_reg_PA[ HPHYBRID_INT_LVLS + 1 ];   // Stack of register PA (4 bit-long)
                 UINT16 m_flags;     // Flags
                 UINT8  m_dmapa;     // DMA peripheral address (4 bits)
