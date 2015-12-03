@@ -723,7 +723,18 @@ else
 	}
 end
 
+local version = str_to_version(_OPTIONS["gcc_version"])
+if string.find(_OPTIONS["gcc"], "clang") and (version < 30500) then
+	buildoptions_cpp {
+		"-x c++",
+		"-std=c++1y",
+	}
 
+	buildoptions_objc {
+		"-x objective-c++",
+		"-std=c++1y",
+	}
+else
 	buildoptions_cpp {
 		"-x c++",
 		"-std=c++14",
@@ -733,8 +744,7 @@ end
 		"-x objective-c++",
 		"-std=c++14",
 	}
-
-
+end
 -- this speeds it up a bit by piping between the preprocessor/compiler/assembler
 	if not ("pnacl" == _OPTIONS["gcc"]) then
 		buildoptions {
@@ -956,7 +966,7 @@ end
 		local version = str_to_version(_OPTIONS["gcc_version"])
 		if string.find(_OPTIONS["gcc"], "clang") then
 			if (version < 30400) then
-				print("Clang version 3.4 or later needed")
+				print("Clang version 3.5 or later needed")
 				os.exit(-1)
 			end
 			buildoptions {
