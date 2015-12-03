@@ -7287,7 +7287,7 @@ ROM_START( peps0308 ) /* Normal board : Double Jackpot Slots (PS0308) - Payout 9
 	ROM_LOAD( "cap911.u50", 0x0000, 0x0100, CRC(f117e781) SHA1(ba9d850c93e5f3abc26b0ba51f67fa7c07e05f59) )
 ROM_END
 
-ROM_START( peps0358 ) /* Normal board : Red White & Blue Wild Star Slots (PS0358) - Payout 94.98% */
+ROM_START( peps0358 ) /* Normal board : Wild Star Red White & Blue Slots (PS0358) - Payout 94.98% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0358_569-a2c.u68",   0x00000, 0x10000, CRC(5db2884f) SHA1(9a493c096d362c11498fec13bc2df1516ec8d967) ) /* 2 Coins Max / 1 Line */
 
@@ -7301,7 +7301,7 @@ ROM_START( peps0358 ) /* Normal board : Red White & Blue Wild Star Slots (PS0358
 	ROM_LOAD( "cap1301.u50", 0x0000, 0x0100, CRC(4135261f) SHA1(0920a9522d818ab7e43e4f13e7b184b956ee75cf) )
 ROM_END
 
-ROM_START( peps0364 ) /* Normal board : Red White & Blue Wild Star Slots (PS0364) - Payout 90.09% */
+ROM_START( peps0364 ) /* Normal board : Wild Star Red White & Blue Slots (PS0364) - Payout 90.09% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0364_569-a2c.u68",   0x00000, 0x10000, CRC(596c4ae4) SHA1(a06626fb7d17fd12c7514d435031924973e4ba55) ) /* 3 Coins Max / 1 Line */
 
@@ -7443,7 +7443,7 @@ ROM_START( peps0628 ) /* Normal board : Double Black Jack (PS0628) - Payout 92.5
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) ) /* WRONG!! - Should be CAP2250 here */
 ROM_END
 
-ROM_START( peps0631 ) /* Normal board : Red White & Blue Wild Star Slots (PS0631) - Payout 89.96% */
+ROM_START( peps0631 ) /* Normal board : Wild Star Red White & Blue Slots (PS0631) - Payout 89.96% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0631_586-a6c.u68",   0x00000, 0x10000, CRC(3d4c52dd) SHA1(f6b31a77de52c0d6402b51349f34bdb687b27178) ) /* 3 Coins Max / 1 Line */
 
@@ -7457,7 +7457,7 @@ ROM_START( peps0631 ) /* Normal board : Red White & Blue Wild Star Slots (PS0631
 	ROM_LOAD( "cap1301.u50", 0x0000, 0x0100, CRC(4135261f) SHA1(0920a9522d818ab7e43e4f13e7b184b956ee75cf) )
 ROM_END
 
-ROM_START( peps0708 ) /* Normal board : Double Cherry Slots (PS0708) - Payout 94.99% */
+ROM_START( peps0708 ) /* Normal board : Double Cherry Bar Slots (PS0708) - Payout 94.99% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0708_589-a6x.u68",   0x00000, 0x10000, CRC(24aea5cd) SHA1(88f2065ce8509b79f36eb20a48217d9086b1fee4) ) /* 2 Coins Max / 1 Line */
 
@@ -7474,6 +7474,20 @@ ROM_END
 ROM_START( peps0716 ) /* Normal board : River Gambler Slots (PS0716) - Payout 95.00% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0716_589-a6x.u68",   0x00000, 0x10000, CRC(7615d7b6) SHA1(91fe62eec720a0dc2ebf48835065148f19499d16) ) /* 2 Coins Max / 1 Line */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2266.u72",  0x00000, 0x8000, CRC(590accd8) SHA1(4e1c963c50799eaa49970e25ecf9cb01eb6b09e1) )
+	ROM_LOAD( "mgo-cg2266.u73",  0x08000, 0x8000, CRC(b87ffa05) SHA1(92126b670b9cabeb5e2cc35b6e9c458088b18eea) )
+	ROM_LOAD( "mbo-cg2266.u74",  0x10000, 0x8000, CRC(e3df30e1) SHA1(c7d2ae9a7c7e53bfb6197b635efcb5dc231e4fe0) )
+	ROM_LOAD( "mxo-cg2266.u75",  0x18000, 0x8000, CRC(56271442) SHA1(61ad0756b9f6412516e46ef6625a4c3899104d4e) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap2266.u50", 0x0000, 0x0100, CRC(5aaff103) SHA1(9cfda9c095cb77a8bb761c131a0f358e79b97abc) )
+ROM_END
+
+ROM_START( peps0722 ) /* Normal board : River Gambler Slots (PS0716) - Payout 90.02% */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ps0722_589-a6x.u68",   0x00000, 0x10000, CRC(efe903c8) SHA1(37b8d9dbc3cbdf1b0126c73a92d43c1d8d080289) ) /* 3 Coins Max / 1 Line */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2266.u72",  0x00000, 0x8000, CRC(590accd8) SHA1(4e1c963c50799eaa49970e25ecf9cb01eb6b09e1) )
@@ -12783,8 +12797,8 @@ GAMEL(1996, peps0207, peps0021, peplus, peplus_slots,   peplus_state, peplus,   
 GAMEL(1996, peps0296, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0296) Haywire Slots",                    0, layout_pe_slots )
 GAMEL(1996, peps0298, peps0042, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0298) Double Diamond Slots",             0, layout_pe_slots )
 GAMEL(1996, peps0308, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0308) Double Jackpot Slots",             0, layout_pe_slots )
-GAMEL(1996, peps0358, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0358) Red White & Blue Wild Star Slots", 0, layout_pe_slots )
-GAMEL(1996, peps0364, peps0358, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0364) Red White & Blue Wild Star Slots", 0, layout_pe_slots )
+GAMEL(1996, peps0358, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0358) Wild Star Red White & Blue Slots", 0, layout_pe_slots )
+GAMEL(1996, peps0364, peps0358, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0364) Wild Star Red White & Blue Slots", 0, layout_pe_slots )
 GAMEL(1996, peps0366, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0366) Double Diamond Deluxe Slots",      0, layout_pe_slots )
 GAMEL(1996, peps0372, peps0366, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0372) Double Diamond Deluxe Slots",      0, layout_pe_slots )
 GAMEL(1996, peps0373, peps0366, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0373) Double Diamond Deluxe Slots",      0, layout_pe_slots )
@@ -12794,9 +12808,10 @@ GAMEL(1996, peps0470, 0,        peplus, peplus_slots,   peplus_state, peplus,   
 GAMEL(1996, peps0581, peps0021, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0581) Red White & Blue Slots",           0, layout_pe_slots )
 GAMEL(1996, peps0615, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0615) Chaos Slots",                      MACHINE_WRONG_COLORS, layout_pe_slots ) /* CAP2246 not dumped */
 GAMEL(1996, peps0628, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0628) Double Black Jack Slots",          MACHINE_WRONG_COLORS, layout_pe_slots ) /* CAP2250 not dumped */
-GAMEL(1996, peps0631, peps0358, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0631) Red White & Blue Wild Star Slots", 0, layout_pe_slots )
-GAMEL(1996, peps0708, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0708) Double Cherry Slots",              0, layout_pe_slots )
+GAMEL(1996, peps0631, peps0358, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0631) Wild Star Red White & Blue Slots", 0, layout_pe_slots )
+GAMEL(1996, peps0708, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0708) Double Cherry Bar Slots",          0, layout_pe_slots )
 GAMEL(1996, peps0716, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0716) River Gambler Slots",              0, layout_pe_slots )
+GAMEL(1996, peps0722, peps0716, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0722) River Gambler Slots",              0, layout_pe_slots )
 
 /* Superboard : Poker */
 GAMEL(1995, pex0002p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000002P+XP000038) Standard Draw Poker", 0, layout_pe_poker )
