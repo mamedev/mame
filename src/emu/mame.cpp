@@ -81,7 +81,7 @@
 //  MACHINE MANAGER
 //**************************************************************************
 
-machine_manager* machine_manager::m_manager = NULL;
+machine_manager* machine_manager::m_manager = nullptr;
 
 osd_interface &machine_manager::osd() const
 {
@@ -111,8 +111,8 @@ machine_manager::machine_manager(emu_options &options,osd_interface &osd)
 		: m_osd(osd),
 		m_options(options),
 		m_lua(global_alloc(lua_engine)),
-		m_new_driver_pending(NULL),
-		m_machine(NULL)
+		m_new_driver_pending(nullptr),
+		m_machine(nullptr)
 {
 }
 
@@ -124,7 +124,7 @@ machine_manager::machine_manager(emu_options &options,osd_interface &osd)
 machine_manager::~machine_manager()
 {
 	global_free(m_lua);
-	m_manager = NULL;
+	m_manager = nullptr;
 }
 
 
@@ -169,11 +169,11 @@ int machine_manager::execute()
 	m_lua->initialize();
 	while (error == MAMERR_NONE && !exit_pending)
 	{
-		m_new_driver_pending = NULL;
+		m_new_driver_pending = nullptr;
 
 		// if no driver, use the internal empty driver
 		const game_driver *system = m_options.system();
-		if (system == NULL)
+		if (system == nullptr)
 		{
 			system = &GAME_NAME(___empty);
 			if (firstgame)
@@ -191,7 +191,7 @@ int machine_manager::execute()
 		}
 
 		// otherwise, perform validity checks before anything else
-		if (system != NULL)
+		if (system != nullptr)
 		{
 			validity_checker valid(m_options);
 			valid.check_shared_source(*system);
@@ -237,7 +237,7 @@ int machine_manager::execute()
 			exit_pending = true;
 
 		// machine will go away when we exit scope
-		set_machine(NULL);
+		set_machine(nullptr);
 	}
 	// return an error
 	return error;

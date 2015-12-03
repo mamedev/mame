@@ -21,8 +21,8 @@ class ui_menu_control_device_image : public ui_menu {
 public:
 	ui_menu_control_device_image(running_machine &machine, render_container *container, device_image_interface *image);
 	virtual ~ui_menu_control_device_image();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 protected:
 	enum {

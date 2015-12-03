@@ -40,8 +40,8 @@ resource_pool::resource_pool(int hash_size)
 	: m_hash_size(hash_size),
 		m_listlock(osd_lock_alloc()),
 		m_hash(hash_size),
-		m_ordered_head(NULL),
-		m_ordered_tail(NULL)
+		m_ordered_head(nullptr),
+		m_ordered_tail(nullptr)
 {
 	memset(&m_hash[0], 0, hash_size*sizeof(m_hash[0]));
 }
@@ -56,7 +56,7 @@ resource_pool::resource_pool(int hash_size)
 resource_pool::~resource_pool()
 {
 	clear();
-	if (m_listlock != NULL)
+	if (m_listlock != nullptr)
 		osd_lock_free(m_listlock);
 }
 
@@ -82,15 +82,15 @@ void resource_pool::add(resource_pool_item &item, size_t size, const char *type)
 
 	// find the entry to insert after
 	resource_pool_item *insert_after;
-	for (insert_after = m_ordered_tail; insert_after != NULL; insert_after = insert_after->m_ordered_prev)
+	for (insert_after = m_ordered_tail; insert_after != nullptr; insert_after = insert_after->m_ordered_prev)
 		if (insert_after->m_id < item.m_id)
 			break;
 
 	// insert into the appropriate spot
-	if (insert_after != NULL)
+	if (insert_after != nullptr)
 	{
 		item.m_ordered_next = insert_after->m_ordered_next;
-		if (item.m_ordered_next != NULL)
+		if (item.m_ordered_next != nullptr)
 			item.m_ordered_next->m_ordered_prev = &item;
 		else
 			m_ordered_tail = &item;
@@ -100,11 +100,11 @@ void resource_pool::add(resource_pool_item &item, size_t size, const char *type)
 	else
 	{
 		item.m_ordered_next = m_ordered_head;
-		if (item.m_ordered_next != NULL)
+		if (item.m_ordered_next != nullptr)
 			item.m_ordered_next->m_ordered_prev = &item;
 		else
 			m_ordered_tail = &item;
-		item.m_ordered_prev = NULL;
+		item.m_ordered_prev = nullptr;
 		m_ordered_head = &item;
 	}
 
@@ -120,14 +120,14 @@ void resource_pool::add(resource_pool_item &item, size_t size, const char *type)
 void resource_pool::remove(void *ptr)
 {
 	// ignore NULLs
-	if (ptr == NULL)
+	if (ptr == nullptr)
 		return;
 
 	// search for the item
 	osd_lock_acquire(m_listlock);
 
 	int hashval = reinterpret_cast<FPTR>(ptr) % m_hash_size;
-	for (resource_pool_item **scanptr = &m_hash[hashval]; *scanptr != NULL; scanptr = &(*scanptr)->m_next)
+	for (resource_pool_item **scanptr = &m_hash[hashval]; *scanptr != nullptr; scanptr = &(*scanptr)->m_next)
 
 		// must match the pointer
 		if ((*scanptr)->m_ptr == ptr)
@@ -137,11 +137,11 @@ void resource_pool::remove(void *ptr)
 			*scanptr = deleteme->m_next;
 
 			// remove from ordered list
-			if (deleteme->m_ordered_prev != NULL)
+			if (deleteme->m_ordered_prev != nullptr)
 				deleteme->m_ordered_prev->m_ordered_next = deleteme->m_ordered_next;
 			else
 				m_ordered_head = deleteme->m_ordered_next;
-			if (deleteme->m_ordered_next != NULL)
+			if (deleteme->m_ordered_next != nullptr)
 				deleteme->m_ordered_next->m_ordered_prev = deleteme->m_ordered_prev;
 			else
 				m_ordered_tail = deleteme->m_ordered_prev;
@@ -169,7 +169,7 @@ resource_pool_item *resource_pool::find(void *ptr)
 
 	int hashval = reinterpret_cast<FPTR>(ptr) % m_hash_size;
 	resource_pool_item *item;
-	for (item = m_hash[hashval]; item != NULL; item = item->m_next)
+	for (item = m_hash[hashval]; item != nullptr; item = item->m_next)
 		if (item->m_ptr == ptr)
 			break;
 
@@ -192,8 +192,8 @@ bool resource_pool::contains(void *_ptrstart, void *_ptrend)
 	// search for the item
 	osd_lock_acquire(m_listlock);
 
-	resource_pool_item *item = NULL;
-	for (item = m_ordered_head; item != NULL; item = item->m_ordered_next)
+	resource_pool_item *item = nullptr;
+	for (item = m_ordered_head; item != nullptr; item = item->m_ordered_next)
 	{
 		UINT8 *objstart = reinterpret_cast<UINT8 *>(item->m_ptr);
 		UINT8 *objend = objstart + item->m_size;
@@ -204,7 +204,7 @@ bool resource_pool::contains(void *_ptrstart, void *_ptrend)
 found:
 	osd_lock_release(m_listlock);
 
-	return (item != NULL);
+	return (item != nullptr);
 }
 
 
@@ -218,7 +218,7 @@ void resource_pool::clear()
 
 	// important: delete from earliest to latest; this allows objects to clean up after
 	// themselves if they wish
-	while (m_ordered_head != NULL)
+	while (m_ordered_head != nullptr)
 		remove(m_ordered_head->m_ptr);
 
 	osd_lock_release(m_listlock);

@@ -55,7 +55,7 @@ public:
 	// osd_output interface
 
 protected:
-	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args);
+	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args) override;
 
 private:
 	// internal helpers

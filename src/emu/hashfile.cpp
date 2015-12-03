@@ -198,7 +198,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 			if (!strcmp(tagname, "hash"))
 			{
 				// we are now examining a hash tag
-				name = NULL;
+				name = nullptr;
 //              device = IO_COUNT;
 
 				while(attributes[0])
@@ -264,7 +264,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 			break;
 
 		case HASH_POS_HASH:
-			text_dest = NULL;
+			text_dest = nullptr;
 
 			if (!strcmp(tagname, "year")) {
 			}
@@ -296,7 +296,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 static void end_handler(void *data, const char *name)
 {
 	struct hash_parse_state *state = (struct hash_parse_state *) data;
-	state->text_dest = NULL;
+	state->text_dest = nullptr;
 
 	state->pos = (hash_parse_position) (state->pos - 1);
 	switch(state->pos)
@@ -310,7 +310,7 @@ static void end_handler(void *data, const char *name)
 			{
 				if (state->use_proc)
 					(*state->use_proc)(state->hashfile, state->param, state->hi);
-				state->hi = NULL;
+				state->hi = nullptr;
 			}
 			break;
 	}
@@ -373,7 +373,7 @@ static void hashfile_parse(hash_file *hashfile,
 	memcallbacks.malloc_fcn = expat_malloc;
 	memcallbacks.realloc_fcn = expat_realloc;
 	memcallbacks.free_fcn = expat_free;
-	state.parser = XML_ParserCreate_MM(NULL, &memcallbacks, NULL);
+	state.parser = XML_ParserCreate_MM(nullptr, &memcallbacks, nullptr);
 	if (!state.parser)
 		goto done;
 
@@ -428,8 +428,8 @@ static void preload_use_proc(hash_file *hashfile, void *param, hash_info *hi)
 hash_file *hashfile_open(emu_options &options, const char *sysname, int is_preload,
 	void (*error_proc)(const char *message))
 {
-	hash_file *hashfile = NULL;
-	object_pool *pool = NULL;
+	hash_file *hashfile = nullptr;
+	object_pool *pool = nullptr;
 	file_error filerr;
 
 	/* create a pool for this hash file */
@@ -453,19 +453,19 @@ hash_file *hashfile_open(emu_options &options, const char *sysname, int is_prelo
 	if (filerr != FILERR_NONE)
 	{
 		global_free(hashfile->file);
-		hashfile->file = NULL;
+		hashfile->file = nullptr;
 		goto error;
 	}
 
 	if (is_preload)
-		hashfile_parse(hashfile, NULL, preload_use_proc, hashfile->error_proc, NULL);
+		hashfile_parse(hashfile, nullptr, preload_use_proc, hashfile->error_proc, nullptr);
 
 	return hashfile;
 
 error:
-	if (hashfile != NULL)
+	if (hashfile != nullptr)
 		hashfile_close(hashfile);
-	return NULL;
+	return nullptr;
 }
 
 
@@ -522,11 +522,11 @@ const hash_info *hashfile_lookup(hash_file *hashfile, const hash_collection *has
 	int i;
 
 	param.hashes = hashes;
-	param.hi = NULL;
+	param.hi = nullptr;
 
 	for (i = 0; i < hashfile->preloaded_hash_count; i++)
 	{
-		if (singular_selector_proc(hashfile, &param, NULL, hashfile->preloaded_hashes[i]->hashes))
+		if (singular_selector_proc(hashfile, &param, nullptr, hashfile->preloaded_hashes[i]->hashes))
 			return hashfile->preloaded_hashes[i];
 	}
 
@@ -535,7 +535,7 @@ const hash_info *hashfile_lookup(hash_file *hashfile, const hash_collection *has
 	return param.hi;
 }
 
-const char *extra_info = NULL;
+const char *extra_info = nullptr;
 
 bool read_hash_config(device_image_interface &image, const char *sysname, std::string &result)
 {
@@ -543,7 +543,7 @@ bool read_hash_config(device_image_interface &image, const char *sysname, std::s
 	const hash_info *info;
 
 	/* open the hash file */
-	hashfile = hashfile_open(image.device().mconfig().options(), sysname, FALSE, NULL);
+	hashfile = hashfile_open(image.device().mconfig().options(), sysname, FALSE, nullptr);
 	if (!hashfile)
 		return false;
 
@@ -567,7 +567,7 @@ bool hashfile_extrainfo(device_image_interface &image, std::string &result)
 {
 	/* now read the hash file */
 	image.crc();
-	extra_info = NULL;
+	extra_info = nullptr;
 	int drv = driver_list::find(*image.device().mconfig().options().system());
 	int compat, open = drv;
 	bool hashfound;

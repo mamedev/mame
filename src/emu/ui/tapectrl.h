@@ -20,8 +20,8 @@ class ui_menu_tape_control : public ui_menu_device_control<cassette_image_device
 public:
 	ui_menu_tape_control(running_machine &machine, render_container *container, cassette_image_device *device);
 	virtual ~ui_menu_tape_control();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	static void get_time_string(std::string &dest, cassette_image_device *cassette, int *curpos, int *endpos);

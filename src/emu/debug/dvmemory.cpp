@@ -47,7 +47,7 @@ debug_view_memory_source::debug_view_memory_source(const char *name, address_spa
 	: debug_view_source(name, &space.device()),
 		m_space(&space),
 		m_memintf(dynamic_cast<device_memory_interface *>(&space.device())),
-		m_base(NULL),
+		m_base(nullptr),
 		m_length(0),
 		m_offsetxor(0),
 		m_endianness(space.endianness()),
@@ -57,8 +57,8 @@ debug_view_memory_source::debug_view_memory_source(const char *name, address_spa
 
 debug_view_memory_source::debug_view_memory_source(const char *name, memory_region &region)
 	: debug_view_source(name),
-		m_space(NULL),
-		m_memintf(NULL),
+		m_space(nullptr),
+		m_memintf(nullptr),
 		m_base(region.base()),
 		m_length(region.bytes()),
 		m_offsetxor(ENDIAN_VALUE_NE_NNE(region.endianness(), 0, region.bytewidth() - 1)),
@@ -69,8 +69,8 @@ debug_view_memory_source::debug_view_memory_source(const char *name, memory_regi
 
 debug_view_memory_source::debug_view_memory_source(const char *name, void *base, int element_size, int num_elements)
 	: debug_view_source(name),
-		m_space(NULL),
-		m_memintf(NULL),
+		m_space(nullptr),
+		m_memintf(nullptr),
 		m_base(base),
 		m_length(element_size * num_elements),
 		m_offsetxor(0),
@@ -133,7 +133,7 @@ void debug_view_memory::enumerate_sources()
 
 	// first add all the devices' address spaces
 	memory_interface_iterator iter(machine().root_device());
-	for (device_memory_interface *memintf = iter.first(); memintf != NULL; memintf = iter.next())
+	for (device_memory_interface *memintf = iter.first(); memintf != nullptr; memintf = iter.next())
 		if (&memintf->device() != &machine().root_device())
 			for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
 				if (memintf->has_space(spacenum))
@@ -144,7 +144,7 @@ void debug_view_memory::enumerate_sources()
 				}
 
 	// then add all the memory regions
-	for (memory_region *region = machine().memory().first_region(); region != NULL; region = region->next())
+	for (memory_region *region = machine().memory().first_region(); region != nullptr; region = region->next())
 	{
 		strprintf(name, "Region '%s'", region->name());
 		m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), *region)));
@@ -157,7 +157,7 @@ void debug_view_memory::enumerate_sources()
 		UINT32 valsize, valcount;
 		void *base;
 		const char *itemname = machine().save().indexed_item(itemnum, base, valsize, valcount);
-		if (itemname == NULL)
+		if (itemname == nullptr)
 			break;
 
 		// add pretty much anything that's not a timer (we may wish to cull other items later)
@@ -195,10 +195,10 @@ void debug_view_memory::view_notify(debug_view_notification type)
 		if (m_bytes_per_chunk > 8)
 			m_bytes_per_chunk = 8;
 		m_data_format = m_bytes_per_chunk;
-		if (source.m_space != NULL)
+		if (source.m_space != nullptr)
 			m_expression.set_context(&source.m_space->device().debug()->symtable());
 		else
-			m_expression.set_context(NULL);
+			m_expression.set_context(nullptr);
 	}
 }
 
@@ -262,7 +262,7 @@ void debug_view_memory::view_update()
 		if (effrow < m_total.y)
 		{
 			offs_t addrbyte = m_byte_offset + effrow * m_bytes_per_row;
-			offs_t address = (source.m_space != NULL) ? source.m_space->byte_to_address(addrbyte) : addrbyte;
+			offs_t address = (source.m_space != nullptr) ? source.m_space->byte_to_address(addrbyte) : addrbyte;
 			char addrtext[20];
 
 			// generate the address
@@ -409,7 +409,7 @@ void debug_view_memory::view_char(int chval)
 		{
 			static const char hexvals[] = "0123456789abcdef";
 			char *hexchar = (char *)strchr(hexvals, tolower(chval));
-			if (hexchar == NULL)
+			if (hexchar == nullptr)
 				break;
 
 			UINT64 data;
@@ -492,7 +492,7 @@ void debug_view_memory::recompute()
 
 	// determine the maximum address and address format string from the raw information
 	int addrchars;
-	if (source.m_space != NULL)
+	if (source.m_space != nullptr)
 	{
 		m_maxaddr = m_no_translation ? source.m_space->bytemask() : source.m_space->logbytemask();
 		addrchars = m_no_translation ? source.m_space->addrchars() : source.m_space->logaddrchars();
@@ -510,7 +510,7 @@ void debug_view_memory::recompute()
 		strprintf(m_addrformat, "%%0%dX%*s", addrchars, 8 - addrchars, "");
 
 	// if we are viewing a space with a minimum chunk size, clamp the bytes per chunk
-	if (source.m_space != NULL && source.m_space->byte_to_address(1) > 1)
+	if (source.m_space != nullptr && source.m_space->byte_to_address(1) > 1)
 	{
 		UINT32 min_bytes_per_chunk = source.m_space->byte_to_address(1);
 		while (m_bytes_per_chunk < min_bytes_per_chunk)
@@ -576,7 +576,7 @@ bool debug_view_memory::needs_recompute()
 
 		const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 		offs_t resultbyte;
-		if (source.m_space != NULL)
+		if (source.m_space != nullptr)
 			resultbyte  = source.m_space->address_to_byte(m_expression.value()) & source.m_space->logbytemask();
 		else
 			resultbyte = m_expression.value();
@@ -697,7 +697,7 @@ bool debug_view_memory::read(UINT8 size, offs_t offs, UINT64 &data)
 	const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 
 	// if no raw data, just use the standard debug routines
-	if (source.m_space != NULL)
+	if (source.m_space != nullptr)
 	{
 		offs_t dummyaddr = offs;
 
@@ -750,7 +750,7 @@ void debug_view_memory::write(UINT8 size, offs_t offs, UINT64 data)
 	const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 
 	// if no raw data, just use the standard debug routines
-	if (source.m_space != NULL)
+	if (source.m_space != nullptr)
 	{
 		switch (size)
 		{

@@ -17,8 +17,8 @@ class ui_menu_device_config : public ui_menu {
 public:
 	ui_menu_device_config(running_machine &machine, render_container *container, device_slot_interface *slot, device_slot_option *option);
 	virtual ~ui_menu_device_config();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	device_slot_interface *m_owner;

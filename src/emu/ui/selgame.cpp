@@ -59,7 +59,7 @@ void ui_menu_select_game::build_driver_list()
 	const osd_directory_entry *dir;
 
 	// iterate while we get new objects
-	while ((dir = path.next()) != NULL)
+	while ((dir = path.next()) != nullptr)
 	{
 		char drivername[50];
 		char *dst = drivername;
@@ -82,7 +82,7 @@ void ui_menu_select_game::build_driver_list()
 		m_driverlist[listnum++] = &m_drivlist->driver();
 
 	// NULL-terminate
-	m_driverlist[listnum] = NULL;
+	m_driverlist[listnum] = nullptr;
 }
 
 
@@ -98,7 +98,7 @@ void ui_menu_select_game::handle()
 
 	// process the menu
 	const ui_menu_event *menu_event = process(0);
-	if (menu_event != NULL && menu_event->itemref != NULL)
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		// reset the error on any future menu_event
 		if (m_error)
@@ -180,7 +180,7 @@ void ui_menu_select_game::inkey_cancel(const ui_menu_event *menu_event)
 	if (m_search[0] != 0)
 	{
 		// since we have already been popped, we must recreate ourself from scratch
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_game(machine(), container, NULL)));
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_game(machine(), container, nullptr)));
 	}
 }
 
@@ -221,7 +221,7 @@ void ui_menu_select_game::populate()
 	int matchcount;
 	int curitem;
 
-	for (curitem = matchcount = 0; m_driverlist[curitem] != NULL && matchcount < VISIBLE_GAMES_IN_LIST; curitem++)
+	for (curitem = matchcount = 0; m_driverlist[curitem] != nullptr && matchcount < VISIBLE_GAMES_IN_LIST; curitem++)
 		if (!(m_driverlist[curitem]->flags & MACHINE_NO_STANDALONE))
 			matchcount++;
 
@@ -235,12 +235,12 @@ void ui_menu_select_game::populate()
 					emulator_info::get_gamesnoun(),
 					emulator_info::get_configname(),
 					emulator_info::get_appname(),emulator_info::get_appname() );
-		item_append(txt.c_str(), NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
+		item_append(txt.c_str(), nullptr, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, nullptr);
 		return;
 	}
 
 	// otherwise, rebuild the match list
-	assert(m_drivlist != NULL);
+	assert(m_drivlist != nullptr);
 	if (m_search[0] != 0 || m_matchlist[0] == -1 || m_rerandomize)
 		m_drivlist->find_approximate_matches(m_search, matchcount, m_matchlist);
 	m_rerandomize = false;
@@ -259,8 +259,8 @@ void ui_menu_select_game::populate()
 	// if we're forced into this, allow general input configuration as well
 	if (ui_menu::stack_has_special_main_menu())
 	{
-		item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-		item_append("Configure General Inputs", NULL, 0, (void *)1);
+		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+		item_append("Configure General Inputs", nullptr, 0, (void *)1);
 	}
 
 	// configure the custom rendering
@@ -290,7 +290,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 
 	// get the size of the text
 	machine().ui().draw_text_full(container, tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-						DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
+						DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(width, origx2 - origx1);
 
@@ -310,10 +310,10 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 
 	// draw the text within it
 	machine().ui().draw_text_full(container, tempbuf[0].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	// determine the text to render below
-	driver = ((FPTR)selectedref > 1) ? (const game_driver *)selectedref : NULL;
+	driver = ((FPTR)selectedref > 1) ? (const game_driver *)selectedref : nullptr;
 	if ((FPTR)driver > 1)
 	{
 		const char *gfxstat, *soundstat;
@@ -380,7 +380,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	for (line = 0; line < 4; line++)
 	{
 		machine().ui().draw_text_full(container, tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-							DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
+							DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
 	}
@@ -393,11 +393,11 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 
 	// draw a box
 	color = UI_BACKGROUND_COLOR;
-	if (driver != NULL)
+	if (driver != nullptr)
 		color = UI_GREEN_COLOR;
-	if (driver != NULL && (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)) != 0)
+	if (driver != nullptr && (driver->flags & (MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_IMPERFECT_SOUND)) != 0)
 		color = UI_YELLOW_COLOR;
-	if (driver != NULL && (driver->flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION)) != 0)
+	if (driver != nullptr && (driver->flags & (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION)) != 0)
 		color = UI_RED_COLOR;
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, color);
 
@@ -410,7 +410,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	for (line = 0; line < 4; line++)
 	{
 		machine().ui().draw_text_full(container, tempbuf[line].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-							DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+							DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 		y1 += machine().ui().get_line_height();
 	}
 }

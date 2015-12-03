@@ -475,7 +475,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 	infile = fopen(tocfname, "rb");
 	path = get_file_path(path);
 
-	if (infile == (FILE *)NULL)
+	if (infile == (FILE *)nullptr)
 	{
 		return CHDERR_FILE_NOT_FOUND;
 	}
@@ -657,7 +657,7 @@ chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 	infile = fopen(tocfname, "rb");
 	path = get_file_path(path);
 
-	if (infile == (FILE *)NULL)
+	if (infile == (FILE *)nullptr)
 	{
 		return CHDERR_FILE_NOT_FOUND;
 	}
@@ -736,7 +736,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 	infile = fopen(tocfname, "rt");
 	path = get_file_path(path);
 
-	if (infile == (FILE *)NULL)
+	if (infile == (FILE *)nullptr)
 	{
 		return CHDERR_FILE_NOT_FOUND;
 	}
@@ -771,13 +771,13 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 		outtoc.tracks[trknum].subsize = 0;
 		outtoc.tracks[trknum].pgsub = CD_SUB_NONE;
 
-		tok=strtok(NULL," ");
+		tok=strtok(nullptr," ");
 		outtoc.tracks[trknum].physframeofs=atoi(tok);
 
-		tok=strtok(NULL," ");
+		tok=strtok(nullptr," ");
 		trktype=atoi(tok);
 
-		tok=strtok(NULL," ");
+		tok=strtok(nullptr," ");
 		trksize=atoi(tok);
 
 		if(trktype==4 && trksize==2352)
@@ -799,16 +799,16 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 
 		std::string name;
 
-		tok=strtok(NULL," ");
+		tok=strtok(nullptr," ");
 		name = tok;
 		if (tok[0]=='"') {
 			do {
-				tok=strtok(NULL," ");
-				if (tok!=NULL) {
+				tok=strtok(nullptr," ");
+				if (tok!=nullptr) {
 					name += " ";
 					name += tok;
 				}
-			} while(tok!=NULL && (strrchr(tok,'"')-tok !=(strlen(tok)-1)));
+			} while(tok!=nullptr && (strrchr(tok,'"')-tok !=(strlen(tok)-1)));
 			strdelchr(name,'"');
 		}
 		outinfo.track[trknum].fname.assign(path).append(name);
@@ -869,7 +869,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 
 	infile = fopen(tocfname, "rt");
 	path = get_file_path(path);
-	if (infile == (FILE *)NULL)
+	if (infile == (FILE *)nullptr)
 	{
 		return CHDERR_FILE_NOT_FOUND;
 	}
@@ -931,7 +931,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 			{
 				/* get the track number */
 				TOKENIZE
-				trknum = strtoul(token, NULL, 10) - 1;
+				trknum = strtoul(token, nullptr, 10) - 1;
 
 				/* next token on the line is the track type */
 				TOKENIZE
@@ -978,7 +978,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 
 				/* get index number */
 				TOKENIZE
-				idx = strtoul(token, NULL, 10);
+				idx = strtoul(token, nullptr, 10);
 
 				/* get index */
 				TOKENIZE
@@ -1191,7 +1191,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 	infile = fopen(tocfname, "rt");
 	path = get_file_path(path);
 
-	if (infile == (FILE *)NULL)
+	if (infile == (FILE *)nullptr)
 	{
 		return CHDERR_FILE_NOT_FOUND;
 	}
@@ -1241,7 +1241,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				if (token[0] == '#')
 				{
 					/* it's a decimal offset, use it */
-					f = strtoul(&token[1], NULL, 10);
+					f = strtoul(&token[1], nullptr, 10);
 				}
 				else if (isdigit((UINT8)token[0]))
 				{

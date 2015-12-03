@@ -148,7 +148,7 @@ public:
 	public:
 		// construction
 		direct_range()
-			: m_next(NULL),
+			: m_next(nullptr),
 				m_bytestart(0),
 				m_byteend(~0) { }
 
@@ -214,8 +214,8 @@ class address_space_config
 public:
 	// construction/destruction
 	address_space_config();
-	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift = 0, address_map_constructor internal = NULL, address_map_constructor defmap = NULL);
-	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, address_map_constructor internal = NULL, address_map_constructor defmap = NULL);
+	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift = 0, address_map_constructor internal = nullptr, address_map_constructor defmap = nullptr);
+	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, address_map_constructor internal = nullptr, address_map_constructor defmap = nullptr);
 	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, address_map_delegate internal, address_map_delegate defmap = address_map_delegate());
 	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, address_map_delegate internal, address_map_delegate defmap = address_map_delegate());
 
@@ -376,23 +376,23 @@ public:
 	void install_read_bank(offs_t addrstart, offs_t addrend, memory_bank *bank) { install_read_bank(addrstart, addrend, 0, 0, bank); }
 	void install_write_bank(offs_t addrstart, offs_t addrend, memory_bank *bank) { install_write_bank(addrstart, addrend, 0, 0, bank); }
 	void install_readwrite_bank(offs_t addrstart, offs_t addrend, memory_bank *bank) { install_readwrite_bank(addrstart, addrend, 0, 0, bank); }
-	void *install_rom(offs_t addrstart, offs_t addrend, void *baseptr = NULL) { return install_rom(addrstart, addrend, 0, 0, baseptr); }
-	void *install_writeonly(offs_t addrstart, offs_t addrend, void *baseptr = NULL) { return install_writeonly(addrstart, addrend, 0, 0, baseptr); }
-	void *install_ram(offs_t addrstart, offs_t addrend, void *baseptr = NULL) { return install_ram(addrstart, addrend, 0, 0, baseptr); }
+	void *install_rom(offs_t addrstart, offs_t addrend, void *baseptr = nullptr) { return install_rom(addrstart, addrend, 0, 0, baseptr); }
+	void *install_writeonly(offs_t addrstart, offs_t addrend, void *baseptr = nullptr) { return install_writeonly(addrstart, addrend, 0, 0, baseptr); }
+	void *install_ram(offs_t addrstart, offs_t addrend, void *baseptr = nullptr) { return install_ram(addrstart, addrend, 0, 0, baseptr); }
 
 	// install ports, banks, RAM (with mirror/mask)
-	void install_read_port(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag) { install_readwrite_port(addrstart, addrend, addrmask, addrmirror, rtag, NULL); }
-	void install_write_port(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *wtag) { install_readwrite_port(addrstart, addrend, addrmask, addrmirror, NULL, wtag); }
+	void install_read_port(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag) { install_readwrite_port(addrstart, addrend, addrmask, addrmirror, rtag, nullptr); }
+	void install_write_port(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *wtag) { install_readwrite_port(addrstart, addrend, addrmask, addrmirror, nullptr, wtag); }
 	void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag);
-	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, tag, NULL); }
-	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, NULL, tag); }
+	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, tag, nullptr); }
+	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, nullptr, tag); }
 	void install_readwrite_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag)  { install_bank_generic(addrstart, addrend, addrmask, addrmirror, tag, tag); }
-	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, memory_bank *bank) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, bank, NULL); }
-	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, memory_bank *bank) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, NULL, bank); }
+	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, memory_bank *bank) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, bank, nullptr); }
+	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, memory_bank *bank) { install_bank_generic(addrstart, addrend, addrmask, addrmirror, nullptr, bank); }
 	void install_readwrite_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, memory_bank *bank)  { install_bank_generic(addrstart, addrend, addrmask, addrmirror, bank, bank); }
-	void *install_rom(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, void *baseptr = NULL) { return install_ram_generic(addrstart, addrend, addrmask, addrmirror, ROW_READ, baseptr); }
-	void *install_writeonly(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, void *baseptr = NULL) { return install_ram_generic(addrstart, addrend, addrmask, addrmirror, ROW_WRITE, baseptr); }
-	void *install_ram(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, void *baseptr = NULL) { return install_ram_generic(addrstart, addrend, addrmask, addrmirror, ROW_READWRITE, baseptr); }
+	void *install_rom(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, void *baseptr = nullptr) { return install_ram_generic(addrstart, addrend, addrmask, addrmirror, ROW_READ, baseptr); }
+	void *install_writeonly(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, void *baseptr = nullptr) { return install_ram_generic(addrstart, addrend, addrmask, addrmirror, ROW_WRITE, baseptr); }
+	void *install_ram(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, void *baseptr = nullptr) { return install_ram_generic(addrstart, addrend, addrmask, addrmirror, ROW_READWRITE, baseptr); }
 
 	// install device memory maps
 	template <typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(address_map &map, device_t &device), int bits = 0, UINT64 unitmask = 0) {
@@ -436,7 +436,7 @@ public:
 
 	// setup
 	void prepare_map();
-	void populate_from_map(address_map *map = NULL);
+	void populate_from_map(address_map *map = nullptr);
 	void allocate_memory();
 	void locate_memory();
 
@@ -495,7 +495,7 @@ class memory_block
 
 public:
 	// construction/destruction
-	memory_block(address_space &space, offs_t bytestart, offs_t byteend, void *memory = NULL);
+	memory_block(address_space &space, offs_t bytestart, offs_t byteend, void *memory = nullptr);
 	~memory_block();
 
 	// getters
@@ -539,7 +539,7 @@ class memory_bank
 	public:
 		// construction/destruction
 		bank_reference(address_space &space, read_or_write readorwrite)
-			: m_next(NULL),
+			: m_next(nullptr),
 				m_space(space),
 				m_readorwrite(readorwrite) { }
 
@@ -568,7 +568,7 @@ class memory_bank
 
 public:
 	// construction/destruction
-	memory_bank(address_space &space, int index, offs_t bytestart, offs_t byteend, const char *tag = NULL);
+	memory_bank(address_space &space, int index, offs_t bytestart, offs_t byteend, const char *tag = nullptr);
 	~memory_bank();
 
 	// getters
@@ -630,8 +630,8 @@ class memory_share
 
 public:
 	// construction/destruction
-	memory_share(UINT8 width, size_t bytes, endianness_t endianness, void *ptr = NULL)
-		: m_next(NULL),
+	memory_share(UINT8 width, size_t bytes, endianness_t endianness, void *ptr = nullptr)
+		: m_next(nullptr),
 			m_ptr(ptr),
 			m_bytes(bytes),
 			m_endianness(endianness),
@@ -643,7 +643,7 @@ public:
 	memory_share *next() const { return m_next; }
 	// NOTE: this being NULL in a C++ member function can lead to undefined behavior.
 	// However, it is relied on throughout MAME, so will remain for now.
-	void *ptr() const { if (this == NULL) return NULL; return m_ptr; }
+	void *ptr() const { if (this == nullptr) return nullptr; return m_ptr; }
 	size_t bytes() const { return m_bytes; }
 	endianness_t endianness() const { return m_endianness; }
 	UINT8 bitwidth() const { return m_bitwidth; }
@@ -682,9 +682,9 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	memory_region *next() const { return m_next; }
-	UINT8 *base() { return (this != NULL) ? &m_buffer[0] : NULL; }
-	UINT8 *end() { return (this != NULL) ? base() + m_buffer.size() : NULL; }
-	UINT32 bytes() const { return (this != NULL) ? m_buffer.size() : 0; }
+	UINT8 *base() { return (this != nullptr) ? &m_buffer[0] : nullptr; }
+	UINT8 *end() { return (this != nullptr) ? base() + m_buffer.size() : nullptr; }
+	UINT32 bytes() const { return (this != nullptr) ? m_buffer.size() : 0; }
 	const char *name() const { return m_name.c_str(); }
 
 	// flag expansion
@@ -883,7 +883,7 @@ inline void *direct_read_data::read_ptr(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
 		return &m_ptr[(byteaddress ^ directxor) & m_bytemask];
-	return NULL;
+	return nullptr;
 }
 
 

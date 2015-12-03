@@ -134,24 +134,24 @@ public:
 
 	// interface helpers
 	device_interface *first_interface() const { return m_interface_list; }
-	template<class _DeviceClass> bool interface(_DeviceClass *&intf) { intf = dynamic_cast<_DeviceClass *>(this); return (intf != NULL); }
-	template<class _DeviceClass> bool interface(_DeviceClass *&intf) const { intf = dynamic_cast<const _DeviceClass *>(this); return (intf != NULL); }
+	template<class _DeviceClass> bool interface(_DeviceClass *&intf) { intf = dynamic_cast<_DeviceClass *>(this); return (intf != nullptr); }
+	template<class _DeviceClass> bool interface(_DeviceClass *&intf) const { intf = dynamic_cast<const _DeviceClass *>(this); return (intf != nullptr); }
 
 	// specialized helpers for common core interfaces
-	bool interface(device_execute_interface *&intf) { intf = m_execute; return (intf != NULL); }
-	bool interface(device_execute_interface *&intf) const { intf = m_execute; return (intf != NULL); }
-	bool interface(device_memory_interface *&intf) { intf = m_memory; return (intf != NULL); }
-	bool interface(device_memory_interface *&intf) const { intf = m_memory; return (intf != NULL); }
-	bool interface(device_state_interface *&intf) { intf = m_state; return (intf != NULL); }
-	bool interface(device_state_interface *&intf) const { intf = m_state; return (intf != NULL); }
-	device_execute_interface &execute() const { assert(m_execute != NULL); return *m_execute; }
-	device_memory_interface &memory() const { assert(m_memory != NULL); return *m_memory; }
-	device_state_interface &state() const { assert(m_state != NULL); return *m_state; }
+	bool interface(device_execute_interface *&intf) { intf = m_execute; return (intf != nullptr); }
+	bool interface(device_execute_interface *&intf) const { intf = m_execute; return (intf != nullptr); }
+	bool interface(device_memory_interface *&intf) { intf = m_memory; return (intf != nullptr); }
+	bool interface(device_memory_interface *&intf) const { intf = m_memory; return (intf != nullptr); }
+	bool interface(device_state_interface *&intf) { intf = m_state; return (intf != nullptr); }
+	bool interface(device_state_interface *&intf) const { intf = m_state; return (intf != nullptr); }
+	device_execute_interface &execute() const { assert(m_execute != nullptr); return *m_execute; }
+	device_memory_interface &memory() const { assert(m_memory != nullptr); return *m_memory; }
+	device_state_interface &state() const { assert(m_state != nullptr); return *m_state; }
 
 	// owned object helpers
 	device_t *first_subdevice() const { return m_subdevice_list.first(); }
 	std::string subtag(const char *tag) const;
-	std::string siblingtag(const char *tag) const { return (this != NULL && m_owner != NULL) ? m_owner->subtag(tag) : std::string(tag); }
+	std::string siblingtag(const char *tag) const { return (this != nullptr && m_owner != nullptr) ? m_owner->subtag(tag) : std::string(tag); }
 	memory_region *memregion(const char *tag) const;
 	memory_share *memshare(const char *tag) const;
 	memory_bank *membank(const char *tag) const;
@@ -185,16 +185,16 @@ public:
 	UINT64 attotime_to_clocks(const attotime &duration) const;
 
 	// timer interfaces
-	emu_timer *timer_alloc(device_timer_id id = 0, void *ptr = NULL);
-	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0, void *ptr = NULL);
-	void synchronize(device_timer_id id = 0, int param = 0, void *ptr = NULL) { timer_set(attotime::zero, id, param, ptr); }
+	emu_timer *timer_alloc(device_timer_id id = 0, void *ptr = nullptr);
+	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0, void *ptr = nullptr);
+	void synchronize(device_timer_id id = 0, int param = 0, void *ptr = nullptr) { timer_set(attotime::zero, id, param, ptr); }
 	void timer_expired(emu_timer &timer, device_timer_id id, int param, void *ptr) { device_timer(timer, id, param, ptr); }
 
 	// state saving interfaces
 	template<typename _ItemType>
-	void ATTR_COLD save_item(_ItemType &value, const char *valname, int index = 0) { assert(m_save != NULL); m_save->save_item(this, name(), tag(), index, value, valname); }
+	void ATTR_COLD save_item(_ItemType &value, const char *valname, int index = 0) { assert(m_save != nullptr); m_save->save_item(this, name(), tag(), index, value, valname); }
 	template<typename _ItemType>
-	void ATTR_COLD save_pointer(_ItemType *value, const char *valname, UINT32 count, int index = 0) { assert(m_save != NULL); m_save->save_pointer(this, name(), tag(), index, value, valname, count); }
+	void ATTR_COLD save_pointer(_ItemType *value, const char *valname, UINT32 count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, value, valname, count); }
 
 	// debugging
 	device_debug *debug() const { return m_debug.get(); }
@@ -355,7 +355,7 @@ public:
 	// construction
 	device_iterator(device_t &root, int maxdepth = 255)
 		: m_root(&root),
-			m_current(NULL),
+			m_current(nullptr),
 			m_curdepth(0),
 			m_maxdepth(maxdepth) { }
 
@@ -374,14 +374,14 @@ public:
 	{
 		// remember our starting position, and end immediately if we're NULL
 		device_t *start = m_current;
-		if (start == NULL)
-			return NULL;
+		if (start == nullptr)
+			return nullptr;
 
 		// search down first
 		if (m_curdepth < m_maxdepth)
 		{
 			m_current = start->first_subdevice();
-			if (m_current != NULL)
+			if (m_current != nullptr)
 			{
 				m_curdepth++;
 				return m_current;
@@ -393,7 +393,7 @@ public:
 		{
 			// found a neighbor? great!
 			m_current = start->next();
-			if (m_current != NULL)
+			if (m_current != nullptr)
 				return m_current;
 
 			// no? try our parent
@@ -402,14 +402,14 @@ public:
 		}
 
 		// returned to the top; we're done
-		return m_current = NULL;
+		return m_current = nullptr;
 	}
 
 	// return the number of items available
 	int count()
 	{
 		int result = 0;
-		for (device_t *item = first(); item != NULL; item = next())
+		for (device_t *item = first(); item != nullptr; item = next())
 			result++;
 		return result;
 	}
@@ -418,7 +418,7 @@ public:
 	int indexof(device_t &device)
 	{
 		int index = 0;
-		for (device_t *item = first(); item != NULL; item = next(), index++)
+		for (device_t *item = first(); item != nullptr; item = next(), index++)
 			if (item == &device)
 				return index;
 		return -1;
@@ -427,10 +427,10 @@ public:
 	// return the indexed item in the list
 	device_t *byindex(int index)
 	{
-		for (device_t *item = first(); item != NULL; item = next(), index--)
+		for (device_t *item = first(); item != nullptr; item = next(), index--)
 			if (index == 0)
 				return item;
-		return NULL;
+		return nullptr;
 	}
 
 private:
@@ -459,26 +459,26 @@ public:
 	// reset and return first item
 	_DeviceClass *first()
 	{
-		for (device_t *device = m_iterator.first(); device != NULL; device = m_iterator.next())
+		for (device_t *device = m_iterator.first(); device != nullptr; device = m_iterator.next())
 			if (device->type() == _DeviceType)
 				return downcast<_DeviceClass *>(device);
-		return NULL;
+		return nullptr;
 	}
 
 	// advance depth-first
 	_DeviceClass *next()
 	{
-		for (device_t *device = m_iterator.next(); device != NULL; device = m_iterator.next())
+		for (device_t *device = m_iterator.next(); device != nullptr; device = m_iterator.next())
 			if (device->type() == _DeviceType)
 				return downcast<_DeviceClass *>(device);
-		return NULL;
+		return nullptr;
 	}
 
 	// return the number of items available
 	int count()
 	{
 		int result = 0;
-		for (_DeviceClass *item = first(); item != NULL; item = next())
+		for (_DeviceClass *item = first(); item != nullptr; item = next())
 			result++;
 		return result;
 	}
@@ -487,7 +487,7 @@ public:
 	int indexof(_DeviceClass &device)
 	{
 		int index = 0;
-		for (_DeviceClass *item = first(); item != NULL; item = next(), index++)
+		for (_DeviceClass *item = first(); item != nullptr; item = next(), index++)
 			if (item == &device)
 				return index;
 		return -1;
@@ -496,10 +496,10 @@ public:
 	// return the indexed item in the list
 	_DeviceClass *byindex(int index)
 	{
-		for (_DeviceClass *item = first(); item != NULL; item = next(), index--)
+		for (_DeviceClass *item = first(); item != nullptr; item = next(), index--)
 			if (index == 0)
 				return item;
-		return NULL;
+		return nullptr;
 	}
 
 private:
@@ -519,7 +519,7 @@ public:
 	// construction
 	device_interface_iterator(device_t &root, int maxdepth = 255)
 		: m_iterator(root, maxdepth),
-			m_current(NULL) { }
+			m_current(nullptr) { }
 
 	// getters
 	_InterfaceClass *current() const { return m_current; }
@@ -527,26 +527,26 @@ public:
 	// reset and return first item
 	_InterfaceClass *first()
 	{
-		for (device_t *device = m_iterator.first(); device != NULL; device = m_iterator.next())
+		for (device_t *device = m_iterator.first(); device != nullptr; device = m_iterator.next())
 			if (device->interface(m_current))
 				return m_current;
-		return NULL;
+		return nullptr;
 	}
 
 	// advance depth-first
 	_InterfaceClass *next()
 	{
-		for (device_t *device = m_iterator.next(); device != NULL; device = m_iterator.next())
+		for (device_t *device = m_iterator.next(); device != nullptr; device = m_iterator.next())
 			if (device->interface(m_current))
 				return m_current;
-		return NULL;
+		return nullptr;
 	}
 
 	// return the number of items available
 	int count()
 	{
 		int result = 0;
-		for (_InterfaceClass *item = first(); item != NULL; item = next())
+		for (_InterfaceClass *item = first(); item != nullptr; item = next())
 			result++;
 		return result;
 	}
@@ -555,7 +555,7 @@ public:
 	int indexof(_InterfaceClass &intrf)
 	{
 		int index = 0;
-		for (_InterfaceClass *item = first(); item != NULL; item = next(), index++)
+		for (_InterfaceClass *item = first(); item != nullptr; item = next(), index++)
 			if (item == &intrf)
 				return index;
 		return -1;
@@ -590,16 +590,16 @@ private:
 inline device_t *device_t::subdevice(const char *tag) const
 {
 	// safety first
-	if (this == NULL)
-		return NULL;
+	if (this == nullptr)
+		return nullptr;
 
 	// empty string or NULL means this device
-	if (tag == NULL || *tag == 0)
+	if (tag == nullptr || *tag == 0)
 		return const_cast<device_t *>(this);
 
 	// do a quick lookup and return that if possible
 	device_t *quick = m_device_map.find(tag);
-	return (quick != NULL) ? quick : subdevice_slow(tag);
+	return (quick != nullptr) ? quick : subdevice_slow(tag);
 }
 
 
@@ -611,22 +611,22 @@ inline device_t *device_t::subdevice(const char *tag) const
 inline device_t *device_t::siblingdevice(const char *tag) const
 {
 	// safety first
-	if (this == NULL)
-		return NULL;
+	if (this == nullptr)
+		return nullptr;
 
 	// empty string or NULL means this device
-	if (tag == NULL || *tag == 0)
+	if (tag == nullptr || *tag == 0)
 		return const_cast<device_t *>(this);
 
 	// leading caret implies the owner, just skip it
 	if (tag[0] == '^') tag++;
 
 	// query relative to the parent, if we have one
-	if (m_owner != NULL)
+	if (m_owner != nullptr)
 		return m_owner->subdevice(tag);
 
 	// otherwise, it's NULL unless the tag is absolute
-	return (tag[0] == ':') ? subdevice(tag) : NULL;
+	return (tag[0] == ':') ? subdevice(tag) : nullptr;
 }
 
 #endif  /* __DEVICE_H__ */

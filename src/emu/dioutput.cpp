@@ -23,7 +23,7 @@
 device_output_interface::device_output_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "output"),
 	m_output_index(0),
-	m_output_name(NULL)
+	m_output_name(nullptr)
 {
 }
 

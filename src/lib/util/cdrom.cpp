@@ -225,8 +225,8 @@ cdrom_file *cdrom_open(const char *inputfile)
 
 	/* allocate memory for the CD-ROM file */
 	file = new cdrom_file();
-	if (file == NULL)
-		return NULL;
+	if (file == nullptr)
+		return nullptr;
 
 	/* setup the CDROM module and get the disc info */
 	chd_error err = chdcd_parse_toc(inputfile, file->cdtoc, file->track_info);
@@ -234,11 +234,11 @@ cdrom_file *cdrom_open(const char *inputfile)
 	{
 		fprintf(stderr, "Error reading input file: %s\n", chd_file::error_string(err));
 		delete file;
-		return NULL;
+		return nullptr;
 	}
 
 	/* fill in the data */
-	file->chd = NULL;
+	file->chd = nullptr;
 
 	LOG(("CD has %d tracks\n", file->cdtoc.numtrks));
 
@@ -249,7 +249,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 		{
 			fprintf(stderr, "Unable to open file: %s\n", file->track_info.track[i].fname.c_str());
 			cdrom_close(file);
-			return NULL;
+			return nullptr;
 		}
 	}
 	/* calculate the starting frame for each track, keeping in mind that CHDMAN
@@ -322,18 +322,18 @@ cdrom_file *cdrom_open(chd_file *chd)
 
 	/* punt if no CHD */
 	if (!chd)
-		return NULL;
+		return nullptr;
 
 	/* validate the CHD information */
 	if (chd->hunk_bytes() % CD_FRAME_SIZE != 0)
-		return NULL;
+		return nullptr;
 	if (chd->unit_bytes() != CD_FRAME_SIZE)
-		return NULL;
+		return nullptr;
 
 	/* allocate memory for the CD-ROM file */
 	file = new cdrom_file();
-	if (file == NULL)
-		return NULL;
+	if (file == nullptr)
+		return nullptr;
 
 	/* fill in the data */
 	file->chd = chd;
@@ -343,7 +343,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 	if (err != CHDERR_NONE)
 	{
 		delete file;
-		return NULL;
+		return nullptr;
 	}
 
 	LOG(("CD has %d tracks\n", file->cdtoc.numtrks));
@@ -411,10 +411,10 @@ cdrom_file *cdrom_open(chd_file *chd)
 
 void cdrom_close(cdrom_file *file)
 {
-	if (file == NULL)
+	if (file == nullptr)
 		return;
 
-	if (file->chd == NULL)
+	if (file->chd == nullptr)
 	{
 		for (int i = 0; i < file->cdtoc.numtrks; i++)
 		{
@@ -461,7 +461,7 @@ chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UI
 	}
 
 	// if a CHD, just read
-	if (file->chd != NULL)
+	if (file->chd != nullptr)
 	{
 		result = file->chd->read_bytes(UINT64(chdsector) * UINT64(CD_FRAME_SIZE) + startoffs, dest, length);
 		/* swap CDDA in the case of LE GDROMs */
@@ -521,7 +521,7 @@ chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UI
 
 UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 datatype, bool phys)
 {
-	if (file == NULL)
+	if (file == nullptr)
 		return 0;
 
 	// compute CHD sector and tracknumber
@@ -606,7 +606,7 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
 
 UINT32 cdrom_read_subcode(cdrom_file *file, UINT32 lbasector, void *buffer, bool phys)
 {
-	if (file == NULL)
+	if (file == nullptr)
 		return ~0;
 
 	// compute CHD sector and tracknumber
@@ -656,7 +656,7 @@ UINT32 cdrom_get_track(cdrom_file *file, UINT32 frame)
 {
 	UINT32 track = 0;
 
-	if (file == NULL)
+	if (file == nullptr)
 		return ~0;
 
 	/* convert to a CHD sector offset and get track information */
@@ -684,7 +684,7 @@ UINT32 cdrom_get_track(cdrom_file *file, UINT32 frame)
 
 UINT32 cdrom_get_track_start(cdrom_file *file, UINT32 track)
 {
-	if (file == NULL)
+	if (file == nullptr)
 		return ~0;
 
 	/* handle lead-out specially */
@@ -712,7 +712,7 @@ UINT32 cdrom_get_track_start(cdrom_file *file, UINT32 track)
 
 UINT32 cdrom_get_track_start_phys(cdrom_file *file, UINT32 track)
 {
-	if (file == NULL)
+	if (file == nullptr)
 		return ~0;
 
 	/* handle lead-out specially */
@@ -743,7 +743,7 @@ UINT32 cdrom_get_track_start_phys(cdrom_file *file, UINT32 track)
 
 int cdrom_get_last_track(cdrom_file *file)
 {
-	if (file == NULL)
+	if (file == nullptr)
 		return -1;
 
 	return file->cdtoc.numtrks;
@@ -768,7 +768,7 @@ int cdrom_get_last_track(cdrom_file *file)
 
 int cdrom_get_adr_control(cdrom_file *file, int track)
 {
-	if (file == NULL)
+	if (file == nullptr)
 		return -1;
 
 	if (track == 0xaa || file->cdtoc.tracks[track].trktype == CD_TRACK_AUDIO)
@@ -797,7 +797,7 @@ int cdrom_get_adr_control(cdrom_file *file, int track)
 
 int cdrom_get_track_type(cdrom_file *file, int track)
 {
-	if (file == NULL)
+	if (file == nullptr)
 		return -1;
 
 	return file->cdtoc.tracks[track].trktype;
@@ -821,8 +821,8 @@ int cdrom_get_track_type(cdrom_file *file, int track)
 
 const cdrom_toc *cdrom_get_toc(cdrom_file *file)
 {
-	if (file == NULL)
-		return NULL;
+	if (file == nullptr)
+		return nullptr;
 
 	return &file->cdtoc;
 }

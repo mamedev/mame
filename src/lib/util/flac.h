@@ -92,7 +92,7 @@ class flac_decoder
 public:
 	// construction/destruction
 	flac_decoder();
-	flac_decoder(const void *buffer, UINT32 length, const void *buffer2 = NULL, UINT32 length2 = 0);
+	flac_decoder(const void *buffer, UINT32 length, const void *buffer2 = nullptr, UINT32 length2 = 0);
 	flac_decoder(core_file &file);
 	~flac_decoder();
 
@@ -106,7 +106,7 @@ public:
 
 	// reset
 	bool reset();
-	bool reset(const void *buffer, UINT32 length, const void *buffer2 = NULL, UINT32 length2 = 0);
+	bool reset(const void *buffer, UINT32 length, const void *buffer2 = nullptr, UINT32 length2 = 0);
 	bool reset(UINT32 sample_rate, UINT8 num_channels, UINT32 block_size, const void *buffer, UINT32 length);
 	bool reset(core_file &file);
 

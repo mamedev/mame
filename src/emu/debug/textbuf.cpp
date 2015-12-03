@@ -88,14 +88,14 @@ text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
 	/* allocate memory for the text buffer object */
 	text = (text_buffer *)global_alloc(text_buffer);
 	if (!text)
-		return NULL;
+		return nullptr;
 
 	/* allocate memory for the buffer itself */
 	text->buffer = (char *)global_alloc_array(char, bytes);
 	if (!text->buffer)
 	{
 		global_free(text);
-		return NULL;
+		return nullptr;
 	}
 
 	/* allocate memory for the lines array */
@@ -104,7 +104,7 @@ text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
 	{
 		global_free_array(text->buffer);
 		global_free(text);
-		return NULL;
+		return nullptr;
 	}
 
 	/* initialize the buffer description */
@@ -319,6 +319,6 @@ const char *text_buffer_get_seqnum_line(text_buffer *text, UINT32 seqnum)
 	UINT32 numlines = text_buffer_num_lines(text);
 	UINT32 index = seqnum - text->linestartseq;
 	if (index >= numlines)
-		return NULL;
+		return nullptr;
 	return &text->buffer[text->lineoffs[(text->linestart + index) % text->linesize]];
 }

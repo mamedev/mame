@@ -64,7 +64,7 @@ public:
 	z80_daisy_chain();
 	void init(device_t *cpudevice, const z80_daisy_config *daisy);
 
-	bool present() const { return (m_daisy_list != NULL); }
+	bool present() const { return (m_daisy_list != nullptr); }
 
 	void reset();
 	int update_irq_state();

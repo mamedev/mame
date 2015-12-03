@@ -42,7 +42,7 @@ public:
 	path_iterator(const char *searchpath);
 
 	// getters
-	bool next(std::string &buffer, const char *name = NULL);
+	bool next(std::string &buffer, const char *name = nullptr);
 
 	// reset
 	void reset() { m_current = m_base; m_index = 0; }
@@ -92,7 +92,7 @@ public:
 	// getters
 	operator core_file *();
 	operator core_file &();
-	bool is_open() const { return (m_file != NULL); }
+	bool is_open() const { return (m_file != nullptr); }
 	const char *filename() const { return m_filename.c_str(); }
 	const char *fullpath() const { return m_fullpath.c_str(); }
 	UINT32 openflags() const { return m_openflags; }
@@ -102,7 +102,7 @@ public:
 
 	// setters
 	void remove_on_close() { m_remove_on_close = true; }
-	void set_openflags(UINT32 openflags) { assert(m_file == NULL); m_openflags = openflags; }
+	void set_openflags(UINT32 openflags) { assert(m_file == nullptr); m_openflags = openflags; }
 	void set_restrict_to_mediapath(bool rtmp = true) { m_restrict_to_mediapath = rtmp; }
 
 	// open/close

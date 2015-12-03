@@ -130,7 +130,7 @@ void debug_view_breakpoints::enumerate_sources()
 
 	// iterate over devices with disassembly interfaces
 	disasm_interface_iterator iter(machine().root_device());
-	for (device_disasm_interface *dasm = iter.first(); dasm != NULL; dasm = iter.next())
+	for (device_disasm_interface *dasm = iter.first(); dasm != nullptr; dasm = iter.next())
 	{
 		std::string name;
 		strprintf(name, "%s '%s'", dasm->device().name(), dasm->device().tag());
@@ -203,11 +203,11 @@ void debug_view_breakpoints::pad_astring_to_length(std::string& str, int len)
 void debug_view_breakpoints::gather_breakpoints()
 {
 	m_buffer.resize(0);
-	for (const debug_view_source *source = m_source_list.first(); source != NULL; source = source->next())
+	for (const debug_view_source *source = m_source_list.first(); source != nullptr; source = source->next())
 	{
 		// Collect
 		device_debug &debugInterface = *source->device()->debug();
-		for (device_debug::breakpoint *bp = debugInterface.breakpoint_first(); bp != NULL; bp = bp->next())
+		for (device_debug::breakpoint *bp = debugInterface.breakpoint_first(); bp != nullptr; bp = bp->next())
 			m_buffer.push_back(bp);
 	}
 

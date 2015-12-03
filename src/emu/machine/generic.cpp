@@ -128,7 +128,7 @@ static void counters_load(running_machine &machine, int config_type, xml_data_no
 		return;
 
 	/* might not have any data */
-	if (parentnode == NULL)
+	if (parentnode == nullptr)
 		return;
 
 	/* iterate over coins nodes */
@@ -141,7 +141,7 @@ static void counters_load(running_machine &machine, int config_type, xml_data_no
 
 	/* get the single tickets node */
 	ticketnode = xml_get_sibling(parentnode->child, "tickets");
-	if (ticketnode != NULL)
+	if (ticketnode != nullptr)
 		state->dispensed_tickets = xml_get_attribute_int(ticketnode, "number", 0);
 }
 
@@ -164,8 +164,8 @@ static void counters_save(running_machine &machine, int config_type, xml_data_no
 	for (i = 0; i < COIN_COUNTERS; i++)
 		if (state->coin_count[i] != 0)
 		{
-			xml_data_node *coinnode = xml_add_child(parentnode, "coins", NULL);
-			if (coinnode != NULL)
+			xml_data_node *coinnode = xml_add_child(parentnode, "coins", nullptr);
+			if (coinnode != nullptr)
 			{
 				xml_set_attribute_int(coinnode, "index", i);
 				xml_set_attribute_int(coinnode, "number", state->coin_count[i]);
@@ -175,8 +175,8 @@ static void counters_save(running_machine &machine, int config_type, xml_data_no
 	/* output tickets */
 	if (state->dispensed_tickets != 0)
 	{
-		xml_data_node *tickets = xml_add_child(parentnode, "tickets", NULL);
-		if (tickets != NULL)
+		xml_data_node *tickets = xml_add_child(parentnode, "tickets", nullptr);
+		if (tickets != nullptr)
 			xml_set_attribute_int(tickets, "number", state->dispensed_tickets);
 	}
 }

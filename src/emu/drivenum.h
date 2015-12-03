@@ -103,7 +103,7 @@ public:
 	using driver_list::compatible_with;
 
 	// filtering/iterating
-	int filter(const char *string = NULL);
+	int filter(const char *string = nullptr);
 	int filter(const game_driver &driver);
 	void include_all();
 	void exclude_all() { memset(&m_included[0], 0, sizeof(m_included[0]) * s_driver_count); m_filtered_count = 0; }

@@ -66,7 +66,7 @@ const UINT32 *palette_client::dirty_state::dirty_list(UINT32 &mindirty, UINT32 &
 	maxdirty = m_maxdirty;
 
 	// if nothing to report, report nothing
-	return (m_mindirty > m_maxdirty) ? NULL : &m_dirty[0];
+	return (m_mindirty > m_maxdirty) ? nullptr : &m_dirty[0];
 }
 
 
@@ -128,7 +128,7 @@ void palette_client::dirty_state::reset()
 
 palette_client::palette_client(palette_t &palette)
 	: m_palette(palette),
-		m_next(NULL),
+		m_next(nullptr),
 		m_live(&m_dirty[0]),
 		m_previous(&m_dirty[1])
 {
@@ -153,7 +153,7 @@ palette_client::palette_client(palette_t &palette)
 palette_client::~palette_client()
 {
 	// first locate and remove ourself from our palette's list
-	for (palette_client **curptr = &m_palette.m_client_list; *curptr != NULL; curptr = &(*curptr)->m_next)
+	for (palette_client **curptr = &m_palette.m_client_list; *curptr != nullptr; curptr = &(*curptr)->m_next)
 		if (*curptr == this)
 		{
 			*curptr = m_next;
@@ -174,8 +174,8 @@ const UINT32 *palette_client::dirty_list(UINT32 &mindirty, UINT32 &maxdirty)
 {
 	// if nothing to report, report nothing and don't swap
 	const UINT32 *result = m_live->dirty_list(mindirty, maxdirty);
-	if (result == NULL)
-		return NULL;
+	if (result == nullptr)
+		return nullptr;
 
 	// swap the live and previous lists
 	dirty_state *temp = m_live;
@@ -220,7 +220,7 @@ palette_t::palette_t(UINT32 numcolors, UINT32 numgroups)
 		m_adjusted_rgb15(numcolors * numgroups + 2),
 		m_group_bright(numgroups),
 		m_group_contrast(numgroups),
-		m_client_list(NULL)
+		m_client_list(nullptr)
 {
 	// initialize gamma map
 	for (UINT32 index = 0; index < 256; index++)
@@ -556,6 +556,6 @@ void palette_t::update_adjusted_color(UINT32 group, UINT32 index)
 	m_adjusted_rgb15[finalindex] = adjusted.as_rgb15();
 
 	// mark dirty in all clients
-	for (palette_client *client = m_client_list; client != NULL; client = client->next())
+	for (palette_client *client = m_client_list; client != nullptr; client = client->next())
 		client->mark_dirty(finalindex);
 }

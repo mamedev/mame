@@ -111,10 +111,10 @@ public:
 
 protected:
 	// optional operation overrides
-	virtual void interface_validity_check(validity_checker &valid) const;
-	virtual void interface_pre_start();
-	virtual void interface_post_start();
-	virtual void interface_pre_reset();
+	virtual void interface_validity_check(validity_checker &valid) const override;
+	virtual void interface_pre_start() override;
+	virtual void interface_post_start() override;
+	virtual void interface_pre_reset() override;
 
 	// internal state
 	simple_list<sound_route> m_route_list;      // list of sound routes
@@ -138,11 +138,11 @@ public:
 
 protected:
 	// optional operation overrides
-	virtual void interface_pre_start();
-	virtual void interface_post_load();
+	virtual void interface_pre_start() override;
+	virtual void interface_post_load() override;
 
 	// sound interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// internal state
 	UINT8               m_outputs;              // number of outputs

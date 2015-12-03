@@ -115,13 +115,13 @@ osd_interface &running_machine::osd() const
 //-------------------------------------------------
 
 running_machine::running_machine(const machine_config &_config, machine_manager &manager)
-	: firstcpu(NULL),
-		primary_screen(NULL),
+	: firstcpu(nullptr),
+		primary_screen(nullptr),
 		debug_flags(0),
-		romload_data(NULL),
-		ui_input_data(NULL),
-		debugcpu_data(NULL),
-		generic_machine_data(NULL),
+		romload_data(nullptr),
+		ui_input_data(nullptr),
+		debugcpu_data(nullptr),
+		generic_machine_data(nullptr),
 		m_config(_config),
 		m_system(_config.gamedrv()),
 		m_manager(manager),
@@ -129,14 +129,14 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		m_paused(false),
 		m_hard_reset_pending(false),
 		m_exit_pending(false),
-		m_soft_reset_timer(NULL),
+		m_soft_reset_timer(nullptr),
 		m_rand_seed(0x9d14abd7),
 		m_ui_active(_config.options().ui_active()),
 		m_basename(_config.gamedrv().name),
 		m_sample_rate(_config.options().sample_rate()),
 		m_saveload_schedule(SLS_NONE),
 		m_saveload_schedule_time(attotime::zero),
-		m_saveload_searchpath(NULL),
+		m_saveload_searchpath(nullptr),
 
 		m_save(*this),
 		m_memory(*this),
@@ -148,12 +148,12 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 
 	// set the machine on all devices
 	device_iterator iter(root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 		device->set_machine(*this);
 
 	// find devices
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
-		if (dynamic_cast<cpu_device *>(device) != NULL)
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
+		if (dynamic_cast<cpu_device *>(device) != nullptr)
 		{
 			firstcpu = downcast<cpu_device *>(device);
 			break;
@@ -185,10 +185,10 @@ running_machine::~running_machine()
 const char *running_machine::describe_context()
 {
 	device_execute_interface *executing = m_scheduler.currently_executing();
-	if (executing != NULL)
+	if (executing != nullptr)
 	{
 		cpu_device *cpu = dynamic_cast<cpu_device *>(&executing->device());
-		if (cpu != NULL)
+		if (cpu != nullptr)
 			strprintf(m_context, "'%s' (%s)", cpu->tag(), core_i64_format(cpu->pc(), cpu->space(AS_PROGRAM).logaddrchars(), cpu->is_octal()));
 	}
 	else
@@ -257,7 +257,7 @@ void running_machine::start()
 	// initialize the watchdog
 	m_watchdog_counter = 0;
 	m_watchdog_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::watchdog_fired), this));
-	if (config().m_watchdog_vblank_count != 0 && primary_screen != NULL)
+	if (config().m_watchdog_vblank_count != 0 && primary_screen != nullptr)
 		primary_screen->register_vblank_callback(vblank_state_delegate(FUNC(running_machine::watchdog_vblank), this));
 	save().save_item(NAME(m_watchdog_enabled));
 	save().save_item(NAME(m_watchdog_counter));
@@ -530,7 +530,7 @@ void running_machine::schedule_soft_reset()
 std::string running_machine::get_statename(const char *option)
 {
 	std::string statename_str("");
-	if (option == NULL || option[0] == 0)
+	if (option == nullptr || option[0] == 0)
 		statename_str.assign("%g");
 	else
 		statename_str.assign(option);
@@ -578,7 +578,7 @@ std::string running_machine::get_statename(const char *option)
 
 			// verify that there is such a device for this system
 			image_interface_iterator iter(root_device());
-			for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
+			for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 			{
 				// get the device name
 				std::string tempdevname(image->brief_instance_name());
@@ -587,7 +587,7 @@ std::string running_machine::get_statename(const char *option)
 				if (devname_str.compare(tempdevname) == 0)
 				{
 					// verify that such a device has an image mounted
-					if (image->basename_noext() != NULL)
+					if (image->basename_noext() != nullptr)
 					{
 						std::string filename(image->basename_noext());
 
@@ -624,7 +624,7 @@ void running_machine::set_saveload_filename(const char *filename)
 	// free any existing request and allocate a copy of the requested name
 	if (osd_is_absolute_path(filename))
 	{
-		m_saveload_searchpath = NULL;
+		m_saveload_searchpath = nullptr;
 		m_saveload_pending_file.assign(filename);
 	}
 	else
@@ -794,7 +794,7 @@ void running_machine::add_logerror_callback(logerror_callback callback)
 void running_machine::popmessage(const char *format, ...) const
 {
 	// if the format is NULL, it is a signal to clear the popmessage
-	if (format == NULL)
+	if (format == nullptr)
 		ui().popup_time(0, " ");
 
 	// otherwise, generate the buffer and call the UI to display the message
@@ -978,7 +978,7 @@ void running_machine::handle_saveload()
 	// unschedule the operation
 cancel:
 	m_saveload_pending_file.clear();
-	m_saveload_searchpath = NULL;
+	m_saveload_searchpath = nullptr;
 	m_saveload_schedule = SLS_NONE;
 }
 
@@ -1094,7 +1094,7 @@ void running_machine::watchdog_vblank(screen_device &screen, bool vblank_state)
 
 void running_machine::logfile_callback(const running_machine &machine, const char *buffer)
 {
-	if (machine.m_logfile != NULL)
+	if (machine.m_logfile != nullptr)
 		machine.m_logfile->puts(buffer);
 }
 
@@ -1112,14 +1112,14 @@ void running_machine::start_all_devices()
 		// iterate over all devices
 		int failed_starts = 0;
 		device_iterator iter(root_device());
-		for (device_t *device = iter.first(); device != NULL; device = iter.next())
+		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 			if (!device->started())
 			{
 				// attempt to start the device, catching any expected exceptions
 				try
 				{
 					// if the device doesn't have a machine yet, set it first
-					if (device->m_machine == NULL)
+					if (device->m_machine == nullptr)
 						device->set_machine(*this);
 
 					// now start the device
@@ -1170,7 +1170,7 @@ void running_machine::stop_all_devices()
 
 	// iterate over devices and stop them
 	device_iterator iter(root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 		device->stop();
 }
 
@@ -1183,7 +1183,7 @@ void running_machine::stop_all_devices()
 void running_machine::presave_all_devices()
 {
 	device_iterator iter(root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 		device->pre_save();
 }
 
@@ -1196,7 +1196,7 @@ void running_machine::presave_all_devices()
 void running_machine::postload_all_devices()
 {
 	device_iterator iter(root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 		device->post_load();
 }
 
@@ -1210,14 +1210,14 @@ const char *running_machine::image_parent_basename(device_t *device)
 	device_t *dev = device;
 	while(dev != &root_device())
 	{
-		device_image_interface *intf = NULL;
-		if (dev!=NULL && dev->interface(intf))
+		device_image_interface *intf = nullptr;
+		if (dev!=nullptr && dev->interface(intf))
 		{
 			return intf->basename_noext();
 		}
 		dev = dev->owner();
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*-------------------------------------------------
@@ -1237,7 +1237,7 @@ std::string &running_machine::nvram_filename(std::string &result, device_t &devi
 	{
 		// add per software nvrams into one folder
 		const char *software = image_parent_basename(&device);
-		if (software!=NULL && strlen(software)>0)
+		if (software!=nullptr && strlen(software)>0)
 		{
 			result.append(PATH_SEPARATOR).append(software);
 		}
@@ -1256,7 +1256,7 @@ std::string &running_machine::nvram_filename(std::string &result, device_t &devi
 void running_machine::nvram_load()
 {
 	nvram_interface_iterator iter(root_device());
-	for (device_nvram_interface *nvram = iter.first(); nvram != NULL; nvram = iter.next())
+	for (device_nvram_interface *nvram = iter.first(); nvram != nullptr; nvram = iter.next())
 	{
 		std::string filename;
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
@@ -1278,7 +1278,7 @@ void running_machine::nvram_load()
 void running_machine::nvram_save()
 {
 	nvram_interface_iterator iter(root_device());
-	for (device_nvram_interface *nvram = iter.first(); nvram != NULL; nvram = iter.next())
+	for (device_nvram_interface *nvram = iter.first(); nvram != nullptr; nvram = iter.next())
 	{
 		std::string filename;
 		emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -1298,7 +1298,7 @@ void running_machine::nvram_save()
 //-------------------------------------------------
 
 running_machine::notifier_callback_item::notifier_callback_item(machine_notify_delegate func)
-	: m_func(func)
+	: m_func(std::move(func))
 {
 }
 

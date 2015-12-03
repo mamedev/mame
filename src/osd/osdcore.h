@@ -962,7 +962,7 @@ enum osd_output_channel
 class osd_output
 {
 public:
-	osd_output() : m_chain(NULL) { }
+	osd_output() : m_chain(nullptr) { }
 	virtual ~osd_output() { }
 
 	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args) = 0;
@@ -973,7 +973,7 @@ protected:
 
 	void chain_output(osd_output_channel channel, const char *msg, va_list args)
 	{
-		if (m_chain != NULL)
+		if (m_chain != nullptr)
 			m_chain->output_callback(channel, msg, args);
 	}
 private:

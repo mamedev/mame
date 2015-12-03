@@ -189,10 +189,10 @@ public:
 
 	// symbol management
 	void symbol_add(void *base, UINT32 length, const char *name);
-	const char *symbol_find(void *base, UINT32 *offset = NULL);
+	const char *symbol_find(void *base, UINT32 *offset = nullptr);
 
 	// logging
-	bool logging() const { return (m_umllog != NULL); }
+	bool logging() const { return (m_umllog != nullptr); }
 	void log_printf(const char *format, ...) ATTR_PRINTF(2,3);
 	void log_flush() { if (logging()) fflush(m_umllog); }
 	bool logging_native() const { return m_beintf.logging(); }
@@ -206,7 +206,7 @@ private:
 
 		// construction/destruction
 		symbol(void *base, UINT32 length, const char *name)
-			: m_next(NULL),
+			: m_next(nullptr),
 				m_base(drccodeptr(base)),
 				m_length(length),
 				m_name(name) { }

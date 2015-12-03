@@ -116,7 +116,7 @@ bool ui_input_push_event(running_machine &machine, ui_event evt)
 	ui_input_private *uidata = machine.ui_input_data;
 
 	/* we may be called before the UI is initialized */
-	if (uidata == NULL)
+	if (uidata == nullptr)
 		return false;
 
 	/* some pre-processing (this is an icky place to do this stuff!) */
@@ -131,7 +131,7 @@ bool ui_input_push_event(running_machine &machine, ui_event evt)
 		case UI_EVENT_MOUSE_LEAVE:
 			if (uidata->current_mouse_target == evt.target)
 			{
-				uidata->current_mouse_target = NULL;
+				uidata->current_mouse_target = nullptr;
 				uidata->current_mouse_x = -1;
 				uidata->current_mouse_y = -1;
 			}
@@ -212,11 +212,11 @@ void ui_input_reset(running_machine &machine)
 render_target *ui_input_find_mouse(running_machine &machine, INT32 *x, INT32 *y, bool *button)
 {
 	ui_input_private *uidata = machine.ui_input_data;
-	if (x != NULL)
+	if (x != nullptr)
 		*x = uidata->current_mouse_x;
-	if (y != NULL)
+	if (y != nullptr)
 		*y = uidata->current_mouse_y;
-	if (button != NULL)
+	if (button != nullptr)
 		*button = uidata->current_mouse_down;
 	return uidata->current_mouse_target;
 }

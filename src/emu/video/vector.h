@@ -58,7 +58,7 @@ public:
 	float get_beam_intensity_weight();
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	static float m_flicker;

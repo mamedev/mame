@@ -253,8 +253,8 @@ private:
 	void set_saveload_filename(const char *filename);
 	std::string get_statename(const char *statename_opt);
 	void handle_saveload();
-	void soft_reset(void *ptr = NULL, INT32 param = 0);
-	void watchdog_fired(void *ptr = NULL, INT32 param = 0);
+	void soft_reset(void *ptr = nullptr, INT32 param = 0);
+	void watchdog_fired(void *ptr = nullptr, INT32 param = 0);
 	void watchdog_vblank(screen_device &screen, bool vblank_state);
 	const char *image_parent_basename(device_t *device);
 	std::string &nvram_filename(std::string &result, device_t &device);

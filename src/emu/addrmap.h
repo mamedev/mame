@@ -51,8 +51,8 @@ public:
 		: m_type(AMH_NONE),
 			m_bits(0),
 			m_mask(0),
-			m_name(NULL),
-			m_tag(NULL) { }
+			m_name(nullptr),
+			m_tag(nullptr) { }
 
 	map_handler_type        m_type;             // type of the handler
 	UINT8                   m_bits;             // width of the handler in bits, or 0 for default

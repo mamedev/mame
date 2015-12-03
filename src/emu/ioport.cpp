@@ -191,296 +191,296 @@ static const char *const seqtypestrings[] = { "standard", "increment", "decremen
 // master character info table
 static const char_info charinfo[] =
 {
-	{ 0x0008,                   "Backspace",    NULL },     // Backspace
+	{ 0x0008,                   "Backspace",    nullptr },     // Backspace
 	{ 0x0009,                   "Tab",          "    " },   // Tab
-	{ 0x000c,                   "Clear",        NULL },     // Clear
-	{ 0x000d,                   "Enter",        NULL },     // Enter
-	{ 0x001a,                   "Esc",          NULL },     // Esc
+	{ 0x000c,                   "Clear",        nullptr },     // Clear
+	{ 0x000d,                   "Enter",        nullptr },     // Enter
+	{ 0x001a,                   "Esc",          nullptr },     // Esc
 	{ 0x0020,                   "Space",        " " },      // Space
-	{ 0x0061,                   NULL,           "A" },      // a
-	{ 0x0062,                   NULL,           "B" },      // b
-	{ 0x0063,                   NULL,           "C" },      // c
-	{ 0x0064,                   NULL,           "D" },      // d
-	{ 0x0065,                   NULL,           "E" },      // e
-	{ 0x0066,                   NULL,           "F" },      // f
-	{ 0x0067,                   NULL,           "G" },      // g
-	{ 0x0068,                   NULL,           "H" },      // h
-	{ 0x0069,                   NULL,           "I" },      // i
-	{ 0x006a,                   NULL,           "J" },      // j
-	{ 0x006b,                   NULL,           "K" },      // k
-	{ 0x006c,                   NULL,           "L" },      // l
-	{ 0x006d,                   NULL,           "M" },      // m
-	{ 0x006e,                   NULL,           "N" },      // n
-	{ 0x006f,                   NULL,           "O" },      // o
-	{ 0x0070,                   NULL,           "P" },      // p
-	{ 0x0071,                   NULL,           "Q" },      // q
-	{ 0x0072,                   NULL,           "R" },      // r
-	{ 0x0073,                   NULL,           "S" },      // s
-	{ 0x0074,                   NULL,           "T" },      // t
-	{ 0x0075,                   NULL,           "U" },      // u
-	{ 0x0076,                   NULL,           "V" },      // v
-	{ 0x0077,                   NULL,           "W" },      // w
-	{ 0x0078,                   NULL,           "X" },      // x
-	{ 0x0079,                   NULL,           "Y" },      // y
-	{ 0x007a,                   NULL,           "Z" },      // z
-	{ 0x00a0,                   NULL,           " " },      // non breaking space
-	{ 0x00a1,                   NULL,           "!" },      // inverted exclaimation mark
-	{ 0x00a6,                   NULL,           "|" },      // broken bar
-	{ 0x00a9,                   NULL,           "(c)" },    // copyright sign
-	{ 0x00ab,                   NULL,           "<<" },     // left pointing double angle
-	{ 0x00ae,                   NULL,           "(r)" },    // registered sign
-	{ 0x00bb,                   NULL,           ">>" },     // right pointing double angle
-	{ 0x00bc,                   NULL,           "1/4" },    // vulgar fraction one quarter
-	{ 0x00bd,                   NULL,           "1/2" },    // vulgar fraction one half
-	{ 0x00be,                   NULL,           "3/4" },    // vulgar fraction three quarters
-	{ 0x00bf,                   NULL,           "?" },      // inverted question mark
-	{ 0x00c0,                   NULL,           "A" },      // 'A' grave
-	{ 0x00c1,                   NULL,           "A" },      // 'A' acute
-	{ 0x00c2,                   NULL,           "A" },      // 'A' circumflex
-	{ 0x00c3,                   NULL,           "A" },      // 'A' tilde
-	{ 0x00c4,                   NULL,           "A" },      // 'A' diaeresis
-	{ 0x00c5,                   NULL,           "A" },      // 'A' ring above
-	{ 0x00c6,                   NULL,           "AE" },     // 'AE' ligature
-	{ 0x00c7,                   NULL,           "C" },      // 'C' cedilla
-	{ 0x00c8,                   NULL,           "E" },      // 'E' grave
-	{ 0x00c9,                   NULL,           "E" },      // 'E' acute
-	{ 0x00ca,                   NULL,           "E" },      // 'E' circumflex
-	{ 0x00cb,                   NULL,           "E" },      // 'E' diaeresis
-	{ 0x00cc,                   NULL,           "I" },      // 'I' grave
-	{ 0x00cd,                   NULL,           "I" },      // 'I' acute
-	{ 0x00ce,                   NULL,           "I" },      // 'I' circumflex
-	{ 0x00cf,                   NULL,           "I" },      // 'I' diaeresis
-	{ 0x00d0,                   NULL,           "D" },      // 'ETH'
-	{ 0x00d1,                   NULL,           "N" },      // 'N' tilde
-	{ 0x00d2,                   NULL,           "O" },      // 'O' grave
-	{ 0x00d3,                   NULL,           "O" },      // 'O' acute
-	{ 0x00d4,                   NULL,           "O" },      // 'O' circumflex
-	{ 0x00d5,                   NULL,           "O" },      // 'O' tilde
-	{ 0x00d6,                   NULL,           "O" },      // 'O' diaeresis
-	{ 0x00d7,                   NULL,           "X" },      // multiplication sign
-	{ 0x00d8,                   NULL,           "O" },      // 'O' stroke
-	{ 0x00d9,                   NULL,           "U" },      // 'U' grave
-	{ 0x00da,                   NULL,           "U" },      // 'U' acute
-	{ 0x00db,                   NULL,           "U" },      // 'U' circumflex
-	{ 0x00dc,                   NULL,           "U" },      // 'U' diaeresis
-	{ 0x00dd,                   NULL,           "Y" },      // 'Y' acute
-	{ 0x00df,                   NULL,           "SS" },     // sharp S
-	{ 0x00e0,                   NULL,           "a" },      // 'a' grave
-	{ 0x00e1,                   NULL,           "a" },      // 'a' acute
-	{ 0x00e2,                   NULL,           "a" },      // 'a' circumflex
-	{ 0x00e3,                   NULL,           "a" },      // 'a' tilde
-	{ 0x00e4,                   NULL,           "a" },      // 'a' diaeresis
-	{ 0x00e5,                   NULL,           "a" },      // 'a' ring above
-	{ 0x00e6,                   NULL,           "ae" },     // 'ae' ligature
-	{ 0x00e7,                   NULL,           "c" },      // 'c' cedilla
-	{ 0x00e8,                   NULL,           "e" },      // 'e' grave
-	{ 0x00e9,                   NULL,           "e" },      // 'e' acute
-	{ 0x00ea,                   NULL,           "e" },      // 'e' circumflex
-	{ 0x00eb,                   NULL,           "e" },      // 'e' diaeresis
-	{ 0x00ec,                   NULL,           "i" },      // 'i' grave
-	{ 0x00ed,                   NULL,           "i" },      // 'i' acute
-	{ 0x00ee,                   NULL,           "i" },      // 'i' circumflex
-	{ 0x00ef,                   NULL,           "i" },      // 'i' diaeresis
-	{ 0x00f0,                   NULL,           "d" },      // 'eth'
-	{ 0x00f1,                   NULL,           "n" },      // 'n' tilde
-	{ 0x00f2,                   NULL,           "o" },      // 'o' grave
-	{ 0x00f3,                   NULL,           "o" },      // 'o' acute
-	{ 0x00f4,                   NULL,           "o" },      // 'o' circumflex
-	{ 0x00f5,                   NULL,           "o" },      // 'o' tilde
-	{ 0x00f6,                   NULL,           "o" },      // 'o' diaeresis
-	{ 0x00f8,                   NULL,           "o" },      // 'o' stroke
-	{ 0x00f9,                   NULL,           "u" },      // 'u' grave
-	{ 0x00fa,                   NULL,           "u" },      // 'u' acute
-	{ 0x00fb,                   NULL,           "u" },      // 'u' circumflex
-	{ 0x00fc,                   NULL,           "u" },      // 'u' diaeresis
-	{ 0x00fd,                   NULL,           "y" },      // 'y' acute
-	{ 0x00ff,                   NULL,           "y" },      // 'y' diaeresis
-	{ 0x2010,                   NULL,           "-" },      // hyphen
-	{ 0x2011,                   NULL,           "-" },      // non-breaking hyphen
-	{ 0x2012,                   NULL,           "-" },      // figure dash
-	{ 0x2013,                   NULL,           "-" },      // en dash
-	{ 0x2014,                   NULL,           "-" },      // em dash
-	{ 0x2015,                   NULL,           "-" },      // horizontal dash
-	{ 0x2018,                   NULL,           "\'" },     // left single quotation mark
-	{ 0x2019,                   NULL,           "\'" },     // right single quotation mark
-	{ 0x201a,                   NULL,           "\'" },     // single low quotation mark
-	{ 0x201b,                   NULL,           "\'" },     // single high reversed quotation mark
-	{ 0x201c,                   NULL,           "\"" },     // left double quotation mark
-	{ 0x201d,                   NULL,           "\"" },     // right double quotation mark
-	{ 0x201e,                   NULL,           "\"" },     // double low quotation mark
-	{ 0x201f,                   NULL,           "\"" },     // double high reversed quotation mark
-	{ 0x2024,                   NULL,           "." },      // one dot leader
-	{ 0x2025,                   NULL,           ".." },     // two dot leader
-	{ 0x2026,                   NULL,           "..." },    // horizontal ellipsis
-	{ 0x2047,                   NULL,           "??" },     // double question mark
-	{ 0x2048,                   NULL,           "?!" },     // question exclamation mark
-	{ 0x2049,                   NULL,           "!?" },     // exclamation question mark
-	{ 0xff01,                   NULL,           "!" },      // fullwidth exclamation point
-	{ 0xff02,                   NULL,           "\"" },     // fullwidth quotation mark
-	{ 0xff03,                   NULL,           "#" },      // fullwidth number sign
-	{ 0xff04,                   NULL,           "$" },      // fullwidth dollar sign
-	{ 0xff05,                   NULL,           "%" },      // fullwidth percent sign
-	{ 0xff06,                   NULL,           "&" },      // fullwidth ampersand
-	{ 0xff07,                   NULL,           "\'" },     // fullwidth apostrophe
-	{ 0xff08,                   NULL,           "(" },      // fullwidth left parenthesis
-	{ 0xff09,                   NULL,           ")" },      // fullwidth right parenthesis
-	{ 0xff0a,                   NULL,           "*" },      // fullwidth asterisk
-	{ 0xff0b,                   NULL,           "+" },      // fullwidth plus
-	{ 0xff0c,                   NULL,           "," },      // fullwidth comma
-	{ 0xff0d,                   NULL,           "-" },      // fullwidth minus
-	{ 0xff0e,                   NULL,           "." },      // fullwidth period
-	{ 0xff0f,                   NULL,           "/" },      // fullwidth slash
-	{ 0xff10,                   NULL,           "0" },      // fullwidth zero
-	{ 0xff11,                   NULL,           "1" },      // fullwidth one
-	{ 0xff12,                   NULL,           "2" },      // fullwidth two
-	{ 0xff13,                   NULL,           "3" },      // fullwidth three
-	{ 0xff14,                   NULL,           "4" },      // fullwidth four
-	{ 0xff15,                   NULL,           "5" },      // fullwidth five
-	{ 0xff16,                   NULL,           "6" },      // fullwidth six
-	{ 0xff17,                   NULL,           "7" },      // fullwidth seven
-	{ 0xff18,                   NULL,           "8" },      // fullwidth eight
-	{ 0xff19,                   NULL,           "9" },      // fullwidth nine
-	{ 0xff1a,                   NULL,           ":" },      // fullwidth colon
-	{ 0xff1b,                   NULL,           ";" },      // fullwidth semicolon
-	{ 0xff1c,                   NULL,           "<" },      // fullwidth less than sign
-	{ 0xff1d,                   NULL,           "=" },      // fullwidth equals sign
-	{ 0xff1e,                   NULL,           ">" },      // fullwidth greater than sign
-	{ 0xff1f,                   NULL,           "?" },      // fullwidth question mark
-	{ 0xff20,                   NULL,           "@" },      // fullwidth at sign
-	{ 0xff21,                   NULL,           "A" },      // fullwidth 'A'
-	{ 0xff22,                   NULL,           "B" },      // fullwidth 'B'
-	{ 0xff23,                   NULL,           "C" },      // fullwidth 'C'
-	{ 0xff24,                   NULL,           "D" },      // fullwidth 'D'
-	{ 0xff25,                   NULL,           "E" },      // fullwidth 'E'
-	{ 0xff26,                   NULL,           "F" },      // fullwidth 'F'
-	{ 0xff27,                   NULL,           "G" },      // fullwidth 'G'
-	{ 0xff28,                   NULL,           "H" },      // fullwidth 'H'
-	{ 0xff29,                   NULL,           "I" },      // fullwidth 'I'
-	{ 0xff2a,                   NULL,           "J" },      // fullwidth 'J'
-	{ 0xff2b,                   NULL,           "K" },      // fullwidth 'K'
-	{ 0xff2c,                   NULL,           "L" },      // fullwidth 'L'
-	{ 0xff2d,                   NULL,           "M" },      // fullwidth 'M'
-	{ 0xff2e,                   NULL,           "N" },      // fullwidth 'N'
-	{ 0xff2f,                   NULL,           "O" },      // fullwidth 'O'
-	{ 0xff30,                   NULL,           "P" },      // fullwidth 'P'
-	{ 0xff31,                   NULL,           "Q" },      // fullwidth 'Q'
-	{ 0xff32,                   NULL,           "R" },      // fullwidth 'R'
-	{ 0xff33,                   NULL,           "S" },      // fullwidth 'S'
-	{ 0xff34,                   NULL,           "T" },      // fullwidth 'T'
-	{ 0xff35,                   NULL,           "U" },      // fullwidth 'U'
-	{ 0xff36,                   NULL,           "V" },      // fullwidth 'V'
-	{ 0xff37,                   NULL,           "W" },      // fullwidth 'W'
-	{ 0xff38,                   NULL,           "X" },      // fullwidth 'X'
-	{ 0xff39,                   NULL,           "Y" },      // fullwidth 'Y'
-	{ 0xff3a,                   NULL,           "Z" },      // fullwidth 'Z'
-	{ 0xff3b,                   NULL,           "[" },      // fullwidth left bracket
-	{ 0xff3c,                   NULL,           "\\" },     // fullwidth backslash
-	{ 0xff3d,                   NULL,           "]" },      // fullwidth right bracket
-	{ 0xff3e,                   NULL,           "^" },      // fullwidth caret
-	{ 0xff3f,                   NULL,           "_" },      // fullwidth underscore
-	{ 0xff40,                   NULL,           "`" },      // fullwidth backquote
-	{ 0xff41,                   NULL,           "a" },      // fullwidth 'a'
-	{ 0xff42,                   NULL,           "b" },      // fullwidth 'b'
-	{ 0xff43,                   NULL,           "c" },      // fullwidth 'c'
-	{ 0xff44,                   NULL,           "d" },      // fullwidth 'd'
-	{ 0xff45,                   NULL,           "e" },      // fullwidth 'e'
-	{ 0xff46,                   NULL,           "f" },      // fullwidth 'f'
-	{ 0xff47,                   NULL,           "g" },      // fullwidth 'g'
-	{ 0xff48,                   NULL,           "h" },      // fullwidth 'h'
-	{ 0xff49,                   NULL,           "i" },      // fullwidth 'i'
-	{ 0xff4a,                   NULL,           "j" },      // fullwidth 'j'
-	{ 0xff4b,                   NULL,           "k" },      // fullwidth 'k'
-	{ 0xff4c,                   NULL,           "l" },      // fullwidth 'l'
-	{ 0xff4d,                   NULL,           "m" },      // fullwidth 'm'
-	{ 0xff4e,                   NULL,           "n" },      // fullwidth 'n'
-	{ 0xff4f,                   NULL,           "o" },      // fullwidth 'o'
-	{ 0xff50,                   NULL,           "p" },      // fullwidth 'p'
-	{ 0xff51,                   NULL,           "q" },      // fullwidth 'q'
-	{ 0xff52,                   NULL,           "r" },      // fullwidth 'r'
-	{ 0xff53,                   NULL,           "s" },      // fullwidth 's'
-	{ 0xff54,                   NULL,           "t" },      // fullwidth 't'
-	{ 0xff55,                   NULL,           "u" },      // fullwidth 'u'
-	{ 0xff56,                   NULL,           "v" },      // fullwidth 'v'
-	{ 0xff57,                   NULL,           "w" },      // fullwidth 'w'
-	{ 0xff58,                   NULL,           "x" },      // fullwidth 'x'
-	{ 0xff59,                   NULL,           "y" },      // fullwidth 'y'
-	{ 0xff5a,                   NULL,           "z" },      // fullwidth 'z'
-	{ 0xff5b,                   NULL,           "{" },      // fullwidth left brace
-	{ 0xff5c,                   NULL,           "|" },      // fullwidth vertical bar
-	{ 0xff5d,                   NULL,           "}" },      // fullwidth right brace
-	{ 0xff5e,                   NULL,           "~" },      // fullwidth tilde
-	{ 0xff5f,                   NULL,           "((" },     // fullwidth double left parenthesis
-	{ 0xff60,                   NULL,           "))" },     // fullwidth double right parenthesis
-	{ 0xffe0,                   NULL,           "\xC2\xA2" },       // fullwidth cent sign
-	{ 0xffe1,                   NULL,           "\xC2\xA3" },       // fullwidth pound sign
-	{ 0xffe4,                   NULL,           "\xC2\xA4" },       // fullwidth broken bar
-	{ 0xffe5,                   NULL,           "\xC2\xA5" },       // fullwidth yen sign
-	{ 0xffe6,                   NULL,           "\xE2\x82\xA9" },   // fullwidth won sign
-	{ 0xffe9,                   NULL,           "\xE2\x86\x90" },   // fullwidth left arrow
-	{ 0xffea,                   NULL,           "\xE2\x86\x91" },   // fullwidth up arrow
-	{ 0xffeb,                   NULL,           "\xE2\x86\x92" },   // fullwidth right arrow
-	{ 0xffec,                   NULL,           "\xE2\x86\x93" },   // fullwidth down arrow
-	{ 0xffed,                   NULL,           "\xE2\x96\xAA" },   // fullwidth solid box
-	{ 0xffee,                   NULL,           "\xE2\x97\xA6" },   // fullwidth open circle
-	{ UCHAR_SHIFT_1,            "Shift",        NULL },     // Shift key
-	{ UCHAR_SHIFT_2,            "Ctrl",         NULL },     // Ctrl key
-	{ UCHAR_MAMEKEY(F1),        "F1",           NULL },     // F1 function key
-	{ UCHAR_MAMEKEY(F2),        "F2",           NULL },     // F2 function key
-	{ UCHAR_MAMEKEY(F3),        "F3",           NULL },     // F3 function key
-	{ UCHAR_MAMEKEY(F4),        "F4",           NULL },     // F4 function key
-	{ UCHAR_MAMEKEY(F5),        "F5",           NULL },     // F5 function key
-	{ UCHAR_MAMEKEY(F6),        "F6",           NULL },     // F6 function key
-	{ UCHAR_MAMEKEY(F7),        "F7",           NULL },     // F7 function key
-	{ UCHAR_MAMEKEY(F8),        "F8",           NULL },     // F8 function key
-	{ UCHAR_MAMEKEY(F9),        "F9",           NULL },     // F9 function key
-	{ UCHAR_MAMEKEY(F10),       "F10",          NULL },     // F10 function key
-	{ UCHAR_MAMEKEY(F11),       "F11",          NULL },     // F11 function key
-	{ UCHAR_MAMEKEY(F12),       "F12",          NULL },     // F12 function key
-	{ UCHAR_MAMEKEY(F13),       "F13",          NULL },     // F13 function key
-	{ UCHAR_MAMEKEY(F14),       "F14",          NULL },     // F14 function key
-	{ UCHAR_MAMEKEY(F15),       "F15",          NULL },     // F15 function key
+	{ 0x0061,                   nullptr,           "A" },      // a
+	{ 0x0062,                   nullptr,           "B" },      // b
+	{ 0x0063,                   nullptr,           "C" },      // c
+	{ 0x0064,                   nullptr,           "D" },      // d
+	{ 0x0065,                   nullptr,           "E" },      // e
+	{ 0x0066,                   nullptr,           "F" },      // f
+	{ 0x0067,                   nullptr,           "G" },      // g
+	{ 0x0068,                   nullptr,           "H" },      // h
+	{ 0x0069,                   nullptr,           "I" },      // i
+	{ 0x006a,                   nullptr,           "J" },      // j
+	{ 0x006b,                   nullptr,           "K" },      // k
+	{ 0x006c,                   nullptr,           "L" },      // l
+	{ 0x006d,                   nullptr,           "M" },      // m
+	{ 0x006e,                   nullptr,           "N" },      // n
+	{ 0x006f,                   nullptr,           "O" },      // o
+	{ 0x0070,                   nullptr,           "P" },      // p
+	{ 0x0071,                   nullptr,           "Q" },      // q
+	{ 0x0072,                   nullptr,           "R" },      // r
+	{ 0x0073,                   nullptr,           "S" },      // s
+	{ 0x0074,                   nullptr,           "T" },      // t
+	{ 0x0075,                   nullptr,           "U" },      // u
+	{ 0x0076,                   nullptr,           "V" },      // v
+	{ 0x0077,                   nullptr,           "W" },      // w
+	{ 0x0078,                   nullptr,           "X" },      // x
+	{ 0x0079,                   nullptr,           "Y" },      // y
+	{ 0x007a,                   nullptr,           "Z" },      // z
+	{ 0x00a0,                   nullptr,           " " },      // non breaking space
+	{ 0x00a1,                   nullptr,           "!" },      // inverted exclaimation mark
+	{ 0x00a6,                   nullptr,           "|" },      // broken bar
+	{ 0x00a9,                   nullptr,           "(c)" },    // copyright sign
+	{ 0x00ab,                   nullptr,           "<<" },     // left pointing double angle
+	{ 0x00ae,                   nullptr,           "(r)" },    // registered sign
+	{ 0x00bb,                   nullptr,           ">>" },     // right pointing double angle
+	{ 0x00bc,                   nullptr,           "1/4" },    // vulgar fraction one quarter
+	{ 0x00bd,                   nullptr,           "1/2" },    // vulgar fraction one half
+	{ 0x00be,                   nullptr,           "3/4" },    // vulgar fraction three quarters
+	{ 0x00bf,                   nullptr,           "?" },      // inverted question mark
+	{ 0x00c0,                   nullptr,           "A" },      // 'A' grave
+	{ 0x00c1,                   nullptr,           "A" },      // 'A' acute
+	{ 0x00c2,                   nullptr,           "A" },      // 'A' circumflex
+	{ 0x00c3,                   nullptr,           "A" },      // 'A' tilde
+	{ 0x00c4,                   nullptr,           "A" },      // 'A' diaeresis
+	{ 0x00c5,                   nullptr,           "A" },      // 'A' ring above
+	{ 0x00c6,                   nullptr,           "AE" },     // 'AE' ligature
+	{ 0x00c7,                   nullptr,           "C" },      // 'C' cedilla
+	{ 0x00c8,                   nullptr,           "E" },      // 'E' grave
+	{ 0x00c9,                   nullptr,           "E" },      // 'E' acute
+	{ 0x00ca,                   nullptr,           "E" },      // 'E' circumflex
+	{ 0x00cb,                   nullptr,           "E" },      // 'E' diaeresis
+	{ 0x00cc,                   nullptr,           "I" },      // 'I' grave
+	{ 0x00cd,                   nullptr,           "I" },      // 'I' acute
+	{ 0x00ce,                   nullptr,           "I" },      // 'I' circumflex
+	{ 0x00cf,                   nullptr,           "I" },      // 'I' diaeresis
+	{ 0x00d0,                   nullptr,           "D" },      // 'ETH'
+	{ 0x00d1,                   nullptr,           "N" },      // 'N' tilde
+	{ 0x00d2,                   nullptr,           "O" },      // 'O' grave
+	{ 0x00d3,                   nullptr,           "O" },      // 'O' acute
+	{ 0x00d4,                   nullptr,           "O" },      // 'O' circumflex
+	{ 0x00d5,                   nullptr,           "O" },      // 'O' tilde
+	{ 0x00d6,                   nullptr,           "O" },      // 'O' diaeresis
+	{ 0x00d7,                   nullptr,           "X" },      // multiplication sign
+	{ 0x00d8,                   nullptr,           "O" },      // 'O' stroke
+	{ 0x00d9,                   nullptr,           "U" },      // 'U' grave
+	{ 0x00da,                   nullptr,           "U" },      // 'U' acute
+	{ 0x00db,                   nullptr,           "U" },      // 'U' circumflex
+	{ 0x00dc,                   nullptr,           "U" },      // 'U' diaeresis
+	{ 0x00dd,                   nullptr,           "Y" },      // 'Y' acute
+	{ 0x00df,                   nullptr,           "SS" },     // sharp S
+	{ 0x00e0,                   nullptr,           "a" },      // 'a' grave
+	{ 0x00e1,                   nullptr,           "a" },      // 'a' acute
+	{ 0x00e2,                   nullptr,           "a" },      // 'a' circumflex
+	{ 0x00e3,                   nullptr,           "a" },      // 'a' tilde
+	{ 0x00e4,                   nullptr,           "a" },      // 'a' diaeresis
+	{ 0x00e5,                   nullptr,           "a" },      // 'a' ring above
+	{ 0x00e6,                   nullptr,           "ae" },     // 'ae' ligature
+	{ 0x00e7,                   nullptr,           "c" },      // 'c' cedilla
+	{ 0x00e8,                   nullptr,           "e" },      // 'e' grave
+	{ 0x00e9,                   nullptr,           "e" },      // 'e' acute
+	{ 0x00ea,                   nullptr,           "e" },      // 'e' circumflex
+	{ 0x00eb,                   nullptr,           "e" },      // 'e' diaeresis
+	{ 0x00ec,                   nullptr,           "i" },      // 'i' grave
+	{ 0x00ed,                   nullptr,           "i" },      // 'i' acute
+	{ 0x00ee,                   nullptr,           "i" },      // 'i' circumflex
+	{ 0x00ef,                   nullptr,           "i" },      // 'i' diaeresis
+	{ 0x00f0,                   nullptr,           "d" },      // 'eth'
+	{ 0x00f1,                   nullptr,           "n" },      // 'n' tilde
+	{ 0x00f2,                   nullptr,           "o" },      // 'o' grave
+	{ 0x00f3,                   nullptr,           "o" },      // 'o' acute
+	{ 0x00f4,                   nullptr,           "o" },      // 'o' circumflex
+	{ 0x00f5,                   nullptr,           "o" },      // 'o' tilde
+	{ 0x00f6,                   nullptr,           "o" },      // 'o' diaeresis
+	{ 0x00f8,                   nullptr,           "o" },      // 'o' stroke
+	{ 0x00f9,                   nullptr,           "u" },      // 'u' grave
+	{ 0x00fa,                   nullptr,           "u" },      // 'u' acute
+	{ 0x00fb,                   nullptr,           "u" },      // 'u' circumflex
+	{ 0x00fc,                   nullptr,           "u" },      // 'u' diaeresis
+	{ 0x00fd,                   nullptr,           "y" },      // 'y' acute
+	{ 0x00ff,                   nullptr,           "y" },      // 'y' diaeresis
+	{ 0x2010,                   nullptr,           "-" },      // hyphen
+	{ 0x2011,                   nullptr,           "-" },      // non-breaking hyphen
+	{ 0x2012,                   nullptr,           "-" },      // figure dash
+	{ 0x2013,                   nullptr,           "-" },      // en dash
+	{ 0x2014,                   nullptr,           "-" },      // em dash
+	{ 0x2015,                   nullptr,           "-" },      // horizontal dash
+	{ 0x2018,                   nullptr,           "\'" },     // left single quotation mark
+	{ 0x2019,                   nullptr,           "\'" },     // right single quotation mark
+	{ 0x201a,                   nullptr,           "\'" },     // single low quotation mark
+	{ 0x201b,                   nullptr,           "\'" },     // single high reversed quotation mark
+	{ 0x201c,                   nullptr,           "\"" },     // left double quotation mark
+	{ 0x201d,                   nullptr,           "\"" },     // right double quotation mark
+	{ 0x201e,                   nullptr,           "\"" },     // double low quotation mark
+	{ 0x201f,                   nullptr,           "\"" },     // double high reversed quotation mark
+	{ 0x2024,                   nullptr,           "." },      // one dot leader
+	{ 0x2025,                   nullptr,           ".." },     // two dot leader
+	{ 0x2026,                   nullptr,           "..." },    // horizontal ellipsis
+	{ 0x2047,                   nullptr,           "??" },     // double question mark
+	{ 0x2048,                   nullptr,           "?!" },     // question exclamation mark
+	{ 0x2049,                   nullptr,           "!?" },     // exclamation question mark
+	{ 0xff01,                   nullptr,           "!" },      // fullwidth exclamation point
+	{ 0xff02,                   nullptr,           "\"" },     // fullwidth quotation mark
+	{ 0xff03,                   nullptr,           "#" },      // fullwidth number sign
+	{ 0xff04,                   nullptr,           "$" },      // fullwidth dollar sign
+	{ 0xff05,                   nullptr,           "%" },      // fullwidth percent sign
+	{ 0xff06,                   nullptr,           "&" },      // fullwidth ampersand
+	{ 0xff07,                   nullptr,           "\'" },     // fullwidth apostrophe
+	{ 0xff08,                   nullptr,           "(" },      // fullwidth left parenthesis
+	{ 0xff09,                   nullptr,           ")" },      // fullwidth right parenthesis
+	{ 0xff0a,                   nullptr,           "*" },      // fullwidth asterisk
+	{ 0xff0b,                   nullptr,           "+" },      // fullwidth plus
+	{ 0xff0c,                   nullptr,           "," },      // fullwidth comma
+	{ 0xff0d,                   nullptr,           "-" },      // fullwidth minus
+	{ 0xff0e,                   nullptr,           "." },      // fullwidth period
+	{ 0xff0f,                   nullptr,           "/" },      // fullwidth slash
+	{ 0xff10,                   nullptr,           "0" },      // fullwidth zero
+	{ 0xff11,                   nullptr,           "1" },      // fullwidth one
+	{ 0xff12,                   nullptr,           "2" },      // fullwidth two
+	{ 0xff13,                   nullptr,           "3" },      // fullwidth three
+	{ 0xff14,                   nullptr,           "4" },      // fullwidth four
+	{ 0xff15,                   nullptr,           "5" },      // fullwidth five
+	{ 0xff16,                   nullptr,           "6" },      // fullwidth six
+	{ 0xff17,                   nullptr,           "7" },      // fullwidth seven
+	{ 0xff18,                   nullptr,           "8" },      // fullwidth eight
+	{ 0xff19,                   nullptr,           "9" },      // fullwidth nine
+	{ 0xff1a,                   nullptr,           ":" },      // fullwidth colon
+	{ 0xff1b,                   nullptr,           ";" },      // fullwidth semicolon
+	{ 0xff1c,                   nullptr,           "<" },      // fullwidth less than sign
+	{ 0xff1d,                   nullptr,           "=" },      // fullwidth equals sign
+	{ 0xff1e,                   nullptr,           ">" },      // fullwidth greater than sign
+	{ 0xff1f,                   nullptr,           "?" },      // fullwidth question mark
+	{ 0xff20,                   nullptr,           "@" },      // fullwidth at sign
+	{ 0xff21,                   nullptr,           "A" },      // fullwidth 'A'
+	{ 0xff22,                   nullptr,           "B" },      // fullwidth 'B'
+	{ 0xff23,                   nullptr,           "C" },      // fullwidth 'C'
+	{ 0xff24,                   nullptr,           "D" },      // fullwidth 'D'
+	{ 0xff25,                   nullptr,           "E" },      // fullwidth 'E'
+	{ 0xff26,                   nullptr,           "F" },      // fullwidth 'F'
+	{ 0xff27,                   nullptr,           "G" },      // fullwidth 'G'
+	{ 0xff28,                   nullptr,           "H" },      // fullwidth 'H'
+	{ 0xff29,                   nullptr,           "I" },      // fullwidth 'I'
+	{ 0xff2a,                   nullptr,           "J" },      // fullwidth 'J'
+	{ 0xff2b,                   nullptr,           "K" },      // fullwidth 'K'
+	{ 0xff2c,                   nullptr,           "L" },      // fullwidth 'L'
+	{ 0xff2d,                   nullptr,           "M" },      // fullwidth 'M'
+	{ 0xff2e,                   nullptr,           "N" },      // fullwidth 'N'
+	{ 0xff2f,                   nullptr,           "O" },      // fullwidth 'O'
+	{ 0xff30,                   nullptr,           "P" },      // fullwidth 'P'
+	{ 0xff31,                   nullptr,           "Q" },      // fullwidth 'Q'
+	{ 0xff32,                   nullptr,           "R" },      // fullwidth 'R'
+	{ 0xff33,                   nullptr,           "S" },      // fullwidth 'S'
+	{ 0xff34,                   nullptr,           "T" },      // fullwidth 'T'
+	{ 0xff35,                   nullptr,           "U" },      // fullwidth 'U'
+	{ 0xff36,                   nullptr,           "V" },      // fullwidth 'V'
+	{ 0xff37,                   nullptr,           "W" },      // fullwidth 'W'
+	{ 0xff38,                   nullptr,           "X" },      // fullwidth 'X'
+	{ 0xff39,                   nullptr,           "Y" },      // fullwidth 'Y'
+	{ 0xff3a,                   nullptr,           "Z" },      // fullwidth 'Z'
+	{ 0xff3b,                   nullptr,           "[" },      // fullwidth left bracket
+	{ 0xff3c,                   nullptr,           "\\" },     // fullwidth backslash
+	{ 0xff3d,                   nullptr,           "]" },      // fullwidth right bracket
+	{ 0xff3e,                   nullptr,           "^" },      // fullwidth caret
+	{ 0xff3f,                   nullptr,           "_" },      // fullwidth underscore
+	{ 0xff40,                   nullptr,           "`" },      // fullwidth backquote
+	{ 0xff41,                   nullptr,           "a" },      // fullwidth 'a'
+	{ 0xff42,                   nullptr,           "b" },      // fullwidth 'b'
+	{ 0xff43,                   nullptr,           "c" },      // fullwidth 'c'
+	{ 0xff44,                   nullptr,           "d" },      // fullwidth 'd'
+	{ 0xff45,                   nullptr,           "e" },      // fullwidth 'e'
+	{ 0xff46,                   nullptr,           "f" },      // fullwidth 'f'
+	{ 0xff47,                   nullptr,           "g" },      // fullwidth 'g'
+	{ 0xff48,                   nullptr,           "h" },      // fullwidth 'h'
+	{ 0xff49,                   nullptr,           "i" },      // fullwidth 'i'
+	{ 0xff4a,                   nullptr,           "j" },      // fullwidth 'j'
+	{ 0xff4b,                   nullptr,           "k" },      // fullwidth 'k'
+	{ 0xff4c,                   nullptr,           "l" },      // fullwidth 'l'
+	{ 0xff4d,                   nullptr,           "m" },      // fullwidth 'm'
+	{ 0xff4e,                   nullptr,           "n" },      // fullwidth 'n'
+	{ 0xff4f,                   nullptr,           "o" },      // fullwidth 'o'
+	{ 0xff50,                   nullptr,           "p" },      // fullwidth 'p'
+	{ 0xff51,                   nullptr,           "q" },      // fullwidth 'q'
+	{ 0xff52,                   nullptr,           "r" },      // fullwidth 'r'
+	{ 0xff53,                   nullptr,           "s" },      // fullwidth 's'
+	{ 0xff54,                   nullptr,           "t" },      // fullwidth 't'
+	{ 0xff55,                   nullptr,           "u" },      // fullwidth 'u'
+	{ 0xff56,                   nullptr,           "v" },      // fullwidth 'v'
+	{ 0xff57,                   nullptr,           "w" },      // fullwidth 'w'
+	{ 0xff58,                   nullptr,           "x" },      // fullwidth 'x'
+	{ 0xff59,                   nullptr,           "y" },      // fullwidth 'y'
+	{ 0xff5a,                   nullptr,           "z" },      // fullwidth 'z'
+	{ 0xff5b,                   nullptr,           "{" },      // fullwidth left brace
+	{ 0xff5c,                   nullptr,           "|" },      // fullwidth vertical bar
+	{ 0xff5d,                   nullptr,           "}" },      // fullwidth right brace
+	{ 0xff5e,                   nullptr,           "~" },      // fullwidth tilde
+	{ 0xff5f,                   nullptr,           "((" },     // fullwidth double left parenthesis
+	{ 0xff60,                   nullptr,           "))" },     // fullwidth double right parenthesis
+	{ 0xffe0,                   nullptr,           "\xC2\xA2" },       // fullwidth cent sign
+	{ 0xffe1,                   nullptr,           "\xC2\xA3" },       // fullwidth pound sign
+	{ 0xffe4,                   nullptr,           "\xC2\xA4" },       // fullwidth broken bar
+	{ 0xffe5,                   nullptr,           "\xC2\xA5" },       // fullwidth yen sign
+	{ 0xffe6,                   nullptr,           "\xE2\x82\xA9" },   // fullwidth won sign
+	{ 0xffe9,                   nullptr,           "\xE2\x86\x90" },   // fullwidth left arrow
+	{ 0xffea,                   nullptr,           "\xE2\x86\x91" },   // fullwidth up arrow
+	{ 0xffeb,                   nullptr,           "\xE2\x86\x92" },   // fullwidth right arrow
+	{ 0xffec,                   nullptr,           "\xE2\x86\x93" },   // fullwidth down arrow
+	{ 0xffed,                   nullptr,           "\xE2\x96\xAA" },   // fullwidth solid box
+	{ 0xffee,                   nullptr,           "\xE2\x97\xA6" },   // fullwidth open circle
+	{ UCHAR_SHIFT_1,            "Shift",        nullptr },     // Shift key
+	{ UCHAR_SHIFT_2,            "Ctrl",         nullptr },     // Ctrl key
+	{ UCHAR_MAMEKEY(F1),        "F1",           nullptr },     // F1 function key
+	{ UCHAR_MAMEKEY(F2),        "F2",           nullptr },     // F2 function key
+	{ UCHAR_MAMEKEY(F3),        "F3",           nullptr },     // F3 function key
+	{ UCHAR_MAMEKEY(F4),        "F4",           nullptr },     // F4 function key
+	{ UCHAR_MAMEKEY(F5),        "F5",           nullptr },     // F5 function key
+	{ UCHAR_MAMEKEY(F6),        "F6",           nullptr },     // F6 function key
+	{ UCHAR_MAMEKEY(F7),        "F7",           nullptr },     // F7 function key
+	{ UCHAR_MAMEKEY(F8),        "F8",           nullptr },     // F8 function key
+	{ UCHAR_MAMEKEY(F9),        "F9",           nullptr },     // F9 function key
+	{ UCHAR_MAMEKEY(F10),       "F10",          nullptr },     // F10 function key
+	{ UCHAR_MAMEKEY(F11),       "F11",          nullptr },     // F11 function key
+	{ UCHAR_MAMEKEY(F12),       "F12",          nullptr },     // F12 function key
+	{ UCHAR_MAMEKEY(F13),       "F13",          nullptr },     // F13 function key
+	{ UCHAR_MAMEKEY(F14),       "F14",          nullptr },     // F14 function key
+	{ UCHAR_MAMEKEY(F15),       "F15",          nullptr },     // F15 function key
 	{ UCHAR_MAMEKEY(ESC),       "Esc",          "\033" },   // Esc key
-	{ UCHAR_MAMEKEY(INSERT),    "Insert",       NULL },     // Insert key
+	{ UCHAR_MAMEKEY(INSERT),    "Insert",       nullptr },     // Insert key
 	{ UCHAR_MAMEKEY(DEL),       "Delete",       "\010" },   // Delete key
 	{ UCHAR_MAMEKEY(HOME),      "Home",         "\014" },   // Home key
-	{ UCHAR_MAMEKEY(END),       "End",          NULL },     // End key
-	{ UCHAR_MAMEKEY(PGUP),      "Page Up",      NULL },     // Page Up key
-	{ UCHAR_MAMEKEY(PGDN),      "Page Down",    NULL },     // Page Down key
-	{ UCHAR_MAMEKEY(LEFT),      "Cursor Left",  NULL },     // Cursor Left
-	{ UCHAR_MAMEKEY(RIGHT),     "Cursor Right", NULL },     // Cursor Right
-	{ UCHAR_MAMEKEY(UP),        "Cursor Up",    NULL },     // Cursor Up
-	{ UCHAR_MAMEKEY(DOWN),      "Cursor Down",  NULL },     // Cursor Down
-	{ UCHAR_MAMEKEY(0_PAD),     "Keypad 0",     NULL },     // 0 on the numeric keypad
-	{ UCHAR_MAMEKEY(1_PAD),     "Keypad 1",     NULL },     // 1 on the numeric keypad
-	{ UCHAR_MAMEKEY(2_PAD),     "Keypad 2",     NULL },     // 2 on the numeric keypad
-	{ UCHAR_MAMEKEY(3_PAD),     "Keypad 3",     NULL },     // 3 on the numeric keypad
-	{ UCHAR_MAMEKEY(4_PAD),     "Keypad 4",     NULL },     // 4 on the numeric keypad
-	{ UCHAR_MAMEKEY(5_PAD),     "Keypad 5",     NULL },     // 5 on the numeric keypad
-	{ UCHAR_MAMEKEY(6_PAD),     "Keypad 6",     NULL },     // 6 on the numeric keypad
-	{ UCHAR_MAMEKEY(7_PAD),     "Keypad 7",     NULL },     // 7 on the numeric keypad
-	{ UCHAR_MAMEKEY(8_PAD),     "Keypad 8",     NULL },     // 8 on the numeric keypad
-	{ UCHAR_MAMEKEY(9_PAD),     "Keypad 9",     NULL },     // 9 on the numeric keypad
-	{ UCHAR_MAMEKEY(SLASH_PAD), "Keypad /",     NULL },     // / on the numeric keypad
-	{ UCHAR_MAMEKEY(ASTERISK),  "Keypad *",     NULL },     // * on the numeric keypad
-	{ UCHAR_MAMEKEY(MINUS_PAD), "Keypad -",     NULL },     // - on the numeric Keypad
-	{ UCHAR_MAMEKEY(PLUS_PAD),  "Keypad +",     NULL },     // + on the numeric Keypad
-	{ UCHAR_MAMEKEY(DEL_PAD),   "Keypad .",     NULL },     // . on the numeric keypad
-	{ UCHAR_MAMEKEY(ENTER_PAD), "Keypad Enter", NULL },     // Enter on the numeric keypad
-	{ UCHAR_MAMEKEY(PRTSCR),    "Print Screen", NULL },     // Print Screen key
-	{ UCHAR_MAMEKEY(PAUSE),     "Pause",        NULL },     // Pause key
-	{ UCHAR_MAMEKEY(LSHIFT),    "Left Shift",   NULL },     // Left Shift key
-	{ UCHAR_MAMEKEY(RSHIFT),    "Right Shift",  NULL },     // Right Shift key
-	{ UCHAR_MAMEKEY(LCONTROL),  "Left Ctrl",    NULL },     // Left Control key
-	{ UCHAR_MAMEKEY(RCONTROL),  "Right Ctrl",   NULL },     // Right Control key
-	{ UCHAR_MAMEKEY(LALT),      "Left Alt",     NULL },     // Left Alt key
-	{ UCHAR_MAMEKEY(RALT),      "Right Alt",    NULL },     // Right Alt key
-	{ UCHAR_MAMEKEY(SCRLOCK),   "Scroll Lock",  NULL },     // Scroll Lock key
-	{ UCHAR_MAMEKEY(NUMLOCK),   "Num Lock",     NULL },     // Num Lock key
-	{ UCHAR_MAMEKEY(CAPSLOCK),  "Caps Lock",    NULL },     // Caps Lock key
-	{ UCHAR_MAMEKEY(LWIN),      "Left Win",     NULL },     // Left Win key
-	{ UCHAR_MAMEKEY(RWIN),      "Right Win",    NULL },     // Right Win key
-	{ UCHAR_MAMEKEY(MENU),      "Menu",         NULL },     // Menu key
-	{ UCHAR_MAMEKEY(CANCEL),    "Break",        NULL }      // Break/Pause key
+	{ UCHAR_MAMEKEY(END),       "End",          nullptr },     // End key
+	{ UCHAR_MAMEKEY(PGUP),      "Page Up",      nullptr },     // Page Up key
+	{ UCHAR_MAMEKEY(PGDN),      "Page Down",    nullptr },     // Page Down key
+	{ UCHAR_MAMEKEY(LEFT),      "Cursor Left",  nullptr },     // Cursor Left
+	{ UCHAR_MAMEKEY(RIGHT),     "Cursor Right", nullptr },     // Cursor Right
+	{ UCHAR_MAMEKEY(UP),        "Cursor Up",    nullptr },     // Cursor Up
+	{ UCHAR_MAMEKEY(DOWN),      "Cursor Down",  nullptr },     // Cursor Down
+	{ UCHAR_MAMEKEY(0_PAD),     "Keypad 0",     nullptr },     // 0 on the numeric keypad
+	{ UCHAR_MAMEKEY(1_PAD),     "Keypad 1",     nullptr },     // 1 on the numeric keypad
+	{ UCHAR_MAMEKEY(2_PAD),     "Keypad 2",     nullptr },     // 2 on the numeric keypad
+	{ UCHAR_MAMEKEY(3_PAD),     "Keypad 3",     nullptr },     // 3 on the numeric keypad
+	{ UCHAR_MAMEKEY(4_PAD),     "Keypad 4",     nullptr },     // 4 on the numeric keypad
+	{ UCHAR_MAMEKEY(5_PAD),     "Keypad 5",     nullptr },     // 5 on the numeric keypad
+	{ UCHAR_MAMEKEY(6_PAD),     "Keypad 6",     nullptr },     // 6 on the numeric keypad
+	{ UCHAR_MAMEKEY(7_PAD),     "Keypad 7",     nullptr },     // 7 on the numeric keypad
+	{ UCHAR_MAMEKEY(8_PAD),     "Keypad 8",     nullptr },     // 8 on the numeric keypad
+	{ UCHAR_MAMEKEY(9_PAD),     "Keypad 9",     nullptr },     // 9 on the numeric keypad
+	{ UCHAR_MAMEKEY(SLASH_PAD), "Keypad /",     nullptr },     // / on the numeric keypad
+	{ UCHAR_MAMEKEY(ASTERISK),  "Keypad *",     nullptr },     // * on the numeric keypad
+	{ UCHAR_MAMEKEY(MINUS_PAD), "Keypad -",     nullptr },     // - on the numeric Keypad
+	{ UCHAR_MAMEKEY(PLUS_PAD),  "Keypad +",     nullptr },     // + on the numeric Keypad
+	{ UCHAR_MAMEKEY(DEL_PAD),   "Keypad .",     nullptr },     // . on the numeric keypad
+	{ UCHAR_MAMEKEY(ENTER_PAD), "Keypad Enter", nullptr },     // Enter on the numeric keypad
+	{ UCHAR_MAMEKEY(PRTSCR),    "Print Screen", nullptr },     // Print Screen key
+	{ UCHAR_MAMEKEY(PAUSE),     "Pause",        nullptr },     // Pause key
+	{ UCHAR_MAMEKEY(LSHIFT),    "Left Shift",   nullptr },     // Left Shift key
+	{ UCHAR_MAMEKEY(RSHIFT),    "Right Shift",  nullptr },     // Right Shift key
+	{ UCHAR_MAMEKEY(LCONTROL),  "Left Ctrl",    nullptr },     // Left Control key
+	{ UCHAR_MAMEKEY(RCONTROL),  "Right Ctrl",   nullptr },     // Right Control key
+	{ UCHAR_MAMEKEY(LALT),      "Left Alt",     nullptr },     // Left Alt key
+	{ UCHAR_MAMEKEY(RALT),      "Right Alt",    nullptr },     // Right Alt key
+	{ UCHAR_MAMEKEY(SCRLOCK),   "Scroll Lock",  nullptr },     // Scroll Lock key
+	{ UCHAR_MAMEKEY(NUMLOCK),   "Num Lock",     nullptr },     // Num Lock key
+	{ UCHAR_MAMEKEY(CAPSLOCK),  "Caps Lock",    nullptr },     // Caps Lock key
+	{ UCHAR_MAMEKEY(LWIN),      "Left Win",     nullptr },     // Left Win key
+	{ UCHAR_MAMEKEY(RWIN),      "Right Win",    nullptr },     // Right Win key
+	{ UCHAR_MAMEKEY(MENU),      "Menu",         nullptr },     // Menu key
+	{ UCHAR_MAMEKEY(CANCEL),    "Break",        nullptr }      // Break/Pause key
 };
 
 
@@ -643,7 +643,7 @@ void ioport_list::append(device_t &device, std::string &errorbuf)
 {
 	// no constructor, no list
 	ioport_constructor constructor = device.input_ports();
-	if (constructor == NULL)
+	if (constructor == nullptr)
 		return;
 
 	// reset error buffer
@@ -653,7 +653,7 @@ void ioport_list::append(device_t &device, std::string &errorbuf)
 	(*constructor)(device, *this, errorbuf);
 
 	// collapse fields and sort the list
-	for (ioport_port *port = first(); port != NULL; port = port->next())
+	for (ioport_port *port = first(); port != nullptr; port = port->next())
 		port->collapse_fields(errorbuf);
 }
 
@@ -668,7 +668,7 @@ void ioport_list::append(device_t &device, std::string &errorbuf)
 //-------------------------------------------------
 
 input_type_entry::input_type_entry(ioport_type type, ioport_group group, int player, const char *token, const char *name, input_seq standard)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_type(type),
 		m_group(group),
 		m_player(player),
@@ -679,7 +679,7 @@ input_type_entry::input_type_entry(ioport_type type, ioport_group group, int pla
 }
 
 input_type_entry::input_type_entry(ioport_type type, ioport_group group, int player, const char *token, const char *name, input_seq standard, input_seq decrement, input_seq increment)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_type(type),
 		m_group(group),
 		m_player(player),
@@ -726,7 +726,7 @@ void input_type_entry::restore_default_seq()
 //-------------------------------------------------
 
 digital_joystick::digital_joystick(int player, int number)
-	:   m_next(NULL),
+	:   m_next(nullptr),
 		m_player(player),
 		m_number(number),
 		m_current(0),
@@ -762,9 +762,9 @@ void digital_joystick::frame_update()
 	m_current = 0;
 
 	// read all the associated ports
-	running_machine *machine = NULL;
+	running_machine *machine = nullptr;
 	for (direction_t direction = JOYDIR_UP; direction < JOYDIR_COUNT; ++direction)
-		for (const simple_list_wrapper<ioport_field> *i = m_field[direction].first(); i != NULL; i = i->next())
+		for (const simple_list_wrapper<ioport_field> *i = m_field[direction].first(); i != nullptr; i = i->next())
 		{
 			machine = &i->object()->machine();
 			if (machine->input().seq_pressed(i->object()->seq(SEQ_TYPE_STANDARD)))
@@ -837,7 +837,7 @@ natural_keyboard::natural_keyboard(running_machine &machine)
 		m_bufend(0),
 		m_status_keydown(false),
 		m_last_cr(false),
-		m_timer(NULL),
+		m_timer(nullptr),
 		m_current_rate(attotime::zero)
 {
 	m_queue_chars = ioport_queue_chars_delegate();
@@ -898,7 +898,7 @@ void natural_keyboard::post(unicode_char ch)
 	{
 		const keycode_map_entry *code = find_code(ch);
 		std::string tempstr;
-		machine().logerror("natural_keyboard::post(): code=%i (%s) field->name='%s'\n", int(ch), unicode_to_string(tempstr, ch), (code != NULL && code->field[0] != NULL) ? code->field[0]->name() : "<null>");
+		machine().logerror("natural_keyboard::post(): code=%i (%s) field->name='%s'\n", int(ch), unicode_to_string(tempstr, ch), (code != nullptr && code->field[0] != nullptr) ? code->field[0]->name() : "<null>");
 	}
 
 	// can we post this key in the queue directly?
@@ -909,7 +909,7 @@ void natural_keyboard::post(unicode_char ch)
 	else if (can_post_alternate(ch))
 	{
 		const char_info *info = char_info::find(ch);
-		assert(info != NULL && info->alternate != NULL);
+		assert(info != nullptr && info->alternate != nullptr);
 		const char *altstring = info->alternate;
 		while (*altstring != 0)
 		{
@@ -1036,13 +1036,13 @@ void natural_keyboard::post_coded(const char *text, size_t length, const attotim
 
 		// look for escape characters
 		if (ch == '{')
-			for (int codenum = 0; codenum < ARRAY_LENGTH(codes); codenum++)
+			for (auto & code : codes)
 			{
-				size_t keylen = strlen(codes[codenum].key);
+				size_t keylen = strlen(code.key);
 				if (curpos + keylen + 2 <= length)
-					if (core_strnicmp(codes[codenum].key, &text[curpos + 1], keylen) == 0 && text[curpos + keylen + 1] == '}')
+					if (core_strnicmp(code.key, &text[curpos + 1], keylen) == 0 && text[curpos + keylen + 1] == '}')
 					{
-						ch = codes[codenum].code;
+						ch = code.code;
 						increment = keylen + 2;
 					}
 			}
@@ -1064,13 +1064,13 @@ void natural_keyboard::post_coded(const char *text, size_t length, const attotim
 void natural_keyboard::build_codes(ioport_manager &manager)
 {
 	// iterate over shift keys
-	ioport_field *shift[UCHAR_SHIFT_END + 1 - UCHAR_SHIFT_BEGIN] = { 0 };
+	ioport_field *shift[UCHAR_SHIFT_END + 1 - UCHAR_SHIFT_BEGIN] = { nullptr };
 	for (int curshift = 0; curshift <= ARRAY_LENGTH(shift); curshift++)
-		if (curshift == 0 || shift[curshift - 1] != NULL)
+		if (curshift == 0 || shift[curshift - 1] != nullptr)
 
 			// iterate over ports and fields
-			for (ioport_port *port = manager.first_port(); port != NULL; port = port->next())
-				for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+			for (ioport_port *port = manager.first_port(); port != nullptr; port = port->next())
+				for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 					if (field->type() == IPT_KEYBOARD)
 					{
 						// fetch the code, ignoring 0
@@ -1089,7 +1089,7 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 							if (curshift == 0)
 							{
 								newcode.field[0] = field;
-								newcode.field[1] = 0;
+								newcode.field[1] = nullptr;
 							}
 							else
 							{
@@ -1122,7 +1122,7 @@ bool natural_keyboard::can_post_directly(unicode_char ch)
 
 	// otherwise, it depends on the input codes
 	const keycode_map_entry *code = find_code(ch);
-	return (code != NULL && code->field[0] != NULL);
+	return (code != nullptr && code->field[0] != nullptr);
 }
 
 
@@ -1134,11 +1134,11 @@ bool natural_keyboard::can_post_directly(unicode_char ch)
 bool natural_keyboard::can_post_alternate(unicode_char ch)
 {
 	const char_info *info = char_info::find(ch);
-	if (info == NULL)
+	if (info == nullptr)
 		return false;
 
 	const char *altstring = info->alternate;
-	if (altstring == NULL)
+	if (altstring == nullptr)
 		return false;
 
 	while (*altstring != 0)
@@ -1274,12 +1274,12 @@ const char *natural_keyboard::unicode_to_string(std::string &buffer, unicode_cha
 
 const natural_keyboard::keycode_map_entry *natural_keyboard::find_code(unicode_char ch) const
 {
-	for (unsigned int index = 0; index < m_keycode_map.size(); index++)
+	for (auto & elem : m_keycode_map)
 	{
-		if (m_keycode_map[index].ch == ch)
-			return &m_keycode_map[index];
+		if (elem.ch == ch)
+			return &elem;
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1295,8 +1295,8 @@ void natural_keyboard::frame_update(ioport_port &port, ioport_value &digital)
 	{
 		// loop through this character's component codes
 		const keycode_map_entry *code = find_code(m_buffer[m_bufbegin]);
-		if (code != NULL)
-			for (int fieldnum = 0; fieldnum < ARRAY_LENGTH(code->field) && code->field[fieldnum] != NULL; fieldnum++)
+		if (code != nullptr)
+			for (int fieldnum = 0; fieldnum < ARRAY_LENGTH(code->field) && code->field[fieldnum] != nullptr; fieldnum++)
 				if (&code->field[fieldnum]->port() == &port)
 					digital |= code->field[fieldnum]->mask();
 	}
@@ -1311,8 +1311,8 @@ const char *natural_keyboard::key_name(std::string &str, unicode_char ch)
 {
 	// attempt to get the string from the character info table
 	const char_info *ci = char_info::find(ch);
-	const char *result = (ci != NULL) ? ci->name : NULL;
-	if (result != NULL)
+	const char *result = (ci != nullptr) ? ci->name : nullptr;
+	if (result != nullptr)
 		str.assign(result);
 
 	// if that doesn't work, convert to UTF-8
@@ -1341,10 +1341,10 @@ std::string natural_keyboard::dump()
 	const size_t left_column_width = 24;
 
 	// loop through all codes
-	for (unsigned int index = 0; index < m_keycode_map.size(); index++)
+	for (auto & code : m_keycode_map)
 	{
 		// describe the character code
-		const natural_keyboard::keycode_map_entry &code = m_keycode_map[index];
+		
 		strcatprintf(buffer,"%08X (%s) ", code.ch, unicode_to_string(tempstr, code.ch));
 
 		// pad with spaces
@@ -1352,7 +1352,7 @@ std::string natural_keyboard::dump()
 			buffer.push_back(' ');
 
 		// identify the keys used
-		for (int field = 0; field < ARRAY_LENGTH(code.field) && code.field[field] != 0; field++)
+		for (int field = 0; field < ARRAY_LENGTH(code.field) && code.field[field] != nullptr; field++)
 			strcatprintf(buffer, "%s'%s'", (field > 0) ? ", " : "", code.field[field]->name());
 
 		// carriage return
@@ -1399,7 +1399,7 @@ bool ioport_condition::eval() const
 
 void ioport_condition::initialize(device_t &device)
 {
-	if (m_tag != NULL)
+	if (m_tag != nullptr)
 		m_port = device.ioport(m_tag);
 }
 
@@ -1414,7 +1414,7 @@ void ioport_condition::initialize(device_t &device)
 //-------------------------------------------------
 
 ioport_setting::ioport_setting(ioport_field &field, ioport_value _value, const char *_name)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_field(field),
 		m_value(_value),
 		m_name(_name)
@@ -1432,7 +1432,7 @@ ioport_setting::ioport_setting(ioport_field &field, ioport_value _value, const c
 //-------------------------------------------------
 
 ioport_diplocation::ioport_diplocation(const char *name, UINT8 swnum, bool invert)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_name(name),
 		m_number(swnum),
 		m_invert(invert)
@@ -1450,7 +1450,7 @@ ioport_diplocation::ioport_diplocation(const char *name, UINT8 swnum, bool inver
 //-------------------------------------------------
 
 ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value defvalue, ioport_value maskbits, const char *name)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_port(port),
 		m_modcount(port.modcount()),
 		m_mask(maskbits),
@@ -1460,8 +1460,8 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 		m_flags(0),
 		m_impulse(0),
 		m_name(name),
-		m_read_param(NULL),
-		m_write_param(NULL),
+		m_read_param(nullptr),
+		m_write_param(nullptr),
 		m_digital_value(false),
 		m_min(0),
 		m_max(maskbits),
@@ -1473,7 +1473,7 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 		m_crosshair_offset(0),
 		m_crosshair_altaxis(0),
 		m_full_turn_count(0),
-		m_remap_table(NULL),
+		m_remap_table(nullptr),
 		m_way(0)
 {
 	// reset sequences and chars
@@ -1485,10 +1485,10 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 	if (type == IPT_DIPSWITCH || type == IPT_CONFIG)
 	{
 		const input_device_default *def = device().input_ports_defaults();
-		if (def != NULL)
+		if (def != nullptr)
 		{
 			const char *fulltag = port.tag();
-			for ( ; def->tag != NULL; def++)
+			for ( ; def->tag != nullptr; def++)
 				if (device().subtag(def->tag) == fulltag && def->mask == m_mask)
 					m_defvalue = def->defvalue & m_mask;
 		}
@@ -1518,9 +1518,9 @@ ioport_field::~ioport_field()
 const char *ioport_field::name() const
 {
 	// if we have a non-default name, use that
-	if (m_live != NULL && !m_live->name.empty())
+	if (m_live != nullptr && !m_live->name.empty())
 		return m_live->name.c_str();
-	if (m_name != NULL)
+	if (m_name != nullptr)
 		return m_name;
 
 	// otherwise, return the name associated with the type
@@ -1536,7 +1536,7 @@ const char *ioport_field::name() const
 const input_seq &ioport_field::seq(input_seq_type seqtype) const
 {
 	// if no live state, return default
-	if (m_live == NULL)
+	if (m_live == nullptr)
 		return defseq(seqtype);
 
 	// if the field is disabled, return no key
@@ -1633,7 +1633,7 @@ ioport_type_class ioport_field::type_class() const
 			break;
 
 		case 0:
-			if (m_name != NULL && m_name != (const char *)-1)
+			if (m_name != nullptr && m_name != (const char *)-1)
 				result = INPUT_CLASS_MISC;
 			else
 				result = INPUT_CLASS_INTERNAL;
@@ -1683,11 +1683,11 @@ void ioport_field::get_user_settings(user_settings &settings)
 		settings.seq[seqtype] = seq(seqtype);
 
 	// if there's a list of settings or we're an adjuster, copy the current value
-	if (first_setting() != NULL || m_type == IPT_ADJUSTER)
+	if (first_setting() != nullptr || m_type == IPT_ADJUSTER)
 		settings.value = m_live->value;
 
 	// if there's analog data, extract the analog settings
-	if (m_live->analog != NULL)
+	if (m_live->analog != nullptr)
 	{
 		settings.sensitivity = m_live->analog->sensitivity();
 		settings.delta = m_live->analog->delta();
@@ -1721,11 +1721,11 @@ void ioport_field::set_user_settings(const user_settings &settings)
 	}
 
 	// if there's a list of settings or we're an adjuster, copy the current value
-	if (first_setting() != NULL || m_type == IPT_ADJUSTER)
+	if (first_setting() != nullptr || m_type == IPT_ADJUSTER)
 		m_live->value = settings.value;
 
 	// if there's analog data, extract the analog settings
-	if (m_live->analog != NULL)
+	if (m_live->analog != nullptr)
 	{
 		m_live->analog->m_sensitivity = settings.sensitivity;
 		m_live->analog->m_delta = settings.delta;
@@ -1749,10 +1749,10 @@ void ioport_field::set_user_settings(const user_settings &settings)
 const char *ioport_field::setting_name() const
 {
 	// only makes sense if we have settings
-	assert(first_setting() != NULL);
+	assert(first_setting() != nullptr);
 
 	// scan the list of settings looking for a match on the current value
-	for (ioport_setting *setting = first_setting(); setting != NULL; setting = setting->next())
+	for (ioport_setting *setting = first_setting(); setting != nullptr; setting = setting->next())
 		if (setting->enabled())
 			if (setting->value() == m_live->value)
 				return setting->name();
@@ -1769,10 +1769,10 @@ const char *ioport_field::setting_name() const
 bool ioport_field::has_previous_setting() const
 {
 	// only makes sense if we have settings
-	assert(first_setting() != NULL);
+	assert(first_setting() != nullptr);
 
 	// scan the list of settings looking for a match on the current value
-	for (ioport_setting *setting = first_setting(); setting != NULL; setting = setting->next())
+	for (ioport_setting *setting = first_setting(); setting != nullptr; setting = setting->next())
 		if (setting->enabled())
 			return (setting->value() != m_live->value);
 
@@ -1788,18 +1788,18 @@ bool ioport_field::has_previous_setting() const
 void ioport_field::select_previous_setting()
 {
 	// only makes sense if we have settings
-	assert(first_setting() != NULL);
+	assert(first_setting() != nullptr);
 
 	// scan the list of settings looking for a match on the current value
-	ioport_setting *prevsetting = NULL;
+	ioport_setting *prevsetting = nullptr;
 	bool found_match = false;
-	for (ioport_setting *setting = first_setting(); setting != NULL; setting = setting->next())
+	for (ioport_setting *setting = first_setting(); setting != nullptr; setting = setting->next())
 		if (setting->enabled())
 		{
 			if (setting->value() == m_live->value)
 			{
 				found_match = true;
-				if (prevsetting != NULL)
+				if (prevsetting != nullptr)
 					break;
 			}
 			prevsetting = setting;
@@ -1808,13 +1808,13 @@ void ioport_field::select_previous_setting()
 	// if we didn't find a matching value, select the first
 	if (!found_match)
 	{
-		for (prevsetting = first_setting(); prevsetting != NULL; prevsetting = prevsetting->next())
+		for (prevsetting = first_setting(); prevsetting != nullptr; prevsetting = prevsetting->next())
 			if (prevsetting->enabled())
 				break;
 	}
 
 	// update the value to the previous one
-	if (prevsetting != NULL)
+	if (prevsetting != nullptr)
 		m_live->value = prevsetting->value();
 }
 
@@ -1827,11 +1827,11 @@ void ioport_field::select_previous_setting()
 bool ioport_field::has_next_setting() const
 {
 	// only makes sense if we have settings
-	assert(first_setting() != NULL);
+	assert(first_setting() != nullptr);
 
 	// scan the list of settings looking for a match on the current value
 	bool found = false;
-	for (ioport_setting *setting = first_setting(); setting != NULL; setting = setting->next())
+	for (ioport_setting *setting = first_setting(); setting != nullptr; setting = setting->next())
 		if (setting->enabled())
 		{
 			if (found)
@@ -1852,30 +1852,30 @@ bool ioport_field::has_next_setting() const
 void ioport_field::select_next_setting()
 {
 	// only makes sense if we have settings
-	assert(first_setting() != NULL);
+	assert(first_setting() != nullptr);
 
 	// scan the list of settings looking for a match on the current value
-	ioport_setting *nextsetting = NULL;
+	ioport_setting *nextsetting = nullptr;
 	ioport_setting *setting;
-	for (setting = first_setting(); setting != NULL; setting = setting->next())
+	for (setting = first_setting(); setting != nullptr; setting = setting->next())
 		if (setting->enabled())
 			if (setting->value() == m_live->value)
 				break;
 
 	// if we found one, scan forward for the next valid one
-	if (setting != NULL)
-		for (nextsetting = setting->next(); nextsetting != NULL; nextsetting = nextsetting->next())
+	if (setting != nullptr)
+		for (nextsetting = setting->next(); nextsetting != nullptr; nextsetting = nextsetting->next())
 			if (nextsetting->enabled())
 				break;
 
 	// if we hit the end, search from the beginning
-	if (nextsetting == NULL)
-		for (nextsetting = first_setting(); nextsetting != NULL; nextsetting = nextsetting->next())
+	if (nextsetting == nullptr)
+		for (nextsetting = first_setting(); nextsetting != nullptr; nextsetting = nextsetting->next())
 			if (nextsetting->enabled())
 				break;
 
 	// update the value to the previous one
-	if (nextsetting != NULL)
+	if (nextsetting != nullptr)
 		m_live->value = nextsetting->value();
 }
 
@@ -1892,7 +1892,7 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 		return;
 
 	// handle analog inputs first
-	if (m_live->analog != NULL)
+	if (m_live->analog != nullptr)
 	{
 		m_live->analog->frame_update(machine());
 		return;
@@ -1957,7 +1957,7 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 		curstate = false;
 
 	// additional logic to restrict digital joysticks
-	if (curstate && !m_digital_value && !mouse_down && m_live->joystick != NULL && m_way != 16 && !machine().options().joystick_contradictory())
+	if (curstate && !m_digital_value && !mouse_down && m_live->joystick != nullptr && m_way != 16 && !machine().options().joystick_contradictory())
 	{
 		UINT8 mask = (m_way == 4) ? m_live->joystick->current4way() : m_live->joystick->current();
 		if (!(mask & (1 << m_live->joydir)))
@@ -2043,21 +2043,21 @@ void ioport_field::crosshair_position(float &x, float &y, bool &gotx, bool &goty
 void ioport_field::expand_diplocation(const char *location, std::string &errorbuf)
 {
 	// if nothing present, bail
-	if (location == NULL)
+	if (location == nullptr)
 		return;
 
 	m_diploclist.reset();
 
 	// parse the string
 	std::string name; // Don't move this variable inside the loop, lastname's lifetime depends on it being outside
-	const char *lastname = NULL;
+	const char *lastname = nullptr;
 	const char *curentry = location;
 	int entries = 0;
 	while (*curentry != 0)
 	{
 		// find the end of this entry
 		const char *comma = strchr(curentry, ',');
-		if (comma == NULL)
+		if (comma == nullptr)
 			comma = curentry + strlen(curentry);
 
 		// extract it to tempbuf
@@ -2069,7 +2069,7 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 		const char *colon = strchr(tempstr.c_str(), ':');
 
 		// allocate and copy the name if it is present
-		if (colon != NULL)
+		if (colon != nullptr)
 		{
 			lastname = name.assign(number, colon - number).c_str();
 			number = colon + 1;
@@ -2078,7 +2078,7 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 		// otherwise, just copy the last name
 		else
 		{
-			if (lastname == NULL)
+			if (lastname == nullptr)
 			{
 				strcatprintf(errorbuf, "Switch location '%s' missing switch name!\n", location);
 				lastname = (char *)"UNK";
@@ -2135,7 +2135,7 @@ void ioport_field::init_live_state(analog_field *analog)
 
 	m_condition.initialize(device());
 
-	for (ioport_setting *setting = first_setting(); setting != NULL; setting = setting->next())
+	for (ioport_setting *setting = first_setting(); setting != nullptr; setting = setting->next())
 		setting->condition().initialize(setting->device());
 }
 
@@ -2151,7 +2151,7 @@ void ioport_field::init_live_state(analog_field *analog)
 
 ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 	: analog(analog),
-		joystick(NULL),
+		joystick(nullptr),
 		value(field.defvalue()),
 		impulse(0),
 		last(0),
@@ -2170,7 +2170,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 	}
 
 	// Name keyboard key names
-	if (field.type_class() == INPUT_CLASS_KEYBOARD && field.specific_name() == NULL)
+	if (field.type_class() == INPUT_CLASS_KEYBOARD && field.specific_name() == nullptr)
 	{
 		// loop through each character on the field
 		std::string tempstr;
@@ -2202,7 +2202,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 //-------------------------------------------------
 
 ioport_port::ioport_port(device_t &owner, const char *tag)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_device(owner),
 		m_tag(tag),
 		m_modcount(0),
@@ -2250,10 +2250,10 @@ ioport_manager &ioport_port::manager() const
 ioport_field *ioport_port::field(ioport_value mask)
 {
 	// if we got the port, look for the field
-	for (ioport_field *field = first_field(); field != NULL; field = field->next())
+	for (ioport_field *field = first_field(); field != nullptr; field = field->next())
 		if ((field->mask() & mask) != 0)
 			return field;
-	return NULL;
+	return nullptr;
 }
 
 
@@ -2269,14 +2269,14 @@ ioport_value ioport_port::read()
 	ioport_value result = m_live->digital;
 
 	// insert dynamic read values
-	for (dynamic_field *dynfield = m_live->readlist.first(); dynfield != NULL; dynfield = dynfield->next())
+	for (dynamic_field *dynfield = m_live->readlist.first(); dynfield != nullptr; dynfield = dynfield->next())
 		dynfield->read(result);
 
 	// apply active high/low state to digital and dynamic read inputs
 	result ^= m_live->defvalue;
 
 	// insert analog portions
-	for (analog_field *analog = m_live->analoglist.first(); analog != NULL; analog = analog->next())
+	for (analog_field *analog = m_live->analoglist.first(); analog != nullptr; analog = analog->next())
 		analog->read(result);
 
 	return result;
@@ -2291,7 +2291,7 @@ void ioport_port::write(ioport_value data, ioport_value mem_mask)
 {
 	// call device line write handlers
 	COMBINE_DATA(&m_live->outputvalue);
-	for (dynamic_field *dynfield = m_live->writelist.first(); dynfield != NULL; dynfield = dynfield->next())
+	for (dynamic_field *dynfield = m_live->writelist.first(); dynfield != nullptr; dynfield = dynfield->next())
 		if (dynfield->field().type() == IPT_OUTPUT)
 			dynfield->write(m_live->outputvalue ^ dynfield->field().defvalue());
 }
@@ -2307,7 +2307,7 @@ void ioport_port::frame_update(ioport_field *mouse_field)
 	m_live->digital = 0;
 
 	// now loop back and modify based on the inputs
-	for (ioport_field *field = first_field(); field != NULL; field = field->next())
+	for (ioport_field *field = first_field(); field != nullptr; field = field->next())
 		field->frame_update(m_live->digital, field == mouse_field);
 
 	// hook for MESS's natural keyboard support
@@ -2327,7 +2327,7 @@ void ioport_port::collapse_fields(std::string &errorbuf)
 
 	// remove the whole list and start from scratch
 	ioport_field *field = m_fieldlist.detach_all();
-	while (field != NULL)
+	while (field != nullptr)
 	{
 		// if this modcount doesn't match, reset
 		if (field->modcount() != lastmodcount)
@@ -2361,7 +2361,7 @@ void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedb
 
 	// first modify/nuke any entries that intersect our maskbits
 	ioport_field *nextfield;
-	for (ioport_field *field = first_field(); field != NULL; field = nextfield)
+	for (ioport_field *field = first_field(); field != nullptr; field = nextfield)
 	{
 		nextfield = field->next();
 		if ((field->mask() & newfield.mask()) != 0 &&
@@ -2381,7 +2381,7 @@ void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedb
 
 	// scan forward to find where to insert ourselves
 	ioport_field *field;
-	for (field = first_field(); field != NULL; field = field->next())
+	for (field = first_field(); field != nullptr; field = field->next())
 		if (field->mask() > lowbit)
 			break;
 
@@ -2415,10 +2415,10 @@ ioport_port_live::ioport_port_live(ioport_port &port)
 		outputvalue(0)
 {
 	// iterate over fields
-	for (ioport_field *field = port.first_field(); field != NULL; field = field->next())
+	for (ioport_field *field = port.first_field(); field != nullptr; field = field->next())
 	{
 		// allocate analog state if it's analog
-		analog_field *analog = NULL;
+		analog_field *analog = nullptr;
 		if (field->is_analog())
 			analog = &analoglist.append(*global_alloc(analog_field(*field)));
 
@@ -2480,7 +2480,7 @@ time_t ioport_manager::initialize()
 
 	// if we have a token list, proceed
 	device_iterator iter(machine().root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 	{
 		std::string errors;
 		m_portlist.append(*device, errors);
@@ -2490,14 +2490,14 @@ time_t ioport_manager::initialize()
 
 	// renumber player numbers for controller ports
 	int player_offset = 0;
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 	{
 		int players = 0;
-		for (ioport_port *port = first_port(); port != NULL; port = port->next())
+		for (ioport_port *port = first_port(); port != nullptr; port = port->next())
 		{
 			if (&port->device()==device)
 			{
-				for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+				for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 					if (field->type_class()==INPUT_CLASS_CONTROLLER)
 					{
 						if (players < field->player() + 1) players = field->player() + 1;
@@ -2509,7 +2509,7 @@ time_t ioport_manager::initialize()
 	}
 
 	// allocate live structures to mirror the configuration
-	for (ioport_port *port = first_port(); port != NULL; port = port->next())
+	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
 		port->init_live_state();
 
 	// handle autoselection of devices
@@ -2525,9 +2525,9 @@ time_t ioport_manager::initialize()
 	// look for 4-way diagonal joysticks and change the default map if we find any
 	const char *joystick_map_default = machine().options().joystick_map();
 	if (joystick_map_default[0] == 0 || strcmp(joystick_map_default, "auto") == 0)
-		for (ioport_port *port = first_port(); port != NULL; port = port->next())
-			for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
-				if (field->live().joystick != NULL && field->rotated())
+		for (ioport_port *port = first_port(); port != nullptr; port = port->next())
+			for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
+				if (field->live().joystick != nullptr && field->rotated())
 				{
 					machine().input().set_global_joystick_map(joystick_map_4way_diagonal);
 					break;
@@ -2545,8 +2545,8 @@ time_t ioport_manager::initialize()
 		m_has_bioses = false;
 
 		// scan the input port array to see what options we need to enable
-		for (ioport_port *port = first_port(); port != NULL; port = port->next())
-			for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+		for (ioport_port *port = first_port(); port != nullptr; port = port->next())
+			for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 			{
 				if (field->type() == IPT_DIPSWITCH)
 					m_has_dips = true;
@@ -2556,7 +2556,7 @@ time_t ioport_manager::initialize()
 					m_has_analog = true;
 			}
 		device_iterator deviter(machine().root_device());
-		for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+		for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
 			if (device->rom_region())
 				for (const rom_entry *rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++)
 					if (ROMENTRY_ISSYSTEM_BIOS(rom)) { m_has_bioses= true; break; }
@@ -2583,7 +2583,7 @@ void ioport_manager::init_port_types()
 	machine().osd().customize_input_type_list(m_typelist);
 
 	// now iterate over the OSD-modified types
-	for (input_type_entry *curtype = first_type(); curtype != NULL; curtype = curtype->next())
+	for (input_type_entry *curtype = first_type(); curtype != nullptr; curtype = curtype->next())
 	{
 		// first copy all the OSD-updated sequences into our current state
 		curtype->restore_default_seq();
@@ -2634,9 +2634,9 @@ void ioport_manager::init_autoselect_devices(int type1, int type2, int type3, co
 		osd_printf_error("Invalid %s value %s; reverting to keyboard\n", option, stemp);
 
 	// only scan the list if we haven't already enabled this class of control
-	if (first_port() != NULL && !machine().input().device_class(autoenable).enabled())
-		for (ioport_port *port = first_port(); port != NULL; port = port->next())
-			for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+	if (first_port() != nullptr && !machine().input().device_class(autoenable).enabled())
+		for (ioport_port *port = first_port(); port != nullptr; port = port->next())
+			for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 
 				// if this port type is in use, apply the autoselect criteria
 				if ((type1 != 0 && field->type() == type1) || (type2 != 0 && field->type() == type2) || (type3 != 0 && field->type() == type3))
@@ -2670,7 +2670,7 @@ const char *ioport_manager::type_name(ioport_type type, UINT8 player)
 {
 	// if we have a machine, use the live state and quick lookup
 	input_type_entry *entry = m_type_to_entry[type][player];
-	if (entry != NULL)
+	if (entry != nullptr)
 		return entry->name();
 
 	// if we find nothing, return an invalid group
@@ -2686,7 +2686,7 @@ const char *ioport_manager::type_name(ioport_type type, UINT8 player)
 ioport_group ioport_manager::type_group(ioport_type type, int player)
 {
 	input_type_entry *entry = m_type_to_entry[type][player];
-	if (entry != NULL)
+	if (entry != nullptr)
 		return entry->group();
 
 	// if we find nothing, return an invalid group
@@ -2706,7 +2706,7 @@ const input_seq &ioport_manager::type_seq(ioport_type type, int player, input_se
 
 	// if we have a machine, use the live state and quick lookup
 	input_type_entry *entry = m_type_to_entry[type][player];
-	if (entry != NULL)
+	if (entry != nullptr)
 		return entry->seq(seqtype);
 
 	// if we find nothing, return an empty sequence
@@ -2722,7 +2722,7 @@ const input_seq &ioport_manager::type_seq(ioport_type type, int player, input_se
 void ioport_manager::set_type_seq(ioport_type type, int player, input_seq_type seqtype, const input_seq &newseq)
 {
 	input_type_entry *entry = m_type_to_entry[type][player];
-	if (entry != NULL)
+	if (entry != nullptr)
 		entry->m_seq[seqtype] = newseq;
 }
 
@@ -2745,8 +2745,8 @@ bool ioport_manager::type_pressed(ioport_type type, int player)
 
 bool ioport_manager::type_class_present(ioport_type_class inputclass)
 {
-	for (ioport_port *port = first_port(); port != NULL; port = port->next())
-		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
+		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 			if (field->type_class() == inputclass)
 				return true;
 	return false;
@@ -2761,8 +2761,8 @@ bool ioport_manager::type_class_present(ioport_type_class inputclass)
 bool ioport_manager::has_keyboard() const
 {
 	// iterate over ports and fields
-	for (ioport_port *port = first_port(); port != NULL; port = port->next())
-		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
+		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 		{
 			// if we are at init, check IPT_KEYBOARD
 			if (!m_safe_to_read && field->type() == IPT_KEYBOARD)
@@ -2784,8 +2784,8 @@ bool ioport_manager::has_keyboard() const
 int ioport_manager::count_players() const
 {
 	int max_player = 0;
-	for (ioport_port *port = first_port(); port != NULL; port = port->next())
-		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
+		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 			if (field->type_class() == INPUT_CLASS_CONTROLLER && max_player <= field->player() + 1)
 				max_player = field->player() + 1;
 
@@ -2802,8 +2802,8 @@ bool ioport_manager::crosshair_position(int player, float &x, float &y)
 {
 	// read all the lightgun values
 	bool gotx = false, goty = false;
-	for (ioport_port *port = first_port(); port != NULL; port = port->next())
-		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
+		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 			if (field->player() == player && field->crosshair_axis() != CROSSHAIR_AXIS_NONE && field->enabled())
 			{
 				field->crosshair_position(x, y, gotx, goty);
@@ -2828,14 +2828,14 @@ void ioport_manager::update_defaults()
 	for (int loopnum = 0; loopnum < 2; loopnum++)
 	{
 		// loop over all input ports
-		for (ioport_port *port = first_port(); port != NULL; port = port->next())
+		for (ioport_port *port = first_port(); port != nullptr; port = port->next())
 		{
 			// only clear on the first pass
 			if (loopnum == 0)
 				port->live().defvalue = 0;
 
 			// first compute the default value for the entire port
-			for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+			for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 				if (field->enabled())
 					port->live().defvalue = (port->live().defvalue & ~field->mask()) | (field->live().value & field->mask());
 		}
@@ -2851,7 +2851,7 @@ void ioport_manager::update_defaults()
 digital_joystick &ioport_manager::digjoystick(int player, int number)
 {
 	// find it in the list
-	for (digital_joystick *joystick = m_joystick_list.first(); joystick != NULL; joystick = joystick->next())
+	for (digital_joystick *joystick = m_joystick_list.first(); joystick != nullptr; joystick = joystick->next())
 		if (joystick->player() == player && joystick->number() == number)
 			return *joystick;
 
@@ -2891,7 +2891,7 @@ g_profiler.start(PROFILER_INPUT);
 	m_last_frame_time = curtime;
 
 	// update the digital joysticks
-	for (digital_joystick *joystick = m_joystick_list.first(); joystick != NULL; joystick = joystick->next())
+	for (digital_joystick *joystick = m_joystick_list.first(); joystick != nullptr; joystick = joystick->next())
 		joystick->frame_update();
 
 	// compute default values for all the ports
@@ -2903,21 +2903,21 @@ g_profiler.start(PROFILER_INPUT);
 	render_target *mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
 
 	// if the button is pressed, map the point and determine what was hit
-	ioport_field *mouse_field = NULL;
-	if (mouse_button && mouse_target != NULL)
+	ioport_field *mouse_field = nullptr;
+	if (mouse_button && mouse_target != nullptr)
 	{
-		ioport_port *port = NULL;
+		ioport_port *port = nullptr;
 		ioport_value mask;
 		float x, y;
 		if (mouse_target->map_point_input(mouse_target_x, mouse_target_y, port, mask, x, y))
 		{
-			if (port != NULL)
+			if (port != nullptr)
 				mouse_field = port->field(mask);
 		}
 	}
 
 	// loop over all input ports
-	for (ioport_port *port = first_port(); port != NULL; port = port->next())
+	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
 	{
 		port->frame_update(mouse_field);
 
@@ -2927,7 +2927,7 @@ g_profiler.start(PROFILER_INPUT);
 
 		// call device line write handlers
 		ioport_value newvalue = port->read();
-		for (dynamic_field *dynfield = port->live().writelist.first(); dynfield != NULL; dynfield = dynfield->next())
+		for (dynamic_field *dynfield = port->live().writelist.first(); dynfield != nullptr; dynfield = dynfield->next())
 			if (dynfield->field().type() != IPT_OUTPUT)
 				dynfield->write(newvalue);
 	}
@@ -2968,7 +2968,7 @@ void ioport_manager::load_config(int config_type, xml_data_node *parentnode)
 	}
 
 	// early exit if no data to parse
-	if (parentnode == NULL)
+	if (parentnode == nullptr)
 		return;
 
 	// iterate over all the remap nodes for controller configs only
@@ -2992,7 +2992,7 @@ void ioport_manager::load_config(int config_type, xml_data_node *parentnode)
 		{
 			// with a valid type, parse out the new sequence
 			input_seq_type seqtype = token_to_seq_type(xml_get_attribute_string(seqnode, "type", ""));
-			if (seqtype != -1 && seqnode->value != NULL)
+			if (seqtype != -1 && seqnode->value != nullptr)
 			{
 				if (strcmp(seqnode->value, "NONE") == 0)
 					newseq[seqtype].set();
@@ -3011,7 +3011,7 @@ void ioport_manager::load_config(int config_type, xml_data_node *parentnode)
 	// after applying the controller config, push that back into the backup, since that is
 	// what we will diff against
 	if (config_type == CONFIG_TYPE_CONTROLLER)
-		for (input_type_entry *entry = m_typelist.first(); entry != NULL; entry = entry->next())
+		for (input_type_entry *entry = m_typelist.first(); entry != nullptr; entry = entry->next())
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				entry->defseq(seqtype) = entry->seq(seqtype);
 }
@@ -3026,7 +3026,7 @@ void ioport_manager::load_remap_table(xml_data_node *parentnode)
 {
 	// count items first so we can allocate
 	int count = 0;
-	for (xml_data_node *remapnode = xml_get_sibling(parentnode->child, "remap"); remapnode != NULL; remapnode = xml_get_sibling(remapnode->next, "remap"))
+	for (xml_data_node *remapnode = xml_get_sibling(parentnode->child, "remap"); remapnode != nullptr; remapnode = xml_get_sibling(remapnode->next, "remap"))
 		count++;
 
 	// if we have some, deal with them
@@ -3038,7 +3038,7 @@ void ioport_manager::load_remap_table(xml_data_node *parentnode)
 
 		// build up the remap table
 		count = 0;
-		for (xml_data_node *remapnode = xml_get_sibling(parentnode->child, "remap"); remapnode != NULL; remapnode = xml_get_sibling(remapnode->next, "remap"))
+		for (xml_data_node *remapnode = xml_get_sibling(parentnode->child, "remap"); remapnode != nullptr; remapnode = xml_get_sibling(remapnode->next, "remap"))
 		{
 			input_code origcode = machine().input().code_from_token(xml_get_attribute_string(remapnode, "origcode", ""));
 			input_code newcode = machine().input().code_from_token(xml_get_attribute_string(remapnode, "newcode", ""));
@@ -3052,7 +3052,7 @@ void ioport_manager::load_remap_table(xml_data_node *parentnode)
 
 		// loop over the remapping table, then over default ports, replacing old with new
 		for (int remapnum = 0; remapnum < count; remapnum++)
-			for (input_type_entry *entry = m_typelist.first(); entry != NULL; entry = entry->next())
+			for (input_type_entry *entry = m_typelist.first(); entry != nullptr; entry = entry->next())
 				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 					entry->m_seq[seqtype].replace(oldtable[remapnum], newtable[remapnum]);
 	}
@@ -3067,7 +3067,7 @@ void ioport_manager::load_remap_table(xml_data_node *parentnode)
 bool ioport_manager::load_default_config(xml_data_node *portnode, int type, int player, const input_seq *newseq)
 {
 	// find a matching port in the list
-	for (input_type_entry *entry = m_typelist.first(); entry != NULL; entry = entry->next())
+	for (input_type_entry *entry = m_typelist.first(); entry != nullptr; entry = entry->next())
 		if (entry->type() == type && entry->player() == player)
 		{
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
@@ -3088,14 +3088,14 @@ bool ioport_manager::load_default_config(xml_data_node *portnode, int type, int 
 bool ioport_manager::load_game_config(xml_data_node *portnode, int type, int player, const input_seq *newseq)
 {
 	// read the mask, index, and defvalue attributes
-	const char *tag = xml_get_attribute_string(portnode, "tag", NULL);
+	const char *tag = xml_get_attribute_string(portnode, "tag", nullptr);
 	ioport_value mask = xml_get_attribute_int(portnode, "mask", 0);
 	ioport_value defvalue = xml_get_attribute_int(portnode, "defvalue", 0);
 
 	// find the port we want; if no tag, search them all
-	for (ioport_port *port = first_port(); port != NULL; port = port->next())
-		if (tag == NULL || strcmp(port->tag(), tag) == 0)
-			for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
+		if (tag == nullptr || strcmp(port->tag(), tag) == 0)
+			for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 
 				// find the matching mask and defvalue
 				if (field->type() == type && field->player() == player &&
@@ -3108,14 +3108,14 @@ bool ioport_manager::load_game_config(xml_data_node *portnode, int type, int pla
 
 					// fetch configurable attributes
 					// for non-analog fields
-					if (field->live().analog == NULL)
+					if (field->live().analog == nullptr)
 					{
 						// fetch the value
 						field->live().value = xml_get_attribute_int(portnode, "value", field->defvalue());
 
 						// fetch yes/no for toggle setting
-						const char *togstring = xml_get_attribute_string(portnode, "toggle", NULL);
-						if (togstring != NULL)
+						const char *togstring = xml_get_attribute_string(portnode, "toggle", nullptr);
+						if (togstring != nullptr)
 							field->live().toggle = (strcmp(togstring, "yes") == 0);
 					}
 
@@ -3128,8 +3128,8 @@ bool ioport_manager::load_game_config(xml_data_node *portnode, int type, int pla
 						field->live().analog->m_sensitivity = xml_get_attribute_int(portnode, "sensitivity", field->sensitivity());
 
 						// fetch yes/no for reverse setting
-						const char *revstring = xml_get_attribute_string(portnode, "reverse", NULL);
-						if (revstring != NULL)
+						const char *revstring = xml_get_attribute_string(portnode, "reverse", nullptr);
+						if (revstring != nullptr)
 							field->live().analog->m_reverse = (strcmp(revstring, "yes") == 0);
 					}
 					return true;
@@ -3152,7 +3152,7 @@ bool ioport_manager::load_game_config(xml_data_node *portnode, int type, int pla
 void ioport_manager::save_config(int config_type, xml_data_node *parentnode)
 {
 	// if no parentnode, ignore
-	if (parentnode == NULL)
+	if (parentnode == nullptr)
 		return;
 
 	// default ports save differently
@@ -3179,7 +3179,7 @@ void ioport_manager::save_sequence(xml_data_node *parentnode, input_seq_type typ
 
 	// add the new node
 	xml_data_node *seqnode = xml_add_child(parentnode, "newseq", seqstring.c_str());
-	if (seqnode != NULL)
+	if (seqnode != nullptr)
 		xml_set_attribute(seqnode, "type", seqtypestrings[type]);
 }
 
@@ -3214,7 +3214,7 @@ bool ioport_manager::save_this_input_field_type(ioport_type type)
 void ioport_manager::save_default_inputs(xml_data_node *parentnode)
 {
 	// iterate over ports
-	for (input_type_entry *entry = m_typelist.first(); entry != NULL; entry = entry->next())
+	for (input_type_entry *entry = m_typelist.first(); entry != nullptr; entry = entry->next())
 	{
 		// only save if this port is a type we save
 		if (save_this_input_field_type(entry->type()))
@@ -3229,8 +3229,8 @@ void ioport_manager::save_default_inputs(xml_data_node *parentnode)
 			if (seqtype < SEQ_TYPE_TOTAL)
 			{
 				// add a new port node
-				xml_data_node *portnode = xml_add_child(parentnode, "port", NULL);
-				if (portnode != NULL)
+				xml_data_node *portnode = xml_add_child(parentnode, "port", nullptr);
+				if (portnode != nullptr)
 				{
 					// add the port information and attributes
 					std::string tempstr;
@@ -3255,8 +3255,8 @@ void ioport_manager::save_default_inputs(xml_data_node *parentnode)
 void ioport_manager::save_game_inputs(xml_data_node *parentnode)
 {
 	// iterate over ports
-	for (ioport_port *port = first_port(); port != NULL; port = port->next())
-		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
+		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 			if (save_this_input_field_type(field->type()))
 			{
 				// determine if we changed
@@ -3284,8 +3284,8 @@ void ioport_manager::save_game_inputs(xml_data_node *parentnode)
 				if (changed)
 				{
 					// add a new port node
-					xml_data_node *portnode = xml_add_child(parentnode, "port", NULL);
-					if (portnode != NULL)
+					xml_data_node *portnode = xml_add_child(parentnode, "port", nullptr);
+					if (portnode != nullptr)
 					{
 						// add the identifying information and attributes
 						std::string tempstr;
@@ -3424,7 +3424,7 @@ void ioport_manager::playback_end(const char *message)
 		m_playback_file.close();
 
 		// pop a message
-		if (message != NULL)
+		if (message != nullptr)
 			machine().popmessage("Playback Ended\nReason: %s", message);
 
 		// display speed stats
@@ -3476,7 +3476,7 @@ void ioport_manager::playback_port(ioport_port &port)
 		playback_read(port.live().digital);
 
 		// loop over analog ports and save their data
-		for (analog_field *analog = port.live().analoglist.first(); analog != NULL; analog = analog->next())
+		for (analog_field *analog = port.live().analoglist.first(); analog != nullptr; analog = analog->next())
 		{
 			// read current and previous values
 			playback_read(analog->m_accum);
@@ -3570,7 +3570,7 @@ void ioport_manager::record_end(const char *message)
 		m_record_file.close();
 
 		// pop a message
-		if (message != NULL)
+		if (message != nullptr)
 			machine().popmessage("Recording Ended\nReason: %s", message);
 	}
 }
@@ -3610,7 +3610,7 @@ void ioport_manager::record_port(ioport_port &port)
 		record_write(port.live().digital);
 
 		// loop over analog ports and save their data
-		for (analog_field *analog = port.live().analoglist.first(); analog != NULL; analog = analog->next())
+		for (analog_field *analog = port.live().analoglist.first(); analog != nullptr; analog = analog->next())
 		{
 			// store current and previous values
 			record_write(analog->m_accum);
@@ -3637,9 +3637,9 @@ ioport_configurer::ioport_configurer(device_t &owner, ioport_list &portlist, std
 	: m_owner(owner),
 		m_portlist(portlist),
 		m_errorbuf(errorbuf),
-		m_curport(NULL),
-		m_curfield(NULL),
-		m_cursetting(NULL)
+		m_curport(nullptr),
+		m_curfield(nullptr),
+		m_cursetting(nullptr)
 {
 }
 
@@ -3652,8 +3652,8 @@ ioport_configurer::ioport_configurer(device_t &owner, ioport_list &portlist, std
 const char *ioport_configurer::string_from_token(const char *string)
 {
 	// 0 is an invalid index
-	if (string == NULL)
-		return NULL;
+	if (string == nullptr)
+		return nullptr;
 
 	// if the index is greater than the count, assume it to be a pointer
 	if (FPTR(string) >= INPUT_STRING_COUNT)
@@ -3689,8 +3689,8 @@ void ioport_configurer::port_alloc(const char *tag)
 
 	// add it to the list, and reset current field/setting
 	m_curport = &m_portlist.append(fulltag.c_str(), *global_alloc(ioport_port(m_owner, fulltag.c_str())));
-	m_curfield = NULL;
-	m_cursetting = NULL;
+	m_curfield = nullptr;
+	m_cursetting = nullptr;
 }
 
 
@@ -3706,13 +3706,13 @@ void ioport_configurer::port_modify(const char *tag)
 
 	// find the existing port
 	m_curport = m_portlist.find(fulltag.c_str());
-	if (m_curport == NULL)
+	if (m_curport == nullptr)
 		throw emu_fatalerror("Requested to modify nonexistent port '%s'", fulltag.c_str());
 
 	// bump the modification count, and reset current field/setting
 	m_curport->m_modcount++;
-	m_curfield = NULL;
-	m_cursetting = NULL;
+	m_curfield = nullptr;
+	m_cursetting = nullptr;
 }
 
 
@@ -3723,7 +3723,7 @@ void ioport_configurer::port_modify(const char *tag)
 void ioport_configurer::field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name)
 {
 	// make sure we have a port
-	if (m_curport == NULL)
+	if (m_curport == nullptr)
 		throw emu_fatalerror("alloc_field called with no active port (mask=%X defval=%X)\n", mask, defval);
 	// append the field
 	if (type != IPT_UNKNOWN && type != IPT_UNUSED)
@@ -3731,7 +3731,7 @@ void ioport_configurer::field_alloc(ioport_type type, ioport_value defval, iopor
 	m_curfield = &m_curport->m_fieldlist.append(*global_alloc(ioport_field(*m_curport, type, defval, mask, string_from_token(name))));
 
 	// reset the current setting
-	m_cursetting = NULL;
+	m_cursetting = nullptr;
 }
 
 
@@ -3769,7 +3769,7 @@ void ioport_configurer::field_add_code(input_seq_type which, input_code code)
 void ioport_configurer::setting_alloc(ioport_value value, const char *name)
 {
 	// make sure we have a field
-	if (m_curfield == NULL)
+	if (m_curfield == nullptr)
 		throw emu_fatalerror("alloc_setting called with no active field (value=%X name=%s)\n", value, name);
 
 	m_cursetting = global_alloc(ioport_setting(*m_curfield, value & m_curfield->mask(), string_from_token(name)));
@@ -3785,7 +3785,7 @@ void ioport_configurer::setting_alloc(ioport_value value, const char *name)
 
 void ioport_configurer::set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value)
 {
-	ioport_condition &target = (m_cursetting != NULL) ? m_cursetting->condition() : m_curfield->condition();
+	ioport_condition &target = (m_cursetting != nullptr) ? m_cursetting->condition() : m_curfield->condition();
 	target.set(condition, tag, mask, value);
 }
 
@@ -3807,14 +3807,14 @@ void ioport_configurer::onoff_alloc(const char *name, ioport_value defval, iopor
 	}
 
 	// expand the diplocation
-	if (diplocation != NULL)
+	if (diplocation != nullptr)
 		field_set_diplocation(diplocation);
 
 	// allocate settings
 	setting_alloc(defval & mask, DEF_STR(Off));
 	setting_alloc(~defval & mask, DEF_STR(On));
 	// clear cursettings set by setting_alloc
-	m_cursetting = NULL;
+	m_cursetting = nullptr;
 }
 
 
@@ -3844,7 +3844,7 @@ const char_info *char_info::find(unicode_char target)
 		else
 			return &charinfo[middle];
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -3853,7 +3853,7 @@ const char_info *char_info::find(unicode_char target)
 //-------------------------------------------------
 
 dynamic_field::dynamic_field(ioport_field &field)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_field(field),
 		m_shift(0),
 		m_oldval(field.defvalue())
@@ -3911,7 +3911,7 @@ void dynamic_field::write(ioport_value newval)
 //-------------------------------------------------
 
 analog_field::analog_field(ioport_field &field)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_field(field),
 		m_shift(0),
 		m_adjdefvalue(field.defvalue() & field.mask()),
@@ -4339,7 +4339,7 @@ void analog_field::read(ioport_value &result)
 	value = apply_settings(value);
 
 	// remap the value if needed
-	if (m_field.remap_table() != NULL)
+	if (m_field.remap_table() != nullptr)
 		value = m_field.remap_table()[value];
 
 	// invert bits if needed
@@ -4381,8 +4381,8 @@ ioport_type ioport_manager::token_to_input_type(const char *string, int &player)
 		return ioport_type(ipnum);
 
 	// find the token in the list
-	for (input_type_entry *entry = m_typelist.first(); entry != NULL; entry = entry->next())
-		if (entry->token() != NULL && !strcmp(entry->token(), string))
+	for (input_type_entry *entry = m_typelist.first(); entry != nullptr; entry = entry->next())
+		if (entry->token() != nullptr && !strcmp(entry->token(), string))
 		{
 			player = entry->player();
 			return entry->type();
@@ -4403,7 +4403,7 @@ const char *ioport_manager::input_type_to_token(std::string &str, ioport_type ty
 {
 	// look up the port and return the token
 	input_type_entry *entry = m_type_to_entry[type][player];
-	if (entry != NULL)
+	if (entry != nullptr)
 		return str.assign(entry->token()).c_str();
 
 	// if that fails, carry on
