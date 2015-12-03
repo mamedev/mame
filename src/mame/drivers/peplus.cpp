@@ -7485,7 +7485,7 @@ ROM_START( peps0716 ) /* Normal board : River Gambler Slots (PS0716) - Payout 95
 	ROM_LOAD( "cap2266.u50", 0x0000, 0x0100, CRC(5aaff103) SHA1(9cfda9c095cb77a8bb761c131a0f358e79b97abc) )
 ROM_END
 
-ROM_START( peps0722 ) /* Normal board : River Gambler Slots (PS0716) - Payout 90.02% */
+ROM_START( peps0722 ) /* Normal board : River Gambler Slots (PS0722) - Payout 90.02% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0722_589-a6x.u68",   0x00000, 0x10000, CRC(efe903c8) SHA1(37b8d9dbc3cbdf1b0126c73a92d43c1d8d080289) ) /* 3 Coins Max / 1 Line */
 
