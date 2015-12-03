@@ -985,6 +985,11 @@ end
 					"-Wno-extern-c-compat",
 				}
 			end
+			if (version >= 30700) then
+				buildoptions {
+					"-Wno-deprecated-register",
+				}
+			end
  			if (version >= 70000) then
 				buildoptions {
 					"-Wno-tautological-undefined-compare",
