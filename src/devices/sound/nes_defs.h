@@ -96,9 +96,9 @@ struct square_t
 {
 		square_t()
 		{
-			for (int i = 0; i < 4; i++)
+			for (auto & elem : regs)
 			{
-				regs[i] = 0;
+				elem = 0;
 			}
 			vbl_length =0;
 			freq = 0;
@@ -128,9 +128,9 @@ struct triangle_t
 {
 		triangle_t()
 		{
-			for (int i = 0; i < 4; i++)
+			for (auto & elem : regs)
 			{
-				regs[i] = 0;
+				elem = 0;
 			}
 			linear_length =0;
 			vbl_length =0;
@@ -158,9 +158,9 @@ struct noise_t
 {
 		noise_t()
 		{
-			for (int i = 0; i < 4; i++)
+			for (auto & elem : regs)
 			{
-				regs[i] = 0;
+				elem = 0;
 			}
 			cur_pos =0;
 			vbl_length =0;
@@ -186,9 +186,9 @@ struct dpcm_t
 {
 		dpcm_t()
 		{
-		for (int i = 0; i < 4; i++)
+		for (auto & elem : regs)
 		{
-			regs[i] = 0;
+			elem = 0;
 		}
 		address = 0;
 		length = 0;

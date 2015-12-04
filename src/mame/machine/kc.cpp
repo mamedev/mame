@@ -84,8 +84,8 @@ READ8_MEMBER( kc_state::expansion_read )
 	// assert MEI line of first slot
 	m_expansions[0]->mei_w(ASSERT_LINE);
 
-	for (int i=0; i<3; i++)
-		m_expansions[i]->read(offset, result);
+	for (auto & elem : m_expansions)
+		elem->read(offset, result);
 
 	return result;
 }
@@ -95,8 +95,8 @@ WRITE8_MEMBER( kc_state::expansion_write )
 	// assert MEI line of first slot
 	m_expansions[0]->mei_w(ASSERT_LINE);
 
-	for (int i=0; i<3; i++)
-		m_expansions[i]->write(offset, data);
+	for (auto & elem : m_expansions)
+		elem->write(offset, data);
 }
 
 /*
@@ -129,8 +129,8 @@ READ8_MEMBER( kc_state::expansion_io_read )
 	}
 	else
 	{
-		for (int i=0; i<3; i++)
-			m_expansions[i]->io_read(offset, result);
+		for (auto & elem : m_expansions)
+			elem->io_read(offset, result);
 	}
 
 	return result;
@@ -152,8 +152,8 @@ WRITE8_MEMBER( kc_state::expansion_io_write )
 	}
 	else
 	{
-		for (int i=0; i<3; i++)
-			m_expansions[i]->io_write(offset, data);
+		for (auto & elem : m_expansions)
+			elem->io_write(offset, data);
 	}
 }
 

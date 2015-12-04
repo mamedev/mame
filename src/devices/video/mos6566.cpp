@@ -773,8 +773,8 @@ void mos6566_device::device_reset()
 {
 	memset(m_reg, 0, sizeof(m_reg));
 
-	for (int i = 0; i < ARRAY_LENGTH(m_mc); i++)
-		m_mc[i] = 63;
+	for (auto & elem : m_mc)
+		elem = 63;
 
 	// from 0 to 311 (0 first, PAL) or from 0 to 261 (? first, NTSC 6567R56A) or from 0 to 262 (? first, NTSC 6567R8)
 	m_rasterline = 0; // VIC2_LINES - 1;

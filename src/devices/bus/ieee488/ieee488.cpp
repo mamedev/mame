@@ -112,9 +112,9 @@ ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, d
 		m_write_ren(*this),
 		m_dio(0xff)
 {
-	for (int i = 0; i < SIGNAL_COUNT; i++)
+	for (auto & elem : m_line)
 	{
-		m_line[i] = 1;
+		elem = 1;
 	}
 }
 
@@ -172,9 +172,9 @@ ieee488_device::daisy_entry::daisy_entry(device_t *device)
 		m_interface(nullptr),
 		m_dio(0xff)
 {
-	for (int i = 0; i < SIGNAL_COUNT; i++)
+	for (auto & elem : m_line)
 	{
-		m_line[i] = 1;
+		elem = 1;
 	}
 
 	device->interface(m_interface);

@@ -67,8 +67,8 @@ decocass_tape_device::decocass_tape_device(const machine_config &mconfig, const 
 	m_clockpos(0),
 	m_numclocks(0)
 {
-	for (int i = 0; i < 256; i++)
-	m_crc16[i] = 0;
+	for (auto & elem : m_crc16)
+	elem = 0;
 }
 
 //-------------------------------------------------

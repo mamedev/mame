@@ -490,11 +490,11 @@ WRITE8_MEMBER(multi_conn_device::write)
 	// We don't have GRAM cartridges, anyway, so it's just used for setting the address.
 	if ((offset & grom_mask()) == grom_base())
 	{
-		for (int i=0; i < NUMBER_OF_CARTRIDGE_SLOTS; i++)
+		for (auto & elem : m_cartridge)
 		{
-			if (m_cartridge[i] != nullptr)
+			if (elem != nullptr)
 			{
-				m_cartridge[i]->write(space, offset, data, mem_mask);
+				elem->write(space, offset, data, mem_mask);
 			}
 		}
 	}
@@ -539,9 +539,9 @@ void multi_conn_device::device_start()
 {
 	m_next_free_slot = 0;
 	m_active_slot = 0;
-	for (int i=0; i < NUMBER_OF_CARTRIDGE_SLOTS; i++)
+	for (auto & elem : m_cartridge)
 	{
-		m_cartridge[i] = nullptr;
+		elem = nullptr;
 	}
 }
 
@@ -1474,22 +1474,22 @@ void ti99_cartridge_pcb::set_cartridge(ti99_cartridge_device *cart)
 
 READ8Z_MEMBER(ti99_cartridge_pcb::gromreadz)
 {
-	for (int i=0; i < 5; i++)
+	for (auto & elem : m_grom)
 	{
-		if (m_grom[i] != nullptr)
+		if (elem != nullptr)
 		{
-			m_grom[i]->readz(space, offset, value, mem_mask);
+			elem->readz(space, offset, value, mem_mask);
 		}
 	}
 }
 
 WRITE8_MEMBER(ti99_cartridge_pcb::gromwrite)
 {
-	for (int i=0; i < 5; i++)
+	for (auto & elem : m_grom)
 	{
-		if (m_grom[i] != nullptr)
+		if (elem != nullptr)
 		{
-			m_grom[i]->write(space, offset, data, mem_mask);
+			elem->write(space, offset, data, mem_mask);
 		}
 	}
 }

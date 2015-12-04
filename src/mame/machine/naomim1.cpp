@@ -159,8 +159,8 @@ void naomi_m1_board::enc_reset()
 	has_history = false;
 	buffer_actual_size = 0;
 
-	for(int i=0; i<111; i++)
-		dict[i] = getb(8);
+	for(auto & elem : dict)
+		elem = getb(8);
 }
 
 void naomi_m1_board::wb(UINT8 byte)

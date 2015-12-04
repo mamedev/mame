@@ -161,8 +161,8 @@ ioport_constructor kc_d002_device::device_input_ports() const
 
 void kc_d002_device::read(offs_t offset, UINT8 &data)
 {
-	for (int i=0; i<5; i++)
-		m_expansions[i]->read(offset, data);
+	for (auto & elem : m_expansions)
+		elem->read(offset, data);
 }
 
 //-------------------------------------------------
@@ -171,8 +171,8 @@ void kc_d002_device::read(offs_t offset, UINT8 &data)
 
 void kc_d002_device::write(offs_t offset, UINT8 data)
 {
-	for (int i=0; i<5; i++)
-		m_expansions[i]->write(offset, data);
+	for (auto & elem : m_expansions)
+		elem->write(offset, data);
 }
 
 //-------------------------------------------------
@@ -192,8 +192,8 @@ void kc_d002_device::io_read(offs_t offset, UINT8 &data)
 	}
 	else
 	{
-		for (int i=0; i<5; i++)
-			m_expansions[i]->io_read(offset, data);
+		for (auto & elem : m_expansions)
+			elem->io_read(offset, data);
 	}
 }
 
@@ -214,8 +214,8 @@ void kc_d002_device::io_write(offs_t offset, UINT8 data)
 	}
 	else
 	{
-		for (int i=0; i<5; i++)
-			m_expansions[i]->io_write(offset, data);
+		for (auto & elem : m_expansions)
+			elem->io_write(offset, data);
 	}
 
 }

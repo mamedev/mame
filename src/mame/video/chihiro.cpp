@@ -433,8 +433,8 @@ int vertex_program_disassembler::disassemble(unsigned int *instruction, char *li
 
 vertex_program_simulator::vertex_program_simulator()
 {
-	for (int i = 0; i < 256; i++)
-		op[i].modified = 0;
+	for (auto & elem : op)
+		elem.modified = 0;
 	initialize_constants();
 }
 
@@ -674,17 +674,17 @@ void vertex_program_simulator::initialize_outputs()
 
 void vertex_program_simulator::initialize_temps()
 {
-	for (int n = 0; n < 32; n++) {
+	for (auto & elem : r_temp) {
 		for (int m = 0; m < 4; m++)
-			r_temp[n].fv[m] = 0;
+			elem.fv[m] = 0;
 	}
 }
 
 void vertex_program_simulator::initialize_constants()
 {
-	for (int n = 0; n < 192; n++) {
+	for (auto & elem : c_constant) {
 		for (int m = 0; m < 4;m++)
-			c_constant[n].fv[m] = 0;
+			elem.fv[m] = 0;
 	}
 }
 

@@ -112,8 +112,8 @@ z80dart_device::z80dart_device(const machine_config &mconfig, device_type type, 
 		m_out_txdrqb_cb(*this),
 		m_variant(variant)
 {
-	for (int i = 0; i < 8; i++)
-		m_int_state[i] = 0;
+	for (auto & elem : m_int_state)
+		elem = 0;
 }
 
 z80dart_device::z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -142,8 +142,8 @@ z80dart_device::z80dart_device(const machine_config &mconfig, const char *tag, d
 		m_out_txdrqb_cb(*this),
 		m_variant(TYPE_DART)
 {
-	for (int i = 0; i < 8; i++)
-		m_int_state[i] = 0;
+	for (auto & elem : m_int_state)
+		elem = 0;
 }
 
 z80sio0_device::z80sio0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -338,9 +338,9 @@ void z80dart_device::check_interrupts()
 
 void z80dart_device::reset_interrupts()
 {
-	for (int i = 0; i < 8; i++)
+	for (auto & elem : m_int_state)
 	{
-		m_int_state[i] = 0;
+		elem = 0;
 	}
 
 	check_interrupts();
@@ -518,11 +518,11 @@ z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag,
 		m_rts(0),
 		m_sync(0)
 {
-	for (int i = 0; i < 3; i++)
-		m_rr[i] = 0;
+	for (auto & elem : m_rr)
+		elem = 0;
 
-	for (int i = 0; i < 6; i++)
-		m_wr[i] = 0;
+	for (auto & elem : m_wr)
+		elem = 0;
 
 	for (int i = 0; i < 3; i++)
 	{

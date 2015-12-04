@@ -760,8 +760,8 @@ void stic_device::screenrefresh()
 		render_background(m_bitmap);
 		// Render the sprites into their buffers
 		render_sprites();
-		for (int i = 0; i < STIC_MOBS; i++)
-			m_sprite[i].collision = 0;
+		for (auto & elem : m_sprite)
+			elem.collision = 0;
 		// Copy the sprites to the background
 		copy_sprites_to_background(m_bitmap);
 		determine_sprite_collisions();

@@ -484,15 +484,15 @@ void cdislave_device::device_start()
 
 void cdislave_device::device_reset()
 {
-	for(INT32 index = 0; index < 4; index++)
+	for(auto & elem : m_channel)
 	{
-		m_channel[index].m_out_buf[0] = 0;
-		m_channel[index].m_out_buf[1] = 0;
-		m_channel[index].m_out_buf[2] = 0;
-		m_channel[index].m_out_buf[3] = 0;
-		m_channel[index].m_out_index = 0;
-		m_channel[index].m_out_count = 0;
-		m_channel[index].m_out_cmd = 0;
+		elem.m_out_buf[0] = 0;
+		elem.m_out_buf[1] = 0;
+		elem.m_out_buf[2] = 0;
+		elem.m_out_buf[3] = 0;
+		elem.m_out_index = 0;
+		elem.m_out_count = 0;
+		elem.m_out_cmd = 0;
 	}
 
 	memset(m_in_buf, 0, 17);

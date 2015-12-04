@@ -35,11 +35,11 @@ void k057714_device::device_reset()
 	m_vram_fifo0_addr = 0;
 	m_vram_fifo1_addr = 0;
 
-	for (int i=0; i < 4; i++)
+	for (auto & elem : m_frame)
 	{
-		m_frame[i].base = 0;
-		m_frame[i].width = 0;
-		m_frame[i].height = 0;
+		elem.base = 0;
+		elem.width = 0;
+		elem.height = 0;
 	}
 }
 

@@ -802,10 +802,10 @@ void laserdisc_device::init_video()
 		m_videopalette->entry_set_color(index, rgb_t(index, index, index));
 
 	// allocate video frames
-	for (int index = 0; index < ARRAY_LENGTH(m_frame); index++)
+	for (auto & frame : m_frame)
 	{
 		// first allocate a YUY16 bitmap at 2x the height
-		frame_data &frame = m_frame[index];
+		
 		frame.m_bitmap.allocate(m_width, m_height * 2);
 		frame.m_bitmap.set_palette(m_videopalette);
 		fillbitmap_yuy16(frame.m_bitmap, 40, 109, 240);
@@ -842,12 +842,12 @@ void laserdisc_device::init_video()
 		texture_format texformat = !m_overupdate_ind16.isnull() ? TEXFORMAT_PALETTEA16 : TEXFORMAT_ARGB32;
 
 		// allocate overlay bitmaps
-		for (int index = 0; index < ARRAY_LENGTH(m_overbitmap); index++)
+		for (auto & elem : m_overbitmap)
 		{
-			m_overbitmap[index].set_format(format, texformat);
+			elem.set_format(format, texformat);
 			if (format==BITMAP_FORMAT_IND16)
-				m_overbitmap[index].set_palette(m_overlay_palette->palette());
-			m_overbitmap[index].resize(m_overwidth, m_overheight);
+				elem.set_palette(m_overlay_palette->palette());
+			elem.resize(m_overwidth, m_overheight);
 		}
 
 		// allocate overlay texture

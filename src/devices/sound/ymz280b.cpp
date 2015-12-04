@@ -138,9 +138,9 @@ void ymz280b_device::update_volumes(struct YMZ280BVoice *voice)
 
 void ymz280b_device::device_post_load()
 {
-	for (int j = 0; j < 8; j++)
+	for (auto & elem : m_voice)
 	{
-		struct YMZ280BVoice *voice = &m_voice[j];
+		struct YMZ280BVoice *voice = &elem;
 		update_step(voice);
 		if(voice->irq_schedule)
 			voice->timer->adjust(attotime::zero);
@@ -660,9 +660,9 @@ void ymz280b_device::device_reset()
 	m_ext_mem_address = 0;
 
 	/* clear other voice parameters */
-	for (int i = 0; i < 8; i++)
+	for (auto & elem : m_voice)
 	{
-		struct YMZ280BVoice *voice = &m_voice[i];
+		struct YMZ280BVoice *voice = &elem;
 
 		voice->curr_sample = 0;
 		voice->last_sample = 0;

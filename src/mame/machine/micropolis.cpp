@@ -82,11 +82,11 @@ micropolis_device::micropolis_device(const machine_config &mconfig, const char *
 	m_sector_length(0),
 	m_drive(nullptr)
 {
-	for (int i = 0; i < 6144; i++)
-		m_buffer[i] = 0;
+	for (auto & elem : m_buffer)
+		elem = 0;
 
-	for (int i = 0; i < 4; i++)
-		m_floppy_drive_tags[i] = nullptr;
+	for (auto & elem : m_floppy_drive_tags)
+		elem = nullptr;
 }
 
 //-------------------------------------------------
@@ -118,11 +118,11 @@ void micropolis_device::device_start()
 
 void micropolis_device::device_reset()
 {
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_floppy_drive_tags)
 	{
-		if (m_floppy_drive_tags[i])
+		if (elem)
 		{
-			legacy_floppy_image_device *img = siblingdevice<legacy_floppy_image_device>(m_floppy_drive_tags[i]);
+			legacy_floppy_image_device *img = siblingdevice<legacy_floppy_image_device>(elem);
 
 			if (img)
 			{

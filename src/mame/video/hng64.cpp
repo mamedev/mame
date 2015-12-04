@@ -1274,11 +1274,11 @@ void hng64_state::video_start()
 	m_tilemap[3].m_tilemap_16x16     = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile3_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
 	m_tilemap[3].m_tilemap_16x16_alt = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile3_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_tilemap)
 	{
-		m_tilemap[i].m_tilemap_8x8->set_transparent_pen(0);
-		m_tilemap[i].m_tilemap_16x16->set_transparent_pen(0);
-		m_tilemap[i].m_tilemap_16x16_alt->set_transparent_pen(0);
+		elem.m_tilemap_8x8->set_transparent_pen(0);
+		elem.m_tilemap_16x16->set_transparent_pen(0);
+		elem.m_tilemap_16x16_alt->set_transparent_pen(0);
 	}
 
 	// Debug switch, turn on / off additive blending on a per-tilemap basis

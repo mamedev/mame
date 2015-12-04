@@ -305,9 +305,9 @@ READ8_MEMBER(qs1000_device::data_to_i8052)
 //-------------------------------------------------
 void qs1000_device::device_reset()
 {
-	for (int ch = 0; ch < QS1000_CHANNELS; ++ch)
+	for (auto & elem : m_channels)
 	{
-		m_channels[ch].m_flags = 0;
+		elem.m_flags = 0;
 	}
 }
 
@@ -486,9 +486,9 @@ void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	memset(outputs[1], 0x0, samples * sizeof(*outputs[1]));
 
 	// Iterate over voices and accumulate sample data
-	for (int ch = 0; ch < QS1000_CHANNELS; ch++)
+	for (auto & chan : m_channels)
 	{
-		qs1000_channel &chan = m_channels[ch];
+		
 
 		UINT8 lvol = chan.m_regs[6];
 		UINT8 rvol = chan.m_regs[7];

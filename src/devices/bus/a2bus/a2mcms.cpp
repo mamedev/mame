@@ -232,9 +232,9 @@ void mcms_device::device_start()
 	memset(m_acc, 0, sizeof(m_acc));
 
 	// the card detect programs volumes and wavetable page but not freq and expects the accumulator to increment
-	for (int i = 0; i < 16; i++)
+	for (auto & elem : m_freq)
 	{
-		m_freq[i] = 0x0040;
+		elem = 0x0040;
 	}
 
 	save_item(NAME(m_enabled));

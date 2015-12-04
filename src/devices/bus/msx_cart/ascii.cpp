@@ -43,9 +43,9 @@ void msx_cart_ascii8::restore_banks()
 
 void msx_cart_ascii8::device_reset()
 {
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
 }
 
@@ -127,9 +127,9 @@ void msx_cart_ascii16::restore_banks()
 
 void msx_cart_ascii16::device_reset()
 {
-	for (int i = 0; i < 2; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
 }
 
@@ -237,9 +237,9 @@ void msx_cart_ascii8_sram::restore_banks()
 
 void msx_cart_ascii8_sram::device_reset()
 {
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
 }
 
@@ -362,9 +362,9 @@ void msx_cart_ascii16_sram::restore_banks()
 
 void msx_cart_ascii16_sram::device_reset()
 {
-	for (int i = 0; i < 2; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
 }
 
@@ -477,9 +477,9 @@ void msx_cart_msxwrite::restore_banks()
 
 void msx_cart_msxwrite::device_reset()
 {
-	for (int i = 0; i < 2; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
 }
 

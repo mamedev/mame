@@ -760,9 +760,9 @@ void ste_state::dmasound_tick()
 	{
 		UINT8 *RAM = m_ram->pointer();
 
-		for (int i = 0; i < 8; i++)
+		for (auto & elem : m_dmasnd_fifo)
 		{
-			m_dmasnd_fifo[i] = RAM[m_dmasnd_cntr];
+			elem = RAM[m_dmasnd_cntr];
 			m_dmasnd_cntr++;
 			m_dmasnd_samples++;
 

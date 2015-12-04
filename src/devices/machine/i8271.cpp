@@ -119,10 +119,10 @@ bool i8271_device::get_ready(int fid)
 
 void i8271_device::set_floppy(floppy_image_device *flop)
 {
-	for(int fid=0; fid<2; fid++) {
-		if(flopi[fid].dev)
-			flopi[fid].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
-		flopi[fid].dev = flop;
+	for(auto & elem : flopi) {
+		if(elem.dev)
+			elem.dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
+		elem.dev = flop;
 	}
 	if(flop)
 		flop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(i8271_device::index_callback), this));
@@ -1540,8 +1540,8 @@ void i8271_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 void i8271_device::index_callback(floppy_image_device *floppy, int state)
 {
-	for(int fid=0; fid<2; fid++) {
-		floppy_info &fi = flopi[fid];
+	for(auto & fi : flopi) {
+		
 		if(fi.dev != floppy)
 			continue;
 

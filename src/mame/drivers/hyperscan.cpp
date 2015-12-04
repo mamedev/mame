@@ -523,22 +523,22 @@ UINT32 hyperscan_state::spg290_screen_update(screen_device &screen, bitmap_rgb32
 
 void hyperscan_state::spg290_timers_update()
 {
-	for(int i=0; i<6; i++)
-		if (m_timers[i].control & 0x80000000)
+	for(auto & elem : m_timers)
+		if (elem.control & 0x80000000)
 		{
-			if (((m_timers[i].control2 >> 30) & 0x03) == 0x00)
+			if (((elem.control2 >> 30) & 0x03) == 0x00)
 			{
-				if (m_timers[i].counter == 0xffff)
+				if (elem.counter == 0xffff)
 				{
-					m_timers[i].counter = m_timers[i].preload;
-					if (m_timers[i].control & 0x08000000)
+					elem.counter = elem.preload;
+					if (elem.control & 0x08000000)
 					{
-						m_timers[i].control |= 0x04000000;
+						elem.control |= 0x04000000;
 						m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 56);
 					}
 				}
 				else
-					m_timers[i].counter++;
+					elem.counter++;
 			}
 			else
 			{

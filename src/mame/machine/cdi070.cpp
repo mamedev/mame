@@ -426,9 +426,9 @@ void cdi68070_device::mcu_frame()
 	{
 		quizard_calculate_state();
 		uart_rx(0x5a);
-		for(int index = 0; index < 8; index++)
+		for(auto & elem : m_state)
 		{
-			uart_rx(m_state[index]);
+			uart_rx(elem);
 		}
 	}
 }

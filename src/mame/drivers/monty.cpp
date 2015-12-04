@@ -44,8 +44,8 @@ public:
 		, m_sed0(*this, "sed1520_0")
 		, m_writeUpper(false)
 	{
-		for (int i = 0; i < 42*32; i++)
-			m_pixels[i] = 0xff000000;
+		for (auto & elem : m_pixels)
+			elem = 0xff000000;
 	}
 
 	DECLARE_WRITE8_MEMBER(sound_w);

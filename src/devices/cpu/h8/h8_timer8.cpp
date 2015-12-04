@@ -278,16 +278,16 @@ void h8_timer8_channel_device::recalc_event(UINT64 cur_time)
 			event_delay = counter_cycle;
 	}
 
-	for(int i=0; i<2; i++) {
+	for(auto & elem : tcor) {
 		UINT32 new_delay = 0xffffffff;
-		if(tcor[i] > tcnt) {
-			if(tcnt >= counter_cycle || tcor[i] <= counter_cycle)
-				new_delay = tcor[i] - tcnt;
-		} else if(tcor[i] <= counter_cycle) {
+		if(elem > tcnt) {
+			if(tcnt >= counter_cycle || elem <= counter_cycle)
+				new_delay = elem - tcnt;
+		} else if(elem <= counter_cycle) {
 			if(tcnt < counter_cycle)
-				new_delay = (counter_cycle - tcnt) + tcor[i];
+				new_delay = (counter_cycle - tcnt) + elem;
 			else
-				new_delay = (0x100 - tcnt) + tcor[i];
+				new_delay = (0x100 - tcnt) + elem;
 		}
 		if(event_delay > new_delay)
 			event_delay = new_delay;

@@ -1410,8 +1410,8 @@ bool dc42_format::save(io_generic *io, floppy_image *image)
 
 				if(hb == 4) {
 					UINT8 h[7];
-					for(int i=0; i<7; i++)
-						h[i] = gb(buf, ts, pos, wrap);
+					for(auto & elem : h)
+						elem = gb(buf, ts, pos, wrap);
 					UINT8 v2 = gcr6bw_tb[h[2]];
 					UINT8 v3 = gcr6bw_tb[h[3]];
 					UINT8 tr = gcr6bw_tb[h[0]] | (v2 & 1 ? 0x40 : 0x00);

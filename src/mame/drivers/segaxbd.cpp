@@ -369,9 +369,9 @@ public:
 		: segaxbd_new_state(mconfig, type, tag),
 		m_subpcb(*this, "subpcb")
 	{
-		for (int i = 0; i < 0x800; i++)
+		for (auto & elem : shareram)
 		{
-			shareram[i] = 0x0000;
+			elem = 0x0000;
 		}
 		rampage1 = 0x0000;
 		rampage2 = 0x0000;

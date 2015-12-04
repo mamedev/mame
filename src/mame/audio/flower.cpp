@@ -89,9 +89,9 @@ void flower_sound_device::device_reset()
 	m_effect_timer->adjust(period, 0, period);
 
 	/* reset all the voices */
-	for (int i = 0; i < 8; i++)
+	for (auto & elem : m_channel_list)
 	{
-		voice = &m_channel_list[i];
+		voice = &elem;
 
 		voice->freq = 0;
 		voice->pos = 0;

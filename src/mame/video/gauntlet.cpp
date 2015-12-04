@@ -83,8 +83,8 @@ VIDEO_START_MEMBER(gauntlet_state,gauntlet)
 {
 	/* modify the motion object code lookup table to account for the code XOR */
 	std::vector<UINT16> &codelookup = m_mob->code_lookup();
-	for (unsigned int i = 0; i < codelookup.size(); i++)
-		codelookup[i] ^= 0x800;
+	for (auto & elem : codelookup)
+		elem ^= 0x800;
 
 	/* set up the base color for the playfield */
 	m_playfield_color_bank = m_vindctr2_screen_refresh ? 0 : 1;

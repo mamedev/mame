@@ -69,9 +69,9 @@ void msx_cart_halnote::restore_banks()
 
 void msx_cart_halnote::device_reset()
 {
-	for (int i = 0; i < 8; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
 }
 

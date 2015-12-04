@@ -306,8 +306,8 @@ DRIVER_INIT_MEMBER(vectrex_state,vectrex)
 {
 	m_imager_angles = unknown_game_angles;
 	m_beam_color = rgb_t::white;
-	for (int i = 0; i < ARRAY_LENGTH(m_imager_colors); i++)
-		m_imager_colors[i] = rgb_t::white;
+	for (auto & elem : m_imager_colors)
+		elem = rgb_t::white;
 
 	/*
 	 * Minestorm's PRNG doesn't work with a 0 seed (mines in the first

@@ -388,16 +388,16 @@ lampinfo lamps[16][16];
 
 void set_clickable_temp(running_machine &machine, const std::string &teststring, int clickport, int clickmask)
 {
-	for (int y = 0; y < 16; y++)
+	for (auto & lamp : lamps)
 	{
 		for (int x = 0; x < 16; x++)
 		{
-			if (!strcmp(teststring.c_str(), lamps[y][x].lampname_alt.c_str()))
+			if (!strcmp(teststring.c_str(), lamp[x].lampname_alt.c_str()))
 			{
-				lamps[y][x].clickport = clickport;
-				lamps[y][x].clickmask = clickmask;
+				lamp[x].clickport = clickport;
+				lamp[x].clickmask = clickmask;
 
-				lamps[y][x].lamptypename = "buttonlamp";
+				lamp[x].lamptypename = "buttonlamp";
 			}
 
 		}
@@ -518,12 +518,12 @@ int find_lamp_strings(running_machine &machine)
 
 	// layout elements for each of the text labels
 	int d = 0;
-	for (int y = 0; y < 16; y++)
+	for (auto & lamp : lamps)
 	{
 		//sc45helperlog("---ROW %02d---\n", y);
 		for (int x = 0; x < 16; x++)
 		{
-			sc45helperlog("<element name=\"lamplabelel%d\"><text string=\"%s\"><color red=\"1.0\" green=\"1.0\" blue=\"1.0\" /></text></element>\n", d, lamps[y][x].lampname.c_str());
+			sc45helperlog("<element name=\"lamplabelel%d\"><text string=\"%s\"><color red=\"1.0\" green=\"1.0\" blue=\"1.0\" /></text></element>\n", d, lamp[x].lampname.c_str());
 			d++;
 		}
 	}
@@ -589,17 +589,17 @@ int find_lamp_strings(running_machine &machine)
 
 	// copy the button strings so we can modify some for easier comparisons
 	d = 0;
-	for (int y = 0; y < 16; y++)
+	for (auto & lamp : lamps)
 	{
 		for (int x = 0; x < 16; x++)
 		{
-			lamps[y][x].lampname_alt = lamps[y][x].lampname;
+			lamp[x].lampname_alt = lamp[x].lampname;
 
-			if (!strcmp(lamps[y][x].lampname_alt.c_str(), "hold2/hi")) lamps[y][x].lampname_alt = "hold2";
-			if (!strcmp(lamps[y][x].lampname_alt.c_str(), "hold3/lo")) lamps[y][x].lampname_alt = "hold3";
-			if (!strcmp(lamps[y][x].lampname_alt.c_str(), "chg stake")) lamps[y][x].lampname_alt = "chnge stk";
-			if (!strcmp(lamps[y][x].lampname_alt.c_str(), "canc/coll")) lamps[y][x].lampname_alt = "cancel";
-			if (!strcmp(lamps[y][x].lampname_alt.c_str(), "start")) lamps[y][x].lampname_alt = "strt exch";
+			if (!strcmp(lamp[x].lampname_alt.c_str(), "hold2/hi")) lamp[x].lampname_alt = "hold2";
+			if (!strcmp(lamp[x].lampname_alt.c_str(), "hold3/lo")) lamp[x].lampname_alt = "hold3";
+			if (!strcmp(lamp[x].lampname_alt.c_str(), "chg stake")) lamp[x].lampname_alt = "chnge stk";
+			if (!strcmp(lamp[x].lampname_alt.c_str(), "canc/coll")) lamp[x].lampname_alt = "cancel";
+			if (!strcmp(lamp[x].lampname_alt.c_str(), "start")) lamp[x].lampname_alt = "strt exch";
 
 		}
 	}
@@ -623,20 +623,20 @@ int find_lamp_strings(running_machine &machine)
 			if (pos == 2) sprintf(tempname2, "%sbot", tempname);
 
 
-			for (int y = 0; y < 16; y++)
+			for (auto & lamp : lamps)
 			{
 				for (int x = 0; x < 16; x++)
 				{
-					if (!strcmp(tempname2, lamps[y][x].lampname_alt.c_str()))
+					if (!strcmp(tempname2, lamp[x].lampname_alt.c_str()))
 					{
 						//sc45helperlog("%s found\n", tempname2);
-						lamps[y][x].draw_label = false;
+						lamp[x].draw_label = false;
 
-						lamps[y][x].x = 0 + (50 * reel);
-						lamps[y][x].y = 300 + (17 * pos);
-						lamps[y][x].width = 50;
-						lamps[y][x].height = 17;
-						lamps[y][x].lamptypename = "reellamp";
+						lamp[x].x = 0 + (50 * reel);
+						lamp[x].y = 300 + (17 * pos);
+						lamp[x].width = 50;
+						lamp[x].height = 17;
+						lamp[x].lamptypename = "reellamp";
 
 
 					}
@@ -676,17 +676,17 @@ int find_lamp_strings(running_machine &machine)
 
 	// dump out basic matrix stuff in layout format
 	d = 0;
-	for (int y = 0; y < 16; y++)
+	for (auto & lamp : lamps)
 	{
 		//sc45helperlog("---ROW %02d---\n", y);
 		for (int x = 0; x < 16; x++)
 		{
-			if (lamps[y][x].clickport== -1) sc45helperlog("<bezel name=\"lamp%d\" element=\"%s\" state=\"0\"><bounds x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\"/></bezel>\n", d, lamps[y][x].lamptypename.c_str(), lamps[y][x].x, lamps[y][x].y, lamps[y][x].width, lamps[y][x].height);
-			else sc45helperlog("<bezel name=\"lamp%d\" element=\"%s\" state=\"0\" inputtag=\"IN-%d\" inputmask=\"0x%02x\"><bounds x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\" /></bezel>\n", d, lamps[y][x].lamptypename.c_str(), lamps[y][x].clickport, lamps[y][x].clickmask, lamps[y][x].x, lamps[y][x].y, lamps[y][x].width, lamps[y][x].height);
+			if (lamp[x].clickport== -1) sc45helperlog("<bezel name=\"lamp%d\" element=\"%s\" state=\"0\"><bounds x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\"/></bezel>\n", d, lamp[x].lamptypename.c_str(), lamp[x].x, lamp[x].y, lamp[x].width, lamp[x].height);
+			else sc45helperlog("<bezel name=\"lamp%d\" element=\"%s\" state=\"0\" inputtag=\"IN-%d\" inputmask=\"0x%02x\"><bounds x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\" /></bezel>\n", d, lamp[x].lamptypename.c_str(), lamp[x].clickport, lamp[x].clickmask, lamp[x].x, lamp[x].y, lamp[x].width, lamp[x].height);
 
-			if (lamps[y][x].draw_label == false) sc45helperlog("<!-- Label not drawn\n");
-			sc45helperlog("<bezel name=\"lamplabel%d\" element=\"lamplabelel%d\"><bounds x=\"%d\" y=\"%d\" width=\"%d\" height=\"10\" /></bezel>\n", d,d, lamps[y][x].x, lamps[y][x].y-10, lamps[y][x].width);
-			if (lamps[y][x].draw_label == false) sc45helperlog("-->\n");
+			if (lamp[x].draw_label == false) sc45helperlog("<!-- Label not drawn\n");
+			sc45helperlog("<bezel name=\"lamplabel%d\" element=\"lamplabelel%d\"><bounds x=\"%d\" y=\"%d\" width=\"%d\" height=\"10\" /></bezel>\n", d,d, lamp[x].x, lamp[x].y-10, lamp[x].width);
+			if (lamp[x].draw_label == false) sc45helperlog("-->\n");
 
 			d++;
 		}
@@ -830,9 +830,9 @@ int find_reel_strings(running_machine &machine)
 
 	int total_reel_symbols = 0;
 
-	for (unsigned int i = 0; i < reelsizes.size(); i++)
+	for (auto & reelsize : reelsizes)
 	{
-		total_reel_symbols += reelsizes[i];
+		total_reel_symbols += reelsize;
 	}
 
 	endblock =   startblock + 4 * (total_reel_symbols);

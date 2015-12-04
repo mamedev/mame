@@ -878,8 +878,8 @@ MACHINE_RESET_MEMBER(jack_state,striv)
 	m_question_address = 0;
 	m_question_rom = 0;
 
-	for (int i = 0; i < 16; i++)
-		m_remap_address[i] = 0;
+	for (auto & elem : m_remap_address)
+		elem = 0;
 }
 
 

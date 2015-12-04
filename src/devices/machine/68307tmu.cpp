@@ -223,9 +223,9 @@ void m68307_timer::write_trr(UINT16 data, UINT16 mem_mask, int which)
 
 void m68307_timer::reset(void)
 {
-	for (int i=0;i<2;i++)
+	for (auto & elem : singletimer)
 	{
-		m68307_single_timer* tptr = &singletimer[i];
+		m68307_single_timer* tptr = &elem;
 
 		tptr->regs[m68307TIMER_TMR] = 0x0000;
 		tptr->regs[m68307TIMER_TRR] = 0xffff;

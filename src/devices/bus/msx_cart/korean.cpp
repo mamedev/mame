@@ -107,9 +107,9 @@ msx_cart_korean_90in1::msx_cart_korean_90in1(const machine_config &mconfig, cons
 	, m_bank_mask(0)
 	, m_selected_bank(0)
 {
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_bank_base)
 	{
-		m_bank_base[i] = nullptr;
+		elem = nullptr;
 	}
 }
 

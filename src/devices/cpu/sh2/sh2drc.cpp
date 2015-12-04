@@ -935,20 +935,20 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 
 	UML_LABEL(block, label++);              // label:
 
-	for (int ramnum = 0; ramnum < SH2_MAX_FASTRAM; ramnum++)
+	for (auto & elem : m_fastram)
 	{
-		if (m_fastram[ramnum].base != nullptr && (!iswrite || !m_fastram[ramnum].readonly))
+		if (elem.base != nullptr && (!iswrite || !elem.readonly))
 		{
-			void *fastbase = (UINT8 *)m_fastram[ramnum].base - m_fastram[ramnum].start;
+			void *fastbase = (UINT8 *)elem.base - elem.start;
 			UINT32 skip = label++;
-			if (m_fastram[ramnum].end != 0xffffffff)
+			if (elem.end != 0xffffffff)
 			{
-				UML_CMP(block, I0, m_fastram[ramnum].end);   // cmp     i0,end
+				UML_CMP(block, I0, elem.end);   // cmp     i0,end
 				UML_JMPc(block, COND_A, skip);                                      // ja      skip
 			}
-			if (m_fastram[ramnum].start != 0x00000000)
+			if (elem.start != 0x00000000)
 			{
-				UML_CMP(block, I0, m_fastram[ramnum].start);// cmp     i0,fastram_start
+				UML_CMP(block, I0, elem.start);// cmp     i0,fastram_start
 				UML_JMPc(block, COND_B, skip);                                      // jb      skip
 			}
 

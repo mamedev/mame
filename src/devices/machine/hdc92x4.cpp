@@ -2721,8 +2721,8 @@ void hdc92x4_device::live_run_until(attotime limit)
 			m_out_dip(ASSERT_LINE);
 
 			// Write the header via DMA
-			for (int slot = 0; slot < 6; slot++)
-				m_out_dma(0, m_register_r[id_field[slot]], 0xff);
+			for (auto & elem : id_field)
+				m_out_dma(0, m_register_r[elem], 0xff);
 
 			m_out_dip(CLEAR_LINE);
 			m_out_dmarq(CLEAR_LINE);
@@ -3296,8 +3296,8 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			m_out_dip(ASSERT_LINE);
 
 			// Write the header via DMA
-			for (int slot = 0; slot < 6; slot++)
-				m_out_dma(0, m_register_r[id_field[slot]], 0xff);
+			for (auto & elem : id_field)
+				m_out_dma(0, m_register_r[elem], 0xff);
 
 			// Continue with reading the sector data
 			m_live_state.state = SEARCH_DAM;

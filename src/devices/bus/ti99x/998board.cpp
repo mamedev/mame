@@ -761,7 +761,7 @@ void mainboard8_device::device_start()
 	m_PTGE = false;
 
 	// Clean mapper
-	for (int i=0; i < 16; i++) m_pas_offset[i] = 0;
+	for (auto & elem : m_pas_offset) elem = 0;
 }
 
 void mainboard8_device::device_reset()
@@ -773,7 +773,7 @@ void mainboard8_device::device_reset()
 	m_hexbus_selected = false;
 
 	// Clean mapper
-	for (int i=0; i < 16; i++) m_pas_offset[i] = 0;
+	for (auto & elem : m_pas_offset) elem = 0;
 
 	m_ready(ASSERT_LINE);
 }

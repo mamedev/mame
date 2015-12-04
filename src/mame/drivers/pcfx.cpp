@@ -380,13 +380,13 @@ inline void pcfx_state::check_irqs()
 	UINT16 active_irqs = m_irq_pending & ~m_irq_mask;
 	int highest_prio = -1;
 
-	for ( int i = 0; i < 8; i++ )
+	for (auto & elem : m_irq_priority)
 	{
 		if ( active_irqs & 0x80 )
 		{
-			if ( m_irq_priority[i] >= highest_prio )
+			if ( elem >= highest_prio )
 			{
-				highest_prio = m_irq_priority[i];
+				highest_prio = elem;
 			}
 		}
 		active_irqs <<= 1;

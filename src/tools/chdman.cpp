@@ -772,9 +772,9 @@ static int print_help(const char *argv0, const char *error = nullptr)
 
 	// print a summary of each command
 	printf("Usage:\n");
-	for (int cmdnum = 0; cmdnum < ARRAY_LENGTH(s_commands); cmdnum++)
+	for (auto & desc : s_commands)
 	{
-		const command_description &desc = s_commands[cmdnum];
+		
 		printf("   %s %s%s\n", argv0, desc.name, desc.description);
 	}
 	printf("\nFor help with any command, run:\n");
@@ -808,10 +808,10 @@ static int print_help(const char *argv0, const command_description &desc, const 
 			option++;
 
 		// find the option
-		for (int optnum = 0; optnum < ARRAY_LENGTH(s_options); optnum++)
-			if (strcmp(option, s_options[optnum].name) == 0)
+		for (auto & s_option : s_options)
+			if (strcmp(option, s_option.name) == 0)
 			{
-				const option_description &odesc = s_options[optnum];
+				const option_description &odesc = s_option;
 				printf("      --%s", odesc.name);
 				if (odesc.shortname != nullptr)
 					printf(", -%s", odesc.shortname);
@@ -1391,10 +1391,10 @@ static void do_info(parameters_t &params)
 
 		// determine our index
 		UINT32 metaindex = ~0;
-		for (unsigned int cur = 0; cur < info.size(); cur++)
-			if (info[cur].tag == metatag)
+		for (auto & elem : info)
+			if (elem.tag == metatag)
 			{
-				metaindex = ++info[cur].index;
+				metaindex = ++elem.index;
 				break;
 			}
 
@@ -2858,10 +2858,10 @@ int CLIB_DECL main(int argc, char *argv[])
 	}
 
 	// iterate over commands to find our match
-	for (int cmdnum = 0; cmdnum < ARRAY_LENGTH(s_commands); cmdnum++)
-		if (strcmp(command, s_commands[cmdnum].name) == 0)
+	for (auto & s_command : s_commands)
+		if (strcmp(command, s_command.name) == 0)
 		{
-			const command_description &desc = s_commands[cmdnum];
+			const command_description &desc = s_command;
 
 			// print help if that was requested
 			if (help)
@@ -2933,7 +2933,7 @@ int CLIB_DECL main(int argc, char *argv[])
 			// all clear, run the command
 			try
 			{
-				(*s_commands[cmdnum].handler)(parameters);
+				(*s_command.handler)(parameters);
 				return 0;
 			}
 			catch (chd_error &err)

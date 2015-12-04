@@ -156,8 +156,8 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x0c:  //ALM$ write
 		{
-			for(int i = 0; i < 8; i++)
-				m_alarm[i] = m_in.data[m_in.read++];
+			for(auto & elem : m_alarm)
+				elem = m_in.data[m_in.read++];
 		}
 		break;
 
@@ -500,8 +500,8 @@ void x07_state::t6834_cmd (UINT8 cmd)
 
 	case 0x36:  //alarm read
 		{
-			for(int i = 0; i < 8; i++)
-				m_out.data[m_out.write++] = m_alarm[i];
+			for(auto & elem : m_alarm)
+				m_out.data[m_out.write++] = elem;
 		}
 		break;
 

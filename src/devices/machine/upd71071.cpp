@@ -133,9 +133,9 @@ void upd71071_device::device_start()
 	m_out_dack_1_cb.resolve_safe();
 	m_out_dack_2_cb.resolve_safe();
 	m_out_dack_3_cb.resolve_safe();
-	for (int x = 0; x < 4; x++)
+	for (auto & elem : m_timer)
 	{
-		m_timer[x] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd71071_device::dma_transfer_timer),this));
+		elem = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd71071_device::dma_transfer_timer),this));
 	}
 	m_selected_channel = 0;
 

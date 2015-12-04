@@ -1593,9 +1593,9 @@ void isa8_cga_pc1512_device::device_reset()
 	m_write = 0x0f;
 	m_read = 0;
 	m_mc6845_address = 0;
-	for ( int i = 0; i < 31; i++ )
+	for (auto & elem : m_mc6845_locked_register)
 	{
-		m_mc6845_locked_register[i] = 0;
+		elem = 0;
 	}
 
 	membank("bank1")->set_base(&m_vram[isa8_cga_pc1512_device::vram_offset[0]]);

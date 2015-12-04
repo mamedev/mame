@@ -23,10 +23,10 @@ lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const ch
 	is_neoCD = false;
 
 	nff0002 = 0;
-	for (int i=0;i<10;i++)
-		CDD_TX[i] = 0;
-	for (int i=0;i<10;i++)
-		CDD_RX[i] = 0;
+	for (auto & elem : CDD_TX)
+		elem = 0;
+	for (auto & elem : CDD_RX)
+		elem = 0;
 	NeoCDCommsWordCount = 0;
 	NeoCD_StatusHack = 0;
 	SCD_CURLBA = 0;

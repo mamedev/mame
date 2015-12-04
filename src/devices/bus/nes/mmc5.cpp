@@ -122,8 +122,8 @@ void nes_exrom_device::pcb_reset()
 	m_ex1_bank = 0;
 	m_vcount = 0;
 
-	for (int i = 0; i < 12; i++)
-		m_vrom_bank[i] = 0x3ff;
+	for (auto & elem : m_vrom_bank)
+		elem = 0x3ff;
 
 	m_prg_regs[0] = 0xfc;
 	m_prg_regs[1] = 0xfd;

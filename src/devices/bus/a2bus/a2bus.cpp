@@ -168,9 +168,9 @@ void a2bus_device::device_start()
 	m_out_inh_cb.resolve_safe();
 
 	// clear slots
-	for (int i = 0; i < 8; i++)
+	for (auto & elem : m_device_list)
 	{
-		m_device_list[i] = nullptr;
+		elem = nullptr;
 	}
 
 	m_slot_irq_mask = m_slot_nmi_mask = 0;

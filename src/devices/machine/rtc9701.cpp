@@ -129,8 +129,8 @@ void rtc9701_device::device_reset()
 
 void rtc9701_device::nvram_default()
 {
-	for (offs_t offs = 0; offs < 0x100; offs++)
-		rtc9701_data[offs] = 0xffff;
+	for (auto & elem : rtc9701_data)
+		elem = 0xffff;
 }
 
 

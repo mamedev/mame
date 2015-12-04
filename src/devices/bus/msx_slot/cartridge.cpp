@@ -85,10 +85,10 @@ static const struct
 
 static const char *msx_cart_get_slot_option(int type)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (slot_list[i].pcb_id == type)
-			return slot_list[i].slot_option;
+		if (elem.pcb_id == type)
+			return elem.slot_option;
 	}
 
 	return slot_list[0].slot_option;
@@ -315,11 +315,11 @@ void msx_slot_cartridge_device::get_default_card_software(std::string &result)
 					{ 17, KOREAN_126IN1 }
 				};
 
-				for (int i = 0; i < ARRAY_LENGTH(extrainfo_map); i++)
+				for (auto & elem : extrainfo_map)
 				{
-					if (extrainfo_map[i].extrainfo == extrainfo_type)
+					if (elem.extrainfo == extrainfo_type)
 					{
-						type = extrainfo_map[i].mapper;
+						type = elem.mapper;
 					}
 				}
 			}

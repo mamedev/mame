@@ -179,8 +179,8 @@ void k007232_device::device_start()
 	m_vol[1][0] = 0;
 	m_vol[1][1] = 255;  /* channel B output to output B */
 
-	for (int i = 0; i < 0x10; i++)
-		m_wreg[i] = 0;
+	for (auto & elem : m_wreg)
+		elem = 0;
 
 	m_stream = machine().sound().stream_alloc(*this, 0 , 2, clock()/128);
 

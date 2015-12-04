@@ -2988,8 +2988,8 @@ const UINT16 raiden2_state::raiden_blended_colors[] = {
 
 void raiden2_state::init_blending(const UINT16 *table)
 {
-	for(int i=0; i<0x800; i++)
-		blend_active[i] = false;
+	for(auto & elem : blend_active)
+		elem = false;
 	while(*table != 0xffff)
 		blend_active[*table++] = true;
 }

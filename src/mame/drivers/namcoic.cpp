@@ -1165,8 +1165,8 @@ WRITE16_MEMBER( namcos2_shared_state::c169_roz_bank_w )
 	UINT16 old_data = m_c169_roz_bank[offset];
 	COMBINE_DATA(&m_c169_roz_bank[offset]);
 	if (m_c169_roz_bank[offset] != old_data)
-		for (int i = 0; i < ROZ_TILEMAP_COUNT; i++)
-			m_c169_roz_tilemap[i]->mark_all_dirty();
+		for (auto & elem : m_c169_roz_tilemap)
+			elem->mark_all_dirty();
 }
 
 READ16_MEMBER( namcos2_shared_state::c169_roz_videoram_r )
@@ -1177,6 +1177,6 @@ READ16_MEMBER( namcos2_shared_state::c169_roz_videoram_r )
 WRITE16_MEMBER( namcos2_shared_state::c169_roz_videoram_w )
 {
 	COMBINE_DATA(&m_c169_roz_videoram[offset]);
-	for (int i = 0; i < ROZ_TILEMAP_COUNT; i++)
-		m_c169_roz_tilemap[i]->mark_tile_dirty(offset);
+	for (auto & elem : m_c169_roz_tilemap)
+		elem->mark_tile_dirty(offset);
 }

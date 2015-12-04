@@ -121,8 +121,8 @@ ay31015_device::ay31015_device(const machine_config &mconfig, device_type type, 
 				m_write_so_cb(*this),
 				m_status_changed_cb(*this)
 {
-	for (int i = 0; i < 41; i++)
-		m_pins[i] = 0;
+	for (auto & elem : m_pins)
+		elem = 0;
 }
 
 ay31015_device::ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -149,8 +149,8 @@ ay31015_device::ay31015_device(const machine_config &mconfig, const char *tag, d
 				m_write_so_cb(*this),
 				m_status_changed_cb(*this)
 {
-	for (int i = 0; i < 41; i++)
-		m_pins[i] = 0;
+	for (auto & elem : m_pins)
+		elem = 0;
 }
 
 ay51013_device::ay51013_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

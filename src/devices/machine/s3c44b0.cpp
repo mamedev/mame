@@ -76,9 +76,9 @@ void s3c44b0_device::device_start()
 
 
 	for (int i = 0; i < 6; i++) m_pwm.timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::pwm_timer_exp),this));
-	for (int i = 0; i < 2; i++) m_uart[i].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::uart_timer_exp),this));
-	for (int i = 0; i < 2; i++) m_zdma[i].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::zdma_timer_exp),this));
-	for (int i = 0; i < 2; i++) m_bdma[i].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::bdma_timer_exp),this));
+	for (auto & elem : m_uart) elem.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::uart_timer_exp),this));
+	for (auto & elem : m_zdma) elem.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::zdma_timer_exp),this));
+	for (auto & elem : m_bdma) elem.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::bdma_timer_exp),this));
 
 	m_lcd.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::lcd_timer_exp),this));
 	m_wdt.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::wdt_timer_exp),this));
@@ -390,12 +390,12 @@ void s3c44b0_device::lcd_render_stn_04()
 	UINT8 *bitmap = m_lcd.bitmap + ((m_lcd.vpos - m_lcd.vpos_min) * (m_lcd.hpos_max - m_lcd.hpos_min + 1)) + (m_lcd.hpos - m_lcd.hpos_min);
 	UINT8 data[16];
 	lcd_dma_read(16, data);
-	for (int i = 0; i < 16; i++)
+	for (auto & elem : data)
 	{
 		for (int j = 0; j < 2; j++)
 		{
-			*bitmap++ = lcd_get_color_stn_04((data[i] >> 4) & 0x0F);
-			data[i] = data[i] << 4;
+			*bitmap++ = lcd_get_color_stn_04((elem >> 4) & 0x0F);
+			elem = elem << 4;
 			m_lcd.hpos++;
 			if (m_lcd.hpos >= m_lcd.hpos_min + (m_lcd.pagewidth_max << 2))
 			{
@@ -416,15 +416,15 @@ void s3c44b0_device::lcd_render_stn_08()
 	UINT8 *bitmap = m_lcd.bitmap + ((m_lcd.vpos - m_lcd.vpos_min) * (m_lcd.hpos_max - m_lcd.hpos_min + 1)) + (m_lcd.hpos - m_lcd.hpos_min);
 	UINT8 data[16];
 	lcd_dma_read(16, data);
-	for (int i = 0; i < 16; i++)
+	for (auto & elem : data)
 	{
 		UINT8 xxx[3];
-		xxx[0] = lcd_get_color_stn_08_r(data[i]);
-		xxx[1] = lcd_get_color_stn_08_g(data[i]);
-		xxx[2] = lcd_get_color_stn_08_b(data[i]);
-		for (int j = 0; j < 3; j++)
+		xxx[0] = lcd_get_color_stn_08_r(elem);
+		xxx[1] = lcd_get_color_stn_08_g(elem);
+		xxx[2] = lcd_get_color_stn_08_b(elem);
+		for (auto & xxx_j : xxx)
 		{
-			*bitmap++ = xxx[j];
+			*bitmap++ = xxx_j;
 			m_lcd.hpos++;
 			if (m_lcd.hpos >= m_lcd.hpos_min + (m_lcd.pagewidth_max * 6))
 			{

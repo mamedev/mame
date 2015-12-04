@@ -157,9 +157,9 @@ es550x_device::es550x_device(const machine_config &mconfig, device_type type, co
 		m_irq_cb(*this),
 		m_read_port_cb(*this)
 {
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_region_base)
 	{
-		m_region_base[i] = nullptr;
+		elem = nullptr;
 	}
 }
 

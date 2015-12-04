@@ -290,9 +290,9 @@ cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, d
 		m_write_data(*this),
 		m_write_reset(*this)
 {
-	for (int i = 0; i < SIGNAL_COUNT; i++)
+	for (auto & elem : m_line)
 	{
-		m_line[i] = 1;
+		elem = 1;
 	}
 }
 
@@ -357,9 +357,9 @@ cbm_iec_device::daisy_entry::daisy_entry(device_t *device)
 		m_device(device),
 		m_interface(nullptr)
 {
-	for (int i = 0; i < SIGNAL_COUNT; i++)
+	for (auto & elem : m_line)
 	{
-		m_line[i] = 1;
+		elem = 1;
 	}
 
 	device->interface(m_interface);

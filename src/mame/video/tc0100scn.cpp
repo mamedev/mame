@@ -318,8 +318,8 @@ void tc0100scn_device::device_reset()
 	m_dblwidth = 0;
 	m_gfxbank = 0; /* Mjnquest uniquely banks tiles */
 
-	for (int i = 0; i < 8; i++)
-		m_ctrl[i] = 0;
+	for (auto & elem : m_ctrl)
+		elem = 0;
 }
 
 

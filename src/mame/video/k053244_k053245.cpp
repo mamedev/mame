@@ -152,8 +152,8 @@ void k05324x_device::device_reset()
 {
 	m_rombank = 0;
 
-	for (int i = 0; i < 0x10; i++)
-		m_regs[i] = 0;
+	for (auto & elem : m_regs)
+		elem = 0;
 }
 
 /*****************************************************************************

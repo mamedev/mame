@@ -855,9 +855,9 @@ void avr8_device::device_reset()
 	logerror("AVR Boot loader section size: %d words\n", m_boot_size);
 	}
 
-	for (int i = 0; i < 0x200; i++)
+	for (auto & elem : m_r)
 	{
-		m_r[i] = 0;
+		elem = 0;
 	}
 
 	m_spi_active = false;

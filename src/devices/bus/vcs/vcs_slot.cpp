@@ -162,10 +162,10 @@ static const vcs_slot slot_list[] =
 
 static int vcs_get_pcb_id(const char *slot)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(slot_list[i].slot_option, slot))
-			return slot_list[i].pcb_id;
+		if (!core_stricmp(elem.slot_option, slot))
+			return elem.pcb_id;
 	}
 
 	return 0;
@@ -173,10 +173,10 @@ static int vcs_get_pcb_id(const char *slot)
 
 static const char *vcs_get_slot(int type)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (slot_list[i].pcb_id == type)
-			return slot_list[i].slot_option;
+		if (elem.pcb_id == type)
+			return elem.slot_option;
 	}
 
 	return "a26_4k";
@@ -671,9 +671,9 @@ int vcs_cart_slot_device::detect_super_chip(UINT8 *cart, UINT32 len)
 	{
 		for (int i = 0; i < len - sizeof signatures[0]; i++)
 		{
-			for (int j = 0; j < (sizeof signatures/sizeof signatures[0]); j++)
+			for (auto & signature : signatures)
 			{
-				if (!memcmp(&cart[i], &signatures[j], sizeof signatures[0]))
+				if (!memcmp(&cart[i], &signature, sizeof signatures[0]))
 				{
 					return 1;
 				}

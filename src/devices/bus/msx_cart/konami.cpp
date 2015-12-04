@@ -21,9 +21,9 @@ msx_cart_konami::msx_cart_konami(const machine_config &mconfig, const char *tag,
 	{
 		m_selected_bank[i] = i;
 	}
-	for (int i = 0; i < 8; i++)
+	for (auto & elem : m_bank_base)
 	{
-		m_bank_base[i] = nullptr;
+		elem = nullptr;
 	}
 }
 
@@ -130,9 +130,9 @@ msx_cart_konami_scc::msx_cart_konami_scc(const machine_config &mconfig, const ch
 	{
 		m_selected_bank[i] = i;
 	}
-	for (int i = 0; i < 8; i++)
+	for (auto & elem : m_bank_base)
 	{
-		m_bank_base[i] = nullptr;
+		elem = nullptr;
 	}
 }
 
@@ -299,13 +299,13 @@ msx_cart_gamemaster2::msx_cart_gamemaster2(const machine_config &mconfig, const 
 	: device_t(mconfig, MSX_CART_GAMEMASTER2, "MSX Cartridge - GAMEMASTER2", tag, owner, clock, "msx_cart_gamemaster2", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 {
-	for (int i = 0; i < 3; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
-	for (int i = 0; i < 8; i++)
+	for (auto & elem : m_bank_base)
 	{
-		m_bank_base[i] = nullptr;
+		elem = nullptr;
 	}
 }
 
@@ -533,21 +533,21 @@ msx_cart_konami_sound::msx_cart_konami_sound(const machine_config &mconfig, devi
 	, m_sccplus_active(false)
 	, m_scc_mode(0)
 {
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
-	for (int i = 0; i < 8; i++)
+	for (auto & elem : m_bank_base)
 	{
-		m_bank_base[i] = nullptr;
+		elem = nullptr;
 	}
-	for (int i = 0; i < 16; i++)
+	for (auto & elem : m_ram_bank)
 	{
-		m_ram_bank[i] = nullptr;
+		elem = nullptr;
 	}
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_ram_enabled)
 	{
-		m_ram_enabled[i] = false;
+		elem = false;
 	}
 }
 

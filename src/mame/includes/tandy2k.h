@@ -96,9 +96,9 @@ public:
 		m_centronics_perror(0),
 		m_centronics_busy(0)
 	{
-		for (int i = 0; i < 4; i++)
+		for (auto & elem : m_busdmarq)
 		{
-			m_busdmarq[i] = CLEAR_LINE;
+			elem = CLEAR_LINE;
 		}
 	}
 

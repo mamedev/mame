@@ -206,9 +206,9 @@ void a2232_device::device_reset_after_children()
 void a2232_device::update_irqs()
 {
 	// look for any active irq
-	for (int i = 0; i < IRQ_SOURCE_COUNT; i++)
+	for (auto & elem : m_irqs)
 	{
-		if (m_irqs[i])
+		if (elem)
 		{
 			m_iocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 			return;

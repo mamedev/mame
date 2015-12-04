@@ -96,8 +96,8 @@ void antic_device::device_start()
 	LOG(("atari cclk_init\n"));
 	cclk_init();
 
-	for (int i = 0; i < 64; i++)
-		m_prio_table[i] = auto_alloc_array_clear(machine(), UINT8, 8*256);
+	for (auto & elem : m_prio_table)
+		elem = auto_alloc_array_clear(machine(), UINT8, 8*256);
 
 	LOG(("atari prio_init\n"));
 	prio_init();

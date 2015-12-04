@@ -55,11 +55,11 @@ void dpc_device::device_start()
 
 void dpc_device::device_reset()
 {
-	for (int data_fetcher = 0; data_fetcher < 8; data_fetcher++)
+	for (auto & elem : m_df)
 	{
-		m_df[data_fetcher].osc_clk = 0;
-		m_df[data_fetcher].flag = 0;
-		m_df[data_fetcher].music_mode = 0;
+		elem.osc_clk = 0;
+		elem.flag = 0;
+		elem.music_mode = 0;
 	}
 	m_oscillator->adjust(attotime::from_hz(18400), 0, attotime::from_hz(18400));
 

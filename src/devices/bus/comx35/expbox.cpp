@@ -149,9 +149,9 @@ void comx_eb_device::device_start()
 	m_expansion_slot[2] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT3_TAG));
 	m_expansion_slot[3] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT4_TAG));
 
-	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
+	for (auto & elem : m_irq)
 	{
-		m_irq[slot] = CLEAR_LINE;
+		elem = CLEAR_LINE;
 	}
 }
 
@@ -162,12 +162,12 @@ void comx_eb_device::device_start()
 
 void comx_eb_device::device_reset()
 {
-	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
+	for (auto & elem : m_expansion_slot)
 	{
-		if (m_expansion_slot[slot] != nullptr)
+		if (elem != nullptr)
 		{
-			m_expansion_slot[slot]->device().reset();
-			m_expansion_slot[slot]->ds_w(0);
+			elem->device().reset();
+			elem->ds_w(0);
 		}
 	}
 }
@@ -181,11 +181,11 @@ int comx_eb_device::comx_ef4_r()
 {
 	int state = CLEAR_LINE;
 
-	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
+	for (auto & elem : m_expansion_slot)
 	{
-		if (m_expansion_slot[slot] != nullptr)
+		if (elem != nullptr)
 		{
-			state |= m_expansion_slot[slot]->ef4_r();
+			state |= elem->ef4_r();
 		}
 	}
 
@@ -199,11 +199,11 @@ int comx_eb_device::comx_ef4_r()
 
 void comx_eb_device::comx_q_w(int state)
 {
-	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
+	for (auto & elem : m_expansion_slot)
 	{
-		if (m_expansion_slot[slot] != nullptr)
+		if (elem != nullptr)
 		{
-			m_expansion_slot[slot]->q_w(state);
+			elem->q_w(state);
 		}
 	}
 }

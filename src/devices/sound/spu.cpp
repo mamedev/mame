@@ -1048,8 +1048,8 @@ void spu_device::device_reset()
 
 	memset(cache,0,(spu_ram_size>>4)*sizeof(sample_cache *));
 
-	for (unsigned int i=0; i<4; i++)
-		output_buf[i]=new unsigned char [output_buffer_size];
+	for (auto & elem : output_buf)
+		elem=new unsigned char [output_buffer_size];
 	output_head=output_tail=output_size=0;
 
 	noise_t=0;
@@ -1082,8 +1082,8 @@ void spu_device::device_post_load()
 //
 void spu_device::device_stop()
 {
-	for (unsigned int i=0; i<4; i++)
-		global_free_array(output_buf[i]);
+	for (auto & elem : output_buf)
+		global_free_array(elem);
 
 	kill_stream();
 

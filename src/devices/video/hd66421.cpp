@@ -125,9 +125,9 @@ hd66421_device::hd66421_device(const machine_config &mconfig, const char *tag, d
 		m_y(0),
 		m_palette(*this, "palette")
 {
-	for (int i = 0; i < 32; i++)
+	for (auto & elem : m_reg)
 	{
-		m_reg[i] = 0;
+		elem = 0;
 	}
 }
 

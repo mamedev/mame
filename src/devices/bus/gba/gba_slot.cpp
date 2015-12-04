@@ -138,10 +138,10 @@ static const gba_slot slot_list[] =
 
 static int gba_get_pcb_id(const char *slot)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(slot_list[i].slot_option, slot))
-			return slot_list[i].pcb_id;
+		if (!core_stricmp(elem.slot_option, slot))
+			return elem.pcb_id;
 	}
 
 	return 0;
@@ -149,10 +149,10 @@ static int gba_get_pcb_id(const char *slot)
 
 static const char *gba_get_slot(int type)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (slot_list[i].pcb_id == type)
-			return slot_list[i].slot_option;
+		if (elem.pcb_id == type)
+			return elem.slot_option;
 	}
 
 	return "gba_rom";
@@ -324,9 +324,9 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		chip &= ~(GBA_CHIP_EEPROM | GBA_CHIP_EEPROM_4K | GBA_CHIP_EEPROM_64K | GBA_CHIP_FLASH | GBA_CHIP_FLASH_1M | GBA_CHIP_FLASH_512 | GBA_CHIP_SRAM);
 
 		// search if it is one of the known titles with NVRAM conflicts
-		for (int i = 0; i < sizeof(gba_chip_fix_conflict_list) / sizeof(gba_chip_fix_conflict_item); i++)
+		for (auto & elem : gba_chip_fix_conflict_list)
 		{
-			const gba_chip_fix_conflict_item *item = &gba_chip_fix_conflict_list[i];
+			const gba_chip_fix_conflict_item *item = &elem;
 			if (!strcmp(game_code, item->game_code))
 			{
 				chip |= item->chip;
@@ -348,9 +348,9 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 
 		osd_printf_info("GBA: Game Code \"%s\"\n", game_code);
 
-		for (int i = 0; i < sizeof(gba_chip_fix_eeprom_list) / sizeof(gba_chip_fix_eeprom_item); i++)
+		for (auto & elem : gba_chip_fix_eeprom_list)
 		{
-			const gba_chip_fix_eeprom_item *item = &gba_chip_fix_eeprom_list[i];
+			const gba_chip_fix_eeprom_item *item = &elem;
 			if (!strcmp(game_code, item->game_code))
 			{
 				chip = (chip & ~GBA_CHIP_EEPROM) | GBA_CHIP_EEPROM_64K;

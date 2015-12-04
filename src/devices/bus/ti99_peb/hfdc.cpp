@@ -802,8 +802,8 @@ void myarc_hfdc_device::set_floppy_motors_running(bool run)
 	}
 
 	// Set all motors
-	for (int i=0; i < 4; i++)
-		if (m_floppy_unit[i] != nullptr) m_floppy_unit[i]->mon_w((run)? 0 : 1);
+	for (auto & elem : m_floppy_unit)
+		if (elem != nullptr) elem->mon_w((run)? 0 : 1);
 }
 
 /*

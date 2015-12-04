@@ -96,10 +96,10 @@ void i8089_channel::device_reset()
 	m_xfer_pending = false;
 
 	// initialize registers
-	for (int i = 0; i < ARRAY_LENGTH(m_r); i++)
+	for (auto & elem : m_r)
 	{
-		m_r[i].w = 0;
-		m_r[i].t = 0;
+		elem.w = 0;
+		elem.t = 0;
 	}
 	m_prio = PRIO_IDLE;
 }

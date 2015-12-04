@@ -389,10 +389,10 @@ void SPC7110_Decomp::init(running_machine &machine, UINT8 *ROM, UINT32 len, UINT
 	m_decomp_buffer_length   = 0;
 
 	//reset context states
-	for (int i = 0; i < 32; i++)
+	for (auto & elem : m_context)
 	{
-		m_context[i].index  = 0;
-		m_context[i].invert = 0;
+		elem.index  = 0;
+		elem.invert = 0;
 	}
 
 	switch (m_decomp_mode)
@@ -873,9 +873,9 @@ void SPC7110_Decomp::mode2(UINT8 init, UINT8 *ROM, UINT32 len)
 
 		if (m_m2_buffer_index == 16)
 		{
-			for (int i = 0; i < 16; i++)
+			for (auto & elem : m_m2_bitplanebuffer)
 			{
-				write(m_m2_bitplanebuffer[i]);
+				write(elem);
 			}
 			m_m2_buffer_index = 0;
 		}

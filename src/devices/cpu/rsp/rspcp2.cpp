@@ -725,10 +725,10 @@ void rsp_cop2::init()
 
 void rsp_cop2::start()
 {
-	for(int regIdx = 0; regIdx < 32; regIdx++ )
+	for(auto & elem : m_v)
 	{
-		m_v[regIdx].d[0] = 0;
-		m_v[regIdx].d[1] = 0;
+		elem.d[0] = 0;
+		elem.d[1] = 0;
 	}
 
 	CLEAR_CARRY_FLAGS();
@@ -740,9 +740,9 @@ void rsp_cop2::start()
 	m_reciprocal_high = 0;
 
 	// Accumulators do not power on to a random state
-	for(int accumIdx = 0; accumIdx < 8; accumIdx++ )
+	for(auto & elem : m_accum)
 	{
-		m_accum[accumIdx].q = 0;
+		elem.q = 0;
 	}
 }
 

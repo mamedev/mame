@@ -198,9 +198,9 @@ econet_device::econet_device(const machine_config &mconfig, const char *tag, dev
 	m_write_clk(*this),
 	m_write_data(*this)
 {
-	for (int i = 0; i < SIGNAL_COUNT; i++)
+	for (auto & elem : m_line)
 	{
-		m_line[i] = 1;
+		elem = 1;
 	}
 }
 
@@ -251,9 +251,9 @@ econet_device::daisy_entry::daisy_entry(device_t *device) :
 	m_device(device),
 	m_interface(nullptr)
 {
-	for (int i = 0; i < SIGNAL_COUNT; i++)
+	for (auto & elem : m_line)
 	{
-		m_line[i] = 1;
+		elem = 1;
 	}
 
 	device->interface(m_interface);

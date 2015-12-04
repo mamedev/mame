@@ -11,9 +11,9 @@ msx_cart_crossblaim::msx_cart_crossblaim(const machine_config &mconfig, const ch
 	, msx_cart_interface(mconfig, *this)
 	, m_selected_bank(1)
 {
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_bank_base)
 	{
-		m_bank_base[i] = nullptr;
+		elem = nullptr;
 	}
 }
 

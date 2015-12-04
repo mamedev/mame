@@ -499,8 +499,8 @@ void k054539_device::device_start()
 	m_timer_handler.resolve_safe();
 	m_apan_cb.bind_relative_to(*owner());
 
-	for (int i = 0; i < 8; i++)
-		gain[i] = 1.0;
+	for (auto & elem : gain)
+		elem = 1.0;
 
 	flags = RESET_FLAGS;
 

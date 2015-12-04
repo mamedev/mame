@@ -144,8 +144,8 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 					m_draw_phase(0),
 					m_use_sprite_write_limitation(true)
 {
-	for (int i = 0; i < PPU_MAX_REG; i++)
-		m_regs[i] = 0;
+	for (auto & elem : m_regs)
+		elem = 0;
 
 	memset(m_palette_ram, 0, ARRAY_LENGTH(m_palette_ram));
 

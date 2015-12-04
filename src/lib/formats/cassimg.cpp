@@ -278,8 +278,8 @@ void cassette_close(cassette_image *cassette)
 	{
 		if ((cassette->flags & CASSETTE_FLAG_DIRTY) && (cassette->flags & CASSETTE_FLAG_SAVEONEXIT))
 			cassette_save(cassette);
-		for (unsigned int i = 0; i < cassette->blocks.size(); i++)
-			global_free(cassette->blocks[i]);
+		for (auto & elem : cassette->blocks)
+			global_free(elem);
 		global_free(cassette);
 	}
 }

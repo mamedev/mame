@@ -481,8 +481,8 @@ void lethal_state::machine_start()
 
 void lethal_state::machine_reset()
 {
-	for (int i = 0; i < 4; i++)
-		m_layer_colorbase[i] = 0;
+	for (auto & elem : m_layer_colorbase)
+		elem = 0;
 
 	m_sprite_colorbase = 0;
 	m_back_colorbase = 0;

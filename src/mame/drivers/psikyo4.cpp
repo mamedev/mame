@@ -296,13 +296,13 @@ WRITE32_MEMBER(psikyo4_state::io_select_w)
 	{
 		UINT32 bankdata = data >> 16;
 		UINT32 bankmask = mem_mask >> 16;
-		for (int i = 0; i < 4; i++)
+		for (auto & elem : m_ymf_bank)
 		{
 			if (bankmask & 0x0f)
 			{
 				int banknum = bankdata & 0x0f;
 				if (banknum < m_ymf_max_bank)
-					m_ymf_bank[i]->set_entry(banknum);
+					elem->set_entry(banknum);
 			}
 			bankdata >>= 4;
 			bankmask >>= 4;

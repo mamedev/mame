@@ -170,32 +170,32 @@ READ8_MEMBER(iq151_state::cartslot_r)
 {
 	UINT8 data = 0xff;
 
-	for (int i=0; i<5; i++)
-		m_carts[i]->read(offset, data);
+	for (auto & elem : m_carts)
+		elem->read(offset, data);
 
 	return data;
 }
 
 WRITE8_MEMBER(iq151_state::cartslot_w)
 {
-	for (int i=0; i<5; i++)
-		m_carts[i]->write(offset, data);
+	for (auto & elem : m_carts)
+		elem->write(offset, data);
 }
 
 READ8_MEMBER(iq151_state::cartslot_io_r)
 {
 	UINT8 data = 0xff;
 
-	for (int i=0; i<5; i++)
-		m_carts[i]->io_read(offset, data);
+	for (auto & elem : m_carts)
+		elem->io_read(offset, data);
 
 	return data;
 }
 
 WRITE8_MEMBER(iq151_state::cartslot_io_w)
 {
-	for (int i=0; i<5; i++)
-		m_carts[i]->io_write(offset, data);
+	for (auto & elem : m_carts)
+		elem->io_write(offset, data);
 }
 
 static ADDRESS_MAP_START(iq151_mem, AS_PROGRAM, 8, iq151_state)
@@ -355,8 +355,8 @@ UINT32 iq151_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	bitmap.fill(0, cliprect);
 
-	for (int i=0; i<5; i++)
-		m_carts[i]->video_update(bitmap, cliprect);
+	for (auto & elem : m_carts)
+		elem->video_update(bitmap, cliprect);
 
 	return 0;
 }

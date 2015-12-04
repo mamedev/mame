@@ -99,8 +99,8 @@ void ds2404_device::device_start()
 	m_rtc[3] = (current_time >> 16) & 0xff;
 	m_rtc[4] = (current_time >> 24) & 0xff;
 
-	for (int i = 0; i < 8; i++)
-		m_state[i] = DS2404_STATE_IDLE;
+	for (auto & elem : m_state)
+		elem = DS2404_STATE_IDLE;
 
 	m_tick_timer = timer_alloc(0);
 	m_tick_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
@@ -353,10 +353,10 @@ void ds2404_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		case 0:
 		{
 			// tick
-			for(int i = 0; i < 5; i++)
+			for(auto & elem : m_rtc)
 			{
-				m_rtc[ i ]++;
-				if(m_rtc[ i ] != 0)
+				elem++;
+				if(elem != 0)
 				{
 					break;
 				}

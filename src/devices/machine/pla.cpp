@@ -48,8 +48,8 @@ void pla_device::device_start()
 
 	// initialize cache
 	m_cache2_ptr = 0;
-	for (int i = 0; i < CACHE2_SIZE; i++)
-		m_cache2[i] = 0x80000000;
+	for (auto & elem : m_cache2)
+		elem = 0x80000000;
 
 	m_cache_size = 0;
 	int csize = 1 << ((m_inputs > MAX_CACHE_BITS) ? MAX_CACHE_BITS : m_inputs);
@@ -146,9 +146,9 @@ UINT32 pla_device::read(UINT32 input)
 	if (input < m_cache_size)
 		return m_cache[input];
 
-	for (int i = 0; i < CACHE2_SIZE; ++i)
+	for (auto cache2_entry : m_cache2)
 	{
-		UINT64 cache2_entry = m_cache2[i];
+		
 
 		if ((UINT32)cache2_entry == input)
 		{

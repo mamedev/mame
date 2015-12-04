@@ -254,14 +254,14 @@ void famibox_state::famicombox_bankswitch(UINT8 bank)
 	};
 
 
-	for (int i = 0; i < ARRAY_LENGTH(famicombox_banks); i++ )
+	for (auto & famicombox_bank : famicombox_banks)
 	{
-		if ( bank == famicombox_banks[i].bank ||
-				famicombox_banks[i].bank == 0 )
+		if ( bank == famicombox_bank.bank ||
+				famicombox_bank.bank == 0 )
 		{
-			membank("cpubank1")->set_base(memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank1_offset);
-			membank("cpubank2")->set_base(memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank2_offset);
-			membank("ppubank1")->set_base(memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].ppubank_offset);
+			membank("cpubank1")->set_base(memregion(famicombox_bank.memory_region)->base() + famicombox_bank.bank1_offset);
+			membank("cpubank2")->set_base(memregion(famicombox_bank.memory_region)->base() + famicombox_bank.bank2_offset);
+			membank("ppubank1")->set_base(memregion(famicombox_bank.memory_region)->base() + famicombox_bank.ppubank_offset);
 			break;
 		}
 	}

@@ -113,24 +113,24 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 		m_stream(nullptr),
 		m_cpu_tag("")
 {
-	for (int i = 0; i < NOISE_LONG; i++)
+	for (auto & elem : m_noise_lut)
 	{
-		m_noise_lut[i] = 0;
+		elem = 0;
 	}
 
-	for (int i = 0; i < 0X20; i++)
+	for (auto & elem : m_vbl_times)
 	{
-		m_vbl_times[i] = 0;
+		elem = 0;
 	}
 
-	for (int i = 0; i < SYNCS_MAX1; i++)
+	for (auto & elem : m_sync_times1)
 	{
-		m_sync_times1[i] = 0;
+		elem = 0;
 	}
 
-	for (int i = 0; i < SYNCS_MAX2; i++)
+	for (auto & elem : m_sync_times2)
 	{
-		m_sync_times2[i] = 0;
+		elem = 0;
 	}
 }
 

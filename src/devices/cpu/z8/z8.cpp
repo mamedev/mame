@@ -693,17 +693,17 @@ void z8_device::device_start()
 	m_t1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z8_device::t1_tick), this));
 
 	/* Clear state */
-	for ( int i = 0; i < 6; i++ )
-		m_irq[i] = 0;
-	for ( int i = 0; i < 256; i++ )
-		m_r[i] = 0;
+	for (auto & elem : m_irq)
+		elem = 0;
+	for (auto & elem : m_r)
+		elem = 0;
 	for ( int i = 0; i < 4; i++ )
 	{
 		m_input[i] = 0;
 		m_output[i] = 0;
 	}
-	for ( int i = 0; i < 16; i++ )
-		m_fake_r[i] = 0;
+	for (auto & elem : m_fake_r)
+		elem = 0;
 	m_fake_sp = 0;
 	m_t0 = 0;
 	m_t1 = 0;

@@ -535,8 +535,8 @@ const char *joystick_map::to_string(std::string &str) const
 	for (auto & elem : m_map)
 	{
 		str.append("  ");
-		for (int colnum = 0; colnum < 9; colnum++)
-			switch (elem[colnum])
+		for (auto & elem_colnum : elem)
+			switch (elem_colnum)
 			{
 				case JOYSTICK_MAP_UP | JOYSTICK_MAP_LEFT:   str.append("7");  break;
 				case JOYSTICK_MAP_UP:                       str.append("8");  break;

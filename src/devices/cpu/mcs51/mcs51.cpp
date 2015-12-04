@@ -279,8 +279,8 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 
 	/* default to standard cmos interfacing */
 
-	for (int i=0; i < ARRAY_LENGTH(m_forced_inputs); i++)
-		m_forced_inputs[i] = 0;
+	for (auto & elem : m_forced_inputs)
+		elem = 0;
 }
 
 

@@ -648,8 +648,8 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, U
 	}
 
 	// build the opcode table (static but it doesn't hurt to regenerate it)
-	for (int opnum = 0; opnum < ARRAY_LENGTH(s_opcode_table_source); opnum++)
-		s_opcode_table[s_opcode_table_source[opnum].opcode] = s_opcode_table_source[opnum].func;
+	for (auto & elem : s_opcode_table_source)
+		s_opcode_table[elem.opcode] = elem.func;
 
 	// create the log
 	if (device.machine().options().drc_log_native())

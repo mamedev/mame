@@ -332,8 +332,8 @@ void esq1_filters::device_start()
 {
 	stream = stream_alloc(8, 2, 44100);
 	memset(filters, 0, sizeof(filters));
-	for(int i=0; i<8; i++)
-		recalc_filter(filters[i]);
+	for(auto & elem : filters)
+		recalc_filter(elem);
 }
 
 void esq1_filters::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)

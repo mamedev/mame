@@ -306,10 +306,10 @@ void joystand_state::video_start()
 	m_bg1_tmap->set_transparent_pen(0xf);
 	m_bg2_tmap->set_transparent_pen(0xf);
 
-	for (int i = 0; i < 2; ++i)
+	for (auto & elem : m_bg15_bitmap)
 	{
-		m_bg15_bitmap[i].allocate(0x200, 0x200);
-		m_bg15_bitmap[i].fill(BG15_TRANSPARENT);
+		elem.allocate(0x200, 0x200);
+		elem.fill(BG15_TRANSPARENT);
 	}
 
 	bg15_tiles_dirty = true;

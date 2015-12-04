@@ -410,10 +410,10 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 			{
 				// make sure we care, first
 				file_type type = FILE_TYPE_INVALID;
-				for (int extnum = 0; extnum < ARRAY_LENGTH(extension_lookup); extnum++)
-					if (core_filename_ends_with(curlist->name.c_str(), extension_lookup[extnum].extension))
+				for (auto & elem : extension_lookup)
+					if (core_filename_ends_with(curlist->name.c_str(), elem.extension))
 					{
-						type = extension_lookup[extnum].type;
+						type = elem.type;
 						break;
 					}
 

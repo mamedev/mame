@@ -52,11 +52,11 @@ void k053247_device::clear_all()
 	m_ram = nullptr;
 	m_gfx = nullptr;
 
-	for (int i=0;i<8;i++)
-		m_kx46_regs[i] = 0;
+	for (auto & elem : m_kx46_regs)
+		elem = 0;
 
-	for (int i=0;i<16;i++)
-		m_kx47_regs[i] = 0;
+	for (auto & elem : m_kx47_regs)
+		elem = 0;
 
 	m_objcha_line = 0;
 	m_z_rejection = 0;

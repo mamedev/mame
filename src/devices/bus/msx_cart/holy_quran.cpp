@@ -50,9 +50,9 @@ void msx_cart_holy_quran::restore_banks()
 
 void msx_cart_holy_quran::device_reset()
 {
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
 }
 

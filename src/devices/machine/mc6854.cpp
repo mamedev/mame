@@ -197,9 +197,9 @@ mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, dev
 		m_rfifo[i] = 0;
 	}
 
-	for (int i = 0; i < MAX_FRAME_LENGTH; i++)
+	for (auto & elem : m_frame)
 	{
-		m_frame[i] = 0;
+		elem = 0;
 	}
 }
 

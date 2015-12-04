@@ -774,9 +774,9 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 #define DATAGOOD 8
 // data postamble is good
 #define DATAPOST 16
-		for (int i = 0; i < 16; i++) {
+		for (auto & elem : visualgrid) {
 			for (int j = 0; j < 35; j++) {
-				visualgrid[i][j] = 0;
+				elem[j] = 0;
 			}
 		}
 		image->get_actual_geometry(g_tracks, g_heads);
@@ -822,8 +822,8 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 
 						if(hb == 4) {
 								UINT8 h[11];
-								for(int i=0; i<11; i++)
-										h[i] = gb(buf, ts, pos, wrap);
+								for(auto & elem : h)
+										elem = gb(buf, ts, pos, wrap);
 								//UINT8 v2 = gcr6bw_tb[h[2]];
 								UINT8 vl = gcr4_decode(h[0],h[1]);
 								UINT8 tr = gcr4_decode(h[2],h[3]);
@@ -1140,9 +1140,9 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 #define DATAGOOD 8
 // data postamble is good
 #define DATAPOST 16
-		for (int i = 0; i < 18; i++) {
+		for (auto & elem : visualgrid) {
 			for (int j = 0; j < 35; j++) {
-				visualgrid[i][j] = 0;
+				elem[j] = 0;
 			}
 		}
 		image->get_actual_geometry(g_tracks, g_heads);
@@ -1182,8 +1182,8 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 
 				if(hb == 4) {
 						UINT8 h[11];
-						for(int i=0; i<11; i++)
-								h[i] = gb(buf, ts, pos, wrap);
+						for(auto & elem : h)
+								elem = gb(buf, ts, pos, wrap);
 						//UINT8 v2 = gcr6bw_tb[h[2]];
 						UINT8 vl = gcr4_decode(h[0],h[1]);
 						UINT8 tr = gcr4_decode(h[2],h[3]);
@@ -1345,8 +1345,8 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 								oldpos=pos;
 								UINT8 h[7];
 								// grab exactly 7 bytes: should be Track, Sector, Checksum, AA, FF and FF and the Br0derbund Title ID
-								for(int i=0; i<7; i++)
-										h[i] = gb(buf, ts, pos, wrap);
+								for(auto & elem : h)
+										elem = gb(buf, ts, pos, wrap);
 								UINT8 tr = gcr6bw_tb[h[0]];
 								UINT8 se = gcr6bw_tb[h[1]];
 								UINT8 chk = gcr6bw_tb[h[2]];

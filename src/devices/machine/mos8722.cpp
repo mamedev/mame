@@ -100,9 +100,9 @@ void mos8722_device::device_start()
 
 void mos8722_device::device_reset()
 {
-	for (int i = 0; i < 16; i++)
+	for (auto & elem : m_reg)
 	{
-		m_reg[i] = 0;
+		elem = 0;
 	}
 
 	m_reg[P1L] = 0x01;

@@ -634,9 +634,9 @@ void lsi53c810_device::device_start()
 	m_dma_cb.bind_relative_to(*owner());
 	m_fetch_cb.bind_relative_to(*owner());
 
-	for (int i = 0; i < 256; i++)
+	for (auto & elem : dma_opcode)
 	{
-		dma_opcode[i] = opcode_handler_delegate(FUNC(lsi53c810_device::dmaop_invalid), this);
+		elem = opcode_handler_delegate(FUNC(lsi53c810_device::dmaop_invalid), this);
 	}
 
 	add_opcode(0x00, 0xc0, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_block_move ), this));

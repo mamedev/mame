@@ -1763,8 +1763,8 @@ void floppy_image_format_t::generate_track_from_levels(int track, int head, std:
 	// Also check if all MG values are valid
 
 	int transition_count = 0;
-	for(unsigned int i=0; i<trackbuf.size(); i++) {
-		switch(trackbuf[i] & floppy_image::MG_MASK) {
+	for(auto & elem : trackbuf) {
+		switch(elem & floppy_image::MG_MASK) {
 		case MG_1:
 			transition_count++;
 			break;
@@ -1809,9 +1809,9 @@ void floppy_image_format_t::generate_track_from_levels(int track, int head, std:
 
 	UINT32 cbit = floppy_image::MG_A;
 	UINT32 count = 0;
-	for(unsigned int i=0; i<trackbuf.size(); i++) {
-		UINT32 bit = trackbuf[i] & floppy_image::MG_MASK;
-		UINT32 time = trackbuf[i] & floppy_image::TIME_MASK;
+	for(auto & elem : trackbuf) {
+		UINT32 bit = elem & floppy_image::MG_MASK;
+		UINT32 time = elem & floppy_image::TIME_MASK;
 		if(bit == MG_0) {
 			count += time;
 			continue;
@@ -1824,7 +1824,7 @@ void floppy_image_format_t::generate_track_from_levels(int track, int head, std:
 			continue;
 		}
 		dest.push_back(cbit | count);
-		dest.push_back(trackbuf[i]);
+		dest.push_back(elem);
 		count = 0;
 	}
 

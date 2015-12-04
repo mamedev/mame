@@ -431,8 +431,8 @@ void pci_bridge_device::device_start()
 {
 	pci_device::device_start();
 
-	for(int i=0; i<32*8; i++)
-		sub_devices[i] = nullptr;
+	for(auto & elem : sub_devices)
+		elem = nullptr;
 
 	for(device_t *d = bus_root()->first_subdevice(); d != nullptr; d = d->next()) {
 		const char *t = d->tag();

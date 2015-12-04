@@ -95,9 +95,9 @@ mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, dev
 	m_index_pulse(0),
 	m_timer_cont(nullptr)
 {
-	for (int i = 0; i < 128; i++)
+	for (auto & elem : m_data)
 	{
-		m_data[i] = 0;
+		elem = 0;
 	}
 }
 

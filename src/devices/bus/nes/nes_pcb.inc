@@ -325,20 +325,20 @@ static const nes_pcb pcb_list[] =
 
 static const nes_pcb *nes_pcb_lookup( const char *slot )
 {
-	for (int i = 0; i < ARRAY_LENGTH(pcb_list); i++)
+	for (auto & elem : pcb_list)
 	{
-		if (!core_stricmp(pcb_list[i].slot_opt, slot))
-			return &pcb_list[i];
+		if (!core_stricmp(elem.slot_opt, slot))
+			return &elem;
 	}
 	return nullptr;
 }
 
 static const nes_pcb *nes_id_lookup( int id )
 {
-	for (int i = 0; i < ARRAY_LENGTH(pcb_list); i++)
+	for (auto & elem : pcb_list)
 	{
-		if (pcb_list[i].pcb_id == id)
-			return &pcb_list[i];
+		if (elem.pcb_id == id)
+			return &elem;
 	}
 	return nullptr;
 }

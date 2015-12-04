@@ -317,8 +317,8 @@ void tc0480scp_device::device_reset()
 {
 	m_dblwidth = 0;
 
-	for (int i = 0; i < 0x18; i++)
-		m_ctrl[i] = 0;
+	for (auto & elem : m_ctrl)
+		elem = 0;
 
 }
 

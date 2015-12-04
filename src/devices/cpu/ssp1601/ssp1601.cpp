@@ -504,9 +504,9 @@ void ssp1601_device::device_start()
 		m_r[i] = 0;
 	}
 	memset( m_RAM, 0, sizeof(m_RAM));
-	for ( int i = 0; i < 6; i++ )
+	for (auto & elem : m_stack)
 	{
-		m_stack[i] = 0;
+		elem = 0;
 	}
 	m_ppc.d = 0;
 	m_g_cycles = 0;

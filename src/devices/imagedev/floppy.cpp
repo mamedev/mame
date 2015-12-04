@@ -1171,7 +1171,7 @@ void floppy_sound_device::device_start()
 	m_samplesize_motor_start = 0;
 	m_samplesize_motor_loop = 0;
 	m_samplesize_motor_end = 0;
-	for (int i = 0; i < MAX_STEP_SAMPLES; ++i) m_samplesize_step[i] = 0;
+	for (auto & elem : m_samplesize_step) elem = 0;
 
 	// Read audio samples. The samples are stored in the list m_samples.
 	m_loaded = load_samples();

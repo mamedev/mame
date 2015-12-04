@@ -139,9 +139,9 @@ void necdsp_device::device_start()
 
 void necdsp_device::device_reset()
 {
-	for (unsigned i = 0; i <  2048; i++)
+	for (auto & elem : dataRAM)
 	{
-		dataRAM[i] = 0x0000;
+		elem = 0x0000;
 	}
 
 	regs.pc = 0x0000;

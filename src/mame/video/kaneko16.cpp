@@ -116,8 +116,8 @@ VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
 
 	/* Render the hi-color static backgrounds held in the ROMs */
 
-	for (int screen = 0; screen < 32; screen++)
-		m_bg15_bitmap[screen].allocate(256, 256);
+	for (auto & elem : m_bg15_bitmap)
+		elem.allocate(256, 256);
 
 /*
     8aba is used as background color

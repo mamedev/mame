@@ -2335,12 +2335,12 @@ void m68000_base_device::clear_all()
 {
 	cpu_type= 0;
 //  dasm_type= 0;
-	for (int i=0;i<16;i++)
-		dar[i]= 0;
+	for (auto & elem : dar)
+		elem= 0;
 	ppc= 0;
 	pc= 0;
-	for (int i=0;i<7;i++)
-		sp[i]= 0;
+	for (auto & elem : sp)
+		elem= 0;
 	vbr= 0;
 	sfc= 0;
 	dfc= 0;

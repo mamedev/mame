@@ -108,29 +108,29 @@ void ics2115_device::device_reset()
 	m_vmode = 0;
 	m_irq_on = false;
 	memset(m_voice, 0, sizeof(m_voice));
-	for(int i = 0; i < 2; ++i)
+	for(auto & elem : m_timer)
 	{
-		m_timer[i].timer->adjust(attotime::never);
-		m_timer[i].period = 0;
-		m_timer[i].scale = 0;
-		m_timer[i].preset = 0;
+		elem.timer->adjust(attotime::never);
+		elem.period = 0;
+		elem.scale = 0;
+		elem.preset = 0;
 	}
-	for(int i = 0; i < 32; i++) {
-		m_voice[i].osc_conf.value = 2;
-		m_voice[i].osc.fc = 0;
-		m_voice[i].osc.acc = 0;
-		m_voice[i].osc.start = 0;
-		m_voice[i].osc.end = 0;
-		m_voice[i].osc.ctl = 0;
-		m_voice[i].osc.saddr = 0;
-		m_voice[i].vol.acc = 0;
-		m_voice[i].vol.incr = 0;
-		m_voice[i].vol.start = 0;
-		m_voice[i].vol.end = 0;
-		m_voice[i].vol.pan = 0x7F;
-		m_voice[i].vol_ctrl.value = 1;
-		m_voice[i].vol.mode = 0;
-		m_voice[i].state.value = 0;
+	for(auto & elem : m_voice) {
+		elem.osc_conf.value = 2;
+		elem.osc.fc = 0;
+		elem.osc.acc = 0;
+		elem.osc.start = 0;
+		elem.osc.end = 0;
+		elem.osc.ctl = 0;
+		elem.osc.saddr = 0;
+		elem.vol.acc = 0;
+		elem.vol.incr = 0;
+		elem.vol.start = 0;
+		elem.vol.end = 0;
+		elem.vol.pan = 0x7F;
+		elem.vol_ctrl.value = 1;
+		elem.vol.mode = 0;
+		elem.state.value = 0;
 	}
 }
 

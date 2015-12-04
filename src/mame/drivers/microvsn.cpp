@@ -163,16 +163,16 @@ MACHINE_START_MEMBER(microvision_state, microvision)
 
 MACHINE_RESET_MEMBER(microvision_state, microvision)
 {
-	for( int i = 0; i < 8; i++ )
+	for(auto & elem : m_lcd_latch)
 	{
-		m_lcd_latch[i] = 0;
+		elem = 0;
 	}
 
-	for( int i = 0; i < 16; i++ )
+	for(auto & elem : m_lcd)
 	{
 		for ( int j = 0; j < 16; j++ )
 		{
-			m_lcd[i][j] = 0;
+			elem[j] = 0;
 		}
 	}
 
@@ -225,11 +225,11 @@ void microvision_state::update_lcd()
 	{
 		UINT16 temp = row;
 
-		for ( int j = 0; j < 16; j++ )
+		for (auto & elem : m_lcd)
 		{
 			if ( ( temp & col ) & 0x8000 )
 			{
-				m_lcd[j][i] = 15;
+				elem[i] = 15;
 			}
 			temp <<= 1;
 		}
@@ -256,13 +256,13 @@ void microvision_state::screen_vblank(screen_device &screen, bool state)
 {
 	if ( state )
 	{
-		for ( int i = 0; i < 16; i++ )
+		for (auto & elem : m_lcd)
 		{
 			for ( int j= 0; j < 16; j++ )
 			{
-				if ( m_lcd[i][j] )
+				if ( elem[j] )
 				{
-					m_lcd[i][j]--;
+					elem[j]--;
 				}
 			}
 		}

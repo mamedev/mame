@@ -649,9 +649,9 @@ void nakajies_state::machine_reset()
 	m_matrix = 0;
 
 	/* Initialize banks */
-	for ( int i = 0; i < 8; i++ )
+	for (auto & elem : m_bank)
 	{
-		m_bank[i] = 0;
+		elem = 0;
 	}
 	memset(m_ram_base, 0, m_ram_size);
 	update_banks();

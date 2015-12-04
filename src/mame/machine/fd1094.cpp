@@ -500,8 +500,8 @@ fd1094_decryption_cache::fd1094_decryption_cache(fd1094_device &fd1094)
 void fd1094_decryption_cache::reset()
 {
 	// reset all allocated cache buffers
-	for (int cache = 0; cache < 256; cache++)
-		m_decrypted_opcodes[cache].clear();
+	for (auto & elem : m_decrypted_opcodes)
+		elem.clear();
 }
 
 
@@ -570,9 +570,9 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 
 	// create the initial masked opcode table
 	memset(m_masked_opcodes_lookup, 0, sizeof(m_masked_opcodes_lookup));
-	for (int index = 0; index < ARRAY_LENGTH(s_masked_opcodes); index++)
+	for (auto opcode : s_masked_opcodes)
 	{
-		UINT16 opcode = s_masked_opcodes[index];
+		
 		m_masked_opcodes_lookup[0][opcode >> 4] |= 1 << ((opcode >> 1) & 7);
 		m_masked_opcodes_lookup[1][opcode >> 4] |= 1 << ((opcode >> 1) & 7);
 	}

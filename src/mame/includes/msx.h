@@ -159,9 +159,9 @@ public:
 		}
 		m_mouse[0] = m_mouse[1] = 0;
 		m_mouse_stat[0] = m_mouse_stat[1] = 0;
-		for (int i = 0; i < ARRAY_LENGTH(m_irq_state); i++)
+		for (auto & elem : m_irq_state)
 		{
-			m_irq_state[i] = CLEAR_LINE;
+			elem = CLEAR_LINE;
 		}
 	}
 

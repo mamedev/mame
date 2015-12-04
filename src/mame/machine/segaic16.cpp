@@ -487,8 +487,8 @@ void sega_315_5195_mapper_device::configure_explicit(const UINT8 *map_data)
 void sega_315_5195_mapper_device::fd1094_state_change(UINT8 state)
 {
 	// iterate over regions and set the decrypted address of any ROM banks
-	for (int index = 0; index < ARRAY_LENGTH(m_banks); index++)
-		m_banks[index].update();
+	for (auto & elem : m_banks)
+		elem.update();
 }
 
 
@@ -511,16 +511,16 @@ void sega_315_5195_mapper_device::device_start()
 	// if we are mapping an FD1089, tell all the banks
 	fd1089_base_device *fd1089 = dynamic_cast<fd1089_base_device *>(m_cpu);
 	if (fd1089 != nullptr)
-		for (int banknum = 0; banknum < ARRAY_LENGTH(m_banks); banknum++)
-			m_banks[banknum].set_decrypt(fd1089);
+		for (auto & elem : m_banks)
+			elem.set_decrypt(fd1089);
 
 	// if we are mapping an FD1094, register for state change notifications and tell all the banks
 	fd1094_device *fd1094 = dynamic_cast<fd1094_device *>(m_cpu);
 	if (fd1094 != nullptr)
 	{
 		fd1094->notify_state_change(fd1094_device::state_change_delegate(FUNC(sega_315_5195_mapper_device::fd1094_state_change), this));
-		for (int banknum = 0; banknum < ARRAY_LENGTH(m_banks); banknum++)
-			m_banks[banknum].set_decrypt(fd1094);
+		for (auto & elem : m_banks)
+			elem.set_decrypt(fd1094);
 	}
 
 	// find the address space that is to be mapped

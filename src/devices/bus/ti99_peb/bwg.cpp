@@ -547,8 +547,8 @@ void snug_bwg_device::set_floppy_motors_running(bool run)
 	m_wd1773->set_force_ready(run);
 
 	// Set all motors
-	for (int i=0; i < 4; i++)
-		if (m_floppy[i] != nullptr) m_floppy[i]->mon_w((run)? 0 : 1);
+	for (auto & elem : m_floppy)
+		if (elem != nullptr) elem->mon_w((run)? 0 : 1);
 
 	// The motor-on line also connects to the wait state logic
 	operate_ready_line();
@@ -621,8 +621,8 @@ void snug_bwg_device::device_reset()
 
 void snug_bwg_device::device_config_complete()
 {
-	for (int i=0; i < 4; i++)
-		m_floppy[i] = nullptr;
+	for (auto & elem : m_floppy)
+		elem = nullptr;
 
 	// Seems to be null when doing a "-listslots"
 	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->first_subdevice());

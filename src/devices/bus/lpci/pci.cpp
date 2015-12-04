@@ -93,8 +93,8 @@ pci_bus_device::pci_bus_device(const machine_config &mconfig, const char *tag, d
 		device_t(mconfig, PCI_BUS, "PCI Bus", tag, owner, clock, "pci_bus", __FILE__), m_busnum(0),
 		m_father(nullptr), m_address(0), m_devicenum(0), m_busnumber(0), m_busnumaddr(nullptr)
 {
-	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++) {
-		m_devtag[i]= nullptr;
+	for (auto & elem : m_devtag) {
+		elem= nullptr;
 	}
 	m_siblings_count = 0;
 }

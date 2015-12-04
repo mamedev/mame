@@ -1715,9 +1715,9 @@ void se3208_device::BuildTable(void)
 
 void se3208_device::device_reset()
 {
-	for ( int i = 0; i < 8; i++ )
+	for (auto & elem : m_R)
 	{
-		m_R[i] = 0;
+		elem = 0;
 	}
 	m_SP = 0;
 	m_ER = 0;

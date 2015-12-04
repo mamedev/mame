@@ -62,11 +62,11 @@ bfmdm01_device::bfmdm01_device(const machine_config &mconfig, const char *tag, d
 	m_comdata(0),
 	m_busy_cb(*this)
 {
-	for (int i = 0; i < 65; i++)
-	m_segbuffer[i] = 0;
+	for (auto & elem : m_segbuffer)
+	elem = 0;
 
-	for (int i = 0; i < DM_BYTESPERROW; i++)
-	m_scanline[i] = 0;
+	for (auto & elem : m_scanline)
+	elem = 0;
 }
 
 //-------------------------------------------------

@@ -144,8 +144,8 @@ void okim9810_device::device_start()
 void okim9810_device::device_reset()
 {
 	m_stream->update();
-	for (int voicenum = 0; voicenum < OKIM9810_VOICES; voicenum++)
-		m_voice[voicenum].m_playing = false;
+	for (auto & elem : m_voice)
+		elem.m_playing = false;
 }
 
 
@@ -191,8 +191,8 @@ void okim9810_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
 	// iterate over voices and accumulate sample data
-	for (int voicenum = 0; voicenum < OKIM9810_VOICES; voicenum++)
-		m_voice[voicenum].generate_audio(*m_direct, outputs, samples, m_global_volume, clock(), m_filter_type);
+	for (auto & elem : m_voice)
+		elem.generate_audio(*m_direct, outputs, samples, m_global_volume, clock(), m_filter_type);
 }
 
 

@@ -292,8 +292,8 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 		m_io(nullptr),
 		m_direct(nullptr)
 {
-	for (int i = 0; i < 4; i++)
-		m_ef[i] = CLEAR_LINE;
+	for (auto & elem : m_ef)
+		elem = CLEAR_LINE;
 }
 
 

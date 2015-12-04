@@ -86,9 +86,9 @@ void vic1010_device::device_start()
 
 void vic1010_device::device_reset()
 {
-	for (int i = 0; i < MAX_SLOTS; i++)
+	for (auto & elem : m_expansion_slot)
 	{
-		m_expansion_slot[i]->reset();
+		elem->reset();
 	}
 }
 
@@ -99,9 +99,9 @@ void vic1010_device::device_reset()
 
 UINT8 vic1010_device::vic20_cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	for (int i = 0; i < MAX_SLOTS; i++)
+	for (auto elem : m_expansion_slot)
 	{
-		UINT8 slot_data = m_expansion_slot[i]->cd_r(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+		UINT8 slot_data = elem->cd_r(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 
 		if (data != slot_data)
 		{
@@ -119,8 +119,8 @@ UINT8 vic1010_device::vic20_cd_r(address_space &space, offs_t offset, UINT8 data
 
 void vic1010_device::vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	for (int i = 0; i < MAX_SLOTS; i++)
+	for (auto & elem : m_expansion_slot)
 	{
-		m_expansion_slot[i]->cd_w(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+		elem->cd_w(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 	}
 }

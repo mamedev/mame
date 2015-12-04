@@ -1386,7 +1386,7 @@ void geneve_mapper_device::device_reset()
 	m_pfm_output_enable = true;
 
 	// Clear map
-	for (int i=0; i < 8; i++) m_map[i] = 0;
+	for (auto & elem : m_map) elem = 0;
 
 	m_genmod = false;
 

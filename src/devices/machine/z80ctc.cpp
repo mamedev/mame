@@ -183,9 +183,9 @@ int z80ctc_device::z80daisy_irq_state()
 
 	// loop over all channels
 	int state = 0;
-	for (int ch = 0; ch < 4; ch++)
+	for (auto & channel : m_channel)
 	{
-		ctc_channel &channel = m_channel[ch];
+		
 
 		// if we're servicing a request, don't indicate more interrupts
 		if (channel.m_int_state & Z80_DAISY_IEO)

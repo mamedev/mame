@@ -712,9 +712,9 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 			l->tmap->set_scroll_rows(1);
 			l->tmap->set_scroll_cols(1);
 
-			for (int r = 0; r < 3; r++)
+			for (auto visible : m_ss9601_reelrects)
 			{
-				rectangle visible = m_ss9601_reelrects[r];
+				
 
 				for (int x = 0; x < 0x40; x++)
 				{

@@ -466,8 +466,8 @@ crt9007_t::crt9007_t(const machine_config &mconfig, const char *tag, device_t *o
 	m_write_slg(*this),
 	m_write_sld(*this)
 {
-	for (int i = 0; i < 0x3d; i++)
-		m_reg[i] = 0;
+	for (auto & elem : m_reg)
+		elem = 0;
 }
 
 

@@ -658,8 +658,8 @@ public:
 	ATTR_COLD void reset()
 	{
 		m_pos = 0;
-		for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
-			m_buffer[i] = nullptr;
+		for (auto & elem : m_buffer)
+			elem = nullptr;
 	}
 
 	ATTR_COLD int resolve()

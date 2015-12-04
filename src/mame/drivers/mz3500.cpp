@@ -770,10 +770,10 @@ void mz3500_state::machine_reset()
 	{
 		m_fdd_sel = 0;
 		{
-			for(int i=0;i<4;i++)
+			for(auto & elem : m_floppy_connector)
 			{
-				m_floppy_connector[i]->get_device()->mon_w(ASSERT_LINE);
-				m_floppy_connector[i]->get_device()->set_rpm(300);
+				elem->get_device()->mon_w(ASSERT_LINE);
+				elem->get_device()->set_rpm(300);
 			}
 
 			machine().device<upd765a_device>("upd765a")->set_rate(250000);

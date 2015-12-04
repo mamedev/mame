@@ -320,8 +320,8 @@ WRITE8_MEMBER(stratos_state::lcd_w)
 	idx++;
 	if(idx == 18*2) {
 		logerror("lcd");
-		for(int i=0; i<18; i++)
-			logerror(" %02x", vals[i]);
+		for(auto & val : vals)
+			logerror(" %02x", val);
 		logerror("\n");
 	}
 }

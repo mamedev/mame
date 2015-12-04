@@ -333,8 +333,8 @@ void ti_fdc_device::set_floppy_motors_running(bool run)
 	m_fd1771->set_force_ready(run);
 
 	// Set all motors
-	for (int i=0; i < 3; i++)
-		if (m_floppy[i] != nullptr) m_floppy[i]->mon_w((run)? 0 : 1);
+	for (auto & elem : m_floppy)
+		if (elem != nullptr) elem->mon_w((run)? 0 : 1);
 
 	// The motor-on line also connects to the wait state logic
 	operate_ready_line();

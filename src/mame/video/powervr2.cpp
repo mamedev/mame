@@ -921,9 +921,9 @@ WRITE32_MEMBER( powervr2_device::softreset_w )
 		logerror("%s: Core Pipeline soft reset\n", tag());
 #endif
 		if (start_render_received == 1) {
-			for (int a=0;a < NUM_BUFFERS;a++)
-				if (grab[a].busy == 1)
-					grab[a].busy = 0;
+			for (auto & elem : grab)
+				if (elem.busy == 1)
+					elem.busy = 0;
 			start_render_received = 0;
 		}
 	}

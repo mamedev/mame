@@ -97,8 +97,8 @@ s2636_device::s2636_device(const machine_config &mconfig, const char *tag, devic
 		m_y_offset(0),
 		m_x_offset(0)
 {
-	for (int i = 0; i < 1; i++)
-		m_reg[i] = 0;
+	for (auto & elem : m_reg)
+		elem = 0;
 }
 
 //-------------------------------------------------

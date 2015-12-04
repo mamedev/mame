@@ -3874,8 +3874,8 @@ MACHINE_START_MEMBER(namcos22_state,adillor)
 {
 	machine_start();
 
-	for (int axis = 0; axis < 2; axis++)
-		m_ar_tb_interrupt[axis] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos22_state::adillor_trackball_interrupt),this));
+	for (auto & elem : m_ar_tb_interrupt)
+		elem = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos22_state::adillor_trackball_interrupt),this));
 }
 
 static MACHINE_CONFIG_DERIVED( adillor, namcos22s )

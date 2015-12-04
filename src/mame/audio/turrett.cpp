@@ -69,8 +69,8 @@ void turrett_device::device_start()
 
 void turrett_device::device_reset()
 {
-	for (int ch = 0; ch < SOUND_CHANNELS; ++ch)
-		m_channels[ch].m_playing = false;
+	for (auto & elem : m_channels)
+		elem.m_playing = false;
 }
 
 

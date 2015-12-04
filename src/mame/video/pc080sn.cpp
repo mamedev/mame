@@ -61,8 +61,8 @@ pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, d
 	m_gfxdecode(*this),
 	m_palette(*this)
 {
-	for (int i = 0; i < 8; i++)
-		m_ctrl[i] = 0;
+	for (auto & elem : m_ctrl)
+		elem = 0;
 
 	for (int i = 0; i < 2; i++)
 	{

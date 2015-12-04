@@ -65,11 +65,11 @@ exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, cons
 {
 	m_sound_banks[0] = m_sound_banks[1] = m_sound_banks[2] = m_sound_banks[3] = 0;
 
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_sound_channel)
 	{
-		m_sound_channel[i].base = nullptr;
-		m_sound_channel[i].offset = 0;
-		m_sound_channel[i].remaining = 0;
+		elem.base = nullptr;
+		elem.offset = 0;
+		elem.remaining = 0;
 	}
 }
 

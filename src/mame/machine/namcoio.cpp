@@ -181,8 +181,8 @@ void namcoio_device::device_start()
 
 void namcoio_device::device_reset()
 {
-	for (int i = 0; i < 16; i++)
-		m_ram[i] = 0;
+	for (auto & elem : m_ram)
+		elem = 0;
 
 	set_reset_line(PULSE_LINE);
 }

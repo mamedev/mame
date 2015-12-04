@@ -11,13 +11,13 @@ msx_cart_majutsushi::msx_cart_majutsushi(const machine_config &mconfig, const ch
 	, msx_cart_interface(mconfig, *this)
 	, m_dac(*this, "dac")
 {
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_selected_bank)
 	{
-		m_selected_bank[i] = 0;
+		elem = 0;
 	}
-	for (int i = 0; i < 8; i++)
+	for (auto & elem : m_bank_base)
 	{
-		m_bank_base[i] = nullptr;
+		elem = nullptr;
 	}
 }
 
