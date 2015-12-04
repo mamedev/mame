@@ -376,7 +376,7 @@ ROM_START( mirage )
 	ROM_LOAD( "mbl-03.10a", 0x000000, 0x200000, CRC(4a599703) SHA1(b49e84faa2d6acca952740d30fc8d1a33ac47e79) )
 
 	ROM_REGION( 0x200000, "oki_bgm", 0 )
-	ROM_COPY( "oki_bgm_data", 0x000000, 0x000000, 0x080000 )
+	ROM_COPY( "oki_bgm_data", nullptr, 0x000000, 0x080000 )
 	ROM_COPY( "oki_bgm_data", 0x100000, 0x080000, 0x080000 ) // - banks 2,3 and 4,5 are swapped, PAL address shuffle
 	ROM_COPY( "oki_bgm_data", 0x080000, 0x100000, 0x080000 ) // /
 	ROM_COPY( "oki_bgm_data", 0x180000, 0x180000, 0x080000 )

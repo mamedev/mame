@@ -46,7 +46,7 @@ public:
 		m_floppy5(*this, MB8877_TAG":5"),
 		m_floppy6(*this, MB8877_TAG":6"),
 		m_floppy7(*this, MB8877_TAG":7"),
-		m_floppy(NULL),
+		m_floppy(nullptr),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_rom(*this, Z80_TAG),
 		m_sw1(*this, "SW1"),

@@ -128,7 +128,7 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 WRITE8_MEMBER( myb3k_state::myb3k_fdc_output_w )
 {
 	/* TODO: complete guesswork! (it just does a 0x24 -> 0x20 in there) */
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (data & 1) floppy = m_floppy0;
 	if (data & 2) floppy = m_floppy1;

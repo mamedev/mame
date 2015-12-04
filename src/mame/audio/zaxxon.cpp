@@ -88,7 +88,7 @@ static const char *const zaxxon_sample_names[] =
 	"20",   /* 9 - Alarm 3 (low fuel) */
 	"05",   /* 10 - initial background noise */
 	"04",   /* 11 - looped asteroid noise */
-	0
+	nullptr
 };
 
 
@@ -188,7 +188,7 @@ static const char *const congo_sample_names[] =
 	"congal",   /* 2 */
 	"congah",   /* 3 */
 	"rim",      /* 4 */
-	0
+	nullptr
 };
 
 

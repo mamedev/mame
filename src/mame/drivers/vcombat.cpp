@@ -328,7 +328,7 @@ WRITE16_MEMBER(vcombat_state::crtc_w)
 {
 	mc6845_device *crtc = machine().device<mc6845_device>("crtc");
 
-	if (crtc == NULL)
+	if (crtc == nullptr)
 		return;
 
 	if (m_crtc_select == 0)
@@ -470,8 +470,8 @@ DRIVER_INIT_MEMBER(vcombat_state,shadfgtr)
 	/* Only one i860 */
 	m_i860_framebuffer[0][0] = auto_alloc_array(machine(), UINT16, 0x8000);
 	m_i860_framebuffer[0][1] = auto_alloc_array(machine(), UINT16, 0x8000);
-	m_i860_framebuffer[1][0] = NULL;
-	m_i860_framebuffer[1][1] = NULL;
+	m_i860_framebuffer[1][0] = nullptr;
+	m_i860_framebuffer[1][1] = nullptr;
 }
 
 

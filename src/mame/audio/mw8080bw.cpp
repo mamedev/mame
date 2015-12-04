@@ -139,7 +139,7 @@ static const char *const seawolf_sample_names[] =
 	"dive",
 	"sonar",
 	"minehit",
-	0
+	nullptr
 };
 
 MACHINE_CONFIG_FRAGMENT( seawolf_audio )
@@ -192,7 +192,7 @@ static const char *const gunfight_sample_names[] =
 	"*gunfight",
 	"gunshot",
 	"killed",
-	0
+	nullptr
 };
 
 
@@ -1542,7 +1542,7 @@ static const char *const gmissile_sample_names[] =
 	"*gmissile",
 	"1",    /* missle */
 	"2",    /* explosion */
-	0
+	nullptr
 };
 
 MACHINE_CONFIG_FRAGMENT( gmissile_audio )
@@ -1634,7 +1634,7 @@ static const char *const m4_sample_names[] =
 	"*m4",
 	"1",    /* missle */
 	"2",    /* explosion */
-	0
+	nullptr
 };
 
 
@@ -1890,7 +1890,7 @@ static const char *const clowns_sample_names[] =
 {
 	"*clowns",
 	"miss",
-	0
+	nullptr
 };
 
 MACHINE_CONFIG_FRAGMENT( clowns_audio )
@@ -3263,7 +3263,7 @@ static const char *const phantom2_sample_names[] =
 	"*phantom2",
 	"1",    /* shot */
 	"2",    /* explosion */
-	0
+	nullptr
 };
 
 MACHINE_CONFIG_FRAGMENT( phantom2_audio )
@@ -3506,7 +3506,7 @@ static const char *const invaders_sample_names[] =
 	"7",        /* fleet move 4 */
 	"8",        /* UFO/saucer hit */
 	"9",        /* bonus base */
-	0
+	nullptr
 };
 
 

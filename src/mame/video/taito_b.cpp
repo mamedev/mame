@@ -41,7 +41,7 @@ VIDEO_START_MEMBER(taitob_state,taitob_core)
 {
 	m_framebuffer[0] = auto_bitmap_ind16_alloc(machine(), 512, 256);
 	m_framebuffer[1] = auto_bitmap_ind16_alloc(machine(), 512, 256);
-	m_pixel_bitmap = NULL;  /* only hitice needs this */
+	m_pixel_bitmap = nullptr;  /* only hitice needs this */
 
 	save_item(NAME(m_pixel_scroll));
 

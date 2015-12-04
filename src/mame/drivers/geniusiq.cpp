@@ -770,7 +770,7 @@ DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state,iq128_cart)
 
 	m_cart_state = IQ128_ROM_CART;
 
-	if (image.software_entry() != NULL)
+	if (image.software_entry() != nullptr)
 	{
 		const char *pcb_type = image.get_feature("pcb_type");
 		if (pcb_type)

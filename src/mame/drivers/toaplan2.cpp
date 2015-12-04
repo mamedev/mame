@@ -378,7 +378,7 @@ MACHINE_START_MEMBER(toaplan2_state,toaplan2)
 
 WRITE_LINE_MEMBER(toaplan2_state::toaplan2_reset)
 {
-	if (m_audiocpu != NULL)
+	if (m_audiocpu != nullptr)
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
@@ -3057,7 +3057,7 @@ static const gfx_layout fixeightblayout =
 };
 
 static GFXDECODE_START( truxton2 )
-	GFXDECODE_ENTRY( NULL,   0, truxton2_tx_tilelayout, 64*16, 64 )
+	GFXDECODE_ENTRY( nullptr,   0, truxton2_tx_tilelayout, 64*16, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( raizing )
@@ -3065,7 +3065,7 @@ static GFXDECODE_START( raizing )
 GFXDECODE_END
 
 static GFXDECODE_START( batrider )
-	GFXDECODE_ENTRY( NULL,   0, batrider_tx_tilelayout, 64*16, 64 )
+	GFXDECODE_ENTRY( nullptr,   0, batrider_tx_tilelayout, 64*16, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( fixeightbl )

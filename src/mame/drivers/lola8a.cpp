@@ -231,8 +231,8 @@ READ8_MEMBER(lola8a_state::keyboard_r)
 	{
 		"line_0", "line_1", "line_2", "line_3",
 		"line_4", "line_5", "line_6", "line_7",
-		"line_8", "line_9", NULL, NULL,
-		NULL,NULL,NULL,NULL
+		"line_8", "line_9", nullptr, nullptr,
+		nullptr,nullptr,nullptr,nullptr
 	};
 
 	if( keynames[m_portb & 0x0f])

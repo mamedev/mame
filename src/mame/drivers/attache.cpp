@@ -868,7 +868,7 @@ static const z80_daisy_config attache_daisy_chain[] =
 	{ "ctc" },
 	{ "sio" },
 	// expansion
-	{ NULL }
+	{ nullptr }
 };
 
 static SLOT_INTERFACE_START( attache_floppies )
@@ -986,7 +986,7 @@ MACHINE_CONFIG_END
 
 ROM_START( attache )
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_FILL(0x0000,0x10000,0x00)
+	ROM_FILL(0x0000,0x10000,nullptr)
 
 	ROM_REGION(0x1000, "boot", 0)
 	ROM_SYSTEM_BIOS(0, "u252revg", "Boot Rev.G")

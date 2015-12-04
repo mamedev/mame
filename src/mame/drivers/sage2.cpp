@@ -232,7 +232,7 @@ WRITE8_MEMBER( sage2_state::ppi0_pc_w )
 	update_fdc_int();
 
 	// drive select
-	m_floppy = NULL;
+	m_floppy = nullptr;
 
 	if (!BIT(data, 3)) m_floppy = m_floppy0->get_device();
 	if (!BIT(data, 4)) m_floppy = m_floppy1->get_device();
@@ -490,7 +490,7 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE(I8259_TAG, pic8259_device, ir1_w))
 	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE(I8259_TAG, pic8259_device, ir3_w))
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_1_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_1_TAG, i8251_device, write_dsr))
 

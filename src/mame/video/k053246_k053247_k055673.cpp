@@ -49,8 +49,8 @@ The sprite RAM format is very similar to the 053245.
 
 void k053247_device::clear_all()
 {
-	m_ram = 0;
-	m_gfx = 0;
+	m_ram = nullptr;
+	m_gfx = nullptr;
 
 	for (int i=0;i<8;i++)
 		m_kx46_regs[i] = 0;
@@ -61,7 +61,7 @@ void k053247_device::clear_all()
 	m_objcha_line = 0;
 	m_z_rejection = 0;
 
-	m_memory_region = 0;
+	m_memory_region = nullptr;
 }
 
 void k053247_device::k053247_get_ram( UINT16 **ram )
@@ -400,7 +400,7 @@ void k053247_device::k053247_sprites_draw_common( _BitmapClass &bitmap, const re
 		m_k053247_cb(&code, &color, &primask);
 
 		k053247_draw_single_sprite_gxcore( bitmap, cliprect,
-				NULL, NULL,
+				nullptr, nullptr,
 				code, m_ram, offs,
 				color,
 				/* gx only */
@@ -967,7 +967,7 @@ void k055673_device::device_start()
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (m_gfxdecode->gfx(gfx_index) == 0)
+		if (m_gfxdecode->gfx(gfx_index) == nullptr)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 

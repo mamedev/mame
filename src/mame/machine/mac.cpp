@@ -1910,7 +1910,7 @@ void mac_state::machine_reset()
 		this->set_memory_overlay(1);
 	}
 
-	if (m_overlay_timeout != (emu_timer *)NULL)
+	if (m_overlay_timeout != (emu_timer *)nullptr)
 	{
 		m_overlay_timeout->adjust(m_maincpu->cycles_to_attotime(8));
 	}
@@ -1919,7 +1919,7 @@ void mac_state::machine_reset()
 	this->m_screen_buffer = 1;
 
 	/* setup 'classic' sound */
-	if (machine().device("custom") != NULL)
+	if (machine().device("custom") != nullptr)
 	{
 		machine().device<mac_sound_device>("custom")->set_sound_buffer(0);
 	}
@@ -2092,7 +2092,7 @@ void mac_state::mac_driver_init(model_t model)
 	}
 	else
 	{
-		m_overlay_timeout = (emu_timer *)NULL;
+		m_overlay_timeout = (emu_timer *)nullptr;
 	}
 
 	/* setup keyboard */
@@ -2257,7 +2257,7 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 {
 	int scanline;
 
-	if (machine().device("custom") != NULL)
+	if (machine().device("custom") != nullptr)
 	{
 		machine().device<mac_sound_device>("custom")->sh_updatebuffer();
 	}
@@ -3138,7 +3138,7 @@ const char *lookup_trap(UINT16 opcode)
 		if (traps[i].trap == opcode)
 			return traps[i].name;
 	}
-	return NULL;
+	return nullptr;
 }
 
 

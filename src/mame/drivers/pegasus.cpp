@@ -424,7 +424,7 @@ int pegasus_state::load_cart(device_image_interface &image, generic_slot_device 
 		return IMAGE_INIT_FAIL;
 	}
 
-	if (image.software_entry() != NULL && size == 0)
+	if (image.software_entry() != nullptr && size == 0)
 	{
 		// we might be loading a cart compatible with all sockets!
 		// so try to get region "rom"

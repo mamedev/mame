@@ -97,7 +97,7 @@ ADDRESS_MAP_END
 
 const address_space_config *ppu2c0x_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 
@@ -124,7 +124,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 				: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_memory_interface(mconfig, *this),
 					device_video_interface(mconfig, *this),
-					m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(ppu2c0x)),
+					m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(ppu2c0x)),
 					m_cpu(*this),
 					m_scanline(0),  // reset the scanline count
 					m_refresh_data(0),

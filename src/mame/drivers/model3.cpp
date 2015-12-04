@@ -1632,7 +1632,7 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 			// clear the interrupt
 			set_irq_line(0x40, CLEAR_LINE);
 
-			if (m_dsbz80 != NULL)
+			if (m_dsbz80 != nullptr)
 			{
 				m_dsbz80->latch_w(space, 0, data&0xff);
 			}
@@ -2102,16 +2102,16 @@ ROM_START( lemans24 )   /* step 1.5, Sega game ID# is 833-13159, ROM board ID# 8
 	ROM_LOAD( "mpr-19870.24", 0x400000, 0x400000, CRC(49c70296) SHA1(9bf88a63c38d318006a9c6c6b7b4452439df876c) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 ROM_END
 
 ROM_START( scud )   /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 834-13072 SPG COMM AUS */
@@ -2181,10 +2181,10 @@ ROM_START( scud )   /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 834-1
 	ROM_LOAD( "mpr-19606.60",  0x600000, 0x200000, CRC(adad46b2) SHA1(360b23870f1d15ab527fae1bb731da6e7a8b19c1) )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
 	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
@@ -2256,10 +2256,10 @@ ROM_START( scudj )  /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 12934
 	ROM_LOAD( "mpr-19606.60",  0x600000, 0x200000, CRC(adad46b2) SHA1(360b23870f1d15ab527fae1bb731da6e7a8b19c1) )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
 	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
@@ -2331,10 +2331,10 @@ ROM_START( scuda )  /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 834-1
 	ROM_LOAD( "mpr-19606.60",  0x600000, 0x200000, CRC(adad46b2) SHA1(360b23870f1d15ab527fae1bb731da6e7a8b19c1) )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
 	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
@@ -2412,10 +2412,10 @@ ROM_START( scudplus )   /* step 1.5, Sega game ID# is 833-13260 SCUD PLUS, ROM b
 	ROM_LOAD( "mpr-19606.60",  0x600000, 0x200000, CRC(adad46b2) SHA1(360b23870f1d15ab527fae1bb731da6e7a8b19c1) )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
 	ROM_LOAD( "epr-19338.bin", 0x000000, 0x010000, CRC(dbf88de6) SHA1(8f5c83e82c26a37a1ed0476d7dfeb698b8417899) )
@@ -2493,10 +2493,10 @@ ROM_START( scudplusa )  /* step 1.5, Sega game ID# is 833-13260 SCUD PLUS, ROM b
 	ROM_LOAD( "mpr-19606.60",  0x600000, 0x200000, CRC(adad46b2) SHA1(360b23870f1d15ab527fae1bb731da6e7a8b19c1) )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
 	ROM_LOAD( "epr-19338.bin", 0x000000, 0x010000, CRC(dbf88de6) SHA1(8f5c83e82c26a37a1ed0476d7dfeb698b8417899) )
@@ -2565,16 +2565,16 @@ ROM_START( vf3 )    /* step 1.0, Sega game ID# is 833-12712, ROM board ID# 834-1
 	ROM_LOAD( "mpr-19210.24",   0x400000, 0x400000, CRC(c03d6502) SHA1(4ca49fe5dd5105ca5f78f4740477beb64137d4be) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 ROM_END
 
 ROM_START( vf3a )   /* step 1.0, Sega game ID# is 833-12712, ROM board ID# 834-12821 */
@@ -2640,16 +2640,16 @@ ROM_START( vf3a )   /* step 1.0, Sega game ID# is 833-12712, ROM board ID# 834-1
 	ROM_LOAD( "mpr-19210.24",   0x400000, 0x400000, CRC(c03d6502) SHA1(4ca49fe5dd5105ca5f78f4740477beb64137d4be) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 ROM_END
 
 ROM_START( vf3tb )  /* step 1.0? */
@@ -2715,16 +2715,16 @@ ROM_START( vf3tb )  /* step 1.0? */
 	ROM_LOAD( "mpr-19210.24",   0x400000, 0x400000, CRC(c03d6502) SHA1(4ca49fe5dd5105ca5f78f4740477beb64137d4be) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 ROM_END
 
 ROM_START( bass )   /* step 1.0, Sega game ID# is 833-13317, ROM board ID# 834-13318 BSS */
@@ -2784,16 +2784,16 @@ ROM_START( bass )   /* step 1.0, Sega game ID# is 833-13317, ROM board ID# 834-1
 	ROM_LOAD( "mpr-20269.24",  0x400000, 0x400000, CRC(105a3181) SHA1(022cbce1d01366461a584ff6225ded40bcb9000b) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 ROM_END
 
 ROM_START( bassdx ) /* step 1.0, Sega game ID# is 833-13476 BSS DX JPN, ROM board ID# 834-13477 BSS DX JPN */
@@ -2853,16 +2853,16 @@ ROM_START( bassdx ) /* step 1.0, Sega game ID# is 833-13476 BSS DX JPN, ROM boar
 	ROM_LOAD( "mpr-20269.24",  0x400000, 0x400000, CRC(105a3181) SHA1(022cbce1d01366461a584ff6225ded40bcb9000b) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 ROM_END
 
 /*
@@ -2947,16 +2947,16 @@ ROM_START( getbass )    /* step 1.0, Sega game ID# is 833-13416 GET BASS STD, RO
 	ROM_LOAD( "mpr-20269.24",  0x400000, 0x400000, CRC(105a3181) SHA1(022cbce1d01366461a584ff6225ded40bcb9000b) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x10000, "iocpu", 0 ) // kl5c80a16cf code
 	ROM_LOAD( "epr-20690.ic11",  0x00000, 0x10000, CRC(b7da201d) SHA1(7e58eb45ee6ec78250ece7b4fcc4e955b8b4f084) )
@@ -3025,16 +3025,16 @@ ROM_START( lostwsga )   /* Step 1.5, PCB cage labeled 834-13172 THE LOST WORLD U
 	ROM_LOAD( "mpr-19935.24",     0x400000, 0x400000, CRC(91c1b618) SHA1(36573304e9a7f19e17b31a69de9b25d9893bc2dc) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 ROM_END
 
 ROM_START( vs2 )    /* Step 2.0 */
@@ -3100,16 +3100,16 @@ ROM_START( vs2 )    /* Step 2.0 */
 	ROM_LOAD( "mpr-19786.24", 0x400000, 0x400000, CRC(b08d889b) SHA1(790b5b2d62a28c39d43aeec9ffb365ccd9dc93af) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 ROM_END
 
 ROM_START( vs215 )  /* Step 1.5 */
@@ -3175,16 +3175,16 @@ ROM_START( vs215 )  /* Step 1.5 */
 	ROM_LOAD( "mpr-19786.24", 0x400000, 0x400000, CRC(b08d889b) SHA1(790b5b2d62a28c39d43aeec9ffb365ccd9dc93af) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 ROM_END
 
 ROM_START( vs215o ) /* Step 1.5, original release.. might even be for Step 1.0??? */
@@ -3250,16 +3250,16 @@ ROM_START( vs215o ) /* Step 1.5, original release.. might even be for Step 1.0??
 	ROM_LOAD( "mpr-19786.24", 0x400000, 0x400000, CRC(b08d889b) SHA1(790b5b2d62a28c39d43aeec9ffb365ccd9dc93af) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 ROM_END
 
 ROM_START( vs298 )  /* Step 2.0, Sega ID# 833-13346, ROM board ID# 834-13347 */
@@ -3325,16 +3325,16 @@ ROM_START( vs298 )  /* Step 2.0, Sega ID# 833-13346, ROM board ID# 834-13347 */
 	ROM_LOAD( "mpr-20904.24", 0x400000, 0x400000, CRC(21a91b84) SHA1(cd2d7231b8652ff38376b672c47127ce054d1f32) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0237-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "29234e96" )
@@ -3403,16 +3403,16 @@ ROM_START( vs29815 )    /* Step 1.5, ROM board ID# 834-13495 VS2 VER98 STEP 1.5 
 	ROM_LOAD( "mpr-20904.24", 0x400000, 0x400000, CRC(21a91b84) SHA1(cd2d7231b8652ff38376b672c47127ce054d1f32) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 ROM_END
 
 ROM_START( vs2v991 )    /* Step 2.0 */
@@ -3478,16 +3478,16 @@ ROM_START( vs2v991 )    /* Step 2.0 */
 	ROM_LOAD( "mpr-21514.24", 0x400000, 0x400000, CRC(6cedd292) SHA1(c1f44715697a8bac9d39926bcd6558ec9a9b2319) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0245-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "29222ac8" )
@@ -3556,16 +3556,16 @@ ROM_START( vs299b ) /* Step 2.0 */
 	ROM_LOAD( "mpr-21514.24", 0x400000, 0x400000, CRC(6cedd292) SHA1(c1f44715697a8bac9d39926bcd6558ec9a9b2319) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0245-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "29222ac8" )
@@ -3634,16 +3634,16 @@ ROM_START( vs299a ) /* Step 2.0 */
 	ROM_LOAD( "mpr-21514.24", 0x400000, 0x400000, CRC(6cedd292) SHA1(c1f44715697a8bac9d39926bcd6558ec9a9b2319) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0245-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "09222ac8" )
@@ -3712,16 +3712,16 @@ ROM_START( vs299 )  /* Step 2.0 */
 	ROM_LOAD( "mpr-21514.24", 0x400000, 0x400000, CRC(6cedd292) SHA1(c1f44715697a8bac9d39926bcd6558ec9a9b2319) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0245-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "29222ac8" )
@@ -3791,16 +3791,16 @@ ROM_START( von2 )   /* Step 2.0 */
 	ROM_LOAD( "mpr-20666.25",  0xc00000, 0x400000, CRC(3ecb2606) SHA1(a38d1f61933c8873deaff0a913c657b768f9783d) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0234-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "292a0e97" )
@@ -3870,16 +3870,16 @@ ROM_START( von254g )    /* Step 2.0, Sega game ID# is 833-13789 */
 	ROM_LOAD( "mpr-20666.25",  0xc00000, 0x400000, CRC(3ecb2606) SHA1(a38d1f61933c8873deaff0a913c657b768f9783d) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0234-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "292a0e97" )
@@ -3945,16 +3945,16 @@ ROM_START( skichamp )   /* Step 2.0 */
 	ROM_LOAD( "mpr-20335.24",  0x400000, 0x400000, CRC(7300d0a2) SHA1(50aac607e4570883cfc7bd0e1765fd8dfa1f9966) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 ROM_END
 
 ROM_START( swtrilgy )   /* Step 2.1, Sega game ID# is 833-13586, ROM board ID# 834-13587 STAR WARS TRILOGY, Security board ID# 837-13588-COM */
@@ -4020,10 +4020,10 @@ ROM_START( swtrilgy )   /* Step 2.1, Sega game ID# is 833-13586, ROM board ID# 8
 	ROM_LOAD( "mpr-21378.24", 0xc00000, 0x400000, CRC(1fcf715e) SHA1(9706f36e7a61d885d34a6974311a2410fe3d6760) )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x10000, "ffcpu", 0 )   /* force feedback controller prg */
 	ROM_LOAD( "epr-21119.ic8",  0x00000, 0x10000, CRC(65082b14) SHA1(6c3c192dd6ef3780c6202dd63fc6086328928818) )
@@ -4095,10 +4095,10 @@ ROM_START( swtrilgya )  /* Step 2.1, Sega game ID# is 833-13586, ROM board ID# 8
 	ROM_LOAD( "mpr-21378.24", 0xc00000, 0x400000, CRC(1fcf715e) SHA1(9706f36e7a61d885d34a6974311a2410fe3d6760) )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0241-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "31272a01" )
@@ -4153,16 +4153,16 @@ ROM_START( dirtdvls )   /* Step 2.1 - Export version, Sega game ID# is 833-13427
 	ROM_LOAD( "mpr-21032.23",  0x800000, 0x400000, CRC(3d3ff407) SHA1(5e298e24cb3050f8683658cef41ce59948e79166) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0238-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "29290f17" )
@@ -4217,16 +4217,16 @@ ROM_START( dirtdvlsa )  /* Step 2.1 - Australia version */
 	ROM_LOAD( "mpr-21032.23",  0x800000, 0x400000, CRC(3d3ff407) SHA1(5e298e24cb3050f8683658cef41ce59948e79166) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
-	ROM_FILL( 0x000000, 0x800000, 0 )
+	ROM_FILL( 0x000000, 0x800000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0238-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "29290f17" )
@@ -4303,10 +4303,10 @@ ROM_START( daytona2 )   /* Step 2.1, ROM board ID# 834-13428 DAYTONA USA2, Secur
 	ROM_LOAD( "mpr-20890.ic24", 0xc00000, 0x400000, CRC(aac96fa2) SHA1(bc68cd48eae50d3558d3c5a0302a3930639e3019) )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
 	ROM_LOAD( "epr-20985.bin", 0x000000, 0x010000, CRC(b139481d) SHA1(05fca7db7c8b084c53bd157ba3e8296f1a961a99) )
@@ -4386,10 +4386,10 @@ ROM_START( dayto2pe )   /* Step 2.1, Sega game ID# is 833-13610 DAYTONA USA2 SP,
 	ROM_LOAD( "mpr-20890.ic24", 0xc00000, 0x400000, CRC(aac96fa2) SHA1(bc68cd48eae50d3558d3c5a0302a3930639e3019) )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
 	ROM_LOAD( "epr-20985.bin", 0x000000, 0x010000, CRC(b139481d) SHA1(05fca7db7c8b084c53bd157ba3e8296f1a961a99) )
@@ -4461,10 +4461,10 @@ ROM_START( srally2 )    /* Step 2.0, Sega game ID# is 833-13373, ROM board ID# 8
 	ROM_LOAD( "mpr-20640.60", 0xc00000, 0x400000, CRC(9eea07b7) SHA1(bdcf136f29e1435c9d82718730ef209d8cfe74d8) )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
 	ROM_LOAD( "epr-20512.bin", 0x000000, 0x010000, CRC(cf64350d) SHA1(f30c8c7b65fb38f7dd63845f12b81388ff3b946d) )
@@ -4524,16 +4524,16 @@ ROM_START( srally2x )   /* Step 2.0 */
 	ROM_LOAD( "mpr-20485.24", 0x400000, 0x400000, CRC(cfd8c19b) SHA1(3b8cc045cb02b93f9d35b81a48085d4d480d6bff) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
-	ROM_FILL( 0x000000, 0x1000000, 0 )
+	ROM_FILL( 0x000000, 0x1000000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
 	ROM_LOAD( "epr-20512.bin", 0x000000, 0x010000, CRC(cf64350d) SHA1(f30c8c7b65fb38f7dd63845f12b81388ff3b946d) )
@@ -4595,16 +4595,16 @@ ROM_START( harley ) /* Step 2.0, Sega game ID# is 833-13325, ROM board ID# 834-1
 	ROM_LOAD( "mpr-20376.25",  0xc00000, 0x400000, CRC(deeed366) SHA1(6d4809960c34865374d146605bb3e009394f7a8c) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
-	ROM_FILL( 0x000000, 0x1000000, 0 )
+	ROM_FILL( 0x000000, 0x1000000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 ROM_END
 
 ROM_START( harleya )    /* Step 2.0, Sega game ID# is 833-13325, ROM board ID# 834-13326 HARLEY DAVIDSON */
@@ -4663,16 +4663,16 @@ ROM_START( harleya )    /* Step 2.0, Sega game ID# is 833-13325, ROM board ID# 8
 	ROM_LOAD( "mpr-20376.25",  0xc00000, 0x400000, CRC(deeed366) SHA1(6d4809960c34865374d146605bb3e009394f7a8c) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
-	ROM_FILL( 0x000000, 0x1000000, 0 )
+	ROM_FILL( 0x000000, 0x1000000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 ROM_END
 
 ROM_START( fvipers2 )   /* Step 2.0 - Japan version */
@@ -4738,16 +4738,16 @@ ROM_START( fvipers2 )   /* Step 2.0 - Japan version */
 	ROM_LOAD( "mpr-20579",  0xc00000, 0x400000, CRC(08788436) SHA1(6c9af2cf65e803882d6f4c0d57eb9e95cdeb5818) ) /* IC25 ?? */
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
-	ROM_FILL( 0x000000, 0x1000000, 0 )
+	ROM_FILL( 0x000000, 0x1000000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0235-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "29260e96" )
@@ -4824,10 +4824,10 @@ ROM_START( spikeout )   /* Step 2.1 */
 	ROM_LOAD( "mpr-21173.ic24",  0xc00000, 0x400000, CRC(ca7226d6) SHA1(e15c6fb9dee91a42889cef350479b1964bf1e5df) )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0240-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "292f2b04" )
@@ -4904,10 +4904,10 @@ ROM_START( spikeofe )   /* Step 2.1, Sega game ID# is 833-13746, ROM board ID# 8
 	ROM_LOAD( "mpr-21652.ic24",  0xc00000, 0x400000, CRC(e7c8c9bf) SHA1(76d8fa89aed86fff4d1ba704aeef96fd2c326bc9) )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0247-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "29236fc8" )
@@ -4969,16 +4969,16 @@ ROM_START( eca )   /* Step 2.1 Export version */
 	ROM_LOAD( "mpr-22890.25",  0xc00000, 0x400000, CRC(b638bd7c) SHA1(ed9c69175fd0ca4c6f22e542b4e68398a6e4ad07) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
-	ROM_FILL( 0x000000, 0x1000000, 0 )
+	ROM_FILL( 0x000000, 0x1000000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0265-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "2923aa91" )
@@ -5040,16 +5040,16 @@ ROM_START( ecau )    /* Step 2.1, ROM board ID# 834-13946-01 ECA */
 	ROM_LOAD( "mpr-22890.25",  0xc00000, 0x400000, CRC(b638bd7c) SHA1(ed9c69175fd0ca4c6f22e542b4e68398a6e4ad07) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
-	ROM_FILL( 0x000000, 0x1000000, 0 )
+	ROM_FILL( 0x000000, 0x1000000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0265-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "2923aa91" )
@@ -5114,16 +5114,16 @@ ROM_START( ecap )   /* Step 2.1 - Proto or Location test - No security dongle */
 	ROM_LOAD( "mpr-22890.25",  0xc00000, 0x400000, CRC(b638bd7c) SHA1(ed9c69175fd0ca4c6f22e542b4e68398a6e4ad07) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
-	ROM_FILL( 0x000000, 0x1000000, 0 )
+	ROM_FILL( 0x000000, 0x1000000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0265-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "2923aa91" )
@@ -5173,16 +5173,16 @@ ROM_START( magtruck )   /* Step 2.1, Sega game ID# is 833-13601-01 (Export), ROM
 	ROM_LOAD( "mpr-21432.25",  0xc00000, 0x400000, CRC(59c0f6df) SHA1(ab1c6fbcb1244c2b56b6967018fceb82d8c5414c) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
-	ROM_FILL( 0x000000, 0x1000000, 0 )
+	ROM_FILL( 0x000000, 0x1000000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0243-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "29266e45" )
@@ -5244,16 +5244,16 @@ ROM_START( oceanhun )   /* Step 2.0, Sega game ID# is 833-13571, ROM board ID# 8
 	ROM_LOAD( "mpr-21097.25",  0xc00000, 0x400000, CRC(0d8033fc) SHA1(d849a99d5f906d3a8f07b8f14183af14fd0d96e9) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
-	ROM_FILL( 0x000000, 0x1000000, 0 )
+	ROM_FILL( 0x000000, 0x1000000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0242-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "292b6a01" )
@@ -5316,16 +5316,16 @@ ROM_START( lamachin )   /* Step 2.0, Sega game ID# is 833-13664, ROM board ID# 8
 	ROM_LOAD( "mpr-21466.25",  0xc00000, 0x400000, CRC(ca20359e) SHA1(1948f71f7eea27f757f0d508ee1390aeb576a8fa) )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, nullptr )
 
 	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
-	ROM_FILL( 0x000000, 0x1000000, 0 )
+	ROM_FILL( 0x000000, 0x1000000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	//             ????     317-0244-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "292a2bc5" )

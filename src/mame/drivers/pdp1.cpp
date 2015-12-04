@@ -460,21 +460,21 @@ static pdp1_reset_param_t pdp1_reset_param =
 		BULLETIN no. 2 (drumInstrWriteup.bin/drumInstrWriteup.txt), and are
 		similar to IOT documented in Parallel Drum Type 23 Instruction Manual. */
 	/*  (iot)       rpa         rpb         tyo         tyi         ppa         ppb         dpy */
-		NULL,       iot_rpa,    iot_rpb,    iot_tyo,    iot_tyi,    iot_ppa,    iot_ppb,    iot_dpy,
+		nullptr,       iot_rpa,    iot_rpb,    iot_tyo,    iot_tyi,    iot_ppa,    iot_ppb,    iot_dpy,
 	/*              spacewar                                                                 */
-		NULL,       iot_011,    NULL,       NULL,       NULL,       NULL,       NULL,       NULL,
+		nullptr,       iot_011,    nullptr,       nullptr,       nullptr,       nullptr,       nullptr,       nullptr,
 	/*                          lag                                             glf?/jsp?   gpl?/gpr?/gcf? */
-		NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,
+		nullptr,       nullptr,       nullptr,       nullptr,       nullptr,       nullptr,       nullptr,       nullptr,
 	/*  rrb         rcb?        rcc?        cks         mcs         mes         mel          */
-		iot_rrb,    NULL,       NULL,       iot_cks,    NULL,       NULL,       NULL,       NULL,
+		iot_rrb,    nullptr,       nullptr,       iot_cks,    nullptr,       nullptr,       nullptr,       nullptr,
 	/*  cad?        rac?        rbc?        pac                     lpr/lfb/lsp swc/sci/sdf?/shr?   scv? */
-		NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,
+		nullptr,       nullptr,       nullptr,       nullptr,       nullptr,       nullptr,       nullptr,       nullptr,
 	/*  (dsc)       (asc)       (isb)       (cac)       (lsm)       (esm)       (cbs)        */
-		NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,
+		nullptr,       nullptr,       nullptr,       nullptr,       nullptr,       nullptr,       nullptr,       nullptr,
 	/*  icv?        dia         dba         dcc         dra                     mri|rlc?    mrf/inr?/ccr? */
-		NULL,       iot_dia,    iot_dba,    iot_dcc,    iot_dra,    NULL,       NULL,       NULL,
+		nullptr,       iot_dia,    iot_dba,    iot_dcc,    iot_dra,    nullptr,       nullptr,       nullptr,
 	/*  mcb|dur?    mwc|mtf?    mrc|sfc?... msm|cgo?    (eem/lem)   mic         muf          */
-		NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,
+		nullptr,       nullptr,       nullptr,       nullptr,       nullptr,       nullptr,       nullptr,       nullptr,
 	},
 	pdp1_tape_read_binary,
 	pdp1_io_sc_callback,
@@ -505,7 +505,7 @@ void pdp1_state::pdp1_machine_stop()
 {
 	/* the core will take care of freeing the timers, BUT we must set the variables
 	to NULL if we don't want to risk confusing the tape image init function */
-	m_tape_reader.timer = m_tape_puncher.timer = m_typewriter.tyo_timer = m_dpy_timer = NULL;
+	m_tape_reader.timer = m_tape_puncher.timer = m_typewriter.tyo_timer = m_dpy_timer = nullptr;
 }
 
 
@@ -677,9 +677,9 @@ public:
 	virtual bool is_creatable() const { return 0; }
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
+	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const { return "tap,rim"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	virtual bool call_load();
 	virtual void call_unload();
@@ -712,9 +712,9 @@ public:
 	virtual bool is_creatable() const { return 1; }
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
+	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const { return "tap,rim"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	virtual bool call_load();
 	virtual void call_unload();
@@ -748,9 +748,9 @@ public:
 	virtual bool is_creatable() const { return 1; }
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
+	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const { return "typ"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	virtual bool call_load();
 	virtual void call_unload();
@@ -783,9 +783,9 @@ public:
 	virtual bool is_creatable() const { return 1; }
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
+	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const { return "drm"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	virtual bool call_load();
 	virtual void call_unload();
@@ -841,7 +841,7 @@ void pdp1_readtape_image_device::call_unload()
 	pdp1_state *state = machine().driver_data<pdp1_state>();
 
 	/* reader unit */
-	state->m_tape_reader.fd = NULL;
+	state->m_tape_reader.fd = nullptr;
 
 	/* stop motor */
 	state->m_tape_reader.motor_on = 0;
@@ -1055,7 +1055,7 @@ void pdp1_punchtape_image_device::call_unload()
 	pdp1_state *state = machine().driver_data<pdp1_state>();
 
 	/* punch unit */
-	state->m_tape_puncher.fd = NULL;
+	state->m_tape_puncher.fd = nullptr;
 }
 
 /*
@@ -1165,7 +1165,7 @@ bool pdp1_printer_image_device::call_load()
 void pdp1_printer_image_device::call_unload()
 {
 	pdp1_state *state = machine().driver_data<pdp1_state>();
-	state->m_typewriter.fd = NULL;
+	state->m_typewriter.fd = nullptr;
 }
 
 /*
@@ -1499,7 +1499,7 @@ bool pdp1_cylinder_image_device::call_load()
 void pdp1_cylinder_image_device::call_unload()
 {
 	pdp1_state *state = machine().driver_data<pdp1_state>();
-	state->m_parallel_drum.fd = NULL;
+	state->m_parallel_drum.fd = nullptr;
 }
 
 static void iot_dia(device_t *device, int op2, int nac, int mb, int *io, int ac)

@@ -143,11 +143,11 @@ public:
 		{
 			m_flash_chip[0].present = 0;
 			m_flash_chip[0].state = F_READ;
-			m_flash_chip[0].data = NULL;
+			m_flash_chip[0].data = nullptr;
 
 			m_flash_chip[1].present = 0;
 			m_flash_chip[1].state = F_READ;
-			m_flash_chip[1].data = NULL;
+			m_flash_chip[1].data = nullptr;
 
 			m_nvram_loaded = false;
 		}

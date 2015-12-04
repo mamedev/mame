@@ -940,7 +940,7 @@ void hp48_port_image_device::hp48_unfill_port()
 	state->m_modules[m_module].off_mask = 0x00fff;  /* 2 KB */
 	state->m_modules[m_module].read     = read8_delegate();
 	state->m_modules[m_module].write    = write8_delegate();
-	state->m_modules[m_module].data     = NULL;
+	state->m_modules[m_module].data     = nullptr;
 	state->m_modules[m_module].isnop    = 1;
 	state->m_port_size[m_port]          = 0;
 }
@@ -1035,12 +1035,12 @@ DRIVER_INIT_MEMBER(hp48_state,hp48)
 		m_modules[i].off_mask = 0x00fff;  /* 2 KB */
 		m_modules[i].read     = read8_delegate();
 		m_modules[i].write    = write8_delegate();
-		m_modules[i].data     = NULL;
+		m_modules[i].data     = nullptr;
 		m_modules[i].isnop    = 0;
 	}
 	m_port_size[0] = 0;
 	m_port_size[1] = 0;
-	m_rom = NULL;
+	m_rom = nullptr;
 }
 
 void hp48_state::machine_reset()

@@ -51,7 +51,7 @@ public:
 		m_joysticks(*this, "JOYSTICKS"),
 		m_buttons(*this, "BUTTONS"),
 		m_palette(*this, "palette"),
-		m_floppy(NULL),
+		m_floppy(nullptr),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),

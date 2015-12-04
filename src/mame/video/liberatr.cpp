@@ -80,7 +80,7 @@ void liberatr_state::init_planet(planet &liberatr_planet, UINT8 *planet_rom)
 		UINT8 *buffer;
 
 		planet_frame frame;
-		planet_frame_line *line = 0;
+		planet_frame_line *line = nullptr;
 
 		UINT16 total_segment_count = 0;
 

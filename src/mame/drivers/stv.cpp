@@ -1273,7 +1273,7 @@ int stv_state::load_cart(device_image_interface &image, generic_slot_device *slo
 	UINT8 *ROM;
 	UINT32 size = slot->common_get_size("rom");
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 		return IMAGE_INIT_FAIL;
 
 	slot->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_BIG);
@@ -2730,7 +2730,7 @@ ROM_START( sfish2 )
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr18343.bin",   0x000000, 0x080000, CRC(48e2eecf) SHA1(a38bfbd5f279525e413b18b5ed3f37f6e9e31cdc) ) /* sport fishing 2 bios */
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "maincpu",0,0,0x080000)
+	ROM_COPY( "maincpu",nullptr,0,0x080000)
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	ROM_LOAD16_BYTE( "epr-18427.ic13",  0x0000001, 0x0100000, CRC(3f25bec8) SHA1(43a5342b882d5aec0f35a8777cb475659f43b1c4) )
@@ -2752,7 +2752,7 @@ ROM_START( sfish2j )
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr18343.bin",   0x000000, 0x080000, CRC(48e2eecf) SHA1(a38bfbd5f279525e413b18b5ed3f37f6e9e31cdc) ) /* sport fishing 2 bios */
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "maincpu",0,0,0x080000)
+	ROM_COPY( "maincpu",nullptr,0,0x080000)
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	ROM_LOAD16_BYTE( "epr18344.a",      0x0000001, 0x0100000, CRC(5a7de018) SHA1(88e0c2a9a9d4ebf699878c0aa9737af85f95ccf8) )

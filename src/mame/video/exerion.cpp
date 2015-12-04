@@ -334,7 +334,7 @@ void exerion_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clip
 		}
 
 		/* draw the scanline */
-		draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &scanline[cliprect.min_x], NULL);
+		draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &scanline[cliprect.min_x], nullptr);
 	}
 }
 

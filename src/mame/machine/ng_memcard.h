@@ -41,7 +41,7 @@ public:
 	virtual bool must_be_loaded() const { return false; }
 	virtual bool is_reset_on_load() const { return false; }
 	virtual const char *file_extensions() const { return "neo"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	virtual bool call_load();
 	virtual void call_unload();

@@ -647,7 +647,7 @@ ROM_START( atamanot )
 
 	ROM_REGION( 0x10000, "kanji_uc", 0 ) //upper case
 	ROM_COPY( "kanji", 0x10000, 0x08000, 0x08000 )
-	ROM_COPY( "kanji", 0x00000, 0x00000, 0x08000 )
+	ROM_COPY( "kanji", nullptr, 0x00000, 0x08000 )
 
 	ROM_REGION( 0x10000, "kanji_lc", 0 ) //lower case
 	ROM_COPY( "kanji", 0x18000, 0x08000, 0x08000 )

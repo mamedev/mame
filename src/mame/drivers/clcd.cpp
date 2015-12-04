@@ -763,13 +763,13 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_rxd))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dcd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("via1", via6522_device, write_pb4))
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, NULL)
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, nullptr)
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("via1", via6522_device, write_pb6)) MCFG_DEVCB_XOR(1)
 
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)

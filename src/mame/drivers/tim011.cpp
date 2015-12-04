@@ -117,7 +117,7 @@ static const floppy_format_type tim011_floppy_formats[] = {
 	FLOPPY_IMD_FORMAT,
 	FLOPPY_MFI_FORMAT,
 	FLOPPY_MFM_FORMAT,
-	NULL
+	nullptr
 };
 
 static MACHINE_CONFIG_START( tim011,tim011_state )

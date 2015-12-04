@@ -696,7 +696,7 @@ void ksys573_state::update_disc()
 	int cd = m_cd->read();
 	cdrom_file *new_cdrom;
 
-	if( m_available_cdroms[ 1 ] != NULL )
+	if( m_available_cdroms[ 1 ] != nullptr )
 	{
 		new_cdrom = m_available_cdroms[ cd ];
 	}
@@ -706,9 +706,9 @@ void ksys573_state::update_disc()
 	}
 
 	atapi_hle_device *image = machine().device<atapi_hle_device>( "ata:0:cr589" );
-	if( image != NULL )
+	if( image != nullptr )
 	{
-		void *current_cdrom = NULL;
+		void *current_cdrom = nullptr;
 		image->GetDevice( &current_cdrom );
 
 		if( current_cdrom != new_cdrom )
@@ -941,7 +941,7 @@ READ16_MEMBER( ksys573_state::gx700pwbf_io_r )
 
 void ksys573_state::gx700pwbf_output( int offset, UINT8 data )
 {
-	if( m_gx700pwfbf_output_callback != NULL )
+	if( m_gx700pwfbf_output_callback != nullptr )
 	{
 		int i;
 		static const int shift[] = { 7, 6, 1, 0, 5, 4, 3, 2 };

@@ -740,7 +740,7 @@ void ng_aes_state::NeoCDDoDMA(address_space& curr_space)
 			//  - DMA controller program[14] -> 0xFFFE (PC: 0xC0A1A0)
 
 			char* data = m_tempcdc->LC8915InitTransfer(NeoCDDMACount);
-			if (data == NULL) {
+			if (data == nullptr) {
 				break;
 			}
 
@@ -838,7 +838,7 @@ if (NeoCDDMAAddress2 == 0x0800)  {
 			//  - DMA controller program[14] -> 0xDA92 (PC: 0xC0A1A0)
 
 			char* data = m_tempcdc->LC8915InitTransfer(NeoCDDMACount);
-			if (data == NULL) {
+			if (data == nullptr) {
 				break;
 			}
 
@@ -1399,7 +1399,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( aes, neogeo_base, ng_aes_state )
 	MCFG_MACHINE_START_OVERRIDE(ng_aes_state, neogeo)
 	MCFG_MACHINE_RESET_OVERRIDE(ng_aes_state, neogeo)
 
-	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot1", neogeo_cart, NULL)
+	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot1", neogeo_cart, nullptr)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","neogeo")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list","AES")

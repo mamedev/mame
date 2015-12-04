@@ -240,7 +240,7 @@ void gba_state::dma_exec(FPTR ch)
 
 //  printf("settng DMA timer %d for %d cycs (tmr %x)\n", ch, cnt, (UINT32)m_dma_timer[ch]);
 //  m_dma_timer[ch]->adjust(ATTOTIME_IN_CYCLES(0, cnt), ch);
-	dma_complete(NULL, ch);
+	dma_complete(nullptr, ch);
 }
 
 void gba_state::audio_tick(int ref)
@@ -2279,7 +2279,7 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 	MCFG_SOUND_ADD("direct_b_right", DAC, 0)        // GBA direct sound B right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spkright", 0.50)
 
-	MCFG_GBA_CARTRIDGE_ADD("cartslot", gba_cart, NULL)
+	MCFG_GBA_CARTRIDGE_ADD("cartslot", gba_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gba")
 MACHINE_CONFIG_END
 

@@ -266,7 +266,7 @@ public:
 				pri,
 				zcode, alpha, drawmode,
 				gx_objzbuf, gx_shdzbuf,
-				0,0
+				0,nullptr
 				);
 
 		}
@@ -308,7 +308,7 @@ public:
 				nozoom,
 				0,
 				0, 0, 0,
-				0, 0,
+				nullptr, nullptr,
 				primask,whichtable
 				);
 

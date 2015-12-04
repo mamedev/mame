@@ -47,12 +47,12 @@ void playch10_state::machine_start()
 	machine().device("ppu")->memory().space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(playch10_state::pc10_chr_r),this), write8_delegate(FUNC(playch10_state::pc10_chr_w),this));
 	machine().device("ppu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(playch10_state::pc10_nt_r),this),write8_delegate(FUNC(playch10_state::pc10_nt_w),this));
 
-	if (NULL != m_vram)
+	if (nullptr != m_vram)
 		set_videoram_bank(0, 8, 0, 8);
 	else pc10_set_videorom_bank(0, 8, 0, 8);
 
 	nvram_device *nvram = machine().device<nvram_device>("nvram");
-	if (nvram != NULL)
+	if (nvram != nullptr)
 		nvram->set_base(memregion("cart" )->base() + 0x6000, 0x1000);
 }
 
@@ -387,7 +387,7 @@ void playch10_state::set_videoram_bank( int first, int count, int bank, int size
 
 DRIVER_INIT_MEMBER(playch10_state,playch10)
 {
-	m_vram = NULL;
+	m_vram = nullptr;
 
 	/* set the controller to default */
 	m_pc10_gun_controller = 0;
@@ -410,7 +410,7 @@ DRIVER_INIT_MEMBER(playch10_state,pc_gun)
 	DRIVER_INIT_CALL(playch10);
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
-	m_vram = NULL;
+	m_vram = nullptr;
 
 	/* set the control type */
 	m_pc10_gun_controller = 1;
@@ -567,7 +567,7 @@ DRIVER_INIT_MEMBER(playch10_state,pcaboard)
 	m_mirroring = PPU_MIRROR_VERT;
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
-	m_vram = NULL;
+	m_vram = nullptr;
 }
 
 /**********************************************************************************/
@@ -618,7 +618,7 @@ DRIVER_INIT_MEMBER(playch10_state,pccboard)
 	machine().device("cart")->memory().space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(playch10_state::cboard_vrom_switch_w),this));
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
-	m_vram = NULL;
+	m_vram = nullptr;
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -743,7 +743,7 @@ DRIVER_INIT_MEMBER(playch10_state,pceboard)
 	UINT8 *prg = memregion("cart")->base();
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
-	m_vram = NULL;
+	m_vram = nullptr;
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
@@ -771,7 +771,7 @@ DRIVER_INIT_MEMBER(playch10_state,pcfboard)
 	UINT32 len = memregion("cart")->bytes();
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
-	m_vram = NULL;
+	m_vram = nullptr;
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
@@ -793,7 +793,7 @@ DRIVER_INIT_MEMBER(playch10_state,pcfboard_2)
 	/* extra ram at $6000-$6fff */
 	machine().device("cart")->memory().space(AS_PROGRAM).install_ram(0x6000, 0x6fff);
 
-	m_vram = NULL;
+	m_vram = nullptr;
 
 	/* common init */
 	DRIVER_INIT_CALL(pcfboard);
@@ -957,7 +957,7 @@ DRIVER_INIT_MEMBER(playch10_state,pcgboard)
 {
 	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
 	UINT8 *prg = memregion("cart")->base();
-	m_vram = NULL;
+	m_vram = nullptr;
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
@@ -986,7 +986,7 @@ DRIVER_INIT_MEMBER(playch10_state,pcgboard)
 
 DRIVER_INIT_MEMBER(playch10_state,pcgboard_type2)
 {
-	m_vram = NULL;
+	m_vram = nullptr;
 	/* common init */
 	DRIVER_INIT_CALL(pcgboard);
 

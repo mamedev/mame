@@ -400,7 +400,7 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	MCFG_NSC810_TIMER0_OUT(WRITELINE(hunter2_state,timer0_out))
 	MCFG_NSC810_TIMER1_OUT(WRITELINE(hunter2_state,timer1_out))
 
-	MCFG_RS232_PORT_ADD("serial",default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial",default_rs232_devices,nullptr)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(hunter2_state,cts_w))
 	MCFG_RS232_RXD_HANDLER(WRITELINE(hunter2_state,rxd_w))
 

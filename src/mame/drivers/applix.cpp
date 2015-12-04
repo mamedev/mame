@@ -349,7 +349,7 @@ WRITE8_MEMBER( applix_state::port08_w )
 	m_port08 = data;
 	membank("bank1")->set_entry(BIT(data, 6));
 
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 	if (BIT(data, 2)) floppy = m_floppy0->get_device();
 	if (BIT(data, 3)) floppy = m_floppy1->get_device();
 

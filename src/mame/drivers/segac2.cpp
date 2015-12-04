@@ -277,7 +277,7 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 WRITE16_MEMBER(segac2_state::segac2_upd7759_w)
 {
 	/* make sure we have a UPD chip */
-	if (m_upd7759 == NULL)
+	if (m_upd7759 == nullptr)
 		return;
 
 	/* only works if we're accessing the low byte */
@@ -415,7 +415,7 @@ READ8_MEMBER(segac2_state::io_portc_r)
 {
 	// D7 : From MB3773P pin 1. (/RESET output)
 	// D6 : From uPD7759 pin 18. (/BUSY output)
-	int busy = (m_upd7759 != NULL) ? (m_upd7759->busy_r() << 6) : 0x40;
+	int busy = (m_upd7759 != nullptr) ? (m_upd7759->busy_r() << 6) : 0x40;
 	return 0xbf | busy;
 }
 
@@ -1706,7 +1706,7 @@ ROM_START( ribbit ) /* Ribbit  (c)1991 Sega */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-13833.ic32", 0x000000, 0x040000, CRC(5347f8ce) SHA1(b95b99536157edfbf0d74a42f64235f47dca7ee1) )
 	ROM_LOAD16_BYTE( "epr-13832.ic31", 0x000001, 0x040000, CRC(889c42c2) SHA1(0839a50a68b64a66d995f1bfaff42fcb60bb4d45) )
-	ROM_COPY( "maincpu", 0x000000, 0x080000, 0x080000 )
+	ROM_COPY( "maincpu", nullptr, 0x080000, 0x080000 )
 	ROM_LOAD16_BYTE( "epr-13838.ic34", 0x100000, 0x080000, CRC(a5d62ac3) SHA1(8d83a7bc4017e125ef4231278f766b2368d5fc1f) )
 	ROM_LOAD16_BYTE( "epr-13837.ic33", 0x100001, 0x080000, CRC(434de159) SHA1(cf2973131cabf2bc0ebb2bfe9f804ad3d7d0a733) )
 
@@ -1981,7 +1981,7 @@ void segac2_state::segac2_common_init(segac2_prot_delegate prot_func)
 	DRIVER_INIT_CALL(megadriv_c2);
 	m_prot_func = prot_func;
 
-	if (m_upd7759 != NULL)
+	if (m_upd7759 != nullptr)
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0x880000, 0x880001, 0, 0x13fefe, write16_delegate(FUNC(segac2_state::segac2_upd7759_w),this));
 }
 

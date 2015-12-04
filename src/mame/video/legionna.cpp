@@ -33,7 +33,7 @@ WRITE16_MEMBER(legionna_state::tile_scroll_w)
 	COMBINE_DATA(scrollvals + offset);
 	data = scrollvals[offset];
 
-	tilemap_t *tm = 0;
+	tilemap_t *tm = nullptr;
 	switch(offset/2) {
 	case 0: tm = m_background_layer; break;
 	case 1: tm = m_midground_layer; break;

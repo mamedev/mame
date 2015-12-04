@@ -167,7 +167,7 @@ void gdrom_device::ExecCommand()
 					m_cur_subblock = 0;
 				}
 
-				if (m_cdda != NULL)
+				if (m_cdda != nullptr)
 				{
 					m_cdda->stop_audio();
 				}
@@ -205,7 +205,7 @@ void gdrom_device::ExecCommand()
 				length = 4;
 			}
 
-			if (m_cdda != NULL)
+			if (m_cdda != nullptr)
 			{
 				m_cdda->stop_audio();
 			}

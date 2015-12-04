@@ -94,7 +94,7 @@ igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const 
 
 const address_space_config *igs017_igs031_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 UINT16 igs017_igs031_device::palette_callback_straight(UINT16 bgr)

@@ -1490,7 +1490,7 @@ WRITE_LINE_MEMBER(bbc_state::fdc_drq_w)
 
 WRITE8_MEMBER(bbc_state::bbc_wd1770_status_w)
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	m_drive_control = data;
 
@@ -1531,7 +1531,7 @@ READ8_MEMBER(bbc_state::bbcm_wd177xl_read)
 
 WRITE8_MEMBER(bbc_state::bbcm_wd1770l_write)
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	m_drive_control = data;
 
@@ -1554,7 +1554,7 @@ WRITE8_MEMBER(bbc_state::bbcm_wd1770l_write)
 
 WRITE8_MEMBER(bbc_state::bbcm_wd1772l_write)
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	m_drive_control = data;
 
@@ -1601,7 +1601,7 @@ int bbc_state::bbc_load_rom(device_image_interface &image, generic_slot_device *
 
 int bbc_state::bbcm_load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		UINT32 filesize = image.length();
 

@@ -275,7 +275,7 @@ static const z80_daisy_config pasopia_daisy[] =
 	{ "z80ctc" },
 	{ "z80pio" },
 //  { "upd765" }, /* TODO */
-	{ NULL }
+	{ nullptr }
 };
 
 

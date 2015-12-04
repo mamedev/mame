@@ -215,7 +215,7 @@ public:
 	virtual bool is_reset_on_load() const { return 0; }
 	virtual const char *image_interface() const { return "sm_memc"; }
 	virtual const char *file_extensions() const { return "smc"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	virtual bool call_load();
 	virtual void call_unload();

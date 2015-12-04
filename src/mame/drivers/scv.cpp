@@ -679,7 +679,7 @@ static MACHINE_CONFIG_START( scv, scv_state )
 	MCFG_UPD1771_ACK_HANDLER(WRITELINE(scv_state, upd1771_ack_w))
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MCFG_SCV_CARTRIDGE_ADD("cartslot", scv_cart, NULL)
+	MCFG_SCV_CARTRIDGE_ADD("cartslot", scv_cart, nullptr)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","scv")

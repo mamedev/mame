@@ -3747,7 +3747,7 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 	m_last_prot_op = -1;
 	m_last_prot_clk = 0;
 
-	m_esc_cb = NULL;
+	m_esc_cb = nullptr;
 	m_resume_trigger = 0;
 
 	m_dmadelay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(konamigx_state::dmaend_callback),this));

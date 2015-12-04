@@ -1519,7 +1519,7 @@ ROM_START( spclords )
 	ROM_REGION( 0x60000, "gfx1", 0 )
 	ROM_LOAD( "136095.30a", 0x00000, 0x20000, CRC(27e0cfec) SHA1(03df57757d091f9a0b8c8d98d091dd759f570788) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136095.31a", 0x20000, 0x20000, CRC(5529cdc7) SHA1(8aff8a42fb2a86b7e4666940da4c1ee19dab6281) ) /* playfield, planes 2-3 */
-	ROM_FILL(               0x40000, 0x20000, 0 )          /* playfield, planes 4-5 */
+	ROM_FILL(               0x40000, 0x20000, nullptr )          /* playfield, planes 4-5 */
 
 	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136095.25a", 0x000000, 0x20000, CRC(1669496e) SHA1(005deaafd6156505e3a27966123e58928837ad9f) ) /* alphanumerics */
@@ -1565,7 +1565,7 @@ ROM_START( spclordsb )
 	ROM_REGION( 0x60000, "gfx1", 0 )
 	ROM_LOAD( "136095.30a", 0x00000, 0x20000, CRC(27e0cfec) SHA1(03df57757d091f9a0b8c8d98d091dd759f570788) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136095.31a", 0x20000, 0x20000, CRC(5529cdc7) SHA1(8aff8a42fb2a86b7e4666940da4c1ee19dab6281) ) /* playfield, planes 2-3 */
-	ROM_FILL(               0x40000, 0x20000, 0 )          /* playfield, planes 4-5 */
+	ROM_FILL(               0x40000, 0x20000, nullptr )          /* playfield, planes 4-5 */
 
 	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136095.25a", 0x000000, 0x20000, CRC(1669496e) SHA1(005deaafd6156505e3a27966123e58928837ad9f) ) /* alphanumerics */
@@ -1611,7 +1611,7 @@ ROM_START( spclordsg )
 	ROM_REGION( 0x60000, "gfx1", 0 )
 	ROM_LOAD( "136095.30a", 0x00000, 0x20000, CRC(27e0cfec) SHA1(03df57757d091f9a0b8c8d98d091dd759f570788) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136095.31a", 0x20000, 0x20000, CRC(5529cdc7) SHA1(8aff8a42fb2a86b7e4666940da4c1ee19dab6281) ) /* playfield, planes 2-3 */
-	ROM_FILL(               0x40000, 0x20000, 0 )          /* playfield, planes 4-5 */
+	ROM_FILL(               0x40000, 0x20000, nullptr )          /* playfield, planes 4-5 */
 
 	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136095.25a", 0x000000, 0x20000, CRC(1669496e) SHA1(005deaafd6156505e3a27966123e58928837ad9f) ) /* alphanumerics */
@@ -1657,7 +1657,7 @@ ROM_START( spclordsa )
 	ROM_REGION( 0x60000, "gfx1", 0 )
 	ROM_LOAD( "136095.30a", 0x00000, 0x20000, CRC(27e0cfec) SHA1(03df57757d091f9a0b8c8d98d091dd759f570788) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136095.31a", 0x20000, 0x20000, CRC(5529cdc7) SHA1(8aff8a42fb2a86b7e4666940da4c1ee19dab6281) ) /* playfield, planes 2-3 */
-	ROM_FILL(               0x40000, 0x20000, 0 )          /* playfield, planes 4-5 */
+	ROM_FILL(               0x40000, 0x20000, nullptr )          /* playfield, planes 4-5 */
 
 	ROM_REGION( 0x020000, "gfx2", 0 )
 	ROM_LOAD( "136095.25a", 0x000000, 0x20000, CRC(1669496e) SHA1(005deaafd6156505e3a27966123e58928837ad9f) ) /* alphanumerics */

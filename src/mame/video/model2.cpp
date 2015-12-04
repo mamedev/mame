@@ -451,9 +451,9 @@ static void model2_3d_process_quad( raster_state *raster, UINT32 attr )
 			/* get our list read to add the triangles */
 			ztri = raster->tri_sorted_list[object.z];
 
-			if ( ztri != NULL )
+			if ( ztri != nullptr )
 			{
-				while( ztri->next != NULL )
+				while( ztri->next != nullptr )
 					ztri = (triangle *)ztri->next;
 			}
 
@@ -492,9 +492,9 @@ static void model2_3d_process_quad( raster_state *raster, UINT32 attr )
 				memcpy( &tri->v[2], &verts[i], sizeof( poly_vertex ) );
 
 				/* add to our sorted list */
-				tri->next = NULL;
+				tri->next = nullptr;
 
-				if ( ztri == NULL )
+				if ( ztri == nullptr )
 				{
 					raster->tri_sorted_list[object.z] = tri;
 				}
@@ -688,9 +688,9 @@ static void model2_3d_process_triangle( raster_state *raster, UINT32 attr )
 			/* get our list read to add the triangles */
 			ztri = raster->tri_sorted_list[object.z];
 
-			if ( ztri != NULL )
+			if ( ztri != nullptr )
 			{
-				while( ztri->next != NULL )
+				while( ztri->next != nullptr )
 					ztri = (triangle *)ztri->next;
 			}
 
@@ -729,9 +729,9 @@ static void model2_3d_process_triangle( raster_state *raster, UINT32 attr )
 				memcpy( &tri->v[2], &verts[i], sizeof( poly_vertex ) );
 
 				/* add to our sorted list */
-				tri->next = NULL;
+				tri->next = nullptr;
 
-				if ( ztri == NULL )
+				if ( ztri == nullptr )
 				{
 					raster->tri_sorted_list[object.z] = tri;
 				}
@@ -953,13 +953,13 @@ void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &c
 	for( z = raster->max_z; z >= raster->min_z; z-- )
 	{
 		/* see if we have items at this z level */
-		if ( raster->tri_sorted_list[z] != NULL )
+		if ( raster->tri_sorted_list[z] != nullptr )
 		{
 			/* get a pointer to the first triangle */
 			triangle *tri = raster->tri_sorted_list[z];
 
 			/* and loop clipping and rendering each triangle */
-			while( tri != NULL )
+			while( tri != nullptr )
 			{
 				/* project and render */
 				model2_3d_project( tri );
@@ -2377,7 +2377,7 @@ static UINT32 * geo_end( geo_state *geo, UINT32 opcode, UINT32 *input )
 	model2_3d_push( raster, 0xFF000000 );
 
 	/* signal end by returning NULL */
-	return NULL;
+	return nullptr;
 }
 
 /* Command 10: Dummy */
@@ -2558,7 +2558,7 @@ static void geo_parse( model2_state *state )
 	UINT32 *input = &state->m_bufferram[address];
 	UINT32  opcode;
 
-	while( input != NULL && (input - state->m_bufferram) < 0x20000  )
+	while( input != nullptr && (input - state->m_bufferram) < 0x20000  )
 	{
 		/* read in the opcode */
 		opcode = *input++;

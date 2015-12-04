@@ -873,9 +873,9 @@ ROM_START( hatris )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b0-ic56.bin", 0x00000, 0x20000, CRC(34f337a4) SHA1(ad74bb3fbfd16c9e92daa1cf5c5e522d11ba7dfb) )
-	ROM_FILL(                0x20000, 0x20000, 0 )
+	ROM_FILL(                0x20000, 0x20000, nullptr )
 	ROM_LOAD( "b1-ic73.bin", 0x40000, 0x08000, CRC(6351d0ba) SHA1(6d6b2e23f0569e625414de11803955df60bbbd48) )
-	ROM_FILL(                0x48000, 0x18000, 0 )
+	ROM_FILL(                0x48000, 0x18000, nullptr )
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "a0-ic55.bin", 0x00000, 0x20000, CRC(7b7bc619) SHA1(b661c772e33aa7352dcdc20c4a9a84ed25ff89d7) )
@@ -895,9 +895,9 @@ ROM_START( hatrisj )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b0-ic56.bin", 0x00000, 0x20000, CRC(34f337a4) SHA1(ad74bb3fbfd16c9e92daa1cf5c5e522d11ba7dfb) )
-	ROM_FILL(                0x20000, 0x20000, 0 )
+	ROM_FILL(                0x20000, 0x20000, nullptr )
 	ROM_LOAD( "b1-ic73.bin", 0x40000, 0x08000, CRC(6351d0ba) SHA1(6d6b2e23f0569e625414de11803955df60bbbd48) )
-	ROM_FILL(                0x48000, 0x18000, 0 )
+	ROM_FILL(                0x48000, 0x18000, nullptr )
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "a0-ic55.bin", 0x00000, 0x20000, CRC(7b7bc619) SHA1(b661c772e33aa7352dcdc20c4a9a84ed25ff89d7) )

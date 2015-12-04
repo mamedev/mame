@@ -112,7 +112,7 @@ WRITE_LINE_MEMBER(bbcbc_state::tms_interrupt)
 static const z80_daisy_config bbcbc_daisy_chain[] =
 {
 	{ "z80pio" },
-	{ NULL }
+	{ nullptr }
 };
 
 

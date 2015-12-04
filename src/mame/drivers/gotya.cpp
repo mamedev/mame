@@ -166,7 +166,7 @@ static const char *const sample_names[] =
 	"18",   /* 'Come on!' */                // 194a
 	"19",   /* 'I love you!' */             // 194a
 	"1a",   /* 'See you again!' */          // 194a
-	0
+	nullptr
 };
 
 void gotya_state::machine_start()

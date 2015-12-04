@@ -30,7 +30,7 @@ static const gfx_layout backlayout =
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	EXTENDED_YOFFS,
 	32*8*8, /* every char takes 8 consecutive bytes */
-	NULL, extyoffs
+	nullptr, extyoffs
 };
 
 static const gfx_layout charlayout =

@@ -119,7 +119,7 @@ void tk2000_state::machine_start()
 	// setup video pointers
 	m_video->m_ram_ptr = m_ram_ptr;
 	m_video->m_aux_ptr = m_ram_ptr;
-	m_video->m_char_ptr = NULL;
+	m_video->m_char_ptr = nullptr;
 	m_video->m_char_size = 0;
 }
 

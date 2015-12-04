@@ -313,11 +313,11 @@ VIDEO_START_MEMBER(fromanc2_state,fromancr)
 	m_tilemap[0][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v0_l0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[0][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v0_l1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[0][2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v0_l2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[0][3] = NULL;
+	m_tilemap[0][3] = nullptr;
 	m_tilemap[1][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v1_l0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[1][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v1_l1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[1][2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v1_l2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1][3] = NULL;
+	m_tilemap[1][3] = nullptr;
 
 	for (int screen = 0; screen < 2; screen++)
 	{
@@ -349,11 +349,11 @@ VIDEO_START_MEMBER(fromanc2_state,fromanc4)
 	m_tilemap[0][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v0_l0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
 	m_tilemap[0][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v0_l1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
 	m_tilemap[0][2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v0_l2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
-	m_tilemap[0][3] = NULL;
+	m_tilemap[0][3] = nullptr;
 	m_tilemap[1][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v1_l0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
 	m_tilemap[1][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v1_l1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
 	m_tilemap[1][2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v1_l2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
-	m_tilemap[1][3] = NULL;
+	m_tilemap[1][3] = nullptr;
 
 	for (int screen = 0; screen < 2; screen++)
 	{

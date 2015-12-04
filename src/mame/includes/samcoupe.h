@@ -77,14 +77,14 @@ public:
 			m_io_mouse_y(*this, "mouse_y"),
 			m_config(*this, "config")
 	{
-		sam_bank_read_ptr[0] = NULL;
-		sam_bank_write_ptr[0] = NULL;
-		sam_bank_read_ptr[1] = NULL;
-		sam_bank_write_ptr[1] = NULL;
-		sam_bank_read_ptr[2] = NULL;
-		sam_bank_write_ptr[2] = NULL;
-		sam_bank_read_ptr[3] = NULL;
-		sam_bank_write_ptr[3] = NULL;
+		sam_bank_read_ptr[0] = nullptr;
+		sam_bank_write_ptr[0] = nullptr;
+		sam_bank_read_ptr[1] = nullptr;
+		sam_bank_write_ptr[1] = nullptr;
+		sam_bank_read_ptr[2] = nullptr;
+		sam_bank_write_ptr[2] = nullptr;
+		sam_bank_read_ptr[3] = nullptr;
+		sam_bank_write_ptr[3] = nullptr;
 	}
 
 	virtual void video_start();

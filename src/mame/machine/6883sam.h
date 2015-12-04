@@ -31,7 +31,7 @@
 class sam6883_friend_device
 {
 public:
-	sam6883_friend_device() { m_cpu = NULL; m_sam_state = 0x0000; }
+	sam6883_friend_device() { m_cpu = nullptr; m_sam_state = 0x0000; }
 
 protected:
 	// SAM state constants

@@ -397,7 +397,7 @@ static const char *const sample_names[] =
 	"*gridlee",
 	"bounce1",
 	"bounce2",
-	0   /* end of array */
+	nullptr   /* end of array */
 };
 
 /*************************************

@@ -291,7 +291,7 @@ TIMER_CALLBACK_MEMBER(cvs_state::cvs_393hz_timer_cb)
 	m_cvs_393hz_clock = !m_cvs_393hz_clock;
 
 	/* quasar.c games use this timer but have no dac3! */
-	if (m_dac3 != NULL)
+	if (m_dac3 != nullptr)
 	{
 		if (m_dac3_state[2])
 			m_dac3->write_unsigned8(m_cvs_393hz_clock * 0xff);
@@ -924,7 +924,7 @@ static const gfx_layout charlayout =
 
 static GFXDECODE_START( cvs )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 256+4 )
-	GFXDECODE_ENTRY( NULL,   0x0000, charlayout, 0, 256+4 )
+	GFXDECODE_ENTRY( nullptr,   0x0000, charlayout, 0, 256+4 )
 GFXDECODE_END
 
 
@@ -938,7 +938,7 @@ GFXDECODE_END
 MACHINE_START_MEMBER(cvs_state,cvs)
 {
 	/* allocate memory */
-	if (m_gfxdecode->gfx(1) != NULL)
+	if (m_gfxdecode->gfx(1) != nullptr)
 		m_gfxdecode->gfx(1)->set_source(m_character_ram);
 
 	start_393hz_timer();

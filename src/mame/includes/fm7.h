@@ -135,7 +135,7 @@ public:
 		m_fdc(*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
 		m_floppy1(*this, "fdc:1"),
-		m_floppy(NULL),
+		m_floppy(nullptr),
 		m_kanji(*this, "kanji1"),
 		m_key1(*this, "key1"),
 		m_key2(*this, "key2"),

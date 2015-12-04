@@ -83,7 +83,7 @@ PALETTE_INIT_MEMBER(calomega_state, calomega)
 	const int b_pot = 0xc0;
 
 	/* 00000BGR */
-	if (color_prom == 0) return;
+	if (color_prom == nullptr) return;
 
 	for (int i = 0;i < palette.entries();i++)
 	{

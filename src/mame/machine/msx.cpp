@@ -407,7 +407,7 @@ void msx_state::msx_memory_init()
 		{
 			for ( int page = 0; page < 4; page++ )
 			{
-				if ( m_all_slots[prim][sec][page] == NULL )
+				if ( m_all_slots[prim][sec][page] == nullptr )
 				{
 					m_all_slots[prim][sec][page] = &m_empty_slot;
 				}

@@ -402,7 +402,7 @@ void hp64k_state::machine_reset()
 		m_floppy_intrq = false;
 		m_floppy_drv_ctrl = ~0;
 		m_floppy_if_state = HP64K_FLPST_IDLE;
-		m_current_floppy = NULL;
+		m_current_floppy = nullptr;
 		m_floppy0_wpt = false;
 		m_floppy1_wpt = false;
 		m_beeper->set_state(0);
@@ -858,7 +858,7 @@ void hp64k_state::hp64k_update_drv_ctrl(void)
 		} else if (!BIT(m_floppy_drv_ctrl , 0)) {
 				new_drive = m_floppy0->get_device();
 		} else {
-				new_drive = NULL;
+				new_drive = nullptr;
 		}
 
 		if (new_drive != m_current_floppy) {
@@ -1398,7 +1398,7 @@ static MACHINE_CONFIG_START(hp64k , hp64k_state)
 				MCFG_I8251_DTR_HANDLER(WRITELINE(hp64k_state , hp64k_dtr_w));
 				MCFG_I8251_RTS_HANDLER(WRITELINE(hp64k_state , hp64k_rts_w));
 
-				MCFG_RS232_PORT_ADD("rs232" , default_rs232_devices , NULL)
+				MCFG_RS232_PORT_ADD("rs232" , default_rs232_devices , nullptr)
 				MCFG_RS232_RXD_HANDLER(WRITELINE(hp64k_state , hp64k_rs232_rxd_w))
 				MCFG_RS232_DCD_HANDLER(WRITELINE(hp64k_state , hp64k_rs232_dcd_w))
 				MCFG_RS232_CTS_HANDLER(WRITELINE(hp64k_state , hp64k_rs232_cts_w))

@@ -484,7 +484,7 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DEVICE_ADD("ext1", SPC1000_EXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(spc1000_exp, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(spc1000_exp, nullptr, false)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(spc1000_state, centronics_busy_w))

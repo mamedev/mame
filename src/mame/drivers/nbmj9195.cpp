@@ -2665,13 +2665,13 @@ INPUT_PORTS_END
 static const z80_daisy_config daisy_chain_main[] =
 {
 	TMPZ84C011_DAISY_INTERNAL,
-	{ NULL }
+	{ nullptr }
 };
 
 static const z80_daisy_config daisy_chain_sound[] =
 {
 	TMPZ84C011_DAISY_INTERNAL,
-	{ NULL }
+	{ nullptr }
 };
 
 

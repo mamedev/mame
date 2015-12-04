@@ -147,7 +147,7 @@ void janshi_vdp_device::device_reset() {}
 
 const address_space_config *janshi_vdp_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 void pinkiri8_state::video_start() {}

@@ -347,7 +347,7 @@ SNAPSHOT_LOAD_MEMBER( mtx_state, mtx )
 	// verify first byte
 	if (header[0] != 0xff)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, NULL);
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, nullptr);
 		return IMAGE_INIT_FAIL;
 	}
 

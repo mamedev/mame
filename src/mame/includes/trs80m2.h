@@ -52,7 +52,7 @@ public:
 		m_floppy1(*this, FD1791_TAG":1"),
 		m_floppy2(*this, FD1791_TAG":2"),
 		m_floppy3(*this, FD1791_TAG":3"),
-		m_floppy(NULL),
+		m_floppy(nullptr),
 		m_ram(*this, RAM_TAG),
 		m_kb(*this, TRS80M2_KEYBOARD_TAG),
 		m_rom(*this, Z80_TAG),

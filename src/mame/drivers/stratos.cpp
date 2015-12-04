@@ -77,7 +77,7 @@ void stratos_state::machine_reset()
 void stratos_state::show_leds()
 {
 	static const char *led_pos[18] = {
-		0, 0, "gPawn", "gKnight", "gBishop", "gRook", "gQueen", "gKing", 0, 0, "rPawn", "rKnight", "rBishop", "rRook", "rQueen", "rKing", 0, 0
+		nullptr, nullptr, "gPawn", "gKnight", "gBishop", "gRook", "gQueen", "gKing", nullptr, nullptr, "rPawn", "rKnight", "rBishop", "rRook", "rQueen", "rKing", nullptr, nullptr
 	};
 	char str_red[64];
 	char str_green[64];

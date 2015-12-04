@@ -29,11 +29,11 @@ pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, const 
 pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
-		m_channel(NULL),
+		m_channel(nullptr),
 		m_sound_latch_a(0),
 		m_sound_latch_b(0),
 		m_sound_latch_c(0),
-		m_poly18(NULL),
+		m_poly18(nullptr),
 		m_polybit(0),
 		m_pa5_resistor(0),
 		m_pc5_resistor(0),

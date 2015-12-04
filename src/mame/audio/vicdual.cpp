@@ -107,7 +107,7 @@ static const char *const frogs_sample_names[] =
 	"hop",
 	"splash",
 	"zip",
-	0
+	nullptr
 };
 
 
@@ -454,7 +454,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER( vicdual_state::headon_audio_w )
 {
-	if (m_discrete == NULL)
+	if (m_discrete == nullptr)
 		return;
 	m_discrete->write(space, HEADON_HISPEED_PC_EN, data & 0x01);
 	m_discrete->write(space, HEADON_SCREECH1_EN, data & 0x02);
@@ -468,7 +468,7 @@ WRITE8_MEMBER( vicdual_state::headon_audio_w )
 
 WRITE8_MEMBER( vicdual_state::invho2_audio_w )
 {
-	if (m_discrete == NULL)
+	if (m_discrete == nullptr)
 		return;
 	m_discrete->write(space, HEADON_HISPEED_PC_EN, data & 0x10);
 	m_discrete->write(space, HEADON_SCREECH1_EN, data & 0x08);

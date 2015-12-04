@@ -262,7 +262,7 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 	{ "a72" },
 	{ "a30" },
 	{ "a29" },
-	{ NULL }
+	{ nullptr }
 };
 
 static MACHINE_CONFIG_START( rt1715, rt1715_state )

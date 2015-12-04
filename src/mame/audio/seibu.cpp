@@ -84,7 +84,7 @@ seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char
 		m_rst18_irq(0xff)
 {
 	m_encryption_mode = 0;
-	m_decrypted_opcodes = NULL;
+	m_decrypted_opcodes = nullptr;
 }
 
 void seibu_sound_device::set_encryption(int mode)
@@ -234,7 +234,7 @@ void seibu_sound_device::update_irq_lines(int param)
 			break;
 	}
 
-	if (m_sound_cpu != NULL)
+	if (m_sound_cpu != nullptr)
 	{
 		if ((m_rst10_irq & m_rst18_irq) == 0xff) /* no IRQs pending */
 			m_sound_cpu->execute().set_input_line(0, CLEAR_LINE);
@@ -509,13 +509,13 @@ const device_type SEIBU_ADPCM = &device_creator<seibu_adpcm_device>;
 seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEIBU_ADPCM, "Seibu ADPCM (MSM5205)", tag, owner, clock, "seibu_adpcm", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_current(0),
 		m_end(0),
 		m_nibble(0),
 		m_playing(0),
-		m_rom_tag(NULL),
-		m_base(NULL)
+		m_rom_tag(nullptr),
+		m_base(nullptr)
 {
 }
 

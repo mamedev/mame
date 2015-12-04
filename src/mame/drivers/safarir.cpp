@@ -294,7 +294,7 @@ static const char *const safarir_sample_names[] =
 	"sound6",
 	"sound7",
 	"sound8",
-	0
+	nullptr
 };
 
 

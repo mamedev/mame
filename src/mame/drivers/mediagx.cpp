@@ -880,9 +880,9 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_FRAGMENT_ADD( pcat_common )
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(18, NULL, cx5510_pci_r, cx5510_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(18, nullptr, cx5510_pci_r, cx5510_pci_w)
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_TIMER_DRIVER_ADD("sound_timer", mediagx_state, sound_timer_callback)
@@ -943,9 +943,9 @@ READ32_MEMBER(mediagx_state::speedup11_r) { return generic_speedup(space, 11); }
 
 static const struct { read32_delegate func; } speedup_handlers[] =
 {
-	{ read32_delegate(FUNC(mediagx_state::speedup0_r),(mediagx_state*)0) }, { read32_delegate(FUNC(mediagx_state::speedup1_r),(mediagx_state*)0) }, { read32_delegate(FUNC(mediagx_state::speedup2_r),(mediagx_state*)0) }, { read32_delegate(FUNC(mediagx_state::speedup3_r),(mediagx_state*)0) },
-	{ read32_delegate(FUNC(mediagx_state::speedup4_r),(mediagx_state*)0) }, { read32_delegate(FUNC(mediagx_state::speedup5_r),(mediagx_state*)0) }, { read32_delegate(FUNC(mediagx_state::speedup6_r),(mediagx_state*)0) }, { read32_delegate(FUNC(mediagx_state::speedup7_r),(mediagx_state*)0) },
-	{ read32_delegate(FUNC(mediagx_state::speedup8_r),(mediagx_state*)0) }, { read32_delegate(FUNC(mediagx_state::speedup9_r),(mediagx_state*)0) }, { read32_delegate(FUNC(mediagx_state::speedup10_r),(mediagx_state*)0) },    { read32_delegate(FUNC(mediagx_state::speedup11_r),(mediagx_state*)0) }
+	{ read32_delegate(FUNC(mediagx_state::speedup0_r),(mediagx_state*)nullptr) }, { read32_delegate(FUNC(mediagx_state::speedup1_r),(mediagx_state*)nullptr) }, { read32_delegate(FUNC(mediagx_state::speedup2_r),(mediagx_state*)nullptr) }, { read32_delegate(FUNC(mediagx_state::speedup3_r),(mediagx_state*)nullptr) },
+	{ read32_delegate(FUNC(mediagx_state::speedup4_r),(mediagx_state*)nullptr) }, { read32_delegate(FUNC(mediagx_state::speedup5_r),(mediagx_state*)nullptr) }, { read32_delegate(FUNC(mediagx_state::speedup6_r),(mediagx_state*)nullptr) }, { read32_delegate(FUNC(mediagx_state::speedup7_r),(mediagx_state*)nullptr) },
+	{ read32_delegate(FUNC(mediagx_state::speedup8_r),(mediagx_state*)nullptr) }, { read32_delegate(FUNC(mediagx_state::speedup9_r),(mediagx_state*)nullptr) }, { read32_delegate(FUNC(mediagx_state::speedup10_r),(mediagx_state*)nullptr) },    { read32_delegate(FUNC(mediagx_state::speedup11_r),(mediagx_state*)nullptr) }
 };
 
 #ifdef MAME_DEBUG

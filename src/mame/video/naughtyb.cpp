@@ -69,7 +69,7 @@ PALETTE_INIT_MEMBER(naughtyb_state, naughtyb)
 	compute_resistor_weights(0, 255, -1.0,
 			2, resistances, weights, 0, 0,
 			2, resistances, weights, 0, 0,
-			0, 0, 0, 0, 0);
+			0, nullptr, nullptr, 0, 0);
 
 	for (int i = 0;i < palette.entries(); i++)
 	{
@@ -246,7 +246,7 @@ UINT32 naughtyb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		copybitmap(bitmap,m_tmpbitmap,0,0,-30*8,0,rightvisiblearea);
 
 		scrollx = ( m_cocktail ) ? *m_scrollreg - 239 : -*m_scrollreg + 16;
-		copyscrollbitmap(bitmap,m_tmpbitmap,1,&scrollx,0,0,scrollvisiblearea);
+		copyscrollbitmap(bitmap,m_tmpbitmap,1,&scrollx,0,nullptr,scrollvisiblearea);
 	}
 	return 0;
 }

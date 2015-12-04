@@ -98,7 +98,7 @@ static const z80_daisy_config z9001_daisy_chain[] =
 	{ "z80pio2" },
 	{ "z80pio1" },
 	{ "z80ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 //Bits0,1 not connected; 2,3,4,5 go to a connector; 6 goes to 'graphics' LED; 7 goes to speaker.

@@ -366,7 +366,7 @@ WRITE8_MEMBER( abc80_state::pio_pb_w )
 static const z80_daisy_config abc80_daisy_chain[] =
 {
 	{ Z80PIO_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 
@@ -562,7 +562,7 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abc80_cards, "abcexp")
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(abc80_state, kbd_w))
 

@@ -887,7 +887,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ssfindo_state,common)
 {
-	m_speedup = 0;
+	m_speedup = nullptr;
 	m_PS7500timer0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ssfindo_state::PS7500_Timer0_callback),this));
 	m_PS7500timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ssfindo_state::PS7500_Timer1_callback),this));
 

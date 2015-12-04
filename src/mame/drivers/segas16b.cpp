@@ -984,7 +984,7 @@ UINT8 segas16b_state::mapper_sound_r()
 void segas16b_state::mapper_sound_w(UINT8 data)
 {
 	soundlatch_write(data & 0xff);
-	if (m_soundcpu != NULL)
+	if (m_soundcpu != nullptr)
 		m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -1283,7 +1283,7 @@ INTERRUPT_GEN_MEMBER( segas16b_state::i8751_main_cpu_vblank )
 void segas16b_state::machine_reset()
 {
 	// if we have a hard-coded mapping configuration, set it now
-	if (m_i8751_initial_config != NULL)
+	if (m_i8751_initial_config != nullptr)
 		m_mapper->configure_explicit(m_i8751_initial_config);
 
 	// queue up a timer to either boost interleave or disable the MCU
@@ -1313,7 +1313,7 @@ void segas16b_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		case TID_INIT_I8751:
 			if (!m_i8751_vblank_hook.isnull())
 				m_mcu->suspend(SUSPEND_REASON_DISABLE, 1);
-			else if (m_mcu != NULL)
+			else if (m_mcu != nullptr)
 				machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
 			break;
 
@@ -8540,7 +8540,7 @@ READ16_MEMBER( isgsm_state::cart_data_r )
 
 WRITE16_MEMBER( isgsm_state::data_w )
 {
-	UINT8 *dest = 0;
+	UINT8 *dest = nullptr;
 
 	// m_data_type
 	// rrrp o?dd

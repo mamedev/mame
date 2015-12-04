@@ -360,7 +360,7 @@ PALETTE_INIT_MEMBER(blitz_state, blitz)
 
 	/* 0000KBGR */
 
-	if (color_prom == 0) return;
+	if (color_prom == nullptr) return;
 
 	for (i = 0;i < palette.entries();i++)
 	{
@@ -764,7 +764,7 @@ ROM_START( megadpkr )
 	ROM_LOAD( "mega-1.u1",  0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_FILL(               0x0000, 0x2000, nullptr ) /* filling the R-G bitplanes */
 	ROM_LOAD( "car1.5a",    0x2000, 0x1000, CRC(29e244d2) SHA1(c309a5ee6922bf2752d218c134edb3ef5f808afa) )    /* text chars / cards deck gfx, bitplane3 */
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
@@ -813,7 +813,7 @@ ROM_START( megadpkrb )
 	ROM_LOAD( "u11.bin",  0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_FILL(               0x0000, 0x2000, nullptr ) /* filling the R-G bitplanes */
 	ROM_LOAD( "car1_5a.bin",    0x2000, 0x1000, CRC(29e244d2) SHA1(c309a5ee6922bf2752d218c134edb3ef5f808afa) )    /* text chars / cards deck gfx, bitplane3 */
 
 	ROM_REGION( 0x3000, "gfx2", 0 )

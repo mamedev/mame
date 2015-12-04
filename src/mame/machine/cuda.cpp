@@ -415,8 +415,8 @@ void cuda_device::device_start()
 	write_via_clock.resolve_safe();
 	write_via_data.resolve_safe();
 
-	m_timer = timer_alloc(0, NULL);
-	m_prog_timer = timer_alloc(1, NULL);
+	m_timer = timer_alloc(0, nullptr);
+	m_prog_timer = timer_alloc(1, nullptr);
 	save_item(NAME(ddrs[0]));
 	save_item(NAME(ddrs[1]));
 	save_item(NAME(ddrs[2]));

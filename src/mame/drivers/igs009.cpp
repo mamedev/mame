@@ -647,7 +647,7 @@ static INPUT_PORTS_START( jingbell )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Memory Clear")    // stats, memory
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igs009_state,hopper_r, (void *)0 )  // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,igs009_state,hopper_r, (void *)nullptr )  // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Pay Out")
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )   // test (press during boot)
@@ -952,7 +952,7 @@ ROM_START( gp98 )
 	ROM_LOAD( "51", 0x100000, 0x80000, CRC(30a2ef85) SHA1(38ea637acd83b175eccd2969ef21879265b88992) )
 
 	ROM_REGION( 0xc0000, "reels", 0 )
-	ROM_COPY( "tempgfx", 0x000000, 0x00000, 0x40000 )
+	ROM_COPY( "tempgfx", nullptr, 0x00000, 0x40000 )
 	ROM_COPY( "tempgfx", 0x080000, 0x40000, 0x40000 )
 	ROM_COPY( "tempgfx", 0x100000, 0x80000, 0x40000 )
 

@@ -705,7 +705,7 @@ const device_type NEOGEO_SPRITE_OPTIMZIED = &device_creator<neosprite_optimized_
 
 neosprite_optimized_device::neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: neosprite_base_device(mconfig, tag, owner, clock, NEOGEO_SPRITE_OPTIMZIED),
-	m_spritegfx8(0)
+	m_spritegfx8(nullptr)
 {
 }
 

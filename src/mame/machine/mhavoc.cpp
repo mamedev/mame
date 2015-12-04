@@ -84,7 +84,7 @@ void mhavoc_state::machine_start()
 void mhavoc_state::machine_reset()
 {
 	address_space &space = m_alpha->space(AS_PROGRAM);
-	m_has_gamma_cpu = (m_gamma != NULL);
+	m_has_gamma_cpu = (m_gamma != nullptr);
 
 	membank("bank1")->configure_entry(0, m_zram0);
 	membank("bank1")->configure_entry(1, m_zram1);

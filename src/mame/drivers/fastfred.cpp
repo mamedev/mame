@@ -626,7 +626,7 @@ GFXDECODE_END
 
 static GFXDECODE_START( imago )
 	GFXDECODE_ENTRY( "gfx1", 0,      charlayout,          0, 32 )
-	GFXDECODE_ENTRY( NULL,   0xb800, imago_spritelayout,  0, 32 )
+	GFXDECODE_ENTRY( nullptr,   0xb800, imago_spritelayout,  0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0,      charlayout,          0, 32 )
 	GFXDECODE_ENTRY( "gfx4", 0,      imago_char_1bpp, 0x140,  1 )
 GFXDECODE_END
@@ -955,7 +955,7 @@ ROM_START( imago )
 
 	ROM_REGION( 0x3000, "gfx3", 0 )
 	ROM_LOAD( "imago14.170", 0x0000, 0x1000, CRC(eded37f6) SHA1(c2ff5d4c1b001740ec4453467f879035db196a9b) )
-	ROM_FILL(                0x1000, 0x2000, 0 )
+	ROM_FILL(                0x1000, 0x2000, nullptr )
 
 	ROM_REGION( 0x1000, "gfx4", 0 )
 	ROM_LOAD( "imago15.191", 0x0000, 0x1000, CRC(85fcc195) SHA1(a76f24201c037d1e6f909fb0ea4ad59b1d6ddd57) )
@@ -992,7 +992,7 @@ ROM_START( imagoa )
 
 	ROM_REGION( 0x3000, "gfx3", 0 )
 	ROM_LOAD( "imago14.170", 0x0000, 0x1000, CRC(eded37f6) SHA1(c2ff5d4c1b001740ec4453467f879035db196a9b) )
-	ROM_FILL(                0x1000, 0x2000, 0 )
+	ROM_FILL(                0x1000, 0x2000, nullptr )
 
 	ROM_REGION( 0x1000, "gfx4", 0 )
 	ROM_LOAD( "imago15.191", 0x0000, 0x1000, CRC(85fcc195) SHA1(a76f24201c037d1e6f909fb0ea4ad59b1d6ddd57) )

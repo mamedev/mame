@@ -900,7 +900,7 @@ static const floppy_format_type apc_floppy_formats[] = {
 	FLOPPY_D88_FORMAT,
 	FLOPPY_IMD_FORMAT,
 	FLOPPY_MFI_FORMAT,
-	NULL
+	nullptr
 };
 
 static SLOT_INTERFACE_START( apc_floppies )

@@ -290,7 +290,7 @@ static void grab_vprog_command(running_machine &machine, int ref, int params, co
 		return;
 	if ((param[0][0] == 0) || (strlen(param[0]) > 127))
 		return;
-	if ((fil = fopen(param[0], "wb")) == NULL)
+	if ((fil = fopen(param[0], "wb")) == nullptr)
 		return;
 	for (int n = 0; n < 136; n++) {
 		chst->nvidia_nv2a->debug_grab_vertex_program_slot(n, instruction);
@@ -829,7 +829,7 @@ ohci_function_device::ohci_function_device()
 	address = 0;
 	controldir = 0;
 	remain = 0;
-	position = NULL;
+	position = nullptr;
 }
 
 void ohci_function_device::execute_reset()
@@ -846,7 +846,7 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 			controldir = p->bmRequestType & 128;
 			// case !=0, in data stage and out status stage
 			// case ==0, out data stage and in status stage
-			position = NULL;
+			position = nullptr;
 			remain = p->wLength;
 			if ((p->bmRequestType & 0x60) == 0) {
 				switch (p->bRequest) {
@@ -871,7 +871,7 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 			if (size > remain)
 				size = remain;
 			if (controldir != 0) {
-				if (position != NULL)
+				if (position != nullptr)
 					memcpy(buffer, position, size);
 				position = position + size;
 				remain = remain - size;
@@ -883,7 +883,7 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 			if (size > remain)
 				size = remain;
 			if (controldir == 0) {
-				if (position != NULL)
+				if (position != nullptr)
 					memcpy(position, buffer, size);
 				position = position + size;
 				remain = remain - size;

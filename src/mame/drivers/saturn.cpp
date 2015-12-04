@@ -1159,7 +1159,7 @@ MACHINE_CONFIG_DERIVED( saturnus, saturn )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","NTSC-U")
 
-	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, NULL)
+	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
 MACHINE_CONFIG_END
@@ -1170,7 +1170,7 @@ MACHINE_CONFIG_DERIVED( saturneu, saturn )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","PAL")
 
-	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, NULL)
+	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
 MACHINE_CONFIG_END
@@ -1181,7 +1181,7 @@ MACHINE_CONFIG_DERIVED( saturnjp, saturn )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","NTSC-J")
 
-	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, NULL)
+	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
 MACHINE_CONFIG_END
@@ -1240,7 +1240,7 @@ ROM_START(saturnjp)
 	ROM_SYSTEM_BIOS(2, "100", "Japan v1.00 (940921)")
 	ROMX_LOAD("sega_100.bin", 0x00000000, 0x00080000, CRC(2aba43c2) SHA1(2b8cb4f87580683eb4d760e4ed210813d667f0a2), ROM_BIOS(3))
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "maincpu",0,0,0x080000)
+	ROM_COPY( "maincpu",nullptr,0,0x080000)
 ROM_END
 
 /* Overseas Saturn */
@@ -1252,7 +1252,7 @@ ROM_START(saturn)
 	ROM_SYSTEM_BIOS(1, "100a", "Overseas v1.00a (941115)")
 	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "maincpu",0,0,0x080000)
+	ROM_COPY( "maincpu",nullptr,0,0x080000)
 ROM_END
 
 ROM_START(saturneu)
@@ -1263,14 +1263,14 @@ ROM_START(saturneu)
 	ROM_SYSTEM_BIOS(1, "100a", "Overseas v1.00a (941115)")
 	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "maincpu",0,0,0x080000)
+	ROM_COPY( "maincpu",nullptr,0,0x080000)
 ROM_END
 
 ROM_START(vsaturn)
 	ROM_REGION( 0x480000, "maincpu", ROMREGION_ERASEFF ) /* SH2 code */
 	ROM_LOAD("vsaturn.bin", 0x00000000, 0x00080000, CRC(e4d61811) SHA1(4154e11959f3d5639b11d7902b3a393a99fb5776))
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "maincpu",0,0,0x080000)
+	ROM_COPY( "maincpu",nullptr,0,0x080000)
 ROM_END
 
 ROM_START(hisaturn)
@@ -1280,7 +1280,7 @@ ROM_START(hisaturn)
 	ROM_SYSTEM_BIOS(1, "101", "v1.01 (950130)")
 	ROMX_LOAD("hisaturn.bin", 0x00000000, 0x00080000, CRC(721e1b60) SHA1(49d8493008fa715ca0c94d99817a5439d6f2c796), ROM_BIOS(2))
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "maincpu",0,0,0x080000)
+	ROM_COPY( "maincpu",nullptr,0,0x080000)
 ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT        COMPANY     FULLNAME            FLAGS */

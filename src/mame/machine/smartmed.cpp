@@ -78,7 +78,7 @@ nand_device::nand_device(const machine_config &mconfig, const char *tag, device_
 		m_page_total_size(0),
 		m_num_pages(0),
 		m_log2_pages_per_block(0),
-		m_pagereg(NULL),
+		m_pagereg(nullptr),
 		m_id_len(0),
 		m_col_address_cycles(0),
 		m_row_address_cycles(0),
@@ -94,7 +94,7 @@ nand_device::nand_device(const machine_config &mconfig, device_type type, const 
 		m_page_total_size(0),
 		m_num_pages(0),
 		m_log2_pages_per_block(0),
-		m_pagereg(NULL),
+		m_pagereg(nullptr),
 		m_id_len(0),
 		m_col_address_cycles(0),
 		m_row_address_cycles(0),
@@ -109,8 +109,8 @@ nand_device::nand_device(const machine_config &mconfig, device_type type, const 
 */
 void nand_device::device_start()
 {
-	m_data_ptr = NULL;
-	m_data_uid_ptr = NULL;
+	m_data_ptr = nullptr;
+	m_data_uid_ptr = nullptr;
 	m_mode = SM_M_INIT;
 	m_pointer_mode = SM_PM_A;
 	m_page_addr = 0;
@@ -335,8 +335,8 @@ void smartmedia_image_device::call_unload()
 	m_page_total_size = 0;
 	m_num_pages = 0;
 	m_log2_pages_per_block = 0;
-	m_data_ptr = NULL;
-	m_data_uid_ptr = NULL;
+	m_data_ptr = nullptr;
+	m_data_uid_ptr = nullptr;
 	m_mode = SM_M_INIT;
 	m_pointer_mode = SM_PM_A;
 	m_page_addr = 0;

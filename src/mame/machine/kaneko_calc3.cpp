@@ -1706,7 +1706,7 @@ void kaneko_calc3_device::mcu_run()
 				{
 					int length;
 
-					length = decompress_table(commandtabl, 0, m_writeaddress_current-2);
+					length = decompress_table(commandtabl, nullptr, m_writeaddress_current-2);
 
 					if (length)
 					{

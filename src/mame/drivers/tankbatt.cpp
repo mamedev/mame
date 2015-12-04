@@ -275,7 +275,7 @@ static const char *const tankbatt_sample_names[] =
 	"engine1",
 	"engine2",
 	"explode1",
-	0   /* end of array */
+	nullptr   /* end of array */
 };
 
 

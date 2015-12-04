@@ -933,7 +933,7 @@ static const mapper8_list_entry mapper_devices[] =
 	{ INTSNAME,         PHYSIC, STOP, 0xffe000, 0xfffff0, 0x000000  },  // ffe000-ffe00f Interrupt level sense
 	{ PERIBOX_TAG,      PHYSIC, STOP, 0x000000, 0x000000, 0x000000  },  // Peripheral Expansion Box
 
-	{ NULL, 0, 0, 0, 0, 0  }
+	{ nullptr, 0, 0, 0, 0, 0  }
 };
 
 static MAPPER8_CONFIG( mapper_conf )
@@ -1111,10 +1111,10 @@ ROM_START(ti99_8)
 
 	// Built-in RAM
 	ROM_REGION(SRAM_SIZE, SRAM_TAG, 0)
-	ROM_FILL(0x0000, SRAM_SIZE, 0x00)
+	ROM_FILL(0x0000, SRAM_SIZE, nullptr)
 
 	ROM_REGION(DRAM_SIZE, DRAM_TAG, 0)
-	ROM_FILL(0x0000, DRAM_SIZE, 0x00)
+	ROM_FILL(0x0000, DRAM_SIZE, nullptr)
 ROM_END
 
 #define rom_ti99_8e rom_ti99_8

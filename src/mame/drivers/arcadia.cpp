@@ -499,7 +499,7 @@ static MACHINE_CONFIG_START( arcadia, arcadia_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */
-	MCFG_ARCADIA_CARTRIDGE_ADD("cartslot", arcadia_cart, NULL)
+	MCFG_ARCADIA_CARTRIDGE_ADD("cartslot", arcadia_cart, nullptr)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","arcadia")

@@ -392,7 +392,7 @@ void exidy440_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, 
 			sy -= (VBSTART - VBEND);
 
 		/* draw line */
-		draw_scanline8(bitmap, 0, y, (HBSTART - HBEND), &m_local_videoram[sy * 512], NULL);
+		draw_scanline8(bitmap, 0, y, (HBSTART - HBEND), &m_local_videoram[sy * 512], nullptr);
 	}
 
 	/* draw the sprites */

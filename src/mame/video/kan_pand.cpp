@@ -226,7 +226,7 @@ void kaneko_pandora_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 void kaneko_pandora_device::eof( )
 {
-	assert(m_spriteram != NULL);
+	assert(m_spriteram != nullptr);
 
 	// the games can disable the clearing of the sprite bitmap, to leave sprite trails
 	if (m_clear_bitmap)

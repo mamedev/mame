@@ -399,9 +399,9 @@ WRITE8_MEMBER(m63_state::snddata_w)
 		m_ay1->address_w(space, 0, offset);
 	else if ((m_p2 & 0xf0) == 0xa0)
 		m_ay1->data_w(space, 0, offset);
-	else if (m_ay2 != NULL && (m_p1 & 0xe0) == 0x60)
+	else if (m_ay2 != nullptr && (m_p1 & 0xe0) == 0x60)
 		m_ay2->address_w(space, 0, offset);
-	else if (m_ay2 != NULL && (m_p1 & 0xe0) == 0x40)
+	else if (m_ay2 != nullptr && (m_p1 & 0xe0) == 0x40)
 			m_ay2->data_w(space, 0, offset);
 	else if ((m_p2 & 0xf0) == 0x70 )
 		m_sound_status = offset;
@@ -974,7 +974,7 @@ ROM_START( fghtbskt )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "fb08.12f",     0x0000, 0x1000, CRC(271cd7b8) SHA1(00cfeb6ba429cf6cc59d6542dea8de2ca79155ed) )
-	ROM_FILL(                 0x1000, 0x1000, 0 )
+	ROM_FILL(                 0x1000, 0x1000, nullptr )
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
 	ROM_LOAD( "fb21.25e",     0x0000, 0x2000, CRC(02843591) SHA1(e38ccc97dcbd642d0ac768837f7baf1573fdb91f) )

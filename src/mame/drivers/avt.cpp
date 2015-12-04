@@ -551,7 +551,7 @@ PALETTE_INIT_MEMBER(avt_state, avt)
 	int j;
 
 	/* 0000BGRI */
-	if (color_prom == 0) return;
+	if (color_prom == nullptr) return;
 
 	for (j = 0; j < palette.entries(); j++)
 	{

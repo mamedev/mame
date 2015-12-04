@@ -186,8 +186,8 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 	scroll[6] = 0;
 	scroll[7] = 0;
 
-	copyscrollbitmap(bitmap, m_background_bitmap, 0, 0, 8, scroll, cliprect);
-	copyscrollbitmap(m_scrolled_collision_background, m_collision_background, 0, 0, 8, scroll, cliprect);
+	copyscrollbitmap(bitmap, m_background_bitmap, 0, nullptr, 8, scroll, cliprect);
+	copyscrollbitmap(m_scrolled_collision_background, m_collision_background, 0, nullptr, 8, scroll, cliprect);
 
 	/* update the S2636 chips */
 	bitmap_ind16 *s2636_0_bitmap = &m_s2636_0->update(cliprect);

@@ -279,7 +279,7 @@ WRITE8_MEMBER( apf_state::apf_dischw_w)
 	/* bit 3 is index of drive to select */
 	UINT8 drive = BIT(data, 3);
 
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 	if (drive)
 		floppy = m_floppy1->get_device();
 	else
@@ -534,7 +534,7 @@ static MACHINE_CONFIG_START( apfm1000, apf_state )
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
 
-	MCFG_APF_CARTRIDGE_ADD("cartslot", apf_cart, NULL)
+	MCFG_APF_CARTRIDGE_ADD("cartslot", apf_cart, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "apfm1000")

@@ -344,7 +344,7 @@ static MACHINE_CONFIG_START( ms_megadriv, md_cons_state )
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_DRIVER(md_cons_state, screen_eof_console)
 
-	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, NULL)
+	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
@@ -357,7 +357,7 @@ static MACHINE_CONFIG_START( ms_megadpal, md_cons_state )
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_DRIVER(md_cons_state, screen_eof_console)
 
-	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, NULL)
+	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
@@ -477,7 +477,7 @@ DEVICE_IMAGE_LOAD_MEMBER( md_cons_state, _32x_cart )
 	UINT32 *ROM32;
 	int i;
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		length = image.length();
 		temp_copy.resize(length);
@@ -928,7 +928,7 @@ ROM_START( 32x_scd )
 	ROM_LOAD( "mpr-15764-t.bin", 0x000000,  0x020000, CRC(2e49d72c) SHA1(328a3228c29fba244b9db2055adc1ec4f7a87e6b) )
 
 	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
-	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
+	ROM_COPY( "gamecart", nullptr, 0x0, 0x400000)
 
 	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
 	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
@@ -947,7 +947,7 @@ ROM_START( 32x_mcd )
 	ROM_LOAD( "megacd_model1_bios_1_00_e.bin", 0x000000,  0x020000, CRC(529ac15a) SHA1(f891e0ea651e2232af0c5c4cb46a0cae2ee8f356) )
 
 	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
-	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
+	ROM_COPY( "gamecart", nullptr, 0x0, 0x400000)
 
 	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
 	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
@@ -980,7 +980,7 @@ ROM_START( 32x_mcdj )
 	ROMX_LOAD( "epr-14088e.bin", 0x000000,  0x020000, CRC(9d2da8f2) SHA1(4846f448160059a7da0215a5df12ca160f26dd69), ROM_BIOS(5) )
 
 	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
-	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
+	ROM_COPY( "gamecart", nullptr, 0x0, 0x400000)
 
 	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
 	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )

@@ -1887,7 +1887,7 @@ DRIVER_INIT_MEMBER(psikyo_state,tengai)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),this));
 
 	s1945_mcu_init();
-	m_s1945_mcu_table = 0;
+	m_s1945_mcu_table = nullptr;
 
 	m_ka302c_banking = 0; // Banking is controlled by mcu
 

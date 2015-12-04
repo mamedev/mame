@@ -29,7 +29,7 @@ void igs022_device::device_start()
 {
 	// Reset  stuff
 	memset(m_kb_regs, 0, 0x100 * sizeof(UINT32));
-	m_sharedprotram = 0;
+	m_sharedprotram = nullptr;
 
 	save_item(NAME(m_kb_regs));
 }

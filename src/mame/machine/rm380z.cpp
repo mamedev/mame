@@ -210,7 +210,7 @@ WRITE8_MEMBER( rm380z_state::keyboard_put )
 
 WRITE8_MEMBER( rm380z_state::disk_0_control )
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) floppy = m_floppy1->get_device();

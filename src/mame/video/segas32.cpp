@@ -222,7 +222,7 @@ void segas32_state::common_start(int multi32)
 	m_spriteram_32bit = auto_alloc_array(machine(), UINT32, 0x20000/4);
 
 	/* allocate the tilemap cache */
-	m_cache_head = NULL;
+	m_cache_head = nullptr;
 	for (tmap = 0; tmap < TILEMAP_CACHE_SIZE; tmap++)
 	{
 		struct cache_entry *entry = auto_alloc(machine(), struct cache_entry);
@@ -470,7 +470,7 @@ WRITE16_MEMBER(segas32_state::system32_videoram_w)
 		offset %= 0x200;
 
 		/* scan the cache for a matching pages */
-		for (entry = m_cache_head; entry != NULL; entry = entry->next)
+		for (entry = m_cache_head; entry != nullptr; entry = entry->next)
 			if (entry->page == page)
 				entry->tmap->mark_tile_dirty(offset);
 	}
@@ -671,7 +671,7 @@ tilemap_t *segas32_state::find_cache_entry(int page, int bank)
 	struct segas32_state::cache_entry *entry, *prev;
 
 	/* scan the list for a matching entry */
-	prev = NULL;
+	prev = nullptr;
 	entry = m_cache_head;
 	while (1)
 	{
@@ -688,7 +688,7 @@ tilemap_t *segas32_state::find_cache_entry(int page, int bank)
 		}
 
 		/* stop on the last entry */
-		if (entry->next == NULL)
+		if (entry->next == nullptr)
 			break;
 		prev = entry;
 		entry = entry->next;
@@ -1992,7 +1992,7 @@ void segas32_state::mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, c
 		UINT8       mixshift;           /* shift from control reg */
 		UINT8       coloroffs;          /* color offset index */
 	} layerorder[16][8], layersort[8];
-	struct layer_info temp_sprite_save = { 0 };
+	struct layer_info temp_sprite_save = { nullptr };
 	UINT8 sprgroup_shift, sprgroup_mask, sprgroup_or;
 	int numlayers, laynum, groupnum;
 	int rgboffs[3][3];

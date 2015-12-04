@@ -686,7 +686,7 @@ void argus_state::bg_setting()
 
 	if (!m_flipscreen)
 	{
-		if (m_bg0_tilemap != NULL)
+		if (m_bg0_tilemap != nullptr)
 		{
 			m_bg0_tilemap->set_scrollx(0, bg0_scrollx & 0x1ff);
 			m_bg0_tilemap->set_scrolly(0, bg0_scrolly & 0x1ff);
@@ -696,7 +696,7 @@ void argus_state::bg_setting()
 	}
 	else
 	{
-		if (m_bg0_tilemap != NULL)
+		if (m_bg0_tilemap != nullptr)
 		{
 			m_bg0_tilemap->set_scrollx(0, (bg0_scrollx + 256) & 0x1ff);
 			m_bg0_tilemap->set_scrolly(0, (bg0_scrolly + 256) & 0x1ff);

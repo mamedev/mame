@@ -322,7 +322,7 @@ WRITE8_MEMBER(system1_state::system1_paletteram_w)
 	  accurate to +/- .003K ohms.
 	*/
 
-	if (m_color_prom != NULL)
+	if (m_color_prom != nullptr)
 	{
 		m_paletteram[offset] = data;
 		UINT8 val;

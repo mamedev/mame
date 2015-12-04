@@ -611,12 +611,12 @@ void seattle_state::machine_reset()
 	m_cpu_stalled_on_voodoo = FALSE;
 
 	/* reset either the DCS2 board or the CAGE board */
-	if (machine().device("dcs") != NULL)
+	if (machine().device("dcs") != nullptr)
 	{
 		m_dcs->reset_w(1);
 		m_dcs->reset_w(0);
 	}
-	else if (machine().device("cage") != NULL)
+	else if (machine().device("cage") != nullptr)
 	{
 		m_cage->control_w(0);
 		m_cage->control_w(3);
@@ -2518,7 +2518,7 @@ static MACHINE_CONFIG_START( seattle_common, seattle_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(seattle_state, ide_interrupt))
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)
 

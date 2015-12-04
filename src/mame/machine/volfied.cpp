@@ -259,7 +259,7 @@ static const UINT16 palette_data_11[0x50] =
 
 static const UINT16 *const palette_data_lookup[] =
 {
-	0,
+	nullptr,
 	palette_data_01,
 	palette_data_02,
 	palette_data_03,

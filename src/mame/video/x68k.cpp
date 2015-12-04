@@ -1079,7 +1079,7 @@ VIDEO_START_MEMBER(x68k_state,x68000)
 	int gfx_index;
 
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (m_gfxdecode->gfx(gfx_index) == 0)
+		if (m_gfxdecode->gfx(gfx_index) == nullptr)
 			break;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */

@@ -547,10 +547,10 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 	m_tr_3a = 0;
 	m_tr_3b = 1;
 
-	m_spritelist=0;
-	m_spriteram16_buffered=0;
-	m_pf_line_inf=0;
-	m_tile_opaque_sp=0;
+	m_spritelist=nullptr;
+	m_spriteram16_buffered=nullptr;
+	m_pf_line_inf=nullptr;
+	m_tile_opaque_sp=nullptr;
 
 	/* Setup individual game */
 	do {
@@ -1665,7 +1665,7 @@ void taito_f3_state::calculate_clip(int y, UINT16 pri, UINT32* clip0, UINT32* cl
 	case 0x0310: /* Clip plane 1 & 2 enable, plane 1 inverted */
 		{
 			if (sa_line_t->clip1_l[y] > sa_line_t->clip1_r[y])
-				line_enable=0;
+				line_enable=nullptr;
 			else
 				*clip0=(sa_line_t->clip1_l[y]) | (sa_line_t->clip1_r[y]<<16);
 
@@ -1675,7 +1675,7 @@ void taito_f3_state::calculate_clip(int y, UINT16 pri, UINT32* clip0, UINT32* cl
 	case 0x0320: /* Clip plane 1 & 2 enable, plane 2 inverted */
 		{
 			if (sa_line_t->clip0_l[y] > sa_line_t->clip0_r[y])
-				line_enable=0;
+				line_enable=nullptr;
 			else
 				*clip0=(sa_line_t->clip0_l[y]) | (sa_line_t->clip0_r[y]<<16);
 
@@ -2272,10 +2272,10 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 			/* set sprite alpha mode */
 			sprite_alpha_check=0;
 			sprite_alpha_all_2a=1;
-			m_dpix_sp[1]=0;
-			m_dpix_sp[2]=0;
-			m_dpix_sp[4]=0;
-			m_dpix_sp[8]=0;
+			m_dpix_sp[1]=nullptr;
+			m_dpix_sp[2]=nullptr;
+			m_dpix_sp[4]=nullptr;
+			m_dpix_sp[8]=nullptr;
 			for(i=0;i<4;i++)    /* i = sprite priority offset */
 			{
 				UINT8 sprite_alpha_mode=(sprite_alpha>>(i*2))&3;
@@ -2389,20 +2389,20 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 					if(alpha_mode[3]>1) alpha_mode[3]=1;
 					if(alpha_mode[4]>1) alpha_mode[4]=1;
 					sprite_alpha_check=0;
-					m_dpix_sp[1]=0;
-					m_dpix_sp[2]=0;
-					m_dpix_sp[4]=0;
-					m_dpix_sp[8]=0;
+					m_dpix_sp[1]=nullptr;
+					m_dpix_sp[2]=nullptr;
+					m_dpix_sp[4]=nullptr;
+					m_dpix_sp[8]=nullptr;
 				}
 			}
 		}
 		else
 		{
 			sprite_alpha_check=0;
-			m_dpix_sp[1]=0;
-			m_dpix_sp[2]=0;
-			m_dpix_sp[4]=0;
-			m_dpix_sp[8]=0;
+			m_dpix_sp[1]=nullptr;
+			m_dpix_sp[2]=nullptr;
+			m_dpix_sp[4]=nullptr;
+			m_dpix_sp[8]=nullptr;
 		}
 
 

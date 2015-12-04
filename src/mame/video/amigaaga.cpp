@@ -449,7 +449,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	int pf1pri = 0, pf2pri = 0;
 	int planes = 0;
 
-	UINT32 *dst = NULL;
+	UINT32 *dst = nullptr;
 	int ebitoffs = 0, obitoffs = 0;
 	int ecolmask = 0, ocolmask = 0;
 	int edelay = 0, odelay = 0;
@@ -564,7 +564,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		}
 
 		/* clear the target pixels to the background color as a starting point */
-		if (dst != NULL)
+		if (dst != nullptr)
 			dst[x*2+0] =
 			dst[x*2+1] = aga_palette[0];
 
@@ -706,7 +706,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				CUSTOM_REG(REG_CLXDAT) |= 0x001;
 
 			/* if we are within the display region, render */
-			if (dst != NULL && x >= m_diw.min_x && x < m_diw.max_x)
+			if (dst != nullptr && x >= m_diw.min_x && x < m_diw.max_x)
 			{
 				int pix, pri;
 
@@ -834,7 +834,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	CUSTOM_REG(REG_COLOR00) = save_color0;
 
 	// save
-	if (dst != NULL)
+	if (dst != nullptr)
 		memcpy(&m_flickerfixer32.pix32(save_scanline), dst, amiga_state::SCREEN_WIDTH * 4);
 
 #if GUESS_COPPER_OFFSET

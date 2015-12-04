@@ -1577,13 +1577,13 @@ ROM_START( ppan )
 	ROM_LOAD( "3.u122",  0x000000, 0x080000, CRC(d0d37028) SHA1(0f58d220a1972bafa1299a19e704b7735886c8b6) )
 
 	ROM_REGION( 0x100000, "oki", 0) /* OKI Samples copied here */
-	ROM_COPY( "okidata",  0x000000, 0x000000, 0x20000 )
-	ROM_COPY( "okidata",  0x000000, 0x020000, 0x20000 )
-	ROM_COPY( "okidata",  0x000000, 0x040000, 0x20000 )
+	ROM_COPY( "okidata",  nullptr, 0x000000, 0x20000 )
+	ROM_COPY( "okidata",  nullptr, 0x020000, 0x20000 )
+	ROM_COPY( "okidata",  nullptr, 0x040000, 0x20000 )
 	ROM_COPY( "okidata",  0x020000, 0x060000, 0x20000 )
-	ROM_COPY( "okidata",  0x000000, 0x080000, 0x20000 )
+	ROM_COPY( "okidata",  nullptr, 0x080000, 0x20000 )
 	ROM_COPY( "okidata",  0x040000, 0x0a0000, 0x20000 )
-	ROM_COPY( "okidata",  0x000000, 0x0c0000, 0x20000 )
+	ROM_COPY( "okidata",  nullptr, 0x0c0000, 0x20000 )
 	ROM_COPY( "okidata",  0x060000, 0x0e0000, 0x20000 )
 ROM_END
 

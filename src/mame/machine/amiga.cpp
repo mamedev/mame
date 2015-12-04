@@ -147,7 +147,7 @@ void amiga_state::machine_start()
 
 	// set up chip RAM access
 	memory_share *share = memshare("chip_ram");
-	if (share == NULL)
+	if (share == nullptr)
 		fatalerror("Unable to find Amiga chip RAM\n");
 	m_chip_ram.set(*share, 2);
 	m_chip_ram_mask = (m_chip_ram.bytes() - 1) & ~1;
@@ -380,7 +380,7 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_irq_proc )
 
 UINT16 amiga_state::joy0dat_r()
 {
-	if (m_input_device == NULL)
+	if (m_input_device == nullptr)
 		return m_joy0dat_port ? m_joy0dat_port->read() : 0xffff;
 
 	if (m_input_device->read() & 0x10)
@@ -391,7 +391,7 @@ UINT16 amiga_state::joy0dat_r()
 
 UINT16 amiga_state::joy1dat_r()
 {
-	if (m_input_device == NULL)
+	if (m_input_device == nullptr)
 		return m_joy1dat_port ? m_joy1dat_port->read() : 0xffff;
 
 	if (m_input_device->read() & 0x20)

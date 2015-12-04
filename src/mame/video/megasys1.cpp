@@ -732,7 +732,7 @@ static const struct priority priorities[] =
 		{ 0x14032,0x04132,0x14032,0x04132,0xfffff,0xfffff,0xfffff,0xfffff,
 			0xfffff,0xfffff,0x01324,0xfffff,0xfffff,0xfffff,0xfffff,0xfffff }
 	},
-	{   0   }   // end of list: use the prom's data
+	{   nullptr   }   // end of list: use the prom's data
 };
 
 

@@ -833,7 +833,7 @@ void ngen_state::machine_start()
 	memory_share* vidshare = memshare("vram");
 	memory_share* fontshare = memshare("fontram");
 	m_hd_buffer.allocate(1024*8);  // 8kB buffer RAM for HD controller
-	if(vidshare == NULL || fontshare == NULL)
+	if(vidshare == nullptr || fontshare == nullptr)
 		fatalerror("Error: VRAM not found");
 	m_vram.set(*vidshare,2);
 	m_fontram.set(*fontshare,2);
@@ -955,13 +955,13 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232_a", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232_a", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("iouart", upd7201_device, ctsa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_device, dcda_w))
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("iouart", upd7201_device, ria_w))
 
-	MCFG_RS232_PORT_ADD("rs232_b", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232_b", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_device, rxb_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("iouart", upd7201_device, ctsb_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_device, dcdb_w))
@@ -976,7 +976,7 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc",mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", MC6845, NULL, 19980000 / 9)  // divisor unknown -- /9 gives 60Hz output, so likely correct
+	MCFG_MC6845_ADD("crtc", MC6845, nullptr, 19980000 / 9)  // divisor unknown -- /9 gives 60Hz output, so likely correct
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(9)
 	MCFG_MC6845_UPDATE_ROW_CB(ngen_state, crtc_update_row)
@@ -1065,13 +1065,13 @@ static MACHINE_CONFIG_START( ngen386, ngen386_state )
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232_a", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232_a", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("iouart", upd7201_device, ctsa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_device, dcda_w))
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("iouart", upd7201_device, ria_w))
 
-	MCFG_RS232_PORT_ADD("rs232_b", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232_b", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_device, rxb_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("iouart", upd7201_device, ctsb_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_device, dcdb_w))
@@ -1086,7 +1086,7 @@ static MACHINE_CONFIG_START( ngen386, ngen386_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc",mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", MC6845, NULL, 19980000 / 9)  // divisor unknown -- /9 gives 60Hz output, so likely correct
+	MCFG_MC6845_ADD("crtc", MC6845, nullptr, 19980000 / 9)  // divisor unknown -- /9 gives 60Hz output, so likely correct
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(9)
 	MCFG_MC6845_UPDATE_ROW_CB(ngen_state, crtc_update_row)

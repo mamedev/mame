@@ -577,7 +577,7 @@ static MACHINE_CONFIG_START( rc759, rc759_state )
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(rc759_state, centronics_select_w))
 
 	// isbx slot
-	MCFG_ISBX_SLOT_ADD("isbx", 0, isbx_cards, NULL)
+	MCFG_ISBX_SLOT_ADD("isbx", 0, isbx_cards, nullptr)
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int1_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int3_w))
 	MCFG_ISBX_SLOT_MDRQT_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq0_w))

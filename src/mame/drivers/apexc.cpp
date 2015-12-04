@@ -84,9 +84,9 @@ public:
 	virtual bool is_creatable() const { return 0; }
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 1; }
-	virtual const char *image_interface() const { return NULL; }
+	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const { return "apc"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	virtual bool call_load();
 	virtual void call_unload();
@@ -213,9 +213,9 @@ public:
 	virtual bool is_creatable() const { return 1; }
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
+	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const { return "tap"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete() { update_names(); }
@@ -247,9 +247,9 @@ public:
 	virtual bool is_creatable() const { return 0; }
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
+	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const { return "tap"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete() { update_names(); }

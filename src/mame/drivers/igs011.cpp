@@ -3126,7 +3126,7 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   // data clear
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0) // hopper switch
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)nullptr) // hopper switch
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // stats
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coin
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -3256,7 +3256,7 @@ static INPUT_PORTS_START( nkishusp )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   // data clear
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0) // hopper switch
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)nullptr) // hopper switch
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // stats
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coin
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -3385,7 +3385,7 @@ static INPUT_PORTS_START( wlcc )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE2  ) // shown in test mode
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)   // clear coin
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL   ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0)   // hopper switch
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL   ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)nullptr)   // hopper switch
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -3514,7 +3514,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)nullptr) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )   // system reset
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // stats
@@ -3841,7 +3841,7 @@ static INPUT_PORTS_START( xymg )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)nullptr) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // stats
@@ -4739,9 +4739,9 @@ ROM_START( vbowl )
 	ROM_REGION( 0x400000, "ics", 0 )
 	ROM_LOAD( "vrbowlng.u67", 0x00000, 0x80000, CRC(53000936) SHA1(e50c6216f559a9248c095bdfae05c3be4be79ff3) )  // 8 bit signed mono & u-law
 	ROM_LOAD( "vrbowlng.u66", 0x80000, 0x80000, CRC(f62cf8ed) SHA1(c53e47e2c619ed974ad40ee4aaa4a35147ea8311) )  // 8 bit signed mono
-	ROM_COPY( "ics", 0, 0x100000,0x100000)
-	ROM_COPY( "ics", 0, 0x200000,0x100000)
-	ROM_COPY( "ics", 0, 0x300000,0x100000)
+	ROM_COPY( "ics", nullptr, 0x100000,0x100000)
+	ROM_COPY( "ics", nullptr, 0x200000,0x100000)
+	ROM_COPY( "ics", nullptr, 0x300000,0x100000)
 ROM_END
 
 ROM_START( vbowlj )
@@ -4758,9 +4758,9 @@ ROM_START( vbowlj )
 	ROM_REGION( 0x400000, "ics", 0 )
 	ROM_LOAD( "vrbowlng.u67", 0x00000, 0x80000, CRC(53000936) SHA1(e50c6216f559a9248c095bdfae05c3be4be79ff3) )  // 8 bit signed mono & u-law
 	ROM_LOAD( "vrbowlng.u66", 0x80000, 0x80000, CRC(f62cf8ed) SHA1(c53e47e2c619ed974ad40ee4aaa4a35147ea8311) )  // 8 bit signed mono
-	ROM_COPY( "ics", 0, 0x100000,0x100000)
-	ROM_COPY( "ics", 0, 0x200000,0x100000)
-	ROM_COPY( "ics", 0, 0x300000,0x100000)
+	ROM_COPY( "ics", nullptr, 0x100000,0x100000)
+	ROM_COPY( "ics", nullptr, 0x200000,0x100000)
+	ROM_COPY( "ics", nullptr, 0x300000,0x100000)
 ROM_END
 
 /***************************************************************************

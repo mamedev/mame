@@ -615,7 +615,7 @@ PALETTE_INIT_MEMBER(dacholer_state, dacholer)
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 0,
 			2, resistances_b,  weights_b,  0, 0,
-			0, 0, 0, 0, 0);
+			0, nullptr, nullptr, 0, 0);
 
 	for (i = 0;i < palette.entries(); i++)
 	{

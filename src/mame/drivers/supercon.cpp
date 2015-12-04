@@ -612,7 +612,7 @@ void supercon_state::machine_start()
 {
 	m_timer_update_irq = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supercon_state::update_irq),this));
 	m_timer_update_irq->adjust( attotime::zero, 0, attotime::from_hz(1000) );
-	m_timer_mouse_click =  machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supercon_state::mouse_click),this),NULL);
+	m_timer_mouse_click =  machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supercon_state::mouse_click),this),nullptr);
 	save_item(NAME(m_save_board));
 	machine().save().register_postload(save_prepost_delegate(FUNC(supercon_state::board_postload),this));
 	machine().save().register_presave(save_prepost_delegate(FUNC(supercon_state::board_presave),this));

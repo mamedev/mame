@@ -808,7 +808,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(oric_state, via_irq_w))
 
 	/* extension port */
-	MCFG_ORICEXT_ADD( "ext", oricext_intf, NULL, "maincpu", WRITELINE(oric_state, ext_irq_w))
+	MCFG_ORICEXT_ADD( "ext", oricext_intf, nullptr, "maincpu", WRITELINE(oric_state, ext_irq_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( prav8d, oric )
@@ -847,9 +847,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( telstrat, oric, telestrat_state )
 	MCFG_WD_FDC_FORCE_READY
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", telestrat_floppies, "3dsdd", telestrat_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", telestrat_floppies, NULL,    telestrat_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", telestrat_floppies, NULL,    telestrat_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", telestrat_floppies, NULL,    telestrat_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
 MACHINE_CONFIG_END
 
 

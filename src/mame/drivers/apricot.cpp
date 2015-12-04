@@ -173,7 +173,7 @@ WRITE8_MEMBER( apricot_state::i8255_portb_w )
 	m_display_on = BIT(data, 3);
 	m_video_mode = BIT(data, 4);
 
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	// bit 5, enable disk select
 	// bit 6, disk select
@@ -440,7 +440,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("ic31", pic8259_device, ir5_w))
 
 	// rs232 port
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 // note: missing a receive clock callback to support external clock mode
 // (m_data_selector_rts == 1 and m_data_selector_dtr == 0)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ic15", z80sio0_device, rxa_w))
@@ -474,8 +474,8 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	// expansion bus
 	MCFG_EXPANSION_ADD("exp", "ic91")
 	MCFG_EXPANSION_IOP_ADD("ic71")
-	MCFG_EXPANSION_SLOT_ADD("exp:1", apricot_expansion_cards, NULL)
-	MCFG_EXPANSION_SLOT_ADD("exp:2", apricot_expansion_cards, NULL)
+	MCFG_EXPANSION_SLOT_ADD("exp:1", apricot_expansion_cards, nullptr)
+	MCFG_EXPANSION_SLOT_ADD("exp:2", apricot_expansion_cards, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apricotxi, apricot )

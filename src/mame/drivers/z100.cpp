@@ -168,7 +168,7 @@ public:
 		m_floppy3(*this, "z207_fdc:3"),
 		m_crtc(*this, "crtc"),
 		m_palette(*this, "palette"),
-		m_floppy(NULL)
+		m_floppy(nullptr)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

@@ -99,7 +99,7 @@ static MACHINE_CONFIG_START( nes, nes_state )
 	MCFG_NES_CONTROL_PORT_ADD("ctrl2", nes_control_port2_devices, "joypad")
 	MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)
 
-	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_cart, NULL)
+	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "nes")
 	MCFG_SOFTWARE_LIST_ADD("ade_list", "nes_ade")         // Camerica/Codemasters Aladdin Deck Enhancer mini-carts
 	MCFG_SOFTWARE_LIST_ADD("ntb_list", "nes_ntbrom")      // Sunsoft Nantettate! Baseball mini-carts
@@ -158,7 +158,7 @@ static MACHINE_CONFIG_DERIVED( famicom, nes )
 	MCFG_DEVICE_REMOVE("ctrl2")
 	MCFG_NES_CONTROL_PORT_ADD("ctrl1", fc_control_port1_devices, "joypad")
 	MCFG_NES_CONTROL_PORT_ADD("ctrl2", fc_control_port2_devices, "joypad")
-	MCFG_FC_EXPANSION_PORT_ADD("exp", fc_expansion_devices, NULL)
+	MCFG_FC_EXPANSION_PORT_ADD("exp", fc_expansion_devices, nullptr)
 	MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "famicom_flop")

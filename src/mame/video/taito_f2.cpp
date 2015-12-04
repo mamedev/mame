@@ -977,7 +977,7 @@ UINT32 taitof2_state::screen_update_taitof2_ssi(screen_device &screen, bitmap_in
 	   (they are in Majestic 12, but the tilemaps are not used anyway) */
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
-	draw_sprites(screen, bitmap, cliprect, NULL, 0);
+	draw_sprites(screen, bitmap, cliprect, nullptr, 0);
 	return 0;
 }
 
@@ -990,7 +990,7 @@ UINT32 taitof2_state::screen_update_taitof2_yesnoj(screen_device &screen, bitmap
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);   /* wrong color? */
-	draw_sprites(screen, bitmap, cliprect, NULL, 0);
+	draw_sprites(screen, bitmap, cliprect, nullptr, 0);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, m_tc0100scn->bottomlayer(), 0, 0);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, m_tc0100scn->bottomlayer() ^ 1, 0, 0);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
@@ -1008,7 +1008,7 @@ UINT32 taitof2_state::screen_update_taitof2(screen_device &screen, bitmap_ind16 
 	bitmap.fill(0, cliprect);   /* wrong color? */
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, m_tc0100scn->bottomlayer(), 0, 0);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, m_tc0100scn->bottomlayer() ^ 1, 0, 0);
-	draw_sprites(screen, bitmap, cliprect, NULL, 0);
+	draw_sprites(screen, bitmap, cliprect, nullptr, 0);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
 	return 0;
 }
@@ -1044,7 +1044,7 @@ UINT32 taitof2_state::screen_update_taitof2_pri(screen_device &screen, bitmap_in
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
-	draw_sprites(screen, bitmap, cliprect, NULL, 1);
+	draw_sprites(screen, bitmap, cliprect, nullptr, 1);
 	return 0;
 }
 
@@ -1052,10 +1052,10 @@ UINT32 taitof2_state::screen_update_taitof2_pri(screen_device &screen, bitmap_in
 
 void taitof2_state::draw_roz_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 priority)
 {
-	if (m_tc0280grd != NULL)
+	if (m_tc0280grd != nullptr)
 		m_tc0280grd->tc0280grd_zoom_draw(screen, bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority);
 
-	if (m_tc0430grw != NULL)
+	if (m_tc0430grw != nullptr)
 		m_tc0430grw->tc0430grw_zoom_draw(screen, bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority);
 }
 
@@ -1071,10 +1071,10 @@ UINT32 taitof2_state::screen_update_taitof2_pri_roz(screen_device &screen, bitma
 
 	taitof2_handle_sprite_buffering();
 
-	if (m_tc0280grd != NULL)
+	if (m_tc0280grd != nullptr)
 		m_tc0280grd->tc0280grd_tilemap_update(roz_base_color);
 
-	if (m_tc0430grw != NULL)
+	if (m_tc0430grw != nullptr)
 		m_tc0430grw->tc0430grw_tilemap_update(roz_base_color);
 
 	m_tc0100scn->tilemap_update();
@@ -1121,7 +1121,7 @@ UINT32 taitof2_state::screen_update_taitof2_pri_roz(screen_device &screen, bitma
 		}
 	}
 
-	draw_sprites(screen, bitmap, cliprect, NULL, 1);
+	draw_sprites(screen, bitmap, cliprect, nullptr, 1);
 	return 0;
 }
 
@@ -1310,7 +1310,7 @@ UINT32 taitof2_state::screen_update_taitof2_metalb(screen_device &screen, bitmap
 	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 8);
 	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 16);
 
-	draw_sprites(screen, bitmap, cliprect, NULL, 1);
+	draw_sprites(screen, bitmap, cliprect, nullptr, 1);
 	return 0;
 }
 

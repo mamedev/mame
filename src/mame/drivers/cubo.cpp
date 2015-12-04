@@ -441,7 +441,7 @@ void cubo_state::potgo_w(UINT16 data)
 {
 	int i;
 
-	if (m_input_hack != NULL)
+	if (m_input_hack != nullptr)
 		(this->*m_input_hack)();
 
 	m_potgo_value = m_potgo_value & 0x5500;
@@ -1105,7 +1105,7 @@ DRIVER_INIT_MEMBER( cubo_state, cubo )
 {
 	m_agnus_id = ALICE_PAL_NEW;
 	m_denise_id = LISA;
-	m_input_hack = NULL;
+	m_input_hack = nullptr;
 }
 
 

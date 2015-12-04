@@ -339,7 +339,7 @@ GFXDECODE_END
 static const z80_daisy_config daisy_chain_sound[] =
 {
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 PALETTE_INIT_MEMBER(pipeline_state, pipeline)

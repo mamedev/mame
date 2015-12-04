@@ -1609,7 +1609,7 @@ ROM_START( cninjabl )
 
 	// split larger bootleg GFX roms into required regions
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_INVERT ) // chars
-	ROM_COPY( "gfxtemp", 0x000000, 0x000000, 0x020000 )
+	ROM_COPY( "gfxtemp", nullptr, 0x000000, 0x020000 )
 
 	ROM_REGION( 0x080000, "gfx2", ROMREGION_INVERT ) // tiles 3
 	ROM_COPY( "gfxtemp", 0x080000, 0x000000, 0x080000 )

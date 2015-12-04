@@ -337,7 +337,7 @@ WRITE_LINE_MEMBER( bcs3_state::ctc_z1_w )
 static const z80_daisy_config daisy_chain_intf[] =
 {
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 DRIVER_INIT_MEMBER( bcs3_state, bcs3a )

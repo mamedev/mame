@@ -583,7 +583,7 @@ PALETTE_INIT_MEMBER(_5clown_state, _5clown)
 
 	/* 0000KBGR */
 
-	if (color_prom == 0) return;
+	if (color_prom == nullptr) return;
 
 	for (i = 0;i < m_palette->entries();i++)
 	{
@@ -1085,7 +1085,7 @@ ROM_START( 5clown )
 
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x2000, 0 ) /* filling the remaining bitplanes */
+	ROM_FILL(               0x0000, 0x2000, nullptr ) /* filling the remaining bitplanes */
 	ROM_COPY( "gfxbanks",   0x7000, 0x2000, 0x1000 )
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
@@ -1117,7 +1117,7 @@ ROM_START( 5clowna )
 
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x2000, 0 ) /* filling the remaining bitplanes */
+	ROM_FILL(               0x0000, 0x2000, nullptr ) /* filling the remaining bitplanes */
 	ROM_COPY( "gfxbanks",   0x7000, 0x2000, 0x1000 )
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
@@ -1148,7 +1148,7 @@ ROM_START( 5clownsp )
 
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x2000, 0 ) /* filling the remaining bitplanes */
+	ROM_FILL(               0x0000, 0x2000, nullptr ) /* filling the remaining bitplanes */
 	ROM_COPY( "gfxbanks",   0x7000, 0x2000, 0x1000 )
 
 	ROM_REGION( 0x3000, "gfx2", 0 )

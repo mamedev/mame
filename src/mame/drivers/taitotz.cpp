@@ -2628,7 +2628,7 @@ INPUT_PORTS_END
 
 void taitotz_state::machine_reset()
 {
-	if (m_hdd_serial_number != NULL)
+	if (m_hdd_serial_number != nullptr)
 	{
 		ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
 		UINT16 *identify_device = hdd->identify_device_buffer();
@@ -2680,7 +2680,7 @@ static MACHINE_CONFIG_START( taitotz, taitotz_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(taitotz_state, ide_interrupt))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -2746,7 +2746,7 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgear)
 	init_taitotz_111a();
 
 	// unknown, not used by BIOS 1.11a
-	m_hdd_serial_number = NULL;
+	m_hdd_serial_number = nullptr;
 
 	m_scr_base = 0x1c0000;
 
@@ -2780,7 +2780,7 @@ DRIVER_INIT_MEMBER(taitotz_state,pwrshovl)
 	init_taitotz_111a();
 
 	// unknown, not used by BIOS 1.11a
-	m_hdd_serial_number = NULL;
+	m_hdd_serial_number = nullptr;
 
 	m_scr_base = 0x1c0000;
 

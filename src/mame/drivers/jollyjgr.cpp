@@ -733,7 +733,7 @@ ROM_START( fspiderb )
 	ROM_LOAD( "11.7h",   0x3000, 0x1000, CRC(7ab56309) SHA1(b43f542a7359c3a4ccf6f116e3a84bd13af6876f) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_COPY( "gfx_bank", 0x0000, 0x0000, 0x800)
+	ROM_COPY( "gfx_bank", nullptr, 0x0000, 0x800)
 	ROM_COPY( "gfx_bank", 0x1000, 0x0800, 0x800)
 
 	ROM_REGION( 0x1000, "gfx2", 0 )

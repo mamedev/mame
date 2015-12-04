@@ -703,7 +703,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 	}
 #endif                              /* !defined( NO_ECHO ) */
 
-	if (sound_ptr != NULL)
+	if (sound_ptr != nullptr)
 	{
 		if (m_dsp_regs[0x6c] & 0x40)
 		{

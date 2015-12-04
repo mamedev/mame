@@ -241,7 +241,7 @@ void pgm_state::draw_sprite_new_zoomed( int wide, int high, int xpos, int ypos, 
 			}
 			else
 			{
-				draw_sprite_line(wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
+				draw_sprite_line(wide, nullptr, nullptr, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
 			}
 
 			ycntdraw++;
@@ -263,7 +263,7 @@ void pgm_state::draw_sprite_new_zoomed( int wide, int high, int xpos, int ypos, 
 			}
 			else
 			{
-				draw_sprite_line(wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
+				draw_sprite_line(wide, nullptr, nullptr, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
 
 				if (!(flip & 0x02))
 				{
@@ -283,7 +283,7 @@ void pgm_state::draw_sprite_new_zoomed( int wide, int high, int xpos, int ypos, 
 		else if (yzoombit == 1 && ygrow == 0)
 		{
 			/* skip this line */
-			draw_sprite_line(wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
+			draw_sprite_line(wide, nullptr, nullptr, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
 		}
 		else /* normal line */
 		{
@@ -300,7 +300,7 @@ void pgm_state::draw_sprite_new_zoomed( int wide, int high, int xpos, int ypos, 
 			}
 			else
 			{
-				draw_sprite_line(wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
+				draw_sprite_line(wide, nullptr, nullptr, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
 
 				if (!(flip & 0x02))
 				{
@@ -464,7 +464,7 @@ void pgm_state::draw_sprite_new_basic( int wide, int high, int xpos, int ypos, i
 		}
 		else
 		{
-			draw_sprite_line_basic(wide, NULL, NULL, flip, xpos, pri, realxsize, palt, 0);
+			draw_sprite_line_basic(wide, nullptr, nullptr, flip, xpos, pri, realxsize, palt, 0);
 
 			if (!(flip & 0x02))
 			{

@@ -16,7 +16,7 @@ const device_type TC0150ROD = &device_creator<tc0150rod_device>;
 
 tc0150rod_device::tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0150ROD, "Taito TC0150ROD", tag, owner, clock, "tc0150rod", __FILE__),
-	m_roadgfx(NULL)
+	m_roadgfx(nullptr)
 {
 }
 

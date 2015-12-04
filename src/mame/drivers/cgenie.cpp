@@ -43,7 +43,7 @@ public:
 		m_color_ram(*this, "colorram"),
 		m_font_ram(*this, "fontram"),
 		m_keyboard(*this, "KEY"),
-		m_palette(NULL),
+		m_palette(nullptr),
 		m_control(0xff),
 		m_rs232_rx(1),
 		m_rs232_dcd(1)
@@ -464,7 +464,7 @@ static MACHINE_CONFIG_START( cgenie, cgenie_state )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "cgenie_cass")
 
 	// serial port
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(cgenie_state, rs232_rx_w))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(cgenie_state, rs232_dcd_w))
 

@@ -1381,7 +1381,7 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	MCFG_MOS6530n_IN_PB_CB(READ8(a7800_state, riot_console_button_r))
 	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a7800_state, riot_button_pullup_w))
 
-	MCFG_A78_CARTRIDGE_ADD("cartslot", a7800_cart, NULL)
+	MCFG_A78_CARTRIDGE_ADD("cartslot", a7800_cart, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","a7800")

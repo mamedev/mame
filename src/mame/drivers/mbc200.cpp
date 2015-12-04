@@ -94,7 +94,7 @@ WRITE8_MEMBER( mbc200_state::pm_porta_w )
 
 WRITE8_MEMBER( mbc200_state::pm_portb_w )
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	// to be verified
 	switch (data & 0x01)

@@ -2835,7 +2835,7 @@ ROM_START( starfigh )
 	// bitplanes 0-1
 	ROM_LOAD( "starfgtr.e4",   0x00000, 0x10000, CRC(54c0ca3d) SHA1(87f785502beb8a52d47bd48275d695ee303054f8) ) // banks 00-03
 	ROM_LOAD( "starfgtr.d4",   0x10000, 0x10000, CRC(4313ba40) SHA1(3c41f99dc40136517f172b3525987d8909f877c3) ) // banks 04-07
-	ROM_COPY( "gfx1", 0x00000, 0x20000, 0x20000 )                                                               // banks 08-0f == 00-07
+	ROM_COPY( "gfx1", nullptr, 0x20000, 0x20000 )                                                               // banks 08-0f == 00-07
 	ROM_LOAD( "starfgtr.b4",   0x40000, 0x10000, CRC(ad8d0f21) SHA1(ffdb407c7fe76b5f290de6bbed2fec34e40daf3f) ) // banks 10-13
 	ROM_LOAD( "starfgtr.a4",   0x50000, 0x10000, CRC(6d8f74c8) SHA1(c40b77e27bd29d6c3a9b4d43189933c10543786b) ) // banks 14-17
 	ROM_COPY( "gfx1", 0x40000, 0x60000, 0x20000 )                                                               // banks 18-1f == 10-17
@@ -2898,13 +2898,13 @@ ROM_START( sparkman )
 	ROM_REGION( 0x100000, "gfx2", ROMREGION_INVERT | ROMREGION_ERASEFF) /* Sprites (1) */
 	// bitplanes 0-1
 	ROM_LOAD( "p7.u4",         0x00000, 0x10000, CRC(17c16ce4) SHA1(b4127e9aedab69193bef1d85e68003e225913417) ) // banks 00-03 (alt gfx)
-	ROM_COPY( "gfx2", 0x00000, 0x10000, 0x10000 )
-	ROM_COPY( "gfx2", 0x00000, 0x20000, 0x10000 )
-	ROM_COPY( "gfx2", 0x00000, 0x30000, 0x10000 )
-	ROM_COPY( "gfx2", 0x00000, 0x40000, 0x10000 )
-	ROM_COPY( "gfx2", 0x00000, 0x50000, 0x10000 )
-	ROM_COPY( "gfx2", 0x00000, 0x60000, 0x10000 )
-	ROM_COPY( "gfx2", 0x00000, 0x70000, 0x10000 )
+	ROM_COPY( "gfx2", nullptr, 0x10000, 0x10000 )
+	ROM_COPY( "gfx2", nullptr, 0x20000, 0x10000 )
+	ROM_COPY( "gfx2", nullptr, 0x30000, 0x10000 )
+	ROM_COPY( "gfx2", nullptr, 0x40000, 0x10000 )
+	ROM_COPY( "gfx2", nullptr, 0x50000, 0x10000 )
+	ROM_COPY( "gfx2", nullptr, 0x60000, 0x10000 )
+	ROM_COPY( "gfx2", nullptr, 0x70000, 0x10000 )
 	// bitplanes 2-3
 	ROM_LOAD( "p8.u6",         0x80000, 0x10000, CRC(414222ea) SHA1(e05f0504c6e735c73027312a85cc55fc98728e53) )
 	ROM_COPY( "gfx2", 0x80000, 0x90000, 0x10000 )
@@ -2954,13 +2954,13 @@ ROM_START( sparkmana )
 	ROM_REGION( 0x100000, "gfx2", ROMREGION_INVERT | ROMREGION_ERASEFF) /* Sprites (1) */
 	// bitplanes 0-1
 	ROM_LOAD( "p7.u4",         0x00000, 0x10000, CRC(17c16ce4) SHA1(b4127e9aedab69193bef1d85e68003e225913417) ) // banks 00-03 (alt gfx)
-	ROM_COPY( "gfx2", 0x00000, 0x10000, 0x10000 )
-	ROM_COPY( "gfx2", 0x00000, 0x20000, 0x10000 )
-	ROM_COPY( "gfx2", 0x00000, 0x30000, 0x10000 )
-	ROM_COPY( "gfx2", 0x00000, 0x40000, 0x10000 )
-	ROM_COPY( "gfx2", 0x00000, 0x50000, 0x10000 )
-	ROM_COPY( "gfx2", 0x00000, 0x60000, 0x10000 )
-	ROM_COPY( "gfx2", 0x00000, 0x70000, 0x10000 )
+	ROM_COPY( "gfx2", nullptr, 0x10000, 0x10000 )
+	ROM_COPY( "gfx2", nullptr, 0x20000, 0x10000 )
+	ROM_COPY( "gfx2", nullptr, 0x30000, 0x10000 )
+	ROM_COPY( "gfx2", nullptr, 0x40000, 0x10000 )
+	ROM_COPY( "gfx2", nullptr, 0x50000, 0x10000 )
+	ROM_COPY( "gfx2", nullptr, 0x60000, 0x10000 )
+	ROM_COPY( "gfx2", nullptr, 0x70000, 0x10000 )
 	// bitplanes 2-3
 	ROM_LOAD( "p8.u6",         0x80000, 0x10000, CRC(414222ea) SHA1(e05f0504c6e735c73027312a85cc55fc98728e53) )
 	ROM_COPY( "gfx2", 0x80000, 0x90000, 0x10000 )

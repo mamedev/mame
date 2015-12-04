@@ -428,7 +428,7 @@ void jaguar_state::machine_reset()
 
 	/* configure banks for gfx/sound ROMs */
 	UINT8 *romboard = memregion("romboard")->base();
-	if (romboard != NULL)
+	if (romboard != nullptr)
 	{
 		/* graphics banks */
 		if (m_is_r3000)
@@ -1815,7 +1815,7 @@ static MACHINE_CONFIG_START( cojagr3k, jaguar_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VT83C461_ADD("ide", cojag_devices, "hdd", NULL, true)
+	MCFG_VT83C461_ADD("ide", cojag_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(jaguar_state, external_int))
 
 	/* video hardware */
@@ -1836,7 +1836,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cojagr3k_rom, cojagr3k )
 	MCFG_DEVICE_MODIFY("ide:0")
-	MCFG_SLOT_DEFAULT_OPTION(NULL)
+	MCFG_SLOT_DEFAULT_OPTION(nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cojag68k, cojagr3k )
@@ -2052,7 +2052,7 @@ DEVICE_IMAGE_LOAD_MEMBER( jaguar_state, jaguar_cart )
 {
 	UINT32 size, load_offset = 0;
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		size = image.length();
 

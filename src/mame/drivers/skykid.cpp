@@ -489,7 +489,7 @@ ROM_START( skykid )
 	ROM_LOAD( "sk1_8.10n",    0x0000, 0x4000, CRC(44bb7375) SHA1(5b2fa6782671150bab5f3c3ac46b47bc23f3d7e0) )    /* sprites */
 	ROM_LOAD( "sk1_7.10m",    0x4000, 0x4000, CRC(3454671d) SHA1(723b26a0f208addc2a22736457cb4be6ab6c69cc) )
 	/* 0x8000-0xbfff  will be unpacked from 0x4000-0x5fff */
-	ROM_FILL(                 0xc000, 0x4000, 0x00 )    // part of the gfx is 2bpp decoded as 3bpp
+	ROM_FILL(                 0xc000, 0x4000, nullptr )    // part of the gfx is 2bpp decoded as 3bpp
 
 	ROM_REGION( 0x0700, "proms", 0 )
 	ROM_LOAD( "sk1-1.2n",     0x0000, 0x0100, CRC(0218e726) SHA1(8b766162a4783c058d9a1ecf8741673d7ef955fb) )    /* red component */
@@ -519,7 +519,7 @@ ROM_START( skykido )
 	ROM_LOAD( "sk1_8.10n",    0x0000, 0x4000, CRC(44bb7375) SHA1(5b2fa6782671150bab5f3c3ac46b47bc23f3d7e0) )    /* sprites */
 	ROM_LOAD( "sk1_7.10m",    0x4000, 0x4000, CRC(3454671d) SHA1(723b26a0f208addc2a22736457cb4be6ab6c69cc) )
 	/* 0x8000-0xbfff  will be unpacked from 0x4000-0x5fff */
-	ROM_FILL(                 0xc000, 0x4000, 0x00 )    // part of the gfx is 2bpp decoded as 3bpp
+	ROM_FILL(                 0xc000, 0x4000, nullptr )    // part of the gfx is 2bpp decoded as 3bpp
 
 	ROM_REGION( 0x0700, "proms", 0 )
 	ROM_LOAD( "sk1-1.2n",     0x0000, 0x0100, CRC(0218e726) SHA1(8b766162a4783c058d9a1ecf8741673d7ef955fb) )    /* red component */
@@ -549,7 +549,7 @@ ROM_START( skykidd )
 	ROM_LOAD( "sk1_8.10n",    0x0000, 0x4000, CRC(44bb7375) SHA1(5b2fa6782671150bab5f3c3ac46b47bc23f3d7e0) )    /* sprites */
 	ROM_LOAD( "sk1_7.10m",    0x4000, 0x4000, CRC(3454671d) SHA1(723b26a0f208addc2a22736457cb4be6ab6c69cc) )
 	/* 0x8000-0xbfff  will be unpacked from 0x4000-0x5fff */
-	ROM_FILL(                 0xc000, 0x4000, 0x00 )    // part of the gfx is 2bpp decoded as 3bpp
+	ROM_FILL(                 0xc000, 0x4000, nullptr )    // part of the gfx is 2bpp decoded as 3bpp
 
 	ROM_REGION( 0x0700, "proms", 0 )
 	ROM_LOAD( "sk1-1.2n",     0x0000, 0x0100, CRC(0218e726) SHA1(8b766162a4783c058d9a1ecf8741673d7ef955fb) )    /* red component */
@@ -579,7 +579,7 @@ ROM_START( skykids )
 	ROM_LOAD( "sk1_8.10n",    0x0000, 0x4000, CRC(44bb7375) SHA1(5b2fa6782671150bab5f3c3ac46b47bc23f3d7e0) )    /* sprites */
 	ROM_LOAD( "sk1_7.10m",    0x4000, 0x4000, CRC(3454671d) SHA1(723b26a0f208addc2a22736457cb4be6ab6c69cc) )
 	/* 0x8000-0xbfff  will be unpacked from 0x4000-0x5fff */
-	ROM_FILL(                 0xc000, 0x4000, 0x00 )    // part of the gfx is 2bpp decoded as 3bpp
+	ROM_FILL(                 0xc000, 0x4000, nullptr )    // part of the gfx is 2bpp decoded as 3bpp
 
 	ROM_REGION( 0x0700, "proms", 0 )
 	ROM_LOAD( "sk1-1.2n",     0x0000, 0x0100, CRC(0218e726) SHA1(8b766162a4783c058d9a1ecf8741673d7ef955fb) )    /* red component */
@@ -609,7 +609,7 @@ ROM_START( drgnbstr )
 	ROM_LOAD( "db1_8.10n",    0x0000, 0x4000, CRC(11942c61) SHA1(0f065cb82cf83967e90b3c7326b36956f4fa9a52) )    /* sprites */
 	ROM_LOAD( "db1_7.10m",    0x4000, 0x4000, CRC(cc130fe2) SHA1(4f5d4f21152b3b4e523a6d17dd5ff5cef52447f2) )
 	/* 0x8000-0xbfff  will be unpacked from 0x4000-0x5fff */
-	ROM_FILL(                 0xc000, 0x4000, 0x00 )    // part of the gfx is 2bpp decoded as 3bpp
+	ROM_FILL(                 0xc000, 0x4000, nullptr )    // part of the gfx is 2bpp decoded as 3bpp
 
 	ROM_REGION( 0x0700, "proms", 0 )
 	ROM_LOAD( "db1-1.2n",     0x0000, 0x0100, CRC(3f8cce97) SHA1(027b3fb0f322a9d68b434b207a40b31799a8a8d6) )    /* red component */

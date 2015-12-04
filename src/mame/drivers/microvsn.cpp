@@ -528,7 +528,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state, microvsn_cart)
 	}
 
 	/* Read cartridge */
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		if (image.fread(rom1, file_size) != file_size)
 		{

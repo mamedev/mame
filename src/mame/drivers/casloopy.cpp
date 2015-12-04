@@ -230,7 +230,7 @@ void casloopy_state::video_start()
 	m_bitmap_vram = auto_alloc_array_clear(machine(), UINT8, 0x20000);
 
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
-		if (m_gfxdecode->gfx(m_gfx_index) == 0)
+		if (m_gfxdecode->gfx(m_gfx_index) == nullptr)
 			break;
 
 	for(int i=0;i<0x10000;i++)

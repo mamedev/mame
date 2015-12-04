@@ -56,8 +56,8 @@ void cloak_state::set_pen(int i)
 	/* compute the color output resistor weights */
 	compute_resistor_weights(0, 255, -1.0,
 								3, resistances, weights, 0, 1000,
-								0, 0, 0, 0, 0,
-								0, 0, 0, 0, 0);
+								0, nullptr, nullptr, 0, 0,
+								0, nullptr, nullptr, 0, 0);
 
 	int r, g, b;
 	int bit0, bit1, bit2;

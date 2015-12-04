@@ -114,7 +114,7 @@ void williams_state::state_save_register()
 
 VIDEO_START_MEMBER(williams_state,williams)
 {
-	blitter_init(m_blitter_config, NULL);
+	blitter_init(m_blitter_config, nullptr);
 	create_palette_lookup();
 	state_save_register();
 }
@@ -132,7 +132,7 @@ VIDEO_START_MEMBER(blaster_state,blaster)
 
 VIDEO_START_MEMBER(williams2_state,williams2)
 {
-	blitter_init(m_blitter_config, NULL);
+	blitter_init(m_blitter_config, nullptr);
 
 	/* create the tilemap */
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(williams2_state::get_tile_info),this), TILEMAP_SCAN_COLS,  24,16, 128,16);

@@ -424,7 +424,7 @@ void mexico86_state::machine_start()
 void mexico86_state::machine_reset()
 {
 	/*TODO: check the PCB and see how the halt / reset lines are connected. */
-	if (m_subcpu != NULL)
+	if (m_subcpu != nullptr)
 		m_subcpu->set_input_line(INPUT_LINE_RESET, (ioport("DSW1")->read() & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
 	m_port_a_in = 0;

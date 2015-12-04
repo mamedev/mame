@@ -767,7 +767,7 @@ static const z80_daisy_config p7_daisy[] =
 	{ "z80ctc" },
 	{ "z80pio" },
 //  { "fdc" }, /* TODO */
-	{ NULL }
+	{ nullptr }
 };
 
 READ8_MEMBER( pasopia7_state::crtc_portb_r )

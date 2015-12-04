@@ -350,7 +350,7 @@ READ8_MEMBER( qx10_state::qx10_30_r )
 
 	return m_fdcint |
 			/*m_fdcmotor*/ 0 << 1 |
-			((floppy1 != NULL) || (floppy2 != NULL) ? 1 : 0) << 3 |
+			((floppy1 != nullptr) || (floppy2 != nullptr) ? 1 : 0) << 3 |
 			m_membank << 4;
 }
 
@@ -749,7 +749,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_device, rxb_w))
 
 	MCFG_RS232_PORT_ADD("kbd", keyboard, "qx10")

@@ -930,7 +930,7 @@ static MACHINE_CONFIG_START( magictg, magictg_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, pci_dev0_r, pci_dev0_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, pci_dev0_r, pci_dev0_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, "voodoo_0", voodoo_0_pci_r, voodoo_0_pci_w)
 
 #if defined(USE_TWO_3DFX)

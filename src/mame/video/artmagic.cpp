@@ -29,7 +29,7 @@ inline UINT16 *artmagic_state::address_to_vram(offs_t *address)
 		return m_vram0;
 	else if (original >= 0x00400000 && original < 0x005fffff)
 		return m_vram1;
-	return NULL;
+	return nullptr;
 }
 
 

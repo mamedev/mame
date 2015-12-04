@@ -679,7 +679,7 @@ static MACHINE_CONFIG_START( kinst, kinst_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kinst_state,  irq0_start)
 
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(kinst_state, ide_interrupt))
 
 	/* video hardware */

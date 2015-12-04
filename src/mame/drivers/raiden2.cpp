@@ -366,7 +366,7 @@ WRITE16_MEMBER(raiden2_state::tile_scroll_w)
 	COMBINE_DATA(scrollvals + offset);
 	data = scrollvals[offset];
 
-	tilemap_t *tm = 0;
+	tilemap_t *tm = nullptr;
 	switch(offset/2) {
 	case 0: tm = background_layer; break;
 	case 1: tm = midground_layer; break;
@@ -1559,7 +1559,7 @@ ROM_START( raiden2 )
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "snd.u1110",  0x000000, 0x08000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu7.u0724", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
@@ -1599,7 +1599,7 @@ ROM_START( raiden2sw ) // original board with serial # 0008307
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu_5.u1110",  0x000000, 0x08000, CRC(c2028ba2) SHA1(f6a9322b669ff82dea6ecf52ad3bd5d0901cce1b) ) // 99.993896% match
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu_7.u0724", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
@@ -1656,7 +1656,7 @@ ROM_START( raiden2hk )
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu5.u1110",  0x000000, 0x08000, CRC(8f130589) SHA1(e58c8beaf9f27f063ffbcb0ab4600123c25ce6f3) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu7.u0724", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
@@ -1730,7 +1730,7 @@ ROM_START( raiden2j )
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu5.u1110",  0x000000, 0x08000, CRC(8f130589) SHA1(e58c8beaf9f27f063ffbcb0ab4600123c25ce6f3) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu7.u0724", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
@@ -1769,7 +1769,7 @@ ROM_START( raiden2i )
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu5.c.u1110",  0x000000, 0x08000, CRC(5db9f922) SHA1(8257aab98657fe44df19d2a48d85fcf65b3d98c6) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu7.u0724", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
@@ -1826,7 +1826,7 @@ ROM_START( raiden2e )
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "r2_snd.u1110", 0x000000, 0x08000, CRC(6bad0a3e) SHA1(eb7ae42353e1984cd60b569c26cdbc3b025a7da6) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "r2_fx0.u0724",   0x000000, 0x020000, CRC(c709bdf6) SHA1(0468d90412b7590d67eaadc0a5e3537cd5e73943) )
@@ -1865,7 +1865,7 @@ ROM_START( raiden2ea )
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "r2.5.u1110", 0x000000, 0x08000, CRC(f5f835af) SHA1(5be82ebc582d0da919e9ae1b9e64528bb295efc7) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "r2.7.u0724", 0x000000, 0x020000, CRC(c7aa4d00) SHA1(9ad99d3891598c1ea3f12318400ee67666da56dd) )
@@ -1904,7 +1904,7 @@ ROM_START( raiden2eu ) // same as raiden2ea, different region
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "r2.5.u1110", 0x000000, 0x08000, CRC(f5f835af) SHA1(5be82ebc582d0da919e9ae1b9e64528bb295efc7) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "r2.7.u0724", 0x000000, 0x020000, CRC(c7aa4d00) SHA1(9ad99d3891598c1ea3f12318400ee67666da56dd) )
@@ -1947,7 +1947,7 @@ ROM_START( raiden2eua ) // sort of a mixture of raiden2e easy set with voice rom
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu__5.27c512.u1110", 0x000000, 0x08000, CRC(6d362472) SHA1(a362e500bb9492affde1f7a4da7e08dd16e755df) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu__7.fx0.27c210.u0724", 0x000000, 0x020000, CRC(c7aa4d00) SHA1(9ad99d3891598c1ea3f12318400ee67666da56dd) )
@@ -1991,7 +1991,7 @@ ROM_START( raiden2g ) // this is the same code revision as raiden2eua but a germ
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "raiden_2_5.bin", 0x000000, 0x08000, CRC(6d362472) SHA1(a362e500bb9492affde1f7a4da7e08dd16e755df) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "raiden_2_7.bin", 0x000000, 0x020000, CRC(c7aa4d00) SHA1(9ad99d3891598c1ea3f12318400ee67666da56dd) )
@@ -2030,7 +2030,7 @@ ROM_START( raiden2nl )
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5_u1110.bin",  0x000000, 0x08000, CRC(8f130589) SHA1(e58c8beaf9f27f063ffbcb0ab4600123c25ce6f3) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "7_u0724.bin", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
@@ -2069,7 +2069,7 @@ ROM_START( raiden2f ) // original board with serial # 12476 that matches raiden2
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu5_u1110.bin",  0x000000, 0x08000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )   // == raiden2
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "7_u0724.bin", 0x000000, 0x020000, CRC(c9ec9469) SHA1(a29f480a1bee073be7a177096ef58e1887a5af24) ) /* PCB silkscreened FX0 */
@@ -2108,7 +2108,7 @@ ROM_START( raiden2u )
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu5.u1110", 0x000000, 0x08000, CRC(6d362472) SHA1(a362e500bb9492affde1f7a4da7e08dd16e755df) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu7.u0724", 0x000000, 0x020000, CRC(c7aa4d00) SHA1(9ad99d3891598c1ea3f12318400ee67666da56dd) )
@@ -2148,7 +2148,7 @@ ROM_START( raiden2dx ) // this set is very weird, it's Raiden II on a Raiden DX 
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "u1110.bin",  0x000000, 0x08000,  CRC(b8ad8fe7) SHA1(290896f811f717ef6e3ec2152d4db98a9fe9b310) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	//ROM_LOAD( "fx0_u0724.bin",    0x000000,   0x020000,   CRC(ded3c718) SHA1(c722ec45cd1b2dab23aac14e9113e0e9697830d3) ) // bad dump
@@ -2186,7 +2186,7 @@ ROM_START( raidendx )
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "dx_5.5b",  0x000000, 0x08000,  CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "dx_7.4s",    0x000000,   0x020000,   CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
@@ -2221,7 +2221,7 @@ ROM_START( raidendxa1 )
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "dx_5.5b",  0x000000, 0x08000,  CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "dx_7.4s",    0x000000,   0x020000,   CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
@@ -2256,7 +2256,7 @@ ROM_START( raidendxa2 )
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "dx_5.5b",  0x000000, 0x08000,  CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "dx_7.4s",    0x000000,   0x020000,   CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
@@ -2291,7 +2291,7 @@ ROM_START( raidendxk )
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "dx_5.5b",  0x000000, 0x08000,  CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "dx_7.4s",    0x000000,   0x020000,   CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
@@ -2326,7 +2326,7 @@ ROM_START( raidendxu )
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "dx_5.5b",  0x000000, 0x08000,  CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "dx_7.4s",    0x000000,   0x020000,   CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
@@ -2361,7 +2361,7 @@ ROM_START( raidendxg )
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5.u1110", 0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "7.u0724", 0x000000, 0x020000, CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
@@ -2397,7 +2397,7 @@ ROM_START( raidendxnl )
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "u1110_5b.bin", 0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "seibu_7b_u724.bin", 0x000000, 0x020000, CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
@@ -2433,7 +2433,7 @@ ROM_START( raidendxj )
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rdxj_5.u1110", 0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "rdxj_7.u0724", 0x000000, 0x020000, CRC(ec31fa10) SHA1(e39c9d95699dbeb21e3661d863eee503c9011bbc) )
@@ -2471,7 +2471,7 @@ ROM_START( raidendxch )
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "dx_5.5b",  0x000000, 0x08000,  CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "dx_7.4s",    0x000000,   0x020000,   CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
@@ -2599,7 +2599,7 @@ ROM_START( zeroteam ) // Fabtek, US licensee, displays 'USA' under zero team log
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu__5.u1110.5b",  0x000000, 0x08000, CRC(7ec1fbc3) SHA1(48299d6530f641b18764cc49e283c347d0918a47) ) // // alternate label "5"
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD16_BYTE( "seibu__7.u072.5s",    0x000000,   0x010000,   CRC(9f6aa0f0) SHA1(1caad7092c07723d12a07aa363ae2aa69cb6be0d) ) // alternate label "7"
@@ -2636,7 +2636,7 @@ ROM_START( zeroteama ) // No licensee, original japan?
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5.a.u1110.5b",  0x000000, 0x08000, CRC(efc484ca) SHA1(c34b8e3e7f4c2967bc6414348993478ed637d338) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD16_BYTE( "7.a.u072.5s", 0x000000,   0x010000, CRC(eb10467f) SHA1(fc7d576dc41bc878ff20f0370e669e19d54fcefb) )
@@ -2680,7 +2680,7 @@ ROM_START( zeroteamb ) // No licensee, later japan?
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5.u1110.5b",  0x000000, 0x08000, CRC(7ec1fbc3) SHA1(48299d6530f641b18764cc49e283c347d0918a47) ) // 5.5c
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD16_BYTE( "7.u072.5s",   0x000000,   0x010000,   CRC(9f6aa0f0) SHA1(1caad7092c07723d12a07aa363ae2aa69cb6be0d) )
@@ -2717,7 +2717,7 @@ ROM_START( zeroteamc ) // Liang Hwa, Taiwan licensee, no special word under logo
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5.c.u1110.5b",  0x000000, 0x08000, CRC(efc484ca) SHA1(c34b8e3e7f4c2967bc6414348993478ed637d338) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD16_BYTE( "b7.u072.5s",  0x000000,   0x010000, CRC(30ec0241) SHA1(a0d0be9458bf97cb9764fb85c988bb816710475e) )
@@ -2755,7 +2755,7 @@ ROM_START( zeroteamd ) // Dream Soft, Korea licensee, no special word under logo
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "512kb.u1110.5b",  0x000000, 0x08000, CRC(efc484ca) SHA1(c34b8e3e7f4c2967bc6414348993478ed637d338) ) // this is a soldered mask rom on this pcb version! the contents match the taiwan version eprom; the mask rom has no label
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD16_BYTE( "512kb.u072.5s",   0x000000,   0x010000, CRC(30ec0241) SHA1(a0d0be9458bf97cb9764fb85c988bb816710475e) ) // this is a soldered mask rom on this pcb version! the contents match the taiwan version eprom; the mask rom has no label
@@ -2793,7 +2793,7 @@ ROM_START( zeroteams ) // No license, displays 'Selection' under logo
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5_sel.bin",  0x000000, 0x08000, CRC(ed91046c) SHA1(de815c999aeeb814d3f091d5a9ac34ea9a388ddb) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD16_BYTE( "7.u072.5s",   0x000000,   0x010000,   CRC(9f6aa0f0) SHA1(1caad7092c07723d12a07aa363ae2aa69cb6be0d) )
@@ -2842,7 +2842,7 @@ ROM_START( zeroteamsr )
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5.5c",  0x000000, 0x08000, CRC(7ec1fbc3) SHA1(48299d6530f641b18764cc49e283c347d0918a47) ) // 5.5c
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD16_BYTE( "7.u072.5s",   0x000000,   0x010000,   CRC(9f6aa0f0) SHA1(1caad7092c07723d12a07aa363ae2aa69cb6be0d) )
@@ -2918,7 +2918,7 @@ ROM_START( xsedae )
 	ROM_LOAD( "8.u1110",  0x000000, 0x08000, CRC(2dc2f81a) SHA1(0f6605042e0e295b4256b43dbdf5d53daebe1a9a) )
 	ROM_CONTINUE(0x10000,0x8000)
 	ROM_CONTINUE(0x20000,0x10000) // TODO
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD16_BYTE( "6.u072.5s",   0x000000,   0x010000, CRC(a788402d) SHA1(8a1ac4760cf75cd2e32c1d15f36ad15cce3d411b) )

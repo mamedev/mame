@@ -1397,7 +1397,7 @@ static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int 
 	} else {
 		uPD71054->timer[no]->adjust( attotime::never, no);
 		state->logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
-				(cpu != NULL) ? cpu->safe_pc() : -1, no );
+				(cpu != nullptr) ? cpu->safe_pc() : -1, no );
 	}
 }
 
@@ -1409,7 +1409,7 @@ static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int 
 TIMER_CALLBACK_MEMBER(seta_state::uPD71054_timer_callback)
 {
 	m_maincpu->set_input_line(4, HOLD_LINE );
-	uPD71054_update_timer( machine(), NULL, param );
+	uPD71054_update_timer( machine(), nullptr, param );
 }
 
 
@@ -10316,7 +10316,7 @@ ROM_START( zingzipbl )
 	ROM_LOAD16_BYTE( "14",  0x100001, 0x080000,  CRC(fefad62f) SHA1(13aaf6cc6af4b42a1184f3fc6c07d9d966153dc1) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_COPY( "gfxtemp", 0x000000, 0x000000, 0x80000 )
+	ROM_COPY( "gfxtemp", nullptr, 0x000000, 0x80000 )
 	ROM_COPY( "gfxtemp", 0x100000, 0x080000, 0x80000 )
 	// 2bpp of extra planes for this layer
 	ROM_LOAD16_BYTE( "15",  0x100000, 0x040000, CRC(af7a786f) SHA1(de67960f529ebfff0f1d55c79912685f9eca9623) )
@@ -10666,7 +10666,7 @@ ROM_START( jjsquawkb )
 	ROM_LOAD( "1.bin",  0x200000, 0x200000, CRC(a5d37cf7) SHA1(9573777f3cdd6b25f0bd56f65f583fddda21c900) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_COPY( "gfxtemp", 0x000000, 0x000000, 0x100000 )
+	ROM_COPY( "gfxtemp", nullptr, 0x000000, 0x100000 )
 	ROM_COPY( "gfxtemp", 0x200000, 0x100000, 0x100000 )
 
 
@@ -10713,7 +10713,7 @@ ROM_START( kamenrid )
 	ROM_LOAD( "fj001007.152", 0x000000, 0x080000, CRC(d9ffe80b) SHA1(c1f919b53cd1b9874a5e5dc5640891e1b227cfc6) )
 
 	ROM_REGION( 0x40000, "gfx2", 0 )    /* Layer 1 */
-	ROM_COPY( "user1", 0x000000, 0x000000, 0x040000 )
+	ROM_COPY( "user1", nullptr, 0x000000, 0x040000 )
 
 	ROM_REGION( 0x40000, "gfx3", 0 )    /* Layer 2 */
 	ROM_COPY( "user1", 0x040000, 0x000000, 0x040000 )
@@ -11076,7 +11076,7 @@ ROM_START( madshark )
 	ROM_LOAD16_BYTE( "fq001005.205", 0x200000, 0x100000, CRC(5f6c6d4a) SHA1(eed5661738282a14ce89917335fd1b695eb7351e) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_COPY( "user1", 0x000000, 0x000000, 0x100000 )
+	ROM_COPY( "user1", nullptr, 0x000000, 0x100000 )
 	ROM_COPY( "user1", 0x200000, 0x100000, 0x100000 )
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
@@ -11100,7 +11100,7 @@ ROM_START( magspeed )
 	ROM_LOAD( "fu001006.152", 0x000000, 0x100000, CRC(70855139) SHA1(24d635aceb823b0569169c8ecced13ac82c17d6a) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* Layer 1 */
-	ROM_COPY( "user1", 0x00000, 0x00000, 0x80000 )
+	ROM_COPY( "user1", nullptr, 0x00000, 0x80000 )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* Layer 2 */
 	ROM_COPY( "user1", 0x80000, 0x00000, 0x80000 )

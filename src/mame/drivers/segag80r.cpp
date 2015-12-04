@@ -785,18 +785,18 @@ static const gfx_layout charlayout =
 
 
 static GFXDECODE_START( segag80r )
-	GFXDECODE_ENTRY( NULL, 0x0000, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( nullptr, 0x0000, charlayout, 0, 16 )
 GFXDECODE_END
 
 
 static GFXDECODE_START( spaceod )
-	GFXDECODE_ENTRY( NULL,           0x0000, charlayout,        0, 16 )
+	GFXDECODE_ENTRY( nullptr,           0x0000, charlayout,        0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x6_planar, 64, 1 )
 GFXDECODE_END
 
 
 static GFXDECODE_START( monsterb )
-	GFXDECODE_ENTRY( NULL,           0x0000, charlayout,        0, 16 )
+	GFXDECODE_ENTRY( nullptr,           0x0000, charlayout,        0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x2_planar, 64, 16 )
 GFXDECODE_END
 

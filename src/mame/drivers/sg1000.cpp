@@ -590,7 +590,7 @@ WRITE8_MEMBER( sf7000_state::ppi_pc_w )
 	if (!BIT(data, 0))
 		m_fdc->set_floppy(m_floppy0);
 	else
-		m_fdc->set_floppy(NULL);
+		m_fdc->set_floppy(nullptr);
 
 	/* floppy motor */
 	m_floppy0->mon_w(BIT(data, 1));
@@ -735,7 +735,7 @@ static MACHINE_CONFIG_START( sg1000, sg1000_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */
-	MCFG_SG1000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, NULL)
+	MCFG_SG1000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
@@ -755,7 +755,7 @@ static MACHINE_CONFIG_DERIVED( omv, sg1000 )
 	MCFG_CPU_IO_MAP(omv_io_map)
 
 	MCFG_DEVICE_REMOVE(CARTSLOT_TAG)
-	MCFG_OMV_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, NULL)
+	MCFG_OMV_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
@@ -798,7 +798,7 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 	MCFG_CASSETTE_INTERFACE("sc3000_cass")
 
 	/* cartridge */
-	MCFG_SC3000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, NULL)
+	MCFG_SC3000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
@@ -849,7 +849,7 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(UPD8251_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(UPD8251_TAG, i8251_device, write_dsr))
 

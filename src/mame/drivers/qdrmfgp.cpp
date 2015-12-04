@@ -581,7 +581,7 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(qdrmfgp_state, ide_interrupt))
 
 	/* video hardware */
@@ -628,7 +628,7 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(qdrmfgp_state, gp2_ide_interrupt))
 
 	/* video hardware */

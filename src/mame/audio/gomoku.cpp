@@ -30,15 +30,15 @@ const device_type GOMOKU = &device_creator<gomoku_sound_device>;
 gomoku_sound_device::gomoku_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GOMOKU, "Gomoku Narabe Renju Audio Custom", tag, owner, clock, "gomoku_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_last_channel(NULL),
-		m_sound_rom(NULL),
+		m_last_channel(nullptr),
+		m_sound_rom(nullptr),
 		m_num_voices(0),
 		m_sound_enable(0),
-		m_stream(NULL),
-		m_mixer_table(NULL),
-		m_mixer_lookup(NULL),
-		m_mixer_buffer(NULL),
-		m_mixer_buffer_2(NULL)
+		m_stream(nullptr),
+		m_mixer_table(nullptr),
+		m_mixer_lookup(nullptr),
+		m_mixer_buffer(nullptr),
+		m_mixer_buffer_2(nullptr)
 {
 	memset(m_channel_list, 0, sizeof(gomoku_sound_channel)*GOMOKU_MAX_VOICES);
 	memset(m_soundregs1, 0, sizeof(UINT8)*0x20);

@@ -100,7 +100,7 @@ void segas24_tile::device_start()
 		throw device_missing_dependencies();
 
 	for(char_gfx_index = 0; char_gfx_index < MAX_GFX_ELEMENTS; char_gfx_index++)
-		if (m_gfxdecode->gfx(char_gfx_index) == 0)
+		if (m_gfxdecode->gfx(char_gfx_index) == nullptr)
 			break;
 	assert(char_gfx_index != MAX_GFX_ELEMENTS);
 
@@ -646,7 +646,7 @@ void segas24_sprite::draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitma
 	UINT8 pmt[4];
 	int i;
 	UINT16 *sprd[0x2000], *clip[0x2000];
-	UINT16 *cclip = 0;
+	UINT16 *cclip = nullptr;
 
 	for(i=0; i<4; i++)
 		pmt[i] = 0xff << (1+spri[3-i]);

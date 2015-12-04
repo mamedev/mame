@@ -1582,7 +1582,7 @@ static const char *const battles_sample_names[] =
 	"*battles",
 	"explo1",   /* ground target explosion */
 	"explo2",   /* Solvalou explosion */
-	0   /* end of array */
+	nullptr   /* end of array */
 };
 
 INTERRUPT_GEN_MEMBER(galaga_state::main_vblank_irq)
@@ -2585,7 +2585,7 @@ ROM_START( xevious )
 	ROM_LOAD( "xvi_16.4n",    0x4000, 0x1000, CRC(605ca889) SHA1(3bf380ef76c03822a042ecc73b5edd4543c268ce) )    /* sprite set #3, planes 0/1 */
 	ROM_LOAD( "xvi_18.4r",    0x5000, 0x2000, CRC(02417d19) SHA1(b5f830dd2cf25cf154308d2e640f0ecdcda5d8cd) )    /* sprite set #1, plane 2, set #2, plane 2 */
 	/* 0x7000-0x8fff  will be unpacked from 0x5000-0x6fff */
-	ROM_FILL(                 0x9000, 0x1000, 0x00 )    // empty space to decode sprite set #3 as 3 bits per pixel
+	ROM_FILL(                 0x9000, 0x1000, nullptr )    // empty space to decode sprite set #3 as 3 bits per pixel
 
 	ROM_REGION( 0x4000, "gfx4", 0 ) /* background tilemaps */
 	ROM_LOAD( "xvi_9.2a",     0x0000, 0x1000, CRC(57ed9879) SHA1(3106d1aacff06cf78371bd19967141072b32b7d7) )
@@ -2640,7 +2640,7 @@ ROM_START( xeviousa )
 	ROM_LOAD( "xvi_16.4n",    0x4000, 0x1000, CRC(605ca889) SHA1(3bf380ef76c03822a042ecc73b5edd4543c268ce) )    /* sprite set #3, planes 0/1 */
 	ROM_LOAD( "xvi_18.4r",    0x5000, 0x2000, CRC(02417d19) SHA1(b5f830dd2cf25cf154308d2e640f0ecdcda5d8cd) )    /* sprite set #1, plane 2, set #2, plane 2 */
 	/* 0x7000-0x8fff  will be unpacked from 0x5000-0x6fff */
-	ROM_FILL(                 0x9000, 0x1000, 0x00 )    // empty space to decode sprite set #3 as 3 bits per pixel
+	ROM_FILL(                 0x9000, 0x1000, nullptr )    // empty space to decode sprite set #3 as 3 bits per pixel
 
 	ROM_REGION( 0x4000, "gfx4", 0 ) /* background tilemaps */
 	ROM_LOAD( "xvi_9.2a",     0x0000, 0x1000, CRC(57ed9879) SHA1(3106d1aacff06cf78371bd19967141072b32b7d7) )
@@ -2688,7 +2688,7 @@ ROM_START( xeviousb )
 	ROM_LOAD( "xvi_16.4n",    0x4000, 0x1000, CRC(605ca889) SHA1(3bf380ef76c03822a042ecc73b5edd4543c268ce) )    /* sprite set #3, planes 0/1 */
 	ROM_LOAD( "xvi_18.4r",    0x5000, 0x2000, CRC(02417d19) SHA1(b5f830dd2cf25cf154308d2e640f0ecdcda5d8cd) )    /* sprite set #1, plane 2, set #2, plane 2 */
 	/* 0x7000-0x8fff  will be unpacked from 0x5000-0x6fff */
-	ROM_FILL(                 0x9000, 0x1000, 0x00 )    // empty space to decode sprite set #3 as 3 bits per pixel
+	ROM_FILL(                 0x9000, 0x1000, nullptr )    // empty space to decode sprite set #3 as 3 bits per pixel
 
 	ROM_REGION( 0x4000, "gfx4", 0 ) /* background tilemaps */
 	ROM_LOAD( "xvi_9.2a",     0x0000, 0x1000, CRC(57ed9879) SHA1(3106d1aacff06cf78371bd19967141072b32b7d7) )
@@ -2739,7 +2739,7 @@ ROM_START( xeviousc )
 	ROM_LOAD( "xvi_16.4n",    0x4000, 0x1000, CRC(605ca889) SHA1(3bf380ef76c03822a042ecc73b5edd4543c268ce) )    /* sprite set #3, planes 0/1 */
 	ROM_LOAD( "xvi_18.4r",    0x5000, 0x2000, CRC(02417d19) SHA1(b5f830dd2cf25cf154308d2e640f0ecdcda5d8cd) )    /* sprite set #1, plane 2, set #2, plane 2 */
 	/* 0x7000-0x8fff  will be unpacked from 0x5000-0x6fff */
-	ROM_FILL(                 0x9000, 0x1000, 0x00 )    // empty space to decode sprite set #3 as 3 bits per pixel
+	ROM_FILL(                 0x9000, 0x1000, nullptr )    // empty space to decode sprite set #3 as 3 bits per pixel
 
 	ROM_REGION( 0x4000, "gfx4", 0 ) /* background tilemaps */
 	ROM_LOAD( "xvi_9.2a",     0x0000, 0x1000, CRC(57ed9879) SHA1(3106d1aacff06cf78371bd19967141072b32b7d7) )
@@ -2796,7 +2796,7 @@ ROM_START( xevios )
 	ROM_LOAD( "14.6d",        0x4000, 0x1000, CRC(605ca889) SHA1(3bf380ef76c03822a042ecc73b5edd4543c268ce) )    /* sprite set #3, planes 0/1 */
 	ROM_LOAD( "16.8d",        0x5000, 0x2000, CRC(44262c04) SHA1(4291f83193d11064c2ba6a9af27951b93bb945c3) )    /* sprite set #1, plane 2, set #2, plane 2 */
 	/* 0x7000-0x8fff  will be unpacked from 0x5000-0x6fff */
-	ROM_FILL(                 0x9000, 0x1000, 0x00 )    // empty space to decode sprite set #3 as 3 bits per pixel
+	ROM_FILL(                 0x9000, 0x1000, nullptr )    // empty space to decode sprite set #3 as 3 bits per pixel
 
 	ROM_REGION( 0x4000, "gfx4", 0 ) /* background tilemaps */
 	ROM_LOAD( "10.1d",        0x0000, 0x1000, CRC(10baeebb) SHA1(c544c9e0bb7a1ef93b3f2c2c1397f659d5334373) )
@@ -2859,7 +2859,7 @@ ROM_START( battles )
 	ROM_LOAD( "bg12.c8",    0x4000, 0x1000, CRC(605ca889) SHA1(3bf380ef76c03822a042ecc73b5edd4543c268ce) )    /* sprite set #3, planes 0/1 */
 	ROM_LOAD( "bg15.c2",    0x5000, 0x2000, CRC(02417d19) SHA1(b5f830dd2cf25cf154308d2e640f0ecdcda5d8cd) )    /* sprite set #1, plane 2, set #2, plane 2 */
 	/* 0x7000-0x8fff  will be unpacked from 0x5000-0x6fff */
-	ROM_FILL(                0x9000, 0x1000, 0x00 )    // empty space to decode sprite set #3 as 3 bits per pixel
+	ROM_FILL(                0x9000, 0x1000, nullptr )    // empty space to decode sprite set #3 as 3 bits per pixel
 
 	ROM_REGION( 0x4000, "gfx4", 0 ) /* background tilemaps (Located on the middle board) */
 	ROM_LOAD( "bg6.b14",     0x0000, 0x1000, CRC(57ed9879) SHA1(3106d1aacff06cf78371bd19967141072b32b7d7) )
@@ -2907,7 +2907,7 @@ ROM_START( sxevious )
 	ROM_LOAD( "xvi_16.4n",    0x4000, 0x1000, CRC(605ca889) SHA1(3bf380ef76c03822a042ecc73b5edd4543c268ce) )    /* sprite set #3, planes 0/1 */
 	ROM_LOAD( "xvi_18.4r",    0x5000, 0x2000, CRC(02417d19) SHA1(b5f830dd2cf25cf154308d2e640f0ecdcda5d8cd) )    /* sprite set #1, plane 2, set #2, plane 2 */
 	/* 0x7000-0x8fff  will be unpacked from 0x5000-0x6fff */
-	ROM_FILL(                 0x9000, 0x1000, 0x00 )    // empty space to decode sprite set #3 as 3 bits per pixel
+	ROM_FILL(                 0x9000, 0x1000, nullptr )    // empty space to decode sprite set #3 as 3 bits per pixel
 
 	ROM_REGION( 0x4000, "gfx4", 0 ) /* background tilemaps */
 	ROM_LOAD( "xvi_9.2a",     0x0000, 0x1000, CRC(57ed9879) SHA1(3106d1aacff06cf78371bd19967141072b32b7d7) )
@@ -2955,7 +2955,7 @@ ROM_START( sxeviousj )
 	ROM_LOAD( "xvi_16.4n",    0x4000, 0x1000, CRC(605ca889) SHA1(3bf380ef76c03822a042ecc73b5edd4543c268ce) )    /* sprite set #3, planes 0/1 */
 	ROM_LOAD( "xvi_18.4r",    0x5000, 0x2000, CRC(02417d19) SHA1(b5f830dd2cf25cf154308d2e640f0ecdcda5d8cd) )    /* sprite set #1, plane 2, set #2, plane 2 */
 	/* 0x7000-0x8fff  will be unpacked from 0x5000-0x6fff */
-	ROM_FILL(                 0x9000, 0x1000, 0x00 )    // empty space to decode sprite set #3 as 3 bits per pixel
+	ROM_FILL(                 0x9000, 0x1000, nullptr )    // empty space to decode sprite set #3 as 3 bits per pixel
 
 	ROM_REGION( 0x4000, "gfx4", 0 ) /* background tilemaps */
 	ROM_LOAD( "xvi_9.2a",     0x0000, 0x1000, CRC(57ed9879) SHA1(3106d1aacff06cf78371bd19967141072b32b7d7) )

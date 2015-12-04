@@ -1464,7 +1464,7 @@ static MACHINE_CONFIG_START( iqunlimz, iqunlim_state )
 	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL_21_4772MHz/(512+256))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
 MACHINE_CONFIG_END
 
 /******************************************************************************

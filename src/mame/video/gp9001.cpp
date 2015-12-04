@@ -228,7 +228,7 @@ gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *ta
 
 const address_space_config *gp9001vdp_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 TILE_GET_INFO_MEMBER(gp9001vdp_device::get_top0_tile_info)

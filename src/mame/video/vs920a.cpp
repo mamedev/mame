@@ -34,7 +34,7 @@ const device_type VS920A = &device_creator<vs920a_text_tilemap_device>;
 
 vs920a_text_tilemap_device::vs920a_text_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VS920A, "VS920A Text Tilemap", tag, owner, clock, "vs920a", __FILE__),
-	m_vram(NULL),
+	m_vram(nullptr),
 	m_pal_base(0),
 	m_gfx_region(0),
 	m_gfxdecode(*this)

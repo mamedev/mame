@@ -247,7 +247,7 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		dynamic_buffer data(size);
 		image.fread(&data[0], size);

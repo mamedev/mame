@@ -100,7 +100,7 @@ asic65_device::asic65_device(const machine_config &mconfig, const char *tag, dev
 	m_xflg(0),
 	m_68data(0),
 	m_tdata(0),
-	m_log(NULL)
+	m_log(nullptr)
 {
 	for (int i = 0; i < 32; i++)
 	{

@@ -134,7 +134,7 @@ static void filter_w(device_t *device, int data)
 		C += 220000;    /* 220000pF = 0.220uF */
 	if (data & 2)
 		C +=  47000;    /*  47000pF = 0.047uF */
-	if (device != NULL)
+	if (device != nullptr)
 		dynamic_cast<filter_rc_device*>(device)->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 5100, 0, CAP_P(C));
 }
 

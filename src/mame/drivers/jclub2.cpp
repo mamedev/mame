@@ -1136,7 +1136,7 @@ ROM_START( darkhors )
 	ROM_LOAD( "gfx5", 0x200000, 0x80000, CRC(281402cd) SHA1(77f8e5e02c6e7161299c06e65a078c1cdda1ba66) )
 	ROM_LOAD( "gfx6", 0x280000, 0x80000, CRC(8ea0149b) SHA1(7792fd7e07a7baa4e15f50b6528c78fb15b40b40) )
 	ROM_LOAD( "gfx7", 0x300000, 0x80000, BAD_DUMP CRC(504bf849) SHA1(13a184ec9e176371808938015111f8918cb4df7d) ) // FIXED BITS (11111111)
-	ROM_FILL(         0x300000, 0x80000, 0 ) // a zero-fill seems fine
+	ROM_FILL(         0x300000, 0x80000, nullptr ) // a zero-fill seems fine
 	ROM_LOAD( "gfx8", 0x380000, 0x80000, CRC(590bec2a) SHA1(7fdbb21f1a3eccde65e91eb2443a0e01487c59c3) ) // 000xxxxxxxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x80000, "oki", 0 ) // Samples
@@ -1314,7 +1314,7 @@ DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 	// is there a way (key sequence) to reprogram it??
 	// I bet the original sets need similar get further in their boot sequence
 	UINT8  *eeprom = (UINT8 *)  memregion("eeprom")->base();
-	if (eeprom != NULL)
+	if (eeprom != nullptr)
 	{
 		size_t len = memregion("eeprom")->bytes();
 		dynamic_buffer temp(len);

@@ -63,7 +63,7 @@ static const char *const rotaryf_sample_names[] =
 	"7",        /* fleet move 4 */
 	"8",        /* UFO/saucer hit */
 	"9",        /* bonus base */
-	0
+	nullptr
 };
 
 

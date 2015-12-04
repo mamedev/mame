@@ -177,9 +177,9 @@ ROM_START( ac1 )
 	ROM_REGION(0x0800, "gfx1",0)
 	// 64 chars - U402 BM513
 	ROM_LOAD ("u402.bin", 0x0000, 0x0200, CRC(cfb67f28) SHA1(e3a62a3a8bce0d098887e31fd16410f38832fd18))
-	ROM_COPY("gfx1", 0x0000, 0x0200, 0x0200)
-	ROM_COPY("gfx1", 0x0000, 0x0400, 0x0200)
-	ROM_COPY("gfx1", 0x0000, 0x0600, 0x0200)
+	ROM_COPY("gfx1", nullptr, 0x0200, 0x0200)
+	ROM_COPY("gfx1", nullptr, 0x0400, 0x0200)
+	ROM_COPY("gfx1", nullptr, 0x0600, 0x0200)
 ROM_END
 
 ROM_START( ac1_32 )

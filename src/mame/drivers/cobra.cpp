@@ -595,7 +595,7 @@ void cobra_jvs_host::write(UINT8 data, const UINT8 *&rec_data, UINT32 &rec_size)
 		m_send_ptr = 0;
 	}
 
-	rec_data = NULL;
+	rec_data = nullptr;
 	rec_size = 0;
 }
 
@@ -1071,7 +1071,7 @@ void cobra_fifo::push(const device_t *cpu, UINT64 data)
 	if (m_verbose)
 	{
 		char accessor_location[50];
-		if (cpu != NULL)
+		if (cpu != nullptr)
 		{
 			// cpu has a name and a PC
 			sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
@@ -1091,7 +1091,7 @@ void cobra_fifo::push(const device_t *cpu, UINT64 data)
 		{
 			int i, j;
 			char accessor_location[50];
-			if (cpu != NULL)
+			if (cpu != nullptr)
 			{
 				// cpu has a name and a PC
 				sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
@@ -1148,7 +1148,7 @@ bool cobra_fifo::pop(const device_t *cpu, UINT64 *result)
 		if (m_verbose)
 		{
 			char accessor_location[50];
-			if (cpu != NULL)
+			if (cpu != nullptr)
 			{
 				// cpu has a name and a PC
 				sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
@@ -1169,7 +1169,7 @@ bool cobra_fifo::pop(const device_t *cpu, UINT64 *result)
 	if (m_verbose)
 	{
 		char accessor_location[50];
-		if (cpu != NULL)
+		if (cpu != nullptr)
 		{
 			// cpu has a name and a PC
 			sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
@@ -2199,8 +2199,8 @@ void cobra_renderer::gfx_fifo_exec()
 
 		if (cobra->m_gfx_re_status == RE_STATUS_IDLE)
 		{
-			fifo_in->pop(NULL, &in1);
-			fifo_in->pop(NULL, &in2);
+			fifo_in->pop(nullptr, &in1);
+			fifo_in->pop(nullptr, &in2);
 			w1 = (UINT32)(in1);
 			w2 = (UINT32)(in2);
 
@@ -2233,12 +2233,12 @@ void cobra_renderer::gfx_fifo_exec()
 					return;
 				}
 
-				fifo_in->pop(NULL, &param[0]);
-				fifo_in->pop(NULL, &param[1]);
-				fifo_in->pop(NULL, &param[2]);
-				fifo_in->pop(NULL, &param[3]);
-				fifo_in->pop(NULL, &param[4]);
-				fifo_in->pop(NULL, &param[5]);
+				fifo_in->pop(nullptr, &param[0]);
+				fifo_in->pop(nullptr, &param[1]);
+				fifo_in->pop(nullptr, &param[2]);
+				fifo_in->pop(nullptr, &param[3]);
+				fifo_in->pop(nullptr, &param[4]);
+				fifo_in->pop(nullptr, &param[5]);
 
 				w[0] = (UINT32)param[0];    w[1] = (UINT32)param[1];    w[2] = (UINT32)param[2];
 				w[3] = (UINT32)param[3];    w[4] = (UINT32)param[4];    w[5] = (UINT32)param[5];
@@ -2294,19 +2294,19 @@ void cobra_renderer::gfx_fifo_exec()
 
 				//printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
 
-				fifo_in->pop(NULL, &in3);
-				fifo_in->pop(NULL, &in4);
-				fifo_in->pop(NULL, &ignore);
-				fifo_in->pop(NULL, &ignore);
-				fifo_in->pop(NULL, &ignore);
-				fifo_in->pop(NULL, &ignore);
+				fifo_in->pop(nullptr, &in3);
+				fifo_in->pop(nullptr, &in4);
+				fifo_in->pop(nullptr, &ignore);
+				fifo_in->pop(nullptr, &ignore);
+				fifo_in->pop(nullptr, &ignore);
+				fifo_in->pop(nullptr, &ignore);
 
 				if (w1 == 0x0f600000 && w2 == 0x10520c00)
 				{
-					fifo_out->push(NULL, w1);
-					fifo_out->push(NULL, w2);
-					fifo_out->push(NULL, in3);
-					fifo_out->push(NULL, in4);
+					fifo_out->push(nullptr, w1);
+					fifo_out->push(nullptr, w2);
+					fifo_out->push(nullptr, in3);
+					fifo_out->push(nullptr, in4);
 				}
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
@@ -2391,34 +2391,34 @@ void cobra_renderer::gfx_fifo_exec()
 					UINT64 in[4];
 					if (w2 & 0x40000000)        // line flags
 					{
-						fifo_in->pop(NULL, &in[0]);
+						fifo_in->pop(nullptr, &in[0]);
 					}
 
 					if (w2 & 0x20000000)        // unknown float (0.0f ... 1.0f)
 					{
-						fifo_in->pop(NULL, &in[1]);
+						fifo_in->pop(nullptr, &in[1]);
 					}
 
-					fifo_in->pop(NULL, &x);                     // X coord
-					fifo_in->pop(NULL, &y);                     // Y coord
-					fifo_in->pop(NULL, &in[2]);                 // coord?
-					fifo_in->pop(NULL, &z);                     // Z coord
+					fifo_in->pop(nullptr, &x);                     // X coord
+					fifo_in->pop(nullptr, &y);                     // Y coord
+					fifo_in->pop(nullptr, &in[2]);                 // coord?
+					fifo_in->pop(nullptr, &z);                     // Z coord
 
 					if (w2 & 0x00200000)        // texture coords
 					{
-						fifo_in->pop(NULL, &w);                 // W coord (1 / Z)
-						fifo_in->pop(NULL, &vert[i].p[POLY_U]); // U/Z coord
-						fifo_in->pop(NULL, &vert[i].p[POLY_V]); // V/Z coord
+						fifo_in->pop(nullptr, &w);                 // W coord (1 / Z)
+						fifo_in->pop(nullptr, &vert[i].p[POLY_U]); // U/Z coord
+						fifo_in->pop(nullptr, &vert[i].p[POLY_V]); // V/Z coord
 					}
 
-					fifo_in->pop(NULL, &a);                     // Gouraud Color Alpha
-					fifo_in->pop(NULL, &r);                     // Gouraud Color R
-					fifo_in->pop(NULL, &g);                     // Gouraud Color G
-					fifo_in->pop(NULL, &b);                     // Gouraud Color B
+					fifo_in->pop(nullptr, &a);                     // Gouraud Color Alpha
+					fifo_in->pop(nullptr, &r);                     // Gouraud Color R
+					fifo_in->pop(nullptr, &g);                     // Gouraud Color G
+					fifo_in->pop(nullptr, &b);                     // Gouraud Color B
 
 					if (w2 & 0x00000001)        // unknown float (0.0f ... 1.0f)
 					{
-						fifo_in->pop(NULL, &in[3]);
+						fifo_in->pop(nullptr, &in[3]);
 					}
 
 					vert[i].x = ((x / z) * vp_width) + vp_center_x;
@@ -2579,10 +2579,10 @@ void cobra_renderer::gfx_fifo_exec()
 
 					UINT64 param[4];
 					param[0] = param[1] = param[2] = param[3] = 0;
-					fifo_in->pop(NULL, &param[0]);
-					fifo_in->pop(NULL, &param[1]);
-					fifo_in->pop(NULL, &param[2]);
-					fifo_in->pop(NULL, &param[3]);
+					fifo_in->pop(nullptr, &param[0]);
+					fifo_in->pop(nullptr, &param[1]);
+					fifo_in->pop(nullptr, &param[2]);
+					fifo_in->pop(nullptr, &param[3]);
 
 					buffer[x+0] = (UINT32)(param[0]);
 					buffer[x+1] = (UINT32)(param[1]);
@@ -2625,10 +2625,10 @@ void cobra_renderer::gfx_fifo_exec()
 				// flush fifo_out so we have fresh data at top
 				fifo_out->flush();
 
-				fifo_out->push(NULL, buffer[x+0]);
-				fifo_out->push(NULL, buffer[x+1]);
-				fifo_out->push(NULL, buffer[x+2]);
-				fifo_out->push(NULL, buffer[x+3]);
+				fifo_out->push(nullptr, buffer[x+0]);
+				fifo_out->push(nullptr, buffer[x+1]);
+				fifo_out->push(nullptr, buffer[x+2]);
+				fifo_out->push(nullptr, buffer[x+3]);
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
 				break;
@@ -2728,7 +2728,7 @@ void cobra_renderer::gfx_fifo_exec()
 				for (i = 0; i < num; i++)
 				{
 					UINT64 value = 0;
-					fifo_in->pop(NULL, &value);
+					fifo_in->pop(nullptr, &value);
 
 					gfx_write_gram(reg + (i*4), 0xffffffff, value);
 				}
@@ -2749,7 +2749,7 @@ void cobra_renderer::gfx_fifo_exec()
 				int reg = (w1 >> 8) & 0xfffff;
 
 				UINT32 ret = gfx_read_gram(reg);
-				fifo_out->push(NULL, ret);
+				fifo_out->push(nullptr, ret);
 
 		//      printf("GFX: reg read %08X\n", reg);
 
@@ -2776,7 +2776,7 @@ void cobra_renderer::gfx_fifo_exec()
 				{
 					UINT32 value = gfx_read_gram(reg + (i*4));
 
-					fifo_out->push(NULL, value);
+					fifo_out->push(nullptr, value);
 				}
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
@@ -2804,7 +2804,7 @@ void cobra_renderer::gfx_fifo_exec()
 				for (int i=0; i < num_left; i++)
 				{
 					UINT64 param = 0;
-					fifo_in->pop(NULL, &param);
+					fifo_in->pop(nullptr, &param);
 					cobra->m_gfx_re_word_count++;
 
 					m_texture_ram[m_texram_ptr] = (UINT32)(param);
@@ -2832,7 +2832,7 @@ void cobra_renderer::gfx_fifo_exec()
 				while (fifo_in->current_num() > 0)
 				{
 					UINT64 param;
-					fifo_in->pop(NULL, &param);
+					fifo_in->pop(nullptr, &param);
 
 					if (c == 0)
 						printf("              ");
@@ -3208,9 +3208,9 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, mpc106_pci_r, mpc106_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, mpc106_pci_r, mpc106_pci_w)
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(cobra_state, ide_interrupt))
 
 	/* video hardware */

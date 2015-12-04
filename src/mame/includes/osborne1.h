@@ -54,10 +54,10 @@ public:
 		m_bank_0xxx(*this, "bank_0xxx"),
 		m_bank_1xxx(*this, "bank_1xxx"),
 		m_bank_fxxx(*this, "bank_fxxx"),
-		m_video_timer(NULL),
-		m_p_chargen(NULL),
-		m_tilemap(NULL),
-		m_acia_rxc_txc_timer(NULL)
+		m_video_timer(nullptr),
+		m_p_chargen(nullptr),
+		m_tilemap(nullptr),
+		m_acia_rxc_txc_timer(nullptr)
 	{ }
 
 

@@ -671,7 +671,7 @@ UINT32 missile_state::screen_update_missile(screen_device &screen, bitmap_ind16 
 
 		int effy = m_flipscreen ? ((256+24 - y) & 0xff) : y;
 		UINT8 *src = &videoram[effy * 64];
-		UINT8 *src3 = NULL;
+		UINT8 *src3 = nullptr;
 
 		/* compute the base of the 3rd pixel row */
 		if (effy >= 224)
@@ -684,7 +684,7 @@ UINT32 missile_state::screen_update_missile(screen_device &screen, bitmap_ind16 
 			pix = ((pix >> 2) & 4) | ((pix << 1) & 2);
 
 			/* if we're in the lower region, get the 3rd bit */
-			if (src3 != NULL)
+			if (src3 != nullptr)
 				pix |= (src3[(x / 8) * 2] >> (x & 7)) & 1;
 
 			dst[x] = pix;

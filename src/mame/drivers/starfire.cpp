@@ -314,7 +314,7 @@ static const char *const starfire_sample_names[] =
 	"lock",
 	"scanner",
 	"overheat",
-	0
+	nullptr
 };
 
 INTERRUPT_GEN_MEMBER(starfire_state::vblank_int)

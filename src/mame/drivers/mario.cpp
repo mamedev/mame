@@ -634,7 +634,7 @@ ROM_START( mario )
 
 	ROM_REGION( 0x1800, "audiocpu", 0 ) /* sound */
 	/* internal rom */
-	ROM_FILL(                 0x0000, 0x0800, 0x00)
+	ROM_FILL(                 0x0000, 0x0800, nullptr)
 	/* first half banked */
 	ROM_LOAD( "tma1-c-6k_e.6k",   0x1000, 0x0800, CRC(06b9ff85) SHA1(111a29bcb9cda0d935675fa26eca6b099a88427f) )
 	/* second half always read */
@@ -668,7 +668,7 @@ ROM_START( marioe )
 
 	ROM_REGION( 0x1800, "audiocpu", 0 ) /* sound */
 	/* internal rom */
-	ROM_FILL(                 0x0000, 0x0800, 0x00)
+	ROM_FILL(                 0x0000, 0x0800, nullptr)
 	/* first half banked */
 	ROM_LOAD( "tma1-c-6k_e.6k",   0x1000, 0x0800, CRC(06b9ff85) SHA1(111a29bcb9cda0d935675fa26eca6b099a88427f) )
 	/* second half always read */
@@ -702,7 +702,7 @@ ROM_START( marioo )
 
 	ROM_REGION( 0x1800, "audiocpu", 0 ) /* sound */
 	/* internal rom */
-	ROM_FILL(                 0x0000, 0x0800, 0x00)
+	ROM_FILL(                 0x0000, 0x0800, nullptr)
 	/* first half banked */
 	ROM_LOAD( "tma1-c-6k_e.6k",   0x1000, 0x0800, CRC(06b9ff85) SHA1(111a29bcb9cda0d935675fa26eca6b099a88427f) )
 	/* second half always read */
@@ -736,7 +736,7 @@ ROM_START( marioj )
 
 	ROM_REGION( 0x1800, "audiocpu", 0 ) /* sound */
 	/* internal rom */
-	ROM_FILL(                 0x0000, 0x0800, 0x00)
+	ROM_FILL(                 0x0000, 0x0800, nullptr)
 	/* first half banked */
 	ROM_LOAD( "tma1c-a.6k",   0x1000, 0x0800, CRC(06b9ff85) SHA1(111a29bcb9cda0d935675fa26eca6b099a88427f) )
 	/* second half always read */

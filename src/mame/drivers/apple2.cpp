@@ -603,7 +603,7 @@ READ8_MEMBER(napple2_state::c080_r)
 		offset &= 0x7F;
 		slot = offset / 0x10;
 
-		if (m_slotdevice[slot] != NULL)
+		if (m_slotdevice[slot] != nullptr)
 		{
 			return m_slotdevice[slot]->read_c0nx(space, offset % 0x10);
 		}
@@ -619,7 +619,7 @@ WRITE8_MEMBER(napple2_state::c080_w)
 	offset &= 0x7F;
 	slot = offset / 0x10;
 
-	if (m_slotdevice[slot] != NULL)
+	if (m_slotdevice[slot] != nullptr)
 	{
 		m_slotdevice[slot]->write_c0nx(space, offset % 0x10, data);
 	}
@@ -631,7 +631,7 @@ READ8_MEMBER(napple2_state::c100_r)
 
 	slotnum = ((offset>>8) & 0xf) + 1;
 
-	if (m_slotdevice[slotnum] != NULL)
+	if (m_slotdevice[slotnum] != nullptr)
 	{
 		if ((m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
 		{
@@ -650,7 +650,7 @@ WRITE8_MEMBER(napple2_state::c100_w)
 
 	slotnum = ((offset>>8) & 0xf) + 1;
 
-	if (m_slotdevice[slotnum] != NULL)
+	if (m_slotdevice[slotnum] != nullptr)
 	{
 		if ((m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
 		{
@@ -669,7 +669,7 @@ READ8_MEMBER(napple2_state::c800_r)
 		return 0xff;
 	}
 
-	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != NULL))
+	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
 		return m_slotdevice[m_cnxx_slot]->read_c800(space, offset&0xfff);
 	}
@@ -685,7 +685,7 @@ WRITE8_MEMBER(napple2_state::c800_w)
 		return;
 	}
 
-	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != NULL))
+	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
 		m_slotdevice[m_cnxx_slot]->write_c800(space, offset&0xfff, data);
 	}
@@ -1318,13 +1318,13 @@ static MACHINE_CONFIG_START( apple2_common, napple2_state )
 	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(napple2_state, a2bus_nmi_w))
 	MCFG_A2BUS_OUT_INH_CB(WRITELINE(napple2_state, a2bus_inh_w))
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl0", apple2_slot0_cards, "lang")
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl1", apple2_cards, NULL)
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl2", apple2_cards, NULL)
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl3", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl1", apple2_cards, nullptr)
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl2", apple2_cards, nullptr)
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl3", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl4", apple2_cards, "mockingboard")
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl5", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl5", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl6", apple2_cards, "diskiing")
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl7", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl7", apple2_cards, nullptr)
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
 

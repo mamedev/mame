@@ -201,7 +201,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ "z80ctc" },
 	{ "z80dart" },
 	{ "z80sio" },
-	{ NULL }
+	{ nullptr }
 };
 
 
@@ -298,7 +298,7 @@ WRITE8_MEMBER( altos5_state::port08_w )
 {
 	m_port08 = data & 0x70;
 
-	m_floppy = NULL;
+	m_floppy = nullptr;
 	if (BIT(data, 5))
 		m_floppy = m_floppy1->get_device();
 	else

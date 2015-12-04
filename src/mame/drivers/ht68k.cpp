@@ -46,7 +46,7 @@ public:
 		m_floppy1(*this, "wd1770:1"),
 		m_floppy2(*this, "wd1770:2"),
 		m_floppy3(*this, "wd1770:3"),
-		m_floppy(NULL),
+		m_floppy(nullptr),
 		m_p_ram(*this, "p_ram")
 	{
 	}
@@ -90,7 +90,7 @@ void ht68k_state::machine_reset()
 	m_maincpu->reset();
 
 	m_fdc->reset();
-	m_fdc->set_floppy(NULL);
+	m_fdc->set_floppy(nullptr);
 }
 
 WRITE_LINE_MEMBER(ht68k_state::duart_irq_handler)
@@ -105,7 +105,7 @@ WRITE_LINE_MEMBER(ht68k_state::duart_txb)
 
 WRITE8_MEMBER(ht68k_state::duart_output)
 {
-	m_floppy = NULL;
+	m_floppy = nullptr;
 
 	if ((BIT(data, 7)) == 0) { m_floppy = m_floppy0->get_device(); }
 	if ((BIT(data, 6)) == 0) { m_floppy = m_floppy1->get_device(); }

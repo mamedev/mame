@@ -1157,7 +1157,7 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 
 			m_fdc_ctrl_2 = data;
 
-			pc88va_fdc_update_ready(NULL, 0);
+			pc88va_fdc_update_ready(nullptr, 0);
 
 			break; // FDC control port 2
 	}

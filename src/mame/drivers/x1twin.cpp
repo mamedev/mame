@@ -391,7 +391,7 @@ static const z80_daisy_config x1_daisy[] =
 {
 	{ "x1kb" },
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 static SLOT_INTERFACE_START( x1_floppies )
@@ -526,7 +526,7 @@ ROM_START( x1twin )
 
 	ROM_REGION(0x1800, "cgrom", 0)
 	ROM_LOAD("ank8.rom", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
-	ROM_COPY("font",     0x00000, 0x00800, 0x1000 )
+	ROM_COPY("font",     nullptr, 0x00800, 0x1000 )
 
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 

@@ -237,7 +237,7 @@ READ32_MEMBER(palmz22_state::s3c2410_adc_data_r )
 
 INPUT_CHANGED_MEMBER(palmz22_state::palmz22_input_changed)
 {
-	if (param == 0)
+	if (param == nullptr)
 	{
 		m_s3c2410->s3c2410_touch_screen( (newval & 0x01) ? 1 : 0);
 	}
@@ -310,7 +310,7 @@ MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( palmz22 )
 	PORT_START( "PENB" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, palmz22_input_changed, (void *)0) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CHANGED_MEMBER(DEVICE_SELF, palmz22_state, palmz22_input_changed, (void *)nullptr) PORT_PLAYER(2)
 	PORT_START( "PENX" )
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_NAME("Pen X") PORT_SENSITIVITY(50) PORT_CROSSHAIR(X, 1, 0, 0) PORT_KEYDELTA(30) PORT_PLAYER(2)
 	PORT_START( "PENY" )

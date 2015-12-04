@@ -128,7 +128,7 @@ void datapack_device::update()
 		if ((m_control & DP_LINE_OUTPUT_ENABLE) && !(m_control & DP_LINE_RESET))
 		{
 			// write data
-			if (software_entry() == NULL && (m_id & DP_ID_WRITE))
+			if (software_entry() == nullptr && (m_id & DP_ID_WRITE))
 			{
 				fseek(pack_addr + OPK_HEAD_SIZE, SEEK_SET);
 				fwrite(&m_data, 1);
@@ -164,7 +164,7 @@ void datapack_device::update()
 		else if (!(m_control & DP_LINE_OUTPUT_ENABLE) && (m_control & DP_LINE_RESET))
 		{
 			// read datapack ID
-			if ((m_id & DP_ID_EPROM) || software_entry() != NULL)
+			if ((m_id & DP_ID_EPROM) || software_entry() != nullptr)
 				m_data = m_id;
 			else
 				m_data = 0x01;      // for identify RAM pack
@@ -282,7 +282,7 @@ bool datapack_device::call_create(int format_type, option_resolution *create_arg
 {
 	static const UINT8 opk_head[6] = {'O', 'P', 'K', 0x00, 0x00, 0x00};
 
-	if (create_args != NULL)
+	if (create_args != nullptr)
 	{
 		m_id = 0x40;
 		m_id |= (option_resolution_lookup_int(create_args, 'R')) ? 0x00 : 0x02;

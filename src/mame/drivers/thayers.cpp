@@ -382,8 +382,8 @@ READ8_MEMBER(thayers_state::dsw_b_r)
 
 READ8_MEMBER(thayers_state::laserdsc_data_r)
 {
-	if (m_ldv1000 != NULL) return m_ldv1000->status_r();
-	if (m_pr7820 != NULL) return m_pr7820->data_r();
+	if (m_ldv1000 != nullptr) return m_ldv1000->status_r();
+	if (m_pr7820 != nullptr) return m_pr7820->data_r();
 	return 0;
 }
 
@@ -413,12 +413,12 @@ WRITE8_MEMBER(thayers_state::laserdsc_control_w)
 
 	if (BIT(data, 5))
 	{
-		if (m_ldv1000 != NULL)
+		if (m_ldv1000 != nullptr)
 		{
 			m_ldv1000->data_w(m_laserdisc_data);
 			m_ldv1000->enter_w(BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 		}
-		if (m_pr7820 != NULL)
+		if (m_pr7820 != nullptr)
 		{
 			m_pr7820->data_w(m_laserdisc_data);
 			m_pr7820_enter = BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE;
@@ -627,15 +627,15 @@ ADDRESS_MAP_END
 
 CUSTOM_INPUT_MEMBER(thayers_state::laserdisc_enter_r)
 {
-	if (m_pr7820 != NULL) return m_pr7820_enter;
-	if (m_ldv1000 != NULL) return (m_ldv1000->status_strobe_r() == ASSERT_LINE) ? 0 : 1;
+	if (m_pr7820 != nullptr) return m_pr7820_enter;
+	if (m_ldv1000 != nullptr) return (m_ldv1000->status_strobe_r() == ASSERT_LINE) ? 0 : 1;
 	return 0;
 }
 
 CUSTOM_INPUT_MEMBER(thayers_state::laserdisc_ready_r)
 {
-	if (m_pr7820 != NULL) return (m_pr7820->ready_r() == ASSERT_LINE) ? 0 : 1;
-	if (m_ldv1000 != NULL) return (m_ldv1000->command_strobe_r() == ASSERT_LINE) ? 0 : 1;
+	if (m_pr7820 != nullptr) return (m_pr7820->ready_r() == ASSERT_LINE) ? 0 : 1;
+	if (m_ldv1000 != nullptr) return (m_ldv1000->command_strobe_r() == ASSERT_LINE) ? 0 : 1;
 	return 0;
 }
 

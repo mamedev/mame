@@ -73,7 +73,7 @@ speech_sound_device::speech_sound_device(const machine_config &mconfig, const ch
 		m_latch(0),
 		m_t0(0),
 		m_p2(0),
-		m_speech(NULL)
+		m_speech(nullptr)
 {
 }
 
@@ -243,7 +243,7 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type ty
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_ourcpu(*this, "ourcpu"),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_in_latch(0),
 		m_out_latch(0),
 		m_last_p2_value(0),
@@ -278,7 +278,7 @@ void usb_sound_device::device_start()
 
 	/* find the CPU we are associated with */
 	m_maincpu = machine().device("maincpu");
-	assert(m_maincpu != NULL);
+	assert(m_maincpu != nullptr);
 
 	/* create a sound stream */
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE);

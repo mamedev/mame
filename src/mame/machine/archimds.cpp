@@ -487,7 +487,7 @@ void archimedes_state::latch_timer_cnt(int tmr)
 
 bool archimedes_state::check_floppy_ready()
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if(!m_fdc)
 		return false;
@@ -859,12 +859,12 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 								/*
 								-x-- ---- In Use Control (floppy?)
 								*/
-								floppy_image_device *floppy = NULL;
+								floppy_image_device *floppy = nullptr;
 
 								if (!(data & 1)) { m_floppy_select = 0; floppy = m_floppy0->get_device(); }
 								if (!(data & 2)) { m_floppy_select = 1; floppy = m_floppy1->get_device(); }
-								if (!(data & 4)) { m_floppy_select = 2; floppy = NULL; } // floppy 2
-								if (!(data & 8)) { m_floppy_select = 3; floppy = NULL; } // floppy 3
+								if (!(data & 4)) { m_floppy_select = 2; floppy = nullptr; } // floppy 2
+								if (!(data & 8)) { m_floppy_select = 3; floppy = nullptr; } // floppy 3
 
 								m_fdc->set_floppy(floppy);
 

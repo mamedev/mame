@@ -1604,7 +1604,7 @@ static const struct CPS1config cps1_config_table[]=
 
 	{"kenseim",     CPS_B_21_DEF, mapper_KNM10B },  // wrong, need to convert equations from PAL
 
-	{0}     /* End of table */
+	{nullptr}     /* End of table */
 };
 
 
@@ -2250,11 +2250,11 @@ VIDEO_START_MEMBER(cps_state,cps)
 
 
 	/* Set up old base */
-	m_scroll1 = NULL;
-	m_scroll2 = NULL;
-	m_scroll3 = NULL;
-	m_obj = NULL;
-	m_other = NULL;
+	m_scroll1 = nullptr;
+	m_scroll2 = nullptr;
+	m_scroll3 = nullptr;
+	m_obj = nullptr;
+	m_other = nullptr;
 	cps1_get_video_base();   /* Calculate base pointers */
 	cps1_get_video_base();   /* Calculate old base pointers */
 

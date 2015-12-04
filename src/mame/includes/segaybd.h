@@ -32,7 +32,7 @@ public:
 			m_digital_ports(*this, digital_ports),
 			m_adc_ports(*this, "ADC"),
 			m_pdrift_bank(0),
-			m_scanline_timer(NULL),
+			m_scanline_timer(nullptr),
 			m_irq2_scanline(0),
 			m_timer_irq_state(0),
 			m_vblank_irq_state(0),

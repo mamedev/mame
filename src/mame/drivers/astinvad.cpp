@@ -618,7 +618,7 @@ static const char *const astinvad_sample_names[] =
 	"6",
 	"7",
 	"8",
-	0
+	nullptr
 };
 
 

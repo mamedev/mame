@@ -277,7 +277,7 @@ void esq5505_state::machine_start()
 void esq5505_state::machine_reset()
 {
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : 0;
+	floppy_image_device *floppy = con ? con->get_device() : nullptr;
 
 	m_rom = (UINT16 *)(void *)memregion("osrom")->base();
 	m_ram = (UINT16 *)(void *)memshare("osram")->ptr();
@@ -453,7 +453,7 @@ WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
 WRITE8_MEMBER(esq5505_state::duart_output)
 {
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : 0;
+	floppy_image_device *floppy = con ? con->get_device() : nullptr;
 
 	m_duart_io = data;
 
@@ -905,7 +905,7 @@ DRIVER_INIT_MEMBER(esq5505_state,common)
 	m_duart_io = 0;
 
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : 0;
+	floppy_image_device *floppy = con ? con->get_device() : nullptr;
 	if (floppy)
 	{
 		m_fdc->set_floppy(floppy);

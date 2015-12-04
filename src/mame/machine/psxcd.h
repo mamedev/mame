@@ -90,8 +90,8 @@ private:
 	void illegalcmd(UINT8 cmd);
 
 	void cmd_complete(command_result *res);
-	void send_result(UINT8 res, UINT8 *data=NULL, int sz=0, int delay=default_irq_delay, UINT8 errcode = 0);
-	command_result *prepare_result(UINT8 res, UINT8 *data=NULL, int sz=0, UINT8 errcode = 0);
+	void send_result(UINT8 res, UINT8 *data=nullptr, int sz=0, int delay=default_irq_delay, UINT8 errcode = 0);
+	command_result *prepare_result(UINT8 res, UINT8 *data=nullptr, int sz=0, UINT8 errcode = 0);
 
 	void start_read();
 	void start_play();

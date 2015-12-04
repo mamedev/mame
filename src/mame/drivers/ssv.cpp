@@ -2444,8 +2444,8 @@ static const gfx_layout layout_16x8x6_ram =
 };
 
 static GFXDECODE_START( eaglshot )
-	GFXDECODE_ENTRY( NULL, 0, layout_16x8x8_ram, 0, 0x8000/64 ) // [0] Sprites (256 colors, decoded from ram)
-	GFXDECODE_ENTRY( NULL, 0, layout_16x8x6_ram, 0, 0x8000/64 ) // [1] Sprites (64 colors, decoded from ram)
+	GFXDECODE_ENTRY( nullptr, 0, layout_16x8x8_ram, 0, 0x8000/64 ) // [0] Sprites (256 colors, decoded from ram)
+	GFXDECODE_ENTRY( nullptr, 0, layout_16x8x6_ram, 0, 0x8000/64 ) // [1] Sprites (64 colors, decoded from ram)
 GFXDECODE_END
 
 static const gfx_layout layout_16x16x8 =
@@ -2964,7 +2964,7 @@ ROM_START( cairblad )
 	ROM_LOAD( "ac1805m0.u8",  0x1000000, 0x400000, CRC(19771f43) SHA1(d6a05392c58d3f60d666e08b3a82f06fa2c8e3a3) ) // AC1805M01.U8    32M Mask
 	ROM_LOAD( "ac1806m0.u11", 0x1400000, 0x400000, CRC(816b97dc) SHA1(3737cb37a4db720901661fa9b4e30c44181efb94) ) // AC1806M01.U11   32M Mask
 
-	ROM_FILL(                 0x1800000, 0x800000, 0)
+	ROM_FILL(                 0x1800000, 0x800000, nullptr)
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", 0 ) /* Samples */
 	ROM_LOAD16_WORD_SWAP( "ac1410m0.u41", 0x000000, 0x400000, CRC(ecf1f255) SHA1(984b1529b8f0c7d94ea713c85d71df00f54eba79) ) // AC1807M01.U41   32M Mask
@@ -3193,13 +3193,13 @@ ROM_START( eaglshot )
 	ROM_LOAD16_WORD_SWAP( "si003-08.u24", 0x200000, 0x200000, CRC(d0122ba2) SHA1(96230fb690cf144cd873f7d51c0304736a698316) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.1", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.0", nullptr, 0x000000, 0x400000 )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.0", nullptr, 0x000000, 0x400000 )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.3", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.0", nullptr, 0x000000, 0x400000 )
 ROM_END
 
 
@@ -3231,7 +3231,7 @@ ROM_START( hypreact )
 	ROM_LOAD( "s14-1-11.u14", 0x0e00000, 0x200000, CRC(6d8e7bae) SHA1(93258663ceb6174917560bb66d72a42ba0f96c0e) )
 	ROM_LOAD( "s14-1-12.u11", 0x1000000, 0x200000, CRC(233a8e23) SHA1(0c813ec80ac63aa342c8ea57d9e38cada74456d9) )
 
-	ROM_FILL(                 0x1200000, 0x600000, 0          )
+	ROM_FILL(                 0x1200000, 0x600000, nullptr          )
 
 //  The chip seems to use REGION1 too, but produces no sound from there.
 
@@ -3271,7 +3271,7 @@ ROM_START( hypreac2 )
 	ROM_LOAD( "s16-1-12.u11", 0x1800000, 0x400000, CRC(87d9c748) SHA1(1332db901e50e2fd25d3323920f99e0ef0b0533d) )
 	ROM_LOAD( "s16-1-11.u14", 0x1c00000, 0x200000, CRC(70b3c0a0) SHA1(009e2f2f292ed6f10a9d54557861294156664e72) )
 
-	ROM_FILL(                 0x1e00000,0x0a00000, 0)
+	ROM_FILL(                 0x1e00000,0x0a00000, nullptr)
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", 0 ) /* Samples */
 	ROM_LOAD16_WORD_SWAP( "s16-1-06.u41", 0x000000, 0x400000, CRC(626e8a81) SHA1(45ef5b630aed575acd160ede1413e0370f4f9761) )
@@ -3433,13 +3433,13 @@ ROM_START( jsk )
 	ROM_LOAD16_BYTE( "jsk-s0.u65", 0x000000, 0x200000, CRC(8d1a9aeb) SHA1(37316bd3e8cbe2a84239e1a11a56d4fe4723ae1a) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.1", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.0", nullptr, 0x000000, 0x400000 )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.0", nullptr, 0x000000, 0x400000 )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.3", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.0", nullptr, 0x000000, 0x400000 )
 ROM_END
 
 
@@ -3528,10 +3528,10 @@ ROM_START( koikois2 )
 	ROM_LOAD16_BYTE( "kk2_snd1.bin", 0x000000, 0x200000, CRC(e5a963e1) SHA1(464ffd53ac2e6db62225b18d12bfea93160771ec) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.0", nullptr, 0x000000, 0x400000 )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.3", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.1", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.1", nullptr, 0x000000, 0x400000 )
 ROM_END
 
 
@@ -3614,7 +3614,7 @@ ROM_START( mslider )
 	ROM_LOAD( "ms-c0.bin", 0x500000, 0x200000, CRC(f9d3e052) SHA1(4cdde756b24ee980f3c79a35a1fe071861fdeef9) )
 	ROM_LOAD( "ms-c1.bin", 0x700000, 0x080000, CRC(7f910c5a) SHA1(23ea13b6c07d3d31a25c21704d6a3e506578b199) )
 
-	ROM_FILL(              0x780000, 0x280000, 0)
+	ROM_FILL(              0x780000, 0x280000, nullptr)
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", 0 ) /* Samples */
 	ROM_LOAD16_WORD_SWAP( "ms-snd0.bin", 0x000000, 0x200000, CRC(cda6e3a5) SHA1(28ad8f34bc4f907654582f3522b377b97234eba8) )
@@ -3709,7 +3709,7 @@ ROM_START( srmp4 )
 	ROM_LOAD( "sx001-06.c1", 0x0e00000, 0x200000, CRC(6fe7229e) SHA1(e1432aa500460f79b5b78ee4b249d8fc9f566ce1) )
 	ROM_LOAD( "sx001-09.c2", 0x1000000, 0x200000, CRC(91dd8218) SHA1(a500dca9eefbf93187b1dfde7ddff1d22b886d44) )
 
-	ROM_FILL(                0x1200000, 0x600000, 0)
+	ROM_FILL(                0x1200000, 0x600000, nullptr)
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", 0 ) /* Samples */
 	ROM_LOAD16_WORD_SWAP( "sx001-10.sd0", 0x000000, 0x200000, CRC(45409ef1) SHA1(327d0a63deac6f0f8b9a408a321c03dd4e965569) )
@@ -3734,7 +3734,7 @@ ROM_START( srmp4o )
 	ROM_LOAD( "sx001-06.c1", 0x0e00000, 0x200000, CRC(6fe7229e) SHA1(e1432aa500460f79b5b78ee4b249d8fc9f566ce1) )
 	ROM_LOAD( "sx001-09.c2", 0x1000000, 0x200000, CRC(91dd8218) SHA1(a500dca9eefbf93187b1dfde7ddff1d22b886d44) )
 
-	ROM_FILL(                0x1200000, 0x600000, 0)
+	ROM_FILL(                0x1200000, 0x600000, nullptr)
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", 0 ) /* Samples */
 	ROM_LOAD16_WORD_SWAP( "sx001-10.sd0", 0x000000, 0x200000, CRC(45409ef1) SHA1(327d0a63deac6f0f8b9a408a321c03dd4e965569) )
@@ -3917,7 +3917,7 @@ ROM_START( survarts )
 	ROM_LOAD( "si001-06.u16", 0x0e00000, 0x200000, CRC(9a62f532) SHA1(7e7ba1224e52b33a9bd14058230efc871178c4f8) ) /* C1 */
 	ROM_LOAD( "si001-09.u15", 0x1000000, 0x200000, CRC(0955e393) SHA1(0be9134190706eaee49177034b0536b05c4bc7ac) ) /* C2 */
 
-	ROM_FILL(                0x1200000, 0x600000, 0)
+	ROM_FILL(                0x1200000, 0x600000, nullptr)
 
 //  The chip seems to use REGION1 too, but produces no sound from there.
 
@@ -3949,7 +3949,7 @@ ROM_START( survartsu )
 	ROM_LOAD( "si001-06.u16", 0x0e00000, 0x200000, CRC(9a62f532) SHA1(7e7ba1224e52b33a9bd14058230efc871178c4f8) ) /* C1 */
 	ROM_LOAD( "si001-09.u15", 0x1000000, 0x200000, CRC(0955e393) SHA1(0be9134190706eaee49177034b0536b05c4bc7ac) ) /* C2 */
 
-	ROM_FILL(                0x1200000, 0x600000, 0)
+	ROM_FILL(                0x1200000, 0x600000, nullptr)
 
 //  The chip seems to use REGION1 too, but produces no sound from there.
 
@@ -3978,7 +3978,7 @@ ROM_START( survartsj )
 	ROM_LOAD( "si001-06.u16", 0x0e00000, 0x200000, CRC(9a62f532) SHA1(7e7ba1224e52b33a9bd14058230efc871178c4f8) ) /* C1 */
 	ROM_LOAD( "si001-09.u15", 0x1000000, 0x200000, CRC(0955e393) SHA1(0be9134190706eaee49177034b0536b05c4bc7ac) ) /* C2 */
 
-	ROM_FILL(                0x1200000, 0x600000, 0)
+	ROM_FILL(                0x1200000, 0x600000, nullptr)
 
 //  The chip seems to use REGION1 too, but produces no sound from there.
 
@@ -4048,7 +4048,7 @@ ROM_START( dynagear )
 	ROM_LOAD( "si002-03.u17", 0x0800000, 0x200000, CRC(4261a6b8) SHA1(df163faa84a86f126d5d405aef316ff9dd3c05eb) )
 	ROM_LOAD( "si002-06.u16", 0x0a00000, 0x200000, CRC(0e1f23f6) SHA1(ea35c75776b75131ef9133a16a36d95132dc6776) )
 
-	ROM_FILL(                0xc00000, 0x400000, 0)
+	ROM_FILL(                0xc00000, 0x400000, nullptr)
 
 //  The chip seems to use REGION1 too, but produces no sound from there.
 
@@ -4094,7 +4094,7 @@ ROM_START( sxyreact )
 	ROM_LOAD( "ac1408m0.u11", 0x1800000, 0x400000, CRC(c45bab47) SHA1(d00802005e091088eabeb672a6428417db43cb66) )
 	ROM_LOAD( "ac1409m0.u14", 0x1c00000, 0x200000, CRC(be1c66c2) SHA1(6d7b60d3b4286a768eac122c3d163e6e5287adc3) )
 
-	ROM_FILL(                 0x1e00000, 0xa00000, 0)
+	ROM_FILL(                 0x1e00000, 0xa00000, nullptr)
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", 0 ) /* Samples */
 	ROM_LOAD16_WORD_SWAP( "ac1410m0.u41", 0x000000, 0x400000, CRC(2a880afc) SHA1(193235bccde28a7d693a1a1f0159260a3a63a7d5) )
@@ -4105,7 +4105,7 @@ ROM_START( sxyreact )
 
 	// a few sparse samples are played from here
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.1", 0x000000,    0x200000, 0x200000 )
+	ROM_COPY( "ensoniq.1", nullptr,    0x200000, 0x200000 )
 ROM_END
 
 /***************************************************************************
@@ -4176,7 +4176,7 @@ ROM_START( sxyreac2 )
 	ROM_LOAD( "ac1705t00.u8",  0x1000000, 0x400000, CRC(2dff0652) SHA1(3c68ec3b233f248208ea80e4799a9504318b4e7c) )
 	ROM_LOAD( "ac1706t00.u11", 0x1400000, 0x400000, CRC(e7a168e0) SHA1(b4e19cc3a1fd0f18db7476ebe7cbb397c60e01b3) )
 
-	ROM_FILL(                 0x1800000, 0x800000, 0)
+	ROM_FILL(                 0x1800000, 0x800000, nullptr)
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", 0 ) /* Samples */
 	ROM_LOAD16_WORD_SWAP( "ac1707t00.u41", 0x000000, 0x400000, CRC(28999bc4) SHA1(4cddaa4a155cc03d456e6edb20dd207f7ff3d9c4) )
@@ -4186,7 +4186,7 @@ ROM_START( sxyreac2 )
 	ROM_CONTINUE( 0x000000, 0x200000 )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.1", 0x000000,    0x200000, 0x200000 )
+	ROM_COPY( "ensoniq.1", nullptr,    0x200000, 0x200000 )
 ROM_END
 
 
@@ -4273,7 +4273,7 @@ ROM_START( stmblade )
 	ROM_LOAD( "sb-c0.u11", 0x0c00000, 0x200000, CRC(825dd8f1) SHA1(39d32f54c97e21f92598442f05fd91ae2403a0d2) )
 	ROM_LOAD( "sb-c1.u7",  0x0e00000, 0x200000, CRC(744afcd7) SHA1(db716a1a2ad5864ebdb4865430cb637fb94ed34f) )
 	ROM_LOAD( "sb-c2.u4",  0x1000000, 0x080000, CRC(fd1d2a92) SHA1(957a8a52b79e252c7f1a4b6383107ae609dce5ef) )
-	ROM_FILL(              0x1200000, 0x600000, 0)
+	ROM_FILL(              0x1200000, 0x600000, nullptr)
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
 	ROM_LOAD16_BYTE( "sb-snd0.u22", 0x000000, 0x200000, CRC(4efd605b) SHA1(9c97be105c923c7db847d9b9aea37025edb685a0) )
@@ -4302,7 +4302,7 @@ ROM_START( stmbladej )
 	ROM_LOAD( "sb-c0.u11", 0x0c00000, 0x200000, CRC(825dd8f1) SHA1(39d32f54c97e21f92598442f05fd91ae2403a0d2) )
 	ROM_LOAD( "sb-c1.u7",  0x0e00000, 0x200000, CRC(744afcd7) SHA1(db716a1a2ad5864ebdb4865430cb637fb94ed34f) )
 	ROM_LOAD( "sb-c2.u4",  0x1000000, 0x080000, CRC(fd1d2a92) SHA1(957a8a52b79e252c7f1a4b6383107ae609dce5ef) )
-	ROM_FILL(              0x1200000, 0x600000, 0)
+	ROM_FILL(              0x1200000, 0x600000, nullptr)
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 )   /* Samples */
 	ROM_LOAD16_BYTE( "sb-snd0.u22", 0x000000, 0x200000, CRC(4efd605b) SHA1(9c97be105c923c7db847d9b9aea37025edb685a0) )
@@ -4368,7 +4368,7 @@ ROM_START( twineag2 )
 	ROM_LOAD( "sx002-08.u3",  0x0e00000, 0x200000, CRC(64edcefa) SHA1(55a71afe87da93e35c5ba291e970bdcd91b52a7a) ) /* C1 */
 	ROM_LOAD( "sx002-09.u2",  0x1000000, 0x200000, CRC(51527c56) SHA1(378155a585e5b847bd8ae1f17cb651138d844e33) ) /* C2, C3 is unpopulated */
 
-	ROM_FILL(             0x1200000, 0x600000, 0          )
+	ROM_FILL(             0x1200000, 0x600000, nullptr          )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 ) /* Samples */
 	ROM_LOAD16_BYTE( "sx002-10.u14", 0x000000, 0x200000, CRC(b0669dfa) SHA1(ff805f59864ac4ccee3e249c06804d844d3df59c) )
@@ -4377,10 +4377,10 @@ ROM_START( twineag2 )
 	ROM_LOAD16_BYTE( "sx002-11.u7",  0x000000, 0x200000, CRC(b8dd621a) SHA1(f9b43e018f2bb121e4f4e9554419cd32b870556b) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.0", nullptr, 0x000000, 0x400000 )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.3", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.1", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.1", nullptr, 0x000000, 0x400000 )
 
 	ROM_REGION( 0x11000, "st010", 0)
 	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
@@ -4412,7 +4412,7 @@ ROM_START( ultrax )
 	ROM_LOAD( "71047-04.u77", 0x0500000, 0x100000, CRC(d9e710d1) SHA1(063459a247f9ff81cb558802e9943b3ea8a2ea3a) )
 	ROM_LOAD( "71047-05.u75", 0x0600000, 0x200000, CRC(10848193) SHA1(40b7ebb6011dc703bbf620cd22cd678c10ec67a4) )
 	ROM_LOAD( "71047-06.u88", 0x0800000, 0x100000, CRC(b8ac2942) SHA1(3e85e8f5669d469dd3114455248546d32a642315) )
-	ROM_FILL(                 0x0900000, 0x300000, 0 )
+	ROM_FILL(                 0x0900000, 0x300000, nullptr )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 ) /* Samples */
 	ROM_LOAD16_BYTE( "71047-07.u59", 0x000000, 0x200000, CRC(d9828b62) SHA1(f66a388d7a00b3a45d386671c061f5b840453451) )
@@ -4421,10 +4421,10 @@ ROM_START( ultrax )
 	ROM_LOAD16_BYTE( "71047-08.u60", 0x000000, 0x200000, CRC(30ebff6d) SHA1(53824c1fc37e22b545fd68b59722f7968f0ca1e2) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.0", nullptr, 0x000000, 0x400000 )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.3", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.1", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.1", nullptr, 0x000000, 0x400000 )
 ROM_END
 
 
@@ -4442,7 +4442,7 @@ ROM_START( ultraxg )
 	ROM_LOAD( "71047-04.u77", 0x0500000, 0x100000, CRC(d9e710d1) SHA1(063459a247f9ff81cb558802e9943b3ea8a2ea3a) )
 	ROM_LOAD( "71047-05.u75", 0x0600000, 0x200000, CRC(10848193) SHA1(40b7ebb6011dc703bbf620cd22cd678c10ec67a4) )
 	ROM_LOAD( "71047-06.u88", 0x0800000, 0x100000, CRC(b8ac2942) SHA1(3e85e8f5669d469dd3114455248546d32a642315) )
-	ROM_FILL(                 0x0900000, 0x300000, 0 )
+	ROM_FILL(                 0x0900000, 0x300000, nullptr )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE | 0 ) /* Samples */
 	ROM_LOAD16_BYTE( "71047-07.u59", 0x000000, 0x200000, CRC(d9828b62) SHA1(f66a388d7a00b3a45d386671c061f5b840453451) )
@@ -4451,10 +4451,10 @@ ROM_START( ultraxg )
 	ROM_LOAD16_BYTE( "71047-08.u60", 0x000000, 0x200000, CRC(30ebff6d) SHA1(53824c1fc37e22b545fd68b59722f7968f0ca1e2) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.0", nullptr, 0x000000, 0x400000 )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.3", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.1", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.1", nullptr, 0x000000, 0x400000 )
 ROM_END
 
 /***************************************************************************
@@ -4693,13 +4693,13 @@ ROM_START( gdfs )
 	ROM_LOAD16_BYTE( "vg004-13.u5", 0x000001, 0x200000, CRC(a4ed3977) SHA1(5843d56f69789e70ce0201a693ffae322b628459) )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.1", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.0", nullptr, 0x000000, 0x400000 )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.0", nullptr, 0x000000, 0x400000 )
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.3", 0 ) /* Samples */
-	ROM_COPY( "ensoniq.0", 0x000000, 0x000000, 0x400000 )
+	ROM_COPY( "ensoniq.0", nullptr, 0x000000, 0x400000 )
 ROM_END
 
 /***************************************************************************

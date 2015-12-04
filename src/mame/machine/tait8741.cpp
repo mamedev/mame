@@ -127,7 +127,7 @@ void taito8741_4pack_device::update(int num)
 		st = &m_taito8741[num];
 		if( st->connect != -1 )
 				sst = &m_taito8741[st->connect];
-		else sst = 0;
+		else sst = nullptr;
 		next = -1;
 		/* check pending command */
 		switch(st->phase)

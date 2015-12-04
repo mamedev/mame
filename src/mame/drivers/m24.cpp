@@ -260,9 +260,9 @@ static MACHINE_CONFIG_START( olivetti, m24_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "mb3", pc_isa8_cards, "lpt", true)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "mb4", pc_isa8_cards, "com", true)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, nullptr, false)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

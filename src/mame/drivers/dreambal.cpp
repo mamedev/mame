@@ -80,7 +80,7 @@ UINT32 dreambal_state::screen_update_dreambal(screen_device &screen, bitmap_ind1
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
-	m_deco_tilegen1->pf_update(NULL, NULL);
+	m_deco_tilegen1->pf_update(nullptr, nullptr);
 
 	bitmap.fill(0, cliprect); /* not Confirmed */
 	screen.priority().fill(0);

@@ -134,7 +134,7 @@ UINT32 rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &
 
 	/* Update playfields */
 	flip_screen_set(BIT(flip, 7));
-	m_deco_tilegen1->pf_update(0, 0);
+	m_deco_tilegen1->pf_update(nullptr, nullptr);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
 	/* Draw playfields - Palette of 2nd playfield chip visible if playfields turned off */

@@ -76,7 +76,7 @@ public:
 		m_floppy1(*this, "mb8877a:1"),
 		m_floppy2(*this, "mb8877a:2"),
 		m_floppy3(*this, "mb8877a:3"),
-		m_floppy(NULL),
+		m_floppy(nullptr),
 		m_palette(*this, "palette")
 	{ }
 

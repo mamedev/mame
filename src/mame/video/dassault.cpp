@@ -86,8 +86,8 @@ UINT32 dassault_state::screen_update_dassault(screen_device &screen, bitmap_rgb3
 
 	/* Update tilemaps */
 	flip_screen_set(BIT(flip, 7));
-	m_deco_tilegen1->pf_update(0, m_pf2_rowscroll);
-	m_deco_tilegen2->pf_update(0, m_pf4_rowscroll);
+	m_deco_tilegen1->pf_update(nullptr, m_pf2_rowscroll);
+	m_deco_tilegen2->pf_update(nullptr, m_pf4_rowscroll);
 
 	/* Draw playfields/update priority bitmap */
 	screen.priority().fill(0, cliprect);

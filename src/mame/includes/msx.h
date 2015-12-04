@@ -153,7 +153,7 @@ public:
 			{
 				for (int page = 0; page < 4; page++ )
 				{
-					m_all_slots[prim][sec][page] = NULL;
+					m_all_slots[prim][sec][page] = nullptr;
 				}
 			}
 		}
@@ -210,7 +210,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(msx_irq_source3) { msx_irq_source(3, state); }  // sometimes expansion slot
 
 protected:
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == 0) ? &m_switched_device_as_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == 0) ? &m_switched_device_as_config : nullptr; }
 
 private:
 	required_device<z80_device> m_maincpu;

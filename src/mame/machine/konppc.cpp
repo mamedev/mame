@@ -37,7 +37,7 @@ void konppc_device::device_start()
 		dsp_shared_ram_bank[i] = 0;
 
 		dsp_state[i] = 0x80;
-		texture_bank[i] = NULL;
+		texture_bank[i] = nullptr;
 
 		nwk_device_sel[i] = 0;
 		nwk_fifo_read_ptr[i] = 0;
@@ -143,7 +143,7 @@ WRITE32_MEMBER( konppc_device::cgboard_dsp_comm_w_ppc )
 				if (data & 0x80000000)
 					dsp_state[cgboard_id] |= 0x10;
 
-				if (k033906 != NULL)    /* zr107.c has no PCI and some games only have one PCI Bridge */
+				if (k033906 != nullptr)    /* zr107.c has no PCI and some games only have one PCI Bridge */
 					k033906->set_reg((data & 0x20000000) ? 1 : 0);
 
 				if (data & 0x10000000)
@@ -236,7 +236,7 @@ void konppc_device::dsp_comm_sharc_w(address_space &space, int board, int offset
 					device->set_flag_input(1, ASSERT_LINE);
 				}
 
-				if (texture_bank[board] != NULL)
+				if (texture_bank[board] != nullptr)
 				{
 					int offset = (data & 0x08) ? 1 : 0;
 
@@ -250,7 +250,7 @@ void konppc_device::dsp_comm_sharc_w(address_space &space, int board, int offset
 		{
 			if (offset == 1)
 			{
-				if (texture_bank[board] != NULL)
+				if (texture_bank[board] != nullptr)
 				{
 					int offset = (data & 0x08) ? 1 : 0;
 

@@ -284,7 +284,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 	n64_periphs *periphs = machine().device<n64_periphs>("rcp");
 	UINT8 *cart = memregion("user2")->base();
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		length = image.fread(cart, 0x4000000);
 	}

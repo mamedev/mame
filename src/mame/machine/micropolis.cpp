@@ -80,13 +80,13 @@ micropolis_device::micropolis_device(const machine_config &mconfig, const char *
 	m_data_offset(0),
 	m_data_count(0),
 	m_sector_length(0),
-	m_drive(NULL)
+	m_drive(nullptr)
 {
 	for (int i = 0; i < 6144; i++)
 		m_buffer[i] = 0;
 
 	for (int i = 0; i < 4; i++)
-		m_floppy_drive_tags[i] = NULL;
+		m_floppy_drive_tags[i] = nullptr;
 }
 
 //-------------------------------------------------

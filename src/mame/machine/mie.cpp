@@ -96,9 +96,9 @@ mie_device::mie_device(const machine_config &mconfig, const char *tag, device_t 
 	: maple_device(mconfig, MIE, "Sega 315-6146 MIE", tag, owner, clock, "mie", __FILE__)
 {
 	memset(gpio_name, 0, sizeof(gpio_name));
-	jvs_name = 0;
-	cpu = 0;
-	jvs = 0;
+	jvs_name = nullptr;
+	cpu = nullptr;
+	jvs = nullptr;
 }
 
 void mie_device::device_start()
@@ -110,7 +110,7 @@ void mie_device::device_start()
 
 	for (int i = 0; i < ARRAY_LENGTH(gpio_name); i++)
 	{
-		gpio_port[i] = gpio_name[i] ? ioport(gpio_name[i]) : NULL;
+		gpio_port[i] = gpio_name[i] ? ioport(gpio_name[i]) : nullptr;
 	}
 
 	save_item(NAME(gpiodir));

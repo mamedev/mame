@@ -15,7 +15,7 @@ const char *const triplhnt_sample_names[] =
 	"*triplhnt",
 	"bear_rac",
 	"witch",
-	0
+	nullptr
 };
 
 /************************************************************************/

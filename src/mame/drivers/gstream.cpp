@@ -612,7 +612,7 @@ void drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_e
 			INT32 dy;
 
 			assert(dest.valid());
-			assert(gfx != NULL);
+			assert(gfx != nullptr);
 			assert(dest.cliprect().contains(cliprect));
 			assert(code < gfx->elements());
 

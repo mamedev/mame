@@ -262,7 +262,7 @@ static const z80_daisy_config p8k_daisy_chain[] =
 	{ "z80pio_0" },
 	{ "z80pio_1" },
 	{ "z80ctc_1" },
-	{ NULL }
+	{ nullptr }
 };
 
 /* Intel 8272 Interface */
@@ -431,7 +431,7 @@ static const z80_daisy_config p8k_16_daisy_chain[] =
 	{ "z80pio_0" },
 	{ "z80pio_1" },
 	{ "z80pio_2" },
-	{ NULL }
+	{ nullptr }
 };
 
 

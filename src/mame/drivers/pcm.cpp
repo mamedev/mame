@@ -228,7 +228,7 @@ static const z80_daisy_config pcm_daisy_chain[] =
 	{ "z80sio" },       /* sio */
 	{ "z80pio_u" },     /* User pio */
 	{ "z80ctc_u" },     /* User ctc */
-	{ NULL }
+	{ nullptr }
 };
 
 

@@ -332,7 +332,7 @@ void kc_state::update_0x0c000()
 {
 	address_space &space = m_maincpu->space( AS_PROGRAM );
 
-	if ((m_pio_data[0] & (1<<7)) && memregion("basic")->base() != NULL)
+	if ((m_pio_data[0] & (1<<7)) && memregion("basic")->base() != nullptr)
 	{
 		/* BASIC takes next priority */
 			LOG(("BASIC rom 0x0c000\n"));

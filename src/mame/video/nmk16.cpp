@@ -112,7 +112,7 @@ void nmk16_state::nmk16_video_init()
 	m_spriteram_old2 = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
 
 	m_videoshift = 0;        /* 256x224 screen, no shift */
-	m_background_bitmap = NULL;
+	m_background_bitmap = nullptr;
 	m_simple_scroll = 1;
 }
 

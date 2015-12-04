@@ -270,7 +270,7 @@ ROM_START( monty )
 	ROM_LOAD( "monty_main.bin",    0x0000, 0x4000, CRC(720b4f55) SHA1(0106eb88d3fbbf25a745b9b6ee785ba13689d095) )   // 27128
 	ROM_LOAD( "monty_module1.bin", 0x4000, 0x4000, CRC(2725d8c3) SHA1(8273b9779c0915f9c7c43ea4fb460f43ce036358) )   // 27128
 	ROM_LOAD( "monty_module2.bin", 0x8000, 0x4000, CRC(db672e47) SHA1(bb14fe86df06cfa4b19625ba417d1a5bc8eae155) )   // 27128
-	ROM_FILL(0x1193,1,0) // patch out HALT so we can type in our names
+	ROM_FILL(0x1193,1,nullptr) // patch out HALT so we can type in our names
 ROM_END
 
 ROM_START( mmonty )
@@ -278,7 +278,7 @@ ROM_START( mmonty )
 	ROM_LOAD( "master_monty_main.bin", 0x0000, 0x8000, CRC(bb5ef4d4) SHA1(ba2c759e429f8740df419f9abb60832eddfba8ab) )   // 27C256
 	ROM_LOAD( "monty_module1.bin",     0x8000, 0x4000, CRC(2725d8c3) SHA1(8273b9779c0915f9c7c43ea4fb460f43ce036358) )   // 27128
 	ROM_LOAD( "monty_module2.bin",     0xc000, 0x4000, CRC(db672e47) SHA1(bb14fe86df06cfa4b19625ba417d1a5bc8eae155) )   // 27128
-	ROM_FILL(0x1487,1,0) // patch out HALT so we can type in our names
+	ROM_FILL(0x1487,1,nullptr) // patch out HALT so we can type in our names
 ROM_END
 
 

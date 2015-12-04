@@ -363,7 +363,7 @@ ROM_START( raiden ) /* from a board with 2 daughter cards, no official board #s?
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "8.u212",      0x000000, 0x08000, CRC(cbe055c7) SHA1(34a06a541d059c621d87fdf41546c9d052a61963) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x010000, "gfx1", 0 ) /* Chars */
 	ROM_LOAD( "9",  0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
@@ -396,7 +396,7 @@ ROM_START( raidena )
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "8.u212",      0x000000, 0x08000, CRC(cbe055c7) SHA1(34a06a541d059c621d87fdf41546c9d052a61963) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x010000, "gfx1", 0 ) /* Chars */
 	ROM_LOAD( "9",  0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
@@ -429,7 +429,7 @@ ROM_START( raident )
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "8.u212",      0x000000, 0x08000, CRC(cbe055c7) SHA1(34a06a541d059c621d87fdf41546c9d052a61963) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x010000, "gfx1", 0 ) /* Chars */
 	ROM_LOAD( "9",  0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
@@ -462,7 +462,7 @@ ROM_START( raidenu )
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "8.u212",      0x000000, 0x08000, CRC(cbe055c7) SHA1(34a06a541d059c621d87fdf41546c9d052a61963) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x010000, "gfx1", 0 ) /* Chars */
 	ROM_LOAD( "9",  0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
@@ -495,7 +495,7 @@ ROM_START( raidenk ) /* Same board as above. Not sure why the sound CPU would be
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "8b.u212",     0x000000, 0x08000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) ) /* Not encrypted */
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x010000, "gfx1", 0 ) /* Chars */
 	ROM_LOAD( "9",  0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
@@ -528,7 +528,7 @@ ROM_START( raidenb )/* Different hardware, Main & Sub CPU code not encrypted. */
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rai6.u212",   0x000000, 0x08000, CRC(723a483b) SHA1(50e67945e83ea1748fb748de3287d26446d4e0a0) ) /* Should be labeled "8" ??? */
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x010000, "gfx1", 0 ) /* Chars */
 	ROM_LOAD( "9",  0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
@@ -565,7 +565,7 @@ ROM_START( raidenua )/* Different hardware, Main, Sub & sound CPU code not encry
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "8.w8",        0x00000, 0x08000, CRC(105b9c11) SHA1(eb142806f8410d584d914b91207361a15ab18e6f) )
 	ROM_CONTINUE(            0x10000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x18000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr, 0x18000, 0x08000 )
 
 	ROM_REGION( 0x010000, "gfx1", 0 ) /* Chars */
 	ROM_LOAD( "9",  0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* U016 on this PCB */

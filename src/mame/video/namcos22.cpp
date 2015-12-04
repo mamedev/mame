@@ -52,7 +52,7 @@ namcos22_renderer::namcos22_renderer(namcos22_state &state)
 void namcos22_renderer::reset()
 {
 	memset(&m_scenenode_root, 0, sizeof(m_scenenode_root));
-	m_scenenode_cur = NULL;
+	m_scenenode_cur = nullptr;
 
 	m_clipx = 320;
 	m_clipy = 240;
@@ -649,7 +649,7 @@ struct namcos22_scenenode *namcos22_renderer::alloc_scenenode(running_machine &m
 struct namcos22_scenenode *namcos22_renderer::new_scenenode(running_machine &machine, UINT32 zsort, namcos22_scenenode_type type)
 {
 	struct namcos22_scenenode *node = &m_scenenode_root;
-	struct namcos22_scenenode *prev = NULL;
+	struct namcos22_scenenode *prev = nullptr;
 	int hash = 0;
 
 	for (int i = 0; i < 24; i += NAMCOS22_RADIX_BITS)
@@ -728,7 +728,7 @@ void namcos22_renderer::render_scene(screen_device &screen, bitmap_rgb32 &bitmap
 	for (int i = NAMCOS22_RADIX_BUCKETS - 1; i >= 0; i--)
 	{
 		render_scene_nodes(screen, bitmap, node->data.nonleaf.next[i]);
-		node->data.nonleaf.next[i] = NULL;
+		node->data.nonleaf.next[i] = nullptr;
 	}
 
 	m_clipx = 320;
@@ -2470,7 +2470,7 @@ void namcos22_state::init_tables()
 
 void namcos22_state::video_start()
 {
-	m_is_ss22 = (m_iomcu == NULL);
+	m_is_ss22 = (m_iomcu == nullptr);
 	init_tables();
 
 	m_mix_bitmap = auto_bitmap_ind16_alloc(machine(), 640, 480);

@@ -463,13 +463,13 @@ static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
 	MCFG_TMS5501_XI_CALLBACK(READ8(compucolor2_state, xi_r))
 	MCFG_TMS5501_XO_CALLBACK(WRITE8(compucolor2_state, xo_w))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
 
 	MCFG_COMPUCOLOR_FLOPPY_PORT_ADD("cd0", compucolor_floppy_port_devices, "floppy")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
 
-	MCFG_COMPUCOLOR_FLOPPY_PORT_ADD("cd1", compucolor_floppy_port_devices, NULL)
+	MCFG_COMPUCOLOR_FLOPPY_PORT_ADD("cd1", compucolor_floppy_port_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
 
 	// internal ram

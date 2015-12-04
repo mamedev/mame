@@ -153,8 +153,8 @@ const device_type TC0480SCP = &device_creator<tc0480scp_device>;
 
 tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0480SCP, "Taito TC0480SCP", tag, owner, clock, "tc0480scp", __FILE__),
-	m_tx_ram(NULL),
-	m_char_ram(NULL),
+	m_tx_ram(nullptr),
+	m_char_ram(nullptr),
 	m_pri_reg(0),
 	m_dblwidth(0),
 	m_gfxnum(0),
@@ -173,10 +173,10 @@ tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *ta
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_bg_ram[i] = NULL;
-		m_bgscroll_ram[i] = NULL;
-		m_rowzoom_ram[i] = NULL;
-		m_bgcolumn_ram[i] = NULL;
+		m_bg_ram[i] = nullptr;
+		m_bgscroll_ram[i] = nullptr;
+		m_rowzoom_ram[i] = nullptr;
+		m_bgcolumn_ram[i] = nullptr;
 		m_bgscrollx[i] = 0;
 		m_bgscrolly[i] = 0;
 	}

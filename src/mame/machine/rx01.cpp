@@ -17,7 +17,7 @@
 #include "formats/basicdsk.h"
 
 static LEGACY_FLOPPY_OPTIONS_START( rx01 )
-	LEGACY_FLOPPY_OPTION(rx01, "img", "RX01 image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+	LEGACY_FLOPPY_OPTION(rx01, "img", "RX01 image", basicdsk_identify_default, basicdsk_construct_default, nullptr,
 		HEADS([1])
 		TRACKS([77])
 		SECTORS([26])

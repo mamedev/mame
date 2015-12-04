@@ -135,7 +135,7 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 public:
 	n64_rdp(n64_state &state);
 
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+	running_machine &machine() const { assert(m_machine != nullptr); return *m_machine; }
 
 	void init_internal_state()
 	{

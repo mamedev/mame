@@ -3202,7 +3202,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_cbus )
 	MCFG_PC9801CBUS_SLOT_ADD("cbus0", pc9801_cbus, "pc9801_26")
-	MCFG_PC9801CBUS_SLOT_ADD("cbus1", pc9801_cbus, NULL)
+	MCFG_PC9801CBUS_SLOT_ADD("cbus1", pc9801_cbus, nullptr)
 //  TODO: six max slots
 MACHINE_CONFIG_END
 
@@ -3229,7 +3229,7 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_ide )
-	MCFG_ATA_INTERFACE_ADD("ide", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ide", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir1_w))
 MACHINE_CONFIG_END
 

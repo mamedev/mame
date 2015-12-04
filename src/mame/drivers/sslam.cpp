@@ -813,8 +813,8 @@ ROM_START( sslam )
 	ROM_LOAD( "3.u13",       0x00000, 0x40000, CRC(d0a9245f) SHA1(2e840cdd7bdfe7c6f986daf88576de0559597499) )
 	ROM_CONTINUE(            0x60000, 0x20000 )
 	ROM_CONTINUE(            0xa0000, 0x20000 )
-	ROM_COPY( "oki", 0x00000, 0x40000, 0x20000)
-	ROM_COPY( "oki", 0x00000, 0x80000, 0x20000)
+	ROM_COPY( "oki", nullptr, 0x40000, 0x20000)
+	ROM_COPY( "oki", nullptr, 0x80000, 0x20000)
 ROM_END
 
 ROM_START( sslama )
@@ -873,8 +873,8 @@ ROM_START( sslama )
 	ROM_LOAD( "3.u13",       0x00000, 0x40000, CRC(d0a9245f) SHA1(2e840cdd7bdfe7c6f986daf88576de0559597499) )
 	ROM_CONTINUE(            0x60000, 0x20000 )
 	ROM_CONTINUE(            0xa0000, 0x20000 )
-	ROM_COPY( "oki", 0x00000, 0x40000, 0x20000)
-	ROM_COPY( "oki", 0x00000, 0x80000, 0x20000)
+	ROM_COPY( "oki", nullptr, 0x40000, 0x20000)
+	ROM_COPY( "oki", nullptr, 0x80000, 0x20000)
 ROM_END
 
 // it's a conversion for a sslam pcb
@@ -904,8 +904,8 @@ ROM_START( powerbals )
 	ROM_LOAD( "20.i013",     0x00000, 0x40000, CRC(12776dbc) SHA1(9ab9930fd581296642834d2cb4ba65264a588af3) )
 	ROM_CONTINUE(            0x60000, 0x20000 )
 	ROM_CONTINUE(            0xa0000, 0x20000 )
-	ROM_COPY( "oki", 0x00000, 0x40000, 0x20000)
-	ROM_COPY( "oki", 0x00000, 0x80000, 0x20000)
+	ROM_COPY( "oki", nullptr, 0x40000, 0x20000)
+	ROM_COPY( "oki", nullptr, 0x80000, 0x20000)
 ROM_END
 
 DRIVER_INIT_MEMBER(sslam_state,sslam)

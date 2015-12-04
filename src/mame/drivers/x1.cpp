@@ -761,7 +761,7 @@ void x1_state::cmt_command( UINT8 cmd )
 	*/
 	m_cmt_current_cmd = cmd;
 
-	if(m_cassette->get_image() == NULL) //avoid a crash if a disk game tries to access this
+	if(m_cassette->get_image() == nullptr) //avoid a crash if a disk game tries to access this
 		return;
 
 	switch(cmd)
@@ -810,7 +810,7 @@ void x1_state::cmt_command( UINT8 cmd )
 
 TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_cmt_wind_timer)
 {
-	if(m_cassette->get_image() == NULL) //avoid a crash if a disk game tries to access this
+	if(m_cassette->get_image() == nullptr) //avoid a crash if a disk game tries to access this
 		return;
 
 	switch(m_cmt_current_cmd)
@@ -922,7 +922,7 @@ WRITE8_MEMBER( x1_state::x1_sub_io_w )
 					// bit 1 = tape inserted
 					// bit 2 = record status (1=OK, 0=write protect)
 			m_sub_val[0] = 0x05;
-			if(m_cassette->get_image() != NULL)
+			if(m_cassette->get_image() != nullptr)
 				m_sub_val[0] |= 0x02;
 			m_sub_cmd_length = 1;
 			logerror("CMT: Command 0xEB received, returning 0x%02x.\n",m_sub_val[0]);
@@ -1023,7 +1023,7 @@ READ8_MEMBER( x1_state::x1_fdc_r )
 
 WRITE8_MEMBER( x1_state::x1_fdc_w )
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	switch(offset+0xff8)
 	{
@@ -2231,7 +2231,7 @@ static const z80_daisy_config x1_daisy[] =
 {
 	{ "x1kb" },
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 static const z80_daisy_config x1turbo_daisy[] =
@@ -2240,7 +2240,7 @@ static const z80_daisy_config x1turbo_daisy[] =
 	{ "ctc" },
 	{ "dma" },
 	{ "sio" },
-	{ NULL }
+	{ nullptr }
 };
 
 /*************************************

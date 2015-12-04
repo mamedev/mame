@@ -216,7 +216,7 @@ static const gfx_layout char_layout =
 };
 
 static GFXDECODE_START( tiamc1 )
-	GFXDECODE_ENTRY( NULL, 0x0000, char_layout, 0, 16 )
+	GFXDECODE_ENTRY( nullptr, 0x0000, char_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprites16x16_layout, 0, 16 )
 GFXDECODE_END
 
@@ -258,7 +258,7 @@ ROM_START( konek )
 	ROM_LOAD( "g3.d17", 0x04000, 0x2000, CRC(91301282) SHA1(cb448a1bb7a9c1768f870a8c062e37807431c9c7) )
 	ROM_LOAD( "g4.d17", 0x06000, 0x2000, CRC(3ff0c20b) SHA1(3d999c05b3986149e569630779ed5581fc202842) )
 	ROM_LOAD( "g5.d17", 0x08000, 0x2000, CRC(e3196d30) SHA1(a03d9f75926be9fcf5ee05df8b00fbf87361ea5b) )
-	ROM_FILL( 0xa000, 0x2000, 0x00 ) /* g6.d17 is unpopulated */
+	ROM_FILL( 0xa000, 0x2000, nullptr ) /* g6.d17 is unpopulated */
 	ROM_LOAD( "g7.d17", 0x0c000, 0x2000, CRC(fe4e9fdd) SHA1(2033585a6c53455d1dafee85cbb807d424ed231d) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
@@ -283,7 +283,7 @@ ROM_START( sosterm )
 	ROM_LOAD( "06.3g", 0x04000, 0x2000, CRC(34dacde6) SHA1(6c91e4dc1d3c85768a94fb4c7d38f29c23664740) )
 	ROM_LOAD( "07.4g", 0x06000, 0x2000, CRC(9f6f8cdd) SHA1(3fa3928935d98906fdf07ed372764456d7a9729a) )
 	ROM_LOAD( "08.5g", 0x08000, 0x2000, CRC(25e70da4) SHA1(ec77b0b79c0477c0939022d7f2a24ae48e4530bf) )
-	ROM_FILL( 0xa000, 0x2000, 0x00 ) /* 09.6g is unpopulated */
+	ROM_FILL( 0xa000, 0x2000, nullptr ) /* 09.6g is unpopulated */
 	ROM_LOAD( "10.7g", 0x0c000, 0x2000, CRC(22bc9997) SHA1(fd638529e29d9fd32dd22534cb748841dde9a2c3) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
@@ -301,7 +301,7 @@ ROM_START( koroleva )
 	ROM_LOAD( "06.3g", 0x04000, 0x2000, CRC(48074786) SHA1(145749053cd00c8547024c9afe3ab0ff7d8f5ff9) )
 	ROM_LOAD( "07.4g", 0x06000, 0x2000, CRC(41a4adb5) SHA1(cdbdf6884307dd0f1fc991e6e1bc4c4fdc351ab1) )
 	ROM_LOAD( "08.5g", 0x08000, 0x2000, CRC(8f379d95) SHA1(0ea70bc14c52b1f4b38b0d14e4249252a2577f2a) )
-	ROM_FILL( 0xa000, 0x2000, 0x00 ) /* 09.6g is unpopulated */
+	ROM_FILL( 0xa000, 0x2000, nullptr ) /* 09.6g is unpopulated */
 	ROM_LOAD( "10.7g", 0x0c000, 0x2000, CRC(397f41f8) SHA1(2d07462afad39dda067114ce8d47e64d6a854283) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
@@ -316,10 +316,10 @@ ROM_START( bilyard )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "04.1g", 0x00000, 0x2000, CRC(a44f913d) SHA1(f01a0e931fb0f719bc7b3f1ca7802dd747c8a56f) )
 	ROM_LOAD( "05.2g", 0x02000, 0x2000, CRC(6e41219f) SHA1(b09a16c9bd48b503ec0f2c636f021199d7ac7924) )
-	ROM_FILL( 0x04000, 0x2000, 0x00 ) /* 06.3g is unpopulated */
-	ROM_FILL( 0x06000, 0x2000, 0x00 ) /* 07.4g is unpopulated */
-	ROM_FILL( 0x08000, 0x2000, 0x00 ) /* 08.5g is unpopulated */
-	ROM_FILL( 0x0a000, 0x2000, 0x00 ) /* 09.6g is unpopulated */
+	ROM_FILL( 0x04000, 0x2000, nullptr ) /* 06.3g is unpopulated */
+	ROM_FILL( 0x06000, 0x2000, nullptr ) /* 07.4g is unpopulated */
+	ROM_FILL( 0x08000, 0x2000, nullptr ) /* 08.5g is unpopulated */
+	ROM_FILL( 0x0a000, 0x2000, nullptr ) /* 09.6g is unpopulated */
 	ROM_LOAD( "10.7g", 0x0c000, 0x2000, CRC(173adb85) SHA1(53f27b45e61365907e8996c283ae70ca5b498129) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )

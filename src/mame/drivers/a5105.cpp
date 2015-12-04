@@ -550,7 +550,7 @@ static const z80_daisy_config a5105_daisy_chain[] =
 {
 	{ "z80ctc" },
 	{ "z80pio" },
-	{ NULL }
+	{ nullptr }
 };
 
 static MACHINE_CONFIG_START( a5105, a5105_state )

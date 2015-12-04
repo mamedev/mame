@@ -178,7 +178,7 @@ const address_space_config *dave_device::memory_space_config(address_spacenum sp
 	{
 		case AS_PROGRAM: return &m_program_space_config;
 		case AS_IO: return &m_io_space_config;
-		default: return NULL;
+		default: return nullptr;
 	}
 }
 

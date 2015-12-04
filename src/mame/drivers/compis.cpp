@@ -600,7 +600,7 @@ void compis_state::machine_start()
 {
 	if (m_ram->size() == 256*1024)
 	{
-		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0x3ffff, NULL);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0x3ffff, nullptr);
 	}
 }
 
@@ -698,12 +698,12 @@ static MACHINE_CONFIG_START( compis, compis_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, ctsb_w))
@@ -717,7 +717,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir1_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir0_w))
 	MCFG_ISBX_SLOT_MDRQT_CALLBACK(DEVWRITELINE(I80186_TAG, i80186_cpu_device, drq0_w))
-	MCFG_ISBX_SLOT_ADD(ISBX_1_TAG, 0, isbx_cards, NULL)
+	MCFG_ISBX_SLOT_ADD(ISBX_1_TAG, 0, isbx_cards, nullptr)
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir6_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir5_w))
 	MCFG_ISBX_SLOT_MDRQT_CALLBACK(DEVWRITELINE(I80186_TAG, i80186_cpu_device, drq1_w))

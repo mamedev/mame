@@ -1018,7 +1018,7 @@ static const z80_daisy_config meritm_daisy_chain[] =
 {
 	{ "z80pio_0" },
 	{ "z80pio_1" },
-	{ NULL }
+	{ nullptr }
 };
 
 MACHINE_START_MEMBER(meritm_state,merit_common)

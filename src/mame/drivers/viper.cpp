@@ -2100,7 +2100,7 @@ static MACHINE_CONFIG_START( viper, viper_state )
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, "mpc8240", mpc8240_pci_r, mpc8240_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(12, "voodoo", voodoo3_pci_r, voodoo3_pci_w)
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 
 	MCFG_DEVICE_ADD("voodoo", VOODOO_3, STD_VOODOO_3_CLOCK)
 	MCFG_VOODOO_FBMEM(8)

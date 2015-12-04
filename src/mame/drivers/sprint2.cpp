@@ -682,7 +682,7 @@ ROM_START( dominos )
 	ROM_LOAD_NIB_LOW ( "7440-01.r4",   0x0000, 0x0200, CRC(957dd8df) SHA1(280457392f40cd66eae34d2fcdbd4d2142793402) )
 
 	ROM_REGION( 0x200, "gfx2", 0 ) /* sprites, not used */
-	ROM_FILL( 0x0000, 0x0200, 0 )
+	ROM_FILL( 0x0000, 0x0200, nullptr )
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  /* SYNC */
@@ -705,7 +705,7 @@ ROM_START( dominos4 ) // built from original Atari source code
 	ROM_LOAD_NIB_LOW ( "007765-01.r4",   0x0000, 0x0200, CRC(6e4e6c75) SHA1(0fc77fecaa73eac57baf778bc51387c75883aad4) )
 
 	ROM_REGION( 0x200, "gfx2", 0 ) /* sprites, not used */
-	ROM_FILL( 0x0000, 0x0200, 0 )
+	ROM_FILL( 0x0000, 0x0200, nullptr )
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  /* SYNC */

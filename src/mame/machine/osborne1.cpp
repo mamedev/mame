@@ -223,7 +223,7 @@ WRITE8_MEMBER( osborne1_state::video_pia_port_b_w )
 	}
 	else
 	{
-		m_fdc->set_floppy(NULL);
+		m_fdc->set_floppy(nullptr);
 	}
 }
 

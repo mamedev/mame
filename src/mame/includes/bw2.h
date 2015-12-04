@@ -43,7 +43,7 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_floppy0(*this, WD2797_TAG":0"),
 			m_floppy1(*this, WD2797_TAG":1"),
-			m_floppy(NULL),
+			m_floppy(nullptr),
 			m_rom(*this, Z80_TAG),
 			m_y0(*this, "Y0"),
 			m_y1(*this, "Y1"),

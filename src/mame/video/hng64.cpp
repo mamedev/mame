@@ -575,7 +575,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	//}
 
 	// Select the proper tilemap size
-	tilemap_t* tilemap = NULL;
+	tilemap_t* tilemap = nullptr;
 	if (global_dimensions==0)
 	{
 		if (bigTilemapBit) tilemap = m_tilemap[tm].m_tilemap_16x16;

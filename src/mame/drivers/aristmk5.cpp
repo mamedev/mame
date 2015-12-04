@@ -513,7 +513,7 @@ void aristmk5_state::machine_reset()
 
 		PRG = memregion(rom_region[op_mode & 3])->base();
 
-		if(PRG!=NULL)
+		if(PRG!=nullptr)
 
 		for(i=0;i<0x400000;i++)
 			ROM[i] = PRG[i];

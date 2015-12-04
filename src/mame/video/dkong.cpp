@@ -807,7 +807,7 @@ void dkong_state::radarscp_step(int line_cnt)
 
 void dkong_state::radarscp_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const UINT8     *htable = NULL;
+	const UINT8     *htable = nullptr;
 	int             x,y;
 	UINT8           draw_ok;
 	UINT16          *pixel;
@@ -890,7 +890,7 @@ void dkong_state::check_palette()
 	int newset;
 
 	port = ioport("VIDHW");
-	if (port != NULL)
+	if (port != nullptr)
 	{
 		newset = port->read();
 		if (newset != m_vidhw)

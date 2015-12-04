@@ -15,7 +15,7 @@ const device_type DECOCOMN = &device_creator<decocomn_device>;
 decocomn_device::decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECOCOMN, "DECO Common Video Functions", tag, owner, clock, "decocomn", __FILE__),
 	device_video_interface(mconfig, *this),
-	m_dirty_palette(NULL),
+	m_dirty_palette(nullptr),
 	m_priority(0),
 	m_palette(*this),
 	m_generic_paletteram_16(*this, "^paletteram")

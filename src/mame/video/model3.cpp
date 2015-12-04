@@ -548,7 +548,7 @@ void model3_state::invalidate_texture(int page, int texx, int texy, int texwidth
 
 	for (int y = 0; y < htiles; y++)
 		for (int x = 0; x < wtiles; x++)
-			while (m_texcache[page][texy + y][texx + x] != NULL)
+			while (m_texcache[page][texy + y][texx + x] != nullptr)
 			{
 				cached_texture *freeme = m_texcache[page][texy + y][texx + x];
 				m_texcache[page][texy + y][texx + x] = freeme->next;
@@ -565,7 +565,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 	int x, y;
 
 	/* if we have one already, validate it */
-	for (tex = m_texcache[page][texy][texx]; tex != NULL; tex = tex->next)
+	for (tex = m_texcache[page][texy][texx]; tex != nullptr; tex = tex->next)
 		if (tex->width == texwidth && tex->height == texheight && tex->format == format)
 			return tex;
 
@@ -1446,7 +1446,7 @@ m3_triangle *model3_state::push_triangle(bool alpha)
 
 		if (m_tri_buffer_ptr >= TRI_BUFFER_SIZE)
 		{
-			return NULL;
+			return nullptr;
 			//fatalerror("push_triangle: tri buffer max exceeded");
 		}
 
@@ -1459,7 +1459,7 @@ m3_triangle *model3_state::push_triangle(bool alpha)
 
 		if (m_tri_alpha_buffer_ptr >= TRI_ALPHA_BUFFER_SIZE)
 		{
-			return NULL;
+			return nullptr;
 			//fatalerror("push_triangle: tri alpha buffer max exceeded");
 		}
 
@@ -1712,7 +1712,7 @@ void model3_state::draw_model(UINT32 addr)
 			}
 			else
 			{
-				texture = NULL;
+				texture = nullptr;
 			}
 
 			for (i=2; i < num_vertices; i++)

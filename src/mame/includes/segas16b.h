@@ -43,7 +43,7 @@ public:
 			m_romboard(ROM_BOARD_INVALID),
 			m_tilemap_type(SEGAIC16_TILEMAP_16B),
 			m_disable_screen_blanking(false),
-			m_i8751_initial_config(NULL),
+			m_i8751_initial_config(nullptr),
 			m_atomicp_sound_divisor(0),
 			m_atomicp_sound_count(0),
 			m_hwc_input_value(0),

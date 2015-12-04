@@ -412,7 +412,7 @@ static MACHINE_CONFIG_START( softbox, softbox_state )
 	MCFG_HARDDISK_ADD("harddisk4")
 	MCFG_HARDDISK_INTERFACE("corvus_hdd")
 
-	MCFG_IMI7000_BUS_ADD("imi5000h", NULL, NULL, NULL)
+	MCFG_IMI7000_BUS_ADD("imi5000h", nullptr, nullptr, nullptr)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "softbox")

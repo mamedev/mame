@@ -338,7 +338,7 @@ static const struct
 	{ "tps",      mg01, mg02 },
 	{ "taitofx1", tt01, tt02 },
 	{ "vspsx",    kn01, kn02 },
-	{ NULL, NULL, NULL }
+	{ nullptr, nullptr, nullptr }
 };
 
 READ8_MEMBER(zn_state::znsecsel_r)
@@ -446,7 +446,7 @@ void zn_state::driver_start()
 	int n_game;
 
 	n_game = 0;
-	while( zn_config_table[ n_game ].s_name != NULL )
+	while( zn_config_table[ n_game ].s_name != nullptr )
 	{
 		if( strcmp( machine().system().name, zn_config_table[ n_game ].s_name ) == 0 )
 		{
@@ -1505,7 +1505,7 @@ static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("8M")
 
-	MCFG_VT83C461_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_VT83C461_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( zn_state::atpsx_dma_read ), (zn_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( zn_state::atpsx_dma_write ), (zn_state *) owner ) )
@@ -2153,7 +2153,7 @@ static MACHINE_CONFIG_DERIVED( jdredd, zn1_2mb_vram )
 	MCFG_DEVICE_MODIFY("gpu")
 	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate( FUNC( zn_state::jdredd_vblank ), (zn_state *) owner))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
 MACHINE_CONFIG_END
 

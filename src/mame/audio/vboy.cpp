@@ -224,7 +224,7 @@ void vboysnd_device::device_start()
 
 	memset(m_aram, 0, 0x600);
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(attotime::zero, 0, attotime::from_hz(AUDIO_FREQ/4));
 }
 

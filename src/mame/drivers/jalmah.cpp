@@ -1480,13 +1480,13 @@ ROM_START ( urashima )
 
 	ROM_REGION( 0x200000, "gfx4", 0 ) /* BG3 */
 	/*0*/
-	ROM_COPY( "gfx2" , 0x000000, 0x000000, 0x40000 )
+	ROM_COPY( "gfx2" , nullptr, 0x000000, 0x40000 )
 	ROM_COPY( "gfx2",  0x040000, 0x040000, 0x40000 )
 	/*1*/
-	ROM_COPY( "gfx2",  0x000000, 0x080000, 0x40000 )
-	ROM_COPY( "gfx3",  0x000000, 0x0c0000, 0x40000 )
+	ROM_COPY( "gfx2",  nullptr, 0x080000, 0x40000 )
+	ROM_COPY( "gfx3",  nullptr, 0x0c0000, 0x40000 )
 	/*2*/
-	ROM_COPY( "gfx2",  0x000000, 0x100000, 0x40000 )
+	ROM_COPY( "gfx2",  nullptr, 0x100000, 0x40000 )
 	ROM_COPY( "gfx3",  0x040000, 0x140000, 0x40000 )
 
 	ROM_REGION( 0x0240, "user1", 0 )
@@ -1710,13 +1710,13 @@ ROM_START( suchipi )
 	ROM_LOAD( "4.bin", 0x80000, 0x80000, CRC(3fe932a1) SHA1(9e768b901738ee9eba207a67c4fd19efb0035a68) )
 
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
-	ROM_COPY( "oki_data" , 0x00000, 0x000000+0x00000, 0x40000 )
+	ROM_COPY( "oki_data" , nullptr, 0x000000+0x00000, 0x40000 )
 
 	/* PAL address shuffling for the BGM data (TODO: check this with a side-by-side test)*/
 	ROM_COPY( "oki_data" , 0x20000, 0x000000+0x40000, 0x20000 ) // 0
 	ROM_COPY( "oki_data" , 0x40000, 0x020000+0x40000, 0x20000 ) // 1
 	ROM_COPY( "oki_data" , 0x60000, 0x040000+0x40000, 0x20000 ) // 2
-	ROM_COPY( "oki_data" , 0x00000, 0x060000+0x40000, 0x20000 ) // 3
+	ROM_COPY( "oki_data" , nullptr, 0x060000+0x40000, 0x20000 ) // 3
 
 	ROM_COPY( "oki_data" , 0x80000, 0x080000+0x40000, 0x40000 )
 	ROM_COPY( "oki_data" , 0xc0000, 0x0c0000+0x40000, 0x40000 )

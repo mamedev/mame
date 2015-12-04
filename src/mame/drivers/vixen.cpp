@@ -526,7 +526,7 @@ WRITE8_MEMBER( vixen_state::i8155_pc_w )
 	*/
 
 	// drive select
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (!BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (!BIT(data, 1)) floppy = m_floppy1->get_device();
@@ -773,7 +773,7 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(vixen_state, rxrdy_w))
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE(vixen_state, txrdy_w))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(P8251A_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(P8251A_TAG, i8251_device, write_dsr))
 

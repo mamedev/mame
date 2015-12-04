@@ -274,7 +274,7 @@ static const char *const dai3wksi_sample_names[] =
 	"5",
 	"6",
 	"6-2",
-	0
+	nullptr
 };
 
 

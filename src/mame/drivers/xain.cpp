@@ -268,7 +268,7 @@ WRITE8_MEMBER(xain_state::m68705_w)
 	m_from_main = data;
 	m_mcu_accept = 0;
 
-	if (m_mcu != NULL)
+	if (m_mcu != nullptr)
 		m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
@@ -358,7 +358,7 @@ CUSTOM_INPUT_MEMBER(xain_state::mcu_status_r)
 {
 	UINT8 res = 0;
 
-	if (m_mcu != NULL)
+	if (m_mcu != nullptr)
 	{
 		if (m_mcu_ready == 1)
 			res |= 0x01;
@@ -378,7 +378,7 @@ READ8_MEMBER(xain_state::mcu_comm_reset_r)
 	m_mcu_ready = 1;
 	m_mcu_accept = 1;
 
-	if (m_mcu != NULL)
+	if (m_mcu != nullptr)
 		m_mcu->set_input_line(0, CLEAR_LINE);
 
 	return 0xff;

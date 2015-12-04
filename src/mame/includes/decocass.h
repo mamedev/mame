@@ -35,7 +35,7 @@ public:
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette")
 	{
-		m_type1_map = 0;
+		m_type1_map = nullptr;
 	}
 
 	/* devices */

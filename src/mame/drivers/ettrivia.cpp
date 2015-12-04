@@ -234,7 +234,7 @@ PALETTE_INIT_MEMBER(ettrivia_state, ettrivia)
 	compute_resistor_weights(0, 255, -1.0,
 			2, resistances, weights, 0, 0,
 			2, resistances, weights, 0, 0,
-			0, 0, 0, 0, 0);
+			0, nullptr, nullptr, 0, 0);
 
 	for (i = 0;i < palette.entries(); i++)
 	{

@@ -280,7 +280,7 @@ int sony_read_status(device_t *device)
 		f = &sony.floppy[sony.floppy_select];
 		cur_image = floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, sony.floppy_select);
 		if (!cur_image->exists())
-			cur_image = NULL;
+			cur_image = nullptr;
 
 		switch(action) {
 		case 0x00:  /* Step direction */
@@ -416,7 +416,7 @@ static void sony_doaction(device_t *device)
 		f = &sony.floppy[sony.floppy_select];
 		cur_image = floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, sony.floppy_select);
 		if (!cur_image->exists())
-			cur_image = NULL;
+			cur_image = nullptr;
 
 		switch(action)
 		{
@@ -549,8 +549,8 @@ void sonydriv_floppy_image_device::device_start()
 	sony.floppy[1].is_fdhd = 0;
 	sony.floppy[0].is_400k = 0;
 	sony.floppy[1].is_400k = 0;
-	sony.floppy[0].loadedtrack_data = NULL;
-	sony.floppy[1].loadedtrack_data = NULL;
+	sony.floppy[0].loadedtrack_data = nullptr;
+	sony.floppy[1].loadedtrack_data = nullptr;
 	sony.floppy[0].head = 0;
 	sony.floppy[1].head = 0;
 	sony.rotation_speed = 0;

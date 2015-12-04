@@ -1471,7 +1471,7 @@ ROM_START( gunpey )
 	ROM_REGION( 0x400000, "blit_data", 0 )
 	ROM_LOAD( "gp_rom3.025",  0x00000, 0x400000,  CRC(f2d1f9f0) SHA1(0d20301fd33892074508b9d127456eae80cc3a1c) )
 	ROM_REGION( 0x400000, "blit_data2", 0 ) // debug test
-	ROM_COPY( "blit_data", 0x00000, 0x00000, 0x400000 )
+	ROM_COPY( "blit_data", nullptr, 0x00000, 0x400000 )
 
 
 	ROM_REGION( 0x400000, "vram", ROMREGION_ERASEFF )

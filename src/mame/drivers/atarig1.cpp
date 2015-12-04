@@ -130,7 +130,7 @@ void atarig1_state::update_bank(int bank)
 
 void atarig1_state::device_post_load()
 {
-	if (m_bslapstic_base != NULL)
+	if (m_bslapstic_base != nullptr)
 	{
 		int bank = m_bslapstic_bank;
 		m_bslapstic_bank = -1;

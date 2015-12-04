@@ -60,7 +60,7 @@ const device_type DECOCASS_TAPE = &device_creator<decocass_tape_device>;
 
 decocass_tape_device::decocass_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECOCASS_TAPE, "DECO Cassette Tape", tag, owner, clock, "decocass_tape", __FILE__),
-	m_tape_timer(NULL),
+	m_tape_timer(nullptr),
 	m_speed(0),
 	m_region(REGION_LEADER),
 	m_bitnum(0),
@@ -91,7 +91,7 @@ void decocass_tape_device::device_start()
 
 	/* fetch the data pointer */
 	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(decocass_tape_device::tape_clock_callback), this));
-	if (region() == NULL)
+	if (region() == nullptr)
 		return;
 	UINT8 *regionbase = region()->base();
 
@@ -350,7 +350,7 @@ UINT8 decocass_tape_device::get_status_bits()
 
 UINT8 decocass_tape_device::is_present()
 {
-	return region() != NULL;
+	return region() != nullptr;
 }
 
 

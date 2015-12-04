@@ -83,7 +83,7 @@ beezer_sound_device::beezer_sound_device(const machine_config &mconfig, const ch
 		m_sh6840_latchwriteold(0),
 		m_sh6840_noiselatch1(0),
 		m_sh6840_noiselatch3(0),
-		m_stream(NULL)/*,
+		m_stream(nullptr)/*,
         m_freq_to_step(0)*/
 {
 	memset(m_sh6840_timer, 0, sizeof(m_sh6840_timer));

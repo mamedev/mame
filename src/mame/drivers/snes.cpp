@@ -1355,7 +1355,7 @@ static MACHINE_CONFIG_START( snes, snes_console_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_SNS_CARTRIDGE_ADD("snsslot", snes_cart, NULL)
+	MCFG_SNS_CARTRIDGE_ADD("snsslot", snes_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","snes")
 	MCFG_SOFTWARE_LIST_ADD("bsx_list","snes_bspack")
 	MCFG_SOFTWARE_LIST_ADD("st_list","snes_strom")

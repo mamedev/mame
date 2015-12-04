@@ -126,7 +126,7 @@ static const char *const starcrus_sample_names[] =
 	"explos1",  /* explosion sound, first part, channel 1 */
 	"explos2",  /* explosion sound, second part, channel 1 */
 	"launch",   /* launch sound, channels 2 and 3 */
-	0
+	nullptr
 };
 
 

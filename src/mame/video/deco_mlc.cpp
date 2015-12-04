@@ -137,7 +137,7 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 
 void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT32* dest)
 {
-	UINT32 *index_ptr=0;
+	UINT32 *index_ptr=nullptr;
 	int offs,fx=0,fy=0,x,y,color,colorOffset,sprite,indx,h,w,bx,by,fx1,fy1;
 	int xoffs,yoffs;
 	UINT8 *rom = memregion("gfx2")->base() + 0x20000, *index_ptr8;

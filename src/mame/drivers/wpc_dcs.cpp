@@ -253,43 +253,43 @@ void wpc_dcs_state::init()
 
 DRIVER_INIT_MEMBER(wpc_dcs_state, dm)
 {
-	lamp->set_names(NULL);
-	out->set_names(NULL);
+	lamp->set_names(nullptr);
+	out->set_names(nullptr);
 	init();
 }
 
 DRIVER_INIT_MEMBER(wpc_dcs_state, ij)
 {
-	lamp->set_names(NULL);
-	out->set_names(NULL);
+	lamp->set_names(nullptr);
+	out->set_names(nullptr);
 	init();
 }
 
 DRIVER_INIT_MEMBER(wpc_dcs_state, jd)
 {
-	lamp->set_names(NULL);
-	out->set_names(NULL);
+	lamp->set_names(nullptr);
+	out->set_names(nullptr);
 	init();
 }
 
 DRIVER_INIT_MEMBER(wpc_dcs_state, pop)
 {
-	lamp->set_names(NULL);
-	out->set_names(NULL);
+	lamp->set_names(nullptr);
+	out->set_names(nullptr);
 	init();
 }
 
 DRIVER_INIT_MEMBER(wpc_dcs_state, sttng)
 {
-	lamp->set_names(NULL);
-	out->set_names(NULL);
+	lamp->set_names(nullptr);
+	out->set_names(nullptr);
 	init();
 }
 
 DRIVER_INIT_MEMBER(wpc_dcs_state, afv)
 {
-	lamp->set_names(NULL);
-	out->set_names(NULL);
+	lamp->set_names(nullptr);
+	out->set_names(nullptr);
 	init();
 }
 

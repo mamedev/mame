@@ -982,9 +982,9 @@ ROM_START( dectalk )
 	// TODO: load this as default if the nvram file is missing, OR get the setup page working enough that it can be saved properly to the chip from an NVR FAULT state!
 	// NOTE: this nvram image is ONLY VALID for v2.0; v1.8 expects a different image.
 	ROM_REGION(0x100,"nvram", 0) // default nvram image is at 0x1A7AE in main rom, read lsn first so 0x0005 in rom becomes 05 00 00 00 etc for all words of main rom
-	ROM_FILL(0x00, 0xff, 0x00) // blank it first;
+	ROM_FILL(0x00, 0xff, nullptr) // blank it first;
 	ROM_FILL(0x00, 0x01, 0x05)
-	ROM_FILL(0x04, 0x01, 0x00)
+	ROM_FILL(0x04, 0x01, nullptr)
 	ROM_FILL(0x08, 0x01, 0x06)
 	ROM_FILL(0x0C, 0x01, 0x01)
 	ROM_FILL(0x10, 0x01, 0x06)
@@ -993,7 +993,7 @@ ROM_START( dectalk )
 	ROM_FILL(0x1C, 0x01, 0x02)
 	ROM_FILL(0x20, 0x01, 0x01)
 	ROM_FILL(0x24, 0x01, 0x01)
-	ROM_FILL(0x28, 0x01, 0x00)
+	ROM_FILL(0x28, 0x01, nullptr)
 	ROM_FILL(0x2C, 0x01, 0x01)
 	ROM_FILL(0xFC, 0x01, 0x0D) // checksum, calculated some weird way which I haven't figured out yet
 	ROM_FILL(0xFD, 0x01, 0x02) // "

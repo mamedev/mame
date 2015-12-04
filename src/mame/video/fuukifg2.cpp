@@ -220,7 +220,7 @@ UINT32 fuuki16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	draw_layer(screen, bitmap, cliprect, tm_middle, 0, 2);
 	draw_layer(screen, bitmap, cliprect, tm_front,  0, 4);
 
-	m_fuukivid->draw_sprites(screen, bitmap, cliprect, flip_screen(), 0);
+	m_fuukivid->draw_sprites(screen, bitmap, cliprect, flip_screen(), nullptr);
 
 	return 0;
 }

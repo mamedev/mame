@@ -78,7 +78,7 @@ void st0020_device::device_start()
 	m_st0020_blitram = auto_alloc_array_clear(machine(), UINT16, 0x100 / 2);
 
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
-		if (m_gfxdecode->gfx(m_gfx_index) == 0)
+		if (m_gfxdecode->gfx(m_gfx_index) == nullptr)
 			break;
 
 	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, layout_16x8x8_2, (UINT8 *)m_st0020_gfxram, 0, m_palette->entries() / 64, 0)));

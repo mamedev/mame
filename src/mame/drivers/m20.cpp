@@ -185,7 +185,7 @@ WRITE16_MEMBER(m20_state::port21_w)
 		m_floppy1->mon_w(1);
 
 	if(!(data & 3))
-		m_fd1797->set_floppy(NULL);
+		m_fd1797->set_floppy(nullptr);
 
 	// density select 1 - sd, 0 - dd
 	m_fd1797->dden_w(data & 8);
@@ -830,7 +830,7 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_RS232_PORT_ADD("kbd", keyboard, "m20")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251_1", i8251_device, write_rxd))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251_2", i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("apb", M20_8086, 0)

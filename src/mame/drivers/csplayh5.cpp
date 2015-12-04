@@ -446,7 +446,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_state::csplayh5_irq)
 static const z80_daisy_config daisy_chain_sound[] =
 {
 	TMPZ84C011_DAISY_INTERNAL,
-	{ NULL }
+	{ nullptr }
 };
 
 static MACHINE_CONFIG_START( csplayh5, csplayh5_state )

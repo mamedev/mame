@@ -209,7 +209,7 @@ seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, const char *
 		device_video_interface(mconfig, *this),
 		m_layer_en_cb(*this),
 		m_layer_scroll_cb(*this),
-		m_space_config("vregs", ENDIANNESS_LITTLE, 16, 7, 0, NULL, *ADDRESS_MAP_NAME(seibu_crtc_vregs))
+		m_space_config("vregs", ENDIANNESS_LITTLE, 16, 7, 0, nullptr, *ADDRESS_MAP_NAME(seibu_crtc_vregs))
 {
 }
 
@@ -249,7 +249,7 @@ void seibu_crtc_device::device_reset()
 
 const address_space_config *seibu_crtc_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 

@@ -49,7 +49,7 @@ public:
 		m_port_scope_binocular(*this, "SSCOPE_BINOCULAR"),
 		m_port_persist(*this, "PERSISTENCE"),
 		m_region_maincpu(*this, "maincpu"),
-		m_mainram(NULL),
+		m_mainram(nullptr),
 		m_is_gamegear(0),
 		m_is_gg_region_japan(0),
 		m_is_smsj(0),

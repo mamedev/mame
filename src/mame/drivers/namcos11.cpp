@@ -535,7 +535,7 @@ void namcos11_state::driver_start()
 	}
 
 	memory_region *bankedroms = memregion( "bankedroms" );
-	if( bankedroms != NULL )
+	if( bankedroms != nullptr )
 	{
 		UINT8 *base = bankedroms->base();
 		int entries = bankedroms->bytes() / ( 1024 * 1024 );
@@ -545,7 +545,7 @@ void namcos11_state::driver_start()
 		for( int bank = 0; bank < 8; bank++ )
 		{
 			m_bank[ bank ] = membank( bankname[ bank ] );
-			if( m_bank[ bank ] != NULL )
+			if( m_bank[ bank ] != nullptr )
 			{
 				m_bank[ bank ]->configure_entries( 0, entries, base, 1024 * 1024 );
 				m_bank[ bank ]->set_entry( 0 );

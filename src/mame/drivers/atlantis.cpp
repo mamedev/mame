@@ -186,7 +186,7 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 	MCFG_PCI9050_SET_MAP(1, map1) // 2 skipped for testing
 	MCFG_PCI9050_SET_MAP(3, map3)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

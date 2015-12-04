@@ -696,7 +696,7 @@ WRITE8_MEMBER(tnzs_state::tnzs_bankswitch1_w)
 				/* bit 2 resets the mcu */
 				if (data & 0x04)
 				{
-					if (m_mcu != NULL && m_mcu->type() == I8742)
+					if (m_mcu != nullptr && m_mcu->type() == I8742)
 						m_mcu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 				}
 				/* Coin count and lockout is handled by the i8742 */

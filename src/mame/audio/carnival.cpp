@@ -92,7 +92,7 @@ static const char *const carnival_sample_names[] =
 	"pipehit",
 	"ranking",
 	"rifle",
-	0
+	nullptr
 };
 
 /* sample IDs - must match sample file name table above */

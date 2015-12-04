@@ -39,7 +39,7 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_floppy0(*this, UPD765_TAG ":0"),
 			m_floppy1(*this, UPD765_TAG ":1"),
-			m_floppy(NULL),
+			m_floppy(nullptr),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_ieee488(*this, IEEE488_TAG),
 			m_reset(1),

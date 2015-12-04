@@ -167,7 +167,7 @@ ADDRESS_MAP_END
 aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: naomi_g1_device(mconfig, AW_ROM_BOARD, "Sammy Atomiswave ROM Board", tag, owner, clock, "aw_rom_board", __FILE__)
 {
-	keyregion = 0;
+	keyregion = nullptr;
 }
 
 void aw_rom_board::static_set_keyregion(device_t &device, const char *_keyregion)
@@ -389,7 +389,7 @@ void aw_rom_board::dma_get_position(UINT8 *&base, UINT32 &limit, bool to_mainram
 {
 	if(!to_mainram) {
 		limit = 0;
-		base = 0;
+		base = nullptr;
 		return;
 	}
 

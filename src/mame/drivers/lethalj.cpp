@@ -707,8 +707,8 @@ ROM_START( eggventr )
 	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "evc8.10.vc8", 0x000000, 0x020000, CRC(225d1164) SHA1(b0dc55f2e8ded1fe7874de05987fcf879772289e) ) /* Labeled as EVC8.10 */
 	ROM_LOAD16_BYTE( "evc9.10.vc9", 0x000001, 0x020000, CRC(42f6e904) SHA1(11be8e7383a218aac0e1a63236bbdb7cca0993bf) ) /* Labeled as EVC9.10 */
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
-	ROM_COPY( "user1", 0x000000, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
+	ROM_COPY( "user1", nullptr, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
+	ROM_COPY( "user1", nullptr, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
 
 	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1",   0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
@@ -733,8 +733,8 @@ ROM_START( eggventr8 )
 	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "evc8.8.vc8", 0x000000, 0x020000, CRC(5a130c04) SHA1(00408912b436efa003bb02dce90fae4fe33a0180) ) /* Labeled as EVC8.8 */
 	ROM_LOAD16_BYTE( "evc9.8.vc9", 0x000001, 0x020000, CRC(3ac0a95b) SHA1(7f3bd0e6d2d790af4aa6881ea8de8b296a64164a) ) /* Labeled as EVC9.8 */
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
-	ROM_COPY( "user1", 0x000000, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
+	ROM_COPY( "user1", nullptr, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
+	ROM_COPY( "user1", nullptr, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
 
 	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1",   0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
@@ -759,8 +759,8 @@ ROM_START( eggventr7 )
 	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "evc8.7.vc8", 0x000000, 0x020000, CRC(99999899) SHA1(e3908600fa711baa7f7562f86498ec7e988a5bea) ) /* Labeled as EVC8.7 */
 	ROM_LOAD16_BYTE( "evc9.7.vc9", 0x000001, 0x020000, CRC(1b608155) SHA1(256dd981515d57f806a3770bdc6ff46b9000f7f3) ) /* Labeled as EVC9.7 */
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
-	ROM_COPY( "user1", 0x000000, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
+	ROM_COPY( "user1", nullptr, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
+	ROM_COPY( "user1", nullptr, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with 0xff filled 0x20000-0x7ffff
 
 	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1",   0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
@@ -833,8 +833,8 @@ ROM_START( eggventrd )
 	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
 	ROM_LOAD16_BYTE( "eggdlx.vc8", 0x000000, 0x020000, CRC(8d678842) SHA1(92b18ec903ec8579e7dffb40284987f1d44255b8) )
 	ROM_LOAD16_BYTE( "eggdlx.vc9", 0x000001, 0x020000, CRC(9db3fd23) SHA1(165a12a2d107c93cf216e755596e7457010a8f17) )
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with data repeated 4 times
-	ROM_COPY( "user1", 0x000000, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with data repeated 4 times
+	ROM_COPY( "user1", nullptr, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with data repeated 4 times
+	ROM_COPY( "user1", nullptr, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with data repeated 4 times
 
 	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1",   0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )

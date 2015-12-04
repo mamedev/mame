@@ -665,7 +665,7 @@ GFXDECODE_END
 
 
 static MACHINE_CONFIG_FRAGMENT( odyssey2_cartslot )
-	MCFG_O2_CARTRIDGE_ADD("cartslot", o2_cart, NULL)
+	MCFG_O2_CARTRIDGE_ADD("cartslot", o2_cart, nullptr)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","odyssey2")
 MACHINE_CONFIG_END

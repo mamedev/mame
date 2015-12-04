@@ -612,7 +612,7 @@ ROM_START( sengokmj )
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "mah1-2-1.013", 0x000000, 0x08000, CRC(6a4f31b8) SHA1(5e1d7ed299c1fd65c7a43faa02831220f4251733) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0,     0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", nullptr,     0x018000, 0x08000 )
 
 	ROM_REGION( 0x100000, "spr_gfx", 0 ) /*Sprites gfx rom*/
 	ROM_LOAD( "rssengo2.72", 0x00000, 0x100000, CRC(fb215ff8) SHA1(f98c0a53ad9b97d209dd1f85c994fc17ec585bd7) )
@@ -622,7 +622,7 @@ ROM_START( sengokmj )
 	ROM_LOAD( "rssengo1.68", 0x100000, 0x100000, CRC(1bbd00e5) SHA1(86391323b8e0d3b7e09a5914d87fb2adc48e5af4) )
 
 	ROM_REGION( 0x080000, "bg_gfx", 0 )
-	ROM_COPY( "gfx_tiles" , 0x000000, 0x00000, 0x080000)
+	ROM_COPY( "gfx_tiles" , nullptr, 0x00000, 0x080000)
 
 	ROM_REGION( 0x080000, "md_gfx", 0 )
 	ROM_COPY( "gfx_tiles" , 0x080000, 0x00000, 0x080000)

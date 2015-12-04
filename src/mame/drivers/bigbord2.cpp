@@ -334,7 +334,7 @@ WRITE8_MEMBER( bigbord2_state::portcc_w )
 	*/
 
 	/* drive select */
-	m_floppy = NULL;
+	m_floppy = nullptr;
 	if BIT(data, 7) m_floppy = m_floppy0->get_device();
 	if BIT(data, 6) m_floppy = m_floppy1->get_device();
 	//if BIT(data, 5) m_floppy = m_floppy2->get_device();
@@ -440,7 +440,7 @@ static const z80_daisy_config bigbord2_daisy_chain[] =
 	{ Z80CTCA_TAG },
 	{ Z80CTCB_TAG },
 	{ Z80SIO_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 /* WD1793 Interface */

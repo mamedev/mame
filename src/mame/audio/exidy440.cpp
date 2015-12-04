@@ -53,21 +53,21 @@ exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, cons
 		device_sound_interface(mconfig, *this),
 		m_sound_command(0),
 		m_sound_command_ack(0),
-		m_mixer_buffer_left(NULL),
-		m_mixer_buffer_right(NULL),
-		m_sound_cache(NULL),
-		m_sound_cache_end(NULL),
-		m_sound_cache_max(NULL),
+		m_mixer_buffer_left(nullptr),
+		m_mixer_buffer_right(nullptr),
+		m_sound_cache(nullptr),
+		m_sound_cache_end(nullptr),
+		m_sound_cache_max(nullptr),
 		m_m6844_priority(0x00),
 		m_m6844_interrupt(0x00),
 		m_m6844_chain(0x00),
-		m_stream(NULL)
+		m_stream(nullptr)
 {
 	m_sound_banks[0] = m_sound_banks[1] = m_sound_banks[2] = m_sound_banks[3] = 0;
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_sound_channel[i].base = NULL;
+		m_sound_channel[i].base = nullptr;
 		m_sound_channel[i].offset = 0;
 		m_sound_channel[i].remaining = 0;
 	}

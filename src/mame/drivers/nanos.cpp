@@ -140,7 +140,7 @@ static const z80_daisy_config nanos_daisy_chain[] =
 	{ "z80ctc_0" },
 	{ "z80sio_1" },
 	{ "z80ctc_1" },
-	{ NULL }
+	{ nullptr }
 };
 
 static ADDRESS_MAP_START( nanos_io , AS_IO, 8, nanos_state)

@@ -595,7 +595,7 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 {
 	UINT32 size = m_dock->common_get_size("rom");
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		UINT8 *DOCK;
 		int chunks_in_file = 0;
@@ -607,7 +607,7 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
 			return IMAGE_INIT_FAIL;
 		}
-		if (image.software_entry() != NULL)
+		if (image.software_entry() != nullptr)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Loading from softlist is not supported yet");
 			return IMAGE_INIT_FAIL;

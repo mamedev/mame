@@ -432,7 +432,7 @@ UINT32 mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 &b
 	}
 
 	// scroll each column as needed
-	copyscrollbitmap(bitmap,*m_tile_bitmap,0,0,32,scrolly,cliprect);
+	copyscrollbitmap(bitmap,*m_tile_bitmap,0,nullptr,32,scrolly,cliprect);
 
 
 	// sprites

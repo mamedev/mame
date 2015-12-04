@@ -219,7 +219,7 @@ DEVICE_IMAGE_LOAD_MEMBER( nascom_state, nascom1_cassette )
 
 DEVICE_IMAGE_UNLOAD_MEMBER( nascom_state, nascom1_cassette )
 {
-	m_tape_image = NULL;
+	m_tape_image = nullptr;
 	m_tape_size = m_tape_index = 0;
 }
 
@@ -261,7 +261,7 @@ SNAPSHOT_LOAD_MEMBER( nascom_state, nascom1 )
 int nascom2_state::load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id)
 {
 	// loading directly from file
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		if (slot->length() > 0x1000)
 		{
@@ -291,19 +291,19 @@ int nascom2_state::load_cart(device_image_interface &image, generic_slot_device 
 		UINT8 *region_c000 = image.get_software_region("c000");
 		UINT8 *region_d000 = image.get_software_region("d000");
 
-		if (region_b000 != NULL)
+		if (region_b000 != nullptr)
 		{
 			UINT32 size = image.get_software_region_length("b000");
 			m_maincpu->space(AS_PROGRAM).install_rom(0xb000, 0xb000 + size - 1, region_b000);
 		}
 
-		if (region_c000 != NULL)
+		if (region_c000 != nullptr)
 		{
 			UINT32 size = image.get_software_region_length("c000");
 			m_maincpu->space(AS_PROGRAM).install_rom(0xc000, 0xc000 + size - 1, region_c000);
 		}
 
-		if (region_d000 != NULL)
+		if (region_d000 != nullptr)
 		{
 			UINT32 size = image.get_software_region_length("d000");
 			m_maincpu->space(AS_PROGRAM).install_rom(0xd000, 0xd000 + size - 1, region_d000);
@@ -705,10 +705,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( nascom2, nascom1, nascom2_state )
 	// nasbus expansion bus
 	MCFG_NASBUS_ADD(NASBUS_TAG)
 	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(nascom2_state, ram_disable_w))
-	MCFG_NASBUS_SLOT_ADD("nasbus1", nasbus_slot_cards, NULL)
-	MCFG_NASBUS_SLOT_ADD("nasbus2", nasbus_slot_cards, NULL)
-	MCFG_NASBUS_SLOT_ADD("nasbus3", nasbus_slot_cards, NULL)
-	MCFG_NASBUS_SLOT_ADD("nasbus4", nasbus_slot_cards, NULL)
+	MCFG_NASBUS_SLOT_ADD("nasbus1", nasbus_slot_cards, nullptr)
+	MCFG_NASBUS_SLOT_ADD("nasbus2", nasbus_slot_cards, nullptr)
+	MCFG_NASBUS_SLOT_ADD("nasbus3", nasbus_slot_cards, nullptr)
+	MCFG_NASBUS_SLOT_ADD("nasbus4", nasbus_slot_cards, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( nascom2c, nascom2, nascom2_state )

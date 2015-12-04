@@ -20,7 +20,7 @@ const device_type K007420 = &device_creator<k007420_device>;
 
 k007420_device::k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K007420, "K007420 Sprite Generator", tag, owner, clock, "k007420", __FILE__),
-	m_ram(NULL),
+	m_ram(nullptr),
 	m_flipscreen(0),
 	m_palette(*this),
 	m_banklimit(0)

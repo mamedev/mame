@@ -62,7 +62,7 @@ tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *ta
 tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_freq_to_step(0),
 		m_step0(0),
 		m_step1(0),
@@ -377,8 +377,8 @@ void buggyboy_sound_device::device_start()
 
 	compute_resistor_weights(0, 16384,  -1.0,
 							4,  &resistors[0], aweights, 0, 0,
-							0, 0, 0, 0, 0,
-							0, 0, 0, 0, 0 );
+							0, nullptr, nullptr, 0, 0,
+							0, nullptr, nullptr, 0, 0 );
 
 	for (i = 0; i < 16; i++)
 		m_eng_voltages[i] = combine_4_weights(aweights, BIT(tmp[i], 0), BIT(tmp[i], 1), BIT(tmp[i], 2), BIT(tmp[i], 3));

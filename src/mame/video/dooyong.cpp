@@ -10,7 +10,7 @@ inline void dooyong_state::scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, t
 	if (old != data)
 	{
 		scroll[offset] = data;
-		if (map != NULL) switch (offset)
+		if (map != nullptr) switch (offset)
 		{
 		case 0: /* Low byte of x scroll - scroll tilemap */
 			map->set_scrollx(0, data);
@@ -850,7 +850,7 @@ VIDEO_START_MEMBER(dooyong_68k_state, popbingo)
 	/* Create tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
-	m_bg2_tilemap = m_fg_tilemap = m_fg2_tilemap = NULL;    /* Stop scroll handler from crashing on these */
+	m_bg2_tilemap = m_fg_tilemap = m_fg2_tilemap = nullptr;    /* Stop scroll handler from crashing on these */
 
 	memset(m_bgscroll8, 0, 0x10);
 	memset(m_bg2scroll8, 0, 0x10);

@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( turrett, turrett_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", turrett_state, vblank)
 	MCFG_CPU_PERIODIC_INT_DRIVER(turrett_state, adc, 60)
 
-	MCFG_ATA_INTERFACE_ADD("ata", turrett_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", turrett_devices, "hdd", nullptr, true)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -488,7 +488,7 @@ INPUT_PORTS_END
 // has it's own mouse
 static MACHINE_CONFIG_FRAGMENT( cfg_com )
 	MCFG_DEVICE_MODIFY("serport0")
-	MCFG_SLOT_DEFAULT_OPTION(NULL)
+	MCFG_SLOT_DEFAULT_OPTION(nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
@@ -505,8 +505,8 @@ static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "com", pc_isa8_cards, "com", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("com", cfg_com)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, nullptr, false)
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)

@@ -284,10 +284,10 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, const char *tag, dev
 			m_segaic16vid(*this, "segaic16vid"),
 			m_segaic16road(*this, "segaic16road"),
 			m_road_priority(1),
-			m_scanline_timer(NULL),
+			m_scanline_timer(nullptr),
 			m_timer_irq_state(0),
 			m_vblank_irq_state(0),
-			m_loffire_sync(NULL),
+			m_loffire_sync(nullptr),
 			m_lastsurv_mux(0),
 			m_paletteram(*this, "paletteram"),
 			m_gprider_hack(false),
@@ -598,7 +598,7 @@ WRITE16_MEMBER( segaxbd_state::iochip_0_w )
 			m_segaic16vid->set_display_enable(data & 0x20);
 
 			m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-			if (m_soundcpu2 != NULL)
+			if (m_soundcpu2 != nullptr)
 				m_soundcpu2->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
@@ -793,7 +793,7 @@ void segaxbd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 			m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 			// if an extra sound board is attached, do an nmi there as well
-			if (m_soundcpu2 != NULL)
+			if (m_soundcpu2 != nullptr)
 				m_soundcpu2->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 			break;
 
@@ -1024,16 +1024,16 @@ void segaxbd_state::palette_init()
 	double weights_normal[6];
 	compute_resistor_weights(0, 255, -1.0,
 		6, resistances_normal, weights_normal, 0, 0,
-		0, NULL, NULL, 0, 0,
-		0, NULL, NULL, 0, 0);
+		0, nullptr, nullptr, 0, 0,
+		0, nullptr, nullptr, 0, 0);
 
 	// compute weight table for shadow/hilight palette entries
 	static const int resistances_sh[6]     = { 3900, 2000, 1000, 1000/2, 1000/4, 470 };
 	double weights_sh[6];
 	compute_resistor_weights(0, 255, -1.0,
 		6, resistances_sh, weights_sh, 0, 0,
-		0, NULL, NULL, 0, 0,
-		0, NULL, NULL, 0, 0);
+		0, nullptr, nullptr, 0, 0,
+		0, nullptr, nullptr, 0, 0);
 
 	// compute R, G, B for each weight
 	for (int value = 0; value < 32; value++)

@@ -388,7 +388,7 @@ WRITE8_MEMBER(osbexec_state::osbexec_pia0_b_w)
 		m_floppy0->mon_w(0);
 		break;
 	default:
-		m_mb8877->set_floppy(NULL);
+		m_mb8877->set_floppy(nullptr);
 		break;
 	}
 
@@ -520,7 +520,7 @@ void osbexec_state::machine_reset()
 static const z80_daisy_config osbexec_daisy_config[] =
 {
 	{ "sio" },
-	{ NULL }
+	{ nullptr }
 };
 
 

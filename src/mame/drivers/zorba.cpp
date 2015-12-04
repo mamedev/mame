@@ -265,7 +265,7 @@ WRITE8_MEMBER( zorba_state::pia0_porta_w )
 	m_beep->set_state(BIT(data, 7));
 	m_fdc->dden_w(BIT(data, 6));
 
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 	if (!BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (!BIT(data, 1)) floppy = m_floppy1->get_device();
 

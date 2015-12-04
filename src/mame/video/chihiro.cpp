@@ -1286,7 +1286,7 @@ inline UINT8 *nv2a_renderer::read_pixel(int x, int y, INT32 c[4])
 		c[3] = 0xff;
 		return addr8;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
@@ -1301,7 +1301,7 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 	bool depth_passed;
 
 	fb[3] = fb[2] = fb[1] = fb[0] = 0;
-	addr = NULL;
+	addr = nullptr;
 	if (color_mask != 0)
 		addr = read_pixel(x, y, fb);
 	if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z24S8) {
@@ -1309,18 +1309,18 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 		deptsten = *daddr32;
 		dep = deptsten >> 8;
 		sten = deptsten & 255;
-		daddr16 = NULL;
+		daddr16 = nullptr;
 	}
 	else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z16) {
 		daddr16 = (UINT16 *)depthbuffer + (pitch_depthbuffer / 2) * y + x;
 		deptsten = *daddr16;
 		dep = (deptsten << 8) | 0xff;
 		sten = 0;
-		daddr32 = NULL;
+		daddr32 = nullptr;
 	}
 	else {
-		daddr32 = NULL;
-		daddr16 = NULL;
+		daddr32 = nullptr;
+		daddr16 = nullptr;
 		dep = 0xffffff;
 		sten = 0;
 	}
@@ -3378,7 +3378,7 @@ int nv2a_renderer::toggle_wait_vblank_support()
 void nv2a_renderer::debug_grab_texture(int type, const char *filename)
 {
 	debug_grab_texttype = type;
-	if (debug_grab_textfile == NULL)
+	if (debug_grab_textfile == nullptr)
 		debug_grab_textfile = (char *)malloc(128);
 	strncpy(debug_grab_textfile, filename, 127);
 }
@@ -3492,13 +3492,13 @@ float *nv2a_renderer::combiner_map_output_select3(int code)
 {
 	switch (code) {
 	case 0:
-		return 0;
+		return nullptr;
 	case 1:
-		return 0;
+		return nullptr;
 	case 2:
-		return 0;
+		return nullptr;
 	case 3:
-		return 0;
+		return nullptr;
 	case 4:
 		return combiner.register_primarycolor;
 	case 5:
@@ -3516,10 +3516,10 @@ float *nv2a_renderer::combiner_map_output_select3(int code)
 	case 13:
 		return combiner.register_spare1;
 	case 14:
-		return 0;
+		return nullptr;
 	case 15:
 	default:
-		return 0;
+		return nullptr;
 	}
 }
 
@@ -3972,7 +3972,7 @@ void nv2a_renderer::vblank_callback(screen_device &screen, bool state)
 #endif
 	if ((state == true) && (puller_waiting == 1)) {
 		puller_waiting = 0;
-		puller_timer_work(NULL, 0);
+		puller_timer_work(nullptr, 0);
 	}
 	if (state == true) {
 		pcrtc[0x100 / 4] |= 1;
@@ -4008,7 +4008,7 @@ bool nv2a_renderer::update_interrupts()
 
 UINT32 nv2a_renderer::screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (displayedtarget != NULL) {
+	if (displayedtarget != nullptr) {
 		bitmap_rgb32 bm(displayedtarget, 640, 480, 640);
 		UINT32 *dst = (UINT32 *)bitmap.raw_pixptr(0, 0);
 

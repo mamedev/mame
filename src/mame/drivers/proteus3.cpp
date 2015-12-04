@@ -376,7 +376,7 @@ ROM_START(proteus3)
 	ROMX_LOAD( "bas5.bin",     0xe800, 0x0800, CRC(bd81bb34) SHA1(6325735e5750a9536e63b67048f74711fae1fa42), ROM_BIOS(1) )
 	ROMX_LOAD( "bas6.bin",     0xf000, 0x0800, CRC(60cd006b) SHA1(28354f78490da1eb5116cbbc43eaca0670f7f398), ROM_BIOS(1) )
 	ROMX_LOAD( "bas7.bin",     0xf800, 0x0800, CRC(84c3dc22) SHA1(8fddba61b5f0270ca2daef32ab5edfd60300c776), ROM_BIOS(1) )
-	ROM_FILL( 0xc000, 1, 0 )  // if c000 isn't 0 it assumes a rom is there and jumps to it
+	ROM_FILL( 0xc000, 1, nullptr )  // if c000 isn't 0 it assumes a rom is there and jumps to it
 
 	ROM_SYSTEM_BIOS( 1, "8k", "8k BASIC")
 	ROMX_LOAD( "proteus3_basic8k.m0", 0xe000, 0x2000, CRC(7d9111c2) SHA1(3c032c9c7f87d22a1a9819b3b812be84404d2ad2), ROM_BIOS(2) )

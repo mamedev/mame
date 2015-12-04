@@ -677,7 +677,7 @@ WRITE_LINE_MEMBER( abc800_state::ctc_z2_w )
 
 void abc800_state::clock_cassette(int state)
 {
-	if (m_cassette == NULL) return;
+	if (m_cassette == nullptr) return;
 
 	if (m_ctc_z0 && !state)
 	{
@@ -708,7 +708,7 @@ WRITE_LINE_MEMBER( abc800_state::sio_txdb_w )
 
 WRITE_LINE_MEMBER( abc800_state::sio_dtrb_w )
 {
-	if (m_cassette == NULL) return;
+	if (m_cassette == nullptr) return;
 
 	if (state)
 	{
@@ -724,7 +724,7 @@ WRITE_LINE_MEMBER( abc800_state::sio_dtrb_w )
 
 WRITE_LINE_MEMBER( abc800_state::sio_rtsb_w )
 {
-	if (m_cassette == NULL) return;
+	if (m_cassette == nullptr) return;
 
 	m_sio_rtsb = state;
 
@@ -770,7 +770,7 @@ static const z80_daisy_config abc800_daisy_chain[] =
 	{ Z80CTC_TAG },
 	{ Z80SIO_TAG },
 	{ Z80DART_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 
@@ -1054,12 +1054,12 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, ctsa_w))
@@ -1129,12 +1129,12 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, ctsa_w))
@@ -1206,12 +1206,12 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, ctsa_w))
@@ -1274,12 +1274,12 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(abc806_state, keydtr_w))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, ctsa_w))

@@ -1329,12 +1329,12 @@ static MACHINE_CONFIG_START( amiga_base, amiga_state )
 	// floppy drives
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_PAL)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amiga_floppies, "35dd", amiga_fdc::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amiga_floppies, 0, amiga_fdc::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", amiga_floppies, 0, amiga_fdc::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", amiga_floppies, 0, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amiga_floppies, nullptr, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", amiga_floppies, nullptr, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", amiga_floppies, nullptr, amiga_fdc::floppy_formats)
 
 	// rs232
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(amiga_state, rs232_rx_w))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(amiga_state, rs232_dcd_w))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(amiga_state, rs232_dsr_w))
@@ -1414,17 +1414,17 @@ static MACHINE_CONFIG_DERIVED_CLASS( a2000, amiga_base, a2000_state )
 	MCFG_DEVICE_ADD("u65", MSM6242, XTAL_32_768kHz)
 
 	// cpu slot
-	MCFG_EXPANSION_SLOT_ADD("maincpu", a2000_expansion_cards, NULL)
+	MCFG_EXPANSION_SLOT_ADD("maincpu", a2000_expansion_cards, nullptr)
 
 	// zorro slots
 	MCFG_ZORRO2_ADD("maincpu")
 	MCFG_ZORRO2_INT2_HANDLER(WRITELINE(a2000_state, zorro2_int2_w))
 	MCFG_ZORRO2_INT6_HANDLER(WRITELINE(a2000_state, zorro2_int6_w))
-	MCFG_ZORRO2_SLOT_ADD("zorro1", zorro2_cards, NULL)
-	MCFG_ZORRO2_SLOT_ADD("zorro2", zorro2_cards, NULL)
-	MCFG_ZORRO2_SLOT_ADD("zorro3", zorro2_cards, NULL)
-	MCFG_ZORRO2_SLOT_ADD("zorro4", zorro2_cards, NULL)
-	MCFG_ZORRO2_SLOT_ADD("zorro5", zorro2_cards, NULL)
+	MCFG_ZORRO2_SLOT_ADD("zorro1", zorro2_cards, nullptr)
+	MCFG_ZORRO2_SLOT_ADD("zorro2", zorro2_cards, nullptr)
+	MCFG_ZORRO2_SLOT_ADD("zorro3", zorro2_cards, nullptr)
+	MCFG_ZORRO2_SLOT_ADD("zorro4", zorro2_cards, nullptr)
+	MCFG_ZORRO2_SLOT_ADD("zorro5", zorro2_cards, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( a2000n, a2000, a2000_state )
@@ -1456,7 +1456,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a500, amiga_base, a500_state )
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
 
 	// cpu slot
-	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, NULL)
+	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( a500n, a500, a500_state )
@@ -1594,7 +1594,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a500p, amiga_base, a500p_state )
 	MCFG_DEVICE_ADD("u9", MSM6242, XTAL_32_768kHz)
 
 	// cpu slot
-	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, NULL)
+	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( a500pn, a500p, a500p_state )
@@ -1631,7 +1631,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a600, amiga_base, a600_state )
 	MCFG_GAYLE_CS1_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs1))
 	MCFG_GAYLE_CS1_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs1))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("gayle", gayle_device, ide_interrupt_w))
 
 	// todo: pcmcia
@@ -1680,7 +1680,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a1200, amiga_base, a1200_state )
 	MCFG_GAYLE_CS1_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs1))
 	MCFG_GAYLE_CS1_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs1))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("gayle", gayle_device, ide_interrupt_w))
 
 	// todo: pcmcia
@@ -1728,7 +1728,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a4000, amiga_base, a4000_state )
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
 
 	// ide
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(a4000_state, ide_interrupt_w))
 
 	// todo: zorro3
@@ -1896,10 +1896,10 @@ ROM_START( a2000 )
 	ROM_DEFAULT_BIOS("kick13")
 	ROM_SYSTEM_BIOS(0, "kick12",  "Kickstart 1.2 (33.180)")
 	ROMX_LOAD("315093-01.u2", 0x00000, 0x40000, CRC(a6ce1636) SHA1(11f9e62cf299f72184835b7b2a70a16333fc0d88), ROM_GROUPWORD | ROM_BIOS(1))
-	ROM_COPY("kickstart", 0x00000, 0x40000, 0x40000)
+	ROM_COPY("kickstart", nullptr, 0x40000, 0x40000)
 	ROM_SYSTEM_BIOS(1, "kick13",  "Kickstart 1.3 (34.5)")
 	ROMX_LOAD("315093-02.u2", 0x00000, 0x40000, CRC(c4f0f55f) SHA1(891e9a547772fe0c6c19b610baf8bc4ea7fcb785), ROM_GROUPWORD | ROM_BIOS(2))
-	ROM_COPY("kickstart", 0x00000, 0x40000, 0x40000)
+	ROM_COPY("kickstart", nullptr, 0x40000, 0x40000)
 	ROM_SYSTEM_BIOS(2, "kick204", "Kickstart 2.04 (37.175)")
 	ROMX_LOAD("390979-01.u2", 0x00000, 0x80000, CRC(c3bdb240) SHA1(c5839f5cb98a7a8947065c3ed2f14f5f42e334a1), ROM_GROUPWORD | ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(3, "kick31",  "Kickstart 3.1 (40.63)")
@@ -1946,7 +1946,7 @@ ROM_START( cdtv )
 	// standard amiga kickstart 1.3
 	ROM_REGION16_BE(0x80000, "kickstart", 0)
 	ROMX_LOAD("315093-02.u13", 0x00000, 0x40000, CRC(c4f0f55f) SHA1(891e9a547772fe0c6c19b610baf8bc4ea7fcb785), ROM_GROUPWORD)
-	ROM_COPY("kickstart", 0x00000, 0x40000, 0x40000)
+	ROM_COPY("kickstart", nullptr, 0x40000, 0x40000)
 
 	// remote control input converter, mos 6500/1 mcu
 	ROM_REGION(0x800, "rcmcu", 0)

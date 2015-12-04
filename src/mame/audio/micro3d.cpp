@@ -174,7 +174,7 @@ micro3d_sound_device::micro3d_sound_device(const machine_config &mconfig, const 
 		m_noise_shift(0),
 		m_noise_value(0),
 		m_noise_subcount(0),
-		m_stream(NULL)
+		m_stream(nullptr)
 
 {
 		memset(m_dac, 0, sizeof(UINT8)*4);

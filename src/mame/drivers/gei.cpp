@@ -209,7 +209,7 @@ WRITE8_MEMBER(gei_state::sound_w)
 	set_led_status(machine(), 9,data & 0x08);
 
 	/* bit 5 - ticket out in trivia games */
-	if (m_ticket != NULL)
+	if (m_ticket != nullptr)
 		m_ticket->write(machine().driver_data()->generic_space(), 0, (data & 0x20)<< 2);
 
 	/* bit 6 enables NMI */

@@ -92,9 +92,9 @@ public:
 	virtual bool is_creatable() const { return 1; }
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
+	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const { return "hdf"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 	virtual bool call_create(int format_type, option_resolution *format_options);
 
 	DECLARE_WRITE16_MEMBER( hdc_w );

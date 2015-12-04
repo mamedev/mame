@@ -19,7 +19,7 @@ naomi_m1_board::naomi_m1_board(const machine_config &mconfig, const char *tag, d
 
 READ16_MEMBER(naomi_m1_board::actel_id_r)
 {
-	if (rombdid_tag && memregion(rombdid_tag) != NULL)
+	if (rombdid_tag && memregion(rombdid_tag) != nullptr)
 	{
 		const UINT8 *bdid = memregion(rombdid_tag)->base();
 		return bdid[0] | (bdid[1] << 8);
@@ -34,7 +34,7 @@ void naomi_m1_board::device_start()
 
 	std::string skey = parameter("key");
 	if(!skey.empty())
-		key = strtoll(skey.c_str(), 0, 16);
+		key = strtoll(skey.c_str(), nullptr, 16);
 	else
 	{
 		logerror("%s: Warning: key not provided\n", tag());

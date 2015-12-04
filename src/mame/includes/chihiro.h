@@ -228,13 +228,13 @@ public:
 		colorformat_rendertarget = nv2a_renderer::NV2A_COLOR_FORMAT_A8R8G8B8;
 		bytespixel_rendertarget = 4;
 		antialias_control = 0;
-		rendertarget = NULL;
-		depthbuffer = NULL;
-		displayedtarget = NULL;
+		rendertarget = nullptr;
+		depthbuffer = nullptr;
+		displayedtarget = nullptr;
 		puller_channel = 0;
 		puller_waiting = 0;
 		debug_grab_texttype = -1;
-		debug_grab_textfile = NULL;
+		debug_grab_textfile = nullptr;
 		waitvblank_used = 1;
 		memset(vertex_attribute_words, 0, sizeof(vertex_attribute_words));
 		memset(vertex_attribute_offset, 0, sizeof(vertex_attribute_offset));

@@ -194,7 +194,7 @@ WRITE8_MEMBER(namcos86_state::bankswitch1_ext_w)
 {
 	UINT8 *base = memregion("user1")->base();
 
-	if (base == 0) return;
+	if (base == nullptr) return;
 
 	membank("bank1")->set_entry(data & 0x1f);
 }
@@ -1232,11 +1232,11 @@ ROM_START( hopmappy )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
 	ROM_LOAD( "hm1_6.7r",     0x00000, 0x04000, CRC(fd0e8887) SHA1(b76737d22bb1c1ae4d700ea6796e8d91f6ffa275) )  /* plane 1,2 */
-	ROM_FILL(                 0x04000, 0x02000, 0 )         /* no plane 3 */
+	ROM_FILL(                 0x04000, 0x02000, nullptr )         /* no plane 3 */
 
 	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "hm1_5.4r",     0x00000, 0x04000, CRC(9c4f31ae) SHA1(1c7072355d6f98b8e8554da19eab0512fdd9e2e1) )  /* plane 1,2 */
-	ROM_FILL(                 0x04000, 0x02000, 0 )         /* no plane 3 */
+	ROM_FILL(                 0x04000, 0x02000, nullptr )         /* no plane 3 */
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "hm1_4.12h",    0x00000, 0x8000, CRC(78719c52) SHA1(06d7bb9f29ccdbf563b3bf13c0290510b26e186f) )

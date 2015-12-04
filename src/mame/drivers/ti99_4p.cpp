@@ -272,7 +272,7 @@ INPUT_PORTS_END
 READ16_MEMBER( ti99_4p_state::memread )
 {
 	int addroff = offset << 1;
-	if (m_rom0 == NULL) return 0;   // premature access
+	if (m_rom0 == nullptr) return 0;   // premature access
 
 	UINT16 zone = addroff & 0xe000;
 	UINT16 value = 0;

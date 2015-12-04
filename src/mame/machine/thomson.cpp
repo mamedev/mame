@@ -363,7 +363,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
 	offs_t size;
 	char name[129];
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 		size = image.length();
 	else
 		size = image.get_software_region_length("rom");
@@ -383,7 +383,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
 		return IMAGE_INIT_FAIL;
 	}
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		if ( image.fread( pos, size ) != size )
 		{
@@ -631,7 +631,7 @@ static MACHINE_CONFIG_FRAGMENT( to7_io_line )
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("^", thomson_state, thom_firq_1))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("^", thomson_state, thom_firq_1))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(to7_io_line_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(to7_io_line_device, write_cts))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(to7_io_line_device, write_dsr))
@@ -1494,7 +1494,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 	int j;
 	char name[129];
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 		size = image.length();
 	else
 		size = image.get_software_region_length("rom");
@@ -1514,7 +1514,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 		return IMAGE_INIT_FAIL;
 	}
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		if ( image.fread(pos, size ) != size )
 		{

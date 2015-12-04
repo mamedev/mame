@@ -163,10 +163,10 @@ UINT32 magmax_state::screen_update_magmax(screen_device &screen, bitmap_ind16 &b
 				UINT16 line_data_flip_x[256];
 				for (i=0; i<256; i++)
 					line_data_flip_x[i] = line_data[255-i];
-				draw_scanline16(bitmap, 0, 255-v, 256, line_data_flip_x, NULL);
+				draw_scanline16(bitmap, 0, 255-v, 256, line_data_flip_x, nullptr);
 			}
 			else
-				draw_scanline16(bitmap, 0, v, 256, line_data, NULL);
+				draw_scanline16(bitmap, 0, v, 256, line_data, nullptr);
 		}
 	}
 

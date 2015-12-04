@@ -168,7 +168,7 @@ PALETTE_INIT_MEMBER(tubep_state,tubep)
 	compute_resistor_weights(0, 255,    -1.0,
 			3,  resistors_txt_rg,   weights_txt_rg, 470,    0,
 			2,  resistors_txt_b,    weights_txt_b,  470,    0,
-			0,  0,  0,  0,  0   );
+			0,  nullptr,  nullptr,  0,  0   );
 
 	/* create text palette */
 
@@ -687,7 +687,7 @@ PALETTE_INIT_MEMBER(tubep_state,rjammer)
 	compute_resistor_weights(0, 255,    -1.0,
 			3,  resistors_rg,   weights_rg, 470,    0,
 			2,  resistors_b,    weights_b,  470,    0,
-			0,  0,  0,  0,  0   );
+			0,  nullptr,  nullptr,  0,  0   );
 
 	for (i = 0;i < palette.entries();i++)
 	{

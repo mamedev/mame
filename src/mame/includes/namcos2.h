@@ -105,7 +105,7 @@ public:
 			m_gametype(0),
 			m_c169_roz_videoram(*this, "rozvideoram", 0),
 			m_c169_roz_gfxbank(0),
-			m_c169_roz_mask(NULL),
+			m_c169_roz_mask(nullptr),
 			m_c355_obj_gfxbank(0),
 			m_c355_obj_palxor(0),
 			m_maincpu(*this, "maincpu"),

@@ -956,7 +956,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	MCFG_AM53CF96_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(twinkle_state, spu_ata_irq))
 	MCFG_ATA_INTERFACE_DMARQ_HANDLER(WRITELINE(twinkle_state, spu_ata_dmarq))
 

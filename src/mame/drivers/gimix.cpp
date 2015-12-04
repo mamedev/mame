@@ -619,7 +619,7 @@ static MACHINE_CONFIG_START( gimix, gimix_state )
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial4",rs232_port_device,write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial4",rs232_port_device,write_rts))
 
-	MCFG_RS232_PORT_ADD("serial1",default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial1",default_rs232_devices,nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia1",acia6850_device,write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia1",acia6850_device,write_cts))
 
@@ -627,11 +627,11 @@ static MACHINE_CONFIG_START( gimix, gimix_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia2",acia6850_device,write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia2",acia6850_device,write_cts))
 
-	MCFG_RS232_PORT_ADD("serial3",default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial3",default_rs232_devices,nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia3",acia6850_device,write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia3",acia6850_device,write_cts))
 
-	MCFG_RS232_PORT_ADD("serial4",default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial4",default_rs232_devices,nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia4",acia6850_device,write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia4",acia6850_device,write_cts))
 

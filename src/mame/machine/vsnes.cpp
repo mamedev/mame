@@ -204,7 +204,7 @@ MACHINE_START_MEMBER(vsnes_state,vsnes)
 	/* establish chr banks */
 	/* bank 1 is used already! */
 	/* DRIVER_INIT is called first - means we can handle this different for VRAM games! */
-	if (NULL != m_vrom[0])
+	if (nullptr != m_vrom[0])
 	{
 		for (i = 0; i < 8; i++)
 		{

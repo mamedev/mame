@@ -317,7 +317,7 @@ static DISCRETE_SOUND_START(bzone)
 		BZ_R12, BZ_R13, BZ_R14, BZ_R15, BZ_R32,
 		BZ_C21,
 		22,                                         /* B+ of op-amp */
-		NULL)
+		nullptr)
 
 	/************************************************/
 	/* Explosion                                    */
@@ -331,7 +331,7 @@ static DISCRETE_SOUND_START(bzone)
 		BZ_R19, BZ_R18, BZ_R17, BZ_R16, BZ_R33,
 		BZ_C22,
 		22,                                         /* B+ of op-amp */
-		NULL)
+		nullptr)
 	/************************************************/
 	/* Engine                                       */
 	/************************************************/

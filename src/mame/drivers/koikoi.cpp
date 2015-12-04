@@ -409,10 +409,10 @@ ROM_START( koikoi )
 	ROM_FILL( 0x08, 1, 0x8b )
 	ROM_FILL( 0x09, 1, 0x3f )
 	ROM_FILL( 0x0a, 1, 0x07 )
-	ROM_FILL( 0x0b, 1, 0x00 ) // unused
+	ROM_FILL( 0x0b, 1, nullptr ) // unused
 	ROM_FILL( 0x0c, 1, 0x2f )
 	ROM_FILL( 0x0d, 1, 0xff )
-	ROM_FILL( 0x0e, 1, 0x00 )
+	ROM_FILL( 0x0e, 1, nullptr )
 	ROM_FILL( 0x0f, 1, 0x0b )
 	ROM_LOAD( "prom.ic23", 0x020, 0x100,  CRC(f1d169a6) SHA1(5ee4b1dfe61e8b97a90cc113ba234298189f1a73) )
 

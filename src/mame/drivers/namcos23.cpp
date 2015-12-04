@@ -3523,7 +3523,7 @@ static const gfx_layout namcos23_cg_layout =
 }; /* cg_layout */
 
 static GFXDECODE_START( namcos23 )
-	GFXDECODE_ENTRY( NULL, 0, namcos23_cg_layout, 0, 0x800 )
+	GFXDECODE_ENTRY( nullptr, 0, namcos23_cg_layout, 0, 0x800 )
 GFXDECODE_END
 
 
