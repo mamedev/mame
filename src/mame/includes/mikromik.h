@@ -127,6 +127,7 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+	DECLARE_PALETTE_INIT( mm1 );
 };
 
 
