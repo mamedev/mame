@@ -98,9 +98,9 @@ void tx1_sound_device::device_config_complete()
 
 void tx1_sound_device::device_start()
 {
-	static const int r0[4] = { 390e3, 180e3, 180e3, 180e3 };
-	static const int r1[3] = { 180e3, 390e3, 56e3 };
-	static const int r2[3] = { 390e3, 390e3, 180e3 };
+	static const int r0[4] = { static_cast<int>(390e3), static_cast<int>(180e3), static_cast<int>(180e3), static_cast<int>(180e3) };
+	static const int r1[3] = { static_cast<int>(180e3), static_cast<int>(390e3), static_cast<int>(56e3) };
+	static const int r2[3] = { static_cast<int>(390e3), static_cast<int>(390e3), static_cast<int>(180e3) };
 
 
 	/* Allocate the stream */

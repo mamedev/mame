@@ -604,7 +604,7 @@ READ8_MEMBER( c64_state::cia1_pa_r )
 
 	// keyboard
 	UINT8 cia1_pb = m_cia1->pb_r();
-	UINT8 row[8] = { m_row0->read(), m_row1->read() & m_lock->read(), m_row2->read(), m_row3->read(),
+	UINT32 row[8] = { m_row0->read(), m_row1->read() & m_lock->read(), m_row2->read(), m_row3->read(),
 						m_row4->read(), m_row5->read(), m_row6->read(), m_row7->read() };
 
 	for (int i = 0; i < 8; i++)

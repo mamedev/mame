@@ -64,17 +64,17 @@ TIMER_CALLBACK_MEMBER(sprint4_state::nmi_callback)
 
 	UINT8 wheel[4] =
 	{
-		ioport("WHEEL1")->read(),
-		ioport("WHEEL2")->read(),
-		ioport("WHEEL3")->read(),
-		ioport("WHEEL4")->read()
+		static_cast<UINT8>(ioport("WHEEL1")->read()),
+		static_cast<UINT8>(ioport("WHEEL2")->read()),
+		static_cast<UINT8>(ioport("WHEEL3")->read()),
+		static_cast<UINT8>(ioport("WHEEL4")->read())
 	};
 	UINT8 lever[4] =
 	{
-		ioport("LEVER1")->read(),
-		ioport("LEVER2")->read(),
-		ioport("LEVER3")->read(),
-		ioport("LEVER4")->read()
+		static_cast<UINT8>(ioport("LEVER1")->read()),
+		static_cast<UINT8>(ioport("LEVER2")->read()),
+		static_cast<UINT8>(ioport("LEVER3")->read()),
+		static_cast<UINT8>(ioport("LEVER4")->read())
 	};
 
 	int i;

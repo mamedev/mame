@@ -164,12 +164,12 @@ UINT32 cdicdic_device::increment_cdda_frame_bcd(UINT32 bcd)
 {
 	UINT8 nybbles[6] =
 	{
-			bcd & 0x0000000f,
-		(bcd & 0x000000f0) >> 4,
-		(bcd & 0x00000f00) >> 8,
-		(bcd & 0x0000f000) >> 12,
-		(bcd & 0x000f0000) >> 16,
-		(bcd & 0x00f00000) >> 20
+		static_cast<UINT8>(bcd & 0x0000000f),
+		static_cast<UINT8>((bcd & 0x000000f0) >> 4),
+		static_cast<UINT8>((bcd & 0x00000f00) >> 8),
+		static_cast<UINT8>((bcd & 0x0000f000) >> 12),
+		static_cast<UINT8>((bcd & 0x000f0000) >> 16),
+		static_cast<UINT8>((bcd & 0x00f00000) >> 20)
 	};
 	nybbles[0]++;
 	if(nybbles[0] == 5 && nybbles[1] == 7)
@@ -204,12 +204,12 @@ UINT32 cdicdic_device::increment_cdda_sector_bcd(UINT32 bcd)
 {
 	UINT8 nybbles[6] =
 	{
-			bcd & 0x0000000f,
-		(bcd & 0x000000f0) >> 4,
-		(bcd & 0x00000f00) >> 8,
-		(bcd & 0x0000f000) >> 12,
-		(bcd & 0x000f0000) >> 16,
-		(bcd & 0x00f00000) >> 20
+		static_cast<UINT8>(bcd & 0x0000000f),
+		static_cast<UINT8>((bcd & 0x000000f0) >> 4),
+		static_cast<UINT8>((bcd & 0x00000f00) >> 8),
+		static_cast<UINT8>((bcd & 0x0000f000) >> 12),
+		static_cast<UINT8>((bcd & 0x000f0000) >> 16),
+		static_cast<UINT8>((bcd & 0x00f00000) >> 20)
 	};
 	nybbles[2]++;
 	if(nybbles[2] == 10)
@@ -615,12 +615,12 @@ void cdicdic_device::process_delayed_command()
 			int index = 0;
 			UINT8 nybbles[6] =
 			{
-					msf & 0x0000000f,
-				(msf & 0x000000f0) >> 4,
-				(msf & 0x00000f00) >> 8,
-				(msf & 0x0000f000) >> 12,
-				(msf & 0x000f0000) >> 16,
-				(msf & 0x00f00000) >> 20
+				static_cast<UINT8>(msf & 0x0000000f),
+				static_cast<UINT8>((msf & 0x000000f0) >> 4),
+				static_cast<UINT8>((msf & 0x00000f00) >> 8),
+				static_cast<UINT8>((msf & 0x0000f000) >> 12),
+				static_cast<UINT8>((msf & 0x000f0000) >> 16),
+				static_cast<UINT8>((msf & 0x00f00000) >> 20)
 			};
 			if(msf & 0x000080)
 			{
@@ -785,12 +785,12 @@ void cdicdic_device::process_delayed_command()
 //          UINT32 next_lba = 0;
 			UINT8 nybbles[6] =
 			{
-					msf & 0x0000000f,
-				(msf & 0x000000f0) >> 4,
-				(msf & 0x00000f00) >> 8,
-				(msf & 0x0000f000) >> 12,
-				(msf & 0x000f0000) >> 16,
-				(msf & 0x00f00000) >> 20
+				static_cast<UINT8>(msf & 0x0000000f),
+				static_cast<UINT8>((msf & 0x000000f0) >> 4),
+				static_cast<UINT8>((msf & 0x00000f00) >> 8),
+				static_cast<UINT8>((msf & 0x0000f000) >> 12),
+				static_cast<UINT8>((msf & 0x000f0000) >> 16),
+				static_cast<UINT8>((msf & 0x00f00000) >> 20)
 			};
 /*          UINT8 next_nybbles[6] =
             {
@@ -857,12 +857,12 @@ void cdicdic_device::process_delayed_command()
 			UINT32 lba = 0;
 			UINT8 nybbles[6] =
 			{
-					msf & 0x0000000f,
-				(msf & 0x000000f0) >> 4,
-				(msf & 0x00000f00) >> 8,
-				(msf & 0x0000f000) >> 12,
-				(msf & 0x000f0000) >> 16,
-				(msf & 0x00f00000) >> 20
+				static_cast<UINT8>(msf & 0x0000000f),
+				static_cast<UINT8>((msf & 0x000000f0) >> 4),
+				static_cast<UINT8>((msf & 0x00000f00) >> 8),
+				static_cast<UINT8>((msf & 0x0000f000) >> 12),
+				static_cast<UINT8>((msf & 0x000f0000) >> 16),
+				static_cast<UINT8>((msf & 0x00f00000) >> 20)
 			};
 			lba = nybbles[0] + nybbles[1]*10 + ((nybbles[2] + nybbles[3]*10)*75) + ((nybbles[4] + nybbles[5]*10)*75*60);
 

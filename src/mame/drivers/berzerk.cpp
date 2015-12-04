@@ -441,7 +441,7 @@ READ8_MEMBER(berzerk_state::intercept_v256_r)
 void berzerk_state::get_pens(rgb_t *pens)
 {
 	static const int resistances_wg[] = { 750, 0 };
-	static const int resistances_el[] = { 1.0 / ((1.0 / 750.0) + (1.0 / 360.0)), 0 };
+	static const int resistances_el[] = { static_cast<int>(1.0 / ((1.0 / 750.0) + (1.0 / 360.0))), 0 };
 
 	int color;
 	double color_weights[2];

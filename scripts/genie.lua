@@ -974,7 +974,7 @@ end
 				"-Wno-tautological-compare",
 				"-Wno-dynamic-class-memaccess",
 				"-Wno-unused-value",
-				"-Wno-c++11-narrowing",
+--				"-Wno-c++11-narrowing",
 				"-Wno-inline-new-delete",
 				"-Wno-constant-logical-operand",
 				"-Wno-deprecated-register",
@@ -997,9 +997,9 @@ end
 				os.exit(-1)
 			end
 				buildoptions {
-					"-Wno-unused-result",
-					"-Wno-narrowing",
-					"-Wno-attributes",
+--					"-Wno-unused-result",
+--					"-Wno-narrowing",
+--					"-Wno-attributes",
 					-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
 					"-Wno-array-bounds",
 				}

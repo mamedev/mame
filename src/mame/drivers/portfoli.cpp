@@ -215,12 +215,12 @@ void portfolio_state::scan_keyboard()
 {
 	UINT8 keycode = 0xff;
 
-	UINT8 keydata[8] = { m_y0->read(), m_y1->read(), m_y2->read(), m_y3->read(),
+	UINT32 keydata[8] = { m_y0->read(), m_y1->read(), m_y2->read(), m_y3->read(),
 							m_y4->read(), m_y5->read(), m_y6->read(), m_y7->read() };
 
 	for (int row = 0; row < 8; row++)
 	{
-		UINT8 data = keydata[row];
+		UINT8 data = static_cast<int>(keydata[row]);
 
 		if (data != 0xff)
 		{

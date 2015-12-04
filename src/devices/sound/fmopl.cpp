@@ -344,48 +344,48 @@ static const int slot_array[32]=
 /* table is 3dB/octave , DV converts this into 6dB/octave */
 /* 0.1875 is bit 0 weight of the envelope counter (volume) expressed in the 'decibel' scale */
 #define DV (0.1875/2.0)
-static const UINT32 ksl_tab[8*16]=
+static const double ksl_tab[8*16]=
 {
 	/* OCT 0 */
-		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV),
-		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV),
-		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV),
-		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV),
+		0.000/DV, 0.000/DV, 0.000/DV, 0.000/DV,
+		0.000/DV, 0.000/DV, 0.000/DV, 0.000/DV,
+		0.000/DV, 0.000/DV, 0.000/DV, 0.000/DV,
+		0.000/DV, 0.000/DV, 0.000/DV, 0.000/DV,
 	/* OCT 1 */
-		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV),
-		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV),
-		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.750/DV), static_cast<UINT32>(1.125/DV), static_cast<UINT32>(1.500/DV),
-		static_cast<UINT32>(1.875/DV), static_cast<UINT32>(2.250/DV), static_cast<UINT32>(2.625/DV), static_cast<UINT32>(3.000/DV),
+		0.000/DV, 0.000/DV, 0.000/DV, 0.000/DV,
+		0.000/DV, 0.000/DV, 0.000/DV, 0.000/DV,
+		0.000/DV, 0.750/DV, 1.125/DV, 1.500/DV,
+		1.875/DV, 2.250/DV, 2.625/DV, 3.000/DV,
 	/* OCT 2 */
-		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV),
-		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(1.125/DV), static_cast<UINT32>(1.875/DV), static_cast<UINT32>(2.625/DV),
-		static_cast<UINT32>(3.000/DV), static_cast<UINT32>(3.750/DV), static_cast<UINT32>(4.125/DV), static_cast<UINT32>(4.500/DV),
-		static_cast<UINT32>(4.875/DV), static_cast<UINT32>(5.250/DV), static_cast<UINT32>(5.625/DV), static_cast<UINT32>(6.000/DV),
+		0.000/DV, 0.000/DV, 0.000/DV, 0.000/DV,
+		0.000/DV, 1.125/DV, 1.875/DV, 2.625/DV,
+		3.000/DV, 3.750/DV, 4.125/DV, 4.500/DV,
+		4.875/DV, 5.250/DV, 5.625/DV, 6.000/DV,
 	/* OCT 3 */
-		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(1.875/DV),
-		static_cast<UINT32>(3.000/DV), static_cast<UINT32>(4.125/DV), static_cast<UINT32>(4.875/DV), static_cast<UINT32>(5.625/DV),
-		static_cast<UINT32>(6.000/DV), static_cast<UINT32>(6.750/DV), static_cast<UINT32>(7.125/DV), static_cast<UINT32>(7.500/DV),
-		static_cast<UINT32>(7.875/DV), static_cast<UINT32>(8.250/DV), static_cast<UINT32>(8.625/DV), static_cast<UINT32>(9.000/DV),
+		0.000/DV, 0.000/DV, 0.000/DV, 1.875/DV,
+		3.000/DV, 4.125/DV, 4.875/DV, 5.625/DV,
+		6.000/DV, 6.750/DV, 7.125/DV, 7.500/DV,
+		7.875/DV, 8.250/DV, 8.625/DV, 9.000/DV,
 	/* OCT 4 */
-		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(3.000/DV), static_cast<UINT32>(4.875/DV),
-		static_cast<UINT32>(6.000/DV), static_cast<UINT32>(7.125/DV), static_cast<UINT32>(7.875/DV), static_cast<UINT32>(8.625/DV),
-		static_cast<UINT32>(9.000/DV), static_cast<UINT32>(9.750/DV), static_cast<UINT32>(10.125/DV),static_cast<UINT32>(10.500/DV),
-		static_cast<UINT32>(10.875/DV),static_cast<UINT32>(11.250/DV),static_cast<UINT32>(11.625/DV),static_cast<UINT32>(12.000/DV),
+		0.000/DV, 0.000/DV, 3.000/DV, 4.875/DV,
+		6.000/DV, 7.125/DV, 7.875/DV, 8.625/DV,
+		9.000/DV, 9.750/DV,10.125/DV,10.500/DV,
+		10.875/DV,11.250/DV,11.625/DV,12.000/DV,
 	/* OCT 5 */
-		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(3.000/DV), static_cast<UINT32>(6.000/DV), static_cast<UINT32>(7.875/DV),
-		static_cast<UINT32>(9.000/DV), static_cast<UINT32>(10.125/DV),static_cast<UINT32>(10.875/DV),static_cast<UINT32>(11.625/DV),
-		static_cast<UINT32>(12.000/DV),static_cast<UINT32>(12.750/DV),static_cast<UINT32>(13.125/DV),static_cast<UINT32>(13.500/DV),
-		static_cast<UINT32>(13.875/DV),static_cast<UINT32>(14.250/DV),static_cast<UINT32>(14.625/DV),static_cast<UINT32>(15.000/DV),
+		0.000/DV, 3.000/DV, 6.000/DV, 7.875/DV,
+		9.000/DV,10.125/DV,10.875/DV,11.625/DV,
+		12.000/DV,12.750/DV,13.125/DV,13.500/DV,
+		13.875/DV,14.250/DV,14.625/DV,15.000/DV,
 	/* OCT 6 */
-		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(6.000/DV), static_cast<UINT32>(9.000/DV), static_cast<UINT32>(10.875/DV),
-		static_cast<UINT32>(12.000/DV),static_cast<UINT32>(13.125/DV),static_cast<UINT32>(13.875/DV),static_cast<UINT32>(14.625/DV),
-		static_cast<UINT32>(15.000/DV),static_cast<UINT32>(15.750/DV),static_cast<UINT32>(16.125/DV),static_cast<UINT32>(16.500/DV),
-		static_cast<UINT32>(16.875/DV),static_cast<UINT32>(17.250/DV),static_cast<UINT32>(17.625/DV),static_cast<UINT32>(18.000/DV),
+		0.000/DV, 6.000/DV, 9.000/DV,10.875/DV,
+		12.000/DV,13.125/DV,13.875/DV,14.625/DV,
+		15.000/DV,15.750/DV,16.125/DV,16.500/DV,
+		16.875/DV,17.250/DV,17.625/DV,18.000/DV,
 	/* OCT 7 */
-		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(9.000/DV), static_cast<UINT32>(12.000/DV),static_cast<UINT32>(13.875/DV),
-		static_cast<UINT32>(15.000/DV),static_cast<UINT32>(16.125/DV),static_cast<UINT32>(16.875/DV),static_cast<UINT32>(17.625/DV),
-		static_cast<UINT32>(18.000/DV),static_cast<UINT32>(18.750/DV),static_cast<UINT32>(19.125/DV),static_cast<UINT32>(19.500/DV),
-		static_cast<UINT32>(19.875/DV),static_cast<UINT32>(20.250/DV),static_cast<UINT32>(20.625/DV),static_cast<UINT32>(21.000/DV)
+		0.000/DV, 9.000/DV,12.000/DV,13.875/DV,
+		15.000/DV,16.125/DV,16.875/DV,17.625/DV,
+		18.000/DV,18.750/DV,19.125/DV,19.500/DV,
+		19.875/DV,20.250/DV,20.625/DV,21.000/DV
 };
 #undef DV
 
@@ -1299,7 +1299,7 @@ static void OPL_initalize(FM_OPL *OPL)
 		logerror("FMOPL.C: ksl_tab[oct=%2i] =",i);
 		for (j=0; j<16; j++)
 		{
-			logerror("%08x ", ksl_tab[i*16+j] );
+			logerror("%08x ", static_cast<UINT32>(ksl_tab[i*16+j]) );
 		}
 		logerror("\n");
 	}
@@ -1674,7 +1674,7 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
 
 			CH->block_fnum = block_fnum;
 
-			CH->ksl_base = ksl_tab[block_fnum>>6];
+			CH->ksl_base = static_cast<UINT32>(ksl_tab[block_fnum>>6]);
 			CH->fc       = OPL->fn_tab[block_fnum&0x03ff] >> (7-block);
 
 			/* BLK 2,1,0 bits -> bits 3,2,1 of kcode */
@@ -1824,7 +1824,7 @@ static void OPL_postload(FM_OPL *OPL)
 
 		/* Look up key scale level */
 		UINT32 block_fnum = CH->block_fnum;
-		CH->ksl_base = ksl_tab[block_fnum >> 6];
+		CH->ksl_base = static_cast<UINT32>(ksl_tab[block_fnum >> 6]);
 		CH->fc       = OPL->fn_tab[block_fnum & 0x03ff] >> (7 - (block_fnum >> 10));
 
 		for( slot=0 ; slot < 2 ; slot++ )
