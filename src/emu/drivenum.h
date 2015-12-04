@@ -119,12 +119,15 @@ private:
 	// internal helpers
 	void release_current() const;
 
+	static const int CONFIG_CACHE_COUNT = 100;
+	
 	// internal state
 	int                 m_current;
 	int                 m_filtered_count;
 	emu_options &       m_options;
 	std::vector<UINT8> m_included;
 	mutable std::vector<std::unique_ptr<machine_config>> m_config;
+	mutable std::vector<int> m_config_cache;
 };
 
 #endif

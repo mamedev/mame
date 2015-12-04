@@ -189,7 +189,15 @@ machine_config &driver_enumerator::config(int index, emu_options &options) const
 	// if we don't have it cached, add it
 	if (m_config[index] == nullptr)
 	{
+		// if our cache is full, release the head entry
+		if (m_config_cache.size() == CONFIG_CACHE_COUNT)
+		{
+			int first = m_config_cache.front();
+			m_config[first] = nullptr;
+			m_config_cache.erase(m_config_cache.begin());
+		}
 		m_config[index] = std::make_unique<machine_config>(*s_drivers_sorted[index], options);
+		m_config_cache.push_back(index);
 	}
 	return *m_config[index];
 }
