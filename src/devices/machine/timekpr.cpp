@@ -215,7 +215,7 @@ void timekeeper_device::device_start()
 	system_time systime;
 
 	/* validate some basic stuff */
-	assert(this != NULL);
+	assert(this != nullptr);
 
 	machine().base_datetime(systime);
 
@@ -398,7 +398,7 @@ READ8_MEMBER( timekeeper_device::read )
 
 void timekeeper_device::nvram_default()
 {
-	if( m_default_data != NULL )
+	if( m_default_data != nullptr )
 	{
 		memcpy( &m_data[0], m_default_data, m_size );
 	}

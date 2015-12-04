@@ -374,7 +374,7 @@ void poly_free(legacy_poly_manager *poly)
 #endif
 
 	/* free the work queue */
-	if (poly->queue != NULL)
+	if (poly->queue != nullptr)
 		osd_work_queue_free(poly->queue);
 }
 
@@ -398,7 +398,7 @@ void poly_wait(legacy_poly_manager *poly, const char *debug_reason)
 		time = get_profile_ticks();
 
 	/* wait for all pending work items to complete */
-	if (poly->queue != NULL)
+	if (poly->queue != nullptr)
 		osd_work_queue_wait(poly->queue, osd_ticks_per_second() * 100);
 
 	/* if we don't have a queue, just run the whole list now */
@@ -630,7 +630,7 @@ UINT32 poly_render_triangle(legacy_poly_manager *poly, void *dest, const rectang
 	}
 
 	/* enqueue the work items */
-	if (poly->queue != NULL)
+	if (poly->queue != nullptr)
 		osd_work_item_queue_multiple(poly->queue, poly_item_callback, poly->unit_next - startunit, poly->unit[startunit], poly->unit_size, WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	/* return the total number of pixels in the triangle */
@@ -738,7 +738,7 @@ UINT32 poly_render_triangle_custom(legacy_poly_manager *poly, void *dest, const 
 #endif
 
 	/* enqueue the work items */
-	if (poly->queue != NULL)
+	if (poly->queue != nullptr)
 		osd_work_item_queue_multiple(poly->queue, poly_item_callback, poly->unit_next - startunit, poly->unit[startunit], poly->unit_size, WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	/* return the total number of pixels in the object */
@@ -963,7 +963,7 @@ UINT32 poly_render_quad(legacy_poly_manager *poly, void *dest, const rectangle &
 #endif
 
 	/* enqueue the work items */
-	if (poly->queue != NULL)
+	if (poly->queue != nullptr)
 		osd_work_item_queue_multiple(poly->queue, poly_item_callback, poly->unit_next - startunit, poly->unit[startunit], poly->unit_size, WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	/* return the total number of pixels in the triangle */
@@ -1195,7 +1195,7 @@ UINT32 poly_render_polygon(legacy_poly_manager *poly, void *dest, const rectangl
 #endif
 
 	/* enqueue the work items */
-	if (poly->queue != NULL)
+	if (poly->queue != nullptr)
 		osd_work_item_queue_multiple(poly->queue, poly_item_callback, poly->unit_next - startunit, poly->unit[startunit], poly->unit_size, WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	/* return the total number of pixels in the triangle */
@@ -1258,7 +1258,7 @@ static void **allocate_array(running_machine &machine, size_t *itemsize, UINT32 
 
 	/* fail if 0 */
 	if (itemcount == 0)
-		return NULL;
+		return nullptr;
 
 	/* round to a cache line boundary */
 	*itemsize = ((*itemsize + CACHE_LINE_SIZE - 1) / CACHE_LINE_SIZE) * CACHE_LINE_SIZE;
@@ -1344,7 +1344,7 @@ static void *poly_item_callback(void *param, int threadid)
 			break;
 		param = polygon->poly->unit[orig_count_next];
 	}
-	return NULL;
+	return nullptr;
 }
 
 

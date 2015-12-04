@@ -213,7 +213,7 @@ static const description_t descriptions[144+3+1] =
 	{ "liim",   format_liim,/*ps_tms9940*/0 },  { "dca",    format_6,   /*ps_tms9940*/0 },
 	{ "dcs",    format_6,   /*ps_tms9940*/0 },
 
-	{ NULL,     illegal,    ps_any }
+	{ nullptr,     illegal,    ps_any }
 };
 
 
@@ -484,11 +484,11 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, 
 	format = descriptions[opc].format;
 
 	/* bl and blwp instructions are subroutines */
-	if (mnemonic != NULL && mnemonic[0] == 'b' && mnemonic[1] == 'l')
+	if (mnemonic != nullptr && mnemonic[0] == 'b' && mnemonic[1] == 'l')
 		dasmflags = DASMFLAG_STEP_OVER;
 
 	/* b *r11 and rtwp are returns */
-	else if (opc == 0x045b || (mnemonic != NULL && strcmp(mnemonic, "rtwp") == 0))
+	else if (opc == 0x045b || (mnemonic != nullptr && strcmp(mnemonic, "rtwp") == 0))
 		dasmflags = DASMFLAG_STEP_OUT;
 
 	switch (format)

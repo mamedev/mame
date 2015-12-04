@@ -73,7 +73,7 @@ qsound_device::qsound_device(const machine_config &mconfig, const char *tag, dev
 		m_cpu(*this, "qsound"),
 		m_sample_rom(*this, DEVICE_SELF),
 		m_data(0),
-		m_stream(NULL)
+		m_stream(nullptr)
 {
 }
 

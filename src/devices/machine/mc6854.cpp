@@ -183,7 +183,7 @@ mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, dev
 	m_dcd(0),
 	m_tstate(0),
 	m_tones(0),
-	m_ttimer(NULL),
+	m_ttimer(nullptr),
 	m_rstate(0),
 	m_rreg(0),
 	m_rones(0),

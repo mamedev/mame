@@ -58,7 +58,7 @@ v25_common_device::v25_common_device(const machine_config &mconfig, device_type 
 	, m_prefetch_size(prefetch_size)
 	, m_prefetch_cycles(prefetch_cycles)
 	, m_chip_type(chip_type)
-	, m_v25v35_decryptiontable(NULL)
+	, m_v25v35_decryptiontable(nullptr)
 {
 }
 

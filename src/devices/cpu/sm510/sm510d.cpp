@@ -169,7 +169,7 @@ static const UINT8 sm510_mnemonic[0x100] =
 
 CPU_DISASSEMBLE(sm510)
 {
-	return sm510_common_disasm(sm510_mnemonic, NULL, buffer, pc, oprom, opram);
+	return sm510_common_disasm(sm510_mnemonic, nullptr, buffer, pc, oprom, opram);
 }
 
 

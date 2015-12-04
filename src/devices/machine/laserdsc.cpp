@@ -64,7 +64,7 @@ laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type ty
 		m_overwidth(0),
 		m_overheight(0),
 		m_overclip(0, -1, 0, -1),
-		m_disc(NULL),
+		m_disc(nullptr),
 		m_width(0),
 		m_height(0),
 		m_fps_times_1million(0),
@@ -80,18 +80,18 @@ laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type ty
 		m_attospertrack(0),
 		m_sliderupdate(attotime::zero),
 		m_videoindex(0),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_audiobufsize(0),
 		m_audiobufin(0),
 		m_audiobufout(0),
 		m_audiocursamples(0),
 		m_audiomaxsamples(0),
 		m_videoenable(false),
-		m_videotex(NULL),
-		m_videopalette(NULL),
+		m_videotex(nullptr),
+		m_videopalette(nullptr),
 		m_overenable(false),
 		m_overindex(0),
-		m_overtex(NULL),
+		m_overtex(nullptr),
 		m_overlay_palette(*this)
 {
 	// initialize overlay_config
@@ -312,7 +312,7 @@ void laserdisc_device::static_set_overlay_palette(device_t &device, const char *
 void laserdisc_device::device_start()
 {
 	// if we have a palette and it's not started, wait for it
-	if (m_overlay_palette != NULL && !m_overlay_palette->started())
+	if (m_overlay_palette != nullptr && !m_overlay_palette->started())
 		throw device_missing_dependencies();
 
 	// initialize the various pieces
@@ -332,15 +332,15 @@ void laserdisc_device::device_start()
 void laserdisc_device::device_stop()
 {
 	// make sure all async operations have completed
-	if (m_disc != NULL)
+	if (m_disc != nullptr)
 		osd_work_queue_wait(m_work_queue, osd_ticks_per_second() * 10);
 
 	// free any textures and palettes
-	if (m_videotex != NULL)
+	if (m_videotex != nullptr)
 		machine().render().texture_free(m_videotex);
-	if (m_videopalette != NULL)
+	if (m_videopalette != nullptr)
 		m_videopalette->deref();
-	if (m_overtex != NULL)
+	if (m_overtex != nullptr)
 		machine().render().texture_free(m_overtex);
 }
 
@@ -372,7 +372,7 @@ void laserdisc_device::device_reset()
 void laserdisc_device::device_validity_check(validity_checker &valid) const
 {
 	texture_format texformat = !m_overupdate_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
-	if (m_overlay_palette == NULL && texformat == TEXFORMAT_PALETTE16)
+	if (m_overlay_palette == nullptr && texformat == TEXFORMAT_PALETTE16)
 		osd_printf_error("Overlay screen does not have palette defined\n");
 }
 
@@ -748,7 +748,7 @@ void laserdisc_device::init_disc()
 	// get the disc metadata and extract the ld
 	m_chdtracks = 0;
 	m_maxtrack = VIRTUAL_LEAD_IN_TRACKS + MAX_TOTAL_TRACKS + VIRTUAL_LEAD_OUT_TRACKS;
-	if (m_disc != NULL)
+	if (m_disc != nullptr)
 	{
 		// require the A/V codec and nothing else
 		if (m_disc->compression(0) != CHD_CODEC_AVHUFF || m_disc->compression(1) != CHD_CODEC_NONE)
@@ -796,7 +796,7 @@ void laserdisc_device::init_video()
 
 	// allocate palette for applying brightness/contrast/gamma
 	m_videopalette = palette_t::alloc(256);
-	if (m_videopalette == NULL)
+	if (m_videopalette == nullptr)
 		throw emu_fatalerror("Out of memory allocating video palette");
 	for (int index = 0; index < 256; index++)
 		m_videopalette->entry_set_color(index, rgb_t(index, index, index));
@@ -826,7 +826,7 @@ void laserdisc_device::init_video()
 	// allocate texture for rendering
 	m_videoenable = true;
 	m_videotex = machine().render().texture_alloc();
-	if (m_videotex == NULL)
+	if (m_videotex == nullptr)
 		fatalerror("Out of memory allocating video texture\n");
 
 	// allocate overlay
@@ -852,7 +852,7 @@ void laserdisc_device::init_video()
 
 		// allocate overlay texture
 		m_overtex = machine().render().texture_alloc();
-		if (m_overtex == NULL)
+		if (m_overtex == nullptr)
 			fatalerror("Out of memory allocating overlay texture\n");
 	}
 }
@@ -994,7 +994,7 @@ void laserdisc_device::read_track_data()
 	// cheat and look up the metadata we are about to retrieve
 	vbi_metadata vbidata = { 0 };
 	if (!m_vbidata.empty())
-		vbi_metadata_unpack(&vbidata, NULL, &m_vbidata[readhunk * VBI_PACKED_BYTES]);
+		vbi_metadata_unpack(&vbidata, nullptr, &m_vbidata[readhunk * VBI_PACKED_BYTES]);
 
 	// if we're in the lead-in area, force the VBI data to be standard lead-in
 	if (m_curtrack - 1 < VIRTUAL_LEAD_IN_TRACKS)
@@ -1059,7 +1059,7 @@ void laserdisc_device::read_track_data()
 
 	// configure the codec and then read
 	m_readresult = CHDERR_FILE_NOT_FOUND;
-	if (m_disc != NULL && !m_videosquelch)
+	if (m_disc != nullptr && !m_videosquelch)
 	{
 		m_readresult = m_disc->codec_configure(CHD_CODEC_AVHUFF, AVHUFF_CODEC_DECOMPRESS_CONFIG, &m_avhuff_config);
 		if (m_readresult == CHDERR_NONE)
@@ -1080,8 +1080,8 @@ void laserdisc_device::read_track_data()
 void *laserdisc_device::read_async_static(void *param, int threadid)
 {
 	laserdisc_device &ld = *reinterpret_cast<laserdisc_device *>(param);
-	ld.m_readresult = ld.m_disc->read_hunk(ld.m_queued_hunknum, NULL);
-	return NULL;
+	ld.m_readresult = ld.m_disc->read_hunk(ld.m_queued_hunknum, nullptr);
+	return nullptr;
 }
 
 
@@ -1149,18 +1149,18 @@ void laserdisc_device::config_load(int config_type, xml_data_node *parentnode)
 		return;
 
 	// might not have any data
-	if (parentnode == NULL)
+	if (parentnode == nullptr)
 		return;
 
 	// iterate over overlay nodes
-	for (xml_data_node *ldnode = xml_get_sibling(parentnode->child, "device"); ldnode != NULL; ldnode = xml_get_sibling(ldnode->next, "device"))
+	for (xml_data_node *ldnode = xml_get_sibling(parentnode->child, "device"); ldnode != nullptr; ldnode = xml_get_sibling(ldnode->next, "device"))
 	{
 		const char *devtag = xml_get_attribute_string(ldnode, "tag", "");
 		if (strcmp(devtag, tag()) == 0)
 		{
 			// handle the overlay node
 			xml_data_node *overnode = xml_get_sibling(ldnode->child, "overlay");
-			if (overnode != NULL)
+			if (overnode != nullptr)
 			{
 				// fetch positioning controls
 				m_overposx = xml_get_attribute_float(overnode, "hoffset", m_overposx);
@@ -1185,16 +1185,16 @@ void laserdisc_device::config_save(int config_type, xml_data_node *parentnode)
 		return;
 
 	// create a node
-	xml_data_node *ldnode = xml_add_child(parentnode, "device", NULL);
-	if (ldnode != NULL)
+	xml_data_node *ldnode = xml_add_child(parentnode, "device", nullptr);
+	if (ldnode != nullptr)
 	{
 		// output the basics
 		xml_set_attribute(ldnode, "tag", tag());
 
 		// add an overlay node
-		xml_data_node *overnode = xml_add_child(ldnode, "overlay", NULL);
+		xml_data_node *overnode = xml_add_child(ldnode, "overlay", nullptr);
 		bool changed = false;
-		if (overnode != NULL)
+		if (overnode != nullptr)
 		{
 			// output the positioning controls
 			if (m_overposx != m_orig_config.m_overposx)

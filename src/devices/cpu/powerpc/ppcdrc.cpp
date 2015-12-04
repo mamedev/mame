@@ -106,7 +106,7 @@ extern offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op);
 
 inline void ppc_device::alloc_handle(drcuml_state *drcuml, code_handle **handleptr, const char *name)
 {
-	if (*handleptr == NULL)
+	if (*handleptr == nullptr)
 		*handleptr = drcuml->handle_alloc(name);
 }
 
@@ -324,21 +324,21 @@ void ppc_device::code_flush_cache()
 		/* add subroutines for memory accesses */
 		for (int mode = 0; mode < 8; mode++)
 		{
-			static_generate_memory_accessor(mode, 1, FALSE, FALSE, "read8",       m_read8[mode],       NULL);
-			static_generate_memory_accessor(mode, 1, TRUE,  FALSE, "write8",      m_write8[mode],      NULL);
-			static_generate_memory_accessor(mode, 2, FALSE, TRUE,  "read16mask",  m_read16mask[mode],  NULL);
+			static_generate_memory_accessor(mode, 1, FALSE, FALSE, "read8",       m_read8[mode],       nullptr);
+			static_generate_memory_accessor(mode, 1, TRUE,  FALSE, "write8",      m_write8[mode],      nullptr);
+			static_generate_memory_accessor(mode, 2, FALSE, TRUE,  "read16mask",  m_read16mask[mode],  nullptr);
 			static_generate_memory_accessor(mode, 2, FALSE, FALSE, "read16",      m_read16[mode],      m_read16mask[mode]);
-			static_generate_memory_accessor(mode, 2, TRUE,  TRUE,  "write16mask", m_write16mask[mode], NULL);
+			static_generate_memory_accessor(mode, 2, TRUE,  TRUE,  "write16mask", m_write16mask[mode], nullptr);
 			static_generate_memory_accessor(mode, 2, TRUE,  FALSE, "write16",     m_write16[mode],     m_write16mask[mode]);
-			static_generate_memory_accessor(mode, 4, FALSE, TRUE,  "read32mask",  m_read32mask[mode],  NULL);
-			static_generate_memory_accessor(mode, 4, FALSE, FALSE, "read32align", m_read32align[mode], NULL);
+			static_generate_memory_accessor(mode, 4, FALSE, TRUE,  "read32mask",  m_read32mask[mode],  nullptr);
+			static_generate_memory_accessor(mode, 4, FALSE, FALSE, "read32align", m_read32align[mode], nullptr);
 			static_generate_memory_accessor(mode, 4, FALSE, FALSE, "read32",      m_read32[mode],      m_read32mask[mode]);
-			static_generate_memory_accessor(mode, 4, TRUE,  TRUE,  "write32mask", m_write32mask[mode], NULL);
-			static_generate_memory_accessor(mode, 4, TRUE,  FALSE, "write32align",m_write32align[mode],NULL);
+			static_generate_memory_accessor(mode, 4, TRUE,  TRUE,  "write32mask", m_write32mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, TRUE,  FALSE, "write32align",m_write32align[mode],nullptr);
 			static_generate_memory_accessor(mode, 4, TRUE,  FALSE, "write32",     m_write32[mode],     m_write32mask[mode]);
-			static_generate_memory_accessor(mode, 8, FALSE, TRUE,  "read64mask",  m_read64mask[mode],  NULL);
+			static_generate_memory_accessor(mode, 8, FALSE, TRUE,  "read64mask",  m_read64mask[mode],  nullptr);
 			static_generate_memory_accessor(mode, 8, FALSE, FALSE, "read64",      m_read64[mode],      m_read64mask[mode]);
-			static_generate_memory_accessor(mode, 8, TRUE,  TRUE,  "write64mask", m_write64mask[mode], NULL);
+			static_generate_memory_accessor(mode, 8, TRUE,  TRUE,  "write64mask", m_write64mask[mode], nullptr);
 			static_generate_memory_accessor(mode, 8, TRUE,  FALSE, "write64",     m_write64[mode],     m_write64mask[mode]);
 			static_generate_lsw_entries(mode);
 			static_generate_stsw_entries(mode);
@@ -380,7 +380,7 @@ void ppc_device::code_compile_block(UINT8 mode, offs_t pc)
 			block = m_drcuml->begin_block(4096);
 
 			/* loop until we get through all instruction sequences */
-			for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next())
+			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
 			{
 				const opcode_desc *curdesc;
 				UINT32 nextpc;
@@ -390,10 +390,10 @@ void ppc_device::code_compile_block(UINT8 mode, offs_t pc)
 					block->append_comment("-------------------------");                         // comment
 
 				/* determine the last instruction in this sequence */
-				for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next())
+				for (seqlast = seqhead; seqlast != nullptr; seqlast = seqlast->next())
 					if (seqlast->flags & OPFLAG_END_SEQUENCE)
 						break;
-				assert(seqlast != NULL);
+				assert(seqlast != nullptr);
 
 				/* if we don't have a hash for this mode/pc, or if we are overriding all, add one */
 				if (override || !m_drcuml->hash_exists(mode, seqhead->pc))
@@ -417,7 +417,7 @@ void ppc_device::code_compile_block(UINT8 mode, offs_t pc)
 				}
 
 				/* validate this code block if we're not pointing into ROM */
-				if (m_program->get_write_ptr(seqhead->physpc) != NULL)
+				if (m_program->get_write_ptr(seqhead->physpc) != nullptr)
 					generate_checksum_block(block, &compiler, seqhead, seqlast);               // <checksum>
 
 				/* label this instruction, if it may be jumped to locally */
@@ -442,7 +442,7 @@ void ppc_device::code_compile_block(UINT8 mode, offs_t pc)
 				/* if the last instruction can change modes, use a variable mode; otherwise, assume the same mode */
 				if (seqlast->flags & OPFLAG_CAN_CHANGE_MODES)
 					UML_HASHJMP(block, mem(&m_core->mode), nextpc, *m_nocode);// hashjmp <mode>,nextpc,nocode
-				else if (seqlast->next() == NULL || seqlast->next()->pc != nextpc)
+				else if (seqlast->next() == nullptr || seqlast->next()->pc != nextpc)
 					UML_HASHJMP(block, m_core->mode, nextpc, *m_nocode);// hashjmp <mode>,nextpc,nocode
 			}
 
@@ -988,7 +988,7 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 	if (!ismasked && size != 1)
 	{
 		/* in little-endian mode, anything misaligned generates an exception */
-		if ((mode & MODE_LITTLE_ENDIAN) || masked == NULL || !(m_cap & PPCCAP_MISALIGNED))
+		if ((mode & MODE_LITTLE_ENDIAN) || masked == nullptr || !(m_cap & PPCCAP_MISALIGNED))
 		{
 			UML_TEST(block, I0, size - 1);                                      // test    i0,size-1
 			UML_JMPc(block, COND_NZ, alignex = label++);                                        // jmp     alignex,nz
@@ -1033,7 +1033,7 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		for (ramnum = 0; ramnum < PPC_MAX_FASTRAM; ramnum++)
-			if (m_fastram[ramnum].base != NULL && (!iswrite || !m_fastram[ramnum].readonly))
+			if (m_fastram[ramnum].base != nullptr && (!iswrite || !m_fastram[ramnum].readonly))
 			{
 				void *fastbase = (UINT8 *)m_fastram[ramnum].base - m_fastram[ramnum].start;
 				UINT32 skip = label++;
@@ -1591,7 +1591,7 @@ void ppc_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 		block->append_comment("[Validation for %08X]", seqhead->pc);                        // comment
 
 	/* loose verify or single instruction: just compare and fail */
-	if (!(m_drcoptions & PPCDRC_STRICT_VERIFY) || seqhead->next() == NULL)
+	if (!(m_drcoptions & PPCDRC_STRICT_VERIFY) || seqhead->next() == nullptr)
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
@@ -3797,7 +3797,7 @@ void ppc_device::log_register_list(drcuml_state *drcuml, const char *string, con
 		if (reglist[0] & REGFLAG_R(regnum))
 		{
 			drcuml->log_printf("%sr%d", (count++ == 0) ? "" : ",", regnum);
-			if (regnostarlist != NULL && !(regnostarlist[0] & REGFLAG_R(regnum)))
+			if (regnostarlist != nullptr && !(regnostarlist[0] & REGFLAG_R(regnum)))
 				drcuml->log_printf("*");
 		}
 
@@ -3805,17 +3805,17 @@ void ppc_device::log_register_list(drcuml_state *drcuml, const char *string, con
 		if (reglist[1] & REGFLAG_FR(regnum))
 		{
 			drcuml->log_printf("%sfr%d", (count++ == 0) ? "" : ",", regnum);
-			if (regnostarlist != NULL && !(regnostarlist[1] & REGFLAG_FR(regnum)))
+			if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_FR(regnum)))
 				drcuml->log_printf("*");
 		}
 
 	for (regnum = 0; regnum < 8; regnum++)
 		if (reglist[2] & REGFLAG_CR(regnum))
 		{
-			if ((reglist[2] & REGFLAG_CR(regnum)) == REGFLAG_CR(regnum) && (regnostarlist == NULL || (regnostarlist[2] & REGFLAG_CR(regnum)) == REGFLAG_CR(regnum)))
+			if ((reglist[2] & REGFLAG_CR(regnum)) == REGFLAG_CR(regnum) && (regnostarlist == nullptr || (regnostarlist[2] & REGFLAG_CR(regnum)) == REGFLAG_CR(regnum)))
 			{
 				drcuml->log_printf("%scr%d", (count++ == 0) ? "" : ",", regnum);
-				if (regnostarlist != NULL && !(regnostarlist[2] & REGFLAG_CR(regnum)))
+				if (regnostarlist != nullptr && !(regnostarlist[2] & REGFLAG_CR(regnum)))
 					drcuml->log_printf("*");
 			}
 			else
@@ -3824,7 +3824,7 @@ void ppc_device::log_register_list(drcuml_state *drcuml, const char *string, con
 					if (reglist[2] & REGFLAG_CR_BIT(regnum * 4 + crnum))
 					{
 						drcuml->log_printf("%scr%d[%s]", (count++ == 0) ? "" : ",", regnum, crtext[crnum]);
-						if (regnostarlist != NULL && !(regnostarlist[2] & REGFLAG_CR_BIT(regnum * 4 + crnum)))
+						if (regnostarlist != nullptr && !(regnostarlist[2] & REGFLAG_CR_BIT(regnum * 4 + crnum)))
 							drcuml->log_printf("*");
 					}
 			}
@@ -3833,37 +3833,37 @@ void ppc_device::log_register_list(drcuml_state *drcuml, const char *string, con
 	if (reglist[3] & REGFLAG_XER_CA)
 	{
 		drcuml->log_printf("%sxer_ca", (count++ == 0) ? "" : ",");
-		if (regnostarlist != NULL && !(regnostarlist[3] & REGFLAG_XER_CA))
+		if (regnostarlist != nullptr && !(regnostarlist[3] & REGFLAG_XER_CA))
 			drcuml->log_printf("*");
 	}
 	if (reglist[3] & REGFLAG_XER_OV)
 	{
 		drcuml->log_printf("%sxer_ov", (count++ == 0) ? "" : ",");
-		if (regnostarlist != NULL && !(regnostarlist[3] & REGFLAG_XER_OV))
+		if (regnostarlist != nullptr && !(regnostarlist[3] & REGFLAG_XER_OV))
 			drcuml->log_printf("*");
 	}
 	if (reglist[3] & REGFLAG_XER_SO)
 	{
 		drcuml->log_printf("%sxer_so", (count++ == 0) ? "" : ",");
-		if (regnostarlist != NULL && !(regnostarlist[3] & REGFLAG_XER_SO))
+		if (regnostarlist != nullptr && !(regnostarlist[3] & REGFLAG_XER_SO))
 			drcuml->log_printf("*");
 	}
 	if (reglist[3] & REGFLAG_XER_COUNT)
 	{
 		drcuml->log_printf("%sxer_count", (count++ == 0) ? "" : ",");
-		if (regnostarlist != NULL && !(regnostarlist[3] & REGFLAG_XER_COUNT))
+		if (regnostarlist != nullptr && !(regnostarlist[3] & REGFLAG_XER_COUNT))
 			drcuml->log_printf("*");
 	}
 	if (reglist[3] & REGFLAG_CTR)
 	{
 		drcuml->log_printf("%sctr", (count++ == 0) ? "" : ",");
-		if (regnostarlist != NULL && !(regnostarlist[3] & REGFLAG_CTR))
+		if (regnostarlist != nullptr && !(regnostarlist[3] & REGFLAG_CTR))
 			drcuml->log_printf("*");
 	}
 	if (reglist[3] & REGFLAG_LR)
 	{
 		drcuml->log_printf("%slr", (count++ == 0) ? "" : ",");
-		if (regnostarlist != NULL && !(regnostarlist[3] & REGFLAG_LR))
+		if (regnostarlist != nullptr && !(regnostarlist[3] & REGFLAG_LR))
 			drcuml->log_printf("*");
 	}
 
@@ -3871,7 +3871,7 @@ void ppc_device::log_register_list(drcuml_state *drcuml, const char *string, con
 		if (reglist[3] & REGFLAG_FPSCR(regnum))
 		{
 			drcuml->log_printf("%sfpscr%d", (count++ == 0) ? "" : ",", regnum);
-			if (regnostarlist != NULL && !(regnostarlist[3] & REGFLAG_FPSCR(regnum)))
+			if (regnostarlist != nullptr && !(regnostarlist[3] & REGFLAG_FPSCR(regnum)))
 				drcuml->log_printf("*");
 		}
 
@@ -3890,7 +3890,7 @@ void ppc_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *descli
 		drcuml->log_printf("\nDescriptor list @ %08X\n", desclist->pc);
 
 	/* output each descriptor */
-	for ( ; desclist != NULL; desclist = desclist->next())
+	for ( ; desclist != nullptr; desclist = desclist->next())
 	{
 		char buffer[100];
 
@@ -3908,12 +3908,12 @@ void ppc_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *descli
 		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer);
 
 		/* output register states */
-		log_register_list(drcuml, "use", desclist->regin, NULL);
+		log_register_list(drcuml, "use", desclist->regin, nullptr);
 		log_register_list(drcuml, "mod", desclist->regout, desclist->regreq);
 		drcuml->log_printf("\n");
 
 		/* if we have a delay slot, output it recursively */
-		if (desclist->delay.first() != NULL)
+		if (desclist->delay.first() != nullptr)
 			log_opcode_desc(drcuml, desclist->delay.first(), indent + 1);
 
 		/* at the end of a sequence add a dividing line */

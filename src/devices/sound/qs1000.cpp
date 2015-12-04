@@ -191,9 +191,9 @@ qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, dev
 		m_out_p2_cb(*this),
 		m_out_p3_cb(*this),
 		//m_serial_w_cb(*this),
-		m_space_config("samples", ENDIANNESS_LITTLE, 8, 24, 0, NULL),
-		m_stream(NULL),
-		m_direct(NULL),
+		m_space_config("samples", ENDIANNESS_LITTLE, 8, 24, 0, nullptr),
+		m_stream(nullptr),
+		m_direct(nullptr),
 		m_cpu(*this, "cpu")
 {
 	m_address_map[0] = *ADDRESS_MAP_NAME(qs1000);
@@ -206,7 +206,7 @@ qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 const rom_entry *qs1000_device::device_rom_region() const
 {
-	return m_external_rom ? NULL : ROM_NAME( qs1000 );
+	return m_external_rom ? nullptr : ROM_NAME( qs1000 );
 }
 
 
@@ -318,7 +318,7 @@ void qs1000_device::device_reset()
 //-------------------------------------------------
 const address_space_config *qs1000_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 

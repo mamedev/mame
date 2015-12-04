@@ -5235,7 +5235,7 @@ WRITE8_MEMBER(ati_vga_device::ati_port_ext_w)
 			if(data & 0x04)
 			{
 				eeprom_serial_93cxx_device* eep = subdevice<eeprom_serial_93cxx_device>("ati_eeprom");
-				if(eep != NULL)
+				if(eep != nullptr)
 				{
 					eep->di_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 					eep->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);

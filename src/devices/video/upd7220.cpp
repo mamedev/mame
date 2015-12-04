@@ -165,7 +165,7 @@ ROM_END
 
 const address_space_config *upd7220_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 
@@ -643,7 +643,7 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	m_disp(0),
 	m_gchr(0),
 	m_bitmap_mod(0),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, 0, NULL, *ADDRESS_MAP_NAME(upd7220_vram))
+	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, 0, nullptr, *ADDRESS_MAP_NAME(upd7220_vram))
 {
 	for (int i = 0; i < 16; i++)
 	{

@@ -46,7 +46,7 @@ enum Regs
 };
 
 static const char *const RegNames[]= {
-	0, "A", "XL", "XH", "X", "YL", "YH", "Y", "UL", "UH", "U", "P", "S"
+	nullptr, "A", "XL", "XH", "X", "YL", "YH", "Y", "UL", "UH", "U", "P", "S"
 };
 
 #if defined(SEC)
@@ -89,7 +89,7 @@ enum Ins
 };
 
 static const char *const InsNames[]={
-	"ILL", "ILL", 0, "NOP",
+	"ILL", "ILL", nullptr, "NOP",
 	"LDA", "STA", "LDI", "LDX", "STX",
 	"LDE", "SDE", "LIN", "SIN",
 	"TIN",

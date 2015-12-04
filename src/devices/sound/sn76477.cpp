@@ -199,9 +199,9 @@ sn76477_device::sn76477_device(const machine_config &mconfig, const char *tag, d
 		m_mixer_c(0),
 		m_envelope_1(0),
 		m_envelope_2(0),
-		m_channel(NULL),
+		m_channel(nullptr),
 		m_our_sample_rate(0),
-		m_file(NULL)
+		m_file(nullptr)
 {
 }
 

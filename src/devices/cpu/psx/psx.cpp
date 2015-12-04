@@ -745,7 +745,7 @@ static const struct
 	{ 0xc0, 0x1a, "sys_c0_1a()" },
 	{ 0xc0, 0x1b, "KernelRedirect(int flag)" },
 	{ 0xc0, 0x1c, "PatchA0Table()" },
-	{ 0x00, 0x00, NULL }
+	{ 0x00, 0x00, nullptr }
 };
 
 UINT32 psxcpu_device::log_bioscall_parameter( int parm )
@@ -878,17 +878,17 @@ void psxcpu_device::log_bioscall()
 			}
 		}
 
-		while( bioscalls[ bioscall ].prototype != NULL &&
+		while( bioscalls[ bioscall ].prototype != nullptr &&
 			( bioscalls[ bioscall ].address != address ||
 			bioscalls[ bioscall ].operation != operation ) )
 		{
 			bioscall++;
 		}
 
-		if( bioscalls[ bioscall ].prototype != NULL )
+		if( bioscalls[ bioscall ].prototype != nullptr )
 		{
 			const char *prototype = bioscalls[ bioscall ].prototype;
-			const char *parmstart = NULL;
+			const char *parmstart = nullptr;
 			int parm = 0;
 			int parmlen = -1;
 			int brackets = 0;
@@ -958,7 +958,7 @@ void psxcpu_device::log_bioscall()
 						if( parm > 0 )
 						{
 							UINT32 format = log_bioscall_parameter( parm - 1 );
-							const char *parmstr = NULL;
+							const char *parmstr = nullptr;
 							int percent = 0;
 
 							for( ;; )
@@ -1002,7 +1002,7 @@ void psxcpu_device::log_bioscall()
 									}
 								}
 
-								if( parmstr != NULL )
+								if( parmstr != nullptr )
 								{
 									if( parm > 0 )
 									{
@@ -1012,7 +1012,7 @@ void psxcpu_device::log_bioscall()
 
 									strcpy( &buf[ pos ], parmstr );
 									pos += strlen( parmstr );
-									parmstr = NULL;
+									parmstr = nullptr;
 
 									parm++;
 								}

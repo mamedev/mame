@@ -77,7 +77,7 @@ INLINE UINT32 epc(const opcode_desc *desc)
 
 INLINE void alloc_handle(drcuml_state *drcuml, code_handle **handleptr, const char *name)
 {
-	if (*handleptr == NULL)
+	if (*handleptr == nullptr)
 		*handleptr = drcuml->handle_alloc(name);
 }
 
@@ -371,7 +371,7 @@ void rsp_device::code_compile_block(offs_t pc)
 			block = drcuml->begin_block(4096);
 
 			/* loop until we get through all instruction sequences */
-			for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next())
+			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
 			{
 				const opcode_desc *curdesc;
 				UINT32 nextpc;
@@ -381,10 +381,10 @@ void rsp_device::code_compile_block(offs_t pc)
 					block->append_comment("-------------------------");                 // comment
 
 				/* determine the last instruction in this sequence */
-				for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next())
+				for (seqlast = seqhead; seqlast != nullptr; seqlast = seqlast->next())
 					if (seqlast->flags & OPFLAG_END_SEQUENCE)
 						break;
-				assert(seqlast != NULL);
+				assert(seqlast != nullptr);
 
 				/* if we don't have a hash for this mode/pc, or if we are overriding all, add one */
 				if (override || !drcuml->hash_exists(0, seqhead->pc))
@@ -408,7 +408,7 @@ void rsp_device::code_compile_block(offs_t pc)
 				}
 
 				/* validate this code block if we're not pointing into ROM */
-				if (m_program->get_write_ptr(seqhead->physpc) != NULL)
+				if (m_program->get_write_ptr(seqhead->physpc) != nullptr)
 					generate_checksum_block(block, &compiler, seqhead, seqlast);
 
 				/* label this instruction, if it may be jumped to locally */
@@ -431,7 +431,7 @@ void rsp_device::code_compile_block(offs_t pc)
 				generate_update_cycles(block, &compiler, nextpc, TRUE);            // <subtract cycles>
 
 				/* if the last instruction can change modes, use a variable mode; otherwise, assume the same mode */
-				if (seqlast->next() == NULL || seqlast->next()->pc != nextpc)
+				if (seqlast->next() == nullptr || seqlast->next()->pc != nextpc)
 					UML_HASHJMP(block, 0, nextpc, *m_nocode);          // hashjmp <mode>,nextpc,nocode
 			}
 
@@ -663,7 +663,7 @@ void rsp_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 		block->append_comment("[Validation for %08X]", seqhead->pc | 0x1000);       // comment
 	}
 	/* loose verify or single instruction: just compare and fail */
-	if (!(m_drcoptions & RSPDRC_STRICT_VERIFY) || seqhead->next() == NULL)
+	if (!(m_drcoptions & RSPDRC_STRICT_VERIFY) || seqhead->next() == nullptr)
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
@@ -671,10 +671,10 @@ void rsp_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 			void *base = m_direct->read_ptr(seqhead->physpc | 0x1000);
 			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                         // load    i0,base,0,dword
 
-			if (seqhead->delay.first() != NULL && seqhead->physpc != seqhead->delay.first()->physpc)
+			if (seqhead->delay.first() != nullptr && seqhead->physpc != seqhead->delay.first()->physpc)
 			{
 				base = m_direct->read_ptr(seqhead->delay.first()->physpc | 0x1000);
-				assert(base != NULL);
+				assert(base != nullptr);
 				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
 
@@ -697,15 +697,15 @@ void rsp_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				base = m_direct->read_ptr(curdesc->physpc | 0x1000);
-				assert(base != NULL);
+				assert(base != nullptr);
 				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                     // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
 
-				if (curdesc->delay.first() != NULL && (curdesc == seqlast || (curdesc->next() != NULL && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
+				if (curdesc->delay.first() != nullptr && (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
 					base = m_direct->read_ptr(curdesc->delay.first()->physpc | 0x1000);
-					assert(base != NULL);
+					assert(base != nullptr);
 					UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i1,base,dword
 					UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
 
@@ -819,7 +819,7 @@ void rsp_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_st
 	}
 
 	/* compile the delay slot using temporary compiler state */
-	assert(desc->delay.first() != NULL);
+	assert(desc->delay.first() != nullptr);
 	generate_sequence_instruction(block, &compiler_temp, desc->delay.first());     // <next instruction>
 
 	generate_branch(block, compiler, desc);

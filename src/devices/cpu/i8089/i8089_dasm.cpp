@@ -353,7 +353,7 @@ private:
 			{
 				offset();
 
-				i8089_instruction *tmp = new i8089_instruction(m_pc, m_oprom + m_pc);
+				auto tmp = new i8089_instruction(m_pc, m_oprom + m_pc);
 				m_pc += tmp->length();
 
 				if (m_w == 0)
@@ -439,7 +439,7 @@ const char *i8089_instruction::m_reg[] =
 
 CPU_DISASSEMBLE( i8089 )
 {
-	i8089_instruction *i = new i8089_instruction(pc, oprom);
+	auto i = new i8089_instruction(pc, oprom);
 	strcpy(buffer, i->buffer());
 	offs_t result = i->length() | i->flags();
 	delete(i);

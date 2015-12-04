@@ -98,7 +98,7 @@ void upd7227_device::device_reset()
 
 const address_space_config *upd7227_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 

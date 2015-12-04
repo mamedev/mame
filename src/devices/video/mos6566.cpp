@@ -248,7 +248,7 @@ const address_space_config *mos6566_device::memory_space_config(address_spacenum
 	{
 		case AS_0: return &m_videoram_space_config;
 		case AS_1: return &m_colorram_space_config;
-		default: return NULL;
+		default: return nullptr;
 	}
 }
 
@@ -585,8 +585,8 @@ mos6566_device::mos6566_device(const machine_config &mconfig, const char *tag, d
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_variant(TYPE_6566),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6566_videoram_map)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6566_colorram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(mos6566_videoram_map)),
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(mos6566_colorram_map)),
 		m_write_irq(*this),
 		m_write_ba(*this),
 		m_write_aec(*this),
@@ -602,8 +602,8 @@ mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, 
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_variant(variant),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6566_videoram_map)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6566_colorram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(mos6566_videoram_map)),
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(mos6566_colorram_map)),
 		m_write_irq(*this),
 		m_write_ba(*this),
 		m_write_aec(*this),

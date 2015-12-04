@@ -391,8 +391,8 @@ WRITE16_MEMBER( huc6261_device::write )
 void huc6261_device::device_start()
 {
 	/* Make sure we are supplied all our mandatory tags */
-	assert( m_huc6270_a_tag != NULL );
-	assert( m_huc6270_b_tag != NULL );
+	assert( m_huc6270_a_tag != nullptr );
+	assert( m_huc6270_b_tag != nullptr );
 
 	m_timer = timer_alloc();
 	m_huc6270_a = machine().device<huc6270_device>(m_huc6270_a_tag);
@@ -401,8 +401,8 @@ void huc6261_device::device_start()
 	m_bmp = auto_bitmap_rgb32_alloc( machine(), HUC6261_WPF, HUC6261_LPF );
 
 	/* We want to have valid devices */
-	assert( m_huc6270_a != NULL );
-	assert( m_huc6270_b != NULL );
+	assert( m_huc6270_a != nullptr );
+	assert( m_huc6270_b != nullptr );
 
 	save_item(NAME(m_last_h));
 	save_item(NAME(m_last_v));

@@ -86,7 +86,7 @@ public:
 	DECLARE_WRITE32_MEMBER( voodoo_w );
 
 	// access to legacy token
-	struct voodoo_state *token() const { assert(m_token != NULL); return m_token; }
+	struct voodoo_state *token() const { assert(m_token != nullptr); return m_token; }
 	void common_start_voodoo(UINT8 type);
 
 	UINT8               m_fbmem;

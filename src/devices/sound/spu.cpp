@@ -240,7 +240,7 @@ static const int filter_coef[5][2]=
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-reverb_params *spu_reverb_cfg=NULL;
+reverb_params *spu_reverb_cfg=nullptr;
 
 float spu_device::freq_multiplier=1.0f;
 
@@ -304,11 +304,11 @@ public:
 		:   invalid_start(0xffffffff),
 			invalid_end(0),
 			last_update_end(0xffffffff),
-			data(NULL),
+			data(nullptr),
 			ref_count(0),
 			valid(false),
 			is_loop(false),
-			loop_cache(NULL)
+			loop_cache(nullptr)
 	{
 	}
 
@@ -353,7 +353,7 @@ public:
 	sample_loop_cache *next;
 
 	sample_loop_cache()
-		:   next(NULL)
+		:   next(nullptr)
 	{
 		sample_cache::cache_size+=num_loop_cache_samples<<1;
 	}
@@ -378,14 +378,14 @@ struct spu_device::cache_pointer
 	sample_cache *cache;
 
 	cache_pointer()
-		: ptr(NULL),
-			cache(NULL)
+		: ptr(nullptr),
+			cache(nullptr)
 	{
 	}
 
 	cache_pointer(const cache_pointer &other)
-		: ptr(NULL),
-			cache(NULL)
+		: ptr(nullptr),
+			cache(nullptr)
 	{
 		operator =(other);
 	}
@@ -417,7 +417,7 @@ struct spu_device::cache_pointer
 		}
 	}
 
-	operator bool() const { return cache!=NULL; }
+	operator bool() const { return cache!=nullptr; }
 
 	bool is_valid() const { return ((cache) && (cache->is_valid_pointer(ptr))); }
 };
@@ -492,8 +492,8 @@ public:
 			in(0),
 			sector_size(_sector_size),
 			num_sectors(_num_sectors),
-			marker_head(NULL),
-			marker_tail(NULL)
+			marker_head(nullptr),
+			marker_tail(nullptr)
 	{
 		buffer_size=sector_size*num_sectors;
 		buffer.resize(buffer_size);
@@ -507,10 +507,10 @@ public:
 
 	unsigned char *add_sector(const unsigned int sector)
 	{
-		stream_marker *xam=new stream_marker;
+		auto xam=new stream_marker;
 		xam->sector=sector;
 		xam->offset=head;
-		xam->next=NULL;
+		xam->next=nullptr;
 		xam->prev=marker_tail;
 		if (marker_tail)
 		{
@@ -539,13 +539,13 @@ public:
 			stream_marker *xam=marker_tail;
 			head=xam->offset;
 			marker_tail=xam->prev;
-			if (marker_tail) marker_tail->next=NULL;
+			if (marker_tail) marker_tail->next=nullptr;
 			global_free(xam);
 		}
 
 		// Set marker head to NULL if the list is now empty
 
-		if (! marker_tail) marker_head=NULL;
+		if (! marker_tail) marker_head=nullptr;
 
 		// Adjust buffer size counter
 
@@ -566,7 +566,7 @@ public:
 			global_free(m);
 		}
 
-		marker_head=marker_tail=NULL;
+		marker_head=marker_tail=nullptr;
 		head=tail=in=0;
 	}
 
@@ -586,10 +586,10 @@ public:
 			stream_marker *xam=marker_head;
 			marker_head=xam->next;
 			global_free(xam);
-			if (marker_head) marker_head->prev=NULL;
+			if (marker_head) marker_head->prev=nullptr;
 		}
 
-		if (! marker_head) marker_head=marker_tail=NULL;
+		if (! marker_head) marker_head=marker_tail=nullptr;
 	}
 
 	unsigned int get_bytes_in() const { return in; }
@@ -645,7 +645,7 @@ signed short *spu_device::sample_cache::get_sample_pointer(const unsigned int ad
 		return data+(((addr-start)>>4)*28);
 	} else
 	{
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -828,9 +828,9 @@ void spu_device::cache_pointer::reset()
 {
 	if (cache)
 	{
-		ptr=NULL;
+		ptr=nullptr;
 		cache->remove_ref();
-		cache=NULL;
+		cache=nullptr;
 	}
 }
 
@@ -1017,7 +1017,7 @@ void spu_device::device_start()
 
 void spu_device::device_reset()
 {
-	cur_reverb_preset = NULL;
+	cur_reverb_preset = nullptr;
 	cur_frame_sample = 0;
 	cur_generate_sample = 0;
 
@@ -1117,7 +1117,7 @@ void spu_device::init_stream()
 void spu_device::kill_stream()
 {
 	global_free(rev);
-	rev=NULL;
+	rev=nullptr;
 }
 
 //
@@ -1310,7 +1310,7 @@ void spu_device::flush_cache(sample_cache *sc,
 													const unsigned int iend)
 {
 	for (unsigned int a=sc->start; a<sc->end; a+=16)
-		cache[a>>4]=NULL;
+		cache[a>>4]=nullptr;
 
 /*  log_static(log_spu,"cache_invalidate: %08x->%08x\n",
                                          sc->start,
@@ -1349,7 +1349,7 @@ spu_device::sample_cache *spu_device::get_sample_cache(const unsigned int addr)
 	sc=new sample_cache;
 	sc->valid=true;
 	sc->start=addr;
-	sc->loop=NULL;
+	sc->loop=nullptr;
 
 	adpcm_packet *ap=(adpcm_packet *)(spu_ram+sc->start);
 	unsigned int a;
@@ -1526,7 +1526,7 @@ spu_device::sample_loop_cache *spu_device::get_loop_cache(sample_cache *cache, c
 	{
 		// No loop cache exists for this address pair, create a new one
 
-		sample_loop_cache *lc=new sample_loop_cache;
+		auto lc=new sample_loop_cache;
 		lc->loopend=lpen;
 		lc->loopstart=lpst;
 		lpcache->add_loop_cache(lc);
@@ -1581,7 +1581,7 @@ void spu_device::update_voice_loop(const unsigned int v)
 	{
 		ra=spureg.voice[v].repaddr<<3;
 		ra=(ra+0xf)&~0xf;
-		const adpcm_packet *ap=ra?(adpcm_packet *)(spu_ram+ra):NULL;
+		const adpcm_packet *ap=ra?(adpcm_packet *)(spu_ram+ra):nullptr;
 
 		if (ap)
 		{
@@ -1681,7 +1681,7 @@ bool spu_device::process_voice(const unsigned int v,
 
 		if (ntoplay)
 		{
-			signed short *noisep=NULL;
+			signed short *noisep=nullptr;
 
 			if (fm)
 			{
@@ -2030,13 +2030,13 @@ void spu_device::generate_voice(const unsigned int v,
 			{
 				// Stitch samples, get the first sample of the next segment
 
-				signed short *nsp=NULL;
+				signed short *nsp=nullptr;
 
 				if (vi->inloopcache)
 				{
 					nsp=vi->play.ptr+(vi->loop_cache->len-vi->lcptr);
 					if (nsp>=vi->play.cache->dend)
-						nsp=NULL;
+						nsp=nullptr;
 				}
 
 				if (! nsp)
@@ -2540,7 +2540,7 @@ void spu_device::update_reverb()
 	{
 		cur_reverb_preset=find_reverb_preset((unsigned short *)&reg[0x1c0]);
 
-		if (cur_reverb_preset==NULL)
+		if (cur_reverb_preset==nullptr)
 		{
 //          printf("spu: reverb=unknown (reg 1c0 = %x)\n", reg[0x1c0]);
 		} else
@@ -2735,8 +2735,8 @@ void spu_device::process_until(const unsigned int tsample)
 														process_samples,
 														isreverb?reverbptr:outptr,
 														isnoise?noiseptr
-																:(isfm?fmptr:NULL),
-														isfmin?fmptr:NULL,
+																:(isfm?fmptr:nullptr),
+														isfmin?fmptr:nullptr,
 														&tleft))
 				{
 					spureg.chon&=~mask;

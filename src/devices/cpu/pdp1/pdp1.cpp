@@ -392,7 +392,7 @@ void pdp1_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const pdp1_reset_param_t *intf = reinterpret_cast<const pdp1_reset_param_t *>(static_config());
-	if (intf != NULL)
+	if (intf != nullptr)
 		*static_cast<pdp1_reset_param_t *>(this) = *intf;
 
 	// or initialize to defaults if none provided

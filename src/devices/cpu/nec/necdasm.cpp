@@ -1599,5 +1599,5 @@ int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const UINT8 *dec
 
 CPU_DISASSEMBLE( nec )
 {
-	return necv_dasm_one(buffer, pc, oprom, NULL);
+	return necv_dasm_one(buffer, pc, oprom, nullptr);
 }

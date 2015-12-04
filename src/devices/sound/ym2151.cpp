@@ -21,7 +21,7 @@
 #endif
 
 #define LOG_CYM_FILE 0
-static FILE * cymfile = NULL;
+static FILE * cymfile = nullptr;
 
 
 /* struct describing a single operator */
@@ -917,7 +917,7 @@ INLINE void set_connect(YM2151 *PSG, YM2151Operator *om1, int cha, int v)
 		/*    +----C1----+     */
 		/* M1-+-MEM---M2-+-OUT */
 		/*    +----C2----+     */
-		om1->connect = 0;   /* special mark */
+		om1->connect = nullptr;   /* special mark */
 		oc1->connect = &PSG->chanout[cha];
 		om2->connect = &PSG->chanout[cha];
 		om1->mem_connect = &PSG->m2;
@@ -1523,8 +1523,8 @@ void * ym2151_init(device_t *device, int clock, int rate)
 	PSG->clock = clock;
 	/*rate = clock/64;*/
 	PSG->sampfreq = rate ? rate : 44100;    /* avoid division by 0 in init_chip_tables() */
-	PSG->irqhandler = NULL;                 /* interrupt handler  */
-	PSG->porthandler = NULL;                /* port write handler */
+	PSG->irqhandler = nullptr;                 /* interrupt handler  */
+	PSG->porthandler = nullptr;                /* port write handler */
 	init_chip_tables( PSG );
 
 	PSG->lfo_timer_add = (1<<LFO_SH) * (clock/64.0) / PSG->sampfreq;
@@ -1566,7 +1566,7 @@ void ym2151_shutdown(void *_chip)
 
 	if (cymfile)
 		fclose (cymfile);
-	cymfile = NULL;
+	cymfile = nullptr;
 
 #ifdef SAVE_SAMPLE
 	fclose(sample[8]);

@@ -58,7 +58,7 @@ public:
 
 	// construction/destruction
 	m6800_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	m6800_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool has_io, int clock_divider, const m6800_cpu_device::op_func *insn, const UINT8 *cycles, address_map_constructor internal = NULL);
+	m6800_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool has_io, int clock_divider, const m6800_cpu_device::op_func *insn, const UINT8 *cycles, address_map_constructor internal = nullptr);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_out_sc2_func(device_t &device, _Object object) { return downcast<m6800_cpu_device &>(device).m_out_sc2_func.set_callback(object); }
@@ -433,7 +433,7 @@ class m6801_cpu_device : public m6800_cpu_device
 {
 public:
 	m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, const m6800_cpu_device::op_func *insn, const UINT8 *cycles, address_map_constructor internal = NULL);
+	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, const m6800_cpu_device::op_func *insn, const UINT8 *cycles, address_map_constructor internal = nullptr);
 
 	void m6801_clock_serial();
 

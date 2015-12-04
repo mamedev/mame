@@ -51,7 +51,7 @@ public:
 		, m_bu_bits(bu_bits)
 		, m_callstack_bits(callstack_bits)
 		, m_callstack_depth(callstack_depth)
-		, m_7seg_table(NULL)
+		, m_7seg_table(nullptr)
 		, m_read_k(*this)
 		, m_read_i(*this)
 		, m_read_d(*this)
@@ -83,7 +83,7 @@ protected:
 	virtual void execute_run();
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : NULL); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }

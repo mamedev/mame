@@ -26,7 +26,7 @@ void h8_timer8_channel_device::set_info(const char *intc, int _irq_ca, int _irq_
 	irq_ca = _irq_ca;
 	irq_cb = _irq_cb;
 	irq_v = _irq_v;
-	chain_tag = NULL;
+	chain_tag = nullptr;
 	chain_type = STOPPED;
 	has_adte = false;
 	has_ice = false;
@@ -179,7 +179,7 @@ void h8_timer8_channel_device::device_start()
 	if(chain_tag)
 		chained_timer = siblingdevice<h8_timer8_channel_device>(chain_tag);
 	else
-		chained_timer = NULL;
+		chained_timer = nullptr;
 }
 
 void h8_timer8_channel_device::device_reset()

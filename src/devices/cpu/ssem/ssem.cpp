@@ -140,7 +140,7 @@ const address_space_config *ssem_device::memory_space_config(address_spacenum sp
 	{
 		return &m_program_config;
 	}
-	return NULL;
+	return nullptr;
 }
 
 

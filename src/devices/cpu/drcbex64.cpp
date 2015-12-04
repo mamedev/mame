@@ -586,14 +586,14 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, U
 		m_hash(cache, modes, addrbits, ignorebits),
 		m_map(cache, 0),
 		m_labels(cache),
-		m_log(NULL),
+		m_log(nullptr),
 		m_sse41(false),
 		m_absmask32((UINT32 *)cache.alloc_near(16*2 + 15)),
-		m_absmask64(NULL),
+		m_absmask64(nullptr),
 		m_rbpvalue(cache.near() + 0x80),
-		m_entry(NULL),
-		m_exit(NULL),
-		m_nocode(NULL),
+		m_entry(nullptr),
+		m_exit(nullptr),
+		m_nocode(nullptr),
 		m_fixup_label(FUNC(drcbe_x64::fixup_label), this),
 		m_fixup_exception(FUNC(drcbe_x64::fixup_exception), this),
 		m_near(*(near_state *)cache.alloc_near(sizeof(m_near)))
@@ -667,7 +667,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, U
 drcbe_x64::~drcbe_x64()
 {
 	// free the log context
-	if (m_log != NULL)
+	if (m_log != nullptr)
 		x86log_free_context(m_log);
 }
 
@@ -679,12 +679,12 @@ drcbe_x64::~drcbe_x64()
 void drcbe_x64::reset()
 {
 	// output a note to the log
-	if (m_log != NULL)
+	if (m_log != nullptr)
 		x86log_printf(m_log, "\n\n===========\nCACHE RESET\n===========\n\n");
 
 	// generate a little bit of glue code to set up the environment
 	drccodeptr *cachetop = m_cache.begin_codegen(500);
-	if (cachetop == NULL)
+	if (cachetop == nullptr)
 		fatalerror("Out of cache space after a reset!\n");
 
 	x86code *dst = (x86code *)*cachetop;
@@ -718,7 +718,7 @@ void drcbe_x64::reset()
 	emit_mov_m64_r64(dst, MABS(&m_near.stacksave), REG_RSP);                            // mov   [stacksave],rsp
 	emit_stmxcsr_m32(dst, MABS(&m_near.ssemode));                                       // stmxcsr [ssemode]
 	emit_jmp_r64(dst, REG_PARAM2);                                                      // jmp   param2
-	if (m_log != NULL)
+	if (m_log != nullptr)
 		x86log_disasm_code_range(m_log, "entry_point", (x86code *)m_entry, dst);
 
 	// generate an exit point
@@ -735,13 +735,13 @@ void drcbe_x64::reset()
 	emit_pop_r64(dst, REG_RSI);                                                         // pop   rsi
 	emit_pop_r64(dst, REG_RBX);                                                         // pop   rbx
 	emit_ret(dst);                                                                      // ret
-	if (m_log != NULL)
+	if (m_log != nullptr)
 		x86log_disasm_code_range(m_log, "exit_point", m_exit, dst);
 
 	// generate a no code point
 	m_nocode = dst;
 	emit_ret(dst);                                                                      // ret
-	if (m_log != NULL)
+	if (m_log != nullptr)
 		x86log_disasm_code_range(m_log, "nocode", m_nocode, dst);
 
 	// finish up codegen
@@ -779,7 +779,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, UINT3
 
 	// begin codegen; fail if we can't
 	drccodeptr *cachetop = m_cache.begin_codegen(numinst * 8 * 4);
-	if (cachetop == NULL)
+	if (cachetop == nullptr)
 		block.abort();
 
 	// compute the base by aligning the cache top to a cache line (assumed to be 64 bytes)
@@ -788,14 +788,14 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, UINT3
 
 	// generate code
 	std::string tempstring;
-	const char *blockname = NULL;
+	const char *blockname = nullptr;
 	for (int inum = 0; inum < numinst; inum++)
 	{
 		const instruction &inst = instlist[inum];
 		assert(inst.opcode() < ARRAY_LENGTH(s_opcode_table));
 
 		// add a comment
-		if (m_log != NULL)
+		if (m_log != nullptr)
 		{
 			std::string dasm;
 			inst.disasm(dasm, &m_drcuml);
@@ -803,7 +803,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, UINT3
 		}
 
 		// extract a blockname
-		if (blockname == NULL)
+		if (blockname == nullptr)
 		{
 			if (inst.opcode() == OP_HANDLE)
 				blockname = inst.param(0).handle().string();
@@ -820,8 +820,8 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, UINT3
 	m_cache.end_codegen();
 
 	// log it
-	if (m_log != NULL)
-		x86log_disasm_code_range(m_log, (blockname == NULL) ? "Unknown block" : blockname, base, m_cache.top());
+	if (m_log != nullptr)
+		x86log_disasm_code_range(m_log, (blockname == nullptr) ? "Unknown block" : blockname, base, m_cache.top());
 
 	// tell all of our utility objects that the block is finished
 	m_hash.block_end(block);
@@ -2603,7 +2603,7 @@ void drcbe_x64::fixup_exception(drccodeptr *codeptr, void *param1, void *param2)
 	// push the original return address on the stack
 	emit_lea_r64_m64(dst, REG_RAX, MABS(src));                                          // lea   rax,[return]
 	emit_push_r64(dst, REG_RAX);                                                        // push  rax
-	if (*targetptr != NULL)
+	if (*targetptr != nullptr)
 		emit_jmp(dst, *targetptr);                                                      // jmp   *targetptr
 	else
 		emit_jmp_m64(dst, MABS(targetptr));                                             // jmp   [targetptr]
@@ -2767,7 +2767,7 @@ void drcbe_x64::op_debug(x86code *&dst, const instruction &inst)
 		// test and branch
 		emit_mov_r64_imm(dst, REG_RAX, (FPTR)&m_device.machine().debug_flags);          // mov   rax,&debug_flags
 		emit_test_m32_imm(dst, MBD(REG_RAX, 0), DEBUG_FLAG_CALL_HOOK);                  // test  [debug_flags],DEBUG_FLAG_CALL_HOOK
-		emit_link skip = { 0 };
+		emit_link skip = { nullptr };
 		emit_jcc_short_link(dst, x64emit::COND_Z, skip);                                // jz    skip
 
 		// push the parameter
@@ -2910,7 +2910,7 @@ void drcbe_x64::op_jmp(x86code *&dst, const instruction &inst)
 
 	// look up the jump target and jump there
 	x86code *jmptarget = (x86code *)m_labels.get_codeptr(labelp.label(), m_fixup_label, dst);
-	if (jmptarget == NULL)
+	if (jmptarget == nullptr)
 		jmptarget = dst + 0x7ffffff0;
 	if (inst.condition() == uml::COND_ALWAYS)
 		emit_jmp(dst, jmptarget);                                                       // jmp   target
@@ -2943,7 +2943,7 @@ void drcbe_x64::op_exh(x86code *&dst, const instruction &inst)
 	if (inst.condition() == uml::COND_ALWAYS)
 	{
 		emit_mov_m32_p32(dst, MABS(&m_state.exp), exp);                                 // mov   [exp],exp
-		if (*targetptr != NULL)
+		if (*targetptr != nullptr)
 			emit_call(dst, *targetptr);                                                 // call  *targetptr
 		else
 			emit_call_m64(dst, MABS(targetptr));                                        // call  [targetptr]
@@ -2977,12 +2977,12 @@ void drcbe_x64::op_callh(x86code *&dst, const instruction &inst)
 	drccodeptr *targetptr = handp.handle().codeptr_addr();
 
 	// skip if conditional
-	emit_link skip = { 0 };
+	emit_link skip = { nullptr };
 	if (inst.condition() != uml::COND_ALWAYS)
 		emit_jcc_short_link(dst, X86_NOT_CONDITION(inst.condition()), skip);            // jcc   skip
 
 	// jump through the handle; directly if a normal jump
-	if (*targetptr != NULL)
+	if (*targetptr != nullptr)
 		emit_call(dst, *targetptr);                                                     // call  *targetptr
 	else
 		emit_call_m64(dst, MABS(targetptr));                                            // call  [targetptr]
@@ -3006,7 +3006,7 @@ void drcbe_x64::op_ret(x86code *&dst, const instruction &inst)
 	assert(inst.numparams() == 0);
 
 	// skip if conditional
-	emit_link skip = { 0 };
+	emit_link skip = { nullptr };
 	if (inst.condition() != uml::COND_ALWAYS)
 		emit_jcc_short_link(dst, X86_NOT_CONDITION(inst.condition()), skip);            // jcc   skip
 
@@ -3037,7 +3037,7 @@ void drcbe_x64::op_callc(x86code *&dst, const instruction &inst)
 	be_parameter paramp(*this, inst.param(1), PTYPE_M);
 
 	// skip if conditional
-	emit_link skip = { 0 };
+	emit_link skip = { nullptr };
 	if (inst.condition() != uml::COND_ALWAYS)
 		emit_jcc_short_link(dst, X86_NOT_CONDITION(inst.condition()), skip);            // jcc   skip
 
@@ -4010,7 +4010,7 @@ void drcbe_x64::op_mov(x86code *&dst, const instruction &inst)
 	int dstreg = dstp.select_register(REG_EAX);
 
 	// always start with a jmp
-	emit_link skip = { 0 };
+	emit_link skip = { nullptr };
 	if (inst.condition() != uml::COND_ALWAYS)
 		emit_jcc_short_link(dst, X86_NOT_CONDITION(inst.condition()), skip);            // jcc   skip
 
@@ -4029,7 +4029,7 @@ void drcbe_x64::op_mov(x86code *&dst, const instruction &inst)
 		else if (inst.condition() != 0 && dstp.is_int_register() && srcp.is_memory())
 		{
 			dst = savedst;
-			skip.target = NULL;
+			skip.target = nullptr;
 			emit_cmovcc_r32_m32(dst, X86_CONDITION(inst.condition()), dstp.ireg(), MABS(srcp.memory()));
 																						// cmovcc dstp,[srcp]
 		}
@@ -4038,7 +4038,7 @@ void drcbe_x64::op_mov(x86code *&dst, const instruction &inst)
 		else if (inst.condition() != 0 && dstp.is_int_register() && srcp.is_int_register())
 		{
 			dst = savedst;
-			skip.target = NULL;
+			skip.target = nullptr;
 			emit_cmovcc_r32_r32(dst, X86_CONDITION(inst.condition()), dstp.ireg(), srcp.ireg());
 																						// cmovcc dstp,srcp
 		}
@@ -4066,7 +4066,7 @@ void drcbe_x64::op_mov(x86code *&dst, const instruction &inst)
 		else if (inst.condition() != 0 && dstp.is_int_register() && srcp.is_memory())
 		{
 			dst = savedst;
-			skip.target = NULL;
+			skip.target = nullptr;
 			emit_cmovcc_r64_m64(dst, X86_CONDITION(inst.condition()), dstp.ireg(), MABS(srcp.memory()));
 																						// cmovcc dstp,[srcp]
 		}
@@ -4075,7 +4075,7 @@ void drcbe_x64::op_mov(x86code *&dst, const instruction &inst)
 		else if (inst.condition() != 0 && dstp.is_int_register() && srcp.is_int_register())
 		{
 			dst = savedst;
-			skip.target = NULL;
+			skip.target = nullptr;
 			emit_cmovcc_r64_r64(dst, X86_CONDITION(inst.condition()), dstp.ireg(), srcp.ireg());
 																						// cmovcc dstp,srcp
 		}
@@ -4089,7 +4089,7 @@ void drcbe_x64::op_mov(x86code *&dst, const instruction &inst)
 	}
 
 	// resolve the jump
-	if (skip.target != NULL)
+	if (skip.target != nullptr)
 		resolve_link(dst, skip);
 }
 
@@ -5944,7 +5944,7 @@ void drcbe_x64::op_fmov(x86code *&dst, const instruction &inst)
 	int dstreg = dstp.select_register(REG_XMM0);
 
 	// always start with a jmp
-	emit_link skip = { 0 };
+	emit_link skip = { nullptr };
 	if (inst.condition() != uml::COND_ALWAYS)
 		emit_jcc_short_link(dst, X86_NOT_CONDITION(inst.condition()), skip);            // jcc   skip
 

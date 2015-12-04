@@ -22,7 +22,7 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
 		device_sound_interface(mconfig, *this), flags(0), ram(nullptr), reverb_pos(0), cur_ptr(0), cur_limit(0),
 	cur_zone(nullptr), rom(nullptr), rom_size(0), rom_mask(0), stream(nullptr), m_timer(nullptr), m_timer_state(0),
 		m_timer_handler(*this),
-		m_rgnoverride(NULL)
+		m_rgnoverride(nullptr)
 {
 }
 
@@ -311,7 +311,7 @@ void k054539_device::init_chip()
 	cur_ptr = 0;
 	memset(ram, 0, 0x4000);
 
-	memory_region *reg = (m_rgnoverride != NULL) ? owner()->memregion(m_rgnoverride) : region();
+	memory_region *reg = (m_rgnoverride != nullptr) ? owner()->memregion(m_rgnoverride) : region();
 	rom = reg->base();
 	rom_size = reg->bytes();
 	rom_mask = 0xffffffffU;

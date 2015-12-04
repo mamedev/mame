@@ -284,13 +284,13 @@ void z80ctc_device::interrupt_check()
 //-------------------------------------------------
 
 z80ctc_device::ctc_channel::ctc_channel()
-	: m_device(NULL),
+	: m_device(nullptr),
 		m_index(0),
 		m_mode(0),
 		m_tconst(0),
 		m_down(0),
 		m_extclk(0),
-		m_timer(NULL),
+		m_timer(nullptr),
 		m_int_state(0)
 {
 }
@@ -369,7 +369,7 @@ UINT8 z80ctc_device::ctc_channel::read()
 
 		VPRINTF_CHANNEL(("CTC clock %f\n",ATTOSECONDS_TO_HZ(period.attoseconds())));
 
-		if (m_timer != NULL)
+		if (m_timer != nullptr)
 			return ((int)(m_timer->remaining().as_double() / period.as_double()) + 1) & 0xff;
 		else
 			return 0;

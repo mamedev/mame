@@ -128,7 +128,7 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	screen_device &screen() const { assert(m_screen != NULL); return *m_screen; }
+	screen_device &screen() const { assert(m_screen != nullptr); return *m_screen; }
 
 	// synchronization
 	void wait(const char *debug_reason = "general");
@@ -288,8 +288,8 @@ private:
 template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(running_machine &machine, UINT8 flags)
 	: m_machine(machine),
-		m_screen(NULL),
-		m_queue(NULL),
+		m_screen(nullptr),
+		m_queue(nullptr),
 		m_polygon(machine, *this),
 		m_object(machine, *this),
 		m_unit(machine, *this),
@@ -316,7 +316,7 @@ template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(screen_device &screen, UINT8 flags)
 	: m_machine(screen.machine()),
 		m_screen(&screen),
-		m_queue(NULL),
+		m_queue(nullptr),
 		m_polygon(screen.machine(), *this),
 		m_object(screen.machine(), *this),
 		m_unit(screen.machine(), *this),
@@ -372,7 +372,7 @@ poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::~poly_manager()
 #endif
 
 	// free the work queue
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_queue_free(m_queue);
 }
 
@@ -435,7 +435,7 @@ void *poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::work_item_cal
 			break;
 		param = &polygon.m_owner->m_unit[orig_count_next];
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -453,7 +453,7 @@ void poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::wait(const cha
 		time = get_profile_ticks();
 
 	// wait for all pending work items to complete
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_queue_wait(m_queue, osd_ticks_per_second() * 100);
 
 	// if we don't have a queue, just run the whole list now
@@ -794,7 +794,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 			extent_t &extent = unit.extent[extnum];
 			extent.startx = istartx;
 			extent.stopx = istopx;
-			extent.userdata = NULL;
+			extent.userdata = nullptr;
 			pixels += istopx - istartx;
 
 			// fill in the parameters for the extent
@@ -808,7 +808,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 	}
 
 	// enqueue the work items
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_item_queue_multiple(m_queue, work_item_callback, m_unit.count() - startunit, &m_unit[startunit], m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	// return the total number of pixels in the triangle
@@ -924,7 +924,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 	}
 
 	// enqueue the work items
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_item_queue_multiple(m_queue, work_item_callback, m_unit.count() - startunit, &m_unit[startunit], m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	// return the total number of pixels in the object
@@ -1117,13 +1117,13 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 				istartx = istopx = 0;
 			extent.startx = istartx;
 			extent.stopx = istopx;
-			extent.userdata = NULL;
+			extent.userdata = nullptr;
 			pixels += istopx - istartx;
 		}
 	}
 
 	// enqueue the work items
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_item_queue_multiple(m_queue, work_item_callback, m_unit.count() - startunit, &m_unit[startunit], m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	// return the total number of pixels in the triangle

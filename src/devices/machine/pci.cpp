@@ -93,7 +93,7 @@ void pci_device::device_start()
 	bank_count = 0;
 	bank_reg_count = 0;
 
-	expansion_rom = 0;
+	expansion_rom = nullptr;
 	expansion_rom_size = 0;
 	expansion_rom_base = 0;
 }
@@ -411,7 +411,7 @@ READ8_MEMBER(pci_bridge_device::header_type_r)
 
 const address_space_config *pci_bridge_device::memory_space_config(address_spacenum spacenum) const
 {
-	return spacenum == AS_PROGRAM ? &configure_space_config : NULL;
+	return spacenum == AS_PROGRAM ? &configure_space_config : nullptr;
 }
 
 device_t *pci_bridge_device::bus_root()
@@ -432,14 +432,14 @@ void pci_bridge_device::device_start()
 	pci_device::device_start();
 
 	for(int i=0; i<32*8; i++)
-		sub_devices[i] = NULL;
+		sub_devices[i] = nullptr;
 
-	for(device_t *d = bus_root()->first_subdevice(); d != NULL; d = d->next()) {
+	for(device_t *d = bus_root()->first_subdevice(); d != nullptr; d = d->next()) {
 		const char *t = d->tag();
 		int l = strlen(t);
 		if(l <= 4 || t[l-5] != ':' || t[l-2] != '.')
 			continue;
-		int id = strtol(t+l-4, 0, 16);
+		int id = strtol(t+l-4, nullptr, 16);
 		int fct = t[l-1] - '0';
 		sub_devices[(id << 3) | fct] = downcast<pci_device *>(d);
 	}

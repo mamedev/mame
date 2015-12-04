@@ -60,7 +60,7 @@ class g65816_device : public cpu_device
 public:
 	// construction/destruction
 	g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	g65816_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal = NULL);
+	g65816_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal = nullptr);
 
 	void set_read_vector_callback(read8_delegate read_vector);
 
@@ -77,7 +77,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state);
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);

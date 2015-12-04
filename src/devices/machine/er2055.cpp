@@ -66,7 +66,7 @@ void er2055_device::device_start()
 
 const address_space_config *er2055_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 
@@ -82,7 +82,7 @@ void er2055_device::nvram_default()
 		m_addrspace[0]->write_byte(byte, 0xff);
 
 	// populate from a memory region if present
-	if (m_region != NULL)
+	if (m_region != nullptr)
 	{
 		if (m_region->bytes() != SIZE_DATA)
 			fatalerror("er2055 region '%s' wrong size (expected size = 0x40)\n", tag());

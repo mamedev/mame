@@ -161,7 +161,7 @@ static FILE *sample[1];
 #endif
 
 #define LOG_CYM_FILE 0
-static FILE * cymfile = NULL;
+static FILE * cymfile = nullptr;
 
 
 
@@ -1956,7 +1956,7 @@ static void OPLL_UnLockTable(void)
 
 	if (cymfile)
 		fclose (cymfile);
-	cymfile = NULL;
+	cymfile = nullptr;
 }
 
 static void OPLLResetChip(YM2413 *chip)
@@ -2005,7 +2005,7 @@ static YM2413 *OPLLCreate(device_t *device, int clock, int rate)
 {
 	YM2413 *chip;
 
-	if (OPLL_LockTable(device) == -1) return NULL;
+	if (OPLL_LockTable(device) == -1) return nullptr;
 
 	/* allocate memory block */
 	chip = auto_alloc_clear(device->machine(), YM2413);

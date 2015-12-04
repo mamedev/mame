@@ -51,7 +51,7 @@ const device_type I8089_CHANNEL = &device_creator<i8089_channel>;
 i8089_channel::i8089_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, I8089_CHANNEL, "Intel 8089 I/O Channel", tag, owner, clock, "i8089_channel", __FILE__),
 	m_write_sintr(*this),
-	m_iop(NULL),
+	m_iop(nullptr),
 	m_icount(0),
 	m_xfer_pending(false),
 	m_dma_value(0),

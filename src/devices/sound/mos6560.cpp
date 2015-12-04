@@ -670,7 +670,7 @@ void mos6560_device::sound_start()
 	}
 	else
 	{
-		m_tone = NULL;
+		m_tone = nullptr;
 	}
 }
 
@@ -694,8 +694,8 @@ mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, 
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_variant(variant),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6560_colorram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(mos6560_colorram_map)),
 		m_read_potx(*this),
 		m_read_poty(*this)
 {
@@ -707,8 +707,8 @@ mos6560_device::mos6560_device(const machine_config &mconfig, const char *tag, d
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_variant(TYPE_6560),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6560_colorram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(mos6560_colorram_map)),
 		m_read_potx(*this),
 		m_read_poty(*this)
 {
@@ -732,7 +732,7 @@ const address_space_config *mos6560_device::memory_space_config(address_spacenum
 	{
 		case AS_0: return &m_videoram_space_config;
 		case AS_1: return &m_colorram_space_config;
-		default: return NULL;
+		default: return nullptr;
 	}
 }
 

@@ -210,7 +210,7 @@ protected:
 
 		// artifacting config
 		void setup_config(device_t *device);
-		void poll_config(void) { m_artifacting = (m_config!=NULL) ? m_config->read() : 0; }
+		void poll_config(void) { m_artifacting = (m_config!=nullptr) ? m_config->read() : 0; }
 
 		// artifacting application
 		template<int xscale>

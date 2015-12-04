@@ -102,7 +102,7 @@ void ym3812_device::device_start()
 
 	/* stream system initialize */
 	m_chip = ym3812_init(this,clock(),rate);
-	assert_always(m_chip != NULL, "Error creating YM3812 chip");
+	assert_always(m_chip != nullptr, "Error creating YM3812 chip");
 
 	m_stream = machine().sound().stream_alloc(*this,0,1,rate);
 
@@ -155,8 +155,8 @@ const device_type YM3812 = &device_creator<ym3812_device>;
 ym3812_device::ym3812_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM3812, "YM3812", tag, owner, clock, "ym3812", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_stream(NULL),
-		m_chip(NULL),
+		m_stream(nullptr),
+		m_chip(nullptr),
 		m_irq_handler(*this)
 {
 }

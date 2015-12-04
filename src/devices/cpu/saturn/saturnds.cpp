@@ -37,7 +37,7 @@ static const char *const adr_b[]=
 { P, WP, XS, X, S, M, B, W };
 
 static const char *const adr_af[]=
-{ P, WP, XS, X, S, M, B, W, 0, 0, 0, 0, 0, 0, 0, A };
+{ P, WP, XS, X, S, M, B, W, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, A };
 
 static const char *const adr_a[]=
 	{ P, WP, XS, X, S, M, B, W };
@@ -590,7 +590,7 @@ static const char *field_2_string(int adr_enum)
 	case FieldW: return W;
 	case FieldA: return A;
 	}
-	return 0;
+	return nullptr;
 }
 
 static const OPCODE opcodes[][0x10]= {

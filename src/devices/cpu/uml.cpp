@@ -256,12 +256,12 @@ inline UINT64 rol64(UINT64 source, UINT8 count)
 uml::code_handle::code_handle(drcuml_state &drcuml, const char *name)
 	: m_code(reinterpret_cast<drccodeptr *>(drcuml.cache().alloc_near(sizeof(drccodeptr)))),
 		m_string(name),
-		m_next(NULL),
+		m_next(nullptr),
 		m_drcuml(drcuml)
 {
-	if (m_code == NULL)
+	if (m_code == nullptr)
 		throw std::bad_alloc();
-	*m_code = NULL;
+	*m_code = nullptr;
 }
 
 
@@ -271,7 +271,7 @@ uml::code_handle::code_handle(drcuml_state &drcuml, const char *name)
 
 void uml::code_handle::set_codeptr(drccodeptr code)
 {
-	assert(*m_code == NULL);
+	assert(*m_code == nullptr);
 	assert_in_cache(m_drcuml.cache(), code);
 	*m_code = code;
 }
@@ -972,7 +972,7 @@ const char *uml::instruction::disasm(std::string &buffer, drcuml_state *drcuml) 
 				UINT32 symoffset;
 
 				// symbol
-				if (drcuml != NULL && (symbol = drcuml->symbol_find(param.memory(), &symoffset)) != NULL)
+				if (drcuml != nullptr && (symbol = drcuml->symbol_find(param.memory(), &symoffset)) != nullptr)
 				{
 					if (symoffset == 0)
 						strcatprintf(buffer, "[%s]", symbol);
@@ -981,7 +981,7 @@ const char *uml::instruction::disasm(std::string &buffer, drcuml_state *drcuml) 
 				}
 
 				// cache memory
-				else if (drcuml != NULL && drcuml->cache().contains_pointer(param.memory()))
+				else if (drcuml != nullptr && drcuml->cache().contains_pointer(param.memory()))
 					strcatprintf(buffer, "[+$%X]", (UINT32)(FPTR)((drccodeptr)param.memory() - drcuml->cache().near()));
 
 				// general memory

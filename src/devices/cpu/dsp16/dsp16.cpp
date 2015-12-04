@@ -72,9 +72,9 @@ dsp16_device::dsp16_device(const machine_config &mconfig, const char *tag, devic
 		m_cacheEnd(CACHE_INVALID),
 		m_cacheRedoNextPC(CACHE_INVALID),
 		m_cacheIterations(0),
-		m_program(NULL),
-		m_data(NULL),
-		m_direct(NULL),
+		m_program(nullptr),
+		m_data(nullptr),
+		m_direct(nullptr),
 		m_icount(0)
 {
 	// Allocate & setup
@@ -205,7 +205,7 @@ const address_space_config *dsp16_device::memory_space_config(address_spacenum s
 {
 	return (spacenum == AS_PROGRAM) ? &m_program_config :
 			(spacenum == AS_DATA) ? &m_data_config :
-			NULL;
+			nullptr;
 }
 
 

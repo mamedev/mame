@@ -176,21 +176,21 @@ sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t 
 	, m_is_slave(0)
 	, m_cpu_type(CPU_TYPE_SH2)
 	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
-	, m_drcuml(NULL)
+	, m_drcuml(nullptr)
 //  , m_drcuml(*this, m_cache, 0, 1, 32, 1)
-	, m_drcfe(NULL)
+	, m_drcfe(nullptr)
 	, m_drcoptions(0)
-	, m_sh2_state(NULL)
-	, m_entry(NULL)
-	, m_read8(NULL)
-	, m_write8(NULL)
-	, m_read16(NULL)
-	, m_write16(NULL)
-	, m_read32(NULL)
-	, m_write32(NULL)
-	, m_interrupt(NULL)
-	, m_nocode(NULL)
-	, m_out_of_cycles(NULL)
+	, m_sh2_state(nullptr)
+	, m_entry(nullptr)
+	, m_read8(nullptr)
+	, m_write8(nullptr)
+	, m_read16(nullptr)
+	, m_write16(nullptr)
+	, m_read32(nullptr)
+	, m_write32(nullptr)
+	, m_interrupt(nullptr)
+	, m_nocode(nullptr)
+	, m_out_of_cycles(nullptr)
 	, m_debugger_temp(0)
 {
 	m_isdrc = (mconfig.options().drc() && !mconfig.m_force_no_drc) ? true : false;
@@ -214,21 +214,21 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 	, m_is_slave(0)
 	, m_cpu_type(cpu_type)
 	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
-	, m_drcuml(NULL)
+	, m_drcuml(nullptr)
 //  , m_drcuml(*this, m_cache, 0, 1, 32, 1)
-	, m_drcfe(NULL)
+	, m_drcfe(nullptr)
 	, m_drcoptions(0)
-	, m_sh2_state(NULL)
-	, m_entry(NULL)
-	, m_read8(NULL)
-	, m_write8(NULL)
-	, m_read16(NULL)
-	, m_write16(NULL)
-	, m_read32(NULL)
-	, m_write32(NULL)
-	, m_interrupt(NULL)
-	, m_nocode(NULL)
-	, m_out_of_cycles(NULL)
+	, m_sh2_state(nullptr)
+	, m_entry(nullptr)
+	, m_read8(nullptr)
+	, m_write8(nullptr)
+	, m_read16(nullptr)
+	, m_write16(nullptr)
+	, m_read32(nullptr)
+	, m_write32(nullptr)
+	, m_interrupt(nullptr)
+	, m_nocode(nullptr)
+	, m_out_of_cycles(nullptr)
 {
 	m_isdrc = (mconfig.options().drc() && !mconfig.m_force_no_drc) ? true : false;
 }
@@ -248,8 +248,8 @@ const address_space_config *sh2_device::memory_space_config(address_spacenum spa
 	switch(spacenum)
 	{
 	case AS_PROGRAM:           return &m_program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_program_config : NULL;
-	default:                   return NULL;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_program_config : nullptr;
+	default:                   return nullptr;
 	}
 }
 

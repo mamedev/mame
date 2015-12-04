@@ -90,13 +90,13 @@ okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, OKIM6295, "OKI6295", tag, owner, clock, "okim6295", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
-		m_space_config("samples", ENDIANNESS_LITTLE, 8, 18, 0, NULL, *ADDRESS_MAP_NAME(okim6295)),
+		m_space_config("samples", ENDIANNESS_LITTLE, 8, 18, 0, nullptr, *ADDRESS_MAP_NAME(okim6295)),
 		m_command(-1),
 		m_bank_installed(false),
 		m_bank_offs(0),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_pin7_state(0),
-		m_direct(NULL)
+		m_direct(nullptr)
 {
 }
 
@@ -185,7 +185,7 @@ void okim6295_device::device_clock_changed()
 
 const address_space_config *okim6295_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 

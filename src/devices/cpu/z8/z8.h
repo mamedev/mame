@@ -51,9 +51,9 @@ protected:
 			case AS_PROGRAM:   return &m_program_config;
 			case AS_DATA:      return &m_data_config;
 			case AS_IO:        return &m_io_config;
-			default:           return NULL;
+			default:           return nullptr;
 		}
-		return NULL;
+		return nullptr;
 	}
 
 	// device_state_interface overrides

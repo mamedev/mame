@@ -687,8 +687,8 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	int chan;
 
 	buf[0] = outputs[0];
-	buf[1] = NULL;
-	buf[2] = NULL;
+	buf[1] = nullptr;
+	buf[2] = nullptr;
 	if (m_streams == AY8910_NUM_CHANNELS)
 	{
 		buf[1] = outputs[1];
@@ -699,7 +699,7 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	if (!m_ready)
 	{
 		for (chan = 0; chan < AY8910_NUM_CHANNELS; chan++)
-			if (buf[chan] != NULL)
+			if (buf[chan] != nullptr)
 				memset(buf[chan], 0, samples * sizeof(*buf[chan]));
 	}
 
@@ -1131,7 +1131,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, dev
 		m_streams(3),
 		m_ioports(2),
 		m_ready(0),
-		m_channel(NULL),
+		m_channel(nullptr),
 		m_register_latch(0),
 		m_last_enable(0),
 		m_prescale_noise(0),
@@ -1173,7 +1173,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 		m_streams(streams),
 		m_ioports(ioports),
 		m_ready(0),
-		m_channel(NULL),
+		m_channel(nullptr),
 		m_register_latch(0),
 		m_last_enable(0),
 		m_prescale_noise(0),

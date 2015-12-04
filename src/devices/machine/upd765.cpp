@@ -153,12 +153,12 @@ void upd765_family_device::device_start()
 			floppy_connector *con = subdevice<floppy_connector>(name);
 			if(con) {
 				flopi[i].dev = con->get_device();
-				if (flopi[i].dev != NULL)
+				if (flopi[i].dev != nullptr)
 					flopi[i].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(upd765_family_device::index_callback), this));
 			} else
-				flopi[i].dev = NULL;
+				flopi[i].dev = nullptr;
 		} else
-			flopi[i].dev = NULL;
+			flopi[i].dev = nullptr;
 
 		flopi[i].main_state = IDLE;
 		flopi[i].sub_state = IDLE;
@@ -181,13 +181,13 @@ void upd765_family_device::device_start()
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
-	cur_live.fi = NULL;
+	cur_live.fi = nullptr;
 
 	if(ready_polled) {
 		poll_timer = timer_alloc(TIMER_DRIVE_READY_POLLING);
 		poll_timer->adjust(attotime::from_usec(100), 0, attotime::from_usec(1024));
 	} else
-		poll_timer = NULL;
+		poll_timer = nullptr;
 
 	cur_irq = false;
 	locked = false;
@@ -219,12 +219,12 @@ void upd765_family_device::soft_reset()
 	result_pos = 0;
 	if(!locked)
 		fifocfg = FIF_DIS;
-	cur_live.fi = 0;
+	cur_live.fi = nullptr;
 	drq = false;
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
-	cur_live.fi = NULL;
+	cur_live.fi = nullptr;
 	tc_done = false;
 	st1 = st2 = st3 = 0x00;
 
@@ -626,7 +626,7 @@ void upd765_family_device::live_sync()
 				cur_live.pll.stop_writing(cur_live.fi->dev, cur_live.tm);
 				cur_live.tm = attotime::never;
 				cur_live.fi->live = false;
-				cur_live.fi = 0;
+				cur_live.fi = nullptr;
 			}
 		}
 		cur_live.next_state = -1;
@@ -644,7 +644,7 @@ void upd765_family_device::live_abort()
 	if(cur_live.fi) {
 		cur_live.pll.stop_writing(cur_live.fi->dev, cur_live.tm);
 		cur_live.fi->live = false;
-		cur_live.fi = 0;
+		cur_live.fi = nullptr;
 	}
 
 	cur_live.tm = attotime::never;

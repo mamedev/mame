@@ -2165,7 +2165,7 @@ void i386_device::i386_cyrix_rsldt() // Opcode 0f 7b
 
 			memset(&seg, 0, sizeof(seg));
 			seg.selector = READ16(ea + 8);
-			i386_load_protected_mode_segment(&seg,NULL);
+			i386_load_protected_mode_segment(&seg,nullptr);
 			m_ldtr.limit = limit;
 			m_ldtr.base = base;
 			m_ldtr.flags = flags;
@@ -2870,7 +2870,7 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 				WRITE32(ea, m_mxcsr);
 				break;
 			case 7: // clflush m8
-				GetNonTranslatedEA(modm, NULL);
+				GetNonTranslatedEA(modm, nullptr);
 				break;
 			default:
 				report_invalid_modrm("sse_group_0fae", modm);

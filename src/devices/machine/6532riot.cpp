@@ -400,7 +400,7 @@ riot6532_device::riot6532_device(const machine_config &mconfig, const char *tag,
 		m_pa7prev(0),
 		m_timershift(0),
 		m_timerstate(0),
-		m_timer(NULL)
+		m_timer(nullptr)
 {
 	memset(m_port, 0x00, sizeof(m_port));
 }

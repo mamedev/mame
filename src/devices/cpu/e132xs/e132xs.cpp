@@ -1839,7 +1839,7 @@ const address_space_config *hyperstone_device::memory_space_config(address_space
 	{
 		return &m_io_config;
 	}
-	return NULL;
+	return nullptr;
 }
 
 

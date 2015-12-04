@@ -124,7 +124,7 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int
 		m_beintf(device.machine().options().drc_use_c() ?
 			*static_cast<drcbe_interface *>(auto_alloc(device.machine(), drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits))) :
 			*static_cast<drcbe_interface *>(auto_alloc(device.machine(), drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits)))),
-		m_umllog(NULL)
+		m_umllog(nullptr)
 {
 	// if we're to log, create the logfile
 	if (device.machine().options().drc_log_uml())
@@ -145,7 +145,7 @@ drcuml_state::~drcuml_state()
 	auto_free(m_device.machine(), &m_beintf);
 
 	// close any files
-	if (m_umllog != NULL)
+	if (m_umllog != nullptr)
 		fclose(m_umllog);
 }
 
@@ -164,8 +164,8 @@ void drcuml_state::reset()
 		m_cache.flush();
 
 		// reset all handle code pointers
-		for (code_handle *handle = m_handlelist.first(); handle != NULL; handle = handle->next())
-			*handle->m_code = NULL;
+		for (code_handle *handle = m_handlelist.first(); handle != nullptr; handle = handle->next())
+			*handle->m_code = nullptr;
 
 		// call the backend to reset
 		m_beintf.reset();
@@ -195,13 +195,13 @@ void drcuml_state::reset()
 drcuml_block *drcuml_state::begin_block(UINT32 maxinst)
 {
 	// find an inactive block that matches our qualifications
-	drcuml_block *bestblock = NULL;
-	for (drcuml_block *block = m_blocklist.first(); block != NULL; block = block->next())
-		if (!block->inuse() && block->maxinst() >= maxinst && (bestblock == NULL || block->maxinst() < bestblock->maxinst()))
+	drcuml_block *bestblock = nullptr;
+	for (drcuml_block *block = m_blocklist.first(); block != nullptr; block = block->next())
+		if (!block->inuse() && block->maxinst() >= maxinst && (bestblock == nullptr || block->maxinst() < bestblock->maxinst()))
 			bestblock = block;
 
 	// if we failed to find one, allocate a new one
-	if (bestblock == NULL)
+	if (bestblock == nullptr)
 		bestblock = &m_blocklist.append(*global_alloc(drcuml_block(*this, maxinst * 3/2)));
 
 	// start the block
@@ -243,21 +243,21 @@ const char *drcuml_state::symbol_find(void *base, UINT32 *offset)
 	drccodeptr search = drccodeptr(base);
 
 	// simple linear search
-	for (symbol *cursym = m_symlist.first(); cursym != NULL; cursym = cursym->next())
+	for (symbol *cursym = m_symlist.first(); cursym != nullptr; cursym = cursym->next())
 		if (search >= cursym->m_base && search < cursym->m_base + cursym->m_length)
 		{
 			// if no offset pointer, only match perfectly
-			if (offset == NULL && search != cursym->m_base)
+			if (offset == nullptr && search != cursym->m_base)
 				continue;
 
 			// return the offset and name
-			if (offset != NULL)
+			if (offset != nullptr)
 				*offset = search - cursym->m_base;
 			return cursym->m_name.c_str();
 		}
 
 	// not found; return NULL
-	return NULL;
+	return nullptr;
 }
 
 
@@ -269,7 +269,7 @@ const char *drcuml_state::symbol_find(void *base, UINT32 *offset)
 void drcuml_state::log_printf(const char *format, ...)
 {
 	// if we have a file, print to it
-	if (m_umllog != NULL)
+	if (m_umllog != nullptr)
 	{
 		va_list va;
 
@@ -293,7 +293,7 @@ void drcuml_state::log_printf(const char *format, ...)
 
 drcuml_block::drcuml_block(drcuml_state &drcuml, UINT32 maxinst)
 	: m_drcuml(drcuml),
-		m_next(NULL),
+		m_next(nullptr),
 		m_nextinst(0),
 		m_maxinst(maxinst * 3/2),
 		m_inst(m_maxinst),
@@ -394,7 +394,7 @@ void drcuml_block::append_comment(const char *format, ...)
 
 	// allocate space in the cache to hold the comment
 	char *comment = (char *)m_drcuml.cache().alloc_temporary(temp.length() + 1);
-	if (comment == NULL)
+	if (comment == nullptr)
 		return;
 	strcpy(comment, temp.c_str());
 
@@ -504,7 +504,7 @@ void drcuml_block::disassemble()
 			while (firstcomment <= instnum)
 			{
 				const char *text = get_comment_text(m_inst[firstcomment++], comment);
-				if (text != NULL)
+				if (text != nullptr)
 					m_drcuml.log_printf("\t%50s; %s\n", "", text);
 			}
 			firstcomment = -1;
@@ -533,7 +533,7 @@ const char *drcuml_block::get_comment_text(const instruction &inst, std::string 
 	}
 
 	// everything else is NULL
-	return NULL;
+	return nullptr;
 }
 
 

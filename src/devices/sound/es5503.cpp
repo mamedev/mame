@@ -61,7 +61,7 @@ es5503_device::es5503_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, ES5503, "Ensoniq ES5503", tag, owner, clock, "es5503", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
-		m_space_config("es5503_samples", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(es5503)),
+		m_space_config("es5503_samples", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(es5503)),
 		m_irq_func(*this),
 		m_adc_func(*this)
 {
@@ -74,7 +74,7 @@ es5503_device::es5503_device(const machine_config &mconfig, const char *tag, dev
 
 const address_space_config *es5503_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 //-------------------------------------------------
@@ -252,7 +252,7 @@ void es5503_device::device_start()
 	output_rate = (clock()/8)/34;   // (input clock / 8) / # of oscs. enabled + 2
 	m_stream = machine().sound().stream_alloc(*this, 0, output_channels, output_rate);
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(attotime::from_hz(output_rate), 0, attotime::from_hz(output_rate));
 }
 

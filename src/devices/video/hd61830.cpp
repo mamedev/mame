@@ -104,7 +104,7 @@ hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, d
 	m_cac(0),
 	m_blink(0),
 	m_cursor(0),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(hd61830)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(hd61830)),
 	m_char_rom(*this, "hd61830")
 {
 }
@@ -171,7 +171,7 @@ void hd61830_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 const address_space_config *hd61830_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 

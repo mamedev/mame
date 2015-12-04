@@ -37,7 +37,7 @@ drc_cache::drc_cache(size_t bytes)
 		m_base(m_near + NEAR_CACHE_SIZE),
 		m_top(m_base),
 		m_end(m_near + bytes),
-		m_codegen(0),
+		m_codegen(nullptr),
 		m_size(bytes)
 {
 	memset(m_free, 0, sizeof(m_free));
@@ -64,7 +64,7 @@ drc_cache::~drc_cache()
 void drc_cache::flush()
 {
 	// can't flush in the middle of codegen
-	assert(m_codegen == NULL);
+	assert(m_codegen == nullptr);
 
 	// just reset the top back to the base and re-seed
 	m_top = m_base;
@@ -85,7 +85,7 @@ void *drc_cache::alloc(size_t bytes)
 	{
 		free_link **linkptr = &m_free[(bytes + CACHE_ALIGNMENT - 1) / CACHE_ALIGNMENT];
 		free_link *link = *linkptr;
-		if (link != NULL)
+		if (link != nullptr)
 		{
 			*linkptr = link->m_next;
 			return link;
@@ -95,7 +95,7 @@ void *drc_cache::alloc(size_t bytes)
 	// if no space, we just fail
 	drccodeptr ptr = (drccodeptr)ALIGN_PTR_DOWN(m_end - bytes);
 	if (m_top > ptr)
-		return NULL;
+		return nullptr;
 
 	// otherwise update the end of the cache
 	m_end = ptr;
@@ -117,7 +117,7 @@ void *drc_cache::alloc_near(size_t bytes)
 	{
 		free_link **linkptr = &m_nearfree[(bytes + CACHE_ALIGNMENT - 1) / CACHE_ALIGNMENT];
 		free_link *link = *linkptr;
-		if (link != NULL)
+		if (link != nullptr)
 		{
 			*linkptr = link->m_next;
 			return link;
@@ -127,7 +127,7 @@ void *drc_cache::alloc_near(size_t bytes)
 	// if no space, we just fail
 	drccodeptr ptr = (drccodeptr)ALIGN_PTR_UP(m_neartop);
 	if (ptr + bytes > m_base)
-		return NULL;
+		return nullptr;
 
 	// otherwise update the top of the near part of the cache
 	m_neartop = ptr + bytes;
@@ -143,12 +143,12 @@ void *drc_cache::alloc_near(size_t bytes)
 void *drc_cache::alloc_temporary(size_t bytes)
 {
 	// can't allocate in the middle of codegen
-	assert(m_codegen == NULL);
+	assert(m_codegen == nullptr);
 
 	// if no space, we just fail
 	drccodeptr ptr = m_top;
 	if (ptr + bytes >= m_end)
-		return NULL;
+		return nullptr;
 
 	// otherwise, update the cache top
 	m_top = (drccodeptr)ALIGN_PTR_UP(ptr + bytes);
@@ -187,13 +187,13 @@ void drc_cache::dealloc(void *memory, size_t bytes)
 drccodeptr *drc_cache::begin_codegen(UINT32 reserve_bytes)
 {
 	// can't restart in the middle of codegen
-	assert(m_codegen == NULL);
-	assert(m_ooblist.first() == NULL);
+	assert(m_codegen == nullptr);
+	assert(m_ooblist.first() == nullptr);
 
 	// if still no space, we just fail
 	drccodeptr ptr = m_top;
 	if (ptr + reserve_bytes >= m_end)
-		return NULL;
+		return nullptr;
 
 	// otherwise, return a pointer to the cache top
 	m_codegen = m_top;
@@ -211,7 +211,7 @@ drccodeptr drc_cache::end_codegen()
 
 	// run the OOB handlers
 	oob_handler *oob;
-	while ((oob = m_ooblist.detach_head()) != NULL)
+	while ((oob = m_ooblist.detach_head()) != nullptr)
 	{
 		// call the callback
 		oob->m_callback(&m_top, oob->m_param1, oob->m_param2);
@@ -223,7 +223,7 @@ drccodeptr drc_cache::end_codegen()
 
 	// update the cache top
 	m_top = (drccodeptr)ALIGN_PTR_UP(m_top);
-	m_codegen = NULL;
+	m_codegen = nullptr;
 
 	return result;
 }
@@ -236,11 +236,11 @@ drccodeptr drc_cache::end_codegen()
 
 void drc_cache::request_oob_codegen(drc_oob_delegate callback, void *param1, void *param2)
 {
-	assert(m_codegen != NULL);
+	assert(m_codegen != nullptr);
 
 	// pull an item from the free list
 	oob_handler *oob = (oob_handler *)alloc(sizeof(*oob));
-	assert(oob != NULL);
+	assert(oob != nullptr);
 
 	// fill it in
 	oob->m_callback = callback;

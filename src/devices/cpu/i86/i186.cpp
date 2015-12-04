@@ -1071,10 +1071,10 @@ void i80186_cpu_device::inc_timer(int which)
 	if (t->control & 2)
 	{
 		if (t->count == (t->active_count ? t->maxB : t->maxA))
-			device_timer(*t->int_timer, which, which, NULL);
+			device_timer(*t->int_timer, which, which, nullptr);
 	}
 	else if (t->count == t->maxA)
-		device_timer(*t->int_timer, which, which, NULL);
+		device_timer(*t->int_timer, which, which, nullptr);
 }
 
 void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_maxA, int new_maxB, int new_control)

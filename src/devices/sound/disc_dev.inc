@@ -109,7 +109,7 @@ DISCRETE_STEP(dsd_555_astbl)
 	}
 
 	/* get the v_charge and update each step if it is a node */
-	if (m_v_charge_node != NULL)
+	if (m_v_charge_node != nullptr)
 	{
 		v_charge = *m_v_charge_node;
 		if (info->options & DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE) v_charge -= 0.5;
@@ -296,7 +296,7 @@ DISCRETE_RESET(dsd_555_astbl)
 
 	/* setup v_charge or node */
 	m_v_charge_node = m_device->node_output_ptr(info->v_charge);
-	if (m_v_charge_node == NULL)
+	if (m_v_charge_node == nullptr)
 	{
 		m_v_charge   = (info->v_charge == DEFAULT_555_CHARGE) ? info->v_pos : info->v_charge;
 

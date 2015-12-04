@@ -89,7 +89,7 @@ s2636_device::s2636_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, S2636, "Signetics 2636", tag, owner, clock, "s2636", __FILE__),
 		device_video_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
-		m_channel(NULL),
+		m_channel(nullptr),
 		m_size(0),
 		m_pos(0),
 		m_level(0),

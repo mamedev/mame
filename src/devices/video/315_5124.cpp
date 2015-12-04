@@ -170,7 +170,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const ch
 	, m_is_pal(false)
 	, m_int_cb(*this)
 	, m_pause_cb(*this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(sega315_5124))
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(sega315_5124))
 	, m_palette(*this, "palette")
 {
 }
@@ -186,7 +186,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_is_pal(false)
 	, m_int_cb(*this)
 	, m_pause_cb(*this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(sega315_5124))
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(sega315_5124))
 	, m_palette(*this, "palette")
 {
 }

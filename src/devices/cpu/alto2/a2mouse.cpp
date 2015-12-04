@@ -212,7 +212,7 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_button_2 )
 static const prom_load_t pl_madr_a32 =
 {
 	"madr.a32",
-	0,
+	nullptr,
 	"a0e3b4a7",
 	"24e50afdeb637a6a8588f8d3a3493c9188b8da2c",
 	/* size */  0400,

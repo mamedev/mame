@@ -162,9 +162,9 @@ const device_type VLM5030 = &device_creator<vlm5030_device>;
 vlm5030_device::vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VLM5030, "VLM5030", tag, owner, clock, "vlm5030", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_channel(NULL),
-		m_coeff(NULL),
-		m_rom(NULL),
+		m_channel(nullptr),
+		m_coeff(nullptr),
+		m_rom(nullptr),
 		m_address_mask(0),
 		m_address(0),
 		m_pin_BSY(0),

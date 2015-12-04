@@ -38,7 +38,7 @@ vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, d
 
 const address_space_config *vrc4373_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_PROGRAM) ? pci_bridge_device::memory_space_config(spacenum) : (spacenum == AS_DATA) ? &m_mem_config : (spacenum == AS_IO) ? &m_io_config : NULL;
+	return (spacenum == AS_PROGRAM) ? pci_bridge_device::memory_space_config(spacenum) : (spacenum == AS_DATA) ? &m_mem_config : (spacenum == AS_IO) ? &m_io_config : nullptr;
 }
 
 void vrc4373_device::device_start()

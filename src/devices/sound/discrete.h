@@ -3801,7 +3801,7 @@ public:
 		if (m_count >= m_allocated)
 		{
 			m_allocated *= 2;
-			_ElementType *newarr = global_alloc_array_clear(_ElementType, m_allocated);
+			auto  newarr = global_alloc_array_clear(_ElementType, m_allocated);
 			for (int i=0; i < m_count; i++)
 				newarr[i] = m_arr[i];
 			global_free_array(m_arr);
@@ -4422,9 +4422,9 @@ public:
 
 	virtual int max_output(void) { return 1; };
 
-	inline bool interface(discrete_step_interface *&intf) const { intf = m_step_intf; return (intf != NULL); }
-	inline bool interface(discrete_input_interface *&intf) const { intf = m_input_intf; return (intf != NULL); }
-	inline bool interface(discrete_sound_output_interface *&intf) const { intf = m_output_intf; return (intf != NULL); }
+	inline bool interface(discrete_step_interface *&intf) const { intf = m_step_intf; return (intf != nullptr); }
+	inline bool interface(discrete_input_interface *&intf) const { intf = m_input_intf; return (intf != nullptr); }
+	inline bool interface(discrete_sound_output_interface *&intf) const { intf = m_output_intf; return (intf != nullptr); }
 
 	/* get the input value from node #n */
 	inline double input(int n) { return *(m_input[n]); }

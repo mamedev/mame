@@ -16,7 +16,7 @@ void linear_flash_pccard_device::device_start()
 
 const address_space_config *linear_flash_pccard_device::memory_space_config( address_spacenum spacenum ) const
 {
-	return ( spacenum == AS_0 ) ? &m_space_config : NULL;
+	return ( spacenum == AS_0 ) ? &m_space_config : nullptr;
 }
 
 READ16_MEMBER( linear_flash_pccard_device::read_memory )

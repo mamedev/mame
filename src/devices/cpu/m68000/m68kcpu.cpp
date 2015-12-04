@@ -2400,11 +2400,11 @@ void m68000_base_device::clear_all()
 	virq_state = 0;
 	nmi_pending = 0;
 
-	cyc_instruction = 0;
-	cyc_exception = 0;
+	cyc_instruction = nullptr;
+	cyc_exception = nullptr;
 
 	int_ack_callback = device_irq_acknowledge_delegate();
-	program = 0;
+	program = nullptr;
 
 	opcode_xor = 0;
 //  readimm16 = 0;
@@ -2415,8 +2415,8 @@ void m68000_base_device::clear_all()
 //  write16 = 0;
 //  write32 = 0;
 
-	m_space = 0;
-	m_direct = 0;
+	m_space = nullptr;
+	m_direct = nullptr;
 
 
 	iotemp = 0;
@@ -2455,7 +2455,7 @@ void m68000_base_device::clear_all()
 		ic_valid[i] = false;
 	}
 
-	internal = 0;
+	internal = nullptr;
 }
 
 
@@ -2512,8 +2512,8 @@ const address_space_config *m68000_base_device::memory_space_config(address_spac
 	switch(spacenum)
 	{
 	case AS_PROGRAM:           return &m_program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_oprogram_config : NULL;
-	default:                   return NULL;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_oprogram_config : nullptr;
+	default:                   return nullptr;
 	}
 }
 

@@ -1464,7 +1464,7 @@ void tms5220_device::device_start()
 	}
 	else
 	{
-		m_speechrom = NULL;
+		m_speechrom = nullptr;
 	}
 
 	set_variant(TMS5220_IS_5220);
@@ -1917,7 +1917,7 @@ tms5220_device::tms5220_device(const machine_config &mconfig, const char *tag, d
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this),
 		m_readyq_handler(*this),
-		m_speechrom_tag(NULL)
+		m_speechrom_tag(nullptr)
 {
 }
 
@@ -1926,7 +1926,7 @@ tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, 
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this),
 		m_readyq_handler(*this),
-		m_speechrom_tag(NULL)
+		m_speechrom_tag(nullptr)
 {
 }
 

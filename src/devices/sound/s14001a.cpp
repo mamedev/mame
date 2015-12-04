@@ -558,7 +558,7 @@ s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, S14001A, "S14001A", tag, owner, clock, "s14001a", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_SpeechRom(*this, DEVICE_SELF),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_WordInput(0),
 		m_LatchedWord(0),
 		m_SyllableAddress(0),

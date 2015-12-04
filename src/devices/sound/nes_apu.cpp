@@ -110,7 +110,7 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 		m_samps_per_sync(0),
 		m_buffer_size(0),
 		m_real_rate(0),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_cpu_tag("")
 {
 	for (int i = 0; i < NOISE_LONG; i++)

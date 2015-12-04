@@ -398,7 +398,7 @@ static const decode_tbl_t decode_tbl[64] =
 	{ int_stx,   DEC_DECODED, "st."        }, /* st.b isrc1ni,#const(isrc2).  */
 	{ int_ldx,   DEC_DECODED, "ld."        }, /* ld.{s,l} isrc1(isrc2),idest.  */
 	{ int_ldx,   DEC_DECODED, "ld."        }, /* ld.{s,l} #const(isrc2),idest.  */
-	{ 0,         0           , 0           },
+	{ nullptr,         0           , nullptr           },
 	{ int_stx,   DEC_DECODED, "st."        }, /* st.{s,l} isrc1ni,#const(isrc2),idest.*/
 	{ int_fldst, DEC_DECODED, "fld."       }, /* fld.{l,d,q} isrc1(isrc2)[++],fdest.  */
 	{ int_fldst, DEC_DECODED, "fld."       }, /* fld.{l,d,q} #const(isrc2)[++],fdest. */
@@ -410,8 +410,8 @@ static const decode_tbl_t decode_tbl[64] =
 	{ int_fldst, DEC_DECODED, "pstd."      }, /* pst.d fdest,#const(isrc2)[++].       */
 	{ int_1,     DEC_DECODED, "bri"        }, /* bri isrc1ni.                         */
 	{ int_12d,   DEC_DECODED, "trap"       }, /* trap isrc1ni,isrc2,idest.            */
-	{ 0,         DEC_MORE,    0            }, /* FP ESCAPE FORMAT, more decode.       */
-	{ 0,         DEC_MORE,    0            }, /* CORE ESCAPE FORMAT, more decode.     */
+	{ nullptr,         DEC_MORE,    nullptr            }, /* FP ESCAPE FORMAT, more decode.       */
+	{ nullptr,         DEC_MORE,    nullptr            }, /* CORE ESCAPE FORMAT, more decode.     */
 	{ int_12S,   DEC_DECODED, "btne"       }, /* btne isrc1,isrc2,sbroff.             */
 	{ int_i2S,   DEC_DECODED, "btne"       }, /* btne #const,isrc2,sbroff.            */
 	{ int_12S,   DEC_DECODED, "bte"        }, /* bte isrc1,isrc2,sbroff.              */
@@ -442,19 +442,19 @@ static const decode_tbl_t decode_tbl[64] =
 	{ int_i2d,   DEC_DECODED, "shra"       }, /* shra #const,isrc2,idest.   */
 	{ int_12d,   DEC_DECODED, "and"        }, /* and isrc1,isrc2,idest.     */
 	{ int_i2d,   DEC_DECODED, "and"        }, /* and #const,isrc2,idest.    */
-	{ 0,         0           , 0           },
+	{ nullptr,         0           , nullptr           },
 	{ int_i2d,   DEC_DECODED, "andh"       }, /* andh #const,isrc2,idest.   */
 	{ int_12d,   DEC_DECODED, "andnot"     }, /* andnot isrc1,isrc2,idest.  */
 	{ int_i2d,   DEC_DECODED, "andnot"     }, /* andnot #const,isrc2,idest. */
-	{ 0,         0           , 0           },
+	{ nullptr,         0           , nullptr           },
 	{ int_i2d,   DEC_DECODED, "andnoth"    }, /* andnoth #const,isrc2,idest.*/
 	{ int_12d,   DEC_DECODED, "or"         }, /* or isrc1,isrc2,idest.      */
 	{ int_i2d,   DEC_DECODED, "or"         }, /* or #const,isrc2,idest.     */
-	{ 0,         0           , 0           },
+	{ nullptr,         0           , nullptr           },
 	{ int_i2d,   DEC_DECODED, "orh"        }, /* orh #const,isrc2,idest.    */
 	{ int_12d,   DEC_DECODED, "xor"        }, /* xor isrc1,isrc2,idest.     */
 	{ int_i2d,   DEC_DECODED, "xor"        }, /* xor #const,isrc2,idest.    */
-	{ 0,         0           , 0           },
+	{ nullptr,         0           , nullptr           },
 	{ int_i2d,   DEC_DECODED, "xorh"       }, /* xorh #const,isrc2,idest.   */
 };
 
@@ -462,13 +462,13 @@ static const decode_tbl_t decode_tbl[64] =
 /* Second-level decode table (i.e., for the 3 core escape opcode bits).  */
 static const decode_tbl_t core_esc_decode_tbl[8] =
 {
-	{ 0,         0          , 0           },
+	{ nullptr,         0          , nullptr           },
 	{ int_0,     DEC_DECODED, "lock"      }, /* lock.           */
 	{ int_1,     DEC_DECODED, "calli"     }, /* calli isrc1ni.  */
-	{ 0,         0          , 0           },
+	{ nullptr,         0          , nullptr           },
 	{ int_0,     DEC_DECODED, "intovr"    }, /* intovr.         */
-	{ 0,         0          , 0           },
-	{ 0,         0          , 0           },
+	{ nullptr,         0          , nullptr           },
+	{ nullptr,         0          , nullptr           },
 	{ int_0,     DEC_DECODED, "unlock"    }, /* unlock.         */
 };
 
@@ -518,97 +518,97 @@ static const decode_tbl_t fp_decode_tbl[128] =
 	{ flop_2d,   DEC_DECODED, "frcp."     }, /* 0x22 frcp.{ss,sd,dd} */
 	{ flop_2d,   DEC_DECODED, "frsqr."    }, /* 0x23 frsqr.{ss,sd,dd} */
 	{ flop_12d,  DEC_DECODED, "pfmul3.dd" }, /* 0x24 pfmul3.dd */
-	{ 0,         0          , 0           }, /* 0x25 */
-	{ 0,         0          , 0           }, /* 0x26 */
-	{ 0,         0          , 0           }, /* 0x27 */
-	{ 0,         0          , 0           }, /* 0x28 */
-	{ 0,         0          , 0           }, /* 0x29 */
-	{ 0,         0          , 0           }, /* 0x2A */
-	{ 0,         0          , 0           }, /* 0x2B */
-	{ 0,         0          , 0           }, /* 0x2C */
-	{ 0,         0          , 0           }, /* 0x2D */
-	{ 0,         0          , 0           }, /* 0x2E */
-	{ 0,         0          , 0           }, /* 0x2F */
+	{ nullptr,         0          , nullptr           }, /* 0x25 */
+	{ nullptr,         0          , nullptr           }, /* 0x26 */
+	{ nullptr,         0          , nullptr           }, /* 0x27 */
+	{ nullptr,         0          , nullptr           }, /* 0x28 */
+	{ nullptr,         0          , nullptr           }, /* 0x29 */
+	{ nullptr,         0          , nullptr           }, /* 0x2A */
+	{ nullptr,         0          , nullptr           }, /* 0x2B */
+	{ nullptr,         0          , nullptr           }, /* 0x2C */
+	{ nullptr,         0          , nullptr           }, /* 0x2D */
+	{ nullptr,         0          , nullptr           }, /* 0x2E */
+	{ nullptr,         0          , nullptr           }, /* 0x2F */
 	{ flop_12d,  DEC_DECODED, "fadd."     }, /* 0x30, [p]fadd.{ss,sd,dd} */
 	{ flop_12d,  DEC_DECODED, "fsub."     }, /* 0x31, [p]fsub.{ss,sd,dd} */
 	{ flop_1d,   DEC_DECODED, "fix."      }, /* 0x32, [p]fix.{ss,sd,dd} */
 	{ flop_1d,   DEC_DECODED, "famov."    }, /* 0x33, [p]famov.{ss,sd,ds,dd} */
 	{ flop_12d,  DEC_DECODED, "f{gt,le}"  }, /* 0x34, pf{gt,le}.{ss,dd} */
 	{ flop_12d,  DEC_DECODED, "feq."      }, /* 0x35, pfeq.{ss,dd} */
-	{ 0,         0          , 0           }, /* 0x36 */
-	{ 0,         0          , 0           }, /* 0x37 */
-	{ 0,         0          , 0           }, /* 0x38 */
-	{ 0,         0          , 0           }, /* 0x39 */
+	{ nullptr,         0          , nullptr           }, /* 0x36 */
+	{ nullptr,         0          , nullptr           }, /* 0x37 */
+	{ nullptr,         0          , nullptr           }, /* 0x38 */
+	{ nullptr,         0          , nullptr           }, /* 0x39 */
 	{ flop_1d,   DEC_DECODED, "ftrunc."   }, /* 0x3A, [p]ftrunc.{ss,sd,dd} */
-	{ 0,         0          , 0           }, /* 0x3B */
-	{ 0,         0          , 0           }, /* 0x3C */
-	{ 0,         0          , 0           }, /* 0x3D */
-	{ 0,         0          , 0           }, /* 0x3E */
-	{ 0,         0          , 0           }, /* 0x3F */
+	{ nullptr,         0          , nullptr           }, /* 0x3B */
+	{ nullptr,         0          , nullptr           }, /* 0x3C */
+	{ nullptr,         0          , nullptr           }, /* 0x3D */
+	{ nullptr,         0          , nullptr           }, /* 0x3E */
+	{ nullptr,         0          , nullptr           }, /* 0x3F */
 	{ flop_fxfr, DEC_DECODED, "fxfr"      }, /* 0x40, fxfr fsrc1,idest. */
-	{ 0,         0          , 0           }, /* 0x41 */
-	{ 0,         0          , 0           }, /* 0x42 */
-	{ 0,         0          , 0           }, /* 0x43 */
-	{ 0,         0          , 0           }, /* 0x44 */
-	{ 0,         0          , 0           }, /* 0x45 */
-	{ 0,         0          , 0           }, /* 0x46 */
-	{ 0,         0          , 0           }, /* 0x47 */
-	{ 0,         0          , 0           }, /* 0x48 */
+	{ nullptr,         0          , nullptr           }, /* 0x41 */
+	{ nullptr,         0          , nullptr           }, /* 0x42 */
+	{ nullptr,         0          , nullptr           }, /* 0x43 */
+	{ nullptr,         0          , nullptr           }, /* 0x44 */
+	{ nullptr,         0          , nullptr           }, /* 0x45 */
+	{ nullptr,         0          , nullptr           }, /* 0x46 */
+	{ nullptr,         0          , nullptr           }, /* 0x47 */
+	{ nullptr,         0          , nullptr           }, /* 0x48 */
 	{ flop_12d,  DEC_DECODED, "fiadd."    }, /* 0x49, [p]fiadd.{ss,dd} */
-	{ 0,         0          , 0           }, /* 0x4A */
-	{ 0,         0          , 0           }, /* 0x4B */
-	{ 0,         0          , 0           }, /* 0x4C */
+	{ nullptr,         0          , nullptr           }, /* 0x4A */
+	{ nullptr,         0          , nullptr           }, /* 0x4B */
+	{ nullptr,         0          , nullptr           }, /* 0x4C */
 	{ flop_12d,  DEC_DECODED, "fisub."    }, /* 0x4D, [p]fisub.{ss,dd} */
-	{ 0,         0          , 0           }, /* 0x4E */
-	{ 0,         0          , 0           }, /* 0x4F */
+	{ nullptr,         0          , nullptr           }, /* 0x4E */
+	{ nullptr,         0          , nullptr           }, /* 0x4F */
 	{ flop_12d,  DEC_DECODED, "faddp"     }, /* 0x50, [p]faddp */
 	{ flop_12d,  DEC_DECODED, "faddz"     }, /* 0x51, [p]faddz */
-	{ 0,         0          , 0           }, /* 0x52 */
-	{ 0,         0          , 0           }, /* 0x53 */
-	{ 0,         0          , 0           }, /* 0x54 */
-	{ 0,         0          , 0           }, /* 0x55 */
-	{ 0,         0          , 0           }, /* 0x56 */
+	{ nullptr,         0          , nullptr           }, /* 0x52 */
+	{ nullptr,         0          , nullptr           }, /* 0x53 */
+	{ nullptr,         0          , nullptr           }, /* 0x54 */
+	{ nullptr,         0          , nullptr           }, /* 0x55 */
+	{ nullptr,         0          , nullptr           }, /* 0x56 */
 	{ flop_12d,  DEC_DECODED, "fzchkl"    }, /* 0x57, [p]fzchkl */
-	{ 0,         0          , 0           }, /* 0x58 */
-	{ 0,         0          , 0           }, /* 0x59 */
+	{ nullptr,         0          , nullptr           }, /* 0x58 */
+	{ nullptr,         0          , nullptr           }, /* 0x59 */
 	{ flop_1d,   DEC_DECODED, "form"      }, /* 0x5A, [p]form.dd */
-	{ 0,         0          , 0           }, /* 0x5B */
-	{ 0,         0          , 0           }, /* 0x5C */
-	{ 0,         0          , 0           }, /* 0x5D */
-	{ 0,         0          , 0           }, /* 0x5E */
+	{ nullptr,         0          , nullptr           }, /* 0x5B */
+	{ nullptr,         0          , nullptr           }, /* 0x5C */
+	{ nullptr,         0          , nullptr           }, /* 0x5D */
+	{ nullptr,         0          , nullptr           }, /* 0x5E */
 	{ flop_12d,  DEC_DECODED, "fzchks"    }, /* 0x5F, [p]fzchks */
-	{ 0,         0          , 0           }, /* 0x60 */
-	{ 0,         0          , 0           }, /* 0x61 */
-	{ 0,         0          , 0           }, /* 0x62 */
-	{ 0,         0          , 0           }, /* 0x63 */
-	{ 0,         0          , 0           }, /* 0x64 */
-	{ 0,         0          , 0           }, /* 0x65 */
-	{ 0,         0          , 0           }, /* 0x66 */
-	{ 0,         0          , 0           }, /* 0x67 */
-	{ 0,         0          , 0           }, /* 0x68 */
-	{ 0,         0          , 0           }, /* 0x69 */
-	{ 0,         0          , 0           }, /* 0x6A */
-	{ 0,         0          , 0           }, /* 0x6B */
-	{ 0,         0          , 0           }, /* 0x6C */
-	{ 0,         0          , 0           }, /* 0x6D */
-	{ 0,         0          , 0           }, /* 0x6E */
-	{ 0,         0          , 0           }, /* 0x6F */
-	{ 0,         0          , 0           }, /* 0x70 */
-	{ 0,         0          , 0           }, /* 0x71 */
-	{ 0,         0          , 0           }, /* 0x72 */
-	{ 0,         0          , 0           }, /* 0x73 */
-	{ 0,         0          , 0           }, /* 0x74 */
-	{ 0,         0          , 0           }, /* 0x75 */
-	{ 0,         0          , 0           }, /* 0x76 */
-	{ 0,         0          , 0           }, /* 0x77 */
-	{ 0,         0          , 0           }, /* 0x78 */
-	{ 0,         0          , 0           }, /* 0x79 */
-	{ 0,         0          , 0           }, /* 0x7A */
-	{ 0,         0          , 0           }, /* 0x7B */
-	{ 0,         0          , 0           }, /* 0x7C */
-	{ 0,         0          , 0           }, /* 0x7D */
-	{ 0,         0          , 0           }, /* 0x7E */
-	{ 0,         0          , 0           }, /* 0x7F */
+	{ nullptr,         0          , nullptr           }, /* 0x60 */
+	{ nullptr,         0          , nullptr           }, /* 0x61 */
+	{ nullptr,         0          , nullptr           }, /* 0x62 */
+	{ nullptr,         0          , nullptr           }, /* 0x63 */
+	{ nullptr,         0          , nullptr           }, /* 0x64 */
+	{ nullptr,         0          , nullptr           }, /* 0x65 */
+	{ nullptr,         0          , nullptr           }, /* 0x66 */
+	{ nullptr,         0          , nullptr           }, /* 0x67 */
+	{ nullptr,         0          , nullptr           }, /* 0x68 */
+	{ nullptr,         0          , nullptr           }, /* 0x69 */
+	{ nullptr,         0          , nullptr           }, /* 0x6A */
+	{ nullptr,         0          , nullptr           }, /* 0x6B */
+	{ nullptr,         0          , nullptr           }, /* 0x6C */
+	{ nullptr,         0          , nullptr           }, /* 0x6D */
+	{ nullptr,         0          , nullptr           }, /* 0x6E */
+	{ nullptr,         0          , nullptr           }, /* 0x6F */
+	{ nullptr,         0          , nullptr           }, /* 0x70 */
+	{ nullptr,         0          , nullptr           }, /* 0x71 */
+	{ nullptr,         0          , nullptr           }, /* 0x72 */
+	{ nullptr,         0          , nullptr           }, /* 0x73 */
+	{ nullptr,         0          , nullptr           }, /* 0x74 */
+	{ nullptr,         0          , nullptr           }, /* 0x75 */
+	{ nullptr,         0          , nullptr           }, /* 0x76 */
+	{ nullptr,         0          , nullptr           }, /* 0x77 */
+	{ nullptr,         0          , nullptr           }, /* 0x78 */
+	{ nullptr,         0          , nullptr           }, /* 0x79 */
+	{ nullptr,         0          , nullptr           }, /* 0x7A */
+	{ nullptr,         0          , nullptr           }, /* 0x7B */
+	{ nullptr,         0          , nullptr           }, /* 0x7C */
+	{ nullptr,         0          , nullptr           }, /* 0x7D */
+	{ nullptr,         0          , nullptr           }, /* 0x7E */
+	{ nullptr,         0          , nullptr           }, /* 0x7F */
 };
 
 

@@ -90,7 +90,7 @@ protected:
 		switch (spacenum)
 		{
 			case AS_PROGRAM: return &m_program_config;
-			default:         return NULL;
+			default:         return nullptr;
 		}
 	}
 
@@ -183,7 +183,7 @@ protected:
 		switch (spacenum)
 		{
 			case AS_PROGRAM: return &m_program_config;
-			default:         return NULL;
+			default:         return nullptr;
 		}
 	}
 

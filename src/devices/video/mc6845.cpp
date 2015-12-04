@@ -534,7 +534,7 @@ void mc6845_device::recompute_parameters(bool postload)
 			if (LOG) logerror("M6845 config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
 								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
-			if ( m_screen != NULL )
+			if ( m_screen != nullptr )
 				m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 			if(!m_reconfigure_cb.isnull())
@@ -704,7 +704,7 @@ void mc6845_device::handle_line_timer()
 			/* also update the cursor state now */
 			update_cursor_state();
 
-			if (m_screen != NULL)
+			if (m_screen != nullptr)
 				m_screen->reset_origin();
 		}
 		else
@@ -1385,7 +1385,7 @@ const address_space_config *mos8563_device::memory_space_config(address_spacenum
 	switch (spacenum)
 	{
 		case AS_0: return &m_videoram_space_config;
-		default: return NULL;
+		default: return nullptr;
 	}
 }
 
@@ -1457,7 +1457,7 @@ ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag,
 mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: mc6845_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
 		m_palette(*this, "palette")
 {
 	set_clock_scale(1.0/8);
@@ -1467,7 +1467,7 @@ mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, 
 mos8563_device::mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, MOS8563, "MOS8563", tag, owner, clock, "mos8563", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
 		m_palette(*this, "palette")
 {
 	set_clock_scale(1.0/8);

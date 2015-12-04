@@ -46,7 +46,7 @@ public:
 	virtual bool is_reset_on_load() const { return 0; }
 	virtual const char *file_extensions() const { return "mid"; }
 	virtual bool core_opens_image_file() const { return FALSE; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	virtual void tx(UINT8 state) { rx_w(state); }
 

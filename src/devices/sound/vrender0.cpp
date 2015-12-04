@@ -86,9 +86,9 @@ const device_type VRENDER0 = &device_creator<vrender0_device>;
 vrender0_device::vrender0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VRENDER0, "VRender0", tag, owner, clock, "vrender0", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_TexBase(NULL),
-		m_FBBase(NULL),
-		m_stream(NULL),
+		m_TexBase(nullptr),
+		m_FBBase(nullptr),
+		m_stream(nullptr),
 		m_reg_base(0)
 {
 }

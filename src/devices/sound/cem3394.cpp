@@ -118,7 +118,7 @@ const device_type CEM3394 = &device_creator<cem3394_device>;
 cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CEM3394, "CEM3394", tag, owner, clock, "cem3394", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_vco_zero_freq(0.0),
 		m_filter_zero_freq(0.0),
 		m_wave_select(0),
@@ -134,8 +134,8 @@ cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, d
 		m_pulse_width(0),
 		m_inv_sample_rate(0.0),
 		m_sample_rate(0),
-		m_mixer_buffer(NULL),
-		m_external_buffer(NULL)
+		m_mixer_buffer(nullptr),
+		m_external_buffer(nullptr)
 {
 	memset(m_values, 0, 8*sizeof(double));
 }

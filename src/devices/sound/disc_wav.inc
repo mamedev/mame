@@ -914,7 +914,7 @@ DISCRETE_RESET(dss_op_amp_osc)
 	for (loop = 0; loop < 8; loop ++)
 	{
 		m_r[loop] = m_device->node_output_ptr(*r_info_ptr);
-		if (m_r[loop] == NULL)
+		if (m_r[loop] == nullptr)
 			m_r[loop] = r_info_ptr;
 		r_info_ptr++;
 	}

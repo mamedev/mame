@@ -32,7 +32,7 @@ std::unique_ptr<ParallelMove> ParallelMove::decodeParallelMove(const Opcode* opc
 		/* No Parallel Data Move : 0100 1010 .... .... : A-131 */
 		if ((w0 & 0xff00) == 0x4a00)
 		{
-			return NULL;
+			return nullptr;
 		}
 		/* Register to Register Data Move : 0100 IIII .... .... : A-133 */
 		else if ((w0 & 0xf000) == 0x4000)

@@ -41,7 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER( buffer_w ) { m_buffer = data; }
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_0) ? &m_space_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_0) ? &m_space_config : nullptr; }
 
 protected:
 	virtual void device_start();

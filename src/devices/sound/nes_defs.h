@@ -198,7 +198,7 @@ struct dpcm_t
 		cur_byte = 0;
 		enabled = false;
 		irq_occurred = false;
-		memory = NULL;
+		memory = nullptr;
 		vol = 0;
 		}
 
@@ -221,7 +221,7 @@ struct apu_t
 		apu_t()
 		{
 		memset(regs, 0, sizeof(regs));
-		buffer = NULL;
+		buffer = nullptr;
 		buf_pos = 0;
 		step_mode = 0;
 		}

@@ -813,7 +813,7 @@ void tms9902_device::device_stop()
 	if (m_dectimer)
 	{
 		m_dectimer->reset();
-		m_dectimer = NULL;
+		m_dectimer = nullptr;
 	}
 }
 

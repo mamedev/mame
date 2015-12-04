@@ -105,7 +105,7 @@ public:
 		, m_pc_bits(pc_bits)
 		, m_byte_bits(byte_bits)
 		, m_x_bits(x_bits)
-		, m_output_pla_table(NULL)
+		, m_output_pla_table(nullptr)
 		, m_read_k(*this)
 		, m_write_o(*this)
 		, m_write_r(*this)
@@ -131,7 +131,7 @@ protected:
 	virtual void execute_run();
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : NULL); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }

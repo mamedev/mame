@@ -887,7 +887,7 @@ void tms0980_cpu_device::read_opcode()
 void tms1xxx_cpu_device::write_o_output(UINT8 index)
 {
 	// a hardcoded table is supported if the output pla is unknown
-	m_o = (m_output_pla_table == NULL) ? m_opla->read(index) : m_output_pla_table[index];
+	m_o = (m_output_pla_table == nullptr) ? m_opla->read(index) : m_output_pla_table[index];
 	m_write_o(0, m_o & m_o_mask, 0xffff);
 }
 

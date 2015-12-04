@@ -90,7 +90,7 @@ void m3745x_device::device_start()
 
 	for (int i = 0; i < NUM_TIMERS; i++)
 	{
-		m_timers[i] = timer_alloc(i, NULL);
+		m_timers[i] = timer_alloc(i, nullptr);
 	}
 
 	m740_device::device_start();

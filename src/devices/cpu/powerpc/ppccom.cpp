@@ -211,15 +211,15 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, data_bits, address_bits, 0, internal_map)
 	, c_bus_frequency(0)
-	, m_core(NULL)
+	, m_core(nullptr)
 	, m_bus_freq_multiplier(1)
-	, m_vtlb(NULL)
+	, m_vtlb(nullptr)
 	, m_flavor(flavor)
 	, m_cap(cap)
 	, m_tb_divisor(tb_divisor)
 	, m_cache(CACHE_SIZE + sizeof(internal_ppc_state))
-	, m_drcuml(NULL)
-	, m_drcfe(NULL)
+	, m_drcuml(nullptr)
+	, m_drcfe(nullptr)
 	, m_drcoptions(0)
 {
 	m_program_config.m_logaddr_width = 32;
@@ -237,37 +237,37 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 //}
 
 ppc603_device::ppc603_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ppc_device(mconfig, PPC603, "PowerPC 603", tag, owner, clock, "ppc603", 32, 64, PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, NULL)
+	: ppc_device(mconfig, PPC603, "PowerPC 603", tag, owner, clock, "ppc603", 32, 64, PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, nullptr)
 {
 }
 
 ppc603e_device::ppc603e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ppc_device(mconfig, PPC603E, "PowerPC 603e", tag, owner, clock, "ppc603e", 32, 64, PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, NULL)
+	: ppc_device(mconfig, PPC603E, "PowerPC 603e", tag, owner, clock, "ppc603e", 32, 64, PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, nullptr)
 {
 }
 
 ppc603r_device::ppc603r_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ppc_device(mconfig, PPC603R, "PowerPC 603R", tag, owner, clock, "ppc603r", 32, 64, PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, NULL)
+	: ppc_device(mconfig, PPC603R, "PowerPC 603R", tag, owner, clock, "ppc603r", 32, 64, PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, nullptr)
 {
 }
 
 ppc602_device::ppc602_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ppc_device(mconfig, PPC602, "PowerPC 602", tag, owner, clock, "ppc602", 32, 64, PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, NULL)
+	: ppc_device(mconfig, PPC602, "PowerPC 602", tag, owner, clock, "ppc602", 32, 64, PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, nullptr)
 {
 }
 
 mpc8240_device::mpc8240_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ppc_device(mconfig, MPC8240, "PowerPC MPC8240", tag, owner, clock, "mpc8240", 32, 64, PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4/* unknown */, NULL)
+	: ppc_device(mconfig, MPC8240, "PowerPC MPC8240", tag, owner, clock, "mpc8240", 32, 64, PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4/* unknown */, nullptr)
 {
 }
 
 ppc601_device::ppc601_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ppc_device(mconfig, PPC601, "PowerPC 601", tag, owner, clock, "ppc601", 32, 64, PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_MFIOC | PPCCAP_601BAT, 0/* no TB */, NULL)
+	: ppc_device(mconfig, PPC601, "PowerPC 601", tag, owner, clock, "ppc601", 32, 64, PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_MFIOC | PPCCAP_601BAT, 0/* no TB */, nullptr)
 {
 }
 
 ppc604_device::ppc604_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ppc_device(mconfig, PPC604, "PowerPC 604", tag, owner, clock, "ppc604", 32, 64, PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU, 4, NULL)
+	: ppc_device(mconfig, PPC604, "PowerPC 604", tag, owner, clock, "ppc604", 32, 64, PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU, 4, nullptr)
 {
 }
 
@@ -557,11 +557,11 @@ void ppc_device::device_start()
 	m_core = (internal_ppc_state *)m_cache.alloc_near(sizeof(internal_ppc_state));
 	memset(m_core, 0, sizeof(internal_ppc_state));
 
-	m_entry = NULL;
-	m_nocode = NULL;
-	m_out_of_cycles = NULL;
-	m_tlb_mismatch = NULL;
-	m_swap_tgpr = NULL;
+	m_entry = nullptr;
+	m_nocode = nullptr;
+	m_out_of_cycles = nullptr;
+	m_tlb_mismatch = nullptr;
+	m_swap_tgpr = nullptr;
 	memset(m_lsw, 0, sizeof(m_lsw));
 	memset(m_stsw, 0, sizeof(m_stsw));
 	memset(m_read8, 0, sizeof(m_read8));
@@ -1148,9 +1148,9 @@ void ppc_device::state_string_export(const device_state_entry &entry, std::strin
 
 void ppc_device::device_stop()
 {
-	if (m_vtlb != NULL)
+	if (m_vtlb != nullptr)
 		vtlb_free(m_vtlb);
-	m_vtlb = NULL;
+	m_vtlb = nullptr;
 
 	/* clean up the DRC */
 	auto_free(machine(), m_drcfe);
@@ -1176,7 +1176,7 @@ void ppc_device::device_reset()
 		m_dec_zero_cycles = total_cycles();
 		if (m_tb_divisor)
 		{
-			decrementer_int_callback(NULL, 0);
+			decrementer_int_callback(nullptr, 0);
 		}
 	}
 
@@ -1408,7 +1408,7 @@ UINT32 ppc_device::ppccom_translate_address_internal(int intention, offs_t &addr
 		UINT32 *ptegptr = (UINT32 *)m_program->get_read_ptr(ptegaddr);
 
 		/* should only have valid memory here, but make sure */
-		if (ptegptr != NULL)
+		if (ptegptr != nullptr)
 		{
 			UINT32 targetupper = 0x80000000 | ((segreg & 0xffffff) << 7) | (hashnum << 6) | ((address >> 22) & 0x3f);
 			int ptenum;
@@ -1794,9 +1794,9 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPR4XX_TCR:
 				m_core->spr[SPR4XX_TCR] = m_core->param1 | (oldval & PPC4XX_TCR_WRC_MASK);
 				if ((oldval ^ m_core->spr[SPR4XX_TCR]) & PPC4XX_TCR_FIE)
-					ppc4xx_fit_callback(NULL, FALSE);
+					ppc4xx_fit_callback(nullptr, FALSE);
 				if ((oldval ^ m_core->spr[SPR4XX_TCR]) & PPC4XX_TCR_PIE)
-					ppc4xx_pit_callback(NULL, FALSE);
+					ppc4xx_pit_callback(nullptr, FALSE);
 				return;
 
 			/* timer status register */
@@ -1809,7 +1809,7 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPR4XX_PIT:
 				m_core->spr[SPR4XX_PIT] = m_core->param1;
 				m_pit_reload = m_core->param1;
-				ppc4xx_pit_callback(NULL, FALSE);
+				ppc4xx_pit_callback(nullptr, FALSE);
 				return;
 
 			/* timebase */

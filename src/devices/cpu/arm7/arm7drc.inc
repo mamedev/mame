@@ -81,7 +81,7 @@ INLINE UINT32 epc(const opcode_desc *desc)
 
 INLINE void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name)
 {
-	if (*handleptr == NULL)
+	if (*handleptr == nullptr)
 		*handleptr = drcuml->handle_alloc(name);
 }
 
@@ -133,7 +133,7 @@ void arm7_cpu_device::arm7_drc_init()
 
 	/* allocate enough space for the cache and the core */
 	cache = auto_alloc(machine(), drc_cache(CACHE_SIZE));
-	if (cache == NULL)
+	if (cache == nullptr)
 		fatalerror("Unable to allocate cache of size %d\n", (UINT32)(CACHE_SIZE));
 
 	/* allocate the implementation-specific state from the full cache */
@@ -302,8 +302,8 @@ void arm7_cpu_device::code_flush_cache()
 		static_generate_entry_point();
 		static_generate_nocode_handler();
 		static_generate_out_of_cycles();
-		static_generate_tlb_translate(NULL); // TODO FIXME
-		static_generate_detect_fault(NULL); // TODO FIXME
+		static_generate_tlb_translate(nullptr); // TODO FIXME
+		static_generate_detect_fault(nullptr); // TODO FIXME
 		//static_generate_tlb_mismatch();
 
 		/* add subroutines for memory accesses */
@@ -337,7 +337,7 @@ void arm7_cpu_device::code_compile_block(UINT8 mode, offs_t pc)
 
 	/* get a description of this sequence */
 	// TODO FIXME
-	const opcode_desc *desclist = NULL; //m_impstate.drcfe->describe_code(pc); // TODO
+	const opcode_desc *desclist = nullptr; //m_impstate.drcfe->describe_code(pc); // TODO
 //  if (drcuml->logging() || drcuml->logging_native())
 //      log_opcode_desc(drcuml, desclist, 0);
 
@@ -351,7 +351,7 @@ void arm7_cpu_device::code_compile_block(UINT8 mode, offs_t pc)
 			drcuml_block *block = drcuml->begin_block(4096);
 
 			/* loop until we get through all instruction sequences */
-			for (const opcode_desc *seqhead = desclist; seqhead != NULL; seqhead = seqlast->next())
+			for (const opcode_desc *seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
 			{
 				const opcode_desc *curdesc;
 				UINT32 nextpc;
@@ -361,10 +361,10 @@ void arm7_cpu_device::code_compile_block(UINT8 mode, offs_t pc)
 					block->append_comment("-------------------------");                     // comment
 
 				/* determine the last instruction in this sequence */
-				for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next())
+				for (seqlast = seqhead; seqlast != nullptr; seqlast = seqlast->next())
 					if (seqlast->flags & OPFLAG_END_SEQUENCE)
 						break;
-				assert(seqlast != NULL);
+				assert(seqlast != nullptr);
 
 				/* if we don't have a hash for this mode/pc, or if we are overriding all, add one */
 				if (override || !drcuml->hash_exists(mode, seqhead->pc))
@@ -388,7 +388,7 @@ void arm7_cpu_device::code_compile_block(UINT8 mode, offs_t pc)
 				}
 
 				/* validate this code block if we're not pointing into ROM */
-				if (m_program->get_write_ptr(seqhead->physpc) != NULL)
+				if (m_program->get_write_ptr(seqhead->physpc) != nullptr)
 					generate_checksum_block(block, &compiler, seqhead, seqlast);
 
 				/* label this instruction, if it may be jumped to locally */
@@ -414,7 +414,7 @@ void arm7_cpu_device::code_compile_block(UINT8 mode, offs_t pc)
 				/*if (seqlast->flags & OPFLAG_CAN_CHANGE_MODES)
 				    UML_HASHJMP(block, uml::mem(&m_impstate.mode), nextpc, *m_impstate.nocode);
 				                                                                            // hashjmp <mode>,nextpc,nocode
-				else*/ if (seqlast->next() == NULL || seqlast->next()->pc != nextpc)
+				else*/ if (seqlast->next() == nullptr || seqlast->next()->pc != nextpc)
 					UML_HASHJMP(block, m_impstate.mode, nextpc, *m_impstate.nocode);
 																							// hashjmp <mode>,nextpc,nocode
 			}
@@ -1051,7 +1051,7 @@ void arm7_cpu_device::static_generate_memory_accessor(int size, bool istlb, bool
 	{
 		for (int ramnum = 0; ramnum < ARM7_MAX_FASTRAM; ramnum++)
 		{
-			if (m_impstate.fastram[ramnum].base != NULL && (!iswrite || !m_impstate.fastram[ramnum].readonly))
+			if (m_impstate.fastram[ramnum].base != nullptr && (!iswrite || !m_impstate.fastram[ramnum].readonly))
 			{
 				void *fastbase = (UINT8 *)m_impstate.fastram[ramnum].base - m_impstate.fastram[ramnum].start;
 				UINT32 skip = label++;
@@ -1198,7 +1198,7 @@ void arm7_cpu_device::generate_checksum_block(drcuml_block *block, compiler_stat
 	}
 
 	/* loose verify or single instruction: just compare and fail */
-	if (!(m_impstate.drcoptions & ARM7DRC_STRICT_VERIFY) || seqhead->next() == NULL)
+	if (!(m_impstate.drcoptions & ARM7DRC_STRICT_VERIFY) || seqhead->next() == nullptr)
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
@@ -1206,7 +1206,7 @@ void arm7_cpu_device::generate_checksum_block(drcuml_block *block, compiler_stat
 			void *base = m_direct->read_ptr(seqhead->physpc);
 			UML_LOAD(block, uml::I0, base, 0, uml::SIZE_DWORD, uml::SCALE_x4);             // load    i0,base,0,dword
 
-			if (seqhead->delay.first() != NULL && seqhead->physpc != seqhead->delay.first()->physpc)
+			if (seqhead->delay.first() != nullptr && seqhead->physpc != seqhead->delay.first()->physpc)
 			{
 				base = m_direct->read_ptr(seqhead->delay.first()->physpc);
 				UML_LOAD(block, uml::I1, base, 0, uml::SIZE_DWORD, uml::SCALE_x4);         // load    i1,base,dword
@@ -1235,7 +1235,7 @@ void arm7_cpu_device::generate_checksum_block(drcuml_block *block, compiler_stat
 				UML_ADD(block, uml::I0, uml::I0, uml::I1);                                 // add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
 
-				if (curdesc->delay.first() != NULL && (curdesc == seqlast || (curdesc->next() != NULL && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
+				if (curdesc->delay.first() != nullptr && (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
 					base = m_direct->read_ptr(curdesc->delay.first()->physpc);
 					UML_LOAD(block, uml::I1, base, 0, uml::SIZE_DWORD, uml::SCALE_x4);     // load    i1,base,dword

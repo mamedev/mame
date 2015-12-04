@@ -72,7 +72,7 @@ WRITE_LINE_MEMBER( ata_interface_device::dasp1_write_line )
 		m_dasp[1] = state;
 
 		ata_device_interface *dev = m_slot[0]->dev();
-		if (dev != NULL)
+		if (dev != nullptr)
 			dev->write_dasp(state);
 
 		set_dasp(m_dasp[0] == ASSERT_LINE || m_dasp[1] == ASSERT_LINE);
@@ -111,7 +111,7 @@ WRITE_LINE_MEMBER( ata_interface_device::pdiag1_write_line )
 		m_pdiag[1] = state;
 
 		ata_device_interface *dev = m_slot[0]->dev();
-		if (dev != NULL)
+		if (dev != nullptr)
 			dev->write_pdiag(state);
 	}
 }
@@ -126,7 +126,7 @@ UINT16 ata_interface_device::read_dma()
 {
 	UINT16 result = 0xffff;
 	for (int i = 0; i < 2; i++)
-		if (m_slot[i]->dev() != NULL)
+		if (m_slot[i]->dev() != nullptr)
 			result &= m_slot[i]->dev()->read_dma();
 
 //  printf( "%s: read_dma %04x\n", machine().describe_context(), result );
@@ -137,7 +137,7 @@ READ16_MEMBER( ata_interface_device::read_cs0 )
 {
 	UINT16 result = mem_mask;
 	for (int i = 0; i < 2; i++)
-		if (m_slot[i]->dev() != NULL)
+		if (m_slot[i]->dev() != nullptr)
 			result &= m_slot[i]->dev()->read_cs0(space, offset, mem_mask);
 
 //  { static int last_status = -1; if (offset == 7 ) { if( result == last_status ) return last_status; last_status = result; } else last_status = -1; }
@@ -151,7 +151,7 @@ READ16_MEMBER( ata_interface_device::read_cs1 )
 {
 	UINT16 result = mem_mask;
 	for (int i = 0; i < 2; i++)
-		if (m_slot[i]->dev() != NULL)
+		if (m_slot[i]->dev() != nullptr)
 			result &= m_slot[i]->dev()->read_cs1(space, offset, mem_mask);
 
 //  printf( "%s: read cs1 %04x %04x %04x\n", machine().describe_context(), offset, result, mem_mask );
@@ -171,7 +171,7 @@ void ata_interface_device::write_dma( UINT16 data )
 //  printf( "%s: write_dma %04x\n", machine().describe_context(), data );
 
 	for (int i = 0; i < 2; i++)
-		if (m_slot[i]->dev() != NULL)
+		if (m_slot[i]->dev() != nullptr)
 			m_slot[i]->dev()->write_dma(data);
 }
 
@@ -180,7 +180,7 @@ WRITE16_MEMBER( ata_interface_device::write_cs0 )
 //  printf( "%s: write cs0 %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask );
 
 	for (int i = 0; i < 2; i++)
-		if (m_slot[i]->dev() != NULL)
+		if (m_slot[i]->dev() != nullptr)
 			m_slot[i]->dev()->write_cs0(space, offset, data, mem_mask);
 }
 
@@ -189,7 +189,7 @@ WRITE16_MEMBER( ata_interface_device::write_cs1 )
 //  printf( "%s: write cs1 %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask );
 
 	for (int i = 0; i < 2; i++)
-		if (m_slot[i]->dev() != NULL)
+		if (m_slot[i]->dev() != nullptr)
 			m_slot[i]->dev()->write_cs1(space, offset, data, mem_mask);
 }
 
@@ -198,7 +198,7 @@ WRITE_LINE_MEMBER( ata_interface_device::write_dmack )
 //  printf( "%s: write_dmack %04x\n", machine().describe_context(), state );
 
 	for (int i = 0; i < 2; i++)
-		if (m_slot[i]->dev() != NULL)
+		if (m_slot[i]->dev() != nullptr)
 			m_slot[i]->dev()->write_dmack(state);
 }
 
@@ -247,7 +247,7 @@ void ata_interface_device::device_start()
 		m_pdiag[i] = 0;
 
 		ata_device_interface *dev = m_slot[i]->dev();
-		if (dev != NULL)
+		if (dev != nullptr)
 		{
 			if (i == 0)
 			{
@@ -299,7 +299,7 @@ const device_type ATA_SLOT = &device_creator<ata_slot_device>;
 ata_slot_device::ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ATA_SLOT, "ATA Connector", tag, owner, clock, "ata_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
-		m_dev(NULL)
+		m_dev(nullptr)
 {
 }
 

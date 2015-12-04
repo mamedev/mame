@@ -184,7 +184,7 @@ static FILE *sample[1];
 #endif
 
 #define LOG_CYM_FILE 0
-static FILE * cymfile = NULL;
+static FILE * cymfile = nullptr;
 
 
 
@@ -1765,7 +1765,7 @@ static void OPL_UnLockTable(void)
 
 	if (cymfile)
 		fclose (cymfile);
-	cymfile = NULL;
+	cymfile = nullptr;
 }
 
 static void OPLResetChip(FM_OPL *OPL)
@@ -1971,7 +1971,7 @@ static FM_OPL *OPLCreate(device_t *device, UINT32 clock, UINT32 rate, int type)
 	FM_OPL *OPL;
 	int state_size;
 
-	if (OPL_LockTable(device) == -1) return NULL;
+	if (OPL_LockTable(device) == -1) return nullptr;
 
 	/* calculate OPL state size */
 	state_size  = sizeof(FM_OPL);

@@ -216,8 +216,8 @@ protected:
 		switch (spacenum)
 		{
 			case AS_PROGRAM: return &m_program_config;
-			case AS_IO:      return NULL;
-			default:         return NULL;
+			case AS_IO:      return nullptr;
+			default:         return nullptr;
 		}
 	}
 
@@ -310,7 +310,7 @@ public:
 
 	inline netlist_mame_device_t &nl_owner() const { return *m_owner; }
 
-	inline bool is_sound_device() const { return (m_sound != NULL); }
+	inline bool is_sound_device() const { return (m_sound != nullptr); }
 
 	inline void update_to_current_time()
 	{
@@ -509,7 +509,7 @@ class NETLIB_NAME(analog_callback) : public netlist::device_t
 {
 public:
 	NETLIB_NAME(analog_callback)()
-		: device_t(), m_cpu_device(NULL), m_last(0) { }
+		: device_t(), m_cpu_device(nullptr), m_last(0) { }
 
 	ATTR_COLD void start()
 	{
@@ -659,7 +659,7 @@ public:
 	{
 		m_pos = 0;
 		for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
-			m_buffer[i] = NULL;
+			m_buffer[i] = nullptr;
 	}
 
 	ATTR_COLD int resolve()
@@ -682,7 +682,7 @@ public:
 	{
 		for (int i=0; i<m_num_channel; i++)
 		{
-			if (m_buffer[i] == NULL)
+			if (m_buffer[i] == nullptr)
 				break; // stop, called outside of stream_update
 			const nl_double v = m_buffer[i][m_pos];
 			m_param[i]->setTo(v * m_param_mult[i].Value() + m_param_offset[i].Value());

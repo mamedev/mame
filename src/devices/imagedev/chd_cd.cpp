@@ -29,18 +29,18 @@ const device_type CDROM = &device_creator<cdrom_image_device>;
 cdrom_image_device::cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CDROM, "CD-ROM Image", tag, owner, clock, "cdrom_image", __FILE__),
 		device_image_interface(mconfig, *this),
-		m_cdrom_handle(NULL),
-		m_extension_list(NULL),
-		m_interface(NULL)
+		m_cdrom_handle(nullptr),
+		m_extension_list(nullptr),
+		m_interface(nullptr)
 {
 }
 
 cdrom_image_device::cdrom_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name,  tag, owner, clock, shortname, source),
 		device_image_interface(mconfig, *this),
-		m_cdrom_handle(NULL),
-		m_extension_list(NULL),
-		m_interface(NULL)
+		m_cdrom_handle(nullptr),
+		m_extension_list(nullptr),
+		m_interface(nullptr)
 {
 }
 //-------------------------------------------------
@@ -80,13 +80,13 @@ void cdrom_image_device::device_start()
 {
 	// try to locate the CHD from a DISK_REGION
 	chd_file *chd = get_disk_handle( machine(), owner()->tag() );
-	if( chd != NULL )
+	if( chd != nullptr )
 	{
 		m_cdrom_handle = cdrom_open( chd );
 	}
 	else
 	{
-		m_cdrom_handle = NULL;
+		m_cdrom_handle = nullptr;
 	}
 }
 
@@ -101,12 +101,12 @@ void cdrom_image_device::device_stop()
 bool cdrom_image_device::call_load()
 {
 	chd_error   err = (chd_error)0;
-	chd_file    *chd = NULL;
+	chd_file    *chd = nullptr;
 
 	if (m_cdrom_handle)
 		cdrom_close(m_cdrom_handle);
 
-	if (software_entry() == NULL)
+	if (software_entry() == nullptr)
 	{
 		if (strstr(m_image_name.c_str(), ".chd") && is_loaded()) {
 			err = m_self_chd.open( *image_core_file() );    /* CDs are never writeable */
@@ -141,7 +141,7 @@ void cdrom_image_device::call_unload()
 {
 	assert(m_cdrom_handle);
 	cdrom_close(m_cdrom_handle);
-	m_cdrom_handle = NULL;
+	m_cdrom_handle = nullptr;
 	if( m_self_chd.opened() )
 		m_self_chd.close();
 }

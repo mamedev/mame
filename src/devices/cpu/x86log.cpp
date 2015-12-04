@@ -103,7 +103,7 @@ x86log_context *x86log_create_context(const char *filename)
 void x86log_free_context(x86log_context *log)
 {
 	/* close any open files */
-	if (log->file != NULL)
+	if (log->file != nullptr)
 		fclose(log->file);
 
 	/* free the structure */
@@ -188,7 +188,7 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 	x86code *cur = start;
 
 	/* print the optional label */
-	if (label != NULL)
+	if (label != nullptr)
 		x86log_printf(log, "\n%s\n", label);
 
 	/* loop from the start until the cache top */
@@ -268,9 +268,9 @@ void x86log_printf(x86log_context *log, const char *format, ...)
 	va_list va;
 
 	/* open the file, creating it if necessary */
-	if (log->file == NULL)
+	if (log->file == nullptr)
 		log->file = fopen(log->filename.c_str(), "w");
-	if (log->file == NULL)
+	if (log->file == nullptr)
 		return;
 
 	/* do the printf */

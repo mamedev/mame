@@ -75,7 +75,7 @@ UINT32 sh2_device::epc(const opcode_desc *desc)
 
 void sh2_device::alloc_handle(drcuml_state *drcuml, code_handle **handleptr, const char *name)
 {
-	if (*handleptr == NULL)
+	if (*handleptr == nullptr)
 		*handleptr = drcuml->handle_alloc(name);
 }
 
@@ -688,7 +688,7 @@ void sh2_device::code_compile_block(UINT8 mode, offs_t pc)
 			block = drcuml->begin_block(4096);
 
 			/* loop until we get through all instruction sequences */
-			for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next())
+			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
 			{
 				const opcode_desc *curdesc;
 				UINT32 nextpc;
@@ -698,10 +698,10 @@ void sh2_device::code_compile_block(UINT8 mode, offs_t pc)
 					block->append_comment("-------------------------");                 // comment
 
 				/* determine the last instruction in this sequence */
-				for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next())
+				for (seqlast = seqhead; seqlast != nullptr; seqlast = seqlast->next())
 					if (seqlast->flags & OPFLAG_END_SEQUENCE)
 						break;
-				assert(seqlast != NULL);
+				assert(seqlast != nullptr);
 
 				/* if we don't have a hash for this mode/pc, or if we are overriding all, add one */
 				if (override || !drcuml->hash_exists(mode, seqhead->pc))
@@ -725,7 +725,7 @@ void sh2_device::code_compile_block(UINT8 mode, offs_t pc)
 				}
 
 				/* validate this code block if we're not pointing into ROM */
-				if (m_program->get_write_ptr(seqhead->physpc) != NULL)
+				if (m_program->get_write_ptr(seqhead->physpc) != nullptr)
 					generate_checksum_block(block, &compiler, seqhead, seqlast);
 
 				/* label this instruction, if it may be jumped to locally */
@@ -755,7 +755,7 @@ void sh2_device::code_compile_block(UINT8 mode, offs_t pc)
 				generate_update_cycles(block, &compiler, nextpc, TRUE);                // <subtract cycles>
 
 				/* SH2 has no modes */
-				if (seqlast->next() == NULL || seqlast->next()->pc != nextpc)
+				if (seqlast->next() == nullptr || seqlast->next()->pc != nextpc)
 				{
 					UML_HASHJMP(block, 0, nextpc, *m_nocode);
 				}
@@ -937,7 +937,7 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 
 	for (int ramnum = 0; ramnum < SH2_MAX_FASTRAM; ramnum++)
 	{
-		if (m_fastram[ramnum].base != NULL && (!iswrite || !m_fastram[ramnum].readonly))
+		if (m_fastram[ramnum].base != nullptr && (!iswrite || !m_fastram[ramnum].readonly))
 		{
 			void *fastbase = (UINT8 *)m_fastram[ramnum].base - m_fastram[ramnum].start;
 			UINT32 skip = label++;
@@ -1109,7 +1109,7 @@ void sh2_device::log_register_list(drcuml_state *drcuml, const char *string, con
 		if (reglist[0] & REGFLAG_R(regnum))
 		{
 			drcuml->log_printf("%sr%d", (count++ == 0) ? "" : ",", regnum);
-			if (regnostarlist != NULL && !(regnostarlist[0] & REGFLAG_R(regnum)))
+			if (regnostarlist != nullptr && !(regnostarlist[0] & REGFLAG_R(regnum)))
 				drcuml->log_printf("*");
 		}
 	}
@@ -1117,42 +1117,42 @@ void sh2_device::log_register_list(drcuml_state *drcuml, const char *string, con
 	if (reglist[1] & REGFLAG_PR)
 	{
 		drcuml->log_printf("%spr", (count++ == 0) ? "" : ",");
-		if (regnostarlist != NULL && !(regnostarlist[1] & REGFLAG_PR))
+		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_PR))
 			drcuml->log_printf("*");
 	}
 
 	if (reglist[1] & REGFLAG_SR)
 	{
 		drcuml->log_printf("%ssr", (count++ == 0) ? "" : ",");
-		if (regnostarlist != NULL && !(regnostarlist[1] & REGFLAG_SR))
+		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_SR))
 			drcuml->log_printf("*");
 	}
 
 	if (reglist[1] & REGFLAG_MACL)
 	{
 		drcuml->log_printf("%smacl", (count++ == 0) ? "" : ",");
-		if (regnostarlist != NULL && !(regnostarlist[1] & REGFLAG_MACL))
+		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_MACL))
 			drcuml->log_printf("*");
 	}
 
 	if (reglist[1] & REGFLAG_MACH)
 	{
 		drcuml->log_printf("%smach", (count++ == 0) ? "" : ",");
-		if (regnostarlist != NULL && !(regnostarlist[1] & REGFLAG_MACH))
+		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_MACH))
 			drcuml->log_printf("*");
 	}
 
 	if (reglist[1] & REGFLAG_GBR)
 	{
 		drcuml->log_printf("%sgbr", (count++ == 0) ? "" : ",");
-		if (regnostarlist != NULL && !(regnostarlist[1] & REGFLAG_GBR))
+		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_GBR))
 			drcuml->log_printf("*");
 	}
 
 	if (reglist[1] & REGFLAG_VBR)
 	{
 		drcuml->log_printf("%svbr", (count++ == 0) ? "" : ",");
-		if (regnostarlist != NULL && !(regnostarlist[1] & REGFLAG_VBR))
+		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_VBR))
 			drcuml->log_printf("*");
 	}
 
@@ -1170,7 +1170,7 @@ void sh2_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *descli
 		drcuml->log_printf("\nDescriptor list @ %08X\n", desclist->pc);
 
 	/* output each descriptor */
-	for ( ; desclist != NULL; desclist = desclist->next())
+	for ( ; desclist != nullptr; desclist = desclist->next())
 	{
 		char buffer[100];
 
@@ -1187,12 +1187,12 @@ void sh2_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *descli
 		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer);
 
 		/* output register states */
-		log_register_list(drcuml, "use", desclist->regin, NULL);
+		log_register_list(drcuml, "use", desclist->regin, nullptr);
 		log_register_list(drcuml, "mod", desclist->regout, desclist->regreq);
 		drcuml->log_printf("\n");
 
 		/* if we have a delay slot, output it recursively */
-		if (desclist->delay.first() != NULL)
+		if (desclist->delay.first() != nullptr)
 			log_opcode_desc(drcuml, desclist->delay.first(), indent + 1);
 
 		/* at the end of a sequence add a dividing line */
@@ -1306,7 +1306,7 @@ void sh2_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 		block->append_comment("[Validation for %08X]", seqhead->pc);                // comment
 
 	/* loose verify or single instruction: just compare and fail */
-	if (!(m_drcoptions & SH2DRC_STRICT_VERIFY) || seqhead->next() == NULL)
+	if (!(m_drcoptions & SH2DRC_STRICT_VERIFY) || seqhead->next() == nullptr)
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
@@ -1444,7 +1444,7 @@ void sh2_device::generate_delay_slot(drcuml_block *block, compiler_state *compil
 	compiler_state compiler_temp = *compiler;
 
 	/* compile the delay slot using temporary compiler state */
-	assert(desc->delay.first() != NULL);
+	assert(desc->delay.first() != nullptr);
 	generate_sequence_instruction(block, &compiler_temp, desc->delay.first(), ovrpc);              // <next instruction>
 
 	/* update the label */

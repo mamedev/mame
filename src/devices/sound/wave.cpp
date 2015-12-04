@@ -72,7 +72,7 @@ void wave_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	double time_index;
 	double duration;
 	stream_sample_t *left_buffer = outputs[0];
-	stream_sample_t *right_buffer = NULL;
+	stream_sample_t *right_buffer = nullptr;
 	int i;
 
 	speaker_device_iterator spkiter(m_cass->machine().root_device());

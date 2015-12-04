@@ -26,7 +26,7 @@ std::unique_ptr<Instruction> Instruction::decodeInstruction(const Opcode* opc,
 	if ((w0 & 0xff00) == 0x0500)
 	{
 		// Avoid "05-- 05--" recursion
-		if (shifted) return NULL;
+		if (shifted) return nullptr;
 
 		std::unique_ptr<Instruction> op = decodeInstruction(opc, w0, w1, true);
 		if (op)
@@ -779,7 +779,7 @@ std::unique_ptr<Instruction> Instruction::decodeInstruction(const Opcode* opc,
 		return std::make_unique<Shfr>(opc, w0, w1);
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 }

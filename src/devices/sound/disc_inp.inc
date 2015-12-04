@@ -65,7 +65,7 @@ DISCRETE_RESET(dss_adjustment)
 	double min, max;
 
 	m_port = m_device->machine().root_device().ioport(m_device->siblingtag((const char *)this->custom_data()).c_str());
-	if (m_port == NULL)
+	if (m_port == nullptr)
 		fatalerror("DISCRETE_ADJUSTMENT - NODE_%d has invalid tag\n", this->index());
 
 	m_lastpval = 0x7fffffff;
@@ -264,7 +264,7 @@ DISCRETE_STEP(dss_input_stream)
 
 DISCRETE_RESET(dss_input_stream)
 {
-	m_ptr = NULL;
+	m_ptr = nullptr;
 	m_data = 0;
 }
 
@@ -304,10 +304,10 @@ DISCRETE_START(dss_input_stream)
 	m_stream_in_number = DSS_INPUT_STREAM__STREAM;
 	m_gain = DSS_INPUT_STREAM__GAIN;
 	m_offset = DSS_INPUT_STREAM__OFFSET;
-	m_ptr = NULL;
+	m_ptr = nullptr;
 
 	m_is_buffered = is_buffered();
-	m_buffer_stream = NULL;
+	m_buffer_stream = nullptr;
 }
 
 void DISCRETE_CLASS_NAME(dss_input_stream)::stream_start(void)

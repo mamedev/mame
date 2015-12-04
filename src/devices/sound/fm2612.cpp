@@ -1087,7 +1087,7 @@ static void setup_connection(fm2612_FM_OPN *OPN, fm2612_FM_CH *CH, int ch)
 		/*    +----C1----+     */
 		/* M1-+-MEM---M2-+-OUT */
 		/*    +----C2----+     */
-		*om1 = 0;   /* special mark */
+		*om1 = nullptr;   /* special mark */
 		*oc1 = carrier;
 		*om2 = carrier;
 		*memc= &OPN->m2;

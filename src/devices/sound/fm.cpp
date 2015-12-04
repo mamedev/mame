@@ -943,7 +943,7 @@ static void setup_connection( FM_OPN *OPN, FM_CH *CH, int ch )
 		/*    +----C1----+     */
 		/* M1-+-MEM---M2-+-OUT */
 		/*    +----C2----+     */
-		*om1 = 0;   /* special mark */
+		*om1 = nullptr;   /* special mark */
 		*oc1 = carrier;
 		*om2 = carrier;
 		*memc= &OPN->m2;
@@ -2268,7 +2268,7 @@ void * ym2203_init(void *param, device_t *device, int clock, int rate,
 	if( !init_tables() )
 	{
 		auto_free( device->machine(), F2203 );
-		return NULL;
+		return nullptr;
 	}
 
 	F2203->OPN.ST.param = param;
@@ -2558,7 +2558,7 @@ static void FM_ADPCMAWrite(YM2610 *F2610,int r,int v)
 					adpcm[c].adpcm_out = 0;
 					adpcm[c].flag      = 1;
 
-					if(F2610->pcmbuf==NULL)
+					if(F2610->pcmbuf==nullptr)
 					{                   /* Check ROM Mapped */
 						F2610->device->logerror("YM2608-YM2610: ADPCM-A rom not mapped\n");
 						adpcm[c].flag = 0;
@@ -2946,7 +2946,7 @@ void * ym2608_init(void *param, device_t *device, int clock, int rate,
 	if( !init_tables() )
 	{
 		auto_free( device->machine(), F2608 );
-		return NULL;
+		return nullptr;
 	}
 
 	F2608->OPN.ST.param = param;
@@ -3627,7 +3627,7 @@ void *ym2610_init(void *param, device_t *device, int clock, int rate,
 	if( !init_tables() )
 	{
 		auto_free( device->machine(), F2610 );
-		return NULL;
+		return nullptr;
 	}
 
 	F2610->device = device;
@@ -3686,7 +3686,7 @@ void ym2610_reset_chip(void *chip)
 	F2610->pcm_size = dev->machine().root_device().memregion(name.c_str())->bytes();
 	name.append(".deltat");
 	F2610->deltaT.memory = (UINT8 *)dev->machine().root_device().memregion(name.c_str())->base();
-	if(F2610->deltaT.memory == NULL)
+	if(F2610->deltaT.memory == nullptr)
 	{
 		F2610->deltaT.memory = (UINT8*)F2610->pcmbuf;
 		F2610->deltaT.memory_size = F2610->pcm_size;

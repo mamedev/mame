@@ -49,9 +49,9 @@ void alto2_cpu_device::activate_dht()
  */
 void alto2_cpu_device::init_dht(int task)
 {
-	set_f1(task, f1_block,          &alto2_cpu_device::f1_early_dht_block, 0);
-	set_f2(task, f2_dht_evenfield,  0, &alto2_cpu_device::f2_late_evenfield);
-	set_f2(task, f2_dht_setmode,    0, &alto2_cpu_device::f2_late_dht_setmode);
+	set_f1(task, f1_block,          &alto2_cpu_device::f1_early_dht_block, nullptr);
+	set_f2(task, f2_dht_evenfield,  nullptr, &alto2_cpu_device::f2_late_evenfield);
+	set_f2(task, f2_dht_setmode,    nullptr, &alto2_cpu_device::f2_late_dht_setmode);
 	m_active_callback[task] = &alto2_cpu_device::activate_dht;
 }
 

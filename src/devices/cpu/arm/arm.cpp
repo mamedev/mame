@@ -604,7 +604,7 @@ void arm_cpu_device::HandleMemSingle( UINT32 insn )
 	/* Fetch the offset */
 	if (insn & INSN_I)
 	{
-		off = decodeShift(insn, NULL);
+		off = decodeShift(insn, nullptr);
 	}
 	else
 	{
@@ -821,7 +821,7 @@ void arm_cpu_device::HandleALU( UINT32 insn )
 	}
 	else
 	{
-		op2 = decodeShift(insn, (insn & INSN_S) ? &sc : NULL);
+		op2 = decodeShift(insn, (insn & INSN_S) ? &sc : nullptr);
 
 			if (!(insn & INSN_S))
 			sc=0;

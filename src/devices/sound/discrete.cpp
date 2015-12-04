@@ -223,13 +223,13 @@ void *discrete_task::task_callback(void *param, int threadid)
 			if ((*task)->lock_threadid(threadid))
 			{
 				if (!(*task)->process())
-					return NULL;
+					return nullptr;
 				(*task)->unlock();
 			}
 		}
 	} while (1);
 
-	return NULL;
+	return nullptr;
 }
 
 bool discrete_task::process(void)
@@ -303,7 +303,7 @@ void discrete_task::check(discrete_task *dest_task)
 					{
 						input_buffer source;
 						int i, found = -1;
-						output_buffer *pbuf = NULL;
+						output_buffer *pbuf = nullptr;
 
 						for (i = 0; i < m_buffers.count(); i++)
 //                          if (m_buffers[i].node->block_node() == inputnode_num)
@@ -335,7 +335,7 @@ void discrete_task::check(discrete_task *dest_task)
 						//source.output_node = i;
 						source.linked_outbuf = pbuf;
 						source.buffer = 0.0; /* please compiler */
-						source.ptr = NULL;
+						source.ptr = nullptr;
 						dest_task->source_list.add(source);
 
 						/* point the input to a buffered location */
@@ -355,14 +355,14 @@ void discrete_task::check(discrete_task *dest_task)
  *************************************/
 
 discrete_base_node::discrete_base_node() :
-	m_device(NULL),
-	m_block(NULL),
+	m_device(nullptr),
+	m_block(nullptr),
 	m_active_inputs(0),
-	m_custom(NULL),
+	m_custom(nullptr),
 	m_input_is_node(0),
-	m_step_intf(NULL),
-	m_input_intf(NULL),
-	m_output_intf(NULL)
+	m_step_intf(nullptr),
+	m_input_intf(nullptr),
+	m_output_intf(nullptr)
 {
 	m_output[0] = 0.0;
 }
@@ -400,7 +400,7 @@ void discrete_base_node::save_state(void)
 
 discrete_base_node *discrete_device::discrete_find_node(int node)
 {
-	if (node < NODE_START || node > NODE_END) return NULL;
+	if (node < NODE_START || node > NODE_END) return nullptr;
 	return m_indexed_node[NODE_INDEX(node)];
 }
 
@@ -454,12 +454,12 @@ const double *discrete_device::node_output_ptr(int onode)
 	const discrete_base_node *node;
 	node = discrete_find_node(onode);
 
-	if (node != NULL)
+	if (node != nullptr)
 	{
 		return &(node->m_output[NODE_CHILD_NODE_NUM(onode)]);
 	}
 	else
-		return NULL;
+		return nullptr;
 }
 
 /*************************************
@@ -679,7 +679,7 @@ void discrete_device::display_profiling(void)
 
 void discrete_device::init_nodes(const sound_block_list_t &block_list)
 {
-	discrete_task *task = NULL;
+	discrete_task *task = nullptr;
 	/* list tail pointers */
 	int                 has_tasks = 0;
 
@@ -731,7 +731,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 				case DSO_TASK_START:
 					if (USE_DISCRETE_TASKS)
 					{
-						if (task != NULL)
+						if (task != nullptr)
 							fatalerror("init_nodes() - Nested DISCRETE_START_TASK.\n");
 						task = auto_alloc_clear(machine(), discrete_task(*this));
 						task->task_group = block->initial[0];
@@ -745,7 +745,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 				case DSO_TASK_END:
 					if (USE_DISCRETE_TASKS)
 					{
-						if (task == NULL)
+						if (task == nullptr)
 							fatalerror("init_nodes() - NO DISCRETE_START_TASK.\n");
 					}
 					break;
@@ -772,7 +772,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 		if (node->interface(step))
 		{
 			/* do we belong to a task? */
-			if (task == NULL)
+			if (task == nullptr)
 				fatalerror("init_nodes() - found node outside of task: %s\n", node->module_name() );
 			else
 				task->step_list.add(step);
@@ -780,7 +780,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 
 		if (USE_DISCRETE_TASKS &&  block->type == DSO_TASK_END)
 		{
-			task = NULL;
+			task = nullptr;
 		}
 
 		/* and register save state */
@@ -836,13 +836,13 @@ void discrete_device::static_set_intf(device_t &device, const discrete_block *in
 
 discrete_device::discrete_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock, "discrete", __FILE__),
-		m_intf(NULL),
+		m_intf(nullptr),
 		m_sample_rate(0),
 		m_sample_time(0),
 		m_neg_sample_time(0),
-		m_indexed_node(NULL),
-		m_disclogfile(NULL),
-		m_queue(NULL),
+		m_indexed_node(nullptr),
+		m_disclogfile(nullptr),
+		m_queue(nullptr),
 		m_profiling(0),
 		m_total_samples(0),
 		m_total_stream_updates(0)
@@ -852,7 +852,7 @@ discrete_device::discrete_device(const machine_config &mconfig, device_type type
 discrete_sound_device::discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: discrete_device(mconfig, DISCRETE, "DISCRETE", tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		m_stream(NULL)
+		m_stream(nullptr)
 {
 }
 
@@ -959,7 +959,7 @@ void discrete_device::device_stop()
 		/* close the debug log */
 		if (m_disclogfile)
 			fclose(m_disclogfile);
-		m_disclogfile = NULL;
+		m_disclogfile = nullptr;
 	}
 }
 
@@ -980,7 +980,7 @@ void discrete_sound_device::device_start()
 	{
 		/* if we are an stream input node, track that */
 		discrete_dss_input_stream_node *input_stream = dynamic_cast<discrete_dss_input_stream_node *>(*node);
-		if (input_stream != NULL)
+		if (input_stream != nullptr)
 		{
 			m_input_stream_list.add(input_stream);
 		}

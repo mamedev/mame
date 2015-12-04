@@ -159,7 +159,7 @@ void i2cmem_device::device_reset()
 
 const address_space_config *i2cmem_device::memory_space_config( address_spacenum spacenum ) const
 {
-	return ( spacenum == 0 ) ? &m_space_config : NULL;
+	return ( spacenum == 0 ) ? &m_space_config : nullptr;
 }
 
 
@@ -179,7 +179,7 @@ void i2cmem_device::nvram_default()
 	}
 
 	/* populate from a memory region if present */
-	if( m_region != NULL )
+	if( m_region != nullptr )
 	{
 		if( m_region->bytes() != i2cmem_bytes )
 		{

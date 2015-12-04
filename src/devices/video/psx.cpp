@@ -568,7 +568,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	}
 
 	// icky!!!
-	machine().save().save_memory( this, "globals", NULL, 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
+	machine().save().save_memory( this, "globals", nullptr, 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
 
 	save_pointer(NAME(p_vram), width * height );
 	save_item(NAME(n_gpu_buffer_offset));
@@ -752,7 +752,7 @@ UINT32 psxgpu_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap,
 			n_line = n_lines;
 			while( n_line > 0 )
 			{
-				draw_scanline16( bitmap, n_x + n_left, n_y + n_top, n_columns, p_p_vram[ ( n_y + n_displaystarty ) & 1023 ] + n_x + n_displaystartx, NULL );
+				draw_scanline16( bitmap, n_x + n_left, n_y + n_top, n_columns, p_p_vram[ ( n_y + n_displaystarty ) & 1023 ] + n_x + n_displaystartx, nullptr );
 				n_y++;
 				n_line--;
 			}

@@ -39,7 +39,7 @@ ADDRESS_MAP_END
 
 const address_space_config *ef9345_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 //**************************************************************************
@@ -100,7 +100,7 @@ ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, EF9345, "EF9345", tag, owner, clock, "ef9345", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(ef9345)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(ef9345)),
 	m_palette(*this)
 {
 }

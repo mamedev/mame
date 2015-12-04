@@ -46,7 +46,7 @@ sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, dev
 		m_rcount(0),
 		m_playing(0),
 		m_RNG(0),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_voiced(0),
 		m_fifo_pos(0),
 		m_drq(*this)

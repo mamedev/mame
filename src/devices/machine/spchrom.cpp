@@ -125,7 +125,7 @@ void speechrom_device::read_and_branch()
 void speechrom_device::device_start()
 {
 	memory_region *region = memregion(tag());
-	if (region == NULL)
+	if (region == nullptr)
 	{
 		throw emu_fatalerror("No region for device '%s'\n", tag());
 	}

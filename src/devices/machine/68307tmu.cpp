@@ -10,7 +10,7 @@ READ16_MEMBER( m68307cpu_device::m68307_internal_timer_r )
 {
 	m68307cpu_device *m68k = this;
 	m68307_timer* timer = m68k->m68307TIMER;
-	assert(timer != NULL);
+	assert(timer != nullptr);
 
 	if (timer)
 	{
@@ -36,7 +36,7 @@ WRITE16_MEMBER( m68307cpu_device::m68307_internal_timer_w )
 {
 	m68307cpu_device *m68k = this;
 	m68307_timer* timer = m68k->m68307TIMER;
-	assert(timer != NULL);
+	assert(timer != nullptr);
 
 	if (timer)
 	{

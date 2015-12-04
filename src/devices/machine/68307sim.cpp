@@ -10,7 +10,7 @@ READ16_MEMBER( m68307cpu_device::m68307_internal_sim_r )
 {
 	m68307cpu_device *m68k = this;
 	m68307_sim* sim = m68k->m68307SIM;
-	assert(sim != NULL);
+	assert(sim != nullptr);
 
 	int pc = space.device().safe_pc();
 
@@ -47,7 +47,7 @@ WRITE16_MEMBER( m68307cpu_device::m68307_internal_sim_w )
 {
 	m68307cpu_device *m68k = this;
 	m68307_sim* sim = m68k->m68307SIM;
-	assert(sim != NULL);
+	assert(sim != nullptr);
 
 	int pc = space.device().safe_pc();
 

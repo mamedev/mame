@@ -207,7 +207,7 @@ static inline const char * REGNAME(UINT8 r) {
 	case 254: return "MAX";
 	case 255: return "ZERO";
 	}
-	return NULL;
+	return nullptr;
 }
 
 static inline char * DESCRIBE_REG(char *s, UINT8 r, const char *name) {
@@ -570,7 +570,7 @@ void es5510_device::device_reset() {
 }
 
 const address_space_config *es5510_device::memory_space_config(address_spacenum spacenum) const {
-	return 0;
+	return nullptr;
 }
 
 UINT64 es5510_device::execute_clocks_to_cycles(UINT64 clocks) const {
@@ -613,7 +613,7 @@ void es5510_device::list_program(void(p)(const char *, ...)) {
 	}
 
 	for (addr = 0; addr < 0xa0; addr++) {
-		DESCRIBE_INSTR(buf, instr[addr], gpr[addr], NULL, NULL, NULL, NULL);
+		DESCRIBE_INSTR(buf, instr[addr], gpr[addr], nullptr, nullptr, nullptr, nullptr);
 		UINT64 inst = instr[addr];
 		UINT8 aReg = (UINT8)((inst >> 16) & 0xff);
 		UINT8 bReg = (UINT8)((inst >> 24) & 0xff);

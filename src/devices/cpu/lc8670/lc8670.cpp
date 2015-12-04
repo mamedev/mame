@@ -396,7 +396,7 @@ const address_space_config * lc8670_cpu_device::memory_space_config(address_spac
 	return  (spacenum == AS_PROGRAM) ? &m_program_config :
 			(spacenum == AS_DATA) ? &m_data_config :
 			(spacenum == AS_IO) ? &m_io_config :
-			NULL;
+			nullptr;
 }
 
 //-------------------------------------------------

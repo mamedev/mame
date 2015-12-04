@@ -93,7 +93,7 @@ void ymf262_device::device_start()
 
 	/* stream system initialize */
 	m_chip = ymf262_init(this,clock(),rate);
-	assert_always(m_chip != NULL, "Error creating YMF262 chip");
+	assert_always(m_chip != nullptr, "Error creating YMF262 chip");
 
 	m_stream = machine().sound().stream_alloc(*this,0,4,rate);
 

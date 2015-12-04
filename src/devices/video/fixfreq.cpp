@@ -97,8 +97,8 @@ void fixedfreq_device::device_start()
 	m_sig_composite = 0;
 	m_sig_field = 0;
 
-	m_bitmap[0] = NULL;
-	m_bitmap[1] = NULL;
+	m_bitmap[0] = nullptr;
+	m_bitmap[1] = nullptr;
 	//m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
 	recompute_parameters(false);
 
@@ -148,9 +148,9 @@ void fixedfreq_device::recompute_parameters(bool postload)
 {
 	bool needs_realloc = (m_htotal != m_hbackporch) && (m_vtotal != m_vbackporch);
 
-	if (m_bitmap[0] != NULL || needs_realloc)
+	if (m_bitmap[0] != nullptr || needs_realloc)
 		auto_free(machine(), m_bitmap[0]);
-	if (m_bitmap[1] != NULL || needs_realloc)
+	if (m_bitmap[1] != nullptr || needs_realloc)
 		auto_free(machine(), m_bitmap[0]);
 
 	m_htotal = m_hbackporch;

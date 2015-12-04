@@ -20,11 +20,11 @@ segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, SEGAPCM, "Sega PCM", tag, owner, clock, "segapcm", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_rom(*this, DEVICE_SELF),
-		m_ram(NULL),
+		m_ram(nullptr),
 		m_bank(0),
 		m_bankshift(0),
 		m_bankmask(0),
-		m_stream(NULL)
+		m_stream(nullptr)
 {
 }
 

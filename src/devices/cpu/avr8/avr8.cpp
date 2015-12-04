@@ -638,8 +638,8 @@ avr8_device::avr8_device(const machine_config &mconfig, const char *name, const 
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 22),
 		m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 4),
-		m_eeprom_tag(NULL),
-		m_eeprom(NULL),
+		m_eeprom_tag(nullptr),
+		m_eeprom(nullptr),
 		m_cpu_type(cpu_type),
 		m_lfuses(0x62),
 		m_hfuses(0x99),
@@ -896,7 +896,7 @@ const address_space_config *avr8_device::memory_space_config(address_spacenum sp
 	{
 		return &m_io_config;
 	}
-	return NULL;
+	return nullptr;
 }
 
 

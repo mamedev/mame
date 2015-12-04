@@ -347,7 +347,7 @@ UINT32 ssp1601_device::ptr1_read_(int ri, int isj2, int modi3)
 {
 	//int t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
 	UINT32 mask, add = 0, t = ri | isj2 | modi3;
-	unsigned char *rp = NULL;
+	unsigned char *rp = nullptr;
 	switch (t)
 	{
 		// mod=0 (00)

@@ -515,7 +515,7 @@ void aica_device::Init()
 	{
 		m_Slots[i].slot=i;
 		m_Slots[i].active=0;
-		m_Slots[i].base=NULL;
+		m_Slots[i].base=nullptr;
 		m_Slots[i].EG.state=AICA_RELEASE;
 		m_Slots[i].lpend=1;
 	}
@@ -1476,12 +1476,12 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 		m_IRQL(0),
 		m_IRQR(0),
 		m_BUFPTR(0),
-		m_AICARAM(NULL),
+		m_AICARAM(nullptr),
 		m_AICARAM_LENGTH(0),
 		m_RAM_MASK(0),
 		m_RAM_MASK16(0),
-		m_buffertmpl(NULL),
-		m_buffertmpr(NULL),
+		m_buffertmpl(nullptr),
+		m_buffertmpr(nullptr),
 		m_IrqTimA(0),
 		m_IrqTimBC(0),
 		m_IrqMidi(0),
@@ -1491,10 +1491,10 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 		m_MidiR(0),
 		m_mcieb(0),
 		m_mcipd(0),
-		m_bufferl(NULL),
-		m_bufferr(NULL),
+		m_bufferl(nullptr),
+		m_bufferr(nullptr),
 		m_length(0),
-		m_RBUFDST(NULL)
+		m_RBUFDST(nullptr)
 
 {
 	memset(&m_udata.data, 0, sizeof(m_udata.data));

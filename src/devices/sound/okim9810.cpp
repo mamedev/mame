@@ -81,8 +81,8 @@ okim9810_device::okim9810_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, OKIM9810, "OKI9810", tag, owner, clock, "okim9810", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
-		m_space_config("samples", ENDIANNESS_BIG, 8, 24, 0, NULL, *ADDRESS_MAP_NAME(okim9810)),
-		m_stream(NULL),
+		m_space_config("samples", ENDIANNESS_BIG, 8, 24, 0, nullptr, *ADDRESS_MAP_NAME(okim9810)),
+		m_stream(nullptr),
 		m_TMP_register(0x00),
 		m_global_volume(0x00),
 		m_filter_type(OKIM9810_SECONDARY_FILTER),
@@ -175,7 +175,7 @@ void okim9810_device::device_clock_changed()
 
 const address_space_config *okim9810_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 

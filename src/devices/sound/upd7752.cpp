@@ -50,7 +50,7 @@ upd7752_device::upd7752_device(const machine_config &mconfig, const char *tag, d
 
 const address_space_config *upd7752_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 

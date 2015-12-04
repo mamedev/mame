@@ -601,7 +601,7 @@ UINT32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				int seg = offset / 2;
 				int com = bank * 8 + (offset & 1) * 4 + c;
 
-				if (m_pixel_update_handler != NULL)
+				if (m_pixel_update_handler != nullptr)
 					m_pixel_update_handler(*this, bitmap, cliprect, m_lcd_contrast, seg, com, pixel);
 				else if (cliprect.contains(seg, com))
 					bitmap.pix16(com, seg) = pixel;

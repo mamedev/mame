@@ -671,7 +671,7 @@ UINT32 lsi53c810_device::lsi53c810_dasm_fetch(UINT32 pc)
 unsigned lsi53c810_device::lsi53c810_dasm(char *buf, UINT32 pc)
 {
 	unsigned result = 0;
-	const char *op_mnemonic = NULL;
+	const char *op_mnemonic = nullptr;
 	UINT32 op = lsi53c810_dasm_fetch(pc);
 	UINT32 dest;
 	int i;

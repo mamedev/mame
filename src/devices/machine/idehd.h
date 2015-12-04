@@ -27,13 +27,13 @@ public:
 	void set_master_password(const UINT8 *password)
 	{
 		m_master_password = password;
-		m_master_password_enable = (password != NULL);
+		m_master_password_enable = (password != nullptr);
 	}
 
 	void set_user_password(const UINT8 *password)
 	{
 		m_user_password = password;
-		m_user_password_enable = (password != NULL);
+		m_user_password_enable = (password != nullptr);
 	}
 
 protected:
@@ -98,8 +98,8 @@ protected:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	virtual int read_sector(UINT32 lba, void *buffer) { if (m_disk == NULL) return 0; return hard_disk_read(m_disk, lba, buffer); }
-	virtual int write_sector(UINT32 lba, const void *buffer) { if (m_disk == NULL) return 0; return hard_disk_write(m_disk, lba, buffer); }
+	virtual int read_sector(UINT32 lba, void *buffer) { if (m_disk == nullptr) return 0; return hard_disk_read(m_disk, lba, buffer); }
+	virtual int write_sector(UINT32 lba, const void *buffer) { if (m_disk == nullptr) return 0; return hard_disk_write(m_disk, lba, buffer); }
 	virtual UINT8 calculate_status();
 
 	chd_file       *m_handle;

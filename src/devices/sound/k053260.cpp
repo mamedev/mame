@@ -76,9 +76,9 @@ const device_type K053260 = &device_creator<k053260_device>;
 k053260_device::k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053260, "K053260 KDSC", tag, owner, clock, "k053260", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_rgnoverride(NULL),
-		m_stream(NULL),
-		m_rom(NULL),
+		m_rgnoverride(nullptr),
+		m_stream(nullptr),
+		m_rom(nullptr),
 		m_rom_size(0),
 		m_keyon(0),
 		m_mode(0)

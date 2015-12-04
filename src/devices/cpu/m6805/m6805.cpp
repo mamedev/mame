@@ -484,7 +484,7 @@ const address_space_config *m6805_base_device::memory_space_config(address_space
 	{
 		return &m_program_config;
 	}
-	return NULL;
+	return nullptr;
 }
 
 

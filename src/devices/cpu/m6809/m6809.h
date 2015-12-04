@@ -223,11 +223,11 @@ protected:
 	void set_b()                                    { m_addressing_mode = ADDRESSING_MODE_REGISTER_B; }
 	void set_d()                                    { m_addressing_mode = ADDRESSING_MODE_REGISTER_D; }
 	void set_imm()                                  { m_addressing_mode = ADDRESSING_MODE_IMMEDIATE; }
-	void set_regop8(UINT8 &reg)                     { m_reg8 = &reg; m_reg16 = NULL; }
-	void set_regop16(PAIR16 &reg)                   { m_reg16 = &reg; m_reg8 = NULL; }
-	UINT8 &regop8()                                 { assert(m_reg8 != NULL); return *m_reg8; }
-	PAIR16 &regop16()                               { assert(m_reg16 != NULL); return *m_reg16; }
-	bool is_register_register_op_16_bit()           { return m_reg16 != NULL; }
+	void set_regop8(UINT8 &reg)                     { m_reg8 = &reg; m_reg16 = nullptr; }
+	void set_regop16(PAIR16 &reg)                   { m_reg16 = &reg; m_reg8 = nullptr; }
+	UINT8 &regop8()                                 { assert(m_reg8 != nullptr); return *m_reg8; }
+	PAIR16 &regop16()                               { assert(m_reg16 != nullptr); return *m_reg16; }
+	bool is_register_register_op_16_bit()           { return m_reg16 != nullptr; }
 	bool add8_sets_h()                              { return true; }
 	bool hd6309_native_mode()                       { return false; }
 

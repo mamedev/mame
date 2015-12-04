@@ -80,7 +80,7 @@ void pc_fdc_family_device::device_start()
 	for(int i=0; i<4; i++) {
 		char name[2] = {'0'+i, 0};
 		floppy_connector *conn = subdevice<floppy_connector>(name);
-		floppy[i] = conn ? conn->get_device() : NULL;
+		floppy[i] = conn ? conn->get_device() : nullptr;
 	}
 
 	irq = drq = false;
@@ -115,7 +115,7 @@ WRITE8_MEMBER( pc_fdc_family_device::dor_w )
 	if(dor & (0x10 << fid))
 		fdc->set_floppy(floppy[fid]);
 	else
-		fdc->set_floppy(NULL);
+		fdc->set_floppy(nullptr);
 
 	check_irq();
 	check_drq();
