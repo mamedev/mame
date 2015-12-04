@@ -98,7 +98,7 @@ const device_type INTV_CART_SLOT = &device_creator<intv_cart_slot_device>;
 
 device_intv_cart_interface::device_intv_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0)
 {
 }
@@ -118,7 +118,7 @@ device_intv_cart_interface::~device_intv_cart_interface()
 
 void device_intv_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = device().machine().memory().region_alloc(std::string(tag).append(INTVSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		memset(m_rom, 0xff, size);
@@ -392,7 +392,7 @@ bool intv_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 			return load_fullpath();
 		else
 		{

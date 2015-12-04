@@ -40,7 +40,7 @@ const device_type XEGS_CART_SLOT = &device_creator<xegs_cart_slot_device>;
 
 device_a800_cart_interface::device_a800_cart_interface (const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0),
 		m_bank_mask(0)
 {
@@ -61,7 +61,7 @@ device_a800_cart_interface::~device_a800_cart_interface ()
 
 void device_a800_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = device().machine().memory().region_alloc(std::string(tag).append(A800SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
@@ -242,7 +242,7 @@ bool a800_cart_slot_device::call_load()
 	{
 		UINT32 len;
 
-		if (software_entry() != NULL)
+		if (software_entry() != nullptr)
 		{
 			const char *pcb_name;
 			len = get_software_region_length("rom");
@@ -250,7 +250,7 @@ bool a800_cart_slot_device::call_load()
 			m_cart->rom_alloc(len, tag());
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), len);
 
-			if ((pcb_name = get_feature("slot")) != NULL)
+			if ((pcb_name = get_feature("slot")) != nullptr)
 				m_type = a800_get_pcb_id(pcb_name);
 			else
 				m_type = A800_8K;

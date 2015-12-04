@@ -119,8 +119,8 @@ coco_rtc_type_t coco_fdc_device::real_time_clock()
 	coco_rtc_type_t result = coco_rtc_type_t(read_safe(machine().root_device().ioport("real_time_clock"), RTC_NONE));
 
 	/* check to make sure we don't have any invalid values */
-	if (((result == RTC_DISTO) && (m_disto_msm6242 == NULL))
-		|| ((result == RTC_CLOUD9) && (m_ds1315 == NULL)))
+	if (((result == RTC_DISTO) && (m_disto_msm6242 == nullptr))
+		|| ((result == RTC_CLOUD9) && (m_ds1315 == nullptr)))
 	{
 		result = RTC_NONE;
 	}
@@ -525,7 +525,7 @@ void dragon_fdc_device::dskreg_w(UINT8 data)
 			data);
 	}
 
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	switch (data & 0x03)
 	{

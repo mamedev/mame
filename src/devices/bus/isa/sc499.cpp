@@ -340,12 +340,12 @@ void sc499_device::device_start()
 
 	LOG1(("start sc499"));
 
-	m_timer = timer_alloc(0, NULL);
-	m_timer1 = timer_alloc(1, NULL);
+	m_timer = timer_alloc(0, nullptr);
+	m_timer1 = timer_alloc(1, nullptr);
 
 	m_installed = false;
 
-	if (m_image->image_core_file() == NULL)
+	if (m_image->image_core_file() == nullptr)
 	{
 		LOG2(("start sc499: no cartridge tape"));
 	}
@@ -1177,7 +1177,7 @@ void sc499_device::read_block()
 
 	tape = m_image->read_block(m_tape_pos);
 
-	if (tape == NULL)
+	if (tape == nullptr)
 	{
 		// either there is no tape or m_tape_pos goes beyond end-of-tape
 		m_status &= ~SC499_STAT_EXC;
@@ -1296,7 +1296,7 @@ UINT8 *sc499_ctape_image_device::read_block(int block_num)
 {
 	// access beyond end of tape cart
 	if (m_ctape_data.size() <= (block_num + 1) * SC499_CTAPE_BLOCK_SIZE)
-		return NULL;
+		return nullptr;
 	else
 		return &m_ctape_data[block_num * SC499_CTAPE_BLOCK_SIZE];
 }

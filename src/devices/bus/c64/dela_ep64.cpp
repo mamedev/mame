@@ -22,9 +22,9 @@ const device_type C64_DELA_EP64 = &device_creator<c64_dela_ep64_cartridge_device
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_dela_ep64 )
-	MCFG_GENERIC_SOCKET_ADD("eprom1", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("eprom1", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("rom,bin")
-	MCFG_GENERIC_SOCKET_ADD("eprom2", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("eprom2", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("rom,bin")
 MACHINE_CONFIG_END
 

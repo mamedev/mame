@@ -28,7 +28,7 @@ const device_type COLECOVISION_CARTRIDGE_SLOT = &device_creator<colecovision_car
 
 device_colecovision_cartridge_interface::device_colecovision_cartridge_interface(const machine_config &mconfig, device_t &device) :
 	device_slot_card_interface(mconfig, device),
-	m_rom(NULL),
+	m_rom(nullptr),
 	m_rom_size(0)
 {
 	m_slot = dynamic_cast<colecovision_cartridge_slot_device *>(device.owner());
@@ -36,7 +36,7 @@ device_colecovision_cartridge_interface::device_colecovision_cartridge_interface
 
 void device_colecovision_cartridge_interface::rom_alloc(size_t size)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = device().machine().memory().region_alloc("coleco_cart:rom", size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
@@ -78,10 +78,10 @@ bool colecovision_cartridge_slot_device::call_load()
 {
 	if (m_card)
 	{
-		size_t size = (software_entry() == NULL) ? length() : get_software_region_length("rom");
+		size_t size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
 		m_card->rom_alloc(size);
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			fread(m_card->m_rom, size);
 		}
@@ -133,7 +133,7 @@ void colecovision_cartridge_slot_device::get_default_card_software(std::string &
 
 UINT8 colecovision_cartridge_slot_device::bd_r(address_space &space, offs_t offset, UINT8 data, int _8000, int _a000, int _c000, int _e000)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		data = m_card->bd_r(space, offset, data, _8000, _a000, _c000, _e000);
 	}

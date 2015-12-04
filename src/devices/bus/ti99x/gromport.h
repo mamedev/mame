@@ -80,7 +80,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cruwrite);
 
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
-	bool    is_available() { return m_pcb != NULL; }
+	bool    is_available() { return m_pcb != nullptr; }
 	bool    has_grom();
 	void    set_slot(int i);
 	UINT16  grom_base();
@@ -108,7 +108,7 @@ protected:
 	bool is_reset_on_load() const       { return false; }
 	const char *image_interface() const { return "ti99_cart"; }
 	const char *file_extensions() const { return "rpk"; }
-	const option_guide *create_option_guide() const { return NULL; }
+	const option_guide *create_option_guide() const { return nullptr; }
 
 private:
 	bool    m_softlist;
@@ -439,9 +439,9 @@ public:
 	const char*     id() { return m_id; }
 	int             get_content_length() { return m_length; }
 	UINT8*          get_contents() { return m_contents; }
-	bool            persistent_ram() { return m_pathname != NULL; }
+	bool            persistent_ram() { return m_pathname != nullptr; }
 	const char*     get_pathname() { return m_pathname; }
-	void            cleanup() { if (m_contents != NULL) global_free_array(m_contents); }
+	void            cleanup() { if (m_contents != nullptr) global_free_array(m_contents); }
 
 private:
 	const char*     m_id;
@@ -530,12 +530,12 @@ static const char error_text[16][30] =
 class rpk_exception
 {
 public:
-	rpk_exception(rpk_open_error value): m_err(value), m_detail(NULL) { };
+	rpk_exception(rpk_open_error value): m_err(value), m_detail(nullptr) { };
 	rpk_exception(rpk_open_error value, const char* detail): m_err(value), m_detail(detail) { };
 
 	const char* to_string()
 	{
-		if (m_detail==NULL) return error_text[(int)m_err];
+		if (m_detail==nullptr) return error_text[(int)m_err];
 		std::string errormsg = std::string(error_text[(int)m_err]).append(": ").append(m_detail);
 		return core_strdup(errormsg.c_str());
 	}

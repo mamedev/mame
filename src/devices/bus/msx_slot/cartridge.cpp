@@ -39,7 +39,7 @@ msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconf
 	, device_slot_interface(mconfig, *this)
 	, msx_internal_slot_interface()
 	, m_irq_handler(*this)
-	, m_cartridge(NULL)
+	, m_cartridge(nullptr)
 {
 }
 
@@ -50,7 +50,7 @@ msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconf
 	, device_slot_interface(mconfig, *this)
 	, msx_internal_slot_interface()
 	, m_irq_handler(*this)
-	, m_cartridge(NULL)
+	, m_cartridge(nullptr)
 {
 }
 

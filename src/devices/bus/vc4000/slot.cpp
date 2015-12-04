@@ -28,7 +28,7 @@ const device_type H21_CART_SLOT = &device_creator<h21_cart_slot_device>;
 
 device_vc4000_cart_interface::device_vc4000_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0)
 {
 }
@@ -48,7 +48,7 @@ device_vc4000_cart_interface::~device_vc4000_cart_interface()
 
 void device_vc4000_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = device().machine().memory().region_alloc(std::string(tag).append(VC4000SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
@@ -174,7 +174,7 @@ bool vc4000_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 size = (software_entry() == NULL) ? length() : get_software_region_length("rom");
+		UINT32 size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
 
 		if (size > 0x1800)
 		{
@@ -184,12 +184,12 @@ bool vc4000_cart_slot_device::call_load()
 
 		m_cart->rom_alloc(size, tag());
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 			fread(m_cart->get_rom_base(), size);
 		else
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			m_type = VC4000_STD;
 			// attempt to identify the non-standard types

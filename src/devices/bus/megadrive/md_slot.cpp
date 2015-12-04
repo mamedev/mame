@@ -65,7 +65,7 @@ const device_type COPERA_CART_SLOT = &device_creator<copera_cart_slot_device>;
 
 device_md_cart_interface::device_md_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device), m_nvram_start(0), m_nvram_end(0), m_nvram_active(0), m_nvram_readonly(0), m_nvram_handlers_installed(0),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0)
 {
 }
@@ -85,7 +85,7 @@ device_md_cart_interface::~device_md_cart_interface()
 
 void device_md_cart_interface::rom_alloc(size_t size, const char *tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = (UINT16 *)device().machine().memory().region_alloc(std::string(tag).append(MDSLOT_ROM_REGION_TAG).c_str(), size, 2, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
@@ -329,7 +329,7 @@ bool base_md_cart_slot_device::call_load()
 		// STEP 1: load the file image and keep a copy for later banking
 		// STEP 2: identify the cart type
 		// The two steps are carried out differently if we are loading from a list or not
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 			res = load_nonlist();
 		else
 			res = load_list();
@@ -378,7 +378,7 @@ int base_md_cart_slot_device::load_list()
 	if (length > get_software_region_length("rom"))
 		memset(ROM + get_software_region_length("rom")/2, 0xffff, (length - get_software_region_length("rom"))/2);
 
-	if ((slot_name = get_feature("slot")) == NULL)
+	if ((slot_name = get_feature("slot")) == nullptr)
 		m_type = SEGA_STD;
 	else
 		m_type = md_get_pcb_id(slot_name);
@@ -995,7 +995,7 @@ void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 
 	logerror("FILE DETAILS\n");
 	logerror("============\n");
 	logerror("Name: %s\n", basename());
-	logerror("File Size: 0x%08x\n", (software_entry() == NULL) ? (int)length() : (int)get_software_region_length("rom"));
+	logerror("File Size: 0x%08x\n", (software_entry() == nullptr) ? (int)length() : (int)get_software_region_length("rom"));
 	logerror("Detected type: %s\n", md_get_slot(m_type));
 	logerror("ROM (Allocated) Size: 0x%X\n", rom_len);
 	logerror("NVRAM: %s\n", nvram_len ? "Yes" : "No");

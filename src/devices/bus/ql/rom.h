@@ -107,7 +107,7 @@ protected:
 	virtual bool is_reset_on_load() const { return 1; }
 	virtual const char *image_interface() const { return "ql_cart"; }
 	virtual const char *file_extensions() const { return "rom,bin"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	// slot interface overrides
 	virtual void get_default_card_software(std::string &result);

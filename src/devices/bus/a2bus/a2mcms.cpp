@@ -223,8 +223,8 @@ void mcms_device::device_start()
 {
 	m_write_irq.resolve();
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, 31250);
-	m_timer = timer_alloc(0, NULL);
-	m_clrtimer = timer_alloc(1, NULL);
+	m_timer = timer_alloc(0, nullptr);
+	m_clrtimer = timer_alloc(1, nullptr);
 	m_enabled = false;
 	memset(m_vols, 0, sizeof(m_vols));
 	memset(m_table, 0, sizeof(m_table));

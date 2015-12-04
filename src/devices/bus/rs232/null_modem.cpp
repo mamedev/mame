@@ -15,7 +15,7 @@ null_modem_device::null_modem_device(const machine_config &mconfig, const char *
 	m_rs232_stopbits(*this, "RS232_STOPBITS"),
 	m_input_count(0),
 	m_input_index(0),
-	m_timer_poll(NULL)
+	m_timer_poll(nullptr)
 {
 }
 

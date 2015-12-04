@@ -17,7 +17,7 @@ msx_cart_majutsushi::msx_cart_majutsushi(const machine_config &mconfig, const ch
 	}
 	for (int i = 0; i < 8; i++)
 	{
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 

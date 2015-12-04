@@ -36,7 +36,7 @@ public:
 	virtual bool is_creatable() const { return 0; }
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 1; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 	virtual const char *image_interface() const { return "neo_cart"; }
 	virtual const char *file_extensions() const { return "bin"; }
 
@@ -46,19 +46,19 @@ public:
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_rom);
 
-	UINT16* get_rom_base() { if (m_cart) { return m_cart->get_rom_base(); } else { return 0; } }
+	UINT16* get_rom_base() { if (m_cart) { return m_cart->get_rom_base(); } else { return nullptr; } }
 	UINT32  get_rom_size() { if (m_cart) { return m_cart->get_rom_size(); } else { return 0; } }
-	UINT8* get_fixed_base() { if (m_cart) { return m_cart->get_fixed_base(); } else { return 0; } }
+	UINT8* get_fixed_base() { if (m_cart) { return m_cart->get_fixed_base(); } else { return nullptr; } }
 	UINT32  get_fixed_size() { if (m_cart) { return m_cart->get_fixed_size(); } else { return 0; } }
-	UINT8* get_sprites_base() { if (m_cart) { return m_cart->get_sprites_base(); } else { return 0; } }
+	UINT8* get_sprites_base() { if (m_cart) { return m_cart->get_sprites_base(); } else { return nullptr; } }
 	UINT32  get_sprites_size() { if (m_cart) { return m_cart->get_sprites_size(); } else { return 0; } }
-	UINT8* get_sprites_optimized() { if (m_cart) { return m_cart->get_sprites_optimized(); } else { return 0; } }
+	UINT8* get_sprites_optimized() { if (m_cart) { return m_cart->get_sprites_optimized(); } else { return nullptr; } }
 	UINT32 get_sprites_addrmask() { if (m_cart) { return m_cart->get_sprites_addrmask(); } else { return 0; } }
-	UINT8* get_audio_base() { if (m_cart) { return m_cart->get_audio_base(); } else { return 0; } }
+	UINT8* get_audio_base() { if (m_cart) { return m_cart->get_audio_base(); } else { return nullptr; } }
 	UINT32  get_audio_size() { if (m_cart) { return m_cart->get_audio_size(); } else { return 0; } }
-	UINT8* get_ym_base() { if (m_cart) { return m_cart->get_ym_base(); } else { return 0; } }
+	UINT8* get_ym_base() { if (m_cart) { return m_cart->get_ym_base(); } else { return nullptr; } }
 	UINT32  get_ym_size() { if (m_cart) { return m_cart->get_ym_size(); } else { return 0; } }
-	UINT8* get_ymdelta_base() { if (m_cart) { return m_cart->get_ymdelta_base(); } else { return 0; } }
+	UINT8* get_ymdelta_base() { if (m_cart) { return m_cart->get_ymdelta_base(); } else { return nullptr; } }
 	UINT32  get_ymdelta_size() { if (m_cart) { return m_cart->get_ymdelta_size(); } else { return 0; } }
 	int get_fixed_bank_type(void) { if (m_cart) { return m_cart->get_fixed_bank_type(); } else { return 0; } }
 

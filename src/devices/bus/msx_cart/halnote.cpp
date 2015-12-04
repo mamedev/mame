@@ -14,7 +14,7 @@ msx_cart_halnote::msx_cart_halnote(const machine_config &mconfig, const char *ta
 	for (int i = 0; i < 8; i++)
 	{
 		m_selected_bank[i] = 0;
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 
@@ -51,8 +51,8 @@ void msx_cart_halnote::map_bank(int bank)
 		}
 		else
 		{
-			m_bank_base[0] = NULL;
-			m_bank_base[1] = NULL;
+			m_bank_base[0] = nullptr;
+			m_bank_base[1] = nullptr;
 		}
 	}
 }
@@ -113,7 +113,7 @@ WRITE8_MEMBER(msx_cart_halnote::write_cart)
 {
 	if (offset < 0x4000)
 	{
-		if (m_bank_base[0] != NULL)
+		if (m_bank_base[0] != nullptr)
 		{
 			m_sram[offset & 0x3fff] = data;
 			return;

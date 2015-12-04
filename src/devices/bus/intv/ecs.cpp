@@ -54,7 +54,7 @@ intv_ecs_device::intv_ecs_device(const machine_config &mconfig, const char *tag,
 void intv_ecs_device::device_start()
 {
 	// if the ECS is mounted directly in the system, use device rom and alloc RAM
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		std::string region_tag;
 		m_rom = memregion(region_tag.assign(tag()).append(":ecs").c_str())->base();
@@ -219,7 +219,7 @@ static MACHINE_CONFIG_FRAGMENT( sub_slot )
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(intv_ecs_device, ay_porta_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono_ecs", 0.33)
 
-	MCFG_INTV_CARTRIDGE_ADD("subslot", intv_cart, NULL)
+	MCFG_INTV_CARTRIDGE_ADD("subslot", intv_cart, nullptr)
 MACHINE_CONFIG_END
 
 

@@ -567,7 +567,7 @@ READ8_MEMBER( c1541_base_t::via0_pa_r )
 
 WRITE8_MEMBER( c1541_base_t::via0_pa_w )
 {
-	if (m_other != NULL)
+	if (m_other != nullptr)
 	{
 		m_other->parallel_data_w(data);
 	}
@@ -636,7 +636,7 @@ WRITE8_MEMBER( c1541_base_t::via0_pb_w )
 
 WRITE_LINE_MEMBER( c1541_base_t::via0_ca2_w )
 {
-	if (m_other != NULL)
+	if (m_other != nullptr)
 	{
 		m_other->parallel_strobe_w(state);
 	}

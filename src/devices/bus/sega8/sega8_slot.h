@@ -135,7 +135,7 @@ public:
 	virtual bool is_creatable() const { return 0; }
 	virtual bool must_be_loaded() const { return m_must_be_loaded; }
 	virtual bool is_reset_on_load() const { return 1; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 	virtual const char *image_interface() const { return m_interface; }
 	virtual const char *file_extensions() const { return m_extensions; }
 

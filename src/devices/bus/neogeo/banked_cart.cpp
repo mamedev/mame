@@ -10,9 +10,9 @@ extern const device_type NEOGEO_BANKED_CART = &device_creator<neogeo_banked_cart
 
 neogeo_banked_cart_device::neogeo_banked_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NEOGEO_BANKED_CART, "NeoGeo Banked Cartridge", tag, owner, clock, "neogeo_banked_cart", __FILE__),
-	m_bank_cartridge(0),
+	m_bank_cartridge(nullptr),
 	m_main_cpu_bank_address(0),
-	m_region(0),
+	m_region(nullptr),
 	m_region_size(0)
 
 {

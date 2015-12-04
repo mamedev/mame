@@ -95,7 +95,7 @@ static const z80_daisy_config wangpc_rtc_daisy_chain[] =
 	{ Z80SIO_TAG },
 	{ Z80CTC_0_TAG },
 	{ Z80CTC_1_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 //-------------------------------------------------

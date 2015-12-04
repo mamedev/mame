@@ -23,7 +23,7 @@ msx_cart_konami::msx_cart_konami(const machine_config &mconfig, const char *tag,
 	}
 	for (int i = 0; i < 8; i++)
 	{
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 
@@ -132,7 +132,7 @@ msx_cart_konami_scc::msx_cart_konami_scc(const machine_config &mconfig, const ch
 	}
 	for (int i = 0; i < 8; i++)
 	{
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 
@@ -305,7 +305,7 @@ msx_cart_gamemaster2::msx_cart_gamemaster2(const machine_config &mconfig, const 
 	}
 	for (int i = 0; i < 8; i++)
 	{
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 
@@ -468,7 +468,7 @@ WRITE8_MEMBER(msx_cart_gamemaster2::write_cart)
 msx_cart_synthesizer::msx_cart_synthesizer(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSX_CART_SYNTHESIZER, "MSX Cartridge - Synthesizer", tag, owner, clock, "msx_cart_synthesizer", __FILE__)
 	, msx_cart_interface(mconfig, *this)
-	, m_bank_base(NULL)
+	, m_bank_base(nullptr)
 	, m_dac(*this, "dac")
 {
 }
@@ -539,11 +539,11 @@ msx_cart_konami_sound::msx_cart_konami_sound(const machine_config &mconfig, devi
 	}
 	for (int i = 0; i < 8; i++)
 	{
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 	for (int i = 0; i < 16; i++)
 	{
-		m_ram_bank[i] = NULL;
+		m_ram_bank[i] = nullptr;
 	}
 	for (int i = 0; i < 4; i++)
 	{
@@ -671,7 +671,7 @@ READ8_MEMBER(msx_cart_konami_sound::read_cart)
 
 	UINT8 *base = m_bank_base[offset >> 13];
 
-	if (base != NULL)
+	if (base != nullptr)
 	{
 		return base[offset & 0x1fff];
 	}
@@ -684,7 +684,7 @@ WRITE8_MEMBER(msx_cart_konami_sound::write_cart)
 	switch (offset & 0xe000)
 	{
 		case 0x4000:
-			if (m_ram_enabled[0] && m_bank_base[2] != NULL)
+			if (m_ram_enabled[0] && m_bank_base[2] != nullptr)
 			{
 				m_bank_base[2][offset & 0x1fff] = data;
 			}
@@ -696,7 +696,7 @@ WRITE8_MEMBER(msx_cart_konami_sound::write_cart)
 			break;
 
 		case 0x6000:
-			if (m_ram_enabled[1] && m_bank_base[3] != NULL)
+			if (m_ram_enabled[1] && m_bank_base[3] != nullptr)
 			{
 				m_bank_base[3][offset & 0x1fff] = data;
 			}
@@ -708,7 +708,7 @@ WRITE8_MEMBER(msx_cart_konami_sound::write_cart)
 			break;
 
 		case 0x8000:
-			if (m_ram_enabled[2] && m_bank_base[0] != NULL)
+			if (m_ram_enabled[2] && m_bank_base[0] != nullptr)
 			{
 				m_bank_base[0][offset & 0x1fff] = data;
 			}
@@ -755,7 +755,7 @@ WRITE8_MEMBER(msx_cart_konami_sound::write_cart)
 			break;
 
 		case 0xa000:
-			if (m_ram_enabled[3] && m_bank_base[1] != NULL)
+			if (m_ram_enabled[3] && m_bank_base[1] != nullptr)
 			{
 				m_bank_base[1][offset & 0x1fff] = data;
 			}

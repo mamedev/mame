@@ -196,7 +196,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device, ti990_hd )
 
 		/* set file descriptor */
 		d->format = format_old;
-		d->hd_handle = NULL;
+		d->hd_handle = nullptr;
 
 		/* use custom image header. */
 		/* to convert old header-less images to this format, insert a 16-byte
@@ -220,7 +220,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device, ti990_hd )
 	if (d->bytes_per_sector > MAX_SECTOR_SIZE)
 	{
 		d->format = format_mame;
-		d->hd_handle = NULL;
+		d->hd_handle = nullptr;
 		d->wp = 1;
 		d->unsafe = 1;
 		return IMAGE_INIT_FAIL;
@@ -247,7 +247,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hdc_device, ti990_hd )
 	d = &m_d[id];
 
 	d->format = format_mame;    /* don't care */
-	d->hd_handle = NULL;
+	d->hd_handle = nullptr;
 	d->wp = 1;
 	d->unsafe = 1;
 
@@ -265,7 +265,7 @@ int ti990_hdc_device::is_unit_loaded(int unit)
 	switch (m_d[unit].format)
 	{
 	case format_mame:
-		reply = (m_d[unit].hd_handle != NULL);
+		reply = (m_d[unit].hd_handle != nullptr);
 		break;
 
 	case format_old:
@@ -995,7 +995,7 @@ void ti990_hdc_device::device_start()
 	for (i=0; i<MAX_DISK_UNIT; i++)
 	{
 		m_d[i].format = format_mame;
-		m_d[i].hd_handle = NULL;
+		m_d[i].hd_handle = nullptr;
 		m_d[i].wp = 1;
 		m_d[i].unsafe = 1;
 	}

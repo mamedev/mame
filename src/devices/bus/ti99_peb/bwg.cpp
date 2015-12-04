@@ -345,10 +345,10 @@ READ8Z_MEMBER(snug_bwg_device::crureadz)
 		if ((offset & 0x00ff)==0)
 		{
 			// Check what drives are not connected
-			reply = ((m_floppy[0] != NULL)? 0 : 0x02)       // DSK1
-					| ((m_floppy[1] != NULL)? 0 : 0x04) // DSK2
-					| ((m_floppy[2] != NULL)? 0 : 0x08) // DSK3
-					| ((m_floppy[3] != NULL)? 0 : 0x01);    // DSK4
+			reply = ((m_floppy[0] != nullptr)? 0 : 0x02)       // DSK1
+					| ((m_floppy[1] != nullptr)? 0 : 0x04) // DSK2
+					| ((m_floppy[2] != nullptr)? 0 : 0x08) // DSK3
+					| ((m_floppy[3] != nullptr)? 0 : 0x01);    // DSK4
 
 			// DIP switches for step and date/time display
 			if (m_dip1 != 0) reply |= 0x10;
@@ -425,7 +425,7 @@ WRITE8_MEMBER(snug_bwg_device::cruwrite)
 			// Select side of disk (bit 7)
 			m_SIDSEL = (data==1)? ASSERT_LINE : CLEAR_LINE;
 			if (TRACE_CRU) logerror("bwg: set side (bit 7) = %d\n", data);
-			if (m_current_floppy != NULL) m_current_floppy->ss_w(data);
+			if (m_current_floppy != nullptr) m_current_floppy->ss_w(data);
 			break;
 
 		case 8:
@@ -509,7 +509,7 @@ void snug_bwg_device::set_drive()
 	}
 	else
 	{
-		m_current_floppy = NULL;
+		m_current_floppy = nullptr;
 		if (TRACE_CRU) logerror("bwg: All drives deselected\n");
 	}
 	m_wd1773->set_floppy(m_current_floppy);
@@ -548,7 +548,7 @@ void snug_bwg_device::set_floppy_motors_running(bool run)
 
 	// Set all motors
 	for (int i=0; i < 4; i++)
-		if (m_floppy[i] != NULL) m_floppy[i]->mon_w((run)? 0 : 1);
+		if (m_floppy[i] != nullptr) m_floppy[i]->mon_w((run)? 0 : 1);
 
 	// The motor-on line also connects to the wait state logic
 	operate_ready_line();
@@ -603,7 +603,7 @@ void snug_bwg_device::device_reset()
 
 	for (int i=0; i < 4; i++)
 	{
-		if (m_floppy[i] != NULL)
+		if (m_floppy[i] != nullptr)
 			logerror("bwg: Connector %d with %s\n", i, m_floppy[i]->name());
 		else
 			logerror("bwg: Connector %d has no floppy attached\n", i);
@@ -622,13 +622,13 @@ void snug_bwg_device::device_reset()
 void snug_bwg_device::device_config_complete()
 {
 	for (int i=0; i < 4; i++)
-		m_floppy[i] = NULL;
+		m_floppy[i] = nullptr;
 
 	// Seems to be null when doing a "-listslots"
-	if (subdevice("0")!=NULL) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->first_subdevice());
-	if (subdevice("1")!=NULL) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->first_subdevice());
-	if (subdevice("2")!=NULL) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->first_subdevice());
-	if (subdevice("3")!=NULL) m_floppy[3] = static_cast<floppy_image_device*>(subdevice("3")->first_subdevice());
+	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->first_subdevice());
+	if (subdevice("1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->first_subdevice());
+	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->first_subdevice());
+	if (subdevice("3")!=nullptr) m_floppy[3] = static_cast<floppy_image_device*>(subdevice("3")->first_subdevice());
 }
 
 INPUT_PORTS_START( bwg_fdc )
@@ -674,9 +674,9 @@ MACHINE_CONFIG_FRAGMENT( bwg_fdc )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("1", bwg_floppies, "525dd", snug_bwg_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("2", bwg_floppies, NULL, snug_bwg_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("2", bwg_floppies, nullptr, snug_bwg_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("3", bwg_floppies, NULL, snug_bwg_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("3", bwg_floppies, nullptr, snug_bwg_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
@@ -684,7 +684,7 @@ ROM_START( bwg_fdc )
 	ROM_REGION(0x8000, DSRROM, 0)
 	ROM_LOAD("bwg.bin", 0x0000, 0x8000, CRC(06f1ec89) SHA1(6ad77033ed268f986d9a5439e65f7d391c4b7651)) /* BwG disk DSR ROM */
 	ROM_REGION(0x0800, BUFFER, 0)  /* BwG RAM buffer */
-	ROM_FILL(0x0000, 0x0400, 0x00)
+	ROM_FILL(0x0000, 0x0400, nullptr)
 ROM_END
 
 machine_config_constructor snug_bwg_device::device_mconfig_additions() const

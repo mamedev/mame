@@ -246,7 +246,7 @@ void ti99_grom_device::device_start(void)
 	const ti99grom_config *conf = reinterpret_cast<const ti99grom_config *>(static_config());
 
 	m_memptr = owner()->memregion(conf->regionname)->base();
-	assert (m_memptr!=NULL);
+	assert (m_memptr!=nullptr);
 	m_memptr += conf->offset_reg;
 
 	m_size = conf->size;

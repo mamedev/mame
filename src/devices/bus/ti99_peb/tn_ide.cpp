@@ -336,13 +336,13 @@ void nouspikel_ide_interface_device::device_reset()
 MACHINE_CONFIG_FRAGMENT( tn_ide )
 	MCFG_DEVICE_ADD( "ide_rtc", RTC65271, 0 )
 	MCFG_RTC65271_INTERRUPT_CB(WRITELINE(nouspikel_ide_interface_device, clock_interrupt_callback))
-	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(nouspikel_ide_interface_device, ide_interrupt_callback))
 MACHINE_CONFIG_END
 
 ROM_START( tn_ide )
 	ROM_REGION(0x80000, BUFFER_TAG, 0)  /* RAM buffer 512 KiB */
-	ROM_FILL(0x0000, 0x80000, 0x00)
+	ROM_FILL(0x0000, 0x80000, nullptr)
 ROM_END
 
 INPUT_PORTS_START( tn_ide )

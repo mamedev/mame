@@ -141,7 +141,7 @@ void bml3bus_device::device_start()
 	// clear slots
 	for (int i = 0; i < BML3BUS_MAX_SLOTS; i++)
 	{
-		m_device_list[i] = NULL;
+		m_device_list[i] = nullptr;
 	}
 }
 
@@ -157,7 +157,7 @@ device_bml3bus_card_interface *bml3bus_device::get_bml3bus_card(int slot)
 {
 	if (slot < 0)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	return m_device_list[slot];

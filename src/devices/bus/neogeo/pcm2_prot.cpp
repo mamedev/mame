@@ -38,7 +38,7 @@ void pcm2_prot_device::neo_pcm2_snk_1999(UINT8* ymrom, UINT32 ymsize, int value)
 	int size = ymsize;
 	int i, j;
 
-	if( rom != NULL )
+	if( rom != nullptr )
 	{   /* swap address lines on the whole ROMs */
 		std::vector<UINT16> buffer(value / 2);
 

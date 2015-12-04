@@ -350,7 +350,7 @@ void threecom3c505_device::device_start()
 	m_tx_data_buffer.start(this, ETH_BUFFER_SIZE);
 	m_program_buffer.start(this, PGM_BUFFER_SIZE);
 
-	m_do_command_timer = timer_alloc(0, NULL);
+	m_do_command_timer = timer_alloc(0, nullptr);
 }
 
 //-------------------------------------------------
@@ -430,7 +430,7 @@ const char *threecom3c505_device::cpu_context()
 	int ms = (t % osd_ticks_per_second()) / 1000;
 
 	/* if we have an executing CPU, output data */
-	if (cpu != NULL)
+	if (cpu != nullptr)
 	{
 		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag(),
 				cpu->safe_pcbase(), tag());

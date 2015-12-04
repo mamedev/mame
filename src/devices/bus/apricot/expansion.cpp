@@ -60,10 +60,10 @@ const device_type APRICOT_EXPANSION_BUS = &device_creator<apricot_expansion_bus_
 
 apricot_expansion_bus_device::apricot_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, APRICOT_EXPANSION_BUS, "Apricot Expansion Bus", tag, owner, clock, "apricot_exp_bus", __FILE__),
-	m_program(NULL),
-	m_io(NULL),
-	m_program_iop(NULL),
-	m_io_iop(NULL),
+	m_program(nullptr),
+	m_io(nullptr),
+	m_program_iop(nullptr),
+	m_io_iop(nullptr),
 	m_dma1_handler(*this),
 	m_dma2_handler(*this),
 	m_ext1_handler(*this),
@@ -173,8 +173,8 @@ void apricot_expansion_bus_device::install_ram(offs_t addrstart, offs_t addrend,
 
 device_apricot_expansion_card_interface::device_apricot_expansion_card_interface(const machine_config &mconfig, device_t &device) :
 	device_slot_card_interface(mconfig, device),
-	m_next(NULL),
-	m_bus(NULL)
+	m_next(nullptr),
+	m_bus(nullptr)
 {
 }
 

@@ -73,7 +73,7 @@ void abc_keyboard_port_device::device_start()
 
 void abc_keyboard_port_device::device_reset()
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 		get_card_device()->reset();
 }
 
@@ -94,7 +94,7 @@ WRITE_LINE_MEMBER( abc_keyboard_port_device::write_rx )
 
 WRITE_LINE_MEMBER( abc_keyboard_port_device::txd_w )
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 		m_card->txd_w(state);
 }
 

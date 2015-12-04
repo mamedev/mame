@@ -45,27 +45,27 @@ void vp575_device::update_interrupts()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( vp575 )
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp1", XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp1", XTAL_3_52128MHz/2, vip_expansion_cards, nullptr)
 	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp1_int_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp1_dma_out_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vp575_device, exp1_dma_in_w))
 
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp2", XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp2", XTAL_3_52128MHz/2, vip_expansion_cards, nullptr)
 	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp2_int_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp2_dma_out_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vp575_device, exp2_dma_in_w))
 
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp3", XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp3", XTAL_3_52128MHz/2, vip_expansion_cards, nullptr)
 	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp3_int_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp3_dma_out_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vp575_device, exp3_dma_in_w))
 
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp4", XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp4", XTAL_3_52128MHz/2, vip_expansion_cards, nullptr)
 	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp4_int_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp4_dma_out_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vp575_device, exp4_dma_in_w))
 
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp5", XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp5", XTAL_3_52128MHz/2, vip_expansion_cards, nullptr)
 	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp5_int_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp5_dma_out_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vp575_device, exp5_dma_in_w))

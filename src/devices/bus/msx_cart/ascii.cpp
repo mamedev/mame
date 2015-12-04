@@ -19,7 +19,7 @@ msx_cart_ascii8::msx_cart_ascii8(const machine_config &mconfig, const char *tag,
 	for (int i = 0; i < 4; i++)
 	{
 		m_selected_bank[i] = 0;
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 
@@ -103,7 +103,7 @@ msx_cart_ascii16::msx_cart_ascii16(const machine_config &mconfig, const char *ta
 	for (int i = 0; i < 2; i++)
 	{
 		m_selected_bank[i] = 0;
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 
@@ -194,7 +194,7 @@ msx_cart_ascii8_sram::msx_cart_ascii8_sram(const machine_config &mconfig, const 
 	for (int i = 0; i < 4; i++)
 	{
 		m_selected_bank[i] = 0;
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 
@@ -212,7 +212,7 @@ void msx_cart_ascii8_sram::setup_bank(UINT8 bank)
 	if (m_selected_bank[bank] & ~(m_sram_select_mask | m_bank_mask))
 	{
 		// Nothing is mapped
-		m_bank_base[bank] = NULL;
+		m_bank_base[bank] = nullptr;
 	}
 	else if (m_selected_bank[bank] & m_sram_select_mask)
 	{
@@ -278,7 +278,7 @@ READ8_MEMBER(msx_cart_ascii8_sram::read_cart)
 	{
 		UINT8 *bank_base = m_bank_base[(offset - 0x4000) >> 13];
 
-		if (bank_base != NULL)
+		if (bank_base != nullptr)
 		{
 			return bank_base[offset & 0x1fff];
 		}
@@ -319,7 +319,7 @@ msx_cart_ascii16_sram::msx_cart_ascii16_sram(const machine_config &mconfig, cons
 	for (int i = 0; i < 2; i++)
 	{
 		m_selected_bank[i] = 0;
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 
@@ -337,7 +337,7 @@ void msx_cart_ascii16_sram::setup_bank(UINT8 bank)
 	if (m_selected_bank[bank] & ~(m_sram_select_mask | m_bank_mask))
 	{
 		// Nothing is mapped
-		m_bank_base[bank] = NULL;
+		m_bank_base[bank] = nullptr;
 	}
 	else if (m_selected_bank[bank] & m_sram_select_mask)
 	{
@@ -403,7 +403,7 @@ READ8_MEMBER(msx_cart_ascii16_sram::read_cart)
 	{
 		UINT8 bank = offset >> 15;
 
-		if (m_bank_base[bank] != NULL)
+		if (m_bank_base[bank] != nullptr)
 		{
 			if (m_selected_bank[bank] & m_sram_select_mask)
 			{
@@ -453,7 +453,7 @@ msx_cart_msxwrite::msx_cart_msxwrite(const machine_config &mconfig, const char *
 	for (int i = 0; i < 2; i++)
 	{
 		m_selected_bank[i] = 0;
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 

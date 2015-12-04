@@ -276,7 +276,7 @@ WRITE_LINE_MEMBER( luxor_55_21046_device::fdc_intrq_w )
 static const z80_daisy_config z80_daisy_chain[] =
 {
 	{ Z80DMA_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 
@@ -340,7 +340,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( abc850, luxor_55_21046 )
 	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, NULL, luxor_55_21046_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, nullptr, luxor_55_21046_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -1057,7 +1057,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_9b_w )
 	*/
 
 	// drive select
-	m_floppy = NULL;
+	m_floppy = nullptr;
 
 	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();

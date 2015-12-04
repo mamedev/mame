@@ -31,7 +31,7 @@ const device_type VCS_CART_SLOT = &device_creator<vcs_cart_slot_device>;
 
 device_vcs_cart_interface::device_vcs_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0)
 {
 }
@@ -51,7 +51,7 @@ device_vcs_cart_interface::~device_vcs_cart_interface()
 
 void device_vcs_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = device().machine().memory().region_alloc(std::string(tag).append(A26SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
@@ -189,7 +189,7 @@ bool vcs_cart_slot_device::call_load()
 		UINT8 *ROM;
 		UINT32 len;
 
-		if (software_entry() != NULL)
+		if (software_entry() != nullptr)
 			len = get_software_region_length("rom");
 		else
 			len = length();
@@ -219,13 +219,13 @@ bool vcs_cart_slot_device::call_load()
 		m_cart->rom_alloc(len, tag());
 		ROM = m_cart->get_rom_base();
 
-		if (software_entry() != NULL)
+		if (software_entry() != nullptr)
 		{
 			const char *pcb_name;
 			bool has_ram = get_software_region("ram") ? TRUE : FALSE;
 			memcpy(ROM, get_software_region("rom"), len);
 
-			if ((pcb_name = get_feature("slot")) != NULL)
+			if ((pcb_name = get_feature("slot")) != nullptr)
 				m_type = vcs_get_pcb_id(pcb_name);
 			else
 			{

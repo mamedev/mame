@@ -107,7 +107,7 @@ void ti_32k_expcard_device::device_start(void)
 
 ROM_START( ti_exp_32k )
 	ROM_REGION(0x8000, RAMREGION, 0)
-	ROM_FILL(0x0000, 0x8000, 0x00)
+	ROM_FILL(0x0000, 0x8000, nullptr)
 ROM_END
 
 const rom_entry *ti_32k_expcard_device::device_rom_region() const

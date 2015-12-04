@@ -13,7 +13,7 @@ msx_cart_rtype::msx_cart_rtype(const machine_config &mconfig, const char *tag, d
 {
 	for (int i = 0; i < 2; i++)
 	{
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 }
 

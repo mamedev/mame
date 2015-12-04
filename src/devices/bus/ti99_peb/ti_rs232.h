@@ -128,7 +128,7 @@ public:
 	bool is_reset_on_load() const       { return false; }
 	const char *image_interface() const { return ""; }
 	const char *file_extensions() const { return ""; }
-	const option_guide *create_option_guide() const { return NULL; }
+	const option_guide *create_option_guide() const { return nullptr; }
 
 protected:
 	virtual void    device_start(void);
@@ -156,7 +156,7 @@ public:
 	bool is_reset_on_load() const       { return false; }
 	const char *image_interface() const { return ""; }
 	const char *file_extensions() const { return ""; }
-	const option_guide *create_option_guide() const { return NULL; }
+	const option_guide *create_option_guide() const { return nullptr; }
 
 protected:
 	virtual void    device_start(void);

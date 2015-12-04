@@ -164,7 +164,7 @@ void comx_eb_device::device_reset()
 {
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
-		if (m_expansion_slot[slot] != NULL)
+		if (m_expansion_slot[slot] != nullptr)
 		{
 			m_expansion_slot[slot]->device().reset();
 			m_expansion_slot[slot]->ds_w(0);
@@ -183,7 +183,7 @@ int comx_eb_device::comx_ef4_r()
 
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
-		if (m_expansion_slot[slot] != NULL)
+		if (m_expansion_slot[slot] != nullptr)
 		{
 			state |= m_expansion_slot[slot]->ef4_r();
 		}
@@ -201,7 +201,7 @@ void comx_eb_device::comx_q_w(int state)
 {
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
-		if (m_expansion_slot[slot] != NULL)
+		if (m_expansion_slot[slot] != nullptr)
 		{
 			m_expansion_slot[slot]->q_w(state);
 		}
@@ -230,7 +230,7 @@ UINT8 comx_eb_device::comx_mrd_r(address_space &space, offs_t offset, int *extro
 	{
 		for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 		{
-			if (BIT(m_select, slot) && m_expansion_slot[slot] != NULL)
+			if (BIT(m_select, slot) && m_expansion_slot[slot] != nullptr)
 			{
 				data |= m_expansion_slot[slot]->mrd_r(space, offset, extrom);
 			}
@@ -249,7 +249,7 @@ void comx_eb_device::comx_mwr_w(address_space &space, offs_t offset, UINT8 data)
 {
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
-		if (BIT(m_select, slot) && m_expansion_slot[slot] != NULL)
+		if (BIT(m_select, slot) && m_expansion_slot[slot] != nullptr)
 		{
 			m_expansion_slot[slot]->mwr_w(space, offset, data);
 		}
@@ -267,7 +267,7 @@ UINT8 comx_eb_device::comx_io_r(address_space &space, offs_t offset)
 
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
-		if (BIT(m_select, slot) && m_expansion_slot[slot] != NULL)
+		if (BIT(m_select, slot) && m_expansion_slot[slot] != nullptr)
 		{
 			data |= m_expansion_slot[slot]->io_r(space, offset);
 		}
@@ -289,7 +289,7 @@ void comx_eb_device::comx_io_w(address_space &space, offs_t offset, UINT8 data)
 
 		for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 		{
-			if (m_expansion_slot[slot] != NULL)
+			if (m_expansion_slot[slot] != nullptr)
 			{
 				m_expansion_slot[slot]->ds_w(BIT(m_select, slot));
 			}
@@ -298,7 +298,7 @@ void comx_eb_device::comx_io_w(address_space &space, offs_t offset, UINT8 data)
 
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
-		if (BIT(m_select, slot) && m_expansion_slot[slot] != NULL)
+		if (BIT(m_select, slot) && m_expansion_slot[slot] != nullptr)
 		{
 			m_expansion_slot[slot]->io_w(space, offset, data);
 		}

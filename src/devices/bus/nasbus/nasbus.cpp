@@ -24,7 +24,7 @@ const device_type NASBUS_SLOT = &device_creator<nasbus_slot_device>;
 nasbus_slot_device::nasbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, NASBUS_SLOT, "NASBUS Slot", tag, owner, clock, "nasbus_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
-	m_nasbus_tag(NULL)
+	m_nasbus_tag(nullptr)
 {
 }
 
@@ -32,7 +32,7 @@ nasbus_slot_device::nasbus_slot_device(const machine_config &mconfig, device_typ
 	const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_slot_interface(mconfig, *this),
-	m_nasbus_tag(NULL)
+	m_nasbus_tag(nullptr)
 {
 }
 
@@ -71,8 +71,8 @@ const device_type NASBUS = &device_creator<nasbus_device>;
 
 nasbus_device::nasbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, NASBUS_SLOT, "NASBUS Backplane", tag, owner, clock, "nasbus", __FILE__),
-	m_program(NULL),
-	m_io(NULL),
+	m_program(nullptr),
+	m_io(nullptr),
 	m_ram_disable_handler(*this)
 {
 }
@@ -146,8 +146,8 @@ WRITE_LINE_MEMBER( nasbus_device::ram_disable_w ) { m_ram_disable_handler(state)
 
 device_nasbus_card_interface::device_nasbus_card_interface(const machine_config &mconfig, device_t &device) :
 	device_slot_card_interface(mconfig, device),
-	m_next(NULL),
-	m_nasbus(NULL)
+	m_next(nullptr),
+	m_nasbus(nullptr)
 {
 }
 

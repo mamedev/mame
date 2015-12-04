@@ -101,7 +101,7 @@ isa8_aga_device::isa8_aga_device(const machine_config &mconfig, device_type type
 
 void isa8_aga_device::device_start()
 {
-	if (m_palette != NULL && !m_palette->started())
+	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
 	m_mode = AGA_COLOR;
@@ -188,7 +188,7 @@ const rom_entry *isa8_aga_pc200_device::device_rom_region() const
 
 void isa8_aga_pc200_device::device_start()
 {
-	if (m_palette != NULL && !m_palette->started())
+	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
 	m_mode = AGA_COLOR;

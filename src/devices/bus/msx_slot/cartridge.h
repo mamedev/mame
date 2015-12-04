@@ -50,7 +50,7 @@ public:
 	virtual bool is_creatable() const { return false; }
 	virtual bool must_be_loaded() const { return false; }
 	virtual bool is_reset_on_load() const { return true; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 	virtual const char *image_interface() const { return "msx_cart"; }
 	virtual const char *file_extensions() const { return "mx1,bin,rom"; }
 

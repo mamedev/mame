@@ -29,9 +29,9 @@ const device_type BUDDHA = &device_creator<buddha_device>;
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( buddha )
-	MCFG_ATA_INTERFACE_ADD("ata_0", ata_devices, NULL, NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata_0", ata_devices, nullptr, nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(buddha_device, ide_0_interrupt_w))
-	MCFG_ATA_INTERFACE_ADD("ata_1", ata_devices, NULL, NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata_1", ata_devices, nullptr, nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(buddha_device, ide_1_interrupt_w))
 MACHINE_CONFIG_END
 

@@ -10,7 +10,7 @@ extern const device_type SMA_PROT = &device_creator<sma_prot_device>;
 
 sma_prot_device::sma_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SMA_PROT, "NeoGeo SMA Cartridge", tag, owner, clock, "sma_prot", __FILE__),
-	m_bankdev(NULL),
+	m_bankdev(nullptr),
 	m_sma_rng(0)
 {
 }

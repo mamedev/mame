@@ -209,7 +209,7 @@ geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const 
 : device_t(mconfig, GENEVE_MAPPER, "Geneve Gate Array", tag, owner, clock, "geneve_mapper", __FILE__), m_gromwaddr_LSB(false), m_gromraddr_LSB(false), m_grom_address(0), m_video_waitstates(false), m_extra_waitstates(false), m_ready_asserted(false), m_read_mode(false), m_debug_no_ws(false), m_geneve_mode(false), m_direct_mode(false), m_cartridge_size(0), m_cartridge_secondpage(false), m_cartridge6_writable(false), m_cartridge7_writable(false), m_turbo(false), m_genmod(false), m_timode(false), m_pfm_mode(0), m_pfm_bank(0), m_pfm_output_enable(false), m_sram_mask(0), m_sram_val(0),
 	m_ready(*this), m_waitcount(0), m_ext_waitcount(0), m_clock(nullptr), m_cpu(nullptr), m_pfm512(nullptr), m_pfm512a(nullptr), m_keyboard(nullptr), m_video(nullptr), m_peribox(nullptr), m_sound(nullptr), m_sram(nullptr), m_dram(nullptr)
 {
-	m_eprom = NULL;
+	m_eprom = nullptr;
 }
 
 INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )

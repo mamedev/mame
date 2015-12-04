@@ -31,7 +31,7 @@ public:
 	virtual void write(offs_t offset, UINT8 data) { }
 	virtual void io_read(offs_t offset, UINT8 &data) { }
 	virtual void io_write(offs_t offset, UINT8 data) { }
-	virtual UINT8* get_cart_base() { return NULL; }
+	virtual UINT8* get_cart_base() { return nullptr; }
 	virtual DECLARE_WRITE_LINE_MEMBER( mei_w ) { };
 };
 
@@ -101,7 +101,7 @@ public:
 	virtual bool is_reset_on_load() const { return 1; }
 	virtual const char *image_interface() const { return "kc_cart"; }
 	virtual const char *file_extensions() const { return "bin"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	// slot interface overrides
 	virtual void get_default_card_software(std::string &result);

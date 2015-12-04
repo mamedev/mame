@@ -44,9 +44,9 @@ public:
 	virtual bool is_creatable() const { return 0; }
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
+	virtual const char *image_interface() const { return nullptr; }
 	virtual const char *file_extensions() const { return "img"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	virtual bool call_load();
 	virtual void call_unload();
@@ -86,7 +86,7 @@ void messimg_disk_image_device::device_config_complete()
 
 void messimg_disk_image_device::device_start()
 {
-	m_data = (UINT8 *)NULL;
+	m_data = (UINT8 *)nullptr;
 
 	if (exists() && fseek(0, SEEK_END) == 0)
 	{
@@ -215,8 +215,8 @@ void nubus_image_device::device_start()
 
 	filectx.curdir[0] = '.';
 	filectx.curdir[1] = '\0';
-	filectx.dirp = NULL;
-	filectx.fd = NULL;
+	filectx.dirp = nullptr;
+	filectx.fd = nullptr;
 }
 
 //-------------------------------------------------
@@ -271,7 +271,7 @@ READ32_MEMBER( nubus_image_device::image_super_r )
 
 WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 {
-	const osd_directory_entry *dp = NULL;
+	const osd_directory_entry *dp = nullptr;
 	char fullpath[1024];
 	UINT64 filesize;
 
@@ -335,7 +335,7 @@ WRITE32_MEMBER( nubus_image_device::file_data_w )
 	UINT32 actualcount = 0;
 
 	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
-	if(filectx.fd != NULL) {
+	if(filectx.fd != nullptr) {
 		//data = ni_ntohl(data);
 		if((filectx.bytecount + count) > filectx.filelen) count = filectx.filelen - filectx.bytecount;
 		osd_write(filectx.fd, &data, filectx.bytecount, count, &actualcount);
@@ -343,21 +343,21 @@ WRITE32_MEMBER( nubus_image_device::file_data_w )
 
 		if(filectx.bytecount >= filectx.filelen) {
 			osd_close(filectx.fd);
-			filectx.fd = NULL;
+			filectx.fd = nullptr;
 		}
 	}
 }
 
 READ32_MEMBER( nubus_image_device::file_data_r )
 {
-	if(filectx.fd != NULL) {
+	if(filectx.fd != nullptr) {
 		UINT32 ret;
 		UINT32 actual = 0;
 		osd_read(filectx.fd, &ret, filectx.bytecount, sizeof(ret), &actual);
 		filectx.bytecount += actual;
 		if(actual < sizeof(ret)) {
 			osd_close(filectx.fd);
-			filectx.fd = NULL;
+			filectx.fd = nullptr;
 		}
 		return ni_htonl(ret);
 	}

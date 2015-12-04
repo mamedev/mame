@@ -118,7 +118,7 @@ bool videobrain_expansion_slot_device::call_load()
 	{
 		size_t size = 0;
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			size = length();
 
@@ -168,7 +168,7 @@ UINT8 videobrain_expansion_slot_device::bo_r(address_space &space, offs_t offset
 {
 	UINT8 data = 0;
 
-	if (m_cart != NULL)
+	if (m_cart != nullptr)
 	{
 		data = m_cart->videobrain_bo_r(space, offset, cs1, cs2);
 	}
@@ -183,7 +183,7 @@ UINT8 videobrain_expansion_slot_device::bo_r(address_space &space, offs_t offset
 
 void videobrain_expansion_slot_device::bo_w(address_space &space, offs_t offset, UINT8 data, int cs1, int cs2)
 {
-	if (m_cart != NULL)
+	if (m_cart != nullptr)
 	{
 		m_cart->videobrain_bo_w(space, offset, data, cs1, cs2);
 	}

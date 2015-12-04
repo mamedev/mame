@@ -126,7 +126,7 @@ void a8sio_device::device_start()
 	m_out_audio_in_cb.resolve_safe();
 
 	// clear slot
-	m_device = NULL;
+	m_device = nullptr;
 }
 
 //-------------------------------------------------
@@ -181,8 +181,8 @@ WRITE8_MEMBER( a8sio_device::audio_in_w )
 
 device_a8sio_card_interface::device_a8sio_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
-	, m_a8sio(NULL)
-	, m_a8sio_tag(NULL), m_a8sio_slottag(nullptr)
+	, m_a8sio(nullptr)
+	, m_a8sio_tag(nullptr), m_a8sio_slottag(nullptr)
 {
 }
 

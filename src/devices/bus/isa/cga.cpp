@@ -258,7 +258,7 @@ static MACHINE_CONFIG_FRAGMENT( cga )
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(isa8_cga_device, hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_cga_device, vsync_changed))
 	MCFG_MC6845_RECONFIGURE_CB(isa8_cga_device, reconfigure)
-	MCFG_VIDEO_SET_SCREEN(NULL)
+	MCFG_VIDEO_SET_SCREEN(nullptr)
 MACHINE_CONFIG_END
 
 
@@ -343,7 +343,7 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type
 
 void isa8_cga_device::device_start()
 {
-	if (m_palette != NULL && !m_palette->started())
+	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
 	set_isa_device();
@@ -1561,7 +1561,7 @@ isa8_cga_pc1512_device::isa8_cga_pc1512_device(const machine_config &mconfig, co
 
 const rom_entry *isa8_cga_pc1512_device::device_rom_region() const
 {
-	return NULL;
+	return nullptr;
 }
 
 

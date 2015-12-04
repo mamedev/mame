@@ -564,7 +564,7 @@ WRITE_LINE_MEMBER( epson_lx810l_t::e05a30_ready )
 UINT32 epson_lx810l_t::screen_update_lx810l(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int scrolly = -bitmap_line(9);
-	copyscrollbitmap(bitmap, m_bitmap, 0, NULL, 1, &scrolly, cliprect);
+	copyscrollbitmap(bitmap, m_bitmap, 0, nullptr, 1, &scrolly, cliprect);
 
 	/* draw "printhead" */
 	bitmap.plot_box(m_real_cr_pos + CR_OFFSET - 10, PAPER_HEIGHT - 36, 20, 36, 0x888888);

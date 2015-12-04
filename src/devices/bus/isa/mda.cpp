@@ -172,7 +172,7 @@ isa8_mda_device::isa8_mda_device(const machine_config &mconfig, device_type type
 
 void isa8_mda_device::device_start()
 {
-	if (m_palette != NULL && !m_palette->started())
+	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
 	set_isa_device();
@@ -591,7 +591,7 @@ isa8_hercules_device::isa8_hercules_device(const machine_config &mconfig, const 
 
 void isa8_hercules_device::device_start()
 {
-	if (m_palette != NULL && !m_palette->started())
+	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
 	m_videoram.resize(0x10000);

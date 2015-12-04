@@ -183,7 +183,7 @@ adam_fdc_device::adam_fdc_device(const machine_config &mconfig, const char *tag,
 		m_maincpu(*this, M6801_TAG),
 		m_fdc(*this, WD2793_TAG),
 		m_floppy0(*this, WD2793_TAG":0:525ssdd"),
-		m_floppy(NULL),
+		m_floppy(nullptr),
 		m_ram(*this, "ram"),
 		m_sw3(*this, "SW3")
 {
@@ -289,7 +289,7 @@ WRITE8_MEMBER( adam_fdc_device::p1_w )
 	m_fdc->dden_w(BIT(data, 3));
 
 	// drive select
-	m_floppy = NULL;
+	m_floppy = nullptr;
 
 	if (BIT(data, 5))
 	{

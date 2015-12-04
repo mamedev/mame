@@ -151,7 +151,7 @@ void a2bus_corvfdc01_device::device_reset()
 {
 	m_fdc_local_status = 0;
 	m_fdc_local_command = 0;
-	m_curfloppy = NULL;
+	m_curfloppy = nullptr;
 }
 
 /*-------------------------------------------------
@@ -194,7 +194,7 @@ UINT8 a2bus_corvfdc01_device::read_c0nx(address_space &space, UINT8 offset)
 void a2bus_corvfdc01_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
 	int current_drive;
-	floppy_image_device *floppy = 0;
+	floppy_image_device *floppy = nullptr;
 
 	switch (offset)
 	{
@@ -205,16 +205,16 @@ void a2bus_corvfdc01_device::write_c0nx(address_space &space, UINT8 offset, UINT
 			switch (current_drive)
 			{
 				case 0:
-					floppy = m_con1 ? m_con1->get_device() : 0;
+					floppy = m_con1 ? m_con1->get_device() : nullptr;
 					break;
 				case 1:
-					floppy = m_con2 ? m_con2->get_device() : 0;
+					floppy = m_con2 ? m_con2->get_device() : nullptr;
 					break;
 				case 2:
-					floppy = m_con3 ? m_con3->get_device() : 0;
+					floppy = m_con3 ? m_con3->get_device() : nullptr;
 					break;
 				case 3:
-					floppy = m_con4 ? m_con4->get_device() : 0;
+					floppy = m_con4 ? m_con4->get_device() : nullptr;
 					break;
 			}
 
@@ -223,7 +223,7 @@ void a2bus_corvfdc01_device::write_c0nx(address_space &space, UINT8 offset, UINT
 				m_wdfdc->set_floppy(floppy);
 			}
 
-			if (m_curfloppy != NULL)
+			if (m_curfloppy != nullptr)
 			{
 				// side select
 				m_curfloppy->ss_w((data & LC_FLPSD1_mask) != 0);

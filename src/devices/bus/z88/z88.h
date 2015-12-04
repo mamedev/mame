@@ -70,7 +70,7 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write) { }
-	virtual UINT8* get_cart_base() { return NULL; }
+	virtual UINT8* get_cart_base() { return nullptr; }
 	virtual UINT32 get_cart_size() { return 0; }
 };
 
@@ -106,7 +106,7 @@ public:
 	virtual bool is_reset_on_load() const { return 0; }
 	virtual const char *image_interface() const { return "z88_cart"; }
 	virtual const char *file_extensions() const { return "epr,bin"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	// slot interface overrides
 	virtual void get_default_card_software(std::string &result);

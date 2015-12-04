@@ -12,7 +12,7 @@ msx_cart_hfox::msx_cart_hfox(const machine_config &mconfig, const char *tag, dev
 	, msx_cart_interface(mconfig, *this)
 {
 	m_selected_bank[0] = m_selected_bank[1] = 0;
-	m_bank_base[0] = m_bank_base[1] = NULL;
+	m_bank_base[0] = m_bank_base[1] = nullptr;
 }
 
 

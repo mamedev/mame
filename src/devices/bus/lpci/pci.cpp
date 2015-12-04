@@ -91,10 +91,10 @@ const device_type PCI_BUS = &device_creator<pci_bus_device>;
 //-------------------------------------------------
 pci_bus_device::pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PCI_BUS, "PCI Bus", tag, owner, clock, "pci_bus", __FILE__), m_busnum(0),
-		m_father(NULL), m_address(0), m_devicenum(0), m_busnumber(0), m_busnumaddr(nullptr)
+		m_father(nullptr), m_address(0), m_devicenum(0), m_busnumber(0), m_busnumaddr(nullptr)
 {
 	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++) {
-		m_devtag[i]= NULL;
+		m_devtag[i]= nullptr;
 	}
 	m_siblings_count = 0;
 }
@@ -119,7 +119,7 @@ READ32_MEMBER( pci_bus_device::read )
 		case 1:
 			if (m_devicenum != -1)
 			{
-				if (m_busnumaddr->m_device[m_devicenum] != NULL)
+				if (m_busnumaddr->m_device[m_devicenum] != nullptr)
 				{
 					function = (m_address >> 8) & 0x07;
 					reg = (m_address >> 0) & 0xfc;
@@ -149,10 +149,10 @@ pci_bus_device *pci_bus_device::pci_search_bustree(int busnum, int devicenum, pc
 	for (a = 0; a < pcibus->m_siblings_count; a++)
 	{
 		ret = pci_search_bustree(busnum, devicenum, pcibus->m_siblings[a]);
-		if (ret != NULL)
+		if (ret != nullptr)
 			return ret;
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -175,7 +175,7 @@ WRITE32_MEMBER( pci_bus_device::write )
 				int busnum = (m_address >> 16) & 0xff;
 				int devicenum = (m_address >> 11) & 0x1f;
 				m_busnumaddr = pci_search_bustree(busnum, devicenum, this);
-				if (m_busnumaddr != NULL)
+				if (m_busnumaddr != nullptr)
 				{
 					m_busnumber = busnum;
 					m_devicenum = devicenum;
@@ -190,7 +190,7 @@ WRITE32_MEMBER( pci_bus_device::write )
 		case 1:
 			if (m_devicenum != -1)
 			{
-				if (m_busnumaddr->m_device[m_devicenum] != NULL)
+				if (m_busnumaddr->m_device[m_devicenum] != nullptr)
 				{
 					int function = (m_address >> 8) & 0x07;
 					int reg = (m_address >> 0) & 0xfc;
@@ -263,13 +263,13 @@ void pci_bus_device::device_start()
 	{
 		sprintf(id, "%d", i);
 		pci_connector *conn = downcast<pci_connector *>(subdevice(id));
-		if (conn!=NULL)
+		if (conn!=nullptr)
 			m_device[i] = conn->get_device();
 		else
-			m_device[i] = NULL;
+			m_device[i] = nullptr;
 	}
 
-	if (m_father != NULL) {
+	if (m_father != nullptr) {
 		pci_bus_device *father = machine().device<pci_bus_device>(m_father);
 		if (father)
 			father->add_sibling(this, m_busnum);

@@ -27,7 +27,7 @@ const device_type VBOY_CART_SLOT = &device_creator<vboy_cart_slot_device>;
 
 device_vboy_cart_interface::device_vboy_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0),
 		m_rom_mask(0)
 {
@@ -48,7 +48,7 @@ device_vboy_cart_interface::~device_vboy_cart_interface()
 
 void device_vboy_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(VBOYSLOT_ROM_REGION_TAG).c_str(), size, 4, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size/4;
@@ -163,8 +163,8 @@ bool vboy_cart_slot_device::call_load()
 	if (m_cart)
 	{
 		UINT8 *ROM;
-		UINT32 len = (software_entry() == NULL) ? length() : get_software_region_length("rom");
-		bool has_eeprom = (software_entry() != NULL) && get_software_region("eeprom");
+		UINT32 len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		bool has_eeprom = (software_entry() != nullptr) && get_software_region("eeprom");
 
 		if (len > 0x200000)
 		{
@@ -180,7 +180,7 @@ bool vboy_cart_slot_device::call_load()
 
 		ROM = (UINT8 *)m_cart->get_rom_base();
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 			fread(ROM, len);
 		else
 			memcpy(ROM, get_software_region("rom"), len);
@@ -189,7 +189,7 @@ bool vboy_cart_slot_device::call_load()
 		if (len < 0x100000) { memcpy(ROM + 0x080000, ROM, 0x080000); }
 		if (len < 0x200000) { memcpy(ROM + 0x100000, ROM, 0x100000); }
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 			m_type = vboy_get_pcb_id("vb_rom");
 		else
 		{

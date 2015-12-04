@@ -80,7 +80,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( common0_w ) { if (exists()) m_device->common0_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( common1_w ) { if (exists()) m_device->common1_w(state); }
 
-	bool exists() { return m_device != NULL; }
+	bool exists() { return m_device != nullptr; }
 
 	void irq_w(int state) { m_write_irq(state); }
 

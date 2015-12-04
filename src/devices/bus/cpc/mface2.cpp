@@ -20,7 +20,7 @@ const device_type CPC_MFACE2 = &device_creator<cpc_multiface2_device>;
 static MACHINE_CONFIG_FRAGMENT( cpc_mface2 )
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
@@ -74,7 +74,7 @@ DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_multiface_directoverride )
 
 int cpc_multiface2_device::multiface_hardware_enabled()
 {
-	if (m_multiface_ram!=NULL)
+	if (m_multiface_ram!=nullptr)
 	{
 		if ((ioport("multiface")->read() & 0x01)!=0)
 		{

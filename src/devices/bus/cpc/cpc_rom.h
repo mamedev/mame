@@ -37,7 +37,7 @@ public:
 	virtual bool is_reset_on_load() const { return 1; }
 	virtual const char *image_interface() const { return "cpc_rom"; }
 	virtual const char *file_extensions() const { return "rom,bin"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 
 	UINT8* base() { return m_base; }
 
@@ -70,7 +70,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	UINT8* base(UINT8 slot) { if(slot >=1 && slot <= 8) return m_rom[slot]->base(); else return NULL; }
+	UINT8* base(UINT8 slot) { if(slot >=1 && slot <= 8) return m_rom[slot]->base(); else return nullptr; }
 
 protected:
 	// device-level overrides

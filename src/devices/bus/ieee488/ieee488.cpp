@@ -76,12 +76,12 @@ ieee488_slot_device::ieee488_slot_device(const machine_config &mconfig, const ch
 
 void ieee488_slot_device::device_start()
 {
-	ieee488_device* bus = NULL;
+	ieee488_device* bus = nullptr;
 
-	for (device_t *device = owner(); device != NULL; device = device->owner())
+	for (device_t *device = owner(); device != nullptr; device = device->owner())
 	{
 		bus = device->subdevice<ieee488_device>(IEEE488_TAG);
-		if (bus != NULL) break;
+		if (bus != nullptr) break;
 	}
 
 	assert(bus);
@@ -153,7 +153,7 @@ void ieee488_device::device_stop()
 
 void ieee488_device::add_device(ieee488_slot_device *slot, device_t *target)
 {
-	daisy_entry *entry = global_alloc(daisy_entry(target));
+	auto entry = global_alloc(daisy_entry(target));
 
 	entry->m_interface->m_bus = this;
 	entry->m_interface->m_slot = slot;
@@ -167,9 +167,9 @@ void ieee488_device::add_device(ieee488_slot_device *slot, device_t *target)
 //-------------------------------------------------
 
 ieee488_device::daisy_entry::daisy_entry(device_t *device)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_device(device),
-		m_interface(NULL),
+		m_interface(nullptr),
 		m_dio(0xff)
 {
 	for (int i = 0; i < SIGNAL_COUNT; i++)

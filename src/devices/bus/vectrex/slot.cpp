@@ -27,7 +27,7 @@ const device_type VECTREX_CART_SLOT = &device_creator<vectrex_cart_slot_device>;
 
 device_vectrex_cart_interface::device_vectrex_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0)
 {
 }
@@ -47,7 +47,7 @@ device_vectrex_cart_interface::~device_vectrex_cart_interface()
 
 void device_vectrex_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = device().machine().memory().region_alloc(std::string(tag).append(VECSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
@@ -152,7 +152,7 @@ bool vectrex_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 size = (software_entry() == NULL) ? length() : get_software_region_length("rom");
+		UINT32 size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
 		UINT8 *ROM;
 
 		if (size > 0x10000)
@@ -164,7 +164,7 @@ bool vectrex_cart_slot_device::call_load()
 		m_cart->rom_alloc((size < 0x1000) ? 0x1000 : size, tag());
 		ROM = m_cart->get_rom_base();
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 			fread(ROM, size);
 		else
 			memcpy(ROM, get_software_region("rom"), size);

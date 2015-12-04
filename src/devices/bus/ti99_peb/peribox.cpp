@@ -222,7 +222,7 @@ peribox_device::peribox_device(const machine_config &mconfig, const char *tag, d
 	m_console_intb(*this),
 	m_datamux_ready(*this), m_inta_flag(0), m_intb_flag(0), m_ready_flag(0)
 {
-	for (int i=2; i <= 8; i++) m_slot[i] = NULL;
+	for (int i=2; i <= 8; i++) m_slot[i] = nullptr;
 	// The address prefix is actually created by the "Flex cable interface"
 	// which sits in slot 1.
 	m_address_prefix = 0x70000;
@@ -237,14 +237,14 @@ peribox_device::peribox_device(const machine_config &mconfig, device_type type, 
 	m_console_intb(*this),
 	m_datamux_ready(*this), m_inta_flag(0), m_intb_flag(0), m_ready_flag(0), m_address_prefix(0)
 {
-	for (int i=2; i <= 8; i++) m_slot[i] = NULL;
+	for (int i=2; i <= 8; i++) m_slot[i] = nullptr;
 }
 
 READ8Z_MEMBER(peribox_device::readz)
 {
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=NULL) m_slot[i]->readz(space, offset | m_address_prefix, value, mem_mask);
+		if (m_slot[i]!=nullptr) m_slot[i]->readz(space, offset | m_address_prefix, value, mem_mask);
 	}
 }
 
@@ -252,7 +252,7 @@ WRITE8_MEMBER(peribox_device::write)
 {
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=NULL) m_slot[i]->write(space, offset | m_address_prefix, data, mem_mask);
+		if (m_slot[i]!=nullptr) m_slot[i]->write(space, offset | m_address_prefix, data, mem_mask);
 	}
 }
 
@@ -260,7 +260,7 @@ SETADDRESS_DBIN_MEMBER(peribox_device::setaddress_dbin)
 {
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=NULL) m_slot[i]->setaddress_dbin(space, offset | m_address_prefix, state);
+		if (m_slot[i]!=nullptr) m_slot[i]->setaddress_dbin(space, offset | m_address_prefix, state);
 	}
 }
 
@@ -268,7 +268,7 @@ READ8Z_MEMBER(peribox_device::crureadz)
 {
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=NULL) m_slot[i]->crureadz(space, offset, value);
+		if (m_slot[i]!=nullptr) m_slot[i]->crureadz(space, offset, value);
 	}
 }
 
@@ -276,7 +276,7 @@ WRITE8_MEMBER(peribox_device::cruwrite)
 {
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=NULL) m_slot[i]->cruwrite(space, offset, data);
+		if (m_slot[i]!=nullptr) m_slot[i]->cruwrite(space, offset, data);
 	}
 }
 
@@ -288,7 +288,7 @@ WRITE_LINE_MEMBER(peribox_device::senila)
 {
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=NULL) m_slot[i]->senila(state);
+		if (m_slot[i]!=nullptr) m_slot[i]->senila(state);
 	}
 }
 
@@ -296,7 +296,7 @@ WRITE_LINE_MEMBER(peribox_device::senilb)
 {
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=NULL) m_slot[i]->senilb(state);
+		if (m_slot[i]!=nullptr) m_slot[i]->senilb(state);
 	}
 }
 
@@ -313,7 +313,7 @@ void peribox_device::set_genmod(bool set)
 {
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=NULL) m_slot[i]->set_genmod(set);
+		if (m_slot[i]!=nullptr) m_slot[i]->set_genmod(set);
 	}
 }
 
@@ -381,7 +381,7 @@ void peribox_device::device_start(void)
 		logerror("%s: AMA/B/C address prefix set to %05x\n", tag(), m_address_prefix);
 		for (int i=2; i < 9; i++)
 		{
-			logerror("%s: Slot %d = %s\n", tag(), i, (m_slot[i] != NULL)? m_slot[i]->m_card->tag() : "EMPTY");
+			logerror("%s: Slot %d = %s\n", tag(), i, (m_slot[i] != nullptr)? m_slot[i]->m_card->tag() : "EMPTY");
 		}
 	}
 }
@@ -670,15 +670,15 @@ void peribox_slot_device::device_config_complete()
 	m_slotnumber = get_index_from_tagname();
 	device_t *carddev = first_subdevice();
 	peribox_device *peb = static_cast<peribox_device*>(owner());
-	if (carddev != NULL)
+	if (carddev != nullptr)
 	{
 		peb->set_slot_loaded(m_slotnumber, this);
 		m_card = static_cast<ti_expansion_card_device*>(carddev);
 	}
 	else
 	{
-		peb->set_slot_loaded(m_slotnumber, NULL);
-		m_card = NULL;
+		peb->set_slot_loaded(m_slotnumber, nullptr);
+		m_card = nullptr;
 	}
 }
 

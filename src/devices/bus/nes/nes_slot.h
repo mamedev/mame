@@ -359,7 +359,7 @@ public:
 	virtual bool is_reset_on_load() const { return 1; }
 	virtual const char *image_interface() const { return "nes_cart"; }
 	virtual const char *file_extensions() const { return "nes,unf,unif"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 	virtual device_image_partialhash_func get_partial_hash() const { return &nes_partialhash; }
 
 	// slot interface overrides

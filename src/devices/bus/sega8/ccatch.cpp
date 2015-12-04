@@ -54,7 +54,7 @@ static SLOT_INTERFACE_START(sg1000_card)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( sub_slot )
-	MCFG_SG1000_CARD_ADD("cardslot", sg1000_card, NULL)
+	MCFG_SG1000_CARD_ADD("cardslot", sg1000_card, nullptr)
 MACHINE_CONFIG_END
 
 machine_config_constructor sega8_cardcatch_device::device_mconfig_additions() const

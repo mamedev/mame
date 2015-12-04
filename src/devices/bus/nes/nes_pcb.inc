@@ -330,7 +330,7 @@ static const nes_pcb *nes_pcb_lookup( const char *slot )
 		if (!core_stricmp(pcb_list[i].slot_opt, slot))
 			return &pcb_list[i];
 	}
-	return NULL;
+	return nullptr;
 }
 
 static const nes_pcb *nes_id_lookup( int id )
@@ -340,14 +340,14 @@ static const nes_pcb *nes_id_lookup( int id )
 		if (pcb_list[i].pcb_id == id)
 			return &pcb_list[i];
 	}
-	return NULL;
+	return nullptr;
 }
 
 int nes_cart_slot_device::nes_get_pcb_id( const char *slot )
 {
 	const nes_pcb *pcb = nes_pcb_lookup(slot);
 
-	if (pcb == NULL)
+	if (pcb == nullptr)
 		fatalerror("Unimplemented PCB type %s\n", slot);
 
 	return pcb->pcb_id;
@@ -358,7 +358,7 @@ const char * nes_cart_slot_device::nes_get_slot( int pcb_id )
 {
 	const nes_pcb *pcb = nes_id_lookup(pcb_id);
 
-	if (pcb == NULL)
+	if (pcb == nullptr)
 		fatalerror("Unimplemented PCB ID %d\n", pcb_id);
 
 	return pcb->slot_opt;
@@ -404,14 +404,14 @@ static const struct nes_cart_lines nes_cart_lines_table[] =
 	{ "CHR A16",  16 },
 	{ "CHR A17",  17 },
 	{ "NC",      127 },
-	{ 0 }
+	{ nullptr }
 };
 
 static int nes_cart_get_line( const char *feature )
 {
 	const struct nes_cart_lines *nes_line = &nes_cart_lines_table[0];
 
-	if (feature == NULL)
+	if (feature == nullptr)
 		return 128;
 
 	while (nes_line->tag)
@@ -447,10 +447,10 @@ void nes_cart_slot_device::call_load_pcb()
 		m_pcb_id = NO_BOARD;
 
 	// SETUP step 3: storing the info needed for emulation
-	if (get_software_region("bwram") != NULL)
+	if (get_software_region("bwram") != nullptr)
 		battery_size = get_software_region_length("bwram");
 
-	if (get_software_region("wram") != NULL)
+	if (get_software_region("wram") != nullptr)
 		prgram_size = get_software_region_length("wram");
 
 	if (get_feature("mirroring"))
@@ -487,12 +487,12 @@ void nes_cart_slot_device::call_load_pcb()
 	{
 		int mask = 0, state = 0;
 
-		if (get_feature("chr-pin26") != NULL)
+		if (get_feature("chr-pin26") != nullptr)
 		{
 			mask |= 0x01;
 			state |= !strcmp(get_feature("chr-pin26"), "CE") ? 0x01 : 0;
 		}
-		if (get_feature("chr-pin27") != NULL)
+		if (get_feature("chr-pin27") != nullptr)
 		{
 			mask |= 0x02;
 			state |= !strcmp(get_feature("chr-pin27"), "CE") ? 0x02 : 0;
@@ -501,7 +501,7 @@ void nes_cart_slot_device::call_load_pcb()
 		m_cart->set_ce(mask, state);
 	}
 
-	if (m_pcb_id == TAITO_X1_005 && get_feature("x1-pin17") != NULL && get_feature("x1-pin31") != NULL)
+	if (m_pcb_id == TAITO_X1_005 && get_feature("x1-pin17") != nullptr && get_feature("x1-pin31") != nullptr)
 	{
 		if (!strcmp(get_feature("x1-pin17"), "CIRAM A10") && !strcmp(get_feature("x1-pin31"), "NC"))
 			m_cart->set_x1_005_alt(TRUE);

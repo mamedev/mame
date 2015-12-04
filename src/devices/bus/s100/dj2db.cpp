@@ -109,9 +109,9 @@ static MACHINE_CONFIG_FRAGMENT( s100_dj2db )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(s100_dj2db_device, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":0", s100_dj2db_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":1", s100_dj2db_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":2", s100_dj2db_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":3", s100_dj2db_floppies, NULL,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":1", s100_dj2db_floppies, nullptr,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":2", s100_dj2db_floppies, nullptr,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":3", s100_dj2db_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -259,7 +259,7 @@ s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *
 	m_floppy1(*this, MB8866_TAG":1"),
 	m_floppy2(*this, MB8866_TAG":2"),
 	m_floppy3(*this, MB8866_TAG":3"),
-	m_floppy(NULL),
+	m_floppy(nullptr),
 	m_rom(*this, "dj2db"),
 	m_ram(*this, "ram"),
 	m_j1a(*this, "J1A"),
@@ -417,7 +417,7 @@ void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, UINT8 d
 		*/
 
 		// drive select
-		m_floppy = NULL;
+		m_floppy = nullptr;
 
 		if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
 		if (BIT(data, 1)) m_floppy = m_floppy1->get_device();

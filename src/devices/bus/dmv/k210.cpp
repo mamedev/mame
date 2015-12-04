@@ -67,7 +67,7 @@ dmv_k210_device::dmv_k210_device(const machine_config &mconfig, const char *tag,
 
 void dmv_k210_device::device_start()
 {
-	m_clk1_timer = timer_alloc(0, NULL);
+	m_clk1_timer = timer_alloc(0, nullptr);
 	m_bus = static_cast<dmvcart_slot_device*>(owner());
 }
 

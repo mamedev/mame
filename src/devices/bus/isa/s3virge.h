@@ -31,7 +31,7 @@ public:
 	virtual READ8_MEMBER(mem_r);
 	virtual WRITE8_MEMBER(mem_w);
 
-	ibm8514a_device* get_8514() { fatalerror("s3virge requested non-existant 8514/A device\n"); return NULL; }
+	ibm8514a_device* get_8514() { fatalerror("s3virge requested non-existant 8514/A device\n"); return nullptr; }
 protected:
 	// device-level overrides
 	virtual void device_start();

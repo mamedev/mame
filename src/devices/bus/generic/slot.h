@@ -119,7 +119,7 @@ public:
 	virtual bool is_creatable() const { return 0; }
 	virtual bool must_be_loaded() const { return m_must_be_loaded; }
 	virtual bool is_reset_on_load() const { return 1; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 	virtual const char *image_interface() const { return m_interface; }
 	virtual const char *file_extensions() const { return m_extensions; }
 
@@ -137,8 +137,8 @@ public:
 	virtual void rom_alloc(size_t size, int width, endianness_t end) { if (m_cart) m_cart->rom_alloc(size, width, end, tag()); }
 	virtual void ram_alloc(UINT32 size)  { if (m_cart) m_cart->ram_alloc(size); }
 
-	UINT8* get_rom_base()  { if (m_cart) return m_cart->get_rom_base(); return NULL; }
-	UINT8* get_ram_base() { if (m_cart) return m_cart->get_ram_base(); return NULL; }
+	UINT8* get_rom_base()  { if (m_cart) return m_cart->get_rom_base(); return nullptr; }
+	UINT8* get_ram_base() { if (m_cart) return m_cart->get_ram_base(); return nullptr; }
 	UINT32 get_rom_size() { if (m_cart) return m_cart->get_rom_size(); return 0; }
 
 	void save_ram()   { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }

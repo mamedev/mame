@@ -15,7 +15,7 @@ msx_cart_holy_quran::msx_cart_holy_quran(const machine_config &mconfig, const ch
 	for (int i = 0; i < 4; i++)
 	{
 		m_selected_bank[i] = 0;
-		m_bank_base[i] = NULL;
+		m_bank_base[i] = nullptr;
 	}
 
 	/* protection uses a simple rotation on databus, some lines inverted:

@@ -100,7 +100,7 @@ public:
 
 	int get_cart_type() { return m_type; };
 	int identify_cart_type(UINT8 *ROM, UINT32 len);
-	bool has_cart() { return m_cart != NULL; }
+	bool has_cart() { return m_cart != nullptr; }
 
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }
@@ -108,7 +108,7 @@ public:
 	virtual bool is_creatable() const { return 0; }
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 1; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual const option_guide *create_option_guide() const { return nullptr; }
 	virtual const char *image_interface() const { return "a7800_cart"; }
 	virtual const char *file_extensions() const { return "bin,a78"; }
 	virtual device_image_partialhash_func get_partial_hash() const { return &a78_partialhash; }

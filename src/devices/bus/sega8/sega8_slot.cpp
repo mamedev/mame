@@ -51,7 +51,7 @@ const device_type SEGA8_CARD_SLOT = &device_creator<sega8_card_slot_device>;
 
 device_sega8_cart_interface::device_sega8_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0),
 		m_rom_page_count(0),
 		has_battery(FALSE),
@@ -76,7 +76,7 @@ device_sega8_cart_interface::~device_sega8_cart_interface()
 
 void device_sega8_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = device().machine().memory().region_alloc(std::string(tag).append(S8SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
@@ -270,7 +270,7 @@ void sega8_cart_slot_device::set_lphaser_xoffset( UINT8 *rom, int size )
 
 void sega8_cart_slot_device::setup_ram()
 {
-	if (software_entry() == NULL)
+	if (software_entry() == nullptr)
 	{
 		if (m_type == SEGA8_CASTLE)
 		{
@@ -335,7 +335,7 @@ bool sega8_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 len = (software_entry() == NULL) ? length() : get_software_region_length("rom");
+		UINT32 len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
 		UINT32 offset = 0;
 		UINT8 *ROM;
 
@@ -359,7 +359,7 @@ bool sega8_cart_slot_device::call_load()
 		m_cart->rom_alloc(len, tag());
 		ROM = m_cart->get_rom_base();
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			fseek(offset, SEEK_SET);
 			fread(ROM, len);
@@ -371,7 +371,7 @@ bool sega8_cart_slot_device::call_load()
 		if (verify_cart(ROM, len) == IMAGE_VERIFY_FAIL)
 			logerror("Warning loading image: verify_cart failed\n");
 
-		if (software_entry() != NULL)
+		if (software_entry() != nullptr)
 			m_type = sega8_get_pcb_id(get_feature("slot") ? get_feature("slot") : "rom");
 		else
 			m_type = get_cart_type(ROM, len);
@@ -381,7 +381,7 @@ bool sega8_cart_slot_device::call_load()
 		setup_ram();
 
 		// Check for gamegear cartridges with PIN 42 set to SMS mode
-		if (software_entry() != NULL)
+		if (software_entry() != nullptr)
 		{
 			const char *pin_42 = get_feature("pin_42");
 			if (pin_42 && !strcmp(pin_42, "sms_mode"))
@@ -731,7 +731,7 @@ void sega8_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len, UIN
 	logerror("FILE DETAILS\n" );
 	logerror("============\n" );
 	logerror("Name: %s\n", basename());
-	logerror("File Size: 0x%08x\n", (software_entry() == NULL) ? (int)length() : (int)get_software_region_length("rom"));
+	logerror("File Size: 0x%08x\n", (software_entry() == nullptr) ? (int)length() : (int)get_software_region_length("rom"));
 	logerror("Detected type: %s\n", sega8_get_slot(m_type));
 	logerror("ROM (Allocated) Size: 0x%X\n", len);
 	logerror("RAM: %s\n", nvram_len ? "Yes" : "No");

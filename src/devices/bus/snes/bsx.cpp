@@ -249,7 +249,7 @@ static SLOT_INTERFACE_START(bsx_cart)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( bs_slot )
-	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, NULL)
+	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, nullptr)
 MACHINE_CONFIG_END
 
 

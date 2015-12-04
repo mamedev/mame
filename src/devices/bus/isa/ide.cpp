@@ -42,7 +42,7 @@ WRITE_LINE_MEMBER(isa16_ide_device::ide_interrupt)
 }
 
 static MACHINE_CONFIG_FRAGMENT( ide )
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, false)
+	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(isa16_ide_device, ide_interrupt))
 MACHINE_CONFIG_END
 
