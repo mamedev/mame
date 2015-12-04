@@ -347,45 +347,45 @@ static const int slot_array[32]=
 static const UINT32 ksl_tab[8*16]=
 {
 	/* OCT 0 */
-		0.000/DV, 0.000/DV, 0.000/DV, 0.000/DV,
-		0.000/DV, 0.000/DV, 0.000/DV, 0.000/DV,
-		0.000/DV, 0.000/DV, 0.000/DV, 0.000/DV,
-		0.000/DV, 0.000/DV, 0.000/DV, 0.000/DV,
+		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV),
+		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV),
+		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV),
+		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV),
 	/* OCT 1 */
-		0.000/DV, 0.000/DV, 0.000/DV, 0.000/DV,
-		0.000/DV, 0.000/DV, 0.000/DV, 0.000/DV,
-		0.000/DV, 0.750/DV, 1.125/DV, 1.500/DV,
-		1.875/DV, 2.250/DV, 2.625/DV, 3.000/DV,
+		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV),
+		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV),
+		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.750/DV), static_cast<UINT32>(1.125/DV), static_cast<UINT32>(1.500/DV),
+		static_cast<UINT32>(1.875/DV), static_cast<UINT32>(2.250/DV), static_cast<UINT32>(2.625/DV), static_cast<UINT32>(3.000/DV),
 	/* OCT 2 */
-		0.000/DV, 0.000/DV, 0.000/DV, 0.000/DV,
-		0.000/DV, 1.125/DV, 1.875/DV, 2.625/DV,
-		3.000/DV, 3.750/DV, 4.125/DV, 4.500/DV,
-		4.875/DV, 5.250/DV, 5.625/DV, 6.000/DV,
+		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV),
+		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(1.125/DV), static_cast<UINT32>(1.875/DV), static_cast<UINT32>(2.625/DV),
+		static_cast<UINT32>(3.000/DV), static_cast<UINT32>(3.750/DV), static_cast<UINT32>(4.125/DV), static_cast<UINT32>(4.500/DV),
+		static_cast<UINT32>(4.875/DV), static_cast<UINT32>(5.250/DV), static_cast<UINT32>(5.625/DV), static_cast<UINT32>(6.000/DV),
 	/* OCT 3 */
-		0.000/DV, 0.000/DV, 0.000/DV, 1.875/DV,
-		3.000/DV, 4.125/DV, 4.875/DV, 5.625/DV,
-		6.000/DV, 6.750/DV, 7.125/DV, 7.500/DV,
-		7.875/DV, 8.250/DV, 8.625/DV, 9.000/DV,
+		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(1.875/DV),
+		static_cast<UINT32>(3.000/DV), static_cast<UINT32>(4.125/DV), static_cast<UINT32>(4.875/DV), static_cast<UINT32>(5.625/DV),
+		static_cast<UINT32>(6.000/DV), static_cast<UINT32>(6.750/DV), static_cast<UINT32>(7.125/DV), static_cast<UINT32>(7.500/DV),
+		static_cast<UINT32>(7.875/DV), static_cast<UINT32>(8.250/DV), static_cast<UINT32>(8.625/DV), static_cast<UINT32>(9.000/DV),
 	/* OCT 4 */
-		0.000/DV, 0.000/DV, 3.000/DV, 4.875/DV,
-		6.000/DV, 7.125/DV, 7.875/DV, 8.625/DV,
-		9.000/DV, 9.750/DV,10.125/DV,10.500/DV,
-		10.875/DV,11.250/DV,11.625/DV,12.000/DV,
+		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(0.000/DV), static_cast<UINT32>(3.000/DV), static_cast<UINT32>(4.875/DV),
+		static_cast<UINT32>(6.000/DV), static_cast<UINT32>(7.125/DV), static_cast<UINT32>(7.875/DV), static_cast<UINT32>(8.625/DV),
+		static_cast<UINT32>(9.000/DV), static_cast<UINT32>(9.750/DV), static_cast<UINT32>(10.125/DV),static_cast<UINT32>(10.500/DV),
+		static_cast<UINT32>(10.875/DV),static_cast<UINT32>(11.250/DV),static_cast<UINT32>(11.625/DV),static_cast<UINT32>(12.000/DV),
 	/* OCT 5 */
-		0.000/DV, 3.000/DV, 6.000/DV, 7.875/DV,
-		9.000/DV,10.125/DV,10.875/DV,11.625/DV,
-		12.000/DV,12.750/DV,13.125/DV,13.500/DV,
-		13.875/DV,14.250/DV,14.625/DV,15.000/DV,
+		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(3.000/DV), static_cast<UINT32>(6.000/DV), static_cast<UINT32>(7.875/DV),
+		static_cast<UINT32>(9.000/DV), static_cast<UINT32>(10.125/DV),static_cast<UINT32>(10.875/DV),static_cast<UINT32>(11.625/DV),
+		static_cast<UINT32>(12.000/DV),static_cast<UINT32>(12.750/DV),static_cast<UINT32>(13.125/DV),static_cast<UINT32>(13.500/DV),
+		static_cast<UINT32>(13.875/DV),static_cast<UINT32>(14.250/DV),static_cast<UINT32>(14.625/DV),static_cast<UINT32>(15.000/DV),
 	/* OCT 6 */
-		0.000/DV, 6.000/DV, 9.000/DV,10.875/DV,
-		12.000/DV,13.125/DV,13.875/DV,14.625/DV,
-		15.000/DV,15.750/DV,16.125/DV,16.500/DV,
-		16.875/DV,17.250/DV,17.625/DV,18.000/DV,
+		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(6.000/DV), static_cast<UINT32>(9.000/DV), static_cast<UINT32>(10.875/DV),
+		static_cast<UINT32>(12.000/DV),static_cast<UINT32>(13.125/DV),static_cast<UINT32>(13.875/DV),static_cast<UINT32>(14.625/DV),
+		static_cast<UINT32>(15.000/DV),static_cast<UINT32>(15.750/DV),static_cast<UINT32>(16.125/DV),static_cast<UINT32>(16.500/DV),
+		static_cast<UINT32>(16.875/DV),static_cast<UINT32>(17.250/DV),static_cast<UINT32>(17.625/DV),static_cast<UINT32>(18.000/DV),
 	/* OCT 7 */
-		0.000/DV, 9.000/DV,12.000/DV,13.875/DV,
-		15.000/DV,16.125/DV,16.875/DV,17.625/DV,
-		18.000/DV,18.750/DV,19.125/DV,19.500/DV,
-		19.875/DV,20.250/DV,20.625/DV,21.000/DV
+		static_cast<UINT32>(0.000/DV), static_cast<UINT32>(9.000/DV), static_cast<UINT32>(12.000/DV),static_cast<UINT32>(13.875/DV),
+		static_cast<UINT32>(15.000/DV),static_cast<UINT32>(16.125/DV),static_cast<UINT32>(16.875/DV),static_cast<UINT32>(17.625/DV),
+		static_cast<UINT32>(18.000/DV),static_cast<UINT32>(18.750/DV),static_cast<UINT32>(19.125/DV),static_cast<UINT32>(19.500/DV),
+		static_cast<UINT32>(19.875/DV),static_cast<UINT32>(20.250/DV),static_cast<UINT32>(20.625/DV),static_cast<UINT32>(21.000/DV)
 };
 #undef DV
 

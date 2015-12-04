@@ -86,7 +86,7 @@ casserr_t coladam_put_byte(cassette_image *cass, int channel, double *time_index
 casserr_t coladam_put_block(cassette_image *cass, int channel, double *time_index, int *prev_sign, int block_index, UINT8 *buffer, int layout_type)
 {
 	int i, checksum_16=0;
-	UINT8 header[] = { 0x16, 0x48, 0x45, 0x00, block_index, 0xff, (0xff - block_index), 0x00, 0x80, 0xf4 };
+	UINT8 header[] = { 0x16, 0x48, 0x45, 0x00, static_cast<UINT8>(block_index), 0xff, static_cast<UINT8>(0xff - block_index), 0x00, 0x80, 0xf4 };
 	casserr_t err;
 	if (layout_type == TYPE_GW)
 	{

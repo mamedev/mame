@@ -6,7 +6,7 @@
 
 CPU_DISASSEMBLE( cp1610 )
 {
-	UINT16 oprom16[4]={ (oprom[0] << 8) | oprom[1], (oprom[2] << 8) | oprom[3], (oprom[4] << 8) | oprom[5], (oprom[6] << 8) | oprom[7] };
+	UINT16 oprom16[4]={ static_cast<UINT16>((oprom[0] << 8) | oprom[1]), static_cast<UINT16>((oprom[2] << 8) | oprom[3]), static_cast<UINT16>((oprom[4] << 8) | oprom[5]), static_cast<UINT16>((oprom[6] << 8) | oprom[7]) };
 	UINT16 op = oprom16[0]; UINT16 subop;
 	UINT16 ea, ea1, ea2;
 	unsigned size = 1;

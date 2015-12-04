@@ -78,7 +78,7 @@ void pc_fdc_family_device::device_start()
 	drq_cb.resolve();
 
 	for(int i=0; i<4; i++) {
-		char name[2] = {'0'+i, 0};
+		char name[2] = {static_cast<char>('0'+i), 0};
 		floppy_connector *conn = subdevice<floppy_connector>(name);
 		floppy[i] = conn ? conn->get_device() : nullptr;
 	}

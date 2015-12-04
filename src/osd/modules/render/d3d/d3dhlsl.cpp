@@ -2907,7 +2907,7 @@ void uniform::update()
 			}
 			else
 			{
-				float targetdims[2] = { shadersys->curr_render_target->target_width, shadersys->curr_render_target->target_height };
+				float targetdims[2] = { static_cast<float>(shadersys->curr_render_target->target_width), static_cast<float>(shadersys->curr_render_target->target_height) };
 				m_shader->set_vector("TargetDims", 2, targetdims);
 			}
 			break;
@@ -3013,7 +3013,7 @@ void uniform::update()
 			break;
 		case CU_POST_SHADOW_COUNT:
 		{
-			float shadowcount[2] = { options->shadow_mask_count_x, options->shadow_mask_count_y };
+			float shadowcount[2] = { static_cast<float>(options->shadow_mask_count_x), static_cast<float>(options->shadow_mask_count_y) };
 			m_shader->set_vector("ShadowCount", 2, shadowcount);
 			break;
 		}
