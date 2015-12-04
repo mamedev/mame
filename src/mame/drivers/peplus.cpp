@@ -5959,7 +5959,7 @@ Currently errors out with CCOM LINK DOWN
 CCOM linking is not supported
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pp0596_a41-a5y.u68",   0x00000, 0x10000, CRC(18475dfe) SHA1(98b8dfd98ce163e78e5c6e80b31dcc58d3ee74e6) ) /* Game Version: A45, Library Version: A5Y,  Video Lib Ver: A4N - 09/05/95   IGT NJ */
+	ROM_LOAD( "pp0596_a41-a5y.u68",   0x00000, 0x10000, CRC(18475dfe) SHA1(98b8dfd98ce163e78e5c6e80b31dcc58d3ee74e6) ) /* Game Version: A45, Library Version: A5Y, Video Lib Ver: A4N - 09/05/95   IGT NJ */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cgxxxx.u72",  0x00000, 0x8000, NO_DUMP ) /* Unknown set needed for correct paytable graphics */
@@ -5989,7 +5989,7 @@ Currently errors out with CCOM LINK DOWN
 CCOM linking is not supported
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pp0598_a41-a96.u68",   0x00000, 0x10000, CRC(075295db) SHA1(7cb238d4df7be7e393dcfe7102aeffa13b1454d9) ) /* Game Version: A45, Library Version: A96,  Video Lib Ver: A4N - 12/21/95   IGT MS */
+	ROM_LOAD( "pp0598_a41-a96.u68",   0x00000, 0x10000, CRC(075295db) SHA1(7cb238d4df7be7e393dcfe7102aeffa13b1454d9) ) /* Game Version: A45, Library Version: A96, Video Lib Ver: A4N - 12/21/95   IGT MS */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cgxxxx.u72",  0x00000, 0x8000, NO_DUMP ) /* Unknown set needed for correct paytable graphics */
@@ -6146,7 +6146,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
      Programs Available: PP0733
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pp0733_a4y-a6g.u68",   0x00000, 0x10000, CRC(027e8e0c) SHA1(8735a6d9cc59ac5ecb615a4e437fb5beaac0dc9f) ) /* Game Version: A4Y, Library Version: A6G,  Video Lib Ver: A0Y - 05/09/96   IGT MS */
+	ROM_LOAD( "pp0733_a4y-a6g.u68",   0x00000, 0x10000, CRC(027e8e0c) SHA1(8735a6d9cc59ac5ecb615a4e437fb5beaac0dc9f) ) /* Game Version: A4Y, Library Version: A6G, Video Lib Ver: A0Y - 05/09/96   IGT MS */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2135.u72",  0x00000, 0x8000, CRC(ecb5c319) SHA1(8c6dce009017c919b4ebfeb0292cfb8819b652a0) ) /*  02/08/95   @ IGT  MS  */
@@ -11286,7 +11286,7 @@ NOTE: This version uses 5 separate decks of cards, one deck for each HOLD button
 	ROM_LOAD( "xp000096.u67",   0x00000, 0x10000, CRC(5aca14e1) SHA1(13bcb8069f9d704983632bb60db119f7308f9d80) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x002412p.u66",   0x00000, 0x10000, CRC(43c250d1) SHA1(868a8ab1795b05c2e57a9b8bf3b2b6be688783e9) ) /* Deuces Wild Bonus Poker */
+	ROM_LOAD( "x002412p.u66",   0x00000, 0x10000, CRC(43c250d1) SHA1(868a8ab1795b05c2e57a9b8bf3b2b6be688783e9) ) /* Standard Draw with 5 decks - Two Pair or Better */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2315.u77",  0x00000, 0x8000, CRC(2c2bb000) SHA1(46135803c9a3066aaaccbf998d91ae3270ab99c4) ) /* 8-17-98   L97-0343   SHUFFLEMASTER NJ */
