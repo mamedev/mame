@@ -997,7 +997,7 @@ end
 				os.exit(-1)
 			end
 				buildoptions {
---					"-Wno-unused-result",
+					"-Wno-unused-result", -- needed for fgets,fread on linux
 --					"-Wno-narrowing",
 --					"-Wno-attributes",
 					-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
