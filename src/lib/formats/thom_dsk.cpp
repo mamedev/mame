@@ -175,7 +175,7 @@ static floperr_t sap_write_indexed_sector(floppy_image_legacy *floppy, int head,
 static floperr_t sap_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	floperr_t err;
-	err = get_offset(floppy, head, track, sector, FALSE, NULL);
+	err = get_offset(floppy, head, track, sector, FALSE, nullptr);
 	if (err)
 		return err;
 
@@ -353,37 +353,37 @@ static FLOPPY_CONSTRUCT(qdd_dsk_construct)
 
 LEGACY_FLOPPY_OPTIONS_START(thomson)
 
-	LEGACY_FLOPPY_OPTION(fdmfm2, "fd", "Thomson FD (MFM) 80 tracks disk image (3\"1/2 DD)", basicdsk_identify_default, basicdsk_construct_default, NULL,
+	LEGACY_FLOPPY_OPTION(fdmfm2, "fd", "Thomson FD (MFM) 80 tracks disk image (3\"1/2 DD)", basicdsk_identify_default, basicdsk_construct_default, nullptr,
 		HEADS([1])
 		TRACKS([80])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
 
-	LEGACY_FLOPPY_OPTION(fdmfm, "fd", "Thomson FD (MFM) 40 tracks disk image (5\"1/4 DD)", basicdsk_identify_default, basicdsk_construct_default, NULL,
+	LEGACY_FLOPPY_OPTION(fdmfm, "fd", "Thomson FD (MFM) 40 tracks disk image (5\"1/4 DD)", basicdsk_identify_default, basicdsk_construct_default, nullptr,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
 
-	LEGACY_FLOPPY_OPTION(fd2, "fd", "Thomson FD (FM) 80 tracks disk image (3\"1/2 SD)", basicdsk_identify_default, basicdsk_construct_default, NULL,
+	LEGACY_FLOPPY_OPTION(fd2, "fd", "Thomson FD (FM) 80 tracks disk image (3\"1/2 SD)", basicdsk_identify_default, basicdsk_construct_default, nullptr,
 		HEADS([1])
 		TRACKS([80])
 		SECTORS([16])
 		SECTOR_LENGTH([128])
 		FIRST_SECTOR_ID([1]))
 
-	LEGACY_FLOPPY_OPTION(fd, "fd", "Thomson FD (FM) 40 tracks disk image (5\"1/4 SD)", basicdsk_identify_default, basicdsk_construct_default, NULL,
+	LEGACY_FLOPPY_OPTION(fd, "fd", "Thomson FD (FM) 40 tracks disk image (5\"1/4 SD)", basicdsk_identify_default, basicdsk_construct_default, nullptr,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([16])
 		SECTOR_LENGTH([128])
 		FIRST_SECTOR_ID([1]))
 
-		LEGACY_FLOPPY_OPTION(sap,"sap", "Thomson SAP floppy disk image",    sap_dsk_identify, sap_dsk_construct, NULL, NULL)
+		LEGACY_FLOPPY_OPTION(sap,"sap", "Thomson SAP floppy disk image",    sap_dsk_identify, sap_dsk_construct, nullptr, nullptr)
 
-	LEGACY_FLOPPY_OPTION(qdd,"qd", "Thomson QDD floppy disk image (2\"8 SD)",   qdd_dsk_identify, qdd_dsk_construct, NULL,
+	LEGACY_FLOPPY_OPTION(qdd,"qd", "Thomson QDD floppy disk image (2\"8 SD)",   qdd_dsk_identify, qdd_dsk_construct, nullptr,
 		HEADS([1])
 		TRACKS([1])
 		SECTORS([400])

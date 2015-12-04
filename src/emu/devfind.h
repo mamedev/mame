@@ -336,7 +336,7 @@ public:
 	{
 		if (isvalidation) return true;
 		this->m_target = reinterpret_cast<_PointerType *>(this->find_memregion(sizeof(_PointerType), m_length, _Required));
-		return this->report_missing(this->m_target != NULL, "memory region", _Required);
+		return this->report_missing(this->m_target != nullptr, "memory region", _Required);
 	}
 
 protected:

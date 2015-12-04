@@ -457,7 +457,7 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 template<class _FunctionClass>
 inline screen_update_ind16_delegate screen_update_delegate_smart(UINT32 (_FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name, const char *devname)
 {
-	return screen_update_ind16_delegate(callback, name, devname, (_FunctionClass *)0);
+	return screen_update_ind16_delegate(callback, name, devname, (_FunctionClass *)nullptr);
 }
 
 template<class _FunctionClass>

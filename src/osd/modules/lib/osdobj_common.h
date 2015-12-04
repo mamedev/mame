@@ -200,7 +200,7 @@ public:
 	//        this INTERFACE but part of the osd IMPLEMENTATION
 
 	// getters
-	running_machine &machine() { assert(m_machine != NULL); return *m_machine; }
+	running_machine &machine() { assert(m_machine != nullptr); return *m_machine; }
 
 
 	virtual void debugger_update();

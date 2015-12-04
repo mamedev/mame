@@ -50,7 +50,7 @@ static const UINT8* skip_gz_header( const UINT8 *p ) {
 	method = *p; p++;
 	flags = *p; p++;
 	if ( method != Z_DEFLATED || ( flags & RESERVED ) != 0 ) {
-		return NULL;
+		return nullptr;
 	}
 	/* Skip time, xflags and OS code */
 	p += 6;
@@ -75,7 +75,7 @@ static const UINT8* skip_gz_header( const UINT8 *p ) {
 	return p;
 }
 
-static UINT8 *gz_ptr = NULL;
+static UINT8 *gz_ptr = nullptr;
 
 static float get_uef_float( const UINT8 *Float)
 {
@@ -114,14 +114,14 @@ static int uef_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 		int inflate_size = ( casdata[ caslen - 1 ] << 24 ) | ( casdata[ caslen - 2 ] << 16 ) | ( casdata[ caslen - 3 ] << 8 ) | casdata[ caslen - 4 ];
 		const UINT8 *in_ptr = skip_gz_header( casdata );
 
-		if ( in_ptr == NULL ) {
+		if ( in_ptr == nullptr ) {
 			goto cleanup;
 		}
 		gz_ptr = (UINT8 *)malloc( inflate_size );
 
-		d_stream.zalloc = 0;
-		d_stream.zfree = 0;
-		d_stream.opaque = 0;
+		d_stream.zalloc = nullptr;
+		d_stream.zfree = nullptr;
+		d_stream.opaque = nullptr;
 		d_stream.next_in = (unsigned char *)in_ptr;
 		d_stream.avail_in = caslen - ( in_ptr - casdata );
 		d_stream.next_out = gz_ptr;
@@ -207,7 +207,7 @@ static int uef_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 cleanup:
 	if ( gz_ptr ) {
 		free( gz_ptr );
-		gz_ptr = NULL;
+		gz_ptr = nullptr;
 	}
 	return -1;
 }
@@ -232,7 +232,7 @@ static int uef_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 	INT16 *p = buffer;
 
 	if ( bytes[0] == 0x1f && bytes[1] == 0x8b ) {
-		if ( gz_ptr == NULL ) {
+		if ( gz_ptr == nullptr ) {
 			return 1;
 		}
 		bytes = gz_ptr;
@@ -327,7 +327,7 @@ const struct CassetteFormat uef_cassette_format = {
 	"uef",
 	uef_cassette_identify,
 	uef_cassette_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(uef_cassette_formats)

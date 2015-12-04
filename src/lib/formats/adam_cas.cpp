@@ -204,7 +204,7 @@ static casserr_t coladam_ddp_load( cassette_image *cass )
 
 
 static const struct CassetteFormat coladam_ddp =
-{ "ddp", coladam_ddp_identify, coladam_ddp_load, NULL /* no save */ };
+{ "ddp", coladam_ddp_identify, coladam_ddp_load, nullptr /* no save */ };
 
 CASSETTE_FORMATLIST_START(coleco_adam_cassette_formats)
 	CASSETTE_FORMAT(coladam_ddp)

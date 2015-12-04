@@ -16,7 +16,7 @@ class debug_none : public osd_module, public debug_module
 public:
 	debug_none()
 	: osd_module(OSD_DEBUG_PROVIDER, "none"), debug_module(),
-		m_machine(NULL)
+		m_machine(nullptr)
 	{
 	}
 

@@ -109,7 +109,7 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				if (byteoffs==78720) break;
 				hex[0]=line[byte * 2];
 				hex[1]=line[(byte * 2) + 1];
-				bytes[byteoffs++] = strtol(hex, NULL, 16);
+				bytes[byteoffs++] = strtol(hex, nullptr, 16);
 			}
 		}
 		start = end + 1;

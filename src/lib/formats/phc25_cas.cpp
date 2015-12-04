@@ -144,7 +144,7 @@ static int phc25_cassette_calculate_size_in_samples(const UINT8 *bytes, int leng
 {
 	phc25_image_size = length;
 
-	return phc25_handle_cassette(NULL, bytes);
+	return phc25_handle_cassette(nullptr, bytes);
 }
 
 static const struct CassetteLegacyWaveFiller phc25_legacy_fill_wave =
@@ -173,7 +173,7 @@ static const struct CassetteFormat phc25_cassette_image_format =
 	"phc",
 	phc25_cassette_identify,
 	phc25_cassette_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(phc25_cassette_formats)

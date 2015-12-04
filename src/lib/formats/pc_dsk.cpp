@@ -134,7 +134,7 @@ static FLOPPY_CONSTRUCT(pc_dsk_construct)
 /* ----------------------------------------------------------------------- */
 
 LEGACY_FLOPPY_OPTIONS_START( pc )
-	LEGACY_FLOPPY_OPTION( pc_dsk, "dsk,ima,img,ufi,360",        "PC floppy disk image", pc_dsk_identify, pc_dsk_construct, NULL,
+	LEGACY_FLOPPY_OPTION( pc_dsk, "dsk,ima,img,ufi,360",        "PC floppy disk image", pc_dsk_identify, pc_dsk_construct, nullptr,
 		HEADS([1]-2)
 		TRACKS(40/[80])
 		SECTORS(8/[9]/10/15/18/36))

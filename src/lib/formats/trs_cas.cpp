@@ -96,7 +96,7 @@ static int trs80l2_cas_to_wav_size(const UINT8 *casdata, int caslen)
 {
 	cas_size = caslen;
 
-	return trs80l2_handle_cas( NULL, casdata );
+	return trs80l2_handle_cas( nullptr, casdata );
 }
 
 static const struct CassetteLegacyWaveFiller trs80l2_cas_legacy_fill_wave =
@@ -128,7 +128,7 @@ static const struct CassetteFormat trs80l2_cas_format =
 	"cas",
 	trs80l2_cas_identify,
 	trs80l2_cas_load,
-	NULL
+	nullptr
 };
 
 

@@ -255,7 +255,7 @@ bool core_options::operator!=(const core_options &rhs)
 void core_options::add_entry(const char *name, const char *description, UINT32 flags, const char *defvalue, bool override_existing)
 {
 	// allocate a new entry
-	auto newentry = global_alloc(entry(name, description, flags, defvalue));
+	auto  newentry = global_alloc(entry(name, description, flags, defvalue));
 	if (newentry->name() != nullptr)
 	{
 		// see if we match an existing entry

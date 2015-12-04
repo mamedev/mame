@@ -172,14 +172,14 @@ static int apf_apt_calculate_size_in_samples(const UINT8 *bytes, int length)
 {
 	apf_image_size = length;
 
-	return apf_apt_handle_cassette(NULL, bytes);
+	return apf_apt_handle_cassette(nullptr, bytes);
 }
 
 static int apf_cpf_calculate_size_in_samples(const UINT8 *bytes, int length)
 {
 	apf_image_size = length;
 
-	return apf_cpf_handle_cassette(NULL, bytes);
+	return apf_cpf_handle_cassette(nullptr, bytes);
 }
 
 //*********************************************************************************
@@ -210,7 +210,7 @@ static const struct CassetteFormat apf_cpf_format =
 	"cas,cpf",
 	apf_cpf_identify,
 	apf_cpf_load,
-	NULL
+	nullptr
 };
 
 //*********************************************************************************
@@ -241,7 +241,7 @@ static const struct CassetteFormat apf_apt_format =
 	"apt",
 	apf_apt_identify,
 	apf_apt_load,
-	NULL
+	nullptr
 };
 
 //*********************************************************************************

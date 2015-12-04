@@ -248,7 +248,7 @@ static bool read_chd(chd_file &file, UINT32 field, movie_info &info, UINT32 soun
 	file.codec_configure(CHD_CODEC_AVHUFF, AVHUFF_CODEC_DECOMPRESS_CONFIG, &avconfig);
 
 	// read the field
-	chd_error chderr = file.read_hunk(field, NULL);
+	chd_error chderr = file.read_hunk(field, nullptr);
 	return (chderr == CHDERR_NONE);
 }
 
@@ -508,13 +508,13 @@ int main(int argc, char *argv[])
 	if (argc < 2)
 		return usage();
 	const char *srcfilename = argv[1];
-	const char *dstfilename = (argc < 3) ? NULL : argv[2];
+	const char *dstfilename = (argc < 3) ? nullptr : argv[2];
 	double offset = (argc < 4) ? 0.0 : atof(argv[3]);
 	double slope = (argc < 5) ? 1.0 : atof(argv[4]);
 
 	// print basic information
 	printf("Input file: %s\n", srcfilename);
-	if (dstfilename != NULL)
+	if (dstfilename != nullptr)
 	{
 		printf("Output file: %s\n", dstfilename);
 		printf("Offset: %f\n", offset);
@@ -538,7 +538,7 @@ int main(int argc, char *argv[])
 	printf("Total fields: %d\n", info.numfields);
 
 	// if we don't have a destination file, scan for edges
-	if (dstfilename == NULL)
+	if (dstfilename == nullptr)
 	{
 		for (UINT32 fieldnum = 60; fieldnum < info.numfields - 60; fieldnum += 30)
 		{
@@ -554,7 +554,7 @@ int main(int argc, char *argv[])
 		// open the destination file
 		chd_resample_compressor dstfile(srcfile, info, INT64(offset * 65536.0 * 256.0), INT64(slope * 65536.0 * 256.0));
 		err = create_chd(dstfile, dstfilename, srcfile, info);
-		if (dstfile == NULL)
+		if (dstfile == nullptr)
 		{
 			fprintf(stderr, "Unable to create file '%s'\n", dstfilename);
 			return 1;

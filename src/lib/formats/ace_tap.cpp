@@ -151,7 +151,7 @@ static int ace_tap_to_wav_size(const UINT8 *casdata, int caslen)
 {
 	cas_size = caslen;
 
-	return ace_handle_tap( NULL, casdata );
+	return ace_handle_tap( nullptr, casdata );
 }
 
 
@@ -184,7 +184,7 @@ static const struct CassetteFormat ace_tap_format =
 	"tap",
 	ace_tap_identify,
 	ace_tap_load,
-	NULL
+	nullptr
 };
 
 

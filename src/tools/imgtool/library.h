@@ -308,7 +308,7 @@ INLINE INT64 imgtool_get_info_int(const imgtool_class *imgclass, UINT32 state)
 INLINE void *imgtool_get_info_ptr(const imgtool_class *imgclass, UINT32 state)
 {
 	union imgtoolinfo info;
-	info.p = NULL;
+	info.p = nullptr;
 	imgclass->get_info(imgclass, state, &info);
 	return info.p;
 }
@@ -316,7 +316,7 @@ INLINE void *imgtool_get_info_ptr(const imgtool_class *imgclass, UINT32 state)
 INLINE void *imgtool_get_info_fct(const imgtool_class *imgclass, UINT32 state)
 {
 	union imgtoolinfo info;
-	info.f = NULL;
+	info.f = nullptr;
 	imgclass->get_info(imgclass, state, &info);
 	return info.f;
 }
@@ -324,7 +324,7 @@ INLINE void *imgtool_get_info_fct(const imgtool_class *imgclass, UINT32 state)
 INLINE char *imgtool_get_info_string(const imgtool_class *imgclass, UINT32 state)
 {
 	union imgtoolinfo info;
-	info.s = NULL;
+	info.s = nullptr;
 	imgclass->get_info(imgclass, state, &info);
 	return info.s;
 }

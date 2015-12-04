@@ -90,7 +90,7 @@ bool pasti_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 			io_generic_read(io, &raw_track[0], pos+16, entry_len-16);
 
-			UINT8 *fuzz = fuzz_len ? &raw_track[16*sect] : 0;
+			UINT8 *fuzz = fuzz_len ? &raw_track[16*sect] : nullptr;
 			UINT8 *bdata = fuzz ? fuzz+fuzz_len : &raw_track[16*sect];
 			UINT8 *tdata = bdata;
 
@@ -105,7 +105,7 @@ bool pasti_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				tsize = tdata[0] | (tdata[1] << 8);
 				tdata += 2;
 			} else
-				tdata = 0;
+				tdata = nullptr;
 
 			if(0) {
 				printf("Track %2d.%d: el=%d fl=%d sect=%d flags=%04x tlen=%d/%d tnum=%d flags2=%02x sync=%x\n",
@@ -133,7 +133,7 @@ bool pasti_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				int s_flags = sh[14] | (sh[15] << 8);
 
 				obs.sectors[s].data       = bdata + s_off;
-				obs.sectors[s].fuzzy_mask = 0;
+				obs.sectors[s].fuzzy_mask = nullptr;
 				memcpy(obs.sectors[s].id, sh+8, 6);
 				obs.sectors[s].time_ratio = s_time ? s_time / 16384.0 : 1;
 				obs.sectors[s].position   = s_pos/8-12;

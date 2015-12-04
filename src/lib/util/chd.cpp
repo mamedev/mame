@@ -1249,7 +1249,7 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex
 
 		// read the metadata
 		// TODO: how to properly allocate a dynamic char buffer?
-		auto  metabuf = new char[metaentry.length+1];
+		auto   metabuf = new char[metaentry.length+1];
 		memset(metabuf, 0x00, metaentry.length+1);
 		file_read(metaentry.offset + METADATA_HEADER_SIZE, metabuf, metaentry.length);
 		output.assign(metabuf);

@@ -120,7 +120,7 @@ static void checkintegrity(const fileinfo *file,int side)
 	int mask0,mask1;
 	int addrbit;
 
-	if (file->buf == 0) return;
+	if (file->buf == nullptr) return;
 
 	/* check for bad data lines */
 	mask0 = 0x0000;
@@ -351,7 +351,7 @@ static float filecompare(const fileinfo *file1,const fileinfo *file2,int mode1,i
 	int base1=0,base2=0,mult1=0,mult2=0,mask1=0,mask2=0;
 
 
-	if (file1->buf == 0 || file2->buf == 0) return 0.0;
+	if (file1->buf == nullptr || file2->buf == nullptr) return 0.0;
 
 	size1 = usedbytes(file1,mode1);
 	size2 = usedbytes(file2,mode2);
@@ -397,7 +397,7 @@ static void readfile(const char *path,fileinfo *file)
 	UINT64 filesize;
 	UINT32 actual;
 	char fullname[256];
-	osd_file *f = 0;
+	osd_file *f = nullptr;
 
 	if (path)
 	{
@@ -408,7 +408,7 @@ static void readfile(const char *path,fileinfo *file)
 	else fullname[0] = 0;
 	strcat(fullname,file->name);
 
-	if ((file->buf = (unsigned char *)malloc(file->size)) == 0)
+	if ((file->buf = (unsigned char *)malloc(file->size)) == nullptr)
 	{
 		printf("%s: out of memory!\n",file->name);
 		return;
@@ -436,7 +436,7 @@ static void readfile(const char *path,fileinfo *file)
 static void freefile(fileinfo *file)
 {
 	free(file->buf);
-	file->buf = 0;
+	file->buf = nullptr;
 }
 
 
@@ -455,12 +455,12 @@ static int load_files(int i, int *found, const char *path)
 
 	/* attempt to open as a directory first */
 	dir = osd_opendir(path);
-	if (dir != NULL)
+	if (dir != nullptr)
 	{
 		const osd_directory_entry *d;
 
 		/* load all files in directory */
-		while ((d = osd_readdir(dir)) != NULL)
+		while ((d = osd_readdir(dir)) != nullptr)
 		{
 			const char *d_name = d->name;
 			char buf[255+1];
@@ -506,7 +506,7 @@ static int load_files(int i, int *found, const char *path)
 		}
 
 		/* load all files in zip file */
-		for (zipent = zip_file_first_file(zip); zipent != NULL; zipent = zip_file_next_file(zip))
+		for (zipent = zip_file_first_file(zip); zipent != nullptr; zipent = zip_file_next_file(zip))
 		{
 			int size;
 
@@ -525,14 +525,14 @@ static int load_files(int i, int *found, const char *path)
 				else
 					strcpy(file->name,zipent->filename);
 				file->size = zipent->uncompressed_length;
-				if ((file->buf = (unsigned char *)malloc(file->size)) == 0)
+				if ((file->buf = (unsigned char *)malloc(file->size)) == nullptr)
 					printf("%s: out of memory!\n",file->name);
 				else
 				{
 					if (zip_file_decompress(zip, (char *)file->buf, file->size) != ZIPERR_NONE)
 					{
 						free(file->buf);
-						file->buf = 0;
+						file->buf = nullptr;
 					}
 				}
 
@@ -728,11 +728,11 @@ int CLIB_DECL main(int argc,char *argv[])
 
 			for (i = 0;i < found[0];i++)
 			{
-				if (files[0][i].listed == 0) printname(&files[0][i],0,0.0,0,0);
+				if (files[0][i].listed == 0) printname(&files[0][i],nullptr,0.0,0,0);
 			}
 			for (i = 0;i < found[1];i++)
 			{
-				if (files[1][i].listed == 0) printname(0,&files[1][i],0.0,0,0);
+				if (files[1][i].listed == 0) printname(nullptr,&files[1][i],0.0,0,0);
 			}
 		}
 

@@ -28,7 +28,7 @@ class debug_internal : public osd_module, public debug_module
 public:
 	debug_internal()
 	: osd_module(OSD_DEBUG_PROVIDER, "internal"), debug_module(),
-		m_machine(NULL)
+		m_machine(nullptr)
 	{
 	}
 
@@ -150,7 +150,7 @@ class DView_edit
 	DISABLE_COPYING(DView_edit);
 
 public:
-	DView_edit(): active(0), container(NULL) { }
+	DView_edit(): active(0), container(nullptr) { }
 	~DView_edit() { }
 	int                 active;
 	render_container *  container;
@@ -170,7 +170,7 @@ class DView
 
 public:
 	DView(render_target *target, running_machine &machine, debug_view_type type, int flags)
-		: next(NULL),
+		: next(nullptr),
 			type(0),
 			state(0),
 			ofs_x(0),
@@ -205,7 +205,7 @@ public:
 		machine().debug_view().free_view(*this->view);
 	}
 
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+	running_machine &machine() const { assert(m_machine != nullptr); return *m_machine; }
 
 	DView *             next;
 
@@ -259,11 +259,11 @@ INLINE void dview_set_state(DView *dv, int state, int onoff)
     LOCAL VARIABLES
 ***************************************************************************/
 
-static render_font *    debug_font = NULL;
+static render_font *    debug_font = nullptr;
 static int              debug_font_width;
 static int              debug_font_height;
 static float            debug_font_aspect;
-static DView *          list = NULL;
+static DView *          list = nullptr;
 static DView *          focus_view;
 
 static ui_menu *        menu;
@@ -271,10 +271,10 @@ static DView_edit *     cur_editor;
 
 static void set_focus_view(DView *dv)
 {
-	if (focus_view != NULL)
+	if (focus_view != nullptr)
 		dview_set_state(focus_view, VIEW_STATE_NEEDS_UPDATE, TRUE);
 
-	if (dv != NULL)
+	if (dv != nullptr)
 		dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
 
 	if (focus_view != dv)
@@ -863,16 +863,16 @@ static void dview_update(debug_view &dw, void *osdprivate)
 
 void debug_internal::exit()
 {
-	for (DView *ndv = list; ndv != NULL; )
+	for (DView *ndv = list; ndv != nullptr; )
 	{
 		DView *temp = ndv;
 		ndv = ndv->next;
 		dview_free(temp);
 	}
-	if (debug_font != NULL)
+	if (debug_font != nullptr)
 	{
 		m_machine->render().font_free(debug_font);
-		debug_font = NULL;
+		debug_font = nullptr;
 	}
 	if (menu)
 		global_free(menu);
@@ -889,10 +889,10 @@ void debug_internal::init_debugger(running_machine &machine)
 	debug_font_width = 0;
 	debug_font_height = 15;
 
-	menu = NULL;
-	cur_editor = NULL;
-	list = NULL;
-	focus_view = NULL;
+	menu = nullptr;
+	cur_editor = nullptr;
+	list = nullptr;
+	focus_view = nullptr;
 
 	debug_font_aspect = m_machine->render().ui_aspect();
 
@@ -980,7 +980,7 @@ static void on_disasm_cpu_activate(DView *dv, const ui_menu_event *event)
 	if (event->iptkey == IPT_UI_RIGHT)
 	{
 		current = current->next();
-		if (current == NULL)
+		if (current == nullptr)
 			current = dv->view->first_source();
 		dv->view->set_source(*current);
 		dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
@@ -1111,7 +1111,7 @@ static void render_editor(DView_edit *editor)
 	editor->container->empty();
 	/* get the size of the text */
 	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-						DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
+						DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(width, 0.5f);
 
@@ -1131,7 +1131,7 @@ static void render_editor(DView_edit *editor)
 
 	/* draw the text within it */
 	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 }
 
@@ -1176,8 +1176,8 @@ static void CreateMainMenu(running_machine &machine)
 		break;
 	}
 
-	menu->item_append(title.append(focus_view->title).c_str(), NULL, MENU_FLAG_DISABLE, NULL);
-	menu->item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	menu->item_append(title.append(focus_view->title).c_str(), nullptr, MENU_FLAG_DISABLE, nullptr);
+	menu->item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 
 	switch (focus_view->type)
 	{
@@ -1191,37 +1191,37 @@ static void CreateMainMenu(running_machine &machine)
 		case DASM_RIGHTCOL_COMMENTS:        subtext = "Comments"; break;
 		}
 		menu->item_append("View", subtext, MENU_FLAG_RIGHT_ARROW, (void *)on_view_opcodes_activate);
-		menu->item_append("Run to cursor", NULL, 0, (void *)on_run_to_cursor_activate);
+		menu->item_append("Run to cursor", nullptr, 0, (void *)on_run_to_cursor_activate);
 
 		if (!dview_is_state(focus_view, VIEW_STATE_FOLLOW_CPU))
 		{
 			menu->item_append("CPU", focus_view->view->source()->name(), MENU_FLAG_RIGHT_ARROW, (void *)on_disasm_cpu_activate);
 		}
-		menu->item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+		menu->item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 		break;
 	}
 	}
 
 	/* add input menu items */
 
-	menu->item_append("New Memory Window", NULL, 0, (void *)on_memory_window_activate);
-	menu->item_append("New Disassembly Window", NULL, 0, (void *)on_disassembly_window_activate);
-	menu->item_append("New Error Log Window", NULL, 0, (void *)on_log_window_activate);
-	menu->item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-	menu->item_append("Run", NULL, 0, (void *)on_run_activate);
-	menu->item_append("Run to Next CPU", NULL, 0, (void *)on_run_cpu_activate);
-	menu->item_append("Run until Next Interrupt on This CPU", NULL, 0, (void *)on_run_irq_activate);
-	menu->item_append("Run until Next VBLANK", NULL, 0, (void *)on_run_vbl_activate);
-	menu->item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-	menu->item_append("Step Into", NULL, 0, (void *)on_step_into_activate);
-	menu->item_append("Step Over", NULL, 0, (void *)on_step_over_activate);
-	menu->item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-	menu->item_append("Soft Reset", NULL, 0, (void *)on_soft_reset_activate);
-	menu->item_append("Hard Reset", NULL, 0, (void *)on_hard_reset_activate);
-	menu->item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	menu->item_append("New Memory Window", nullptr, 0, (void *)on_memory_window_activate);
+	menu->item_append("New Disassembly Window", nullptr, 0, (void *)on_disassembly_window_activate);
+	menu->item_append("New Error Log Window", nullptr, 0, (void *)on_log_window_activate);
+	menu->item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	menu->item_append("Run", nullptr, 0, (void *)on_run_activate);
+	menu->item_append("Run to Next CPU", nullptr, 0, (void *)on_run_cpu_activate);
+	menu->item_append("Run until Next Interrupt on This CPU", nullptr, 0, (void *)on_run_irq_activate);
+	menu->item_append("Run until Next VBLANK", nullptr, 0, (void *)on_run_vbl_activate);
+	menu->item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	menu->item_append("Step Into", nullptr, 0, (void *)on_step_into_activate);
+	menu->item_append("Step Over", nullptr, 0, (void *)on_step_over_activate);
+	menu->item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	menu->item_append("Soft Reset", nullptr, 0, (void *)on_soft_reset_activate);
+	menu->item_append("Hard Reset", nullptr, 0, (void *)on_hard_reset_activate);
+	menu->item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 	if (!dview_is_state(focus_view, VIEW_STATE_FOLLOW_CPU))
-		menu->item_append("Close Window", NULL, 0, (void *)on_close_activate);
-	menu->item_append("Exit", NULL, 0, (void *)on_exit_activate);
+		menu->item_append("Close Window", nullptr, 0, (void *)on_close_activate);
+	menu->item_append("Exit", nullptr, 0, (void *)on_exit_activate);
 }
 
 static int map_point(DView *dv, INT32 target_x, INT32 target_y, INT32 *mapped_x, INT32 *mapped_y)
@@ -1254,16 +1254,16 @@ static void handle_mouse(running_machine &machine)
 	INT32           x,y;
 	bool            button;
 
-	if (menu != NULL)
+	if (menu != nullptr)
 		return;
 
 	mouse_target = ui_input_find_mouse(machine, &x, &y, &button);
 
-	if (mouse_target == NULL)
+	if (mouse_target == nullptr)
 		return;
 	//printf("mouse %d %d %d\n", x, y, button);
 
-	for (DView *dv = list; dv != NULL; dv = dv->next)
+	for (DView *dv = list; dv != nullptr; dv = dv->next)
 	{
 		if (mouse_target == dv->target)
 		{
@@ -1313,17 +1313,17 @@ static void handle_editor(running_machine &machine)
 				break;
 			}
 		}
-		if (cur_editor != NULL)
+		if (cur_editor != nullptr)
 		{
 			render_editor(cur_editor);
 			if (ui_input_pressed(machine, IPT_UI_SELECT))
 			{
 				process_string(focus_view, focus_view->editor.str.c_str());
 				focus_view->editor.str = "";
-				cur_editor = NULL;
+				cur_editor = nullptr;
 			}
 			if (ui_input_pressed(machine, IPT_UI_CANCEL))
-				cur_editor = NULL;
+				cur_editor = nullptr;
 		}
 	}
 
@@ -1340,11 +1340,11 @@ static void handle_menus(running_machine &machine)
 
 	machine.render().ui_container().empty();
 	ui_input_frame_update(machine);
-	if (menu != NULL)
+	if (menu != nullptr)
 	{
 		/* process the menu */
 		event = menu->process(0);
-		if (event != NULL && (event->iptkey == IPT_UI_SELECT || (event->iptkey == IPT_UI_RIGHT)))
+		if (event != nullptr && (event->iptkey == IPT_UI_SELECT || (event->iptkey == IPT_UI_RIGHT)))
 		{
 			//global_free(menu);
 			//menu = NULL;
@@ -1355,7 +1355,7 @@ static void handle_menus(running_machine &machine)
 		else if (ui_input_pressed(machine, IPT_UI_CONFIGURE))
 		{
 			global_free(menu);
-			menu = NULL;
+			menu = nullptr;
 		}
 	}
 	else
@@ -1378,7 +1378,7 @@ static void followers_set_cpu(device_t *device)
 {
 	std::string title;
 
-	for (DView *dv = list; dv != NULL; dv = dv->next)
+	for (DView *dv = list; dv != nullptr; dv = dv->next)
 	{
 		if (dview_is_state(dv, VIEW_STATE_FOLLOW_CPU))
 		{
@@ -1420,7 +1420,7 @@ static void update_views(void)
 	DView *dv, *prev;
 
 	LIST_GET_LAST(list, dv);
-	while (dv != NULL)
+	while (dv != nullptr)
 	{
 		dview_update_view(dv);
 		LIST_GET_PREVIOUS(list, dv, prev);
@@ -1431,7 +1431,7 @@ static void update_views(void)
 
 void debug_internal::wait_for_debugger(device_t &device, bool firststop)
 {
-	if (firststop && list == NULL)
+	if (firststop && list == nullptr)
 	{
 		render_target *target = &device.machine().render().ui_target();
 
@@ -1463,7 +1463,7 @@ void debug_internal::wait_for_debugger(device_t &device, bool firststop)
 
 void debug_internal::debugger_update()
 {
-	if ((m_machine != NULL) && (!debug_cpu_is_stopped(*m_machine)) && (m_machine->phase() == MACHINE_PHASE_RUNNING))
+	if ((m_machine != nullptr) && (!debug_cpu_is_stopped(*m_machine)) && (m_machine->phase() == MACHINE_PHASE_RUNNING))
 	{
 		update_views();
 	}

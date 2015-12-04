@@ -196,7 +196,7 @@ static int vg5k_k7_to_wav_size(const UINT8 *casdata, int caslen)
 {
 	k7_size = caslen ;
 
-	return vg5k_handle_tap( NULL, casdata );
+	return vg5k_handle_tap( nullptr, casdata );
 }
 
 
@@ -228,7 +228,7 @@ static const struct CassetteFormat vg5k_k7_format =
 	"k7",
 	vg5k_k7_identify,
 	vg5k_k7_load,
-	NULL
+	nullptr
 };
 
 

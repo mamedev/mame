@@ -221,7 +221,7 @@ static const struct CassetteFormat tvc64_cassette_image_format =
 	"cas",
 	tvc64_cassette_identify,
 	tvc64_cassette_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(tvc64_cassette_formats)

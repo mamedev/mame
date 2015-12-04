@@ -217,7 +217,7 @@ static int hector_tap_forth_to_wav_size(const UINT8 *casdata, int caslen)
 {
 	cas_size = caslen ;
 
-	return hector_handle_forth_tap( NULL, casdata );
+	return hector_handle_forth_tap( nullptr, casdata );
 }
 
 /*******************************************************************
@@ -236,7 +236,7 @@ static int hector_tap_to_wav_size(const UINT8 *casdata, int caslen)
 {
 	cas_size = caslen ;
 
-	return hector_handle_tap( NULL, casdata );//forth removed here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	return hector_handle_tap( nullptr, casdata );//forth removed here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
 
@@ -291,7 +291,7 @@ static const struct CassetteFormat hector_k7_format =
 	"k7,cin",
 	hector_k7_identify,
 	hector_k7_load,
-	NULL
+	nullptr
 };
 
 static const struct CassetteFormat hector_k7Forth_format =
@@ -299,7 +299,7 @@ static const struct CassetteFormat hector_k7Forth_format =
 	"for",
 	hector_k7forth_identify,
 	hector_k7forth_load,
-	NULL
+	nullptr
 };
 
 

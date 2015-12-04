@@ -81,11 +81,11 @@ static floppy_image_legacy *floppy_init(void *fp, const struct io_procs *procs, 
 
 	floppy = (floppy_image_legacy *)malloc(sizeof(floppy_image_legacy));
 	if (!floppy)
-		return NULL;
+		return nullptr;
 
 	memset(floppy, 0, sizeof(*floppy));
-	floppy->tags = pool_alloc_lib(NULL);
-	floppy->tag_data = NULL;
+	floppy->tags = pool_alloc_lib(nullptr);
+	floppy->tag_data = nullptr;
 	floppy->io.file = fp;
 	floppy->io.procs = procs;
 	floppy->io.filler = 0xFF;
@@ -151,7 +151,7 @@ static floperr_t floppy_open_internal(void *fp, const struct io_procs *procs, co
 	if (outfloppy)
 	{
 		/* call the format constructor */
-		err = floppy_options[best_option].construct(floppy, &floppy_options[best_option], NULL);
+		err = floppy_options[best_option].construct(floppy, &floppy_options[best_option], nullptr);
 		if (err)
 			goto done;
 
@@ -168,7 +168,7 @@ done:
 	if (floppy && (!outfloppy || err))
 	{
 		floppy_close_internal(floppy, FALSE);
-		floppy = NULL;
+		floppy = nullptr;
 	}
 
 	if (outoption)
@@ -183,7 +183,7 @@ done:
 floperr_t floppy_identify(void *fp, const struct io_procs *procs, const char *extension,
 	const struct FloppyFormat *formats, int *identified_format)
 {
-	return floppy_open_internal(fp, procs, extension, formats, INT_MAX, FLOPPY_FLAGS_READONLY, NULL, identified_format);
+	return floppy_open_internal(fp, procs, extension, formats, INT_MAX, FLOPPY_FLAGS_READONLY, nullptr, identified_format);
 }
 
 
@@ -191,7 +191,7 @@ floperr_t floppy_identify(void *fp, const struct io_procs *procs, const char *ex
 floperr_t floppy_open(void *fp, const struct io_procs *procs, const char *extension,
 	const struct FloppyFormat *format, int flags, floppy_image_legacy **outfloppy)
 {
-	return floppy_open_internal(fp, procs, extension, format, 1, flags, outfloppy, NULL);
+	return floppy_open_internal(fp, procs, extension, format, 1, flags, outfloppy, nullptr);
 }
 
 
@@ -199,7 +199,7 @@ floperr_t floppy_open(void *fp, const struct io_procs *procs, const char *extens
 floperr_t floppy_open_choices(void *fp, const struct io_procs *procs, const char *extension,
 	const struct FloppyFormat *formats, int flags, floppy_image_legacy **outfloppy)
 {
-	return floppy_open_internal(fp, procs, extension, formats, INT_MAX, flags, outfloppy, NULL);
+	return floppy_open_internal(fp, procs, extension, formats, INT_MAX, flags, outfloppy, nullptr);
 }
 
 
@@ -231,11 +231,11 @@ static floperr_t option_to_floppy_error(optreserr_t oerr)
 
 floperr_t floppy_create(void *fp, const struct io_procs *procs, const struct FloppyFormat *format, option_resolution *parameters, floppy_image_legacy **outfloppy)
 {
-	floppy_image_legacy *floppy = NULL;
+	floppy_image_legacy *floppy = nullptr;
 	optreserr_t oerr;
 	floperr_t err;
 	int heads, tracks, h, t;
-	option_resolution *alloc_resolution = NULL;
+	option_resolution *alloc_resolution = nullptr;
 
 	assert(format);
 
@@ -307,7 +307,7 @@ done:
 	if (err && floppy)
 	{
 		floppy_close_internal(floppy, FALSE);
-		floppy = NULL;
+		floppy = nullptr;
 	}
 
 	if (outfloppy)
@@ -474,7 +474,7 @@ static floperr_t floppy_readwrite_sector(floppy_image_legacy *floppy, int head, 
 	{
 		/* find out the size of this sector */
 		if (indexed)
-			err = fmt->get_indexed_sector_info(floppy, head, track, sector, NULL, NULL, NULL, &sector_length, NULL);
+			err = fmt->get_indexed_sector_info(floppy, head, track, sector, nullptr, nullptr, nullptr, &sector_length, nullptr);
 		else
 			err = fmt->get_sector_length(floppy, head, track, sector, &sector_length);
 		if (err)
@@ -683,7 +683,7 @@ floperr_t floppy_format_track(floppy_image_legacy *floppy, int head, int track, 
 {
 	floperr_t err;
 	struct FloppyCallbacks *format;
-	option_resolution *alloc_resolution = NULL;
+	option_resolution *alloc_resolution = nullptr;
 	optreserr_t oerr;
 
 	/* supported? */
@@ -785,7 +785,7 @@ floperr_t floppy_get_sector_count(floppy_image_legacy *floppy, int head, int tra
 
 	do
 	{
-		err = floppy_get_indexed_sector_info(floppy, head, track, sector_index, NULL, NULL, NULL, NULL, NULL);
+		err = floppy_get_indexed_sector_info(floppy, head, track, sector_index, nullptr, nullptr, nullptr, nullptr, nullptr);
 		if (!err)
 			sector_index++;
 	}
@@ -867,7 +867,7 @@ floperr_t floppy_load_track(floppy_image_legacy *floppy, int head, int track, in
 
 error:
 	if (track_data)
-		*track_data = NULL;
+		*track_data = nullptr;
 	if (track_length)
 		*track_length = 0;
 	return err;
@@ -923,7 +923,7 @@ const char *floppy_error(floperr_t err)
 	};
 
 	if ((err < 0) || (err >= ARRAY_LENGTH(error_messages)))
-		return NULL;
+		return nullptr;
 	return error_messages[err];
 }
 
@@ -1017,7 +1017,7 @@ const char *floppy_image::get_variant_name(UINT32 form_factor, UINT32 variant)
 
 floppy_image_format_t::floppy_image_format_t()
 {
-	next = 0;
+	next = nullptr;
 }
 
 floppy_image_format_t::~floppy_image_format_t()
@@ -2184,7 +2184,7 @@ const floppy_image_format_t::desc_e *floppy_image_format_t::atari_st_fcp_get_des
 	case 11:
 		return atari_st_fcp_11;
 	}
-	return 0;
+	return nullptr;
 }
 
 //  Amiga layouts

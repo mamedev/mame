@@ -150,7 +150,7 @@ static int camplynx_cassette_calculate_size_in_samples(const UINT8 *bytes, int l
 {
 	camplynx_image_size = length;
 
-	return camplynx_handle_cassette(NULL, bytes);
+	return camplynx_handle_cassette(nullptr, bytes);
 }
 
 static const struct CassetteLegacyWaveFiller lynx48k_legacy_fill_wave =
@@ -200,7 +200,7 @@ static const struct CassetteFormat lynx48k_cassette_image_format =
 	"tap",
 	lynx48k_cassette_identify,
 	lynx48k_cassette_load,
-	NULL
+	nullptr
 };
 
 static const struct CassetteFormat lynx128k_cassette_image_format =
@@ -208,7 +208,7 @@ static const struct CassetteFormat lynx128k_cassette_image_format =
 	"tap",
 	lynx128k_cassette_identify,
 	lynx128k_cassette_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(lynx48k_cassette_formats)

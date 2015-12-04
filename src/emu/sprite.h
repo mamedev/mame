@@ -89,7 +89,7 @@ protected:
 		: device_t(mconfig, type, name, tag, owner, 0, shortname, file),
 			m_xorigin(0),
 			m_yorigin(0),
-			m_spriteram(NULL),
+			m_spriteram(nullptr),
 			m_spriteram_bytes(0),
 			m_dirty(dirty_granularity)
 	{

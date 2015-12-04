@@ -245,7 +245,7 @@ static int kc_kcc_to_wav_size(const UINT8 *casdata, int caslen)
 {
 	kc_image_size = caslen ;
 
-	return kc_handle_kcc( NULL, casdata );
+	return kc_handle_kcc( nullptr, casdata );
 }
 
 
@@ -277,7 +277,7 @@ static const struct CassetteFormat kc_kcc_format =
 	"kcc,kcb",
 	kc_kcc_identify,
 	kc_kcc_load,
-	NULL
+	nullptr
 };
 
 
@@ -297,7 +297,7 @@ static int kc_tap_to_wav_size(const UINT8 *casdata, int caslen)
 {
 	kc_image_size = caslen ;
 
-	return kc_handle_tap( NULL, casdata );
+	return kc_handle_tap( nullptr, casdata );
 }
 
 
@@ -329,7 +329,7 @@ static const struct CassetteFormat kc_tap_format =
 	"tap,853,854,855,tp2,kcm",
 	kc_tap_identify,
 	kc_tap_load,
-	NULL
+	nullptr
 };
 
 
@@ -349,7 +349,7 @@ static int kc_sss_to_wav_size(const UINT8 *casdata, int caslen)
 {
 	kc_image_size = caslen ;
 
-	return kc_handle_sss( NULL, casdata );
+	return kc_handle_sss( nullptr, casdata );
 }
 
 
@@ -380,7 +380,7 @@ static const struct CassetteFormat kc_sss_format =
 	"sss",
 	kc_sss_identify,
 	kc_sss_load,
-	NULL
+	nullptr
 };
 
 

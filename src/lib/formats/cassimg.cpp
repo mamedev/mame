@@ -100,7 +100,7 @@ static void cassette_finishinit(casserr_t err, cassette_image *cassette, cassett
 	if (cassette && (err || !outcassette))
 	{
 		cassette_close(cassette);
-		cassette = NULL;
+		cassette = nullptr;
 	}
 	if (outcassette)
 		*outcassette = cassette;
@@ -133,7 +133,7 @@ casserr_t cassette_open_choices(void *file, const struct io_procs *procs, const 
 		formats = cassette_default_formats;
 
 	/* create the cassette object */
-	cassette = cassette_init(NULL, file, procs, flags);
+	cassette = cassette_init(nullptr, file, procs, flags);
 	if (!cassette)
 	{
 		err = CASSETTE_ERROR_OUTOFMEMORY;
@@ -141,7 +141,7 @@ casserr_t cassette_open_choices(void *file, const struct io_procs *procs, const 
 	}
 
 	/* identify the image */
-	format = NULL;
+	format = nullptr;
 	for (i = 0; !format && formats[i]; i++)
 	{
 		if (good_format(formats[i], extension, flags))
@@ -150,7 +150,7 @@ casserr_t cassette_open_choices(void *file, const struct io_procs *procs, const 
 			memset(&opts, 0, sizeof(opts));
 			err = format->identify(cassette, &opts);
 			if (err == CASSETTE_ERROR_INVALIDIMAGE)
-				format = NULL;
+				format = nullptr;
 			else if (err)
 				goto done;
 		}
@@ -189,8 +189,8 @@ casserr_t cassette_open(void *file, const struct io_procs *procs,
 {
 	const struct CassetteFormat *formats[2];
 	formats[0] = format;
-	formats[1] = NULL;
-	return cassette_open_choices(file, procs, NULL, formats, flags, outcassette);
+	formats[1] = nullptr;
+	return cassette_open_choices(file, procs, nullptr, formats, flags, outcassette);
 }
 
 
@@ -207,7 +207,7 @@ casserr_t cassette_create(void *file, const struct io_procs *procs, const struct
 		return CASSETTE_ERROR_INVALIDIMAGE;
 
 	/* is this a good format? */
-	if (!good_format(format, NULL, flags))
+	if (!good_format(format, nullptr, flags))
 		return CASSETTE_ERROR_INVALIDIMAGE;
 
 	/* normalize arguments */
@@ -374,7 +374,7 @@ static casserr_t compute_manipulation_ranges(cassette_image *cassette, int chann
 
 static casserr_t lookup_sample(cassette_image *cassette, int channel, size_t sample, INT32 **ptr)
 {
-	*ptr = NULL;
+	*ptr = nullptr;
 	size_t sample_blocknum = (sample / SAMPLES_PER_BLOCK) * cassette->channels + channel;
 	size_t sample_index = sample % SAMPLES_PER_BLOCK;
 
@@ -385,7 +385,7 @@ static casserr_t lookup_sample(cassette_image *cassette, int channel, size_t sam
 		memset(&cassette->blocks[osize], 0, (cassette->blocks.size()-osize)*sizeof(cassette->blocks[0]));
 	}
 
-	if (cassette->blocks[sample_blocknum] == NULL)
+	if (cassette->blocks[sample_blocknum] == nullptr)
 		cassette->blocks[sample_blocknum] = global_alloc(sample_block);
 
 	sample_block &block = *cassette->blocks[sample_blocknum];
@@ -763,7 +763,7 @@ casserr_t cassette_read_modulated_data(cassette_image *cassette, int channel, do
 	casserr_t err;
 	UINT8 buffer_stack[1024];
 	UINT8 *buffer;
-	UINT8 *alloc_buffer = NULL;
+	UINT8 *alloc_buffer = nullptr;
 	double delta;
 	double total_displacement = 0.0;
 	size_t this_length;

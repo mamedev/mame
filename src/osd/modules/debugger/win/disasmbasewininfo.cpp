@@ -25,7 +25,7 @@ disasmbasewin_info::disasmbasewin_info(debugger_windows_interface &debugger, boo
 		return;
 
 	m_views[0].reset(global_alloc(disasmview_info(debugger, *this, window())));
-	if ((m_views[0] == NULL) || !m_views[0]->is_valid())
+	if ((m_views[0] == nullptr) || !m_views[0]->is_valid())
 	{
 		m_views[0].reset();
 		return;
@@ -115,10 +115,10 @@ void disasmbasewin_info::update_menu()
 
 		// first find an existing breakpoint at this address
 		device_debug::breakpoint *bp = debug->breakpoint_first();
-		while ((bp != NULL) && (bp->address() != address))
+		while ((bp != nullptr) && (bp->address() != address))
 			bp = bp->next();
 
-		if (bp == NULL)
+		if (bp == nullptr)
 		{
 			ModifyMenu(menu, ID_TOGGLE_BREAKPOINT, MF_BYCOMMAND, ID_TOGGLE_BREAKPOINT, TEXT("Set breakpoint at cursor\tF9"));
 			ModifyMenu(menu, ID_DISABLE_BREAKPOINT, MF_BYCOMMAND, ID_DISABLE_BREAKPOINT, TEXT("Disable breakpoint at cursor\tShift+F9"));
@@ -131,7 +131,7 @@ void disasmbasewin_info::update_menu()
 			else
 				ModifyMenu(menu, ID_DISABLE_BREAKPOINT, MF_BYCOMMAND, ID_DISABLE_BREAKPOINT, TEXT("Enable breakpoint at cursor\tShift+F9"));
 		}
-		bool const available = (bp != NULL) && (!is_main_console() || dasmview->source_is_visible_cpu());
+		bool const available = (bp != nullptr) && (!is_main_console() || dasmview->source_is_visible_cpu());
 		EnableMenuItem(menu, ID_DISABLE_BREAKPOINT, MF_BYCOMMAND | (available ? MF_ENABLED : MF_GRAYED));
 	}
 	else
@@ -168,7 +168,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				INT32 bpindex = -1;
 
 				// first find an existing breakpoint at this address
-				for (device_debug::breakpoint *bp = debug->breakpoint_first(); bp != NULL; bp = bp->next())
+				for (device_debug::breakpoint *bp = debug->breakpoint_first(); bp != nullptr; bp = bp->next())
 				{
 					if (address == bp->address())
 					{
@@ -182,7 +182,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				{
 					if (bpindex == -1)
 					{
-						bpindex = debug->breakpoint_set(address, NULL, NULL);
+						bpindex = debug->breakpoint_set(address, nullptr, nullptr);
 						debug_console_printf(machine(), "Breakpoint %X set\n", bpindex);
 					}
 					else
@@ -213,11 +213,11 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 				// first find an existing breakpoint at this address
 				device_debug::breakpoint *bp = debug->breakpoint_first();
-				while ((bp != NULL) && (bp->address() != address))
+				while ((bp != nullptr) && (bp->address() != address))
 					bp = bp->next();
 
 				// if it doesn't exist, add a new one
-				if (bp != NULL)
+				if (bp != nullptr)
 				{
 					if (!is_main_console())
 					{

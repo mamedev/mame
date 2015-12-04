@@ -327,7 +327,7 @@ tagmap_error tagmap_t<_ElementType, _HashSize>::add_common(const char *tag, _Ele
 			}
 
 	// now allocate a new entry and add to the head of the list
-	auto                 entry = global_alloc(entry_t(tag, fullhash, object));
+	auto                                   entry = global_alloc(entry_t(tag, fullhash, object));
 	entry->m_next = m_table[hashindex];
 	m_table[hashindex] = entry;
 	return TMERR_NONE;

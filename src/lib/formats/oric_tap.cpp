@@ -513,7 +513,7 @@ static const struct CassetteFormat oric_tap_format =
 	"tap",
 	oric_tap_identify,
 	oric_tap_load,
-	NULL
+	nullptr
 };
 
 

@@ -454,7 +454,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 		}
 
 		// filename
-		else if (opts->filename == NULL)
+		else if (opts->filename == nullptr)
 			opts->filename = curarg;
 
 		// fail
@@ -467,7 +467,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 		goto usage;
 
 	// if no file or no architecture, fail
-	if (opts->filename == NULL || opts->dasm == NULL)
+	if (opts->filename == nullptr || opts->dasm == nullptr)
 		goto usage;
 	return 0;
 
@@ -545,7 +545,7 @@ int main(int argc, char *argv[])
 			int numchunks;
 
 			// disassemble
-			pcdelta = (*opts.dasm->func)(NULL, buffer, curpc, oprom, oprom, opts.mode) & DASMFLAG_LENGTHMASK;
+			pcdelta = (*opts.dasm->func)(nullptr, buffer, curpc, oprom, oprom, opts.mode) & DASMFLAG_LENGTHMASK;
 
 			if (opts.dasm->pcshift < 0)
 				numbytes = pcdelta << -opts.dasm->pcshift;
