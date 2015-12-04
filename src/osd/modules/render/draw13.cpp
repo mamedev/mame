@@ -260,7 +260,7 @@ static void drawsdl2_exit(void);
 //  STATIC VARIABLES
 //============================================================
 
-#define BM_ALL (-1)
+#define BM_ALL (UINT32_MAX)
 //( SDL_BLENDMODE_MASK | SDL_BLENDMODE_BLEND | SDL_BLENDMODE_ADD | SDL_BLENDMODE_MOD)
 
 #define ENTRY(a,b,f) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, BM_ALL, #a, #b, 0, 0, 0, 0}
