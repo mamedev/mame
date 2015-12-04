@@ -422,7 +422,7 @@ static const gfx_layout destroyr_major_object_layout =
 	},
 	0x0800,   /* increment */
 	destroyr_major_object_layout_xoffset,
-	NULL
+	nullptr
 };
 
 static const UINT32 destroyr_waves_layout_xoffset[64] =
@@ -447,7 +447,7 @@ static const gfx_layout destroyr_waves_layout =
 	{ 0x00, 0x80 },
 	0x04,     /* increment */
 	destroyr_waves_layout_xoffset,
-	NULL
+	nullptr
 };
 
 

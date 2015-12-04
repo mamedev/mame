@@ -726,12 +726,12 @@ void ufo_state::machine_start()
 
 	for (int m = 0; m < 4; m++)
 	{
-		for (int p = 0; p < 2; p++)
+		for (auto & elem : m_player)
 		{
-			m_player[p].motor[m].running = 0;
-			m_player[p].motor[m].direction = 0;
-			m_player[p].motor[m].position = 0.5;
-			m_player[p].motor[m].speed = motor_speeds[m];
+			elem.motor[m].running = 0;
+			elem.motor[m].direction = 0;
+			elem.motor[m].position = 0.5;
+			elem.motor[m].speed = motor_speeds[m];
 		}
 
 		save_item(NAME(m_player[0].motor[m].running), m);

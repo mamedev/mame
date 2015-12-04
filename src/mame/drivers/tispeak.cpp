@@ -432,7 +432,7 @@ void tispeak_state::init_cartridge()
 {
 	m_overlay = 0;
 
-	if (m_cart != NULL && m_cart->exists())
+	if (m_cart != nullptr && m_cart->exists())
 	{
 		std::string region_tag;
 		memory_region *src = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());

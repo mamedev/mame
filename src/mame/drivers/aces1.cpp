@@ -260,8 +260,8 @@ void aces1_state::machine_start()
 		m_reel_clock[reel] =0;
 		m_reel_phase[reel] =0;
 	}
-	m_aces1_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aces1_state::m_aces1_irq_timer_callback),this), 0);
-	m_aces1_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aces1_state::m_aces1_nmi_timer_callback),this), 0);
+	m_aces1_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aces1_state::m_aces1_irq_timer_callback),this), nullptr);
+	m_aces1_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aces1_state::m_aces1_nmi_timer_callback),this), nullptr);
 }
 
 void aces1_state::machine_reset()

@@ -105,7 +105,7 @@ static const z80_daisy_config maincpu_daisy_chain[] =
 	TMPZ84C015_DAISY_INTERNAL,
 	{ "external_ctc" },
 	{ "external_sio" },
-	{ NULL }
+	{ nullptr }
 };
 
 
@@ -387,22 +387,22 @@ static MACHINE_CONFIG_START( pve500, pve500_state )
 	MCFG_EEPROM_SERIAL_MSM16911_8BIT_ADD("eeprom")
 
 	/* FIX-ME: These are actually RS422 ports (except EDL IN/OUT which is indeed an RS232 port)*/
-	MCFG_RS232_PORT_ADD("recorder", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("recorder", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, rxa_w))
 
-	MCFG_RS232_PORT_ADD("player1", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("player1", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, rxb_w))
 
-	MCFG_RS232_PORT_ADD("player2", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("player2", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("external_sio", z80dart_device, rxa_w))
 
-	MCFG_RS232_PORT_ADD("edl_inout", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("edl_inout", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("external_sio", z80dart_device, rxb_w))
 
-	MCFG_RS232_PORT_ADD("switcher", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("switcher", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("subcpu", tmpz84c015_device, rxa_w))
 
-	MCFG_RS232_PORT_ADD("serial_mixer", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("serial_mixer", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("subcpu", tmpz84c015_device, rxb_w))
 
 	/* ICF5: 2kbytes of RAM shared between the two CPUs (dual-port RAM)*/

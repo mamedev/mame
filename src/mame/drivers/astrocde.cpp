@@ -1198,7 +1198,7 @@ static const char *const seawolf_sample_names[] =
 	"dive",
 	"sonar",
 	"minehit",
-	0
+	nullptr
 };
 
 /*************************************
@@ -1210,7 +1210,7 @@ static const char *const seawolf_sample_names[] =
 static const z80_daisy_config tenpin_daisy_chain[] =
 {
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 

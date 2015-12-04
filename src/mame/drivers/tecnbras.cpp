@@ -60,9 +60,9 @@ ADDRESS_MAP_END
 DRIVER_INIT_MEMBER( tecnbras_state, tecnbras )
 {
 	m_xcoord = 0;
-	for (int x=0; x<14; x++){
+	for (auto & elem : m_digit){
 		for (int y=0; y<7; y++){
-			m_digit[x][y] = 0;
+			elem[y] = 0;
 		}
 	}
 }

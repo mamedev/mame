@@ -1485,12 +1485,12 @@ static MACHINE_CONFIG_DERIVED( mvs, neogeo_arcade )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_slot)
 
-	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot1", neogeo_cart, NULL)
-	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot2", neogeo_cart, NULL)
-	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot3", neogeo_cart, NULL)
-	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot4", neogeo_cart, NULL)
-	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot5", neogeo_cart, NULL)
-	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot6", neogeo_cart, NULL)
+	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot1", neogeo_cart, nullptr)
+	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot2", neogeo_cart, nullptr)
+	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot3", neogeo_cart, nullptr)
+	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot4", neogeo_cart, nullptr)
+	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot5", neogeo_cart, nullptr)
+	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot6", neogeo_cart, nullptr)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","neogeo")
 MACHINE_CONFIG_END

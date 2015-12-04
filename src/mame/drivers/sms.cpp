@@ -503,7 +503,7 @@ static MACHINE_CONFIG_START( sms_ntsc_base, sms_state )
 	MCFG_SOUND_ADD("segapsg", SEGAPSG, XTAL_53_693175MHz/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SMS_CARTRIDGE_ADD("slot", sms_cart, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot", sms_cart, nullptr)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sms")
 
@@ -592,8 +592,8 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_SEGA315_5124_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 
 	// card and expansion slots, not present in Master System II
-	MCFG_SMS_CARD_ADD("mycard", sms_cart, NULL)
-	MCFG_SMS_EXPANSION_ADD("exp", sms_expansion_devices, NULL)
+	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
+	MCFG_SMS_EXPANSION_ADD("exp", sms_expansion_devices, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( sms_sdisp, sms1_ntsc, smssdisp_state )
@@ -609,38 +609,38 @@ static MACHINE_CONFIG_DERIVED_CLASS( sms_sdisp, sms1_ntsc, smssdisp_state )
 	MCFG_DEVICE_REMOVE("mycard")
 	MCFG_DEVICE_REMOVE("exp")
 
-	MCFG_SMS_CARTRIDGE_ADD("slot2", sms_cart, NULL)
-	MCFG_SMS_CARTRIDGE_ADD("slot3", sms_cart, NULL)
-	MCFG_SMS_CARTRIDGE_ADD("slot4", sms_cart, NULL)
-	MCFG_SMS_CARTRIDGE_ADD("slot5", sms_cart, NULL)
-	MCFG_SMS_CARTRIDGE_ADD("slot6", sms_cart, NULL)
-	MCFG_SMS_CARTRIDGE_ADD("slot7", sms_cart, NULL)
-	MCFG_SMS_CARTRIDGE_ADD("slot8", sms_cart, NULL)
-	MCFG_SMS_CARTRIDGE_ADD("slot9", sms_cart, NULL)
-	MCFG_SMS_CARTRIDGE_ADD("slot10", sms_cart, NULL)
-	MCFG_SMS_CARTRIDGE_ADD("slot11", sms_cart, NULL)
-	MCFG_SMS_CARTRIDGE_ADD("slot12", sms_cart, NULL)
-	MCFG_SMS_CARTRIDGE_ADD("slot13", sms_cart, NULL)
-	MCFG_SMS_CARTRIDGE_ADD("slot14", sms_cart, NULL)
-	MCFG_SMS_CARTRIDGE_ADD("slot15", sms_cart, NULL)
-	MCFG_SMS_CARTRIDGE_ADD("slot16", sms_cart, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot2", sms_cart, nullptr)
+	MCFG_SMS_CARTRIDGE_ADD("slot3", sms_cart, nullptr)
+	MCFG_SMS_CARTRIDGE_ADD("slot4", sms_cart, nullptr)
+	MCFG_SMS_CARTRIDGE_ADD("slot5", sms_cart, nullptr)
+	MCFG_SMS_CARTRIDGE_ADD("slot6", sms_cart, nullptr)
+	MCFG_SMS_CARTRIDGE_ADD("slot7", sms_cart, nullptr)
+	MCFG_SMS_CARTRIDGE_ADD("slot8", sms_cart, nullptr)
+	MCFG_SMS_CARTRIDGE_ADD("slot9", sms_cart, nullptr)
+	MCFG_SMS_CARTRIDGE_ADD("slot10", sms_cart, nullptr)
+	MCFG_SMS_CARTRIDGE_ADD("slot11", sms_cart, nullptr)
+	MCFG_SMS_CARTRIDGE_ADD("slot12", sms_cart, nullptr)
+	MCFG_SMS_CARTRIDGE_ADD("slot13", sms_cart, nullptr)
+	MCFG_SMS_CARTRIDGE_ADD("slot14", sms_cart, nullptr)
+	MCFG_SMS_CARTRIDGE_ADD("slot15", sms_cart, nullptr)
+	MCFG_SMS_CARTRIDGE_ADD("slot16", sms_cart, nullptr)
 
-	MCFG_SMS_CARD_ADD("slot17", sms_cart, NULL)
-	MCFG_SMS_CARD_ADD("slot18", sms_cart, NULL)
-	MCFG_SMS_CARD_ADD("slot19", sms_cart, NULL)
-	MCFG_SMS_CARD_ADD("slot20", sms_cart, NULL)
-	MCFG_SMS_CARD_ADD("slot21", sms_cart, NULL)
-	MCFG_SMS_CARD_ADD("slot22", sms_cart, NULL)
-	MCFG_SMS_CARD_ADD("slot23", sms_cart, NULL)
-	MCFG_SMS_CARD_ADD("slot24", sms_cart, NULL)
-	MCFG_SMS_CARD_ADD("slot25", sms_cart, NULL)
-	MCFG_SMS_CARD_ADD("slot26", sms_cart, NULL)
-	MCFG_SMS_CARD_ADD("slot27", sms_cart, NULL)
-	MCFG_SMS_CARD_ADD("slot28", sms_cart, NULL)
-	MCFG_SMS_CARD_ADD("slot29", sms_cart, NULL)
-	MCFG_SMS_CARD_ADD("slot30", sms_cart, NULL)
-	MCFG_SMS_CARD_ADD("slot31", sms_cart, NULL)
-	MCFG_SMS_CARD_ADD("slot32", sms_cart, NULL)
+	MCFG_SMS_CARD_ADD("slot17", sms_cart, nullptr)
+	MCFG_SMS_CARD_ADD("slot18", sms_cart, nullptr)
+	MCFG_SMS_CARD_ADD("slot19", sms_cart, nullptr)
+	MCFG_SMS_CARD_ADD("slot20", sms_cart, nullptr)
+	MCFG_SMS_CARD_ADD("slot21", sms_cart, nullptr)
+	MCFG_SMS_CARD_ADD("slot22", sms_cart, nullptr)
+	MCFG_SMS_CARD_ADD("slot23", sms_cart, nullptr)
+	MCFG_SMS_CARD_ADD("slot24", sms_cart, nullptr)
+	MCFG_SMS_CARD_ADD("slot25", sms_cart, nullptr)
+	MCFG_SMS_CARD_ADD("slot26", sms_cart, nullptr)
+	MCFG_SMS_CARD_ADD("slot27", sms_cart, nullptr)
+	MCFG_SMS_CARD_ADD("slot28", sms_cart, nullptr)
+	MCFG_SMS_CARD_ADD("slot29", sms_cart, nullptr)
+	MCFG_SMS_CARD_ADD("slot30", sms_cart, nullptr)
+	MCFG_SMS_CARD_ADD("slot31", sms_cart, nullptr)
+	MCFG_SMS_CARD_ADD("slot32", sms_cart, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sms_pal_base, sms_state )
@@ -660,7 +660,7 @@ static MACHINE_CONFIG_START( sms_pal_base, sms_state )
 	MCFG_SOUND_ADD("segapsg", SEGAPSG, MASTER_CLOCK_PAL/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SMS_CARTRIDGE_ADD("slot", sms_cart, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot", sms_cart, nullptr)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sms")
 
@@ -732,8 +732,8 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 	MCFG_SEGA315_5124_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 
 	// card and expansion slots, not present in Master System II
-	MCFG_SMS_CARD_ADD("mycard", sms_cart, NULL)
-	MCFG_SMS_EXPANSION_ADD("exp", sms_expansion_devices, NULL)
+	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
+	MCFG_SMS_EXPANSION_ADD("exp", sms_expansion_devices, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms1_kr, sms1_ntsc )
@@ -741,7 +741,7 @@ static MACHINE_CONFIG_DERIVED( sms1_kr, sms1_ntsc )
 	MCFG_CPU_IO_MAP(sms1kr_io)
 
 	MCFG_DEVICE_REMOVE("slot")
-	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, NULL)
+	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms1_krfm, sms1_kr )
@@ -770,7 +770,7 @@ static MACHINE_CONFIG_DERIVED( sms2_kr, sms2_ntsc )
 	MCFG_CPU_IO_MAP(smsj_io)
 
 	MCFG_DEVICE_REMOVE("slot")
-	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, NULL)
+	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( gamegear, sms_state )
@@ -809,11 +809,11 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
 	/* cartridge */
-	MCFG_GG_CARTRIDGE_ADD("slot", gg_cart, NULL)
+	MCFG_GG_CARTRIDGE_ADD("slot", gg_cart, nullptr)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gamegear")
 
-	MCFG_GG_EXT_PORT_ADD("ext", gg_ext_port_devices, NULL)
+	MCFG_GG_EXT_PORT_ADD("ext", gg_ext_port_devices, nullptr)
 	MCFG_GG_EXT_PORT_TH_INPUT_HANDLER(WRITELINE(sms_state, gg_ext_th_input))
 	//MCFG_GG_EXT_PORT_PIXEL_HANDLER(READ32(sms_state, sms_pixel_color)) // only for GG-TV mod
 MACHINE_CONFIG_END
@@ -849,7 +849,7 @@ ROM_END
 
 ROM_START(smssdisp)
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_FILL(0x0000, 0x4000, 0x00)
+	ROM_FILL(0x0000, 0x4000, nullptr)
 
 	ROM_REGION(0x4000, "user1", 0)
 	ROM_FILL(0x0000, 0x4000, 0xff)
@@ -888,7 +888,7 @@ ROM_END
 
 ROM_START(sg1000m3)
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_FILL(0x0000, 0x4000, 0x00)
+	ROM_FILL(0x0000, 0x4000, nullptr)
 ROM_END
 
 ROM_START(smsj) /* PCB Label: "SEGA(R) IC BOARD M4J MAIN // 837-6418"; has "YM2413 // 78 04 71 G" at IC10; Back of pcb has traces marked "171-5541 (C)SEGA 1987 MADE IN JAPAN"
@@ -912,7 +912,7 @@ ROM_END
 
 ROM_START(gamegear)
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_FILL(0x0000, 0x4000, 0x00)
+	ROM_FILL(0x0000, 0x4000, nullptr)
 
 	ROM_REGION(0x0400, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "none", "No BIOS" ) /* gamegear */

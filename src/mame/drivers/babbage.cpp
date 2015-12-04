@@ -190,7 +190,7 @@ static const z80_daisy_config babbage_daisy_chain[] =
 	{ "z80pio_1" },
 	{ "z80pio_2" },
 	{ "z80ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)

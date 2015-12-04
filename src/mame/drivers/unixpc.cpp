@@ -124,7 +124,7 @@ WRITE16_MEMBER( unixpc_state::disk_control_w )
 	if (BIT(data, 6))
 		m_wd2797->set_floppy(m_floppy);
 	else
-		m_wd2797->set_floppy(NULL);
+		m_wd2797->set_floppy(nullptr);
 }
 
 WRITE_LINE_MEMBER( unixpc_state::wd2797_intrq_w )

@@ -330,9 +330,9 @@ void cops_state::laserdisc_w(UINT8 data)
 						laserdisc_response_w(0x0a);
 						break;
 					case 0x60: /* Addr Inq (get current frame number) */
-						for ( int i = 0; i < 5; i++ )
+						for (auto & elem : m_ld_frame)
 						{
-							laserdisc_response_w(m_ld_frame[i]);
+							laserdisc_response_w(elem);
 						}
 						break;
 					case 0x80: /* text start */

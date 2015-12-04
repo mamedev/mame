@@ -810,7 +810,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(bbc_state, bbc_rts_w))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_acia6850_irq_w))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(bbc_state, write_rxd_serial))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(bbc_state, write_dcd_serial))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
@@ -1154,7 +1154,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(bbc_state, bbc_rts_w))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_acia6850_irq_w))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(bbc_state, write_rxd_serial))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(bbc_state, write_dcd_serial))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
@@ -1199,7 +1199,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(bbc_state, econet_clk_w))
 	MCFG_ECONET_DATA_CALLBACK(DEVWRITELINE("mc6854", mc6854_device, set_rx))
-	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, NULL)
+	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
 MACHINE_CONFIG_END
 
 
@@ -1293,7 +1293,7 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", bbc_floppies_35, "qd", bbc_state::floppy_formats_bbcmc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", bbc_floppies_35, NULL, bbc_state::floppy_formats_bbcmc)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", bbc_floppies_35, nullptr, bbc_state::floppy_formats_bbcmc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* eeprom pcd8572 */

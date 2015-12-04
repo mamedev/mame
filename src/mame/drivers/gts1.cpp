@@ -500,7 +500,7 @@ READ8_MEMBER (gts1_state::gts1_nvram_r)
 			// FIXME: Schematics says TO Z5
 			if (!m_nvram_wr && m_nvram_e2) {
 				UINT8* nvram = memregion("nvram")->base();
-				assert(nvram != NULL);
+				assert(nvram != nullptr);
 				data = nvram[m_nvram_addr];
 				LOG(("%s: nvram[%02x] -> %x\n", __FUNCTION__, m_nvram_addr, data));
 			}
@@ -532,7 +532,7 @@ WRITE8_MEMBER(gts1_state::gts1_nvram_w)
 			if (m_nvram_wr && m_nvram_e2) {
 				LOG(("%s: nvram[%02x] <- %x\n", __FUNCTION__, m_nvram_addr, data & 15));
 				UINT8* nvram = memregion("nvram")->base();
-				assert(nvram != NULL);
+				assert(nvram != nullptr);
 				nvram[m_nvram_addr] = data & 15;
 			}
 			break;

@@ -1375,7 +1375,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* cartridge */
-	MCFG_VBOY_CARTRIDGE_ADD("cartslot", vboy_cart, NULL)
+	MCFG_VBOY_CARTRIDGE_ADD("cartslot", vboy_cart, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vboy")

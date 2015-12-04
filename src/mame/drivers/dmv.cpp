@@ -371,15 +371,15 @@ SLOT_INTERFACE_END
 void dmv_state::ifsel_r(address_space &space, int ifsel, offs_t offset, UINT8 &data)
 {
 	dmvcart_slot_device *slots[] = { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a };
-	for(int i=0; i<8; i++)
-		slots[i]->io_read(space, ifsel, offset, data);
+	for(auto & slot : slots)
+		slot->io_read(space, ifsel, offset, data);
 }
 
 void dmv_state::ifsel_w(address_space &space, int ifsel, offs_t offset, UINT8 data)
 {
 	dmvcart_slot_device *slots[] = { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a };
-	for(int i=0; i<8; i++)
-		slots[i]->io_write(space, ifsel, offset, data);
+	for(auto & slot : slots)
+		slot->io_write(space, ifsel, offset, data);
 }
 
 WRITE8_MEMBER(dmv_state::exp_program_w)
@@ -416,8 +416,8 @@ void dmv_state::update_busint(int slot, int state)
 	m_busint[slot] = state;
 
 	int new_state = CLEAR_LINE;
-	for (int i=0; i<8; i++)
-		if (m_busint[i] != CLEAR_LINE)
+	for (auto & elem : m_busint)
+		if (elem != CLEAR_LINE)
 		{
 			new_state = ASSERT_LINE;
 			break;
@@ -777,34 +777,34 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("slot1", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot1, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot1, nullptr, false)
 	MCFG_DEVICE_ADD("slot2", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, nullptr, false)
 	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(dmv_state, busint2_w))
 	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(dmv_state, irq2_w))
 	MCFG_DEVICE_ADD("slot2a", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2a, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2a, nullptr, false)
 	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(dmv_state, busint2a_w))
 	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(dmv_state, irq2a_w))
 	MCFG_DEVICE_ADD("slot3", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, nullptr, false)
 	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(dmv_state, busint3_w))
 	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(dmv_state, irq3_w))
 	MCFG_DEVICE_ADD("slot4", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, nullptr, false)
 	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(dmv_state, busint4_w))
 	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(dmv_state, irq4_w))
 	MCFG_DEVICE_ADD("slot5", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, nullptr, false)
 	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(dmv_state, busint5_w))
 	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(dmv_state, irq5_w))
 	MCFG_DEVICE_ADD("slot6", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot2_6, nullptr, false)
 	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(dmv_state, busint6_w))
 	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(dmv_state, irq6_w))
 
 	MCFG_DEVICE_ADD("slot7", DMVCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot7, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(dmv_slot7, nullptr, false)
 	MCFG_DMVCART_SLOT_PROGRAM_READWRITE_CB(READ8(dmv_state, exp_program_r), WRITE8(dmv_state, exp_program_w))
 	MCFG_DMVCART_SLOT_OUT_THOLD_CB(WRITELINE(dmv_state, thold7_w))
 	MCFG_DMVCART_SLOT_OUT_INT_CB(WRITELINE(dmv_state, busint7_w))

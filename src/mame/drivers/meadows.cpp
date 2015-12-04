@@ -597,7 +597,7 @@ static const char *const bowl3d_sample_names[] =
 	"footstep", /* "foot sweep" */
 	"crash",    /* "crash" */
 	"cheering", /* "cheering" */
-	0
+	nullptr
 };
 
 /*************************************

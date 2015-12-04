@@ -3759,11 +3759,11 @@ ROM_START( mtrainnv )
 
 	ROM_REGION( 0x10000, "tilemap", 0 )
 	ROM_LOAD( "mtrain_tilemap.bin", 0x00000, 0x10000, NO_DUMP )
-	ROM_COPY( "maincpu", 0x0000, 0x00000, 0x10000 ) // just to show something
+	ROM_COPY( "maincpu", nullptr, 0x00000, 0x10000 ) // just to show something
 
 	ROM_REGION( 0x10000, "reels", 0 )
 	ROM_LOAD( "mtrain_reels.bin", 0x00000, 0x10000, NO_DUMP )
-	ROM_COPY( "maincpu", 0x0000, 0x00000, 0x10000 ) // just to show something
+	ROM_COPY( "maincpu", nullptr, 0x00000, 0x10000 ) // just to show something
 ROM_END
 
 

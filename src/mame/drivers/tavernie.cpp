@@ -192,7 +192,7 @@ SLOT_INTERFACE_END
 // can support 3 drives
 WRITE8_MEMBER( tavernie_state::ds_w )
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 	if ((data & 3) == 1) floppy = m_floppy0->get_device();
 	//if ((data & 3) == 2) floppy = m_floppy1->get_device();
 	//if ((data & 3) == 3) floppy = m_floppy2->get_device();

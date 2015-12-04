@@ -289,10 +289,10 @@ static const gfx_layout scorelayout =
 
 static GFXDECODE_START( ace )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 2 )
-	GFXDECODE_ENTRY( NULL, 0x8000, charlayout0, 0, 2 ) /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( NULL, 0x8000, charlayout1, 0, 2 ) /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( NULL, 0x8000, charlayout2, 0, 2 ) /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( NULL, 0x8000, scorelayout, 0, 2 ) /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( nullptr, 0x8000, charlayout0, 0, 2 ) /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( nullptr, 0x8000, charlayout1, 0, 2 ) /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( nullptr, 0x8000, charlayout2, 0, 2 ) /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( nullptr, 0x8000, scorelayout, 0, 2 ) /* the game dynamically modifies this */
 GFXDECODE_END
 
 void aceal_state::ace_postload()
@@ -311,8 +311,8 @@ void aceal_state::machine_start()
 
 void aceal_state::machine_reset()
 {
-	for (int i = 0; i < 8; i++)
-		m_objpos[i] = 0;
+	for (auto & elem : m_objpos)
+		elem = 0;
 }
 
 static MACHINE_CONFIG_START( ace, aceal_state )

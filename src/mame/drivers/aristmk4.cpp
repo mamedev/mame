@@ -731,7 +731,7 @@ static const char *const meter_sample_names[] =
 {
 	"*3bagflvt",
 	"tick",
-	0
+	nullptr
 };
 
 /******************************************************************************

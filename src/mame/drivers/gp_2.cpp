@@ -566,7 +566,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( gp_2_state::zero_timer )
 static const z80_daisy_config daisy_chain[] =
 {
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 static MACHINE_CONFIG_START( gp_2, gp_2_state )

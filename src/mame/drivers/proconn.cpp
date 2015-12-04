@@ -305,7 +305,7 @@ static const z80_daisy_config z80_daisy_chain[] =
 {
 	{ "z80ctc" },
 	{ "z80sio" },
-	{ NULL }
+	{ nullptr }
 };
 
 void proconn_state::machine_reset()

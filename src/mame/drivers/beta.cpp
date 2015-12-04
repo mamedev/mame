@@ -300,7 +300,7 @@ DEVICE_IMAGE_LOAD_MEMBER( beta_state, beta_eprom )
 
 DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )
 {
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 		image.fwrite(&m_eprom_rom[0], 0x800);
 }
 
@@ -355,7 +355,7 @@ static MACHINE_CONFIG_START( beta, beta_state )
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
 	/* EPROM socket */
-	MCFG_GENERIC_CARTSLOT_ADD(EPROM_TAG, generic_plain_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD(EPROM_TAG, generic_plain_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(beta_state, beta_eprom)
 	MCFG_GENERIC_UNLOAD(beta_state, beta_eprom)

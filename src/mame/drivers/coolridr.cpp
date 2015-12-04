@@ -560,7 +560,7 @@ void coolridr_state::video_start()
 {
 	/* find first empty slot to decode gfx */
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
-		if (m_gfxdecode->gfx(m_gfx_index) == 0)
+		if (m_gfxdecode->gfx(m_gfx_index) == nullptr)
 			break;
 
 	m_screen->register_screen_bitmap(m_temp_bitmap_sprites);
@@ -1451,7 +1451,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 		free (object);
 
-		return NULL;
+		return nullptr;
 	}
 
 	/************* object->spriteblit[9] *************/
@@ -2137,7 +2137,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 	free (object);
 
-	return NULL;
+	return nullptr;
 
 }
 
@@ -2266,7 +2266,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	}
 	else
 	{
-		testobject->indirect_tiles = NULL;
+		testobject->indirect_tiles = nullptr;
 	}
 
 	int test_indirect_zoom_enable = (m_spriteblit[5] & 0x00000001);
@@ -2283,7 +2283,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	}
 	else
 	{
-		testobject->indirect_zoom = NULL;
+		testobject->indirect_zoom = nullptr;
 	}
 
 	testobject->zpri = m_blitterAddr | m_blittype<<12;
@@ -3812,10 +3812,10 @@ ROM_START( coolridr )
 	ROM_LOAD16_WORD_SWAP( "mpr-17645.ic6", 0x2400000, 0x0400000, CRC(56968d07) SHA1(e88c3d66ea05affb4681a25d155f097bd1b5a84b) ) // 0049
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 ROM_END
 
 /*
@@ -3856,10 +3856,10 @@ ROM_START( aquastge )
 	ROM_LOAD16_WORD_SWAP( "mpr-18290.ic6", 0x2400000, 0x0200000, CRC(11f7adb0) SHA1(a72f9892f93506456edc7ffc66224446a58ca38b) ) // 0049
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, nullptr )
 ROM_END
 
 

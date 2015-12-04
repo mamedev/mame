@@ -1191,7 +1191,7 @@ static const gfx_layout spyhunt_charlayout =
 	},
 	128*8,
 	spyhunt_charlayout_xoffset,
-	NULL
+	nullptr
 };
 
 
@@ -1250,7 +1250,7 @@ static const gfx_layout spyhuntpr_charlayout =
 	{ 0*8,  4*8,  8*8,  12*8,    16*8,  20*8,  24*8,  28*8,     1*8,  5*8, 9*8, 13*8,    17*8,  21*8,  25*8,  29*8    },
 	32*8,
 	spyhuntp_charlayout_xoffset,
-	NULL
+	nullptr
 };
 
 static GFXDECODE_START( mcr3 )

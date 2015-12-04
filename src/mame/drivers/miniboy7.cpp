@@ -258,7 +258,7 @@ PALETTE_INIT_MEMBER(miniboy7_state, miniboy7)
 	int i;
 
 	/* 0000IBGR */
-	if (m_proms == 0) return;
+	if (m_proms == nullptr) return;
 
 	for (i = 0;i < palette.entries();i++)
 	{

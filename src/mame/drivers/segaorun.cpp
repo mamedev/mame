@@ -566,7 +566,7 @@ READ8_MEMBER( segaorun_state::sound_data_r )
 void segaorun_state::machine_reset()
 {
 	// reset misc components
-	if (m_custom_map != NULL)
+	if (m_custom_map != nullptr)
 		m_mapper->configure_explicit(m_custom_map);
 	m_segaic16vid->tilemap_reset(*m_screen);
 
@@ -2894,7 +2894,7 @@ DRIVER_INIT_MEMBER(segaorun_state,generic)
 	m_scanline_timer = timer_alloc(TID_SCANLINE);
 
 	// configure the NVRAM to point to our workram
-	if (m_nvram != NULL)
+	if (m_nvram != nullptr)
 		m_nvram->set_base(m_workram, m_workram.bytes());
 
 	// point globals to allocated memory regions

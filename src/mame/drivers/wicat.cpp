@@ -309,8 +309,8 @@ void wicat_state::machine_reset()
 	m_kb_timer->adjust(attotime::zero,0,attotime::from_msec(50));
 	m_nmi_enable = 0;
 	m_crtc_irq = CLEAR_LINE;
-	for(int x=0;x<8;x++)
-		m_kb_keys[x] = 0;
+	for(auto & elem : m_kb_keys)
+		elem = 0;
 }
 
 void wicat_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -816,31 +816,31 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
 	MCFG_MC2661_TXEMT_DSCHG_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
 
-	MCFG_RS232_PORT_ADD("serial1",default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial1",default_rs232_devices,nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart1",mc2661_device,rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart1",mc2661_device,dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart1",mc2661_device,dsr_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart1",mc2661_device,cts_w))
 
-	MCFG_RS232_PORT_ADD("serial2",default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial2",default_rs232_devices,nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart2",mc2661_device,rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart2",mc2661_device,dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart2",mc2661_device,dsr_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart2",mc2661_device,cts_w))
 
-	MCFG_RS232_PORT_ADD("serial3",default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial3",default_rs232_devices,nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart3",mc2661_device,rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart3",mc2661_device,dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart3",mc2661_device,dsr_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart3",mc2661_device,cts_w))
 
-	MCFG_RS232_PORT_ADD("serial4",default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial4",default_rs232_devices,nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart4",mc2661_device,rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart4",mc2661_device,dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart4",mc2661_device,dsr_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart4",mc2661_device,cts_w))
 
-	MCFG_RS232_PORT_ADD("serial5",default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial5",default_rs232_devices,nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart5",mc2661_device,rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart5",mc2661_device,dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart5",mc2661_device,dsr_w))

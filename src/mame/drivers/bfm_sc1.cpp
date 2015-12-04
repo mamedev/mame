@@ -1147,9 +1147,9 @@ int bfm_sc1_state::sc1_find_project_string( )
 	UINT8 *src = memregion( "maincpu" )->base();
 	int size = memregion( "maincpu" )->bytes();
 
-	for (int search=0;search<7;search++)
+	for (auto & elem : title_string)
 	{
-		int strlength = strlen(title_string[search]);
+		int strlength = strlen(elem);
 
 		for (int i=0;i<size-strlength;i++)
 		{
@@ -1158,7 +1158,7 @@ int bfm_sc1_state::sc1_find_project_string( )
 			for (j=0;j<strlength;j+=1)
 			{
 				UINT8 rom = src[(i+j)];
-				UINT8 chr = title_string[search][j];
+				UINT8 chr = elem[j];
 
 				if (rom != chr)
 				{
