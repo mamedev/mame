@@ -300,9 +300,9 @@ INLINE void waveCalcCycleLen(sidOperator* pVoice)
 /*  else */
 	{
 #if defined(DIRECT_FIXPOINT)
-		register UINT16 diff = pVoice->cycleLenCount - pVoice->cycleLen.w[HI];
+		UINT16 diff = pVoice->cycleLenCount - pVoice->cycleLen.w[HI];
 #else
-		register UINT16 diff = pVoice->cycleLenCount - pVoice->cycleLen;
+		UINT16 diff = pVoice->cycleLenCount - pVoice->cycleLen;
 #endif
 		if ( pVoice->wavePre[diff].len != pVoice->cycleLenCount )
 		{

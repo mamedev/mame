@@ -326,29 +326,29 @@ static const int hamming_lut[64] = {
  */
 UINT32 alto2_cpu_device::hamming_code(int write, UINT32 dw_addr, UINT32 dw_data)
 {
-	register UINT8 hpb = write ? 0 : m_mem.hpb[dw_addr];
-	register UINT8 hc_0_a;
-	register UINT8 hc_0b1;
-	register UINT8 hc_1_a;
-	register UINT8 hc_2_a;
-	register UINT8 hc_2_b;
-	register UINT8 hc_0;
-	register UINT8 hc_1;
-	register UINT8 hc_2;
-	register UINT8 h_0_2;
-	register UINT8 hc_3_a;
-	register UINT8 hc_3_4;
-	register UINT8 hcpa;
-	register UINT8 hc_4_a;
-	register UINT8 hc_3;
-	register UINT8 hc_4;
-	register UINT8 hc_5;
-	register UINT8 hcpb;
-	register UINT8 perr;
-	register UINT8 pca;
-	register UINT8 pcb;
-	register UINT8 pc;
-	register int syndrome;
+	UINT8 hpb = write ? 0 : m_mem.hpb[dw_addr];
+	UINT8 hc_0_a;
+	UINT8 hc_0b1;
+	UINT8 hc_1_a;
+	UINT8 hc_2_a;
+	UINT8 hc_2_b;
+	UINT8 hc_0;
+	UINT8 hc_1;
+	UINT8 hc_2;
+	UINT8 h_0_2;
+	UINT8 hc_3_a;
+	UINT8 hc_3_4;
+	UINT8 hcpa;
+	UINT8 hc_4_a;
+	UINT8 hc_3;
+	UINT8 hc_4;
+	UINT8 hc_5;
+	UINT8 hcpb;
+	UINT8 perr;
+	UINT8 pca;
+	UINT8 pcb;
+	UINT8 pc;
+	int syndrome;
 
 	/* a75: WD01   WD04   WD08   WD11   WD15   WD19   WD23   WD26   WD30 ---     HC(0)A */
 	hc_0_a = parity_odd (dw_data & A75);

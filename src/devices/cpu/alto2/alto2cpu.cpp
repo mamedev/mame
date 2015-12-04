@@ -1725,14 +1725,14 @@ void alto2_cpu_device::f1_early_task()
 {
 #if USE_PRIO_F9318
 	/* Doesn't work yet */
-	register f9318_in_t wakeup_hi;
-	register f9318_out_t u1;
-	register f9318_in_t wakeup_lo;
-	register f9318_out_t u2;
-	register int addr = 017;
-	register int rdct1, rdct2, rdct4, rdct8;
-	register int ct1, ct2, ct4, ct8;
-	register int wakeup, ct;
+	f9318_in_t wakeup_hi;
+	f9318_out_t u1;
+	f9318_in_t wakeup_lo;
+	f9318_out_t u2;
+	int addr = 017;
+	int rdct1, rdct2, rdct4, rdct8;
+	int ct1, ct2, ct4, ct8;
+	int wakeup, ct;
 
 	LOG((this,LOG_CPU,2, "   TASK %02o:%s\n", m_task, task_name(m_task)));
 
@@ -2024,8 +2024,8 @@ void alto2_cpu_device::f2_late_load_md()
 #if 1
 UINT32 alto2_cpu_device::alu_74181(UINT32 a, UINT32 b, UINT8 smc)
 {
-	register UINT32 f;
-	register const UINT32 cout = 1 << 16;
+	UINT32 f;
+	const UINT32 cout = 1 << 16;
 
 	switch (smc & A10_ALUIN) {
 	case SMC(0,0,0,0, 0, 0): // 0000: A + 1

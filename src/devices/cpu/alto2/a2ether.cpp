@@ -245,7 +245,7 @@ static void dump_packet(device_t *device, const char* name, const UINT16 *src, s
  */
 void alto2_cpu_device::eth_wakeup()
 {
-	register int st = m_eth.status;
+	int st = m_eth.status;
 	LOG((this,LOG_ETH,0,"IBUSY=%d OBUSY=%d ", GET_ETH_IBUSY(st), GET_ETH_OBUSY(st)));
 	UINT8 busy = GET_ETH_IBUSY(st) | GET_ETH_OBUSY(st);
 	if (0 == busy) {
