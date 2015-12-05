@@ -142,7 +142,7 @@ public:
 		for (entry_t *entry = m_table[fullhash % ARRAY_LENGTH(m_table)]; entry != nullptr; entry = entry->next())
 			if (entry->fullhash() == fullhash && entry->tag() == tag)
 				return entry->object();
-		return _ElementType(nullptr);
+		return _ElementType(NULL);
 	}
 
 	// find by tag without checking anything but the hash
