@@ -343,7 +343,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(isa8_pgc_device::scanline_callback)
 	// XXX hpos shifts every frame -- fix
 	if (y == 0) DBG_LOG(2,"scanline_cb",
 		("frame %d x %.4d y %.3d\n",
-		static_cast<int>(m_screen->frame_number()), m_screen->hpos(), y));
+		(int) m_screen->frame_number(), m_screen->hpos(), y));
 
 	if (y < PGC_VERT_START) return;
 	y -= PGC_VERT_START;

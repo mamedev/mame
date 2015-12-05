@@ -375,7 +375,7 @@ WRITE_LINE_MEMBER( ti99_datamux_device::ready_line )
 	{
 		if (state != m_sysready) logerror("datamux: READY line from PBox = %d\n", state);
 	}
-	m_sysready = static_cast<line_state>(state);
+	m_sysready = (line_state)state;
 	// Also propagate to CPU via driver
 	ready_join();
 }

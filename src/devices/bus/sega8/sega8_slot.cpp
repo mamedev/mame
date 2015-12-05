@@ -220,7 +220,7 @@ int sega8_cart_slot_device::verify_cart( UINT8 *magic, int size )
 	// Verify the file is a valid image - check $7ff0 for "TMR SEGA"
 	if (size >= 0x8000)
 	{
-		if (!strncmp(reinterpret_cast<char*>(&magic[0x7ff0]), "TMR SEGA", 8))
+		if (!strncmp((char*)&magic[0x7ff0], "TMR SEGA", 8))
 			retval = IMAGE_VERIFY_PASS;
 	}
 
@@ -578,21 +578,21 @@ int sega8_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 	}
 
 	// Terebi Oekaki (TV Draw)
-	if (len >= 0x13b3 + 7 && !strncmp(reinterpret_cast<const char *>(&ROM[0x13b3]), "annakmn", 7))
+	if (len >= 0x13b3 + 7 && !strncmp((const char *)&ROM[0x13b3], "annakmn", 7))
 		type = SEGA8_TEREBIOEKAKI;
 
 	// The Castle (ROM+RAM)
-	if (len >= 0x1cc3 + 10 && !strncmp(reinterpret_cast<const char *>(&ROM[0x1cc3]), "ASCII 1986", 10))
+	if (len >= 0x1cc3 + 10 && !strncmp((const char *)&ROM[0x1cc3], "ASCII 1986", 10))
 		type = SEGA8_CASTLE;
 
 	// BASIC Level 3
-	if (len >= 0x6a20 + 29 && !strncmp(reinterpret_cast<const char *>(&ROM[0x6a20]), "SC-3000 BASIC Level 3 ver 1.0", 29))
+	if (len >= 0x6a20 + 29 && !strncmp((const char *)&ROM[0x6a20], "SC-3000 BASIC Level 3 ver 1.0", 29))
 		type = SEGA8_BASIC_L3;
 
 	// Music Editor
 	if (len >= 0x0841 + 5)
 	{
-		if (!strncmp(reinterpret_cast<const char *>(&ROM[0x0841]), "PIANO", 5) || !strncmp(reinterpret_cast<const char *>(&ROM[0x0841]), "music", 5))
+		if (!strncmp((const char *)&ROM[0x0841], "PIANO", 5) || !strncmp((const char *)&ROM[0x0841], "music", 5))
 			type = SEGA8_MUSIC_EDITOR;
 	}
 
@@ -731,7 +731,7 @@ void sega8_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len, UIN
 	logerror("FILE DETAILS\n" );
 	logerror("============\n" );
 	logerror("Name: %s\n", basename());
-	logerror("File Size: 0x%08x\n", (software_entry() == nullptr) ? static_cast<int>(length()) : static_cast<int>(get_software_region_length("rom")));
+	logerror("File Size: 0x%08x\n", (software_entry() == nullptr) ? (int)length() : (int)get_software_region_length("rom"));
 	logerror("Detected type: %s\n", sega8_get_slot(m_type));
 	logerror("ROM (Allocated) Size: 0x%X\n", len);
 	logerror("RAM: %s\n", nvram_len ? "Yes" : "No");

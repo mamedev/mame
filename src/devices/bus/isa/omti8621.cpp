@@ -1358,7 +1358,7 @@ void omti_disk_image_device::device_reset()
 
 	if (exists() && fseek(0, SEEK_END) == 0)
 	{
-		UINT32 disk_size = static_cast<UINT32>(ftell() / OMTI_DISK_SECTOR_SIZE);
+		UINT32 disk_size = (UINT32)(ftell() / OMTI_DISK_SECTOR_SIZE);
 		UINT16 disk_type = disk_size >= 300000 ? OMTI_DISK_TYPE_348_MB : OMTI_DISK_TYPE_155_MB;
 		if (disk_type != m_type) {
 			LOG1(("device_reset_omti_disk: disk size=%d blocks, disk type=%x", disk_size, disk_type ));

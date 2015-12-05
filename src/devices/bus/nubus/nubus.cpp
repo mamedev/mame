@@ -138,7 +138,7 @@ void nubus_device::install_device(offs_t start, offs_t end, read8_delegate rhand
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
 			break;
 		case 64:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, (static_cast<UINT64>(mask)<<32)|mask);
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
@@ -155,7 +155,7 @@ void nubus_device::install_device(offs_t start, offs_t end, read16_delegate rhan
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
 			break;
 		case 64:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, (static_cast<UINT64>(mask)<<32)|mask);
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
@@ -172,7 +172,7 @@ void nubus_device::install_device(offs_t start, offs_t end, read32_delegate rhan
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
 			break;
 		case 64:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, (static_cast<UINT64>(mask)<<32)|mask);
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
@@ -189,7 +189,7 @@ void nubus_device::install_readonly_device(offs_t start, offs_t end, read32_dele
 			m_maincpu->space(AS_PROGRAM).install_read_handler(start, end, rhandler, mask);
 			break;
 		case 64:
-			m_maincpu->space(AS_PROGRAM).install_read_handler(start, end, rhandler, (static_cast<UINT64>(mask)<<32)|mask);
+			m_maincpu->space(AS_PROGRAM).install_read_handler(start, end, rhandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
@@ -206,7 +206,7 @@ void nubus_device::install_writeonly_device(offs_t start, offs_t end, write32_de
 			m_maincpu->space(AS_PROGRAM).install_write_handler(start, end, whandler, mask);
 			break;
 		case 64:
-			m_maincpu->space(AS_PROGRAM).install_write_handler(start, end, whandler, (static_cast<UINT64>(mask)<<32)|mask);
+			m_maincpu->space(AS_PROGRAM).install_write_handler(start, end, whandler, ((UINT64)mask<<32)|mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);

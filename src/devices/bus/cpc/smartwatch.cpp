@@ -76,7 +76,7 @@ void cpc_smartwatch_device::device_reset()
 
 READ8_MEMBER(cpc_smartwatch_device::rtc_w)
 {
-	UINT8* bank = static_cast<UINT8*>(m_bank->base());
+	UINT8* bank = (UINT8*)m_bank->base();
 	if(offset & 1)
 		m_rtc->read_1(space,0);
 	else
@@ -86,6 +86,6 @@ READ8_MEMBER(cpc_smartwatch_device::rtc_w)
 
 READ8_MEMBER(cpc_smartwatch_device::rtc_r)
 {
-	UINT8* bank = static_cast<UINT8*>(m_bank->base());
+	UINT8* bank = (UINT8*)m_bank->base();
 	return ((bank[(offset & 1)+4]) & 0xfe) | (m_rtc->read_data(space,0) & 0x01);
 }

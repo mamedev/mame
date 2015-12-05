@@ -97,10 +97,10 @@ void nubus_radiustpd_device::device_start()
 
 	slotspace = get_slotspace();
 
-	printf("[radiustpd %p] slotspace = %x\n", static_cast<void *>(this), slotspace);
+	printf("[radiustpd %p] slotspace = %x\n", (void *)this, slotspace);
 
 	m_vram.resize(VRAM_SIZE);
-	m_vram32 = reinterpret_cast<UINT32 *>(&m_vram[0]);
+	m_vram32 = (UINT32 *)&m_vram[0];
 
 	m_nubus->install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_radiustpd_device::vram_r), this), write32_delegate(FUNC(nubus_radiustpd_device::vram_w), this));
 	m_nubus->install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(FUNC(nubus_radiustpd_device::vram_r), this), write32_delegate(FUNC(nubus_radiustpd_device::vram_w), this));

@@ -843,7 +843,7 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 
 void base_sns_cart_slot_device::setup_nvram()
 {
-	UINT8 *ROM = static_cast<UINT8 *>(m_cart->get_rom_base());
+	UINT8 *ROM = (UINT8 *)m_cart->get_rom_base();
 	UINT32 size = 0;
 	if (software_entry() == nullptr)
 	{

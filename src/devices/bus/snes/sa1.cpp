@@ -349,23 +349,23 @@ UINT8 sns_sa1_device::read_regs(address_space &space, UINT32 offset)
 			break;
 		case 0x106:
 			// Math Result bits0-7
-			value = static_cast<UINT64>(m_math_res >> 0) & 0xff;
+			value = (UINT64)(m_math_res >> 0) & 0xff;
 			break;
 		case 0x107:
 			// Math Result bits8-15
-			value = static_cast<UINT64>(m_math_res >> 8) & 0xff;
+			value = (UINT64)(m_math_res >> 8) & 0xff;
 			break;
 		case 0x108:
 			// Math Result bits16-23
-			value = static_cast<UINT64>(m_math_res >> 16) & 0xff;
+			value = (UINT64)(m_math_res >> 16) & 0xff;
 			break;
 		case 0x109:
 			// Math Result bits24-31
-			value = static_cast<UINT64>(m_math_res >> 24) & 0xff;
+			value = (UINT64)(m_math_res >> 24) & 0xff;
 			break;
 		case 0x10a:
 			// Math Result bits32-39
-			value = static_cast<UINT64>(m_math_res >> 32) & 0xff;
+			value = (UINT64)(m_math_res >> 32) & 0xff;
 			break;
 		case 0x10b:
 			// Math Overflow (above 40bit result)
@@ -749,7 +749,7 @@ void sns_sa1_device::write_regs(address_space &space, UINT32 offset, UINT8 data)
 			switch (m_math_ctlr)
 			{
 				case 0: //signed multiplication
-					m_math_res = static_cast<INT16>(m_math_a) * static_cast<INT16>(m_math_b);
+					m_math_res = (INT16)m_math_a * (INT16)m_math_b;
 					m_math_b = 0;
 					break;
 				case 1: //unsigned division
@@ -757,14 +757,14 @@ void sns_sa1_device::write_regs(address_space &space, UINT32 offset, UINT8 data)
 						m_math_res = 0;
 					else
 					{
-						INT16  quotient  = static_cast<INT16>(m_math_a) / static_cast<UINT16>(m_math_b);
-						UINT16 remainder = static_cast<INT16>(m_math_a) % static_cast<UINT16>(m_math_b);
-						m_math_res = static_cast<UINT64>((remainder << 16) | quotient);
+						INT16  quotient  = (INT16)m_math_a / (UINT16)m_math_b;
+						UINT16 remainder = (INT16)m_math_a % (UINT16)m_math_b;
+						m_math_res = (UINT64)((remainder << 16) | quotient);
 					}
 					break;
 				case 2: //sigma (accumulative multiplication)
 				case 3:
-					UINT64 acum = static_cast<INT16>(m_math_a) * static_cast<INT16>(m_math_b);
+					UINT64 acum = (INT16)m_math_a * (INT16)m_math_b;
 					UINT64 mask = U64(0xffffffffff);
 					m_math_res += acum;
 					m_math_overflow = (m_math_res > mask) ? 0x80 : 0;

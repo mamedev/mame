@@ -445,7 +445,7 @@ void ti990_hdc_device::store_registers()
 
 	m_d[dsk_sel].unsafe = 0;      /* I think */
 
-	dma_address = ((static_cast<int>(m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
+	dma_address = ((((int) m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
 	byte_count = m_w[4] & 0xfffe;
 
 	/* formatted words per track */
@@ -584,7 +584,7 @@ void ti990_hdc_device::read_data()
 		return;
 	}
 
-	dma_address = ((static_cast<int>(m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
+	dma_address = ((((int) m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
 	byte_count = m_w[4] & 0xfffe;
 
 	cylinder = m_w[3];
@@ -618,7 +618,7 @@ void ti990_hdc_device::read_data()
 		if (! (m_w[1] & w1_transfer_inhibit))
 			for (i=0; i<bytes_read; i+=2)
 			{
-				machine().device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, (static_cast<int>(buffer[i]) << 8) | buffer[i+1]);
+				machine().device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
 				dma_address = (dma_address + 2) & 0x1ffffe;
 			}
 
@@ -691,7 +691,7 @@ void ti990_hdc_device::write_data()
 		return;
 	}
 
-	dma_address = ((static_cast<int>(m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
+	dma_address = ((((int) m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
 	byte_count = m_w[4] & 0xfffe;
 
 	cylinder = m_w[3];
@@ -793,6 +793,9 @@ void ti990_hdc_device::unformatted_read()
 		return;
 	}
 
+	dma_address = ((((int) m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
+	byte_count = m_w[4] & 0xfffe;
+
 	cylinder = m_w[3];
 	head = m_w[1] & w1_head_address;
 	sector = m_w[2] & 0xff;
@@ -800,7 +803,7 @@ void ti990_hdc_device::unformatted_read()
 	if (check_sector_address(dsk_sel, cylinder, head, sector))
 		return;
 
-	dma_address = ((static_cast<int>(m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
+	dma_address = ((((int) m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
 	byte_count = m_w[4] & 0xfffe;
 
 	/* bits 0-4: head address; bits 5-15: cylinder address */

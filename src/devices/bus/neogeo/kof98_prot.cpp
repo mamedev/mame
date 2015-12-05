@@ -70,7 +70,7 @@ void kof98_prot_device::kof98_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size)
 	}
 	memmove( &src[0x100000], &src[0x200000], 0x400000 );
 
-	UINT16* mem16 = reinterpret_cast<UINT16*>(cpurom);
+	UINT16* mem16 = (UINT16*)cpurom;
 	m_default_rom[0] = mem16[0x100 / 2];
 	m_default_rom[1] = mem16[0x102 / 2];
 

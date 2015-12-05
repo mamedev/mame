@@ -302,7 +302,7 @@ void sma_prot_device::kof99_decrypt_68k(UINT8* base)
 	UINT16 *rom;
 	int i,j;
 
-	rom = reinterpret_cast<UINT16 *>(base + 0x100000);
+	rom = (UINT16 *)(base + 0x100000);
 	/* swap data lines on the whole ROMs */
 	for (i = 0;i < 0x800000/2;i++)
 	{
@@ -321,7 +321,7 @@ void sma_prot_device::kof99_decrypt_68k(UINT8* base)
 	}
 
 	/* swap address lines & relocate fixed part */
-	rom = reinterpret_cast<UINT16 *>(base);
+	rom = (UINT16 *)base;
 	for (i = 0;i < 0x0c0000/2;i++)
 	{
 		rom[i] = rom[0x700000/2 + BITSWAP24(i,23,22,21,20,19,18,11,6,14,17,16,5,8,10,12,0,4,3,2,7,9,15,13,1)];
@@ -335,7 +335,7 @@ void sma_prot_device::garou_decrypt_68k(UINT8* base)
 	int i,j;
 
 	/* thanks to Razoola and Mr K for the info */
-	rom = reinterpret_cast<UINT16 *>(base + 0x100000);
+	rom = (UINT16 *)(base + 0x100000);
 	/* swap data lines on the whole ROMs */
 	for (i = 0;i < 0x800000/2;i++)
 	{
@@ -343,14 +343,14 @@ void sma_prot_device::garou_decrypt_68k(UINT8* base)
 	}
 
 	/* swap address lines & relocate fixed part */
-	rom = reinterpret_cast<UINT16 *>(base);
+	rom = (UINT16 *)base;
 	for (i = 0;i < 0x0c0000/2;i++)
 	{
 		rom[i] = rom[0x710000/2 + BITSWAP24(i,23,22,21,20,19,18,4,5,16,14,7,9,6,13,17,15,3,1,2,12,11,8,10,0)];
 	}
 
 	/* swap address lines for the banked part */
-	rom = reinterpret_cast<UINT16 *>(base + 0x100000);
+	rom = (UINT16 *)(base + 0x100000);
 	for (i = 0;i < 0x800000/2;i+=0x8000/2)
 	{
 		UINT16 buffer[0x8000/2];
@@ -369,7 +369,7 @@ void sma_prot_device::garouh_decrypt_68k(UINT8* base)
 	int i,j;
 
 	/* thanks to Razoola and Mr K for the info */
-	rom = reinterpret_cast<UINT16 *>(base + 0x100000);
+	rom = (UINT16 *)(base + 0x100000);
 	/* swap data lines on the whole ROMs */
 	for (i = 0;i < 0x800000/2;i++)
 	{
@@ -377,14 +377,14 @@ void sma_prot_device::garouh_decrypt_68k(UINT8* base)
 	}
 
 	/* swap address lines & relocate fixed part */
-	rom = reinterpret_cast<UINT16 *>(base);
+	rom = (UINT16 *)base;
 	for (i = 0;i < 0x0c0000/2;i++)
 	{
 		rom[i] = rom[0x7f8000/2 + BITSWAP24(i,23,22,21,20,19,18,5,16,11,2,6,7,17,3,12,8,14,4,0,9,1,10,15,13)];
 	}
 
 	/* swap address lines for the banked part */
-	rom = reinterpret_cast<UINT16 *>(base + 0x100000);
+	rom = (UINT16 *)(base + 0x100000);
 	for (i = 0;i < 0x800000/2;i+=0x8000/2)
 	{
 		UINT16 buffer[0x8000/2];
@@ -403,7 +403,7 @@ void sma_prot_device::mslug3_decrypt_68k(UINT8* base)
 	int i,j;
 
 	/* thanks to Razoola and Mr K for the info */
-	rom = reinterpret_cast<UINT16 *>(base + 0x100000);
+	rom = (UINT16 *)(base + 0x100000);
 	/* swap data lines on the whole ROMs */
 	for (i = 0;i < 0x800000/2;i++)
 	{
@@ -411,14 +411,14 @@ void sma_prot_device::mslug3_decrypt_68k(UINT8* base)
 	}
 
 	/* swap address lines & relocate fixed part */
-	rom = reinterpret_cast<UINT16 *>(base);
+	rom = (UINT16 *)base;
 	for (i = 0;i < 0x0c0000/2;i++)
 	{
 		rom[i] = rom[0x5d0000/2 + BITSWAP24(i,23,22,21,20,19,18,15,2,1,13,3,0,9,6,16,4,11,5,7,12,17,14,10,8)];
 	}
 
 	/* swap address lines for the banked part */
-	rom = reinterpret_cast<UINT16 *>(base + 0x100000);
+	rom = (UINT16 *)(base + 0x100000);
 	for (i = 0;i < 0x800000/2;i+=0x10000/2)
 	{
 		UINT16 buffer[0x10000/2];
@@ -437,7 +437,7 @@ void sma_prot_device::kof2000_decrypt_68k(UINT8* base)
 	int i,j;
 
 	/* thanks to Razoola and Mr K for the info */
-	rom = reinterpret_cast<UINT16 *>(base + 0x100000);
+	rom = (UINT16 *)(base + 0x100000);
 	/* swap data lines on the whole ROMs */
 	for (i = 0;i < 0x800000/2;i++)
 	{
@@ -456,7 +456,7 @@ void sma_prot_device::kof2000_decrypt_68k(UINT8* base)
 	}
 
 	/* swap address lines & relocate fixed part */
-	rom = reinterpret_cast<UINT16 *>(base);
+	rom = (UINT16 *)base;
 	for (i = 0;i < 0x0c0000/2;i++)
 	{
 		rom[i] = rom[0x73a000/2 + BITSWAP24(i,23,22,21,20,19,18,8,4,15,13,3,14,16,2,6,17,7,12,10,0,5,11,1,9)];

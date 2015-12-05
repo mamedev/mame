@@ -158,7 +158,7 @@ nes_kstudio_rom_device::nes_kstudio_rom_device(const machine_config &mconfig, co
 
 void nes_kstudio_rom_device::device_start()
 {
-	m_rom = static_cast<UINT8*>(memregion("exrom")->base());
+	m_rom = (UINT8*)memregion("exrom")->base();
 	save_item(NAME(m_bank));
 }
 

@@ -136,7 +136,7 @@ nes_ntb_rom_device::nes_ntb_rom_device(const machine_config &mconfig, const char
 
 void nes_ntb_rom_device::device_start()
 {
-	m_rom = static_cast<UINT8*>(memregion("ntbrom")->base());
+	m_rom = (UINT8*)memregion("ntbrom")->base();
 }
 
 const rom_entry *nes_ntb_rom_device::device_rom_region() const

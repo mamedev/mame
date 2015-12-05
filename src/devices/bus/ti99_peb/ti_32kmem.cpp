@@ -101,7 +101,7 @@ void ti_32k_expcard_device::device_start(void)
 	// ROM_FILL does not seem to allow filling with an alternating pattern
 	for (int i=0; i < 0x8000; i+=2)
 	{
-		m_ram_ptr[i] = static_cast<UINT8>(0xff);
+		m_ram_ptr[i] = (UINT8)0xff;
 	}
 }
 

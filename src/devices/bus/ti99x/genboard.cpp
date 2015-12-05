@@ -214,7 +214,7 @@ geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const 
 
 INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )
 {
-	int number = static_cast<int>(reinterpret_cast<UINT64>(param)&0x03);
+	int number = (int)((UINT64)param&0x03);
 	int value = newval;
 
 	switch (number)
@@ -298,7 +298,7 @@ WRITE8_MEMBER( geneve_mapper_device::write_grom )
 		}
 		else
 		{
-			m_grom_address = (m_grom_address & 0x00ff) | (static_cast<UINT16>(data)<<8);
+			m_grom_address = (m_grom_address & 0x00ff) | ((UINT16)data<<8);
 			m_gromwaddr_LSB = true;
 		}
 	}

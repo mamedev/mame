@@ -164,7 +164,7 @@ void tap_990_device::cmd_read_binary_forward()
 
 	m_tape[tap_sel].bot = 0;
 
-	dma_address = ((static_cast<int>(m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
+	dma_address = ((((int)m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
 	char_count = m_w[4];
 	read_offset = m_w[3];
 
@@ -191,7 +191,7 @@ void tap_990_device::cmd_read_binary_forward()
 			goto update_registers;
 		}
 	}
-	reclen = (static_cast<int>(buffer[1]) << 8) | buffer[0];
+	reclen = (((int) buffer[1]) << 8) | buffer[0];
 	if (buffer[2] || buffer[3])
 	{   /* no idea what these bytes mean */
 		logerror("Tape error\n");
@@ -257,7 +257,7 @@ void tap_990_device::cmd_read_binary_forward()
 		/* DMA */
 		for (i=0; i<bytes_read; i+=2)
 		{
-			machine().device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, (static_cast<int>(buffer[i]) << 8) | buffer[i+1]);
+			machine().device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
 			dma_address = (dma_address + 2) & 0x1ffffe;
 		}
 
@@ -308,7 +308,7 @@ skip_trailer:
 		goto update_registers;
 	}
 
-	if (reclen != ((static_cast<int>(buffer[1]) << 8) | buffer[0]))
+	if (reclen != ((((int) buffer[1]) << 8) | buffer[0]))
 	{   /* eject tape */
 		logerror("Tape error\n");
 		m_tape[tap_sel].img->unload();
@@ -410,7 +410,7 @@ void tap_990_device::cmd_record_skip_forward()
 				goto update_registers;
 			}
 		}
-		reclen = (static_cast<int>(buffer[1]) << 8) | buffer[0];
+		reclen = (((int) buffer[1]) << 8) | buffer[0];
 		if (buffer[2] || buffer[3])
 		{   /* no idea what these bytes mean */
 			logerror("Tape format looks gooofy\n");
@@ -451,7 +451,7 @@ void tap_990_device::cmd_record_skip_forward()
 			goto update_registers;
 		}
 
-		if (reclen != ((static_cast<int>(buffer[1]) << 8) | buffer[0]))
+		if (reclen != ((((int) buffer[1]) << 8) | buffer[0]))
 		{   /* eject tape */
 			m_tape[tap_sel].img->unload();
 			m_w[0] |= w0_offline;
@@ -553,7 +553,7 @@ void tap_990_device::cmd_record_skip_reverse()
 			update_interrupt();
 			goto update_registers;
 		}
-		reclen = (static_cast<int>(buffer[1]) << 8) | buffer[0];
+		reclen = (((int) buffer[1]) << 8) | buffer[0];
 		if (buffer[2] || buffer[3])
 		{   /* no idea what these bytes mean */
 			logerror("Tape format looks gooofy\n");
@@ -600,7 +600,7 @@ void tap_990_device::cmd_record_skip_reverse()
 			update_interrupt();
 			goto update_registers;
 		}
-		if (reclen != ((static_cast<int>(buffer[1]) << 8) | buffer[0]))
+		if (reclen != ((((int) buffer[1]) << 8) | buffer[0]))
 		{   /* eject tape */
 			m_tape[tap_sel].img->unload();
 			m_w[0] |= w0_offline;

@@ -95,7 +95,7 @@ void isa8_number_9_rev_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_memory(0xc0000, 0xc0001, 0, 0, read8_delegate(FUNC(upd7220_device::read), static_cast<upd7220_device *>(m_upd7220)), write8_delegate(FUNC(upd7220_device::write), static_cast<upd7220_device *>(m_upd7220)));
+	m_isa->install_memory(0xc0000, 0xc0001, 0, 0, read8_delegate(FUNC(upd7220_device::read), (upd7220_device *)m_upd7220), write8_delegate(FUNC(upd7220_device::write), (upd7220_device *)m_upd7220));
 	m_isa->install_memory(0xc0100, 0xc03ff, 0, 0, read8_delegate(FUNC(isa8_number_9_rev_device::pal8_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::pal8_w), this));
 	m_isa->install_memory(0xc0400, 0xc0401, 0, 0, read8_delegate(FUNC(isa8_number_9_rev_device::bank_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::bank_w), this));
 	m_isa->install_memory(0xc0500, 0xc06ff, 0, 0, read8_delegate(FUNC(isa8_number_9_rev_device::overlay_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::overlay_w), this));

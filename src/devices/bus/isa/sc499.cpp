@@ -469,7 +469,7 @@ void sc499_device::check_tape()
 		{
 			// tape has changed, get new size
 			m_image_length = m_image->tapelen();
-			m_ctape_block_count = static_cast<UINT32>((m_image_length + SC499_CTAPE_BLOCK_SIZE - 1) / SC499_CTAPE_BLOCK_SIZE);
+			m_ctape_block_count = (UINT32)((m_image_length + SC499_CTAPE_BLOCK_SIZE - 1) / SC499_CTAPE_BLOCK_SIZE);
 		}
 
 		LOG1(("check_tape: tape image is %s with %d blocks", m_image->filename(), m_ctape_block_count));
@@ -1311,7 +1311,7 @@ bool sc499_ctape_image_device::call_load()
 {
 	UINT32 size;
 	io_generic io;
-	io.file = static_cast<device_image_interface *>(this);
+	io.file = (device_image_interface *)this;
 	io.procs = &image_ioprocs;
 	io.filler = 0xff;
 

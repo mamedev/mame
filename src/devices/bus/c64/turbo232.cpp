@@ -189,6 +189,8 @@ void c64_turbo232_cartridge_device::c64_cd_w(address_space &space, offs_t offset
 			case 7:
 				if (m_es & ES_M)
 				{
+					data = m_es;
+
 					switch (m_es & ES_S_MASK)
 					{
 					case ES_S_230400: m_acia->set_xtal(XTAL_3_6864MHz); break;

@@ -216,9 +216,9 @@ void mpc105_device::pci_write(pci_bus_device *pcibus, int function, int offset, 
 			break;
 
 		case 0xA0:  /* memory enable */
-			if (m_bank_enable != static_cast<UINT8>(data))
+			if (m_bank_enable != (UINT8) data)
 			{
-				m_bank_enable = static_cast<UINT8>(data);
+				m_bank_enable = (UINT8) data;
 				update_memory();
 			}
 			break;

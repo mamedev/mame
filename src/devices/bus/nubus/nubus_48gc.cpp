@@ -243,7 +243,7 @@ UINT32 jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			for (y = 0; y < m_yres; y++)
 			{
 				scanline = &bitmap.pix32(y);
-				base = reinterpret_cast<UINT32 *>(&m_vram[y * m_stride]);
+				base = (UINT32 *)&m_vram[y * m_stride];
 				for (x = 0; x < m_xres; x++)
 				{
 					*scanline++ = *base++;

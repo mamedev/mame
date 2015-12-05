@@ -181,7 +181,7 @@ bool ti99_handset_device::poll_keyboard(int num)
 				previous_key[num] = current_key = previous_key[num] & ~0x20;
 			}
 			/* post message */
-			post_message((static_cast<unsigned>(current_key) << 4) | (num << 1));
+			post_message((((unsigned)current_key) << 4) | (num << 1));
 			return true;
 		}
 	}
@@ -208,7 +208,7 @@ bool ti99_handset_device::poll_keyboard(int num)
 		previous_key[num] = current_key;
 
 		/* post message */
-		post_message((static_cast<unsigned>(current_key) << 4) | (num << 1));
+		post_message((((unsigned) current_key) << 4) | (num << 1));
 		return true;
 	}
 	return false;

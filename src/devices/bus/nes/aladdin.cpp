@@ -202,7 +202,7 @@ nes_algq_rom_device::nes_algq_rom_device(const machine_config &mconfig, const ch
 
 void nes_algn_rom_device::device_start()
 {
-	m_rom = static_cast<UINT8*>(memregion("aderom")->base());
+	m_rom = (UINT8*)memregion("aderom")->base();
 	save_item(NAME(m_lobank));
 }
 
@@ -214,7 +214,7 @@ void nes_algn_rom_device::device_reset()
 
 void nes_algq_rom_device::device_start()
 {
-	m_rom = static_cast<UINT8*>(memregion("aderom")->base());
+	m_rom = (UINT8*)memregion("aderom")->base();
 	save_item(NAME(m_lobank));
 	save_item(NAME(m_hibank));
 	save_item(NAME(m_bank_base));

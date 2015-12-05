@@ -72,7 +72,7 @@ READ8_MEMBER(generic_rom_plain_device::read_rom)
 
 READ16_MEMBER(generic_rom_plain_device::read16_rom)
 {
-	UINT16 *ROM = reinterpret_cast<UINT16 *>(m_rom);
+	UINT16 *ROM = (UINT16 *)m_rom;
 	if (offset < m_rom_size/2)
 		return ROM[offset];
 	else
@@ -81,7 +81,7 @@ READ16_MEMBER(generic_rom_plain_device::read16_rom)
 
 READ32_MEMBER(generic_rom_plain_device::read32_rom)
 {
-	UINT32 *ROM = reinterpret_cast<UINT32 *>(m_rom);
+	UINT32 *ROM = (UINT32 *)m_rom;
 	if (offset < m_rom_size/4)
 		return ROM[offset];
 	else
@@ -96,13 +96,13 @@ READ8_MEMBER(generic_rom_linear_device::read_rom)
 
 READ16_MEMBER(generic_rom_linear_device::read16_rom)
 {
-	UINT16 *ROM = reinterpret_cast<UINT16 *>(m_rom);
+	UINT16 *ROM = (UINT16 *)m_rom;
 	return ROM[offset % (m_rom_size/2)];
 }
 
 READ32_MEMBER(generic_rom_linear_device::read32_rom)
 {
-	UINT32 *ROM = reinterpret_cast<UINT32 *>(m_rom);
+	UINT32 *ROM = (UINT32 *)m_rom;
 	return ROM[offset % (m_rom_size/4)];
 }
 

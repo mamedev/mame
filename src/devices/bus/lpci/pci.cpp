@@ -210,9 +210,9 @@ READ64_MEMBER(pci_bus_device::read_64be)
 	UINT64 result = 0;
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
 	if (ACCESSING_BITS_0_31)
-		result |= static_cast<UINT64>(read(space, offset * 2 + 0, mem_mask >> 0)) << 0;
+		result |= (UINT64)read(space, offset * 2 + 0, mem_mask >> 0) << 0;
 	if (ACCESSING_BITS_32_63)
-		result |= static_cast<UINT64>(read(space, offset * 2 + 1, mem_mask >> 32)) << 32;
+		result |= (UINT64)read(space, offset * 2 + 1, mem_mask >> 32) << 32;
 	return FLIPENDIAN_INT64(result);
 }
 

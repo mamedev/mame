@@ -300,7 +300,7 @@ static const UINT8 spc7110_mode2_context_table[32][2] =
 SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
 				:  m_machine(machine)
 {
-	m_decomp_buffer = static_cast<UINT8*>(auto_alloc_array(machine, UINT8, SPC7110_DECOMP_BUFFER_SIZE));
+	m_decomp_buffer = (UINT8*)auto_alloc_array(machine, UINT8, SPC7110_DECOMP_BUFFER_SIZE);
 	reset();
 
 	for (int i = 0; i < 256; i++)
@@ -995,7 +995,7 @@ void sns_rom_spc7110_device::spc7110_update_time(UINT8 offset)
 		month--;
 		year += (year >= 90) ? 1900 : 2000;
 
-		second += static_cast<UINT32>(diff);
+		second += (UINT32)diff;
 		while (second >= 60)
 		{
 			second -= 60;
@@ -1120,7 +1120,7 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 			adjust = spc7110_data_adjust();
 			if (m_r4818 & 8)
 			{
-				adjust = static_cast<INT16>(adjust);  //16-bit sign extend
+				adjust = (INT16)adjust;  //16-bit sign extend
 			}
 
 			adjustaddr = address;
@@ -1136,7 +1136,7 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 				UINT32 increment = (m_r4818 & 1) ? spc7110_data_increment() : 1;
 				if (m_r4818 & 4)
 				{
-					increment = static_cast<INT16>(increment);  //16-bit sign extend
+					increment = (INT16)increment;  //16-bit sign extend
 				}
 
 				if ((m_r4818 & 16) == 0)
@@ -1172,7 +1172,7 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 			adjust = spc7110_data_adjust();
 			if (m_r4818 & 8)
 			{
-				adjust = static_cast<INT16>(adjust);  //16-bit sign extend
+				adjust = (INT16)adjust;  //16-bit sign extend
 			}
 
 			data = ROM[spc7110_datarom_addr(address + adjust, len)];
@@ -1324,7 +1324,7 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 				UINT32 increment = spc7110_data_adjust() & 0xff;
 				if (m_r4818 & 8)
 				{
-					increment = static_cast<INT8>(increment);  //8-bit sign extend
+					increment = (INT8)increment;  //8-bit sign extend
 				}
 				spc7110_set_data_pointer(spc7110_data_pointer() + increment);
 			}
@@ -1333,7 +1333,7 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 				UINT32 increment = spc7110_data_adjust();
 				if (m_r4818 & 8)
 				{
-					increment = static_cast<INT16>(increment);  //16-bit sign extend
+					increment = (INT16)increment;  //16-bit sign extend
 				}
 				spc7110_set_data_pointer(spc7110_data_pointer() + increment);
 			}
@@ -1362,7 +1362,7 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 				UINT32 increment = spc7110_data_adjust() & 0xff;
 				if (m_r4818 & 8)
 				{
-					increment = static_cast<INT8>(increment);  //8-bit sign extend
+					increment = (INT8)increment;  //8-bit sign extend
 				}
 				spc7110_set_data_pointer(spc7110_data_pointer() + increment);
 			}
@@ -1371,7 +1371,7 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 				UINT32 increment = spc7110_data_adjust();
 				if (m_r4818 & 8)
 				{
-					increment = static_cast<INT16>(increment);  //16-bit sign extend
+					increment = (INT16)increment;  //16-bit sign extend
 				}
 				spc7110_set_data_pointer(spc7110_data_pointer() + increment);
 			}
@@ -1406,8 +1406,8 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 			if (m_r482e & 1)
 			{
 				//signed 16-bit x 16-bit multiplication
-				INT16 r0 = static_cast<INT16>(m_r4824 + (m_r4825 << 8));
-				INT16 r1 = static_cast<INT16>(m_r4820 + (m_r4821 << 8));
+				INT16 r0 = (INT16)(m_r4824 + (m_r4825 << 8));
+				INT16 r1 = (INT16)(m_r4820 + (m_r4821 << 8));
 
 				INT32 result = r0 * r1;
 				m_r4828 = result;
@@ -1418,8 +1418,8 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 			else
 			{
 				//unsigned 16-bit x 16-bit multiplication
-				UINT16 r0 = static_cast<UINT16>(m_r4824 + (m_r4825 << 8));
-				UINT16 r1 = static_cast<UINT16>(m_r4820 + (m_r4821 << 8));
+				UINT16 r0 = (UINT16)(m_r4824 + (m_r4825 << 8));
+				UINT16 r1 = (UINT16)(m_r4820 + (m_r4821 << 8));
 
 				UINT32 result = r0 * r1;
 				m_r4828 = result;
@@ -1440,16 +1440,16 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 			if (m_r482e & 1)
 			{
 				//signed 32-bit x 16-bit division
-				INT32 dividend = static_cast<INT32>(m_r4820 + (m_r4821 << 8) + (m_r4822 << 16) + (m_r4823 << 24));
-				INT16 divisor  = static_cast<INT16>(m_r4826 + (m_r4827 << 8));
+				INT32 dividend = (INT32)(m_r4820 + (m_r4821 << 8) + (m_r4822 << 16) + (m_r4823 << 24));
+				INT16 divisor  = (INT16)(m_r4826 + (m_r4827 << 8));
 
 				INT32 quotient;
 				INT16 remainder;
 
 				if (divisor)
 				{
-					quotient  = static_cast<INT32>(dividend / divisor);
-					remainder = static_cast<INT32>(dividend % divisor);
+					quotient  = (INT32)(dividend / divisor);
+					remainder = (INT32)(dividend % divisor);
 				}
 				else
 				{
@@ -1469,16 +1469,16 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 			else
 			{
 				//unsigned 32-bit x 16-bit division
-				UINT32 dividend = static_cast<UINT32>(m_r4820 + (m_r4821 << 8) + (m_r4822 << 16) + (m_r4823 << 24));
-				UINT16 divisor  = static_cast<UINT16>(m_r4826 + (m_r4827 << 8));
+				UINT32 dividend = (UINT32)(m_r4820 + (m_r4821 << 8) + (m_r4822 << 16) + (m_r4823 << 24));
+				UINT16 divisor  = (UINT16)(m_r4826 + (m_r4827 << 8));
 
 				UINT32 quotient;
 				UINT16 remainder;
 
 				if (divisor)
 				{
-					quotient  = static_cast<UINT32>(dividend / divisor);
-					remainder = static_cast<UINT16>(dividend % divisor);
+					quotient  = (UINT32)(dividend / divisor);
+					remainder = (UINT16)(dividend % divisor);
 				}
 				else
 				{
@@ -1575,7 +1575,7 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 					{
 						m_r4842 = 0x80;
 						m_rtc_state = RTCS_IndexSelect;
-						m_rtc_mode = static_cast<RTC_Mode>(data);
+						m_rtc_mode = (RTC_Mode)data;
 						m_rtc_index = 0;
 					}
 					break;

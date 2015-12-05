@@ -97,7 +97,7 @@ void beckerport_device::device_start(void)
 	file_error filerr = osd_open(chAddress, 0, &m_pSocket, &filesize);
 	if (filerr != FILERR_NONE)
 	{
-		osd_printf_verbose("Error: osd_open returned error %i!\n", static_cast<int>(filerr));
+		osd_printf_verbose("Error: osd_open returned error %i!\n", (int) filerr);
 		return;
 	}
 
@@ -167,7 +167,7 @@ READ8_MEMBER(beckerport_device::read)
 			fprintf(stderr, "%s: read from bad offset %d\n", __FILE__, offset);
 	}
 
-	return static_cast<int>(data);
+	return (int)data;
 }
 
 /*-------------------------------------------------
@@ -176,7 +176,7 @@ READ8_MEMBER(beckerport_device::read)
 
 WRITE8_MEMBER(beckerport_device::write)
 {
-	char d = static_cast<char>(data);
+	char d = (char)data;
 	file_error filerr;
 
 	if (m_pSocket == nullptr)

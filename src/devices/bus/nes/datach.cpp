@@ -188,7 +188,7 @@ nes_datach_24c01_device::nes_datach_24c01_device(const machine_config &mconfig, 
 
 void nes_datach_rom_device::device_start()
 {
-	m_rom = static_cast<UINT8*>(memregion("datachrom")->base());
+	m_rom = (UINT8*)memregion("datachrom")->base();
 	save_item(NAME(m_bank));
 }
 

@@ -534,8 +534,8 @@ public:
 
 	const char* to_string()
 	{
-		if (m_detail==nullptr) return error_text[static_cast<int>(m_err)];
-		std::string errormsg = std::string(error_text[static_cast<int>(m_err)]).append(": ").append(m_detail);
+		if (m_detail==nullptr) return error_text[(int)m_err];
+		std::string errormsg = std::string(error_text[(int)m_err]).append(": ").append(m_detail);
 		return core_strdup(errormsg.c_str());
 	}
 

@@ -29,7 +29,7 @@ void sbp_prot_device::device_reset()
 
 READ16_MEMBER( sbp_prot_device::sbp_lowerrom_r )
 {
-	UINT16* rom = reinterpret_cast<UINT16*>(m_mainrom);
+	UINT16* rom = (UINT16*)m_mainrom;
 	UINT16 origdata = rom[(offset+(0x200/2))];
 	UINT16 data =  BITSWAP16(origdata, 11,10,9,8,15,14,13,12,3,2,1,0,7,6,5,4);
 	int realoffset = 0x200+(offset*2);
@@ -78,7 +78,7 @@ void sbp_prot_device::sbp_install_protection(cpu_device* maincpu, UINT8* cpurom,
 
 	/* the game code clears the text overlay used ingame immediately after writing it.. why? protection? sloppy code that the hw ignores? imperfect emulation? */
 	{
-		UINT16* rom = reinterpret_cast<UINT16*>(cpurom);
+		UINT16* rom = (UINT16*)cpurom;
 
 		rom[0x2a6f8 / 2] = 0x4e71;
 		rom[0x2a6fa / 2] = 0x4e71;
