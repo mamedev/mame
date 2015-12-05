@@ -3746,6 +3746,8 @@ ROM_END
 
 */
 
+
+
 ROM_START( glpracr2 )
 	TPS_BIOS
 
@@ -3756,8 +3758,8 @@ ROM_START( glpracr2 )
 	ROM_LOAD( "gra2-1.218",          0x0c00000, 0x400000, CRC(28ce033c) SHA1(4dc53e5c82fde683efd72c66b397d56aa72d52b9) )
 	ROM_LOAD( "gra2-2.219",          0x1000000, 0x400000, CRC(0c9cb7da) SHA1(af23c11e69428413ff4d1c2746adb786de927cb5) )
 	ROM_LOAD( "gra2-3.220",          0x1400000, 0x400000, CRC(264e3a0c) SHA1(c1509b16d7192b9f61dbceb299290239219adefd) )
-	ROM_LOAD( "gra2-4.221",          0x1800000, 0x400000, CRC(2b070307) SHA1(43c028aaca297358f87c6633c2020d71e34317b8) )
-	ROM_LOAD( "gra2-5.222",          0x1c00000, 0x400000, CRC(94a363c1) SHA1(4c53822a672ac99b001c9fe82f9d0f8496989e67) )
+	ROM_LOAD( "gra2-4.221",          0x1800000, 0x400000, BAD_DUMP CRC(2b070307) SHA1(43c028aaca297358f87c6633c2020d71e34317b8) ) // gra2-4.221                                      BADADDR  xxxxxxxxxxxxxxxxxx-xxx
+	ROM_LOAD( "gra2-5.222",          0x1c00000, 0x400000, BAD_DUMP CRC(94a363c1) SHA1(4c53822a672ac99b001c9fe82f9d0f8496989e67) ) // gra2-5.222                                      BADADDR  xxxxxxxxxxxxxxxxxxx--x
 	ROM_LOAD( "gra2-6.223",          0x2000000, 0x400000, CRC(8c6b4c4c) SHA1(0053f736dcd437c01da8cadd820e8af658ce6077) )
 	ROM_LOAD( "gra2-7.323",          0x2400000, 0x400000, CRC(7dfb6c54) SHA1(6e9a9a4172f957ba354ddd82c30735a56c5934b1) )
 ROM_END
@@ -3772,8 +3774,8 @@ ROM_START( glpracr2j )
 	ROM_LOAD( "gra2-1.218",          0x0c00000, 0x400000, CRC(28ce033c) SHA1(4dc53e5c82fde683efd72c66b397d56aa72d52b9) )
 	ROM_LOAD( "gra2-2.219",          0x1000000, 0x400000, CRC(0c9cb7da) SHA1(af23c11e69428413ff4d1c2746adb786de927cb5) )
 	ROM_LOAD( "gra2-3.220",          0x1400000, 0x400000, CRC(264e3a0c) SHA1(c1509b16d7192b9f61dbceb299290239219adefd) )
-	ROM_LOAD( "gra2-4.221",          0x1800000, 0x400000, CRC(2b070307) SHA1(43c028aaca297358f87c6633c2020d71e34317b8) )
-	ROM_LOAD( "gra2-5.222",          0x1c00000, 0x400000, CRC(94a363c1) SHA1(4c53822a672ac99b001c9fe82f9d0f8496989e67) )
+	ROM_LOAD( "gra2-4.221",          0x1800000, 0x400000, BAD_DUMP CRC(2b070307) SHA1(43c028aaca297358f87c6633c2020d71e34317b8) ) // gra2-4.221                                      BADADDR  xxxxxxxxxxxxxxxxxx-xxx
+	ROM_LOAD( "gra2-5.222",          0x1c00000, 0x400000, BAD_DUMP CRC(94a363c1) SHA1(4c53822a672ac99b001c9fe82f9d0f8496989e67) ) // gra2-5.222                                      BADADDR  xxxxxxxxxxxxxxxxxxx--x
 	ROM_LOAD( "gra2-6.223",          0x2000000, 0x400000, CRC(8c6b4c4c) SHA1(0053f736dcd437c01da8cadd820e8af658ce6077) )
 	ROM_LOAD( "gra2-7.323",          0x2400000, 0x400000, CRC(7dfb6c54) SHA1(6e9a9a4172f957ba354ddd82c30735a56c5934b1) )
 ROM_END
@@ -3788,8 +3790,8 @@ ROM_START( glpracr2l )
 	ROM_LOAD( "gra2-1.218",          0x0c00000, 0x400000, CRC(28ce033c) SHA1(4dc53e5c82fde683efd72c66b397d56aa72d52b9) )
 	ROM_LOAD( "gra2-2.219",          0x1000000, 0x400000, CRC(0c9cb7da) SHA1(af23c11e69428413ff4d1c2746adb786de927cb5) )
 	ROM_LOAD( "gra2-3.220",          0x1400000, 0x400000, CRC(264e3a0c) SHA1(c1509b16d7192b9f61dbceb299290239219adefd) )
-	ROM_LOAD( "gra2-4.221",          0x1800000, 0x400000, CRC(2b070307) SHA1(43c028aaca297358f87c6633c2020d71e34317b8) )
-	ROM_LOAD( "gra2-5.222",          0x1c00000, 0x400000, CRC(94a363c1) SHA1(4c53822a672ac99b001c9fe82f9d0f8496989e67) )
+	ROM_LOAD( "gra2-4.221",          0x1800000, 0x400000, BAD_DUMP CRC(2b070307) SHA1(43c028aaca297358f87c6633c2020d71e34317b8) ) // gra2-4.221                                      BADADDR  xxxxxxxxxxxxxxxxxx-xxx
+	ROM_LOAD( "gra2-5.222",          0x1c00000, 0x400000, BAD_DUMP CRC(94a363c1) SHA1(4c53822a672ac99b001c9fe82f9d0f8496989e67) ) // gra2-5.222                                      BADADDR  xxxxxxxxxxxxxxxxxxx--x
 	ROM_LOAD( "gra2-6.223",          0x2000000, 0x400000, CRC(8c6b4c4c) SHA1(0053f736dcd437c01da8cadd820e8af658ce6077) )
 	ROM_LOAD( "gra2-7.323",          0x2400000, 0x400000, CRC(7dfb6c54) SHA1(6e9a9a4172f957ba354ddd82c30735a56c5934b1) )
 
