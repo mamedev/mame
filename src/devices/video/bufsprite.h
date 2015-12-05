@@ -80,7 +80,7 @@ public:
 
 protected:
 	// first-time setup
-	virtual void device_start()
+	virtual void device_start() override
 	{
 		if (m_spriteram != nullptr)
 		{

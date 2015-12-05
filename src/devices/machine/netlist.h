@@ -68,7 +68,7 @@ public:
 	{
 	}
 
-	bool parse(netlist::setup_t &setup, const pstring &name);
+	bool parse(netlist::setup_t &setup, const pstring &name) override;
 private:
 	pstring m_name;
 };
@@ -97,7 +97,7 @@ public:
 
 protected:
 
-	void vlog(const plog_level &l, const pstring &ls) const;
+	void vlog(const plog_level &l, const pstring &ls) const override;
 
 private:
 	netlist_mame_device_t &m_parent;
@@ -133,15 +133,15 @@ protected:
 	virtual void nl_register_devices() { };
 
 	// device_t overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_stop();
-	virtual void device_reset();
-	virtual void device_post_load();
-	virtual void device_pre_save();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
+	virtual void device_pre_save() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	//virtual void device_debug_setup();
-	virtual void device_clock_changed();
+	virtual void device_clock_changed() override;
 
 	netlist::netlist_time m_div;
 
@@ -183,12 +183,12 @@ public:
 
 protected:
 	// netlist_mame_device_t
-	virtual void nl_register_devices();
+	virtual void nl_register_devices() override;
 
 	// device_t overrides
 
 	//virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_start() override;
 	//virtual void device_stop();
 	//virtual void device_reset();
 	//virtual void device_post_load();
@@ -197,21 +197,21 @@ protected:
 
 	// device_execute_interface overrides
 
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const;
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const;
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override;
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override;
 
-	ATTR_HOT virtual void execute_run();
+	ATTR_HOT virtual void execute_run() override;
 
 	// device_disasm_interface overrides
-	ATTR_COLD virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	ATTR_COLD virtual UINT32 disasm_max_opcode_bytes() const { return 1; }
-	ATTR_COLD virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	ATTR_COLD virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	ATTR_COLD virtual UINT32 disasm_max_opcode_bytes() const override { return 1; }
+	ATTR_COLD virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// device_memory_interface overrides
 
 	address_space_config m_program_config;
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
 	{
 		switch (spacenum)
 		{
@@ -223,7 +223,7 @@ protected:
 
 	//  device_state_interface overrides
 
-	virtual void state_string_export(const device_state_entry &entry, std::string &str)
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) override
 	{
 		if (entry.index() >= 0)
 		{
@@ -263,16 +263,16 @@ public:
 
 	// device_sound_interface overrides
 
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 protected:
 	// netlist_mame_device_t
-	virtual void nl_register_devices();
+	virtual void nl_register_devices() override;
 
 	// device_t overrides
 
 	//virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_start() override;
 	//virtual void device_stop();
 	//virtual void device_reset();
 	//virtual void device_post_load();
@@ -372,7 +372,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	netlist::param_double_t *m_param;
@@ -399,8 +399,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void custom_netlist_additions(netlist::setup_t &setup);
+	virtual void device_start() override;
+	virtual void custom_netlist_additions(netlist::setup_t &setup) override;
 
 private:
 	pstring m_in;
@@ -439,8 +439,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override
 	{
 		if (is_sound_device())
 			update_to_current_time();
@@ -471,8 +471,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void custom_netlist_additions(netlist::setup_t &setup);
+	virtual void device_start() override;
+	virtual void custom_netlist_additions(netlist::setup_t &setup) override;
 private:
 	UINT32 m_channel;
 	pstring m_param_name;
@@ -495,8 +495,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void custom_netlist_additions(netlist::setup_t &setup);
+	virtual void device_start() override;
+	virtual void custom_netlist_additions(netlist::setup_t &setup) override;
 private:
 	UINT32 m_channel;
 	pstring m_out_name;
@@ -511,14 +511,14 @@ public:
 	NETLIB_NAME(analog_callback)()
 		: device_t(), m_cpu_device(nullptr), m_last(0) { }
 
-	ATTR_COLD void start()
+	ATTR_COLD void start() override
 	{
 		register_input("IN", m_in);
 		m_cpu_device = downcast<netlist_mame_cpu_device_t *>(&downcast<netlist_mame_t &>(netlist()).parent());
 		save(NLNAME(m_last));
 	}
 
-	ATTR_COLD void reset()
+	ATTR_COLD void reset() override
 	{
 		m_last = 0.0;
 	}
@@ -528,7 +528,7 @@ public:
 		m_callback = callback;
 	}
 
-	ATTR_HOT void update()
+	ATTR_HOT void update() override
 	{
 		nl_double cur = INPANALOG(m_in);
 
@@ -562,7 +562,7 @@ public:
 
 	static const int BUFSIZE = 2048;
 
-	ATTR_COLD void start()
+	ATTR_COLD void start() override
 	{
 		register_input("IN", m_in);
 		register_param("CHAN", m_channel, 0);
@@ -572,7 +572,7 @@ public:
 		save(NAME(m_last_buffer));
 	}
 
-	ATTR_COLD void reset()
+	ATTR_COLD void reset() override
 	{
 		m_cur = 0.0;
 		m_last_pos = 0;
@@ -590,7 +590,7 @@ public:
 		}
 	}
 
-	ATTR_HOT void update()
+	ATTR_HOT void update() override
 	{
 		nl_double val = INPANALOG(m_in) * m_mult.Value() + m_offset.Value();
 		sound_update(netlist().time());
@@ -636,7 +636,7 @@ public:
 
 	static const int MAX_INPUT_CHANNELS = 10;
 
-	ATTR_COLD void start()
+	ATTR_COLD void start() override
 	{
 		// clock part
 		register_output("Q", m_Q);
@@ -655,7 +655,7 @@ public:
 		m_num_channel = 0;
 	}
 
-	ATTR_COLD void reset()
+	ATTR_COLD void reset() override
 	{
 		m_pos = 0;
 		for (auto & elem : m_buffer)
@@ -678,7 +678,7 @@ public:
 		return m_num_channel;
 	}
 
-	ATTR_HOT void update()
+	ATTR_HOT void update() override
 	{
 		for (int i=0; i<m_num_channel; i++)
 		{

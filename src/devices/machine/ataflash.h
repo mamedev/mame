@@ -23,13 +23,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual attotime seek_time();
-	virtual void process_command();
-	virtual void process_buffer();
-	virtual bool is_ready();
+	virtual attotime seek_time() override;
+	virtual void process_command() override;
+	virtual void process_buffer() override;
+	virtual bool is_ready() override;
 
 private:
 	UINT8 m_cis[512];

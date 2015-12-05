@@ -822,8 +822,8 @@ public:
 
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	osd_work_queue *m_work_queue;
 	osd_work_item *m_blitter_request;

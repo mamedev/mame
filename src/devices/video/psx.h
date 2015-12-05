@@ -190,7 +190,7 @@ class psxgpu_device : public device_t
 public:
 	// construction/destruction
 	psxgpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_vblank_handler(device_t &device, _Object object) { return downcast<psxgpu_device &>(device).m_vblank_handler.set_callback(object); }
@@ -206,8 +206,8 @@ public:
 	DECLARE_PALETTE_INIT( psx );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	void updatevisiblearea();

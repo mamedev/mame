@@ -99,9 +99,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_stop();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
 private:
 	// internal state
 	struct voodoo_state *m_token;
@@ -113,7 +113,7 @@ public:
 	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type VOODOO_1;
@@ -124,7 +124,7 @@ public:
 	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type VOODOO_2;
@@ -145,7 +145,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	DECLARE_READ32_MEMBER( banshee_agp_r );
 	DECLARE_WRITE32_MEMBER( banshee_agp_w );
 	DECLARE_READ8_MEMBER( banshee_vga_r );
@@ -160,7 +160,7 @@ public:
 	voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type VOODOO_3;

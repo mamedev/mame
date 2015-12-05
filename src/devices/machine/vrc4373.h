@@ -63,9 +63,9 @@ class vrc4373_device : public pci_host_device {
 public:
 	vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void reset_all_mappings();
+	virtual void reset_all_mappings() override;
 	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
+							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
 
 	void set_cpu_tag(const char *tag);
 
@@ -96,9 +96,9 @@ public:
 
 protected:
 	address_space *m_cpu_space;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	void dma_transfer(int which);
 
 private:

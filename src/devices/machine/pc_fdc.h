@@ -33,7 +33,7 @@ public:
 
 	required_device<upd765a_device> fdc;
 
-	virtual DECLARE_ADDRESS_MAP(map, 8);
+	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 
 	virtual void tc_w(bool state) override;
 	virtual UINT8 dma_r() override;
@@ -66,7 +66,7 @@ class pc_fdc_xt_device : public pc_fdc_family_device {
 public:
 	pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8);
+	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 	WRITE8_MEMBER(dor_fifo_w);
 };
 
@@ -74,7 +74,7 @@ class pc_fdc_at_device : public pc_fdc_family_device {
 public:
 	pc_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8);
+	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 };
 
 extern const device_type PC_FDC_XT;

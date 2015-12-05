@@ -25,7 +25,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	void reg_w(ATTR_UNUSED UINT8 reg, UINT8 data);

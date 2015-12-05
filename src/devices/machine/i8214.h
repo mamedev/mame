@@ -67,7 +67,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	inline void trigger_interrupt(int level);

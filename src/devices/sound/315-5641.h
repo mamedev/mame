@@ -12,7 +12,7 @@ public:
 	sega_315_5641_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	UINT8 get_fifo_space();
-	void advance_state();
+	void advance_state() override;
 	DECLARE_WRITE8_MEMBER(port_w);
 
 	UINT8       m_fifo_data[0x40];
@@ -21,8 +21,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 
 };

@@ -37,9 +37,9 @@ public:
 
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void queue_insert(UINT8 data);
 	void clear_buffer(void);
 
@@ -91,12 +91,12 @@ public:
 		{ downcast<at_keyboard_device &>(device).m_scan_code_set = default_set; downcast<at_keyboard_device &>(device).m_type = type; }
 
 protected:
-	virtual void device_reset();
-	virtual void device_start();
+	virtual void device_reset() override;
+	virtual void device_start() override;
 
 private:
-	virtual void standard_scancode_insert(int our_code, int pressed);
-	virtual void extended_scancode_insert(int code, int pressed);
+	virtual void standard_scancode_insert(int our_code, int pressed) override;
+	virtual void extended_scancode_insert(int code, int pressed) override;
 	void helper(const char *codes);
 	void clear_buffer_and_acknowledge(void);
 
