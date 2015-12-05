@@ -124,10 +124,6 @@ class m50740_device : public m5074x_device
 public:
 	m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	m50740_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-
-protected:
-
-private:
 };
 
 class m50741_device : public m5074x_device
@@ -135,10 +131,6 @@ class m50741_device : public m5074x_device
 public:
 	m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	m50741_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-
-protected:
-
-private:
 };
 
 extern const device_type M50740;

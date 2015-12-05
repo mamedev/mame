@@ -33,8 +33,8 @@ public:
 	}
 
 	char *buffer() { return m_buffer; }
-	int length() { return m_pc; }
-	int flags() { return m_flags; }
+	int length() const { return m_pc; }
+	int flags() const { return m_flags; }
 
 private:
 	const UINT8 *m_oprom;

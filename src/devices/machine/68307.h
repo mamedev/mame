@@ -122,8 +122,6 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
 	virtual void device_reset();
-
-private:
 };
 
 static const device_type M68307 = &device_creator<m68307cpu_device>;

@@ -44,14 +44,6 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
 	virtual void device_reset();
-
-
-private:
-	// devices/pointers
-
-	// internal state
-
-	// callbacks
 };
 
 

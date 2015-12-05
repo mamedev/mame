@@ -91,7 +91,7 @@ x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, dev
 		m_region(*this, DEVICE_SELF),
 		m_rate(0),
 		m_adr(0),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_sound_enable(0),
 		m_base_clock(0)
 {

@@ -28,7 +28,6 @@ protected:
 	virtual void device_start();
 
 private:
-	private:
 	void reg_w(ATTR_UNUSED UINT8 reg, UINT8 data);
 	UINT8 reg_r(ATTR_UNUSED UINT8 reg);
 

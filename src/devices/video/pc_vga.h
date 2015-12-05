@@ -265,7 +265,6 @@ protected:
 		UINT8 rgb32_en;
 		UINT8 id;
 	}svga;
-private:
 };
 
 // ======================> ibm8514_device
@@ -652,9 +651,6 @@ public:
 	virtual WRITE8_MEMBER(port_03d0_w);
 	virtual READ8_MEMBER(mem_r);
 	virtual WRITE8_MEMBER(mem_w);
-
-protected:
-private:
 };
 
 

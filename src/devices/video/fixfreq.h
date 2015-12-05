@@ -151,9 +151,6 @@ private:
 	int m_sig_vsync;
 	int m_sig_composite;
 	int m_sig_field;
-
-protected:
-
 };
 
 

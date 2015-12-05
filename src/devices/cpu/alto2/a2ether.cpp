@@ -47,7 +47,7 @@
 static const prom_load_t pl_enet_a41 =
 {   /* P3601 256x4 BPROM; Ethernet phase encoder 1 "PE1" */
 	"enet.a41",
-	0,
+	nullptr,
 	"d5de8d86",
 	"c134a4c898c73863124361a9b0218f7a7f00082a",
 	/* size */  0400,
@@ -64,7 +64,7 @@ static const prom_load_t pl_enet_a41 =
 static const prom_load_t pl_enet_a42 =
 {   /* P3601 256x4 BPROM; Ethernet phase encoder 2 "PE2" */
 	"enet.a42",
-	0,
+	nullptr,
 	"9d5c81bd",
 	"ac7e63332a3dad0bef7cd0349b24e156a96a4bf0",
 	/* size */  0400,
@@ -106,7 +106,7 @@ static const prom_load_t pl_enet_a42 =
 static const prom_load_t pl_enet_a49 =
 {   /* P3601 256x4 BPROM; Ethernet FIFO control "AFIFO" */
 	"enet.a49",
-	0,
+	nullptr,
 	"4d2dcdb2",
 	"583327a7d70cd02702c941c0e43c1e9408ff7fd0",
 	/* size */  0400,

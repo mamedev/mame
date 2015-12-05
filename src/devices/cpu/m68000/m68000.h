@@ -427,7 +427,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 class m68301_device : public m68000_base_device
@@ -447,7 +446,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 
@@ -470,7 +468,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 class m68008plcc_device : public m68000_base_device
@@ -490,7 +487,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 class m68010_device : public m68000_base_device
@@ -510,7 +506,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 class m68ec020_device : public m68000_base_device
@@ -530,7 +525,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 class m68020_device : public m68000_base_device
@@ -550,7 +544,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 class m68020fpu_device : public m68000_base_device
@@ -570,7 +563,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 class m68020pmmu_device : public m68000_base_device
@@ -590,7 +582,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 class m68020hmmu_device : public m68000_base_device
@@ -612,7 +603,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 class m68ec030_device : public m68000_base_device
@@ -632,7 +622,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 class m68030_device : public m68000_base_device
@@ -652,7 +641,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 class m68ec040_device : public m68000_base_device
@@ -672,7 +660,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 class m68lc040_device : public m68000_base_device
@@ -692,7 +679,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 class m68040_device : public m68000_base_device
@@ -712,7 +698,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 class scc68070_device : public m68000_base_device
@@ -732,7 +717,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 
@@ -758,7 +742,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 
@@ -781,7 +764,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-protected:
 };
 
 

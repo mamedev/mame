@@ -131,7 +131,6 @@ public:
 	};
 	void step(void);
 	void reset(void);
-protected:
 private:
 	DISCRETE_CLASS_INPUT(I_IN0,     0);
 	DISCRETE_CLASS_INPUT(I_IN1,     1);

@@ -143,7 +143,7 @@ private:
 	void timer0_tick(bool ext_line = false);
 	void timer1_tick();
 	void base_timer_tick();
-	void dasm_arg(UINT8 op, char *buffer, offs_t pc, int arg, const UINT8 *oprom, int &pos);
+	static void dasm_arg(UINT8 op, char *buffer, offs_t pc, int arg, const UINT8 *oprom, int &pos);
 
 	// opcodes handlers
 	int op_nop();

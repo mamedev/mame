@@ -839,11 +839,11 @@ void alto2_cpu_device::reset_memory()
 {
 	if (m_mem.ram) {
 		auto_free(machine(), m_mem.ram);
-		m_mem.ram = 0;
+		m_mem.ram = nullptr;
 	}
 	if (m_mem.hpb) {
 		auto_free(machine(), m_mem.hpb);
-		m_mem.hpb = 0;
+		m_mem.hpb = nullptr;
 	}
 	// allocate 64K or 128K words of main memory
 	ioport_port* config = ioport(":CONFIG");
