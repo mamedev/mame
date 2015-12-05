@@ -273,10 +273,10 @@ READ8_MEMBER(cpc_symbiface2_device::rom_rewrite_r)
 	if(bank >= 32)
 		return 0xff;
 
-	m_4xxx_ptr_r = (UINT8*)machine().root_device().membank("bank3")->base();
-	m_4xxx_ptr_w = (UINT8*)machine().root_device().membank("bank11")->base();
-	m_6xxx_ptr_r = (UINT8*)machine().root_device().membank("bank4")->base();
-	m_6xxx_ptr_w = (UINT8*)machine().root_device().membank("bank12")->base();
+	m_4xxx_ptr_r = static_cast<UINT8*>(machine().root_device().membank("bank3")->base());
+	m_4xxx_ptr_w = static_cast<UINT8*>(machine().root_device().membank("bank11")->base());
+	m_6xxx_ptr_r = static_cast<UINT8*>(machine().root_device().membank("bank4")->base());
+	m_6xxx_ptr_w = static_cast<UINT8*>(machine().root_device().membank("bank12")->base());
 	machine().root_device().membank("bank3")->set_base(&m_rom_space[bank*16384]);
 	machine().root_device().membank("bank4")->set_base(&m_rom_space[bank*16384+8192]);
 	machine().root_device().membank("bank11")->set_base(&m_rom_space[bank*16384]);

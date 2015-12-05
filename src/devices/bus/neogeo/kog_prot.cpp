@@ -46,7 +46,7 @@ void kog_prot_device::kog_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 	/* the protection chip does some *very* strange things to the rom */
 	UINT8 *src = cpurom;
 	dynamic_buffer dst( 0x600000 );
-	UINT16 *rom = (UINT16 *)cpurom;
+	UINT16 *rom = reinterpret_cast<UINT16 *>(cpurom);
 	int i;
 	static const int sec[] = { 0x3, 0x8, 0x7, 0xC, 0x1, 0xA, 0x6, 0xD };
 

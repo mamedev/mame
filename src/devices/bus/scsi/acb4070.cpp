@@ -53,7 +53,7 @@ void acb4070_device::WriteData( UINT8 *data, int dataLength )
 	switch( command[ 0 ] )
 	{
 	case T10SPC_CMD_MODE_SELECT_6:
-		adaptec_sense_t *sense=(adaptec_sense_t *) data;
+		adaptec_sense_t *sense=reinterpret_cast<adaptec_sense_t *>(data);
 		int tracks=(sense->cylinder_count[0]<<8)+sense->cylinder_count[1];
 		int capacity=(tracks * sense->head_count * 17);
 		logerror("Tracks=%d, Heads=%d sec/track=%d\n",tracks,sense->head_count,sense->sectors_per_track);

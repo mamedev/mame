@@ -45,7 +45,7 @@ static INPUT_PORTS_START( sms_light_phaser )
 	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_CHANGED_MEMBER(DEVICE_SELF, sms_light_phaser_device, position_changed, nullptr)
 
 	PORT_START("LPHASER_Y")
-	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_CHANGED_MEMBER(DEVICE_SELF, sms_light_phaser_device, position_changed, 0)
+	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_CHANGED_MEMBER(DEVICE_SELF, sms_light_phaser_device, position_changed, nullptr)
 INPUT_PORTS_END
 
 
@@ -172,7 +172,7 @@ int sms_light_phaser_device::bright_aim_area( emu_timer *timer, int lgun_x, int 
 			/* step 1: r^2 = dx^2 + dy^2 */
 			/* step 2: dx^2 = r^2 - dy^2 */
 			/* step 3: dx = sqrt(r^2 - dy^2) */
-			dx_radius = ceil((float) sqrt((float) (r_x_r - (dy * dy))));
+			dx_radius = ceil(static_cast<float>(sqrt(static_cast<float>(r_x_r - (dy * dy)))));
 		}
 
 		aim_area.min_x = MAX(lgun_x - dx_radius, visarea.min_x);

@@ -916,8 +916,8 @@ WRITE8_MEMBER( gkracker_device::cruwrite )
 
 INPUT_CHANGED_MEMBER( gkracker_device::gk_changed )
 {
-	if (TRACE_GKRACKER) logerror("%s: Input changed %d - %d\n", tag(), (int)((UINT64)param & 0x07), newval);
-	m_gk_switch[(UINT64)param & 0x07] = newval;
+	if (TRACE_GKRACKER) logerror("%s: Input changed %d - %d\n", tag(), static_cast<int>(reinterpret_cast<UINT64>(param) & 0x07), newval);
+	m_gk_switch[reinterpret_cast<UINT64>(param) & 0x07] = newval;
 }
 
 void gkracker_device::insert(int index, ti99_cartridge_device* cart)
@@ -938,12 +938,12 @@ void gkracker_device::remove(int index)
 void gkracker_device::gk_install_menu(const char* menutext, int len, int ptr, int next, int start)
 {
 	const int base = 0x0000;
-	m_ram_ptr[base + ptr] = (UINT8)((next >> 8) & 0xff);
-	m_ram_ptr[base + ptr+1] = (UINT8)(next & 0xff);
-	m_ram_ptr[base + ptr+2] = (UINT8)((start >> 8) & 0xff);
-	m_ram_ptr[base + ptr+3] = (UINT8)(start & 0xff);
+	m_ram_ptr[base + ptr] = static_cast<UINT8>((next >> 8) & 0xff);
+	m_ram_ptr[base + ptr+1] = static_cast<UINT8>(next & 0xff);
+	m_ram_ptr[base + ptr+2] = static_cast<UINT8>((start >> 8) & 0xff);
+	m_ram_ptr[base + ptr+3] = static_cast<UINT8>(start & 0xff);
 
-	m_ram_ptr[base + ptr+4] = (UINT8)(len & 0xff);
+	m_ram_ptr[base + ptr+4] = static_cast<UINT8>(len & 0xff);
 	memcpy(m_ram_ptr + base + ptr+5, menutext, len);
 }
 
@@ -2276,7 +2276,7 @@ rpk_socket* rpk_reader::load_rom_resource(zip_file* zip, xml_data_node* rom_reso
 	if (sha1 != nullptr)
 	{
 		hash_collection actual_hashes;
-		actual_hashes.compute((const UINT8 *)contents, length, hash_collection::HASH_TYPES_CRC_SHA1);
+		actual_hashes.compute(static_cast<const UINT8 *>(contents), length, hash_collection::HASH_TYPES_CRC_SHA1);
 
 		hash_collection expected_hashes;
 		expected_hashes.add_from_string(hash_collection::HASH_SHA1, sha1, strlen(sha1));
@@ -2495,7 +2495,7 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 			if (!found) throw rpk_exception(RPK_INVALID_RESOURCE_REF, uses_name);
 		}
 	}
-	catch (rpk_exception &exp)
+	catch (rpk_exception)
 	{
 		newrpk->close();
 		if (layout_xml != nullptr)     xml_file_free(layout_xml);

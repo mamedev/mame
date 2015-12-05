@@ -96,11 +96,11 @@ READ16_MEMBER( ti_exp_video_device::read16 )
 
 	if (offset & 1)
 	{   /* read VDP status */
-		return ((int) m_v9938->status_r()) << 8;
+		return static_cast<int>(m_v9938->status_r()) << 8;
 	}
 	else
 	{   /* read VDP RAM */
-		return ((int) m_v9938->vram_r()) << 8;
+		return static_cast<int>(m_v9938->vram_r()) << 8;
 	}
 }
 

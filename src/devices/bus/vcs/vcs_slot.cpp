@@ -308,7 +308,7 @@ bool vcs_cart_slot_device::call_load()
 
 		// pass a pointer to the now allocated ROM for the DPC chip
 		if (m_type == A26_DPC)
-			m_cart->setup_addon_ptr((UINT8 *)m_cart->get_rom_base() + 0x2000);
+			m_cart->setup_addon_ptr(static_cast<UINT8 *>(m_cart->get_rom_base()) + 0x2000);
 
 		return IMAGE_INIT_PASS;
 	}

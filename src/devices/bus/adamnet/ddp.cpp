@@ -174,7 +174,7 @@ WRITE8_MEMBER( adam_digital_data_pack_device::p1_w )
 
 	if (m_ddp0->exists())
 	{
-		m_ddp0->set_speed(BIT(data, 0) ? (double) 80/1.875 : 20/1.875); // speed select
+		m_ddp0->set_speed(BIT(data, 0) ? static_cast<double>(80)/1.875 : 20/1.875); // speed select
 		if(!(data & 0x08)) m_ddp0->go_forward();
 		if(!(data & 0x10)) m_ddp0->go_reverse();
 		m_ddp0->change_state(BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR); // motor control
@@ -182,7 +182,7 @@ WRITE8_MEMBER( adam_digital_data_pack_device::p1_w )
 
 	if (m_ddp1->exists())
 	{
-		m_ddp1->set_speed(BIT(data, 0) ? (double) 80/1.875 : 20/1.875); // speed select
+		m_ddp1->set_speed(BIT(data, 0) ? static_cast<double>(80)/1.875 : 20/1.875); // speed select
 		if(!(data & 0x08)) m_ddp1->go_forward();
 		if(!(data & 0x10)) m_ddp1->go_reverse();
 		m_ddp1->change_state(BIT(data, 2) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR); // motor control

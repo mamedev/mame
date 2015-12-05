@@ -229,7 +229,7 @@ void i82371ab_device::device_reset()
 {
 	southbridge_device::device_reset();
 	memset(m_regs, 0, sizeof(m_regs));
-	UINT32 (*regs32)[64] = (UINT32 (*)[64])(m_regs);
+	UINT32 (*regs32)[64] = reinterpret_cast<UINT32 (*)[64]>(m_regs);
 
 	/* isa */
 	regs32[0][0x00] = 0x71108086;

@@ -125,7 +125,7 @@ bool neogeo_cart_slot_device::call_load()
 			}
 
 			m_cart->decrypt_all(
-				(UINT8*)m_cart->get_rom_base(), m_cart->get_rom_size(),
+				reinterpret_cast<UINT8*>(m_cart->get_rom_base()), m_cart->get_rom_size(),
 				m_cart->get_sprites_base(), m_cart->get_sprites_size(),
 				m_cart->get_fixed_base(), m_cart->get_fixed_size(),
 				m_cart->get_ym_base(), m_cart->get_ym_size(),
@@ -151,7 +151,7 @@ void neogeo_cart_slot_device::setup_memory_banks(running_machine &machine)
 	UINT32 size = get_rom_size();
 	machine.memory().region_free(":maincpu");
 	machine.memory().region_alloc(":maincpu",size,2, ENDIANNESS_BIG);
-	memcpy(memregion(":maincpu")->base(),(UINT8*)base16,size);
+	memcpy(memregion(":maincpu")->base(),reinterpret_cast<UINT8*>(base16),size);
 
 	UINT8* base =  get_audio_base();
 	size = get_audio_size();

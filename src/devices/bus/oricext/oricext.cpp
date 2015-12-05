@@ -72,8 +72,8 @@ void oricext_device::device_start()
 	bank_c000_w = membank(":bank_c000_w");
 	bank_e000_w = membank(":bank_e000_w");
 	bank_f800_w = membank(":bank_f800_w");
-	rom = (UINT8 *)machine().root_device().memregion(cputag)->base();
-	ram = (UINT8 *)memshare(":ram")->ptr();
+	rom = static_cast<UINT8 *>(machine().root_device().memregion(cputag)->base());
+	ram = static_cast<UINT8 *>(memshare(":ram")->ptr());
 
 	memset(junk_read, 0xff, sizeof(junk_read));
 	memset(junk_write, 0x00, sizeof(junk_write));

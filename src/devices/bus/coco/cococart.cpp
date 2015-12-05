@@ -114,15 +114,15 @@ void cococart_slot_device::device_timer(emu_timer &timer, device_timer_id id, in
 	switch(id)
 	{
 		case TIMER_CART:
-			set_line("CART", m_cart_line, (cococart_line_value) param);
+			set_line("CART", m_cart_line, static_cast<cococart_line_value>(param));
 			break;
 
 		case TIMER_NMI:
-			set_line("NMI", m_nmi_line, (cococart_line_value) param);
+			set_line("NMI", m_nmi_line, static_cast<cococart_line_value>(param));
 			break;
 
 		case TIMER_HALT:
-			set_line("HALT", m_halt_line, (cococart_line_value) param);
+			set_line("HALT", m_halt_line, static_cast<cococart_line_value>(param));
 			break;
 	}
 }
@@ -231,7 +231,7 @@ void cococart_slot_device::set_line_timer(coco_cartridge_line &line, cococart_li
 		? machine().firstcpu->cycles_to_attotime(line.delay)
 		: attotime::zero;
 
-	line.timer[line.timer_index]->adjust(delay, (int) value);
+	line.timer[line.timer_index]->adjust(delay, static_cast<int>(value));
 	line.timer_index = (line.timer_index + 1) % TIMER_POOL;
 }
 

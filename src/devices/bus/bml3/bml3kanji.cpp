@@ -58,7 +58,7 @@ const rom_entry *bml3bus_kanji_device::device_rom_region() const
 
 READ8_MEMBER( bml3bus_kanji_device::bml3_kanji_r )
 {
-	return m_rom[((UINT32)m_kanji_addr << 1) + offset];
+	return m_rom[(static_cast<UINT32>(m_kanji_addr) << 1) + offset];
 }
 
 WRITE8_MEMBER( bml3bus_kanji_device::bml3_kanji_w )

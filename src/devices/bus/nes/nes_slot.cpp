@@ -158,7 +158,7 @@ void device_nes_cart_interface::prg_alloc(size_t size, const char *tag)
 			// A few pirate carts have PRG made of 32K + 2K or some weird similar config
 			// in this case we treat the banking as if this 'extra' PRG is not present and
 			// the pcb code has to handle it by accessing directly m_prg!
-			printf("Warning! The loaded PRG has size not a multiple of 8KB (0x%X)\n", (UINT32)size);
+			printf("Warning! The loaded PRG has size not a multiple of 8KB (0x%X)\n", static_cast<UINT32>(size));
 			m_prg_chunks--;
 		}
 

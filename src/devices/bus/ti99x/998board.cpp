@@ -723,7 +723,7 @@ void mainboard8_device::device_start()
 				for (int j=1; (j < 8) && (kind == MAP8_UNDEF); j++)
 				{
 					// Pseudo devices are enumerated as 1 ... 6 (see MAP8_SRAM etc.)
-					if (strcmp(entry[i].name, pseudodev[j-1])==0) kind = (mapper8_device_kind)j;
+					if (strcmp(entry[i].name, pseudodev[j-1])==0) kind = static_cast<mapper8_device_kind>(j);
 				}
 				if (kind==MAP8_UNDEF)
 				{
@@ -735,13 +735,13 @@ void mainboard8_device::device_start()
 				{
 					if (entry[i].mode != PHYSIC)
 					{
-						auto ad = new logically_addressed_device(kind, (device_t*)dev, entry[i]);
+						auto ad = new logically_addressed_device(kind, static_cast<device_t*>(dev), entry[i]);
 						m_logcomp.append(*ad);
 						if (TRACE_CONFIG) logerror("%s: Device %s mounted into logical address space.\n", tag(), entry[i].name);
 					}
 					else
 					{
-						auto ad = new physically_addressed_device(kind, (device_t*)dev, entry[i]);
+						auto ad = new physically_addressed_device(kind, static_cast<device_t*>(dev), entry[i]);
 						m_physcomp.append(*ad);
 						if (TRACE_CONFIG) logerror("%s: Device %s mounted into physical address space.\n", tag(), entry[i].name);
 					}
@@ -1002,7 +1002,7 @@ WRITE8_MEMBER( ti998_spsyn_device::write )
 	{
 		attotime time_to_ready = attotime::from_double(m_vsp->time_to_ready());
 		int cycles_to_ready = machine().device<cpu_device>("maincpu")->attotime_to_cycles(time_to_ready);
-		if (TRACE_SPEECH && TRACE_DETAIL) logerror("%s: time to ready: %f -> %d\n", tag(), time_to_ready.as_double(), (int) cycles_to_ready);
+		if (TRACE_SPEECH && TRACE_DETAIL) logerror("%s: time to ready: %f -> %d\n", tag(), time_to_ready.as_double(), static_cast<int>(cycles_to_ready));
 
 		machine().device("maincpu")->execute().adjust_icount(-cycles_to_ready);
 		machine().scheduler().timer_set(attotime::zero, FUNC_NULL);

@@ -319,7 +319,7 @@ int a800_cart_slot_device::identify_cart_type(UINT8 *header)
 	int type = A800_8K;
 
 	// check CART format
-	if (strncmp((const char *)header, "CART", 4))
+	if (strncmp(reinterpret_cast<const char *>(header), "CART", 4))
 		fatalerror("Invalid header detected!\n");
 
 	switch ((header[4] << 24) + (header[5] << 16) +  (header[6] << 8) + (header[7] << 0))

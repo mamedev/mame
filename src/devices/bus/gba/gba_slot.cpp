@@ -51,7 +51,7 @@ void device_gba_cart_interface::rom_alloc(UINT32 size, const char *tag)
 	if (m_rom == nullptr)
 	{
 		// we always alloc 32MB of rom region!
-		m_rom = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
+		m_rom = reinterpret_cast<UINT32 *>(device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base());
 		m_rom_size = size;
 	}
 }
@@ -176,7 +176,7 @@ bool gba_cart_slot_device::call_load()
 		}
 
 		m_cart->rom_alloc(size, tag());
-		ROM = (UINT8 *)m_cart->get_rom_base();
+		ROM = reinterpret_cast<UINT8 *>(m_cart->get_rom_base());
 
 		if (software_entry() == nullptr)
 		{

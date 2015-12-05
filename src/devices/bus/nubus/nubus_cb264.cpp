@@ -205,7 +205,7 @@ UINT32 nubus_cb264_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		case 4: // 24 bpp
 		case 7: // ???
 			{
-				UINT32 *vram32 = (UINT32 *)&m_vram[0];
+				UINT32 *vram32 = reinterpret_cast<UINT32 *>(&m_vram[0]);
 
 				for (y = 0; y < 480; y++)
 				{

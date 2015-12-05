@@ -100,7 +100,7 @@ void ngbootleg_prot_device::kof97oro_px_decode(UINT8* cpurom, UINT32 cpurom_size
 {
 	int i;
 	std::vector<UINT16> tmp( 0x500000 );
-	UINT16 *src = (UINT16*)cpurom;
+	UINT16 *src = reinterpret_cast<UINT16*>(cpurom);
 
 	for (i = 0; i < 0x500000/2; i++) {
 		tmp[i] = src[i ^ 0x7ffef];
@@ -190,12 +190,12 @@ void ngbootleg_prot_device::decrypt_kof10th(UINT8* cpurom, UINT32 cpurom_size)
 	}
 
 	// Altera protection chip patches these over P ROM
-	((UINT16*)src)[0x0124/2] = 0x000d; // Enables XOR for RAM moves, forces SoftDIPs, and USA region
-	((UINT16*)src)[0x0126/2] = 0xf7a8;
+	reinterpret_cast<UINT16*>(src)[0x0124/2] = 0x000d; // Enables XOR for RAM moves, forces SoftDIPs, and USA region
+	reinterpret_cast<UINT16*>(src)[0x0126/2] = 0xf7a8;
 
-	((UINT16*)src)[0x8bf4/2] = 0x4ef9; // Run code to change "S" data
-	((UINT16*)src)[0x8bf6/2] = 0x000d;
-	((UINT16*)src)[0x8bf8/2] = 0xf980;
+	reinterpret_cast<UINT16*>(src)[0x8bf4/2] = 0x4ef9; // Run code to change "S" data
+	reinterpret_cast<UINT16*>(src)[0x8bf6/2] = 0x000d;
+	reinterpret_cast<UINT16*>(src)[0x8bf8/2] = 0xf980;
 
 }
 
@@ -205,7 +205,7 @@ void ngbootleg_prot_device::decrypt_kof10th(UINT8* cpurom, UINT32 cpurom_size)
 
 void ngbootleg_prot_device::kf10thep_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 {
-	UINT16 *rom = (UINT16*)cpurom;
+	UINT16 *rom = reinterpret_cast<UINT16*>(cpurom);
 	std::vector<UINT16> buf(0x100000/2);
 
 	memcpy(&buf[0x000000/2], &rom[0x060000/2], 0x20000);
@@ -454,7 +454,7 @@ void ngbootleg_prot_device::patch_cthd2003(cpu_device* maincpu, neogeo_banked_ca
 {
 	/* patches thanks to razoola */
 	int i;
-	UINT16 *mem16 = (UINT16 *)cpurom;
+	UINT16 *mem16 = reinterpret_cast<UINT16 *>(cpurom);
 
 	/* special ROM banking handler */
 	maincpu->space(AS_PROGRAM).install_write_handler(0x2ffff0, 0x2fffff, write16_delegate(FUNC(ngbootleg_prot_device::cthd2003_bankswitch_w),this));
@@ -561,7 +561,7 @@ void ngbootleg_prot_device::patch_ct2k3sa(UINT8* cpurom, UINT32 cpurom_size)
 {
 	/* patches thanks to razoola - same as for cthd2003*/
 	int i;
-	UINT16 *mem16 = (UINT16 *)cpurom;
+	UINT16 *mem16 = reinterpret_cast<UINT16 *>(cpurom);
 
 	// theres still a problem on the character select screen but it seems to be related to cpu core timing issues,
 	// overclocking the 68k prevents it.
@@ -631,7 +631,7 @@ void ngbootleg_prot_device::lans2004_decrypt_68k(UINT8* cpurom, UINT32 cpurom_si
 	/* Descrambling P ROMs - Thanks to Razoola for the info */
 	int i;
 	UINT8 *src = cpurom;
-	UINT16 *rom = (UINT16*)cpurom;
+	UINT16 *rom = reinterpret_cast<UINT16*>(cpurom);
 
 	{
 		static const int sec[] = { 0x3, 0x8, 0x7, 0xC, 0x1, 0xA, 0x6, 0xD };
@@ -788,7 +788,7 @@ void ngbootleg_prot_device::svcplus_px_decrypt(UINT8* cpurom, UINT32 cpurom_size
 void ngbootleg_prot_device::svcplus_px_hack(UINT8* cpurom, UINT32 cpurom_size)
 {
 	/* patched by the protection chip? */
-	UINT16 *mem16 = (UINT16 *)cpurom;
+	UINT16 *mem16 = reinterpret_cast<UINT16 *>(cpurom);
 	mem16[0x0f8016/2] = 0x33c1;
 }
 
@@ -839,7 +839,7 @@ void ngbootleg_prot_device::svcsplus_px_decrypt(UINT8* cpurom, UINT32 cpurom_siz
 void ngbootleg_prot_device::svcsplus_px_hack(UINT8* cpurom, UINT32 cpurom_size)
 {
 	/* patched by the protection chip? */
-	UINT16 *mem16 = (UINT16 *)cpurom;
+	UINT16 *mem16 = reinterpret_cast<UINT16 *>(cpurom);
 	mem16[0x9e90/2] = 0x000f;
 	mem16[0x9e92/2] = 0xc9c0;
 	mem16[0xa10c/2] = 0x4eb9;
@@ -865,7 +865,7 @@ WRITE16_MEMBER( ngbootleg_prot_device::kof2003_w )
 {
 	data = COMBINE_DATA(&m_cartridge_ram[offset]);
 	if (offset == 0x1ff0/2 || offset == 0x1ff2/2) {
-		UINT8* cr = (UINT8 *)m_cartridge_ram;
+		UINT8* cr = reinterpret_cast<UINT8 *>(m_cartridge_ram);
 		UINT32 address = (cr[BYTE_XOR_LE(0x1ff3)]<<16)|(cr[BYTE_XOR_LE(0x1ff2)]<<8)|cr[BYTE_XOR_LE(0x1ff1)];
 		UINT8 prt = cr[BYTE_XOR_LE(0x1ff2)];
 
@@ -882,7 +882,7 @@ WRITE16_MEMBER( ngbootleg_prot_device::kof2003p_w )
 {
 	data = COMBINE_DATA(&m_cartridge_ram[offset]);
 	if (offset == 0x1ff0/2 || offset == 0x1ff2/2) {
-		UINT8* cr = (UINT8 *)m_cartridge_ram;
+		UINT8* cr = reinterpret_cast<UINT8 *>(m_cartridge_ram);
 		UINT32 address = (cr[BYTE_XOR_LE(0x1ff3)]<<16)|(cr[BYTE_XOR_LE(0x1ff2)]<<8)|cr[BYTE_XOR_LE(0x1ff0)];
 		UINT8 prt = cr[BYTE_XOR_LE(0x1ff2)];
 
@@ -929,7 +929,7 @@ void ngbootleg_prot_device::kf2k3bl_install_protection(cpu_device* maincpu, neog
 void ngbootleg_prot_device::kf2k3pl_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 {
 	std::vector<UINT16> tmp(0x100000/2);
-	UINT16*rom16 = (UINT16*)cpurom;
+	UINT16*rom16 = reinterpret_cast<UINT16*>(cpurom);
 	int j;
 	int i;
 
@@ -977,7 +977,7 @@ void ngbootleg_prot_device::kf2k3upl_px_decrypt(UINT8* cpurom, UINT32 cpurom_siz
 		}
 	}
 
-	UINT16*rom16 = (UINT16*)cpurom;
+	UINT16*rom16 = reinterpret_cast<UINT16*>(cpurom);
 	kof2k3_overlay = rom16[0x58196 / 2];
 
 

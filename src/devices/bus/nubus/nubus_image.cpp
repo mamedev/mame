@@ -86,18 +86,18 @@ void messimg_disk_image_device::device_config_complete()
 
 void messimg_disk_image_device::device_start()
 {
-	m_data = (UINT8 *)nullptr;
+	m_data = static_cast<UINT8 *>(nullptr);
 
 	if (exists() && fseek(0, SEEK_END) == 0)
 	{
-		m_size = (UINT32)ftell();
+		m_size = static_cast<UINT32>(ftell());
 	}
 }
 
 bool messimg_disk_image_device::call_load()
 {
 	fseek(0, SEEK_END);
-	m_size = (UINT32)ftell();
+	m_size = static_cast<UINT32>(ftell());
 	if (m_size > (256*1024*1024))
 	{
 		printf("Mac image too large: must be 256MB or less!\n");
@@ -105,7 +105,7 @@ bool messimg_disk_image_device::call_load()
 		return IMAGE_INIT_FAIL;
 	}
 
-	m_data = (UINT8 *)auto_alloc_array_clear(machine(), UINT32, m_size/sizeof(UINT32));
+	m_data = reinterpret_cast<UINT8 *>(auto_alloc_array_clear(machine(), UINT32, m_size/sizeof(UINT32)));
 	fseek(0, SEEK_SET);
 	fread(m_data, m_size);
 	m_ejected = false;
@@ -255,7 +255,7 @@ READ32_MEMBER( nubus_image_device::image_r )
 
 WRITE32_MEMBER( nubus_image_device::image_super_w )
 {
-	UINT32 *image = (UINT32*)m_image->m_data;
+	UINT32 *image = reinterpret_cast<UINT32*>(m_image->m_data);
 	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 	mem_mask = ((mem_mask & 0xff) << 24) | ((mem_mask & 0xff00) << 8) | ((mem_mask & 0xff0000) >> 8) | ((mem_mask & 0xff000000) >> 24);
 
@@ -264,7 +264,7 @@ WRITE32_MEMBER( nubus_image_device::image_super_w )
 
 READ32_MEMBER( nubus_image_device::image_super_r )
 {
-	UINT32 *image = (UINT32*)m_image->m_data;
+	UINT32 *image = reinterpret_cast<UINT32*>(m_image->m_data);
 	UINT32 data = image[offset];
 	return ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 }
@@ -279,24 +279,24 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 	filectx.curcmd = data;
 	switch(data) {
 	case kFileCmdGetDir:
-		strcpy((char*)filectx.filename, (char*)filectx.curdir);
+		strcpy(reinterpret_cast<char*>(filectx.filename), reinterpret_cast<char*>(filectx.curdir));
 		break;
 	case kFileCmdSetDir:
 		if ((filectx.filename[0] == '/') || (filectx.filename[0] == '$')) {
-			strcpy((char*)filectx.curdir, (char*)filectx.filename);
+			strcpy(reinterpret_cast<char*>(filectx.curdir), reinterpret_cast<char*>(filectx.filename));
 		} else {
-			strcat((char*)filectx.curdir, "/");
-			strcat((char*)filectx.curdir, (char*)filectx.filename);
+			strcat(reinterpret_cast<char*>(filectx.curdir), "/");
+			strcat(reinterpret_cast<char*>(filectx.curdir), reinterpret_cast<char*>(filectx.filename));
 		}
 		break;
 	case kFileCmdGetFirstListing:
 		if(filectx.dirp) osd_closedir(filectx.dirp);
-		filectx.dirp = osd_opendir((const char *)filectx.curdir);
+		filectx.dirp = osd_opendir(reinterpret_cast<const char *>(filectx.curdir));
 	case kFileCmdGetNextListing:
 		if (filectx.dirp) {
 			dp = osd_readdir(filectx.dirp);
 			if(dp) {
-				strncpy((char*)filectx.filename, dp->name, sizeof(filectx.filename));
+				strncpy(reinterpret_cast<char*>(filectx.filename), dp->name, sizeof(filectx.filename));
 			} else {
 				memset(filectx.filename, 0, sizeof(filectx.filename));
 			}
@@ -307,18 +307,18 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 		break;
 	case kFileCmdGetFile:
 		memset(fullpath, 0, sizeof(fullpath));
-		strcpy(fullpath, (const char *)filectx.curdir);
+		strcpy(fullpath, reinterpret_cast<const char *>(filectx.curdir));
 		strcat(fullpath, "/");
-		strcat(fullpath, (const char*)filectx.filename);
-		if(osd_open((const char*)fullpath, OPEN_FLAG_READ, &filectx.fd, &filectx.filelen) != FILERR_NONE) printf("Error opening %s\n", fullpath);
+		strcat(fullpath, reinterpret_cast<const char*>(filectx.filename));
+		if(osd_open(static_cast<const char*>(fullpath), OPEN_FLAG_READ, &filectx.fd, &filectx.filelen) != FILERR_NONE) printf("Error opening %s\n", fullpath);
 		filectx.bytecount = 0;
 		break;
 	case kFileCmdPutFile:
 		memset(fullpath, 0, sizeof(fullpath));
-		strcpy(fullpath, (const char *)filectx.curdir);
+		strcpy(fullpath, reinterpret_cast<const char *>(filectx.curdir));
 		strcat(fullpath, "/");
-		strcat(fullpath, (const char*)filectx.filename);
-		if(osd_open((const char*)fullpath, OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, &filectx.fd, &filesize) != FILERR_NONE) printf("Error opening %s\n", fullpath);
+		strcat(fullpath, reinterpret_cast<const char*>(filectx.filename));
+		if(osd_open(static_cast<const char*>(fullpath), OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, &filectx.fd, &filesize) != FILERR_NONE) printf("Error opening %s\n", fullpath);
 		filectx.bytecount = 0;
 		break;
 	}
@@ -377,12 +377,12 @@ READ32_MEMBER( nubus_image_device::file_len_r )
 
 WRITE32_MEMBER( nubus_image_device::file_name_w )
 {
-	((UINT32*)(filectx.filename))[offset] = ni_ntohl(data);
+	reinterpret_cast<UINT32*>(filectx.filename)[offset] = ni_ntohl(data);
 }
 
 READ32_MEMBER( nubus_image_device::file_name_r )
 {
 	UINT32 ret;
-	ret = ni_htonl(((UINT32*)(filectx.filename))[offset]);
+	ret = ni_htonl(reinterpret_cast<UINT32*>(filectx.filename)[offset]);
 	return ret;
 }

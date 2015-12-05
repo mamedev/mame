@@ -27,9 +27,9 @@ void sony_cdu76s_device::ReadData( UINT8 *data, int dataLength )
 			data[3] = 0x02; // response data format = SPC-3 standard
 			// some Konami games freak out if this isn't "Sony", so we'll lie
 			// this is the actual drive on my Nagano '98 board
-			strcpy((char *)&data[8], "Sony");
-			strcpy((char *)&data[16], "CDU-76S");
-			strcpy((char *)&data[32], "1.0");
+			strcpy(reinterpret_cast<char *>(&data[8]), "Sony");
+			strcpy(reinterpret_cast<char *>(&data[16]), "CDU-76S");
+			strcpy(reinterpret_cast<char *>(&data[32]), "1.0");
 			break;
 
 		default:

@@ -114,7 +114,7 @@ void snug_bwg_device::operate_ready_line()
 WRITE_LINE_MEMBER( snug_bwg_device::fdc_irq_w )
 {
 	if (TRACE_SIGNALS) logerror("bwg: set intrq = %d\n", state);
-	m_IRQ = (line_state)state;
+	m_IRQ = static_cast<line_state>(state);
 	// Unlike the TI FDC, the BwG does not set the INTB line. Anyway, no one cares.
 	// We need to explicitly set the READY line to release the datamux
 	operate_ready_line();
@@ -123,7 +123,7 @@ WRITE_LINE_MEMBER( snug_bwg_device::fdc_irq_w )
 WRITE_LINE_MEMBER( snug_bwg_device::fdc_drq_w )
 {
 	if (TRACE_SIGNALS) logerror("bwg: set drq = %d\n", state);
-	m_DRQ = (line_state)state;
+	m_DRQ = static_cast<line_state>(state);
 
 	// We need to explicitly set the READY line to release the datamux
 	operate_ready_line();

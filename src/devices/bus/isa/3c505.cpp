@@ -907,7 +907,7 @@ void threecom3c505_device::device_timer(emu_timer &timer, device_timer_id id, in
 
 void threecom3c505_device::do_command()
 {
-	pcb_struct &command_pcp = (pcb_struct &) m_command_buffer;
+	pcb_struct &command_pcp = reinterpret_cast<pcb_struct &>(m_command_buffer);
 
 	// default to successful completion
 	m_response.command = command_pcp.command + CMD_RESPONSE_OFFSET;
@@ -1011,7 +1011,7 @@ void threecom3c505_device::do_command()
 			memcpy(m_station_address, command_pcp.data.eth_addr, command_pcp.length);
 		}
 		set_filter_list();
-		set_mac((char *) m_station_address);
+		set_mac(reinterpret_cast<char *>(m_station_address));
 		break;
 
 	case CMD_MC_17: // 0x17

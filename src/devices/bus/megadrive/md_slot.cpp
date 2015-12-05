@@ -87,7 +87,7 @@ void device_md_cart_interface::rom_alloc(size_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = (UINT16 *)device().machine().memory().region_alloc(std::string(tag).append(MDSLOT_ROM_REGION_TAG).c_str(), size, 2, ENDIANNESS_LITTLE)->base();
+		m_rom = reinterpret_cast<UINT16 *>(device().machine().memory().region_alloc(std::string(tag).append(MDSLOT_ROM_REGION_TAG).c_str(), size, 2, ENDIANNESS_LITTLE)->base());
 		m_rom_size = size;
 	}
 }
@@ -351,7 +351,7 @@ bool base_md_cart_slot_device::call_load()
 			if (m_cart->get_nvram_size())
 				battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0xff);
 
-			file_logging((UINT8 *)m_cart->get_rom_base(), m_cart->get_rom_size(), m_cart->get_nvram_size());
+			file_logging(reinterpret_cast<UINT8 *>(m_cart->get_rom_base()), m_cart->get_rom_size(), m_cart->get_nvram_size());
 		}
 
 		return res;
@@ -372,7 +372,7 @@ int base_md_cart_slot_device::load_list()
 
 	m_cart->rom_alloc(length, tag());
 	ROM = m_cart->get_rom_base();
-	memcpy((UINT8 *)ROM, get_software_region("rom"), get_software_region_length("rom"));
+	memcpy(reinterpret_cast<UINT8 *>(ROM), get_software_region("rom"), get_software_region_length("rom"));
 
 	// if we allocated a ROM larger that the file (e.g. due to uneven cart size), set remaining space to 0xff
 	if (length > get_software_region_length("rom"))
@@ -402,7 +402,7 @@ static int genesis_is_SMD(unsigned char *buf, unsigned int len)
 		return 1;
 
 	/* aq quiz */
-	if (len > (0xf0 + 8) && !strncmp("UZ(-01  ", (const char *) &buf[0xf0], 8))
+	if (len > (0xf0 + 8) && !strncmp("UZ(-01  ", reinterpret_cast<const char *>(&buf[0xf0]), 8))
 		return 1;
 
 	/* Phelios USA redump */
@@ -412,11 +412,11 @@ static int genesis_is_SMD(unsigned char *buf, unsigned int len)
 		return 1;
 
 	/* jap baseball 94 */
-	if (len > (0xf0 + 9) && !strncmp("OL R-AEAL", (const char *) &buf[0xf0], 9))
+	if (len > (0xf0 + 9) && !strncmp("OL R-AEAL", reinterpret_cast<const char *>(&buf[0xf0]), 9))
 		return 1;
 
 	/* devilish Mahjong Tower */
-	if (len > (0xf3 + 11) && !strncmp("optrEtranet", (const char *) &buf[0xf3], 11))
+	if (len > (0xf3 + 11) && !strncmp("optrEtranet", reinterpret_cast<const char *>(&buf[0xf3]), 11))
 		return 1;
 
 	/* golden axe 2 beta */
@@ -424,27 +424,27 @@ static int genesis_is_SMD(unsigned char *buf, unsigned int len)
 		return 1;
 
 	/* omega race */
-	if (len > (0x90 + 8) && !strncmp("OEARC   ", (const char *) &buf[0x90], 8))
+	if (len > (0x90 + 8) && !strncmp("OEARC   ", reinterpret_cast<const char *>(&buf[0x90]), 8))
 		return 1;
 
 	/* budokan beta */
-	if ((len >= 0x6708 + 8) && !strncmp(" NTEBDKN", (const char *) &buf[0x6708], 8))
+	if ((len >= 0x6708 + 8) && !strncmp(" NTEBDKN", reinterpret_cast<const char *>(&buf[0x6708]), 8))
 		return 1;
 
 	/* cdx pro 1.8 bios */
-	if (len > (0x2c0 + 7) && !strncmp("so fCXP", (const char *) &buf[0x2c0], 7))
+	if (len > (0x2c0 + 7) && !strncmp("so fCXP", reinterpret_cast<const char *>(&buf[0x2c0]), 7))
 		return 1;
 
 	/* ishido (hacked) */
-	if (len > (0x90 + 8) && !strncmp("sio-Wyo ", (const char *) &buf[0x0090], 8))
+	if (len > (0x90 + 8) && !strncmp("sio-Wyo ", reinterpret_cast<const char *>(&buf[0x0090]), 8))
 		return 1;
 
 	/* onslaught */
-	if (len > (0x88 + 8) && !strncmp("SS  CAL ", (const char *) &buf[0x0088], 8))
+	if (len > (0x88 + 8) && !strncmp("SS  CAL ", reinterpret_cast<const char *>(&buf[0x0088]), 8))
 		return 1;
 
 	/* tram terror pirate */
-	if ((len >= 0x3648 + 8) && !strncmp("SG NEPIE", (const char *) &buf[0x3648], 8))
+	if ((len >= 0x3648 + 8) && !strncmp("SG NEPIE", reinterpret_cast<const char *>(&buf[0x3648]), 8))
 		return 1;
 
 	/* breath of fire 3 chinese */
@@ -452,7 +452,7 @@ static int genesis_is_SMD(unsigned char *buf, unsigned int len)
 		return 1;
 
 	/*tetris pirate */
-	if ((len >= 0x1cbe + 5) && !strncmp("@TTI>", (const char *) &buf[0x1cbe], 5))
+	if ((len >= 0x1cbe + 5) && !strncmp("@TTI>", reinterpret_cast<const char *>(&buf[0x1cbe]), 5))
 		return 1;
 
 	return 0;
@@ -486,7 +486,7 @@ int base_md_cart_slot_device::load_nonlist()
 	m_cart->rom_alloc((len == 0x500000) ? 0x900000 : len, tag());
 
 	// STEP 3: copy the game data in the appropriate way
-	ROM = (unsigned char *)m_cart->get_rom_base();
+	ROM = reinterpret_cast<unsigned char *>(m_cart->get_rom_base());
 
 	if (is_smd)
 	{
@@ -580,7 +580,7 @@ void base_md_cart_slot_device::setup_custom_mappers()
 
 void base_md_cart_slot_device::setup_nvram()
 {
-	UINT8 *ROM = (UINT8 *)m_cart->get_rom_base();
+	UINT8 *ROM = reinterpret_cast<UINT8 *>(m_cart->get_rom_base());
 	m_cart->m_nvram_readonly = 0;
 	m_cart->m_nvram_active = 0;
 	m_cart->m_nvram_handlers_installed = 0;
@@ -715,21 +715,21 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			if (!memcmp(&ROM[0x08c8], smouse_sig, sizeof(smouse_sig)))
 				type = SMOUSE;
 
-			if (!memcmp((char *)&ROM[0x7e30e], "SEGA", 4) ||
-				!memcmp((char *)&ROM[0x7e100], "SEGA", 4) ||
-				!memcmp((char *)&ROM[0x7e1e6], "SEGA", 4))
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x7e30e]), "SEGA", 4) ||
+				!memcmp(reinterpret_cast<char *>(&ROM[0x7e100]), "SEGA", 4) ||
+				!memcmp(reinterpret_cast<char *>(&ROM[0x7e1e6]), "SEGA", 4))
 				type = REALTEC;
 
-			if (!memcmp((char *)&ROM[0x0180], "GM T-50396", 10)) // NHLPA Hockey 93
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "GM T-50396", 10)) // NHLPA Hockey 93
 				type = EA_NHLPA;
 
-			if (!memcmp((char *)&ROM[0x0180], "GM MK-1215", 10)) // Evander Holyfield
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "GM MK-1215", 10)) // Evander Holyfield
 				type = SEGA_EEPROM;
 			break;
 
 		case 0xc0000:
 
-			if (!memcmp((char *)&ROM[0x0180], "GM G-4060 ", 8)) // Wonder Boy V
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "GM G-4060 ", 8)) // Wonder Boy V
 				type = SEGA_EEPROM;
 			break;
 
@@ -743,25 +743,25 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			if (!memcmp(&ROM[0xee0d0], bugsl_sig, sizeof(bugsl_sig)))
 				type = BUGSLIFE;
 
-			if (!memcmp((char *)&ROM[0x0172], "GAME : ELF WOR", 14))
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0172]), "GAME : ELF WOR", 14))
 				type = ELFWOR;
 
 			if (!memcmp(&ROM[0x123e4], sbub_sig, sizeof(sbub_sig)))
 				type = SBUBBOB;
 
-			if (!memcmp((char *)&ROM[0x0180], "GM T-50176", 10)) // Rings of Power
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "GM T-50176", 10)) // Rings of Power
 				type = EA_NHLPA;
 
-			if (!memcmp((char *)&ROM[0x0180], "MK 00001211-00", 14)) // Sports Talk Baseball
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "MK 00001211-00", 14)) // Sports Talk Baseball
 				type = SEGA_EEPROM;
 
-			if (!memcmp((char *)&ROM[0x0180], "GM T-120096-", 12)) // Micro Machines 2
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "GM T-120096-", 12)) // Micro Machines 2
 				type = CODE_MASTERS;
 
-			if (!memcmp((char *)&ROM[0x0180], "GM T-120146-", 12)) // Brian Lara Cricket 96 / Shane Wayne Cricket 96
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "GM T-120146-", 12)) // Brian Lara Cricket 96 / Shane Wayne Cricket 96
 				type = BRIAN_LARA;
 
-			if (!memcmp((char *)&ROM[0x0190], "OJKRPTBVFCA     ", 0x10)) // Micro Machines '96 / Military TODO: better way to recognize these?
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0190]), "OJKRPTBVFCA     ", 0x10)) // Micro Machines '96 / Military TODO: better way to recognize these?
 				type = CODE_MASTERS;
 			break;
 
@@ -799,17 +799,17 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			if (!memcmp(&ROM[0x17bb2], s15in1_sig, sizeof(s15in1_sig)))
 				type = MC_PIRATE;
 
-			if (!memcmp((char *)&ROM[0x0180], "GM T-081326 ", 12)) // NBA Jam
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "GM T-081326 ", 12)) // NBA Jam
 				type = NBA_JAM;
 
-			if (!memcmp((char *)&ROM[0x0180], "GM MK-1228", 10)) // Greatest Heavyweight of the Ring
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "GM MK-1228", 10)) // Greatest Heavyweight of the Ring
 				type = SEGA_EEPROM;
 
-			if ((!memcmp((char *)&ROM[0x0180], "GM T-12046", 10)) || // Mega Man
-				(!memcmp((char *)&ROM[0x0180], "GM T-12053", 10) && !memcmp(&ROM[0x18e], rockman_sig, sizeof(rockman_sig)))) // / Rock Man (EEPROM version)
+			if ((!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "GM T-12046", 10)) || // Mega Man
+				(!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "GM T-12053", 10) && !memcmp(&ROM[0x18e], rockman_sig, sizeof(rockman_sig)))) // / Rock Man (EEPROM version)
 				type = SEGA_EEPROM;
 
-			if (!memcmp((char *)&ROM[0x0150], "Virtua Racing", 13))
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0150]), "Virtua Racing", 13))
 				type = SEGA_SVP;
 
 			break;
@@ -826,10 +826,10 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			if (!memcmp(&ROM[0x1fd0d2], kof99_sig, sizeof(kof99_sig)))
 				type = KOF99;
 
-			if (!memcmp((char *)&ROM[0x0180], "GM T-81406", 10)) // NBA Jam TE
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "GM T-81406", 10)) // NBA Jam TE
 				type = NBA_JAM_TE;
 
-			if (!memcmp((char *)&ROM[0x0180], "GM T-081276 ", 12)) // NFL Quarterback Club
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "GM T-081276 ", 12)) // NFL Quarterback Club
 				type = NBA_JAM_TE;
 
 			break;
@@ -845,24 +845,24 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			if (!memcmp(&ROM[0x1e700], s19in1_sig, sizeof(s19in1_sig)))
 				type = MC_PIRATE;
 
-			if (!memcmp((char *)&ROM[0x0180], "GM T-081586-", 12)) // NFL Quarterback Club 96
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "GM T-081586-", 12)) // NFL Quarterback Club 96
 				type = NFL_QB_96;
 
-			if (!memcmp((char *)&ROM[0x0180], "GM T-081576 ", 12)) // College Slam
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "GM T-081576 ", 12)) // College Slam
 				type = C_SLAM;
 
-			if (!memcmp((char *)&ROM[0x0180], "GM T-81476", 10)) // Big Hurt Baseball
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "GM T-81476", 10)) // Big Hurt Baseball
 				type = C_SLAM;
 
 			break;
 
 		case 0x500000:
-			if (!memcmp((char *)&ROM[0x0120], "SUPER STREET FIGHTER2 ", 22))
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0120]), "SUPER STREET FIGHTER2 ", 22))
 				type = SSF2;
 			break;
 
 		case 0x800000:
-			if (!memcmp((char *)&ROM[0x0180], "GM T-574023-", 12)) // Pier Solar
+			if (!memcmp(reinterpret_cast<char *>(&ROM[0x0180]), "GM T-574023-", 12)) // Pier Solar
 				type = PSOLAR;
 			break;
 
@@ -995,7 +995,7 @@ void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 
 	logerror("FILE DETAILS\n");
 	logerror("============\n");
 	logerror("Name: %s\n", basename());
-	logerror("File Size: 0x%08x\n", (software_entry() == nullptr) ? (int)length() : (int)get_software_region_length("rom"));
+	logerror("File Size: 0x%08x\n", (software_entry() == nullptr) ? static_cast<int>(length()) : static_cast<int>(get_software_region_length("rom")));
 	logerror("Detected type: %s\n", md_get_slot(m_type));
 	logerror("ROM (Allocated) Size: 0x%X\n", rom_len);
 	logerror("NVRAM: %s\n", nvram_len ? "Yes" : "No");

@@ -50,7 +50,7 @@ void device_vboy_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(VBOYSLOT_ROM_REGION_TAG).c_str(), size, 4, ENDIANNESS_LITTLE)->base();
+		m_rom = reinterpret_cast<UINT32 *>(device().machine().memory().region_alloc(std::string(tag).append(VBOYSLOT_ROM_REGION_TAG).c_str(), size, 4, ENDIANNESS_LITTLE)->base());
 		m_rom_size = size/4;
 		m_rom_mask = m_rom_size - 1;
 	}
@@ -178,7 +178,7 @@ bool vboy_cart_slot_device::call_load()
 		if (has_eeprom)
 			m_cart->eeprom_alloc(get_software_region_length("eeprom"));
 
-		ROM = (UINT8 *)m_cart->get_rom_base();
+		ROM = reinterpret_cast<UINT8 *>(m_cart->get_rom_base());
 
 		if (software_entry() == nullptr)
 			fread(ROM, len);

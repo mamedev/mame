@@ -58,7 +58,7 @@ iq151_ms151a_device::iq151_ms151a_device(const machine_config &mconfig, const ch
 
 void iq151_ms151a_device::device_start()
 {
-	m_rom = (UINT8*)memregion("ms151a")->base();
+	m_rom = static_cast<UINT8*>(memregion("ms151a")->base());
 
 	// allocate a bitmap for represent the paper
 	m_paper = auto_bitmap_ind16_alloc(machine(), PAPER_WIDTH, PAPER_HEIGHT);

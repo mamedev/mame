@@ -323,11 +323,11 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 				if(m_voice[x].voice_ctrl & 0x04)
 				{  // 16-bit PCM
 					current = ((m_voice[x].current_addr >> 9) & 0xc0000) + (((m_voice[x].current_addr >> 9) & 0x1ffff) << 1);
-					m_voice[x].sample = (INT16)((m_wave_ram[current & 0xffffe]) | ((m_wave_ram[(current & 0xffffe)+1])<<8));
+					m_voice[x].sample = static_cast<INT16>((m_wave_ram[current & 0xffffe]) | ((m_wave_ram[(current & 0xffffe)+1])<<8));
 				}
 				else
 				{  // 8-bit PCM
-					m_voice[x].sample = (INT16)(m_wave_ram[current & 0xfffff] << 8);
+					m_voice[x].sample = static_cast<INT16>(m_wave_ram[current & 0xfffff] << 8);
 				}
 				if(m_voice[x].voice_ctrl & 0x40)  // voice direction
 					m_voice[x].current_addr -= (m_voice[x].freq_ctrl >> 1);
@@ -376,7 +376,7 @@ void gf1_device::device_start()
 	acia6850_device::device_start();
 
 	int i;
-	double out = (double)(1 << 13);
+	double out = static_cast<double>(1 << 13);
 
 	m_txirq_handler.resolve_safe();
 	m_rxirq_handler.resolve_safe();
@@ -413,7 +413,7 @@ void gf1_device::device_start()
 
 	for (i=4095;i>=0;i--)
 	{
-		m_volume_table[i] = (INT16)out;
+		m_volume_table[i] = static_cast<INT16>(out);
 		out /= 1.002709201; /* 0.0235 dB Steps */
 	}
 

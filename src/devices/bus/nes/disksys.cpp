@@ -116,7 +116,7 @@ void nes_disksys_device::device_start()
 {
 	common_start();
 
-	m_2c33_rom = (UINT8*)memregion("drive")->base();
+	m_2c33_rom = static_cast<UINT8*>(memregion("drive")->base());
 
 	m_disk->floppy_install_load_proc(nes_disksys_device::load_proc);
 	m_disk->floppy_install_unload_proc(nes_disksys_device::unload_proc);

@@ -378,7 +378,7 @@ bool a78_cart_slot_device::call_load()
 			char head[128];
 			fread(head, 128);
 
-			if (verify_header((char *)head) == IMAGE_VERIFY_FAIL)
+			if (verify_header(static_cast<char *>(head)) == IMAGE_VERIFY_FAIL)
 				return IMAGE_INIT_FAIL;
 
 			len = (head[49] << 24) | (head[50] << 16) | (head[51] << 8) | head[52];
@@ -449,7 +449,7 @@ bool a78_cart_slot_device::call_load()
 				osd_printf_info("Run it through the expansion to exploit this feature.\n");
 			}
 
-			internal_header_logging((UINT8 *)head, length());
+			internal_header_logging(reinterpret_cast<UINT8 *>(head), length());
 
 			m_cart->rom_alloc(len, tag());
 			fread(m_cart->get_rom_base(), len);

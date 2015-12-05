@@ -428,7 +428,7 @@ void sns_rom_sdd1_device::device_start()
 {
 	m_sdd1emu = auto_alloc(machine(), SDD1_emu(machine()));
 
-	m_buffer.data = (UINT8*)auto_alloc_array(machine(), UINT8, 0x10000);
+	m_buffer.data = static_cast<UINT8*>(auto_alloc_array(machine(), UINT8, 0x10000));
 	m_buffer.ready = 0;
 
 	save_item(NAME(m_sdd1_enable));
@@ -573,7 +573,7 @@ UINT8 sns_rom_sdd1_device::read_helper(UINT32 addr)
 					}
 
 					// fetch a decompressed byte; once buffer is depleted, disable channel and invalidate buffer
-					data = m_buffer.data[(UINT16)m_buffer.offset++];
+					data = m_buffer.data[static_cast<UINT16>(m_buffer.offset++)];
 					if (m_buffer.offset >= m_buffer.size)
 					{
 						m_buffer.ready = 0;

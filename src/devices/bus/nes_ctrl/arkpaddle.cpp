@@ -124,7 +124,7 @@ void nes_vaus_device::write(UINT8 data)
 	int old = m_start_conv;
 
 	if (data == 0 && old == 1)
-		m_latch = (UINT8) (m_paddle->read() ^ 0xff);
+		m_latch = static_cast<UINT8>(m_paddle->read() ^ 0xff);
 
 	m_start_conv = data;
 }

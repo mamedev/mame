@@ -811,7 +811,7 @@ void myarc_hfdc_device::set_floppy_motors_running(bool run)
 */
 WRITE_LINE_MEMBER( myarc_hfdc_device::intrq_w )
 {
-	m_irq = (line_state)state;
+	m_irq = static_cast<line_state>(state);
 	if (TRACE_INT) logerror("%s: INT pin from controller = %d, propagating to INTA*\n", tag(), state);
 
 	// Set INTA*
@@ -838,7 +838,7 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::dmarq_w )
 */
 WRITE_LINE_MEMBER( myarc_hfdc_device::dip_w )
 {
-	m_dip = (line_state)state;
+	m_dip = static_cast<line_state>(state);
 }
 
 /*

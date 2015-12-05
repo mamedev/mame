@@ -118,7 +118,7 @@ public:
 		DECLARE_WRITE8_MEMBER(dsp_rbuf_status_w);
 		DECLARE_WRITE8_MEMBER(dsp_cmd_w);
 
-		DECLARE_WRITE_LINE_MEMBER( midi_rx_w ) { device_serial_interface::rx_w((UINT8)state); }
+		DECLARE_WRITE_LINE_MEMBER( midi_rx_w ) { device_serial_interface::rx_w(static_cast<UINT8>(state)); }
 
 protected:
 		// device-level overrides

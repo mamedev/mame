@@ -264,7 +264,7 @@ int intv_cart_slot_device::load_fullpath()
 			return IMAGE_INIT_FAIL;
 
 		m_cart->rom_alloc(0x20000, tag());
-		ROM = (UINT8 *)m_cart->get_rom_base();
+		ROM = static_cast<UINT8 *>(m_cart->get_rom_base());
 
 		for (int i = 0; i < num_segments; i++)
 		{
@@ -313,7 +313,7 @@ int intv_cart_slot_device::load_fullpath()
 		std::string extrainfo;
 
 		m_cart->rom_alloc(0x20000, tag());
-		ROM = (UINT8 *)m_cart->get_rom_base();
+		ROM = static_cast<UINT8 *>(m_cart->get_rom_base());
 
 		if (!hashfile_extrainfo(*this, extrainfo))
 		{

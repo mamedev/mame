@@ -34,7 +34,7 @@ NeoGeo 'V' (PCM) ROM encryption
 /* Neo-Pcm2 Drivers for Encrypted V Roms */
 void pcm2_prot_device::neo_pcm2_snk_1999(UINT8* ymrom, UINT32 ymsize, int value)
 {   /* thanks to Elsemi for the NEO-PCM2 info */
-	UINT16 *rom = (UINT16 *)ymrom;
+	UINT16 *rom = reinterpret_cast<UINT16 *>(ymrom);
 	int size = ymsize;
 	int i, j;
 

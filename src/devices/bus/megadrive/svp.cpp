@@ -101,7 +101,7 @@ UINT32 md_rom_svp_device::pm_io(int reg, int write, UINT32 d)
 	if (reg == 4 || (m_svp->state().state_int(SSP_ST) & 0x60))
 	{
 #define CADDR ((((mode<<16)&0x7f0000)|addr)<<1)
-		UINT16 *dram = (UINT16 *)m_dram;
+		UINT16 *dram = reinterpret_cast<UINT16 *>(m_dram);
 		if (write)
 		{
 			int mode = m_pmac_write[reg] >> 16;
@@ -127,7 +127,7 @@ UINT32 md_rom_svp_device::pm_io(int reg, int write, UINT32 d)
 			else if ((mode & 0x47ff) == 0x001c) // IRAM
 			{
 				int inc = get_inc(mode);
-				((UINT16 *)m_iram)[addr & 0x3ff] = d;
+				reinterpret_cast<UINT16 *>(m_iram)[addr & 0x3ff] = d;
 				m_pmac_write[reg] += inc;
 			}
 			else
@@ -142,7 +142,7 @@ UINT32 md_rom_svp_device::pm_io(int reg, int write, UINT32 d)
 			int addr = m_pmac_read[reg] & 0xffff;
 			if ((mode & 0xfff0) == 0x0800) // ROM, inc 1, verified to be correct
 			{
-				UINT16 *ROM = (UINT16 *)get_rom_base();
+				UINT16 *ROM = static_cast<UINT16 *>(get_rom_base());
 				m_pmac_read[reg] += 1;
 				d = ROM[addr | ((mode & 0xf) << 16)];
 			}
@@ -169,13 +169,13 @@ UINT32 md_rom_svp_device::pm_io(int reg, int write, UINT32 d)
 		return d;
 	}
 
-	return (UINT32)-1;
+	return static_cast<UINT32>(-1);
 }
 
 READ16_MEMBER( md_rom_svp_device::read_pm0 )
 {
 	UINT32 d = pm_io(0, 0, 0);
-	if (d != (UINT32)-1)
+	if (d != static_cast<UINT32>(-1))
 		return d;
 	d = m_xst2;
 	m_xst2 &= ~2; // ?
@@ -185,7 +185,7 @@ READ16_MEMBER( md_rom_svp_device::read_pm0 )
 WRITE16_MEMBER( md_rom_svp_device::write_pm0 )
 {
 	UINT32 r = pm_io(0, 1, data);
-	if (r != (UINT32)-1)
+	if (r != static_cast<UINT32>(-1))
 		return;
 	m_xst2 = data; // ?
 }
@@ -193,7 +193,7 @@ WRITE16_MEMBER( md_rom_svp_device::write_pm0 )
 READ16_MEMBER( md_rom_svp_device::read_pm1 )
 {
 	UINT32 r = pm_io(1, 0, 0);
-	if (r != (UINT32)-1)
+	if (r != static_cast<UINT32>(-1))
 		return r;
 	logerror("svp: PM1 acces in non PM mode?\n");
 	return 0;
@@ -202,7 +202,7 @@ READ16_MEMBER( md_rom_svp_device::read_pm1 )
 WRITE16_MEMBER( md_rom_svp_device::write_pm1 )
 {
 	UINT32 r = pm_io(1, 1, data);
-	if (r != (UINT32)-1)
+	if (r != static_cast<UINT32>(-1))
 		return;
 	logerror("svp: PM1 acces in non PM mode?\n");
 }
@@ -210,7 +210,7 @@ WRITE16_MEMBER( md_rom_svp_device::write_pm1 )
 READ16_MEMBER( md_rom_svp_device::read_pm2 )
 {
 	UINT32 r = pm_io(2, 0, 0);
-	if (r != (UINT32)-1)
+	if (r != static_cast<UINT32>(-1))
 		return r;
 	logerror("svp: PM2 acces in non PM mode?\n");
 	return 0;
@@ -219,7 +219,7 @@ READ16_MEMBER( md_rom_svp_device::read_pm2 )
 WRITE16_MEMBER( md_rom_svp_device::write_pm2 )
 {
 	UINT32 r = pm_io(2, 1, data);
-	if (r != (UINT32)-1)
+	if (r != static_cast<UINT32>(-1))
 		return;
 	logerror("svp: PM2 acces in non PM mode?\n");
 }
@@ -227,7 +227,7 @@ WRITE16_MEMBER( md_rom_svp_device::write_pm2 )
 READ16_MEMBER( md_rom_svp_device::read_xst )
 {
 	UINT32 d = pm_io(3, 0, 0);
-	if (d != (UINT32)-1)
+	if (d != static_cast<UINT32>(-1))
 		return d;
 	return m_xst;
 }
@@ -235,7 +235,7 @@ READ16_MEMBER( md_rom_svp_device::read_xst )
 WRITE16_MEMBER( md_rom_svp_device::write_xst )
 {
 	UINT32 r = pm_io(3, 1, data);
-	if (r != (UINT32)-1)
+	if (r != static_cast<UINT32>(-1))
 		return;
 	m_xst2 |= 1;
 	m_xst = data;
@@ -294,7 +294,7 @@ WRITE16_MEMBER( md_rom_svp_device::write_al )
 
 READ16_MEMBER( md_rom_svp_device::rom_read1 )
 {
-	UINT16 *IRAM = (UINT16 *)m_iram;
+	UINT16 *IRAM = reinterpret_cast<UINT16 *>(m_iram);
 	return IRAM[offset];
 }
 
@@ -404,7 +404,7 @@ void md_rom_svp_device::device_start()
 
 READ16_MEMBER(md_rom_svp_device::read)
 {
-	UINT16 *DRAM = (UINT16 *)m_dram;
+	UINT16 *DRAM = reinterpret_cast<UINT16 *>(m_dram);
 
 	if (offset >= 0x300000/2 && offset < 0x320000/2)
 	{
@@ -438,7 +438,7 @@ WRITE16_MEMBER(md_rom_svp_device::write)
 	if (offset >= 0x300000/2 && offset < 0x320000/2)
 	{
 		UINT32 a1 = offset - 0x300000/2;
-		UINT16 *DRAM = (UINT16 *)m_dram;
+		UINT16 *DRAM = reinterpret_cast<UINT16 *>(m_dram);
 		DRAM[a1] = data;
 	}
 }

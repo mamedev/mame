@@ -437,8 +437,8 @@ WRITE8_MEMBER(a2bus_mouse_device::mcu_timer_w)
 		// recalculate the timer now
 		UINT32 m_ticks = 2043600 / 4;
 		m_ticks /= prescale[m_timer_ctl & 7];
-		m_ticks /= (int)(m_timer_cnt + 1);
-		m_timer->adjust(attotime::from_hz((double)m_ticks), TIMER_68705, attotime::from_hz((double)m_ticks));
+		m_ticks /= static_cast<int>(m_timer_cnt + 1);
+		m_timer->adjust(attotime::from_hz(static_cast<double>(m_ticks)), TIMER_68705, attotime::from_hz(static_cast<double>(m_ticks)));
 	}
 }
 

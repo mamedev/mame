@@ -72,8 +72,8 @@ iq151_video32_device::iq151_video32_device(const machine_config &mconfig, const 
 
 void iq151_video32_device::device_start()
 {
-	m_videoram = (UINT8*)memregion("videoram")->base();
-	m_chargen = (UINT8*)memregion("chargen")->base();
+	m_videoram = static_cast<UINT8*>(memregion("videoram")->base());
+	m_chargen = static_cast<UINT8*>(memregion("chargen")->base());
 
 	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, iq151_video32_charlayout, m_chargen, 0, 1, 0)));
 }

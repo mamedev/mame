@@ -519,7 +519,7 @@ void sb_device::process_fifo(UINT8 cmd)
 				m_dsp.adc_length = 1;
 				m_dsp.wbuf_status = 0x80;
 				m_dsp.dma_no_irq = true;
-				m_dack_out = (UINT8)(m_dsp.prot_value & 0xff);
+				m_dack_out = static_cast<UINT8>(m_dsp.prot_value & 0xff);
 				drq_w(1);
 				break;
 
@@ -1332,7 +1332,7 @@ void sb16_device::dack16_w(int line, UINT16 data)
 	// set the transfer timer on the 1st byte
 	if (!m_dsp.dma_timer_started)
 	{
-		m_timer->adjust(attotime::from_hz((double)m_dsp.frequency), 0, attotime::from_hz((double)m_dsp.frequency));
+		m_timer->adjust(attotime::from_hz(static_cast<double>(m_dsp.frequency)), 0, attotime::from_hz(static_cast<double>(m_dsp.frequency)));
 		m_dsp.d_rptr = m_dsp.d_wptr = 0;
 		m_dsp.dma_timer_started = true;
 	}
@@ -1379,7 +1379,7 @@ void sb_device::dack_w(int line, UINT8 data)
 	// set the transfer timer on the 1st byte
 	if (!m_dsp.dma_timer_started)
 	{
-		m_timer->adjust(attotime::from_hz((double)m_dsp.frequency), 0, attotime::from_hz((double)m_dsp.frequency));
+		m_timer->adjust(attotime::from_hz(static_cast<double>(m_dsp.frequency)), 0, attotime::from_hz(static_cast<double>(m_dsp.frequency)));
 		m_dsp.d_rptr = m_dsp.d_wptr = 0;
 		m_dsp.dma_timer_started = true;
 	}
