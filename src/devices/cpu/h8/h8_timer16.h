@@ -121,8 +121,8 @@ protected:
 	bool counter_incrementing;
 	bool channel_active;
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void update_counter(UINT64 cur_time = 0);
 	void recalc_event(UINT64 cur_time = 0);
@@ -140,10 +140,10 @@ public:
 	void set_info(int tgr_count, int tbr_count, const char *intc, int irq_base);
 
 protected:
-	virtual void tcr_update();
-	virtual void tier_update();
-	virtual void isr_update(UINT8 value);
-	virtual UINT8 isr_to_sr() const;
+	virtual void tcr_update() override;
+	virtual void tier_update() override;
+	virtual void isr_update(UINT8 value) override;
+	virtual UINT8 isr_to_sr() const override;
 };
 
 class h8s_timer16_channel_device : public h8_timer16_channel_device {
@@ -158,10 +158,10 @@ public:
 protected:
 	int count_types[8];
 
-	virtual void tcr_update();
-	virtual void tier_update();
-	virtual void isr_update(UINT8 value);
-	virtual UINT8 isr_to_sr() const;
+	virtual void tcr_update() override;
+	virtual void tier_update() override;
+	virtual void isr_update(UINT8 value) override;
+	virtual UINT8 isr_to_sr() const override;
 };
 
 class h8_timer16_device : public device_t {
@@ -195,8 +195,8 @@ protected:
 	UINT8 default_tstr;
 	UINT8 tstr;
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 extern const device_type H8_TIMER16;

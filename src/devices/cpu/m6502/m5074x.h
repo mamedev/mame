@@ -97,11 +97,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void execute_set_input(int inputnum, int state);
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void execute_set_input(int inputnum, int state) override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	void send_port(address_space &space, UINT8 offset, UINT8 data);
 	UINT8 read_port(UINT8 offset);

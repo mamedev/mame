@@ -39,17 +39,17 @@ public:
 		m740_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 		m740_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-		virtual void device_start();
-		virtual void device_reset();
+		virtual void device_start() override;
+		virtual void device_reset() override;
 
 		static const disasm_entry disasm_entries[0x200];
 
-		virtual void state_string_export(const device_state_entry &entry, std::string &str);
+		virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
 
-		virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-		virtual void do_exec_full();
-		virtual void do_exec_partial();
-		virtual void execute_set_input(int inputnum, int state);
+		virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+		virtual void do_exec_full() override;
+		virtual void do_exec_partial() override;
+		virtual void execute_set_input(int inputnum, int state) override;
 
 protected:
 #define O(o) void o ## _full(); void o ## _partial()

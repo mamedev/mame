@@ -156,26 +156,26 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 4); } // "
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 2; }
-	virtual UINT32 execute_input_lines() const { return 2+1; } // 3rd one is internal
-	virtual void execute_set_input(int line, int state);
-	virtual void execute_run();
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 4); } // "
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 2; }
+	virtual UINT32 execute_input_lines() const override { return 2+1; } // 3rd one is internal
+	virtual void execute_set_input(int line, int state) override;
+	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	void state_string_export(const device_state_entry &entry, std::string &str) override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -353,9 +353,9 @@ public:
 
 protected:
 	// overrides
-	virtual UINT8 read_r(int index);
-	virtual void write_r(int index, UINT8 data);
-	virtual int read_d(int index);
+	virtual UINT8 read_r(int index) override;
+	virtual void write_r(int index, UINT8 data) override;
+	virtual int read_d(int index) override;
 };
 
 class hd38750_device : public hmcs43_cpu_device
@@ -390,8 +390,8 @@ public:
 
 protected:
 	// overrides
-	virtual UINT8 read_r(int index);
-	virtual void write_r(int index, UINT8 data);
+	virtual UINT8 read_r(int index) override;
+	virtual void write_r(int index, UINT8 data) override;
 };
 
 class hd38800_device : public hmcs44_cpu_device
@@ -426,8 +426,8 @@ public:
 
 protected:
 	// overrides
-	virtual UINT8 read_r(int index);
-	virtual void write_r(int index, UINT8 data);
+	virtual UINT8 read_r(int index) override;
+	virtual void write_r(int index, UINT8 data) override;
 };
 
 class hd38820_device : public hmcs45_cpu_device

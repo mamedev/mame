@@ -51,7 +51,7 @@ public:
 	{
 		m_valid = decode(word0, word1);
 	}
-	bool decode(const UINT16 word0, const UINT16 word1)
+	bool decode(const UINT16 word0, const UINT16 word1) override
 	{
 		reg_id r;
 		decode_RR_table(BITSn(word0,0x3000), r);
@@ -71,11 +71,11 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const
+	void disassemble(std::string& retString) const override
 	{
 		retString = m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate() override {}
 
 private:
 	std::string m_source;
@@ -91,7 +91,7 @@ public:
 	{
 		m_valid = decode(word0, word1);
 	}
-	bool decode(const UINT16 word0, const UINT16 word1)
+	bool decode(const UINT16 word0, const UINT16 word1) override
 	{
 		std::string ea;
 		if (opDestination() == iB)
@@ -113,11 +113,11 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const
+	void disassemble(std::string& retString) const override
 	{
 		retString = m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate() override {}
 
 private:
 	std::string m_source;
@@ -133,7 +133,7 @@ public:
 	{
 		m_valid = decode(word0, word1);
 	}
-	bool decode(const UINT16 word0, const UINT16 word1)
+	bool decode(const UINT16 word0, const UINT16 word1) override
 	{
 		reg_id r;
 		reg_id D1;
@@ -167,11 +167,11 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const
+	void disassemble(std::string& retString) const override
 	{
 		retString = parallelMove + " " + parallelMove2;
 	}
-	void evaluate() {}
+	void evaluate() override {}
 
 private:
 	std::string parallelMove;
@@ -187,7 +187,7 @@ public:
 	{
 		m_valid = decode(word0, word1);
 	}
-	bool decode(const UINT16 word0, const UINT16 word1)
+	bool decode(const UINT16 word0, const UINT16 word1) override
 	{
 		decode_IIIIx_table(BITSn(word0,0x0f00), BITSn(word0,0x0008),
 							m_source, m_destination);
@@ -214,7 +214,7 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const
+	void disassemble(std::string& retString) const override
 	{
 		// (?,?) is a parallel nop
 		if (m_source == iWEIRD && m_destination == iWEIRD)
@@ -222,7 +222,7 @@ public:
 		else
 			retString = regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
-	void evaluate() {}
+	void evaluate() override {}
 
 private:
 	reg_id m_source;
@@ -240,7 +240,7 @@ public:
 		pms2 = "";
 		m_valid = decode(word0, word1);
 	}
-	bool decode(const UINT16 word0, const UINT16 word1)
+	bool decode(const UINT16 word0, const UINT16 word1) override
 	{
 		reg_id r;
 		reg_id S;
@@ -261,11 +261,11 @@ public:
 		pms2 = parallel_move_str2;
 		return true;
 	}
-	void disassemble(std::string& retString) const
+	void disassemble(std::string& retString) const override
 	{
 		retString = pms + " " + pms2;
 	}
-	void evaluate() {}
+	void evaluate() override {}
 
 private:
 	std::string pms;    // TODO
@@ -282,7 +282,7 @@ public:
 		m_ea = "";
 		m_valid = decode(word0, word1);
 	}
-	bool decode(const UINT16 word0, const UINT16 word1)
+	bool decode(const UINT16 word0, const UINT16 word1) override
 	{
 		reg_id r;
 		decode_RR_table(BITSn(word0,0x0300), r);
@@ -290,11 +290,11 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const
+	void disassemble(std::string& retString) const override
 	{
 		retString = m_ea;
 	}
-	void evaluate() {}
+	void evaluate() override {}
 
 private:
 	std::string m_ea;
@@ -311,7 +311,7 @@ public:
 		m_destination = "";
 		m_valid = decode(word0, word1);
 	}
-	bool decode(const UINT16 word0, const UINT16 word1)
+	bool decode(const UINT16 word0, const UINT16 word1) override
 	{
 		INT8 b;
 		reg_id SD;
@@ -321,11 +321,11 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const
+	void disassemble(std::string& retString) const override
 	{
 		retString = m_source + "," + m_destination;
 	}
-	void evaluate() {}
+	void evaluate() override {}
 
 private:
 	std::string m_source;
