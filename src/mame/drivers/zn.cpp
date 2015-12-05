@@ -2807,7 +2807,10 @@ ROM Definitions
 
 #define CPZN1_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1000c.353", 0x0000000, 0x080000, CRC(50033af6) SHA1(486d92ff6c7f1e54f8e0ef41cd9116eca0e10e1a) ) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "standard" ) \
+	ROMX_LOAD( "coh-1000c.353", 0x0000000, 0x080000, CRC(50033af6) SHA1(486d92ff6c7f1e54f8e0ef41cd9116eca0e10e1a), ROM_BIOS(1)) \
+	ROM_SYSTEM_BIOS( 1, "bios1", "development" ) \
+	ROMX_LOAD( "coh-1000c-devel.bin", 0x000000, 0x080000, CRC(f20f7fe5) SHA1(9aac7d3b3d0cc0bbbe4056164b73078dce41d91c), ROM_BIOS(2) ) \
 	ROM_REGION( 0x2000, "mcu", 0 ) \
 	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
