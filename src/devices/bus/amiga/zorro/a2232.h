@@ -101,15 +101,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rs232_7_cts_w );
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset_after_children();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset_after_children() override;
 
 	// device_zorro2_card_interface overrides
 	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w );
 
 	// amiga_autoconfig overrides
-	virtual void autoconfig_base_address(offs_t address);
+	virtual void autoconfig_base_address(offs_t address) override;
 
 private:
 	enum

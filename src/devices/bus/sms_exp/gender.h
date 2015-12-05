@@ -38,12 +38,12 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_ram);
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
 
-	virtual int get_lphaser_xoffs();
+	virtual int get_lphaser_xoffs() override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	required_device<sega8_cart_slot_device> m_subslot;

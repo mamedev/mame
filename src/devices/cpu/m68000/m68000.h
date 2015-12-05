@@ -143,27 +143,27 @@ public:
 
 	void clear_all(void);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 10; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 
 
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 4; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
-	virtual UINT32 execute_input_lines() const { return 8; }; // number of input lines
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override { return 4; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
+	virtual UINT32 execute_input_lines() const override { return 8; }; // number of input lines
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_stop();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// address spaces
 	const address_space_config m_program_config, m_oprogram_config;
@@ -394,12 +394,12 @@ public:
 	inline void cpu_execute(void);
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
 
 	// device_memory_interface overrides
-	virtual bool memory_translate(address_spacenum space, int intention, offs_t &address);
+	virtual bool memory_translate(address_spacenum space, int intention, offs_t &address) override;
 };
 
 
@@ -416,17 +416,17 @@ public:
 
 
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 10; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 4; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 4; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class m68301_device : public m68000_base_device
@@ -435,17 +435,17 @@ public:
 	// construction/destruction
 	m68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 10; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 4; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 4; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -457,17 +457,17 @@ public:
 	// construction/destruction
 	m68008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 10; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 4; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 4; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class m68008plcc_device : public m68000_base_device
@@ -476,17 +476,17 @@ public:
 	// construction/destruction
 	m68008plcc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 10; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 4; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 4; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class m68010_device : public m68000_base_device
@@ -495,17 +495,17 @@ public:
 	// construction/destruction
 	m68010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 10; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 4; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 4; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class m68ec020_device : public m68000_base_device
@@ -514,17 +514,17 @@ public:
 	// construction/destruction
 	m68ec020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 2; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 2; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class m68020_device : public m68000_base_device
@@ -533,17 +533,17 @@ public:
 	// construction/destruction
 	m68020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 2; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 2; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class m68020fpu_device : public m68000_base_device
@@ -552,17 +552,17 @@ public:
 	// construction/destruction
 	m68020fpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 2; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 2; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class m68020pmmu_device : public m68000_base_device
@@ -571,17 +571,17 @@ public:
 	// construction/destruction
 	m68020pmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 2; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 2; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class m68020hmmu_device : public m68000_base_device
@@ -590,19 +590,19 @@ public:
 	// construction/destruction
 	m68020hmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 2; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 2; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
-	virtual bool memory_translate(address_spacenum space, int intention, offs_t &address);
+	virtual bool memory_translate(address_spacenum space, int intention, offs_t &address) override;
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class m68ec030_device : public m68000_base_device
@@ -611,17 +611,17 @@ public:
 	// construction/destruction
 	m68ec030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 2; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 2; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class m68030_device : public m68000_base_device
@@ -630,17 +630,17 @@ public:
 	// construction/destruction
 	m68030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 2; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 2; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class m68ec040_device : public m68000_base_device
@@ -649,17 +649,17 @@ public:
 	// construction/destruction
 	m68ec040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 2; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 2; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class m68lc040_device : public m68000_base_device
@@ -668,17 +668,17 @@ public:
 	// construction/destruction
 	m68lc040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 2; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 2; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class m68040_device : public m68000_base_device
@@ -687,17 +687,17 @@ public:
 	// construction/destruction
 	m68040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 2; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 2; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class scc68070_device : public m68000_base_device
@@ -706,17 +706,17 @@ public:
 	// construction/destruction
 	scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 10; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 4; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 4; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -731,17 +731,17 @@ public:
 	fscpu32_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
 						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 2; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 2; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -752,18 +752,18 @@ public:
 	// construction/destruction
 	mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT32 execute_min_cycles() const { return 2; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_min_cycles() const override { return 2; };
+	virtual UINT32 execute_max_cycles() const override { return 158; };
 
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
+	virtual UINT32 execute_default_irq_vector() const override { return -1; };
 
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 

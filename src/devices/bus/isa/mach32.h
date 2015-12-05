@@ -27,9 +27,9 @@ public:
 	DECLARE_WRITE16_MEMBER(mach32_mem_boundary_w) { m_membounds = data; if(data & 0x10) logerror("ATI: Unimplemented memory boundary activated."); }
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_config_complete() override;
 
 	UINT16 m_chip_ID;
 	UINT16 m_membounds;
@@ -123,9 +123,9 @@ public:
 	DECLARE_READ16_MEMBER(mach32_status_r) { return vga_vblank() << 1; }
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 /*
@@ -141,9 +141,9 @@ public:
 	mach64_8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_config_complete() override;
 };
 
 // main SVGA device
@@ -161,9 +161,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 // device type definition
 extern const device_type ATIMACH32;

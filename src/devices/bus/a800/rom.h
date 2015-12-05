@@ -17,8 +17,8 @@ public:
 	a800_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 };
@@ -33,8 +33,8 @@ public:
 	a800_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_80xx);
@@ -53,8 +53,8 @@ public:
 	a800_rom_williams_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
@@ -73,8 +73,8 @@ public:
 	a800_rom_express_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
@@ -93,8 +93,8 @@ public:
 	a800_rom_blizzard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 };
@@ -109,8 +109,8 @@ public:
 	a800_rom_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
@@ -144,8 +144,8 @@ public:
 	a800_rom_microcalc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
@@ -164,8 +164,8 @@ public:
 	xegs_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
@@ -196,8 +196,8 @@ public:
 	a5200_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_80xx);

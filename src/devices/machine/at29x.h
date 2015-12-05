@@ -39,14 +39,14 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
-	virtual void device_start(void);
-	virtual void device_reset(void);
-	virtual void device_stop(void);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start(void) override;
+	virtual void device_reset(void) override;
+	virtual void device_stop(void) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	void       nvram_default();
-	void       nvram_read(emu_file &file);
-	void       nvram_write(emu_file &file);
+	void       nvram_default() override;
+	void       nvram_read(emu_file &file) override;
+	void       nvram_write(emu_file &file) override;
 
 	int        get_sector_number(offs_t address) { return address / m_sector_size; }
 

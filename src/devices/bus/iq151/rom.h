@@ -24,14 +24,14 @@ public:
 	iq151_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// iq151cart_interface overrides
-	virtual UINT8* get_cart_base();
+	virtual UINT8* get_cart_base() override;
 
 	UINT8 * m_rom;
 };
@@ -48,7 +48,7 @@ public:
 
 protected:
 	// iq151cart_interface overrides
-	virtual void read(offs_t offset, UINT8 &data);
+	virtual void read(offs_t offset, UINT8 &data) override;
 };
 
 // ======================> iq151_basicg_device
@@ -62,7 +62,7 @@ public:
 
 protected:
 	// iq151cart_interface overrides
-	virtual void read(offs_t offset, UINT8 &data);
+	virtual void read(offs_t offset, UINT8 &data) override;
 };
 
 
@@ -77,8 +77,8 @@ public:
 
 protected:
 	// iq151cart_interface overrides
-	virtual void read(offs_t offset, UINT8 &data);
-	virtual void io_write(offs_t offset, UINT8 data);
+	virtual void read(offs_t offset, UINT8 &data) override;
+	virtual void io_write(offs_t offset, UINT8 data) override;
 
 	bool m_active;
 };
@@ -95,8 +95,8 @@ public:
 
 protected:
 	// iq151cart_interface overrides
-	virtual void read(offs_t offset, UINT8 &data);
-	virtual void io_write(offs_t offset, UINT8 data);
+	virtual void read(offs_t offset, UINT8 &data) override;
+	virtual void io_write(offs_t offset, UINT8 data) override;
 
 	bool m_active;
 };
@@ -113,8 +113,8 @@ public:
 
 protected:
 	// iq151cart_interface overrides
-	virtual void read(offs_t offset, UINT8 &data);
-	virtual void io_write(offs_t offset, UINT8 data);
+	virtual void read(offs_t offset, UINT8 &data) override;
+	virtual void io_write(offs_t offset, UINT8 data) override;
 
 	bool m_active;
 };

@@ -32,10 +32,10 @@ public:
 	DECLARE_WRITE8_MEMBER(cruwrite);
 
 protected:
-	virtual void device_start(void);
-	virtual void device_reset(void);
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start(void) override;
+	virtual void device_reset(void) override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 

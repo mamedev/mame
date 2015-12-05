@@ -29,7 +29,7 @@ public:
 	virtual ~spc1000_exp_device();
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read);

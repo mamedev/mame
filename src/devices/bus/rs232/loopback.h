@@ -17,7 +17,7 @@ public:
 	virtual WRITE_LINE_MEMBER( input_dtr );
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type RS232_LOOPBACK;

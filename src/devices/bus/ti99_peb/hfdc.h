@@ -48,16 +48,16 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
-	void device_config_complete();
+	void device_config_complete() override;
 
 private:
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	void device_start();
-	void device_reset();
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void device_start() override;
+	void device_reset() override;
 
-	const rom_entry *device_rom_region() const;
-	machine_config_constructor device_mconfig_additions() const;
-	ioport_constructor device_input_ports() const;
+	const rom_entry *device_rom_region() const override;
+	machine_config_constructor device_mconfig_additions() const override;
+	ioport_constructor device_input_ports() const override;
 
 	// Debug accessors
 	void debug_read(offs_t offset, UINT8* value);

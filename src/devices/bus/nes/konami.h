@@ -17,10 +17,10 @@ public:
 	nes_konami_vrc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	UINT8 m_mmc_vrom_bank[2];
@@ -36,12 +36,12 @@ public:
 	nes_konami_vrc2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(read_m);
 	virtual DECLARE_WRITE8_MEMBER(write_m);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	UINT8 m_mmc_vrom_bank[8];
@@ -58,11 +58,11 @@ public:
 	nes_konami_vrc3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	UINT16 m_irq_count, m_irq_count_latch;
@@ -84,11 +84,11 @@ public:
 	nes_konami_vrc4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	void set_prg();
@@ -115,8 +115,8 @@ public:
 	nes_konami_vrc6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
 	required_device<vrc6snd_device> m_vrc6snd;
@@ -132,11 +132,11 @@ public:
 	nes_konami_vrc7_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	required_device<ym2413_device> m_ym2413;

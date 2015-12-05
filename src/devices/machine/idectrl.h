@@ -92,10 +92,10 @@ public:
 	DECLARE_WRITE32_MEMBER( bmdma_w );
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
-	virtual void set_irq(int state);
-	virtual void set_dmarq(int state);
+	virtual void set_irq(int state) override;
+	virtual void set_dmarq(int state) override;
 
 private:
 	void execute_dma();

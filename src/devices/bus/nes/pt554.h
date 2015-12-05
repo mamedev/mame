@@ -15,7 +15,7 @@ public:
 	nes_bandai_pt554_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual DECLARE_WRITE8_MEMBER(write_m);
 
 private:

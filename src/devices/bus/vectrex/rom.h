@@ -17,8 +17,8 @@ public:
 	vectrex_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start() {}
-	virtual void device_reset() {}
+	virtual void device_start() override {}
+	virtual void device_reset() override {}
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -33,8 +33,8 @@ public:
 	vectrex_rom64k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);

@@ -20,8 +20,8 @@ public:
 	msx_cart_sfg(const machine_config &mconfig, const device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_cart);
@@ -49,7 +49,7 @@ class msx_cart_sfg01 : public msx_cart_sfg
 public:
 	msx_cart_sfg01(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -58,7 +58,7 @@ class msx_cart_sfg05 : public msx_cart_sfg
 public:
 	msx_cart_sfg05(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 #endif

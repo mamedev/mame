@@ -30,23 +30,23 @@ public:
 	kc_d004_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() { return 0xa7; }
-	virtual void control_w(UINT8 data);
-	virtual void read(offs_t offset, UINT8 &data);
-	virtual void io_read(offs_t offset, UINT8 &data);
-	virtual void io_write(offs_t offset, UINT8 data);
+	virtual UINT8 module_id_r() override { return 0xa7; }
+	virtual void control_w(UINT8 data) override;
+	virtual void read(offs_t offset, UINT8 &data) override;
+	virtual void io_read(offs_t offset, UINT8 &data) override;
+	virtual void io_write(offs_t offset, UINT8 data) override;
 
 public:
 	DECLARE_READ8_MEMBER(hw_input_gate_r);
@@ -89,12 +89,12 @@ public:
 	kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 
 public:
 	DECLARE_READ8_MEMBER(gide_r);

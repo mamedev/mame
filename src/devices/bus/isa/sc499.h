@@ -29,19 +29,19 @@ public:
 	sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
-	virtual void call_unload();
-	virtual iodevice_t image_type() const { return IO_MAGTAPE; }
+	virtual bool call_load() override;
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override { return load_software(swlist, swname, start_entry); }
+	virtual void call_unload() override;
+	virtual iodevice_t image_type() const override { return IO_MAGTAPE; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return "sc499_cass"; }
-	virtual const char *file_extensions() const { return "act,ct"; }
-	virtual const option_guide *create_option_guide() const { return nullptr; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 1; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return "sc499_cass"; }
+	virtual const char *file_extensions() const override { return "act,ct"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	UINT8 *read_block(int block_num);
 	void write_block(int block_num, UINT8 *ptr);
@@ -49,8 +49,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start() { };
+	virtual void device_config_complete() override;
+	virtual void device_start() override { };
 
 	dynamic_buffer m_ctape_data;
 };
@@ -70,16 +70,16 @@ public:
 
 private:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// ISA overrides
-	virtual UINT8 dack_r(int line);
-	virtual void dack_w(int line,UINT8 data);
-	virtual void eop_w(int state);
+	virtual UINT8 dack_r(int line) override;
+	virtual void dack_w(int line,UINT8 data) override;
+	virtual void eop_w(int state) override;
 
 	const char *cpu_context();
 

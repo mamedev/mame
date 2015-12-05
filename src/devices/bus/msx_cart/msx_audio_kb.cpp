@@ -55,9 +55,9 @@ public:
 		, m_keyboard(*this, "KEY")
 	{ };
 
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
-	virtual DECLARE_READ8_MEMBER(read)
+	virtual DECLARE_READ8_MEMBER(read) override
 	{
 		UINT8 result = 0xff;
 
@@ -71,13 +71,13 @@ public:
 		return result;
 	}
 
-	virtual DECLARE_WRITE8_MEMBER(write)
+	virtual DECLARE_WRITE8_MEMBER(write) override
 	{
 		m_row = data;
 	}
 
 protected:
-	virtual void device_start() { }
+	virtual void device_start() override { }
 
 private:
 	UINT8 m_row;
@@ -185,9 +185,9 @@ public:
 		, m_keyboard(*this, "KEY")
 	{ };
 
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
-	virtual DECLARE_READ8_MEMBER(read)
+	virtual DECLARE_READ8_MEMBER(read) override
 	{
 		UINT8 result = 0xff;
 
@@ -201,14 +201,14 @@ public:
 		return result;
 	}
 
-	virtual DECLARE_WRITE8_MEMBER(write)
+	virtual DECLARE_WRITE8_MEMBER(write) override
 	{
 		logerror("msx_nms1160::write %02x\n", data);
 		m_row = data;
 	}
 
 protected:
-	virtual void device_start() { }
+	virtual void device_start() override { }
 
 private:
 	UINT8 m_row;

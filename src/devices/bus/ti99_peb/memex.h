@@ -29,10 +29,10 @@ public:
 	DECLARE_WRITE8_MEMBER(cruwrite) { };
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual ioport_constructor device_input_ports() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
 private:
 	bool    access_enabled(offs_t offset);

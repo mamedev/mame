@@ -17,13 +17,13 @@ public:
 	saturn_bram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file) { if (!m_ext_bram.empty()) file.read(&m_ext_bram[0], m_ext_bram.size()); }
-	virtual void nvram_write(emu_file &file) { if (!m_ext_bram.empty()) file.write(&m_ext_bram[0], m_ext_bram.size()); }
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override { if (!m_ext_bram.empty()) file.read(&m_ext_bram[0], m_ext_bram.size()); }
+	virtual void nvram_write(emu_file &file) override { if (!m_ext_bram.empty()) file.write(&m_ext_bram[0], m_ext_bram.size()); }
 
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_ext_bram);

@@ -54,37 +54,37 @@ protected:
 	class mi_default : public memory_interface {
 	public:
 		virtual ~mi_default() {}
-		virtual UINT8 read(UINT16 adr);
-		virtual UINT8 read_opcode(UINT16 adr);
-		virtual UINT8 read_opcode_arg(UINT16 adr);
-		virtual void write(UINT16 adr, UINT8 val);
+		virtual UINT8 read(UINT16 adr) override;
+		virtual UINT8 read_opcode(UINT16 adr) override;
+		virtual UINT8 read_opcode_arg(UINT16 adr) override;
+		virtual void write(UINT16 adr, UINT8 val) override;
 	};
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_pre_save();
-	virtual void device_post_load();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_pre_save() override;
+	virtual void device_post_load() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual UINT32 execute_input_lines() const;
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const;
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const;
+	virtual UINT32 execute_min_cycles() const override;
+	virtual UINT32 execute_max_cycles() const override;
+	virtual UINT32 execute_input_lines() const override;
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override;
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override;
+	virtual UINT32 disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
 
 	// addressing modes
 	enum

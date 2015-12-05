@@ -15,10 +15,10 @@ public:
 	nes_nina001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_m);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -31,10 +31,10 @@ public:
 	nes_nina006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -47,10 +47,10 @@ public:
 	nes_maxi15_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(read_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	void update_banks();

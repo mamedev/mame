@@ -18,21 +18,21 @@ public:
 	// construction/destruction
 	cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	virtual READ8_MEMBER(port_03c0_r);
-	virtual WRITE8_MEMBER(port_03c0_w);
-	virtual READ8_MEMBER(port_03b0_r);
-	virtual WRITE8_MEMBER(port_03b0_w);
-	virtual READ8_MEMBER(port_03d0_r);
-	virtual WRITE8_MEMBER(port_03d0_w);
-	virtual READ8_MEMBER(mem_r);
-	virtual WRITE8_MEMBER(mem_w);
+	virtual READ8_MEMBER(port_03c0_r) override;
+	virtual WRITE8_MEMBER(port_03c0_w) override;
+	virtual READ8_MEMBER(port_03b0_r) override;
+	virtual WRITE8_MEMBER(port_03b0_w) override;
+	virtual READ8_MEMBER(port_03d0_r) override;
+	virtual WRITE8_MEMBER(port_03d0_w) override;
+	virtual READ8_MEMBER(mem_r) override;
+	virtual WRITE8_MEMBER(mem_w) override;
 
-	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual UINT16 offset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual UINT16 offset() override;
 
 	UINT8 m_chip_id;
 
@@ -106,7 +106,7 @@ class cirrus_gd5430_device :  public cirrus_gd5428_device
 public:
 	cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 // device type definition

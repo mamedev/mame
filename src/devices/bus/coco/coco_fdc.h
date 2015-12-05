@@ -40,10 +40,10 @@ public:
 		DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual const rom_entry *device_rom_region() const;
+		virtual machine_config_constructor device_mconfig_additions() const override;
+		virtual const rom_entry *device_rom_region() const override;
 
-		virtual UINT8* get_cart_base();
+		virtual UINT8* get_cart_base() override;
 
 		virtual void update_lines();
 		virtual void dskreg_w(UINT8 data);
@@ -55,7 +55,7 @@ public:
 		DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 protected:
 		// device-level overrides
-		virtual void device_start();
+		virtual void device_start() override;
 		virtual DECLARE_READ8_MEMBER(read);
 		virtual DECLARE_WRITE8_MEMBER(write);
 
@@ -92,7 +92,7 @@ public:
 		coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
-		virtual const rom_entry *device_rom_region() const;
+		virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -109,7 +109,7 @@ public:
 		coco3_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
-		virtual const rom_entry *device_rom_region() const;
+		virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -126,7 +126,7 @@ public:
 		cp400_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
-		virtual const rom_entry *device_rom_region() const;
+		virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -144,13 +144,13 @@ public:
 		dragon_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual const rom_entry *device_rom_region() const;
-		virtual void update_lines();
-		virtual void dskreg_w(UINT8 data);
+		virtual machine_config_constructor device_mconfig_additions() const override;
+		virtual const rom_entry *device_rom_region() const override;
+		virtual void update_lines() override;
+		virtual void dskreg_w(UINT8 data) override;
 protected:
 		// device-level overrides
-		virtual void device_start();
+		virtual void device_start() override;
 		virtual DECLARE_READ8_MEMBER(read);
 		virtual DECLARE_WRITE8_MEMBER(write);
 };
@@ -169,7 +169,7 @@ public:
 		sdtandy_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
-		virtual const rom_entry *device_rom_region() const;
+		virtual const rom_entry *device_rom_region() const override;
 };
 
 

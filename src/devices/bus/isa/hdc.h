@@ -53,9 +53,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	hard_disk_file *pc_hdc_file(int id);
 	void pc_hdc_result(int set_error_info);
 	int no_dma(void);
@@ -152,16 +152,16 @@ public:
 		required_device<xt_hdc_device> m_hdc;
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual const rom_entry *device_rom_region() const;
-		virtual ioport_constructor device_input_ports() const;
+		virtual machine_config_constructor device_mconfig_additions() const override;
+		virtual const rom_entry *device_rom_region() const override;
+		virtual ioport_constructor device_input_ports() const override;
 protected:
 		// device-level overrides
-		virtual void device_start();
-		virtual void device_reset();
+		virtual void device_start() override;
+		virtual void device_reset() override;
 public:
-		virtual UINT8 dack_r(int line);
-		virtual void dack_w(int line,UINT8 data);
+		virtual UINT8 dack_r(int line) override;
+		virtual void dack_w(int line,UINT8 data) override;
 		UINT8 pc_hdc_dipswitch_r();
 
 		int dip;                /* dip switches */
@@ -174,7 +174,7 @@ public:
 	isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	required_device<ec1841_device> m_hdc;
 };

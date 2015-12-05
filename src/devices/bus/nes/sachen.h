@@ -15,10 +15,10 @@ public:
 	nes_sachen_sa009_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -31,10 +31,10 @@ public:
 	nes_sachen_sa0036_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -47,10 +47,10 @@ public:
 	nes_sachen_sa0037_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -63,10 +63,10 @@ public:
 	nes_sachen_sa72007_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -79,10 +79,10 @@ public:
 	nes_sachen_sa72008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -95,10 +95,10 @@ public:
 	nes_sachen_tca01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(read_l);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -111,12 +111,12 @@ public:
 	nes_sachen_tcu01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_m) { write_l(space, (offset + 0x100) & 0xfff, data, mem_mask); }
-	virtual DECLARE_WRITE8_MEMBER(write_h) { write_l(space, (offset + 0x100) & 0xfff, data, mem_mask); }
+	virtual DECLARE_WRITE8_MEMBER(write_m) override { write_l(space, (offset + 0x100) & 0xfff, data, mem_mask); }
+	virtual DECLARE_WRITE8_MEMBER(write_h) override { write_l(space, (offset + 0x100) & 0xfff, data, mem_mask); }
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -129,11 +129,11 @@ public:
 	nes_sachen_tcu02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(read_l);
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	UINT8 m_latch;
@@ -150,11 +150,11 @@ public:
 	nes_sachen_74x374_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(read_l);
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	void set_mirror(UINT8 nt);
@@ -171,7 +171,7 @@ public:
 	nes_sachen_74x374_alt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual DECLARE_READ8_MEMBER(read_l) { return 0xff; }   // no read_l here
+	virtual DECLARE_READ8_MEMBER(read_l) override { return 0xff; }   // no read_l here
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 };
 
@@ -186,11 +186,11 @@ public:
 	nes_sachen_8259a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_m) { write_l(space, (offset + 0x100) & 0xfff, data, mem_mask); }
+	virtual DECLARE_WRITE8_MEMBER(write_m) override { write_l(space, (offset + 0x100) & 0xfff, data, mem_mask); }
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	virtual void chr_update();
@@ -207,7 +207,7 @@ public:
 	nes_sachen_8259b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void chr_update();
+	virtual void chr_update() override;
 };
 
 
@@ -220,7 +220,7 @@ public:
 	nes_sachen_8259c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void chr_update();
+	virtual void chr_update() override;
 };
 
 
@@ -232,10 +232,10 @@ public:
 	// construction/destruction
 	nes_sachen_8259d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
-	virtual void chr_update();
+	virtual void chr_update() override;
 };
 
 

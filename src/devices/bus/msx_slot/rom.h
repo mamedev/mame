@@ -19,7 +19,7 @@ public:
 	// static configuration helpers
 	static void set_rom_start(device_t &device, const char *region, UINT32 offset);
 
-	virtual void device_start();
+	virtual void device_start() override;
 
 	virtual DECLARE_READ8_MEMBER(read);
 

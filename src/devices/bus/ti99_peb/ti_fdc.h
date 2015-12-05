@@ -40,14 +40,14 @@ public:
 	// bool dvena_r();
 
 protected:
-	void device_start();
-	void device_reset();
-	void device_config_complete();
+	void device_start() override;
+	void device_reset() override;
+	void device_config_complete() override;
 
-	const rom_entry *device_rom_region() const;
-	machine_config_constructor device_mconfig_additions() const;
+	const rom_entry *device_rom_region() const override;
+	machine_config_constructor device_mconfig_additions() const override;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// Wait state logic

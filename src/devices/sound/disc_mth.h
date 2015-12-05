@@ -129,8 +129,8 @@ public:
 		TOK_OR,          /* Bitwise OR */
 		TOK_XOR          /* Bitwise XOR */
 	};
-	void step(void);
-	void reset(void);
+	void step(void) override;
+	void reset(void) override;
 private:
 	DISCRETE_CLASS_INPUT(I_IN0,     0);
 	DISCRETE_CLASS_INPUT(I_IN1,     1);

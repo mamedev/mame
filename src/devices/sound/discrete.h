@@ -4321,9 +4321,9 @@ public:
 protected:
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_stop();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
 
 	// configuration state
 	const discrete_block *m_intf;
@@ -4376,17 +4376,17 @@ public:
 
 	/* --------------------------------- */
 
-	virtual void update_to_current_time(void) const { m_stream->update(); }
+	virtual void update_to_current_time(void) const override { m_stream->update(); }
 
 	sound_stream *get_stream(void) { return m_stream; }
 protected:
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	/* the output stream */
@@ -4492,7 +4492,7 @@ template <class C>
 class discrete_node_factory : public discrete_node_base_factory
 {
 public:
-	discrete_base_node *Create(discrete_device * pdev, const discrete_block *block);
+	discrete_base_node *Create(discrete_device * pdev, const discrete_block *block) override;
 };
 
 template <class C>

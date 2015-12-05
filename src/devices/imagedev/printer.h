@@ -30,19 +30,19 @@ public:
 	template<class _Object> static devcb_base &set_online_callback(device_t &device, _Object object) { return downcast<printer_image_device &>(device).m_online_cb.set_callback(object); }
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual bool call_create(int format_type, option_resolution *format_options);
-	virtual void call_unload();
+	virtual bool call_load() override;
+	virtual bool call_create(int format_type, option_resolution *format_options) override;
+	virtual void call_unload() override;
 
 	// image device
-	virtual iodevice_t image_type() const { return IO_PRINTER; }
-	virtual bool is_readable()  const { return 0; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *file_extensions() const { return "prn"; }
-	virtual const option_guide *create_option_guide() const { return nullptr; }
+	virtual iodevice_t image_type() const override { return IO_PRINTER; }
+	virtual bool is_readable()  const override { return 0; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 1; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *file_extensions() const override { return "prn"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// specific implementation
 
@@ -52,8 +52,8 @@ public:
 	void output(UINT8 data);
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 	devcb_write_line m_online_cb;
 };

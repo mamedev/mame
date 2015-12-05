@@ -38,9 +38,9 @@ public:
 	sns_rom_bsx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// additional reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
@@ -79,8 +79,8 @@ public:
 	sns_rom_bsxlo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// additional reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
@@ -99,8 +99,8 @@ public:
 	sns_rom_bsxhi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// additional reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
@@ -120,8 +120,8 @@ public:
 	sns_rom_bsmempak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// additional reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);

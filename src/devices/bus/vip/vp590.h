@@ -32,8 +32,8 @@ public:
 	vp590_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
 	DECLARE_READ_LINE_MEMBER( rd_r );
@@ -42,15 +42,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_vip_expansion_card_interface overrides
-	virtual void vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh);
-	virtual void vip_io_w(address_space &space, offs_t offset, UINT8 data);
-	virtual void vip_dma_w(address_space &space, offs_t offset, UINT8 data);
-	virtual UINT32 vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual int vip_ef3_r();
-	virtual int vip_ef4_r();
+	virtual void vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh) override;
+	virtual void vip_io_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual void vip_dma_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual UINT32 vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual int vip_ef3_r() override;
+	virtual int vip_ef4_r() override;
 
 private:
 	required_device<cdp1862_device> m_cgc;

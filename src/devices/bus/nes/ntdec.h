@@ -15,10 +15,10 @@ public:
 	nes_ntdec_asder_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	UINT8 m_latch;
@@ -34,10 +34,10 @@ public:
 	nes_ntdec_fh_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_m);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 

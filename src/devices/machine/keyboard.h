@@ -26,8 +26,8 @@ public:
 
 	template<class _Object> static devcb_base &set_keyboard_callback(device_t &device, _Object object) { return downcast<generic_keyboard_device &>(device).m_keyboard_cb.set_callback(object); }
 
-	virtual ioport_constructor device_input_ports() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 protected:
 	required_ioport m_io_kbd0;
 	required_ioport m_io_kbd1;
@@ -41,9 +41,9 @@ protected:
 	required_ioport m_io_kbd9;
 	required_ioport m_io_kbdc;
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void send_key(UINT8 code) { m_keyboard_cb((offs_t)0, code); }
 	emu_timer *m_timer;
 private:

@@ -15,10 +15,10 @@ public:
 	nes_74x161x161x32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -31,10 +31,10 @@ public:
 	nes_74x139x74_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_m);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -47,10 +47,10 @@ public:
 	nes_74x377_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -63,10 +63,10 @@ public:
 	nes_74x161x138_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_m);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 

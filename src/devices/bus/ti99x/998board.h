@@ -127,7 +127,7 @@ public:
 	ti998_oso_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	void device_start();
+	void device_start() override;
 
 private:
 	UINT8 m_data;
@@ -162,10 +162,10 @@ public:
 	DECLARE_WRITE8_MEMBER( spchrom_read_and_branch );
 
 protected:
-	virtual void    device_start();
-	virtual void    device_reset(void);
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void    device_start() override;
+	virtual void    device_reset(void) override;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	tms5220_device  *m_vsp;
@@ -209,9 +209,9 @@ public:
 	void clock_in(int state);
 
 protected:
-	void device_start(void);
-	void device_reset(void);
-	machine_config_constructor device_mconfig_additions() const;
+	void device_start(void) override;
+	void device_reset(void) override;
+	machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	bool access_logical_r(address_space& space, offs_t offset, UINT8 *value, UINT8 mem_mask );

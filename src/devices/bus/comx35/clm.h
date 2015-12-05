@@ -31,21 +31,21 @@ public:
 	comx_clm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// not really public
 	MC6845_UPDATE_ROW( crtc_update_row );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_comx_expansion_card_interface overrides
-	virtual int comx_ef4_r();
-	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom);
-	virtual void comx_mwr_w(address_space &space, offs_t offset, UINT8 data);
+	virtual int comx_ef4_r() override;
+	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom) override;
+	virtual void comx_mwr_w(address_space &space, offs_t offset, UINT8 data) override;
 
 private:
 	required_device<mc6845_device> m_crtc;

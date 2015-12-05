@@ -136,7 +136,7 @@ public:
 	required_ioport m_irqdrq;
 	required_ioport m_romopts;
 
-	virtual void recv_cb(UINT8 *data, int length);
+	virtual void recv_cb(UINT8 *data, int length) override;
 
 protected:
 	virtual int tx_data(device_t *, const UINT8 *, int);
@@ -145,14 +145,14 @@ protected:
 	const char *cpu_context();
 
 	// device-level overrides
-	virtual void device_start();
-	virtual const rom_entry *device_rom_region() const;
+	virtual void device_start() override;
+	virtual const rom_entry *device_rom_region() const override;
 
 private:
 	// device-level overrides
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	class data_buffer_fifo;
 

@@ -195,12 +195,12 @@ class mfmhd_generic_format : public mfmhd_image_format_t
 {
 public:
 	mfmhd_generic_format() { m_devtag = std::string("mfmhd_generic_format"); };
-	chd_error load(chd_file* chdfile, UINT16* trackimage, int tracksize, int cylinder, int head);
-	chd_error save(chd_file* chdfile, UINT16* trackimage, int tracksize, int cylinder, int head);
+	chd_error load(chd_file* chdfile, UINT16* trackimage, int tracksize, int cylinder, int head) override;
+	chd_error save(chd_file* chdfile, UINT16* trackimage, int tracksize, int cylinder, int head) override;
 
 	// Yes, we want to save all parameters
-	virtual bool save_param(mfmhd_param_t type) { return true; }
-	virtual int get_default(mfmhd_param_t type);
+	virtual bool save_param(mfmhd_param_t type) override { return true; }
+	virtual int get_default(mfmhd_param_t type) override;
 
 protected:
 	virtual UINT8   cylinder_to_ident(int cylinder);

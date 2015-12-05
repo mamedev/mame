@@ -15,13 +15,13 @@ public:
 	nes_rex_dbz5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_m) { return read_l(space, offset, mem_mask); }
+	virtual DECLARE_READ8_MEMBER(read_m) override { return read_l(space, offset, mem_mask); }
 	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual void chr_cb( int start, int bank, int source );
+	virtual void chr_cb( int start, int bank, int source ) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 private:
 	UINT8 m_extra;
@@ -37,14 +37,14 @@ public:
 	nes_rex_sl1632_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
-	virtual void set_prg(int prg_base, int prg_mask);
-	virtual void set_chr(UINT8 chr, int chr_base, int chr_mask);
+	virtual void set_prg(int prg_base, int prg_mask) override;
+	virtual void set_chr(UINT8 chr, int chr_base, int chr_mask) override;
 
 	UINT8 m_mode, m_mirror;
 	UINT8 m_extra_bank[12];

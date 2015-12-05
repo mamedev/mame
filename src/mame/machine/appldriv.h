@@ -29,8 +29,8 @@ public:
 	// construction/destruction
 	apple525_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual bool call_load();
-	virtual void call_unload();
+	virtual bool call_load() override;
+	virtual void call_unload() override;
 	void set_params(int dividend, int divisor) { m_dividend = dividend; m_divisor = divisor;}
 
 	int get_dividend() { return m_dividend; }
@@ -46,7 +46,7 @@ public:
 	UINT8 track_data[APPLE2_NIBBLE_SIZE * APPLE2_SECTOR_COUNT];
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	int m_dividend;

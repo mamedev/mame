@@ -49,25 +49,25 @@ public:
 	virtual ~nes_datach_slot_device();
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete() { update_names(); }
+	virtual void device_start() override;
+	virtual void device_config_complete() override { update_names(); }
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
+	virtual bool call_load() override;
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
 
-	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 0; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 1; }
-	virtual const char *image_interface() const { return "datach_cart"; }
-	virtual const char *file_extensions() const { return "nes,bin"; }
-	virtual const option_guide *create_option_guide() const { return nullptr; }
+	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 0; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 1; }
+	virtual const char *image_interface() const override { return "datach_cart"; }
+	virtual const char *file_extensions() const override { return "nes,bin"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result);
+	virtual void get_default_card_software(std::string &result) override;
 
 	virtual DECLARE_READ8_MEMBER(read);
 	void write_prg_bank(UINT8 bank) { if (m_cart) m_cart->write_prg_bank(bank); }
@@ -101,13 +101,13 @@ public:
 	nes_datach_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 	virtual UINT8* get_cart_base();
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 // ======================> nes_datach_24c01_device
@@ -119,7 +119,7 @@ public:
 	nes_datach_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 // device type definition
@@ -142,14 +142,14 @@ public:
 	nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual DECLARE_READ8_MEMBER(read_m);
 	virtual DECLARE_READ8_MEMBER(read_h);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	UINT8 m_datach_latch;

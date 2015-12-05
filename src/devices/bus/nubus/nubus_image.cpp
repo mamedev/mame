@@ -37,25 +37,25 @@ public:
 	messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_QUICKLOAD; }
+	virtual iodevice_t image_type() const override { return IO_QUICKLOAD; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return nullptr; }
-	virtual const char *file_extensions() const { return "img"; }
-	virtual const option_guide *create_option_guide() const { return nullptr; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return nullptr; }
+	virtual const char *file_extensions() const override { return "img"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load();
-	virtual void call_unload();
+	virtual bool call_load() override;
+	virtual void call_unload() override;
 
 	protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 public:
 	UINT32 m_size;
 	UINT8 *m_data;

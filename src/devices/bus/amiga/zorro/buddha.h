@@ -55,17 +55,17 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_zorro2_card_interface overrides
 	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w );
 
 	// amiga_autoconfig overrides
-	virtual void autoconfig_base_address(offs_t address);
+	virtual void autoconfig_base_address(offs_t address) override;
 
 private:
 	required_device<ata_interface_device> m_ata_0;

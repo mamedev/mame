@@ -16,13 +16,13 @@ public:
 	nes_sxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(read_m);
 	virtual DECLARE_WRITE8_MEMBER(write_m);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 	virtual void update_regs(int reg);      // this is needed to simplify NES-EVENT pcb implementation, which handle differently some regs!
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	TIMER_CALLBACK_MEMBER(resync_callback);
@@ -44,7 +44,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_m);
 	virtual DECLARE_WRITE8_MEMBER(write_m);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 class nes_sxrom_a_device : public nes_sxrom_device
@@ -66,7 +66,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_m);
 	virtual DECLARE_WRITE8_MEMBER(write_m);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 

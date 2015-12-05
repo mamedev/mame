@@ -17,8 +17,8 @@ public:
 	a78_versaboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_40xx);
@@ -53,11 +53,11 @@ public:
 	a78_rom_p450_vb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_04xx) { if (offset >= 0x50 && offset < 0x60) return m_pokey450->read(space, offset & 0x0f); else return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_04xx) { if (offset >= 0x50 && offset < 0x60) m_pokey450->write(space, offset & 0x0f, data); }
+	virtual DECLARE_READ8_MEMBER(read_04xx) override { if (offset >= 0x50 && offset < 0x60) return m_pokey450->read(space, offset & 0x0f); else return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER(write_04xx) override { if (offset >= 0x50 && offset < 0x60) m_pokey450->write(space, offset & 0x0f, data); }
 
 protected:
 	required_device<pokey_device> m_pokey450;

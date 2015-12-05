@@ -18,28 +18,28 @@ public:
 	// construction/destruction
 	trident_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual READ8_MEMBER(port_03c0_r);
-	virtual WRITE8_MEMBER(port_03c0_w);
-	virtual READ8_MEMBER(port_03d0_r);
-	virtual WRITE8_MEMBER(port_03d0_w);
+	virtual READ8_MEMBER(port_03c0_r) override;
+	virtual WRITE8_MEMBER(port_03c0_w) override;
+	virtual READ8_MEMBER(port_03d0_r) override;
+	virtual WRITE8_MEMBER(port_03d0_w) override;
 	DECLARE_READ8_MEMBER(port_83c6_r);
 	DECLARE_WRITE8_MEMBER(port_83c6_w);
 	DECLARE_READ8_MEMBER(port_43c6_r);
 	DECLARE_WRITE8_MEMBER(port_43c6_w);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
-	virtual READ8_MEMBER(mem_r);
-	virtual WRITE8_MEMBER(mem_w);
-	virtual UINT16 offset();
+	virtual READ8_MEMBER(mem_r) override;
+	virtual WRITE8_MEMBER(mem_w) override;
+	virtual UINT16 offset() override;
 
 	DECLARE_READ8_MEMBER(accel_r);
 	DECLARE_WRITE8_MEMBER(accel_w);
 
-	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	struct
 	{

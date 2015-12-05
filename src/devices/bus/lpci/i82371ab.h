@@ -23,13 +23,13 @@ public:
 	// construction/destruction
 	i82371ab_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask);
-	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask);
+	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask) override;
+	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask) override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT32 pci_isa_r(device_t *busdevice, int offset, UINT32 mem_mask);
 	void pci_isa_w(device_t *busdevice, int offset, UINT32 data, UINT32 mem_mask);

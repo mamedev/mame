@@ -17,8 +17,8 @@ public:
 	a26_rom_2k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -50,8 +50,8 @@ public:
 	a26_rom_f6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -72,7 +72,7 @@ public:
 	a26_rom_f4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -104,7 +104,7 @@ public:
 	a26_rom_f8_sw_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 };
 
 
@@ -131,8 +131,8 @@ public:
 	a26_rom_fe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -155,8 +155,8 @@ public:
 	a26_rom_3e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -179,7 +179,7 @@ public:
 	a26_rom_3f_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -199,8 +199,8 @@ public:
 	a26_rom_e0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -220,8 +220,8 @@ public:
 	a26_rom_e7_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -241,7 +241,7 @@ public:
 	a26_rom_ua_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -287,8 +287,8 @@ public:
 	a26_rom_fv_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -322,7 +322,7 @@ public:
 	a26_rom_4in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -338,8 +338,8 @@ public:
 	a26_rom_8in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -358,7 +358,7 @@ public:
 	a26_rom_32in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);

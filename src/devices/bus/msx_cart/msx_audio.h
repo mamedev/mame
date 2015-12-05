@@ -21,10 +21,10 @@ public:
 	msx_cart_msx_audio_hxmu900(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
 	virtual DECLARE_READ8_MEMBER(read_cart);
 
@@ -40,11 +40,11 @@ public:
 	msx_cart_msx_audio_nms1205(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
 	virtual DECLARE_READ8_MEMBER(read_cart);
 
@@ -66,12 +66,12 @@ public:
 	msx_cart_msx_audio_fsca1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_cart);

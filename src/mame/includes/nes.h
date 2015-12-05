@@ -90,10 +90,10 @@ public:
 	DECLARE_READ8_MEMBER(fc_in1_r);
 	DECLARE_WRITE8_MEMBER(fc_in0_w);
 	DECLARE_WRITE8_MEMBER(nes_vh_sprite_dma_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
-	virtual void video_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void video_reset() override;
 	DECLARE_PALETTE_INIT(nes);
 	UINT32 screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	NESCTRL_BRIGHTPIXEL_CB(bright_pixel);

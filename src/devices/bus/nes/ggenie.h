@@ -15,7 +15,7 @@ public:
 	nes_ggenie_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(read_l);
 	virtual DECLARE_READ8_MEMBER(read_m);
 	virtual DECLARE_READ8_MEMBER(read_h);
@@ -28,14 +28,14 @@ public:
 	virtual DECLARE_READ8_MEMBER(nt_r);
 	virtual DECLARE_WRITE8_MEMBER(nt_w);
 
-	void hblank_irq(int scanline, int vblank, int blanked) { if (m_gg_bypass && m_ggslot->m_cart) m_ggslot->m_cart->hblank_irq(scanline, vblank, blanked); }
-	void scanline_irq(int scanline, int vblank, int blanked) { if (m_gg_bypass && m_ggslot->m_cart) m_ggslot->m_cart->scanline_irq(scanline, vblank, blanked); }
-	void ppu_latch(offs_t offset) { if (m_gg_bypass && m_ggslot->m_cart) m_ggslot->m_cart->ppu_latch(offset); }
+	void hblank_irq(int scanline, int vblank, int blanked) override { if (m_gg_bypass && m_ggslot->m_cart) m_ggslot->m_cart->hblank_irq(scanline, vblank, blanked); }
+	void scanline_irq(int scanline, int vblank, int blanked) override { if (m_gg_bypass && m_ggslot->m_cart) m_ggslot->m_cart->scanline_irq(scanline, vblank, blanked); }
+	void ppu_latch(offs_t offset) override { if (m_gg_bypass && m_ggslot->m_cart) m_ggslot->m_cart->ppu_latch(offset); }
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void pcb_reset();
-	virtual void pcb_start(running_machine &machine, UINT8 *ciram_ptr, bool cart_mounted);
+	virtual void pcb_reset() override;
+	virtual void pcb_start(running_machine &machine, UINT8 *ciram_ptr, bool cart_mounted) override;
 
 private:
 	// emulate the Game Genie!

@@ -96,11 +96,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// amiga_autoconfig overrides
-	virtual void autoconfig_base_address(offs_t address);
+	virtual void autoconfig_base_address(offs_t address) override;
 
 private:
 

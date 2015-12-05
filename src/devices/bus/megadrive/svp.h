@@ -22,10 +22,10 @@ public:
 
 //protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual void set_bank_to_rom(const char *banktag, UINT32 offset);
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void set_bank_to_rom(const char *banktag, UINT32 offset) override;
 
 	required_device<device_t> m_svp;
 	required_ioport m_test_ipt;
@@ -36,7 +36,7 @@ public:
 	virtual DECLARE_READ16_MEMBER(read_a15);
 	virtual DECLARE_WRITE16_MEMBER(write_a15);
 
-	virtual int read_test();
+	virtual int read_test() override;
 
 	virtual DECLARE_READ16_MEMBER(rom_read1);
 	virtual DECLARE_READ16_MEMBER(rom_read2);

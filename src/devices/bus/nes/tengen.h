@@ -15,10 +15,10 @@ public:
 	nes_tengen008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -32,14 +32,14 @@ public:
 	nes_tengen032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual DECLARE_WRITE8_MEMBER(tengen032_write);
-	virtual DECLARE_WRITE8_MEMBER(write_h) { tengen032_write(space, offset, data, mem_mask); }
+	virtual DECLARE_WRITE8_MEMBER(write_h) override { tengen032_write(space, offset, data, mem_mask); }
 	virtual void chr_cb(int start, int bank, int source);
 
-	virtual void hblank_irq(int scanline, int vblank, int blanked);
-	virtual void pcb_reset();
+	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
+	virtual void pcb_reset() override;
 
 protected:
 	void set_prg();
@@ -70,7 +70,7 @@ public:
 
 	// device-level overrides
 	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual void chr_cb(int start, int bank, int source);
+	virtual void chr_cb(int start, int bank, int source) override;
 
 protected:
 	void set_mirror();

@@ -84,10 +84,10 @@ public:
 
 protected:
 	/* Constructor */
-	void device_start();
-	void device_stop();
-	void device_reset();
-	ioport_constructor device_input_ports() const;
+	void device_start() override;
+	void device_stop() override;
+	void device_reset() override;
+	ioport_constructor device_input_ports() const override;
 
 private:
 	// Keeps the address space pointer

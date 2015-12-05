@@ -32,15 +32,15 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( ks_changed );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual const rom_entry *device_rom_region() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
-	void nvram_default();
-	void nvram_read(emu_file &file);
-	void nvram_write(emu_file &file);
+	void nvram_default() override;
+	void nvram_read(emu_file &file) override;
+	void nvram_write(emu_file &file) override;
 
 private:
 	void    setbit(int& page, int pattern, bool set);

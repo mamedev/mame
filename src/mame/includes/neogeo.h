@@ -134,8 +134,8 @@ protected:
 
 
 	// device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -178,8 +178,8 @@ protected:
 
 	// video hardware, including maincpu interrupts
 	// TODO: make into a device
-	virtual void video_start();
-	virtual void video_reset();
+	virtual void video_start() override;
+	virtual void video_reset() override;
 
 	emu_timer  *m_display_position_interrupt_timer;
 	emu_timer  *m_display_position_vblank_timer;

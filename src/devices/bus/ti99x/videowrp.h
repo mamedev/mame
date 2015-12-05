@@ -29,10 +29,10 @@ protected:
 
 	/* Constructor */
 	ti_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	virtual void device_start(void);
-	virtual void device_reset(void);
-	virtual DECLARE_READ8Z_MEMBER(readz) { };
-	virtual DECLARE_WRITE8_MEMBER(write) { };
+	virtual void device_start(void) override;
+	virtual void device_reset(void) override;
+	virtual DECLARE_READ8Z_MEMBER(readz) override { };
+	virtual DECLARE_WRITE8_MEMBER(write) override { };
 };
 
 /*
@@ -45,7 +45,7 @@ public:
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 
-	void    reset_vdp(int state) { m_tms9928a->reset_line(state); }
+	void    reset_vdp(int state) override { m_tms9928a->reset_line(state); }
 };
 
 /*
@@ -60,10 +60,10 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ16_MEMBER(read16);
 	DECLARE_WRITE16_MEMBER(write16);
-	void    reset_vdp(int state) { m_v9938->reset_line(state); }
+	void    reset_vdp(int state) override { m_v9938->reset_line(state); }
 
 protected:
-	virtual void    device_start(void);
+	virtual void    device_start(void) override;
 	v9938_device    *m_v9938;
 };
 
@@ -96,7 +96,7 @@ public:
 	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<ti_sound_system_device &>(device).m_console_ready.set_callback(object); }
 
 protected:
-	virtual void device_start(void);
+	virtual void device_start(void) override;
 	virtual machine_config_constructor device_mconfig_additions() const =0;
 
 private:
@@ -113,7 +113,7 @@ public:
 	ti_sound_sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 /*
@@ -125,7 +125,7 @@ public:
 	ti_sound_sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 

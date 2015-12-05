@@ -15,7 +15,7 @@ public:
 	nes_exrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(read_l);
 	virtual DECLARE_READ8_MEMBER(read_m);
 	virtual DECLARE_READ8_MEMBER(read_h);
@@ -27,8 +27,8 @@ public:
 	virtual DECLARE_READ8_MEMBER(nt_r);
 	virtual DECLARE_WRITE8_MEMBER(nt_w);
 
-	virtual void hblank_irq(int scanline, int vblank, int blanked);
-	virtual void pcb_reset();
+	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
+	virtual void pcb_reset() override;
 
 protected:
 	void set_mirror(int page, int src);

@@ -30,17 +30,17 @@ public:
 	a2bus_arcboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset);
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
+	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
+	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
 
 	required_device<tms9918a_device> m_tms;
 	required_device<ay8910_device> m_ay;

@@ -40,16 +40,16 @@ public:
 	DECLARE_WRITE8_MEMBER(cruwrite);
 
 protected:
-	virtual void device_start(void);
-	virtual void device_reset(void);
-	virtual void device_stop(void);
+	virtual void device_start(void) override;
+	virtual void device_reset(void) override;
+	virtual void device_stop(void) override;
 
-	virtual const rom_entry *device_rom_region() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
-	void nvram_default();
-	void nvram_read(emu_file &file);
-	void nvram_write(emu_file &file);
+	void nvram_default() override;
+	void nvram_read(emu_file &file) override;
+	void nvram_write(emu_file &file) override;
 
 private:
 	UINT8*          m_dsrrom;

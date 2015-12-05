@@ -27,15 +27,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual const rom_entry *device_rom_region() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const rom_entry *device_rom_region() const override;
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() { return 0xfb; }
-	virtual void control_w(UINT8 data);
-	virtual void read(offs_t offset, UINT8 &data);
-	virtual UINT8* get_cart_base();
+	virtual UINT8 module_id_r() override { return 0xfb; }
+	virtual void control_w(UINT8 data) override;
+	virtual void read(offs_t offset, UINT8 &data) override;
+	virtual UINT8* get_cart_base() override;
 	virtual DECLARE_WRITE_LINE_MEMBER( mei_w );
 
 protected:
@@ -60,9 +60,9 @@ public:
 
 protected:
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() { return 0xfc; }
-	virtual void control_w(UINT8 data);
-	virtual void read(offs_t offset, UINT8 &data);
+	virtual UINT8 module_id_r() override { return 0xfc; }
+	virtual void control_w(UINT8 data) override;
+	virtual void read(offs_t offset, UINT8 &data) override;
 };
 
 
@@ -77,12 +77,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 
 	// kcexp_interface overrides
-	virtual UINT8 module_id_r() { return 0x01; }
-	virtual void control_w(UINT8 data);
-	virtual void read(offs_t offset, UINT8 &data);
+	virtual UINT8 module_id_r() override { return 0x01; }
+	virtual void control_w(UINT8 data) override;
+	virtual void read(offs_t offset, UINT8 &data) override;
 
 private:
 	// internal state

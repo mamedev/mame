@@ -33,17 +33,17 @@ public:
 	coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual UINT8* get_cart_base();
+	virtual UINT8* get_cart_base() override;
 
 	DECLARE_WRITE_LINE_MEMBER(multi_cart_w);
 	DECLARE_WRITE_LINE_MEMBER(multi_nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(multi_halt_w);
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual DECLARE_WRITE8_MEMBER(write);
 

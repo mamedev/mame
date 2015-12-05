@@ -29,7 +29,7 @@ public:
 	virtual ~astrocade_exp_device();
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	bool get_card_mounted() { return m_card_mounted; }
 

@@ -24,7 +24,7 @@ public:
 	// static configuration helpers
 	static void set_ym2413_tag(device_t &device, const char *tag) { dynamic_cast<msx_slot_music_device &>(device).m_ym2413_tag = tag; }
 
-	virtual void device_start();
+	virtual void device_start() override;
 
 	virtual DECLARE_READ8_MEMBER(read);
 

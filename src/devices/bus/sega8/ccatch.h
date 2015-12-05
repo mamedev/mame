@@ -17,9 +17,9 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_mapper) {}
+	virtual DECLARE_WRITE8_MEMBER(write_mapper) override {}
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:
 	required_device<sega8_card_slot_device> m_card;

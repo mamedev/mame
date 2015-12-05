@@ -26,8 +26,8 @@ public:
 	kc_d002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// interface callbacks
 	DECLARE_WRITE_LINE_MEMBER( out_irq_w );
@@ -36,14 +36,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// kcexp_interface overrides
-	virtual void read(offs_t offset, UINT8 &data);
-	virtual void write(offs_t offset, UINT8 data);
-	virtual void io_read(offs_t offset, UINT8 &data);
-	virtual void io_write(offs_t offset, UINT8 data);
+	virtual void read(offs_t offset, UINT8 &data) override;
+	virtual void write(offs_t offset, UINT8 data) override;
+	virtual void io_read(offs_t offset, UINT8 &data) override;
+	virtual void io_write(offs_t offset, UINT8 data) override;
 	virtual DECLARE_WRITE_LINE_MEMBER( mei_w );
 
 private:

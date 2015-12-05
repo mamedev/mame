@@ -153,13 +153,13 @@ public:
 	virtual ~base_sns_cart_slot_device();
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual void call_unload();
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
+	virtual bool call_load() override;
+	virtual void call_unload() override;
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
 
 	void get_cart_type_addon(UINT8 *ROM, UINT32 len, int &type, int &addon);
 	UINT32 snes_skip_header(UINT8 *ROM, UINT32 snes_rom_size);
@@ -171,16 +171,16 @@ public:
 	void save_ram() { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram();
 					if (m_cart && m_cart->get_rtc_ram_size()) m_cart->save_rtc_ram(); }
 
-	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 0; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 1; }
-	virtual bool is_reset_on_load() const { return 1; }
-	virtual const option_guide *create_option_guide() const { return nullptr; }
+	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 0; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return 1; }
+	virtual bool is_reset_on_load() const override { return 1; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result);
+	virtual void get_default_card_software(std::string &result) override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
@@ -216,8 +216,8 @@ class sns_cart_slot_device :  public base_sns_cart_slot_device
 public:
 	// construction/destruction
 	sns_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual const char *image_interface() const { return "snes_cart"; }
-	virtual const char *file_extensions() const { return "sfc"; }
+	virtual const char *image_interface() const override { return "snes_cart"; }
+	virtual const char *file_extensions() const override { return "sfc"; }
 };
 
 // ======================> sns_sufami_cart_slot_device
@@ -227,9 +227,9 @@ class sns_sufami_cart_slot_device :  public base_sns_cart_slot_device
 public:
 	// construction/destruction
 	sns_sufami_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual const char *image_interface() const { return "st_cart"; }
-	virtual const char *file_extensions() const { return "st"; }
-	virtual bool must_be_loaded() const { return 0; }
+	virtual const char *image_interface() const override { return "st_cart"; }
+	virtual const char *file_extensions() const override { return "st"; }
+	virtual bool must_be_loaded() const override { return 0; }
 };
 
 // ======================> sns_sufami_cart_slot_device
@@ -239,9 +239,9 @@ class sns_bsx_cart_slot_device :  public base_sns_cart_slot_device
 public:
 	// construction/destruction
 	sns_bsx_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual const char *image_interface() const { return "bspack"; }
-	virtual const char *file_extensions() const { return "bs"; }
-	virtual bool must_be_loaded() const { return 0; }
+	virtual const char *image_interface() const override { return "bspack"; }
+	virtual const char *file_extensions() const override { return "bs"; }
+	virtual bool must_be_loaded() const override { return 0; }
 };
 
 

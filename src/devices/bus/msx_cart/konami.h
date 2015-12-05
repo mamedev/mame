@@ -25,10 +25,10 @@ public:
 	msx_cart_konami(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_cart);
@@ -49,11 +49,11 @@ public:
 	msx_cart_konami_scc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_cart);
@@ -77,10 +77,10 @@ public:
 	msx_cart_gamemaster2(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_cart);
@@ -102,10 +102,10 @@ public:
 	msx_cart_synthesizer(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_cart);
@@ -123,11 +123,11 @@ public:
 	msx_cart_konami_sound(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_cart);
@@ -157,7 +157,7 @@ class msx_cart_konami_sound_snatcher : public msx_cart_konami_sound
 public:
 	msx_cart_konami_sound_snatcher(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 };
 
 
@@ -166,7 +166,7 @@ class msx_cart_konami_sound_sdsnatcher : public msx_cart_konami_sound
 public:
 	msx_cart_konami_sound_sdsnatcher(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 };
 
 
@@ -178,10 +178,10 @@ public:
 	msx_cart_keyboard_master(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
 	virtual DECLARE_READ8_MEMBER(read_cart);
 

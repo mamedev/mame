@@ -25,9 +25,9 @@ public:
 	dmv_k806_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_READ8_MEMBER(portt1_r);
 	DECLARE_READ8_MEMBER(port1_r);
@@ -37,11 +37,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void io_read(address_space &space, int ifsel, offs_t offset, UINT8 &data);
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, UINT8 data);
+	virtual void io_read(address_space &space, int ifsel, offs_t offset, UINT8 &data) override;
+	virtual void io_write(address_space &space, int ifsel, offs_t offset, UINT8 data) override;
 
 private:
 	required_device<upi41_cpu_device> m_mcu;

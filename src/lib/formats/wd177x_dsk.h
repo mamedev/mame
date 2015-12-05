@@ -37,10 +37,10 @@ public:
 	// End the array with {}
 	wd177x_format(const format *formats);
 
-	virtual int identify(io_generic *io, UINT32 form_factor);
-	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
-	virtual bool save(io_generic *io, floppy_image *image);
-	virtual bool supports_save() const;
+	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) override;
+	virtual bool save(io_generic *io, floppy_image *image) override;
+	virtual bool supports_save() const override;
 
 protected:
 	enum { FM_DAM = 0xf56f, FM_DDAM = 0xf56a, MFM_DAM = 0xfb, MFM_DDAM = 0xf8 };

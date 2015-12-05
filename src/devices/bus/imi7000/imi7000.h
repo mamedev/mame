@@ -80,7 +80,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	imi7000_slot_device *m_unit[4];
 };
@@ -97,7 +97,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	device_imi7000_interface *m_card;
 };

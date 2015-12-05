@@ -38,10 +38,10 @@ public:
 	UINT16  get_grom_mask() { return m_grommask; }
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_config_complete();
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_config_complete() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	ti99_cartridge_connector_device*    m_connector;
@@ -87,28 +87,28 @@ public:
 	UINT16  grom_mask();
 
 protected:
-	virtual void device_start() { };
-	virtual void device_config_complete();
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry* device_rom_region() const;
+	virtual void device_start() override { };
+	virtual void device_config_complete() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry* device_rom_region() const override;
 
 	// Image handling: implementation of methods which are abstract in the parent
-	bool call_load();
-	void call_unload();
-	bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
+	bool call_load() override;
+	void call_unload() override;
+	bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
 
 	void prepare_cartridge();
 
 	// device_image_interface
-	iodevice_t image_type() const { return IO_CARTSLOT; }
-	bool is_readable()  const           { return true; }
-	bool is_writeable() const           { return false; }
-	bool is_creatable() const           { return false; }
-	bool must_be_loaded() const         { return false; }
-	bool is_reset_on_load() const       { return false; }
-	const char *image_interface() const { return "ti99_cart"; }
-	const char *file_extensions() const { return "rpk"; }
-	const option_guide *create_option_guide() const { return nullptr; }
+	iodevice_t image_type() const override { return IO_CARTSLOT; }
+	bool is_readable()  const override           { return true; }
+	bool is_writeable() const override           { return false; }
+	bool is_creatable() const override           { return false; }
+	bool must_be_loaded() const override         { return false; }
+	bool is_reset_on_load() const override       { return false; }
+	const char *image_interface() const override { return "ti99_cart"; }
+	const char *file_extensions() const override { return "rpk"; }
+	const option_guide *create_option_guide() const override { return nullptr; }
 
 private:
 	bool    m_softlist;
@@ -145,7 +145,7 @@ public:
 
 protected:
 	ti99_cartridge_connector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	virtual void device_config_complete();
+	virtual void device_config_complete() override;
 
 	gromport_device*    m_gromport;
 };
@@ -164,9 +164,9 @@ public:
 	DECLARE_WRITE8_MEMBER(cruwrite);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	ti99_cartridge_device *m_cartridge;
@@ -191,14 +191,14 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz);
 	DECLARE_WRITE8_MEMBER(cruwrite);
 
-	void insert(int index, ti99_cartridge_device* cart);
-	void remove(int index);
+	void insert(int index, ti99_cartridge_device* cart) override;
+	void remove(int index) override;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	int     m_active_slot;
@@ -224,22 +224,22 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz);
 	DECLARE_WRITE8_MEMBER(cruwrite);
 
-	void insert(int index, ti99_cartridge_device* cart);
-	void remove(int index);
+	void insert(int index, ti99_cartridge_device* cart) override;
+	void remove(int index) override;
 	DECLARE_INPUT_CHANGED_MEMBER( gk_changed );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry* device_rom_region() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry* device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device_nvram_interface
-	void nvram_default();
-	void nvram_read(emu_file &file);
-	void nvram_write(emu_file &file);
+	void nvram_default() override;
+	void nvram_read(emu_file &file) override;
+	void nvram_write(emu_file &file) override;
 
 private:
 	int     m_gk_switch[6];         // Used to cache the switch settings.

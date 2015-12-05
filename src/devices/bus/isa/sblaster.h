@@ -122,10 +122,10 @@ public:
 
 protected:
 		// device-level overrides
-		virtual void device_reset();
+		virtual void device_reset() override;
 		UINT8 dack_r(int line);
 		void dack_w(int line, UINT8 data);
-		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 		virtual void drq16_w(int state) { }
 		virtual void drq_w(int state) { }
 		virtual void irq_w(int state, int source) { }
@@ -133,9 +133,9 @@ protected:
 		void adpcm_decode(UINT8 sample, int size);
 
 		// serial overrides
-		virtual void rcv_complete();    // Rx completed receiving byte
-		virtual void tra_complete();    // Tx completed sending byte
-		virtual void tra_callback();    // Tx send bit
+		virtual void rcv_complete() override;    // Rx completed receiving byte
+		virtual void tra_complete() override;    // Tx completed sending byte
+		virtual void tra_callback() override;    // Tx send bit
 
 		static const int MIDI_RING_SIZE = 2048;
 
@@ -163,11 +163,11 @@ public:
 		DECLARE_READ8_MEMBER(ym3812_16_r);
 		DECLARE_WRITE8_MEMBER(ym3812_16_w);
 protected:
-		virtual void device_start();
-		virtual void drq_w(int state) { m_isa->drq1_w(state); }
-		virtual void irq_w(int state, int source) { m_isa->irq5_w(state); }
-		virtual UINT8 dack_r(int line) { return sb_device::dack_r(line); }
-		virtual void dack_w(int line, UINT8 data) { sb_device::dack_w(line, data); }
+		virtual void device_start() override;
+		virtual void drq_w(int state) override { m_isa->drq1_w(state); }
+		virtual void irq_w(int state, int source) override { m_isa->irq5_w(state); }
+		virtual UINT8 dack_r(int line) override { return sb_device::dack_r(line); }
+		virtual void dack_w(int line, UINT8 data) override { sb_device::dack_w(line, data); }
 private:
 		required_device<ym3812_device> m_ym3812;
 };
@@ -179,14 +179,14 @@ public:
 		isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
+		virtual machine_config_constructor device_mconfig_additions() const override;
 
 		DECLARE_READ8_MEMBER(saa1099_16_r);
 		DECLARE_WRITE8_MEMBER(saa1099_1_16_w);
 		DECLARE_WRITE8_MEMBER(saa1099_2_16_w);
 protected:
 		// device-level overrides
-		virtual void device_start();
+		virtual void device_start() override;
 private:
 		// internal state
 		required_device<saa1099_device> m_saa1099_1;
@@ -201,10 +201,10 @@ public:
 		isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
+		virtual machine_config_constructor device_mconfig_additions() const override;
 protected:
 		// device-level overrides
-		virtual void device_start();
+		virtual void device_start() override;
 };
 
 class sb16_device : public sb_device,
@@ -218,17 +218,17 @@ public:
 		DECLARE_READ8_MEMBER(mixer_r);
 		DECLARE_WRITE8_MEMBER(mixer_w);
 protected:
-		virtual void device_start();
-		virtual UINT16 dack16_r(int line);
-		virtual UINT8 dack_r(int line) { return sb_device::dack_r(line); }
-		virtual void dack_w(int line, UINT8 data) { sb_device::dack_w(line, data); }
-		virtual void dack16_w(int line, UINT16 data);
-		virtual void drq16_w(int state) { m_isa->drq5_w(state); }
-		virtual void drq_w(int state) { m_isa->drq1_w(state); }
-		virtual void irq_w(int state, int source) { (state?m_dsp.irq_active|=source:m_dsp.irq_active&=~source); m_isa->irq5_w(m_dsp.irq_active != 0);  }
-		virtual void mixer_reset();
+		virtual void device_start() override;
+		virtual UINT16 dack16_r(int line) override;
+		virtual UINT8 dack_r(int line) override { return sb_device::dack_r(line); }
+		virtual void dack_w(int line, UINT8 data) override { sb_device::dack_w(line, data); }
+		virtual void dack16_w(int line, UINT16 data) override;
+		virtual void drq16_w(int state) override { m_isa->drq5_w(state); }
+		virtual void drq_w(int state) override { m_isa->drq1_w(state); }
+		virtual void irq_w(int state, int source) override { (state?m_dsp.irq_active|=source:m_dsp.irq_active&=~source); m_isa->irq5_w(m_dsp.irq_active != 0);  }
+		virtual void mixer_reset() override;
 		void mixer_set();
-		virtual void rcv_complete();    // Rx completed receiving byte
+		virtual void rcv_complete() override;    // Rx completed receiving byte
 private:
 		struct sb16_mixer m_mixer;
 };
@@ -240,10 +240,10 @@ public:
 		isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
+		virtual machine_config_constructor device_mconfig_additions() const override;
 protected:
 		// device-level overrides
-		virtual void device_start();
+		virtual void device_start() override;
 };
 
 // device type definition

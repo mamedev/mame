@@ -16,14 +16,14 @@ public:
 	nes_waixing_a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(read_l);
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 	virtual DECLARE_WRITE8_MEMBER(waixing_write);
-	virtual DECLARE_WRITE8_MEMBER(write_h) { waixing_write(space, offset, data, mem_mask); }
-	virtual void chr_cb(int start, int bank, int source);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override { waixing_write(space, offset, data, mem_mask); }
+	virtual void chr_cb(int start, int bank, int source) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	void set_mirror(UINT8 nt);
@@ -39,7 +39,7 @@ public:
 	// construction/destruction
 	nes_waixing_a1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void chr_cb(int start, int bank, int source);
+	virtual void chr_cb(int start, int bank, int source) override;
 };
 
 
@@ -52,7 +52,7 @@ public:
 	nes_waixing_b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void chr_cb(int start, int bank, int source);
+	virtual void chr_cb(int start, int bank, int source) override;
 };
 
 
@@ -65,7 +65,7 @@ public:
 	nes_waixing_c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void chr_cb(int start, int bank, int source);
+	virtual void chr_cb(int start, int bank, int source) override;
 };
 
 
@@ -78,7 +78,7 @@ public:
 	nes_waixing_d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void chr_cb(int start, int bank, int source);
+	virtual void chr_cb(int start, int bank, int source) override;
 };
 
 
@@ -91,7 +91,7 @@ public:
 	nes_waixing_e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void chr_cb(int start, int bank, int source);
+	virtual void chr_cb(int start, int bank, int source) override;
 };
 
 
@@ -105,12 +105,12 @@ public:
 
 	// device-level overrides
 	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual void prg_cb(int start, int bank);
-	virtual void chr_cb(int start, int bank, int source);
+	virtual void prg_cb(int start, int bank) override;
+	virtual void chr_cb(int start, int bank, int source) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 private:
-	virtual void set_prg(int prg_base, int prg_mask);
+	virtual void set_prg(int prg_base, int prg_mask) override;
 };
 
 
@@ -124,12 +124,12 @@ public:
 
 	// device-level overrides
 	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual void chr_cb(int start, int bank, int source);
+	virtual void chr_cb(int start, int bank, int source) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
-	virtual void set_chr(UINT8 chr, int chr_base, int chr_mask);
+	virtual void set_chr(UINT8 chr, int chr_base, int chr_mask) override;
 };
 
 
@@ -144,7 +144,7 @@ public:
 
 	// device-level overrides
 	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual void chr_cb(int start, int bank, int source);
+	virtual void chr_cb(int start, int bank, int source) override;
 
 	// This PCB does not have 1K of internal RAM, so it's not derived from nes_waixing_a_device!!
 };
@@ -186,13 +186,13 @@ public:
 	nes_waixing_j_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
-	virtual void set_prg(int prg_base, int prg_mask);
+	virtual void set_prg(int prg_base, int prg_mask) override;
 	UINT8 m_reg[4];
 };
 
@@ -206,11 +206,11 @@ public:
 	nes_waixing_sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(chr_r);
-	virtual void chr_cb(int start, int bank, int source);
+	virtual void chr_cb(int start, int bank, int source) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	UINT8 m_reg[2];
@@ -226,12 +226,12 @@ public:
 	nes_waixing_sec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual void prg_cb(int start, int bank);
-	virtual void chr_cb(int start, int bank, int source);
+	virtual void prg_cb(int start, int bank) override;
+	virtual void chr_cb(int start, int bank, int source) override;
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	UINT8 m_reg;
@@ -247,11 +247,11 @@ public:
 	nes_waixing_sgz_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void hblank_irq(int scanline, int vblank, int blanked);
-	virtual void pcb_reset();
+	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
+	virtual void pcb_reset() override;
 
 protected:
 	UINT16 m_irq_count, m_irq_count_latch;
@@ -270,10 +270,10 @@ public:
 	nes_waixing_sgzlz_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	UINT8 m_latch;
@@ -289,10 +289,10 @@ public:
 	nes_waixing_ffv_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	UINT8 m_reg[2];
@@ -308,10 +308,10 @@ public:
 	nes_waixing_wxzs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -324,10 +324,10 @@ public:
 	nes_waixing_dq8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -340,10 +340,10 @@ public:
 	nes_waixing_wxzs2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 };
 
 
@@ -356,10 +356,10 @@ public:
 	nes_waixing_fs304_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 
-	virtual void pcb_reset();
+	virtual void pcb_reset() override;
 
 protected:
 	UINT8 m_reg[4];

@@ -26,25 +26,25 @@ public:
 	static void static_set_interface(device_t &device, const char *_interface) { downcast<snapshot_image_device &>(device).m_interface = _interface; }
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
-	virtual iodevice_t image_type() const { return IO_SNAPSHOT; }
+	virtual bool call_load() override;
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override { return load_software(swlist, swname, start_entry); }
+	virtual iodevice_t image_type() const override { return IO_SNAPSHOT; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 0; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return m_interface; }
-	virtual const char *file_extensions() const { return m_file_extensions; }
-	virtual const option_guide *create_option_guide() const { return nullptr; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 0; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return m_interface; }
+	virtual const char *file_extensions() const override { return m_file_extensions; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	TIMER_CALLBACK_MEMBER(process_snapshot_or_quickload);
 	void set_handler(snapquick_load_delegate load, const char *ext, seconds_t sec) { m_load = load; m_file_extensions = ext; m_delay_seconds = sec; };
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 	snapquick_load_delegate m_load;                 /* loading function */
 	const char *        m_file_extensions;      /* file extensions */
@@ -65,7 +65,7 @@ public:
 	// construction/destruction
 	quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual iodevice_t image_type() const { return IO_QUICKLOAD; }
+	virtual iodevice_t image_type() const override { return IO_QUICKLOAD; }
 };
 
 // device type definition

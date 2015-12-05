@@ -35,10 +35,10 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 
-	virtual void tc_w(bool state);
-	virtual UINT8 dma_r();
-	virtual void dma_w(UINT8 data);
-	virtual UINT8 do_dir_r();
+	virtual void tc_w(bool state) override;
+	virtual UINT8 dma_r() override;
+	virtual void dma_w(UINT8 data) override;
+	virtual UINT8 do_dir_r() override;
 
 	READ8_MEMBER(dor_r);
 	WRITE8_MEMBER(dor_w);
@@ -48,9 +48,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	bool irq, drq, fdc_drq, fdc_irq;
 	devcb_write_line intrq_cb, drq_cb;

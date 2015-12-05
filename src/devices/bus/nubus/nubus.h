@@ -68,7 +68,7 @@ public:
 	nubus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// inline configuration
 	static void static_set_nubus_slot(device_t &device, const char *tag, const char *slottag);
@@ -118,8 +118,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// internal state
 	cpu_device   *m_maincpu;

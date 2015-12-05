@@ -72,22 +72,22 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_abcbus_interface overrides
-	virtual void abcbus_cs(UINT8 data);
-	virtual UINT8 abcbus_inp();
-	virtual void abcbus_out(UINT8 data);
-	virtual UINT8 abcbus_stat();
-	virtual void abcbus_c1(UINT8 data);
-	virtual void abcbus_c3(UINT8 data);
+	virtual void abcbus_cs(UINT8 data) override;
+	virtual UINT8 abcbus_inp() override;
+	virtual void abcbus_out(UINT8 data) override;
+	virtual UINT8 abcbus_stat() override;
+	virtual void abcbus_c1(UINT8 data) override;
+	virtual void abcbus_c3(UINT8 data) override;
 
 private:
 	required_device<cpu_device> m_maincpu;

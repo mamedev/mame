@@ -27,8 +27,8 @@ public:
 	DECLARE_READ16_MEMBER(sbp_lowerrom_r);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 #endif

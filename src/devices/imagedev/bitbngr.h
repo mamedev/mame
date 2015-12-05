@@ -17,27 +17,27 @@ public:
 	bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual bool call_create(int format_type, option_resolution *format_options);
-	virtual void call_unload();
+	virtual bool call_load() override;
+	virtual bool call_create(int format_type, option_resolution *format_options) override;
+	virtual void call_unload() override;
 
 	// image device
-	virtual iodevice_t image_type() const { return IO_SERIAL; }
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *file_extensions() const { return ""; }
-	virtual const option_guide *create_option_guide() const { return nullptr; }
+	virtual iodevice_t image_type() const override { return IO_SERIAL; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 1; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *file_extensions() const override { return ""; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	void output(UINT8 data);
 	UINT32 input(void *buffer, UINT32 length);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 };
 
 // device type definition

@@ -27,8 +27,8 @@ public:
 	UINT16 m_default_rom[2];
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 #endif

@@ -20,7 +20,7 @@ public:
 
 	static void force_start_address(device_t &device, UINT16 start) { downcast<msx_slot_ram_device &>(device).m_start_address = start; }
 
-	virtual void device_start();
+	virtual void device_start() override;
 
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual DECLARE_WRITE8_MEMBER(write);

@@ -58,8 +58,8 @@ public:
 	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb);
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect);
@@ -245,16 +245,16 @@ public:
 	// construction/destruction
 	svga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	virtual void zero();
-	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void zero() override;
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 protected:
 	void svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual UINT8 pc_vga_choosevideomode();
-	virtual void device_start();
+	virtual UINT8 pc_vga_choosevideomode() override;
+	virtual void device_start() override;
 	struct
 	{
 		UINT8 bank_r,bank_w;
@@ -378,8 +378,8 @@ public:
 
 	} ibm8514;
 protected:
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 	vga_device* m_vga;  // for pass-through
 	std::string m_vga_tag;  // pass-through device tag
 private:
@@ -441,7 +441,7 @@ public:
 	READ16_MEMBER(mach8_clksel_r) { return mach8.clksel; }
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 	struct
 	{
 		UINT16 scratch0;
@@ -470,17 +470,17 @@ public:
 	// construction/destruction
 	tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual READ8_MEMBER(port_03b0_r);
-	virtual WRITE8_MEMBER(port_03b0_w);
-	virtual READ8_MEMBER(port_03c0_r);
-	virtual WRITE8_MEMBER(port_03c0_w);
-	virtual READ8_MEMBER(port_03d0_r);
-	virtual WRITE8_MEMBER(port_03d0_w);
-	virtual READ8_MEMBER(mem_r);
-	virtual WRITE8_MEMBER(mem_w);
+	virtual READ8_MEMBER(port_03b0_r) override;
+	virtual WRITE8_MEMBER(port_03b0_w) override;
+	virtual READ8_MEMBER(port_03c0_r) override;
+	virtual WRITE8_MEMBER(port_03c0_w) override;
+	virtual READ8_MEMBER(port_03d0_r) override;
+	virtual WRITE8_MEMBER(port_03d0_w) override;
+	virtual READ8_MEMBER(mem_r) override;
+	virtual WRITE8_MEMBER(mem_w) override;
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	void tseng_define_video_mode();
@@ -518,20 +518,20 @@ public:
 	ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	ati_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	virtual READ8_MEMBER(mem_r);
-	virtual WRITE8_MEMBER(mem_w);
+	virtual READ8_MEMBER(mem_r) override;
+	virtual WRITE8_MEMBER(mem_w) override;
 
 	// VGA registers
-	virtual READ8_MEMBER(port_03c0_r);
+	virtual READ8_MEMBER(port_03c0_r) override;
 	READ8_MEMBER(ati_port_ext_r);
 	WRITE8_MEMBER(ati_port_ext_w);
 
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual UINT16 offset();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual UINT16 offset() override;
 
 	mach8_device* get_8514() { return m_8514; }
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 private:
 	void ati_define_video_mode();
 	struct
@@ -556,24 +556,24 @@ public:
 	s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	s3_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	virtual READ8_MEMBER(port_03b0_r);
-	virtual WRITE8_MEMBER(port_03b0_w);
-	virtual READ8_MEMBER(port_03c0_r);
-	virtual WRITE8_MEMBER(port_03c0_w);
-	virtual READ8_MEMBER(port_03d0_r);
-	virtual WRITE8_MEMBER(port_03d0_w);
-	virtual READ8_MEMBER(mem_r);
-	virtual WRITE8_MEMBER(mem_w);
+	virtual READ8_MEMBER(port_03b0_r) override;
+	virtual WRITE8_MEMBER(port_03b0_w) override;
+	virtual READ8_MEMBER(port_03c0_r) override;
+	virtual WRITE8_MEMBER(port_03c0_w) override;
+	virtual READ8_MEMBER(port_03d0_r) override;
+	virtual WRITE8_MEMBER(port_03d0_w) override;
+	virtual READ8_MEMBER(mem_r) override;
+	virtual WRITE8_MEMBER(mem_w) override;
 
-	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	ibm8514a_device* get_8514() { return m_8514; }
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	struct
 	{
 		UINT8 memory_config;
@@ -620,7 +620,7 @@ protected:
 		UINT8 cursor_bg_ptr;
 		UINT8 extended_dac_ctrl;
 	} s3;
-	virtual UINT16 offset();
+	virtual UINT16 offset() override;
 
 private:
 	UINT8 s3_crtc_reg_read(UINT8 index);
@@ -643,14 +643,14 @@ public:
 	gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 
-	virtual READ8_MEMBER(port_03b0_r);
-	virtual WRITE8_MEMBER(port_03b0_w);
-	virtual READ8_MEMBER(port_03c0_r);
-	virtual WRITE8_MEMBER(port_03c0_w);
-	virtual READ8_MEMBER(port_03d0_r);
-	virtual WRITE8_MEMBER(port_03d0_w);
-	virtual READ8_MEMBER(mem_r);
-	virtual WRITE8_MEMBER(mem_w);
+	virtual READ8_MEMBER(port_03b0_r) override;
+	virtual WRITE8_MEMBER(port_03b0_w) override;
+	virtual READ8_MEMBER(port_03c0_r) override;
+	virtual WRITE8_MEMBER(port_03c0_w) override;
+	virtual READ8_MEMBER(port_03d0_r) override;
+	virtual WRITE8_MEMBER(port_03d0_w) override;
+	virtual READ8_MEMBER(mem_r) override;
+	virtual WRITE8_MEMBER(mem_w) override;
 };
 
 

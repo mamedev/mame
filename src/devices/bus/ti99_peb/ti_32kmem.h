@@ -27,8 +27,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cruwrite) { };
 
 protected:
-	virtual void device_start();
-	virtual const rom_entry *device_rom_region() const;
+	virtual void device_start() override;
+	virtual const rom_entry *device_rom_region() const override;
 private:
 	UINT8*  m_ram_ptr;
 };

@@ -48,12 +48,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( senila );
 
 protected:
-	virtual void device_start(void);
-	virtual void device_reset(void);
-	virtual void device_stop(void);
-	virtual const rom_entry *device_rom_region(void) const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start(void) override;
+	virtual void device_reset(void) override;
+	virtual void device_stop(void) override;
+	virtual const rom_entry *device_rom_region(void) const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	void        incoming_dtr(int uartind, line_state value);
@@ -120,21 +120,21 @@ class ti_rs232_attached_device : public device_t, public device_image_interface
 public:
 	ti_rs232_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	iodevice_t image_type() const { return IO_SERIAL; }
-	bool is_readable()  const           { return true; }
-	bool is_writeable() const           { return true; }
-	bool is_creatable() const           { return true; }
-	bool must_be_loaded() const         { return false; }
-	bool is_reset_on_load() const       { return false; }
-	const char *image_interface() const { return ""; }
-	const char *file_extensions() const { return ""; }
-	const option_guide *create_option_guide() const { return nullptr; }
+	iodevice_t image_type() const override { return IO_SERIAL; }
+	bool is_readable()  const override           { return true; }
+	bool is_writeable() const override           { return true; }
+	bool is_creatable() const override           { return true; }
+	bool must_be_loaded() const override         { return false; }
+	bool is_reset_on_load() const override       { return false; }
+	const char *image_interface() const override { return ""; }
+	const char *file_extensions() const override { return ""; }
+	const option_guide *create_option_guide() const override { return nullptr; }
 
 protected:
-	virtual void    device_start(void);
-	bool    call_load();
-	void    call_unload();
-	virtual void    device_config_complete();
+	virtual void    device_start(void) override;
+	bool    call_load() override;
+	void    call_unload() override;
+	virtual void    device_config_complete() override;
 
 private:
 	int get_index_from_tagname();
@@ -148,21 +148,21 @@ class ti_pio_attached_device : public device_t, public device_image_interface
 public:
 	ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	iodevice_t image_type() const { return IO_PARALLEL; }
-	bool is_readable()  const           { return true; }
-	bool is_writeable() const           { return true; }
-	bool is_creatable() const           { return true; }
-	bool must_be_loaded() const         { return false; }
-	bool is_reset_on_load() const       { return false; }
-	const char *image_interface() const { return ""; }
-	const char *file_extensions() const { return ""; }
-	const option_guide *create_option_guide() const { return nullptr; }
+	iodevice_t image_type() const override { return IO_PARALLEL; }
+	bool is_readable()  const override           { return true; }
+	bool is_writeable() const override           { return true; }
+	bool is_creatable() const override           { return true; }
+	bool must_be_loaded() const override         { return false; }
+	bool is_reset_on_load() const override       { return false; }
+	const char *image_interface() const override { return ""; }
+	const char *file_extensions() const override { return ""; }
+	const option_guide *create_option_guide() const override { return nullptr; }
 
 protected:
-	virtual void    device_start(void);
-	bool    call_load();
-	void    call_unload();
-	virtual void    device_config_complete();
+	virtual void    device_start(void) override;
+	bool    call_load() override;
+	void    call_unload() override;
+	virtual void    device_config_complete() override;
 };
 
 #endif

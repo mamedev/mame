@@ -26,18 +26,18 @@ public:
 	tvc_hbf_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// tvcexp_interface overrides
-	virtual UINT8 id_r() { return 0x02; } // ID_A to GND, ID_B to VCC
+	virtual UINT8 id_r() override { return 0x02; } // ID_A to GND, ID_B to VCC
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual DECLARE_WRITE8_MEMBER(write);
 	virtual DECLARE_READ8_MEMBER(io_read);

@@ -17,17 +17,17 @@ public:
 	o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset() {}
+	virtual void device_start() override;
+	virtual void device_reset() override {}
 
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom04) { if (m_subslot->exists()) return m_subslot->read_rom04(space, offset); else return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_rom0c) { if (m_subslot->exists()) return m_subslot->read_rom0c(space, offset); else return 0xff; }
+	virtual DECLARE_READ8_MEMBER(read_rom04) override { if (m_subslot->exists()) return m_subslot->read_rom04(space, offset); else return 0xff; }
+	virtual DECLARE_READ8_MEMBER(read_rom0c) override { if (m_subslot->exists()) return m_subslot->read_rom0c(space, offset); else return 0xff; }
 
-	virtual void write_bank(int bank)   { if (m_subslot->exists()) m_subslot->write_bank(bank); }
+	virtual void write_bank(int bank) override   { if (m_subslot->exists()) m_subslot->write_bank(bank); }
 
 	DECLARE_WRITE_LINE_MEMBER(lrq_callback);
 	DECLARE_WRITE8_MEMBER(io_write);

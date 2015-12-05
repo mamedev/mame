@@ -31,13 +31,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_pet_expansion_card_interface overrides
-	virtual int pet_norom_r(address_space &space, offs_t offset, int sel);
-	virtual UINT8 pet_bd_r(address_space &space, offs_t offset, UINT8 data, int &sel);
-	virtual void pet_bd_w(address_space &space, offs_t offset, UINT8 data, int &sel);
+	virtual int pet_norom_r(address_space &space, offs_t offset, int sel) override;
+	virtual UINT8 pet_bd_r(address_space &space, offs_t offset, UINT8 data, int &sel) override;
+	virtual void pet_bd_w(address_space &space, offs_t offset, UINT8 data, int &sel) override;
 
 private:
 	inline UINT8 read_ram(offs_t offset);

@@ -66,8 +66,8 @@ public:
 	void neogeo_cmc50_m1_decrypt(UINT8* romcrypt, UINT32 romcrypt_size, UINT8* romaudio, UINT32 romaudio_size);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	const UINT8 *type0_t03;
 	const UINT8 *type0_t12;

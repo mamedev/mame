@@ -16,8 +16,8 @@ public:
 	nes_jy_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual DECLARE_READ8_MEMBER(read_l);
 	virtual DECLARE_READ8_MEMBER(read_m);
 	virtual DECLARE_WRITE8_MEMBER(write_l);
@@ -26,8 +26,8 @@ public:
 	virtual DECLARE_READ8_MEMBER(chr_r);
 	virtual DECLARE_READ8_MEMBER(nt_r);
 
-	virtual void scanline_irq(int scanline, int vblank, int blanked);
-	virtual void pcb_reset();
+	virtual void scanline_irq(int scanline, int vblank, int blanked) override;
+	virtual void pcb_reset() override;
 
 protected:
 	void irq_clock(int blanked, int mode);
@@ -74,7 +74,7 @@ public:
 
 protected:
 	void update_mirror_typeb();
-	virtual void update_mirror() { update_mirror_typeb(); }
+	virtual void update_mirror() override { update_mirror_typeb(); }
 };
 
 // ======================> nes_jy_typec_device
@@ -89,7 +89,7 @@ public:
 
 protected:
 	void update_mirror_typec();
-	virtual void update_mirror() { update_mirror_typec(); }
+	virtual void update_mirror() override { update_mirror_typec(); }
 };
 
 

@@ -25,8 +25,8 @@ public:
 	void samsh5sp_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 #endif
