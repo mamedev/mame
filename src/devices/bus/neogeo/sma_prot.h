@@ -47,12 +47,6 @@ public:
 protected:
 	virtual void device_start();
 	virtual void device_reset();
-
-
-
-private:
-
-
 };
 
 #endif

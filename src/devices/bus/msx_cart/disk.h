@@ -136,9 +136,6 @@ public:
 
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_cart);
-
-private:
-
 };
 
 

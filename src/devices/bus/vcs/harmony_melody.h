@@ -29,8 +29,6 @@ public:
 
 	void check_bankswitch(offs_t offset);
 
-protected:
-
 private:
 	required_device<lpc210x_device> m_cpu;
 };

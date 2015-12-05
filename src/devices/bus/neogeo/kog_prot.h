@@ -29,12 +29,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual ioport_constructor device_input_ports() const;
-
-
-
-private:
-
-
 };
 
 #endif

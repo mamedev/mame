@@ -298,7 +298,6 @@ protected:
 	int                 m_grom_address; // for gromemu
 	int                 m_ram_page;     // for super
 	const char*         m_tag;
-private:
 };
 
 /******************** Standard cartridge ******************************/

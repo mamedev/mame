@@ -55,8 +55,6 @@ class a2bus_zipdrive_device : public a2bus_zipdrivebase_device
 {
 public:
 	a2bus_zipdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
 };
 
 // device type definition

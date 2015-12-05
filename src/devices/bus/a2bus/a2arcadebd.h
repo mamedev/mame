@@ -44,8 +44,6 @@ protected:
 
 	required_device<tms9918a_device> m_tms;
 	required_device<ay8910_device> m_ay;
-
-private:
 };
 
 // device type definition

@@ -153,7 +153,6 @@ protected:
 		virtual void device_start();
 		virtual DECLARE_READ8_MEMBER(read);
 		virtual DECLARE_WRITE8_MEMBER(write);
-private:
 };
 
 

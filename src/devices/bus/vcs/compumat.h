@@ -24,8 +24,6 @@ public:
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
-
-private:
 };
 
 

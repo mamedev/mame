@@ -63,8 +63,6 @@ protected:
 	virtual void device_reset();
 
 	device_parallel_interface *m_cart;
-
-private:
 };
 
 // class representing interface-specific live parallel device

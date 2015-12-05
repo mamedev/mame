@@ -69,8 +69,6 @@ class a2bus_vulcangold_device : public a2bus_vulcanbase_device
 public:
 	a2bus_vulcangold_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual const rom_entry *device_rom_region() const;
-
-protected:
 };
 
 // device type definition

@@ -27,7 +27,6 @@ public:
 
 	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask) = 0;
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask) = 0;
-private:
 };
 
 class pci_connector: public device_t,

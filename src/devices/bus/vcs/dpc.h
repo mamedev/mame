@@ -83,9 +83,6 @@ public:
 	virtual DECLARE_DIRECT_UPDATE_MEMBER(cart_opbase);
 
 	virtual void setup_addon_ptr(UINT8 *ptr);
-
-protected:
-//  int m_reset_bank;
 };
 
 

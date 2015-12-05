@@ -77,7 +77,7 @@ beckerport_device::beckerport_device(const machine_config &mconfig, const char *
 beckerport_device::~beckerport_device()
 {
 	if (m_pSocket != nullptr)
-		device_stop();
+		beckerport_device::device_stop();
 }
 
 /*-------------------------------------------------

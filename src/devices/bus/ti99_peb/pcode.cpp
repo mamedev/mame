@@ -300,7 +300,7 @@ MACHINE_CONFIG_END
 
 INPUT_PORTS_START( ti99_pcode )
 	PORT_START( ACTIVE_TAG )
-	PORT_DIPNAME( 0x01, 0x00, "P-Code activation switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti_pcode_card_device, switch_changed, 0)
+	PORT_DIPNAME( 0x01, 0x00, "P-Code activation switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti_pcode_card_device, switch_changed, nullptr)
 		PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING( 0x01, DEF_STR( On ) )
 INPUT_PORTS_END

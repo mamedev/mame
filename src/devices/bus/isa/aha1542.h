@@ -44,10 +44,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	// device_isa16_card_interface
-
-private:
-	// internal state
 };
 
 // device type definition

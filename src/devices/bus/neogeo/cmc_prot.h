@@ -78,10 +78,6 @@ protected:
 	const UINT8 *address_16_23_xor1;
 	const UINT8 *address_16_23_xor2;
 	const UINT8 *address_0_7_xor;
-
-private:
-
-
 };
 
 #endif

@@ -205,8 +205,6 @@ public:
 protected:
 		// device-level overrides
 		virtual void device_start();
-private:
-		// internal state
 };
 
 class sb16_device : public sb_device,
@@ -246,8 +244,6 @@ public:
 protected:
 		// device-level overrides
 		virtual void device_start();
-private:
-		// internal state
 };
 
 // device type definition

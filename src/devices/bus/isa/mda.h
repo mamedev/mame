@@ -89,8 +89,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-private:
-	// internal state
 public:
 	UINT8 m_configuration_switch; //hercules
 };

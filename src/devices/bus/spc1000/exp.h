@@ -15,8 +15,6 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write) {}
-
-protected:
 };
 
 

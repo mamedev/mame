@@ -90,6 +90,8 @@ public:
 class bus16z_device : device_t
 {
 public:
+	bus16z_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+		: device_t(mconfig, type, name, tag, owner, clock, shortname, source) { }
 	virtual DECLARE_READ16Z_MEMBER(read16z) =0;
 	virtual DECLARE_WRITE16_MEMBER(write16) =0;
 	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { };

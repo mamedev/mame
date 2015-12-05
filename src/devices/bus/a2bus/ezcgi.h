@@ -45,8 +45,6 @@ protected:
 	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
 
 	required_device<tms9918a_device> m_tms;
-
-private:
 };
 
 class a2bus_ezcgi_9938_device:
@@ -72,8 +70,6 @@ protected:
 	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
 
 	required_device<v9938_device> m_tms;
-
-private:
 };
 
 class a2bus_ezcgi_9958_device:
@@ -99,8 +95,6 @@ protected:
 	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
 
 	required_device<v9958_device> m_tms;
-
-private:
 };
 
 // device type definition
