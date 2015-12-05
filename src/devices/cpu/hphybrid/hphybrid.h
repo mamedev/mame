@@ -137,6 +137,8 @@ protected:
 
         UINT16 fetch(void);
         
+        UINT16 get_skip_addr(UINT16 opcode , bool condition) const;
+
                 int m_icount;
 
                 // State of processor
@@ -166,7 +168,6 @@ private:
 
                 UINT32 get_ea(UINT16 opcode);
                 void do_add(UINT16& addend1 , UINT16 addend2);
-                UINT16 get_skip_addr(UINT16 opcode , bool condition) const;
                 UINT16 get_skip_addr_sc(UINT16 opcode , UINT16& v , unsigned n);
                 void do_pw(UINT16 opcode);
                 void check_for_interrupts(void);
@@ -184,7 +185,18 @@ public:
 protected:
         virtual void device_start();
         virtual void device_reset();
-        virtual UINT32 execute_max_cycles() const { return 213; }       // XFR 16
+        virtual UINT32 execute_max_cycles() const { return 237; }       // FMP 15
+
+        static UINT8 do_dec_shift_r(UINT8 d1 , UINT64& mantissa);
+        static UINT8 do_dec_shift_l(UINT8 d12 , UINT64& mantissa);
+        UINT64 get_ar1(void);
+        void set_ar1(UINT64 v);
+        UINT64 get_ar2(void) const;
+        void set_ar2(UINT64 v);
+        UINT64 do_mrxy(UINT64 ar);
+        bool do_dec_add(bool carry_in , UINT64& a , UINT64 b);
+        void do_mpy(void);
+
         virtual UINT16 execute_no_bpc_ioc(UINT16 opcode);
         virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
         virtual UINT32 add_mae(aec_cases_t aec_case , UINT16 addr);

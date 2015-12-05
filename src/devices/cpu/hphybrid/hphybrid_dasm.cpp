@@ -346,6 +346,8 @@ static const dis_entry_t dis_table_emc[] = {
         {0xffff , 0x7340 , "NRM" , param_none , 0 },
         {0xfff0 , 0x7380 , "CLR" , param_n16 , 0 },
         {0xffff , 0x73c0 , "CDC" , param_none , 0 },
+        {0xffc0 , 0x74c0 , "SDS" , param_skip , 0 },
+        {0xffc0 , 0x75c0 , "SDC" , param_skip , 0 },
         {0xffff , 0x7a00 , "FMP" , param_none , 0 },
         {0xffff , 0x7a21 , "FDV" , param_none , 0 },
         {0xffff , 0x7b00 , "MRX" , param_none , 0 },

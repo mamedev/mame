@@ -936,7 +936,16 @@ void hp_hybrid_cpu_device::do_pw(UINT16 opcode)
 																tmp_addr |= 0x10000;
 												}
                                                                                                 if (tmp_addr <= (HP_REG_LAST_ADDR * 2 + 1)) {
-                                                                                                        // Cannot write bytes to registers
+                                                                                                        // Single bytes can be written to registers.
+                                                                                                        // The addressed register gets the written byte in the proper position
+                                                                                                        // and a 0 in the other byte because access to registers is always done in
+                                                                                                        // 16 bits units.
+                                                                                                        if (BIT(tmp_addr , 0)) {
+                                                                                                                tmp &= 0xff;
+                                                                                                        } else {
+                                                                                                                tmp <<= 8;
+                                                                                                        }
+                                                                                                        WM(tmp_addr >> 1 , tmp);
                                                                                                 } else {
                                                                                                         // Extend address, preserve LSB & form byte address
                                                                                                         tmp_addr = (add_mae(AEC_CASE_C , tmp_addr >> 1) << 1) | (tmp_addr & 1);
@@ -1095,12 +1104,147 @@ void hp_5061_3001_cpu_device::device_reset()
         hp_hybrid_cpu_device::device_reset();
 }
 
+UINT8 hp_5061_3001_cpu_device::do_dec_shift_r(UINT8 d1 , UINT64& mantissa)
+{
+        UINT8 d12 = (UINT8)(mantissa & 0xf);
+
+        mantissa = (mantissa >> 4) | ((UINT64)d1 << 44);
+
+        return d12;
+}
+
+UINT8 hp_5061_3001_cpu_device::do_dec_shift_l(UINT8 d12 , UINT64& mantissa)
+{
+        UINT8 d1 = (UINT8)((mantissa >> 44) & 0xf);
+
+        mantissa = (mantissa << 4) | ((UINT64)d12);
+        mantissa &= 0xffffffffffffULL;
+
+        return d1;
+}
+
+UINT64 hp_5061_3001_cpu_device::get_ar1(void)
+{
+        UINT32 addr;
+        UINT64 tmp;
+
+        addr = add_mae(AEC_CASE_B , HP_REG_AR1_ADDR + 1);
+        tmp = (UINT64)RM(addr++);
+        tmp <<= 16;
+        tmp |= (UINT64)RM(addr++);
+        tmp <<= 16;
+        tmp |= (UINT64)RM(addr);
+
+        return tmp;
+}
+
+void hp_5061_3001_cpu_device::set_ar1(UINT64 v)
+{
+        UINT32 addr;
+
+        addr = add_mae(AEC_CASE_B , HP_REG_AR1_ADDR + 3);
+        WM(addr-- , (UINT16)(v & 0xffff));
+        v >>= 16;
+        WM(addr-- , (UINT16)(v & 0xffff));
+        v >>= 16;
+        WM(addr , (UINT16)(v & 0xffff));
+}
+
+UINT64 hp_5061_3001_cpu_device::get_ar2(void) const
+{
+        UINT64 tmp;
+
+        tmp = (UINT64)m_reg_ar2[ 1 ];
+        tmp <<= 16;
+        tmp |= (UINT64)m_reg_ar2[ 2 ];
+        tmp <<= 16;
+        tmp |= (UINT64)m_reg_ar2[ 3 ];
+
+        return tmp;
+}
+
+void hp_5061_3001_cpu_device::set_ar2(UINT64 v)
+{
+        m_reg_ar2[ 3 ] = (UINT16)(v & 0xffff);
+        v >>= 16;
+        m_reg_ar2[ 2 ] = (UINT16)(v & 0xffff);
+        v >>= 16;
+        m_reg_ar2[ 1 ] = (UINT16)(v & 0xffff);
+}
+
+UINT64 hp_5061_3001_cpu_device::do_mrxy(UINT64 ar)
+{
+        UINT8 n;
+
+        n = m_reg_B & 0xf;
+        m_reg_A &= 0xf;
+        m_reg_se = m_reg_A;
+        while (n--) {
+                m_reg_se = do_dec_shift_r(m_reg_A , ar);
+                m_reg_A = 0;
+                m_icount -= 4;
+        }
+        m_reg_A = m_reg_se;
+        BIT_CLR(m_flags , HPHYBRID_DC_BIT);
+
+        return ar;
+}
+
+bool hp_5061_3001_cpu_device::do_dec_add(bool carry_in , UINT64& a , UINT64 b)
+{
+    UINT64 tmp = 0;
+    unsigned i;
+    UINT8 digit_a , digit_b;
+
+    for (i = 0; i < 12; i++) {
+        digit_a = (UINT8)(a & 0xf);
+        digit_b = (UINT8)(b & 0xf);
+
+        if (carry_in) {
+            digit_a++;
+        }
+
+        digit_a += digit_b;
+
+        carry_in = digit_a >= 10;
+
+        if (carry_in) {
+            digit_a = (digit_a - 10) & 0xf;
+        }
+
+        tmp |= (UINT64)digit_a << (4 * i);
+
+        a >>= 4;
+        b >>= 4;
+    }
+
+    a = tmp;
+
+    return carry_in;
+}
+
+void hp_5061_3001_cpu_device::do_mpy(void)
+{
+        INT32 a = (INT16)m_reg_A;
+        INT32 b = (INT16)m_reg_B;
+        INT32 p = a * b;
+
+        m_reg_A = (UINT16)(p & 0xffff);
+        m_reg_B = (UINT16)((p >> 16) & 0xffff);
+
+        // Not entirely correct
+        m_icount -= 65;
+}
+
 UINT16 hp_5061_3001_cpu_device::execute_no_bpc_ioc(UINT16 opcode)
 {
         // EMC instructions
         UINT8 n;
         UINT16 tmp1;
         UINT16 tmp2;
+        UINT64 tmp_ar;
+        UINT64 tmp_ar2;
+        bool carry;
 
         switch (opcode & 0xfff0) {
         case 0x7300:
@@ -1133,61 +1277,155 @@ UINT16 hp_5061_3001_cpu_device::execute_no_bpc_ioc(UINT16 opcode)
                 switch (opcode) {
                 case 0x7200:
                         // MWA
+                        m_icount -= 28;
+                        tmp_ar2 = get_ar2();
+                        carry = do_dec_add(BIT(m_flags , HPHYBRID_DC_BIT) , tmp_ar2 , m_reg_B);
+                        set_ar2(tmp_ar2);
+                        if (carry) {
+                                BIT_SET(m_flags, HPHYBRID_DC_BIT);
+                        } else {
+                                BIT_CLR(m_flags, HPHYBRID_DC_BIT);
+                        }
                         break;
                         
                 case 0x7220:
                         // CMY
+                        m_icount -= 23;
+                        tmp_ar2 = get_ar2();
+                        tmp_ar2 = 0x999999999999ULL - tmp_ar2;
+                        do_dec_add(true , tmp_ar2 , 0);
+                        set_ar2(tmp_ar2);
+                        BIT_CLR(m_flags , HPHYBRID_DC_BIT);
                         break;
                         
                 case 0x7260:
                         // CMX
+                        m_icount -= 59;
+                        tmp_ar = get_ar1();
+                        tmp_ar = 0x999999999999ULL - tmp_ar;
+                        do_dec_add(true , tmp_ar , 0);
+                        set_ar1(tmp_ar);
+                        BIT_CLR(m_flags , HPHYBRID_DC_BIT);
                         break;
                         
                 case 0x7280:
                         // FXA
+                        m_icount -= 40;
+                        tmp_ar2 = get_ar2();
+                        carry = do_dec_add(BIT(m_flags , HPHYBRID_DC_BIT) , tmp_ar2 , get_ar1());
+                        set_ar2(tmp_ar2);
+                        if (carry) {
+                                BIT_SET(m_flags, HPHYBRID_DC_BIT);
+                        } else {
+                                BIT_CLR(m_flags, HPHYBRID_DC_BIT);
+                        }
                         break;
                         
                 case 0x7340:
                         // NRM
+                        tmp_ar2 = get_ar2();
+                        m_icount -= 23;
+                        for (n = 0; n < 12 && (tmp_ar2 & 0xf00000000000ULL) == 0; n++) {
+                                do_dec_shift_l(0 , tmp_ar2);
+                                m_icount--;
+                        }
+                        m_reg_B = n;
+                        if (n < 12) {
+                                BIT_CLR(m_flags , HPHYBRID_DC_BIT);
+                                set_ar2(tmp_ar2);
+                        } else {
+                                BIT_SET(m_flags , HPHYBRID_DC_BIT);
+                                // When ar2 is 0, total time is 69 cycles
+                                // (salcazzo che cosa fa per altri 34 cicli)
+                                m_icount -= 34;
+                        }
                         break;
                         
                 case 0x73c0:
                         // CDC
+                        m_icount -= 11;
+                        BIT_CLR(m_flags , HPHYBRID_DC_BIT);
                         break;
                         
                 case 0x7a00:
                         // FMP
+                        m_icount -= 42;
+                        m_reg_A = 0;
+                        tmp_ar = get_ar1();
+                        tmp_ar2 = get_ar2();
+                        for (n = m_reg_B & 0xf; n > 0; n--) {
+                                m_icount -= 13;
+                                if (do_dec_add(BIT(m_flags , HPHYBRID_DC_BIT) , tmp_ar2 , tmp_ar)) {
+                                        m_reg_A++;
+                                }
+                                BIT_CLR(m_flags , HPHYBRID_DC_BIT);
+                        }
+                        set_ar2(tmp_ar2);
                         break;
                         
                 case 0x7a21:
                         // FDV
+                        // No doc mentions any limit on the iterations done by this instruction.
+                        // Here we stop at 15 (after all there are only 4 bits in the loop counter). But is it correct?
+                        m_icount -= 37;
+                        m_reg_B = 0;
+                        tmp_ar = get_ar1();
+                        tmp_ar2 = get_ar2();
+                        while (m_reg_B < 15 && !do_dec_add(BIT(m_flags , HPHYBRID_DC_BIT) , tmp_ar2 , tmp_ar)) {
+                                m_icount -= 13;
+                                BIT_CLR(m_flags , HPHYBRID_DC_BIT);
+                                m_reg_B++;
+                        }
+                        set_ar2(tmp_ar2);
                         break;
                         
                 case 0x7b00:
                         // MRX
+                        set_ar1(do_mrxy(get_ar1()));
+                        m_icount -= 62;
                         break;
                         
                 case 0x7b21:
                         // DRS
+                        tmp_ar = get_ar1();
+                        m_icount -= 56;
+                        m_reg_A = m_reg_se = do_dec_shift_r(0 , tmp_ar);
+                        set_ar1(tmp_ar);
+                        BIT_CLR(m_flags , HPHYBRID_DC_BIT);
                         break;
                         
                 case 0x7b40:
                         // MRY
+                        set_ar2(do_mrxy(get_ar2()));
+                        m_icount -= 33;
                         break;
                         
                 case 0x7b61:
                         // MLY
+                        tmp_ar2 = get_ar2();
+                        m_icount -= 32;
+                        m_reg_A = m_reg_se = do_dec_shift_l(m_reg_A & 0xf , tmp_ar2);
+                        set_ar2(tmp_ar2);
+                        BIT_CLR(m_flags , HPHYBRID_DC_BIT);
                         break;
                         
                 case 0x7b8f:
                         // MPY
+                        do_mpy();
                         break;
 
                 default:
-                        // Unrecognized instructions: NOP
-                        // Execution time is fictional
-                        logerror("hp-5061-3001: unknown opcode %04x\n" , opcode);
-                        m_icount -= 6;
+                        if ((opcode & 0xfec0) == 0x74c0) {
+                                // SDS
+                                // SDC
+                                m_icount -= 14;
+                                return get_skip_addr(opcode , !BIT(m_flags , HPHYBRID_DC_BIT));
+                        } else {
+                                // Unrecognized instructions: NOP
+                                // Execution time is fictional
+                                logerror("hp-5061-3001: unknown opcode %04x\n" , opcode);
+                                m_icount -= 6;
+                        }
                         break;
                 }
         }
