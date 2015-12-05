@@ -58,7 +58,7 @@ protected:
 	// inline helper
 
 private:
-	void draw_character( unsigned char c );
+	void draw_character( unsigned char c, int block, int smallblock );
 	void screen_scanning( int force_clear );
 	void set_busy_flag(int period);
 	void set_video_mode(void);

@@ -181,44 +181,78 @@ void ef9365_device::draw_border(UINT16 line)
 
 }
 
-void ef9365_device::draw_character( unsigned char c )
+void ef9365_device::draw_character( unsigned char c, int block, int smallblock )
 {
 	int x_char,y_char;
 	int char_base,char_pix;
 	unsigned int x, y, p;
+	int x_char_res,y_char_res;
 
 	x = ( (m_registers[EF9365_REG_X_MSB]<<8) | m_registers[EF9365_REG_X_LSB]);
 	y = ( (m_registers[EF9365_REG_Y_MSB]<<8) | m_registers[EF9365_REG_Y_LSB]);
 
+	x_char_res = 5;
+	y_char_res = 8;
+
+	if( smallblock )
+	{
+		block = 1;
+		x_char_res = 4;
+		y_char_res = 4;
+	}
+
 	if(c<96)
 	{
-		y = ( 256 - y ) - 8;
+		y = ( 256 - y ) - y_char_res;
 
-		if( ( x < ( 256 - 5 ) ) && ( y < ( 256 - 8 ) ) )
+		if( ( x < ( 256 - 5 ) ) && ( y < ( 256 - y_char_res ) ) )
 		{
 			char_base = c * 5; // 5 bytes per char.
 			char_pix = 0;
 
-			for(y_char=0;y_char<8;y_char++)
+			if ( block )
 			{
-				for(x_char=0;x_char<5;x_char++)
+				// 5x8 or 4x4 block
+
+				for( y_char = 0 ; y_char < y_char_res ; y_char++ )
 				{
-					if ( m_charset->u8(char_base + (char_pix>>3) ) & ( 0x80 >> (char_pix&7)))
+					for( x_char = 0 ; x_char < x_char_res ; x_char++ )
 					{
-						for(p = 0 ; p < 4 ; p++)
+						for( p = 0 ; p < 4 ; p++ )
 						{
 							if( m_current_color & (0x01 << p) )
 								m_videoram->write_byte ( (0x2000*p) + ((((y_char+y)*256) + (x_char+x))>>3), m_videoram->read_byte( (0x2000*p) + ((((y_char+y)*256) + (x_char+x))>>3)) |  (0x80 >> ((((y_char+y)*256) + (x_char+x))&7) ) );
 							else
 								m_videoram->write_byte ( (0x2000*p) + ((((y_char+y)*256) + (x_char+x))>>3), m_videoram->read_byte( (0x2000*p) + ((((y_char+y)*256) + (x_char+x))>>3)) & ~(0x80 >> ((((y_char+y)*256) + (x_char+x))&7) ) );
 						}
+						char_pix++;
 					}
+				}
+			}
+			else
+			{
+				// 5x8 character
+				for( y_char=0 ; y_char < y_char_res ;y_char++ )
+				{
+					for( x_char=0 ; x_char < x_char_res ; x_char++ )
+					{
+						if ( m_charset->u8(char_base + (char_pix>>3) ) & ( 0x80 >> (char_pix&7)))
+						{
+							for( p = 0 ; p < 4 ; p++ )
+							{
+								if( m_current_color & (0x01 << p) )
+									m_videoram->write_byte ( (0x2000*p) + ((((y_char+y)*256) + (x_char+x))>>3), m_videoram->read_byte( (0x2000*p) + ((((y_char+y)*256) + (x_char+x))>>3)) |  (0x80 >> ((((y_char+y)*256) + (x_char+x))&7) ) );
+								else
+									m_videoram->write_byte ( (0x2000*p) + ((((y_char+y)*256) + (x_char+x))>>3), m_videoram->read_byte( (0x2000*p) + ((((y_char+y)*256) + (x_char+x))>>3)) & ~(0x80 >> ((((y_char+y)*256) + (x_char+x))&7) ) );
+							}
+						}
 
-					char_pix++;
+						char_pix++;
+					}
 				}
 			}
 
-			x = x + 6;
+			x = x + ( x_char_res + 1 );
 
 			m_registers[EF9365_REG_X_MSB] = x >> 8;
 			m_registers[EF9365_REG_X_LSB] = x & 0xFF;
@@ -342,11 +376,13 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 			#ifdef DBGMODE
 				printf("5x8 block drawing (size according to CSIZE)\n");
 			#endif
+				draw_character( 0x00 , 1 , 0 );
 			break;
 			case 0xB: // 4x4 block drawing (size according to CSIZE)
 			#ifdef DBGMODE
 				printf("4x4 block drawing (size according to CSIZE)\n");
 			#endif
+				draw_character( 0x00 , 1 , 1 );
 			break;
 			case 0xC: // Screen scanning : pen or Eraser as defined by CTRL1
 			#ifdef DBGMODE
@@ -411,7 +447,7 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 				#ifdef DBGMODE
 				printf("Draw character\n");
 				#endif
-				draw_character( cmd - 0x20 );
+				draw_character( cmd - 0x20, 0 , 0 );
 			}
 		}
 	}
