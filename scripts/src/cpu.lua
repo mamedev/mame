@@ -1436,6 +1436,22 @@ if (CPUS["PDP1"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- PATINHO FEIO - Escola Politecnica - USP (Brazil)
+--@src/devices/cpu/patinhofeio/patinho_feio.h,CPUS["PATINHOFEIO"] = true
+--------------------------------------------------
+
+if (CPUS["PATINHOFEIO"]~=null) then
+    files {
+        MAME_DIR .. "src/devices/cpu/patinhofeio/patinho_feio.cpp",
+        MAME_DIR .. "src/devices/cpu/patinhofeio/patinho_feio.h",
+    }
+end
+
+if (CPUS["PATINHOFEIO"]~=null or _OPTIONS["with-tools"]) then
+    table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/patinhofeio/patinho_feio_dasm.cpp")
+end
+
+--------------------------------------------------
 -- Motorola PowerPC series
 --@src/devices/cpu/powerpc/ppc.h,CPUS["POWERPC"] = true
 --------------------------------------------------

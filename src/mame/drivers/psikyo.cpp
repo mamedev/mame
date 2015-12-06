@@ -1055,14 +1055,11 @@ static MACHINE_CONFIG_START( sngkace, psikyo_state )
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,sngkace)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  1.2)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono",  1.0)
 MACHINE_CONFIG_END
 
 
@@ -1101,14 +1098,11 @@ static MACHINE_CONFIG_START( gunbird, psikyo_state )
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  1.2)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono",  1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( s1945bl, psikyo_state ) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
@@ -1181,12 +1175,11 @@ static MACHINE_CONFIG_START( s1945, psikyo_state )
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
