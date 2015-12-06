@@ -55,8 +55,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(hdd_irq);
 
-	DECLARE_READ8_MEMBER(p0_5_r);
-	DECLARE_WRITE8_MEMBER(p0_5_w);
+	DECLARE_READ8_MEMBER(p0_7_r);
+	DECLARE_WRITE8_MEMBER(p0_7_w);
 	DECLARE_READ8_MEMBER(fdd_68k_r);
 	DECLARE_WRITE8_MEMBER(fdd_68k_w);
 	DECLARE_WRITE8_MEMBER(p38_w);
@@ -76,15 +76,18 @@ public:
 	UINT8 reg_p3;
 	UINT8 reg_p4;
 	UINT8 reg_p5;
+	UINT8 reg_p6;
+	UINT8 reg_p7;
 	UINT8 reg_p21;
 	UINT8 reg_p38;
+	UINT32 fdd_68k_dma_address;
 protected:
         /* Device-level overrides */
         virtual void device_start();
         virtual void device_reset();
 
 	/* Protected variables */
-	UINT32 fdd_68k_dma_address;
+	//UINT32 fdd_68k_dma_address;
 	bool b_fdc_irq;
 
 	/* Attached devices */

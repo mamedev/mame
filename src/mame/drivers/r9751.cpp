@@ -105,7 +105,7 @@ READ8_MEMBER(r9751_state::pdc_dma_r)
 
 WRITE8_MEMBER(r9751_state::pdc_dma_w)
 {
-	m_maincpu->space(AS_PROGRAM).write_byte(offset,data);
+	m_maincpu->space(AS_PROGRAM).write_byte(m_pdc->fdd_68k_dma_address,data);
 }
 
 DRIVER_INIT_MEMBER(r9751_state,r9751)
@@ -238,6 +238,10 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 		case 0x5FF080B0: /* fdd_dest_address register */
 			fdd_dest_address = data << 1;
 			logerror("--- FDD destination address: %08X\n", fdd_dest_address);
+			data_b0 = data & 0xFF;
+			data_b1 = (data & 0xFF00) >> 8;
+			m_pdc->reg_p6 = data_b0;
+			m_pdc->reg_p7 = data_b1;
 			break;
 		case 0x5FF0C0B0:
 		case 0x5FF0C1B0: /* FDD command address register */

@@ -61,7 +61,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( pdc_io, AS_IO, 8, pdc_device )
-	AM_RANGE(0x00, 0x05) AM_READWRITE(p0_5_r,p0_5_w) AM_MIRROR(0xFF00)
+	AM_RANGE(0x00, 0x07) AM_READWRITE(p0_7_r,p0_7_w) AM_MIRROR(0xFF00)
 	AM_RANGE(0x21, 0x2F) AM_READWRITE(fdd_68k_r,fdd_68k_w) AM_MIRROR(0xFF00)
 	AM_RANGE(0x38, 0x38) AM_READ(p38_r) AM_MIRROR(0xFF00) // Possibly UPD765 interrupt
 	AM_RANGE(0x39, 0x39) AM_READ(p39_r) AM_MIRROR(0xFF00) // HDD related
@@ -127,7 +127,7 @@ static MACHINE_CONFIG_FRAGMENT( pdc )
 	MCFG_I8237_IN_IOR_0_CB(READ8(pdc_device, i8237_fdc_dma_r))
 	MCFG_I8237_OUT_IOW_0_CB(WRITE8(pdc_device, i8237_fdc_dma_w))
 	MCFG_I8237_IN_IOR_1_CB(READ8(pdc_device, m68k_dma_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(pdc_device, m68k_dma_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(pdc_device, m68k_dma_w))
         // MCFG_AM9517A_OUT_DACK_0_CB(WRITELINE(pdc_device, fdc_dack_w))
 
 	/* Hard Disk Controller - HDC9224 */
@@ -182,7 +182,10 @@ void pdc_device::device_reset()
 {
 	/* Reset registers */
 	reg_p38 = 0;
-
+	reg_p38 |= 4; /* ready for 68k ram DMA */
+	//reg_p38 |= 0x20; // no idea at all - bit 5 (32)
+	m_fdc->set_ready_line_connected(false);
+	m_fdc->ready_w(true);
 	/* Reset CPU */
         m_pdccpu->reset();
 
@@ -204,6 +207,8 @@ WRITE_LINE_MEMBER(pdc_device::i8237_hreq_w)
 WRITE_LINE_MEMBER(pdc_device::i8237_eop_w)
 {
 	m_fdc->tc_w(state);
+	reg_p38 |= 4; /* ready for 68k ram DMA */
+	if(state) m_dma8237->dreq1_w(0);
 }
 
 READ8_MEMBER(pdc_device::i8237_dma_mem_r)
@@ -219,17 +224,18 @@ WRITE8_MEMBER(pdc_device::i8237_dma_mem_w)
 READ8_MEMBER(pdc_device::i8237_fdc_dma_r)
 {
 	UINT8 ret = m_fdc->dma_r();
+	logerror("PDC: 8237 DMA CHANNEL 0 READ ADDRESS: %08X, DATA: %02X\n", offset, ret );
 	return ret;
 }
 
 WRITE8_MEMBER(pdc_device::i8237_fdc_dma_w)
 {
+	logerror("PDC: 8237 DMA CHANNEL 0 WRITE ADDRESS: %08X, DATA: %02X\n", offset, data );
 	m_fdc->dma_w(data);
 }
 
 READ8_MEMBER(pdc_device::m68k_dma_r)
 {
-	//return m_m68k_r_cb(offset);
 	UINT32 address;
 	UINT8 data;
 
@@ -241,8 +247,9 @@ READ8_MEMBER(pdc_device::m68k_dma_r)
 
 WRITE8_MEMBER(pdc_device::m68k_dma_w)
 {
-	//m_m68k_w_cb(offset,data);
-	logerror("PDC: 8237 DMA CHANNEL 1 WRITE ADDRESS: %08X, DATA: %02X\n", offset, data );
+	UINT32 address = fdd_68k_dma_address++;
+	logerror("PDC: 8237 DMA CHANNEL 1 WRITE ADDRESS: %08X, DATA: %02X\n", address, data );
+	m_m68k_w_cb(data);
 }
 
 WRITE_LINE_MEMBER(pdc_device::hdd_irq)
@@ -254,7 +261,7 @@ WRITE_LINE_MEMBER(pdc_device::fdc_irq)
 {
 	b_fdc_irq = state != 0;
 }
-READ8_MEMBER(pdc_device::p0_5_r)
+READ8_MEMBER(pdc_device::p0_7_r)
 {
 	switch(offset)
 	{
@@ -270,13 +277,19 @@ READ8_MEMBER(pdc_device::p0_5_r)
 		case 3: /* Port 3: FDD command address high byte [0x5FF0C0B0][0x5FF0C1B0] */
 			logerror("PDC: Port 0x03 READ: %02X\n", reg_p3);
 			return reg_p3;
+		case 6: /* Port 6: FDD data destination address low byte [0x5FF080B0] */
+			logerror("PDC: Port 0x06 READ: %02X\n", reg_p6);
+			return reg_p6;
+		case 7: /* Port 7: FDD data destination address high byte [0x5FF080B0] */
+			logerror("PDC: Port 0x07 READ: %02X\n", reg_p7);
+			return reg_p7;
 		default:
 			logerror("(!)PDC: Port %02X READ: \n", offset);
 			return 0;
 	}
 }
 
-WRITE8_MEMBER(pdc_device::p0_5_w)
+WRITE8_MEMBER(pdc_device::p0_7_w)
 {
 	switch(offset)
 	{
@@ -330,6 +343,8 @@ WRITE8_MEMBER(pdc_device::fdd_68k_w)
 			{
 				case 0x80:
 					m_dma8237->dreq1_w(1);
+					reg_p38 &= ~4; // Clear bit 4
+					logerror("PDC: Port 0x26 WRITE: 0x80, DMA REQ CH 1\n");
 					break;
 			}
 			break;
@@ -338,26 +353,28 @@ WRITE8_MEMBER(pdc_device::fdd_68k_w)
 			{
 				case 0xFF:
 					m_dma8237->dreq1_w(0);
+					logerror("PDC: Port 0x2C WRITE: 0xFF, DMA REQ CH 1 OFF\n");
 					break;
 			}
 			break;
 		default:
-			logerror("(!)PDC: Port %02X WRITE: %02X\n", address, data);
+			logerror("(!)PDC: Port %02X WRITE: %02X, PC: %X\n", address, data, space.device().safe_pc());
 			break;
 	}
 }
 
 WRITE8_MEMBER(pdc_device::p38_w)
 {
-	logerror("PDC: Port 0x38 set bit: %i\n", data);
+	logerror("PDC: Port 0x38 WRITE: %i\n", data);
 	//reg_p38 |= data;
 	reg_p38 = data;
 }
 
 READ8_MEMBER(pdc_device::p38_r)
 {
+	reg_p38 ^= 0x20; /* Invert bit 5 (32) */
 	//UINT8 retn;
-//	logerror("PDC: Port 0x38 READ: %02X\n", reg_p38);
+	logerror("PDC: Port 0x38 READ: %02X, PC: %X\n", reg_p38, space.device().safe_pc());
 	//retn = reg_p38;
 	//reg_p38 &= ~2; // Clear bit 1
 	//return retn;
@@ -368,5 +385,6 @@ READ8_MEMBER(pdc_device::p39_r)
 {
 	UINT8 data = 1;
 	if(b_fdc_irq) data |= 8; // Set bit 3
+	logerror("PDC: Port 0x39 READ: %02X, PC: %X\n", data, space.device().safe_pc());
 	return data;
 }
