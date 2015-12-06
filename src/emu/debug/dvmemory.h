@@ -11,6 +11,9 @@
 #ifndef __DVMEMORY_H__
 #define __DVMEMORY_H__
 
+#include "softfloat/mamesf.h"
+#include "softfloat/softfloat.h"
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -94,6 +97,7 @@ private:
 	// memory access
 	bool read(UINT8 size, offs_t offs, UINT64 &data);
 	void write(UINT8 size, offs_t offs, UINT64 data);
+	bool read(UINT8 size, offs_t offs, floatx80 &data);
 
 	// internal state
 	debug_view_expression m_expression;         // expression describing the start address
@@ -122,7 +126,7 @@ private:
 		UINT8           m_spacing;              /* spacing between each entry */
 		UINT8           m_shift[24];            /* shift for each character */
 	};
-	static const memory_view_pos s_memory_pos_table[9]; // table for rendering at different chunk sizes
+	static const memory_view_pos s_memory_pos_table[12]; // table for rendering at different data formats
 
 	// constants
 	static const int MEM_MAX_LINE_WIDTH = 1024;
