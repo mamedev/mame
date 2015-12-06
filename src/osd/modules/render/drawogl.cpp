@@ -556,9 +556,11 @@ public:
 		return &window().target()->get_primitives();
 	}
 
+#ifdef OSD_WINDOWS
 	virtual void save() override { }
 	virtual void record() override { }
 	virtual void toggle_fsfx() override { }
+#endif
 
 private:
 	void destroy_all_textures();
