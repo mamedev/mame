@@ -26,6 +26,7 @@ end
 	uuid (os.uuid(_target .."_" .. _subtarget))
 	kind "ConsoleApp"
 
+	addprojectflags()
 	flags {
 		"NoManifest",
 		"Symbols", -- always include minimum symbols for executables 

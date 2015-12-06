@@ -765,6 +765,7 @@ function createMAMEProjects(_target, _subtarget, _name)
 	targetsubdir(_target .."_" .. _subtarget)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-" .. _target .."_" .. _subtarget .. "_" .._name))
+	addprojectflags()
 
 	includedirs {
 		MAME_DIR .. "src/osd",

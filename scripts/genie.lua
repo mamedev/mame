@@ -53,6 +53,15 @@ function layoutbuildtask(_folder, _name)
 		{  MAME_DIR .. "scripts/build/file2str.py" }, {"@echo Converting src/".._folder.."/".._name..".lay...",    PYTHON .. " $(1) $(<) $(@) layout_".._name }};
 end
 
+function addprojectflags()
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "gcc") and (version >= 50100) then
+		buildoptions_cpp {
+			"-Wsuggest-override",
+		}
+	end
+end
+
 CPUS = {}
 SOUNDS  = {}
 MACHINES  = {}

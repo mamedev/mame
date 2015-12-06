@@ -13,6 +13,8 @@ project "utils"
 	uuid "22489ad0-4cb2-4d91-ad81-24b0d80ca30a"
 	kind (LIBTYPE)
 
+	addprojectflags()
+
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/lib/util",
@@ -104,6 +106,8 @@ project "utils"
 project "formats"
 	uuid "f69636b1-fcce-45ce-b09a-113e371a2d7a"
 	kind (LIBTYPE)
+
+	addprojectflags()
 
 	options {
 		"ArchiveSplit",

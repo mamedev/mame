@@ -107,6 +107,8 @@ project ("osd_" .. _OPTIONS["osd"])
 	dofile("windows_cfg.lua")
 	osdmodulesbuild()
 
+	addprojectflags()
+	
 	defines {
 		"DIRECT3D_VERSION=0x0900",
 	}
@@ -197,6 +199,8 @@ project ("ocore_" .. _OPTIONS["osd"])
 		"SingleOutputDir",
 	}
 
+	addprojectflags()
+
 	dofile("windows_cfg.lua")
 
 	includedirs {
@@ -264,6 +268,8 @@ if _OPTIONS["with-tools"] then
 		uuid ("061293ca-7290-44ac-b2b5-5913ae8dc9c0")
 		kind "ConsoleApp"
 
+		addprojectflags()
+	
 		flags {
 			"Symbols", -- always include minimum symbols for executables 	
 		}

@@ -21,6 +21,8 @@ project ("osd_" .. _OPTIONS["osd"])
 		"SingleOutputDir",
 	}
 	
+	addprojectflags()
+
 	dofile("osdmini_cfg.lua")
 	
 	includedirs {
@@ -67,6 +69,8 @@ project ("ocore_" .. _OPTIONS["osd"])
 	removeflags {
 		"SingleOutputDir",	
 	}
+
+	addprojectflags()
 
 	dofile("osdmini_cfg.lua")
 	
