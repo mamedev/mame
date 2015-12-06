@@ -23,7 +23,11 @@ CPU_DISASSEMBLE( patinho_feio )
             //ARM = "Armazena": Stores the contents of the
             //                  accumulator in the given 12bit address
             addr = (oprom[0] & 0x0F) << 8 | oprom[1];
-            sprintf (buffer, "ARM     /%03X", addr);
+            if (addr==0){
+                sprintf (buffer, "ARM     (IDX)");
+            }else{
+                sprintf (buffer, "ARM     /%03X", addr);
+            }
             return 2;
         case 0x30:
             //ARMX = "Armazenamento indexado": Stores the contents of the accumulator in the
@@ -35,7 +39,11 @@ CPU_DISASSEMBLE( patinho_feio )
             //CAR = "Carrega": Loads the contents of the given 12bit address
             //                 into the accumulator
             addr = (oprom[0] & 0x0F) << 8 | oprom[1];
-            sprintf (buffer, "CAR     /%03X", addr);
+            if (addr==0){
+                sprintf (buffer, "CAR     (IDX)");
+            }else{
+                sprintf (buffer, "CAR     /%03X", addr);
+            }
             return 2;
         case 0x50:
             //CARX = "Carga indexada": Loads the contents of the given 12bit address
