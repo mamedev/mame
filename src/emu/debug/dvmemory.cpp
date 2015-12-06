@@ -325,14 +325,14 @@ void debug_view_memory::view_update()
 						switch (m_data_format)
 						{
 						case 9:
-							sprintf(valuetext, "%g", uint32_to_float((UINT32)chunkdata));
+							sprintf(valuetext, "%.8g", uint32_to_float((UINT32)chunkdata));
 							break;
 						case 10:
-							sprintf(valuetext, "%g", uint64_to_double(chunkdata));
+							sprintf(valuetext, "%.24g", uint64_to_double(chunkdata));
 							break;
 						case 11:
 							float64 f64 = floatx80_to_float64(chunkdata80);
-							sprintf(valuetext, "%g", uint64_to_double(f64));
+							sprintf(valuetext, "%.24g", uint64_to_double(f64));
 							break;
 						}
 					else {
