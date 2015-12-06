@@ -19,7 +19,7 @@ public:
     DECLARE_READ16_MEMBER(rc_r);
     void load_tape(const char* name);
     void load_raw_data(const char* name, unsigned int start_address, unsigned int data_length);
-    virtual void machine_start();
+    virtual void machine_start() override;
 //    virtual void machine_reset();
 //    required_device<patinho_feio_cpu_device> m_maincpu;
 };
