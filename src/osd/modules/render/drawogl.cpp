@@ -538,7 +538,9 @@ public:
 	virtual int create() override;
 	virtual int draw(const int update) override;
 
-	int xy_to_render_target(const int x, const int y, int *xt, int *yt);
+#ifndef OSD_WINDOWS
+	int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
+#endif
 	virtual void destroy() override;
 	virtual render_primitive_list *get_primitives() override
 	{
