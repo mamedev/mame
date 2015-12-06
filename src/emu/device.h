@@ -564,10 +564,10 @@ public:
 	// return the indexed item in the list
 	_InterfaceClass *byindex(int index)
 	{
-		for (_InterfaceClass *item = first(); item != NULL; item = next(), index--)
+		for (_InterfaceClass *item = first(); item != nullptr; item = next(), index--)
 			if (index == 0)
 				return item;
-		return NULL;
+		return nullptr;
 	}
 
 private:

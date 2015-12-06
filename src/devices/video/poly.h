@@ -620,7 +620,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tile(
 	}
 
 	// enqueue the work items
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_item_queue_multiple(m_queue, work_item_callback, m_unit.count() - startunit, &m_unit[startunit], m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	// return the total number of pixels in the triangle

@@ -332,7 +332,7 @@ public:
 	UINT32 mask() const { return m_length - 1; } // only valid if length is known to be a power of 2
 
 	// finder
-	virtual bool findit(bool isvalidation = false)
+	virtual bool findit(bool isvalidation = false) override
 	{
 		if (isvalidation) return true;
 		this->m_target = reinterpret_cast<_PointerType *>(this->find_memregion(sizeof(_PointerType), m_length, _Required));
