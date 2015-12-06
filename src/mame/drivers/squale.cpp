@@ -60,6 +60,8 @@
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "sound/ay8910.h"
+#include "machine/wd_fdc.h"
+#include "softlist.h"
 
 #define MAIN_CLOCK           XTAL_14MHz
 #define AY_CLOCK             MAIN_CLOCK / 8     /* 1.75 Mhz */
@@ -76,9 +78,16 @@ public:
 		, m_pia_u75(*this, "pia_u75")
 		, m_ef9365(*this, "ef9365")
 		, m_maincpu(*this, "maincpu")
+		, m_fdc(*this, "wd1770")
+		, m_floppy0(*this, "wd1770:0")
+		, m_floppy(NULL)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(ctrl_w);
+	DECLARE_WRITE8_MEMBER(fdc_sel0_w);
+	DECLARE_READ8_MEMBER(fdc_sel0_r);
+	DECLARE_WRITE8_MEMBER(fdc_sel1_w);
+	DECLARE_READ8_MEMBER(fdc_sel1_r);
 	DECLARE_READ8_MEMBER(pia_u72_porta_r);
 	DECLARE_READ8_MEMBER(pia_u72_portb_r);
 	DECLARE_READ8_MEMBER(pia_u75_porta_r);
@@ -99,6 +108,8 @@ public:
 	virtual void machine_reset();
 
 	UINT8 keyboard_line;
+	UINT8 fdc_sel0;
+	UINT8 fdc_sel1;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(squale_scanline);
 
@@ -109,6 +120,9 @@ private:
 	required_device<pia6821_device> m_pia_u75;
 	required_device<ef9365_device> m_ef9365;
 	required_device<cpu_device> m_maincpu;
+	required_device<wd1770_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	floppy_image_device *m_floppy;
 };
 
 /*************************
@@ -124,6 +138,46 @@ WRITE8_MEMBER( squale_state::ctrl_w )
 	membank("rom_bank")->set_entry(data >> 7);
 
 	m_ef9365->static_set_color_filler(data & 0xF);
+}
+
+WRITE8_MEMBER( squale_state::fdc_sel0_w )
+{
+	#ifdef DBGMODE
+	printf("write fdc_sel0_w reg : 0x%X\n",data);
+	#endif
+
+	fdc_sel0 = data;
+}
+
+WRITE8_MEMBER( squale_state::fdc_sel1_w )
+{
+	#ifdef DBGMODE
+	printf("write fdc_sel1_w reg : 0x%X\n",data);
+	#endif
+
+	fdc_sel1 = data;
+}
+
+READ8_MEMBER( squale_state::fdc_sel0_r )
+{
+	UINT8 data = 0xFF;
+
+	#ifdef DBGMODE
+	printf("%s: read fdc_sel0_r\n",machine().describe_context());
+	#endif
+	data = 0x00;
+	return data;
+}
+
+READ8_MEMBER( squale_state::fdc_sel1_r )
+{
+	UINT8 data = 0xFF;
+
+	#ifdef DBGMODE
+	printf("%s: read fdc_sel1_r\n",machine().describe_context());
+	#endif
+	data = 0x00;
+	return data;
 }
 
 READ8_MEMBER( squale_state::pia_u72_porta_r )
@@ -283,7 +337,11 @@ static ADDRESS_MAP_START(squale_mem, AS_PROGRAM, 8, squale_state)
 	AM_RANGE(0xf048,0xf04b) AM_DEVREADWRITE("pia_u72", pia6821_device, read, write)
 	AM_RANGE(0xf050,0xf05f) AM_DEVREADWRITE("ef6850", acia6850_device, data_r, data_w)
 	AM_RANGE(0xf060,0xf06f) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, address_data_w)
+	AM_RANGE(0xf080,0xf083) AM_DEVREADWRITE("wd1770", wd1770_t, read, write)
+	AM_RANGE(0xf08a,0xf08a) AM_READWRITE( fdc_sel0_r, fdc_sel0_w )
+	AM_RANGE(0xf08b,0xf08b) AM_READWRITE( fdc_sel1_r, fdc_sel1_w )
 	AM_RANGE(0xf100,0xffff) AM_ROMBANK("rom_bank");
+
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( squale_io, AS_IO, 8, squale_state)
@@ -378,9 +436,16 @@ static INPUT_PORTS_START( squale )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 INPUT_PORTS_END
 
+static SLOT_INTERFACE_START( squale_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
+
 void squale_state::machine_start()
 {
 	int i;
+
+	fdc_sel0 = 0x00;
+	fdc_sel1 = 0x00;
 
 	membank("rom_bank")->configure_entry(0, memregion("maincpu")->base() + 0x100);
 	membank("rom_bank")->configure_entry(1, memregion("maincpu")->base() + 0x1100);
@@ -448,6 +513,11 @@ static MACHINE_CONFIG_START( squale, squale_state )
 	MCFG_DEVICE_ADD("ef9365", EF9365, 0)
 	MCFG_EF9365_PALETTE("palette")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("squale_sl", squale_state, squale_scanline, "screen", 0, 10)
+
+	/* Floppy */
+	MCFG_WD1770_ADD("wd1770", XTAL_8MHz )
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", squale_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop525_list", "squale")
 
 MACHINE_CONFIG_END
 
