@@ -133,9 +133,9 @@ public:
 	DECLARE_WRITE16_MEMBER(eeprom_clock_w);
 	DECLARE_WRITE16_MEMBER(eeprom_cs_w);
 	DECLARE_DRIVER_INIT(gaelco3d);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(gaelco3d2);
 	DECLARE_MACHINE_RESET(common);
 	UINT32 screen_update_gaelco3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

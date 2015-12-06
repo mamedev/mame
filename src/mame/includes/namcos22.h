@@ -481,9 +481,9 @@ public:
 	DECLARE_DRIVER_INIT(alpinesa);
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	virtual void machine_reset();
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(adillor);
 	UINT32 screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

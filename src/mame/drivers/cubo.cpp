@@ -355,8 +355,8 @@ public:
 	UINT16 m_potgo_value;
 
 protected:
-	virtual void rs232_tx(int state);
-	virtual void potgo_w(UINT16 data);
+	virtual void rs232_tx(int state) override;
+	virtual void potgo_w(UINT16 data) override;
 
 private:
 	required_device<microtouch_device> m_microtouch;

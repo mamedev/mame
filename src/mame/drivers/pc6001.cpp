@@ -246,9 +246,9 @@ public:
 	DECLARE_WRITE8_MEMBER(pc6001sr_vram_bank_w);
 	DECLARE_WRITE8_MEMBER(pc6001sr_system_latch_w);
 	DECLARE_WRITE8_MEMBER(necsr_ppi8255_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pc6001);
 	DECLARE_MACHINE_RESET(pc6001m2);
 	DECLARE_PALETTE_INIT(pc6001m2);

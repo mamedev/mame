@@ -56,8 +56,8 @@ public:
 	UINT8 m_key;
 	UINT8 m_prev_key;
 	bool m_step;
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 };
 

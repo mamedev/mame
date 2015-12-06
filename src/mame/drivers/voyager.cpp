@@ -38,8 +38,8 @@ public:
 	UINT32 m_idle_skip_ram;
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
 	DECLARE_DRIVER_INIT(voyager);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void intel82439tx_init();
 };
 

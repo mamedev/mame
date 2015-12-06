@@ -49,7 +49,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(read_line_adc083x_sars);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 	devcb_write_line m_dsr_handler;
 
@@ -101,8 +101,8 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d3);
 
 protected:
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	required_device<x76f041_device> m_x76f041;
@@ -128,7 +128,7 @@ public:
 	ADC083X_INPUT_CB(punchmania_inputs_callback);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	required_device<ds2401_device> m_ds2401;
@@ -191,8 +191,8 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d7);
 
 protected:
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	required_device<x76f100_device> m_x76f100;
@@ -218,7 +218,7 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d4);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	required_device<ds2401_device> m_ds2401;
@@ -242,8 +242,8 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_zs01_sda);
 
 protected:
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	required_device<zs01_device> m_zs01;

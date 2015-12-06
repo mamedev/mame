@@ -99,8 +99,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_ms32_roz_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_extra_tile_info);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(f1superb);
 	UINT32 screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ms32_interrupt);

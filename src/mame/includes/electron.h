@@ -91,9 +91,9 @@ public:
 	DECLARE_WRITE8_MEMBER(electron_ula_w);
 	void electron_tape_start();
 	void electron_tape_stop();
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(electron);
 	UINT32 screen_update_electron(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(electron_tape_timer_handler);
@@ -110,7 +110,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( electron_cart );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

@@ -31,7 +31,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_memory_region m_rom;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( i8355_a_r );
 	DECLARE_WRITE8_MEMBER( i8355_a_w );

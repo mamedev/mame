@@ -144,9 +144,9 @@ private:
 	UINT8 m_term_status;
 	int m_c8[8];
 	floppy_image_device *m_floppy;
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
 	address_space *m_mem;

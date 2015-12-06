@@ -191,7 +191,7 @@ protected:
 public:
 	int m_meter;
 	DECLARE_DRIVER_INIT(proconn);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(meter_w);
 	DECLARE_WRITE16_MEMBER(serial_transmit);
 	DECLARE_READ16_MEMBER(serial_receive);

@@ -187,8 +187,8 @@ private:
 	UINT8 *m_work_ram;
 	bool m_motor;
 	bool m_centronics_busy;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<z80_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
 	required_device<cassette_image_device> m_cass;

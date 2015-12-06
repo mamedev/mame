@@ -76,7 +76,7 @@ private:
 	UINT16 m_tty_data;
 	UINT8 m_tty_key_data;
 	int m_tty_cnt;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<teleprinter_device> m_teleprinter;
 	required_device<cpu_device> m_maincpu;
 };

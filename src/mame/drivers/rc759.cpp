@@ -101,8 +101,8 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<i80186_cpu_device> m_maincpu;

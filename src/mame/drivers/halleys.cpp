@@ -269,8 +269,8 @@ public:
 	DECLARE_DRIVER_INIT(halley87);
 	DECLARE_DRIVER_INIT(benberob);
 	DECLARE_DRIVER_INIT(halleys);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(halleys);
 	UINT32 screen_update_halleys(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_benberob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

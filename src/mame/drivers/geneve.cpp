@@ -270,8 +270,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( mapper_ready );
 
 	DECLARE_DRIVER_INIT(geneve);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(geneve_hblank_interrupt);
 
 	DECLARE_WRITE_LINE_MEMBER(set_tms9901_INT2_from_v9938);

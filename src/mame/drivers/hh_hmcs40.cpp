@@ -141,8 +141,8 @@ public:
 	void display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety);
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 
@@ -2006,7 +2006,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 // handlers
@@ -2687,7 +2687,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 // handlers: maincpu side
@@ -2865,7 +2865,7 @@ public:
 		: eturtles_state(mconfig, type, tag)
 	{ }
 
-	virtual void prepare_display();
+	virtual void prepare_display() override;
 	DECLARE_READ8_MEMBER(cop_data_r);
 };
 

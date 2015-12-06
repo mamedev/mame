@@ -122,8 +122,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_DRIVER_INIT(decode);
 	DECLARE_DRIVER_INIT(nodecode);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	int b85_find_project_string( );
 	required_device<cpu_device> m_maincpu;

@@ -75,8 +75,8 @@ public:
 	DECLARE_WRITE8_MEMBER(psg_a_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_tape);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_w(screen_device &screen, bool state);
 
@@ -143,8 +143,8 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 protected:
 	enum {
@@ -173,7 +173,7 @@ protected:
 
 	UINT8 m_junk_read[0x4000], m_junk_write[0x4000];
 
-	virtual void update_irq();
+	virtual void update_irq() override;
 	void remap();
 };
 

@@ -171,10 +171,10 @@ class hp64k_state : public driver_device
 public:
 		hp64k_state(const machine_config &mconfig, device_type type, const char *tag);
 
-		virtual void driver_start();
+		virtual void driver_start() override;
 		//virtual void machine_start();
-		virtual void video_start();
-		virtual void machine_reset();
+		virtual void video_start() override;
+		virtual void machine_reset() override;
 
 		UINT8 hp64k_crtc_filter(UINT8 data);
 		DECLARE_WRITE16_MEMBER(hp64k_crtc_w);

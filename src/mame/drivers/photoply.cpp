@@ -30,7 +30,7 @@ public:
 	UINT8 m_vga_address;
 
 	DECLARE_DRIVER_INIT(photoply);
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 

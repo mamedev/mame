@@ -352,7 +352,7 @@ public:
 	DECLARE_PALETTE_DECODER(GGGGGRRRRRBBBBBI);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void set_bus_error(UINT32 address, bool write, UINT16 mem_mask);
 	bool m_bus_error;
 };

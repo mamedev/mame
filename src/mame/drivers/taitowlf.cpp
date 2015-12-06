@@ -56,8 +56,8 @@ public:
 	DECLARE_WRITE32_MEMBER(pnp_data_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
 	DECLARE_DRIVER_INIT(taitowlf);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	#if !ENABLE_VGA
 	DECLARE_PALETTE_INIT(taitowlf);
 	#endif

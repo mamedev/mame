@@ -81,8 +81,8 @@ public:
 	UINT16 m_pcg_internal_addr;
 	UINT8 m_key_mux;
 	UINT8 m_memsel[4];
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(a5105);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	required_device<ram_device> m_ram;

@@ -59,7 +59,7 @@ public:
 	required_device<es5510_device> m_esp;
 	required_device<esq2x40_sq1_t> m_sq1vfd;
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	DECLARE_DRIVER_INIT(asr);
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);

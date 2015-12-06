@@ -90,8 +90,8 @@ public:
 	required_device<dmvcart_slot_device> m_slot7;
 	required_device<dmvcart_slot_device> m_slot7a;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void update_halt_line();
 
 	DECLARE_WRITE8_MEMBER(leds_w);

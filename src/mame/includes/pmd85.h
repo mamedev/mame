@@ -75,7 +75,7 @@ public:
 	DECLARE_DRIVER_INIT(pmd853);
 	DECLARE_DRIVER_INIT(alfa);
 	DECLARE_DRIVER_INIT(c2717);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	UINT32 screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pmd85_cassette_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(write_cas_tx);
@@ -146,7 +146,7 @@ protected:
 	void mato_update_memory();
 	void c2717_update_memory();
 	void pmd85_common_driver_init();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	int m_cas_tx;
 };

@@ -43,8 +43,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mouser_flip_screen_x_w);
 	DECLARE_WRITE8_MEMBER(mouser_flip_screen_y_w);
 	DECLARE_DRIVER_INIT(mouser);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(mouser);
 	UINT32 screen_update_mouser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mouser_nmi_interrupt);

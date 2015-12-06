@@ -75,7 +75,7 @@ private:
 	UINT8 m_game;
 	UINT8 m_out_offs;
 	UINT8 m_port2;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_p_ram;
 };

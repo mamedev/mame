@@ -249,7 +249,7 @@ public:
 
 	required_shared_ptr<UINT16> m_videoram;
 	DECLARE_READ16_MEMBER(unk_r);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(goldngam);
 	UINT32 screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

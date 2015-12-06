@@ -12,8 +12,8 @@ class ns11_keycus_device : public device_t
 protected:
 	ns11_keycus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 protected:
 	UINT16 m_p1;

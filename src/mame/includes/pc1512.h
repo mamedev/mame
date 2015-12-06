@@ -105,10 +105,10 @@ public:
 	optional_shared_ptr<UINT8> m_video_ram;
 	required_ioport m_lk;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -240,8 +240,8 @@ public:
 			m_opt(0)
 	{ }
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_READ8_MEMBER( printer_r );

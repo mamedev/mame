@@ -25,8 +25,8 @@ public:
 	void tbowl_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfxdecode_device *gfxdecode, int xscroll, UINT8* spriteram);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT8 m_gfxregion;
 	int m_bootleg; // for Gals Pinball / Hot Pinball

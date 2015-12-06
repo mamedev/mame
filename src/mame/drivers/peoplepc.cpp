@@ -62,8 +62,8 @@ public:
 
 	UINT8 m_dma0pg;
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 static const gfx_layout peoplepc_charlayout =

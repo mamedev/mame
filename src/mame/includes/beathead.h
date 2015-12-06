@@ -24,9 +24,9 @@ public:
 			m_ram_base(*this, "ram_base"),
 			m_rom_base(*this, "rom_base") { }
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -62,7 +62,7 @@ public:
 	UINT32 *        m_movie_speedup_data;
 
 	// in drivers/beathead.c
-	virtual void update_interrupts();
+	virtual void update_interrupts() override;
 	DECLARE_WRITE32_MEMBER( interrupt_control_w );
 	DECLARE_READ32_MEMBER( interrupt_control_r );
 	DECLARE_WRITE32_MEMBER( eeprom_data_w );

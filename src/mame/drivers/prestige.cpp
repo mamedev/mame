@@ -128,7 +128,7 @@ public:
 		UINT8   split_pos;
 	} m_lcdc;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	UINT32 screen_update(int bpp, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_1bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_2bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -494,8 +494,8 @@ public:
 	cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual bool switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch);
-	virtual bool coin_counters(UINT8 *&buf, UINT8 count);
+	virtual bool switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch) override;
+	virtual bool coin_counters(UINT8 *&buf, UINT8 count) override;
 };
 
 const device_type COBRA_JVS = &device_creator<cobra_jvs>;
@@ -746,8 +746,8 @@ public:
 	DECLARE_DRIVER_INIT(racjamdx);
 	DECLARE_DRIVER_INIT(bujutsu);
 	DECLARE_DRIVER_INIT(cobra);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_cobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cobra_vblank);
 	void cobra_video_exit();

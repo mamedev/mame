@@ -65,8 +65,8 @@ private:
 	const UINT8 *m_p_chargen;
 	UINT8       m_data_out;
 	UINT8       m_keyboard_input;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;

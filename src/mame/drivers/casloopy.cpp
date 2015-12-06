@@ -181,9 +181,9 @@ public:
 	UINT16 sh7021_regs[0x100];
 	int m_gfx_index;
 	DECLARE_DRIVER_INIT(casloopy);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ16_MEMBER(vregs_r);
 	DECLARE_WRITE16_MEMBER(vregs_w);

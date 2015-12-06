@@ -65,8 +65,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sn2_port_a_u2_u3_w);
 	DECLARE_WRITE8_MEMBER(sn2_port_b_u2_u3_w);
 	DECLARE_WRITE_LINE_MEMBER(sn2_ca2_u2_u3_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(toratora_timer);
 };

@@ -41,8 +41,8 @@ public:
 	DECLARE_READ8_MEMBER(snd_status_r);
 	DECLARE_WRITE8_MEMBER(snd_status_w);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	INTERRUPT_GEN_MEMBER(snd_timed_irq);
 	IRQ_CALLBACK_MEMBER(irq_callback);

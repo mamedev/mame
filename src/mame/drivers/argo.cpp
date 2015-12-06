@@ -51,13 +51,13 @@ public:
 	UINT8 m_p_cursor_pos;
 	bool m_ram_ctrl;
 	UINT8 m_scroll_ctrl;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(argo);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 // write to videoram if following 'out b9,61' otherwise write to the unknown 'extra' ram

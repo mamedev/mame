@@ -87,8 +87,8 @@ public:
 	required_shared_ptr<UINT16> m_p_videoram;
 	required_device<palette_device> m_palette;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ16_MEMBER(m20_i8259_r);
 	DECLARE_WRITE16_MEMBER(m20_i8259_w);

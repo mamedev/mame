@@ -498,7 +498,7 @@ public:
 	DECLARE_DRIVER_INIT(majorpkr);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

@@ -124,8 +124,8 @@ private:
 	UINT8 m_portb;
 	bool m_ca2;
 	bool m_has_cart_ram;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<ram_device> m_ram;
 	required_device<mc6847_base_device> m_crtc;

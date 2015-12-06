@@ -90,8 +90,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svi318_cart);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	memory_region *m_cart_rom;

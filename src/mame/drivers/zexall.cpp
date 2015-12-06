@@ -52,7 +52,7 @@ private:
 	UINT8 m_out_req; // byte written to 0xFFFE
 	UINT8 m_out_req_last; // old value at 0xFFFE before the most recent write
 	UINT8 m_out_ack; // byte written to 0xFFFC
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 DRIVER_INIT_MEMBER(zexall_state,zexall)

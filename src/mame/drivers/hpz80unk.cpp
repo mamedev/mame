@@ -59,7 +59,7 @@ public:
 	required_shared_ptr<UINT8> m_p_rom;
 	UINT8 m_term_data;
 	UINT8 m_port02_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 READ8_MEMBER( hpz80unk_state::port02_r )

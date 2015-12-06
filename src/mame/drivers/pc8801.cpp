@@ -475,9 +475,9 @@ public:
 	DECLARE_PALETTE_INIT(pc8801);
 protected:
 
-	virtual void video_start();
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void video_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 public:
 	DECLARE_MACHINE_RESET(pc8801_clock_speed);
 	DECLARE_MACHINE_RESET(pc8801_dic);

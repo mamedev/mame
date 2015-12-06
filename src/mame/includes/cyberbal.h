@@ -62,8 +62,8 @@ public:
 	UINT8           m_sound_data_from_6502;
 	UINT8           m_sound_data_from_68k_ready;
 	UINT8           m_sound_data_from_6502_ready;
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ16_MEMBER(sound_state_r);
 	DECLARE_WRITE16_MEMBER(p2_reset_w);
 	DECLARE_READ8_MEMBER(special_port3_r);

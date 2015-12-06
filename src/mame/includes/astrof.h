@@ -71,7 +71,7 @@ public:
 	DECLARE_DRIVER_INIT(abattle);
 	DECLARE_DRIVER_INIT(sstarbtl);
 	DECLARE_DRIVER_INIT(acombat3);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(astrof);
 	DECLARE_MACHINE_START(abattle);
 	DECLARE_MACHINE_RESET(abattle);

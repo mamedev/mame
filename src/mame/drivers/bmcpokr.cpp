@@ -91,7 +91,7 @@ public:
 	DECLARE_WRITE16_MEMBER(pixram_w);
 	DECLARE_WRITE16_MEMBER(pixpal_w);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 	UINT32 screen_update_bmcpokr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

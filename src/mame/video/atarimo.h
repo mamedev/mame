@@ -105,7 +105,7 @@ public:
 	void set_slipram(UINT16 *ram) { m_slipram.set_target(ram, 2); }
 
 	// rendering
-	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	void apply_stain(bitmap_ind16 &bitmap, UINT16 *pf, UINT16 *mo, int x, int y);
 
 	// memory access
@@ -118,9 +118,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// timer IDs

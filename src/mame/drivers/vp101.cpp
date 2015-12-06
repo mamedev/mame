@@ -39,7 +39,7 @@ protected:
 	required_device<mips3_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void video_start();
+	virtual void video_start() override;
 };
 
 

@@ -154,7 +154,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel3_tile_info);
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel4_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_luckgrln(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(luckgrln_irq);
 	required_device<cpu_device> m_maincpu;

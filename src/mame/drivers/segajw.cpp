@@ -60,8 +60,8 @@ protected:
 	required_device<cpu_device> m_audiocpu;
 
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT64      m_coin_start_cycles;
 	UINT64      m_hopper_start_cycles;
 	UINT8       m_coin_counter;

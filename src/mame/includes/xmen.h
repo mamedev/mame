@@ -58,8 +58,8 @@ public:
 	DECLARE_WRITE16_MEMBER(xmen_18fa00_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(xmen_frame_r);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(xmen6p);
 	UINT32 screen_update_xmen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_xmen6p_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

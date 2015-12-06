@@ -76,11 +76,11 @@ public:
 
 protected:
 	/* driver overrides */
-	virtual void device_start(void);
-	virtual void device_reset(void);
+	virtual void device_start(void) override;
+	virtual void device_reset(void) override;
 
 	/* interrupts */
-	virtual bool firq_get_line(void);
+	virtual bool firq_get_line(void) override;
 
 	/* PIA1 */
 	virtual DECLARE_READ8_MEMBER( ff20_read );

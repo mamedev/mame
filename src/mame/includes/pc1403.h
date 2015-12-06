@@ -52,14 +52,14 @@ public:
 	DECLARE_WRITE8_MEMBER(pc1403_asic_write);
 	DECLARE_READ8_MEMBER(pc1403_lcd_read);
 	DECLARE_WRITE8_MEMBER(pc1403_lcd_write);
-	virtual void video_start();
-	virtual void machine_start();
+	virtual void video_start() override;
+	virtual void machine_start() override;
 	required_device<sc61860_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif /* PC1403_H_ */

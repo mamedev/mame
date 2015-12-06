@@ -48,7 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ8_MEMBER(dedicated_switch_r);
 	DECLARE_DRIVER_INIT(whitestar);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(whitestar_firq_interrupt);
 };
 

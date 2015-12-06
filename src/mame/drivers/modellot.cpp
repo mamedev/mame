@@ -40,7 +40,7 @@ public:
 private:
 	UINT8 m_term_data;
 	const UINT8 *m_p_chargen;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 

@@ -60,8 +60,8 @@ public:
 
 	UINT8 m_ram[256];
 	DECLARE_DRIVER_INIT(unichamp);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(unichamp);
 
 	DECLARE_READ8_MEMBER(bext_r);
@@ -76,7 +76,7 @@ public:
 
 protected:
 	required_ioport m_ctrls;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 PALETTE_INIT_MEMBER(unichamp_state, unichamp)

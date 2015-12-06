@@ -87,8 +87,8 @@ public:
 	DECLARE_WRITE8_MEMBER(kungfur_control_w);
 	DECLARE_WRITE8_MEMBER(kungfur_adpcm1_w);
 	DECLARE_WRITE8_MEMBER(kungfur_adpcm2_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(kungfur_irq);
 	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm1_int);
 	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm2_int);

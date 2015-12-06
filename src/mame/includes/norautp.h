@@ -31,7 +31,7 @@ public:
 	DECLARE_DRIVER_INIT(ssa);
 	DECLARE_DRIVER_INIT(enc);
 	DECLARE_DRIVER_INIT(deb);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(norautp);
 	UINT32 screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

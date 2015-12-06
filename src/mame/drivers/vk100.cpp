@@ -239,8 +239,8 @@ public:
 	DECLARE_READ8_MEMBER(SYSTAT_A);
 	DECLARE_READ8_MEMBER(SYSTAT_B);
 	DECLARE_DRIVER_INIT(vk100);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	TIMER_CALLBACK_MEMBER(execute_vg);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
@@ -252,7 +252,7 @@ public:
 	void vram_write(UINT8 data);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 // vram access functions:

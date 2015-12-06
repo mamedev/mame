@@ -107,7 +107,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gts1_pa_w);
 	DECLARE_WRITE8_MEMBER(gts1_pb_w);
 private:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<5> m_switches;
 	UINT8 m_strobe;             //!< switches strobe lines (5 lower bits used)

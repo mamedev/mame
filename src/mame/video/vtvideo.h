@@ -35,9 +35,9 @@ public:
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// internal state
 	void recompute_parameters();
@@ -83,16 +83,16 @@ class rainbow_video_device : public vt100_video_device
 public:
 	rainbow_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	virtual void video_blanking(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	int MHFU(int);
 	void palette_select(int choice);
 	void notify_vblank(bool choice);
 protected:
-	virtual void display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type);
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type) override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 extern const device_type VT100_VIDEO;

@@ -180,7 +180,7 @@ public:
 	DECLARE_READ8_MEMBER(pia_pb_r);
 	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
 
-	void machine_reset();
+	void machine_reset() override;
 
 	int get_color_offset(UINT8 tile, UINT8 attr, int ra, int px);
 	MC6845_UPDATE_ROW(crtc_update_row);

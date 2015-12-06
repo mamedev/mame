@@ -187,7 +187,7 @@ public:
 	DECLARE_DRIVER_INIT(clatt);
 	DECLARE_DRIVER_INIT(rou029);
 	DECLARE_DRIVER_INIT(nocrypt);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void sc1_common_init(int reels, int decrypt, int defaultbank);
 	void Scorpion1_SetSwitchState(int strobe, int data, int state);

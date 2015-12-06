@@ -27,20 +27,20 @@ public:
 	virtual ~pce220_serial_device();
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual void call_unload();
-	virtual bool call_create(int format_type, option_resolution *format_options);
+	virtual bool call_load() override;
+	virtual void call_unload() override;
+	virtual bool call_create(int format_type, option_resolution *format_options) override;
 
-	virtual iodevice_t image_type() const { return IO_SERIAL; }
+	virtual iodevice_t image_type() const override { return IO_SERIAL; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return nullptr; }
-	virtual const char *file_extensions() const { return "txt,ihx"; }
-	virtual const option_guide *create_option_guide() const { return nullptr; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 1; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return nullptr; }
+	virtual const char *file_extensions() const override { return "txt,ihx"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// specific implementation
 	UINT8 in_xin(void) { return m_xin & 0x01; }
@@ -57,10 +57,10 @@ protected:
 	int get_next_state();
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_config_complete();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_config_complete() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// internal device state

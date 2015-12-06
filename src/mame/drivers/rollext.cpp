@@ -99,9 +99,9 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 	DECLARE_DRIVER_INIT(rollext);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	void preprocess_texture_data();
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };

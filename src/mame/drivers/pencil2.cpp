@@ -112,7 +112,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
 private:
-	virtual void machine_start();
+	virtual void machine_start() override;
 	int m_centronics_busy;
 	int m_centronics_ack;
 	bool m_cass_state;

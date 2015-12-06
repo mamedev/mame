@@ -86,7 +86,7 @@ protected:
 
 	// devices
 	required_device<m68340cpu_device> m_maincpu;
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 READ8_MEMBER(mpu5_state::asic_r8)

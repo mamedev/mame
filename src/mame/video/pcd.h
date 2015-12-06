@@ -44,13 +44,13 @@ public:
 	DECLARE_WRITE8_MEMBER(p2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mouse_timer);
 
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 protected:
-	void device_start();
-	void device_reset();
+	void device_start() override;
+	void device_reset() override;
 private:
 	required_ioport m_mouse_btn;
 	required_ioport m_mouse_x;
@@ -95,15 +95,15 @@ public:
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(p1_w);
 
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 protected:
-	void device_start();
-	void device_reset();
-	void tra_callback();
-	void rcv_complete();
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void device_start() override;
+	void device_reset() override;
+	void tra_callback() override;
+	void rcv_complete() override;
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 private:
 	dynamic_buffer m_vram;
 	required_region_ptr<UINT8> m_charrom;

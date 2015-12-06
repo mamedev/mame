@@ -68,14 +68,14 @@ public:
 	required_device<wd1772_t> m_fdc;
 	required_device<via6522_device> m_via;
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	int last_sndram_bank;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	DECLARE_DRIVER_INIT(mirage);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_porta);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_portb);

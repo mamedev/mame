@@ -511,8 +511,8 @@ public:
 	DECLARE_DRIVER_INIT(nbanfl);
 	DECLARE_DRIVER_INIT(sf2049);
 	DECLARE_DRIVER_INIT(sf2049se);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nile_timer_callback);
 	void remap_dynamic_addresses();

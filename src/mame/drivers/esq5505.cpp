@@ -186,8 +186,8 @@ public:
 	optional_device<hd63450_device> m_dmac;
 	required_device<midi_port_device> m_mdout;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ16_MEMBER(lower_r);
 	DECLARE_WRITE16_MEMBER(lower_w);

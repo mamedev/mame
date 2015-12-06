@@ -46,8 +46,8 @@ public:
 	DECOSPR_PRIORITY_CB_MEMBER(default_col_cb);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	UINT8 m_gfxregion;
 	decospr_pri_cb_delegate m_pri_cb;
 	decospr_col_cb_delegate m_col_cb;

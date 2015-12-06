@@ -117,7 +117,7 @@ public:
 	UINT8 funkball_config_reg_r();
 	void funkball_config_reg_w(UINT8 data);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	struct
@@ -135,8 +135,8 @@ public:
 	DECLARE_WRITE32_MEMBER(serial_w);
 	DECLARE_READ8_MEMBER(io20_r);
 	DECLARE_WRITE8_MEMBER(io20_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 void funkball_state::video_start()

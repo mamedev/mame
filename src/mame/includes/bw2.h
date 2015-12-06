@@ -81,7 +81,7 @@ public:
 	required_ioport m_y8;
 	required_ioport m_y9;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

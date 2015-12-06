@@ -24,7 +24,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 public:
 	DECLARE_DRIVER_INIT(jvh);
 };

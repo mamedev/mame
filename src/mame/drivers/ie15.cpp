@@ -62,18 +62,18 @@ public:
 		m_io_keyboard(*this, "keyboard")
 	{ }
 
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
 	DECLARE_WRITE16_MEMBER( kbd_put );
 	DECLARE_PALETTE_INIT( ie15 );
 
 	DECLARE_WRITE_LINE_MEMBER( serial_rx_callback );
-	virtual void rcv_complete();
-	virtual void tra_callback();
-	virtual void tra_complete();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void rcv_complete() override;
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	DECLARE_WRITE8_MEMBER( mem_w );
 	DECLARE_READ8_MEMBER( mem_r );

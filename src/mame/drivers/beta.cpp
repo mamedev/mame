@@ -69,7 +69,7 @@ public:
 	required_ioport m_q8;
 	required_ioport m_q9;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( riot_pa_r );
 	DECLARE_WRITE8_MEMBER( riot_pa_w );

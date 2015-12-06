@@ -55,8 +55,8 @@ public:
 	required_device<rs232_port_device> m_rs232d;
 	required_memory_region m_rom;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

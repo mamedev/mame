@@ -424,9 +424,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_to_sh1_w);
 	DECLARE_DRIVER_INIT(coolridr);
 	DECLARE_DRIVER_INIT(aquastge);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	UINT32 m_colbase;
 

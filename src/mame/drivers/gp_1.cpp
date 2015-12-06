@@ -56,7 +56,7 @@ private:
 	UINT8 m_u14;
 	UINT8 m_digit;
 	UINT8 m_segment[16];
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	optional_device<sn76477_device> m_sn;

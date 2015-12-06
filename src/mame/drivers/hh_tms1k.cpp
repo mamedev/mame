@@ -683,7 +683,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 // handlers
@@ -1385,7 +1385,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 // handlers
@@ -1549,7 +1549,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 // handlers
@@ -1919,7 +1919,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 // handlers
@@ -2053,7 +2053,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_k);
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 // handlers
@@ -2900,7 +2900,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(speed_switch);
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 // handlers
@@ -3052,7 +3052,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(gearbox_sim_tick);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 // handlers
@@ -4075,8 +4075,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
 
 protected:
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 };
 
 // handlers

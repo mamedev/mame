@@ -29,7 +29,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	UINT8 m_initial_value;

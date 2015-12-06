@@ -54,7 +54,7 @@ public:
 	UINT8 m_term_data;
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(to_term);
 	DECLARE_READ8_MEMBER(from_term);
 };

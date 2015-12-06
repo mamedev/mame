@@ -82,7 +82,7 @@ public:
 	DECLARE_DRIVER_INIT(funcube3);
 	DECLARE_DRIVER_INIT(funcube);
 	DECLARE_DRIVER_INIT(funcube2);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(mj4simai);
 	DECLARE_MACHINE_START(funcube);
 	DECLARE_MACHINE_RESET(funcube);

@@ -377,7 +377,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 private:
 	enum
@@ -461,7 +461,7 @@ private:
 	UINT8 m_z80_mailbox, m_8088_mailbox;
 
 	void update_kbd_irq();
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	int m_unit;
 	floppy_image_device *m_floppy;

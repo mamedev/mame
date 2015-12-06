@@ -72,7 +72,7 @@ public:
 	{
 	}
 
-	virtual void driver_start()
+	virtual void driver_start() override
 	{
 		m_mmu_mode = MMU_MODE_TEST;
 		update_mmu_mode(MMU_MODE_KERN);

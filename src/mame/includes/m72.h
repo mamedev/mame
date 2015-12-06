@@ -156,8 +156,8 @@ public:
 
 	TILEMAP_MAPPER_MEMBER(m82_scan_rows);
 
-	void machine_start();
-	void machine_reset();
+	void machine_start() override;
+	void machine_reset() override;
 	DECLARE_VIDEO_START(m72);
 	DECLARE_VIDEO_START(xmultipl);
 	DECLARE_VIDEO_START(hharry);

@@ -40,7 +40,7 @@ protected:
 	// devices
 
 	// driver_device overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 private:
 	UINT8 m_input_line;
 };

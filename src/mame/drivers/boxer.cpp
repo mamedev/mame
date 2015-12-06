@@ -62,8 +62,8 @@ public:
 	DECLARE_WRITE8_MEMBER(boxer_irq_reset_w);
 	DECLARE_WRITE8_MEMBER(boxer_crowd_w);
 	DECLARE_WRITE8_MEMBER(boxer_led_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(boxer);
 	UINT32 screen_update_boxer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pot_interrupt);
@@ -71,7 +71,7 @@ public:
 	void draw_boxer( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /*************************************

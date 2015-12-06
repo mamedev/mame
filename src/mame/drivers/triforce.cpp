@@ -451,8 +451,8 @@ public:
 	DECLARE_WRITE64_MEMBER(gc_pi_w);
 	DECLARE_READ64_MEMBER(gc_exi_r);
 	DECLARE_WRITE64_MEMBER(gc_exi_w);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_triforce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<ppc_device> m_maincpu;
 };

@@ -122,8 +122,8 @@ public:
 	UINT8   m_msm2_vck;
 	UINT8   m_msm2_vck2;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE16_MEMBER(dma_start_w);
 	DECLARE_WRITE16_MEMBER(dma_stop_w);
@@ -158,7 +158,7 @@ public:
 	void msm5205_update(int chip);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

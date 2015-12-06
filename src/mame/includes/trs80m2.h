@@ -80,10 +80,10 @@ public:
 	required_memory_region m_char_rom;
 	optional_shared_ptr<UINT8> m_video_ram;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( read );
@@ -155,7 +155,7 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<pic8259_device> m_pic;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER( ual_w );
 	DECLARE_WRITE8_MEMBER( tcl_w );

@@ -92,9 +92,9 @@ public:
 	DECLARE_READ8_MEMBER(input_system_r);
 	DECLARE_DRIVER_INIT(jngolady);
 	DECLARE_DRIVER_INIT(luckygrl);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jangou);
 	DECLARE_MACHINE_START(jngolady);
 	DECLARE_MACHINE_RESET(jngolady);

@@ -95,10 +95,10 @@ private:
 
 	address_space *m_program;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	void update_interrupt();
 

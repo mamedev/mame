@@ -153,7 +153,7 @@ public:
 	optional_device<raiden2cop_device> m_raiden2cop;
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 /*----------- defined in machine/r2crypt.c -----------*/

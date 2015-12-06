@@ -73,8 +73,8 @@ public:
 	void digitalker_set_bank(UINT8 bank);
 
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 

@@ -30,9 +30,9 @@ public:
 	DECLARE_WRITE8_MEMBER(kangaroo_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(kangaroo_videoram_w);
 	DECLARE_WRITE8_MEMBER(kangaroo_video_control_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(kangaroo_mcu);
 	UINT32 screen_update_kangaroo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void videoram_write( UINT16 offset, UINT8 data, UINT8 mask );

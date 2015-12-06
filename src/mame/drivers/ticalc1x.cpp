@@ -32,7 +32,7 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 

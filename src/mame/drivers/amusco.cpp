@@ -96,7 +96,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE16_MEMBER(amusco_videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_READ8_MEMBER(mc6845_r);
 	DECLARE_WRITE8_MEMBER(mc6845_w);
 	DECLARE_WRITE16_MEMBER(vram_w);

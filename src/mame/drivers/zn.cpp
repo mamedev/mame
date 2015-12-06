@@ -119,7 +119,7 @@ public:
 	void jdredd_vblank(screen_device &screen, bool vblank_state);
 
 protected:
-	virtual void driver_start();
+	virtual void driver_start() override;
 
 private:
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );

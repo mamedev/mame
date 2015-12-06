@@ -106,7 +106,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pcat_nit_rombank_w);
 	DECLARE_READ8_MEMBER(pcat_nit_io_r);
 	DECLARE_DRIVER_INIT(pcat_nit);
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 /*************************************

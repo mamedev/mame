@@ -275,7 +275,7 @@ public:
 	void set_irq_line(UINT8 bit, int line);
 	void model3_init(int step);
 	// video
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_model3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(tile_info_layer0_4bit);
 	TILE_GET_INFO_MEMBER(tile_info_layer1_4bit);

@@ -93,8 +93,8 @@ public:
 	UINT8 *m_p_chargen;
 	bool m_cone;
 	required_shared_ptr<UINT8> m_p_videoram;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	UINT8 m_85;

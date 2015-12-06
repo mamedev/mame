@@ -112,9 +112,9 @@ public:
 	DECLARE_WRITE16_MEMBER(oki1_bank_w);
 	DECLARE_WRITE16_MEMBER(oki2_bank_w);
 	DECLARE_DRIVER_INIT(pasha2);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_pasha2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki1;

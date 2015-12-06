@@ -38,7 +38,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<huc6261_device> m_huc6261;
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -69,7 +69,7 @@ public:
 	TIMER_CALLBACK_MEMBER(pad_func);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

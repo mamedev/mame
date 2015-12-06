@@ -64,7 +64,7 @@ protected:
 	required_ioport_array<8> swarray;
 
 	// driver_device overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 private:
 	UINT8 firq_src, zc, switch_col;

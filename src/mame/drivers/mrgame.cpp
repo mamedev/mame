@@ -93,8 +93,8 @@ private:
 	UINT8 m_video_data;
 	UINT8 m_video_status;
 	UINT8 m_video_ctrl[8];
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<m68000_device> m_maincpu;
 	required_device<z80_device> m_audiocpu1;
 	required_device<z80_device> m_audiocpu2;

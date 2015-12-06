@@ -22,7 +22,7 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( ram_addr_r );
 	DECLARE_WRITE8_MEMBER( ram_addr_w );

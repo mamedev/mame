@@ -329,7 +329,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
 
 protected:
-	virtual void driver_start();
+	virtual void driver_start() override;
 
 private:
 	required_shared_ptr<UINT16> m_sharedram;

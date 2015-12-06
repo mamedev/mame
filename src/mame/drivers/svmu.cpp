@@ -40,7 +40,7 @@ public:
 	required_region_ptr<UINT8> m_bios;
 
 	DECLARE_PALETTE_INIT(svmu);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER(page_w);
 	DECLARE_READ8_MEMBER(prog_r);

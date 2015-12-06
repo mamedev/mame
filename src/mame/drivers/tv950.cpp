@@ -25,7 +25,7 @@ public:
 	{ }
 
 private:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 

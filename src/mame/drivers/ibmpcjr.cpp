@@ -89,7 +89,7 @@ public:
 	int m_signal_count;
 	UINT8 m_nmi_enabled;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	emu_timer *m_pc_int_delay_timer;
 	emu_timer *m_pcjr_watchdog;
 	emu_timer *m_keyb_signal_timer;
@@ -101,7 +101,7 @@ public:
 		TIMER_KB_SIGNAL
 	};
 
-	void machine_reset();
+	void machine_reset() override;
 	DECLARE_DRIVER_INIT(pcjr);
 };
 

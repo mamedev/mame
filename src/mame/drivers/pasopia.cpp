@@ -73,9 +73,9 @@ public:
 	UINT8 *m_p_vram;
 	DECLARE_DRIVER_INIT(pasopia);
 	TIMER_CALLBACK_MEMBER(pio_timer);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 };
 
 // needed to scan the keyboard, as the pio emulation doesn't do it.

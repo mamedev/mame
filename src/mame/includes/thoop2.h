@@ -24,7 +24,7 @@ public:
 	DECLARE_WRITE16_MEMBER(thoop2_vram_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_thoop2_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_thoop2_screen1);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_thoop2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void thoop2_sort_sprites();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);

@@ -65,7 +65,7 @@ public:
 	DECLARE_MACHINE_START(cabal);
 	DECLARE_MACHINE_START(cabalbl);
 	DECLARE_MACHINE_RESET(cabalbl);
-	virtual void video_start();
+	virtual void video_start() override;
 
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);

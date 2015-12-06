@@ -112,7 +112,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_p);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	UINT8 m_cass_data[4];

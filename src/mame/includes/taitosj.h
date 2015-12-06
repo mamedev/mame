@@ -98,9 +98,9 @@ public:
 	DECLARE_DRIVER_INIT(taitosj);
 	DECLARE_DRIVER_INIT(junglhbr);
 	DECLARE_DRIVER_INIT(spacecr);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_taitosj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_kikstart(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(taitosj_mcu_real_data_w);

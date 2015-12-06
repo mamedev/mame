@@ -44,7 +44,7 @@ private:
 	UINT8 m_swrow;
 	bool m_in_cmd_mode[2];
 	UINT8 m_digit[2];
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	optional_device<gottlieb_sound_r0_device> m_r0_sound;
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;

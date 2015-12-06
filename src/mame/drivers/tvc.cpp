@@ -65,8 +65,8 @@ public:
 	memory_region *m_ext;
 	memory_region *m_vram;
 
-	void machine_start();
-	void machine_reset();
+	void machine_start() override;
+	void machine_reset() override;
 
 	void set_mem_page(UINT8 data);
 	DECLARE_WRITE8_MEMBER(bank_w);

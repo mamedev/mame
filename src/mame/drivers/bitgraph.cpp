@@ -140,8 +140,8 @@ public:
 	DECLARE_WRITE8_MEMBER( ppu_i8243_w );
 
 private:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<acia6850_device> m_acia0;

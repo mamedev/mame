@@ -90,7 +90,7 @@ public:
 	DECLARE_READ8_MEMBER(ldp_read);
 	DECLARE_WRITE8_MEMBER(ldp_write);
 	DECLARE_DRIVER_INIT(lgp);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	UINT32 screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_lgp);
 	TIMER_CALLBACK_MEMBER(irq_stop);

@@ -134,7 +134,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 void r2dx_v33_state::machine_start()

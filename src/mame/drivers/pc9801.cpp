@@ -495,9 +495,9 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	enum
 	{
@@ -723,7 +723,7 @@ public:
 
 	DECLARE_DRIVER_INIT(pc9801_kanji);
 	inline void set_dma_channel(int channel, int state);
-	virtual void device_reset_after_children();
+	virtual void device_reset_after_children() override;
 };
 
 

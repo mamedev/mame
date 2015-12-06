@@ -347,8 +347,8 @@ public:
 	DECLARE_READ16_MEMBER(mcu_status_r);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	required_shared_ptr<UINT16> m_mcuram;

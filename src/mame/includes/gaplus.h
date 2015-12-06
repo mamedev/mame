@@ -81,9 +81,9 @@ public:
 	DECLARE_DRIVER_INIT(gaplus);
 	DECLARE_DRIVER_INIT(gaplusd);
 	DECLARE_DRIVER_INIT(galaga3);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(gaplus);
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
@@ -102,5 +102,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

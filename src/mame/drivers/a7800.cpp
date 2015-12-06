@@ -142,8 +142,8 @@ public:
 	DECLARE_WRITE8_MEMBER(maria_w);
 	DECLARE_DRIVER_INIT(a7800_pal);
 	DECLARE_DRIVER_INIT(a7800_ntsc);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(a7800);
 	DECLARE_PALETTE_INIT(a7800p);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);

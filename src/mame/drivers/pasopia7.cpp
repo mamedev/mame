@@ -113,7 +113,7 @@ public:
 	UINT8 m_mux_data;
 	DECLARE_DRIVER_INIT(p7_lcd);
 	DECLARE_DRIVER_INIT(p7_raster);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(pasopia7);
 	DECLARE_PALETTE_INIT(p7_lcd);
 	UINT32 screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

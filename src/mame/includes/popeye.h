@@ -42,7 +42,7 @@ public:
 	DECLARE_DRIVER_INIT(skyskipr);
 	DECLARE_DRIVER_INIT(popeye);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(popeye);
 	DECLARE_VIDEO_START(popeye);
 	DECLARE_PALETTE_INIT(popeyebl);

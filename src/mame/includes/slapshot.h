@@ -79,8 +79,8 @@ public:
 	DECLARE_WRITE16_MEMBER(opwolf3_adc_req_w);
 
 	DECLARE_DRIVER_INIT(slapshot);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_taito_no_buffer(screen_device &screen, bool state);
@@ -91,5 +91,5 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

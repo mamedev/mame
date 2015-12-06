@@ -382,7 +382,7 @@ public:
 	{
 	}
 
-	virtual DECLARE_WRITE16_MEMBER(write_cs0)
+	virtual DECLARE_WRITE16_MEMBER(write_cs0) override
 	{
 		// the first write is to the device head register
 		if( offset == 6 && (m_status & IDE_STATUS_DRQ))

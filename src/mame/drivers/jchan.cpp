@@ -213,7 +213,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sknsspr_sprite32regs_2_w);
 
 	DECLARE_DRIVER_INIT(jchan);
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

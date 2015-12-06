@@ -229,8 +229,8 @@ public:
 	required_ioport m_io8_port;
 
 	DECLARE_DRIVER_INIT(aces1);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(m_aces1_irq_timer_callback);
 	TIMER_CALLBACK_MEMBER(m_aces1_nmi_timer_callback);
 };

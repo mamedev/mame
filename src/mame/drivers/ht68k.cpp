@@ -63,7 +63,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(duart_txb);
 	DECLARE_WRITE8_MEMBER(duart_output);
 	required_shared_ptr<UINT16> m_p_ram;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 

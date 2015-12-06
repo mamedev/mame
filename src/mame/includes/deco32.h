@@ -151,7 +151,7 @@ public:
 	DECLARE_READ16_MEMBER(dg_protection_region_0_146_r);
 	DECLARE_WRITE16_MEMBER(dg_protection_region_0_146_w);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_DRIVER_INIT(tattass);
 	DECLARE_DRIVER_INIT(nslasher);
 	DECLARE_DRIVER_INIT(captaven);
@@ -216,7 +216,7 @@ public:
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_READ32_MEMBER(lockload_gun_mirror_r);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_DRIVER_INIT(dragngun);
 	DECLARE_DRIVER_INIT(dragngunj);
 	DECLARE_DRIVER_INIT(lockload);

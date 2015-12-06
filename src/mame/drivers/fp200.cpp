@@ -68,10 +68,10 @@ public:
 	DECLARE_PALETTE_INIT(fp200);
 protected:
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 };
 
 void fp200_state::video_start()

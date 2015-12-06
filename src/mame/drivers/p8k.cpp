@@ -88,7 +88,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE_LINE_MEMBER( p8k_daisy_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( p8k_dma_irq_w );

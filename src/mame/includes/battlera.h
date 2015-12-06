@@ -35,7 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(adpcm_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

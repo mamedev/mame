@@ -97,9 +97,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;

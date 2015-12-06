@@ -54,7 +54,7 @@ protected:
 	//virtual void machine_start();
 	//virtual void machine_reset();
 
-	virtual void video_start();
+	virtual void video_start() override;
 public:
 	DECLARE_DRIVER_INIT(chsuper3);
 	DECLARE_DRIVER_INIT(chmpnum);

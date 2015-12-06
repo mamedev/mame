@@ -38,7 +38,7 @@ public:
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ16_MEMBER( cs4031_ior );
 	DECLARE_WRITE16_MEMBER( cs4031_iow );

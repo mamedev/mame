@@ -55,7 +55,7 @@ public:
 	DECLARE_DRIVER_INIT(upscope);
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 

@@ -89,14 +89,14 @@ public:
 	DECLARE_READ8_MEMBER(ssi263_register_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_enter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_ready_r);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void check_interrupt();
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<10> m_row;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

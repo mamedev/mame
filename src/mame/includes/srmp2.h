@@ -61,7 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(srmp3_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(srmp3_adpcm_code_w);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_MACHINE_START(srmp2);
 	DECLARE_PALETTE_INIT(srmp2);
 	DECLARE_MACHINE_START(srmp3);

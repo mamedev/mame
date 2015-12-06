@@ -44,7 +44,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(halt_i86_w);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void machine_reset();
+	void machine_reset() override;
 
 	UINT8 m_sysctl, m_pa, m_kbcin, m_kbcout;
 	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;

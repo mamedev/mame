@@ -394,13 +394,13 @@ public:
 	DECLARE_READ32_MEMBER(mediaboard_r);
 	DECLARE_WRITE32_MEMBER(mediaboard_w);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	void baseboard_ide_event(int type, UINT8 *read, UINT8 *write);
 	UINT8 *baseboard_ide_dimmboard(UINT32 lba);
 	void dword_write_le(UINT8 *addr, UINT32 d);
 	void word_write_le(UINT8 *addr, UINT16 d);
-	virtual void hack_eeprom();
-	virtual void hack_usb();
+	virtual void hack_eeprom() override;
+	virtual void hack_usb() override;
 
 	struct chihiro_devices {
 		bus_master_ide_controller_device    *ide;
@@ -602,12 +602,12 @@ public:
 	// construction/destruction
 	ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual int  read_sector(UINT32 lba, void *buffer);
-	virtual int  write_sector(UINT32 lba, const void *buffer);
+	virtual int  read_sector(UINT32 lba, void *buffer) override;
+	virtual int  write_sector(UINT32 lba, const void *buffer) override;
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	UINT8 read_buffer[0x20];
 	UINT8 write_buffer[0x20];
 	chihiro_state *chihirosystem;

@@ -69,7 +69,7 @@ public:
 private:
 	UINT8 m_keydata;
 	UINT8 m_irq_mask;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<rs232_port_device> m_rs232;

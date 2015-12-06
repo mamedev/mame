@@ -55,7 +55,7 @@ protected:
 	required_shared_ptr<UINT16> m_vram;
 	required_device<palette_device> m_palette;
 	// driver_device overrides
-	virtual void video_start();
+	virtual void video_start() override;
 
 };
 

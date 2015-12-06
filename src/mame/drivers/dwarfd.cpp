@@ -337,8 +337,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	DECLARE_DRIVER_INIT(qc);
 	DECLARE_DRIVER_INIT(dwarfd);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(dwarfd);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(qc_display_pixels);

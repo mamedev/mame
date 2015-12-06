@@ -102,7 +102,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(trvquest_misc_w);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /*----------- defined in video/gameplan.c -----------*/

@@ -23,7 +23,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_DRIVER_INIT(jupiter);
 };
 
@@ -49,8 +49,8 @@ public:
 	required_shared_ptr<UINT8> m_p_ram;
 	const UINT8 *m_p_chargen;
 
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_DRIVER_INIT(jupiter3);

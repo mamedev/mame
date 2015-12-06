@@ -49,7 +49,7 @@ public:
 	required_shared_ptr<UINT8> m_p_videoram;
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 private:
 	UINT8 m_term_data;

@@ -15,7 +15,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(io_write) = 0;
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 #endif

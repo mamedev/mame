@@ -39,7 +39,7 @@ public:
 	DECLARE_READ8_MEMBER(term_status_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 READ8_MEMBER( imds_state::term_status_r )

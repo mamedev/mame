@@ -74,7 +74,7 @@ public:
 	required_shared_ptr<UINT16> m_video_ram;
 
 	DECLARE_DRIVER_INIT(vt240);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(vt240_irq);
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 };

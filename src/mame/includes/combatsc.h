@@ -89,7 +89,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info0_bootleg);
 	TILE_GET_INFO_MEMBER(get_tile_info1_bootleg);
 	TILE_GET_INFO_MEMBER(get_text_info_bootleg);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(combatsc);
 	DECLARE_VIDEO_START(combatsc);
 	DECLARE_PALETTE_INIT(combatsc);

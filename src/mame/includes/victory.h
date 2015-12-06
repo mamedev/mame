@@ -72,7 +72,7 @@ public:
 	DECLARE_READ8_MEMBER(video_control_r);
 	DECLARE_WRITE8_MEMBER(video_control_w);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

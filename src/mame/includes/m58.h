@@ -39,7 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 
 	DECLARE_DRIVER_INIT(yard85);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(m58);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

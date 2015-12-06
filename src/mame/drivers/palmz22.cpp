@@ -89,8 +89,8 @@ public:
 
 	UINT32 m_port[8];
 	DECLARE_DRIVER_INIT(palmz22);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(palmz22_input_changed);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	DECLARE_WRITE8_MEMBER( s3c2410_nand_command_w );

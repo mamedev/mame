@@ -60,7 +60,7 @@ public:
 
 protected:
 	// amiga_state overrides
-	virtual void potgo_w(UINT16 data);
+	virtual void potgo_w(UINT16 data) override;
 	int get_lightgun_pos(int player, int *x, int *y);
 
 private:

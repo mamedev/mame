@@ -1159,7 +1159,7 @@ public:
 	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 

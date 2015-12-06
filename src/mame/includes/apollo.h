@@ -204,8 +204,8 @@ public:
 	DECLARE_DRIVER_INIT(dn5500);
 	DECLARE_DRIVER_INIT(apollo);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(apollo);
 	DECLARE_MACHINE_START(apollo);
 
@@ -341,7 +341,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 
 protected:
-	virtual void device_reset();
+	virtual void device_reset() override;
 
 private:
 		UINT8 m_csrb;
@@ -364,32 +364,32 @@ public:
 	apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~apollo_ni();
 
-	virtual iodevice_t image_type() const { return IO_ROM; }
+	virtual iodevice_t image_type() const override { return IO_ROM; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return nullptr; }
-	virtual const char *file_extensions() const { return "ani,bin"; }
-	virtual const option_guide *create_option_guide() const { return nullptr; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 1; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return nullptr; }
+	virtual const char *file_extensions() const override { return "ani,bin"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	DECLARE_WRITE16_MEMBER(write);
 	DECLARE_READ16_MEMBER(read);
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual bool call_create(int format_type, option_resolution *format_options);
-	virtual void call_unload();
+	virtual bool call_load() override;
+	virtual bool call_create(int format_type, option_resolution *format_options) override;
+	virtual void call_unload() override;
 
 	void set_node_id_from_disk();
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() ;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override ;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	void set_node_id(UINT32 node_id);
@@ -436,9 +436,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 protected:
 	class lut_fifo;
 	class bt458;
@@ -648,9 +648,9 @@ public:
 	apollo_graphics_19i(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 private:
 	// internal state
 };

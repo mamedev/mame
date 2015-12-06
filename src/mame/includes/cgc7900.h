@@ -65,8 +65,8 @@ public:
 	required_shared_ptr<UINT16> m_color_status_bg;
 	required_shared_ptr<UINT16> m_roll_overlay;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_PALETTE_INIT(cgc7900);
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

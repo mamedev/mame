@@ -60,7 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cclimber_colorram_w);
 	DECLARE_WRITE8_MEMBER(cannonb_flip_screen_w);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_DRIVER_INIT(cclimber);
 	DECLARE_DRIVER_INIT(yamato);
 	DECLARE_DRIVER_INIT(ckongb);

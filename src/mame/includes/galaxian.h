@@ -259,7 +259,7 @@ public:
 	DECLARE_DRIVER_INIT(ghostmun);
 	DECLARE_DRIVER_INIT(froggrs);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(galaxian);
 	DECLARE_PALETTE_INIT(moonwar);
 	void tenspot_set_game_bank(int bank, int from_game);

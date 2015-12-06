@@ -44,8 +44,8 @@ public:
 private:
 	UINT8 m_irqmask;
 	UINT8 m_irqff;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
 	required_device<discrete_device> m_discrete;

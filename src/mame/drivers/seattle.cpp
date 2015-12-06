@@ -510,8 +510,8 @@ public:
 	DECLARE_DRIVER_INIT(wg3dh);
 	DECLARE_DRIVER_INIT(mace);
 	DECLARE_DRIVER_INIT(blitz99);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(galileo_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);

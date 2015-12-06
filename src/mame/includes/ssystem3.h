@@ -51,7 +51,7 @@ public:
 	{ }
 
 	DECLARE_DRIVER_INIT(ssystem3);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ssystem3);
 	UINT32 screen_update_ssystem3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(ssystem3_via_write_a);

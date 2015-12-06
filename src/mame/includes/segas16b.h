@@ -147,9 +147,9 @@ protected:
 	};
 
 	// device overrides
-	virtual void video_start();
-	virtual void machine_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void video_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// internal helpers
 	void init_generic(segas16b_rom_board rom_board);
@@ -264,7 +264,7 @@ public:
 
 //protected:
 	// driver overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	// configuration
 	UINT8           m_read_xor;

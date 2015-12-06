@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 *m_ram;
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 READ16_MEMBER( dms86_state::dms86_82_r )

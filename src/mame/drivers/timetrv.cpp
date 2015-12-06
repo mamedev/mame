@@ -44,7 +44,7 @@ public:
 	DECLARE_READ8_MEMBER(test2_r);
 	DECLARE_READ8_MEMBER(in_r);
 	DECLARE_READ8_MEMBER(ld_r);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(ld_irq);

@@ -77,7 +77,7 @@ public:
 	required_device<dl1416_device> m_ds3;
 	required_device<dl1416_device> m_ds4;
 	required_device<dl1416_device> m_ds5;
-	virtual void machine_start();
+	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(aim65_printer_timer);
 	void aim65_pia();
 

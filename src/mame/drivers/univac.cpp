@@ -50,8 +50,8 @@ private:
 	const UINT8 *m_p_chargen;
 	bool m_screen_num;
 	UINT8 m_framecnt;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_device<nvram_device> m_nvram;

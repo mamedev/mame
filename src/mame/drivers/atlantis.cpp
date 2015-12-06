@@ -50,8 +50,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_dcs(*this, "dcs") { }
 	DECLARE_DRIVER_INIT(mwskins);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_mwskins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<mips3_device> m_maincpu;
 	required_device<dcs2_audio_denver_device> m_dcs;

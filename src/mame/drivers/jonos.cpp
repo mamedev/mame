@@ -30,8 +30,8 @@ public:
 	required_shared_ptr<UINT8> m_p_videoram;
 private:
 	const UINT8 *m_p_chargen;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 };
 

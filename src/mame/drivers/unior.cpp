@@ -79,8 +79,8 @@ public:
 private:
 	UINT8 m_4c;
 	UINT8 m_4e;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<i8257_device> m_dma;

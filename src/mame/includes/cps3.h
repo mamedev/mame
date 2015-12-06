@@ -120,8 +120,8 @@ public:
 	DECLARE_DRIVER_INIT(sfiii2);
 	DECLARE_DRIVER_INIT(cps3boot);
 	SH2_DMA_KLUDGE_CB(dma_callback);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cps3_vbl_interrupt);
 	INTERRUPT_GEN_MEMBER(cps3_other_interrupt);

@@ -57,8 +57,8 @@ private:
 	UINT8 m_ppi_porta;
 	UINT8 m_ppi_portc;
 	void update_speaker();
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	ioport_port *m_io_ports[10];
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;

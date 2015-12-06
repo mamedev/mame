@@ -168,9 +168,9 @@ public:
 	// static configuration helpers
 	static void install_slot_pages(device_t &owner, UINT8 prim, UINT8 sec, UINT8 page, UINT8 numpages, device_t *device);
 
-	virtual void driver_start();
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void driver_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_ADDRESS_MAP(switched_device_map, 8);
 	DECLARE_WRITE8_MEMBER(msx_sec_slot_w);
@@ -210,7 +210,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(msx_irq_source3) { msx_irq_source(3, state); }  // sometimes expansion slot
 
 protected:
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == 0) ? &m_switched_device_as_config : nullptr; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == 0) ? &m_switched_device_as_config : nullptr; }
 
 private:
 	required_device<z80_device> m_maincpu;

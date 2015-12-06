@@ -97,7 +97,7 @@ protected:
 	// Timers
 	static const device_timer_id TIMER_PADDLE = 0;
 	emu_timer *m_paddle_timer;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// i8021 variables
 	UINT8   m_p0;

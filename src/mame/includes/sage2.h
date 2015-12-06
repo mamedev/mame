@@ -59,8 +59,8 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<ieee488_device> m_ieee488;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void update_fdc_int();
 

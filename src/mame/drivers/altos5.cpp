@@ -64,7 +64,7 @@ private:
 	floppy_image_device *m_floppy;
 	UINT8 convert(offs_t offset, bool state);
 	void setup_banks(UINT8 source);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio0;
 	required_device<z80pio_device> m_pio1;

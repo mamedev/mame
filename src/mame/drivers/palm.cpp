@@ -47,8 +47,8 @@ public:
 	//DECLARE_READ16_MEMBER(palm_spim_in);
 	UINT8 m_port_f_latch;
 	UINT16 m_spim_data;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(pen_check);
 	DECLARE_INPUT_CHANGED_MEMBER(button_check);
 	DECLARE_WRITE8_MEMBER(palm_port_f_out);

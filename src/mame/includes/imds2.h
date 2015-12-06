@@ -68,10 +68,10 @@ class imds2_state : public driver_device
 
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
-	virtual void driver_start();
-	virtual void machine_start();
-	virtual void video_start();
-	virtual void machine_reset();
+	virtual void driver_start() override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
+	virtual void machine_reset() override;
 
 	private:
 	required_device<i8085a_cpu_device> m_ipccpu;

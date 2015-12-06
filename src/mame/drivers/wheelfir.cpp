@@ -287,9 +287,9 @@ public:
 	DECLARE_READ16_MEMBER(wheelfir_snd_r);
 	DECLARE_WRITE16_MEMBER(coin_cnt_w);
 	DECLARE_DRIVER_INIT(wheelfir);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_wheelfir(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);

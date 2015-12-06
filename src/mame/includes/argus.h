@@ -106,7 +106,7 @@ public:
 	TILE_GET_INFO_MEMBER(butasan_get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(butasan_get_bg1_tile_info);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_VIDEO_START(argus);
 	DECLARE_VIDEO_RESET(argus);
 	DECLARE_VIDEO_START(valtric);

@@ -289,8 +289,8 @@ public:
 	void fm77av_encoder_setup_command();
 	void fm77av_encoder_handle_command();
 	DECLARE_DRIVER_INIT(fm7);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(fm7);
 	DECLARE_MACHINE_START(fm77av);
 	DECLARE_MACHINE_START(fm11);
@@ -384,7 +384,7 @@ public:
 	optional_device<address_map_bank_device> m_avbank16;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif /*FM7_H_*/

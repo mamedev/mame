@@ -59,8 +59,8 @@ private:
 	UINT8 m_p[4];
 	UINT16 m_display_data;
 	int m_digit_index;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 

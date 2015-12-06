@@ -40,8 +40,8 @@ public:
 
 	DECLARE_DRIVER_INIT(fruitpc);
 	DECLARE_READ8_MEMBER(fruit_inp_r);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 READ8_MEMBER(fruitpc_state::fruit_inp_r)

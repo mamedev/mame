@@ -111,8 +111,8 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 private:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_shared_ptr<UINT16> m_p_base;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart1;

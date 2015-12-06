@@ -125,8 +125,8 @@ public:
 	required_shared_ptr<UINT16> m_hires_ram;
 	optional_shared_ptr<UINT8> m_char_ram;
 
-	virtual void machine_start();
-	virtual void device_reset_after_children();
+	virtual void machine_start() override;
+	virtual void device_reset_after_children() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

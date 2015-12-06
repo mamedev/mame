@@ -171,7 +171,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void video_start();
+	virtual void video_start() override;
 };
 
 

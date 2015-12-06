@@ -261,8 +261,8 @@ public:
 	void init_titlef(void);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class segas32_regular_state :  public segas32_state
@@ -271,7 +271,7 @@ public:
 	segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 //  virtual void device_start();
 //  virtual void device_reset();
 };
@@ -282,8 +282,8 @@ public:
 	segas32_v25_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
@@ -293,8 +293,8 @@ public:
 	sega_multi32_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 

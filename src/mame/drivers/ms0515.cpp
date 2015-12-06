@@ -31,7 +31,7 @@ public:
 	DECLARE_WRITE16_MEMBER(ms0515_bank_w);
 	DECLARE_WRITE8_MEMBER(ms0515_sys_w);
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	UINT8 *m_video_ram;
 	UINT8 m_sysreg;

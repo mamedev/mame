@@ -18,8 +18,8 @@ public:
 protected:
 	UINT8* m_ram;
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 private:
 };
 

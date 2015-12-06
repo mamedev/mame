@@ -112,7 +112,7 @@ private:
 	UINT8 m_porta;
 	UINT8 m_portb;
 	UINT8 m_portc;
-	virtual void machine_start();
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<i8255_device> m_ppi;

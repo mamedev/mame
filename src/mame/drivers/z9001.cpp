@@ -66,9 +66,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	const UINT8 *m_p_chargen;
 	bool m_cassbit;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	//virtual void machine_start();
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 };

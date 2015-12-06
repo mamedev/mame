@@ -48,8 +48,8 @@ public:
 	DECLARE_WRITE16_MEMBER(kaneko_hit_w);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	calc1_hit_t m_hit;

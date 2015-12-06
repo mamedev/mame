@@ -37,7 +37,7 @@ public:
 
 	DECLARE_DRIVER_INIT(pcktgal);
 	DECLARE_PALETTE_INIT(pcktgal);
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	UINT32 screen_update_pcktgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_pcktgalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

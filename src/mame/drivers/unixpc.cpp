@@ -42,7 +42,7 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	DECLARE_READ16_MEMBER( line_printer_r );
 	DECLARE_WRITE16_MEMBER( misc_control_w );

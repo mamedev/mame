@@ -42,7 +42,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	virtual void machine_reset() { m_maincpu->set_pc(0x8000); }
+	virtual void machine_reset() override { m_maincpu->set_pc(0x8000); }
 
 	DECLARE_READ8_MEMBER(lola8a_port_a_r);
 	DECLARE_WRITE8_MEMBER(lola8a_port_b_w);

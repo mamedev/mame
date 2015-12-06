@@ -18,7 +18,7 @@ public:
 
 protected:
 	// device-level overrides
-	void device_start();
+	void device_start() override;
 };
 
 void asst128_mb_device::device_start()
@@ -53,7 +53,7 @@ public:
 	DECLARE_FLOPPY_FORMATS( asst128_formats );
 	DECLARE_WRITE8_MEMBER(asst128_fdc_dor_w);
 
-	void machine_start();
+	void machine_start() override;
 };
 
 void asst128_state::machine_start()

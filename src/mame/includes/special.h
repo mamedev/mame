@@ -147,7 +147,7 @@ protected:
 	required_ioport m_io_line12;
 
 	required_device<palette_device> m_palette;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif /* SPECIAL_H_ */

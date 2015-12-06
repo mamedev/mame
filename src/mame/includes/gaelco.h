@@ -41,7 +41,7 @@ public:
 	DECLARE_WRITE16_MEMBER(gaelco_vram_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco_screen1);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_VIDEO_START(bigkarnk);
 	DECLARE_VIDEO_START(maniacsq);
 	UINT32 screen_update_bigkarnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

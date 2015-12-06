@@ -152,9 +152,9 @@ public:
 	DECLARE_DRIVER_INIT(trs80m4p);
 	DECLARE_DRIVER_INIT(lnw80);
 	DECLARE_DRIVER_INIT(trs80);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(trs80m4);
 	DECLARE_MACHINE_RESET(lnw80);
 	DECLARE_PALETTE_INIT(lnw80);

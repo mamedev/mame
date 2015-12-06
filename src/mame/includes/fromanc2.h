@@ -95,7 +95,7 @@ public:
 	TILE_GET_INFO_MEMBER(fromancr_get_v1_l0_tile_info);
 	TILE_GET_INFO_MEMBER(fromancr_get_v1_l1_tile_info);
 	TILE_GET_INFO_MEMBER(fromancr_get_v1_l2_tile_info);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(fromanc2);
 	DECLARE_VIDEO_START(fromanc2);
 	DECLARE_VIDEO_START(fromancr);

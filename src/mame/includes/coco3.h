@@ -53,15 +53,15 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void update_cart_base(UINT8 *cart_base);
+	virtual void update_cart_base(UINT8 *cart_base) override;
 
 	/* interrupts */
-	virtual bool firq_get_line(void);
-	virtual bool irq_get_line(void);
+	virtual bool firq_get_line(void) override;
+	virtual bool irq_get_line(void) override;
 
 	/* miscellaneous */
-	virtual void update_keyboard_input(UINT8 value, UINT8 z);
-	virtual void cart_w(bool line);
+	virtual void update_keyboard_input(UINT8 value, UINT8 z) override;
+	virtual void cart_w(bool line) override;
 };
 
 #endif // __COCO3__

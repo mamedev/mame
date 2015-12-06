@@ -32,7 +32,7 @@ public:
 	DECLARE_WRITE16_MEMBER( dual68_terminal_w );
 	//UINT8 m_term_data;
 	required_shared_ptr<UINT16> m_p_ram;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 

@@ -336,8 +336,8 @@ public:
 	DECLARE_DRIVER_INIT(nss);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(nss_vblank_irq);
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);

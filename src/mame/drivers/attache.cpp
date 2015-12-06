@@ -139,9 +139,9 @@ public:
 	// overrides
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_int(screen_device &screen, bool state);
-	virtual void driver_start();
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void driver_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_WRITE8_MEMBER(rom_w);

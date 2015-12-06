@@ -79,8 +79,8 @@ public:
 	UINT8 m_term_data;
 	UINT8 m_key_row;
 	UINT8 m_2;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 protected:
 	ioport_port *m_io_port[8];

@@ -144,8 +144,8 @@ public:
 	DECLARE_READ16_MEMBER(b38_crtc_r);
 	DECLARE_WRITE16_MEMBER(b38_crtc_w);
 protected:
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 private:
 	optional_device<i80186_cpu_device> m_maincpu;

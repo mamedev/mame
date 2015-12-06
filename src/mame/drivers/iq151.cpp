@@ -88,7 +88,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cartslot_w);
 	DECLARE_READ8_MEMBER(cartslot_io_r);
 	DECLARE_WRITE8_MEMBER(cartslot_io_w);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	UINT8 m_vblank_irq_state;

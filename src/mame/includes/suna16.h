@@ -74,7 +74,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bssoccer_interrupt);
 
 	DECLARE_DRIVER_INIT(uballoon);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(bestbest);
 	DECLARE_MACHINE_START(bssoccer);
 	DECLARE_MACHINE_START(uballoon);

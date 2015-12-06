@@ -73,7 +73,7 @@ public:
 	int m_comms_blocks;
 	bool m_comms_ack;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_READ16_MEMBER(comms_r);
 	DECLARE_WRITE16_MEMBER(comms_w);
 	DECLARE_WRITE16_MEMBER(data_bank_w);

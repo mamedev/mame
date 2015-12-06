@@ -24,7 +24,7 @@ public:
 	DECLARE_DRIVER_INIT(piccolop);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(s2k_get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ampoker2);
 	DECLARE_VIDEO_START(sigma2k);
 	UINT32 screen_update_ampoker2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

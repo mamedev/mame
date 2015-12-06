@@ -47,7 +47,7 @@ public:
 	DECLARE_READ32_MEMBER(main_cycle_r);
 	DECLARE_READ16_MEMBER(sub_cycle_r);
 	DECLARE_DRIVER_INIT(superchs);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_superchs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
 	required_device<cpu_device> m_maincpu;

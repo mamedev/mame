@@ -30,7 +30,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tricep_terminal_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	required_shared_ptr<UINT16> m_p_ram;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 

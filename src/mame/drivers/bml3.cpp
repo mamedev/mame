@@ -141,8 +141,8 @@ private:
 	bool m_cassbit;
 	bool m_cassold;
 	UINT8 m_cass_data[4];
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	void m6845_change_clock(UINT8 setting);
 	UINT8 m_crtc_index;
 	UINT8 *m_extram;

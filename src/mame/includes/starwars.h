@@ -70,7 +70,7 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(esb_setdirect);
 	DECLARE_DRIVER_INIT(esb);
 	DECLARE_DRIVER_INIT(starwars);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(math_run_clear);
 	TIMER_CALLBACK_MEMBER(main_callback);
 	TIMER_CALLBACK_MEMBER(sound_callback);

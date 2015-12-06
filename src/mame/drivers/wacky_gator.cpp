@@ -48,7 +48,7 @@ public:
 	required_memory_region m_samples;
 
 	DECLARE_DRIVER_INIT(wackygtr);
-	void machine_reset();
+	void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	DECLARE_WRITE8_MEMBER(sample_ctrl_w);

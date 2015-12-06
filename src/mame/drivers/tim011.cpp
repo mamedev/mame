@@ -26,8 +26,8 @@ public:
 			m_floppy2(*this, FDC9266_TAG ":2:35dd"),
 			m_floppy3(*this, FDC9266_TAG ":3:35dd") { }
 
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_tim011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(print_w);
 	DECLARE_WRITE8_MEMBER(scroll_w);

@@ -133,8 +133,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	UINT8 m_video_latch;
 	UINT8 m_pa;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(applix);
 	UINT8 m_palette_latch[4];
 	required_shared_ptr<UINT16> m_base;

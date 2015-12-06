@@ -47,13 +47,13 @@ public:
 	required_shared_ptr<UINT8> m_p_videoram;
 	const UINT8* m_p_chargen;
 	UINT8 m_kbd_row;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(plan80);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 READ8_MEMBER( plan80_state::plan80_04_r )

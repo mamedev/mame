@@ -36,8 +36,8 @@ public:
 	UINT8 m_porta;
 	UINT8 m_portc;
 	emu_timer *m_vb_timer;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(scv);
 	UINT32 screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -55,7 +55,7 @@ protected:
 	required_memory_region m_charrom;
 
 	ioport_port *m_key[8];
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void scv_set_banks();
 	inline void plot_sprite_part( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 pat, UINT8 col, UINT8 screen_sprite_start_line );

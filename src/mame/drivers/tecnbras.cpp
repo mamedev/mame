@@ -40,8 +40,8 @@ public:
 private:
 	int m_xcoord;
 	char m_digit[14][7];
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 

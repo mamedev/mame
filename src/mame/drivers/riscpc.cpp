@@ -58,8 +58,8 @@ public:
 	void fire_iomd_timer(int timer);
 	void viddma_transfer_start();
 	void vidc20_dynamic_screen_change();
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(IOMD_timer0_callback);

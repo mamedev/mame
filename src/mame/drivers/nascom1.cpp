@@ -81,7 +81,7 @@ public:
 	DECLARE_SNAPSHOT_LOAD_MEMBER( nascom1 );
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 private:
 
@@ -121,7 +121,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket2_load) { return load_cart(image, m_socket2, 2); }
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 private:
 	required_device<nasbus_device> m_nasbus;

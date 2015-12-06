@@ -312,7 +312,7 @@ public:
 	DECLARE_DRIVER_INIT(marvland);
 	DECLARE_DRIVER_INIT(rthun2);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	void video_start_finallap();
 	void video_start_luckywld();
 	void video_start_metlhawk();

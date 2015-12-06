@@ -134,9 +134,9 @@ private:
 	UINT8 m_pia1_pa;
 	UINT8 m_pia1_pb;
 
-	virtual void machine_reset();
-	virtual void machine_start();
-	virtual void driver_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void driver_start() override;
 
 	void refresh_memory();
 

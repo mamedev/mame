@@ -408,7 +408,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(tntell_get_overlay);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 

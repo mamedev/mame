@@ -67,7 +67,7 @@ protected:
 	required_device<wpc_out_device> out;
 
 	// driver_device overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 private:
 	static const char *const lamps_corv[64];

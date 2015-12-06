@@ -160,8 +160,8 @@ public:
 		} pmu;
 	} m_vg230;
 
-	void machine_reset();
-	void machine_start();
+	void machine_reset() override;
+	void machine_start() override;
 
 	UINT32 screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pasogo_interrupt);

@@ -53,9 +53,9 @@ public:
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_READ16_MEMBER(ex_board_r);
 	DECLARE_READ16_MEMBER(pit_r);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_fp6000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device>m_crtc;

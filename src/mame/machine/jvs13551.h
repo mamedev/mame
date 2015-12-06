@@ -29,7 +29,7 @@ public:
 	sega_837_13551(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	static void static_set_port_tag(device_t &device, int port, const char *tag);
 
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 
 	DECLARE_WRITE_LINE_MEMBER(jvs13551_coin_1_w);
 	DECLARE_WRITE_LINE_MEMBER(jvs13551_coin_2_w);
@@ -37,22 +37,22 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// JVS device overrides
-	virtual const char *device_id();
-	virtual UINT8 command_format_version();
-	virtual UINT8 jvs_standard_version();
-	virtual UINT8 comm_method_version();
-	virtual void function_list(UINT8 *&buf);
-	virtual bool switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch);
-	virtual bool coin_counters(UINT8 *&buf, UINT8 count);
-	virtual bool coin_add(UINT8 slot, INT32 count);
-	virtual bool analogs(UINT8 *&buf, UINT8 count);
-	virtual bool swoutputs(UINT8 count, const UINT8 *vals);
-	virtual bool swoutputs(UINT8 id, UINT8 val);
+	virtual const char *device_id() override;
+	virtual UINT8 command_format_version() override;
+	virtual UINT8 jvs_standard_version() override;
+	virtual UINT8 comm_method_version() override;
+	virtual void function_list(UINT8 *&buf) override;
+	virtual bool switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch) override;
+	virtual bool coin_counters(UINT8 *&buf, UINT8 count) override;
+	virtual bool coin_add(UINT8 slot, INT32 count) override;
+	virtual bool analogs(UINT8 *&buf, UINT8 count) override;
+	virtual bool swoutputs(UINT8 count, const UINT8 *vals) override;
+	virtual bool swoutputs(UINT8 id, UINT8 val) override;
 
 private:
 	const char *port_tag[12];

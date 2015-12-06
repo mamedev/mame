@@ -43,7 +43,7 @@ public:
 	bool m_flipscreen;
 	UINT8 m_last;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

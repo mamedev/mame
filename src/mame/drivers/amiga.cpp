@@ -44,8 +44,8 @@ public:
 	DECLARE_WRITE16_MEMBER( write_protect_w );
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<address_map_bank_device> m_bootrom;
@@ -74,11 +74,11 @@ public:
 	DECLARE_WRITE16_MEMBER( clock_w );
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	// amiga_state overrides
-	virtual bool int2_pending();
-	virtual bool int6_pending();
+	virtual bool int2_pending() override;
+	virtual bool int6_pending() override;
 
 private:
 	// devices
@@ -104,11 +104,11 @@ public:
 	DECLARE_DRIVER_INIT( ntsc );
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	// amiga_state overrides
-	virtual bool int2_pending();
-	virtual bool int6_pending();
+	virtual bool int2_pending() override;
+	virtual bool int6_pending() override;
 
 private:
 	// devices
@@ -149,11 +149,11 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	// amiga_state overrides
-	virtual bool int2_pending();
-	virtual bool int6_pending();
+	virtual bool int2_pending() override;
+	virtual bool int6_pending() override;
 
 private:
 	// devices
@@ -205,11 +205,11 @@ public:
 	DECLARE_DRIVER_INIT( ntsc );
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	// amiga_state overrides
-	virtual bool int2_pending();
-	virtual bool int6_pending();
+	virtual bool int2_pending() override;
+	virtual bool int6_pending() override;
 
 private:
 	// devices
@@ -237,7 +237,7 @@ public:
 	static const UINT8 GAYLE_ID = 0xd0;
 
 protected:
-	virtual bool int2_pending();
+	virtual bool int2_pending() override;
 
 private:
 	int m_gayle_int2;
@@ -259,7 +259,7 @@ public:
 	static const UINT8 GAYLE_ID = 0xd1;
 
 protected:
-	virtual bool int2_pending();
+	virtual bool int2_pending() override;
 
 private:
 	int m_gayle_int2;
@@ -328,7 +328,7 @@ public:
 
 protected:
 	// amiga_state overrides
-	virtual void potgo_w(UINT16 data);
+	virtual void potgo_w(UINT16 data) override;
 
 private:
 	required_device<cdda_device> m_cdda;

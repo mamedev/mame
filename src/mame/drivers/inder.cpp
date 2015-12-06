@@ -86,7 +86,7 @@ private:
 	UINT8 m_sndbank;
 	UINT32 m_sound_addr;
 	UINT8 *m_p_speech;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<sn76489_device> m_sn;

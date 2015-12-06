@@ -61,7 +61,7 @@ public:
 
 	DECLARE_PALETTE_INIT(cardline);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);

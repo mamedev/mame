@@ -72,7 +72,7 @@ private:
 	bool m_diag_on;
 	UINT8 m_firqtimer;
 	UINT8 m_diag_segments;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_ccpu;
 	required_device<cpu_device> m_hcpu;
 	required_shared_ptr<UINT8> m_shared_ram;

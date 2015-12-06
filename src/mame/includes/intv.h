@@ -98,9 +98,9 @@ public:
 	DECLARE_DRIVER_INIT(intvecs);
 	DECLARE_DRIVER_INIT(intvkbd);
 	DECLARE_DRIVER_INIT(intv);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(intv);
 	void ecs_banks_restore();
 	UINT32 screen_update_intv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -149,7 +149,7 @@ protected:
 	void intv_stic_screenrefresh();
 	void draw_background(bitmap_ind16 &bitmap, int transparency);
 	void draw_sprites(bitmap_ind16 &bitmap, int behind_foreground);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif /* INTV_H_ */

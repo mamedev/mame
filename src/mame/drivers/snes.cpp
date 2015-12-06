@@ -92,13 +92,13 @@ public:
 	SNESCTRL_ONSCREEN_CB(onscreen_cb);
 	SNESCTRL_GUNLATCH_CB(gun_latch_cb);
 	virtual DECLARE_WRITE8_MEMBER(io_read);
-	virtual UINT8 oldjoy1_read(int latched);
-	virtual UINT8 oldjoy2_read(int latched);
-	virtual void write_joy_latch(UINT8 data);
-	virtual void wrio_write(UINT8 data);
+	virtual UINT8 oldjoy1_read(int latched) override;
+	virtual UINT8 oldjoy2_read(int latched) override;
+	virtual void write_joy_latch(UINT8 data) override;
+	virtual void wrio_write(UINT8 data) override;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	int m_type;
 	required_device<snes_control_port_device> m_ctrl1;
 	required_device<snes_control_port_device> m_ctrl2;

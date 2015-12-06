@@ -87,7 +87,7 @@ private:
 	bool m_cass_state;
 	bool m_cassold;
 	UINT8 m_clockcnt;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_device<acia6850_device> m_acia1; // cassette uart

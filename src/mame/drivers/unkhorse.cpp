@@ -47,7 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE_LINE_MEMBER(timer_out);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -89,9 +89,9 @@ public:
 	UINT8 m_j;
 	UINT8 m_scroll;
 	required_shared_ptr<UINT8> m_p_videoram;
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_DRIVER_INIT(okean240);
 	UINT32 screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -100,7 +100,7 @@ protected:
 	ioport_port *m_io_port[11];
 	required_device<cpu_device> m_maincpu;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 // okean240 requires bit 4 to change

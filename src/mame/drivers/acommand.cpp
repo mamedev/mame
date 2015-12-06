@@ -98,7 +98,7 @@ public:
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	TILE_GET_INFO_MEMBER(ac_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(ac_get_tx_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(acommand_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask);
