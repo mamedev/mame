@@ -77,7 +77,7 @@ public:
 
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_WRITE8_MEMBER(port_a_w);
+	virtual DECLARE_WRITE8_MEMBER(port_a_w) override;
 
 private:
 	UINT8 m_lcd_ctrl;

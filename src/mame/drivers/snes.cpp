@@ -91,7 +91,7 @@ public:
 	// input related
 	SNESCTRL_ONSCREEN_CB(onscreen_cb);
 	SNESCTRL_GUNLATCH_CB(gun_latch_cb);
-	virtual DECLARE_WRITE8_MEMBER(io_read);
+	virtual DECLARE_WRITE8_MEMBER(io_read) override;
 	virtual UINT8 oldjoy1_read(int latched) override;
 	virtual UINT8 oldjoy2_read(int latched) override;
 	virtual void write_joy_latch(UINT8 data) override;

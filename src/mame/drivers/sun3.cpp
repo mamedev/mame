@@ -315,7 +315,7 @@ public:
 	required_device<scc8530_t> m_scc1;
 	required_device<scc8530_t> m_scc2;
 	optional_device<n82077aa_device> m_fdc;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	required_shared_ptr<UINT32> m_p_ram;
 	optional_shared_ptr<UINT32> m_bw2_vram;

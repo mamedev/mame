@@ -108,8 +108,8 @@ private:
 	UINT8 *m_p_audio;
 	UINT8 *m_p_music;
 	UINT8 *m_p_dmdcpu;
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_musiccpu;

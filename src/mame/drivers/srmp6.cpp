@@ -109,8 +109,8 @@ public:
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_READ16_MEMBER(srmp6_irq_ack_r);
 	DECLARE_DRIVER_INIT(INIT);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_palette();
 	UINT32 process(UINT8 b,UINT32 dst_offset);

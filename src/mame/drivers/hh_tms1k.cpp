@@ -2191,7 +2191,7 @@ public:
 		: gpoker_state(mconfig, type, tag)
 	{ }
 
-	virtual DECLARE_WRITE16_MEMBER(write_r);
+	virtual DECLARE_WRITE16_MEMBER(write_r) override;
 };
 
 // handlers

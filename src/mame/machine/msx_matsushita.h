@@ -31,8 +31,8 @@ public:
 
 	virtual UINT8 get_id() override;
 
-	virtual DECLARE_READ8_MEMBER(io_read);
-	virtual DECLARE_WRITE8_MEMBER(io_write);
+	virtual DECLARE_READ8_MEMBER(io_read) override;
+	virtual DECLARE_WRITE8_MEMBER(io_write) override;
 
 private:
 	required_ioport m_io_config;

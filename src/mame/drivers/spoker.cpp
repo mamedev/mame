@@ -74,9 +74,9 @@ public:
 
 	DECLARE_DRIVER_INIT(spk116it);
 	DECLARE_DRIVER_INIT(3super8);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

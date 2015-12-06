@@ -224,8 +224,8 @@ public:
 	required_ioport m_b;
 	required_device<screen_device> m_screen;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( cart_400 );
 	DECLARE_READ8_MEMBER( cart_a00 );
@@ -273,8 +273,8 @@ public:
 
 	required_device<cdp1864_device> m_cti;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( cart_c00 );
 	DECLARE_WRITE8_MEMBER( dma_w );

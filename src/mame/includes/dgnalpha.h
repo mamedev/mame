@@ -83,8 +83,8 @@ protected:
 	virtual bool firq_get_line(void) override;
 
 	/* PIA1 */
-	virtual DECLARE_READ8_MEMBER( ff20_read );
-	virtual DECLARE_WRITE8_MEMBER( ff20_write );
+	virtual DECLARE_READ8_MEMBER( ff20_read ) override;
+	virtual DECLARE_WRITE8_MEMBER( ff20_write ) override;
 
 private:
 	UINT8 m_just_reset;

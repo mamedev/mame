@@ -80,8 +80,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(squale_scanline);
 

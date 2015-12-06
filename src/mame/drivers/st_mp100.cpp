@@ -69,7 +69,7 @@ private:
 	UINT8 m_digit;
 	UINT8 m_counter;
 	UINT8 m_segment[5];
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_u10;
 	required_device<pia6821_device> m_pia_u11;

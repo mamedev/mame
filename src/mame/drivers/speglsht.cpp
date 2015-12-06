@@ -136,7 +136,7 @@ public:
 	DECLARE_READ32_MEMBER(irq_ack_clear);
 	DECLARE_DRIVER_INIT(speglsht);
 	DECLARE_MACHINE_RESET(speglsht);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_VIDEO_START(speglsht);
 	UINT32 screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<palette_device> m_palette;

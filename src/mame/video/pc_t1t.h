@@ -123,7 +123,7 @@ public:
 
 	UINT8   *m_jxkanji;
 
-	virtual MC6845_UPDATE_ROW( crtc_update_row );
+	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( pcjx_text_update_row );
 	MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row );
 

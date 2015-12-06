@@ -275,7 +275,7 @@ public:
 	DECLARE_DRIVER_INIT(ssfindo);
 	DECLARE_DRIVER_INIT(ppcar);
 	DECLARE_DRIVER_INIT(tetfight);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

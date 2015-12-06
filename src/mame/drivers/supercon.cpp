@@ -87,9 +87,9 @@ public:
 	void set_border_pieces();
 	void clear_pieces();
 	void update_leds();
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_DRIVER_INIT(supercon);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(mouse_click);
 	TIMER_CALLBACK_MEMBER(update_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_artwork);

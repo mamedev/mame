@@ -94,11 +94,11 @@ public:
 	konami573_cassette_x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	konami573_cassette_x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
 
-	virtual DECLARE_READ_LINE_MEMBER(read_line_secflash_sda);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d0);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d1);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d2);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d3);
+	virtual DECLARE_READ_LINE_MEMBER(read_line_secflash_sda) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d0) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d1) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d2) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d3) override;
 
 protected:
 	virtual void device_start() override;
@@ -116,14 +116,14 @@ class konami573_cassette_xi_device: public konami573_cassette_x_device
 public:
 	konami573_cassette_xi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ_LINE_MEMBER(read_line_ds2401);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d4);
+	virtual DECLARE_READ_LINE_MEMBER(read_line_ds2401) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d4) override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d0);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d1);
-	virtual DECLARE_READ_LINE_MEMBER(read_line_adc083x_do);
-	virtual DECLARE_READ_LINE_MEMBER(read_line_adc083x_sars);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d5);
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d0) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d1) override;
+	virtual DECLARE_READ_LINE_MEMBER(read_line_adc083x_do) override;
+	virtual DECLARE_READ_LINE_MEMBER(read_line_adc083x_sars) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d5) override;
 
 	ADC083X_INPUT_CB(punchmania_inputs_callback);
 
@@ -180,15 +180,15 @@ public:
 	template<class _Object> static devcb_base &set_d6_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d6_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_d7_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d7_handler.set_callback(object); }
 
-	virtual DECLARE_READ_LINE_MEMBER(read_line_secflash_sda);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d0);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d1);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d2);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d3);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d4);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d5);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d6);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d7);
+	virtual DECLARE_READ_LINE_MEMBER(read_line_secflash_sda) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d0) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d1) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d2) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d3) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d4) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d5) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d6) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d7) override;
 
 protected:
 	virtual void device_start() override;
@@ -214,8 +214,8 @@ class konami573_cassette_yi_device: public konami573_cassette_y_device
 public:
 	konami573_cassette_yi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ_LINE_MEMBER(read_line_ds2401);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d4);
+	virtual DECLARE_READ_LINE_MEMBER(read_line_ds2401) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d4) override;
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -233,13 +233,13 @@ class konami573_cassette_zi_device: public device_t,
 public:
 	konami573_cassette_zi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ_LINE_MEMBER(read_line_ds2401);
-	virtual DECLARE_READ_LINE_MEMBER(read_line_secflash_sda);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d4);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d1);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d2);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d3);
-	virtual DECLARE_WRITE_LINE_MEMBER(write_line_zs01_sda);
+	virtual DECLARE_READ_LINE_MEMBER(read_line_ds2401) override;
+	virtual DECLARE_READ_LINE_MEMBER(read_line_secflash_sda) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d4) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d1) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d2) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d3) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_line_zs01_sda) override;
 
 protected:
 	virtual void device_start() override;

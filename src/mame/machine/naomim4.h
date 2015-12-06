@@ -16,7 +16,7 @@ public:
 
 	static void static_set_tags(device_t &device, const char *_key_tag);
 
-	virtual DECLARE_ADDRESS_MAP(submap, 16);
+	virtual DECLARE_ADDRESS_MAP(submap, 16) override;
 
 	DECLARE_READ16_MEMBER(m4_id_r);
 protected:

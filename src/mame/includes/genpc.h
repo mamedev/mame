@@ -133,7 +133,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w ) override;
 
 protected:
 	// device-level overrides
@@ -142,9 +142,9 @@ protected:
 
 	required_device<cassette_image_device>  m_cassette;
 public:
-	virtual DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
-	virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
-	virtual DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
+	virtual DECLARE_READ8_MEMBER ( pc_ppi_porta_r ) override;
+	virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r ) override;
+	virtual DECLARE_WRITE8_MEMBER( pc_ppi_portb_w ) override;
 };
 
 
@@ -172,10 +172,10 @@ protected:
 	virtual void device_reset() override;
 
 public:
-	virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
-	virtual DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
+	virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r ) override;
+	virtual DECLARE_WRITE8_MEMBER( pc_ppi_portb_w ) override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w ) override;
 };
 
 extern const device_type EC1841_MOTHERBOARD;

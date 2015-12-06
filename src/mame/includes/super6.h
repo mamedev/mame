@@ -59,8 +59,8 @@ public:
 	required_region_ptr<UINT8> m_rom;
 	required_ioport m_j7;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );

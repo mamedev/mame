@@ -35,7 +35,7 @@ public:
 	required_shared_ptr<UINT8> m_attr;
 	required_shared_ptr<UINT8> m_vram;
 	DECLARE_WRITE8_MEMBER(out_w);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(summit);
 	UINT32 screen_update_summit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
