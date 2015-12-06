@@ -538,4 +538,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR   NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1984, squale, 0,      0,       squale,    squale,driver_device,   0,     "Apollo 7", "Squale",    MACHINE_IS_SKELETON )
+COMP( 1984, squale, 0,      0,       squale,    squale,driver_device,   0,     "Apollo 7", "Squale",    MACHINE_TYPE_COMPUTER | MACHINE_IMPERFECT_GRAPHICS )
