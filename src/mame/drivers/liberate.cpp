@@ -877,7 +877,7 @@ ROM_START( prosoccr )
 	ROM_COPY( "shared_gfx", 0x4800, 0x4800, 0x1800 )
 
 	ROM_REGION( 0x6000, "sp_gfx", 0 )
-	ROM_COPY( "shared_gfx", nullptr, 0x0000, 0x2000 )
+	ROM_COPY( "shared_gfx", 0x0000, 0x0000, 0x2000 )
 	ROM_COPY( "shared_gfx", 0x2000, 0x2000, 0x2000 )
 	ROM_COPY( "shared_gfx", 0x4000, 0x4000, 0x2000 )
 
@@ -934,7 +934,7 @@ ROM_START( prosport )
 
 	/* 8 - Pro Bowling */
 	ROM_REGION( 0x6000, "probowl_fg_gfx", 0 )
-	ROM_COPY( "fg_gfx_src", nullptr, 0x00000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x00000, 0x00000, 0x2000 )
 	ROM_COPY( "fg_gfx_src", 0x06000, 0x02000, 0x2000 )
 	ROM_COPY( "fg_gfx_src", 0x0c000, 0x04000, 0x2000 )
 
@@ -953,7 +953,7 @@ ROM_START( prosport )
 	ROM_LOAD( "ic45ar17.bin",   0x01000, 0x1000, CRC(5f1c621e) SHA1(29ce85d3d5da5ee16bb67644b0555ab9bce52d05) )
 
 	ROM_REGION(0x02000, "user1", 0 )
-	ROM_COPY( "gfx2", nullptr, 0x0000, 0x2000 )
+	ROM_COPY( "gfx2", 0x00000, 0x0000, 0x2000 )
 ROM_END
 
 ROM_START( prosporta )
@@ -996,7 +996,7 @@ ROM_START( prosporta )
 
 	/* 8 - Pro Bowling */
 	ROM_REGION( 0x6000, "probowl_fg_gfx", 0 )
-	ROM_COPY( "fg_gfx_src", nullptr, 0x00000, 0x2000 )
+	ROM_COPY( "fg_gfx_src", 0x00000, 0x00000, 0x2000 )
 	ROM_COPY( "fg_gfx_src", 0x06000, 0x02000, 0x2000 )
 	ROM_COPY( "fg_gfx_src", 0x0c000, 0x04000, 0x2000 )
 
@@ -1015,7 +1015,7 @@ ROM_START( prosporta )
 	ROM_LOAD( "ar17.45",   0x01000, 0x1000, CRC(5f1c621e) SHA1(29ce85d3d5da5ee16bb67644b0555ab9bce52d05) )
 
 	ROM_REGION(0x02000, "user1", 0 )
-	ROM_COPY( "gfx2", nullptr, 0x0000, 0x2000 )
+	ROM_COPY( "gfx2", 0x00000, 0x0000, 0x2000 )
 ROM_END
 
 ROM_START( boomrang )

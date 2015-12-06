@@ -5551,7 +5551,7 @@ ROM_START( mustangb )
 	ROM_REGION(0x20000, "audiocpu", 0 ) /* 64k for sound cpu code */
 	ROM_LOAD( "mustang.16",    0x00000, 0x8000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
 	ROM_LOAD( "90058-1",    0x00000, 0x20000, CRC(81ccfcad) SHA1(70a0f769c0d4588f6f17bd52cc86a745f30e9f00) )
@@ -5575,7 +5575,7 @@ ROM_START( mustangb2 )
 	ROM_REGION(0x20000, "audiocpu", 0 ) /* 64k for sound cpu code */
 	ROM_LOAD( "01.bin",    0x00000, 0x8000, CRC(90820499) SHA1(ddd43373eb1891a05159085b52bf74760824e5aa) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
 	ROM_LOAD( "06.bin",    0x00000, 0x20000, CRC(81ccfcad) SHA1(70a0f769c0d4588f6f17bd52cc86a745f30e9f00) )
@@ -5882,7 +5882,7 @@ ROM_START( tdragonb )
 	ROM_REGION(0x20000, "audiocpu", 0 ) /* 64k for sound cpu code */
 	ROM_LOAD( "td_02.bin",    0x00000, 0x8000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", nullptr, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
 	ROM_LOAD( "td_08.bin",      0x000000, 0x20000, CRC(5144dc69) SHA1(e64d88dc0e7672f811868621f74ec209aeafbc6f) )   /* 8x8 tiles */
@@ -6687,7 +6687,7 @@ ROM_START( atombjt ) // based off bjtwina set
 	ROM_LOAD32_BYTE( "26.u45",  0x000000, 0x80000, CRC(6cc4e817) SHA1(70f2ab50e228a029d3157c94fe0a79e7aad010bd) )
 
 	ROM_REGION( 0x100000, "fgtile", 0 )
-	ROM_COPY( "gfxtemp", nullptr, 0x00000, 0x100000 )
+	ROM_COPY( "gfxtemp", 0x000000, 0x00000, 0x100000 )
 
 	ROM_REGION( 0x100000, "bgtile", 0 )
 	ROM_COPY( "gfxtemp", 0x100000, 0x00000, 0x100000 )

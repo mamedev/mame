@@ -1597,19 +1597,19 @@ ROM_START( wbeachvl )
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x1c0000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user2", nullptr, 0x000000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
 	ROM_COPY( "user2", 0x020000, 0x020000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x040000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
 	ROM_COPY( "user2", 0x040000, 0x060000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x080000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
 	ROM_COPY( "user2", 0x060000, 0x0a0000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x0c0000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user2", 0x080000, 0x0e0000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x100000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x100000, 0x020000)
 	ROM_COPY( "user2", 0x0a0000, 0x120000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x140000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x140000, 0x020000)
 	ROM_COPY( "user2", 0x0c0000, 0x160000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x180000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x180000, 0x020000)
 	ROM_COPY( "user2", 0x0e0000, 0x1a0000, 0x020000)
 ROM_END
 
@@ -1642,19 +1642,19 @@ ROM_START( wbeachvl2 )
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x1c0000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user2", nullptr, 0x000000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
 	ROM_COPY( "user2", 0x020000, 0x020000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x040000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
 	ROM_COPY( "user2", 0x040000, 0x060000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x080000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
 	ROM_COPY( "user2", 0x060000, 0x0a0000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x0c0000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user2", 0x080000, 0x0e0000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x100000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x100000, 0x020000)
 	ROM_COPY( "user2", 0x0a0000, 0x120000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x140000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x140000, 0x020000)
 	ROM_COPY( "user2", 0x0c0000, 0x160000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x180000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x180000, 0x020000)
 	ROM_COPY( "user2", 0x0e0000, 0x1a0000, 0x020000)
 ROM_END
 
@@ -1687,19 +1687,19 @@ ROM_START( wbeachvl3 )
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x1c0000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user2", nullptr, 0x000000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
 	ROM_COPY( "user2", 0x020000, 0x020000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x040000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
 	ROM_COPY( "user2", 0x040000, 0x060000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x080000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
 	ROM_COPY( "user2", 0x060000, 0x0a0000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x0c0000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user2", 0x080000, 0x0e0000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x100000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x100000, 0x020000)
 	ROM_COPY( "user2", 0x0a0000, 0x120000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x140000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x140000, 0x020000)
 	ROM_COPY( "user2", 0x0c0000, 0x160000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x180000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x180000, 0x020000)
 	ROM_COPY( "user2", 0x0e0000, 0x1a0000, 0x020000)
 ROM_END
 
@@ -1736,11 +1736,11 @@ ROM_START( excelsr )
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0xc0000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user2", nullptr, 0x000000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
 	ROM_COPY( "user2", 0x020000, 0x020000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x040000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
 	ROM_COPY( "user2", 0x040000, 0x060000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x080000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
 	ROM_COPY( "user2", 0x060000, 0x0a0000, 0x020000)
 ROM_END
 
@@ -1777,11 +1777,11 @@ ROM_START( excelsra )
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0xc0000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user2", nullptr, 0x000000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
 	ROM_COPY( "user2", 0x020000, 0x020000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x040000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
 	ROM_COPY( "user2", 0x040000, 0x060000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x080000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
 	ROM_COPY( "user2", 0x060000, 0x0a0000, 0x020000)
 ROM_END
 
@@ -1815,10 +1815,10 @@ ROM_START( hrdtimes )
 	ROM_CONTINUE(             0x60000, 0x20000 )
 	ROM_CONTINUE(             0xa0000, 0x20000 )
 	ROM_CONTINUE(             0xe0000, 0x20000 )
-	ROM_COPY( "oki", nullptr, 0x20000, 0x20000 )
-	ROM_COPY( "oki", nullptr, 0x40000, 0x20000 )
-	ROM_COPY( "oki", nullptr, 0x80000, 0x20000 )
-	ROM_COPY( "oki", nullptr, 0xc0000, 0x20000 )
+	ROM_COPY( "oki", 0x000000, 0x20000, 0x20000 )
+	ROM_COPY( "oki", 0x000000, 0x40000, 0x20000 )
+	ROM_COPY( "oki", 0x000000, 0x80000, 0x20000 )
+	ROM_COPY( "oki", 0x000000, 0xc0000, 0x20000 )
 ROM_END
 
 /* Different revision of the PCB, uses larger gfx ROMs, however the content is the same */
@@ -1849,10 +1849,10 @@ ROM_START( hrdtimesa )
 	ROM_CONTINUE(             0x60000, 0x20000 )
 	ROM_CONTINUE(             0xa0000, 0x20000 )
 	ROM_CONTINUE(             0xe0000, 0x20000 )
-	ROM_COPY( "oki", nullptr, 0x20000, 0x20000 )
-	ROM_COPY( "oki", nullptr, 0x40000, 0x20000 )
-	ROM_COPY( "oki", nullptr, 0x80000, 0x20000 )
-	ROM_COPY( "oki", nullptr, 0xc0000, 0x20000 )
+	ROM_COPY( "oki", 0x000000, 0x20000, 0x20000 )
+	ROM_COPY( "oki", 0x000000, 0x40000, 0x20000 )
+	ROM_COPY( "oki", 0x000000, 0x80000, 0x20000 )
+	ROM_COPY( "oki", 0x000000, 0xc0000, 0x20000 )
 ROM_END
 
 /*
@@ -1929,8 +1929,8 @@ ROM_START( hotmind )
 	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "20.io13",      0x00000, 0x20000, CRC(0bf3a3e5) SHA1(2ae06f37a6bcd20bc5fbaa90d970aba2ebf3cf5a) )
 	ROM_CONTINUE(             0x60000, 0x20000 )
-	ROM_COPY( "oki", nullptr, 0x20000, 0x20000 )
-	ROM_COPY( "oki", nullptr, 0x40000, 0x20000 )
+	ROM_COPY( "oki", 0x000000, 0x20000, 0x20000 )
+	ROM_COPY( "oki", 0x000000, 0x40000, 0x20000 )
 
 	ROM_REGION( 0x8000, "plds", 0 )     /* These were read protected */
 	ROM_LOAD( "palce16v8h-25-pc4_u58.jed",   0x0000, 0xb89,  BAD_DUMP CRC(ba88c1da) SHA1(9b55e96eee44a467bdfbf760137ccb2fb3afedf0) )
@@ -1972,8 +1972,8 @@ ROM_START( luckboomh )
 	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "20.io13",      0x00000, 0x20000, CRC(0d42c0a3) SHA1(1b1d4c7dcbb063e8bf133063770b753947d1a017) )
 	ROM_CONTINUE(             0x60000, 0x20000 )
-	ROM_COPY( "oki", nullptr, 0x20000, 0x20000 )
-	ROM_COPY( "oki", nullptr, 0x40000, 0x20000 )
+	ROM_COPY( "oki", 0x000000, 0x20000, 0x20000 )
+	ROM_COPY( "oki", 0x000000, 0x40000, 0x20000 )
 ROM_END
 
 

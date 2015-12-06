@@ -1747,7 +1747,7 @@ static const gfx_layout fg_layout =
 };
 
 static GFXDECODE_START( gfxdecode )
-	GFXDECODE_ENTRY( nullptr,      0x4000, bg_ram_layout, 0, 1 )   /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0x0000,      0x4000, bg_ram_layout, 0, 1 )   /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "bgtiles", 0x0000, bg_rom_layout, 0, 1 )
 	GFXDECODE_ENTRY( "sprites", 0x0000, fg_layout,     0, 1 )
 GFXDECODE_END

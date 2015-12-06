@@ -313,7 +313,7 @@ ROM_START( battlane )
 
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* first half of da00-5 will be copied at 0x4000-0x7fff */
-	ROM_COPY( "user1", nullptr, 0x4000, 0x4000 )
+	ROM_COPY( "user1", 0x0000, 0x4000, 0x4000 )
 	ROM_LOAD( "da01-5",     0x8000, 0x8000, CRC(7a6c3f02) SHA1(bee1ee858f81453a53afc2d016f549924801b090) )
 
 	ROM_REGION( 0x10000, "sub", 0 )     /* 64K for slave CPU */
@@ -341,7 +341,7 @@ ROM_START( battlane2 )
 
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* first half of da00-3 will be copied at 0x4000-0x7fff */
-	ROM_COPY( "user1", nullptr, 0x4000, 0x4000 )
+	ROM_COPY( "user1", 0x0000, 0x4000, 0x4000 )
 	ROM_LOAD( "da01-3",     0x8000, 0x8000, CRC(d9e40800) SHA1(dc87ae0d8631c220dbbddbf0e49b6bdaeb635269) )
 
 	ROM_REGION( 0x10000, "sub", 0 )     /* 64K for slave CPU */
@@ -369,7 +369,7 @@ ROM_START( battlane3 )
 
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* first half of bl_04.rom will be copied at 0x4000-0x7fff */
-	ROM_COPY( "user1", nullptr, 0x4000, 0x4000 )
+	ROM_COPY( "user1", 0x0000, 0x4000, 0x4000 )
 	ROM_LOAD( "bl_05.rom",  0x8000, 0x8000, CRC(001c4bbe) SHA1(4320c0a85b5b3505ac7292673759e5288cf4187f) )
 
 	ROM_REGION( 0x10000, "sub", 0 )     /* 64K for slave CPU */

@@ -177,7 +177,7 @@ ROM_START( myarc_exp )
 	ROM_REGION(0x2000, DSRROM, 0)
 	ROM_LOAD("myarc512k_xb2.bin", 0x0000, 0x2000, CRC(41fbb96d) SHA1(4dc7fdfa46842957bcbb0cf2c37764e4bb6d877a)) /* DSR for Ramdisk etc. */
 	ROM_REGION(0x80000, RAMREGION, 0)
-	ROM_FILL(0x0000, 0x80000, nullptr)
+	ROM_FILL(0x0000, 0x80000, 0x00)
 ROM_END
 
 void myarc_memory_expansion_device::device_start()

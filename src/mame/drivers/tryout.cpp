@@ -185,7 +185,7 @@ static const gfx_layout spritelayout =
 static GFXDECODE_START( tryout )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 4 )
-	GFXDECODE_ENTRY( nullptr,   0, vramlayout,   0, 4 )
+	GFXDECODE_ENTRY( 0x0000,   0, vramlayout,   0, 4 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( tryout, tryout_state )

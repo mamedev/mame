@@ -633,7 +633,7 @@ ROM_START( gaplus ) /* Version 2 or 3 PCB */
 	ROM_LOAD( "gp2-12.11r", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
 	ROM_LOAD( "gp2-9.11m",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
 	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
-	ROM_FILL(               0xa000, 0x2000, nullptr )    // optional ROM, not used
+	ROM_FILL(               0xa000, 0x2000, 0x00 )    // optional ROM, not used
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "gp2-3.1p", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
@@ -674,7 +674,7 @@ ROM_START( gaplusa ) /* Version 2 or 3 PCB */
 	ROM_LOAD( "gp2-12.11r", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
 	ROM_LOAD( "gp2-9.11m",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
 	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
-	ROM_FILL(               0xa000, 0x2000, nullptr )    // optional ROM, not used
+	ROM_FILL(               0xa000, 0x2000, 0x00 )    // optional ROM, not used
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "gp2-3.1p", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
@@ -715,7 +715,7 @@ ROM_START( gaplusd ) /* Alternate hardware */
 	ROM_LOAD( "gp2-12.11r", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
 	ROM_LOAD( "gp2-9.11m",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
 	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
-	ROM_FILL(               0xa000, 0x2000, nullptr )    // optional ROM, not used
+	ROM_FILL(               0xa000, 0x2000, 0x00 )    // optional ROM, not used
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "gp2-3.1p", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
@@ -756,7 +756,7 @@ ROM_START( gaplust ) /* Tecfri PCB */
 	ROM_LOAD( "gp2-12.11r", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
 	ROM_LOAD( "gp2-9.11m",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
 	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
-	ROM_FILL(               0xa000, 0x2000, nullptr )    // optional ROM, not used
+	ROM_FILL(               0xa000, 0x2000, 0x00 )    // optional ROM, not used
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "gp2-3.1p", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
@@ -797,7 +797,7 @@ ROM_START( galaga3 ) /* Version 2 or 3 PCB */
 	ROM_LOAD( "gp2-12.11r", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
 	ROM_LOAD( "gp2-9.11m",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
 	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
-	ROM_FILL(               0xa000, 0x2000, nullptr )    // optional ROM, not used
+	ROM_FILL(               0xa000, 0x2000, 0x00 )    // optional ROM, not used
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "gp2-3.1p", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
@@ -838,7 +838,7 @@ ROM_START( galaga3a ) /* Version 2 or 3 PCB */
 	ROM_LOAD( "gp2-12.11r", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
 	ROM_LOAD( "gp2-9.11m",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
 	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
-	ROM_FILL(               0xa000, 0x2000, nullptr )    // optional ROM, not used
+	ROM_FILL(               0xa000, 0x2000, 0x00 )    // optional ROM, not used
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "gp2-3.1p", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
@@ -879,7 +879,7 @@ ROM_START( galaga3b ) /* Version 2 or 3 PCB */
 	ROM_LOAD( "gp2-12.11r", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
 	ROM_LOAD( "gp2-9.11m",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
 	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
-	ROM_FILL(               0xa000, 0x2000, nullptr )    // optional ROM, not used
+	ROM_FILL(               0xa000, 0x2000, 0x00 )    // optional ROM, not used
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "gp2-3.1p", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
@@ -921,7 +921,7 @@ ROM_START( galaga3c ) /* Version (AKA Midway) 1 PCB */
 	ROM_LOAD( "gp2-12.5k", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
 	ROM_LOAD( "gp2-9.5n",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
 	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
-	ROM_FILL(              0xa000, 0x2000, nullptr )    // optional ROM, not used
+	ROM_FILL(              0xa000, 0x2000, 0x00 )    // optional ROM, not used
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "gp2-3.1c", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
@@ -959,7 +959,7 @@ ROM_START( galaga3m ) /* Version (AKA Midway) 1 PCB */
 	ROM_LOAD( "gp2-12.5k", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
 	ROM_LOAD( "gp2-9.5n",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
 	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
-	ROM_FILL(              0xa000, 0x2000, nullptr )    // optional ROM, not used
+	ROM_FILL(              0xa000, 0x2000, 0x00 )    // optional ROM, not used
 
 	ROM_REGION( 0x0800, "proms", 0 )
 	ROM_LOAD( "gp2-3.1c", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */

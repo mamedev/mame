@@ -626,8 +626,8 @@ ROM_START( powerbal )
 	ROM_LOAD( "1.u16",        0x00000, 0x40000, CRC(12776dbc) SHA1(9ab9930fd581296642834d2cb4ba65264a588af3) )
 	ROM_CONTINUE(             0x60000, 0x20000 )
 	ROM_CONTINUE(             0xa0000, 0x20000 )
-	ROM_COPY( "oki",  nullptr, 0x40000, 0x20000)
-	ROM_COPY( "oki",  nullptr, 0x80000, 0x20000)
+	ROM_COPY( "oki",  0x000000, 0x40000, 0x20000)
+	ROM_COPY( "oki",  0x000000, 0x80000, 0x20000)
 
 	ROM_REGION( 0x1200, "plds", 0 )
 	ROM_LOAD( "palce16v8h.u102",  0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */

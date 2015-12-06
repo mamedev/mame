@@ -190,7 +190,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( mogura )
-	GFXDECODE_ENTRY( nullptr, 0, tiles8x8_layout, 0, 8 )
+	GFXDECODE_ENTRY( 0x0000, 0, tiles8x8_layout, 0, 8 )
 GFXDECODE_END
 
 void mogura_state::machine_start()

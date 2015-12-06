@@ -330,7 +330,7 @@ ROM_START( binbug )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "6574.bin", 0x0000, 0x0800, CRC(fd75df4f) SHA1(4d09aae2f933478532b7d3d1a2dee7123d9828ca) )
-	ROM_FILL(0, 16, nullptr)
+	ROM_FILL(0, 16, 0x00)
 ROM_END
 
 /* Driver */
@@ -462,7 +462,7 @@ static const z80_daisy_config dg680_daisy_chain[] =
 {
 	{ "z80ctc" },
 	{ "z80pio" },
-	{ nullptr }
+	{ 0x00 }
 };
 
 

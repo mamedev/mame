@@ -1782,9 +1782,9 @@ ROM_START( x68000 )
 	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
 	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(4) )
 	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
-	ROM_FILL(0x0000,0x8000,nullptr)
+	ROM_FILL(0x0000,0x8000,0x00)
 	ROM_REGION(0x20000, "user2", 0)
-	ROM_FILL(0x000,0x20000,nullptr)
+	ROM_FILL(0x000,0x20000,0x00)
 ROM_END
 
 ROM_START( x68ksupr )
@@ -1802,9 +1802,9 @@ ROM_START( x68ksupr )
 	ROM_LOAD("scsiinsu.bin",0xfc0000, 0x002000, CRC(f65a3e24) SHA1(15a17798839a3f7f361119205aebc301c2df5967) )  // Dumped from an X68000 Super HD
 //  ROM_LOAD("scsiexrom.dat",0xea0000, 0x002000, NO_DUMP )
 	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
-	ROM_FILL(0x0000,0x8000,nullptr)
+	ROM_FILL(0x0000,0x8000,0x00)
 	ROM_REGION(0x20000, "user2", 0)
-	ROM_FILL(0x000,0x20000,nullptr)
+	ROM_FILL(0x000,0x20000,0x00)
 ROM_END
 
 ROM_START( x68kxvi )
@@ -1822,9 +1822,9 @@ ROM_START( x68kxvi )
 	ROM_LOAD("scsiinco.bin",0xfc0000, 0x002000, CRC(2485e14d) SHA1(101a9bba8ea4bb90965c144bcfd7182f889ab958) )  // Dumped from an X68000 XVI Compact
 //  ROM_LOAD("scsiexrom.dat",0xea0000, 0x002000, NO_DUMP )
 	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
-	ROM_FILL(0x0000,0x8000,nullptr)
+	ROM_FILL(0x0000,0x8000,0x00)
 	ROM_REGION(0x20000, "user2", 0)
-	ROM_FILL(0x000,0x20000,nullptr)
+	ROM_FILL(0x000,0x20000,0x00)
 ROM_END
 
 ROM_START( x68030 )
@@ -1842,9 +1842,9 @@ ROM_START( x68030 )
 	ROM_LOAD("scsiinrom.dat",0xfc0000, 0x002000, CRC(1c6c889e) SHA1(3f063d4231cdf53da6adc4db96533725e260076a) BAD_DUMP )
 //  ROM_LOAD("scsiexrom.dat",0xea0000, 0x002000, NO_DUMP )
 	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
-	ROM_FILL(0x0000,0x8000,nullptr)
+	ROM_FILL(0x0000,0x8000,0x00)
 	ROM_REGION(0x20000, "user2", 0)
-	ROM_FILL(0x000,0x20000,nullptr)
+	ROM_FILL(0x000,0x20000,0x00)
 ROM_END
 
 

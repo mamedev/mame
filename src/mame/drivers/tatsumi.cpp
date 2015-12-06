@@ -832,7 +832,7 @@ GFXDECODE_END
 
 static GFXDECODE_START( roundup5 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 1024, 256)
-	GFXDECODE_ENTRY( nullptr, 0, roundup5_vramlayout, 0, 16)
+	GFXDECODE_ENTRY( 0x0000, 0, roundup5_vramlayout, 0, 16)
 GFXDECODE_END
 
 static GFXDECODE_START( cyclwarr )

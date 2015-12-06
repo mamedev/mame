@@ -2100,7 +2100,7 @@ ROM_START( cpokerx )
 
 	//copy?
 	ROM_REGION( 0x60000, "gfx2", 0 )
-	ROM_COPY( "gfx1", nullptr, 0, 0x60000 )
+	ROM_COPY( "gfx1", 0x000000, 0, 0x60000 )
 
 	ROM_REGION( 0x4000, "plds", 0 )
 	ROM_LOAD( "16v8b.u31",  0x00000, 0x000892, BAD_DUMP CRC(33dec5f5) SHA1(f5c2e45513fa3657160ff38111a745f76cf679e1) )  // all 0's, seems protected

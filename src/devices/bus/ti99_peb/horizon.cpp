@@ -434,7 +434,7 @@ ROM_START( horizon )
 	ROM_REGION(MAXRAM_SIZE, NVRAMREGION, 0)
 	ROM_FILL(0x0000, MAXRAM_SIZE, nullptr)
 	ROM_REGION(0x8000, RAMREGION, 0)
-	ROM_FILL(0x0000, 0x8000, nullptr)
+	ROM_FILL(0x0000, 0x8000, 0x00)
 ROM_END
 
 const rom_entry *horizon_ramdisk_device::device_rom_region() const

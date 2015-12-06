@@ -997,7 +997,7 @@ ROM_START( ninjaw )
 	ROM_LOAD( "b31-04.173", 0x180000, 0x80000, CRC(2e1e4cb5) SHA1(4733cfc015a68e021108a9e1e8ea807b0e7eac7a) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_COPY( "gfx1", nullptr, 0x000000, 0x100000 )    /* SCR (screens 2+) */
+	ROM_COPY( "gfx1", 0x000000, 0x000000, 0x100000 )    /* SCR (screens 2+) */
 
 /* The actual board duplicates the SCR gfx roms for 2nd/3rd TC0100SCN */
 //  ROM_LOAD( "b31-01.26", 0x00000, 0x80000, CRC(8e8237a7) SHA1(3e181a153d9b4b7f6a620614ea9022285583a5b5) ) /* SCR (screen 2) */
@@ -1052,7 +1052,7 @@ ROM_START( ninjawu )
 	ROM_LOAD( "b31-04.173", 0x180000, 0x80000, CRC(2e1e4cb5) SHA1(4733cfc015a68e021108a9e1e8ea807b0e7eac7a) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_COPY( "gfx1", nullptr, 0x000000, 0x100000 )    /* SCR (screens 2+) */
+	ROM_COPY( "gfx1", 0x000000, 0x000000, 0x100000 )    /* SCR (screens 2+) */
 
 /* The actual board duplicates the SCR gfx roms for 2nd/3rd TC0100SCN */
 //  ROM_LOAD( "b31-01.26", 0x00000, 0x80000, CRC(8e8237a7) SHA1(3e181a153d9b4b7f6a620614ea9022285583a5b5) ) /* SCR (screen 2) */
@@ -1107,7 +1107,7 @@ ROM_START( ninjawj )
 	ROM_LOAD( "b31-04.173", 0x180000, 0x80000, CRC(2e1e4cb5) SHA1(4733cfc015a68e021108a9e1e8ea807b0e7eac7a) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_COPY( "gfx1", nullptr, 0x000000, 0x100000 )    /* SCR (screens 2+) */
+	ROM_COPY( "gfx1", 0x000000, 0x000000, 0x100000 )    /* SCR (screens 2+) */
 
 /* The actual board duplicates the SCR gfx roms for 2nd/3rd TC0100SCN */
 //  ROM_LOAD( "b31-01.26", 0x00000, 0x80000, CRC(8e8237a7) SHA1(3e181a153d9b4b7f6a620614ea9022285583a5b5) ) /* SCR (screen 2) */
@@ -1160,7 +1160,7 @@ ROM_START( darius2 )
 	ROM_LOAD( "c07-02", 0x80000, 0x80000, CRC(75d16d4b) SHA1(795423278b66eca41accce1f8a4425d65af7b629) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_COPY( "gfx1", nullptr, 0x000000, 0x100000 )    /* SCR (screens 2+) */
+	ROM_COPY( "gfx1", 0x000000, 0x000000, 0x100000 )    /* SCR (screens 2+) */
 
 	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c07-10.95", 0x00000, 0x80000, CRC(4bbe0ed9) SHA1(081b73c4e4d4fa548445e5548573099bcb1e9213) )

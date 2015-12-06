@@ -8226,7 +8226,7 @@ ROM_START( pacmanbla ) /* content is the same as the above bootleg, but arranged
 	ROM_COPY( "tempgfx", 0x1800, 0x0800, 0x0800 )
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_COPY( "tempgfx", nullptr, 0x0000, 0x0800 )
+	ROM_COPY( "tempgfx", 0x0000, 0x0000, 0x0800 )
 	ROM_COPY( "tempgfx", 0x1000, 0x0800, 0x0800 )
 
 	ROM_REGION( 0x0020, "proms", 0 )

@@ -235,7 +235,7 @@ ROM_START( m4firebld ) // looks weird, bad dump?
 	// reports src/mame/drivers/mpu4.c: m4firebld has ROM fba2_6 extending past the defined memory region (bug)
 	//ROM_LOAD( "fba2_6", 0x0000, 0x010000, CRC(cf16b2d0) SHA1(32249fb15708dfa408c4642be7a41fba7aeda657) )
 	//ROM_IGNORE(0x070000)
-	ROM_COPY( "temp", nullptr, 0x0000, 0x010000 )
+	ROM_COPY( "temp", 0x0000, 0x0000, 0x010000 )
 ROM_END
 
 

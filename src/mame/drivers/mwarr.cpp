@@ -637,13 +637,13 @@ ROM_START( mwarr )
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x100000, "oki2", 0 ) /* Samples */
-	ROM_COPY( "user1", nullptr, 0x000000, 0x020000)
-	ROM_COPY( "user1", nullptr, 0x020000, 0x020000)
-	ROM_COPY( "user1", nullptr, 0x040000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x020000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
 	ROM_COPY( "user1", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "user1", nullptr, 0x080000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
 	ROM_COPY( "user1", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "user1", nullptr, 0x0c0000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user1", 0x060000, 0x0e0000, 0x020000)
 ROM_END
 

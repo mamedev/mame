@@ -289,10 +289,10 @@ static const gfx_layout scorelayout =
 
 static GFXDECODE_START( ace )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 2 )
-	GFXDECODE_ENTRY( nullptr, 0x8000, charlayout0, 0, 2 ) /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( nullptr, 0x8000, charlayout1, 0, 2 ) /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( nullptr, 0x8000, charlayout2, 0, 2 ) /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( nullptr, 0x8000, scorelayout, 0, 2 ) /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0x0000, 0x8000, charlayout0, 0, 2 ) /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0x0000, 0x8000, charlayout1, 0, 2 ) /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0x0000, 0x8000, charlayout2, 0, 2 ) /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0x0000, 0x8000, scorelayout, 0, 2 ) /* the game dynamically modifies this */
 GFXDECODE_END
 
 void aceal_state::ace_postload()

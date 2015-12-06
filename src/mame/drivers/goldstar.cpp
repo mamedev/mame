@@ -10414,7 +10414,7 @@ ROM_START( skill98 )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -10465,7 +10465,7 @@ ROM_START( schery97 )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -10516,7 +10516,7 @@ ROM_START( schery97a )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -10560,7 +10560,7 @@ ROM_START( roypok96 )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -10602,7 +10602,7 @@ ROM_START( roypok96a )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -10643,7 +10643,7 @@ ROM_START( roypok96b )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -10684,7 +10684,7 @@ ROM_START( pokonl97 )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -10735,7 +10735,7 @@ ROM_START( nfb96 )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -10785,7 +10785,7 @@ ROM_START( nfb96a )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -10837,7 +10837,7 @@ ROM_START( nfb96b )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -10882,7 +10882,7 @@ ROM_START( nfb96c )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -10927,7 +10927,7 @@ ROM_START( nfb96txt )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -10971,7 +10971,7 @@ ROM_START( nc96 )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -11012,7 +11012,7 @@ ROM_START( nc96a )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -11053,7 +11053,7 @@ ROM_START( nc96b )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -11094,7 +11094,7 @@ ROM_START( nc96c )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -11135,7 +11135,7 @@ ROM_START( nc96d )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -11176,7 +11176,7 @@ ROM_START( nc96e )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -11217,7 +11217,7 @@ ROM_START( nc96f )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -11257,7 +11257,7 @@ ROM_START( nc96txt )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	// no proms present, using nfb96 ones
@@ -11302,7 +11302,7 @@ ROM_START( match98 )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
@@ -11352,7 +11352,7 @@ ROM_START( fb2010 )
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", nullptr, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette

@@ -1341,7 +1341,7 @@ ROM_START( ct386sx )
 	ROM_SYSTEM_BIOS(0, "neatsx", "NEATsx 386sx")
 	ROMX_LOAD("012l-u25.bin", 0xf0000, 0x8000, CRC(4ab1862d) SHA1(d4e8d0ff43731270478ca7671a129080ff350a4f),ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD("012h-u24.bin", 0xf0001, 0x8000, CRC(17472521) SHA1(7588c148fe53d9dc4cb2d0ab6e0fd51a39bb5d1a),ROM_SKIP(1) | ROM_BIOS(1) )
-	ROM_FILL(0xfe2c9, 1, nullptr) // skip incompatible keyboard controller test
+	ROM_FILL(0xfe2c9, 1, 0x00) // skip incompatible keyboard controller test
 	ROM_FILL(0xfe2cb, 1, 0xbb) // fix checksum
 ROM_END
 

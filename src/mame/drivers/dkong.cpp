@@ -1891,7 +1891,7 @@ ROM_START( radarscp )
 	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "trs2s3i",      0x0000, 0x0800, CRC(78034f14) SHA1(548b44ac69f39df6687da1c0f60968009b1e0767) )
 	ROM_RELOAD(               0x0800, 0x0800 )
-	ROM_FILL(                 0x1000, 0x0800, nullptr )
+	ROM_FILL(                 0x1000, 0x0800, 0x00 )
 	/* socket 3J is empty */
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
@@ -2998,7 +2998,7 @@ ROM_START( drakton )
 	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
 	ROM_LOAD( "2716.3h",      0x0000, 0x0800, CRC(3489a35b) SHA1(9ebcf4b20b212d54e6b1a6d9abbda3109298631b) ) /* dkong */
 	ROM_RELOAD(               0x0800, 0x0800 )
-	ROM_FILL(                 0x1000, 0x0800, nullptr )
+	ROM_FILL(                 0x1000, 0x0800, 0x00 )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "2716.3n",      0x0000, 0x0800, CRC(ea0e7f9a) SHA1(a8e2b43e15281d45e414eaae98e5248bad79c41b) )

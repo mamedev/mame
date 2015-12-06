@@ -414,7 +414,7 @@ static INPUT_PORTS_START( playboy )
 	PORT_DIPSETTING(    0x40, "Extra Ball or Special Held Until Collected")
 
 	PORT_MODIFY("X0")   /* Drop Target switches */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, drop_target_x0, (void *)nullptr) // PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, drop_target_x0, (void *)0x00) // PORT_CODE(KEYCODE_STOP)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, drop_target_x0, (void *)0x01) // PORT_CODE(KEYCODE_SLASH)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, drop_target_x0, (void *)0x02) // PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, by35_state, drop_target_x0, (void *)0x03) // PORT_CODE(KEYCODE_CLOSEBRACE)
@@ -2193,7 +2193,7 @@ ROM_START(skflight)
 	ROM_RELOAD(0x28000, 0x8000)
 	ROM_RELOAD(0x38000, 0x8000)
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_COPY("sound1", nullptr, 0x8000,0x8000)
+	ROM_COPY("sound1", 0x0000, 0x8000,0x8000)
 ROM_END
 
 /*--------------------------------
@@ -2216,7 +2216,7 @@ ROM_START(cobrap)
 	ROM_LOAD("snd_u11.256",0x18000,0x8000, CRC(d4da383c) SHA1(032a4a425936d5c822fba6e46483f03a87c1a6ec))
 	ROM_RELOAD(0x38000, 0x8000)
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_COPY("sound1", nullptr, 0x8000,0x8000)
+	ROM_COPY("sound1", 0x0000, 0x8000,0x8000)
 ROM_END
 
 /*--------------------------------
@@ -2243,7 +2243,7 @@ ROM_START(futrquen)
 	ROM_LOAD("snd_u11.bin",0x18000,0x8000, CRC(71d98d17) SHA1(9575b80a91a67b1644e909f70d364e0a75f73b02))
 	ROM_RELOAD(0x38000, 0x8000)
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_COPY("sound1", nullptr, 0x8000,0x8000)
+	ROM_COPY("sound1", 0x0000, 0x8000,0x8000)
 ROM_END
 /*--------------------------------
 / F1 Grand Prix
@@ -2267,7 +2267,7 @@ ROM_START(f1gpp)
 	ROM_LOAD("snd_u11a",0x38000,0x8000, CRC(884dc754) SHA1(b121476ea621eae7a7ba0b9a1b5e87051e1e9e3d))
 	ROM_LOAD("snd_u11b",0x18000,0x8000, CRC(2394b498) SHA1(bf0884a6556a27791e7e801051be5975dd6b95c4))
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_COPY("sound1", nullptr, 0x8000,0x8000)
+	ROM_COPY("sound1", 0x0000, 0x8000,0x8000)
 ROM_END
 
 /*--------------------------------
@@ -2294,7 +2294,7 @@ ROM_START(toppin)
 	ROM_LOAD("snd_u11.bin",0x18000,0x8000, CRC(1814a50d) SHA1(6fe22e774fa90725d0db9f1020bad88bae0ef85c))
 	ROM_RELOAD(0x38000, 0x8000)
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_COPY("sound1", nullptr, 0x8000,0x8000)
+	ROM_COPY("sound1", 0x0000, 0x8000,0x8000)
 ROM_END
 
 /*--------------------------------
@@ -2319,7 +2319,7 @@ ROM_START(uboat65)
 	ROM_RELOAD(0x28000, 0x8000)
 	ROM_RELOAD(0x38000, 0x8000)
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_COPY("sound1", nullptr, 0x8000,0x8000)
+	ROM_COPY("sound1", 0x0000, 0x8000,0x8000)
 ROM_END
 /*--------------------------------
 / Big Ball Bowling (Bowler)

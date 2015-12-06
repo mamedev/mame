@@ -520,7 +520,7 @@ ROM_START( macsbios )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   nullptr, 0x000000, 0x400000 ) // Bios
+	ROM_COPY( "user1",   0x000000, 0x000000, 0x400000 ) // Bios
 ROM_END
 
 ROM_START( mac2bios )
@@ -529,7 +529,7 @@ ROM_START( mac2bios )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   nullptr, 0x000000, 0x400000 ) // Bios
+	ROM_COPY( "user1",   0x000000, 0x000000, 0x400000 ) // Bios
 ROM_END
 
 ROM_START( kisekaem )
@@ -545,8 +545,8 @@ ROM_START( kisekaem )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   nullptr, 0x000000, 0x400000 ) // Bios
-	ROM_COPY( "user2",   nullptr, 0x400000, 0x400000 ) // Slot A
+	ROM_COPY( "user1",   0x000000, 0x000000, 0x400000 ) // Bios
+	ROM_COPY( "user2",   0x000000, 0x400000, 0x400000 ) // Slot A
 ROM_END
 
 ROM_START( kisekaeh )
@@ -562,8 +562,8 @@ ROM_START( kisekaeh )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   nullptr, 0x000000, 0x400000 ) // Bios
-	ROM_COPY( "user2",   nullptr, 0x400000, 0x400000 ) // Slot A
+	ROM_COPY( "user1",   0x000000, 0x000000, 0x400000 ) // Bios
+	ROM_COPY( "user2",   0x000000, 0x400000, 0x400000 ) // Slot A
 ROM_END
 
 ROM_START( cultname ) // uses printer - two different games ? (slot a - checks for printer, slot b - not)
@@ -584,9 +584,9 @@ ROM_START( cultname ) // uses printer - two different games ? (slot a - checks f
 
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   nullptr, 0x000000, 0x400000 ) // Bios
-	ROM_COPY( "user2",   nullptr, 0x400000, 0x400000 ) // Slot A
-	ROM_COPY( "user3",   nullptr, 0x800000, 0x400000 ) // Slot B
+	ROM_COPY( "user1",   0x000000, 0x000000, 0x400000 ) // Bios
+	ROM_COPY( "user2",   0x000000, 0x400000, 0x400000 ) // Slot A
+	ROM_COPY( "user3",   0x000000, 0x800000, 0x400000 ) // Slot B
 ROM_END
 
 /* these are listed as MACS2 sub-boards, is it the same?  - it's not ;) */
@@ -603,7 +603,7 @@ ROM_START( yuka )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASE00 ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user2",   nullptr, 0x000000, 0x400000 ) // Slot A
+	ROM_COPY( "user2",   0x000000, 0x000000, 0x400000 ) // Slot A
 ROM_END
 
 ROM_START( yujan )
@@ -618,7 +618,7 @@ ROM_START( yujan )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user2",   nullptr, 0x000000, 0x400000 ) // Slot A
+	ROM_COPY( "user2",   0x000000, 0x000000, 0x400000 ) // Slot A
 ROM_END
 
 #if 0

@@ -294,7 +294,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( trvmadns )
-	GFXDECODE_ENTRY( nullptr, 0x6000, charlayout, 0, 4 ) // doesn't matter where we point this, all the tiles are decoded while the game runs
+	GFXDECODE_ENTRY( 0x0000, 0x6000, charlayout, 0, 4 ) // doesn't matter where we point this, all the tiles are decoded while the game runs
 GFXDECODE_END
 
 TILE_GET_INFO_MEMBER(trvmadns_state::get_bg_tile_info)

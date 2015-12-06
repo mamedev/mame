@@ -1031,7 +1031,7 @@ ROM_START( kingdrby )
 	ROM_LOAD( "im1_yk.g1", 0x0000, 0x1000, CRC(1921605d) SHA1(0aa6f7195ea59d0080620ab02a737e5c319dd3e7) )
 	ROM_LOAD( "im2_yk.f1", 0x1000, 0x1000, CRC(8504314e) SHA1(309645e17fb3149dce57ae6844cc58652a1eeb35) )
 	ROM_LOAD( "im3_yk.e1", 0x2000, 0x1000, CRC(b0e473ec) SHA1(234598548b2a2a8f53d40bc07c3b1759074b7d93) )
-	ROM_COPY( "soundcpu", nullptr, 0x3000, 0x1000 )
+	ROM_COPY( "soundcpu", 0x0000, 0x3000, 0x1000 )
 
 	/* sprites gfxs */
 	ROM_REGION( 0x8000, "gfx1", 0 )
@@ -1162,7 +1162,7 @@ ROM_START( kingdrbb2 )
 	ROM_LOAD( "h1", 0x0000, 0x1000, CRC(444aa020) SHA1(0d40e9499892177b4d8123ad7b6909e8f6e0c8ab) )
 	ROM_LOAD( "h2", 0x1000, 0x1000, CRC(4102d356) SHA1(d9eb2dcc7cbbe2449fe41ef5eef0470d4dcac0c8) )
 	ROM_LOAD( "h3", 0x2000, 0x1000, CRC(b5a95093) SHA1(dd3e0742042fab113092664bde0e1215d009d861) )
-	ROM_COPY( "soundcpu", nullptr, 0x3000, 0x1000 )
+	ROM_COPY( "soundcpu", 0x0000, 0x3000, 0x1000 )
 
 	/* sprites gfxs */
 	ROM_REGION( 0x8000, "gfx1", 0 ) // kingdrby sprites, smaller top roms

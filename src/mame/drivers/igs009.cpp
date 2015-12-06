@@ -952,7 +952,7 @@ ROM_START( gp98 )
 	ROM_LOAD( "51", 0x100000, 0x80000, CRC(30a2ef85) SHA1(38ea637acd83b175eccd2969ef21879265b88992) )
 
 	ROM_REGION( 0xc0000, "reels", 0 )
-	ROM_COPY( "tempgfx", nullptr, 0x00000, 0x40000 )
+	ROM_COPY( "tempgfx", 0x000000, 0x00000, 0x40000 )
 	ROM_COPY( "tempgfx", 0x080000, 0x40000, 0x40000 )
 	ROM_COPY( "tempgfx", 0x100000, 0x80000, 0x40000 )
 

@@ -107,7 +107,7 @@ WRITE8_MEMBER(sams_memory_expansion_device::cruwrite)
 
 ROM_START( sams_card )
 	ROM_REGION(0x100000, RAMREGION, 0)
-	ROM_FILL(0x0000, 0x100000, nullptr)
+	ROM_FILL(0x0000, 0x100000, 0x00)
 ROM_END
 
 void sams_memory_expansion_device::device_start()

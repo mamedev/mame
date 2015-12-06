@@ -201,7 +201,7 @@ ROM_START( uts20 )
 	ROM_LOAD( "uts20e.rom", 0x4000, 0x1000, CRC(0dfc8062) SHA1(cd681020bfb4829d4cebaf1b5bf618e67b55bda3) )
 	ROM_FILL(0x2bd,1,0xaf) // test 2
 	ROM_FILL(0x3c1,2,0xaf) // test 5
-	ROM_FILL(0x928,1,nullptr)
+	ROM_FILL(0x928,1,0x00)
 
 	/* character generator not dumped, using the one from 'c10' for now */
 	ROM_REGION( 0x2000, "chargen", 0 )

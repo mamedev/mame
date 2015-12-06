@@ -1739,7 +1739,7 @@ ROM_START( galgbios )
 	GALGAMES_BIOS_ROMS
 
 	ROM_REGION( 0x200000, "blitter", 0 )
-	ROM_COPY( "maincpu", nullptr, 0, 0x200000 )
+	ROM_COPY( "maincpu", 0x00000, 0, 0x200000 )
 
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE )
 	// RAM, filled by the 68000 and fed to the OKI
@@ -1772,7 +1772,7 @@ ROM_START( galgame2 )
 	ROM_LOAD( "namco.u4", 0x000, 0x9db, CRC(63ec1224) SHA1(2966b2aa431e6b8d46cbba18a6fc4de7395caa04) )
 
 	ROM_REGION( 0x200000 * 2, "blitter", 0 )
-	ROM_COPY( "maincpu", nullptr, 0, 0x200000 * 2 )
+	ROM_COPY( "maincpu", 0x00000, 0, 0x200000 * 2 )
 
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE )
 	// RAM, filled by the 68000 and fed to the OKI

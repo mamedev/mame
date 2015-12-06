@@ -1792,7 +1792,7 @@ ROM_START( fcrash )
 	ROMX_LOAD( "17.bin",     0x180003, 0x20000, CRC(c59a4d6c) SHA1(59e49c7d24dd333007de4bb621050011a5392bcc) , ROM_SKIP(3) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_COPY( "gfx", nullptr, 0x000000, 0x8000 )   /* stars */
+	ROM_COPY( "gfx", 0x000000, 0x000000, 0x8000 )   /* stars */
 ROM_END
 
 ROM_START( ffightbl )
@@ -1811,7 +1811,7 @@ ROM_START( ffightbl )
 	ROMX_LOAD( "fg-a.bin",     0x000003, 0x80000, CRC(16a89b2c) SHA1(4d0e1ec6ae9a2bd31fa77140532bbce64d3874e9) , ROM_SKIP(3) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_COPY( "gfx", nullptr, 0x000000, 0x8000 )   /* stars */
+	ROM_COPY( "gfx", 0x000000, 0x000000, 0x8000 )   /* stars */
 ROM_END
 
 // this is identical to the Final Crash bootleg but without the modified gfx.
@@ -1852,7 +1852,7 @@ ROM_START( ffightbla )
 	ROMX_LOAD( "17.bin",     0x180003, 0x20000, CRC(c59a4d6c) SHA1(59e49c7d24dd333007de4bb621050011a5392bcc) , ROM_SKIP(3) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_COPY( "gfx", nullptr, 0x000000, 0x8000 )   /* stars */
+	ROM_COPY( "gfx", 0x000000, 0x000000, 0x8000 )   /* stars */
 ROM_END
 
 
@@ -1914,7 +1914,7 @@ ROM_START( kodb )
 	ROMX_LOAD( "bi.ic94",   0x000007, 0x80000, CRC(4a1b43fe) SHA1(7957f45b2862825c9509043c63c7da7108bd251b), ROM_SKIP(7) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_COPY( "gfx", nullptr, 0x000000, 0x8000 )   /* stars */
+	ROM_COPY( "gfx", 0x000000, 0x000000, 0x8000 )   /* stars */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "2.ic19",      0x00000, 0x40000, CRC(a2db1575) SHA1(1a4a29e4b045af50700adf1665697feab12cc234) )

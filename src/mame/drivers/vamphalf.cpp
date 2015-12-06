@@ -2162,13 +2162,13 @@ ROM_START( finalgdr ) /* version 2.20.5915, Korea only */
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user2", nullptr, 0x000000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x020000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x040000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x020000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
 	ROM_COPY( "user2", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x080000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
 	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x0c0000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
 ROM_END
 
@@ -2280,13 +2280,13 @@ ROM_START( mrkickera )
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user2", nullptr, 0x000000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x020000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x040000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x020000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
 	ROM_COPY( "user2", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x080000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
 	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x0c0000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* Default EEPROM (it doesn't boot without and the game code crashes) (game also refuses to boot if program attempts to rewrite it, CPU bug or protection?) */
@@ -2314,13 +2314,13 @@ ROM_START( mrkicker )
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user2", nullptr, 0x000000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x020000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x040000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x020000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
 	ROM_COPY( "user2", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x080000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
 	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x0c0000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
 ROM_END
 
@@ -2392,13 +2392,13 @@ ROM_START( aoh )
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x100000, "oki_2", 0 ) /* Samples */
-	ROM_COPY( "user2", nullptr, 0x000000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x020000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x040000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x020000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
 	ROM_COPY( "user2", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x080000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
 	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x0c0000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
 ROM_END
 
@@ -2445,21 +2445,21 @@ ROM_START( boonggab )
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x200000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user2", nullptr, 0x000000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x020000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x040000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x020000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
 	ROM_COPY( "user2", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x080000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
 	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x0c0000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x100000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x100000, 0x020000)
 	ROM_COPY( "user2", 0x080000, 0x120000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x140000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x140000, 0x020000)
 	ROM_COPY( "user2", 0x0a0000, 0x160000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x180000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x180000, 0x020000)
 	ROM_COPY( "user2", 0x0c0000, 0x1a0000, 0x020000)
-	ROM_COPY( "user2", nullptr, 0x1c0000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x1c0000, 0x020000)
 	ROM_COPY( "user2", 0x0e0000, 0x1e0000, 0x020000)
 ROM_END
 

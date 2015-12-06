@@ -684,7 +684,7 @@ ROM_START( bwg_fdc )
 	ROM_REGION(0x8000, DSRROM, 0)
 	ROM_LOAD("bwg.bin", 0x0000, 0x8000, CRC(06f1ec89) SHA1(6ad77033ed268f986d9a5439e65f7d391c4b7651)) /* BwG disk DSR ROM */
 	ROM_REGION(0x0800, BUFFER, 0)  /* BwG RAM buffer */
-	ROM_FILL(0x0000, 0x0400, nullptr)
+	ROM_FILL(0x0000, 0x0400, 0x00)
 ROM_END
 
 machine_config_constructor snug_bwg_device::device_mconfig_additions() const

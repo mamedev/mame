@@ -533,7 +533,7 @@ ROM_START( wmg )
 	ROM_FILL( 0x2f81d, 1, 0xba )
 	ROM_FILL( 0x2e0b7, 1, 0x7e )
 	ROM_FILL( 0x2e0b8, 1, 0xf8 )
-	ROM_FILL( 0x2e0b9, 1, nullptr )
+	ROM_FILL( 0x2e0b9, 1, 0x00 )
 
 	ROM_REGION( 0x18000, "soundcpu", 0 )
 	ROM_LOAD( "wmg.snd",         0x10000, 0x8000, CRC(1d08990e) SHA1(7bfb29426b3876f113e6ec3bc6c2fce9d2d1eb0c) )

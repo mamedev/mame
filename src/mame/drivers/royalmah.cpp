@@ -3782,7 +3782,7 @@ ROM_START( daisyari )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "1a.bin",     0x00000, 0x10000, CRC(7d14f90c) SHA1(742684d0785a93a45de0467e004db00531d016e2) )
 	/* bank switched ROMs follow */
-	ROM_COPY( "maincpu",    nullptr, 0x10000, 0x10000 )
+	ROM_COPY( "maincpu",    0x00000, 0x10000, 0x10000 )
 	ROM_LOAD( "1c.bin",     0x20000, 0x10000, CRC(edfe52b9) SHA1(704c107fc8b89f561d2031d10468c124ab3d007a) ) /*2*/
 	ROM_LOAD( "1d.bin",     0x30000, 0x10000, CRC(38f54a98) SHA1(d06eb851c75bfb2d8dd99bf5072c7f359f1f17e2) ) /*3*/
 	ROM_LOAD( "1f.bin",     0x40000, 0x10000, CRC(b635f295) SHA1(dba3a59133c33c915dba678c510f00fb476f24da) ) /*4*/
@@ -3814,7 +3814,7 @@ ROM_START( mjclub )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "5",     0x00000, 0x10000, CRC(cd148465) SHA1(42d1848656e461cfbf3fc0ba88ef8f4e67425f8c) )
 	/* bank switched ROMs follow */
-	ROM_COPY( "maincpu", nullptr, 0x10000, 0x10000 )
+	ROM_COPY( "maincpu", 0x00000, 0x10000, 0x10000 )
 	ROM_LOAD( "1",       0x50000, 0x10000, CRC(d0131f4b) SHA1(aac40b47b48f0ebfb07aaf17cb2a080fdcaa4697) )
 	ROM_LOAD( "3",       0x60000, 0x10000, CRC(25628c38) SHA1(5166934c488c2f91bd6026c7896ad3536727d950) )
 	ROM_LOAD( "4",       0x70000, 0x10000, CRC(a6ada333) SHA1(5fd44bf298a6f327118b98641af1aa0910519ded) )

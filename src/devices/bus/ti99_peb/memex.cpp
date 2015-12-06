@@ -162,7 +162,7 @@ INPUT_PORTS_END
 
 ROM_START( memex )
 	ROM_REGION(MEMEX_SIZE, RAMREGION, 0)
-	ROM_FILL(0x000000, MEMEX_SIZE, nullptr)
+	ROM_FILL(0x000000, MEMEX_SIZE, 0x00)
 ROM_END
 
 ioport_constructor geneve_memex_device::device_input_ports() const

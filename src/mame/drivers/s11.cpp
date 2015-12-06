@@ -502,7 +502,7 @@ ROM_START(grand_l4)
 	ROM_LOAD("lzrd_u26.l4", 0x4000, 0x2000, CRC(5fe50db6) SHA1(7e2adfefce5c33ad605606574dbdfb2642aa0e85))
 	ROM_RELOAD( 0x6000, 0x2000)
 	ROM_LOAD("lzrd_u27.l4", 0x8000, 0x8000, CRC(6462ca55) SHA1(0ebfa998d3cefc213ada9ed815d44977120e5d6d))
-	ROM_FILL(0x6035, 1, nullptr) // default to English
+	ROM_FILL(0x6035, 1, 0x00) // default to English
 
 	// according to the manual these should be 32K roms just like the other games here
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)

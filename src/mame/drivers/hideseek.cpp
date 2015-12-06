@@ -123,10 +123,10 @@ MACHINE_CONFIG_END
 ROM_START( hideseek )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD( "hd64f7045f28_internal_rom.bin",  0x000000, 0x040000, NO_DUMP ) // on chip ROM
-	ROM_FILL(         0, 1, nullptr )
+	ROM_FILL(         0, 1, 0x00 )
 	ROM_FILL(         1, 1, 0x40 )
-	ROM_FILL(         2, 1, nullptr )
-	ROM_FILL(         3, 1, nullptr )
+	ROM_FILL(         2, 1, 0x00 )
+	ROM_FILL(         3, 1, 0x00 )
 	ROM_FILL(         4, 1, 0x01 )
 	ROM_FILL(         5, 1, 0xff )
 	ROM_FILL(         6, 1, 0xff )

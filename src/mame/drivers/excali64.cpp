@@ -626,12 +626,12 @@ ROM_START( excali64 )
 	ROM_LOAD( "rom_1.ic17", 0x0000, 0x4000, CRC(e129a305) SHA1(e43ec7d040c2b2e548d22fd6bbc7df8b45a26e5a) )
 	ROM_LOAD( "rom_2.ic24", 0x4000, 0x2000, CRC(916d9f5a) SHA1(91c527cce963481b7bebf077e955ca89578bb553) )
 	// fix a bug that causes screen to be filled with 'p'
-	ROM_FILL(0x4ee, 1, nullptr)
+	ROM_FILL(0x4ee, 1, 0)
 	ROM_FILL(0x4ef, 1, 8)
-	ROM_FILL(0x4f6, 1, nullptr)
+	ROM_FILL(0x4f6, 1, 0)
 	ROM_FILL(0x4f7, 1, 8)
 	// patch out the protection
-	ROM_FILL(0x3ce7, 1, nullptr)
+	ROM_FILL(0x3ce7, 1, 0)
 
 	ROM_REGION(0x10000, "rambank", ROMREGION_ERASE00)
 	ROM_REGION(0xA000, "videoram", ROMREGION_ERASE00)

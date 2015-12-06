@@ -2258,7 +2258,7 @@ ROM_START( automat )
 
 	/* copy out the chars */
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT ) /* chars */
-	ROM_COPY( "gfxload1", nullptr, 0x00000, 0x8000 )
+	ROM_COPY( "gfxload1", 0x00000, 0x00000, 0x8000 )
 	ROM_COPY( "gfxload1", 0x10000, 0x08000, 0x8000 )
 	ROM_COPY( "gfxload1", 0x20000, 0x10000, 0x8000 )
 	ROM_COPY( "gfxload1", 0x30000, 0x18000, 0x8000 )
@@ -2706,7 +2706,7 @@ ROM_START( secretab )
 	ROM_LOAD( "sa_14.bin", 0x30000, 0x10000,CRC(3dac9128) SHA1(f3a2068e90973c1f04f1bbaa209111e3f9669ee0) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT ) /* chars */
-	ROM_COPY( "charset", nullptr, 0x00000, 0x8000 )
+	ROM_COPY( "charset", 0x00000, 0x00000, 0x8000 )
 	ROM_COPY( "charset", 0x10000, 0x08000, 0x8000 )
 	ROM_COPY( "charset", 0x20000, 0x10000, 0x8000 )
 	ROM_COPY( "charset", 0x30000, 0x18000, 0x8000 )

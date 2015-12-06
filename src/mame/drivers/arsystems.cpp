@@ -845,7 +845,7 @@ ROM_END
 ROM_START( ar_argh ) // this plugs directly into the a500 motherboard, no arcadia bios, just the a500 kickstart and game ROMs
 	ROM_REGION16_BE(0x80000, "kickstart", 0 )
 	ROM_LOAD16_WORD("315093-01.u2", 0x00000, 0x40000, CRC(a6ce1636) SHA1(11f9e62cf299f72184835b7b2a70a16333fc0d88))
-	ROM_COPY("kickstart", nullptr, 0x40000, 0x40000 )
+	ROM_COPY("kickstart", 0x00000, 0x40000, 0x40000 )
 
 	ROM_REGION16_BE( 0x180000, "user3", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "argh-1-hi-11-28-87.u12",  0x000000, 0x10000, CRC(3b1f8075) SHA1(61aeff9f6a2dff6efe4276cb0bcbb80b495e26b6) )

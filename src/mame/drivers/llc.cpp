@@ -289,7 +289,7 @@ ROM_START( llc1 )
 	ROM_LOAD( "llc1_tb1.bin", 0x0800, 0x0400, CRC(0d9d4039) SHA1(b515e385af57f4faf3a9f7b4a1edd59a1c1ea260) )
 	ROM_LOAD( "llc1_tb2.bin", 0x0c00, 0x0400, CRC(28bfea2a) SHA1(a68a8b87bfc931627ddd8d124b153e511477fbaf) )
 	ROM_LOAD( "llc1_tb3.bin", 0x1000, 0x0400, CRC(fe5e3132) SHA1(cc3b191e41f5772a4b86b8eb0ebe6fce67872df6) )
-	ROM_FILL(0x23b, 1, nullptr) // don't reboot when typing into the monitor
+	ROM_FILL(0x23b, 1, 0x00) // don't reboot when typing into the monitor
 	ROM_FILL(0x2dc, 1, 0x0f) // fix display of AF in the reg command
 	ROM_REGION(0x0400, "chargen",0)
 	ROM_LOAD ("llc1_zg.bin", 0x0000, 0x0400, CRC(fa2cd659) SHA1(1fa5f9992f35929f656c4ce55ed6980c5da1772b) )
