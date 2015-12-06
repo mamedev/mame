@@ -1435,6 +1435,7 @@ pss64           // 199? Nintendo / Hudson Soft
 
 // SNES-based hacks
 kinstb          // bootleg
+mk3snes			// bootleg
 ffight2b        // bootleg
 sblast2b        // bootleg
 iron            // bootleg
