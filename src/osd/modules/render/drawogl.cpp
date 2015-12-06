@@ -1091,7 +1091,7 @@ void sdl_info_ogl::destroy()
 //============================================================
 //  drawsdl_xy_to_render_target
 //============================================================
-
+#ifndef OSD_WINDOWS
 int sdl_info_ogl::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
 	*xt = x - m_last_hofs;
@@ -1102,7 +1102,7 @@ int sdl_info_ogl::xy_to_render_target(int x, int y, int *xt, int *yt)
 		return 0;
 	return 1;
 }
-
+#endif
 //============================================================
 //  drawsdl_destroy_all_textures
 //============================================================
