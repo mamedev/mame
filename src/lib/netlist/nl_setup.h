@@ -252,7 +252,7 @@ namespace netlist
 		{
 		}
 
-		bool parse(setup_t &setup, const pstring &name);
+		bool parse(setup_t &setup, const pstring &name) override;
 
 	private:
 		pstring m_str;
@@ -267,7 +267,7 @@ namespace netlist
 		{
 		}
 
-		bool parse(setup_t &setup, const pstring &name);
+		bool parse(setup_t &setup, const pstring &name) override;
 
 	private:
 		pstring m_filename;
@@ -281,7 +281,7 @@ namespace netlist
 		{
 		}
 
-		bool parse(setup_t &setup, const pstring &name);
+		bool parse(setup_t &setup, const pstring &name) override;
 
 	private:
 		pstring m_str;
@@ -297,7 +297,7 @@ namespace netlist
 		{
 		}
 
-		bool parse(setup_t &setup, const pstring &name)
+		bool parse(setup_t &setup, const pstring &name) override
 		{
 			if (name == m_setup_func_name)
 			{

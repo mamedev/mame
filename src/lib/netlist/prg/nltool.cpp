@@ -194,7 +194,7 @@ public:
 
 protected:
 
-	void vlog(const plog_level &l, const pstring &ls) const
+	void vlog(const plog_level &l, const pstring &ls) const override
 	{
 		pout("{}: {}\n", l.name().cstr(), ls.cstr());
 		if (l == plog_level::FATAL)

@@ -158,7 +158,7 @@ public:
 
 
 protected:
-	void format_element(const char *f, const char *l, const char *fmt_spec, ...);
+	void format_element(const char *f, const char *l, const char *fmt_spec, ...) override;
 
 private:
 
@@ -243,7 +243,7 @@ public:
 	virtual ~plog_channel() { }
 
 protected:
-	virtual void vdowrite(const pstring &ls) const;
+	virtual void vdowrite(const pstring &ls) const override;
 
 private:
 	plog_dispatch_intf *m_base;

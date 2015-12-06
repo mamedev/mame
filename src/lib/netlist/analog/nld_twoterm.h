@@ -133,9 +133,9 @@ public:
 	}
 
 protected:
-	virtual void start();
-	virtual void reset();
-	ATTR_HOT void update();
+	virtual void start() override;
+	virtual void reset() override;
+	ATTR_HOT void update() override;
 
 private:
 };
@@ -155,9 +155,9 @@ public:
 	}
 
 protected:
-	virtual void start();
-	virtual void reset();
-	ATTR_HOT void update();
+	virtual void start() override;
+	virtual void reset() override;
+	ATTR_HOT void update() override;
 };
 
 NETLIB_DEVICE_WITH_PARAMS_DERIVED(R, R_base,
@@ -196,15 +196,15 @@ class NETLIB_NAME(C) : public NETLIB_NAME(twoterm)
 public:
 	ATTR_COLD NETLIB_NAME(C)() : NETLIB_NAME(twoterm)(CAPACITOR), m_GParallel(0.0) { }
 
-	ATTR_HOT void step_time(const nl_double st);
+	ATTR_HOT void step_time(const nl_double st) override;
 
 	param_double_t m_C;
 
 protected:
-	virtual void start();
-	virtual void reset();
-	virtual void update_param();
-	ATTR_HOT void update();
+	virtual void start() override;
+	virtual void reset() override;
+	virtual void update_param() override;
+	ATTR_HOT void update() override;
 
 private:
 	nl_double m_GParallel;
@@ -298,9 +298,9 @@ public:
 	param_model_t m_model;
 
 protected:
-	virtual void start();
-	virtual void update_param();
-	ATTR_HOT void update();
+	virtual void start() override;
+	virtual void update_param() override;
+	ATTR_HOT void update() override;
 
 	generic_diode m_D;
 };
@@ -317,9 +317,9 @@ public:
 	ATTR_COLD NETLIB_NAME(VS)() : NETLIB_NAME(twoterm)(VS) { }
 
 protected:
-	virtual void start();
-	virtual void reset();
-	ATTR_HOT void update();
+	virtual void start() override;
+	virtual void reset() override;
+	ATTR_HOT void update() override;
 
 	param_double_t m_R;
 	param_double_t m_V;
@@ -335,9 +335,9 @@ public:
 	ATTR_COLD NETLIB_NAME(CS)() : NETLIB_NAME(twoterm)(CS) { }
 
 protected:
-	virtual void start();
-	virtual void reset();
-	ATTR_HOT void update();
+	virtual void start() override;
+	virtual void reset() override;
+	ATTR_HOT void update() override;
 
 	param_double_t m_I;
 };

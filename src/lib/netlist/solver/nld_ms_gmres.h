@@ -53,10 +53,10 @@ public:
 			delete[] m_v[i];
 	}
 
-	virtual void vsetup(analog_net_t::list_t &nets);
+	virtual void vsetup(analog_net_t::list_t &nets) override;
 	ATTR_HOT virtual int vsolve_non_dynamic(const bool newton_raphson);
 protected:
-	ATTR_HOT virtual nl_double vsolve();
+	ATTR_HOT virtual nl_double vsolve() override;
 
 private:
 
