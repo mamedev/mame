@@ -257,6 +257,7 @@ public:
 
 	emu_timer *m_overlay_timeout;
 	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
+	DECLARE_READ32_MEMBER(rom_switch_r);
 
 #ifndef MAC_USE_EMULATED_KBD
 	/* used to store the reply to most keyboard commands */

@@ -347,12 +347,20 @@ void mac_state::v8_resize()
 	if (is_rom)
 	{
 		mac_install_memory(0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
+		
+		// install catcher in place of ROM that will detect the first access to ROM in its real location
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa00000, 0xafffff, read32_delegate(FUNC(mac_state::rom_switch_r), this), 0xffffffff);
 	}
 	else
 	{
 		address_space& space = m_maincpu->space(AS_PROGRAM);
 		UINT32 onboard_amt, simm_amt, simm_size;
 		static const UINT32 simm_sizes[4] = { 0, 2*1024*1024, 4*1024*1024, 8*1024*1024 };
+
+		// re-install ROM in its normal place
+		size_t rom_mask = memregion("bootrom")->bytes() - 1;
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0xa00000, 0xafffff, rom_mask, 0, "bankR");
+		membank("bankR")->set_base((void *)memregion("bootrom")->base());
 
 		// force unmap of entire RAM region
 		space.unmap_write(0, 0x9fffff, 0x9fffff, 0);
@@ -458,6 +466,17 @@ void mac_state::set_memory_overlay(int overlay)
 		else if ((m_model == MODEL_MAC_LC_III) || (m_model == MODEL_MAC_LC_III_PLUS) || (m_model >= MODEL_MAC_LC_475 && m_model <= MODEL_MAC_LC_580))   // up to 36 MB
 		{
 			mac_install_memory(0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
+
+			if (is_rom)
+			{
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000000, 0x4fffffff, read32_delegate(FUNC(mac_state::rom_switch_r), this), 0xffffffff);
+			}
+			else
+			{
+				size_t rom_mask = memregion("bootrom")->bytes() - 1;
+				m_maincpu->space(AS_PROGRAM).install_read_bank(0x40000000, 0x4fffffff, rom_mask, 0, "bankR");
+				membank("bankR")->set_base((void *)memregion("bootrom")->base());
+			}
 		}
 		else if (m_model == MODEL_MAC_QUADRA_700)
 		{
@@ -475,6 +494,21 @@ void mac_state::set_memory_overlay(int overlay)
 	}
 }
 
+READ32_MEMBER(mac_state::rom_switch_r)
+{
+	offs_t ROM_size = memregion("bootrom")->bytes(); 
+	UINT32 *ROM_data = (UINT32 *)memregion("bootrom")->base();
+
+	// disable the overlay
+	if (m_overlay)
+	{
+		set_memory_overlay(0);
+	}
+
+//	printf("rom_switch_r: offset %08x ROM_size -1 = %08x, masked = %08x\n", offset, ROM_size-1, offset & ((ROM_size - 1)>>2));
+
+	return ROM_data[offset & ((ROM_size - 1)>>2)];
+}
 
 
 /*
@@ -1912,7 +1946,18 @@ void mac_state::machine_reset()
 
 	if (m_overlay_timeout != (emu_timer *)nullptr)
 	{
-		m_overlay_timeout->adjust(m_maincpu->cycles_to_attotime(8));
+		if ((m_model == MODEL_MAC_LC_III) || (m_model == MODEL_MAC_LC_III_PLUS) || (m_model >= MODEL_MAC_LC_475 && m_model <= MODEL_MAC_LC_580))   // up to 36 MB 
+		{
+			m_overlay_timeout->adjust(attotime::never);
+		}
+		else if (((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_COLOR_CLASSIC) && ((m_model != MODEL_MAC_LC_III) && (m_model != MODEL_MAC_LC_III_PLUS))) || (m_model == MODEL_MAC_CLASSIC_II))
+		{
+			m_overlay_timeout->adjust(attotime::never);
+		}
+		else
+		{
+			m_overlay_timeout->adjust(m_maincpu->cycles_to_attotime(8));
+		}
 	}
 
 	/* setup videoram */
