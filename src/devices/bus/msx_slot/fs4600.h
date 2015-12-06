@@ -26,8 +26,8 @@ public:
 	virtual void device_start() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 	void restore_banks();
 

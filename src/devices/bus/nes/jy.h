@@ -18,13 +18,13 @@ public:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_m) override;
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
-	virtual DECLARE_READ8_MEMBER(chr_r);
-	virtual DECLARE_READ8_MEMBER(nt_r);
+	virtual DECLARE_READ8_MEMBER(chr_r) override;
+	virtual DECLARE_READ8_MEMBER(nt_r) override;
 
 	virtual void scanline_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
@@ -85,7 +85,7 @@ public:
 	// construction/destruction
 	nes_jy_typec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ8_MEMBER(chr_r);
+	virtual DECLARE_READ8_MEMBER(chr_r) override;
 
 protected:
 	void update_mirror_typec();

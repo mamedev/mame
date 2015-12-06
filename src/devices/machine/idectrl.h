@@ -33,10 +33,10 @@ public:
 	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	virtual DECLARE_READ16_MEMBER(read_cs0);
-	virtual DECLARE_READ16_MEMBER(read_cs1);
-	virtual DECLARE_WRITE16_MEMBER(write_cs0);
-	virtual DECLARE_WRITE16_MEMBER(write_cs1);
+	virtual DECLARE_READ16_MEMBER(read_cs0) override;
+	virtual DECLARE_READ16_MEMBER(read_cs1) override;
+	virtual DECLARE_WRITE16_MEMBER(write_cs0) override;
+	virtual DECLARE_WRITE16_MEMBER(write_cs1) override;
 };
 
 extern const device_type IDE_CONTROLLER;

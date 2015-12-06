@@ -20,7 +20,7 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
 
 private:
 	UINT32 m_start_address;

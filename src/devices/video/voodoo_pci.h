@@ -27,7 +27,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual DECLARE_ADDRESS_MAP(config_map, 32);
+	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
 	void set_cpu_tag(const char *tag);
 	static void set_type(const int type) {m_type = type;}

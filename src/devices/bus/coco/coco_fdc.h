@@ -56,8 +56,8 @@ public:
 protected:
 		// device-level overrides
 		virtual void device_start() override;
-		virtual DECLARE_READ8_MEMBER(read);
-		virtual DECLARE_WRITE8_MEMBER(write);
+		virtual DECLARE_READ8_MEMBER(read) override;
+		virtual DECLARE_WRITE8_MEMBER(write) override;
 
 		coco_rtc_type_t real_time_clock();
 
@@ -151,8 +151,8 @@ public:
 protected:
 		// device-level overrides
 		virtual void device_start() override;
-		virtual DECLARE_READ8_MEMBER(read);
-		virtual DECLARE_WRITE8_MEMBER(write);
+		virtual DECLARE_READ8_MEMBER(read) override;
+		virtual DECLARE_WRITE8_MEMBER(write) override;
 };
 
 

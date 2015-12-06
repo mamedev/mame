@@ -20,7 +20,7 @@ public:
 	virtual void device_start() override {}
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_cart);
+	virtual DECLARE_READ32_MEMBER(read_cart) override;
 };
 
 // ======================> vboy_eeprom_device
@@ -32,8 +32,8 @@ public:
 	vboy_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_eeprom);
-	virtual DECLARE_WRITE32_MEMBER(write_eeprom);
+	virtual DECLARE_READ32_MEMBER(read_eeprom) override;
+	virtual DECLARE_WRITE32_MEMBER(write_eeprom) override;
 };
 
 

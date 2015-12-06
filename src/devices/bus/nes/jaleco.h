@@ -17,7 +17,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_m);
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
 
 	virtual void pcb_reset() override;
 };
@@ -34,7 +34,7 @@ public:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual DECLARE_WRITE8_MEMBER(write_m);
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
 
 	virtual void pcb_reset() override;
 
@@ -53,7 +53,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 };
@@ -70,7 +70,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 
@@ -88,7 +88,7 @@ public:
 	nes_jf17_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 private:
 	required_device<samples_device> m_samples;
@@ -106,7 +106,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 };
@@ -121,7 +121,7 @@ public:
 	nes_jf19_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 private:
 	required_device<samples_device> m_samples;

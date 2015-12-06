@@ -151,8 +151,8 @@ public:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 

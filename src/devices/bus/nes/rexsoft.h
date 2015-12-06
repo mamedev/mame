@@ -16,9 +16,9 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_READ8_MEMBER(read_l);
+	virtual DECLARE_READ8_MEMBER(read_l) override;
 	virtual DECLARE_READ8_MEMBER(read_m) override { return read_l(space, offset, mem_mask); }
-	virtual DECLARE_WRITE8_MEMBER(write_l);
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 	virtual void chr_cb( int start, int bank, int source ) override;
 
 	virtual void pcb_reset() override;
@@ -38,7 +38,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 

@@ -36,7 +36,7 @@ protected:
 	virtual void control_w(UINT8 data) override;
 	virtual void read(offs_t offset, UINT8 &data) override;
 	virtual UINT8* get_cart_base() override;
-	virtual DECLARE_WRITE_LINE_MEMBER( mei_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( mei_w ) override;
 
 protected:
 	kcexp_slot_device *m_slot;

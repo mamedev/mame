@@ -23,8 +23,8 @@ class gromport_device : public bus8z_device, public device_slot_interface
 {
 public:
 	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(crureadz);
 	DECLARE_WRITE8_MEMBER(cruwrite);
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
@@ -74,8 +74,8 @@ class ti99_cartridge_device : public bus8z_device, public device_image_interface
 public:
 	ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(crureadz);
 	DECLARE_WRITE8_MEMBER(cruwrite);
 
@@ -131,8 +131,8 @@ extern const device_type TI99CART;
 class ti99_cartridge_connector_device : public bus8z_device
 {
 public:
-	virtual DECLARE_READ8Z_MEMBER(readz) =0;
-	virtual DECLARE_WRITE8_MEMBER(write) =0;
+	virtual DECLARE_READ8Z_MEMBER(readz) override =0;
+	virtual DECLARE_WRITE8_MEMBER(write) override =0;
 	virtual DECLARE_READ8Z_MEMBER(crureadz) = 0;
 	virtual DECLARE_WRITE8_MEMBER(cruwrite) = 0;
 
@@ -158,10 +158,10 @@ class single_conn_device : public ti99_cartridge_connector_device
 public:
 	single_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
 protected:
 	virtual void device_start() override;
@@ -186,10 +186,10 @@ class multi_conn_device : public ti99_cartridge_connector_device
 public:
 	multi_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
 	void insert(int index, ti99_cartridge_device* cart) override;
 	void remove(int index) override;
@@ -219,10 +219,10 @@ class gkracker_device : public ti99_cartridge_connector_device, public device_nv
 public:
 	gkracker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
 	void insert(int index, ti99_cartridge_device* cart) override;
 	void remove(int index) override;
@@ -314,8 +314,8 @@ class ti99_paged_cartridge : public ti99_cartridge_pcb
 {
 public:
 	~ti99_paged_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 };
 
 /********************** Mini Memory ***********************************/
@@ -324,8 +324,8 @@ class ti99_minimem_cartridge : public ti99_cartridge_pcb
 {
 public:
 	~ti99_minimem_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 };
 
 /********************* Super Space II *********************************/
@@ -334,10 +334,10 @@ class ti99_super_cartridge : public ti99_cartridge_pcb
 {
 public:
 	~ti99_super_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 };
 
 /************************* MBX  ***************************************/
@@ -346,8 +346,8 @@ class ti99_mbx_cartridge : public ti99_cartridge_pcb
 {
 public:
 	~ti99_mbx_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 };
 
 /********************** Paged 379i ************************************/
@@ -356,8 +356,8 @@ class ti99_paged379i_cartridge : public ti99_cartridge_pcb
 {
 public:
 	~ti99_paged379i_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 private:
 	int     get_paged379i_bank(int rompage);
 };
@@ -368,8 +368,8 @@ class ti99_paged378_cartridge : public ti99_cartridge_pcb
 {
 public:
 	~ti99_paged378_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 private:
 	int     get_paged378_bank(int rompage);
 };
@@ -380,8 +380,8 @@ class ti99_paged377_cartridge : public ti99_cartridge_pcb
 {
 public:
 	~ti99_paged377_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 private:
 	int     get_paged377_bank(int rompage);
 };
@@ -392,10 +392,10 @@ class ti99_pagedcru_cartridge : public ti99_cartridge_pcb
 {
 public:
 	~ti99_pagedcru_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 };
 
 /********************** GROM emulation cartridge  ************************************/
@@ -406,8 +406,8 @@ public:
 	ti99_gromemu_cartridge(): m_waddr_LSB(false)
 	{  m_grom_address = 0; }
 	~ti99_gromemu_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(gromemureadz);
 	DECLARE_WRITE8_MEMBER(gromemuwrite);
 private:

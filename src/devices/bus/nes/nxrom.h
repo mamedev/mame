@@ -33,9 +33,9 @@ public:
 	// construction/destruction
 	nes_nrom368_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_READ8_MEMBER(read_h);
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_m) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
 };
 
 
@@ -61,7 +61,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 };
@@ -77,7 +77,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 };
@@ -94,8 +94,8 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_READ8_MEMBER(chr_r);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_READ8_MEMBER(chr_r) override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 
@@ -114,7 +114,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 };
@@ -130,7 +130,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 };
@@ -146,7 +146,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 };
@@ -162,7 +162,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 };
@@ -178,7 +178,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 };
@@ -193,8 +193,8 @@ public:
 	nes_nochr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual DECLARE_READ8_MEMBER(chr_r);
-	virtual DECLARE_WRITE8_MEMBER(chr_w);
+	virtual DECLARE_READ8_MEMBER(chr_r) override;
+	virtual DECLARE_WRITE8_MEMBER(chr_w) override;
 };
 
 

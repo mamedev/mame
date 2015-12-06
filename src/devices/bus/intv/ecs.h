@@ -28,16 +28,16 @@ public:
 
 	// actual ECS accesses
 	// paged ROMs
-	virtual DECLARE_READ16_MEMBER(read_rom20);
-	virtual DECLARE_READ16_MEMBER(read_rom70);
-	virtual DECLARE_READ16_MEMBER(read_rome0);
-	virtual DECLARE_READ16_MEMBER(read_romf0);
+	virtual DECLARE_READ16_MEMBER(read_rom20) override;
+	virtual DECLARE_READ16_MEMBER(read_rom70) override;
+	virtual DECLARE_READ16_MEMBER(read_rome0) override;
+	virtual DECLARE_READ16_MEMBER(read_romf0) override;
 	// RAM
 	virtual DECLARE_READ16_MEMBER(read_ram) override { return (int)m_ram[offset & (m_ram.size() - 1)]; }
 	virtual DECLARE_WRITE16_MEMBER(write_ram) override { m_ram[offset & (m_ram.size() - 1)] = data & 0xff; }
 	// AY8914
-	virtual DECLARE_READ16_MEMBER(read_ay);
-	virtual DECLARE_WRITE16_MEMBER(write_ay);
+	virtual DECLARE_READ16_MEMBER(read_ay) override;
+	virtual DECLARE_WRITE16_MEMBER(write_ay) override;
 	DECLARE_READ8_MEMBER(ay_porta_r);
 	DECLARE_READ8_MEMBER(ay_portb_r);
 	DECLARE_WRITE8_MEMBER(ay_porta_w);

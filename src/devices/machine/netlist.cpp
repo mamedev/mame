@@ -593,7 +593,7 @@ void netlist_mame_sound_device_t::device_start()
 	// Configure inputs
 
 	m_num_inputs = 0;
-	m_in = NULL;
+	m_in = nullptr;
 
 	plist_t<nld_sound_in *> indevs = netlist().get_device_list<nld_sound_in>();
 	if (indevs.size() > 1)

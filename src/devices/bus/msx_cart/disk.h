@@ -52,8 +52,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 	void post_load();
 
@@ -75,8 +75,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 	void post_load();
 
@@ -134,8 +134,8 @@ public:
 	virtual void device_reset() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 };
 
 

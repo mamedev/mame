@@ -24,7 +24,7 @@ public:
 	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
 							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
 
-	virtual DECLARE_ADDRESS_MAP(config_map, 32);
+	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
 
 protected:

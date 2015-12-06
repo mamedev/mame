@@ -24,7 +24,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_rom);
+	virtual DECLARE_READ16_MEMBER(read_rom) override;
 
 	virtual void activate_cart(ACTIVATE_CART_PARAMS) override {}
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override {}

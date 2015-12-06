@@ -228,10 +228,10 @@ protected:
 	public: \
 		_name(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock); \
 		virtual ~_name(); \
-		virtual void handled_variants(UINT32 *variants, int &var_count) const; \
-		virtual const char *image_interface() const { return _interface; } \
+		virtual void handled_variants(UINT32 *variants, int &var_count) const override; \
+		virtual const char *image_interface() const override { return _interface; } \
 	protected: \
-		virtual void setup_characteristics(); \
+		virtual void setup_characteristics() override; \
 	};
 
 DECLARE_FLOPPY_IMAGE_DEVICE(floppy_3_ssdd, "floppy_3")

@@ -21,8 +21,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_h);
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
 };
 
 // ======================> sns_rom21_srtc_device
@@ -38,8 +38,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read);
-	virtual DECLARE_WRITE8_MEMBER(chip_write);
+	virtual DECLARE_READ8_MEMBER(chip_read) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
 
 	// S-RTC specific variables
 	enum

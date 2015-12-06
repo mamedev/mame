@@ -106,7 +106,7 @@ protected:
 	virtual void device_reset_after_children() override;
 
 	// device_zorro2_card_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
 
 	// amiga_autoconfig overrides
 	virtual void autoconfig_base_address(offs_t address) override;

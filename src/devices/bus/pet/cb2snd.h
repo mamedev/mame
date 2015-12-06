@@ -28,7 +28,7 @@ public:
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_m );
+	virtual DECLARE_WRITE_LINE_MEMBER( input_m ) override;
 
 	required_device<dac_device> m_dac;
 

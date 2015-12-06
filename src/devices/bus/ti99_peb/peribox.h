@@ -44,9 +44,9 @@ public:
 	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object)     {  return downcast<peribox_device &>(device).m_datamux_ready.set_callback(object); }
 
 	// Next seven methods are called from the console
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz);
 	DECLARE_WRITE8_MEMBER(cruwrite);
@@ -151,9 +151,9 @@ public:
 	peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// Called from the box (direction to card)
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
 	DECLARE_WRITE_LINE_MEMBER(senila);
 	DECLARE_WRITE_LINE_MEMBER(senilb);

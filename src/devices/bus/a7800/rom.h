@@ -22,7 +22,7 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx);
+	virtual DECLARE_READ8_MEMBER(read_40xx) override;
 };
 
 
@@ -39,8 +39,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx);
-	virtual DECLARE_WRITE8_MEMBER(write_40xx);
+	virtual DECLARE_READ8_MEMBER(read_40xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
 
 protected:
 	required_device<pokey_device> m_pokey;
@@ -61,8 +61,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx);
-	virtual DECLARE_WRITE8_MEMBER(write_40xx);
+	virtual DECLARE_READ8_MEMBER(read_40xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
 
 protected:
 	int m_bank;
@@ -81,8 +81,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx);
-	virtual DECLARE_WRITE8_MEMBER(write_40xx);
+	virtual DECLARE_READ8_MEMBER(read_40xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
 
 protected:
 	required_device<pokey_device> m_pokey;
@@ -99,8 +99,8 @@ public:
 	a78_rom_sg_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx);
-	virtual DECLARE_WRITE8_MEMBER(write_40xx);
+	virtual DECLARE_READ8_MEMBER(read_40xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
 };
 
 
@@ -114,8 +114,8 @@ public:
 	a78_rom_sg9_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx);
-	virtual DECLARE_WRITE8_MEMBER(write_40xx);
+	virtual DECLARE_READ8_MEMBER(read_40xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
 };
 
 
@@ -132,8 +132,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx);
-	virtual DECLARE_WRITE8_MEMBER(write_40xx);
+	virtual DECLARE_READ8_MEMBER(read_40xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
 
 protected:
 	int m_bank;
@@ -153,8 +153,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx);
-	virtual DECLARE_WRITE8_MEMBER(write_40xx);
+	virtual DECLARE_READ8_MEMBER(read_40xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
 
 protected:
 	int m_bank;

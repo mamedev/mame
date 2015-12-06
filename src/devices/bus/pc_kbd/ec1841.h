@@ -47,8 +47,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_pc_kbd_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_write );
-	virtual DECLARE_WRITE_LINE_MEMBER( data_write );
+	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) override;
+	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) override;
 
 private:
 	required_device<cpu_device> m_maincpu;

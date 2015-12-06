@@ -352,7 +352,7 @@ public:
 	virtual void add_card(device_zorro_card_interface *card) override;
 
 	// interface (from slot device)
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgout_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( cfgout_w ) override;
 
 	DECLARE_WRITE_LINE_MEMBER( eint1_w );
 	DECLARE_WRITE_LINE_MEMBER( eint4_w );

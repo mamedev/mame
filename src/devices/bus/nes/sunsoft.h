@@ -17,7 +17,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_m);
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
 
 	virtual void pcb_reset() override;
 };
@@ -33,7 +33,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 };
@@ -50,7 +50,7 @@ public:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 
@@ -74,8 +74,8 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_WRITE8_MEMBER(write_m);
+	virtual DECLARE_READ8_MEMBER(read_m) override;
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
 	virtual DECLARE_WRITE8_MEMBER(sun4_write);
 	virtual DECLARE_WRITE8_MEMBER(write_h) override { sun4_write(space, offset, data, mem_mask); }
 
@@ -98,8 +98,8 @@ public:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_WRITE8_MEMBER(write_m);
+	virtual DECLARE_READ8_MEMBER(read_m) override;
+	virtual DECLARE_WRITE8_MEMBER(write_m) override;
 	virtual DECLARE_WRITE8_MEMBER(fme7_write);
 	virtual DECLARE_WRITE8_MEMBER(write_h) override { fme7_write(space, offset, data, mem_mask); }
 
@@ -127,7 +127,7 @@ public:
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 private:
 	required_device<ay8910_device> m_ym2149;

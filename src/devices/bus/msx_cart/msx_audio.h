@@ -26,7 +26,7 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
 
 private:
 	required_device<y8950_device> m_y8950;
@@ -46,7 +46,7 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
 
 	DECLARE_WRITE_LINE_MEMBER(midi_in);
 	DECLARE_WRITE_LINE_MEMBER(irq_write);
@@ -73,8 +73,8 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 	DECLARE_WRITE8_MEMBER(write_y8950);
 	DECLARE_READ8_MEMBER(read_y8950);

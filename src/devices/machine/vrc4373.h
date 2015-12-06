@@ -69,7 +69,7 @@ public:
 
 	void set_cpu_tag(const char *tag);
 
-	virtual DECLARE_ADDRESS_MAP(config_map, 32);
+	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
 	DECLARE_READ32_MEMBER(  pcictrl_r);
 	DECLARE_WRITE32_MEMBER( pcictrl_w);

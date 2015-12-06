@@ -19,13 +19,13 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_04xx);
-	virtual DECLARE_WRITE8_MEMBER(write_04xx);
-	virtual DECLARE_READ8_MEMBER(read_10xx);
-	virtual DECLARE_WRITE8_MEMBER(write_10xx);
-	virtual DECLARE_READ8_MEMBER(read_30xx);
-	virtual DECLARE_READ8_MEMBER(read_40xx);
-	virtual DECLARE_WRITE8_MEMBER(write_40xx);
+	virtual DECLARE_READ8_MEMBER(read_04xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_04xx) override;
+	virtual DECLARE_READ8_MEMBER(read_10xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_10xx) override;
+	virtual DECLARE_READ8_MEMBER(read_30xx) override;
+	virtual DECLARE_READ8_MEMBER(read_40xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
 
 protected:
 	required_device<a78_cart_slot_device> m_hscslot;

@@ -30,8 +30,8 @@ public:
 	virtual void write_bank(int bank) override   { if (m_subslot->exists()) m_subslot->write_bank(bank); }
 
 	DECLARE_WRITE_LINE_MEMBER(lrq_callback);
-	DECLARE_WRITE8_MEMBER(io_write);
-	DECLARE_READ8_MEMBER(t0_read) { return m_speech->lrq_r() ? 0 : 1; }
+	virtual DECLARE_WRITE8_MEMBER(io_write) override;
+	virtual DECLARE_READ8_MEMBER(t0_read)  override { return m_speech->lrq_r() ? 0 : 1; }
 
 private:
 	required_device<sp0256_device> m_speech;

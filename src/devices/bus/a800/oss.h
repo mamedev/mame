@@ -18,8 +18,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx);
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+	virtual DECLARE_READ8_MEMBER(read_80xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
 
 protected:
 	int m_bank;
@@ -38,8 +38,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx);
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+	virtual DECLARE_READ8_MEMBER(read_80xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
 
 protected:
 	int m_bank;
@@ -58,8 +58,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx);
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+	virtual DECLARE_READ8_MEMBER(read_80xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
 
 protected:
 	int m_bank;
@@ -78,8 +78,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx);
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+	virtual DECLARE_READ8_MEMBER(read_80xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
 
 protected:
 	int m_bank;

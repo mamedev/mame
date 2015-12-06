@@ -21,8 +21,8 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 
 private:
 	const UINT8 *m_bunsetsu_rom;

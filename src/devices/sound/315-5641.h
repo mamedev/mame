@@ -13,7 +13,7 @@ public:
 
 	UINT8 get_fifo_space();
 	void advance_state() override;
-	DECLARE_WRITE8_MEMBER(port_w);
+	virtual DECLARE_WRITE8_MEMBER(port_w) override;
 
 	UINT8       m_fifo_data[0x40];
 	UINT8       m_fifo_read;    // last read offset (will read in m_fifo_read+1)

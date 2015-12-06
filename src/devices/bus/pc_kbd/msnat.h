@@ -29,8 +29,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const rom_entry *device_rom_region() const override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(clock_write);
-	virtual DECLARE_WRITE_LINE_MEMBER(data_write);
+	virtual DECLARE_WRITE_LINE_MEMBER(clock_write) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(data_write) override;
 
 	DECLARE_READ8_MEMBER(p0_read);
 	DECLARE_WRITE8_MEMBER(p0_write);

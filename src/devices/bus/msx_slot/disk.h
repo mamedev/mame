@@ -131,8 +131,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 	void post_load();
 
@@ -153,8 +153,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 	void post_load();
 
@@ -170,8 +170,8 @@ class msx_slot_disk3_device : public msx_slot_tc8566_disk_device
 public:
 	msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 };
 
 
@@ -180,8 +180,8 @@ class msx_slot_disk4_device : public msx_slot_tc8566_disk_device
 public:
 	msx_slot_disk4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 };
 
 
@@ -213,8 +213,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 	void post_load();
 

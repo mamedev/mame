@@ -26,7 +26,7 @@ public:
 	required_device<cassette_image_device> m_cassette;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 
 private:
 	cpu_device   *m_maincpu;

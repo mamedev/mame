@@ -44,7 +44,7 @@ protected:
 	virtual void write(offs_t offset, UINT8 data) override;
 	virtual void io_read(offs_t offset, UINT8 &data) override;
 	virtual void io_write(offs_t offset, UINT8 data) override;
-	virtual DECLARE_WRITE_LINE_MEMBER( mei_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( mei_w ) override;
 
 private:
 	kcexp_slot_device *m_slot;

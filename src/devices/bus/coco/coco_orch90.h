@@ -28,7 +28,7 @@ public:
 protected:
 		// device-level overrides
 		virtual void device_start() override;
-		virtual DECLARE_WRITE8_MEMBER(write);
+		virtual DECLARE_WRITE8_MEMBER(write) override;
 private:
 		// internal state
 		dac_device *m_left_dac;

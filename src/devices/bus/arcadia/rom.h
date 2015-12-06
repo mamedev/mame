@@ -21,8 +21,8 @@ public:
 	virtual void device_reset() override {}
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_READ8_MEMBER(extra_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_READ8_MEMBER(extra_rom) override;
 };
 
 // ======================> arcadia_golf_device

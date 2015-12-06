@@ -15,8 +15,8 @@ public:
 	sega8_cardcatch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart);
-	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
 	virtual DECLARE_WRITE8_MEMBER(write_mapper) override {}
 
 	virtual machine_config_constructor device_mconfig_additions() const override;

@@ -21,8 +21,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 
 
 	DECLARE_READ8_MEMBER(read8_r);

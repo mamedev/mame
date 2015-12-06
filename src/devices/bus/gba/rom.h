@@ -34,8 +34,8 @@ public:
 	gba_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ram);
-	virtual DECLARE_WRITE32_MEMBER(write_ram);
+	virtual DECLARE_READ32_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
 };
 
 // ======================> gba_rom_flash_device
@@ -51,8 +51,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ram);
-	virtual DECLARE_WRITE32_MEMBER(write_ram);
+	virtual DECLARE_READ32_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
 
 private:
 	//UINT32 m_flash_size;
@@ -73,8 +73,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ram);
-	virtual DECLARE_WRITE32_MEMBER(write_ram);
+	virtual DECLARE_READ32_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
 
 private:
 	//UINT32 m_flash_size;
@@ -133,8 +133,8 @@ public:
 	virtual void device_start() override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ram);
-	virtual DECLARE_WRITE32_MEMBER(write_ram);
+	virtual DECLARE_READ32_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
 
 private:
 	std::unique_ptr<gba_eeprom_device> m_eeprom;
@@ -153,8 +153,8 @@ public:
 	virtual void device_start() override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ram);
-	virtual DECLARE_WRITE32_MEMBER(write_ram);
+	virtual DECLARE_READ32_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
 
 private:
 	std::unique_ptr<gba_eeprom_device> m_eeprom;

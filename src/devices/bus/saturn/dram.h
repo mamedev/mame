@@ -20,10 +20,10 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ext_dram0);
-	virtual DECLARE_READ32_MEMBER(read_ext_dram1);
-	virtual DECLARE_WRITE32_MEMBER(write_ext_dram0);
-	virtual DECLARE_WRITE32_MEMBER(write_ext_dram1);
+	virtual DECLARE_READ32_MEMBER(read_ext_dram0) override;
+	virtual DECLARE_READ32_MEMBER(read_ext_dram1) override;
+	virtual DECLARE_WRITE32_MEMBER(write_ext_dram0) override;
+	virtual DECLARE_WRITE32_MEMBER(write_ext_dram1) override;
 };
 
 class saturn_dram8mb_device : public saturn_dram_device

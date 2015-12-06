@@ -33,7 +33,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( motor_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( motor_w ) override;
 
 protected:
 	virtual void device_start() override;

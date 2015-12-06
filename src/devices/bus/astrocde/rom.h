@@ -21,7 +21,7 @@ public:
 	virtual void device_reset() override {}
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 };
 
 // ======================> astrocade_rom_256k_device
@@ -36,7 +36,7 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 
 private:
 	UINT8 m_base_bank;
@@ -54,7 +54,7 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 
 private:
 	UINT8 m_base_bank;

@@ -68,9 +68,9 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read);
-	virtual DECLARE_READ16_MEMBER(read_a13);
-	virtual DECLARE_WRITE16_MEMBER(write_a13);
+	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual DECLARE_READ16_MEMBER(read_a13) override;
+	virtual DECLARE_WRITE16_MEMBER(write_a13) override;
 
 private:
 	UINT8 m_bank[3];

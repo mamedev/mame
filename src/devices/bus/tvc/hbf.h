@@ -38,10 +38,10 @@ protected:
 
 	// tvcexp_interface overrides
 	virtual UINT8 id_r() override { return 0x02; } // ID_A to GND, ID_B to VCC
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
-	virtual DECLARE_READ8_MEMBER(io_read);
-	virtual DECLARE_WRITE8_MEMBER(io_write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual DECLARE_READ8_MEMBER(io_read) override;
+	virtual DECLARE_WRITE8_MEMBER(io_write) override;
 
 private:
 	// internal state

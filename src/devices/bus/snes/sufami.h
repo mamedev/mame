@@ -20,10 +20,10 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 private:
 	required_device<sns_sufami_cart_slot_device> m_slot1;
@@ -42,7 +42,7 @@ public:
 	virtual void device_start() override;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
+	virtual DECLARE_READ8_MEMBER(read_l) override;
 };
 
 

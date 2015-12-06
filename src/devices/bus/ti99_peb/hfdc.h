@@ -32,11 +32,11 @@ class myarc_hfdc_device : public ti_expansion_card_device
 public:
 	myarc_hfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
 	DECLARE_WRITE_LINE_MEMBER( dmarq_w );
 	DECLARE_WRITE_LINE_MEMBER( intrq_w );

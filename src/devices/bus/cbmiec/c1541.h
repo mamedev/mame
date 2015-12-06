@@ -138,7 +138,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// not really public
-	virtual DECLARE_READ8_MEMBER( via0_pa_r );
+	virtual DECLARE_READ8_MEMBER( via0_pa_r ) override;
 };
 
 

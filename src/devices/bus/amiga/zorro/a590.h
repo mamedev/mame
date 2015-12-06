@@ -87,7 +87,7 @@ protected:
 	virtual void int6_w(int state) override { m_slot->int6_w(state); }
 
 	// input from slot
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
 
 private:
 	required_ioport m_dips;
@@ -117,7 +117,7 @@ public:
 	virtual void int6_w(int state) override { m_slot->int6_w(state); }
 
 	// input from slot
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
 
 private:
 	required_ioport m_jp1;

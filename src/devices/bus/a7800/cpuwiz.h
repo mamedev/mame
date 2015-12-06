@@ -21,8 +21,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx);
-	virtual DECLARE_WRITE8_MEMBER(write_40xx);
+	virtual DECLARE_READ8_MEMBER(read_40xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
 
 protected:
 	int m_ram_bank;
@@ -38,7 +38,7 @@ public:
 	a78_megacart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_WRITE8_MEMBER(write_40xx);
+	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
 };
 
 

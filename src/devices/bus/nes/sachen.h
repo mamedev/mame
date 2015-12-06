@@ -16,7 +16,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_l);
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 
 	virtual void pcb_reset() override;
 };
@@ -32,7 +32,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 };
@@ -48,7 +48,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
 };
@@ -64,7 +64,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_l);
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 
 	virtual void pcb_reset() override;
 };
@@ -80,7 +80,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_l);
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 
 	virtual void pcb_reset() override;
 };
@@ -96,7 +96,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_READ8_MEMBER(read_l);
+	virtual DECLARE_READ8_MEMBER(read_l) override;
 
 	virtual void pcb_reset() override;
 };
@@ -112,7 +112,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_l);
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 	virtual DECLARE_WRITE8_MEMBER(write_m) override { write_l(space, (offset + 0x100) & 0xfff, data, mem_mask); }
 	virtual DECLARE_WRITE8_MEMBER(write_h) override { write_l(space, (offset + 0x100) & 0xfff, data, mem_mask); }
 
@@ -130,8 +130,8 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_WRITE8_MEMBER(write_l);
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 
 	virtual void pcb_reset() override;
 
@@ -151,8 +151,8 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_WRITE8_MEMBER(write_l);
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 
 	virtual void pcb_reset() override;
 
@@ -172,7 +172,7 @@ public:
 
 	// device-level overrides
 	virtual DECLARE_READ8_MEMBER(read_l) override { return 0xff; }   // no read_l here
-	virtual DECLARE_WRITE8_MEMBER(write_l);
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 };
 
 
@@ -187,7 +187,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_l);
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 	virtual DECLARE_WRITE8_MEMBER(write_m) override { write_l(space, (offset + 0x100) & 0xfff, data, mem_mask); }
 
 	virtual void pcb_reset() override;

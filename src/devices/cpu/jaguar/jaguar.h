@@ -249,8 +249,8 @@ public:
 	// construction/destruction
 	jaguargpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_WRITE32_MEMBER(ctrl_w);
-	DECLARE_READ32_MEMBER(ctrl_r);
+	DECLARE_WRITE32_MEMBER(ctrl_w) override;
+	DECLARE_READ32_MEMBER(ctrl_r) override;
 
 protected:
 	virtual void execute_run() override;
@@ -264,8 +264,8 @@ public:
 	// construction/destruction
 	jaguardsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_WRITE32_MEMBER(ctrl_w);
-	DECLARE_READ32_MEMBER(ctrl_r);
+	DECLARE_WRITE32_MEMBER(ctrl_w) override;
+	DECLARE_READ32_MEMBER(ctrl_r) override;
 
 protected:
 	virtual UINT32 execute_input_lines() const override { return 6; }

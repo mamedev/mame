@@ -31,10 +31,10 @@ public:
 	required_ioport m_test_ipt;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read);
-	virtual DECLARE_WRITE16_MEMBER(write);
-	virtual DECLARE_READ16_MEMBER(read_a15);
-	virtual DECLARE_WRITE16_MEMBER(write_a15);
+	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual DECLARE_READ16_MEMBER(read_a15) override;
+	virtual DECLARE_WRITE16_MEMBER(write_a15) override;
 
 	virtual int read_test() override;
 

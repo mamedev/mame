@@ -25,8 +25,8 @@ public:
 	required_device<upd7725_device> m_upd7725;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read);
-	virtual DECLARE_WRITE8_MEMBER(chip_write);
+	virtual DECLARE_READ8_MEMBER(chip_read) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
 
 	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
@@ -52,8 +52,8 @@ public:
 	required_device<upd7725_device> m_upd7725;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read);
-	virtual DECLARE_WRITE8_MEMBER(chip_write);
+	virtual DECLARE_READ8_MEMBER(chip_read) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
 
 	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
@@ -77,8 +77,8 @@ public:
 	required_device<upd96050_device> m_upd96050;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read);
-	virtual DECLARE_WRITE8_MEMBER(chip_write);
+	virtual DECLARE_READ8_MEMBER(chip_read) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
 
 	virtual DECLARE_READ32_MEMBER(setadsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(setadsp_data_r);

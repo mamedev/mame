@@ -21,7 +21,7 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_rom);
+	virtual DECLARE_READ32_MEMBER(read_rom) override;
 };
 
 

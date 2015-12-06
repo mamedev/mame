@@ -21,7 +21,7 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 };
 
 
@@ -54,9 +54,9 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
-	virtual DECLARE_DIRECT_UPDATE_MEMBER(cart_opbase);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual DECLARE_DIRECT_UPDATE_MEMBER(cart_opbase) override;
 
 protected:
 	int m_base_bank;
@@ -75,8 +75,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 };
 
 
@@ -90,8 +90,8 @@ public:
 	a26_rom_f8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 };
 
 
@@ -117,8 +117,8 @@ public:
 	a26_rom_fa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 };
 
 
@@ -135,10 +135,10 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_READ8_MEMBER(read_bank);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_READ8_MEMBER(read_bank) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 
 protected:
 	int m_base_bank;
@@ -159,9 +159,9 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
 
 protected:
 	int m_num_bank;
@@ -182,8 +182,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 
 protected:
 	int m_num_bank;
@@ -203,8 +203,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 
 protected:
 	int m_base_banks[4];
@@ -224,8 +224,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 
 protected:
 	int m_ram_bank;
@@ -244,9 +244,9 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_READ8_MEMBER(read_bank);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_READ8_MEMBER(read_bank) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 };
 
 
@@ -259,8 +259,8 @@ public:
 	a26_rom_cv_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 };
 
 
@@ -273,8 +273,8 @@ public:
 	a26_rom_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 };
 
 
@@ -291,8 +291,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 
 protected:
 	int m_locked;
@@ -308,8 +308,8 @@ public:
 	a26_rom_jvp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 };
 
 
@@ -325,7 +325,7 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 };
 
 
@@ -342,7 +342,7 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 
 protected:
 	int m_reset_bank;
@@ -361,7 +361,7 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 };
 
 
@@ -374,8 +374,8 @@ public:
 	a26_rom_x07_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 };
 
 

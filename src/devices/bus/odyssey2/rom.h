@@ -21,8 +21,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom04);
-	virtual DECLARE_READ8_MEMBER(read_rom0c);
+	virtual DECLARE_READ8_MEMBER(read_rom04) override;
+	virtual DECLARE_READ8_MEMBER(read_rom0c) override;
 
 	virtual void write_bank(int bank) override;
 
@@ -39,8 +39,8 @@ public:
 	o2_rom12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom04);
-	virtual DECLARE_READ8_MEMBER(read_rom0c);
+	virtual DECLARE_READ8_MEMBER(read_rom04) override;
+	virtual DECLARE_READ8_MEMBER(read_rom0c) override;
 };
 
 // ======================> o2_rom16_device
@@ -52,8 +52,8 @@ public:
 	o2_rom16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom04);
-	virtual DECLARE_READ8_MEMBER(read_rom0c);
+	virtual DECLARE_READ8_MEMBER(read_rom04) override;
+	virtual DECLARE_READ8_MEMBER(read_rom0c) override;
 };
 
 

@@ -15,8 +15,8 @@ class linear_flash_pccard_device : public device_t,
 	public device_slot_card_interface
 {
 public:
-	virtual DECLARE_READ16_MEMBER(read_memory);
-	virtual DECLARE_WRITE16_MEMBER(write_memory);
+	virtual DECLARE_READ16_MEMBER(read_memory) override;
+	virtual DECLARE_WRITE16_MEMBER(write_memory) override;
 
 protected:
 	linear_flash_pccard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);

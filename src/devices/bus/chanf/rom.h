@@ -26,7 +26,7 @@ public:
 	void common_write_3853(UINT32 offset, UINT8 data);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 
 
 protected:
@@ -99,10 +99,10 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 	virtual DECLARE_READ8_MEMBER(read_ram) override { return common_read_3853(offset); }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) override { common_write_3853(offset, data); }
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 
 private:
 	int m_base_bank;
@@ -122,10 +122,10 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 	virtual DECLARE_READ8_MEMBER(read_ram) override { return common_read_3853(offset); }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) override { common_write_3853(offset, data); }
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 
 private:
 	int m_base_bank, m_half_bank;

@@ -149,8 +149,8 @@ public:
 
 	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<ti998_spsyn_device &>(device).m_ready.set_callback(object); }
 
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz) { };
 	DECLARE_WRITE8_MEMBER(cruwrite) { };
@@ -197,8 +197,8 @@ public:
 	DECLARE_READ8_MEMBER( readm);       // used from address map
 	DECLARE_WRITE8_MEMBER( writem );    // used from address map
 
-	DECLARE_READ8Z_MEMBER( readz );
-	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8Z_MEMBER( readz ) override;
+	DECLARE_WRITE8_MEMBER( write ) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz);
 	DECLARE_WRITE8_MEMBER(cruwrite);

@@ -26,7 +26,7 @@ public:
 
 	virtual void device_start() override;
 
-	virtual DECLARE_READ8_MEMBER(read);
+	virtual DECLARE_READ8_MEMBER(read) override;
 
 	DECLARE_WRITE8_MEMBER(write_ym2413);
 

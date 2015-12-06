@@ -23,8 +23,8 @@ public:
 
 	// reading and writing
 	// actual IntelliVoice access
-	virtual DECLARE_READ16_MEMBER(read_speech);
-	virtual DECLARE_WRITE16_MEMBER(write_speech);
+	virtual DECLARE_READ16_MEMBER(read_speech) override;
+	virtual DECLARE_WRITE16_MEMBER(write_speech) override;
 
 	// passthru access
 	virtual DECLARE_READ16_MEMBER(read_rom04) override { return m_subslot->read_rom04(space, offset, mem_mask); }

@@ -21,7 +21,7 @@ public:
 	virtual void device_reset() override {}
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 };
 
 // ======================> vectrex_rom64k_device
@@ -37,8 +37,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
 
 private:
 	int m_bank;
@@ -53,7 +53,7 @@ public:
 	vectrex_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
 };
 
 

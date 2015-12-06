@@ -22,8 +22,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 protected:
 	dynamic_buffer m_ram;
@@ -67,8 +67,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 private:
 	dynamic_buffer m_ram;
@@ -90,8 +90,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 private:
 	dynamic_buffer m_ram;
@@ -113,8 +113,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 private:
 	dynamic_buffer m_ram;

@@ -26,8 +26,8 @@ public:
 	virtual void nvram_write(emu_file &file) override { if (!m_ext_bram.empty()) file.write(&m_ext_bram[0], m_ext_bram.size()); }
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ext_bram);
-	virtual DECLARE_WRITE32_MEMBER(write_ext_bram);
+	virtual DECLARE_READ32_MEMBER(read_ext_bram) override;
+	virtual DECLARE_WRITE32_MEMBER(write_ext_bram) override;
 };
 
 class saturn_bram4mb_device : public saturn_bram_device

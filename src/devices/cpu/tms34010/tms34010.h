@@ -1027,8 +1027,8 @@ public:
 	tms34010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	/* Reads & writes to the 34010 I/O registers; place at 0xc0000000 */
-	virtual DECLARE_WRITE16_MEMBER( io_register_w );
-	virtual DECLARE_READ16_MEMBER( io_register_r );
+	virtual DECLARE_WRITE16_MEMBER( io_register_w ) override;
+	virtual DECLARE_READ16_MEMBER( io_register_r ) override;
 
 protected:
 	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 8 - 1) / 8; }
@@ -1044,8 +1044,8 @@ public:
 	tms34020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	/* Reads & writes to the 34010 I/O registers; place at 0xc0000000 */
-	virtual DECLARE_WRITE16_MEMBER( io_register_w );
-	virtual DECLARE_READ16_MEMBER( io_register_r );
+	virtual DECLARE_WRITE16_MEMBER( io_register_w ) override;
+	virtual DECLARE_READ16_MEMBER( io_register_r ) override;
 
 protected:
 	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 4 - 1) / 4; }

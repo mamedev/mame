@@ -21,7 +21,7 @@ public:
 	virtual void device_reset() override {}
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
 };
 
 // ======================> apf_basic_device
@@ -33,7 +33,7 @@ public:
 	apf_basic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(extra_rom);
+	virtual DECLARE_READ8_MEMBER(extra_rom) override;
 };
 
 // ======================> apf_spacedst_device
@@ -45,8 +45,8 @@ public:
 	apf_spacedst_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
 };
 
 

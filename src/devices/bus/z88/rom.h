@@ -27,7 +27,7 @@ protected:
 	virtual void device_start() override;
 
 	// z88cart_interface overrides
-	virtual DECLARE_READ8_MEMBER(read);
+	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual UINT8* get_cart_base() override;
 	virtual UINT32 get_cart_size() override { return 0x8000; }
 

@@ -78,9 +78,9 @@ public:
 	required_device<dpc_device> m_dpc;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
-	virtual DECLARE_DIRECT_UPDATE_MEMBER(cart_opbase);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual DECLARE_DIRECT_UPDATE_MEMBER(cart_opbase) override;
 
 	virtual void setup_addon_ptr(UINT8 *ptr) override;
 };
