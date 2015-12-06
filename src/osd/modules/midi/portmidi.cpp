@@ -30,11 +30,11 @@ public:
 	}
 	virtual ~pm_module() { }
 
-	virtual int init(const osd_options &options);
-	virtual void exit();
+	virtual int init(const osd_options &options)override;
+	virtual void exit()override;
 
-	osd_midi_device *create_midi_device();
-	void list_midi_devices(void);
+	virtual osd_midi_device *create_midi_device() override;
+	virtual void list_midi_devices(void) override;
 };
 
 
@@ -48,12 +48,12 @@ class osd_midi_device_pm : public osd_midi_device
 public:
 	osd_midi_device_pm(): pmStream(nullptr), xmit_cnt(0), last_status(0), rx_sysex(false) { }
 	virtual ~osd_midi_device_pm() { }
-	virtual bool open_input(const char *devname);
-	virtual bool open_output(const char *devname);
-	virtual void close();
-	virtual bool poll();
-	virtual int read(UINT8 *pOut);
-	virtual void write(UINT8 data);
+	virtual bool open_input(const char *devname) override;
+	virtual bool open_output(const char *devname) override;
+	virtual void close() override;
+	virtual bool poll() override;
+	virtual int read(UINT8 *pOut) override;
+	virtual void write(UINT8 data) override;
 
 private:
 	PortMidiStream *pmStream;

@@ -20,12 +20,12 @@ class bbc_dfs_format : public wd177x_format
 public:
 	bbc_dfs_format();
 
-	virtual int find_size(io_generic *io, UINT32 form_factor);
-	virtual int identify(io_generic *io, UINT32 form_factor);
-	virtual int get_image_offset(const format &f, int head, int track);
-	virtual const char *name() const;
-	virtual const char *description() const;
-	virtual const char *extensions() const;
+	virtual int find_size(io_generic *io, UINT32 form_factor) override;
+	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual int get_image_offset(const format &f, int head, int track) override;
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
 
 private:
 	static const format formats[];
@@ -36,12 +36,12 @@ class bbc_adfs_format : public wd177x_format
 public:
 	bbc_adfs_format();
 
-	virtual int find_size(io_generic *io, UINT32 form_factor);
-	virtual int identify(io_generic *io, UINT32 form_factor);
-	virtual int get_image_offset(const format &f, int head, int track);
-	virtual const char *name() const;
-	virtual const char *description() const;
-	virtual const char *extensions() const;
+	virtual int find_size(io_generic *io, UINT32 form_factor) override;
+	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual int get_image_offset(const format &f, int head, int track) override;
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
 
 private:
 	static const format formats[];
@@ -52,12 +52,12 @@ class bbc_dos_format : public wd177x_format
 public:
 	bbc_dos_format();
 
-	virtual int find_size(io_generic *io, UINT32 form_factor);
-	virtual int identify(io_generic *io, UINT32 form_factor);
-	virtual int get_image_offset(const format &f, int head, int track);
-	virtual const char *name() const;
-	virtual const char *description() const;
-	virtual const char *extensions() const;
+	virtual int find_size(io_generic *io, UINT32 form_factor) override;
+	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual int get_image_offset(const format &f, int head, int track) override;
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
 
 private:
 	static const format formats[];
@@ -68,11 +68,11 @@ class bbc_cpm_format : public wd177x_format
 public:
 	bbc_cpm_format();
 
-	virtual int identify(io_generic *io, UINT32 form_factor);
-	virtual int get_image_offset(const format &f, int head, int track);
-	virtual const char *name() const;
-	virtual const char *description() const;
-	virtual const char *extensions() const;
+	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual int get_image_offset(const format &f, int head, int track) override;
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
 
 private:
 	static const format formats[];

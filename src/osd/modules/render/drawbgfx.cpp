@@ -64,17 +64,17 @@ public:
 		m_last_blit_time(0), m_last_blit_pixels(0)
 	{}
 
-	/* virtual */ int create();
-	/* virtual */ int draw(const int update);
+	virtual int create() override;
+	virtual int draw(const int update) override;
 #ifdef OSD_SDL
-	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
+	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
 #else
-	/* virtual */ void save() { }
-	/* virtual */ void record() { }
-	/* virtual */ void toggle_fsfx() { }
+	virtual void save() override { }
+	virtual void record() override { }
+	virtual void toggle_fsfx() override { }
 #endif
-	/* virtual */ void destroy();
-	/* virtual */ render_primitive_list *get_primitives()
+	virtual void destroy() override;
+	virtual render_primitive_list *get_primitives() override
 	{
 #ifdef OSD_WINDOWS
 		RECT client;

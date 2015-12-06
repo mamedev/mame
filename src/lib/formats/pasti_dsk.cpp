@@ -175,7 +175,7 @@ void pasti_format::wd_generate_unsynced_gap(std::vector<UINT32> &track, const wd
 	for(int i=tstart; i != tend;) {
 		unsigned char v = obs.track_data[i];
 		int j;
-		for(j=i+1; j != tend && obs.track_data[j] == v; j++);
+		for(j=i+1; j != tend && obs.track_data[j] == v; j++) {};
 		int size = j-i;
 		if(size < 4) {
 			mfm_w(track, 8, v, cell_size);

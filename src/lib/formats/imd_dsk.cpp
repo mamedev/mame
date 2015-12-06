@@ -427,7 +427,7 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	io_generic_read(io, &img[0], 0, size);
 
 	UINT64 pos;
-	for(pos=0; pos < size && img[pos] != 0x1a; pos++);
+	for(pos=0; pos < size && img[pos] != 0x1a; pos++) {};
 	pos++;
 
 	if(pos >= size)

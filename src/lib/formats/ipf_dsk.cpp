@@ -5,7 +5,8 @@
 
 const floppy_format_type FLOPPY_IPF_FORMAT = &floppy_image_format_creator<ipf_format>;
 
-ipf_format::ipf_format()
+ipf_format::ipf_format(): tinfos(nullptr), tcount(0), type(0), release(0), revision(0), encoder_type(0), 
+encoder_revision(0), origin(0), min_cylinder(0), max_cylinder(0), min_head(0), max_head(0), credit_day(0), credit_time(0)
 {
 }
 

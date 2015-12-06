@@ -22,12 +22,12 @@ public:
 
 	virtual ~debug_none() { }
 
-	virtual int init(const osd_options &options) { return 0; }
-	virtual void exit() { }
+	virtual int init(const osd_options &options) override { return 0; }
+	virtual void exit() override { }
 
-	virtual void init_debugger(running_machine &machine);
-	virtual void wait_for_debugger(device_t &device, bool firststop);
-	virtual void debugger_update();
+	virtual void init_debugger(running_machine &machine) override;
+	virtual void wait_for_debugger(device_t &device, bool firststop) override;
+	virtual void debugger_update() override;
 
 private:
 	running_machine *m_machine;

@@ -35,7 +35,6 @@ protected:
 	virtual void write_track(io_generic *io, UINT8 *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes) =0;
 
 	int get_encoding(int cell_size);
-	int get_track_size(int cell_size);
 
 	void generate_track_fm(int track, int head, int cell_size, UINT8* trackdata, floppy_image *image);
 	void generate_track_mfm(int track, int head, int cell_size, UINT8* trackdata, floppy_image *image);

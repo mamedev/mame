@@ -233,12 +233,12 @@ public:
 		ReleaseDC(m_window, m_hdc);
 	}
 
-	virtual void MakeCurrent()
+	virtual void MakeCurrent() override
 	{
 		this->pfn_wglMakeCurrent(m_hdc, m_context);
 	}
 
-	virtual const char *LastErrorMsg()
+	virtual const char *LastErrorMsg() override
 	{
 		if (m_error[0] == 0)
 			return NULL;
@@ -246,7 +246,7 @@ public:
 			return m_error;
 	}
 
-	virtual void *getProcAddress(const char *proc)
+	virtual void *getProcAddress(const char *proc) override
 	{
 		void *ret = (void *) GetProcAddress(m_module, proc);
 		if (ret == NULL)
@@ -254,7 +254,7 @@ public:
 		return ret;
 	}
 
-	virtual int SetSwapInterval(const int swap)
+	virtual int SetSwapInterval(const int swap) override
 	{
 		if (this->pfn_wglSwapIntervalEXT != NULL)
 		{
@@ -263,7 +263,7 @@ public:
 		return 0;
 	}
 
-	virtual void SwapBuffer()
+	virtual void SwapBuffer() override
 	{
 		SwapBuffers(m_hdc);
 		//wglSwapLayerBuffers(GetDC(window().m_hwnd), WGL_SWAP_MAIN_PLANE);
@@ -535,12 +535,12 @@ public:
 			m_texVerticex[i] = 0.0f;
 	}
 
-	/* virtual */ int create();
-	/* virtual */ int draw(const int update);
+	virtual int create() override;
+	virtual int draw(const int update) override;
 
-	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
-	/* virtual */ void destroy();
-	/* virtual */ render_primitive_list *get_primitives()
+	int xy_to_render_target(const int x, const int y, int *xt, int *yt);
+	virtual void destroy() override;
+	virtual render_primitive_list *get_primitives() override
 	{
 #ifdef OSD_WINDOWS
 		osd_dim nd = window().get_size();
@@ -556,9 +556,9 @@ public:
 		return &window().target()->get_primitives();
 	}
 
-	/* virtual */ void save() { }
-	/* virtual */ void record() { }
-	/* virtual */ void toggle_fsfx() { }
+	virtual void save() override { }
+	virtual void record() override { }
+	virtual void toggle_fsfx() override { }
 
 private:
 	void destroy_all_textures();

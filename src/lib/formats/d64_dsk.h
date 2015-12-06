@@ -58,7 +58,7 @@ protected:
 
 	const format *formats;
 
-	int find_size(io_generic *io, UINT32 form_factor);
+	int find_size(io_generic *io, UINT32 form_factor) const;
 	virtual int get_physical_track(const format &f, int head, int track);
 	virtual UINT32 get_cell_size(const format &f, int track);
 	virtual int get_sectors_per_track(const format &f, int track);

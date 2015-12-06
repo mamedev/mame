@@ -535,7 +535,7 @@ static const UINT8 prodos_skewing[] =
 };
 
 
-a2_16sect_format::a2_16sect_format() : floppy_image_format_t()
+a2_16sect_format::a2_16sect_format() : floppy_image_format_t(), m_prodos_order(false)
 {
 }
 

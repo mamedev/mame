@@ -166,20 +166,20 @@ public:
 	virtual void register_options();
 
 	// general overridables
-	virtual void init(running_machine &machine);
-	virtual void update(bool skip_redraw);
+	virtual void init(running_machine &machine) override;
+	virtual void update(bool skip_redraw) override;
 
 	// debugger overridables
-	virtual void init_debugger();
-	virtual void wait_for_debugger(device_t &device, bool firststop);
+	virtual void init_debugger() override;
+	virtual void wait_for_debugger(device_t &device, bool firststop) override;
 
 	// audio overridables
-	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
-	virtual void set_mastervolume(int attenuation);
-	virtual bool no_sound();
+	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame) override;
+	virtual void set_mastervolume(int attenuation) override;
+	virtual bool no_sound() override;
 
 	// input overridables
-	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
+	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 
 	// font overridables
 	virtual osd_font *font_open(const char *name, int &height);
@@ -187,14 +187,14 @@ public:
 	virtual bool font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
 
 	// video overridables
-	virtual void *get_slider_list();
+	virtual void *get_slider_list() override;
 
 	// command option overrides
-	virtual bool execute_command(const char *command);
+	virtual bool execute_command(const char *command) override;
 
-	osd_font *font_alloc() { return m_font_module->font_alloc(); }
+	virtual osd_font *font_alloc() override { return m_font_module->font_alloc(); }
 
-	osd_midi_device *create_midi_device() { return m_midi->create_midi_device(); }
+	virtual osd_midi_device *create_midi_device() override { return m_midi->create_midi_device(); }
 
 	// FIXME: everything below seems to be osd specific and not part of
 	//        this INTERFACE but part of the osd IMPLEMENTATION
@@ -227,7 +227,7 @@ public:
 	osd_options &options() { return m_options; }
 
 	// osd_output interface ...
-	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args);
+	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args)  override;
 
 protected:
 	virtual bool input_init();

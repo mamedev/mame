@@ -510,7 +510,7 @@ void td0dsk_t::reconst()
 	for (i = 0, j = N_CHAR; j < T; i += 2, j++) {
 		k = i + 1;
 		f = freq[j] = freq[i] + freq[k];
-		for (k = j - 1; f < freq[k]; k--);
+		for (k = j - 1; f < freq[k]; k--) {};
 		k++;
 		l = (j - k) * 2;
 
@@ -550,7 +550,7 @@ void td0dsk_t::update(int c)
 
 		/* swap nodes to keep the tree freq-ordered */
 		if (k > freq[l = c + 1]) {
-			while (k > freq[++l]);
+			while (k > freq[++l]) {};
 			l--;
 			freq[c] = freq[l];
 			freq[l] = k;

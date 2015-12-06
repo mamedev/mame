@@ -110,7 +110,7 @@ public:
 	operator _DeviceClass &() { assert(object_finder_base<_DeviceClass>::m_target != nullptr); return *object_finder_base<_DeviceClass>::m_target; }
 
 	// finder
-	virtual bool findit(bool isvalidation = false)
+	virtual bool findit(bool isvalidation = false) override
 	{
 		device_t *device = this->m_base.subdevice(this->m_tag);
 		this->m_target = dynamic_cast<_DeviceClass *>(device);
@@ -396,7 +396,7 @@ public:
 	}
 
 	// finder
-	virtual bool findit(bool isvalidation = false)
+	virtual bool findit(bool isvalidation = false) override
 	{
 		if (isvalidation) return true;
 		this->m_target = reinterpret_cast<_PointerType *>(this->find_memshare(m_width, m_bytes, _Required));

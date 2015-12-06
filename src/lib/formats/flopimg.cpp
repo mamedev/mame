@@ -958,7 +958,7 @@ floppy_image::~floppy_image()
 {
 }
 
-void floppy_image::get_maximal_geometry(int &_tracks, int &_heads)
+void floppy_image::get_maximal_geometry(int &_tracks, int &_heads) const
 {
 	_tracks = tracks;
 	_heads = heads;
@@ -1097,7 +1097,7 @@ bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *
 		(type == CRC && (crcs[p1].type == CRC_CCITT || crcs[p1].type == CRC_AMIGA));
 }
 
-void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs)
+void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs) const
 {
 	memset(crcs, 0, MAX_CRC_COUNT * sizeof(*crcs));
 	for(int i=0; i != MAX_CRC_COUNT; i++)
@@ -1134,7 +1134,7 @@ void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs)
 	for(int i=0; desc[i].type != END; i++)
 		if(desc[i].type == CRC) {
 			int j;
-			for(j = i+1; desc[j].type != END && type_no_data(desc[j].type); j++);
+			for(j = i+1; desc[j].type != END && type_no_data(desc[j].type); j++) {};
 			crcs[desc[i].p1].fixup_mfm_clock = type_data_mfm(desc[j].type, desc[j].p1, crcs);
 		}
 }
@@ -1545,7 +1545,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 		case SIZE_ID: {
 			int size = sect[sector_idx].size;
 			int id;
-			for(id = 0; size > 128; size >>=1, id++);
+			for(id = 0; size > 128; size >>=1, id++) {};
 			mfm_w(buffer, 8, id);
 			break;
 		}
@@ -1553,7 +1553,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 		case SIZE_ID_FM: {
 			int size = sect[sector_idx].size;
 			int id;
-			for(id = 0; size > 128; size >>=1, id++);
+			for(id = 0; size > 128; size >>=1, id++) {};
 			fm_w(buffer, 8, id);
 			break;
 		}
