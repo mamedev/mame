@@ -9608,7 +9608,8 @@ galhustl        // (c) 1997 ACE International
 
 // Playmark games
 sslam           // (c) 1993 - hack of Namco's Super World Court
-sslama          // (c) 1993 - hack of Namco's Super World Court
+sslama          // ^
+sslamb			// ^
 powerbal        // (c) 1994
 powerbals       // (c) 1994
 magicstk        // (c) 1995
