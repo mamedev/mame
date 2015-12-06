@@ -147,6 +147,9 @@ WRITE8_MEMBER( squale_state::fdc_sel0_w )
 	#endif
 
 	fdc_sel0 = data;
+
+	// drive select
+	m_floppy = NULL;
 }
 
 WRITE8_MEMBER( squale_state::fdc_sel1_w )
@@ -446,6 +449,7 @@ void squale_state::machine_start()
 
 	fdc_sel0 = 0x00;
 	fdc_sel1 = 0x00;
+	m_floppy = NULL;
 
 	membank("rom_bank")->configure_entry(0, memregion("maincpu")->base() + 0x100);
 	membank("rom_bank")->configure_entry(1, memregion("maincpu")->base() + 0x1100);
