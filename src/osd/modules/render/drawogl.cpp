@@ -362,29 +362,29 @@ public:
 	{
 		SDL_GL_DeleteContext(m_context);
 	}
-	virtual void MakeCurrent()
+	virtual void MakeCurrent() override
 	{
 		SDL_GL_MakeCurrent(m_window, m_context);
 	}
 
-	virtual int SetSwapInterval(const int swap)
+	virtual int SetSwapInterval(const int swap) override
 	{
 		return SDL_GL_SetSwapInterval(swap);
 	}
 
-	virtual const char *LastErrorMsg()
+	virtual const char *LastErrorMsg() override
 	{
 		if (m_error[0] == 0)
 			return NULL;
 		else
 			return m_error;
 	}
-	virtual void *getProcAddress(const char *proc)
+	virtual void *getProcAddress(const char *proc) override
 	{
 		return SDL_GL_GetProcAddress(proc);
 	}
 
-	virtual void SwapBuffer()
+	virtual void SwapBuffer() override
 	{
 		SDL_GL_SwapWindow(m_window);
 	}

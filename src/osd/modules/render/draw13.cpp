@@ -174,11 +174,11 @@ public:
 		}
 	}
 
-	/* virtual */ int create();
-	/* virtual */ int draw(const int update);
-	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
-	/* virtual */ void destroy();
-	/* virtual */ render_primitive_list *get_primitives()
+	/* virtual */ int create() override;
+	/* virtual */ int draw(const int update) override;
+	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
+	/* virtual */ void destroy() override;
+	/* virtual */ render_primitive_list *get_primitives() override
 	{
 		osd_dim nd = window().blit_surface_size();
 		if (nd != m_blit_dim)
