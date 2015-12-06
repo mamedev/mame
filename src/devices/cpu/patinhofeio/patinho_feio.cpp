@@ -497,7 +497,7 @@ void patinho_feio_cpu_device::execute_instruction()
                     printf("Unimplemented ENTR /%X0 instruction\n", channel);
                     break;
                 case 0x80:
-                    printf("Unimplemented SAI /%X0 instruction\n", channel);
+                    printf("Unimplemented SAI /%X0 instruction (ACC = 0x%02X '%c')\n", channel, ACC, ACC);
                     break;
             }
             return;
