@@ -734,6 +734,8 @@ void tms57002_device::execute_run()
 		}
 
 		for(;;) {
+			UINT32 c, d;
+			INT64 r;
 			const icd *i = cache.inst + ipc;
 
 			ipc = i->next;

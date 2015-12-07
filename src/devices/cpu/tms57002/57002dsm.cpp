@@ -12,6 +12,30 @@
 #include "debugger.h"
 #include "tms57002.h"
 
+static const char *get_memadr(UINT32 opcode, char type)
+{
+	static char buff[2][10];
+	static int index = 0;
+	char *buf;
+
+	index = 1-index;
+	buf = buff[index];
+
+	if(((opcode & 0x400) && (type == 'c')) || (!(opcode & 0x400) && (type == 'd'))) {
+		if(opcode & 0x100)
+			sprintf(buf, "%c(%02x)", type, opcode & 0xff);
+		else if(opcode & 0x80)
+			sprintf(buf, "%c*+", type);
+		else
+			sprintf(buf, "%c*", type);
+	} else if(opcode & 0x200)
+		sprintf(buf, "%c*+", type);
+	else
+		sprintf(buf, "%c*", type);
+	return buf;
+}
+
+
 CPU_DISASSEMBLE(tms57002)
 {
 	UINT32 opcode = opram[0] | (opram[1] << 8) | (opram[2] << 16);
