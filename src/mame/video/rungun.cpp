@@ -137,16 +137,6 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 	
 	m_ttl_tilemap[m_current_display_bank]->draw(screen, bitmap, cliprect, 0, 0);
 
-	// copy frame output to temp buffers so we can demultiplex it for the dual screen output
-	// (really only need to do this for dual setup)
-	if (m_current_display_bank)
-	{
-		copybitmap(m_rng_dual_demultiplex_right_temp, bitmap, 0, 0, 0, 0, cliprect);
-	}
-	else
-	{
-		copybitmap(m_rng_dual_demultiplex_left_temp, bitmap, 0, 0, 0, 0, cliprect);		
-	}
 	return 0;
 }
 
@@ -154,10 +144,18 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 // the 60hz signal gets split between 2 screens
 UINT32 rungun_state::screen_update_rng_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	int m_current_display_bank = machine().first_screen()->frame_number() & 1;
+
+	if (!m_current_display_bank)
+		screen_update_rng(screen, m_rng_dual_demultiplex_left_temp, cliprect);
+	else
+		screen_update_rng(screen, m_rng_dual_demultiplex_right_temp, cliprect);
+
 	copybitmap( bitmap, m_rng_dual_demultiplex_left_temp, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
+// this depends upon the fisrt screen being updated, and the bitmap being copied to the temp bitmap
 UINT32 rungun_state::screen_update_rng_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap( bitmap, m_rng_dual_demultiplex_right_temp, 0, 0, 0, 0, cliprect);

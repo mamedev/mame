@@ -333,7 +333,48 @@ static INPUT_PORTS_START( rng )
 	KONAMI8_B123_START(4)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( rng_dual )
+	PORT_INCLUDE(rng)
 
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x10, 0x10, "Monitors" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPNAME( 0x20, 0x20, "Number of players" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x20, "4" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( rng_nodip )
+	PORT_INCLUDE(rng)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 /**********************************************************************************/
 
@@ -430,28 +471,11 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	MCFG_K053252_OFFSETS(9*8, 24)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_SCREEN_ADD("demultiplex1", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(59.185606)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(88, 88+384-1, 24, 24+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_left)
-	MCFG_SCREEN_PALETTE("palette")
-
 	MCFG_PALETTE_ADD("palette2", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 	
-	MCFG_SCREEN_ADD("demultiplex2", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(59.185606)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(88, 88+384-1, 24, 24+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_right)
-	MCFG_SCREEN_PALETTE("palette2")
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -470,6 +494,19 @@ MACHINE_CONFIG_END
 // for dual-screen output Run and Gun requires the video de-multiplexer board connected to the Jamma output, this gives you 2 Jamma connectors, one for each screen.
 // this means when operated as a single dedicated cabinet the game runs at 60fps, and has smoother animations than when operated as a twin setup where each
 // screen only gets an update every other frame.
+static MACHINE_CONFIG_DERIVED( rng_dual, rng )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_left)
+
+	MCFG_SCREEN_ADD("demultiplex2", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(59.185606)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(88, 88+384-1, 24, 24+224-1)
+	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng_dual_right)
+	MCFG_SCREEN_PALETTE("palette2")
+MACHINE_CONFIG_END
 
 
 // Older non-US 53936/A13 roms were all returning bad from the mask ROM check. Using the US ROM on non-US reports good therefore I guess that data matches for that
@@ -517,7 +554,92 @@ ROM_START( rungun )
 	ROM_LOAD( "rungun.nv", 0x0000, 0x080, CRC(7bbf0e3c) SHA1(0fd3c9400e9b97a06517e0c8620f773a383100fd) )
 ROM_END
 
+ROM_START( rungund ) // same as above set, but with demux adapter connected
+	/* main program Europe Version AA  1993, 10.8 */
+	ROM_REGION( 0x300000, "maincpu", 0)
+	ROM_LOAD16_BYTE( "247eaa03.bin", 0x000000, 0x80000, CRC(f5c91ec0) SHA1(298926ea30472fa8d2c0578dfeaf9a93509747ef) )
+	ROM_LOAD16_BYTE( "247eaa04.bin", 0x000001, 0x80000, CRC(0e62471f) SHA1(2861b7a4e78ff371358d318a1b13a6488c0ac364) )
+
+	/* data (Guru 1 megabyte redump) */
+	ROM_LOAD16_BYTE( "247b01.23n", 0x200000, 0x80000, CRC(2d774f27) SHA1(c48de9cb9daba25603b8278e672f269807aa0b20) )
+	ROM_CONTINUE(                  0x100000, 0x80000)
+	ROM_LOAD16_BYTE( "247b02.21n", 0x200001, 0x80000, CRC(d088c9de) SHA1(19d7ad4120f7cfed9cae862bb0c799fdad7ab15c) )
+	ROM_CONTINUE(                  0x100001, 0x80000)
+
+	/* sound program */
+	ROM_REGION( 0x030000, "soundcpu", 0 )
+	ROM_LOAD("247a05",  0x000000, 0x20000, CRC(64e85430) SHA1(542919c3be257c8f118fc21d3835d7b6426a22ed) )
+	ROM_RELOAD(         0x010000, 0x20000 )
+
+	/* '936 tiles */
+	ROM_REGION( 0x400000, "gfx1", 0)
+	//ROM_LOAD( "247-a13", 0x000000, 0x200000, BAD_DUMP CRC(cc194089) SHA1(b5af94f5f583d282ac1499b371bbaac8b2fedc03) )
+	ROM_LOAD( "247a13", 0x000000, 0x200000, CRC(c5a8ef29) SHA1(23938b8093bc0b9eef91f6d38127ca7acbdc06a6) )
+
+	/* sprites */
+	ROM_REGION( 0x800000, "gfx2", 0)
+	ROM_LOAD64_WORD( "247-a11", 0x000000, 0x200000, CRC(c3f60854) SHA1(cbee7178ab9e5aa6a5aeed0511e370e29001fb01) )  // 5y
+	ROM_LOAD64_WORD( "247-a08", 0x000002, 0x200000, CRC(3e315eef) SHA1(898bc4d5ad244e5f91cbc87820b5d0be99ef6662) )  // 2u
+	ROM_LOAD64_WORD( "247-a09", 0x000004, 0x200000, CRC(5ca7bc06) SHA1(83c793c68227399f93bd1ed167dc9ed2aaac4167) )  // 2y
+	ROM_LOAD64_WORD( "247-a10", 0x000006, 0x200000, CRC(a5ccd243) SHA1(860b88ade1a69f8b6c5b8206424814b386343571) )  // 5u
+
+	/* TTL text plane ("fix layer") */
+	ROM_REGION( 0x20000, "gfx3", 0)
+	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "shared", 0)
+	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
+	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "rungun.nv", 0x0000, 0x080, CRC(7bbf0e3c) SHA1(0fd3c9400e9b97a06517e0c8620f773a383100fd) )
+ROM_END
+
 ROM_START( runguna )
+	/* main program Europe Version AA 1993, 10.4 */
+	ROM_REGION( 0x300000, "maincpu", 0)
+	ROM_LOAD16_BYTE( "247eaa03.rom", 0x000000, 0x80000, CRC(fec3e1d6) SHA1(cd89dc32ad06308134d277f343a7e8b5fe381f69) )
+	ROM_LOAD16_BYTE( "247eaa04.rom", 0x000001, 0x80000, CRC(1b556af9) SHA1(c8351ebd595307d561d089c66cd6ed7f6111d996) )
+
+	/* data (Guru 1 megabyte redump) */
+	ROM_LOAD16_BYTE( "247b01.23n", 0x200000, 0x80000, CRC(2d774f27) SHA1(c48de9cb9daba25603b8278e672f269807aa0b20) )
+	ROM_CONTINUE(                  0x100000, 0x80000)
+	ROM_LOAD16_BYTE( "247b02.21n", 0x200001, 0x80000, CRC(d088c9de) SHA1(19d7ad4120f7cfed9cae862bb0c799fdad7ab15c) )
+	ROM_CONTINUE(                  0x100001, 0x80000)
+
+	/* sound program */
+	ROM_REGION( 0x030000, "soundcpu", 0 )
+	ROM_LOAD("1.13g",  0x000000, 0x20000, CRC(c0b35df9) SHA1(a0c73d993eb32bd0cd192351b5f86794efd91949) )
+	ROM_RELOAD(         0x010000, 0x20000 )
+
+	/* '936 tiles */
+	ROM_REGION( 0x400000, "gfx1", 0)
+	//ROM_LOAD( "247-a13", 0x000000, 0x200000, BAD_DUMP CRC(cc194089) SHA1(b5af94f5f583d282ac1499b371bbaac8b2fedc03) )
+	ROM_LOAD( "247a13", 0x000000, 0x200000, CRC(c5a8ef29) SHA1(23938b8093bc0b9eef91f6d38127ca7acbdc06a6) )
+
+	/* sprites */
+	ROM_REGION( 0x800000, "gfx2", 0)
+	ROM_LOAD64_WORD( "247-a11", 0x000000, 0x200000, CRC(c3f60854) SHA1(cbee7178ab9e5aa6a5aeed0511e370e29001fb01) )  // 5y
+	ROM_LOAD64_WORD( "247-a08", 0x000002, 0x200000, CRC(3e315eef) SHA1(898bc4d5ad244e5f91cbc87820b5d0be99ef6662) )  // 2u
+	ROM_LOAD64_WORD( "247-a09", 0x000004, 0x200000, CRC(5ca7bc06) SHA1(83c793c68227399f93bd1ed167dc9ed2aaac4167) )  // 2y
+	ROM_LOAD64_WORD( "247-a10", 0x000006, 0x200000, CRC(a5ccd243) SHA1(860b88ade1a69f8b6c5b8206424814b386343571) )  // 5u
+
+	/* TTL text plane ("fix layer") */
+	ROM_REGION( 0x20000, "gfx3", 0)
+	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "shared", 0)
+	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
+	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "runguna.nv", 0x0000, 0x080, CRC(7bbf0e3c) SHA1(0fd3c9400e9b97a06517e0c8620f773a383100fd) )
+ROM_END
+
+
+ROM_START( rungunad ) // same as above set, but with demux adapter connected
 	/* main program Europe Version AA 1993, 10.4 */
 	ROM_REGION( 0x300000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "247eaa03.rom", 0x000000, 0x80000, CRC(fec3e1d6) SHA1(cd89dc32ad06308134d277f343a7e8b5fe381f69) )
@@ -606,15 +728,60 @@ ROM_START( rungunb )
 	ROM_LOAD( "runguna.nv", 0x0000, 0x080, CRC(7bbf0e3c) SHA1(0fd3c9400e9b97a06517e0c8620f773a383100fd) )
 ROM_END
 
-ROM_START( rungunu )
-	/* main program US Version AB 1993 10.12 */
-	ROM_REGION( 0x300000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "247uab03.bin", 0x000000, 0x80000, CRC(f259fd11) SHA1(60381a3fa7f78022dcb3e2f3d13ea32a10e4e36e) )
-	ROM_LOAD16_BYTE( "247uab04.bin", 0x000001, 0x80000, CRC(b918cf5a) SHA1(4314c611ef600ec081f409c78218de1639f8b463) )
 
-	/* data */
-	ROM_LOAD16_BYTE( "247a01", 0x100000, 0x80000, CRC(8341cf7d) SHA1(372c147c4a5d54aed2a16b0ed258247e65dda563) )
-	ROM_LOAD16_BYTE( "247a02", 0x100001, 0x80000, CRC(f5ef3f45) SHA1(2e1d8f672c130dbfac4365dc1301b47beee10161) )
+ROM_START( rungunbd ) // same as above set, but with demux adapter connected
+	/* main program Europe Version AA 1993, 9.10 */
+	ROM_REGION( 0x300000, "maincpu", 0)
+	ROM_LOAD16_BYTE( "4.18n", 0x000000, 0x80000, CRC(d6515edb) SHA1(4c30c5df231945027a7d3c54e250b0a246ae3b17))
+	ROM_LOAD16_BYTE( "5.16n", 0x000001, 0x80000, CRC(f2f03eec) SHA1(081fd43b83e148694d34349b826bd02e0a1f85c9))
+
+	/* data (Guru 1 megabyte redump) */
+	ROM_LOAD16_BYTE( "247b01.23n", 0x200000, 0x80000, CRC(2d774f27) SHA1(c48de9cb9daba25603b8278e672f269807aa0b20) )
+	ROM_CONTINUE(                  0x100000, 0x80000)
+	ROM_LOAD16_BYTE( "247b02.21n", 0x200001, 0x80000, CRC(d088c9de) SHA1(19d7ad4120f7cfed9cae862bb0c799fdad7ab15c) )
+	ROM_CONTINUE(                  0x100001, 0x80000)
+
+	/* sound program */
+	ROM_REGION( 0x030000, "soundcpu", 0 )
+	ROM_LOAD("1.13g",  0x000000, 0x20000, CRC(c0b35df9) SHA1(a0c73d993eb32bd0cd192351b5f86794efd91949) )
+	ROM_RELOAD(         0x010000, 0x20000 )
+
+	/* '936 tiles */
+	ROM_REGION( 0x400000, "gfx1", 0)
+	//ROM_LOAD( "247-a13", 0x000000, 0x200000, BAD_DUMP CRC(cc194089) SHA1(b5af94f5f583d282ac1499b371bbaac8b2fedc03) )
+	ROM_LOAD( "247a13", 0x000000, 0x200000, CRC(c5a8ef29) SHA1(23938b8093bc0b9eef91f6d38127ca7acbdc06a6) )
+
+	/* sprites */
+	ROM_REGION( 0x800000, "gfx2", 0)
+	ROM_LOAD64_WORD( "247-a11", 0x000000, 0x200000, CRC(c3f60854) SHA1(cbee7178ab9e5aa6a5aeed0511e370e29001fb01) )  // 5y
+	ROM_LOAD64_WORD( "247-a08", 0x000002, 0x200000, CRC(3e315eef) SHA1(898bc4d5ad244e5f91cbc87820b5d0be99ef6662) )  // 2u
+	ROM_LOAD64_WORD( "247-a09", 0x000004, 0x200000, CRC(5ca7bc06) SHA1(83c793c68227399f93bd1ed167dc9ed2aaac4167) )  // 2y
+	ROM_LOAD64_WORD( "247-a10", 0x000006, 0x200000, CRC(a5ccd243) SHA1(860b88ade1a69f8b6c5b8206424814b386343571) )  // 5u
+
+	/* TTL text plane ("fix layer") */
+	ROM_REGION( 0x20000, "gfx3", 0)
+	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "shared", 0)
+	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
+	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "runguna.nv", 0x0000, 0x080, CRC(7bbf0e3c) SHA1(0fd3c9400e9b97a06517e0c8620f773a383100fd) )
+ROM_END
+
+ROM_START( rungunua )
+	/* main program US Version BA 1993 10.8 */
+	ROM_REGION( 0x300000, "maincpu", 0)
+	ROM_LOAD16_BYTE( "247uba03.bin", 0x000000, 0x80000, CRC(c24d7500) SHA1(38e6ae9fc00bf8f85549be4733992336c46fe1f3) )
+	ROM_LOAD16_BYTE( "247uba04.bin", 0x000001, 0x80000, CRC(3f255a4a) SHA1(3a4d50ecec8546933ad8dabe21682ba0951eaad0) )
+
+	/* data (Guru 1 megabyte redump) */
+	ROM_LOAD16_BYTE( "247b01.23n", 0x200000, 0x80000, CRC(2d774f27) SHA1(c48de9cb9daba25603b8278e672f269807aa0b20) )
+	ROM_CONTINUE(                  0x100000, 0x80000)
+	ROM_LOAD16_BYTE( "247b02.21n", 0x200001, 0x80000, CRC(d088c9de) SHA1(19d7ad4120f7cfed9cae862bb0c799fdad7ab15c) )
+	ROM_CONTINUE(                  0x100001, 0x80000)
 
 	/* sound program */
 	ROM_REGION( 0x030000, "soundcpu", 0 )
@@ -642,10 +809,11 @@ ROM_START( rungunu )
 	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "rungunu.nv", 0x0000, 0x080, CRC(d501f579) SHA1(9e01d9a6a8cdc782dd2a92fbf2295e8df732f892) )
+	ROM_LOAD( "rungunua.nv", 0x0000, 0x080, CRC(9890d304) SHA1(c94a77d1d45e372350456cf8eaa7e7ebd3cdbb84) )
 ROM_END
 
-ROM_START( rungunua )
+
+ROM_START( rungunuad )  // same as above set, but with demux adapter connected
 	/* main program US Version BA 1993 10.8 */
 	ROM_REGION( 0x300000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "247uba03.bin", 0x000000, 0x80000, CRC(c24d7500) SHA1(38e6ae9fc00bf8f85549be4733992336c46fe1f3) )
@@ -728,13 +896,108 @@ ROM_START( slmdunkj )
 	ROM_LOAD( "slmdunkj.nv", 0x0000, 0x080, CRC(531d27bd) SHA1(42251272691c66c1f89f99e6e5e2f300c1a7d69d) )
 ROM_END
 
+ROM_START( slmdunkjd ) // same as above set, but with demux adapter connected
+	/* main program Japan Version AA 1993 10.8 */
+	ROM_REGION( 0x300000, "maincpu", 0)
+	ROM_LOAD16_BYTE( "247jaa03.bin", 0x000000, 0x20000, CRC(87572078) SHA1(cfa784eb40ed8b3bda9d57abb6022bbe92056206) )
+	ROM_LOAD16_BYTE( "247jaa04.bin", 0x000001, 0x20000, CRC(aa105e00) SHA1(617ac14535048b6e0da43cc98c4b67c8e306bef1) )
+
+	/* data (Guru 1 megabyte redump) */
+	ROM_LOAD16_BYTE( "247b01.23n", 0x200000, 0x80000, CRC(2d774f27) SHA1(c48de9cb9daba25603b8278e672f269807aa0b20) )
+	ROM_CONTINUE(                  0x100000, 0x80000)
+	ROM_LOAD16_BYTE( "247b02.21n", 0x200001, 0x80000, CRC(d088c9de) SHA1(19d7ad4120f7cfed9cae862bb0c799fdad7ab15c) )
+	ROM_CONTINUE(                  0x100001, 0x80000)
+
+	/* sound program */
+	ROM_REGION( 0x030000, "soundcpu", 0 )
+	ROM_LOAD("247a05",  0x000000, 0x20000, CRC(64e85430) SHA1(542919c3be257c8f118fc21d3835d7b6426a22ed) )
+	ROM_RELOAD(         0x010000, 0x20000 )
+
+	/* '936 tiles */
+	ROM_REGION( 0x400000, "gfx1", 0)
+	//ROM_LOAD( "247-a13", 0x000000, 0x200000, BAD_DUMP CRC(cc194089) SHA1(b5af94f5f583d282ac1499b371bbaac8b2fedc03) )
+	ROM_LOAD( "247a13", 0x000000, 0x200000, CRC(c5a8ef29) SHA1(23938b8093bc0b9eef91f6d38127ca7acbdc06a6) )
+
+	/* sprites */
+	ROM_REGION( 0x800000, "gfx2", 0)
+	ROM_LOAD64_WORD( "247-a11", 0x000000, 0x200000, CRC(c3f60854) SHA1(cbee7178ab9e5aa6a5aeed0511e370e29001fb01) )  // 5y
+	ROM_LOAD64_WORD( "247-a08", 0x000002, 0x200000, CRC(3e315eef) SHA1(898bc4d5ad244e5f91cbc87820b5d0be99ef6662) )  // 2u
+	ROM_LOAD64_WORD( "247-a09", 0x000004, 0x200000, CRC(5ca7bc06) SHA1(83c793c68227399f93bd1ed167dc9ed2aaac4167) )  // 2y
+	ROM_LOAD64_WORD( "247-a10", 0x000006, 0x200000, CRC(a5ccd243) SHA1(860b88ade1a69f8b6c5b8206424814b386343571) )  // 5u
+
+	/* TTL text plane ("fix layer") */
+	ROM_REGION( 0x20000, "gfx3", 0)
+	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "shared", 0)
+	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
+	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "slmdunkj.nv", 0x0000, 0x080, CRC(531d27bd) SHA1(42251272691c66c1f89f99e6e5e2f300c1a7d69d) )
+ROM_END
+
+
+
+ROM_START( rungunud ) // dual cabinet setup ONLY
+	/* main program US Version AB 1993 10.12 */
+	ROM_REGION( 0x300000, "maincpu", 0)
+	ROM_LOAD16_BYTE( "247uab03.bin", 0x000000, 0x80000, CRC(f259fd11) SHA1(60381a3fa7f78022dcb3e2f3d13ea32a10e4e36e) )
+	ROM_LOAD16_BYTE( "247uab04.bin", 0x000001, 0x80000, CRC(b918cf5a) SHA1(4314c611ef600ec081f409c78218de1639f8b463) )
+
+	/* data */
+	ROM_LOAD16_BYTE( "247a01", 0x100000, 0x80000, CRC(8341cf7d) SHA1(372c147c4a5d54aed2a16b0ed258247e65dda563) )
+	ROM_LOAD16_BYTE( "247a02", 0x100001, 0x80000, CRC(f5ef3f45) SHA1(2e1d8f672c130dbfac4365dc1301b47beee10161) )
+
+	/* sound program */
+	ROM_REGION( 0x030000, "soundcpu", 0 )
+	ROM_LOAD("247a05", 0x000000, 0x20000, CRC(64e85430) SHA1(542919c3be257c8f118fc21d3835d7b6426a22ed) )
+	ROM_RELOAD(        0x010000, 0x20000 )
+
+	/* '936 tiles */
+	ROM_REGION( 0x400000, "gfx1", 0)
+	ROM_LOAD( "247a13", 0x000000, 0x200000, CRC(c5a8ef29) SHA1(23938b8093bc0b9eef91f6d38127ca7acbdc06a6) )
+
+	/* sprites */
+	ROM_REGION( 0x800000, "gfx2", 0)
+	ROM_LOAD64_WORD( "247-a11", 0x000000, 0x200000, CRC(c3f60854) SHA1(cbee7178ab9e5aa6a5aeed0511e370e29001fb01) )  // 5y
+	ROM_LOAD64_WORD( "247-a08", 0x000002, 0x200000, CRC(3e315eef) SHA1(898bc4d5ad244e5f91cbc87820b5d0be99ef6662) )  // 2u
+	ROM_LOAD64_WORD( "247-a09", 0x000004, 0x200000, CRC(5ca7bc06) SHA1(83c793c68227399f93bd1ed167dc9ed2aaac4167) )  // 2y
+	ROM_LOAD64_WORD( "247-a10", 0x000006, 0x200000, CRC(a5ccd243) SHA1(860b88ade1a69f8b6c5b8206424814b386343571) )  // 5u
+
+	/* TTL text plane ("fix layer") */
+	ROM_REGION( 0x20000, "gfx3", 0)
+	ROM_LOAD( "247-a12", 0x000000, 0x20000, CRC(57a8d26e) SHA1(0431d10b76d77c26a1f6f2b55d9dbcfa959e1cd0) )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "shared", 0)
+	ROM_LOAD( "247-a06", 0x000000, 0x200000, CRC(b8b2a67e) SHA1(a873d32f4b178c714743664fa53c0dca29cb3ce4) )
+	ROM_LOAD( "247-a07", 0x200000, 0x200000, CRC(0108142d) SHA1(4dc6a36d976dad9c0da5a5b1f01f2eb3b369c99d) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "rungunu.nv", 0x0000, 0x080, CRC(d501f579) SHA1(9e01d9a6a8cdc782dd2a92fbf2295e8df732f892) )
+ROM_END
+
 
 // these sets operate as single screen / dual screen depending on if you have the video de-multiplexer plugged in, and the dipswitch set to 1 or 2 monitors
-GAMEL( 1993, rungun,   0,      rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
-GAMEL( 1993, runguna,  rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.4)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
-GAMEL( 1993, rungunb,  rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 9.10, prototype?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
-GAMEL( 1993, rungunua, rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UBA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
-GAMEL( 1993, slmdunkj, rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Slam Dunk (ver JAA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
+
+// the 2nd letter of the code indicates the cabinet type, this is why the selectable (single/dual) screen version of Run and Gun for the USA is 'UBA' because the first release there 'UAA' was dual screen only.
+// it appears that all other regions were switchable from the first release, so use the 'A' code.
+
+// these are running WITHOUT the demux adapter, on a single screen
+GAME( 1993, rungun,   0,      rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, runguna,  rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.4)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, rungunb,  rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 9.10, prototype?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, rungunua, rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UBA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1993, slmdunkj, rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Slam Dunk (ver JAA 1993 10.8)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+
+// these sets have the demux adapter connected, and output to 2 screens (as the adapter represents a physical hardware difference, albeit a minor one, use clone sets)
+GAMEL( 1993, rungund,  rungun, rng_dual, rng_dual, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.8) (dual screen with demux adapter)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
+GAMEL( 1993, rungunad, rungun, rng_dual, rng_dual, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 10.4) (dual screen with demux adapter)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
+GAMEL( 1993, rungunbd, rungun, rng_dual, rng_dual, driver_device, 0, ROT0, "Konami", "Run and Gun (ver EAA 1993 9.10, prototype?) (dual screen with demux adapter)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
+GAMEL( 1993, rungunuad,rungun, rng_dual, rng_dual, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UBA 1993 10.8) (dual screen with demux adapter)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
+GAMEL( 1993, slmdunkjd,rungun, rng_dual, rng_dual, driver_device, 0, ROT0, "Konami", "Slam Dunk (ver JAA 1993 10.8) (dual screen with demux adapter)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
 
 // this set has no dipswitches to select single screen mode (they're not even displayed in test menu) it's twin cabinet ONLY
-GAMEL( 1993, rungunu,  rungun, rng, rng, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UAB 1993 10.12, dedicated twin cabinet)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual ) 
+GAMEL( 1993, rungunud, rungun, rng_dual, rng_nodip, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UAB 1993 10.12, dedicated twin cabinet)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual ) 
