@@ -313,8 +313,6 @@ project ("osd_" .. _OPTIONS["osd"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
 	kind (LIBTYPE)
 
-	addprojectflags()
-
 	dofile("sdl_cfg.lua")
 	osdmodulesbuild()
 
@@ -418,8 +416,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 		"SingleOutputDir",
 	}
 
-	addprojectflags()
-
 	dofile("sdl_cfg.lua")
 
 	includedirs {
@@ -480,8 +476,6 @@ if _OPTIONS["with-tools"] then
 			"Symbols", -- always include minimum symbols for executables 	
 		}
 		
-		addprojectflags()
-
 		dofile("sdl_cfg.lua")
 
 		includedirs {
@@ -543,8 +537,6 @@ if _OPTIONS["targetos"] == "macosx" and _OPTIONS["with-tools"] then
 			"Symbols", -- always include minimum symbols for executables 	
 		}
 
-		addprojectflags()
-		
 		dofile("sdl_cfg.lua")
 
 		if _OPTIONS["SEPARATE_BIN"]~="1" then 
