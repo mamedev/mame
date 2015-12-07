@@ -6221,6 +6221,21 @@ DRIVER_INIT_MEMBER(galaxian_state,nolock)
 	space.unmap_write(0x6002, 0x6002, 0, 0x7f8);
 }
 
+DRIVER_INIT_MEMBER(galaxian_state, warofbugg)
+{
+	UINT8* romdata = memregion("maincpu")->base();
+	assert(memregion("maincpu")->bytes() == 0x4000);
+	UINT8 buf[0x4000];
+	memcpy(buf, romdata, 0x4000);
+
+	// the rom data is at the very least, backwards, but there still seems to be missing code
+	for (int i = 0; i < 0x4000; i++)
+		romdata[i] = buf[i^0x7ff];
+
+	DRIVER_INIT_CALL(nolock);
+
+}
+
 
 DRIVER_INIT_MEMBER(galaxian_state,azurian)
 {
@@ -11149,7 +11164,7 @@ GAME( 19??, omega,       theend,   galaxian,   omega,      galaxian_state, galax
 /* these games require the coin lockout mechanism to be disabled */
 GAME( 1981, warofbug,    0,        galaxian,   warofbug,   galaxian_state, nolock,     ROT90,  "Armenia / Food and Fun Corp", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, warofbugu,   warofbug, galaxian,   warofbug,   galaxian_state, nolock,     ROT90,  "Armenia / Super Video Games", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, warofbugg,   warofbug, galaxian,   warofbug,   galaxian_state, nolock,     ROT90,  "Armenia", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze (German)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, warofbugg,   warofbug, galaxian,   warofbug,   galaxian_state, warofbugg,  ROT90,  "Armenia", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze (German)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, spactrai,    warofbug, spactrai,   spactrai,   galaxian_state, nolock,     ROT90,  "Celv",    "Space Train", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, redufo,      0,        galaxian,   redufo,     galaxian_state, nolock,     ROT270, "Artic", "Defend the Terra Attack on the Red UFO", MACHINE_SUPPORTS_SAVE ) // is this the original?
 GAME( 1981, redufob,     redufo,   galaxian,   redufob,    galaxian_state, nolock,     ROT90,  "bootleg", "Defend the Terra Attack on the Red UFO (bootleg)", MACHINE_SUPPORTS_SAVE ) // rev A?
