@@ -731,7 +731,7 @@ SRC = src
 
 ifeq ($(OS),windows)
 GCC_VERSION      := $(shell $(subst @,,$(CC)) -dumpversion 2> NUL)
-CLANG_VERSION    := $(shell $(subst @,,$(CC)) --version 2> NUL| head -n 1 | sed "s/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$$/\1/")
+CLANG_VERSION    := $(shell $(subst @,,$(CC)) --version 2> NUL| head -n 1 | grep clang | sed "s/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$$/\1/" | head -n 1)
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > NUL 2>&1 && echo python)
 ifdef MSBUILD
 MSBUILD_PARAMS   := /v:minimal /m:$(NUMBER_OF_PROCESSORS)
