@@ -118,7 +118,7 @@ READ8_MEMBER( osborne1_state::opcode_r )
 
 WRITE8_MEMBER( osborne1_state::bankswitch_w )
 {
-	switch (offset & 0x03)
+	switch (offset)
 	{
 	case 0x00:
 		if (set_rom_mode(1))
