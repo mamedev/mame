@@ -111,6 +111,10 @@ public:
 		m_io_in0(*this, "IN0"),
 		m_io_in1(*this, "IN1"),
 		m_cps2_dial_type(0),
+		m_ecofghtr_dial_direction0(0),
+		m_ecofghtr_dial_direction1(0),
+		m_ecofghtr_dial_last0(0),
+		m_ecofghtr_dial_last1(0),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
@@ -180,6 +184,11 @@ public:
 	int          m_cps2disabledigitalvolume;
 	emu_timer    *m_digital_volume_timer;
 	int			 m_cps2_dial_type;
+	int			 m_ecofghtr_dial_direction0;
+	int			 m_ecofghtr_dial_direction1;
+	int			 m_ecofghtr_dial_last0;
+	int			 m_ecofghtr_dial_last1;
+
 
 	/* fcrash sound hw */
 	int          m_sample_buffer1;

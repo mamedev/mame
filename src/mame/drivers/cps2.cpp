@@ -806,7 +806,7 @@ TIMER_CALLBACK_MEMBER(cps_state::cps2_update_digital_volume)
 	machine().device<qsound_device>("qsound")->set_output_gain(1, m_cps2digitalvolumelevel / 39.0);
 }
 
-READ16_MEMBER( cps_state::cps2_qsound_volume_r )
+READ16_MEMBER(cps_state::cps2_qsound_volume_r)
 {
 	static const UINT16 cps2_vol_states[40] =
 	{
@@ -827,10 +827,10 @@ READ16_MEMBER( cps_state::cps2_qsound_volume_r )
 	if (m_cps2networkpresent)
 		return 0x2021; /* SSF2TB doesn't have a digital slider in the test screen */
 	else
-	if (m_cps2disabledigitalvolume)
-		return 0xd000; /* digital display isn't shown in test mode */
-	else
-		return result;
+		if (m_cps2disabledigitalvolume)
+			return 0xd000; /* digital display isn't shown in test mode */
+		else
+			return result;
 }
 
 
@@ -840,12 +840,12 @@ READ16_MEMBER( cps_state::cps2_qsound_volume_r )
  *
  *************************************/
 
-READ16_MEMBER( cps_state::kludge_r )
+READ16_MEMBER(cps_state::kludge_r)
 {
 	return 0xffff;
 }
 
-READ16_MEMBER( cps_state::joy_or_paddle_r )
+READ16_MEMBER(cps_state::joy_or_paddle_r)
 {
 	if (m_readpaddle != 0)
 	{
@@ -861,12 +861,61 @@ READ16_MEMBER(cps_state::joy_or_paddle_ecofghtr_r)
 {
 	if (m_readpaddle == 0 || (m_io_in1->read() & 0x10) == 0x10) // ignore bit if spinner not enabled
 	{
-		return (ioport("IN0")->read());
+		UINT16 ret = m_io_in0->read();
+
+		if ((m_io_in1->read() & 0x10) == 0x00)
+		{
+			ret = ret & 0xdfdf;
+
+			ret |= m_ecofghtr_dial_direction1 << 13;
+			ret |= m_ecofghtr_dial_direction0 << 5;
+		}
+
+		return ret;
 	}
 	else
 	{
-		// this is actually a magnitude, direction appears in IN0 above (button 2)
-		return (ioport("PADDLE1")->read() & 0xff) | (ioport("PADDLE2")->read() << 8);
+		int dial0 = (ioport("DIAL0")->read());
+		int dial1 = (ioport("DIAL1")->read());
+
+		UINT16 ret = (dial0 & 0xff) | ((dial1 & 0xff) << 8);
+
+		// 1st dial
+		if ((dial0 & 0x800) == (m_ecofghtr_dial_last0 & 0x800))
+		{
+			if (dial0 > m_ecofghtr_dial_last0) m_ecofghtr_dial_direction0 = 1;
+			else  m_ecofghtr_dial_direction0 = 0;
+		}
+		// catch wraparound of value
+		else if ((dial0 & 0x800) > (m_ecofghtr_dial_last0 & 0x800)) // value gone from 0x000 to 0xfff
+		{
+			m_ecofghtr_dial_direction0 = 0;
+		}
+		else if ((dial0 & 0x800) < (m_ecofghtr_dial_last0 & 0x800)) // value gone from 0xfff to 0x000
+		{
+			m_ecofghtr_dial_direction0 = 1;
+		}
+
+		// 2nd dial
+		if ((dial1 & 0x800) == (m_ecofghtr_dial_last1 & 0x800))
+		{
+			if (dial1 > m_ecofghtr_dial_last1) m_ecofghtr_dial_direction1 = 1;
+			else  m_ecofghtr_dial_direction1 = 0;
+		}
+		// catch wraparound of value
+		else if ((dial1 & 0x800) > (m_ecofghtr_dial_last1 & 0x800)) // value gone from 0x000 to 0xfff
+		{
+			m_ecofghtr_dial_direction1 = 0;
+		}
+		else if ((dial1 & 0x800) < (m_ecofghtr_dial_last1 & 0x800)) // value gone from 0xfff to 0x000
+		{
+			m_ecofghtr_dial_direction1 = 1;
+		}		
+
+		m_ecofghtr_dial_last0 = dial0;
+		m_ecofghtr_dial_last1 = dial1;
+
+		return ret;
 	}
 }
 
@@ -1102,11 +1151,11 @@ static INPUT_PORTS_START( ecofghtr )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_CONFSETTING(    0x10, DEF_STR( No ) )
 
-	PORT_START("PADDLE1")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_START("DIAL0")
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
 
-	PORT_START("PADDLE2")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(2)
+	PORT_START("DIAL1")
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
