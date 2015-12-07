@@ -113,7 +113,7 @@ public:
 
 	// constants
 	static const int PRIORITY_SHIFT = 12;
-	static const UINT16 PRIORITY_MASK = (~0 << PRIORITY_SHIFT) & 0xffff;
+	static const UINT16 PRIORITY_MASK = (0xffff << PRIORITY_SHIFT) & 0xffff;
 	static const UINT16 DATA_MASK = PRIORITY_MASK ^ 0xffff;
 
 protected:

@@ -45,7 +45,7 @@ std::unique_ptr<Instruction> Instruction::decodeInstruction(const Opcode* opc,
 				/* TODO: More? */)
 			{
 				op->m_sizeIncrement = 1;
-				return std::move(op);
+				return op;
 			}
 		}
 	}

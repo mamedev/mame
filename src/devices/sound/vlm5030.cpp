@@ -600,7 +600,7 @@ void vlm5030_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			if (u[0] > 511)
 				buffer[buf_count] = 511<<6;
 			else if (u[0] < -511)
-				buffer[buf_count] = -511<<6;
+				buffer[buf_count] = UINT32(-511)<<6;
 			else
 				buffer[buf_count] = (u[0] << 6);
 			buf_count++;
