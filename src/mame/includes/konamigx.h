@@ -164,6 +164,7 @@ public:
 
 	void konamigx_mixer_init(screen_device &screen, int objdma);
 	void konamigx_objdma(void);
+	void generate_sprites(address_space &space, UINT32 src, UINT32 spr, int count);
 
 	void fantjour_dma_install();
 

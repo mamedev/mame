@@ -166,12 +166,23 @@
 
 // Say hello to gokuparo at 0x2a285c
 
+/*!
+@todo
+ - Daisu Kiss: sets up 0x00257e28 as set variable in a 2p game after beating specific stages, and causes a game breaking sticky sprite.
+   It actually also sets up something that looks like non-sprite sub-commands in the same area (example is for character select), I'm inclined to think upper bits are actually used for something else:
+   00010005
+   00000006
+   000e0002
+   002e0080
+ - Sexy Parodius: sets up p1 as 2 at start of stage 1. Related to missing snow?
+ */
+
 static struct sprite_entry {
 	int pri;
 	UINT32 adr;
 } sprites[0x100];
 
-static void generate_sprites(address_space &space, UINT32 src, UINT32 spr, int count)
+void konamigx_state::generate_sprites(address_space &space, UINT32 src, UINT32 spr, int count)
 {
 	int scount = 0;
 	int ecount = 0;
@@ -207,7 +218,7 @@ static void generate_sprites(address_space &space, UINT32 src, UINT32 spr, int c
 			UINT16 color_set    = 0x0000;
 			UINT16 color_rotate = 0x0000;
 			UINT16 v;
-
+			
 			v = space.read_word(adr+24);
 			if(v & 0x8000) {
 				color_mask = 0xf3ff;
@@ -236,10 +247,11 @@ static void generate_sprites(address_space &space, UINT32 src, UINT32 spr, int c
 				zoom_x = 0x40;
 			if(!zoom_y)
 				zoom_y = 0x40;
-
+			
 			if(set >= 0x200000 && set < 0xd00000)
 			{
 				UINT16 count2 = space.read_word(set);
+
 				set += 2;
 				while(count2) {
 					UINT16 idx  = space.read_word(set);
@@ -247,7 +259,7 @@ static void generate_sprites(address_space &space, UINT32 src, UINT32 spr, int c
 					UINT16 col  = space.read_word(set+4);
 					short y = space.read_word(set+6);
 					short x = space.read_word(set+8);
-
+								
 					if(idx == 0xffff) {
 						set = (flip<<16) | col;
 						if(set >= 0x200000 && set < 0xd00000)
