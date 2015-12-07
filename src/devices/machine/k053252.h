@@ -26,6 +26,9 @@
 #define MCFG_K053252_OFFSETS(_offsx, _offsy) \
 	k053252_device::set_offsets(*device, _offsx, _offsy);
 
+#define MCFG_K053252_SET_SLAVE_SCREEN(_tag) \
+	k053252_device::static_set_slave_screen(*device, _tag);
+
 
 class k053252_device : public device_t,
 						public device_video_interface
@@ -46,6 +49,9 @@ public:
 
 	void res_change();
 
+	static void static_set_slave_screen(device_t &device, const char *tag);
+
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -65,6 +71,10 @@ protected:
 //  devcb_write8       m_int_time_cb;
 	int                m_offsx;
 	int                m_offsy;
+
+	const char *    m_slave_screen_tag; 
+	screen_device * m_slave_screen;
+
 };
 
 extern const device_type K053252;

@@ -73,7 +73,10 @@ k053252_device::k053252_device(const machine_config &mconfig, const char *tag, d
 		m_int2_ack_cb(*this),
 		//m_int_time_cb(*this),
 		m_offsx(0),
-		m_offsy(0)
+		m_offsy(0),
+		// ugly, needed to work with the rungun etc. video demux board
+		m_slave_screen_tag(nullptr),
+		m_slave_screen(nullptr)
 {
 }
 
@@ -99,6 +102,12 @@ void k053252_device::device_start()
 	save_item(NAME(m_vbp));
 	save_item(NAME(m_vsw));
 	save_item(NAME(m_hsw));
+
+	if (m_slave_screen_tag != nullptr)
+	{
+		// find the screen device if explicitly configured
+		m_slave_screen = device().siblingdevice<screen_device>(m_slave_screen_tag);
+	}
 }
 
 //-------------------------------------------------
@@ -168,6 +177,9 @@ void k053252_device::res_change()
 		visarea.max_y = m_offsy + m_vc - m_vfp - m_vbp - (m_vsw) - 1;
 
 		m_screen->configure(m_hc, m_vc, visarea, refresh);
+
+		if (m_slave_screen)
+			m_slave_screen->configure(m_hc, m_vc, visarea, refresh);
 	}
 }
 
@@ -230,4 +242,11 @@ WRITE8_MEMBER( k053252_device::write )
 		case 0x0e: m_int1_ack_cb(1); break;
 		case 0x0f: m_int2_ack_cb(1); break;
 	}
+}
+
+
+void k053252_device::static_set_slave_screen(device_t &device, const char *tag)
+{
+	k053252_device &dev = downcast<k053252_device &>(device);
+	dev.m_slave_screen_tag = tag;
 }
