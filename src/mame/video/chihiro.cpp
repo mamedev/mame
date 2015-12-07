@@ -625,7 +625,7 @@ void vertex_program_simulator::jump(int address)
 
 void vertex_program_simulator::process(int address, vertex_nv *in, vertex_nv *out, int count)
 {
-#if 0 // useful while debugging to see what is being executed
+#if 1 // useful while debugging to see what is being executed
 	static int debugvps = 0;
 	if (debugvps) {
 		char *pp;
@@ -3211,7 +3211,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 	}
 	if ((maddress >= 0x0b00) && (maddress < 0x0b80)) {
 		//machine().logerror("VP_UPLOAD_INST\n");
-		if (vertexprogram.upload_instruction_index < 192) {
+		if (vertexprogram.upload_instruction_index < 256) {
 			vertexprogram.exec.op[vertexprogram.upload_instruction_index].i[vertexprogram.upload_instruction_component] = data;
 			vertexprogram.exec.op[vertexprogram.upload_instruction_index].modified |= (1 << vertexprogram.upload_instruction_component);
 		}
@@ -3229,8 +3229,9 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 	}
 	if ((maddress >= 0x0b80) && (maddress < 0x0c00)) {
 		//machine().logerror("VP_UPLOAD_CONST\n");
-		if (vertexprogram.upload_parameter_index < 256)
+		if (vertexprogram.upload_parameter_index < 192) {
 			vertexprogram.exec.c_constant[vertexprogram.upload_parameter_index].iv[vertexprogram.upload_parameter_component] = data;
+		}
 		else
 			machine().logerror("Need to increase size of vertexprogram.parameter to %d\n\r", vertexprogram.upload_parameter_index);
 		vertexprogram.upload_parameter_component++;
