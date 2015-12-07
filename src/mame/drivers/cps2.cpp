@@ -728,6 +728,10 @@ WRITE16_MEMBER( cps_state::cps2_eeprom_port_w )
 
 		/* EEPROM */
 		ioport("EEPROMOUT")->write(data, 0xffff);
+		if (m_cps2_dial_type == 2) // ecofghtr
+		{
+			m_readpaddle = (data & 0x0100);
+		}
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -746,9 +750,7 @@ WRITE16_MEMBER( cps_state::cps2_eeprom_port_w )
 			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
 		coin_counter_w(machine(), 0, data & 0x0001);
-		if ((strncmp(machine().system().name, "pzloop2", 7) == 0) ||
-			(strncmp(machine().system().name, "pzloop2j", 8) == 0) ||
-			(strncmp(machine().system().name, "pzloop2jr1", 10) == 0))
+		if (m_cps2_dial_type == 1) // pzloop2
 		{
 			// Puzz Loop 2 uses coin counter 2 input to switch between stick and paddle controls
 			m_readpaddle = data & 0x0002;
@@ -846,9 +848,26 @@ READ16_MEMBER( cps_state::kludge_r )
 READ16_MEMBER( cps_state::joy_or_paddle_r )
 {
 	if (m_readpaddle != 0)
+	{
 		return (ioport("IN0")->read());
+	}
 	else
+	{
 		return (ioport("PADDLE1")->read() & 0xff) | (ioport("PADDLE2")->read() << 8);
+	}
+}
+
+READ16_MEMBER(cps_state::joy_or_paddle_ecofghtr_r)
+{
+	if (m_readpaddle == 0 || (m_io_in1->read() & 0x10) == 0x10) // ignore bit if spinner not enabled
+	{
+		return (ioport("IN0")->read());
+	}
+	else
+	{
+		// this is actually a magnitude, direction appears in IN0 above (button 2)
+		return (ioport("PADDLE1")->read() & 0xff) | (ioport("PADDLE2")->read() << 8);
+	}
 }
 
 
@@ -1078,10 +1097,16 @@ static INPUT_PORTS_START( ecofghtr )
 
 	PORT_MODIFY("IN1")
 	// If this bit is set then the Test Mode shows 'Rolling' instead of Shot2/3 - this is the 'spinner' mode.
-	// I think the IN0 port gets multiplexed and reads with 'button2' set become the angle?
-	// button1 still acts as shoot (as well as part of the angle?) hence thinking it's multiplexed.
-	// todo: investigate how this works
-	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	// in this mode the IN0 port is multiplexed with an analog input, what would be Button 2 ends up being 'direction'
+	PORT_CONFNAME( 0x10, 0x00, "Use Spinners" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_CONFSETTING(    0x10, DEF_STR( No ) )
+
+	PORT_START("PADDLE1")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("PADDLE2")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -9245,6 +9270,7 @@ DRIVER_INIT_MEMBER(cps_state,pzloop2)
 	DRIVER_INIT_CALL(cps2);
 
 	m_readpaddle = 0;
+	m_cps2_dial_type = 1;
 
 	save_item(NAME(m_readpaddle));
 
@@ -9307,6 +9333,14 @@ DRIVER_INIT_MEMBER(cps_state,gigaman2)
 DRIVER_INIT_MEMBER(cps_state,ecofghtr)
 {
 	DRIVER_INIT_CALL(cps2);
+
+	m_readpaddle = 0;
+	m_cps2_dial_type = 2;
+
+	save_item(NAME(m_readpaddle));
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x804000, 0x804001, read16_delegate(FUNC(cps_state::joy_or_paddle_ecofghtr_r), this));
+
 }
 
 
