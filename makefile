@@ -730,8 +730,8 @@ SRC = src
 3RDPARTY = 3rdparty
 
 ifeq ($(OS),windows)
-GCC_VERSION      := $(shell gcc -dumpversion 2> NUL)
-CLANG_VERSION    := $(shell %CLANG%\bin\clang --version 2> NUL| head -n 1 | sed "s/[^0-9,.]//g")
+GCC_VERSION      := $(shell $(subst @,,$(CC)) -dumpversion 2> NUL)
+CLANG_VERSION    := 
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > NUL 2>&1 && echo python)
 CHECK_CLANG      :=
 ifdef MSBUILD
