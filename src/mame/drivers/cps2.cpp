@@ -1073,6 +1073,19 @@ static INPUT_PORTS_START( cps2_2p3b )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(2) */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ecofghtr )
+	PORT_INCLUDE(cps2_2p3b)
+
+	PORT_MODIFY("IN1")
+	// If this bit is set then the Test Mode shows 'Rolling' instead of Shot2/3 - this is the 'spinner' mode.
+	// I think the IN0 port gets multiplexed and reads with 'button2' set become the angle?
+	// button1 still acts as shoot (as well as part of the angle?) hence thinking it's multiplexed.
+	// todo: investigate how this works
+	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )
+INPUT_PORTS_END
+
+
+
 /* 2 players and 2 buttons */
 static INPUT_PORTS_START( cps2_2p2b )
 	PORT_INCLUDE(cps2_2p3b)
@@ -9291,6 +9304,12 @@ DRIVER_INIT_MEMBER(cps_state,gigaman2)
 	m_digital_volume_timer->adjust(attotime::never, 0, attotime::never);
 }
 
+DRIVER_INIT_MEMBER(cps_state,ecofghtr)
+{
+	DRIVER_INIT_CALL(cps2);
+}
+
+
 
 /*************************************
  *
@@ -9311,12 +9330,12 @@ GAME( 1993, ssf2tb,     ssf2,     cps2, cps2_2p6b, cps_state, ssf2tb,   ROT0,   
 GAME( 1993, ssf2tbr1,   ssf2,     cps2, cps2_2p6b, cps_state, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (World 930911)", MACHINE_SUPPORTS_SAVE ) // works, but not in tournament mode
 GAME( 1993, ssf2tbj,    ssf2,     cps2, cps2_2p6b, cps_state, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (Japan 930911)", MACHINE_SUPPORTS_SAVE ) // works, but not in tournament mode
 GAME( 1993, ssf2tbh,    ssf2,     cps2, cps2_2p6b, cps_state, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (Hispanic 931005)", MACHINE_SUPPORTS_SAVE )  // works, but not in tournament mode
-GAME( 1993, ecofghtr,   0,        cps2, cps2_2p3b, cps_state, cps2,     ROT0,   "Capcom", "Eco Fighters (World 931203)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ecofghtru,  ecofghtr, cps2, cps2_2p3b, cps_state, cps2,     ROT0,   "Capcom", "Eco Fighters (USA 940215)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ecofghtru1, ecofghtr, cps2, cps2_2p3b, cps_state, cps2,     ROT0,   "Capcom", "Eco Fighters (USA 931203)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, uecology,   ecofghtr, cps2, cps2_2p3b, cps_state, cps2,     ROT0,   "Capcom", "Ultimate Ecology (Japan 931203)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ecofghtra,  ecofghtr, cps2, cps2_2p3b, cps_state, cps2,     ROT0,   "Capcom", "Eco Fighters (Asia 931203)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ecofghtrh,  ecofghtr, cps2, cps2_2p3b, cps_state, cps2,     ROT0,   "Capcom", "Eco Fighters (Hispanic 931203)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ecofghtr,   0,        cps2, ecofghtr, cps_state, ecofghtr,  ROT0,   "Capcom", "Eco Fighters (World 931203)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ecofghtru,  ecofghtr, cps2, ecofghtr, cps_state, ecofghtr,  ROT0,   "Capcom", "Eco Fighters (USA 940215)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ecofghtru1, ecofghtr, cps2, ecofghtr, cps_state, ecofghtr,  ROT0,   "Capcom", "Eco Fighters (USA 931203)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, uecology,   ecofghtr, cps2, ecofghtr, cps_state, ecofghtr,  ROT0,   "Capcom", "Ultimate Ecology (Japan 931203)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ecofghtra,  ecofghtr, cps2, ecofghtr, cps_state, ecofghtr,  ROT0,   "Capcom", "Eco Fighters (Asia 931203)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ecofghtrh,  ecofghtr, cps2, ecofghtr, cps_state, ecofghtr,  ROT0,   "Capcom", "Eco Fighters (Hispanic 931203)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ddtod,      0,        cps2, cps2_4p4b, cps_state, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Euro 940412)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ddtodr1,    ddtod,    cps2, cps2_4p4b, cps_state, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Euro 940113)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ddtodu,     ddtod,    cps2, cps2_4p4b, cps_state, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (USA 940125)", MACHINE_SUPPORTS_SAVE )
@@ -11004,7 +11023,7 @@ ROM_END
 
 
 GAME( 1993, ddtodd,   ddtod,    dead_cps2, cps2_4p4b, cps_state, cps2,    ROT0,   "bootleg", "Dungeons & Dragons: Tower of Doom (Euro 940412 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ecofghtrd,ecofghtr, dead_cps2, cps2_2p3b, cps_state, cps2,    ROT0,   "bootleg", "Eco Fighters (World 931203 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ecofghtrd,ecofghtr, dead_cps2, ecofghtr, cps_state, ecofghtr, ROT0,   "bootleg", "Eco Fighters (World 931203 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ssf2ud,   ssf2,     dead_cps2, cps2_2p6b, cps_state, cps2,    ROT0,   "bootleg", "Super Street Fighter II: The New Challengers (USA 930911 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ssf2tbd,  ssf2,     dead_cps2, cps2_2p6b, cps_state, ssf2tb,  ROT0,   "bootleg", "Super Street Fighter II: The Tournament Battle (World 931119 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, armwar1d, armwar,   dead_cps2, cps2_3p3b, cps_state, cps2,    ROT0,   "bootleg", "Armored Warriors (Euro 941011 Phoenix Edition) (bootleg)", MACHINE_SUPPORTS_SAVE )
