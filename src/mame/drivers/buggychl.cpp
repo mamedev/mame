@@ -303,7 +303,7 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( buggychl )
-	GFXDECODE_ENTRY( 0x0000,           0, charlayout,   0, 8 ) /* decoded at runtime */
+	GFXDECODE_ENTRY( nullptr,           0, charlayout,   0, 8 ) /* decoded at runtime */
 	/* sprites are drawn pixel by pixel by draw_sprites() */
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 8 )
 GFXDECODE_END

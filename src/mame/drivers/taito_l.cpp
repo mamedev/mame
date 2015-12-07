@@ -1700,7 +1700,7 @@ static const gfx_layout char_layout =
 static GFXDECODE_START( taito_l )
 	GFXDECODE_ENTRY( "gfx1", 0, bg2_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, sp2_layout, 0, 16 )
-	GFXDECODE_ENTRY( 0x0000,           0, char_layout,  0, 16 )  // Ram-based
+	GFXDECODE_ENTRY( nullptr,           0, char_layout,  0, 16 )  // Ram-based
 GFXDECODE_END
 
 

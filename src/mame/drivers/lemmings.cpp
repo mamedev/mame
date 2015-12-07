@@ -220,7 +220,7 @@ static const gfx_layout sprite_layout =
 static GFXDECODE_START( lemmings )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,  0, 16 ) /* Sprites 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout,  0, 16 ) /* Sprites 16x16 */
-	GFXDECODE_ENTRY( 0x0000,           0, charlayout,         0, 16 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( nullptr,           0, charlayout,         0, 16 ) /* Dynamically modified */
 GFXDECODE_END
 
 /******************************************************************************/

@@ -626,7 +626,7 @@ GFXDECODE_END
 
 static GFXDECODE_START( imago )
 	GFXDECODE_ENTRY( "gfx1", 0,      charlayout,          0, 32 )
-	GFXDECODE_ENTRY( 0x0000,   0xb800, imago_spritelayout,  0, 32 )
+	GFXDECODE_ENTRY( nullptr,   0xb800, imago_spritelayout,  0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0,      charlayout,          0, 32 )
 	GFXDECODE_ENTRY( "gfx4", 0,      imago_char_1bpp, 0x140,  1 )
 GFXDECODE_END

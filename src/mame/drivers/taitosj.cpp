@@ -1703,10 +1703,10 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( taitosj )
-	GFXDECODE_ENTRY( 0x0000, 0x9000, charlayout,   0, 8 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( 0x0000, 0x9000, spritelayout, 0, 8 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( 0x0000, 0xa800, charlayout,   0, 8 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( 0x0000, 0xa800, spritelayout, 0, 8 )    /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( nullptr, 0x9000, charlayout,   0, 8 )    /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( nullptr, 0x9000, spritelayout, 0, 8 )    /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( nullptr, 0xa800, charlayout,   0, 8 )    /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( nullptr, 0xa800, spritelayout, 0, 8 )    /* the game dynamically modifies this */
 GFXDECODE_END
 
 

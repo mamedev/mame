@@ -386,10 +386,10 @@ static const gfx_layout tile_layout =
 };
 
 static GFXDECODE_START( taito_f3 )
-	GFXDECODE_ENTRY( 0x0000,   0x000000, charlayout,       0x0000, 0x0400>>4 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( nullptr,   0x000000, charlayout,       0x0000, 0x0400>>4 ) /* Dynamically modified */
 	GFXDECODE_ENTRY( "gfx2", 0x000000, tile_layout,      0x0000, 0x2000>>4 ) /* Tiles area */
 	GFXDECODE_ENTRY( "gfx1", 0x000000, spriteram_layout, 0x1000, 0x1000>>4 ) /* Sprites area */
-	GFXDECODE_ENTRY( 0x0000,   0x000000, pivotlayout,      0x0000,  0x400>>4 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( nullptr,   0x000000, pivotlayout,      0x0000,  0x400>>4 ) /* Dynamically modified */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -523,10 +523,10 @@ static const gfx_layout bubsympb_tile_layout =
 
 
 static GFXDECODE_START( bubsympb )
-	GFXDECODE_ENTRY( 0x0000,           0x000000, charlayout,          0,  64 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( nullptr,           0x000000, charlayout,          0,  64 ) /* Dynamically modified */
 	GFXDECODE_ENTRY( "gfx2", 0x000000, bubsympb_tile_layout, 0, 512 ) /* Tiles area */
 	GFXDECODE_ENTRY( "gfx1", 0x000000, bubsympb_sprite_layout, 4096, 256 ) /* Sprites area */
-	GFXDECODE_ENTRY( 0x0000,           0x000000, pivotlayout,         0,  64 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( nullptr,           0x000000, pivotlayout,         0,  64 ) /* Dynamically modified */
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( bubsympb, taito_f3_state )

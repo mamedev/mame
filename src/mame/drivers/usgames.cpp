@@ -209,7 +209,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( usgames )
-	GFXDECODE_ENTRY( 0x0000, 0x2800, charlayout, 0, 256 )
+	GFXDECODE_ENTRY( nullptr, 0x2800, charlayout, 0, 256 )
 GFXDECODE_END
 
 

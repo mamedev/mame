@@ -924,7 +924,7 @@ static const gfx_layout charlayout =
 
 static GFXDECODE_START( cvs )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 256+4 )
-	GFXDECODE_ENTRY( 0x0000,   0x0000, charlayout, 0, 256+4 )
+	GFXDECODE_ENTRY( nullptr,   0x0000, charlayout, 0, 256+4 )
 GFXDECODE_END
 
 

@@ -3712,12 +3712,12 @@ static const gfx_layout namcos22_cg_layout =
 #undef XOR
 
 static GFXDECODE_START( namcos22 )
-	GFXDECODE_ENTRY( 0x0000,      0, namcos22_cg_layout,   0, 0x800 )
+	GFXDECODE_ENTRY( nullptr,      0, namcos22_cg_layout,   0, 0x800 )
 	GFXDECODE_ENTRY( "textile", 0, texture_tile_layout,  0, 0x80 )
 GFXDECODE_END
 
 static GFXDECODE_START( super )
-	GFXDECODE_ENTRY( 0x0000,      0, namcos22_cg_layout,   0, 0x800 )
+	GFXDECODE_ENTRY( nullptr,      0, namcos22_cg_layout,   0, 0x800 )
 	GFXDECODE_ENTRY( "textile", 0, texture_tile_layout,  0, 0x80 )
 	GFXDECODE_ENTRY( "sprite",  0, sprite_layout,        0, 0x80 )
 GFXDECODE_END
