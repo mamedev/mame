@@ -735,7 +735,7 @@ CLANG_VERSION    := $(shell %CLANG%\bin\clang --version 2> NUL| head -n 1 | sed 
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > NUL 2>&1 && echo python)
 CHECK_CLANG      :=
 ifdef MSBUILD
-MSBUILD_PARAMS   := /v:minimal /m:$(NUMBER_OF_PROCESSORS) 
+MSBUILD_PARAMS   := /v:minimal /m:$(NUMBER_OF_PROCESSORS)
 ifeq ($(CONFIG),debug)
 MSBUILD_PARAMS += /p:Configuration=Debug
 else
@@ -755,20 +755,21 @@ endif
 else
 GCC_VERSION      := $(shell $(subst @,,$(CC)) -dumpversion 2> /dev/null)
 ifneq ($(OS),solaris)
-CLANG_VERSION    := $(shell clang --version  2> /dev/null | head -n 1 | grep -e 'version [0-9]\.[0-9]\(\.[0-9]\)\?' -o | grep -e '[0-9]\.[0-9]\(\.[0-9]\)\?' -o | tail -n 1)
+CLANG_VERSION    := $(shell $(subst @,,$(CC))  --version  2> /dev/null | head -n 1 | grep -e 'version [0-9]\.[0-9]\(\.[0-9]\)\?' -o | grep -e '[0-9]\.[0-9]\(\.[0-9]\)\?' -o | tail -n 1)
 endif
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
-CHECK_CLANG      := $(shell gcc --version  2> /dev/null | grep 'clang' | head -n 1)
+CHECK_CLANG      := $(shell $(subst @,,$(CC))  --version  2> /dev/null | grep 'clang' | head -n 1)
 endif
-
-ifeq ($(TARGETOS),macosx)
+ifeq ($(CLANG_VERSION),)
+$(info GCC $(GCC_VERSION) detected)
+else
+$(info Clang $(CLANG_VERSION) detected)
 ifeq ($(ARCHITECTURE),_x64)
 ARCHITECTURE := _x64_clang
 else
 ARCHITECTURE := _x86_clang
 endif
 endif
-
 ifneq ($(PYTHON_AVAILABLE),python)
 $(error Python is not available in path)
 endif
@@ -1122,14 +1123,14 @@ os2_x86: generate $(PROJECTDIR)/gmake-os2/Makefile
 cmake: generate
 	$(SILENT) $(GENIE) $(PARAMS) cmake
 ifeq ($(OS),windows)
-	$(SILENT)echo cmake_minimum_required(VERSION 2.8.4) > CMakeLists.txt 
-	$(SILENT)echo add_subdirectory($(PROJECTDIR)/cmake) >> CMakeLists.txt 
+	$(SILENT)echo cmake_minimum_required(VERSION 2.8.4) > CMakeLists.txt
+	$(SILENT)echo add_subdirectory($(PROJECTDIR)/cmake) >> CMakeLists.txt
 else
-	$(SILENT)echo "cmake_minimum_required(VERSION 2.8.4)" > CMakeLists.txt 
-	$(SILENT)echo "add_subdirectory($(PROJECTDIR)/cmake)" >> CMakeLists.txt 
+	$(SILENT)echo "cmake_minimum_required(VERSION 2.8.4)" > CMakeLists.txt
+	$(SILENT)echo "add_subdirectory($(PROJECTDIR)/cmake)" >> CMakeLists.txt
 endif
 
-	
+
 #-------------------------------------------------
 # Clean/bootstrap
 #-------------------------------------------------
@@ -1170,7 +1171,7 @@ $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/file2str.py
 	@echo Converting $<...
 	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ layout_$(basename $(notdir $<))
 
-	
+
 #-------------------------------------------------
 # Regression tests
 #-------------------------------------------------
@@ -1264,4 +1265,3 @@ endif
 cppcheck:
 	@echo Generate CppCheck analysis report
 	cppcheck --enable=all src/ $(CPPCHECK_PARAMS) -j9
-	
