@@ -121,7 +121,9 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 	m_current_display_bank = machine().first_screen()->frame_number() & 1;
-
+	if(m_single_screen_mode == true)
+		m_current_display_bank = 0;
+		
 	if(m_video_priority_mode == false)
 	{
 		m_k053936->zoom_draw(screen, bitmap, cliprect, m_936_tilemap[m_current_display_bank], 0, 0, 1);
@@ -160,4 +162,19 @@ UINT32 rungun_state::screen_update_rng_dual_right(screen_device &screen, bitmap_
 {
 	copybitmap( bitmap, m_rng_dual_demultiplex_right_temp, 0, 0, 0, 0, cliprect);
 	return 0;
+}
+
+void rungun_state::sprite_dma_trigger(void)
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	UINT32 src_address;
+
+	if(m_single_screen_mode == true)
+		src_address = 1*0x2000;
+	else
+		src_address = m_current_display_bank*0x2000;
+
+	// TODO: size could be programmable somehow.
+	for(int i=0;i<0x1000;i+=2)
+		m_k055673->k053247_word_w(space,i/2,m_banked_ram[(i + src_address) /2],0xffff);	
 }
