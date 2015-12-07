@@ -1743,19 +1743,28 @@ ADDRESS_MAP_END
 // this is WRONG (a copy of the above) but set does appear to have a similar odd memory map with RAM aronud 0x400 and scrambled ROMs
 static ADDRESS_MAP_START( spactrai_map, AS_PROGRAM, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x0400, 0x0bff) AM_RAM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x01f8) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x1002, 0x1002) AM_MIRROR(0x01f8) AM_WRITE(coin_count_0_w)
-	AM_RANGE(0x1003, 0x1003) AM_MIRROR(0x01f8) AM_WRITE(scramble_background_enable_w)
-	AM_RANGE(0x1004, 0x1004) AM_MIRROR(0x01f8) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0x1005, 0x1005) AM_MIRROR(0x01f8) //POUT2
-	AM_RANGE(0x1006, 0x1006) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0x1007, 0x1007) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0x1200, 0x12ff) AM_MIRROR(0x0100) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x03ff) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x4000, 0xbfff) AM_ROM
+	AM_RANGE(0x0000, 0x01ff) AM_ROM
+	AM_RANGE(0x0200, 0x05ff) AM_RAM // this sits over ROM, does the 0x400 bytes of ROM underneath bank or appear elsewhere?
+	AM_RANGE(0x0600, 0x11ff) AM_ROM
+	AM_RANGE(0x1200, 0x15ff) AM_RAM  AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram") // see above comment
+	AM_RANGE(0x1600, 0x4fff) AM_ROM
+
+//	AM_RANGE(0x6000, 0x60ff) AM_RAM
+//	AM_RANGE(0x6800, 0x68ff) AM_RAM
+//	AM_RANGE(0x7000, 0x70ff) AM_RAM
+
+//	AM_RANGE(0xfe01, 0xfe01) AM_WRITE(irq_enable_w)
+	AM_RANGE(0xfe00, 0xfeff) AM_RAM AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
+
+//	AM_RANGE(0xec00, 0xefff)
+//	AM_RANGE(0xf002, 0xf002) AM_WRITE(coin_count_0_w)
+//	AM_RANGE(0xf003, 0xf003) AM_WRITE(scramble_background_enable_w)
+//	AM_RANGE(0xf004, 0xf004) AM_WRITE(galaxian_stars_enable_w)
+//	AM_RANGE(0xf005, 0xf005) 
+//	AM_RANGE(0xf006, 0xf006) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_x_w)
+//	AM_RANGE(0xf007, 0xf007) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_y_w)
+	AM_RANGE(0xf200, 0xf2ff) AM_MIRROR(0x0100) 
+//	AM_RANGE(0xf400, 0xf400) AM_MIRROR(0x03ff) AM_READ(watchdog_reset_r)
 //  AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x3efc) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 //  AM_RANGE(0xc100, 0xc103) AM_MIRROR(0x3efc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 ADDRESS_MAP_END
@@ -5393,9 +5402,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( spactrai, galaxian )
 
+	MCFG_WATCHDOG_VBLANK_INIT(0)
+
 	/* strange memory map, maybe a kind of protection */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spactrai_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxian_state,  nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
@@ -7593,7 +7605,7 @@ ROM_START( spactrai )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "6cen.bin",  0x0000, 0x0800, CRC(a59a9f3f) SHA1(9564f1d013d566dc0b19762aec66119e2ece0b49) ) // MK2716J
-	ROM_LOAD( "7cen.bin",  0x0800, 0x0400, CRC(16cf5a5b) SHA1(0369786902544d31e506fe1ba6a69aa6e8ba9b5c) ) // MM2758A
+	ROM_LOAD( "7cen.bin",  0x0800, 0x0400, BAD_DUMP CRC(16cf5a5b) SHA1(0369786902544d31e506fe1ba6a69aa6e8ba9b5c) ) // MM2758A - seems to be the wrong type of ROM used on the actual PCB?!
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "stk.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
