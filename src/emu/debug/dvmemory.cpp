@@ -312,8 +312,8 @@ void debug_view_memory::view_update()
 				else {
 					int ch;
 					char valuetext[64];
-					UINT64 chunkdata;
-					floatx80 chunkdata80;
+					UINT64 chunkdata = 0;
+					floatx80 chunkdata80 = { 0, 0 };
 					bool ismapped;
 					
 					if (m_data_format != 11)
