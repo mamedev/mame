@@ -834,6 +834,9 @@ if _OPTIONS["OPTIMIZE"] then
 		buildoptions {
 			_OPTIONS["ARCHOPTS"]
 		}
+		linkoptions {
+			_OPTIONS["ARCHOPTS"]
+		}
 	end
 	if _OPTIONS["OPT_FLAGS"] then
 		buildoptions {
