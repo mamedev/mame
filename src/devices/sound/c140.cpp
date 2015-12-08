@@ -115,7 +115,6 @@ void c140_device::device_start()
 
 	if (m_rom_ptr != NULL)
 	{
-		printf("asdf\n");
 		m_pRom = m_rom_ptr;
 	}
 
