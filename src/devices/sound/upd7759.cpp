@@ -171,7 +171,7 @@ upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, 
 	, m_adpcm_state(0)
 	, m_adpcm_data(0)
 	, m_sample(0)
-	, m_rom_region(*this, this->tag())
+	, m_rom_region(*this, DEVICE_SELF)
 	, m_rom(nullptr)
 	, m_rombase(nullptr)
 	, m_romoffset(0)
@@ -232,11 +232,10 @@ void upd7759_device::device_start()
 
 	/* compute the ROM base or allocate a timer */
 	m_romoffset = 0;
-	if (m_rom_region != nullptr)
+	m_rom = m_rombase;
+	if (m_rombase != nullptr)
 	{
-		m_rom = m_rombase = m_rom_region->base();
-
-		UINT32 romsize = m_rom_region->bytes();
+		UINT32 romsize = m_rombase.bytes();
 		if (romsize >= 0x20000)
 		{
 			m_rommask = 0x1ffff;
@@ -314,11 +313,10 @@ void upd7756_device::device_start()
 
 	/* compute the ROM base or allocate a timer */
 	m_romoffset = 0;
-	if (m_rom_region != nullptr)
+	m_rom = m_rombase;
+	if (m_rombase != nullptr)
 	{
-		m_rom = m_rombase = m_rom_region->base();
-
-		UINT32 romsize = region()->bytes();
+		UINT32 romsize = m_rombase.bytes();
 		if (romsize >= 0x20000)
 		{
 			m_rommask = 0x1ffff;
@@ -735,7 +733,9 @@ void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int para
 void upd775x_device::postload()
 {
 	if (m_rombase)
+	{
 		m_rom = m_rombase + m_romoffset;
+	}
 }
 
 /************************************************************

@@ -97,8 +97,8 @@ private:
 	void parse_frame();
 
 	// internal state
-	/* table region */
-	optional_memory_region m_table_region;
+	/* table */
+	optional_region_ptr<UINT8> m_table;
 
 	/* coefficient tables */
 	int m_variant;                /* Variant of the 5110 - see tms5110.h */
@@ -194,7 +194,6 @@ private:
 	UINT8 m_romclk_hack_state;
 
 	emu_timer *m_romclk_hack_timer;
-	const UINT8 *m_table;
 };
 
 extern const device_type TMS5110;

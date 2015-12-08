@@ -149,7 +149,7 @@ scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_
 		m_roffset(0),
 		m_irq_cb(*this),
 		m_main_irq_cb(*this),
-		m_ram_region(*this, this->tag()),
+		m_ram_region(*this, DEVICE_SELF),
 		m_BUFPTR(0),
 		m_SCSPRAM(nullptr),
 		m_SCSPRAM_LENGTH(0),

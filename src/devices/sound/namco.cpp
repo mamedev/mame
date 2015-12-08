@@ -38,7 +38,7 @@ const device_type NAMCO_CUS30 = &device_creator<namco_cus30_device>;
 namco_audio_device::namco_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	, device_sound_interface(mconfig, *this)
-	, m_wave_region(*this, this->tag())
+	, m_wave_ptr(*this, DEVICE_SELF)
 	, m_last_channel(nullptr)
 	, m_soundregs(nullptr)
 	, m_wavedata(nullptr)
@@ -96,7 +96,7 @@ void namco_audio_device::device_start()
 	logerror("Namco: freq fractional bits = %d: internal freq = %d, output freq = %d\n", m_f_fracbits, m_namco_clock, m_sample_rate);
 
 	/* build the waveform table */
-	build_decoded_waveform(m_wave_region != NULL ? m_wave_region->base() : NULL);
+	build_decoded_waveform(m_wave_ptr);
 
 	/* get stream channels */
 	if (m_stereo)
@@ -110,7 +110,7 @@ void namco_audio_device::device_start()
 	/* register with the save state system */
 	save_pointer(NAME(m_soundregs), 0x400);
 
-	if (m_wave_region == nullptr)
+	if (m_wave_ptr == nullptr)
 		save_pointer(NAME(m_wavedata), 0x400);
 
 	save_item(NAME(m_voices));

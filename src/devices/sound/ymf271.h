@@ -147,7 +147,7 @@ private:
 	UINT8 m_ext_rw;
 	UINT8 m_ext_readlatch;
 
-	UINT8 *m_mem_base;
+	optional_region_ptr<UINT8> m_mem_base;
 	UINT32 m_mem_size;
 	UINT32 m_clock;
 
@@ -159,8 +159,6 @@ private:
 	devcb_write_line m_irq_handler;
 	devcb_read8 m_ext_read_handler;
 	devcb_write8 m_ext_write_handler;
-
-	optional_memory_region m_mem_region;
 };
 
 extern const device_type YMF271;

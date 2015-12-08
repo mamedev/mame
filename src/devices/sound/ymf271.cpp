@@ -1706,11 +1706,8 @@ void ymf271_device::device_start()
 	m_timA = timer_alloc(0);
 	m_timB = timer_alloc(1);
 
-	if (m_mem_region != NULL)
-	{
-		m_mem_base = m_mem_region->base();
-		m_mem_size = m_mem_region->bytes();
-	}
+	m_mem_size = m_mem_base.bytes();
+
 	m_irq_handler.resolve();
 
 	m_ext_read_handler.resolve();
@@ -1760,17 +1757,16 @@ ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, dev
 	, m_ext_address(0)
 	, m_ext_rw(0)
 	, m_ext_readlatch(0)
-	, m_mem_base(NULL)
+	, m_mem_base(*this, DEVICE_SELF)
 	, m_mem_size(0)
-	, m_irq_handler(*this)
-	, m_ext_read_handler(*this)
-	, m_ext_write_handler(*this)
-	, m_mem_region(*this, this->tag())
 	, m_clock(0)
 	, m_timA(nullptr)
 	, m_timB(nullptr)
 	, m_stream(nullptr)
 	, m_mix_buffer(nullptr)
+	, m_irq_handler(*this)
+	, m_ext_read_handler(*this)
+	, m_ext_write_handler(*this)
 {
 	memset(m_slots, 0, sizeof(m_slots));
 	memset(m_groups, 0, sizeof(m_groups));

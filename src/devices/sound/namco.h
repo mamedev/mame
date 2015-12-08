@@ -54,7 +54,7 @@ protected:
 	UINT32 namco_update_one(stream_sample_t *buffer, int length, const INT16 *wave, UINT32 counter, UINT32 freq);
 
 	/* waveform region */
-	optional_memory_region m_wave_region;
+	optional_region_ptr<UINT8> m_wave_ptr;
 
 	/* data about the sound system */
 	sound_channel m_channel_list[MAX_VOICES];
