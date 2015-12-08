@@ -1060,10 +1060,10 @@ UINT32 nv2a_renderer::texture_get_texel(int number, int x, int y)
 	x = (unsigned int)x & (texture[number].sizeu - 1);
 	y = (unsigned int)y & (texture[number].sizev - 1);
 	switch (texture[number].format) {
-	case A8R8G8B8:
+	case NV2A_TEX_FORMAT::A8R8G8B8:
 		to = dilated0[texture[number].dilate][x] + dilated1[texture[number].dilate][y]; // offset of texel in texture memory
 		return *(((UINT32 *)texture[number].buffer) + to); // get texel color
-	case DXT1:
+	case NV2A_TEX_FORMAT::DXT1:
 		bx = x >> 2;
 		by = y >> 2;
 		x = x & 3;
@@ -1104,7 +1104,7 @@ UINT32 nv2a_renderer::texture_get_texel(int number, int x, int y)
 		default:
 			return 0xff000000;
 		}
-	case DXT3:
+	case NV2A_TEX_FORMAT::DXT3:
 		bx = x >> 2;
 		by = y >> 2;
 		x = x & 3;
@@ -1134,25 +1134,25 @@ UINT32 nv2a_renderer::texture_get_texel(int number, int x, int y)
 			cr = pal5bit(((color0 & 0xf800) + 2 * (color1 & 0xf800)) / 3 >> 11);
 			return ((ca + (ca << 4)) << 24) | (cr << 16) | (cg << 8) | (cb);
 		}
-	case A4R4G4B4:
+	case NV2A_TEX_FORMAT::A4R4G4B4:
 		to = dilated0[texture[number].dilate][x] + dilated1[texture[number].dilate][y]; // offset of texel in texture memory
 		a4r4g4b4 = *(((UINT16 *)texture[number].buffer) + to); // get texel color
 		return convert_a4r4g4b4_a8r8g8b8(a4r4g4b4);
-	case A1R5G5B5:
+	case NV2A_TEX_FORMAT::A1R5G5B5:
 		to = dilated0[texture[number].dilate][x] + dilated1[texture[number].dilate][y]; // offset of texel in texture memory
 		a1r5g5b5 = *(((UINT16 *)texture[number].buffer) + to); // get texel color
 		return convert_a1r5g5b5_a8r8g8b8(a1r5g5b5);
-	case R5G6B5:
+	case NV2A_TEX_FORMAT::R5G6B5:
 		to = dilated0[texture[number].dilate][x] + dilated1[texture[number].dilate][y]; // offset of texel in texture memory
 		r5g6b5 = *(((UINT16 *)texture[number].buffer) + to); // get texel color
 		return 0xff000000 + convert_r5g6b5_r8g8b8(r5g6b5);
-	case R8G8B8_RECT:
+	case NV2A_TEX_FORMAT::R8G8B8_RECT:
 		to = texture[number].rectangle_pitch*y + (x << 2);
 		return *((UINT32 *)(((UINT8 *)texture[number].buffer) + to));
-	case A8R8G8B8_RECT:
+	case NV2A_TEX_FORMAT::A8R8G8B8_RECT:
 		to = texture[number].rectangle_pitch*y + (x << 2);
 		return *((UINT32 *)(((UINT8 *)texture[number].buffer) + to));
-	case DXT5:
+	case NV2A_TEX_FORMAT::DXT5:
 		bx = x >> 2;
 		by = y >> 2;
 		x = x & 3;
@@ -1248,12 +1248,12 @@ inline UINT8 *nv2a_renderer::read_pixel(int x, int y, INT32 c[4])
 	UINT16 *addr16;
 	UINT8 *addr8;
 
-	if (type_rendertarget == SWIZZLED)
+	if (type_rendertarget == NV2A_RT_TYPE::SWIZZLED)
 		offset = (dilated0[dilate_rendertarget][x] + dilated1[dilate_rendertarget][y]) * bytespixel_rendertarget;
 	else // type_rendertarget == LINEAR*/
 		offset = pitch_rendertarget * y + x * bytespixel_rendertarget;
 	switch (colorformat_rendertarget) {
-	case NV2A_COLOR_FORMAT_R5G6B5:
+	case NV2A_COLOR_FORMAT::R5G6B5:
 		addr16 = (UINT16 *)((UINT8 *)rendertarget + offset);
 		color = *addr16;
 		c[3] = 0xff;
@@ -1261,8 +1261,8 @@ inline UINT8 *nv2a_renderer::read_pixel(int x, int y, INT32 c[4])
 		c[1] = pal6bit((color & 0x07e0) >> 5);
 		c[0] = pal5bit(color & 0x1f);
 		return (UINT8 *)addr16;
-	case NV2A_COLOR_FORMAT_X8R8G8B8_Z8R8G8B8:
-	case NV2A_COLOR_FORMAT_X8R8G8B8_X8R8G8B8:
+	case NV2A_COLOR_FORMAT::X8R8G8B8_Z8R8G8B8:
+	case NV2A_COLOR_FORMAT::X8R8G8B8_X8R8G8B8:
 		addr = (UINT32 *)((UINT8 *)rendertarget + offset);
 		color = *addr;
 
@@ -1271,7 +1271,7 @@ inline UINT8 *nv2a_renderer::read_pixel(int x, int y, INT32 c[4])
 		c[1] = (color >> 8) & 255;
 		c[0] = color & 255;
 		return (UINT8 *)addr;
-	case NV2A_COLOR_FORMAT_A8R8G8B8:
+	case NV2A_COLOR_FORMAT::A8R8G8B8:
 		addr = (UINT32 *)((UINT8 *)rendertarget + offset);
 		color = *addr;
 		c[3] = color >> 24;
@@ -1279,7 +1279,7 @@ inline UINT8 *nv2a_renderer::read_pixel(int x, int y, INT32 c[4])
 		c[1] = (color >> 8) & 255;
 		c[0] = color & 255;
 		return (UINT8 *)addr;
-	case NV2A_COLOR_FORMAT_B8:
+	case NV2A_COLOR_FORMAT::B8:
 		addr8 = (UINT8 *)rendertarget + offset;
 		c[0] = *addr8;
 		c[1] = c[2] = 0;
@@ -1304,14 +1304,14 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 	addr = nullptr;
 	if (color_mask != 0)
 		addr = read_pixel(x, y, fb);
-	if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z24S8) {
+	if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z24S8) {
 		daddr32 = depthbuffer + (pitch_depthbuffer / 4) * y + x;
 		deptsten = *daddr32;
 		dep = deptsten >> 8;
 		sten = deptsten & 255;
 		daddr16 = nullptr;
 	}
-	else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z16) {
+	else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z16) {
 		daddr16 = (UINT16 *)depthbuffer + (pitch_depthbuffer / 2) * y + x;
 		deptsten = *daddr16;
 		dep = (deptsten << 8) | 0xff;
@@ -1338,32 +1338,32 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 	// alpha test
 	if (alpha_test_enabled) {
 		switch (alpha_func) {
-			case nv2a_renderer::NEVER:
+			case NV2A_COMPARISON_OP::NEVER:
 				return;
-			case nv2a_renderer::ALWAYS:
+			case NV2A_COMPARISON_OP::ALWAYS:
 			default:
 				break;
-			case nv2a_renderer::LESS:
+			case NV2A_COMPARISON_OP::LESS:
 				if (c[3] >= alpha_reference)
 					return;
 				break;
-			case nv2a_renderer::LEQUAL:
+			case NV2A_COMPARISON_OP::LEQUAL:
 				if (c[3] > alpha_reference)
 					return;
 				break;
-			case nv2a_renderer::EQUAL:
+			case NV2A_COMPARISON_OP::EQUAL:
 				if (c[3] != alpha_reference)
 					return;
 				break;
-			case nv2a_renderer::GEQUAL:
+			case NV2A_COMPARISON_OP::GEQUAL:
 				if (c[3] < alpha_reference)
 					return;
 				break;
-			case nv2a_renderer::GREATER:
+			case NV2A_COMPARISON_OP::GREATER:
 				if (c[3] <= alpha_reference)
 					return;
 				break;
-			case nv2a_renderer::NOTEQUAL:
+			case NV2A_COMPARISON_OP::NOTEQUAL:
 				if (c[3] == alpha_reference)
 					return;
 				break;
@@ -1375,77 +1375,77 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 		stenc=stencil_mask & stencil_ref;
 		stenv=stencil_mask & sten;
 		switch (stencil_func) {
-		case nv2a_renderer::NEVER:
+		case NV2A_COMPARISON_OP::NEVER:
 			stencil_passed = false;
 			break;
-		case nv2a_renderer::LESS:
+		case NV2A_COMPARISON_OP::LESS:
 			if (stenc >= stenv)
 				stencil_passed = false;
 			break;
-		case nv2a_renderer::EQUAL:
+		case NV2A_COMPARISON_OP::EQUAL:
 			if (stenc != stenv)
 				stencil_passed = false;
 			break;
-		case nv2a_renderer::LEQUAL:
+		case NV2A_COMPARISON_OP::LEQUAL:
 			if (stenc > stenv)
 				stencil_passed = false;
 			break;
-		case nv2a_renderer::GREATER:
+		case NV2A_COMPARISON_OP::GREATER:
 			if (stenc <= stenv)
 				stencil_passed = false;
 			break;
-		case nv2a_renderer::NOTEQUAL:
+		case NV2A_COMPARISON_OP::NOTEQUAL:
 			if (stenc == stenv)
 				stencil_passed = false;
 			break;
-		case nv2a_renderer::GEQUAL:
+		case NV2A_COMPARISON_OP::GEQUAL:
 			if (stenc < stenv)
 				stencil_passed = false;
 			break;
-		case nv2a_renderer::ALWAYS:
+		case NV2A_COMPARISON_OP::ALWAYS:
 		default:
 			break;
 		}
 		if (stencil_passed == false) {
 			switch (stencil_op_fail) {
-			case nv2a_renderer::ZEROOP:
+			case NV2A_STENCIL_OP::ZEROOP:
 				sten = 0;
 				break;
-			case nv2a_renderer::INVERTOP:
+			case NV2A_STENCIL_OP::INVERTOP:
 				sten = sten ^ 255;
 				break;
-			case nv2a_renderer::KEEP:
+			case NV2A_STENCIL_OP::KEEP:
 			default:
 				break;
-			case nv2a_renderer::REPLACE:
+			case NV2A_STENCIL_OP::REPLACE:
 				sten = stencil_ref;
 				break;
-			case nv2a_renderer::INCR:
+			case NV2A_STENCIL_OP::INCR:
 				if (sten < 255)
 					sten++;
 				break;
-			case nv2a_renderer::DECR:
+			case NV2A_STENCIL_OP::DECR:
 				if (sten > 0)
 					sten--;
 				break;
-			case nv2a_renderer::INCR_WRAP:
+			case NV2A_STENCIL_OP::INCR_WRAP:
 				if (sten < 255)
 					sten++;
 				else
 					sten = 0;
 				break;
-			case nv2a_renderer::DECR_WRAP:
+			case NV2A_STENCIL_OP::DECR_WRAP:
 				if (sten > 0)
 					sten--;
 				else
 					sten = 255;
 				break;
 			}
-			if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z24S8) {
+			if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z24S8) {
 				deptsten = (dep << 8) | sten;
 				*daddr32 = deptsten;
 			}
-			else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z16) {
+			else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z16) {
 				deptsten = dep >> 8;
 				*daddr16 = (UINT16)deptsten;
 			}
@@ -1456,110 +1456,110 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 	depth_passed = true;
 	if (depth_test_enabled) {
 		switch (depth_function) {
-			case nv2a_renderer::NEVER:
+			case NV2A_COMPARISON_OP::NEVER:
 				depth_passed = false;
 				break;
-			case nv2a_renderer::LESS:
+			case NV2A_COMPARISON_OP::LESS:
 				if (depth >= dep)
 					depth_passed = false;
 				break;
-			case nv2a_renderer::EQUAL:
+			case NV2A_COMPARISON_OP::EQUAL:
 				if (depth != dep)
 					depth_passed = false;
 				break;
-			case nv2a_renderer::LEQUAL:
+			case NV2A_COMPARISON_OP::LEQUAL:
 				if (depth > dep)
 					depth_passed = false;
 				break;
-			case nv2a_renderer::GREATER:
+			case NV2A_COMPARISON_OP::GREATER:
 				if (depth <= dep)
 					depth_passed = false;
 				break;
-			case nv2a_renderer::NOTEQUAL:
+			case NV2A_COMPARISON_OP::NOTEQUAL:
 				if (depth == dep)
 					depth_passed = false;
 				break;
-			case nv2a_renderer::GEQUAL:
+			case NV2A_COMPARISON_OP::GEQUAL:
 				if (depth < dep)
 					depth_passed = false;
 				break;
-			case nv2a_renderer::ALWAYS:
+			case NV2A_COMPARISON_OP::ALWAYS:
 			default:
 				break;
 		}
 		if (depth_passed == false) {
 			switch (stencil_op_zfail) {
-			case nv2a_renderer::ZEROOP:
+			case NV2A_STENCIL_OP::ZEROOP:
 				sten = 0;
 				break;
-			case nv2a_renderer::INVERTOP:
+			case NV2A_STENCIL_OP::INVERTOP:
 				sten = sten ^ 255;
 				break;
-			case nv2a_renderer::KEEP:
+			case NV2A_STENCIL_OP::KEEP:
 			default:
 				break;
-			case nv2a_renderer::REPLACE:
+			case NV2A_STENCIL_OP::REPLACE:
 				sten = stencil_ref;
 				break;
-			case nv2a_renderer::INCR:
+			case NV2A_STENCIL_OP::INCR:
 				if (sten < 255)
 					sten++;
 				break;
-			case nv2a_renderer::DECR:
+			case NV2A_STENCIL_OP::DECR:
 				if (sten > 0)
 					sten--;
 				break;
-			case nv2a_renderer::INCR_WRAP:
+			case NV2A_STENCIL_OP::INCR_WRAP:
 				if (sten < 255)
 					sten++;
 				else
 					sten = 0;
 				break;
-			case nv2a_renderer::DECR_WRAP:
+			case NV2A_STENCIL_OP::DECR_WRAP:
 				if (sten > 0)
 					sten--;
 				else
 					sten = 255;
 				break;
 			}
-			if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z24S8) {
+			if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z24S8) {
 				deptsten = (dep << 8) | sten;
 				*daddr32 = deptsten;
 			}
-			else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z16) {
+			else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z16) {
 				deptsten = dep >> 8;
 				*daddr16 = (UINT16)deptsten;
 			}
 			return;
 		}
 		switch (stencil_op_zpass) {
-		case nv2a_renderer::ZEROOP:
+		case NV2A_STENCIL_OP::ZEROOP:
 			sten = 0;
 			break;
-		case nv2a_renderer::INVERTOP:
+		case NV2A_STENCIL_OP::INVERTOP:
 			sten = sten ^ 255;
 			break;
-		case nv2a_renderer::KEEP:
+		case NV2A_STENCIL_OP::KEEP:
 		default:
 			break;
-		case nv2a_renderer::REPLACE:
+		case NV2A_STENCIL_OP::REPLACE:
 			sten = stencil_ref;
 			break;
-		case nv2a_renderer::INCR:
+		case NV2A_STENCIL_OP::INCR:
 			if (sten < 255)
 				sten++;
 			break;
-		case nv2a_renderer::DECR:
+		case NV2A_STENCIL_OP::DECR:
 			if (sten > 0)
 				sten--;
 			break;
-		case nv2a_renderer::INCR_WRAP:
+		case NV2A_STENCIL_OP::INCR_WRAP:
 			if (sten < 255)
 				sten++;
 			else
 				sten = 0;
 			break;
-		case nv2a_renderer::DECR_WRAP:
+		case NV2A_STENCIL_OP::DECR_WRAP:
 			if (sten > 0)
 				sten--;
 			else
@@ -1570,56 +1570,56 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 	// blending
 	if (blending_enabled) {
 		switch (blend_function_source) {
-			case nv2a_renderer::ZERO:
+			case NV2A_BLEND_FACTOR::ZERO:
 				s[3] = s[2] = s[1] = s[0] = 0;
 				break;
-			case nv2a_renderer::ONE:
+			case NV2A_BLEND_FACTOR::ONE:
 			default:
 				s[3] = s[2] = s[1] = s[0] = 255;
 				break;
-			case nv2a_renderer::DST_COLOR:
+			case NV2A_BLEND_FACTOR::DST_COLOR:
 				s[3] = fb[3];
 				s[2] = fb[2];
 				s[1] = fb[1];
 				s[0] = fb[0];
 				break;
-			case nv2a_renderer::ONE_MINUS_DST_COLOR:
+			case NV2A_BLEND_FACTOR::ONE_MINUS_DST_COLOR:
 				s[3] = fb[3] ^ 255;
 				s[2] = fb[2] ^ 255;
 				s[1] = fb[1] ^ 255;
 				s[0] = fb[0] ^ 255;
 				break;
-			case nv2a_renderer::SRC_ALPHA:
+			case NV2A_BLEND_FACTOR::SRC_ALPHA:
 				s[3] = s[2] = s[1] = s[0] = c[3];
 				break;
-			case nv2a_renderer::ONE_MINUS_SRC_ALPHA:
+			case NV2A_BLEND_FACTOR::ONE_MINUS_SRC_ALPHA:
 				s[3] = s[2] = s[1] = s[0] = c[3] ^ 255;
 				break;
-			case nv2a_renderer::DST_ALPHA:
+			case NV2A_BLEND_FACTOR::DST_ALPHA:
 				s[3] = s[2] = s[1] = s[0] = fb[3];
 				break;
-			case nv2a_renderer::ONE_MINUS_DST_ALPHA:
+			case NV2A_BLEND_FACTOR::ONE_MINUS_DST_ALPHA:
 				s[3] = s[2] = s[1] = s[0] = fb[3] ^ 255;
 				break;
-			case nv2a_renderer::CONSTANT_COLOR:
+			case NV2A_BLEND_FACTOR::CONSTANT_COLOR:
 				s[3] = cc[3];
 				s[2] = cc[2];
 				s[1] = cc[1];
 				s[0] = cc[0];
 				break;
-			case nv2a_renderer::ONE_MINUS_CONSTANT_COLOR:
+			case NV2A_BLEND_FACTOR::ONE_MINUS_CONSTANT_COLOR:
 				s[3] = cc[3] ^ 255;
 				s[2] = cc[2] ^ 255;
 				s[1] = cc[1] ^ 255;
 				s[0] = cc[0] ^ 255;
 				break;
-			case nv2a_renderer::CONSTANT_ALPHA:
+			case NV2A_BLEND_FACTOR::CONSTANT_ALPHA:
 				s[3] = s[2] = s[1] = s[0] = cc[3];
 				break;
-			case nv2a_renderer::ONE_MINUS_CONSTANT_ALPHA:
+			case NV2A_BLEND_FACTOR::ONE_MINUS_CONSTANT_ALPHA:
 				s[3] = s[2] = s[1] = s[0] = cc[3] ^ 255;
 				break;
-			case nv2a_renderer::SRC_ALPHA_SATURATE:
+			case NV2A_BLEND_FACTOR::SRC_ALPHA_SATURATE:
 				s[3] = 255;
 				if (c[3] < (fb[3] ^ 255))
 					s[2] = c[3];
@@ -1629,58 +1629,58 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 				break;
 		}
 		switch (blend_function_destination) {
-			case nv2a_renderer::ZERO:
+			case NV2A_BLEND_FACTOR::ZERO:
 			default:
 				d[3] = d[2] = d[1] = d[0] = 0;
 				break;
-			case nv2a_renderer::ONE:
+			case NV2A_BLEND_FACTOR::ONE:
 				d[3] = d[2] = d[1] = d[0] = 255;
 				break;
-			case nv2a_renderer::SRC_COLOR:
+			case NV2A_BLEND_FACTOR::SRC_COLOR:
 				d[3] = c[3];
 				d[2] = c[2];
 				d[1] = c[1];
 				d[0] = c[0];
 				break;
-			case nv2a_renderer::ONE_MINUS_SRC_COLOR:
+			case NV2A_BLEND_FACTOR::ONE_MINUS_SRC_COLOR:
 				d[3] = c[3] ^ 255;
 				d[2] = c[2] ^ 255;
 				d[1] = c[1] ^ 255;
 				d[0] = c[0] ^ 255;
 				break;
-			case nv2a_renderer::SRC_ALPHA:
+			case NV2A_BLEND_FACTOR::SRC_ALPHA:
 				d[3] = d[2] = d[1] = d[0] = c[3];
 				break;
-			case nv2a_renderer::ONE_MINUS_SRC_ALPHA:
+			case NV2A_BLEND_FACTOR::ONE_MINUS_SRC_ALPHA:
 				d[3] = d[2] = d[1] = d[0] = c[3] ^ 255;
 				break;
-			case nv2a_renderer::DST_ALPHA:
+			case NV2A_BLEND_FACTOR::DST_ALPHA:
 				d[3] = d[2] = d[1] = d[0] = fb[3];
 				break;
-			case nv2a_renderer::ONE_MINUS_DST_ALPHA:
+			case NV2A_BLEND_FACTOR::ONE_MINUS_DST_ALPHA:
 				d[3] = d[2] = d[1] = d[0] = fb[3] ^ 255;
 				break;
-			case nv2a_renderer::CONSTANT_COLOR:
+			case NV2A_BLEND_FACTOR::CONSTANT_COLOR:
 				d[3] = cc[3];
 				d[2] = cc[2];
 				d[1] = cc[1];
 				d[0] = cc[0];
 				break;
-			case nv2a_renderer::ONE_MINUS_CONSTANT_COLOR:
+			case NV2A_BLEND_FACTOR::ONE_MINUS_CONSTANT_COLOR:
 				d[3] = cc[3] ^ 255;
 				d[2] = cc[2] ^ 255;
 				d[1] = cc[1] ^ 255;
 				d[0] = cc[0] ^ 255;
 				break;
-			case nv2a_renderer::CONSTANT_ALPHA:
+			case NV2A_BLEND_FACTOR::CONSTANT_ALPHA:
 				d[3] = d[2] = d[1] = d[0] = cc[3];
 				break;
-			case nv2a_renderer::ONE_MINUS_CONSTANT_ALPHA:
+			case NV2A_BLEND_FACTOR::ONE_MINUS_CONSTANT_ALPHA:
 				d[3] = d[2] = d[1] = d[0] = cc[3] ^ 255;
 				break;
 		}
 		switch (blend_equation) {
-			case nv2a_renderer::FUNC_ADD:
+			case NV2A_BLEND_EQUATION::FUNC_ADD:
 				c[3] = (c[3] * s[3] + fb[3] * d[3]) / 255;
 				if (c[3] > 255)
 					c[3] = 255;
@@ -1694,7 +1694,7 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 				if (c[0] > 255)
 					c[0] = 255;
 				break;
-			case nv2a_renderer::FUNC_SUBTRACT:
+			case NV2A_BLEND_EQUATION::FUNC_SUBTRACT:
 				c[3] = (c[3] * s[3] - fb[3] * d[3]) / 255;
 				if (c[3] < 0)
 					c[3] = 255;
@@ -1708,7 +1708,7 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 				if (c[0] < 0)
 					c[0] = 255;
 				break;
-			case nv2a_renderer::FUNC_REVERSE_SUBTRACT:
+			case NV2A_BLEND_EQUATION::FUNC_REVERSE_SUBTRACT:
 				c[3] = (fb[3] * d[3] - c[3] * s[3]) / 255;
 				if (c[3] < 0)
 					c[3] = 255;
@@ -1722,7 +1722,7 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 				if (c[0] < 0)
 					c[0] = 255;
 				break;
-			case nv2a_renderer::MIN:
+			case NV2A_BLEND_EQUATION::MIN:
 				c[3] = s[3];
 				if (d[3] < c[3])
 					c[3] = d[3];
@@ -1736,7 +1736,7 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 				if (d[0] < c[0])
 					c[0] = d[0];
 				break;
-			case nv2a_renderer::MAX:
+			case NV2A_BLEND_EQUATION::MAX:
 				c[3] = s[3];
 				if (d[3] > c[3])
 					c[3] = d[3];
@@ -1756,94 +1756,94 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 	// logical operation
 	if (logical_operation_enabled) {
 		switch (logical_operation) {
-			case  nv2a_renderer::CLEAR:
+			case  NV2A_LOGIC_OP::CLEAR:
 				c[3] = 0;
 				c[2] = 0;
 				c[1] = 0;
 				c[0] = 0;
 				break;
-			case  nv2a_renderer::AND:
+			case  NV2A_LOGIC_OP::AND:
 				c[3] = c[3] & fb[3];
 				c[2] = c[2] & fb[2];
 				c[1] = c[1] & fb[1];
 				c[0] = c[0] & fb[0];
 				break;
-			case  nv2a_renderer::AND_REVERSE:
+			case  NV2A_LOGIC_OP::AND_REVERSE:
 				c[3] = c[3] & (fb[3] ^ 255);
 				c[2] = c[2] & (fb[2] ^ 255);
 				c[1] = c[1] & (fb[1] ^ 255);
 				c[0] = c[0] & (fb[0] ^ 255);
 				break;
-			case  nv2a_renderer::COPY:
+			case  NV2A_LOGIC_OP::COPY:
 			default:
 				break;
-			case  nv2a_renderer::AND_INVERTED:
+			case  NV2A_LOGIC_OP::AND_INVERTED:
 				c[3] = (c[3] ^ 255) & fb[3];
 				c[2] = (c[2] ^ 255) & fb[2];
 				c[1] = (c[1] ^ 255) & fb[1];
 				c[0] = (c[0] ^ 255) & fb[0];
 				break;
-			case  nv2a_renderer::NOOP:
+			case  NV2A_LOGIC_OP::NOOP:
 				c[3] = fb[3];
 				c[2] = fb[2];
 				c[1] = fb[1];
 				c[0] = fb[0];
 				break;
-			case  nv2a_renderer::XOR:
+			case  NV2A_LOGIC_OP::XOR:
 				c[3] = c[3] ^ fb[3];
 				c[2] = c[2] ^ fb[2];
 				c[1] = c[1] ^ fb[1];
 				c[0] = c[0] ^ fb[0];
 				break;
-			case  nv2a_renderer::OR:
+			case  NV2A_LOGIC_OP::OR:
 				c[3] = c[3] | fb[3];
 				c[2] = c[2] | fb[2];
 				c[1] = c[1] | fb[1];
 				c[0] = c[0] | fb[0];
 				break;
-			case  nv2a_renderer::NOR:
+			case  NV2A_LOGIC_OP::NOR:
 				c[3] = (c[3] | fb[3]) ^ 255;
 				c[2] = (c[2] | fb[2]) ^ 255;
 				c[1] = (c[1] | fb[1]) ^ 255;
 				c[0] = (c[0] | fb[0]) ^ 255;
 				break;
-			case  nv2a_renderer::EQUIV:
+			case  NV2A_LOGIC_OP::EQUIV:
 				c[3] = (c[3] ^ fb[3]) ^ 255;
 				c[2] = (c[2] ^ fb[2]) ^ 255;
 				c[1] = (c[1] ^ fb[1]) ^ 255;
 				c[0] = (c[0] ^ fb[0]) ^ 255;
 				break;
-			case  nv2a_renderer::INVERT:
+			case  NV2A_LOGIC_OP::INVERT:
 				c[3] = fb[3] ^ 255;
 				c[2] = fb[2] ^ 255;
 				c[1] = fb[1] ^ 255;
 				c[0] = fb[0] ^ 255;
 				break;
-			case  nv2a_renderer::OR_REVERSE:
+			case  NV2A_LOGIC_OP::OR_REVERSE:
 				c[3] = c[3] | (fb[3] ^ 255);
 				c[2] = c[2] | (fb[2] ^ 255);
 				c[1] = c[1] | (fb[1] ^ 255);
 				c[0] = c[0] | (fb[0] ^ 255);
 				break;
-			case  nv2a_renderer::COPY_INVERTED:
+			case  NV2A_LOGIC_OP::COPY_INVERTED:
 				c[3] = c[3] ^ 255;
 				c[2] = c[2] ^ 255;
 				c[1] = c[1] ^ 255;
 				c[0] = c[0] ^ 255;
 				break;
-			case  nv2a_renderer::OR_INVERTED:
+			case  NV2A_LOGIC_OP::OR_INVERTED:
 				c[3] = (c[3] ^ 255) | fb[3];
 				c[2] = (c[2] ^ 255) | fb[2];
 				c[1] = (c[1] ^ 255) | fb[1];
 				c[0] = (c[0] ^ 255) | fb[0];
 				break;
-			case  nv2a_renderer::NAND:
+			case  NV2A_LOGIC_OP::NAND:
 				c[3] = (c[3] & fb[3]) ^ 255;
 				c[2] = (c[2] & fb[2]) ^ 255;
 				c[1] = (c[1] & fb[1]) ^ 255;
 				c[0] = (c[0] & fb[0]) ^ 255;
 				break;
-			case  nv2a_renderer::SET:
+			case  NV2A_LOGIC_OP::SET:
 				c[3] = 255;
 				c[2] = 255;
 				c[1] = 255;
@@ -1858,29 +1858,29 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 		ft = ((UINT32)fb[3] << 24) | ((UINT32)fb[2] << 16) | ((UINT32)fb[1] << 8) | (UINT32)fb[0];
 		w = (ft & ~color_mask) | (ct & color_mask);
 		switch (colorformat_rendertarget) {
-		case NV2A_COLOR_FORMAT_R5G6B5:
+		case NV2A_COLOR_FORMAT::R5G6B5:
 			w = ((w >> 8) & 0xf800) + ((w >> 5) & 0x7e0) + ((w >> 3) & 0x1f);
 			*((UINT16 *)addr) = (UINT16)w;
 			break;
-		case NV2A_COLOR_FORMAT_X8R8G8B8_Z8R8G8B8:
-		case NV2A_COLOR_FORMAT_X8R8G8B8_X8R8G8B8:
+		case NV2A_COLOR_FORMAT::X8R8G8B8_Z8R8G8B8:
+		case NV2A_COLOR_FORMAT::X8R8G8B8_X8R8G8B8:
 			*((UINT32 *)addr) = w;
 			break;
-		case NV2A_COLOR_FORMAT_A8R8G8B8:
+		case NV2A_COLOR_FORMAT::A8R8G8B8:
 			*((UINT32 *)addr) = w;
 			break;
-		case NV2A_COLOR_FORMAT_B8:
+		case NV2A_COLOR_FORMAT::B8:
 			*addr = (UINT8)w;
 			break;
 		}
 	}
 	if (depth_write_enabled)
 		dep = depth;
-	if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z24S8) {
+	if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z24S8) {
 		deptsten = (dep << 8) | sten;
 		*daddr32 = deptsten;
 	}
-	else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z16) {
+	else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z16) {
 		deptsten = dep >> 8;
 		*daddr16 = (UINT16)deptsten;
 	}
@@ -1899,12 +1899,12 @@ void nv2a_renderer::render_color(INT32 scanline, const extent_t &extent, const n
 		int ca, cr, cg, cb;
 		int xp = extent.startx + x; // x coordinate of current pixel
 
-		cb = ((extent.param[PARAM_COLOR_B].start + (float)x*extent.param[PARAM_COLOR_B].dpdx))*255.0f;
-		cg = ((extent.param[PARAM_COLOR_G].start + (float)x*extent.param[PARAM_COLOR_G].dpdx))*255.0f;
-		cr = ((extent.param[PARAM_COLOR_R].start + (float)x*extent.param[PARAM_COLOR_R].dpdx))*255.0f;
-		ca = ((extent.param[PARAM_COLOR_A].start + (float)x*extent.param[PARAM_COLOR_A].dpdx))*255.0f;
+		cb = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].dpdx))*255.0f;
+		cg = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].dpdx))*255.0f;
+		cr = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].dpdx))*255.0f;
+		ca = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].dpdx))*255.0f;
 		a8r8g8b8 = (ca << 24) + (cr << 16) + (cg << 8) + cb; // pixel color obtained by interpolating the colors of the vertices
-		z = (extent.param[PARAM_Z].start + (float)x*extent.param[PARAM_Z].dpdx);
+		z = (extent.param[(int)VERTEX_PARAMETER::PARAM_Z].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_Z].dpdx);
 		write_pixel(xp, scanline, a8r8g8b8, z);
 		x--;
 	}
@@ -1926,10 +1926,10 @@ void nv2a_renderer::render_texture_simple(INT32 scanline, const extent_t &extent
 		int up, vp;
 		int xp = extent.startx + x; // x coordinate of current pixel
 
-		up = (extent.param[PARAM_TEXTURE0_U].start + (float)x*extent.param[PARAM_TEXTURE0_U].dpdx)*(float)(objectdata.data->texture[0].sizeu - 1); // x coordinate of texel in texture
-		vp = (extent.param[PARAM_TEXTURE0_V].start + (float)x*extent.param[PARAM_TEXTURE0_V].dpdx)*(float)(objectdata.data->texture[0].sizev - 1); // y coordinate of texel in texture
+		up = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].dpdx)*(float)(objectdata.data->texture[0].sizeu - 1); // x coordinate of texel in texture
+		vp = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].dpdx)*(float)(objectdata.data->texture[0].sizev - 1); // y coordinate of texel in texture
 		a8r8g8b8 = texture_get_texel(0, up, vp);
-		z = (extent.param[PARAM_Z].start + (float)x*extent.param[PARAM_Z].dpdx);
+		z = (extent.param[(int)VERTEX_PARAMETER::PARAM_Z].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_Z].dpdx);
 		write_pixel(xp, scanline, a8r8g8b8, z);
 		x--;
 	}
@@ -1955,17 +1955,17 @@ void nv2a_renderer::render_register_combiners(INT32 scanline, const extent_t &ex
 		xp = extent.startx + x;
 		// 1: fetch data
 		// 1.1: interpolated color from vertices
-		cb = ((extent.param[PARAM_COLOR_B].start + (float)x*extent.param[PARAM_COLOR_B].dpdx))*255.0f;
-		cg = ((extent.param[PARAM_COLOR_G].start + (float)x*extent.param[PARAM_COLOR_G].dpdx))*255.0f;
-		cr = ((extent.param[PARAM_COLOR_R].start + (float)x*extent.param[PARAM_COLOR_R].dpdx))*255.0f;
-		ca = ((extent.param[PARAM_COLOR_A].start + (float)x*extent.param[PARAM_COLOR_A].dpdx))*255.0f;
+		cb = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].dpdx))*255.0f;
+		cg = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].dpdx))*255.0f;
+		cr = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].dpdx))*255.0f;
+		ca = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].dpdx))*255.0f;
 		color[0] = (ca << 24) + (cr << 16) + (cg << 8) + cb; // pixel color obtained by interpolating the colors of the vertices
 		color[1] = 0; // lighting not yet
 		// 1.2: color for each of the 4 possible textures
 		for (n = 0; n < 4; n++) {
 			if (texture[n].enabled) {
-				up = (extent.param[PARAM_TEXTURE0_U + n * 2].start + (float)x*extent.param[PARAM_TEXTURE0_U + n * 2].dpdx)*(float)(objectdata.data->texture[n].sizeu - 1);
-				vp = extent.param[PARAM_TEXTURE0_V + n * 2].start*(float)(objectdata.data->texture[n].sizev - 1);
+				up = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].dpdx)*(float)(objectdata.data->texture[n].sizeu - 1);
+				vp = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].start*(float)(objectdata.data->texture[n].sizev - 1);
 				color[n + 2] = texture_get_texel(n, up, vp);
 			}
 		}
@@ -1990,7 +1990,7 @@ void nv2a_renderer::render_register_combiners(INT32 scanline, const extent_t &ex
 		combiner_final_output();
 		a8r8g8b8 = combiner_float_argb8(combiner.output);
 		// 3: write pixel
-		z = (extent.param[PARAM_Z].start + (float)x*extent.param[PARAM_Z].dpdx);
+		z = (extent.param[(int)VERTEX_PARAMETER::PARAM_Z].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_Z].dpdx);
 		write_pixel(xp, scanline, a8r8g8b8, z);
 		x--;
 	}
@@ -2144,7 +2144,7 @@ void nv2a_renderer::read_vertex(address_space & space, offs_t address, vertex_nv
 
 	l = vertexbuffer_size[attrib];
 	switch (vertexbuffer_kind[attrib]) {
-	case NV2A_VTXBUF_TYPE_FLOAT:
+	case NV2A_VTXBUF_TYPE::FLOAT:
 	default:
 		vertex.attribute[attrib].fv[0] = 0;
 		vertex.attribute[attrib].fv[1] = 0;
@@ -2155,21 +2155,21 @@ void nv2a_renderer::read_vertex(address_space & space, offs_t address, vertex_nv
 			d = d + 4;
 		}
 		break;
-	case NV2A_VTXBUF_TYPE_UBYTE:
+	case NV2A_VTXBUF_TYPE::UBYTE:
 		u = space.read_dword(address + 0);
 		for (c = l-1; c >= 0; c--) {
 			vertex.attribute[attrib].fv[c] = (u & 0xff) / 255.0;
 			u = u >> 8;
 		}
 		break;
-	case  NV2A_VTXBUF_TYPE_UBYTE2:
+	case  NV2A_VTXBUF_TYPE::UBYTE2:
 		u = space.read_dword(address + 0);
 		for (c = 0; c < l; c++) {
 			vertex.attribute[attrib].fv[c] = (u & 0xff) / 255.0;
 			u = u >> 8;
 		}
 		break;
-	case NV2A_VTXBUF_TYPE_UNKNOWN_6: // ???
+	case NV2A_VTXBUF_TYPE::UNKNOWN_6: // ???
 		u = space.read_dword(address + 0);
 		vertex.attribute[attrib].fv[0] = (u & 0xff) / 255.0; // b
 		vertex.attribute[attrib].fv[1] = ((u & 0xff00) >> 8) / 255.0;  // g
@@ -2303,13 +2303,13 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destinati
 		for (m = 0; m < count; m++) {
 			destination[m].x = source[m].attribute[0].fv[0];
 			destination[m].y = source[m].attribute[0].fv[1];
-			for (u = PARAM_COLOR_B; u <= PARAM_COLOR_A; u++) // 0=b 1=g 2=r 3=a
+			for (u = (int)VERTEX_PARAMETER::PARAM_COLOR_B; u <= (int)VERTEX_PARAMETER::PARAM_COLOR_A; u++) // 0=b 1=g 2=r 3=a
 				destination[m].p[u] = source[m].attribute[3].fv[u];
 			for (u = 0; u < 4; u++) {
-				destination[m].p[PARAM_TEXTURE0_U + u * 2] = source[m].attribute[9 + u].fv[0];
-				destination[m].p[PARAM_TEXTURE0_V + u * 2] = source[m].attribute[9 + u].fv[1];
+				destination[m].p[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + u * 2] = source[m].attribute[9 + u].fv[0];
+				destination[m].p[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + u * 2] = source[m].attribute[9 + u].fv[1];
 			}
-			destination[m].p[PARAM_Z] = 0xffffff;
+			destination[m].p[(int)VERTEX_PARAMETER::PARAM_Z] = 0xffffff;
 		}
 	}
 	else {
@@ -2320,13 +2320,13 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destinati
 		for (m = 0; m < count; m++) {
 			destination[m].x = vert[m].attribute[0].fv[0];
 			destination[m].y = vert[m].attribute[0].fv[1];
-			for (u = PARAM_COLOR_B; u <= PARAM_COLOR_A; u++) // 0=b 1=g 2=r 3=a
+			for (u = (int)VERTEX_PARAMETER::PARAM_COLOR_B; u <= (int)VERTEX_PARAMETER::PARAM_COLOR_A; u++) // 0=b 1=g 2=r 3=a
 				destination[m].p[u] = vert[m].attribute[3].fv[u];
 			for (u = 0; u < 4; u++) {
-				destination[m].p[PARAM_TEXTURE0_U + u * 2] = vert[m].attribute[9 + u].fv[0];
-				destination[m].p[PARAM_TEXTURE0_V + u * 2] = vert[m].attribute[9 + u].fv[1];
+				destination[m].p[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + u * 2] = vert[m].attribute[9 + u].fv[0];
+				destination[m].p[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + u * 2] = vert[m].attribute[9 + u].fv[1];
 			}
-			destination[m].p[PARAM_Z] = vert[m].attribute[0].fv[2];
+			destination[m].p[(int)VERTEX_PARAMETER::PARAM_Z] = vert[m].attribute[0].fv[2];
 		}
 	}
 }
@@ -2343,7 +2343,7 @@ void nv2a_renderer::clear_depth_buffer(int what, UINT32 value)
 	else
 		m = 1;
 	if (what == 3) {
-		if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z24S8) {
+		if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z24S8) {
 			UINT32 *p, *pl;
 			int x, y;
 
@@ -2357,7 +2357,7 @@ void nv2a_renderer::clear_depth_buffer(int what, UINT32 value)
 				pl = pl + pitch_rendertarget / 4;
 			}
 		}
-		else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z16) {
+		else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z16) {
 			UINT16 *p, *pl;
 			int x, y;
 
@@ -2373,7 +2373,7 @@ void nv2a_renderer::clear_depth_buffer(int what, UINT32 value)
 		}
 	}
 	else {
-		if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z24S8) {
+		if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z24S8) {
 			UINT32 mask;
 			UINT32 *p, *pl;
 			int x, y;
@@ -2393,7 +2393,7 @@ void nv2a_renderer::clear_depth_buffer(int what, UINT32 value)
 				pl = pl + pitch_rendertarget / 4;
 			}
 		}
-		else if ((depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT_Z16) && (what == 1)) {
+		else if ((depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z16) && (what == 1)) {
 			UINT16 *p, *pl;
 			int x, y;
 
@@ -2429,13 +2429,14 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 	}
 	if (maddress == 0x1810) {
 		// draw vertices
-		int offset, count, type;
+		int offset, count;
+		NV2A_BEGIN_END type;
 		UINT32 n;
 		render_delegate renderspans;
 
 		offset = data & 0xffffff;
 		count = (data >> 24) & 0xff;
-		type = channel[chanel][subchannel].object.method[0x17fc / 4];
+		type = (NV2A_BEGIN_END)channel[chanel][subchannel].object.method[0x17fc / 4];
 		if (((channel[chanel][subchannel].object.method[0x1e60 / 4] & 7) > 0) && (combiner.used != 0)) {
 			renderspans = render_delegate(FUNC(nv2a_renderer::render_register_combiners), this);
 		}
@@ -2447,7 +2448,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 #ifdef LOG_NV2A
 		printf("vertex %d %d %d\n\r", type, offset, count);
 #endif
-		if (type == nv2a_renderer::QUADS) {
+		if (type == NV2A_BEGIN_END::QUADS) {
 			for (n = 0; n <= count; n += 4) {
 				vertex_nv vert[4];
 				vertex_t xy[4];
@@ -2458,7 +2459,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				wait();
 			}
 		}
-		else if (type == nv2a_renderer::TRIANGLE_FAN) {
+		else if (type == NV2A_BEGIN_END::TRIANGLE_FAN) {
 			vertex_nv vert[3];
 			vertex_t xy[3];
 
@@ -2473,7 +2474,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				wait();
 			}
 		}
-		else if (type == nv2a_renderer::TRIANGLE_STRIP) {
+		else if (type == NV2A_BEGIN_END::TRIANGLE_STRIP) {
 			vertex_nv vert[4];
 			vertex_t xy[4];
 
@@ -2494,7 +2495,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		countlen--;
 	}
 	if ((maddress == 0x1800) || (maddress == 0x1808)) {
-		UINT32 type, n;
+		NV2A_BEGIN_END type;
+		UINT32 n;
 		render_delegate renderspans;
 		int mult;
 
@@ -2513,8 +2515,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		// vertices are selected from the vertex buffer using an array of indexes
 		// each dword after 1800 contains two 16 bit index values to select the vartices
 		// each dword after 1808 contains a 32 bit index value to select the vartices
-		type = channel[chanel][subchannel].object.method[0x17fc / 4];
-		if (type == nv2a_renderer::QUADS) {
+		type = (NV2A_BEGIN_END)channel[chanel][subchannel].object.method[0x17fc / 4];
+		if (type == NV2A_BEGIN_END::QUADS) {
 			while (1) {
 				vertex_nv vert[4];
 				vertex_t xy[4];
@@ -2533,7 +2535,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				wait();
 			}
 		}
-		else if (type == nv2a_renderer::TRIANGLE_FAN) {
+		else if (type == NV2A_BEGIN_END::TRIANGLE_FAN) {
 			if ((countlen * mult + indexesleft_count) >= 3) {
 				vertex_nv vert[3];
 				vertex_t xy[3];
@@ -2561,7 +2563,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				}
 			}
 		}
-		else if (type == nv2a_renderer::TRIANGLES) {
+		else if (type == NV2A_BEGIN_END::TRIANGLES) {
 			while (1) {
 				vertex_nv vert[3];
 				vertex_t xy[3];
@@ -2580,7 +2582,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				wait();
 			}
 		}
-		else if (type == nv2a_renderer::TRIANGLE_STRIP) {
+		else if (type == NV2A_BEGIN_END::TRIANGLE_STRIP) {
 			if ((countlen * mult + indexesleft_count) >= 3) {
 				vertex_nv vert[4];
 				vertex_t xy[4];
@@ -2632,7 +2634,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 	}
 	if (maddress == 0x1818) {
 		int n;
-		int type;
+		NV2A_BEGIN_END type;
 		render_delegate renderspans;
 
 		if (((channel[chanel][subchannel].object.method[0x1e60 / 4] & 7) > 0) && (combiner.used != 0)) {
@@ -2648,8 +2650,8 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		// then countlen number of dwords with 1818
 		// end with 17fc primitive type 0
 		// at 1760 16 words specify the vertex format:for each possible vertex attribute the number of components (0=not present) and type of each
-		type = channel[chanel][subchannel].object.method[0x17fc / 4];
-		if (type == nv2a_renderer::TRIANGLE_FAN) {
+		type = (NV2A_BEGIN_END)channel[chanel][subchannel].object.method[0x17fc / 4];
+		if (type == NV2A_BEGIN_END::TRIANGLE_FAN) {
 			vertex_nv vert[3];
 			vertex_t xy[3];
 			int c;
@@ -2677,7 +2679,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				wait();
 			}
 		}
-		else if (type == nv2a_renderer::TRIANGLES) {
+		else if (type == NV2A_BEGIN_END::TRIANGLES) {
 			while (countlen > 0) {
 				vertex_nv vert[3];
 				vertex_t xy[3];
@@ -2696,7 +2698,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				wait();
 			}
 		}
-		else if (type == nv2a_renderer::TRIANGLE_STRIP) {
+		else if (type == NV2A_BEGIN_END::TRIANGLE_STRIP) {
 			vertex_nv vert[4];
 			vertex_t xy[4];
 			int c;
@@ -2724,7 +2726,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				wait();
 			}
 		}
-		else if (type == nv2a_renderer::QUADS) {
+		else if (type == NV2A_BEGIN_END::QUADS) {
 			while (countlen > 0) {
 				vertex_nv vert[4];
 				vertex_t xy[4];
@@ -2743,7 +2745,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 				wait();
 			}
 		}
-		else if (type == nv2a_renderer::QUAD_STRIP) {
+		else if (type == NV2A_BEGIN_END::QUAD_STRIP) {
 			vertex_nv vert[4];
 			vertex_t xy[4];
 			int c;
@@ -2789,22 +2791,22 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		int bit = method - 0x1760 / 4;
 
 		vertexbuffer_stride[bit] = (data >> 8) & 255;
-		vertexbuffer_kind[bit] = data & 15;
+		vertexbuffer_kind[bit] = (NV2A_VTXBUF_TYPE)(data & 15);
 		vertexbuffer_size[bit] = (data >> 4) & 15;
 		switch (vertexbuffer_kind[bit]) {
-		case NV2A_VTXBUF_TYPE_UBYTE2:
+		case NV2A_VTXBUF_TYPE::UBYTE2:
 			vertex_attribute_words[bit] = (vertexbuffer_size[bit] * 1) >> 2;
 			break;
-		case NV2A_VTXBUF_TYPE_FLOAT:
+		case NV2A_VTXBUF_TYPE::FLOAT:
 			vertex_attribute_words[bit] = (vertexbuffer_size[bit] * 4) >> 2;
 			break;
-		case NV2A_VTXBUF_TYPE_UBYTE:
+		case NV2A_VTXBUF_TYPE::UBYTE:
 			vertex_attribute_words[bit] = (vertexbuffer_size[bit] * 1) >> 2;
 			break;
-		case NV2A_VTXBUF_TYPE_USHORT:
+		case NV2A_VTXBUF_TYPE::USHORT:
 			vertex_attribute_words[bit] = (vertexbuffer_size[bit] * 2) >> 2;
 			break;
-		case NV2A_VTXBUF_TYPE_UNKNOWN_6:
+		case NV2A_VTXBUF_TYPE::UNKNOWN_6:
 			vertex_attribute_words[bit] = (vertexbuffer_size[bit] * 4) >> 2;
 			break;
 		default:
@@ -2906,19 +2908,19 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		log2height_rendertarget = (data >> 24) & 255;
 		log2width_rendertarget = (data >> 16) & 255;
 		antialiasing_rendertarget = (data >> 12) & 15;
-		type_rendertarget = (data >> 8) & 15;
-		depthformat_rendertarget = (data >> 4) & 15;
-		colorformat_rendertarget = (data >> 0) & 15;
+		type_rendertarget = (NV2A_RT_TYPE)((data >> 8) & 15);
+		depthformat_rendertarget = (NV2A_RT_DEPTH_FORMAT)((data >> 4) & 15);
+		colorformat_rendertarget = (NV2A_COLOR_FORMAT)((data >> 0) & 15);
 		switch (colorformat_rendertarget) {
-		case NV2A_COLOR_FORMAT_R5G6B5:
+		case NV2A_COLOR_FORMAT::R5G6B5:
 			bytespixel_rendertarget = 2;
 			break;
-		case NV2A_COLOR_FORMAT_X8R8G8B8_Z8R8G8B8:
-		case NV2A_COLOR_FORMAT_X8R8G8B8_X8R8G8B8:
-		case NV2A_COLOR_FORMAT_A8R8G8B8:
+		case NV2A_COLOR_FORMAT::X8R8G8B8_Z8R8G8B8:
+		case NV2A_COLOR_FORMAT::X8R8G8B8_X8R8G8B8:
+		case NV2A_COLOR_FORMAT::A8R8G8B8:
 			bytespixel_rendertarget = 4;
 			break;
-		case NV2A_COLOR_FORMAT_B8:
+		case NV2A_COLOR_FORMAT::B8:
 			bytespixel_rendertarget = 1;
 			break;
 		default:
@@ -2997,7 +2999,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		alpha_test_enabled = data != 0;
 	}
 	if (maddress == 0x033c) {
-		alpha_func = data;
+		alpha_func = (NV2A_COMPARISON_OP)data;
 	}
 	if (maddress == 0x0340) {
 		alpha_reference = data;
@@ -3012,7 +3014,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		depth_test_enabled = data != 0;
 	}
 	if (maddress == 0x0354) {
-		depth_function = data;
+		depth_function = (NV2A_COMPARISON_OP)data;
 	}
 	if (maddress == 0x0358) {
 		//color_mask = data;
@@ -3036,7 +3038,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		stencil_test_enabled = data != 0;
 	}
 	if (maddress == 0x0364) {
-		stencil_func = data;
+		stencil_func = (NV2A_COMPARISON_OP)data;
 	}
 	if (maddress == 0x0368) {
 		if (data > 255)
@@ -3047,25 +3049,25 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		stencil_mask = data;
 	}
 	if (maddress == 0x0370) {
-		stencil_op_fail = data;
+		stencil_op_fail = (NV2A_STENCIL_OP)data;
 	}
 	if (maddress == 0x0374) {
-		stencil_op_zfail = data;
+		stencil_op_zfail = (NV2A_STENCIL_OP)data;
 	}
 	if (maddress == 0x0378) {
-		stencil_op_zpass = data;
+		stencil_op_zpass = (NV2A_STENCIL_OP)data;
 	}
 	if (maddress == 0x0344) {
-		blend_function_source = data;
+		blend_function_source = (NV2A_BLEND_FACTOR)data;
 	}
 	if (maddress == 0x0348) {
-		blend_function_destination = data;
+		blend_function_destination = (NV2A_BLEND_FACTOR)data;
 	}
 	if (maddress == 0x034c) {
 		blend_color = data;
 	}
 	if (maddress == 0x0350) {
-		blend_equation = data;
+		blend_equation = (NV2A_BLEND_EQUATION)data;
 	}
 	if (maddress == 0x0d40) {
 		if (data != 0)
@@ -3075,7 +3077,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		logical_operation_enabled = data != 0;
 	}
 	if (maddress == 0x0d44) {
-		logical_operation = data;
+		logical_operation = (NV2A_LOGIC_OP)data;
 	}
 	// Texture Units
 	if ((maddress >= 0x1b00) && (maddress < 0x1c00)) {
@@ -3116,7 +3118,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 			texture[unit].sizev = 1 << basesizev;
 			texture[unit].sizew = 1 << basesizew;
 			texture[unit].dilate = dilatechose[(basesizeu << 4) + basesizev];
-			texture[unit].format = format;
+			texture[unit].format = (NV2A_TEX_FORMAT)format;
 			if (debug_grab_texttype == format) {
 				FILE *f;
 				int written;
