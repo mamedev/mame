@@ -68,7 +68,7 @@ protected:
     bool m_scheduled_IND_bit_reset;
     bool m_indirect_addressing;
 
-    bool m_flags;
+    int m_flags;
     // V = "Vai um" (Carry flag)
     // T = "Transbordo" (Overflow flag)
     

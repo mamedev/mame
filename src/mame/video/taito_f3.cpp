@@ -1836,7 +1836,7 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 		y_end=-1;
 		y_inc=-1;
 
-		if (m_f3_game_config->extend)    sx=-sx+(UINT16(188-512)<<16); else sx=-sx+(188<<16); /* Adjust for flipped scroll position */
+		if (m_f3_game_config->extend)    sx=-sx+(((188-512)&0xffff)<<16); else sx=-sx+(188<<16); /* Adjust for flipped scroll position */
 		y_index_fx=-sy-(256<<16); /* Adjust for flipped scroll position */
 	}
 	else

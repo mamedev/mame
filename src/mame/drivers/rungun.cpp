@@ -182,7 +182,7 @@ READ16_MEMBER(rungun_state::palette_read)
 
 WRITE16_MEMBER(rungun_state::palette_write)
 {
-	palette_device *cur_paldevice = m_video_mux_bank == 0 ? m_palette : m_palette2;
+	palette_device *cur_paldevice = m_video_mux_bank == 0 ? m_palette : static_cast<palette_device *>(m_palette2);
 	UINT32 addr = offset + m_video_mux_bank*0x800/2;
 	COMBINE_DATA(&m_pal_ram[addr]);
 	
