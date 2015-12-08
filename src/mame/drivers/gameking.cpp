@@ -4,7 +4,7 @@
 /*
   PeT mess@utanet.at 2015
   
-  Thanks to Deathadder, Judge, Porchy, Klaus Sommer, James Brolly + last and also least Brian Provinciano
+  Thanks to Deathadder, Judge, Porchy, Klaus Sommer, James Brolly & Brian Provinciano
 
   hopefully my work (reverse engineerung, cartridge+bios backup, emulation) will be honored in future
   and my name will not be removed entirely, especially by simple code rewrites of working emulation
