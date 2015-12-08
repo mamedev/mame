@@ -973,7 +973,7 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0xd00000, 0xd01fff) AM_DEVREAD("k056832", k056832_device, k_5bpp_rom_long_r)
 	AM_RANGE(0xd20000, 0xd20fff) AM_DEVREADWRITE16("k055673", k055673_device, k053247_word_r, k053247_word_w, 0xffffffff)
-	AM_RANGE(0xd21000, 0xd23fff) AM_RAM
+	AM_RANGE(0xd21000, 0xd21fff) AM_RAM // second bank of sprite RAM
 	AM_RANGE(0xd40000, 0xd4003f) AM_DEVWRITE("k056832", k056832_device, long_w)
 	AM_RANGE(0xd44000, 0xd4400f) AM_WRITE(konamigx_tilebank_w)
 	AM_RANGE(0xd48000, 0xd48007) AM_DEVWRITE16("k055673", k055673_device, k053246_word_w, 0xffffffff)
