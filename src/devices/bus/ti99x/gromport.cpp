@@ -2495,7 +2495,7 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 			if (!found) throw rpk_exception(RPK_INVALID_RESOURCE_REF, uses_name);
 		}
 	}
-	catch (rpk_exception &exp)
+	catch (rpk_exception &)
 	{
 		newrpk->close();
 		if (layout_xml != nullptr)     xml_file_free(layout_xml);
