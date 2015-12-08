@@ -7661,8 +7661,8 @@ ROM_START( spactrai )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "6cen.bin",  0x0000, 0x0800, CRC(a59a9f3f) SHA1(9564f1d013d566dc0b19762aec66119e2ece0b49) ) // MK2716J
-	ROM_LOAD( "7cen.bin",  0x0800, 0x0400, BAD_DUMP CRC(16cf5a5b) SHA1(0369786902544d31e506fe1ba6a69aa6e8ba9b5c) ) // MM2758A - seems to be the wrong type of ROM used on the actual PCB?!
-
+	ROM_LOAD( "7cen.bin",  0x0800, 0x0800, CRC(9b75b40a) SHA1(4ad94db3f1d6b45a3de1ed9b51d361f20c6706e4) ) // marked MM2758Q (which is meant to be a 1Kx8 EPROM, but in reality is a 2Kx8 EPROM ?!)
+	 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "stk.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
