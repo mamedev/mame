@@ -6,7 +6,6 @@
 Undumped carts:
 
  * GPA-108 - ??? [possibly no game used this ID]
- * GPA-110 - Fighting Bug ~ ファイティング バグ
  * GPA-113 - ??? [possibly no game used this ID]
 
 -->
@@ -113,6 +112,19 @@ Undumped carts:
 		<part name="cart" interface="pv1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="pchnkufo.bin" size="16384" crc="9ee981ab" sha1="d6ca45430a34ce0090ba882ade5a2268a862d4f4" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="fightbug" supported="no">
+		<description>Fighting Bug</description>
+		<year>1982</year>
+		<publisher>Casio</publisher>
+		<info name="serial" value="GPA-110"/>
+		<info name="alt_title" value="ファイティング バグ"/>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="fightbug.bin" size="8192" crc="84986255" sha1="7202641a387da90323d149e2f327a5c828856556" offset="0000" />
 			</dataarea>
 		</part>
 	</software>
