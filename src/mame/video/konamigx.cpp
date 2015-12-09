@@ -1049,8 +1049,10 @@ K056832_CB_MEMBER(konamigx_state::alpha_tile_callback)
 	else
 	{
 		/* save mixcode and mark tile alpha (unimplemented) */
-		*code = 0;
-
+		// Daisu-Kiss stage presentation
+		// Sexy Parodius level 3b
+		*code =  (m_gx_tilebanks[(d & 0xe000)>>13]<<13) + (d & 0x1fff);
+		
 		if (VERBOSE)
 			popmessage("skipped alpha tile(layer=%d mix=%d)", layer, mixcode);
 	}
