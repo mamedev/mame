@@ -1285,6 +1285,8 @@ inline UINT8 *nv2a_renderer::read_pixel(int x, int y, INT32 c[4])
 		c[1] = c[2] = 0;
 		c[3] = 0xff;
 		return addr8;
+	default:
+		return nullptr;
 	}
 	return nullptr;
 }
@@ -1871,6 +1873,8 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 			break;
 		case NV2A_COLOR_FORMAT::B8:
 			*addr = (UINT8)w;
+			break;
+		default:
 			break;
 		}
 	}
