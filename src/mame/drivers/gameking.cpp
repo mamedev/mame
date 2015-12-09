@@ -22,6 +22,7 @@
   use gameking3 cartridge to get illegal cartridge scroller
 */
 
+#include <stddef.h>
 #include "emu.h"
 #include "cpu/m6502/r65c02.h"
 #include "bus/generic/slot.h"
