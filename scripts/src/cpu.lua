@@ -1463,17 +1463,7 @@ if (CPUS["POWERPC"]~=null) then
 		MAME_DIR .. "src/devices/cpu/powerpc/ppcfe.cpp",
 		MAME_DIR .. "src/devices/cpu/powerpc/ppcfe.h",
 		MAME_DIR .. "src/devices/cpu/powerpc/ppcdrc.cpp",
-		
-		--MAME_DIR .. "src/devices/cpu/powerpc/drc_ops.cpp",
-		MAME_DIR .. "src/devices/cpu/powerpc/drc_ops.h",
-		--MAME_DIR .. "src/devices/cpu/powerpc/ppc.cpp",
 		MAME_DIR .. "src/devices/cpu/powerpc/ppc.h",
-		MAME_DIR .. "src/devices/cpu/powerpc/ppc403.inc",
-		MAME_DIR .. "src/devices/cpu/powerpc/ppc602.inc",
-		MAME_DIR .. "src/devices/cpu/powerpc/ppc603.inc",
-		MAME_DIR .. "src/devices/cpu/powerpc/ppc_mem.inc",
-		MAME_DIR .. "src/devices/cpu/powerpc/ppc_ops.h",
-		MAME_DIR .. "src/devices/cpu/powerpc/ppc_ops.inc",
 	}
 end
 

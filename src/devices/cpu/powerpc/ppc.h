@@ -14,9 +14,6 @@
 #ifndef __PPC_H__
 #define __PPC_H__
 
-#ifdef PPC_H_INCLUDED_FROM_PPC_C
-#include <setjmp.h>
-#endif
 #include "cpu/vtlb.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
