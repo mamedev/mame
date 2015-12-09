@@ -161,6 +161,7 @@ public:
 	DECLARE_DRIVER_INIT(mtrain);
 	DECLARE_DRIVER_INIT(saklove);
 	DECLARE_DRIVER_INIT(xplan);
+	DECLARE_DRIVER_INIT(ptrain);
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_0);
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
 	DECLARE_VIDEO_START(subsino2);
@@ -2674,6 +2675,69 @@ DRIVER_INIT_MEMBER(subsino2_state,xtrain)
 
 /***************************************************************************
 
+Panda Train (Novamatic 1.7)
+(c) 1999 Subsino
+
+Note: It's the same hardware as X-Train
+
+PCB:
+  SUBSINO
+
+CPU:
+  AMD Am188 EM-20KC (@U10)
+  Osc. 20.000 MHz (@OSC20)
+  MB84256C-10L (@U13)
+
+Video:
+  Subsino SS9601 9901WK002 (@U16)
+  Subsino SS9802 (@U1)
+  Subsino SS9803 (@U29)
+  HM86171-80 (@U26) - RAMDAC
+  2 x HM62H256DK-12 (@U21-U22)
+
+Sound:
+  U6295 (@U6)
+  Osc. 8.4672 MHz (@X1)
+  Philips TDA1519 (@U9)
+  LM324 (@U8) - Quad Operational Amplifier
+
+Other:
+  Osc. 12.000 MHz (@OSC12)
+  Battery (3V button cell)
+  Reset switch (@SW5)
+  Volume trimmer (@VR1)
+  4 x DSW8 (@SW1-SW4, only SW1 is populated)
+  4 x ULN2003A? (@U3-U5) - High Voltage, High Current Darlington Transistor Arrays
+  10 pin edge connector
+  36 pin edge connector
+  28 pin JAMMA connector
+
+***************************************************************************/
+
+ROM_START( ptrain )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "panda(top)-novam_1-v1.4.u14", 0x00000, 0x40000, CRC(75b12734) SHA1(d05d0cba2de9d7021736bbd7c67d9b3c552374ee) )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "panda-novam_3-v1.4.0.u20", 0x00000, 0x80000, CRC(2d5ab471) SHA1(3df42b7f762d738a4409498984e90c80625fae1f) )
+	ROM_LOAD32_BYTE( "panda-novam_4-v1.4.1.u19", 0x00001, 0x80000, CRC(a4b6985c) SHA1(1d3d23f7c9e775439a2d1a4c68b703bf51b0350f) )
+	ROM_LOAD32_BYTE( "panda-novam_5-v1.4.2.u18", 0x00002, 0x80000, CRC(716f7500) SHA1(971589a2530a0d4152bb68dbc7794985525a837d) )
+	ROM_LOAD32_BYTE( "panda-novam_6-v1.4.3.u17", 0x00003, 0x80000, CRC(10f0c21a) SHA1(400e53bf3dd6fe6f2dd679ed5151fb4400a6ec9f) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "panda-novam_2-v1.4.u7", 0x00000, 0x80000, CRC(d1debec8) SHA1(9086975e5bef2066a688ab3c1df3b384f59e507d) )
+ROM_END
+
+DRIVER_INIT_MEMBER(subsino2_state,ptrain)
+{
+	UINT8 *rom = memregion("maincpu")->base();
+
+	// patch protection test (it always enters test mode on boot otherwise)
+	rom[0xe1b08-0xc0000] = 0xeb;
+}
+
+/***************************************************************************
+
 Water-Nymph (Ver. 1.4)
 (c) 1996 Subsino
 
@@ -2718,10 +2782,11 @@ DRIVER_INIT_MEMBER(subsino2_state,wtrnymph)
 	rom[0xc2d7] = 0x18;
 }
 
-GAME( 1996, mtrain,   0,        mtrain,   mtrain, subsino2_state,   mtrain,   ROT0, "Subsino",        "Magic Train (Ver. 1.31)",              0 )
+GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, mtrain,   ROT0, "Subsino",        "Magic Train (Ver. 1.31)",              0 )
 GAME( 1996, wtrnymph, 0,        mtrain,   wtrnymph, subsino2_state, wtrnymph, ROT0, "Subsino",        "Water-Nymph (Ver. 1.4)",               0 )
-GAME( 1998, expcard,  0,        expcard,  expcard, subsino2_state,  expcard,  ROT0, "American Alpha", "Express Card / Top Card (Ver. 1.5)",   0 )
-GAME( 1998, saklove,  0,        saklove,  saklove, subsino2_state,  saklove,  ROT0, "Subsino",        "Ying Hua Lian 2.0 (China, Ver. 1.02)", 0 )
-GAME( 1999, xtrain,   0,        xtrain,   xtrain, subsino2_state,   xtrain,   ROT0, "Subsino",        "X-Train (Ver. 1.3)",                   0 )
-GAME( 1999, bishjan,  0,        bishjan,  bishjan, subsino2_state,  bishjan,  ROT0, "Subsino",        "Bishou Jan (Japan, Ver. 2.03)",        MACHINE_NO_SOUND )
-GAME( 2006, xplan,    0,        xplan,    xplan, subsino2_state,    xplan,    ROT0, "Subsino",        "X-Plan (Ver. 1.01)",                   0 )
+GAME( 1998, expcard,  0,        expcard,  expcard,  subsino2_state, expcard,  ROT0, "American Alpha", "Express Card / Top Card (Ver. 1.5)",   0 )
+GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, saklove,  ROT0, "Subsino",        "Ying Hua Lian 2.0 (China, Ver. 1.02)", 0 )
+GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, xtrain,   ROT0, "Subsino",        "X-Train (Ver. 1.3)",                   0 )
+GAME( 1999, ptrain,   0,        xtrain,   xtrain,   subsino2_state, ptrain,   ROT0, "Subsino",        "Panda Train (Novamatic 1.7)",          0 )
+GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, bishjan,  ROT0, "Subsino",        "Bishou Jan (Japan, Ver. 2.03)",        MACHINE_NO_SOUND )
+GAME( 2006, xplan,    0,        xplan,    xplan,    subsino2_state, xplan,    ROT0, "Subsino",        "X-Plan (Ver. 1.01)",                   0 )
