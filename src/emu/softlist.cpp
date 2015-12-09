@@ -22,7 +22,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef tagmap_t<software_info *> softlist_map;
+typedef std::unordered_map<std::string,software_info *> softlist_map;
 
 
 // ======================> softlist_parser
@@ -567,15 +567,15 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 		// Second, since the xml is fine, run additional checks:
 
 		// check for duplicate names
-		if (names.add(swinfo->shortname(), swinfo, false) == TMERR_DUPLICATE)
+		if (!names.insert(std::make_pair(swinfo->shortname(), swinfo)).second)
 		{
-			software_info *match = names.find(swinfo->shortname());
+			software_info *match = names.find(swinfo->shortname())->second;
 			osd_printf_error("%s: %s is a duplicate name (%s)\n", filename(), swinfo->shortname(), match->shortname());
 		}
 
 		// check for duplicate descriptions
 		std::string longname = std::string(swinfo->longname());
-		if (descriptions.add(strmakelower(longname).c_str(), swinfo, false) == TMERR_DUPLICATE)
+		if (!descriptions.insert(std::make_pair(strmakelower(longname), swinfo)).second)
 			osd_printf_error("%s: %s is a duplicate description (%s)\n", filename(), swinfo->longname(), swinfo->shortname());
 
 		bool is_clone = false;
@@ -619,7 +619,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 			if (part->romdata() == nullptr)
 				osd_printf_error("%s: %s has a part (%s) with no data\n", filename(), swinfo->shortname(), part->name());
 
-			if (part_names.add(part->name(), swinfo, false) == TMERR_DUPLICATE)
+			if (!part_names.insert(std::make_pair(part->name(), swinfo)).second)
 				osd_printf_error("%s: %s has a part (%s) whose name is duplicate\n", filename(), swinfo->shortname(), part->name());
 
 			for (const rom_entry *data = part->romdata(); data->_name != nullptr; data++)

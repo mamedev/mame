@@ -267,7 +267,6 @@ protected:
 	debug_module* m_debugger;
 	midi_module* m_midi;
 private:
-	//tagmap_t<osd_video_type>  m_video_options;
 	std::vector<const char *> m_video_names;
 };
 

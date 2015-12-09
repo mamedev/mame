@@ -58,10 +58,10 @@ void ui_menu_device_config::populate()
 	if (execiter.count() > 0)
 	{
 		str.append("* CPU:\n");
-		tagmap_t<UINT8> exectags;
+		std::unordered_set<std::string> exectags;
 		for (device_execute_interface *exec = execiter.first(); exec != nullptr; exec = execiter.next())
 		{
-			if (exectags.add(exec->device().tag(), 1, FALSE) == TMERR_DUPLICATE)
+			if (!exectags.insert(exec->device().tag()).second)
 				continue;
 
 			// get cpu specific clock that takes internal multiplier/dividers into account
@@ -74,7 +74,7 @@ void ui_menu_device_config::populate()
 			for (device_execute_interface *scan = execinneriter.first(); scan != nullptr; scan = execinneriter.next())
 			{
 				if (exec->device().type() == scan->device().type() && strcmp(name, scan->device().name()) == 0 && exec->device().clock() == scan->device().clock())
-					if (exectags.add(scan->device().tag(), 1, FALSE) != TMERR_DUPLICATE)
+					if (exectags.insert(scan->device().tag()).second)
 						count++;
 			}
 
@@ -121,10 +121,10 @@ void ui_menu_device_config::populate()
 	if (snditer.count() > 0)
 	{
 		str.append("* Sound:\n");
-		tagmap_t<UINT8> soundtags;
+		std::unordered_set<std::string> soundtags;
 		for (device_sound_interface *sound = snditer.first(); sound != nullptr; sound = snditer.next())
 		{
-			if (soundtags.add(sound->device().tag(), 1, FALSE) == TMERR_DUPLICATE)
+			if (!soundtags.insert(sound->device().tag()).second)
 				continue;
 
 			// count how many identical sound chips we have
@@ -133,7 +133,7 @@ void ui_menu_device_config::populate()
 			for (device_sound_interface *scan = sndinneriter.first(); scan != nullptr; scan = sndinneriter.next())
 			{
 				if (sound->device().type() == scan->device().type() && sound->device().clock() == scan->device().clock())
-					if (soundtags.add(scan->device().tag(), 1, FALSE) != TMERR_DUPLICATE)
+					if (soundtags.insert(scan->device().tag()).second)
 						count++;
 			}
 			// if more than one, prepend a #x in front of the CPU name

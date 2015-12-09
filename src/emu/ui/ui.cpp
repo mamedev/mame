@@ -1158,10 +1158,10 @@ std::string &ui_manager::game_info_astring(std::string &str)
 
 	// loop over all CPUs
 	execute_interface_iterator execiter(machine().root_device());
-	tagmap_t<UINT8> exectags;
+	std::unordered_set<std::string> exectags;
 	for (device_execute_interface *exec = execiter.first(); exec != nullptr; exec = execiter.next())
 	{
-		if (exectags.add(exec->device().tag(), 1, FALSE) == TMERR_DUPLICATE)
+		if (!exectags.insert(exec->device().tag()).second)
 			continue;
 		// get cpu specific clock that takes internal multiplier/dividers into account
 		int clock = exec->device().clock();
@@ -1173,7 +1173,7 @@ std::string &ui_manager::game_info_astring(std::string &str)
 		for (device_execute_interface *scan = execinneriter.first(); scan != nullptr; scan = execinneriter.next())
 		{
 			if (exec->device().type() == scan->device().type() && strcmp(name, scan->device().name()) == 0 && exec->device().clock() == scan->device().clock())
-				if (exectags.add(scan->device().tag(), 1, FALSE) != TMERR_DUPLICATE)
+				if (exectags.insert(scan->device().tag()).second)
 					count++;
 		}
 
@@ -1191,11 +1191,11 @@ std::string &ui_manager::game_info_astring(std::string &str)
 
 	// loop over all sound chips
 	sound_interface_iterator snditer(machine().root_device());
-	tagmap_t<UINT8> soundtags;
+	std::unordered_set<std::string> soundtags;
 	bool found_sound = false;
 	for (device_sound_interface *sound = snditer.first(); sound != nullptr; sound = snditer.next())
 	{
-		if (soundtags.add(sound->device().tag(), 1, FALSE) == TMERR_DUPLICATE)
+		if (!soundtags.insert(sound->device().tag()).second)
 			continue;
 
 		// append the Sound: string
@@ -1209,7 +1209,7 @@ std::string &ui_manager::game_info_astring(std::string &str)
 		for (device_sound_interface *scan = sndinneriter.first(); scan != nullptr; scan = sndinneriter.next())
 		{
 			if (sound->device().type() == scan->device().type() && sound->device().clock() == scan->device().clock())
-				if (soundtags.add(scan->device().tag(), 1, FALSE) != TMERR_DUPLICATE)
+				if (soundtags.insert(scan->device().tag()).second)
 					count++;
 		}
 		// if more than one, prepend a #x in front of the CPU name

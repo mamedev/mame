@@ -670,7 +670,7 @@ device_t *device_t::subdevice_slow(const char *tag) const
 
 	// if we got a match, add to the fast map
 	if (curdevice != nullptr)
-		m_device_map.add(tag, curdevice);
+		m_device_map.insert(std::make_pair(tag, curdevice));
 	return curdevice;
 }
 
@@ -760,7 +760,7 @@ device_t *device_t::replace_subdevice(device_t &old, device_type type, const cha
 	// iterate over all devices and remove any references to the old device
 	device_iterator iter(mconfig().root_device());
 	for (device_t *scan = iter.first(); scan != nullptr; scan = iter.next())
-		scan->m_device_map.reset(); //remove(&old);
+		scan->m_device_map.clear(); //remove(&old);
 
 	// create a new device, and substitute it for the old one
 	device_t *device = (*type)(mconfig(), tag, this, clock);
@@ -783,7 +783,7 @@ void device_t::remove_subdevice(device_t &device)
 	// iterate over all devices and remove any references
 	device_iterator iter(mconfig().root_device());
 	for (device_t *scan = iter.first(); scan != nullptr; scan = iter.next())
-		scan->m_device_map.reset(); //remove(&device);
+		scan->m_device_map.clear(); //remove(&device);
 
 	// remove from our list
 	m_subdevice_list.remove(device);

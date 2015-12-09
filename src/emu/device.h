@@ -252,7 +252,7 @@ protected:
 	device_t *              m_owner;                // device that owns us
 	device_t *              m_next;                 // next device by the same owner (of any type/class)
 	simple_list<device_t>   m_subdevice_list;       // list of sub-devices we own
-	mutable tagmap_t<device_t *> m_device_map;      // map of device names looked up and found
+	mutable std::unordered_map<std::string,device_t *> m_device_map;      // map of device names looked up and found
 
 	// device interfaces
 	device_interface *      m_interface_list;       // head of interface list
@@ -598,8 +598,8 @@ inline device_t *device_t::subdevice(const char *tag) const
 		return const_cast<device_t *>(this);
 
 	// do a quick lookup and return that if possible
-	device_t *quick = m_device_map.find(tag);
-	return (quick != nullptr) ? quick : subdevice_slow(tag);
+	auto quick = m_device_map.find(tag);
+	return (quick != m_device_map.end()) ? quick->second : subdevice_slow(tag);
 }
 
 

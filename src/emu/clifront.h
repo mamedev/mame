@@ -27,8 +27,6 @@ class osd_interface;
 // cli_frontend handles command-line processing and emulator execution
 class cli_frontend
 {
-	typedef tagmap_t<FPTR> int_map;
-
 public:
 	// construction/destruction
 	cli_frontend(cli_options &options, osd_interface &osd);

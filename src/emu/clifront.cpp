@@ -821,14 +821,14 @@ void cli_frontend::verifyroms(const char *gamename)
 	if (!matched || strchr(gamename, '*') || strchr(gamename, '?'))
 	{
 		driver_enumerator dummy_drivlist(m_options);
-		int_map device_map;
+		std::unordered_set<std::string> device_map;
 		while (dummy_drivlist.next())
 		{
 			machine_config &config = dummy_drivlist.config();
 			device_iterator iter(config.root_device());
 			for (device_t *dev = iter.first(); dev != nullptr; dev = iter.next())
 			{
-				if (dev->owner() != nullptr && (*(dev->shortname()) != 0) && dev->rom_region() != nullptr && (device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE)) {
+				if (dev->owner() != nullptr && (*(dev->shortname()) != 0) && dev->rom_region() != nullptr && (device_map.insert(dev->shortname()).second)) {
 					if (core_strwildcmp(gamename, dev->shortname()) == 0)
 					{
 						matched++;
@@ -891,7 +891,7 @@ void cli_frontend::verifyroms(const char *gamename)
 						if (!device->configured())
 							device->config_complete();
 
-					if (device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE) {
+					if (device_map.insert(dev->shortname()).second) {
 						if (core_strwildcmp(gamename, dev->shortname()) == 0)
 						{
 							matched++;
@@ -1250,7 +1250,7 @@ void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlis
 void cli_frontend::listsoftware(const char *gamename)
 {
 	FILE *out = stdout;
-	int_map list_map;
+	std::unordered_set<std::string> list_map;
 	bool isfirst = true;
 
 	// determine which drivers to output; return an error if none found
@@ -1262,7 +1262,7 @@ void cli_frontend::listsoftware(const char *gamename)
 	{
 		software_list_device_iterator iter(drivlist.config().root_device());
 		for (software_list_device *swlistdev = iter.first(); swlistdev != nullptr; swlistdev = iter.next())
-			if (list_map.add(swlistdev->list_name(), 0, false) != TMERR_DUPLICATE)
+			if (list_map.insert(swlistdev->list_name()).second)
 				if (swlistdev->first_software_info() != nullptr)
 				{
 					if (isfirst) { fprintf(out, SOFTLIST_XML_BEGIN); isfirst = false; }
@@ -1283,7 +1283,7 @@ void cli_frontend::listsoftware(const char *gamename)
 -------------------------------------------------*/
 void cli_frontend::verifysoftware(const char *gamename)
 {
-	int_map list_map;
+	std::unordered_set<std::string> list_map;
 
 	int correct = 0;
 	int incorrect = 0;
@@ -1306,7 +1306,7 @@ void cli_frontend::verifysoftware(const char *gamename)
 		software_list_device_iterator iter(drivlist.config().root_device());
 		for (software_list_device *swlistdev = iter.first(); swlistdev != nullptr; swlistdev = iter.next())
 			if (swlistdev->list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
-				if (list_map.add(swlistdev->list_name(), 0, false) != TMERR_DUPLICATE)
+				if (list_map.insert(swlistdev->list_name()).second)
 					if (swlistdev->first_software_info() != nullptr)
 					{
 						nrlists++;
@@ -1385,7 +1385,7 @@ void cli_frontend::verifysoftware(const char *gamename)
 void cli_frontend::getsoftlist(const char *gamename)
 {
 	FILE *out = stdout;
-	int_map list_map;
+	std::unordered_set<std::string> list_map;
 	bool isfirst = TRUE;
 
 	driver_enumerator drivlist(m_options);
@@ -1393,7 +1393,7 @@ void cli_frontend::getsoftlist(const char *gamename)
 	{
 		software_list_device_iterator iter(drivlist.config().root_device());
 		for (software_list_device *swlistdev = iter.first(); swlistdev != nullptr; swlistdev = iter.next())
-			if (core_strwildcmp(gamename, swlistdev->list_name()) == 0 && list_map.add(swlistdev->list_name(), 0, false) != TMERR_DUPLICATE)
+			if (core_strwildcmp(gamename, swlistdev->list_name()) == 0 && list_map.insert(swlistdev->list_name()).second)
 				if (swlistdev->first_software_info() != nullptr)
 				{
 					if (isfirst) { fprintf( out, SOFTLIST_XML_BEGIN); isfirst = FALSE; }
@@ -1413,7 +1413,7 @@ void cli_frontend::getsoftlist(const char *gamename)
 -------------------------------------------------*/
 void cli_frontend::verifysoftlist(const char *gamename)
 {
-	int_map list_map;
+	std::unordered_set<std::string> list_map;
 	int correct = 0;
 	int incorrect = 0;
 	int notfound = 0;
@@ -1426,7 +1426,7 @@ void cli_frontend::verifysoftlist(const char *gamename)
 	{
 		software_list_device_iterator iter(drivlist.config().root_device());
 		for (software_list_device *swlistdev = iter.first(); swlistdev != nullptr; swlistdev = iter.next())
-			if (core_strwildcmp(gamename, swlistdev->list_name()) == 0 && list_map.add(swlistdev->list_name(), 0, false) != TMERR_DUPLICATE)
+			if (core_strwildcmp(gamename, swlistdev->list_name()) == 0 && list_map.insert(swlistdev->list_name()).second)
 				if (swlistdev->first_software_info() != nullptr)
 				{
 					matched++;
@@ -1880,13 +1880,11 @@ void media_identifier::identify_data(const char *name, const UINT8 *data, int le
 //  of drivers by hash
 //-------------------------------------------------
 
-typedef tagmap_t<FPTR> slname_map;
-
 int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 {
 	int found = 0;
-	slname_map listnames;
-	slname_map shortnames;
+	std::unordered_set<std::string> listnames;
+	std::unordered_set<std::string> shortnames;
 
 	// iterate over drivers
 	m_drivlist.reset();
@@ -1896,7 +1894,7 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 		device_iterator deviter(m_drivlist.config().root_device());
 		for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
 		{
-			if (shortnames.add(device->shortname(), 0, FALSE) != TMERR_DUPLICATE)
+			if (shortnames.insert(device->shortname()).second)
 			{
 				for (const rom_entry *region = rom_first_region(*device); region != nullptr; region = rom_next_region(region))
 					for (const rom_entry *rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
@@ -1920,7 +1918,7 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 		software_list_device_iterator iter(m_drivlist.config().root_device());
 		for (software_list_device *swlistdev = iter.first(); swlistdev != nullptr; swlistdev = iter.next())
 		{
-			if (listnames.add(swlistdev->list_name(), 0, FALSE) != TMERR_DUPLICATE)
+			if (listnames.insert(swlistdev->list_name()).second)
 			{
 				for (software_info *swinfo = swlistdev->first_software_info(); swinfo != nullptr; swinfo = swinfo->next())
 					for (software_part *part = swinfo->first_part(); part != nullptr; part = part->next())

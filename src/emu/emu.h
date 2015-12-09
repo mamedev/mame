@@ -24,6 +24,8 @@
 #include <list>
 #include <vector>
 #include <memory>
+#include <unordered_map>
+#include <unordered_set>
 
 // core emulator headers -- must be first
 #include "emucore.h"

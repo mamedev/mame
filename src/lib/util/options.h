@@ -12,7 +12,7 @@
 #define __OPTIONS_H__
 
 #include "corefile.h"
-#include "tagmap.h"
+#include <unordered_map>
 
 
 
@@ -178,7 +178,7 @@ private:
 
 	// internal state
 	simple_list<entry>      m_entrylist;            // head of list of entries
-	tagmap_t<entry *>       m_entrymap;             // map for fast lookup
+	std::unordered_map<std::string,entry *>       m_entrymap;             // map for fast lookup
 	std::string             m_command;              // command found
 	static const char *const s_option_unadorned[];  // array of unadorned option "names"
 };

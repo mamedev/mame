@@ -114,11 +114,11 @@ void ui_menu_file_manager::populate()
 
 	// cycle through all devices for this system
 	device_iterator iter(machine().root_device());
-	tagmap_t<UINT8> devtags;
+	std::unordered_set<std::string> devtags;
 	for (device_t *dev = iter.first(); dev != nullptr; dev = iter.next())
 	{
 		bool tag_appended = false;
-		if (devtags.add(dev->tag(), 1, FALSE) == TMERR_DUPLICATE)
+		if (!devtags.insert(dev->tag()).second)
 			continue;
 
 		// check whether it owns an image interface
@@ -131,7 +131,7 @@ void ui_menu_file_manager::populate()
 			{
 				// if it is a children device, and not something further down the device tree, we want it in the menu!
 				if (strcmp(scan->device().owner()->tag(), dev->tag()) == 0)
-					if (devtags.add(scan->device().tag(), 1, FALSE) != TMERR_DUPLICATE)
+					if (devtags.insert(scan->device().tag()).second)
 					{
 						// check whether we already had some devices with the same owner: if not, output the owner tag!
 						if (!tag_appended)

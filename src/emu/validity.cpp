@@ -55,10 +55,10 @@ inline const char *validity_checker::ioport_string_from_index(UINT32 index)
 inline int validity_checker::get_defstr_index(const char *string, bool suppress_error)
 {
 	// check for strings that should be DEF_STR
-	int strindex = m_defstr_map.find(string);
-	if (!suppress_error && strindex != 0 && string != ioport_string_from_index(strindex))
+	auto strindex = m_defstr_map.find(string);
+	if (!suppress_error && strindex != m_defstr_map.end() && string != ioport_string_from_index(strindex->second))
 		osd_printf_error("Must use DEF_STR( %s )\n", string);
-	return strindex;
+	return (strindex != m_defstr_map.end()) ? strindex->second : 0;
 }
 
 
@@ -135,7 +135,7 @@ validity_checker::validity_checker(emu_options &options)
 	{
 		const char *string = ioport_string_from_index(strnum);
 		if (string != nullptr)
-			m_defstr_map.add(string, strnum, false);
+			m_defstr_map.insert(std::make_pair(string, strnum));
 	}
 }
 
@@ -234,16 +234,16 @@ void validity_checker::validate_begin()
 	osd_output::push(this);
 
 	// reset all our maps
-	m_names_map.reset();
-	m_descriptions_map.reset();
-	m_roms_map.reset();
-	m_defstr_map.reset();
-	m_region_map.reset();
+	m_names_map.clear();
+	m_descriptions_map.clear();
+	m_roms_map.clear();
+	m_defstr_map.clear();
+	m_region_map.clear();
 
 	// reset internal state
 	m_errors = 0;
 	m_warnings = 0;
-	m_already_checked.reset();
+	m_already_checked.clear();
 }
 
 
@@ -270,7 +270,7 @@ void validity_checker::validate_one(const game_driver &driver)
 	m_current_config = nullptr;
 	m_current_device = nullptr;
 	m_current_ioport = nullptr;
-	m_region_map.reset();
+	m_region_map.clear();
 
 	// reset error/warning state
 	int start_errors = m_errors;
@@ -531,16 +531,16 @@ void validity_checker::validate_driver()
 {
 	// check for duplicate names
 	std::string tempstr;
-	if (m_names_map.add(m_current_driver->name, m_current_driver, false) == TMERR_DUPLICATE)
+	if (!m_names_map.insert(std::make_pair(m_current_driver->name, m_current_driver)).second)
 	{
-		const game_driver *match = m_names_map.find(m_current_driver->name);
+		const game_driver *match = m_names_map.find(m_current_driver->name)->second;
 		osd_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(tempstr, match->source_file).c_str(), match->name);
 	}
 
 	// check for duplicate descriptions
-	if (m_descriptions_map.add(m_current_driver->description, m_current_driver, false) == TMERR_DUPLICATE)
+	if (!m_descriptions_map.insert(std::make_pair(m_current_driver->description, m_current_driver)).second)
 	{
-		const game_driver *match = m_descriptions_map.find(m_current_driver->description);
+		const game_driver *match = m_descriptions_map.find(m_current_driver->description)->second;
 		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(tempstr, match->source_file).c_str(), match->name);
 	}
 
@@ -654,7 +654,7 @@ void validity_checker::validate_roms()
 
 				// attempt to add it to the map, reporting duplicates as errors
 				current_length = ROMREGION_GETLENGTH(romp);
-				if (m_region_map.add(fulltag.c_str(), current_length, false) == TMERR_DUPLICATE)
+				if (!m_region_map.insert(std::make_pair(fulltag, current_length)).second)
 					osd_printf_error("Multiple ROM_REGIONs with the same tag '%s' defined\n", fulltag.c_str());
 			}
 
@@ -855,11 +855,11 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 //  stored within an ioport field or setting
 //-------------------------------------------------
 
-void validity_checker::validate_condition(ioport_condition &condition, device_t &device, int_map &port_map)
+void validity_checker::validate_condition(ioport_condition &condition, device_t &device, std::unordered_set<std::string> &port_map)
 {
 	// resolve the tag
 	// then find a matching port
-	if (port_map.find(device.subtag(condition.tag()).c_str()) == 0)
+	if (port_map.find(device.subtag(condition.tag())) == port_map.end())
 		osd_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag());
 }
 
@@ -870,7 +870,7 @@ void validity_checker::validate_condition(ioport_condition &condition, device_t 
 
 void validity_checker::validate_inputs()
 {
-	int_map port_map;
+	std::unordered_set<std::string> port_map;
 
 	// iterate over devices
 	device_iterator iter(m_current_config->root_device());
@@ -894,7 +894,7 @@ void validity_checker::validate_inputs()
 
 		// do a first pass over ports to add their names and find duplicates
 		for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
-			if (port_map.add(port->tag(), 1, false) == TMERR_DUPLICATE)
+			if (!port_map.insert(port->tag()).second)
 				osd_printf_error("Multiple I/O ports with the same tag '%s' defined\n", port->tag());
 
 		// iterate over ports
@@ -971,7 +971,7 @@ void validity_checker::validate_inputs()
 
 void validity_checker::validate_devices()
 {
-	int_map device_map;
+	std::unordered_set<std::string> device_map;
 
 	device_iterator iter_find(m_current_config->root_device());
 	for (const device_t *device = iter_find.first(); device != nullptr; device = iter_find.next())
@@ -990,7 +990,7 @@ void validity_checker::validate_devices()
 		validate_tag(device->basetag());
 
 		// look for duplicates
-		if (device_map.add(device->tag(), 0, false) == TMERR_DUPLICATE)
+		if (!device_map.insert(device->tag()).second)
 			osd_printf_error("Multiple devices with the same tag '%s' defined\n", device->tag());
 
 		// all devices must have a shortname
@@ -1009,7 +1009,7 @@ void validity_checker::validate_devices()
 	}
 
 	// if device is slot cart device, we must have a shortname
-	int_map slot_device_map;
+	std::unordered_set<std::string> slot_device_map;
 	slot_interface_iterator slotiter(m_current_config->root_device());
 	for (const device_slot_interface *slot = slotiter.first(); slot != nullptr; slot = slotiter.next())
 	{
@@ -1026,7 +1026,7 @@ void validity_checker::validate_devices()
 					device->config_complete();
 
 			if (strcmp(dev->shortname(), "") == 0) {
-				if (slot_device_map.add(dev->name(), 0, false) != TMERR_DUPLICATE)
+				if (slot_device_map.insert(dev->name()).second)
 					osd_printf_error("Device '%s' is slot cart device but does not have short name defined\n",dev->name());
 			}
 
