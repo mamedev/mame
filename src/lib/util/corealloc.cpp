@@ -27,6 +27,10 @@
 // define this to zap memory to a fixed non-0 value before freeing
 //#define OVERWRITE_FREED_MEMORY
 
+// compatibility with non-clang compilers
+#ifndef __has_feature
+	#define __has_feature(x) 0
+#endif
 
 
 //**************************************************************************
