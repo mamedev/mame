@@ -845,30 +845,46 @@ if _OPTIONS["OPTIMIZE"] then
 	end
 	if _OPTIONS["LTO"]=="1" then
 		buildoptions {
--- windows native mingw GCC 5.2 fails with -flto=x with x > 1. bug unfixed as of this date
+-- windows native mingw GCC 5.2 fails with -flto=x with x > 1. bug unfixed as of this commit
 			"-flto=1",
+-- if ld fails, just buy more RAM or uncomment this!
+--			"-Wl,-no-keep-memory",
+			"-Wl,-v",
+-- silence redefine warnings from discrete.c.
+			"-Wl,-allow-multiple-definition",
 			"-fuse-linker-plugin",
 -- these next flags allow MAME to compile in GCC 5.2. odr warnings should be fixed as LTO randomly crashes otherwise
 -- some GCC 4.9.x on Windows do not have -Wodr and -flto-odr-type-merging enabled. adjust accordingly...
--- -ffat-lto-objects lets you link non-lto version without rebuilding all .o/.a
-			"-ffat-lto-objects",
+-- no-fat-lto-objects is faster to compile and uses less memory, but you can't mix with a non-lto .o/.a without rebuilding
+			"-fno-fat-lto-objects",
 			"-flto-odr-type-merging",
 			"-Wodr",
-			"-flto-compression-level=9", -- lto didn't work with anything <9  on linux with < 12G RAM
+			"-flto-compression-level=0", -- lto doesn't work with anything <9 on linux with < 12G RAM, much slower if <> 0
 --			"-flto-report", -- if you get an error in lto after [WPA] stage, but before [LTRANS] stage, you need more memory!
 --			"-fmem-report-wpa","-fmem-report","-fpre-ipa-mem-report","-fpost-ipa-mem-report","-flto-report-wpa","-fmem-report",
+-- this six flag combo lets MAME compile with LTO=1 on linux with no errors and ~2% speed boost, but compile time is much longer
+-- if you are going to wait on lto, you might as well enable these for GCC
+--			"-fdevirtualize-at-ltrans","-fgcse-sm","-fgcse-las",
+--			"-fipa-pta","-fipa-icf","-fvariable-expansion-in-unroller",
 		}
 -- same flags are needed by linker
 		linkoptions {
-			"-Wl,-no-keep-memory",
 			"-flto=1",
+--			"-Wl,-no-keep-memory",
+			"-Wl,-v",
+			"-Wl,-allow-multiple-definition",
 			"-fuse-linker-plugin",
-			"-ffat-lto-objects",
+			"-fno-fat-lto-objects",
 			"-flto-odr-type-merging",
 			"-Wodr",
-			"-flto-compression-level=9", -- lto didn't work with anything < 9 on linux with < 12G RAM
+			"-flto-compression-level=0", -- lto doesn't work with anything <9 on linux with < 12G RAM, much slower if <> 0
 --			"-flto-report", -- if you get an error in lto after [WPA] stage, but before [LTRANS] stage, you need more memory!
 --			"-fmem-report-wpa","-fmem-report","-fpre-ipa-mem-report","-fpost-ipa-mem-report","-flto-report-wpa","-fmem-report",
+-- this six flag combo lets MAME compile with LTO=1 on linux with no errors and ~2% speed boost, but compile time is much longer
+-- if you are going to wait on lto, you might as well enable these for GCC
+--			"-fdevirtualize-at-ltrans","-fgcse-sm","-fgcse-las",
+--			"-fipa-pta","-fipa-icf","-fvariable-expansion-in-unroller",
+
 		}
 
 	end
@@ -1164,7 +1180,7 @@ configuration { "vs*" }
 			"/wd4365", -- warning C4365: 'action' : conversion from 'type_1' to 'type_2', signed/unsigned mismatch
 			"/wd4389", -- warning C4389: 'operator' : signed/unsigned mismatch
 			"/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch
-			"/wd4388", -- warning C4388:
+			"/wd4388", -- warning C4388: signed/unsigned mismatch
 			"/wd4267", -- warning C4267: 'var' : conversion from 'size_t' to 'type', possible loss of data
 			"/wd4005", -- warning C4005: The macro identifier is defined twice. The compiler uses the second macro definition
 			"/wd4350", -- warning C4350: behavior change: 'member1' called instead of 'member2'
@@ -1173,10 +1189,10 @@ configuration { "vs*" }
 			"/wd4060", -- warning C4060: switch statement contains no 'case' or 'default' labels
 			"/wd4065", -- warning C4065: switch statement contains 'default' but no 'case' labels
 			"/wd4640", -- warning C4640: 'instance' : construction of local static object is not thread-safe
-			"/wd4290", -- warning C4290:
+			"/wd4290", -- warning C4290: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
 			"/wd4355", -- warning C4355: 'this' : used in base member initializer list
 			"/wd4800", -- warning C4800: 'type' : forcing value to bool 'true' or 'false' (performance warning)
-			"/wd4371", -- warning C4371:
+			"/wd4371", -- warning C4371: layout of class may have changed from a previous version of the compiler due to better packing of member 'member'
 			"/wd4548", -- warning C4548: expression before comma has no effect; expected expression with side-effect
 		}
 if _OPTIONS["vs"]=="intel-15" then
@@ -1208,8 +1224,8 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd1879", 			-- warning #1879: unimplemented pragma ignored
 			"/Qwd3291", 			-- warning #3291: invalid narrowing conversion from "double" to "int"
 			"/Qwd1195", 			-- error #1195: conversion from integer to smaller pointer
-			"/Qwd47",				-- error #47: incompatible redefinition of macro "xxx"
-			"/Qwd265",				-- error #265: floating-point operation result is out of range
+			"/Qwd47",			-- error #47: incompatible redefinition of macro "xxx"
+			"/Qwd265",			-- error #265: floating-point operation result is out of range
 			-- these occur on a release build, while we can increase the size limits instead some of the files do require extreme amounts
 			"/Qwd11074",			-- remark #11074: Inlining inhibited by limit max-size  / remark #11074: Inlining inhibited by limit max-total-size
 			"/Qwd11075",			-- remark #11075: To get full report use -Qopt-report:4 -Qopt-report-phase ipo
