@@ -81,7 +81,7 @@ if BASE_TARGETOS=="unix" then
 		"SDLMAME_UNIX",
 	}
 	if _OPTIONS["targetos"]=="macosx" then
-		if _OPTIONS["MACOSX_USE_LIBSDL"]~="1" then
+		if _OPTIONS["USE_LIBSDL"]~="1" then
 			buildoptions {
 				"-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
 			}

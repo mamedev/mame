@@ -54,14 +54,20 @@ function maintargetosdoptions(_target,_subtarget)
 	end
 
 	if _OPTIONS["targetos"]=="windows" then
-		if _OPTIONS["SDL_LIBVER"]=="sdl2" then
-			links {
-				"SDL2.dll",
-			}
+		if _OPTIONS["USE_LIBSDL"]~="1" then
+			if _OPTIONS["SDL_LIBVER"]=="sdl2" then
+				links {
+					"SDL2.dll",
+				}
+			else
+				links {
+					"SDL.dll",
+				}
+			end
 		else
-			links {
-				"SDL.dll",
-			}
+			local str = backtick(sdlconfigcmd() .. " --libs | sed 's/ -lSDLmain//'")
+			addlibfromstring(str)
+			addoptionsfromstring(str)
 		end
 		links {
 			"psapi",
@@ -192,16 +198,16 @@ if not _OPTIONS["SDL_FRAMEWORK_PATH"] then
 end
 
 newoption {
-	trigger = "MACOSX_USE_LIBSDL",
-	description = "Use SDL library on OS (rather than framework)",
+	trigger = "USE_LIBSDL",
+	description = "Use SDL library on OS (rather than framework/dll)",
 	allowed = {
-		{ "0",  "Use framework"  },
+		{ "0",  "Use framework/dll"  },
 		{ "1",  "Use library" },
 	},
 }
 
-if not _OPTIONS["MACOSX_USE_LIBSDL"] then
-	_OPTIONS["MACOSX_USE_LIBSDL"] = "0"
+if not _OPTIONS["USE_LIBSDL"] then
+	_OPTIONS["USE_LIBSDL"] = "0"
 end
 
 
@@ -255,7 +261,7 @@ if BASE_TARGETOS=="unix" then
 				"-weak_framework Metal",
 			}
 		end
-		if _OPTIONS["MACOSX_USE_LIBSDL"]~="1" then
+		if _OPTIONS["USE_LIBSDL"]~="1" then
 			linkoptions {
 				"-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
 			}
@@ -269,7 +275,7 @@ if BASE_TARGETOS=="unix" then
 				}
 			end
 		else
-			local str = backtick(sdlconfigcmd() .. " --libs | sed 's/-lSDLmain//'")
+			local str = backtick(sdlconfigcmd() .. " --libs --static | sed 's/-lSDLmain//'")
 			addlibfromstring(str)
 			addoptionsfromstring(str)
 		end
@@ -529,14 +535,20 @@ if _OPTIONS["with-tools"] then
 		}
 
 		if _OPTIONS["targetos"] == "windows" then
-			if _OPTIONS["SDL_LIBVER"] == "sdl2" then
-				links {
-					"SDL2.dll",
-				}
+			if _OPTIONS["USE_LIBSDL"]~="1" then
+				if _OPTIONS["SDL_LIBVER"] == "sdl2" then
+					links {
+						"SDL2.dll",
+					}
+				else
+					links {
+						"SDL.dll",
+					}
+				end
 			else
-				links {
-					"SDL.dll",
-				}
+				local str = backtick(sdlconfigcmd() .. " --libs | sed 's/ -lSDLmain//'")
+				addlibfromstring(str)
+				addoptionsfromstring(str)
 			end
 			links {
 				"psapi",
