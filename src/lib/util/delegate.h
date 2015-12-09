@@ -94,9 +94,8 @@
 
 // select which one we will be using
 #if defined(__GNUC__)
-	/* does not work in versions over 4.7.x of 32bit MINGW  */
-	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)))
-		//#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
+	/* 32bit MINGW  asks for different convention */
+	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__)
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_INTERNAL
 		#define MEMBER_ABI __thiscall
 		#define HAS_DIFFERENT_ABI 1
