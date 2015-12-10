@@ -447,31 +447,50 @@ WRITE8_MEMBER(subsino2_state::ss9601_tilesize_w)
 	m_ss9601_tilesize = data;
 
 	tilesize_t sizes[2];
-	switch (data)
+	switch ((data&0xf0)>>4)
 	{
-		case 0x00:
+		case 0x0:
 			sizes[0] = TILE_8x8;
-			sizes[1] = TILE_8x8;
 			break;
 
-		case 0x40:
+		case 0x4:
 			sizes[0] = TILE_8x32;
-			sizes[1] = TILE_8x8;
 			break;
 
-		case 0x70:
+		case 0x7:
 			sizes[0] = TILE_64x32;
-			sizes[1] = TILE_8x8;
 			break;
 
 		default:
 			sizes[0] = TILE_8x8;
-			sizes[1] = TILE_8x8;
 
-			logerror("%s: warning, unknown tilesize = %02x\n", machine().describe_context(), data);
-			popmessage("UNKNOWN TILESIZE %02X", data);
+			logerror("%s: warning, layer 0 unknown tilesize = %02x\n", machine().describe_context(), data);
+			popmessage("layer 0 UNKNOWN TILESIZE %02X", data);
 			break;
 	}
+
+	switch (data&0x0f)
+	{
+		case 0x0:
+			sizes[1] = TILE_8x8;
+			break;
+
+		case 0x4:
+			sizes[1] = TILE_8x32;
+			break;
+
+		case 0x7:
+			sizes[1] = TILE_64x32;
+			break;
+
+		default:
+			sizes[1] = TILE_8x8;
+
+			logerror("%s: warning, layer 1 unknown tilesize = %02x\n", machine().describe_context(), data);
+			popmessage("layer 1 UNKNOWN TILESIZE %02X", data);
+			break;
+	}
+
 
 	for (int i = 0; i < 2; i++)
 	{
