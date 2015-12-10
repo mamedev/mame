@@ -468,8 +468,8 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 
 	if ((offset >= 0x1000) && (offset <= 0x1015))
 	{
-		// SOUND
-		nesapu_device *m_sound = machine().device<nesapu_device>("maincpu::nessound");
+		// SOUND (this is a hack, it should have extra channels, not pass to the existing APU!!!)
+		nesapu_device *m_sound = machine().device<nesapu_device>("maincpu:nesapu");
 		m_sound->write(space, offset & 0x1f, data);
 		return;
 	}
