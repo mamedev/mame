@@ -528,7 +528,7 @@ static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitopjc_state,  taitopjc_vbi)
 
 	/* TMS320C53 DSP */
-	MCFG_CPU_ADD("dsp", TMS32051, 40000000)		// TODO: add 32053
+	MCFG_CPU_ADD("dsp", TMS32053, 40000000)
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 	MCFG_CPU_DATA_MAP(tms_data_map)
 

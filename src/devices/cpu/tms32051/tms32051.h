@@ -58,6 +58,7 @@ class tms32051_device : public cpu_device
 public:
 	// construction/destruction
 	tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_READ16_MEMBER( cpuregs_r );
 	DECLARE_WRITE16_MEMBER( cpuregs_w );
@@ -83,7 +84,6 @@ protected:
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 
@@ -365,7 +365,20 @@ private:
 };
 
 
+class tms32053_device : public tms32051_device
+{
+public:
+	// construction/destruction
+	tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual void device_config_complete() override;
+	virtual void device_reset() override;
+};
+
+
 extern const device_type TMS32051;
+extern const device_type TMS32053;
 
 
 #endif /* __TMS32051_H__ */

@@ -40,19 +40,20 @@ enum
 
 
 const device_type TMS32051 = &device_creator<tms32051_device>;
+const device_type TMS32053 = &device_creator<tms32053_device>;
 
 
 /**************************************************************************
- * Internal memory map
+ * TMS32051 Internal memory map
  **************************************************************************/
 
-static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 16, tms32051_device )
+static ADDRESS_MAP_START( tms32051_internal_pgm, AS_PROGRAM, 16, tms32051_device )
 //  AM_RANGE(0x0000, 0x1fff) AM_ROM                         // ROM          TODO: is off-chip if MP/_MC = 0
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("saram")       // SARAM        TODO: is off-chip if RAM bit = 0
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is off-chip if CNF = 0
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( internal_data, AS_DATA, 16, tms32051_device )
+static ADDRESS_MAP_START( tms32051_internal_data, AS_DATA, 16, tms32051_device )
 	AM_RANGE(0x0000, 0x005f) AM_READWRITE(cpuregs_r, cpuregs_w)
 	AM_RANGE(0x0060, 0x007f) AM_RAM                         // DARAM B2
 	AM_RANGE(0x0100, 0x02ff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is unconnected if CNF = 1
@@ -63,8 +64,41 @@ ADDRESS_MAP_END
 
 tms32051_device::tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, TMS32051, "TMS32051", tag, owner, clock, "tms32051", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(internal_pgm))
-	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(internal_data))
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32051_internal_pgm))
+	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32051_internal_data))
+{
+}
+
+tms32051_device::tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char* shortname, const char* source)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1)
+	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1)
+{
+}
+
+
+
+/**************************************************************************
+ * TMS32053 Internal memory map
+ **************************************************************************/
+
+static ADDRESS_MAP_START( tms32053_internal_pgm, AS_PROGRAM, 16, tms32053_device )
+//  AM_RANGE(0x0000, 0x3fff) AM_ROM                         // ROM          TODO: is off-chip if MP/_MC = 0
+	AM_RANGE(0x4000, 0x4bff) AM_RAM AM_SHARE("saram")       // SARAM        TODO: is off-chip if RAM bit = 0
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is off-chip if CNF = 0
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tms32053_internal_data, AS_DATA, 16, tms32053_device )
+	AM_RANGE(0x0000, 0x005f) AM_READWRITE(cpuregs_r, cpuregs_w)
+	AM_RANGE(0x0060, 0x007f) AM_RAM                         // DARAM B2
+	AM_RANGE(0x0100, 0x02ff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is unconnected if CNF = 1
+	AM_RANGE(0x0300, 0x04ff) AM_RAM                         // DARAM B1
+	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("saram")       // SARAM        TODO: is off-chip if OVLY = 0
+ADDRESS_MAP_END
+
+
+tms32053_device::tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms32051_device(mconfig, TMS32053, "TMS32053", tag, owner, clock, "tms32053", __FILE__)
 {
 }
 
@@ -441,6 +475,9 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 		case 0x00: break;
 		case 0x04: m_imr = data; break;
 
+		case 0x05: // GREG
+			break;
+
 		case 0x06: // IFR
 		{
 			for (int i = 0; i < 16; i++)
@@ -509,6 +546,12 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 		case 0x28: // PDWSR
 			break;
 
+		case 0x29: // IOWSR
+			break;
+
+		case 0x2a: // CWSR
+			break;
+
 		default:
 			if (!space.debugger_access())
 				fatalerror("32051: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, m_pc-1);
@@ -528,4 +571,38 @@ bool tms32051_device::memory_read(address_spacenum spacenum, offs_t offset, int 
 		value = (DM_READ16(offset>>1));
 	}
 	return 1;
+}
+
+
+
+void tms32053_device::device_reset()
+{
+	// reset registers
+	m_st0.intm  = 1;
+	m_st0.ov    = 0;
+	m_st1.c     = 1;
+	m_st1.cnf   = 0;
+	m_st1.hm    = 1;
+	m_st1.pm    = 0;
+	m_st1.sxm   = 1;
+	m_st1.xf    = 1;
+	m_pmst.avis = 0;
+	m_pmst.braf = 0;
+	m_pmst.iptr = 0;
+	m_pmst.ndx  = 0;
+	m_pmst.ovly = 0;
+	m_pmst.ram  = 0;
+	m_pmst.mpmc = 0; // TODO: this is set to logical pin state at reset
+	m_pmst.trm  = 0;
+	m_ifr       = 0;
+	m_cbcr      = 0;
+	m_rptc      = -1;
+
+	CHANGE_PC(0);
+}
+
+void tms32053_device::device_config_complete()
+{
+	m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32053_internal_pgm));
+	m_data_config = address_space_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32053_internal_data));
 }
