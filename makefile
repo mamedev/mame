@@ -745,7 +745,9 @@ MSBUILD_PARAMS += /p:Platform=x64
 else
 MSBUILD_PARAMS += /p:Platform=win32
 endif
-ifeq ($(SUBTARGET),mess)
+ifeq ($(SUBTARGET),mame)
+MSBUILD_SOLUTION := $(SUBTARGET).sln
+else ifeq ($(SUBTARGET),mess)
 MSBUILD_SOLUTION := $(SUBTARGET).sln
 else
 MSBUILD_SOLUTION := $(TARGET)$(SUBTARGET).sln

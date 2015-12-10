@@ -1134,6 +1134,7 @@ configuration { "vs*" }
 		}
 
 		buildoptions {
+			"/WX",	   -- Treats all compiler warnings as errors.
 			"/wd4025", -- warning C4025: 'number' : based pointer passed to function with variable arguments: parameter number
 			"/wd4003", -- warning C4003: not enough actual parameters for macro 'xxx'
 			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
