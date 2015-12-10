@@ -67,6 +67,7 @@ static ADDRESS_MAP_START( pdc_io, AS_IO, 8, pdc_device )
 	AM_RANGE(0x39, 0x39) AM_READ(p39_r) AM_MIRROR(0xFF00) // HDD related
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE(HDC_TAG, hdc9224_device,read,write) AM_MIRROR(0xFF00)
 	AM_RANGE(0x42, 0x43) AM_DEVICE(FDC_TAG, upd765a_device, map) AM_MIRROR(0xFF00)
+	AM_RANGE(0x50, 0x53) AM_WRITE(p50_53_w) AM_MIRROR(0xFF00)
 	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE(FDCDMA_TAG,am9517a_device,read,write) AM_MIRROR(0xFF00)
 ADDRESS_MAP_END
 
@@ -111,10 +112,11 @@ static MACHINE_CONFIG_FRAGMENT( pdc )
 	/* Floppy Disk Controller - uPD765a - NEC D765AC-2 */
 	MCFG_UPD765A_ADD(FDC_TAG, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pdc_device, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(FDCDMA_TAG, am9517a_device, dreq0_w)) MCFG_DEVCB_INVERT
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(FDCDMA_TAG, am9517a_device, dreq0_w)) //MCFG_DEVCB_INVERT
 
 	// Floppy disk drive
 	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", pdc_floppies, "35hd", pdc_device::floppy_formats)
+	//MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", pdc_floppies, "35hd", floppy_image_device::default_floppy_formats)
 
 	/* DMA Controller - Intel P8237A-5 */
 	/* Channel 0: uPD765a Floppy Disk Controller */
@@ -158,7 +160,8 @@ pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t 
         m_pdccpu(*this, Z80_TAG),
 	m_dma8237(*this, FDCDMA_TAG),
 	m_fdc(*this, FDC_TAG),
-	m_floppy(*this, FDC_TAG ":0"),
+	//m_floppy(*this, FDC_TAG ":0"),
+	//m_floppy(*this, FDC_TAG ":0:35hd"),
 	m_hdc9224(*this, HDC_TAG),
 	m_pdc_ram(*this, "pdc_ram"),
 	m_m68k_r_cb(*this),
@@ -172,6 +175,10 @@ pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t 
 
 void pdc_device::device_start()
 {
+//	m_fdc->set_floppy(m_floppy);
+//	floppy_image_device *m_floppy;
+//	m_floppy = machine().device<floppy_connector>("fdc:0")->get_device();
+
 }
 
 //-------------------------------------------------
@@ -184,14 +191,22 @@ void pdc_device::device_reset()
 	reg_p38 = 0;
 	reg_p38 |= 4; /* ready for 68k ram DMA */
 	//reg_p38 |= 0x20; // no idea at all - bit 5 (32)
-	m_fdc->set_ready_line_connected(false);
-	m_fdc->ready_w(true);
+	//m_fdc->ready_w(true);
+	//m_floppy->mon_w(0);
+	//m_fdc->set_floppy(m_floppy);
+	//m_fdc->tc_w(1);
+	//m_floppy->ready_w(true);
+
 	/* Reset CPU */
         m_pdccpu->reset();
 
 	/* Resolve callbacks */
 	m_m68k_r_cb.resolve_safe(0);
 	m_m68k_w_cb.resolve_safe();
+
+	//machine().device<floppy_connector>(FDC_TAG":0")->get_device()->mon_w(false);
+	//subdevice<floppy_connector>("fdc:0")->get_device()->mon_w(true);
+	m_fdc->set_rate(500000) ;
 }
 
 //-------------------------------------------------
@@ -239,7 +254,7 @@ READ8_MEMBER(pdc_device::m68k_dma_r)
 	UINT32 address;
 	UINT8 data;
 
-	address = fdd_68k_dma_address++;
+	address = fdd_68k_dma_r_address++;
 	data =  m_m68k_r_cb(address);
 	logerror("PDC: 8237 DMA CHANNEL 1 READ ADDRESS: %08X, DATA: %02X\n", address, data );
 	return data;
@@ -247,9 +262,9 @@ READ8_MEMBER(pdc_device::m68k_dma_r)
 
 WRITE8_MEMBER(pdc_device::m68k_dma_w)
 {
-	UINT32 address = fdd_68k_dma_address++;
-	logerror("PDC: 8237 DMA CHANNEL 1 WRITE ADDRESS: %08X, DATA: %02X\n", address, data );
+	logerror("PDC: 8237 DMA CHANNEL 1 WRITE ADDRESS: %08X, DATA: %02X\n", fdd_68k_dma_w_address, data );
 	m_m68k_w_cb(data);
+	fdd_68k_dma_w_address++;
 }
 
 WRITE_LINE_MEMBER(pdc_device::hdd_irq)
@@ -273,9 +288,11 @@ READ8_MEMBER(pdc_device::p0_7_r)
 			return reg_p1;
 		case 2: /* Port 2: FDD command address low byte [0x5FF0C0B0][0x5FF0C1B0] */
 			logerror("PDC: Port 0x02 READ: %02X\n", reg_p2);
+			fdd_68k_dma_r_address = (fdd_68k_dma_r_address & (0xFF<<9)) | (reg_p2 << 1);
 			return reg_p2;
 		case 3: /* Port 3: FDD command address high byte [0x5FF0C0B0][0x5FF0C1B0] */
 			logerror("PDC: Port 0x03 READ: %02X\n", reg_p3);
+			fdd_68k_dma_r_address = (fdd_68k_dma_r_address & (0xFF<<1)) | (reg_p3 << 9);
 			return reg_p3;
 		case 6: /* Port 6: FDD data destination address low byte [0x5FF080B0] */
 			logerror("PDC: Port 0x06 READ: %02X\n", reg_p6);
@@ -328,14 +345,14 @@ WRITE8_MEMBER(pdc_device::fdd_68k_w)
 			reg_p38 &= ~2; // Clear bit 1
 			reg_p21 = data;
 			break;
-		case 0x23: /* Port 23: FDD 68k DMA low byte */
+		case 0x23: /* Port 23: FDD 68k DMA high byte */
 			/* The address is << 1 on the 68k side */
-			fdd_68k_dma_address = (fdd_68k_dma_address & (0xFF<<1)) | (data << 9);
+			fdd_68k_dma_w_address = (fdd_68k_dma_w_address & (0xFF<<1)) | (data << 9);
 			logerror("PDC: Port %02X WRITE: %02X\n", address, data);
 			break;
-		case 0x24: /* Port 24: FDD 68k DMA high byte */
+		case 0x24: /* Port 24: FDD 68k DMA low byte */
 			/* The address is << 1 on the 68k side */
-			fdd_68k_dma_address = (fdd_68k_dma_address & (0xFF<<9)) | (data << 1);
+			fdd_68k_dma_w_address = (fdd_68k_dma_w_address & (0xFF<<9)) | (data << 1);
 			logerror("PDC: Port %02X WRITE: %02X\n", address, data);
 			break;
 		case 0x26:
@@ -387,4 +404,25 @@ READ8_MEMBER(pdc_device::p39_r)
 	if(b_fdc_irq) data |= 8; // Set bit 3
 	logerror("PDC: Port 0x39 READ: %02X, PC: %X\n", data, space.device().safe_pc());
 	return data;
+}
+
+WRITE8_MEMBER(pdc_device::p50_53_w)
+{
+	UINT8 address = 0x50 + offset;
+	switch(address)
+	{
+		case 0x53: /* Port 53: Almost certainly not FDD motor control, but seems to work */
+			switch(data)
+			{
+				case 0x80:
+					logerror("PDC: FDD Motor on.\n");
+					m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(0);
+					break;
+				default:
+					logerror("PDC: Port 0x53 WRITE: %x\n", data);
+			}
+			break;
+		default:
+			logerror("PDC: Port %02x WRITE: %x\n", address, data);
+	}
 }

@@ -2,7 +2,7 @@
 // copyright-holders:Brandon Munger
 /******************************************************************************
 *
-* Rolm CBX 9751 Release 9005 Driver
+* Rolm CBX 9751 Driver
 * 
 * This driver attempts to emulate the following models:
 * * Model 10
@@ -10,6 +10,10 @@
 * * Model 40
 * * Model 50
 * * Model 70
+*
+* The following software releases are known:
+* * 9004
+* * 9005
 *
 * The basis of this driver was influenced by the zexall.c driver by
 * Jonathan Gevaryahu and Robbbert.
@@ -65,7 +69,7 @@ public:
 
 	DECLARE_DRIVER_INIT(r9751);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	//DECLARE_FLOPPY_FORMATS( floppy_formats );
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pdc_device> m_pdc;
@@ -105,7 +109,8 @@ READ8_MEMBER(r9751_state::pdc_dma_r)
 
 WRITE8_MEMBER(r9751_state::pdc_dma_w)
 {
-	m_maincpu->space(AS_PROGRAM).write_byte(m_pdc->fdd_68k_dma_address,data);
+	/* NOTE: This needs to be changed to a function that accepts an address and data */
+	m_maincpu->space(AS_PROGRAM).write_byte(m_pdc->fdd_68k_dma_w_address,data);
 }
 
 DRIVER_INIT_MEMBER(r9751_state,r9751)
@@ -437,4 +442,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
-COMP( 1988, r9751,   0,          0,      r9751,   r9751, r9751_state, r9751,      "ROLM Systems, Inc.",   "ROLM 9751 Release 9005 Model 10", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1988, r9751,   0,          0,      r9751,   r9751, r9751_state, r9751,      "ROLM Systems, Inc.",   "ROLM 9751 Model 10", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
