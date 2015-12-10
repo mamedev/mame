@@ -544,38 +544,38 @@ WRITE32_MEMBER(konamigx_state::control_w)
 /**********************************************************************************/
 /* IRQ controllers */
 
-READ32_MEMBER(konamigx_state::ccu_r)
+READ8_MEMBER(konamigx_state::ccu_r)
 {
 	// the routine at 204abe in opengolf polls to see if we're in vblank (it wants values between 0x111 and 0x1df)
-	if (offset == 0x1c/4)
-	{
-		return 0x01002000;
-	}
-	else
-	{
-//      logerror("Read unhandled CCU register %x\n", offset);
-	}
-
+	if (offset == 0x1c/2)
+		return 0x01;
+	
+	if (offset == 0x1e/2)
+		return 0x20;
+	
+//  logerror("Read unhandled CCU register %x\n", offset);
 	return 0;
 }
 
-WRITE32_MEMBER(konamigx_state::ccu_w)
+WRITE8_MEMBER(konamigx_state::ccu_w)
 {
-	if (offset == 0x1c/4)
+	switch(offset)
 	{
+		case 0x1a/2:
+			printf("%d INT-TIME\n",data);
+			break;
+		
 		// vblank interrupt ACK
-		if (ACCESSING_BITS_24_31)
-		{
+		case 0x1c/2:
 			m_maincpu->set_input_line(1, CLEAR_LINE);
 			m_gx_syncen |= 0x20;
-		}
+			break;
 
 		// hblank interrupt ACK
-		if (ACCESSING_BITS_8_15)
-		{
+		case 0x1e/2:
 			m_maincpu->set_input_line(2, CLEAR_LINE);
 			m_gx_syncen |= 0x40;
-		}
+			break;
 	}
 }
 
@@ -633,7 +633,7 @@ void konamigx_state::dmastart_callback(int data)
 }
 
 
-INTERRUPT_GEN_MEMBER(konamigx_state::konamigx_vbinterrupt)
+INTERRUPT_GEN_MEMBER(konamigx_state::konamigx_type2_vblank_irq)
 {
 	// lift idle suspension
 	if (m_resume_trigger && m_suspension_active)
@@ -657,7 +657,28 @@ INTERRUPT_GEN_MEMBER(konamigx_state::konamigx_vbinterrupt)
 	dmastart_callback(0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_hbinterrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type2_scanline)
+{
+	int scanline = param;
+	
+	if(scanline == 48)
+	{
+		if (m_gx_syncen & 0x40)
+		{
+			m_gx_syncen &= ~0x40;
+
+			if ((m_gx_wrport1_1 & 0x82) == 0x82 || (m_gx_syncen & 2))
+			{
+				popmessage("HBlank IRQ enabled, contact MAMEdev");
+				m_gx_syncen &= ~2;
+				m_maincpu->set_input_line(2, HOLD_LINE);
+			}
+		}
+
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type4_scanline)
 {
 	int scanline = param;
 
@@ -993,7 +1014,7 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xd48000, 0xd48007) AM_DEVWRITE16("k055673", k055673_device, k053246_word_w, 0xffffffff)
 	AM_RANGE(0xd4a000, 0xd4a00f) AM_DEVREAD16("k055673", k055673_device, k055673_rom_word_r, 0xffffffff)
 	AM_RANGE(0xd4a010, 0xd4a01f) AM_DEVWRITE16("k055673", k055673_device, k055673_reg_word_w, 0xffffffff)
-	AM_RANGE(0xd4c000, 0xd4c01f) AM_READWRITE(ccu_r, ccu_w)
+	AM_RANGE(0xd4c000, 0xd4c01f) AM_READWRITE8(ccu_r, ccu_w,0xff00ff00)
 	AM_RANGE(0xd4e000, 0xd4e01f) AM_WRITENOP
 	AM_RANGE(0xd50000, 0xd500ff) AM_DEVWRITE("k055555", k055555_device, K055555_long_w)
 	AM_RANGE(0xd52000, 0xd5201f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xff00ff00)
@@ -1585,7 +1606,7 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 24000000)
 	MCFG_CPU_PROGRAM_MAP(gx_type2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", konamigx_state, konamigx_vbinterrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", konamigx_state, konamigx_type2_vblank_irq)
 
 	MCFG_CPU_ADD("soundcpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(gxsndmap)
@@ -1700,6 +1721,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( le2, konamigx )
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, le2)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_type2_scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_8, 1, 0, "none")
@@ -1769,7 +1791,7 @@ static MACHINE_CONFIG_DERIVED( gxtype3, konamigx )
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gx_type3_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_hbinterrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_type4_scanline, "screen", 0, 1)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -1806,7 +1828,7 @@ static MACHINE_CONFIG_DERIVED( gxtype4, konamigx )
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gx_type4_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_hbinterrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_type4_scanline, "screen", 0, 1)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 

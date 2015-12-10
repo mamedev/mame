@@ -77,8 +77,8 @@ public:
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE32_MEMBER(control_w);
 	DECLARE_READ32_MEMBER(waitskip_r);
-	DECLARE_READ32_MEMBER(ccu_r);
-	DECLARE_WRITE32_MEMBER(ccu_w);
+	DECLARE_READ8_MEMBER(ccu_r);
+	DECLARE_WRITE8_MEMBER(ccu_w);
 	DECLARE_READ32_MEMBER(sound020_r);
 	DECLARE_WRITE32_MEMBER(sound020_w);
 	DECLARE_READ32_MEMBER(le2_gun_H_r);
@@ -124,12 +124,13 @@ public:
 	UINT32 screen_update_konamigx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_konamigx_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_konamigx_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(konamigx_vbinterrupt);
+	INTERRUPT_GEN_MEMBER(konamigx_type2_vblank_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_type2_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_type4_scanline);
 	INTERRUPT_GEN_MEMBER(tms_sync);
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_CALLBACK_MEMBER(boothack_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_hbinterrupt);
 	ADC083X_INPUT_CB(adc0834_callback);
 	K056832_CB_MEMBER(type2_tile_callback);
 	K056832_CB_MEMBER(alpha_tile_callback);
