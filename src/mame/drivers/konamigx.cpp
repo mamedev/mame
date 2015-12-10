@@ -460,7 +460,7 @@ WRITE32_MEMBER(konamigx_state::eeprom_w)
 	{
 		odata = data >> 24;
 		/*
-		  bit 7: afr
+		  bit 7: afr, a watchdog timer bit
 		  bit 6: objscan
 		  bit 5: background color select: 0 = 338 solid color, 1 = 5^5 gradient
 		  bit 4: coin counter 2
@@ -471,6 +471,9 @@ WRITE32_MEMBER(konamigx_state::eeprom_w)
 		*/
 
 		m_eepromout->write(odata, 0xff);
+
+		coin_counter_w(machine(), 0, odata & 0x08);
+		coin_counter_w(machine(), 1, odata & 0x10);
 
 		m_gx_wrport1_0 = odata;
 	}
@@ -1015,7 +1018,7 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xd4a000, 0xd4a00f) AM_DEVREAD16("k055673", k055673_device, k055673_rom_word_r, 0xffffffff)
 	AM_RANGE(0xd4a010, 0xd4a01f) AM_DEVWRITE16("k055673", k055673_device, k055673_reg_word_w, 0xffffffff)
 	AM_RANGE(0xd4c000, 0xd4c01f) AM_READWRITE8(ccu_r, ccu_w,0xff00ff00)
-	AM_RANGE(0xd4e000, 0xd4e01f) AM_WRITENOP
+	AM_RANGE(0xd4e000, 0xd4e01f) AM_WRITENOP // left-over for "secondary" CCU, apparently (used by type 3/4 for slave screen?)
 	AM_RANGE(0xd50000, 0xd500ff) AM_DEVWRITE("k055555", k055555_device, K055555_long_w)
 	AM_RANGE(0xd52000, 0xd5201f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xff00ff00)
 	AM_RANGE(0xd56000, 0xd56003) AM_WRITE(eeprom_w)
@@ -1324,6 +1327,7 @@ static INPUT_PORTS_START( le2 )
 	PORT_DIPNAME( 0x02000000, 0x02000000, "Coin Mechanism")
 	PORT_DIPSETTING(          0x02000000, "Common")
 	PORT_DIPSETTING(          0x00000000, "Independent")
+	//  TODO: inverted for le2j
 	PORT_DIPNAME( 0x04000000, 0x04000000, "Stage Select" )
 	PORT_DIPSETTING(          0x04000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
