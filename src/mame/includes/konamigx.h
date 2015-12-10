@@ -4,6 +4,7 @@
 #include "sound/k054539.h"
 #include "cpu/tms57002/tms57002.h"
 #include "machine/adc083x.h"
+#include "machine/k053252.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k055555.h"
@@ -18,6 +19,7 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_dasp(*this, "dasp"),
+		m_k053252(*this, "k053252"),
 		m_k055673(*this, "k055673"),
 		m_k055555(*this, "k055555"),
 		m_k056832(*this, "k056832"),
@@ -50,6 +52,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<tms57002_device> m_dasp;
+	required_device<k053252_device> m_k053252;
 	required_device<k055673_device> m_k055673;
 	required_device<k055555_device> m_k055555;
 	required_device<k056832_device> m_k056832;
@@ -77,8 +80,6 @@ public:
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE32_MEMBER(control_w);
 	DECLARE_READ32_MEMBER(waitskip_r);
-	DECLARE_READ8_MEMBER(ccu_r);
-	DECLARE_WRITE8_MEMBER(ccu_w);
 	DECLARE_READ32_MEMBER(sound020_r);
 	DECLARE_WRITE32_MEMBER(sound020_w);
 	DECLARE_READ32_MEMBER(le2_gun_H_r);
@@ -102,6 +103,8 @@ public:
 	DECLARE_WRITE32_MEMBER(konamigx_tilebank_w);
 	DECLARE_WRITE32_MEMBER(konamigx_t1_psacmap_w);
 	DECLARE_WRITE32_MEMBER(konamigx_t4_psacmap_w);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(hblank_irq_ack_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(gx_rdport1_3_r);
 	DECLARE_DRIVER_INIT(konamigx);
 	TILE_GET_INFO_MEMBER(get_gx_psac_tile_info);

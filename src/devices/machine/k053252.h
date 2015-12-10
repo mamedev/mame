@@ -56,6 +56,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_clock_changed() override { res_change(); }
 
 	private:
 	// internal state

@@ -54,6 +54,7 @@ TODO:
 - dual screen support (for Konami GX types 3/4)
 - viostorm and dbz reads the VCT port, but their usage is a side effect to send an irq ack thru the same port:
   i.e. first one uses move.b $26001d.l, $26001d.l, second one clr.b
+- le2 sets int-time but never ever enables hblank irq?
 
 ***************************************************************************************************************************/
 
@@ -143,11 +144,12 @@ READ8_MEMBER( k053252_device::read )
 	//TODO: debugger_access()
 	switch(offset)
 	{
-		/* VCT read-back (TODO: values not extensively tested) */
+		/* VCT read-back */
+		// TODO: correct?
 		case 0x0e:
-			return (m_screen->vpos() >> 8) & 1;
+			return ((m_screen->vpos()-m_vc) >> 8) & 1;
 		case 0x0f:
-			return m_screen->vpos() & 0xff;
+			return (m_screen->vpos()-m_vc) & 0xff;
 		default:
 			//popmessage("Warning: k053252 read %02x, contact MAMEdev",offset);
 			break;
@@ -238,6 +240,7 @@ WRITE8_MEMBER( k053252_device::write )
 			logerror("%02x VSW / %02x HSW set\n",m_vsw,m_hsw);
 			res_change();
 			break;
+		
 		//case 0x0d: m_int_time(data); break;
 		case 0x0e: m_int1_ack_cb(1); break;
 		case 0x0f: m_int2_ack_cb(1); break;
