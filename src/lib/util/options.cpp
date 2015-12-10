@@ -702,7 +702,10 @@ void core_options::remove_entry(core_options::entry &delentry)
 	// remove all names from the map
 	for (int name = 0; name < ARRAY_LENGTH(delentry.m_name); name++)
 		if (!delentry.m_name[name].empty())
-			m_entrymap.erase(m_entrymap.find(delentry.m_name[name]));
+		{
+			auto entry = m_entrymap.find(delentry.m_name[name]);
+			if (entry!= m_entrymap.end()) m_entrymap.erase(entry);
+		}
 
 	// remove the entry from the list
 	m_entrylist.remove(delentry);
