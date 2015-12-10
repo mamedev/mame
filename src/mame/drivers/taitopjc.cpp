@@ -83,6 +83,7 @@
 #include "cpu/powerpc/ppc.h"
 #include "cpu/tlcs900/tlcs900.h"
 #include "cpu/mn10200/mn10200.h"
+#include "cpu/tms32051/tms32051.h"
 #include "machine/nvram.h"
 
 #define LOG_TLCS_TO_PPC_COMMANDS        1
@@ -101,12 +102,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_iocpu(*this, "iocpu"),
-		m_soundcpu(*this, "mn10200")
+		m_soundcpu(*this, "mn10200"),
+		m_dsp(*this, "dsp")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_iocpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<cpu_device> m_dsp;
 
 	DECLARE_READ64_MEMBER(video_r);
 	DECLARE_WRITE64_MEMBER(video_w);
@@ -485,6 +488,14 @@ ADDRESS_MAP_START( mn10200_map, AS_PROGRAM, 16, driver_device )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, taitopjc_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("user2", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitopjc_state )
+ADDRESS_MAP_END
+
+
 static INPUT_PORTS_START( taitopjc )
 INPUT_PORTS_END
 
@@ -517,6 +528,9 @@ static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitopjc_state,  taitopjc_vbi)
 
 	/* TMS320C53 DSP */
+	MCFG_CPU_ADD("dsp", TMS32051, 40000000)		// TODO: add 32053
+	MCFG_CPU_PROGRAM_MAP(tms_program_map)
+	MCFG_CPU_DATA_MAP(tms_data_map)
 
 	MCFG_CPU_ADD("mn10200", MN1020012A, 10000000) /* MN1020819DA sound CPU - NOTE: May have 64kB internal ROM */
 	MCFG_CPU_PROGRAM_MAP(mn10200_map)
@@ -552,10 +566,10 @@ ROM_START( optiger )
 	ROM_LOAD32_BYTE( "e63-31-1_p-lh.8",  0x000002, 0x080000, CRC(ad69e649) SHA1(9fc853d2cb6e7cac87dc06bad91048f191b799c5) )
 	ROM_LOAD32_BYTE( "e63-30-1_p-ll.7",  0x000003, 0x080000, CRC(a6183479) SHA1(e556c3edf100342079e680ec666f018fca7a82b0) )
 
-	ROM_REGION64_BE( 0x20000, "user2", 0 )
+	ROM_REGION( 0x20000, "user2", 0 )
 	/* More PowerPC code? */
-	ROM_LOAD16_BYTE( "e63-04_l.29",  0x000001, 0x010000, CRC(eccae391) SHA1(e5293c16342cace54dc4b6dfb827558e18ac25a4) )
-	ROM_LOAD16_BYTE( "e63-03_h.28",  0x000000, 0x010000, CRC(58fce52f) SHA1(1e3d9ee034b25e658ca45a8b900de2aa54b00135) )
+	ROM_LOAD16_BYTE( "e63-04_l.29",  0x000000, 0x010000, CRC(eccae391) SHA1(e5293c16342cace54dc4b6dfb827558e18ac25a4) )
+	ROM_LOAD16_BYTE( "e63-03_h.28",  0x000001, 0x010000, CRC(58fce52f) SHA1(1e3d9ee034b25e658ca45a8b900de2aa54b00135) )
 
 	ROM_REGION( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e63-28-1_0.59", 0x000000, 0x020000, CRC(ef41ffaf) SHA1(419621f354f548180d37961b861304c469e43a65) )
