@@ -483,7 +483,7 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seabattl_state, seabattl_interrupt)
 
 	MCFG_DEVICE_ADD("s2636", S2636, 0)
-	MCFG_S2636_OFFSETS(3, -21)
+	MCFG_S2636_OFFSETS(-13, -29)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_DEVICE_ADD("sc_thousand", DM9368, 0)
