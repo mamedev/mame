@@ -354,11 +354,6 @@ int running_machine::run(bool firstrun)
 		// perform a soft reset -- this takes us to the running phase
 		soft_reset();
 
-#ifdef MAME_DEBUG
-		g_tagmap_finds = 0;
-		if (strcmp(config().m_gamedrv.name, "___empty") != 0)
-			g_tagmap_counter_enabled = true;
-#endif
 		// handle initial load
 		if (m_saveload_schedule != SLS_NONE)
 			handle_saveload();
@@ -391,15 +386,6 @@ int running_machine::run(bool firstrun)
 
 		// and out via the exit phase
 		m_current_phase = MACHINE_PHASE_EXIT;
-
-#ifdef MAME_DEBUG
-		if (g_tagmap_counter_enabled)
-		{
-			g_tagmap_counter_enabled = false;
-			if (*(options().command()) == 0)
-				osd_printf_info("%d tagmap lookups\n", g_tagmap_finds);
-		}
-#endif
 
 		// save the NVRAM and configuration
 		sound().ui_mute(true);
@@ -443,15 +429,6 @@ int running_machine::run(bool firstrun)
 	// in case we got here via exception
 	m_current_phase = MACHINE_PHASE_EXIT;
 
-#ifdef MAME_DEBUG
-	if (g_tagmap_counter_enabled)
-	{
-		g_tagmap_counter_enabled = false;
-		if (*(options().command()) == 0)
-			osd_printf_info("%d tagmap lookups\n", g_tagmap_finds);
-	}
-#endif
-
 	// call all exit callbacks registered
 	call_notifiers(MACHINE_NOTIFY_EXIT);
 	zip_file_cache_clear();
@@ -472,15 +449,6 @@ void running_machine::schedule_exit()
 
 	// if we're executing, abort out immediately
 	m_scheduler.eat_all_cycles();
-
-#ifdef MAME_DEBUG
-	if (g_tagmap_counter_enabled)
-	{
-		g_tagmap_counter_enabled = false;
-		if (*(options().command()) == 0)
-			osd_printf_info("%d tagmap lookups\n", g_tagmap_finds);
-	}
-#endif
 
 	// if we're autosaving on exit, schedule a save as well
 	if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) && this->time() > attotime::zero)

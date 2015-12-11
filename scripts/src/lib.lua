@@ -86,7 +86,6 @@ project "utils"
 		MAME_DIR .. "src/lib/util/pool.h",
 		MAME_DIR .. "src/lib/util/sha1.cpp",
 		MAME_DIR .. "src/lib/util/sha1.h",
-		MAME_DIR .. "src/lib/util/tagmap.cpp",
 		MAME_DIR .. "src/lib/util/tagmap.h",
 		MAME_DIR .. "src/lib/util/unicode.cpp",
 		MAME_DIR .. "src/lib/util/unicode.h",

@@ -1037,15 +1037,6 @@ void video_manager::recompute_speed(const attotime &emutime)
 	// if we're past the "time-to-execute" requested, signal an exit
 	if (m_seconds_to_run != 0 && emutime.seconds() >= m_seconds_to_run)
 	{
-#ifdef MAME_DEBUG
-		if (g_tagmap_counter_enabled)
-		{
-			g_tagmap_counter_enabled = false;
-			if (*(machine().options().command()) == 0)
-				osd_printf_info("%d tagmap lookups\n", g_tagmap_finds);
-		}
-#endif
-
 		if (machine().first_screen() != nullptr)
 		{
 			// create a final screenshot
