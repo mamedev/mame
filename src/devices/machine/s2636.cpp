@@ -4,49 +4,46 @@
 
     Signetics 2636 Programmable Video Interface
 
-	This emulation is pretty low-level.  For the most part it models
-	the kinds of counters and flags you'd use if you were actually
-	implementing it in programmable logic or on silicon.  It even
-	renders pixels sequentially without multiple passes or needing to
-	backtrack.  This works pretty well, but it probably isn't the most
-	efficient way to do things.  I'm sure there are potential
-	performance improvements in the drawing and collision detection
-	code.
+    This emulation is pretty low-level.  For the most part it models
+    the kinds of counters and flags you'd use if you were actually
+    implementing it in programmable logic or on silicon.  I'm sure
+    there are potential performance improvements in the drawing and
+    collision detection code.
 
-	At present the entire internal space of 256 bytes can be read and
-	written.  This isn't accurate as some registers are read- or write-
-	only, and there are several unused blocks in the address range.  We
-	should be returning some fixed value on attempt to read unreadable
-	locations.
+    At present the entire internal space of 256 bytes can be read and
+    written.  This isn't accurate as some registers are read- or write-
+    only, and there are several unused blocks in the address range.  We
+    should be returning some fixed value on attempt to read unreadable
+    locations.
 
-	This implementation really needs proper display timing information
-	information to work properly.  Audio pitch will be wrong if the
-	screen's scan time is inaccurate.  Positioning objects depends on
-	the screen's visible area representing the pixel clock periods
-	periods between blanking pulses.  You also need to call the line
-	rendering function at appropriate times if something expects to see
-	collision or completion flags.
+    This implementation really needs proper display timing information
+    information to work properly.  Audio pitch will be wrong if the
+    screen's scan time is inaccurate.  Positioning objects depends on
+    the screen's visible area representing the pixel clock periods
+    periods between blanking pulses.  You also need to call the line
+    rendering function at appropriate times if something expects to see
+    collision or completion flags.
 
-	The crude "offset" system for adjusting the position of the image
-	has been maintained, but it's clearly inadequate for what games are
-	doing with it, and it will inevitably lead to bugs.  If an object
-	is positioned outside the visible area using the offset mechanism,
-	it won't be displayed and neither will its duplicates.
+    The crude "offset" system for adjusting the position of the image
+    has been maintained, but it's clearly inadequate for what games are
+    doing with it, and it will inevitably lead to bugs.  If an object
+    is positioned outside the visible area using the offset mechanism,
+    it won't be displayed and neither will its duplicates.
 
-	If what's happening in the games right now is correct, the hardware
-	must  be feeding something other than the actual vertical and
-	horizontal blanking signals to the S2623(s) so they start drawing
-	inside the blanking region and have advanced to the desired
-	location on reaching the visible area.  Implementing this properly
-	would require decoupling the S2623 from the screen and giving it
-	some other means to determine when it believes the blanking periods
-	begin and end.
+    If what's happening in the games right now is correct, the hardware
+    must  be feeding something other than the actual vertical and
+    horizontal blanking signals to the S2623(s) so they start drawing
+    inside the blanking region and have advanced to the desired
+    location on reaching the visible area.  Implementing this properly
+    would require decoupling the S2623 from the screen and giving it
+    some other means to determine when it believes the blanking periods
+    begin and end.
 
-	Sorry, analog input isn't currently supported, and neither is
-	interrupt request/acknowledge.  I have't got to them yet, and I'm
-	still not sure whether reading a status register clears a pending
-	interrupt.  The address decoding features still aren't implemented
-	but they'd be pretty hard to fit in the MAME framework.
+    Sorry, analog input isn't currently supported, and neither is
+    interrupt request/acknowledge.  I have't got to them yet, and I'm
+    still not sure whether reading a status register clears a pending
+    interrupt.  The address decoding features still aren't implemented
+    but they'd be pretty hard to fit in the MAME framework.
 
 
     ADDRESS MAP
@@ -227,8 +224,10 @@ void s2636_device::render_first_line()
 
 void s2636_device::render_next_line()
 {
+	// pre-clear the line for convenience
 	rectangle const &vis_area = m_screen->visible_area();
 	UINT16 *const   row = &m_bitmap.pix16(m_screen_line);
+	m_bitmap.plot_box(0, m_screen_line, m_bitmap.width(), 1, 0);
 
 	if ((vis_area.min_y > m_screen_line) || (vis_area.max_y < m_screen_line))
 	{
@@ -236,10 +235,6 @@ void s2636_device::render_next_line()
 		{
 			m_registers[REG_VBL_COL_OBJ] |= 0x40;
 			m_vrst = true;
-		}
-		for (int screen_col = 0; screen_col < m_bitmap.width(); screen_col++)
-		{
-			row[screen_col] = 0;
 		}
 	}
 	else
@@ -265,16 +260,8 @@ void s2636_device::render_next_line()
 		}
 
 		// work out what object pixels belong in this line
-		UINT16  obj_clr[OBJ_COUNT];
-		int     obj_h_cnt[OBJ_COUNT];
-		int     obj_inc[OBJ_COUNT];
-		UINT8   obj_bits[OBJ_COUNT];
 		for (int i = 0; i < OBJ_COUNT; i++)
 		{
-			obj_clr[i] = object_color(i) | 0x08;
-			obj_h_cnt[i] = m_registers[OFFS_OBJ[i] + (m_obj_dup[i] ? OFFS_HCB : OFFS_HC)] + m_x_offset;
-			obj_inc[i] = 1 << (3 - object_scale(i));
-
 			// repurpose counter and set flag when we've skipped enough lines
 			if (!m_obj_cnt[i])
 			{
@@ -284,9 +271,22 @@ void s2636_device::render_next_line()
 
 			if (m_obj_disp[i])
 			{
+				int const obj_inc = 1 << (3 - object_scale(i));
+				m_obj_cnt[i] -= obj_inc;
+
 				// fetch appropriate line from object
-				m_obj_cnt[i] -= obj_inc[i];
-				obj_bits[i] = m_registers[OFFS_OBJ[i] + OBJ_HEIGHT - 1 - (m_obj_cnt[i] >> 3)];
+				UINT8 const     obj_bits = m_registers[OFFS_OBJ[i] + OBJ_HEIGHT - 1 - (m_obj_cnt[i] >> 3)];
+				UINT16 const    obj_clr = object_color(i) | 0x08 | (0x10 << i);
+
+				// blit it to the line ignoring intermediate pixels
+				int const obj_h_cnt = m_registers[OFFS_OBJ[i] + (m_obj_dup[i] ? OFFS_HCB : OFFS_HC)] + m_x_offset;
+				for (int x = 0, screen_col = vis_area.min_x + (obj_h_cnt * m_divider); (OBJ_WIDTH << 3) > x && (vis_area.max_x >= screen_col); )
+				{
+					bool const bit = bool((obj_bits << (x >> 3)) & 0x80);
+					if (bit && (vis_area.min_x <= screen_col)) row[screen_col] |= obj_clr;
+					x += obj_inc;
+					screen_col += m_divider;
+				}
 
 				// if that's the last line of the object, flag completion and prepare for duplicates
 				if (!m_obj_cnt[i])
@@ -301,7 +301,25 @@ void s2636_device::render_next_line()
 			{
 				// count down lines to display object
 				m_obj_cnt[i]--;
-				obj_bits[i] = 0x00;
+			}
+		}
+
+		// let's take a look at the score display
+		UINT16 const    bg_clr = m_registers[REG_BG_ENB_CLR] & 0x07;
+		int const       score_row = m_vis_line - m_y_offset - SCORE_START_Y[m_registers[REG_SCORE_FMT] & 0x01];
+		if ((0 <= score_row) && (SCORE_HEIGHT > score_row))
+		{
+			int const (&score_start_x)[SCORE_DIGITS] = SCORE_START_X[(m_registers[REG_SCORE_FMT] >> 1) & 0x01];
+			for (int i = 0; i < SCORE_DIGITS; i++)
+			{
+				UINT16  score_bits = SCORE_FONT[score_digit(i)][score_row >> 2];
+				int     screen_col = vis_area.min_x + ((score_start_x[i] + m_x_offset) * m_divider);
+				while (score_bits && (vis_area.max_x >= screen_col))
+				{
+					if (score_bits & 0x0001) row[screen_col] |= bg_clr | 0x08;
+					score_bits >>= 1;
+					screen_col += m_divider;
+				}
 			}
 		}
 
@@ -315,69 +333,17 @@ void s2636_device::render_next_line()
 		UINT8 const     bg_hbar_bits = m_registers[bg_hbar_offs];
 		bool const      bg_hbar_stretch = bool(bg_hbar_bits & (1 << ((((bg_row % 40) >= 20) ? 3 : 0) + (((bg_row % 20) >= 11) ? 2 : ((bg_row % 20) >= 2) ? 1 : 0))));
 		int const       bg_hbar_width = bg_hbar_stretch ? 8 : (0xc0 == (bg_hbar_bits & 0xc0)) ? 4 : (0x40 == (bg_hbar_bits & 0xc0)) ? 2 : 1;
-		UINT16 const    bg_clr = m_registers[REG_BG_ENB_CLR] & 0x07;
 		UINT16 const    scrn_clr = bg_enable ? ((m_registers[REG_BG_ENB_CLR] >> 4) & 0x07) : 0x00;
 
-		// let's take a look at the score display
-		int const       (&score_start_x)[SCORE_DIGITS] = SCORE_START_X[(m_registers[REG_SCORE_FMT] >> 1) & 0x01];
-		int const       score_row = m_vis_line - m_y_offset - SCORE_START_Y[m_registers[REG_SCORE_FMT] & 0x01];
-		bool const      score_draw = (0 <= score_row) && (SCORE_HEIGHT > score_row);
-		UINT16          score_bits[SCORE_DIGITS];
-		for (int i = 0; i < SCORE_DIGITS; i++)
-			score_bits[i] = score_draw ? SCORE_FONT[score_digit(i)][score_row >> 2] : 0x0000;
-
-		// clear leading horizontal blanking area
-		m_bitmap.plot_box(0, m_screen_line, m_bitmap.width(), 1, 0);
-
-		bool obj_vis[4] = { false, false, false, false };
 		for (int screen_col = vis_area.min_x, x = 0; vis_area.max_x >= screen_col; x++)
 		{
-			// render objects
-			bool obj[4];
-			for (int i = 0; i < OBJ_COUNT; i++)
-			{
-				if (!obj_h_cnt[i])
-				{
-					obj_h_cnt[i] = OBJ_WIDTH << 3;
-					obj_vis[i] = true;
-				}
-				if (obj_vis[i])
-				{
-					obj_h_cnt[i] -= obj_inc[i];
-					obj[i] = bool(obj_bits[i] & (1U << (obj_h_cnt[i] >> 3)));
-					if (obj[i]) row[screen_col] |= obj_clr[i];
-					if (!obj_h_cnt[i])
-					{
-						obj_h_cnt[i] = -1;
-						obj_vis[i] = 0;
-					}
-				}
-				else
-				{
-					obj_h_cnt[i]--;
-					obj[i] = false;
-				}
-			}
-
 			// check object-object collisions
-			if (obj[0] && obj[1]) m_registers[REG_VBL_COL_OBJ] |= 0x20;
-			if (obj[0] && obj[2]) m_registers[REG_VBL_COL_OBJ] |= 0x10;
-			if (obj[0] && obj[3]) m_registers[REG_VBL_COL_OBJ] |= 0x08;
-			if (obj[1] && obj[2]) m_registers[REG_VBL_COL_OBJ] |= 0x04;
-			if (obj[1] && obj[3]) m_registers[REG_VBL_COL_OBJ] |= 0x02;
-			if (obj[2] && obj[3]) m_registers[REG_VBL_COL_OBJ] |= 0x01;
-
-			// render scores
-			if (score_draw)
-			{
-				for (int i = 0; i < SCORE_DIGITS; i++)
-				{
-					int const   score_col = x - m_x_offset - score_start_x[i];
-					bool const  score = bool(score_bits[i] & (1U << score_col));
-					if ((0 <= score_col) && (SCORE_WIDTH > score_col) && score)
-						row[screen_col] |= bg_clr | 0x08;
-				}
-			}
+			if ((row[screen_col] & 0x10) && (row[screen_col] & 0x20)) m_registers[REG_VBL_COL_OBJ] |= 0x20;
+			if ((row[screen_col] & 0x10) && (row[screen_col] & 0x40)) m_registers[REG_VBL_COL_OBJ] |= 0x10;
+			if ((row[screen_col] & 0x10) && (row[screen_col] & 0x80)) m_registers[REG_VBL_COL_OBJ] |= 0x08;
+			if ((row[screen_col] & 0x20) && (row[screen_col] & 0x40)) m_registers[REG_VBL_COL_OBJ] |= 0x04;
+			if ((row[screen_col] & 0x20) && (row[screen_col] & 0x80)) m_registers[REG_VBL_COL_OBJ] |= 0x02;
+			if ((row[screen_col] & 0x40) && (row[screen_col] & 0x80)) m_registers[REG_VBL_COL_OBJ] |= 0x01;
 
 			// work out if the background hits this pixel
 			int const   bg_col = x - m_x_offset - BG_START_X;
@@ -385,10 +351,10 @@ void s2636_device::render_next_line()
 			if (bg_draw && (0 <= bg_col) && (BG_WIDTH > bg_col) && bg && (bg_hbar_width > (bg_col & 0x07)))
 			{
 				// do object-background collisions
-				if (obj[0]) m_registers[REG_COL_BG_CMPL] |= 0x80;
-				if (obj[1]) m_registers[REG_COL_BG_CMPL] |= 0x40;
-				if (obj[2]) m_registers[REG_COL_BG_CMPL] |= 0x20;
-				if (obj[3]) m_registers[REG_COL_BG_CMPL] |= 0x10;
+				if (row[screen_col] & 0x10) m_registers[REG_COL_BG_CMPL] |= 0x80;
+				if (row[screen_col] & 0x20) m_registers[REG_COL_BG_CMPL] |= 0x40;
+				if (row[screen_col] & 0x40) m_registers[REG_COL_BG_CMPL] |= 0x20;
+				if (row[screen_col] & 0x80) m_registers[REG_COL_BG_CMPL] |= 0x10;
 				if (!(row[screen_col] & 0x08)) row[screen_col] = bg_clr;
 			}
 			else if (!(row[screen_col] & 0x08))
@@ -397,10 +363,8 @@ void s2636_device::render_next_line()
 				row[screen_col] = scrn_clr;
 			}
 
-			// advance the screen column
-			screen_col++;
-
-			// deal with pixel clock divider ratio
+			// clear collision crud and deal with pixel clock divider ratio
+			row[screen_col++] &= 0x0f;
 			for (int i = 1; (i < m_divider) && (vis_area.max_x >= screen_col); i++, screen_col++)
 			{
 				row[screen_col] = row[screen_col - 1];
