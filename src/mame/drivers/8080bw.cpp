@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Michael Strutts,Nicola Salmoria,Tormod Tjaberg,Mirko Buffoni,Lee Taylor,Valerio Verrando,Marco Cassili,Zsolt Vasvari,Aaron Giles,Jonathan Gevaryahu,hap,Robbbert
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni,Lee Taylor, Valerio Verrando, Zsolt Vasvari,Aaron Giles,Jonathan Gevaryahu,hap,Robbbert
+// thanks-to:Michael Strutts, Marco Cassili
 /*****************************************************************************
 
     8080bw.c

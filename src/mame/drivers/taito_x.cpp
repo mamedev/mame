@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Richard Bush, Howie Cohen, Yochizo
+// license:BSD-3-Clause
+// copyright-holders:Howie Cohen, Yochizo
+// thanks-to:Richard Bush
 /***************************************************************************
 
 

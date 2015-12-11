@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Robbbert, Manfred Schneider
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
+// thanks-to:Manfred Schneider
 /***************************************************************************
 
         Elektor Junior

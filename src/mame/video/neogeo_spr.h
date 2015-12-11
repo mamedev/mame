@@ -1,6 +1,6 @@
-// license:???
-// copyright-holders:Bryan McPhail,Fuzz,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
-
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// thanks-to:Fuzz
 #define VERBOSE     (0)
 
 // todo, move these back, currently the sprite code needs some of the values tho

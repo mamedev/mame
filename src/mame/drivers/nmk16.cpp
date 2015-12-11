@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Mirko Buffoni,Richard Bush,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
+// license:BSD-3-Clause
+// copyright-holders:Mirko Buffoni,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
+// thanks-to:Richard Bush
 /********************************************************************
 
 Task Force Harrier       1989 UPL        68000 Z80           YM2203 2xOKIM6295

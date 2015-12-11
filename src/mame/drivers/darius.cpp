@@ -1,5 +1,6 @@
 // license:???
 // copyright-holders:David Graves, Jarek Burczynski
+// thanks-to:Richard Bush
 /***************************************************************************
 
 Darius    (c) Taito 1986

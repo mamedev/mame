@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Bryan McPhail,Fuzz,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// thanks-to:Fuzz
 
 /***************************************************************************
 

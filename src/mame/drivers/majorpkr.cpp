@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
+// thanks-to:Tomasz Slanina,Rob Ragon
 /**********************************************************************************
 
   Major Poker / Major Joker

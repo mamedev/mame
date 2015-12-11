@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Peter Trauner, Manfred Schneider, Robbbert
+// license:GPL-2.0+
+// copyright-holders:Peter Trauner, Robbbert
+// thanks-to:Manfred Schneider
 /*****************************************************************************
  *
  * includes/vc4000.h
