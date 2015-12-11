@@ -16,7 +16,7 @@ matrix:
   exclude:
     - os: osx
       compiler: gcc
-    - os: osx
+    - os: linux
       compiler: clang
 env:
   - SUBTARGET=arcade MAME=mamearcade64 LDOPTS="-Wl,-no-keep-memory"
