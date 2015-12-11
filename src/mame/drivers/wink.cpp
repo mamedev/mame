@@ -1,9 +1,8 @@
-// license:???
-// copyright-holders:HIGHWAYMAN, Nicola Salmoria, Pierpaolo Prazzoli
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Pierpaolo Prazzoli
+// thanks-to:HIGHWAYMAN
 /*
     Wink    -   (c) 1985 Midcoin
-
-    driver by HIGHWAYMAN, Nicola Salmoria, Pierpaolo Prazzoli
 
     TODO:
     - better interrupts?

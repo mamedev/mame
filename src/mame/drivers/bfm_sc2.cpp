@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:James Wallace,'Re-Animator'
+// license:BSD-3-Clause
+// copyright-holders:James Wallace
+// thanks-to: 'Re-Animator'
 /****************************************************************************************
 
     bfm_sc2.c

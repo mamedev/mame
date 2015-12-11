@@ -1,8 +1,8 @@
-// license:???
-// copyright-holders:ElSemi, kingshriek, Deunan Knute, R. Belmont
+// license:BSD-3-Clause
+// copyright-holders:ElSemi, Deunan Knute, R. Belmont
+// thanks-to: kingshriek
 /*
     Sega/Yamaha AICA emulation
-    By ElSemi, kingshriek, Deunan Knute, and R. Belmont
 
     This is effectively a 64-voice SCSP, with the following differences:
     - No FM mode

@@ -1,13 +1,12 @@
-// license:???
-// copyright-holders:Jason Nelson, Phil Stroffolino
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino
+// thanks-to:Jason Nelson
 /*****************************************************************************
 
    MOLE ATTACK by Yachiyo Electronics Co.,LTD. 1982
 
    Known Clones:
    "Holey Moley", from tai (Thomas Automatics, Inc.)
-
-   emulated by Jason Nelson, Phil Stroffolino
 
    Known Issues:
    - some dips not mapped

@@ -1,4 +1,4 @@
-// license:???
+// license:LGPL-2.1+
 // copyright-holders:Ralf Schaefer, Cowering
 /**********************************************************************
 
