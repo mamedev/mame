@@ -52,7 +52,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<tms57002_device> m_dasp;
-	required_device<k053252_device> m_k053252;
+	optional_device<k053252_device> m_k053252; // not hooked up in tasman.cpp yet (does it even have it?)
 	required_device<k055673_device> m_k055673;
 	required_device<k055555_device> m_k055555;
 	required_device<k056832_device> m_k056832;

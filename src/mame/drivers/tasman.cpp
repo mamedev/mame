@@ -24,7 +24,7 @@
 
 #define CUSTOM_DRAW 1
 
-class kongambl_state : public konamigx_state
+class kongambl_state : public konamigx_state // with everything devicified there's probably not much point in inheriting the GX state.
 {
 public:
 	kongambl_state(const machine_config &mconfig, device_type type, const char *tag)
