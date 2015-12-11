@@ -625,6 +625,7 @@ INTERRUPT_GEN_MEMBER(konamigx_state::konamigx_type2_vblank_irq)
 		if ((m_gx_wrport1_1 & 0x81) == 0x81 || (m_gx_syncen & 1))
 		{
 			m_gx_syncen &= ~1;
+			// TODO: enabling ASSERT_LINE breaks opengolf, annoying.
 			device.execute().set_input_line(1, HOLD_LINE);
 		}
 	}
