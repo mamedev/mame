@@ -1232,7 +1232,7 @@ void hp_5061_3001_cpu_device::do_mpy(void)
         m_reg_A = (UINT16)(p & 0xffff);
         m_reg_B = (UINT16)((p >> 16) & 0xffff);
 
-        // Not entirely correct
+        // Not entirely correct, timing depends on initial content of A register
         m_icount -= 65;
 }
 
