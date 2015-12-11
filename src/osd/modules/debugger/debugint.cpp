@@ -73,7 +73,8 @@ enum
 	VIEW_STATE_MOVING           = 0x02,
 	VIEW_STATE_SIZING           = 0x04,
 	VIEW_STATE_NEEDS_UPDATE     = 0x08,
-	VIEW_STATE_FOLLOW_CPU       = 0x10
+	VIEW_STATE_FOLLOW_CPU       = 0x10,
+	VIEW_STATE_VISIBLE          = 0x20
 };
 
 /***************************************************************************
@@ -94,17 +95,17 @@ enum
 
 #define LIST_GET_PREVIOUS(_list, _elem, _prev) \
 	do { \
-		_prev = NULL; \
+		_prev = nullptr; \
 		if (_list != _elem) \
-			for (_prev = _list; _prev != NULL; _prev = _prev->next) \
+			for (_prev = _list; _prev != nullptr; _prev = _prev->next) \
 				if ((_prev)->next == _elem) \
 					break; \
 	} while (0)
 
 #define LIST_GET_LAST(_list, _last) \
 	do { \
-		for (_last = _list; _last != NULL; _last = _last->next) \
-			if ((_last)->next == NULL) \
+		for (_last = _list; _last != nullptr; _last = _last->next) \
+			if ((_last)->next == nullptr) \
 				break; \
 	} while (0)
 
@@ -112,7 +113,7 @@ enum
 	do { \
 		_type *_hlp; \
 		LIST_GET_PREVIOUS(_list, _elem, _hlp); \
-		if (_hlp != NULL) \
+		if (_hlp != nullptr) \
 			(_hlp)->next = (_elem)->next; \
 		else \
 			_list = (_elem)->next; \
@@ -122,7 +123,7 @@ enum
 	do { \
 		_type *_hlp; \
 		LIST_GET_LAST(_list, _hlp); \
-		if (_hlp != NULL) \
+		if (_hlp != nullptr) \
 			(_hlp)->next = _elem; \
 		else \
 			_list = _elem; \
@@ -182,7 +183,7 @@ public:
 		this->view = machine.debug_view().alloc_view(type, dview_update, this);
 		this->type = type;
 		this->m_machine = &machine;
-		this->state = flags | VIEW_STATE_NEEDS_UPDATE;
+		this->state = flags | VIEW_STATE_NEEDS_UPDATE | VIEW_STATE_VISIBLE;
 
 		// initial size
 		this->bounds.set(0, 300, 0, 300);
@@ -301,6 +302,7 @@ static DView *dview_alloc(render_target *target, running_machine &machine, debug
 
 static void dview_free(DView *dv)
 {
+	dv->container->empty();
 	LIST_REMOVE(list, dv, DView);
 	global_free(dv);
 }
@@ -916,7 +918,7 @@ static void set_view_by_name(render_target *target, const char *name)
 	for (i = 0; ; i++ )
 	{
 		s = target->view_name(i);
-		if (s == NULL)
+		if (s == nullptr)
 			return;
 		//printf("%d %s\n", i, s);
 		if (strcmp(name, s) == 0)
@@ -950,6 +952,21 @@ static void process_string(DView *dv, const char *str)
 		downcast<debug_view_memory *>(dv->view)->set_expression(str);
 		break;
 	}
+}
+
+static void debug_hide_all()
+{
+	for (DView *dv = list; dv != nullptr; dv = dv->next)
+	{
+		dv->container->empty();
+		dview_set_state(dv,VIEW_STATE_VISIBLE,false);
+	}
+}
+
+static void debug_show_all()
+{
+	for (DView *dv = list; dv != nullptr; dv = dv->next)
+		dview_set_state(dv,VIEW_STATE_VISIBLE,true);
 }
 
 static void on_memory_window_activate(DView *dv, const ui_menu_event *event)
@@ -1011,13 +1028,11 @@ static void on_run_activate(DView *dv, const ui_menu_event *event)
 	debug_cpu_get_visible_cpu(dv->machine())->debug()->go();
 }
 
-#if 0
-void on_run_h_activate(DView *dv, const ui_menu_event *event)
+static void on_run_h_activate(DView *dv, const ui_menu_event *event)
 {
-	debugwin_show(0);
+	debug_hide_all();
 	debug_cpu_get_visible_cpu(dv->machine())->debug()->go();
 }
-#endif
 
 static void on_run_cpu_activate(DView *dv, const ui_menu_event *event)
 {
@@ -1209,6 +1224,7 @@ static void CreateMainMenu(running_machine &machine)
 	menu->item_append("New Error Log Window", nullptr, 0, (void *)on_log_window_activate);
 	menu->item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 	menu->item_append("Run", nullptr, 0, (void *)on_run_activate);
+	menu->item_append("Run and Hide Debugger", nullptr, 0, (void *)on_run_h_activate);
 	menu->item_append("Run to Next CPU", nullptr, 0, (void *)on_run_cpu_activate);
 	menu->item_append("Run until Next Interrupt on This CPU", nullptr, 0, (void *)on_run_irq_activate);
 	menu->item_append("Run until Next VBLANK", nullptr, 0, (void *)on_run_vbl_activate);
@@ -1347,9 +1363,9 @@ static void handle_menus(running_machine &machine)
 		if (event != nullptr && (event->iptkey == IPT_UI_SELECT || (event->iptkey == IPT_UI_RIGHT)))
 		{
 			//global_free(menu);
-			//menu = NULL;
+			//menu = nullptr;
 			((void (*)(DView *, const ui_menu_event *)) event->itemref)(focus_view, event);
-			//ui_menu_stack_push(ui_menu_alloc(machine, menu->container, (ui_menu_handler_func)event->itemref, NULL));
+			//ui_menu_stack_push(ui_menu_alloc(machine, menu->container, (ui_menu_handler_func)event->itemref,nullptr));
 			CreateMainMenu(machine);
 		}
 		else if (ui_input_pressed(machine, IPT_UI_CONFIGURE))
@@ -1409,7 +1425,8 @@ static void dview_update_view(DView *dv)
 	if (dview_is_state(dv, VIEW_STATE_NEEDS_UPDATE) || dv->rt_width != old_rt_width || dv->rt_height != old_rt_height)
 	{
 		dview_size_allocate(dv);
-		dview_draw(dv);
+		if(dview_is_state(dv, VIEW_STATE_VISIBLE))
+			dview_draw(dv);
 		dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, FALSE);
 	}
 }
@@ -1440,6 +1457,7 @@ void debug_internal::wait_for_debugger(device_t &device, bool firststop)
 		DView *disassembly = dview_alloc(target, device.machine(), DVT_DISASSEMBLY, VIEW_STATE_FOLLOW_CPU);
 		disassembly->editor.active = TRUE;
 		disassembly->editor.container = &device.machine().render().ui_container();
+		disassembly->ofs_x = 300;
 
 		dview_alloc(target, device.machine(), DVT_STATE, VIEW_STATE_FOLLOW_CPU);
 
@@ -1447,11 +1465,13 @@ void debug_internal::wait_for_debugger(device_t &device, bool firststop)
 		dview_set_title(console, "Console");
 		console->editor.active = TRUE;
 		console->editor.container = &device.machine().render().ui_container();
+		console->bounds.setx(0,600);
+		console->ofs_x = 600;
 		set_focus_view(console);
 	}
 
 	followers_set_cpu(&device);
-
+	debug_show_all();
 	//ui_update_and_render(device.machine(), device.machine().render().ui_container()());
 	update_views();
 	device.machine().osd().update(false);
