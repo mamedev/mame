@@ -149,6 +149,8 @@ public:
 	INTERRUPT_GEN_MEMBER(megasys1D_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1B_scanline);
+	DECLARE_WRITE16_MEMBER(ms1_ram_w);
+
 	inline void scrollram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int which);
 	void create_tilemaps();
 	void megasys1_priority_create();

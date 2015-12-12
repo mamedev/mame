@@ -290,6 +290,17 @@ ADDRESS_MAP_END
 #define INTERRUPT_NUM_C INTERRUPT_NUM_B
 #define interrupt_C     interrupt_B
 
+WRITE16_MEMBER(megasys1_state::ms1_ram_w )
+{
+	// DON'T use COMBINE_DATA
+	// byte writes end up mirroring in both words like nmk16.c
+	// 64street relies on this for attract inputs
+
+	m_ram[offset] = data;
+//	if (mem_mask != 0xffff) printf("byte write to RAM %04x %04x %04x\n", offset, data, mem_mask);
+
+}
+
 static ADDRESS_MAP_START( megasys1C_map, AS_PROGRAM, 16, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -301,7 +312,7 @@ static ADDRESS_MAP_START( megasys1C_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_MIRROR(0x4000) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_SHARE("scrollram.1")
 	AM_RANGE(0x0f0000, 0x0f3fff) AM_MIRROR(0x4000) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_SHARE("scrollram.2")
 	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x1c0000, 0x1cffff) AM_MIRROR(0x30000) AM_RAM AM_SHARE("ram") //0x1f****, Cybattler reads attract mode inputs at 0x1d****
+	AM_RANGE(0x1c0000, 0x1cffff) AM_MIRROR(0x30000) AM_RAM_WRITE(ms1_ram_w) AM_SHARE("ram") //0x1f****, Cybattler reads attract mode inputs at 0x1d****
 ADDRESS_MAP_END
 
 
