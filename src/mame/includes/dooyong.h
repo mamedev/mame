@@ -54,7 +54,6 @@ public:
 	dooyong_z80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dooyong_state(mconfig, type, tag),
 		m_txvideoram(*this, "txvideoram"),
-		m_paletteram_flytiger(*this, "flytiger_palram"),
 		m_spriteram(*this, "spriteram")
 	{ }
 
@@ -83,7 +82,7 @@ public:
 	DECLARE_VIDEO_START(primella);
 
 	required_shared_ptr<UINT8> m_txvideoram;
-	optional_shared_ptr<UINT8> m_paletteram_flytiger;
+	UINT8* m_paletteram_flytiger;
 	UINT8 m_sprites_disabled;
 	UINT8 m_flytiger_palette_bank;
 	UINT8 m_flytiger_pri;

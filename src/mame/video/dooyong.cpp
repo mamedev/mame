@@ -108,11 +108,14 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 	coin_counter_w(machine(), 0, data & 0x80);
 	coin_counter_w(machine(), 1, data & 0x40);
 
-	/* bit 1 is used but unknown */
+	/* bit 1 is used but unknown - possibly palette banking */
+	m_flytiger_palette_bank = (data & 0x02)^2;
 
 	/* bit 2 is continuously toggled (unknown) */
 	/* bit 4 is used but unknown */
 }
+	
+
 
 WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
 {
@@ -132,12 +135,12 @@ WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
 
 WRITE8_MEMBER(dooyong_z80_state::paletteram_flytiger_w)
 {
-	if (m_flytiger_palette_bank)
-	{
-		m_paletteram_flytiger[offset] = data;
-		UINT16 const value = m_paletteram_flytiger[offset & ~1] | (m_paletteram_flytiger[offset | 1] << 8);
-		m_palette->set_pen_color(offset/2, pal5bit(value >> 10), pal5bit(value >> 5), pal5bit(value >> 0));
-	}
+	if (!m_flytiger_palette_bank) offset+= 0x800;
+	
+	m_paletteram_flytiger[offset] = data;
+	UINT16 const value = m_paletteram_flytiger[offset & ~1] | (m_paletteram_flytiger[offset | 1] << 8);
+	m_palette->set_pen_color(offset/2, pal5bit(value >> 10), pal5bit(value >> 5), pal5bit(value >> 0));
+	
 }
 
 WRITE8_MEMBER(dooyong_z80_state::flytiger_ctrl_w)
@@ -522,6 +525,9 @@ VIDEO_START_MEMBER(dooyong_z80_ym2203_state, pollux)
 	m_fg_gfx = 3;
 	m_tx_tilemap_mode = 0;
 
+	m_paletteram_flytiger = auto_alloc_array_clear(machine(), UINT8, 0x1000);
+	save_pointer(NAME(m_paletteram_flytiger), 0x1000);
+
 	/* Create tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
@@ -591,6 +597,9 @@ VIDEO_START_MEMBER(dooyong_z80_state, flytiger)
 	m_bg_gfx = 2;
 	m_fg_gfx = 3;
 	m_tx_tilemap_mode = 0;
+
+	m_paletteram_flytiger = auto_alloc_array_clear(machine(), UINT8, 0x1000);
+	save_pointer(NAME(m_paletteram_flytiger), 0x1000);
 
 	/* Create tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
