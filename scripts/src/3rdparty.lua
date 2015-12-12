@@ -129,11 +129,19 @@ project "softfloat"
 	includedirs {
 		MAME_DIR .. "src/osd",
 	}
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+			"/wd4146", -- warning C4146: unary minus operator applied to unsigned type, result still unsigned
+			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
+		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
 		}
 end	
+	configuration { }
+
 	files {
 		MAME_DIR .. "3rdparty/softfloat/softfloat.c",
 		MAME_DIR .. "3rdparty/softfloat/fsincos.c",
