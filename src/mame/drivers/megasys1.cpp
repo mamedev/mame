@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_SHARE("scrollram.0")
 	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_SHARE("scrollram.1")
 	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_SHARE("scrollram.2")
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(ms1_ram_w) AM_SHARE("ram")
 ADDRESS_MAP_END
 
 
@@ -276,7 +276,7 @@ static ADDRESS_MAP_START( megasys1B_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x050000, 0x053fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_SHARE("scrollram.0")
 	AM_RANGE(0x054000, 0x057fff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_SHARE("scrollram.1")
 	AM_RANGE(0x058000, 0x05bfff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_SHARE("scrollram.2")
-	AM_RANGE(0x060000, 0x07ffff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x060000, 0x07ffff) AM_RAM_WRITE(ms1_ram_w) AM_SHARE("ram")
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READWRITE(ip_select_r,ip_select_w)
 ADDRESS_MAP_END
@@ -294,7 +294,7 @@ WRITE16_MEMBER(megasys1_state::ms1_ram_w )
 {
 	// DON'T use COMBINE_DATA
 	// byte writes end up mirroring in both words like nmk16.c
-	// 64street relies on this for attract inputs
+	// 64th Street and Chimera Beast rely on this for attract inputs
 
 	m_ram[offset] = data;
 //	if (mem_mask != 0xffff) printf("byte write to RAM %04x %04x %04x\n", offset, data, mem_mask);
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0f8000, 0x0f8001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 //  AM_RANGE(0x100000, 0x100001) // protection
-	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM /*_WRITE(ms1_ram_w)*/ AM_SHARE("ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megasys1D_oki_map, AS_0, 8, megasys1_state )
@@ -4320,8 +4320,11 @@ DRIVER_INIT_MEMBER(megasys1_state,monkelf)
  *
  *************************************/
 
+// Type Z
 GAME( 1988, lomakai,  0,        system_Z,          lomakai,  driver_device,  0,        ROT0,   "Jaleco", "Legend of Makai (World)", 0 )
 GAME( 1988, makaiden, lomakai,  system_Z,          lomakai,  driver_device,  0,        ROT0,   "Jaleco", "Makai Densetsu (Japan)", 0 )
+
+// Type A
 GAME( 1988, p47,      0,        system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", 0 )
 GAME( 1988, p47j,     p47,      system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", 0 )
 GAME( 1988, p47je,    p47,      system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", 0 )
@@ -4342,20 +4345,26 @@ GAME( 1990, rodland,  0,        system_A,          rodland,  megasys1_state, rod
 GAME( 1990, rodlandj, rodland,  system_A,          rodland,  megasys1_state, rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", 0 )
 GAME( 1990, rittam,   rodland,  system_A,          rodland,  megasys1_state, rittam,   ROT0,   "Jaleco", "R&T (Rod-Land prototype?)", 0 )
 GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  megasys1_state,  rodlandjb,        ROT0,   "bootleg","Rod-Land (Japan bootleg)", 0 )
-GAME( 1991, avspirit, 0,        system_B,          avspirit, megasys1_state, avspirit, ROT0,   "Jaleco", "Avenging Spirit", 0 )
 GAME( 1990, phantasm, avspirit, system_A,          phantasm, megasys1_state, phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", 0 )
+GAME( 1992, soldam,   0,        system_A,          soldam,   megasys1_state, soldam,   ROT0,   "Jaleco", "Soldam", 0 )
+GAME( 1992, soldamj,  soldam,   system_A,          soldam,   megasys1_state, soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", 0 )
+
+// Type B
+GAME( 1991, avspirit, 0,        system_B,          avspirit, megasys1_state, avspirit, ROT0,   "Jaleco", "Avenging Spirit", 0 )
 GAME( 1990, monkelf,  avspirit, system_B,          avspirit, megasys1_state, monkelf,  ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", 0 )
 GAME( 1991, edf,      0,        system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 1)", 0 )
 GAME( 1991, edfa,     edf,      system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 2)", 0 )
 GAME( 1991, edfu,     edf,      system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", 0 )
 GAME( 1991, edfbl,    edf,      system_Bbl,        edf,      megasys1_state, edfbl,    ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", MACHINE_NO_SOUND )
+GAME( 1993, hayaosi1, 0,        system_B_hayaosi1, hayaosi1, megasys1_state, hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS )
+
+// Type C
 GAME( 1991, 64street, 0,        system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", 0 )
 GAME( 1991, 64streetj,64street, system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan)", 0 )
-GAME( 1992, soldam,   0,        system_A,          soldam,   megasys1_state, soldam,   ROT0,   "Jaleco", "Soldam", 0 )
-GAME( 1992, soldamj,  soldam,   system_A,          soldam,   megasys1_state, soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", 0 )
 GAME( 1992, bigstrik, 0,        system_C,          bigstrik, megasys1_state, bigstrik, ROT0,   "Jaleco", "Big Striker", 0 )
 GAME( 1993, chimerab, 0,        system_C,          chimerab, megasys1_state, chimerab, ROT0,   "Jaleco", "Chimera Beast (prototype)", 0 )
 GAME( 1993, cybattlr, 0,        system_C,          cybattlr, megasys1_state, cybattlr, ROT90,  "Jaleco", "Cybattler", 0 )
-GAME( 1993, hayaosi1, 0,        system_B_hayaosi1, hayaosi1, megasys1_state, hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS )
+
+// Type D
 GAME( 1993, peekaboo, 0,        system_D,          peekaboo, megasys1_state, peekaboo, ROT0,   "Jaleco", "Peek-a-Boo!", 0 )
 GAME( 1993, peekaboou,peekaboo, system_D,          peekaboo, megasys1_state, peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (North America, ver 1.0)", 0 )
