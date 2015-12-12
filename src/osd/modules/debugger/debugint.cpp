@@ -374,6 +374,16 @@ static void dview_draw_box(DView *dv, int rtype, int x, int y, int w, int h, rgb
 			PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
 
+static void dview_draw_line(DView *dv, int rtype, int x1, int y1, int x2, int y2, rgb_t col)
+{
+	rectangle r;
+	
+	dview_get_rect(dv, rtype, r);
+	dv->container->add_line(NX(dv, x1 + r.min_x), NY(dv, y1 + r.min_y),
+			NX(dv, x2 + r.min_x), NY(dv, y2 + r.min_y), UI_LINE_WIDTH, col,
+			PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+}
+
 static void dview_draw_char(DView *dv, int rtype, int x, int y, int h, rgb_t col, UINT16 ch)
 {
 	rectangle r;
@@ -411,8 +421,15 @@ static void dview_draw_hsb(DView *dv)
 
 	dview_get_rect(dv, RECT_DVIEW_HSB, r);
 
-	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, 0, 0, VSB_WIDTH,HSB_HEIGHT, rgb_t(0xff, 0xff, 0x00, 0x00));
-	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, r.width() - VSB_WIDTH, 0, VSB_WIDTH, HSB_HEIGHT, rgb_t(0xff, 0xff, 0x00, 0x00));
+	dview_draw_box(dv, RECT_DVIEW_HSB, 0, 0, r.width(), r.height(), rgb_t(0xff, 0x60, 0x60, 0x60));
+	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, 0, 0, VSB_WIDTH,HSB_HEIGHT, rgb_t(0xff, 0xc0, 0xc0, 0xc0));
+	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, r.width() - VSB_WIDTH, 0, VSB_WIDTH, HSB_HEIGHT, rgb_t(0xff, 0xc0, 0xc0, 0xc0));
+
+	// draw arrows
+	dview_draw_line(dv, RECT_DVIEW_HSB, (VSB_WIDTH/3)*2, HSB_HEIGHT/4, VSB_WIDTH/3, HSB_HEIGHT/2, rgb_t(0xff, 0x00, 0x00, 0x00));
+	dview_draw_line(dv, RECT_DVIEW_HSB, VSB_WIDTH/3, HSB_HEIGHT/2, (VSB_WIDTH/3)*2, (HSB_HEIGHT/4)*3, rgb_t(0xff, 0x00, 0x00, 0x00));
+	dview_draw_line(dv, RECT_DVIEW_HSB, r.width() - (VSB_WIDTH/3)*2, HSB_HEIGHT/4, r.width() - VSB_WIDTH/3, HSB_HEIGHT/2, rgb_t(0xff, 0x00, 0x00, 0x00));
+	dview_draw_line(dv, RECT_DVIEW_HSB, r.width() - VSB_WIDTH/3, HSB_HEIGHT/2, r.width() - (VSB_WIDTH/3)*2, (HSB_HEIGHT/4)*3, rgb_t(0xff, 0x00, 0x00, 0x00));
 
 	ts = (r.width()) - 2 * VSB_WIDTH;
 
@@ -421,7 +438,7 @@ static void dview_draw_hsb(DView *dv)
 
 	vt = (ts * (sb->value - sb->lower)) / (sb->upper - sb->lower - sb->page_size) + sz / 2 + r.min_x + VSB_WIDTH;
 
-	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, vt - sz / 2, 0, sz, HSB_HEIGHT, rgb_t(0xff, 0xff, 0x00, 0x00));
+	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, vt - sz / 2, 0, sz, HSB_HEIGHT, rgb_t(0xff, 0xc0, 0xc0, 0xc0));
 }
 
 static void dview_draw_vsb(DView *dv)
@@ -435,8 +452,15 @@ static void dview_draw_vsb(DView *dv)
 
 	dview_get_rect(dv, RECT_DVIEW_VSB, r);
 
-	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, r.height() - HSB_HEIGHT, VSB_WIDTH, HSB_HEIGHT, rgb_t(0xff, 0xff, 0x00, 0x00));
-	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, 0,                       VSB_WIDTH, HSB_HEIGHT, rgb_t(0xff, 0xff, 0x00, 0x00));
+	dview_draw_box(dv, RECT_DVIEW_VSB, 0, 0, r.width(), r.height(), rgb_t(0xff, 0x60, 0x60, 0x60));
+	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, r.height() - HSB_HEIGHT, VSB_WIDTH, HSB_HEIGHT, rgb_t(0xff, 0xc0, 0xc0, 0xc0));
+	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, 0,                       VSB_WIDTH, HSB_HEIGHT, rgb_t(0xff, 0xc0, 0xc0, 0xc0));
+
+	// draw arrows
+	dview_draw_line(dv, RECT_DVIEW_VSB, VSB_WIDTH/4, (HSB_HEIGHT/3)*2, VSB_WIDTH/2, HSB_HEIGHT/3, rgb_t(0xff, 0x00, 0x00, 0x00));
+	dview_draw_line(dv, RECT_DVIEW_VSB, VSB_WIDTH/2, HSB_HEIGHT/3, (VSB_WIDTH/4)*3, (HSB_HEIGHT/3)*2, rgb_t(0xff, 0x00, 0x00, 0x00));
+	dview_draw_line(dv, RECT_DVIEW_VSB, VSB_WIDTH/4, r.height() - (HSB_HEIGHT/3)*2, VSB_WIDTH/2, r.height() - HSB_HEIGHT/3, rgb_t(0xff, 0x00, 0x00, 0x00));
+	dview_draw_line(dv, RECT_DVIEW_VSB, VSB_WIDTH/2, r.height() - HSB_HEIGHT/3, (VSB_WIDTH/4)*3, r.height() - (HSB_HEIGHT/3)*2, rgb_t(0xff, 0x00, 0x00, 0x00));
 
 	ts = r.height() - 2 * HSB_HEIGHT;
 
@@ -445,7 +469,7 @@ static void dview_draw_vsb(DView *dv)
 
 	vt = (ts * (sb->value - sb->lower)) / (sb->upper - sb->lower - sb->page_size) + sz / 2 + HSB_HEIGHT;
 
-	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, vt - sz / 2, VSB_WIDTH, sz, rgb_t(0xff, 0xff, 0x00, 0x00));
+	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, vt - sz / 2, VSB_WIDTH, sz, rgb_t(0xff, 0xc0, 0xc0, 0xc0));
 }
 
 static void dview_draw_size(DView *dv)
@@ -455,7 +479,15 @@ static void dview_draw_size(DView *dv)
 	dview_get_rect(dv, RECT_DVIEW_SIZE, r);
 
 	dview_draw_outlined_box(dv, RECT_DVIEW_SIZE, 0, 0,
-			r.width(),r.height(), rgb_t(0xff, 0xff, 0xff, 0x00));
+			r.width(),r.height(), rgb_t(0xff, 0x80, 0x80, 0x80));
+	dview_draw_line(dv, RECT_DVIEW_SIZE, 11, r.height()-1, r.width()-1, 11, rgb_t(0xff, 0xc0, 0xc0, 0xc0));
+	dview_draw_line(dv, RECT_DVIEW_SIZE, 12, r.height()-1, r.width()-1, 12, rgb_t(0xff, 0x60, 0x60, 0x60));
+	dview_draw_line(dv, RECT_DVIEW_SIZE, 13, r.height()-1, r.width()-1, 13, rgb_t(0xff, 0xc0, 0xc0, 0xc0));
+	dview_draw_line(dv, RECT_DVIEW_SIZE, 14, r.height()-1, r.width()-1, 14, rgb_t(0xff, 0x60, 0x60, 0x60));
+	dview_draw_line(dv, RECT_DVIEW_SIZE, 15, r.height()-1, r.width()-1, 15, rgb_t(0xff, 0xc0, 0xc0, 0xc0));
+	dview_draw_line(dv, RECT_DVIEW_SIZE, 16, r.height()-1, r.width()-1, 16, rgb_t(0xff, 0x60, 0x60, 0x60));
+	dview_draw_line(dv, RECT_DVIEW_SIZE, 17, r.height()-1, r.width()-1, 17, rgb_t(0xff, 0xc0, 0xc0, 0xc0));
+	dview_draw_line(dv, RECT_DVIEW_SIZE, 18, r.height()-1, r.width()-1, 18, rgb_t(0xff, 0x60, 0x60, 0x60));
 }
 
 static void dview_set_title(DView *dv, std::string title)
