@@ -1733,7 +1733,6 @@ void m68000_base_device::define_state(void)
 	state_add(M68K_USP,        "USP",       iotemp).callimport().callexport();
 	if (cpu_type & MASK_020_OR_LATER)
 		state_add(M68K_MSP,    "MSP",       iotemp).callimport().callexport();
-	state_add(M68K_ISP,        "ISP",       iotemp).callimport().callexport();
 
 	std::string tempstr;
 	for (int regnum = 0; regnum < 8; regnum++) {
