@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Mike Balfour, Patrick Lawrence, Brad Oliver
+// copyright-holders:Derrick Renaud 
 /*************************************************************************
 
     audio\atarifb.c
