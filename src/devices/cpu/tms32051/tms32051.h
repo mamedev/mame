@@ -164,6 +164,8 @@ protected:
 	address_space *m_data;
 	int m_icount;
 
+	bool m_idle;
+
 	inline void CHANGE_PC(UINT16 new_pc);
 	inline UINT16 PM_READ16(UINT16 address);
 	inline void PM_WRITE16(UINT16 address, UINT16 data);

@@ -35,7 +35,15 @@ enum
 	TMS32051_AR4,
 	TMS32051_AR5,
 	TMS32051_AR6,
-	TMS32051_AR7
+	TMS32051_AR7,
+	TMS32051_IFR,
+	TMS32051_IMR,
+	TMS32051_ST0_ARP,
+	TMS32051_ST0_INTM,
+	TMS32051_ST0_DP,
+	TMS32051_ST1_ARB,
+	TMS32051_TIM,
+	TMS32051_PSC
 };
 
 
@@ -93,7 +101,7 @@ static ADDRESS_MAP_START( tms32053_internal_data, AS_DATA, 16, tms32053_device )
 	AM_RANGE(0x0060, 0x007f) AM_RAM                         // DARAM B2
 	AM_RANGE(0x0100, 0x02ff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is unconnected if CNF = 1
 	AM_RANGE(0x0300, 0x04ff) AM_RAM                         // DARAM B1
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("saram")       // SARAM        TODO: is off-chip if OVLY = 0
+	AM_RANGE(0x0800, 0x13ff) AM_RAM AM_SHARE("saram")       // SARAM        TODO: is off-chip if OVLY = 0
 ADDRESS_MAP_END
 
 
@@ -225,6 +233,15 @@ void tms32051_device::device_start()
 	state_add( TMS32051_AR6,   "AR6", m_ar[6]).formatstr("%04X");
 	state_add( TMS32051_AR7,   "AR7", m_ar[7]).formatstr("%04X");
 
+	state_add( TMS32051_IFR,      "IFR", m_ifr).formatstr("%04X");
+	state_add( TMS32051_IMR,      "IMR", m_imr).formatstr("%04X");
+	state_add( TMS32051_ST0_ARP,  "ST0 ARP", m_st0.arp).formatstr("%1d");
+	state_add( TMS32051_ST0_INTM, "ST0 INTM", m_st0.intm).formatstr("%1d");
+	state_add( TMS32051_ST0_DP,   "ST0 DP", m_st0.dp).formatstr("%04X");
+	state_add( TMS32051_ST1_ARB,  "ST1 ARB", m_st1.arb).formatstr("%04X");
+	state_add( TMS32051_TIM,      "TIM", m_timer.tim).formatstr("%04X");
+	state_add( TMS32051_PSC,      "PSC", m_timer.psc).formatstr("%04X");
+
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
 
 	m_icountptr = &m_icount;
@@ -252,6 +269,8 @@ void tms32051_device::device_reset()
 	m_ifr       = 0;
 	m_cbcr      = 0;
 	m_rptc      = -1;
+
+	m_idle = false;
 
 	// simulate internal rom boot loader (can be removed when the dsp rom(s) is dumped)
 	m_st0.intm  = 1;
@@ -289,6 +308,8 @@ void tms32051_device::check_interrupts()
 
 				m_pc = (m_pmst.iptr << 11) | ((i+1) << 1);
 				m_ifr &= ~(1 << i);
+
+				m_idle = false;
 
 				save_interrupt_context();
 				break;
@@ -347,42 +368,50 @@ void tms32051_device::execute_run()
 	{
 		UINT16 ppc;
 
-		// handle block repeat
-		if (m_pmst.braf)
+		if (m_idle)
 		{
-			if (m_pc == m_paer)
-			{
-				if (m_brcr > 0)
-				{
-					CHANGE_PC(m_pasr);
-				}
-
-				m_brcr--;
-				if (m_brcr <= 0)
-				{
-					m_pmst.braf = 0;
-				}
-			}
-		}
-
-		ppc = m_pc;
-		debugger_instruction_hook(this, m_pc);
-
-		m_op = ROPCODE();
-		(this->*s_opcode_table[m_op >> 8])();
-
-		// handle single repeat
-		if (m_rptc > 0)
-		{
-			if (ppc == m_rpt_end)
-			{
-				CHANGE_PC(m_rpt_start);
-				m_rptc--;
-			}
+			debugger_instruction_hook(this, m_pc);
+			CYCLES(1);
 		}
 		else
 		{
-			m_rptc = 0;
+			// handle block repeat
+			if (m_pmst.braf)
+			{
+				if (m_pc == m_paer)
+				{
+					if (m_brcr > 0)
+					{
+						CHANGE_PC(m_pasr);
+					}
+						
+					m_brcr--;
+					if (m_brcr <= 0)
+					{
+						m_pmst.braf = 0;
+					}
+				}
+			}
+
+			ppc = m_pc;
+			debugger_instruction_hook(this, m_pc);
+
+			m_op = ROPCODE();
+			(this->*s_opcode_table[m_op >> 8])();
+
+			// handle single repeat
+			if (m_rptc > 0)
+			{
+				if (ppc == m_rpt_end)
+				{
+					CHANGE_PC(m_rpt_start);
+					m_rptc--;
+				}
+			}
+			else
+			{
+				m_rptc = 0;
+			}
 		}
 
 		m_timer.psc--;
@@ -597,6 +626,8 @@ void tms32053_device::device_reset()
 	m_ifr       = 0;
 	m_cbcr      = 0;
 	m_rptc      = -1;
+
+	m_idle = false;
 
 	CHANGE_PC(0);
 }
