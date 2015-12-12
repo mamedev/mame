@@ -49,7 +49,7 @@ extern "C" unsigned char _BitScanReverse(unsigned long *Index, unsigned long Mas
 
 #ifndef count_leading_zeros
 #define count_leading_zeros _count_leading_zeros
-INLINE UINT8 _count_leading_zeros(UINT32 value)
+static inline UINT8 _count_leading_zeros(UINT32 value)
 {
 	UINT32 index;
 	return _BitScanReverse((unsigned long *)&index, value) ? (index ^ 31) : 32;
@@ -64,7 +64,7 @@ INLINE UINT8 _count_leading_zeros(UINT32 value)
 
 #ifndef count_leading_ones
 #define count_leading_ones _count_leading_ones
-INLINE UINT8 _count_leading_ones(UINT32 value)
+static inline UINT8 _count_leading_ones(UINT32 value)
 {
 	UINT32 index;
 	return _BitScanReverse((unsigned long *)&index, ~value) ? (index ^ 31) : 32;
@@ -86,7 +86,7 @@ INLINE UINT8 _count_leading_ones(UINT32 value)
 
 #ifndef compare_exchange32
 #define compare_exchange32 _compare_exchange32
-INLINE INT32 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
+static inline INT32 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 {
 	return _InterlockedCompareExchange((volatile long *)ptr, exchange, compare);
 }
@@ -103,7 +103,7 @@ INLINE INT32 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 excha
 #ifdef PTR64
 #ifndef compare_exchange64
 #define compare_exchange64 _compare_exchange64
-INLINE INT64 _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
+static inline INT64 _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 {
 	return _InterlockedCompareExchange64(ptr, exchange, compare);
 }
@@ -119,7 +119,7 @@ INLINE INT64 _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 excha
 
 #ifndef atomic_exchange32
 #define atomic_exchange32 _atomic_exchange32
-INLINE INT32 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
+static inline INT32 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 {
 	return _InterlockedExchange((volatile long *)ptr, exchange);
 }
@@ -134,7 +134,7 @@ INLINE INT32 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 
 #ifndef atomic_add32
 #define atomic_add32 _atomic_add32
-INLINE INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
+static inline INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 {
 	return _InterlockedExchangeAdd((volatile long *)ptr, delta) + delta;
 }
@@ -149,7 +149,7 @@ INLINE INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 
 #ifndef atomic_increment32
 #define atomic_increment32 _atomic_increment32
-INLINE INT32 _atomic_increment32(INT32 volatile *ptr)
+static inline INT32 _atomic_increment32(INT32 volatile *ptr)
 {
 	return _InterlockedIncrement((volatile long *)ptr);
 }
@@ -164,7 +164,7 @@ INLINE INT32 _atomic_increment32(INT32 volatile *ptr)
 
 #ifndef atomic_decrement32
 #define atomic_decrement32 _atomic_decrement32
-INLINE INT32 _atomic_decrement32(INT32 volatile *ptr)
+static inline INT32 _atomic_decrement32(INT32 volatile *ptr)
 {
 	return _InterlockedDecrement((volatile long *)ptr);
 }

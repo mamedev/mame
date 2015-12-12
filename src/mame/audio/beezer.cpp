@@ -192,7 +192,7 @@ void beezer_sound_device::device_reset()
  *
  *************************************/
 // need to set int_flag properly here
-INLINE void sh6840_apply_clock(struct sh6840_timer_channel_beez *t, int clocks)
+static inline void sh6840_apply_clock(struct sh6840_timer_channel_beez *t, int clocks)
 {
 	/* dual 8-bit case */
 	if (t->cr & 0x04)

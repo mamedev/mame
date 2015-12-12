@@ -231,7 +231,7 @@ WRITE8_MEMBER( tx1_sound_device::ay8910_b_w )
 
  ***************************************************************************/
 
-INLINE void update_engine(int eng[4])
+static inline void update_engine(int eng[4])
 {
 	int p0 = eng[0];
 	int p1 = eng[1];

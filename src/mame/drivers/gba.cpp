@@ -22,7 +22,7 @@
 
 #define VERBOSE_LEVEL   (0)
 
-INLINE void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -1838,7 +1838,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 	}
 }
 
-INLINE UINT32 COMBINE_DATA32_16(UINT32 prev, UINT32 data, UINT32 mem_mask)
+static inline UINT32 COMBINE_DATA32_16(UINT32 prev, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA(&prev);
 	switch(mem_mask)

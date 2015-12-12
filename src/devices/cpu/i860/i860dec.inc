@@ -896,7 +896,7 @@ void i860_cpu_device::dump_state (i860s *cpustate)
 #endif
 
 /* Sign extend N-bit number.  */
-INLINE INT32 sign_ext (UINT32 x, int n)
+static inline INT32 sign_ext (UINT32 x, int n)
 {
 	INT32 t;
 	t = x >> (n - 1);

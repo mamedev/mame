@@ -2318,7 +2318,7 @@ UINT8 saturn_state::stv_vdp2_check_vram_cycle_pattern_registers( UINT8 access_co
 	return access_command_ok == 3 ? 1 : 0;
 }
 
-INLINE UINT32 stv_add_blend(UINT32 a, UINT32 b)
+static inline UINT32 stv_add_blend(UINT32 a, UINT32 b)
 {
 	rgb_t rb = (a & 0xff00ff) + (b & 0xff00ff);
 	rgb_t g = (a & 0x00ff00) + (b & 0x00ff00);

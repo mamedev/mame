@@ -130,7 +130,7 @@ struct cdrom_file
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 &tracknum)
+ * @fn  static inline UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 &tracknum)
  *
  * @brief   Physical to chd lba.
  *
@@ -141,7 +141,7 @@ struct cdrom_file
  * @return  An UINT32.
  */
 
-INLINE UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 &tracknum)
+static inline UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 &tracknum)
 {
 	UINT32 chdlba;
 	int track;
@@ -164,7 +164,7 @@ INLINE UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 &trac
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE UINT32 logical_to_chd_lba(cdrom_file *file, UINT32 loglba, UINT32 &tracknum)
+ * @fn  static inline UINT32 logical_to_chd_lba(cdrom_file *file, UINT32 loglba, UINT32 &tracknum)
  *
  * @brief   Logical to chd lba.
  *
@@ -175,7 +175,7 @@ INLINE UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 &trac
  * @return  An UINT32.
  */
 
-INLINE UINT32 logical_to_chd_lba(cdrom_file *file, UINT32 loglba, UINT32 &tracknum)
+static inline UINT32 logical_to_chd_lba(cdrom_file *file, UINT32 loglba, UINT32 &tracknum)
 {
 	UINT32 chdlba, physlba;
 	int track;

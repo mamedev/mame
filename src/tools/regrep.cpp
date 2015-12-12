@@ -169,7 +169,7 @@ static void append_driver_list_table(const char *header, std::string &dirname, c
     from a string
 -------------------------------------------------*/
 
-INLINE char *trim_string(char *string)
+static inline char *trim_string(char *string)
 {
 	int length;
 
@@ -191,7 +191,7 @@ INLINE char *trim_string(char *string)
     index for a given entry
 -------------------------------------------------*/
 
-INLINE int get_unique_index(const summary_file *curfile, int index)
+static inline int get_unique_index(const summary_file *curfile, int index)
 {
 	int listnum, curindex = 0;
 

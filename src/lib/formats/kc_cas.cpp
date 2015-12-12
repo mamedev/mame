@@ -43,7 +43,7 @@ static int kc_image_size;
 /*******************************************************************
    Generate one high-low cycle of sample data
 ********************************************************************/
-INLINE int kc_cas_cycle(INT16 *buffer, int sample_pos, int len)
+static inline int kc_cas_cycle(INT16 *buffer, int sample_pos, int len)
 {
 	int num_samples = KC_WAV_FREQUENCY / (len * 2);
 
@@ -63,7 +63,7 @@ INLINE int kc_cas_cycle(INT16 *buffer, int sample_pos, int len)
 /*******************************************************************
    Generate n samples of silence
 ********************************************************************/
-INLINE int kc_cas_silence(INT16 *buffer, int sample_pos, int len)
+static inline int kc_cas_silence(INT16 *buffer, int sample_pos, int len)
 {
 	int i = 0;
 
@@ -78,7 +78,7 @@ INLINE int kc_cas_silence(INT16 *buffer, int sample_pos, int len)
 /*******************************************************************
    Generate samples for 1 byte
 ********************************************************************/
-INLINE int kc_cas_byte(INT16 *buffer, int sample_pos, UINT8 data)
+static inline int kc_cas_byte(INT16 *buffer, int sample_pos, UINT8 data)
 {
 	int samples = 0;
 

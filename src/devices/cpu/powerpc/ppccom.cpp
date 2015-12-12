@@ -306,7 +306,7 @@ ppc405gp_device::ppc405gp_device(const machine_config &mconfig, const char *tag,
     of access and the protection bits
 -------------------------------------------------*/
 
-INLINE int page_access_allowed(int transtype, UINT8 key, UINT8 protbits)
+static inline int page_access_allowed(int transtype, UINT8 key, UINT8 protbits)
 {
 	if (key == 0)
 		return (transtype == TRANSLATE_WRITE) ? (protbits != 3) : TRUE;
@@ -450,7 +450,7 @@ inline void ppc_device::set_decrementer(UINT32 newdec)
     is_nan_double - is a double value a NaN
 -------------------------------------------------*/
 
-INLINE int is_nan_double(double x)
+static inline int is_nan_double(double x)
 {
 	UINT64 xi = *(UINT64*)&x;
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
@@ -464,7 +464,7 @@ INLINE int is_nan_double(double x)
     quiet NaN
 -------------------------------------------------*/
 
-INLINE int is_qnan_double(double x)
+static inline int is_qnan_double(double x)
 {
 	UINT64 xi = *(UINT64*)&x;
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
@@ -479,7 +479,7 @@ INLINE int is_qnan_double(double x)
     signaling NaN
 -------------------------------------------------*/
 
-INLINE int is_snan_double(double x)
+static inline int is_snan_double(double x)
 {
 	UINT64 xi = *(UINT64*)&x;
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
@@ -494,7 +494,7 @@ INLINE int is_snan_double(double x)
     infinity
 -------------------------------------------------*/
 
-INLINE int is_infinity_double(double x)
+static inline int is_infinity_double(double x)
 {
 	UINT64 xi = *(UINT64*)&x;
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
@@ -507,7 +507,7 @@ INLINE int is_infinity_double(double x)
     normalized
 -------------------------------------------------*/
 
-INLINE int is_normalized_double(double x)
+static inline int is_normalized_double(double x)
 {
 	UINT64 exp;
 	UINT64 xi = *(UINT64*)&x;
@@ -522,7 +522,7 @@ INLINE int is_normalized_double(double x)
     denormalized
 -------------------------------------------------*/
 
-INLINE int is_denormalized_double(double x)
+static inline int is_denormalized_double(double x)
 {
 	UINT64 xi = *(UINT64*)&x;
 	return( ((xi & DOUBLE_EXP) == 0) &&
@@ -534,7 +534,7 @@ INLINE int is_denormalized_double(double x)
     sign_double - return sign of a double value
 -------------------------------------------------*/
 
-INLINE int sign_double(double x)
+static inline int sign_double(double x)
 {
 	UINT64 xi = *(UINT64*)&x;
 	return ((xi & DOUBLE_SIGN) != 0);

@@ -314,7 +314,7 @@ static const enum opcodes ops_001c_002f_s0[20]=
 static int PC;
 
 
-INLINE UINT16 readop_arg(const UINT8 *opram, unsigned pc)
+static inline UINT16 readop_arg(const UINT8 *opram, unsigned pc)
 {
 	UINT16 result = opram[PC++ - pc] << 8;
 	return result | opram[PC++ - pc];

@@ -533,7 +533,7 @@ UINT8 saturn_state::stv_read_gouraud_table( void )
 	}
 }
 
-INLINE INT32 _shading( INT32 color, INT32 correction )
+static inline INT32 _shading( INT32 color, INT32 correction )
 {
 	correction = (correction >> 16) & 0x1f;
 	color += (correction - 16);

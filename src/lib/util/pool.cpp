@@ -100,7 +100,7 @@ static void report_failure(object_pool *pool, const char *format, ...) ATTR_PRIN
     object
 -------------------------------------------------*/
 
-INLINE int hash_object(void *object)
+static inline int hash_object(void *object)
 {
 	return ((size_t)object >> 4) % POOL_HASH_SIZE;
 }
@@ -111,7 +111,7 @@ INLINE int hash_object(void *object)
     a given object type
 -------------------------------------------------*/
 
-INLINE objtype_entry *get_object_type(object_pool *pool, object_type type)
+static inline objtype_entry *get_object_type(object_pool *pool, object_type type)
 {
 	objtype_entry *entry;
 

@@ -91,7 +91,7 @@ static const UINT8 fcc_shift[8] = { 23, 25, 26, 27, 28, 29, 30, 31 };
     descriptor
 -------------------------------------------------*/
 
-INLINE UINT32 epc(const opcode_desc *desc)
+static inline UINT32 epc(const opcode_desc *desc)
 {
 	return (desc->flags & OPFLAG_IN_DELAY_SLOT) ? (desc->pc - 3) : desc->pc;
 }
@@ -102,7 +102,7 @@ INLINE UINT32 epc(const opcode_desc *desc)
     already allocated
 -------------------------------------------------*/
 
-INLINE void alloc_handle(drcuml_state *drcuml, code_handle **handleptr, const char *name)
+static inline void alloc_handle(drcuml_state *drcuml, code_handle **handleptr, const char *name)
 {
 	if (*handleptr == nullptr)
 		*handleptr = drcuml->handle_alloc(name);

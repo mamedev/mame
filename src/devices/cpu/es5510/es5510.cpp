@@ -34,7 +34,7 @@ static inline INT64 SX64(INT64 x) { return (x & S64(0x0000800000000000)) ? x | S
 #define VERBOSE_EXEC 0
 
 #if VERBOSE
-INLINE void ATTR_PRINTF(1,2) log_to_stderr(const char *format, ...) {
+static inline void ATTR_PRINTF(1,2) log_to_stderr(const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
 	vfprintf(stderr, format, ap);

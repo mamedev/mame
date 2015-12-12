@@ -21,7 +21,7 @@ static int cas_size;
 /*******************************************************************
    Generate one high-low cycle of sample data
 ********************************************************************/
-INLINE int trs80l2_cas_cycle(INT16 *buffer, int sample_pos, int silence, int high, int low)
+static inline int trs80l2_cas_cycle(INT16 *buffer, int sample_pos, int silence, int high, int low)
 {
 	int i = 0;
 

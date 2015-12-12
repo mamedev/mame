@@ -22,20 +22,20 @@
  *************************************/
 
 /* Borrowed from segasnd.c */
-INLINE void configure_filter(m3d_filter_state *state, double r, double c)
+static inline void configure_filter(m3d_filter_state *state, double r, double c)
 {
 	state->capval = 0;
 	state->exponent = 1.0 - exp(-1.0 / (r * c * 2000000/8));
 }
 
 #if 0
-INLINE double step_rc_filter(m3d_filter_state *state, double input)
+static inline double step_rc_filter(m3d_filter_state *state, double input)
 {
 	state->capval += (input - state->capval) * state->exponent;
 	return state->capval;
 }
 
-INLINE double step_cr_filter(m3d_filter_state *state, double input)
+static inline double step_cr_filter(m3d_filter_state *state, double input)
 {
 	double result = (input - state->capval);
 	state->capval += (input - state->capval) * state->exponent;

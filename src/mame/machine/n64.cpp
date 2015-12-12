@@ -1739,7 +1739,7 @@ UINT8 n64_periphs::calc_mempak_crc(UINT8 *buffer, int length)
 	return crc;
 }
 
-INLINE UINT8 convert_to_bcd(int val)
+static inline UINT8 convert_to_bcd(int val)
 {
 	return ((val / 10) << 4) | (val % 10);
 }

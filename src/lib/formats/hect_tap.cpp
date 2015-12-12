@@ -40,7 +40,7 @@ enum
 /*******************************************************************
    Generate one high-low cycle of sample data
 ********************************************************************/
-INLINE int hector_tap_cycle(INT16 *buffer, int sample_pos, int high, int low)
+static inline int hector_tap_cycle(INT16 *buffer, int sample_pos, int high, int low)
 {
 	int i = 0;
 
@@ -62,7 +62,7 @@ INLINE int hector_tap_cycle(INT16 *buffer, int sample_pos, int high, int low)
 }
 
 
-INLINE int hector_tap_byte(INT16 *buffer, int sample_pos, UINT8 data)
+static inline int hector_tap_byte(INT16 *buffer, int sample_pos, UINT8 data)
 {
 /* Writing an entire byte */
 	int i, samples;
@@ -81,7 +81,7 @@ INLINE int hector_tap_byte(INT16 *buffer, int sample_pos, UINT8 data)
 }
 
 
-INLINE int hector_tap_synchro(INT16 *buffer, int sample_pos, int nb_synchro)
+static inline int hector_tap_synchro(INT16 *buffer, int sample_pos, int nb_synchro)
 {
 /* Writing an entire byte */
 	int i, samples;

@@ -61,12 +61,12 @@ const device_type MK48T08 = &device_creator<mk48t08_device>;
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE UINT8 make_bcd(UINT8 data)
+static inline UINT8 make_bcd(UINT8 data)
 {
 	return ( ( ( data / 10 ) % 10 ) << 4 ) + ( data % 10 );
 }
 
-INLINE UINT8 from_bcd( UINT8 data )
+static inline UINT8 from_bcd( UINT8 data )
 {
 	return ( ( ( data >> 4 ) & 15 ) * 10 ) + ( data & 15 );
 }

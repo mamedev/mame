@@ -135,7 +135,7 @@ static int      len;
 
 
 /* This in fact gives the number of samples for half of the pulse */
-INLINE int tap_data_to_samplecount(int data, int frequency)
+static inline int tap_data_to_samplecount(int data, int frequency)
 {
 //  return (int) (0.5 * (0.5 + (((double)CBM_WAV_FREQUENCY / frequency) * (double)data)));      // MESS TZX formula
 	return (int) (0.5 * (((double)CBM_WAV_FREQUENCY / frequency) * (double)((data) + 0.5)));    // tap2wav formula

@@ -1312,7 +1312,7 @@ WRITE64_MEMBER(model3_state::real3d_cmd_w)
 /*****************************************************************************/
 /* matrix and vector operations */
 
-INLINE float dot_product3(VECTOR3 a, VECTOR3 b)
+static inline float dot_product3(VECTOR3 a, VECTOR3 b)
 {
 	return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]);
 }

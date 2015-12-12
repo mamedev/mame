@@ -211,7 +211,7 @@ void debug_view_memory::view_notify(debug_view_notification type)
 //  whose 32 bit representation is value
 //-------------------------------------------------
 
-INLINE float uint32_to_float(UINT32 value)
+static inline float uint32_to_float(UINT32 value)
 {
 	union {
 		float f;
@@ -227,7 +227,7 @@ INLINE float uint32_to_float(UINT32 value)
 //  whose 64 bit representation is value
 //-------------------------------------------------
 
-INLINE float uint64_to_double(UINT64 value)
+static inline float uint64_to_double(UINT64 value)
 {
 	union {
 		double f;

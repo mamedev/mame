@@ -207,12 +207,12 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen )
 	}
 }
 
-INLINE int millisec_to_samplecount( int millisec )
+static inline int millisec_to_samplecount( int millisec )
 {
 	return (int) (millisec * ((double)TZX_WAV_FREQUENCY / 1000.0));
 }
 
-INLINE int tcycles_to_samplecount( int tcycles )
+static inline int tcycles_to_samplecount( int tcycles )
 {
 	return (int) ((0.5 + (((double)TZX_WAV_FREQUENCY / 3500000) * (double)tcycles)) * (double) t_scale);
 }
@@ -335,7 +335,7 @@ static int tzx_handle_direct(INT16 **buffer, const UINT8 *bytes, int pause, int 
 }
 
 
-INLINE int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol, int maxp)
+static inline int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol, int maxp)
 {
 	int size = 0;
 	const UINT8 *cursymb = symtable + (2 * maxp + 1)*symbol;
@@ -395,7 +395,7 @@ INLINE int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol
 	return size;
 }
 
-INLINE int stream_get_bit(const UINT8 *bytes, UINT8 &stream_bit, UINT32 &stream_byte)
+static inline int stream_get_bit(const UINT8 *bytes, UINT8 &stream_bit, UINT32 &stream_byte)
 {
 	// get bit here
 	UINT8 retbit = 0;

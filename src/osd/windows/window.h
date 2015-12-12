@@ -171,13 +171,13 @@ extern int win_create_menu(running_machine &machine, HMENU *menus);
 //  rect_width / rect_height
 //============================================================
 
-INLINE int rect_width(const RECT *rect)
+static inline int rect_width(const RECT *rect)
 {
 	return rect->right - rect->left;
 }
 
 
-INLINE int rect_height(const RECT *rect)
+static inline int rect_height(const RECT *rect)
 {
 	return rect->bottom - rect->top;
 }

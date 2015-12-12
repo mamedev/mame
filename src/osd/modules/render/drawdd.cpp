@@ -171,7 +171,7 @@ inline void renderer_dd::update_outer_rects()
 }
 
 
-INLINE int better_mode(int width0, int height0, int width1, int height1, float desired_aspect)
+static inline int better_mode(int width0, int height0, int width1, int height1, float desired_aspect)
 {
 	float aspect0 = (float)width0 / (float)height0;
 	float aspect1 = (float)width1 / (float)height1;

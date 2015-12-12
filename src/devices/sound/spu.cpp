@@ -39,22 +39,22 @@ const device_type SPU = &device_creator<spu_device>;
 //
 //
 //
-INLINE unsigned int min(unsigned int a, unsigned int b)
+static inline unsigned int min(unsigned int a, unsigned int b)
 {
 	return (a > b) ? b : a;
 }
 
-INLINE unsigned int max(unsigned int a, unsigned int b)
+static inline unsigned int max(unsigned int a, unsigned int b)
 {
 	return (a > b) ? a : b;
 }
 
-INLINE double mindb(double a, double b)
+static inline double mindb(double a, double b)
 {
 	return (a > b) ? b : a;
 }
 
-INLINE double maxdb(double a, double b)
+static inline double maxdb(double a, double b)
 {
 	return (a > b) ? a : b;
 }

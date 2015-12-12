@@ -68,7 +68,7 @@
     descriptor
 -------------------------------------------------*/
 
-INLINE UINT32 epc(const opcode_desc *desc)
+static inline UINT32 epc(const opcode_desc *desc)
 {
 	return desc->pc;
 }
@@ -79,7 +79,7 @@ INLINE UINT32 epc(const opcode_desc *desc)
     already allocated
 -------------------------------------------------*/
 
-INLINE void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name)
+static inline void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name)
 {
 	if (*handleptr == nullptr)
 		*handleptr = drcuml->handle_alloc(name);

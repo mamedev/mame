@@ -220,7 +220,7 @@ static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tm
 	}
 }
 
-INLINE UINT32 alpha_additive_r32(UINT32 d, UINT32 s, UINT8 level)
+static inline UINT32 alpha_additive_r32(UINT32 d, UINT32 s, UINT8 level)
 {
 	UINT32 add;
 	add = (s & 0x00ff0000) + (d & 0x00ff0000);

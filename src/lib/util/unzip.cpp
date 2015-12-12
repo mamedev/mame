@@ -99,7 +99,7 @@
 ***************************************************************************/
 
 /**
- * @fn  INLINE UINT16 read_word(UINT8 *buf)
+ * @fn  static inline UINT16 read_word(UINT8 *buf)
  *
  * @brief   Reads a word.
  *
@@ -108,13 +108,13 @@
  * @return  The word.
  */
 
-INLINE UINT16 read_word(UINT8 *buf)
+static inline UINT16 read_word(UINT8 *buf)
 {
 	return (buf[1] << 8) | buf[0];
 }
 
 /**
- * @fn  INLINE UINT32 read_dword(UINT8 *buf)
+ * @fn  static inline UINT32 read_dword(UINT8 *buf)
  *
  * @brief   Reads a double word.
  *
@@ -123,7 +123,7 @@ INLINE UINT16 read_word(UINT8 *buf)
  * @return  The double word.
  */
 
-INLINE UINT32 read_dword(UINT8 *buf)
+static inline UINT32 read_dword(UINT8 *buf)
 {
 	return (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0];
 }

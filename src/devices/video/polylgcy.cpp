@@ -210,7 +210,7 @@ static void poly_state_presave(legacy_poly_manager *poly);
     down
 -------------------------------------------------*/
 
-INLINE INT32 round_coordinate(float value)
+static inline INT32 round_coordinate(float value)
 {
 	INT32 result = floor(value);
 	return result + (value - (float)result > 0.5f);
@@ -222,7 +222,7 @@ INLINE INT32 round_coordinate(float value)
     a simple tri_extent to a full poly_extent
 -------------------------------------------------*/
 
-INLINE void convert_tri_extent_to_poly_extent(poly_extent *dstextent, const tri_extent *srcextent, const polygon_info *polygon, INT32 y)
+static inline void convert_tri_extent_to_poly_extent(poly_extent *dstextent, const tri_extent *srcextent, const polygon_info *polygon, INT32 y)
 {
 	/* copy start/stop always */
 	dstextent->startx = srcextent->startx;
@@ -242,7 +242,7 @@ INLINE void convert_tri_extent_to_poly_extent(poly_extent *dstextent, const tri_
     a vertex based on p[0] crossing the clipval
 -------------------------------------------------*/
 
-INLINE void interpolate_vertex(poly_vertex *outv, const poly_vertex *v1, const poly_vertex *v2, int paramcount, float clipval)
+static inline void interpolate_vertex(poly_vertex *outv, const poly_vertex *v1, const poly_vertex *v2, int paramcount, float clipval)
 {
 	float frac = (clipval - v1->p[0]) / (v2->p[0] - v1->p[0]);
 	int paramnum;
@@ -260,7 +260,7 @@ INLINE void interpolate_vertex(poly_vertex *outv, const poly_vertex *v1, const p
     another
 -------------------------------------------------*/
 
-INLINE void copy_vertex(poly_vertex *outv, const poly_vertex *v, int paramcount)
+static inline void copy_vertex(poly_vertex *outv, const poly_vertex *v, int paramcount)
 {
 	int paramnum;
 
@@ -276,7 +276,7 @@ INLINE void copy_vertex(poly_vertex *outv, const poly_vertex *v, int paramcount)
     object, blocking if we run out
 -------------------------------------------------*/
 
-INLINE polygon_info *allocate_polygon(legacy_poly_manager *poly, int miny, int maxy)
+static inline polygon_info *allocate_polygon(legacy_poly_manager *poly, int miny, int maxy)
 {
 	/* wait for a work item if we have to */
 	if (poly->polygon_next + 1 > poly->polygon_count)

@@ -143,7 +143,7 @@ static INT32 slider_crossoffset(running_machine &machine, void *arg, std::string
 //  character a possible line break?
 //-------------------------------------------------
 
-INLINE int is_breakable_char(unicode_char ch)
+static inline int is_breakable_char(unicode_char ch)
 {
 	// regular spaces and hyphens are breakable
 	if (ch == ' ' || ch == '-')

@@ -354,17 +354,17 @@ static bool blit_info_initialized = false;
 //============================================================
 
 
-INLINE float round_nearest(float f)
+static inline float round_nearest(float f)
 {
 	return floor(f + 0.5f);
 }
 
-INLINE HashT texture_compute_hash(const render_texinfo &texture, const UINT32 flags)
+static inline HashT texture_compute_hash(const render_texinfo &texture, const UINT32 flags)
 {
 	return (HashT)texture.base ^ (flags & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK));
 }
 
-INLINE SDL_BlendMode map_blendmode(const int blendmode)
+static inline SDL_BlendMode map_blendmode(const int blendmode)
 {
 	switch (blendmode)
 	{
@@ -382,7 +382,7 @@ INLINE SDL_BlendMode map_blendmode(const int blendmode)
 	return SDL_BLENDMODE_NONE;
 }
 
-INLINE void set_coloralphamode(SDL_Texture  *texture_id, const render_color *color)
+static inline void set_coloralphamode(SDL_Texture  *texture_id, const render_color *color)
 {
 	UINT32 sr = (UINT32)(255.0f * color->r);
 	UINT32 sg = (UINT32)(255.0f * color->g);

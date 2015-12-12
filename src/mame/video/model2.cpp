@@ -105,7 +105,7 @@
  *
  *******************************************/
 
-INLINE void transform_point( poly_vertex *point, float *matrix )
+static inline void transform_point( poly_vertex *point, float *matrix )
 {
 	float tx = (point->x * matrix[0]) + (point->y * matrix[3]) + (point->pz * matrix[6]) + (matrix[9]);
 	float ty = (point->x * matrix[1]) + (point->y * matrix[4]) + (point->pz * matrix[7]) + (matrix[10]);
@@ -116,7 +116,7 @@ INLINE void transform_point( poly_vertex *point, float *matrix )
 	point->pz = tz;
 }
 
-INLINE void transform_vector( poly_vertex *vector, float *matrix )
+static inline void transform_vector( poly_vertex *vector, float *matrix )
 {
 	float tx = (vector->x * matrix[0]) + (vector->y * matrix[3]) + (vector->pz * matrix[6]);
 	float ty = (vector->x * matrix[1]) + (vector->y * matrix[4]) + (vector->pz * matrix[7]);
@@ -127,7 +127,7 @@ INLINE void transform_vector( poly_vertex *vector, float *matrix )
 	vector->pz = tz;
 }
 
-INLINE void normalize_vector( poly_vertex *vector )
+static inline void normalize_vector( poly_vertex *vector )
 {
 	float n = sqrt( (vector->x * vector->x) + (vector->y * vector->y) + (vector->pz * vector->pz) );
 
@@ -140,12 +140,12 @@ INLINE void normalize_vector( poly_vertex *vector )
 	}
 }
 
-INLINE float dot_product( poly_vertex *v1, poly_vertex *v2 )
+static inline float dot_product( poly_vertex *v1, poly_vertex *v2 )
 {
 	return (v1->x * v2->x) + (v1->y * v2->y) + (v1->pz * v2->pz);
 }
 
-INLINE void vector_cross3( poly_vertex *dst, poly_vertex *v0, poly_vertex *v1, poly_vertex *v2 )
+static inline void vector_cross3( poly_vertex *dst, poly_vertex *v0, poly_vertex *v1, poly_vertex *v2 )
 {
 	poly_vertex p1, p2;
 

@@ -222,7 +222,7 @@ UINT32 atarisy4_state::screen_update_atarisy4(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-INLINE UINT32 xy_to_screen_addr(UINT32 x, UINT32 y)
+static inline UINT32 xy_to_screen_addr(UINT32 x, UINT32 y)
 {
 //  UINT32 offset = ((gpu.mcr >> 4) & 3) << 9;
 	UINT32 offset = 0;

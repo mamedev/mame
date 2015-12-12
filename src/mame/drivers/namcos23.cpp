@@ -1655,7 +1655,7 @@ float namcos23_state::f24_to_f32(UINT32 v)
 	return *(float *)&r;
 }
 
-INLINE UINT8 light(UINT8 c, float l)
+static inline UINT8 light(UINT8 c, float l)
 {
 	if(l < 1)
 		l = l*c;

@@ -278,23 +278,23 @@ struct UINT16LE
 	UINT8 bytes[2];
 };
 
-INLINE UINT16 get_UINT16BE(UINT16BE word)
+static inline UINT16 get_UINT16BE(UINT16BE word)
 {
 	return (word.bytes[0] << 8) | word.bytes[1];
 }
 
-INLINE void set_UINT16BE(UINT16BE *word, UINT16 data)
+static inline void set_UINT16BE(UINT16BE *word, UINT16 data)
 {
 	word->bytes[0] = (data >> 8) & 0xff;
 	word->bytes[1] = data & 0xff;
 }
 
-INLINE UINT16 get_UINT16LE(UINT16LE word)
+static inline UINT16 get_UINT16LE(UINT16LE word)
 {
 	return word.bytes[0] | (word.bytes[1] << 8);
 }
 
-INLINE void set_UINT16LE(UINT16LE *word, UINT16 data)
+static inline void set_UINT16LE(UINT16LE *word, UINT16 data)
 {
 	word->bytes[0] = data & 0xff;
 	word->bytes[1] = (data >> 8) & 0xff;
@@ -1081,7 +1081,7 @@ static void close_image_lvl1(ti99_lvl1_imgref *l1_img)
 
     Return offset in image
 */
-INLINE int sector_address_to_image_offset(const ti99_lvl1_imgref *l1_img, const ti99_sector_address *address)
+static inline int sector_address_to_image_offset(const ti99_lvl1_imgref *l1_img, const ti99_sector_address *address)
 {
 	int offset = 0;
 
@@ -2200,7 +2200,7 @@ static int alloc_fdr_AU(struct ti99_lvl2_imgref *l2_img, unsigned *fdr_AU)
 	return IMGTOOLERR_NOSPACE;
 }
 
-INLINE int get_dsk_fdr_cluster_baseAU(struct ti99_lvl2_imgref *l2_img, dsk_fdr *fdr, int cluster_index)
+static inline int get_dsk_fdr_cluster_baseAU(struct ti99_lvl2_imgref *l2_img, dsk_fdr *fdr, int cluster_index)
 {
 	int reply;
 
@@ -2213,7 +2213,7 @@ INLINE int get_dsk_fdr_cluster_baseAU(struct ti99_lvl2_imgref *l2_img, dsk_fdr *
 	return reply;
 }
 
-INLINE int get_dsk_fdr_cluster_baseaphysrec(struct ti99_lvl2_imgref *l2_img, dsk_fdr *fdr, int cluster_index)
+static inline int get_dsk_fdr_cluster_baseaphysrec(struct ti99_lvl2_imgref *l2_img, dsk_fdr *fdr, int cluster_index)
 {
 	int reply;
 
@@ -2226,18 +2226,18 @@ INLINE int get_dsk_fdr_cluster_baseaphysrec(struct ti99_lvl2_imgref *l2_img, dsk
 	return reply;
 }
 
-INLINE int get_dsk_fdr_cluster_lastfphysrec(dsk_fdr *fdr, int cluster_index)
+static inline int get_dsk_fdr_cluster_lastfphysrec(dsk_fdr *fdr, int cluster_index)
 {
 	return (fdr->clusters[cluster_index][2] << 4) | (fdr->clusters[cluster_index][1] >> 4);
 }
 
-INLINE void set_dsk_fdr_cluster_lastfphysrec(dsk_fdr *fdr, int cluster_index, int data)
+static inline void set_dsk_fdr_cluster_lastfphysrec(dsk_fdr *fdr, int cluster_index, int data)
 {
 	fdr->clusters[cluster_index][1] = (fdr->clusters[cluster_index][1] & 0x0f) | (data << 4);
 	fdr->clusters[cluster_index][2] = data >> 4;
 }
 
-INLINE void set_dsk_fdr_cluster(struct ti99_lvl2_imgref *l2_img, dsk_fdr *fdr, int cluster_index, int baseAU, int lastfphysrec)
+static inline void set_dsk_fdr_cluster(struct ti99_lvl2_imgref *l2_img, dsk_fdr *fdr, int cluster_index, int baseAU, int lastfphysrec)
 {
 	/* convert AU address to FDR value */
 	if (l2_img->AUformat.physrecsperAU <= 2)
@@ -2249,29 +2249,29 @@ INLINE void set_dsk_fdr_cluster(struct ti99_lvl2_imgref *l2_img, dsk_fdr *fdr, i
 	fdr->clusters[cluster_index][2] = lastfphysrec >> 4;
 }
 
-INLINE unsigned get_win_fdr_fphysrecs(win_fdr *fdr)
+static inline unsigned get_win_fdr_fphysrecs(win_fdr *fdr)
 {
 	return (((unsigned) fdr->xinfo_MSB << 12) & 0xf0000) | get_UINT16BE(fdr->fphysrecs_LSW);
 }
 
-INLINE void set_win_fdr_fphysrecs(win_fdr *fdr, unsigned data)
+static inline void set_win_fdr_fphysrecs(win_fdr *fdr, unsigned data)
 {
 	fdr->xinfo_MSB = (fdr->xinfo_MSB & 0x0f) | ((data >> 12) & 0xf0);
 	set_UINT16BE(&fdr->fphysrecs_LSW, data & 0xffff);
 }
 
-INLINE unsigned get_win_fdr_fixrecs(win_fdr *fdr)
+static inline unsigned get_win_fdr_fixrecs(win_fdr *fdr)
 {
 	return (((unsigned) fdr->xinfo_MSB << 16) & 0xf0000) | get_UINT16LE(fdr->fixrecs_LSW);
 }
 
-INLINE void set_win_fdr_fixrecs(win_fdr *fdr, unsigned data)
+static inline void set_win_fdr_fixrecs(win_fdr *fdr, unsigned data)
 {
 	fdr->xinfo_MSB = (fdr->xinfo_MSB & 0xf0) | ((data >> 16) & 0x0f);
 	set_UINT16LE(&fdr->fixrecs_LSW, data & 0xffff);
 }
 
-INLINE unsigned get_win_fdr_prevsibFDR_aphysrec(struct ti99_lvl2_imgref *l2_img, win_fdr *fdr)
+static inline unsigned get_win_fdr_prevsibFDR_aphysrec(struct ti99_lvl2_imgref *l2_img, win_fdr *fdr)
 {
 	unsigned prevsibFDR_AU = get_UINT16BE(fdr->prevsibFDR_AU);
 
@@ -2280,7 +2280,7 @@ INLINE unsigned get_win_fdr_prevsibFDR_aphysrec(struct ti99_lvl2_imgref *l2_img,
 			: 0;
 }
 
-INLINE unsigned get_win_fdr_nextsibFDR_aphysrec(struct ti99_lvl2_imgref *l2_img, win_fdr *fdr)
+static inline unsigned get_win_fdr_nextsibFDR_aphysrec(struct ti99_lvl2_imgref *l2_img, win_fdr *fdr)
 {
 	unsigned nextsibFDR_AU = get_UINT16BE(fdr->nextsibFDR_AU);
 
@@ -2289,7 +2289,7 @@ INLINE unsigned get_win_fdr_nextsibFDR_aphysrec(struct ti99_lvl2_imgref *l2_img,
 			: 0;
 }
 
-INLINE unsigned get_win_fdr_cursibFDR_basefphysrec(win_fdr *fdr)
+static inline unsigned get_win_fdr_cursibFDR_basefphysrec(win_fdr *fdr)
 {
 	return get_UINT16BE(fdr->prevsibFDR_AU) ? get_win_fdr_fphysrecs(fdr) : 0;
 }

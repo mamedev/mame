@@ -33,7 +33,7 @@ static DWORD create_path_recursive(const TCHAR *path);
 //  INLINE FUNCTIONS
 //============================================================
 
-INLINE int is_path_to_physical_drive(const char *path)
+static inline int is_path_to_physical_drive(const char *path)
 {
 	return (_strnicmp(path, "\\\\.\\physicaldrive", 17) == 0);
 }

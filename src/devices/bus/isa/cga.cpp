@@ -1191,7 +1191,7 @@ WRITE8_MEMBER( isa8_cga_device::io_write )
 //          proc = cga_pgfx_4bpp;
 //
 
-//INLINE void pgfx_plot_unit_4bpp(bitmap_ind16 &bitmap,
+//static inline void pgfx_plot_unit_4bpp(bitmap_ind16 &bitmap,
 //                           int x, int y, int offs)
 //{
 //  int color, values[2];
@@ -1259,7 +1259,7 @@ WRITE8_MEMBER( isa8_cga_device::io_write )
 //
 //
 //
-//INLINE void pgfx_plot_unit_2bpp(bitmap_ind16 &bitmap,
+//static inline void pgfx_plot_unit_2bpp(bitmap_ind16 &bitmap,
 //                   int x, int y, const UINT16 *palette, int offs)
 //{
 //  int i;

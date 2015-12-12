@@ -554,24 +554,6 @@ if (_ACTION == nil) then return false end
 configuration { "x64" }
 	defines { "PTR64=1" }
 
--- map the INLINE to something digestible by GCC
-configuration { "gmake" }
-	buildoptions_cpp {
-		"-DINLINE=\"static inline\"",
-	}
-	buildoptions_objc {
-		"-DINLINE=\"static inline\"",
-	}
-configuration { "xcode4*" }
-	buildoptions {
-		"-DINLINE=\"static inline\"",
-	}
-
-configuration { "vs*" }
-	defines {
-		"INLINE=static inline",
-	}
-
 -- define MAME_DEBUG if we are a debugging build
 configuration { "Debug" }
 	defines {
@@ -1002,7 +984,6 @@ end
 				"-Wno-tautological-compare",
 				"-Wno-dynamic-class-memaccess",
 				"-Wno-unused-value",
---				"-Wno-c++11-narrowing",
 				"-Wno-inline-new-delete",
 				"-Wno-constant-logical-operand",
 				"-Wno-deprecated-register",
@@ -1026,8 +1007,6 @@ end
 			end
 				buildoptions {
 					"-Wno-unused-result", -- needed for fgets,fread on linux
---					"-Wno-narrowing",
---					"-Wno-attributes",
 					-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
 					"-Wno-array-bounds",
 				}

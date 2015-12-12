@@ -218,7 +218,7 @@ DISCRETE_RESET(dss_counter)
 #define DSS_LFSR_NOISE__FEED    DISCRETE_INPUT(4)
 #define DSS_LFSR_NOISE__BIAS    DISCRETE_INPUT(5)
 
-INLINE int dss_lfsr_function(discrete_device *dev, int myfunc, int in0, int in1, int bitmask)
+static inline int dss_lfsr_function(discrete_device *dev, int myfunc, int in0, int in1, int bitmask)
 {
 	int retval;
 

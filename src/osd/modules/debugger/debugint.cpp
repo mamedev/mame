@@ -238,17 +238,17 @@ public:
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE int dview_is_state(DView *dv, int state)
+static inline int dview_is_state(DView *dv, int state)
 {
 	return ((dv->state & state) ? TRUE : FALSE);
 }
 
-INLINE int dview_is_state_all(DView *dv, int state)
+static inline int dview_is_state_all(DView *dv, int state)
 {
 	return ((dv->state & state) == state ? TRUE : FALSE);
 }
 
-INLINE void dview_set_state(DView *dv, int state, int onoff)
+static inline void dview_set_state(DView *dv, int state, int onoff)
 {
 	if (onoff)
 		dv->state |= state;
@@ -682,7 +682,7 @@ static int dview_on_mouse(DView *dv, int mx, int my, bool button)
 
 }
 
-INLINE void map_attr_to_fg_bg(unsigned char attr, rgb_t *fg, rgb_t *bg)
+static inline void map_attr_to_fg_bg(unsigned char attr, rgb_t *fg, rgb_t *bg)
 {
 	*bg = rgb_t(0xff,0xff,0xff,0xff);
 	*fg = rgb_t(0xff,0x00,0x00,0x00);

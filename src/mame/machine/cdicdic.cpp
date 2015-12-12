@@ -33,7 +33,7 @@ TODO:
 const device_type MACHINE_CDICDIC = &device_creator<cdicdic_device>;
 
 #if ENABLE_VERBOSE_LOG
-INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -99,7 +99,7 @@ const INT32 cdicdic_device::s_cdic_adpcm_filter_coef[5][2] =
 //  INLINES
 //**************************************************************************
 
-INLINE int CDIC_IS_VALID_SAMPLE_BUF(UINT16 *cdram, UINT16 addr)
+static inline int CDIC_IS_VALID_SAMPLE_BUF(UINT16 *cdram, UINT16 addr)
 {
 	UINT8 *cdram8 = ((UINT8*)cdram) + addr + 8;
 	if(cdram8[2] != 0xff)
@@ -109,7 +109,7 @@ INLINE int CDIC_IS_VALID_SAMPLE_BUF(UINT16 *cdram, UINT16 addr)
 	return 0;
 }
 
-INLINE double CDIC_SAMPLE_BUF_FREQ(UINT16 *cdram, UINT16 addr)
+static inline double CDIC_SAMPLE_BUF_FREQ(UINT16 *cdram, UINT16 addr)
 {
 	UINT8 *cdram8 = ((UINT8*)cdram) + addr + 8;
 	switch(cdram8[2] & 0x3f)
@@ -129,7 +129,7 @@ INLINE double CDIC_SAMPLE_BUF_FREQ(UINT16 *cdram, UINT16 addr)
 	}
 }
 
-INLINE int CDIC_SAMPLE_BUF_SIZE(UINT16 *cdram, UINT16 addr)
+static inline int CDIC_SAMPLE_BUF_SIZE(UINT16 *cdram, UINT16 addr)
 {
 	UINT8 *cdram8 = ((UINT8*)cdram) + addr + 8;
 	switch(cdram8[2] & 0x3f)
@@ -151,7 +151,7 @@ INLINE int CDIC_SAMPLE_BUF_SIZE(UINT16 *cdram, UINT16 addr)
 	}
 }
 
-INLINE INT16 clamp(INT16 in)
+static inline INT16 clamp(INT16 in)
 {
 	return in;
 }

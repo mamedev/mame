@@ -247,7 +247,7 @@ WRITE8_MEMBER( k053260_device::write )
 }
 
 
-INLINE int limit( int val, int max, int min )
+static inline int limit( int val, int max, int min )
 {
 	if ( val > max )
 		val = max;

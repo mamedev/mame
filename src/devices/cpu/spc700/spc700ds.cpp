@@ -323,13 +323,13 @@ static const spc700_opcode_struct g_opcodes[256] =
 static unsigned int g_pc;
 static const UINT8 *rombase;
 
-INLINE unsigned int read_8_immediate(void)
+static inline unsigned int read_8_immediate(void)
 {
 	g_pc++;
 	return *rombase++;
 }
 
-INLINE unsigned int read_16_immediate(void)
+static inline unsigned int read_16_immediate(void)
 {
 	unsigned int result;
 	g_pc += 2;

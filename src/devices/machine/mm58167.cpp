@@ -93,7 +93,7 @@ void mm58167_device::device_reset()
 }
 
 
-INLINE UINT8 make_bcd(UINT8 data)
+static inline UINT8 make_bcd(UINT8 data)
 {
 	return ((data / 10) << 4) | (data % 10);
 }

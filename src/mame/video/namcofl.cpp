@@ -11,7 +11,7 @@
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
  */
 #ifdef UNUSED_FUNCTION
-INLINE UINT16
+static inline UINT16
 nth_word32( const UINT32 *source, int which )
 {
 	source += which/2;
@@ -31,7 +31,7 @@ nth_word32( const UINT32 *source, int which )
  * read from 32-bit aligned memory as if it were an array of bytes.
  */
 #ifdef UNUSED_FUNCTION
-INLINE UINT8
+static inline UINT8
 nth_byte32( const UINT32 *pSource, int which )
 {
 		UINT32 data = pSource[which/4];

@@ -30,7 +30,7 @@ TODO:
 const device_type MACHINE_MCD212 = &device_creator<mcd212_device>;
 
 #if ENABLE_VERBOSE_LOG
-INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -729,7 +729,7 @@ void mcd212_device::process_dca(int channel)
 	m_channel[channel].dca = addr * 2;
 }
 
-INLINE UINT8 MCD212_LIM(INT32 in)
+static inline UINT8 MCD212_LIM(INT32 in)
 {
 	if(in < 0)
 	{
@@ -742,7 +742,7 @@ INLINE UINT8 MCD212_LIM(INT32 in)
 	return (UINT8)in;
 }
 
-INLINE UINT8 BYTE_TO_CLUT(int channel, int icm, UINT8 byte)
+static inline UINT8 BYTE_TO_CLUT(int channel, int icm, UINT8 byte)
 {
 	switch(icm)
 	{

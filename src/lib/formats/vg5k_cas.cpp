@@ -20,7 +20,7 @@ static int k7_size;
 /*******************************************************************
    Generate one high-low cycle of sample data
 ********************************************************************/
-INLINE int vg5k_cas_cycle(INT16 *buffer, int sample_pos, int len)
+static inline int vg5k_cas_cycle(INT16 *buffer, int sample_pos, int len)
 {
 	int i = 0;
 
@@ -45,7 +45,7 @@ INLINE int vg5k_cas_cycle(INT16 *buffer, int sample_pos, int len)
 /*******************************************************************
    Generate n samples of silence
 ********************************************************************/
-INLINE int vg5k_cas_silence(INT16 *buffer, int sample_pos, int len)
+static inline int vg5k_cas_silence(INT16 *buffer, int sample_pos, int len)
 {
 	int i = 0;
 
@@ -60,7 +60,7 @@ INLINE int vg5k_cas_silence(INT16 *buffer, int sample_pos, int len)
 /*******************************************************************
    Generate the end-byte samples
 ********************************************************************/
-INLINE int vg5k_cas_eob(INT16 *buffer, int sample_pos)
+static inline int vg5k_cas_eob(INT16 *buffer, int sample_pos)
 {
 	int i, samples = 0;
 
@@ -73,7 +73,7 @@ INLINE int vg5k_cas_eob(INT16 *buffer, int sample_pos)
 }
 
 
-INLINE int vg5k_cas_byte(INT16 *buffer, int sample_pos, UINT8 data)
+static inline int vg5k_cas_byte(INT16 *buffer, int sample_pos, UINT8 data)
 {
 /* Writing an entire byte */
 	int i, samples;
@@ -100,7 +100,7 @@ INLINE int vg5k_cas_byte(INT16 *buffer, int sample_pos, UINT8 data)
 /*******************************************************************
    Generate n sample of synchro
 ********************************************************************/
-INLINE int vg5k_k7_synchro(INT16 *buffer, int sample_pos, int len)
+static inline int vg5k_k7_synchro(INT16 *buffer, int sample_pos, int len)
 {
 	int i, samples = 0;
 

@@ -50,7 +50,7 @@ struct text_buffer
     currently held in the buffer
 -------------------------------------------------*/
 
-INLINE INT32 buffer_used(text_buffer *text)
+static inline INT32 buffer_used(text_buffer *text)
 {
 	INT32 used = text->bufend - text->bufstart;
 	if (used < 0)
@@ -64,7 +64,7 @@ INLINE INT32 buffer_used(text_buffer *text)
     available in the buffer
 -------------------------------------------------*/
 
-INLINE INT32 buffer_space(text_buffer *text)
+static inline INT32 buffer_space(text_buffer *text)
 {
 	return text->bufsize - buffer_used(text);
 }

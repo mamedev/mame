@@ -561,7 +561,7 @@ READ16_MEMBER( namcos2_shared_state::c355_obj_position_r )
 	return m_c355_obj_position[offset];
 }
 
-INLINE UINT8
+static inline UINT8
 nth_byte16( const UINT16 *pSource, int which )
 {
 	UINT16 data = pSource[which/2];
@@ -579,7 +579,7 @@ nth_byte16( const UINT16 *pSource, int which )
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
  */
 #ifdef UNUSED_FUNCTION
-INLINE UINT16
+static inline UINT16
 nth_word32( const UINT32 *pSource, int which )
 {
 	UINT32 data = pSource[which/2];
@@ -598,7 +598,7 @@ nth_word32( const UINT32 *pSource, int which )
  * read from 32-bit aligned memory as if it were an array of bytes.
  */
 #ifdef UNUSED_FUNCTION
-INLINE UINT8
+static inline UINT8
 nth_byte32( const UINT32 *pSource, int which )
 {
 		UINT32 data = pSource[which/4];

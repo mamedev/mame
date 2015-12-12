@@ -104,7 +104,7 @@ static file_error osd_or_zlib_write(core_file *file, const void *buffer, UINT64 
     works for most platforms
 -------------------------------------------------*/
 
-INLINE int is_directory_separator(char c)
+static inline int is_directory_separator(char c)
 {
 	return (c == '\\' || c == '/' || c == ':');
 }

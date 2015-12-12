@@ -39,7 +39,7 @@ static void set_interfaces(base *d3dptr);
 //  INLINES
 //============================================================
 
-INLINE void convert_present_params(const present_parameters *params, D3DPRESENT_PARAMETERS *d3d9params)
+static inline void convert_present_params(const present_parameters *params, D3DPRESENT_PARAMETERS *d3d9params)
 {
 	memset(d3d9params, 0, sizeof(*d3d9params));
 	d3d9params->BackBufferWidth = params->BackBufferWidth;

@@ -285,7 +285,7 @@ static const raster_info predef_raster_table[] =
     in device is, in fact, a voodoo device
 -------------------------------------------------*/
 
-INLINE voodoo_state *get_safe_token(device_t *device)
+static inline voodoo_state *get_safe_token(device_t *device)
 {
 	assert(device != nullptr);
 	assert((device->type() == VOODOO_1) || (device->type() == VOODOO_2) || (device->type() == VOODOO_BANSHEE) ||  (device->type() == VOODOO_3));
@@ -1426,7 +1426,7 @@ static void recompute_texture_params(tmu_state *t)
 }
 
 
-INLINE INT32 prepare_tmu(tmu_state *t)
+static inline INT32 prepare_tmu(tmu_state *t)
 {
 	INT64 texdx, texdy;
 	INT32 lodbase;

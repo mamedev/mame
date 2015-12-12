@@ -89,7 +89,7 @@ VIDEO_START_MEMBER(amiga_state,amiga_aga)
  *
  *************************************/
 
-INLINE void fetch_sprite_data(amiga_state *state, int scanline, int sprite)
+static inline void fetch_sprite_data(amiga_state *state, int scanline, int sprite)
 {
 	switch((CUSTOM_REG(REG_FMODE) >> 2) & 0x03)
 	{
@@ -217,7 +217,7 @@ static void update_sprite_dma(amiga_state *state, int scanline)
  *
  *************************************/
 
-INLINE UINT32 interleave_sprite_data(UINT16 lobits, UINT16 hibits)
+static inline UINT32 interleave_sprite_data(UINT16 lobits, UINT16 hibits)
 {
 	return (amiga_expand_byte[lobits & 0xff] << 0) | (amiga_expand_byte[lobits >> 8] << 16) |
 			(amiga_expand_byte[hibits & 0xff] << 1) | (amiga_expand_byte[hibits >> 8] << 17);
@@ -332,7 +332,7 @@ static int get_sprite_pixel(amiga_state *state, int x)
  *
  *************************************/
 
-INLINE UINT8 assemble_odd_bitplanes(amiga_state *state, int planes, int obitoffs)
+static inline UINT8 assemble_odd_bitplanes(amiga_state *state, int planes, int obitoffs)
 {
 	UINT64 *aga_bpldat = state->m_aga_bpldat;
 	UINT8 pix = (aga_bpldat[0] >> obitoffs) & 1;
@@ -350,7 +350,7 @@ INLINE UINT8 assemble_odd_bitplanes(amiga_state *state, int planes, int obitoffs
 }
 
 
-INLINE UINT8 assemble_even_bitplanes(amiga_state *state, int planes, int ebitoffs)
+static inline UINT8 assemble_even_bitplanes(amiga_state *state, int planes, int ebitoffs)
 {
 	UINT8 pix = 0;
 	if (planes >= 2)
@@ -371,7 +371,7 @@ INLINE UINT8 assemble_even_bitplanes(amiga_state *state, int planes, int ebitoff
 	return pix;
 }
 
-INLINE void fetch_bitplane_data(amiga_state *state, int plane)
+static inline void fetch_bitplane_data(amiga_state *state, int plane)
 {
 	UINT64 *aga_bpldat = state->m_aga_bpldat;
 
@@ -409,7 +409,7 @@ INLINE void fetch_bitplane_data(amiga_state *state, int plane)
  *
  *************************************/
 
-INLINE rgb_t update_ham(amiga_state *state, int newpix)
+static inline rgb_t update_ham(amiga_state *state, int newpix)
 {
 	switch (newpix & 0x03)
 	{

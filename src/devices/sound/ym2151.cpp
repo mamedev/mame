@@ -753,7 +753,7 @@ static void init_chip_tables(YM2151 *chip)
 		}                                                       \
 }
 
-INLINE void envelope_KONKOFF(YM2151 *PSG, YM2151Operator * op, int v)
+static inline void envelope_KONKOFF(YM2151 *PSG, YM2151Operator * op, int v)
 {
 	if (v&0x08) /* M1 */
 		KEY_ON (op+0, 1)
@@ -857,7 +857,7 @@ static TIMER_CALLBACK( timer_callback_chip_busy )
 
 
 
-INLINE void set_connect(YM2151 *PSG, YM2151Operator *om1, int cha, int v)
+static inline void set_connect(YM2151 *PSG, YM2151Operator *om1, int cha, int v)
 {
 	YM2151Operator *om2 = om1+1;
 	YM2151Operator *oc1 = om1+2;
@@ -949,7 +949,7 @@ INLINE void set_connect(YM2151 *PSG, YM2151Operator *om1, int cha, int v)
 }
 
 
-INLINE void refresh_EG(YM2151Operator * op)
+static inline void refresh_EG(YM2151Operator * op)
 {
 	UINT32 kc;
 	UINT32 v;
@@ -1650,7 +1650,7 @@ void ym2151_reset_chip(void *_chip)
 
 
 
-INLINE signed int op_calc(YM2151Operator * OP, unsigned int env, signed int pm)
+static inline signed int op_calc(YM2151Operator * OP, unsigned int env, signed int pm)
 {
 	UINT32 p;
 
@@ -1663,7 +1663,7 @@ INLINE signed int op_calc(YM2151Operator * OP, unsigned int env, signed int pm)
 	return tl_tab[p];
 }
 
-INLINE signed int op_calc1(YM2151Operator * OP, unsigned int env, signed int pm)
+static inline signed int op_calc1(YM2151Operator * OP, unsigned int env, signed int pm)
 {
 	UINT32 p;
 	INT32  i;
@@ -1687,7 +1687,7 @@ INLINE signed int op_calc1(YM2151Operator * OP, unsigned int env, signed int pm)
 
 #define volume_calc(OP) ((OP)->tl + ((UINT32)(OP)->volume) + (AM & (OP)->AMmask))
 
-INLINE void chan_calc(YM2151 *PSG, unsigned int chan)
+static inline void chan_calc(YM2151 *PSG, unsigned int chan)
 {
 	YM2151Operator *op;
 	unsigned int env;
@@ -1737,7 +1737,7 @@ INLINE void chan_calc(YM2151 *PSG, unsigned int chan)
 	op->mem_value = PSG->mem;
 }
 
-INLINE void chan7_calc(YM2151 *PSG)
+static inline void chan7_calc(YM2151 *PSG)
 {
 	YM2151Operator *op;
 	unsigned int env;
@@ -2007,7 +2007,7 @@ rate 11 1         |
                                  --
 */
 
-INLINE void advance_eg(YM2151 *PSG)
+static inline void advance_eg(YM2151 *PSG)
 {
 	YM2151Operator *op;
 	unsigned int i;
@@ -2091,7 +2091,7 @@ INLINE void advance_eg(YM2151 *PSG)
 }
 
 
-INLINE void advance(YM2151 *PSG)
+static inline void advance(YM2151 *PSG)
 {
 	YM2151Operator *op;
 	unsigned int i;
@@ -2275,7 +2275,7 @@ INLINE void advance(YM2151 *PSG)
 }
 
 #if 0
-INLINE signed int acc_calc(signed int value)
+static inline signed int acc_calc(signed int value)
 {
 	if (value>=0)
 	{

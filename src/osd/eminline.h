@@ -19,7 +19,7 @@
 #if defined(__i386__) || defined(__x86_64__)
 
 
-INLINE void ATTR_FORCE_INLINE
+static inline void ATTR_FORCE_INLINE
 osd_yield_processor(void)
 {
 	__asm__ __volatile__ ( " rep ; nop ;" );
@@ -32,7 +32,7 @@ osd_yield_processor(void)
 //  osd_exchange64
 //============================================================
 
-INLINE INT64 ATTR_UNUSED ATTR_NONNULL(1) ATTR_FORCE_INLINE
+static inline INT64 ATTR_UNUSED ATTR_NONNULL(1) ATTR_FORCE_INLINE
 _osd_exchange64(INT64 volatile *ptr, INT64 exchange)
 {
 	INT64 ret;
@@ -52,7 +52,7 @@ _osd_exchange64(INT64 volatile *ptr, INT64 exchange)
 #elif defined(__ppc__) || defined (__PPC__) || defined(__ppc64__) || defined(__PPC64__)
 
 
-INLINE void ATTR_FORCE_INLINE
+static inline void ATTR_FORCE_INLINE
 osd_yield_processor(void)
 {
 	__asm__ __volatile__ ( " nop \n nop \n" );
@@ -66,7 +66,7 @@ osd_yield_processor(void)
 //  osd_exchange64
 //============================================================
 
-INLINE INT64 ATTR_UNUSED ATTR_NONNULL(1) ATTR_FORCE_INLINE
+static inline INT64 ATTR_UNUSED ATTR_NONNULL(1) ATTR_FORCE_INLINE
 _osd_exchange64(INT64 volatile *ptr, INT64 exchange)
 {
 	INT64 ret;
@@ -152,7 +152,7 @@ INT64 win_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 -------------------------------------------------*/
 
 #ifndef mul_32x32
-INLINE INT64 mul_32x32(INT32 a, INT32 b)
+static inline INT64 mul_32x32(INT32 a, INT32 b)
 {
 	return (INT64)a * (INT64)b;
 }
@@ -166,7 +166,7 @@ INLINE INT64 mul_32x32(INT32 a, INT32 b)
 -------------------------------------------------*/
 
 #ifndef mulu_32x32
-INLINE UINT64 mulu_32x32(UINT32 a, UINT32 b)
+static inline UINT64 mulu_32x32(UINT32 a, UINT32 b)
 {
 	return (UINT64)a * (UINT64)b;
 }
@@ -180,7 +180,7 @@ INLINE UINT64 mulu_32x32(UINT32 a, UINT32 b)
 -------------------------------------------------*/
 
 #ifndef mul_32x32_hi
-INLINE INT32 mul_32x32_hi(INT32 a, INT32 b)
+static inline INT32 mul_32x32_hi(INT32 a, INT32 b)
 {
 	return (UINT32)(((INT64)a * (INT64)b) >> 32);
 }
@@ -194,7 +194,7 @@ INLINE INT32 mul_32x32_hi(INT32 a, INT32 b)
 -------------------------------------------------*/
 
 #ifndef mulu_32x32_hi
-INLINE UINT32 mulu_32x32_hi(UINT32 a, UINT32 b)
+static inline UINT32 mulu_32x32_hi(UINT32 a, UINT32 b)
 {
 	return (UINT32)(((UINT64)a * (UINT64)b) >> 32);
 }
@@ -209,7 +209,7 @@ INLINE UINT32 mulu_32x32_hi(UINT32 a, UINT32 b)
 -------------------------------------------------*/
 
 #ifndef mul_32x32_shift
-INLINE INT32 mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
+static inline INT32 mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 {
 	return (INT32)(((INT64)a * (INT64)b) >> shift);
 }
@@ -224,7 +224,7 @@ INLINE INT32 mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 -------------------------------------------------*/
 
 #ifndef mulu_32x32_shift
-INLINE UINT32 mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
+static inline UINT32 mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 {
 	return (UINT32)(((UINT64)a * (UINT64)b) >> shift);
 }
@@ -237,7 +237,7 @@ INLINE UINT32 mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 -------------------------------------------------*/
 
 #ifndef div_64x32
-INLINE INT32 div_64x32(INT64 a, INT32 b)
+static inline INT32 div_64x32(INT64 a, INT32 b)
 {
 	return a / (INT64)b;
 }
@@ -250,7 +250,7 @@ INLINE INT32 div_64x32(INT64 a, INT32 b)
 -------------------------------------------------*/
 
 #ifndef divu_64x32
-INLINE UINT32 divu_64x32(UINT64 a, UINT32 b)
+static inline UINT32 divu_64x32(UINT64 a, UINT32 b)
 {
 	return a / (UINT64)b;
 }
@@ -264,7 +264,7 @@ INLINE UINT32 divu_64x32(UINT64 a, UINT32 b)
 -------------------------------------------------*/
 
 #ifndef div_64x32_rem
-INLINE INT32 div_64x32_rem(INT64 a, INT32 b, INT32 *remainder)
+static inline INT32 div_64x32_rem(INT64 a, INT32 b, INT32 *remainder)
 {
 	INT32 res = div_64x32(a, b);
 	*remainder = a - ((INT64)b * res);
@@ -280,7 +280,7 @@ INLINE INT32 div_64x32_rem(INT64 a, INT32 b, INT32 *remainder)
 -------------------------------------------------*/
 
 #ifndef divu_64x32_rem
-INLINE UINT32 divu_64x32_rem(UINT64 a, UINT32 b, UINT32 *remainder)
+static inline UINT32 divu_64x32_rem(UINT64 a, UINT32 b, UINT32 *remainder)
 {
 	UINT32 res = divu_64x32(a, b);
 	*remainder = a - ((UINT64)b * res);
@@ -296,7 +296,7 @@ INLINE UINT32 divu_64x32_rem(UINT64 a, UINT32 b, UINT32 *remainder)
 -------------------------------------------------*/
 
 #ifndef div_32x32_shift
-INLINE INT32 div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
+static inline INT32 div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 {
 	return ((INT64)a << shift) / (INT64)b;
 }
@@ -310,7 +310,7 @@ INLINE INT32 div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 -------------------------------------------------*/
 
 #ifndef divu_32x32_shift
-INLINE UINT32 divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
+static inline UINT32 divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 {
 	return ((UINT64)a << shift) / (UINT64)b;
 }
@@ -323,7 +323,7 @@ INLINE UINT32 divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 -------------------------------------------------*/
 
 #ifndef mod_64x32
-INLINE INT32 mod_64x32(INT64 a, INT32 b)
+static inline INT32 mod_64x32(INT64 a, INT32 b)
 {
 	return a - (b * div_64x32(a, b));
 }
@@ -336,7 +336,7 @@ INLINE INT32 mod_64x32(INT64 a, INT32 b)
 -------------------------------------------------*/
 
 #ifndef modu_64x32
-INLINE UINT32 modu_64x32(UINT64 a, UINT32 b)
+static inline UINT32 modu_64x32(UINT64 a, UINT32 b)
 {
 	return a - (b * divu_64x32(a, b));
 }
@@ -349,7 +349,7 @@ INLINE UINT32 modu_64x32(UINT64 a, UINT32 b)
 -------------------------------------------------*/
 
 #ifndef recip_approx
-INLINE float recip_approx(float value)
+static inline float recip_approx(float value)
 {
 	return 1.0f / value;
 }
@@ -367,7 +367,7 @@ INLINE float recip_approx(float value)
 -------------------------------------------------*/
 
 #ifndef count_leading_zeros
-INLINE UINT8 count_leading_zeros(UINT32 val)
+static inline UINT8 count_leading_zeros(UINT32 val)
 {
 	UINT8 count;
 	for (count = 0; (INT32)val >= 0; count++) val <<= 1;
@@ -382,7 +382,7 @@ INLINE UINT8 count_leading_zeros(UINT32 val)
 -------------------------------------------------*/
 
 #ifndef count_leading_ones
-INLINE UINT8 count_leading_ones(UINT32 val)
+static inline UINT8 count_leading_ones(UINT32 val)
 {
 	UINT8 count;
 	for (count = 0; (INT32)val < 0; count++) val <<= 1;
@@ -409,7 +409,7 @@ INLINE UINT8 count_leading_ones(UINT32 val)
 -------------------------------------------------*/
 
 #ifndef compare_exchange32
-INLINE INT32 compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
+static inline INT32 compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 {
 	INT32 oldval = *ptr;
 	if (*ptr == compare)
@@ -433,7 +433,7 @@ INLINE INT32 compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchan
 
 #ifdef PTR64
 #ifndef compare_exchange64
-INLINE INT64 compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
+static inline INT64 compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 {
 	INT64 oldval = *ptr;
 	if (*ptr == compare)
@@ -452,7 +452,7 @@ INLINE INT64 compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchan
 -------------------------------------------------*/
 
 #ifndef compare_exchange_ptr
-INLINE void *compare_exchange_ptr(void * volatile *ptr, void *compare, void *exchange)
+static inline void *compare_exchange_ptr(void * volatile *ptr, void *compare, void *exchange)
 {
 #ifdef PTR64
 	INT64 result;
@@ -478,7 +478,7 @@ INLINE void *compare_exchange_ptr(void * volatile *ptr, void *compare, void *exc
 -------------------------------------------------*/
 
 #ifndef atomic_exchange32
-INLINE INT32 atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
+static inline INT32 atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 {
 	INT32 oldval = *ptr;
 	*ptr = exchange;
@@ -499,7 +499,7 @@ INLINE INT32 atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 -------------------------------------------------*/
 
 #ifndef atomic_add32
-INLINE INT32 atomic_add32(INT32 volatile *ptr, INT32 delta)
+static inline INT32 atomic_add32(INT32 volatile *ptr, INT32 delta)
 {
 	return (*ptr += delta);
 }
@@ -518,7 +518,7 @@ INLINE INT32 atomic_add32(INT32 volatile *ptr, INT32 delta)
 -------------------------------------------------*/
 
 #ifndef atomic_increment32
-INLINE INT32 atomic_increment32(INT32 volatile *ptr)
+static inline INT32 atomic_increment32(INT32 volatile *ptr)
 {
 	return atomic_add32(ptr, 1);
 }
@@ -537,7 +537,7 @@ INLINE INT32 atomic_increment32(INT32 volatile *ptr)
 -------------------------------------------------*/
 
 #ifndef atomic_decrement32
-INLINE INT32 atomic_decrement32(INT32 volatile *ptr)
+static inline INT32 atomic_decrement32(INT32 volatile *ptr)
 {
 	return atomic_add32(ptr, -1);
 }
@@ -557,7 +557,7 @@ INLINE INT32 atomic_decrement32(INT32 volatile *ptr)
 -------------------------------------------------*/
 
 #ifndef get_profile_ticks
-INLINE INT64 get_profile_ticks(void)
+static inline INT64 get_profile_ticks(void)
 {
 	return osd_ticks();
 }

@@ -168,7 +168,7 @@ static void execute_dumpkbd(running_machine &machine, int ref, int params, const
     given address is valid for cheating
 -------------------------------------------------*/
 
-INLINE int cheat_address_is_valid(address_space &space, offs_t address)
+static inline int cheat_address_is_valid(address_space &space, offs_t address)
 {
 	return debug_cpu_translate(space, TRANSLATE_READ, &address) && (space.get_write_ptr(address) != nullptr);
 }
@@ -179,7 +179,7 @@ INLINE int cheat_address_is_valid(address_space &space, offs_t address)
     the current cheat width, if signed
 -------------------------------------------------*/
 
-INLINE UINT64 cheat_sign_extend(const cheat_system *cheatsys, UINT64 value)
+static inline UINT64 cheat_sign_extend(const cheat_system *cheatsys, UINT64 value)
 {
 	if (cheatsys->signed_cheat)
 	{
@@ -196,7 +196,7 @@ INLINE UINT64 cheat_sign_extend(const cheat_system *cheatsys, UINT64 value)
     cheat_byte_swap - swap a value
 -------------------------------------------------*/
 
-INLINE UINT64 cheat_byte_swap(const cheat_system *cheatsys, UINT64 value)
+static inline UINT64 cheat_byte_swap(const cheat_system *cheatsys, UINT64 value)
 {
 	if (cheatsys->swapped_cheat)
 	{
@@ -217,7 +217,7 @@ INLINE UINT64 cheat_byte_swap(const cheat_system *cheatsys, UINT64 value)
     and swapping if necessary
 -------------------------------------------------*/
 
-INLINE UINT64 cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address)
+static inline UINT64 cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address)
 {
 	return cheat_sign_extend(cheatsys, cheat_byte_swap(cheatsys, debug_read_memory(space, address, cheatsys->width, TRUE)));
 }

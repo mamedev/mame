@@ -53,51 +53,51 @@ static const int samples[] = { 1, 0, 3, 1, 2, 0, 4 };
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE UINT8 fetch_8bit(UINT8 *v)
+static inline UINT8 fetch_8bit(UINT8 *v)
 {
 	return *v;
 }
 
 
 #ifdef UNUSED_FUNCTION
-INLINE UINT16 fetch_16bit(UINT8 *v)
+static inline UINT16 fetch_16bit(UINT8 *v)
 {
 	return BIG_ENDIANIZE_INT16(*(UINT16 *)v);
 }
 #endif
 
-INLINE UINT32 fetch_32bit(UINT8 *v)
+static inline UINT32 fetch_32bit(UINT8 *v)
 {
 	return BIG_ENDIANIZE_INT32(*(UINT32 *)v);
 }
 
 
-INLINE void put_8bit(UINT8 *v, UINT8 data)
+static inline void put_8bit(UINT8 *v, UINT8 data)
 {
 	*v = data;
 }
 
 
 #ifdef UNUSED_FUNCTION
-INLINE void put_16bit(UINT8 *v, UINT16 data)
+static inline void put_16bit(UINT8 *v, UINT16 data)
 {
 	*(UINT16 *)v = BIG_ENDIANIZE_INT16(data);
 }
 #endif
 
-INLINE void put_32bit(UINT8 *v, UINT32 data)
+static inline void put_32bit(UINT8 *v, UINT32 data)
 {
 	*(UINT32 *)v = BIG_ENDIANIZE_INT32(data);
 }
 
 
-INLINE int compute_bpp(const png_info *pnginfo)
+static inline int compute_bpp(const png_info *pnginfo)
 {
 	return samples[pnginfo->color_type] * pnginfo->bit_depth / 8;
 }
 
 
-INLINE int compute_rowbytes(const png_info *pnginfo)
+static inline int compute_rowbytes(const png_info *pnginfo)
 {
 	return (pnginfo->width * samples[pnginfo->color_type] * pnginfo->bit_depth + 7) / 8;
 }

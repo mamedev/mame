@@ -20,7 +20,7 @@
 #define ROL16(val, shift)   ( ((UINT16)val << shift) | ((UINT16)val >> (16 - shift)) )
 #define SWAP16(val)         ( (((UINT16)val << 8) & 0xff00) | ((UINT16)val >> 8) )
 
-INLINE UINT8 reverse_nibble(UINT8 nibble)
+static inline UINT8 reverse_nibble(UINT8 nibble)
 {
 	return  (nibble & 1) << 3 |
 			(nibble & 2) << 1 |
@@ -402,7 +402,7 @@ enum
 
 #define TX1_SET_INS0_BIT    do { if (!(ins & 0x4) && math.i0ff) ins |= math.i0ff; } while(0)
 
-INLINE UINT16 get_tx1_datarom_addr(math_t &math)
+static inline UINT16 get_tx1_datarom_addr(math_t &math)
 {
 	UINT16 addr;
 
@@ -960,7 +960,7 @@ enum
 
 #define BB_SET_INS0_BIT do { if (!(ins & 0x4) && math.i0ff) ins |= math.i0ff;} while(0)
 
-INLINE UINT16 get_bb_datarom_addr(math_t &math)
+static inline UINT16 get_bb_datarom_addr(math_t &math)
 {
 	UINT16 addr;
 

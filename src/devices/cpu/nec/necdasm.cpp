@@ -875,7 +875,7 @@ static char modrm_string[256];
 
 #define MAX_LENGTH  8
 
-INLINE UINT8 FETCH(void)
+static inline UINT8 FETCH(void)
 {
 	if ((opcode_ptr - opcode_ptr_base) + 1 > MAX_LENGTH)
 		return 0xff;
@@ -884,7 +884,7 @@ INLINE UINT8 FETCH(void)
 }
 
 #if 0
-INLINE UINT16 FETCH16(void)
+static inline UINT16 FETCH16(void)
 {
 	UINT16 d;
 	if ((opcode_ptr - opcode_ptr_base) + 2 > MAX_LENGTH)
@@ -896,7 +896,7 @@ INLINE UINT16 FETCH16(void)
 }
 #endif
 
-INLINE UINT8 FETCHD(void)
+static inline UINT8 FETCHD(void)
 {
 	if ((opcode_ptr - opcode_ptr_base) + 1 > MAX_LENGTH)
 		return 0xff;
@@ -904,7 +904,7 @@ INLINE UINT8 FETCHD(void)
 	return *opcode_ptr++;
 }
 
-INLINE UINT16 FETCHD16(void)
+static inline UINT16 FETCHD16(void)
 {
 	UINT16 d;
 	if ((opcode_ptr - opcode_ptr_base) + 2 > MAX_LENGTH)

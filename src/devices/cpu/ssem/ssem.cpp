@@ -25,7 +25,7 @@ CPU_DISASSEMBLE( ssem );
 // The de facto snapshot format for other SSEM simulators stores the data physically in that format as well.
 // Therefore, in MESS, every 32-bit word has its bits reversed, too, and as a result the values must be
 // un-reversed before being used.
-INLINE UINT32 reverse(UINT32 v)
+static inline UINT32 reverse(UINT32 v)
 {
 	// Taken from http://www-graphics.stanford.edu/~seander/bithacks.html#ReverseParallel
 	// swap odd and even bits

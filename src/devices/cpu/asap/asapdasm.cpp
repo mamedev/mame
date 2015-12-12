@@ -35,7 +35,7 @@ static const char *const condition[16] =
     CODE CODE
 ***************************************************************************/
 
-INLINE char *src2(UINT32 op, int scale)
+static inline char *src2(UINT32 op, int scale)
 {
 	static char temp[20];
 	if ((op & 0xffe0) == 0xffe0)

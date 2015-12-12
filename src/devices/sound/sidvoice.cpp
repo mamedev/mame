@@ -48,7 +48,7 @@ void sidInitMixerEngine(running_machine &machine)
 
 }
 
-INLINE void waveAdvance(sidOperator* pVoice)
+static inline void waveAdvance(sidOperator* pVoice)
 {
 #if defined(DIRECT_FIXPOINT)
 	pVoice->waveStep.l += pVoice->waveStepAdd.l;
@@ -62,7 +62,7 @@ INLINE void waveAdvance(sidOperator* pVoice)
 #endif
 }
 
-INLINE void noiseAdvance(sidOperator* pVoice)
+static inline void noiseAdvance(sidOperator* pVoice)
 {
 	pVoice->noiseStep += pVoice->noiseStepAdd;
 	if (pVoice->noiseStep >= (1L<<20))
@@ -90,7 +90,7 @@ INLINE void noiseAdvance(sidOperator* pVoice)
 	}
 }
 
-INLINE void noiseAdvanceHp(sidOperator* pVoice)
+static inline void noiseAdvanceHp(sidOperator* pVoice)
 {
 	UINT32 tmp = pVoice->noiseStepAdd;
 	while (tmp >= (1L<<20))
@@ -274,7 +274,7 @@ static void sidMode74(sidOperator* pVoice)  {
 /* */
 /* */
 
-INLINE void waveCalcCycleLen(sidOperator* pVoice)
+static inline void waveCalcCycleLen(sidOperator* pVoice)
 {
 #if defined(DIRECT_FIXPOINT)
 	pVoice->cycleAddLen.w[HI] = 0;
@@ -326,7 +326,7 @@ INLINE void waveCalcCycleLen(sidOperator* pVoice)
 	}  /* see above (opening bracket) */
 }
 
-INLINE void waveCalcFilter(sidOperator* pVoice)
+static inline void waveCalcFilter(sidOperator* pVoice)
 {
 	if ( pVoice->filtEnabled )
 	{

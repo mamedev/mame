@@ -17,7 +17,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{
@@ -835,12 +835,12 @@ void cxhumax_state::video_start()
     The document also contains the constants below as floats.
 --------------------------------------------------------------------------*/
 
-INLINE UINT8 clamp16_shift8(UINT32 x)
+static inline UINT8 clamp16_shift8(UINT32 x)
 {
 	return (((INT32) x < 0) ? 0 : (x > 65535 ? 255: x >> 8));
 }
 
-INLINE UINT32 ycc_to_rgb(UINT32 ycc)
+static inline UINT32 ycc_to_rgb(UINT32 ycc)
 {
 	/* original equations:
 

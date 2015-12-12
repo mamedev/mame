@@ -41,13 +41,13 @@ struct UINT32BE
 	UINT8 bytes[4];
 };
 
-INLINE UINT32 get_UINT32BE(UINT32BE word)
+static inline UINT32 get_UINT32BE(UINT32BE word)
 {
 	return (word.bytes[0] << 24) | (word.bytes[1] << 16) | (word.bytes[2] << 8) | word.bytes[3];
 }
 
 #ifdef UNUSED_FUNCTION
-INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
+static inline void set_UINT32BE(UINT32BE *word, UINT32 data)
 {
 	word->bytes[0] = (data >> 24) & 0xff;
 	word->bytes[1] = (data >> 16) & 0xff;

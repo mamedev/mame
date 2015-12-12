@@ -471,7 +471,7 @@ static void printf_chunk_recursive(avi_file *file, avi_chunk *chunk, int indent)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE UINT16 fetch_16bits(const UINT8 *data)
+ * @fn  static inline UINT16 fetch_16bits(const UINT8 *data)
  *
  * @brief   Fetches the 16bits.
  *
@@ -480,7 +480,7 @@ static void printf_chunk_recursive(avi_file *file, avi_chunk *chunk, int indent)
  * @return  The 16bits.
  */
 
-INLINE UINT16 fetch_16bits(const UINT8 *data)
+static inline UINT16 fetch_16bits(const UINT8 *data)
 {
 	return data[0] | (data[1] << 8);
 }
@@ -492,7 +492,7 @@ INLINE UINT16 fetch_16bits(const UINT8 *data)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE UINT32 fetch_32bits(const UINT8 *data)
+ * @fn  static inline UINT32 fetch_32bits(const UINT8 *data)
  *
  * @brief   Fetches the 32bits.
  *
@@ -501,7 +501,7 @@ INLINE UINT16 fetch_16bits(const UINT8 *data)
  * @return  The 32bits.
  */
 
-INLINE UINT32 fetch_32bits(const UINT8 *data)
+static inline UINT32 fetch_32bits(const UINT8 *data)
 {
 	return data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
 }
@@ -513,7 +513,7 @@ INLINE UINT32 fetch_32bits(const UINT8 *data)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE UINT64 fetch_64bits(const UINT8 *data)
+ * @fn  static inline UINT64 fetch_64bits(const UINT8 *data)
  *
  * @brief   Fetches the 64bits.
  *
@@ -522,7 +522,7 @@ INLINE UINT32 fetch_32bits(const UINT8 *data)
  * @return  The 64bits.
  */
 
-INLINE UINT64 fetch_64bits(const UINT8 *data)
+static inline UINT64 fetch_64bits(const UINT8 *data)
 {
 	return (UINT64)data[0] | ((UINT64)data[1] << 8) |
 			((UINT64)data[2] << 16) | ((UINT64)data[3] << 24) |
@@ -537,7 +537,7 @@ INLINE UINT64 fetch_64bits(const UINT8 *data)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE void put_16bits(UINT8 *data, UINT16 value)
+ * @fn  static inline void put_16bits(UINT8 *data, UINT16 value)
  *
  * @brief   Puts the 16bits.
  *
@@ -545,7 +545,7 @@ INLINE UINT64 fetch_64bits(const UINT8 *data)
  * @param   value           The value.
  */
 
-INLINE void put_16bits(UINT8 *data, UINT16 value)
+static inline void put_16bits(UINT8 *data, UINT16 value)
 {
 	data[0] = value >> 0;
 	data[1] = value >> 8;
@@ -558,7 +558,7 @@ INLINE void put_16bits(UINT8 *data, UINT16 value)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE void put_32bits(UINT8 *data, UINT32 value)
+ * @fn  static inline void put_32bits(UINT8 *data, UINT32 value)
  *
  * @brief   Puts the 32bits.
  *
@@ -566,7 +566,7 @@ INLINE void put_16bits(UINT8 *data, UINT16 value)
  * @param   value           The value.
  */
 
-INLINE void put_32bits(UINT8 *data, UINT32 value)
+static inline void put_32bits(UINT8 *data, UINT32 value)
 {
 	data[0] = value >> 0;
 	data[1] = value >> 8;
@@ -581,7 +581,7 @@ INLINE void put_32bits(UINT8 *data, UINT32 value)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE void put_64bits(UINT8 *data, UINT64 value)
+ * @fn  static inline void put_64bits(UINT8 *data, UINT64 value)
  *
  * @brief   Puts the 64bits.
  *
@@ -589,7 +589,7 @@ INLINE void put_32bits(UINT8 *data, UINT32 value)
  * @param   value           The value.
  */
 
-INLINE void put_64bits(UINT8 *data, UINT64 value)
+static inline void put_64bits(UINT8 *data, UINT64 value)
 {
 	data[0] = value >> 0;
 	data[1] = value >> 8;
@@ -608,7 +608,7 @@ INLINE void put_64bits(UINT8 *data, UINT64 value)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE avi_stream *get_video_stream(avi_file *file)
+ * @fn  static inline avi_stream *get_video_stream(avi_file *file)
  *
  * @brief   Gets video stream.
  *
@@ -617,7 +617,7 @@ INLINE void put_64bits(UINT8 *data, UINT64 value)
  * @return  null if it fails, else the video stream.
  */
 
-INLINE avi_stream *get_video_stream(avi_file *file)
+static inline avi_stream *get_video_stream(avi_file *file)
 {
 	int streamnum;
 
@@ -636,7 +636,7 @@ INLINE avi_stream *get_video_stream(avi_file *file)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE avi_stream *get_audio_stream(avi_file *file, int channel, int *offset)
+ * @fn  static inline avi_stream *get_audio_stream(avi_file *file, int channel, int *offset)
  *
  * @brief   Gets audio stream.
  *
@@ -647,7 +647,7 @@ INLINE avi_stream *get_video_stream(avi_file *file)
  * @return  null if it fails, else the audio stream.
  */
 
-INLINE avi_stream *get_audio_stream(avi_file *file, int channel, int *offset)
+static inline avi_stream *get_audio_stream(avi_file *file, int channel, int *offset)
 {
 	int streamnum;
 
@@ -674,7 +674,7 @@ INLINE avi_stream *get_audio_stream(avi_file *file, int channel, int *offset)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 offset, UINT32 length)
+ * @fn  static inline avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 offset, UINT32 length)
  *
  * @brief   Sets stream chunk information.
  *
@@ -686,7 +686,7 @@ INLINE avi_stream *get_audio_stream(avi_file *file, int channel, int *offset)
  * @return  An avi_error.
  */
 
-INLINE avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 offset, UINT32 length)
+static inline avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 offset, UINT32 length)
 {
 	/* if we need to allocate more, allocate more */
 	if (index >= stream->chunksalloc)
@@ -720,7 +720,7 @@ INLINE avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE UINT32 compute_idx1_size(avi_file *file)
+ * @fn  static inline UINT32 compute_idx1_size(avi_file *file)
  *
  * @brief   Calculates the index 1 size.
  *
@@ -729,7 +729,7 @@ INLINE avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 
  * @return  The calculated index 1 size.
  */
 
-INLINE UINT32 compute_idx1_size(avi_file *file)
+static inline UINT32 compute_idx1_size(avi_file *file)
 {
 	int chunks = 0;
 	int strnum;
@@ -748,7 +748,7 @@ INLINE UINT32 compute_idx1_size(avi_file *file)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE UINT32 get_chunkid_for_stream(avi_file *file, avi_stream *stream)
+ * @fn  static inline UINT32 get_chunkid_for_stream(avi_file *file, avi_stream *stream)
  *
  * @brief   Gets chunkid for stream.
  *
@@ -758,7 +758,7 @@ INLINE UINT32 compute_idx1_size(avi_file *file)
  * @return  The chunkid for stream.
  */
 
-INLINE UINT32 get_chunkid_for_stream(avi_file *file, avi_stream *stream)
+static inline UINT32 get_chunkid_for_stream(avi_file *file, avi_stream *stream)
 {
 	UINT32 chunkid;
 
@@ -778,7 +778,7 @@ INLINE UINT32 get_chunkid_for_stream(avi_file *file, avi_stream *stream)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE UINT32 framenum_to_samplenum(avi_file *file, UINT32 framenum)
+ * @fn  static inline UINT32 framenum_to_samplenum(avi_file *file, UINT32 framenum)
  *
  * @brief   Framenum to samplenum.
  *
@@ -788,7 +788,7 @@ INLINE UINT32 get_chunkid_for_stream(avi_file *file, avi_stream *stream)
  * @return  An UINT32.
  */
 
-INLINE UINT32 framenum_to_samplenum(avi_file *file, UINT32 framenum)
+static inline UINT32 framenum_to_samplenum(avi_file *file, UINT32 framenum)
 {
 	return ((UINT64)file->info.audio_samplerate * (UINT64)framenum * (UINT64)file->info.video_sampletime + file->info.video_timescale - 1) / (UINT64)file->info.video_timescale;
 }
@@ -801,7 +801,7 @@ INLINE UINT32 framenum_to_samplenum(avi_file *file, UINT32 framenum)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE avi_error expand_tempbuffer(avi_file *file, UINT32 length)
+ * @fn  static inline avi_error expand_tempbuffer(avi_file *file, UINT32 length)
  *
  * @brief   Expand tempbuffer.
  *
@@ -811,7 +811,7 @@ INLINE UINT32 framenum_to_samplenum(avi_file *file, UINT32 framenum)
  * @return  An avi_error.
  */
 
-INLINE avi_error expand_tempbuffer(avi_file *file, UINT32 length)
+static inline avi_error expand_tempbuffer(avi_file *file, UINT32 length)
 {
 	/* expand the tempbuffer to hold the data if necessary */
 	if (length > file->tempbuffersize)

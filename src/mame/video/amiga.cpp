@@ -381,7 +381,7 @@ void amiga_sprite_enable_comparitor(running_machine &machine, int which, int ena
  *
  *************************************/
 
-INLINE void fetch_sprite_data(amiga_state *state, int scanline, int sprite)
+static inline void fetch_sprite_data(amiga_state *state, int scanline, int sprite)
 {
 	CUSTOM_REG(REG_SPR0DATA + 4 * sprite) = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
 	CUSTOM_REG(REG_SPR0DATB + 4 * sprite) = state->chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
@@ -457,7 +457,7 @@ static void update_sprite_dma(amiga_state *state, int scanline)
  *
  *************************************/
 
-INLINE UINT32 interleave_sprite_data(UINT16 lobits, UINT16 hibits)
+static inline UINT32 interleave_sprite_data(UINT16 lobits, UINT16 hibits)
 {
 	return (amiga_expand_byte[lobits & 0xff] << 0) | (amiga_expand_byte[lobits >> 8] << 16) |
 			(amiga_expand_byte[hibits & 0xff] << 1) | (amiga_expand_byte[hibits >> 8] << 17);
@@ -557,7 +557,7 @@ static int get_sprite_pixel(amiga_state *state, int x)
  *
  *************************************/
 
-INLINE UINT8 assemble_odd_bitplanes(amiga_state *state, int planes, int obitoffs)
+static inline UINT8 assemble_odd_bitplanes(amiga_state *state, int planes, int obitoffs)
 {
 	UINT8 pix = (CUSTOM_REG(REG_BPL1DAT) >> obitoffs) & 1;
 	if (planes >= 3)
@@ -570,7 +570,7 @@ INLINE UINT8 assemble_odd_bitplanes(amiga_state *state, int planes, int obitoffs
 }
 
 
-INLINE UINT8 assemble_even_bitplanes(amiga_state *state, int planes, int ebitoffs)
+static inline UINT8 assemble_even_bitplanes(amiga_state *state, int planes, int ebitoffs)
 {
 	UINT8 pix = 0;
 	if (planes >= 2)
@@ -586,7 +586,7 @@ INLINE UINT8 assemble_even_bitplanes(amiga_state *state, int planes, int ebitoff
 	return pix;
 }
 
-INLINE void fetch_bitplane_data(amiga_state *state, int plane)
+static inline void fetch_bitplane_data(amiga_state *state, int plane)
 {
 	CUSTOM_REG(REG_BPL1DAT + plane) = state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
 	CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
@@ -599,7 +599,7 @@ INLINE void fetch_bitplane_data(amiga_state *state, int plane)
  *
  *************************************/
 
-INLINE int update_ham(amiga_state *state, int newpix)
+static inline int update_ham(amiga_state *state, int newpix)
 {
 	switch (newpix >> 4)
 	{

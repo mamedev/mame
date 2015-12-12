@@ -427,7 +427,7 @@ int8 nesapu_device::apu_noise(noise_t *chan)
 }
 
 /* RESET DPCM PARAMETERS */
-INLINE void apu_dpcmreset(dpcm_t *chan)
+static inline void apu_dpcmreset(dpcm_t *chan)
 {
 	chan->address = 0xC000 + (uint16) (chan->regs[2] << 6);
 	chan->length = (uint16) (chan->regs[3] << 4) + 1;

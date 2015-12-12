@@ -30,7 +30,7 @@ TODO:
 const device_type MACHINE_CDI68070 = &device_creator<cdi68070_device>;
 
 #if ENABLE_VERBOSE_LOG
-INLINE void ATTR_PRINTF(1,2) verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(1,2) verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{

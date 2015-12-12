@@ -19,7 +19,7 @@
 #define PARENT_FLOPPY_2 "^floppy2"
 #define PARENT_FLOPPY_3 "^floppy3"
 
-INLINE apple525_floppy_image_device *get_device(device_t *device)
+static inline apple525_floppy_image_device *get_device(device_t *device)
 {
 	assert(device != nullptr);
 	assert(device->type() == FLOPPY_APPLE);

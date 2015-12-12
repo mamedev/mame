@@ -55,7 +55,7 @@ static void MixerInit(int threeVoiceAmplify)
 }
 
 
-INLINE void syncEm(SID6581_t *This)
+static inline void syncEm(SID6581_t *This)
 {
 	int sync1 = (This->optr1.modulator->cycleLenCount <= 0);
 	int sync2 = (This->optr2.modulator->cycleLenCount <= 0);

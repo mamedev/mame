@@ -11,7 +11,7 @@
 static int cas_size;
 
 
-INLINE int kim1_output_signal( INT16 *buffer, int sample_pos, int high )
+static inline int kim1_output_signal( INT16 *buffer, int sample_pos, int high )
 {
 	int sample_count, i, j;
 
@@ -62,7 +62,7 @@ INLINE int kim1_output_signal( INT16 *buffer, int sample_pos, int high )
 }
 
 
-INLINE int kim1_output_byte( INT16 *buffer, int sample_pos, UINT8 byte )
+static inline int kim1_output_byte( INT16 *buffer, int sample_pos, UINT8 byte )
 {
 	int i;
 	int sample_count = 0;

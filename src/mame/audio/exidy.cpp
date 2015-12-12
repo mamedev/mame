@@ -55,7 +55,7 @@ WRITE_LINE_MEMBER( exidy_sound_device::update_irq_state )
  *
  *************************************/
 
-INLINE void sh6840_apply_clock(struct sh6840_timer_channel *t, int clocks)
+static inline void sh6840_apply_clock(struct sh6840_timer_channel *t, int clocks)
 {
 	/* dual 8-bit case */
 	if (t->cr & 0x04)

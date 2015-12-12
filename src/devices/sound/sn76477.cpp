@@ -265,13 +265,13 @@ void sn76477_device::device_stop()
 #undef max
 #undef min
 
-INLINE double max(double a, double b)
+static inline double max(double a, double b)
 {
 	return (a > b) ? a : b;
 }
 
 
-INLINE double min(double a, double b)
+static inline double min(double a, double b)
 {
 	return (a < b) ? a : b;
 }

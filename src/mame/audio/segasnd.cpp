@@ -37,21 +37,21 @@
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE void configure_filter(g80_filter_state *state, double r, double c)
+static inline void configure_filter(g80_filter_state *state, double r, double c)
 {
 	state->capval = 0;
 	state->exponent = 1.0 - exp(-1.0 / (r * c * SAMPLE_RATE));
 }
 
 
-INLINE double step_rc_filter(g80_filter_state *state, double input)
+static inline double step_rc_filter(g80_filter_state *state, double input)
 {
 	state->capval += (input - state->capval) * state->exponent;
 	return state->capval;
 }
 
 
-INLINE double step_cr_filter(g80_filter_state *state, double input)
+static inline double step_cr_filter(g80_filter_state *state, double input)
 {
 	double result = (input - state->capval);
 	state->capval += (input - state->capval) * state->exponent;
@@ -503,7 +503,7 @@ READ8_MEMBER( usb_sound_device::t1_r )
  *
  *************************************/
 
-INLINE void clock_channel(timer8253_channel *ch)
+static inline void clock_channel(timer8253_channel *ch)
 {
 	UINT8 lastgate = ch->lastgate;
 

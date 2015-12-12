@@ -760,14 +760,14 @@ static const float dot3_tex_table[32] =
 		0.266666f,  0.300000f,  0.333333f,  0.366666f,  0.400000f,  0.433333f,  0.466666f,  0.500000f,
 };
 
-INLINE float dot_product_vec3(VECTOR3 a, VECTOR3 b)
+static inline float dot_product_vec3(VECTOR3 a, VECTOR3 b)
 {
 	return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]);
 }
 
 // Fast inverse square-root
 // Adapted from http://en.wikipedia.org/wiki/Fast_inverse_square_root
-INLINE float finvsqrt(float number)
+static inline float finvsqrt(float number)
 {
 	UINT32 i;
 	float x2, y;
@@ -783,7 +783,7 @@ INLINE float finvsqrt(float number)
 }
 
 #if 0
-INLINE void normalize_vec3(VECTOR3 *v)
+static inline void normalize_vec3(VECTOR3 *v)
 {
 	float l = finvsqrt(*v[0] * *v[0] + *v[1] * *v[1] + *v[2] * *v[2]);
 	*v[0] *= l;
@@ -792,7 +792,7 @@ INLINE void normalize_vec3(VECTOR3 *v)
 }
 #endif
 
-INLINE float clamp_pos(float v)
+static inline float clamp_pos(float v)
 {
 	if (v < 0.0f)
 		return 0.0f;
@@ -800,7 +800,7 @@ INLINE float clamp_pos(float v)
 		return v;
 }
 
-INLINE UINT32 generate_texel_address(int iu, int iv)
+static inline UINT32 generate_texel_address(int iu, int iv)
 {
 	// generate texel address from U and V
 	UINT32 addr = 0;
@@ -1074,7 +1074,7 @@ void taitotz_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 	}
 }
 
-INLINE int is_point_inside(float x, float y, float z, PLANE cp)
+static inline int is_point_inside(float x, float y, float z, PLANE cp)
 {
 	float s = (x * cp.x) + (y * cp.y) + (z * cp.z) + cp.d;
 	if (s >= 0.0f)

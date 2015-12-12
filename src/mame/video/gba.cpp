@@ -15,7 +15,7 @@
 
 #define VERBOSE_LEVEL   (0)
 
-INLINE void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -34,9 +34,9 @@ static const int coeff[32] = {
 };
 
 /* Utility functions */
-INLINE UINT32 alpha_blend_pixel(UINT32 color0, UINT32 color1, int ca, int cb);
-INLINE UINT32 increase_brightness(UINT32 color, int coeff_);
-INLINE UINT32 decrease_brightness(UINT32 color, int coeff_);
+static inline UINT32 alpha_blend_pixel(UINT32 color0, UINT32 color1, int ca, int cb);
+static inline UINT32 increase_brightness(UINT32 color, int coeff_);
+static inline UINT32 decrease_brightness(UINT32 color, int coeff_);
 
 #define GBA_MODE0    0
 #define GBA_MODE1    1
@@ -1776,7 +1776,7 @@ inline int gba_state::is_in_window(int x, int window)
 	return 0;
 }
 
-INLINE UINT32 alpha_blend_pixel(UINT32 color0, UINT32 color1, int ca, int cb)
+static inline UINT32 alpha_blend_pixel(UINT32 color0, UINT32 color1, int ca, int cb)
 {
 	if(color0 < 0x80000000)
 	{
@@ -1799,7 +1799,7 @@ INLINE UINT32 alpha_blend_pixel(UINT32 color0, UINT32 color1, int ca, int cb)
 	return color0;
 }
 
-INLINE UINT32 increase_brightness(UINT32 color, int coeff_)
+static inline UINT32 increase_brightness(UINT32 color, int coeff_)
 {
 	int r = (color >>  0) & 0x1f;
 	int g = (color >>  5) & 0x1f;
@@ -1816,7 +1816,7 @@ INLINE UINT32 increase_brightness(UINT32 color, int coeff_)
 	return (color & 0xffff0000) | (b << 10) | (g << 5) | r;
 }
 
-INLINE UINT32 decrease_brightness(UINT32 color, int coeff_)
+static inline UINT32 decrease_brightness(UINT32 color, int coeff_)
 {
 	int r = (color >>  0) & 0x1f;
 	int g = (color >>  5) & 0x1f;

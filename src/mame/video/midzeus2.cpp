@@ -165,20 +165,20 @@ static int subregwrite_count[0x100];
  *
  *************************************/
 
-INLINE void *waveram0_ptr_from_expanded_addr(UINT32 addr)
+static inline void *waveram0_ptr_from_expanded_addr(UINT32 addr)
 {
 	UINT32 blocknum = (addr % WAVERAM0_WIDTH) + ((addr >> 16) % WAVERAM0_HEIGHT) * WAVERAM0_WIDTH;
 	return WAVERAM_BLOCK0(blocknum);
 }
 
-INLINE void *waveram1_ptr_from_expanded_addr(UINT32 addr)
+static inline void *waveram1_ptr_from_expanded_addr(UINT32 addr)
 {
 	UINT32 blocknum = (addr % WAVERAM1_WIDTH) + ((addr >> 16) % WAVERAM1_HEIGHT) * WAVERAM1_WIDTH;
 	return WAVERAM_BLOCK1(blocknum);
 }
 
 #ifdef UNUSED_FUNCTION
-INLINE void *waveram0_ptr_from_texture_addr(UINT32 addr, int width)
+static inline void *waveram0_ptr_from_texture_addr(UINT32 addr, int width)
 {
 	UINT32 blocknum = ((addr & ~1) * width) / 8;
 	return WAVERAM_BLOCK0(blocknum);
@@ -193,14 +193,14 @@ INLINE void *waveram0_ptr_from_texture_addr(UINT32 addr, int width)
  *************************************/
 
 #ifdef UNUSED_FUNCTION
-INLINE void waveram_plot(int y, int x, UINT32 color)
+static inline void waveram_plot(int y, int x, UINT32 color)
 {
 	if (zeus_cliprect.contains(x, y))
 		WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
 }
 #endif
 
-INLINE void waveram_plot_depth(int y, int x, UINT32 color, UINT16 depth)
+static inline void waveram_plot_depth(int y, int x, UINT32 color, UINT16 depth)
 {
 	if (zeus_cliprect.contains(x, y))
 	{
@@ -210,7 +210,7 @@ INLINE void waveram_plot_depth(int y, int x, UINT32 color, UINT16 depth)
 }
 
 #ifdef UNUSED_FUNCTION
-INLINE void waveram_plot_check_depth(int y, int x, UINT32 color, UINT16 depth)
+static inline void waveram_plot_check_depth(int y, int x, UINT32 color, UINT16 depth)
 {
 	if (zeus_cliprect.contains(x, y))
 	{
@@ -225,7 +225,7 @@ INLINE void waveram_plot_check_depth(int y, int x, UINT32 color, UINT16 depth)
 #endif
 
 #ifdef UNUSED_FUNCTION
-INLINE void waveram_plot_check_depth_nowrite(int y, int x, UINT32 color, UINT16 depth)
+static inline void waveram_plot_check_depth_nowrite(int y, int x, UINT32 color, UINT16 depth)
 {
 	if (zeus_cliprect.contains(x, y))
 	{
@@ -243,7 +243,7 @@ INLINE void waveram_plot_check_depth_nowrite(int y, int x, UINT32 color, UINT16 
  *
  *************************************/
 
-INLINE UINT8 get_texel_8bit(const void *base, int y, int x, int width)
+static inline UINT8 get_texel_8bit(const void *base, int y, int x, int width)
 {
 	UINT32 byteoffs = (y / 2) * (width * 2) + ((x / 4) << 3) + ((y & 1) << 2) + (x & 3);
 	return WAVERAM_READ8(base, byteoffs);
@@ -251,7 +251,7 @@ INLINE UINT8 get_texel_8bit(const void *base, int y, int x, int width)
 
 
 #ifdef UNUSED_FUNCTION
-INLINE UINT8 get_texel_4bit(const void *base, int y, int x, int width)
+static inline UINT8 get_texel_4bit(const void *base, int y, int x, int width)
 {
 	UINT32 byteoffs = (y / 2) * (width * 2) + ((x / 8) << 3) + ((y & 1) << 2) + ((x / 2) & 3);
 	return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;

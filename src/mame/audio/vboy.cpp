@@ -184,8 +184,8 @@ static const INT8 outLvlTbl[16][16] = {
 	{ 0,  2,  4,  6,  8, 10, 12, 14, 16, 17, 19, 21, 23, 25, 27, 29}
 };
 
-INLINE UINT8 mgetb(register UINT8 *ptr) { return *ptr; }
-INLINE void mputb(UINT8 *ptr, INT8 data) { *ptr = data; }
+static inline UINT8 mgetb(register UINT8 *ptr) { return *ptr; }
+static inline void mputb(UINT8 *ptr, INT8 data) { *ptr = data; }
 
 //**************************************************************************
 //  LIVE DEVICE

@@ -158,13 +158,13 @@ static void *osd_sharedmem_ptr(osd_shared_mem *os_shmem)
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE void shmem_lock(shmem_t *shmem)
+static inline void shmem_lock(shmem_t *shmem)
 {
 	while (atomic_exchange32(&shmem->lock,1) == 0)
 		;
 }
 
-INLINE void shmem_unlock(shmem_t *shmem)
+static inline void shmem_unlock(shmem_t *shmem)
 {
 	atomic_exchange32(&shmem->lock,0);
 }

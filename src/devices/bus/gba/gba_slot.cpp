@@ -256,7 +256,7 @@ bool gba_cart_slot_device::call_softlist_load(software_list_device &swlist, cons
  fullpath
  -------------------------------------------------*/
 
-INLINE std::string gba_chip_string( UINT32 chip )
+static inline std::string gba_chip_string( UINT32 chip )
 {
 	std::string str;
 	if (chip == 0) str += "NONE ";
@@ -273,7 +273,7 @@ INLINE std::string gba_chip_string( UINT32 chip )
 }
 
 
-INLINE int gba_chip_has_conflict( UINT32 chip )
+static inline int gba_chip_has_conflict( UINT32 chip )
 {
 	int count1 = 0, count2 = 0;
 	if (chip & GBA_CHIP_EEPROM) count1++;
