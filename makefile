@@ -1265,3 +1265,4 @@ endif
 cppcheck:
 	@echo Generate CppCheck analysis report
 	cppcheck --enable=all src/ $(CPPCHECK_PARAMS) -j9
+
