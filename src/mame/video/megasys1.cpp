@@ -589,8 +589,8 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_D_w)
 
     00-07                       ?
     08      fed- ---- ---- ---- ?
-            ---c ---- ---- ---- mosaic sol. (?)
-            ---- ba98 ---- ---- mosaic      (?)
+            ---c ---- ---- ---- mosaic sol.
+            ---- ba98 ---- ---- mosaic      
             ---- ---- 7--- ---- y flip
             ---- ---- -6-- ---- x flip
             ---- ---- --45 ---- ?
@@ -599,9 +599,53 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_D_w)
     0C      Y position
     0E      Code                                            */
 
+inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, INT32 code, INT32 color, INT32 sx, INT32 sy, INT32 flipx, INT32 flipy, UINT8 mosaic, UINT8 mosaicsol, INT32 priority)
+{
+
+//	if (sy >= nScreenHeight || sy < -15 || sx >= nScreenWidth || sx < -15) return;
+	gfx_element *decodegfx = m_gfxdecode->gfx(3);
+	sy = sy + cliprect.min_y;
+
+	const UINT8* gfx = decodegfx->get_data(code);
+
+	flipy = (flipy) ? 0x0f : 0;
+	flipx = (flipx) ? 0x0f : 0;
+
+	color = (color * 16) + decodegfx->colorbase();
+
+
+	for (INT32 y = 0; y < 16; y++, sy++, sx-=16)
+	{
+		UINT16 *dest = &bitmap.pix16(sy)+ sx;
+		UINT8 *prio = &screen.priority().pix8(sy) + sx;
+
+
+		for (INT32 x = 0; x < 16; x++, sx++)
+		{
+			if (sx < cliprect.min_x || sy < cliprect.min_y || sx > cliprect.max_x || sy > cliprect.max_y) continue;	
+
+			INT32 pxl;
+
+			if (mosaicsol) {
+				pxl = gfx[(((y ^ flipy) |  mosaic) * 16) + ((x ^ flipx) |  mosaic)];
+			} else {
+				pxl = gfx[(((y ^ flipy) & ~mosaic) * 16) + ((x ^ flipx) & ~mosaic)];
+			}
+
+			if (pxl != 0x0f) {
+				if ((priority & (1 << (prio[x] & 0x1f))) == 0 && prio[x] < 0x80) {
+					dest[x] = pxl + color;
+					prio[x] |= 0x80;
+				}
+			}
+		}
+	}
+
+}
+
 void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	int color,code,sx,sy,flipx,flipy,attr,sprite,offs,color_mask;
+	int color,code,sx,sy,flipx,flipy,attr,sprite;
 
 /* objram: 0x100*4 entries      spritedata: 0x80 entries */
 
@@ -609,47 +653,49 @@ void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 	if (m_hardware_type_z == 0)  /* standard sprite hardware */
 	{
-		color_mask = (m_sprite_flag & 0x100) ? 0x07 : 0x0f;
+		INT32 color_mask = (m_sprite_flag & 0x100) ? 0x07 : 0x0f;
 
-		for (offs = (0x800-8)/2;offs >= 0;offs -= 8/2)
+		UINT16 *objectram = (UINT16*)m_buffer2_objectram;
+		UINT16 *spriteram = (UINT16*)m_buffer2_spriteram16;
+
+		for (INT32 offs = (0x800-8)/2; offs >= 0; offs -= 4)
 		{
-			for (sprite = 0; sprite < 4 ; sprite ++)
+			for (INT32 sprite = 0; sprite < 4 ; sprite ++)
 			{
-				UINT16 *objectdata = &m_buffer2_objectram[offs + (0x800/2) * sprite];
-				UINT16 *spritedata = &m_buffer2_spriteram16[ (objectdata[ 0 ] & 0x7f) * 0x10/2];
+				UINT16 *objectdata = &objectram[offs + (0x800/2) * sprite];
+				UINT16 *spritedata = &spriteram[(objectdata[0] & 0x7f) * 8];
 
-				attr = spritedata[ 8/2 ];
-				if (((attr & 0xc0)>>6) != sprite)   continue;   // flipping
+				INT32 attr = spritedata[4];
+				if (((attr & 0xc0) >> 6) != sprite) continue;
 
-				/* apply the position displacements */
-				sx = ( spritedata[0x0A/2] + objectdata[0x02/2] ) % 512;
-				sy = ( spritedata[0x0C/2] + objectdata[0x04/2] ) % 512;
+				INT32 sx = (spritedata[5] + objectdata[1]) & 0x1ff;
+				INT32 sy = (spritedata[6] + objectdata[2]) & 0x1ff;
 
-				if (sx > 256-1) sx -= 512;
-				if (sy > 256-1) sy -= 512;
+				if (sx > 255) sx -= 512;
+				if (sy > 255) sy -= 512;
 
-				flipx = attr & 0x40;
-				flipy = attr & 0x80;
+				INT32 code  = spritedata[7] + objectdata[3];
+				INT32 color = attr & color_mask;
+
+				INT32 flipx = attr & 0x40;
+				INT32 flipy = attr & 0x80;
+				INT32 pri  = (attr & 0x08) ? 0x0c : 0x0a;
+				INT32 mosaic = (attr & 0x0f00)>>8;
+				INT32 mossol = (attr & 0x1000)>>8;
+
+				code = (code & 0xfff) + ((m_sprite_bank & 1) << 12);
 
 				if (m_screen_flag & 1)
 				{
-					flipx = !flipx;     flipy = !flipy;
-					sx = 240-sx;        sy = 240-sy;
+					flipx = !flipx;
+					flipy = !flipy;
+					sx = 240 - sx;
+					sy = 240 - sy;
 				}
 
-				/* sprite code is displaced as well */
-				code  = spritedata[0x0E/2] + objectdata[0x06/2];
-				color = (attr & color_mask);
-
-				m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
-						(code & 0xfff ) + ((m_sprite_bank & 1) << 12),
-						color,
-						flipx, flipy,
-						sx, sy,
-						screen.priority(),
-						(attr & 0x08) ? 0x0c : 0x0a,15);
-			}   /* sprite */
-		}   /* offs */
+				draw_16x16_priority_sprite(screen,bitmap,cliprect,code, color, sx, sy - 16, flipx, flipy, mosaic, mossol, pri);
+			}
+		}
 	}   /* non Z hw */
 	else
 	{
