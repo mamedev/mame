@@ -1,5 +1,5 @@
 /*
-** $Id: ltm.c,v 2.33 2014/11/21 12:15:57 roberto Exp $
+** $Id: ltm.c,v 2.36 2015/11/03 15:47:30 roberto Exp $
 ** Tag methods
 ** See Copyright Notice in lua.h
 */
@@ -57,7 +57,7 @@ void luaT_init (lua_State *L) {
 ** tag methods
 */
 const TValue *luaT_gettm (Table *events, TMS event, TString *ename) {
-  const TValue *tm = luaH_getstr(events, ename);
+  const TValue *tm = luaH_getshortstr(events, ename);
   lua_assert(event <= TM_EQ);
   if (ttisnil(tm)) {  /* no tag method? */
     events->flags |= cast_byte(1u<<event);  /* cache this fact */
@@ -79,20 +79,25 @@ const TValue *luaT_gettmbyobj (lua_State *L, const TValue *o, TMS event) {
     default:
       mt = G(L)->mt[ttnov(o)];
   }
-  return (mt ? luaH_getstr(mt, G(L)->tmname[event]) : luaO_nilobject);
+  return (mt ? luaH_getshortstr(mt, G(L)->tmname[event]) : luaO_nilobject);
 }
 
 
 void luaT_callTM (lua_State *L, const TValue *f, const TValue *p1,
                   const TValue *p2, TValue *p3, int hasres) {
   ptrdiff_t result = savestack(L, p3);
-  setobj2s(L, L->top++, f);  /* push function (assume EXTRA_STACK) */
-  setobj2s(L, L->top++, p1);  /* 1st argument */
-  setobj2s(L, L->top++, p2);  /* 2nd argument */
+  StkId func = L->top;
+  setobj2s(L, func, f);  /* push function (assume EXTRA_STACK) */
+  setobj2s(L, func + 1, p1);  /* 1st argument */
+  setobj2s(L, func + 2, p2);  /* 2nd argument */
+  L->top += 3;
   if (!hasres)  /* no result? 'p3' is third argument */
     setobj2s(L, L->top++, p3);  /* 3rd argument */
   /* metamethod may yield only when called from Lua code */
-  luaD_call(L, L->top - (4 - hasres), hasres, isLua(L->ci));
+  if (isLua(L->ci))
+    luaD_call(L, func, hasres);
+  else
+    luaD_callnoyield(L, func, hasres);
   if (hasres) {  /* if has result, move it to its place */
     p3 = restorestack(L, result);
     setobjs2s(L, p3, --L->top);
@@ -117,6 +122,7 @@ void luaT_trybinTM (lua_State *L, const TValue *p1, const TValue *p2,
     switch (event) {
       case TM_CONCAT:
         luaG_concaterror(L, p1, p2);
+      /* call never returns, but to avoid warnings: *//* FALLTHROUGH */
       case TM_BAND: case TM_BOR: case TM_BXOR:
       case TM_SHL: case TM_SHR: case TM_BNOT: {
         lua_Number dummy;
@@ -124,8 +130,8 @@ void luaT_trybinTM (lua_State *L, const TValue *p1, const TValue *p2,
           luaG_tointerror(L, p1, p2);
         else
           luaG_opinterror(L, p1, p2, "perform bitwise operation on");
-        /* else go through */
       }
+      /* calls never return, but to avoid warnings: *//* FALLTHROUGH */
       default:
         luaG_opinterror(L, p1, p2, "perform arithmetic on");
     }

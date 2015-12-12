@@ -366,6 +366,10 @@ project "lua"
 	--	"ForceCPP",
 	--}
 
+	configuration { "gmake" }
+		buildoptions_c {
+			"-Wno-bad-function-cast"
+		}
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
