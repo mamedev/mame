@@ -27,11 +27,11 @@ Japanese Releases - Pyuuta
 017E Maze Patrol ~ メイズ パトロール    [dumped]
 018E Tron ~ トロン
 019E Mr. Do! ~ Mr.DO!    [dumped]
-020E Bermuda Triangle ~ バミューダ・ トライアングル
+020E Bermuda Triangle ~ バミューダ・ トライアングル  [dumped]
 021E 4-nin Mahjan ~ 四人麻雀
-022E Triplecommand ~ トリプルコマンド
+022E Triplecommand ~ トリプルコマンド   [dumped]
 023E SuperBike ~ スーパーバイク
-024E Rescue Copter [3D] ~ レスキュー コプター
+024E Rescue Copter [3D] ~ レスキュー コプター   [dumped]
 025E Baseball [3D] ~ ベースボール [dumped]
 026E Battlefighter [3D] ~ バトルファイター
 
@@ -93,6 +93,19 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
+	<software name="bermudat">
+		<description>Bermuda Triangle (Jpn)</description>
+		<year>198?</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="バミューダ・ トライアングル"/>
+		<info name="serial" value="020E"/>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="bermudatriangle.bin" size="8192" crc="95577ceb" sha1="4b75c4bdd2285eff5ed0df3a951d8527270e6b96" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+	
 	<software name="bombman">
 		<description>Bombman (Jpn)</description>
 		<year>1982</year>
