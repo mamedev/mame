@@ -35,9 +35,9 @@ class add_exception
 {
 public:
 	add_exception(const char *tag) : m_tag(tag) { }
-	const char *tag() const { return m_tag; }
+	const char *tag() const { return m_tag.c_str(); }
 private:
-	const char *m_tag;
+	std::string m_tag;
 };
 
 // a tagged_list is a class that maintains a list of objects that can be quickly looked up by tag
