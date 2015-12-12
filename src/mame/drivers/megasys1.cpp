@@ -293,7 +293,7 @@ ADDRESS_MAP_END
 WRITE16_MEMBER(megasys1_state::ms1_ram_w )
 {
 	// DON'T use COMBINE_DATA
-	// byte writes end up mirroring in both words like nmk16.c
+	// byte writes end up mirroring in both bytes of the word like nmk16.c
 	// 64th Street and Chimera Beast rely on this for attract inputs
 
 	m_ram[offset] = data;
