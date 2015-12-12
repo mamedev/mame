@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Jarek Burczynski
+// copyright-holders:Jarek Burczynski,Tatsuyuki Satoh
 /*
 **
 ** File: fmopl.c - software implementation of FM sound generator

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Jarek Burczynski
+// copyright-holders:Jarek Burczynski,Tatsuyuki Satoh
 /*
   File: fm.h -- header file for software emulation for FM sound generator
 
