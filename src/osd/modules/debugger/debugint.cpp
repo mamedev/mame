@@ -1003,6 +1003,18 @@ static void debug_show_all()
 
 static void on_memory_window_activate(DView *dv, const ui_menu_event *event)
 {
+	DView *ndv;
+	render_target *target;
+	const debug_view_source *source;
+
+	target = &dv->machine().render().ui_target();
+
+	ndv = dview_alloc(target, dv->machine(), DVT_MEMORY, 0);
+	ndv->editor.active = TRUE;
+	ndv->editor.container = &dv->machine().render().ui_container();
+	source = ndv->view->source();
+	dview_set_title(ndv, source->name());
+	set_focus_view(ndv);
 }
 
 static void on_disassembly_window_activate(DView *dv, const ui_menu_event *event)
@@ -1146,6 +1158,75 @@ static void on_run_to_cursor_activate(DView *dv, const ui_menu_event *event)
 	}
 }
 
+static void on_memory_address_type(DView *dv, const ui_menu_event *event)
+{
+	debug_view_memory *memview = downcast<debug_view_memory *>(focus_view->view);
+	bool phys = memview->physical();
+
+	if (event->iptkey == IPT_UI_RIGHT)
+	{
+		memview->set_physical(!phys);
+		dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
+	}
+}
+
+static void on_memory_data_format(DView *dv, const ui_menu_event *event)
+{
+	debug_view_memory *memview = downcast<debug_view_memory *>(focus_view->view);
+	int format = memview->get_data_format();
+	int idx;
+	int order[7] = { 1, 2, 4, 8, 9, 10, 11 };
+
+	for(int x=0; x<7; x++)
+	{
+		if(order[x] == format)
+			idx = x;
+	}
+	
+	if (event->iptkey == IPT_UI_RIGHT)
+	{
+		idx++;
+		if(idx >= 7) 
+			idx = 0;
+		memview->set_data_format(order[idx]);
+		dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
+	}
+	if (event->iptkey == IPT_UI_LEFT)
+	{
+		idx--;
+		if(idx < 0) 
+			idx = 6;
+		memview->set_data_format(order[idx]);
+		dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
+	}
+}
+
+static void on_memory_region(DView *dv, const ui_menu_event *event)
+{
+	debug_view_memory *memview = downcast<debug_view_memory *>(focus_view->view);
+	const debug_view_source *source = memview->source();
+
+	if (event->iptkey == IPT_UI_LEFT)
+	{
+		int idx = memview->source_list().indexof(*source);
+		if(idx > 0)
+			memview->set_source(*memview->source_list().find(idx-1));
+		else
+			memview->set_source(*memview->source_list().find(memview->source_list().count()-1));
+		dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
+		dview_set_title(dv, memview->source()->name());
+	}
+	if (event->iptkey == IPT_UI_RIGHT)
+	{
+		if(source->next() != nullptr)
+			memview->set_source(*source->next());
+		else
+			memview->set_source(*memview->first_source());
+		dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
+		dview_set_title(dv, memview->source()->name());
+	}
+}
+
 /*-------------------------------------------------
     editor
   -------------------------------------------------*/
@@ -1244,6 +1325,30 @@ static void CreateMainMenu(running_machine &machine)
 		{
 			menu->item_append("CPU", focus_view->view->source()->name(), MENU_FLAG_RIGHT_ARROW, (void *)on_disasm_cpu_activate);
 		}
+		menu->item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+		break;
+	}
+	case DVT_MEMORY:
+	{
+		bool phys = downcast<debug_view_memory *>(focus_view->view)->physical();
+		int format = downcast<debug_view_memory *>(focus_view->view)->get_data_format();
+		const debug_view_source* source = downcast<debug_view_memory *>(focus_view->view)->source();
+		menu->item_append("Region", source->name(), MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)on_memory_region);
+		if(phys)
+			menu->item_append("Address type", "Physical", MENU_FLAG_RIGHT_ARROW, (void *)on_memory_address_type);
+		else
+			menu->item_append("Address type", "Logical", MENU_FLAG_RIGHT_ARROW, (void *)on_memory_address_type);
+		switch(format)
+		{
+		case 1: subtext = "1 byte chunks"; break;
+		case 2: subtext = "2 byte chunks"; break;
+		case 4: subtext = "4 byte chunks"; break;
+		case 8: subtext = "8 byte chunks"; break;
+		case 9: subtext = "32-bit floating point"; break;
+		case 10: subtext = "64-bit floating point"; break;
+		case 11: subtext = "80-bit floating point"; break;
+		}
+		menu->item_append("Format", subtext, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)on_memory_data_format);
 		menu->item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 		break;
 	}
@@ -1392,7 +1497,7 @@ static void handle_menus(running_machine &machine)
 	{
 		/* process the menu */
 		event = menu->process(0);
-		if (event != nullptr && (event->iptkey == IPT_UI_SELECT || (event->iptkey == IPT_UI_RIGHT)))
+		if (event != nullptr && (event->iptkey == IPT_UI_SELECT || (event->iptkey == IPT_UI_LEFT) || (event->iptkey == IPT_UI_RIGHT)))
 		{
 			//global_free(menu);
 			//menu = nullptr;
