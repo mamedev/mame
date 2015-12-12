@@ -254,7 +254,7 @@ VIDEO_START_MEMBER(megasys1_state,megasys1)
 
     However, this is probably a game specific thing, as Soldam uses
     layer 1 in both modes, and even with 8x8 tiles the tile code must
-    be multiplied by 4!
+    be multiplied by 4! (for the High Score table)
 
     AFAIK, the other games use a layer in one mode only (always 8x8 or
     16x16) so it could be that the multiplication factor is constant
@@ -265,7 +265,8 @@ VIDEO_START_MEMBER(megasys1_state,megasys1)
 	m_8x8_scroll_factor[1] = 1; m_16x16_scroll_factor[1] = 4;
 	m_8x8_scroll_factor[2] = 1; m_16x16_scroll_factor[2] = 4;
 
-	if (strcmp(machine().system().name, "soldamj") == 0)
+	if (strcmp(machine().system().name, "soldam") == 0 ||
+	    strcmp(machine().system().name, "soldamj") == 0)
 	{
 		m_8x8_scroll_factor[1] = 4; m_16x16_scroll_factor[1] = 4;
 	}
