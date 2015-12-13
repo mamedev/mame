@@ -3720,6 +3720,9 @@ shiryu2         // Strider Hiryu 2 (JAPAN 991213)
 // Capcom medal games
 alien           // (c) 2005
 
+// Capcom Nintendo HW?
+tvcapcom
+
 // Tecmo ZN1
 tps
 glpracr2        // Gallop Racer 2 (USA)
@@ -8227,6 +8230,7 @@ xxmissio        // UPL-86001 [1986]
 ninjakd2        // UPL-????? (c) 1987
 ninjakd2a       // UPL-????? (c) 1987
 ninjakd2b       // UPL-????? (c) 1987
+ninjakd2c		// UPL-????? (c) 1987
 rdaction        // UPL-87003?(c) 1987 + World Games license
 jt104           // hack?
 mnight          // UPL-????? (c) 1987 distributed by Kawakus

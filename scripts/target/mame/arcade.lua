@@ -1324,6 +1324,7 @@ files {
 	MAME_DIR .. "src/mame/video/vulgus.cpp",
 	MAME_DIR .. "src/mame/machine/kabuki.cpp",
 	MAME_DIR .. "src/mame/machine/kabuki.h",
+	MAME_DIR .. "src/mame/drivers/tvcapcom.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "cinemat")
