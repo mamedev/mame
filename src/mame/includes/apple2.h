@@ -344,7 +344,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_iie_data_ready_w);
 	void apple2_update_memory_postload();
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	void apple2_setup_memory(const apple2_memmap_config *config);
 	void apple2_update_memory();
 	inline UINT32 effective_a2();

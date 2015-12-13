@@ -64,9 +64,9 @@ public:
 	DECLARE_WRITE8_MEMBER(cloud9_bitmode_w);
 	DECLARE_WRITE8_MEMBER(cloud9_bitmode_addr_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_cloud9(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(clock_irq);
 	inline void cloud9_write_vram( UINT16 addr, UINT8 data, UINT8 bitmd, UINT8 pixba );

@@ -190,7 +190,7 @@ typedef UINT8 netlist_sig_t;
 #define NETLIB_FUNC_VOID(_chip, _name, _params) ATTR_HOT void NETLIB_NAME(_chip) :: _name _params
 
 #define NETLIB_UPDATE_TERMINALS(_chip) ATTR_HOT void NETLIB_NAME(_chip) :: update_terminals(void)
-#define NETLIB_UPDATE_TERMINALSI() ATTR_HOT void update_terminals(void)
+#define NETLIB_UPDATE_TERMINALSI() ATTR_HOT void update_terminals(void) override
 #define NETLIB_UPDATEI() ATTR_HOT void update(void)
 
 #define NETLIB_DEVICE_BASE(_name, _pclass, _extra, _priv)                       \
@@ -201,9 +201,9 @@ typedef UINT8 netlist_sig_t;
 		: _pclass()    { }                                                      \
 	protected:                                                                  \
 		_extra                                                                  \
-		ATTR_HOT void update();                                                 \
-		ATTR_HOT void start();                                                  \
-		ATTR_HOT void reset();                                                  \
+		ATTR_HOT void update() override;                                        \
+		ATTR_HOT void start() override;                                         \
+		ATTR_HOT void reset() override;                                         \
 		_priv                                                                   \
 	}
 
@@ -224,25 +224,25 @@ typedef UINT8 netlist_sig_t;
 		: device_t()                                                            \
 			{ }                                                                 \
 	/*protected:*/                                                              \
-		ATTR_HOT void update();                                                 \
-		ATTR_HOT void start();                                                  \
-		ATTR_HOT void reset();                                                  \
+		ATTR_HOT void update() override;                                        \
+		ATTR_HOT void start() override;                                         \
+		ATTR_HOT void reset() override;                                         \
 	public:                                                                     \
 		_priv                                                                   \
 	}
 
 #define NETLIB_DEVICE_WITH_PARAMS(_name, _priv)                                 \
 		NETLIB_DEVICE_BASE(NETLIB_NAME(_name), device_t,                        \
-			ATTR_HOT void update_param();                                       \
+			ATTR_HOT void update_param() override;                              \
 		, _priv)
 
 #define NETLIB_DEVICE_WITH_PARAMS_DERIVED(_name, _pclass, _priv)                \
 		NETLIB_DEVICE_BASE(NETLIB_NAME(_name), NETLIB_NAME(_pclass),            \
-			ATTR_HOT void update_param();                                       \
+			ATTR_HOT void update_param() override;                              \
 		, _priv)
 
 #define NETLIB_LOGIC_FAMILY(_fam)                                               \
-virtual logic_family_desc_t *default_logic_family()                             \
+virtual logic_family_desc_t *default_logic_family() override                    \
 {                                                                               \
 	return netlist_family_ ## _fam;                                             \
 }
@@ -497,7 +497,7 @@ namespace netlist
 		ATTR_HOT /* inline */ void update_dev(const UINT32 mask);
 
 	protected:
-		virtual void save_register()
+		virtual void save_register() override
 		{
 			save(NLNAME(m_state));
 			device_object_t::save_register();
@@ -548,9 +548,9 @@ namespace netlist
 		terminal_t *m_otherterm;
 
 	protected:
-		virtual void save_register();
+		virtual void save_register() override;
 
-		virtual void reset();
+		virtual void reset() override;
 	private:
 		ATTR_HOT  void set_ptr(nl_double *ptr, const nl_double val)
 		{
@@ -624,7 +624,7 @@ namespace netlist
 		ATTR_HOT  void activate_lh();
 
 	protected:
-		virtual void reset()
+		virtual void reset() override
 		{
 			//netlist_core_terminal_t::reset();
 			set_state(STATE_INP_ACTIVE);
@@ -648,7 +648,7 @@ namespace netlist
 		ATTR_HOT  nl_double Q_Analog() const;
 
 	protected:
-		virtual void reset()
+		virtual void reset() override
 		{
 			//netlist_core_terminal_t::reset();
 			set_state(STATE_INP_ACTIVE);
@@ -716,8 +716,8 @@ namespace netlist
 
 	protected:  //FIXME: needed by current solver code
 
-		virtual void save_register();
-		virtual void reset();
+		virtual void save_register() override;
+		virtual void reset() override;
 
 		netlist_sig_t m_new_Q;
 		netlist_sig_t m_cur_Q;
@@ -789,8 +789,8 @@ namespace netlist
 
 	protected:  //FIXME: needed by current solver code
 
-		virtual void save_register();
-		virtual void reset();
+		virtual void save_register() override;
+		virtual void reset() override;
 
 
 	private:
@@ -826,8 +826,8 @@ namespace netlist
 
 	protected:
 
-		virtual void save_register();
-		virtual void reset();
+		virtual void save_register() override;
+		virtual void reset() override;
 
 
 	private:
@@ -852,7 +852,7 @@ namespace netlist
 		ATTR_COLD logic_output_t();
 
 		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
-		virtual void reset()
+		virtual void reset() override
 		{
 			set_state(STATE_OUT);
 		}
@@ -876,7 +876,7 @@ namespace netlist
 		ATTR_COLD analog_output_t();
 
 		ATTR_COLD void init_object(core_device_t &dev, const pstring &aname);
-		virtual void reset()
+		virtual void reset() override
 		{
 			set_state(STATE_OUT);
 		}
@@ -914,7 +914,7 @@ namespace netlist
 
 	protected:
 
-		virtual void reset() { }
+		virtual void reset() override { }
 
 	private:
 		const param_type_t m_param_type;
@@ -938,7 +938,7 @@ namespace netlist
 		ATTR_HOT  C Value() const { return m_param;   }
 
 	protected:
-		virtual void save_register()
+		virtual void save_register() override
 		{
 			/* pstrings not yet supported, these need special logic */
 			if (T != param_t::STRING && T != param_t::MODEL)
@@ -973,7 +973,7 @@ namespace netlist
 		ATTR_COLD const pstring model_value_str(const pstring &entity);
 		ATTR_COLD const pstring model_type();
 	protected:
-		void changed()
+		void changed() override
 		{
 			m_map.clear();
 		}
@@ -1089,7 +1089,7 @@ namespace netlist
 
 		virtual ~device_t();
 
-		virtual void init(netlist_t &anetlist, const pstring &name);
+		virtual void init(netlist_t &anetlist, const pstring &name) override;
 
 		ATTR_COLD setup_t &setup();
 
@@ -1110,9 +1110,9 @@ namespace netlist
 
 	protected:
 
-		ATTR_HOT virtual void update() { }
-		ATTR_HOT virtual void start() { }
-		ATTR_HOT virtual void update_terminals() { }
+		ATTR_HOT virtual void update() override { }
+		ATTR_HOT virtual void start() override { }
+		ATTR_HOT virtual void update_terminals() override { }
 
 		template <class C, class T>
 		ATTR_COLD void register_param(const pstring &sname, C &param, const T initialVal);
@@ -1134,11 +1134,11 @@ namespace netlist
 
 	protected:
 
-		void reset() {}
+		void reset() override {}
 
-		void register_state(pstate_manager_t &manager, const pstring &module);
-		void on_pre_save();
-		void on_post_load();
+		void register_state(pstate_manager_t &manager, const pstring &module) override;
+		void on_pre_save() override;
+		void on_post_load() override;
 
 	private:
 		struct names_t { char m_buf[64]; };
@@ -1243,8 +1243,8 @@ namespace netlist
 		//  virtual void vlog(const plog_level &l, const pstring &ls) = 0;
 
 		/* from netlist_object */
-		virtual void reset();
-		virtual void save_register();
+		virtual void reset() override;
+		virtual void save_register() override;
 
 	#if (NL_KEEP_STATISTICS)
 		// performance

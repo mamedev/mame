@@ -70,7 +70,7 @@ static const char *const spacefb_sample_names[] =
 	"shipfire",
 	"explode1",
 	"explode2",
-	0
+	nullptr
 };
 
 

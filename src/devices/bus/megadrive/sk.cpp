@@ -52,7 +52,7 @@ void md_rom_sk_device::device_start()
 
 READ16_MEMBER(md_rom_sk_device::read)
 {
-	if (m_exp->m_cart != NULL && m_exp->m_cart->get_rom_base() != NULL && offset >= 0x200000/2 && offset < (0x200000 + m_exp->m_cart->get_rom_size())/2)
+	if (m_exp->m_cart != nullptr && m_exp->m_cart->get_rom_base() != nullptr && offset >= 0x200000/2 && offset < (0x200000 + m_exp->m_cart->get_rom_size())/2)
 		return m_exp->m_cart->m_rom[offset - 0x200000/2];
 	if (offset < 0x400000/2)
 		return m_rom[MD_ADDR(offset)];
@@ -79,7 +79,7 @@ static SLOT_INTERFACE_START(sk_sub_cart)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( sk_slot )
-	MCFG_MD_CARTRIDGE_ADD("subslot", sk_sub_cart, NULL)
+	MCFG_MD_CARTRIDGE_ADD("subslot", sk_sub_cart, nullptr)
 	MCFG_MD_CARTRIDGE_NOT_MANDATORY
 MACHINE_CONFIG_END
 

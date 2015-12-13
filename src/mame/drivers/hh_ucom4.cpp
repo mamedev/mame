@@ -1839,7 +1839,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch);
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 // handlers

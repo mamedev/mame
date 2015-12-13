@@ -38,7 +38,7 @@ const device_type SATURN_CART_SLOT = &device_creator<sat_cart_slot_device>;
 
 device_sat_cart_interface::device_sat_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device), m_cart_type(0),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0)
 {
 }
@@ -58,7 +58,7 @@ device_sat_cart_interface::~device_sat_cart_interface()
 
 void device_sat_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(SATSLOT_ROM_REGION_TAG).c_str(), size, 4, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
@@ -149,18 +149,18 @@ bool sat_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		bool is_rom = ((software_entry() == NULL) || ((software_entry() != NULL) && get_software_region("rom")));
+		bool is_rom = ((software_entry() == nullptr) || ((software_entry() != nullptr) && get_software_region("rom")));
 
 		if (is_rom)
 		{
 			// from fullpath, only ROM carts
-			UINT32 len = (software_entry() != NULL) ? get_software_region_length("rom") : length();
+			UINT32 len = (software_entry() != nullptr) ? get_software_region_length("rom") : length();
 			UINT32 *ROM;
 
 			m_cart->rom_alloc(len, tag());
 			ROM = m_cart->get_rom_base();
 
-			if (software_entry() != NULL)
+			if (software_entry() != nullptr)
 				memcpy(ROM, get_software_region("rom"), len);
 			else
 				fread(ROM, len);

@@ -77,7 +77,7 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 
 	if (!overwrite)
 	{
-		if (osd_getenv(name) != NULL)
+		if (osd_getenv(name) != nullptr)
 			return 0;
 	}
 	buf = (char *) osd_malloc_array(strlen(name)+strlen(value)+2);
@@ -217,7 +217,7 @@ void osd_free(void *ptr)
 
 void *osd_alloc_executable(size_t size)
 {
-	return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	return VirtualAlloc(nullptr, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 }
 
 

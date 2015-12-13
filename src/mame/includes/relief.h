@@ -24,7 +24,7 @@ public:
 	UINT8           m_ym2413_volume;
 	UINT8           m_overall_volume;
 	UINT8           m_adpcm_bank;
-	virtual void update_interrupts();
+	virtual void update_interrupts() override;
 	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_WRITE16_MEMBER(audio_control_w);
 	DECLARE_WRITE16_MEMBER(audio_volume_w);

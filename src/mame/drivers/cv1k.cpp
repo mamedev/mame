@@ -215,7 +215,7 @@ public:
 
 	UINT32 screen_update_cv1k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	/* game specific */
 	DECLARE_READ64_MEMBER(cv1k_speedup_r);

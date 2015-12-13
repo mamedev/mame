@@ -111,8 +111,8 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 private:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_shared_ptr<UINT16> m_p_base;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart1;
@@ -193,8 +193,8 @@ WRITE8_MEMBER(pt68k4_state::fdc_select_w)
 {
 	floppy_connector *con = machine().device<floppy_connector>(WDFDC_TAG":0");
 	floppy_connector *con2 = machine().device<floppy_connector>(WDFDC_TAG":1");
-	floppy_image_device *floppy = con ? con->get_device() : 0;
-	floppy_image_device *floppy2 = con2 ? con2->get_device() : 0;
+	floppy_image_device *floppy = con ? con->get_device() : nullptr;
+	floppy_image_device *floppy2 = con2 ? con2->get_device() : nullptr;
 	int drive = data & 3;
 
 	if (drive != m_lastdrive)
@@ -210,7 +210,7 @@ WRITE8_MEMBER(pt68k4_state::fdc_select_w)
 				break;
 
 			default:
-				m_wdfdc->set_floppy(NULL);
+				m_wdfdc->set_floppy(nullptr);
 				break;
 		}
 
@@ -330,7 +330,7 @@ void pt68k4_state::machine_reset()
 	if (m_wdfdc)
 	{
 		floppy_connector *con = machine().device<floppy_connector>(WDFDC_TAG":0");
-		floppy_image_device *floppy = con ? con->get_device() : 0;
+		floppy_image_device *floppy = con ? con->get_device() : nullptr;
 
 		m_wdfdc->set_floppy(floppy);
 		floppy->ss_w(0);
@@ -407,11 +407,11 @@ static MACHINE_CONFIG_START( pt68k2, pt68k4_state )
 	MCFG_ISA8_BUS_CUSTOM_SPACES()
 	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(pt68k4_state, irq5_w))
 	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa1", pt68k4_isa8_cards, "cga", false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa2", pt68k4_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa3", pt68k4_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa4", pt68k4_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa5", pt68k4_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa6", pt68k4_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa2", pt68k4_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa3", pt68k4_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa4", pt68k4_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa5", pt68k4_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa6", pt68k4_isa8_cards, nullptr, false)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
@@ -444,11 +444,11 @@ static MACHINE_CONFIG_START( pt68k4, pt68k4_state )
 	MCFG_ISA8_BUS_CUSTOM_SPACES()
 	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa1", pt68k4_isa8_cards, "fdc_at", false)
 	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa2", pt68k4_isa8_cards, "cga", false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa3", pt68k4_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa4", pt68k4_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa5", pt68k4_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa6", pt68k4_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa7", pt68k4_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa3", pt68k4_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa4", pt68k4_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa5", pt68k4_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa6", pt68k4_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD(ISABUS_TAG, "isa7", pt68k4_isa8_cards, nullptr, false)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)

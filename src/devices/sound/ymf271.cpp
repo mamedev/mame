@@ -1726,10 +1726,10 @@ void ymf271_device::device_start()
 
 void ymf271_device::device_reset()
 {
-	for (int i = 0; i < 48; i++)
+	for (auto & elem : m_slots)
 	{
-		m_slots[i].active = 0;
-		m_slots[i].volume = 0;
+		elem.active = 0;
+		elem.volume = 0;
 	}
 
 	// reset timers and IRQ

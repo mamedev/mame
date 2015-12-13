@@ -135,7 +135,7 @@ static MACHINE_CONFIG_FRAGMENT( decodmd2 )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("firq_timer",decodmd_type2_device,dmd_firq,attotime::from_hz(80))
 
-	MCFG_MC6845_ADD("dmd6845", MC6845, NULL, XTAL_8MHz / 8)  // TODO: confirm clock speed
+	MCFG_MC6845_ADD("dmd6845", MC6845, nullptr, XTAL_8MHz / 8)  // TODO: confirm clock speed
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(decodmd_type2_device, crtc_update_row)

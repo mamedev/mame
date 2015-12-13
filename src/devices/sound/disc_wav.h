@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:K.Wilkins
+// copyright-holders:K.Wilkins,Couriersud
+// thanks-to:Derrick Renaud, F.Palazzolo
 #pragma once
 
 #ifndef __DISC_WAV_H__
@@ -124,8 +125,8 @@ public:
 		TYPE_MASK = 0x0f,
 		OUT_IS_LOGIC = 0x10
 	};
-	void step(void);
-	void reset(void);
+	void step(void) override;
+	void reset(void) override;
 protected:
 	inline double tftab(double x);
 	inline double tf(double x);

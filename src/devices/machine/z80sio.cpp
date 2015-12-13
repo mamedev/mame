@@ -129,8 +129,8 @@ z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, co
 	m_out_txdrqb_cb(*this),
 	m_variant(variant)
 {
-	for (int i = 0; i < 8; i++)
-		m_int_state[i] = 0;
+	for (auto & elem : m_int_state)
+		elem = 0;
 }
 
 z80sio_device::z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -159,8 +159,8 @@ z80sio_device::z80sio_device(const machine_config &mconfig, const char *tag, dev
 	m_out_txdrqb_cb(*this),
 	m_variant(TYPE_Z80SIO)
 {
-	for (int i = 0; i < 8; i++)
-		m_int_state[i] = 0;
+	for (auto & elem : m_int_state)
+		elem = 0;
 }
 
 //-------------------------------------------------
@@ -317,9 +317,9 @@ void z80sio_device::reset_interrupts()
 {
 	LOG(("%s %s \n",FUNCNAME, tag()));
 	// reset internal interrupt sources
-	for (int i = 0; i < 8; i++)
+	for (auto & elem : m_int_state)
 	{
-		m_int_state[i] = 0;
+		elem = 0;
 	}
 
 	check_interrupts();

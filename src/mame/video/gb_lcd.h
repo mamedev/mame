@@ -57,8 +57,8 @@ protected:
 	virtual void update_scanline();
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	void common_start();
 	void common_reset();
 
@@ -147,7 +147,7 @@ public:
 protected:
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -161,11 +161,11 @@ public:
 protected:
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void update_sprites();
-	virtual void update_scanline();
+	virtual void update_sprites() override;
+	virtual void update_scanline() override;
 	void refresh_border();
 };
 
@@ -175,20 +175,20 @@ class cgb_lcd_device : public gb_lcd_device
 public:
 	cgb_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ8_MEMBER(video_r);
-	virtual DECLARE_WRITE8_MEMBER(video_w);
+	virtual DECLARE_READ8_MEMBER(video_r) override;
+	virtual DECLARE_WRITE8_MEMBER(video_w) override;
 
 protected:
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void update_sprites();
-	virtual void update_scanline();
+	virtual void update_sprites() override;
+	virtual void update_scanline() override;
 
-	virtual TIMER_CALLBACK_MEMBER(lcd_timer_proc);
-	virtual void videoptr_restore();
+	virtual TIMER_CALLBACK_MEMBER(lcd_timer_proc) override;
+	virtual void videoptr_restore() override;
 	void hdma_trans(UINT16 length);
 };
 

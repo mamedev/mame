@@ -66,7 +66,7 @@ static const UINT8 TZX_HEADER[8] = { 'Z','X','T','a','p','e','!',0x1a };
 
 static INT16    wave_data = 0;
 static int  block_count = 0;
-static UINT8**  blocks = NULL;
+static UINT8**  blocks = nullptr;
 static float t_scale = 1;  /* for scaling T-states to the 4MHz CPC */
 
 static void toggle_wave_data(void)
@@ -207,19 +207,19 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen )
 	}
 }
 
-INLINE int millisec_to_samplecount( int millisec )
+static inline int millisec_to_samplecount( int millisec )
 {
 	return (int) (millisec * ((double)TZX_WAV_FREQUENCY / 1000.0));
 }
 
-INLINE int tcycles_to_samplecount( int tcycles )
+static inline int tcycles_to_samplecount( int tcycles )
 {
 	return (int) ((0.5 + (((double)TZX_WAV_FREQUENCY / 3500000) * (double)tcycles)) * (double) t_scale);
 }
 
 static void tzx_output_wave( INT16 **buffer, int length )
 {
-	if (buffer == NULL)
+	if (buffer == nullptr)
 	{
 		return;
 	}
@@ -335,14 +335,14 @@ static int tzx_handle_direct(INT16 **buffer, const UINT8 *bytes, int pause, int 
 }
 
 
-INLINE int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol, int maxp)
+static inline int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol, int maxp)
 {
 	int size = 0;
 	const UINT8 *cursymb = symtable + (2 * maxp + 1)*symbol;
 
 	UINT8 starttype = cursymb[0];
 
-//	printf("start polarity %01x (max number of symbols is %d)\n", starttype, maxp);
+//  printf("start polarity %01x (max number of symbols is %d)\n", starttype, maxp);
 
 	switch (starttype)
 	{
@@ -371,13 +371,11 @@ INLINE int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol
 	for (int i = 0; i < maxp; i++)
 	{
 		UINT16 pulse_length = cursymb[1 + (i*2)] | (cursymb[2 + (i*2)] << 8);
-	//	printf("pulse_length %04x\n", pulse_length);
+	//  printf("pulse_length %04x\n", pulse_length);
 
 		// shorter lists can be terminated with a pulse_length of 0
 		if (pulse_length != 0)
 		{
-			
-
 			int samples = tcycles_to_samplecount(pulse_length);
 			tzx_output_wave(buffer, samples);
 			size += samples;
@@ -397,7 +395,7 @@ INLINE int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol
 	return size;
 }
 
-INLINE int stream_get_bit(const UINT8 *bytes, UINT8 &stream_bit, UINT32 &stream_byte)
+static inline int stream_get_bit(const UINT8 *bytes, UINT8 &stream_bit, UINT32 &stream_byte)
 {
 	// get bit here
 	UINT8 retbit = 0;
@@ -425,7 +423,7 @@ static int tzx_handle_generalized(INT16 **buffer, const UINT8 *bytes, int pause,
 
 	if (totp > 0)
 	{
-	//	printf("pilot block table %04x\n", totp);
+	//  printf("pilot block table %04x\n", totp);
 
 		const UINT8 *symtable = bytes;
 		const UINT8 *table2 = symtable + (2 * npp + 1)*asp;
@@ -440,7 +438,7 @@ static int tzx_handle_generalized(INT16 **buffer, const UINT8 *bytes, int pause,
 			for (int j = 0; j < repetitions; j++)
 			{
 				size += tzx_handle_symbol(buffer, symtable, symbol, npp);
-			//	toggle_wave_data();
+			//  toggle_wave_data();
 			}
 
 
@@ -470,7 +468,7 @@ static int tzx_handle_generalized(INT16 **buffer, const UINT8 *bytes, int pause,
 		for (int i = 0; i < totd; i++)
 		{
 			UINT8 symbol = 0;
-			
+
 			for (int j = 0; j < NB; j++)
 			{
 				symbol |= stream_get_bit(table2, stream_bit, stream_byte) << j;
@@ -750,12 +748,12 @@ static int tzx_cas_do_work( INT16 **buffer )
 
 				data_size = cur_block[1] + (cur_block[2] << 8) + (cur_block[3] << 16) + (cur_block[4] << 24);
 				pause_time= cur_block[5] + (cur_block[6] << 8);
-				
+
 				UINT32 totp = cur_block[7] + (cur_block[8] << 8) + (cur_block[9] << 16) + (cur_block[10] << 24);
 				int npp = cur_block[11];
 				int asp = cur_block[12];
 				if (asp == 0) asp = 256;
-				
+
 				UINT32 totd = cur_block[13] + (cur_block[14] << 8) + (cur_block[15] << 16) + (cur_block[16] << 24);
 				int npd = cur_block[17];
 				int asd = cur_block[18];
@@ -807,7 +805,7 @@ static int tzx_cas_to_wav_size( const UINT8 *casdata, int caslen )
 		goto cleanup;
 	}
 
-	size = tzx_cas_do_work(NULL);
+	size = tzx_cas_do_work(nullptr);
 
 	return size;
 
@@ -845,7 +843,7 @@ static int tap_cas_to_wav_size( const UINT8 *casdata, int caslen )
 //      int pilot_length = (p[2] == 0x00) ? 8063 : 3223;    /* worldofspectrum */
 		LOG_FORMATS("tap_cas_to_wav_size: Handling TAP block containing 0x%X bytes", data_size);
 		p += 2;
-		size += tzx_cas_handle_block(NULL, p, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
+		size += tzx_cas_handle_block(nullptr, p, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
 		LOG_FORMATS(", total size is now: %d\n", size);
 		p += data_size;
 	}
@@ -938,7 +936,7 @@ static const struct CassetteFormat tzx_cassette_format =
 	"tzx",
 	tzx_cassette_identify,
 	tzx_cassette_load,
-	NULL
+	nullptr
 };
 
 static const struct CassetteFormat tap_cassette_format =
@@ -946,7 +944,7 @@ static const struct CassetteFormat tap_cassette_format =
 	"tap,blk",
 	tap_cassette_identify,
 	tap_cassette_load,
-	NULL
+	nullptr
 };
 
 static const struct CassetteFormat cdt_cassette_format =
@@ -954,7 +952,7 @@ static const struct CassetteFormat cdt_cassette_format =
 	"cdt",
 	cdt_cassette_identify,
 	cdt_cassette_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(tzx_cassette_formats)

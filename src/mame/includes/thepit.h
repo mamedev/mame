@@ -51,8 +51,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	DECLARE_DRIVER_INIT(rtriv);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(thepit);
 	DECLARE_PALETTE_INIT(suprmous);
 

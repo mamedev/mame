@@ -18,7 +18,7 @@ msx_cart_fmpac::msx_cart_fmpac(const machine_config &mconfig, const char *tag, d
 	, msx_cart_interface(mconfig, *this)
 	, m_ym2413(*this, "ym2413")
 	, m_selected_bank(0)
-	, m_bank_base(NULL)
+	, m_bank_base(nullptr)
 	, m_sram_active(false)
 	, m_opll_active(false)
 	, m_1ffe(0)

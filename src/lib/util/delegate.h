@@ -90,12 +90,12 @@
 // types of delegates supported
 #define DELEGATE_TYPE_COMPATIBLE 0
 #define DELEGATE_TYPE_INTERNAL 1
+#define DELEGATE_TYPE_MSVC 2
 
 // select which one we will be using
 #if defined(__GNUC__)
-	/* does not work in versions over 4.7.x of 32bit MINGW  */
-	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)))
-		//#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
+	/* 32bit MINGW  asks for different convention */
+	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__)
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_INTERNAL
 		#define MEMBER_ABI __thiscall
 		#define HAS_DIFFERENT_ABI 1
@@ -110,6 +110,10 @@
 		#define MEMBER_ABI
 		#define HAS_DIFFERENT_ABI 0
 	#endif
+#elif defined(_MSC_VER) && defined (PTR64)
+#define MEMBER_ABI
+#define HAS_DIFFERENT_ABI 0
+#define USE_DELEGATE_TYPE DELEGATE_TYPE_MSVC
 #else
 #define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
 #endif
@@ -541,6 +545,64 @@ private:
 	int                     m_this_delta;       // delta to apply to the 'this' pointer
 };
 
+#elif (USE_DELEGATE_TYPE == DELEGATE_TYPE_MSVC)
+
+// ======================> delegate_mfp
+const int SINGLE_MEMFUNCPTR_SIZE = sizeof(void (delegate_generic_class::*)());
+
+// struct describing the contents of a member function pointer
+class delegate_mfp
+{
+public:
+	// default constructor
+	delegate_mfp()
+		: m_function(0) { }
+
+	// copy constructor
+	delegate_mfp(const delegate_mfp &src)
+		: m_function(src.m_function) { }
+
+	// construct from any member function pointer
+	template<typename _MemberFunctionType, class _MemberFunctionClass, typename _ReturnType, typename _StaticFunctionType>
+	delegate_mfp(_MemberFunctionType mfp, _MemberFunctionClass *, _ReturnType *, _StaticFunctionType)
+	{
+		//assert(sizeof(mfp) == 12 || sizeof(mfp) == 16);
+		m_size = sizeof(mfp);
+		*reinterpret_cast<_MemberFunctionType *>(this) = mfp;
+	}
+
+	// comparison helpers
+	bool operator==(const delegate_mfp &rhs) const { return (m_function == rhs.m_function); }
+	bool isnull() const { return (m_function == 0); }
+
+	// getters
+	delegate_generic_class *real_object(delegate_generic_class *original) const { return original; }
+
+	// binding helper
+	template<typename _FunctionType>
+	void update_after_bind(_FunctionType &funcptr, delegate_generic_class *&object)
+	{
+		funcptr = reinterpret_cast<_FunctionType>(m_function);
+		if (m_size == SINGLE_MEMFUNCPTR_SIZE + sizeof(int))
+			object = reinterpret_cast<delegate_generic_class *>(reinterpret_cast<UINT8 *>(object) + m_this_delta);
+	}
+
+private:
+	// extract the generic function and adjust the object pointer
+	delegate_generic_function convert_to_generic(delegate_generic_class *&object) const;
+
+	// actual state
+	FPTR                    m_function;         // first item can be one of two things:
+												//    if even, it's a pointer to the function
+												//    if odd, it's the byte offset into the vtable
+	int                     m_this_delta;       // delta to apply to the 'this' pointer
+
+	int                     m_dummy1;
+	int                     m_dummy2;
+
+	int                     m_size;
+};
+
 #endif
 
 
@@ -568,16 +630,16 @@ public:
 	typedef MEMBER_ABI generic_static_func generic_member_func;
 	// generic constructor
 	delegate_base()
-		: m_function(NULL),
-			m_object(NULL),
-			m_name(NULL),
-			m_latebinder(NULL),
-			m_raw_function(NULL) { }
+		: m_function(nullptr),
+			m_object(nullptr),
+			m_name(nullptr),
+			m_latebinder(nullptr),
+			m_raw_function(nullptr) { }
 
 	// copy constructor
 	delegate_base(const delegate_base &src)
 		: m_function(src.m_function),
-			m_object(NULL),
+			m_object(nullptr),
 			m_name(src.m_name),
 			m_latebinder(src.m_latebinder),
 			m_raw_function(src.m_raw_function),
@@ -589,7 +651,7 @@ public:
 	// copy constructor with late bind
 	delegate_base(const delegate_base &src, delegate_late_bind &object)
 		: m_function(src.m_function),
-			m_object(NULL),
+			m_object(nullptr),
 			m_name(src.m_name),
 			m_latebinder(src.m_latebinder),
 			m_raw_function(src.m_raw_function),
@@ -601,12 +663,12 @@ public:
 	// construct from member function with object pointer
 	template<class _FunctionClass>
 	delegate_base(typename traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object)
-		: m_function(NULL),
-			m_object(NULL),
+		: m_function(nullptr),
+			m_object(nullptr),
 			m_name(name),
 			m_latebinder(&late_bind_helper<_FunctionClass>),
-			m_raw_function(NULL),
-			m_raw_mfp(funcptr, object, (_ReturnType *)0, (generic_static_func)0)
+			m_raw_function(nullptr),
+			m_raw_mfp(funcptr, object, (_ReturnType *)nullptr, (generic_static_func)nullptr)
 	{
 		bind(reinterpret_cast<delegate_generic_class *>(object));
 	}
@@ -615,7 +677,7 @@ public:
 	template<class _FunctionClass>
 	delegate_base(typename traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object)
 		: m_function(reinterpret_cast<generic_static_func>(funcptr)),
-			m_object(NULL),
+			m_object(nullptr),
 			m_name(name),
 			m_latebinder(&late_bind_helper<_FunctionClass>),
 			m_raw_function(reinterpret_cast<generic_static_func>(funcptr))
@@ -627,7 +689,7 @@ public:
 	template<class _FunctionClass>
 	delegate_base(typename traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object)
 		: m_function(reinterpret_cast<generic_static_func>(funcptr)),
-			m_object(NULL),
+			m_object(nullptr),
 			m_name(name),
 			m_latebinder(&late_bind_helper<_FunctionClass>),
 			m_raw_function(reinterpret_cast<generic_static_func>(funcptr))
@@ -641,7 +703,7 @@ public:
 		if (this != &src)
 		{
 			m_function = src.m_function;
-			m_object = NULL;
+			m_object = nullptr;
 			m_name = src.m_name;
 			m_latebinder = src.m_latebinder;
 			m_raw_function = src.m_raw_function;
@@ -681,11 +743,11 @@ public:
 	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9, _P10Type p10, _P11Type p11, _P12Type p12) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12)); }
 
 	// getters
-	bool has_object() const { return (object() != NULL); }
+	bool has_object() const { return (object() != nullptr); }
 	const char *name() const { return m_name; }
 
 	// helpers
-	bool isnull() const { return (m_raw_function == NULL && m_raw_mfp.isnull()); }
+	bool isnull() const { return (m_raw_function == nullptr && m_raw_mfp.isnull()); }
 	bool is_mfp() const { return !m_raw_mfp.isnull(); }
 
 	// late binding
@@ -703,7 +765,7 @@ protected:
 	static delegate_generic_class *late_bind_helper(delegate_late_bind &object)
 	{
 		_FunctionClass *result = dynamic_cast<_FunctionClass *>(&object);
-		if (result == NULL) {
+		if (result == nullptr) {
 			throw binding_type_exception(typeid(_FunctionClass), typeid(object));
 		}
 		return reinterpret_cast<delegate_generic_class *>(result);
@@ -715,7 +777,7 @@ protected:
 		m_object = object;
 
 		// if we're wrapping a member function pointer, handle special stuff
-		if (m_object != NULL && is_mfp())
+		if (m_object != nullptr && is_mfp())
 			m_raw_mfp.update_after_bind(m_function, m_object);
 	}
 

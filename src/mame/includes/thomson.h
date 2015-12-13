@@ -692,8 +692,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	required_device<pia6821_device> m_pia_io;

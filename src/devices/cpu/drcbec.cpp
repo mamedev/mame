@@ -313,7 +313,7 @@ void drcbe_c::reset()
 {
 	// reset our hash tables
 	m_hash.reset();
-	m_hash.set_default_codeptr(NULL);
+	m_hash.set_default_codeptr(nullptr);
 }
 
 
@@ -330,7 +330,7 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, UINT32 
 
 	// begin codegen; fail if we can't
 	drccodeptr *cachetop = m_cache.begin_codegen(numinst * sizeof(drcbec_instruction) * 4);
-	if (cachetop == NULL)
+	if (cachetop == nullptr)
 		block.abort();
 
 	// compute the base by aligning the cache top to an even multiple of drcbec_instruction
@@ -528,7 +528,7 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_HASHJMP, 4, 0):   // HASHJMP mode,pc,handle
 				sp = 0;
 				newinst = (const drcbec_instruction *)m_hash.get_codeptr(PARAM0, PARAM1);
-				if (newinst == NULL)
+				if (newinst == nullptr)
 				{
 					assert(sp < ARRAY_LENGTH(callstack));
 					m_state.exp = PARAM1;

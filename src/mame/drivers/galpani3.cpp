@@ -114,7 +114,7 @@ public:
 	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrolly_w);
 
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);

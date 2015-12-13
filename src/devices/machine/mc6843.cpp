@@ -93,11 +93,11 @@ mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, dev
 	m_data_idx(0),
 	m_data_id(0),
 	m_index_pulse(0),
-	m_timer_cont(NULL)
+	m_timer_cont(nullptr)
 {
-	for (int i = 0; i < 128; i++)
+	for (auto & elem : m_data)
 	{
-		m_data[i] = 0;
+		elem = 0;
 	}
 }
 
@@ -169,7 +169,7 @@ legacy_floppy_image_device* mc6843_device::floppy_image( UINT8 drive )
 	legacy_floppy_image_device *img = floppy_get_device( machine(), drive );
 	if (!img && owner()) {
 		// For slot devices, drives are typically attached to the slot rather than the machine
-		const char *floppy_name = NULL;
+		const char *floppy_name = nullptr;
 		switch (drive) {
 		case 0:
 			floppy_name = FLOPPY_0;

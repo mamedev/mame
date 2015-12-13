@@ -107,7 +107,7 @@ bool cbm2_expansion_slot_device::call_load()
 
 	if (m_card)
 	{
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			size = length();
 
@@ -167,7 +167,7 @@ void cbm2_expansion_slot_device::get_default_card_software(std::string &result)
 
 UINT8 cbm2_expansion_slot_device::read(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		data = m_card->cbm2_bd_r(space, offset, data, csbank1, csbank2, csbank3);
 	}
@@ -182,7 +182,7 @@ UINT8 cbm2_expansion_slot_device::read(address_space &space, offs_t offset, UINT
 
 void cbm2_expansion_slot_device::write(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		m_card->cbm2_bd_w(space, offset, data, csbank1, csbank2, csbank3);
 	}

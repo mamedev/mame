@@ -680,10 +680,10 @@ static const gfx_layout objlayout =
 };
 
 static GFXDECODE_START( decocass )
-	GFXDECODE_ENTRY( NULL, 0x6000, charlayout,       0, 4 )  /* char set #1 */
-	GFXDECODE_ENTRY( NULL, 0x6000, spritelayout,     0, 4 )  /* sprites */
-	GFXDECODE_ENTRY( NULL, 0xd000, tilelayout,      32, 2 )  /* background tiles */
-	GFXDECODE_ENTRY( NULL, 0xd800, objlayout,       48, 4 )  /* object */
+	GFXDECODE_ENTRY( nullptr, 0x6000, charlayout,       0, 4 )  /* char set #1 */
+	GFXDECODE_ENTRY( nullptr, 0x6000, spritelayout,     0, 4 )  /* sprites */
+	GFXDECODE_ENTRY( nullptr, 0xd000, tilelayout,      32, 2 )  /* background tiles */
+	GFXDECODE_ENTRY( nullptr, 0xd800, objlayout,       48, 4 )  /* object */
 GFXDECODE_END
 
 PALETTE_INIT_MEMBER(decocass_state, decocass)

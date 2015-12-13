@@ -67,31 +67,31 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual void execute_run();
+	virtual void execute_run() override;
 
 	int m_icount;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 7; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 7; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	bool sysbus_width() { return BIT(m_sysbus, 0); }

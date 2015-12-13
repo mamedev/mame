@@ -217,7 +217,7 @@ public:
 	required_device<m68340cpu_device> m_maincpu;
 	required_device<esq2x40_sq1_t> m_sq1vfd;
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 public:
 	DECLARE_DRIVER_INIT(mr);

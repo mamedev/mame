@@ -38,7 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER( motors_w );
 
 	// driver_device overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

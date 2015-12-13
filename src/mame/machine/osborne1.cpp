@@ -118,7 +118,7 @@ READ8_MEMBER( osborne1_state::opcode_r )
 
 WRITE8_MEMBER( osborne1_state::bankswitch_w )
 {
-	switch (offset & 0x03)
+	switch (offset)
 	{
 	case 0x00:
 		if (set_rom_mode(1))
@@ -223,7 +223,7 @@ WRITE8_MEMBER( osborne1_state::video_pia_port_b_w )
 	}
 	else
 	{
-		m_fdc->set_floppy(NULL);
+		m_fdc->set_floppy(nullptr);
 	}
 }
 
@@ -437,7 +437,7 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 
 	// Check reset key if necessary - it affects NMI
 	if (!m_ub6a_q)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, (m_btn_reset->read() && 0x80) ? CLEAR_LINE : ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, (m_btn_reset->read() & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_video_timer->adjust(machine().first_screen()->time_until_pos(y + 1, 0));
 }

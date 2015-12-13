@@ -641,7 +641,7 @@ void metro_state::draw_layers( screen_device &screen, bitmap_ind16 &bitmap, cons
 
 			if (BIT(layers_ctrl, layer))    // for debug
 			{
-				UINT16 *tilemapram = 0;
+				UINT16 *tilemapram = nullptr;
 
 				switch (layer)
 				{

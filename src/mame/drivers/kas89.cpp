@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
+// thanks-to:Iris Falbala,Rob Ragon
 /*************************************************************************************
 
   /\/\<< Kasino '89 >>/\/\
@@ -247,8 +248,8 @@ public:
 	DECLARE_WRITE8_MEMBER(led_mux_data_w);
 	DECLARE_WRITE8_MEMBER(led_mux_select_w);
 	DECLARE_DRIVER_INIT(kas89);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_nmi_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_sound_nmi_cb);
 	DECLARE_WRITE_LINE_MEMBER(kas89_vdp_interrupt);

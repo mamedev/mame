@@ -18,16 +18,16 @@ class ui_menu_video_targets : public ui_menu {
 public:
 	ui_menu_video_targets(running_machine &machine, render_container *container);
 	virtual ~ui_menu_video_targets();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 };
 
 class ui_menu_video_options : public ui_menu {
 public:
 	ui_menu_video_options(running_machine &machine, render_container *container, render_target *target);
 	virtual ~ui_menu_video_options();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	enum {

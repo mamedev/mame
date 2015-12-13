@@ -437,7 +437,7 @@ machine_config_constructor midway_ssio_device::device_mconfig_additions() const
 
 ioport_constructor midway_ssio_device::device_input_ports() const
 {
-	return NULL;
+	return nullptr;
 //  return INPUT_PORTS_NAME( midway_ssio );
 }
 

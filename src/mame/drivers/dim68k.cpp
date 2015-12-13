@@ -71,8 +71,8 @@ public:
 	bool m_speaker_bit;
 	UINT8 m_video_control;
 	UINT8 m_term_data;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;

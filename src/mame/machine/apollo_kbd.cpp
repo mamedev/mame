@@ -146,7 +146,7 @@ const char *apollo_kbd_device::cpu_context()
 	int ms = (t % osd_ticks_per_second()) / 1000;
 
 	/* if we have an executing CPU, output data */
-	if (cpu != NULL)
+	if (cpu != nullptr)
 	{
 		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag(),
 				cpu->safe_pcbase(), tag());
@@ -163,9 +163,9 @@ const char *apollo_kbd_device::cpu_context()
 //**************************************************************************
 
 apollo_kbd_device::beeper::beeper() :
-	m_device(NULL),
-	m_beeper(NULL),
-	m_timer(NULL)
+	m_device(nullptr),
+	m_beeper(nullptr),
+	m_timer(nullptr)
 {
 }
 
@@ -218,7 +218,7 @@ TIMER_CALLBACK( apollo_kbd_device::beeper::static_beeper_callback )
 //**************************************************************************
 
 apollo_kbd_device::mouse::mouse() :
-	m_device(NULL)
+	m_device(nullptr)
 {
 }
 

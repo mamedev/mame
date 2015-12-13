@@ -30,7 +30,7 @@ static MACHINE_CONFIG_FRAGMENT( cpc_rom )
 
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
@@ -99,7 +99,7 @@ rom_image_device::~rom_image_device()
 
 void rom_image_device::device_start()
 {
-	m_base = NULL;
+	m_base = nullptr;
 }
 
 /*-------------------------------------------------
@@ -131,5 +131,5 @@ bool rom_image_device::call_load()
 void rom_image_device::call_unload()
 {
 	global_free_array(m_base);
-	m_base = NULL;
+	m_base = nullptr;
 }

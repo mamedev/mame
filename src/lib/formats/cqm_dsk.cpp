@@ -128,7 +128,7 @@ static floperr_t cqm_read_indexed_sector(floppy_image_legacy *floppy, int head, 
 static floperr_t cqm_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	floperr_t err;
-	err = get_offset(floppy, head, track, sector, FALSE, NULL);
+	err = get_offset(floppy, head, track, sector, FALSE, nullptr);
 	if (err)
 		return err;
 

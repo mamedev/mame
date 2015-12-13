@@ -23,7 +23,7 @@ public:
 	DECLARE_READ8_MEMBER(ioboard_unk_r);
 	DECLARE_WRITE8_MEMBER(ioboard_data_w);
 	DECLARE_WRITE8_MEMBER(ioboard_reg_w);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_hotstuff(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };

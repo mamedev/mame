@@ -329,8 +329,8 @@ void naomi_gdrom_board::write_from_qword(UINT8 *region, UINT64 qword)
 naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: naomi_board(mconfig, NAOMI_GDROM_BOARD, "Sega NAOMI GDROM Board", tag, owner, clock, "naomi_gdrom_board", __FILE__)
 {
-	image_tag = 0;
-	pic_tag = 0;
+	image_tag = nullptr;
+	pic_tag = nullptr;
 }
 
 void naomi_gdrom_board::static_set_tags(device_t &device, const char *_image_tag, const char *_pic_tag)
@@ -388,7 +388,7 @@ void naomi_gdrom_board::device_start()
 {
 	naomi_board::device_start();
 
-	dimm_data = 0;
+	dimm_data = nullptr;
 	dimm_data_size = 0;
 
 	char name[128];

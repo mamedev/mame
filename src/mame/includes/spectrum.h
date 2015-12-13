@@ -244,7 +244,7 @@ protected:
 	void ts2068_hires_scanline(bitmap_ind16 &bitmap, int y, int borderlines);
 	void ts2068_64col_scanline(bitmap_ind16 &bitmap, int y, int borderlines, unsigned short inkcolor);
 	void ts2068_lores_scanline(bitmap_ind16 &bitmap, int y, int borderlines, int screen);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

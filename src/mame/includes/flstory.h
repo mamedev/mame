@@ -118,7 +118,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(victnine_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_rumba_tile_info);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(flstory);
 	DECLARE_VIDEO_START(flstory);
 	DECLARE_VIDEO_START(victnine);

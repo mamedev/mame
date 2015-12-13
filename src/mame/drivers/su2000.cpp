@@ -67,8 +67,8 @@ public:
 		: pcat_base_state(mconfig, type, tag){ }
 
 	UINT32      *m_pc_ram;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 

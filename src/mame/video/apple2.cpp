@@ -101,7 +101,7 @@ inline void apple2_state::apple2_plot_text_character(bitmap_ind16 &bitmap, int x
 	const UINT8 *chardata;
 	UINT16 color;
 
-	if (m_sysconfig != NULL)
+	if (m_sysconfig != nullptr)
 	{
 		switch (m_sysconfig->read() & 0x03)
 		{
@@ -291,7 +291,7 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 	UINT16 *artifact_map_ptr;
 	int mon_type = 0;
 
-	if (m_sysconfig != NULL)
+	if (m_sysconfig != nullptr)
 	{
 		mon_type = m_sysconfig->read() & 0x03;
 	}

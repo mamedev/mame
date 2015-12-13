@@ -11,7 +11,7 @@ READ8_MEMBER( m68307cpu_device::m68307_internal_mbus_r )
 {
 	m68307cpu_device *m68k = this;
 	m68307_mbus* mbus = m68k->m68307MBUS;
-	assert(mbus != NULL);
+	assert(mbus != nullptr);
 	UINT8 retval;
 
 	if (mbus)
@@ -59,7 +59,7 @@ WRITE8_MEMBER( m68307cpu_device::m68307_internal_mbus_w )
 {
 	m68307cpu_device *m68k = this;
 	m68307_mbus* mbus = m68k->m68307MBUS;
-	assert(mbus != NULL);
+	assert(mbus != nullptr);
 
 	if (mbus)
 	{

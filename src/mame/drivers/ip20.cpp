@@ -70,8 +70,8 @@ public:
 	DECLARE_WRITE32_MEMBER(int_w);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
 	DECLARE_DRIVER_INIT(ip204415);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_ip204415(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(ip20_timer_rtc);
 	required_device<wd33c93_device> m_wd33c93;
@@ -81,7 +81,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

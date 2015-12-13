@@ -64,8 +64,8 @@ public:
 	virtual DECLARE_ADDRESS_MAP(io_map, 16);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	UINT8 inta_r() { return m_pic->acknowledge(); }
 
@@ -88,8 +88,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	required_device<pic8259_device> m_pic;
 	required_device<pit8254_device> m_pit;

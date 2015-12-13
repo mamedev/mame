@@ -52,8 +52,8 @@ public:
 	DECLARE_WRITE8_MEMBER( ay_port_b_w );
 
 private:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	UINT8 m_column;

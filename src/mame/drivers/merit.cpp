@@ -126,7 +126,7 @@ public:
 	DECLARE_DRIVER_INIT(key_0);
 	DECLARE_DRIVER_INIT(key_2);
 	DECLARE_DRIVER_INIT(dtrvwz5);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_MACHINE_START(casino5);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);

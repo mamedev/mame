@@ -63,7 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER(proj_parm_2_w);
 	DECLARE_READ8_MEMBER(coll_det_r);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int collision_check_s1s2();

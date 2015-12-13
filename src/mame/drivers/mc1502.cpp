@@ -285,7 +285,7 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
 	MCFG_I8251_SYNDET_HANDLER(WRITELINE(mc1502_state, mc1502_i8251_syndet))
 
-	MCFG_RS232_PORT_ADD("irps", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("irps", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd8251", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("upd8251", i8251_device, write_dsr))
 

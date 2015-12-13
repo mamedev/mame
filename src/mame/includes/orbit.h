@@ -52,9 +52,9 @@ public:
 	DECLARE_WRITE8_MEMBER(orbit_misc_w);
 	DECLARE_WRITE8_MEMBER(orbit_playfield_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_orbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(orbit_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_off);

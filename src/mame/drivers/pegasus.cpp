@@ -90,9 +90,9 @@ private:
 	UINT8 *m_p_pcgram;
 	const UINT8 *m_p_chargen;
 	UINT8 m_control_bits;
-	virtual void machine_reset();
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	void pegasus_decrypt_rom(UINT8 *ROM);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -424,7 +424,7 @@ int pegasus_state::load_cart(device_image_interface &image, generic_slot_device 
 		return IMAGE_INIT_FAIL;
 	}
 
-	if (image.software_entry() != NULL && size == 0)
+	if (image.software_entry() != nullptr && size == 0)
 	{
 		// we might be loading a cart compatible with all sockets!
 		// so try to get region "rom"

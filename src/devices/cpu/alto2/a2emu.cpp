@@ -607,11 +607,11 @@ void alto2_cpu_device::f2_late_idisp()
 		LOG((this,LOG_EMU,2,"    IDISP<-; branch on SH^3 (%#o|%#o)\n", m_next2, r));
 	} else {
 		//int addr = CTL2K_U3(f2_emu_idisp) + X_RDBITS(m_emu.ir,16,1,7);
-        // The above line triggers the following warning in PVS-Studio:
-        // V501: There are identical sub-expressions to the left and to the right of the '==' operator: f2_emu_idisp == f2_emu_idisp
-        // This is because CTL2K_U3(f2) checks f2 == f2_emu_idisp, and so will always evaluate to true in this case.
-        // Consider checking if this is a typo or if it is correct.
-        int addr = 0x80 + X_RDBITS(m_emu.ir,16,1,7);
+		// The above line triggers the following warning in PVS-Studio:
+		// V501: There are identical sub-expressions to the left and to the right of the '==' operator: f2_emu_idisp == f2_emu_idisp
+		// This is because CTL2K_U3(f2) checks f2 == f2_emu_idisp, and so will always evaluate to true in this case.
+		// Consider checking if this is a typo or if it is correct.
+		int addr = 0x80 + X_RDBITS(m_emu.ir,16,1,7);
 		/* 0???????xxxxxxxx */
 		r = m_ctl2k_u3[addr];
 		LOG((this,LOG_EMU,2,"    IDISP<-; IR (%#o) branch on PROM ctl2k_u3[%03o] (%#o|%#o)\n", m_emu.ir, addr, m_next2, r));
@@ -657,26 +657,26 @@ void alto2_cpu_device::init_emu(int task)
 
 	init_ram(task);
 
-	set_bs(task, bs_emu_read_sreg,      &alto2_cpu_device::bs_early_read_sreg, 0);
+	set_bs(task, bs_emu_read_sreg,      &alto2_cpu_device::bs_early_read_sreg, nullptr);
 	set_bs(task, bs_emu_load_sreg,      &alto2_cpu_device::bs_early_load_sreg, &alto2_cpu_device::bs_late_load_sreg);
-	set_bs(task, bs_disp,               &alto2_cpu_device::bs_early_emu_disp, 0);
+	set_bs(task, bs_disp,               &alto2_cpu_device::bs_early_emu_disp, nullptr);
 
-	set_f1(task, f1_block,              &alto2_cpu_device::f1_early_emu_block, 0);  // catch the emulator task trying to block (wrong branch)
-	set_f1(task, f1_emu_swmode,         0, &alto2_cpu_device::f1_late_swmode);
-	set_f1(task, f1_emu_wrtram,         0, &alto2_cpu_device::f1_late_wrtram);
-	set_f1(task, f1_emu_rdram,          0, &alto2_cpu_device::f1_late_rdram);
-	set_f1(task, f1_emu_load_rmr,       0, &alto2_cpu_device::f1_late_emu_load_rmr);
-	set_f1(task, f1_task_14,            0, 0);                                      // F1 014 is undefined (?)
-	set_f1(task, f1_emu_load_esrb,      0, &alto2_cpu_device::f1_late_emu_load_esrb);
-	set_f1(task, f1_emu_rsnf,           &alto2_cpu_device::f1_early_rsnf, 0);
-	set_f1(task, f1_emu_startf,         &alto2_cpu_device::f1_early_startf, 0);
+	set_f1(task, f1_block,              &alto2_cpu_device::f1_early_emu_block, nullptr);  // catch the emulator task trying to block (wrong branch)
+	set_f1(task, f1_emu_swmode,         nullptr, &alto2_cpu_device::f1_late_swmode);
+	set_f1(task, f1_emu_wrtram,         nullptr, &alto2_cpu_device::f1_late_wrtram);
+	set_f1(task, f1_emu_rdram,          nullptr, &alto2_cpu_device::f1_late_rdram);
+	set_f1(task, f1_emu_load_rmr,       nullptr, &alto2_cpu_device::f1_late_emu_load_rmr);
+	set_f1(task, f1_task_14,            nullptr, nullptr);                                      // F1 014 is undefined (?)
+	set_f1(task, f1_emu_load_esrb,      nullptr, &alto2_cpu_device::f1_late_emu_load_esrb);
+	set_f1(task, f1_emu_rsnf,           &alto2_cpu_device::f1_early_rsnf, nullptr);
+	set_f1(task, f1_emu_startf,         &alto2_cpu_device::f1_early_startf, nullptr);
 
-	set_f2(task, f2_emu_busodd,         0, &alto2_cpu_device::f2_late_busodd);
-	set_f2(task, f2_emu_magic,          0, &alto2_cpu_device::f2_late_magic);
+	set_f2(task, f2_emu_busodd,         nullptr, &alto2_cpu_device::f2_late_busodd);
+	set_f2(task, f2_emu_magic,          nullptr, &alto2_cpu_device::f2_late_magic);
 	set_f2(task, f2_emu_load_dns,       &alto2_cpu_device::f2_early_load_dns, &alto2_cpu_device::f2_late_load_dns);
-	set_f2(task, f2_emu_acdest,         &alto2_cpu_device::f2_early_acdest, 0);
-	set_f2(task, f2_emu_load_ir,        0, &alto2_cpu_device::f2_late_load_ir);
-	set_f2(task, f2_emu_idisp,          0, &alto2_cpu_device::f2_late_idisp);
+	set_f2(task, f2_emu_acdest,         &alto2_cpu_device::f2_early_acdest, nullptr);
+	set_f2(task, f2_emu_load_ir,        nullptr, &alto2_cpu_device::f2_late_load_ir);
+	set_f2(task, f2_emu_idisp,          nullptr, &alto2_cpu_device::f2_late_idisp);
 	set_f2(task, f2_emu_acsource,       &alto2_cpu_device::f2_early_acsource, &alto2_cpu_device::f2_late_acsource);
 }
 

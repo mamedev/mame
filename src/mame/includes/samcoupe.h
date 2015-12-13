@@ -77,17 +77,17 @@ public:
 			m_io_mouse_y(*this, "mouse_y"),
 			m_config(*this, "config")
 	{
-		sam_bank_read_ptr[0] = NULL;
-		sam_bank_write_ptr[0] = NULL;
-		sam_bank_read_ptr[1] = NULL;
-		sam_bank_write_ptr[1] = NULL;
-		sam_bank_read_ptr[2] = NULL;
-		sam_bank_write_ptr[2] = NULL;
-		sam_bank_read_ptr[3] = NULL;
-		sam_bank_write_ptr[3] = NULL;
+		sam_bank_read_ptr[0] = nullptr;
+		sam_bank_write_ptr[0] = nullptr;
+		sam_bank_read_ptr[1] = nullptr;
+		sam_bank_write_ptr[1] = nullptr;
+		sam_bank_read_ptr[2] = nullptr;
+		sam_bank_write_ptr[2] = nullptr;
+		sam_bank_read_ptr[3] = nullptr;
+		sam_bank_write_ptr[3] = nullptr;
 	}
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -129,8 +129,8 @@ public:
 	DECLARE_READ8_MEMBER(samcoupe_keyboard_r);
 	DECLARE_WRITE8_MEMBER(samcoupe_border_w);
 	DECLARE_READ8_MEMBER(samcoupe_attributes_r);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(samcoupe);
 	INTERRUPT_GEN_MEMBER(samcoupe_frame_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_off);
@@ -197,7 +197,7 @@ public:
 	int m_lpt1_busy;
 	int m_lpt2_busy;
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif /* SAMCOUPE_H_ */

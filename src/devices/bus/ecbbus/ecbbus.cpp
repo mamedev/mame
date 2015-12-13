@@ -95,8 +95,8 @@ ecbbus_device::ecbbus_device(const machine_config &mconfig, const char *tag, dev
 	m_write_irq(*this),
 	m_write_nmi(*this)
 {
-	for (int i = 0; i < MAX_ECBBUS_SLOTS; i++)
-		m_ecbbus_device[i] = NULL;
+	for (auto & elem : m_ecbbus_device)
+		elem = nullptr;
 }
 
 
@@ -130,11 +130,11 @@ READ8_MEMBER( ecbbus_device::mem_r )
 {
 	UINT8 data = 0;
 
-	for (int i = 0; i < MAX_ECBBUS_SLOTS; i++)
+	for (auto & elem : m_ecbbus_device)
 	{
-		if (m_ecbbus_device[i] != NULL)
+		if (elem != nullptr)
 		{
-			data |= m_ecbbus_device[i]->ecbbus_mem_r(offset);
+			data |= elem->ecbbus_mem_r(offset);
 		}
 	}
 
@@ -148,11 +148,11 @@ READ8_MEMBER( ecbbus_device::mem_r )
 
 WRITE8_MEMBER( ecbbus_device::mem_w )
 {
-	for (int i = 0; i < MAX_ECBBUS_SLOTS; i++)
+	for (auto & elem : m_ecbbus_device)
 	{
-		if (m_ecbbus_device[i] != NULL)
+		if (elem != nullptr)
 		{
-			m_ecbbus_device[i]->ecbbus_mem_w(offset, data);
+			elem->ecbbus_mem_w(offset, data);
 		}
 	}
 }
@@ -166,11 +166,11 @@ READ8_MEMBER( ecbbus_device::io_r )
 {
 	UINT8 data = 0;
 
-	for (int i = 0; i < MAX_ECBBUS_SLOTS; i++)
+	for (auto & elem : m_ecbbus_device)
 	{
-		if (m_ecbbus_device[i] != NULL)
+		if (elem != nullptr)
 		{
-			data |= m_ecbbus_device[i]->ecbbus_io_r(offset);
+			data |= elem->ecbbus_io_r(offset);
 		}
 	}
 
@@ -184,11 +184,11 @@ READ8_MEMBER( ecbbus_device::io_r )
 
 WRITE8_MEMBER( ecbbus_device::io_w )
 {
-	for (int i = 0; i < MAX_ECBBUS_SLOTS; i++)
+	for (auto & elem : m_ecbbus_device)
 	{
-		if (m_ecbbus_device[i] != NULL)
+		if (elem != nullptr)
 		{
-			m_ecbbus_device[i]->ecbbus_io_w(offset, data);
+			elem->ecbbus_io_w(offset, data);
 		}
 	}
 }

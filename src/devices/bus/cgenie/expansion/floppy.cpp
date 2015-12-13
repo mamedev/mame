@@ -77,8 +77,8 @@ static MACHINE_CONFIG_FRAGMENT( cgenie_fdc )
 
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:1", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:2", cgenie_floppies, NULL,   cgenie_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1793:3", cgenie_floppies, NULL,   cgenie_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1793:2", cgenie_floppies, nullptr,   cgenie_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1793:3", cgenie_floppies, nullptr,   cgenie_fdc_device::floppy_formats)
 
 //  MCFG_SOFTWARE_LIST_ADD("floppy_list", "cgenie_flop")
 
@@ -112,7 +112,7 @@ cgenie_fdc_device::cgenie_fdc_device(const machine_config &mconfig, const char *
 	m_floppy2(*this, "fd1793:2"),
 	m_floppy3(*this, "fd1793:3"),
 	m_socket(*this, "socket"),
-	m_floppy(NULL),
+	m_floppy(nullptr),
 	m_irq_status(0)
 {
 }
@@ -199,7 +199,7 @@ WRITE8_MEMBER( cgenie_fdc_device::select_w )
 	if (VERBOSE)
 		logerror("cgenie_fdc_device::motor_w: 0x%02x\n", data);
 
-	m_floppy = NULL;
+	m_floppy = nullptr;
 
 	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();

@@ -56,8 +56,8 @@ private:
 			: width(0),
 				xoffs(0), yoffs(0),
 				bmwidth(0), bmheight(0),
-				rawdata(NULL),
-				texture(NULL) { }
+				rawdata(nullptr),
+				texture(nullptr) { }
 
 		INT32               width;              // width from this character to the next
 		INT32               xoffs, yoffs;       // X and Y offset from baseline to top,left of bitmap

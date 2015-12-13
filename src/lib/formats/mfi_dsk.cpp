@@ -187,8 +187,8 @@ bool mfi_format::save(io_generic *io, floppy_image *image)
 
 	int pos = sizeof(header) + (tracks << resolution)*heads*sizeof(entry);
 	int epos = 0;
-	UINT32 *precomp = global_alloc_array(UINT32, max_track_size);
-	UINT8 *postcomp = global_alloc_array(UINT8, max_track_size*4 + 1000);
+	auto precomp = global_alloc_array(UINT32, max_track_size);
+	auto postcomp = global_alloc_array(UINT8, max_track_size*4 + 1000);
 
 	for(int track=0; track <= (tracks-1) << 2; track += 4 >> resolution)
 		for(int head=0; head<heads; head++) {

@@ -117,7 +117,7 @@ public:
 	DECLARE_DRIVER_INIT(laserdisc);
 	TILE_GET_INFO_MEMBER(horizontal_tile_info);
 	TILE_GET_INFO_MEMBER(vertical_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(statriv2);
 	DECLARE_VIDEO_START(vertical);
 	UINT32 screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

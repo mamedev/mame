@@ -220,7 +220,7 @@ public:
 	template<class _Object> static devcb_base &set_aec_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_aec.set_callback(object); }
 	template<class _Object> static devcb_base &set_k_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_k.set_callback(object); }
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -252,9 +252,9 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void execute_run();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void execute_run() override;
 
 	int m_icount;
 	int m_variant;
@@ -398,8 +398,8 @@ public:
 	mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks / 8); }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 8); }
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks / 8); }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 8); }
 };
 
 
@@ -413,7 +413,7 @@ public:
 	mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 
 	// device-level overrides
-	virtual void execute_run();
+	virtual void execute_run() override;
 };
 
 
@@ -436,8 +436,8 @@ public:
 	mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks / 8); }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 8); }
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks / 8); }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 8); }
 };
 
 

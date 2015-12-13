@@ -35,7 +35,7 @@
 static const prom_load_t pl_displ_a38 =
 {
 	"displ.a38",
-	0,
+	nullptr,
 	"fd30beb7",
 	"65e4a19ba4ff748d525122128c514abedd55d866",
 	/* size */  0400,
@@ -123,7 +123,7 @@ static const prom_load_t pl_displ_a38 =
 static const prom_load_t pl_displ_a63 =
 {
 	"displ.a63",
-	0,
+	nullptr,
 	"82a20d60",
 	"39d90703568be5419ada950e112d99227873fdea",
 	/* size */  0040,
@@ -166,7 +166,7 @@ static const prom_load_t pl_displ_a63 =
 static const prom_load_t pl_displ_a66 =
 {
 	"displ.a66",
-	0,
+	nullptr,
 	"9f91aad9",
 	"69b1d4c71f4e18103112e8601850c2654e9265cf",
 	/* size */  0400,

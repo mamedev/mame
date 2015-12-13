@@ -251,9 +251,9 @@ public:
 	inline UINT16 vdp_get_word_from_68k_mem(UINT32 source);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// called when we hit 240 and 241 (used to control the z80 irq line on genesis, or the main irq on c2)
 	devcb_write_line m_sndirqline_callback;

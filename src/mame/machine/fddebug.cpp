@@ -309,7 +309,7 @@ static int validate_opcode(address_space &space, UINT32 pc, const UINT8 *opdata,
     used to decrypt it
 -----------------------------------------------*/
 
-INLINE int addr_to_keyaddr(offs_t address)
+static inline int addr_to_keyaddr(offs_t address)
 {
 	/* for address xx0000-xx0006 (but only if >= 000008), use key xx2000-xx2006 */
 	if ((address & 0x0ffc) == 0 && address >= 4)
@@ -325,7 +325,7 @@ INLINE int addr_to_keyaddr(offs_t address)
     always be 1
 -----------------------------------------------*/
 
-INLINE UINT8 mask_for_keyaddr(offs_t address)
+static inline UINT8 mask_for_keyaddr(offs_t address)
 {
 	/* the first half of the key always has bit 0x80 set; the second half 0x40 */
 	/* however, the values at 0000-0003 and 1000-1003 don't follow this rule */
@@ -343,7 +343,7 @@ INLINE UINT8 mask_for_keyaddr(offs_t address)
     the specified number of steps
 -----------------------------------------------*/
 
-INLINE UINT32 advance_seed(UINT32 seed, int count)
+static inline UINT32 advance_seed(UINT32 seed, int count)
 {
 	/* iterate over the seed for 'count' reps */
 	while (count--)
@@ -360,7 +360,7 @@ INLINE UINT32 advance_seed(UINT32 seed, int count)
     from a seed and apply the given mask
 -----------------------------------------------*/
 
-INLINE UINT8 key_value_from_seed(UINT32 seed, UINT8 mask)
+static inline UINT8 key_value_from_seed(UINT32 seed, UINT8 mask)
 {
 	/* put bits 16-21 of the seed in the low 6 bits and OR with the mask */
 	return ((~seed >> 16) & 0x3f) | mask;
@@ -373,7 +373,7 @@ INLINE UINT8 key_value_from_seed(UINT32 seed, UINT8 mask)
     given seed
 -----------------------------------------------*/
 
-INLINE void generate_key_bytes(UINT8 *dest, UINT32 keyoffs, UINT32 count, UINT32 seed)
+static inline void generate_key_bytes(UINT8 *dest, UINT32 keyoffs, UINT32 count, UINT32 seed)
 {
 	int bytenum;
 
@@ -395,7 +395,7 @@ INLINE void generate_key_bytes(UINT8 *dest, UINT32 keyoffs, UINT32 count, UINT32
     an opcode based on the opcode
 -----------------------------------------------*/
 
-INLINE UINT8 get_opcode_length(UINT16 opcode)
+static inline UINT8 get_opcode_length(UINT16 opcode)
 {
 	/* return the length from the table */
 	return optable[opcode].flags >> 28;
@@ -407,7 +407,7 @@ INLINE UINT8 get_opcode_length(UINT16 opcode)
     constraint
 -----------------------------------------------*/
 
-INLINE void set_constraint(fd1094_constraint *constraint, UINT32 pc, UINT16 state, UINT16 value, UINT16 mask)
+static inline void set_constraint(fd1094_constraint *constraint, UINT32 pc, UINT16 state, UINT16 value, UINT16 mask)
 {
 	constraint->pc = pc;
 	constraint->state = state;
@@ -420,7 +420,7 @@ INLINE void set_constraint(fd1094_constraint *constraint, UINT32 pc, UINT16 stat
     for a given address
 -----------------------------------------------*/
 
-INLINE void print_possibilities(running_machine &machine)
+static inline void print_possibilities(running_machine &machine)
 {
 	int i;
 
@@ -435,7 +435,7 @@ INLINE void print_possibilities(running_machine &machine)
     0=no, 1=yes, 2=unlikely
 -----------------------------------------------*/
 
-INLINE int pc_is_valid(address_space &space, UINT32 pc, UINT32 flags)
+static inline int pc_is_valid(address_space &space, UINT32 pc, UINT32 flags)
 {
 	/* if we're odd or out of range, fail */
 	if ((pc & 1) == 1)
@@ -453,7 +453,7 @@ INLINE int pc_is_valid(address_space &space, UINT32 pc, UINT32 flags)
     valid? 0=no, 1=yes, 2=unlikely
 -----------------------------------------------*/
 
-INLINE int addr_is_valid(address_space &space, UINT32 addr, UINT32 flags)
+static inline int addr_is_valid(address_space &space, UINT32 addr, UINT32 flags)
 {
 	/* if this a JMP, the address is a PC */
 	if (flags & OF_JMP)

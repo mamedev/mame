@@ -144,7 +144,7 @@ static const z80_daisy_config einstein_daisy_chain[] =
 	{ "adc_daisy" },
 	{ IC_I063 },
 	{ "fire_daisy" },
-	{ NULL }
+	{ nullptr }
 };
 
 
@@ -222,7 +222,7 @@ WRITE8_MEMBER(einstein_state::einstein_drsel_w)
 
 	/* bit 0 to 3 select the drive */
 	static const char *names[] = { IC_I042 ":0", IC_I042 ":1", IC_I042 ":2", IC_I042 ":3" };
-	floppy_image_device *floppy = 0;
+	floppy_image_device *floppy = nullptr;
 	for(int i=0; i<4; i++) {
 		if(BIT(data, i)) {
 			floppy_connector *con = machine().device<floppy_connector>(names[i]);

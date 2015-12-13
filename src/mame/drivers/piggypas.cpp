@@ -26,8 +26,8 @@ public:
 		m_ticket(*this, "ticket")
 	{ }
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(mcs51_tx_callback);
 	DECLARE_INPUT_CHANGED_MEMBER(ball_sensor);

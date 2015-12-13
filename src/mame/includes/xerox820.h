@@ -65,8 +65,8 @@ public:
 		m_400_460(0)
 	{ }
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -127,7 +127,7 @@ public:
 
 	required_device<beep_device> m_beeper;
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( kbpio_pa_w );
 
@@ -149,7 +149,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<SCSI_PORT_DEVICE> m_sasibus;
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( bell_w );
 	DECLARE_WRITE8_MEMBER( slden_w );
@@ -160,7 +160,7 @@ public:
 	DECLARE_WRITE8_MEMBER( rdpio_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( rdpio_pardy_w );
 
-	void bankswitch(int bank);
+	void bankswitch(int bank) override;
 };
 
 #endif

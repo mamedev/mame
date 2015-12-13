@@ -1,191 +1,109 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- Acorn Cambridge Workstation Disks -->
+<!-- BBC Micro - 32016 Co-Processor Discs -->
 
 <!-- Loading Instructions:
 
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbc_32016_flop" description="Cambridge Workstation Distribution Discs">
+<softwarelist name="bbc_32016_flop" description="32016 Co-Processor Discs">
 
-	<software name="panos111" supported="no">
-		<description>1 PanOS Startup and Utilities v1.1</description>
+	<software name="panos11" cloneof="panos14" supported="no">
+		<description>PanOS Version 1.10 System Disks</description>
 		<year>1985</year>
 		<publisher>Acorn Computers</publisher>
 		<info name="format" value="DFS" />
 		<info name="compatibility" value="32016 co-processor" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="PanOS Startup and Utilities"/>
 			<dataarea name="flop" size="407552">
 				<rom name="panos11-1.ssd" size="407552" crc="bec45a4d" sha1="4634c4bc7fc62576a0cfe2ac43d75abfca7458fc" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="panos112" supported="no">
-		<description>2 PanOS System v1.1</description>
-		<year>1985</year>
-		<publisher>Acorn Computers</publisher>
-		<info name="format" value="DFS" />
-		<info name="compatibility" value="32016 co-processor" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="PanOS System"/>
 			<dataarea name="flop" size="245760">
 				<rom name="panos11-2.ssd" size="245760" crc="e80fb7c4" sha1="41cd9b89a0b3e844f22b2afc7ff4acc52ae7d70c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="panos113" supported="no">
-		<description>3 FORTRAN 77 (PanOS) v1.1</description>
-		<year>1985</year>
-		<publisher>Acorn Computers</publisher>
-		<info name="format" value="DFS" />
-		<info name="compatibility" value="32016 co-processor" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="FORTRAN 77 (PanOS)"/>
 			<dataarea name="flop" size="309760">
 				<rom name="panos11-3.ssd" size="309760" crc="43841e68" sha1="99afc53f9964f825f0361bbe5f9c228e4a24fa9c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="panos114" supported="no">
-		<description>4 ISO PASCAL (PanOS) v1.1</description>
-		<year>1985</year>
-		<publisher>Acorn Computers</publisher>
-		<info name="format" value="DFS" />
-		<info name="compatibility" value="32016 co-processor" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="ISO PASCAL (PanOS)"/>
 			<dataarea name="flop" size="360960">
 				<rom name="panos11-4.ssd" size="360960" crc="634a61a5" sha1="232f80862d038f3932a8333bd3690e2e7f0aa25c" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="panos115" supported="no">
-		<description>5 C (PanOS) v1.1</description>
-		<year>1985</year>
-		<publisher>Acorn Computers</publisher>
-		<info name="format" value="DFS" />
-		<info name="compatibility" value="32016 co-processor" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="C (PanOS)"/>
 			<dataarea name="flop" size="401664">
 				<rom name="panos11-5.ssd" size="401664" crc="99c7c7ad" sha1="bf5d4cece6673a04c634ea59af19cad3ed74e58b" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="panos116" supported="no">
-		<description>6 Cambridge LISP (PanOS) v1.1</description>
-		<year>1985</year>
-		<publisher>Acorn Computers</publisher>
-		<info name="format" value="DFS" />
-		<info name="compatibility" value="32016 co-processor" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Cambridge LISP (PanOS)"/>
 			<dataarea name="flop" size="409600">
 				<rom name="panos11-6.ssd" size="409600" crc="e125d3c1" sha1="35f3cb89abc909e0d6787ffa2e727f0f4b1937b9" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="panos117" supported="no">
-		<description>7 Welcome Programs v1.1</description>
-		<year>1985</year>
-		<publisher>Acorn Computers</publisher>
-		<info name="format" value="DFS" />
-		<info name="compatibility" value="32016 co-processor" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Welcome Programs"/>
 			<dataarea name="flop" size="377344">
 				<rom name="panos11-7.ssd" size="377344" crc="baa462ea" sha1="22cab34f8f51b13a3995db63a83354097c0a613e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="panos141" supported="no">
-		<description>1 PanOS Startup and Utilities v1.4</description>
+	<software name="panos14" supported="no">
+		<description>PanOS Version 1.40 System Disks</description>
 		<year>1985</year>
 		<publisher>Acorn Computers</publisher>
 		<info name="format" value="DFS" />
 		<info name="compatibility" value="32016 co-processor" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="PanOS Startup and Utilities"/>
 			<dataarea name="flop" size="384768">
 				<rom name="panos14-1.ssd" size="384768" crc="eed42267" sha1="55a8a650ad214e2c623f6c0a2639acc96cd264cf" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="panos142" supported="no">
-		<description>2 PanOS System v1.4</description>
-		<year>1985</year>
-		<publisher>Acorn Computers</publisher>
-		<info name="format" value="DFS" />
-		<info name="compatibility" value="32016 co-processor" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="PanOS System"/>
 			<dataarea name="flop" size="205060">
 				<rom name="panos14-2.ssd" size="205060" crc="5f0b7639" sha1="4bd9e7ee5db79f4c0f3608b7d2b9b5437aae356d" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="panos143" supported="no">
-		<description>3 FORTRAN 77 (PanOS) v1.4</description>
-		<year>1985</year>
-		<publisher>Acorn Computers</publisher>
-		<info name="format" value="DFS" />
-		<info name="compatibility" value="32016 co-processor" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="FORTRAN 77 (PanOS)"/>
 			<dataarea name="flop" size="290304">
 				<rom name="panos14-3.ssd" size="290304" crc="5b28d9e4" sha1="e8503acb278259483bcb82697c3a8006be09ce42" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="panos144" supported="no">
-		<description>4 ISO PASCAL (PanOS) v1.4</description>
-		<year>1985</year>
-		<publisher>Acorn Computers</publisher>
-		<info name="format" value="DFS" />
-		<info name="compatibility" value="32016 co-processor" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="ISO PASCAL (PanOS)"/>
 			<dataarea name="flop" size="378624">
 				<rom name="panos14-4.ssd" size="378624" crc="62fc2639" sha1="f2ceeccb021f4c5030150244fb47897cc7e63f80" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="panos145" supported="no">
-		<description>5 C (PanOS) v1.4</description>
-		<year>1985</year>
-		<publisher>Acorn Computers</publisher>
-		<info name="format" value="DFS" />
-		<info name="compatibility" value="32016 co-processor" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="C (PanOS)"/>
 			<dataarea name="flop" size="378624">
 				<rom name="panos14-5.ssd" size="378624" crc="2f0940f6" sha1="873942b6033fd234db791b34d4df76a866f366b7" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="panos146" supported="no">
-		<description>6 Cambridge LISP (PanOS) v1.4</description>
-		<year>1985</year>
-		<publisher>Acorn Computers</publisher>
-		<info name="format" value="DFS" />
-		<info name="compatibility" value="32016 co-processor" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Cambridge LISP (PanOS)"/>
 			<dataarea name="flop" size="409088">
 				<rom name="panos14-6.ssd" size="409088" crc="5337964d" sha1="bfecd5cada401d6dfeb410ebc17fb62333f19bbc" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="panos147" supported="no">
-		<description>7 Welcome Programs v1.4</description>
-		<year>1985</year>
-		<publisher>Acorn Computers</publisher>
-		<info name="format" value="DFS" />
-		<info name="compatibility" value="32016 co-processor" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Welcome Programs"/>
 			<dataarea name="flop" size="402176">
 				<rom name="panos14-7.ssd" size="402176" crc="2e5e4fe4" sha1="f69687efea606468a72ed1363f6eab0ce8203f6b" offset="0" />
 			</dataarea>

@@ -49,14 +49,14 @@ void ui_menu_input_groups::populate()
 	int player;
 
 	/* build up the menu */
-	item_append("User Interface", NULL, 0, (void *)(IPG_UI + 1));
+	item_append("User Interface", nullptr, 0, (void *)(IPG_UI + 1));
 	for (player = 0; player < MAX_PLAYERS; player++)
 	{
 		char buffer[40];
 		sprintf(buffer, "Player %d Controls", player + 1);
-		item_append(buffer, NULL, 0, (void *)(FPTR)(IPG_PLAYER1 + player + 1));
+		item_append(buffer, nullptr, 0, (void *)(FPTR)(IPG_PLAYER1 + player + 1));
 	}
-	item_append("Other Controls", NULL, 0, (void *)(FPTR)(IPG_OTHER + 1));
+	item_append("Other Controls", nullptr, 0, (void *)(FPTR)(IPG_OTHER + 1));
 }
 
 ui_menu_input_groups::~ui_menu_input_groups()
@@ -72,7 +72,7 @@ void ui_menu_input_groups::handle()
 {
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
-	if (menu_event != NULL && menu_event->iptkey == IPT_UI_SELECT)
+	if (menu_event != nullptr && menu_event->iptkey == IPT_UI_SELECT)
 		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_input_general(machine(), container, int((long long)(menu_event->itemref)-1))));
 }
 
@@ -90,7 +90,7 @@ ui_menu_input_general::ui_menu_input_general(running_machine &machine, render_co
 
 void ui_menu_input_general::populate()
 {
-	input_item_data *itemlist = NULL;
+	input_item_data *itemlist = nullptr;
 	int suborder[SEQ_TYPE_TOTAL];
 	int sortorder = 1;
 
@@ -100,10 +100,10 @@ void ui_menu_input_general::populate()
 	suborder[SEQ_TYPE_INCREMENT] = 2;
 
 	/* iterate over the input ports and add menu items */
-	for (input_type_entry *entry = machine().ioport().first_type(); entry != NULL; entry = entry->next())
+	for (input_type_entry *entry = machine().ioport().first_type(); entry != nullptr; entry = entry->next())
 
 		/* add if we match the group and we have a valid name */
-		if (entry->group() == group && entry->name() != NULL && entry->name()[0] != 0)
+		if (entry->group() == group && entry->name() != nullptr && entry->name()[0] != 0)
 		{
 			input_seq_type seqtype;
 
@@ -123,7 +123,7 @@ void ui_menu_input_general::populate()
 				item->sortorder = sortorder * 4 + suborder[seqtype];
 				item->type = ioport_manager::type_is_analog(entry->type()) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 				item->name = entry->name();
-				item->owner_name = NULL;
+				item->owner_name = nullptr;
 				item->next = itemlist;
 				itemlist = item;
 
@@ -152,7 +152,7 @@ ui_menu_input_specific::ui_menu_input_specific(running_machine &machine, render_
 
 void ui_menu_input_specific::populate()
 {
-	input_item_data *itemlist = NULL;
+	input_item_data *itemlist = nullptr;
 	int suborder[SEQ_TYPE_TOTAL];
 	int port_count = 0;
 
@@ -162,16 +162,16 @@ void ui_menu_input_specific::populate()
 	suborder[SEQ_TYPE_INCREMENT] = 2;
 
 	/* iterate over the input ports and add menu items */
-	for (ioport_port *port = machine().ioport().first_port(); port != NULL; port = port->next())
+	for (ioport_port *port = machine().ioport().first_port(); port != nullptr; port = port->next())
 	{
 		port_count++;
-		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 		{
 			const char *name = field->name();
 
 			/* add if we match the group and we have a valid name */
-			if (name != NULL && field->enabled() &&
-				((field->type() == IPT_OTHER && field->name() != NULL) || machine().ioport().type_group(field->type(), field->player()) != IPG_INVALID))
+			if (name != nullptr && field->enabled() &&
+				((field->type() == IPT_OTHER && field->name() != nullptr) || machine().ioport().type_group(field->type(), field->player()) != IPG_INVALID))
 			{
 				input_seq_type seqtype;
 				UINT32 sortorder;
@@ -226,8 +226,8 @@ ui_menu_input_specific::~ui_menu_input_specific()
 -------------------------------------------------*/
 ui_menu_input::ui_menu_input(running_machine &machine, render_container *container) : ui_menu(machine, container), last_sortorder(0), record_next(false)
 {
-	pollingitem = 0;
-	pollingref = 0;
+	pollingitem = nullptr;
+	pollingref = nullptr;
 	pollingseq = SEQ_TYPE_STANDARD;
 }
 
@@ -253,22 +253,22 @@ void ui_menu_input::toggle_none_default(input_seq &selected_seq, input_seq &orig
 
 void ui_menu_input::handle()
 {
-	input_item_data *seqchangeditem = NULL;
+	input_item_data *seqchangeditem = nullptr;
 	const ui_menu_event *menu_event;
 	int invalidate = false;
 
 	/* process the menu */
-	menu_event = process((pollingitem != NULL) ? UI_MENU_PROCESS_NOKEYS : 0);
+	menu_event = process((pollingitem != nullptr) ? UI_MENU_PROCESS_NOKEYS : 0);
 
 	/* if we are polling, handle as a special case */
-	if (pollingitem != NULL)
+	if (pollingitem != nullptr)
 	{
 		input_item_data *item = pollingitem;
 
 		/* if UI_CANCEL is pressed, abort */
 		if (ui_input_pressed(machine(), IPT_UI_CANCEL))
 		{
-			pollingitem = NULL;
+			pollingitem = nullptr;
 			record_next = false;
 			toggle_none_default(item->seq, starting_seq, *item->defseq);
 			seqchangeditem = item;
@@ -277,7 +277,7 @@ void ui_menu_input::handle()
 		/* poll again; if finished, update the sequence */
 		if (machine().input().seq_poll())
 		{
-			pollingitem = NULL;
+			pollingitem = nullptr;
 			record_next = true;
 			item->seq = machine().input().seq_poll_final();
 			seqchangeditem = item;
@@ -285,7 +285,7 @@ void ui_menu_input::handle()
 	}
 
 	/* otherwise, handle the events */
-	else if (menu_event != NULL && menu_event->itemref != NULL)
+	else if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		input_item_data *item = (input_item_data *)menu_event->itemref;
 		switch (menu_event->iptkey)
@@ -295,7 +295,7 @@ void ui_menu_input::handle()
 				pollingitem = item;
 				last_sortorder = item->sortorder;
 				starting_seq = item->seq;
-				machine().input().seq_poll_start((item->type == INPUT_TYPE_ANALOG) ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, record_next ? &item->seq : NULL);
+				machine().input().seq_poll_start((item->type == INPUT_TYPE_ANALOG) ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, record_next ? &item->seq : nullptr);
 				invalidate = true;
 				break;
 
@@ -314,7 +314,7 @@ void ui_menu_input::handle()
 	}
 
 	/* if the sequence changed, update it */
-	if (seqchangeditem != NULL)
+	if (seqchangeditem != nullptr)
 	{
 		update_input(seqchangeditem);
 
@@ -325,8 +325,8 @@ void ui_menu_input::handle()
 	/* if the menu is invalidated, clear it now */
 	if (invalidate)
 	{
-		pollingref = NULL;
-		if (pollingitem != NULL)
+		pollingref = nullptr;
+		if (pollingitem != nullptr)
 		{
 			pollingref = pollingitem->ref;
 			pollingseq = pollingitem->seqtype;
@@ -376,7 +376,7 @@ int ui_menu_input::compare_items(const void *i1, const void *i2)
 
 void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 {
-	const char *nameformat[INPUT_TYPE_TOTAL] = { 0 };
+	const char *nameformat[INPUT_TYPE_TOTAL] = { nullptr };
 	input_item_data **itemarray, *item;
 	int numitems = 0, curitem;
 	std::string text;
@@ -391,12 +391,12 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 	nameformat[INPUT_TYPE_ANALOG_DEC] = "%s Analog Dec";
 
 	/* first count the number of items */
-	for (item = itemlist; item != NULL; item = item->next)
+	for (item = itemlist; item != nullptr; item = item->next)
 		numitems++;
 
 	/* now allocate an array of items and fill it up */
 	itemarray = (input_item_data **)m_pool_alloc(sizeof(*itemarray) * numitems);
-	for (item = itemlist, curitem = 0; item != NULL; item = item->next)
+	for (item = itemlist, curitem = 0; item != nullptr; item = item->next)
 		itemarray[curitem++] = item;
 
 	/* sort it */
@@ -409,16 +409,16 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 
 		/* generate the name of the item itself, based off the base name and the type */
 		item = itemarray[curitem];
-		assert(nameformat[item->type] != NULL);
+		assert(nameformat[item->type] != nullptr);
 
 		if (item->owner_name && strcmp(item->owner_name, prev_owner.c_str()) != 0)
 		{
 			if (first_entry)
 				first_entry = false;
 			else
-				item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+				item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 			strprintf(text, "[root%s]", item->owner_name);
-			item_append(text.c_str(), NULL, 0, NULL);
+			item_append(text.c_str(), nullptr, 0, nullptr);
 			prev_owner.assign(item->owner_name);
 		}
 
@@ -481,7 +481,7 @@ void ui_menu_settings::handle()
 	const ui_menu_event *menu_event = process(0);
 
 	// handle events
-	if (menu_event != NULL && menu_event->itemref != NULL)
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		// reset
 		if ((FPTR)menu_event->itemref == 1)
@@ -532,7 +532,7 @@ void ui_menu_settings::handle()
     switches menus
 -------------------------------------------------*/
 
-ui_menu_settings::ui_menu_settings(running_machine &machine, render_container *container, UINT32 _type) : ui_menu(machine, container), diplist(NULL), dipcount(0)
+ui_menu_settings::ui_menu_settings(running_machine &machine, render_container *container, UINT32 _type) : ui_menu(machine, container), diplist(nullptr), dipcount(0)
 {
 	type = _type;
 }
@@ -547,12 +547,12 @@ void ui_menu_settings::populate()
 
 	/* reset the dip switch tracking */
 	dipcount = 0;
-	diplist = NULL;
+	diplist = nullptr;
 	diplist_tailptr = &diplist;
 
 	/* loop over input ports and set up the current values */
-	for (port = machine().ioport().first_port(); port != NULL; port = port->next())
-		for (field = port->first_field(); field != NULL; field = field->next())
+	for (port = machine().ioport().first_port(); port != nullptr; port = port->next())
+		for (field = port->first_field(); field != nullptr; field = field->next())
 			if (field->type() == type && field->enabled())
 			{
 				UINT32 flags = 0;
@@ -570,9 +570,9 @@ void ui_menu_settings::populate()
 					if (first_entry)
 						first_entry = false;
 					else
-						item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+						item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 					strprintf(name, "[root%s]", field->device().tag());
-					item_append(name.c_str(), NULL, 0, NULL);
+					item_append(name.c_str(), nullptr, 0, nullptr);
 					prev_owner.assign(field->device().tag());
 				}
 
@@ -581,7 +581,7 @@ void ui_menu_settings::populate()
 				item_append(name.c_str(), field->setting_name(), flags, (void *)field);
 
 				/* for DIP switches, build up the model */
-				if (type == IPT_DIPSWITCH && field->first_diplocation() != NULL)
+				if (type == IPT_DIPSWITCH && field->first_diplocation() != nullptr)
 				{
 					const ioport_diplocation *diploc;
 					ioport_field::user_settings settings;
@@ -591,21 +591,21 @@ void ui_menu_settings::populate()
 					field->get_user_settings(settings);
 
 					/* iterate over each bit in the field */
-					for (diploc = field->first_diplocation(); diploc != NULL; diploc = diploc->next())
+					for (diploc = field->first_diplocation(); diploc != nullptr; diploc = diploc->next())
 					{
 						UINT32 mask = accummask & ~(accummask - 1);
 						dip_descriptor *dip;
 
 						/* find the matching switch name */
-						for (dip = diplist; dip != NULL; dip = dip->next)
+						for (dip = diplist; dip != nullptr; dip = dip->next)
 							if (strcmp(dip->name, diploc->name()) == 0)
 								break;
 
 						/* allocate new if none */
-						if (dip == NULL)
+						if (dip == nullptr)
 						{
 							dip = (dip_descriptor *)m_pool_alloc(sizeof(*dip));
-							dip->next = NULL;
+							dip->next = nullptr;
 							dip->name = diploc->name();
 							dip->mask = dip->state = 0;
 							*diplist_tailptr = dip;
@@ -626,8 +626,8 @@ void ui_menu_settings::populate()
 	if (type == IPT_DIPSWITCH)
 		custombottom = dipcount ? dipcount * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) + DIP_SWITCH_SPACING : 0;
 
-	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-	item_append("Reset",  NULL, 0, (void *)1);
+	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append("Reset",  nullptr, 0, (void *)1);
 }
 
 ui_menu_settings::~ui_menu_settings()
@@ -654,7 +654,7 @@ void ui_menu_settings_dip_switches::custom_render(void *selectedref, float top, 
 	y1 += (float)DIP_SWITCH_SPACING;
 
 	// iterate over DIP switches
-	for (dip_descriptor *dip = diplist; dip != NULL; dip = dip->next)
+	for (dip_descriptor *dip = diplist; dip != nullptr; dip = dip->next)
 	{
 		const ioport_diplocation *diploc;
 		UINT32 selectedmask = 0;
@@ -664,8 +664,8 @@ void ui_menu_settings_dip_switches::custom_render(void *selectedref, float top, 
 		{
 			ioport_field *field = (ioport_field *)selectedref;
 
-			if (field != NULL && field->first_diplocation() != NULL)
-				for (diploc = field->first_diplocation(); diploc != NULL; diploc = diploc->next())
+			if (field != nullptr && field->first_diplocation() != nullptr)
+				for (diploc = field->first_diplocation(); diploc != nullptr; diploc = diploc->next())
 					if (strcmp(dip->name, diploc->name()) == 0)
 						selectedmask |= 1 << (diploc->number() - 1);
 		}
@@ -707,8 +707,8 @@ void ui_menu_settings_dip_switches::custom_render_one(float x1, float y1, float 
 						DRAW_NORMAL,
 						UI_TEXT_COLOR,
 						PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA),
-						NULL ,
-						NULL);
+						nullptr ,
+						nullptr);
 
 	/* compute top and bottom for on and off positions */
 	switch_toggle_gap = ((DIP_SWITCH_HEIGHT/2) - SINGLE_TOGGLE_SWITCH_HEIGHT)/2;
@@ -757,7 +757,7 @@ void ui_menu_analog::handle()
 	const ui_menu_event *menu_event = process(UI_MENU_PROCESS_LR_REPEAT);
 
 	/* handle events */
-	if (menu_event != NULL && menu_event->itemref != NULL)
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		analog_item_data *data = (analog_item_data *)menu_event->itemref;
 		int newval = data->cur;
@@ -828,8 +828,8 @@ void ui_menu_analog::populate()
 	bool first_entry = true;
 
 	/* loop over input ports and add the items */
-	for (port = machine().ioport().first_port(); port != NULL; port = port->next())
-		for (field = port->first_field(); field != NULL; field = field->next())
+	for (port = machine().ioport().first_port(); port != nullptr; port = port->next())
+		for (field = port->first_field(); field != nullptr; field = field->next())
 			if (field->is_analog() && field->enabled())
 			{
 				ioport_field::user_settings settings;
@@ -874,9 +874,9 @@ void ui_menu_analog::populate()
 							if (first_entry)
 								first_entry = false;
 							else
-								item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+								item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 							strprintf(name,"[root%s]", field->device().tag());
-							item_append(name.c_str(), NULL, 0, NULL);
+							item_append(name.c_str(), nullptr, 0, nullptr);
 							prev_owner.assign(field->device().tag());
 						}
 

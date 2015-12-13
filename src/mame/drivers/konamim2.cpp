@@ -253,7 +253,7 @@ public:
 	DECLARE_READ64_MEMBER(device2_r);
 	DECLARE_READ64_MEMBER(cpu_r);
 	DECLARE_DRIVER_INIT(m2);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m2);
 	void cde_init();

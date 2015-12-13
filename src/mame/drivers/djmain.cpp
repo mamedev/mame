@@ -1342,10 +1342,10 @@ GFXDECODE_END
 void djmain_state::machine_start()
 {
 	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
-	if (m_ata_master_password != NULL)
+	if (m_ata_master_password != nullptr)
 		hdd->set_master_password(m_ata_master_password);
 
-	if (m_ata_user_password != NULL)
+	if (m_ata_user_password != nullptr)
 		hdd->set_user_password(m_ata_user_password);
 
 	save_item(NAME(m_sndram_bank));
@@ -1386,7 +1386,7 @@ static MACHINE_CONFIG_START( djmainj, djmain_state )
 	MCFG_CPU_PROGRAM_MAP(maincpu_djmainj)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", djmain_state,  vb_interrupt)
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(djmain_state, ide_interrupt))
 
 	/* video hardware */
@@ -1967,8 +1967,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(djmain_state,beatmania)
 {
-	m_ata_master_password = NULL;
-	m_ata_user_password = NULL;
+	m_ata_master_password = nullptr;
+	m_ata_user_password = nullptr;
 }
 
 static const UINT8 beatmania_master_password[2 + 32] =

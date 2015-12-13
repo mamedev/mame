@@ -1993,7 +1993,7 @@ static UINT8 curmode;
 #define MODRM_REG2  (modrm & 0x7)
 #define MODRM_MOD   ((modrm >> 6) & 0x3)
 
-INLINE UINT8 FETCH(void)
+static inline UINT8 FETCH(void)
 {
 	if ((opcode_ptr - opcode_ptr_base) + 1 > max_length)
 		return 0xff;
@@ -2002,7 +2002,7 @@ INLINE UINT8 FETCH(void)
 }
 
 #if 0
-INLINE UINT16 FETCH16(void)
+static inline UINT16 FETCH16(void)
 {
 	UINT16 d;
 	if ((opcode_ptr - opcode_ptr_base) + 2 > max_length)
@@ -2014,7 +2014,7 @@ INLINE UINT16 FETCH16(void)
 }
 #endif
 
-INLINE UINT32 FETCH32(void)
+static inline UINT32 FETCH32(void)
 {
 	UINT32 d;
 	if ((opcode_ptr - opcode_ptr_base) + 4 > max_length)
@@ -2025,7 +2025,7 @@ INLINE UINT32 FETCH32(void)
 	return d;
 }
 
-INLINE UINT8 FETCHD(void)
+static inline UINT8 FETCHD(void)
 {
 	if ((opcode_ptr - opcode_ptr_base) + 1 > max_length)
 		return 0xff;
@@ -2033,7 +2033,7 @@ INLINE UINT8 FETCHD(void)
 	return *opcode_ptr++;
 }
 
-INLINE UINT16 FETCHD16(void)
+static inline UINT16 FETCHD16(void)
 {
 	UINT16 d;
 	if ((opcode_ptr - opcode_ptr_base) + 2 > max_length)
@@ -2044,7 +2044,7 @@ INLINE UINT16 FETCHD16(void)
 	return d;
 }
 
-INLINE UINT32 FETCHD32(void)
+static inline UINT32 FETCHD32(void)
 {
 	UINT32 d;
 	if ((opcode_ptr - opcode_ptr_base) + 4 > max_length)

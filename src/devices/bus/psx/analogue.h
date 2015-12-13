@@ -14,17 +14,17 @@ class psx_analog_controller_device :    public device_t,
 public:
 	psx_analog_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 	DECLARE_INPUT_CHANGED_MEMBER(change_mode);
 protected:
-	virtual void device_reset();
-	virtual void device_start() {}
+	virtual void device_reset() override;
+	virtual void device_start() override {}
 	enum {
 		JOYSTICK,
 		DUALSHOCK
 	} m_type;
 private:
-	virtual bool get_pad(int count, UINT8 *odata, UINT8 idata);
+	virtual bool get_pad(int count, UINT8 *odata, UINT8 idata) override;
 	UINT8 pad_data(int count, bool analog);
 
 	bool m_confmode;

@@ -26,7 +26,7 @@ const device_type TC8830F = &device_creator<tc8830f_device>;
 
 tc8830f_device::tc8830f_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC8830F, "TC8830F", tag, owner, clock, "tc8830f", __FILE__),
-		device_sound_interface(mconfig, *this),
+		device_sound_interface(mconfig, *this), m_stream(nullptr),
 		m_playing(false),
 		m_address(0),
 		m_stop_address(0),
@@ -37,7 +37,7 @@ tc8830f_device::tc8830f_device(const machine_config &mconfig, const char *tag, d
 		m_output(0),
 		m_command(0),
 		m_cmd_rw(0),
-		m_phrase(0)
+		m_phrase(0), m_mem_base(nullptr), m_mem_mask(0)
 {
 }
 

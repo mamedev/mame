@@ -98,7 +98,7 @@ void wd_fdc_t::device_start()
 	t_sector = timer_alloc(TM_SECTOR);
 	dden = disable_mfm;
 	enmf = false;
-	floppy = 0;
+	floppy = nullptr;
 	status = 0x00;
 
 	save_item(NAME(status));

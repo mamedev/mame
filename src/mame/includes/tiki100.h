@@ -107,8 +107,8 @@ public:
 	required_ioport m_st_io;
 	required_device<palette_device> m_palette;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

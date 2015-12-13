@@ -40,7 +40,7 @@ void cdda_device::device_start()
 	m_audio_length = 0;
 	m_audio_samples = 0;
 	m_audio_bptr = 0;
-	m_disc = NULL;
+	m_disc = nullptr;
 
 	save_item( NAME(m_audio_playing) );
 	save_item( NAME(m_audio_pause) );

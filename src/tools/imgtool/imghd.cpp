@@ -134,8 +134,8 @@ imgtoolerr_t imghd_open(imgtool_stream *stream, struct mess_hard_disk_file *hard
 	chd_error chderr;
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 
-	hard_disk->hard_disk = NULL;
-	hard_disk->chd = NULL;
+	hard_disk->hard_disk = nullptr;
+	hard_disk->chd = nullptr;
 
 	chderr = hard_disk->chd->open(*stream_core_file(stream), stream_isreadonly(stream));
 	if (chderr)
@@ -170,7 +170,7 @@ void imghd_close(struct mess_hard_disk_file *disk)
 	if (disk->hard_disk)
 	{
 		hard_disk_close(disk->hard_disk);
-		disk->hard_disk = NULL;
+		disk->hard_disk = nullptr;
 	}
 	if (disk->stream)
 		stream_close(disk->stream);

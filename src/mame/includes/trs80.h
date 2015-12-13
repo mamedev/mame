@@ -51,24 +51,24 @@ public:
 		m_io_line5(*this, "LINE5"),
 		m_io_line6(*this, "LINE6"),
 		m_io_line7(*this, "LINE7"),
-		m_bank1(NULL),
-		m_bank2(NULL),
-		m_bank3(NULL),
-		m_bank4(NULL),
-		m_bank5(NULL),
-		m_bank6(NULL),
-		m_bank7(NULL),
-		m_bank8(NULL),
-		m_bank9(NULL),
-		m_bank11(NULL),
-		m_bank12(NULL),
-		m_bank13(NULL),
-		m_bank14(NULL),
-		m_bank15(NULL),
-		m_bank16(NULL),
-		m_bank17(NULL),
-		m_bank18(NULL),
-		m_bank19(NULL) { }
+		m_bank1(nullptr),
+		m_bank2(nullptr),
+		m_bank3(nullptr),
+		m_bank4(nullptr),
+		m_bank5(nullptr),
+		m_bank6(nullptr),
+		m_bank7(nullptr),
+		m_bank8(nullptr),
+		m_bank9(nullptr),
+		m_bank11(nullptr),
+		m_bank12(nullptr),
+		m_bank13(nullptr),
+		m_bank14(nullptr),
+		m_bank15(nullptr),
+		m_bank16(nullptr),
+		m_bank17(nullptr),
+		m_bank18(nullptr),
+		m_bank19(nullptr) { }
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -152,9 +152,9 @@ public:
 	DECLARE_DRIVER_INIT(trs80m4p);
 	DECLARE_DRIVER_INIT(lnw80);
 	DECLARE_DRIVER_INIT(trs80);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(trs80m4);
 	DECLARE_MACHINE_RESET(lnw80);
 	DECLARE_PALETTE_INIT(lnw80);

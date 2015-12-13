@@ -154,8 +154,8 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 	m_out_txdrqb_cb(*this),
 	m_variant(variant),
 	m_wr0_ptrbits(0){
-	for (int i = 0; i < 6; i++)
-		m_int_state[i] = 0;
+	for (auto & elem : m_int_state)
+		elem = 0;
 }
 
 z80scc_device::z80scc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -184,8 +184,8 @@ z80scc_device::z80scc_device(const machine_config &mconfig, const char *tag, dev
 		m_out_txdrqb_cb(*this),
 		m_variant(TYPE_Z80SCC)
 {
-	for (int i = 0; i < 6; i++)
-		m_int_state[i] = 0;
+	for (auto & elem : m_int_state)
+		elem = 0;
 }
 
 scc8030_device::scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -379,9 +379,9 @@ void z80scc_device::reset_interrupts()
 {
 	LOG(("%s %s \n",FUNCNAME, tag()));
 	// reset internal interrupt sources
-	for (int i = 0; i < 6; i++)
+	for (auto & elem : m_int_state)
 	{
-		m_int_state[i] = 0;
+		elem = 0;
 	}
 
 	// check external interrupt sources

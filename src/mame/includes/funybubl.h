@@ -27,8 +27,8 @@ public:
 	DECLARE_WRITE8_MEMBER(funybubl_soundcommand_w);
 	DECLARE_WRITE8_MEMBER(funybubl_paldatawrite);
 	DECLARE_WRITE8_MEMBER(funybubl_oki_bank_sw);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_funybubl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;

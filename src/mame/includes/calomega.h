@@ -55,7 +55,7 @@ public:
 	DECLARE_PALETTE_INIT(calomega);
 
 protected:
-	virtual void video_start();
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;

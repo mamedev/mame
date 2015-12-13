@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:K.Wilkins
+// copyright-holders:K.Wilkins,Couriersud
+// thanks-to:Derrick Renaud, F.Palazzolo
 #pragma once
 
 #ifndef __DISC_FLTH__

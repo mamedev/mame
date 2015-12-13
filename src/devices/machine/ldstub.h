@@ -59,9 +59,9 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) { }
-	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) { return fieldnum; }
-	virtual void player_overlay(bitmap_yuy16 &bitmap) { }
+	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override { }
+	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override { return fieldnum; }
+	virtual void player_overlay(bitmap_yuy16 &bitmap) override { }
 };
 
 
@@ -83,9 +83,9 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) { }
-	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) { return fieldnum; }
-	virtual void player_overlay(bitmap_yuy16 &bitmap) { }
+	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override { }
+	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override { return fieldnum; }
+	virtual void player_overlay(bitmap_yuy16 &bitmap) override { }
 };
 
 
@@ -105,9 +105,9 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) { }
-	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) { return fieldnum; }
-	virtual void player_overlay(bitmap_yuy16 &bitmap) { }
+	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override { }
+	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override { return fieldnum; }
+	virtual void player_overlay(bitmap_yuy16 &bitmap) override { }
 };
 
 

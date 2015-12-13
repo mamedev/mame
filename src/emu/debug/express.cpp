@@ -112,14 +112,14 @@ class integer_symbol_entry : public symbol_entry
 {
 public:
 	// construction/destruction
-	integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, UINT64 *ptr = NULL);
+	integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, UINT64 *ptr = nullptr);
 	integer_symbol_entry(symbol_table &table, const char *name, UINT64 constval);
 	integer_symbol_entry(symbol_table &table, const char *name, void *ref, symbol_table::getter_func getter, symbol_table::setter_func setter);
 
 	// symbol access
-	virtual bool is_lval() const;
-	virtual UINT64 value() const;
-	virtual void set_value(UINT64 newvalue);
+	virtual bool is_lval() const override;
+	virtual UINT64 value() const override;
+	virtual void set_value(UINT64 newvalue) override;
 
 private:
 	// internal helpers
@@ -141,9 +141,9 @@ public:
 	function_symbol_entry(symbol_table &table, const char *name, void *ref, int minparams, int maxparams, symbol_table::execute_func execute);
 
 	// symbol access
-	virtual bool is_lval() const;
-	virtual UINT64 value() const;
-	virtual void set_value(UINT64 newvalue);
+	virtual bool is_lval() const override;
+	virtual UINT64 value() const override;
+	virtual void set_value(UINT64 newvalue) override;
 
 	// execution helper
 	virtual UINT64 execute(int numparams, const UINT64 *paramlist);
@@ -204,7 +204,7 @@ const char *expression_error::code_string() const
 //-------------------------------------------------
 
 symbol_entry::symbol_entry(symbol_table &table, symbol_type type, const char *name, void *ref)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_table(table),
 		m_type(type),
 		m_name(name),
@@ -232,9 +232,9 @@ symbol_entry::~symbol_entry()
 //-------------------------------------------------
 
 integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, UINT64 *ptr)
-	: symbol_entry(table, SMT_INTEGER, name, (ptr == NULL) ? &m_value : ptr),
+	: symbol_entry(table, SMT_INTEGER, name, (ptr == nullptr) ? &m_value : ptr),
 		m_getter(internal_getter),
-		m_setter((rw == symbol_table::READ_ONLY) ? NULL : internal_setter),
+		m_setter((rw == symbol_table::READ_ONLY) ? nullptr : internal_setter),
 		m_value(0)
 {
 }
@@ -243,7 +243,7 @@ integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name
 integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, UINT64 constval)
 	: symbol_entry(table, SMT_INTEGER, name, &m_value),
 		m_getter(internal_getter),
-		m_setter(NULL),
+		m_setter(nullptr),
 		m_value(constval)
 {
 }
@@ -264,7 +264,7 @@ integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name
 
 bool integer_symbol_entry::is_lval() const
 {
-	return (m_setter != NULL);
+	return (m_setter != nullptr);
 }
 
 
@@ -284,7 +284,7 @@ UINT64 integer_symbol_entry::value() const
 
 void integer_symbol_entry::set_value(UINT64 newvalue)
 {
-	if (m_setter != NULL)
+	if (m_setter != nullptr)
 		(*m_setter)(m_table, m_ref, newvalue);
 	else
 		throw emu_fatalerror("Symbol '%s' is read-only", m_name.c_str());
@@ -387,10 +387,10 @@ UINT64 function_symbol_entry::execute(int numparams, const UINT64 *paramlist)
 symbol_table::symbol_table(void *globalref, symbol_table *parent)
 	: m_parent(parent),
 		m_globalref(globalref),
-		m_memory_param(NULL),
-		m_memory_valid(NULL),
-		m_memory_read(NULL),
-		m_memory_write(NULL)
+		m_memory_param(nullptr),
+		m_memory_valid(nullptr),
+		m_memory_read(nullptr),
+		m_memory_write(nullptr)
 {
 }
 
@@ -460,13 +460,13 @@ void symbol_table::add(const char *name, void *ref, int minparams, int maxparams
 symbol_entry *symbol_table::find_deep(const char *symbol)
 {
 	// walk up the table hierarchy to find the owner
-	for (symbol_table *symtable = this; symtable != NULL; symtable = symtable->m_parent)
+	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
 	{
 		symbol_entry *entry = symtable->find(symbol);
-		if (entry != NULL)
+		if (entry != nullptr)
 			return entry;
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -477,7 +477,7 @@ symbol_entry *symbol_table::find_deep(const char *symbol)
 UINT64 symbol_table::value(const char *symbol)
 {
 	symbol_entry *entry = find_deep(symbol);
-	return (entry != NULL) ? entry->value() : 0;
+	return (entry != nullptr) ? entry->value() : 0;
 }
 
 
@@ -488,7 +488,7 @@ UINT64 symbol_table::value(const char *symbol)
 void symbol_table::set_value(const char *symbol, UINT64 value)
 {
 	symbol_entry *entry = find_deep(symbol);
-	if (entry != NULL)
+	if (entry != nullptr)
 		entry->set_value(value);
 }
 
@@ -501,8 +501,8 @@ void symbol_table::set_value(const char *symbol, UINT64 value)
 expression_error::error_code symbol_table::memory_valid(const char *name, expression_space space)
 {
 	// walk up the table hierarchy to find the owner
-	for (symbol_table *symtable = this; symtable != NULL; symtable = symtable->m_parent)
-		if (symtable->m_memory_valid != NULL)
+	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
+		if (symtable->m_memory_valid != nullptr)
 		{
 			expression_error::error_code err = (*symtable->m_memory_valid)(symtable->m_memory_param, name, space);
 			if (err != expression_error::NO_SUCH_MEMORY_SPACE)
@@ -519,11 +519,11 @@ expression_error::error_code symbol_table::memory_valid(const char *name, expres
 UINT64 symbol_table::memory_value(const char *name, expression_space space, UINT32 offset, int size)
 {
 	// walk up the table hierarchy to find the owner
-	for (symbol_table *symtable = this; symtable != NULL; symtable = symtable->m_parent)
-		if (symtable->m_memory_valid != NULL)
+	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
+		if (symtable->m_memory_valid != nullptr)
 		{
 			expression_error::error_code err = (*symtable->m_memory_valid)(symtable->m_memory_param, name, space);
-			if (err != expression_error::NO_SUCH_MEMORY_SPACE && symtable->m_memory_read != NULL)
+			if (err != expression_error::NO_SUCH_MEMORY_SPACE && symtable->m_memory_read != nullptr)
 				return (*symtable->m_memory_read)(symtable->m_memory_param, name, space, offset, size);
 			return 0;
 		}
@@ -538,11 +538,11 @@ UINT64 symbol_table::memory_value(const char *name, expression_space space, UINT
 void symbol_table::set_memory_value(const char *name, expression_space space, UINT32 offset, int size, UINT64 value)
 {
 	// walk up the table hierarchy to find the owner
-	for (symbol_table *symtable = this; symtable != NULL; symtable = symtable->m_parent)
-		if (symtable->m_memory_valid != NULL)
+	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
+		if (symtable->m_memory_valid != nullptr)
 		{
 			expression_error::error_code err = (*symtable->m_memory_valid)(symtable->m_memory_param, name, space);
-			if (err != expression_error::NO_SUCH_MEMORY_SPACE && symtable->m_memory_write != NULL)
+			if (err != expression_error::NO_SUCH_MEMORY_SPACE && symtable->m_memory_write != nullptr)
 				(*symtable->m_memory_write)(symtable->m_memory_param, name, space, offset, size, value);
 			return;
 		}
@@ -563,11 +563,11 @@ parsed_expression::parsed_expression(symbol_table *symtable, const char *express
 	m_token_stack_ptr(0)
 {
 	// if we got an expression parse it
-	if (expression != NULL)
+	if (expression != nullptr)
 		parse(expression);
 
 	// if we get a result pointer, execute it
-	if (result != NULL)
+	if (result != nullptr)
 		*result = execute();
 }
 
@@ -866,7 +866,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 	{
 		static const char valid[] = "abcdefghijklmnopqrstuvwxyz0123456789_$#.:";
 		char val = tolower((UINT8)string[0]);
-		if (val == 0 || strchr(valid, val) == NULL)
+		if (val == 0 || strchr(valid, val) == nullptr)
 			break;
 		buffer.append(&val, 1);
 		string++;
@@ -939,7 +939,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 
 	// check for a symbol match
 	symbol_entry *symbol = m_symtable->find_deep(buffer.c_str());
-	if (symbol != NULL)
+	if (symbol != nullptr)
 	{
 		token.configure_symbol(*symbol);
 
@@ -971,7 +971,7 @@ void parsed_expression::parse_number(parse_token &token, const char *string, int
 		// look up the number's value, stopping if not valid
 		static const char numbers[] = "0123456789abcdef";
 		const char *ptr = strchr(numbers, tolower((UINT8)*string));
-		if (ptr == NULL)
+		if (ptr == nullptr)
 			break;
 
 		// if outside of the base, we also stop
@@ -1065,9 +1065,9 @@ void parsed_expression::parse_memory_operator(parse_token &token, const char *st
 {
 	// if there is a '.', it means we have a name
 	const char *startstring = string;
-	const char *namestring = NULL;
+	const char *namestring = nullptr;
 	const char *dot = strrchr(string, '.');
-	if (dot != NULL)
+	if (dot != nullptr)
 	{
 		namestring = m_stringlist.append(*global_alloc(expression_string(string, dot - string)));
 		string = dot + 1;
@@ -1130,7 +1130,7 @@ void parsed_expression::parse_memory_operator(parse_token &token, const char *st
 	}
 
 	// validate the name
-	if (m_symtable != NULL)
+	if (m_symtable != nullptr)
 	{
 		expression_error::error_code err = m_symtable->memory_valid(namestring, memspace);
 		if (err != expression_error::NONE)
@@ -1154,15 +1154,15 @@ void parsed_expression::normalize_operator(parse_token *prevtoken, parse_token &
 	{
 		// Determine if an open paren is part of a function or not
 		case TVL_LPAREN:
-			if (prevtoken != NULL && prevtoken->is_operator(TVL_EXECUTEFUNC))
+			if (prevtoken != nullptr && prevtoken->is_operator(TVL_EXECUTEFUNC))
 				thistoken.set_function_separator();
 			break;
 
 		// Determine if ++ is a pre or post increment
 		case TVL_PLUSPLUS:
-			if (nexttoken != NULL && (nexttoken->is_symbol() || (nexttoken->is_operator(TVL_MEMORYAT))))
+			if (nexttoken != nullptr && (nexttoken->is_symbol() || (nexttoken->is_operator(TVL_MEMORYAT))))
 				thistoken.configure_operator(TVL_PREINCREMENT, 2);
-			else if (prevtoken != NULL && (prevtoken->is_symbol() || (prevtoken->is_operator(TVL_MEMORYAT))))
+			else if (prevtoken != nullptr && (prevtoken->is_symbol() || (prevtoken->is_operator(TVL_MEMORYAT))))
 				thistoken.configure_operator(TVL_POSTINCREMENT, 1);
 			else
 				throw expression_error(expression_error::SYNTAX, thistoken.offset());
@@ -1170,9 +1170,9 @@ void parsed_expression::normalize_operator(parse_token *prevtoken, parse_token &
 
 		// Determine if -- is a pre or post decrement
 		case TVL_MINUSMINUS:
-			if (nexttoken != NULL && (nexttoken->is_symbol() || (nexttoken->is_operator(TVL_MEMORYAT))))
+			if (nexttoken != nullptr && (nexttoken->is_symbol() || (nexttoken->is_operator(TVL_MEMORYAT))))
 				thistoken.configure_operator(TVL_PREDECREMENT, 2);
-			else if (prevtoken != NULL && (prevtoken->is_symbol() || (prevtoken->is_operator(TVL_MEMORYAT))))
+			else if (prevtoken != nullptr && (prevtoken->is_symbol() || (prevtoken->is_operator(TVL_MEMORYAT))))
 				thistoken.configure_operator(TVL_POSTDECREMENT, 1);
 			else
 				throw expression_error(expression_error::SYNTAX, thistoken.offset());
@@ -1183,7 +1183,7 @@ void parsed_expression::normalize_operator(parse_token *prevtoken, parse_token &
 		case TVL_SUBTRACT:
 			// Assume we're unary if we are the first token, or if the previous token is not
 			// a symbol, a number, or a right parenthesis
-			if (prevtoken == NULL || (!prevtoken->is_symbol() && !prevtoken->is_number() && !prevtoken->is_operator(TVL_RPAREN)))
+			if (prevtoken == nullptr || (!prevtoken->is_symbol() && !prevtoken->is_number() && !prevtoken->is_operator(TVL_RPAREN)))
 				thistoken.configure_operator(thistoken.is_operator(TVL_ADD) ? TVL_UPLUS : TVL_UMINUS, 2);
 			break;
 
@@ -1192,7 +1192,7 @@ void parsed_expression::normalize_operator(parse_token *prevtoken, parse_token &
 			for (int lookback = 0; lookback < MAX_STACK_DEPTH; lookback++)
 			{
 				parse_token *peek = peek_token(lookback);
-				if (peek == NULL)
+				if (peek == nullptr)
 					break;
 
 				// if we hit an execute function operator, or else a left parenthesis that is
@@ -1218,9 +1218,9 @@ void parsed_expression::infix_to_postfix()
 	simple_list<parse_token> stack;
 
 	// loop over all the original tokens
-	parse_token *prev = NULL;
+	parse_token *prev = nullptr;
 	parse_token *next;
-	for (parse_token *token = m_tokenlist.detach_all(); token != NULL; prev = token, token = next)
+	for (parse_token *token = m_tokenlist.detach_all(); token != nullptr; prev = token, token = next)
 	{
 		// pre-determine our next token
 		next = token->next();
@@ -1246,7 +1246,7 @@ void parsed_expression::infix_to_postfix()
 			{
 				// loop until we find our matching opener
 				parse_token *popped;
-				while ((popped = stack.detach_head()) != NULL)
+				while ((popped = stack.detach_head()) != nullptr)
 				{
 					if (popped->is_operator(TVL_LPAREN))
 						break;
@@ -1254,7 +1254,7 @@ void parsed_expression::infix_to_postfix()
 				}
 
 				// if we didn't find an open paren, it's an error
-				if (popped == NULL)
+				if (popped == nullptr)
 					throw expression_error(expression_error::UNBALANCED_PARENS, token->offset());
 
 				// free ourself and our matching opening parenthesis
@@ -1271,7 +1271,7 @@ void parsed_expression::infix_to_postfix()
 
 				// loop until we can't peek at the stack anymore
 				parse_token *peek;
-				while ((peek = stack.first()) != NULL)
+				while ((peek = stack.first()) != nullptr)
 				{
 					// break if any of the above conditions are true
 					if (peek->is_operator(TVL_LPAREN))
@@ -1292,7 +1292,7 @@ void parsed_expression::infix_to_postfix()
 
 	// finish popping the stack
 	parse_token *popped;
-	while ((popped = stack.detach_head()) != NULL)
+	while ((popped = stack.detach_head()) != nullptr)
 	{
 		// it is an error to have a left parenthesis still on the stack
 		if (popped->is_operator(TVL_LPAREN))
@@ -1342,7 +1342,7 @@ inline void parsed_expression::pop_token(parse_token &token)
 inline parsed_expression::parse_token *parsed_expression::peek_token(int count)
 {
 	if (m_token_stack_ptr <= count)
-		return NULL;
+		return nullptr;
 	return &m_token_stack[m_token_stack_ptr - count - 1];
 }
 
@@ -1395,7 +1395,7 @@ UINT64 parsed_expression::execute_tokens()
 
 	// loop over the entire sequence
 	parse_token t1, t2, result;
-	for (parse_token *token = m_tokenlist.first(); token != NULL; token = token->next())
+	for (parse_token *token = m_tokenlist.first(); token != nullptr; token = token->next())
 	{
 		// symbols/numbers/strings just get pushed
 		if (!token->is_operator())
@@ -1641,7 +1641,7 @@ UINT64 parsed_expression::execute_tokens()
 	pop_token_rval(result);
 
 	// error if our stack isn't empty
-	if (peek_token(0) != NULL)
+	if (peek_token(0) != nullptr)
 		throw expression_error(expression_error::SYNTAX, 0);
 
 	return result.value();
@@ -1658,13 +1658,13 @@ UINT64 parsed_expression::execute_tokens()
 //-------------------------------------------------
 
 parsed_expression::parse_token::parse_token(int offset)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_type(INVALID),
 		m_offset(offset),
 		m_value(0),
 		m_flags(0),
-		m_string(NULL),
-		m_symbol(NULL)
+		m_string(nullptr),
+		m_symbol(nullptr)
 {
 }
 
@@ -1681,7 +1681,7 @@ UINT64 parsed_expression::parse_token::get_lval_value(symbol_table *table)
 		return m_symbol->value();
 
 	// or get the value from the memory callbacks
-	else if (is_memory() && table != NULL)
+	else if (is_memory() && table != nullptr)
 		return table->memory_value(m_string, memory_space(), address(), 1 << memory_size());
 
 	return 0;
@@ -1700,7 +1700,7 @@ inline void parsed_expression::parse_token::set_lval_value(symbol_table *table, 
 		m_symbol->set_value(value);
 
 	// or set the value via the memory callbacks
-	else if (is_memory() && table != NULL)
+	else if (is_memory() && table != nullptr)
 		table->set_memory_value(m_string, memory_space(), address(), 1 << memory_size(), value);
 }
 
@@ -1714,13 +1714,13 @@ void parsed_expression::execute_function(parse_token &token)
 {
 	// pop off all pushed parameters
 	UINT64 funcparams[MAX_FUNCTION_PARAMS];
-	symbol_entry *symbol = NULL;
+	symbol_entry *symbol = nullptr;
 	int paramcount = 0;
 	while (paramcount < MAX_FUNCTION_PARAMS)
 	{
 		// peek at the next token on the stack
 		parse_token *peek = peek_token(0);
-		if (peek == NULL)
+		if (peek == nullptr)
 			throw expression_error(expression_error::INVALID_PARAM_COUNT, token.offset());
 
 		// if it is a function symbol, break out of the loop

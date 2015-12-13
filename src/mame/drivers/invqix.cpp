@@ -153,7 +153,7 @@ protected:
 	required_shared_ptr<UINT16> m_vram;
 
 	// driver_device overrides
-	virtual void video_start();
+	virtual void video_start() override;
 
 private:
 	UINT16 m_vctl;      // 0000 for normal, 0001 for flip, 0100 when going to change (blank?)

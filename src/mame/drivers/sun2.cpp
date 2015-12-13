@@ -85,7 +85,7 @@ public:
 		m_p_ram(*this, "p_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	required_shared_ptr<UINT16> m_p_ram;
 };

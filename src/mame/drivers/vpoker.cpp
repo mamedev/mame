@@ -117,7 +117,7 @@ public:
 	DECLARE_READ8_MEMBER(blitter_r);
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

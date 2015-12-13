@@ -33,7 +33,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(color_w);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };

@@ -47,8 +47,8 @@ public:
 	void set_channel2(int active);
 	void play_channel1(int data);
 	void play_channel2(int data);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(polyplay);
 	UINT32 screen_update_polyplay(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(periodic_interrupt);

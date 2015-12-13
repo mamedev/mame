@@ -50,7 +50,7 @@ PALETTE_INIT_MEMBER(cclimber_state,cclimber)
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 0,
 			2, resistances_b,  weights_b,  0, 0,
-			0, 0, 0, 0, 0);
+			0, nullptr, nullptr, 0, 0);
 
 	for (i = 0;i < palette.entries(); i++)
 	{
@@ -582,7 +582,7 @@ void cclimber_state::toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 
 	/* draw the sprites -- note that it is important to draw them exactly in this
 	   order, to have the correct priorities. */
-	for (offs = 0x1c; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int x = m_spriteram[offs + 3];
 		int y = 240 - m_spriteram[offs + 2];

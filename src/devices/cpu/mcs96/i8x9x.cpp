@@ -13,7 +13,8 @@
 
 i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	mcs96_device(mconfig, type, name, tag, owner, clock, 8, "i8x9x", __FILE__),
-	io_config("io", ENDIANNESS_LITTLE, 16, 16, -1)
+	io_config("io", ENDIANNESS_LITTLE, 16, 16, -1), io(nullptr), base_timer2(0), ad_done(0), hso_command(0), ad_command(0), hso_time(0), ad_result(0),
+	ios0(0), ios1(0), ioc0(0), ioc1(0), sbuf(0), sp_stat(0), serial_send_buf(0), serial_send_timer(0)
 {
 }
 
@@ -24,7 +25,7 @@ offs_t i8x9x_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
 
 const address_space_config *i8x9x_device::memory_space_config(address_spacenum spacenum) const
 {
-	return spacenum == AS_PROGRAM ? &program_config : spacenum == AS_IO ? &io_config : NULL;
+	return spacenum == AS_PROGRAM ? &program_config : spacenum == AS_IO ? &io_config : nullptr;
 }
 
 void i8x9x_device::device_start()

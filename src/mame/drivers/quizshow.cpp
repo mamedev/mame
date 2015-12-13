@@ -70,8 +70,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(quizshow_category_select);
 	DECLARE_DRIVER_INIT(quizshow);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(quizshow);
 	UINT32 screen_update_quizshow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(quizshow_clock_timer_cb);

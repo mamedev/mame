@@ -19,7 +19,7 @@ MACHINE_RESET_MEMBER(scramble_state,scramble)
 {
 	MACHINE_RESET_CALL_MEMBER(galaxold);
 
-	if (m_audiocpu != NULL)
+	if (m_audiocpu != nullptr)
 		sh_init();
 }
 

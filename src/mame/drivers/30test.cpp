@@ -68,8 +68,8 @@ public:
 	DECLARE_WRITE8_MEMBER(hc11_mux_w);
 	DECLARE_READ8_MEMBER(hc11_okibank_r);
 	DECLARE_WRITE8_MEMBER(hc11_okibank_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 };

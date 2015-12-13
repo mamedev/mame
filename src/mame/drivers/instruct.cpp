@@ -74,7 +74,7 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(instruct);
 	INTERRUPT_GEN_MEMBER(t2l_int);
 private:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	UINT16 m_lar;
 	UINT8 m_digit;
 	bool m_valid_digit;

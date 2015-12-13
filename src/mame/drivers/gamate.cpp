@@ -50,7 +50,7 @@ public:
 	TIMER_CALLBACK_MEMBER(gamate_timer2);
 
 private:
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	struct
 	{

@@ -85,7 +85,7 @@ public:
 	DECLARE_DRIVER_INIT(renaimj);
 	DECLARE_DRIVER_INIT(csplayh7);
 	DECLARE_DRIVER_INIT(junai2);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
 
@@ -446,7 +446,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_state::csplayh5_irq)
 static const z80_daisy_config daisy_chain_sound[] =
 {
 	TMPZ84C011_DAISY_INTERNAL,
-	{ NULL }
+	{ nullptr }
 };
 
 static MACHINE_CONFIG_START( csplayh5, csplayh5_state )

@@ -1160,7 +1160,7 @@ void fm7_state::fm7_mmr_refresh(address_space& space)
 	if(m_basic_rom_en)
 	{
 		UINT8* ROM = memregion("fbasic")->base();
-		if(ROM != NULL)
+		if(ROM != nullptr)
 			membank("fbasic_bank_r")->set_base(ROM);
 	}
 	else

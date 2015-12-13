@@ -25,9 +25,9 @@ k001604_device::k001604_device(const machine_config &mconfig, const char *tag, d
 	m_roz_size(0),
 	m_txt_mem_offset(0),
 	m_roz_mem_offset(0),
-	m_tile_ram(NULL),
-	m_char_ram(NULL),
-	m_reg(NULL),
+	m_tile_ram(nullptr),
+	m_char_ram(nullptr),
+	m_reg(nullptr),
 	m_gfxdecode(*this),
 	m_palette(*this)
 {

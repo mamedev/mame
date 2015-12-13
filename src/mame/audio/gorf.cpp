@@ -38,7 +38,7 @@ static const char *const PhonemeTable[65] =
 	"U"  ,"Y"  ,"T"  ,"R"  ,"E"  ,"W"  ,"AE" ,"AE1",
 	"AW2","UH2","UH1","UH" ,"O2" ,"O1" ,"IU" ,"U1",
 	"THV","TH" ,"ER" ,"EH" ,"E1" ,"AW" ,"PA1","STOP",
-	0
+	nullptr
 };
 
 static const char *const GorfWordTable[] =
@@ -73,7 +73,7 @@ static const char *const GorfWordTable[] =
 	"UH1TAEEH3K","BAH2I3Y1T","KAH1NKER","DYVAH1U1ER","DUHST","GAE1LUH1KSY","GAH1EH3T",
 	"PAH1I1R","TRAH2I1Y","SU1PRE1N","AWL","HA2AYL",
 	"EH1MPAH1I1R",
-0
+nullptr
 };
 
 #define num_samples (sizeof(GorfWordTable)/sizeof(char *))
@@ -106,7 +106,7 @@ const char *const gorf_sample_names[] =
 	"coin", "attack","bite","conquer","devour","dust",
 	"galaxy","got","power","try","supreme","all",
 	"hail","emperor",
-	0
+	nullptr
 };
 
 

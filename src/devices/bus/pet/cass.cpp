@@ -81,10 +81,10 @@ void pet_datassette_port_device::device_start()
 }
 
 
-READ_LINE_MEMBER( pet_datassette_port_device::read ) { int state = 1; if (m_cart != NULL) state = m_cart->datassette_read(); return state; }
-WRITE_LINE_MEMBER( pet_datassette_port_device::write ) { if (m_cart != NULL) m_cart->datassette_write(state); }
-READ_LINE_MEMBER( pet_datassette_port_device::sense_r ) { int state = 1; if (m_cart != NULL) state = m_cart->datassette_sense(); return state; }
-WRITE_LINE_MEMBER( pet_datassette_port_device::motor_w ) { if (m_cart != NULL) m_cart->datassette_motor(state); }
+READ_LINE_MEMBER( pet_datassette_port_device::read ) { int state = 1; if (m_cart != nullptr) state = m_cart->datassette_read(); return state; }
+WRITE_LINE_MEMBER( pet_datassette_port_device::write ) { if (m_cart != nullptr) m_cart->datassette_write(state); }
+READ_LINE_MEMBER( pet_datassette_port_device::sense_r ) { int state = 1; if (m_cart != nullptr) state = m_cart->datassette_sense(); return state; }
+WRITE_LINE_MEMBER( pet_datassette_port_device::motor_w ) { if (m_cart != nullptr) m_cart->datassette_motor(state); }
 
 WRITE_LINE_MEMBER( pet_datassette_port_device::read_w ) { m_read_handler(state); }
 

@@ -34,7 +34,7 @@ const device_type A2BUS_CFFA2_6502 = &device_creator<a2bus_cffa2_6502_device>;
 #define CFFA2_ATA_TAG     "cffa2_ata"
 
 MACHINE_CONFIG_FRAGMENT( cffa2 )
-	MCFG_ATA_INTERFACE_ADD(CFFA2_ATA_TAG, ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD(CFFA2_ATA_TAG, ata_devices, "hdd", nullptr, false)
 
 // not yet, the core explodes
 //  MCFG_SOFTWARE_LIST_ADD("hdd_list", "apple2gs_hdd")

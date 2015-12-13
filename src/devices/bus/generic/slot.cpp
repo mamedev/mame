@@ -37,7 +37,7 @@ const device_type GENERIC_SOCKET = &device_creator<generic_slot_device>;
 
 device_generic_cart_interface::device_generic_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0)
 {
 }
@@ -57,7 +57,7 @@ device_generic_cart_interface::~device_generic_cart_interface()
 
 void device_generic_cart_interface::rom_alloc(size_t size, int width, endianness_t endian, const char *tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = device().machine().memory().region_alloc(std::string(tag).append(GENERIC_ROM_REGION_TAG).c_str(), size, width, endian)->base();
 		m_rom_size = size;
@@ -87,7 +87,7 @@ generic_slot_device::generic_slot_device(const machine_config &mconfig, const ch
 						device_t(mconfig, GENERIC_SOCKET, "Generic ROM Socket / RAM Socket / Cartridge Slot", tag, owner, clock, "generic_socket", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
-						m_interface(NULL),
+						m_interface(nullptr),
 						m_default_card("rom"),
 						m_extensions("bin"),
 						m_must_be_loaded(FALSE),
@@ -200,9 +200,9 @@ void generic_slot_device::get_default_card_software(std::string &result)
 UINT32 generic_slot_device::common_get_size(const char *region)
 {
 	// if we are loading from softlist, you have to specify a region
-	assert((software_entry() == NULL) || (region != NULL));
+	assert((software_entry() == nullptr) || (region != nullptr));
 
-	return (software_entry() == NULL) ? length() : get_software_region_length(region);
+	return (software_entry() == nullptr) ? length() : get_software_region_length(region);
 }
 
 /*-------------------------------------------------
@@ -213,12 +213,12 @@ UINT32 generic_slot_device::common_get_size(const char *region)
 void generic_slot_device::common_load_rom(UINT8 *ROM, UINT32 len, const char *region)
 {
 	// basic sanity check
-	assert((ROM != NULL) && (len > 0));
+	assert((ROM != nullptr) && (len > 0));
 
 	// if we are loading from softlist, you have to specify a region
-	assert((software_entry() == NULL) || (region != NULL));
+	assert((software_entry() == nullptr) || (region != nullptr));
 
-	if (software_entry() == NULL)
+	if (software_entry() == nullptr)
 		fread(ROM, len);
 	else
 		memcpy(ROM, get_software_region(region), len);

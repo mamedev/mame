@@ -10,25 +10,25 @@ driver by Couriersud
 
 
  Atari Pong Games List - Data based, in part from:
- 
+
  - "Andy's collection of Bronzeage Atari Video Arcade PCBs"
  http://www.andysarcade.net/personal/bronzeage/index.htm
- 
+
  - "Atari's Technical Manual Log"
  http://www.atarigames.com/manuals.txt
- 
+
  Suspected "same games" are grouped together.  These are usually the exact same game but different cabinet/name.
 
- Technical Manual #s  Game Name(s)                                               Atari Part #'s                     Data
- -------------------+----------------------------------------------------------+----------------------------------+---------+
- TM-013               Pong (1972)                                                A001433                            NO
- TM-0??               Pong In-A-Barrel (1973)                                    A001433?                           NO
- TM-015               Cocktail Pong/Coup Franc (1974)                            A001433?                           NO
- TM-0??               Dr. Pong/Puppy Pong/Snoopy Pong (1974)                     A001433?                           NO
- 422                  Superpong (1974)                                           A000423                            NO
- TM-014               Pong Doubles/Coupe Davis (1973)                            A000785                            NO
- TM-058               Breakout/Breakout Cocktail/Consolette (1976)               A004533                            NO
- 
+ Technical Manual #s      Game Name(s)                                                    Atari Part #'s                     Data
+ -----------------------+---------------------------------------------------------------+----------------------------------+---------+
+ TM-013,029               Pong (1972)                                                     A001433                            NO
+ TM-0??                   Pong In-A-Barrel (1973)                                         A001433?                           NO
+ TM-015                   Cocktail Pong (1974)                                            A001433?                           NO
+ TM-0??                   Dr. Pong/Puppy Pong/Snoopy Pong (1974)                          A001433?                           NO
+ 422,TM-029               Superpong (1974)                                                A000423                            NO
+ TM-014,029               Pong Doubles/Coupe Davis (1973)                                 A000785                            NO
+ TM-058                   Breakout/Breakout Cocktail/Consolette (1976)                    A004533                            NO
+
 Notes:
 
 TODO: Please see netlist include files
@@ -36,8 +36,8 @@ TODO: Breakout Cocktail and Consolette are believed to use the Breakout PCB with
       cabinet designs, this needs to be verified.
 TODO: Coupe Davis is believed to use the Pong Doubles PCB, just a different cabinet design,
       this needs to be verified.
-TODO: Dr. Pong, Pong In-A-Barrel, Puppy Pong, Snoopy Pong, Cocktail Pong and Coup Franc are
-      all believed to use the Pong (Rev E) PCB, but different cabinet designs; this needs to
+TODO: Dr. Pong, Pong In-A-Barrel, Puppy Pong, Snoopy Pong, and Cocktail Pong are all
+      believed to use the Pong (Rev E) PCB, but different cabinet designs; this needs to
       be verified.
 TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifications, this
       needs to be verified.
@@ -146,10 +146,10 @@ public:
 protected:
 
 	// driver_device overrides
-	virtual void machine_start() { };
-	virtual void machine_reset() { };
+	virtual void machine_start() override { };
+	virtual void machine_reset() override { };
 
-	virtual void video_start() { };
+	virtual void video_start() override { };
 
 private:
 
@@ -174,9 +174,9 @@ public:
 protected:
 
 	// driver_device overrides
-	virtual void machine_start() { };
-	virtual void machine_reset() { };
-	virtual void video_start()  { };
+	virtual void machine_start() override { };
+	virtual void machine_reset() override { };
+	virtual void video_start() override  { };
 
 private:
 
@@ -238,9 +238,9 @@ public:
 protected:
 
 	// driver_device overrides
-	virtual void machine_start() { };
-	virtual void machine_reset() { };
-	virtual void video_start()  { };
+	virtual void machine_start() override { };
+	virtual void machine_reset() override { };
+	virtual void video_start() override  { };
 
 private:
 
@@ -525,43 +525,39 @@ ROM_END
 /*   // 100% TTL - NO ROMS
 
 ROM_START( pongbarl ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( coupedav ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( coupfran ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( cktpong ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( drpong ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( pupppong ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( snoopong ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( suprpong ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( breakckt ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( consolet ) // dummy to satisfy game entry
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 */
 
@@ -573,7 +569,6 @@ GAMEL( 1976, breakout,  0, breakout, breakout,  driver_device,  0, ROT90, "Atari
 // 100% TTL
 //GAME( 1973, coupedav,   pongd,    pongd,    pongd,     driver_device,  0, ROT0,  "Atari France", "Coupe Davis [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1973, pongbarl,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Pong In-A-Barrel [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1974, coupfran,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari Europe", "Coup Franc [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, cktpong,    pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari / National Entertainment Co.", "Cocktail Pong [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, drpong,     pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Dr. Pong [TTL]", MACHINE_SUPPORTS_SAVE)
 //GAME( 1974, pupppong,   pong,     pong,     pong,      driver_device,  0, ROT0,  "Atari", "Puppy Pong [TTL]", MACHINE_SUPPORTS_SAVE)

@@ -32,9 +32,9 @@ const device_type WAVE = &device_creator<wave_device>;
 
 wave_device::wave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WAVE, "Wave", tag, owner, clock, "wave", __FILE__),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this), m_cass(nullptr)
 {
-	m_cassette_tag = 0;
+	m_cassette_tag = nullptr;
 }
 
 //-------------------------------------------------
@@ -72,7 +72,7 @@ void wave_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	double time_index;
 	double duration;
 	stream_sample_t *left_buffer = outputs[0];
-	stream_sample_t *right_buffer = NULL;
+	stream_sample_t *right_buffer = nullptr;
 	int i;
 
 	speaker_device_iterator spkiter(m_cass->machine().root_device());

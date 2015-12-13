@@ -100,7 +100,7 @@ public:
 	DECLARE_WRITE8_MEMBER(testb_w);
 	DECLARE_DRIVER_INIT(jokrwild);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jokrwild);
 	UINT32 screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

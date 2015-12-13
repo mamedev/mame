@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Mirko Buffoni,Richard Bush,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
+// license:BSD-3-Clause
+// copyright-holders:Mirko Buffoni,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
+// thanks-to:Richard Bush
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "machine/nmk004.h"

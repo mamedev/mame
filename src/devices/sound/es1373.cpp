@@ -24,8 +24,8 @@ ADDRESS_MAP_END
 
 es1373_device::es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, ES1373, "Creative Labs Ensoniq AudioPCI97 ES1373", tag, owner, clock, "es1373", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_eslog(NULL),
+		device_sound_interface(mconfig, *this), m_stream(nullptr),
+		m_eslog(nullptr), m_tempCount(0), m_timer(nullptr), m_memory_space(nullptr), m_cpu_tag(nullptr), m_cpu(nullptr),
 		m_irq_num(-1)
 {
 }
@@ -45,7 +45,7 @@ void es1373_device::device_stop()
 	if (LOG_ES_FILE && m_eslog)
 	{
 		fclose(m_eslog);
-		m_eslog = NULL;
+		m_eslog = nullptr;
 	}
 }
 
@@ -61,7 +61,7 @@ void es1373_device::device_start()
 	// create the stream
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100/2);
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(attotime::zero, 0, attotime::from_hz(44100/2/16));
 
 }
@@ -73,7 +73,7 @@ void es1373_device::device_reset()
 	if (LOG_ES_FILE && m_eslog)
 	{
 		fclose(m_eslog);
-		m_eslog = NULL;
+		m_eslog = nullptr;
 	}
 	if (LOG_ES_FILE && !m_eslog)
 		m_eslog = fopen("es.log", "w");

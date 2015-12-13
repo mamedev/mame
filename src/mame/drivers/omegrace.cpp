@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Bernd Wiebelt
 /***************************************************************************
 
@@ -243,7 +243,7 @@ public:
 	DECLARE_WRITE8_MEMBER(omegrace_leds_w);
 	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
 	DECLARE_DRIVER_INIT(omegrace);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
+// thanks-to:Iris Falbala,Rob Ragon
 /******************************************************************************
 
     MAGIC FLY
@@ -465,7 +466,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mux_port_w);
 	TILE_GET_INFO_MEMBER(get_magicfly_tile_info);
 	TILE_GET_INFO_MEMBER(get_7mezzo_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(magicfly);
 	DECLARE_PALETTE_INIT(bchance);
 	DECLARE_VIDEO_START(7mezzo);

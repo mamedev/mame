@@ -31,7 +31,7 @@
 ***************************************************************************/
 
 #if 0
-INLINE char *signed_16bit(INT16 val)
+static inline char *signed_16bit(INT16 val)
 {
 	static char temp[10];
 	if (val < 0)

@@ -63,17 +63,17 @@ protected:
 	UINT32 ram_start;
 	UINT8 syscr;
 
-	virtual void update_irq_filter();
-	virtual void interrupt_taken();
-	virtual int trapa_setup();
-	virtual void irq_setup();
-	virtual void internal_update(UINT64 current_time);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void update_irq_filter() override;
+	virtual void interrupt_taken() override;
+	virtual int trapa_setup() override;
+	virtual void irq_setup() override;
+	virtual void internal_update(UINT64 current_time) override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 	DECLARE_ADDRESS_MAP(map, 16);
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 };
 
 class h83044_device : public h83048_device {

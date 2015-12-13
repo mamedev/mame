@@ -132,8 +132,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_PALETTE_INIT(apple2);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -603,7 +603,7 @@ READ8_MEMBER(napple2_state::c080_r)
 		offset &= 0x7F;
 		slot = offset / 0x10;
 
-		if (m_slotdevice[slot] != NULL)
+		if (m_slotdevice[slot] != nullptr)
 		{
 			return m_slotdevice[slot]->read_c0nx(space, offset % 0x10);
 		}
@@ -619,7 +619,7 @@ WRITE8_MEMBER(napple2_state::c080_w)
 	offset &= 0x7F;
 	slot = offset / 0x10;
 
-	if (m_slotdevice[slot] != NULL)
+	if (m_slotdevice[slot] != nullptr)
 	{
 		m_slotdevice[slot]->write_c0nx(space, offset % 0x10, data);
 	}
@@ -631,7 +631,7 @@ READ8_MEMBER(napple2_state::c100_r)
 
 	slotnum = ((offset>>8) & 0xf) + 1;
 
-	if (m_slotdevice[slotnum] != NULL)
+	if (m_slotdevice[slotnum] != nullptr)
 	{
 		if ((m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
 		{
@@ -650,7 +650,7 @@ WRITE8_MEMBER(napple2_state::c100_w)
 
 	slotnum = ((offset>>8) & 0xf) + 1;
 
-	if (m_slotdevice[slotnum] != NULL)
+	if (m_slotdevice[slotnum] != nullptr)
 	{
 		if ((m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
 		{
@@ -669,7 +669,7 @@ READ8_MEMBER(napple2_state::c800_r)
 		return 0xff;
 	}
 
-	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != NULL))
+	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
 		return m_slotdevice[m_cnxx_slot]->read_c800(space, offset&0xfff);
 	}
@@ -685,7 +685,7 @@ WRITE8_MEMBER(napple2_state::c800_w)
 		return;
 	}
 
-	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != NULL))
+	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
 		m_slotdevice[m_cnxx_slot]->write_c800(space, offset&0xfff, data);
 	}
@@ -1318,13 +1318,13 @@ static MACHINE_CONFIG_START( apple2_common, napple2_state )
 	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(napple2_state, a2bus_nmi_w))
 	MCFG_A2BUS_OUT_INH_CB(WRITELINE(napple2_state, a2bus_inh_w))
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl0", apple2_slot0_cards, "lang")
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl1", apple2_cards, NULL)
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl2", apple2_cards, NULL)
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl3", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl1", apple2_cards, nullptr)
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl2", apple2_cards, nullptr)
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl3", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl4", apple2_cards, "mockingboard")
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl5", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl5", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl6", apple2_cards, "diskiing")
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl7", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl7", apple2_cards, nullptr)
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
 
@@ -1468,6 +1468,15 @@ ROM_START(uniap2ti) /* "Teclado Inteligente" means "smart keyboard" in brazilian
 	ROM_LOAD ( "unitron_apii+_keyboard.ic3", 0x0800, 0x0800, CRC(edc43205) SHA1(220cc21d86f1ab63a301ae7a9c5ff0f3f6cddb70))
 ROM_END
 
+ROM_START(microeng)
+	ROM_REGION(0x0800,"gfx1",0)
+	ROM_LOAD ( "microengenho_6c.bin", 0x0000, 0x0800, CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659))
+
+	ROM_REGION(0x4000,"maincpu",0)
+	ROM_LOAD ( "microengenho_d0_d8.bin", 0x1000, 0x1000, CRC(834eabf4) SHA1(9a2385c6df16e5f5d15b79da17d21bf0f99dbd08))
+	ROM_LOAD ( "microengenho_e0_e8.bin", 0x2000, 0x1000, CRC(0d494efd) SHA1(a2fd1223a3ca0cfee24a6afe66ea3c4c144dd98e))
+	ROM_LOAD ( "microengenho_f0_f8.bin", 0x3000, 0x1000, CRC(588717cf) SHA1(e2a867c4a390d65e5ea181a4f933abb9992e4a63))
+ROM_END
 
 /*
     J-Plus ROM numbers confirmed by:
@@ -1605,6 +1614,7 @@ COMP( 1977, apple2,   0,        0,        apple2,      apple2,  driver_device,  
 COMP( 1979, apple2p,  apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Apple Computer",    "Apple ][+", MACHINE_SUPPORTS_SAVE )
 COMP( 1980, apple2jp, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Apple Computer",    "Apple ][ J-Plus", MACHINE_SUPPORTS_SAVE )
 COMP( 198?, elppa,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Victor do Brasil",  "Elppa II+", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, microeng, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Spectrum Eletronica (SCOPUS)", "Micro Engenho", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, maxxi,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Polymax",  "Maxxi", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, prav82,   apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Pravetz",           "Pravetz 82", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, ace100,   apple2,   0,        apple2,      apple2p, driver_device,  0,        "Franklin Computer", "Franklin Ace 100", MACHINE_SUPPORTS_SAVE )

@@ -779,7 +779,7 @@ static MACHINE_CONFIG_START( gameboy, gb_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* cartslot */
-	MCFG_GB_CARTRIDGE_ADD("gbslot", gb_cart, NULL)
+	MCFG_GB_CARTRIDGE_ADD("gbslot", gb_cart, nullptr)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gameboy")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gbc_list","gbcolor")
@@ -890,7 +890,7 @@ static MACHINE_CONFIG_START( gbcolor, gb_state )
 	MCFG_RAM_DEFAULT_SIZE("48K") /* 2 pages of 8KB VRAM, 8 pages of 4KB RAM */
 
 	/* cartslot */
-	MCFG_GB_CARTRIDGE_ADD("gbslot", gb_cart, NULL)
+	MCFG_GB_CARTRIDGE_ADD("gbslot", gb_cart, nullptr)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gbcolor")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gb_list","gameboy")
@@ -932,7 +932,7 @@ static MACHINE_CONFIG_START( megaduck, megaduck_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* cartslot */
-	MCFG_MEGADUCK_CARTRIDGE_ADD("duckslot", megaduck_cart, NULL)
+	MCFG_MEGADUCK_CARTRIDGE_ADD("duckslot", megaduck_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "megaduck")
 MACHINE_CONFIG_END
 

@@ -31,7 +31,7 @@
 //-------------------------------------------------
 
 debug_view_source::debug_view_source(const char *name, device_t *device)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_name(name),
 		m_device(device),
 		m_is_octal(false)
@@ -67,9 +67,9 @@ debug_view_source::~debug_view_source()
 //-------------------------------------------------
 
 debug_view::debug_view(running_machine &machine, debug_view_type type, debug_view_osd_update_func osdupdate, void *osdprivate)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_type(type),
-		m_source(NULL),
+		m_source(nullptr),
 		m_osdupdate(osdupdate),
 		m_osdprivate(osdprivate),
 		m_visible(80,10),
@@ -133,7 +133,7 @@ void debug_view::end_update()
 
 void debug_view::flush_osd_updates()
 {
-	if (m_osd_update_pending && m_osdupdate != NULL)
+	if (m_osd_update_pending && m_osdupdate != nullptr)
 		(*m_osdupdate)(*this, m_osdprivate);
 	m_osd_update_pending = false;
 }
@@ -236,7 +236,7 @@ void debug_view::set_source(const debug_view_source &source)
 
 const debug_view_source *debug_view::source_for_device(device_t *device) const
 {
-	for (debug_view_source *source = m_source_list.first(); source != NULL; source = source->next())
+	for (debug_view_source *source = m_source_list.first(); source != nullptr; source = source->next())
 		if (device == source->device())
 			return source;
 	return m_source_list.first();
@@ -316,7 +316,7 @@ void debug_view::view_click(const int button, const debug_view_xy& pos)
 
 debug_view_manager::debug_view_manager(running_machine &machine)
 	: m_machine(machine),
-		m_viewlist(NULL)
+		m_viewlist(nullptr)
 {
 }
 
@@ -327,7 +327,7 @@ debug_view_manager::debug_view_manager(running_machine &machine)
 
 debug_view_manager::~debug_view_manager()
 {
-	while (m_viewlist != NULL)
+	while (m_viewlist != nullptr)
 	{
 		debug_view *oldhead = m_viewlist;
 		m_viewlist = oldhead->m_next;
@@ -374,7 +374,7 @@ debug_view *debug_view_manager::alloc_view(debug_view_type type, debug_view_osd_
 		default:
 			fatalerror("Attempt to create invalid debug view type %d\n", type);
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -385,7 +385,7 @@ debug_view *debug_view_manager::alloc_view(debug_view_type type, debug_view_osd_
 void debug_view_manager::free_view(debug_view &view)
 {
 	// free us but only if we're in the list
-	for (debug_view **viewptr = &m_viewlist; *viewptr != NULL; viewptr = &(*viewptr)->m_next)
+	for (debug_view **viewptr = &m_viewlist; *viewptr != nullptr; viewptr = &(*viewptr)->m_next)
 		if (*viewptr == &view)
 		{
 			*viewptr = view.m_next;
@@ -403,7 +403,7 @@ void debug_view_manager::free_view(debug_view &view)
 void debug_view_manager::update_all_except(debug_view_type type)
 {
 	// loop over each view and force an update
-	for (debug_view *view = m_viewlist; view != NULL; view = view->next())
+	for (debug_view *view = m_viewlist; view != nullptr; view = view->next())
 		if (type == DVT_NONE || type != view->type())
 			view->force_update();
 }
@@ -416,7 +416,7 @@ void debug_view_manager::update_all_except(debug_view_type type)
 void debug_view_manager::update_all(debug_view_type type)
 {
 	// loop over each view and force an update
-	for (debug_view *view = m_viewlist; view != NULL; view = view->next())
+	for (debug_view *view = m_viewlist; view != nullptr; view = view->next())
 		if (type == DVT_NONE || type == view->type())
 			view->force_update();
 }
@@ -429,7 +429,7 @@ void debug_view_manager::update_all(debug_view_type type)
 
 void debug_view_manager::flush_osd_updates()
 {
-	for (debug_view *view = m_viewlist; view != NULL; view = view->m_next)
+	for (debug_view *view = m_viewlist; view != nullptr; view = view->m_next)
 		view->flush_osd_updates();
 }
 
@@ -441,7 +441,7 @@ void debug_view_manager::flush_osd_updates()
 debug_view *debug_view_manager::append(debug_view *view)
 {
 	debug_view **viewptr;
-	for (viewptr = &m_viewlist; *viewptr != NULL; viewptr = &(*viewptr)->m_next) { }
+	for (viewptr = &m_viewlist; *viewptr != nullptr; viewptr = &(*viewptr)->m_next) { }
 	*viewptr = view;
 	return view;
 }
@@ -482,7 +482,7 @@ debug_view_expression::~debug_view_expression()
 
 void debug_view_expression::set_context(symbol_table *context)
 {
-	m_parsed.set_symbols((context != NULL) ? context : debug_cpu_get_global_symtable(machine()));
+	m_parsed.set_symbols((context != nullptr) ? context : debug_cpu_get_global_symtable(machine()));
 	m_dirty = true;
 }
 

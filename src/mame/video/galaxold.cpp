@@ -402,12 +402,12 @@ void galaxold_state::state_save_register()
 
 void galaxold_state::video_start_common()
 {
-	m_modify_charcode = 0;
-	m_modify_spritecode = 0;
-	m_modify_color = 0;
-	m_modify_ypos = 0;
+	m_modify_charcode = nullptr;
+	m_modify_spritecode = nullptr;
+	m_modify_color = nullptr;
+	m_modify_ypos = nullptr;
 
-	m_draw_bullets = 0;
+	m_draw_bullets = nullptr;
 
 	m_draw_background = &galaxold_state::galaxold_draw_background;
 	m_background_enable = 0;

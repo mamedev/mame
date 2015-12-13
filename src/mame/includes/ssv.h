@@ -133,8 +133,8 @@ public:
 	DECLARE_DRIVER_INIT(jsk);
 	DECLARE_DRIVER_INIT(twineag2);
 	DECLARE_DRIVER_INIT(mslider);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(gdfs);
 	DECLARE_VIDEO_START(eaglshot);
 

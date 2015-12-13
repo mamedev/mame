@@ -161,11 +161,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 private:
 	// internal state
 
@@ -242,8 +242,8 @@ public:
 	required_ioport m_key0, m_key1, m_key2, m_key3, m_key4, m_key5;
 	optional_ioport m_key6, m_montype;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	model_t m_model;
 
@@ -254,6 +254,10 @@ public:
 	UINT32 m_via2_vbl;
 	UINT32 m_se30_vbl_enable;
 	UINT8 m_nubus_irq_state;
+
+	emu_timer *m_overlay_timeout;
+	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
+	DECLARE_READ32_MEMBER(rom_switch_r);
 
 #ifndef MAC_USE_EMULATED_KBD
 	/* used to store the reply to most keyboard commands */
@@ -419,7 +423,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(mac_asc_irq);
 
-	DECLARE_DIRECT_UPDATE_MEMBER(overlay_opbaseoverride);
 private:
 	int has_adb();
 	void adb_reset();

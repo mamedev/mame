@@ -45,7 +45,7 @@ public:
 	required_device<printer_image_device> m_printer;
 
 protected:
-	virtual void pia1_pa_changed(UINT8 data);
+	virtual void pia1_pa_changed(UINT8 data) override;
 };
 
 
@@ -62,10 +62,10 @@ public:
 	required_device<mos6551_device> m_acia;
 
 protected:
-	virtual DECLARE_READ8_MEMBER( ff00_read );
-	virtual DECLARE_WRITE8_MEMBER( ff00_write );
+	virtual DECLARE_READ8_MEMBER( ff00_read ) override;
+	virtual DECLARE_WRITE8_MEMBER( ff00_write ) override;
 
-	virtual void pia1_pb_changed(UINT8 data);
+	virtual void pia1_pb_changed(UINT8 data) override;
 	void page_rom(bool romswitch);
 };
 

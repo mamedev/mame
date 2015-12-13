@@ -95,9 +95,9 @@ public:
 	DECLARE_READ16_MEMBER(analog_r);
 	DECLARE_DRIVER_INIT(airrace);
 	DECLARE_DRIVER_INIT(laststar);
-	virtual void machine_reset();
-	virtual void video_start();
-	virtual void video_reset();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void video_reset() override;
 	DECLARE_MACHINE_RESET(airrace);
 	UINT32 screen_update_atarisy4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
@@ -222,7 +222,7 @@ UINT32 atarisy4_state::screen_update_atarisy4(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-INLINE UINT32 xy_to_screen_addr(UINT32 x, UINT32 y)
+static inline UINT32 xy_to_screen_addr(UINT32 x, UINT32 y)
 {
 //  UINT32 offset = ((gpu.mcr >> 4) & 3) << 9;
 	UINT32 offset = 0;

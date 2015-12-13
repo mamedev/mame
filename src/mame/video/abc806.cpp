@@ -413,9 +413,9 @@ void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 void abc806_state::video_start()
 {
 	// initialize variables
-	for (int i = 0; i < 16; i++)
+	for (auto & elem : m_hrc)
 	{
-		m_hrc[i] = 0;
+		elem = 0;
 	}
 
 	m_sync = 10;

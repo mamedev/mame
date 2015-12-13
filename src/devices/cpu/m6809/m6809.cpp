@@ -89,8 +89,7 @@ March 2013 NPW:
 #define LOG_INTERRUPTS  0
 
 // turn off 'unreferenced label' errors
-// this pragma doesn't work on older GCCs, so cut off at 4.2
-#if defined(__GNUC__) && __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)
+#if defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-label"
 #endif
 #ifdef _MSC_VER
@@ -116,7 +115,7 @@ m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *
 	m_sprogram_config("decrypted_opcodes", ENDIANNESS_BIG, 8, 16),
 	m_clock_divider(divider)
 {
-	m_mintf = NULL;
+	m_mintf = nullptr;
 }
 
 
@@ -161,8 +160,8 @@ void m6809_base_device::device_start()
 	m_y.w = 0;
 	m_dp = 0;
 	m_reg = 0;
-	m_reg8 = NULL;
-	m_reg16 = NULL;
+	m_reg8 = nullptr;
+	m_reg16 = nullptr;
 
 	// setup regtable
 	save_item(NAME(m_pc.w));
@@ -251,8 +250,8 @@ void m6809_base_device::device_pre_save()
 
 void m6809_base_device::device_post_load()
 {
-	m_reg8 = NULL;
-	m_reg16 = NULL;
+	m_reg8 = nullptr;
+	m_reg16 = nullptr;
 
 	switch(m_reg)
 	{
@@ -292,8 +291,8 @@ const address_space_config *m6809_base_device::memory_space_config(address_space
 	switch(spacenum)
 	{
 	case AS_PROGRAM:           return &m_program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_sprogram_config : NULL;
-	default:                   return NULL;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_sprogram_config : nullptr;
+	default:                   return nullptr;
 	}
 }
 

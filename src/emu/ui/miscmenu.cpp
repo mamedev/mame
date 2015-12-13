@@ -32,7 +32,7 @@ ui_menu_keyboard_mode::ui_menu_keyboard_mode(running_machine &machine, render_co
 void ui_menu_keyboard_mode::populate()
 {
 	bool natural = machine().ui().use_natural_keyboard();
-	item_append("Keyboard Mode:", natural ? "Natural" : "Emulated", natural ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, NULL);
+	item_append("Keyboard Mode:", natural ? "Natural" : "Emulated", natural ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, nullptr);
 }
 
 ui_menu_keyboard_mode::~ui_menu_keyboard_mode()
@@ -46,7 +46,7 @@ void ui_menu_keyboard_mode::handle()
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
 
-	if (menu_event != NULL)
+	if (menu_event != nullptr)
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
@@ -70,7 +70,7 @@ void ui_menu_bios_selection::populate()
 {
 	/* cycle through all devices for this system */
 	device_iterator deviter(machine().root_device());
-	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
 	{
 		if (device->rom_region()) {
 			const char *val = "default";
@@ -85,8 +85,8 @@ void ui_menu_bios_selection::populate()
 		}
 	}
 
-	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-	item_append("Reset",  NULL, 0, (void *)1);
+	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+	item_append("Reset",  nullptr, 0, (void *)1);
 }
 
 ui_menu_bios_selection::~ui_menu_bios_selection()
@@ -102,7 +102,7 @@ void ui_menu_bios_selection::handle()
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
 
-	if (menu_event != NULL && menu_event->itemref != NULL)
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		if ((FPTR)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
 			machine().schedule_hard_reset();
@@ -154,10 +154,10 @@ void ui_menu_network_devices::populate()
 {
 	/* cycle through all devices for this system */
 	network_interface_iterator iter(machine().root_device());
-	for (device_network_interface *network = iter.first(); network != NULL; network = iter.next())
+	for (device_network_interface *network = iter.first(); network != nullptr; network = iter.next())
 	{
 		int curr = network->get_interface();
-		const char *title = NULL;
+		const char *title = nullptr;
 		const osd_netdev::entry_t *entry = netdev_first();
 		while(entry) {
 			if(entry->id==curr) {
@@ -180,7 +180,7 @@ void ui_menu_network_devices::handle()
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
 
-	if (menu_event != NULL && menu_event->itemref != NULL)
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT) {
 			device_network_interface *network = (device_network_interface *)menu_event->itemref;
@@ -266,7 +266,7 @@ void ui_menu_bookkeeping::populate()
 	}
 
 	/* append the single item */
-	item_append(tempstring.c_str(), NULL, MENU_FLAG_MULTILINE, NULL);
+	item_append(tempstring.c_str(), nullptr, MENU_FLAG_MULTILINE, nullptr);
 }
 
 /*-------------------------------------------------
@@ -280,7 +280,7 @@ void ui_menu_crosshair::handle()
 	const ui_menu_event *menu_event = process(UI_MENU_PROCESS_LR_REPEAT);
 
 	/* handle events */
-	if (menu_event != NULL && menu_event->itemref != NULL)
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		crosshair_user_settings settings;
 		crosshair_item_data *data = (crosshair_item_data *)menu_event->itemref;
@@ -445,7 +445,7 @@ void ui_menu_crosshair::populate()
 
 			/* look for the current name, then remember the name before */
 			/* and find the next name */
-			while (((dir = path.next()) != NULL) && !finished)
+			while (((dir = path.next()) != nullptr) && !finished)
 			{
 				int length = strlen(dir->name);
 

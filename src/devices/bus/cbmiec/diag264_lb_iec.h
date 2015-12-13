@@ -31,10 +31,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_cbm_iec_interface overrides
-	virtual void cbm_iec_atn(int state);
+	virtual void cbm_iec_atn(int state) override;
 };
 
 

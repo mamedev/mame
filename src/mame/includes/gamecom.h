@@ -267,8 +267,8 @@ private:
 	void recompute_lcd_params();
 	void handle_input_press(UINT16 mux_data);
 	int common_load(device_image_interface &image, generic_slot_device *slot);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_shared_ptr<UINT8> m_p_nvram;
 	required_device<cpu_device> m_maincpu;

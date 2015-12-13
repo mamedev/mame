@@ -15,12 +15,12 @@ protected:
 		UINT16 m_boundary;
 		mi_konami1(UINT16 boundary);
 		virtual ~mi_konami1() {}
-		virtual UINT8 read_opcode(UINT16 adr);
+		virtual UINT8 read_opcode(UINT16 adr) override;
 	};
 
 	UINT16 m_boundary;
 
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type KONAMI1;

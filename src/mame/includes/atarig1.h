@@ -44,9 +44,9 @@ public:
 	UINT16          m_playfield_xscroll;
 	UINT16          m_playfield_yscroll;
 
-	virtual void device_post_load();
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void device_post_load() override;
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(mo_control_w);
 	DECLARE_WRITE16_MEMBER(mo_command_w);
 	DECLARE_READ16_MEMBER(special_port0_r);

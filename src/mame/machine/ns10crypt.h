@@ -46,7 +46,7 @@ private:
 	static const int initSbox[16];
 	const gf2_reducer *_reducer;
 
-	void device_start();
+	void device_start() override;
 	void init(int iv);
 };
 

@@ -11,7 +11,7 @@ const device_type CHANNELF_SOUND = &device_creator<channelf_sound_device>;
 channelf_sound_device::channelf_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CHANNELF_SOUND, "Channel F Sound", tag, owner, clock, "channelf_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_channel(NULL),
+		m_channel(nullptr),
 		m_sound_mode(0),
 		m_incr(0),
 		m_decay_mult(0),

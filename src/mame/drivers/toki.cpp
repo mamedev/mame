@@ -6,11 +6,9 @@ Toki
 
 driver by Jarek Parchanski
 
-
 Coin inputs are handled by the sound CPU, so they don't work with sound
 disabled. Use the service switch instead.
 
---
 Mametesters bug tokiu056gre - "tokiu: "0000000" is always displayed as the top hiscore during gameplay,
 regardless of what it actually is. This does not happen in the other Toki sets."
 
@@ -25,14 +23,72 @@ the problem is that the version in Tokiu has not been adjusted for the different
 it reads from the $68008 location instead of $680010.  From analysing the code I'm certain this is a bug
 in the original USA version code and not an emulation bug.
 
-
-
 TODO
 ----
-
 Does the bootleg use a 68000 @ 10MHz ? This causes some bad slow-
 downs at the floating monkey machine (round 1), so set to 12 MHz
 for now. Even at 12 this slowdown still happens a little.
+
+***************************************************************************
+Toki
+TAD Corporation, 1989
+
+PCB Layout
+----------
+
+TOKI-TM 1989 TAD CORPORATION
+|------------------------------------------------------------------|
+|VOL YM3014   9 14.31818MHz  SG0140 SEI0021BU SEI0021BU SIS6091    |
+|HB-41 M6295  8  SEI80BU  82S129    SEI0021BU SEI0021BU 2 SEI0050BU|
+|LA4460 YM3812 Z80          SIS6091  SIS6091  SIS6091   1    12MHz |
+|              5814 PLHS18P8  UEC-51                     82S135    |
+| SEI0100BU    7                         SEI0010BU     SEI0010BU   |
+|UEC-02        74LS154                BK2        BK1   SEI0010BU   |
+|                                                        PLHS18P8  |
+|J             6        4   PLHS18P8 74F841                        |
+|A  UEC-01                  PLHS18P8 74F841 SIS6091  SEI0060BU     |
+|M  UEC-01     5        3   74F269   74F827    SG0140  SIS6091     |
+|M  UEC-01                                                  SIS6091|
+|A  UEC-01   58257    58257                                        |
+|                                       SIS6091                    |
+| DSW1(8)                                                          |
+|                                SIS6091                           |
+|        |------------------|           SIS6091 SG0140  SIS6091    |
+| DSW2(8)|     68000-10     |                    SEI0060BU  SIS6091|
+|        |------------------|                    PLHS18P8          |
+|                                SG0140             OBJ1 SEI0010BU |
+|20MHz    PLHS18P8 PLHS18P8                         OBJ2 SEI0010BU |
+|------------------------------------------------------------------|
+Notes:
+       68000 - Clock 10.000MHz [20/2]
+         Z80 - Clock 3.579545MHz [14.31818/4]
+       M6295 - Clock 1.000MHz [20/20]
+      YM3812 - Clock 3.579545MHz [14.31818/4]
+       58257 - 32kx8 SRAM
+        5814 - 2kx8 SRAM
+    4, 6 & 9 - 128kx8 EPROM/maskROM (i.e. 27C010)
+ 1,2,3,5 & 7 - 64kx8 EPROM/maskROM (i.e. 27C512)
+           8 - 8kx8 EPROM (i.e. 27C64)
+     BK1/BK2 - 512kx8 DIP40 mask ROM
+   OBJ1/OBJ2 - 512kx8 DIP40 mask ROM
+      82S129 - Philips 82S129 1k-bit (256x4) Biploar PROM at location J3
+      82S135 - Philips 82S135 2k-bit (256x8) Bipolar PROM at location B6
+      LA4460 - Sanyo LA4460 12W Power AMP
+   SEI0100BU - Custom chip marked 'SEI0100BU YM3931' (SDIP64)
+     SIS6091 - Unknown QFP80. Probably RAM? (there's no known sprite/BG RAM on the PCB)
+      SG0140 - Custom chip marked 'SG0140', actually Toshiba Gate Array TC110G05AN-0012
+   SEI0021BU - Custom chip marked 'SEI0021BU', actually Toshiba Gate Array TC17G008AN-0022
+     SEI80BU - Custom chip marked 'SEI80BU'
+   SEI0060BU - Custom chip marked 'SEI0060BU', actually Toshiba Gate Array TC17G008AN-0024
+   SEI0050BU - Custom chip marked 'SEI0050BU M ^ 844 00' ^=triangle symbol (possibly Mitsubishi?)
+   SEI0010BU - Custom chip marked 'SEI0010BU', actually Toshiba Gate Array TC17G005AN-0025
+    PLHS18P8 - Signetics PLHS18P8AN Programmable logic chip (DIP20)
+      UEC-51 - Custom ceramic module, maybe RGB DAC?
+       HB-41 - Custom ceramic module, audio DAC/filter
+      UEC-01 - Custom ceramic module, I/O
+      UEC-02 - Custom ceramic module, drives the coin counters
+       VSync - 59.6094Hz
+       HSync - 15.31996kHz
 
 ***************************************************************************/
 
@@ -458,149 +514,149 @@ MACHINE_CONFIG_END
 
 ROM_START( toki )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
-	ROM_LOAD16_BYTE( "l10_6.bin",    0x00000, 0x20000, CRC(94015d91) SHA1(8b8d7c589eff038467f55e81ffd450f726c5a8b5) )
-	ROM_LOAD16_BYTE( "k10_4e.bin",   0x00001, 0x20000, CRC(531bd3ef) SHA1(2e561f92f5c5f2da16c4791274ccbd421b9b0a05) )
-	ROM_LOAD16_BYTE( "tokijp.005",   0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
-	ROM_LOAD16_BYTE( "tokijp.003",   0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
+	ROM_LOAD16_BYTE( "6e.m10",   0x00000, 0x20000, CRC(94015d91) SHA1(8b8d7c589eff038467f55e81ffd450f726c5a8b5) )
+	ROM_LOAD16_BYTE( "4e.k10",   0x00001, 0x20000, CRC(531bd3ef) SHA1(2e561f92f5c5f2da16c4791274ccbd421b9b0a05) )
+	ROM_LOAD16_BYTE( "5.m12",    0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
+	ROM_LOAD16_BYTE( "3.k12",    0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
-	ROM_LOAD( "tokijp.008",   0x00000, 0x02000, CRC(6c87c4c5) SHA1(d76822bcde3d42afae72a0945b6acbf3c6a1d955) )  /* encrypted */
-	ROM_LOAD( "tokijp.007",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )  /* banked stuff */
+	ROM_LOAD( "8.m3",   0x00000, 0x02000, CRC(6c87c4c5) SHA1(d76822bcde3d42afae72a0945b6acbf3c6a1d955) )  /* encrypted */
+	ROM_LOAD( "7.m7",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )  /* banked stuff */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "tokijp.001",   0x000000, 0x10000, CRC(8aa964a2) SHA1(875129bdd5f699ee30a98160718603a3bc958d84) )   /* chars */
-	ROM_LOAD( "tokijp.002",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
+	ROM_LOAD( "1.c5",   0x000000, 0x10000, CRC(8aa964a2) SHA1(875129bdd5f699ee30a98160718603a3bc958d84) )   /* chars */
+	ROM_LOAD( "2.c3",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "toki.ob1",     0x000000, 0x80000, CRC(a27a80ba) SHA1(3dd3b6b0ace6ca6653603bea952b828b154a2223) )   /* sprites */
-	ROM_LOAD( "toki.ob2",     0x080000, 0x80000, CRC(fa687718) SHA1(f194b742399d8124d97cfa3d59beb980c36cfb3c) )
+	ROM_LOAD( "toki_obj1.c20",   0x000000, 0x80000, CRC(a27a80ba) SHA1(3dd3b6b0ace6ca6653603bea952b828b154a2223) )   /* sprites */
+	ROM_LOAD( "toki_obj2.c22",   0x080000, 0x80000, CRC(fa687718) SHA1(f194b742399d8124d97cfa3d59beb980c36cfb3c) )
 
 	ROM_REGION( 0x080000, "gfx3", 0 )
-	ROM_LOAD( "toki.bk1",     0x000000, 0x80000, CRC(fdaa5f4b) SHA1(ea850361bc8274639e8433bd2a5307fd3a0c9a24) )   /* tiles 1 */
+	ROM_LOAD( "toki_bk1.cd8",   0x000000, 0x80000, CRC(fdaa5f4b) SHA1(ea850361bc8274639e8433bd2a5307fd3a0c9a24) )   /* tiles 1 */
 
 	ROM_REGION( 0x080000, "gfx4", 0 )
-	ROM_LOAD( "toki.bk2",     0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
+	ROM_LOAD( "toki_bk2.ef8",   0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
-	ROM_LOAD( "tokijp.009",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
 ROM_END
 
 
 ROM_START( tokia )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
-	ROM_LOAD16_BYTE( "tokijp.006",   0x00000, 0x20000, CRC(03d726b1) SHA1(bbe3a1ea1943cd73b821b3de4d5bf3dfbffd2168) )
-	ROM_LOAD16_BYTE( "4c.10k",       0x00001, 0x20000, CRC(b2c345c5) SHA1(ff8ff31551e835e29192d7ddd3e1601968b3e2c5) )
-	ROM_LOAD16_BYTE( "tokijp.005",   0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
-	ROM_LOAD16_BYTE( "tokijp.003",   0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
+	ROM_LOAD16_BYTE( "6.m10",    0x00000, 0x20000, CRC(03d726b1) SHA1(bbe3a1ea1943cd73b821b3de4d5bf3dfbffd2168) )
+	ROM_LOAD16_BYTE( "4c.k10",   0x00001, 0x20000, CRC(b2c345c5) SHA1(ff8ff31551e835e29192d7ddd3e1601968b3e2c5) )
+	ROM_LOAD16_BYTE( "5.m12",    0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
+	ROM_LOAD16_BYTE( "3.k12",    0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
-	ROM_LOAD( "tokijp.008",   0x00000, 0x02000, CRC(6c87c4c5) SHA1(d76822bcde3d42afae72a0945b6acbf3c6a1d955) )  /* encrypted */
-	ROM_LOAD( "tokijp.007",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )  /* banked stuff */
+	ROM_LOAD( "8.m3",   0x00000, 0x02000, CRC(6c87c4c5) SHA1(d76822bcde3d42afae72a0945b6acbf3c6a1d955) )  /* encrypted */
+	ROM_LOAD( "7.m7",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )  /* banked stuff */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "tokijp.001",   0x000000, 0x10000, CRC(8aa964a2) SHA1(875129bdd5f699ee30a98160718603a3bc958d84) )   /* chars */
-	ROM_LOAD( "tokijp.002",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
+	ROM_LOAD( "1.c5",   0x000000, 0x10000, CRC(8aa964a2) SHA1(875129bdd5f699ee30a98160718603a3bc958d84) )   /* chars */
+	ROM_LOAD( "2.c3",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "toki.ob1",     0x000000, 0x80000, CRC(a27a80ba) SHA1(3dd3b6b0ace6ca6653603bea952b828b154a2223) )   /* sprites */
-	ROM_LOAD( "toki.ob2",     0x080000, 0x80000, CRC(fa687718) SHA1(f194b742399d8124d97cfa3d59beb980c36cfb3c) )
+	ROM_LOAD( "toki_obj1.c20",   0x000000, 0x80000, CRC(a27a80ba) SHA1(3dd3b6b0ace6ca6653603bea952b828b154a2223) )   /* sprites */
+	ROM_LOAD( "toki_obj2.c22",   0x080000, 0x80000, CRC(fa687718) SHA1(f194b742399d8124d97cfa3d59beb980c36cfb3c) )
 
 	ROM_REGION( 0x080000, "gfx3", 0 )
-	ROM_LOAD( "toki.bk1",     0x000000, 0x80000, CRC(fdaa5f4b) SHA1(ea850361bc8274639e8433bd2a5307fd3a0c9a24) )   /* tiles 1 */
+	ROM_LOAD( "toki_bk1.cd8",   0x000000, 0x80000, CRC(fdaa5f4b) SHA1(ea850361bc8274639e8433bd2a5307fd3a0c9a24) )   /* tiles 1 */
 
 	ROM_REGION( 0x080000, "gfx4", 0 )
-	ROM_LOAD( "toki.bk2",     0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
+	ROM_LOAD( "toki_bk2.ef8",   0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
-	ROM_LOAD( "tokijp.009",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
 ROM_END
 
 ROM_START( tokiua )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
-	ROM_LOAD16_BYTE( "tokijp.006",   0x00000, 0x20000, CRC(03d726b1) SHA1(bbe3a1ea1943cd73b821b3de4d5bf3dfbffd2168) )
-	ROM_LOAD16_BYTE( "4u.k10",       0x00001, 0x20000, CRC(ca2f50d9) SHA1(e2660a9627850fa39469804a3ff563caedd0782b) )
-	ROM_LOAD16_BYTE( "tokijp.005",   0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
-	ROM_LOAD16_BYTE( "tokijp.003",   0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
+	ROM_LOAD16_BYTE( "6.m10",    0x00000, 0x20000, CRC(03d726b1) SHA1(bbe3a1ea1943cd73b821b3de4d5bf3dfbffd2168) )
+	ROM_LOAD16_BYTE( "4u.k10",   0x00001, 0x20000, CRC(ca2f50d9) SHA1(e2660a9627850fa39469804a3ff563caedd0782b) )
+	ROM_LOAD16_BYTE( "5.m12",    0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
+	ROM_LOAD16_BYTE( "3.k12",    0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
-	ROM_LOAD( "tokijp.008",   0x00000, 0x02000, CRC(6c87c4c5) SHA1(d76822bcde3d42afae72a0945b6acbf3c6a1d955) )  /* encrypted */
-	ROM_LOAD( "tokijp.007",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )  /* banked stuff */
+	ROM_LOAD( "8.m3",   0x00000, 0x02000, CRC(6c87c4c5) SHA1(d76822bcde3d42afae72a0945b6acbf3c6a1d955) )  /* encrypted */
+	ROM_LOAD( "7.m7",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )  /* banked stuff */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "tokijp.001",   0x000000, 0x10000, CRC(8aa964a2) SHA1(875129bdd5f699ee30a98160718603a3bc958d84) )   /* chars */
-	ROM_LOAD( "tokijp.002",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
+	ROM_LOAD( "1.c5",   0x000000, 0x10000, CRC(8aa964a2) SHA1(875129bdd5f699ee30a98160718603a3bc958d84) )   /* chars */
+	ROM_LOAD( "2.c3",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "toki.ob1",     0x000000, 0x80000, CRC(a27a80ba) SHA1(3dd3b6b0ace6ca6653603bea952b828b154a2223) )   /* sprites */
-	ROM_LOAD( "toki.ob2",     0x080000, 0x80000, CRC(fa687718) SHA1(f194b742399d8124d97cfa3d59beb980c36cfb3c) )
+	ROM_LOAD( "toki_obj1.c20",   0x000000, 0x80000, CRC(a27a80ba) SHA1(3dd3b6b0ace6ca6653603bea952b828b154a2223) )   /* sprites */
+	ROM_LOAD( "toki_obj2.c22",   0x080000, 0x80000, CRC(fa687718) SHA1(f194b742399d8124d97cfa3d59beb980c36cfb3c) )
 
 	ROM_REGION( 0x080000, "gfx3", 0 )
-	ROM_LOAD( "toki.bk1",     0x000000, 0x80000, CRC(fdaa5f4b) SHA1(ea850361bc8274639e8433bd2a5307fd3a0c9a24) )   /* tiles 1 */
+	ROM_LOAD( "toki_bk1.cd8",   0x000000, 0x80000, CRC(fdaa5f4b) SHA1(ea850361bc8274639e8433bd2a5307fd3a0c9a24) )   /* tiles 1 */
 
 	ROM_REGION( 0x080000, "gfx4", 0 )
-	ROM_LOAD( "toki.bk2",     0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
+	ROM_LOAD( "toki_bk2.ef8",   0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
-	ROM_LOAD( "tokijp.009",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
 ROM_END
 
 
 ROM_START( tokiu )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
-	ROM_LOAD16_BYTE( "6b.10m",       0x00000, 0x20000, CRC(3674d9fe) SHA1(7c610bee23b0f7e6a9e3d5d72d6084e025eb89ec) )
-	ROM_LOAD16_BYTE( "14.10k",       0x00001, 0x20000, CRC(bfdd48af) SHA1(3e48375019471a51f0c00d3444b0c1d37d2f8e92) )
-	ROM_LOAD16_BYTE( "tokijp.005",   0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
-	ROM_LOAD16_BYTE( "tokijp.003",   0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
+	ROM_LOAD16_BYTE( "6b.10m",   0x00000, 0x20000, CRC(3674d9fe) SHA1(7c610bee23b0f7e6a9e3d5d72d6084e025eb89ec) )
+	ROM_LOAD16_BYTE( "14.10k",   0x00001, 0x20000, CRC(bfdd48af) SHA1(3e48375019471a51f0c00d3444b0c1d37d2f8e92) )
+	ROM_LOAD16_BYTE( "5.m12",    0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
+	ROM_LOAD16_BYTE( "3.k12",    0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
-	ROM_LOAD( "tokijp.008",   0x00000, 0x02000, CRC(6c87c4c5) SHA1(d76822bcde3d42afae72a0945b6acbf3c6a1d955) )  /* encrypted */
-	ROM_LOAD( "tokijp.007",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )  /* banked stuff */
+	ROM_LOAD( "8.m3",   0x00000, 0x02000, CRC(6c87c4c5) SHA1(d76822bcde3d42afae72a0945b6acbf3c6a1d955) )  /* encrypted */
+	ROM_LOAD( "7.m7",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )  /* banked stuff */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "tokijp.001",   0x000000, 0x10000, CRC(8aa964a2) SHA1(875129bdd5f699ee30a98160718603a3bc958d84) )   /* chars */
-	ROM_LOAD( "tokijp.002",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
+	ROM_LOAD( "1.c5",   0x000000, 0x10000, CRC(8aa964a2) SHA1(875129bdd5f699ee30a98160718603a3bc958d84) )   /* chars */
+	ROM_LOAD( "2.c3",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "toki.ob1",     0x000000, 0x80000, CRC(a27a80ba) SHA1(3dd3b6b0ace6ca6653603bea952b828b154a2223) )   /* sprites */
-	ROM_LOAD( "toki.ob2",     0x080000, 0x80000, CRC(fa687718) SHA1(f194b742399d8124d97cfa3d59beb980c36cfb3c) )
+	ROM_LOAD( "toki_obj1.c20",   0x000000, 0x80000, CRC(a27a80ba) SHA1(3dd3b6b0ace6ca6653603bea952b828b154a2223) )   /* sprites */
+	ROM_LOAD( "toki_obj2.c22",   0x080000, 0x80000, CRC(fa687718) SHA1(f194b742399d8124d97cfa3d59beb980c36cfb3c) )
 
 	ROM_REGION( 0x080000, "gfx3", 0 )
-	ROM_LOAD( "toki.bk1",     0x000000, 0x80000, CRC(fdaa5f4b) SHA1(ea850361bc8274639e8433bd2a5307fd3a0c9a24) )   /* tiles 1 */
+	ROM_LOAD( "toki_bk1.cd8",   0x000000, 0x80000, CRC(fdaa5f4b) SHA1(ea850361bc8274639e8433bd2a5307fd3a0c9a24) )   /* tiles 1 */
 
 	ROM_REGION( 0x080000, "gfx4", 0 )
-	ROM_LOAD( "toki.bk2",     0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
+	ROM_LOAD( "toki_bk2.ef8",   0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
-	ROM_LOAD( "tokijp.009",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
 ROM_END
 
 ROM_START( juju )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
-	ROM_LOAD16_BYTE( "tokijp.006",   0x00000, 0x20000, CRC(03d726b1) SHA1(bbe3a1ea1943cd73b821b3de4d5bf3dfbffd2168) )
-	ROM_LOAD16_BYTE( "tokijp.004",   0x00001, 0x20000, CRC(54a45e12) SHA1(240538c8b010bb6e1e7fea2ed2fb1d5f9bc64b2b) )
-	ROM_LOAD16_BYTE( "tokijp.005",   0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
-	ROM_LOAD16_BYTE( "tokijp.003",   0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
+	ROM_LOAD16_BYTE( "6.m10",   0x00000, 0x20000, CRC(03d726b1) SHA1(bbe3a1ea1943cd73b821b3de4d5bf3dfbffd2168) )
+	ROM_LOAD16_BYTE( "4.k10",   0x00001, 0x20000, CRC(54a45e12) SHA1(240538c8b010bb6e1e7fea2ed2fb1d5f9bc64b2b) )
+	ROM_LOAD16_BYTE( "5.m12",   0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
+	ROM_LOAD16_BYTE( "3.k12",   0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
-	ROM_LOAD( "tokijp.008",   0x00000, 0x02000, CRC(6c87c4c5) SHA1(d76822bcde3d42afae72a0945b6acbf3c6a1d955) )  /* encrypted */
-	ROM_LOAD( "tokijp.007",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )  /* banked stuff */
+	ROM_LOAD( "8.m3",   0x00000, 0x02000, CRC(6c87c4c5) SHA1(d76822bcde3d42afae72a0945b6acbf3c6a1d955) )  /* encrypted */
+	ROM_LOAD( "7.m7",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )  /* banked stuff */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "tokijp.001",   0x000000, 0x10000, CRC(8aa964a2) SHA1(875129bdd5f699ee30a98160718603a3bc958d84) )   /* chars */
-	ROM_LOAD( "tokijp.002",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
+	ROM_LOAD( "1.c5",   0x000000, 0x10000, CRC(8aa964a2) SHA1(875129bdd5f699ee30a98160718603a3bc958d84) )   /* chars */
+	ROM_LOAD( "2.c3",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "toki.ob1",     0x000000, 0x80000, CRC(a27a80ba) SHA1(3dd3b6b0ace6ca6653603bea952b828b154a2223) )   /* sprites */
-	ROM_LOAD( "toki.ob2",     0x080000, 0x80000, CRC(fa687718) SHA1(f194b742399d8124d97cfa3d59beb980c36cfb3c) )
+	ROM_LOAD( "toki_obj1.c20",   0x000000, 0x80000, CRC(a27a80ba) SHA1(3dd3b6b0ace6ca6653603bea952b828b154a2223) )   /* sprites */
+	ROM_LOAD( "toki_obj2.c22",   0x080000, 0x80000, CRC(fa687718) SHA1(f194b742399d8124d97cfa3d59beb980c36cfb3c) )
 
 	ROM_REGION( 0x080000, "gfx3", 0 )
-	ROM_LOAD( "toki.bk1",     0x000000, 0x80000, CRC(fdaa5f4b) SHA1(ea850361bc8274639e8433bd2a5307fd3a0c9a24) )   /* tiles 1 */
+	ROM_LOAD( "toki_bk1.cd8",   0x000000, 0x80000, CRC(fdaa5f4b) SHA1(ea850361bc8274639e8433bd2a5307fd3a0c9a24) )   /* tiles 1 */
 
 	ROM_REGION( 0x080000, "gfx4", 0 )
-	ROM_LOAD( "toki.bk2",     0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
+	ROM_LOAD( "toki_bk2.ef8",   0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
-	ROM_LOAD( "tokijp.009",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
 ROM_END
 
 ROM_START( jujuba )

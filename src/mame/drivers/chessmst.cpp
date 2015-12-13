@@ -34,7 +34,7 @@ public:
 	UINT16 m_led_sel;
 	UINT8 m_sensor[64];
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( pio1_port_a_w );
 	DECLARE_WRITE8_MEMBER( pio1_port_b_w );

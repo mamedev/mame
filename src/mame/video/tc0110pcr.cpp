@@ -22,7 +22,7 @@ const device_type TC0110PCR = &device_creator<tc0110pcr_device>;
 
 tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0110PCR, "Taito TC0110PCR", tag, owner, clock, "tc0110pcr", __FILE__),
-		m_ram(NULL),
+		m_ram(nullptr),
 		m_type(0),
 		m_addr(0),
 		m_palette(*this)

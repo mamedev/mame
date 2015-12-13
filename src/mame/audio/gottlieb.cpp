@@ -177,7 +177,7 @@ static const char *const reactor_sample_names[] =
 	"fx_39j", /* "45000" */
 	"fx_39k", /* "50000" */
 	"fx_39l", /* "55000" */
-	0   /* end of array */
+	nullptr   /* end of array */
 };
 
 static const char *const qbert_sample_names[] =
@@ -227,7 +227,7 @@ static const char *const qbert_sample_names[] =
 	"fx_23", /* O1 with varying voice clock */
 	"fx_28",
 	"fx_36",
-	0   /* end of array */
+	nullptr   /* end of array */
 };
 
 MACHINE_CONFIG_FRAGMENT( reactor_samples )
@@ -429,7 +429,7 @@ WRITE8_MEMBER( gottlieb_sound_r1_device::write )
 	m_riot->porta_in_set(pa0_5 | (pa7 << 7), 0xbf);
 
 #if USE_FAKE_VOTRAX
-	if (pa7 && m_samples != NULL)
+	if (pa7 && m_samples != nullptr)
 		trigger_sample(pa0_5);
 #endif
 }
@@ -464,7 +464,7 @@ WRITE8_MEMBER( gottlieb_sound_r1_device::r6532_portb_w )
 
 WRITE8_MEMBER( gottlieb_sound_r1_device::votrax_data_w )
 {
-	if (m_votrax != NULL)
+	if (m_votrax != nullptr)
 	{
 		m_votrax->inflection_w(space, offset, data >> 6);
 		m_votrax->write(space, offset, ~data & 0x3f);
@@ -486,7 +486,7 @@ WRITE8_MEMBER( gottlieb_sound_r1_device::speech_clock_dac_w )
 	// prevent negative clock values (and possible crash)
 	if (data < 0x65) data = 0x65;
 
-	if (m_votrax != NULL)
+	if (m_votrax != nullptr)
 	{
 		// nominal clock is 0xa0
 		if (data != m_last_speech_clock)
@@ -494,7 +494,7 @@ WRITE8_MEMBER( gottlieb_sound_r1_device::speech_clock_dac_w )
 			osd_printf_debug("clock = %02X\n", data);
 
 			// totally random guesswork; would like to get real measurements on a board
-			if (m_votrax != NULL)
+			if (m_votrax != nullptr)
 				m_votrax->set_unscaled_clock(600000 + (data - 0xa0) * 10000);
 			m_last_speech_clock = data;
 		}
@@ -672,7 +672,7 @@ gottlieb_sound_r2_device::gottlieb_sound_r2_device(const machine_config &mconfig
 		m_ay2(*this, "ay2"),
 		m_sp0250(*this, "spsnd"),
 		m_cobram3_mod(false),
-		m_nmi_timer(NULL),
+		m_nmi_timer(nullptr),
 		m_nmi_state(0),
 		m_audiocpu_latch(0),
 		m_speechcpu_latch(0),

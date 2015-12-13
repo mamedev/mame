@@ -571,7 +571,7 @@ void nc_state::nc_sound_update(int channel)
 	int on;
 	int frequency;
 	int period;
-	beep_device *beeper_device = NULL;
+	beep_device *beeper_device = nullptr;
 
 	switch(channel)
 	{
@@ -1444,7 +1444,7 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(nc_state, nc100_tc8521_alarm_callback))
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_plain_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_plain_slot, nullptr)
 	MCFG_GENERIC_LOAD(nc_state, nc_pcmcia_card)
 	MCFG_GENERIC_UNLOAD(nc_state, nc_pcmcia_card)
 
@@ -1460,7 +1460,7 @@ MACHINE_CONFIG_END
 static const floppy_format_type ibmpc_floppy_formats[] = {
 	FLOPPY_PC_FORMAT,
 	FLOPPY_MFI_FORMAT,
-	NULL
+	nullptr
 };
 
 static SLOT_INTERFACE_START( ibmpc_floppies )

@@ -6,11 +6,12 @@
 const device_type I8271 = &device_creator<i8271_device>;
 
 i8271_device::i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8271, "Intel 8271", tag, owner, clock, "i8271", __FILE__),
+	: device_t(mconfig, I8271, "Intel 8271", tag, owner, clock, "i8271", __FILE__), ready_connected(false), mode(0), main_phase(0),
 	intrq_cb(*this),
 	drq_cb(*this),
 	hdl_cb(*this),
-	opt_cb(*this)
+	opt_cb(*this), irq(false), drq(false), scan_done(false), scan_match(false), command_pos(0), sectors_read(0), scan_len(0), dma_data(0), oport(0), rr(0), scan_sec(0), moder(0),
+	precomp(0), perpmode(0), srate(0), hset(0), icnt(0), hload(0), sector_size(0), cur_rate(0)
 {
 	select_connected = true;
 	external_ready = false;
@@ -49,12 +50,12 @@ void i8271_device::device_start()
 			floppy_connector *con = subdevice<floppy_connector>(name);
 			if(con) {
 				flopi[i].dev = con->get_device();
-				if (flopi[i].dev != NULL)
+				if (flopi[i].dev != nullptr)
 					flopi[i].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(i8271_device::index_callback), this));
 			} else
-				flopi[i].dev = NULL;
+				flopi[i].dev = nullptr;
 		} else
-			flopi[i].dev = NULL;
+			flopi[i].dev = nullptr;
 
 		flopi[i].main_state = IDLE;
 		flopi[i].sub_state = IDLE;
@@ -70,7 +71,7 @@ void i8271_device::device_start()
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
-	cur_live.fi = NULL;
+	cur_live.fi = nullptr;
 }
 
 void i8271_device::device_reset()
@@ -90,11 +91,11 @@ void i8271_device::soft_reset()
 	set_irq(false);
 	set_drq(false);
 	command_pos = 0;
-	cur_live.fi = 0;
+	cur_live.fi = nullptr;
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
-	cur_live.fi = NULL;
+	cur_live.fi = nullptr;
 	rr = 0;
 	scan_sec = 0;
 	moder = 0xc0;
@@ -118,10 +119,10 @@ bool i8271_device::get_ready(int fid)
 
 void i8271_device::set_floppy(floppy_image_device *flop)
 {
-	for(int fid=0; fid<2; fid++) {
-		if(flopi[fid].dev)
-			flopi[fid].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
-		flopi[fid].dev = flop;
+	for(auto & elem : flopi) {
+		if(elem.dev)
+			elem.dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
+		elem.dev = flop;
 	}
 	if(flop)
 		flop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(i8271_device::index_callback), this));
@@ -302,7 +303,7 @@ void i8271_device::live_sync()
 				cur_live.pll.stop_writing(cur_live.fi->dev, cur_live.tm);
 				cur_live.tm = attotime::never;
 				cur_live.fi->live = false;
-				cur_live.fi = 0;
+				cur_live.fi = nullptr;
 			}
 		}
 		cur_live.next_state = -1;
@@ -320,7 +321,7 @@ void i8271_device::live_abort()
 	if(cur_live.fi) {
 		cur_live.pll.stop_writing(cur_live.fi->dev, cur_live.tm);
 		cur_live.fi->live = false;
-		cur_live.fi = 0;
+		cur_live.fi = nullptr;
 	}
 
 	cur_live.tm = attotime::never;
@@ -1539,8 +1540,8 @@ void i8271_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 void i8271_device::index_callback(floppy_image_device *floppy, int state)
 {
-	for(int fid=0; fid<2; fid++) {
-		floppy_info &fi = flopi[fid];
+	for(auto & fi : flopi) {
+		
 		if(fi.dev != floppy)
 			continue;
 

@@ -59,7 +59,7 @@ public:
 	DECLARE_WRITE32_MEMBER(nwk_voodoo_1_w);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	UINT32 dsp_comm_sharc_r(int board, int offset);
 	void dsp_comm_sharc_w(address_space &space, int board, int offset, UINT32 data);

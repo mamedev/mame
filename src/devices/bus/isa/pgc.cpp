@@ -227,7 +227,7 @@ void isa8_pgc_device::device_start()
 	int width = PGC_DISP_HORZ;
 	int height = PGC_DISP_VERT;
 
-	if (m_palette != NULL && !m_palette->started())
+	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
 	set_isa_device();

@@ -242,7 +242,7 @@ WRITE_LINE_MEMBER(mtx_state::ctc_trg2_w)
 static const z80_daisy_config mtx_daisy_chain[] =
 {
 	{ Z80CTC_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 /*-------------------------------------------------
@@ -253,7 +253,7 @@ static const z80_daisy_config rs128_daisy_chain[] =
 {
 	{ Z80CTC_TAG },
 	{ Z80DART_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 

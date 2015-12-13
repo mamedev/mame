@@ -9,15 +9,15 @@ const device_type H8S_INTC = &device_creator<h8s_intc_device>;
 
 h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, H8_INTC, "H8 INTC", tag, owner, clock, "h8_intc", __FILE__),
-	cpu(*this, DEVICE_SELF_OWNER)
+	cpu(*this, DEVICE_SELF_OWNER), nmi_input(false), irq_input(0), ier(0), isr(0), iscr(0), icr_filter(0), ipr_filter(0)
 {
 	irq_vector_base = 4;
 	irq_vector_nmi = 3;
 }
 
 h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	cpu(*this, DEVICE_SELF_OWNER)
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source), irq_vector_base(0), irq_vector_nmi(0),
+	cpu(*this, DEVICE_SELF_OWNER), nmi_input(false), irq_input(0), ier(0), isr(0), iscr(0), icr_filter(0), ipr_filter(0)
 {
 }
 

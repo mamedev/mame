@@ -23,7 +23,7 @@ const device_type RF5C68 = &device_creator<rf5c68_device>;
 rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RF5C68, "RF5C68", tag, owner, clock, "rf5c68", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_cbank(0),
 		m_wbank(0),
 		m_enable(0)

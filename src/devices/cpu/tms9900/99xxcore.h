@@ -283,7 +283,7 @@ Other references can be found on spies.com:
 
 struct tms99xx_state;
 
-INLINE void execute(tms99xx_state *cpustate, UINT16 opcode);
+static inline void execute(tms99xx_state *cpustate, UINT16 opcode);
 
 #if EXTERNAL_INSTRUCTION_DECODING
 static void external_instruction_notify(tms99xx_state *cpustate, int ext_op_ID);
@@ -533,7 +533,7 @@ struct tms99xx_state
 	int extra_byte; /* buffer holding the unused byte in a word read */
 };
 
-INLINE tms99xx_state *get_safe_token(device_t *device)
+static inline tms99xx_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 //  assert(device->type() == TMS99XX_GET_INFO);
@@ -803,7 +803,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 	makes memory access slower, I have emulated this feature, because if I did otherwise,
 	there would be some implementation problems in some driver sooner or later.*/
 
-	INLINE int readword(tms99xx_state *cpustate, int addr)
+	static inline int readword(tms99xx_state *cpustate, int addr)
 	{
 		int val;
 
@@ -1082,7 +1082,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 #define READREG(reg)         readword(cpustate, (cpustate->WP+(reg)) & 0xffff)
 #define WRITEREG(reg, data)  writeword(cpustate, (cpustate->WP+(reg)) & 0xffff, (data))
 
-INLINE UINT16 READREG_DEBUG(tms99xx_state *cpustate, int reg)
+static inline UINT16 READREG_DEBUG(tms99xx_state *cpustate, int reg)
 {
 	int temp = cpustate->icount;
 	UINT16 result = READREG(reg);
@@ -1090,7 +1090,7 @@ INLINE UINT16 READREG_DEBUG(tms99xx_state *cpustate, int reg)
 	return result;
 }
 
-INLINE void WRITEREG_DEBUG(tms99xx_state *cpustate, int reg, UINT16 data)
+static inline void WRITEREG_DEBUG(tms99xx_state *cpustate, int reg, UINT16 data)
 {
 	int temp = cpustate->icount;
 	WRITEREG(reg, data);
@@ -1173,7 +1173,7 @@ INLINE void WRITEREG_DEBUG(tms99xx_state *cpustate, int reg, UINT16 data)
 		}
 	}
 
-	INLINE void handle_error_interrupt(tms99xx_state *cpustate)
+	static inline void handle_error_interrupt(tms99xx_state *cpustate)
 	{
 		if (cpustate->error_interrupt_callback)
 			(*cpustate->error_interrupt_callback)(cpustate->device, cpustate->error_interrupt_register ? 1 : 0);
@@ -1339,12 +1339,12 @@ static const UINT16 inverted_right_shift_mask_table[17] =
 	0xFFFF
 };
 
-INLINE UINT16 logical_right_shift(UINT16 val, int c)
+static inline UINT16 logical_right_shift(UINT16 val, int c)
 {
 	return((val>>c) & right_shift_mask_table[c]);
 }
 
-INLINE INT16 arithmetic_right_shift(INT16 val, int c)
+static inline INT16 arithmetic_right_shift(INT16 val, int c)
 {
 	if (val < 0)
 		return((val>>c) | inverted_right_shift_mask_table[c]);
@@ -1359,7 +1359,7 @@ INLINE INT16 arithmetic_right_shift(INT16 val, int c)
 /*
     Set lae
 */
-INLINE void setst_lae(tms99xx_state *cpustate, INT16 val)
+static inline void setst_lae(tms99xx_state *cpustate, INT16 val)
 {
 	cpustate->STATUS &= ~ (ST_LGT | ST_AGT | ST_EQ);
 
@@ -1375,7 +1375,7 @@ INLINE void setst_lae(tms99xx_state *cpustate, INT16 val)
 /*
     Set laep (BYTE)
 */
-INLINE void setst_byte_laep(tms99xx_state *cpustate, INT8 val)
+static inline void setst_byte_laep(tms99xx_state *cpustate, INT8 val)
 {
 	cpustate->STATUS &= ~ (ST_LGT | ST_AGT | ST_EQ);
 
@@ -1392,7 +1392,7 @@ INLINE void setst_byte_laep(tms99xx_state *cpustate, INT8 val)
 /*
     For COC, CZC, and TB
 */
-INLINE void setst_e(tms99xx_state *cpustate, UINT16 val, UINT16 to)
+static inline void setst_e(tms99xx_state *cpustate, UINT16 val, UINT16 to)
 {
 	if (val == to)
 		cpustate->STATUS |= ST_EQ;
@@ -1403,7 +1403,7 @@ INLINE void setst_e(tms99xx_state *cpustate, UINT16 val, UINT16 to)
 /*
     For CI, C, CB
 */
-INLINE void setst_c_lae(tms99xx_state *cpustate, UINT16 to, UINT16 val)
+static inline void setst_c_lae(tms99xx_state *cpustate, UINT16 to, UINT16 val)
 {
 	cpustate->STATUS &= ~ (ST_LGT | ST_AGT | ST_EQ);
 
@@ -1421,7 +1421,7 @@ INLINE void setst_c_lae(tms99xx_state *cpustate, UINT16 to, UINT16 val)
 /*
     Set laeco for add
 */
-INLINE INT16 setst_add_laeco(tms99xx_state *cpustate, int a, int b)
+static inline INT16 setst_add_laeco(tms99xx_state *cpustate, int a, int b)
 {
 	UINT32 res;
 	INT16 res2;
@@ -1457,7 +1457,7 @@ INLINE INT16 setst_add_laeco(tms99xx_state *cpustate, int a, int b)
 /*
     Set laeco for subtract
 */
-INLINE INT16 setst_sub_laeco(tms99xx_state *cpustate, int a, int b)
+static inline INT16 setst_sub_laeco(tms99xx_state *cpustate, int a, int b)
 {
 	UINT32 res;
 	INT16 res2;
@@ -1493,7 +1493,7 @@ INLINE INT16 setst_sub_laeco(tms99xx_state *cpustate, int a, int b)
 /*
     Set laecop for add (BYTE)
 */
-INLINE INT8 setst_addbyte_laecop(tms99xx_state *cpustate, int a, int b)
+static inline INT8 setst_addbyte_laecop(tms99xx_state *cpustate, int a, int b)
 {
 	unsigned int res;
 	INT8 res2;
@@ -1531,7 +1531,7 @@ INLINE INT8 setst_addbyte_laecop(tms99xx_state *cpustate, int a, int b)
 /*
     Set laecop for subtract (BYTE)
 */
-INLINE INT8 setst_subbyte_laecop(tms99xx_state *cpustate, int a, int b)
+static inline INT8 setst_subbyte_laecop(tms99xx_state *cpustate, int a, int b)
 {
 	unsigned int res;
 	INT8 res2;
@@ -1570,7 +1570,7 @@ INLINE INT8 setst_subbyte_laecop(tms99xx_state *cpustate, int a, int b)
 /*
     For NEG
 */
-INLINE void setst_laeo(tms99xx_state *cpustate, INT16 val)
+static inline void setst_laeo(tms99xx_state *cpustate, INT16 val)
 {
 	cpustate->STATUS &= ~ (ST_LGT | ST_AGT | ST_EQ | ST_OV);
 
@@ -1591,7 +1591,7 @@ INLINE void setst_laeo(tms99xx_state *cpustate, INT16 val)
 /*
     Meat of SRA
 */
-INLINE UINT16 setst_sra_laec(tms99xx_state *cpustate, INT16 a, UINT16 c)
+static inline UINT16 setst_sra_laec(tms99xx_state *cpustate, INT16 a, UINT16 c)
 {
 	cpustate->STATUS &= ~ (ST_LGT | ST_AGT | ST_EQ | ST_C);
 
@@ -1617,7 +1617,7 @@ INLINE UINT16 setst_sra_laec(tms99xx_state *cpustate, INT16 a, UINT16 c)
 /*
     Meat of SRL.  Same algorithm as SRA, except that we fills in with 0s.
 */
-INLINE UINT16 setst_srl_laec(tms99xx_state *cpustate, UINT16 a,UINT16 c)
+static inline UINT16 setst_srl_laec(tms99xx_state *cpustate, UINT16 a,UINT16 c)
 {
 	cpustate->STATUS &= ~ (ST_LGT | ST_AGT | ST_EQ | ST_C);
 
@@ -1643,7 +1643,7 @@ INLINE UINT16 setst_srl_laec(tms99xx_state *cpustate, UINT16 a,UINT16 c)
 //
 // Meat of SRC
 //
-INLINE UINT16 setst_src_laec(tms99xx_state *cpustate, UINT16 a,UINT16 c)
+static inline UINT16 setst_src_laec(tms99xx_state *cpustate, UINT16 a,UINT16 c)
 {
 	cpustate->STATUS &= ~ (ST_LGT | ST_AGT | ST_EQ | ST_C);
 
@@ -1668,7 +1668,7 @@ INLINE UINT16 setst_src_laec(tms99xx_state *cpustate, UINT16 a,UINT16 c)
 //
 // Meat of SLA
 //
-INLINE UINT16 setst_sla_laeco(tms99xx_state *cpustate, UINT16 a, UINT16 c)
+static inline UINT16 setst_sla_laeco(tms99xx_state *cpustate, UINT16 a, UINT16 c)
 {
 	cpustate->STATUS &= ~ (ST_LGT | ST_AGT | ST_EQ | ST_C | ST_OV);
 
@@ -1889,7 +1889,7 @@ static CPU_EXIT( tms99xx )
 }
 
 /* fetch : read one word at * PC, and increment PC. */
-INLINE UINT16 fetch(tms99xx_state *cpustate)
+static inline UINT16 fetch(tms99xx_state *cpustate)
 {
 	UINT16 value = readword(cpustate, cpustate->PC);
 	cpustate->PC += 2;
@@ -4971,7 +4971,7 @@ static void h4000b(tms99xx_state *cpustate, UINT16 opcode)
 }
 
 
-INLINE void execute(tms99xx_state *cpustate, UINT16 opcode)
+static inline void execute(tms99xx_state *cpustate, UINT16 opcode)
 {
 #if (! HAS_9995_OPCODES)
 

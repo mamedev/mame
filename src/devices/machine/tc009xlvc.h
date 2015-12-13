@@ -76,11 +76,11 @@ public:
 	void screen_eof(void);
 
 protected:
-	virtual void device_config_complete();
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual void device_config_complete() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 	address_space_config        m_space_config;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

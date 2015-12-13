@@ -20,13 +20,13 @@
 //-------------------------------------------------
 
 memory_array::memory_array()
-	: m_base(NULL),
+	: m_base(nullptr),
 		m_bytes(0),
 		m_membits(0),
 		m_endianness(ENDIANNESS_LITTLE),
 		m_bytes_per_entry(0),
-		m_read_entry(NULL),
-		m_write_entry(NULL)
+		m_read_entry(nullptr),
+		m_write_entry(nullptr)
 {
 }
 
@@ -38,7 +38,7 @@ memory_array::memory_array()
 void memory_array::set(void *base, UINT32 bytes, int membits, endianness_t endianness, int bpe)
 {
 	// validate inputs
-	assert(base != NULL);
+	assert(base != nullptr);
 	assert(bytes > 0);
 	assert(membits == 8 || membits == 16 || membits == 32 || membits == 64);
 	assert(bpe == 1 || bpe == 2 || bpe == 4);

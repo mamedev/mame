@@ -122,8 +122,8 @@ public:
 	DECLARE_READ8_MEMBER(ex_upd_busy_r);
 	DECLARE_WRITE8_MEMBER(ex_upd_start_w);
 
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(simulate_xyz);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_info);
 };
@@ -726,12 +726,12 @@ void ufo_state::machine_start()
 
 	for (int m = 0; m < 4; m++)
 	{
-		for (int p = 0; p < 2; p++)
+		for (auto & elem : m_player)
 		{
-			m_player[p].motor[m].running = 0;
-			m_player[p].motor[m].direction = 0;
-			m_player[p].motor[m].position = 0.5;
-			m_player[p].motor[m].speed = motor_speeds[m];
+			elem.motor[m].running = 0;
+			elem.motor[m].direction = 0;
+			elem.motor[m].position = 0.5;
+			elem.motor[m].speed = motor_speeds[m];
 		}
 
 		save_item(NAME(m_player[0].motor[m].running), m);

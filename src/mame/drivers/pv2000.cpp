@@ -65,8 +65,8 @@ public:
 	UINT8 m_key_pressed;
 	UINT8 m_keyb_column;
 	UINT8 m_cass_conf;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pv2000_cart);
 };
 

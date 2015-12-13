@@ -30,7 +30,7 @@ TODO:
 const device_type MACHINE_MCD212 = &device_creator<mcd212_device>;
 
 #if ENABLE_VERBOSE_LOG
-INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -729,7 +729,7 @@ void mcd212_device::process_dca(int channel)
 	m_channel[channel].dca = addr * 2;
 }
 
-INLINE UINT8 MCD212_LIM(INT32 in)
+static inline UINT8 MCD212_LIM(INT32 in)
 {
 	if(in < 0)
 	{
@@ -742,7 +742,7 @@ INLINE UINT8 MCD212_LIM(INT32 in)
 	return (UINT8)in;
 }
 
-INLINE UINT8 BYTE_TO_CLUT(int channel, int icm, UINT8 byte)
+static inline UINT8 BYTE_TO_CLUT(int channel, int icm, UINT8 byte)
 {
 	switch(icm)
 	{
@@ -1470,37 +1470,37 @@ TIMER_CALLBACK_MEMBER( mcd212_device::perform_scan )
 
 void mcd212_device::device_reset()
 {
-	for(int index = 0; index < 2; index++)
+	for(auto & elem : m_channel)
 	{
-		m_channel[index].csrr = 0;
-		m_channel[index].csrw = 0;
-		m_channel[index].dcr = 0;
-		m_channel[index].vsr = 0;
-		m_channel[index].ddr = 0;
-		m_channel[index].dcp = 0;
-		m_channel[index].dca = 0;
-		memset(m_channel[index].clut_r, 0, 256);
-		memset(m_channel[index].clut_g, 0, 256);
-		memset(m_channel[index].clut_b, 0, 256);
-		m_channel[index].image_coding_method = 0;
-		m_channel[index].transparency_control = 0;
-		m_channel[index].plane_order = 0;
-		m_channel[index].clut_bank = 0;
-		m_channel[index].transparent_color_a = 0;
-		m_channel[index].transparent_color_b = 0;
-		m_channel[index].mask_color_a = 0;
-		m_channel[index].mask_color_b = 0;
-		m_channel[index].dyuv_abs_start_a = 0;
-		m_channel[index].dyuv_abs_start_b = 0;
-		m_channel[index].cursor_position = 0;
-		m_channel[index].cursor_control = 0;
-		memset((UINT8*)&m_channel[index].cursor_pattern, 0, 16 * sizeof(UINT32));
-		memset((UINT8*)&m_channel[index].region_control, 0, 8 * sizeof(UINT32));
-		m_channel[index].backdrop_color = 0;
-		m_channel[index].mosaic_hold_a = 0;
-		m_channel[index].mosaic_hold_b = 0;
-		memset(m_channel[index].weight_factor_a, 0, 768);
-		memset(m_channel[index].weight_factor_b, 0, 768);
+		elem.csrr = 0;
+		elem.csrw = 0;
+		elem.dcr = 0;
+		elem.vsr = 0;
+		elem.ddr = 0;
+		elem.dcp = 0;
+		elem.dca = 0;
+		memset(elem.clut_r, 0, 256);
+		memset(elem.clut_g, 0, 256);
+		memset(elem.clut_b, 0, 256);
+		elem.image_coding_method = 0;
+		elem.transparency_control = 0;
+		elem.plane_order = 0;
+		elem.clut_bank = 0;
+		elem.transparent_color_a = 0;
+		elem.transparent_color_b = 0;
+		elem.mask_color_a = 0;
+		elem.mask_color_b = 0;
+		elem.dyuv_abs_start_a = 0;
+		elem.dyuv_abs_start_b = 0;
+		elem.cursor_position = 0;
+		elem.cursor_control = 0;
+		memset((UINT8*)&elem.cursor_pattern, 0, 16 * sizeof(UINT32));
+		memset((UINT8*)&elem.region_control, 0, 8 * sizeof(UINT32));
+		elem.backdrop_color = 0;
+		elem.mosaic_hold_a = 0;
+		elem.mosaic_hold_b = 0;
+		memset(elem.weight_factor_a, 0, 768);
+		memset(elem.weight_factor_b, 0, 768);
 	}
 	memset(m_region_flag_0, 0, 768);
 	memset(m_region_flag_1, 0, 768);

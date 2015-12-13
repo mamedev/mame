@@ -162,9 +162,9 @@ UINT32 matmania_state::screen_update_matmania(screen_device &screen, bitmap_ind1
 	{
 		int scrolly = -*m_scroll;
 		if (m_pageselect[0] & 0x01) // maniach sets 0x20 sometimes, which must have a different meaning
-			copyscrollbitmap(bitmap, *m_tmpbitmap2, 0, 0, 1, &scrolly, cliprect);
+			copyscrollbitmap(bitmap, *m_tmpbitmap2, 0, nullptr, 1, &scrolly, cliprect);
 		else
-			copyscrollbitmap(bitmap, *m_tmpbitmap, 0, 0, 1, &scrolly, cliprect);
+			copyscrollbitmap(bitmap, *m_tmpbitmap, 0, nullptr, 1, &scrolly, cliprect);
 	}
 
 
@@ -235,9 +235,9 @@ UINT32 matmania_state::screen_update_maniach(screen_device &screen, bitmap_ind16
 		int scrolly = -*m_scroll;
 
 		if (m_pageselect[0] & 0x01) // this sets 0x20 sometimes, which must have a different meaning
-			copyscrollbitmap(bitmap, *m_tmpbitmap2, 0, 0, 1, &scrolly, cliprect);
+			copyscrollbitmap(bitmap, *m_tmpbitmap2, 0, nullptr, 1, &scrolly, cliprect);
 		else
-			copyscrollbitmap(bitmap, *m_tmpbitmap, 0, 0, 1, &scrolly, cliprect);
+			copyscrollbitmap(bitmap, *m_tmpbitmap, 0, nullptr, 1, &scrolly, cliprect);
 	}
 
 

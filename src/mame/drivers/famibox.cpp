@@ -108,9 +108,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(famibox_coin_r);
 	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(famibox);
 	UINT32 screen_update_famibox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(famicombox_attract_timer_callback);
@@ -254,14 +254,14 @@ void famibox_state::famicombox_bankswitch(UINT8 bank)
 	};
 
 
-	for (int i = 0; i < ARRAY_LENGTH(famicombox_banks); i++ )
+	for (auto & famicombox_bank : famicombox_banks)
 	{
-		if ( bank == famicombox_banks[i].bank ||
-				famicombox_banks[i].bank == 0 )
+		if ( bank == famicombox_bank.bank ||
+				famicombox_bank.bank == 0 )
 		{
-			membank("cpubank1")->set_base(memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank1_offset);
-			membank("cpubank2")->set_base(memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank2_offset);
-			membank("ppubank1")->set_base(memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].ppubank_offset);
+			membank("cpubank1")->set_base(memregion(famicombox_bank.memory_region)->base() + famicombox_bank.bank1_offset);
+			membank("cpubank2")->set_base(memregion(famicombox_bank.memory_region)->base() + famicombox_bank.bank2_offset);
+			membank("ppubank1")->set_base(memregion(famicombox_bank.memory_region)->base() + famicombox_bank.ppubank_offset);
 			break;
 		}
 	}

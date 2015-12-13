@@ -371,7 +371,7 @@ void mtech_state::set_genz80_as_sms()
 	memset(sms_mainram,0x00,0x2000);
 
 	// fixed rom bank area
-	sms_rom = (UINT8 *)prg.install_rom(0x0000, 0xbfff, NULL);
+	sms_rom = (UINT8 *)prg.install_rom(0x0000, 0xbfff, nullptr);
 
 	memcpy(sms_rom, m_region_maincpu->base(), 0xc000);
 
@@ -735,14 +735,14 @@ int mtech_state::load_cart(device_image_interface &image, generic_slot_device *s
 	const char  *pcb_name;
 	UINT32 size = slot->common_get_size("rom");
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 		return IMAGE_INIT_FAIL;
 
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	ROM = slot->get_rom_base();
 	memcpy(ROM, image.get_software_region("rom"), size);
 
-	if ((pcb_name = image.get_feature("pcb_type")) == NULL)
+	if ((pcb_name = image.get_feature("pcb_type")) == nullptr)
 		return IMAGE_INIT_FAIL;
 	else
 	{

@@ -21,7 +21,7 @@ static int cas_size;
 /*******************************************************************
    Generate one high-low cycle of sample data
 ********************************************************************/
-INLINE int trs80l2_cas_cycle(INT16 *buffer, int sample_pos, int silence, int high, int low)
+static inline int trs80l2_cas_cycle(INT16 *buffer, int sample_pos, int silence, int high, int low)
 {
 	int i = 0;
 
@@ -96,7 +96,7 @@ static int trs80l2_cas_to_wav_size(const UINT8 *casdata, int caslen)
 {
 	cas_size = caslen;
 
-	return trs80l2_handle_cas( NULL, casdata );
+	return trs80l2_handle_cas( nullptr, casdata );
 }
 
 static const struct CassetteLegacyWaveFiller trs80l2_cas_legacy_fill_wave =
@@ -128,7 +128,7 @@ static const struct CassetteFormat trs80l2_cas_format =
 	"cas",
 	trs80l2_cas_identify,
 	trs80l2_cas_load,
-	NULL
+	nullptr
 };
 
 

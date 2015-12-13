@@ -27,7 +27,7 @@ neogeo_cart_slot_device::neogeo_cart_slot_device(const machine_config &mconfig, 
 						device_t(mconfig, NEOGEO_CART_SLOT, "NeoGeo Cartridge Slot", tag, owner, clock, "neogeo_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
-						m_cart(0)
+						m_cart(nullptr)
 {
 }
 
@@ -76,7 +76,7 @@ bool neogeo_cart_slot_device::call_load()
 		UINT8* ROM8;
 		UINT32 len;
 
-		if (software_entry() != NULL)
+		if (software_entry() != nullptr)
 		{
 			// create memory regions
 			len = get_software_region_length("maincpu");
@@ -87,7 +87,7 @@ bool neogeo_cart_slot_device::call_load()
 			m_cart->fixed_alloc(len);   ROM8 = m_cart->get_fixed_base();
 			memcpy(ROM8, get_software_region("fixed"), len);
 
-			if (get_software_region("audiocpu") != NULL)
+			if (get_software_region("audiocpu") != nullptr)
 			{
 				len = get_software_region_length("audiocpu");
 				m_cart->audio_alloc(len + 0x10000); ROM8 = m_cart->get_audio_base();
@@ -99,7 +99,7 @@ bool neogeo_cart_slot_device::call_load()
 			m_cart->ym_alloc(len);  ROM8 = m_cart->get_ym_base();
 			memcpy(ROM8, get_software_region("ymsnd"), len);
 
-			if (get_software_region("ymsnd.deltat") != NULL)
+			if (get_software_region("ymsnd.deltat") != nullptr)
 			{
 				len = get_software_region_length("ymsnd.deltat");
 				m_cart->ymdelta_alloc(len); ROM8 = m_cart->get_ymdelta_base();
@@ -115,7 +115,7 @@ bool neogeo_cart_slot_device::call_load()
 			m_cart->sprites_alloc(len); ROM8 = m_cart->get_sprites_base();
 			memcpy(ROM8, get_software_region("sprites"), len);
 
-			if (get_software_region("audiocrypt") != NULL)  // encrypted Z80 code
+			if (get_software_region("audiocrypt") != nullptr)  // encrypted Z80 code
 			{
 				len = get_software_region_length("audiocrypt");
 				m_cart->audiocrypt_alloc(len);  ROM8 = m_cart->get_audiocrypt_base();

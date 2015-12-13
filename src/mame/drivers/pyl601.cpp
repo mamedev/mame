@@ -84,8 +84,8 @@ public:
 	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
 	DECLARE_DRIVER_INIT(pyl601);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	required_device<cpu_device> m_maincpu;

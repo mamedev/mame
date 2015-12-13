@@ -10,7 +10,7 @@ READ32_MEMBER( m68340cpu_device::m68340_internal_serial_r )
 {
 	m68340cpu_device *m68k = this;
 	m68340_serial* serial = m68k->m68340SERIAL;
-	assert(serial != NULL);
+	assert(serial != nullptr);
 
 	if (serial)
 	{
@@ -25,7 +25,7 @@ WRITE32_MEMBER( m68340cpu_device::m68340_internal_serial_w )
 {
 	m68340cpu_device *m68k = this;
 	m68340_serial* serial = m68k->m68340SERIAL;
-	assert(serial != NULL);
+	assert(serial != nullptr);
 
 	if (serial)
 	{

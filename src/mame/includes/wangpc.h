@@ -90,8 +90,8 @@ public:
 	required_device<wangpcbus_device> m_bus;
 	required_ioport m_sw;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void select_drive();
 	void check_level1_interrupts();

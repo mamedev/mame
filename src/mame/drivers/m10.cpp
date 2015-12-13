@@ -796,7 +796,7 @@ static const char *const m10_sample_names[] =
 	"8",        /* UFO/saucer hit */
 	"9",        /* bonus base */
 	"0",        /* UFO sound */
-	0
+	nullptr
 };
 
 /*************************************

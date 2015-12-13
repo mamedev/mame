@@ -39,7 +39,7 @@ static const char *const PhonemeTable[65] =
 	"U"  ,"Y"  ,"T"  ,"R"  ,"E"  ,"W"  ,"AE" ,"AE1",
 	"AW2","UH2","UH1","UH" ,"O2" ,"O1" ,"IU" ,"U1",
 	"THV","TH" ,"ER" ,"EH" ,"E1" ,"AW" ,"PA1","STOP",
-	0
+	nullptr
 };
 
 /* Missing samples : ready,  from,  one,  bite,  youl,  explode,  if,  myself,  back,
@@ -69,7 +69,7 @@ static const char *const wowWordTable[] =
 "WOO1R", "WORYER", "watch.wav", "WE1Y", "WEHLKUHM",
 "WERR", "WAH1EH3I3L", "WIL", "WITH", "WIZERD", "wont.wav",
 "WO1O2R", "WO1ERLD", "WORLINGS", "WORLUHK",
-"YI3U", "Y1IUU", "YIUUI", "Y1IUU1U1", "YI3U1", "Y1IUUL", "YIUU1L", "Y1IUUD", "YO2O2R",0
+"YI3U", "Y1IUU", "YIUUI", "Y1IUU1U1", "YI3U1", "Y1IUUL", "YIUU1L", "Y1IUUD", "YO2O2R",nullptr
 };
 
 #define num_samples (sizeof(wowWordTable)/sizeof(char *))
@@ -97,7 +97,7 @@ const char *const wow_sample_names[] =
 	"war", "warrior", "watch", "we", "welcome",
 	"were", "while", "will", "with", "wizard", "wont",
 	"wor", "world", "worlings", "worlock",
-	"you", "you", "you", "you", "you", "youl", "youl", "youd", "your",0
+	"you", "you", "you", "you", "you", "youl", "youl", "youd", "your",nullptr
 };
 
 

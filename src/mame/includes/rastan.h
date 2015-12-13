@@ -39,8 +39,8 @@ public:
 	DECLARE_WRITE8_MEMBER(rastan_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(rastan_msm5205_start_w);
 	DECLARE_WRITE8_MEMBER(rastan_msm5205_stop_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_rastan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(rastan_msm5205_vck);
 };

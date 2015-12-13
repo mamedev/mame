@@ -290,7 +290,7 @@ WRITE8_MEMBER( luxor_55_10828_device::pio_pb_w )
 static const z80_daisy_config daisy_chain[] =
 {
 	{ Z80PIO_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 static SLOT_INTERFACE_START( abc_floppies )
@@ -592,7 +592,7 @@ WRITE8_MEMBER( luxor_55_10828_device::ctrl_w )
 	m_sel0 = BIT(data, 0);
 	m_sel1 = BIT(data, 1);
 
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) floppy = m_floppy1->get_device();

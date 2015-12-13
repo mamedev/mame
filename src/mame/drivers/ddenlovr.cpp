@@ -686,7 +686,7 @@ void ddenlovr_state::do_plot( int x, int y, int pen )
 }
 
 
-INLINE int fetch_bit( UINT8 *src_data, int src_len, int *bit_addr )
+static inline int fetch_bit( UINT8 *src_data, int src_len, int *bit_addr )
 {
 	const int baddrmask = 0x7ffffff;
 
@@ -697,7 +697,7 @@ INLINE int fetch_bit( UINT8 *src_data, int src_len, int *bit_addr )
 	if (baddr / 8 >= src_len)
 	{
 #ifdef MAME_DEBUG
-//		popmessage("GFX ROM OVER %06x", baddr / 8);
+//      popmessage("GFX ROM OVER %06x", baddr / 8);
 #endif
 		return 1;
 	}
@@ -705,7 +705,7 @@ INLINE int fetch_bit( UINT8 *src_data, int src_len, int *bit_addr )
 	return (src_data[baddr / 8] >> (7 - (baddr & 7))) & 1;
 }
 
-INLINE int fetch_word( UINT8 *src_data, int src_len, int *bit_addr, int word_len )
+static inline int fetch_word( UINT8 *src_data, int src_len, int *bit_addr, int word_len )
 {
 	int res = 0;
 
@@ -11614,13 +11614,13 @@ ROM_START( kotbinsp )
 	ROM_LOAD16_BYTE( "909033.6c", 0x200001, 0x080000, CRC(9388b85d) SHA1(a35fe0b585cba256bb5575f7b539b33dd0ca3aa0) )
 	ROM_FILL(                     0x300000, 0x100000, 0xff )
 	// mirror the whole address space (25 bits)
-	ROM_COPY( "blitter", 0, 0x0400000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x0800000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x0c00000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x1000000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x1400000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x1800000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x1c00000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x0400000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x0800000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x0c00000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x1000000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x1400000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x1800000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x1c00000, 0x400000 )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "909031.1c", 0x00000, 0x80000, CRC(9f20a531) SHA1(1b43edd70c4c958cbbcd6c051ea6ba5e6fb41e77) )

@@ -73,10 +73,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(psychic5);
 	DECLARE_MACHINE_START(bombsa);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(psychic5);
 	DECLARE_VIDEO_START(bombsa);
 	DECLARE_VIDEO_RESET(psychic5);

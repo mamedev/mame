@@ -587,11 +587,11 @@ UINT32 nbmj8891_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 		if (m_gfxdraw_mode)
 		{
-			copyscrollbitmap      (bitmap, m_tmpbitmap0, 0, 0, 0, 0, cliprect);
-			copyscrollbitmap_trans(bitmap, m_tmpbitmap1, 0, 0, 1, &scrolly, cliprect, 0xff);
+			copyscrollbitmap      (bitmap, m_tmpbitmap0, 0, nullptr, 0, nullptr, cliprect);
+			copyscrollbitmap_trans(bitmap, m_tmpbitmap1, 0, nullptr, 1, &scrolly, cliprect, 0xff);
 		}
 		else
-			copyscrollbitmap(bitmap, m_tmpbitmap0, 0, 0, 1, &scrolly, cliprect);
+			copyscrollbitmap(bitmap, m_tmpbitmap0, 0, nullptr, 1, &scrolly, cliprect);
 	}
 	else
 		bitmap.fill(0xff);

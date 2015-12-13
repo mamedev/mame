@@ -363,12 +363,12 @@ WRITE16_MEMBER(cave_state::cave_vram_3_8x8_w){ vram_8x8_w(space, offset, data, m
 
 void cave_state::cave_vh_start( int num )
 {
-	assert(m_palette_map != NULL);
+	assert(m_palette_map != nullptr);
 
-	m_tilemap[0] = 0;
-	m_tilemap[1] = 0;
-	m_tilemap[2] = 0;
-	m_tilemap[3] = 0;
+	m_tilemap[0] = nullptr;
+	m_tilemap[1] = nullptr;
+	m_tilemap[2] = nullptr;
+	m_tilemap[3] = nullptr;
 
 	m_tiledim[0] = 0;
 	m_tiledim[1] = 0;
@@ -793,10 +793,10 @@ void cave_state::cave_sprite_check(int chip, screen_device &screen, const rectan
 			sprite++;
 		}
 
-		m_sprite_table[chip][0][i[0]] = 0;
-		m_sprite_table[chip][1][i[1]] = 0;
-		m_sprite_table[chip][2][i[2]] = 0;
-		m_sprite_table[chip][3][i[3]] = 0;
+		m_sprite_table[chip][0][i[0]] = nullptr;
+		m_sprite_table[chip][1][i[1]] = nullptr;
+		m_sprite_table[chip][2][i[2]] = nullptr;
+		m_sprite_table[chip][3][i[3]] = nullptr;
 
 		switch (spritetype)
 		{
@@ -1630,7 +1630,7 @@ UINT32 cave_state::screen_update_cave(screen_device &screen, bitmap_rgb32 &bitma
 
 void cave_state::cave_get_sprite_info(int chip)
 {
-	if (m_videoregs[chip] == NULL)
+	if (m_videoregs[chip] == nullptr)
 		return;
 
 	if (m_kludge == 3)   /* mazinger metmqstr */

@@ -188,10 +188,10 @@ static const SDD1_PEM_state PEM_evolution_table[33] =
 
 void SDD1_PEM::PEM_prepareDecomp()
 {
-	for (int i = 0; i < 32; i++)
+	for (auto & elem : m_contextInfo)
 	{
-		m_contextInfo[i].status = 0;
-		m_contextInfo[i].MPS = 0;
+		elem.status = 0;
+		elem.MPS = 0;
 	}
 }
 
@@ -459,10 +459,10 @@ void sns_rom_sdd1_device::device_reset()
 	m_mmc[2] = 2 << 20;
 	m_mmc[3] = 3 << 20;
 
-	for(int i = 0; i < 8; i++)
+	for(auto & elem : m_dma)
 	{
-		m_dma[i].addr = 0;
-		m_dma[i].size = 0;
+		elem.addr = 0;
+		elem.size = 0;
 	}
 }
 

@@ -2051,7 +2051,7 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 	}
 
 	bool new_object = true;
-	rdp_poly_state* object = NULL;
+	rdp_poly_state* object = nullptr;
 	bool valid = false;
 
 	INT32* minx = flip ? &minxhx : &minxmx;
@@ -3129,7 +3129,7 @@ n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 320
 	ignore = false;
 	dolog = false;
 	m_aux_buf_ptr = 0;
-	m_aux_buf = NULL;
+	m_aux_buf = nullptr;
 	m_pipe_clean = true;
 
 	m_pending_mode_block = false;
@@ -3145,9 +3145,9 @@ n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 320
 	m_one.set(0xff, 0xff, 0xff, 0xff);
 	m_zero.set(0, 0, 0, 0);
 
-	m_tmem = NULL;
+	m_tmem = nullptr;
 
-	m_machine = NULL;
+	m_machine = nullptr;
 
 	//memset(m_hidden_bits, 3, 8388608);
 

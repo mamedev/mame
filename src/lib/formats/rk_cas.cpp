@@ -217,63 +217,63 @@ static const struct CassetteFormat rku_cassette_format = {
 	"rku",
 	rk20_cassette_identify,
 	rk20_cassette_load,
-	NULL
+	nullptr
 };
 
 static const struct CassetteFormat rk8_cassette_format = {
 	"rk8",
 	rk60_cassette_identify,
 	rk60_cassette_load,
-	NULL
+	nullptr
 };
 
 static const struct CassetteFormat rks_cassette_format = {
 	"rks",
 	rk20_cassette_identify,
 	rk20_cassette_load,
-	NULL
+	nullptr
 };
 
 static const struct CassetteFormat rko_cassette_format = {
 	"rko",
 	rk20_cassette_identify,
 	rk20_cassette_load,
-	NULL
+	nullptr
 };
 
 static const struct CassetteFormat rkr_cassette_format = {
 	"rk,rkr",
 	rk20_cassette_identify,
 	rk20_cassette_load,
-	NULL
+	nullptr
 };
 
 static const struct CassetteFormat rka_cassette_format = {
 	"rka",
 	rk20_cassette_identify,
 	rk20_cassette_load,
-	NULL
+	nullptr
 };
 
 static const struct CassetteFormat rkm_cassette_format = {
 	"rkm",
 	rk22_cassette_identify,
 	rk22_cassette_load,
-	NULL
+	nullptr
 };
 
 static const struct CassetteFormat rkp_cassette_format = {
 	"rkp",
 	rk20_cassette_identify,
 	rk20_cassette_load,
-	NULL
+	nullptr
 };
 
 static const struct CassetteFormat gam_cassette_format = {
 	"gam,g16,pki",
 	gam_cassette_identify,
 	gam_cassette_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(rku_cassette_formats)

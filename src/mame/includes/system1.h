@@ -119,9 +119,9 @@ public:
 	DECLARE_DRIVER_INIT(spatter);
 	DECLARE_DRIVER_INIT(spattera);
 	TILE_GET_INFO_MEMBER(tile_get_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(system2);
 	DECLARE_VIDEO_START(system2);
 	UINT32 screen_update_system1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

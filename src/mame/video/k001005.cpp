@@ -1173,16 +1173,16 @@ const device_type K001005 = &device_creator<k001005_device>;
 k001005_device::k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K001005, "K001005 Polygon Renderer", tag, owner, clock, "k001005", __FILE__),
 		device_video_interface(mconfig, *this),
-		m_k001006(NULL),
-		m_fifo(NULL),
+		m_k001006(nullptr),
+		m_fifo(nullptr),
 		m_status(0),
 		m_ram_ptr(0),
 		m_fifo_read_ptr(0),
 		m_fifo_write_ptr(0),
 		m_reg_far_z(0)
 {
-		m_ram[0] = 0;
-		m_ram[1] = 0;
+		m_ram[0] = nullptr;
+		m_ram[1] = nullptr;
 }
 
 //-------------------------------------------------

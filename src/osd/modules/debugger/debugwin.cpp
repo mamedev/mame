@@ -44,35 +44,35 @@ public:
 
 	virtual ~debugger_windows() { }
 
-	virtual int init(const osd_options &options) { return 0; }
-	virtual void exit();
+	virtual int init(const osd_options &options) override { return 0; }
+	virtual void exit() override;
 
-	virtual void init_debugger(running_machine &machine);
-	virtual void wait_for_debugger(device_t &device, bool firststop);
-	virtual void debugger_update();
+	virtual void init_debugger(running_machine &machine) override;
+	virtual void wait_for_debugger(device_t &device, bool firststop) override;
+	virtual void debugger_update() override;
 
 protected:
-	virtual running_machine &machine() const { return *m_machine; }
+	virtual running_machine &machine() const override { return *m_machine; }
 
-	virtual ui_metrics &metrics() const { return *m_metrics; }
+	virtual ui_metrics &metrics() const override { return *m_metrics; }
 
-	virtual bool const &waiting_for_debugger() const { return m_waiting_for_debugger; }
-	virtual bool seq_pressed() const;
+	virtual bool const &waiting_for_debugger() const override { return m_waiting_for_debugger; }
+	virtual bool seq_pressed() const override;
 
-	virtual void create_memory_window() { create_window<memorywin_info>(); }
-	virtual void create_disasm_window() { create_window<disasmwin_info>(); }
-	virtual void create_log_window() { create_window<logwin_info>(); }
-	virtual void create_points_window() { create_window<pointswin_info>(); }
-	virtual void remove_window(debugwin_info &info);
+	virtual void create_memory_window() override { create_window<memorywin_info>(); }
+	virtual void create_disasm_window() override { create_window<disasmwin_info>(); }
+	virtual void create_log_window() override { create_window<logwin_info>(); }
+	virtual void create_points_window() override { create_window<pointswin_info>(); }
+	virtual void remove_window(debugwin_info &info) override;
 
-	virtual void show_all();
-	virtual void hide_all();
+	virtual void show_all() override;
+	virtual void hide_all() override;
 
 private:
 	template <typename T> T *create_window();
 
 	running_machine             *m_machine;
-	auto_pointer<ui_metrics>    m_metrics;
+	std::unique_ptr<ui_metrics>    m_metrics;
 	bool                        m_waiting_for_debugger;
 	simple_list<debugwin_info>  m_window_list;
 	consolewin_info             *m_main_console;
@@ -94,7 +94,7 @@ void debugger_windows::exit()
 void debugger_windows::init_debugger(running_machine &machine)
 {
 	m_machine = &machine;
-	m_metrics.reset(global_alloc(ui_metrics(downcast<osd_options &>(m_machine->options()))));
+	m_metrics = std::make_unique<ui_metrics>(downcast<osd_options &>(m_machine->options()));
 }
 
 

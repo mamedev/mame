@@ -10,8 +10,8 @@
 class SDD1_IM //Input Manager
 {
 public:
-	SDD1_IM(): 
-		m_byte_ptr(0), 
+	SDD1_IM():
+		m_byte_ptr(0),
 		m_bit_count(0)
 	{ }
 
@@ -38,9 +38,9 @@ class SDD1_BG // Bits Generator
 public:
 	SDD1_BG(SDD1_GCD* associatedGCD, UINT8 code)
 		: m_code_num(code),
-		  m_MPScount(0),
-		  m_LPSind(0),
-		  m_GCD(associatedGCD)
+			m_MPScount(0),
+			m_LPSind(0),
+			m_GCD(associatedGCD)
 	{
 	}
 
@@ -153,16 +153,16 @@ public:
 	sns_rom_sdd1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	virtual DECLARE_READ8_MEMBER(chip_read);
-	virtual DECLARE_WRITE8_MEMBER(chip_write);
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual DECLARE_READ8_MEMBER(chip_read) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
 
 	UINT8 read_helper(UINT32 offset);
 

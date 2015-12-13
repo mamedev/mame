@@ -89,8 +89,8 @@ public:
 	required_shared_ptr<UINT16> m_video_ram;
 	required_ioport m_s8;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( tape_mon_w );
 	DECLARE_READ16_MEMBER( isbx0_tdma_r );

@@ -32,8 +32,8 @@ public:
 	UINT8 m_startup_mem_map;
 	DECLARE_READ8_MEMBER(lviv_io_r);
 	DECLARE_WRITE8_MEMBER(lviv_io_w);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lviv);
 	UINT32 screen_update_lviv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(lviv_ppi_0_porta_r);

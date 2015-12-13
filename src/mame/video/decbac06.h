@@ -115,8 +115,8 @@ public:
 	DECLARE_WRITE8_MEMBER( pf_rowscroll_8bit_swap_w );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT8 m_gfxregion8x8;
 	UINT8 m_gfxregion16x16;

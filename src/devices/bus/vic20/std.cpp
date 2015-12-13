@@ -48,19 +48,19 @@ void vic20_standard_cartridge_device::device_start()
 
 UINT8 vic20_standard_cartridge_device::vic20_cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	if (!blk1 && (m_blk1 != NULL))
+	if (!blk1 && (m_blk1 != nullptr))
 	{
 		data = m_blk1[offset];
 	}
-	else if (!blk2 && (m_blk2 != NULL))
+	else if (!blk2 && (m_blk2 != nullptr))
 	{
 		data = m_blk2[offset];
 	}
-	else if (!blk3 && (m_blk3 != NULL))
+	else if (!blk3 && (m_blk3 != nullptr))
 	{
 		data = m_blk3[offset];
 	}
-	else if (!blk5 && (m_blk5 != NULL))
+	else if (!blk5 && (m_blk5 != nullptr))
 	{
 		data = m_blk5[offset];
 	}

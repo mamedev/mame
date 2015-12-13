@@ -4287,7 +4287,7 @@ MACHINE_START_MEMBER(dynax_state,dynax)
 
 MACHINE_RESET_MEMBER(dynax_state,dynax)
 {
-	if (m_msm != NULL)
+	if (m_msm != nullptr)
 		MACHINE_RESET_CALL_MEMBER(adpcm);
 
 	m_sound_irq = 0;
@@ -5068,7 +5068,7 @@ ROM_START( cdracula )
 	ROM_LOAD( "escape.uc", 0x40000, 0x20000, CRC(393fa285) SHA1(654ab2fb92efa28f65bcc7c70a9fae2e43657309) )
 	ROM_LOAD( "escape.ud", 0x60000, 0x20000, CRC(eff474af) SHA1(7ab1f0079d051c9b0c4aa566a4d92032c7060d8e) )
 	ROM_LOAD( "escape.ue", 0x80000, 0x20000, CRC(0f9dc93b) SHA1(a3b33795cf07882ecc80d9afa5174e771ee0df08) )
-	ROM_FILL(              0xa0000, 0x20000, 0 )
+	ROM_FILL(              0xa0000, 0x20000, 0x000000 )
 
 	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
 	ROM_LOAD( "82s147an.u26", 0x000, 0x200, CRC(1a3fe146) SHA1(7d1b4dd66fc95ea5ed584f0bb571cca09fe519b0) ) // FIXED BITS (00xxxxxx)
@@ -6913,7 +6913,7 @@ ROM_START( tenkai2b )
 	ROM_LOAD( "mc2.u21", 0x000000, 0x100000, CRC(713f79d7) SHA1(6e518b3127b232cc280b172dedbbc708987f9325) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )   // blitter data
-	ROM_COPY( "gfx1", 0, 0, 0x100000 )
+	ROM_COPY( "gfx1", 0x000000, 0, 0x100000 )
 	ROM_LOAD( "mc3.u15", 0x00000, 0x20000, CRC(5b552cdf) SHA1(86aaa02dcf8dab670d818287c91c8cb296362401) )   // 1xxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
@@ -6985,7 +6985,7 @@ ROM_START( tenkaibb )
 	ROM_LOAD( "lzc-02.u19", 0x000000, 0x100000, CRC(90a19443) SHA1(8f593c00e39dd5acc76b058591019d117967a17b) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )   // blitter data
-	ROM_COPY( "gfx1", 0, 0, 0x100000 )
+	ROM_COPY( "gfx1", 0x000000, 0, 0x100000 )
 	ROM_LOAD( "lzc-03.u15", 0x000000, 0x020000, CRC(5b552cdf) SHA1(86aaa02dcf8dab670d818287c91c8cb296362401) )  // 1xxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 

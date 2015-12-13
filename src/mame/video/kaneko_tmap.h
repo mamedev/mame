@@ -68,8 +68,8 @@ public:
 
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	TILE_GET_INFO_MEMBER(get_tile_info_0);

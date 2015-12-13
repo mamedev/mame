@@ -65,8 +65,8 @@ public:
 	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_tilehigh_w);
 	DECLARE_WRITE16_MEMBER(sshangha_video_w);
 	DECLARE_DRIVER_INIT(sshangha);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_sshangha(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void sshangha_set_color_888(pen_t color, int rshift, int gshift, int bshift, UINT32 data);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

@@ -165,9 +165,9 @@ static ADDRESS_MAP_START( laserbat_map, AS_PROGRAM, 8, laserbat_state )
 	AM_RANGE(0x7800, 0x7bff) AM_ROM
 
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_WRITENOP // always 0 (bullet ram in Quasar)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_device, work_ram_r, work_ram_w)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_device, work_ram_r, work_ram_w)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_3", s2636_device, work_ram_r, work_ram_w)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_device, read, write)
+	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_device, read, write)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_3", s2636_device, read, write)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_WRITE(laserbat_videoram_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 ADDRESS_MAP_END
@@ -496,9 +496,9 @@ UINT32 laserbat_state::screen_update_laserbat(screen_device &screen, bitmap_ind1
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* update the S2636 chips */
-	bitmap_ind16 &s2636_1_bitmap = m_s2636_1->update(cliprect);
-	bitmap_ind16 &s2636_2_bitmap = m_s2636_2->update(cliprect);
-	bitmap_ind16 &s2636_3_bitmap = m_s2636_3->update(cliprect);
+	bitmap_ind16 const &s2636_1_bitmap = m_s2636_1->update(cliprect);
+	bitmap_ind16 const &s2636_2_bitmap = m_s2636_2->update(cliprect);
+	bitmap_ind16 const &s2636_3_bitmap = m_s2636_3->update(cliprect);
 
 	/* copy the S2636 images into the main bitmap */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -670,16 +670,13 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_DEVICE_ADD("s2636_1", S2636, 0)
-	MCFG_S2636_WORKRAM_SIZE(0x100)
-	MCFG_S2636_OFFSETS(0, -19)
+	MCFG_S2636_OFFSETS(-16, -27)
 
 	MCFG_DEVICE_ADD("s2636_2", S2636, 0)
-	MCFG_S2636_WORKRAM_SIZE(0x100)
-	MCFG_S2636_OFFSETS(0, -19)
+	MCFG_S2636_OFFSETS(-16, -27)
 
 	MCFG_DEVICE_ADD("s2636_3", S2636, 0)
-	MCFG_S2636_WORKRAM_SIZE(0x100)
-	MCFG_S2636_OFFSETS(0, -19)
+	MCFG_S2636_OFFSETS(-16, -27)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -738,16 +735,13 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_DEVICE_ADD("s2636_1", S2636, 0)
-	MCFG_S2636_WORKRAM_SIZE(0x100)
-	MCFG_S2636_OFFSETS(0, -19)
+	MCFG_S2636_OFFSETS(-16, -19)
 
 	MCFG_DEVICE_ADD("s2636_2", S2636, 0)
-	MCFG_S2636_WORKRAM_SIZE(0x100)
-	MCFG_S2636_OFFSETS(0, -19)
+	MCFG_S2636_OFFSETS(-16, -19)
 
 	MCFG_DEVICE_ADD("s2636_3", S2636, 0)
-	MCFG_S2636_WORKRAM_SIZE(0x100)
-	MCFG_S2636_OFFSETS(0, -19)
+	MCFG_S2636_OFFSETS(-16, -19)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -962,7 +956,7 @@ ROM_START( catnmousa )
 ROM_END
 
 
-GAME( 1981, laserbat, 0,        laserbat, laserbat, driver_device, 0, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, lazarian, laserbat, laserbat, lazarian, driver_device, 0, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, laserbat, 0,        laserbat, laserbat, driver_device, 0, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, lazarian, laserbat, laserbat, lazarian, driver_device, 0, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, catnmous, 0,        catnmous, catnmous, driver_device, 0, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE)
 GAME( 1982, catnmousa,catnmous, catnmous, catnmous, driver_device, 0, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)

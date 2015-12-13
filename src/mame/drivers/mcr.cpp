@@ -1735,7 +1735,7 @@ static const char *const journey_sample_names[] =
 {
 	"*journey",
 	"sepways",
-	0
+	nullptr
 };
 
 static const char *const twotiger_sample_names[] =
@@ -1743,7 +1743,7 @@ static const char *const twotiger_sample_names[] =
 	"*twotiger",
 	"left",
 	"right",
-	0
+	nullptr
 };
 
 /*************************************
@@ -2781,7 +2781,7 @@ void mcr_state::mcr_init(int cpuboard, int vidboard, int ssioboard)
 	save_item(NAME(last_op4));
 
 	midway_ssio_device *ssio = machine().device<midway_ssio_device>("ssio");
-	if (ssio != NULL)
+	if (ssio != nullptr)
 	{
 		ssio->set_custom_output(0, 0xff, write8_delegate(FUNC(mcr_state::mcr_control_port_w), this));
 	}

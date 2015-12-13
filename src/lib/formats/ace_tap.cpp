@@ -26,7 +26,7 @@ static int cas_size;
 /*******************************************************************
    Generate one high-low cycle of sample data
 ********************************************************************/
-INLINE int ace_tap_cycle(INT16 *buffer, int sample_pos, int high, int low)
+static inline int ace_tap_cycle(INT16 *buffer, int sample_pos, int high, int low)
 {
 	int i = 0;
 
@@ -48,7 +48,7 @@ INLINE int ace_tap_cycle(INT16 *buffer, int sample_pos, int high, int low)
 }
 
 
-INLINE int ace_tap_silence(INT16 *buffer, int sample_pos, int samples)
+static inline int ace_tap_silence(INT16 *buffer, int sample_pos, int samples)
 {
 	int i = 0;
 
@@ -64,7 +64,7 @@ INLINE int ace_tap_silence(INT16 *buffer, int sample_pos, int samples)
 }
 
 
-INLINE int ace_tap_byte(INT16 *buffer, int sample_pos, UINT8 data)
+static inline int ace_tap_byte(INT16 *buffer, int sample_pos, UINT8 data)
 {
 	int i, samples;
 
@@ -151,7 +151,7 @@ static int ace_tap_to_wav_size(const UINT8 *casdata, int caslen)
 {
 	cas_size = caslen;
 
-	return ace_handle_tap( NULL, casdata );
+	return ace_handle_tap( nullptr, casdata );
 }
 
 
@@ -184,7 +184,7 @@ static const struct CassetteFormat ace_tap_format =
 	"tap",
 	ace_tap_identify,
 	ace_tap_load,
-	NULL
+	nullptr
 };
 
 

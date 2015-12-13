@@ -351,7 +351,7 @@ UINT32 policetr_state::screen_update_policetr(screen_device &screen, bitmap_ind1
 
 	/* render all the scanlines from the dstbitmap to MAME's bitmap */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-		draw_scanline8(bitmap, cliprect.min_x, y, width, &m_dstbitmap[DSTBITMAP_WIDTH * y + cliprect.min_x], NULL);
+		draw_scanline8(bitmap, cliprect.min_x, y, width, &m_dstbitmap[DSTBITMAP_WIDTH * y + cliprect.min_x], nullptr);
 
 	return 0;
 }

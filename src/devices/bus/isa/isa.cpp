@@ -26,8 +26,8 @@ const device_type ISA8_SLOT = &device_creator<isa8_slot_device>;
 //-------------------------------------------------
 isa8_slot_device::isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_SLOT, "ISA8_SLOT", tag, owner, clock, "isa8_slot", __FILE__),
-		device_slot_interface(mconfig, *this), 
-	m_owner(nullptr), 
+		device_slot_interface(mconfig, *this),
+	m_owner(nullptr),
 	m_isa_tag(nullptr)
 {
 }

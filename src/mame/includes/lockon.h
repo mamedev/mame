@@ -120,9 +120,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_vol);
 	DECLARE_WRITE8_MEMBER(ym2203_out_b);
 	TILE_GET_INFO_MEMBER(get_lockon_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lockon);
 	UINT32 screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_lockon(screen_device &screen, bool state);

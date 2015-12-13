@@ -892,7 +892,7 @@ static const gfx_layout shape_layout =
 static GFXDECODE_START( namcona1 )
 	GFXDECODE_RAM( "cgram", 0, cg_layout_8bpp, 0, 0x2000/256 )
 	GFXDECODE_RAM( "cgram", 0, cg_layout_4bpp, 0, 0x2000/16  )
-	GFXDECODE_RAM(  NULL,   0, shape_layout,   0, 0x2000/2   )
+	GFXDECODE_RAM(  nullptr,   0, shape_layout,   0, 0x2000/2   )
 GFXDECODE_END
 
 /***************************************************************************/

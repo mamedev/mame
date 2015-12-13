@@ -210,7 +210,7 @@ static void poly_state_presave(legacy_poly_manager *poly);
     down
 -------------------------------------------------*/
 
-INLINE INT32 round_coordinate(float value)
+static inline INT32 round_coordinate(float value)
 {
 	INT32 result = floor(value);
 	return result + (value - (float)result > 0.5f);
@@ -222,7 +222,7 @@ INLINE INT32 round_coordinate(float value)
     a simple tri_extent to a full poly_extent
 -------------------------------------------------*/
 
-INLINE void convert_tri_extent_to_poly_extent(poly_extent *dstextent, const tri_extent *srcextent, const polygon_info *polygon, INT32 y)
+static inline void convert_tri_extent_to_poly_extent(poly_extent *dstextent, const tri_extent *srcextent, const polygon_info *polygon, INT32 y)
 {
 	/* copy start/stop always */
 	dstextent->startx = srcextent->startx;
@@ -242,7 +242,7 @@ INLINE void convert_tri_extent_to_poly_extent(poly_extent *dstextent, const tri_
     a vertex based on p[0] crossing the clipval
 -------------------------------------------------*/
 
-INLINE void interpolate_vertex(poly_vertex *outv, const poly_vertex *v1, const poly_vertex *v2, int paramcount, float clipval)
+static inline void interpolate_vertex(poly_vertex *outv, const poly_vertex *v1, const poly_vertex *v2, int paramcount, float clipval)
 {
 	float frac = (clipval - v1->p[0]) / (v2->p[0] - v1->p[0]);
 	int paramnum;
@@ -260,7 +260,7 @@ INLINE void interpolate_vertex(poly_vertex *outv, const poly_vertex *v1, const p
     another
 -------------------------------------------------*/
 
-INLINE void copy_vertex(poly_vertex *outv, const poly_vertex *v, int paramcount)
+static inline void copy_vertex(poly_vertex *outv, const poly_vertex *v, int paramcount)
 {
 	int paramnum;
 
@@ -276,7 +276,7 @@ INLINE void copy_vertex(poly_vertex *outv, const poly_vertex *v, int paramcount)
     object, blocking if we run out
 -------------------------------------------------*/
 
-INLINE polygon_info *allocate_polygon(legacy_poly_manager *poly, int miny, int maxy)
+static inline polygon_info *allocate_polygon(legacy_poly_manager *poly, int miny, int maxy)
 {
 	/* wait for a work item if we have to */
 	if (poly->polygon_next + 1 > poly->polygon_count)
@@ -374,7 +374,7 @@ void poly_free(legacy_poly_manager *poly)
 #endif
 
 	/* free the work queue */
-	if (poly->queue != NULL)
+	if (poly->queue != nullptr)
 		osd_work_queue_free(poly->queue);
 }
 
@@ -398,7 +398,7 @@ void poly_wait(legacy_poly_manager *poly, const char *debug_reason)
 		time = get_profile_ticks();
 
 	/* wait for all pending work items to complete */
-	if (poly->queue != NULL)
+	if (poly->queue != nullptr)
 		osd_work_queue_wait(poly->queue, osd_ticks_per_second() * 100);
 
 	/* if we don't have a queue, just run the whole list now */
@@ -630,7 +630,7 @@ UINT32 poly_render_triangle(legacy_poly_manager *poly, void *dest, const rectang
 	}
 
 	/* enqueue the work items */
-	if (poly->queue != NULL)
+	if (poly->queue != nullptr)
 		osd_work_item_queue_multiple(poly->queue, poly_item_callback, poly->unit_next - startunit, poly->unit[startunit], poly->unit_size, WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	/* return the total number of pixels in the triangle */
@@ -738,7 +738,7 @@ UINT32 poly_render_triangle_custom(legacy_poly_manager *poly, void *dest, const 
 #endif
 
 	/* enqueue the work items */
-	if (poly->queue != NULL)
+	if (poly->queue != nullptr)
 		osd_work_item_queue_multiple(poly->queue, poly_item_callback, poly->unit_next - startunit, poly->unit[startunit], poly->unit_size, WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	/* return the total number of pixels in the object */
@@ -963,7 +963,7 @@ UINT32 poly_render_quad(legacy_poly_manager *poly, void *dest, const rectangle &
 #endif
 
 	/* enqueue the work items */
-	if (poly->queue != NULL)
+	if (poly->queue != nullptr)
 		osd_work_item_queue_multiple(poly->queue, poly_item_callback, poly->unit_next - startunit, poly->unit[startunit], poly->unit_size, WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	/* return the total number of pixels in the triangle */
@@ -1195,7 +1195,7 @@ UINT32 poly_render_polygon(legacy_poly_manager *poly, void *dest, const rectangl
 #endif
 
 	/* enqueue the work items */
-	if (poly->queue != NULL)
+	if (poly->queue != nullptr)
 		osd_work_item_queue_multiple(poly->queue, poly_item_callback, poly->unit_next - startunit, poly->unit[startunit], poly->unit_size, WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	/* return the total number of pixels in the triangle */
@@ -1258,7 +1258,7 @@ static void **allocate_array(running_machine &machine, size_t *itemsize, UINT32 
 
 	/* fail if 0 */
 	if (itemcount == 0)
-		return NULL;
+		return nullptr;
 
 	/* round to a cache line boundary */
 	*itemsize = ((*itemsize + CACHE_LINE_SIZE - 1) / CACHE_LINE_SIZE) * CACHE_LINE_SIZE;
@@ -1344,7 +1344,7 @@ static void *poly_item_callback(void *param, int threadid)
 			break;
 		param = polygon->poly->unit[orig_count_next];
 	}
-	return NULL;
+	return nullptr;
 }
 
 

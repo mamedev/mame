@@ -55,7 +55,7 @@ okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag,
 		m_adpcm_type(0),
 		m_data_in(0),
 		m_nibble_shift(0),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_output_bits(0),
 		m_signal(0),
 		m_step(0)

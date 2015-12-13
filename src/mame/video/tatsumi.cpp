@@ -169,7 +169,7 @@ VIDEO_START_MEMBER(tatsumi_state,bigfight)
 /********************************************************************/
 
 template<class _BitmapClass>
-INLINE void roundupt_drawgfxzoomrotate(tatsumi_state *state,
+static inline void roundupt_drawgfxzoomrotate(tatsumi_state *state,
 		_BitmapClass &dest_bmp, const rectangle &clip, gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,UINT32 ssx,UINT32 ssy,
 		int scalex, int scaley, int rotate, int write_priority_only )

@@ -42,7 +42,12 @@ function premake.cmake.project(prj)
 			for _,v in ipairs(cfg.includedirs) do
 				_p('include_directories(../%s)', premake.esc(v))
 			end
+			for _,v in ipairs(cfg.defines) do
+				_p('add_definitions(-D%s)', premake.esc(v))
+			end
+			break
 		end
+		break
 	end
 
 	if (prj.kind=='StaticLib') then

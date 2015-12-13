@@ -19,12 +19,12 @@ public:
 	UINT8 *memory(UINT32 &size) { size = dimm_data_size; return dimm_data; }
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void board_setup_address(UINT32 address, bool is_dma);
-	virtual void board_get_buffer(UINT8 *&base, UINT32 &limit);
-	virtual void board_advance(UINT32 size);
+	virtual void board_setup_address(UINT32 address, bool is_dma) override;
+	virtual void board_get_buffer(UINT8 *&base, UINT32 &limit) override;
+	virtual void board_advance(UINT32 size) override;
 
 private:
 	enum { FILENAME_LENGTH=24 };

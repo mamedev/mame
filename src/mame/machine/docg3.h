@@ -27,13 +27,13 @@ public:
 	void set_size(int _size) { m_size = _size; }
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 public:
 	DECLARE_READ16_MEMBER( sec_1_r );
 	DECLARE_WRITE16_MEMBER( sec_1_w );

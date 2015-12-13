@@ -32,7 +32,7 @@ public:
 	DECLARE_WRITE8_MEMBER( relays_w );
 	UINT16 m_nixie[16];
 	UINT8 m_timer;
-	virtual void machine_start();
+	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 	UINT8 nixie_to_num(UINT16 val);
 	inline void output_set_nixie_value(int index, int value);

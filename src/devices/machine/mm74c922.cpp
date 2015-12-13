@@ -43,13 +43,13 @@ mm74c922_device::mm74c922_device(const machine_config &mconfig, const char *tag,
 	m_read_x2(*this),
 	m_read_x3(*this),
 	m_read_x4(*this),
-	m_read_x5(*this),
+	m_read_x5(*this), m_cap_osc(0), m_cap_debounce(0),
 	m_max_y(5), // TODO 4 for 74C922, 5 for 74C923
 	m_inhibit(0),
 	m_x(0),
-	m_y(0),
+	m_y(0), m_data(0),
 	m_da(0),
-	m_next_da(0)
+	m_next_da(0), m_scan_timer(nullptr)
 {
 }
 

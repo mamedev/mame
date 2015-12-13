@@ -19,7 +19,7 @@ machine_config_constructor ne1000_device::device_mconfig_additions() const {
 ne1000_device::ne1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, NE1000, "NE1000 Network Adapter", tag, owner, clock, "ne1000", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
-		m_dp8390(*this, "dp8390d"), 
+		m_dp8390(*this, "dp8390d"),
 	m_irq(0)
 	{
 }

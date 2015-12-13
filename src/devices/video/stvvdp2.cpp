@@ -2318,7 +2318,7 @@ UINT8 saturn_state::stv_vdp2_check_vram_cycle_pattern_registers( UINT8 access_co
 	return access_command_ok == 3 ? 1 : 0;
 }
 
-INLINE UINT32 stv_add_blend(UINT32 a, UINT32 b)
+static inline UINT32 stv_add_blend(UINT32 a, UINT32 b)
 {
 	rgb_t rb = (a & 0xff00ff) + (b & 0xff00ff);
 	rgb_t g = (a & 0x00ff00) + (b & 0x00ff00);
@@ -4542,7 +4542,7 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 	use_coeff_table = coeff_table_mode = coeff_table_size = coeff_table_shift = 0;
 	coeff_table_offset = 0;
 	coeff_table_val = 0;
-	coeff_table_base = NULL;
+	coeff_table_base = nullptr;
 
 	if ( LOG_ROZ == 1 ) logerror( "Rendering RBG with parameter %s\n", iRP == 1 ? "A" : "B" );
 	if ( LOG_ROZ == 1 ) logerror( "RPMD (parameter mode) = %x\n", STV_VDP2_RPMD );
@@ -6411,7 +6411,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	int i;
 	UINT16 pix;
 	UINT16 *framebuffer_line;
-	UINT32 *bitmap_line, *bitmap_line2 = NULL;
+	UINT32 *bitmap_line, *bitmap_line2 = nullptr;
 	UINT8  interlace_framebuffer;
 	UINT8  double_x;
 	static const UINT16 sprite_colormask_table[] = {

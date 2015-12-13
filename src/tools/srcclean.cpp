@@ -39,7 +39,7 @@ static int le_convert(char *buffer, int size)
 	/* brute force */
 	*end = 0;
 	pos = strchr(buffer, 0x0d);
-	while (pos != NULL)
+	while (pos != nullptr)
 	{
 		memmove(pos, pos+1,end - pos + 1);
 		size--;
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
 
 	/* read the file */
 	file = fopen(argv[1], "rb");
-	if (file == NULL)
+	if (file == nullptr)
 	{
 		fprintf(stderr, "Can't open %s\n", argv[1]);
 		return 1;
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 	fclose(file);
 
 	/* check whether we have dos line endings and are in unix mode */
-	if (unix_le && (strchr((char *) original, 0x0d) != NULL))
+	if (unix_le && (strchr((char *) original, 0x0d) != nullptr))
 		fixed_dos_style = 1;
 
 	/* determine if we are a C file */

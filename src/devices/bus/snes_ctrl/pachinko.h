@@ -29,17 +29,17 @@ public:
 	snes_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_sms_control_port_interface overrides
-	virtual UINT8 read_pin4();
-	virtual void write_strobe(UINT8 data);
-	virtual void port_poll();
+	virtual UINT8 read_pin4() override;
+	virtual void write_strobe(UINT8 data) override;
+	virtual void port_poll() override;
 
 private:
 	required_ioport m_dial;

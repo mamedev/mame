@@ -37,7 +37,7 @@ class open_chd
 
 public:
 	open_chd(const char *region)
-		: m_next(NULL),
+		: m_next(nullptr),
 			m_region(region) { }
 
 	open_chd *next() const { return m_next; }
@@ -56,7 +56,7 @@ private:
 
 struct romload_private
 {
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+	running_machine &machine() const { assert(m_machine != nullptr); return *m_machine; }
 
 	running_machine *m_machine;         /* machine object where needed */
 
@@ -93,7 +93,7 @@ file_error common_process_file(emu_options &options, const char *location, const
 {
 	file_error filerr;
 
-	if (location != NULL && strcmp(location, "") != 0)
+	if (location != nullptr && strcmp(location, "") != 0)
 		filerr = image_file.open(location, PATH_SEPARATOR, ROM_GETNAME(romp), ext);
 	else
 		filerr = image_file.open(ROM_GETNAME(romp), ext);
@@ -114,7 +114,7 @@ file_error common_process_file(emu_options &options, const char *location, bool 
 	if (filerr != FILERR_NONE)
 	{
 		global_free(*image_file);
-		*image_file = NULL;
+		*image_file = nullptr;
 	}
 	return filerr;
 }
@@ -131,10 +131,10 @@ file_error common_process_file(emu_options &options, const char *location, bool 
 
 chd_file *get_disk_handle(running_machine &machine, const char *region)
 {
-	for (open_chd *curdisk = machine.romload_data->chd_list.first(); curdisk != NULL; curdisk = curdisk->next())
+	for (open_chd *curdisk = machine.romload_data->chd_list.first(); curdisk != nullptr; curdisk = curdisk->next())
 		if (strcmp(curdisk->region(), region) == 0)
 			return &curdisk->chd();
-	return NULL;
+	return nullptr;
 }
 
 
@@ -145,7 +145,7 @@ chd_file *get_disk_handle(running_machine &machine, const char *region)
 
 int set_disk_handle(running_machine &machine, const char *region, const char *fullpath)
 {
-	open_chd *chd = global_alloc(open_chd(region));
+	auto chd = global_alloc(open_chd(region));
 	chd_error err = chd->orig_chd().open(fullpath);
 	if (err == CHDERR_NONE)
 		machine.romload_data->chd_list.append(*chd);
@@ -170,7 +170,7 @@ const rom_entry *rom_first_region(const device_t &device)
 	const rom_entry *romp = device.rom_region();
 	while (romp && ROMENTRY_ISPARAMETER(romp))
 		romp++;
-	return (romp != NULL && !ROMENTRY_ISEND(romp)) ? romp : NULL;
+	return (romp != nullptr && !ROMENTRY_ISEND(romp)) ? romp : nullptr;
 }
 
 
@@ -186,7 +186,7 @@ const rom_entry *rom_next_region(const rom_entry *romp)
 		romp++;
 	while (ROMENTRY_ISPARAMETER(romp))
 		romp++;
-	return ROMENTRY_ISEND(romp) ? NULL : romp;
+	return ROMENTRY_ISEND(romp) ? nullptr : romp;
 }
 
 
@@ -200,7 +200,7 @@ const rom_entry *rom_first_file(const rom_entry *romp)
 	romp++;
 	while (!ROMENTRY_ISFILE(romp) && !ROMENTRY_ISREGIONEND(romp))
 		romp++;
-	return ROMENTRY_ISREGIONEND(romp) ? NULL : romp;
+	return ROMENTRY_ISREGIONEND(romp) ? nullptr : romp;
 }
 
 
@@ -214,7 +214,7 @@ const rom_entry *rom_next_file(const rom_entry *romp)
 	romp++;
 	while (!ROMENTRY_ISFILE(romp) && !ROMENTRY_ISREGIONEND(romp))
 		romp++;
-	return ROMENTRY_ISREGIONEND(romp) ? NULL : romp;
+	return ROMENTRY_ISREGIONEND(romp) ? nullptr : romp;
 }
 
 
@@ -228,7 +228,7 @@ const rom_entry *rom_first_parameter(const device_t &device)
 	const rom_entry *romp = device.rom_region();
 	while (romp && !ROMENTRY_ISEND(romp) && !ROMENTRY_ISPARAMETER(romp))
 		romp++;
-	return (romp != NULL && !ROMENTRY_ISEND(romp)) ? romp : NULL;
+	return (romp != nullptr && !ROMENTRY_ISEND(romp)) ? romp : nullptr;
 }
 
 
@@ -242,7 +242,7 @@ const rom_entry *rom_next_parameter(const rom_entry *romp)
 	romp++;
 	while (!ROMENTRY_ISREGIONEND(romp) && !ROMENTRY_ISPARAMETER(romp))
 		romp++;
-	return ROMENTRY_ISEND(romp) ? NULL : romp;
+	return ROMENTRY_ISEND(romp) ? nullptr : romp;
 }
 
 
@@ -335,7 +335,7 @@ static void CLIB_DECL ATTR_PRINTF(1,2) debugload(const char *string, ...)
 
 static void determine_bios_rom(romload_private *romdata, device_t *device, const char *specbios)
 {
-	const char *defaultname = NULL;
+	const char *defaultname = nullptr;
 	const rom_entry *rom;
 	int default_no = 1;
 	int bios_count = 0;
@@ -359,7 +359,7 @@ static void determine_bios_rom(romload_private *romdata, device_t *device, const
 			sprintf(bios_number, "%d", bios_flags - 1);
 			if (core_stricmp(bios_number, specbios) == 0 || core_stricmp(biosname, specbios) == 0)
 				device->set_system_bios(bios_flags);
-			if (defaultname != NULL && core_stricmp(biosname, defaultname) == 0)
+			if (defaultname != nullptr && core_stricmp(biosname, defaultname) == 0)
 				default_no = bios_flags;
 			bios_count++;
 		}
@@ -368,7 +368,7 @@ static void determine_bios_rom(romload_private *romdata, device_t *device, const
 	if (device->system_bios() == 0 && bios_count > 0)
 	{
 		/* if we got neither an empty string nor 'default' then warn the user */
-		if (specbios[0] != 0 && strcmp(specbios, "default") != 0 && romdata != NULL)
+		if (specbios[0] != 0 && strcmp(specbios, "default") != 0 && romdata != nullptr)
 		{
 			strcatprintf(romdata->errorstring, "%s: invalid bios\n", specbios);
 			romdata->errors++;
@@ -397,9 +397,9 @@ static void count_roms(romload_private *romdata)
 
 	/* loop over regions, then over files */
 	device_iterator deviter(romdata->machine().config().root_device());
-	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
-		for (region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
-			for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
+	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
+		for (region = rom_first_region(*device); region != nullptr; region = rom_next_region(region))
+			for (rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
 				if (ROM_GETBIOSFLAGS(rom) == 0 || ROM_GETBIOSFLAGS(rom) == device->system_bios())
 				{
 					romdata->romstotal++;
@@ -488,7 +488,7 @@ static void dump_wrong_and_correct_checksums(romload_private *romdata, const has
 static void verify_length_and_hash(romload_private *romdata, const char *name, UINT32 explength, const hash_collection &hashes)
 {
 	/* we've already complained if there is no file */
-	if (romdata->file == NULL)
+	if (romdata->file == nullptr)
 		return;
 
 	/* verify length */
@@ -533,7 +533,7 @@ static void display_loading_rom_message(romload_private *romdata, const char *na
 {
 	char buffer[200];
 
-	if (name != NULL)
+	if (name != nullptr)
 		sprintf(buffer, "Loading %s (%d%%)", from_list ? "Software" : emulator_info::get_capstartgamenoun(), (UINT32)(100 * (UINT64)romdata->romsloadedsize / (UINT64)romdata->romstotalsize));
 	else
 		sprintf(buffer, "Loading Complete");
@@ -551,7 +551,7 @@ static void display_loading_rom_message(romload_private *romdata, const char *na
 static void display_rom_load_results(romload_private *romdata, bool from_list)
 {
 	/* final status display */
-	display_loading_rom_message(romdata, NULL, from_list);
+	display_loading_rom_message(romdata, nullptr, from_list);
 
 	/* if we had errors, they are fatal */
 	if (romdata->errors != 0)
@@ -584,7 +584,7 @@ static void region_post_process(romload_private *romdata, const char *rgntag, bo
 	int i, j;
 
 	// do nothing if no region
-	if (region == NULL)
+	if (region == nullptr)
 		return;
 
 	LOG(("+ datawidth=%dbit endian=%s\n", region->bitwidth(),
@@ -634,8 +634,8 @@ static int open_rom_file(romload_private *romdata, const char *regiontag, const 
 
 	/* attempt reading up the chain through the parents. It automatically also
 	 attempts any kind of load by checksum supported by the archives. */
-	romdata->file = NULL;
-	for (int drv = driver_list::find(romdata->machine().system()); romdata->file == NULL && drv != -1; drv = driver_list::clone(drv)) {
+	romdata->file = nullptr;
+	for (int drv = driver_list::find(romdata->machine().system()); romdata->file == nullptr && drv != -1; drv = driver_list::clone(drv)) {
 		if (tried_file_names.length() != 0)
 			tried_file_names += " ";
 		tried_file_names += driver_list::driver(drv).name;
@@ -643,7 +643,7 @@ static int open_rom_file(romload_private *romdata, const char *regiontag, const 
 	}
 
 	/* if the region is load by name, load the ROM from there */
-	if (romdata->file == NULL && regiontag != NULL)
+	if (romdata->file == nullptr && regiontag != nullptr)
 	{
 		// check if we are dealing with softwarelists. if so, locationtag
 		// is actually a concatenation of: listname + setname + parentname
@@ -697,25 +697,25 @@ static int open_rom_file(romload_private *romdata, const char *regiontag, const 
 		else
 		{
 			// try to load from list/setname
-			if ((romdata->file == NULL) && (tag2.c_str() != NULL))
+			if ((romdata->file == nullptr) && (tag2.c_str() != nullptr))
 			{
 				tried_file_names += " " + tag2;
 				filerr = common_process_file(romdata->machine().options(), tag2.c_str(), has_crc, crc, romp, &romdata->file);
 			}
 			// try to load from list/parentname
-			if ((romdata->file == NULL) && has_parent && (tag3.c_str() != NULL))
+			if ((romdata->file == nullptr) && has_parent && (tag3.c_str() != nullptr))
 			{
 				tried_file_names += " " + tag3;
 				filerr = common_process_file(romdata->machine().options(), tag3.c_str(), has_crc, crc, romp, &romdata->file);
 			}
 			// try to load from setname
-			if ((romdata->file == NULL) && (tag4.c_str() != NULL))
+			if ((romdata->file == nullptr) && (tag4.c_str() != nullptr))
 			{
 				tried_file_names += " " + tag4;
 				filerr = common_process_file(romdata->machine().options(), tag4.c_str(), has_crc, crc, romp, &romdata->file);
 			}
 			// try to load from parentname
-			if ((romdata->file == NULL) && has_parent && (tag5.c_str() != NULL))
+			if ((romdata->file == nullptr) && has_parent && (tag5.c_str() != nullptr))
 			{
 				tried_file_names += " " + tag5;
 				filerr = common_process_file(romdata->machine().options(), tag5.c_str(), has_crc, crc, romp, &romdata->file);
@@ -740,7 +740,7 @@ static int open_rom_file(romload_private *romdata, const char *regiontag, const 
 static int rom_fread(romload_private *romdata, UINT8 *buffer, int length, const rom_entry *parent_region)
 {
 	/* files just pass through */
-	if (romdata->file != NULL)
+	if (romdata->file != nullptr)
 		return romdata->file->read(buffer, length);
 
 	/* otherwise, fill with randomness unless it was already specifically erased */
@@ -910,7 +910,7 @@ static void copy_rom_data(romload_private *romdata, const rom_entry *romp)
 
 	/* make sure the source was valid */
 	memory_region *region = romdata->machine().root_device().memregion(srcrgntag);
-	if (region == NULL)
+	if (region == nullptr)
 		fatalerror("Error in RomModule definition: COPY from an invalid region\n");
 
 	/* make sure we find within the region space */
@@ -999,19 +999,19 @@ static void process_rom_entries(romload_private *romdata, const char *regiontag,
 				}
 
 				/* reseek to the start and clear the baserom so we don't reverify */
-				if (romdata->file != NULL)
+				if (romdata->file != nullptr)
 					romdata->file->seek(0, SEEK_SET);
-				baserom = NULL;
+				baserom = nullptr;
 				explength = 0;
 			}
 			while (ROMENTRY_ISRELOAD(romp));
 
 			/* close the file */
-			if (romdata->file != NULL)
+			if (romdata->file != nullptr)
 			{
 				LOG(("Closing ROM file\n"));
 				global_free(romdata->file);
-				romdata->file = NULL;
+				romdata->file = nullptr;
 			}
 		}
 		else
@@ -1041,10 +1041,10 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 		filerr = common_process_file(options, driver_list::driver(searchdrv).name, ".chd", romp, image_file);
 
 	if (filerr != FILERR_NONE)
-		filerr = common_process_file(options, NULL, ".chd", romp, image_file);
+		filerr = common_process_file(options, nullptr, ".chd", romp, image_file);
 
 	/* look for the disk in the locationtag too */
-	if (filerr != FILERR_NONE && locationtag != NULL)
+	if (filerr != FILERR_NONE && locationtag != nullptr)
 	{
 		// check if we are dealing with softwarelists. if so, locationtag
 		// is actually a concatenation of: listname + setname + parentname
@@ -1095,19 +1095,19 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 		else
 		{
 			// try to load from list/setname
-			if ((filerr != FILERR_NONE) && (tag2.c_str() != NULL))
+			if ((filerr != FILERR_NONE) && (tag2.c_str() != nullptr))
 				filerr = common_process_file(options, tag2.c_str(), ".chd", romp, image_file);
 			// try to load from list/parentname (if any)
-			if ((filerr != FILERR_NONE) && has_parent && (tag3.c_str() != NULL))
+			if ((filerr != FILERR_NONE) && has_parent && (tag3.c_str() != nullptr))
 				filerr = common_process_file(options, tag3.c_str(), ".chd", romp, image_file);
 			// try to load from setname
-			if ((filerr != FILERR_NONE) && (tag4.c_str() != NULL))
+			if ((filerr != FILERR_NONE) && (tag4.c_str() != nullptr))
 				filerr = common_process_file(options, tag4.c_str(), ".chd", romp, image_file);
 			// try to load from parentname (if any)
-			if ((filerr != FILERR_NONE) && has_parent && (tag5.c_str() != NULL))
+			if ((filerr != FILERR_NONE) && has_parent && (tag5.c_str() != nullptr))
 				filerr = common_process_file(options, tag5.c_str(), ".chd", romp, image_file);
 			// only for CHD we also try to load from list/
-			if ((filerr != FILERR_NONE) && (tag1.c_str() != NULL))
+			if ((filerr != FILERR_NONE) && (tag1.c_str() != nullptr))
 			{
 				tag1.erase(tag1.length() - 1, 1);    // remove the PATH_SEPARATOR
 				filerr = common_process_file(options, tag1.c_str(), ".chd", romp, image_file);
@@ -1136,10 +1136,10 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 	{
 		machine_config config(driver_list::driver(drv), options);
 		device_iterator deviter(config.root_device());
-		for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
-			for (region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
+		for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
+			for (region = rom_first_region(*device); region != nullptr; region = rom_next_region(region))
 				if (ROMREGION_ISDISKDATA(region))
-					for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
+					for (rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
 
 						/* look for a differing name but with the same hash data */
 						if (strcmp(ROM_GETNAME(romp), ROM_GETNAME(rom)) != 0 &&
@@ -1151,7 +1151,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 								filerr = common_process_file(options, driver_list::driver(searchdrv).name, ".chd", rom, image_file);
 
 							if (filerr != FILERR_NONE)
-								filerr = common_process_file(options, NULL, ".chd", rom, image_file);
+								filerr = common_process_file(options, nullptr, ".chd", rom, image_file);
 
 							/* did the file open succeed? */
 							if (filerr == FILERR_NONE)
@@ -1227,7 +1227,7 @@ static void process_disk_entries(romload_private *romdata, const char *regiontag
 		/* handle files */
 		if (ROMENTRY_ISFILE(romp))
 		{
-			open_chd *chd = global_alloc(open_chd(regiontag));
+			auto chd = global_alloc(open_chd(regiontag));
 
 			hash_collection hashes(ROM_GETHASHDATA(romp));
 			chd_error err;
@@ -1296,7 +1296,7 @@ static void normalize_flags_for_device(running_machine &machine, const char *rgn
 	if (device->interface(memory))
 	{
 		const address_space_config *spaceconfig = memory->space_config();
-		if (spaceconfig != NULL)
+		if (spaceconfig != nullptr)
 		{
 			int buswidth;
 
@@ -1345,7 +1345,7 @@ void load_software_part_region(device_t &device, software_list_device &swlist, c
 	romdata->romsloadedsize = 0;
 
 	software_info *swinfo = swlist.find(swname);
-	if (swinfo != NULL)
+	if (swinfo != nullptr)
 	{
 		UINT32 supported = swinfo->supported();
 		if (supported == SOFTWARE_SUPPORTED_PARTIAL)
@@ -1365,11 +1365,11 @@ void load_software_part_region(device_t &device, software_list_device &swlist, c
 
 		locationtag.append(breakstr);
 
-		while (swinfo != NULL)
+		while (swinfo != nullptr)
 		{
 			locationtag.append(swinfo->shortname()).append(breakstr);
 			const char *parentname = swinfo->parentname();
-			swinfo = (parentname != NULL) ? swlist.find(parentname) : NULL;
+			swinfo = (parentname != nullptr) ? swlist.find(parentname) : nullptr;
 		}
 		// strip the final '%'
 		locationtag.erase(locationtag.length() - 1, 1);
@@ -1377,7 +1377,7 @@ void load_software_part_region(device_t &device, software_list_device &swlist, c
 
 
 	/* loop until we hit the end */
-	for (region = start_region; region != NULL; region = rom_next_region(region))
+	for (region = start_region; region != nullptr; region = rom_next_region(region))
 	{
 		UINT32 regionlength = ROMREGION_GETLENGTH(region);
 
@@ -1391,9 +1391,9 @@ void load_software_part_region(device_t &device, software_list_device &swlist, c
 		endianness_t endianness = ROMREGION_ISBIGENDIAN(region) ? ENDIANNESS_BIG : ENDIANNESS_LITTLE;
 		UINT8 width = ROMREGION_GETWIDTH(region) / 8;
 		memory_region *memregion = romdata->machine().root_device().memregion(regiontag.c_str());
-		if (memregion != NULL)
+		if (memregion != nullptr)
 		{
-			if (romdata->machine().device(regiontag.c_str()) != NULL)
+			if (romdata->machine().device(regiontag.c_str()) != nullptr)
 				normalize_flags_for_device(romdata->machine(), regiontag.c_str(), width, endianness);
 
 			/* clear old region (todo: should be moved to an image unload function) */
@@ -1419,7 +1419,7 @@ void load_software_part_region(device_t &device, software_list_device &swlist, c
 #endif
 
 		/* update total number of roms */
-		for (const rom_entry *rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
+		for (const rom_entry *rom = rom_first_file(region); rom != nullptr; rom = rom_next_file(rom))
 		{
 			romdata->romstotal++;
 			romdata->romstotalsize += rom_file_size(rom);
@@ -1433,7 +1433,7 @@ void load_software_part_region(device_t &device, software_list_device &swlist, c
 	}
 
 	/* now go back and post-process all the regions */
-	for (region = start_region; region != NULL; region = rom_next_region(region))
+	for (region = start_region; region != nullptr; region = rom_next_region(region))
 	{
 		regiontag = device.subtag(ROMREGION_GETTAG(region));
 		region_post_process(romdata, regiontag.c_str(), ROMREGION_ISINVERTED(region));
@@ -1454,8 +1454,8 @@ static void process_region_list(romload_private *romdata)
 
 	/* loop until we hit the end */
 	device_iterator deviter(romdata->machine().root_device());
-	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
-		for (const rom_entry *region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
+	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
+		for (const rom_entry *region = rom_first_region(*device); region != nullptr; region = rom_next_region(region))
 		{
 			UINT32 regionlength = ROMREGION_GETLENGTH(region);
 
@@ -1470,7 +1470,7 @@ static void process_region_list(romload_private *romdata)
 				/* if this is a device region, override with the device width and endianness */
 				UINT8 width = ROMREGION_GETWIDTH(region) / 8;
 				endianness_t endianness = ROMREGION_ISBIGENDIAN(region) ? ENDIANNESS_BIG : ENDIANNESS_LITTLE;
-				if (romdata->machine().device(regiontag.c_str()) != NULL)
+				if (romdata->machine().device(regiontag.c_str()) != nullptr)
 					normalize_flags_for_device(romdata->machine(), regiontag.c_str(), width, endianness);
 
 				/* remember the base and length */
@@ -1495,20 +1495,20 @@ static void process_region_list(romload_private *romdata)
 				process_rom_entries(romdata, device->shortname(), region, region + 1, device, FALSE);
 			}
 			else if (ROMREGION_ISDISKDATA(region))
-				process_disk_entries(romdata, regiontag.c_str(), region, region + 1, NULL);
+				process_disk_entries(romdata, regiontag.c_str(), region, region + 1, nullptr);
 		}
 
 	/* now go back and post-process all the regions */
-	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
-		for (const rom_entry *region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
+	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
+		for (const rom_entry *region = rom_first_region(*device); region != nullptr; region = rom_next_region(region))
 		{
 			regiontag = rom_region_name(*device, region);
 			region_post_process(romdata, regiontag.c_str(), ROMREGION_ISINVERTED(region));
 		}
 
 	/* and finally register all per-game parameters */
-	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
-		for (const rom_entry *param = rom_first_parameter(*device); param != NULL; param = rom_next_parameter(param))
+	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
+		for (const rom_entry *param = rom_first_parameter(*device); param != nullptr; param = rom_next_parameter(param))
 		{
 			regiontag = rom_parameter_name(*device, param);
 			romdata->machine().parameters().add(regiontag, rom_parameter_value(param));
@@ -1536,7 +1536,7 @@ void rom_init(running_machine &machine)
 
 	/* figure out which BIOS we are using */
 	device_iterator deviter(romdata->machine().config().root_device());
-	for (device_t *device = deviter.first(); device != NULL; device = deviter.next()) {
+	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next()) {
 		if (device->rom_region()) {
 			const char *specbios;
 			std::string temp;

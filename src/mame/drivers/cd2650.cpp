@@ -62,8 +62,8 @@ public:
 
 private:
 	UINT8 m_term_data;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;
 	required_device<cassette_image_device> m_cass;

@@ -53,7 +53,7 @@ es8712_device::es8712_device(const machine_config &mconfig, const char *tag, dev
 		m_end(0),
 		m_repeat(0),
 		m_bank_offset(0),
-		m_stream(NULL)
+		m_stream(nullptr)
 {
 }
 

@@ -131,7 +131,7 @@ public:
 	DECLARE_DRIVER_INIT(cshootere);
 	DECLARE_DRIVER_INIT(cshooter);
 	TILE_GET_INFO_MEMBER(get_cstx_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cshooter);
 	DECLARE_MACHINE_RESET(cshooter);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

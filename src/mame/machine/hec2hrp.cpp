@@ -104,7 +104,7 @@ TIMER_CALLBACK_MEMBER(hec2hrp_state::Callback_CK)
 
 WRITE8_MEMBER( hec2hrp_state::minidisc_control_w )
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (BIT(data, 6)) floppy = m_floppy0->get_device();
 	// bit 7 = drive 2?

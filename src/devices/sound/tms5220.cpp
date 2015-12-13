@@ -377,6 +377,8 @@ void tms5220_device::register_for_save_states()
 	save_item(NAME(m_old_frame_energy_idx));
 	save_item(NAME(m_old_frame_pitch_idx));
 	save_item(NAME(m_old_frame_k_idx));
+	save_item(NAME(m_old_zpar));
+	save_item(NAME(m_old_uv_zpar));
 #endif
 	save_item(NAME(m_current_energy));
 	save_item(NAME(m_current_pitch));
@@ -1462,7 +1464,7 @@ void tms5220_device::device_start()
 	}
 	else
 	{
-		m_speechrom = NULL;
+		m_speechrom = nullptr;
 	}
 
 	set_variant(TMS5220_IS_5220);
@@ -1915,7 +1917,7 @@ tms5220_device::tms5220_device(const machine_config &mconfig, const char *tag, d
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this),
 		m_readyq_handler(*this),
-		m_speechrom_tag(NULL)
+		m_speechrom_tag(nullptr)
 {
 }
 
@@ -1924,7 +1926,7 @@ tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, 
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this),
 		m_readyq_handler(*this),
-		m_speechrom_tag(NULL)
+		m_speechrom_tag(nullptr)
 {
 }
 

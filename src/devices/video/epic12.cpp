@@ -11,12 +11,13 @@ const device_type EPIC12 = &device_creator<epic12_device>;
 
 epic12_device::epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, EPIC12, "EP1C12 Blitter", tag, owner, clock, "epic12", __FILE__),
-		device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this), m_ram16(nullptr), m_gfx_size(0), m_bitmaps(nullptr), m_use_ram(nullptr),
+	m_main_ramsize(0), m_main_rammask(0), m_maincpu(nullptr), m_ram16_copy(nullptr), m_work_queue(nullptr)
 {
 	m_is_unsafe = 0;
 	m_delay_scale = 0;
-	m_blitter_request = 0;
-	m_blitter_delay_timer = 0;
+	m_blitter_request = nullptr;
+	m_blitter_delay_timer = nullptr;
 	m_blitter_busy = 0;
 	m_gfx_addr = 0;
 	m_gfx_scroll_0_x = 0;
@@ -657,7 +658,7 @@ void *epic12_device::blit_request_callback(void *param, int threadid)
 	epic12_device *object = reinterpret_cast<epic12_device *>(param);
 
 	object->gfx_exec();
-	return NULL;
+	return nullptr;
 }
 
 
@@ -668,7 +669,7 @@ void *epic12_device::blit_request_callback_unsafe(void *param, int threadid)
 
 	epic12_device_blit_delay = 0;
 	object->gfx_exec_unsafe();
-	return NULL;
+	return nullptr;
 }
 
 

@@ -76,7 +76,7 @@ public:
 		m_floppy1(*this, "mb8877a:1"),
 		m_floppy2(*this, "mb8877a:2"),
 		m_floppy3(*this, "mb8877a:3"),
-		m_floppy(NULL),
+		m_floppy(nullptr),
 		m_palette(*this, "palette")
 	{ }
 
@@ -196,9 +196,9 @@ public:
 	UINT8 mz2500_cg_latch_compare();
 	UINT8 mz2500_ram_read(UINT16 offset, UINT8 bank_num);
 	void mz2500_ram_write(UINT16 offset, UINT8 data, UINT8 bank_num);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mz2500);
 	UINT32 screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mz2500_vbl);

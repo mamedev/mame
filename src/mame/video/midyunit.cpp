@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Alex Pasadyn, Zsolt Vasvari, Kurt Mahan, Ernesto Corvi, Aaron Giles
+// license:BSD-3-Clause
+// copyright-holders:Alex Pasadyn, Zsolt Vasvari, Ernesto Corvi, Aaron Giles
+// thanks-to:Kurt Mahan
 /*************************************************************************
 
     Williams/Midway Y/Z-unit system
@@ -563,7 +564,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(midyunit_state::scanline_update)
 		dest[x] = m_pen_map[src[coladdr++ & 0x1ff]];
 
 	/* handle autoerase on the previous line */
-	autoerase_line(NULL, params->rowaddr - 1);
+	autoerase_line(nullptr, params->rowaddr - 1);
 
 	/* if this is the last update of the screen, set a timer to clear out the final line */
 	/* (since we update one behind) */

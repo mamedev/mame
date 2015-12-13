@@ -1150,9 +1150,9 @@ void tms32051_device::op_rete()
 	UINT16 pc = POP_STACK();
 	CHANGE_PC(pc);
 
-	m_st0.intm = 0;
-
 	restore_interrupt_context();
+
+	m_st0.intm = 0;
 
 	CYCLES(4);
 }
@@ -1675,7 +1675,7 @@ void tms32051_device::op_clrc_xf()
 
 void tms32051_device::op_idle()
 {
-	fatalerror("32051: unimplemented op idle at %08X\n", m_pc-1);
+	m_idle = true;
 }
 
 void tms32051_device::op_idle2()

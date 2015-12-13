@@ -187,8 +187,8 @@ private:
 	UINT8 *m_work_ram;
 	bool m_motor;
 	bool m_centronics_busy;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<z80_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
 	required_device<cassette_image_device> m_cass;
@@ -484,7 +484,7 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DEVICE_ADD("ext1", SPC1000_EXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(spc1000_exp, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(spc1000_exp, nullptr, false)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(spc1000_state, centronics_busy_w))

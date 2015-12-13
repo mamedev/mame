@@ -294,18 +294,18 @@ CPU68 PCB:
 
   JP2          /D-ST           /VBL
   JP3
-  
-*****************************  
+
+*****************************
 
 Winning Run / Winning Run Suzuka GP/ Winning Run 91
 Namco 1988-91
 
 These games run on Namco System 21 hardware. Note each set of PCBs for System 21 games are slightly different,
 with some common PCBs and some unique-to-that-game PCBs. This covers the Winning Run series.
-The PCBs are housed in a metal box. The front has a small filter board containing a 60-pin flat cable connector. 
-Underneath is a connector that plugs into PCB #3. 
-Inside at the bottom is a small MOTHER PCB containing 8 connectors where the PCBs plug in and the power input connector. 
-On Winning Run there is an additional PCB for the controls and cabinet motion. 
+The PCBs are housed in a metal box. The front has a small filter board containing a 60-pin flat cable connector.
+Underneath is a connector that plugs into PCB #3.
+Inside at the bottom is a small MOTHER PCB containing 8 connectors where the PCBs plug in and the power input connector.
+On Winning Run there is an additional PCB for the controls and cabinet motion.
 The PAL labels suggest it was originally used with Metal Hawk. It may be used with other games too.
 
 
@@ -514,9 +514,9 @@ Filter Board
 |                                |
 |-------|60-PIN FLAT CABLE|------|
         |-------CONN------|
-        
-****************************  
- 
+
+****************************
+
 */
 #include "emu.h"
 #include "cpu/m68000/m68000.h"

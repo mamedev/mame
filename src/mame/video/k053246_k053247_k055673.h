@@ -266,7 +266,7 @@ public:
 				pri,
 				zcode, alpha, drawmode,
 				gx_objzbuf, gx_shdzbuf,
-				0,0
+				0,nullptr
 				);
 
 		}
@@ -308,7 +308,7 @@ public:
 				nozoom,
 				0,
 				0, 0, 0,
-				0, 0,
+				nullptr, nullptr,
 				primask,whichtable
 				);
 
@@ -474,8 +474,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 private:
 
 
@@ -491,7 +491,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 //  virtual void device_reset();
 private:
 

@@ -101,7 +101,7 @@ READ8_MEMBER( trackfld_audio_device::hyperspt_sh_timer_r )
 {
 	UINT32 clock = m_audiocpu->total_cycles() / TIMER_RATE;
 
-	if (m_vlm != NULL)
+	if (m_vlm != nullptr)
 		return (clock & 0x3) | (m_vlm->bsy() ? 0x04 : 0);
 	else
 		return (clock & 0x3);

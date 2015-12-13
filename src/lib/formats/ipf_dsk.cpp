@@ -5,7 +5,8 @@
 
 const floppy_format_type FLOPPY_IPF_FORMAT = &floppy_image_format_creator<ipf_format>;
 
-ipf_format::ipf_format()
+ipf_format::ipf_format(): tinfos(nullptr), tcount(0), type(0), release(0), revision(0), encoder_type(0), 
+encoder_revision(0), origin(0), min_cylinder(0), max_cylinder(0), min_head(0), max_head(0), credit_day(0), credit_time(0)
 {
 }
 
@@ -88,7 +89,7 @@ bool ipf_format::parse(dynamic_buffer &data, floppy_image *image)
 	if(res)
 		res = generate_tracks(image);
 	global_free_array(tinfos);
-	tinfos = NULL;
+	tinfos = nullptr;
 	return res;
 }
 
@@ -118,9 +119,9 @@ bool ipf_format::parse_info(const UINT8 *info)
 ipf_format::track_info *ipf_format::get_index(UINT32 idx)
 {
 	if(idx > 1000)
-		return 0;
+		return nullptr;
 	if(idx >= tcount) {
-		track_info *ti1 = global_alloc_array_clear(track_info, idx+1);
+		auto ti1 = global_alloc_array_clear(track_info, idx+1);
 		memcpy(ti1, tinfos, tcount*sizeof(tinfos));
 		global_free_array(tinfos);
 		tcount = idx+1;

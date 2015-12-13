@@ -55,7 +55,7 @@ private:
 	UINT8 m_t_c;
 	UINT8 m_segment[7];
 	UINT8 *m_p_prom;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
 	required_device<dac_device> m_dac1;

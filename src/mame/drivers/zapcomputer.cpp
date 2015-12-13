@@ -44,7 +44,7 @@ public:
 
 private:
 	UINT8 decode7seg(UINT8 data);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 };
 

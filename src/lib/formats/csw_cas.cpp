@@ -110,9 +110,9 @@ static int csw_cas_to_wav_size( const UINT8 *casdata, int caslen )
 	d_stream.avail_out = 1;
 	d_stream.total_out=0;
 
-	d_stream.zalloc = 0;
-	d_stream.zfree = 0;
-	d_stream.opaque = 0;
+	d_stream.zalloc = nullptr;
+	d_stream.zfree = nullptr;
+	d_stream.opaque = nullptr;
 	d_stream.data_type=0;
 
 	err = inflateInit( &d_stream );
@@ -218,9 +218,9 @@ static int csw_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes )
 	d_stream.avail_out = 1;
 	d_stream.total_out=0;
 
-	d_stream.zalloc = 0;
-	d_stream.zfree = 0;
-	d_stream.opaque = 0;
+	d_stream.zalloc = nullptr;
+	d_stream.zfree = nullptr;
+	d_stream.opaque = nullptr;
 	d_stream.data_type=0;
 
 	err = inflateInit( &d_stream );
@@ -300,7 +300,7 @@ static const struct CassetteFormat csw_cassette_format = {
 	"csw",
 	csw_cassette_identify,
 	csw_cassette_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(csw_cassette_formats)

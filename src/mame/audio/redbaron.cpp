@@ -38,8 +38,8 @@ const device_type REDBARON = &device_creator<redbaron_sound_device>;
 redbaron_sound_device::redbaron_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, REDBARON, "Red Baron Audio Custom", tag, owner, clock, "redbaron_custom", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_vol_lookup(NULL),
-		m_channel(NULL),
+		m_vol_lookup(nullptr),
+		m_channel(nullptr),
 		m_latch(0),
 		m_poly_counter(0),
 		m_poly_shift(0),

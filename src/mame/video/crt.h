@@ -69,7 +69,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	crt_point *m_list; /* array of (crt_window_width*crt_window_height) point */

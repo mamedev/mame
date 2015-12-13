@@ -18,12 +18,12 @@ const device_type GEEBEE = &device_creator<geebee_sound_device>;
 geebee_sound_device::geebee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GEEBEE, "Gee Bee Audio Custom", tag, owner, clock, "geebee_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_decay(NULL),
-		m_channel(NULL),
+		m_decay(nullptr),
+		m_channel(nullptr),
 		m_sound_latch(0),
 		m_sound_signal(0),
 		m_volume(0),
-		m_volume_timer(NULL),
+		m_volume_timer(nullptr),
 		m_noise(0),
 		m_vcount(0)
 {

@@ -7,7 +7,7 @@ const device_type H8_PORT = &device_creator<h8_port_device>;
 
 h8_port_device::h8_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, H8_PORT, "H8 digital port", tag, owner, clock, "h8_digital_port", __FILE__),
-	cpu(*this, DEVICE_SELF_OWNER)
+	cpu(*this, DEVICE_SELF_OWNER), io(nullptr), address(0), default_ddr(0), ddr(0), pcr(0), odr(0), mask(0), dr(0), last_output(0)
 {
 }
 

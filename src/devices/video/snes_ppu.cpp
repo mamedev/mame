@@ -409,14 +409,14 @@ void snes_ppu_device::device_reset()
 	memset(&m_oam, 0, sizeof(m_oam));
 	memset(&m_mode7, 0, sizeof(m_mode7));
 
-	for (int i = 0; i < 2; i++)
+	for (auto & elem : m_scanlines)
 	{
-		m_scanlines[i].enable = 0;
-		m_scanlines[i].clip = 0;
-		memset(m_scanlines[i].buffer, 0, SNES_SCR_WIDTH);
-		memset(m_scanlines[i].priority, 0, SNES_SCR_WIDTH);
-		memset(m_scanlines[i].layer, 0, SNES_SCR_WIDTH);
-		memset(m_scanlines[i].blend_exception, 0, SNES_SCR_WIDTH);
+		elem.enable = 0;
+		elem.clip = 0;
+		memset(elem.buffer, 0, SNES_SCR_WIDTH);
+		memset(elem.priority, 0, SNES_SCR_WIDTH);
+		memset(elem.layer, 0, SNES_SCR_WIDTH);
+		memset(elem.blend_exception, 0, SNES_SCR_WIDTH);
 	}
 
 	for (int i = 0; i < 6; i++)
@@ -442,27 +442,27 @@ void snes_ppu_device::device_reset()
 		memset(m_clipmasks[i], 0, SNES_SCR_WIDTH);
 	}
 
-	for (int i = 0; i < ARRAY_LENGTH(m_oam_spritelist); i++)
+	for (auto & elem : m_oam_spritelist)
 	{
-		m_oam_spritelist[i].tile = 0;
-		m_oam_spritelist[i].x = 0;
-		m_oam_spritelist[i].y = 0;
-		m_oam_spritelist[i].size = 0;
-		m_oam_spritelist[i].vflip = 0;
-		m_oam_spritelist[i].hflip = 0;
-		m_oam_spritelist[i].priority_bits = 0;
-		m_oam_spritelist[i].pal = 0;
-		m_oam_spritelist[i].height = 0;
-		m_oam_spritelist[i].width = 0;
+		elem.tile = 0;
+		elem.x = 0;
+		elem.y = 0;
+		elem.size = 0;
+		elem.vflip = 0;
+		elem.hflip = 0;
+		elem.priority_bits = 0;
+		elem.pal = 0;
+		elem.height = 0;
+		elem.width = 0;
 	}
 
-	for (int i = 0; i < ARRAY_LENGTH(m_oam_tilelist); i++)
+	for (auto & elem : m_oam_tilelist)
 	{
-		m_oam_tilelist[i].x = 0;
-		m_oam_tilelist[i].priority = 0;
-		m_oam_tilelist[i].pal = 0;
-		m_oam_tilelist[i].tileaddr = 0;
-		m_oam_tilelist[i].hflip = 0;
+		elem.x = 0;
+		elem.priority = 0;
+		elem.pal = 0;
+		elem.tileaddr = 0;
+		elem.hflip = 0;
 	}
 }
 

@@ -20,8 +20,8 @@ class ui_menu_barcode_reader : public ui_menu_device_control<barcode_reader_devi
 public:
 	ui_menu_barcode_reader(running_machine &machine, render_container *container, barcode_reader_device *device);
 	virtual ~ui_menu_barcode_reader();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	char  m_barcode_buffer[20];

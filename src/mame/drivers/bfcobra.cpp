@@ -298,8 +298,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_DRIVER_INIT(bfcobra);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	INTERRUPT_GEN_MEMBER(vblank_gen);

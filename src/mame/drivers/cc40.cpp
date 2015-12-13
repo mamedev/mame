@@ -95,8 +95,8 @@ public:
 		m_key_matrix(*this, "IN"),
 		m_battery_inp(*this, "BATTERY")
 	{
-		m_sysram[0] = NULL;
-		m_sysram[1] = NULL;
+		m_sysram[0] = nullptr;
+		m_sysram[1] = nullptr;
 	}
 
 	required_device<tms70c20_device> m_maincpu;
@@ -140,8 +140,8 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(cc40);
 	DECLARE_INPUT_CHANGED_MEMBER(sysram_size_changed);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cc40_cartridge);
@@ -402,7 +402,7 @@ INPUT_CHANGED_MEMBER(cc40_state::sysram_size_changed)
 
 static INPUT_PORTS_START( cc40 )
 	PORT_START("RAMSIZE")
-	PORT_CONFNAME( 0x07, 0x01, "RAM Chip 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cc40_state, sysram_size_changed, (void *)0)
+	PORT_CONFNAME( 0x07, 0x01, "RAM Chip 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cc40_state, sysram_size_changed, (void *)nullptr)
 	PORT_CONFSETTING(    0x00, "None" )
 	PORT_CONFSETTING(    0x01, "2KB" )
 	PORT_CONFSETTING(    0x04, "8KB" )
@@ -520,7 +520,7 @@ void cc40_state::machine_reset()
 
 void cc40_state::init_sysram(int chip, UINT16 size)
 {
-	if (m_sysram[chip] == NULL)
+	if (m_sysram[chip] == nullptr)
 	{
 		// init to largest possible
 		m_sysram[chip] = auto_alloc_array(machine(), UINT8, 0x2000);

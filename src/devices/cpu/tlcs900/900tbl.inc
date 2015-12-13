@@ -5470,7 +5470,7 @@ void tlcs900h_device::_B8()
 void tlcs900h_device::_C0()
 {
 	const tlcs900inst *inst;
-	UINT32 *reg = NULL;
+	UINT32 *reg = nullptr;
 
 	switch ( m_op & 0x07 )
 	{
@@ -5599,7 +5599,7 @@ void tlcs900h_device::oC8()
 void tlcs900h_device::_D0()
 {
 	const tlcs900inst *inst;
-	UINT32 *reg = NULL;
+	UINT32 *reg = nullptr;
 
 	switch ( m_op & 0x07 )
 	{
@@ -5726,7 +5726,7 @@ void tlcs900h_device::oD8()
 void tlcs900h_device::_E0()
 {
 	const tlcs900inst *inst;
-	UINT32 *reg = NULL;
+	UINT32 *reg = nullptr;
 
 	switch ( m_op & 0x07 )
 	{
@@ -5851,7 +5851,7 @@ void tlcs900h_device::_E8()
 void tlcs900h_device::_F0()
 {
 	const tlcs900inst *inst;
-	UINT32 *reg = NULL;
+	UINT32 *reg = nullptr;
 
 	switch ( m_op & 0x07 )
 	{

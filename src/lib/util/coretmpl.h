@@ -25,41 +25,6 @@
 #endif
 
 
-// ======================> auto_pointer
-
-// an object that transparently wraps a pointer and auto-frees it upon destruction
-template<class _ElementType>
-class auto_pointer
-{
-private:
-	// we don't support deep copying
-	auto_pointer(const auto_pointer &);
-	auto_pointer &operator=(const auto_pointer &);
-
-public:
-	// construction/destruction
-	auto_pointer(_ElementType *value = NULL)
-		: m_ptr(value) { }
-	virtual ~auto_pointer() { reset(); }
-
-	// operators
-	operator _ElementType *() const { return m_ptr; }
-	_ElementType &operator*() const { assert(m_ptr != NULL); return *m_ptr; }
-	_ElementType *operator->() const { return m_ptr; }
-
-	// simple getters
-	_ElementType *get() const { return m_ptr; }
-
-	// core operations
-	void reset(_ElementType *ptr = NULL) { if (m_ptr != ptr) { global_free(m_ptr); m_ptr = ptr; } }
-
-private:
-	// internal state
-	_ElementType *  m_ptr;          // pointer we are tracking
-};
-
-
-
 typedef std::vector<UINT8> dynamic_buffer;
 
 
@@ -77,8 +42,8 @@ class simple_list
 public:
 	// construction/destruction
 	simple_list()
-		: m_head(NULL),
-			m_tail(NULL),
+		: m_head(nullptr),
+			m_tail(nullptr),
 			m_count(0) { }
 
 	virtual ~simple_list() { reset(); }
@@ -91,7 +56,7 @@ public:
 	// remove (free) all objects in the list, leaving an empty list
 	void reset()
 	{
-		while (m_head != NULL)
+		while (m_head != nullptr)
 			remove(*m_head);
 	}
 
@@ -100,7 +65,7 @@ public:
 	{
 		object.m_next = m_head;
 		m_head = &object;
-		if (m_tail == NULL)
+		if (m_tail == nullptr)
 			m_tail = m_head;
 		m_count++;
 		return object;
@@ -116,7 +81,7 @@ public:
 		_ElementType *head = list.detach_all();
 		tail->m_next = m_head;
 		m_head = head;
-		if (m_tail == NULL)
+		if (m_tail == nullptr)
 			m_tail = tail;
 		m_count += count;
 	}
@@ -124,8 +89,8 @@ public:
 	// add the given object to the tail of the list
 	_ElementType &append(_ElementType &object)
 	{
-		object.m_next = NULL;
-		if (m_tail != NULL)
+		object.m_next = nullptr;
+		if (m_tail != nullptr)
 			m_tail = m_tail->m_next = &object;
 		else
 			m_tail = m_head = &object;
@@ -141,7 +106,7 @@ public:
 			return;
 		_ElementType *tail = list.last();
 		_ElementType *head = list.detach_all();
-		if (m_tail != NULL)
+		if (m_tail != nullptr)
 			m_tail->m_next = head;
 		else
 			m_head = head;
@@ -152,7 +117,7 @@ public:
 	// insert the given object after a particular object (NULL means prepend)
 	_ElementType &insert_after(_ElementType &object, _ElementType *insert_after)
 	{
-		if (insert_after == NULL)
+		if (insert_after == nullptr)
 			return prepend(object);
 		object.m_next = insert_after->m_next;
 		insert_after->m_next = &object;
@@ -165,9 +130,9 @@ public:
 	// insert the given object before a particular object (NULL means append)
 	_ElementType &insert_before(_ElementType &object, _ElementType *insert_before)
 	{
-		if (insert_before == NULL)
+		if (insert_before == nullptr)
 			return append(object);
-		for (_ElementType **curptr = &m_head; *curptr != NULL; curptr = &(*curptr)->m_next)
+		for (_ElementType **curptr = &m_head; *curptr != nullptr; curptr = &(*curptr)->m_next)
 			if (*curptr == insert_before)
 			{
 				object.m_next = insert_before;
@@ -183,11 +148,11 @@ public:
 	// replace an item in the list at the same location, and remove it
 	_ElementType &replace_and_remove(_ElementType &object, _ElementType &toreplace)
 	{
-		_ElementType *prev = NULL;
-		for (_ElementType *cur = m_head; cur != NULL; prev = cur, cur = cur->m_next)
+		_ElementType *prev = nullptr;
+		for (_ElementType *cur = m_head; cur != nullptr; prev = cur, cur = cur->m_next)
 			if (cur == &toreplace)
 			{
-				if (prev != NULL)
+				if (prev != nullptr)
 					prev->m_next = &object;
 				else
 					m_head = &object;
@@ -204,12 +169,12 @@ public:
 	_ElementType *detach_head()
 	{
 		_ElementType *result = m_head;
-		if (result != NULL)
+		if (result != nullptr)
 		{
 			m_head = result->m_next;
 			m_count--;
-			if (m_head == NULL)
-				m_tail = NULL;
+			if (m_head == nullptr)
+				m_tail = nullptr;
 		}
 		return result;
 	}
@@ -217,11 +182,11 @@ public:
 	// detach the given item from the list, but don't free its memory
 	_ElementType &detach(_ElementType &object)
 	{
-		_ElementType *prev = NULL;
-		for (_ElementType *cur = m_head; cur != NULL; prev = cur, cur = cur->m_next)
+		_ElementType *prev = nullptr;
+		for (_ElementType *cur = m_head; cur != nullptr; prev = cur, cur = cur->m_next)
 			if (cur == &object)
 			{
-				if (prev != NULL)
+				if (prev != nullptr)
 					prev->m_next = object.m_next;
 				else
 					m_head = object.m_next;
@@ -237,7 +202,7 @@ public:
 	_ElementType *detach_all()
 	{
 		_ElementType *result = m_head;
-		m_head = m_tail = NULL;
+		m_head = m_tail = nullptr;
 		m_count = 0;
 		return result;
 	}
@@ -251,17 +216,17 @@ public:
 	// find an object by index in the list
 	_ElementType *find(int index) const
 	{
-		for (_ElementType *cur = m_head; cur != NULL; cur = cur->m_next)
+		for (_ElementType *cur = m_head; cur != nullptr; cur = cur->m_next)
 			if (index-- == 0)
 				return cur;
-		return NULL;
+		return nullptr;
 	}
 
 	// return the index of the given object in the list
 	int indexof(const _ElementType &object) const
 	{
 		int index = 0;
-		for (_ElementType *cur = m_head; cur != NULL; cur = cur->m_next)
+		for (_ElementType *cur = m_head; cur != nullptr; cur = cur->m_next)
 		{
 			if (cur == &object)
 				return index;
@@ -291,7 +256,7 @@ public:
 
 	// construction/destruction
 	simple_list_wrapper(_ObjectType *object)
-		: m_next(NULL),
+		: m_next(nullptr),
 			m_object(object) { }
 
 	// operators
@@ -329,13 +294,13 @@ public:
 	_ItemType *alloc()
 	{
 		_ItemType *result = m_freelist.detach_head();
-		if (result == NULL)
+		if (result == nullptr)
 			result = global_alloc(_ItemType);
 		return result;
 	}
 
 	// reclaim an item by adding it to the free list
-	void reclaim(_ItemType *item) { if (item != NULL) m_freelist.append(*item); }
+	void reclaim(_ItemType *item) { if (item != nullptr) m_freelist.append(*item); }
 	void reclaim(_ItemType &item) { m_freelist.append(item); }
 
 	// reclaim all items from a list

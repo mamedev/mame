@@ -737,7 +737,7 @@ void g65816_device::g65816_set_sp(unsigned val)
 unsigned g65816_device::g65816_get_reg(int regnum)
 {
 	/* Set the function tables to emulation mode if the FTABLE is NULL */
-	if( FTABLE_GET_REG == NULL )
+	if( FTABLE_GET_REG == nullptr )
 		g65816i_set_execution_mode(EXECUTION_MODE_E);
 
 	return (this->*FTABLE_GET_REG)(regnum);
@@ -813,11 +813,11 @@ void g65816_device::device_start()
 	m_wrdiv = 0;
 	m_dvdd = 0;
 	m_rddiv = 0;
-	m_opcodes = NULL;
-	m_get_reg = NULL;
-	m_set_reg = NULL;
-	m_set_line = NULL;
-	m_execute = NULL;
+	m_opcodes = nullptr;
+	m_get_reg = nullptr;
+	m_set_reg = nullptr;
+	m_set_line = nullptr;
+	m_execute = nullptr;
 	m_debugger_temp = 0;
 
 	m_program = &space(AS_PROGRAM);

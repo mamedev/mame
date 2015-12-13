@@ -1082,8 +1082,8 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 			get_tile_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16a_tile_info),this);
 			info->numpages = 4;
 			info->draw_layer = tilemap_16a_draw_layer;
-			info->reset = NULL;
-			info->latch_timer = NULL;
+			info->reset = nullptr;
+			info->latch_timer = nullptr;
 			break;
 
 		case SEGAIC16_TILEMAP_16A:
@@ -1091,8 +1091,8 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 			get_tile_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16a_tile_info),this);
 			info->numpages = 8;
 			info->draw_layer = tilemap_16a_draw_layer;
-			info->reset = NULL;
-			info->latch_timer = NULL;
+			info->reset = nullptr;
+			info->latch_timer = nullptr;
 			break;
 
 		case SEGAIC16_TILEMAP_16B:

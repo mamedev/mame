@@ -203,7 +203,7 @@ class xbox_base_state : public driver_device
 public:
 	xbox_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		nvidia_nv2a(NULL),
+		nvidia_nv2a(nullptr),
 		debug_irq_active(false),
 		debug_irq_number(0),
 		m_maincpu(*this, "maincpu") { }
@@ -241,7 +241,7 @@ public:
 	void vblank_callback(screen_device &screen, bool state);
 	UINT32 screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_WRITE_LINE_MEMBER(xbox_pic8259_1_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(xbox_pit8254_out0_changed);

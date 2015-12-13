@@ -96,7 +96,7 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_floppy0(*this, WD2797_TAG":0"),
 			m_floppy1(*this, WD2797_TAG":1"),
-			m_floppy(NULL),
+			m_floppy(nullptr),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_work_ram(*this, "work_ram"),
 			m_video_ram(*this, "video_ram")
@@ -118,10 +118,10 @@ public:
 	floppy_image_device *m_floppy;
 	required_device<centronics_device> m_centronics;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	MC6845_UPDATE_ROW(update_row);
@@ -312,7 +312,7 @@ void fp_state::lat_ls259_w(offs_t offset, int state)
 	{
 	case 0:
 		{
-			m_floppy = NULL;
+			m_floppy = nullptr;
 
 			if (state) m_floppy = m_floppy0->get_device();
 			else m_floppy = m_floppy1->get_device();
@@ -637,7 +637,7 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(I8237_TAG, am9517a_device, dreq1_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", fp_floppies, "d32w", fp_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", fp_floppies, NULL,   fp_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", fp_floppies, nullptr,   fp_state::floppy_formats)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fp_state, write_centronics_busy))

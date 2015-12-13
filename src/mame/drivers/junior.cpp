@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Robbbert, Manfred Schneider
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
+// thanks-to:Manfred Schneider
 /***************************************************************************
 
         Elektor Junior
@@ -48,8 +49,8 @@ public:
 	UINT8 m_port_a;
 	UINT8 m_port_b;
 	UINT8 m_led_time[6];
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(junior_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(junior_update_leds);
 	required_device<cpu_device> m_maincpu;

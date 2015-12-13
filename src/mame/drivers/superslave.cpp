@@ -287,7 +287,7 @@ static const z80_daisy_config superslave_daisy_chain[] =
 	{ Z80DART_0_TAG },
 	{ Z80DART_1_TAG },
 	{ Z80PIO_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 
@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( superslave, superslave_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80DART_0_TAG, z80dart_device, ctsa_w))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_0_TAG, z80dart_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80DART_0_TAG, z80dart_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80DART_0_TAG, z80dart_device, ctsb_w))
@@ -366,12 +366,12 @@ static MACHINE_CONFIG_START( superslave, superslave_state )
 	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_D_TAG, rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_RS232_PORT_ADD(RS232_C_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_C_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_1_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80DART_1_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80DART_1_TAG, z80dart_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD(RS232_D_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_D_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_1_TAG, z80dart_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80DART_1_TAG, z80dart_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80DART_1_TAG, z80dart_device, ctsb_w))

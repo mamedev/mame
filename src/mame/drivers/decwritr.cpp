@@ -48,7 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(la120_DC305_r);
 	DECLARE_WRITE8_MEMBER(la120_DC305_w);
 private:
-	virtual void machine_start();
+	virtual void machine_start() override;
 	//virtual void machine_reset();
 	ioport_port* m_col_array[16];
 	UINT8 m_led_array;

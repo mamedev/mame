@@ -118,8 +118,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(einstein2);
 	DECLARE_MACHINE_RESET(einstein2);
 	UINT32 screen_update_einstein2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -169,11 +169,11 @@ public:
 	einstein_keyboard_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 private:
-	virtual void device_start();
+	virtual void device_start() override;
 	// z80daisy_interface overrides
-	virtual int z80daisy_irq_state();
-	virtual int z80daisy_irq_ack();
-	virtual void z80daisy_irq_reti();
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
 };
 
 extern const device_type EINSTEIN_KEYBOARD_DAISY;
@@ -189,11 +189,11 @@ public:
 	einstein_adc_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 private:
-	virtual void device_start();
+	virtual void device_start() override;
 	// z80daisy_interface overrides
-	virtual int z80daisy_irq_state();
-	virtual int z80daisy_irq_ack();
-	virtual void z80daisy_irq_reti();
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
 
 };
 
@@ -209,11 +209,11 @@ public:
 	einstein_fire_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 private:
-	virtual void device_start();
+	virtual void device_start() override;
 	// z80daisy_interface overrides
-	virtual int z80daisy_irq_state();
-	virtual int z80daisy_irq_ack();
-	virtual void z80daisy_irq_reti();
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
 };
 
 extern const device_type EINSTEIN_FIRE_DAISY;

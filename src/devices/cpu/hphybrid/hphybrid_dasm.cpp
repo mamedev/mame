@@ -257,7 +257,7 @@ static const dis_entry_t dis_table[] = {
 		{0xff78 , 0x7970 , "WBC" , param_reg_id , 0 },
 		{0xff78 , 0x7978 , "WBD" , param_reg_id , 0 },
 		// *** END ***
-		{0 , 0 , NULL , NULL , 0 }
+		{0 , 0 , nullptr , nullptr , 0 }
 };
 
 CPU_DISASSEMBLE(hp_hybrid)

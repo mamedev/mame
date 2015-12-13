@@ -64,8 +64,8 @@ protected:
 	tia_video_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void draw_sprite_helper(UINT8* p, UINT8 *col, struct player_gfx *gfx, UINT8 GRP, UINT8 COLUP, UINT8 REFP);
 	void draw_missile_helper(UINT8* p, UINT8* col, int horz, int skipdelay, int latch, int start, UINT8 RESMP, UINT8 ENAM, UINT8 NUSIZ, UINT8 COLUM);
@@ -213,7 +213,7 @@ public:
 	DECLARE_PALETTE_INIT(tia_pal);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class tia_ntsc_video_device : public tia_video_device
@@ -224,7 +224,7 @@ public:
 	DECLARE_PALETTE_INIT(tia_ntsc);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 

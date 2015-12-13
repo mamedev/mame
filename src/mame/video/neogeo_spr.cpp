@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Bryan McPhail,Fuzz,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// thanks-to:Fuzz
 /* NeoGeo sprites (and fixed text layer) */
 
 #include "emu.h"
@@ -705,7 +706,7 @@ const device_type NEOGEO_SPRITE_OPTIMZIED = &device_creator<neosprite_optimized_
 
 neosprite_optimized_device::neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: neosprite_base_device(mconfig, tag, owner, clock, NEOGEO_SPRITE_OPTIMZIED),
-	m_spritegfx8(0)
+	m_spritegfx8(nullptr)
 {
 }
 

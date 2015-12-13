@@ -69,7 +69,7 @@ public:
 private:
 	UINT8 m_keydata;
 	UINT8 m_irq_mask;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<rs232_port_device> m_rs232;
@@ -400,7 +400,7 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	MCFG_NSC810_TIMER0_OUT(WRITELINE(hunter2_state,timer0_out))
 	MCFG_NSC810_TIMER1_OUT(WRITELINE(hunter2_state,timer1_out))
 
-	MCFG_RS232_PORT_ADD("serial",default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial",default_rs232_devices,nullptr)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(hunter2_state,cts_w))
 	MCFG_RS232_RXD_HANDLER(WRITELINE(hunter2_state,rxd_w))
 

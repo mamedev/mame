@@ -126,7 +126,7 @@ public:
 		m_desc = desc;
 	}
 
-	virtual void start()
+	virtual void start() override
 	{
 		pstring header = m_desc[0];
 
@@ -181,7 +181,7 @@ public:
 		save(NLNAME(m_active));
 	}
 
-	void reset()
+	void reset() override
 	{
 		m_active = 0;
 		m_ign = 0;
@@ -242,12 +242,12 @@ public:
 		}
 	}
 
-	ATTR_HOT void update()
+	ATTR_HOT void update() override
 	{
 		process<true>();
 	}
 
-	ATTR_HOT void inc_active()
+	ATTR_HOT void inc_active() override
 	{
 		nl_assert(netlist().use_deactivate());
 		if (has_state == 0)
@@ -257,7 +257,7 @@ public:
 			}
 	}
 
-	ATTR_HOT void dec_active()
+	ATTR_HOT void dec_active() override
 	{
 		nl_assert(netlist().use_deactivate());
 		/* FIXME:
@@ -321,7 +321,7 @@ public:
 			const pstring &def_param)
 	: netlist_base_factory_truthtable_t(name, classname, def_param) { }
 
-	device_t *Create()
+	device_t *Create() override
 	{
 		typedef nld_truthtable_t<m_NI, m_NO, has_state> tt_type;
 		device_t *r = palloc(tt_type(&m_ttbl, m_desc));

@@ -879,7 +879,7 @@ READ8_MEMBER(seibuspi_state::sound_fifo_status_r)
 	// d0: fifo full flag (z80)
 	// d1: fifo empty flag (main)
 	// other bits: unused?
-	int d1 = (m_soundfifo2 != NULL) ? m_soundfifo2->ef_r() << 1 : 0;
+	int d1 = (m_soundfifo2 != nullptr) ? m_soundfifo2->ef_r() << 1 : 0;
 	return d1 | m_soundfifo1->ff_r();
 }
 
@@ -1060,7 +1060,7 @@ READ8_MEMBER(seibuspi_state::z80_soundfifo_status_r)
 	// d0: fifo full flag (main)
 	// d1: fifo empty flag (z80)
 	// other bits: unused?
-	int d0 = (m_soundfifo2 != NULL) ? m_soundfifo2->ff_r() : 0;
+	int d0 = (m_soundfifo2 != nullptr) ? m_soundfifo2->ff_r() : 0;
 	return d0 | m_soundfifo1->ef_r() << 1;
 }
 
@@ -1767,7 +1767,7 @@ IRQ_CALLBACK_MEMBER(seibuspi_state::spi_irq_callback)
 
 void seibuspi_state::init_spi_common()
 {
-	if (m_z80_rom != NULL)
+	if (m_z80_rom != nullptr)
 		membank("bank1")->configure_entries(0, 8, m_z80_rom->base(), 0x8000);
 }
 
@@ -1806,7 +1806,7 @@ void seibuspi_state::machine_start()
 	save_item(NAME(m_z80_lastbank));
 	save_item(NAME(m_sb_coin_latch));
 	save_item(NAME(m_ejsakura_input_port));
-	if (m_z80_rom != NULL) save_pointer(NAME(m_z80_rom->base()), m_z80_rom->bytes());
+	if (m_z80_rom != nullptr) save_pointer(NAME(m_z80_rom->base()), m_z80_rom->bytes());
 }
 
 MACHINE_RESET_MEMBER(seibuspi_state,spi)

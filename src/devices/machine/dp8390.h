@@ -49,12 +49,12 @@ public:
 	DECLARE_READ16_MEMBER( dp8390_r );
 	DECLARE_WRITE_LINE_MEMBER( dp8390_cs );
 	DECLARE_WRITE_LINE_MEMBER( dp8390_reset );
-	void recv_cb(UINT8 *buf, int len);
+	void recv_cb(UINT8 *buf, int len) override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	int m_type;
 

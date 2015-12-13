@@ -191,9 +191,9 @@ qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, dev
 		m_out_p2_cb(*this),
 		m_out_p3_cb(*this),
 		//m_serial_w_cb(*this),
-		m_space_config("samples", ENDIANNESS_LITTLE, 8, 24, 0, NULL),
-		m_stream(NULL),
-		m_direct(NULL),
+		m_space_config("samples", ENDIANNESS_LITTLE, 8, 24, 0, nullptr),
+		m_stream(nullptr),
+		m_direct(nullptr),
 		m_cpu(*this, "cpu")
 {
 	m_address_map[0] = *ADDRESS_MAP_NAME(qs1000);
@@ -206,7 +206,7 @@ qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 const rom_entry *qs1000_device::device_rom_region() const
 {
-	return m_external_rom ? NULL : ROM_NAME( qs1000 );
+	return m_external_rom ? nullptr : ROM_NAME( qs1000 );
 }
 
 
@@ -305,9 +305,9 @@ READ8_MEMBER(qs1000_device::data_to_i8052)
 //-------------------------------------------------
 void qs1000_device::device_reset()
 {
-	for (int ch = 0; ch < QS1000_CHANNELS; ++ch)
+	for (auto & elem : m_channels)
 	{
-		m_channels[ch].m_flags = 0;
+		elem.m_flags = 0;
 	}
 }
 
@@ -318,7 +318,7 @@ void qs1000_device::device_reset()
 //-------------------------------------------------
 const address_space_config *qs1000_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 
@@ -486,9 +486,9 @@ void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	memset(outputs[1], 0x0, samples * sizeof(*outputs[1]));
 
 	// Iterate over voices and accumulate sample data
-	for (int ch = 0; ch < QS1000_CHANNELS; ch++)
+	for (auto & chan : m_channels)
 	{
-		qs1000_channel &chan = m_channels[ch];
+		
 
 		UINT8 lvol = chan.m_regs[6];
 		UINT8 rvol = chan.m_regs[7];

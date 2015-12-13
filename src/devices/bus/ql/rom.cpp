@@ -81,7 +81,7 @@ bool ql_rom_cartridge_slot_t::call_load()
 	{
 		size_t size = 0;
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			size = length();
 

@@ -28,7 +28,7 @@ const device_type MB3773 = &device_creator<mb3773_device>;
 //-------------------------------------------------
 
 mb3773_device::mb3773_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
-	: device_t(mconfig, MB3773, "MB3773 Power Supply Monitor", tag, owner, clock, "mb3773", __FILE__)
+	: device_t(mconfig, MB3773, "MB3773 Power Supply Monitor", tag, owner, clock, "mb3773", __FILE__), m_watchdog_timer(nullptr), m_ck(0)
 {
 }
 

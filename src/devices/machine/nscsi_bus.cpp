@@ -6,7 +6,7 @@ const device_type NSCSI_BUS = &device_creator<nscsi_bus_device>;
 const device_type NSCSI_CONNECTOR = &device_creator<nscsi_connector>;
 
 nscsi_bus_device::nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, NSCSI_BUS, "NSCSI Bus", tag, owner, clock, "nscsi_bus", __FILE__)
+	device_t(mconfig, NSCSI_BUS, "NSCSI Bus", tag, owner, clock, "nscsi_bus", __FILE__), data(0), ctrl(0)
 {
 	devcnt = 0;
 	memset(dev, 0, sizeof(dev));
@@ -156,7 +156,7 @@ nscsi_device::nscsi_device(const machine_config &mconfig, device_type type, cons
 	device_slot_card_interface(mconfig, *this)
 {
 	scsi_id = scsi_refid = -1;
-	scsi_bus = 0;
+	scsi_bus = nullptr;
 }
 
 void nscsi_device::connect_to_bus(nscsi_bus_device *bus, int refid, int default_scsi_id)

@@ -13,7 +13,7 @@ const device_type TC0180VCU = &device_creator<tc0180vcu_device>;
 
 tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0180VCU, "Taito TC0180VCU", tag, owner, clock, "tc0180vcu", __FILE__),
-	m_ram(NULL),
+	m_ram(nullptr),
 	//m_scrollram(NULL),
 	//m_bg_rambank(0),
 	//m_fg_rambank(0),

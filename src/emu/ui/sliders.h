@@ -17,10 +17,10 @@ class ui_menu_sliders : public ui_menu {
 public:
 	ui_menu_sliders(running_machine &machine, render_container *container, bool menuless_mode = false);
 	virtual ~ui_menu_sliders();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 	static UINT32 ui_handler(running_machine &machine, render_container *container, UINT32 state);
 

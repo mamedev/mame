@@ -74,12 +74,12 @@ void dc_controller_device::fixed_status(UINT32 *dest)
 {
 	dest[0] = 0x20000000; // Controller
 	dest[1] =
-		((port[2] != NULL) ? 0x010000 : 0) |
-		((port[3] != NULL) ? 0x020000 : 0) |
-		((port[4] != NULL) ? 0x040000 : 0) |
-		((port[5] != NULL) ? 0x080000 : 0) |
-		((port[6] != NULL) ? 0x100000 : 0) |
-		((port[7] != NULL) ? 0x200000 : 0) |
+		((port[2] != nullptr) ? 0x010000 : 0) |
+		((port[3] != nullptr) ? 0x020000 : 0) |
+		((port[4] != nullptr) ? 0x040000 : 0) |
+		((port[5] != nullptr) ? 0x080000 : 0) |
+		((port[6] != nullptr) ? 0x100000 : 0) |
+		((port[7] != nullptr) ? 0x200000 : 0) |
 		((port[0] ? port[0]->active() : 0) << 8) |
 		(port[1] ? port[1]->active() : 0); // 1st function - controller
 	dest[2] = 0; // No 2nd function

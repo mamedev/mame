@@ -588,7 +588,7 @@ static MACHINE_CONFIG_START( pc8401a, pc8401a_state )
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 
@@ -596,11 +596,11 @@ static MACHINE_CONFIG_START( pc8401a, pc8401a_state )
 	MCFG_FRAGMENT_ADD(pc8401a_video)
 
 	/* option ROM cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* I/O ROM cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("io_cart", generic_linear_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD("io_cart", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* internal ram */
@@ -630,7 +630,7 @@ static MACHINE_CONFIG_START( pc8500, pc8500_state )
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 
@@ -638,11 +638,11 @@ static MACHINE_CONFIG_START( pc8500, pc8500_state )
 	MCFG_FRAGMENT_ADD(pc8500_video)
 
 	/* option ROM cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* I/O ROM cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("io_cart", generic_linear_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD("io_cart", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* internal ram */

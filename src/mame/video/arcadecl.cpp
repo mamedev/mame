@@ -56,7 +56,7 @@ const atari_motion_objects_config arcadecl_state::s_mob_config =
 
 VIDEO_START_MEMBER(arcadecl_state,arcadecl)
 {
-	if (m_mob != NULL)
+	if (m_mob != nullptr)
 		m_mob->set_scroll(-12, 0x110);
 }
 
@@ -71,17 +71,17 @@ VIDEO_START_MEMBER(arcadecl_state,arcadecl)
 UINT32 arcadecl_state::screen_update_arcadecl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// start drawing
-	if (m_mob != NULL)
+	if (m_mob != nullptr)
 		m_mob->draw_async(cliprect);
 
 	// draw the playfield
 	arcadecl_bitmap_render(bitmap, cliprect);
 
 	// draw and merge the MO
-	if (m_mob != NULL)
+	if (m_mob != nullptr)
 	{
 		bitmap_ind16 &mobitmap = m_mob->bitmap();
-		for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+		for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 			for (int y = rect->min_y; y <= rect->max_y; y++)
 			{
 				UINT16 *mo = &mobitmap.pix16(y);

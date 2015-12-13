@@ -33,9 +33,9 @@ enum
 };
 
 geneve_memex_device::geneve_memex_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: ti_expansion_card_device(mconfig, TI99_MEMEX, "Geneve memory expansion card", tag, owner, clock, "ti99_memex", __FILE__), 
-  m_ram(nullptr), 
-  m_genmod(0)
+: ti_expansion_card_device(mconfig, TI99_MEMEX, "Geneve memory expansion card", tag, owner, clock, "ti99_memex", __FILE__),
+	m_ram(nullptr),
+	m_genmod(0)
 {
 }
 
@@ -125,9 +125,9 @@ void geneve_memex_device::device_reset()
 {
 	UINT8 dips = ioport("MEMEXDIPS")->read();
 	if (VERBOSE>5) LOG("geneve: memex dips = %02x\n", dips);
-	for (int i=0; i < 8; i++)
+	for (auto & elem : m_dip_switch)
 	{
-		m_dip_switch[i] = ((dips & 0x01)!=0x00);
+		elem = ((dips & 0x01)!=0x00);
 		dips = dips >> 1;
 	}
 }

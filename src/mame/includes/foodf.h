@@ -28,7 +28,7 @@ public:
 
 	UINT8           m_whichport;
 	required_shared_ptr<UINT16> m_spriteram;
-	virtual void update_interrupts();
+	virtual void update_interrupts() override;
 	DECLARE_WRITE16_MEMBER(nvram_recall_w);
 	DECLARE_WRITE8_MEMBER(digital_w);
 	DECLARE_READ16_MEMBER(analog_r);

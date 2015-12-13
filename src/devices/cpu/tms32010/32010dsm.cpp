@@ -153,7 +153,7 @@ static const char *const TMS32010Formats[] = {
 	FMT("1111110100000000bbbbbbbbbbbbbbbb", "bgez %B"),
 	FMT("1111111000000000bbbbbbbbbbbbbbbb", "bnz  %B"),
 	FMT("1111111100000000bbbbbbbbbbbbbbbb", "bz   %B"),
-	NULL
+	nullptr
 };
 
 #define MAX_OPS ((ARRAY_LENGTH(TMS32010Formats) - 1) / PTRS_PER_FORMAT)

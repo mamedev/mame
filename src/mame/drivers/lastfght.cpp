@@ -127,9 +127,9 @@ public:
 	DECLARE_READ16_MEMBER(lastfght_sound_r);
 	DECLARE_WRITE16_MEMBER(lastfght_sound_w);
 	DECLARE_DRIVER_INIT(lastfght);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_lastfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

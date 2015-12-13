@@ -163,7 +163,7 @@ void bbusters_state::draw_block(bitmap_ind16 &dest,int x,int y,int size,int flip
 		if (dy>=16 && dy<240) {
 			UINT16 *destline = &dest.pix16(dy);
 			UINT8 srcline=*m_scale_table_ptr;
-			const UINT8 *srcptr=0;
+			const UINT8 *srcptr=nullptr;
 
 			if (!flipy)
 				srcline=size-srcline-1;

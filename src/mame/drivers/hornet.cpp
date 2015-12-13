@@ -412,8 +412,8 @@ public:
 
 	DECLARE_DRIVER_INIT(hornet);
 	DECLARE_DRIVER_INIT(hornet_2board);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(hornet_2board);
 	UINT32 screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -652,7 +652,7 @@ WRITE32_MEMBER(hornet_state::comm_rombank_w)
 {
 	int bank = data >> 24;
 	UINT8 *usr3 = memregion("user3")->base();
-	if (usr3 != NULL)
+	if (usr3 != nullptr)
 		membank("bank1")->set_entry(bank & 0x7f);
 }
 
@@ -948,7 +948,7 @@ void hornet_state::machine_reset()
 {
 	UINT8 *usr3 = memregion("user3")->base();
 	UINT8 *usr5 = memregion("user5")->base();
-	if (usr3 != NULL)
+	if (usr3 != nullptr)
 	{
 		membank("bank1")->configure_entries(0, memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
 		membank("bank1")->set_entry(0);
@@ -1041,7 +1041,7 @@ MACHINE_RESET_MEMBER(hornet_state,hornet_2board)
 	UINT8 *usr3 = memregion("user3")->base();
 	UINT8 *usr5 = memregion("user5")->base();
 
-	if (usr3 != NULL)
+	if (usr3 != nullptr)
 	{
 		membank("bank1")->configure_entries(0, memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
 		membank("bank1")->set_entry(0);

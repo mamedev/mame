@@ -43,8 +43,8 @@ public:
 	required_ioport_array<16> m_keyboard;
 	required_ioport m_battery_status;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(alphasmart);
 	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -77,7 +77,7 @@ public:
 
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_WRITE8_MEMBER(port_a_w);
+	virtual DECLARE_WRITE8_MEMBER(port_a_w) override;
 
 private:
 	UINT8 m_lcd_ctrl;

@@ -58,7 +58,7 @@ public:
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER( port10_w );
 	DECLARE_WRITE8_MEMBER( port30_w );

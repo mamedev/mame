@@ -46,7 +46,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(sid_r);
 	UINT8 m_prev_key;
 	UINT8 m_count_key;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 protected:
 	required_ioport m_line0;

@@ -210,9 +210,9 @@ public:
 												UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right, int bg_map_num);
 	UINT8 display_world(int num, bitmap_ind16 &bitmap, const rectangle &cliprect, bool right, int &cur_spt);
 	void m_set_brightness(void);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(vboy);
 	UINT32 screen_update_vboy_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_vboy_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1375,7 +1375,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* cartridge */
-	MCFG_VBOY_CARTRIDGE_ADD("cartslot", vboy_cart, NULL)
+	MCFG_VBOY_CARTRIDGE_ADD("cartslot", vboy_cart, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vboy")

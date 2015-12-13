@@ -78,7 +78,7 @@ const gfx_layout mcr_sprite_layout =
 const z80_daisy_config mcr_daisy_chain[] =
 {
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 
@@ -88,7 +88,7 @@ const z80_daisy_config mcr_ipu_daisy_chain[] =
 	{ "ipu_pio1" },
 	{ "ipu_sio" },
 	{ "ipu_pio0" },
-	{ NULL }
+	{ nullptr }
 };
 
 

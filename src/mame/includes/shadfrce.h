@@ -77,7 +77,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg0tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1tile_info);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 

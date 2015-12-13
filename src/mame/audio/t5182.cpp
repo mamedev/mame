@@ -212,7 +212,7 @@ TIMER_CALLBACK_MEMBER( t5182_device::setirq_callback )
 			break;
 	}
 
-	if (m_ourcpu == NULL)
+	if (m_ourcpu == nullptr)
 		return;
 
 	if (m_irqstate == 0)  /* no IRQs pending */

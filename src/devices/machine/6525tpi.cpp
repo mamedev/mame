@@ -132,9 +132,9 @@ tpi6525_device::tpi6525_device(const machine_config &mconfig, const char *tag, d
 	m_cr(0),
 	m_air(0)
 {
-	for (int i = 0; i < 5; i++)
+	for (auto & elem : m_irq_level)
 	{
-		m_irq_level[i] = 0;
+		elem = 0;
 	}
 }
 

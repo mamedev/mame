@@ -91,7 +91,7 @@ public:
 			m_joy(*this, "JOY")
 	{ }
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

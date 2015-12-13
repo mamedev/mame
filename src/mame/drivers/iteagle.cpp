@@ -124,8 +124,8 @@ public:
 
 	required_device<mips3_device> m_maincpu;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 void iteagle_state::machine_start()

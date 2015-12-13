@@ -173,8 +173,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_DRIVER_INIT(kinst);
 	DECLARE_DRIVER_INIT(kinst2);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq0_start);
 	required_device<mips3_device> m_maincpu;
@@ -182,7 +182,7 @@ public:
 	required_device<dcs_audio_2k_device> m_dcs;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -679,7 +679,7 @@ static MACHINE_CONFIG_START( kinst, kinst_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kinst_state,  irq0_start)
 
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(kinst_state, ide_interrupt))
 
 	/* video hardware */

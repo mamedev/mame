@@ -30,7 +30,7 @@ public:
 	UINT8 m_vga_address;
 
 	DECLARE_DRIVER_INIT(photoply);
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 
@@ -125,7 +125,7 @@ static MACHINE_CONFIG_START( photoply, photoply_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", photoply )
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

@@ -471,7 +471,7 @@ static void printf_chunk_recursive(avi_file *file, avi_chunk *chunk, int indent)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE UINT16 fetch_16bits(const UINT8 *data)
+ * @fn  static inline UINT16 fetch_16bits(const UINT8 *data)
  *
  * @brief   Fetches the 16bits.
  *
@@ -480,7 +480,7 @@ static void printf_chunk_recursive(avi_file *file, avi_chunk *chunk, int indent)
  * @return  The 16bits.
  */
 
-INLINE UINT16 fetch_16bits(const UINT8 *data)
+static inline UINT16 fetch_16bits(const UINT8 *data)
 {
 	return data[0] | (data[1] << 8);
 }
@@ -492,7 +492,7 @@ INLINE UINT16 fetch_16bits(const UINT8 *data)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE UINT32 fetch_32bits(const UINT8 *data)
+ * @fn  static inline UINT32 fetch_32bits(const UINT8 *data)
  *
  * @brief   Fetches the 32bits.
  *
@@ -501,7 +501,7 @@ INLINE UINT16 fetch_16bits(const UINT8 *data)
  * @return  The 32bits.
  */
 
-INLINE UINT32 fetch_32bits(const UINT8 *data)
+static inline UINT32 fetch_32bits(const UINT8 *data)
 {
 	return data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
 }
@@ -513,7 +513,7 @@ INLINE UINT32 fetch_32bits(const UINT8 *data)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE UINT64 fetch_64bits(const UINT8 *data)
+ * @fn  static inline UINT64 fetch_64bits(const UINT8 *data)
  *
  * @brief   Fetches the 64bits.
  *
@@ -522,7 +522,7 @@ INLINE UINT32 fetch_32bits(const UINT8 *data)
  * @return  The 64bits.
  */
 
-INLINE UINT64 fetch_64bits(const UINT8 *data)
+static inline UINT64 fetch_64bits(const UINT8 *data)
 {
 	return (UINT64)data[0] | ((UINT64)data[1] << 8) |
 			((UINT64)data[2] << 16) | ((UINT64)data[3] << 24) |
@@ -537,7 +537,7 @@ INLINE UINT64 fetch_64bits(const UINT8 *data)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE void put_16bits(UINT8 *data, UINT16 value)
+ * @fn  static inline void put_16bits(UINT8 *data, UINT16 value)
  *
  * @brief   Puts the 16bits.
  *
@@ -545,7 +545,7 @@ INLINE UINT64 fetch_64bits(const UINT8 *data)
  * @param   value           The value.
  */
 
-INLINE void put_16bits(UINT8 *data, UINT16 value)
+static inline void put_16bits(UINT8 *data, UINT16 value)
 {
 	data[0] = value >> 0;
 	data[1] = value >> 8;
@@ -558,7 +558,7 @@ INLINE void put_16bits(UINT8 *data, UINT16 value)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE void put_32bits(UINT8 *data, UINT32 value)
+ * @fn  static inline void put_32bits(UINT8 *data, UINT32 value)
  *
  * @brief   Puts the 32bits.
  *
@@ -566,7 +566,7 @@ INLINE void put_16bits(UINT8 *data, UINT16 value)
  * @param   value           The value.
  */
 
-INLINE void put_32bits(UINT8 *data, UINT32 value)
+static inline void put_32bits(UINT8 *data, UINT32 value)
 {
 	data[0] = value >> 0;
 	data[1] = value >> 8;
@@ -581,7 +581,7 @@ INLINE void put_32bits(UINT8 *data, UINT32 value)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE void put_64bits(UINT8 *data, UINT64 value)
+ * @fn  static inline void put_64bits(UINT8 *data, UINT64 value)
  *
  * @brief   Puts the 64bits.
  *
@@ -589,7 +589,7 @@ INLINE void put_32bits(UINT8 *data, UINT32 value)
  * @param   value           The value.
  */
 
-INLINE void put_64bits(UINT8 *data, UINT64 value)
+static inline void put_64bits(UINT8 *data, UINT64 value)
 {
 	data[0] = value >> 0;
 	data[1] = value >> 8;
@@ -608,7 +608,7 @@ INLINE void put_64bits(UINT8 *data, UINT64 value)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE avi_stream *get_video_stream(avi_file *file)
+ * @fn  static inline avi_stream *get_video_stream(avi_file *file)
  *
  * @brief   Gets video stream.
  *
@@ -617,7 +617,7 @@ INLINE void put_64bits(UINT8 *data, UINT64 value)
  * @return  null if it fails, else the video stream.
  */
 
-INLINE avi_stream *get_video_stream(avi_file *file)
+static inline avi_stream *get_video_stream(avi_file *file)
 {
 	int streamnum;
 
@@ -626,7 +626,7 @@ INLINE avi_stream *get_video_stream(avi_file *file)
 		if (file->stream[streamnum].type == STREAMTYPE_VIDS)
 			return &file->stream[streamnum];
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -636,7 +636,7 @@ INLINE avi_stream *get_video_stream(avi_file *file)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE avi_stream *get_audio_stream(avi_file *file, int channel, int *offset)
+ * @fn  static inline avi_stream *get_audio_stream(avi_file *file, int channel, int *offset)
  *
  * @brief   Gets audio stream.
  *
@@ -647,7 +647,7 @@ INLINE avi_stream *get_video_stream(avi_file *file)
  * @return  null if it fails, else the audio stream.
  */
 
-INLINE avi_stream *get_audio_stream(avi_file *file, int channel, int *offset)
+static inline avi_stream *get_audio_stream(avi_file *file, int channel, int *offset)
 {
 	int streamnum;
 
@@ -657,14 +657,14 @@ INLINE avi_stream *get_audio_stream(avi_file *file, int channel, int *offset)
 		{
 			if (channel < file->stream[streamnum].channels)
 			{
-				if (offset != NULL)
+				if (offset != nullptr)
 					*offset = channel;
 				return &file->stream[streamnum];
 			}
 			channel -= file->stream[streamnum].channels;
 		}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -674,7 +674,7 @@ INLINE avi_stream *get_audio_stream(avi_file *file, int channel, int *offset)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 offset, UINT32 length)
+ * @fn  static inline avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 offset, UINT32 length)
  *
  * @brief   Sets stream chunk information.
  *
@@ -686,16 +686,16 @@ INLINE avi_stream *get_audio_stream(avi_file *file, int channel, int *offset)
  * @return  An avi_error.
  */
 
-INLINE avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 offset, UINT32 length)
+static inline avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 offset, UINT32 length)
 {
 	/* if we need to allocate more, allocate more */
 	if (index >= stream->chunksalloc)
 	{
 		UINT32 newcount = MAX(index, stream->chunksalloc + 1000);
 		avi_chunk_list *newchunks = (avi_chunk_list *)malloc(newcount * sizeof(stream->chunk[0]));
-		if (newchunks == NULL)
+		if (newchunks == nullptr)
 			return AVIERR_NO_MEMORY;
-		if (stream->chunk != NULL)
+		if (stream->chunk != nullptr)
 		{
 			memcpy(newchunks, stream->chunk, stream->chunksalloc * sizeof(stream->chunk[0]));
 			free(stream->chunk);
@@ -720,7 +720,7 @@ INLINE avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE UINT32 compute_idx1_size(avi_file *file)
+ * @fn  static inline UINT32 compute_idx1_size(avi_file *file)
  *
  * @brief   Calculates the index 1 size.
  *
@@ -729,7 +729,7 @@ INLINE avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 
  * @return  The calculated index 1 size.
  */
 
-INLINE UINT32 compute_idx1_size(avi_file *file)
+static inline UINT32 compute_idx1_size(avi_file *file)
 {
 	int chunks = 0;
 	int strnum;
@@ -748,7 +748,7 @@ INLINE UINT32 compute_idx1_size(avi_file *file)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE UINT32 get_chunkid_for_stream(avi_file *file, avi_stream *stream)
+ * @fn  static inline UINT32 get_chunkid_for_stream(avi_file *file, avi_stream *stream)
  *
  * @brief   Gets chunkid for stream.
  *
@@ -758,7 +758,7 @@ INLINE UINT32 compute_idx1_size(avi_file *file)
  * @return  The chunkid for stream.
  */
 
-INLINE UINT32 get_chunkid_for_stream(avi_file *file, avi_stream *stream)
+static inline UINT32 get_chunkid_for_stream(avi_file *file, avi_stream *stream)
 {
 	UINT32 chunkid;
 
@@ -778,7 +778,7 @@ INLINE UINT32 get_chunkid_for_stream(avi_file *file, avi_stream *stream)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE UINT32 framenum_to_samplenum(avi_file *file, UINT32 framenum)
+ * @fn  static inline UINT32 framenum_to_samplenum(avi_file *file, UINT32 framenum)
  *
  * @brief   Framenum to samplenum.
  *
@@ -788,7 +788,7 @@ INLINE UINT32 get_chunkid_for_stream(avi_file *file, avi_stream *stream)
  * @return  An UINT32.
  */
 
-INLINE UINT32 framenum_to_samplenum(avi_file *file, UINT32 framenum)
+static inline UINT32 framenum_to_samplenum(avi_file *file, UINT32 framenum)
 {
 	return ((UINT64)file->info.audio_samplerate * (UINT64)framenum * (UINT64)file->info.video_sampletime + file->info.video_timescale - 1) / (UINT64)file->info.video_timescale;
 }
@@ -801,7 +801,7 @@ INLINE UINT32 framenum_to_samplenum(avi_file *file, UINT32 framenum)
 -------------------------------------------------*/
 
 /**
- * @fn  INLINE avi_error expand_tempbuffer(avi_file *file, UINT32 length)
+ * @fn  static inline avi_error expand_tempbuffer(avi_file *file, UINT32 length)
  *
  * @brief   Expand tempbuffer.
  *
@@ -811,16 +811,16 @@ INLINE UINT32 framenum_to_samplenum(avi_file *file, UINT32 framenum)
  * @return  An avi_error.
  */
 
-INLINE avi_error expand_tempbuffer(avi_file *file, UINT32 length)
+static inline avi_error expand_tempbuffer(avi_file *file, UINT32 length)
 {
 	/* expand the tempbuffer to hold the data if necessary */
 	if (length > file->tempbuffersize)
 	{
 		file->tempbuffersize = 2 * length;
 		UINT8 *newbuffer = (UINT8 *)malloc(file->tempbuffersize);
-		if (newbuffer == NULL)
+		if (newbuffer == nullptr)
 			return AVIERR_NO_MEMORY;
-		if (file->tempbuffer != NULL)
+		if (file->tempbuffer != nullptr)
 			free(file->tempbuffer);
 		file->tempbuffer = newbuffer;
 	}
@@ -850,14 +850,14 @@ INLINE avi_error expand_tempbuffer(avi_file *file, UINT32 length)
 
 avi_error avi_open(const char *filename, avi_file **file)
 {
-	avi_file *newfile = NULL;
+	avi_file *newfile = nullptr;
 	file_error filerr;
 	avi_error avierr;
 	UINT64 length;
 
 	/* allocate the file */
 	newfile = (avi_file *)malloc(sizeof(*newfile));
-	if (newfile == NULL)
+	if (newfile == nullptr)
 		return AVIERR_NO_MEMORY;
 	memset(newfile, 0, sizeof(*newfile));
 	newfile->type = FILETYPE_READ;
@@ -886,9 +886,9 @@ avi_error avi_open(const char *filename, avi_file **file)
 
 error:
 	/* clean up after an error */
-	if (newfile != NULL)
+	if (newfile != nullptr)
 	{
-		if (newfile->file != NULL)
+		if (newfile->file != nullptr)
 			osd_close(newfile->file);
 		free(newfile);
 	}
@@ -914,7 +914,7 @@ error:
 
 avi_error avi_create(const char *filename, const avi_movie_info *info, avi_file **file)
 {
-	avi_file *newfile = NULL;
+	avi_file *newfile = nullptr;
 	file_error filerr;
 	avi_stream *stream;
 	avi_error avierr;
@@ -935,7 +935,7 @@ avi_error avi_create(const char *filename, const avi_movie_info *info, avi_file 
 
 	/* allocate the file */
 	newfile = (avi_file *)malloc(sizeof(*newfile));
-	if (newfile == NULL)
+	if (newfile == nullptr)
 		return AVIERR_NO_MEMORY;
 	memset(newfile, 0, sizeof(*newfile));
 	newfile->type = FILETYPE_CREATE;
@@ -955,7 +955,7 @@ avi_error avi_create(const char *filename, const avi_movie_info *info, avi_file 
 
 	/* allocate two streams */
 	newfile->stream = (avi_stream *)malloc(2 * sizeof(newfile->stream[0]));
-	if (newfile->stream == NULL)
+	if (newfile->stream == nullptr)
 	{
 		avierr = AVIERR_NO_MEMORY;
 		goto error;
@@ -1000,11 +1000,11 @@ avi_error avi_create(const char *filename, const avi_movie_info *info, avi_file 
 
 error:
 	/* clean up after an error */
-	if (newfile != NULL)
+	if (newfile != nullptr)
 	{
-		if (newfile->stream != NULL)
+		if (newfile->stream != nullptr)
 			free(newfile->stream);
-		if (newfile->file != NULL)
+		if (newfile->file != nullptr)
 		{
 			osd_close(newfile->file);
 			osd_rmfile(filename);
@@ -1073,26 +1073,26 @@ avi_error avi_close(avi_file *file)
 	for (strnum = 0; strnum < file->streams; strnum++)
 	{
 		avi_stream *stream = &file->stream[strnum];
-		if (stream->huffyuv != NULL)
+		if (stream->huffyuv != nullptr)
 		{
 			huffyuv_data *huffyuv = stream->huffyuv;
 			int table;
 
 			for (table = 0; table < ARRAY_LENGTH(huffyuv->table); table++)
-				if (huffyuv->table[table].extralookup != NULL)
+				if (huffyuv->table[table].extralookup != nullptr)
 					free(huffyuv->table[table].extralookup);
 			free(huffyuv);
 		}
-		if (stream->chunk != NULL)
+		if (stream->chunk != nullptr)
 			free(stream->chunk);
 	}
 
 	/* free the file itself */
-	if (file->soundbuf != NULL)
+	if (file->soundbuf != nullptr)
 		free(file->soundbuf);
-	if (file->stream != NULL)
+	if (file->stream != nullptr)
 		free(file->stream);
-	if (file->tempbuffer != NULL)
+	if (file->tempbuffer != nullptr)
 		free(file->tempbuffer);
 	free(file);
 	return avierr;
@@ -1228,7 +1228,7 @@ avi_error avi_read_video_frame(avi_file *file, UINT32 framenum, bitmap_yuy16 &bi
 
 	/* get the video stream */
 	stream = get_video_stream(file);
-	if (stream == NULL)
+	if (stream == nullptr)
 		return AVIERR_INVALID_STREAM;
 
 	/* validate our ability to handle the data */
@@ -1301,7 +1301,7 @@ avi_error avi_read_sound_samples(avi_file *file, int channel, UINT32 firstsample
 
 	/* get the audio stream */
 	stream = get_audio_stream(file, channel, &offset);
-	if (stream == NULL)
+	if (stream == nullptr)
 		return AVIERR_INVALID_STREAM;
 
 	/* validate our ability to handle the data */
@@ -1579,7 +1579,7 @@ static avi_error read_chunk_data(avi_file *file, const avi_chunk *chunk, UINT8 *
 
 	/* allocate memory for the data */
 	*buffer = (UINT8 *)malloc(chunk->size);
-	if (*buffer == NULL)
+	if (*buffer == nullptr)
 		return AVIERR_NO_MEMORY;
 
 	/* read from the file */
@@ -1587,7 +1587,7 @@ static avi_error read_chunk_data(avi_file *file, const avi_chunk *chunk, UINT8 *
 	if (filerr != FILERR_NONE || bytes_read != chunk->size)
 	{
 		free(*buffer);
-		*buffer = NULL;
+		*buffer = nullptr;
 		return AVIERR_READ_ERROR;
 	}
 
@@ -1614,8 +1614,8 @@ static avi_error read_chunk_data(avi_file *file, const avi_chunk *chunk, UINT8 *
 
 static avi_error get_first_chunk(avi_file *file, const avi_chunk *parent, avi_chunk *newchunk)
 {
-	UINT64 startoffset = (parent != NULL && parent->type != 0) ? parent->offset + 12 : 0;
-	if (parent != NULL && parent->type != CHUNKTYPE_LIST && parent->type != CHUNKTYPE_RIFF && parent->type != 0)
+	UINT64 startoffset = (parent != nullptr && parent->type != 0) ? parent->offset + 12 : 0;
+	if (parent != nullptr && parent->type != CHUNKTYPE_LIST && parent->type != CHUNKTYPE_RIFF && parent->type != 0)
 		return AVIERR_INVALID_DATA;
 	return get_next_chunk_internal(file, parent, newchunk, startoffset);
 }
@@ -1790,7 +1790,7 @@ static avi_error get_next_chunk_internal(avi_file *file, const avi_chunk *parent
 	UINT32 bytesread;
 
 	/* NULL parent implies the root */
-	if (parent == NULL)
+	if (parent == nullptr)
 		parent = &file->rootchunk;
 
 	/* start at the current offset */
@@ -1843,7 +1843,7 @@ static avi_error read_movie_data(avi_file *file)
 	int strindex;
 
 	/* find the RIFF chunk */
-	avierr = find_first_chunk(file, CHUNKTYPE_RIFF, NULL, &riff);
+	avierr = find_first_chunk(file, CHUNKTYPE_RIFF, nullptr, &riff);
 	if (avierr != AVIERR_NONE)
 		goto error;
 
@@ -1954,7 +1954,7 @@ static avi_error extract_movie_info(avi_file *file)
 
 	/* get the video stream */
 	stream = get_video_stream(file);
-	if (stream != NULL)
+	if (stream != nullptr)
 	{
 		/* fill in the info */
 		file->info.video_format = stream->format;
@@ -1966,8 +1966,8 @@ static avi_error extract_movie_info(avi_file *file)
 	}
 
 	/* get the first audio stream */
-	stream = get_audio_stream(file, 0, NULL);
-	if (stream != NULL)
+	stream = get_audio_stream(file, 0, nullptr);
+	if (stream != nullptr)
 	{
 		/* fill in the info */
 		file->info.audio_format = stream->format;
@@ -1984,8 +1984,8 @@ static avi_error extract_movie_info(avi_file *file)
 	while (1)
 	{
 		/* get the stream info */
-		stream = get_audio_stream(file, file->info.audio_channels, NULL);
-		if (stream == NULL)
+		stream = get_audio_stream(file, file->info.audio_channels, nullptr);
+		if (stream == nullptr)
 			break;
 		file->info.audio_channels++;
 
@@ -2021,7 +2021,7 @@ static avi_error extract_movie_info(avi_file *file)
 
 static avi_error parse_avih_chunk(avi_file *file, avi_chunk *avih)
 {
-	UINT8 *chunkdata = NULL;
+	UINT8 *chunkdata = nullptr;
 	avi_error avierr;
 
 	/* read the data */
@@ -2034,12 +2034,12 @@ static avi_error parse_avih_chunk(avi_file *file, avi_chunk *avih)
 
 	/* allocate memory for the streams */
 	file->stream = (avi_stream *)malloc(sizeof(*file->stream) * file->streams);
-	if (file->stream == NULL)
+	if (file->stream == nullptr)
 		goto error;
 	memset(file->stream, 0, sizeof(*file->stream) * file->streams);
 
 error:
-	if (chunkdata != NULL)
+	if (chunkdata != nullptr)
 		free(chunkdata);
 	return avierr;
 }
@@ -2064,7 +2064,7 @@ error:
 
 static avi_error parse_strh_chunk(avi_file *file, avi_stream *stream, avi_chunk *strh)
 {
-	UINT8 *chunkdata = NULL;
+	UINT8 *chunkdata = nullptr;
 	avi_error avierr;
 
 	/* read the data */
@@ -2079,7 +2079,7 @@ static avi_error parse_strh_chunk(avi_file *file, avi_stream *stream, avi_chunk 
 	stream->samples = fetch_32bits(&chunkdata[32]);
 
 error:
-	if (chunkdata != NULL)
+	if (chunkdata != nullptr)
 		free(chunkdata);
 	return avierr;
 }
@@ -2104,7 +2104,7 @@ error:
 
 static avi_error parse_strf_chunk(avi_file *file, avi_stream *stream, avi_chunk *strf)
 {
-	UINT8 *chunkdata = NULL;
+	UINT8 *chunkdata = nullptr;
 	avi_error avierr;
 
 	/* read the data */
@@ -2136,7 +2136,7 @@ static avi_error parse_strf_chunk(avi_file *file, avi_stream *stream, avi_chunk 
 	}
 
 error:
-	if (chunkdata != NULL)
+	if (chunkdata != nullptr)
 		free(chunkdata);
 	return avierr;
 }
@@ -2161,7 +2161,7 @@ error:
 static avi_error parse_indx_chunk(avi_file *file, avi_stream *stream, avi_chunk *strf)
 {
 	UINT32 entries, entry;
-	UINT8 *chunkdata = NULL;
+	UINT8 *chunkdata = nullptr;
 	UINT16 longs_per_entry;
 	UINT8 type;
 	UINT64 baseoffset;
@@ -2238,7 +2238,7 @@ static avi_error parse_indx_chunk(avi_file *file, avi_stream *stream, avi_chunk 
 	}
 
 error:
-	if (chunkdata != NULL)
+	if (chunkdata != nullptr)
 		free(chunkdata);
 	return avierr;
 }
@@ -2262,7 +2262,7 @@ error:
 
 static avi_error parse_idx1_chunk(avi_file *file, UINT64 baseoffset, avi_chunk *idx1)
 {
-	UINT8 *chunkdata = NULL;
+	UINT8 *chunkdata = nullptr;
 	avi_error avierr;
 	UINT32 entries;
 	UINT32 entry;
@@ -2300,7 +2300,7 @@ static avi_error parse_idx1_chunk(avi_file *file, UINT64 baseoffset, avi_chunk *
 	}
 
 error:
-	if (chunkdata != NULL)
+	if (chunkdata != nullptr)
 		free(chunkdata);
 	return avierr;
 }
@@ -2841,7 +2841,7 @@ static avi_error write_indx_chunk(avi_file *file, avi_stream *stream, int initia
 
 			/* allocate memory */
 			tempbuf = (UINT8 *)malloc(24 + 8 * chunks_this_index);
-			if (tempbuf == NULL)
+			if (tempbuf == nullptr)
 				return AVIERR_NO_MEMORY;
 			memset(tempbuf, 0, 24 + 8 * chunks_this_index);
 
@@ -2920,7 +2920,7 @@ static avi_error write_idx1_chunk(avi_file *file)
 
 	/* allocate a temporary buffer */
 	tempbuf = (UINT8 *)malloc(tempbuflength);
-	if (tempbuf == NULL)
+	if (tempbuf == nullptr)
 		return AVIERR_NO_MEMORY;
 
 	/* fill it in */
@@ -2971,15 +2971,15 @@ static avi_error write_idx1_chunk(avi_file *file)
 
 static avi_error soundbuf_initialize(avi_file *file)
 {
-	avi_stream *audio = get_audio_stream(file, 0, NULL);
+	avi_stream *audio = get_audio_stream(file, 0, nullptr);
 	avi_stream *video = get_video_stream(file);
 
 	/* we require a video stream */
-	if (video == NULL)
+	if (video == nullptr)
 		return AVIERR_UNSUPPORTED_VIDEO_FORMAT;
 
 	/* skip if no audio stream */
-	if (audio == NULL)
+	if (audio == nullptr)
 		return AVIERR_NONE;
 
 	/* determine the number of samples we want in our buffer; 2 seconds should be enough */
@@ -2987,7 +2987,7 @@ static avi_error soundbuf_initialize(avi_file *file)
 
 	/* allocate a buffer */
 	file->soundbuf = (INT16 *)malloc(file->soundbuf_samples * file->info.audio_channels * sizeof(file->soundbuf[0]));
-	if (file->soundbuf == NULL)
+	if (file->soundbuf == nullptr)
 		return AVIERR_NO_MEMORY;
 	memset(file->soundbuf, 0, file->soundbuf_samples * file->info.audio_channels * sizeof(file->soundbuf[0]));
 
@@ -3015,12 +3015,12 @@ static avi_error soundbuf_initialize(avi_file *file)
 
 static avi_error soundbuf_write_chunk(avi_file *file, UINT32 framenum)
 {
-	avi_stream *stream = get_audio_stream(file, 0, NULL);
+	avi_stream *stream = get_audio_stream(file, 0, nullptr);
 	avi_error avierr;
 	UINT32 length;
 
 	/* skip if no audio stream */
-	if (stream == NULL)
+	if (stream == nullptr)
 		return AVIERR_NONE;
 
 	/* determine the length of this chunk */
@@ -3058,7 +3058,7 @@ static avi_error soundbuf_write_chunk(avi_file *file, UINT32 framenum)
 
 static avi_error soundbuf_flush(avi_file *file, int only_flush_full)
 {
-	avi_stream *stream = get_audio_stream(file, 0, NULL);
+	avi_stream *stream = get_audio_stream(file, 0, nullptr);
 	INT32 channelsamples = file->soundbuf_samples;
 	INT32 processedsamples = 0;
 	UINT32 bytes_per_sample;
@@ -3069,7 +3069,7 @@ static avi_error soundbuf_flush(avi_file *file, int only_flush_full)
 	int channel;
 
 	/* skip if no stream */
-	if (stream == NULL)
+	if (stream == nullptr)
 		return AVIERR_NONE;
 
 	/* get the chunk ID for this stream */
@@ -3337,7 +3337,7 @@ static avi_error huffyuv_extract_tables(avi_stream *stream, const UINT8 *chunkda
 
 	/* allocate memory for the data */
 	stream->huffyuv = (huffyuv_data *)malloc(sizeof(*stream->huffyuv));
-	if (stream->huffyuv == NULL)
+	if (stream->huffyuv == nullptr)
 	{
 		avierr = AVIERR_NO_MEMORY;
 		goto error;
@@ -3425,7 +3425,7 @@ static avi_error huffyuv_extract_tables(avi_stream *stream, const UINT8 *chunkda
 		if (bitsat16 > 0)
 		{
 			table->extralookup = (UINT16 *)malloc(bitsat16 * 65536 * sizeof(table->extralookup[0]));
-			if (table->extralookup == NULL)
+			if (table->extralookup == nullptr)
 			{
 				avierr = AVIERR_NO_MEMORY;
 				goto error;
@@ -3454,10 +3454,10 @@ static avi_error huffyuv_extract_tables(avi_stream *stream, const UINT8 *chunkda
 	}
 
 error:
-	if (avierr != AVIERR_NONE && stream->huffyuv != NULL)
+	if (avierr != AVIERR_NONE && stream->huffyuv != nullptr)
 	{
 		free(stream->huffyuv);
-		stream->huffyuv = NULL;
+		stream->huffyuv = nullptr;
 	}
 	return avierr;
 }
@@ -3759,7 +3759,7 @@ static void printf_chunk_recursive(avi_file *file, avi_chunk *container, int ind
 		/* print data within the chunk */
 		if (chunksize > 0 && curchunk.size < 1024 * 1024)
 		{
-			UINT8 *data = NULL;
+			UINT8 *data = nullptr;
 			int i;
 
 			/* read the data for a chunk */

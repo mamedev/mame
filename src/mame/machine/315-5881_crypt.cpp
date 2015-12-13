@@ -49,7 +49,7 @@ void sega_315_5881_crypt_device::device_start()
 
 	std::string skey = parameter("key");
 	if(!skey.empty())
-		key = strtoll(skey.c_str(), 0, 16);
+		key = strtoll(skey.c_str(), nullptr, 16);
 	else
 	{
 		logerror("%s: Warning: key not provided\n", tag());

@@ -118,7 +118,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	DECLARE_WRITE8_MEMBER(esripsys_dac_w);
 	DECLARE_DRIVER_INIT(esripsys);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_esripsys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(esripsys_vblank_irq);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);

@@ -85,7 +85,7 @@ bool windows_osd_interface::output_init()
 	int result;
 
 	// reset globals
-	clientlist = NULL;
+	clientlist = nullptr;
 
 	// create our window class
 	result = create_window_class();
@@ -100,11 +100,11 @@ bool windows_osd_interface::output_init()
 						WINDOW_STYLE,
 						0, 0,
 						1, 1,
-						NULL,
-						NULL,
+						nullptr,
+						nullptr,
 						GetModuleHandleUni(),
-						NULL);
-	assert(output_hwnd != NULL);
+						nullptr);
+	assert(output_hwnd != nullptr);
 
 	// set a pointer to the running machine
 	SetWindowLongPtr(output_hwnd, GWLP_USERDATA, (LONG_PTR)&machine());
@@ -128,7 +128,7 @@ bool windows_osd_interface::output_init()
 	PostMessage(HWND_BROADCAST, om_mame_start, (WPARAM)output_hwnd, 0);
 
 	// register a notifier for output changes
-	output_set_notifier(NULL, notifier_callback, NULL);
+	output_set_notifier(nullptr, notifier_callback, nullptr);
 
 	return true;
 }
@@ -141,7 +141,7 @@ bool windows_osd_interface::output_init()
 void windows_osd_interface::output_exit()
 {
 	// free all the clients
-	while (clientlist != NULL)
+	while (clientlist != nullptr)
 	{
 		registered_client *temp = clientlist;
 		clientlist = temp->next;
@@ -219,7 +219,7 @@ static LRESULT register_client(HWND hwnd, LPARAM id)
 
 	// find the end of the list; if we find ourself already registered,
 	// return 1
-	for (client = &clientlist; *client != NULL; client = &(*client)->next)
+	for (client = &clientlist; *client != nullptr; client = &(*client)->next)
 		if ((*client)->id == id)
 		{
 			(*client)->hwnd = hwnd;
@@ -229,7 +229,7 @@ static LRESULT register_client(HWND hwnd, LPARAM id)
 
 	// add us to the end
 	*client = global_alloc(registered_client);
-	(*client)->next = NULL;
+	(*client)->next = nullptr;
 	(*client)->id = id;
 	(*client)->hwnd = hwnd;
 
@@ -249,7 +249,7 @@ static LRESULT unregister_client(HWND hwnd, LPARAM id)
 	int found = FALSE;
 
 	// find any matching IDs in the list and remove them
-	for (client = &clientlist; *client != NULL; client = &(*client)->next)
+	for (client = &clientlist; *client != nullptr; client = &(*client)->next)
 		if ((*client)->id == id)
 		{
 			registered_client *temp = *client;
@@ -281,7 +281,7 @@ static LRESULT send_id_string(running_machine &machine, HWND hwnd, LPARAM id)
 		name = output_id_to_name(id);
 
 	// a NULL name is an empty string
-	if (name == NULL)
+	if (name == nullptr)
 		name = "";
 
 	// allocate memory for the message
@@ -310,7 +310,7 @@ static void notifier_callback(const char *outname, INT32 value, void *param)
 	registered_client *client;
 
 	// loop over clients and notify them
-	for (client = clientlist; client != NULL; client = client->next)
-		if (param == NULL || param == client)
+	for (client = clientlist; client != nullptr; client = client->next)
+		if (param == nullptr || param == client)
 			PostMessage(client->hwnd, om_mame_update_state, output_name_to_id(outname), value);
 }

@@ -325,7 +325,7 @@ public:
 	required_device<i80286_cpu_device> m_convcpu;
 
 private:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 32, fanucs15_state)

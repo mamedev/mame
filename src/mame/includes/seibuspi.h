@@ -128,8 +128,8 @@ public:
 	void set_scroll(tilemap_t *layer, int scroll);
 	void combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tile, int sx, int sy, int opaque, INT16 *rowscroll);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(spi);
 	DECLARE_MACHINE_RESET(sxx2e);
 	DECLARE_VIDEO_START(ejanhs);

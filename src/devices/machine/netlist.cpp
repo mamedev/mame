@@ -48,7 +48,7 @@ void netlist_mame_sub_interface::static_set_mult_offset(device_t &device, const 
 netlist_mame_analog_input_t::netlist_mame_analog_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, NETLIST_ANALOG_INPUT, "Netlist Analog Input", tag, owner, clock, "netlist_analog_input", __FILE__),
 			netlist_mame_sub_interface(*owner),
-			m_param(0),
+			m_param(nullptr),
 			m_auto_port(true),
 			m_param_name("")
 {
@@ -65,7 +65,7 @@ void netlist_mame_analog_input_t::device_start()
 	LOG_DEV_CALLS(("start %s\n", tag()));
 	netlist::param_t *p = this->nl_owner().setup().find_param(m_param_name);
 	m_param = dynamic_cast<netlist::param_double_t *>(p);
-	if (m_param == NULL)
+	if (m_param == nullptr)
 	{
 		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
 	}
@@ -119,7 +119,7 @@ void netlist_mame_analog_output_t::device_start()
 netlist_mame_logic_input_t::netlist_mame_logic_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, NETLIST_ANALOG_INPUT, "Netlist Logic Input", tag, owner, clock, "netlist_logic_input", __FILE__),
 			netlist_mame_sub_interface(*owner),
-			m_param(0),
+			m_param(nullptr),
 			m_mask(0xffffffff),
 			m_shift(0),
 			m_param_name("")
@@ -140,7 +140,7 @@ void netlist_mame_logic_input_t::device_start()
 	LOG_DEV_CALLS(("start %s\n", tag()));
 	netlist::param_t *p = downcast<netlist_mame_device_t *>(this->owner())->setup().find_param(m_param_name);
 	m_param = dynamic_cast<netlist::param_int_t *>(p);
-	if (m_param == NULL)
+	if (m_param == nullptr)
 	{
 		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
 	}
@@ -173,7 +173,7 @@ void netlist_mame_stream_input_t::device_start()
 void netlist_mame_stream_input_t::custom_netlist_additions(netlist::setup_t &setup)
 {
 	NETLIB_NAME(sound_in) *snd_in = setup.netlist().get_first_device<NETLIB_NAME(sound_in)>();
-	if (snd_in == NULL)
+	if (snd_in == nullptr)
 		snd_in = dynamic_cast<NETLIB_NAME(sound_in) *>(setup.register_dev("NETDEV_SOUND_IN", "STREAM_INPUT"));
 
 	pstring sparam = pfmt("STREAM_INPUT.CHAN{1}")(m_channel);
@@ -266,9 +266,9 @@ netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, cons
 	: device_t(mconfig, NETLIST_CORE, "Netlist core device", tag, owner, clock, "netlist_core", __FILE__),
 		m_icount(0),
 		m_old(netlist::netlist_time::zero),
-		m_netlist(NULL),
-		m_setup(NULL),
-		m_setup_func(NULL)
+		m_netlist(nullptr),
+		m_setup(nullptr),
+		m_setup_func(nullptr)
 {
 }
 
@@ -276,9 +276,9 @@ netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, devi
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, file),
 		m_icount(0),
 		m_old(netlist::netlist_time::zero),
-		m_netlist(NULL),
-		m_setup(NULL),
-		m_setup_func(NULL)
+		m_netlist(nullptr),
+		m_setup(nullptr),
+		m_setup_func(nullptr)
 {
 }
 
@@ -312,10 +312,10 @@ void netlist_mame_device_t::device_start()
 	m_setup_func(*m_setup);
 
 	/* let sub-devices tweak the netlist */
-	for( device_t *d = this->first_subdevice(); d != NULL; d = d->next() )
+	for( device_t *d = this->first_subdevice(); d != nullptr; d = d->next() )
 	{
 		netlist_mame_sub_interface *sdev = dynamic_cast<netlist_mame_sub_interface *>(d);
-		if( sdev != NULL )
+		if( sdev != nullptr )
 		{
 			LOG_DEV_CALLS(("Found subdevice %s/%s\n", d->name(), d->shortname()));
 			sdev->custom_netlist_additions(*m_setup);
@@ -359,9 +359,9 @@ void netlist_mame_device_t::device_stop()
 	m_netlist->stop();
 
 	global_free(m_setup);
-	m_setup = NULL;
+	m_setup = nullptr;
 	global_free(m_netlist);
-	m_netlist = NULL;
+	m_netlist = nullptr;
 }
 
 ATTR_COLD void netlist_mame_device_t::device_post_load()
@@ -410,13 +410,13 @@ ATTR_COLD void netlist_mame_device_t::save_state()
 			case DT_DOUBLE:
 				{
 					double *td = s->resolved<double>();
-					if (td != NULL) save_pointer(td, s->m_name.cstr(), s->m_count);
+					if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
 				}
 				break;
 			case DT_FLOAT:
 				{
 					float *td = s->resolved<float>();
-					if (td != NULL) save_pointer(td, s->m_name.cstr(), s->m_count);
+					if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
 				}
 				break;
 #if (PHAS_INT128)
@@ -576,7 +576,7 @@ void netlist_mame_sound_device_t::device_start()
 	m_num_outputs = outdevs.size();
 
 	/* resort channels */
-	for (int i=0; i < MAX_OUT; i++) m_out[i] = NULL;
+	for (int i=0; i < MAX_OUT; i++) m_out[i] = nullptr;
 	for (int i=0; i < m_num_outputs; i++)
 	{
 		int chan = outdevs[i]->m_channel.Value();
@@ -587,13 +587,13 @@ void netlist_mame_sound_device_t::device_start()
 			fatalerror("illegal channel number");
 		m_out[chan] = outdevs[i];
 		m_out[chan]->m_sample = netlist::netlist_time::from_hz(clock());
-		m_out[chan]->m_buffer = NULL;
+		m_out[chan]->m_buffer = nullptr;
 	}
 
 	// Configure inputs
 
 	m_num_inputs = 0;
-	m_in = NULL;
+	m_in = nullptr;
 
 	plist_t<nld_sound_in *> indevs = netlist().get_device_list<nld_sound_in>();
 	if (indevs.size() > 1)

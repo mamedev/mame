@@ -84,7 +84,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hitpoker_pic_w);
 	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_DRIVER_INIT(hitpoker);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(hitpoker_irq);
 	required_device<cpu_device> m_maincpu;

@@ -775,8 +775,8 @@ const address_space_config *z180_device::memory_space_config(address_spacenum sp
 	{
 	case AS_PROGRAM:           return &m_program_config;
 	case AS_IO:                return &m_io_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_opcodes_config : NULL;
-	default:                   return NULL;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_opcodes_config : nullptr;
+	default:                   return nullptr;
 	}
 }
 
@@ -1888,7 +1888,7 @@ void z180_device::device_start()
 	int oldval, newval, val;
 	UINT8 *padd, *padc, *psub, *psbc;
 
-	if (static_config() != NULL)
+	if (static_config() != nullptr)
 	{
 		m_daisy.init(this, (const z80_daisy_config *)static_config());
 	}

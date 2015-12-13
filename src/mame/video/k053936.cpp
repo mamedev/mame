@@ -232,8 +232,8 @@ const device_type K053936 = &device_creator<k053936_device>;
 
 k053936_device::k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053936, "K053936 Video Controller", tag, owner, clock, "k053936", __FILE__),
-	m_ctrl(NULL),
-	m_linectrl(NULL),
+	m_ctrl(nullptr),
+	m_linectrl(nullptr),
 	m_wrap(0),
 	m_xoff(0),
 	m_yoff(0)
@@ -433,7 +433,7 @@ void K053936GP_set_cliprect(int chip, int minx, int maxx, int miny, int maxy)
 	cliprect.set(minx, maxx, miny, maxy);
 }
 
-INLINE void K053936GP_copyroz32clip( running_machine &machine,
+static inline void K053936GP_copyroz32clip( running_machine &machine,
 		bitmap_rgb32 &dst_bitmap, bitmap_ind16 &src_bitmap,
 		const rectangle &dst_cliprect, const rectangle &src_cliprect,
 		UINT32 _startx,UINT32 _starty,int _incxx,int _incxy,int _incyx,int _incyy,

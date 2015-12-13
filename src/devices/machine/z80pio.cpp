@@ -275,7 +275,7 @@ void z80pio_device::check_interrupts()
 //-------------------------------------------------
 
 z80pio_device::pio_port::pio_port() :
-	m_device(NULL),
+	m_device(nullptr),
 	m_index(0),
 	m_mode(0),
 	m_next_control_word(0),

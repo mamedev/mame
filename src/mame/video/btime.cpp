@@ -38,7 +38,7 @@ PALETTE_INIT_MEMBER(btime_state,btime)
 
 	/* Burger Time doesn't have a color PROM, but Hamburge has. */
 	/* This function is also used by Eggs. */
-	if (color_prom == 0) return;
+	if (color_prom == nullptr) return;
 
 	for (i = 0; i < palette.entries(); i++)
 	{
@@ -495,7 +495,7 @@ UINT32 btime_state::screen_update_bnj(screen_device &screen, bitmap_ind16 &bitma
 		scroll = (m_bnj_scroll1 & 0x02) * 128 + 511 - m_bnj_scroll2;
 		if (!flip_screen())
 			scroll = 767 - scroll;
-		copyscrollbitmap(bitmap, *m_background_bitmap, 1, &scroll, 0, 0, cliprect);
+		copyscrollbitmap(bitmap, *m_background_bitmap, 1, &scroll, 0, nullptr, cliprect);
 
 		/* copy the low priority characters followed by the sprites
 		   then the high priority characters */

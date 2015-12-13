@@ -1804,7 +1804,7 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD_VU002_SPRITES
-	kaneko16_sprite_device::set_offsets(*device, 0, -1 << 6);
+	kaneko16_sprite_device::set_offsets(*device, 0, -1*64);
 	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_berlwall_state,berlwall)
@@ -2319,7 +2319,7 @@ void kaneko16_state::kaneko16_unscramble_tiles(const char *region)
 	int size            =   memregion(region)->bytes();
 	int i;
 
-	if (RAM == NULL)    return;
+	if (RAM == nullptr)    return;
 
 	for (i = 0; i < size; i ++)
 	{
@@ -2470,8 +2470,8 @@ ROM_START( explbrkr )
 	ROM_COPY( "user1", 0x0c0000, 0x160000, 0x020000)
 	ROM_COPY( "user1", 0x000000, 0x180000, 0x020000)
 	ROM_COPY( "user1", 0x0e0000, 0x1a0000, 0x020000)
-	ROM_FILL(                         0x1c0000, 0x020000, 0x00 )
-	ROM_FILL(                         0x1e0000, 0x020000, 0x00 )
+	ROM_FILL(                         0x1c0000, 0x020000, 0x000000 )
+	ROM_FILL(                         0x1e0000, 0x020000, 0x000000 )
 ROM_END
 
 ROM_START( bakubrkr )
@@ -2512,8 +2512,8 @@ ROM_START( bakubrkr )
 	ROM_COPY( "user1", 0x0c0000, 0x160000, 0x020000)
 	ROM_COPY( "user1", 0x000000, 0x180000, 0x020000)
 	ROM_COPY( "user1", 0x0e0000, 0x1a0000, 0x020000)
-	ROM_FILL(                         0x1c0000, 0x020000, 0x00 )
-	ROM_FILL(                         0x1e0000, 0x020000, 0x00 )
+	ROM_FILL(                         0x1c0000, 0x020000, 0x000000 )
+	ROM_FILL(                         0x1e0000, 0x020000, 0x000000 )
 ROM_END
 
 
@@ -3057,7 +3057,7 @@ ROM_START( gtmr )
 	ROM_LOAD( "mm-300-406-a0.bin",  0x000000, 0x200000, CRC(b15f6b7f) SHA1(5e84919d788add53fc87f4d85f437df413b1dbc5) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
-	ROM_COPY("gfx2",0,0,0x200000) // it isn't on the board twice.
+	ROM_COPY("gfx2",0x000000,0,0x200000) // it isn't on the board twice.
 
 	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
 	ROM_LOAD( "mm-100-401-e0.bin",  0x000000, 0x100000, CRC(b9cbfbee) SHA1(051d48a68477ef9c29bd5cc0bb7955d513a0ab94) )  // 16 x $10000
@@ -3086,7 +3086,7 @@ ROM_START( gtmra )
 	ROM_LOAD( "mm-300-406-a0.bin",  0x000000, 0x200000, CRC(b15f6b7f) SHA1(5e84919d788add53fc87f4d85f437df413b1dbc5) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
-	ROM_COPY("gfx2",0,0,0x200000) // it isn't on the board twice.
+	ROM_COPY("gfx2",0x000000,0,0x200000) // it isn't on the board twice.
 
 	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
 	ROM_LOAD( "mm-100-401-e0.bin",  0x000000, 0x100000, CRC(b9cbfbee) SHA1(051d48a68477ef9c29bd5cc0bb7955d513a0ab94) )  // 16 x $10000
@@ -3126,7 +3126,7 @@ ROM_START( gtmre )
 	ROM_LOAD( "gmmu52.bin",  0x000000, 0x200000, CRC(b15f6b7f) SHA1(5e84919d788add53fc87f4d85f437df413b1dbc5) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
-	ROM_COPY("gfx2",0,0,0x200000) // it isn't on the board twice.
+	ROM_COPY("gfx2",0x000000,0,0x200000) // it isn't on the board twice.
 
 	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
 	ROM_LOAD( "gmmu23.bin",  0x000000, 0x100000, CRC(b9cbfbee) SHA1(051d48a68477ef9c29bd5cc0bb7955d513a0ab94) ) // 16 x $10000
@@ -3163,7 +3163,7 @@ ROM_START( gtmrusa )
 	ROM_LOAD( "mm-300-406-a0.bin",  0x000000, 0x200000, CRC(b15f6b7f) SHA1(5e84919d788add53fc87f4d85f437df413b1dbc5) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
-	ROM_COPY("gfx2",0,0,0x200000) // it isn't on the board twice.
+	ROM_COPY("gfx2",0x000000,0,0x200000) // it isn't on the board twice.
 
 	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
 	ROM_LOAD( "mm-100-401-a0.bin",  0x000000, 0x100000, CRC(b9cbfbee) SHA1(051d48a68477ef9c29bd5cc0bb7955d513a0ab94) ) // 16 x $10000
@@ -3352,7 +3352,7 @@ ROM_START( gtmr2 )
 	ROM_LOAD16_BYTE( "m2b1x0.u94", 0x400001, 0x020000, CRC(03c48bdb) SHA1(f5ba45d026530d46f760cf06d02a1ffcca89aa3c) )
 
 	ROM_REGION( 0x440000, "gfx3", 0 )   /* Tiles (scrambled) */
-	ROM_COPY("gfx2",0,0,0x440000) // it isn't on the board twice.
+	ROM_COPY("gfx2",0x000000,0,0x440000) // it isn't on the board twice.
 
 	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
 	ROM_LOAD( "m2-100-0.u48",      0x000000, 0x100000, CRC(5250fa45) SHA1(b1ad4660906997faea0aa89866de01a0e9f2b61d) )
@@ -3383,7 +3383,7 @@ ROM_START( gtmr2a )
 	ROM_LOAD16_BYTE( "m2b1x0.u94", 0x400001, 0x020000, CRC(03c48bdb) SHA1(f5ba45d026530d46f760cf06d02a1ffcca89aa3c) )
 
 	ROM_REGION( 0x440000, "gfx3", 0 )   /* Tiles (scrambled) */
-	ROM_COPY("gfx2",0,0,0x440000) // it isn't on the board twice.
+	ROM_COPY("gfx2",0x000000,0,0x440000) // it isn't on the board twice.
 
 	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
 	ROM_LOAD( "m2-100-0.u48",      0x000000, 0x100000, CRC(5250fa45) SHA1(b1ad4660906997faea0aa89866de01a0e9f2b61d) )
@@ -3414,7 +3414,7 @@ ROM_START( gtmr2u )
 	ROM_LOAD16_BYTE( "m2b1x0.u94", 0x400001, 0x020000, CRC(03c48bdb) SHA1(f5ba45d026530d46f760cf06d02a1ffcca89aa3c) )
 
 	ROM_REGION( 0x440000, "gfx3", 0 )   /* Tiles (scrambled) */
-	ROM_COPY("gfx2",0,0,0x440000) // it isn't on the board twice.
+	ROM_COPY("gfx2",0x000000,0,0x440000) // it isn't on the board twice.
 
 	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
 	ROM_LOAD( "m2-100-0.u48",      0x000000, 0x100000, CRC(5250fa45) SHA1(b1ad4660906997faea0aa89866de01a0e9f2b61d) )

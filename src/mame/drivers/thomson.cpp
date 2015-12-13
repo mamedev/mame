@@ -591,7 +591,7 @@ static const floppy_interface thomson_floppy_interface =
 {
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(thomson),
-	NULL
+	nullptr
 };
 
 FLOPPY_FORMATS_MEMBER( thomson_state::cd90_640_formats )
@@ -708,7 +708,7 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
 	/// 2400 7N2
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_rxd))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dcd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dsr))

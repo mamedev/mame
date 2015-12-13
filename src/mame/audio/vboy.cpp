@@ -184,8 +184,8 @@ static const INT8 outLvlTbl[16][16] = {
 	{ 0,  2,  4,  6,  8, 10, 12, 14, 16, 17, 19, 21, 23, 25, 27, 29}
 };
 
-INLINE UINT8 mgetb(register UINT8 *ptr) { return *ptr; }
-INLINE void mputb(UINT8 *ptr, INT8 data) { *ptr = data; }
+static inline UINT8 mgetb(register UINT8 *ptr) { return *ptr; }
+static inline void mputb(UINT8 *ptr, INT8 data) { *ptr = data; }
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -224,7 +224,7 @@ void vboysnd_device::device_start()
 
 	memset(m_aram, 0, 0x600);
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(attotime::zero, 0, attotime::from_hz(AUDIO_FREQ/4));
 }
 

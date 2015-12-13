@@ -64,9 +64,9 @@ public:
 	required_memory_region m_bscom_rom;
 	required_ioport m_special;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	void bankswitch(UINT8 data);
 	void update_irq();
@@ -154,9 +154,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 };
 
 #endif

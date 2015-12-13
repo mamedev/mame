@@ -362,7 +362,7 @@ WRITE16_MEMBER( alto2_cpu_device::utilout_w )
 static const prom_load_t pl_madr_a64 =
 {
 	"madr.a64",
-	0,
+	nullptr,
 	"a66b0eda",
 	"4d9088f592caa3299e90966b17765be74e523144",
 	/* size */  0400,
@@ -379,7 +379,7 @@ static const prom_load_t pl_madr_a64 =
 static const prom_load_t pl_madr_a65 =
 {
 	"madr.a65",
-	0,
+	nullptr,
 	"ba37febd",
 	"82e9db1cb65f451755295f0d179e6f8fe3349d4d",
 	/* size */  0400,

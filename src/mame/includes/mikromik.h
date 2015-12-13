@@ -83,8 +83,8 @@ public:
 	required_memory_region m_char_rom;
 	required_shared_ptr<UINT16> m_video_ram;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -127,6 +127,7 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+	DECLARE_PALETTE_INIT( mm1 );
 };
 
 

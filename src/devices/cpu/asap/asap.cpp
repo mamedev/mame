@@ -151,8 +151,8 @@ asap_device::asap_device(const machine_config &mconfig, const char *tag, device_
 		m_nextpc(0),
 		m_irq_state(0),
 		m_icount(0),
-		m_program(NULL),
-		m_direct(NULL)
+		m_program(nullptr),
+		m_direct(nullptr)
 {
 	// initialize the src2val table to contain immediates for low values
 	for (int i = 0; i < REGBASE; i++)
@@ -238,7 +238,7 @@ void asap_device::device_reset()
 
 const address_space_config *asap_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_PROGRAM) ? &m_program_config : NULL;
+	return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr;
 }
 
 

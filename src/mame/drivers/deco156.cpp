@@ -64,7 +64,7 @@ public:
 	DECLARE_WRITE32_MEMBER(hvysmsh_oki_0_bank_w);
 	DECLARE_DRIVER_INIT(hvysmsh);
 	DECLARE_DRIVER_INIT(wcvol95);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_wcvol95(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 	void descramble_sound( const char *tag );

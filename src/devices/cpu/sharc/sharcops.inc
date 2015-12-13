@@ -2761,7 +2761,7 @@ void adsp21062_device::sharcop_unimplemented()
 {
 	extern CPU_DISASSEMBLE(sharc);
 	char dasm[1000];
-	CPU_DISASSEMBLE_NAME(sharc)(NULL, dasm, m_pc, NULL, NULL, 0);
+	CPU_DISASSEMBLE_NAME(sharc)(nullptr, dasm, m_pc, nullptr, nullptr, 0);
 	osd_printf_debug("SHARC: %08X: %s\n", m_pc, dasm);
 	fatalerror("SHARC: Unimplemented opcode %04X%08X at %08X\n", (UINT16)(m_opcode >> 32), (UINT32)(m_opcode), m_pc);
 }

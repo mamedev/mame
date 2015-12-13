@@ -78,11 +78,13 @@
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="G20" />
 		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Draughts"/>
 			<dataarea name="cass" size="6165">
 				<rom name="dar-draughts-v2.1(1983)(acornsoft)(g20).uef" size="6165" crc="35e365ed" sha1="0000bae54eaaa8d5507cc0d7a444aaeac03df97d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Reversi"/>
 			<dataarea name="cass" size="5627">
 				<rom name="dar-reversi-v2.1(1983)(acornsoft)(g20).uef" size="5627" crc="fc23b2d1" sha1="6b96831ba63e0e9f6f4470af8a27cfc6a69588b1" offset="0" />
 			</dataarea>
@@ -94,31 +96,37 @@
 		<year>1982</year>
 		<publisher>I.J.K.</publisher>
 		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Beetle"/>
 			<dataarea name="cass" size="2152">
 				<rom name="fg-beetle(ijk).uef" size="2152" crc="b59da103" sha1="027cfc74305d4ffa415ea5c2a18eaf8049335eb1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Dice"/>
 			<dataarea name="cass" size="1127">
 				<rom name="fg-dice(ijk).uef" size="1127" crc="8b9c429f" sha1="fd246f58c464c23b5e7f1d618e337bd108bf656a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="bbc_cass">
+			<feature name="part_id" value="Grand National"/>
 			<dataarea name="cass" size="1498">
 				<rom name="fg-grandnational(ijk).uef" size="1498" crc="a734c961" sha1="e99e2f2fbb366f84a3869bb9637228452d9db109" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="bbc_cass">
+			<feature name="part_id" value="Hangman"/>
 			<dataarea name="cass" size="5086">
 				<rom name="fg-hangman(ijk).uef" size="5086" crc="e0f6ee12" sha1="ae091f682f59b88ac597337ade7718bc32bcf4b6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass5" interface="bbc_cass">
+			<feature name="part_id" value="Kryptogram"/>
 			<dataarea name="cass" size="1502">
 				<rom name="fg-kryptogram(ijk).uef" size="1502" crc="75367a68" sha1="5e260a5d929694dd32bf8fc62700999ece741f42" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass6" interface="bbc_cass">
+			<feature name="part_id" value="Music"/>
 			<dataarea name="cass" size="1169">
 				<rom name="fg-music(ijk).uef" size="1169" crc="0a54e462" sha1="f5edcc6217f19744890b861fac5ba98ba1e5fe83" offset="0" />
 			</dataarea>

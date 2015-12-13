@@ -116,7 +116,7 @@ no color in the palette will have this value
 #define RGB32(r,g,b) ((r << 16) | (g << 8) | (b << 0))
 #define RGB16(r,g,b) ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3)
 
-INLINE UINT16 RGB32TO16(UINT32 rgb)
+static inline UINT16 RGB32TO16(UINT32 rgb)
 {
 	return (((rgb >> (16 + 3)) & 0x1f) << 11) | (((rgb >> (8 + 2)) & 0x3f) << 5) | (((rgb >> (3)) & 0x1f) << 0);
 }
@@ -125,7 +125,7 @@ INLINE UINT16 RGB32TO16(UINT32 rgb)
 #define EXTRACTG8(Src)  (((Src >>  5) << 2) & 0xff)
 #define EXTRACTB8(Src)  (((Src >>  0) << 3) & 0xff)
 
-INLINE UINT16 Shade(UINT16 Src, UINT32 Shade)
+static inline UINT16 Shade(UINT16 Src, UINT32 Shade)
 {
 	UINT32 scr = (EXTRACTR8(Src) * ((Shade >> 16) & 0xff)) >> 8;
 	UINT32 scg = (EXTRACTG8(Src) * ((Shade >>  8) & 0xff)) >> 8;
@@ -296,7 +296,6 @@ TILENAME(bpp, t, a)\
 			else if (bpp == 8)\
 			{\
 				UINT8 Texel = Quad->u.Imageb[Offset];\
-				Texel = Quad->u.Imageb[Offset];\
 				Color = Quad->Pal[Texel];\
 			}\
 			else if (bpp == 16)\
@@ -485,7 +484,7 @@ int vr0video_device::vrender0_ProcessPacket(UINT32 PacketPtr, UINT16 *Dest, UINT
 	{
 		QuadInfo Quad;
 
-		Quad.Pitch = 512;
+		Quad.Pitch = 1024;
 
 //      assert(Endx >= Dx && Endy >= Dy);
 

@@ -332,7 +332,7 @@ DISCRETE_RESET(dst_diode_mix)
 
 	for (addr = 0; addr < m_size; addr++)
 	{
-		if (info == NULL)
+		if (info == nullptr)
 		{
 			/* setup default junction voltage */
 			m_v_junction[addr] = 0.5;
@@ -1170,7 +1170,7 @@ DISCRETE_RESET(dst_mixer)
 	for (bit = 0; bit < 8; bit++)
 	{
 		m_r_node[bit] = m_device->node_output_ptr(info->r_node[bit]);
-		if (m_r_node[bit] != NULL)
+		if (m_r_node[bit] != nullptr)
 		{
 			m_r_node_bit_flag |= 1 << bit;
 		}

@@ -79,7 +79,7 @@ void at28c16_device::device_validity_check(validity_checker &valid) const
 
 const address_space_config *at28c16_device::memory_space_config( address_spacenum spacenum ) const
 {
-	return ( spacenum == 0 ) ? &m_space_config : NULL;
+	return ( spacenum == 0 ) ? &m_space_config : nullptr;
 }
 
 
@@ -120,7 +120,7 @@ void at28c16_device::nvram_default()
 	}
 
 	/* populate from a memory region if present */
-	if( m_region != NULL )
+	if( m_region != nullptr )
 	{
 		if( m_region->bytes() != AT28C16_DATA_BYTES )
 		{

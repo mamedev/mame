@@ -2066,7 +2066,7 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 	UINT32 size = m_cart->common_get_size("rom");
 	UINT16 gran = 0;
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		// check for lnx header
 		const char *filetype = image.filetype();
@@ -2099,7 +2099,7 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	// set-up granularity
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		const char *filetype = image.filetype();
 		if (!core_stricmp(filetype, "lnx"))     // from header
@@ -2126,7 +2126,7 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 	}
 
 	// set-up rotation from softlist
-	if (image.software_entry() != NULL)
+	if (image.software_entry() != nullptr)
 	{
 		const char *rotate = image.get_feature("rotation");
 		m_rotate = 0;

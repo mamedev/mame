@@ -176,7 +176,7 @@ public:
 	DECLARE_DRIVER_INIT(ebases);
 	DECLARE_DRIVER_INIT(gorf);
 	DECLARE_DRIVER_INIT(astrocde);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(astrocde);
 	DECLARE_VIDEO_START(profpac);
 	DECLARE_PALETTE_INIT(profpac);
@@ -190,7 +190,7 @@ public:
 	inline void increment_dest(UINT8 curwidth);
 	void execute_blit(address_space &space);
 	void init_sparklestar();
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	/*----------- defined in audio/wow.c -----------*/
 	DECLARE_READ8_MEMBER( wow_speech_r );
@@ -201,7 +201,7 @@ public:
 	CUSTOM_INPUT_MEMBER( gorf_speech_status_r );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /*----------- defined in audio/wow.c -----------*/

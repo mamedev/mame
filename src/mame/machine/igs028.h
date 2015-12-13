@@ -14,10 +14,10 @@ public:
 	void IGS028_handle(void);
 
 protected:
-	virtual void device_config_complete();
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT32 olds_prot_addr(UINT16 addr);
 	UINT32 olds_read_reg(UINT16 addr);

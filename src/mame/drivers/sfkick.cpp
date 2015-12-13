@@ -100,7 +100,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_port_a_w);
 	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
 	DECLARE_DRIVER_INIT(sfkick);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	void sfkick_remap_banks();
 	void sfkick_bank_set(int num, int data);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

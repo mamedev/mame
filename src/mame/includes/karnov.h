@@ -65,8 +65,8 @@ public:
 	DECLARE_DRIVER_INIT(chelnovj);
 	DECLARE_DRIVER_INIT(chelnov);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(karnov);
 	DECLARE_VIDEO_START(karnov);
 	DECLARE_VIDEO_START(wndrplnt);

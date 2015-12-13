@@ -331,7 +331,7 @@ ROM_START( dcon )
 	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k code for sound Z80 */
 	ROM_LOAD( "fmsnd",           0x000000, 0x08000, CRC(50450faa) SHA1(d4add7d357951b51d53ed7f143ece7f3bde7f4cb) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "fix0",  0x000000, 0x10000, CRC(ab30061f) SHA1(14dba37fef7bd13c827fd542b24cc593dcdc9f99) ) /* chars */
@@ -366,7 +366,7 @@ ROM_START( sdgndmps )
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
 	ROM_LOAD( "911-a05.010",   0x00000, 0x08000, CRC(90455406) SHA1(dd2c5b96ac4b51251a3d34d97cc9af360afaa38c) )
 	ROM_CONTINUE(              0x10000, 0x08000 )
-	ROM_COPY( "audiocpu", 0,  0x18000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000,  0x18000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "911-a08.66",   0x000000, 0x10000, CRC(e7e04823) SHA1(d9b1ace5cd8218d5a4767cf5adbc267dce7c0668) ) /* chars */

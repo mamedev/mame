@@ -36,7 +36,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
-	void machine_reset();
+	void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( digit_w );
 	DECLARE_WRITE8_MEMBER( segment_w );

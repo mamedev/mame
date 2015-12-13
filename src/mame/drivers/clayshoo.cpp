@@ -40,8 +40,8 @@ public:
 	DECLARE_READ8_MEMBER(analog_r);
 	DECLARE_WRITE8_MEMBER(input_port_select_w);
 	DECLARE_READ8_MEMBER(input_port_r);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_clayshoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(reset_analog_bit);
 	UINT8 difficulty_input_port_r( int bit );

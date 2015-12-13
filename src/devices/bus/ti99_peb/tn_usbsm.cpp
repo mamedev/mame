@@ -52,7 +52,7 @@ enum
 };
 
 nouspikel_usb_smartmedia_device::nouspikel_usb_smartmedia_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: ti_expansion_card_device(mconfig, TI99_USBSM, "Nouspikel USB/Smartmedia card", tag, owner, clock, "ti99_usbsm", __FILE__), 
+: ti_expansion_card_device(mconfig, TI99_USBSM, "Nouspikel USB/Smartmedia card", tag, owner, clock, "ti99_usbsm", __FILE__),
 m_feeprom_page(0), m_sram_page(0), m_cru_register(0), m_tms9995_mode(false), m_enable_io(false), m_enable_int(false), m_enable_sm(false),
 m_write_flash(false), m_input_latch(0), m_output_latch(0),
 	m_smartmedia(*this, "smartmedia"),

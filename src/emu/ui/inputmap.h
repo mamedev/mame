@@ -19,15 +19,15 @@ class ui_menu_input_groups : public ui_menu {
 public:
 	ui_menu_input_groups(running_machine &machine, render_container *container);
 	virtual ~ui_menu_input_groups();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 };
 
 class ui_menu_input : public ui_menu {
 public:
 	ui_menu_input(running_machine &machine, render_container *container);
 	virtual ~ui_menu_input();
-	virtual void handle();
+	virtual void handle() override;
 
 protected:
 	enum {
@@ -72,29 +72,29 @@ class ui_menu_input_general : public ui_menu_input {
 public:
 	ui_menu_input_general(running_machine &machine, render_container *container, int group);
 	virtual ~ui_menu_input_general();
-	virtual void populate();
+	virtual void populate() override;
 
 protected:
 	int group;
-	virtual void update_input(struct input_item_data *seqchangeditem);
+	virtual void update_input(struct input_item_data *seqchangeditem) override;
 };
 
 class ui_menu_input_specific : public ui_menu_input {
 public:
 	ui_menu_input_specific(running_machine &machine, render_container *container);
 	virtual ~ui_menu_input_specific();
-	virtual void populate();
+	virtual void populate() override;
 
 protected:
-	virtual void update_input(struct input_item_data *seqchangeditem);
+	virtual void update_input(struct input_item_data *seqchangeditem) override;
 };
 
 class ui_menu_settings : public ui_menu {
 public:
 	ui_menu_settings(running_machine &machine, render_container *container, UINT32 type);
 	virtual ~ui_menu_settings();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 protected:
 	/* DIP switch descriptor */
@@ -115,7 +115,7 @@ public:
 	ui_menu_settings_dip_switches(running_machine &machine, render_container *container);
 	virtual ~ui_menu_settings_dip_switches();
 
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 private:
 	void custom_render_one(float x1, float y1, float x2, float y2, const dip_descriptor *dip, UINT32 selectedmask);
 };
@@ -130,8 +130,8 @@ class ui_menu_analog : public ui_menu {
 public:
 	ui_menu_analog(running_machine &machine, render_container *container);
 	virtual ~ui_menu_analog();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	enum {

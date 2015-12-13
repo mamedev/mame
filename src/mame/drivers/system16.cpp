@@ -404,7 +404,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_w)
 			m_soundbank_ptr = mem;
 			break;
 		default:
-			m_soundbank_ptr = NULL;
+			m_soundbank_ptr = nullptr;
 			logerror("Invalid bank setting %02X (%04X)\n", data, space.device().safe_pc());
 			break;
 	}
@@ -1024,7 +1024,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys18_tilebank_w)
 
 READ8_MEMBER(segas1x_bootleg_state::system18_bank_r)
 {
-	if (m_sound_bank != NULL)
+	if (m_sound_bank != nullptr)
 		return m_sound_bank[offset];
 
 	return 0xff;
@@ -1051,7 +1051,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::sys18_soundbank_w)
 	if (mask)
 		m_sound_bank = &mem[0x10000 + offs + ((bank & mask) << 13)];
 	else
-		m_sound_bank = NULL;
+		m_sound_bank = nullptr;
 }
 
 static ADDRESS_MAP_START( sound_18_io_map, AS_IO, 8, segas1x_bootleg_state )
@@ -1223,7 +1223,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::shdancbl_bankctrl_w)
 			m_soundbank_ptr = &mem[0x24000]; /* IC46 4000-7FFF */
 			break;
 		default:
-			m_soundbank_ptr = NULL;
+			m_soundbank_ptr = nullptr;
 			logerror("Invalid bank setting %02X (%04X)\n", data, space.device().safe_pc());
 			break;
 	}
@@ -3486,10 +3486,10 @@ ROM_END
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,common)
 {
 	m_bg1_trans = 0;
-	m_splittab_bg_x = 0;
-	m_splittab_bg_y = 0;
-	m_splittab_fg_x = 0;
-	m_splittab_fg_y = 0;
+	m_splittab_bg_x = nullptr;
+	m_splittab_bg_y = nullptr;
+	m_splittab_fg_x = nullptr;
+	m_splittab_fg_y = nullptr;
 
 	m_spritebank_type = 0;
 	m_back_yscroll = 0;
@@ -3499,7 +3499,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,common)
 	m_sample_buffer = 0;
 	m_sample_select = 0;
 
-	m_soundbank_ptr = NULL;
+	m_soundbank_ptr = nullptr;
 
 	m_beautyb_unkx = 0;
 

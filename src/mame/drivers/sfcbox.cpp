@@ -147,8 +147,8 @@ public:
 	DECLARE_WRITE8_MEMBER( port_83_w );
 	DECLARE_WRITE8_MEMBER( snes_map_0_w );
 	DECLARE_WRITE8_MEMBER( snes_map_1_w );
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
 };

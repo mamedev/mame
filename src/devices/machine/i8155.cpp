@@ -214,7 +214,7 @@ i8155_device::i8155_device(const machine_config &mconfig, const char *tag, devic
 		m_out_to_cb(*this),
 		m_command(0),
 		m_status(0),
-		m_space_config("ram", ENDIANNESS_LITTLE, 8, 8, 0, NULL, *ADDRESS_MAP_NAME(i8155))
+		m_space_config("ram", ENDIANNESS_LITTLE, 8, 8, 0, nullptr, *ADDRESS_MAP_NAME(i8155))
 {
 }
 
@@ -342,7 +342,7 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 const address_space_config *i8155_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 

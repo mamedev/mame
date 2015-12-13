@@ -4,6 +4,7 @@
 #include "sound/k054539.h"
 #include "cpu/tms57002/tms57002.h"
 #include "machine/adc083x.h"
+#include "machine/k053252.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k055555.h"
@@ -18,6 +19,7 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_dasp(*this, "dasp"),
+		m_k053252(*this, "k053252"),
 		m_k055673(*this, "k055673"),
 		m_k055555(*this, "k055555"),
 		m_k056832(*this, "k056832"),
@@ -50,6 +52,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<tms57002_device> m_dasp;
+	optional_device<k053252_device> m_k053252; // not hooked up in tasman.cpp yet (does it even have it?)
 	required_device<k055673_device> m_k055673;
 	required_device<k055555_device> m_k055555;
 	required_device<k056832_device> m_k056832;
@@ -77,8 +80,6 @@ public:
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE32_MEMBER(control_w);
 	DECLARE_READ32_MEMBER(waitskip_r);
-	DECLARE_READ32_MEMBER(ccu_r);
-	DECLARE_WRITE32_MEMBER(ccu_w);
 	DECLARE_READ32_MEMBER(sound020_r);
 	DECLARE_WRITE32_MEMBER(sound020_w);
 	DECLARE_READ32_MEMBER(le2_gun_H_r);
@@ -102,6 +103,8 @@ public:
 	DECLARE_WRITE32_MEMBER(konamigx_tilebank_w);
 	DECLARE_WRITE32_MEMBER(konamigx_t1_psacmap_w);
 	DECLARE_WRITE32_MEMBER(konamigx_t4_psacmap_w);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(hblank_irq_ack_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(gx_rdport1_3_r);
 	DECLARE_DRIVER_INIT(konamigx);
 	TILE_GET_INFO_MEMBER(get_gx_psac_tile_info);
@@ -124,12 +127,13 @@ public:
 	UINT32 screen_update_konamigx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_konamigx_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_konamigx_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(konamigx_vbinterrupt);
+	INTERRUPT_GEN_MEMBER(konamigx_type2_vblank_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_type2_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_type4_scanline);
 	INTERRUPT_GEN_MEMBER(tms_sync);
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_CALLBACK_MEMBER(boothack_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_hbinterrupt);
 	ADC083X_INPUT_CB(adc0834_callback);
 	K056832_CB_MEMBER(type2_tile_callback);
 	K056832_CB_MEMBER(alpha_tile_callback);
@@ -164,6 +168,7 @@ public:
 
 	void konamigx_mixer_init(screen_device &screen, int objdma);
 	void konamigx_objdma(void);
+	void generate_sprites(address_space &space, UINT32 src, UINT32 spr, int count);
 
 	void fantjour_dma_install();
 

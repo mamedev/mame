@@ -2,8 +2,6 @@
 // copyright-holders:David Haywood
 /* Aquarium (c)1996 Excellent Systems */
 
-/* the hardware is similar to gcpinbal.c, probably should merge it at some point */
-
 /*
 
 AQUARIUM
@@ -23,15 +21,14 @@ AQUARF1              68000-16            6
                      Z80-6  5                    SW2Q
 
 
-To Do:
-- Merge with gcpinbal.c (and clean up gcpinbal.c)
 
 Notes:
 - A bug in the program code causes the OKI to be reset on the very
   first coin inserted.
-- The current dump is Japanese. The game also includes English text,
-  so it may have been released overseas too. Use cheat/debugger and
-  set RAM[0x000a5c / 2] to 1 to be able to change the game to English.
+
+// Sound banking + video references 
+// https://www.youtube.com/watch?v=nyAQPrkt_a4
+// https://www.youtube.com/watch?v=0gn2Kj2M46Q
 
 */
 
@@ -69,7 +66,17 @@ WRITE16_MEMBER(aquarium_state::aquarium_sound_w)
 
 WRITE8_MEMBER(aquarium_state::aquarium_z80_bank_w)
 {
-	membank("bank1")->set_entry(data & 0x07);
+	// uses bits ---x --xx
+	data = BITSWAP8(data, 7, 6, 5, 2, 3,      1, 4, 0);
+
+	//printf("aquarium bank %04x %04x\n", data, mem_mask);
+	// aquarium bank 0003 00ff - correct (title)   011
+	// aquarium bank 0006 00ff - correct (select)  110
+	// aquarium bank 0005 00ff - level 1 (correct)
+	// (all music seems correct w/regards the reference video)
+	
+
+	membank("bank1")->set_entry(data & 0x7);
 }
 
 UINT8 aquarium_state::aquarium_snd_bitswap( UINT8 scrambled_data )
@@ -275,8 +282,8 @@ DRIVER_INIT_MEMBER(aquarium_state,aquarium)
 	}
 
 	/* configure and set up the sound bank */
-	membank("bank1")->configure_entries(0, 7, &Z80[0x18000], 0x8000);
-	membank("bank1")->set_entry(1);
+	membank("bank1")->configure_entries(0, 0x8, &Z80[0x00000], 0x8000);
+	membank("bank1")->set_entry(0x00);
 }
 
 
@@ -339,10 +346,10 @@ MACHINE_CONFIG_END
 
 ROM_START( aquarium )
 	ROM_REGION( 0x080000, "maincpu", 0 )     /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "aquar3",  0x000000, 0x080000, CRC(344509a1) SHA1(9deb610732dee5066b3225cd7b1929b767579235) )
+	ROM_LOAD16_WORD_SWAP( "aquar3.bin",  0x000000, 0x080000, CRC(f197991e) SHA1(0a217d735e2643605dbfd6ee20f98f46b37d4838) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 (sound) code */
-	ROM_LOAD( "aquar5",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) )
+	ROM_LOAD( "aquar5",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) ) 
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* BG Tiles */
 	ROM_LOAD( "aquar1",      0x000000, 0x080000, CRC(575df6ac) SHA1(071394273e512666fe124facdd8591a767ad0819) ) // 4bpp
@@ -366,4 +373,34 @@ ROM_START( aquarium )
 	ROM_LOAD( "aquar4",  0x000000, 0x80000, CRC(9a4af531) SHA1(bb201b7a6c9fd5924a0d79090257efffd8d4aba1) )
 ROM_END
 
-GAME( 1996, aquarium, 0, aquarium, aquarium, aquarium_state, aquarium, ROT0, "Excellent System", "Aquarium (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+ROM_START( aquariumj )
+	ROM_REGION( 0x080000, "maincpu", 0 )     /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "aquar3",  0x000000, 0x080000, CRC(344509a1) SHA1(9deb610732dee5066b3225cd7b1929b767579235) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 (sound) code */
+	ROM_LOAD( "aquar5",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) ) 
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* BG Tiles */
+	ROM_LOAD( "aquar1",      0x000000, 0x080000, CRC(575df6ac) SHA1(071394273e512666fe124facdd8591a767ad0819) ) // 4bpp
+	/* data is expanded here from USER1 */
+	ROM_REGION( 0x100000, "user1", 0 ) /* BG Tiles */
+	ROM_LOAD( "aquar6",      0x000000, 0x020000, CRC(9065b146) SHA1(befc218bbcd63453ea7eb8f976796d36f2b2d552) ) // 1bpp
+
+	ROM_REGION( 0x100000, "gfx4", 0 ) /* BG Tiles */
+	ROM_LOAD( "aquar8",      0x000000, 0x080000, CRC(915520c4) SHA1(308207cb20f1ed6df365710c808644a6e4f07614) ) // 4bpp
+	/* data is expanded here from USER2 */
+	ROM_REGION( 0x100000, "user2", 0 ) /* BG Tiles */
+	ROM_LOAD( "aquar7",      0x000000, 0x020000, CRC(b96b2b82) SHA1(2b719d0c185d1eca4cd9ea66bed7842b74062288) ) // 1bpp
+
+	ROM_REGION( 0x060000, "gfx2", 0 ) /* FG Tiles */
+	ROM_LOAD( "aquar2",   0x000000, 0x020000, CRC(aa071b05) SHA1(517415bfd8e4dd51c6eb03a25c706f8613d34a09) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 ) /* Sprites? */
+	ROM_LOAD( "aquarf1",     0x000000, 0x0100000, CRC(14758b3c) SHA1(b372ccb42acb55a3dd15352a9d4ed576878a6731) )
+
+	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "aquar4",  0x000000, 0x80000, CRC(9a4af531) SHA1(bb201b7a6c9fd5924a0d79090257efffd8d4aba1) )
+ROM_END
+
+GAME( 1996, aquarium, 0,        aquarium, aquarium, aquarium_state, aquarium, ROT0, "Excellent System", "Aquarium (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, aquariumj,aquarium, aquarium, aquarium, aquarium_state, aquarium, ROT0, "Excellent System", "Aquarium (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

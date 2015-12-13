@@ -95,23 +95,23 @@ void dave_device::device_start()
 	save_item(NAME(m_level_and));
 	save_item(NAME(m_mame_volumes));
 
-	for (int i = 0; i < ARRAY_LENGTH(m_period); i++)
-		m_period[i] = (STEP * machine().sample_rate()) / 125000;
+	for (auto & elem : m_period)
+		elem = (STEP * machine().sample_rate()) / 125000;
 
-	for (int i = 0; i < ARRAY_LENGTH(m_count); i++)
-		m_count[i] = (STEP * machine().sample_rate()) / 125000;
+	for (auto & elem : m_count)
+		elem = (STEP * machine().sample_rate()) / 125000;
 
-	for (int i = 0; i < ARRAY_LENGTH(m_level); i++)
-		m_level[i] = 0;
+	for (auto & elem : m_level)
+		elem = 0;
 
-	for (int i = 0; i < ARRAY_LENGTH(m_level_or); i++)
-		m_level_or[i] = 0;
+	for (auto & elem : m_level_or)
+		elem = 0;
 
-	for (int i = 0; i < ARRAY_LENGTH(m_level_and); i++)
-		m_level_and[i] = 0;
+	for (auto & elem : m_level_and)
+		elem = 0;
 
-	for (int i = 0; i < ARRAY_LENGTH(m_mame_volumes); i++)
-		m_mame_volumes[i] = 0;
+	for (auto & elem : m_mame_volumes)
+		elem = 0;
 
 	/* dave has 3 tone channels and 1 noise channel.
 	 the volumes are mixed internally and output as left and right volume */
@@ -129,14 +129,14 @@ void dave_device::device_reset()
 {
 	m_write_irq(CLEAR_LINE);
 
-	for (int i = 0; i < 4; i++)
-		m_segment[i] = 0;
+	for (auto & elem : m_segment)
+		elem = 0;
 
 	m_irq_status = 0;
 	m_irq_enable = 0;
 
-	for (int i = 0; i < 32; i++)
-		m_regs[i] = 0;
+	for (auto & elem : m_regs)
+		elem = 0;
 }
 
 
@@ -178,7 +178,7 @@ const address_space_config *dave_device::memory_space_config(address_spacenum sp
 	{
 		case AS_PROGRAM: return &m_program_space_config;
 		case AS_IO: return &m_io_space_config;
-		default: return NULL;
+		default: return nullptr;
 	}
 }
 

@@ -174,9 +174,9 @@ void applefdc_base_device::device_timer(emu_timer &timer, device_timer_id id, in
 
 const applefdc_interface *applefdc_base_device::get_interface()
 {
-	static const applefdc_interface dummy_interface = {0, };
+	static const applefdc_interface dummy_interface = {nullptr, };
 
-	return (static_config() != NULL)
+	return (static_config() != nullptr)
 		? (const applefdc_interface *) static_config()
 		: &dummy_interface;
 }
@@ -331,7 +331,7 @@ void applefdc_base_device::write_reg(UINT8 data)
 						logerror("applefdc_write_reg(): latch mode off not implemented\n");
 				}
 
-				if (intf->write_data != NULL)
+				if (intf->write_data != nullptr)
 					intf->write_data(this, data);
 			}
 			break;
@@ -366,7 +366,7 @@ void applefdc_base_device::turn_motor_onoff(bool status)
 	}
 
 	/* invoke callback, if present */
-	if (intf->set_enable_lines != NULL)
+	if (intf->set_enable_lines != nullptr)
 		intf->set_enable_lines(this, enable_lines);
 
 	if (LOG_APPLEFDC_EXTRA)
@@ -406,7 +406,7 @@ void applefdc_base_device::iwm_access(int offset)
 			(offset & 1) ? "setting" : "clearing", lines[offset >> 1], m_lines);
 	}
 
-	if ((offset < 0x08) && (intf->set_lines != NULL))
+	if ((offset < 0x08) && (intf->set_lines != nullptr))
 		intf->set_lines(this, m_lines & 0x0f);
 
 	switch(offset)
@@ -424,13 +424,13 @@ void applefdc_base_device::iwm_access(int offset)
 
 		case 0x0A:
 			/* turn off IWM_DRIVE */
-			if ((m_lines & IWM_MOTOR) && (intf->set_enable_lines != NULL))
+			if ((m_lines & IWM_MOTOR) && (intf->set_enable_lines != nullptr))
 				intf->set_enable_lines(this, 1);
 			break;
 
 		case 0x0B:
 			/* turn on IWM_DRIVE */
-			if ((m_lines & IWM_MOTOR) && (intf->set_enable_lines != NULL))
+			if ((m_lines & IWM_MOTOR) && (intf->set_enable_lines != nullptr))
 				intf->set_enable_lines(this, 2);
 			break;
 	}
@@ -463,7 +463,7 @@ UINT8 applefdc_base_device::read(UINT8 offset)
 				case 0x0C:
 					if (m_lines & IWM_Q7)
 					{
-						if (intf->write_data != NULL)
+						if (intf->write_data != nullptr)
 							intf->write_data(this, m_write_byte);
 						result = 0;
 					}
@@ -525,7 +525,7 @@ void applefdc_base_device::write(UINT8 offset, UINT8 data)
 				case 0x0C:
 					if (m_lines & IWM_Q7)
 					{
-						if (intf->write_data != NULL)
+						if (intf->write_data != nullptr)
 							intf->write_data(this, m_write_byte);
 					}
 					break;

@@ -229,7 +229,7 @@ void vigilant_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clip
 		m_rear_refresh=0;
 	}
 
-	copyscrollbitmap(bitmap,*m_bg_bitmap,1,&scrollx,0,0,bottomvisiblearea);
+	copyscrollbitmap(bitmap,*m_bg_bitmap,1,&scrollx,0,nullptr,bottomvisiblearea);
 }
 
 

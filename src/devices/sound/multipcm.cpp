@@ -45,22 +45,22 @@ ALLOW_SAVE_TYPE(multipcm_device::state_t); // allow save_item on a non-fundament
 //Times are based on a 44100Hz timebase. It's adjusted to the actual sampling rate on startup
 
 const double multipcm_device::BASE_TIMES[64] = {
-	0,			0,			0,			0,
-	6222.95,	4978.37,	4148.66,	3556.01,
-	3111.47,	2489.21,	2074.33,	1778.00,
-	1555.74,	1244.63,	1037.19,	889.02,
-	777.87,		622.31,		518.59,		444.54,
-	388.93,		311.16,		259.32,		222.27,
-	194.47,		155.60,		129.66,		111.16,
-	97.23,		77.82,		64.85,		55.60,
-	48.62,		38.91,		32.43,		27.80,
-	24.31,		19.46,		16.24,		13.92,
-	12.15,		9.75,		8.12,		6.98,
-	6.08,		4.90,		4.08,		3.49,
-	3.04,		2.49,		2.13,		1.90,
-	1.72,		1.41,		1.18,		1.04,
-	0.91,		0.73,		0.59,		0.50,
-	0.45,		0.45,		0.45,		0.45
+	0,          0,          0,          0,
+	6222.95,    4978.37,    4148.66,    3556.01,
+	3111.47,    2489.21,    2074.33,    1778.00,
+	1555.74,    1244.63,    1037.19,    889.02,
+	777.87,     622.31,     518.59,     444.54,
+	388.93,     311.16,     259.32,     222.27,
+	194.47,     155.60,     129.66,     111.16,
+	97.23,      77.82,      64.85,      55.60,
+	48.62,      38.91,      32.43,      27.80,
+	24.31,      19.46,      16.24,      13.92,
+	12.15,      9.75,       8.12,       6.98,
+	6.08,       4.90,       4.08,       3.49,
+	3.04,       2.49,       2.13,       1.90,
+	1.72,       1.41,       1.18,       1.04,
+	0.91,       0.73,       0.59,       0.50,
+	0.45,       0.45,       0.45,       0.45
 };
 
 const INT32 multipcm_device::VALUE_TO_CHANNEL[32] =
@@ -457,25 +457,25 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, MULTIPCM, "Sega/Yamaha 315-5560", tag, owner, clock, "multipcm", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
-		m_space_config("mpcm_samples", ENDIANNESS_LITTLE, 8, 24, 0, NULL),
-		m_stream(NULL),
-		m_samples(NULL),
-		m_slots(NULL),
+		m_space_config("mpcm_samples", ENDIANNESS_LITTLE, 8, 24, 0, nullptr),
+		m_stream(nullptr),
+		m_samples(nullptr),
+		m_slots(nullptr),
 		m_cur_slot(0),
 		m_address(0),
 		m_bank_right(0),
 		m_bank_left(0),
 		m_rate(0),
-		m_attack_step(NULL),
-		m_decay_release_step(NULL),
-		m_freq_step_table(NULL),
-		m_direct(NULL),
-		m_left_pan_table(NULL),
-		m_right_pan_table(NULL),
-		m_linear_to_exp_volume(NULL),
-		m_total_level_steps(NULL),
-		m_pitch_scale_tables(NULL),
-		m_amplitude_scale_tables(NULL)
+		m_attack_step(nullptr),
+		m_decay_release_step(nullptr),
+		m_freq_step_table(nullptr),
+		m_direct(nullptr),
+		m_left_pan_table(nullptr),
+		m_right_pan_table(nullptr),
+		m_linear_to_exp_volume(nullptr),
+		m_total_level_steps(nullptr),
+		m_pitch_scale_tables(nullptr),
+		m_amplitude_scale_tables(nullptr)
 {
 	m_address_map[0] = *ADDRESS_MAP_NAME(multipcm);
 }
@@ -487,7 +487,7 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 
 const address_space_config *multipcm_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 //-------------------------------------------------

@@ -11,16 +11,16 @@ class ngen_keyboard_device : public serial_keyboard_device
 {
 public:
 	ngen_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ioport_constructor device_input_ports() const;
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) { device_serial_interface::rx_w(state); }
+	virtual ioport_constructor device_input_ports() const override;
+	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void rcv_complete();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void rcv_complete() override;
 
 private:
-	virtual UINT8 keyboard_handler(UINT8 last_code, UINT8 *scan_line);
+	virtual UINT8 keyboard_handler(UINT8 last_code, UINT8 *scan_line) override;
 	UINT8 row_number(UINT8 code);
 	void write(UINT8 data);
 

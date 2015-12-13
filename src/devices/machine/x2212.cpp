@@ -107,7 +107,7 @@ void x2210_device::device_start()
 
 const address_space_config *x2212_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_sram_space_config : (spacenum == 1) ? &m_e2prom_space_config : NULL;
+	return (spacenum == 0) ? &m_sram_space_config : (spacenum == 1) ? &m_e2prom_space_config : nullptr;
 }
 
 
@@ -126,7 +126,7 @@ void x2212_device::nvram_default()
 	}
 
 	// populate from a memory region if present
-	if (m_region != NULL)
+	if (m_region != nullptr)
 	{
 		if (m_region->bytes() != SIZE_DATA)
 			fatalerror("x2212 region '%s' wrong size (expected size = 0x100)\n", tag());

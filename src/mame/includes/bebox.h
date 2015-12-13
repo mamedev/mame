@@ -69,8 +69,8 @@ public:
 	UINT8 m_at_pages[0x10];
 	UINT32 m_scsi53c810_data[0x100 / 4];
 	DECLARE_DRIVER_INIT(bebox);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_master_set_int_line);
 	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_slave_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
@@ -124,7 +124,7 @@ public:
 	void bebox_update_interrupts();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

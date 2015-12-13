@@ -66,16 +66,16 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// subclass overrides
-	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime);
-	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime);
-	virtual void player_overlay(bitmap_yuy16 &bitmap) { }
+	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
+	virtual INT32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
+	virtual void player_overlay(bitmap_yuy16 &bitmap) override { }
 
 	// internal helpers
 	bool focus_on() const { return !(m_portb1 & 0x01); }

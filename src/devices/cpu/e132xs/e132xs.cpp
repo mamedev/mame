@@ -835,7 +835,7 @@ static const INT32 immediate_values[32] =
 {
 	0, 1, 2, 3, 4, 5, 6, 7,
 	8, 9, 10, 11, 12, 13, 14, 15,
-	16, 0, 0, 0, 32, 64, 128, 0x80000000,
+	16, 0, 0, 0, 32, 64, 128, static_cast<INT32>(0x80000000),
 	-8, -7, -6, -5, -4, -3, -2, -1
 };
 
@@ -1839,7 +1839,7 @@ const address_space_config *hyperstone_device::memory_space_config(address_space
 	{
 		return &m_io_config;
 	}
-	return NULL;
+	return nullptr;
 }
 
 

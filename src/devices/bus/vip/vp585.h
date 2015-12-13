@@ -30,16 +30,16 @@ public:
 	vp585_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_vip_expansion_card_interface overrides
-	virtual void vip_io_w(address_space &space, offs_t offset, UINT8 data);
-	virtual int vip_ef3_r();
-	virtual int vip_ef4_r();
+	virtual void vip_io_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual int vip_ef3_r() override;
+	virtual int vip_ef4_r() override;
 
 private:
 	required_ioport m_j1;

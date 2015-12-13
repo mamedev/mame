@@ -20,9 +20,9 @@ class ui_menu_select_game : public ui_menu {
 public:
 	ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename);
 	virtual ~ui_menu_select_game();
-	virtual void populate();
-	virtual void handle();
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
+	virtual void populate() override;
+	virtual void handle() override;
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 	// force game select menu
 	static void force_game_select(running_machine &machine, render_container *container);
@@ -35,7 +35,7 @@ private:
 	char                    m_search[40];
 	int                     m_matchlist[VISIBLE_GAMES_IN_LIST];
 	std::vector<const game_driver *> m_driverlist;
-	auto_pointer<driver_enumerator> m_drivlist;
+	std::unique_ptr<driver_enumerator> m_drivlist;
 
 	// internal methods
 	void build_driver_list();

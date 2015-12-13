@@ -228,7 +228,7 @@ UINT32 tecmo16_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
 
-	m_mixer->mix_bitmaps(screen, bitmap, cliprect, m_palette, &m_tile_bitmap_bg, &m_tile_bitmap_fg, (bitmap_ind16*)0, &m_sprite_bitmap);
+	m_mixer->mix_bitmaps(screen, bitmap, cliprect, m_palette, &m_tile_bitmap_bg, &m_tile_bitmap_fg, (bitmap_ind16*)nullptr, &m_sprite_bitmap);
 
 	// todo, this should go through the mixer!
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);

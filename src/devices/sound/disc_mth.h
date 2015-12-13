@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:K.Wilkins
+// copyright-holders:K.Wilkins,Couriersud
+// thanks-to:Derrick Renaud, F.Palazzolo
 #pragma once
 
 #ifndef __DISC_MTH_H__
@@ -129,9 +130,8 @@ public:
 		TOK_OR,          /* Bitwise OR */
 		TOK_XOR          /* Bitwise XOR */
 	};
-	void step(void);
-	void reset(void);
-protected:
+	void step(void) override;
+	void reset(void) override;
 private:
 	DISCRETE_CLASS_INPUT(I_IN0,     0);
 	DISCRETE_CLASS_INPUT(I_IN1,     1);

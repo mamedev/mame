@@ -85,7 +85,7 @@ static const char *const regnamee[] =
 
 static char tempbuf[10][40];
 
-INLINE char *signed_16bit_unary(INT16 val)
+static inline char *signed_16bit_unary(INT16 val)
 {
 	static char temp[10];
 	if (val < 0)
@@ -95,7 +95,7 @@ INLINE char *signed_16bit_unary(INT16 val)
 	return temp;
 }
 
-INLINE char *signed_16bit_sep(INT16 val)
+static inline char *signed_16bit_sep(INT16 val)
 {
 	static char temp[10];
 	if (val < 0)
@@ -105,7 +105,7 @@ INLINE char *signed_16bit_sep(INT16 val)
 	return temp;
 }
 
-INLINE char *signed_16bit_sep_nospace(INT16 val)
+static inline char *signed_16bit_sep_nospace(INT16 val)
 {
 	static char temp[10];
 	if (val < 0)
@@ -115,7 +115,7 @@ INLINE char *signed_16bit_sep_nospace(INT16 val)
 	return temp;
 }
 
-INLINE char *unsigned_16bit_size(INT16 val, UINT8 size)
+static inline char *unsigned_16bit_size(INT16 val, UINT8 size)
 {
 	static char temp[10];
 	if (size)

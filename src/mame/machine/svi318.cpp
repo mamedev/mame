@@ -63,7 +63,7 @@ DEVICE_IMAGE_LOAD_MEMBER( svi318_state, svi318_cart )
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	if (image.software_entry() == NULL && !cart_verify(m_cart->get_rom_base()))
+	if (image.software_entry() == nullptr && !cart_verify(m_cart->get_rom_base()))
 		return IMAGE_INIT_FAIL;
 
 	return IMAGE_INIT_PASS;
@@ -222,7 +222,7 @@ WRITE_LINE_MEMBER(svi318_state::fdc_drq_w)
 
 WRITE8_MEMBER(svi318_state::fdc_drive_motor_w)
 {
-	m_floppy = NULL;
+	m_floppy = nullptr;
 
 	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();

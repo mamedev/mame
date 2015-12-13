@@ -1199,13 +1199,13 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 {
 	if (ACCESSING_BITS_0_7 && (offset == 0))
 	{
-		if (m_dsbz80 != NULL)
+		if (m_dsbz80 != nullptr)
 		{
 			m_dsbz80->latch_w(space, 0, data&0xff);
 		}
 
 		// for Manx TT DX
-		if (m_m1audio != NULL)
+		if (m_m1audio != nullptr)
 		{
 			if (!m_m1audio->ready_r(space, 0))
 			{

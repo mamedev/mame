@@ -91,6 +91,7 @@ CPUS["APEXC"] = true
 CPUS["CP1610"] = true
 CPUS["F8"] = true
 CPUS["LH5801"] = true
+CPUS["PATINHOFEIO"] = true
 CPUS["PDP1"] = true
 CPUS["SATURN"] = true
 CPUS["SC61860"] = true
@@ -272,6 +273,7 @@ VIDEOS["DL1416"] = true
 VIDEOS["DM9368"] = true
 VIDEOS["EF9340_1"] = true
 VIDEOS["EF9345"] = true
+VIDEOS["EF9365"] = true
 VIDEOS["GF4500"] = true
 --VIDEOS+= EPIC12"] = true
 --VIDEOS+= FIXFREQ"] = true
@@ -851,6 +853,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"ultratec",
 		"unisonic",
 		"unisys",
+		"usp",
 		"veb",
 		"vidbrain",
 		"videoton",
@@ -879,6 +882,7 @@ function createMESSProjects(_target, _subtarget, _name)
 	targetsubdir(_target .."_" .. _subtarget)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-" .. _target .."_" .. _subtarget .. "_" .._name))
+	addprojectflags()
 
 	includedirs {
 		MAME_DIR .. "src/osd",
@@ -2142,6 +2146,7 @@ files {
 	MAME_DIR .. "src/mame/machine/mm1kb.cpp",
 	MAME_DIR .. "src/mame/machine/mm1kb.h",
 	MAME_DIR .. "src/mame/video/mikromik.cpp",
+	MAME_DIR .. "src/mame/drivers/nokia_3310.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "northstar")
@@ -2632,6 +2637,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/tek405x.cpp",
 	MAME_DIR .. "src/mame/includes/tek405x.h",
 	MAME_DIR .. "src/mame/drivers/tek410x.cpp",
+	MAME_DIR .. "src/mame/drivers/tekxp33x.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "telenova")
@@ -2840,6 +2846,11 @@ files {
 createMESSProjects(_target, _subtarget, "unisys")
 files {
 	MAME_DIR .. "src/mame/drivers/univac.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "usp")
+files {
+    MAME_DIR .. "src/mame/drivers/patinho_feio.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "veb")

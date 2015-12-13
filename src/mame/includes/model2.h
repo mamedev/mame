@@ -257,7 +257,7 @@ struct m2_poly_extra_data
 };
 
 
-INLINE UINT16 get_texel( UINT32 base_x, UINT32 base_y, int x, int y, UINT32 *sheet )
+static inline UINT16 get_texel( UINT32 base_x, UINT32 base_y, int x, int y, UINT32 *sheet )
 {
 	UINT32  baseoffs = ((base_y/2)*512)+(base_x/2);
 	UINT32  texeloffs = ((y/2)*512)+(x/2);

@@ -80,7 +80,7 @@ void spacefb_state::video_start()
 	compute_resistor_weights(0, 0xff, -1.0,
 								3, resistances_rg, m_color_weights_rg, 470, 0,
 								2, resistances_b,  m_color_weights_b,  470, 0,
-								0, 0, 0, 0, 0);
+								0, nullptr, nullptr, 0, 0);
 
 	width = m_screen->width();
 	height = m_screen->height();

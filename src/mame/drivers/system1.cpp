@@ -436,11 +436,11 @@ void system1_state::bank0c_custom_w(UINT8 data, UINT8 prevdata)
 WRITE8_MEMBER(system1_state::videomode_w)
 {
 	/* bit 6 is connected to the 8751 IRQ */
-	if (m_mcu != NULL)
+	if (m_mcu != nullptr)
 		m_mcu->set_input_line(MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* handle any custom banking or other stuff */
-	if (m_videomode_custom != NULL)
+	if (m_videomode_custom != nullptr)
 		(this->*m_videomode_custom)(data, m_videomode_prev);
 	m_videomode_prev = data;
 
@@ -526,7 +526,7 @@ READ8_MEMBER(system1_state::sound_data_r)
 	z80pio_device *pio = machine().device<z80pio_device>("pio");
 
 	/* if we have an 8255 PPI, get the data from the port and toggle the ack */
-	if (m_ppi8255 != NULL)
+	if (m_ppi8255 != nullptr)
 	{
 		m_ppi8255->pc6_w(0);
 		m_ppi8255->pc6_w(1);
@@ -534,7 +534,7 @@ READ8_MEMBER(system1_state::sound_data_r)
 	}
 
 	/* if we have a Z80 PIO, get the data from the port and toggle the strobe */
-	else if (pio != NULL)
+	else if (pio != nullptr)
 	{
 		UINT8 data = pio->port_read(z80pio_device::PORT_A);
 		pio->strobe(z80pio_device::PORT_A, false);
@@ -4789,20 +4789,20 @@ ROM_END
 
 DRIVER_INIT_MEMBER(system1_state,bank00)
 {
-	m_videomode_custom = NULL;
-	m_banked_decrypted_opcodes = NULL;
+	m_videomode_custom = nullptr;
+	m_banked_decrypted_opcodes = nullptr;
 }
 
 DRIVER_INIT_MEMBER(system1_state,bank44)
 {
 	m_videomode_custom = &system1_state::bank44_custom_w;
-	m_banked_decrypted_opcodes = NULL;
+	m_banked_decrypted_opcodes = nullptr;
 }
 
 DRIVER_INIT_MEMBER(system1_state,bank0c)
 {
 	m_videomode_custom = &system1_state::bank0c_custom_w;
-	m_banked_decrypted_opcodes = NULL;
+	m_banked_decrypted_opcodes = nullptr;
 }
 
 DRIVER_INIT_MEMBER(system1_state,regulus)

@@ -113,7 +113,7 @@ public:
 	required_device<esqpanel2x40_sq1_device> m_sq1panel;
 	required_device<midi_port_device> m_mdout;
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);

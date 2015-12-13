@@ -983,7 +983,7 @@ const char *tlcs90_device::internal_registers_names(UINT16 x)
 	int ir = x - T90_IOBASE;
 	if ( ir >= 0 && ir < ARRAY_LENGTH(ir_names) )
 		return ir_names[ir];
-	return NULL;
+	return nullptr;
 }
 int tlcs90_device::sprint_arg(char *buffer, UINT32 pc, const char *pre, const e_mode mode, const UINT16 r, const UINT16 rb)
 {
@@ -2496,7 +2496,7 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
 
 	// Overflow
 
-	if ( m_timer_value == 0 )
+	if ( m_timer_value == nullptr )
 	{
 //      logerror("CPU Timer 4 overflow\n");
 	}

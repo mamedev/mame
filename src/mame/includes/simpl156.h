@@ -62,7 +62,7 @@ public:
 	DECLARE_DRIVER_INIT(prtytime);
 	DECLARE_DRIVER_INIT(osman);
 	DECLARE_DRIVER_INIT(chainrec);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_simpl156(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(simpl156_vbl_interrupt);
 };

@@ -122,7 +122,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
 	DECLARE_DRIVER_INIT(tetriskr);
 	DECLARE_DRIVER_INIT(filetto);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	UINT32 screen_update_tetriskr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT8 pcxt_speaker_get_spk();
 	void pcxt_speaker_set_spkrdata(UINT8 data);
@@ -137,7 +137,7 @@ public:
 	// construction/destruction
 	isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 const device_type ISA8_CGA_FILETTO = &device_creator<isa8_cga_filetto_device>;
@@ -169,9 +169,9 @@ public:
 	// construction/destruction
 	isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void device_start();
-	virtual const rom_entry *device_rom_region() const;
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual void device_start() override;
+	virtual const rom_entry *device_rom_region() const override;
 
 	DECLARE_READ8_MEMBER(bg_bank_r);
 	DECLARE_WRITE8_MEMBER(bg_bank_w);

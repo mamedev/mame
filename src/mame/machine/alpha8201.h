@@ -20,7 +20,7 @@ public:
 	DECLARE_READ8_MEMBER(mcu_data_r);
 	DECLARE_WRITE8_MEMBER(mcu_data_w);
 	DECLARE_WRITE16_MEMBER(mcu_d_w);
-	
+
 	// external I/O
 	DECLARE_WRITE_LINE_MEMBER(bus_dir_w);
 	DECLARE_WRITE_LINE_MEMBER(mcu_start_w);
@@ -29,9 +29,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	// devices/pointers

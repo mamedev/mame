@@ -356,7 +356,7 @@ UINT32 twincobr_state::screen_update_toaplan0(screen_device &screen, bitmap_ind1
 
 	UINT16 *buffered_spriteram16;
 	UINT32 bytes;
-	if (m_spriteram16 != NULL)
+	if (m_spriteram16 != nullptr)
 	{
 		buffered_spriteram16 = m_spriteram16->buffer();
 		bytes = m_spriteram16->bytes();

@@ -232,7 +232,7 @@ static floperr_t apple2_dsk_write_track(floppy_image_legacy *floppy, int head, i
 		nibble = (UINT8 *)buffer;
 		nibble += sector * APPLE2_SMALL_NIBBLE_SIZE;
 
-		disk_decode_nib(sector_buffer, nibble, NULL, NULL, NULL);
+		disk_decode_nib(sector_buffer, nibble, nullptr, nullptr, nullptr);
 		floppy_write_sector(floppy, head, track, sector, 0, sector_buffer, sizeof(sector_buffer), 0);
 	}
 
@@ -249,7 +249,7 @@ static FLOPPY_IDENTIFY(apple2_nib_identify)
 {
 	UINT64 size;
 	size = floppy_image_size(floppy);
-	*vote = (size == APPLE2_TRACK_COUNT * APPLE2_SECTOR_COUNT * APPLE2_NIBBLE_SIZE) ? 100 : 0;
+	*vote = ((size == APPLE2_TRACK_COUNT * APPLE2_SECTOR_COUNT * APPLE2_NIBBLE_SIZE) || (size == (APPLE2_TRACK_COUNT + 1) * APPLE2_SECTOR_COUNT * APPLE2_NIBBLE_SIZE)) ? 100 : 0;
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -264,7 +264,7 @@ static FLOPPY_CONSTRUCT(apple2_nib_construct)
 
 static floperr_t apple2_nib_read_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
 {
-	if ((head != 0) || (track < 0) || (track >= APPLE2_TRACK_COUNT))
+	if ((head != 0) || (track < 0) || (track > APPLE2_TRACK_COUNT))
 		return FLOPPY_ERROR_SEEKERROR;
 	if (offset != 0)
 		return FLOPPY_ERROR_UNSUPPORTED;
@@ -276,7 +276,7 @@ static floperr_t apple2_nib_read_track(floppy_image_legacy *floppy, int head, in
 
 static floperr_t apple2_nib_write_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
 {
-	if ((head != 0) || (track < 0) || (track >= APPLE2_TRACK_COUNT))
+	if ((head != 0) || (track < 0) || (track > APPLE2_TRACK_COUNT))
 		return FLOPPY_ERROR_SEEKERROR;
 	if (offset != 0)
 		return FLOPPY_ERROR_UNSUPPORTED;
@@ -376,14 +376,14 @@ static floperr_t apple2_nib_read_sector(floppy_image_legacy *floppy, int head, i
 	if (buflen != APPLE2_SECTOR_SIZE)
 		return FLOPPY_ERROR_INTERNAL;
 
-	err = floppy_load_track(floppy, head, track, FALSE, &track_data_v, NULL);
+	err = floppy_load_track(floppy, head, track, FALSE, &track_data_v, nullptr);
 	if (err)
 		return err;
 	track_data = (UINT8 *) track_data_v;
 
 	nibble = track_data + (sector * APPLE2_NIBBLE_SIZE);
 
-	if (disk_decode_nib((UINT8 *)buffer, nibble, NULL, NULL, NULL))
+	if (disk_decode_nib((UINT8 *)buffer, nibble, nullptr, nullptr, nullptr))
 		return FLOPPY_ERROR_INVALIDIMAGE;
 
 	return FLOPPY_ERROR_SUCCESS;
@@ -465,7 +465,7 @@ static floperr_t apple2_nib_write_sector(floppy_image_legacy *floppy, int head, 
 	if (buflen != APPLE2_SECTOR_SIZE)
 		return FLOPPY_ERROR_INTERNAL;
 
-	err = floppy_load_track(floppy, head, track, TRUE, &track_data_v, NULL);
+	err = floppy_load_track(floppy, head, track, TRUE, &track_data_v, nullptr);
 	if (err)
 		return err;
 	track_data = (UINT8 *) track_data_v;
@@ -494,19 +494,19 @@ static UINT32 apple2_get_track_size(floppy_image_legacy *floppy, int head, int t
 /* ----------------------------------------------------------------------- */
 
 LEGACY_FLOPPY_OPTIONS_START( apple2 )
-	LEGACY_FLOPPY_OPTION( apple2_do, "do,dsk,bin",  "Apple ][ DOS order disk image",    apple2_dsk_identify,    apple2_do_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple2_do, "do,dsk,bin",  "Apple ][ DOS order disk image",    apple2_dsk_identify,    apple2_do_construct, nullptr,
 		HEADS([1])
 		TRACKS([35])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-	LEGACY_FLOPPY_OPTION( apple2_po, "po,dsk,bin",  "Apple ][ ProDOS order disk image", apple2_dsk_identify,    apple2_po_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple2_po, "po,dsk,bin",  "Apple ][ ProDOS order disk image", apple2_dsk_identify,    apple2_po_construct, nullptr,
 		HEADS([1])
 		TRACKS([35])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-	LEGACY_FLOPPY_OPTION( apple2_nib, "dsk,nib",    "Apple ][ Nibble order disk image", apple2_nib_identify,    apple2_nib_construct, NULL,
+	LEGACY_FLOPPY_OPTION( apple2_nib, "dsk,nib",    "Apple ][ Nibble order disk image", apple2_nib_identify,    apple2_nib_construct, nullptr,
 		HEADS([1])
 		TRACKS([35])
 		SECTORS([16])
@@ -535,7 +535,7 @@ static const UINT8 prodos_skewing[] =
 };
 
 
-a2_16sect_format::a2_16sect_format() : floppy_image_format_t()
+a2_16sect_format::a2_16sect_format() : floppy_image_format_t(), m_prodos_order(false)
 {
 }
 
@@ -774,9 +774,9 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 #define DATAGOOD 8
 // data postamble is good
 #define DATAPOST 16
-		for (int i = 0; i < 16; i++) {
+		for (auto & elem : visualgrid) {
 			for (int j = 0; j < 35; j++) {
-				visualgrid[i][j] = 0;
+				elem[j] = 0;
 			}
 		}
 		image->get_actual_geometry(g_tracks, g_heads);
@@ -822,8 +822,8 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 
 						if(hb == 4) {
 								UINT8 h[11];
-								for(int i=0; i<11; i++)
-										h[i] = gb(buf, ts, pos, wrap);
+								for(auto & elem : h)
+										elem = gb(buf, ts, pos, wrap);
 								//UINT8 v2 = gcr6bw_tb[h[2]];
 								UINT8 vl = gcr4_decode(h[0],h[1]);
 								UINT8 tr = gcr4_decode(h[2],h[3]);
@@ -1140,9 +1140,9 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 #define DATAGOOD 8
 // data postamble is good
 #define DATAPOST 16
-		for (int i = 0; i < 18; i++) {
+		for (auto & elem : visualgrid) {
 			for (int j = 0; j < 35; j++) {
-				visualgrid[i][j] = 0;
+				elem[j] = 0;
 			}
 		}
 		image->get_actual_geometry(g_tracks, g_heads);
@@ -1182,8 +1182,8 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 
 				if(hb == 4) {
 						UINT8 h[11];
-						for(int i=0; i<11; i++)
-								h[i] = gb(buf, ts, pos, wrap);
+						for(auto & elem : h)
+								elem = gb(buf, ts, pos, wrap);
 						//UINT8 v2 = gcr6bw_tb[h[2]];
 						UINT8 vl = gcr4_decode(h[0],h[1]);
 						UINT8 tr = gcr4_decode(h[2],h[3]);
@@ -1345,8 +1345,8 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 								oldpos=pos;
 								UINT8 h[7];
 								// grab exactly 7 bytes: should be Track, Sector, Checksum, AA, FF and FF and the Br0derbund Title ID
-								for(int i=0; i<7; i++)
-										h[i] = gb(buf, ts, pos, wrap);
+								for(auto & elem : h)
+										elem = gb(buf, ts, pos, wrap);
 								UINT8 tr = gcr6bw_tb[h[0]];
 								UINT8 se = gcr6bw_tb[h[1]];
 								UINT8 chk = gcr6bw_tb[h[2]];

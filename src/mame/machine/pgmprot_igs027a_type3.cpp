@@ -566,10 +566,10 @@ void pgm_arm_type3_state::pgm_patch_external_arm_rom_jumptable_theglada(int base
 	*/
 
 
-	for (int i = 0; i < 131; i++)
+	for (auto & subroutine_addresse : subroutine_addresses)
 	{
 //      UINT32 addr = extprot[(base/2)] | (extprot[(base/2) + 1] << 16);
-		extprot[(base / 2)] = subroutine_addresses[i];
+		extprot[(base / 2)] = subroutine_addresse;
 
 		base += 4;
 //      printf("%04x (%08x)\n", subroutine_addresses[i], addr );

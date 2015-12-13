@@ -29,7 +29,7 @@ const device_type PARALLEL_SLOT = &device_creator<parallel_slot_device>;
 parallel_slot_device::parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PARALLEL_SLOT, "Parallel Slot", tag, owner, clock, "parallel_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
-	m_cart(NULL)
+	m_cart(nullptr)
 {
 }
 

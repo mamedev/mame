@@ -43,7 +43,7 @@ private:
 	bool m_clock_bit;
 	UINT8 m_row;
 	UINT32 m_disp_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 

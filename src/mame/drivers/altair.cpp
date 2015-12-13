@@ -40,7 +40,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 private:
 	required_device<cpu_device> m_maincpu;

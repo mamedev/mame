@@ -990,7 +990,7 @@ VIDEO_START_MEMBER(dynax_state,mjdialq2)
 
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_MJDIALQ2;
-	m_update_irq_func = 0;
+	m_update_irq_func = nullptr;
 
 	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
 	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);

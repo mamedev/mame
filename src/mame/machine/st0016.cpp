@@ -49,8 +49,8 @@ st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *
 		m_palette(*this, "palette")
 
 {
-	for (int i = 0; i < 0xc0; i++)
-		st0016_vregs[i] = 0;
+	for (auto & elem : st0016_vregs)
+		elem = 0;
 }
 
 
@@ -587,7 +587,7 @@ void st0016_cpu_device::startup()
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (m_gfxdecode->gfx(gfx_index) == 0)
+		if (m_gfxdecode->gfx(gfx_index) == nullptr)
 			break;
 
 	assert(gfx_index != MAX_GFX_ELEMENTS);

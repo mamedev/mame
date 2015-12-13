@@ -43,9 +43,9 @@ public:
 	c1581_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( cnt_w );
@@ -59,14 +59,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_cbm_iec_interface overrides
-	virtual void cbm_iec_srq(int state);
-	virtual void cbm_iec_atn(int state);
-	virtual void cbm_iec_data(int state);
-	virtual void cbm_iec_reset(int state);
+	virtual void cbm_iec_srq(int state) override;
+	virtual void cbm_iec_atn(int state) override;
+	virtual void cbm_iec_data(int state) override;
+	virtual void cbm_iec_reset(int state) override;
 
 	enum
 	{
@@ -99,7 +99,7 @@ public:
 	c1563_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 

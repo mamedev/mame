@@ -241,8 +241,8 @@ public:
 	DECLARE_WRITE16_MEMBER(expro02_vram_0_bank_w);
 	DECLARE_WRITE16_MEMBER(expro02_vram_1_bank_w);
 	DECLARE_DRIVER_INIT(expro02);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(expro02);
 	UINT32 screen_update_backgrounds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_expro02(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -263,9 +263,9 @@ public:
 	parallel_drum_t m_parallel_drum;
 	required_device<pdp1_device> m_maincpu;
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pdp1);
 	UINT32 screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_pdp1(screen_device &screen, bool state);

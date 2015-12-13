@@ -54,7 +54,7 @@ public:
 	DECLARE_READ8_MEMBER(ram_r);
 
 private:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	UINT8 m_resetcnt;
 	UINT8 m_ram_data;
 	required_device<cosmac_device> m_maincpu;

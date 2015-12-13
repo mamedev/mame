@@ -436,7 +436,7 @@ void c8280_t::device_reset()
 	m_riot1->pa7_w(1);
 
 	m_fk5 = 0;
-	m_floppy = NULL;
+	m_floppy = nullptr;
 	m_fdc->set_floppy(m_floppy);
 	m_fdc->dden_w(0);
 }
@@ -513,7 +513,7 @@ WRITE8_MEMBER( c8280_t::fk5_w )
 	m_fk5 = data & 0x27;
 
 	// drive select
-	m_floppy = NULL;
+	m_floppy = nullptr;
 
 	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();

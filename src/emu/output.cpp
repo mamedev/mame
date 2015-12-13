@@ -26,7 +26,7 @@ class output_notify
 {
 public:
 	output_notify(output_notifier_func callback, void *param)
-		: m_next(NULL),
+		: m_next(nullptr),
 			m_notifier(callback),
 			m_param(param) { }
 
@@ -78,7 +78,7 @@ static void output_exit(running_machine &machine);
     get_hash - return the hash of an output value
 -------------------------------------------------*/
 
-INLINE UINT32 get_hash(const char *string)
+static inline UINT32 get_hash(const char *string)
 {
 	return core_crc32(0, (UINT8 *)string, (UINT32)strlen(string));
 }
@@ -88,17 +88,17 @@ INLINE UINT32 get_hash(const char *string)
     find_item - find an item based on a string
 -------------------------------------------------*/
 
-INLINE output_item *find_item(const char *string)
+static inline output_item *find_item(const char *string)
 {
 	UINT32 hash = get_hash(string);
 	output_item *item;
 
 	/* use the hash as a starting point and find an entry */
-	for (item = itemtable[hash % HASH_SIZE]; item != NULL; item = item->next)
+	for (item = itemtable[hash % HASH_SIZE]; item != nullptr; item = item->next)
 		if (item->hash == hash && strcmp(string, item->name.c_str()) == 0)
 			return item;
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -106,9 +106,9 @@ INLINE output_item *find_item(const char *string)
     create_new_item - create a new item
 -------------------------------------------------*/
 
-INLINE output_item *create_new_item(const char *outname, INT32 value)
+static inline output_item *create_new_item(const char *outname, INT32 value)
 {
-	output_item *item = global_alloc(output_item);
+	auto item = global_alloc(output_item);
 	UINT32 hash = get_hash(outname);
 
 	/* fill in the data */
@@ -174,7 +174,7 @@ static void output_exit(running_machine &machine)
 
 	/* remove all items */
 	for (hash = 0; hash < HASH_SIZE; hash++)
-		for (item = itemtable[hash]; item != NULL; )
+		for (item = itemtable[hash]; item != nullptr; )
 		{
 			output_item *next = item->next;
 
@@ -198,7 +198,7 @@ void output_set_value(const char *outname, INT32 value)
 	INT32 oldval;
 
 	/* if no item of that name, create a new one and send the item's state */
-	if (item == NULL)
+	if (item == nullptr)
 	{
 		item = create_new_item(outname, value);
 		oldval = value + 1;
@@ -215,11 +215,11 @@ void output_set_value(const char *outname, INT32 value)
 	if (oldval != value)
 	{
 		/* call the local notifiers first */
-		for (output_notify *notify = item->notifylist.first(); notify != NULL; notify = notify->next())
+		for (output_notify *notify = item->notifylist.first(); notify != nullptr; notify = notify->next())
 			(*notify->m_notifier)(outname, value, notify->m_param);
 
 		/* call the global notifiers next */
-		for (output_notify *notify = global_notifylist.first(); notify != NULL; notify = notify->next())
+		for (output_notify *notify = global_notifylist.first(); notify != nullptr; notify = notify->next())
 			(*notify->m_notifier)(outname, value, notify->m_param);
 	}
 }
@@ -261,7 +261,7 @@ INT32 output_get_value(const char *outname)
 	output_item *item = find_item(outname);
 
 	/* if no item, value is 0 */
-	if (item == NULL)
+	if (item == nullptr)
 		return 0;
 	return item->value;
 }
@@ -302,12 +302,12 @@ INT32 output_get_indexed_value(const char *basename, int index)
 void output_set_notifier(const char *outname, output_notifier_func callback, void *param)
 {
 	/* if an item is specified, find it */
-	if (outname != NULL)
+	if (outname != nullptr)
 	{
 		output_item *item = find_item(outname);
 
 		/* if no item of that name, create a new one */
-		if (item == NULL)
+		if (item == nullptr)
 			item = create_new_item(outname, 0);
 		item->notifylist.append(*global_alloc(output_notify(callback, param)));
 	}
@@ -328,7 +328,7 @@ void output_notify_all(output_notifier_func callback, void *param)
 
 	/* remove all items */
 	for (hash = 0; hash < HASH_SIZE; hash++)
-		for (item = itemtable[hash]; item != NULL; item = item->next)
+		for (item = itemtable[hash]; item != nullptr; item = item->next)
 			(*callback)(item->name.c_str(), item->value, param);
 }
 
@@ -343,7 +343,7 @@ UINT32 output_name_to_id(const char *outname)
 	output_item *item = find_item(outname);
 
 	/* if no item, ID is 0 */
-	if (item == NULL)
+	if (item == nullptr)
 		return 0;
 	return item->id;
 }
@@ -361,10 +361,10 @@ const char *output_id_to_name(UINT32 id)
 
 	/* remove all items */
 	for (hash = 0; hash < HASH_SIZE; hash++)
-		for (item = itemtable[hash]; item != NULL; item = item->next)
+		for (item = itemtable[hash]; item != nullptr; item = item->next)
 			if (item->id == id)
 				return item->name.c_str();
 
 	/* nothing found, return NULL */
-	return NULL;
+	return nullptr;
 }

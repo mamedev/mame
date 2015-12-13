@@ -100,9 +100,9 @@ public:
 	TILE_GET_INFO_MEMBER(robokid_get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(robokid_get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(robokid_get_bg2_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(mnight);
 	DECLARE_VIDEO_START(arkarea);
 	DECLARE_VIDEO_START(robokid);

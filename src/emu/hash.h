@@ -89,10 +89,10 @@ public:
 	bool from_internal_string(const char *string);
 
 	// creation
-	void begin(const char *types = NULL);
+	void begin(const char *types = nullptr);
 	void buffer(const UINT8 *data, UINT32 length);
 	void end();
-	void compute(const UINT8 *data, UINT32 length, const char *types = NULL) { begin(types); buffer(data, length); end(); }
+	void compute(const UINT8 *data, UINT32 length, const char *types = nullptr) { begin(types); buffer(data, length); end(); }
 
 private:
 	// internal helpers

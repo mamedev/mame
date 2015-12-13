@@ -52,7 +52,7 @@ const device_type PC080SN = &device_creator<pc080sn_device>;
 
 pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC080SN, "Taito PC080SN", tag, owner, clock, "pc080sn", __FILE__),
-	m_ram(NULL),
+	m_ram(nullptr),
 	m_gfxnum(0),
 	m_x_offset(0),
 	m_y_offset(0),
@@ -61,13 +61,13 @@ pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, d
 	m_gfxdecode(*this),
 	m_palette(*this)
 {
-	for (int i = 0; i < 8; i++)
-		m_ctrl[i] = 0;
+	for (auto & elem : m_ctrl)
+		elem = 0;
 
 	for (int i = 0; i < 2; i++)
 	{
-		m_bg_ram[i] = NULL;
-		m_bgscroll_ram[i] = NULL;
+		m_bg_ram[i] = nullptr;
+		m_bgscroll_ram[i] = nullptr;
 		m_bgscrollx[i] = 0;
 		m_bgscrolly[i] = 0;
 	}

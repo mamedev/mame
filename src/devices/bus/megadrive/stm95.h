@@ -64,19 +64,19 @@ public:
 	md_eeprom_stm95_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read);
-	virtual DECLARE_READ16_MEMBER(read_a13);
-	virtual DECLARE_WRITE16_MEMBER(write_a13);
+	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual DECLARE_READ16_MEMBER(read_a13) override;
+	virtual DECLARE_WRITE16_MEMBER(write_a13) override;
 
 private:
 	UINT8 m_bank[3];
 	int m_rdcnt;
 
-	auto_pointer<stm95_eeprom_device> m_stm95;
+	std::unique_ptr<stm95_eeprom_device> m_stm95;
 };
 
 

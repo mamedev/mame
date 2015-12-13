@@ -115,7 +115,7 @@ private:
 	UINT8 m_u11_b;
 	bool m_u10_timer;
 	bool m_u11_timer;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<m6809e_device> m_videocpu;
 	required_device<m6803_cpu_device> m_audiocpu;

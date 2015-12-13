@@ -96,14 +96,14 @@ void gba_rom_eeprom_device::device_start()
 {
 	// for the moment we use a custom eeprom implementation, so we alloc/save it as nvram
 	nvram_alloc(0x200);
-	m_eeprom.reset(global_alloc(gba_eeprom_device(machine(), (UINT8*)get_nvram_base(), get_nvram_size(), 6)));
+	m_eeprom = std::make_unique<gba_eeprom_device>(machine(), (UINT8*)get_nvram_base(), get_nvram_size(), 6);
 }
 
 void gba_rom_eeprom64_device::device_start()
 {
 	// for the moment we use a custom eeprom implementation, so we alloc/save it as nvram
 	nvram_alloc(0x2000);
-	m_eeprom.reset(global_alloc(gba_eeprom_device(machine(), (UINT8*)get_nvram_base(), get_nvram_size(), 14)));
+	m_eeprom = std::make_unique<gba_eeprom_device>(machine(), (UINT8*)get_nvram_base(), get_nvram_size(), 14);
 }
 
 

@@ -203,10 +203,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	struct filter {
@@ -332,8 +332,8 @@ void esq1_filters::device_start()
 {
 	stream = stream_alloc(8, 2, 44100);
 	memset(filters, 0, sizeof(filters));
-	for(int i=0; i<8; i++)
-		recalc_filter(filters[i]);
+	for(auto & elem : filters)
+		recalc_filter(elem);
 }
 
 void esq1_filters::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
@@ -418,7 +418,7 @@ public:
 	int m_seq_bank;
 	UINT8 m_seqram[0x10000];
 	UINT8 m_dosram[0x2000];
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 	void send_through_panel(UINT8 data);

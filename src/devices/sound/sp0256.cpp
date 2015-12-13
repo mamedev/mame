@@ -215,7 +215,7 @@ void sp0256_device::device_reset()
 /* ======================================================================== */
 /*  LIMIT            -- Limiter function for digital sample output.         */
 /* ======================================================================== */
-INLINE INT16 limit(INT16 s)
+static inline INT16 limit(INT16 s)
 {
 #ifdef HIGH_QUALITY /* Higher quality than the original, but who cares? */
 	if (s >  8191) return  8191;
@@ -230,7 +230,7 @@ INLINE INT16 limit(INT16 s)
 /* ======================================================================== */
 /*  LPC12_UPDATE     -- Update the 12-pole filter, outputting samples.      */
 /* ======================================================================== */
-INLINE int lpc12_update(struct lpc12_t *f, int num_samp, INT16 *out, UINT32 *optr)
+static inline int lpc12_update(struct lpc12_t *f, int num_samp, INT16 *out, UINT32 *optr)
 {
 	int i, j;
 	INT16 samp;
@@ -360,7 +360,7 @@ static const int stage_map[6] = { 0, 1, 2, 3, 4, 5 };
 /* ======================================================================== */
 /*  LPC12_REGDEC -- Decode the register set in the filter bank.             */
 /* ======================================================================== */
-INLINE void lpc12_regdec(struct lpc12_t *f)
+static inline void lpc12_regdec(struct lpc12_t *f)
 {
 	int i;
 
@@ -722,7 +722,7 @@ static const INT16 sp0256_df_idx[16 * 8] =
 /* ======================================================================== */
 /*  BITREV32       -- Bit-reverse a 32-bit number.                            */
 /* ======================================================================== */
-INLINE UINT32 bitrev32(UINT32 val)
+static inline UINT32 bitrev32(UINT32 val)
 {
 	val = ((val & 0xFFFF0000) >> 16) | ((val & 0x0000FFFF) << 16);
 	val = ((val & 0xFF00FF00) >>  8) | ((val & 0x00FF00FF) <<  8);
@@ -736,7 +736,7 @@ INLINE UINT32 bitrev32(UINT32 val)
 /* ======================================================================== */
 /*  BITREV8       -- Bit-reverse a 8-bit number.                            */
 /* ======================================================================== */
-INLINE UINT8 bitrev8(UINT8 val)
+static inline UINT8 bitrev8(UINT8 val)
 {
 	val = ((val & 0xF0) >>  4) | ((val & 0x0F) <<  4);
 	val = ((val & 0xCC) >>  2) | ((val & 0x33) <<  2);

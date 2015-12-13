@@ -41,7 +41,7 @@ void ym2413_device::device_start()
 
 	/* emulator create */
 	m_chip = ym2413_init(this, clock(), rate);
-	assert_always(m_chip != NULL, "Error creating YM2413 chip");
+	assert_always(m_chip != nullptr, "Error creating YM2413 chip");
 
 	/* stream system initialize */
 	m_stream = machine().sound().stream_alloc(*this,0,2,rate);

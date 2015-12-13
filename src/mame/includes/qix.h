@@ -114,7 +114,7 @@ public:
 	DECLARE_DRIVER_INIT(slither);
 	DECLARE_DRIVER_INIT(zookeep);
 	DECLARE_DRIVER_INIT(kram3);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(qixmcu);
 	DECLARE_VIDEO_START(qix);
 	TIMER_CALLBACK_MEMBER(pia_w_callback);

@@ -97,9 +97,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -406,7 +406,7 @@ READ8_MEMBER( smc777_state::fdc_request_r )
 
 WRITE8_MEMBER( smc777_state::floppy_select_w )
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	// ---- xxxx select floppy drive (yes, 15 of them, A to P)
 	switch (data & 0x01)

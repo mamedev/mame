@@ -167,7 +167,7 @@ public:
 	DECLARE_READ8_MEMBER(qs1000_p1_r);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_DRIVER_INIT(vamphalf);
 	DECLARE_DRIVER_INIT(vamphafk);
 	DECLARE_DRIVER_INIT(coolmini);
@@ -644,7 +644,7 @@ void vamphalf_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 			offs = (block + cnt) / 2;
 
 			// 16bit version
-			if(m_tiles != NULL)
+			if(m_tiles != nullptr)
 			{
 				if(m_tiles[offs] & 0x0100) continue;
 

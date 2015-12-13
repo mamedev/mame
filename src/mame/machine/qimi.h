@@ -39,7 +39,7 @@ public:
 	template<class _Object> static devcb_base &set_exting_wr_callback(device_t &device, _Object object) { return downcast<qimi_t &>(device).m_write_extint.set_callback(object); }
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 	UINT8 read(address_space &space, offs_t offset, UINT8 data);
 	DECLARE_WRITE8_MEMBER( write );
@@ -49,8 +49,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	enum

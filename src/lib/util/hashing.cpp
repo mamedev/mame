@@ -63,13 +63,13 @@ bool sha1_t::from_string(const char *string, int length)
 		return false;
 
 	// iterate through our raw buffer
-	for (int bytenum = 0; bytenum < sizeof(m_raw); bytenum++)
+	for (auto & elem : m_raw)
 	{
 		int upper = char_to_hex(*string++);
 		int lower = char_to_hex(*string++);
 		if (upper == -1 || lower == -1)
 			return false;
-		m_raw[bytenum] = (upper << 4) | lower;
+		elem = (upper << 4) | lower;
 	}
 	return true;
 }
@@ -82,8 +82,8 @@ bool sha1_t::from_string(const char *string, int length)
 const char *sha1_t::as_string(std::string &buffer) const
 {
 	buffer.clear();
-	for (int i = 0; i < ARRAY_LENGTH(m_raw); i++)
-		strcatprintf(buffer, "%02x", m_raw[i]);
+	for (auto & elem : m_raw)
+		strcatprintf(buffer, "%02x", elem);
 	return buffer.c_str();
 }
 
@@ -106,13 +106,13 @@ bool md5_t::from_string(const char *string, int length)
 		return false;
 
 	// iterate through our raw buffer
-	for (int bytenum = 0; bytenum < sizeof(m_raw); bytenum++)
+	for (auto & elem : m_raw)
 	{
 		int upper = char_to_hex(*string++);
 		int lower = char_to_hex(*string++);
 		if (upper == -1 || lower == -1)
 			return false;
-		m_raw[bytenum] = (upper << 4) | lower;
+		elem = (upper << 4) | lower;
 	}
 	return true;
 }
@@ -125,8 +125,8 @@ bool md5_t::from_string(const char *string, int length)
 const char *md5_t::as_string(std::string &buffer) const
 {
 	buffer.clear();
-	for (int i = 0; i < ARRAY_LENGTH(m_raw); i++)
-		strcatprintf(buffer, "%02x", m_raw[i]);
+	for (auto & elem : m_raw)
+		strcatprintf(buffer, "%02x", elem);
 	return buffer.c_str();
 }
 

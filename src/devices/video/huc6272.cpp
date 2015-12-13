@@ -31,7 +31,7 @@ ADDRESS_MAP_END
 
 const address_space_config *huc6272_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 //**************************************************************************
@@ -68,7 +68,7 @@ inline void huc6272_device::write_dword(offs_t address, UINT32 data)
 huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, huc6272, "huc6272", tag, owner, clock, "huc6272", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 32, 32, 0, NULL, *ADDRESS_MAP_NAME(huc6272_vram))
+		m_space_config("videoram", ENDIANNESS_LITTLE, 32, 32, 0, nullptr, *ADDRESS_MAP_NAME(huc6272_vram))
 {
 }
 

@@ -135,7 +135,7 @@ void cyberbal_state::scanline_update(screen_device &screen, int scanline)
 
 	/* loop over screens */
 	screen_device_iterator iter(*this);
-	for (i = 0, update_screen = iter.first(); update_screen != NULL; i++, update_screen = iter.next())
+	for (i = 0, update_screen = iter.first(); update_screen != nullptr; i++, update_screen = iter.next())
 	{
 		/* need explicit target() because one is optional_device and other is required_device */
 		tilemap_t *curplayfield = i ? m_playfield2_tilemap.target() : m_playfield_tilemap.target();
@@ -218,7 +218,7 @@ UINT32 cyberbal_state::update_one_screen(screen_device &screen, bitmap_ind16 &bi
 
 	/* draw and merge the MO */
 	bitmap_ind16 &mobitmap = curmob->bitmap();
-	for (const sparse_dirty_rect *rect = curmob->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+	for (const sparse_dirty_rect *rect = curmob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap.pix16(y);

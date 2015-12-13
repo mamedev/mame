@@ -223,7 +223,7 @@ public:
 	DECLARE_WRITE16_MEMBER(gunpey_vram_bank_w);
 	DECLARE_WRITE16_MEMBER(gunpey_vregs_addr_w);
 	DECLARE_DRIVER_INIT(gunpey);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_gunpey(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(gunpey_scanline);
 	TIMER_CALLBACK_MEMBER(blitter_end);

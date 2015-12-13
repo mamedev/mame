@@ -24,6 +24,9 @@
 #elif defined(__APPLE__) && defined(__MACH__)
 #define PLATFORM_MACOSX   (1)
 #define PLATFORM_STRING   "macosx"
+#elif defined(__OS2__)
+#define PLATFORM_OS2      (1)
+#define PLATFORM_STRING   "os2"
 #else
 #define PLATFORM_WINDOWS  (1)
 #define PLATFORM_STRING   "windows"

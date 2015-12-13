@@ -244,9 +244,9 @@ public:
 	DECLARE_READ8_MEMBER(ppi0_c_r);
 	DECLARE_WRITE8_MEMBER(ppi0_a_w);
 	DECLARE_WRITE8_MEMBER(ppi0_b_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(sureshot);
 	UINT32 screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

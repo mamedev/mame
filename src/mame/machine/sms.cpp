@@ -854,9 +854,9 @@ void sms_state::setup_bios()
 	m_BIOS = memregion("user1")->base();
 	m_bios_page_count = (m_BIOS ? memregion("user1")->bytes() / 0x4000 : 0);
 
-	if (m_BIOS == NULL || m_BIOS[0] == 0x00)
+	if (m_BIOS == nullptr || m_BIOS[0] == 0x00)
 	{
-		m_BIOS = NULL;
+		m_BIOS = nullptr;
 		m_has_bios_0400 = 0;
 		m_has_bios_2000 = 0;
 		m_has_bios_full = 0;
@@ -890,7 +890,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 	m_expslot = machine().device<sms_expansion_slot_device>("exp");
 	m_space = &m_maincpu->space(AS_PROGRAM);
 
-	if (m_mainram == NULL)
+	if (m_mainram == nullptr)
 	{
 		m_mainram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
 		save_pointer(NAME(m_mainram), 0x2000);

@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol
 #define INC_8BIT(x) \
 { \
-	register UINT8 r,f; \
+	UINT8 r,f; \
 	x++; \
 	r=(x);  \
 	f=(UINT8)(m_F&FLAG_C); \
@@ -13,7 +13,7 @@
 
 #define DEC_8BIT(x) \
 { \
-	register UINT8 r,f; \
+	UINT8 r,f; \
 	x--; \
 	r=(x);  \
 	f=(UINT8)((m_F&FLAG_C)|FLAG_N); \
@@ -24,22 +24,22 @@
 
 #define INC_16BIT(x,y) \
 { \
-	register UINT16 r = x << 8 | y; \
+	UINT16 r = x << 8 | y; \
 	if (++y == 0) x++; \
 	m_incdec16_func(r << 16 | x << 8 | y); \
 }
 
 #define DEC_16BIT(x,y) \
 { \
-	register UINT16 r = x << 8 | y; \
+	UINT16 r = x << 8 | y; \
 	if (--y == 0xff) x--; \
 	m_incdec16_func(r << 16 | x << 8 | y); \
 }
 
 #define ADD_HL_RR(x) \
 { \
-	register UINT32 r1,r2; \
-	register UINT8 f; \
+	UINT32 r1,r2; \
+	UINT8 f; \
 	r1=((m_H<<8)|m_L)+(x); \
 	r2=(((m_H<<8)|m_L)&0xFFF)+((x)&0xFFF); \
 	f=(UINT8)(m_F&FLAG_Z); \
@@ -52,8 +52,8 @@
 
 #define ADD_A_X(x) \
 { \
-	register UINT16 r1,r2; \
-	register UINT8 f; \
+	UINT16 r1,r2; \
+	UINT8 f; \
 	r1=(UINT16)((m_A&0xF)+((x)&0xF)); \
 	r2=(UINT16)(m_A+(x)); \
 	m_A=(UINT8)r2; \
@@ -66,8 +66,8 @@
 
 #define SUB_A_X(x) \
 { \
-	register UINT16 r1,r2; \
-	register UINT8 f; \
+	UINT16 r1,r2; \
+	UINT8 f; \
 	r1=(UINT16)((m_A&0xF)-((x)&0xF)); \
 	r2=(UINT16)(m_A-(x)); \
 	m_A=(UINT8)r2; \
@@ -80,8 +80,8 @@
 
 #define CP_A_X(x) \
 { \
-	register UINT16 r1,r2; \
-	register UINT8 f; \
+	UINT16 r1,r2; \
+	UINT8 f; \
 	r1=(UINT16)((m_A&0xF)-((x)&0xF)); \
 	r2=(UINT16)(m_A-(x)); \
 	if( ((UINT8)r2)==0 ) f=FLAG_N|FLAG_Z; \
@@ -93,8 +93,8 @@
 
 #define SBC_A_X(x) \
 { \
-	register UINT16 r1,r2; \
-	register UINT8 f; \
+	UINT16 r1,r2; \
+	UINT8 f; \
 	r1=(UINT16)((m_A&0xF)-((x)&0xF)-((m_F&FLAG_C)?1:0)); \
 	r2=(UINT16)(m_A-(x)-((m_F&FLAG_C)?1:0)); \
 	m_A=(UINT8)r2; \
@@ -107,8 +107,8 @@
 
 #define ADC_A_X(x) \
 { \
-	register UINT16 r1,r2;  \
-	register UINT8 f; \
+	UINT16 r1,r2;  \
+	UINT8 f; \
 	r1=(UINT16)((m_A&0xF)+((x)&0xF)+((m_F&FLAG_C)?1:0));  \
 	r2=(UINT16)(m_A+(x)+((m_F&FLAG_C)?1:0)); \
 	if( (m_A=(UINT8)r2)==0 ) f=FLAG_Z; \
@@ -431,7 +431,7 @@ case 0x33: /*      INC SP */
 case 0x34: /*      INC (HL) */
 	{
 		UINT16 addr = ( m_H << 8 ) | m_L;
-		register UINT8 r, f;
+		UINT8 r, f;
 
 		f = (UINT8) (m_F & FLAG_C);
 		r = mem_read_byte( addr );
@@ -450,7 +450,7 @@ case 0x34: /*      INC (HL) */
 case 0x35: /*      DEC (HL) */
 	{
 		UINT16 addr = ( m_H << 8 ) | m_L;
-		register UINT8 r, f;
+		UINT8 r, f;
 
 		f = (UINT8) ((m_F & FLAG_C) | FLAG_N);
 		r = mem_read_byte( addr );
@@ -1293,7 +1293,7 @@ case 0xE8: /*      ADD SP,n8 */
  */
 
 	{
-	register INT32 n;
+	INT32 n;
 
 	n = (INT8) mem_read_byte( m_PC++ );
 
@@ -1380,7 +1380,7 @@ case 0xF8: /*      LD HL,SP+n8 */
  */
 
 	{
-	register INT32 n;
+	INT32 n;
 
 	n = (INT8) mem_read_byte( m_PC++ );
 

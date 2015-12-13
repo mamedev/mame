@@ -32,19 +32,19 @@ public:
 	ql_trump_card_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int ram_size);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_ql_expansion_card_interface overrides
-	virtual UINT8 read(address_space &space, offs_t offset, UINT8 data);
-	virtual void write(address_space &space, offs_t offset, UINT8 data);
+	virtual UINT8 read(address_space &space, offs_t offset, UINT8 data) override;
+	virtual void write(address_space &space, offs_t offset, UINT8 data) override;
 
 private:
 	required_device<wd1772_t> m_fdc;

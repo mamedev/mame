@@ -162,7 +162,7 @@ static MACHINE_CONFIG_START( horizon, horizon_state )
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_R_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_R_TAG, i8251_device, write_dsr))
 
@@ -170,17 +170,17 @@ static MACHINE_CONFIG_START( horizon, horizon_state )
 	MCFG_S100_BUS_ADD()
 	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT))
 	//MCFG_S100_SLOT_ADD("s100_1", horizon_s100_cards, NULL, NULL) // CPU
-	MCFG_S100_SLOT_ADD("s100_2", horizon_s100_cards, NULL) // RAM
+	MCFG_S100_SLOT_ADD("s100_2", horizon_s100_cards, nullptr) // RAM
 	MCFG_S100_SLOT_ADD("s100_3", horizon_s100_cards, "mdsad") // MDS
-	MCFG_S100_SLOT_ADD("s100_4", horizon_s100_cards, NULL) // FPB
-	MCFG_S100_SLOT_ADD("s100_5", horizon_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD("s100_6", horizon_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD("s100_7", horizon_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD("s100_8", horizon_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD("s100_9", horizon_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD("s100_10", horizon_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD("s100_11", horizon_s100_cards, NULL)
-	MCFG_S100_SLOT_ADD("s100_12", horizon_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD("s100_4", horizon_s100_cards, nullptr) // FPB
+	MCFG_S100_SLOT_ADD("s100_5", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100_6", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100_7", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100_8", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100_9", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100_10", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100_11", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100_12", horizon_s100_cards, nullptr)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "horizon")

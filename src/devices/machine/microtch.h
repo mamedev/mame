@@ -15,18 +15,18 @@ public:
 	microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	template<class _Object> static devcb_base &static_set_stx_callback(device_t &device, _Object object) { return downcast<microtouch_device &>(device).m_out_stx_func.set_callback(object); }
 
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 	DECLARE_WRITE_LINE_MEMBER(rx) { device_serial_interface::rx_w(state); }
 	DECLARE_INPUT_CHANGED_MEMBER(touch);
 
 	typedef delegate<int (int *, int *)> touch_cb;
 	static void static_set_touch_callback(device_t &device, touch_cb object) { downcast<microtouch_device &>(device).m_out_touch_cb = object; }
 protected:
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void tra_callback();
-	virtual void tra_complete();
-	virtual void rcv_complete();
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void rcv_complete() override;
 private:
 	int check_command( const char* commandtocheck, int command_len, UINT8* command_data );
 	void send_format_table_packet(UINT8 flag, int x, int y);

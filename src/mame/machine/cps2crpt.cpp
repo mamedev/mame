@@ -747,16 +747,16 @@ DRIVER_INIT_MEMBER(cps_state,cps2crpt)
 	UINT32 upper;
 
 	std::string skey1 = parameter("cryptkey1");;
-	key[0] = strtoll(skey1.c_str(), 0, 16);
+	key[0] = strtoll(skey1.c_str(), nullptr, 16);
 
 	std::string skey2 = parameter("cryptkey2");
-	key[1] = strtoll(skey2.c_str(), 0, 16);
+	key[1] = strtoll(skey2.c_str(), nullptr, 16);
 
 	std::string slower = parameter("cryptlower");
-	lower = strtoll(slower.c_str(), 0, 16);
+	lower = strtoll(slower.c_str(), nullptr, 16);
 
 	std::string supper = parameter("cryptupper");
-	upper = strtoll(supper.c_str(), 0, 16);
+	upper = strtoll(supper.c_str(), nullptr, 16);
 
 	// we have a proper key so use it to decrypt
 	if (lower!=0xff0000) // don't run the decrypt on 'dead key' games for now

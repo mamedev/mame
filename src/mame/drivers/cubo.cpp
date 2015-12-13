@@ -12,17 +12,19 @@
    ----------------------------------------------
    Candy Puzzle         |  1.0 | 1995
    Double Strixx        |      | 1995
+   Greyhound Race       |      | 199x
    Harem Challenge      |      | 1995
    Laser Quiz           |      | 1995
+   Laser Quiz France    |  1.0 | 1995
+   Laser Quiz Greece?   |      | 1995 *may exist
    Laser Quiz 2 "Italy" |  1.0 | 1995
    Laser Strixx         |      | 1995
    Laser Strixx 2       |      | 1995
+   Lucky Five           |      | 1995
+   Magic Number         |      | 1995
    Magic Premium        |  1.1 | 1996
-   Laser Quiz France    |  1.0 | 1995
-   Laser Quiz Greece?   |      | 1995 *may exist
    Odeon Twister        |      | 199x
    Odeon Twister 2      |202.19| 1999
-
 
    ToDo:
    - remove the hack needed to make inputs working
@@ -353,8 +355,8 @@ public:
 	UINT16 m_potgo_value;
 
 protected:
-	virtual void rs232_tx(int state);
-	virtual void potgo_w(UINT16 data);
+	virtual void rs232_tx(int state) override;
+	virtual void potgo_w(UINT16 data) override;
 
 private:
 	required_device<microtouch_device> m_microtouch;
@@ -439,7 +441,7 @@ void cubo_state::potgo_w(UINT16 data)
 {
 	int i;
 
-	if (m_input_hack != NULL)
+	if (m_input_hack != nullptr)
 		(this->*m_input_hack)();
 
 	m_potgo_value = m_potgo_value & 0x5500;
@@ -1103,7 +1105,7 @@ DRIVER_INIT_MEMBER( cubo_state, cubo )
 {
 	m_agnus_id = ALICE_PAL_NEW;
 	m_denise_id = LISA;
-	m_input_hack = NULL;
+	m_input_hack = nullptr;
 }
 
 

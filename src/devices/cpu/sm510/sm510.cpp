@@ -166,7 +166,7 @@ void sm510_base_device::device_reset()
 inline UINT16 sm510_base_device::get_lcd_row(int column, UINT8* ram)
 {
 	// output 0 if lcd blackpate/bleeder is off, or in case row doesn't exist
-	if (ram == NULL || m_bc || !m_bp)
+	if (ram == nullptr || m_bc || !m_bp)
 		return 0;
 
 	UINT16 rowdata = 0;

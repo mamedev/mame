@@ -79,12 +79,12 @@ public:
 	required_device<palette_device> m_palette;
 	UINT8 *m_p_chargen;
 	UINT8 m_term_data;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_WRITE_LINE_MEMBER(h19_ace_irq);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

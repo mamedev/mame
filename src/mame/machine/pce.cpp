@@ -110,8 +110,8 @@ MACHINE_START_MEMBER(pce_state,pce)
 
 MACHINE_RESET_MEMBER(pce_state,mess_pce)
 {
-	for (int joy_i = 0; joy_i < 5; joy_i++)
-		m_joy_6b_packet[joy_i] = 0;
+	for (auto & elem : m_joy_6b_packet)
+		elem = 0;
 
 	/* Note: Arcade Card BIOS contents are the same as System 3, only internal HW differs.
 	   We use a category to select between modes (some games can be run in either S-CD or A-CD modes) */

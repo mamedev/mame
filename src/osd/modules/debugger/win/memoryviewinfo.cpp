@@ -22,9 +22,9 @@ memoryview_info::~memoryview_info()
 }
 
 
-UINT8 memoryview_info::bytes_per_chunk() const
+UINT8 memoryview_info::data_format() const
 {
-	return view<debug_view_memory>()->bytes_per_chunk();
+	return view<debug_view_memory>()->get_data_format();
 }
 
 
@@ -51,9 +51,9 @@ void memoryview_info::set_expression(char const *string)
 	view<debug_view_memory>()->set_expression(string);
 }
 
-void memoryview_info::set_bytes_per_chunk(UINT8 chunkbytes)
+void memoryview_info::set_data_format(UINT8 dataformat)
 {
-	view<debug_view_memory>()->set_bytes_per_chunk(chunkbytes);
+	view<debug_view_memory>()->set_data_format(dataformat);
 }
 
 void memoryview_info::set_chunks_per_row(UINT32 rowchunks)

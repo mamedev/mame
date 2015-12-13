@@ -54,9 +54,9 @@ public:
 	UINT8 m_clock_address;
 	DECLARE_READ16_MEMBER(concept_io_r);
 	DECLARE_WRITE16_MEMBER(concept_io_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_concept(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(via_in_a);

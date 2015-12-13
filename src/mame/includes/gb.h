@@ -137,8 +137,8 @@ protected:
 	void save_gbc_only();
 	void save_sgb_only();
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 

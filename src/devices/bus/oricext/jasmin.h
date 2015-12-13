@@ -31,11 +31,11 @@ protected:
 	UINT8 *jasmin_rom;
 	floppy_image_device *cur_floppy, *floppies[4];
 
-	virtual void device_start();
-	virtual void device_reset();
-	const rom_entry *device_rom_region() const;
-	machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	const rom_entry *device_rom_region() const override;
+	machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	void remap();
 };

@@ -177,9 +177,9 @@ public:
 	DECLARE_DRIVER_INIT(dangcurv);
 	DECLARE_DRIVER_INIT(taitojc);
 	TILE_GET_INFO_MEMBER(taitojc_tile_info);
-	virtual void machine_reset();
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_taitojc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_dendego(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(taitojc_vblank);

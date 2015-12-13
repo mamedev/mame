@@ -135,7 +135,7 @@ void ncr539x_device::device_start()
 	m_out_irq_cb.resolve_safe();
 	m_out_drq_cb.resolve_safe();
 
-	m_operation_timer = timer_alloc(0, NULL);
+	m_operation_timer = timer_alloc(0, nullptr);
 }
 
 //-------------------------------------------------

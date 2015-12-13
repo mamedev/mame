@@ -128,8 +128,8 @@ public:
 	UINT8 m_311_output;
 	UINT32 m_cassette_high_count;
 	UINT8 m_led_time[6];
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(kim1_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(kim1_cassette_input);
 	TIMER_DEVICE_CALLBACK_MEMBER(kim1_update_leds);

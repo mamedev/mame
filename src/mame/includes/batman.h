@@ -24,7 +24,7 @@ public:
 	UINT16          m_latch_data;
 	UINT8           m_alpha_tile_bank;
 
-	virtual void update_interrupts();
+	virtual void update_interrupts() override;
 	DECLARE_WRITE16_MEMBER(latch_w);
 	DECLARE_DRIVER_INIT(batman);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);

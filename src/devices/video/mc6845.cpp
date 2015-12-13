@@ -55,6 +55,7 @@ const device_type SY6545_1 = &device_creator<sy6545_1_device>;
 const device_type SY6845E = &device_creator<sy6845e_device>;
 const device_type HD6345 = &device_creator<hd6345_device>;
 const device_type AMS40041 = &device_creator<ams40041_device>;
+const device_type AMS40489 = &device_creator<ams40489_device>;
 const device_type MOS8563 = &device_creator<mos8563_device>;
 const device_type MOS8568 = &device_creator<mos8568_device>;
 
@@ -220,7 +221,7 @@ WRITE8_MEMBER( mc6845_device::register_w )
 		case 0x06:  m_vert_disp        =   data & 0x7f; break;
 		case 0x07:  m_vert_sync_pos    =   data & 0x7f; break;
 		case 0x08:  m_mode_control     =   data & 0xff; break;
-		case 0x09:  m_max_ras_addr     =   data & 0x1f; if (MODE_INTERLACE_AND_VIDEO) m_max_ras_addr += m_interlace_adjust; break;
+		case 0x09:  m_max_ras_addr     =   data & 0x1f; break;
 		case 0x0a:  m_cursor_start_ras =   data & 0x7f; break;
 		case 0x0b:  m_cursor_end_ras   =   data & 0x1f; break;
 		case 0x0c:  m_disp_start_addr  = ((data & 0x3f) << 8) | (m_disp_start_addr & 0x00ff); break;
@@ -456,7 +457,7 @@ void mc6845_device::recompute_parameters(bool postload)
 {
 	UINT16 hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
 
-	UINT16 video_char_height = m_max_ras_addr + 1;   // fix garbage at the bottom of the screen (eg victor9k)
+	UINT16 video_char_height = m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust);   // fix garbage at the bottom of the screen (eg victor9k)
 	// Would be useful for 'interlace and video' mode support...
 	// UINT16 frame_char_height = (MODE_INTERLACE_AND_VIDEO ? m_max_ras_addr / 2 : m_max_ras_addr) + 1;
 
@@ -533,7 +534,7 @@ void mc6845_device::recompute_parameters(bool postload)
 			if (LOG) logerror("M6845 config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
 								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
-			if ( m_screen != NULL )
+			if ( m_screen != nullptr )
 				m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 			if(!m_reconfigure_cb.isnull())
@@ -654,7 +655,7 @@ void mc6845_device::handle_line_timer()
 	// For rudimentary 'interlace and video' support, m_raster_counter increments by 1 rather than the correct 2.
 	// The correct test would be:
 	// if ( m_raster_counter == (MODE_INTERLACE_AND_VIDEO ? m_max_ras_addr + 1 : m_max_ras_addr) )
-	if ( m_raster_counter == m_max_ras_addr )
+	if ( m_raster_counter == m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1 )
 	{
 		/* Check if we have reached the end of the vertical area */
 		if ( m_line_counter == m_vert_char_total )
@@ -703,7 +704,7 @@ void mc6845_device::handle_line_timer()
 			/* also update the cursor state now */
 			update_cursor_state();
 
-			if (m_screen != NULL)
+			if (m_screen != nullptr)
 				m_screen->reset_origin();
 		}
 		else
@@ -922,7 +923,7 @@ void mc6845_device::update_cursor_state()
 UINT8 mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* compute the current raster line */
-	UINT8 ra = y % (m_max_ras_addr + 1);
+	UINT8 ra = y % (m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust));
 
 	/* check if the cursor is visible and is on this scanline */
 	int cursor_visible = m_cursor_state &&
@@ -943,7 +944,7 @@ UINT8 mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle 
 	if (MODE_ROW_COLUMN_ADDRESSING)
 	{
 		UINT8 cc = 0;
-		UINT8 cr = y / (m_max_ras_addr + 1);
+		UINT8 cr = y / (m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust));
 		UINT16 ma = (cr << 8) | cc;
 
 		m_update_row_cb(bitmap, cliprect, ma, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
@@ -954,7 +955,7 @@ UINT8 mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle 
 	}
 
 	/* update MA if the last raster address */
-	if (ra == m_max_ras_addr)
+	if (ra == m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1)
 		m_current_disp_addr = (m_current_disp_addr + m_horiz_disp) & 0x3fff;
 
 	return ra;
@@ -1064,6 +1065,8 @@ void mc6845_device::device_start()
 	m_line_address = 0;
 	m_current_disp_addr = 0;
 	m_disp_start_addr = 0;
+	m_noninterlace_adjust = 1;
+	m_interlace_adjust = 1;
 
 	save_item(NAME(m_show_border_area));
 	save_item(NAME(m_visarea_adjust_min_x));
@@ -1173,6 +1176,11 @@ void hd6845_device::device_start()
 	m_supports_status_reg_d6 = false;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
+
+	// Non-interlace Mode, Interlace Sync Mode - When total number of rasters is RN, RN-1 shall be programmed.
+	m_noninterlace_adjust = 1;
+	// Interlace Sync & Video Mode - When total number of rasters is RN, RN-2 shall be programmed.
+	m_interlace_adjust = 2;
 }
 
 
@@ -1230,6 +1238,18 @@ void ams40041_device::device_start()
 	m_mode_control     =  2;
 
 	m_supports_disp_start_addr_r = false;
+	m_supports_vert_sync_width = false;
+	m_supports_status_reg_d5 = false;
+	m_supports_status_reg_d6 = false;
+	m_supports_status_reg_d7 = false;
+	m_supports_transparent = false;
+}
+
+void ams40489_device::device_start()
+{
+	mc6845_device::device_start();
+
+	m_supports_disp_start_addr_r = true;
 	m_supports_vert_sync_width = false;
 	m_supports_status_reg_d5 = false;
 	m_supports_status_reg_d6 = false;
@@ -1343,6 +1363,7 @@ void sy6545_1_device::device_reset() { mc6845_device::device_reset(); }
 void sy6845e_device::device_reset() { mc6845_device::device_reset(); }
 void hd6345_device::device_reset() { mc6845_device::device_reset(); }
 void ams40041_device::device_reset() { mc6845_device::device_reset(); }
+void ams40489_device::device_reset() { mc6845_device::device_reset(); }
 
 void mos8563_device::device_reset()
 {
@@ -1364,7 +1385,7 @@ const address_space_config *mos8563_device::memory_space_config(address_spacenum
 	switch (spacenum)
 	{
 		case AS_0: return &m_videoram_space_config;
-		default: return NULL;
+		default: return nullptr;
 	}
 }
 
@@ -1427,11 +1448,16 @@ ams40041_device::ams40041_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: mc6845_device(mconfig, AMS40489, "AMS40489 ASIC (CRTC)", tag, owner, clock, "ams40489", __FILE__)
+{
+}
+
 
 mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: mc6845_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
 		m_palette(*this, "palette")
 {
 	set_clock_scale(1.0/8);
@@ -1441,7 +1467,7 @@ mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, 
 mos8563_device::mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, MOS8563, "MOS8563", tag, owner, clock, "mos8563", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
 		m_palette(*this, "palette")
 {
 	set_clock_scale(1.0/8);

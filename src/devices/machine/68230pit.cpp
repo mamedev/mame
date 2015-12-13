@@ -31,8 +31,8 @@ pit68230_device::pit68230_device(const machine_config &mconfig, device_type type
 		device_execute_interface (mconfig, *this)
 		, m_icount (0)
 		, m_write_pa (*this)
-		, m_write_h2 (*this)
-{
+		, m_write_h2 (*this), m_pgcr(0), m_psrr(0), m_paddr(0), m_pbddr(0), m_pcddr(0), m_pacr(0), m_pbcr(0), m_padr(0), m_pbdr(0), m_psr(0)
+	{
 }
 
 
@@ -41,8 +41,8 @@ pit68230_device::pit68230_device(const machine_config &mconfig, const char *tag,
 		device_execute_interface (mconfig, *this)
 		, m_icount (0)
 		, m_write_pa (*this)
-		, m_write_h2 (*this)
-{
+		, m_write_h2 (*this), m_pgcr(0), m_psrr(0), m_paddr(0), m_pbddr(0), m_pcddr(0), m_pacr(0), m_pbcr(0), m_padr(0), m_pbdr(0), m_psr(0)
+	{
 }
 
 //-------------------------------------------------

@@ -129,7 +129,7 @@ static int a26_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 }
 
 static int a26_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
-	return a26_cas_do_work( NULL, casdata );
+	return a26_cas_do_work( nullptr, casdata );
 }
 
 static const struct CassetteLegacyWaveFiller a26_legacy_fill_wave = {
@@ -160,7 +160,7 @@ static const struct CassetteFormat a26_cassette_format = {
 	"a26",
 	a26_cassette_identify,
 	a26_cassette_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(a26_cassette_formats)

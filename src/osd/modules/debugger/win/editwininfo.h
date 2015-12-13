@@ -20,9 +20,9 @@ public:
 	editwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler);
 	virtual ~editwin_info();
 
-	virtual bool restore_field(HWND wnd);
+	virtual bool restore_field(HWND wnd) override;
 
-	virtual bool set_default_focus();
+	virtual bool set_default_focus() override;
 
 protected:
 	static DWORD const  COMBO_BOX_STYLE     = WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL;
@@ -33,7 +33,7 @@ protected:
 	void editwnd_select_all();
 	void set_edit_defstr(char const *string) { m_edit_defstr = string; }
 
-	virtual void draw_contents(HDC dc);
+	virtual void draw_contents(HDC dc) override;
 
 private:
 	virtual void process_string(char const *string) = 0;

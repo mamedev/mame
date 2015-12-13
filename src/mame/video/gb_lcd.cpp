@@ -565,7 +565,7 @@ void gb_lcd_device::update_sprites()
 			case 0xA0:                 /* priority is set (behind bgnd & wnd, flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 						plot_pixel(bitmap, xindex, yindex, spal[colour]);
 					data >>= 1;
@@ -574,7 +574,7 @@ void gb_lcd_device::update_sprites()
 			case 0x20:                 /* priority is not set (overlaps bgnd & wnd, flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if (colour && xindex >= 0 && xindex < 160)
 						plot_pixel(bitmap, xindex, yindex, spal[colour]);
 					data >>= 1;
@@ -583,7 +583,7 @@ void gb_lcd_device::update_sprites()
 			case 0x80:                 /* priority is set (behind bgnd & wnd, don't flip x) */
 				for (bit = 0; bit < 8 && xindex < 160; bit++, xindex++)
 				{
-					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+					int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 						plot_pixel(bitmap, xindex, yindex, spal[colour]);
 					data <<= 1;
@@ -592,7 +592,7 @@ void gb_lcd_device::update_sprites()
 			case 0x00:                 /* priority is not set (overlaps bgnd & wnd, don't flip x) */
 				for (bit = 0; bit < 8 && xindex < 160; bit++, xindex++)
 				{
-					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+					int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if (colour && xindex >= 0 && xindex < 160)
 						plot_pixel(bitmap, xindex, yindex, spal[colour]);
 					data <<= 1;
@@ -694,7 +694,7 @@ void gb_lcd_device::update_scanline()
 				{
 					while ((m_layer[l].xshift < 8) && i)
 					{
-						register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+						int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 						plot_pixel(bitmap, xindex, m_current_line, m_gb_bpal[colour]);
 						m_bg_zbuf[xindex] = colour;
 						xindex++;
@@ -807,7 +807,7 @@ void sgb_lcd_device::update_sprites()
 			case 0xA0:                 /* priority is set (behind bgnd & wnd, flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour && !m_bg_zbuf[xindex - SGB_XOFFSET])
 						plot_pixel(bitmap, xindex, yindex, m_sgb_pal[pal + spal[colour]]);
 					data >>= 1;
@@ -816,7 +816,7 @@ void sgb_lcd_device::update_sprites()
 			case 0x20:                 /* priority is not set (overlaps bgnd & wnd, flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour)
 						plot_pixel(bitmap, xindex, yindex, m_sgb_pal[pal + spal[colour]]);
 					data >>= 1;
@@ -825,7 +825,7 @@ void sgb_lcd_device::update_sprites()
 			case 0x80:                 /* priority is set (behind bgnd & wnd, don't flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+					int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour && !m_bg_zbuf[xindex - SGB_XOFFSET])
 						plot_pixel(bitmap, xindex, yindex, m_sgb_pal[pal + spal[colour]]);
 					data <<= 1;
@@ -834,7 +834,7 @@ void sgb_lcd_device::update_sprites()
 			case 0x00:                 /* priority is not set (overlaps bgnd & wnd, don't flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+					int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour)
 						plot_pixel(bitmap, xindex, yindex, m_sgb_pal[pal + spal[colour]]);
 					data <<= 1;
@@ -886,7 +886,7 @@ void sgb_lcd_device::refresh_border()
 
 			for (int i = 0; i < 8; i++)
 			{
-				register UINT8 colour;
+				UINT8 colour;
 				if ((map[xidx + 1] & 0x40))  /* Horizontal flip */
 				{
 					colour = ((data  & 0x0001) ? 1 : 0) | ((data  & 0x0100) ? 2 : 0) |
@@ -1041,7 +1041,7 @@ void sgb_lcd_device::update_scanline()
 
 					while ((m_layer[l].xshift < 8) && i)
 					{
-						register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+						int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 						plot_pixel(bitmap, xindex + SGB_XOFFSET, m_current_line + SGB_YOFFSET, m_sgb_pal[sgb_palette + m_gb_bpal[colour]]);
 						m_bg_zbuf[xindex] = colour;
 						xindex++;
@@ -1149,7 +1149,7 @@ void cgb_lcd_device::update_sprites()
 			case 0xA0:                 /* priority is set (behind bgnd & wnd, flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 					{
 						if (!m_gbc_mode)
@@ -1162,7 +1162,7 @@ void cgb_lcd_device::update_sprites()
 			case 0x20:                 /* priority is not set (overlaps bgnd & wnd, flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if ((m_bg_zbuf[xindex] & 0x80) && (m_bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
 						colour = 0;
 					if (colour && xindex >= 0 && xindex < 160)
@@ -1177,7 +1177,7 @@ void cgb_lcd_device::update_sprites()
 			case 0x80:                 /* priority is set (behind bgnd & wnd, don't flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+					int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 					{
 						if (!m_gbc_mode)
@@ -1192,7 +1192,7 @@ void cgb_lcd_device::update_sprites()
 				{
 					if (xindex >= 0 && xindex < 160)
 					{
-						register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+						int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 						if ((m_bg_zbuf[xindex] & 0x80) && (m_bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
 							colour = 0;
 						if (colour)

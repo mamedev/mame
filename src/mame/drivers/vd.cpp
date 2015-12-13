@@ -37,7 +37,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 private:
 	UINT8 m_t_c;
 	UINT8 segment[5];

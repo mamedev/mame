@@ -156,7 +156,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tilemap_info(tile_data &tileinfo, int tile_index, int whichtilemap, int tilesize);
@@ -167,7 +167,7 @@ public:
 	void do_blit();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

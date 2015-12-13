@@ -1469,7 +1469,7 @@ static const help_item static_help_list[] =
 const char *debug_get_help(const char *tag)
 {
 	static char ambig_message[1024];
-	const help_item *found = NULL;
+	const help_item *found = nullptr;
 	int i, msglen, foundcount = 0;
 	int taglen = (int)strlen(tag);
 	char tagcopy[256];

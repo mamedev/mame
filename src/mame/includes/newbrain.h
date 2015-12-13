@@ -116,11 +116,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(cop_regint_tick);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	enum
 	{
@@ -223,7 +223,7 @@ public:
 	required_device<floppy_image_device> m_floppy;
 	optional_shared_ptr<UINT8> m_eim_ram;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER( fdc_auxiliary_w );
 	DECLARE_READ8_MEMBER( fdc_control_r );

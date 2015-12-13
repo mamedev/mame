@@ -59,7 +59,7 @@ tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type typ
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_out_int_line_cb(*this),
-		m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(memmap))
+		m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(memmap))
 {
 	m_50hz = is_50hz;
 	m_reva = is_reva;
@@ -74,7 +74,7 @@ tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag
 		device_video_interface(mconfig, *this),
 		m_vram_size(0),
 		m_out_int_line_cb(*this),
-		m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(memmap))
+		m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(memmap))
 {
 	m_50hz = false;
 	m_reva = true;
@@ -709,8 +709,8 @@ void tms9928a_device::device_start()
 
 void tms9928a_device::device_reset()
 {
-	for ( int i = 0; i < 8; i++ )
-		m_Regs[i] = 0;
+	for (auto & elem : m_Regs)
+		elem = 0;
 
 	m_StatusReg = 0;
 	m_FifthSprite = 31;

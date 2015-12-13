@@ -25,7 +25,7 @@ const device_type I5000_SND = &device_creator<i5000snd_device>;
 
 i5000snd_device::i5000snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I5000_SND, "I5000", tag, owner, clock, "i5000snd", __FILE__),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this), m_stream(nullptr), m_rom_base(nullptr), m_rom_mask(0)
 {
 }
 
@@ -35,9 +35,9 @@ void i5000snd_device::device_start()
 	// fill volume table
 	double div = 1.032;
 	double vol = 2047.0;
-	for (int i = 0; i < 0x100; i++)
+	for (auto & elem : m_lut_volume)
 	{
-		m_lut_volume[i] = vol + 0.5;
+		elem = vol + 0.5;
 		vol /= div;
 	}
 	m_lut_volume[0xff] = 0;

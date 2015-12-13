@@ -212,9 +212,9 @@ void lynx2_sound_device::device_start()
 
 void lynx_sound_device::device_reset()
 {
-	for (int i = 0; i < LYNX_AUDIO_CHANNELS; i++)
+	for (auto & elem : m_audio)
 	{
-		reset_channel(&m_audio[i]);
+		reset_channel(&elem);
 	}
 }
 

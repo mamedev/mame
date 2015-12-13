@@ -209,19 +209,19 @@ static const struct
 } sundance_port_map[16] =
 {
 	{ "PAD1", 0x155 },  /* bit  0 is set if P1 1,3,5,7,9 is pressed */
-	{ NULL, 0 },
-	{ NULL, 0 },
-	{ NULL, 0 },
+	{ nullptr, 0 },
+	{ nullptr, 0 },
+	{ nullptr, 0 },
 
-	{ NULL, 0 },
-	{ NULL, 0 },
-	{ NULL, 0 },
-	{ NULL, 0 },
+	{ nullptr, 0 },
+	{ nullptr, 0 },
+	{ nullptr, 0 },
+	{ nullptr, 0 },
 
 	{ "PAD2", 0x1a1 },  /* bit  8 is set if P2 1,6,8,9 is pressed */
 	{ "PAD1", 0x1a1 },  /* bit  9 is set if P1 1,6,8,9 is pressed */
 	{ "PAD2", 0x155 },  /* bit 10 is set if P2 1,3,5,7,9 is pressed */
-	{ NULL, 0 },
+	{ nullptr, 0 },
 
 	{ "PAD1", 0x093 },  /* bit 12 is set if P1 1,2,5,8 is pressed */
 	{ "PAD2", 0x093 },  /* bit 13 is set if P2 1,2,5,8 is pressed */

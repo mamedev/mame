@@ -145,7 +145,7 @@ public:
 	DECLARE_WRITE8_MEMBER(to_sound_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(sub);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

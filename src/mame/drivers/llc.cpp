@@ -148,14 +148,14 @@ WRITE8_MEMBER( llc_state::kbd_put )
 static const z80_daisy_config llc1_daisy_chain[] =
 {
 	{ "z80ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 static const z80_daisy_config llc2_daisy_chain[] =
 {
 	{ "z80pio1" },
 	{ "z80ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 /* F4 Character Displayer */

@@ -24,8 +24,8 @@ public:
 
 	required_shared_ptr<UINT16> m_bitmap;
 
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(latch_w);
 	DECLARE_DRIVER_INIT(rampart);
 	DECLARE_MACHINE_START(rampart);

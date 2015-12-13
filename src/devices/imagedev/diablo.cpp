@@ -32,11 +32,11 @@ const device_type DIABLO = &device_creator<diablo_image_device>;
 diablo_image_device::diablo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DIABLO, "Diablo", tag, owner, clock, "diablo_image", __FILE__),
 		device_image_interface(mconfig, *this),
-		m_chd(NULL),
-		m_hard_disk_handle(NULL),
+		m_chd(nullptr),
+		m_hard_disk_handle(nullptr),
 		m_device_image_load(device_image_load_delegate()),
 		m_device_image_unload(device_image_func_delegate()),
-		m_interface(NULL)
+		m_interface(nullptr)
 {
 }
 
@@ -73,17 +73,17 @@ const option_guide *diablo_image_device::create_option_guide() const
 
 void diablo_image_device::device_start()
 {
-	m_chd = NULL;
+	m_chd = nullptr;
 
 	// try to locate the CHD from a DISK_REGION
 	chd_file *handle = get_disk_handle(machine(), tag());
-	if (handle != NULL)
+	if (handle != nullptr)
 	{
 		m_hard_disk_handle = hard_disk_open(handle);
 	}
 	else
 	{
-		m_hard_disk_handle = NULL;
+		m_hard_disk_handle = nullptr;
 	}
 }
 
@@ -151,15 +151,15 @@ void diablo_image_device::call_unload()
 		m_device_image_unload(*this);
 	}
 
-	if (m_hard_disk_handle != NULL)
+	if (m_hard_disk_handle != nullptr)
 	{
 		hard_disk_close(m_hard_disk_handle);
-		m_hard_disk_handle = NULL;
+		m_hard_disk_handle = nullptr;
 	}
 
 	m_origchd.close();
 	m_diffchd.close();
-	m_chd = NULL;
+	m_chd = nullptr;
 }
 
 /*-------------------------------------------------
@@ -209,13 +209,13 @@ int diablo_image_device::internal_load_dsk()
 {
 	chd_error err = CHDERR_NONE;
 
-	m_chd = NULL;
+	m_chd = nullptr;
 
 	if (m_hard_disk_handle)
 		hard_disk_close(m_hard_disk_handle);
 
 	/* open the CHD file */
-	if (software_entry() != NULL)
+	if (software_entry() != nullptr)
 	{
 		m_chd = get_disk_handle(device().machine(), device().subtag("harddriv").c_str());
 	}
@@ -240,18 +240,18 @@ int diablo_image_device::internal_load_dsk()
 		}
 	}
 
-	if (m_chd != NULL)
+	if (m_chd != nullptr)
 	{
 		/* open the hard disk file */
 		m_hard_disk_handle = hard_disk_open(m_chd);
-		if (m_hard_disk_handle != NULL)
+		if (m_hard_disk_handle != nullptr)
 			return IMAGE_INIT_PASS;
 	}
 
 	/* if we had an error, close out the CHD */
 	m_origchd.close();
 	m_diffchd.close();
-	m_chd = NULL;
+	m_chd = nullptr;
 	seterror(IMAGE_ERROR_UNSPECIFIED, chd_file::error_string(err));
 
 	return IMAGE_INIT_FAIL;
@@ -266,7 +266,7 @@ int diablo_image_device::internal_load_dsk()
 
 chd_file *diablo_image_device::get_chd_file()
 {
-	chd_file *result = NULL;
+	chd_file *result = nullptr;
 	hard_disk_file *hd_file = get_hard_disk_file();
 	if (hd_file)
 		result = hard_disk_get_chd(hd_file);

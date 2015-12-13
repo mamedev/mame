@@ -281,7 +281,7 @@ UINT32 mystwarr_state::screen_update_mystwarr(screen_device &screen, bitmap_rgb3
 
 	m_sprite_colorbase = m_k055555->K055555_get_palette_index(4)<<5;
 
-	konamigx_mixer(screen, bitmap, cliprect, 0, 0, 0, 0, blendmode, 0, 0);
+	konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, blendmode, nullptr, 0);
 	return 0;
 }
 
@@ -298,7 +298,7 @@ UINT32 mystwarr_state::screen_update_metamrph(screen_device &screen, bitmap_rgb3
 
 	m_sprite_colorbase = m_k055555->K055555_get_palette_index(4)<<4;
 
-	konamigx_mixer(screen, bitmap, cliprect, 0, GXSUB_K053250 | GXSUB_4BPP, 0, 0, 0, 0, 0);
+	konamigx_mixer(screen, bitmap, cliprect, nullptr, GXSUB_K053250 | GXSUB_4BPP, nullptr, 0, 0, nullptr, 0);
 	return 0;
 }
 
@@ -321,7 +321,7 @@ UINT32 mystwarr_state::screen_update_martchmp(screen_device &screen, bitmap_rgb3
 	// not quite right
 	blendmode = (m_oinprion==0xef && m_k054338->register_r(K338_REG_PBLEND)) ? ((1<<16|GXMIX_BLEND_FORCE)<<2) : 0;
 
-	konamigx_mixer(screen, bitmap, cliprect, 0, 0, 0, 0, blendmode, 0, 0);
+	konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, blendmode, nullptr, 0);
 	return 0;
 }
 
@@ -482,6 +482,6 @@ UINT32 mystwarr_state::screen_update_dadandrn(screen_device &screen, bitmap_rgb3
 			popmessage("K053936: PSAC colorbase changed");
 	}
 
-	konamigx_mixer(screen, bitmap, cliprect, (m_roz_enable) ? m_ult_936_tilemap : 0, rozmode, 0, 0, 0, 0, 0);
+	konamigx_mixer(screen, bitmap, cliprect, (m_roz_enable) ? m_ult_936_tilemap : nullptr, rozmode, nullptr, 0, 0, nullptr, 0);
 	return 0;
 }

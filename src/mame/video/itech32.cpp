@@ -1169,8 +1169,8 @@ void itech32_state::handle_video_command()
 			}
 			else
 			{
-				if (m_enable_latch[0]) shiftreg_clear(m_videoplane[0], NULL);
-				if (m_enable_latch[1]) shiftreg_clear(m_videoplane[1], NULL);
+				if (m_enable_latch[0]) shiftreg_clear(m_videoplane[0], nullptr);
+				if (m_enable_latch[1]) shiftreg_clear(m_videoplane[1], nullptr);
 			}
 
 			g_profiler.stop();
@@ -1386,12 +1386,12 @@ UINT32 itech32_state::screen_update_itech32(screen_device &screen, bitmap_ind16 
 			}
 
 			/* draw from the buffer */
-			draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &scanline[cliprect.min_x], NULL);
+			draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &scanline[cliprect.min_x], nullptr);
 		}
 
 		/* otherwise, draw directly from VRAM */
 		else
-			draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &src1[cliprect.min_x], NULL);
+			draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &src1[cliprect.min_x], nullptr);
 	}
 	return 0;
 }

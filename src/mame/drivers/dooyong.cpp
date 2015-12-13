@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( pollux_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state )
 	AM_RANGE(0xf010, 0xf010) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf018, 0xf01f) AM_WRITE(bgscroll_w)
 	AM_RANGE(0xf020, 0xf027) AM_WRITE(fgscroll_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(paletteram_flytiger_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gulfstrm_map, AS_PROGRAM, 8, dooyong_z80_ym2203_state )
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( flytiger_map, AS_PROGRAM, 8, dooyong_z80_state )
 	AM_RANGE(0xe020, 0xe020) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xe030, 0xe037) AM_WRITE(bgscroll_w)
 	AM_RANGE(0xe040, 0xe047) AM_WRITE(fgscroll_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_flytiger_w) AM_SHARE("flytiger_palram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_flytiger_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
 ADDRESS_MAP_END
 
@@ -944,7 +944,7 @@ static MACHINE_CONFIG_START( pollux, dooyong_z80_ym2203_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
-	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, pollux)
@@ -1012,7 +1012,7 @@ static MACHINE_CONFIG_START( flytiger, dooyong_z80_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flytiger)
-	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, flytiger)
@@ -2084,7 +2084,7 @@ GAME( 1991, gulfstrmm,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "D
 GAME( 1991, pollux,   0,        pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 1)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, polluxa,  pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 2)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, polluxa2, pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 3)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) /* Original Dooyong Board distributed by TCH */
-GAME( 1991, polluxn,  pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong (NTC license)",         "Pollux (Japan, NTC license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, polluxn,  pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong (NTC / Atlus license)", "Pollux (Japan, NTC license, distributed by Atlus)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, flytiger, 0,        flytiger, flytiger, driver_device, 0, ROT270, "Dooyong",                       "Flying Tiger (set 1)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, flytigera,flytiger, flytiger, flytiger, driver_device, 0, ROT270, "Dooyong",                       "Flying Tiger (set 2)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

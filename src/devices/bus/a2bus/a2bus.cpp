@@ -168,9 +168,9 @@ void a2bus_device::device_start()
 	m_out_inh_cb.resolve_safe();
 
 	// clear slots
-	for (int i = 0; i < 8; i++)
+	for (auto & elem : m_device_list)
 	{
-		m_device_list[i] = NULL;
+		elem = nullptr;
 	}
 
 	m_slot_irq_mask = m_slot_nmi_mask = 0;
@@ -188,7 +188,7 @@ device_a2bus_card_interface *a2bus_device::get_a2bus_card(int slot)
 {
 	if (slot < 0)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	if (m_device_list[slot])
@@ -196,7 +196,7 @@ device_a2bus_card_interface *a2bus_device::get_a2bus_card(int slot)
 		return m_device_list[slot];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void a2bus_device::add_a2bus_card(int slot, device_a2bus_card_interface *card)

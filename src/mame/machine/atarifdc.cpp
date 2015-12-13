@@ -136,7 +136,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image)
 
 	if( size <= 0 )
 	{
-		m_drv[id].image = NULL;
+		m_drv[id].image = nullptr;
 		return;
 	}
 
@@ -147,7 +147,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image)
 	ext = image.filetype();
 
 	// hack alert, this means we can only load ATR via the softlist at the moment, image.filetype reutrns NULL :/
-	if (image.software_entry() != NULL) ext="ATR";
+	if (image.software_entry() != nullptr) ext="ATR";
 
 	/* no extension: assume XFD format (no header) */
 	if (!ext)
@@ -749,7 +749,7 @@ legacy_floppy_image_device *atari_fdc_device::atari_floppy_get_device_child(int 
 		case 2 : return subdevice<legacy_floppy_image_device>(FLOPPY_2);
 		case 3 : return subdevice<legacy_floppy_image_device>(FLOPPY_3);
 	}
-	return NULL;
+	return nullptr;
 }
 
 const device_type ATARI_FDC = &device_creator<atari_fdc_device>;

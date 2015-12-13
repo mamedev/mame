@@ -9,7 +9,7 @@
 //-------------------------------------------------
 
 device_neogeo_cart_interface::device_neogeo_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device), 
+	: device_slot_card_interface(mconfig, device),
 		m_sprite_gfx_address_mask(0)
 /*
 m_rom(NULL),

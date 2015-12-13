@@ -131,7 +131,7 @@ struct fdi_pulse_track_header
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE struct fdidsk_tag *get_tag(floppy_image_legacy *floppy)
+static inline struct fdidsk_tag *get_tag(floppy_image_legacy *floppy)
 {
 	return (fdidsk_tag *)floppy_tag(floppy);
 }

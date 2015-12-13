@@ -20,7 +20,7 @@ FLOPPY_FORMATS_END
 
 amiga_fdc::amiga_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, AMIGA_FDC, "Amiga FDC", tag, owner, clock, "amiga_fdc", __FILE__),
-	m_write_index(*this)
+	m_write_index(*this), floppy(nullptr), t_gen(nullptr), dsklen(0), pre_dsklen(0), dsksync(0), dskbyt(0), adkcon(0), dmacon(0), dskpt(0), dma_value(0), dma_state(0)
 {
 }
 
@@ -34,10 +34,10 @@ void amiga_fdc::device_start()
 		if(con)
 			floppy_devices[i] = con->get_device();
 		else
-			floppy_devices[i] = 0;
+			floppy_devices[i] = nullptr;
 	}
 
-	floppy = 0;
+	floppy = nullptr;
 
 	t_gen = timer_alloc(0);
 }
@@ -45,7 +45,7 @@ void amiga_fdc::device_start()
 
 void amiga_fdc::device_reset()
 {
-	floppy = 0;
+	floppy = nullptr;
 	dsklen = 0x4000;
 	dsksync = 0x4489;
 	adkcon = 0;
@@ -457,7 +457,7 @@ WRITE8_MEMBER( amiga_fdc::ciaaprb_w )
 	else if(!(data & 0x40))
 		floppy = floppy_devices[3];
 	else
-		floppy = 0;
+		floppy = nullptr;
 
 	if(old_floppy != floppy) {
 		if(old_floppy)

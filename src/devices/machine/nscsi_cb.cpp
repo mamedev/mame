@@ -14,7 +14,7 @@ nscsi_callback_device::nscsi_callback_device(const machine_config &mconfig, cons
 		m_write_io(*this),
 		m_write_cd(*this),
 		m_write_sel(*this),
-		m_write_bsy(*this)
+		m_write_bsy(*this), m_ctrl(0)
 {
 }
 

@@ -37,11 +37,11 @@ sm8500_cpu_device::sm8500_cpu_device(const machine_config &mconfig, const char *
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_dma_func(*this)
 	, m_timer_func(*this)
-	, m_PC(0)
-	, m_SYS(0)
-	, m_SP(0)
+	, m_PC(0), m_IE0(0), m_IE1(0), m_IR0(0), m_IR1(0)
+		, m_SYS(0), m_CKC(0), m_clock_changed(0)
+		, m_SP(0)
 	, m_PS0(0)
-	, m_PS1(0)
+	, m_PS1(0), m_IFLAGS(0), m_CheckInterrupts(0), m_halted(0), m_icount(0), m_program(nullptr), m_oldpc(0)
 {
 }
 
@@ -198,9 +198,9 @@ void sm8500_cpu_device::state_string_export(const device_state_entry &entry, std
 
 void sm8500_cpu_device::device_reset()
 {
-	for ( int i = 0; i < 0x108; i++ )
+	for (auto & elem : m_register_ram)
 	{
-		m_register_ram[i] = 0;
+		elem = 0;
 	}
 
 	m_PC = 0x1020;

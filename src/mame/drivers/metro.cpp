@@ -1722,8 +1722,8 @@ public:
 	template<class _Object> static devcb_base &set_data_cb(device_t &device, _Object object) { return downcast<puzzlet_io_device &>(device).data_cb.set_callback(object); }
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	devcb_write_line data_cb;
@@ -5036,7 +5036,7 @@ VG460-(A)
 |SW2          361A06    361A04           |---| |
 |             361A07    361A05                 |
 |----------------------------------------------|
-Notes: 
+Notes:
            * - Not populated
        68000 - Clock input 12.000MHz [24/2]
       D78C10 - NEC D78C10 8-bit CPU with A/D Converter. Clock input 12.000MHz [24/2]
@@ -5059,9 +5059,9 @@ Notes:
       M54532 - Mitsubishi M54532P Quad 1.5A Darlington Transistor Array with Clamp Diode
       MM1035 - Mitsumi System Reset IC with Built-in Watchdog Timer (==Fujitsu MB3773)
       TA7222 - Toshiba TA7222 5.8w Audio Power Amplifier
-       HSync - 14.9505kHz 
+       HSync - 14.9505kHz
        VSync - 57.1556Hz
-     
+
 ***************************************************************************/
 
 ROM_START( karatour )

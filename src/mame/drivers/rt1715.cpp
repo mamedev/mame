@@ -40,8 +40,8 @@ public:
 	DECLARE_READ8_MEMBER(k7658_data_r);
 	DECLARE_WRITE8_MEMBER(k7658_data_w);
 	DECLARE_WRITE8_MEMBER(rt1715_rom_disable);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(rt1715);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	required_device<cpu_device> m_maincpu;
@@ -262,7 +262,7 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 	{ "a72" },
 	{ "a30" },
 	{ "a29" },
-	{ NULL }
+	{ nullptr }
 };
 
 static MACHINE_CONFIG_START( rt1715, rt1715_state )

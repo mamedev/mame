@@ -54,7 +54,7 @@ public:
 	required_device<rp5c15_device> m_rtc;
 	required_device<speaker_sound_device> m_speaker;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( key_r );
 	DECLARE_WRITE8_MEMBER( speaker_w );

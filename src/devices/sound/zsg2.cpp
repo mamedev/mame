@@ -206,33 +206,33 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 		INT32 mix_r = 0;
 
 		// loop over all channels
-		for (int ch = 0; ch < 48; ch++)
+		for (auto & elem : m_chan)
 		{
-			if (!m_chan[ch].is_playing)
+			if (!elem.is_playing)
 				continue;
 
-			m_chan[ch].step_ptr += m_chan[ch].step;
-			if (m_chan[ch].step_ptr & 0x10000)
+			elem.step_ptr += elem.step;
+			if (elem.step_ptr & 0x10000)
 			{
-				m_chan[ch].step_ptr &= 0xffff;
-				if (++m_chan[ch].cur_pos >= m_chan[ch].end_pos)
+				elem.step_ptr &= 0xffff;
+				if (++elem.cur_pos >= elem.end_pos)
 				{
 					// loop sample
-					m_chan[ch].cur_pos = m_chan[ch].loop_pos;
-					if ((m_chan[ch].cur_pos + 1) >= m_chan[ch].end_pos)
+					elem.cur_pos = elem.loop_pos;
+					if ((elem.cur_pos + 1) >= elem.end_pos)
 					{
 						// end of sample
-						m_chan[ch].is_playing = false;
+						elem.is_playing = false;
 						continue;
 					}
 				}
-				m_chan[ch].samples = prepare_samples(m_chan[ch].page | m_chan[ch].cur_pos);
+				elem.samples = prepare_samples(elem.page | elem.cur_pos);
 			}
 
-			INT32 sample = (m_chan[ch].samples[m_chan[ch].step_ptr >> 14 & 3] * m_chan[ch].vol) >> 16;
+			INT32 sample = (elem.samples[elem.step_ptr >> 14 & 3] * elem.vol) >> 16;
 
-			mix_l += (sample * m_chan[ch].panl + sample * (0x1f - m_chan[ch].panr)) >> 5;
-			mix_r += (sample * m_chan[ch].panr + sample * (0x1f - m_chan[ch].panl)) >> 5;
+			mix_l += (sample * elem.panl + sample * (0x1f - elem.panr)) >> 5;
+			mix_r += (sample * elem.panr + sample * (0x1f - elem.panl)) >> 5;
 		}
 
 		outputs[0][i] = mix_l;

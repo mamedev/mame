@@ -6,7 +6,7 @@
 const device_type NSCSI_CDROM = &device_creator<nscsi_cdrom_device>;
 
 nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	nscsi_full_device(mconfig, NSCSI_CDROM, "SCSI CDROM", tag, owner, clock, "scsi_cdrom", __FILE__)
+	nscsi_full_device(mconfig, NSCSI_CDROM, "SCSI CDROM", tag, owner, clock, "scsi_cdrom", __FILE__), cdrom(nullptr), bytes_per_sector(0), lba(0), cur_lba(0), blocks(0)
 {
 }
 

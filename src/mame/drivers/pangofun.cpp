@@ -107,7 +107,7 @@ public:
 		: pcat_base_state(mconfig, type, tag) { }
 
 	DECLARE_DRIVER_INIT(pangofun);
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 

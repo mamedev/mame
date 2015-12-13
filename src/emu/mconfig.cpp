@@ -26,17 +26,17 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		m_watchdog_vblank_count(0),
 		m_watchdog_time(attotime::zero),
 		m_force_no_drc(false),
-		m_default_layout(NULL),
+		m_default_layout(nullptr),
 		m_gamedrv(gamedrv),
 		m_options(options)
 {
 	// construct the config
-	(*gamedrv.machine_config)(*this, NULL, NULL);
+	(*gamedrv.machine_config)(*this, nullptr, nullptr);
 
 	bool is_selected_driver = core_stricmp(gamedrv.name,options.system_name())==0;
 	// intialize slot devices - make sure that any required devices have been allocated
 	slot_interface_iterator slotiter(root_device());
-	for (device_slot_interface *slot = slotiter.first(); slot != NULL; slot = slotiter.next())
+	for (device_slot_interface *slot = slotiter.first(); slot != nullptr; slot = slotiter.next())
 	{
 		device_t &owner = slot->device();
 		std::string temp;
@@ -45,7 +45,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		if (!is_selected_driver || !options.exists(owner.tag()+1))
 			selval = slot->default_option();
 
-		if (selval != NULL && *selval != 0)
+		if (selval != nullptr && *selval != 0)
 		{
 			const device_slot_option *option = slot->option(selval);
 
@@ -54,11 +54,11 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 				device_t *new_dev = device_add(&owner, option->name(), option->devtype(), option->clock());
 
 				const char *default_bios = option->default_bios();
-				if (default_bios != NULL)
+				if (default_bios != nullptr)
 					device_t::static_set_default_bios_tag(*new_dev, default_bios);
 
 				machine_config_constructor additions = option->machine_config();
-				if (additions != NULL)
+				if (additions != nullptr)
 					(*additions)(const_cast<machine_config &>(*this), new_dev, new_dev);
 
 				const input_device_default *input_device_defaults = option->input_device_defaults();
@@ -75,7 +75,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 
 	// then notify all devices that their configuration is complete
 	device_iterator iter(root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 		if (!device->configured())
 			device->config_complete();
 }
@@ -115,7 +115,7 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 	if (tag[0] == ':')
 	{
 		tag++;
-		owner = m_root_device;
+		owner = m_root_device.get();
 	}
 
 	// go down the path until we're done with it
@@ -125,7 +125,7 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 		assert(next != tag);
 		std::string part(tag, next-tag);
 		device_t *curdevice;
-		for (curdevice = owner->m_subdevice_list.first(); curdevice != NULL; curdevice = curdevice->next())
+		for (curdevice = owner->m_subdevice_list.first(); curdevice != nullptr; curdevice = curdevice->next())
 			if (part.compare(curdevice->m_basetag)==0)
 				break;
 		if (!curdevice)
@@ -137,18 +137,18 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 	assert(tag[0]);
 
 	// if there's an owner, let the owner do the work
-	if (owner != NULL)
+	if (owner != nullptr)
 		return owner->add_subdevice(type, tag, clock);
 
 	// otherwise, allocate the device directly
-	assert(m_root_device == NULL);
+	assert(m_root_device == nullptr);
 	m_root_device.reset((*type)(*this, tag, owner, clock));
 
 	// apply any machine configuration owned by the device now
 	machine_config_constructor additions = m_root_device->machine_config_additions();
-	if (additions != NULL)
-		(*additions)(*this, m_root_device, NULL);
-	return m_root_device;
+	if (additions != nullptr)
+		(*additions)(*this, m_root_device.get(), nullptr);
+	return m_root_device.get();
 }
 
 
@@ -160,9 +160,9 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 device_t *machine_config::device_replace(device_t *owner, const char *tag, device_type type, UINT32 clock)
 {
 	// find the original device by this name (must exist)
-	assert(owner != NULL);
+	assert(owner != nullptr);
 	device_t *device = owner->subdevice(tag);
-	if (device == NULL)
+	if (device == nullptr)
 	{
 		osd_printf_warning("Warning: attempting to replace non-existent device '%s'\n", tag);
 		return device_add(owner, tag, type, clock);
@@ -181,17 +181,17 @@ device_t *machine_config::device_replace(device_t *owner, const char *tag, devic
 device_t *machine_config::device_remove(device_t *owner, const char *tag)
 {
 	// find the original device by this name (must exist)
-	assert(owner != NULL);
+	assert(owner != nullptr);
 	device_t *device = owner->subdevice(tag);
-	if (device == NULL)
+	if (device == nullptr)
 	{
 		osd_printf_warning("Warning: attempting to remove non-existent device '%s'\n", tag);
-		return NULL;
+		return nullptr;
 	}
 
 	// let the device's owner do the work
 	device->owner()->remove_subdevice(*device);
-	return NULL;
+	return nullptr;
 }
 
 
@@ -203,10 +203,10 @@ device_t *machine_config::device_remove(device_t *owner, const char *tag)
 device_t *machine_config::device_find(device_t *owner, const char *tag)
 {
 	// find the original device by this name (must exist)
-	assert(owner != NULL);
+	assert(owner != nullptr);
 	device_t *device = owner->subdevice(tag);
-	assert(device != NULL);
-	if (device == NULL)
+	assert(device != nullptr);
+	if (device == nullptr)
 		throw emu_fatalerror("Unable to find device '%s'\n", tag);
 
 	// return the device

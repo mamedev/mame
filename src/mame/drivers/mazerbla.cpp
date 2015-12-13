@@ -222,9 +222,9 @@ public:
 	DECLARE_READ8_MEMBER(soundcommand_r);
 	DECLARE_DRIVER_INIT(mazerbla);
 	DECLARE_DRIVER_INIT(greatgun);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mazerbla);
 	UINT32 screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);

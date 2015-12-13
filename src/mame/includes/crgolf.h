@@ -56,8 +56,8 @@ public:
 	DECLARE_READ8_MEMBER(crgolf_videoram_r);
 	DECLARE_WRITE8_MEMBER(crgolfhi_sample_w);
 	DECLARE_DRIVER_INIT(crgolfhi);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(crgolf);
 	UINT32 screen_update_crgolf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(main_to_sound_callback);

@@ -14,22 +14,22 @@ class pseudo_terminal_device : public device_t,
 public:
 		pseudo_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-		virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) {
+		virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override {
 				device_serial_interface::rx_w(state);
 		}
 
 		DECLARE_WRITE_LINE_MEMBER(update_serial);
 
 protected:
-		virtual ioport_constructor device_input_ports() const;
-		virtual void device_start();
-		virtual void device_stop();
-		virtual void device_reset();
-		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+		virtual ioport_constructor device_input_ports() const override;
+		virtual void device_start() override;
+		virtual void device_stop() override;
+		virtual void device_reset() override;
+		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-		virtual void tra_callback();
-		virtual void tra_complete();
-		virtual void rcv_complete();
+		virtual void tra_callback() override;
+		virtual void tra_complete() override;
+		virtual void rcv_complete() override;
 
 private:
 		required_ioport m_rs232_txbaud;

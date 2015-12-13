@@ -59,8 +59,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 	DECLARE_DRIVER_INIT(pengadvb);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void pengadvb_decrypt(const char* region);
 };
 

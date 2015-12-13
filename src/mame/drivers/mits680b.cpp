@@ -46,7 +46,7 @@ public:
 	DECLARE_READ8_MEMBER(status_check_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 READ8_MEMBER( mits680b_state::status_check_r )

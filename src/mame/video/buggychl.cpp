@@ -120,7 +120,7 @@ void buggychl_state::draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 	for (offs = 0; offs < 256; offs++)
 		scroll[offs] = -m_scrollh[offs];
 
-	copyscrollbitmap_trans(bitmap, m_tmp_bitmap2, 256, scroll, 0, 0, clip, 32);
+	copyscrollbitmap_trans(bitmap, m_tmp_bitmap2, 256, scroll, 0, nullptr, clip, 32);
 }
 
 

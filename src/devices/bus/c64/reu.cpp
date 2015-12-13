@@ -33,7 +33,7 @@ const device_type C64_REU1764 = &device_creator<c64_reu1764_cartridge_device>;
 static MACHINE_CONFIG_FRAGMENT( c64_reu )
 	MCFG_MOS8726_ADD(MOS8726R1_TAG)
 
-	MCFG_GENERIC_SOCKET_ADD("rom", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 MACHINE_CONFIG_END
 

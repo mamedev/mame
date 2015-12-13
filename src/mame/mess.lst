@@ -259,6 +259,7 @@ telngtcs
 krvnjvtv
 oc2000
 mpt05
+h21		// TRQ Video Computer H-21
 
 
 // Game Park
@@ -444,6 +445,7 @@ prav8m  // Pravetz 8M
 uniap2en // 1982 Unitron AP II (in English)
 uniap2pt // 1982 Unitron AP II (in Brazilian Portuguese)
 uniap2ti // 1982 Unitron AP II+ (Teclado Inteligente)
+microeng // 1982 Micro Engenho (Brazilian Apple2 clone) - Spectrum/SCOPUS
 apple2jp  // ??? ???? Apple ][j+
 apple2e   // Jan 1983 Apple //e
 apple2euk // Jan 1983 Apple //e (UK)
@@ -1772,6 +1774,9 @@ tmc600s2
 //osc1000b
 nano
 
+// Escola Politecnica da USP (Brazil)
+patinho // 1972 Patinho Feio
+
 // MIT
 tx0_64kw  // April 1956 MIT TX-0 (64kw RAM)
 tx0_8kw   // 1962 MIT TX-0 (8kw RAM)
@@ -2015,6 +2020,8 @@ newbrainmd
 mm1m6
 mm1m7
 
+noki3310
+
 // Nuova Elettronica
 z80ne    // 1980 - Z80NE
 z80net  // 1980 - Z80NE + LX388 Video Interface
@@ -2252,6 +2259,7 @@ splitsec    // Parker Bros
 mmerlin     // Parker Bros
 tandy12     // Tandy Radio Shack
 tbreakup    // Tomy
+tpinball    // Tomy
 
 // hh_tms1k derivatives
 elecbowl    // Marx
@@ -2598,6 +2606,7 @@ tek4052a
 //tek4054
 tek4107a
 tek4109a
+tekxp330
 phunsy
 ob68k1a
 vta2000
@@ -2751,6 +2760,7 @@ tecnbras
 minicom
 mcom4_02
 gameking
+gamekin3
 leapster
 leapstertv
 excali64

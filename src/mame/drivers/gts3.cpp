@@ -60,7 +60,7 @@ private:
 	UINT8 m_row; // for lamps and switches
 	UINT8 m_segment[4];
 	UINT8 m_u4b;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<m65c02_device> m_maincpu;
 	required_device<via6522_device> m_u4;
 	required_device<via6522_device> m_u5;

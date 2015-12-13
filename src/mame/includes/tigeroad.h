@@ -45,7 +45,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tigeroad_tilemap_scan);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_tigeroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void f1dream_protection_w(address_space &space);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
@@ -75,6 +75,6 @@ public:
 	DECLARE_MACHINE_RESET(pushman);
 	DECLARE_MACHINE_RESET(bballs);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 };

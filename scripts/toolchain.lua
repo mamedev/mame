@@ -42,10 +42,10 @@ newoption {
 	allowed = {
 		{ "intel-14",	   "Intel C++ Compiler XE 14.0" },
 		{ "intel-15",	   "Intel C++ Compiler XE 15.0" },
-		{ "vs2012-clang",  "Clang 3.6"         },
 		{ "vs2013-clang",  "Clang 3.6"         },
-		{ "vs2012-xp", 	   "Visual Studio 2012 targeting XP" },
+		{ "vs2015-clang",  "Clang 3.6"         },
 		{ "vs2013-xp", 	   "Visual Studio 2013 targeting XP" },
+		{ "vs2015-xp", 	   "Visual Studio 2015 targeting XP" },
 		{ "winphone8",     "Windows Phone 8.0" },
 		{ "winphone81",    "Windows Phone 8.1" },
 		{ "winstore81",    "Windows Store 8.1" },
@@ -325,7 +325,7 @@ function toolchain(_buildDir, _subDir)
 		if "os2" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-os2")
 		end
-	elseif _ACTION == "vs2012" or _ACTION == "vs2013" or _ACTION == "vs2015" then
+	elseif _ACTION == "vs2013" or _ACTION == "vs2015" then
 
 		if (_ACTION .. "-clang") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("LLVM-" .. _ACTION)
@@ -367,13 +367,13 @@ function toolchain(_buildDir, _subDir)
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-intel")
 		end
 
-		if ("vs2012-xp") == _OPTIONS["vs"] then
-			premake.vstudio.toolset = ("v110_xp")
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
-		end
-
 		if ("vs2013-xp") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("v120_xp")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
+		end
+		
+		if ("vs2015-xp") == _OPTIONS["vs"] then
+			premake.vstudio.toolset = ("v140_xp")
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
 		end
 	elseif _ACTION == "xcode4" then
@@ -753,10 +753,13 @@ function toolchain(_buildDir, _subDir)
 	configuration { "asmjs" }
 		targetdir (_buildDir .. "asmjs" .. "/bin")
 		objdir (_buildDir .. "asmjs" .. "/obj")
+		includedirs {
+			"$(EMSCRIPTEN)/system/include",
+			"$(EMSCRIPTEN)/system/include/compat",
+			"$(EMSCRIPTEN)/system/include/libc",
+			"$(EMSCRIPTEN)/system/lib/libcxxabi/include",
+		}
 		buildoptions {
-			"-isystem$(EMSCRIPTEN)/system/include",
-			"-isystem$(EMSCRIPTEN)/system/include/compat",
-			"-isystem$(EMSCRIPTEN)/system/include/libc",
 			"-Wno-cast-align",
 			"-Wno-tautological-compare",
 			"-Wno-self-assign-field",

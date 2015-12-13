@@ -66,8 +66,8 @@ public:
 	required_device<palette_device> m_palette;
 
 private:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT8 m_comm_latch;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8255_device> m_ppi_m;
@@ -94,7 +94,7 @@ WRITE8_MEMBER( mbc200_state::pm_porta_w )
 
 WRITE8_MEMBER( mbc200_state::pm_portb_w )
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	// to be verified
 	switch (data & 0x01)

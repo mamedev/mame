@@ -18,9 +18,9 @@ const device_type K037122 = &device_creator<k037122_device>;
 k037122_device::k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K037122, "K037122 2D Tilemap", tag, owner, clock, "k037122", __FILE__),
 	device_video_interface(mconfig, *this),
-	m_tile_ram(NULL),
-	m_char_ram(NULL),
-	m_reg(NULL),
+	m_tile_ram(nullptr),
+	m_char_ram(nullptr),
+	m_reg(nullptr),
 	m_gfx_index(0),
 	m_gfxdecode(*this),
 	m_palette(*this)

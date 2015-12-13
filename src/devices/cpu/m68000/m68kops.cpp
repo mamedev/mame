@@ -34758,7 +34758,7 @@ static const opcode_handler_struct m68k_opcode_handler_table[] =
 	{m68000_base_device_ops::m68k_op_bfset_32_al, 0xffff, 0xeef9, {255, 255,  24,  24,  24,  24,  20}},
 	{m68000_base_device_ops::m68k_op_bfins_32_aw, 0xffff, 0xeff8, {255, 255,  21,  21,  21,  21,  17}},
 	{m68000_base_device_ops::m68k_op_bfins_32_al, 0xffff, 0xeff9, {255, 255,  21,  21,  21,  21,  17}},
-	{0, 0, 0, {0, 0, 0, 0, 0}}
+	{nullptr, 0, 0, {0, 0, 0, 0, 0}}
 };
 
 

@@ -38,11 +38,11 @@ public:
 	x1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 private:
-	virtual void device_start();
+	virtual void device_start() override;
 	// z80daisy_interface overrides
-	virtual int z80daisy_irq_state();
-	virtual int z80daisy_irq_ack();
-	virtual void z80daisy_irq_reti();
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
 };
 
 struct scrn_reg_t

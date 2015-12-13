@@ -44,7 +44,7 @@ inline const atarigen_screen_timer *get_screen_timer(screen_device &screen)
 			return &state->m_screen_timer[i];
 
 	fatalerror("Unexpected: no atarivc_eof_update_timer for screen '%s'\n", screen.tag());
-	return NULL;
+	return nullptr;
 }
 
 
@@ -62,9 +62,9 @@ const device_type ATARI_SOUND_COMM = &device_creator<atari_sound_comm_device>;
 
 atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ATARI_SOUND_COMM, "Atari Sound Communications", tag, owner, clock, "atarscom", __FILE__),
-		m_sound_cpu_tag(NULL),
+		m_sound_cpu_tag(nullptr),
 		m_main_int_cb(*this),
-		m_sound_cpu(NULL),
+		m_sound_cpu(nullptr),
 		m_main_to_sound_ready(false),
 		m_sound_to_main_ready(false),
 		m_main_to_sound_data(0),
@@ -93,10 +93,10 @@ void atari_sound_comm_device::static_set_sound_cpu(device_t &device, const char 
 void atari_sound_comm_device::device_start()
 {
 	// find the sound CPU
-	if (m_sound_cpu_tag == NULL)
+	if (m_sound_cpu_tag == nullptr)
 		throw emu_fatalerror("No sound CPU specified!");
 	m_sound_cpu = siblingdevice<m6502_device>(m_sound_cpu_tag);
-	if (m_sound_cpu == NULL)
+	if (m_sound_cpu == nullptr)
 		throw emu_fatalerror("Sound CPU '%s' not found!", m_sound_cpu_tag);
 
 	// resolve callbacks
@@ -362,9 +362,9 @@ atari_vad_device::atari_vad_device(const machine_config &mconfig, const char *ta
 		m_playfield2_tilemap(*this, "playfield2"),
 		m_mob(*this, "mob"),
 		m_eof_data(*this, "eof"),
-		m_scanline_int_timer(NULL),
-		m_tilerow_update_timer(NULL),
-		m_eof_timer(NULL),
+		m_scanline_int_timer(nullptr),
+		m_tilerow_update_timer(nullptr),
+		m_eof_timer(nullptr),
 		m_palette_bank(0),
 		m_pf0_xscroll_raw(0),
 		m_pf0_yscroll(0),
@@ -431,7 +431,7 @@ WRITE16_MEMBER(atari_vad_device::alpha_w)
 WRITE16_MEMBER(atari_vad_device::playfield_upper_w)
 {
 	m_playfield_tilemap->write_ext(space, offset, data, mem_mask);
-	if (m_playfield2_tilemap != NULL)
+	if (m_playfield2_tilemap != nullptr)
 		m_playfield2_tilemap->write_ext(space, offset, data, mem_mask);
 }
 
@@ -485,9 +485,9 @@ WRITE16_MEMBER(atari_vad_device::playfield2_latched_msb_w)
 void atari_vad_device::device_start()
 {
 	// verify configuration
-	if (m_playfield_tilemap == NULL)
+	if (m_playfield_tilemap == nullptr)
 		throw emu_fatalerror("Playfield tilemap not found!");
-	if (m_eof_data == NULL)
+	if (m_eof_data == nullptr)
 		throw emu_fatalerror("EOF data not found!");
 
 	// resolve callbacks
@@ -517,7 +517,7 @@ void atari_vad_device::device_start()
 void atari_vad_device::device_reset()
 {
 	// share extended memory between the two tilemaps
-	if (m_playfield2_tilemap != NULL)
+	if (m_playfield2_tilemap != nullptr)
 		m_playfield2_tilemap->extmem().set(m_playfield_tilemap->extmem());
 
 	// reset the state
@@ -691,7 +691,7 @@ void atari_vad_device::internal_control_write(offs_t offset, UINT16 newword)
 inline void atari_vad_device::update_pf_xscrolls()
 {
 	m_playfield_tilemap->set_scrollx(0, m_pf0_xscroll_raw + ((m_pf1_xscroll_raw) & 7));
-	if (m_playfield2_tilemap != NULL)
+	if (m_playfield2_tilemap != nullptr)
 		m_playfield2_tilemap->set_scrollx(0, m_pf1_xscroll_raw + 4);
 }
 
@@ -708,7 +708,7 @@ void atari_vad_device::update_parameter(UINT16 newword)
 	{
 		case 9:
 			m_mo_xscroll = (newword >> 7) & 0x1ff;
-			if (m_mob != NULL)
+			if (m_mob != nullptr)
 				m_mob->set_xscroll(m_mo_xscroll);
 			break;
 
@@ -724,13 +724,13 @@ void atari_vad_device::update_parameter(UINT16 newword)
 
 		case 13:
 			m_mo_yscroll = (newword >> 7) & 0x1ff;
-			if (m_mob != NULL)
+			if (m_mob != nullptr)
 				m_mob->set_yscroll(m_mo_yscroll);
 			break;
 
 		case 14:
 			m_pf1_yscroll = (newword >> 7) & 0x1ff;
-			if (m_playfield2_tilemap != NULL)
+			if (m_playfield2_tilemap != nullptr)
 				m_playfield2_tilemap->set_scrolly(0, m_pf1_yscroll);
 			break;
 
@@ -751,7 +751,7 @@ void atari_vad_device::update_parameter(UINT16 newword)
 void atari_vad_device::update_tilerow(emu_timer &timer, int scanline)
 {
 	// skip if out of bounds, or not enabled
-	if (scanline <= m_screen->visible_area().max_y && (m_control[0x0a] & 0x2000) != 0 && m_alpha_tilemap != NULL)
+	if (scanline <= m_screen->visible_area().max_y && (m_control[0x0a] & 0x2000) != 0 && m_alpha_tilemap != nullptr)
 	{
 		// iterate over non-visible alpha tiles in this row
 		int offset = scanline / 8 * 64 + 48 + 2 * (scanline % 8);
@@ -960,7 +960,7 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_xscroll(*this, "xscroll"),
 		m_yscroll(*this, "yscroll"),
 		m_slapstic_num(0),
-		m_slapstic(NULL),
+		m_slapstic(nullptr),
 		m_slapstic_bank(0),
 		m_slapstic_last_pc(0),
 		m_slapstic_last_address(0),
@@ -987,7 +987,7 @@ void atarigen_state::machine_start()
 	// allocate timers for all screens
 	screen_device_iterator iter(*this);
 	assert(iter.count() <= ARRAY_LENGTH(m_screen_timer));
-	for (i = 0, screen = iter.first(); screen != NULL; i++, screen = iter.next())
+	for (i = 0, screen = iter.first(); screen != nullptr; i++, screen = iter.next())
 	{
 		m_screen_timer[i].screen = screen;
 		m_screen_timer[i].scanline_interrupt_timer = timer_alloc(TID_SCANLINE_INTERRUPT, (void *)screen);
@@ -1016,7 +1016,7 @@ void atarigen_state::machine_reset()
 	m_video_int_state = m_sound_int_state = m_scanline_int_state = 0;
 
 	// reset the control latch on the EAROM, if present
-	if (m_earom != NULL)
+	if (m_earom != nullptr)
 		m_earom->set_control(0, 1, 1, 0, 0);
 
 	// reset the slapstic
@@ -1236,7 +1236,7 @@ void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t 
 {
 	// reset in case we have no state
 	m_slapstic_num = chipnum;
-	m_slapstic = NULL;
+	m_slapstic = nullptr;
 
 	// if we have a chip, install it
 	if (chipnum != 0)
@@ -1314,7 +1314,7 @@ READ16_MEMBER(atarigen_state::slapstic_r)
 void atarigen_state::set_volume_by_type(int volume, device_type type)
 {
 	sound_interface_iterator iter(*this);
-	for (device_sound_interface *sound = iter.first(); sound != NULL; sound = iter.next())
+	for (device_sound_interface *sound = iter.first(); sound != nullptr; sound = iter.next())
 		if (sound->device().type() == type)
 			sound->set_output_gain(ALL_OUTPUTS, volume / 100.0);
 }
@@ -1463,7 +1463,7 @@ void atarigen_state::blend_gfx(int gfx0, int gfx1, int mask0, int mask1)
 	gx0->set_granularity(granularity);
 
 	// free the second graphics element
-	m_gfxdecode->set_gfx(gfx1, NULL);
+	m_gfxdecode->set_gfx(gfx1, nullptr);
 }
 
 

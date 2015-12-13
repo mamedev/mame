@@ -25,7 +25,7 @@ static const char *reg_names[32] =
 };
 
 // determines if right rotate or I/O field length is to be used
-INLINE bool is_rot(UINT16 opcode)
+static inline bool is_rot(UINT16 opcode)
 {
 	if((opcode & 0x1000) || (opcode & 0x0010))
 		return false;
@@ -33,7 +33,7 @@ INLINE bool is_rot(UINT16 opcode)
 		return true;
 }
 
-INLINE bool is_src_rot(UINT16 opcode)
+static inline bool is_src_rot(UINT16 opcode)
 {
 	if((opcode & 0x1000))
 		return false;

@@ -51,8 +51,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_post_load();
+	virtual void device_start() override;
+	virtual void device_post_load() override;
 
 private:
 	void update();

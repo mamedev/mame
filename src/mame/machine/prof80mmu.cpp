@@ -61,7 +61,7 @@ void prof80_mmu_device::device_start()
 
 const address_space_config *prof80_mmu_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_PROGRAM) ? &m_program_space_config : NULL;
+	return (spacenum == AS_PROGRAM) ? &m_program_space_config : nullptr;
 }
 
 

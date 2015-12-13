@@ -600,7 +600,7 @@ public:
 	UINT8 m_video_ctrl;
 
 private:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	INT32 m_vram_bank;
 	UINT8 m_vbl_ctrl;
 	UINT8 m_keyboard_row;

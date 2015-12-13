@@ -24,7 +24,7 @@ public:
 	debugwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler);
 	virtual ~debugwin_info();
 
-	bool is_valid() const { return m_wnd != NULL; }
+	bool is_valid() const { return m_wnd != nullptr; }
 	debugwin_info *next() const { return m_next; }
 
 	void set_ignore_char_lparam(LPARAM value) { m_ignore_char_lparam = value >> 16; }
@@ -82,6 +82,9 @@ protected:
 		ID_2_BYTE_CHUNKS,
 		ID_4_BYTE_CHUNKS,
 		ID_8_BYTE_CHUNKS,
+		ID_FLOATING_POINT_32BIT,
+		ID_FLOATING_POINT_64BIT,
+		ID_FLOATING_POINT_80BIT,
 		ID_LOGICAL_ADDRESSES,
 		ID_PHYSICAL_ADDRESSES,
 		ID_REVERSE_VIEW,
@@ -115,7 +118,7 @@ protected:
 	void draw_border(HDC dc, RECT &bounds);
 	void draw_border(HDC dc, HWND child);
 
-	auto_pointer<debugview_info>    m_views[MAX_VIEWS];
+	std::unique_ptr<debugview_info>    m_views[MAX_VIEWS];
 
 private:
 	LRESULT window_proc(UINT message, WPARAM wparam, LPARAM lparam);

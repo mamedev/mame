@@ -41,7 +41,7 @@ public:
 	DECLARE_DRIVER_INIT(route16c);
 	DECLARE_MACHINE_START(speakres);
 	DECLARE_MACHINE_START(ttmahjng);
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ttmahjng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

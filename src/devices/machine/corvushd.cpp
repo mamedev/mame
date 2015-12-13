@@ -955,16 +955,16 @@ hard_disk_file *corvus_hdc_t::corvus_hdc_file(int drv) {
 	// Corvus drive id numbers are 1-based so we check 1..4 instead of 0..3
 	if (drv < 1 || drv > 4)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	harddisk_image_device *img = siblingdevice<harddisk_image_device>(tags[drv - 1]);
 
 	if ( !img )
-		return NULL;
+		return nullptr;
 
 	if (!img->exists())
-		return NULL;
+		return nullptr;
 
 	// Pick up the Head/Cylinder/Sector info
 	hard_disk_file *file = img->get_hard_disk_file();

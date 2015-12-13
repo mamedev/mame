@@ -37,8 +37,8 @@ i8008_device::i8008_device(const machine_config &mconfig, const char *tag, devic
 	: cpu_device(mconfig, I8008, "i8008", tag, owner, clock, "i8008", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 14),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 8),
-		m_program(0),
-		m_direct(0)
+		m_program(nullptr),
+		m_direct(nullptr)
 {
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -143,7 +143,7 @@ const address_space_config *i8008_device::memory_space_config(address_spacenum s
 {
 	return  (spacenum == AS_PROGRAM) ? &m_program_config :
 			(spacenum == AS_IO) ? &m_io_config :
-			NULL;
+			nullptr;
 }
 
 //-------------------------------------------------

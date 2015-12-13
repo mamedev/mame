@@ -18,9 +18,9 @@ public:
 	msx_cart_bm_012(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual void device_start() override;
 
 	DECLARE_WRITE_LINE_MEMBER(midi_in);
 

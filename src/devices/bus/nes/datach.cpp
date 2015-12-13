@@ -102,7 +102,7 @@ bool nes_datach_slot_device::call_load()
 			return IMAGE_INIT_FAIL;
 
 		// Existing Datach carts are all 256K, so we only load files of this size
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			if (length() != 0x40000 && length() != 0x40010)
 				return IMAGE_INIT_FAIL;

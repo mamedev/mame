@@ -27,7 +27,7 @@ const device_type DAC = &device_creator<dac_device>;
 dac_device::dac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DAC, "DAC", tag, owner, clock, "dac", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_output(0)
 {
 }

@@ -162,8 +162,8 @@ public:
 	DECLARE_DRIVER_INIT(lhzb2a);
 	DECLARE_DRIVER_INIT(mgdha);
 
-	virtual void video_start();
-	virtual void machine_reset();
+	virtual void video_start() override;
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(iqblocka);
 	DECLARE_MACHINE_RESET(mgcs);
 	DECLARE_MACHINE_RESET(lhzb2a);

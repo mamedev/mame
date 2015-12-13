@@ -200,7 +200,7 @@ protected:
 	required_device<m68340cpu_device> m_maincpu;
 public:
 	DECLARE_DRIVER_INIT(hb);
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 READ32_MEMBER(pluto5_state::pluto5_mem_r)

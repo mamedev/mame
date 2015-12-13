@@ -20,9 +20,9 @@ mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, d
 	m_rxc_handler(*this),
 	m_rts_handler(*this),
 	m_dtr_handler(*this),
-	m_control(0),
+	m_control(0), m_command(0),
 	m_status(0),
-	m_tdr(0),
+	m_tdr(0), m_rdr(0),
 	m_irq_state(0),
 	m_irq(0),
 	m_txd(0),
@@ -34,15 +34,15 @@ mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, d
 	m_cts(1),
 	m_dsr(1),
 	m_dcd(1),
-	m_rxd(1),
+	m_rxd(1), m_wordlength(0), m_extrastop(0), m_brk(0), m_echo_mode(0), m_parity(0),
 	m_rx_state(STATE_START),
-	m_rx_clock(0),
-	m_rx_counter(0),
+	m_rx_clock(0), m_rx_bits(0), m_rx_shift(0), m_rx_parity(0),
+	m_rx_counter(0), m_rx_irq_enable(0),
 	m_rx_internal_clock(0),
 	m_tx_state(STATE_START),
 	m_tx_output(OUTPUT_MARK),
-	m_tx_clock(0),
-	m_tx_counter(0)
+	m_tx_clock(0), m_tx_bits(0), m_tx_shift(0), m_tx_parity(0),
+	m_tx_counter(0), m_tx_enable(0), m_tx_irq_enable(0), m_tx_internal_clock(0)
 {
 }
 

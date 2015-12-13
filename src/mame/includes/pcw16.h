@@ -129,9 +129,9 @@ public:
 	void pcw16_write_mem(UINT8 bank, UINT16 offset, UINT8 data);
 	UINT8 read_bank_data(UINT8 type, UINT16 offset);
 	void write_bank_data(UINT8 type, UINT16 offset, UINT8 data);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pcw16);
 	UINT32 screen_update_pcw16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(pcw16_timer_callback);

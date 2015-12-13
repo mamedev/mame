@@ -19,9 +19,10 @@ const device_type K054539 = &device_creator<k054539_device>;
 
 k054539_device::k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K054539, "K054539 ADPCM", tag, owner, clock, "k054539", __FILE__),
-		device_sound_interface(mconfig, *this),
+		device_sound_interface(mconfig, *this), flags(0), ram(nullptr), reverb_pos(0), cur_ptr(0), cur_limit(0),
+	cur_zone(nullptr), rom(nullptr), rom_size(0), rom_mask(0), stream(nullptr), m_timer(nullptr), m_timer_state(0),
 		m_timer_handler(*this),
-		m_rgnoverride(NULL)
+		m_rgnoverride(nullptr)
 {
 }
 
@@ -99,8 +100,8 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 #define VOL_CAP 1.80
 
 	static const INT16 dpcm[16] = {
-		0<<8, 1<<8, 4<<8, 9<<8, 16<<8, 25<<8, 36<<8, 49<<8,
-		-64<<8, -49<<8, -36<<8, -25<<8, -16<<8, -9<<8, -4<<8, -1<<8
+		0 * 0x100,     1 * 0x100,   4 * 0x100,   9 * 0x100,  16 * 0x100, 25 * 0x100, 36 * 0x100, 49 * 0x100,
+		-64 * 0x100, -49 * 0x100, -36 * 0x100, -25 * 0x100, -16 * 0x100, -9 * 0x100, -4 * 0x100, -1 * 0x100
 	};
 
 
@@ -310,7 +311,7 @@ void k054539_device::init_chip()
 	cur_ptr = 0;
 	memset(ram, 0, 0x4000);
 
-	memory_region *reg = (m_rgnoverride != NULL) ? owner()->memregion(m_rgnoverride) : region();
+	memory_region *reg = (m_rgnoverride != nullptr) ? owner()->memregion(m_rgnoverride) : region();
 	rom = reg->base();
 	rom_size = reg->bytes();
 	rom_mask = 0xffffffffU;
@@ -498,8 +499,8 @@ void k054539_device::device_start()
 	m_timer_handler.resolve_safe();
 	m_apan_cb.bind_relative_to(*owner());
 
-	for (int i = 0; i < 8; i++)
-		gain[i] = 1.0;
+	for (auto & elem : gain)
+		elem = 1.0;
 
 	flags = RESET_FLAGS;
 

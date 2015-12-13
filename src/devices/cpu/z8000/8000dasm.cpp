@@ -97,7 +97,7 @@ CPU_DISASSEMBLE( z8000 )
 	UINT32 old_w;
 
 	/* already initialized? */
-	if(z8000_exec == NULL)
+	if(z8000_exec == nullptr)
 		z8000_init_tables();
 
 	GET_OP(oprom, 0, new_pc - pc);

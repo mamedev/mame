@@ -1,9 +1,8 @@
-// license:???
-// copyright-holders:HIGHWAYMAN, Nicola Salmoria, Pierpaolo Prazzoli
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Pierpaolo Prazzoli
+// thanks-to:HIGHWAYMAN
 /*
     Wink    -   (c) 1985 Midcoin
-
-    driver by HIGHWAYMAN, Nicola Salmoria, Pierpaolo Prazzoli
 
     TODO:
     - better interrupts?
@@ -53,9 +52,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	DECLARE_DRIVER_INIT(wink);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	UINT32 screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -20,7 +20,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const debug_view_memory::memory_view_pos debug_view_memory::s_memory_pos_table[9] =
+const debug_view_memory::memory_view_pos debug_view_memory::s_memory_pos_table[12] =
 {
 	/* 0 bytes per chunk:                         */ {  0, { 0 } },
 	/* 1 byte  per chunk: 00 11 22 33 44 55 66 77 */ {  3, { 0x04, 0x00, 0x80 } },
@@ -30,7 +30,10 @@ const debug_view_memory::memory_view_pos debug_view_memory::s_memory_pos_table[9
 	/* 5 bytes per chunk:                         */ {  0, { 0 } },
 	/* 6 bytes per chunk:                         */ {  0, { 0 } },
 	/* 7 bytes per chunk:                         */ {  0, { 0 } },
-	/* 8 bytes per chunk:     0011223344556677    */ { 24, { 0xbc, 0xbc, 0xbc, 0xbc, 0x3c, 0x38, 0x34, 0x30, 0x2c, 0x28, 0x24, 0x20, 0x1c, 0x18, 0x14, 0x10, 0x0c, 0x08, 0x04, 0x00, 0x80, 0x80, 0x80, 0x80 } }
+	/* 8 bytes per chunk:     0011223344556677    */ { 24, { 0xbc, 0xbc, 0xbc, 0xbc, 0x3c, 0x38, 0x34, 0x30, 0x2c, 0x28, 0x24, 0x20, 0x1c, 0x18, 0x14, 0x10, 0x0c, 0x08, 0x04, 0x00, 0x80, 0x80, 0x80, 0x80 } },
+	/* 32 bit floating point:                     */ { 16, { 0 } },
+	/* 64 bit floating point:                     */ { 32, { 0 } },
+	/* 80 bit floating point:                     */ { 32, { 0 } },
 };
 
 
@@ -47,7 +50,7 @@ debug_view_memory_source::debug_view_memory_source(const char *name, address_spa
 	: debug_view_source(name, &space.device()),
 		m_space(&space),
 		m_memintf(dynamic_cast<device_memory_interface *>(&space.device())),
-		m_base(NULL),
+		m_base(nullptr),
 		m_length(0),
 		m_offsetxor(0),
 		m_endianness(space.endianness()),
@@ -57,8 +60,8 @@ debug_view_memory_source::debug_view_memory_source(const char *name, address_spa
 
 debug_view_memory_source::debug_view_memory_source(const char *name, memory_region &region)
 	: debug_view_source(name),
-		m_space(NULL),
-		m_memintf(NULL),
+		m_space(nullptr),
+		m_memintf(nullptr),
 		m_base(region.base()),
 		m_length(region.bytes()),
 		m_offsetxor(ENDIAN_VALUE_NE_NNE(region.endianness(), 0, region.bytewidth() - 1)),
@@ -69,8 +72,8 @@ debug_view_memory_source::debug_view_memory_source(const char *name, memory_regi
 
 debug_view_memory_source::debug_view_memory_source(const char *name, void *base, int element_size, int num_elements)
 	: debug_view_source(name),
-		m_space(NULL),
-		m_memintf(NULL),
+		m_space(nullptr),
+		m_memintf(nullptr),
 		m_base(base),
 		m_length(element_size * num_elements),
 		m_offsetxor(0),
@@ -94,9 +97,11 @@ debug_view_memory::debug_view_memory(running_machine &machine, debug_view_osd_up
 		m_expression(machine),
 		m_chunks_per_row(16),
 		m_bytes_per_chunk(1),
+		m_data_format(1),
 		m_reverse_view(false),
 		m_ascii_view(true),
 		m_no_translation(false),
+		m_edit_enabled(true),
 		m_maxaddr(0),
 		m_bytes_per_row(16),
 		m_byte_offset(0)
@@ -131,7 +136,7 @@ void debug_view_memory::enumerate_sources()
 
 	// first add all the devices' address spaces
 	memory_interface_iterator iter(machine().root_device());
-	for (device_memory_interface *memintf = iter.first(); memintf != NULL; memintf = iter.next())
+	for (device_memory_interface *memintf = iter.first(); memintf != nullptr; memintf = iter.next())
 		if (&memintf->device() != &machine().root_device())
 			for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
 				if (memintf->has_space(spacenum))
@@ -142,7 +147,7 @@ void debug_view_memory::enumerate_sources()
 				}
 
 	// then add all the memory regions
-	for (memory_region *region = machine().memory().first_region(); region != NULL; region = region->next())
+	for (memory_region *region = machine().memory().first_region(); region != nullptr; region = region->next())
 	{
 		strprintf(name, "Region '%s'", region->name());
 		m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), *region)));
@@ -155,7 +160,7 @@ void debug_view_memory::enumerate_sources()
 		UINT32 valsize, valcount;
 		void *base;
 		const char *itemname = machine().save().indexed_item(itemnum, base, valsize, valcount);
-		if (itemname == NULL)
+		if (itemname == nullptr)
 			break;
 
 		// add pretty much anything that's not a timer (we may wish to cull other items later)
@@ -190,13 +195,48 @@ void debug_view_memory::view_notify(debug_view_notification type)
 		const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 		m_chunks_per_row = m_bytes_per_chunk * m_chunks_per_row / source.m_prefsize;
 		m_bytes_per_chunk = source.m_prefsize;
-		if (source.m_space != NULL)
+		if (m_bytes_per_chunk > 8)
+			m_bytes_per_chunk = 8;
+		m_data_format = m_bytes_per_chunk;
+		if (source.m_space != nullptr)
 			m_expression.set_context(&source.m_space->device().debug()->symtable());
 		else
-			m_expression.set_context(NULL);
+			m_expression.set_context(nullptr);
 	}
 }
 
+
+//-------------------------------------------------
+//  uint32_to_float - return a floating point number
+//  whose 32 bit representation is value
+//-------------------------------------------------
+
+static inline float uint32_to_float(UINT32 value)
+{
+	union {
+		float f;
+		UINT32 i;
+	} v;
+
+	v.i = value;
+	return v.f;
+}
+
+//-------------------------------------------------
+//  uint64_to_double - return a floating point number
+//  whose 64 bit representation is value
+//-------------------------------------------------
+
+static inline float uint64_to_double(UINT64 value)
+{
+	union {
+		double f;
+		UINT64 i;
+	} v;
+
+	v.i = value;
+	return v.f;
+}
 
 //-------------------------------------------------
 //  view_update - update the contents of the
@@ -212,7 +252,7 @@ void debug_view_memory::view_update()
 		recompute();
 
 	// get positional data
-	const memory_view_pos &posdata = s_memory_pos_table[m_bytes_per_chunk];
+	const memory_view_pos &posdata = s_memory_pos_table[m_data_format];
 
 	// loop over visible rows
 	for (UINT32 row = 0; row < m_visible.y; row++)
@@ -241,7 +281,7 @@ void debug_view_memory::view_update()
 		if (effrow < m_total.y)
 		{
 			offs_t addrbyte = m_byte_offset + effrow * m_bytes_per_row;
-			offs_t address = (source.m_space != NULL) ? source.m_space->byte_to_address(addrbyte) : addrbyte;
+			offs_t address = (source.m_space != nullptr) ? source.m_space->byte_to_address(addrbyte) : addrbyte;
 			char addrtext[20];
 
 			// generate the address
@@ -255,17 +295,60 @@ void debug_view_memory::view_update()
 			for (int chunknum = 0; chunknum < m_chunks_per_row; chunknum++)
 			{
 				int chunkindex = m_reverse_view ? (m_chunks_per_row - 1 - chunknum) : chunknum;
+				int spacing = posdata.m_spacing;
 
-				UINT64 chunkdata;
-				bool ismapped = read(m_bytes_per_chunk, addrbyte + chunknum * m_bytes_per_chunk, chunkdata);
-				dest = destrow + m_section[1].m_pos + 1 + chunkindex * posdata.m_spacing;
-				for (int ch = 0; ch < posdata.m_spacing; ch++, dest++)
-					if (dest >= destmin && dest < destmax)
-					{
-						UINT8 shift = posdata.m_shift[ch];
-						if (shift < 64)
-							dest->byte = ismapped ? "0123456789ABCDEF"[(chunkdata >> shift) & 0x0f] : '*';
+				if (m_data_format <= 8) {
+					UINT64 chunkdata;
+					bool ismapped = read(m_bytes_per_chunk, addrbyte + chunknum * m_bytes_per_chunk, chunkdata);
+					dest = destrow + m_section[1].m_pos + 1 + chunkindex * spacing;
+					for (int ch = 0; ch < posdata.m_spacing; ch++, dest++)
+						if (dest >= destmin && dest < destmax)
+						{
+							UINT8 shift = posdata.m_shift[ch];
+							if (shift < 64)
+								dest->byte = ismapped ? "0123456789ABCDEF"[(chunkdata >> shift) & 0x0f] : '*';
+						}
+				}
+				else {
+					int ch;
+					char valuetext[64];
+					UINT64 chunkdata = 0;
+					floatx80 chunkdata80 = { 0, 0 };
+					bool ismapped;
+					
+					if (m_data_format != 11)
+						ismapped = read(m_bytes_per_chunk, addrbyte + chunknum * m_bytes_per_chunk, chunkdata);
+					else
+						ismapped = read(m_bytes_per_chunk, addrbyte + chunknum * m_bytes_per_chunk, chunkdata80);
+
+					if (ismapped)
+						switch (m_data_format)
+						{
+						case 9:
+							sprintf(valuetext, "%.8g", uint32_to_float((UINT32)chunkdata));
+							break;
+						case 10:
+							sprintf(valuetext, "%.24g", uint64_to_double(chunkdata));
+							break;
+						case 11:
+							float64 f64 = floatx80_to_float64(chunkdata80);
+							sprintf(valuetext, "%.24g", uint64_to_double(f64));
+							break;
+						}
+					else {
+						valuetext[0] = '*';
+						valuetext[1] = 0;
 					}
+					dest = destrow + m_section[1].m_pos + 1 + chunkindex * spacing;
+					// first copy the text
+					for (ch = 0; (ch < spacing) && (valuetext[ch] != 0); ch++, dest++)
+						if (dest >= destmin && dest < destmax)
+							dest->byte = valuetext[ch];
+					// then fill with spaces
+					for (; ch < spacing; ch++, dest++)
+						if (dest >= destmin && dest < destmax)
+							dest->byte = ' ';
+				}
 			}
 
 			// generate the ASCII data
@@ -294,6 +377,10 @@ void debug_view_memory::view_char(int chval)
 {
 	// get the position
 	cursor_pos pos = get_cursor_pos(m_cursor);
+
+	// editing is not supported when showing floating point values
+	if (m_edit_enabled == false)
+		return;
 
 	// handle the incoming key
 	switch (chval)
@@ -360,7 +447,7 @@ void debug_view_memory::view_char(int chval)
 		{
 			static const char hexvals[] = "0123456789abcdef";
 			char *hexchar = (char *)strchr(hexvals, tolower(chval));
-			if (hexchar == NULL)
+			if (hexchar == nullptr)
 				break;
 
 			UINT64 data;
@@ -443,7 +530,7 @@ void debug_view_memory::recompute()
 
 	// determine the maximum address and address format string from the raw information
 	int addrchars;
-	if (source.m_space != NULL)
+	if (source.m_space != nullptr)
 	{
 		m_maxaddr = m_no_translation ? source.m_space->bytemask() : source.m_space->logbytemask();
 		addrchars = m_no_translation ? source.m_space->addrchars() : source.m_space->logaddrchars();
@@ -461,7 +548,7 @@ void debug_view_memory::recompute()
 		strprintf(m_addrformat, "%%0%dX%*s", addrchars, 8 - addrchars, "");
 
 	// if we are viewing a space with a minimum chunk size, clamp the bytes per chunk
-	if (source.m_space != NULL && source.m_space->byte_to_address(1) > 1)
+	if (source.m_space != nullptr && source.m_space->byte_to_address(1) > 1)
 	{
 		UINT32 min_bytes_per_chunk = source.m_space->byte_to_address(1);
 		while (m_bytes_per_chunk < min_bytes_per_chunk)
@@ -478,7 +565,13 @@ void debug_view_memory::recompute()
 
 	// compute the section widths
 	m_section[0].m_width = 1 + 8 + 1;
-	m_section[1].m_width = 1 + 3 * m_bytes_per_row + 1;
+	if (m_data_format <= 8)
+		m_section[1].m_width = 1 + 3 * m_bytes_per_row + 1;
+	else {
+		const memory_view_pos &posdata = s_memory_pos_table[m_data_format];
+
+		m_section[1].m_width = 1 + posdata.m_spacing * m_chunks_per_row + 1;
+	}
 	m_section[2].m_width = m_ascii_view ? (1 + m_bytes_per_row + 1) : 0;
 
 	// compute the section positions
@@ -524,7 +617,7 @@ bool debug_view_memory::needs_recompute()
 
 		const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 		offs_t resultbyte;
-		if (source.m_space != NULL)
+		if (source.m_space != nullptr)
 			resultbyte  = source.m_space->address_to_byte(m_expression.value()) & source.m_space->logbytemask();
 		else
 			resultbyte = m_expression.value();
@@ -547,27 +640,46 @@ debug_view_memory::cursor_pos debug_view_memory::get_cursor_pos(const debug_view
 {
 	// start with the base address for this row
 	cursor_pos pos;
+	const memory_view_pos &posdata = s_memory_pos_table[m_data_format];
 	pos.m_address = m_byte_offset + cursor.y * m_bytes_per_chunk * m_chunks_per_row;
 
 	// determine the X position within the middle section, clamping as necessary
-	const memory_view_pos &posdata = s_memory_pos_table[m_bytes_per_chunk];
-	int xposition = cursor.x - m_section[1].m_pos - 1;
-	if (xposition < 0)
-		xposition = 0;
-	else if (xposition >= posdata.m_spacing * m_chunks_per_row)
-		xposition = posdata.m_spacing * m_chunks_per_row - 1;
+	if (m_data_format <= 8) {
+		int xposition = cursor.x - m_section[1].m_pos - 1;
+		if (xposition < 0)
+			xposition = 0;
+		else if (xposition >= posdata.m_spacing * m_chunks_per_row)
+			xposition = posdata.m_spacing * m_chunks_per_row - 1;
 
-	// compute chunk number and offset within that chunk
-	int chunknum = xposition / posdata.m_spacing;
-	int chunkoffs = xposition % posdata.m_spacing;
+		// compute chunk number and offset within that chunk
+		int chunknum = xposition / posdata.m_spacing;
+		int chunkoffs = xposition % posdata.m_spacing;
 
-	// reverse the chunknum if we're reversed
-	if (m_reverse_view)
-		chunknum = m_chunks_per_row - 1 - chunknum;
+		// reverse the chunknum if we're reversed
+		if (m_reverse_view)
+			chunknum = m_chunks_per_row - 1 - chunknum;
 
-	// compute the address and shift
-	pos.m_address += chunknum * m_bytes_per_chunk;
-	pos.m_shift = posdata.m_shift[chunkoffs] & 0x7f;
+		// compute the address and shift
+		pos.m_address += chunknum * m_bytes_per_chunk;
+		pos.m_shift = posdata.m_shift[chunkoffs] & 0x7f;
+	}
+	else {
+		int xposition = cursor.x - m_section[1].m_pos - 1;
+		// check for lower limit
+		if (xposition < 0)
+			xposition = 0;
+		int chunknum = xposition / posdata.m_spacing;
+		// check for upper limit
+		if (chunknum >= m_chunks_per_row)
+			chunknum = m_chunks_per_row - 1;
+		// reverse the chunknum if we're reversed
+		if (m_reverse_view)
+			chunknum = m_chunks_per_row - 1 - chunknum;
+		// compute the address
+		pos.m_address += chunknum * m_bytes_per_chunk;
+		pos.m_shift = 0;
+	}
+
 	return pos;
 }
 
@@ -579,7 +691,7 @@ debug_view_memory::cursor_pos debug_view_memory::get_cursor_pos(const debug_view
 
 void debug_view_memory::set_cursor_pos(cursor_pos pos)
 {
-	const memory_view_pos &posdata = s_memory_pos_table[m_bytes_per_chunk];
+	const memory_view_pos &posdata = s_memory_pos_table[m_data_format];
 
 	// offset the address by the byte offset
 	if (pos.m_address < m_byte_offset)
@@ -594,13 +706,18 @@ void debug_view_memory::set_cursor_pos(cursor_pos pos)
 	if (m_reverse_view)
 		chunknum = m_chunks_per_row - 1 - chunknum;
 
-	// scan within the chunk to find the shift
-	for (m_cursor.x = 0; m_cursor.x < posdata.m_spacing; m_cursor.x++)
-		if (posdata.m_shift[m_cursor.x] == pos.m_shift)
-			break;
+	if (m_data_format <= 8) {
+		// scan within the chunk to find the shift
+		for (m_cursor.x = 0; m_cursor.x < posdata.m_spacing; m_cursor.x++)
+			if (posdata.m_shift[m_cursor.x] == pos.m_shift)
+				break;
 
-	// add in the chunk offset and shift to the right of divider1
-	m_cursor.x += m_section[1].m_pos + 1 + posdata.m_spacing * chunknum;
+		// add in the chunk offset and shift to the right of divider1
+		m_cursor.x += m_section[1].m_pos + 1 + posdata.m_spacing * chunknum;
+	}
+	else {
+		m_cursor.x = m_section[1].m_pos + 1 + posdata.m_spacing * chunknum;
+	}
 
 	// clamp to the window bounds
 	m_cursor.x = MIN(m_cursor.x, m_total.x);
@@ -621,7 +738,7 @@ bool debug_view_memory::read(UINT8 size, offs_t offs, UINT64 &data)
 	const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 
 	// if no raw data, just use the standard debug routines
-	if (source.m_space != NULL)
+	if (source.m_space != nullptr)
 	{
 		offs_t dummyaddr = offs;
 
@@ -666,6 +783,31 @@ bool debug_view_memory::read(UINT8 size, offs_t offs, UINT64 &data)
 
 
 //-------------------------------------------------
+//  read - read a 80 bit value
+//-------------------------------------------------
+
+bool debug_view_memory::read(UINT8 size, offs_t offs, floatx80 &data)
+{
+	UINT64 t;
+	bool mappedhi, mappedlo;
+	const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
+
+	if (source.m_endianness == ENDIANNESS_LITTLE) {
+		mappedlo = read(8, offs, data.low);
+		mappedhi = read(2, offs+8, t);
+		data.high = (bits16)t;
+	}
+	else {
+		mappedhi = read(2, offs, t);
+		data.high = (bits16)t;
+		mappedlo = read(8, offs + 2, data.low);
+	}
+
+	return mappedhi && mappedlo;
+}
+
+
+//-------------------------------------------------
 //  write - generic memory view data writer
 //-------------------------------------------------
 
@@ -674,7 +816,7 @@ void debug_view_memory::write(UINT8 size, offs_t offs, UINT64 data)
 	const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 
 	// if no raw data, just use the standard debug routines
-	if (source.m_space != NULL)
+	if (source.m_space != nullptr)
 	{
 		switch (size)
 		{
@@ -735,32 +877,6 @@ void debug_view_memory::set_expression(const char *expression)
 
 
 //-------------------------------------------------
-//  set_bytes_per_chunk - specify the number of
-//  bytes displayed per chunk
-//-------------------------------------------------
-
-void debug_view_memory::set_bytes_per_chunk(UINT8 chunkbytes)
-{
-	const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
-
-	cursor_pos pos = begin_update_and_get_cursor_pos();
-	pos.m_address += (pos.m_shift / 8) ^ ((source.m_endianness == ENDIANNESS_LITTLE) ? 0 : (m_bytes_per_chunk - 1));
-	pos.m_shift %= 8;
-
-	m_bytes_per_chunk = chunkbytes;
-	m_chunks_per_row = m_bytes_per_row / chunkbytes;
-	if (m_chunks_per_row < 1)
-		m_chunks_per_row = 1;
-	m_recompute = m_update_pending = true;
-
-	pos.m_shift += 8 * ((pos.m_address % m_bytes_per_chunk) ^ ((source.m_endianness == ENDIANNESS_LITTLE) ? 0 : (m_bytes_per_chunk - 1)));
-	pos.m_address -= pos.m_address % m_bytes_per_chunk;
-
-	end_update_and_set_cursor_pos(pos);
-}
-
-
-//-------------------------------------------------
 //  set_chunks_per_row - specify the number of
 //  chunks displayed across a row
 //-------------------------------------------------
@@ -776,6 +892,70 @@ void debug_view_memory::set_chunks_per_row(UINT32 rowchunks)
 	end_update_and_set_cursor_pos(pos);
 }
 
+
+//-------------------------------------------------
+//  set_data_format - specify what kind of values
+//  are shown, 1-8 8-64 bits, 9 32bit floating point
+//-------------------------------------------------
+
+void debug_view_memory::set_data_format(int format)
+{
+	cursor_pos pos;
+
+	// should never be
+	if ((format <= 0) || (format > 11))
+		return;
+	// no need to change
+	if (format == m_data_format)
+		return;
+
+	pos = begin_update_and_get_cursor_pos();
+	if ((format <= 8) && (m_data_format <= 8)) {
+		const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
+
+		pos.m_address += (pos.m_shift / 8) ^ ((source.m_endianness == ENDIANNESS_LITTLE) ? 0 : (m_bytes_per_chunk - 1));
+		pos.m_shift %= 8;
+
+		m_bytes_per_chunk = format;
+		m_chunks_per_row = m_bytes_per_row / format;
+		if (m_chunks_per_row < 1)
+			m_chunks_per_row = 1;
+
+		pos.m_shift += 8 * ((pos.m_address % m_bytes_per_chunk) ^ ((source.m_endianness == ENDIANNESS_LITTLE) ? 0 : (m_bytes_per_chunk - 1)));
+		pos.m_address -= pos.m_address % m_bytes_per_chunk;
+	} else {
+		if (format <= 8) {
+			m_supports_cursor = true;
+			m_edit_enabled = true;
+
+			m_bytes_per_chunk = format;
+		}
+		else {
+			m_supports_cursor = false;
+			m_edit_enabled = false;
+			m_cursor_visible = false;
+
+			switch (format)
+			{
+			case 9:
+				m_bytes_per_chunk = 4;
+				break;
+			case 10:
+				m_bytes_per_chunk = 8;
+				break;
+			case 11:
+				m_bytes_per_chunk = 10;
+				break;
+			}
+		}
+		m_chunks_per_row = m_bytes_per_row / m_bytes_per_chunk;
+		pos.m_shift = 0;
+		pos.m_address -= pos.m_address % m_bytes_per_chunk;
+	}
+	m_recompute = m_update_pending = true;
+	m_data_format = format;
+	end_update_and_set_cursor_pos(pos);
+}
 
 //-------------------------------------------------
 //  set_reverse - specify true if the memory view

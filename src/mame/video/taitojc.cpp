@@ -304,7 +304,7 @@ void taitojc_state::video_start()
 {
 	/* find first empty slot to decode gfx */
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
-		if (m_gfxdecode->gfx(m_gfx_index) == 0)
+		if (m_gfxdecode->gfx(m_gfx_index) == nullptr)
 			break;
 
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);

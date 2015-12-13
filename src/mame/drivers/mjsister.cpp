@@ -69,16 +69,16 @@ public:
 	DECLARE_WRITE8_MEMBER(input_sel2_w);
 	DECLARE_READ8_MEMBER(keys_r);
 	TIMER_CALLBACK_MEMBER(dac_callback);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void redraw();
 	void plot0( int offset, UINT8 data );
 	void plot1( int offset, UINT8 data );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

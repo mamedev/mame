@@ -20,24 +20,24 @@ class ui_menu_keyboard_mode : public ui_menu {
 public:
 	ui_menu_keyboard_mode(running_machine &machine, render_container *container);
 	virtual ~ui_menu_keyboard_mode();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 };
 
 class ui_menu_network_devices : public ui_menu {
 public:
 	ui_menu_network_devices(running_machine &machine, render_container *container);
 	virtual ~ui_menu_network_devices();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 };
 
 class ui_menu_bookkeeping : public ui_menu {
 public:
 	ui_menu_bookkeeping(running_machine &machine, render_container *container);
 	virtual ~ui_menu_bookkeeping();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	attotime prevtime;
@@ -47,8 +47,8 @@ class ui_menu_crosshair : public ui_menu {
 public:
 	ui_menu_crosshair(running_machine &machine, render_container *container);
 	virtual ~ui_menu_crosshair();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	enum {
@@ -73,16 +73,16 @@ class ui_menu_quit_game : public ui_menu {
 public:
 	ui_menu_quit_game(running_machine &machine, render_container *container);
 	virtual ~ui_menu_quit_game();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 };
 
 class ui_menu_bios_selection : public ui_menu {
 public:
 	ui_menu_bios_selection(running_machine &machine, render_container *container);
 	virtual ~ui_menu_bios_selection();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 };

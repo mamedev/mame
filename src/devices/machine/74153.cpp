@@ -55,14 +55,14 @@ ttl74153_device::ttl74153_device(const machine_config &mconfig, const char *tag,
 	m_input_lines[1][2] = 0;
 	m_input_lines[1][3] = 0;
 
-	for (int i = 0; i < 2; i++)
-		m_enable[i] = 0;
+	for (auto & elem : m_enable)
+		elem = 0;
 
-	for (int i = 0; i < 2; i++)
-		m_output[i] = 0;
+	for (auto & elem : m_output)
+		elem = 0;
 
-	for (int i = 0; i < 2; i++)
-		m_last_output[i] = 0;
+	for (auto & elem : m_last_output)
+		elem = 0;
 }
 
 //-------------------------------------------------

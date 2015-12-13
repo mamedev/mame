@@ -247,7 +247,7 @@ const char *apple2gs_state::apple2gs_irq_name(UINT16 irq_mask)
 		case IRQ_DOC:               return "IRQ_DOC";
 		case IRQ_SLOT:              return "IRQ_SLOT";
 	}
-	return NULL;
+	return nullptr;
 }
 
 void apple2gs_state::apple2gs_add_irq(UINT16 irq_mask)
@@ -1638,7 +1638,7 @@ UINT8 apple2gs_state::apple2gs_xxCxxx_r(address_space &space, offs_t address)
 			else
 			{
 				// accessing a slot mapped to "Your Card", C800 should belong to that card
-				if (slotdevice != NULL)
+				if (slotdevice != nullptr)
 				{
 					if (slotdevice->take_c800())
 					{
@@ -1655,7 +1655,7 @@ UINT8 apple2gs_state::apple2gs_xxCxxx_r(address_space &space, offs_t address)
 		}
 		else    // C800-CFFF, not cards
 		{
-			slotdevice = NULL;
+			slotdevice = nullptr;
 
 			// if CFFF accessed, reset C800 area to internal ROM
 			if(!space.debugger_access())
@@ -1730,7 +1730,7 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, UIN
 			else
 			{
 				// accessing a slot mapped to "Your Card", C800 should belong to that card if it can take it
-				if (slotdevice != NULL)
+				if (slotdevice != nullptr)
 				{
 					if (slotdevice->take_c800())
 					{
@@ -1744,7 +1744,7 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, UIN
 		}
 		else    // C800-CFFF, not cards
 		{
-			slotdevice = NULL;
+			slotdevice = nullptr;
 
 			// if CFFF accessed, reset C800 area to internal ROM
 			if ((address & 0xfff) == 0xfff)
@@ -1908,7 +1908,7 @@ MACHINE_RESET_MEMBER(apple2gs_state,apple2gs)
 	// call "base class" machine reset to set up m_rambase and the language card
 	machine_reset();
 
-	m_cur_slot6_image = NULL;
+	m_cur_slot6_image = nullptr;
 	m_newvideo = 0x00;
 	m_vgcint = 0x00;
 	m_langsel = 0x00;
@@ -1961,7 +1961,7 @@ MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 	apple2gs_refresh_delegates();
 
 	m_machinetype = APPLE_IIGS;
-	apple2eplus_init_common(NULL);
+	apple2eplus_init_common(nullptr);
 
 	/* set up Apple IIgs vectoring */
 	m_maincpu->set_read_vector_callback(read8_delegate(FUNC(apple2gs_state::apple2gs_read_vector),this));

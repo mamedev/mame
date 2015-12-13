@@ -162,5 +162,5 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

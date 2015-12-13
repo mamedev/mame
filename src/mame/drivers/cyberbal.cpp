@@ -35,7 +35,7 @@
 
 void cyberbal_state::update_interrupts()
 {
-	if (m_extracpu != NULL)
+	if (m_extracpu != nullptr)
 	{
 		m_maincpu->set_input_line(1, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 		m_extracpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);

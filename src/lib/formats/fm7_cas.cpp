@@ -65,7 +65,7 @@ static int fm7_cas_to_wav_size (const UINT8 *casdata, int caslen)
 {
 	cas_size = caslen;
 
-	return fm7_handle_t77(NULL,casdata);
+	return fm7_handle_t77(nullptr,casdata);
 }
 
 /*******************************************************************
@@ -104,7 +104,7 @@ static const struct CassetteFormat fm7_cassette_format = {
 	"t77",
 	fm7_cas_identify,
 	fm7_cas_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(fm7_cassette_formats)

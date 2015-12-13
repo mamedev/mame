@@ -76,8 +76,8 @@ public:
 	const UINT8 *m_p_chargen;
 	UINT8 m_keyboard_line;
 	bool m_keyboard_part;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( z1013 );
 };

@@ -67,8 +67,8 @@ public:
 	DECLARE_DRIVER_INIT(ps3);
 	DECLARE_DRIVER_INIT(ps5);
 	DECLARE_DRIVER_INIT(mjgtaste);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	void ps3_init();
 	void ps5_init();
 	UINT32 screen_update_psikyosh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

@@ -57,7 +57,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 private:
 	UINT8 m_keydata;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<pia6821_device> m_pia;
 	required_device<cassette_image_device> m_cass;
 	required_device<cpu_device> m_maincpu;

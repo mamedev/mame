@@ -1003,7 +1003,7 @@ void cps3_state::cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rg
 			if (!bpp) m_gfxdecode->gfx(1)->set_granularity(256);
 			else m_gfxdecode->gfx(1)->set_granularity(64);
 
-			cps3_drawgfxzoom(bitmap,clip,m_gfxdecode->gfx(1),tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, NULL, 0);
+			cps3_drawgfxzoom(bitmap,clip,m_gfxdecode->gfx(1),tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, nullptr, 0);
 		}
 	}
 }
@@ -1243,11 +1243,11 @@ UINT32 cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitma
 
 									if (global_alpha || alpha)
 									{
-										cps3_drawgfxzoom(m_renderbuffer_bitmap,m_renderbuffer_clip,m_gfxdecode->gfx(1),realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(m_renderbuffer_bitmap,m_renderbuffer_clip,m_gfxdecode->gfx(1),realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, nullptr, 0);
 									}
 									else
 									{
-										cps3_drawgfxzoom(m_renderbuffer_bitmap,m_renderbuffer_clip,m_gfxdecode->gfx(1),realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(m_renderbuffer_bitmap,m_renderbuffer_clip,m_gfxdecode->gfx(1),realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, nullptr, 0);
 									}
 									count++;
 								}
@@ -1313,7 +1313,7 @@ UINT32 cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitma
 				pal += m_ss_pal_base << 5;
 				tile+=0x200;
 
-				cps3_drawgfxzoom(bitmap, cliprect, m_gfxdecode->gfx(0),tile,pal,flipx,flipy,x*8,y*8,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,NULL,0);
+				cps3_drawgfxzoom(bitmap, cliprect, m_gfxdecode->gfx(0),tile,pal,flipx,flipy,x*8,y*8,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,nullptr,0);
 				count++;
 			}
 		}
@@ -1403,7 +1403,7 @@ READ32_MEMBER(cps3_state::cps3_gfxflash_r)
 
 	fujitsu_29f016a_device *chip0 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) & ~1];
 	fujitsu_29f016a_device *chip1 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) |  1];
-	if (chip0 == NULL || chip1 == NULL)
+	if (chip0 == nullptr || chip1 == nullptr)
 		return 0xffffffff;
 
 	if(DEBUG_PRINTF) printf("gfxflash_r\n");
@@ -1441,7 +1441,7 @@ WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
 
 	fujitsu_29f016a_device *chip0 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) & ~1];
 	fujitsu_29f016a_device *chip1 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) |  1];
-	if (chip0 == NULL || chip1 == NULL)
+	if (chip0 == nullptr || chip1 == nullptr)
 		return;
 
 //  if(DEBUG_PRINTF) printf("cps3_gfxflash_w %08x %08x %08x\n", offset *2, data, mem_mask);
@@ -1496,7 +1496,7 @@ UINT32 cps3_state::cps3_flashmain_r(address_space &space, int which, UINT32 offs
 {
 	UINT32 result = 0;
 
-	if (m_simm[which][0] == NULL || m_simm[which][1] == NULL || m_simm[which][2] == NULL || m_simm[which][3] == NULL)
+	if (m_simm[which][0] == nullptr || m_simm[which][1] == nullptr || m_simm[which][2] == nullptr || m_simm[which][3] == nullptr)
 		return 0xffffffff;
 
 	if (ACCESSING_BITS_24_31)   // Flash 1
@@ -1551,7 +1551,7 @@ void cps3_state::cps3_flashmain_w(int which, UINT32 offset, UINT32 data, UINT32 
 {
 	int command;
 
-	if (m_simm[which][0] == NULL || m_simm[which][1] == NULL || m_simm[which][2] == NULL || m_simm[which][3] == NULL)
+	if (m_simm[which][0] == nullptr || m_simm[which][1] == nullptr || m_simm[which][2] == nullptr || m_simm[which][3] == nullptr)
 		return;
 
 	if (ACCESSING_BITS_24_31)   // Flash 1
@@ -2324,7 +2324,7 @@ void cps3_state::copy_from_nvram()
 	romdata  += 0x800000/4;
 	romdata2 += 0x800000/4;
 
-	if (m_simm[1][0] != NULL)
+	if (m_simm[1][0] != nullptr)
 		for (i=0;i<0x800000;i+=4)
 		{
 			UINT32 data;
@@ -2349,9 +2349,9 @@ void cps3_state::copy_from_nvram()
 
 			fujitsu_29f016a_device *flash0 = m_simm[2 + flashnum/8][flashnum % 8 + 0];
 			fujitsu_29f016a_device *flash1 = m_simm[2 + flashnum/8][flashnum % 8 + 1];
-			if (flash0 == NULL || flash1 == NULL)
+			if (flash0 == nullptr || flash1 == nullptr)
 				continue;
-			if (flash0 != NULL && flash1 != NULL)
+			if (flash0 != nullptr && flash1 != nullptr)
 			{
 				for (i=0;i<0x200000;i+=2)
 				{

@@ -1711,7 +1711,7 @@ void a400_state::setup_ram(int bank, UINT32 size)
 		case 0: // 0x0000-0x7fff
 			ram_top = MIN(size, 0x8000) - 1;
 			m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, ram_top, "0000");
-			if (m_0000 == NULL)
+			if (m_0000 == nullptr)
 				m_0000.findit();
 			m_0000->set_base(m_ram->pointer());
 			break;
@@ -1720,7 +1720,7 @@ void a400_state::setup_ram(int bank, UINT32 size)
 			if (ram_top > 0x8000)
 			{
 				m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x8000, ram_top, "8000");
-				if (m_8000 == NULL)
+				if (m_8000 == nullptr)
 					m_8000.findit();
 				m_8000->set_base(m_ram->pointer() + 0x8000);
 			}
@@ -1730,7 +1730,7 @@ void a400_state::setup_ram(int bank, UINT32 size)
 			if (ram_top > 0xa000)
 			{
 				m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0xa000, ram_top, "a000");
-				if (m_a000 == NULL)
+				if (m_a000 == nullptr)
 					m_a000.findit();
 				m_a000->set_base(m_ram->pointer() + 0xa000);
 			}
@@ -2103,7 +2103,7 @@ static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 
 	MCFG_DEVICE_ADD("a8sio", A8SIO, 0)
 	MCFG_A8SIO_DATA_IN_CB(DEVWRITELINE("pokey", pokey_device, sid_w))
-	MCFG_A8SIO_SLOT_ADD("a8sio", "sio", NULL)
+	MCFG_A8SIO_SLOT_ADD("a8sio", "sio", nullptr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2142,7 +2142,7 @@ static MACHINE_CONFIG_DERIVED( atari_common, atari_common_nodac )
 	/* devices */
 	MCFG_DEVICE_ADD("fdc", ATARI_FDC, 0)
 
-	MCFG_A800_CARTRIDGE_ADD("cartleft", a800_left, NULL)
+	MCFG_A800_CARTRIDGE_ADD("cartleft", a800_left, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list","a800_flop")
@@ -2194,7 +2194,7 @@ static MACHINE_CONFIG_DERIVED( a800, atari_common )
 	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
 
-	MCFG_A800_CARTRIDGE_ADD("cartright", a800_right, NULL)
+	MCFG_A800_CARTRIDGE_ADD("cartright", a800_right, nullptr)
 MACHINE_CONFIG_END
 
 
@@ -2211,7 +2211,7 @@ static MACHINE_CONFIG_DERIVED( a800pal, atari_common )
 	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)
 	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
 
-	MCFG_A800_CARTRIDGE_ADD("cartright", a800_right, NULL)
+	MCFG_A800_CARTRIDGE_ADD("cartright", a800_right, nullptr)
 MACHINE_CONFIG_END
 
 
@@ -2303,7 +2303,7 @@ static MACHINE_CONFIG_DERIVED( xegs, a800xl )
 	MCFG_DEVICE_REMOVE("cartleft")
 	MCFG_DEVICE_REMOVE("cart_list")
 
-	MCFG_XEGS_CARTRIDGE_ADD("cartleft", xegs_carts, NULL)
+	MCFG_XEGS_CARTRIDGE_ADD("cartleft", xegs_carts, nullptr)
 MACHINE_CONFIG_END
 
 
@@ -2339,7 +2339,7 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
 
-	MCFG_A5200_CARTRIDGE_ADD("cartleft", a5200_carts, NULL)
+	MCFG_A5200_CARTRIDGE_ADD("cartleft", a5200_carts, nullptr)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","a5200")

@@ -49,7 +49,7 @@ ADDRESS_MAP_END
 naomi_m4_board::naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: naomi_board(mconfig, NAOMI_M4_BOARD, "Sega NAOMI M4 Board", tag, owner, clock, "naomi_m4_board", __FILE__)
 {
-	key_tag = 0;
+	key_tag = nullptr;
 }
 
 void naomi_m4_board::static_set_tags(device_t &device, const char *_key_tag)
@@ -134,7 +134,7 @@ void naomi_m4_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 	if (cfi_mode) {
 		int fpr_num = 0;
 
-		if (rombdid_tag && memregion(rombdid_tag) != NULL)
+		if (rombdid_tag && memregion(rombdid_tag) != nullptr)
 		{
 			fpr_num = *memregion(rombdid_tag)->base() & 0x7f;
 
@@ -217,7 +217,7 @@ READ16_MEMBER(naomi_m4_board::m4_id_r)
 {
 	UINT16 epr_flag = 0;
 
-	if (rombdid_tag && memregion(rombdid_tag) != NULL)
+	if (rombdid_tag && memregion(rombdid_tag) != nullptr)
 	{
 		epr_flag = *memregion(rombdid_tag)->base() & 0x80;
 

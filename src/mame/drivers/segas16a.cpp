@@ -191,7 +191,7 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 	m_sprites->set_flip(data & 0x80);
 
 	// bit 6: set 8751 interrupt line
-	if (m_mcu != NULL)
+	if (m_mcu != nullptr)
 		m_mcu->set_input_line(MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	// bit 4: enable display
@@ -636,7 +636,7 @@ void segas16a_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		case TID_INIT_I8751:
 			if (!m_i8751_vblank_hook.isnull())
 				m_mcu->suspend(SUSPEND_REASON_DISABLE, 1);
-			else if (m_mcu != NULL)
+			else if (m_mcu != nullptr)
 				machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
 			break;
 

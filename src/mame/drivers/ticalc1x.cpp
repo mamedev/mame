@@ -32,7 +32,7 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 
@@ -593,8 +593,8 @@ public:
 		: wizatron_state(mconfig, type, tag)
 	{ }
 
-	virtual DECLARE_WRITE16_MEMBER(write_o);
-	virtual DECLARE_READ8_MEMBER(read_k);
+	virtual DECLARE_WRITE16_MEMBER(write_o) override;
+	virtual DECLARE_READ8_MEMBER(read_k) override;
 };
 
 // handlers

@@ -327,7 +327,7 @@ public:
 	{
 	}
 
-	virtual UINT32 lba_address()
+	virtual UINT32 lba_address() override
 	{
 		if (m_device_head & IDE_DEVICE_HEAD_L)
 			return (((m_device_head & IDE_DEVICE_HEAD_HS) << 24) | (m_cylinder_high << 16) | (m_cylinder_low << 8) | m_sector_number) - 63;
@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( turrett, turrett_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", turrett_state, vblank)
 	MCFG_CPU_PERIODIC_INT_DRIVER(turrett_state, adc, 60)
 
-	MCFG_ATA_INTERFACE_ADD("ata", turrett_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", turrett_devices, "hdd", nullptr, true)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

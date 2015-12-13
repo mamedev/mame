@@ -31,7 +31,7 @@ const device_type ACTION_REPLAY_MK3 = &device_creator<action_replay_mk3_device>;
 
 static INPUT_PORTS_START( ar_button )
 	PORT_START("freeze")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, action_replay_device, freeze, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, action_replay_device, freeze, nullptr)
 INPUT_PORTS_END
 
 ioport_constructor action_replay_device::device_input_ports() const

@@ -54,23 +54,23 @@ public:
 	omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_HARDDISK; }
+	virtual iodevice_t image_type() const override { return IO_HARDDISK; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
-	virtual const char *file_extensions() const { return "awd"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 1; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return nullptr; }
+	virtual const char *file_extensions() const override { return "awd"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_create(int format_type, option_resolution *format_options);
+	virtual bool call_create(int format_type, option_resolution *format_options) override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void omti_disk_config(UINT16 disk_type);
 public:
@@ -187,7 +187,7 @@ static const char *cpu_context(const device_t *device) {
 	device_t *cpu = device->machine().firstcpu;
 
 	/* if we have an executing CPU, output data */
-	if (cpu != NULL) {
+	if (cpu != nullptr) {
 		osd_ticks_t t = osd_ticks();
 		int s = t / osd_ticks_per_second();
 		int ms = (t % osd_ticks_per_second()) / 1000;
@@ -293,7 +293,7 @@ void omti8621_device::device_start()
 
 	sector_buffer.resize(OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 
 	our_disks[0] = subdevice<omti_disk_image_device>(OMTI_DISK0_TAG);
 	our_disks[1] = subdevice<omti_disk_image_device>(OMTI_DISK1_TAG);
@@ -376,7 +376,7 @@ omti8621_device::omti8621_device(const machine_config &mconfig, const char *tag,
 	device_isa16_card_interface(mconfig, *this),
 	m_fdc(*this, OMTI_FDC_TAG),
 	m_iobase(*this, "IO_BASE"),
-	m_biosopts(*this, "BIOS_OPTS"), jumper(0), omti_state(0), status_port(0), config_port(0), mask_port(0), command_length(0), command_index(0), command_status(0), data_buffer(nullptr), 
+	m_biosopts(*this, "BIOS_OPTS"), jumper(0), omti_state(0), status_port(0), config_port(0), mask_port(0), command_length(0), command_index(0), command_status(0), data_buffer(nullptr),
 	data_length(0), data_index(0), diskaddr_ecc_error(0), diskaddr_format_bad_track(0), m_timer(nullptr), m_installed(false)
 {
 }
@@ -1335,7 +1335,7 @@ void omti_disk_image_device::device_start()
 {
 	m_image = this;
 
-	if (m_image->image_core_file() == NULL)
+	if (m_image->image_core_file() == nullptr)
 	{
 		LOG1(("device_start_omti_disk: no disk"));
 	}

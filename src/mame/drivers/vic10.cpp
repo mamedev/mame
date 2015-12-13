@@ -391,7 +391,7 @@ READ8_MEMBER( vic10_state::cia_pa_r )
 
 	// keyboard
 	UINT8 cia_pb = m_cia->pb_r();
-	UINT8 row[8] = { m_row0->read(), m_row1->read() & m_lock->read(), m_row2->read(), m_row3->read(),
+	UINT32 row[8] = { m_row0->read(), m_row1->read() & m_lock->read(), m_row2->read(), m_row3->read(),
 						m_row4->read(), m_row5->read(), m_row6->read(), m_row7->read() };
 
 	for (int i = 0; i < 8; i++)
@@ -641,10 +641,10 @@ static MACHINE_CONFIG_START( vic10, vic10_state )
 	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(vic10_state, cia_pb_r))
 	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(vic10_state, cia_pb_w))
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", DEVWRITELINE(MOS6526_TAG, mos6526_device, flag_w))
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(DEVWRITELINE(MOS6566_TAG, mos6566_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
-	MCFG_VIC10_EXPANSION_SLOT_ADD(VIC10_EXPANSION_SLOT_TAG, XTAL_8MHz/8, vic10_expansion_cards, NULL)
+	MCFG_VIC10_EXPANSION_SLOT_ADD(VIC10_EXPANSION_SLOT_TAG, XTAL_8MHz/8, vic10_expansion_cards, nullptr)
 	MCFG_VIC10_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(vic10_state, exp_irq_w))
 	MCFG_VIC10_EXPANSION_SLOT_RES_CALLBACK(WRITELINE(vic10_state, exp_reset_w))
 	MCFG_VIC10_EXPANSION_SLOT_CNT_CALLBACK(DEVWRITELINE(MOS6526_TAG, mos6526_device, cnt_w))

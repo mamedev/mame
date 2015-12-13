@@ -310,9 +310,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_hng64_tile2_16x16_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile3_8x8_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile3_16x16_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_hng64(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(hng64_irq);

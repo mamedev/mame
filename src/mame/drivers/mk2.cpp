@@ -74,7 +74,7 @@ public:
 	DECLARE_READ8_MEMBER(mk2_read_b);
 	DECLARE_WRITE8_MEMBER(mk2_write_b);
 	UINT8 m_led[5];
-	virtual void machine_start();
+	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(update_leds);
 };
 

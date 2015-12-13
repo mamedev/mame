@@ -143,7 +143,7 @@ WRITE8_MEMBER( super80_state::port3f_w )
 	// m_fdc->58(BIT(data, 0));   5/8 pin not emulated in wd_fdc
 	m_fdc->enmf_w(BIT(data,1));
 
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 	if (BIT(data, 2)) floppy = m_floppy0->get_device();
 	if (BIT(data, 3)) floppy = m_floppy1->get_device();
 	//if (BIT(data, 4)) floppy = m_floppy2->get_device();

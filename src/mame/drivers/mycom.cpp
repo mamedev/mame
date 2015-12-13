@@ -104,9 +104,9 @@ private:
 	UINT8 m_sn_we;
 	UINT32 m_upper_sw;
 	UINT8 *m_p_ram;
-	virtual void machine_reset();
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;

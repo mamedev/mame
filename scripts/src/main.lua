@@ -26,6 +26,7 @@ end
 	uuid (os.uuid(_target .."_" .. _subtarget))
 	kind "ConsoleApp"
 
+	addprojectflags()
 	flags {
 		"NoManifest",
 		"Symbols", -- always include minimum symbols for executables 
@@ -85,6 +86,11 @@ end
 
 	configuration { "asmjs" }
 		targetextension ".bc"  
+		if os.getenv("EMSCRIPTEN") then
+			postbuildcommands {
+				os.getenv("EMSCRIPTEN") .. "/emcc -O3 -s DISABLE_EXCEPTION_CATCHING=2 -s USE_SDL=2 --memory-init-file 0 -s ALLOW_MEMORY_GROWTH=0 -s TOTAL_MEMORY=268435456 -s EXCEPTION_CATCHING_WHITELIST='[\"__ZN15running_machine17start_all_devicesEv\"]' -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '__Z14js_get_machinev', '__Z9js_get_uiv', '__Z12js_get_soundv', '__ZN10ui_manager12set_show_fpsEb', '__ZNK10ui_manager8show_fpsEv', '__ZN13sound_manager4muteEbh', '_SDL_PauseAudio']\" $(TARGET) -o " .. MAME_DIR .. _OPTIONS["target"] .. _OPTIONS["subtarget"] .. ".js --post-js " .. MAME_DIR .. "src/osd/sdl/emscripten_post.js",
+			}
+		end
 
 	configuration { }
 

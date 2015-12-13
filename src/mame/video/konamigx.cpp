@@ -14,7 +14,7 @@
 #define VERBOSE 0
 
 
-INLINE void set_color_555(palette_device &palette, pen_t color, int rshift, int gshift, int bshift, UINT16 data);
+static inline void set_color_555(palette_device &palette, pen_t color, int rshift, int gshift, int bshift, UINT16 data);
 
 
 void konamigx_state::konamigx_precache_registers(void)
@@ -864,7 +864,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 				m_gx_objzbuf, m_gx_shdzbuf, code, m_gx_spriteram, offs,
 				color, alpha, drawmode, zcode, pri,
 				/* non-gx only */
-				0,0,NULL,NULL,0
+				0,0,nullptr,nullptr,0
 				);
 		}
 		/* the rest are tilemaps of various kinda */
@@ -1049,8 +1049,10 @@ K056832_CB_MEMBER(konamigx_state::alpha_tile_callback)
 	else
 	{
 		/* save mixcode and mark tile alpha (unimplemented) */
-		*code = 0;
-
+		// Daisu-Kiss stage presentation
+		// Sexy Parodius level 3b
+		*code =  (m_gx_tilebanks[(d & 0xe000)>>13]<<13) + (d & 0x1fff);
+		
 		if (VERBOSE)
 			popmessage("skipped alpha tile(layer=%d mix=%d)", layer, mixcode);
 	}
@@ -1411,7 +1413,7 @@ UINT32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb3
 
 	if (m_gx_specialrozenable==3)
 	{
-		konamigx_mixer(screen, bitmap, cliprect, m_gx_psac_tilemap, GXSUB_8BPP,0,0,  0, 0, m_gx_rushingheroes_hack);
+		konamigx_mixer(screen, bitmap, cliprect, m_gx_psac_tilemap, GXSUB_8BPP,nullptr,0,  0, nullptr, m_gx_rushingheroes_hack);
 	}
 	// hack, draw the roz tilemap if W is held
 	// todo: fix so that it works with the mixer without crashing(!)
@@ -1426,11 +1428,11 @@ UINT32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb3
 		else K053936_0_zoom_draw(screen, *m_type3_roz_temp_bitmap, temprect,m_gx_psac_tilemap, 0,0,0); // soccerss playfield
 
 
-		konamigx_mixer(screen, bitmap, cliprect, 0, 0, 0, 0, 0, m_type3_roz_temp_bitmap, m_gx_rushingheroes_hack);
+		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, 0, m_type3_roz_temp_bitmap, m_gx_rushingheroes_hack);
 	}
 	else
 	{
-		konamigx_mixer(screen, bitmap, cliprect, 0, 0, 0, 0, 0, 0, m_gx_rushingheroes_hack);
+		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, 0, nullptr, m_gx_rushingheroes_hack);
 	}
 
 
@@ -1557,7 +1559,7 @@ UINT32 konamigx_state::screen_update_konamigx_right(screen_device &screen, bitma
 	return 0;
 }
 
-INLINE void set_color_555(palette_device &palette, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
+static inline void set_color_555(palette_device &palette, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
 	palette.set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }

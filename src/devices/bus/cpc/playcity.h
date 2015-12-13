@@ -31,7 +31,7 @@ public:
 	cpc_playcity_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_READ8_MEMBER(ctc_r);
 	DECLARE_WRITE8_MEMBER(ctc_w);
@@ -44,12 +44,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_zc1_cb) { if(state) { m_slot->nmi_w(1); m_slot->nmi_w(0); } }
 	DECLARE_WRITE_LINE_MEMBER(ctc_intr_cb) { m_slot->irq_w(state); }
 
-	virtual WRITE_LINE_MEMBER(cursor_w) { m_ctc->trg1(state); }
+	virtual WRITE_LINE_MEMBER(cursor_w) override { m_ctc->trg1(state); }
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	cpc_expansion_slot_device *m_slot;

@@ -141,8 +141,8 @@ private:
 	bool m_cassbit;
 	bool m_cassold;
 	UINT8 m_cass_data[4];
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	void m6845_change_clock(UINT8 setting);
 	UINT8 m_crtc_index;
 	UINT8 *m_extram;
@@ -1021,10 +1021,10 @@ static MACHINE_CONFIG_START( bml3_common, bml3_state )
 	   Note it isn't feasible to use both, as they each place boot ROM at F800.
 	 */
 	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl1", bml3_cards, "bml3mp1805")
-	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl2", bml3_cards, NULL)
-	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl3", bml3_cards, NULL)
-	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl4", bml3_cards, NULL)
-	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl5", bml3_cards, NULL)
+	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl2", bml3_cards, nullptr)
+	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl3", bml3_cards, nullptr)
+	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl4", bml3_cards, nullptr)
+	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl5", bml3_cards, nullptr)
 	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl6", bml3_cards, "bml3kanji")
 
 MACHINE_CONFIG_END

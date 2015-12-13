@@ -45,6 +45,7 @@
 #define SSF2T_USA_KEY                  CRYPT_PARAMS( "94fa8902","4c77143f", "000000", "400000" )    // 0838 0007 2000  btst    #7,$2000
 #define SSF2T_JAPAN_KEY                CRYPT_PARAMS( "942a5702","05ac140e", "000000", "400000" )    // 0838 0007 2000  btst    #7,$2000
 #define SSF2T_JAPAN_RENTAL_KEY         CRYPT_PARAMS( "943c2b02","7acd1422", "000000", "400000" )    // 0838 0007 2000  btst    #7,$2000 // curious, not the usual Japan key on the rent version
+#define SSF2T_HISPANIC_KEY             CRYPT_PARAMS( "940e2d02","75211432", "000000", "400000" )    // 0838 0007 2000  btst    #7,$2000
 
 #define XMCOTA_WORLD_KEY               CRYPT_PARAMS( "3bc6eda4","97f80251", "000000", "100000" )    // 0C80 1972 0301  cmpi.l  #$19720301,D0
 #define XMCOTA_USA_KEY                 CRYPT_PARAMS( "32a57ecd","98016f4b", "000000", "100000" )    // 0C80 1972 0301  cmpi.l  #$19720301,D0

@@ -743,7 +743,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 
 		m_m1audio->check_fifo_irq();
 
-		if (m_m1comm != NULL)
+		if (m_m1comm != nullptr)
 			m_m1comm->check_vint_irq();
 	}
 }
@@ -862,7 +862,7 @@ WRITE16_MEMBER(model1_state::snd_latch_to_68k_w)
 		m_snd_cmd_state = 0;
 	}
 
-	if (m_dsbz80 != NULL)
+	if (m_dsbz80 != nullptr)
 	{
 //      printf("%d: %02x (last %02x)\n", m_snd_cmd_state, data, m_last_snd_cmd);
 		// HACK: on h/w, who filters out commands the DSB shouldn't see?  Need a wiring diagram.

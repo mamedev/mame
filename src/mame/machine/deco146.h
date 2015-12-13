@@ -131,9 +131,9 @@ public:
 
 
 protected:
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT16 read_protport(UINT16 address, UINT16 mem_mask);
 	virtual void write_protport(address_space &space, UINT16 address, UINT16 data, UINT16 mem_mask);

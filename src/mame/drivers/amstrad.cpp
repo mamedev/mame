@@ -911,7 +911,7 @@ static MACHINE_CONFIG_START( amstrad_base, amstrad_state )
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_cpc)
 
-	MCFG_MC6845_ADD("mc6845", MC6845, NULL, XTAL_16MHz / 16)
+	MCFG_MC6845_ADD("mc6845", HD6845, nullptr, XTAL_16MHz / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE(amstrad_state, amstrad_de_changed))
@@ -947,7 +947,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cpc464, amstrad_base )
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc464_exp_cards, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(cpc464_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(amstrad_state, cpc_romdis))  // ROMDIS
@@ -966,7 +966,7 @@ static MACHINE_CONFIG_DERIVED( cpc664, amstrad_base )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
 
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(amstrad_state, cpc_romdis))  // ROMDIS
@@ -985,7 +985,7 @@ static MACHINE_CONFIG_DERIVED( cpc6128, amstrad_base )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
 
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(amstrad_state, cpc_romdis))  // ROMDIS
@@ -1036,7 +1036,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_plus)
 
-	MCFG_MC6845_ADD("mc6845", MC6845, NULL, XTAL_40MHz / 40)
+	MCFG_MC6845_ADD("mc6845", AMS40489, nullptr, XTAL_40MHz / 40)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE(amstrad_state, amstrad_plus_de_changed))
@@ -1073,7 +1073,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpcplus_exp_cards, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(cpcplus_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(amstrad_state, cpc_romdis))  // ROMDIS
@@ -1115,7 +1115,7 @@ static MACHINE_CONFIG_START( gx4000, amstrad_state )
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_plus)
 
-	MCFG_MC6845_ADD("mc6845", MC6845, NULL, XTAL_40MHz / 40)
+	MCFG_MC6845_ADD("mc6845", AMS40489, nullptr, XTAL_40MHz / 40)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE(amstrad_state, amstrad_plus_de_changed))
@@ -1156,7 +1156,7 @@ static MACHINE_CONFIG_DERIVED( aleste, cpc6128 )
 
 	MCFG_DEVICE_REMOVE("exp")
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(aleste_exp_cards, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(aleste_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(amstrad_state, cpc_romdis))  // ROMDIS

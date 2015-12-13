@@ -226,8 +226,8 @@ MACHINE_RESET_MEMBER(gb_state,gbc)
 	/* Enable BIOS rom */
 	m_bios_disable = 0;
 
-	for (int i = 0; i < 8; i++)
-		memset(m_gbc_rammap[i], 0, 0x1000);
+	for (auto & elem : m_gbc_rammap)
+		memset(elem, 0, 0x1000);
 }
 
 MACHINE_RESET_MEMBER(gb_state,sgb)

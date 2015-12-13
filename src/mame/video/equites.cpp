@@ -3,7 +3,7 @@
 /*************************************************************************
 
     Equites, Splendor Blast driver
-    
+
     functions to emulate the video hardware
 
 *************************************************************************/
@@ -191,7 +191,7 @@ WRITE16_MEMBER(equites_state::splndrbt_selchar_w)
 {
 	// data bit is A16 (offset)
 	data = (offset == 0) ? 0 : 1;
-	
+
 	// select active char map
 	if (m_fg_char_bank != data)
 	{

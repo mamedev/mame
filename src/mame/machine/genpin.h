@@ -30,7 +30,7 @@ const char *const genpin_sample_names[] =
 	"relay_release",
 	"solenoid_engage",
 	"solenoid_release",
-	0   /* end of array */
+	nullptr   /* end of array */
 };
 
 MACHINE_CONFIG_EXTERN( genpin_audio );

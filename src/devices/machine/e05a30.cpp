@@ -35,7 +35,7 @@ e05a30_device::e05a30_device(const machine_config &mconfig, const char *tag, dev
 	m_write_centronics_select(*this),
 	m_printhead(0),
 	m_pf_stepper(0),
-	m_cr_stepper(0)
+	m_cr_stepper(0), m_centronics_data(0), m_centronics_busy(0), m_centronics_nack(0), m_centronics_strobe(0), m_centronics_data_latch(0), m_centronics_data_latched(0)
 {
 }
 

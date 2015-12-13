@@ -45,16 +45,16 @@ const device_type MSX_SLOT_DISK6 = &device_creator<msx_slot_disk6_device>;
 
 msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: msx_slot_rom_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_floppy0(NULL)
-	, m_floppy1(NULL)
-	, m_floppy2(NULL)
-	, m_floppy3(NULL)
-	, m_floppy(NULL)
-	, m_fdc_tag(NULL)
-	, m_floppy0_tag(NULL)
-	, m_floppy1_tag(NULL)
-	, m_floppy2_tag(NULL)
-	, m_floppy3_tag(NULL)
+	, m_floppy0(nullptr)
+	, m_floppy1(nullptr)
+	, m_floppy2(nullptr)
+	, m_floppy3(nullptr)
+	, m_floppy(nullptr)
+	, m_fdc_tag(nullptr)
+	, m_floppy0_tag(nullptr)
+	, m_floppy1_tag(nullptr)
+	, m_floppy2_tag(nullptr)
+	, m_floppy3_tag(nullptr)
 {
 }
 
@@ -63,17 +63,17 @@ void msx_slot_disk_device::device_start()
 {
 	msx_slot_rom_device::device_start();
 
-	if (m_fdc_tag == NULL)
+	if (m_fdc_tag == nullptr)
 	{
 		fatalerror("msx_slot_disk_device: no FDC tag specified\n");
 	}
 
-	m_floppy0 = m_floppy0_tag ? owner()->subdevice<floppy_connector>(m_floppy0_tag) : NULL;
-	m_floppy1 = m_floppy1_tag ? owner()->subdevice<floppy_connector>(m_floppy1_tag) : NULL;
-	m_floppy2 = m_floppy2_tag ? owner()->subdevice<floppy_connector>(m_floppy2_tag) : NULL;
-	m_floppy3 = m_floppy3_tag ? owner()->subdevice<floppy_connector>(m_floppy3_tag) : NULL;
+	m_floppy0 = m_floppy0_tag ? owner()->subdevice<floppy_connector>(m_floppy0_tag) : nullptr;
+	m_floppy1 = m_floppy1_tag ? owner()->subdevice<floppy_connector>(m_floppy1_tag) : nullptr;
+	m_floppy2 = m_floppy2_tag ? owner()->subdevice<floppy_connector>(m_floppy2_tag) : nullptr;
+	m_floppy3 = m_floppy3_tag ? owner()->subdevice<floppy_connector>(m_floppy3_tag) : nullptr;
 
-	if (m_floppy0 == NULL && m_floppy1 == NULL)
+	if (m_floppy0 == nullptr && m_floppy1 == nullptr)
 	{
 		logerror("msx_slot_disk_device: Warning: both floppy0 and floppy1 were not found\n");
 	}
@@ -82,7 +82,7 @@ void msx_slot_disk_device::device_start()
 
 msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: msx_slot_disk_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_fdc(NULL)
+	, m_fdc(nullptr)
 {
 }
 
@@ -93,7 +93,7 @@ void msx_slot_wd_disk_device::device_start()
 
 	m_fdc = owner()->subdevice<wd_fdc_analog_t>(m_fdc_tag);
 
-	if (m_fdc == NULL)
+	if (m_fdc == nullptr)
 	{
 		fatalerror("msx_slot_wd_disk_device: Unable to find FDC with tag '%s'\n", m_fdc_tag);
 	}
@@ -102,7 +102,7 @@ void msx_slot_wd_disk_device::device_start()
 
 msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: msx_slot_disk_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_fdc(NULL)
+	, m_fdc(nullptr)
 {
 }
 
@@ -113,7 +113,7 @@ void msx_slot_tc8566_disk_device::device_start()
 
 	m_fdc = owner()->subdevice<tc8566af_device>(m_fdc_tag);
 
-	if (m_fdc == NULL)
+	if (m_fdc == nullptr)
 	{
 		fatalerror("msx_slot_tc8566_disk_device: Unable to find FDC with tag '%s'\n", m_fdc_tag);
 	}
@@ -178,15 +178,15 @@ void msx_slot_disk1_device::set_control(UINT8 data)
 	{
 		case 0:
 		case 2:
-			m_floppy = m_floppy0 ? m_floppy0->get_device() : NULL;
+			m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
 			break;
 
 		case 1:
-			m_floppy = m_floppy1 ? m_floppy1->get_device() : NULL;
+			m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
 			break;
 
 		default:
-			m_floppy = NULL;
+			m_floppy = nullptr;
 			break;
 	}
 
@@ -327,15 +327,15 @@ void msx_slot_disk2_device::set_control(UINT8 data)
 	switch (m_control & 3)
 	{
 		case 1:
-			m_floppy = m_floppy0 ? m_floppy0->get_device() : NULL;
+			m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
 			break;
 
 		case 2:
-			m_floppy = m_floppy1 ? m_floppy1->get_device() : NULL;
+			m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
 			break;
 
 		default:
-			m_floppy = NULL;
+			m_floppy = nullptr;
 			break;
 	}
 
@@ -562,23 +562,23 @@ void msx_slot_disk5_device::set_control(UINT8 control)
 	switch (m_control & 0x0f)
 	{
 		case 0x01:
-			m_floppy = m_floppy0 ? m_floppy0->get_device() : NULL;
+			m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
 			break;
 
 		case 0x02:
-			m_floppy = m_floppy1 ? m_floppy1->get_device() : NULL;
+			m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
 			break;
 
 		case 0x04:
-			m_floppy = m_floppy2 ? m_floppy2->get_device() : NULL;
+			m_floppy = m_floppy2 ? m_floppy2->get_device() : nullptr;
 			break;
 
 		case 0x08:
-			m_floppy = m_floppy3 ? m_floppy3->get_device() : NULL;
+			m_floppy = m_floppy3 ? m_floppy3->get_device() : nullptr;
 			break;
 
 		default:
-			m_floppy = NULL;
+			m_floppy = nullptr;
 			break;
 	}
 
@@ -681,7 +681,7 @@ void msx_slot_disk6_device::select_drive()
 {
 	if (m_drive_select1)
 	{
-		m_floppy = m_floppy1 ? m_floppy1->get_device() : NULL;
+		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
 		if (!m_floppy)
 		{
 			m_drive_select1 = 0;
@@ -690,7 +690,7 @@ void msx_slot_disk6_device::select_drive()
 
 	if (m_drive_select0)
 	{
-		m_floppy = m_floppy0 ? m_floppy0->get_device() : NULL;
+		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
 		if (!m_floppy)
 		{
 			m_drive_select0 = 0;

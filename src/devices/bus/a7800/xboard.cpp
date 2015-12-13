@@ -107,7 +107,7 @@ void a78_xm_device::device_reset()
 
 
 static MACHINE_CONFIG_FRAGMENT( a78_xb )
-	MCFG_A78_CARTRIDGE_ADD("xb_slot", a7800_cart, NULL)
+	MCFG_A78_CARTRIDGE_ADD("xb_slot", a7800_cart, nullptr)
 
 	MCFG_SPEAKER_STANDARD_MONO("xb_speaker")
 
@@ -116,7 +116,7 @@ static MACHINE_CONFIG_FRAGMENT( a78_xb )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( a78_xm )
-	MCFG_A78_CARTRIDGE_ADD("xb_slot", a7800_cart, NULL)
+	MCFG_A78_CARTRIDGE_ADD("xb_slot", a7800_cart, nullptr)
 
 	MCFG_SPEAKER_STANDARD_MONO("xb_speaker")
 

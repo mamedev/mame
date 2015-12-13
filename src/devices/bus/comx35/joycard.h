@@ -30,15 +30,15 @@ public:
 	comx_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_comx_expansion_card_interface overrides
-	virtual UINT8 comx_io_r(address_space &space, offs_t offset);
+	virtual UINT8 comx_io_r(address_space &space, offs_t offset) override;
 
 private:
 	required_ioport m_joy1;

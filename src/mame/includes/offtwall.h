@@ -28,7 +28,7 @@ public:
 
 	UINT16 *m_spritecache_count;
 	UINT16 *m_unknown_verify_base;
-	virtual void update_interrupts();
+	virtual void update_interrupts() override;
 	DECLARE_WRITE16_MEMBER(io_latch_w);
 	DECLARE_READ16_MEMBER(bankswitch_r);
 	DECLARE_READ16_MEMBER(bankrom_r);

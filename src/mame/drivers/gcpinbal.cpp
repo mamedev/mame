@@ -503,7 +503,7 @@ MACHINE_CONFIG_END
 ROM_START( gcpinbal )
 	ROM_REGION( 0x200000, "maincpu", 0 )  /* 512k for 68000 program */
 	ROM_LOAD16_WORD_SWAP( "2_excellent.u43",  0x000000, 0x80000, CRC(d174bd7f) SHA1(0e6c17265e1400de941e3e2ca3be835aaaff6695) ) /* Red line across label */
-	ROM_FILL            ( 0x80000,  0x080000, 0x0 ) /* unpopulated 27C4096 socket at U44 */
+	ROM_FILL            ( 0x80000,  0x080000, 0x00 ) /* unpopulated 27C4096 socket at U44 */
 	ROM_LOAD16_WORD_SWAP( "3_excellent.u45",  0x100000, 0x80000, CRC(0511ad56) SHA1(e0602ece514126ce719ebc9de6649ebe907be904) )
 	ROM_LOAD16_WORD_SWAP( "4_excellent.u46",  0x180000, 0x80000, CRC(e0f3a1b4) SHA1(761dddf374a92c1a1e4a211ead215d5be461a082) )
 

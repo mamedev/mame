@@ -1094,7 +1094,7 @@ void i386_device::i386_repeat(int invert_flag)
 	UINT32 count;
 	INT32 cycle_base = 0, cycle_adjustment = 0;
 	UINT8 prefix_flag=1;
-	UINT8 *flag = NULL;
+	UINT8 *flag = nullptr;
 
 
 	do {
@@ -1162,7 +1162,7 @@ void i386_device::i386_repeat(int invert_flag)
 			// TODO: cycle count
 			cycle_base = 8;
 			cycle_adjustment = -4;
-			flag = NULL;
+			flag = nullptr;
 			break;
 
 		case 0x6e:
@@ -1171,7 +1171,7 @@ void i386_device::i386_repeat(int invert_flag)
 			// TODO: cycle count
 			cycle_base = 8;
 			cycle_adjustment = -4;
-			flag = NULL;
+			flag = nullptr;
 			break;
 
 		case 0xa4:
@@ -1179,7 +1179,7 @@ void i386_device::i386_repeat(int invert_flag)
 			/* MOVSB, MOVSW, MOVSD */
 			cycle_base = 8;
 			cycle_adjustment = -4;
-			flag = NULL;
+			flag = nullptr;
 			break;
 
 		case 0xa6:
@@ -1195,7 +1195,7 @@ void i386_device::i386_repeat(int invert_flag)
 			/* LODSB, LODSW, LODSD */
 			cycle_base = 5;
 			cycle_adjustment = 1;
-			flag = NULL;
+			flag = nullptr;
 			break;
 
 		case 0xaa:
@@ -1203,7 +1203,7 @@ void i386_device::i386_repeat(int invert_flag)
 			/* STOSB, STOSW, STOSD */
 			cycle_base = 5;
 			cycle_adjustment = 0;
-			flag = NULL;
+			flag = nullptr;
 			break;
 
 		case 0xae:

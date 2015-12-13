@@ -29,7 +29,7 @@
 
 #define ATARIRLE_PRIORITY_SHIFT     12
 #define ATARIRLE_BANK_SHIFT         15
-#define ATARIRLE_PRIORITY_MASK      ((~0 << ATARIRLE_PRIORITY_SHIFT) & 0xffff)
+#define ATARIRLE_PRIORITY_MASK      ((0xffff << ATARIRLE_PRIORITY_SHIFT) & 0xffff)
 #define ATARIRLE_DATA_MASK          (ATARIRLE_PRIORITY_MASK ^ 0xffff)
 
 #define ATARIRLE_CONTROL_MOGO       1
@@ -95,8 +95,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// a sprite parameter, which is a word index + shift + mask

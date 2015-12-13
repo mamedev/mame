@@ -75,8 +75,8 @@ public:
 	DECLARE_DRIVER_INIT(yukon);
 	DECLARE_DRIVER_INIT(exidy440);
 	DECLARE_DRIVER_INIT(claypign);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(exidy440);
 	DECLARE_VIDEO_START(topsecex);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int scroll_offset, int check_collision);

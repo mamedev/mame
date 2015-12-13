@@ -40,12 +40,12 @@ public:
 
 protected:
 	// device-level overrides
-	const rom_entry *device_rom_region() const;
-	machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	const rom_entry *device_rom_region() const override;
+	machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	struct qsound_channel

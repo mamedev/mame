@@ -21,7 +21,7 @@ const device_type FIFO7200 = &device_creator<fifo7200_device>;
 
 fifo7200_device::fifo7200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, FIFO7200, "IDT7200 FIFO", tag, owner, clock, "fifo7200", __FILE__),
-		m_ram_size(0),
+		m_ram_size(0), m_read_ptr(0), m_write_ptr(0), m_ef(0), m_ff(0), m_hf(0),
 		m_ef_handler(*this),
 		m_ff_handler(*this),
 		m_hf_handler(*this)

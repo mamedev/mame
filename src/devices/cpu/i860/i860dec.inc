@@ -896,7 +896,7 @@ void i860_cpu_device::dump_state (i860s *cpustate)
 #endif
 
 /* Sign extend N-bit number.  */
-INLINE INT32 sign_ext (UINT32 x, int n)
+static inline INT32 sign_ext (UINT32 x, int n)
 {
 	INT32 t;
 	t = x >> (n - 1);
@@ -1342,7 +1342,7 @@ void i860_cpu_device::insn_pstd (UINT32 insn)
 	UINT32 fdest = get_fdest (insn);
 	UINT32 eff = 0;
 	int auto_inc = (insn & 1);
-	UINT8 *bebuf = 0;
+	UINT8 *bebuf = nullptr;
 	int pm = GET_PSR_PM ();
 	int i;
 	UINT32 wmask;
@@ -4066,7 +4066,7 @@ const i860_cpu_device::decode_tbl_t i860_cpu_device::decode_tbl[64] = {
 	{ &i860_cpu_device::insn_stx,         DEC_DECODED}, /* st.b isrc1ni,#const(isrc2).  */
 	{ &i860_cpu_device::insn_ldx,         DEC_DECODED}, /* ld.{s,l} isrc1(isrc2),idest.  */
 	{ &i860_cpu_device::insn_ldx,         DEC_DECODED}, /* ld.{s,l} #const(isrc2),idest.  */
-	{ 0,                0},
+	{ nullptr,                0},
 	{ &i860_cpu_device::insn_stx,         DEC_DECODED}, /* st.{s,l} isrc1ni,#const(isrc2),idest.*/
 	{ &i860_cpu_device::insn_fldy,        DEC_DECODED}, /* fld.{l,d,q} isrc1(isrc2)[++],fdest. */
 	{ &i860_cpu_device::insn_fldy,        DEC_DECODED}, /* fld.{l,d,q} #const(isrc2)[++],fdest. */
@@ -4078,8 +4078,8 @@ const i860_cpu_device::decode_tbl_t i860_cpu_device::decode_tbl[64] = {
 	{ &i860_cpu_device::insn_pstd,        DEC_DECODED}, /* pst.d fdest,#const(isrc2)[++].  */
 	{ &i860_cpu_device::insn_bri,         DEC_DECODED}, /* bri isrc1ni.  */
 	{ &i860_cpu_device::insn_trap,        DEC_DECODED}, /* trap isrc1ni,isrc2,idest.   */
-	{ 0,                DEC_MORE}, /* FP ESCAPE FORMAT, more decode.  */
-	{ 0,                DEC_MORE}, /* CORE ESCAPE FORMAT, more decode.  */
+	{ nullptr,                DEC_MORE}, /* FP ESCAPE FORMAT, more decode.  */
+	{ nullptr,                DEC_MORE}, /* CORE ESCAPE FORMAT, more decode.  */
 	{ &i860_cpu_device::insn_btne,        DEC_DECODED}, /* btne isrc1,isrc2,sbroff.  */
 	{ &i860_cpu_device::insn_btne_imm,    DEC_DECODED}, /* btne #const,isrc2,sbroff.  */
 	{ &i860_cpu_device::insn_bte,         DEC_DECODED}, /* bte isrc1,isrc2,sbroff.  */
@@ -4110,33 +4110,33 @@ const i860_cpu_device::decode_tbl_t i860_cpu_device::decode_tbl[64] = {
 	{ &i860_cpu_device::insn_shra_imm,    DEC_DECODED}, /* shra #const,isrc2,idest.  */
 	{ &i860_cpu_device::insn_and,         DEC_DECODED}, /* and isrc1,isrc2,idest.  */
 	{ &i860_cpu_device::insn_and_imm,     DEC_DECODED}, /* and #const,isrc2,idest.  */
-	{ 0,                0},
+	{ nullptr,                0},
 	{ &i860_cpu_device::insn_andh_imm,    DEC_DECODED}, /* andh #const,isrc2,idest.  */
 	{ &i860_cpu_device::insn_andnot,      DEC_DECODED}, /* andnot isrc1,isrc2,idest.  */
 	{ &i860_cpu_device::insn_andnot_imm,  DEC_DECODED}, /* andnot #const,isrc2,idest.  */
-	{ 0,                0},
+	{ nullptr,                0},
 	{ &i860_cpu_device::insn_andnoth_imm, DEC_DECODED}, /* andnoth #const,isrc2,idest.  */
 	{ &i860_cpu_device::insn_or,          DEC_DECODED}, /* or isrc1,isrc2,idest.  */
 	{ &i860_cpu_device::insn_or_imm,      DEC_DECODED}, /* or #const,isrc2,idest.  */
-	{ 0,                0},
+	{ nullptr,                0},
 	{ &i860_cpu_device::insn_orh_imm,     DEC_DECODED}, /* orh #const,isrc2,idest.  */
 	{ &i860_cpu_device::insn_xor,         DEC_DECODED}, /* xor isrc1,isrc2,idest.  */
 	{ &i860_cpu_device::insn_xor_imm,     DEC_DECODED}, /* xor #const,isrc2,idest.  */
-	{ 0,                0},
+	{ nullptr,                0},
 	{ &i860_cpu_device::insn_xorh_imm,    DEC_DECODED}, /* xorh #const,isrc2,idest.  */
 };
 
 
 /* Second-level decode table (i.e., for the 3 core escape opcode bits).  */
 const i860_cpu_device::decode_tbl_t i860_cpu_device::core_esc_decode_tbl[8] = {
-	{ 0,                0},
-	{ 0,                0}, /* lock  (FIXME: unimplemented).  */
+	{ nullptr,                0},
+	{ nullptr,                0}, /* lock  (FIXME: unimplemented).  */
 	{ &i860_cpu_device::insn_calli,       DEC_DECODED}, /* calli isrc1ni.                 */
-	{ 0,                0},
+	{ nullptr,                0},
 	{ &i860_cpu_device::insn_intovr,      DEC_DECODED}, /* intovr.                        */
-	{ 0,                0},
-	{ 0,                0},
-	{ 0,                0}, /* unlock (FIXME: unimplemented). */
+	{ nullptr,                0},
+	{ nullptr,                0},
+	{ nullptr,                0}, /* unlock (FIXME: unimplemented). */
 };
 
 
@@ -4184,97 +4184,97 @@ const i860_cpu_device::decode_tbl_t i860_cpu_device::fp_decode_tbl[128] = {
 	{ &i860_cpu_device::insn_frcp,        DEC_DECODED}, /* 0x22 frcp.{ss,sd,dd} */
 	{ &i860_cpu_device::insn_frsqr,       DEC_DECODED}, /* 0x23 frsqr.{ss,sd,dd} */
 	{ &i860_cpu_device::insn_fmul,        DEC_DECODED}, /* 0x24 pfmul3.dd */
-	{ 0,                0}, /* 0x25 */
-	{ 0,                0}, /* 0x26 */
-	{ 0,                0}, /* 0x27 */
-	{ 0,                0}, /* 0x28 */
-	{ 0,                0}, /* 0x29 */
-	{ 0,                0}, /* 0x2A */
-	{ 0,                0}, /* 0x2B */
-	{ 0,                0}, /* 0x2C */
-	{ 0,                0}, /* 0x2D */
-	{ 0,                0}, /* 0x2E */
-	{ 0,                0}, /* 0x2F */
+	{ nullptr,                0}, /* 0x25 */
+	{ nullptr,                0}, /* 0x26 */
+	{ nullptr,                0}, /* 0x27 */
+	{ nullptr,                0}, /* 0x28 */
+	{ nullptr,                0}, /* 0x29 */
+	{ nullptr,                0}, /* 0x2A */
+	{ nullptr,                0}, /* 0x2B */
+	{ nullptr,                0}, /* 0x2C */
+	{ nullptr,                0}, /* 0x2D */
+	{ nullptr,                0}, /* 0x2E */
+	{ nullptr,                0}, /* 0x2F */
 	{ &i860_cpu_device::insn_fadd_sub,    DEC_DECODED}, /* 0x30, [p]fadd.{ss,sd,dd} */
 	{ &i860_cpu_device::insn_fadd_sub,    DEC_DECODED}, /* 0x31, [p]fsub.{ss,sd,dd} */
-	{ 0,                0}, /* 0x32, [p]fix.{ss,sd,dd}  FIXME: nyi. */
+	{ nullptr,                0}, /* 0x32, [p]fix.{ss,sd,dd}  FIXME: nyi. */
 	{ &i860_cpu_device::insn_famov,       DEC_DECODED}, /* 0x33, [p]famov.{ss,sd,ds,dd} */
 	{ &i860_cpu_device::insn_fcmp,        DEC_DECODED}, /* 0x34, pf{gt,le}.{ss,dd} */
 	{ &i860_cpu_device::insn_fcmp,        DEC_DECODED}, /* 0x35, pfeq.{ss,dd} */
-	{ 0,                0}, /* 0x36 */
-	{ 0,                0}, /* 0x37 */
-	{ 0,                0}, /* 0x38 */
-	{ 0,                0}, /* 0x39 */
+	{ nullptr,                0}, /* 0x36 */
+	{ nullptr,                0}, /* 0x37 */
+	{ nullptr,                0}, /* 0x38 */
+	{ nullptr,                0}, /* 0x39 */
 	{ &i860_cpu_device::insn_ftrunc,      DEC_DECODED}, /* 0x3A, [p]ftrunc.{ss,sd,dd} */
-	{ 0,                0}, /* 0x3B */
-	{ 0,                0}, /* 0x3C */
-	{ 0,                0}, /* 0x3D */
-	{ 0,                0}, /* 0x3E */
-	{ 0,                0}, /* 0x3F */
+	{ nullptr,                0}, /* 0x3B */
+	{ nullptr,                0}, /* 0x3C */
+	{ nullptr,                0}, /* 0x3D */
+	{ nullptr,                0}, /* 0x3E */
+	{ nullptr,                0}, /* 0x3F */
 	{ &i860_cpu_device::insn_fxfr,        DEC_DECODED}, /* 0x40, fxfr */
-	{ 0,                0}, /* 0x41 */
-	{ 0,                0}, /* 0x42 */
-	{ 0,                0}, /* 0x43 */
-	{ 0,                0}, /* 0x44 */
-	{ 0,                0}, /* 0x45 */
-	{ 0,                0}, /* 0x46 */
-	{ 0,                0}, /* 0x47 */
-	{ 0,                0}, /* 0x48 */
+	{ nullptr,                0}, /* 0x41 */
+	{ nullptr,                0}, /* 0x42 */
+	{ nullptr,                0}, /* 0x43 */
+	{ nullptr,                0}, /* 0x44 */
+	{ nullptr,                0}, /* 0x45 */
+	{ nullptr,                0}, /* 0x46 */
+	{ nullptr,                0}, /* 0x47 */
+	{ nullptr,                0}, /* 0x48 */
 	{ &i860_cpu_device::insn_fiadd_sub,   DEC_DECODED}, /* 0x49, [p]fiadd.{ss,dd} */
-	{ 0,                0}, /* 0x4A */
-	{ 0,                0}, /* 0x4B */
-	{ 0,                0}, /* 0x4C */
+	{ nullptr,                0}, /* 0x4A */
+	{ nullptr,                0}, /* 0x4B */
+	{ nullptr,                0}, /* 0x4C */
 	{ &i860_cpu_device::insn_fiadd_sub,   DEC_DECODED}, /* 0x4D, [p]fisub.{ss,dd} */
-	{ 0,                0}, /* 0x4E */
-	{ 0,                0}, /* 0x4F */
+	{ nullptr,                0}, /* 0x4E */
+	{ nullptr,                0}, /* 0x4F */
 	{ &i860_cpu_device::insn_faddp,       DEC_DECODED}, /* 0x50, [p]faddp */
 	{ &i860_cpu_device::insn_faddz,       DEC_DECODED}, /* 0x51, [p]faddz */
-	{ 0,                0}, /* 0x52 */
-	{ 0,                0}, /* 0x53 */
-	{ 0,                0}, /* 0x54 */
-	{ 0,                0}, /* 0x55 */
-	{ 0,                0}, /* 0x56 */
+	{ nullptr,                0}, /* 0x52 */
+	{ nullptr,                0}, /* 0x53 */
+	{ nullptr,                0}, /* 0x54 */
+	{ nullptr,                0}, /* 0x55 */
+	{ nullptr,                0}, /* 0x56 */
 	{ &i860_cpu_device::insn_fzchk,       DEC_DECODED}, /* 0x57, [p]fzchkl */
-	{ 0,                0}, /* 0x58 */
-	{ 0,                0}, /* 0x59 */
+	{ nullptr,                0}, /* 0x58 */
+	{ nullptr,                0}, /* 0x59 */
 	{ &i860_cpu_device::insn_form,        DEC_DECODED}, /* 0x5A, [p]form.dd */
-	{ 0,                0}, /* 0x5B */
-	{ 0,                0}, /* 0x5C */
-	{ 0,                0}, /* 0x5D */
-	{ 0,                0}, /* 0x5E */
+	{ nullptr,                0}, /* 0x5B */
+	{ nullptr,                0}, /* 0x5C */
+	{ nullptr,                0}, /* 0x5D */
+	{ nullptr,                0}, /* 0x5E */
 	{ &i860_cpu_device::insn_fzchk,       DEC_DECODED}, /* 0x5F, [p]fzchks */
-	{ 0,                0}, /* 0x60 */
-	{ 0,                0}, /* 0x61 */
-	{ 0,                0}, /* 0x62 */
-	{ 0,                0}, /* 0x63 */
-	{ 0,                0}, /* 0x64 */
-	{ 0,                0}, /* 0x65 */
-	{ 0,                0}, /* 0x66 */
-	{ 0,                0}, /* 0x67 */
-	{ 0,                0}, /* 0x68 */
-	{ 0,                0}, /* 0x69 */
-	{ 0,                0}, /* 0x6A */
-	{ 0,                0}, /* 0x6B */
-	{ 0,                0}, /* 0x6C */
-	{ 0,                0}, /* 0x6D */
-	{ 0,                0}, /* 0x6E */
-	{ 0,                0}, /* 0x6F */
-	{ 0,                0}, /* 0x70 */
-	{ 0,                0}, /* 0x71 */
-	{ 0,                0}, /* 0x72 */
-	{ 0,                0}, /* 0x73 */
-	{ 0,                0}, /* 0x74 */
-	{ 0,                0}, /* 0x75 */
-	{ 0,                0}, /* 0x76 */
-	{ 0,                0}, /* 0x77 */
-	{ 0,                0}, /* 0x78 */
-	{ 0,                0}, /* 0x79 */
-	{ 0,                0}, /* 0x7A */
-	{ 0,                0}, /* 0x7B */
-	{ 0,                0}, /* 0x7C */
-	{ 0,                0}, /* 0x7D */
-	{ 0,                0}, /* 0x7E */
-	{ 0,                0}, /* 0x7F */
+	{ nullptr,                0}, /* 0x60 */
+	{ nullptr,                0}, /* 0x61 */
+	{ nullptr,                0}, /* 0x62 */
+	{ nullptr,                0}, /* 0x63 */
+	{ nullptr,                0}, /* 0x64 */
+	{ nullptr,                0}, /* 0x65 */
+	{ nullptr,                0}, /* 0x66 */
+	{ nullptr,                0}, /* 0x67 */
+	{ nullptr,                0}, /* 0x68 */
+	{ nullptr,                0}, /* 0x69 */
+	{ nullptr,                0}, /* 0x6A */
+	{ nullptr,                0}, /* 0x6B */
+	{ nullptr,                0}, /* 0x6C */
+	{ nullptr,                0}, /* 0x6D */
+	{ nullptr,                0}, /* 0x6E */
+	{ nullptr,                0}, /* 0x6F */
+	{ nullptr,                0}, /* 0x70 */
+	{ nullptr,                0}, /* 0x71 */
+	{ nullptr,                0}, /* 0x72 */
+	{ nullptr,                0}, /* 0x73 */
+	{ nullptr,                0}, /* 0x74 */
+	{ nullptr,                0}, /* 0x75 */
+	{ nullptr,                0}, /* 0x76 */
+	{ nullptr,                0}, /* 0x77 */
+	{ nullptr,                0}, /* 0x78 */
+	{ nullptr,                0}, /* 0x79 */
+	{ nullptr,                0}, /* 0x7A */
+	{ nullptr,                0}, /* 0x7B */
+	{ nullptr,                0}, /* 0x7C */
+	{ nullptr,                0}, /* 0x7D */
+	{ nullptr,                0}, /* 0x7E */
+	{ nullptr,                0}, /* 0x7F */
 };
 
 

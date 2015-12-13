@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Alex Pasadyn, Zsolt Vasvari, Kurt Mahan, Ernesto Corvi, Aaron Giles
+// license:BSD-3-Clause
+// copyright-holders:Alex Pasadyn, Zsolt Vasvari, Ernesto Corvi, Aaron Giles
+// thanks-to:Kurt Mahan
 /*************************************************************************
 
     Driver for Midway T-unit games.
@@ -112,5 +113,5 @@ public:
 	UINT8 m_gfx_rom_large;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

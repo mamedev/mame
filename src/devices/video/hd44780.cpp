@@ -47,14 +47,14 @@ ROM_END
 
 hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, HD44780, "HD44780 A00", tag, owner, clock, "hd44780_a00", __FILE__),
-	m_pixel_update_func(NULL)
+	m_pixel_update_func(nullptr)
 {
 	set_charset_type(CHARSET_HD44780_A00);
 }
 
 hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_pixel_update_func(NULL)
+	m_pixel_update_func(nullptr)
 {
 }
 
@@ -77,7 +77,7 @@ const rom_entry *hd44780_device::device_rom_region() const
 		case CHARSET_KS0066_F05:    return ROM_NAME( ks0066_f05 );
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 //-------------------------------------------------
@@ -235,7 +235,7 @@ void hd44780_device::update_nibble(int rs, int rw)
 
 inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, UINT8 line, UINT8 pos, UINT8 y, UINT8 x, int state)
 {
-	if (m_pixel_update_func != NULL)
+	if (m_pixel_update_func != nullptr)
 	{
 		m_pixel_update_func(*this, bitmap, line, pos, y, x, state);
 	}

@@ -510,7 +510,7 @@ Registers:
  *
  *************************************/
 
-INLINE void count_states(struct micro_t &micro, int states)
+static inline void count_states(struct micro_t &micro, int states)
 {
 	attotime state_time = MICRO_STATE_CLOCK_PERIOD * states;
 

@@ -79,7 +79,7 @@ cquestsnd_cpu_device::cquestsnd_cpu_device(const machine_config &mconfig, const 
 	: cpu_device(mconfig, CQUESTSND, "Cube Quest Sound CPU", tag, owner, clock, "cquestsnd", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 64, 8, -3)
 	, m_dac_w(*this)
-	, m_sound_region_tag(NULL)
+	, m_sound_region_tag(nullptr)
 {
 }
 
@@ -168,7 +168,7 @@ READ16_MEMBER( cquestrot_cpu_device::rotram_r )
 void cquestsnd_cpu_device::device_start()
 {
 	m_dac_w.resolve_safe();
-	assert(m_sound_region_tag != NULL);
+	assert(m_sound_region_tag != nullptr);
 	m_sound_data = (UINT16*)machine().root_device().memregion(m_sound_region_tag)->base();
 
 	m_program = &space(AS_PROGRAM);

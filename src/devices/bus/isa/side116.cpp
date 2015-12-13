@@ -23,7 +23,7 @@ const device_type ISA8_SIDE116 = &device_creator<side116_device>;
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( side116 )
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(side116_device, ide_interrupt))
 MACHINE_CONFIG_END
 

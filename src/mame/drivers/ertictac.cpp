@@ -39,8 +39,8 @@ public:
 
 	DECLARE_READ32_MEMBER(ertictac_podule_r);
 	DECLARE_DRIVER_INIT(ertictac);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(ertictac_podule_irq);
 };
 

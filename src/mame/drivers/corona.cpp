@@ -347,7 +347,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mux_port_w);
 	DECLARE_WRITE8_MEMBER(wc_meters_w);
 	void blitter_execute(int x, int y, int color, int width, int flag);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(corona);
 	UINT32 screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

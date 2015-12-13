@@ -769,28 +769,28 @@ WRITE_LINE_MEMBER( ti99_4x_state::notconnected )
 */
 static const dmux_device_list_entry dmux_devices[] =
 {
-	{ VIDEO_SYSTEM_TAG, 0x8800, 0xfc01, 0x0400, NULL, 0, 0 },
+	{ VIDEO_SYSTEM_TAG, 0x8800, 0xfc01, 0x0400, nullptr, 0, 0 },
 	{ GROM0_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
 	{ GROM1_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
 	{ GROM2_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
-	{ TISOUND_TAG,   0x8400, 0xfc01, 0x0000, NULL, 0, 0 },
-	{ GROMPORT_TAG,  0x9800, 0xfc01, 0x0400, NULL, 0, 0 },
-	{ GROMPORT_TAG,  0x6000, 0xe000, 0x0000, NULL, 0, 0 },
-	{ PERIBOX_TAG,   0x0000, 0x0000, 0x0000, NULL, 0, 0 },  // Peribox needs all addresses
-	{ NULL, 0, 0, 0, NULL, 0, 0  }
+	{ TISOUND_TAG,   0x8400, 0xfc01, 0x0000, nullptr, 0, 0 },
+	{ GROMPORT_TAG,  0x9800, 0xfc01, 0x0400, nullptr, 0, 0 },
+	{ GROMPORT_TAG,  0x6000, 0xe000, 0x0000, nullptr, 0, 0 },
+	{ PERIBOX_TAG,   0x0000, 0x0000, 0x0000, nullptr, 0, 0 },  // Peribox needs all addresses
+	{ nullptr, 0, 0, 0, nullptr, 0, 0  }
 };
 
 static const dmux_device_list_entry dmux_devices_ev[] =
 {
-	{ VIDEO_SYSTEM_TAG, 0x8800, 0xfc01, 0x0400, NULL, 0, 0 },
+	{ VIDEO_SYSTEM_TAG, 0x8800, 0xfc01, 0x0400, nullptr, 0, 0 },
 	{ GROM0_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
 	{ GROM1_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
 	{ GROM2_TAG,     0x9800, 0xfc01, 0x0400, "GROMENA", 0x01, 0x00 },
-	{ TISOUND_TAG,   0x8400, 0xfc01, 0x0000, NULL, 0, 0 },
-	{ GROMPORT_TAG,  0x9800, 0xfc01, 0x0400, NULL, 0, 0 },
-	{ GROMPORT_TAG,  0x6000, 0xe000, 0x0000, NULL, 0, 0 },
-	{ PERIBOX_TAG,   0x0000, 0x0000, 0x0000, NULL, 0, 0 },  // Peribox needs all addresses
-	{ NULL, 0, 0, 0, NULL, 0, 0  }
+	{ TISOUND_TAG,   0x8400, 0xfc01, 0x0000, nullptr, 0, 0 },
+	{ GROMPORT_TAG,  0x9800, 0xfc01, 0x0400, nullptr, 0, 0 },
+	{ GROMPORT_TAG,  0x6000, 0xe000, 0x0000, nullptr, 0, 0 },
+	{ PERIBOX_TAG,   0x0000, 0x0000, 0x0000, nullptr, 0, 0 },  // Peribox needs all addresses
+	{ nullptr, 0, 0, 0, nullptr, 0, 0  }
 };
 
 static DMUX_CONFIG( datamux_conf )

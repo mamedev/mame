@@ -31,9 +31,9 @@ void msx_state::check_irq()
 {
 	int state = CLEAR_LINE;
 
-	for (int i = 0; i < ARRAY_LENGTH(m_irq_state); i++)
+	for (auto & elem : m_irq_state)
 	{
-		if (m_irq_state[i] != CLEAR_LINE)
+		if (elem != CLEAR_LINE)
 		{
 			state = ASSERT_LINE;
 		}
@@ -47,9 +47,9 @@ void msx_state::machine_reset()
 {
 	msx_memory_reset ();
 	msx_memory_map_all ();
-	for (int i = 0; i < ARRAY_LENGTH(m_irq_state); i++)
+	for (auto & elem : m_irq_state)
 	{
-		m_irq_state[i] = CLEAR_LINE;
+		elem = CLEAR_LINE;
 	}
 	check_irq();
 }
@@ -401,15 +401,15 @@ void msx_state::msx_memory_init()
 	int count_populated_pages = 0;
 
 	// Populate all unpopulated slots with the dummy interface
-	for ( int prim = 0; prim < 4; prim++ )
+	for (auto & elem : m_all_slots)
 	{
 		for ( int sec = 0; sec < 4; sec++ )
 		{
 			for ( int page = 0; page < 4; page++ )
 			{
-				if ( m_all_slots[prim][sec][page] == NULL )
+				if ( elem[sec][page] == nullptr )
 				{
-					m_all_slots[prim][sec][page] = &m_empty_slot;
+					elem[sec][page] = &m_empty_slot;
 				}
 				else
 				{
@@ -428,9 +428,9 @@ void msx_state::msx_memory_reset ()
 {
 	m_primary_slot = 0;
 
-	for (int prim=0; prim<4; prim++)
+	for (auto & elem : m_secondary_slot)
 	{
-		m_secondary_slot[prim] = 0;
+		elem = 0;
 	}
 }
 

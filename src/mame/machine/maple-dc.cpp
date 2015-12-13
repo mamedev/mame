@@ -34,8 +34,8 @@ maple_dc_device::maple_dc_device(const machine_config &mconfig, const char *tag,
 	// Do not move that in device_start or there will be a race
 	// condition with the maple devices call to register_port.
 	memset(devices, 0, sizeof(devices));
-	cpu = 0;
-	irq_cb = 0;
+	cpu = nullptr;
+	irq_cb = nullptr;
 }
 
 void maple_dc_device::register_port(int port, maple_device *device)

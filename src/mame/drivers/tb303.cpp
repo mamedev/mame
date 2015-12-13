@@ -46,7 +46,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(t3_clock);
 	TIMER_DEVICE_CALLBACK_MEMBER(t3_off);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 

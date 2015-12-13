@@ -30,7 +30,7 @@ const int EnvelopeVolumes[]={ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 
 gamate_sound_device::gamate_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GAMATE_SND, "Gamate Audio Custom", tag, owner, clock, "gamate_sound", __FILE__)
 	, device_sound_interface(mconfig, *this)
-	, m_mixer_channel(NULL)
+	, m_mixer_channel(nullptr)
 	{}
 
 //-------------------------------------------------

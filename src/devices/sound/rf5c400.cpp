@@ -69,7 +69,7 @@ rf5c400_device::rf5c400_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, RF5C400, "RF5C400", tag, owner, clock, "rf5c400", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_rom(*this, DEVICE_SELF),
-		m_stream(NULL)
+		m_stream(nullptr)
 {
 	memset(m_env_ar_table, 0, sizeof(double)*0x9f);
 	memset(m_env_dr_table, 0, sizeof(double)*0x9f);

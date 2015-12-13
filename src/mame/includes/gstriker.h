@@ -65,8 +65,8 @@ public:
 	DECLARE_READ16_MEMBER(vbl_toggle_r);
 	DECLARE_WRITE16_MEMBER(vbl_toggle_w);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_DRIVER_INIT(twrldc94a);
 	DECLARE_DRIVER_INIT(vgoalsoc);
 	DECLARE_DRIVER_INIT(twrldc94);

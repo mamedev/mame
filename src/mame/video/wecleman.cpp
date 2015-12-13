@@ -825,6 +825,7 @@ void wecleman_state::hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &c
 ***************************************************************************/
 
 // new video and palette code
+// TODO: remove me.
 WRITE16_MEMBER(wecleman_state::wecleman_videostatus_w)
 {
 	COMBINE_DATA(m_videostatus);

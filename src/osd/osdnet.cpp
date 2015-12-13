@@ -7,11 +7,11 @@ static class simple_list<osd_netdev::entry_t> netdev_list;
 
 void add_netdev(const char *name, const char *description, create_netdev func)
 {
-	osd_netdev::entry_t *entry = global_alloc_clear(osd_netdev::entry_t);
+	auto entry = global_alloc_clear(osd_netdev::entry_t);
 	entry->id = netdev_list.count();
 	strncpy(entry->name, name, 255);
 	entry->name[255] = '\0';
-	strncpy(entry->description, (description != NULL) ? description : "(no name)", 255);
+	strncpy(entry->description, (description != nullptr) ? description : "(no name)", 255);
 	entry->description[255] = '\0';
 	entry->func = func;
 	netdev_list.append(*entry);
@@ -35,7 +35,7 @@ class osd_netdev *open_netdev(int id, class device_network_interface *ifdev, int
 		entry = entry->m_next;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 osd_netdev::osd_netdev(class device_network_interface *ifdev, int rate)

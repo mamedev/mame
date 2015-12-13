@@ -39,7 +39,7 @@ const device_type NES_NTDEC_FH = &device_creator<nes_ntdec_fh_device>;
 
 
 nes_ntdec_asder_device::nes_ntdec_asder_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_NTDEC_ASDER, "NES Cart NTDEC Asder PCB", tag, owner, clock, "nes_ntdec_asder", __FILE__), 
+					: nes_nrom_device(mconfig, NES_NTDEC_ASDER, "NES Cart NTDEC Asder PCB", tag, owner, clock, "nes_ntdec_asder", __FILE__),
 	m_latch(0)
 				{
 }

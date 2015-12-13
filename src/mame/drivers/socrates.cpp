@@ -150,8 +150,8 @@ public:
 	DECLARE_WRITE8_MEMBER(socrates_scroll_w);
 	DECLARE_WRITE8_MEMBER(socrates_sound_w);
 	DECLARE_DRIVER_INIT(socrates);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(socrates);
 	UINT32 screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(assert_irq);
@@ -164,7 +164,7 @@ public:
 	rgb_t socrates_create_color(UINT8 color);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -198,8 +198,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( send_input );
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	int get_color(int index, int y);
 
 private:
@@ -1464,7 +1464,7 @@ static MACHINE_CONFIG_START( iqunlimz, iqunlim_state )
 	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL_21_4772MHz/(512+256))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
 MACHINE_CONFIG_END
 
 /******************************************************************************

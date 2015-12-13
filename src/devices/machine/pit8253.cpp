@@ -83,7 +83,7 @@ pit8253_device::pit8253_timer *pit8253_device::get_timer(int which)
 	if (which < PIT8253_MAX_TIMER)
 		return &m_timers[which];
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -758,7 +758,7 @@ READ8_MEMBER( pit8253_device::read )
 
 	LOG2(("pit8253_r(): offset %d\n", offset));
 
-	if (timer == NULL)
+	if (timer == nullptr)
 	{
 		/* Reading mode control register is illegal according to docs */
 		/* Experimentally determined: reading it returns 0 */
@@ -935,11 +935,11 @@ WRITE8_MEMBER( pit8253_device::write )
 
 	LOG2(("pit8253: write(): offset=%d data=0x%02x\n", offset, data));
 
-	if (timer == NULL)
+	if (timer == nullptr)
 	{
 		/* Write to mode control register */
 		timer = get_timer((data >> 6) & 3);
-		if (timer == NULL)
+		if (timer == nullptr)
 		{
 			readback_command(data);
 			return;
@@ -1042,7 +1042,7 @@ void pit8253_device::gate_w(int gate, int state)
 {
 	pit8253_timer *timer = get_timer(gate);
 
-	if (timer == NULL)
+	if (timer == nullptr)
 		return;
 
 	LOG2(("pit8253 : gate_w(): gate=%d state=%d\n", gate, state));
@@ -1082,7 +1082,7 @@ WRITE_LINE_MEMBER( pit8253_device::write_gate2 )
 void pit8253_device::set_clockin(int timerno, double new_clockin)
 {
 	pit8253_timer *timer = get_timer(timerno);
-	assert(timer != NULL);
+	assert(timer != nullptr);
 
 	LOG2(("pit8253_set_clockin(): PIT timer=%d, clockin = %f\n", timerno, new_clockin));
 
@@ -1095,7 +1095,7 @@ void pit8253_device::set_clockin(int timerno, double new_clockin)
 void pit8253_device::set_clock_signal(int timerno, int state)
 {
 	pit8253_timer *timer = get_timer(timerno);
-	assert(timer != NULL);
+	assert(timer != nullptr);
 
 	LOG2(("pit8253_set_clock_signal(): PIT timer=%d, state = %d\n", timerno, state));
 

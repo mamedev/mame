@@ -22,7 +22,7 @@ DECLARE_WRITE32_MEMBER(write);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	// internal state

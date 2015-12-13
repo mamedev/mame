@@ -195,11 +195,11 @@ public:
 
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void video_start();
+	virtual void video_start() override;
 
 	// machine
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(joystand_interrupt);
 };
 
@@ -306,10 +306,10 @@ void joystand_state::video_start()
 	m_bg1_tmap->set_transparent_pen(0xf);
 	m_bg2_tmap->set_transparent_pen(0xf);
 
-	for (int i = 0; i < 2; ++i)
+	for (auto & elem : m_bg15_bitmap)
 	{
-		m_bg15_bitmap[i].allocate(0x200, 0x200);
-		m_bg15_bitmap[i].fill(BG15_TRANSPARENT);
+		elem.allocate(0x200, 0x200);
+		elem.fill(BG15_TRANSPARENT);
 	}
 
 	bg15_tiles_dirty = true;

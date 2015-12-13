@@ -76,9 +76,9 @@ const device_type K053260 = &device_creator<k053260_device>;
 k053260_device::k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053260, "K053260 KDSC", tag, owner, clock, "k053260", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_rgnoverride(NULL),
-		m_stream(NULL),
-		m_rom(NULL),
+		m_rgnoverride(nullptr),
+		m_stream(nullptr),
+		m_rom(nullptr),
 		m_rom_size(0),
 		m_keyon(0),
 		m_mode(0)
@@ -115,8 +115,8 @@ void k053260_device::device_start()
 
 void k053260_device::device_reset()
 {
-	for (int i = 0; i < 4; i++)
-		m_voice[i].voice_reset();
+	for (auto & elem : m_voice)
+		elem.voice_reset();
 }
 
 
@@ -208,9 +208,9 @@ WRITE8_MEMBER( k053260_device::write )
 		// 0x29 is a read register
 
 		case 0x2a: // loop and pcm/adpcm select
-			for (int i = 0; i < 4; i++)
+			for (auto & elem : m_voice)
 			{
-				m_voice[i].set_loop_kadpcm(data);
+				elem.set_loop_kadpcm(data);
 				data >>= 1;
 			}
 			break;
@@ -247,7 +247,7 @@ WRITE8_MEMBER( k053260_device::write )
 }
 
 
-INLINE int limit( int val, int max, int min )
+static inline int limit( int val, int max, int min )
 {
 	if ( val > max )
 		val = max;
@@ -272,9 +272,9 @@ void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		{
 			stream_sample_t buffer[2] = {0, 0};
 
-			for (int i = 0; i < 4; i++)
+			for (auto & voice : m_voice)
 			{
-				KDSC_Voice &voice = m_voice[i];
+				
 				if (voice.playing())
 					voice.play(buffer);
 			}

@@ -1721,15 +1721,15 @@ const device_type APOLLO_GRAPHICS = &device_creator<apollo_graphics_15i> ;
 
 apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, APOLLO_GRAPHICS, "Apollo Screen", tag, owner, clock,"apollo_graphics_15i", __FILE__),
-	m_lut_fifo(NULL),
-	m_bt458(NULL)
+	m_lut_fifo(nullptr),
+	m_bt458(nullptr)
 {
 }
 
 apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, UINT32 clock, device_type type,const char *name, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_lut_fifo(NULL),
-	m_bt458(NULL)
+	m_lut_fifo(nullptr),
+	m_bt458(nullptr)
 {
 }
 
@@ -1795,14 +1795,14 @@ void apollo_graphics_15i::device_start()
 	m_p_clock = 0;
 	m_data_clock = 0;
 
-	m_image_memory = 0;
+	m_image_memory = nullptr;
 	m_image_plane_size = 0;
 	m_image_memory_size = 0;
 
 	memset(m_color_lookup_table, 0, sizeof(m_color_lookup_table));
 
-	m_lut_fifo = NULL;
-	m_bt458 = NULL;
+	m_lut_fifo = nullptr;
+	m_bt458 = nullptr;
 }
 
 //-------------------------------------------------
@@ -1866,14 +1866,14 @@ void apollo_graphics_15i::device_reset()
 		}
 	}
 
-	if (m_image_memory == NULL)
+	if (m_image_memory == nullptr)
 	{
 		/* allocate the memory image */
 		m_image_plane_size = m_buffer_height * m_buffer_width / 16;
 		m_image_memory_size = m_image_plane_size * m_n_planes;
 		m_image_memory
 				= auto_alloc_array(machine(), UINT16, m_image_memory_size);
-		assert(m_image_memory != NULL);
+		assert(m_image_memory != nullptr);
 
 		MLOG1(("device reset apollo graphics: buffer=%p size=%0x", (void *) m_image_memory, m_image_memory_size));
 	}

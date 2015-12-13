@@ -59,7 +59,7 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_d008_w)
 	 leaving the tilt screen (as the MCU is now out of sync with main CPU
 	 which resets itself).  This bit is the likely candidate as it is flipped
 	 early in bootup just prior to accessing the MCU for the first time. */
-	if (m_mcu != NULL)  // Bootlegs don't have the MCU but still set this bit
+	if (m_mcu != nullptr)  // Bootlegs don't have the MCU but still set this bit
 		m_mcu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -171,7 +171,7 @@ TILE_GET_INFO_MEMBER(arkanoid_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START_MEMBER(arkanoid_state,arkanoid)
+void arkanoid_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(arkanoid_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }

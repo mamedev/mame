@@ -41,9 +41,9 @@ protected:
 	UINT8 cur_scanline, visible_page, firq_scanline;
 	std::vector<UINT8> ram, screen_buffer, bitcounts;
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 extern const device_type WPC_DMD;

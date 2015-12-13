@@ -392,8 +392,8 @@ public:
 	DECLARE_DRIVER_INIT(coh3002t_nz);
 
 protected:
-	virtual void driver_start();
-	virtual void machine_reset();
+	virtual void driver_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<psxsio0_device> m_sio0;

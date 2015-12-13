@@ -74,7 +74,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mf_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_timer_proc);
 	int atari_input_disabled();
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	required_device<cpu_device> m_mcu;
 	required_device<speaker_sound_device> m_speaker;

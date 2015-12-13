@@ -260,7 +260,7 @@ void psikyosh_state::draw_bglayerscroll( int layer, bitmap_rgb32 &bitmap, const 
 
 	/* cache rendered bitmap */
 	int last_bank[32]; // corresponds to bank of bitmap in m_bg_bitmap. bg_bitmap is split into 16/32-rows of one-tile high each
-	for(int ii = 0; ii < 32; ii++) last_bank[ii] = -1;
+	for(auto & elem : last_bank) elem = -1;
 
 	int scr_width = cliprect.width();
 	int scr_height = cliprect.height();

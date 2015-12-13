@@ -270,8 +270,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( mapper_ready );
 
 	DECLARE_DRIVER_INIT(geneve);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(geneve_hblank_interrupt);
 
 	DECLARE_WRITE_LINE_MEMBER(set_tms9901_INT2_from_v9938);
@@ -756,10 +756,10 @@ ROM_START(geneve)
 	ROM_LOAD_OPTIONAL("gnmbt100.bin", 0x8000, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47)) /* CPU ROMs GenMod */
 
 	ROM_REGION(SRAM_SIZE, SRAM_TAG, 0)
-	ROM_FILL(0x0000, SRAM_SIZE, 0)
+	ROM_FILL(0x0000, SRAM_SIZE, 0x00)
 
 	ROM_REGION(DRAM_SIZE, DRAM_TAG, 0)
-	ROM_FILL(0x0000, DRAM_SIZE, 0)
+	ROM_FILL(0x0000, DRAM_SIZE, 0x00)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT    INIT       COMPANY     FULLNAME */

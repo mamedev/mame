@@ -108,6 +108,13 @@ public:
 		m_objram1(*this, "objram1"),
 		m_objram2(*this, "objram2"),
 		m_output(*this, "output"),
+		m_io_in0(*this, "IN0"),
+		m_io_in1(*this, "IN1"),
+		m_cps2_dial_type(0),
+		m_ecofghtr_dial_direction0(0),
+		m_ecofghtr_dial_direction1(0),
+		m_ecofghtr_dial_last0(0),
+		m_ecofghtr_dial_last1(0),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
@@ -117,7 +124,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
 	/* memory pointers */
 	// cps1
@@ -137,11 +145,14 @@ public:
 	optional_shared_ptr<UINT16> m_objram1;
 	optional_shared_ptr<UINT16> m_objram2;
 	optional_shared_ptr<UINT16> m_output;
+	
+	optional_ioport m_io_in0;
+	optional_ioport m_io_in1;
 	UINT16 *     m_cps2_buffered_obj;
 	// game-specific
 	UINT16 *     m_gigaman2_dummyqsound_ram;
 	UINT16  sf2ceblp_prot;
-
+	
 	/* video-related */
 	tilemap_t      *m_bg_tilemap[3];
 	int          m_scanline1;
@@ -172,6 +183,12 @@ public:
 	int          m_cps2digitalvolumelevel;
 	int          m_cps2disabledigitalvolume;
 	emu_timer    *m_digital_volume_timer;
+	int			 m_cps2_dial_type;
+	int			 m_ecofghtr_dial_direction0;
+	int			 m_ecofghtr_dial_direction1;
+	int			 m_ecofghtr_dial_last0;
+	int			 m_ecofghtr_dial_last1;
+
 
 	/* fcrash sound hw */
 	int          m_sample_buffer1;
@@ -279,6 +296,7 @@ public:
 	DECLARE_DRIVER_INIT(pzloop2);
 	DECLARE_DRIVER_INIT(singbrd);
 	DECLARE_DRIVER_INIT(gigaman2);
+	DECLARE_DRIVER_INIT(ecofghtr);
 	DECLARE_DRIVER_INIT(sf2dongb);
 	DECLARE_DRIVER_INIT(sf2ceblp);
 	TILEMAP_MAPPER_MEMBER(tilemap0_scan);
@@ -381,6 +399,7 @@ public:
 	DECLARE_READ16_MEMBER(cps2_qsound_volume_r);
 	DECLARE_READ16_MEMBER(kludge_r);
 	DECLARE_READ16_MEMBER(joy_or_paddle_r);
+	DECLARE_READ16_MEMBER(joy_or_paddle_ecofghtr_r);
 	DECLARE_WRITE_LINE_MEMBER(m5205_int1);
 	DECLARE_WRITE_LINE_MEMBER(m5205_int2);
 };

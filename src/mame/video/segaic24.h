@@ -51,7 +51,7 @@ public:
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	enum {
@@ -95,7 +95,7 @@ public:
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, const int *spri);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	UINT16 *sprite_ram;
@@ -115,7 +115,7 @@ public:
 	UINT16 get_reg(int reg);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	UINT16 mixer_reg[16];

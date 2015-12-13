@@ -47,9 +47,9 @@ public:
 					UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
@@ -83,15 +83,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(e05a30_ready);
 
 	/* Centronics stuff */
-	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) { if (m_e05a30) m_e05a30->centronics_input_strobe(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) { if (m_e05a30) m_e05a30->centronics_input_data0(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) { if (m_e05a30) m_e05a30->centronics_input_data1(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data2 ) { if (m_e05a30) m_e05a30->centronics_input_data2(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data3 ) { if (m_e05a30) m_e05a30->centronics_input_data3(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) { if (m_e05a30) m_e05a30->centronics_input_data4(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) { if (m_e05a30) m_e05a30->centronics_input_data5(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) { if (m_e05a30) m_e05a30->centronics_input_data6(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) { if (m_e05a30) m_e05a30->centronics_input_data7(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) override { if (m_e05a30) m_e05a30->centronics_input_strobe(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) override { if (m_e05a30) m_e05a30->centronics_input_data0(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) override { if (m_e05a30) m_e05a30->centronics_input_data1(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data2 ) override { if (m_e05a30) m_e05a30->centronics_input_data2(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data3 ) override { if (m_e05a30) m_e05a30->centronics_input_data3(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) override { if (m_e05a30) m_e05a30->centronics_input_data4(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) override { if (m_e05a30) m_e05a30->centronics_input_data5(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) override { if (m_e05a30) m_e05a30->centronics_input_data6(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) override { if (m_e05a30) m_e05a30->centronics_input_data7(state); }
 	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_ack) { output_ack(state); }
 	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_busy) { output_busy(state); }
 	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_perror) { output_perror(state); }
@@ -108,9 +108,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -147,7 +147,7 @@ public:
 					device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 

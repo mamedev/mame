@@ -61,12 +61,12 @@ const device_type MK48T08 = &device_creator<mk48t08_device>;
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE UINT8 make_bcd(UINT8 data)
+static inline UINT8 make_bcd(UINT8 data)
 {
 	return ( ( ( data / 10 ) % 10 ) << 4 ) + ( data % 10 );
 }
 
-INLINE UINT8 from_bcd( UINT8 data )
+static inline UINT8 from_bcd( UINT8 data )
 {
 	return ( ( ( data >> 4 ) & 15 ) * 10 ) + ( data & 15 );
 }
@@ -215,7 +215,7 @@ void timekeeper_device::device_start()
 	system_time systime;
 
 	/* validate some basic stuff */
-	assert(this != NULL);
+	assert(this != nullptr);
 
 	machine().base_datetime(systime);
 
@@ -398,7 +398,7 @@ READ8_MEMBER( timekeeper_device::read )
 
 void timekeeper_device::nvram_default()
 {
-	if( m_default_data != NULL )
+	if( m_default_data != nullptr )
 	{
 		memcpy( &m_data[0], m_default_data, m_size );
 	}

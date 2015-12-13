@@ -179,9 +179,9 @@ public:
 	DECLARE_DRIVER_INIT(multigmt);
 	DECLARE_DRIVER_INIT(multigam);
 	DECLARE_DRIVER_INIT(multigm3);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(multigam);
 	DECLARE_MACHINE_START(multigm3);
 	DECLARE_MACHINE_RESET(multigm3);
@@ -1267,7 +1267,7 @@ ROM_START( multigam )
 	ROM_LOAD( "8.bin", 0x00000, 0x20000, CRC(509c0e94) SHA1(9e87c74e76afe6c3a7ba194439434f54e2c879eb) )
 	ROM_LOAD( "9.bin", 0x20000, 0x20000, CRC(48416f20) SHA1(f461fcbff6d2fa4774d64c26475089d1aeea7fb5) )
 	ROM_LOAD( "10.bin", 0x40000, 0x20000, CRC(869d1661) SHA1(ac155bd24ebfea8e064859e1a05317001286f9ae) )
-	ROM_FILL( 0x60000, 0x20000, 0x00 )
+	ROM_FILL( 0x60000, 0x20000, 0x0000 )
 ROM_END
 
 ROM_START( multigmb )
@@ -1286,7 +1286,7 @@ ROM_START( multigmb )
 	ROM_LOAD( "8.bin", 0x00000, 0x20000, CRC(509c0e94) SHA1(9e87c74e76afe6c3a7ba194439434f54e2c879eb) )
 	ROM_LOAD( "9.bin", 0x20000, 0x20000, CRC(48416f20) SHA1(f461fcbff6d2fa4774d64c26475089d1aeea7fb5) )
 	ROM_LOAD( "10.bin", 0x40000, 0x20000, CRC(869d1661) SHA1(ac155bd24ebfea8e064859e1a05317001286f9ae) )
-	ROM_FILL( 0x60000, 0x20000, 0x00 )
+	ROM_FILL( 0x60000, 0x20000, 0x0000 )
 ROM_END
 
 ROM_START( multigm2 )
@@ -1325,7 +1325,7 @@ ROM_START( multigm3 )
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "mg3-7.bin", 0x00000, 0x20000, CRC(d8308cdb) SHA1(7bfb864611c32cf3740cfd650bfe275513d511d7) )
 	ROM_LOAD( "mg3-8.bin", 0x20000, 0x20000, CRC(b4a53b9d) SHA1(63d8901149d0d9b69f28bfc096f7932448542032) )
-	ROM_FILL( 0x40000, 0x20000, 0x00 )
+	ROM_FILL( 0x40000, 0x20000, 0x0000 )
 	ROM_LOAD( "mg3-9.bin", 0x60000, 0x20000, CRC(a0ae2b4b) SHA1(5e026ad8a6b2a8120e386471d5178625bda04525) )
 ROM_END
 

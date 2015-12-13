@@ -52,22 +52,22 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_c64_floppy_parallel_interface overrides
-	virtual void parallel_data_w(UINT8 data);
-	virtual void parallel_strobe_w(int state);
+	virtual void parallel_data_w(UINT8 data) override;
+	virtual void parallel_strobe_w(int state) override;
 
 	// device_pet_user_port_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER(input_8);
-	virtual WRITE_LINE_MEMBER(input_c) { if (state) m_parallel_output |= 1; else m_parallel_output &= ~1; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_d) { if (state) m_parallel_output |= 2; else m_parallel_output &= ~2; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_e) { if (state) m_parallel_output |= 4; else m_parallel_output &= ~4; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_f) { if (state) m_parallel_output |= 8; else m_parallel_output &= ~8; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_h) { if (state) m_parallel_output |= 16; else m_parallel_output &= ~16; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_j) { if (state) m_parallel_output |= 32; else m_parallel_output &= ~32; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_k) { if (state) m_parallel_output |= 64; else m_parallel_output &= ~64; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_l) { if (state) m_parallel_output |= 128; else m_parallel_output &= ~128; update_output(); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_8) override;
+	virtual WRITE_LINE_MEMBER(input_c) override { if (state) m_parallel_output |= 1; else m_parallel_output &= ~1; update_output(); }
+	virtual WRITE_LINE_MEMBER(input_d) override { if (state) m_parallel_output |= 2; else m_parallel_output &= ~2; update_output(); }
+	virtual WRITE_LINE_MEMBER(input_e) override { if (state) m_parallel_output |= 4; else m_parallel_output &= ~4; update_output(); }
+	virtual WRITE_LINE_MEMBER(input_f) override { if (state) m_parallel_output |= 8; else m_parallel_output &= ~8; update_output(); }
+	virtual WRITE_LINE_MEMBER(input_h) override { if (state) m_parallel_output |= 16; else m_parallel_output &= ~16; update_output(); }
+	virtual WRITE_LINE_MEMBER(input_j) override { if (state) m_parallel_output |= 32; else m_parallel_output &= ~32; update_output(); }
+	virtual WRITE_LINE_MEMBER(input_k) override { if (state) m_parallel_output |= 64; else m_parallel_output &= ~64; update_output(); }
+	virtual WRITE_LINE_MEMBER(input_l) override { if (state) m_parallel_output |= 128; else m_parallel_output &= ~128; update_output(); }
 
 private:
 	void update_output();

@@ -80,8 +80,8 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_stop();
+	virtual void device_start() override;
+	virtual void device_stop() override;
 
 	class daisy_entry
 	{
@@ -119,7 +119,7 @@ public:
 	econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// inline configuration
 	static void static_set_slot(device_t &device, int address);

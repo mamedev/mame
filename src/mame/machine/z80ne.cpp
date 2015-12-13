@@ -651,7 +651,7 @@ WRITE8_MEMBER(z80ne_state::lx390_motor_w)
 	    d1 1=select drive 1
 	    d0 1=select drive 0 */
 
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) floppy = m_floppy1->get_device();

@@ -29,16 +29,16 @@ DEVICE_ADDRESS_MAP_START(target2_map, 32, vrc4373_device)
 ADDRESS_MAP_END
 
 vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: pci_host_device(mconfig, VRC4373, "NEC VRC4373 System Controller", tag, owner, clock, "vrc4373", __FILE__),
+	: pci_host_device(mconfig, VRC4373, "NEC VRC4373 System Controller", tag, owner, clock, "vrc4373", __FILE__), m_cpu_space(nullptr), m_cpu(nullptr), cpu_tag(nullptr),
 		m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
-		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32)
+		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32), m_ram_size(0), m_ram_base(0), m_simm_size(0), m_simm_base(0), m_pci1_laddr(0), m_pci2_laddr(0), m_pci_io_laddr(0), m_target1_laddr(0), m_target2_laddr(0)
 
 {
 }
 
 const address_space_config *vrc4373_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_PROGRAM) ? pci_bridge_device::memory_space_config(spacenum) : (spacenum == AS_DATA) ? &m_mem_config : (spacenum == AS_IO) ? &m_io_config : NULL;
+	return (spacenum == AS_PROGRAM) ? pci_bridge_device::memory_space_config(spacenum) : (spacenum == AS_DATA) ? &m_mem_config : (spacenum == AS_IO) ? &m_io_config : nullptr;
 }
 
 void vrc4373_device::device_start()

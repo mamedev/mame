@@ -51,7 +51,7 @@ private:
 	UINT8 m_segment;
 	UINT8 m_lamprow;
 	UINT8 m_swrow;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	optional_device<gottlieb_sound_r0_device> m_r0_sound;
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;

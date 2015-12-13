@@ -67,9 +67,9 @@ public:
 	DECLARE_WRITE8_MEMBER(exerion_portb_w);
 	DECLARE_DRIVER_INIT(exerion);
 	DECLARE_DRIVER_INIT(exerionb);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(exerion);
 	UINT32 screen_update_exerion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect);

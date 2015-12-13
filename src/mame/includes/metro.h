@@ -208,6 +208,6 @@ public:
 	DECLARE_READ_LINE_MEMBER(metro_rxd_r);
 
 protected:
-	virtual void machine_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

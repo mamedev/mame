@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Stefan Jokisch
+// copyright-holders:Derrick Renaud 
 /*************************************************************************
 
     audio\dragrace.c

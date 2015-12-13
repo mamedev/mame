@@ -93,8 +93,8 @@ public:
 	DECLARE_READ32_MEMBER(backfire_eeprom_r);
 	DECLARE_WRITE32_MEMBER(backfire_eeprom_w);
 	DECLARE_DRIVER_INIT(backfire);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_backfire_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_backfire_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);

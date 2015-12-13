@@ -4161,7 +4161,7 @@ ROM_END
 
 void itech32_state::init_program_rom()
 {
-	if (m_main_ram == NULL)
+	if (m_main_ram == nullptr)
 		m_main_ram.set_target(m_nvram, m_nvram.bytes());
 	memcpy(m_main_ram, m_main_rom, 0x80);
 }

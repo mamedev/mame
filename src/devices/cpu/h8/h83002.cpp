@@ -23,7 +23,7 @@ h83002_device::h83002_device(const machine_config &mconfig, const char *tag, dev
 	timer16_3(*this, "timer16:3"),
 	timer16_4(*this, "timer16:4"),
 	sci0(*this, "sci0"),
-	sci1(*this, "sci1")
+	sci1(*this, "sci1"), syscr(0)
 {
 }
 

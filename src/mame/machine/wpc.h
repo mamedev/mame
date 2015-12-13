@@ -127,13 +127,13 @@ public:
 	template<class _bank_w> void set_bank_write(_bank_w bank_w) { m_bank_w.set_callback(bank_w); }
 	template<class _dmdbank_w> void set_dmdbank_write(_dmdbank_w dmdbank_w) { m_dmdbank_w.set_callback(dmdbank_w); }
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 1;
 	static const device_timer_id TIMER_ZEROCROSS = 2;
 protected:
 	// overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	UINT8 m_shift_addr_high;

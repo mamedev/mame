@@ -677,7 +677,7 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pa_w )
 	*/
 
 	// floppy drive select
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (!BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (!BIT(data, 1)) floppy = m_floppy1->get_device();
@@ -1085,7 +1085,7 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(v1050_state, sio_rxrdy_w))
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE(v1050_state, sio_txrdy_w))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251A_SIO_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251A_SIO_TAG, i8251_device, write_dsr))
 
@@ -1097,8 +1097,8 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(v1050_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", v1050_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":3", v1050_floppies, NULL,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", v1050_floppies, nullptr,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":3", v1050_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 
 	// SASI bus
 	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)

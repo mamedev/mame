@@ -44,8 +44,8 @@ address_space_config::address_space_config()
 		m_addrbus_shift(0),
 		m_logaddr_width(0),
 		m_page_shift(0),
-		m_internal_map(NULL),
-		m_default_map(NULL)
+		m_internal_map(nullptr),
+		m_default_map(nullptr)
 {
 }
 
@@ -92,10 +92,10 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_addrbus_shift(addrshift),
 		m_logaddr_width(addrwidth),
 		m_page_shift(0),
-		m_internal_map(NULL),
-		m_default_map(NULL),
-		m_internal_map_delegate(internal),
-		m_default_map_delegate(defmap)
+		m_internal_map(nullptr),
+		m_default_map(nullptr),
+		m_internal_map_delegate(std::move(internal)),
+		m_default_map_delegate(std::move(defmap))
 {
 }
 
@@ -107,10 +107,10 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_addrbus_shift(addrshift),
 		m_logaddr_width(logwidth),
 		m_page_shift(pageshift),
-		m_internal_map(NULL),
-		m_default_map(NULL),
-		m_internal_map_delegate(internal),
-		m_default_map_delegate(defmap)
+		m_internal_map(nullptr),
+		m_default_map(nullptr),
+		m_internal_map_delegate(std::move(internal)),
+		m_default_map_delegate(std::move(defmap))
 {
 }
 
@@ -244,16 +244,16 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 	for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
 	{
 		const address_space_config *spaceconfig = space_config(spacenum);
-		if (spaceconfig != NULL)
+		if (spaceconfig != nullptr)
 		{
 			int datawidth = spaceconfig->m_databus_width;
 			int alignunit = datawidth / 8;
 
 			// construct the maps
-			::address_map *map = global_alloc(::address_map(const_cast<device_t &>(device()), spacenum));
+			auto map = global_alloc(::address_map(const_cast<device_t &>(device()), spacenum));
 
 			// if this is an empty map, just skip it
-			if (map->m_entrylist.first() == NULL)
+			if (map->m_entrylist.first() == nullptr)
 			{
 				global_free(map);
 				continue;
@@ -266,7 +266,7 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 				osd_printf_error("Wrong memory handlers provided for %s space! (width = %d, memory = %08x)\n", spaceconfig->m_name, datawidth, map->m_databits);
 
 			// loop over entries and look for errors
-			for (address_map_entry *entry = map->m_entrylist.first(); entry != NULL; entry = entry->next())
+			for (address_map_entry *entry = map->m_entrylist.first(); entry != nullptr; entry = entry->next())
 			{
 				UINT32 bytestart = spaceconfig->addr2byte(entry->m_addrstart);
 				UINT32 byteend = spaceconfig->addr2byte_end(entry->m_addrend);
@@ -295,14 +295,14 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 					osd_printf_error("Wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", spaceconfig->m_name, entry->m_addrstart, entry->m_addrend, alignunit);
 
 				// if this is a program space, auto-assign implicit ROM entries
-				if (entry->m_read.m_type == AMH_ROM && entry->m_region == NULL)
+				if (entry->m_read.m_type == AMH_ROM && entry->m_region == nullptr)
 				{
 					entry->m_region = device().tag();
 					entry->m_rgnoffs = entry->m_addrstart;
 				}
 
 				// if this entry references a memory region, validate it
-				if (entry->m_region != NULL && entry->m_share == 0)
+				if (entry->m_region != nullptr && entry->m_share == nullptr)
 				{
 					// make sure we can resolve the full path to the region
 					bool found = false;
@@ -310,8 +310,8 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 
 					// look for the region
 					device_iterator deviter(device().mconfig().root_device());
-					for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
-						for (const rom_entry *romp = rom_first_region(*device); romp != NULL && !found; romp = rom_next_region(romp))
+					for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
+						for (const rom_entry *romp = rom_first_region(*device); romp != nullptr && !found; romp = rom_next_region(romp))
 						{
 							if (rom_region_name(*device, romp) == entry_region)
 							{
@@ -330,16 +330,16 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 
 				// make sure all devices exist
 				// FIXME: This doesn't work! AMH_DEVICE_DELEGATE entries don't even set m_tag, the device tag is inside the proto-delegate
-				if (entry->m_read.m_type == AMH_DEVICE_DELEGATE && entry->m_read.m_tag != NULL)
+				if (entry->m_read.m_type == AMH_DEVICE_DELEGATE && entry->m_read.m_tag != nullptr)
 				{
 					std::string temp(entry->m_read.m_tag);
-					if (device().siblingdevice(temp.c_str()) == NULL)
+					if (device().siblingdevice(temp.c_str()) == nullptr)
 						osd_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_read.m_tag);
 				}
-				if (entry->m_write.m_type == AMH_DEVICE_DELEGATE && entry->m_write.m_tag != NULL)
+				if (entry->m_write.m_type == AMH_DEVICE_DELEGATE && entry->m_write.m_tag != nullptr)
 				{
 					std::string temp(entry->m_write.m_tag);
-					if (device().siblingdevice(temp.c_str()) == NULL)
+					if (device().siblingdevice(temp.c_str()) == nullptr)
 						osd_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_write.m_tag);
 				}
 
@@ -353,7 +353,7 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 					valid.validate_tag(entry->m_read.m_tag);
 				if (entry->m_write.m_type == AMH_BANK)
 					valid.validate_tag(entry->m_write.m_tag);
-				if (entry->m_share != NULL)
+				if (entry->m_share != nullptr)
 					valid.validate_tag(entry->m_share);
 			}
 

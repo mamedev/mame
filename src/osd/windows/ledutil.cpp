@@ -180,13 +180,13 @@ int main(int argc, char *argv[])
 	// if the argument is "-kill", post a close message
 	if (strcmp(arg, "-kill") == 0)
 	{
-		if (otherwnd != NULL)
+		if (otherwnd != nullptr)
 			PostMessage(otherwnd, WM_QUIT, 0, 0);
-		return (otherwnd != NULL) ? 1 : 0;
+		return (otherwnd != nullptr) ? 1 : 0;
 	}
 
 	// if we had another instance, defer to it
-	if (otherwnd != NULL)
+	if (otherwnd != nullptr)
 		return 0;
 
 	// call the startup code
@@ -205,11 +205,11 @@ int main(int argc, char *argv[])
 						WINDOW_STYLE,
 						0, 0,
 						1, 1,
-						NULL,
-						NULL,
-						GetModuleHandle(NULL),
-						NULL);
-	if (listener_hwnd == NULL)
+						nullptr,
+						nullptr,
+						GetModuleHandle(nullptr),
+						nullptr);
+	if (listener_hwnd == nullptr)
 		goto error;
 
 	// allocate message ids
@@ -235,18 +235,18 @@ int main(int argc, char *argv[])
 
 	// see if MAME is already running
 	otherwnd = FindWindow(OUTPUT_WINDOW_CLASS, OUTPUT_WINDOW_NAME);
-	if (otherwnd != NULL)
+	if (otherwnd != nullptr)
 		handle_mame_start((WPARAM)otherwnd, 0);
 
 	// process messages
-	while (GetMessage(&message, NULL, 0, 0))
+	while (GetMessage(&message, nullptr, 0, 0))
 	{
 		TranslateMessage(&message);
 		DispatchMessage(&message);
 	}
 
 	// reset on the way out if still live
-	if (mame_target != NULL)
+	if (mame_target != nullptr)
 		handle_mame_stop((WPARAM)mame_target, 0);
 	exitcode = 0;
 
@@ -273,7 +273,7 @@ static int create_window_class(void)
 
 		// initialize the description of the window class
 		wc.lpszClassName    = WINDOW_CLASS;
-		wc.hInstance        = GetModuleHandle(NULL);
+		wc.hInstance        = GetModuleHandle(nullptr);
 		wc.lpfnWndProc      = listener_window_proc;
 
 		// register the class; fail if we can't
@@ -351,7 +351,7 @@ static LRESULT handle_mame_stop(WPARAM wparam, LPARAM lparam)
 		return 1;
 
 	// clear our target out
-	mame_target = NULL;
+	mame_target = nullptr;
 	reset_id_to_outname_cache();
 
 	// reset the LED states
@@ -379,11 +379,11 @@ static LRESULT handle_copydata(WPARAM wparam, LPARAM lparam)
 
 	// allocate memory
 	entry = (id_map_entry *)malloc(sizeof(*entry));
-	if (entry == NULL)
+	if (entry == nullptr)
 		return 0;
 
 	string = (char *)malloc(strlen(data->string) + 1);
-	if (string == NULL)
+	if (string == nullptr)
 	{
 		free(entry);
 		return 0;
@@ -411,7 +411,7 @@ static LRESULT handle_copydata(WPARAM wparam, LPARAM lparam)
 static void reset_id_to_outname_cache(void)
 {
 	// free our ID list
-	while (idmaplist != NULL)
+	while (idmaplist != nullptr)
 	{
 		id_map_entry *temp = idmaplist;
 		idmaplist = temp->next;
@@ -430,7 +430,7 @@ static const char *map_id_to_outname(WPARAM id)
 	id_map_entry *entry;
 
 	// see if we have an entry in our map
-	for (entry = idmaplist; entry != NULL; entry = entry->next)
+	for (entry = idmaplist; entry != nullptr; entry = entry->next)
 		if (entry->id == id)
 			return entry->name;
 
@@ -438,7 +438,7 @@ static const char *map_id_to_outname(WPARAM id)
 	SendMessage(mame_target, om_mame_get_id_string, (WPARAM)listener_hwnd, id);
 
 	// now see if we have the entry in our map
-	for (entry = idmaplist; entry != NULL; entry = entry->next)
+	for (entry = idmaplist; entry != nullptr; entry = entry->next)
 		if (entry->id == id)
 			return entry->name;
 
@@ -476,7 +476,7 @@ static void output_startup(const char *commandline)
 {
 	// default to PS/2, override if USB is specified as a parameter
 	ledmethod = LED_METHOD_PS2;
-	if (commandline != NULL && strcmp(commandline, "-usb") == 0)
+	if (commandline != nullptr && strcmp(commandline, "-usb") == 0)
 		ledmethod = LED_METHOD_USB;
 
 	// output the method
@@ -522,7 +522,7 @@ static void output_mame_start(void)
 				return;
 			}
 
-			hKbdDev = CreateFile(TEXT("\\\\.\\Kbd"), GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+			hKbdDev = CreateFile(TEXT("\\\\.\\Kbd"), GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 			if (hKbdDev == INVALID_HANDLE_VALUE)
 			{
 				error_number = GetLastError();
@@ -551,7 +551,7 @@ static void output_mame_stop(void)
 	switch (ledmethod)
 	{
 		case LED_METHOD_PS2:
-			if (!DefineDosDevice(DDD_REMOVE_DEFINITION, TEXT("Kbd"), NULL))
+			if (!DefineDosDevice(DDD_REMOVE_DEFINITION, TEXT("Kbd"), nullptr))
 			{
 				error_number = GetLastError();
 				fprintf(stderr, "Unable to close the keyboard device. (error %d)\n", error_number);
@@ -632,9 +632,9 @@ static int led_get_state(void)
 			OutputBuffer.UnitId = 0;
 
 			DeviceIoControl(hKbdDev, IOCTL_KEYBOARD_QUERY_INDICATORS,
-							NULL, 0,
+							nullptr, 0,
 							&OutputBuffer, DataLength,
-							&ReturnedLength, NULL);
+							&ReturnedLength, nullptr);
 
 			// Demangle lights to match 95/98
 			if (OutputBuffer.LedFlags & KEYBOARD_NUM_LOCK_ON) result |= 0x1;
@@ -702,8 +702,8 @@ static void led_set_state(int state)
 			InputBuffer.LedFlags = LedFlags;
 			DeviceIoControl(hKbdDev, IOCTL_KEYBOARD_SET_INDICATORS,
 							&InputBuffer, DataLength,
-							NULL, 0,
-							&ReturnedLength, NULL);
+							nullptr, 0,
+							&ReturnedLength, nullptr);
 			break;
 		}
 	}

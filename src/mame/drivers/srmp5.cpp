@@ -116,7 +116,7 @@ public:
 	DECLARE_READ8_MEMBER(cmd1_r);
 	DECLARE_READ8_MEMBER(cmd2_r);
 	DECLARE_READ8_MEMBER(cmd_stat8_r);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_DRIVER_INIT(srmp5);
 	UINT32 screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

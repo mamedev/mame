@@ -58,9 +58,9 @@ ay3600_device::ay3600_device(const machine_config &mconfig, const char *tag, dev
 	m_write_data_ready(*this),
 	m_write_ako(*this)
 {
-	for (int i = 0; i < 9; i++)
+	for (auto & elem : m_x_mask)
 	{
-		m_x_mask[i] = 0;
+		elem = 0;
 	}
 }
 

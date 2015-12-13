@@ -37,7 +37,7 @@ rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, d
 		device_nvram_interface(mconfig, *this),
 		m_latch(0),
 		m_reset_line(CLEAR_LINE),
-		m_clock_line(CLEAR_LINE)
+		m_clock_line(CLEAR_LINE), rtc_state(), cmd_stream_pos(0), current_cmd(0), rtc9701_address_pos(0), rtc9701_current_address(0), rtc9701_current_data(0), rtc9701_data_pos(0)
 {
 }
 
@@ -129,8 +129,8 @@ void rtc9701_device::device_reset()
 
 void rtc9701_device::nvram_default()
 {
-	for (offs_t offs = 0; offs < 0x100; offs++)
-		rtc9701_data[offs] = 0xffff;
+	for (auto & elem : rtc9701_data)
+		elem = 0xffff;
 }
 
 

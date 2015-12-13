@@ -470,9 +470,9 @@ UINT32 seibuspi_state::screen_update_spi(screen_device &screen, bitmap_rgb32 &bi
 	}
 	else
 	{
-		back_rowscroll = NULL;
-		midl_rowscroll = NULL;
-		fore_rowscroll = NULL;
+		back_rowscroll = nullptr;
+		midl_rowscroll = nullptr;
+		fore_rowscroll = nullptr;
 	}
 
 	screen.priority().fill(0, cliprect);
@@ -507,7 +507,7 @@ UINT32 seibuspi_state::screen_update_spi(screen_device &screen, bitmap_rgb32 &bi
 	draw_sprites(bitmap, cliprect, screen.priority(), 3);
 
 	if (~m_layer_enable & 8)
-		combine_tilemap(bitmap, cliprect, m_text_layer, 0, 0, 0, NULL);
+		combine_tilemap(bitmap, cliprect, m_text_layer, 0, 0, 0, nullptr);
 
 	return 0;
 }
@@ -665,7 +665,7 @@ VIDEO_START_MEMBER(seibuspi_state,sys386f)
 	m_sprite_ram_size = 0x2000;
 	m_sprite_bpp = 8;
 
-	m_tilemap_ram = NULL;
+	m_tilemap_ram = nullptr;
 	m_palette_ram = auto_alloc_array_clear(machine(), UINT32, m_palette_ram_size/4);
 	m_sprite_ram = auto_alloc_array_clear(machine(), UINT32, m_sprite_ram_size/4);
 
@@ -691,7 +691,7 @@ void seibuspi_state::register_video_state()
 	save_item(NAME(m_midl_layer_d14));
 	save_item(NAME(m_fore_layer_d14));
 
-	if (m_tilemap_ram != NULL) save_pointer(NAME(m_tilemap_ram), m_tilemap_ram_size/4);
+	if (m_tilemap_ram != nullptr) save_pointer(NAME(m_tilemap_ram), m_tilemap_ram_size/4);
 	save_pointer(NAME(m_palette_ram), m_palette_ram_size/4);
 	save_pointer(NAME(m_sprite_ram), m_sprite_ram_size/4);
 }

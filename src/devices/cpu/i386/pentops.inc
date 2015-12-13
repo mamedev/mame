@@ -1200,7 +1200,7 @@ void i386_device::pentium_tzcnt_r32_rm32()
 	// TODO: actually implement TZCNT
 }
 
-INLINE INT8 SaturatedSignedWordToSignedByte(INT16 word)
+static inline INT8 SaturatedSignedWordToSignedByte(INT16 word)
 {
 	if (word > 127)
 		return 127;
@@ -1209,7 +1209,7 @@ INLINE INT8 SaturatedSignedWordToSignedByte(INT16 word)
 	return (INT8)word;
 }
 
-INLINE UINT8 SaturatedSignedWordToUnsignedByte(INT16 word)
+static inline UINT8 SaturatedSignedWordToUnsignedByte(INT16 word)
 {
 	if (word > 255)
 		return 255;
@@ -1218,7 +1218,7 @@ INLINE UINT8 SaturatedSignedWordToUnsignedByte(INT16 word)
 	return (UINT8)word;
 }
 
-INLINE INT16 SaturatedSignedDwordToSignedWord(INT32 dword)
+static inline INT16 SaturatedSignedDwordToSignedWord(INT32 dword)
 {
 	if (dword > 32767)
 		return 32767;
@@ -1227,7 +1227,7 @@ INLINE INT16 SaturatedSignedDwordToSignedWord(INT32 dword)
 	return (INT16)dword;
 }
 
-INLINE UINT16 SaturatedSignedDwordToUnsignedWord(INT32 dword)
+static inline UINT16 SaturatedSignedDwordToUnsignedWord(INT32 dword)
 {
 	if (dword > 65535)
 		return 65535;
@@ -2165,7 +2165,7 @@ void i386_device::i386_cyrix_rsldt() // Opcode 0f 7b
 
 			memset(&seg, 0, sizeof(seg));
 			seg.selector = READ16(ea + 8);
-			i386_load_protected_mode_segment(&seg,NULL);
+			i386_load_protected_mode_segment(&seg,nullptr);
 			m_ldtr.limit = limit;
 			m_ldtr.base = base;
 			m_ldtr.flags = flags;
@@ -2870,7 +2870,7 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 				WRITE32(ea, m_mxcsr);
 				break;
 			case 7: // clflush m8
-				GetNonTranslatedEA(modm, NULL);
+				GetNonTranslatedEA(modm, nullptr);
 				break;
 			default:
 				report_invalid_modrm("sse_group_0fae", modm);
@@ -3786,7 +3786,7 @@ void i386_device::sse_subps() // Opcode 0f 5c
 	CYCLES(1);     // TODO: correct cycle count
 }
 
-INLINE float sse_min_single(float src1, float src2)
+static inline float sse_min_single(float src1, float src2)
 {
 	/*if ((src1 == 0) && (src2 == 0))
 	    return src2;
@@ -3799,7 +3799,7 @@ INLINE float sse_min_single(float src1, float src2)
 	return src2;
 }
 
-INLINE double sse_min_double(double src1, double src2)
+static inline double sse_min_double(double src1, double src2)
 {
 	/*if ((src1 == 0) && (src2 == 0))
 	    return src2;
@@ -3852,7 +3852,7 @@ void i386_device::sse_divps() // Opcode 0f 5e
 	CYCLES(1);     // TODO: correct cycle count
 }
 
-INLINE float sse_max_single(float src1, float src2)
+static inline float sse_max_single(float src1, float src2)
 {
 	/*if ((src1 == 0) && (src2 == 0))
 	    return src2;
@@ -3865,7 +3865,7 @@ INLINE float sse_max_single(float src1, float src2)
 	return src2;
 }
 
-INLINE double sse_max_double(double src1, double src2)
+static inline double sse_max_double(double src1, double src2)
 {
 	/*if ((src1 == 0) && (src2 == 0))
 	    return src2;
@@ -4333,25 +4333,25 @@ void i386_device::sse_unpckhpd_r128_rm128() // Opcode 66 0f 15
 	CYCLES(1);     // TODO: correct cycle count
 }
 
-INLINE bool sse_issingleordered(float op1, float op2)
+static inline bool sse_issingleordered(float op1, float op2)
 {
 	// TODO: true when at least one of the two source operands being compared is a NaN
 	return (op1 != op1) || (op1 != op2);
 }
 
-INLINE bool sse_issingleunordered(float op1, float op2)
+static inline bool sse_issingleunordered(float op1, float op2)
 {
 	// TODO: true when neither source operand is a NaN
 	return !((op1 != op1) || (op1 != op2));
 }
 
-INLINE bool sse_isdoubleordered(double op1, double op2)
+static inline bool sse_isdoubleordered(double op1, double op2)
 {
 	// TODO: true when at least one of the two source operands being compared is a NaN
 	return (op1 != op1) || (op1 != op2);
 }
 
-INLINE bool sse_isdoubleunordered(double op1, double op2)
+static inline bool sse_isdoubleunordered(double op1, double op2)
 {
 	// TODO: true when neither source operand is a NaN
 	return !((op1 != op1) || (op1 != op2));

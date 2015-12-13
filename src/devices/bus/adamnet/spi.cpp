@@ -80,7 +80,7 @@ static MACHINE_CONFIG_FRAGMENT( adam_spi )
 
 	MCFG_DEVICE_ADD(MC2661_TAG, MC2661, XTAL_4_9152MHz)
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")

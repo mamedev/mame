@@ -126,7 +126,7 @@ static char *effective_address( psxcpu_state *state, UINT32 pc, UINT32 op )
 {
 	static char s_address[ 20 ];
 
-	if( state != NULL && state->pc() == pc )
+	if( state != nullptr && state->pc() == pc )
 	{
 		sprintf( s_address, "%s(%s) ; 0x%08x", make_signed_hex_str_16( INS_IMMEDIATE( op ) ), s_cpugenreg[ INS_RS( op ) ],
 			(UINT32)( state->r( INS_RS( op ) ) + (INT16)INS_IMMEDIATE( op ) ) );
@@ -139,7 +139,7 @@ static char *effective_address( psxcpu_state *state, UINT32 pc, UINT32 op )
 static UINT32 relative_address( psxcpu_state *state, UINT32 pc, UINT32 op )
 {
 	UINT32 nextpc = pc + 4;
-	if( state != NULL && state->pc() == pc && state->delayr() == PSXCPU_DELAYR_PC )
+	if( state != nullptr && state->pc() == pc && state->delayr() == PSXCPU_DELAYR_PC )
 	{
 		nextpc = state->delayv();
 	}
@@ -150,7 +150,7 @@ static UINT32 relative_address( psxcpu_state *state, UINT32 pc, UINT32 op )
 static UINT32 jump_address( psxcpu_state *state, UINT32 pc, UINT32 op )
 {
 	UINT32 nextpc = pc + 4;
-	if( state != NULL && state->pc() == pc && state->delayr() == PSXCPU_DELAYR_PC )
+	if( state != nullptr && state->pc() == pc && state->delayr() == PSXCPU_DELAYR_PC )
 	{
 		nextpc = state->delayv();
 	}
@@ -676,5 +676,5 @@ unsigned DasmPSXCPU( psxcpu_state *state, char *buffer, UINT32 pc, const UINT8 *
 
 CPU_DISASSEMBLE( psxcpu_generic )
 {
-	return DasmPSXCPU( NULL, buffer, pc, opram );
+	return DasmPSXCPU( nullptr, buffer, pc, opram );
 }

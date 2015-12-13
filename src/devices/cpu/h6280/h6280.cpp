@@ -263,9 +263,9 @@ void h6280_device::device_start()
 	m_icount = 0;
 
 	/* clear pending interrupts */
-	for (int i = 0; i < 3; i++)
+	for (auto & elem : m_irq_state)
 	{
-		m_irq_state[i] = CLEAR_LINE;
+		elem = CLEAR_LINE;
 	}
 	m_nmi_state = CLEAR_LINE;
 }

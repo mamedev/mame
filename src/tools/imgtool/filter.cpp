@@ -25,7 +25,7 @@ INT64 filter_get_info_int(filter_getinfoproc get_info, UINT32 state)
 void *filter_get_info_ptr(filter_getinfoproc get_info, UINT32 state)
 {
 	union filterinfo info;
-	info.p = NULL;
+	info.p = nullptr;
 	get_info(state, &info);
 	return info.p;
 }
@@ -33,7 +33,7 @@ void *filter_get_info_ptr(filter_getinfoproc get_info, UINT32 state)
 void *filter_get_info_fct(filter_getinfoproc get_info, UINT32 state)
 {
 	union filterinfo info;
-	info.f = NULL;
+	info.f = nullptr;
 	get_info(state, &info);
 	return info.f;
 }
@@ -41,7 +41,7 @@ void *filter_get_info_fct(filter_getinfoproc get_info, UINT32 state)
 const char *filter_get_info_string(filter_getinfoproc get_info, UINT32 state)
 {
 	union filterinfo info;
-	info.s = NULL;
+	info.s = nullptr;
 	get_info(state, &info);
 	return info.s;
 }
@@ -61,7 +61,7 @@ const filter_getinfoproc filters[] =
 	filter_thombas128_getinfo,
 	filter_thomcrypt_getinfo,
 	filter_bml3bas_getinfo,
-	NULL
+	nullptr
 };
 
 
@@ -78,5 +78,5 @@ filter_getinfoproc filter_lookup(const char *name)
 			return filters[i];
 	}
 
-	return NULL;
+	return nullptr;
 }

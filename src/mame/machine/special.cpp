@@ -244,7 +244,7 @@ WRITE_LINE_MEMBER( special_state::fdc_drq )
 WRITE8_MEMBER( special_state::specimx_disk_ctrl_w )
 {
 	static const char *names[] = { "fd0", "fd1"};
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 	floppy_connector *con = machine().device<floppy_connector>(names[m_drive & 1]);
 	if(con)
 		floppy = con->get_device();

@@ -44,9 +44,9 @@ public:
 	static const int K1GE_SCREEN_HEIGHT = 199;
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	devcb_write_line m_vblank_pin_w;
 	devcb_write_line m_hblank_pin_w;
@@ -74,9 +74,9 @@ public:
 
 	DECLARE_PALETTE_INIT(k2ge);
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void draw(int line);
+	virtual void draw(int line) override;
 
 	void draw_scroll_plane( UINT16 *p, UINT16 base, int line, int scroll_x, int scroll_y, UINT16 pal_base );
 	void draw_sprite_plane( UINT16 *p, UINT16 priority, int line, int scroll_x, int scroll_y );

@@ -791,7 +791,7 @@ INTERRUPT_GEN_MEMBER(segas32_state::start_of_vblank_int)
 	machine().scheduler().timer_set(m_screen->time_until_pos(0), timer_expired_delegate(FUNC(segas32_state::end_of_vblank_int),this));
 	if (m_system32_prot_vblank)
 		(this->*m_system32_prot_vblank)();
-	if (m_s32comm != NULL)
+	if (m_s32comm != nullptr)
 		m_s32comm->check_vint_irq();
 }
 
@@ -4921,10 +4921,10 @@ void segas32_state::segas32_common_init(read16_delegate custom_r, write16_delega
 	/* reset the custom handlers and other pointers */
 	m_custom_io_r[0] = custom_r;
 	m_custom_io_w[0] = custom_w;
-	m_system32_prot_vblank = NULL;
-	m_sw1_output = NULL;
-	m_sw2_output = NULL;
-	m_sw3_output = NULL;
+	m_system32_prot_vblank = nullptr;
+	m_sw1_output = nullptr;
+	m_sw2_output = nullptr;
+	m_sw3_output = nullptr;
 }
 
 
@@ -5203,8 +5203,8 @@ void segas32_state::init_arescue(int m_hasdsp)
 	segas32_common_init(read16_delegate(FUNC(segas32_state::analog_custom_io_r),this), write16_delegate(FUNC(segas32_state::analog_custom_io_w),this));
 	if (m_hasdsp) m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00007, read16_delegate(FUNC(segas32_state::arescue_dsp_r),this), write16_delegate(FUNC(segas32_state::arescue_dsp_w),this));
 
-	for (int i = 0; i < 6; i++)
-		m_arescue_dsp_io[i] = 0x00;
+	for (auto & elem : m_arescue_dsp_io)
+		elem = 0x00;
 
 	m_sw1_output = &segas32_state::arescue_sw1_output;
 }

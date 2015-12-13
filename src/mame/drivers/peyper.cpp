@@ -64,7 +64,7 @@ public:
 private:
 	UINT8 m_digit;
 	UINT8 m_disp_layout[36];
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<4> m_switch;
 };

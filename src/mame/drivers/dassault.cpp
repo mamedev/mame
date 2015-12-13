@@ -53,7 +53,7 @@ Notes:
  M6295(2) - OKI M6295 4-Channel Mixing ADPCM Voice Synthesis LSI. Clock input 1.000MHz [32/32]. Pin 7 HIGH (QFP44)
    YM2203 - Yamaha YM2203C FM Operator Type-N(OPN). Clock input 4.000MHz [32/8] (DIP40)
    YM2151 - Yamaha YM2151 FM Operator Type-M(OPM). Clock input 3.55556MHz comes from a 74F163 on pin 12. F163 input pin 2 is 32MHz (DIP24)
-   YM3012 - Yamaha YM3012 2-Channel Serial Input Floating D/A Converter (DIP16) 
+   YM3012 - Yamaha YM3012 2-Channel Serial Input Floating D/A Converter (DIP16)
    YM3014 - Yamaha YM3014 Serial Input Floating D/A Converter (DIP8)
      6116 - 2kx8 SRAM (DIP24)
      6264 - 8kx8 SRAM (DIP28)
@@ -65,7 +65,7 @@ GT* & GZ* - EPROMs
      3403 - NEC uPC3403C Quad Operational Amplifier (DIP14)
 RCDM-I111 - Custom Data East resistor array
   SW1/2/3 - 8-position DIP switch (2 populated, SW3 unpopulated)
-    HSYNC - 15.80464kHz 
+    HSYNC - 15.80464kHz
     VSYNC - 58.1052Hz
 
 Sub PCB:
@@ -95,15 +95,15 @@ Notes:
             (some PCBs may use a 28.0MHz oscillator)
        59 - 68000-based CPU (in custom QFP64 package) disguised as Data East chip 59. Clock input 14.161MHz [28.322/2] (QFP64)
        52 - Data East custom chip 52 graphic generator IC (QFP128)
-   MB7138 - Fujitsu MB7138 Bi-Polar PROM marked 'GR-1' (DIP24)  
+   MB7138 - Fujitsu MB7138 Bi-Polar PROM marked 'GR-1' (DIP24)
      6116 - 2kx8 SRAM (DIP24)
      6264 - 8kx8 SRAM (DIP28)
      MAJ* - Mask ROMs
 GT* & GZ* - EPROMs
    MB8421 - Fujitsu MB8421 CMOS 16k-bit Dual-port SRAM (SDIP52)
    MB8431 - Fujitsu MB8431 CMOS 16k-bit Dual-port SRAM (SDIP52)
- 
-***************************************************************************   
+
+***************************************************************************
 
 Stephh's notes (based on the games M68000 code and some tests) :
 

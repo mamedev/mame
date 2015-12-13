@@ -49,7 +49,7 @@ static const char *const pulsar_sample_names[] =
 	"birth",
 	"hbeat",
 	"movmaze",
-	0
+	nullptr
 };
 
 

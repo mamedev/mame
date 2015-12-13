@@ -81,9 +81,9 @@ public:
 	DECLARE_WRITE16_MEMBER(midas_eeprom_w);
 	DECLARE_WRITE16_MEMBER(midas_zoomtable_w);
 	DECLARE_DRIVER_INIT(livequiz);
-	virtual void video_start();
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void video_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 
 	UINT32 screen_update_midas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

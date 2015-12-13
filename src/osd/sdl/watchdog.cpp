@@ -38,7 +38,7 @@ static void *watchdog_thread(void *param)
 			osd_process_kill();
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 watchdog::watchdog(void)

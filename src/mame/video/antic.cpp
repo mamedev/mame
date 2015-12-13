@@ -28,7 +28,7 @@ const device_type ATARI_ANTIC = &device_creator<antic_device>;
 antic_device::antic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 				device_t(mconfig, ATARI_ANTIC, "Atari ANTIC", tag, owner, clock, "antic", __FILE__),
 				device_video_interface(mconfig, *this),
-				m_gtia_tag(NULL),
+				m_gtia_tag(nullptr),
 				m_maincpu(*this, ":maincpu"),
 				m_djoy_b(*this, ":djoy_b"),
 				m_artifacts(*this, ":artifacts"),
@@ -96,8 +96,8 @@ void antic_device::device_start()
 	LOG(("atari cclk_init\n"));
 	cclk_init();
 
-	for (int i = 0; i < 64; i++)
-		m_prio_table[i] = auto_alloc_array_clear(machine(), UINT8, 8*256);
+	for (auto & elem : m_prio_table)
+		elem = auto_alloc_array_clear(machine(), UINT8, 8*256);
 
 	LOG(("atari prio_init\n"));
 	prio_init();
@@ -1655,7 +1655,7 @@ void antic_device::linerefresh()
 	dst[2] = color_lookup[PBK] | color_lookup[PBK] << 16;
 	dst[3] = color_lookup[PBK] | color_lookup[PBK] << 16;
 
-	draw_scanline8(*m_bitmap, 12, y, MIN(m_bitmap->width() - 12, sizeof(scanline)), (const UINT8 *) scanline, NULL);
+	draw_scanline8(*m_bitmap, 12, y, MIN(m_bitmap->width() - 12, sizeof(scanline)), (const UINT8 *) scanline, nullptr);
 }
 
 

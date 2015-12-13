@@ -101,7 +101,7 @@ static const UINT16 m_p_n_prevpointlist3[] = { 2, 0, 1 };
 #define TEXTURE_V( a ) ( a.b.h )
 #define TEXTURE_U( a ) ( a.b.l )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
+static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -568,7 +568,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	}
 
 	// icky!!!
-	machine().save().save_memory( this, "globals", NULL, 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
+	machine().save().save_memory( this, "globals", nullptr, 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
 
 	save_pointer(NAME(p_vram), width * height );
 	save_item(NAME(n_gpu_buffer_offset));
@@ -752,7 +752,7 @@ UINT32 psxgpu_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap,
 			n_line = n_lines;
 			while( n_line > 0 )
 			{
-				draw_scanline16( bitmap, n_x + n_left, n_y + n_top, n_columns, p_p_vram[ ( n_y + n_displaystarty ) & 1023 ] + n_x + n_displaystartx, NULL );
+				draw_scanline16( bitmap, n_x + n_left, n_y + n_top, n_columns, p_p_vram[ ( n_y + n_displaystarty ) & 1023 ] + n_x + n_displaystartx, nullptr );
 				n_y++;
 				n_line--;
 			}
@@ -1282,7 +1282,7 @@ void psxgpu_device::decode_tpage( UINT32 tpage )
 	a.sw.l = SINT11( COORD_X( a ) ); \
 	a.sw.h = SINT11( COORD_Y( a ) );
 
-INLINE int CullVertex( int a, int b )
+static inline int CullVertex( int a, int b )
 {
 	int d = a - b;
 	if( d < -1023 || d > 1023 )

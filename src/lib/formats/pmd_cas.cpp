@@ -181,7 +181,7 @@ static int pmd85_cassette_calculate_size_in_samples(const UINT8 *bytes, int leng
 {
 	pmd85_image_size = length;
 
-	return pmd85_handle_cassette(NULL, bytes);
+	return pmd85_handle_cassette(nullptr, bytes);
 }
 
 static const struct CassetteLegacyWaveFiller pmd85_legacy_fill_wave =
@@ -210,7 +210,7 @@ static const struct CassetteFormat pmd85_cassette_image_format =
 	"pmd,tap,ptp",
 	pmd85_cassette_identify,
 	pmd85_cassette_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(pmd85_cassette_formats)

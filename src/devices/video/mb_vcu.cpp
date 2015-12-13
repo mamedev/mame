@@ -97,7 +97,7 @@ const address_space_config *mb_vcu_device::memory_space_config(address_spacenum 
 	{
 		case AS_0: return &m_videoram_space_config;
 		case AS_1: return &m_paletteram_space_config;
-		default: return NULL;
+		default: return nullptr;
 	}
 }
 
@@ -154,8 +154,8 @@ mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, MB_VCU, "Mazer Blazer custom VCU", tag, owner, clock, "mb_vcu", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_vram)),
-		m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_pal_ram)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, nullptr, *ADDRESS_MAP_NAME(mb_vcu_vram)),
+		m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mb_vcu_pal_ram)),
 		m_cpu(*this),
 		m_palette(*this)
 {

@@ -264,7 +264,7 @@ void lisa_state::scan_keyboard()
 {
 	int i, j;
 	UINT8 keycode;
-	UINT8 keybuf[8] = { m_io_line0->read(), m_io_line1->read(), m_io_line2->read(), m_io_line3->read(),
+	UINT32 keybuf[8] = { m_io_line0->read(), m_io_line1->read(), m_io_line2->read(), m_io_line3->read(),
 						m_io_line4->read(), m_io_line5->read(), m_io_line6->read(), m_io_line7->read() };
 
 	if (! m_COPS_force_unplug)

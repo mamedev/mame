@@ -54,7 +54,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 };

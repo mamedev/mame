@@ -62,18 +62,18 @@ isa8_aga_device::isa8_aga_device(const machine_config &mconfig, const char *tag,
 		m_palette(*this, "palette"),
 		m_mc6845(*this, AGA_MC6845_NAME),
 		m_cga_config(*this, "cga_config"),
-		m_update_row_type(-1), 
+		m_update_row_type(-1),
 		m_mode(),
 		m_mda_mode_control(0),
-		m_mda_status(0), 
+		m_mda_status(0),
 		m_mda_chr_gen(nullptr),
 		m_cga_mode_control(0),
 		m_cga_color_select(0),
-		m_cga_status(0), 
+		m_cga_status(0),
 		m_cga_chr_gen(nullptr),
 		m_framecnt(0),
 		m_vsync(0),
-		m_hsync(0), 
+		m_hsync(0),
 		m_videoram(nullptr)
 {
 }
@@ -101,7 +101,7 @@ isa8_aga_device::isa8_aga_device(const machine_config &mconfig, device_type type
 
 void isa8_aga_device::device_start()
 {
-	if (m_palette != NULL && !m_palette->started())
+	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
 	m_mode = AGA_COLOR;
@@ -188,7 +188,7 @@ const rom_entry *isa8_aga_pc200_device::device_rom_region() const
 
 void isa8_aga_pc200_device::device_start()
 {
-	if (m_palette != NULL && !m_palette->started())
+	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
 	m_mode = AGA_COLOR;

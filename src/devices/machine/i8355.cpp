@@ -99,7 +99,7 @@ i8355_device::i8355_device(const machine_config &mconfig, const char *tag, devic
 		m_out_pa_cb(*this),
 		m_in_pb_cb(*this),
 		m_out_pb_cb(*this),
-		m_space_config("ram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(i8355))
+		m_space_config("ram", ENDIANNESS_LITTLE, 8, 11, 0, nullptr, *ADDRESS_MAP_NAME(i8355))
 {
 }
 
@@ -140,7 +140,7 @@ void i8355_device::device_reset()
 
 const address_space_config *i8355_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 

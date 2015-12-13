@@ -529,16 +529,16 @@ class funcube_touchscreen_device : public device_t,
 public:
 	funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object) { return downcast<funcube_touchscreen_device &>(device).m_tx_cb.set_callback(object); }
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual void tra_complete();
-	virtual void tra_callback();
+	virtual void tra_complete() override;
+	virtual void tra_callback() override;
 
 private:
 	devcb_write_line m_tx_cb;
@@ -2720,7 +2720,7 @@ ROM_START( gundamex )
 	ROM_LOAD( "ka001006.u21",  0x1000000, 0x200000, CRC(6aac2f2f) SHA1(fac5478ca2941a93c57f670a058ff626e537bcde) )
 	ROM_LOAD( "ka001007.u22",  0x1200000, 0x200000, CRC(588f9d63) SHA1(ed5148d09d02e3bc12c50c39c5c86e6356b2dd7a) )
 	ROM_LOAD( "ka001008.u23",  0x1400000, 0x200000, CRC(db55a60a) SHA1(03d118c7284ca86219891c473e2a89489710ea27) )
-	ROM_FILL(                  0x1800000, 0x600000, 0 ) // 6bpp instead of 8bpp
+	ROM_FILL(                  0x1800000, 0x600000, 0x00 ) // 6bpp instead of 8bpp
 
 	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
 	// Leave 1MB empty (addressable by the chip)
@@ -2759,7 +2759,7 @@ ROM_START( mj4simai )
 	ROM_LOAD( "cha-06.u17",  0x0c00000, 0x400000, CRC(5cb0b3a9) SHA1(92fb82d45b4c46326d5796981f812e20a8ddb4f2) )
 	ROM_LOAD( "cha-01.u21",  0x1000000, 0x400000, CRC(35f47b37) SHA1(4a8eb088890272f2a069e2c3f00fadf6421f7b0e) )
 	ROM_LOAD( "cha-02.u22",  0x1400000, 0x400000, CRC(f6346860) SHA1(4eebd3fa315b97964fa39b88224f9de7622ba881) )
-	ROM_FILL(                0x1800000, 0x800000, 0 )   // 6bpp instead of 8bpp
+	ROM_FILL(                0x1800000, 0x800000, 0x00 )   // 6bpp instead of 8bpp
 
 	ROM_REGION( 0x500000, "x1snd", 0 )  // Samples
 	// Leave 1MB empty (addressable by the chip)
@@ -3035,7 +3035,7 @@ ROM_START( penbros )
 	ROM_LOAD( "u38.bin", 0x000000, 0x400000, CRC(4247b39e) SHA1(f273931293beced312e02c870bf35e9cf0c91a8b) )
 	ROM_LOAD( "u39.bin", 0x400000, 0x400000, CRC(f9f07faf) SHA1(66fc4a9ad422fb384d2c775e43619137226898fc) )
 	ROM_LOAD( "u40.bin", 0x800000, 0x400000, CRC(dc9e0a96) SHA1(c2c8ccf9039ee0e179b08fdd2d37f29899349cda) )
-	ROM_FILL(            0xc00000, 0x400000, 0 )    // 6bpp instead of 8bpp
+	ROM_FILL(            0xc00000, 0x400000, 0x00 )    // 6bpp instead of 8bpp
 
 	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
 	// Leave 1MB empty (addressable by the chip)

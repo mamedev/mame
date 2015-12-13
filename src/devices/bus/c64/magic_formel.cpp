@@ -139,7 +139,7 @@ INPUT_CHANGED_MEMBER( c64_magic_formel_cartridge_device::freeze )
 
 static INPUT_PORTS_START( c64_magic_formel )
 	PORT_START("FREEZE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, c64_magic_formel_cartridge_device, freeze, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, c64_magic_formel_cartridge_device, freeze, nullptr)
 INPUT_PORTS_END
 
 

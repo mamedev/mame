@@ -201,8 +201,8 @@ void wd7600_device::device_reset()
 	m_memory_ctrl = 0;
 	m_diagnostic = 0xe080;
 
-	for(int x=0;x<4;x++)
-		m_bank_start[x] = 0;
+	for(auto & elem : m_bank_start)
+		elem = 0;
 
 	// initialize dma controller clocks
 	m_dma1->set_unscaled_clock(clock());

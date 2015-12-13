@@ -66,7 +66,7 @@
 #define ENABLE_VERBOSE_LOG (0)
 
 #if ENABLE_VERBOSE_LOG
-INLINE void ATTR_PRINTF(3,4) verboselog(UINT16 pc, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog(UINT16 pc, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -638,8 +638,8 @@ avr8_device::avr8_device(const machine_config &mconfig, const char *name, const 
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 22),
 		m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 4),
-		m_eeprom_tag(NULL),
-		m_eeprom(NULL),
+		m_eeprom_tag(nullptr),
+		m_eeprom(nullptr),
 		m_cpu_type(cpu_type),
 		m_lfuses(0x62),
 		m_hfuses(0x99),
@@ -855,9 +855,9 @@ void avr8_device::device_reset()
 	logerror("AVR Boot loader section size: %d words\n", m_boot_size);
 	}
 
-	for (int i = 0; i < 0x200; i++)
+	for (auto & elem : m_r)
 	{
-		m_r[i] = 0;
+		elem = 0;
 	}
 
 	m_spi_active = false;
@@ -896,7 +896,7 @@ const address_space_config *avr8_device::memory_space_config(address_spacenum sp
 	{
 		return &m_io_config;
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1315,8 +1315,8 @@ void avr8_device::timer1_tick()
 	// Cache things in array form to avoid a compare+branch inside a potentially high-frequency timer
 	//UINT8 compare_mode[2] = { (m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1A_MASK) >> AVR8_TCCR1A_COM1A_SHIFT,
 								//(m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1B_MASK) >> AVR8_TCCR1A_COM1B_SHIFT };
-	UINT16 ocr1[2] = { (m_r[AVR8_REGIDX_OCR1AH] << 8) | m_r[AVR8_REGIDX_OCR1AL],
-						(m_r[AVR8_REGIDX_OCR1BH] << 8) | m_r[AVR8_REGIDX_OCR1BL] };
+	UINT16 ocr1[2] = { static_cast<UINT16>((m_r[AVR8_REGIDX_OCR1AH] << 8) | m_r[AVR8_REGIDX_OCR1AL]),
+					   static_cast<UINT16>((m_r[AVR8_REGIDX_OCR1BH] << 8) | m_r[AVR8_REGIDX_OCR1BL]) };
 	UINT8 ocf1[2] = { (1 << AVR8_TIFR1_OCF1A_SHIFT), (1 << AVR8_TIFR1_OCF1B_SHIFT) };
 	UINT8 int1[2] = { AVR8_INTIDX_OCF1A, AVR8_INTIDX_OCF1B };
 	INT32 increment = m_timer_increment[1];
@@ -1711,8 +1711,8 @@ void avr8_device::timer4_tick()
 	// Cache things in array form to avoid a compare+branch inside a potentially high-frequency timer
 	//UINT8 compare_mode[2] = { (m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1A_MASK) >> AVR8_TCCR1A_COM1A_SHIFT,
 								//(m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1B_MASK) >> AVR8_TCCR1A_COM1B_SHIFT };
-	UINT16 ocr4[2] = { (m_r[AVR8_REGIDX_OCR4AH] << 8) | m_r[AVR8_REGIDX_OCR4AL],
-						(m_r[AVR8_REGIDX_OCR4BH] << 8) | m_r[AVR8_REGIDX_OCR4BL] };
+	UINT16 ocr4[2] = { static_cast<UINT16>((m_r[AVR8_REGIDX_OCR4AH] << 8) | m_r[AVR8_REGIDX_OCR4AL]),
+					   static_cast<UINT16>((m_r[AVR8_REGIDX_OCR4BH] << 8) | m_r[AVR8_REGIDX_OCR4BL]) };
 //TODO  UINT8 ocf4[2] = { (1 << AVR8_TIFR4_OCF4A_SHIFT), (1 << AVR8_TIFR4_OCF4B_SHIFT) };
 //TODO  UINT8 int4[2] = { AVR8_INTIDX_OCF4A, AVR8_INTIDX_OCF4B };
 	INT32 increment = m_timer_increment[4];

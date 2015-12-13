@@ -55,8 +55,8 @@ public:
 	emu_timer *m_test_timer;
 	bitmap_rgb32 m_lcdbitmap;
 	DECLARE_INPUT_CHANGED_MEMBER(mcu_input);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(cdi);
 	DECLARE_MACHINE_RESET(quizard12);
 	DECLARE_MACHINE_RESET(quizard17);

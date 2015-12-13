@@ -138,9 +138,9 @@ public:
 	static void static_set_reverse_rw_mode(device_t &device, bool flag) { downcast<i8257_device &>(device).m_reverse_rw = flag; }
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void execute_run();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void execute_run() override;
 
 	int m_icount;
 

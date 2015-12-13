@@ -279,7 +279,7 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap )
 			int pal_base = ((attributes&0xf)+0x10)*16;
 			int height  = 16<<((attributes>>6)&0x3);
 			int width   = 16<<((attributes>>4)&0x3);
-			const UINT16 *pen_data = 0;
+			const UINT16 *pen_data = nullptr;
 			int flipy = attributes&0x0200;
 			int flipx = attributes&0x0100;
 

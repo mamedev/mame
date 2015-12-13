@@ -71,8 +71,8 @@ public:
 	required_ioport m_y7;
 	required_ioport m_battery;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void check_interrupt();
 	void trigger_interrupt(int level);

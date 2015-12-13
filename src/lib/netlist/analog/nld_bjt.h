@@ -47,9 +47,9 @@ public:
 	inline bool is_qtype(q_type atype) const { return m_qtype == atype; }
 	inline void set_qtype(q_type atype) { m_qtype = atype; }
 protected:
-	virtual void start();
-	virtual void reset();
-	ATTR_HOT void update();
+	virtual void start() override;
+	virtual void reset() override;
+	ATTR_HOT void update() override;
 
 	param_model_t m_model;
 private:
@@ -102,7 +102,7 @@ public:
 		m_gB(NETLIST_GMIN_DEFAULT), m_gC(NETLIST_GMIN_DEFAULT), m_V(0.0), m_state_on(0) { }
 
 
-	ATTR_HOT void virtual update();
+	ATTR_HOT void virtual update() override;
 
 	nld_twoterm m_RB;
 	nld_twoterm m_RC;
@@ -113,9 +113,9 @@ public:
 
 protected:
 
-	virtual void start();
-	ATTR_HOT virtual void update_param();
-	virtual void reset();
+	virtual void start() override;
+	ATTR_HOT virtual void update_param() override;
+	virtual void reset() override;
 	NETLIB_UPDATE_TERMINALSI();
 
 	nl_double m_gB; // base conductance / switch on
@@ -145,10 +145,10 @@ public:
 
 protected:
 
-	virtual void start();
-	virtual void reset();
-	ATTR_HOT void update_param();
-	ATTR_HOT void virtual update();
+	virtual void start() override;
+	virtual void reset() override;
+	ATTR_HOT void update_param() override;
+	ATTR_HOT void virtual update() override;
 	NETLIB_UPDATE_TERMINALSI();
 
 	generic_diode m_gD_BC;

@@ -37,6 +37,8 @@ TODO:
  a match in particular circumstances because there's a write in the 94000-9bfff region;
 -Massive clean-ups needed for the MCU snippet programs and the input-ports, also check if
  the programs are actually into the m68k program itself (like hachamf/tdragon/ddealer);
+-Video code could be optimized too (for example by calling the priority function only when 
+ priority number is updated), might also need a merging with Jaleco Mega System 1/NMK16 drivers;
 
 Notes (1st MCU ver.):
 -$f000e is bogus,maybe the program snippets can modify this value,or the MCU itself can
@@ -206,8 +208,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc3_tile_info);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(urashima);
 	UINT32 screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1708,13 +1710,13 @@ ROM_START( suchipi )
 	ROM_LOAD( "4.bin", 0x80000, 0x80000, CRC(3fe932a1) SHA1(9e768b901738ee9eba207a67c4fd19efb0035a68) )
 
 	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* Samples */
-	ROM_COPY( "oki_data" , 0x00000, 0x000000+0x00000, 0x40000 )
+	ROM_COPY( "oki_data" , 0x000000, 0x000000+0x00000, 0x40000 )
 
 	/* PAL address shuffling for the BGM data (TODO: check this with a side-by-side test)*/
 	ROM_COPY( "oki_data" , 0x20000, 0x000000+0x40000, 0x20000 ) // 0
 	ROM_COPY( "oki_data" , 0x40000, 0x020000+0x40000, 0x20000 ) // 1
 	ROM_COPY( "oki_data" , 0x60000, 0x040000+0x40000, 0x20000 ) // 2
-	ROM_COPY( "oki_data" , 0x00000, 0x060000+0x40000, 0x20000 ) // 3
+	ROM_COPY( "oki_data" , 0x000000, 0x060000+0x40000, 0x20000 ) // 3
 
 	ROM_COPY( "oki_data" , 0x80000, 0x080000+0x40000, 0x40000 )
 	ROM_COPY( "oki_data" , 0xc0000, 0x0c0000+0x40000, 0x40000 )

@@ -1436,6 +1436,22 @@ if (CPUS["PDP1"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- PATINHO FEIO - Escola Politecnica - USP (Brazil)
+--@src/devices/cpu/patinhofeio/patinho_feio.h,CPUS["PATINHOFEIO"] = true
+--------------------------------------------------
+
+if (CPUS["PATINHOFEIO"]~=null) then
+    files {
+        MAME_DIR .. "src/devices/cpu/patinhofeio/patinho_feio.cpp",
+        MAME_DIR .. "src/devices/cpu/patinhofeio/patinho_feio.h",
+    }
+end
+
+if (CPUS["PATINHOFEIO"]~=null or _OPTIONS["with-tools"]) then
+    table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/patinhofeio/patinho_feio_dasm.cpp")
+end
+
+--------------------------------------------------
 -- Motorola PowerPC series
 --@src/devices/cpu/powerpc/ppc.h,CPUS["POWERPC"] = true
 --------------------------------------------------
@@ -1447,17 +1463,7 @@ if (CPUS["POWERPC"]~=null) then
 		MAME_DIR .. "src/devices/cpu/powerpc/ppcfe.cpp",
 		MAME_DIR .. "src/devices/cpu/powerpc/ppcfe.h",
 		MAME_DIR .. "src/devices/cpu/powerpc/ppcdrc.cpp",
-		
-		--MAME_DIR .. "src/devices/cpu/powerpc/drc_ops.cpp",
-		MAME_DIR .. "src/devices/cpu/powerpc/drc_ops.h",
-		--MAME_DIR .. "src/devices/cpu/powerpc/ppc.cpp",
 		MAME_DIR .. "src/devices/cpu/powerpc/ppc.h",
-		MAME_DIR .. "src/devices/cpu/powerpc/ppc403.inc",
-		MAME_DIR .. "src/devices/cpu/powerpc/ppc602.inc",
-		MAME_DIR .. "src/devices/cpu/powerpc/ppc603.inc",
-		MAME_DIR .. "src/devices/cpu/powerpc/ppc_mem.inc",
-		MAME_DIR .. "src/devices/cpu/powerpc/ppc_ops.h",
-		MAME_DIR .. "src/devices/cpu/powerpc/ppc_ops.inc",
 	}
 end
 
@@ -1895,7 +1901,6 @@ if (CPUS["TMS9900"]~=null) then
 		MAME_DIR .. "src/devices/cpu/tms9900/tms9995.h",
 		MAME_DIR .. "src/devices/cpu/tms9900/ti990_10.cpp",
 		MAME_DIR .. "src/devices/cpu/tms9900/ti990_10.h",
-		MAME_DIR .. "src/devices/cpu/tms9900/99xxcore.h",
 		MAME_DIR .. "src/devices/cpu/tms9900/tms99com.h",
 	}
 end

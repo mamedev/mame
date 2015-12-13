@@ -34,7 +34,7 @@ ds1204_device::ds1204_device( const machine_config &mconfig, const char *tag, de
 	device_nvram_interface(mconfig, *this),
 	m_rst( 0 ),
 	m_clk( 0 ),
-	m_dqw( 0 )
+	m_dqw( 0 ), m_dqr(0), m_state(0), m_bit(0)
 {
 }
 

@@ -102,7 +102,7 @@ void nubus_lview_device::device_start()
 	m_nubus->install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(FUNC(nubus_lview_device::vram_r), this), write32_delegate(FUNC(nubus_lview_device::vram_w), this));
 	m_nubus->install_device(slotspace+0xb0000, slotspace+0xbffff, read32_delegate(FUNC(nubus_lview_device::lview_r), this), write32_delegate(FUNC(nubus_lview_device::lview_w), this));
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(m_screen->time_until_pos(599, 0), 0);
 }
 

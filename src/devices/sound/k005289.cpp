@@ -56,12 +56,12 @@ const device_type K005289 = &device_creator<k005289_device>;
 k005289_device::k005289_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K005289, "K005289 SCC", tag, owner, clock, "k005289", __FILE__),
 		device_sound_interface(mconfig, *this),
-	m_sound_prom(NULL),
-	m_stream(NULL),
+	m_sound_prom(nullptr),
+	m_stream(nullptr),
 	m_rate(0),
-	m_mixer_table(NULL),
-	m_mixer_lookup(NULL),
-	m_mixer_buffer(NULL)
+	m_mixer_table(nullptr),
+	m_mixer_lookup(nullptr),
+	m_mixer_buffer(nullptr)
 {
 }
 

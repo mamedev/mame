@@ -88,9 +88,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_youjyudn_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_youjyudn_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_horizon_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(m62);
 	DECLARE_VIDEO_START(kungfum);
 	DECLARE_VIDEO_START(battroad);

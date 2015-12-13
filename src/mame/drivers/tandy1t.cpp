@@ -297,11 +297,11 @@ READ8_MEMBER(tandy1000_state::tandy1000_pio_r)
 
 void tandy1000_state::tandy1000_set_bios_bank()
 {
-	UINT8 *p = NULL;
+	UINT8 *p = nullptr;
 
-	assert( m_romcs0 != NULL );
-	assert( m_romcs1 != NULL );
-	assert( m_biosbank != NULL );
+	assert( m_romcs0 != nullptr );
+	assert( m_romcs1 != nullptr );
+	assert( m_biosbank != nullptr );
 
 	if ( m_tandy_bios_bank & 0x10 )
 	{
@@ -590,17 +590,17 @@ static MACHINE_CONFIG_START( t1000hx, tandy1000_state )
 	MCFG_FRAGMENT_ADD(tandy1000_common)
 
 	// plus cards are isa with a nonstandard conntector
-	MCFG_ISA8_SLOT_ADD("mb:isa", "plus1", pc_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "plus1", pc_isa8_cards, nullptr, false)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( t1000sx, t1000hx )
 	MCFG_DEVICE_MODIFY("isa_fdc")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_fdc_525)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, nullptr, false)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
@@ -622,10 +622,10 @@ static MACHINE_CONFIG_DERIVED( t1000_16_8, t1000_16 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( XTAL_24MHz / 3 )
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, nullptr, false)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( t1000_286, tandy1000_state )
@@ -636,11 +636,11 @@ static MACHINE_CONFIG_START( t1000_286, tandy1000_state )
 
 	MCFG_FRAGMENT_ADD(tandy1000_common)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, nullptr, false)
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_DEFINITION

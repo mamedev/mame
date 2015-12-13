@@ -3344,7 +3344,7 @@ static INPUT_PORTS_START( alpiner )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START ) // Decision / View Change
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY // L Selection
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_16WAY // R Selection
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state,alpine_motor_read, (void *)0) // steps are free
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state,alpine_motor_read, (void *)nullptr) // steps are free
 
 	PORT_START("MCUP5B")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state,alpine_motor_read, (void *)1) // steps are locked
@@ -3712,12 +3712,12 @@ static const gfx_layout namcos22_cg_layout =
 #undef XOR
 
 static GFXDECODE_START( namcos22 )
-	GFXDECODE_ENTRY( NULL,      0, namcos22_cg_layout,   0, 0x800 )
+	GFXDECODE_ENTRY( nullptr,      0, namcos22_cg_layout,   0, 0x800 )
 	GFXDECODE_ENTRY( "textile", 0, texture_tile_layout,  0, 0x80 )
 GFXDECODE_END
 
 static GFXDECODE_START( super )
-	GFXDECODE_ENTRY( NULL,      0, namcos22_cg_layout,   0, 0x800 )
+	GFXDECODE_ENTRY( nullptr,      0, namcos22_cg_layout,   0, 0x800 )
 	GFXDECODE_ENTRY( "textile", 0, texture_tile_layout,  0, 0x80 )
 	GFXDECODE_ENTRY( "sprite",  0, sprite_layout,        0, 0x80 )
 GFXDECODE_END
@@ -3874,8 +3874,8 @@ MACHINE_START_MEMBER(namcos22_state,adillor)
 {
 	machine_start();
 
-	for (int axis = 0; axis < 2; axis++)
-		m_ar_tb_interrupt[axis] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos22_state::adillor_trackball_interrupt),this));
+	for (auto & elem : m_ar_tb_interrupt)
+		elem = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos22_state::adillor_trackball_interrupt),this));
 }
 
 static MACHINE_CONFIG_DERIVED( adillor, namcos22s )

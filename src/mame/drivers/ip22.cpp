@@ -153,8 +153,8 @@ public:
 	DECLARE_WRITE32_MEMBER(hpc3_unkpbus0_w);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
 	DECLARE_DRIVER_INIT(ip225015);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(ip22_vbl);
 	TIMER_CALLBACK_MEMBER(ip22_dma);
 	TIMER_CALLBACK_MEMBER(ip22_timer);
@@ -167,7 +167,7 @@ public:
 	void rtc_update();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

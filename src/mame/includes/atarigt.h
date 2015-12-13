@@ -58,8 +58,8 @@ public:
 	UINT16          m_protresult;
 	UINT8           m_protdata[0x800];
 
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ32_MEMBER(special_port2_r);
 	DECLARE_READ32_MEMBER(special_port3_r);
 	DECLARE_READ32_MEMBER(analog_port0_r);

@@ -120,7 +120,7 @@ public:
 	required_ioport m_y8;
 	required_ioport m_battery;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	memory_region *m_opt_region;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -163,7 +163,7 @@ public:
 	trsm100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: kc85_state(mconfig, type, tag) { }
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 class pc8201_state : public kc85_state
@@ -174,7 +174,7 @@ public:
 			m_cas_cart(*this, "cas_cartslot")
 	{ }
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	required_device<generic_slot_device> m_cas_cart;
 
 	DECLARE_READ8_MEMBER( bank_r );
@@ -244,7 +244,7 @@ public:
 	required_ioport m_y7;
 	required_ioport m_y8;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	memory_region *m_opt_region;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

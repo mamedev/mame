@@ -31,18 +31,18 @@ public:
 	vp620_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// not really public
 	DECLARE_WRITE8_MEMBER( kb_w );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_vip_byteio_port_interface overrides
-	virtual UINT8 vip_in_r();
-	virtual int vip_ef4_r();
+	virtual UINT8 vip_in_r() override;
+	virtual int vip_ef4_r() override;
 
 private:
 	UINT8 m_keydata;

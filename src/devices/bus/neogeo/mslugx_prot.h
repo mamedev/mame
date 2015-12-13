@@ -28,14 +28,8 @@ public:
 	UINT16     m_mslugx_command;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-
-
-
-private:
-
-
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 #endif

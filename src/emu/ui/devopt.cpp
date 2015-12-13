@@ -27,7 +27,7 @@ ui_menu_device_config::ui_menu_device_config(running_machine &machine, render_co
 	m_mounted = false;
 
 	device_iterator deviter(machine.config().root_device());
-	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
 	{
 		if (strcmp(device->tag(), tmp_tag.c_str()) == 0)
 		{
@@ -58,10 +58,10 @@ void ui_menu_device_config::populate()
 	if (execiter.count() > 0)
 	{
 		str.append("* CPU:\n");
-		tagmap_t<UINT8> exectags;
-		for (device_execute_interface *exec = execiter.first(); exec != NULL; exec = execiter.next())
+		std::unordered_set<std::string> exectags;
+		for (device_execute_interface *exec = execiter.first(); exec != nullptr; exec = execiter.next())
 		{
-			if (exectags.add(exec->device().tag(), 1, FALSE) == TMERR_DUPLICATE)
+			if (!exectags.insert(exec->device().tag()).second)
 				continue;
 
 			// get cpu specific clock that takes internal multiplier/dividers into account
@@ -71,10 +71,10 @@ void ui_menu_device_config::populate()
 			int count = 1;
 			const char *name = exec->device().name();
 			execute_interface_iterator execinneriter(*dev);
-			for (device_execute_interface *scan = execinneriter.first(); scan != NULL; scan = execinneriter.next())
+			for (device_execute_interface *scan = execinneriter.first(); scan != nullptr; scan = execinneriter.next())
 			{
 				if (exec->device().type() == scan->device().type() && strcmp(name, scan->device().name()) == 0 && exec->device().clock() == scan->device().clock())
-					if (exectags.add(scan->device().tag(), 1, FALSE) != TMERR_DUPLICATE)
+					if (exectags.insert(scan->device().tag()).second)
 						count++;
 			}
 
@@ -98,7 +98,7 @@ void ui_menu_device_config::populate()
 	if (scriter.count() > 0)
 	{
 		str.append("* Video:\n");
-		for (screen_device *screen = scriter.first(); screen != NULL; screen = scriter.next())
+		for (screen_device *screen = scriter.first(); screen != nullptr; screen = scriter.next())
 		{
 			strcatprintf(str,"  Screen '%s': ", screen->tag());
 
@@ -121,19 +121,19 @@ void ui_menu_device_config::populate()
 	if (snditer.count() > 0)
 	{
 		str.append("* Sound:\n");
-		tagmap_t<UINT8> soundtags;
-		for (device_sound_interface *sound = snditer.first(); sound != NULL; sound = snditer.next())
+		std::unordered_set<std::string> soundtags;
+		for (device_sound_interface *sound = snditer.first(); sound != nullptr; sound = snditer.next())
 		{
-			if (soundtags.add(sound->device().tag(), 1, FALSE) == TMERR_DUPLICATE)
+			if (!soundtags.insert(sound->device().tag()).second)
 				continue;
 
 			// count how many identical sound chips we have
 			int count = 1;
 			sound_interface_iterator sndinneriter(*dev);
-			for (device_sound_interface *scan = sndinneriter.first(); scan != NULL; scan = sndinneriter.next())
+			for (device_sound_interface *scan = sndinneriter.first(); scan != nullptr; scan = sndinneriter.next())
 			{
 				if (sound->device().type() == scan->device().type() && sound->device().clock() == scan->device().clock())
-					if (soundtags.add(scan->device().tag(), 1, FALSE) != TMERR_DUPLICATE)
+					if (soundtags.insert(scan->device().tag()).second)
 						count++;
 			}
 			// if more than one, prepend a #x in front of the CPU name
@@ -184,12 +184,12 @@ void ui_menu_device_config::populate()
 	std::string errors, dips_opt, confs_opt;
 	ioport_list portlist;
 	device_iterator iptiter(*dev);
-	for (device_t *iptdev = iptiter.first(); iptdev != NULL; iptdev = iptiter.next())
+	for (device_t *iptdev = iptiter.first(); iptdev != nullptr; iptdev = iptiter.next())
 		portlist.append(*iptdev, errors);
 
 	// check if the device adds inputs to the system
-	for (ioport_port *port = portlist.first(); port != NULL; port = port->next())
-		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+	for (ioport_port *port = portlist.first(); port != nullptr; port = port->next())
+		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
 		{
 			if (field->type() >= IPT_MAHJONG_FIRST && field->type() < IPT_MAHJONG_LAST)
 				input_mj++;
@@ -211,7 +211,7 @@ void ui_menu_device_config::populate()
 			{
 				dips++;
 				dips_opt.append("  ").append(field->name());
-				for (ioport_setting *setting = field->first_setting(); setting != NULL; setting = setting->next())
+				for (ioport_setting *setting = field->first_setting(); setting != nullptr; setting = setting->next())
 				{
 					if (setting->value() == field->defvalue())
 					{
@@ -224,7 +224,7 @@ void ui_menu_device_config::populate()
 			{
 				confs++;
 				confs_opt.append("  ").append(field->name());
-				for (ioport_setting *setting = field->first_setting(); setting != NULL; setting = setting->next())
+				for (ioport_setting *setting = field->first_setting(); setting != nullptr; setting = setting->next())
 				{
 					if (setting->value() == field->defvalue())
 					{
@@ -262,7 +262,7 @@ void ui_menu_device_config::populate()
 	if (imgiter.count() > 0)
 	{
 		str.append("* Media Options:\n");
-		for (const device_image_interface *imagedev = imgiter.first(); imagedev != NULL; imagedev = imgiter.next())
+		for (const device_image_interface *imagedev = imgiter.first(); imagedev != nullptr; imagedev = imgiter.next())
 			strcatprintf(str,"  %s    [tag: %s]\n", imagedev->image_type_name(), imagedev->device().tag());
 	}
 
@@ -270,7 +270,7 @@ void ui_menu_device_config::populate()
 	if (slotiter.count() > 0)
 	{
 		str.append("* Slot Options:\n");
-		for (const device_slot_interface *slot = slotiter.first(); slot != NULL; slot = slotiter.next())
+		for (const device_slot_interface *slot = slotiter.first(); slot != nullptr; slot = slotiter.next())
 			strcatprintf(str,"  %s    [default: %s]\n", slot->device().tag(), slot->default_option() ? slot->default_option() : "----");
 	}
 
@@ -279,7 +279,7 @@ void ui_menu_device_config::populate()
 			str.append("[None]\n");
 
 	const_cast<machine_config &>(machine().config()).device_remove(&machine().config().root_device(), m_option->name());
-	item_append(str.c_str(), NULL, MENU_FLAG_MULTILINE, NULL);
+	item_append(str.c_str(), nullptr, MENU_FLAG_MULTILINE, nullptr);
 }
 
 void ui_menu_device_config::handle()

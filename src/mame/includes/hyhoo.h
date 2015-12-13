@@ -40,11 +40,11 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update_hyhoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void hyhoo_gfxdraw();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

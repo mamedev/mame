@@ -67,14 +67,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// serial overrides
-	virtual void rcv_complete();    // Rx completed receiving byte
-	virtual void tra_complete();    // Tx completed sending byte
-	virtual void tra_callback();    // Tx send bit
+	virtual void rcv_complete() override;    // Rx completed receiving byte
+	virtual void tra_complete() override;    // Tx completed sending byte
+	virtual void tra_callback() override;    // Tx send bit
 
 	bool m_eps_mode;
 
@@ -97,10 +97,10 @@ public:
 
 	required_device<esq1x22_t> m_vfd;
 
-	virtual void send_to_display(UINT8 data) { m_vfd->write_char(data); }
+	virtual void send_to_display(UINT8 data) override { m_vfd->write_char(data); }
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 };
@@ -111,10 +111,10 @@ public:
 
 	required_device<esq2x40_t> m_vfd;
 
-	virtual void send_to_display(UINT8 data) { m_vfd->write_char(data); }
+	virtual void send_to_display(UINT8 data) override { m_vfd->write_char(data); }
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 };
@@ -125,10 +125,10 @@ public:
 
 	required_device<esq2x40_sq1_t> m_vfd;
 
-	virtual void send_to_display(UINT8 data) { m_vfd->write_char(data); }
+	virtual void send_to_display(UINT8 data) override { m_vfd->write_char(data); }
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 };

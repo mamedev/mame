@@ -26,7 +26,7 @@ INPUT_CHANGED_MEMBER( vcs_lightpen_device::trigger )
 
 static INPUT_PORTS_START( vcs_lightpen )
 	PORT_START("JOY")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vcs_lightpen_device, trigger, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vcs_lightpen_device, trigger, nullptr)
 	PORT_BIT( 0xdf, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("LIGHTX")

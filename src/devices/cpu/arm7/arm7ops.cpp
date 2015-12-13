@@ -408,7 +408,7 @@ void arm7_cpu_device::HandleMemSingle(UINT32 insn)
 	if (insn & INSN_I)
 	{
 		/* Register Shift */
-		off = decodeShift(insn, NULL);
+		off = decodeShift(insn, nullptr);
 	}
 	else
 	{
@@ -956,7 +956,7 @@ void arm7_cpu_device::HandleALU(UINT32 insn)
 	/* Op2 = Register Value */
 	else
 	{
-		op2 = decodeShift(insn, (insn & INSN_S) ? &sc : NULL);
+		op2 = decodeShift(insn, (insn & INSN_S) ? &sc : nullptr);
 
 		// LD TODO sc will always be 0 if this applies
 		if (!(insn & INSN_S))

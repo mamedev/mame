@@ -147,7 +147,7 @@
 upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
-		m_channel(NULL),
+		m_channel(nullptr),
 		m_sample_offset_shift(0),
 		m_pos(0),
 		m_step(0),
@@ -171,8 +171,8 @@ upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, 
 		m_adpcm_state(0),
 		m_adpcm_data(0),
 		m_sample(0),
-		m_rom(NULL),
-		m_rombase(NULL),
+		m_rom(nullptr),
+		m_rombase(nullptr),
 		m_romoffset(0),
 		m_rommask(0),
 		m_drqcallback(*this)
@@ -183,14 +183,14 @@ const device_type UPD7759 = &device_creator<upd7759_device>;
 
 upd7759_device::upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: upd775x_device(mconfig, UPD7759, "uPD7759", tag, owner, clock, "upd7759", __FILE__),
-		m_timer(NULL)
+		m_timer(nullptr)
 {
 }
 
 
 upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: upd775x_device(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_timer(NULL)
+		m_timer(nullptr)
 {
 }
 
@@ -232,7 +232,7 @@ void upd7759_device::device_start()
 	/* compute the ROM base or allocate a timer */
 	m_romoffset = 0;
 	m_rom = m_rombase = region()->base();
-	if (m_rombase == NULL)
+	if (m_rombase == nullptr)
 	{
 		assert(type() == UPD7759); // other chips do not support slave mode
 		m_timer = timer_alloc(TIMER_SLAVE_UPDATE);
@@ -307,7 +307,7 @@ void upd7756_device::device_start()
 	/* compute the ROM base or allocate a timer */
 	m_romoffset = 0;
 	m_rom = m_rombase = region()->base();
-	if (m_rombase == NULL)
+	if (m_rombase == nullptr)
 	{
 		m_rommask = 0;
 	}
@@ -800,7 +800,7 @@ READ_LINE_MEMBER( upd775x_device::busy_r )
 
 void upd775x_device::set_bank_base(UINT32 base)
 {
-	assert(m_rombase != NULL);
+	assert(m_rombase != nullptr);
 	m_rom = m_rombase + base;
 	m_romoffset = base;
 }

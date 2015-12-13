@@ -38,9 +38,9 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<centronics_device> m_centronics;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER( p2_w );
@@ -70,7 +70,7 @@ public:
 		: jtc_state(mconfig, type, tag)
 	{ }
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -82,7 +82,7 @@ public:
 		: jtc_state(mconfig, type, tag)
 	{ }
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( videoram_r );

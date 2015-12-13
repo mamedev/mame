@@ -54,8 +54,8 @@ public:
 	DECLARE_WRITE8_MEMBER(simpsons_k052109_w);
 	DECLARE_READ8_MEMBER(simpsons_k053247_r);
 	DECLARE_WRITE8_MEMBER(simpsons_k053247_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_simpsons(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(simpsons_irq);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
@@ -68,5 +68,5 @@ public:
 	K053246_CB_MEMBER(sprite_callback);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

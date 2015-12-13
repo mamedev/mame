@@ -175,8 +175,8 @@ void arcompact_device::device_reset()
 	m_delayactive = 0;
 	m_delayjump = 0x00000000;
 
-	for (int i = 0; i < 0x40; i++)
-		m_regs[i] = 0;
+	for (auto & elem : m_regs)
+		elem = 0;
 
 	m_status32 = 0;
 	m_LP_START = 0;

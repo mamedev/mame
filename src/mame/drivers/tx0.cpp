@@ -333,7 +333,7 @@ void tx0_state::tx0_machine_stop()
 {
 	/* the core will take care of freeing the timers, BUT we must set the variables
 	to NULL if we don't want to risk confusing the tape image init function */
-	m_tape_reader.timer = m_tape_puncher.timer = m_typewriter.prt_timer = m_dis_timer = NULL;
+	m_tape_reader.timer = m_tape_puncher.timer = m_typewriter.prt_timer = m_dis_timer = nullptr;
 }
 
 
@@ -360,23 +360,23 @@ public:
 	tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_PUNCHTAPE; }
+	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 0; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
-	virtual const char *file_extensions() const { return "tap,rim"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 0; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return nullptr; }
+	virtual const char *file_extensions() const override { return "tap,rim"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load();
-	virtual void call_unload();
+	virtual bool call_load() override;
+	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { update_names(); }
-	virtual void device_start() { }
+	virtual void device_config_complete() override { update_names(); }
+	virtual void device_start() override { }
 };
 
 const device_type TX0_READTAPE = &device_creator<tx0_readtape_image_device>;
@@ -395,23 +395,23 @@ public:
 	tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_PUNCHTAPE; }
+	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
 
-	virtual bool is_readable()  const { return 0; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
-	virtual const char *file_extensions() const { return "tap,rim"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return 0; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 1; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return nullptr; }
+	virtual const char *file_extensions() const override { return "tap,rim"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load();
-	virtual void call_unload();
+	virtual bool call_load() override;
+	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { update_names(); }
-	virtual void device_start() { }
+	virtual void device_config_complete() override { update_names(); }
+	virtual void device_start() override { }
 };
 
 const device_type TX0_PUNCHTAPE = &device_creator<tx0_punchtape_image_device>;
@@ -431,23 +431,23 @@ public:
 	tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_PRINTER; }
+	virtual iodevice_t image_type() const override { return IO_PRINTER; }
 
-	virtual bool is_readable()  const { return 0; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
-	virtual const char *file_extensions() const { return "typ"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return 0; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 1; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return nullptr; }
+	virtual const char *file_extensions() const override { return "typ"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load();
-	virtual void call_unload();
+	virtual bool call_load() override;
+	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { update_names(); }
-	virtual void device_start() { }
+	virtual void device_config_complete() override { update_names(); }
+	virtual void device_start() override { }
 };
 
 const device_type TX0_PRINTER = &device_creator<tx0_printer_image_device>;
@@ -466,23 +466,23 @@ public:
 	tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_MAGTAPE; }
+	virtual iodevice_t image_type() const override { return IO_MAGTAPE; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
-	virtual const char *file_extensions() const { return "tap"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 1; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return nullptr; }
+	virtual const char *file_extensions() const override { return "tap"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load();
-	virtual void call_unload();
+	virtual bool call_load() override;
+	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { update_names(); }
-	virtual void device_start();
+	virtual void device_config_complete() override { update_names(); }
+	virtual void device_start() override;
 };
 
 const device_type TX0_MAGTAPE = &device_creator<tx0_magtape_image_device>;
@@ -534,7 +534,7 @@ void tx0_readtape_image_device::call_unload()
 	tx0_state *state = machine().driver_data<tx0_state>();
 
 	/* reader unit */
-	state->m_tape_reader.fd = NULL;
+	state->m_tape_reader.fd = nullptr;
 
 	/* stop motor */
 	state->m_tape_reader.motor_on = 0;
@@ -649,7 +649,7 @@ void tx0_punchtape_image_device::call_unload()
 	tx0_state *state = machine().driver_data<tx0_state>();
 
 	/* punch unit */
-	state->m_tape_puncher.fd = NULL;
+	state->m_tape_puncher.fd = nullptr;
 }
 
 TIMER_CALLBACK_MEMBER(tx0_state::puncher_callback)
@@ -726,7 +726,7 @@ bool tx0_printer_image_device::call_load()
 void tx0_printer_image_device::call_unload()
 {
 	tx0_state *state = machine().driver_data<tx0_state>();
-	state->m_typewriter.fd = NULL;
+	state->m_typewriter.fd = nullptr;
 }
 
 /*
@@ -877,7 +877,7 @@ bool tx0_magtape_image_device::call_load()
 void tx0_magtape_image_device::call_unload()
 {
 	tx0_state *state = machine().driver_data<tx0_state>();
-	state->m_magtape.img = NULL;
+	state->m_magtape.img = nullptr;
 
 	if (state->m_magtape.timer)
 	{

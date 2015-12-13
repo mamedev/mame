@@ -285,8 +285,8 @@ void jaguar_cpu_device::init_tables()
 	/* if we're not the first, skip */
 	if (table_refcount++ != 0)
 	{
-		assert(mirror_table != NULL);
-		assert(condition_table != NULL);
+		assert(mirror_table != nullptr);
+		assert(condition_table != nullptr);
 		return;
 	}
 
@@ -440,13 +440,13 @@ jaguar_cpu_device::~jaguar_cpu_device()
 	if (--table_refcount != 0)
 		return;
 
-	if (mirror_table != NULL)
+	if (mirror_table != nullptr)
 		global_free_array(mirror_table);
-	mirror_table = NULL;
+	mirror_table = nullptr;
 
-	if (condition_table != NULL)
+	if (condition_table != nullptr)
 		global_free_array(condition_table);
-	condition_table = NULL;
+	condition_table = nullptr;
 }
 
 

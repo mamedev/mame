@@ -72,7 +72,7 @@ private:
 	UINT8 m_port1, m_port2;
 	//UINT8 m_digit;
 	UINT8 m_segment;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<m6803_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;

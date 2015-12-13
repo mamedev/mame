@@ -65,7 +65,7 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	optional_shared_ptr<UINT16> m_vram16;
 	optional_shared_ptr<UINT32> m_vram;

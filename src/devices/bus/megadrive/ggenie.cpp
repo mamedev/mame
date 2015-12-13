@@ -169,7 +169,7 @@ static SLOT_INTERFACE_START(ggenie_sub_cart)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( ggenie_slot )
-	MCFG_MD_CARTRIDGE_ADD("subslot", ggenie_sub_cart, NULL)
+	MCFG_MD_CARTRIDGE_ADD("subslot", ggenie_sub_cart, nullptr)
 	MCFG_MD_CARTRIDGE_NOT_MANDATORY
 MACHINE_CONFIG_END
 

@@ -75,7 +75,7 @@ private:
 	UINT8 m_sndcmd;
 	UINT8 m_votrax_cmd;
 	UINT8 m_io[16];
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_cpu2;
 	required_device<pia6821_device> m_pia;

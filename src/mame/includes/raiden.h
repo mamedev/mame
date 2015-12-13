@@ -63,7 +63,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(raidenb);
 
 	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *scrollregs);

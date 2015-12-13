@@ -58,32 +58,32 @@ class tms32051_device : public cpu_device
 public:
 	// construction/destruction
 	tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_READ16_MEMBER( cpuregs_r );
 	DECLARE_WRITE16_MEMBER( cpuregs_w );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 5; }
-	virtual UINT32 execute_input_lines() const { return 6; }
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 5; }
+	virtual UINT32 execute_input_lines() const override { return 6; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : NULL ); }
-	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value);
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ); }
+	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 
@@ -163,6 +163,8 @@ private:
 	direct_read_data *m_direct;
 	address_space *m_data;
 	int m_icount;
+
+	bool m_idle;
 
 	inline void CHANGE_PC(UINT16 new_pc);
 	inline UINT16 PM_READ16(UINT16 address);
@@ -365,7 +367,20 @@ private:
 };
 
 
+class tms32053_device : public tms32051_device
+{
+public:
+	// construction/destruction
+	tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual void device_config_complete() override;
+	virtual void device_reset() override;
+};
+
+
 extern const device_type TMS32051;
+extern const device_type TMS32053;
 
 
 #endif /* __TMS32051_H__ */

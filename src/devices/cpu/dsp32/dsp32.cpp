@@ -173,8 +173,8 @@ dsp32c_device::dsp32c_device(const machine_config &mconfig, const char *tag, dev
 		m_icount(0),
 		m_lastpins(0),
 		m_ppc(0),
-		m_program(NULL),
-		m_direct(NULL),
+		m_program(nullptr),
+		m_direct(nullptr),
 		m_output_pins_changed(*this)
 {
 	// set our instruction counter
@@ -308,7 +308,7 @@ void dsp32c_device::device_reset()
 
 const address_space_config *dsp32c_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_PROGRAM) ? &m_program_config : NULL;
+	return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr;
 }
 
 

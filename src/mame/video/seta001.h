@@ -55,8 +55,8 @@ public:
 	int is_flipped() { return ((m_spritectrl[ 0 ] & 0x40) >> 6); };
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 

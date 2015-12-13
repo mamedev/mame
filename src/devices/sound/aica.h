@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:ElSemi, kingshriek, Deunan Knute, R. Belmont
+// license:BSD-3-Clause
+// copyright-holders:ElSemi, Deunan Knute, R. Belmont
+// thanks-to: kingshriek
 /*
 
     Sega/Yamaha AICA emulation
@@ -97,10 +98,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 private:
 	unsigned char DecodeSCI(unsigned char irq);
 	void ResetInterrupts();

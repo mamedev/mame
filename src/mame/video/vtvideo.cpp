@@ -112,7 +112,7 @@ void vt100_video_device::device_start()
 	m_write_clear_video_interrupt.resolve_safe();
 
 	m_gfx = machine().root_device().memregion(m_char_rom_tag)->base();
-	assert(m_gfx != NULL);
+	assert(m_gfx != nullptr);
 
 	// LBA7 is scan line frequency update
 	machine().scheduler().timer_pulse(attotime::from_nsec(31778), timer_expired_delegate(FUNC(vt100_video_device::lba7_change), this));
@@ -247,7 +247,7 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 	if (data == 0)
 	{
 		UINT8 *rom = machine().root_device().memregion("maincpu")->base();
-		if (rom != NULL)
+		if (rom != nullptr)
 		{
 			UINT32 PC = space.device().safe_pc();
 			if ((rom[ PC - 1] == 0xe6) &&

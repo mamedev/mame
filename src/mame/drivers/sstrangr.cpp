@@ -30,7 +30,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(port_w);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update_sstrangr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sstrngr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

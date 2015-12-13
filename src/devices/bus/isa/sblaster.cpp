@@ -1170,7 +1170,7 @@ void sb8_device::device_start()
 		m_isa->install_device(0x0228, 0x0229, 0, 0, read8_delegate( FUNC(sb8_device::ym3812_16_r), this ), write8_delegate( FUNC(sb8_device::ym3812_16_w), this ) );
 	}
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 
 	save_item(NAME(m_dack_out));
 	save_item(NAME(m_onebyte_midi));
@@ -1223,7 +1223,7 @@ void sb16_device::device_start()
 	m_isa->install_device(0x0220, 0x0223, 0, 0, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
 	m_isa->install_device(0x0228, 0x0229, 0, 0, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 
 	save_item(NAME(m_mixer.data));
 	save_item(NAME(m_mixer.status));

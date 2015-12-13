@@ -188,7 +188,7 @@ WRITE8_MEMBER( abc_fd2_t::pio_pb_w )
 
 	*/
 
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) floppy = m_floppy1->get_device();
@@ -212,7 +212,7 @@ WRITE8_MEMBER( abc_fd2_t::pio_pb_w )
 static const z80_daisy_config daisy_chain[] =
 {
 	{ Z80PIO_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 

@@ -29,8 +29,8 @@ public:
 	required_device<atari_motion_objects_device> m_mob;
 	int m_playfield_latch;
 
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(skullxbo_halt_until_hblank_0_w);
 	DECLARE_WRITE16_MEMBER(skullxbo_mobwr_w);
 	DECLARE_DRIVER_INIT(skullxbo);

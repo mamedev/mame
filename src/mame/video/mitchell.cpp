@@ -157,7 +157,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 	/* bit 3 is unknown (used, e.g. marukin pulses it on the title screen) */
 
 	/* bit 4 selects OKI M6295 bank */
-	if (m_oki != NULL)
+	if (m_oki != nullptr)
 		m_oki->set_bank_base((data & 0x10) ? 0x40000 : 0x00000);
 
 	/* bit 5 is palette RAM bank selector (doesn't apply to mgakuen) */

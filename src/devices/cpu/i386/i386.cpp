@@ -209,7 +209,7 @@ void i386_device::i386_set_descriptor_accessed(UINT16 selector)
 		base = m_gdtr.base;
 
 	addr = base + (selector & ~7) + 5;
-	i386_translate_address(TRANSLATE_READ, &addr, NULL);
+	i386_translate_address(TRANSLATE_READ, &addr, nullptr);
 	rights = m_program->read_byte(addr);
 	// Should a fault be thrown if the table is read only?
 	m_program->write_byte(addr, rights | 1);
@@ -221,7 +221,7 @@ void i386_device::i386_load_segment_descriptor(int segment )
 	{
 		if (!V8086_MODE)
 		{
-			i386_load_protected_mode_segment(&m_sreg[segment], NULL );
+			i386_load_protected_mode_segment(&m_sreg[segment], nullptr );
 			if(m_sreg[segment].selector)
 				i386_set_descriptor_accessed(m_sreg[segment].selector);
 		}
@@ -479,7 +479,7 @@ void i386_device::i386_check_sreg_validity(int reg)
 
 	memset(&desc, 0, sizeof(desc));
 	desc.selector = selector;
-	i386_load_protected_mode_segment(&desc,NULL);
+	i386_load_protected_mode_segment(&desc,nullptr);
 	DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 	RPL = selector & 0x03;
 
@@ -564,7 +564,7 @@ void i386_device::i386_sreg_load(UINT16 selector, UINT8 reg, bool *fault)
 
 		memset(&stack, 0, sizeof(stack));
 		stack.selector = selector;
-		i386_load_protected_mode_segment(&stack,NULL);
+		i386_load_protected_mode_segment(&stack,nullptr);
 		DPL = (stack.flags >> 5) & 0x03;
 
 		if((selector & ~0x0003) == 0)
@@ -623,7 +623,7 @@ void i386_device::i386_sreg_load(UINT16 selector, UINT8 reg, bool *fault)
 
 		memset(&desc, 0, sizeof(desc));
 		desc.selector = selector;
-		i386_load_protected_mode_segment(&desc,NULL);
+		i386_load_protected_mode_segment(&desc,nullptr);
 		DPL = (desc.flags >> 5) & 0x03;
 
 		if(selector & 0x0004)  // LDT
@@ -785,7 +785,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 			/* Task gate */
 			memset(&desc, 0, sizeof(desc));
 			desc.selector = segment;
-			i386_load_protected_mode_segment(&desc,NULL);
+			i386_load_protected_mode_segment(&desc,nullptr);
 			if(segment & 0x04)
 			{
 				logerror("IRQ: Task gate: TSS is not in the GDT.\n");
@@ -822,7 +822,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 			/* Interrupt or Trap gate */
 			memset(&desc, 0, sizeof(desc));
 			desc.selector = segment;
-			i386_load_protected_mode_segment(&desc,NULL);
+			i386_load_protected_mode_segment(&desc,nullptr);
 			CPL = m_CPL;  // current privilege level
 			DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 //          RPL = segment & 0x03;  // requested privilege level
@@ -872,7 +872,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 				/* Check new stack segment in TSS */
 				memset(&stack, 0, sizeof(stack));
 				stack.selector = i386_get_stack_segment(DPL);
-				i386_load_protected_mode_segment(&stack,NULL);
+				i386_load_protected_mode_segment(&stack,nullptr);
 				oldSS = m_sreg[SS].selector;
 				if(flags & 0x0008)
 					oldESP = REG32(ESP);
@@ -948,7 +948,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 				WRITE_TEST(stack.base+newESP-1);
 				/* Load new stack segment descriptor */
 				m_sreg[SS].selector = stack.selector;
-				i386_load_protected_mode_segment(&m_sreg[SS],NULL);
+				i386_load_protected_mode_segment(&m_sreg[SS],nullptr);
 				i386_set_descriptor_accessed(stack.selector);
 				REG32(ESP) = newESP;
 				if(V8086_MODE)
@@ -1148,7 +1148,7 @@ void i386_device::i286_task_switch(UINT16 selector, UINT8 nested)
 	m_task.segment = selector;
 	memset(&seg, 0, sizeof(seg));
 	seg.selector = m_task.segment;
-	i386_load_protected_mode_segment(&seg,NULL);
+	i386_load_protected_mode_segment(&seg,nullptr);
 	m_task.limit = seg.limit;
 	m_task.base = seg.base;
 	m_task.flags = seg.flags;
@@ -1160,7 +1160,7 @@ void i386_device::i286_task_switch(UINT16 selector, UINT8 nested)
 	tss = m_task.base;
 	m_ldtr.segment = READ16(tss+0x2a) & 0xffff;
 	seg.selector = m_ldtr.segment;
-	i386_load_protected_mode_segment(&seg,NULL);
+	i386_load_protected_mode_segment(&seg,nullptr);
 	m_ldtr.limit = seg.limit;
 	m_ldtr.base = seg.base;
 	m_ldtr.flags = seg.flags;
@@ -1259,7 +1259,7 @@ void i386_device::i386_task_switch(UINT16 selector, UINT8 nested)
 	m_task.segment = selector;
 	memset(&seg, 0, sizeof(seg));
 	seg.selector = m_task.segment;
-	i386_load_protected_mode_segment(&seg,NULL);
+	i386_load_protected_mode_segment(&seg,nullptr);
 	m_task.limit = seg.limit;
 	m_task.base = seg.base;
 	m_task.flags = seg.flags;
@@ -1271,7 +1271,7 @@ void i386_device::i386_task_switch(UINT16 selector, UINT8 nested)
 	tss = m_task.base;
 	m_ldtr.segment = READ32(tss+0x60) & 0xffff;
 	seg.selector = m_ldtr.segment;
-	i386_load_protected_mode_segment(&seg,NULL);
+	i386_load_protected_mode_segment(&seg,nullptr);
 	m_ldtr.limit = seg.limit;
 	m_ldtr.base = seg.base;
 	m_ldtr.flags = seg.flags;
@@ -1379,7 +1379,7 @@ void i386_device::i386_protected_mode_jump(UINT16 seg, UINT32 off, int indirect,
 	/* Determine segment type */
 	memset(&desc, 0, sizeof(desc));
 	desc.selector = segment;
-	i386_load_protected_mode_segment(&desc,NULL);
+	i386_load_protected_mode_segment(&desc,nullptr);
 	CPL = m_CPL;  // current privilege level
 	DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 	RPL = segment & 0x03;  // requested privilege level
@@ -1437,7 +1437,7 @@ void i386_device::i386_protected_mode_jump(UINT16 seg, UINT32 off, int indirect,
 				logerror("JMP: Available 386 TSS at %08x\n",m_pc);
 				memset(&desc, 0, sizeof(desc));
 				desc.selector = segment;
-				i386_load_protected_mode_segment(&desc,NULL);
+				i386_load_protected_mode_segment(&desc,nullptr);
 				DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 				if(DPL < CPL)
 				{
@@ -1505,7 +1505,7 @@ void i386_device::i386_protected_mode_jump(UINT16 seg, UINT32 off, int indirect,
 					}
 				}
 				desc.selector = call_gate.selector;
-				i386_load_protected_mode_segment(&desc,NULL);
+				i386_load_protected_mode_segment(&desc,nullptr);
 				DPL = (desc.flags >> 5) & 0x03;
 				if((desc.flags & 0x0018) != 0x18)
 				{
@@ -1564,7 +1564,7 @@ void i386_device::i386_protected_mode_jump(UINT16 seg, UINT32 off, int indirect,
 				}
 				/* Check the TSS that the task gate points to */
 				desc.selector = call_gate.selector;
-				i386_load_protected_mode_segment(&desc,NULL);
+				i386_load_protected_mode_segment(&desc,nullptr);
 				DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 				RPL = call_gate.selector & 0x03;  // requested privilege level
 				if(call_gate.selector & 0x04)
@@ -1649,7 +1649,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 	/* Determine segment type */
 	memset(&desc, 0, sizeof(desc));
 	desc.selector = selector;
-	i386_load_protected_mode_segment(&desc,NULL);
+	i386_load_protected_mode_segment(&desc,nullptr);
 	CPL = m_CPL;  // current privilege level
 	DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 	RPL = selector & 0x03;  // requested privilege level
@@ -1794,7 +1794,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 						FAULT(FAULT_GP,desc.selector & ~0x03)  // #GP(selector)
 					}
 				}
-				i386_load_protected_mode_segment(&desc,NULL);
+				i386_load_protected_mode_segment(&desc,nullptr);
 				if((desc.flags & 0x0018) != 0x18)
 				{
 					logerror("CALL: Call gate: Segment is not a code segment.\n");
@@ -1820,7 +1820,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 					/* Check new SS segment for privilege level from TSS */
 					memset(&stack, 0, sizeof(stack));
 					stack.selector = i386_get_stack_segment(DPL);
-					i386_load_protected_mode_segment(&stack,NULL);
+					i386_load_protected_mode_segment(&stack,nullptr);
 					if((stack.selector & ~0x03) == 0)
 					{
 						logerror("CALL: Call gate: TSS selector is null\n");
@@ -1926,7 +1926,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 
 					memset(&temp, 0, sizeof(temp));
 					temp.selector = oldSS;
-					i386_load_protected_mode_segment(&temp,NULL);
+					i386_load_protected_mode_segment(&temp,nullptr);
 					/* copy parameters from old stack to new stack */
 					for(x=(gate.dword_count & 0x1f)-1;x>=0;x--)
 					{
@@ -1993,7 +1993,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 				}
 				/* Check the TSS that the task gate points to */
 				desc.selector = gate.selector;
-				i386_load_protected_mode_segment(&desc,NULL);
+				i386_load_protected_mode_segment(&desc,nullptr);
 				if(gate.selector & 0x04)
 				{
 					logerror("CALL: Task Gate: TSS is not global.\n");
@@ -2087,7 +2087,7 @@ void i386_device::i386_protected_mode_retf(UINT8 count, UINT8 operand32)
 
 	memset(&desc, 0, sizeof(desc));
 	desc.selector = newCS;
-	i386_load_protected_mode_segment(&desc,NULL);
+	i386_load_protected_mode_segment(&desc,nullptr);
 	CPL = m_CPL;  // current privilege level
 	DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 	RPL = newCS & 0x03;
@@ -2267,7 +2267,7 @@ void i386_device::i386_protected_mode_retf(UINT8 count, UINT8 operand32)
 
 		/* Check SS selector and descriptor */
 		desc.selector = newSS;
-		i386_load_protected_mode_segment(&desc,NULL);
+		i386_load_protected_mode_segment(&desc,nullptr);
 		DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 		if((newSS & ~0x07) == 0)
 		{
@@ -2405,7 +2405,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 		}
 		memset(&desc, 0, sizeof(desc));
 		desc.selector = task;
-		i386_load_protected_mode_segment(&desc,NULL);
+		i386_load_protected_mode_segment(&desc,nullptr);
 		if((desc.flags & 0x001f) != 0x000b)
 		{
 			logerror("IRET (%08x): Task return: Back-linked TSS is not a busy TSS.\n",m_pc);
@@ -2525,7 +2525,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				}
 				memset(&desc, 0, sizeof(desc));
 				desc.selector = newCS;
-				i386_load_protected_mode_segment(&desc,NULL);
+				i386_load_protected_mode_segment(&desc,nullptr);
 				DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 				RPL = newCS & 0x03;
 				if((desc.flags & 0x0018) != 0x0018)
@@ -2586,7 +2586,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				/* return to outer privilege level */
 				memset(&desc, 0, sizeof(desc));
 				desc.selector = newCS;
-				i386_load_protected_mode_segment(&desc,NULL);
+				i386_load_protected_mode_segment(&desc,nullptr);
 				DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
 				RPL = newCS & 0x03;
 				if(operand32 == 0)
@@ -2669,7 +2669,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				}
 				memset(&stack, 0, sizeof(stack));
 				stack.selector = newSS;
-				i386_load_protected_mode_segment(&stack,NULL);
+				i386_load_protected_mode_segment(&stack,nullptr);
 				DPL = (stack.flags >> 5) & 0x03;
 				if((newSS & ~0x03) == 0)
 				{
@@ -2999,7 +2999,7 @@ UINT8 i386_device::read8_debug(UINT32 ea, UINT8 *data)
 {
 	UINT32 address = ea;
 
-	if(!i386_translate_address(TRANSLATE_DEBUG_MASK,&address,NULL))
+	if(!i386_translate_address(TRANSLATE_DEBUG_MASK,&address,nullptr))
 		return 0;
 
 	address &= m_a20_mask;
@@ -3134,7 +3134,7 @@ UINT64 i386_device::debug_virttophys(symbol_table &table, int params, const UINT
 {
 	UINT32 result = param[0];
 
-	if(!i386_translate_address(TRANSLATE_DEBUG_MASK,&result,NULL))
+	if(!i386_translate_address(TRANSLATE_DEBUG_MASK,&result,nullptr))
 		return 0;
 	return result;
 }
@@ -3962,7 +3962,7 @@ bool i386_device::memory_translate(address_spacenum spacenum, int intention, off
 {
 	bool ret = true;
 	if(spacenum == AS_PROGRAM)
-		ret = i386_translate_address(intention, &address, NULL);
+		ret = i386_translate_address(intention, &address, nullptr);
 	address &= m_a20_mask;
 	return ret;
 }

@@ -55,12 +55,12 @@ m3745x_device::m3745x_device(const machine_config &mconfig, device_type type, co
 	read_ad_4(*this),
 	read_ad_5(*this),
 	read_ad_6(*this),
-	read_ad_7(*this), 
-	m_intreq1(0), 
-	m_intreq2(0), 
-	m_intctrl1(0), 
-	m_intctrl2(0), 
-	m_adctrl(0), 
+	read_ad_7(*this),
+	m_intreq1(0),
+	m_intreq2(0),
+	m_intctrl1(0),
+	m_intctrl2(0),
+	m_adctrl(0),
 	m_last_all_ints(0)
 {
 }
@@ -90,7 +90,7 @@ void m3745x_device::device_start()
 
 	for (int i = 0; i < NUM_TIMERS; i++)
 	{
-		m_timers[i] = timer_alloc(i, NULL);
+		m_timers[i] = timer_alloc(i, nullptr);
 	}
 
 	m740_device::device_start();
@@ -123,9 +123,9 @@ void m3745x_device::device_reset()
 
 	SP = 0x01ff;    // we have the "traditional" stack in page 1, not 0 like some M740 derivatives
 
-	for (int i = 0; i < NUM_TIMERS; i++)
+	for (auto & elem : m_timers)
 	{
-		m_timers[i]->adjust(attotime::never);
+		elem->adjust(attotime::never);
 	}
 
 	// all ports reset to input on startup

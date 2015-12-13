@@ -80,8 +80,8 @@ public:
 	TILE_GET_INFO_MEMBER(zaxxon_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(razmataz_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(congo_get_fg_tile_info);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(zaxxon);
 	DECLARE_VIDEO_START(razmataz);
 	DECLARE_VIDEO_START(congo);

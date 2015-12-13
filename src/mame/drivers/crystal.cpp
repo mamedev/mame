@@ -116,6 +116,71 @@ Notes:
       3x Intel E28F128J3A 128MBit surface mounted FlashROMs (TSOP56, labelled 'BREZZASOFT BCSV0004Fxx', xx=01, 02, 03)
          Note: there are 8 spaces total for FlashROMs. Only U1, U2 & U3 are populated in this cart.
 
+
+
+P's Attack (c) 2004 Uniana Co., Ltd
+
++----------1||||---1|||||--1|||||---------------------------+
+|VOL       TICKET  GUN_1P  GUN_2P                 +---------|
+|                                                 |         |
++-+                                               |  256MB  |
+  |       CC-DAC                                  | Compact |
++-+                                  EMUL*        |  Flash  |
+|                                                 |         |
+|J          +---+                                 +---------|
+|A          |   |                                           |
+|M          | R |   25.1750MHz              +--------------+|
+|M          | A |                           |     42Pin*   ||
+|A          | M |                           +--------------+|
+|           |   |                           +--------------+|
+|C          +---+       +------------+      |     SYS      ||
+|O                      |            |      +--------------+|
+|N          +---+       |            |                      |
+|N          |   |       |VRenderZERO+|                      |
+|E SERVICE  | R |       | MagicEyes  |  +-------+    62256* |
+|C          | A |       |            |  |  RAM  |           |
+|T TEST     | M |       |            |  +-------+    62256* |
+|O          |   |       +------------+                      |
+|R RESET    +---+                                           |
+|                                   14.31818MHz             |
++-+                                                         |
+  |                                EEPROM                   |
++-+                GAL                                 DSW  |
+|                                                           |
+|  VGA                           PIC               BAT3.6V* |
++-----------------------------------------------------------+
+
+* denotes unpopulated device
+
+RAM are Samsung K4S641632H-TC75
+VGA is a standard PC 15 pin VGA connection
+DSW is 2 switch dipswitch (switches 3-8 are unpopulated)
+PIC is a Microchip PIC16C711-041/P (silkscreened on the PCB as COSTOM)
+SYS is a ST M27C160 EPROM (silkscreened on the PCB as SYSTEM_ROM_32M)
+GAL is a GAL16V8B (not dumped)
+EMUL is an unpopulated 8 pin connector
+EEPROM is a 93C86 16K 5.0v Serial EEPROM (2048x8-bit or 1024x16-bit)
+CC-DAC is a TDA1311A Stereo Continuous Calibration DAC
+
+TICKET is a 5 pin connector:
+
+  1| +12v
+  2| IN
+  3| OUT
+  4| GND
+  5| LED
+
+GUN_xP are 6 pin gun connectors (pins 1-4 match the UNICO sytle guns):
+
+  1| GND
+  2| SW
+  3| +5v
+  4| SENS
+  5| SOL
+  6| GND
+
+
+
 */
 
 #include "emu.h"
@@ -140,7 +205,9 @@ public:
 		m_reset_patch(*this, "reset_patch"),
 		m_maincpu(*this, "maincpu"),
 		m_vr0(*this, "vr0"),
-		m_ds1302(*this, "rtc") { }
+		m_ds1302(*this, "rtc"),
+		m_screen(*this, "screen")
+		{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_sysregs;
@@ -148,13 +215,14 @@ public:
 	required_shared_ptr<UINT32> m_vidregs;
 	required_shared_ptr<UINT32> m_textureram;
 	required_shared_ptr<UINT32> m_frameram;
-	required_shared_ptr<UINT32> m_reset_patch;
+	optional_shared_ptr<UINT32> m_reset_patch; // not needed for trivrus
 //  UINT32 *  m_nvram;    // currently this uses generic nvram handling
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<vr0video_device> m_vr0;
 	required_device<ds1302_device> m_ds1302;
+	required_device<screen_device> m_screen;
 
 #ifdef IDLE_LOOP_SPEEDUP
 	UINT8     m_FlipCntRead;
@@ -196,9 +264,14 @@ public:
 	DECLARE_DRIVER_INIT(crysking);
 	DECLARE_DRIVER_INIT(evosocc);
 	DECLARE_DRIVER_INIT(donghaer);
+	DECLARE_DRIVER_INIT(psattack);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	DECLARE_READ32_MEMBER(trivrus_input_r);
+	DECLARE_WRITE32_MEMBER(trivrus_input_w);
+	UINT8 m_trivrus_input;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_crystal(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(crystal_interrupt);
@@ -211,6 +284,8 @@ public:
 	void PatchReset(  );
 	UINT16 GetVidReg( address_space &space, UINT16 reg );
 	void SetVidReg( address_space &space, UINT16 reg, UINT16 val );
+
+
 };
 
 void crystal_state::IntReq( int num )
@@ -525,8 +600,76 @@ static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32, crystal_state )
 
 ADDRESS_MAP_END
 
+// Trivia R Us
+// To do: touch panel, RTC
+
+READ32_MEMBER(crystal_state::trivrus_input_r)
+{
+	switch (m_trivrus_input)
+	{
+		case 1: return ioport("IN1")->read();
+		case 2: return ioport("IN2")->read();
+		case 3: return ioport("IN3")->read();
+		case 4: return ioport("IN4")->read();
+		case 5: return ioport("IN5")->read();
+		case 6: return ioport("DSW")->read();
+	}
+	logerror("%s: unknown input %02x read\n", machine().describe_context(), m_trivrus_input);
+	return 0xffffffff;
+}
+
+WRITE32_MEMBER(crystal_state::trivrus_input_w)
+{
+	if (ACCESSING_BITS_0_7)
+		m_trivrus_input = data & 0xff;
+}
+
+static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
+	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_WRITENOP
+
+//  0x01280000 & 0x0000ffff (written at boot)
+	AM_RANGE(0x01500000, 0x01500003) AM_READWRITE(trivrus_input_r, trivrus_input_w)
+//  0x01500010 & 0x000000ff = sec
+//  0x01500010 & 0x00ff0000 = min
+//  0x01500014 & 0x000000ff = hour
+//  0x01500014 & 0x00ff0000 = day
+//  0x01500018 & 0x000000ff = month
+//  0x0150001c & 0x000000ff = year - 2000
+	AM_RANGE(0x01600000, 0x01607fff) AM_RAM AM_SHARE("nvram")
+
+	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE(Timer0_r, Timer0_w)
+	AM_RANGE(0x01801408, 0x0180140b) AM_READWRITE(Timer1_r, Timer1_w)
+	AM_RANGE(0x01801410, 0x01801413) AM_READWRITE(Timer2_r, Timer2_w)
+	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
+	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, PIO_w)
+
+	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
+	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
+
+	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
+	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
+	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
+
+	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
+
+	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_SHARE("vidregs")
+	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_SHARE("textureram")
+	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_SHARE("frameram")
+	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE("vrender", vrender0_device, vr0_snd_read, vr0_snd_write)
+
+	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
+	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
+
+//  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
+
+ADDRESS_MAP_END
+
+
 void crystal_state::PatchReset(  )
 {
+	if (!m_reset_patch)
+		return;
+
 	//The test menu reset routine seems buggy
 	//it reads the reset vector from 0x02000000 but it should be
 	//read from 0x00000000. At 0x2000000 there is the bios signature
@@ -603,6 +746,7 @@ void crystal_state::machine_start()
 	save_item(NAME(m_PIO));
 	save_item(NAME(m_DMActrl));
 	save_item(NAME(m_OldPort4));
+	save_item(NAME(m_trivrus_input));
 	machine().save().register_postload(save_prepost_delegate(FUNC(crystal_state::crystal_banksw_postload), this));
 }
 
@@ -649,6 +793,24 @@ void crystal_state::SetVidReg( address_space &space, UINT16 reg, UINT16 val )
 
 UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	int xres = 320;
+	int yres = 240;
+
+	// probably more registers around here control height / interlace enable etc.
+	// 0x341c looks like height, but doesn't change for interlace mode.
+	xres = m_sysregs[0x340c / 4]+1;
+	if (xres > 640) xres = 640;
+
+	// force double height if 640 wide (probably a reg for this)
+	if (xres == 640) yres = 480;
+
+
+	rectangle visarea;
+	visarea.set(0, xres-1, 0, yres-1);
+	m_screen->configure(xres, yres, visarea, m_screen->frame_period().attoseconds() );
+
+
+
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int DoFlip;
 
@@ -703,8 +865,8 @@ UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 
 		SetVidReg(space, 0x8e, GetVidReg(space, 0x8e) ^ 1);
 
 	srcline = (UINT16 *) Visible;
-	for (y = 0; y < 240; y++)
-		memcpy(&bitmap.pix16(y), &srcline[y * 512], width * 2);
+	for (y = 0; y < screen.height(); y++)
+		memcpy(&bitmap.pix16(y), &srcline[y * 1024], width * 2);
 
 	return 0;
 }
@@ -835,18 +997,19 @@ static INPUT_PORTS_START(officeye)
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Blue") // BLUE
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	//PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START2 ) // where is start2?
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Red")  // RED
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Red")
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Green")  // GREEN
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 Green")
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Blue") // BLUE
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Blue")
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_START2 ) // where is start3?
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P3_P4")
@@ -893,6 +1056,84 @@ static INPUT_PORTS_START(officeye)
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START(trivrus)
+	PORT_START("IN1")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("Up")        PORT_CODE(KEYCODE_UP)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("Left/True") PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("Down")      PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Enter/Exit")
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Next")
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("Right/False") PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(1)
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Sound")
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN4")
+	PORT_BIT( 0x000000ff, IP_ACTIVE_LOW, IPT_OTHER )PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN5")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_SERVICE1 ) // Free Game
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )   // Setup
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "Interlace?" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Serial?" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )       // hangs at boot
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Touch Screen" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 static MACHINE_CONFIG_START( crystal, crystal_state )
 
 	MCFG_CPU_ADD("maincpu", SE3208, 43000000)
@@ -905,8 +1146,8 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(crystal_state, screen_update_crystal)
 	MCFG_SCREEN_VBLANK_DRIVER(crystal_state, screen_eof_crystal)
 	MCFG_SCREEN_PALETTE("palette")
@@ -926,16 +1167,12 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-/*
-    Top blade screen is 32 pixels wider
-*/
-static MACHINE_CONFIG_DERIVED( topbladv, crystal )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(320+32, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319+32, 0, 239)
-
+static MACHINE_CONFIG_DERIVED( trivrus, crystal )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(trivrus_mem)
 MACHINE_CONFIG_END
+
 
 ROM_START( crysbios )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
@@ -943,7 +1180,7 @@ ROM_START( crysbios )
 
 	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF ) // Flash
 
-	ROM_REGION( 0x10000, "user2",   ROMREGION_ERASEFF ) //Unmapped flash
+	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
 ROM_START( crysking )
@@ -955,7 +1192,7 @@ ROM_START( crysking )
 	ROM_LOAD("bcsv0004f02.u2",  0x1000000, 0x1000000, CRC(0e799845) SHA1(419674ce043cb1efb18303f4cb7fdbbae642ee39) )
 	ROM_LOAD("bcsv0004f03.u3",  0x2000000, 0x1000000, CRC(659e2d17) SHA1(342c98f3f695ef4dea8b533612451c4d2fb58809) )
 
-	ROM_REGION( 0x10000, "user2",   ROMREGION_ERASEFF ) //Unmapped flash
+	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
 ROM_START( evosocc )
@@ -967,7 +1204,7 @@ ROM_START( evosocc )
 	ROM_LOAD("bcsv0001u02",  0x1000000, 0x1000000, CRC(47ef1794) SHA1(f573706c17d1342b9b7aed9b40b8b648f0bf58db) )
 	ROM_LOAD("bcsv0001u03",  0x2000000, 0x1000000, CRC(f396a2ec) SHA1(f305eb10856fb5d4c229a6b09d6a2fb21b24ce66) )
 
-	ROM_REGION( 0x10000, "user2",   ROMREGION_ERASEFF ) //Unmapped flash
+	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
 ROM_START( topbladv )
@@ -981,9 +1218,8 @@ ROM_START( topbladv )
 	ROM_REGION32_LE( 0x3000000, "user1", 0 ) // Flash
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(bd23f640) SHA1(1d22aa2c828642bb7c1dfea4e13f777f95acc701) )
 
-	ROM_REGION( 0x10000, "user2",   ROMREGION_ERASEFF ) //Unmapped flash
+	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
-
 
 ROM_START( officeye )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // bios (not the standard one)
@@ -997,9 +1233,8 @@ ROM_START( officeye )
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(d3f3eec4) SHA1(ea728415bd4906964b7d37f4379a8a3bd42a1c2d) )
 	ROM_LOAD("flash.u2",  0x1000000, 0x1000000, CRC(e4f85d0a) SHA1(2ddfa6b3a30e69754aa9d96434ff3d37784bfa57) )
 
-	ROM_REGION( 0x10000, "user2",   ROMREGION_ERASEFF ) //Unmapped flash
+	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
-
 
 ROM_START( donghaer )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
@@ -1012,8 +1247,48 @@ ROM_START( donghaer )
 	ROM_LOAD( "u1",           0x0000000, 0x1000000, CRC(61217ad7) SHA1(2593f1356aa850f4f9aa5d00bec822aa59c59224) )
 	ROM_LOAD( "u2",           0x1000000, 0x1000000, CRC(6d82f1a5) SHA1(036bd45f0daac1ffeaa5ad9774fc1b56e3c75ff9) )
 
-	ROM_REGION( 0x10000, "user2",   ROMREGION_ERASEFF ) //Unmapped flash
+	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
+
+ROM_START( trivrus )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "u4", 0x00000, 0x80000, CRC(2d2e9a11) SHA1(73e7b19a032eae21312ca80f8c42cc16725496a7) )
+
+	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF ) // Flash
+	ROM_LOAD( "u3", 0x000000, 0x1000010, CRC(ba901707) SHA1(e281ba07024cd19ef1ab72d2197014f7b1f4d30f) )
+
+	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
+ROM_END
+
+ROM_START( psattack )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD("5.sys",  0x000000, 0x200000, CRC(f09878e4) SHA1(25b8dbac47d3911615c8874746e420ece13e7181) )
+
+	ROM_REGION( 0x4010, "pic16c711", 0 )
+	ROM_LOAD("16c711.pic",  0x0000, 0x137b, CRC(617d8292) SHA1(d32d6054ce9db2e31efaf41015afcc78ed32f6aa) ) // raw dump
+	ROM_LOAD("16c711.bin",  0x0000, 0x4010, CRC(b316693f) SHA1(eba1f75043bd415268eedfdb95c475e73c14ff86) ) // converted to binary
+
+	DISK_REGION( "cfcard" )
+	DISK_IMAGE_READONLY( "psattack", 0, SHA1(e99cd0dafc33ec13bf56061f81dc7c0a181594ee) )
+
+	// keep driver happy
+	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF )
+ROM_END
+
+ROM_START( ddz )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD("ddz.001.rom",  0x000000, 0x400000, CRC(b379f823) SHA1(531885b35d668d22c75a9759994f4aca6eacb046) )
+	ROM_LOAD("ddz.002.rom",  0x000000, 0x400000, CRC(285c744d) SHA1(2f8bc70825e55e3114015cb263e786df35cde275) )
+	ROM_LOAD("ddz.003.rom",  0x000000, 0x400000, CRC(61c9b5c9) SHA1(0438417398403456a1c49408881797a94aa86f49) )
+
+	// keep driver happy
+	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF )
+ROM_END
+
+
+
 
 DRIVER_INIT_MEMBER(crystal_state,crysking)
 {
@@ -1132,10 +1407,19 @@ DRIVER_INIT_MEMBER(crystal_state, donghaer)
 	Rom[WORD_XOR_LE(0x19C72 / 2)] = 0x9001; // PUSH %R0
 }
 
+DRIVER_INIT_MEMBER(crystal_state,psattack)
+{
+}
 
-GAME( 2001, crysbios,        0, crystal,  crystal, driver_device,         0, ROT0, "BrezzaSoft", "Crystal System BIOS", MACHINE_IS_BIOS_ROOT )
-GAME( 2001, crysking, crysbios, crystal,  crystal, crystal_state,  crysking, ROT0, "BrezzaSoft", "The Crystal of Kings", 0 )
-GAME( 2001, evosocc,  crysbios, crystal,  crystal, crystal_state,  evosocc,  ROT0, "Evoga", "Evolution Soccer", 0 )
-GAME( 2003, topbladv, crysbios, topbladv, crystal, crystal_state,  topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", 0 )
-GAME( 2001, officeye,        0, crystal,  officeye,crystal_state,  officeye, ROT0, "Danbi", "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING ) // still has some instability issues
-GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  donghaer, ROT0, "Danbi", "Donggul Donggul Haerong", MACHINE_NOT_WORKING )
+
+GAME( 2001, crysbios,        0, crystal,  crystal, driver_device,         0, ROT0, "BrezzaSoft",          "Crystal System BIOS",                  MACHINE_IS_BIOS_ROOT )
+GAME( 2001, crysking, crysbios, crystal,  crystal, crystal_state,  crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings",                 0 )
+GAME( 2001, evosocc,  crysbios, crystal,  crystal, crystal_state,  evosocc,  ROT0, "Evoga",               "Evolution Soccer",                     0 )
+GAME( 2003, topbladv, crysbios, crystal,  crystal, crystal_state,  topbladv, ROT0, "SonoKong / Expotato", "Top Blade V",                          0 )
+GAME( 2001, officeye,        0, crystal,  officeye,crystal_state,  officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING ) // still has some instability issues
+GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING )
+GAME( 2009, trivrus,         0, trivrus,  trivrus, driver_device,         0, ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 )
+// has a CF card instead of flash roms
+GAME( 2004, psattack, 0, crystal, crystal, crystal_state, psattack, ROT0, "Uniana", "P's Attack", MACHINE_IS_SKELETON )
+// looks like the same kind of hw from strings in the ROM, but scrambled / encrypted?
+GAME( 200?, ddz,    0,  crystal, crystal, driver_device, 0, ROT0, "IGS?", "Dou Di Zhu", MACHINE_IS_SKELETON )

@@ -105,9 +105,9 @@ public:
 	DECLARE_WRITE8_MEMBER(pcw9512_parallel_w);
 	void mcu_transmit_serial(UINT8 bit);
 	DECLARE_DRIVER_INIT(pcw);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pcw);
 	UINT32 screen_update_pcw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_pcw_printer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

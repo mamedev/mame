@@ -47,7 +47,7 @@ public:
 
 	void show_leds();
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void machine_reset();
+	virtual void machine_reset() override;
 };
 
 DRIVER_INIT_MEMBER( stratos_state, stratos )
@@ -77,7 +77,7 @@ void stratos_state::machine_reset()
 void stratos_state::show_leds()
 {
 	static const char *led_pos[18] = {
-		0, 0, "gPawn", "gKnight", "gBishop", "gRook", "gQueen", "gKing", 0, 0, "rPawn", "rKnight", "rBishop", "rRook", "rQueen", "rKing", 0, 0
+		nullptr, nullptr, "gPawn", "gKnight", "gBishop", "gRook", "gQueen", "gKing", nullptr, nullptr, "rPawn", "rKnight", "rBishop", "rRook", "rQueen", "rKing", nullptr, nullptr
 	};
 	char str_red[64];
 	char str_green[64];
@@ -320,8 +320,8 @@ WRITE8_MEMBER(stratos_state::lcd_w)
 	idx++;
 	if(idx == 18*2) {
 		logerror("lcd");
-		for(int i=0; i<18; i++)
-			logerror(" %02x", vals[i]);
+		for(auto & val : vals)
+			logerror(" %02x", val);
 		logerror("\n");
 	}
 }

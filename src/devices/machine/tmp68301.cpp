@@ -109,7 +109,7 @@ tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag,
 		m_scr(0),
 		m_pdir(0),
 		m_pdr(0),
-		m_space_config("regs", ENDIANNESS_LITTLE, 16, 10, 0, NULL, *ADDRESS_MAP_NAME(tmp68301_regs))
+		m_space_config("regs", ENDIANNESS_LITTLE, 16, 10, 0, nullptr, *ADDRESS_MAP_NAME(tmp68301_regs))
 {
 	memset(m_regs, 0, sizeof(m_regs));
 	memset(m_IE, 0, sizeof(m_IE));
@@ -161,7 +161,7 @@ void tmp68301_device::device_reset()
 
 const address_space_config *tmp68301_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 //**************************************************************************

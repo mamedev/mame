@@ -398,7 +398,7 @@ void vbi_metadata_pack(UINT8 *dest, UINT32 framenum, const vbi_metadata *vbi)
 
 void vbi_metadata_unpack(vbi_metadata *vbi, UINT32 *framenum, const UINT8 *source)
 {
-	if (framenum != NULL)
+	if (framenum != nullptr)
 		*framenum = (source[0] << 16) | (source[1] << 8) | source[2];
 	vbi->white = source[3];
 	vbi->line16 = (source[4] << 16) | (source[5] << 8) | source[6];

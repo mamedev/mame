@@ -462,8 +462,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_sfbonus_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_sfbonus_reel3_tile_info);
 	TILE_GET_INFO_MEMBER(get_sfbonus_reel4_tile_info);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	void draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int category);
 	UINT32 screen_update_sfbonus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

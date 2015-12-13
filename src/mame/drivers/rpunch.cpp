@@ -822,7 +822,7 @@ DRIVER_INIT_MEMBER(rpunch_state,svolley)
 	/* the main differences between Super Volleyball and Rabbit Punch are */
 	/* the lack of direct-mapped bitmap and a different palette base for sprites */
 	m_sprite_palette = 0x080;
-	m_bitmapram.set_target(NULL, 0);
+	m_bitmapram.set_target(nullptr, 0);
 }
 
 

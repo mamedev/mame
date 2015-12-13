@@ -290,7 +290,7 @@ void abc1600_mover_device::device_reset()
 
 const address_space_config *abc1600_mover_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 

@@ -49,7 +49,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pit68230_device> m_pit1;
 	required_device<pit68230_device> m_pit2;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<UINT32> m_p_ram;
