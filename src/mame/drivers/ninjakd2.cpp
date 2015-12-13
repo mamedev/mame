@@ -1585,7 +1585,7 @@ DRIVER_INIT_MEMBER(ninjakd2_state,robokidj)
 GAME( 1987, ninjakd2,  0,        ninjakd2, ninjakd2, ninjakd2_state, ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ninjakd2a, ninjakd2, ninjakd2, ninjakd2, ninjakd2_state, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ninjakd2b, ninjakd2, ninjakd2, rdaction, ninjakd2_state, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjakd2c, ninjakd2, ninjakd2, rdaction, ninjakd2_state, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 4)", MACHINE_SUPPORTS_SAVE ) // close to set 3
+GAME( 1987, ninjakd2c, ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 4)", MACHINE_SUPPORTS_SAVE ) // close to set 3
 GAME( 1987, rdaction,  ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, ROT0,   "UPL (World Games license)",       "Rad Action / NinjaKun Ashura no Shou", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, jt104,     ninjakd2, ninjakd2, rdaction, ninjakd2_state, bootleg,  ROT0,   "UPL (United Amusements license)", "JT-104 (title screen modification of Rad Action)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, mnight,    0,        mnight,   mnight,   ninjakd2_state, mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night", MACHINE_SUPPORTS_SAVE )
