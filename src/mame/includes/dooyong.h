@@ -72,6 +72,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(txvideoram_w);
 	DECLARE_WRITE8_MEMBER(primella_ctrl_w);
+	DECLARE_READ8_MEMBER(paletteram_flytiger_r);
 	DECLARE_WRITE8_MEMBER(paletteram_flytiger_w);
 	DECLARE_WRITE8_MEMBER(flytiger_ctrl_w);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

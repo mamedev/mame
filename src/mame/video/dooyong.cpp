@@ -144,6 +144,14 @@ WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
 //  logerror("%04x: bankswitch = %02x\n",space.device().safe_pc(),data&0xe0);
 }
 
+READ8_MEMBER(dooyong_z80_state::paletteram_flytiger_r)
+{
+	if (m_palette_bank) offset+= 0x800;
+	
+	return m_paletteram_flytiger[offset];
+}
+
+
 WRITE8_MEMBER(dooyong_z80_state::paletteram_flytiger_w)
 {
 	if (m_palette_bank) offset+= 0x800;
