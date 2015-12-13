@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- Tomy Tutor ant Pyuuta Cartridges
+<!-- Tomy Tutor and Pyuuta Cartridges
 Here's a list of known software packages and peripherals. There are 50 documented cartridges, counting both Japanese and American domestic releases; however, some are Japan-only, and a few are verifiably vapourware or were never otherwise released.
 
 Info Taken from: http://www.floodgap.com/retrobits/tomy/carts.html
@@ -82,7 +82,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 
 	<software name="baseball">
 		<description>Baseball (Jpn)</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="ベースボール"/>
 		<info name="serial" value="025E"/>
