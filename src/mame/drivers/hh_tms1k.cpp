@@ -18,6 +18,7 @@
  @MP0923   TMS1000   1979, Entex Baseball 2
  @MP1030   TMS1100   1980, APF Mathemagician
  @MP1133   TMS1470   1979, Kosmos Astro
+ @MP1180   TMS1100   1980, Tomy Pinball
  @MP1204   TMS1100   1980, Entex Baseball 3 (6007)
  @MP1211   TMS1100   1980, Entex Space Invader
  @MP1218   TMS1100   1980, Entex Basketball 2 (6010)
@@ -56,6 +57,7 @@
  *MP3491   TMS1100   1980, Mattel Horserace Analyzer
   MP3496   TMS1100   1980, MicroVision cartridge: Sea Duel
   M34009   TMS1100   1981, MicroVision cartridge: Alien Raiders (note: MP3498, MP3499, M3400x..)
+ @M34012   TMS1100   1980, Mattel Dungeons & Dragons - Computer Labyrinth Game
   M34017   TMS1100   1981, MicroVision cartridge: Cosmic Hunter
   M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
  *M34078A  TMS1100   1983, Milton Bradley Arcade Mania
@@ -70,13 +72,13 @@
  @MP7334   TMS1400   1981, Coleco Total Control 4
  @MP7351   TMS1400CR 1982, Parker Brothers Master Merlin
  @MP7551   TMS1670   1980, Entex Color Football 4 (6009)
+ @MPF553   TMS1670   1980, Gakken Jackpot: Gin Rummy & Black Jack (note: assume F to be a misprint)
  *MP7573   TMS1670?  1981, Entex Select-a-Game cartridge: Football 4 (? note: 40-pin, VFD-capable)
 
   inconsistent:
 
- @MPF553   TMS1670  1980, Gakken Jackpot: Gin Rummy & Black Jack
- *M95041   ?        1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
- @CD7282SL TMS1100  1981, Tandy/RadioShack Tandy-12 (serial is similar to TI Speak & Spell series?)
+ *M95041   ?         1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
+ @CD7282SL TMS1100   1981, Tandy/RadioShack Tandy-12 (serial is similar to TI Speak & Spell series?)
 
   (* denotes not yet emulated by MAME, @ denotes it's in this driver)
 
@@ -4225,6 +4227,120 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Tomy Pinball
+  * PCB label TOMY P-B
+  * TMS1100 MP1180 TOMY PINB (die labeled MP1180)
+  * 3 7seg LEDs, and other LEDs behind bezel, 1bit sound
+
+  known releases:
+  - Japan: Pinball
+  - USA: Power House Pinball
+  - Europe: Flipper Pinball
+
+  NOTE!: MAME external artwork is required
+
+***************************************************************************/
+
+class tpinball_state : public hh_tms1k_state
+{
+public:
+	tpinball_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+
+	DECLARE_INPUT_CHANGED_MEMBER(flipper_button);
+};
+
+// handlers
+
+void tpinball_state::prepare_display()
+{
+	// R0-R2 are 7segs
+	for (int y = 0; y < 3; y++)
+		m_display_segmask[y] = 0x7f;
+
+	display_matrix(7, 9, m_o, m_r);
+}
+
+WRITE16_MEMBER(tpinball_state::write_r)
+{
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+
+	// R9: input mux
+	m_inp_mux = data >> 9 & 1;
+
+	// R0-R8: led select
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(tpinball_state::write_o)
+{
+	// O0-O6: led state
+	// O7: N/C
+	m_o = data & 0x7f;
+	prepare_display();
+}
+
+READ8_MEMBER(tpinball_state::read_k)
+{
+	// K: multiplexed inputs (note: the Vss row is always on)
+	return m_inp_matrix[1]->read() | read_inputs(1);
+}
+
+
+// config
+
+static INPUT_PORTS_START( tpinball )
+	PORT_START("IN.0") // R9
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Plunger")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // Vss!
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Right Flipper") PORT_CHANGED_MEMBER(DEVICE_SELF, tpinball_state, flipper_button, (void *)1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Flipper") PORT_CHANGED_MEMBER(DEVICE_SELF, tpinball_state, flipper_button, (void *)0)
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(tpinball_state::flipper_button)
+{
+	// rectangular LEDs under LEDs D,F and E,G are directly connected
+	// to the left and right flipper buttons - output them to lamp90 and 91
+	output_set_lamp_value(90 + (int)(FPTR)param, newval);
+}
+
+
+static MACHINE_CONFIG_START( tpinball, tpinball_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // RC osc. R=47K, C=47pf -> ~350kHz
+	MCFG_TMS1XXX_READ_K_CB(READ8(tpinball_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tpinball_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tpinball_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Game driver(s)
 
 ***************************************************************************/
@@ -4588,6 +4704,17 @@ ROM_START( tbreakup )
 ROM_END
 
 
+ROM_START( tpinball )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "mp1180_tomy_pinb", 0x0000, 0x800, CRC(2163b92d) SHA1(bc53d1911e88b4e89d951c6f769703105c13389c) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_tpinball_output.pla", 0, 365, CRC(87e67aaf) SHA1(ebc7bae1352f39173f1bf0dc10cdc6f635dedab4) )
+ROM_END
+
+
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 COMP( 1980, mathmagi,  0,        0, mathmagi,  mathmagi,  driver_device, 0, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
@@ -4631,6 +4758,7 @@ CONS( 1982, mmerlin,   0,        0, mmerlin,   mmerlin,   driver_device, 0, "Par
 CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE ) // some of the minigames: ***
 
 CONS( 1979, tbreakup,  0,        0, tbreakup,  tbreakup,  driver_device, 0, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tpinball,  0,        0, tpinball,  tpinball,  driver_device, 0, "Tomy", "Pinball (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.
