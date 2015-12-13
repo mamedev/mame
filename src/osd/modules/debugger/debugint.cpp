@@ -60,7 +60,7 @@ private:
 #define BORDER_XTHICKNESS 1
 #define HSB_HEIGHT 20
 #define VSB_WIDTH 20
-#define TITLE_HEIGHT 20
+#define TITLE_HEIGHT (debug_font_height + 3*BORDER_YTHICKNESS)
 
 enum
 {
