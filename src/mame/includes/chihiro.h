@@ -393,6 +393,7 @@ public:
 		depthformat_rendertarget = NV2A_RT_DEPTH_FORMAT::Z24S8;
 		colorformat_rendertarget = NV2A_COLOR_FORMAT::A8R8G8B8;
 		bytespixel_rendertarget = 4;
+		clear_rendertarget.set(0, 0, 639, 479);
 		antialias_control = 0;
 		rendertarget = nullptr;
 		depthbuffer = nullptr;
@@ -462,6 +463,7 @@ public:
 	int read_vertices_0x1810(address_space & space, vertex_nv *destination, int offset, int limit);
 	int read_vertices_0x1818(address_space & space, vertex_nv *destination, UINT32 address, int limit);
 	void convert_vertices_poly(vertex_nv *source, vertex_t *destination, int count);
+	void clear_render_target(int what, UINT32 value);
 	void clear_depth_buffer(int what, UINT32 value);
 	inline UINT8 *direct_access_ptr(offs_t address);
 	TIMER_CALLBACK_MEMBER(puller_timer_work);
@@ -494,6 +496,7 @@ public:
 	NV2A_RT_DEPTH_FORMAT depthformat_rendertarget;
 	NV2A_COLOR_FORMAT colorformat_rendertarget;
 	int bytespixel_rendertarget;
+	rectangle clear_rendertarget;
 	UINT32 antialias_control;
 	UINT32 *rendertarget;
 	UINT32 *depthbuffer;
