@@ -555,6 +555,8 @@ public:
 	DECLARE_WRITE8_MEMBER( cd_ba_w );
 	DECLARE_READ8_MEMBER( ba_cd_r );
 	DECLARE_WRITE8_MEMBER( ba_cd_w );
+	DECLARE_READ8_MEMBER( ba_cd_inv_r );
+	DECLARE_WRITE8_MEMBER( ba_cd_inv_w );
 
 	/* Definitions moved to z80scc.c for enhencements */
 	DECLARE_READ8_MEMBER( da_r );  // { return m_chanA->data_read(); }

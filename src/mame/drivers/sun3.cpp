@@ -283,7 +283,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/timekpr.h"
-#include "machine/8530scc.h"
+#include "machine/z80scc.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 #include "bus/scsi/scsicd.h"
@@ -291,12 +291,15 @@
 #include "machine/upd765.h"
 #include "formats/pc_dsk.h"
 #include "formats/mfi_dsk.h"
+#include "bus/rs232/rs232.h"
 
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"
 #define SCC2_TAG        "scc2"
 #define ESP_TAG         "esp"
 #define FDC_TAG         "fdc"
+#define RS232A_TAG		"rs232a"
+#define RS232B_TAG		"rs232b"
 
 class sun3_state : public driver_device
 {
@@ -312,8 +315,8 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<scc8530_t> m_scc1;
-	required_device<scc8530_t> m_scc2;
+	required_device<z80scc_device> m_scc1;
+	required_device<z80scc_device> m_scc2;
 	optional_device<n82077aa_device> m_fdc;
 	virtual void machine_reset() override;
 
@@ -343,11 +346,6 @@ public:
 	DECLARE_WRITE32_MEMBER(ramwrite_w);
 	DECLARE_READ32_MEMBER(fpa_r);
 	DECLARE_READ32_MEMBER(p4id_r);
-
-	DECLARE_READ8_MEMBER(scc1_r);
-	DECLARE_WRITE8_MEMBER(scc1_w);
-	DECLARE_READ8_MEMBER(scc2_r);
-	DECLARE_WRITE8_MEMBER(scc2_w);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -379,8 +377,8 @@ static ADDRESS_MAP_START(sun3_80_mem, AS_PROGRAM, 32, sun3_state)
 	AM_RANGE(0x61001000, 0x61001003) AM_READWRITE(memreg_r, memreg_w)
 	AM_RANGE(0x61001004, 0x61001007) AM_READWRITE(memrerraddr_r, memrerraddr_w)
 	AM_RANGE(0x61001400, 0x61001403) AM_READWRITE(irqctrl_r, irqctrl_w)
-	AM_RANGE(0x62000000, 0x6200000f) AM_READWRITE8(scc1_r, scc1_w, 0xff00ff00)
-	AM_RANGE(0x62002000, 0x6200200f) AM_READWRITE8(scc2_r, scc2_w, 0xff00ff00)
+	AM_RANGE(0x62000000, 0x6200000f) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
+	AM_RANGE(0x62002000, 0x6200200f) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
 	AM_RANGE(0x63000000, 0x6301ffff) AM_ROM AM_REGION("user1",0)
 	AM_RANGE(0x64000000, 0x640007ff) AM_DEVREADWRITE8(TIMEKEEPER_TAG, timekeeper_device, read, write, 0xffffffff)
 	AM_RANGE(0x66000000, 0x6600003f) AM_DEVREADWRITE8(ESP_TAG, ncr539x_device, read, write, 0xff000000)
@@ -403,8 +401,8 @@ static ADDRESS_MAP_START(sun3_460_mem, AS_PROGRAM, 32, sun3_state)
 	AM_RANGE(0x61001000, 0x61001003) AM_READWRITE(memreg_r, memreg_w)
 	AM_RANGE(0x61001004, 0x61001007) AM_READWRITE(memrerraddr_r, memrerraddr_w)
 	AM_RANGE(0x61001400, 0x61001403) AM_READWRITE(irqctrl_r, irqctrl_w)
-	AM_RANGE(0x62000000, 0x6200000f) AM_READWRITE8(scc1_r, scc1_w, 0xff00ff00)
-	AM_RANGE(0x62002000, 0x6200200f) AM_READWRITE8(scc2_r, scc2_w, 0xff00ff00)
+	AM_RANGE(0x62000000, 0x6200000f) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
+	AM_RANGE(0x62002000, 0x6200200f) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
 	AM_RANGE(0x63000000, 0x6301ffff) AM_ROM AM_REGION("user1",0)
 
 	AM_RANGE(0x6f00003c, 0x6f00003f) AM_READWRITE(printer_r, printer_w)
@@ -502,32 +500,6 @@ WRITE32_MEMBER(sun3_state::ramwrite_w)
 	}
 
 	COMBINE_DATA(&pRAM[offset]);
-}
-
-// sun3:    0 = B control, 1 = B data,    2 = A control, 3 = A data
-// 8530scc: 0 = B control, 1 = A control, 2 = B data,    3 = A data
-READ8_MEMBER(sun3_state::scc1_r)
-{
-	int regsel = ((offset & 1)<<1) | ((offset & 2) >> 1);
-	return m_scc1->reg_r(space, regsel);
-}
-
-WRITE8_MEMBER(sun3_state::scc1_w)
-{
-	int regsel = ((offset & 1)<<1) | ((offset & 2) >> 1);
-	m_scc1->reg_w(space, regsel, data);
-}
-
-READ8_MEMBER(sun3_state::scc2_r)
-{
-	int regsel = ((offset & 1)<<1) | ((offset & 2) >> 1);
-	return m_scc2->reg_r(space, regsel);
-}
-
-WRITE8_MEMBER(sun3_state::scc2_w)
-{
-	int regsel = ((offset & 1)<<1) | ((offset & 2) >> 1);
-	m_scc2->reg_w(space, regsel, data);
 }
 
 READ32_MEMBER(sun3_state::enable_r)
@@ -759,8 +731,8 @@ static MACHINE_CONFIG_START( sun3, sun3_state )
 	MCFG_CPU_ADD("maincpu", M68020, 16670000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
 
-	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530, XTAL_4_9152MHz)
-	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530, XTAL_4_9152MHz)
+	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sun3_80, sun3_state )
@@ -770,8 +742,20 @@ static MACHINE_CONFIG_START( sun3_80, sun3_state )
 
 	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
 
-	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530, XTAL_4_9152MHz)
-	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530, XTAL_4_9152MHz)
+	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
@@ -800,8 +784,20 @@ static MACHINE_CONFIG_START( sun3_460, sun3_state )
 
 	MCFG_M48T02_ADD(TIMEKEEPER_TAG)
 
-	MCFG_DEVICE_ADD(SCC1_TAG, SCC8530, XTAL_4_9152MHz)
-	MCFG_DEVICE_ADD(SCC2_TAG, SCC8530, XTAL_4_9152MHz)
+	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
