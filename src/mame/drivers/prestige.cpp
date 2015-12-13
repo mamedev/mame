@@ -95,6 +95,7 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_cart(*this, "cartslot"),
 			m_keyboard(*this, "KEY"),
+			m_cart_type(*this, "CART_TYPE"),
 			m_bank1(*this, "bank1"),
 			m_bank2(*this, "bank2"),
 			m_bank3(*this, "bank3"),
@@ -106,6 +107,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<16> m_keyboard;
+	required_ioport m_cart_type;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
@@ -165,14 +167,14 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 		break;
 
 	case 1:
-		if (!(m_bank[5] & 0x01) && (m_bank[5] & 0x02) && m_cart->exists())
+		if (!(m_bank[5] & 0x01) && (m_bank[5] & 0x02) && (m_cart_type->read() == 0x02 || m_cart->exists()))
 			m_bank2->set_entry(0x40 + (data & 0x1f));
 		else
 			m_bank2->set_entry(data & 0x3f);
 		break;
 
 	case 2:
-		if (!(m_bank[5] & 0x01) && (m_bank[5] & 0x04) && m_cart->exists())
+		if (!(m_bank[5] & 0x01) && (m_bank[5] & 0x04) && (m_cart_type->read() == 0x02 || m_cart->exists()))
 			m_bank3->set_entry(0x40 + (data & 0x1f));
 		else
 			m_bank3->set_entry(data & 0x3f);
@@ -194,7 +196,7 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 		{
 			program.install_ram(0x8000, 0xbfff, m_vram);
 		}
-		else if (ioport("CART_TYPE")->read() == 0x01)
+		else if (m_cart_type->read() == 0x01)
 		{
 			//cartridge memory is writable
 			if (data & 0x02)
@@ -468,9 +470,10 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( glcolor )
 	PORT_START("CART_TYPE")
-	PORT_CONFNAME( 0x01, 0x00, "Cartridge Type" )
+	PORT_CONFNAME( 0x03, 0x02, "Cartridge Type" )
 	PORT_CONFSETTING( 0x00, "ROM" )
 	PORT_CONFSETTING( 0x01, "RAM" )
+	PORT_CONFSETTING( 0x02, "Internal" )
 
 	PORT_START("KEY.0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
@@ -623,6 +626,8 @@ void prestige_state::machine_start()
 
 	UINT8 *rom = memregion("maincpu")->base();
 	UINT8 *cart = m_cart_rom->base();
+	if (cart == nullptr)
+		cart = rom + 0x40000;   // internal ROM also includes extra contents that are activated by a cartridge that works as a jumper
 	UINT8 *ram = m_ram->pointer();
 	memset(ram, 0x00, m_ram->size());
 
@@ -714,7 +719,7 @@ static MACHINE_CONFIG_START( prestige_base, prestige_state )
 	MCFG_CPU_IO_MAP(prestige_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(prestige_state,prestige_int_ack)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", prestige_state, irq_timer, attotime::from_msec(10))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", prestige_state, irq_timer, attotime::from_hz(200))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -754,11 +759,18 @@ static MACHINE_CONFIG_DERIVED( glcolor, prestige_base )
 	MCFG_PALETTE_INIT_OWNER(prestige_state, glcolor)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "glcolor")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("snotec_cart", "snotec")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( glmcolor, glcolor )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(prestige_io)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( snotec, glcolor )
+	MCFG_SOFTWARE_LIST_REMOVE("cart_list")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "snotec")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("glcolor_cart", "glcolor")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( prestige, prestige_base )
@@ -812,6 +824,16 @@ ROM_END
 ROM_START( glscolor )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "27-5488-00.u5", 0x00000, 0x080000, CRC(e6cf7702) SHA1(ce40418a7777b331bf8c4c881d51732aeb384582) )    // identical to 'Genius Leader Color'
+ROM_END
+
+ROM_START( snotec )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "27-5616-01.u6", 0x00000, 0x080000, CRC(74093f5b) SHA1(3495b07e297315051888261d608680513a05c08b) )
+ROM_END
+
+ROM_START( snotecex )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "27-5758-00.u6", 0x00000, 0x080000, CRC(aac672be) SHA1(6ac09c3ae8c1c987072b2272cfcf34d9083431cb) )
 ROM_END
 
 ROM_START( glmcolor )
@@ -870,6 +892,8 @@ ROM_END
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
 COMP( 1994, glcolor,   0,       0,  glcolor,    glcolor,  driver_device,     0,  "VTech",   "Genius Leader Color (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 1994, glscolor,  glcolor, 0,  glcolor,    glcolor,  driver_device,     0,  "VTech",   "Genius Leader Super Color (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1995, snotec,    0,       0,  snotec,     glcolor,  driver_device,     0,  "Bandai",  "Super Note Club (Japan)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1996, snotecex,  0,       0,  snotec,     glcolor,  driver_device,     0,  "Bandai",  "Super Note Club EX (Japan)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 1996, glmcolor,  0,       0,  glmcolor,   glmcolor, driver_device,     0,  "VTech",   "Genius Leader Magic Color (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 1997, gl6000sl,  0,       0,  gl6000sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6000SL (Germany)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 1998, gl7007sl,  0,       0,  gl7007sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 7007SL (Germany)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
