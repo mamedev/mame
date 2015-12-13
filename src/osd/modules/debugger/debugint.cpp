@@ -20,6 +20,9 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
+#include "config.h"
+#include "debugger.h"
+#include "modules/lib/osdobj_common.h"
 #include "debug_module.h"
 #include "modules/osdmodule.h"
 
@@ -42,7 +45,9 @@ public:
 	virtual void debugger_update() override;
 
 private:
-	running_machine *m_machine;
+	running_machine* m_machine;
+	const char*      font_name;
+	float            font_size;
 };
 
 
@@ -184,7 +189,6 @@ public:
 		this->type = type;
 		this->m_machine = &machine;
 		this->state = flags | VIEW_STATE_NEEDS_UPDATE | VIEW_STATE_VISIBLE;
-
 		// initial size
 		this->bounds.set(0, 300, 0, 300);
 
@@ -504,6 +508,7 @@ static void dview_draw_title(DView *dv)
 	int i;
 	rgb_t col = rgb_t(0xff,0x00,0x00,0xff);
 	rectangle r;
+	int str_x = 2;
 
 	dview_get_rect(dv, RECT_DVIEW_TITLE, r);
 
@@ -517,9 +522,10 @@ static void dview_draw_title(DView *dv)
 
 	for (i = 0; i<strlen(dv->title.c_str()); i++)
 	{
-		dview_draw_char(dv, RECT_DVIEW_TITLE, i * debug_font_width + BORDER_XTHICKNESS,
+		dview_draw_char(dv, RECT_DVIEW_TITLE, str_x,
 				BORDER_YTHICKNESS, debug_font_height, //r.max_y - 2 * BORDER_YTHICKNESS,
 				rgb_t(0xff,0xff,0xff,0xff), (UINT16) dv->title[i] );
+		str_x += debug_font->char_width(debug_font_height, debug_font_aspect,(UINT16) dv->title[i]) + 2*BORDER_XTHICKNESS;
 	}
 }
 
@@ -732,39 +738,18 @@ static void dview_draw(DView *dv)
 			r.width() /*- (dv->vs ? VSB_WIDTH : 0)*/,
 			r.height() /*- (dv->hsb.visible ? HSB_HEIGHT : 0)*/, bg_base);
 
-	/* background first */
+	/* draw background and text */
 	viewdata = dv->view->viewdata();
-
 	yy = BORDER_YTHICKNESS;
 	for(j=0; j<vsize.y; j++)
 	{
 		xx = BORDER_XTHICKNESS;
 		for(i=0; i<vsize.x; i++)
 		{
-			map_attr_to_fg_bg(viewdata->attrib, &fg, &bg);
-
-			if (bg != bg_base)
-				dview_draw_box(dv, RECT_DVIEW_CLIENT, xx, yy,
-						debug_font_width, debug_font_height, bg);
-			xx += debug_font_width;
-			viewdata++;
-		}
-		yy += debug_font_height;
-	}
-
-	/* now the text */
-	viewdata = dv->view->viewdata();
-
-	yy = BORDER_YTHICKNESS;
-	for(j=0; j<vsize.y; j++)
-	{
-		xx = BORDER_XTHICKNESS;
-		for(i=0; i<vsize.x; i++)
-		{
-			UINT16 s;
+			UINT16 s = ' ';
 			unsigned char v = viewdata->byte;
 
-			if (v != ' ')
+//			if (v != ' ')
 			{
 				if(v < 128) {
 					s = v;
@@ -773,7 +758,9 @@ static void dview_draw(DView *dv)
 					s |= (0x80 | (v & 0x3f));
 				}
 				map_attr_to_fg_bg(viewdata->attrib, &fg, &bg);
-
+				if (bg != bg_base)
+					dview_draw_box(dv, RECT_DVIEW_CLIENT, xx, yy,
+							debug_font_width, debug_font_height, bg);
 				dview_draw_char(dv, RECT_DVIEW_CLIENT, xx, yy, debug_font_height, fg, s);
 			}
 			xx += debug_font_width;
@@ -815,9 +802,9 @@ static void dview_size_allocate(DView *dv)
 	dv->vsb.visible = (size.y * debug_font_height > r.height() ? 1 : 0);
 	dview_get_rect(dv, RECT_DVIEW_CLIENT, r);
 
-	dv->hsb.visible = (size.x * debug_font_width > r.width() ? 1 : 0);
-	dv->vsb.visible = (size.y * debug_font_height > r.height() ? 1 : 0);
-	dview_get_rect(dv, RECT_DVIEW_CLIENT, r);
+//	dv->hsb.visible = (size.x * debug_font_width > r.width() ? 1 : 0);
+//	dv->vsb.visible = (size.y * debug_font_height > r.height() ? 1 : 0);
+//	dview_get_rect(dv, RECT_DVIEW_CLIENT, r);
 
 	col.y = (r.height() - 2 * BORDER_YTHICKNESS /*+ debug_font_height  - 1*/) / debug_font_height;
 	col.x = (r.width() - 2 * BORDER_XTHICKNESS /*+ debug_font_width - 1*/) / debug_font_width;
@@ -918,11 +905,19 @@ void debug_internal::init_debugger(running_machine &machine)
 	int chw;
 
 	m_machine = &machine;
+	font_name = (downcast<osd_options &>(m_machine->options()).debugger_font());
+	font_size = (downcast<osd_options &>(m_machine->options()).debugger_font_size());
 
-	debug_font = m_machine->render().font_alloc("ui.bdf"); //ui_get_font(machine);
+	if(!strcmp(font_name, OSDOPTVAL_AUTO))
+		debug_font = m_machine->render().font_alloc("Courier New");
+	else
+		debug_font = m_machine->render().font_alloc(font_name);
+		
 	debug_font_width = 0;
-	debug_font_height = 15;
-
+	if(font_size == 0)
+		debug_font_height = 16;  // default
+	else
+		debug_font_height = font_size;
 	menu = nullptr;
 	cur_editor = nullptr;
 	list = nullptr;
@@ -936,9 +931,7 @@ void debug_internal::init_debugger(running_machine &machine)
 		if (chw>debug_font_width)
 			debug_font_width = chw;
 	}
-	debug_font_width++;
-	/* FIXME: above does not really work */
-	debug_font_width = 10;
+	debug_font_width += 2*BORDER_XTHICKNESS;
 }
 
 #if 0
