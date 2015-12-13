@@ -134,6 +134,7 @@ void hp_hybrid_cpu_device::device_start()
 				m_dmama = 0;
 				m_dmac = 0;
 				m_reg_I = 0;
+                                m_forced_bsc_25 = false;
 
 				{
 								state_add(HPHYBRID_A,  "A", m_reg_A);
@@ -174,6 +175,7 @@ void hp_hybrid_cpu_device::device_start()
 				save_item(NAME(m_dmama));
 				save_item(NAME(m_dmac));
 				save_item(NAME(m_reg_I));
+                                save_item(NAME(m_forced_bsc_25));
 
 				m_icountptr = &m_icount;
 }
@@ -642,6 +644,9 @@ UINT16 hp_hybrid_cpu_device::RM(UINT32 addr)
         UINT16 addr_wo_bsc = remove_mae(addr);
 
         if (addr_wo_bsc <= HP_REG_LAST_ADDR) {
+                // Any access to internal registers removes forcing of BSC 2x
+                m_forced_bsc_25 = false;
+
                 // Memory mapped registers that are present in both 3001 & 3011
                 switch (addr_wo_bsc) {
                 case HP_REG_A_ADDR:
@@ -716,6 +721,9 @@ void hp_hybrid_cpu_device::WM(UINT32 addr , UINT16 v)
         UINT16 addr_wo_bsc = remove_mae(addr);
 
         if (addr_wo_bsc <= HP_REG_LAST_ADDR) {
+                // Any access to internal registers removes forcing of BSC 2x
+                m_forced_bsc_25 = false;
+
                 // Memory mapped registers
                 switch (addr_wo_bsc) {
                 case HP_REG_A_ADDR:
@@ -1046,7 +1054,8 @@ void hp_hybrid_cpu_device::WIO(UINT8 pa , UINT8 ic , UINT16 v)
 }
 
 hp_5061_3001_cpu_device::hp_5061_3001_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-        : hp_hybrid_cpu_device(mconfig, HP_5061_3001, "HP-5061-3001", tag, owner, clock, "5061-3001", 22)
+        : hp_hybrid_cpu_device(mconfig, HP_5061_3001, "HP-5061-3001", tag, owner, clock, "5061-3001", 22),
+          m_boot_mode(false)
 {
 }
 
@@ -1095,11 +1104,13 @@ void hp_5061_3001_cpu_device::device_reset()
         // R36  0
         // R37  0
         m_reg_aec[ 0 ] = 0;
-        m_reg_aec[ 1 ] = 0x25;  // FU_TEST
+        m_reg_aec[ 1 ] = 5;
         m_reg_aec[ 2 ] = 0;
         m_reg_aec[ 3 ] = 0;
         m_reg_aec[ 4 ] = 0;
         m_reg_aec[ 5 ] = 0;
+
+        m_forced_bsc_25 = m_boot_mode;
 
         hp_hybrid_cpu_device::device_reset();
 }
@@ -1471,7 +1482,13 @@ UINT32 hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , UINT16 addr)
                 return 0;
         }
 
-        return (UINT32)addr | ((UINT32)(m_reg_aec[ bsc_reg - HP_REG_R32_ADDR ] & BSC_REG_MASK) << 16);
+        UINT16 aec_reg = m_reg_aec[ bsc_reg - HP_REG_R32_ADDR ] & BSC_REG_MASK;
+
+        if (m_forced_bsc_25) {
+                aec_reg = (aec_reg & 0xf) | 0x20;
+        }
+
+        return (UINT32)addr | ((UINT32)aec_reg << 16);
 }
 
 UINT16 hp_5061_3001_cpu_device::read_non_common_reg(UINT16 addr)

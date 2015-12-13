@@ -8,14 +8,14 @@
 // The HP hybrid processor series is composed of a few different models with different
 // capabilities. The series was derived from HP's own 2116 processor by translating a
 // discrete implementation of the 1960s into a multi-chip module (hence the "hybrid" name).
-// This emulator currently supports the 5061-3011 version only.
+// This emulator currently supports both the 5061-3001 & the 5061-3011 versions.
 //
 // For this emulator I mainly relied on these sources:
 // - http://www.hp9845.net/ website
 // - HP manual "Assembly development ROM manual for the HP9845": this is the most precious
 //   and "enabling" resource of all
 // - US Patent 4,180,854 describing the HP9845 system
-// - Study of disassembly of firmware of HP64000 system
+// - Study of disassembly of firmware of HP64000 & HP9845 systems
 // - A lot of "educated" guessing
 
 #ifndef _HPHYBRID_H_
@@ -25,11 +25,6 @@
 #define HPHYBRID_IRH    0       // High-level interrupt
 #define HPHYBRID_IRL    1       // Low-level interrupt
 #define HPHYBRID_INT_LVLS   2   // Levels of interrupt
-
-#define HPHYBRID_DMAR   2       // DMA request
-#define HPHYBRID_HALT   3       // "Halt" input
-#define HPHYBRID_STS    4       // "Status" input
-#define HPHYBRID_FLG    5       // "Flag" input
 
 // I/O addressing space (16-bit wide)
 // Addresses into this space are composed as follows:
@@ -74,6 +69,10 @@
 
 #define HP_REG_IV_MASK  0xfff0
 #define HP_REG_PA_MASK  0x000f
+
+// Set boot mode of 5061-3001: either normal (false) or as in HP9845 system (true)
+#define MCFG_HPHYBRID_SET_9845_BOOT(_mode) \
+	hp_5061_3001_cpu_device::set_boot_mode_static(*device, _mode);
 
 class hp_hybrid_cpu_device : public cpu_device
 {
@@ -140,6 +139,7 @@ protected:
         UINT16 get_skip_addr(UINT16 opcode , bool condition) const;
 
                 int m_icount;
+        bool m_forced_bsc_25;
 
                 // State of processor
                 UINT16 m_reg_A;     // Register A
@@ -182,6 +182,8 @@ class hp_5061_3001_cpu_device : public hp_hybrid_cpu_device
 public:
         hp_5061_3001_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	static void set_boot_mode_static(device_t &device, bool mode) { downcast<hp_5061_3001_cpu_device &>(device).m_boot_mode = mode; }
+
 protected:
         virtual void device_start();
         virtual void device_reset();
@@ -204,6 +206,8 @@ protected:
         virtual void write_non_common_reg(UINT16 addr , UINT16 v);
 
 private:
+        bool m_boot_mode;
+
         // Additional state of processor
         UINT16 m_reg_ar2[ 4 ];  // AR2 register
         UINT16 m_reg_se;        // SE register (4 bits)
