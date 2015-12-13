@@ -10,7 +10,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_palette_bank(0)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(bgscroll_w);
@@ -23,6 +24,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg2_tile_info);
 	inline void get_tile_info(tile_data &tileinfo, int tile_index, UINT8 const *tilerom, UINT8 const *scroll, int graphics);
 	inline void scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap_t *map);
+
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg2_tilemap;
@@ -46,6 +48,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	UINT8 m_palette_bank;
 };
 
 class dooyong_z80_state : public dooyong_state
@@ -84,7 +87,6 @@ public:
 	required_shared_ptr<UINT8> m_txvideoram;
 	UINT8* m_paletteram_flytiger;
 	UINT8 m_sprites_disabled;
-	UINT8 m_flytiger_palette_bank;
 	UINT8 m_flytiger_pri;
 	UINT8 m_tx_pri;
 	int m_tx_tilemap_mode;

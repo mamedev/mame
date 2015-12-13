@@ -731,17 +731,17 @@ static const gfx_layout popbingo_tilelayout =
 };
 
 static GFXDECODE_START( lastday )
-	GFXDECODE_ENTRY( "gfx1", 0, lastday_charlayout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,         512, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, lastday_charlayout,   0, 16+64 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16+64 )
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16+64 )
+	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,         512, 16+64 )
 GFXDECODE_END
 
 static GFXDECODE_START( flytiger )
-	GFXDECODE_ENTRY( "gfx1", 0, lastday_charlayout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,         512, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, lastday_charlayout,   0, 16+64 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16+64 )
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16+64 )
+	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,         512, 32+64 )
 GFXDECODE_END
 
 static GFXDECODE_START( bluehawk )
