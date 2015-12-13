@@ -39,7 +39,9 @@ public:
 		m_io_dsw1(*this, "DSW1"),
 		m_io_dsw2(*this, "DSW2"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen")
+		{ }
 
 	required_shared_ptr<UINT16> m_vregs;
 	required_shared_ptr<UINT16> m_objectram;
@@ -58,6 +60,9 @@ public:
 	optional_ioport m_io_dsw2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+
+	bitmap_ind16 m_sprite_buffer_bitmap;
 
 	UINT16 *m_spriteram;
 	UINT16 m_ip_select;
@@ -154,6 +159,8 @@ public:
 	inline void scrollram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int which);
 	void create_tilemaps();
 	void megasys1_priority_create();
+	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void partial_clear_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 param);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	inline void draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, INT32 code, INT32 color, INT32 sx, INT32 sy, INT32 flipx, INT32 flipy, UINT8 mosaic, UINT8 mosaicsol, INT32 priority);
 	void rodland_gfx_unmangle(const char *region);
