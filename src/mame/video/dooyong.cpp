@@ -109,7 +109,7 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 	coin_counter_w(machine(), 1, data & 0x40);
 
 	/* bit 1 is used but unknown - possibly palette banking */
-	m_flytiger_palette_bank = (data & 0x02)^2;
+	m_flytiger_palette_bank = (data & 0x02);
 
 	/* bit 2 is continuously toggled (unknown) */
 	/* bit 4 is used but unknown */
