@@ -154,7 +154,6 @@ class spc1000_state : public driver_device
 public:
 	spc1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_motor(false)
 		, m_maincpu(*this, "maincpu")
 		, m_vdg(*this, "mc6847")
 		, m_cass(*this, "cassette")
@@ -185,7 +184,7 @@ private:
 	UINT8 m_GMODE;
 	UINT16 m_page;
 	UINT8 *m_work_ram;
-	bool m_motor;
+	attotime m_time;
 	bool m_centronics_busy;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -223,11 +222,12 @@ READ8_MEMBER(spc1000_state::iplk_r)
 
 WRITE8_MEMBER( spc1000_state::cass_w )
 {
-	bool m = BIT(data, 1) ? true : false;
+	attotime time = machine().scheduler().time();
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
-	if (m && !m_motor)
-		m_cass->change_state(m_cass->get_state() & CASSETTE_MASK_MOTOR ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-	m_motor = m;
+	if (BIT(data, 1) && ATTOSECONDS_IN_MSEC((time - m_time).as_attoseconds()) > 500) {
+		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		m_time = time;
+	}
 	m_centronics->write_strobe(BIT(data, 2) ? true : false);
 }
 
@@ -403,13 +403,14 @@ void spc1000_state::machine_start()
 	// intialize banks 2 & 4 (write banks)
 	membank("bank2")->set_base(ram);
 	membank("bank4")->set_base(ram + 0x8000);
+	
+    	m_time = machine().scheduler().time();	
 }
 
 void spc1000_state::machine_reset()
 {
 	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
 	m_IPLK = 1;
-	m_motor = false;
 }
 
 READ8_MEMBER(spc1000_state::mc6847_videoram_r)
