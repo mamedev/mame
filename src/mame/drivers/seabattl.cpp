@@ -261,7 +261,7 @@ static ADDRESS_MAP_START( seabattl_map, AS_PROGRAM, 8, seabattl_state )
 	AM_RANGE(0x1e06, 0x1e06) AM_MIRROR(0x20f0) AM_READ_PORT("DIPS1") AM_WRITE(sound_w)
 	AM_RANGE(0x1e07, 0x1e07) AM_MIRROR(0x20f0) AM_READ_PORT("DIPS0") AM_WRITE(sound2_w)
 	AM_RANGE(0x1fcc, 0x1fcc) AM_MIRROR(0x2000) AM_READ_PORT("IN1")
-	AM_RANGE(0x1f00, 0x1fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("s2636", s2636_device, read, write)
+	AM_RANGE(0x1f00, 0x1fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("s2636", s2636_device, read_data, write_data)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( seabattl_io_map, AS_IO, 8, seabattl_state )

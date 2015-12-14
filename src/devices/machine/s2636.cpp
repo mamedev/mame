@@ -162,9 +162,12 @@ s2636_device::s2636_device(const machine_config &mconfig, const char *tag, devic
 	, m_divider(1)
 	, m_y_offset(0)
 	, m_x_offset(0)
+	, m_intreq_cb(*this)
 	, m_vrst(false)
 	, m_screen_line(0)
 	, m_vis_line(0)
+	, m_intreq(CLEAR_LINE)
+	, m_intack(CLEAR_LINE)
 	, m_stream(nullptr)
 	, m_sample_cnt(0)
 	, m_sound_lvl(false)
@@ -187,18 +190,24 @@ void s2636_device::device_start()
 
 	save_item(NAME(m_registers));
 
-	save_item(NAME(m_obj_cnt));
-	save_item(NAME(m_obj_disp));
-	save_item(NAME(m_obj_dup));
-
 	save_item(NAME(m_vrst));
 	save_item(NAME(m_screen_line));
 	save_item(NAME(m_vis_line));
 
+	save_item(NAME(m_obj_cnt));
+	save_item(NAME(m_obj_disp));
+	save_item(NAME(m_obj_dup));
+
+	save_item(NAME(m_intreq));
+	save_item(NAME(m_intack));
+
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
 	save_item(NAME(m_sample_cnt));
 	save_item(NAME(m_sound_lvl));
+
+	m_intreq_cb.resolve_safe();
 }
+
 
 //-------------------------------------------------
 //  backwards-compatible update method
@@ -215,6 +224,10 @@ bitmap_ind16 const &s2636_device::update(const rectangle &cliprect)
 }
 
 
+//-------------------------------------------------
+//  render the first line into the bitmap
+//-------------------------------------------------
+
 void s2636_device::render_first_line()
 {
 	m_screen_line = 0;
@@ -222,8 +235,14 @@ void s2636_device::render_first_line()
 }
 
 
+//-------------------------------------------------
+//  render next line into the bitmap
+//-------------------------------------------------
+
 void s2636_device::render_next_line()
 {
+	assert(m_screen_line < m_bitmap.height());
+
 	// pre-clear the line for convenience
 	rectangle const &vis_area = m_screen->visible_area();
 	UINT16 *const   row = &m_bitmap.pix16(m_screen_line);
@@ -235,6 +254,7 @@ void s2636_device::render_next_line()
 		{
 			m_registers[REG_VBL_COL_OBJ] |= 0x40;
 			m_vrst = true;
+			update_intreq(ASSERT_LINE);
 		}
 	}
 	else
@@ -254,9 +274,10 @@ void s2636_device::render_next_line()
 			m_registers[REG_COL_BG_CMPL] = 0x00;
 			m_registers[REG_VBL_COL_OBJ] = 0x00;
 
-			// set our internal tracking flags
+			// set our internal tracking flags and clear interrupt
 			m_vrst = false;
 			m_vis_line = 0;
+			update_intreq(CLEAR_LINE);
 		}
 
 		// work out what object pixels belong in this line
@@ -295,6 +316,7 @@ void s2636_device::render_next_line()
 					m_obj_cnt[i] = 1 + m_registers[OFFS_OBJ[i] + OFFS_VCB];
 					m_obj_disp[i] = false;
 					m_obj_dup[i] = true;
+					update_intreq(ASSERT_LINE);
 				}
 			}
 			else
@@ -381,7 +403,7 @@ void s2636_device::render_next_line()
 //  bus access handlers
 //-------------------------------------------------
 
-READ8_MEMBER( s2636_device::read )
+READ8_MEMBER( s2636_device::read_data )
 {
 	mask_offset(offset);
 	UINT8 data = m_registers[offset];
@@ -399,7 +421,7 @@ READ8_MEMBER( s2636_device::read )
 	return data;
 }
 
-WRITE8_MEMBER( s2636_device::write )
+WRITE8_MEMBER( s2636_device::write_data )
 {
 	mask_offset(offset);
 
@@ -407,6 +429,17 @@ WRITE8_MEMBER( s2636_device::write )
 		m_stream->update();
 
 	m_registers[offset] = data;
+}
+
+WRITE_LINE_MEMBER( s2636_device::write_intack )
+{
+	assert((ASSERT_LINE == state) || (HOLD_LINE == state) || (CLEAR_LINE == state) || (PULSE_LINE == state));
+
+	// pretend interrupt acknowledge is handled instantaneously
+	m_intack = state;
+	update_intreq(m_intreq);
+	if (ASSERT_LINE != m_intreq)
+		m_intack = CLEAR_LINE;
 }
 
 
@@ -435,5 +468,16 @@ void s2636_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 
 		*buffer++ = m_sound_lvl ? 0x7fff : 0x0000;
 		m_sample_cnt--;
+	}
+}
+
+
+void s2636_device::update_intreq(int value)
+{
+	int const new_value = m_intack ? CLEAR_LINE : value;
+	if (new_value != m_intreq)
+	{
+		m_intreq = new_value;
+		m_intreq_cb(m_intreq);
 	}
 }

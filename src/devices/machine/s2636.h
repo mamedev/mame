@@ -13,9 +13,26 @@
 #define S2636_IS_PIXEL_DRAWN(p)     (((p) & 0x08) ? TRUE : FALSE)
 #define S2636_PIXEL_COLOR(p)        ((p) & 0x07)
 
+
 /*************************************
  *
  *  Device configuration macros
+ *
+ *************************************/
+
+#define MCFG_S2636_OFFSETS(_yoffs, _xoffs) \
+	s2636_device::set_offsets(*device, _yoffs, _xoffs);
+
+#define MCFG_S2636_DIVIDER(_divider) \
+	s2636_device::set_divider(*device, _divider);
+
+#define MCFG_S2623_SET_INTREQ_CALLBACK(_devcb) \
+	devcb = &s2636_device::set_intreq_cb(*device, DEVCB_##_devcb);
+
+
+/*************************************
+ *
+ *  Device state class
  *
  *************************************/
 
@@ -40,6 +57,12 @@ public:
 		dev.m_divider = divider;
 	}
 
+	template<class _Object> static devcb_base &set_intreq_cb(device_t &device, _Object object)
+	{
+		s2636_device &dev = downcast<s2636_device &>(device);
+		return dev.m_intreq_cb.set_callback(object);
+	}
+
 	// returns a BITMAP_FORMAT_IND16 bitmap the size of the screen
 	// D0-D2 of each pixel is the pixel color
 	// D3 indicates how the S2636 drew this pixel - 0 = background, 1 = object/score
@@ -53,8 +76,10 @@ public:
 	void render_first_line();
 	void render_next_line();
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read_data );
+	DECLARE_WRITE8_MEMBER( write_data );
+
+	DECLARE_WRITE_LINE_MEMBER( write_intack );
 
 protected:
 	// device-level overrides
@@ -116,35 +141,40 @@ private:
 	UINT8 object_color(int obj) const { return (m_registers[REG_OBJ_CLR_1_2 + (obj >> 1)] >> ((obj & 1) ? 0 : 3)) & 0x07; }
 	UINT8 score_digit(int digit) const { return (m_registers[REG_SCORE_1_2 + (digit >> 1)] >> ((digit & 1) ? 0 : 4)) & 0x0f; }
 
-	int             m_divider;
-	int             m_y_offset;
-	int             m_x_offset;
+	void update_intreq(int value);
 
-	bitmap_ind16    m_bitmap;
+	// Configuration
+	int     m_divider;
+	int     m_y_offset;
+	int     m_x_offset;
 
-	UINT8           m_registers[0x100];
+	// interfacing with other devices
+	devcb_write_line    m_intreq_cb;
+	bitmap_ind16        m_bitmap;
 
-	int             m_obj_cnt[OBJ_COUNT];
-	bool            m_obj_disp[OBJ_COUNT];
-	bool            m_obj_dup[OBJ_COUNT];
+	// 256-byte register file (not all of this really exists)
+	UINT8   m_registers[0x100];
 
-	bool            m_vrst;
-	int             m_screen_line;
-	int             m_vis_line;
+	// tracking where we're up to in the screen update
+	bool    m_vrst;
+	int     m_screen_line;
+	int     m_vis_line;
 
+	// current display state of object
+	int     m_obj_cnt[OBJ_COUNT];
+	bool    m_obj_disp[OBJ_COUNT];
+	bool    m_obj_dup[OBJ_COUNT];
+
+	// interrupt generation
+	int     m_intreq;
+	int     m_intack;
+
+	// sound generation state
 	sound_stream    *m_stream;
 	int             m_sample_cnt;
 	bool            m_sound_lvl;
 };
 
 extern const device_type S2636;
-
-
-#define MCFG_S2636_OFFSETS(_yoffs, _xoffs) \
-	s2636_device::set_offsets(*device, _yoffs, _xoffs);
-
-#define MCFG_S2636_DIVIDER(_divider) \
-	s2636_device::set_divider(*device, _divider);
-
 
 #endif /* __S2636_H__ */

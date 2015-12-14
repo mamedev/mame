@@ -155,7 +155,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_r)
 	if (m_s2650_flag)
 		return m_character_ram[(0 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return m_s2636_0->read(space, offset);
+		return m_s2636_0->read_data(space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
@@ -167,7 +167,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
 		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
-		m_s2636_0->write(space, offset, data);
+		m_s2636_0->write_data(space, offset, data);
 }
 
 
@@ -176,7 +176,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_r)
 	if (m_s2650_flag)
 		return m_character_ram[(1 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return m_s2636_1->read(space, offset);
+		return m_s2636_1->read_data(space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
@@ -188,7 +188,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
 		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
-		m_s2636_1->write(space, offset, data);
+		m_s2636_1->write_data(space, offset, data);
 }
 
 
@@ -197,7 +197,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_r)
 	if (m_s2650_flag)
 		return m_character_ram[(2 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return m_s2636_2->read(space, offset);
+		return m_s2636_2->read_data(space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
@@ -209,7 +209,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
 		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
-		m_s2636_2->write(space, offset, data);
+		m_s2636_2->write_data(space, offset, data);
 }
 
 
