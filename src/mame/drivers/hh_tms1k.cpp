@@ -4235,7 +4235,20 @@ MACHINE_CONFIG_END
   known releases:
   - Japan: Pinball
   - USA: Power House Pinball
-  - Europe: Flipper Pinball
+  - Europe: Flipper
+
+  lamp translation table: led zz from game PCB = MAME lampyx:
+
+    0 = -          10 = lamp50     20 = lamp64     A = lamp30
+    1 = lamp33     11 = lamp55     21 = lamp65     B = lamp34
+    2 = lamp31     12 = lamp51     22 = lamp70     C = lamp35
+    3 = lamp32     13 = lamp52     23 = lamp71     D = lamp80
+    4 = lamp40     14 = lamp53     24 = lamp72     E = lamp81
+    5 = lamp41     15 = lamp60     25 = lamp73     F = lamp82
+    6 = lamp42     16 = lamp54     26 = lamp74     G = lamp83
+    7 = lamp43     17 = lamp61
+    8 = lamp44     18 = lamp62
+    9 = lamp45     19 = lamp63
 
   NOTE!: MAME external artwork is required
 
@@ -4319,7 +4332,7 @@ INPUT_CHANGED_MEMBER(tpinball_state::flipper_button)
 static MACHINE_CONFIG_START( tpinball, tpinball_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // RC osc. R=47K, C=47pf -> ~350kHz
+	MCFG_CPU_ADD("maincpu", TMS1100, 375000) // RC osc. R=47K, C=47pf -> ~375kHz
 	MCFG_TMS1XXX_READ_K_CB(READ8(tpinball_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tpinball_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tpinball_state, write_o))
@@ -4706,7 +4719,7 @@ ROM_END
 
 ROM_START( tpinball )
 	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "mp1180_tomy_pinb", 0x0000, 0x800, CRC(2163b92d) SHA1(bc53d1911e88b4e89d951c6f769703105c13389c) )
+	ROM_LOAD( "mp1180", 0x0000, 0x800, CRC(2163b92d) SHA1(bc53d1911e88b4e89d951c6f769703105c13389c) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
