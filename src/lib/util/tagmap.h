@@ -77,7 +77,7 @@ public:
 	}
 
 	// operations by tag
-	void remove(const char *tag) { auto search = m_map.find(tag);  if (search != m_map.end()) m_list.remove(*search->second); }
+	void remove(const char *tag) { auto search = m_map.find(tag);  if (search != m_map.end()) { m_list.remove(*search->second); m_map.erase(search); } }
 	_ElementType *find(const char *tag) const { auto search = m_map.find(tag); return (search == m_map.end()) ? nullptr : search->second; }
 
 private:
