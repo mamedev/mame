@@ -90,7 +90,7 @@ WRITE8_MEMBER(dooyong_z80_state::bankswitch_w)
 
 MACHINE_START_MEMBER(dooyong_z80_state, cpu_z80)
 {
-	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 }
 
 WRITE8_MEMBER(dooyong_z80_state::flip_screen_w)
@@ -1166,10 +1166,9 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( lastday ) /* 90030003 PCB */
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "lday3.s5",     0x00000, 0x10000, CRC(a06dfb1e) SHA1(c6220eda8c01d55862700e369db7291dbbedc8c8) )
-	ROM_RELOAD(               0x10000, 0x10000 )                /* banked at 0x8000-0xbfff */
-	ROM_LOAD( "4.u5",         0x20000, 0x10000, CRC(70961ea6) SHA1(245d3da67abb4a511a024f030de461b9a2b4804e) )  /* banked at 0x8000-0xbfff */
+	ROM_LOAD( "4.u5",         0x10000, 0x10000, CRC(70961ea6) SHA1(245d3da67abb4a511a024f030de461b9a2b4804e) )  /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "1.d3",    0x0000, 0x8000, CRC(dd4316fd) SHA1(496e6657bb76d91f488a2464d1af1be095ab9105) )    /* empty */
@@ -1202,10 +1201,9 @@ ROM_START( lastday ) /* 90030003 PCB */
 	ROM_LOAD16_BYTE( "13.r14",   0x00001, 0x10000, CRC(6bdbd887) SHA1(a54f26f9ddd72b8b8f7a030610c1c4a5f94a3358) )ROM_END
 
 ROM_START( lastdaya ) /* 90030003 PCB */
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "lday3.s5",     0x00000, 0x10000, CRC(a06dfb1e) SHA1(c6220eda8c01d55862700e369db7291dbbedc8c8) )
-	ROM_RELOAD(               0x10000, 0x10000 )                /* banked at 0x8000-0xbfff */
-	ROM_LOAD( "4.u5",         0x20000, 0x10000, CRC(70961ea6) SHA1(245d3da67abb4a511a024f030de461b9a2b4804e) )  /* banked at 0x8000-0xbfff */
+	ROM_LOAD( "4.u5",         0x10000, 0x10000, CRC(70961ea6) SHA1(245d3da67abb4a511a024f030de461b9a2b4804e) )  /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "e1.d3",        0x0000, 0x8000, CRC(ce96e106) SHA1(5ef1f221618abd757e02db79c3d7016100f30c07) )    /* empty */
@@ -1239,10 +1237,9 @@ ROM_START( lastdaya ) /* 90030003 PCB */
 ROM_END
 
 ROM_START( ddaydoo ) /* 90030003 PCB */
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "3.s5",    0x00000, 0x10000, CRC(7817d4f3) SHA1(b85db234c04f248fd2927a2224380783780673f5)) /* closest to 'lastday' set */
-	ROM_RELOAD(          0x10000, 0x10000 )                /* banked at 0x8000-0xbfff */
-	ROM_LOAD( "4.u5",    0x20000, 0x10000, CRC(70961ea6) SHA1(245d3da67abb4a511a024f030de461b9a2b4804e) )  /* banked at 0x8000-0xbfff */
+	ROM_LOAD( "4.u5",    0x10000, 0x10000, CRC(70961ea6) SHA1(245d3da67abb4a511a024f030de461b9a2b4804e) )  /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "1.d3",    0x0000, 0x8000, CRC(dd4316fd) SHA1(496e6657bb76d91f488a2464d1af1be095ab9105) )    /* empty */
@@ -1276,9 +1273,8 @@ ROM_START( ddaydoo ) /* 90030003 PCB */
 ROM_END
 
 ROM_START( gulfstrm )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "1.l4",         0x00000, 0x20000, CRC(59e0478b) SHA1(dd6e48c6e91ddb087d20336eab79bbadd968d4b1) )
-	ROM_RELOAD(               0x10000, 0x20000 )                /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "3.c5",         0x00000, 0x10000, CRC(c029b015) SHA1(86f8d4f6560cb99e25e8e8baf72dde743a7b9c4c) )
@@ -1313,9 +1309,8 @@ ROM_START( gulfstrm )
 ROM_END
 
 ROM_START( gulfstrma )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "1.bin",       0x00000, 0x20000, CRC(d04fb06b) SHA1(bdf09ab692f90e3dea815605998f75b6478c8047) )
-	ROM_RELOAD(              0x10000, 0x20000 )             /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "3.c5",         0x00000, 0x10000, CRC(c029b015) SHA1(86f8d4f6560cb99e25e8e8baf72dde743a7b9c4c) )
@@ -1350,9 +1345,8 @@ ROM_START( gulfstrma )
 ROM_END
 
 ROM_START( gulfstrmb )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "1.l4",        0x00000, 0x20000, CRC(aabd95a5) SHA1(f1d3ade952e96b288e2cd4b172931862b16b4af9) ) // sldh
-	ROM_RELOAD(              0x10000, 0x20000 )             /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "3.c5",         0x00000, 0x10000, CRC(c029b015) SHA1(86f8d4f6560cb99e25e8e8baf72dde743a7b9c4c) )
@@ -1387,9 +1381,8 @@ ROM_START( gulfstrmb )
 ROM_END
 
 ROM_START( gulfstrmm )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "18.l4",        0x00000, 0x20000, CRC(d38e2667) SHA1(3690d708c7be85871d6bb32a774d711a30782126) )
-	ROM_RELOAD(               0x10000, 0x20000 )                /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "3.c5",         0x00000, 0x10000, CRC(c029b015) SHA1(86f8d4f6560cb99e25e8e8baf72dde743a7b9c4c) )
@@ -1424,9 +1417,8 @@ ROM_START( gulfstrmm )
 ROM_END
 
 ROM_START( pollux )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "pollux2.bin",  0x00000, 0x10000, CRC(45e10d4e) SHA1(ece25fcc0acda9a8cfc00f3132a87469037b5a4e) )
-	ROM_RELOAD(               0x10000, 0x10000 )    /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "pollux3.bin",  0x00000, 0x10000, CRC(85a9dc98) SHA1(a349bfb05d870ba920469066ce5c007363aca348) )
@@ -1456,9 +1448,8 @@ ROM_START( pollux )
 ROM_END
 
 ROM_START( polluxa )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "dooyong2.bin",  0x00000, 0x10000, CRC(e4ea8dbd) SHA1(19652261981672fae896e3065f1f5078f7ae93b6) )
-	ROM_RELOAD(               0x10000, 0x10000 )    /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "pollux3.bin",  0x00000, 0x10000, CRC(85a9dc98) SHA1(a349bfb05d870ba920469066ce5c007363aca348) )
@@ -1488,9 +1479,8 @@ ROM_START( polluxa )
 ROM_END
 
 ROM_START( polluxa2 )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "dooyong16_tms27c512.bin",  0x00000, 0x10000, CRC(dffe5173) SHA1(fec9b8198ae8a1b7c9b798b9317ed6d986c11e35) )
-	ROM_RELOAD(               0x10000, 0x10000 )    /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "pollux3.bin",  0x00000, 0x10000, CRC(85a9dc98) SHA1(a349bfb05d870ba920469066ce5c007363aca348) )
@@ -1520,9 +1510,8 @@ ROM_START( polluxa2 )
 ROM_END
 
 ROM_START( polluxn )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "polluxntc_2.3g",  0x00000, 0x10000, CRC(96d3e3af) SHA1(fc0e7a60bee0ed74c28d403a97a852eb677f8189) )
-	ROM_RELOAD(               0x10000, 0x10000 )    /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "polluxntc_3.6t",  0x00000, 0x10000, CRC(85a9dc98) SHA1(a349bfb05d870ba920469066ce5c007363aca348) )
@@ -1553,9 +1542,8 @@ ROM_END
 
 
 ROM_START( bluehawk )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "rom19",        0x00000, 0x20000, CRC(24149246) SHA1(458fd429a895353b8636c717dcd58d57b8723012) )
-	ROM_RELOAD(               0x10000, 0x20000 )    /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "rom1",         0x00000, 0x10000, CRC(eef22920) SHA1(a3295ae7524df8c4d00ac3da422bbf66c959bf4f) )
@@ -1581,9 +1569,8 @@ ROM_START( bluehawk )
 ROM_END
 
 ROM_START( bluehawkn )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "rom19",        0x00000, 0x20000, CRC(24149246) SHA1(458fd429a895353b8636c717dcd58d57b8723012) )  // ROM2
-	ROM_RELOAD(               0x10000, 0x20000 )    /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "rom1",         0x00000, 0x10000, CRC(eef22920) SHA1(a3295ae7524df8c4d00ac3da422bbf66c959bf4f) )
@@ -1678,9 +1665,8 @@ Top Board
 */
 
 ROM_START( flytiger )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "1.3c",         0x00000, 0x20000, CRC(2d634c8e) SHA1(012ad31c0edc67d727d216e2ede321c1d1f27226) )
-	ROM_RELOAD(               0x10000, 0x20000 )                /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "3.6p",         0x00000, 0x10000, CRC(d238df5e) SHA1(428fd7abd78238089c0c0fd73de57102f4f65a74))
@@ -1706,9 +1692,8 @@ ROM_START( flytiger )
 ROM_END
 
 ROM_START( flytigera ) // alt pcb type
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "ftiger_1.3c",  0x00000, 0x20000, CRC(02acd1ce) SHA1(48167a317d3785bfe688bdda01ff344e72d3b138) )
-	ROM_RELOAD(               0x10000, 0x20000 )                /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "ftiger_11.6p", 0x00000, 0x10000, CRC(d238df5e) SHA1(428fd7abd78238089c0c0fd73de57102f4f65a74))
@@ -1740,9 +1725,8 @@ ROM_START( flytigera ) // alt pcb type
 ROM_END
 
 ROM_START( sadari )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "1.3d",         0x00000, 0x20000, CRC(bd953217) SHA1(6e230103ea01744761ab8a194d0dde6921bee92e) )
-	ROM_RELOAD(               0x10000, 0x20000 )                /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "3.6r",         0x0000, 0x10000, CRC(4786fca6) SHA1(b2347e2f6bbe3dd9d1cc8d8a4af40e7997d5ab74) )
@@ -1769,9 +1753,8 @@ ROM_START( sadari )
 ROM_END
 
 ROM_START( gundl94 )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "gd94_001.d3",  0x00000, 0x20000, CRC(3a5cc045) SHA1(182743458c36bb6254a39cf9a371fd2b0d72d145) )
-	ROM_RELOAD(               0x10000, 0x20000 )                /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "gd94_003.r6",  0x0000, 0x10000, CRC(ea41c4ad) SHA1(e39e0507f4f370432ef0ca11dbecef176716cec4) )
@@ -1802,9 +1785,8 @@ ROM_START( gundl94 )
 ROM_END
 
 ROM_START( primella )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 128k for banks */
 	ROM_LOAD( "1_d3.bin",     0x00000, 0x20000, CRC(82fea4e0) SHA1(3603c0edda29868d5e282465880e1ad341365f6f) )
-	ROM_RELOAD(               0x10000, 0x20000 )                /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "gd94_003.r6",  0x0000, 0x10000, CRC(ea41c4ad) SHA1(e39e0507f4f370432ef0ca11dbecef176716cec4) )
