@@ -22,8 +22,8 @@ public:
 		m_bank0000(*this, "bank0000"),
 		m_bank2000(*this, "bank2000"),
 		m_k052109(*this, "k052109"),
-		m_k053246(*this, "k053246"),
-		m_k053251(*this, "k053251") { }
+		m_sprites(*this, "sprites"),
+		m_mixer(*this, "mixer") { }
 
 	/* memory pointers */
 	std::unique_ptr<uint16_t[]>   m_spriteram;
@@ -43,8 +43,8 @@ public:
 	required_device<address_map_bank_device> m_bank0000;
 	required_device<address_map_bank_device> m_bank2000;
 	required_device<k052109_device> m_k052109;
-	required_device<k053247_device> m_k053246;
-	required_device<k053251_device> m_k053251;
+	required_device<k053246_053247_device> m_sprites;
+	required_device<k053251_device> m_mixer;
 	DECLARE_WRITE8_MEMBER(z80_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(z80_arm_nmi_w);
 	DECLARE_WRITE8_MEMBER(simpsons_eeprom_w);
@@ -59,10 +59,8 @@ public:
 	uint32_t screen_update_simpsons(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(simpsons_irq);
 	void simpsons_video_banking(int bank);
-	void simpsons_objdma();
 	K052109_CB_MEMBER(tile_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
-	K053246_CB_MEMBER(sprite_callback);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

@@ -1,49 +1,69 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Olivier Galibert
 #pragma once
 #ifndef __K054338_H__
 #define __K054338_H__
 
-#include "k055555.h"
+// 054338 "CLTC" is a final blender/modifier
+//
+// Mixes two images, each composed of:
+// - one bitmap_ind16 with a 13-bit color code
+// - one bitmap_ind16 with:
+//   - bits 0-1: shadow code
+//   - bits 2-3: brightness code
+//   - bits 4-5: mixing code
+//   - bit 15:   pixel present when 1
+//
+// The bitmaps are in a 4-entry array indexed with the BITMAP_* enum
+//
+// The init callback is called at startup, when the bitmap size
+// changes for whatever reason, and when loading a state.  The
+// (optional) callback can then initialize those of the bitmaps that
+// never change, if any.
+//
+// The update callback is called when updating the frame, and has to
+// update the bitmaps according to the cliprect.  The k054338 device
+// itself will not change the bitmap contents from one frame to the
+// next.
+//
+// The class proposes either bitmap_update to call the callbacks as
+// needed and compute the new image, or screen_update with the normal
+// screen updating interface.
 
-#define K338_REG_BGC_R      0
-#define K338_REG_BGC_GB     1
-#define K338_REG_SHAD1R     2
-#define K338_REG_BRI3       11
-#define K338_REG_PBLEND     13
-#define K338_REG_CONTROL    15
-
-#define K338_CTL_KILL       0x01    /* 0 = no video output, 1 = enable */
-#define K338_CTL_MIXPRI     0x02
-#define K338_CTL_SHDPRI     0x04
-#define K338_CTL_BRTPRI     0x08
-#define K338_CTL_WAILSL     0x10
-#define K338_CTL_CLIPSL     0x20
-
-
-class k054338_device : public device_t,
-						public device_video_interface
+class k054338_device : public device_t
 {
 public:
+	enum {
+		BITMAP_FRONT_COLOR,
+		BITMAP_FRONT_ATTRIBUTES,
+		BITMAP_LAYER2_COLOR,
+		BITMAP_LAYER2_ATTRIBUTES
+	};
+
+	typedef device_delegate<void (bitmap_ind16 **)> init_cb;
+	typedef device_delegate<void (bitmap_ind16 **, const rectangle &)> update_cb;
+
 	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~k054338_device() {}
+	~k054338_device();
 
-	// static configuration
-	static void set_mixer_tag(device_t &device, const char  *tag) { downcast<k054338_device &>(device).m_k055555_tag = tag; }
-	static void set_alpha_invert(device_t &device, int alpha_inv) { downcast<k054338_device &>(device).m_alpha_inv = alpha_inv; }
+	void set_init_cb(init_cb _cb) { m_init_cb = _cb; }
+	void set_update_cb(update_cb _cb) { m_update_cb = _cb; }
+	void set_palette_tag(const char *tag) { m_palette_tag = tag; }
 
-	DECLARE_WRITE16_MEMBER( word_w ); // "CLCT" registers
-	DECLARE_WRITE32_MEMBER( long_w );
+	DECLARE_WRITE16_MEMBER(backr_w);
+	DECLARE_WRITE16_MEMBER(backgb_w);
+	DECLARE_WRITE16_MEMBER(shadow_w);
+	DECLARE_WRITE16_MEMBER(shadow2_w); // Need to fix that in the memory system
+	DECLARE_WRITE16_MEMBER(bri1_w);
+	DECLARE_WRITE16_MEMBER(bri23_w);
+	DECLARE_WRITE16_MEMBER(mix1_w);
+	DECLARE_WRITE16_MEMBER(mix23_w);
+	DECLARE_WRITE16_MEMBER(system_w);
 
-	DECLARE_READ16_MEMBER( word_r );        // CLTC
+	DECLARE_ADDRESS_MAP(map, 16);
 
-	int register_r(int reg);
-	void update_all_shadows(int rushingheroes_hack, palette_device &palette);          // called at the beginning of SCREEN_UPDATE()
-	void fill_solid_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect);             // solid backcolor fill
-	void fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &cliprect, const pen_t *pal_ptr, int mode);  // solid or gradient fill using k055555
-	int  set_alpha_level(int pblend);                         // blend style 0-2
-	void invert_alpha(int invert);                                // 0=0x00(invis)-0x1f(solid), 1=0x1f(invis)-0x00(solod)
-	void export_config(int **shdRGB);
+	void bitmap_update(bitmap_rgb32 *bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -51,23 +71,43 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	// internal state
-	uint16_t      m_regs[32];
-	int         m_shd_rgb[9];
-	int         m_alpha_inv;
-	const char  *m_k055555_tag;
+	init_cb m_init_cb;
+	update_cb m_update_cb;
+	const char *m_palette_tag;
+	palette_device *m_palette;
 
-	k055555_device *m_k055555;  /* used to fill BG color */
+	bitmap_ind16 *m_bitmaps[4];
+
+	uint8_t m_through_shadow_table[0x300];
+	uint8_t m_clip_shadow_table[0x300];
+	int32_t m_shadow[3][3];
+	uint32_t m_back;
+	uint8_t m_brightness[3], m_mix_level[3];
+	uint8_t m_system;
+	bool m_mix_add[3];
 };
 
 extern const device_type K054338;
 
+
+#define MCFG_K054338_ADD(_tag, _palette_tag) \
+	MCFG_DEVICE_ADD(_tag, K054338, 0)		 \
+	downcast<k054338_device *>(device)->set_palette_tag(_palette_tag);
 
 #define MCFG_K054338_MIXER(_tag) \
 	k054338_device::set_mixer_tag(*device, _tag);
 
 #define MCFG_K054338_ALPHAINV(_alphainv) \
 	k054338_device::set_alpha_invert(*device, _alphainv);
+
+#define MCFG_K054338_SET_INIT_CB(_tag, _class, _method)					\
+	downcast<k054338_device *>(device)->set_init_cb(k054338_device::init_cb(&_class::_method, #_class "::" #_method, _tag, (_class *)nullptr));
+
+#define MCFG_K054338_SET_UPDATE_CB(_tag, _class, _method)				\
+	downcast<k054338_device *>(device)->set_update_cb(k054338_device::update_cb(&_class::_method, #_class "::" #_method, _tag, (_class *)nullptr));
+
+#define MCFG_K054338_PALETTE(_palette_tag) \
+	downcast<k054338_device *>(device)->set_palette_tag(_palette_tag);
 
 #define MCFG_K054338_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 

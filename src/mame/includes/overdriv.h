@@ -22,9 +22,9 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k051316_1(*this, "k051316_1"),
 		m_k051316_2(*this, "k051316_2"),
-		m_k053246(*this, "k053246"),
-		m_k053251(*this, "k053251"),
-		m_k053252(*this, "k053252"),
+		m_sprites(*this, "sprites"),
+		m_mixer(*this, "mixer"),
+		m_video_timings(*this, "video_timings"),
 		m_screen(*this, "screen")
 	{ }
 
@@ -42,9 +42,9 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<k051316_device> m_k051316_1;
 	required_device<k051316_device> m_k051316_2;
-	required_device<k053247_device> m_k053246;
-	required_device<k053251_device> m_k053251;
-	required_device<k053252_device> m_k053252;
+	required_device<k053246_053247_device> m_sprites;
+	required_device<k053251_device> m_mixer;
+	required_device<k053252_device> m_video_timings;
 	required_device<screen_device> m_screen;
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_WRITE16_MEMBER(cpuA_ctrl_w);
@@ -59,12 +59,8 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	uint32_t screen_update_overdriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	//INTERRUPT_GEN_MEMBER(cpuB_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(overdriv_cpuA_scanline);
-	int m_fake_timer;
-
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
-	K053246_CB_MEMBER(sprite_callback);
 };

@@ -67,7 +67,7 @@
 #include "speaker.h"
 
 
-#define VERBOSE_KEYBOARD    0
+#define VERBOSE_KEYBOARD    1
 #define VERBOSE_DISK        0
 
 /***************************************************************************
@@ -344,7 +344,7 @@ WRITE8_MEMBER(einstein_state::einstein_kybintmsk_w)
 	if (data & 0x01)
 	{
 		logerror("key int is disabled\n");
-		m_interrupt_mask &= ~EINSTEIN_KEY_INT;
+		//		m_interrupt_mask &= ~EINSTEIN_KEY_INT;
 	}
 	else
 	{

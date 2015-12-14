@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0xe88a, 0xe88e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
 	AM_RANGE(0xe88f, 0xe88f) AM_DEVWRITE("k051649", k051649_device, k051649_keyonoff_w)
 	AM_RANGE(0xe8e0, 0xe8ff) AM_DEVREADWRITE("k051649", k051649_device, k051649_test_r, k051649_test_w)
-	AM_RANGE(0xf000, 0xf00f) AM_DEVREADWRITE("k053252", k053252_device, read, write)
+	AM_RANGE(0xf000, 0xf00f) AM_DEVICE("video_timings", k053252_device, map)
 	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE("oki", okim6295_device, write)
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("DSW2")
@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( hexionb_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0xe88a, 0xe88e) AM_NOP
 	AM_RANGE(0xe88f, 0xe88f) AM_NOP
 	AM_RANGE(0xe8e0, 0xe8ff) AM_NOP
-	AM_RANGE(0xf000, 0xf00f) AM_DEVREADWRITE("k053252", k053252_device, read, write)
+	AM_RANGE(0xf000, 0xf00f) AM_DEVICE("video_timings", k053252_device, map)
 	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE("oki", okim6295_device, write)
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("DSW2")
@@ -247,9 +247,9 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hexion_state, scanline, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL_24MHz/2) /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(hexion_state, irq_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(hexion_state, nmi_ack_w))
+	MCFG_DEVICE_ADD("video_timings", K053252, XTAL_24MHz/2) /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
+//	MCFG_K053252_INT1_ACK_CB(WRITELINE(hexion_state, irq_ack_w))
+//	MCFG_K053252_INT2_ACK_CB(WRITELINE(hexion_state, nmi_ack_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

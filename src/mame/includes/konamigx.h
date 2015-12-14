@@ -1,19 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Acho A. Tang, Phil Stroffolino, Olivier Galibert
+
 #ifndef MAME_INCLUDES_KONAMIGX_H
 #define MAME_INCLUDES_KONAMIGX_H
 
-#include "sound/k056800.h"
-#include "sound/k054539.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/tms57002/tms57002.h"
 #include "machine/adc083x.h"
+#include "machine/eepromser.h"
 #include "machine/k053252.h"
-#include "video/k054156_k054157_k056832.h"
-#include "video/k053246_k053247_k055673.h"
-#include "video/k055555.h"
-#include "video/k054338.h"
-#include "video/k053936.h"
 #include "screen.h"
+#include "sound/k054539.h"
+#include "sound/k056800.h"
+#include "video/k053246_k053247_k055673.h"
+#include "video/k053936.h"
+#include "video/k054156_k054157_k056832.h"
+#include "video/k054338.h"
+#include "video/k055555.h"
 
 class konamigx_state : public driver_device
 {
@@ -23,15 +26,16 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_dasp(*this, "dasp"),
-		m_k053252(*this, "k053252"),
-		m_k055673(*this, "k055673"),
-		m_k055555(*this, "k055555"),
-		m_k056832(*this, "k056832"),
-		m_k054338(*this, "k054338"),
+		m_video_timings(*this, "video_timings"),
+		m_tilemap(*this, "tilemap"),
+		m_sprites(*this, "sprites"),
+		m_roz(*this, "roz"),
+		m_mixer(*this, "mixer"),
+		m_blender(*this, "blender"),
 		m_k056800(*this, "k056800"),
 		m_k054539_1(*this,"k054539_1"),
 		m_k054539_2(*this,"k054539_2"),
-		m_gfxdecode(*this, "gfxdecode"),
+		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_workram(*this,"workram"),
@@ -43,28 +47,42 @@ public:
 		m_k053936_0_linectrl_16(*this,"k053936_0_li16",16),
 		m_konamigx_type3_psac2_bank(*this,"psac2_bank"),
 		m_generic_paletteram_32(*this, "paletteram"),
+		m_spriteram(*this, "spriteram"),
 		m_an0(*this, "AN0"),
 		m_an1(*this, "AN1"),
 		m_light0_x(*this, "LIGHT0_X"),
 		m_light0_y(*this, "LIGHT0_Y"),
 		m_light1_x(*this, "LIGHT1_X"),
 		m_light1_y(*this, "LIGHT1_Y"),
-		m_eepromout(*this, "EEPROMOUT"),
 		m_use_68020_post_clock_hack(0)
 		{ }
 
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_soundcpu;
-	optional_device<tms57002_device> m_dasp;
-	required_device<k053252_device> m_k053252;
-	required_device<k055673_device> m_k055673;
-	required_device<k055555_device> m_k055555;
-	required_device<k056832_device> m_k056832;
-	optional_device<k054338_device> m_k054338;
-	optional_device<k056800_device> m_k056800;
-	optional_device<k054539_device> m_k054539_1;
-	optional_device<k054539_device> m_k054539_2;
-	optional_device<gfxdecode_device> m_gfxdecode;
+	enum {
+		IRQ_LANC,
+		IRQ_ESC,
+		IRQ_SUBCPU,
+		IRQ_OBJDMA,
+		IRQ_EXTIO,
+		IRQ_TRACKBALL,
+		IRQ_EXTGR,
+		IRQ_TIMER,
+		IRQ_VBLANK,
+		IRQ_COUNT
+	};
+
+	required_device<m68ec020_device> m_maincpu;
+	required_device<m68000_device> m_soundcpu;
+	required_device<tms57002_device> m_dasp;
+	required_device<k053252_device> m_video_timings;
+	required_device<k054156_056832_device> m_tilemap;
+	required_device<k053246_055673_device> m_sprites;
+	optional_device<k053936_device> m_roz;
+	required_device<k055555_device> m_mixer;
+	required_device<k054338_device> m_blender;
+	required_device<k056800_device> m_k056800;
+	required_device<k054539_device> m_k054539_1;
+	required_device<k054539_device> m_k054539_2;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
@@ -77,8 +95,21 @@ public:
 	optional_shared_ptr<uint16_t> m_k053936_0_linectrl_16;
 	optional_shared_ptr<uint32_t> m_konamigx_type3_psac2_bank;
 	optional_shared_ptr<uint32_t> m_generic_paletteram_32;
+	required_shared_ptr<uint32_t> m_spriteram;
 
-	optional_ioport m_an0, m_an1, m_light0_x, m_light0_y, m_light1_x, m_light1_y, m_eepromout;
+	optional_ioport m_an0, m_an1, m_light0_x, m_light0_y, m_light1_x, m_light1_y;
+
+	void set_irq_level(int irq, int level);
+	void update_irqs();
+
+	DECLARE_WRITE_LINE_MEMBER(objdmairq_w);
+	DECLARE_WRITE_LINE_MEMBER(objdmaact_w);
+	DECLARE_WRITE_LINE_MEMBER(vblankirq_w);
+	DECLARE_WRITE_LINE_MEMBER(htimerirq_w);
+	DECLARE_WRITE16_MEMBER(port1_w);
+	DECLARE_WRITE16_MEMBER(port2_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(rdport1_r);
+	DECLARE_WRITE16_MEMBER(roz_banking_w);
 
 	DECLARE_WRITE32_MEMBER(esc_w);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
@@ -94,9 +125,6 @@ public:
 	DECLARE_WRITE16_MEMBER(tms57002_data_word_w);
 	DECLARE_READ16_MEMBER(tms57002_status_word_r);
 	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
-	DECLARE_READ16_MEMBER(K055550_word_r);
-	DECLARE_WRITE16_MEMBER(K055550_word_w);
-	DECLARE_WRITE16_MEMBER(K053990_martchmp_word_w);
 	DECLARE_WRITE32_MEMBER(fantjour_dma_w);
 	DECLARE_WRITE32_MEMBER(konamigx_type3_psac2_bank_w);
 	DECLARE_WRITE32_MEMBER(konamigx_tilebank_w);
@@ -113,19 +141,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_gx_psac1b_tile_info);
 	DECLARE_MACHINE_START(konamigx);
 	DECLARE_MACHINE_RESET(konamigx);
-	DECLARE_VIDEO_START(konamigx_5bpp);
-	DECLARE_VIDEO_START(dragoonj);
-	DECLARE_VIDEO_START(le2);
-	DECLARE_VIDEO_START(konamigx_6bpp);
-	DECLARE_VIDEO_START(opengolf);
-	DECLARE_VIDEO_START(racinfrc);
-	DECLARE_VIDEO_START(konamigx_type3);
-	DECLARE_VIDEO_START(konamigx_type4);
-	DECLARE_VIDEO_START(konamigx_type4_vsn);
-	DECLARE_VIDEO_START(konamigx_type4_sd2);
-	uint32_t screen_update_konamigx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_konamigx_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_konamigx_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(konamigx_type2_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_type2_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_type4_scanline);
@@ -133,40 +148,30 @@ public:
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_CALLBACK_MEMBER(boothack_callback);
 	ADC083X_INPUT_CB(adc0834_callback);
-	K056832_CB_MEMBER(type2_tile_callback);
-	K056832_CB_MEMBER(alpha_tile_callback);
-	K055673_CB_MEMBER(type2_sprite_callback);
-	K055673_CB_MEMBER(dragoonj_sprite_callback);
-	K055673_CB_MEMBER(salmndr2_sprite_callback);
-	K055673_CB_MEMBER(le2_sprite_callback);
+
+	void sprites_wiring(uint32_t output, uint16_t &color, uint16_t &attr);
+	void blender_update(bitmap_ind16 **bitmaps, const rectangle &cliprect);
+	void mixer_init(bitmap_ind16 **bitmaps);
+	void mixer_update(bitmap_ind16 **bitmaps, const rectangle &cliprect);
+	void mixer_update_type1(bitmap_ind16 **bitmaps, const rectangle &cliprect);
+
+private:
+	static const int irq_to_level[];
+
+	uint32_t m_irqin, m_irqmask;
+	int m_objdma; 
+	uint16_t m_port1, m_port2;
+	uint8_t m_cur_irq;
+
+public:
 
 	void common_init();
-	DECLARE_READ32_MEMBER( k_6bpp_rom_long_r );
-	void konamigx_mixer     (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,tilemap_t *sub1, int sub1flags,tilemap_t *sub2, int sub2flags,int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack);
-	void konamigx_mixer_draw(screen_device &Screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
-						tilemap_t *sub1, int sub1flags,
-						tilemap_t *sub2, int sub2flags,
-						int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
-						struct GX_OBJ *objpool,
-						int *objbuf,
-						int nobj
-						);
-
-
-	void gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code);
-	void gx_draw_basic_extended_tilemaps_1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub1, int sub1flags, int rushingheroes_hack, int offs);
-	void gx_draw_basic_extended_tilemaps_2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub2, int sub2flags, bitmap_ind16 *extra_bitmap, int offs);
-
 	void konamigx_esc_alert(uint32_t *srcbase, int srcoffs, int count, int mode);
 	void konamigx_precache_registers(void);
 
 	void wipezbuf(int noshadow);
 
 	void dmastart_callback(int data);
-
-	void konamigx_mixer_init(screen_device &screen, int objdma);
-	void konamigx_objdma(void);
-	void generate_sprites(address_space &space, uint32_t src, uint32_t spr, int count);
 
 	void fantjour_dma_install();
 
@@ -180,11 +185,6 @@ public:
 	void sexyparo_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
 	void tbyahhoo_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
 	void daiskiss_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
-
-	inline int K053247GX_combine_c18(int attrib);
-	inline int K055555GX_decode_objcolor(int c18);
-	inline int K055555GX_decode_inpri(int c18);
-	int K055555GX_decode_vmixcolor(int layer, int *color);
 
 	uint8_t m_sound_ctrl;
 	uint8_t m_sound_intck;
@@ -201,8 +201,6 @@ public:
 
 	uint8_t m_esc_program[4096];
 	esc_cb m_esc_cb;
-
-	uint16_t m_prot_data[0x20];
 
 	uint16_t *m_gx_spriteram;
 
@@ -261,6 +259,8 @@ public:
 
 	DECLARE_DRIVER_INIT(posthack);
 	int m_use_68020_post_clock_hack;
+
+	void generate_sprites(address_space &space, uint32_t src, uint32_t spr, int count, int prislot, int offx);
 };
 
 // Sprite Callbacks

@@ -115,9 +115,35 @@ Known Issues
 #include "speaker.h"
 
 
-#define JOE_DEBUG 0
-#define JOE_DMADELAY (attotime::from_nsec(42700 + 341300))
+// Out of 14 bits, 9 are wired to color and the last 5 to the top bits
+// of priority.  Shadow is directly connected.
+void gijoe_state::sprites_wiring(uint32_t output, uint16_t &color, uint16_t &attr)
+{
+	color = output & 0x1ff;
+	attr  = ((output & 0xc000) >> 6) | ((output >> 8) & 0x3e);
+}
 
+void gijoe_state::videodac_update(bitmap_ind16 **bitmaps, const rectangle &cliprect)
+{
+	m_mixer->bitmap_update(bitmaps, cliprect);
+}
+
+void gijoe_state::mixer_init(bitmap_ind16 **bitmaps)
+{
+	bitmaps[k053251_device::LAYER1_ATTR]->fill(0);
+	bitmaps[k053251_device::LAYER2_ATTR]->fill(0);
+}
+
+void gijoe_state::mixer_update(bitmap_ind16 **bitmaps, const rectangle &cliprect)
+{
+	m_tilemap->bitmap_update(bitmaps[k053251_device::LAYER1_COLOR], cliprect, 0);
+	m_tilemap->bitmap_update(bitmaps[k053251_device::LAYER2_COLOR], cliprect, 1);
+	m_tilemap->bitmap_update(bitmaps[k053251_device::LAYER3_COLOR], cliprect, 2);
+	m_tilemap->bitmap_update(bitmaps[k053251_device::LAYER4_COLOR], cliprect, 3);
+	m_sprites->bitmap_update(bitmaps[k053251_device::LAYER0_COLOR],
+							 bitmaps[k053251_device::LAYER0_ATTR],
+							 cliprect);
+}
 
 READ16_MEMBER(gijoe_state::control2_r)
 {
@@ -138,58 +164,25 @@ WRITE16_MEMBER(gijoe_state::control2_w)
 
 		m_cur_control2 = data;
 
+		m_maincpu->set_input_line(6, (m_cur_control2 & 0x20) && m_cur_objdmairq ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(5, (m_cur_control2 & 0x80) && m_cur_vblankirq ? ASSERT_LINE : CLEAR_LINE);
+
 		/* bit 6 = enable sprite ROM reading */
-		m_k053246->k053246_set_objcha_line( (data & 0x0040) ? ASSERT_LINE : CLEAR_LINE);
+		m_sprites->set_objcha(data & 0x0040);
 	}
 }
 
-void gijoe_state::gijoe_objdma(  )
+WRITE_LINE_MEMBER(gijoe_state::vblankirq_w)
 {
-	uint16_t *src_head, *src_tail, *dst_head, *dst_tail;
-
-	src_head = m_spriteram;
-	src_tail = m_spriteram + 255 * 8;
-	m_k053246->k053247_get_ram( &dst_head);
-	dst_tail = dst_head + 255 * 8;
-
-	for (; src_head <= src_tail; src_head += 8)
-	{
-		if (*src_head & 0x8000)
-		{
-			memcpy(dst_head, src_head, 0x10);
-			dst_head += 8;
-		}
-		else
-		{
-			*dst_tail = 0;
-			dst_tail -= 8;
-		}
-	}
+	m_cur_vblankirq = state;
+	m_maincpu->set_input_line(5, (m_cur_control2 & 0x80) && m_cur_vblankirq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(gijoe_state::dmaend_callback)
+
+WRITE_LINE_MEMBER(gijoe_state::objdmairq_w)
 {
-	if (m_cur_control2 & 0x0020)
-		m_maincpu->set_input_line(6, HOLD_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(gijoe_state::gijoe_interrupt)
-{
-	// global interrupt masking (*this game only)
-	if (!m_k056832->is_irq_enabled(0))
-		return;
-
-	if (m_k053246->k053246_is_irq_enabled())
-	{
-		gijoe_objdma();
-
-		// 42.7us(clr) + 341.3us(xfer) delay at 6Mhz dotclock
-		m_dmadelay_timer->adjust(JOE_DMADELAY);
-	}
-
-	// trigger V-blank interrupt
-	if (m_cur_control2 & 0x0080)
-		device.execute().set_input_line(5, HOLD_LINE);
+	m_cur_objdmairq = state;
+	m_maincpu->set_input_line(6, (m_cur_control2 & 0x20) && m_cur_objdmairq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE16_MEMBER(gijoe_state::sound_cmd_w)
@@ -214,16 +207,15 @@ READ16_MEMBER(gijoe_state::sound_status_r)
 static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("spriteram")                               // Sprites
-	AM_RANGE(0x110000, 0x110007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
-	AM_RANGE(0x120000, 0x121fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)      // Graphic planes
-	AM_RANGE(0x122000, 0x123fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)      // Graphic planes mirror read
-	AM_RANGE(0x130000, 0x131fff) AM_DEVREAD("k056832", k056832_device, rom_word_r)                               // Passthrough to tile roms
-	AM_RANGE(0x160000, 0x160007) AM_DEVWRITE("k056832", k056832_device, b_word_w)                                    // VSCCS (board dependent)
+	AM_RANGE(0x110000, 0x110007) AM_DEVICE("sprites", k053246_053247_device, objset1)
+	AM_RANGE(0x120000, 0x121fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("tilemap", k054156_054157_device, vram16_r, vram16_w)
+	AM_RANGE(0x130000, 0x131fff) AM_DEVREAD("tilemap", k054156_054157_device, rom16_r)
+	AM_RANGE(0x160000, 0x160007) AM_DEVICE("tilemap", k054156_054157_device, vsccs)
 	AM_RANGE(0x170000, 0x170001) AM_WRITENOP                                                // Watchdog
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_SHARE("workram")                 // Main RAM.  Spec. 180000-1803ff, 180400-187fff
 	AM_RANGE(0x190000, 0x190fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
-	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVWRITE("k056832", k056832_device, word_w)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVICE8("mixer", k053251_device, map, 0x00ff)
+	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVICE("tilemap", k054156_054157_device, vacset)
 	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x1c0014, 0x1c0015) AM_READ(sound_status_r)
 	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM
@@ -233,13 +225,7 @@ static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
 	AM_RANGE(0x1e4000, 0x1e4001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1e4002, 0x1e4003) AM_READ_PORT("START")
 	AM_RANGE(0x1e8000, 0x1e8001) AM_READWRITE(control2_r, control2_w)
-	AM_RANGE(0x1f0000, 0x1f0001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
-#if JOE_DEBUG
-	AM_RANGE(0x110000, 0x110007) AM_DEVREAD("k053246", k053247_device, k053246_reg_word_r)
-	AM_RANGE(0x160000, 0x160007) AM_DEVREAD("k056832", k056832_device, b_word_r)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREAD("k053251", k053251_device, lsb_r)
-	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVREAD("k056832", k056832_device, word_r)
-#endif
+	AM_RANGE(0x1f0000, 0x1f0001) AM_DEVREAD("sprites", k053246_053247_device, rom16_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gijoe_state )
@@ -296,8 +282,6 @@ INPUT_PORTS_END
 
 void gijoe_state::machine_start()
 {
-	m_dmadelay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gijoe_state::dmaend_callback),this));
-
 	save_item(NAME(m_cur_control2));
 }
 
@@ -311,7 +295,6 @@ static MACHINE_CONFIG_START( gijoe, gijoe_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)   /* 16MHz Confirmed */
 	MCFG_CPU_PROGRAM_MAP(gijoe_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gijoe_state,  gijoe_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/4)  /* Amuse & confirmed. Z80E at 8MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -320,29 +303,29 @@ static MACHINE_CONFIG_START( gijoe, gijoe_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gijoe_state, screen_update_gijoe)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_RAW_PARAMS(6000000, 384, 0, 48+288, 264, 15, 15+224)
+	MCFG_SCREEN_UPDATE_DEVICE("videodac", kvideodac_device, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(gijoe_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(gijoe_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -37, 20)
-	MCFG_K053246_PALETTE("palette")
+	MCFG_K054156_054157_ADD("tilemap", 6000000, 2, 2, 24, "palette")
+	MCFG_K054156_054157_INT1_CB(WRITELINE(gijoe_state, vblankirq_w))
+	MCFG_K054156_054157_VBLANK_CB(DEVWRITELINE(":sprites", k053246_053247_device, vblank_w))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053246_053247_ADD("sprites", 6000000, "palette", "spriteram")
+	MCFG_K053246_053247_WIRING_CB(gijoe_state, sprites_wiring)
+	MCFG_K053246_053247_DMAIRQ_CB(WRITELINE(gijoe_state, objdmairq_w))
+
+	MCFG_K053251_ADD("mixer", k053251_device::LAYER0_ATTR)
+	MCFG_K053251_SET_INIT_CB(DEVICE_SELF, gijoe_state, mixer_init)
+	MCFG_K053251_SET_UPDATE_CB(DEVICE_SELF, gijoe_state, mixer_update)
+
+	MCFG_KVIDEODAC_ADD("videodac", "palette", 0x300, 0.6, 0, 1.0)
+	MCFG_KVIDEODAC_SET_UPDATE_CB(DEVICE_SELF, gijoe_state, videodac_update)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -367,15 +350,15 @@ ROM_START( gijoe )
 	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "069a01.7c", 0x000000, 0x010000, CRC(74172b99) SHA1(f5e0e0d43317454fdacd3df7cd3035fcae4aef68) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD32_WORD( "069a10.18j", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
-	ROM_LOAD32_WORD( "069a09.16j", 0x000002, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_WORD_SWAP( "069a10.18j", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
+	ROM_LOAD32_WORD_SWAP( "069a09.16j", 0x000002, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD64_WORD( "069a08.6h", 0x000000, 0x100000, CRC(325477d4) SHA1(140c57b0ac9e5cf702d788f416408a5eeb5d6d3c) )
-	ROM_LOAD64_WORD( "069a05.1h", 0x000002, 0x100000, CRC(c4ab07ed) SHA1(dc806eff00937d9465b1726fae8fdc3022464a28) )
-	ROM_LOAD64_WORD( "069a07.4h", 0x000004, 0x100000, CRC(ccaa3971) SHA1(16989cbbd65fe1b41c4a85fea02ba1e9880818a9) )
-	ROM_LOAD64_WORD( "069a06.2h", 0x000006, 0x100000, CRC(63eba8e1) SHA1(aa318d356c2580765452106ea0d2228273a90523) )
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "069a08.6h", 0x000000, 0x100000, CRC(325477d4) SHA1(140c57b0ac9e5cf702d788f416408a5eeb5d6d3c) )
+	ROM_LOAD64_WORD_SWAP( "069a05.1h", 0x000002, 0x100000, CRC(c4ab07ed) SHA1(dc806eff00937d9465b1726fae8fdc3022464a28) )
+	ROM_LOAD64_WORD_SWAP( "069a07.4h", 0x000004, 0x100000, CRC(ccaa3971) SHA1(16989cbbd65fe1b41c4a85fea02ba1e9880818a9) )
+	ROM_LOAD64_WORD_SWAP( "069a06.2h", 0x000006, 0x100000, CRC(63eba8e1) SHA1(aa318d356c2580765452106ea0d2228273a90523) )
 
 	ROM_REGION( 0x200000, "k054539", 0 )
 	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
@@ -400,11 +383,11 @@ ROM_START( gijoea )
 	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "069a01.7c", 0x000000, 0x010000, CRC(74172b99) SHA1(f5e0e0d43317454fdacd3df7cd3035fcae4aef68) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD32_WORD( "069a10.18j", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
-	ROM_LOAD32_WORD( "069a09.16j", 0x000002, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_WORD_SWAP( "069a10.18j", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
+	ROM_LOAD32_WORD_SWAP( "069a09.16j", 0x000002, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD64_WORD( "069a08.6h", 0x000000, 0x100000, CRC(325477d4) SHA1(140c57b0ac9e5cf702d788f416408a5eeb5d6d3c) )
 	ROM_LOAD64_WORD( "069a05.1h", 0x000002, 0x100000, CRC(c4ab07ed) SHA1(dc806eff00937d9465b1726fae8fdc3022464a28) )
 	ROM_LOAD64_WORD( "069a07.4h", 0x000004, 0x100000, CRC(ccaa3971) SHA1(16989cbbd65fe1b41c4a85fea02ba1e9880818a9) )
@@ -427,11 +410,11 @@ ROM_START( gijoeu )
 	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "069a01.7c", 0x000000, 0x010000, CRC(74172b99) SHA1(f5e0e0d43317454fdacd3df7cd3035fcae4aef68) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD32_WORD( "069a10.18j", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
-	ROM_LOAD32_WORD( "069a09.16j", 0x000002, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_WORD_SWAP( "069a10.18j", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
+	ROM_LOAD32_WORD_SWAP( "069a09.16j", 0x000002, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD64_WORD( "069a08.6h", 0x000000, 0x100000, CRC(325477d4) SHA1(140c57b0ac9e5cf702d788f416408a5eeb5d6d3c) )
 	ROM_LOAD64_WORD( "069a05.1h", 0x000002, 0x100000, CRC(c4ab07ed) SHA1(dc806eff00937d9465b1726fae8fdc3022464a28) )
 	ROM_LOAD64_WORD( "069a07.4h", 0x000004, 0x100000, CRC(ccaa3971) SHA1(16989cbbd65fe1b41c4a85fea02ba1e9880818a9) )
@@ -454,11 +437,11 @@ ROM_START( gijoej )
 	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "069a01.7c", 0x000000, 0x010000, CRC(74172b99) SHA1(f5e0e0d43317454fdacd3df7cd3035fcae4aef68) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD32_WORD( "069a10.18j", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
-	ROM_LOAD32_WORD( "069a09.16j", 0x000002, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_WORD_SWAP( "069a10.18j", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
+	ROM_LOAD32_WORD_SWAP( "069a09.16j", 0x000002, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD64_WORD( "069a08.6h", 0x000000, 0x100000, CRC(325477d4) SHA1(140c57b0ac9e5cf702d788f416408a5eeb5d6d3c) )
 	ROM_LOAD64_WORD( "069a05.1h", 0x000002, 0x100000, CRC(c4ab07ed) SHA1(dc806eff00937d9465b1726fae8fdc3022464a28) )
 	ROM_LOAD64_WORD( "069a07.4h", 0x000004, 0x100000, CRC(ccaa3971) SHA1(16989cbbd65fe1b41c4a85fea02ba1e9880818a9) )

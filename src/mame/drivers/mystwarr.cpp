@@ -133,18 +133,172 @@ we have no way of knowing which is the later/corrected version.
 **************************************************************************/
 
 #include "emu.h"
-#include "includes/mystwarr.h"
-#include "includes/konamigx.h"
-#include "includes/konamipt.h"
-#include "video/k053250.h"
-
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "includes/konamipt.h"
+#include "includes/mystwarr.h"
 #include "machine/eepromser.h"
 #include "sound/k054539.h"
 #include "speaker.h"
+#include "video/k053250.h"
+#include "video/k054000.h"
 
 
+void mystwarr_state::blender_update(bitmap_ind16 **bitmaps, const rectangle &cliprect)
+{
+	m_mixer->bitmap_update(bitmaps, cliprect);
+}
+
+void mystwarr_state::mixer_init(bitmap_ind16 **bitmaps)
+{
+	bitmaps[k055555_device::LAYERO_COLOR]->fill(0);
+	bitmaps[k055555_device::LAYERS1_COLOR]->fill(0);
+	bitmaps[k055555_device::LAYERS2_COLOR]->fill(0);
+	bitmaps[k055555_device::LAYERS3_COLOR]->fill(0);
+	bitmaps[k055555_device::LAYERO_ATTR]->fill(0);
+	bitmaps[k055555_device::LAYERS1_ATTR]->fill(0);
+	bitmaps[k055555_device::LAYERS2_ATTR]->fill(0);
+	bitmaps[k055555_device::LAYERS3_ATTR]->fill(0);
+}
+
+void mystwarr_state::mixer_update(bitmap_ind16 **bitmaps, const rectangle &cliprect)
+{
+	m_tilemap->bitmap_update(bitmaps[k055555_device::LAYERA_COLOR], cliprect, 0);
+	m_tilemap->bitmap_update(bitmaps[k055555_device::LAYERB_COLOR], cliprect, 1);
+	m_tilemap->bitmap_update(bitmaps[k055555_device::LAYERC_COLOR], cliprect, 2);
+	m_tilemap->bitmap_update(bitmaps[k055555_device::LAYERD_COLOR], cliprect, 3);
+}
+
+WRITE16_MEMBER(mystwarr_state::ddd_053936_enable_w)
+{
+	if (ACCESSING_BITS_8_15) {
+		m_roz_enable = data & 0x0100;
+		m_roz_rombank = (data & 0xc000)>>14;
+	}
+}
+
+WRITE16_MEMBER(mystwarr_state::ddd_053936_clip_w)
+{
+	int old, clip_x, clip_y, size_x, size_y;
+	int minx, maxx, miny, maxy;
+	
+	if (offset == 1) {
+		if (ACCESSING_BITS_8_15) K053936GP_clip_enable(0, data & 0x0100);
+	} else {
+		old = m_clip;
+		COMBINE_DATA(&m_clip);
+		if (m_clip != old)
+			{
+				clip_x = (m_clip & 0x003f) >> 0;
+				clip_y = (m_clip & 0x0fc0) >> 6;
+				size_x = (m_clip & 0x3000) >> 12;
+				size_y = (m_clip & 0xc000) >> 14;
+				
+				switch (size_x)
+					{
+					case 0x3: size_x = 1; break;
+					case 0x2: size_x = 2; break;
+					default:  size_x = 4; break;
+					}
+				
+				switch (size_y)
+					{
+					case 0x3: size_y = 1; break;
+					case 0x2: size_y = 2; break;
+					default:  size_y = 4; break;
+					}
+				
+				minx = clip_x << 7;
+				maxx = ((clip_x + size_x) << 7) - 1;
+				miny = clip_y << 7;
+				maxy = ((clip_y + size_y) << 7) - 1;
+				
+				K053936GP_set_cliprect(0, minx, maxx, miny, maxy);
+			}
+	}
+}
+
+TILE_GET_INFO_MEMBER(mystwarr_state::get_gai_936_tile_info)
+{
+	int tileno, colour;
+	uint8_t *ROM = memregion("gfx4")->base();
+	uint8_t *dat1 = ROM, *dat2 = ROM + 0x20000, *dat3 = ROM + 0x60000;
+
+	tileno = dat3[tile_index] | ((dat2[tile_index]&0x3f)<<8);
+
+	if (tile_index & 1)
+		colour = (dat1[tile_index>>1]&0xf);
+	else
+		colour = ((dat1[tile_index>>1]>>4)&0xf);
+
+	if (dat2[tile_index] & 0x80) colour |= 0x10;
+
+	colour |= m_sub1_colorbase << 4;
+
+	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
+}
+
+TILE_GET_INFO_MEMBER(mystwarr_state::get_ult_936_tile_info)
+{
+	int tileno, colour;
+	uint8_t *ROM = memregion("gfx4")->base();
+	uint8_t *dat1 = ROM, *dat2 = ROM + 0x40000;
+
+	tileno = dat2[tile_index] | ((dat1[tile_index]&0x1f)<<8);
+
+	colour = m_sub1_colorbase;
+
+	SET_TILE_INFO_MEMBER(0, tileno, colour, (dat1[tile_index]&0x40) ? TILE_FLIPX : 0);
+}
+
+// reference: 223e5c in gaiapolis (ROMs 34j and 36m)
+READ16_MEMBER(mystwarr_state::gai_053936_tilerom_0_r)
+{
+	uint8_t *ROM1 = (uint8_t *)memregion("gfx4")->base();
+	uint8_t *ROM2 = (uint8_t *)memregion("gfx4")->base();
+
+	ROM1 += 0x20000;
+	ROM2 += 0x20000+0x40000;
+
+	return ((ROM1[offset]<<8) | ROM2[offset]);
+}
+
+READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_0_r)
+{
+	uint8_t *ROM1 = (uint8_t *)memregion("gfx4")->base();
+	uint8_t *ROM2 = (uint8_t *)memregion("gfx4")->base();
+
+	ROM2 += 0x40000;
+
+	return ((ROM1[offset]<<8) | ROM2[offset]);
+}
+
+// reference: 223e1a in gaiapolis (ROM 36j)
+READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_1_r)
+{
+	uint8_t *ROM = (uint8_t *)memregion("gfx4")->base();
+
+	return ROM[offset/2];
+}
+
+// reference: 223db0 in gaiapolis (ROMs 32n, 29n, 26n)
+READ16_MEMBER(mystwarr_state::gai_053936_tilerom_2_r)
+{
+	uint8_t *ROM = (uint8_t *)memregion("gfx3")->base();
+
+	offset += (m_roz_rombank * 0x100000);
+
+	return ROM[offset/2]<<8;
+}
+
+READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_2_r)
+{
+	uint8_t *ROM = (uint8_t *)memregion("gfx3")->base();
+
+	offset += (m_roz_rombank * 0x100000);
+
+	return ROM[offset]<<8;
+}
 
 READ16_MEMBER(mystwarr_state::eeprom_r)
 {
@@ -217,8 +371,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::metamrph_interrupt)
 	if(scanline == 24)
 		m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 
-	if(scanline == 248)
-		if (m_k055673->k053246_is_irq_enabled()) m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
+	//	if(scanline == 248)
+	//		if (m_k055673->k053246_is_irq_enabled()) m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mchamp_interrupt)
@@ -227,10 +381,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mchamp_interrupt)
 
 	if (!(m_mw_irq_control & 0x02)) return;
 
-	if(scanline == 247)
-	{
-		if (m_k055673->k053246_is_irq_enabled()) m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
-	}
+	//	if(scanline == 247)
+	//	{
+	//		if (m_k055673->k053246_is_irq_enabled()) m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
+	//	}
 
 	if(scanline == 23)
 		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
@@ -291,7 +445,7 @@ READ16_MEMBER(mystwarr_state::sound_status_msb_r)
 
 WRITE16_MEMBER(mystwarr_state::irq_ack_w)
 {
-	m_k056832->b_word_w(space, offset, data, mem_mask);
+	//	m_k056832->b_word_w(space, offset, data, mem_mask);
 
 	if (offset == 3 && ACCESSING_BITS_0_7)
 	{
@@ -302,48 +456,289 @@ WRITE16_MEMBER(mystwarr_state::irq_ack_w)
 	}
 }
 
-/* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
-/* of RAM, but they put 0x10000 there. The CPU can access them all. */
-READ16_MEMBER(mystwarr_state::k053247_scattered_word_r)
+/*
+K055550
+-------
+
+Protection chip which performs a memset() operation.
+
+Used in Violent Storm and Ultimate Battler to clear VRAM between scenes, among
+other things.  May also perform other functions since Violent Storm still isn't
+happy...
+
+Has word-wide registers as follows:
+
+0: Count of units to transfer.  The write here triggers the transfer.
+1-6: Unknown
+7: Destination address, MSW
+8: Destination address, LSW
+9: Unknown
+10: Size of transfer units, MSW
+11: Size of transfer units, LSW
+12: Unknown
+13: Value to fill destination region with
+14-15: Unknown
+
+*/
+
+
+READ16_MEMBER(mystwarr_state::K055550_word_r)
 {
-	if (offset & 0x0078)
-		return m_spriteram[offset];
-	else
+	return(m_prot_data[offset]);
+}
+
+WRITE16_MEMBER(mystwarr_state::K055550_word_w)
+{
+	uint32_t adr, bsize, count, i, lim;
+	int src, tgt, srcend, tgtend, skip, cx1, sx1, wx1, cy1, sy1, wy1, cz1, sz1, wz1, c2, s2, w2;
+	int dx, dy, angle;
+
+	COMBINE_DATA(m_prot_data+offset);
+
+	if (offset == 0 && ACCESSING_BITS_8_15)
 	{
-		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
-		return m_k055673->k053247_word_r(space,offset,mem_mask);
+		data >>= 8;
+		switch (data)
+		{
+			case 0x97: // memset() (Dadandarn at 0x639dc)
+			case 0x9f: // memset() (Violent Storm at 0x989c)
+				adr   = (m_prot_data[7] << 16) | m_prot_data[8];
+				bsize = (m_prot_data[10] << 16) | m_prot_data[11];
+				count = (m_prot_data[0] & 0xff) + 1;
+
+				lim = adr+bsize*count;
+				for(i=adr; i<lim; i+=2)
+					space.write_word(i, m_prot_data[0x1a/2]);
+			break;
+
+			// WARNING: The following cases are speculation based with questionable accuracy!(AAT)
+
+			case 0x87: // unknown memory write (Violent Storm at 0x00b6ea)
+				// Violent Storm writes the following data to the 55550 in mode 0x87.
+				// All values are hardcoded and the write happens each frame during
+				// gameplay. It refers to a 32x8-word list at 0x210e00 and seems to
+				// be tied with another 13x128-byte table at 0x205080.
+				// Both tables appear "check-only" and have little effect on gameplay.
+				count =(m_prot_data[0] & 0xff) + 1;          // unknown ( byte 0x00)
+				i     = m_prot_data[1];                      // unknown ( byte 0x1f)
+				adr   = m_prot_data[7]<<16 | m_prot_data[8];   // address (dword 0x210e00)
+				lim   = m_prot_data[9];                      // unknown ( word 0x0010)
+				src   = m_prot_data[10]<<16 | m_prot_data[11]; // unknown (dword zero)
+				tgt   = m_prot_data[12]<<16 | m_prot_data[13]; // unknown (dword zero)
+			break;
+
+			case 0xa0: // update collision detection table (Violent Storm at 0x018b42)
+				count = m_prot_data[0] & 0xff;             // number of objects - 1
+				skip  = m_prot_data[1]>>(8-1);             // words to skip in each entry to reach the "hit list"
+				adr   = m_prot_data[2]<<16 | m_prot_data[3]; // where the table is located
+				bsize = m_prot_data[5]<<16 | m_prot_data[6]; // object entry size in bytes
+
+				srcend = adr + bsize * count;
+				tgtend = srcend + bsize;
+
+				// let's hope GCC will inline the mem24bew calls
+				for (src=adr; src<srcend; src+=bsize)
+				{
+					cx1 = (short)space.read_word(src);
+					sx1 = (short)space.read_word(src + 2);
+					wx1 = (short)space.read_word(src + 4);
+
+					cy1 = (short)space.read_word(src + 6);
+					sy1 = (short)space.read_word(src + 8);
+					wy1 = (short)space.read_word(src +10);
+
+					cz1 = (short)space.read_word(src +12);
+					sz1 = (short)space.read_word(src +14);
+					wz1 = (short)space.read_word(src +16);
+
+					count = i = src + skip;
+					tgt = src + bsize;
+
+					for (; count<tgt; count++) space.write_byte(count, 0);
+
+					for (; tgt<tgtend; i++, tgt+=bsize)
+					{
+						c2 = (short)space.read_word(tgt);
+						s2 = (short)space.read_word(tgt + 2);
+						w2 = (short)space.read_word(tgt + 4);
+						if (abs((cx1+sx1)-(c2+s2))>=wx1+w2) continue; // X rejection
+
+						c2 = (short)space.read_word(tgt + 6);
+						s2 = (short)space.read_word(tgt + 8);
+						w2 = (short)space.read_word(tgt +10);
+						if (abs((cy1+sy1)-(c2+s2))>=wy1+w2) continue; // Y rejection
+
+						c2 = (short)space.read_word(tgt +12);
+						s2 = (short)space.read_word(tgt +14);
+						w2 = (short)space.read_word(tgt +16);
+						if (abs((cz1+sz1)-(c2+s2))>=wz1+w2) continue; // Z rejection
+
+						space.write_byte(i, 0x80); // collision confirmed
+					}
+				}
+			break;
+
+			case 0xc0: // calculate object "homes-in" vector (Violent Storm at 0x03da9e)
+				dx = (short)m_prot_data[0xc];
+				dy = (short)m_prot_data[0xd];
+
+				// it's not necessary to use lookup tables because Violent Storm
+				// only calls the service once per enemy per frame.
+				if (dx)
+				{
+					if (dy)
+					{
+						angle = (atan((double)dy / dx) * 128.0) / M_PI;
+						if (dx < 0) angle += 128;
+						i = (angle - 0x40) & 0xff;
+					}
+					else
+						i = (dx > 0) ? 0xc0 : 0x40;
+				}
+				else
+					if (dy > 0) i = 0;
+				else
+					if (dy < 0) i = 0x80;
+				else
+					i = machine().rand() & 0xff; // vector direction indeterminate
+
+				m_prot_data[0x10] = i;
+			break;
+
+			default:
+//              logerror("%06x: unknown K055550 command %02x\n", space.device().safe_pc(), data);
+			break;
+		}
 	}
 }
 
-WRITE16_MEMBER(mystwarr_state::k053247_scattered_word_w)
+WRITE16_MEMBER(mystwarr_state::K053990_martchmp_word_w)
 {
-	if (offset & 0x0078)
-	{
-//      osd_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, space.device().safe_pc());
-		COMBINE_DATA(m_spriteram+offset);
-	}
-	else
-	{
-		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
+	int src_addr, src_count, src_skip;
+	int dst_addr, /*dst_count,*/ dst_skip;
+	int mod_addr, mod_count, mod_skip, mod_offs;
+	int mode, i, element_size = 1;
+	uint16_t mod_val, mod_data;
 
-		m_k055673->k053247_word_w(space,offset,data,mem_mask);
+	COMBINE_DATA(m_prot_data+offset);
+
+	if (offset == 0x0c && ACCESSING_BITS_8_15)
+	{
+		mode  = (m_prot_data[0x0d]<<8 & 0xff00) | (m_prot_data[0x0f] & 0xff);
+
+		switch (mode)
+		{
+			case 0xffff: // word copy
+				element_size = 2;
+			case 0xff00: // byte copy
+				src_addr  = m_prot_data[0x0];
+				src_addr |= m_prot_data[0x1]<<16 & 0xff0000;
+				dst_addr  = m_prot_data[0x2];
+				dst_addr |= m_prot_data[0x3]<<16 & 0xff0000;
+				src_count = m_prot_data[0x8]>>8;
+				//dst_count = m_prot_data[0x9]>>8;
+				src_skip  = m_prot_data[0xa] & 0xff;
+				dst_skip  = m_prot_data[0xb] & 0xff;
+
+				if ((m_prot_data[0x8] & 0xff) == 2) src_count <<= 1;
+				src_skip += element_size;
+				dst_skip += element_size;
+
+				if (element_size == 1)
+				for (i=src_count; i; i--)
+				{
+					space.write_byte(dst_addr, space.read_byte(src_addr));
+					src_addr += src_skip;
+					dst_addr += dst_skip;
+				}
+				else for (i=src_count; i; i--)
+				{
+					space.write_word(dst_addr, space.read_word(src_addr));
+					src_addr += src_skip;
+					dst_addr += dst_skip;
+				}
+			break;
+
+			case 0x00ff: // sprite list modifier
+				src_addr  = m_prot_data[0x0];
+				src_addr |= m_prot_data[0x1]<<16 & 0xff0000;
+				src_skip  = m_prot_data[0x1]>>8;
+				dst_addr  = m_prot_data[0x2];
+				dst_addr |= m_prot_data[0x3]<<16 & 0xff0000;
+				dst_skip  = m_prot_data[0x3]>>8;
+				mod_addr  = m_prot_data[0x4];
+				mod_addr |= m_prot_data[0x5]<<16 & 0xff0000;
+				mod_skip  = m_prot_data[0x5]>>8;
+				mod_offs  = m_prot_data[0x8] & 0xff;
+				mod_offs<<= 1;
+				mod_count = 0x100;
+
+				src_addr += mod_offs;
+				dst_addr += mod_offs;
+
+				for (i=mod_count; i; i--)
+				{
+					mod_val  = space.read_word(mod_addr);
+					mod_addr += mod_skip;
+
+					mod_data = space.read_word(src_addr);
+					src_addr += src_skip;
+
+					mod_data += mod_val;
+
+					space.write_word(dst_addr, mod_data);
+					dst_addr += dst_skip;
+				}
+			break;
+
+			default:
+			break;
+		}
 	}
 }
+
+// /* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
+// /* of RAM, but they put 0x10000 there. The CPU can access them all. */
+// READ16_MEMBER(mystwarr_state::k053247_scattered_word_r)
+// {
+// 	if (offset & 0x0078)
+// 		return m_spriteram[offset];
+// 	else
+// 	{
+// 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
+// 		return m_k055673->k053247_word_r(space,offset,mem_mask);
+// 	}
+// }
+
+// WRITE16_MEMBER(mystwarr_state::k053247_scattered_word_w)
+// {
+// 	if (offset & 0x0078)
+// 	{
+// //      osd_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, space.device().safe_pc());
+// 		COMBINE_DATA(m_spriteram+offset);
+// 	}
+// 	else
+// 	{
+// 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
+
+// 		m_k055673->k053247_word_w(space,offset,data,mem_mask);
+// 	}
+// }
 
 /* 68000 memory handlers */
 /* Mystic Warriors */
 static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM // main program
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gx_workram")
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(k053247_scattered_word_r,k053247_scattered_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0x480000, 0x4800ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
-	AM_RANGE(0x482000, 0x48200f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)
-	AM_RANGE(0x482010, 0x48201f) AM_DEVWRITE("k055673", k055673_device,k055673_reg_word_w)
-	AM_RANGE(0x484000, 0x484007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)
-	AM_RANGE(0x48a000, 0x48a01f) AM_DEVWRITE("k054338", k054338_device, word_w)
-	AM_RANGE(0x48c000, 0x48c03f) AM_DEVWRITE("k056832", k056832_device,word_w)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("workram")
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x480000, 0x4800ff) AM_DEVICE8("mixer", k055555_device, map, 0xff00)
+	AM_RANGE(0x482000, 0x48200f) AM_DEVREAD("sprites", k053246_055673_device, rom16_r)
+	AM_RANGE(0x482010, 0x48201f) AM_DEVICE("sprites", k053246_055673_device, objset2)
+	AM_RANGE(0x484000, 0x484007) AM_DEVICE("sprites", k053246_055673_device, objset1)
+	AM_RANGE(0x48a000, 0x48a01f) AM_DEVICE("blender", k054338_device, map)
+	AM_RANGE(0x48c000, 0x48c03f) AM_DEVICE("tilemap", k054156_054157_device, vacset)
 	AM_RANGE(0x490000, 0x490001) AM_WRITE(mweeprom_w)
-	AM_RANGE(0x492000, 0x492001) AM_WRITENOP    // watchdog
+	AM_RANGE(0x492000, 0x492001) AM_NOP    // watchdog
 	AM_RANGE(0x494000, 0x494001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x494002, 0x494003) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x496000, 0x496001) AM_READ_PORT("IN0")
@@ -353,44 +748,42 @@ static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x498014, 0x498015) AM_READ(sound_status_r)
 	AM_RANGE(0x498000, 0x49801f) AM_RAM
 	AM_RANGE(0x49a000, 0x49a001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x49c000, 0x49c01f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)
-	AM_RANGE(0x49e000, 0x49e007) AM_WRITE(irq_ack_w)    // VSCCS (custom)
-	AM_RANGE(0x600000, 0x601fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w)
-	AM_RANGE(0x602000, 0x603fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM mirror read(essential)
-	AM_RANGE(0x680000, 0x683fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
+	AM_RANGE(0x49c000, 0x49c01f) AM_DEVICE8("video_timings", k053252_device, map, 0x00ff)
+	AM_RANGE(0x49e000, 0x49e007) AM_DEVICE("tilemap", k054156_054157_device, vsccs)
+	AM_RANGE(0x600000, 0x601fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("tilemap", k054156_054157_device, vram16_r, vram16_w)
+	AM_RANGE(0x680000, 0x683fff) AM_DEVREAD("tilemap", k054156_054157_device, rom16_r)
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 /* Metamorphic Force */
 static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM // main program
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gx_workram")
-	AM_RANGE(0x210000, 0x210fff) AM_DEVREADWRITE("k055673", k055673_device,k053247_word_r,k053247_word_w)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("workram")
+	AM_RANGE(0x210000, 0x210fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x211000, 0x21ffff) AM_RAM
-	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)
-	AM_RANGE(0x244000, 0x24400f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)
-	AM_RANGE(0x244010, 0x24401f) AM_DEVWRITE("k055673", k055673_device,k055673_reg_word_w)
+	AM_RANGE(0x240000, 0x240007) AM_DEVICE("sprites", k053246_055673_device, objset1)
+	AM_RANGE(0x244000, 0x24400f) AM_DEVREAD("sprites", k053246_055673_device, rom16_r)
+	AM_RANGE(0x244010, 0x24401f) AM_DEVICE("sprites", k053246_055673_device, objset2)
 	AM_RANGE(0x24c000, 0x24ffff) AM_DEVREADWRITE("k053250_1", k053250_device, ram_r, ram_w)
 	AM_RANGE(0x250000, 0x25000f) AM_DEVREADWRITE("k053250_1", k053250_device, reg_r, reg_w)
-	AM_RANGE(0x254000, 0x25401f) AM_DEVWRITE("k054338", k054338_device, word_w)
-	AM_RANGE(0x258000, 0x2580ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
-	AM_RANGE(0x260000, 0x26001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)
+	AM_RANGE(0x254000, 0x25401f) AM_DEVICE("blender", k054338_device, map)
+	AM_RANGE(0x258000, 0x2580ff) AM_DEVICE("mixer", k055555_device, map)
+	AM_RANGE(0x260000, 0x26001f) AM_DEVICE8("video_timings", k053252_device, map, 0x00ff)
 	AM_RANGE(0x264000, 0x264001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x26800c, 0x26800d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x26800e, 0x26800f) AM_WRITE(sound_cmd2_w)
 	AM_RANGE(0x268014, 0x268015) AM_READ(sound_status_r)
 	AM_RANGE(0x268000, 0x26801f) AM_RAM
-	AM_RANGE(0x26c000, 0x26c007) AM_DEVWRITE("k056832", k056832_device,b_word_w)
-	AM_RANGE(0x270000, 0x27003f) AM_DEVWRITE("k056832", k056832_device,word_w)
+	AM_RANGE(0x26c000, 0x26c007) AM_DEVICE("tilemap", k054156_054157_device, vsccs)
+	AM_RANGE(0x270000, 0x27003f) AM_DEVICE("tilemap", k054156_054157_device, vacset)
 	AM_RANGE(0x274000, 0x274001) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x274002, 0x274003) AM_READ_PORT("P2_P4")
 	AM_RANGE(0x278000, 0x278001) AM_READ_PORT("IN0")
 	AM_RANGE(0x278002, 0x278003) AM_READ(eeprom_r)
 	AM_RANGE(0x27c000, 0x27c001) AM_READNOP // watchdog lives here
 	AM_RANGE(0x27c000, 0x27c001) AM_WRITE(mmeeprom_w)
-	AM_RANGE(0x300000, 0x301fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w)
-	AM_RANGE(0x302000, 0x303fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM mirror read/write (essential)
-	AM_RANGE(0x310000, 0x311fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
+	AM_RANGE(0x300000, 0x301fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("tilemap", k054156_054157_device, vram16_r, vram16_w)
+	AM_RANGE(0x310000, 0x311fff) AM_DEVREAD("tilemap", k054156_054157_device, rom16_r)
 	AM_RANGE(0x320000, 0x321fff) AM_DEVREAD("k053250_1", k053250_device, rom_r)
 	AM_RANGE(0x330000, 0x331fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
@@ -398,63 +791,36 @@ ADDRESS_MAP_END
 /* Violent Storm */
 static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM     // main program
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gx_workram")
-	AM_RANGE(0x210000, 0x210fff) AM_DEVREADWRITE("k055673", k055673_device, k053247_word_r,k053247_word_w)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("workram")
+	AM_RANGE(0x210000, 0x210fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x211000, 0x21ffff) AM_RAM
-	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)
-	AM_RANGE(0x244000, 0x24400f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)
-	AM_RANGE(0x244010, 0x24401f) AM_DEVWRITE("k055673", k055673_device,k055673_reg_word_w)
+	AM_RANGE(0x240000, 0x240007) AM_DEVICE("sprites", k053246_055673_device, objset1)
+	AM_RANGE(0x244000, 0x24400f) AM_DEVREAD("sprites", k053246_055673_device, rom16_r)
+	AM_RANGE(0x244010, 0x24401f) AM_DEVICE("sprites", k053246_055673_device, objset2)
 	AM_RANGE(0x24c000, 0x24ffff) AM_RAM     // K053250 ram
 	AM_RANGE(0x250000, 0x25000f) AM_RAM     // K053250 reg
-	AM_RANGE(0x254000, 0x25401f) AM_DEVWRITE("k054338", k054338_device, word_w)
-	AM_RANGE(0x258000, 0x2580ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
+	AM_RANGE(0x254000, 0x25401f) AM_DEVICE("blender", k054338_device, map)
+	AM_RANGE(0x258000, 0x2580ff) AM_DEVICE("mixer", k055555_device, map)
 	AM_RANGE(0x25c000, 0x25c03f) AM_READWRITE(K055550_word_r,K055550_word_w)
-	AM_RANGE(0x260000, 0x26001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)
+	AM_RANGE(0x260000, 0x26001f) AM_DEVICE8("video_timings", k053252_device, map, 0x00ff)
 	AM_RANGE(0x264000, 0x264001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x26800c, 0x26800d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x26800e, 0x26800f) AM_WRITE(sound_cmd2_w)
 	AM_RANGE(0x268014, 0x268015) AM_READ(sound_status_r)
 	AM_RANGE(0x268000, 0x26801f) AM_RAM
-	AM_RANGE(0x26c000, 0x26c007) AM_DEVWRITE("k056832", k056832_device,b_word_w)
-	AM_RANGE(0x270000, 0x27003f) AM_DEVWRITE("k056832", k056832_device,word_w)
+	AM_RANGE(0x26c000, 0x26c007) AM_DEVICE("tilemap", k054156_054157_device, vsccs)
+	AM_RANGE(0x270000, 0x27003f) AM_DEVICE("tilemap", k054156_054157_device, vacset)
 	AM_RANGE(0x274000, 0x274001) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x274002, 0x274003) AM_READ_PORT("P2_P4")
 	AM_RANGE(0x278000, 0x278001) AM_READ_PORT("IN0")
 	AM_RANGE(0x278002, 0x278003) AM_READ(eeprom_r)
 	AM_RANGE(0x27c000, 0x27c001) AM_READNOP     // watchdog lives here
 	AM_RANGE(0x27c000, 0x27c001) AM_WRITE(mmeeprom_w)
-	AM_RANGE(0x300000, 0x301fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w)
-	AM_RANGE(0x302000, 0x303fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM mirror read(essential)
+	AM_RANGE(0x300000, 0x301fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("tilemap", k054156_054157_device, vram16_r, vram16_w)
 	AM_RANGE(0x304000, 0x3041ff) AM_RAM
-	AM_RANGE(0x310000, 0x311fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
+	AM_RANGE(0x310000, 0x311fff) AM_DEVREAD("tilemap", k054156_054157_device, rom16_r)
 	AM_RANGE(0x330000, 0x331fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
-
-// Martial Champion specific interfaces
-READ16_MEMBER(mystwarr_state::k053247_martchmp_word_r)
-{
-	if (offset & 0x0018)
-		return m_spriteram[offset];
-	else
-	{
-		offset = (offset & 0x0007) | ((offset & 0x1fe0) >> 2);
-		return m_k055673->k053247_word_r(space,offset,mem_mask);
-	}
-}
-
-WRITE16_MEMBER(mystwarr_state::k053247_martchmp_word_w)
-{
-	if (offset & 0x0018)
-	{
-		COMBINE_DATA(m_spriteram+offset);
-	}
-	else
-	{
-		offset = (offset & 0x0007) | ((offset & 0x1fe0) >> 2);
-
-		m_k055673->k053247_word_w(space,offset,data,mem_mask);
-	}
-}
 
 READ16_MEMBER(mystwarr_state::mccontrol_r)
 {
@@ -470,7 +836,7 @@ WRITE16_MEMBER(mystwarr_state::mccontrol_w)
 		// bit 1 = IRQ enable
 		// bit 2 = OBJCHA
 
-		m_k055673->k053246_set_objcha_line((data&0x04) ? ASSERT_LINE : CLEAR_LINE);
+		m_sprites->set_objcha(data&0x04);
 
 //      if (data & 0xf8) logerror("Unk write %x to mccontrol\n", data);
 
@@ -483,14 +849,14 @@ WRITE16_MEMBER(mystwarr_state::mccontrol_w)
 /* Martial Champion */
 static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                 // main program
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("gx_workram")          // work RAM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("workram")          // work RAM
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM                                 // data ROM
-	AM_RANGE(0x400000, 0x4000ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)                // PCU2
-	AM_RANGE(0x402000, 0x40200f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)         // sprite ROM readback
-	AM_RANGE(0x402010, 0x40201f) AM_DEVWRITE("k055673", k055673_device,k055673_reg_word_w)            // OBJSET2
-	AM_RANGE(0x404000, 0x404007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)                // OBJSET1
-	AM_RANGE(0x40a000, 0x40a01f) AM_DEVWRITE("k054338", k054338_device, word_w)                // CLTC
-	AM_RANGE(0x40c000, 0x40c03f) AM_DEVWRITE("k056832", k056832_device,word_w)                // VACSET
+	AM_RANGE(0x400000, 0x4000ff) AM_DEVICE("mixer", k055555_device, map)
+	AM_RANGE(0x402000, 0x40200f) AM_DEVREAD("sprites", k053246_055673_device, rom16_r)
+	AM_RANGE(0x402010, 0x40201f) AM_DEVICE("sprites", k053246_055673_device, objset2)
+	AM_RANGE(0x404000, 0x404007) AM_DEVICE("sprites", k053246_055673_device, objset1)
+	AM_RANGE(0x40a000, 0x40a01f) AM_DEVICE("blender", k054338_device, map)
+	AM_RANGE(0x40c000, 0x40c03f) AM_DEVICE("tilemap", k054156_054157_device, vacset)
 	AM_RANGE(0x40e000, 0x40e03f) AM_WRITE(K053990_martchmp_word_w)      // protection
 	AM_RANGE(0x410000, 0x410001) AM_WRITE(mweeprom_w)
 	AM_RANGE(0x412000, 0x412001) AM_READWRITE(mccontrol_r,mccontrol_w)
@@ -503,41 +869,39 @@ static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x41800e, 0x41800f) AM_WRITE(sound_cmd2_w)
 	AM_RANGE(0x418000, 0x41801f) AM_RAM                                 // sound regs fall through
 	AM_RANGE(0x41a000, 0x41a001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x41c000, 0x41c01f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)              // CCU
-	AM_RANGE(0x41e000, 0x41e007) AM_DEVWRITE("k056832", k056832_device,b_word_w)              // VSCCS
-	AM_RANGE(0x480000, 0x483fff) AM_READWRITE(k053247_martchmp_word_r,k053247_martchmp_word_w) AM_SHARE("spriteram")    // sprite RAM
+	AM_RANGE(0x41c000, 0x41c01f) AM_DEVICE8("video_timings", k053252_device, map, 0x00ff)
+	AM_RANGE(0x41e000, 0x41e007) AM_DEVICE("tilemap", k054156_054157_device, vsccs)
+	AM_RANGE(0x480000, 0x483fff) AM_RAM AM_SHARE("spriteram")    // sprite RAM
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")                     // palette RAM
-	AM_RANGE(0x680000, 0x681fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM
-	AM_RANGE(0x682000, 0x683fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM mirror read/write (essential)
-	AM_RANGE(0x700000, 0x703fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)          // tile ROM readback
+	AM_RANGE(0x680000, 0x681fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("tilemap", k054156_054157_device, vram16_r, vram16_w)
+	AM_RANGE(0x700000, 0x703fff) AM_DEVREAD("tilemap", k054156_054157_device, rom16_r)
 ADDRESS_MAP_END
 
 /* Ultimate Battler Dadandarn */
 static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                         // main program and data ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(k053247_scattered_word_r,k053247_scattered_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0x410000, 0x411fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM
-	AM_RANGE(0x412000, 0x413fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM mirror read/write (essential)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x410000, 0x411fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("tilemap", k054156_054157_device, vram16_r, vram16_w)
 	AM_RANGE(0x420000, 0x421fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x430000, 0x430007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)
-	AM_RANGE(0x440000, 0x443fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
-	AM_RANGE(0x450000, 0x45000f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)
-	AM_RANGE(0x450010, 0x45001f) AM_DEVWRITE("k055673", k055673_device,k055673_reg_word_w)
+	AM_RANGE(0x430000, 0x430007) AM_DEVICE("sprites", k053246_055673_device, objset1)
+	AM_RANGE(0x440000, 0x443fff) AM_DEVREAD("tilemap", k054156_054157_device, rom16_r)
+	AM_RANGE(0x450000, 0x45000f) AM_DEVREAD("sprites", k053246_055673_device, rom16_r)
+	AM_RANGE(0x450010, 0x45001f) AM_DEVICE("sprites", k053246_055673_device, objset2)
 	AM_RANGE(0x460000, 0x46001f) AM_WRITEONLY AM_SHARE("k053936_0_ct16")
 	AM_RANGE(0x470000, 0x470fff) AM_RAM AM_SHARE("k053936_0_li16")
-	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE("k056832", k056832_device,word_w)        // VACSET
-	AM_RANGE(0x482000, 0x482007) AM_DEVWRITE("k056832", k056832_device,b_word_w)  // VSCCS
+	AM_RANGE(0x480000, 0x48003f) AM_DEVICE("tilemap", k054156_054157_device, vacset)
+	AM_RANGE(0x482000, 0x482007) AM_DEVICE("tilemap", k054156_054157_device, vsccs)
 	AM_RANGE(0x484000, 0x484003) AM_WRITE(ddd_053936_clip_w)
-	AM_RANGE(0x486000, 0x48601f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)
-	AM_RANGE(0x488000, 0x4880ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
+	AM_RANGE(0x486000, 0x48601f) AM_DEVICE8("video_timings", k053252_device, map, 0x00ff)
+	AM_RANGE(0x488000, 0x4880ff) AM_DEVICE("mixer", k055555_device, map)
 	AM_RANGE(0x48a00c, 0x48a00d) AM_WRITE(sound_cmd1_msb_w)
 	AM_RANGE(0x48a00e, 0x48a00f) AM_WRITE(sound_cmd2_msb_w)
 	AM_RANGE(0x48a014, 0x48a015) AM_READ(sound_status_msb_r)
 	AM_RANGE(0x48a000, 0x48a01f) AM_RAM                 // sound regs fall-through
-	AM_RANGE(0x48c000, 0x48c01f) AM_DEVWRITE("k054338", k054338_device, word_w)
+	AM_RANGE(0x48c000, 0x48c01f) AM_DEVICE("blender", k054338_device, map)
 	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1") // bit 3 (0x8) is test switch
 	AM_RANGE(0x48e020, 0x48e021) AM_READ(dddeeprom_r)
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("gx_workram")
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0x680000, 0x68003f) AM_READWRITE(K055550_word_r,K055550_word_w)
 	AM_RANGE(0x6a0000, 0x6a0001) AM_WRITE(mmeeprom_w)
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE(ddd_053936_enable_w)
@@ -554,29 +918,28 @@ ADDRESS_MAP_END
 // c00000 = 936 tiles (7fffff window)
 static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM                             // main program
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(k053247_scattered_word_r,k053247_scattered_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0x410000, 0x411fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w)     // tilemap RAM
-	AM_RANGE(0x412000, 0x413fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w)     // tilemap RAM mirror read / write (essential)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x410000, 0x411fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("tilemap", k054156_054157_device, vram16_r, vram16_w)
 	AM_RANGE(0x420000, 0x421fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x430000, 0x430007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)
-	AM_RANGE(0x440000, 0x441fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
-	AM_RANGE(0x450000, 0x45000f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)
-	AM_RANGE(0x450010, 0x45001f) AM_DEVWRITE("k055673", k055673_device,k055673_reg_word_w)
+	AM_RANGE(0x430000, 0x430007) AM_DEVICE("sprites", k053246_055673_device, objset1)
+	AM_RANGE(0x440000, 0x441fff) AM_DEVREAD("tilemap", k054156_054157_device, rom16_r)
+	AM_RANGE(0x450000, 0x45000f) AM_DEVREAD("sprites", k053246_055673_device, rom16_r)
+	AM_RANGE(0x450010, 0x45001f) AM_DEVICE("sprites", k053246_055673_device, objset2)
 	AM_RANGE(0x460000, 0x46001f) AM_WRITEONLY AM_SHARE("k053936_0_ct16")
 	AM_RANGE(0x470000, 0x470fff) AM_RAM AM_SHARE("k053936_0_li16")
-	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE("k056832", k056832_device,word_w)            // VACSET
-	AM_RANGE(0x482000, 0x482007) AM_DEVWRITE("k056832", k056832_device,b_word_w)          // VSCCS
+	AM_RANGE(0x480000, 0x48003f) AM_DEVICE("tilemap", k054156_054157_device, vacset)
+	AM_RANGE(0x482000, 0x482007) AM_DEVICE("tilemap", k054156_054157_device, vsccs)
 	AM_RANGE(0x484000, 0x484003) AM_WRITE(ddd_053936_clip_w)
-	AM_RANGE(0x486000, 0x48601f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)
-	AM_RANGE(0x488000, 0x4880ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
+	AM_RANGE(0x486000, 0x48601f) AM_DEVICE8("video_timings", k053252_device, map, 0x00ff)
+	AM_RANGE(0x488000, 0x4880ff) AM_DEVICE("mixer", k055555_device, map)
 	AM_RANGE(0x48a00c, 0x48a00d) AM_WRITE(sound_cmd1_msb_w)
 	AM_RANGE(0x48a00e, 0x48a00f) AM_WRITE(sound_cmd2_msb_w)
 	AM_RANGE(0x48a014, 0x48a015) AM_READ(sound_status_msb_r)
 	AM_RANGE(0x48a000, 0x48a01f) AM_RAM                             // sound regs fall-through
-	AM_RANGE(0x48c000, 0x48c01f) AM_DEVWRITE("k054338", k054338_device, word_w)
+	AM_RANGE(0x48c000, 0x48c01f) AM_DEVICE("blender", k054338_device, map)
 	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1")             // bit 3 (0x8) is test switch
 	AM_RANGE(0x48e020, 0x48e021) AM_READ(dddeeprom_r)
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("gx_workram")
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0x660000, 0x6600ff) AM_DEVREADWRITE("k054000", k054000_device, lsb_r, lsb_w)
 	AM_RANGE(0x6a0000, 0x6a0001) AM_WRITE(mmeeprom_w)
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE(ddd_053936_enable_w)
@@ -886,9 +1249,6 @@ MACHINE_START_MEMBER(mystwarr_state,mystwarr)
 
 	m_mw_irq_control = 0;
 
-	/* konamigx_mixer uses this, so better initialize it */
-	m_gx_wrport1_0 = 0;
-
 	save_item(NAME(m_mw_irq_control));
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_nmi_clk));
@@ -972,8 +1332,8 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
-	MCFG_DEVICE_ADD("k053252", K053252, 6000000) // 6 MHz?
-	MCFG_K053252_OFFSETS(24, 16)
+	MCFG_DEVICE_ADD("video_timings", K053252, 6000000) // 6 MHz?
+//	MCFG_K053252_OFFSETS(24, 16)
 
 	MCFG_MACHINE_START_OVERRIDE(mystwarr_state,mystwarr)
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,mystwarr)
@@ -985,31 +1345,26 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_mystwarr)
+//	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
+	MCFG_SCREEN_UPDATE_DEVICE("blender", k054338_device, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XRGB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(mystwarr_state, mystwarr_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_K055555_ADD("k055555")
+	MCFG_K054156_054157_5BPP_ADD("tilemap", 6000000, 4, 4, 24, "palette")
 
-	MCFG_DEVICE_ADD("k055673", K055673, 0)
-	MCFG_K055673_CB(mystwarr_state, mystwarr_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -48, -24)
-	MCFG_K055673_PALETTE("palette")
+	MCFG_K055555_ADD("mixer")
+	MCFG_K055555_SET_INIT_CB(DEVICE_SELF, mystwarr_state, mixer_init)
+	MCFG_K055555_SET_UPDATE_CB(DEVICE_SELF, mystwarr_state, mixer_update)
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
-	MCFG_K054338_ALPHAINV(1)
-	MCFG_K054338_MIXER("k055555")
+	MCFG_DEVICE_ADD("blender", K054338, 0)
+	MCFG_K054338_SET_UPDATE_CB(DEVICE_SELF, mystwarr_state, blender_update)
+	MCFG_K054338_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, mystwarr)
+	MCFG_K053246_055673_ADD("sprites", 6000000, "palette", "spriteram")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1034,8 +1389,8 @@ static MACHINE_CONFIG_DERIVED( viostorm, mystwarr )
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,viostorm)
 
-	MCFG_DEVICE_REPLACE("k053252", K053252, 16000000/2)
-	MCFG_K053252_OFFSETS(40, 16)
+	MCFG_DEVICE_REPLACE("video_timings", K053252, 16000000/2)
+//	MCFG_K053252_OFFSETS(40, 16)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1044,21 +1399,10 @@ static MACHINE_CONFIG_DERIVED( viostorm, mystwarr )
 	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, metamrph_interrupt)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, viostorm)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_metamrph)
-
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(900))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
-
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(mystwarr_state, game4bpp_tile_callback)
-
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(mystwarr_state, metamrph_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -62, -23)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
@@ -1071,27 +1415,16 @@ static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, metamrph_interrupt)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24, 15)
+	MCFG_DEVICE_MODIFY("video_timings")
+//	MCFG_K053252_OFFSETS(24, 15)
 
 	MCFG_K053250_ADD("k053250_1", "palette", "screen", -7, 0)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, metamrph)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_metamrph)
-
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(900))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 15, 15+224-1)
-
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(mystwarr_state, game4bpp_tile_callback)
-
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(mystwarr_state, metamrph_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -51, -24)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
@@ -1104,27 +1437,16 @@ static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mystwarr_state,  ddd_interrupt)
 	MCFG_DEVICE_REMOVE("scantimer")
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24, 16+1)
+	MCFG_DEVICE_MODIFY("video_timings")
+//	MCFG_K053252_OFFSETS(24, 16+1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dadandrn)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, dadandrn)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_dadandrn)
-
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 17, 17+224-1)
-
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(mystwarr_state, game5bpp_tile_callback)
-
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(mystwarr_state, gaiapols_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -42, -22)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
@@ -1137,30 +1459,19 @@ static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mystwarr_state,  ddd_interrupt)
 	MCFG_DEVICE_REMOVE("scantimer")
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(40, 16)
+	MCFG_DEVICE_MODIFY("video_timings")
+//	MCFG_K053252_OFFSETS(40, 16)
 
 	MCFG_K054000_ADD("k054000")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gaiapols)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, gaiapols)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_dadandrn)
-
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+376-1, 16, 16+224-1)
-
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(mystwarr_state, game4bpp_tile_callback)
-
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(mystwarr_state, gaiapols_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -61, -22) // stage2 brick walls
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
@@ -1173,35 +1484,28 @@ static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, mchamp_interrupt)
 
-	MCFG_DEVICE_REPLACE("k053252", K053252, 16000000/2)
-	MCFG_K053252_OFFSETS(32, 24-1)
+	MCFG_DEVICE_REPLACE("video_timings", K053252, 16000000/2)
+//	MCFG_K053252_OFFSETS(32, 24-1)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(XRGB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
-
-	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, martchmp)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_martchmp)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
-
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(mystwarr_state, game5bpp_tile_callback)
-
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(mystwarr_state, martchmp_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -58, -23)
 MACHINE_CONFIG_END
 
 /**********************************************************************************/
 
 #define ROM_LOADTILE_WORD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPWORD | ROM_SKIP(3) | ROM_REVERSE)
 #define ROM_LOADTILE_BYTE(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPBYTE | ROM_SKIP(4))
+
+#define TILE_1WORD_ROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPWORD | ROM_SKIP(6) | ROM_REVERSE)
+#define TILE_2WORD_ROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPWORD | ROM_SKIP(2) | ROM_REVERSE)
+#define TILE_1BYTE_ROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPBYTE | ROM_SKIP(7)) ROM_RELOAD(offset+4, length)
+#define TILE_2BYTE_ROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPBYTE | ROM_SKIP(3))
 
 ROM_START( mystwarr )
 	/* main program */
@@ -1217,13 +1521,13 @@ ROM_START( mystwarr )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
-	ROM_LOADTILE_WORD( "128a08.1h", 0x000000, 1*1024*1024, CRC(63d6cfa0) SHA1(324bf25cf79aa030d2dcc94a53c1984eb8abec3a) )
-	ROM_LOADTILE_WORD( "128a09.1k", 0x000002, 1*1024*1024, CRC(573a7725) SHA1(f2fef32053ed2a65c6c3ddd3e1657a866aa80b3e) )
-	ROM_LOADTILE_BYTE( "128a10.3h", 0x000004, 512*1024, CRC(558e545a) SHA1(cac53e545f3f8980d431443f2c3b8b95e6077d1c) )
+	ROM_REGION( 0x400000, "tilemap", ROMREGION_ERASE00 )
+	TILE_1WORD_ROM_LOAD( "128a08.1h", 0x000000, 1*1024*1024, CRC(63d6cfa0) SHA1(324bf25cf79aa030d2dcc94a53c1984eb8abec3a) )
+	TILE_1WORD_ROM_LOAD( "128a09.1k", 0x000004, 1*1024*1024, CRC(573a7725) SHA1(f2fef32053ed2a65c6c3ddd3e1657a866aa80b3e) )
+	TILE_1BYTE_ROM_LOAD( "128a10.3h", 0x000002, 512*1024, CRC(558e545a) SHA1(cac53e545f3f8980d431443f2c3b8b95e6077d1c) )
 
 	/* sprites */
-	ROM_REGION( 0x500000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "128a16.22k", 0x000000, 1*1024*1024, CRC(459b6407) SHA1(e4dace4912f9558bee75a8e95ee2637f5e950b47) )
 	ROM_LOAD64_WORD( "128a15.20k", 0x000002, 1*1024*1024, CRC(6bbfedf4) SHA1(0b3acb2b34c722ddc60c0e64e12baa1f225e4fbb) )
 	ROM_LOAD64_WORD( "128a14.19k", 0x000004, 1*1024*1024, CRC(f7bd89dd) SHA1(c9b2ebd5a49840f8b260d53c25cfcc238d21c75c) )
@@ -1257,7 +1561,7 @@ ROM_START( mystwarru )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "128a08.1h", 0x000000, 1*1024*1024, CRC(63d6cfa0) SHA1(324bf25cf79aa030d2dcc94a53c1984eb8abec3a) )
 	ROM_LOADTILE_WORD( "128a09.1k", 0x000002, 1*1024*1024, CRC(573a7725) SHA1(f2fef32053ed2a65c6c3ddd3e1657a866aa80b3e) )
 	ROM_LOADTILE_BYTE( "128a10.3h", 0x000004, 512*1024, CRC(558e545a) SHA1(cac53e545f3f8980d431443f2c3b8b95e6077d1c) )
@@ -1297,7 +1601,7 @@ ROM_START( mystwarrj )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "128a08.1h", 0x000000, 1*1024*1024, CRC(63d6cfa0) SHA1(324bf25cf79aa030d2dcc94a53c1984eb8abec3a) )
 	ROM_LOADTILE_WORD( "128a09.1k", 0x000002, 1*1024*1024, CRC(573a7725) SHA1(f2fef32053ed2a65c6c3ddd3e1657a866aa80b3e) )
 	ROM_LOADTILE_BYTE( "128a10.3h", 0x000004, 512*1024, CRC(558e545a) SHA1(cac53e545f3f8980d431443f2c3b8b95e6077d1c) )
@@ -1377,7 +1681,7 @@ ROM_START( mystwarraa )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "128a08.1h", 0x000000, 1*1024*1024, CRC(63d6cfa0) SHA1(324bf25cf79aa030d2dcc94a53c1984eb8abec3a) )
 	ROM_LOADTILE_WORD( "128a09.1k", 0x000002, 1*1024*1024, CRC(573a7725) SHA1(f2fef32053ed2a65c6c3ddd3e1657a866aa80b3e) )
 	ROM_LOADTILE_BYTE( "128a10.3h", 0x000004, 512*1024, CRC(558e545a) SHA1(cac53e545f3f8980d431443f2c3b8b95e6077d1c) )
@@ -1415,7 +1719,7 @@ ROM_START( viostorm )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00)
+	ROM_REGION( 0x600000, "tilemap", ROMREGION_ERASE00)
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 2*1024*1024, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 2*1024*1024, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
@@ -1450,7 +1754,7 @@ ROM_START( viostormeb )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00)
+	ROM_REGION( 0x600000, "tilemap", ROMREGION_ERASE00)
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 2*1024*1024, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 2*1024*1024, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
@@ -1485,7 +1789,7 @@ ROM_START( viostormu )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00)
+	ROM_REGION( 0x600000, "tilemap", ROMREGION_ERASE00)
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 2*1024*1024, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 2*1024*1024, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
@@ -1520,7 +1824,7 @@ ROM_START( viostormub )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00)
+	ROM_REGION( 0x600000, "tilemap", ROMREGION_ERASE00)
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 2*1024*1024, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 2*1024*1024, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
@@ -1555,7 +1859,7 @@ ROM_START( viostorma )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 2*1024*1024, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 2*1024*1024, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
@@ -1590,7 +1894,7 @@ ROM_START( viostormab )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 2*1024*1024, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 2*1024*1024, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
@@ -1626,7 +1930,7 @@ ROM_START( viostormj )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 2*1024*1024, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 2*1024*1024, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
@@ -1662,7 +1966,7 @@ ROM_START( metamrph )
 	ROM_LOAD("224a05", 0x000000, 0x40000, CRC(4b4c985c) SHA1(c83cce05355023be9cd55b4aa595c61f8236269c) )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "224a09", 0x000000, 1*1024*1024, CRC(1931afce) SHA1(78838c0fd2a9c80f130db1fcf6c88b14f7363639) )
 	ROM_LOADTILE_WORD( "224a08", 0x000002, 1*1024*1024, CRC(dc94d53a) SHA1(91e16371a335f078a81c06a1045759653080aba0) )
 
@@ -1773,7 +2077,7 @@ ROM_START( metamrphu )
 	ROM_LOAD("224a05", 0x000000, 0x40000, CRC(4b4c985c) SHA1(c83cce05355023be9cd55b4aa595c61f8236269c) )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "224a09", 0x000000, 1*1024*1024, CRC(1931afce) SHA1(78838c0fd2a9c80f130db1fcf6c88b14f7363639) )
 	ROM_LOADTILE_WORD( "224a08", 0x000002, 1*1024*1024, CRC(dc94d53a) SHA1(91e16371a335f078a81c06a1045759653080aba0) )
 
@@ -1810,7 +2114,7 @@ ROM_START( metamrphj )
 	ROM_LOAD("224a05", 0x000000, 0x40000, CRC(4b4c985c) SHA1(c83cce05355023be9cd55b4aa595c61f8236269c) )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "224a09", 0x000000, 1*1024*1024, CRC(1931afce) SHA1(78838c0fd2a9c80f130db1fcf6c88b14f7363639) )
 	ROM_LOADTILE_WORD( "224a08", 0x000002, 1*1024*1024, CRC(dc94d53a) SHA1(91e16371a335f078a81c06a1045759653080aba0) )
 
@@ -1848,7 +2152,7 @@ ROM_START( mtlchamp )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 1*1024*1024, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 1*1024*1024, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 512*1024, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
@@ -1885,7 +2189,7 @@ ROM_START( mtlchamp1 )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 1*1024*1024, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 1*1024*1024, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 512*1024, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
@@ -1922,7 +2226,7 @@ ROM_START( mtlchampa )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 1*1024*1024, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 1*1024*1024, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 512*1024, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
@@ -1959,7 +2263,7 @@ ROM_START( mtlchampj )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 1*1024*1024, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 1*1024*1024, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 512*1024, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
@@ -1996,7 +2300,7 @@ ROM_START( mtlchampu )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 1*1024*1024, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 1*1024*1024, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 512*1024, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
@@ -2033,7 +2337,7 @@ ROM_START( mtlchampu1 )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 1*1024*1024, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 1*1024*1024, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 512*1024, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
@@ -2071,7 +2375,7 @@ ROM_START( gaiapols )
 	ROM_LOAD("123e13.9c", 0x00000, 0x40000, CRC(e772f822) SHA1(2a5cdfc0aacad56cbef8bdbe8319e7ff4ab71eee) )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "123e16.2t", 0x000000, 1*1024*1024, CRC(a3238200) SHA1(9ea073f7611b5c0b328c707c97ef174634c303bc) )
 	ROM_LOADTILE_WORD( "123e17.2x", 0x000002, 1*1024*1024, CRC(bd0b9fb9) SHA1(1714c19d2123b8fd4cfedb66d13bdcee6fc77576) )
 
@@ -2118,7 +2422,7 @@ ROM_START( gaiapolsu )
 	ROM_LOAD("123e13.9c", 0x00000, 0x40000, CRC(e772f822) SHA1(2a5cdfc0aacad56cbef8bdbe8319e7ff4ab71eee) )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "123e16.2t", 0x000000, 1*1024*1024, CRC(a3238200) SHA1(9ea073f7611b5c0b328c707c97ef174634c303bc) )
 	ROM_LOADTILE_WORD( "123e17.2x", 0x000002, 1*1024*1024, CRC(bd0b9fb9) SHA1(1714c19d2123b8fd4cfedb66d13bdcee6fc77576) )
 
@@ -2165,7 +2469,7 @@ ROM_START( gaiapolsj )
 	ROM_LOAD("123e13.9c", 0x00000, 0x40000, CRC(e772f822) SHA1(2a5cdfc0aacad56cbef8bdbe8319e7ff4ab71eee) )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "123e16.2t", 0x000000, 1*1024*1024, CRC(a3238200) SHA1(9ea073f7611b5c0b328c707c97ef174634c303bc) )
 	ROM_LOADTILE_WORD( "123e17.2x", 0x000002, 1*1024*1024, CRC(bd0b9fb9) SHA1(1714c19d2123b8fd4cfedb66d13bdcee6fc77576) )
 
@@ -2210,7 +2514,7 @@ ROM_START( mmaulers )
 	ROM_LOAD("170a13.9c", 0x00000, 0x40000, CRC(2ebf4d1c) SHA1(33a3f4153dfdc46cc223d216a17ef9428c09129d) )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "170a16.2t", 0x000000, 1*1024*1024, CRC(41fee912) SHA1(73cf167ac9fc42cb8048a87b6c6d1c3c0ae3c2e2) )
 	ROM_LOADTILE_WORD( "170a17.2x", 0x000002, 1*1024*1024, CRC(96957c91) SHA1(b12d356f8a015ec0984bdb86da9c569eb0c67880) )
 	ROM_LOADTILE_BYTE( "170a24.5r", 0x000004, 512*1024, CRC(562ad4bd) SHA1(f55b29142ea39f090244f0945a56760bab25c7a7) )
@@ -2257,7 +2561,7 @@ ROM_START( dadandrn )
 	ROM_LOAD("170a13.9c", 0x00000, 0x40000, CRC(2ebf4d1c) SHA1(33a3f4153dfdc46cc223d216a17ef9428c09129d) )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "tilemap", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "170a16.2t", 0x000000, 1*1024*1024, CRC(41fee912) SHA1(73cf167ac9fc42cb8048a87b6c6d1c3c0ae3c2e2) )
 	ROM_LOADTILE_WORD( "170a17.2x", 0x000002, 1*1024*1024, CRC(96957c91) SHA1(b12d356f8a015ec0984bdb86da9c569eb0c67880) )
 	ROM_LOADTILE_BYTE( "170a24.5r", 0x000004, 512*1024, CRC(562ad4bd) SHA1(f55b29142ea39f090244f0945a56760bab25c7a7) )

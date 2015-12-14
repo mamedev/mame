@@ -149,77 +149,36 @@ Unresolved Issues:
 #define XE_SKIPIDLE   1
 #define XE_DMADELAY   attotime::from_usec(256)
 
-#if 0 // (for reference; do not remove)
-
-/* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
-/* of RAM, but they put 0x8000 there. The CPU can access them all. Address lines */
-/* A1, A5 and A6 don't go to the 053247. */
-READ16_MEMBER(xexex_state::k053247_scattered_word_r)
+void xexex_state::blender_init(bitmap_ind16 **bitmaps)
 {
-	if (offset & 0x0031)
-		return m_spriteram[offset];
-	else
-	{
-		offset = ((offset & 0x000e) >> 1) | ((offset & 0x3fc0) >> 3);
-		return k053247_word_r(m_k053246, offset, mem_mask);
+	bitmaps[0]->fill(0);
+	bitmaps[1]->fill(0x8000);
+	bitmaps[2]->fill(0);
+	bitmaps[3]->fill(0);
+	if(0)
+	logerror("got k054338 init, sizes %dx%d %dx%d %dx%d %dx%d\n",
+			 bitmaps[0]->width(), bitmaps[0]->height(),
+			 bitmaps[1]->width(), bitmaps[1]->height(),
+			 bitmaps[2]->width(), bitmaps[2]->height(),
+			 bitmaps[3]->width(), bitmaps[3]->height());
+}
+
+void xexex_state::blender_update(bitmap_ind16 **bitmaps, const rectangle &cliprect)
+{
+	static int layer = 0;
+	m_tilemap->bitmap_update(bitmaps[0], cliprect, layer);
+	for(int y=cliprect.min_y; y<=cliprect.max_y; y++) {
+		uint16_t *dest = &bitmaps[0]->pix(y, cliprect.min_x);
+		for(int x=cliprect.min_x; x<=cliprect.max_x; x++)
+			*dest++ |= 0x700;
 	}
-}
-
-WRITE16_MEMBER(xexex_state::k053247_scattered_word_w)
-{
-	if (offset & 0x0031)
-		COMBINE_DATA(m_spriteram + offset);
-	else
-	{
-		offset = ((offset & 0x000e) >> 1) | ((offset & 0x3fc0) >> 3);
-		k053247_word_w(m_k053246, offset, data, mem_mask);
-	}
-}
-
-#endif
-
-
-void xexex_state::xexex_objdma( int limiter )
-{
-	int counter, num_inactive;
-	uint16_t *src, *dst;
-
-	counter = m_frame;
-	m_frame = m_screen->frame_number();
-	if (limiter && counter == m_frame)
-		return; // make sure we only do DMA transfer once per frame
-
-	m_k053246->k053247_get_ram( &dst);
-	counter = m_k053246->k053247_get_dy();
-	src = m_spriteram;
-	num_inactive = counter = 256;
-
-	do
-	{
-		if (*src & 0x8000)
-		{
-			dst[0] = src[0x0];  dst[1] = src[0x2];
-			dst[2] = src[0x4];  dst[3] = src[0x6];
-			dst[4] = src[0x8];  dst[5] = src[0xa];
-			dst[6] = src[0xc];  dst[7] = src[0xe];
-			dst += 8;
-			num_inactive--;
-		}
-		src += 0x40;
-	}
-	while (--counter);
-
-	if (num_inactive) do { *dst = 0; dst += 8; } while (--num_inactive);
-}
-
-READ16_MEMBER(xexex_state::spriteram_mirror_r)
-{
-	return m_spriteram[offset];
-}
-
-WRITE16_MEMBER(xexex_state::spriteram_mirror_w)
-{
-	COMBINE_DATA(m_spriteram + offset);
+	if(0)
+	logerror("got k054338 update, sizes %dx%d %dx%d %dx%d %dx%d, cr (%d, %d)-(%d, %d)\n",
+			 bitmaps[0]->width(), bitmaps[0]->height(),
+			 bitmaps[1]->width(), bitmaps[1]->height(),
+			 bitmaps[2]->width(), bitmaps[2]->height(),
+			 bitmaps[3]->width(), bitmaps[3]->height(),
+			 cliprect.min_x, cliprect.min_y, cliprect.max_x, cliprect.max_y);
 }
 
 READ16_MEMBER(xexex_state::xexex_waitskip_r)
@@ -245,7 +204,7 @@ void xexex_state::parse_control2(  )
 	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
 
 	/* bit 8 = enable sprite ROM reading */
-	m_k053246->k053246_set_objcha_line( (m_cur_control2 & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
+	m_sprites->set_objcha(m_cur_control2 & 0x0100);
 
 	/* bit 9 = disable alpha channel on K054157 plane 0 (under investigation) */
 	m_cur_alpha = !(m_cur_control2 & 0x200);
@@ -305,22 +264,6 @@ K054539_CB_MEMBER(xexex_state::ym_set_mixing)
 	m_filter2r->flt_volume_set_volume((71.0 * right) / 55.0);
 }
 
-TIMER_CALLBACK_MEMBER(xexex_state::dmaend_callback)
-{
-	if (m_cur_control2 & 0x0040)
-	{
-		// foul-proof (CPU0 could be deactivated while we wait)
-		if (m_suspension_active)
-		{
-			m_suspension_active = 0;
-			machine().scheduler().trigger(m_resume_trigger);
-		}
-
-		// IRQ 5 is the "object DMA end interrupt" and shouldn't be triggered
-		// if object data isn't ready for DMA within the frame.
-		m_maincpu->set_input_line(5, HOLD_LINE);
-	}
-}
 
 TIMER_DEVICE_CALLBACK_MEMBER(xexex_state::xexex_interrupt)
 {
@@ -342,15 +285,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(xexex_state::xexex_interrupt)
 	/* TODO: vblank is at 256! (enable CCU then have fun in fixing offsetted layers) */
 	if(scanline == 128)
 	{
-		if (m_k053246->k053246_is_irq_enabled())
-		{
-			// OBJDMA starts at the beginning of V-blank
-			xexex_objdma(0);
-
-			// schedule DMA end interrupt
-			m_dmadelay_timer->adjust(XE_DMADELAY);
-		}
-
 		// IRQ 4 is the V-blank interrupt. It controls color, sound and
 		// vital game logics that shouldn't be interfered by frame-drop.
 		if (m_cur_control2 & 0x0800)
@@ -367,42 +301,31 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xexex_state )
 	AM_RANGE(0x080014, 0x080015) AM_READ(xexex_waitskip_r)              // helps sound CPU by giving back control as early as possible
 #endif
 
-	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("spriteram")           // K053247 sprite RAM
-	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(spriteram_mirror_r, spriteram_mirror_w)   // K053247 sprite RAM mirror read
-	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE("k056832", k056832_device, word_w)              // VACSET (K054157)
-	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)              // OBJSET1
-	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)               // Passthrough to sprite roms
+	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_MIRROR(0x8000) AM_SHARE("spriteram")
+	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVICE("tilemap", k054156_054157_device, vacset)
+	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVICE("sprites", k053246_053247_device, objset1)
+	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD("sprites", k053246_053247_device, rom16_r)
 	AM_RANGE(0x0c6000, 0x0c7fff) AM_DEVREADWRITE("k053250", k053250_device, ram_r, ram_w)    // K053250 "road" RAM
 	AM_RANGE(0x0c8000, 0x0c800f) AM_DEVREADWRITE("k053250", k053250_device, reg_r, reg_w)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE("k054338", k054338_device, word_w)              // CLTC
-	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE("k053251", k053251_device, lsb_w)               // priority encoder
-//  AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                // CCU
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVICE("blender", k054338_device, map)              // CLTC
+	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE("mixer", k053251_device, lsb_w)               // priority encoder
+	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVICE8("video_timings", k053252_device, map, 0x00ff)
 	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
 	AM_RANGE(0x0d6014, 0x0d6015) AM_READ(sound_status_r)
 	AM_RANGE(0x0d6000, 0x0d601f) AM_RAM                                 // sound regs fall through
-	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE("k056832", k056832_device, b_word_w)                // VSCCS regs
+	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVICE("tilemap", k054156_054157_device, vsccs)
 	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1")
 	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2")
 	AM_RANGE(0x0dc000, 0x0dc001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0dc002, 0x0dc003) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
-	AM_RANGE(0x180000, 0x181fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
-	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
-	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD("k056832", k056832_device, rom_word_r)       // Passthrough to tile roms
+	AM_RANGE(0x180000, 0x181fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("tilemap", k054156_054157_device, vram16_r, vram16_w)
+	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD("tilemap", k054156_054157_device, rom16_r)
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREAD("k053250", k053250_device, rom_r)
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-
-#if XE_DEBUG
-	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVREAD("k056832", k056832_device, word_r)
-	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVREAD("k053246", k053247_device, k053246_reg_word_r)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVREAD("k054338", k054338_device, word_r)
-	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVREAD("k053251", k053251_device, lsb_r)
-	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVREAD("k056832", k056832_device, b_word_r)
-#endif
-
 ADDRESS_MAP_END
 
 
@@ -473,7 +396,6 @@ void xexex_state::machine_start()
 	save_item(NAME(m_cur_control2));
 	machine().save().register_postload(save_prepost_delegate(FUNC(xexex_state::xexex_postload), this));
 
-	m_dmadelay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xexex_state::dmaend_callback),this));
 }
 
 void xexex_state::machine_reset()
@@ -512,35 +434,30 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-//  MCFG_SCREEN_REFRESH_RATE(XTAL_32MHz/4/512/288)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_32MHz/4, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255) // 8Mhz horizontal dotclock
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 0, 0+256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(xexex_state, screen_update_xexex)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_32MHz/4, 384+33+40+55, 0, 383, 256+12+6+15, 0, 255) // 8Mhz horizontal dotclock
+	MCFG_SCREEN_SIZE(1024, 512)
+	MCFG_SCREEN_VISIBLE_AREA(55, 55+384-1, 15, 15+256-1)
+	MCFG_SCREEN_UPDATE_DEVICE("blender", k054338_device, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XRGB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(xexex_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(xexex_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48, 32)
-	MCFG_K053246_PALETTE("palette")
+	MCFG_K054156_054157_ADD("tilemap", XTAL_32MHz/4, 2, 4, 24, "palette")
+
+	MCFG_K053246_053247_ADD("sprites", XTAL_32MHz/4, "palette", "spriteram")
 
 	MCFG_K053250_ADD("k053250", "palette", "screen", -5, -16)
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("mixer", k053251_device::LAYER0_ATTR)
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4)
+	MCFG_DEVICE_ADD("video_timings", K053252, XTAL_32MHz/4)
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
+	MCFG_DEVICE_ADD("blender", K054338, 0)
+	MCFG_K054338_SET_INIT_CB(DEVICE_SELF, xexex_state, blender_init)
+	MCFG_K054338_SET_UPDATE_CB(DEVICE_SELF, xexex_state, blender_update)
+	MCFG_K054338_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -583,11 +500,11 @@ ROM_START( xexex ) /* Europe, Version AA */
 	ROM_REGION( 0x020000, "audiocpu", 0 )
 	ROM_LOAD( "067eaa05.4e", 0x000000, 0x020000, CRC(0e33d6ec) SHA1(4dd68cb78c779e2d035e43fec35a7672ed1c259b) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD32_WORD( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
-	ROM_LOAD32_WORD( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_WORD_SWAP( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
+	ROM_LOAD32_WORD_SWAP( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD64_WORD( "067b12.17n",  0x000000, 0x100000, CRC(08d611b0) SHA1(9cac60131e0411f173acd8ef3f206e5e58a7e5d2) )
 	ROM_LOAD64_WORD( "067b11.19n",  0x000002, 0x100000, CRC(a26f7507) SHA1(6bf717cb9fcad59a2eafda967f14120b9ebbc8c5) )
 	ROM_LOAD64_WORD( "067b10.20n",  0x000004, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
@@ -616,11 +533,11 @@ ROM_START( orius ) /* USA, Version AA */
 	ROM_REGION( 0x020000, "audiocpu", 0 )
 	ROM_LOAD( "067uaa05.4e", 0x000000, 0x020000, CRC(0e33d6ec) SHA1(4dd68cb78c779e2d035e43fec35a7672ed1c259b) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_WORD( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
 	ROM_LOAD32_WORD( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD64_WORD( "067b12.17n",  0x000000, 0x100000, CRC(08d611b0) SHA1(9cac60131e0411f173acd8ef3f206e5e58a7e5d2) )
 	ROM_LOAD64_WORD( "067b11.19n",  0x000002, 0x100000, CRC(a26f7507) SHA1(6bf717cb9fcad59a2eafda967f14120b9ebbc8c5) )
 	ROM_LOAD64_WORD( "067b10.20n",  0x000004, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
@@ -647,11 +564,11 @@ ROM_START( xexexa ) /* Asia, Version AA */
 	ROM_REGION( 0x020000, "audiocpu", 0 )
 	ROM_LOAD( "067eaa05.4e", 0x000000, 0x020000, CRC(0e33d6ec) SHA1(4dd68cb78c779e2d035e43fec35a7672ed1c259b) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_WORD( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
 	ROM_LOAD32_WORD( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD64_WORD( "067b12.17n",  0x000000, 0x100000, CRC(08d611b0) SHA1(9cac60131e0411f173acd8ef3f206e5e58a7e5d2) )
 	ROM_LOAD64_WORD( "067b11.19n",  0x000002, 0x100000, CRC(a26f7507) SHA1(6bf717cb9fcad59a2eafda967f14120b9ebbc8c5) )
 	ROM_LOAD64_WORD( "067b10.20n",  0x000004, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
@@ -678,11 +595,11 @@ ROM_START( xexexj ) /* Japan, Version AA */
 	ROM_REGION( 0x020000, "audiocpu", 0 )
 	ROM_LOAD( "067jaa05.4e", 0x000000, 0x020000, CRC(2f4dd0a8) SHA1(bfa76c9c968f1beba648a2911510e3d666a8fe3a) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_WORD( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
 	ROM_LOAD32_WORD( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD64_WORD( "067b12.17n",  0x000000, 0x100000, CRC(08d611b0) SHA1(9cac60131e0411f173acd8ef3f206e5e58a7e5d2) )
 	ROM_LOAD64_WORD( "067b11.19n",  0x000002, 0x100000, CRC(a26f7507) SHA1(6bf717cb9fcad59a2eafda967f14120b9ebbc8c5) )
 	ROM_LOAD64_WORD( "067b10.20n",  0x000004, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
@@ -707,8 +624,8 @@ DRIVER_INIT_MEMBER(xexex_state,xexex)
 	if (!strcmp(machine().system().name, "xexex"))
 	{
 		// Invulnerability
-//      *(uint16_t *)(memregion("maincpu")->base() + 0x648d4) = 0x4a79;
-//      *(uint16_t *)(memregion("maincpu")->base() + 0x00008) = 0x5500;
+		*(uint16_t *)(memregion("maincpu")->base() + 0x648d4) = 0x4a79;
+		*(uint16_t *)(memregion("maincpu")->base() + 0x00008) = 0x5500;
 		m_strip_0x1a = 1;
 	}
 }

@@ -149,6 +149,17 @@ WRITE8_MEMBER(vendetta_state::K052109_w)
 	m_k052109->write(space, offset + 0x2000, data);
 }
 
+K052109_CB_MEMBER(vendetta_state::vendetta_tile_callback)
+{
+	*code |= ((*color & 0x03) << 8) | ((*color & 0x30) << 6) | ((*color & 0x0c) << 10) | (bank << 14);
+	*color = m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+}
+
+K052109_CB_MEMBER(vendetta_state::esckids_tile_callback)
+{
+	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) <<  9) | (bank << 13);
+	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >>  5);
+}
 
 WRITE8_MEMBER(vendetta_state::_5fe0_w)
 {
@@ -164,7 +175,7 @@ WRITE8_MEMBER(vendetta_state::_5fe0_w)
 	/* bit 4 = INIT ?? */
 
 	/* bit 5 = enable sprite ROM reading */
-	m_k053246->k053246_set_objcha_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	m_sprites->set_objcha(data & 0x20);
 }
 
 void vendetta_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -203,8 +214,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x5f80, 0x5f9f) AM_DEVREADWRITE("k054000", k054000_device, read, write)
-	AM_RANGE(0x5fa0, 0x5faf) AM_DEVWRITE("k053251", k053251_device, write)
-	AM_RANGE(0x5fb0, 0x5fb7) AM_DEVWRITE("k053246", k053247_device, k053246_w)
+	AM_RANGE(0x5fa0, 0x5faf) AM_DEVWRITE("mixer", k053251_device, write)
+	AM_RANGE(0x5fb0, 0x5fb7) AM_DEVICE("sprites", k053246_053247_device, objset1_8)
 	AM_RANGE(0x5fc0, 0x5fc0) AM_READ_PORT("P1")
 	AM_RANGE(0x5fc1, 0x5fc1) AM_READ_PORT("P2")
 	AM_RANGE(0x5fc2, 0x5fc2) AM_READ_PORT("P3")
@@ -215,7 +226,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x5fe2, 0x5fe2) AM_WRITE(eeprom_w)
 	AM_RANGE(0x5fe4, 0x5fe4) AM_READWRITE(z80_irq_r, z80_irq_w)
 	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVREADWRITE("k053260", k053260_device, main_read, main_write)
-	AM_RANGE(0x5fe8, 0x5fe9) AM_DEVREAD("k053246", k053247_device, k053246_r)
+	AM_RANGE(0x5fe8, 0x5fe9) AM_DEVREAD("sprites", k053246_053247_device, rom8_r)
 	AM_RANGE(0x5fea, 0x5fea) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	AM_RANGE(0x4000, 0x4fff) AM_DEVICE("videobank0", address_map_bank_device, amap8)
@@ -232,14 +243,14 @@ static ADDRESS_MAP_START( esckids_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x3f83, 0x3f83) AM_READ_PORT("P4")             // ???  (But not used)
 	AM_RANGE(0x3f92, 0x3f92) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x3f93, 0x3f93) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x3fa0, 0x3fa7) AM_DEVWRITE("k053246", k053247_device, k053246_w)           // 053246 (Sprite)
-	AM_RANGE(0x3fb0, 0x3fbf) AM_DEVWRITE("k053251", k053251_device, write)           // 053251 (Priority Encoder)
-	AM_RANGE(0x3fc0, 0x3fcf) AM_DEVREADWRITE("k053252", k053252_device, read, write)              // Not Emulated (053252 ???)
+	AM_RANGE(0x3fa0, 0x3fa7) AM_DEVICE("sprites", k053246_053247_device, objset1)           // 053246 (Sprite)
+	AM_RANGE(0x3fb0, 0x3fbf) AM_DEVWRITE("mixer", k053251_device, write)           // 053251 (Priority Encoder)
+	AM_RANGE(0x3fc0, 0x3fcf) AM_DEVICE("video_timings", k053252_device, map)
 	AM_RANGE(0x3fd0, 0x3fd0) AM_WRITE(_5fe0_w)      // Coin Counter, 052109 RMRD, 053246 OBJCHA
 	AM_RANGE(0x3fd2, 0x3fd2) AM_WRITE(eeprom_w)    // EEPROM, Video banking
 	AM_RANGE(0x3fd4, 0x3fd4) AM_READWRITE(z80_irq_r, z80_irq_w)            // Sound
 	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVREADWRITE("k053260", k053260_device, main_read, main_write) // Sound
-	AM_RANGE(0x3fd8, 0x3fd9) AM_DEVREAD("k053246", k053247_device, k053246_r)                // 053246 (Sprite)
+	AM_RANGE(0x3fd8, 0x3fd9) AM_DEVREAD("sprites", k053246_053247_device, rom8_r)                // 053246 (Sprite)
 	AM_RANGE(0x3fda, 0x3fda) AM_WRITENOP                // Not Emulated (Watchdog ???)
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	AM_RANGE(0x2000, 0x2fff) AM_DEVICE("videobank0", address_map_bank_device, amap8)    // 052109 (Tilemap) 0x0000-0x0fff - 052109 (Tilemap)
@@ -251,7 +262,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( videobank0_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x0000, 0x0fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
-	AM_RANGE(0x1000, 0x1fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_r, k053247_w)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( videobank1_map, AS_PROGRAM, 8, vendetta_state )
@@ -381,15 +392,11 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(vendetta_state::irq)
-{
-	if (m_irq_enabled)
-		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
-}
-
 void vendetta_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 28, memregion("maincpu")->base(), 0x2000);
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	membank("bank1")->configure_entries(0, 28, &ROM[0x10000], 0x2000);
 	membank("bank1")->set_entry(0);
 
 	save_item(NAME(m_irq_enabled));
@@ -423,7 +430,6 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)   /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vendetta_state,  irq)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(vendetta_state, banking_callback))
 
 	MCFG_DEVICE_ADD("videobank0", ADDRESS_MAP_BANK, 0)
@@ -454,7 +460,7 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(vendetta_state, screen_update)
+//	MCFG_SCREEN_UPDATE_DRIVER(vendetta_state, screen_update_vendetta)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -465,12 +471,9 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(vendetta_state, vendetta_tile_callback)
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(vendetta_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 53, 6)
-	MCFG_K053246_PALETTE("palette")
+	MCFG_K053246_053247_ADD("sprites", 8000000, "palette", "spriteram")
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("mixer", k053251_device::LAYER1_ATTR)
 
 	MCFG_K054000_ADD("k054000")
 
@@ -504,11 +507,8 @@ static MACHINE_CONFIG_DERIVED( esckids, vendetta )
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(vendetta_state, esckids_tile_callback)
 
-	MCFG_DEVICE_MODIFY("k053246")
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 101, 6)
-
-	MCFG_DEVICE_ADD("k053252", K053252, 6000000)
-	MCFG_K053252_OFFSETS(12*8, 1*8)
+	MCFG_DEVICE_ADD("video_timings", K053252, 6000000)
+//	MCFG_K053252_OFFSETS(12*8, 1*8)
 MACHINE_CONFIG_END
 
 

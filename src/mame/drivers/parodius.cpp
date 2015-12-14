@@ -273,7 +273,7 @@ static MACHINE_CONFIG_START( parodius, parodius_state )
 	MCFG_K05324X_OFFSETS(0, 0)
 	MCFG_K05324X_CB(parodius_state, sprite_callback)
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("k053251", k053251_device::LAYER1_ATTR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

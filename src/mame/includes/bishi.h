@@ -23,9 +23,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_k056832(*this, "k056832"),
-		m_k054338(*this, "k054338"),
-		m_k055555(*this, "k055555"),
+		m_tilemap(*this, "tilemap"),
+		m_blender(*this, "blender"),
+		m_mixer(*this, "mixer"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen") { }
 
@@ -42,9 +42,9 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	required_device<k056832_device> m_k056832;
-	required_device<k054338_device> m_k054338;
-	required_device<k055555_device> m_k055555;
+	required_device<k058143_056832_device> m_tilemap;
+	required_device<k054338_device> m_blender;
+	required_device<k055555_device> m_mixer;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	DECLARE_READ16_MEMBER(control_r);
@@ -57,5 +57,8 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_bishi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bishi_scanline);
-	K056832_CB_MEMBER(tile_callback);
+
+	void blender_update(screen_device &screen, bitmap_ind16 **bitmaps, const rectangle &cliprect);
+	void mixer_init(screen_device &screen, bitmap_ind16 **bitmaps);
+	void mixer_update(screen_device &screen, bitmap_ind16 **bitmaps, const rectangle &cliprect);
 };

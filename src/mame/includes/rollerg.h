@@ -24,7 +24,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k053244(*this, "k053244"),
 		m_k051316(*this, "k051316"),
-		m_k053252(*this, "k053252")
+		m_video_timings(*this, "video_timings")
 		{ }
 
 	/* misc */
@@ -35,7 +35,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<k05324x_device> m_k053244;
 	required_device<k051316_device> m_k051316;
-	required_device<k053252_device> m_k053252;
+	required_device<k053252_device> m_video_timings;
 	DECLARE_WRITE8_MEMBER(rollerg_0010_w);
 	DECLARE_READ8_MEMBER(rollerg_k051316_r);
 	DECLARE_WRITE8_MEMBER(soundirq_w);

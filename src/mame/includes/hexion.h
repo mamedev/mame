@@ -8,12 +8,12 @@ public:
 	hexion_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
-		m_k053252(*this, "k053252"),
+		m_video_timings(*this, "video_timings"),
 		m_gfxdecode(*this, "gfxdecode")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<k053252_device> m_k053252;
+	required_device<k053252_device> m_video_timings;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	uint8_t *m_vram[2];

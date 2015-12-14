@@ -51,7 +51,7 @@ WRITE16_MEMBER(xmen_state::eeprom_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		/* bit 8 = enable sprite ROM reading */
-		m_k053246->k053246_set_objcha_line( (data & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
+		m_sprites->set_objcha(data & 0x0100);
 		/* bit 9 = enable char ROM reading through the video RAM */
 		m_k052109->set_rmrd_line((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
 	}
@@ -90,23 +90,31 @@ WRITE8_MEMBER(xmen_state::sound_bankswitch_w)
 	m_z80bank->set_entry(data & 0x07);
 }
 
+K052109_CB_MEMBER(xmen_state::tile_callback)
+{
+        /* (color & 0x02) is flip y handled internally by the 052109 */
+        if (layer == 0)
+                *color = m_layer_colorbase[layer] + ((*color & 0xf0) >> 4);
+        else
+                *color = m_layer_colorbase[layer] + ((*color & 0x7c) >> 2);
+}
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
 	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
-	AM_RANGE(0x108020, 0x108027) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
+	AM_RANGE(0x108020, 0x108027) AM_DEVICE("sprites", k053246_053247_device, objset1)
 	AM_RANGE(0x10804c, 0x10804d) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x10804e, 0x10804f) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x108054, 0x108055) AM_READ(sound_status_r)
-	AM_RANGE(0x108060, 0x10807f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
+	AM_RANGE(0x108060, 0x10807f) AM_DEVWRITE("mixer", k053251_device, lsb_w)
 	AM_RANGE(0x10a000, 0x10a001) AM_READ_PORT("P2_P4") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x10a002, 0x10a003) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x10a004, 0x10a005) AM_READ_PORT("EEPROM")
-	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
+	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD("sprites", k053246_053247_device, rom16_r)
 	AM_RANGE(0x110000, 0x113fff) AM_RAM     /* main RAM */
 	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
 	AM_RANGE(0x18c000, 0x197fff) AM_DEVREADWRITE("k052109", k052109_device, lsb_r, lsb_w)
@@ -127,22 +135,19 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( 6p_main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("spriteramleft")   /* sprites (screen 1) */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM
-	AM_RANGE(0x102000, 0x102fff) AM_RAM AM_SHARE("spriteramright")  /* sprites (screen 2) */
-	AM_RANGE(0x103000, 0x103fff) AM_RAM     /* 6p - a buffer? */
+	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")   /* screen 1 at +0, screen 2 at +2000 */
 	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
-	AM_RANGE(0x108020, 0x108027) AM_DEVWRITE("k053246", k053247_device, k053246_word_w) /* sprites */
+	AM_RANGE(0x108020, 0x108027) AM_DEVICE("sprites", k053246_053247_device, objset1) /* sprites */
 	AM_RANGE(0x10804c, 0x10804d) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x10804e, 0x10804f) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x108054, 0x108055) AM_READ(sound_status_r)
-	AM_RANGE(0x108060, 0x10807f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
+	AM_RANGE(0x108060, 0x10807f) AM_DEVWRITE("mixer", k053251_device, lsb_w)
 	AM_RANGE(0x10a000, 0x10a001) AM_READ_PORT("P2_P4") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x10a002, 0x10a003) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x10a004, 0x10a005) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x10a006, 0x10a007) AM_READ_PORT("P5_P6")
-	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD("k053246", k053247_device, k053246_word_r) /* sprites */
+	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD("sprites", k053246_053247_device, rom16_r)
 	AM_RANGE(0x110000, 0x113fff) AM_RAM     /* main RAM */
 	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
 /*  AM_RANGE(0x18c000, 0x197fff) AM_DEVWRITE("k052109", k052109_device, lsb_w) AM_SHARE("tilemapleft") */
@@ -333,7 +338,6 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )   /* correct, same issue of TMNT2 */
-	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -344,12 +348,9 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(xmen_state, tile_callback)
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(xmen_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 53, -2)
-	MCFG_K053246_PALETTE("palette")
+	MCFG_K053246_053247_ADD("sprites", 8000000, "palette", "spriteram")
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("mixer", k053251_device::LAYER1_ATTR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -391,7 +392,6 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen6p_left)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen2", RASTER)
@@ -399,23 +399,17 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(16*8, 52*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen6p_right)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(xmen_state, screen_vblank_xmen6p))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(xmen_state,xmen6p)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
 	MCFG_DEVICE_ADD("k052109", K052109, 0)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(xmen_state, tile_callback)
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(xmen_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 53, -2)
-	MCFG_K053246_SET_SCREEN("screen")
-	MCFG_K053246_PALETTE("palette")
+	MCFG_K053246_053247_ADD("sprites", 6000000, "palette", "spriteram")
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("mixer", k053251_device::LAYER1_ATTR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -8,7 +8,7 @@
 #include "video/k053251.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k053244_k053245.h"
-#include "video/konami_helper.h"
+#include "video/kvideodac.h"
 
 class asterix_state : public driver_device
 {
@@ -22,9 +22,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_k056832(*this, "k056832"),
-		m_k053244(*this, "k053244"),
-		m_k053251(*this, "k053251") { }
+		m_tilemap(*this, "tilemap"),
+		m_sprites(*this, "sprites"),
+		m_mixer(*this, "mixer"),
+		m_videodac(*this, "videodac") { }
 
 	/* video-related */
 	int         m_sprite_colorbase;
@@ -41,9 +42,10 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<k056832_device> m_k056832;
-	required_device<k05324x_device> m_k053244;
-	required_device<k053251_device> m_k053251;
+	required_device<k054156_054157_device> m_tilemap;
+	required_device<k05324x_device> m_sprites;
+	required_device<k053251_device> m_mixer;
+	required_device<kvideodac_device> m_videodac;
 	DECLARE_WRITE16_MEMBER(control2_w);
 	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
@@ -52,11 +54,13 @@ public:
 	DECLARE_DRIVER_INIT(asterix);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	uint32_t screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(asterix_interrupt);
-	K05324X_CB_MEMBER(sprite_callback);
-	K056832_CB_MEMBER(tile_callback);
 	void reset_spritebank();
+
+
+	void videodac_update(bitmap_ind16 **bitmaps, const rectangle &cliprect);
+	void mixer_init(bitmap_ind16 **bitmaps);
+	void mixer_update(bitmap_ind16 **bitmaps, const rectangle &cliprect);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

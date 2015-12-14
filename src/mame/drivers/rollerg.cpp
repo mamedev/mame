@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( rollerg_map, AS_PROGRAM, 8, rollerg_state )
 	AM_RANGE(0x0053, 0x0053) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0060, 0x0060) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0061, 0x0061) AM_READ(pip_r)             /* ????? */
-	AM_RANGE(0x0100, 0x010f) AM_DEVREADWRITE("k053252", k053252_device, read, write)      /* 053252? */
+	AM_RANGE(0x0100, 0x010f) AM_DEVICE("video_timings", k053252_device, map)
 	AM_RANGE(0x0200, 0x020f) AM_DEVWRITE("k051316", k051316_device, ctrl_w)
 	AM_RANGE(0x0300, 0x030f) AM_DEVREADWRITE("k053244", k05324x_device, k053244_r, k053244_w)
 	AM_RANGE(0x0800, 0x0fff) AM_READ(rollerg_k051316_r) AM_DEVWRITE("k051316", k051316_device, write)
@@ -276,9 +276,9 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 	MCFG_K051316_OFFSETS(22, 1)
 	MCFG_K051316_CB(rollerg_state, zoom_callback)
 
-	MCFG_DEVICE_ADD("k053252", K053252, 3000000*2)
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(rollerg_state,rollerg_irq_ack_w))
-	MCFG_K053252_OFFSETS(14*8, 2*8)
+	MCFG_DEVICE_ADD("video_timings", K053252, 3000000*2)
+//	MCFG_K053252_INT1_ACK_CB(WRITELINE(rollerg_state,rollerg_irq_ack_w))
+//	MCFG_K053252_OFFSETS(14*8, 2*8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

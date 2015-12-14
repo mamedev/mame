@@ -70,8 +70,23 @@ WRITE16_MEMBER(overdriv_state::eeprom_w)
 	}
 }
 
+K051316_CB_MEMBER(overdriv_state::zoom_callback_1)
+{
+	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
+	*code |= ((*color & 0x03) << 8);
+	*color = m_zoom_colorbase[0] + ((*color & 0x3c) >> 2);
+}
+
+K051316_CB_MEMBER(overdriv_state::zoom_callback_2)
+{
+	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
+	*code |= ((*color & 0x03) << 8);
+	*color = m_zoom_colorbase[1] + ((*color & 0x3c) >> 2);
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::overdriv_cpuA_scanline)
 {
+#if 0	
 	const int timer_threshold = 168; // fwiw matches 0 on mask ROM check, so IF it's a timer irq then should be close ...
 	int scanline = param;
 
@@ -90,6 +105,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::overdriv_cpuA_scanline)
 		m_fake_timer -= timer_threshold;
 		m_maincpu->set_input_line(5, HOLD_LINE);
 	}
+#endif
 }
 
 #ifdef UNUSED_FUNCTION
@@ -128,7 +144,7 @@ WRITE16_MEMBER(overdriv_state::cpuB_ctrl_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = enable sprite ROM reading */
-		m_k053246->k053246_set_objcha_line( (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+		m_sprites->set_objcha(data & 0x01);
 
 		/* bit 1 used but unknown (irq enable?) */
 
@@ -163,12 +179,12 @@ static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITENOP            /* unknown (always 0x30) */
-	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff) /* 053252? (LSB) */
+	AM_RANGE(0x100000, 0x10001f) AM_DEVICE8("video_timings", k053252_device, map, 0x00ff)
 	AM_RANGE(0x140000, 0x140001) AM_WRITENOP //watchdog reset?
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("PADDLE") AM_WRITENOP  // writes 0 at POST and expect that motor busy flag is off, then checks if paddle is at center otherwise throws a "VOLUME ERROR".
 	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVWRITE8("k051316_1", k051316_device, ctrl_w, 0xff00)
 	AM_RANGE(0x1c8000, 0x1c801f) AM_DEVWRITE8("k051316_2", k051316_device, ctrl_w, 0xff00)
-	AM_RANGE(0x1d0000, 0x1d001f) AM_DEVWRITE("k053251", k053251_device, msb_w)
+	AM_RANGE(0x1d0000, 0x1d001f) AM_DEVWRITE("mixer", k053251_device, msb_w)
 	AM_RANGE(0x1d8000, 0x1d8003) AM_DEVREADWRITE8("k053260_1", k053260_device, main_read, main_write, 0x00ff)
 	AM_RANGE(0x1e0000, 0x1e0003) AM_DEVREADWRITE8("k053260_2", k053260_device, main_read, main_write, 0x00ff)
 	AM_RANGE(0x1e8000, 0x1e8001) AM_WRITE(overdriv_soundirq_w)
@@ -183,55 +199,16 @@ static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x238000, 0x238001) AM_WRITE(slave_irq5_assert_w)
 ADDRESS_MAP_END
 
-#ifdef UNUSED_FUNCTION
-WRITE16_MEMBER( overdriv_state::overdriv_k053246_word_w )
-{
-	m_k053246->k053246_word_w(space,offset,data,mem_mask);
-
-	uint16_t *src, *dst;
-
-	m_k053246->k053247_get_ram(&dst);
-
-	src = m_sprram;
-
-	// this should be the sprite dma/irq bit...
-	// but it is already turned off by the time overdriv_state::cpuB_interrupt is executed?
-	// even now it rarely gets set, I imagine because the communication / irq is actually
-	// worse than we thought. (drive very slowly and things update..)
-	if (m_k053246->k053246_is_irq_enabled())
-	{
-		memcpy(dst,src,0x1000);
-	}
-
-	//printf("%02x %04x %04x\n", offset, data, mem_mask);
-
-}
-#endif
-
-TIMER_CALLBACK_MEMBER(overdriv_state::objdma_end_cb )
-{
-	m_subcpu->set_input_line(6, HOLD_LINE);
-}
-
-WRITE16_MEMBER(overdriv_state::objdma_w)
-{
-	if(data & 0x10)
-		machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(overdriv_state::objdma_end_cb), this));
-
-	m_k053246->k053246_w(space,5,data,mem_mask);
-}
-
 static ADDRESS_MAP_START( overdriv_slave_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /* work RAM */
 	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM //AM_DEVREADWRITE("k053250_1", k053250_device, ram_r, ram_w)
 	AM_RANGE(0x100000, 0x10000f) AM_DEVREADWRITE("k053250_1", k053250_device, reg_r, reg_w)
 	AM_RANGE(0x108000, 0x10800f) AM_DEVREADWRITE("k053250_2", k053250_device, reg_r, reg_w)
-	AM_RANGE(0x118000, 0x118fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w) // data gets copied to sprite chip with DMA..
-	AM_RANGE(0x120000, 0x120001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
+	AM_RANGE(0x118000, 0x118fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x120000, 0x120001) AM_DEVREAD("sprites", k053246_053247_device, rom16_r)
 	AM_RANGE(0x128000, 0x128001) AM_READWRITE(cpuB_ctrl_r, cpuB_ctrl_w) /* enable K053247 ROM reading, plus something else */
-	AM_RANGE(0x130004, 0x130005) AM_WRITE(objdma_w)
-	AM_RANGE(0x130000, 0x130007) AM_DEVREADWRITE8("k053246", k053247_device, k053246_r,k053246_w,0xffff)
+	AM_RANGE(0x130000, 0x130007) AM_DEVICE("sprites", k053246_053247_device, objset1)
 	//AM_RANGE(0x140000, 0x140001) used in later stages, set after writes at 0x208000-0x20bfff range
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x208000, 0x20bfff) AM_RAM // sprite indirect table?
@@ -300,7 +277,6 @@ void overdriv_state::machine_start()
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_zoom_colorbase));
 	save_item(NAME(m_road_colorbase));
-	save_item(NAME(m_fake_timer));
 }
 
 void overdriv_state::machine_reset()
@@ -343,17 +319,15 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4,384,0,305,264,0,224)
-	MCFG_SCREEN_UPDATE_DRIVER(overdriv_state, screen_update_overdriv)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(overdriv_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx1", NORMAL_PLANE_ORDER, 77, 22)
-	MCFG_K053246_PALETTE("palette")
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+
+	MCFG_K053246_053247_ADD("sprites", XTAL_24MHz/4, "palette", "spriteram")
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
@@ -366,12 +340,12 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 	MCFG_K051316_OFFSETS(15, 1)
 	MCFG_K051316_CB(overdriv_state, zoom_callback_2)
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("mixer", k053251_device::LAYER0_ATTR)
 	MCFG_K053250_ADD("k053250_1", "palette", "screen", 0, 0)
 	MCFG_K053250_ADD("k053250_2", "palette", "screen", 0, 0)
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL_24MHz/4)
-	MCFG_K053252_OFFSETS(13*8, 2*8)
+	MCFG_DEVICE_ADD("video_timings", K053252, XTAL_24MHz/4)
+//	MCFG_K053252_OFFSETS(13*8, 2*8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

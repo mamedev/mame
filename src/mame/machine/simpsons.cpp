@@ -40,7 +40,7 @@ WRITE8_MEMBER(simpsons_state::simpsons_coin_counter_w)
 	m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	/* bit 4 = INIT (unknown) */
 	/* bit 5 = enable sprite ROM reading */
-	m_k053246->k053246_set_objcha_line((~data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	m_sprites->set_objcha(~data & 0x20);
 }
 
 READ8_MEMBER(simpsons_state::simpsons_sound_interrupt_r)

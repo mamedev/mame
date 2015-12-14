@@ -123,8 +123,8 @@ Keyboard Mania 2nd Mix - dongle, program CD, audio CD
         sets the size, 20-2E may set the minimum x and y coordinates but I haven't seen
         them set to something other than 0 yet. One context is set as the one the RAMDAC
         outputs to the monitor (not sure how this is selected yet, probably the lower
-        bits of register 12). Thestartup test in the popn BIOS checks all of VRAM, so
-        it moves the currentdisplay address around so you don't see crazy colors, which
+        bits of register 12). The startup test in the popn BIOS checks all of VRAM, so
+        it moves the current display address around so you don't see crazy colors, which
         is very helpful in figuring out how this part works.
 
         The other new part is that there are two VRAM write ports, managed by registers

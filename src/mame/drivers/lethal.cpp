@@ -286,9 +286,60 @@ WRITE8_MEMBER(lethal_state::control2_w)
 	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
 }
 
+WRITE8_MEMBER(lethal_state::lethalen_palette_control)
+{
+	switch (offset)
+        {
+		case 0: // 40c8 - PCU1 from schematics
+			m_layer_colorbase[0] = (data & 0x7) * 1024 / 16;
+			m_layer_colorbase[1] = ((data >> 4) & 0x7) * 1024 / 16;
+			break;
+
+		case 4: // 40cc - PCU2 from schematics
+			m_layer_colorbase[2] = (data & 0x7) * 1024 / 16;
+			m_layer_colorbase[3] = ((data >> 4) & 0x7) * 1024 / 16;
+			break;
+
+		case 8: // 40d0 - PCU3 from schematics
+			m_sprite_colorbase = (data & 0x7) * 1024 / 64;
+			m_back_colorbase = ((data >> 4) & 0x7) * 1024 + 1023;
+			break;
+        }
+}
+
+K05324X_CB_MEMBER(lethal_state::sprite_callback)
+{
+	int pri = (*color & 0xfff0);
+	*color = *color & 0x000f;
+	*color += m_sprite_colorbase;
+
+	/* this isn't ideal.. shouldn't need to hardcode it? not 100% sure about it anyway*/
+	if (pri == 0x10)
+		*priority = 0xf0; // guys on first level
+	else if (pri == 0x90)
+		*priority = 0xf0; // car doors
+	else if (pri == 0x20)
+		*priority = 0xf0 | 0xcc; // people behind glass on 1st level
+	else if (pri == 0xa0)
+		*priority = 0xf0 | 0xcc; // glass on 1st/2nd level
+	else if (pri == 0x40)
+		*priority = 0; // blood splats?
+	else if (pri == 0x00)
+		*priority = 0; // gunshots etc
+	else if (pri == 0x30)
+		*priority = 0xf0 | 0xcc | 0xaa; // mask sprites (always in a bad colour, used to do special effects i think
+	else
+        {
+			popmessage("unknown pri %04x\n", pri);
+			*priority = 0;
+        }
+
+	*code = (*code & 0x3fff); // | spritebanks[(*code >> 12) & 3];
+}
+
 INTERRUPT_GEN_MEMBER(lethal_state::lethalen_interrupt)
 {
-	if (m_k056832->is_irq_enabled(0))
+	//*//	if (m_tilemap->is_irq_enabled(0))
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
@@ -343,8 +394,8 @@ READ8_MEMBER(lethal_state::gunsaux_r)
 static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM             // work RAM
-	AM_RANGE(0x4000, 0x403f) AM_DEVWRITE("k056832", k056832_device, write)
-	AM_RANGE(0x4040, 0x404f) AM_DEVWRITE("k056832", k056832_device, b_w)
+	AM_RANGE(0x4000, 0x403f) AM_DEVICE("tilemap", k054156_054157_device, vacset8)
+	AM_RANGE(0x4040, 0x404f) AM_DEVICE("tilemap", k054156_054157_device, vsccs8)
 	AM_RANGE(0x4080, 0x4080) AM_READNOP     // watchdog
 	AM_RANGE(0x4090, 0x4090) AM_READNOP
 	AM_RANGE(0x40a0, 0x40a0) AM_READNOP
@@ -370,10 +421,7 @@ static ADDRESS_MAP_START( bank4000_map, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0x8000) AM_DEVREADWRITE("k053244", k05324x_device, k053245_r, k053245_w)
 
 	// VRD = 0, CBNK = 0
-	AM_RANGE(0x2000, 0x27ff) AM_DEVREADWRITE("k056832", k056832_device, ram_code_lo_r, ram_code_lo_w)
-	AM_RANGE(0x2800, 0x2fff) AM_DEVREADWRITE("k056832", k056832_device, ram_code_hi_r, ram_code_hi_w)
-	AM_RANGE(0x3000, 0x37ff) AM_DEVREADWRITE("k056832", k056832_device, ram_attr_lo_r, ram_attr_lo_w)
-	AM_RANGE(0x3800, 0x3fff) AM_DEVREADWRITE("k056832", k056832_device, ram_attr_hi_r, ram_attr_hi_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("tilemap", k054156_054157_device, vram8_r, vram8_w)
 
 	// VRD = 1, CBNK = 0 or 1
 	AM_RANGE(0xa000, 0xbfff) AM_MIRROR(0x4000) AM_UNMAP // AM_DEVREAD("k056832", k056832_device, rom_byte_r)
@@ -515,17 +563,12 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(216, 504-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lethal_state, screen_update_lethalen)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(lethal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8LE, 1, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+	MCFG_K054156_DUAL_054157_ADD("tilemap", MAIN_CLOCK/4, 8, 8, 24, "palette")
 
 	MCFG_DEVICE_ADD("k053244", K053244, 0)
 	MCFG_GFX_PALETTE("palette")

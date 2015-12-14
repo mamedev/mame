@@ -123,13 +123,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, simpsons_state )
 	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P2")
 	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P3")
 	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("P4")
-	AM_RANGE(0x1fa0, 0x1fa7) AM_DEVWRITE("k053246", k053247_device, k053246_w)
-	AM_RANGE(0x1fb0, 0x1fbf) AM_DEVWRITE("k053251", k053251_device, write)
+	AM_RANGE(0x1fa0, 0x1fa7) AM_DEVICE("sprites", k053246_053247_device, objset1_8)
+	AM_RANGE(0x1fb0, 0x1fbf) AM_DEVWRITE("mixer", k053251_device, write)
 	AM_RANGE(0x1fc0, 0x1fc0) AM_WRITE(simpsons_coin_counter_w)
 	AM_RANGE(0x1fc2, 0x1fc2) AM_WRITE(simpsons_eeprom_w)
 	AM_RANGE(0x1fc4, 0x1fc4) AM_READ(simpsons_sound_interrupt_r)
 	AM_RANGE(0x1fc6, 0x1fc7) AM_DEVREADWRITE("k053260", k053260_device, main_read, main_write)
-	AM_RANGE(0x1fc8, 0x1fc9) AM_DEVREAD("k053246", k053247_device, k053246_r)
+	AM_RANGE(0x1fc8, 0x1fc9) AM_DEVREAD("sprites", k053246_053247_device, rom8_r)
 	AM_RANGE(0x1fca, 0x1fca) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVICE("bank2000", address_map_bank_device, amap8)
@@ -145,7 +145,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bank2000_map, AS_PROGRAM, 8, simpsons_state )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(simpsons_k052109_r, simpsons_k052109_w)
-	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(simpsons_k053247_r, simpsons_k053247_w)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -162,6 +162,27 @@ void simpsons_state::sound_nmi_callback( int param )
 }
 #endif
 
+K052109_CB_MEMBER(simpsons_state::tile_callback)
+{
+	*code |= ((*color & 0x3f) << 8) | (bank << 14);
+	*color = m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+}
+
+READ8_MEMBER(simpsons_state::simpsons_k052109_r)
+{
+	return m_k052109->read(space, offset + 0x2000);
+}
+
+WRITE8_MEMBER(simpsons_state::simpsons_k052109_w)
+{
+	m_k052109->write(space, offset + 0x2000, data);
+}
+
+void simpsons_state::simpsons_video_banking( int bank )
+{
+	m_bank0000->set_bank(bank & 1);
+	m_bank2000->set_bank((bank >> 1) & 1);
+}
 
 void simpsons_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -280,39 +301,8 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-void simpsons_state::simpsons_objdma(  )
-{
-	int counter, num_inactive;
-	uint16_t *src, *dst;
-
-	m_k053246->k053247_get_ram(&dst);
-
-	src = m_spriteram.get();
-	num_inactive = counter = 256;
-
-	do {
-		if ((*src & 0x8000) && (*src & 0xff))
-		{
-			memcpy(dst, src, 0x10);
-			dst += 8;
-			num_inactive--;
-		}
-		src += 8;
-	}
-	while (--counter);
-
-	if (num_inactive) do { *dst = 0; dst += 8; } while (--num_inactive);
-}
-
 INTERRUPT_GEN_MEMBER(simpsons_state::simpsons_irq)
 {
-	if (m_k053246->k053246_is_irq_enabled())
-	{
-		simpsons_objdma();
-		// 32+256us delay at 8MHz dotclock; artificially shortened since actual V-blank length is unknown
-		timer_set(attotime::from_usec(30), TIMER_DMAEND);
-	}
-
 	if (m_k052109->is_irq_enabled())
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
@@ -352,7 +342,6 @@ static MACHINE_CONFIG_START( simpsons, simpsons_state )
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
 //  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_UPDATE_DRIVER(simpsons_state, screen_update_simpsons)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -364,12 +353,9 @@ static MACHINE_CONFIG_START( simpsons, simpsons_state )
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(simpsons_state, tile_callback)
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(simpsons_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 53, 23)
-	MCFG_K053246_PALETTE("palette")
+	MCFG_K053246_053247_ADD("sprites", 6000000, "palette", "spriteram")
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("k053251", k053251_device::LAYER1_ATTR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

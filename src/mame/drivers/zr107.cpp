@@ -195,7 +195,7 @@ public:
 		m_watchdog(*this, "watchdog"),
 		m_k001604(*this, "k001604"),
 		m_k056800(*this, "k056800"),
-		m_k056832(*this, "k056832"),
+		m_tilemap(*this, "tilemap"),
 		m_workram(*this, "workram"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
@@ -221,7 +221,7 @@ public:
 	required_device<watchdog_timer_device> m_watchdog;
 	optional_device<k001604_device> m_k001604;
 	required_device<k056800_device> m_k056800;
-	optional_device<k056832_device> m_k056832;
+	optional_device<k058143_056832_device> m_tilemap;
 	optional_shared_ptr<uint32_t> m_workram;
 	required_ioport m_in0, m_in1, m_in2, m_in3, m_in4, m_out4, m_eepromout, m_analog1, m_analog2, m_analog3;
 	required_device<palette_device> m_palette;
@@ -259,7 +259,7 @@ public:
 	INTERRUPT_GEN_MEMBER(zr107_vblank);
 	WRITE_LINE_MEMBER(k054539_irq_gen);
 	ADC083X_INPUT_CB(adc0838_callback);
-	K056832_CB_MEMBER(tile_callback);
+	//	K056832_CB_MEMBER(tile_callback);
 
 protected:
 	virtual void machine_start() override;
@@ -305,13 +305,14 @@ WRITE32_MEMBER(zr107_state::paletteram32_w)
 
 #define NUM_LAYERS  2
 
-K056832_CB_MEMBER(zr107_state::tile_callback)
-{
-	*color += layer * 0x40;
-}
+//K056832_CB_MEMBER(zr107_state::tile_callback)
+//{
+//	*color += layer * 0x40;
+//}
 
 VIDEO_START_MEMBER(zr107_state,zr107)
 {
+#if 0
 	m_k056832->set_layer_offs(0, -29, -27);
 	m_k056832->set_layer_offs(1, -29, -27);
 	m_k056832->set_layer_offs(2, -29, -27);
@@ -320,15 +321,16 @@ VIDEO_START_MEMBER(zr107_state,zr107)
 	m_k056832->set_layer_offs(5, -29, -27);
 	m_k056832->set_layer_offs(6, -29, -27);
 	m_k056832->set_layer_offs(7, -29, -27);
+#endif
 }
 
 uint32_t zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
+	//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 	m_k001005->draw(bitmap, cliprect);
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
+	//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
@@ -471,11 +473,11 @@ void zr107_state::machine_start()
 
 static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE("workram") /* Work RAM */
-	AM_RANGE(0x74000000, 0x74003fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)
-	AM_RANGE(0x74020000, 0x7402003f) AM_DEVREADWRITE("k056832", k056832_device, long_r, long_w)
+	AM_RANGE(0x74000000, 0x74003fff) AM_DEVREADWRITE("tilemap", k058143_056832_device, vram32_r, vram32_w)
+	AM_RANGE(0x74020000, 0x7402003f) AM_DEVICE16("tilemap", k058143_056832_device, vacset, 0xffffffff)
 	AM_RANGE(0x74060000, 0x7406003f) AM_READWRITE(ccu_r, ccu_w)
 	AM_RANGE(0x74080000, 0x74081fff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
-	AM_RANGE(0x740a0000, 0x740a3fff) AM_DEVREAD("k056832", k056832_device, rom_long_r)
+	AM_RANGE(0x740a0000, 0x740a3fff) AM_DEVREAD("tilemap", k058143_056832_device, rom32_r)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_DEVREADWRITE("konppc", konppc_device, cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)        /* 21N 21K 23N 23K */
 	AM_RANGE(0x78010000, 0x7801ffff) AM_DEVWRITE("konppc", konppc_device, cgboard_dsp_shared_w_ppc)
 	AM_RANGE(0x78040000, 0x7804000f) AM_DEVREADWRITE("k001006_1", k001006_device, read, write)
@@ -790,10 +792,9 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 
 	MCFG_VIDEO_START_OVERRIDE(zr107_state,zr107)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(zr107_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx2", K056832_BPP_8, 1, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+
+	MCFG_K058143_056832_ADD("tilemap", 12000000, 8, 8, 24, "palette")
 
 	MCFG_DEVICE_ADD("k001005", K001005, 0)
 	MCFG_K001005_TEXEL_CHIP("k001006_1")

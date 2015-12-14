@@ -1,6 +1,59 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
 /*
+xexex:
+[:k053251] write 0, 00
+[:k053251] write 1, 00
+[:k053251] write 2, 00
+[:k053251] write 3, 00
+[:k053251] write 4, 00
+[:k053251] write 5, 3e
+[:k053251] write 6, 3e
+[:k053251] write 7, 3e
+[:k053251] write 8, 3e
+[:k053251] write 9, 0e  221100 - palette extra bits
+[:k053251] write a, 1a  444333 - palette extra bits
+[:k053251] write b, 00
+[:k053251] write c, 06
+
+[:k053251] write 0, 00
+[:k053251] write 1, 08
+[:k053251] write 2, 02
+[:k053251] write 3, 04
+[:k053251] write 4, 06
+[:k053251] write 5, 3e
+[:k053251] write c, 07
+
+asterix:
+[:k053251] write 0, 29
+[:k053251] write 1, 10
+[:k053251] write 2, 30
+[:k053251] write 3, 00
+[:k053251] write 4, 38
+[:k053251] write 6, 28
+[:k053251] write 9, 18
+[:k053251] write a, 09
+[:k053251] write b, 00
+[:k053251] write c, 05
+
+[:k053251] write 0, 29
+[:k053251] write 1, 10
+[:k053251] write 2, 30
+[:k053251] write 3, 00
+[:k053251] write 4, 38
+[:k053251] write 6, 28
+[:k053251] write 9, 18
+[:k053251] write a, 09
+
+[:k053251] write 0, 21
+[:k053251] write 1, 10
+[:k053251] write 2, 30
+[:k053251] write 3, 00
+[:k053251] write 4, 38
+[:k053251] write 6, 28
+[:k053251] write 9, 18
+[:k053251] write a, 09
+
 Konami 053251
 ------
 Priority encoder.
@@ -8,7 +61,7 @@ Priority encoder.
 The chip has inputs for 5 layers (CI0-CI4); only 4 are used (CI1-CI4)
 CI0-CI2 are 9(=5+4) bits inputs, CI3-CI4 8(=4+4) bits
 
-The input connctions change from game to game. E.g. in Simpsons,
+The input connections change from game to game. E.g. in Simpsons,
 CI0 = grounded (background color)
 CI1 = sprites
 CI2 = FIX
@@ -117,14 +170,32 @@ actually used, since the priority is taken from the external ports.
 
 */
 
-#include "emu.h"
 #include "k053251.h"
-#include "konami_helper.h"
+#include "kvideodac.h"
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 const device_type K053251 = device_creator<k053251_device>;
+
+DEVICE_ADDRESS_MAP_START(map, 8, k053251_device)
+	AM_RANGE(0x00, 0x04) AM_WRITE(inpri_w)
+	AM_RANGE(0x05, 0x08) AM_WRITE(rega_w)
+	AM_RANGE(0x09, 0x0a) AM_WRITE(cblk_w)
+	AM_RANGE(0x0b, 0x0f) AM_WRITE(regb_w)
+ADDRESS_MAP_END
+
+WRITE8_MEMBER(k053251_device::rega_w)
+{
+	data &= 0x3f;
+	logerror("reg%c %02x\n", offset+'5', data);
+}
+
+WRITE8_MEMBER(k053251_device::regb_w)
+{
+	data &= 0x3f;
+	logerror("reg%c %02x\n", offset+'b', data);
+}
 
 k053251_device::k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K053251, "K053251 Priority Encoder", tag, owner, clock, "k053251", __FILE__),
@@ -135,12 +206,41 @@ k053251_device::k053251_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+void k053251_device::set_shadow_layer(int layer)
+{
+	m_shadow_layer = layer;
+}
+
+WRITE8_MEMBER(k053251_device::inpri_w)
+{
+	data &= 0x3f;
+	m_inpri[offset] = data;
+	logerror("layer %d inpri %02x\n", offset, data);
+}
+
+WRITE8_MEMBER(k053251_device::cblk_w)
+{
+	data &= 0x3f;
+	m_cblk[offset] = data;
+	if(offset)
+		logerror("cblk 3=%d 4=%d\n", data & 7, data >> 3);
+	else
+		logerror("cblk 0=%d 1=%d 2=%d\n", data & 3, (data >> 2) & 3, (data >> 4) & 3);
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void k053251_device::device_start()
 {
+	m_init_cb.bind_relative_to(*owner());
+	m_update_cb.bind_relative_to(*owner());
+	memset(m_bitmaps, 0, sizeof(m_bitmaps));
+
+	save_item(NAME(m_inpri));
+	save_item(NAME(m_cblk));
+
 	save_item(NAME(m_ram));
 	save_item(NAME(m_tilemaps_set));
 	save_item(NAME(m_dirty_tmap));
@@ -154,6 +254,9 @@ void k053251_device::device_start()
 
 void k053251_device::device_reset()
 {
+	memset(m_inpri, 0, sizeof(m_inpri));
+	memset(m_cblk, 0, sizeof(m_cblk));
+
 	int i;
 
 	m_tilemaps_set = 0;
@@ -167,6 +270,103 @@ void k053251_device::device_reset()
 	reset_indexes();
 }
 
+void k053251_device::bitmap_update(bitmap_ind16 **bitmaps, const rectangle &cliprect)
+{
+	if(!m_bitmaps[0] || m_bitmaps[0]->width() != bitmaps[0]->width() || m_bitmaps[0]->height() != bitmaps[0]->height()) {
+		if(m_bitmaps[0])
+			for(int i=0; i<BITMAP_COUNT; i++)
+				delete m_bitmaps[i];
+		for(int i=0; i<BITMAP_COUNT; i++)
+			m_bitmaps[i] = new bitmap_ind16(bitmaps[0]->width(), bitmaps[0]->height());
+		if(!m_init_cb.isnull())
+			m_init_cb(m_bitmaps);
+	}
+
+	m_update_cb(m_bitmaps, cliprect);
+
+	uint16_t l0pal = (m_cblk[0] << 9) & 0x600;
+	uint16_t l1pal = (m_cblk[0] << 7) & 0x600;
+	uint16_t l2pal = (m_cblk[0] << 5) & 0x600;
+	uint16_t l3pal = (m_cblk[1] << 8) & 0x700;
+	uint16_t l4pal = (m_cblk[1] << 5) & 0x700;
+
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
+		const uint16_t *c0 = &m_bitmaps[LAYER0_COLOR]->pix16(y, cliprect.min_x);
+		const uint16_t *c1 = &m_bitmaps[LAYER1_COLOR]->pix16(y, cliprect.min_x);
+		const uint16_t *c2 = &m_bitmaps[LAYER2_COLOR]->pix16(y, cliprect.min_x);
+		const uint16_t *c3 = &m_bitmaps[LAYER3_COLOR]->pix16(y, cliprect.min_x);
+		const uint16_t *c4 = &m_bitmaps[LAYER4_COLOR]->pix16(y, cliprect.min_x);
+		const uint16_t *a0 = &m_bitmaps[LAYER0_ATTR ]->pix16(y, cliprect.min_x);
+		const uint16_t *a1 = &m_bitmaps[LAYER1_ATTR ]->pix16(y, cliprect.min_x);
+		const uint16_t *a2 = &m_bitmaps[LAYER2_ATTR ]->pix16(y, cliprect.min_x);
+		uint16_t *dc = &bitmaps[kvideodac_device::BITMAP_COLOR]->pix16(y, cliprect.min_x);
+		uint16_t *da = &bitmaps[kvideodac_device::BITMAP_ATTRIBUTES]->pix16(y, cliprect.min_x);
+
+		const uint16_t *const *shadp = m_shadow_layer == LAYER0_ATTR ? &a0 : m_shadow_layer == LAYER1_ATTR ? &a1 : &a2;
+
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
+			uint8_t pri = 0x3f;
+			uint16_t attr = 0x0000, color = 0x0000;
+			uint16_t cc, ca;
+			uint16_t shada = **shadp;
+
+			cc = *c0++ & 0x1ff;
+			ca = *a0++;
+			if(1)			if(cc & 0xf) {
+				uint8_t lpri = ca & 0x3f;
+				attr = 0x8000;
+				color = cc | l0pal;
+				pri = lpri;
+			}
+
+			cc = *c1++ & 0x1ff;
+			ca = *a1++;
+			if(1)			if(cc & 0xf) {
+				uint8_t lpri = m_inpri[1];
+				if(!attr || lpri < pri) {
+					attr = 0x8000;
+					color = cc | l1pal;
+					pri = lpri;
+				}
+			}
+
+			cc = *c2++ & 0x0ff;
+			ca = *a2++;
+			if(1)			if(cc & 0xf) {
+				uint8_t lpri = m_inpri[2];
+				if(!attr || lpri < pri) {
+					attr = 0x8000;
+					color = cc | l2pal;
+					pri = lpri;
+				}
+			}
+
+			cc = *c3++ & 0x0ff;
+			if(1)			if(cc & 0xf) {
+				uint8_t lpri = m_inpri[3];
+				if(!attr || lpri < pri) {
+					attr = 0x8000;
+					color = cc | l3pal;
+					pri = lpri;
+				}
+			}
+
+			cc = *c4++ & 0x0ff;
+			if(1)			if(cc & 0xf) {
+				uint8_t lpri = m_inpri[4];
+				if(!attr || lpri < pri) {
+					attr = 0x8000;
+					color = cc | l4pal;
+					pri = lpri;
+				}
+			}
+			*dc++ = color;
+			*da++ = attr | pri | ((shada & 3) << 8);
+		}
+	}
+}
+
+
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
@@ -174,7 +374,7 @@ void k053251_device::device_reset()
 WRITE8_MEMBER( k053251_device::write )
 {
 	int i, newind;
-
+	logerror("write %x, %02x\n", offset, data);
 	data &= 0x3f;
 
 	if (m_ram[offset] != data)

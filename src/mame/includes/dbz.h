@@ -23,12 +23,12 @@ public:
 		m_bg2_videoram(*this, "bg2_videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_k053246(*this, "k053246"),
-		m_k053251(*this, "k053251"),
-		m_k053252(*this, "k053252"),
-		m_k056832(*this, "k056832"),
+		m_video_timings(*this, "video_timings"),
+		m_tilemap(*this, "tilemap"),
+		m_sprites(*this, "sprites"),
 		m_k053936_1(*this, "k053936_1"),
 		m_k053936_2(*this, "k053936_2"),
+		m_mixer(*this, "mixer"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_soundlatch(*this, "soundlatch") { }
 
@@ -49,12 +49,12 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<k053247_device> m_k053246;
-	required_device<k053251_device> m_k053251;
-	required_device<k053252_device> m_k053252;
-	required_device<k056832_device> m_k056832;
+	required_device<k053252_device> m_video_timings;
+	required_device<k054156_054157_device> m_tilemap;
+	required_device<k053246_053247_device> m_sprites;
 	required_device<k053936_device> m_k053936_1;
 	required_device<k053936_device> m_k053936_2;
+	required_device<k053251_device> m_mixer;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
@@ -67,13 +67,7 @@ public:
 	DECLARE_DRIVER_INIT(dbza);
 	DECLARE_DRIVER_INIT(dbz);
 	DECLARE_DRIVER_INIT(dbz2);
-	TILE_GET_INFO_MEMBER(get_dbz_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_dbz_bg1_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(dbz_scanline);
-	K056832_CB_MEMBER(tile_callback);
-	K053246_CB_MEMBER(sprite_callback);
 };

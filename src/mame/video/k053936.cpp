@@ -2,7 +2,6 @@
 // copyright-holders:David Haywood
 /* */
 
-#include "emu.h"
 #include "k053936.h"
 
 #define VERBOSE 0
@@ -76,7 +75,132 @@ additional control from extra RAM:
 
 */
 
+DEVICE_ADDRESS_MAP_START(map, 16, k053936_device)
+	AM_RANGE(0x00, 0x03) AM_WRITE(counter_start_w)
+	AM_RANGE(0x04, 0x07) AM_WRITE(vadd_w)
+	AM_RANGE(0x08, 0x0b) AM_WRITE(hadd_w)
+	AM_RANGE(0x0c, 0x0d) AM_WRITE(mode1_w)
+	AM_RANGE(0x0e, 0x0f) AM_WRITE(mode2_w)
+	AM_RANGE(0x10, 0x11) AM_WRITE(x_min_w)
+	AM_RANGE(0x12, 0x13) AM_WRITE(x_max_w)
+	AM_RANGE(0x14, 0x15) AM_WRITE(y_min_w)
+	AM_RANGE(0x16, 0x17) AM_WRITE(y_max_w)
+ADDRESS_MAP_END
 
+void k053936_device::set_rozram_tag(const char *rozram_tag)
+{
+	m_rozram_tag = rozram_tag;
+}
+
+WRITE16_MEMBER(k053936_device::counter_start_w)
+{
+	COMBINE_DATA(m_counter_start+offset);
+	if(0)
+		logerror("%c counter start %04x\n", 'x'+offset, m_counter_start[offset]);
+}
+
+WRITE16_MEMBER(k053936_device::vadd_w)
+{
+	COMBINE_DATA(m_vadd+offset);
+	logerror("%c vadd %04x\n", 'x'+offset, m_vadd[offset]);
+}
+
+WRITE16_MEMBER(k053936_device::hadd_w)
+{
+	COMBINE_DATA(m_hadd+offset);
+	logerror("%c hadd %04x\n", 'x'+offset, m_hadd[offset]);
+}
+
+WRITE16_MEMBER(k053936_device::mode1_w)
+{
+	COMBINE_DATA(&m_mode1);
+	logerror("mode1 lx*%s hstep*%s 1=%02x ly*%s vstep*%s 2=%02x\n",
+			 m_mode1 & 0x8000 ? "256" : "1",
+			 m_mode1 & 0x4000 ? "256" : "1",
+			 (m_mode1 & 0x3f00) >> 8,
+			 m_mode1 & 0x0080 ? "256" : "1",
+			 m_mode1 & 0x0040 ? "256" : "1",
+			 m_mode1 & 0x003f);
+}
+
+WRITE16_MEMBER(k053936_device::mode2_w)
+{
+	COMBINE_DATA(&m_mode2);
+	logerror("mode2 h=%02x ?=%c ram=%s ?=%c%c%c%c%c%c\n",
+			 m_mode2 >> 8,
+			 m_mode2 & 0x80 ? '1' : '0',
+			 m_mode2 & 0x40 ? "on" : "off",
+			 m_mode2 & 0x20 ? '1' : '0',
+			 m_mode2 & 0x10 ? '1' : '0',
+			 m_mode2 & 0x08 ? '1' : '0',
+			 m_mode2 & 0x04 ? '1' : '0',
+			 m_mode2 & 0x02 ? '1' : '0',
+			 m_mode2 & 0x01 ? '1' : '0');
+}
+
+WRITE16_MEMBER(k053936_device::x_min_w)
+{
+	COMBINE_DATA(m_min + 0);
+	logerror("x min %04x\n", m_min[0]);
+}
+
+WRITE16_MEMBER(k053936_device::x_max_w)
+{
+	COMBINE_DATA(m_max + 0);
+	logerror("x max %04x\n", m_max[0]);
+}
+
+WRITE16_MEMBER(k053936_device::y_min_w)
+{
+	COMBINE_DATA(m_min + 1);
+	logerror("y min %04x\n", m_min[1]);
+}
+
+WRITE16_MEMBER(k053936_device::y_max_w)
+{
+	COMBINE_DATA(m_max + 1);
+	logerror("y max %04x\n", m_max[1]);
+}
+
+void k053936_device::bitmap_update(bitmap_ind16 *bitmap_x, bitmap_ind16 *bitmap_y, const rectangle &cliprect)
+{
+	if(m_mode2 & 0x0040) {
+		uint32_t x_base = m_counter_start[0] << 8;
+		uint32_t y_base = m_counter_start[1] << 8;
+		for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
+			uint16_t *xd = &bitmap_x->pix16(y, cliprect.min_x);
+			uint16_t *yd = &bitmap_y->pix16(y, cliprect.min_x);
+
+			uint32_t x_cur, y_cur;
+			uint32_t x_delta, y_delta;
+
+			switch(m_rozram->bytewidth()) {
+			default: abort();
+			case 4: {
+				const uint32_t *base = (const uint32_t *)m_rozram->ptr();
+				base += y << 1;
+				x_cur = x_base + (base[0] >> 16);
+				y_cur = y_base + (base[0] & 0xffff);
+				x_delta = base[1] >> 16;
+				y_delta = base[1] & 0xffff;
+				break;
+			}
+			}
+			
+			x_cur += cliprect.min_y * x_delta;
+			y_cur += cliprect.min_y * y_delta;
+			for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
+				*xd++ = (x_cur >> 8) & 0x1fff;
+				*yd++ = (y_cur >> 8) & 0x1fff;
+				x_cur += x_delta;
+				y_cur += y_delta;
+			}
+		}
+	} else {
+		bitmap_x->fill(0, cliprect);
+		bitmap_y->fill(0, cliprect);
+	}
+}
 
 
 static void K053936_zoom_draw(int chip,uint16_t *ctrl,uint16_t *linectrl, screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,uint32_t priority, int glfgreat_hack)
@@ -230,7 +354,7 @@ void K053936_set_offset(int chip, int xoffs, int yoffs)
 const device_type K053936 = device_creator<k053936_device>;
 
 k053936_device::k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K053936, "K053936 Video Controller", tag, owner, clock, "k053936", __FILE__),
+	: device_t(mconfig, K053936, "K053936 ROZ coordinates generator", tag, owner, clock, "k053936", __FILE__),
 	m_ctrl(nullptr),
 	m_linectrl(nullptr),
 	m_wrap(0),
@@ -245,6 +369,13 @@ k053936_device::k053936_device(const machine_config &mconfig, const char *tag, d
 
 void k053936_device::device_start()
 {
+	// Can't use a required_* because the pointer type varies
+	m_rozram = owner()->memshare(m_rozram_tag);
+	if(!m_rozram)
+		fatalerror("ROZram shared memory '%s' does not exist\n", m_rozram_tag);
+	if(m_rozram->bytewidth() > 4)
+		fatalerror("ROZram shared memory '%s' byte width is %d, which is too large\n", m_rozram_tag, m_rozram->bytewidth());
+
 	m_ctrl = make_unique_clear<uint16_t[]>(0x20);
 	m_linectrl = make_unique_clear<uint16_t[]>(0x4000);
 
@@ -258,6 +389,14 @@ void k053936_device::device_start()
 
 void k053936_device::device_reset()
 {
+	memset(m_counter_start, 0, sizeof(m_counter_start));
+	memset(m_vadd, 0, sizeof(m_vadd));
+	memset(m_hadd, 0, sizeof(m_hadd));
+	m_mode1 = 0x0000;
+	m_mode2 = 0x0000;
+	memset(m_min, 0, sizeof(m_min));
+	memset(m_max, 0, sizeof(m_max));
+
 	memset(m_ctrl.get(), 0, 0x20);
 }
 

@@ -31,7 +31,7 @@
  *  18d:    055555 (priority encoder)
  *   5f:    056766 (sprites)
  *  18f:    056832 (tiles)
- *  22f:    058143 = 054156 (tiles)
+ *  22f:    058143 (tiles)
  *  12j:    058141 = 054539 (x2) (2 sound chips in one)
  *
  *  TODO:
@@ -193,7 +193,7 @@ WRITE32_MEMBER(djmain_state::v_ctrl_w)
 READ32_MEMBER(djmain_state::v_rom_r)
 {
 	uint8_t *mem8 = memregion("gfx2")->base();
-	int bank = m_k056832->word_r(space, 0x34/2, 0xffff);
+	int bank = m_tilemap->rom16_r(space, 0x34/2, 0xffff);
 
 	offset *= 2;
 
@@ -316,11 +316,6 @@ WRITE32_MEMBER(djmain_state::light_ctrl_2_w)
 
 // unknown ports :-(
 
-WRITE32_MEMBER(djmain_state::unknown590000_w)
-{
-	//logerror("%08X: unknown 590000 write %08X: %08X & %08X\n", space.device().safe_pcbase(), offset, data, mem_mask);
-}
-
 WRITE32_MEMBER(djmain_state::unknown802000_w)
 {
 	//logerror("%08X: unknown 802000 write %08X: %08X & %08X\n", space.device().safe_pcbase(), offset, data, mem_mask);
@@ -382,9 +377,9 @@ static ADDRESS_MAP_START( maincpu_djmain, AS_PROGRAM, 32, djmain_state )
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM                         // WORK RAM
 	AM_RANGE(0x480000, 0x48443f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")       // COLOR RAM
 	AM_RANGE(0x500000, 0x57ffff) AM_READWRITE(sndram_r, sndram_w)               // SOUND RAM
-	AM_RANGE(0x580000, 0x58003f) AM_DEVREADWRITE("k056832", k056832_device, long_r, long_w)      // VIDEO REG (tilemap)
-	AM_RANGE(0x590000, 0x590007) AM_WRITE(unknown590000_w)                  // ??
-	AM_RANGE(0x5a0000, 0x5a005f) AM_DEVWRITE("k055555", k055555_device, K055555_long_w)                  // 055555: priority encoder
+	AM_RANGE(0x580000, 0x58003f) AM_DEVICE16("tilemap", k058143_056832_device, vacset, 0xffffffff)
+	AM_RANGE(0x590000, 0x590007) AM_DEVICE16("tilemap", k058143_056832_device, vsccs, 0xffffffff)
+	AM_RANGE(0x5a0000, 0x5a005f) AM_DEVICE8("mixer", k055555_device, map, 0xff00ff00)
 	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8("k054539_1", k054539_device, read, write, 0xff00ff00)
 	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8("k054539_2", k054539_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x5c0000, 0x5c0003) AM_READ8(inp1_r, 0xffffffff)  //  DSW3,BTN3,BTN2,BTN1  // input port control (buttons and DIP switches)
@@ -404,7 +399,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(maincpu_djmainj, AS_PROGRAM, 32, djmain_state)
 	AM_IMPORT_FROM(maincpu_djmain)
 
-	AM_RANGE(0xc00000, 0xc01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap) (beatmania)
+	AM_RANGE(0xc00000, 0xc01fff) AM_DEVREADWRITE("tilemap", k058143_056832_device, vram32_r, vram32_w)
 	AM_RANGE(0xc02000, 0xc02047) AM_WRITE(unknownc02000_w)                  // ??
 	AM_RANGE(0xf00000, 0xf0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs (beatmania)
 	AM_RANGE(0xf40000, 0xf4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg (beatmania)
@@ -415,7 +410,7 @@ static ADDRESS_MAP_START(maincpu_djmainu, AS_PROGRAM, 32, djmain_state)
 
 	AM_RANGE(0xd00000, 0xd0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs (hiphopmania)
 	AM_RANGE(0xd40000, 0xd4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg (hiphopmania)
-	AM_RANGE(0xe00000, 0xe01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap) (hiphopmania)
+	AM_RANGE(0xe00000, 0xe01fff) AM_DEVREADWRITE("tilemap", k058143_056832_device, vram32_r, vram32_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(maincpu_djmaina, AS_PROGRAM, 32, djmain_state)
@@ -423,7 +418,7 @@ static ADDRESS_MAP_START(maincpu_djmaina, AS_PROGRAM, 32, djmain_state)
 
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs
 	AM_RANGE(0xc40000, 0xc4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg
-	AM_RANGE(0xf00000, 0xf01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap)
+	AM_RANGE(0xf00000, 0xf01fff) AM_DEVREADWRITE("tilemap", k058143_056832_device, vram32_r, vram32_w)
 ADDRESS_MAP_END
 
 
@@ -1400,12 +1395,8 @@ static MACHINE_CONFIG_START( djmainj, djmain_state )
 	MCFG_PALETTE_FORMAT(XBGR)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", djmain)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(djmain_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx2", K056832_BPP_4dj, 1, 1, "none")
-	MCFG_K056832_PALETTE("palette")
-
-	MCFG_K055555_ADD("k055555")
+	MCFG_K058143_056832_ADD("tilemap", 12000000, 8, 8, 24, "palette")
+	MCFG_K055555_ADD("mixer")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

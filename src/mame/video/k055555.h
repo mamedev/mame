@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Olivier Galibert
 /* */
 
 #pragma once
@@ -9,98 +9,123 @@
 #define MCFG_K055555_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, K055555, 0)
 
+#define MCFG_K055555_SET_INIT_CB(_tag, _class, _method)					\
+	downcast<k055555_device *>(device)->set_init_cb(k055555_device::init_cb(&_class::_method, #_class "::" #_method, _tag, (_class *)nullptr));
 
-
-/* K055555 registers */
-/* priority inputs */
-#define K55_PALBASE_BG      0   // background palette
-#define K55_CONTROL         1   // control register
-#define K55_COLSEL_0        2   // layer A, B color depth
-#define K55_COLSEL_1        3   // layer C, D color depth
-#define K55_COLSEL_2        4   // object, S1 color depth
-#define K55_COLSEL_3        5   // S2, S3 color depth
-
-#define K55_PRIINP_0        7   // layer A pri 0
-#define K55_PRIINP_1        8   // layer A pri 1
-#define K55_PRIINP_2        9   // layer A "COLPRI"
-#define K55_PRIINP_3        10  // layer B pri 0
-#define K55_PRIINP_4        11  // layer B pri 1
-#define K55_PRIINP_5        12  // layer B "COLPRI"
-#define K55_PRIINP_6        13  // layer C pri
-#define K55_PRIINP_7        14  // layer D pri
-#define K55_PRIINP_8        15  // OBJ pri
-#define K55_PRIINP_9        16  // sub 1 (GP:PSAC) pri
-#define K55_PRIINP_10       17  // sub 2 (GX:PSAC) pri
-#define K55_PRIINP_11       18  // sub 3 pri
-
-#define K55_OINPRI_ON       19  // object priority bits selector
-
-#define K55_PALBASE_A       23  // layer A palette
-#define K55_PALBASE_B       24  // layer B palette
-#define K55_PALBASE_C       25  // layer C palette
-#define K55_PALBASE_D       26  // layer D palette
-#define K55_PALBASE_OBJ     27  // OBJ palette
-#define K55_PALBASE_SUB1    28  // SUB1 palette
-#define K55_PALBASE_SUB2    29  // SUB2 palette
-#define K55_PALBASE_SUB3    30  // SUB3 palette
-
-#define K55_BLEND_ENABLES   33  // blend enables for tilemaps
-#define K55_VINMIX_ON       34  // additional blend enables for tilemaps
-#define K55_OSBLEND_ENABLES 35  // obj/sub blend enables
-#define K55_OSBLEND_ON      36  // not sure, related to obj/sub blend
-
-#define K55_SHAD1_PRI       37  // shadow/highlight 1 priority
-#define K55_SHAD2_PRI       38  // shadow/highlight 2 priority
-#define K55_SHAD3_PRI       39  // shadow/highlight 3 priority
-#define K55_SHD_ON          40  // shadow/highlight
-#define K55_SHD_PRI_SEL     41  // shadow/highlight
-
-#define K55_VBRI            42  // VRAM layer brightness enable
-#define K55_OSBRI           43  // obj/sub brightness enable, part 1
-#define K55_OSBRI_ON        44  // obj/sub brightness enable, part 2
-#define K55_INPUT_ENABLES   45  // input enables
-
-/* bit masks for the control register */
-#define K55_CTL_GRADDIR     0x01    // 0=vertical, 1=horizontal
-#define K55_CTL_GRADENABLE  0x02    // 0=BG is base color only, 1=gradient
-#define K55_CTL_FLIPPRI     0x04    // 0=standard Konami priority, 1=reverse
-#define K55_CTL_SDSEL       0x08    // 0=normal shadow timing, 1=(not used by GX)
-
-/* bit masks for the input enables */
-#define K55_INP_VRAM_A      0x01
-#define K55_INP_VRAM_B      0x02
-#define K55_INP_VRAM_C      0x04
-#define K55_INP_VRAM_D      0x08
-#define K55_INP_OBJ         0x10
-#define K55_INP_SUB1        0x20
-#define K55_INP_SUB2        0x40
-#define K55_INP_SUB3        0x80
-
+#define MCFG_K055555_SET_UPDATE_CB(_tag, _class, _method)				\
+	downcast<k055555_device *>(device)->set_update_cb(k055555_device::update_cb(&_class::_method, #_class "::" #_method, _tag, (_class *)nullptr));
 
 class k055555_device : public device_t
 {
 public:
+	enum {
+		LAYERA_COLOR,
+		LAYERB_COLOR,
+		LAYERC_COLOR,
+		LAYERD_COLOR,
+		LAYERO_COLOR,
+		LAYERS1_COLOR,
+		LAYERS2_COLOR,
+		LAYERS3_COLOR,
+		LAYERO_ATTR,
+		LAYERS1_ATTR,
+		LAYERS2_ATTR,
+		LAYERS3_ATTR,
+		BITMAP_COUNT
+	};
+
+	typedef device_delegate<void (bitmap_ind16 **)> init_cb;
+	typedef device_delegate<void (bitmap_ind16 **, const rectangle &)> update_cb;
+
 	k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~k055555_device() { }
+	~k055555_device();
 
-	void K055555_write_reg(uint8_t regnum, uint8_t regdat);
+	void set_init_cb(init_cb _cb) { m_init_cb = _cb; }
+	void set_update_cb(update_cb _cb) { m_update_cb = _cb; }
 
-	DECLARE_WRITE16_MEMBER( K055555_word_w );
-	DECLARE_WRITE32_MEMBER( K055555_long_w );
+	DECLARE_WRITE8_MEMBER(bgc_cblk_w);
+	DECLARE_WRITE8_MEMBER(bgc_set_w);
+	DECLARE_WRITE8_MEMBER(colset0_w);
+	DECLARE_WRITE8_MEMBER(colset1_w);
+	DECLARE_WRITE8_MEMBER(colset2_w);
+	DECLARE_WRITE8_MEMBER(colset3_w);
+	DECLARE_WRITE8_MEMBER(colchg_on_w);
+	DECLARE_WRITE8_MEMBER(a_pri0_w);
+	DECLARE_WRITE8_MEMBER(a_pri1_w);
+	DECLARE_WRITE8_MEMBER(a_colpri_w);
+	DECLARE_WRITE8_MEMBER(b_pri0_w);
+	DECLARE_WRITE8_MEMBER(b_pri1_w);
+	DECLARE_WRITE8_MEMBER(b_colpri_w);
+	DECLARE_WRITE8_MEMBER(c_pri_w);
+	DECLARE_WRITE8_MEMBER(d_pri_w);
+	DECLARE_WRITE8_MEMBER(o_pri_w);
+	DECLARE_WRITE8_MEMBER(s1_pri_w);
+	DECLARE_WRITE8_MEMBER(s2_pri_w);
+	DECLARE_WRITE8_MEMBER(s3_pri_w);
+	DECLARE_WRITE8_MEMBER(o_inpri_on_w);
+	DECLARE_WRITE8_MEMBER(s1_inpri_on_w);
+	DECLARE_WRITE8_MEMBER(s2_inpri_on_w);
+	DECLARE_WRITE8_MEMBER(s3_inpri_on_w);
+	DECLARE_WRITE8_MEMBER(a_cblk_w);
+	DECLARE_WRITE8_MEMBER(b_cblk_w);
+	DECLARE_WRITE8_MEMBER(c_cblk_w);
+	DECLARE_WRITE8_MEMBER(d_cblk_w);
+	DECLARE_WRITE8_MEMBER(o_cblk_w);
+	DECLARE_WRITE8_MEMBER(s1_cblk_w);
+	DECLARE_WRITE8_MEMBER(s2_cblk_w);
+	DECLARE_WRITE8_MEMBER(s3_cblk_w);
+	DECLARE_WRITE8_MEMBER(s2_cblk_on_w);
+	DECLARE_WRITE8_MEMBER(s3_cblk_on_w);
+	DECLARE_WRITE8_MEMBER(v_inmix_w);
+	DECLARE_WRITE8_MEMBER(v_inmix_on_w);
+	DECLARE_WRITE8_MEMBER(os_inmix_w);
+	DECLARE_WRITE8_MEMBER(os_inmix_on_w);
+	DECLARE_WRITE8_MEMBER(shd_pri1_w);
+	DECLARE_WRITE8_MEMBER(shd_pri2_w);
+	DECLARE_WRITE8_MEMBER(shd_pri3_w);
+	DECLARE_WRITE8_MEMBER(shd_on_w);
+	DECLARE_WRITE8_MEMBER(shd_pri_sel_w);
+	DECLARE_WRITE8_MEMBER(v_inbri_w);
+	DECLARE_WRITE8_MEMBER(os_inbri_w);
+	DECLARE_WRITE8_MEMBER(os_inbri_on_w);
+	DECLARE_WRITE8_MEMBER(disp_w);
 
-	int K055555_read_register(int regnum);
-	int K055555_get_palette_index(int idx);
+	DECLARE_ADDRESS_MAP(map, 8);
+
+	void bitmap_update(bitmap_ind16 **bitmaps, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	void device_start() override;
+	void device_reset() override;
+	void device_post_load() override;
 
 private:
-	uint8_t   m_regs[128];
+	init_cb m_init_cb;
+	update_cb m_update_cb;
+
+	bitmap_ind16 *m_bitmaps[BITMAP_COUNT];
+
+	uint8_t m_shadow_value[4][256];
+
+	uint16_t m_color_mask[8];
+	uint8_t m_colset[4];
+	uint8_t m_cblk[8];
+	uint8_t m_cblk_on[2];
+	uint8_t m_pri[8+2];
+	uint8_t m_inpri_on[4];
+	uint8_t m_colpri[2];
+	uint8_t m_shd_pri[3];
+	uint8_t m_shd_on, m_shd_pri_sel;
+	uint8_t m_bgc_cblk, m_bgc_set, m_colchg_on;
+	uint8_t m_v_inmix, m_v_inmix_on, m_os_inmix, m_os_inmix_on;
+	uint8_t m_v_inbri, m_os_inbri, m_os_inbri_on;
+	uint8_t m_disp;
+
+	void update_shadow_value_array(int entry);
+	void compute_color_mask(int i);
 };
 
 extern const device_type K055555;
-
 
 #endif

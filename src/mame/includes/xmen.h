@@ -22,8 +22,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k054539(*this, "k054539"),
 		m_k052109(*this, "k052109"),
-		m_k053246(*this, "k053246"),
-		m_k053251(*this, "k053251"),
+		m_sprites(*this, "sprites"),
+		m_mixer(*this, "mixer"),
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
@@ -51,8 +51,8 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<k054539_device> m_k054539;
 	required_device<k052109_device> m_k052109;
-	required_device<k053247_device> m_k053246;
-	required_device<k053251_device> m_k053251;
+	required_device<k053246_053247_device> m_sprites;
+	required_device<k053251_device> m_mixer;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
@@ -67,12 +67,6 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(xmen_frame_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_VIDEO_START(xmen6p);
-	uint32_t screen_update_xmen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_xmen6p_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_xmen6p_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_xmen6p);
 	TIMER_DEVICE_CALLBACK_MEMBER(xmen_scanline);
 	K052109_CB_MEMBER(tile_callback);
-	K053246_CB_MEMBER(sprite_callback);
 };

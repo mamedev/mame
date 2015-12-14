@@ -15,10 +15,11 @@
 
 void djmain_state::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+#if 0
 	int offs, pri_code;
 	int sortedlist[NUM_SPRITES];
 
-	m_gfxdecode->gfx(0)->set_colorbase(m_k055555->K055555_read_register(K55_PALBASE_SUB2) * 0x400);
+	m_gfxdecode->gfx(0)->set_colorbase(m_mixer->K055555_read_register(K55_PALBASE_SUB2) * 0x400);
 
 	for (offs = 0; offs < NUM_SPRITES; offs++)
 		sortedlist[offs] = -1;
@@ -126,30 +127,28 @@ void djmain_state::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect
 				}
 			}
 	}
+#endif
 }
 
-
-K056832_CB_MEMBER(djmain_state::tile_callback)
-{
-}
 
 void djmain_state::video_start()
 {
-	m_k056832->set_layer_offs(0, -92, -27);
+	//	m_k056832->set_layer_offs(0, -92, -27);
 	// m_k056832->set_layer_offs(1, -87, -27);
-	m_k056832->set_layer_offs(1, -88, -27);
+	//	m_k056832->set_layer_offs(1, -88, -27);
 }
 
 uint32_t djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int enables = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+#if 0
+	int enables = m_mixer->K055555_read_register(K55_INPUT_ENABLES);
 	int pri[NUM_LAYERS + 1];
 	int order[NUM_LAYERS + 1];
 	int i, j;
 
 	for (i = 0; i < NUM_LAYERS; i++)
-		pri[i] = m_k055555->K055555_read_register(K55_PRIINP_0 + i * 3);
-	pri[i] = m_k055555->K055555_read_register(K55_PRIINP_10);
+		pri[i] = m_mixer->K055555_read_register(K55_PRIINP_0 + i * 3);
+	pri[i] = m_mixer->K055555_read_register(K55_PRIINP_10);
 
 	for (i = 0; i < NUM_LAYERS + 1; i++)
 		order[i] = i;
@@ -181,5 +180,6 @@ uint32_t djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 
 				m_k056832->tilemap_draw_dj(screen, bitmap, cliprect, layer, 0, 1 << i);
 		}
 	}
+#endif
 	return 0;
 }

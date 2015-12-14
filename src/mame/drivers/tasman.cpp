@@ -53,9 +53,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<k053252_device> m_k053252;
-	required_device<k055673_device> m_k055673;
+	required_device<k053246_055673_device> m_k055673;
 	required_device<k055555_device> m_k055555;
-	required_device<k056832_device> m_k056832;
+	required_device<k058143_056832_device> m_k056832;
 #if CUSTOM_DRAW
 	required_device<gfxdecode_device> m_gfxdecode;
 #endif
@@ -74,16 +74,13 @@ public:
 
 	virtual void machine_reset() override { m_irq_mask = 0; };
 	uint32_t screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	WRITE_LINE_MEMBER(vblank_irq_ack_w);
-	WRITE_LINE_MEMBER(hblank_irq_ack_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kongambl_vblank);
-	K056832_CB_MEMBER(tile_callback);
-	K053246_CB_MEMBER(sprite_callback);
 };
 
 
 VIDEO_START_MEMBER(kongambl_state,kongambl)
 {
+#if 0
 	#if CUSTOM_DRAW
 
 	#else
@@ -93,10 +90,12 @@ VIDEO_START_MEMBER(kongambl_state,kongambl)
 	m_k056832->set_layer_offs(2,  4, 0);
 	m_k056832->set_layer_offs(3,  6, 0);
 	#endif
+#endif
 }
 
 uint32_t kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+#if 0
 	#if CUSTOM_DRAW
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	uint32_t count;
@@ -141,6 +140,7 @@ uint32_t kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_in
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 	#endif
+#endif
 	return 0;
 }
 
@@ -219,9 +219,9 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	//0x400000 0x400001 "13M" even addresses
 	//0x400002,0x400003 "13J" odd addresses
-	AM_RANGE(0x400000, 0x401fff) AM_DEVREAD("k056832", k056832_device, rom_long_r)
-	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("k056832", k056832_device, unpaged_ram_long_r, unpaged_ram_long_w)
-	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE("k056832", k056832_device, long_w)
+	AM_RANGE(0x400000, 0x401fff) AM_DEVREAD("tilemap", k058143_056832_device, rom32_r)
+	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("tilemap", k058143_056832_device, vram32_r, vram32_w)
+	AM_RANGE(0x480000, 0x48003f) AM_DEVICE16("tilemap", k058143_056832_device, vacset, 0xffffffff)
 
 
 
@@ -229,15 +229,15 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	AM_RANGE(0x460000, 0x47ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
-	AM_RANGE(0x4b0000, 0x4b001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0xff00ff00)
+	AM_RANGE(0x4b0000, 0x4b001f) AM_DEVICE8("video_timings", k053252_device, map, 0xff00ff00)
 
-	AM_RANGE(0x4c0000, 0x4c0007) AM_DEVWRITE16("k055673", k055673_device, k053246_word_w, 0xffffffff)
+	AM_RANGE(0x4c0000, 0x4c0007) AM_DEVICE16("sprites", k053246_055673_device, objset1, 0xffffffff)
 	//AM_RANGE(0x4c4000, 0x4c4003) AM_WRITENOP
 	//AM_RANGE(0x4c4004, 0x4c4007) AM_WRITENOP
 	//AM_RANGE(0x4c801c, 0x4c801f) AM_WRITENOP
 	//AM_RANGE(0x4cc01c, 0x4cc01f) AM_WRITENOP
 
-	AM_RANGE(0x4cc000, 0x4cc00f) AM_DEVREAD16("k055673", k055673_device, k055673_rom_word_r, 0xffffffff)
+	AM_RANGE(0x4cc000, 0x4cc00f) AM_DEVREAD("sprites", k053246_055673_device, rom32_r)
 
 	AM_RANGE(0x4d0000, 0x4d0003) AM_WRITE8(kongambl_ff_w,0xff000000)
 
@@ -578,15 +578,6 @@ static INPUT_PORTS_START( kongambl )
 INPUT_PORTS_END
 
 
-K053246_CB_MEMBER(kongambl_state::sprite_callback)
-{
-}
-
-K056832_CB_MEMBER(kongambl_state::tile_callback)
-{
-}
-
-
 static const gfx_layout charlayout8_tasman =
 {
 	8,8,
@@ -603,16 +594,6 @@ static GFXDECODE_START( tasman )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout8_tasman, 0, 0x8000/(1 << 8) )
 GFXDECODE_END
 
-
-WRITE_LINE_MEMBER(kongambl_state::vblank_irq_ack_w)
-{
-	m_maincpu->set_input_line(1, CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(kongambl_state::hblank_irq_ack_w)
-{
-	m_maincpu->set_input_line(2, CLEAR_LINE);
-}
 
 TIMER_DEVICE_CALLBACK_MEMBER(kongambl_state::kongambl_vblank)
 {
@@ -642,10 +623,10 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_CPU_PROGRAM_MAP(kongamaud_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(kongambl_state, irq2_line_hold,  480)
 
-	MCFG_DEVICE_ADD("k053252", K053252, 25000000)
-	MCFG_K053252_OFFSETS(0, 16) // TBD
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(kongambl_state, vblank_irq_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(kongambl_state, hblank_irq_ack_w))
+	MCFG_DEVICE_ADD("video_timings", K053252, 25000000)
+//	MCFG_K053252_OFFSETS(0, 16) // TBD
+//	MCFG_K053252_INT1_ACK_CB(WRITELINE(konamigx_state, vblank_irq_ack_w))
+//	MCFG_K053252_INT2_ACK_CB(WRITELINE(konamigx_state, hblank_irq_ack_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -660,21 +641,15 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 
 	MCFG_VIDEO_START_OVERRIDE(kongambl_state,kongambl)
 
-	MCFG_K055555_ADD("k055555")
+	MCFG_K055555_ADD("mixer")
 
-	MCFG_DEVICE_ADD("k055673", K055673, 0)
-	MCFG_K055673_CB(kongambl_state, sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_LE2, -48+1, -23)
-	MCFG_K055673_PALETTE("palette")
+	MCFG_K053246_055673_ADD("sprites", 6000000, "palette", "spriteram")
 
 #if CUSTOM_DRAW
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tasman)
 #endif
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(kongambl_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8TASMAN, 0, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+	MCFG_K058143_056832_ADD("tilemap", 12000000, 8, 8, 24, "palette")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END

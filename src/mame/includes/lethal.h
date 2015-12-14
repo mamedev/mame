@@ -21,7 +21,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_bank4000(*this, "bank4000"),
-		m_k056832(*this, "k056832"),
+		m_tilemap(*this, "tilemap"),
 		m_k053244(*this, "k053244"),
 		m_palette(*this, "palette") { }
 
@@ -37,7 +37,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<address_map_bank_device> m_bank4000;
-	required_device<k056832_device> m_k056832;
+	required_device<k054156_054157_device> m_tilemap;
 	required_device<k05324x_device> m_k053244;
 	required_device<palette_device> m_palette;
 
@@ -50,9 +50,6 @@ public:
 	DECLARE_WRITE8_MEMBER(lethalen_palette_control);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lethalen_interrupt);
 	K05324X_CB_MEMBER(sprite_callback);
-	K056832_CB_MEMBER(tile_callback);
 };

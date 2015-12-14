@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#include "emu.h"
 #include "k053250.h"
 #include "screen.h"
 
@@ -26,7 +25,7 @@ void k053250_device::unpack_nibbles()
 {
 	m_unpacked_rom.resize(m_rom.length()*2);
 
-	for (int i = 0; i < m_rom.length(); i++)
+	for(int i=0; i < m_rom.length(); i++)
 	{
 		m_unpacked_rom[2*i] = m_rom[i] >> 4;
 		m_unpacked_rom[2*i+1] = m_rom[i] & 0xf;
@@ -397,7 +396,7 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 			    bitmap       : pointer to a MAME bitmap as the render target
 			    pal_ptr      : pointer to the palette's physical location relative to the scanline
 			    pix_ptr      : pointer to the physical start location of source pixels in ROM
-			    cliprect     : pointer to a rectangle structue which describes the visible area of the target bitmap
+			    cliprect     : pointer to a rectangle structure which describes the visible area of the target bitmap
 			    line_pos     : scanline render position relative to the target bitmap
 			                   should be a Y offset to the target bitmap in normal orientaion,
 			                   or an X offset to the target bitmap if X,Y are swapped

@@ -59,25 +59,159 @@ TODO:
 ***************************************************************************************************************************/
 
 
-#include "emu.h"
 #include "k053252.h"
 
 
 const device_type K053252 = device_creator<k053252_device>;
 
+DEVICE_ADDRESS_MAP_START(map, 8, k053252_device)
+	AM_RANGE(0x00, 0x00) AM_WRITE(hch_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(hcl_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(hfph_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(hfpl_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(hbph_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(hbpl_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(irq1_en_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(irq2_en_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(vch_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(vcl_w)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE(vfp_w)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(vbp_w)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(sw_w)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(tm_w)
+	AM_RANGE(0x0e, 0x0e) AM_READWRITE(vcth_r, irq1_ack_w)
+	AM_RANGE(0x0f, 0x0f) AM_READWRITE(vctl_r, irq2_ack_w)
+ADDRESS_MAP_END
+
+
+
 k053252_device::k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K053252, "K053252 Timing/Interrupt", tag, owner, clock, "k053252", __FILE__)
-	, device_video_interface(mconfig, *this)
-	, m_int1_en_cb(*this)
-	, m_int2_en_cb(*this)
-	, m_int1_ack_cb(*this)
-	, m_int2_ack_cb(*this)
-	//, m_int_time_cb(*this)
-	, m_offsx(0)
-	, m_offsy(0)
-	, m_slave_screen(*this, finder_base::DUMMY_TAG) // ugly, needed to work with the rungun etc. video demux board
+	: device_t(mconfig, K053252, "K053252 Video Timing/Interrupt", tag, owner, clock, "k053252", __FILE__),
+		device_video_interface(mconfig, *this, false),
+		m_int1_cb(*this),
+		m_int2_cb(*this),
+		m_vblank_cb(*this),
+		m_vsync_cb(*this)
 {
 }
+
+READ8_MEMBER(k053252_device::vcth_r)
+{
+	return (m_vct & 0xfe) | ((m_vct >> 8) & 1);
+}
+
+READ8_MEMBER(k053252_device::vctl_r)
+{
+	return m_vct;
+}
+
+WRITE8_MEMBER(k053252_device::hch_w)
+{
+	m_hc = (m_hc & 0x00ff) | (data << 8);
+	update_screen();
+}
+
+WRITE8_MEMBER(k053252_device::hcl_w)
+{
+	m_hc = (m_hc & 0xff00) | data;
+	update_screen();
+}
+
+WRITE8_MEMBER(k053252_device::hfph_w)
+{
+	m_hfp = (m_hfp & 0x00ff) | (data << 8);
+	update_screen();
+}
+
+WRITE8_MEMBER(k053252_device::hfpl_w)
+{
+	m_hfp = (m_hfp & 0xff00) | data;
+	update_screen();
+}
+
+WRITE8_MEMBER(k053252_device::hbph_w)
+{
+	m_hbp = (m_hbp & 0x00ff) | (data << 8);
+	update_screen();
+}
+
+WRITE8_MEMBER(k053252_device::hbpl_w)
+{
+	m_hbp = (m_hbp & 0xff00) | data;
+	update_screen();
+}
+
+WRITE8_MEMBER(k053252_device::irq1_en_w)
+{
+	if(m_int1_on && !data) {
+		m_int1_on = false;
+		m_int1_cb(CLEAR_LINE);
+	}
+	m_int1_en = data;
+	logerror("irq 1 enable %02x\n", data);
+}
+
+WRITE8_MEMBER(k053252_device::irq2_en_w)
+{
+	if(m_int2_on && !data) {
+		m_int2_on = false;
+		m_int2_cb(CLEAR_LINE);
+	}
+	m_int2_en = data;
+	logerror("irq 2 enable %02x\n", data);
+}
+
+WRITE8_MEMBER(k053252_device::vch_w)
+{
+	m_vc = (m_vc & 0x00ff) | (data << 8);
+	update_screen();
+}
+
+WRITE8_MEMBER(k053252_device::vcl_w)
+{
+	m_vc = (m_vc & 0xff00) | data;
+	update_screen();
+}
+
+WRITE8_MEMBER(k053252_device::vfp_w)
+{
+	m_vfp = data;
+	update_screen();
+}
+
+WRITE8_MEMBER(k053252_device::vbp_w)
+{
+	m_vbp = data;
+	update_screen();
+}
+
+WRITE8_MEMBER(k053252_device::sw_w)
+{
+	m_sw = data;
+	update_screen();
+}
+
+WRITE8_MEMBER(k053252_device::tm_w)
+{
+	m_tm = data;
+}
+
+WRITE8_MEMBER(k053252_device::irq1_ack_w)
+{
+	if(m_int1_on) {
+		m_int1_on = false;
+		m_int1_cb(CLEAR_LINE);
+	}
+}
+
+WRITE8_MEMBER(k053252_device::irq2_ack_w)
+{
+	if(m_int2_on) {
+		m_int2_on = false;
+		m_int2_cb(CLEAR_LINE);
+	}
+}
+
 
 
 //-------------------------------------------------
@@ -86,21 +220,48 @@ k053252_device::k053252_device(const machine_config &mconfig, const char *tag, d
 
 void k053252_device::device_start()
 {
-	m_int1_en_cb.resolve_safe();
-	m_int2_en_cb.resolve_safe();
-	m_int1_ack_cb.resolve_safe();
-	m_int2_ack_cb.resolve_safe();
-	//m_int_time_cb.resolve_safe();
+	m_int1_cb.resolve_safe();
+	m_int2_cb.resolve_safe();
+	m_vblank_cb.resolve_safe();
+	m_vsync_cb.resolve_safe();
 
-	save_item(NAME(m_regs));
+	m_timer_frame = timer_alloc(TIMER_FRAME);
+	m_timer_htimer = timer_alloc(TIMER_HTIMER);
+	m_timer_source_vblank = timer_alloc(TIMER_SOURCE_VBLANK);
+
+	save_item(NAME(m_vct));
+
 	save_item(NAME(m_hc));
 	save_item(NAME(m_hfp));
 	save_item(NAME(m_hbp));
 	save_item(NAME(m_vc));
 	save_item(NAME(m_vfp));
 	save_item(NAME(m_vbp));
-	save_item(NAME(m_vsw));
-	save_item(NAME(m_hsw));
+	save_item(NAME(m_sw));
+	save_item(NAME(m_tm));
+
+	save_item(NAME(m_int1_en));
+	save_item(NAME(m_int1_on));
+	save_item(NAME(m_int2_en));
+	save_item(NAME(m_int2_on));
+
+	save_item(NAME(m_line_duration));
+	save_item(NAME(m_frame));
+	save_item(NAME(m_vblank_in_to_vsync_in));
+	save_item(NAME(m_vsync_in_to_vsync_out));
+	save_item(NAME(m_vsync_out_to_vblank_out));
+	save_item(NAME(m_vsync_in_to_hblank_in));
+	save_item(NAME(m_hblank_in_to_hsync_in));
+	save_item(NAME(m_hsync_in_to_hblank_in));
+	save_item(NAME(m_timer_frame_state));
+	save_item(NAME(m_timer_htimer_state));
+
+	m_hc = m_vc = 0;
+	m_timer_frame_state = FT_WAIT_VBLANK_IN;
+	m_timer_htimer_state = HT_WAIT_HBLANK_IN;
+
+	if(m_screen)
+		m_screen->register_vblank_callback(vblank_state_delegate(&k053252_device::screen_vblank, this));
 }
 
 //-------------------------------------------------
@@ -109,150 +270,201 @@ void k053252_device::device_start()
 
 void k053252_device::device_reset()
 {
-	int i;
+	// Default to the standard 288x224 layout
+	m_hc  = 0x17f;
+	m_hfp = 0x010;
+	m_hbp = 0x030;
+	m_vc  = 0x107;
+	m_vfp =  0x11;
+	m_vbp =  0x0e;
+	m_sw  =  0x73;
+	m_tm  =  0xff;
 
-	for (i = 0; i < 16; i++)
-		m_regs[i] = 0;
+	m_vct = 0x000;
 
-	m_regs[0x08] = 1; // Xexex apparently does a wrong assignment for VC (sets up the INT enable register instead)
+	m_int1_on = false;
+	m_int1_en = true;
+	m_int2_on = false;
+	m_int2_en = true;
 
-	reset_internal_state();
+	m_timer_frame_state = FT_WAIT_VBLANK_IN;
+	m_timer_htimer_state = HT_WAIT_HBLANK_IN;
+
+	update_screen();
 }
 
-void k053252_device::reset_internal_state()
+void k053252_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_hc=0;
-	m_hfp=0;
-	m_hbp=0;
-	m_vc=0;
-	m_vfp=0;
-	m_vbp=0;
-	m_vsw=0;
-	m_hsw=0;
-}
-
-/*****************************************************************************
-    DEVICE HANDLERS
-*****************************************************************************/
-
-READ8_MEMBER( k053252_device::read )
-{
-	//TODO: debugger_access()
-	switch(offset)
-	{
-		/* VCT read-back */
-		// TODO: correct?
-		case 0x0e:
-			return ((m_screen->vpos()-m_vc) >> 8) & 1;
-		case 0x0f:
-			return (m_screen->vpos()-m_vc) & 0xff;
-		default:
-			//popmessage("Warning: k053252 read %02x, contact MAMEdev",offset);
-			break;
-	}
-
-	return m_regs[offset];
-}
-
-void k053252_device::res_change()
-{
-	if(m_hc && m_vc &&
-		m_hbp && m_hfp &&
-		m_vbp && m_vfp &&
-		m_hsw && m_vsw) //safety checks
-	{
-		rectangle visarea;
-		//(HC+1) - HFP - HBP - 8*(HSW+1)
-		//VC - VFP - VBP - (VSW+1)
-		attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock()) * (m_hc) * m_vc;
-
-		visarea.min_x = m_offsx;
-		visarea.min_y = m_offsy;
-		visarea.max_x = m_offsx + m_hc - m_hfp - m_hbp - 8*(m_hsw) - 1;
-		visarea.max_y = m_offsy + m_vc - m_vfp - m_vbp - (m_vsw) - 1;
-
-		m_screen->configure(m_hc, m_vc, visarea, refresh);
-
-		if (m_slave_screen.found())
-			m_slave_screen->configure(m_hc, m_vc, visarea, refresh);
-
-#if 0
-		attoseconds_t hsync = HZ_TO_ATTOSECONDS(clock()) * (m_hc);
-		printf("H %d HFP %d HSW %d HBP %d\n",m_hc,m_hfp,m_hsw*8,m_hbp);
-		printf("V %d VFP %d VSW %d VBP %d\n",m_vc,m_vfp,m_vsw,m_vbp);
-		// L stands for Legacy ...
-		printf("L %d %d\n",m_offsx,m_offsy);
-		printf("Screen params: Clock: %u V-Sync %.2f H-Sync %.f\n",clock(),ATTOSECONDS_TO_HZ(refresh),ATTOSECONDS_TO_HZ(hsync));
-		printf("visible screen area: %d x %d\n\n",(visarea.max_x - visarea.min_x) + 1,(visarea.max_y - visarea.min_y) + 1);
-#endif
+	switch(id) {
+	case TIMER_FRAME:
+		frame_transition();
+		break;
+	case TIMER_HTIMER:
+		htimer_transition();
+		break;
+	case TIMER_SOURCE_VBLANK:
+		if(m_timer_frame_state == FT_WAIT_VBLANK_IN)
+			frame_transition();
+		break;
 	}
 }
 
-WRITE8_MEMBER( k053252_device::write )
+void k053252_device::device_clock_changed()
 {
-	m_regs[offset] = data;
+	update_screen();
+}
 
-	switch(offset)
-	{
-		case 0x00:
-		case 0x01:
-			m_hc  = (m_regs[1]&0xff);
-			m_hc |= ((m_regs[0]&0x03)<<8);
-			m_hc++;
-			logerror("%d (%04x) HC set\n",m_hc,m_hc);
-			res_change();
-			break;
-		case 0x02:
-		case 0x03:
-			m_hfp  = (m_regs[3]&0xff);
-			m_hfp |= ((m_regs[2]&0x01)<<8);
-			logerror("%d (%04x) HFP set\n",m_hfp,m_hfp);
-			res_change();
-			break;
-		case 0x04:
-		case 0x05:
-			m_hbp  = (m_regs[5]&0xff);
-			m_hbp |= ((m_regs[4]&0x01)<<8);
-			logerror("%d (%04x) HBP set\n",m_hbp,m_hbp);
-			res_change();
-			break;
-		case 0x06: m_int1_en_cb(data); break;
-		case 0x07: m_int2_en_cb(data); break;
-		case 0x08:
-		case 0x09:
-			m_vc  = (m_regs[9]&0xff);
-			m_vc |= ((m_regs[8]&0x01)<<8);
-			m_vc++;
-			logerror("%d (%04x) VC set\n",m_vc,m_vc);
-			res_change();
-			break;
-		case 0x0a:
-			m_vfp  = (m_regs[0x0a]&0xff);
-			logerror("%d (%04x) VFP set\n",m_vfp,m_vfp);
-			res_change();
-			break;
-		case 0x0b:
-			m_vbp  = (m_regs[0x0b]&0xff);
-			m_vbp++;
-			logerror("%d (%04x) VBP set\n",m_vbp,m_vbp);
-			res_change();
-			break;
-		case 0x0c:
-			m_vsw  = ((m_regs[0x0c]&0xf0) >> 4) + 1;
-			m_hsw  = ((m_regs[0x0c]&0x0f) >> 0) + 1;
-			logerror("%02x VSW / %02x HSW set\n",m_vsw,m_hsw);
-			res_change();
-			break;
+void k053252_device::screen_vblank(screen_device &src, bool state)
+{
+	if(state && m_timer_frame_state == FT_WAIT_VBLANK_IN)
+		frame_transition();
+}
 
-		//case 0x0d: m_int_time(data); break;
-		case 0x0e: m_int1_ack_cb(1); break;
-		case 0x0f: m_int2_ack_cb(1); break;
+void k053252_device::update_screen()
+{
+	// Beware, it's called before reset through device_clock_changed()
+	if(!m_hc || !m_vc)
+		return;
+
+	int hc = (m_hc & 0x3ff) + 1;
+	int hfp = (m_hfp & 0x1ff);
+	int hbp = (m_hbp & 0x1ff);
+	int hsw = ((m_sw & 0xf) + 1)*8;
+
+	int vc = (m_vc & 0x1ff) + 1;
+	int vfp = (m_vfp & 0xff);
+	int vbp = (m_vbp & 0xff) + 1;
+	int vsw = ((m_sw >> 4) & 0xf) + 1;
+
+	int width  = hc - hfp - hsw - hbp;
+	int height = vc - vfp - vsw - vbp;
+
+	// We put the origin of the screen bitmap at the start of the back porch (end of sync)
+	rectangle visarea;
+	visarea.min_x = hbp;
+	visarea.min_y = vbp;
+	visarea.max_x = hc - hsw - hfp - 1;
+	visarea.max_y = vc - vsw - vfp - 1;
+
+	// Screen vblank happens at coordinates (0, vc - vsw - vfp) and ends at (0, vbp)
+	// Vsync happens at (0, vc - vsw) and ends at (0, 0)
+	// Hsync happens at (hc - hsw, line) and ends at (0, line+1)
+	// Hblank happens at (hc - hsw - hfp, line) and ends at (hbp, line+1)
+	m_line_duration = attotime::from_ticks(hc, clock());
+	m_frame = m_line_duration * vc;
+	m_vblank_in_to_vsync_in = m_line_duration * vfp;
+	m_vsync_in_to_vsync_out = m_line_duration * vsw;
+	m_vsync_out_to_vblank_out = m_line_duration * vbp;
+	m_vsync_in_to_hblank_in = attotime::from_ticks(hc - hsw - hfp, clock());
+	m_hblank_in_to_hsync_in = attotime::from_ticks(hfp, clock());
+	m_hsync_in_to_hblank_in = attotime::from_ticks(hc - hfp, clock());
+
+	switch(m_timer_frame_state) {
+	case FT_WAIT_VBLANK_IN:  break;
+	case FT_WAIT_VSYNC_IN:   m_vblank_cb(CLEAR_LINE); break;
+	case FT_WAIT_VSYNC_OUT:  m_vblank_cb(CLEAR_LINE); m_vsync_cb(ASSERT_LINE); break;
+	case FT_WAIT_VBLANK_OUT: m_vblank_cb(CLEAR_LINE); break;
+	}
+
+	m_timer_frame->adjust(attotime::never);
+	m_timer_frame_state = FT_WAIT_VBLANK_IN;
+	m_timer_htimer->adjust(attotime::never);
+	m_timer_htimer_state = HT_WAIT_HBLANK_IN;
+
+	if(0) {
+		visarea.min_x = 0;
+		visarea.min_y = 0;
+		visarea.max_x = hc-1;
+		visarea.max_y = vc-1;
+	}
+
+	logerror("YTY '252 w %03x vis %03x hs %x\n", 
+			 width, hbp, hsw);
+	logerror("XTX '252 h %03x vis %03x vs %x\n", 
+			 height, vbp, vsw);
+	logerror("screen: %dMHz %d (%d - %d - %d - %d) %d (%d - %d - %d - %d) vbl %gHz, visarea (%d, %d)-(%d, %d)\n",
+			 clock()/1000000,
+			 hc, hbp, width,  hfp, hsw,
+			 vc, vbp, height, vfp, vsw,
+			 1/m_frame.as_double(),
+			 visarea.min_x, visarea.min_y,
+			 visarea.max_x, visarea.max_y);
+
+	logerror("TIMINGS '252 %2d %3d %2d %3d %2d %2d %3d %2d %3d %2d %2d\n",
+			 clock()/1000000,
+			 hc, hbp, width,  hfp, hsw,
+			 vc, vbp, height, vfp, vsw);
+
+	// If there's a screen, use it.  Otherwise, setup a timer for a
+	// vblank similar to what the screen would have done.
+	if(m_screen)
+		m_screen->configure(hc, vc, visarea, m_frame.as_attoseconds());
+	else
+		// Run the timer in half a frame then every frame
+		m_timer_source_vblank->adjust(m_frame/2, 0, m_frame);
+}
+
+void k053252_device::frame_transition()
+{
+	switch(m_timer_frame_state) {
+	case FT_WAIT_VBLANK_IN:
+		m_timer_frame->adjust(m_vblank_in_to_vsync_in);
+		m_timer_frame_state = FT_WAIT_VSYNC_IN;
+		if(m_int1_en && !m_int1_on) {
+			m_int1_on = true;
+			m_int1_cb(ASSERT_LINE);
+		}
+		m_vblank_cb(ASSERT_LINE);
+		break;
+	case FT_WAIT_VSYNC_IN:
+		m_timer_frame->adjust(m_vsync_in_to_vsync_out);
+		m_timer_frame_state = FT_WAIT_VSYNC_OUT;
+		m_timer_htimer->adjust(m_vsync_in_to_hblank_in);
+		m_timer_htimer_state = HT_WAIT_HBLANK_IN;
+		m_vct = (m_vc & 0x3ff) ^ 0x3ff;
+		m_vsync_cb(ASSERT_LINE);
+		break;
+	case FT_WAIT_VSYNC_OUT:
+		m_timer_frame->adjust(m_vsync_out_to_vblank_out);
+		m_timer_frame_state = FT_WAIT_VBLANK_OUT;
+		m_vsync_cb(CLEAR_LINE);
+		break;
+	case FT_WAIT_VBLANK_OUT:
+		m_timer_frame->adjust(attotime::never);
+		m_timer_frame_state = FT_WAIT_VBLANK_IN;
+		m_vblank_cb(CLEAR_LINE);
+		// dragoona locks up if there's an int1 pending when it's turned on
+		// (the irq handler waits for the objdma ending but the objdma is enabled just after turning the int1 enable on)
+		if(m_int1_on) {
+			m_int1_on = false;
+			m_int1_cb(CLEAR_LINE);
+		}
+		break;
 	}
 }
 
-
-void k053252_device::static_set_slave_screen(device_t &device, const char *tag)
+void k053252_device::htimer_transition()
 {
-	k053252_device &dev = downcast<k053252_device &>(device);
-	dev.m_slave_screen.set_tag(tag);
+	switch(m_timer_htimer_state) {
+	case HT_WAIT_HBLANK_IN:
+		if(m_int2_en && (m_vct ^ 0x3ff) - (m_vc & 0x1ff) == m_tm) {
+			if(!m_int2_on) {
+				m_int2_on = true;
+				m_int2_cb(ASSERT_LINE);
+			}
+			m_timer_htimer->adjust(m_hblank_in_to_hsync_in);
+			m_timer_htimer_state = HT_WAIT_HSYNC_IN;
+		} else
+			m_timer_htimer->adjust(m_line_duration);
+		m_vct++;
+		break;
+	case HT_WAIT_HSYNC_IN:
+		m_timer_htimer->adjust(m_hsync_in_to_hblank_in);
+		m_timer_htimer_state = HT_WAIT_HBLANK_IN;
+		if(m_int2_on) {
+			m_int2_on = false;
+			m_int2_cb(CLEAR_LINE);
+		}
+		break;
+	}
 }

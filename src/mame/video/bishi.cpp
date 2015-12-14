@@ -13,6 +13,7 @@
 #include "includes/bishi.h"
 
 
+#if 0
 K056832_CB_MEMBER(bishi_state::tile_callback)
 {
 //  *code -= '0';
@@ -22,17 +23,20 @@ K056832_CB_MEMBER(bishi_state::tile_callback)
 
 	*color = m_layer_colorbase[layer] + ((*color & 0xf0));
 }
+#endif
 
 void bishi_state::video_start()
 {
 	assert(m_screen->format() == BITMAP_FORMAT_RGB32);
 
+#if 0
 	m_k056832->set_layer_association(0);
 
 	m_k056832->set_layer_offs(0, -2, 0);
 	m_k056832->set_layer_offs(1,  2, 0);
 	m_k056832->set_layer_offs(2,  4, 0);
 	m_k056832->set_layer_offs(3,  6, 0);
+#endif
 
 	// the 55555 is set to "0x10, 0x11, 0x12, 0x13", but these values are almost correct...
 	m_layer_colorbase[0] = 0x00;
@@ -43,6 +47,7 @@ void bishi_state::video_start()
 
 uint32_t bishi_state::screen_update_bishi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+#if 0
 	int layers[4], layerpri[4], i;/*, old;*/
 /*  int bg_colorbase, new_colorbase, plane, dirty; */
 	static const int pris[4] = { K55_PRIINP_0, K55_PRIINP_3, K55_PRIINP_6, K55_PRIINP_7 };
@@ -68,5 +73,7 @@ uint32_t bishi_state::screen_update_bishi(screen_device &screen, bitmap_rgb32 &b
 			m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[i], 0, 1 << i);
 		}
 	}
+#endif
+
 	return 0;
 }

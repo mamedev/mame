@@ -28,11 +28,11 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_oki(*this, "oki"),
 		m_k054539(*this, "k054539"),
-		m_k053246(*this, "k053246"),
-		m_k053251(*this, "k053251"),
-		m_k053252(*this, "k053252"),
-		m_k056832(*this, "k056832"),
-		m_k054338(*this, "k054338"),
+		m_sprites(*this, "sprites"),
+		m_mixer(*this, "mixer"),
+		m_video_timings(*this, "video_timings"),
+		m_tilemap(*this, "tilemap"),
+		m_blender(*this, "blender"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
@@ -59,11 +59,11 @@ public:
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<okim6295_device> m_oki;
 	optional_device<k054539_device> m_k054539;
-	required_device<k053247_device> m_k053246;
-	required_device<k053251_device> m_k053251;
-	optional_device<k053252_device> m_k053252;
-	required_device<k056832_device> m_k056832;
-	required_device<k054338_device> m_k054338;
+	required_device<k053246_053247_device> m_sprites;
+	required_device<k053251_device> m_mixer;
+	optional_device<k053252_device> m_video_timings;
+	required_device<k054156_054157_device> m_tilemap;
+	required_device<k054338_device> m_blender;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	optional_device<generic_latch_8_device> m_soundlatch;
@@ -82,13 +82,6 @@ public:
 	DECLARE_WRITE16_MEMBER(moobl_oki_bank_w);
 	DECLARE_MACHINE_START(moo);
 	DECLARE_MACHINE_RESET(moo);
-	DECLARE_VIDEO_START(moo);
-	DECLARE_VIDEO_START(bucky);
-	uint32_t screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(moo_interrupt);
 	INTERRUPT_GEN_MEMBER(moobl_interrupt);
-	TIMER_CALLBACK_MEMBER(dmaend_callback);
-	void moo_objdma();
-	K056832_CB_MEMBER(tile_callback);
-	K053246_CB_MEMBER(sprite_callback);
 };

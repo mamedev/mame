@@ -132,6 +132,7 @@ READ16_MEMBER(bishi_state::bishi_mirror_r)
 
 READ16_MEMBER(bishi_state::bishi_K056832_rom_r)
 {
+#if 0
 	uint16_t ouroffs;
 
 	ouroffs = (offset >> 1) * 8;
@@ -142,6 +143,8 @@ READ16_MEMBER(bishi_state::bishi_K056832_rom_r)
 		ouroffs += 4;
 
 	return m_k056832->bishi_rom_word_r(space, ouroffs, mem_mask);
+#endif
+	return 0;
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bishi_state )
@@ -153,15 +156,15 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bishi_state )
 	AM_RANGE(0x800008, 0x800009) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x810000, 0x810003) AM_WRITE(control2_w)       // bank switch for K056832 character ROM test
 	AM_RANGE(0x820000, 0x820001) AM_WRITENOP            // lamps (see lamp test in service menu)
-	AM_RANGE(0x830000, 0x83003f) AM_DEVWRITE("k056832", k056832_device, word_w)
-	AM_RANGE(0x840000, 0x840007) AM_DEVWRITE("k056832", k056832_device, b_word_w)    // VSCCS
-	AM_RANGE(0x850000, 0x85001f) AM_DEVWRITE("k054338", k054338_device, word_w)  // CLTC
-	AM_RANGE(0x870000, 0x8700ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)  // PCU2
+	AM_RANGE(0x830000, 0x83003f) AM_DEVICE("tilemap", k058143_056832_device, vacset)
+	AM_RANGE(0x840000, 0x840007) AM_DEVICE("tilemap", k058143_056832_device, vsccs)
+	AM_RANGE(0x850000, 0x85001f) AM_DEVICE("blender", k054338_device, map)
+	AM_RANGE(0x870000, 0x8700ff) AM_DEVICE("mixer", k055555_device, map)
 	AM_RANGE(0x880000, 0x880003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff00)
-	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  // Graphic planes
+	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE("tilemap", k058143_056832_device, vram16_r, vram16_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xb04000, 0xb047ff) AM_READ(bishi_mirror_r)    // bug in the ram/rom test?
-	AM_RANGE(0xc00000, 0xc01fff) AM_READ(bishi_K056832_rom_r)
+	AM_RANGE(0xc00000, 0xc01fff) AM_DEVREAD("tilemap", k058143_056832_device, rom16_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( bishi )
@@ -395,15 +398,18 @@ static MACHINE_CONFIG_START( bishi, bishi_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(bishi_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
+	MCFG_K058143_056832_ADD("tilemap", XTAL_24MHz/4, 8, 8, 24, "palette")
+
+	MCFG_DEVICE_ADD("blender", K054338, 0)
+//	MCFG_K054338_SET_UPDATE_CB(DEVICE_SELF, bishi_state, blender_update)
+	MCFG_K054338_PALETTE("palette")
 	// FP 201404: any reason why this is not connected to the k055555 below?
 
-	MCFG_K055555_ADD("k055555")
+	MCFG_K055555_ADD("mixer")
+//	MCFG_K055555_SET_INIT_CB(DEVICE_SELF, bishi_state, mixer_init)
+//	MCFG_K055555_SET_UPDATE_CB(DEVICE_SELF, bishi_state, mixer_update)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

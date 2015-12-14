@@ -25,6 +25,28 @@ TODO:
 #include "speaker.h"
 
 
+void asterix_state::videodac_update(bitmap_ind16 **bitmaps, const rectangle &cliprect)
+{
+	m_mixer->bitmap_update(bitmaps, cliprect);
+}
+
+void asterix_state::mixer_init(bitmap_ind16 **bitmaps)
+{
+	bitmaps[k053251_device::LAYER1_ATTR]->fill(0);
+	bitmaps[k053251_device::LAYER2_ATTR]->fill(0);
+}
+
+void asterix_state::mixer_update(bitmap_ind16 **bitmaps, const rectangle &cliprect)
+{
+	m_tilemap->bitmap_update(bitmaps[k053251_device::LAYER0_COLOR], cliprect, 0);
+	m_tilemap->bitmap_update(bitmaps[k053251_device::LAYER2_COLOR], cliprect, 1);
+	m_tilemap->bitmap_update(bitmaps[k053251_device::LAYER3_COLOR], cliprect, 2);
+	m_tilemap->bitmap_update(bitmaps[k053251_device::LAYER4_COLOR], cliprect, 3);
+	//	m_sprites->bitmap_update(bitmaps[k053251_device::LAYER0_COLOR],
+	//							 bitmaps[k053251_device::LAYER0_ATTR],
+	//							 cliprect);
+}
+
 #if 0
 READ16_MEMBER(asterix_state::control2_r)
 {
@@ -43,23 +65,15 @@ WRITE16_MEMBER(asterix_state::control2_w)
 		ioport("EEPROMOUT")->write(data, 0xff);
 
 		/* bit 5 is select tile bank */
-		m_k056832->set_tile_bank((data & 0x20) >> 5);
-		// TODO: looks like 0xffff is used from time to time for chip selection/reset something, not unlike Jackal
-		if((data & 0xff) != 0xff)
-		{
-			machine().bookkeeping().coin_counter_w(0, data & 0x08);
-			machine().bookkeeping().coin_counter_w(1, data & 0x10);
-			machine().bookkeeping().coin_lockout_w(0, data & 0x40);
-			machine().bookkeeping().coin_lockout_w(1, data & 0x80);
-		}
+		//*//		m_tilemap->set_tile_bank((data & 0x20) >> 5);
 	}
 }
 
 INTERRUPT_GEN_MEMBER(asterix_state::asterix_interrupt)
 {
 	// global interrupt masking
-	if (!m_k056832->is_irq_enabled(0))
-		return;
+	//*//	if (!m_tilemap->is_irq_enabled(0))
+	//*//		return;
 
 	device.execute().set_input_line(5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
 }
@@ -90,44 +104,6 @@ WRITE16_MEMBER(asterix_state::sound_irq_w)
 // Check the routine at 7f30 in the ead version.
 // You're not supposed to laugh.
 // This emulation is grossly overkill but hey, I'm having fun.
-#if 0
-WRITE16_MEMBER(asterix_state::protection_w)
-{
-	COMBINE_DATA(m_prot + offset);
-
-	if (offset == 1)
-	{
-		uint32_t cmd = (m_prot[0] << 16) | m_prot[1];
-		switch (cmd >> 24)
-		{
-		case 0x64:
-			{
-			uint32_t param1 = (read_word(cmd & 0xffffff) << 16) | read_word((cmd & 0xffffff) + 2);
-			uint32_t param2 = (read_word((cmd & 0xffffff) + 4) << 16) | read_word((cmd & 0xffffff) + 6);
-
-			switch (param1 >> 24)
-			{
-				case 0x22:
-				{
-					int size = param2 >> 24;
-					param1 &= 0xffffff;
-					param2 &= 0xffffff;
-					while(size >= 0)
-					{
-						write_word(param2, read_word(param1));
-						param1 += 2;
-						param2 += 2;
-						size--;
-					}
-				break;
-				}
-			}
-			break;
-			}
-		}
-	}
-}
-#endif
 
 WRITE16_MEMBER(asterix_state::protection_w)
 {
@@ -171,24 +147,24 @@ WRITE16_MEMBER(asterix_state::protection_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, asterix_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
-	AM_RANGE(0x180000, 0x1807ff) AM_DEVREADWRITE("k053244", k05324x_device, k053245_word_r, k053245_word_w)
+	AM_RANGE(0x180000, 0x1807ff) AM_DEVREADWRITE("sprites", k05324x_device, k053245_word_r, k053245_word_w)
 	AM_RANGE(0x180800, 0x180fff) AM_RAM                             // extra RAM, or mirror for the above?
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("k053244", k05324x_device, k053244_word_r, k053244_word_w)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("sprites", k05324x_device, k053244_word_r, k053244_word_w)
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE("k053244", k05324x_device, k053244_lsb_r, k053244_lsb_w)
+	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE("sprites", k05324x_device, k053244_lsb_r, k053244_lsb_w)
 	AM_RANGE(0x380000, 0x380001) AM_READ_PORT("IN0")
 	AM_RANGE(0x380002, 0x380003) AM_READ_PORT("IN1")
 	AM_RANGE(0x380100, 0x380101) AM_WRITE(control2_w)
 	AM_RANGE(0x380200, 0x380203) AM_DEVREADWRITE8("k053260", k053260_device, main_read, main_write, 0x00ff)
 	AM_RANGE(0x380300, 0x380301) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x380400, 0x380401) AM_WRITE(asterix_spritebank_w)
-	AM_RANGE(0x380500, 0x38051f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
+//	AM_RANGE(0x380400, 0x380401) AM_WRITE(asterix_spritebank_w)
+	AM_RANGE(0x380500, 0x38051f) AM_DEVICE8("mixer", k053251_device, map, 0x00ff)
 	AM_RANGE(0x380600, 0x380601) AM_NOP                             // Watchdog
-	AM_RANGE(0x380700, 0x380707) AM_DEVWRITE("k056832", k056832_device, b_word_w)
+	AM_RANGE(0x380700, 0x380707) AM_DEVICE("tilemap", k054156_054157_device, vsccs)
 	AM_RANGE(0x380800, 0x380803) AM_WRITE(protection_w)
-	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("k056832", k056832_device, ram_half_word_r, ram_half_word_w)
-	AM_RANGE(0x420000, 0x421fff) AM_DEVREAD("k056832", k056832_device, old_rom_word_r)   // Passthrough to tile roms
-	AM_RANGE(0x440000, 0x44003f) AM_DEVWRITE("k056832", k056832_device, word_w)
+	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("tilemap", k054156_054157_device, vram16_r, vram16_w)
+	AM_RANGE(0x420000, 0x421fff) AM_DEVREAD("tilemap", k054156_054157_device, rom16_r)
+	AM_RANGE(0x440000, 0x44003f) AM_DEVICE("tilemap", k054156_054157_device, vacset)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, asterix_state )
@@ -271,28 +247,28 @@ static MACHINE_CONFIG_START( asterix, asterix_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(asterix_state, screen_update_asterix)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 384, 48, 48+288, 264, 15, 15+224)
+	MCFG_SCREEN_UPDATE_DEVICE("videodac", kvideodac_device, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(asterix_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 1, "none")
-	MCFG_K056832_PALETTE("palette")
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_DEVICE_ADD("k053244", K053244, 0)
+	MCFG_K054156_054157_ADD("tilemap", XTAL_24MHz/4, 2, 2, 16, "palette")
+
+	MCFG_DEVICE_ADD("sprites", K053244, 0)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K05324X_OFFSETS(-3, -1)
-	MCFG_K05324X_CB(asterix_state, sprite_callback)
+//	MCFG_K05324X_CB(asterix_state, sprite_callback)
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("mixer", k053251_device::LAYER1_ATTR)
+	MCFG_K053251_SET_INIT_CB(DEVICE_SELF, asterix_state, mixer_init)
+	MCFG_K053251_SET_UPDATE_CB(DEVICE_SELF, asterix_state, mixer_update)
+
+	MCFG_KVIDEODAC_ADD("videodac", "palette", 0x300, 0.6, 0, 1.0)
+	MCFG_KVIDEODAC_SET_UPDATE_CB(DEVICE_SELF, asterix_state, videodac_update)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -317,11 +293,11 @@ ROM_START( asterix )
 	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "068_a05.5f", 0x000000, 0x010000,  CRC(d3d0d77b) SHA1(bfa77a8bf651dc27f481e96a2d63242084cc214c) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD32_WORD( "068a12.16k", 0x000000, 0x080000, CRC(b9da8e9c) SHA1(a46878916833923e421da0667e37620ae0b77744) )
-	ROM_LOAD32_WORD( "068a11.12k", 0x000002, 0x080000, CRC(7eb07a81) SHA1(672c0c60834df7816d33d88643e4575b8ca9bcc1) )
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD32_WORD_SWAP( "068a12.16k", 0x000000, 0x080000, CRC(b9da8e9c) SHA1(a46878916833923e421da0667e37620ae0b77744) )
+	ROM_LOAD32_WORD_SWAP( "068a11.12k", 0x000002, 0x080000, CRC(7eb07a81) SHA1(672c0c60834df7816d33d88643e4575b8ca9bcc1) )
 
-	ROM_REGION( 0x400000, "k053244", 0 )
+	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD32_WORD( "068a08.7k", 0x000000, 0x200000, CRC(c41278fe) SHA1(58e5f67a67ae97e0b264489828cd7e74662c5ed5) )
 	ROM_LOAD32_WORD( "068a07.3k", 0x000002, 0x200000, CRC(32efdbc4) SHA1(b7e8610aa22249176d82b750e2549d1eea6abe4f) )
 
@@ -342,11 +318,11 @@ ROM_START( asterixeac )
 	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "068_a05.5f", 0x000000, 0x010000,  CRC(d3d0d77b) SHA1(bfa77a8bf651dc27f481e96a2d63242084cc214c) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD32_WORD( "068a12.16k", 0x000000, 0x080000, CRC(b9da8e9c) SHA1(a46878916833923e421da0667e37620ae0b77744) )
-	ROM_LOAD32_WORD( "068a11.12k", 0x000002, 0x080000, CRC(7eb07a81) SHA1(672c0c60834df7816d33d88643e4575b8ca9bcc1) )
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD32_WORD_SWAP( "068a12.16k", 0x000000, 0x080000, CRC(b9da8e9c) SHA1(a46878916833923e421da0667e37620ae0b77744) )
+	ROM_LOAD32_WORD_SWAP( "068a11.12k", 0x000002, 0x080000, CRC(7eb07a81) SHA1(672c0c60834df7816d33d88643e4575b8ca9bcc1) )
 
-	ROM_REGION( 0x400000, "k053244", 0 )
+	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD32_WORD( "068a08.7k", 0x000000, 0x200000, CRC(c41278fe) SHA1(58e5f67a67ae97e0b264489828cd7e74662c5ed5) )
 	ROM_LOAD32_WORD( "068a07.3k", 0x000002, 0x200000, CRC(32efdbc4) SHA1(b7e8610aa22249176d82b750e2549d1eea6abe4f) )
 
@@ -367,11 +343,11 @@ ROM_START( asterixeaa )
 	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "068_a05.5f", 0x000000, 0x010000,  CRC(d3d0d77b) SHA1(bfa77a8bf651dc27f481e96a2d63242084cc214c) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD32_WORD( "068a12.16k", 0x000000, 0x080000, CRC(b9da8e9c) SHA1(a46878916833923e421da0667e37620ae0b77744) )
-	ROM_LOAD32_WORD( "068a11.12k", 0x000002, 0x080000, CRC(7eb07a81) SHA1(672c0c60834df7816d33d88643e4575b8ca9bcc1) )
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD32_WORD_SWAP( "068a12.16k", 0x000000, 0x080000, CRC(b9da8e9c) SHA1(a46878916833923e421da0667e37620ae0b77744) )
+	ROM_LOAD32_WORD_SWAP( "068a11.12k", 0x000002, 0x080000, CRC(7eb07a81) SHA1(672c0c60834df7816d33d88643e4575b8ca9bcc1) )
 
-	ROM_REGION( 0x400000, "k053244", 0 )
+	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD32_WORD( "068a08.7k", 0x000000, 0x200000, CRC(c41278fe) SHA1(58e5f67a67ae97e0b264489828cd7e74662c5ed5) )
 	ROM_LOAD32_WORD( "068a07.3k", 0x000002, 0x200000, CRC(32efdbc4) SHA1(b7e8610aa22249176d82b750e2549d1eea6abe4f) )
 
@@ -392,11 +368,11 @@ ROM_START( asterixaad )
 	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "068_a05.5f", 0x000000, 0x010000,  CRC(d3d0d77b) SHA1(bfa77a8bf651dc27f481e96a2d63242084cc214c) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD32_WORD( "068a12.16k", 0x000000, 0x080000, CRC(b9da8e9c) SHA1(a46878916833923e421da0667e37620ae0b77744) )
-	ROM_LOAD32_WORD( "068a11.12k", 0x000002, 0x080000, CRC(7eb07a81) SHA1(672c0c60834df7816d33d88643e4575b8ca9bcc1) )
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD32_WORD_SWAP( "068a12.16k", 0x000000, 0x080000, CRC(b9da8e9c) SHA1(a46878916833923e421da0667e37620ae0b77744) )
+	ROM_LOAD32_WORD_SWAP( "068a11.12k", 0x000002, 0x080000, CRC(7eb07a81) SHA1(672c0c60834df7816d33d88643e4575b8ca9bcc1) )
 
-	ROM_REGION( 0x400000, "k053244", 0 )
+	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD32_WORD( "068a08.7k", 0x000000, 0x200000, CRC(c41278fe) SHA1(58e5f67a67ae97e0b264489828cd7e74662c5ed5) )
 	ROM_LOAD32_WORD( "068a07.3k", 0x000002, 0x200000, CRC(32efdbc4) SHA1(b7e8610aa22249176d82b750e2549d1eea6abe4f) )
 
@@ -417,11 +393,11 @@ ROM_START( asterixj )
 	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "068_a05.5f", 0x000000, 0x010000,  CRC(d3d0d77b) SHA1(bfa77a8bf651dc27f481e96a2d63242084cc214c) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD32_WORD( "068a12.16k", 0x000000, 0x080000, CRC(b9da8e9c) SHA1(a46878916833923e421da0667e37620ae0b77744) )
-	ROM_LOAD32_WORD( "068a11.12k", 0x000002, 0x080000, CRC(7eb07a81) SHA1(672c0c60834df7816d33d88643e4575b8ca9bcc1) )
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD32_WORD_SWAP( "068a12.16k", 0x000000, 0x080000, CRC(b9da8e9c) SHA1(a46878916833923e421da0667e37620ae0b77744) )
+	ROM_LOAD32_WORD_SWAP( "068a11.12k", 0x000002, 0x080000, CRC(7eb07a81) SHA1(672c0c60834df7816d33d88643e4575b8ca9bcc1) )
 
-	ROM_REGION( 0x400000, "k053244", 0 )
+	ROM_REGION( 0x400000, "sprites", 0 )
 	ROM_LOAD32_WORD( "068a08.7k", 0x000000, 0x200000, CRC(c41278fe) SHA1(58e5f67a67ae97e0b264489828cd7e74662c5ed5) )
 	ROM_LOAD32_WORD( "068a07.3k", 0x000002, 0x200000, CRC(32efdbc4) SHA1(b7e8610aa22249176d82b750e2549d1eea6abe4f) )
 

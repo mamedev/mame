@@ -26,14 +26,16 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k052109(*this, "k052109"),
-		m_k053246(*this, "k053246"),
-		m_k053251(*this, "k053251"),
-		m_k053252(*this, "k053252"),
+		m_sprites(*this, "sprites"),
+		m_mixer(*this, "mixer"),
+		m_video_timings(*this, "video_timings"),
 		m_k054000(*this, "k054000"),
 		m_palette(*this, "palette"),
 		m_videobank0(*this, "videobank0"),
 		m_videobank1(*this, "videobank1") { }
 
+	/* memory pointers */
+	std::vector<uint8_t> m_paletteram;
 
 	/* video-related */
 	int        m_layer_colorbase[3];
@@ -47,9 +49,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k052109_device> m_k052109;
-	required_device<k053247_device> m_k053246;
-	required_device<k053251_device> m_k053251;
-	optional_device<k053252_device> m_k053252;
+	required_device<k053246_053247_device> m_sprites;
+	required_device<k053251_device> m_mixer;
+	optional_device<k053252_device> m_video_timings;
 	optional_device<k054000_device> m_k054000;
 	required_device<palette_device> m_palette;
 
@@ -66,15 +68,11 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	INTERRUPT_GEN_MEMBER(irq);
-
+	INTERRUPT_GEN_MEMBER(vendetta_irq);
+	void vendetta_video_banking( int select );
 	K052109_CB_MEMBER(vendetta_tile_callback);
 	K052109_CB_MEMBER(esckids_tile_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
-	K053246_CB_MEMBER(sprite_callback);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

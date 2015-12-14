@@ -12,8 +12,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_obj_ram(*this, "obj_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_k056832(*this, "k056832"),
-		m_k055555(*this, "k055555"),
+		m_tilemap(*this, "tilemap"),
+		m_mixer(*this, "mixer"),
 		m_ata(*this, "ata"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -70,11 +70,10 @@ public:
 	void sndram_set_bank();
 	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<k056832_device> m_k056832;
-	required_device<k055555_device> m_k055555;
+	required_device<k058143_056832_device> m_tilemap;
+	required_device<k055555_device> m_mixer;
 	required_device<ata_interface_device> m_ata;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	K056832_CB_MEMBER(tile_callback);
 	optional_ioport_array<2> m_turntable;
 };

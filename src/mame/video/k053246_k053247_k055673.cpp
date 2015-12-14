@@ -1,19 +1,72 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Olivier Galibert
 /***************************************************************************/
 /*                                                                         */
-/*                                 053246                                  */
-/*                          with 053247 or 055673                          */
-/*  is the 053247 / 055673 choice just a BPP change like the tilemaps?     */
+/*    053246 with 053247 or 055673                                         */
+/*    058142 with 055673                                                   */
 /*                                                                         */
+/*    Konami Sprite Chips                                                  */
 /*                                                                         */
 /***************************************************************************/
 /* later Konami GX board replaces the 053246 with a 058142 */
 
 /*
 
-053247/053246
+053246/053247
+053246/055673
+058142/055673
 -------------
+
+
+This chip combination generates a sprite layer in konami systems.  The
+053246 manages the spriteram, computes the sprite tiles positions,
+generates rom addresses and sends render commands to the
+053247/055673.  That chip, with the read tile data, renders the data
+to a double-buffered linebuffer, the other buffer being scanned out to
+the mixer chip.
+
+
+Per-sprite information (spriteram):
+
+     f   e   d   c   b   a   9   8   7   6   5   4   3   2   1   0
++0   b  cz  vf  hf   -vs--   -hs--   ------------zcode------------
++2   -------------------------charcode----------------------------
++4   .   .   .   .   .   .   ----------------vpos-----------------
++6   .   .   .   .   .   .   ----------------hpos-----------------
++8   .   .   .   .   .   .   ----------------vzoom----------------
++a   .   .   .   .   .   .   ----------------hzoom----------------
++c  vb  hb   .   .   -sd--   ----------------attr-----------------
++e   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
+
+
+
+Registers 054236/058142 (objset1):
+
+     f   e   d   c   b   a   9   8   7   6   5   4   3   2   1   0
++0   .   .   .   .   .   .   ----------------hscr-----------------
++2   .   .   .   .   .   .   ----------------vscr-----------------
++4   ---------ocha (low)----------   .   . sd0 dma res w16 gvf ghf
++6   ----------------------ocha (high)----------------------------
+
+
+Registers 055673 (objset2):
+
+     f   e   d   c   b   a   9   8   7   6   5   4   3   2   1   0
++0-f -----------------character rom data--------------------------
++10  .   .   .   . wr0   ---c0---- mo0 mh0   -mv0- bo0 bh0   -bv0-
++12  .   .   .   . wr1   ---c1---- mo1 mh1   -mv1- bo1 bh1   -bv1-
++14  .   .   .   . wr2   ---c2---- mo2 mh2   -mv2- bo2 bh2   -bv2-
++16  .   .   .   . wr3   ---c3---- mo3 mh3   -mv3- bo3 bh3   -bv3-
++18  .   .   .   .   ----bank1----   .   .   .   .   ----bank0----
++1a  .   .   .   .   ----bank3----   .   .   .   .   ----bank2----
++1c  .   .   .   .   ----coreg---- rom w1k sds pri owr   ---cm----
++1e  .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
+
+
+
+
+
+
 Sprite generators. Nothing is known about their external interface.
 The sprite RAM format is very similar to the 053245.
 
@@ -34,1122 +87,783 @@ The sprite RAM format is very similar to the 053245.
 
 */
 
-#include "emu.h"
 #include "k053246_k053247_k055673.h"
-#include "konami_helper.h"
 
-#define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+const device_type K053246_053247 = device_creator<k053246_053247_device>;
+const device_type K053246_055673 = device_creator<k053246_055673_device>;
 
+DEVICE_ADDRESS_MAP_START(objset1, 16, k053246_055673_device)
+	AM_RANGE(0x00, 0x01) AM_WRITE(hscr_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(vscr_w)
+	AM_RANGE(0x04, 0x05) AM_WRITE(oms_w)
+	AM_RANGE(0x06, 0x07) AM_WRITE(ocha_w)
+ADDRESS_MAP_END
 
-/*****************************************************************************
-    DEVICE HANDLERS
-*****************************************************************************/
+DEVICE_ADDRESS_MAP_START(objset2, 16, k053246_055673_device)
+	AM_RANGE(0x00, 0x07) AM_WRITE(atrbk_w)
+	AM_RANGE(0x08, 0x0b) AM_WRITE(vrcbk_w)
+	AM_RANGE(0x0c, 0x0d) AM_WRITE(opset_w)
+ADDRESS_MAP_END
 
+DEVICE_ADDRESS_MAP_START(objset1_8, 8, k053246_055673_device)
+ADDRESS_MAP_END
 
-void k053247_device::clear_all()
+k053246_055673_device::k053246_055673_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, K053246_055673, "053246/055673 Sprite Generator Combo", tag, owner, clock, "k055673", __FILE__),
+	  device_gfx_interface(mconfig, *this),
+	  m_dmairq_cb(*this),
+	  m_dmaact_cb(*this),
+	  m_region(*this, DEVICE_SELF)
 {
-	m_ram = nullptr;
-	m_gfx = nullptr;
-
-	for (auto & elem : m_kx46_regs)
-		elem = 0;
-
-	for (auto & elem : m_kx47_regs)
-		elem = 0;
-
-	m_objcha_line = 0;
-	m_z_rejection = 0;
-
-	m_memory_region = nullptr;
+	m_is_053247 = false;
 }
 
-void k053247_device::k053247_get_ram( uint16_t **ram )
-{
-	*ram = m_ram.get();
-}
-
-int k053247_device::k053247_get_dx( void )
-{
-	return m_dx;
-}
-
-int k053247_device::k053247_get_dy( void )
-{
-	return m_dy;
-}
-
-int k053247_device::k053246_read_register( int regnum )
-{
-	return(m_kx46_regs[regnum]);
-}
-
-int k053247_device::k053247_read_register( int regnum )
-{
-	return(m_kx47_regs[regnum]);
-}
-
-
-WRITE16_MEMBER( k053247_device::k055673_reg_word_w ) // write-only OBJSET2 registers (see p.43 table 6.1)
-{
-	COMBINE_DATA(m_kx47_regs + offset);
-}
-
-READ16_MEMBER( k053247_device::k053247_word_r )
-{
-	return m_ram[offset];
-}
-
-WRITE16_MEMBER( k053247_device::k053247_word_w )
-{
-	COMBINE_DATA(m_ram.get() + offset);
-}
-
-READ8_MEMBER( k053247_device::k053247_r )
-{
-	int offs = offset >> 1;
-
-	if (offset & 1)
-		return(m_ram[offs] & 0xff);
-	else
-		return(m_ram[offs] >> 8);
-}
-
-WRITE8_MEMBER( k053247_device::k053247_w )
-{
-	int offs = offset >> 1;
-
-	if (offset & 1)
-		m_ram[offs] = (m_ram[offs] & 0xff00) | data;
-	else
-		m_ram[offs] = (m_ram[offs] & 0x00ff) | (data << 8);
-}
-
-// The K055673 supports a non-objcha based ROM readback
-// write the address to the 246 as usual, but there's a completely separate ROM
-// window that works without needing an objcha line.
-// in this window, +0 = 32 bits from one set of ROMs, and +8 = 32 bits from another set
-
-// FIXME: rearrange ROM loading so this can be merged with the 4/6/8bpp version
-READ16_MEMBER( k053247_device::k055673_5bpp_rom_word_r ) // 5bpp
-{
-	uint8_t *ROM8 = (uint8_t *)space.machine().root_device().memregion(m_memory_region)->base();
-	uint16_t *ROM = (uint16_t *)space.machine().root_device().memregion(m_memory_region)->base();
-	int size4 = (space.machine().root_device().memregion(m_memory_region)->bytes() / (1024 * 1024)) / 5;
-	int romofs;
-
-	size4 *= 4 * 1024 * 1024;   // get offset to 5th bit
-	ROM8 += size4;
-
-	romofs = m_kx46_regs[6] << 16 | m_kx46_regs[7] << 8 | m_kx46_regs[4];
-
-	switch (offset)
-	{
-		case 0: // 20k / 36u
-			return ROM[romofs + 2];
-		case 1: // 17k / 36y
-			return ROM[romofs + 3];
-		case 2: // 10k / 32y
-		case 3:
-			romofs /= 2;
-			return ROM8[romofs + 1];
-		case 4: // 22k / 34u
-			return ROM[romofs];
-		case 5: // 19k / 34y
-			return ROM[romofs + 1];
-		case 6: // 12k / 29y
-		case 7:
-			romofs /= 2;
-			return ROM8[romofs];
-		default:
-			LOG(("55673_rom_word_r: Unknown read offset %x\n", offset));
-			break;
-	}
-
-	return 0;
-}
-
-READ16_MEMBER( k053247_device::k055673_rom_word_r )
-{
-	if (m_bpp == 5)
-		return k055673_5bpp_rom_word_r(space, offset, mem_mask);
-
-	uint16_t *ROM = (uint16_t *)space.machine().root_device().memregion(m_memory_region)->base();
-	int romofs;
-
-	romofs = m_kx46_regs[6] << 16 | m_kx46_regs[7] << 8 | m_kx46_regs[4];
-
-	romofs = (romofs >> 2) * m_bpp;
-
-	if ((offset & 0x4) == 0) romofs += m_bpp >> 1;
-
-	return ROM[romofs + (offset & 0x3)];
-}
-
-READ8_MEMBER( k053247_device::k053246_r )
-{
-	if (m_objcha_line == ASSERT_LINE)
-	{
-		int addr;
-
-		addr = (m_kx46_regs[6] << 17) | (m_kx46_regs[7] << 9) | (m_kx46_regs[4] << 1) | ((offset & 1) ^ 1);
-		addr &= space.machine().root_device().memregion(m_memory_region)->bytes() - 1;
-//      if (VERBOSE)
-//          popmessage("%04x: offset %02x addr %06x", space.device().safe_pc(), offset, addr);
-		return space.machine().root_device().memregion(m_memory_region)->base()[addr];
-	}
-	else
-	{
-//      LOG(("%04x: read from unknown 053246 address %x\n", space.device().safe_pc(), offset));
-		return 0;
-	}
-}
-
-WRITE8_MEMBER( k053247_device::k053246_w )
-{
-	m_kx46_regs[offset] = data;
-}
-
-READ16_MEMBER( k053247_device::k053246_word_r )
-{
-	offset <<= 1;
-	return k053246_r( space, offset + 1) | (k053246_r( space, offset) << 8);
-}
-
-WRITE16_MEMBER( k053247_device::k053246_word_w )
-{
-	if (ACCESSING_BITS_8_15)
-		k053246_w( space, offset << 1,(data >> 8) & 0xff);
-	if (ACCESSING_BITS_0_7)
-		k053246_w( space, (offset << 1) + 1,data & 0xff);
-}
-
-void k053247_device::k053246_set_objcha_line( int state )
-{
-	m_objcha_line = state;
-}
-
-int k053247_device::k053246_is_irq_enabled( void )
-{
-	// This bit enables obj DMA rather than obj IRQ even though the two functions usually coincide.
-	return m_kx46_regs[5] & 0x10;
-}
-
-/*
- * Sprite Format
- * ------------------
- *
- * Word | Bit(s)           | Use
- * -----+-fedcba9876543210-+----------------
- *   0  | x--------------- | active (show this sprite)
- *   0  | -x-------------- | maintain aspect ratio (when set, zoom y acts on both axis)
- *   0  | --x------------- | flip y
- *   0  | ---x------------ | flip x
- *   0  | ----xxxx-------- | sprite size (see below)
- *   0  | --------xxxxxxxx | zcode
- *   1  | xxxxxxxxxxxxxxxx | sprite code
- *   2  | ------xxxxxxxxxx | y position
- *   3  | ------xxxxxxxxxx | x position
- *   4  | xxxxxxxxxxxxxxxx | zoom y (0x40 = normal, <0x40 = enlarge, >0x40 = reduce)
- *   5  | xxxxxxxxxxxxxxxx | zoom x (0x40 = normal, <0x40 = enlarge, >0x40 = reduce)
- *   6  | x--------------- | mirror y (top half is drawn as mirror image of the bottom)
- *   6  | -x-------------- | mirror x (right half is drawn as mirror image of the left)
- *   6  | --xx------------ | reserved (sprites with these two bits set don't seem to be graphics data at all)
- *   6  | ----xx---------- | shadow code: 0=off, 0x400=preset1, 0x800=preset2, 0xc00=preset3
- *   6  | ------xx-------- | effect code: flicker, upper palette, full shadow...etc. (game dependent)
- *   6  | --------xxxxxxxx | "color", but depends on external connections (implies priority)
- *   7  | xxxxxxxxxxxxxxxx | game dependent
- *
- * shadow enables transparent shadows. Note that it applies to the last sprite pen ONLY.
- * The rest of the sprite remains normal.
- */
-
-template<class _BitmapClass>
-void k053247_device::k053247_sprites_draw_common( _BitmapClass &bitmap, const rectangle &cliprect )
-{
-#define NUM_SPRITES 256
-
-
-	int code, color, x, y, shadow, shdmask, count, temp, primask;
-
-	int sortedlist[NUM_SPRITES];
-	int offs,zcode;
-
-
-
-
-	uint8_t drawmode_table[256];
-	uint8_t shadowmode_table[256];
-
-
-	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
-	drawmode_table[0] = DRAWMODE_NONE;
-	memset(shadowmode_table, DRAWMODE_SHADOW, sizeof(shadowmode_table));
-	shadowmode_table[0] = DRAWMODE_NONE;
-
-	/*
-	    safeguard older drivers missing any of the following video attributes:
-
-	    VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS
-	*/
-	if (palette().shadows_enabled())
-	{
-		if (sizeof(typename _BitmapClass::pixel_t) == 4 && (palette().hilights_enabled()))
-			shdmask = 3; // enable all shadows and highlights
-		else
-			shdmask = 0; // enable default shadows
-	}
-	else
-		shdmask = -1; // disable everything
-
-	/*
-	    The k053247 does not draw pixels on top of those with equal or smaller Z-values
-	    regardless of priority. Embedded shadows inherit Z-values from their host sprites
-	    but do not assume host priorities unless explicitly told. In other words shadows
-	    can have priorities different from that of normal pens in the same sprite,
-	    in addition to the ability of masking themselves from specific layers or pixels
-	    on the other sprites.
-
-	    In front-to-back rendering, sprites cannot sandwich between alpha blended layers
-	    or the draw code will have to figure out the percentage opacities of what is on
-	    top and beneath each sprite pixel and blend the target accordingly. The process
-	    is overly demanding for realtime software and is thus another shortcoming of
-	    pdrawgfx and pixel based mixers. Even mahjong games with straight forward video
-	    subsystems are feeling the impact by which the girls cannot appear under
-	    translucent dialogue boxes.
-
-	    These are a small part of the k053247's feature set but many games expect them
-	    to be the minimum compliances. The specification will undoubtedly require
-	    redesigning the priority system from the ground up. Drawgfx.c and tilemap.c must
-	    also undergo heavy facelifts but in the end the changes could hurt simpler games
-	    more than they help complex systems; therefore the new engine should remain
-	    completely stand alone and self-contained. Implementation details are being
-	    hammered down but too early to make propositions.
-	*/
-
-	// Prebuild a sorted table by descending Z-order.
-	zcode = m_z_rejection;
-	offs = count = 0;
-
-	if (zcode == -1)
-	{
-		for (; offs < 0x800; offs += 8)
-			if (m_ram[offs] & 0x8000)
-				sortedlist[count++] = offs;
-	}
-	else
-	{
-		for (; offs < 0x800; offs += 8)
-			if ((m_ram[offs] & 0x8000) && ((m_ram[offs] & 0xff) != zcode))
-				sortedlist[count++] = offs;
-	}
-
-	int w = count;
-	count--;
-	int h = count;
-
-	if (!(m_kx47_regs[0xc / 2] & 0x10))
-	{
-		// sort objects in decending order(smaller z closer) when OPSET PRI is clear
-		for (y = 0; y < h; y++)
-		{
-			offs = sortedlist[y];
-			zcode = m_ram[offs] & 0xff;
-			for (x = y + 1; x < w; x++)
-			{
-				temp = sortedlist[x];
-				code = m_ram[temp] & 0xff;
-				if (zcode <= code)
-				{
-					zcode = code;
-					sortedlist[x] = offs;
-					sortedlist[y] = offs = temp;
-				}
-			}
-		}
-	}
-	else
-	{
-		// sort objects in ascending order(bigger z closer) when OPSET PRI is set
-		for (y = 0; y < h; y++)
-		{
-			offs = sortedlist[y];
-			zcode = m_ram[offs] & 0xff;
-			for (x = y + 1; x < w; x++)
-			{
-				temp = sortedlist[x];
-				code = m_ram[temp] & 0xff;
-				if (zcode >= code)
-				{
-					zcode = code;
-					sortedlist[x] = offs;
-					sortedlist[y] = offs = temp;
-				}
-			}
-		}
-	}
-
-	for (; count >= 0; count--)
-	{
-		offs = sortedlist[count];
-
-		code = m_ram[offs + 1];
-		shadow = color = m_ram[offs + 6];
-		primask = 0;
-
-		m_k053247_cb(&code, &color, &primask);
-
-		k053247_draw_single_sprite_gxcore( bitmap, cliprect,
-				nullptr, nullptr,
-				code, m_ram.get(), offs,
-				color,
-				/* gx only */
-				0, 0, 0, 0,
-				/* non-gx only */
-				primask,shadow,drawmode_table,shadowmode_table,shdmask
-				);
-
-
-
-	} // end of sprite-list loop
-#undef NUM_SPRITES
-}
-
-void k053247_device::k053247_sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect )
-{ k053247_sprites_draw_common( bitmap, cliprect); }
-
-void k053247_device::k053247_sprites_draw( bitmap_rgb32 &bitmap, const rectangle &cliprect )
-{ k053247_sprites_draw_common( bitmap, cliprect); }
-
-
-
-/*
-    Parameter Notes
-    ---------------
-    clip    : *caller must supply a pointer to target clip rectangle
-    alpha   : 0 = invisible, 255 = solid
-    drawmode:
-        0 = all pens solid
-        1 = solid pens only
-        2 = all pens solid with alpha blending
-        3 = solid pens only with alpha blending
-        4 = shadow pens only
-        5 = all pens shadow
-    zcode   : 0 = closest, 255 = furthest (pixel z-depth), -1 = disable depth buffers and shadows
-    pri     : 0 = topmost, 255 = backmost (pixel priority)
-*/
-
-void k053247_device::zdrawgfxzoom32GP(
-		bitmap_rgb32 &bitmap, const rectangle &cliprect,
-		uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy,
-		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, uint8_t* gx_objzbuf, uint8_t* gx_shdzbuf)
-{
-#define FP     19
-#define FPONE  (1<<FP)
-#define FPHALF (1<<(FP-1))
-#define FPENT  0
-
-	// inner loop
-	const uint8_t  *src_ptr;
-	int src_x;
-	int eax, ecx;
-	int src_fx, src_fdx;
-	int shdpen;
-	uint8_t  z8 = 0, p8 = 0;
-	uint8_t  *ozbuf_ptr;
-	uint8_t  *szbuf_ptr;
-	const pen_t *pal_base;
-	const pen_t *shd_base;
-	uint32_t *dst_ptr;
-
-	// outter loop
-	int src_fby, src_fdy, src_fbx;
-	const uint8_t *src_base;
-	int dst_w, dst_h;
-
-	// one-time
-	int nozoom, granularity;
-	int src_fw, src_fh;
-	int dst_minx, dst_maxx, dst_miny, dst_maxy;
-	int dst_skipx, dst_skipy, dst_x, dst_y, dst_lastx, dst_lasty;
-	int src_pitch, dst_pitch;
-
-
-	// cull illegal and transparent objects
-	if (!scalex || !scaley) return;
-
-	// find shadow pens and cull invisible shadows
-	granularity = shdpen = m_gfx->granularity();
-	shdpen--;
-
-	if (zcode >= 0)
-	{
-		if (drawmode == 5) { drawmode = 4; shdpen = 1; }
-	}
-	else
-		if (drawmode >= 4) return;
-
-	// alpha blend necessary?
-	if (drawmode & 2)
-	{
-		if (alpha <= 0) return;
-		if (alpha >= 255) drawmode &= ~2;
-	}
-
-	// fill internal data structure with default values
-	ozbuf_ptr  = gx_objzbuf;
-	szbuf_ptr  = gx_shdzbuf;
-
-	src_pitch = 16;
-	src_fw    = 16;
-	src_fh    = 16;
-	src_base  = m_gfx->get_data(code % m_gfx->elements());
-
-	pal_base  = palette().pens() + m_gfx->colorbase() + (color % m_gfx->colors()) * granularity;
-	shd_base  = palette().shadow_table();
-
-	dst_ptr   = &bitmap.pix32(0);
-	dst_pitch = bitmap.rowpixels();
-	dst_minx  = cliprect.min_x;
-	dst_maxx  = cliprect.max_x;
-	dst_miny  = cliprect.min_y;
-	dst_maxy  = cliprect.max_y;
-	dst_x     = sx;
-	dst_y     = sy;
-
-	// cull off-screen objects
-	if (dst_x > dst_maxx || dst_y > dst_maxy) return;
-	nozoom = (scalex == 0x10000 && scaley == 0x10000);
-	if (nozoom)
-	{
-		dst_h = dst_w = 16;
-		src_fdy = src_fdx = 1;
-	}
-	else
-	{
-		dst_w = ((scalex<<4)+0x8000)>>16;
-		dst_h = ((scaley<<4)+0x8000)>>16;
-		if (!dst_w || !dst_h) return;
-
-		src_fw <<= FP;
-		src_fh <<= FP;
-		src_fdx = src_fw / dst_w;
-		src_fdy = src_fh / dst_h;
-	}
-	dst_lastx = dst_x + dst_w - 1;
-	if (dst_lastx < dst_minx) return;
-	dst_lasty = dst_y + dst_h - 1;
-	if (dst_lasty < dst_miny) return;
-
-	// clip destination
-	dst_skipx = 0;
-	eax = dst_minx;  if ((eax -= dst_x) > 0) { dst_skipx = eax;  dst_w -= eax;  dst_x = dst_minx; }
-	eax = dst_lastx; if ((eax -= dst_maxx) > 0) dst_w -= eax;
-	dst_skipy = 0;
-	eax = dst_miny;  if ((eax -= dst_y) > 0) { dst_skipy = eax;  dst_h -= eax;  dst_y = dst_miny; }
-	eax = dst_lasty; if ((eax -= dst_maxy) > 0) dst_h -= eax;
-
-	// calculate zoom factors and clip source
-	if (nozoom)
-	{
-		if (!flipx) src_fbx = 0; else { src_fbx = src_fw - 1; src_fdx = -src_fdx; }
-		if (!flipy) src_fby = 0; else { src_fby = src_fh - 1; src_fdy = -src_fdy; src_pitch = -src_pitch; }
-	}
-	else
-	{
-		if (!flipx) src_fbx = FPENT; else { src_fbx = src_fw - FPENT - 1; src_fdx = -src_fdx; }
-		if (!flipy) src_fby = FPENT; else { src_fby = src_fh - FPENT - 1; src_fdy = -src_fdy; }
-	}
-	src_fbx += dst_skipx * src_fdx;
-	src_fby += dst_skipy * src_fdy;
-
-	// adjust insertion points and pre-entry constants
-	eax = (dst_y - dst_miny) * GX_ZBUFW + (dst_x - dst_minx) + dst_w;
-	z8 = (uint8_t)zcode;
-	p8 = (uint8_t)pri;
-	ozbuf_ptr += eax;
-	szbuf_ptr += eax << 1;
-	dst_ptr += dst_y * dst_pitch + dst_x + dst_w;
-	dst_w = -dst_w;
-
-	if (!nozoom)
-	{
-		ecx = src_fby;   src_fby += src_fdy;
-		ecx >>= FP;      src_fx = src_fbx;
-		src_x = src_fbx; src_fx += src_fdx;
-		ecx <<= 4;       src_ptr = src_base;
-		src_x >>= FP;    src_ptr += ecx;
-		ecx = dst_w;
-
-		if (zcode < 0) // no shadow and z-buffering
-		{
-			do {
-				do {
-					eax = src_ptr[src_x];
-					src_x = src_fx;
-					src_fx += src_fdx;
-					src_x >>= FP;
-					if (!eax || eax >= shdpen) continue;
-					dst_ptr [ecx] = pal_base[eax];
-				}
-				while (++ecx);
-
-				ecx = src_fby;   src_fby += src_fdy;
-				dst_ptr += dst_pitch;
-				ecx >>= FP;      src_fx = src_fbx;
-				src_x = src_fbx; src_fx += src_fdx;
-				ecx <<= 4;       src_ptr = src_base;
-				src_x >>= FP;    src_ptr += ecx;
-				ecx = dst_w;
-			}
-			while (--dst_h);
-		}
-		else
-		{
-			switch (drawmode)
-			{
-				case 0: // all pens solid
-					do {
-						do {
-							eax = src_ptr[src_x];
-							src_x = src_fx;
-							src_fx += src_fdx;
-							src_x >>= FP;
-							if (!eax || ozbuf_ptr[ecx] < z8) continue;
-							eax = pal_base[eax];
-							ozbuf_ptr[ecx] = z8;
-							dst_ptr [ecx] = eax;
-						}
-						while (++ecx);
-
-						ecx = src_fby;   src_fby += src_fdy;
-						ozbuf_ptr += GX_ZBUFW;
-						dst_ptr += dst_pitch;
-						ecx >>= FP;      src_fx = src_fbx;
-						src_x = src_fbx; src_fx += src_fdx;
-						ecx <<= 4;       src_ptr = src_base;
-						src_x >>= FP;    src_ptr += ecx;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-
-				case 1: // solid pens only
-					do {
-						do {
-							eax = src_ptr[src_x];
-							src_x = src_fx;
-							src_fx += src_fdx;
-							src_x >>= FP;
-							if (!eax || eax >= shdpen || ozbuf_ptr[ecx] < z8) continue;
-							eax = pal_base[eax];
-							ozbuf_ptr[ecx] = z8;
-							dst_ptr [ecx] = eax;
-						}
-						while (++ecx);
-
-						ecx = src_fby;   src_fby += src_fdy;
-						ozbuf_ptr += GX_ZBUFW;
-						dst_ptr += dst_pitch;
-						ecx >>= FP;      src_fx = src_fbx;
-						src_x = src_fbx; src_fx += src_fdx;
-						ecx <<= 4;       src_ptr = src_base;
-						src_x >>= FP;    src_ptr += ecx;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-
-				case 2: // all pens solid with alpha blending
-					do {
-						do {
-							eax = src_ptr[src_x];
-							src_x = src_fx;
-							src_fx += src_fdx;
-							src_x >>= FP;
-							if (!eax || ozbuf_ptr[ecx] < z8) continue;
-							ozbuf_ptr[ecx] = z8;
-
-							dst_ptr[ecx] = alpha_blend_r32(pal_base[eax], dst_ptr[ecx], alpha);
-						}
-						while (++ecx);
-
-						ecx = src_fby;   src_fby += src_fdy;
-						ozbuf_ptr += GX_ZBUFW;
-						dst_ptr += dst_pitch;
-						ecx >>= FP;      src_fx = src_fbx;
-						src_x = src_fbx; src_fx += src_fdx;
-						ecx <<= 4;       src_ptr = src_base;
-						src_x >>= FP;    src_ptr += ecx;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-
-				case 3: // solid pens only with alpha blending
-					do {
-						do {
-							eax = src_ptr[src_x];
-							src_x = src_fx;
-							src_fx += src_fdx;
-							src_x >>= FP;
-							if (!eax || eax >= shdpen || ozbuf_ptr[ecx] < z8) continue;
-							ozbuf_ptr[ecx] = z8;
-
-							dst_ptr[ecx] = alpha_blend_r32(pal_base[eax], dst_ptr[ecx], alpha);
-						}
-						while (++ecx);
-
-						ecx = src_fby;   src_fby += src_fdy;
-						ozbuf_ptr += GX_ZBUFW;
-						dst_ptr += dst_pitch;
-						ecx >>= FP;      src_fx = src_fbx;
-						src_x = src_fbx; src_fx += src_fdx;
-						ecx <<= 4;       src_ptr = src_base;
-						src_x >>= FP;    src_ptr += ecx;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-
-				case 4: // shadow pens only
-					do {
-						do {
-							eax = src_ptr[src_x];
-							src_x = src_fx;
-							src_fx += src_fdx;
-							src_x >>= FP;
-							if (eax < shdpen || szbuf_ptr[ecx*2] < z8 || szbuf_ptr[ecx*2+1] <= p8) continue;
-							rgb_t pix = dst_ptr[ecx];
-							szbuf_ptr[ecx*2] = z8;
-							szbuf_ptr[ecx*2+1] = p8;
-
-							// the shadow tables are 15-bit lookup tables which accept RGB15... lossy, nasty, yuck!
-							dst_ptr[ecx] = shd_base[pix.as_rgb15()];
-							//dst_ptr[ecx] =(eax>>3&0x001f);lend_r32( eax, 0x00000000, 128);
-						}
-						while (++ecx);
-
-						ecx = src_fby;   src_fby += src_fdy;
-						szbuf_ptr += (GX_ZBUFW<<1);
-						dst_ptr += dst_pitch;
-						ecx >>= FP;      src_fx = src_fbx;
-						src_x = src_fbx; src_fx += src_fdx;
-						ecx <<= 4;       src_ptr = src_base;
-						src_x >>= FP;    src_ptr += ecx;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-			}   // switch (drawmode)
-		}   // if (zcode < 0)
-	}   // if (!nozoom)
-	else
-	{
-		src_ptr = src_base + (src_fby<<4) + src_fbx;
-		src_fdy = src_fdx * dst_w + src_pitch;
-		ecx = dst_w;
-
-		if (zcode < 0) // no shadow and z-buffering
-		{
-			do {
-				do {
-					eax = *src_ptr;
-					src_ptr += src_fdx;
-					if (!eax || eax >= shdpen) continue;
-					dst_ptr[ecx] = pal_base[eax];
-				}
-				while (++ecx);
-
-				src_ptr += src_fdy;
-				dst_ptr += dst_pitch;
-				ecx = dst_w;
-			}
-			while (--dst_h);
-		}
-		else
-		{
-			switch (drawmode)
-			{
-				case 0: // all pens solid
-					do {
-						do {
-							eax = *src_ptr;
-							src_ptr += src_fdx;
-							if (!eax || ozbuf_ptr[ecx] < z8) continue;
-							eax = pal_base[eax];
-							ozbuf_ptr[ecx] = z8;
-							dst_ptr[ecx] = eax;
-						}
-						while (++ecx);
-
-						src_ptr += src_fdy;
-						ozbuf_ptr += GX_ZBUFW;
-						dst_ptr += dst_pitch;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-
-				case 1:  // solid pens only
-					do {
-						do {
-							eax = *src_ptr;
-							src_ptr += src_fdx;
-							if (!eax || eax >= shdpen || ozbuf_ptr[ecx] < z8) continue;
-							eax = pal_base[eax];
-							ozbuf_ptr[ecx] = z8;
-							dst_ptr[ecx] = eax;
-						}
-						while (++ecx);
-
-						src_ptr += src_fdy;
-						ozbuf_ptr += GX_ZBUFW;
-						dst_ptr += dst_pitch;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-
-				case 2: // all pens solid with alpha blending
-					do {
-						do {
-							eax = *src_ptr;
-							src_ptr += src_fdx;
-							if (!eax || ozbuf_ptr[ecx] < z8) continue;
-							ozbuf_ptr[ecx] = z8;
-
-							dst_ptr[ecx] = alpha_blend_r32(pal_base[eax], dst_ptr[ecx], alpha);
-						}
-						while (++ecx);
-
-						src_ptr += src_fdy;
-						ozbuf_ptr += GX_ZBUFW;
-						dst_ptr += dst_pitch;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-
-				case 3: // solid pens only with alpha blending
-					do {
-						do {
-							eax = *src_ptr;
-							src_ptr += src_fdx;
-							if (!eax || eax >= shdpen || ozbuf_ptr[ecx] < z8) continue;
-							ozbuf_ptr[ecx] = z8;
-
-							dst_ptr[ecx] = alpha_blend_r32(pal_base[eax], dst_ptr[ecx], alpha);
-						}
-						while (++ecx);
-
-						src_ptr += src_fdy;
-						ozbuf_ptr += GX_ZBUFW;
-						dst_ptr += dst_pitch;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-
-				case 4: // shadow pens only
-					do {
-						do {
-							eax = *src_ptr;
-							src_ptr += src_fdx;
-							if (eax < shdpen || szbuf_ptr[ecx*2] < z8 || szbuf_ptr[ecx*2+1] <= p8) continue;
-							rgb_t pix = dst_ptr[ecx];
-							szbuf_ptr[ecx*2] = z8;
-							szbuf_ptr[ecx*2+1] = p8;
-
-							// the shadow tables are 15-bit lookup tables which accept RGB15... lossy, nasty, yuck!
-							dst_ptr[ecx] = shd_base[pix.as_rgb15()];
-						}
-						while (++ecx);
-
-						src_ptr += src_fdy;
-						szbuf_ptr += (GX_ZBUFW<<1);
-						dst_ptr += dst_pitch;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-			}
-		}
-	}
-#undef FP
-#undef FPONE
-#undef FPHALF
-#undef FPENT
-}
-
-
-
-void k053247_device::zdrawgfxzoom32GP(
-		bitmap_ind16 &bitmap, const rectangle &cliprect,
-		uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy,
-		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, uint8_t* gx_objzbuf, uint8_t* gx_shdzbuf)
-{
-	fatalerror("no zdrawgfxzoom32GP for bitmap_ind16\n");
-}
-
-
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-
-
-
-const device_type K055673 = device_creator<k055673_device>;
-
-k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: k053247_device(mconfig, K055673, "K053246 & K055673 Sprite Generator", tag, owner, clock, "k055673", __FILE__)
-{
-}
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void k055673_device::device_start()
-{
-	int gfx_index = 0;
-	uint32_t total;
-
-	static const gfx_layout spritelayout =  /* System GX sprite layout */
-	{
-		16,16,
-		0,
-		5,
-		{ 32, 24, 16, 8, 0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7, 40, 41, 42, 43, 44, 45, 46, 47 },
-		{ 0, 10*8, 10*8*2, 10*8*3, 10*8*4, 10*8*5, 10*8*6, 10*8*7, 10*8*8,
-			10*8*9, 10*8*10, 10*8*11, 10*8*12, 10*8*13, 10*8*14, 10*8*15 },
-		16*16*5
-	};
-	static const gfx_layout spritelayout2 = /* Run and Gun sprite layout */
-	{
-		16,16,
-		0,
-		4,
-		{ 24, 16, 8, 0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7, 32, 33, 34, 35, 36, 37, 38, 39 },
-		{ 0, 64, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960 },
-		16*16*4
-	};
-	static const gfx_layout spritelayout3 = /* Lethal Enforcers II sprite layout */
-	{
-		16,16,
-		0,
-		8,
-		{ 56, 48, 40, 32, 24, 16, 8, 0 },
-		{  0,1,2,3,4,5,6,7,64+0,64+1,64+2,64+3,64+4,64+5,64+6,64+7 },
-		{ 128*0, 128*1, 128*2,  128*3,  128*4,  128*5,  128*6,  128*7,
-			128*8, 128*9, 128*10, 128*11, 128*12, 128*13, 128*14, 128*15 },
-		16*16*8
-	};
-	static const gfx_layout spritelayout4 = /* System GX 6bpp sprite layout */
-	{
-		16,16,
-		0,
-		6,
-		{ 40, 32, 24, 16, 8, 0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7, 48, 49, 50, 51, 52, 53, 54, 55 },
-		{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7, 12*8*8,
-			12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
-		16*16*6
-	};
-	uint8_t *s1, *s2, *d;
-	long i;
-	uint16_t *alt_k055673_rom;
-	int size4;
-
-	alt_k055673_rom = (uint16_t *)machine().root_device().memregion(m_memory_region)->base();
-
-	/* decode the graphics */
-	switch (m_bpp)
-	{
-		case K055673_LAYOUT_GX:
-			size4 = (machine().root_device().memregion(m_memory_region)->bytes()/(1024*1024))/5;
-			size4 *= 4*1024*1024;
-			/* set the # of tiles based on the 4bpp section */
-			alt_k055673_rom = auto_alloc_array(machine(), uint16_t, size4 * 5 / 2);
-			d = (uint8_t *)alt_k055673_rom;
-			// now combine the graphics together to form 5bpp
-			s1 = machine().root_device().memregion(m_memory_region)->base(); // 4bpp area
-			s2 = s1 + (size4);   // 1bpp area
-			for (i = 0; i < size4; i+= 4)
-			{
-				*d++ = *s1++;
-				*d++ = *s1++;
-				*d++ = *s1++;
-				*d++ = *s1++;
-				*d++ = *s2++;
-			}
-
-			total = size4 / 128;
-			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout, 5);
-			break;
-
-		case K055673_LAYOUT_RNG:
-			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16/2);
-			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout2, 4);
-			break;
-
-		case K055673_LAYOUT_LE2:
-			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16);
-			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout3, 8);
-			break;
-
-		case K055673_LAYOUT_GX6:
-			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16*6/8);
-			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout4, 6);
-			break;
-
-		default:
-			fatalerror("Unsupported layout\n");
-	}
-
-	if (VERBOSE && !(palette().shadows_enabled()))
-		popmessage("driver should use VIDEO_HAS_SHADOWS");
-
-	m_z_rejection = -1;
-	m_gfx = gfx(gfx_index);
-	m_objcha_line = CLEAR_LINE;
-	m_ram = std::make_unique<uint16_t[]>(0x1000/2);
-
-	memset(m_ram.get(),  0, 0x1000);
-	memset(m_kx46_regs, 0, 8);
-	memset(m_kx47_regs, 0, 32);
-
-	save_pointer(NAME(m_ram.get()), 0x800);
-	save_item(NAME(m_kx46_regs));
-	save_item(NAME(m_kx47_regs));
-	save_item(NAME(m_objcha_line));
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-
-
-const device_type K053246 = device_creator<k053247_device>;
-
-k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K053246, "K053246 & K053247 Sprite Generator", tag, owner, clock, "k053247", __FILE__),
-		device_video_interface(mconfig, *this),
-		device_gfx_interface(mconfig, *this),
-		m_gfx_num(0)
-{
-	clear_all();
-}
-
-k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+k053246_055673_device::k053246_055673_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this),
-		device_gfx_interface(mconfig, *this, nullptr),
-		m_gfx_num(0)
+	  device_gfx_interface(mconfig, *this),
+	  m_dmairq_cb(*this),
+	  m_dmaact_cb(*this),
+	  m_region(*this, DEVICE_SELF)
 {
-	clear_all();
+	m_is_053247 = false;
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void k053247_device::device_start()
+void k053246_055673_device::set_info(const char *palette_tag, const char *spriteram_tag)
 {
-	uint32_t total;
-	static const gfx_layout spritelayout =
-	{
-		16,16,
-		0,
-		4,
-		{ 0, 1, 2, 3 },
-		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4,
-				10*4, 11*4, 8*4, 9*4, 14*4, 15*4, 12*4, 13*4 },
-		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-				8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-		128*8
-	};
+	static_set_palette(*this, palette_tag);
+	m_spriteram_tag = spriteram_tag;
+}
 
-	/* decode the graphics */
-	switch (m_bpp)
-	{
-	case NORMAL_PLANE_ORDER:
-		total = machine().root_device().memregion(m_memory_region)->bytes() / 128;
-		konami_decode_gfx(*this, m_gfx_num, machine().root_device().memregion(m_memory_region)->base(), total, &spritelayout, 4);
+void k053246_055673_device::set_wiring_cb(wiring_delegate cb)
+{
+	m_wiring_cb = cb;
+}
+
+void k053246_055673_device::device_start()
+{
+	m_dmaact_cb.resolve_safe();
+	m_dmairq_cb.resolve_safe();
+
+	// Can't use a required_* because the pointer type varies
+	m_spriteram = owner()->memshare(m_spriteram_tag);
+	if(!m_spriteram)
+		fatalerror("Spriteram shared memory '%s' does not exist\n", m_spriteram_tag);
+	if(m_spriteram->bytewidth() > 4)
+		fatalerror("Spriteram shared memory '%s' byte width is %d, which is too large\n", m_spriteram_tag, m_spriteram->bytewidth());
+
+	m_timer_objdma = timer_alloc(0);
+
+	save_item(NAME(m_timer_objdma_state));
+	save_item(NAME(m_sram));
+	save_item(NAME(m_ocha));
+	save_item(NAME(m_hscr));
+	save_item(NAME(m_vscr));
+	save_item(NAME(m_atrbk));
+	save_item(NAME(m_vrcbk));
+	save_item(NAME(m_oms));
+	save_item(NAME(m_coreg));
+	save_item(NAME(m_opset));
+	save_item(NAME(m_dmairq_on));
+}
+
+void k053246_055673_device::device_reset()
+{
+	m_ocha = 0;
+	m_hscr = 0;
+	m_vscr = 0;
+	memset(m_atrbk, 0, sizeof(m_atrbk));
+	memset(m_vrcbk, 0, sizeof(m_vrcbk));
+	m_oms = 0;
+	m_coreg = 0;
+	m_opset = 0;
+	m_dmairq_on = false;
+
+	m_timer_objdma_state = OD_IDLE;
+	m_timer_objdma->adjust(attotime::never);
+
+	decode_sprite_roms();
+}
+
+void k053246_055673_device::device_post_load()
+{
+	decode_sprite_roms();
+}
+
+void k053246_055673_device::set_objcha(bool active)
+{
+}
+
+WRITE16_MEMBER(k053246_055673_device::hscr_w)
+{
+	uint16_t old = m_hscr;
+	COMBINE_DATA(&m_hscr);
+	if(m_hscr != old) {
+		logerror("hscr_w %04x\n", m_hscr);
+		logerror("TIMINGS OH %4d %03x\n", m_hscr & 0x3ff, m_hscr & 0x3ff);
+	}
+}
+
+WRITE16_MEMBER(k053246_055673_device::vscr_w)
+{
+	uint16_t old = m_vscr;
+	COMBINE_DATA(&m_vscr);
+	if(m_vscr != old) {
+		logerror("vscr_w %04x\n", m_vscr);
+		logerror("TIMINGS OV %4d %03x\n", m_vscr & 0x3ff, m_vscr & 0x3ff);
+	}
+}
+
+WRITE16_MEMBER(k053246_055673_device::oms_w)
+{
+	if(ACCESSING_BITS_8_15 && (data >> 8) != (m_ocha & 0xff))
+		m_ocha = (m_ocha & 0xffff00) | (data >> 8);
+
+	if(ACCESSING_BITS_0_7 && (data & 0x3f) != (m_oms & 0x3f)) {
+		uint8_t diff = (data ^ m_oms) & 0x2f;
+		m_oms = data & 0x3f;
+		if(!(m_oms & 0x10) && m_dmairq_on) {
+			m_dmairq_on = false;
+			m_dmairq_cb(CLEAR_LINE);
+		}
+
+		if(diff)
+			logerror("oms_w sd0en=%s dma=%s res=%s mode=%d flip=%c%c\n",
+					 m_oms & 0x20 ? "normal" : "shadow",
+					 m_oms & 0x10 ? "on" : "off",
+					 m_oms & 0x08 ? "high" : "normal",
+					 m_oms & 0x04 ? 16 : 8,
+					 m_oms & 0x02 ? 'y' : '-',
+					 m_oms & 0x01 ? 'x' : '-');
+	}
+}
+
+WRITE16_MEMBER(k053246_055673_device::ocha_w)
+{
+	m_ocha = (m_ocha & 0x0000ff) | ((data << 8) & 0xffff00);
+}
+
+WRITE16_MEMBER(k053246_055673_device::atrbk_w)
+{
+	if(m_atrbk[offset] != (data & 0xfff)) {
+		m_atrbk[offset] = data & 0xfff;
+		logerror("atrbk_w %d wr=%s trans=0-%x mix=%c%c bri=%c%c\n",
+				 offset,
+				 m_atrbk[offset] & 0x800 ? "on" : "off",
+				 0x7f >> (((~data) >> 8) & 7),
+				 m_atrbk[offset] & 0x040 ? '0' : m_atrbk[offset] & 0x080 ? 'c' : m_atrbk[offset] & 0x020 ? '1' : '0',
+				 m_atrbk[offset] & 0x080 ? 'c' : m_atrbk[offset] & 0x010 ? '1' : '0',
+				 m_atrbk[offset] & 0x004 ? '0' : m_atrbk[offset] & 0x008 ? 'c' : m_atrbk[offset] & 0x002 ? '1' : '0',
+				 m_atrbk[offset] & 0x008 ? 'c' : m_atrbk[offset] & 0x001 ? '1' : '0');
+
+	}
+}
+
+WRITE16_MEMBER(k053246_055673_device::vrcbk_w)
+{
+	if(ACCESSING_BITS_8_15 && m_vrcbk[offset*2+1] != ((data >> 8) & 0xf)) {
+		m_vrcbk[offset*2+1] = (data >> 8) & 0x0f;
+		logerror("vrcbk[%d] = %x\n", offset*2+1, m_vrcbk[offset*2+1]);
+	}
+
+	if(ACCESSING_BITS_0_7 && m_vrcbk[offset*2] != (data & 0xf)) {
+		m_vrcbk[offset*2] = data & 0x0f;
+		logerror("vrcbk[%d] = %x\n", offset*2, m_vrcbk[offset*2]);
+	}
+}
+
+WRITE16_MEMBER(k053246_055673_device::opset_w)
+{
+	if(ACCESSING_BITS_8_15 && m_coreg != ((data >> 8) & 0xf)) {
+		m_coreg = (data >> 8) & 0xf;
+		logerror("coreg_w %x\n", m_coreg);
+	}
+	if(ACCESSING_BITS_0_7 && m_opset != (data & 0xff)) {
+		static int bpp[8] = { 4, 5, 6, 7, 8, 8, 8, 8 };
+		m_opset = data;
+		decode_sprite_roms();
+		logerror("opset_w rom=%s wrap=%d sdsel=%s pri=%s objwr=%s bpp=%d\n",
+				 m_opset & 0x80 ? "readback" : "normal",
+				 m_opset & 0x40 ? 512 : 1024,
+				 m_opset & 0x20 ? "pri" : "nopri",
+				 m_opset & 0x10 ? "higher" : "lower",
+				 m_opset & 0x08 ? "invert" : "normal",
+				 bpp[m_opset & 7]);
+	}
+}
+
+READ8_MEMBER(k053246_055673_device::rom8_r)
+{
+	uint32_t off = ((m_vrcbk[(m_ocha >> 20) & 3] << 22) | ((m_ocha & 0xffffc) << 2) | offset) & (m_region->bytes() - 1);
+	const uint8_t *rom = m_region->base() + (off^1);
+	return rom[0];
+}
+
+READ16_MEMBER(k053246_055673_device::rom16_r)
+{
+	uint32_t off = ((m_vrcbk[(m_ocha >> 20) & 3] << 22) | ((m_ocha & 0xffffc) << 2) | (offset << 1)) & (m_region->bytes() - 1);
+	const uint8_t *rom = m_region->base() + off;
+	return (rom[1] << 8) | rom[0];
+}
+
+READ32_MEMBER(k053246_055673_device::rom32_r)
+{
+	uint32_t off = ((m_vrcbk[(m_ocha >> 20) & 3] << 22) | ((m_ocha & 0xffffc) << 2) | (offset << 2)) & (m_region->bytes() - 1);
+	const uint8_t *rom = m_region->base() + off;
+	return (rom[1] << 24) | (rom[0] << 16) | (rom[3] << 8) | rom[2];
+}
+
+
+WRITE_LINE_MEMBER(k053246_055673_device::vblank_w)
+{
+	if(state) {
+		if(m_oms & 0x10) {
+			if(m_dmairq_on) {
+				m_dmairq_on = false;
+				m_dmairq_cb(CLEAR_LINE);
+			}
+			m_timer_objdma_state = OD_WAIT_START;
+			m_timer_objdma->adjust(attotime::from_ticks(256, clock()));
+		} else
+			memset(m_sram, 0, sizeof(m_sram));
+	}
+}
+
+void k053246_055673_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(m_timer_objdma_state) {
+	case OD_WAIT_START:
+		m_timer_objdma_state = OD_WAIT_END;
+		m_timer_objdma->adjust(attotime::from_ticks(2048, clock()));
+		m_dmaact_cb(ASSERT_LINE);
+		switch(m_spriteram->bytewidth()) {
+		case 1: {
+			const uint8_t *base = (const uint8_t *)m_spriteram->ptr();
+			for(uint32_t i=0; i<0x800; i++)
+				m_sram[i] = (base[2*i] << 8) | base[2*i+1];
+			break;
+		}
+		case 2: {
+			memcpy(m_sram, m_spriteram->ptr(), 0x1000);
+			break;
+		}
+		case 4: {
+			const uint32_t *base = (const uint32_t *)m_spriteram->ptr();
+			for(uint32_t i=0; i<0x800; i+=2) {
+				m_sram[i] = base[i>>1] >> 16;
+				m_sram[i+1] = base[i>>1];
+			}
+			break;
+		}
+		}
 		break;
 
-	default:
-		fatalerror("Unsupported plane_order\n");
+	case OD_WAIT_END:
+		m_timer_objdma_state = OD_IDLE;
+		m_timer_objdma->adjust(attotime::never);
+		m_dmaact_cb(CLEAR_LINE);
+		if((m_oms & 0x10) && !m_dmairq_on) {
+			m_dmairq_on = true;
+			m_dmairq_cb(ASSERT_LINE);
+		}
+		break;
+	}
+}
+
+void k053246_055673_device::generate_tile_layout(tile_layout *tl, int &tl_count, uint32_t minp, uint32_t maxp, int screen_center, int offset, int width_order, int zoom, const int *tile_id_steps, bool flip, bool mirror, bool gflip)
+{
+	tl_count = 0;
+	if(!zoom)
+		return;
+
+	if(gflip) {
+		screen_center = ~screen_center;
+		flip = !flip;
 	}
 
-	if (VERBOSE)
-	{
-		if (m_screen->format() == BITMAP_FORMAT_RGB32)
-		{
-			if (!palette().shadows_enabled() || !palette().hilights_enabled())
-				popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
-		}
-		else
-		{
-			if (!(palette().shadows_enabled()))
-				popmessage("driver should use VIDEO_HAS_SHADOWS");
-		}
+	screen_center += offset;
+
+	uint32_t pxor[2], tbase[2];
+	int32_t step[2];
+	uint32_t pxor_test = width_order ? 1 << (width_order-1) : 0;
+	uint32_t xor_mask = (1 << width_order) - 1;
+
+	if(mirror) {
+		pxor[0]  = 0;
+		pxor[1]  = xor_mask;
+		tbase[0] = 0;
+		tbase[1] = 0x3ff;
+		step[0]  = zoom;
+		step[1]  = -zoom;
+	} else if(flip) {
+		pxor[0]  = xor_mask;
+		pxor[1]  = xor_mask;
+		tbase[0] = 0x3ff;
+		tbase[1] = 0x3ff;
+		step[0]  = -zoom;
+		step[1]  = -zoom;
+	} else {
+		pxor[0]  = 0;
+		pxor[1]  = 0;
+		tbase[0] = 0;
+		tbase[1] = 0;
+		step[0]  = zoom;
+		step[1]  = zoom;
 	}
 
-	m_gfx = gfx(m_gfx_num);
+	if(false)
+		fprintf(stderr, "generate span=(%d %d) center=%d width=%d zoom=%d%s%s\n", minp, maxp, screen_center, 1<<(4+width_order), zoom, flip ? " (flipped)" : "", mirror ? " (mirrored)" : "");
 
-	m_ram = make_unique_clear<uint16_t[]>(0x1000 / 2);
+	// Assume the inverse table produces 10 bits, we'll see how it goes
+	uint32_t inverse = (1 << (10+10)) / zoom;
 
-	save_pointer(NAME(m_ram.get()), 0x1000 / 2);
-	save_item(NAME(m_kx46_regs));
-	save_item(NAME(m_kx47_regs));
-	save_item(NAME(m_objcha_line));
-	save_item(NAME(m_z_rejection));
+	// All computations are fixed-point, 6 bits as pixel fraction.
+	// Integer part size tends to be 10 bits.
+
+	// Wrap at 512 or 1024 according to the internal
+	// configuration.  We don't really know where zero is, but
+	// it's around there, where "there" is the end of hsync.
+	uint32_t wrap_mask = m_opset & 0x40 ? 0x7fff : 0xffff;
+
+	// Start at the left/top position (max width_order is 3), which is
+	// at half the sprite size.
+	uint32_t pos = ((screen_center << 6) - (inverse >> (5 - width_order))) & wrap_mask;
+
+	for(uint32_t tnum = 0; tnum != (1 << width_order); tnum++) {
+		// Advance by 16 sprite pixels
+		uint32_t npos = (pos + (inverse >> 4)) & wrap_mask;
+
+		// Compute integer screen positions
+		uint32_t pos1 = pos >> 6;
+		uint32_t npos1 = npos >> 6;
+
+		if(false)
+			fprintf(stderr, "* %d  %x %x -> %d %d\n", tnum, pos, npos, pos1, npos1);
+
+		// Only bother if not fully clipped and not reduced to zero pixels
+		if(((npos1 > pos1) && (npos1 > minp && pos1 <= maxp)) ||
+		   ((pos1 > npos1) && (npos1 > minp || pos1 <= maxp))) {
+			// Basics of the tile
+			int slot = (tnum & pxor_test) ? 1 : 0;
+			tl[tl_count].step = step[slot];
+			tl[tl_count].tileid_delta = tile_id_steps[tnum ^ pxor[slot]];
+
+			// Left clipping, if needed.  Probably done with hard
+			// clipping in the chip.
+			if(pos1 < minp || pos1 > maxp) {
+				tl[tl_count].sc_min = minp;
+				tl[tl_count].tile_min = tbase[slot] + step[slot] * ((minp - pos1) & 0x1ff);
+			} else {
+				tl[tl_count].sc_min = pos1;
+				tl[tl_count].tile_min = tbase[slot];
+			}
+
+			// Right clipping
+			if(npos1 > minp && npos1 <= maxp)
+				tl[tl_count].sc_max = npos1 - 1;
+			else
+				tl[tl_count].sc_max = maxp;
+
+			tl_count++;
+		}
+		pos = npos;
+	}
+	if(false) {
+		for(int i=0; i<tl_count; i++)
+			fprintf(stderr, " [(%d, %d) %x.%02x %d %d]", tl[i].sc_min, tl[i].sc_max, (tl[i].tile_min >> 6) & 7, tl[i].tile_min & 0x3f, tl[i].step, tl[i].tileid_delta);
+		fprintf(stderr, "\n");
+	}
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void k053247_device::device_reset()
+template<uint16_t mask> void k053246_055673_device::draw_tile_keep_shadow(bitmap_ind16 *bcolor, bitmap_ind16 *battr,
+																		  gfx_element *g, uint32_t tile_base_id,
+																		  const tile_layout &lx, const tile_layout &ly,
+																		  uint16_t attr, uint16_t palette, uint8_t trans_mask)
 {
-	m_z_rejection = -1;
-	m_objcha_line = CLEAR_LINE;
+	uint32_t tid = tile_base_id ^ lx.tileid_delta ^ ly.tileid_delta;
+	const uint8_t *data = g->get_data(tid);
+	uint32_t typ = ly.tile_min;
+	for(int y = ly.sc_min; y <= ly.sc_max; y++) {
+		const uint8_t *data1 = data + 16*(typ >> 6);		
+		uint16_t *bc = &bcolor->pix16(y, lx.sc_min);
+		uint16_t *ba = &battr ->pix16(y, lx.sc_min);
+		uint32_t txp = lx.tile_min;
+		for(int x = lx.sc_min; x <= lx.sc_max; x++) {
+			uint8_t col = data1[txp >> 6];
+			if(col & trans_mask) {
+				*bc++ = palette | col;
+				*ba = (*ba & mask) | attr;
+				ba++;
+			} else {
+				bc++;
+				ba++;
+			}
+			txp += lx.step;
+		}
+		typ += ly.step;
+	}
+}
 
-	memset(m_kx46_regs, 0, 8);
-	memset(m_kx47_regs, 0, 32);
+void k053246_055673_device::draw_tile_force_shadow(bitmap_ind16 *bcolor, bitmap_ind16 *battr,
+												   gfx_element *g, uint32_t tile_base_id,
+												   const tile_layout &lx, const tile_layout &ly,
+												   uint16_t attr, uint16_t palette, uint8_t trans_mask)
+{
+	uint32_t tid = tile_base_id + lx.tileid_delta + ly.tileid_delta;
+	const uint8_t *data = g->get_data(tid);
+	uint32_t typ = ly.tile_min;
+	for(int y = ly.sc_min; y <= ly.sc_max; y++) {
+		const uint8_t *data1 = data + 16*(typ >> 6);		
+		uint16_t *bc = &bcolor->pix16(y, lx.sc_min);
+		uint16_t *ba = &battr ->pix16(y, lx.sc_min);
+		uint32_t txp = lx.tile_min;
+		for(int x = lx.sc_min; x <= lx.sc_max; x++) {
+			uint8_t col = data1[txp >> 6];
+			if(col & trans_mask) {
+				*bc++ = palette | col;
+				*ba++ = attr;
+
+			} else {
+				bc++;
+				ba++;
+			}
+			txp += lx.step;
+		}
+		typ += ly.step;
+	}
+}
+
+template<uint16_t mask> void k053246_055673_device::draw_tile_keep_detect_shadow(bitmap_ind16 *bcolor, bitmap_ind16 *battr,
+																				 gfx_element *g, uint32_t tile_base_id,
+																				 const tile_layout &lx, const tile_layout &ly,
+																				 uint16_t noshadow_attr, uint16_t shadow_attr,
+																				 uint16_t palette, uint8_t trans_mask, uint8_t shadow_color)
+{
+	uint32_t tid = tile_base_id | lx.tileid_delta | ly.tileid_delta;
+	const uint8_t *data = g->get_data(tid);
+	uint32_t typ = ly.tile_min;
+	for(int y = ly.sc_min; y <= ly.sc_max; y++) {
+		const uint8_t *data1 = data + 16*(typ >> 6);		
+		uint16_t *bc = &bcolor->pix16(y, lx.sc_min);
+		uint16_t *ba = &battr ->pix16(y, lx.sc_min);
+		uint32_t txp = lx.tile_min;
+		for(int x = lx.sc_min; x <= lx.sc_max; x++) {
+			uint8_t col = data1[txp >> 6];
+			if((col & shadow_color) == shadow_color) {
+				*bc++ = palette; // Hypothesis: a sprite cannot shadow another sprite
+				*ba++ = shadow_attr;
+				
+			} else if(col & trans_mask) {
+				*bc++ = palette | col;
+				*ba = (*ba & mask) | noshadow_attr;
+				ba++;
+
+			} else {
+				bc++;
+				ba++;
+			}
+			txp += lx.step;
+		}
+		typ += ly.step;
+	}
+}
+
+void k053246_055673_device::draw_tile_force_detect_shadow(bitmap_ind16 *bcolor, bitmap_ind16 *battr,
+														  gfx_element *g, uint32_t tile_base_id,
+														  const tile_layout &lx, const tile_layout &ly,
+														  uint16_t noshadow_attr, uint16_t shadow_attr,
+														  uint16_t palette, uint8_t trans_mask, uint8_t shadow_color)
+{
+	uint32_t tid = tile_base_id | lx.tileid_delta | ly.tileid_delta;
+	const uint8_t *data = g->get_data(tid);
+	uint32_t typ = ly.tile_min;
+	for(int y = ly.sc_min; y <= ly.sc_max; y++) {
+		const uint8_t *data1 = data + 16*(typ >> 6);		
+		uint16_t *bc = &bcolor->pix16(y, lx.sc_min);
+		uint16_t *ba = &battr ->pix16(y, lx.sc_min);
+		uint32_t txp = lx.tile_min;
+		for(int x = lx.sc_min; x <= lx.sc_max; x++) {
+			uint8_t col = data1[txp >> 6];
+			if((col & shadow_color) == shadow_color) {
+				*bc++ = palette;
+				*ba++ = shadow_attr;
+				
+			} else if(col & trans_mask) {
+				*bc++ = palette | col;
+				*ba++ = noshadow_attr;
+
+			} else {
+				bc++;
+				ba++;
+			}
+			txp += lx.step;
+		}
+		typ += ly.step;
+	}
+}
+
+void k053246_055673_device::bitmap_update(bitmap_ind16 *bcolor, bitmap_ind16 *battr, const rectangle &cliprect)
+{
+	static const int xoff[16] = { 0, 1, 4,  5, 16, 17, 20, 21, 0, 1, 4,  5, 16, 17, 20, 21 };
+	static const int yoff[16] = { 0, 2, 8, 10, 32, 34, 40, 42, 0, 2, 8, 10, 32, 34, 40, 42 };
+	static const int unwrap[32] = { 0, 1, 0, 1, 2, 3, 2, 3, 0, 1, 0, 1, 2, 3, 2, 3, 4, 5, 4, 5, 6, 7, 6, 7, 4, 5, 4, 5, 6, 7, 6, 7 };
+	uint16_t wrmask = m_opset & 0x08 ? 0x0800 : 0x000;
+	int bpp;
+	if(m_opset & 0x04)
+		bpp = 8;
+	else
+		bpp = 4 | (m_opset & 0x03);
+
+	uint8_t shadow_color = (1 << bpp) - 1;
+	uint32_t coreg = (m_coreg << 12) & (0xf00 << bpp);
+	
+	bcolor->fill(0, cliprect);
+	battr->fill(0, cliprect);
+
+	int offx = 0, offy = 0;
+
+	uint32_t off = m_hscr & 0x3ff;
+	bool flip = m_oms & 0x01;
+
+	// goku [:video_timings] TIMINGS '252  6 384 48 288 16 32 264 15 224 17  8
+	// sexy [:video_timings] TIMINGS '252  6 384 48 288 16 32 264 15 224 17  8
+
+	static uint32_t curx = 0x02c;
+
+	// gokuparo
+	if(     !flip && off == 0x3be && 1)
+		offx = 0x02c;
+	else if( flip && off == 0x296 && 1)
+		offx = 0x156;
+
+	else {
+		if(machine().input().code_pressed(KEYCODE_D))
+			curx++;
+		if(machine().input().code_pressed(KEYCODE_A))
+			curx--;
+		curx &= 0x3ff;
+		logerror("Unknown X offset, hscr=%03x, flip=%s, cur=%03x\n", off, flip ? "on" : "off", curx);
+		offx = curx;
+	}
+
+	static uint32_t cury = 0x000;
+
+	off = m_vscr & 0x3ff;
+	flip = m_oms & 0x02;
+
+	// gokuparo, 
+	if(      flip && off == 0x3e9 && 1)
+		offy = 0x000;
+	else if(!flip && off == 0x2e9 && 1)
+		offy = 0x0ff;
+
+	else {
+		if(machine().input().code_pressed(KEYCODE_S))
+			cury++;
+		if(machine().input().code_pressed(KEYCODE_W))
+			cury--;
+		cury &= 0x3ff;
+		logerror("Unknown Y offset, vscr=%03x, flip=%s, cur=%03x\n", off, flip ? "on" : "off", cury);
+		offy = cury;
+	}
+
+	// The sprites are drawn in priority order.  The draw order within
+	// a priority level is unknown.
+	int bucket[256];
+	int next[256];
+	memset(bucket, 0xff, sizeof(bucket));
+	memset(next, 0xff, sizeof(next));
+
+	uint8_t prixor = m_opset & 0x10 ? 0x00 : 0xff;
+	for(int i=0; i<0x100; i++) {
+		const uint16_t *spr = m_sram + (i << 3);
+		if(!(spr[0] & 0x8000))
+			continue;
+
+		int slot = (spr[0] ^ prixor) & 0xff; 
+		next[i] = bucket[slot];
+		bucket[slot] = i;
+	}
+
+	gfx_element *g = gfx(0);
+	for(int i=0; i<256; i++) {
+		int sid = bucket[i];
+		while(sid != -1) {
+			const uint16_t *spr = m_sram + (sid << 3);
+			
+			uint16_t atrbk = m_is_053247 ? 0x0000 : m_atrbk[(spr[6] >> 8) & 3];
+			if((atrbk ^ wrmask) & 0x0800)
+				continue;
+			
+			int osx = (spr[0] >>  8) & 3;
+			int osy = (spr[0] >> 10) & 3;
+
+			uint32_t tile_base_id = spr[1];
+			if(!m_is_053247)
+				tile_base_id = ((tile_base_id & 0x3fff) | (m_vrcbk[(tile_base_id >> 14) & 3] << 14));
+
+			int dx = unwrap[tile_base_id & 0x1f];
+			int dy = unwrap[(tile_base_id >> 1) & 0x1f];
+			tile_base_id &= ~0x3f;
+
+			int zoom = spr[4] & 0x3ff;
+			tile_layout ly[16];
+			int tly;
+			generate_tile_layout(ly, tly, cliprect.min_y, cliprect.max_y, -spr[2], offy, osy, zoom, yoff+dy, spr[0] & 0x2000, spr[6] & 0x8000, m_oms & 2);
+			if(!tly)
+				goto skip;
+			
+			if(!(spr[0] & 0x4000))
+				zoom = spr[5] & 0x3ff;
+			tile_layout lx[16];
+			int tlx;
+			generate_tile_layout(lx, tlx, cliprect.min_x, cliprect.max_x, spr[3], offx, osx, zoom, xoff+dx, spr[0] & 0x1000, spr[6] & 0x4000, m_oms & 1);
+		
+			if(!tlx)
+				goto skip;
+
+			uint32_t info_ns, info_s;
+			uint16_t trans_mask;
+			if(!m_is_053247) {
+				info_s = ((spr[6] & 0xf00) << 8) | ((spr[6] & 0x0ff) << bpp) | coreg;
+				info_ns = info_s & (m_oms & 0x20 ? 0x3ffff : 0x7ffff);
+				trans_mask = (0xff << ((atrbk >> 8) & 7)) & shadow_color;
+			} else {
+				info_s  = (spr[6] & 0xfff) << 4;
+				info_ns = info_s & (m_oms & 0x20 ? 0x3fff : 0x7fff);
+				trans_mask = shadow_color;
+			}
+
+#if 0
+			color = (spr[6] << bpp) & 0xff;
+			attr = ((spr[6] & 0xff) >> (8-bpp)) | coreg;
+#endif
+			uint16_t color, shadow_attr, noshadow_attr;
+
+			m_wiring_cb(info_ns, color, noshadow_attr);
+			m_wiring_cb(info_s,  color, shadow_attr);
+
+			//		logerror("tbid %x color %x ns %x s %x\n", tile_base_id, color, noshadow_attr, shadow_attr);
+
+			//		uint16_t color          = info_ns & 0x1ff;
+			//		uint16_t noshadow_attr  = ((info_ns & 0xc000) >> 6) | ((info_ns >> 8) & 0x3e);
+			//		uint16_t shadow_attr    = ((info_s  & 0xc000) >> 6) | ((info_s  >> 8) & 0x3e);
+
+			if((m_opset & 0x20) || !(m_oms & 0x20)) {
+				if(!(spr[6] & 0x0c00))
+					for(int y=0; y<tly; y++)
+						for(int x=0; x<tlx; x++)
+							draw_tile_force_shadow(bcolor, battr, g, tile_base_id, lx[x], ly[y], noshadow_attr, color, trans_mask);
+				else
+					for(int y=0; y<tly; y++)
+						for(int x=0; x<tlx; x++)
+							draw_tile_force_detect_shadow(bcolor, battr, g, tile_base_id, lx[x], ly[y], noshadow_attr, shadow_attr, color, trans_mask, shadow_color);
+
+			} else if(m_oms & 0x20)  {
+				if(!(spr[6] & 0x0c00))
+					for(int y=0; y<tly; y++)
+						for(int x=0; x<tlx; x++)
+							draw_tile_keep_shadow<0x0300>(bcolor, battr, g, tile_base_id, lx[x], ly[y], noshadow_attr, color, trans_mask);
+				else
+					for(int y=0; y<tly; y++)
+						for(int x=0; x<tlx; x++)
+							draw_tile_keep_detect_shadow<0x0300>(bcolor, battr, g, tile_base_id, lx[x], ly[y], noshadow_attr, shadow_attr, color, trans_mask, shadow_color);
+
+			} else {
+				if(!(spr[6] & 0x0800))
+					for(int y=0; y<tly; y++)
+						for(int x=0; x<tlx; x++)
+							draw_tile_keep_shadow<0x0100>(bcolor, battr, g, tile_base_id, lx[x], ly[y], noshadow_attr, color, trans_mask);
+				else
+					for(int y=0; y<tly; y++)
+						for(int x=0; x<tlx; x++)
+							draw_tile_keep_detect_shadow<0x0100>(bcolor, battr, g, tile_base_id, lx[x], ly[y], noshadow_attr, shadow_attr, color, trans_mask, shadow_color);
+			}
+
+		skip:
+			sid = next[sid];
+		}
+	}
+}
+
+void k053246_055673_device::decode_sprite_roms()
+{
+	gfx_layout gfx_layouts[1];
+	gfx_decode_entry gfx_entries[2];
+
+	int bpp;
+
+	if(m_is_053247)
+		bpp = 4;
+	else if(m_opset & 0x04)
+		bpp = 8;
+	else
+		bpp = 4 | (m_opset & 0x03);
+
+	logerror("Decoding sprite roms as %d bpp %s\n", bpp, m_is_053247 ? "chunky" : "planar");
+
+	int bits_per_block = m_is_053247 ? 32 : 64;
+
+	gfx_layouts[0].width = 16;
+	gfx_layouts[0].height = 16;
+	gfx_layouts[0].total = m_region->bytes() / (bits_per_block*16*2/8);
+	gfx_layouts[0].planes = bpp;
+
+	if(m_is_053247) {
+		// Chunky format, 32 bits per line, 4bpp
+		for(int j=0; j<bpp; j++)
+			gfx_layouts[0].planeoffset[j] = j;
+		for(int j=0; j<16; j++) {
+			gfx_layouts[0].xoffset[j] = 4*(j & 7) + (j & 8 ? bits_per_block : 0);
+			gfx_layouts[0].yoffset[j] = j*2*bits_per_block;
+		}
+
+	} else {
+		// Planar format, 64 bits per line (32 to 64 actually used)
+		for(int j=0; j<bpp; j++)
+			gfx_layouts[0].planeoffset[bpp-1-j] = 8*j;
+		for(int j=0; j<16; j++) {
+			gfx_layouts[0].xoffset[j] = (j & 7) + (j & 8 ? bits_per_block : 0);
+			gfx_layouts[0].yoffset[j] = j*2*bits_per_block;
+		}
+	}
+	gfx_layouts[0].extxoffs = nullptr;
+	gfx_layouts[0].extyoffs = nullptr;
+	gfx_layouts[0].charincrement = bits_per_block * 2 * 16;
+
+	gfx_entries[0].memory_region = tag();
+	gfx_entries[0].start = 0;
+	gfx_entries[0].gfxlayout = gfx_layouts;
+	gfx_entries[0].color_codes_start = 0;
+	gfx_entries[0].total_color_codes = palette().entries() >> bpp;
+	gfx_entries[0].flags = 0;
+
+	gfx_entries[1].gfxlayout = nullptr;
+
+	decode_gfx(gfx_entries);
 }
 
 
-/*
-    In a K053247+K055555 setup objects with Z-code 0x00 should be ignored
-    when PRFLIP is cleared, while objects with Z-code 0xff should be
-    ignored when PRFLIP is set.
-
-    These behaviors can also be seen in older K053245(6)+K053251 setups.
-    Bucky'O Hare, The Simpsons and Sunset Riders rely on their implications
-    to prepare and retire sprites. They probably apply to many other Konami
-    games but it's hard to tell because most artifacts have been filtered
-    by exclusion sort.
-
-    A driver may call K05324x_set_z_rejection() to set which zcode to ignore.
-    Parameter:
-               -1 = accept all(default)
-        0x00-0xff = zcode to ignore
-*/
-
-void k053247_device::k053247_set_z_rejection( int zcode )
+k053246_053247_device::k053246_053247_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: k053246_055673_device(mconfig, K053246_053247, "K053246/053247 Sprite Generator Combo", tag, owner, clock, "k053247", __FILE__)
 {
-	m_z_rejection = zcode;
+	m_is_053247 = true;
 }
 
-
-READ16_MEMBER( k053247_device::k053246_reg_word_r )
+READ8_MEMBER(k053246_053247_device::rom8_r)
 {
-	return(m_kx46_regs[offset * 2] << 8 | m_kx46_regs[offset * 2 + 1]);
-}   // OBJSET1
+	uint32_t off = ((m_ocha << 1) | offset) & (m_region->bytes() - 1);
+	const uint8_t *rom = m_region->base() + (off^1);
+	return rom[0];
+}
+
+READ16_MEMBER(k053246_053247_device::rom16_r)
+{
+	uint32_t off = (m_ocha << 1) & (m_region->bytes() - 1);
+	const uint8_t *rom = m_region->base() + off;
+	return (rom[1] << 8) | rom[0];
+}
+
+READ32_MEMBER(k053246_053247_device::rom32_r)
+{
+	abort();
+}

@@ -14,9 +14,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
 		m_workram(*this, "workram"),
-		m_k056832(*this, "k056832"),
+		m_tilemap(*this, "tilemap"),
 		m_k054539(*this, "k054539"),
-		m_k053252(*this, "k053252"),
+		m_video_timings(*this, "video_timings"),
 		m_ata(*this, "ata"),
 		m_inputs_port(*this, "INPUTS"),
 		m_dsw_port(*this, "DSW"),
@@ -27,9 +27,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_nvram;
 	required_shared_ptr<uint16_t> m_workram;
-	required_device<k056832_device> m_k056832;
+	required_device<k054156_056832_device> m_tilemap;
 	required_device<k054539_device> m_k054539;
-	required_device<k053252_device> m_k053252;
+	required_device<k053252_device> m_video_timings;
 	required_device<ata_interface_device> m_ata;
 	required_ioport m_inputs_port;
 	required_ioport m_dsw_port;
@@ -66,6 +66,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(gp2_ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq1_gen);
-	K056832_CB_MEMBER(qdrmfgp_tile_callback);
-	K056832_CB_MEMBER(qdrmfgp2_tile_callback);
+	//	K056832_CB_MEMBER(qdrmfgp_tile_callback);
+	//	K056832_CB_MEMBER(qdrmfgp2_tile_callback);
 };

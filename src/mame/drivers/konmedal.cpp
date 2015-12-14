@@ -38,13 +38,13 @@ public:
 	konmedal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_k056832(*this, "k056832"),
+ //		m_k056832(*this, "k056832"),
 		m_palette(*this, "palette"),
 		m_ymz(*this, "ymz")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<k056832_device> m_k056832;
+//	required_device<k056832_device> m_k056832;
 	required_device<palette_device> m_palette;
 	required_device<ymz280b_device> m_ymz;
 
@@ -69,7 +69,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_konmedal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(konmedal_interrupt);
-	K056832_CB_MEMBER(tile_callback);
+//	K056832_CB_MEMBER(tile_callback);
 };
 
 WRITE8_MEMBER(konmedal_state::control2_w)
@@ -80,6 +80,7 @@ WRITE8_MEMBER(konmedal_state::control2_w)
 
 READ8_MEMBER(konmedal_state::vram_r)
 {
+#if 0
 	if (!(m_control2 & 0x80))
 	{
 		if (offset & 1)
@@ -95,7 +96,8 @@ READ8_MEMBER(konmedal_state::vram_r)
 	{
 		return m_k056832->konmedal_rom_r(space, offset);
 	}
-
+#endif
+	
 	return 0;
 }
 
@@ -106,11 +108,11 @@ WRITE8_MEMBER(konmedal_state::vram_w)
 
 	if (offset & 1)
 	{
-		m_k056832->ram_code_hi_w(space, offset>>1, data);
+		//		m_k056832->ram_code_hi_w(space, offset>>1, data);
 		return;
 	}
-
-	m_k056832->ram_code_lo_w(space, offset>>1, data);
+	
+	//	m_k056832->ram_code_lo_w(space, offset>>1, data);
 }
 
 READ8_MEMBER(konmedal_state::magic_r)
@@ -118,6 +120,7 @@ READ8_MEMBER(konmedal_state::magic_r)
 	return 0xc1;    // checked at 60f before reading a page of the VROM
 }
 
+#if 0	
 K056832_CB_MEMBER(konmedal_state::tile_callback)
 {
 	int codebits = *code;
@@ -132,6 +135,7 @@ K056832_CB_MEMBER(konmedal_state::tile_callback)
 	bank = (data >> bankshifts[bs]) & 0xf;
 	*code = (codebits & 0x3ff) | (bank << 10);
 }
+#endif
 
 void konmedal_state::video_start()
 {
@@ -143,8 +147,12 @@ uint32_t konmedal_state::screen_update_konmedal(screen_device &screen, bitmap_in
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
-	// game only draws on this layer, apparently
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 1);
+//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 1);
+//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
+//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
+
+	// force "A" layer over top of everything
+//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
 	return 0;
 }
@@ -166,7 +174,7 @@ PALETTE_INIT_MEMBER(konmedal_state, konmedal)
 INTERRUPT_GEN_MEMBER(konmedal_state::konmedal_interrupt)
 {
 	m_maincpu->set_input_line(0, HOLD_LINE);
-	m_k056832->mark_plane_dirty(3);
+	//	m_k056832->mark_plane_dirty(3);
 }
 
 WRITE8_MEMBER(konmedal_state::bankswitch_w)
@@ -181,12 +189,12 @@ static ADDRESS_MAP_START( medal_main, AS_PROGRAM, 8, konmedal_state )
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xafff) AM_RAM // work RAM?
 	AM_RANGE(0xb800, 0xbfff) AM_RAM // stack goes here
-	AM_RANGE(0xc000, 0xc03f) AM_DEVWRITE("k056832", k056832_device, write)
+//	AM_RANGE(0xc000, 0xc03f) AM_DEVWRITE("k056832", k056832_device, write)
 	AM_RANGE(0xc100, 0xc100) AM_WRITE(control2_w)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xc500, 0xc500) AM_NOP // read to reset watchdog
 	AM_RANGE(0xc702, 0xc703) AM_READ(inputs_r)
-	AM_RANGE(0xc800, 0xc80f) AM_DEVWRITE("k056832", k056832_device, b_w)
+//	AM_RANGE(0xc800, 0xc80f) AM_DEVWRITE("k056832", k056832_device, b_w)
 	AM_RANGE(0xc80f, 0xc80f) AM_READ(magic_r)
 	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(vram_r, vram_w)
@@ -227,10 +235,10 @@ static MACHINE_CONFIG_START( konmedal, konmedal_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_INIT_OWNER(konmedal_state, konmedal)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(konmedal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+//	MCFG_DEVICE_ADD("k056832", K056832, 0)
+//	MCFG_K056832_CB(konmedal_state, tile_callback)
+//	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
+//	MCFG_K056832_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
