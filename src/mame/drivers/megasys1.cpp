@@ -172,15 +172,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_scanline)
 {
 	int scanline = param;
 
-	// irq 1 is vblank (confirmed by Saint Dragon "press start" behaviour), 2 & 3 unknown
+	// stdragon: irq 1 is vblank ("press start" behaviour), 2 unknown, 3 is RTE. Or maybe 1 is raster irq?
+	// p47: irq 2 valid, others RTE
+	// kickoff: irq 3 valid, others RTE
+	// tshingen: irq 3 RTE, irq 1 reads inputs, irq 2 sets vregs values (pending further investigation ...)
+	// kazan: irq 3 disables irq in SW then execute a routine, irq 2 just execute this routine, irq 1 RTR
+	// astyanax: irq 3 RTE, irq 1 sets "ffff0210" OR 2, irq 2 vblank
+	// hachoo: irq 2 vblank, irq 3 & 1 sets 0xf004e buffer with the level number
+	// jitsupro: irq 3 RTE, irq 2 sets palette and vregs, irq 1 reads inputs
+	// plusalph: irq 1 & 3 RTE, irq 2 valid
+	// rodland: irq 1 & 3 RTE, irq 2 valid (sets palette, vregs ...)
+	// soldam: irq 1 & 3 RTE, irq 2 valid
 	
 	if(scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
-	if(scanline == 0)
+	if(scanline == 16)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
-	// RTE in stdragon
 	if(scanline == 128)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 }
