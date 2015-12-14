@@ -16,6 +16,7 @@
 //   and "enabling" resource of all
 // - US Patent 4,180,854 describing the HP9845 system
 // - Study of disassembly of firmware of HP64000 & HP9845 systems
+// - hp9800e emulator for inspiration on implementing EMC instructions
 // - A lot of "educated" guessing
 
 #ifndef _HPHYBRID_H_
@@ -74,6 +75,10 @@
 #define MCFG_HPHYBRID_SET_9845_BOOT(_mode) \
 	hp_5061_3001_cpu_device::set_boot_mode_static(*device, _mode);
 
+// PA changed callback
+#define MCFG_HPHYBRID_PA_CHANGED(_devcb) \
+        hp_hybrid_cpu_device::set_pa_changed_func(*device , DEVCB_##_devcb);
+
 class hp_hybrid_cpu_device : public cpu_device
 {
 public:
@@ -81,6 +86,8 @@ public:
                 DECLARE_WRITE_LINE_MEMBER(halt_w);
                 DECLARE_WRITE_LINE_MEMBER(status_w);
                 DECLARE_WRITE_LINE_MEMBER(flag_w);
+
+        template<class _Object> static devcb_base &set_pa_changed_func(device_t &device, _Object object) { return downcast<hp_hybrid_cpu_device &>(device).m_pa_changed_func.set_callback(object); }
 
 protected:
         hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname , UINT8 addrwidth);
@@ -137,6 +144,8 @@ protected:
         UINT16 fetch(void);
         
         UINT16 get_skip_addr(UINT16 opcode , bool condition) const;
+
+        devcb_write8 m_pa_changed_func;
 
                 int m_icount;
         bool m_forced_bsc_25;

@@ -111,6 +111,7 @@ WRITE_LINE_MEMBER(hp_hybrid_cpu_device::flag_w)
 
 hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname , UINT8 addrwidth)
         : cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+          m_pa_changed_func(*this),
           m_program_config("program", ENDIANNESS_BIG, 16, addrwidth, -1),
           m_io_config("io", ENDIANNESS_BIG, 16, 6, -1)
 {
@@ -178,6 +179,8 @@ void hp_hybrid_cpu_device::device_start()
                                 save_item(NAME(m_forced_bsc_25));
 
 				m_icountptr = &m_icount;
+
+                                m_pa_changed_func.resolve_safe();
 }
 
 void hp_hybrid_cpu_device::device_reset()
@@ -503,9 +506,11 @@ UINT16 hp_hybrid_cpu_device::execute_one_sub(UINT16 opcode)
 																												if (BIT(m_flags , HPHYBRID_IRH_SVC_BIT)) {
 																																BIT_CLR(m_flags , HPHYBRID_IRH_SVC_BIT);
 																																memmove(&m_reg_PA[ 0 ] , &m_reg_PA[ 1 ] , HPHYBRID_INT_LVLS);
+                                                                                                                                                                                                                                                                m_pa_changed_func((UINT8)CURRENT_PA);
 																												} else if (BIT(m_flags , HPHYBRID_IRL_SVC_BIT)) {
 																																BIT_CLR(m_flags , HPHYBRID_IRL_SVC_BIT);
 																																memmove(&m_reg_PA[ 0 ] , &m_reg_PA[ 1 ] , HPHYBRID_INT_LVLS);
+                                                                                                                                                                                                                                                                m_pa_changed_func((UINT8)CURRENT_PA);
 																												}
 																								}
 																								tmp = RM(AEC_CASE_C , m_reg_R--) + (opcode & 0x1f);
@@ -755,6 +760,7 @@ void hp_hybrid_cpu_device::WM(UINT32 addr , UINT16 v)
 
                 case HP_REG_PA_ADDR:
                         CURRENT_PA = v & HP_REG_PA_MASK;
+                        m_pa_changed_func((UINT8)CURRENT_PA);
                         break;
 
                 case HP_REG_W_ADDR:
@@ -1006,6 +1012,8 @@ void hp_hybrid_cpu_device::check_for_interrupts(void)
 				memmove(&m_reg_PA[ 1 ] , &m_reg_PA[ 0 ] , HPHYBRID_INT_LVLS);
 
 				CURRENT_PA = new_PA;
+
+                                m_pa_changed_func((UINT8)CURRENT_PA);
 
 				// Is this correct? Patent @ pg 210 suggests that the whole interrupt recognition sequence
 				// lasts for 32 cycles (6 are already accounted for in get_ea for one indirection)
@@ -1456,7 +1464,7 @@ UINT32 hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , UINT16 addr)
         bool top_half = BIT(addr , 15) != 0;
 
         // Detect accesses to top half of base page
-        if ((addr & 0xfe00) == 0xfe00) {
+        if (aec_case == AEC_CASE_C && (addr & 0xfe00) == 0xfe00) {
             aec_case = AEC_CASE_B;
         }
 
