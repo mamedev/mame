@@ -156,11 +156,12 @@ class DView_edit
 	DISABLE_COPYING(DView_edit);
 
 public:
-	DView_edit(): active(0), container(nullptr) { }
+	DView_edit(DView* owner): active(0), container(nullptr), owner(owner) { }
 	~DView_edit() { }
 	int                 active;
 	render_container *  container;
 	std::string         str;
+	DView*              owner;
 };
 
 /***************************************************************************
@@ -180,7 +181,8 @@ public:
 			type(0),
 			state(0),
 			ofs_x(0),
-			ofs_y(0)
+			ofs_y(0),
+			editor(this)
 		{
 		this->target = target;
 		//dv->container = render_target_get_component_container(target, name, &pos);
@@ -914,7 +916,7 @@ void debug_internal::init_debugger(running_machine &machine)
 		debug_font = m_machine->render().font_alloc(font_name);
 		
 	debug_font_width = 0;
-	if(font_size == 0)
+	if(font_size < 8)
 		debug_font_height = 16;  // default
 	else
 		debug_font_height = font_size;
@@ -1226,34 +1228,27 @@ static void on_memory_region(DView *dv, const ui_menu_event *event)
 
 static void render_editor(DView_edit *editor)
 {
-	float width, maxwidth;
-	float x1, y1, x2, y2;
+	DView* dv = editor->owner;
+	rectangle r;
+	const char* str = editor->str.c_str();
+	int str_x = 2 * BORDER_XTHICKNESS;
+//	int editor_width;
+	
+	dview_get_rect(dv,RECT_DVIEW_HSB,r);
 
-	editor->container->empty();
-	/* get the size of the text */
-	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
-						DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, nullptr);
-	width += 2 * UI_BOX_LR_BORDER;
-	maxwidth = MAX(width, 0.5f);
-
-	/* compute our bounds */
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = 0.25f;
-	y2 = 0.45f - UI_BOX_TB_BORDER;
-
-	/* draw a box */
-	editor->container->manager().machine().ui().draw_outlined_box(editor->container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
-
-	/* take off the borders */
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-
-	/* draw the text within it */
-	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-
+//	editor_width = debug_font->string_width(debug_font_height, debug_font_aspect, editor->str.c_str());
+	
+	dview_draw_box(dv,RECT_DVIEW_HSB,0,0,r.width(),r.height(),rgb_t(0xff,0xff,0xff,0xff));
+	dview_draw_line(dv,RECT_DVIEW_HSB,0,0,r.width(),0,rgb_t(0xff,0xc0,0xc0,0xc0));
+	dview_draw_line(dv,RECT_DVIEW_HSB,r.width(),0,r.width(),r.height(),rgb_t(0xff,0x60,0x60,0x60));
+	dview_draw_line(dv,RECT_DVIEW_HSB,r.width(),r.height(),0,r.height(),rgb_t(0xff,0x60,0x60,0x60));
+	dview_draw_line(dv,RECT_DVIEW_HSB,0,r.height(),0,0,rgb_t(0xff,0xc0,0xc0,0xc0));
+	
+	for(int x=0;x<strlen(str);x++)
+	{
+		dview_draw_char(dv,RECT_DVIEW_HSB,str_x,BORDER_YTHICKNESS,r.height(),rgb_t(0xff,0x00,0x00,0x00),(UINT16)str[x]);
+		str_x += debug_font->char_width(r.height(),debug_font_aspect,(UINT16)str[x]) + 2*BORDER_XTHICKNESS;
+	}
 }
 
 /*-------------------------------------------------
