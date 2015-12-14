@@ -360,13 +360,32 @@ WRITE8_MEMBER(vsnes_state::gun_in0_w)
 		/* do the gun thing */
 		int x = ioport("GUNX")->read();
 		int y = ioport("GUNY")->read();
-		UINT32 pix, color_base;
+		UINT8 pix;
 
 		/* get the pixel at the gun position */
 		pix = m_ppu1->get_pixel(x, y);
 
+
+		rgb_t col = m_palette->pen_color(pix);
+		//UINT8 r = col.r();
+		//UINT8 g = col.g();
+		//UINT8 b = col.b();
+		UINT8 bright = col.brightness();
+		// todo, calculate how bright it is with pix.r * 0.3 + pix.g * 0.59 + pix.b * 0.11 ?
+		// the mame calc above is UINT8 brightness() const { return (r() * 222 + g() * 707 + b() * 71) / 1000; }  (from lib/util/palette.h)
+
+		//printf("pix is %02x | %02x %02x %02x | %02x\n", pix, r,g,b,bright);
+
+		if (bright == 0xff)
+		{
+			m_input_latch[0] |= 0x40;
+		}
+
+
+
+#if 0 // this is junk code, only works for NES palette..
 		/* get the color base from the ppu */
-		color_base = m_ppu1->get_colorbase();
+		UINT32 color_base = m_ppu1->get_colorbase();
 
 		/* look at the screen and see if the cursor is over a bright pixel */
 		if ((pix == color_base + 0x20 ) || (pix == color_base + 0x30) ||
@@ -374,6 +393,7 @@ WRITE8_MEMBER(vsnes_state::gun_in0_w)
 		{
 			m_input_latch[0] |= 0x40;
 		}
+#endif
 
 		m_input_latch[1] = ioport("IN1")->read();
 	}
