@@ -2673,14 +2673,88 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Mattel Dungeons & Dragons - Computer Labyrinth Game
+  * TMS1100 M34012-N2LL (die labeled M34012)
+  * 72 buttons, no LEDs, 1bit sound
+
+
+
+***************************************************************************/
+
+class mdndclab_state : public hh_tms1k_state
+{
+public:
+	mdndclab_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(mdndclab_state::write_r)
+{
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+
+	// R0-R9: input mux part
+}
+
+WRITE16_MEMBER(mdndclab_state::write_o)
+{
+	// O0-O7: input mux part
+}
+
+READ8_MEMBER(mdndclab_state::read_k)
+{
+	// K: multiplexed inputs
+	return 0;
+	//return read_inputs(18);
+}
+
+
+// config
+
+static INPUT_PORTS_START( mdndclab )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( mdndclab, mdndclab_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 500000) // approximation - RC osc. R=27K, C=100pf, but unknown RC curve
+	MCFG_TMS1XXX_READ_K_CB(READ8(mdndclab_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mdndclab_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(mdndclab_state, write_o))
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Milton Bradley Comp IV
   * TMC0904NL CP0904A (die labeled 4A0970D-04A)
   * 10 LEDs behind bezel, no sound
 
+  known releases:
+  - USA: Comp IV (two versions, different casing)
+  - Europe: Logic 5
+  - Japan: Pythaligoras
+
   This is small tabletop Mastermind game; a code-breaking game where the player
   needs to find out the correct sequence of colours (numbers in our case).
-  It is known as Logic 5 in Europe, and as Pythaligoras in Japan.
-
   Press the R key to start, followed by a set of unique numbers and E.
   Refer to the official manual for more information.
 
@@ -4359,8 +4433,8 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( mathmagi )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "mp1030", 0x0000, 0x800, CRC(a81d7ccb) SHA1(4756ce42f1ea28ce5fe6498312f8306f10370969) )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1030", 0x0000, 0x0800, CRC(a81d7ccb) SHA1(4756ce42f1ea28ce5fe6498312f8306f10370969) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, BAD_DUMP CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // not verified
@@ -4559,6 +4633,17 @@ ROM_START( astro )
 ROM_END
 
 
+ROM_START( mdndclab )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "m34012", 0x0000, 0x0800, CRC(e851fccd) SHA1(158362c2821678a51554e02dbb2f9ef5aaf5f59f) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_mdndclab_output.pla", 0, 365, CRC(592b40ba) SHA1(63a2531278a665ace54c541101e052eb84413511) )
+ROM_END
+
+
 ROM_START( comp4 )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "tmc0904nl_cp0904a", 0x0000, 0x0400, CRC(6233ee1b) SHA1(738e109b38c97804b4ec52bed80b00a8634ad453) )
@@ -4586,8 +4671,8 @@ ROM_END
 
 
 ROM_START( ssimon )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "mp3476", 0x0000, 0x800, CRC(98200571) SHA1(cbd0bcfc11a534aa0be5d011584cdcac58ff437a) )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3476", 0x0000, 0x0800, CRC(98200571) SHA1(cbd0bcfc11a534aa0be5d011584cdcac58ff437a) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
@@ -4623,8 +4708,8 @@ ROM_END
 
 
 ROM_START( merlin )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "mp3404", 0x0000, 0x800, CRC(7515a75d) SHA1(76ca3605d3fde1df62f79b9bb1f534c2a2ae0229) )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3404", 0x0000, 0x0800, CRC(7515a75d) SHA1(76ca3605d3fde1df62f79b9bb1f534c2a2ae0229) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common3_micro.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
@@ -4696,8 +4781,8 @@ ROM_END
 
 
 ROM_START( tandy12 )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "cd7282sl", 0x0000, 0x800, CRC(a10013dd) SHA1(42ebd3de3449f371b99937f9df39c240d15ac686) )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "cd7282sl", 0x0000, 0x0800, CRC(a10013dd) SHA1(42ebd3de3449f371b99937f9df39c240d15ac686) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, BAD_DUMP CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // not verified
@@ -4718,8 +4803,8 @@ ROM_END
 
 
 ROM_START( tpinball )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "mp1180", 0x0000, 0x800, CRC(2163b92d) SHA1(bc53d1911e88b4e89d951c6f769703105c13389c) )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1180", 0x0000, 0x0800, CRC(2163b92d) SHA1(bc53d1911e88b4e89d951c6f769703105c13389c) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
@@ -4754,6 +4839,8 @@ CONS( 1979, starwbc,   0,        0, starwbc,   starwbc,   driver_device, 0, "Ken
 CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command (patent)", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1979, astro,     0,        0, astro,     astro,     driver_device, 0, "Kosmos", "Astro", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+
+CONS( 1980, mdndclab,  0,        0, mdndclab,  mdndclab,  driver_device, 0, "Mattel", "Dungeons & Dragons - Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE ) // ***
 
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", MACHINE_SUPPORTS_SAVE )

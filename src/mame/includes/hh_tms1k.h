@@ -30,13 +30,13 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<11> m_inp_matrix; // max 11
+	optional_ioport_array<18> m_inp_matrix; // max 18
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
 	UINT16 m_r;                         // MCU R-pins data
 	UINT16 m_o;                         // MCU O-pins data
-	UINT16 m_inp_mux;                   // multiplexed inputs mask
+	UINT32 m_inp_mux;                   // multiplexed inputs mask
 	bool m_power_on;
 	bool m_power_led;
 
