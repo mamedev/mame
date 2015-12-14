@@ -62,8 +62,9 @@ public:
 	DECLARE_WRITE8_MEMBER(p38_w);
 	DECLARE_READ8_MEMBER(p38_r);
 	DECLARE_READ8_MEMBER(p39_r);
-	DECLARE_WRITE8_MEMBER(p50_53_w);
+	DECLARE_WRITE8_MEMBER(p50_5f_w);
 
+	DECLARE_READ8_MEMBER(ds_r); // Dip switches???
 	DECLARE_READ8_MEMBER(m68k_dma_r);
 	DECLARE_WRITE8_MEMBER(m68k_dma_w);
 
@@ -81,8 +82,7 @@ public:
 	UINT8 reg_p7;
 	UINT8 reg_p21;
 	UINT8 reg_p38;
-	UINT32 fdd_68k_dma_r_address; /* m68k -> FDD DMA read address */
-	UINT32 fdd_68k_dma_w_address; /* FDD -> m68k DMA write address */
+	UINT32 fdd_68k_dma_address; /* FDD <-> m68k DMA read/write address */
 protected:
         /* Device-level overrides */
         virtual void device_start();
