@@ -76,7 +76,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ) ); }
 	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value) override;
 
 	// device_disasm_interface overrides
@@ -86,6 +86,7 @@ protected:
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
+	address_space_config m_io_config;
 
 	typedef void ( tms32051_device::*opcode_func )();
 	static const opcode_func s_opcode_table[256];
@@ -162,6 +163,7 @@ protected:
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_data;
+	address_space *m_io;
 	int m_icount;
 
 	bool m_idle;

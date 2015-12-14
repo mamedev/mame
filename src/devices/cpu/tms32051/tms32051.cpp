@@ -74,6 +74,7 @@ tms32051_device::tms32051_device(const machine_config &mconfig, const char *tag,
 	: cpu_device(mconfig, TMS32051, "TMS32051", tag, owner, clock, "tms32051", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32051_internal_pgm))
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32051_internal_data))
+	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, -1)
 {
 }
 
@@ -81,6 +82,7 @@ tms32051_device::tms32051_device(const machine_config &mconfig, device_type type
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1)
+	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, -1)
 {
 }
 
@@ -179,6 +181,7 @@ void tms32051_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_data = &space(AS_DATA);
+	m_io = &space(AS_IO);
 
 	m_pcstack_ptr = 0;
 	m_op = 0;
@@ -489,6 +492,24 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 		case 0x28: // PDWSR
 			return 0;
 
+		case 0x50:	// Memory-mapped I/O ports
+		case 0x51:
+		case 0x52:
+		case 0x53:
+		case 0x54:
+		case 0x55:
+		case 0x56:
+		case 0x57:
+		case 0x58:
+		case 0x59:
+		case 0x5a:
+		case 0x5b:
+		case 0x5c:
+		case 0x5d:
+		case 0x5e:
+		case 0x5f:
+			return m_io->read_word(offset << 1);
+
 		default:
 			if (!space.debugger_access())
 				fatalerror("32051: cpuregs_r: unimplemented memory-mapped register %02X at %04X\n", offset, m_pc-1);
@@ -581,6 +602,25 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 		case 0x2a: // CWSR
 			break;
 
+		case 0x50:	// Memory-mapped I/O ports
+		case 0x51:
+		case 0x52:
+		case 0x53:
+		case 0x54:
+		case 0x55:
+		case 0x56:
+		case 0x57:
+		case 0x58:
+		case 0x59:
+		case 0x5a:
+		case 0x5b:
+		case 0x5c:
+		case 0x5d:
+		case 0x5e:
+		case 0x5f:
+			m_io->write_word(offset << 1, data);
+			break;
+
 		default:
 			if (!space.debugger_access())
 				fatalerror("32051: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, m_pc-1);
@@ -598,6 +638,10 @@ bool tms32051_device::memory_read(address_spacenum spacenum, offs_t offset, int 
 	else if (spacenum == AS_DATA)
 	{
 		value = (DM_READ16(offset>>1));
+	}
+	else if (spacenum == AS_IO)
+	{
+		value = m_io->read_word(offset);
 	}
 	return 1;
 }
