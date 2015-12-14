@@ -263,8 +263,6 @@ static MACHINE_CONFIG_START( tisr16, tisr16_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tisr16)
 
-	/* no video! */
-
 	/* no sound! */
 MACHINE_CONFIG_END
 
@@ -366,8 +364,6 @@ static MACHINE_CONFIG_START( ti1270, ti1270_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ti1270)
 
-	/* no video! */
-
 	/* no sound! */
 MACHINE_CONFIG_END
 
@@ -464,8 +460,6 @@ static MACHINE_CONFIG_START( ti1000, ti1000_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ti1270)
-
-	/* no video! */
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -566,8 +560,6 @@ static MACHINE_CONFIG_START( wizatron, wizatron_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_wizatron)
 
-	/* no video! */
-
 	/* no sound! */
 MACHINE_CONFIG_END
 
@@ -641,8 +633,6 @@ static MACHINE_CONFIG_START( lilprof, lilprof_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_wizatron)
-
-	/* no video! */
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -757,8 +747,6 @@ static MACHINE_CONFIG_START( lilprof78, lilprof78_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_wizatron)
 
-	/* no video! */
-
 	/* no sound! */
 MACHINE_CONFIG_END
 
@@ -870,8 +858,6 @@ static MACHINE_CONFIG_START( dataman, dataman_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_dataman)
-
-	/* no video! */
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -1128,8 +1114,6 @@ static MACHINE_CONFIG_START( majestic, majestic_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ti30)
-
-	/* no video! */
 
 	/* no sound! */
 MACHINE_CONFIG_END

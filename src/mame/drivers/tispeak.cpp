@@ -925,8 +925,6 @@ static MACHINE_CONFIG_START( snmath, tispeak_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_snmath)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
 
@@ -1020,8 +1018,6 @@ static MACHINE_CONFIG_START( vocaid, tispeak_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ol_timer", tispeak_state, tntell_get_overlay, attotime::from_msec(50))
 	MCFG_DEFAULT_LAYOUT(layout_tntell)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
