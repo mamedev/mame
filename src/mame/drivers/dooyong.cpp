@@ -69,12 +69,7 @@ Pollux:
 Many (all? at least pollux, primella and flying tiger) use some kind of
 banked palette ram. Bit 1 at address 0xf008 controls banking (both palettes
 are almost identical, except for much darker BG layer colors).
-There's also significant gfx problem on title screen - gfx over left pilot's
-shoulder (right part of the screen) should be - according to pics from flyer -
-blue with orange/red flame (palette 2 instead palette 1). Also some explosions
-and stars should be red instead blue (also pal 2 instead pal 1). I have no
-idea how to fix it without breaking other parts of game. Title screen should
-be verified on real PCB.
+
 
 ***************************************************************************/
 
@@ -567,6 +562,9 @@ static INPUT_PORTS_START( flytiger )
 	PORT_DIPNAME( 0x40, 0x40, "Auto Fire" )             PORT_DIPLOCATION("SWB:7") /* Mainly (only?) for 3-way charge */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // allows title screen colours to cycle
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sadari )
@@ -2081,13 +2079,13 @@ GAME( 1991, gulfstrma,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "D
 GAME( 1991, gulfstrmb,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong",                       "Gulf Storm (set 3)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1991, gulfstrmm,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Media Shoji)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, pollux,   0,        pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 1)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, polluxa,  pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 2)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, polluxa2, pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 3)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) /* Original Dooyong Board distributed by TCH */
-GAME( 1991, polluxn,  pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong (NTC / Atlus license)", "Pollux (Japan, NTC license, distributed by Atlus)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pollux,   0,        pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 1)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1991, polluxa,  pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 2)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1991, polluxa2, pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 3)",       MACHINE_SUPPORTS_SAVE ) /* Original Dooyong Board distributed by TCH */
+GAME( 1991, polluxn,  pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong (NTC / Atlus license)", "Pollux (Japan, NTC license, distributed by Atlus)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, flytiger, 0,        flytiger, flytiger, driver_device, 0, ROT270, "Dooyong",                       "Flying Tiger (set 1)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, flytigera,flytiger, flytiger, flytiger, driver_device, 0, ROT270, "Dooyong",                       "Flying Tiger (set 2)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, flytiger, 0,        flytiger, flytiger, driver_device, 0, ROT270, "Dooyong",                       "Flying Tiger (set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1992, flytigera,flytiger, flytiger, flytiger, driver_device, 0, ROT270, "Dooyong",                       "Flying Tiger (set 2)",         MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, bluehawk, 0,        bluehawk, bluehawk, driver_device, 0, ROT270, "Dooyong",                       "Blue Hawk",            MACHINE_SUPPORTS_SAVE )
 GAME( 1993, bluehawkn,bluehawk, bluehawk, bluehawk, driver_device, 0, ROT270, "Dooyong (NTC license)",         "Blue Hawk (NTC)",      MACHINE_SUPPORTS_SAVE )

@@ -112,7 +112,7 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 
 	/* bit 1 is used but unknown - palette banking (both write and display based on pollux bombs) */
 	int last_palbank = m_palette_bank;
-	m_palette_bank = (data & 0x02)>>1;
+	if (m_paletteram_flytiger) m_palette_bank = (data & 0x02)>>1;
 
 	if (last_palbank != m_palette_bank)
 	{
