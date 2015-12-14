@@ -2809,12 +2809,12 @@ ROM_START( finallapjc )
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c1",  0x080000, CRC(b0efec87) SHA1(6d042f35942c2bdbf5aeb31358d3837ee9c8e5fa) )
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c2",  0x100000, CRC(263b8e31) SHA1(e2665edd89f7bb8c699e61df6de6a2e8e0698092) )
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c3",  0x180000, CRC(c2c56743) SHA1(3f338599ffd2e13452cdc3dbf3697fd8aa04bcd2) )
-	NAMCOS2_GFXROM_LOAD_128K( "fl2-c4",  0x200000, CRC(83c77a50) SHA1(a3c19de25819586bdecae46326836090e80a92ee) )
+	NAMCOS2_GFXROM_LOAD_128K( "fl1-c4",  0x200000, CRC(cdc1de2e) SHA1(701dcc4fc25e7b6118947a5accabd43c0475ebe9) ) // Japan specific (was labeled fl2 - seems like fl1 is correct, fl2 is the english version?)
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c5",  0x280000, CRC(ab89da77) SHA1(5cbead4289269a832c0d44d0ded79b58fcc4cc17) )
-	NAMCOS2_GFXROM_LOAD_128K( "fl2-c6",  0x300000, CRC(239bd9a0) SHA1(729abe89bea31b4e21161c69579df775b1cba6fe) )
+	NAMCOS2_GFXROM_LOAD_128K( "fl1-c6",  0x300000, CRC(8e78a3c3) SHA1(d1cd7fad038d52430f933b3ee2440554d2aeade9) ) // Japan specific (was labeled fl2 - seems like fl1 is correct, fl2 is the english version?)
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* Mask shape */
-	NAMCOS2_GFXROM_LOAD_128K( "fl2-sha",  0x000000, CRC(5fda0b6d) SHA1(92c0410e159977ea73a8e8c0cb1321c3056f6c2f) )
+	NAMCOS2_GFXROM_LOAD_128K( "fl1_sha.bin",  0x000000, CRC(b7e1c7a3) SHA1(b82f9b340d95b80a12286647adba8c139b4d081a) )
 
 	ROM_REGION16_BE( 0x200000, "data_rom", ROMREGION_ERASEFF ) /* Shared data roms */
 	/* No DAT files present in ZIP archive */
@@ -2864,9 +2864,9 @@ ROM_START( finallapjb )
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c1",  0x080000, CRC(b0efec87) SHA1(6d042f35942c2bdbf5aeb31358d3837ee9c8e5fa) )
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c2",  0x100000, CRC(263b8e31) SHA1(e2665edd89f7bb8c699e61df6de6a2e8e0698092) )
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c3",  0x180000, CRC(c2c56743) SHA1(3f338599ffd2e13452cdc3dbf3697fd8aa04bcd2) )
-	NAMCOS2_GFXROM_LOAD_128K( "fl2-c4",  0x200000, CRC(cdc1de2e) SHA1(701dcc4fc25e7b6118947a5accabd43c0475ebe9) )
+	NAMCOS2_GFXROM_LOAD_128K( "fl1-c4",  0x200000, CRC(cdc1de2e) SHA1(701dcc4fc25e7b6118947a5accabd43c0475ebe9) ) // Japan specific (was labeled fl2 - seems like fl1 is correct, fl2 is the english version?)
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c5",  0x280000, CRC(ab89da77) SHA1(5cbead4289269a832c0d44d0ded79b58fcc4cc17) )
-	NAMCOS2_GFXROM_LOAD_128K( "fl2-c6",  0x300000, CRC(8e78a3c3) SHA1(d1cd7fad038d52430f933b3ee2440554d2aeade9) )
+	NAMCOS2_GFXROM_LOAD_128K( "fl1-c6",  0x300000, CRC(8e78a3c3) SHA1(d1cd7fad038d52430f933b3ee2440554d2aeade9) ) // Japan specific (was labeled fl2 - seems like fl1 is correct, fl2 is the english version?)
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* Mask shape */
 	NAMCOS2_GFXROM_LOAD_128K( "fl1_sha.bin",  0x000000, CRC(b7e1c7a3) SHA1(b82f9b340d95b80a12286647adba8c139b4d081a) )
