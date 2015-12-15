@@ -359,23 +359,27 @@ WRITE8_MEMBER(vsnes_state::gun_in0_w)
 
 		/* do the gun thing */
 		int x = ioport("GUNX")->read();
-		int y = ioport("GUNY")->read();
+		float y = ioport("GUNY")->read();
 		UINT8 pix;
 
+		y = y * 0.9375f; // scale 256 (our gun input range is 0 - 255) to 240 (screen visible area / bitmap we're using is 0 - 239)
+
+		UINT8 realy = (int)y;
+
 		/* get the pixel at the gun position */
-		pix = m_ppu1->get_pixel(x, y);
+		pix = m_ppu1->get_pixel(x, realy);
 
 
 		rgb_t col = m_palette->pen_color(pix);
-		//UINT8 r = col.r();
-		//UINT8 g = col.g();
-		//UINT8 b = col.b();
 		UINT8 bright = col.brightness();
 		// todo, calculate how bright it is with pix.r * 0.3 + pix.g * 0.59 + pix.b * 0.11 ?
 		// the mame calc above is UINT8 brightness() const { return (r() * 222 + g() * 707 + b() * 71) / 1000; }  (from lib/util/palette.h)
-
-		//printf("pix is %02x | %02x %02x %02x | %02x\n", pix, r,g,b,bright);
-
+#if 0
+		UINT8 r = col.r();
+		UINT8 g = col.g();
+		UINT8 b = col.b();
+		printf("pix is %02x | %02x %02x %02x | %02x\n", pix, r,g,b,bright);
+#endif
 		if (bright == 0xff)
 		{
 			m_input_latch[0] |= 0x40;
