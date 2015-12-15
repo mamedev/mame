@@ -524,9 +524,12 @@ static void dview_draw_title(DView *dv)
 
 	for (i = 0; i<strlen(dv->title.c_str()); i++)
 	{
-		dview_draw_char(dv, RECT_DVIEW_TITLE, str_x,
+		if(str_x < r.width() - debug_font_width)
+		{
+			dview_draw_char(dv, RECT_DVIEW_TITLE, str_x,
 				BORDER_YTHICKNESS, debug_font_height, //r.max_y - 2 * BORDER_YTHICKNESS,
 				rgb_t(0xff,0xff,0xff,0xff), (UINT16) dv->title[i] );
+		}
 		str_x += debug_font->char_width(debug_font_height, debug_font_aspect,(UINT16) dv->title[i]) + 2*BORDER_XTHICKNESS;
 	}
 }
@@ -1232,11 +1235,16 @@ static void render_editor(DView_edit *editor)
 	rectangle r;
 	const char* str = editor->str.c_str();
 	int str_x = 2 * BORDER_XTHICKNESS;
+	int start;
 //	int editor_width;
 	
 	dview_get_rect(dv,RECT_DVIEW_HSB,r);
 
 //	editor_width = debug_font->string_width(debug_font_height, debug_font_aspect, editor->str.c_str());
+	// figure out which character to start drawing, so that you can always see the end of the string you're typing
+	start = strlen(str) - (r.width() / (debug_font_width + 2*BORDER_XTHICKNESS));
+	if(start < 0)
+		start = 0;
 	
 	dview_draw_box(dv,RECT_DVIEW_HSB,0,0,r.width(),r.height(),rgb_t(0xff,0xff,0xff,0xff));
 	dview_draw_line(dv,RECT_DVIEW_HSB,0,0,r.width(),0,rgb_t(0xff,0xc0,0xc0,0xc0));
@@ -1244,9 +1252,10 @@ static void render_editor(DView_edit *editor)
 	dview_draw_line(dv,RECT_DVIEW_HSB,r.width(),r.height(),0,r.height(),rgb_t(0xff,0x60,0x60,0x60));
 	dview_draw_line(dv,RECT_DVIEW_HSB,0,r.height(),0,0,rgb_t(0xff,0xc0,0xc0,0xc0));
 	
-	for(int x=0;x<strlen(str);x++)
+	for(int x=start;x<strlen(str);x++)
 	{
-		dview_draw_char(dv,RECT_DVIEW_HSB,str_x,BORDER_YTHICKNESS,r.height(),rgb_t(0xff,0x00,0x00,0x00),(UINT16)str[x]);
+		if(str_x < r.width() - debug_font_width)
+			dview_draw_char(dv,RECT_DVIEW_HSB,str_x,BORDER_YTHICKNESS,r.height(),rgb_t(0xff,0x00,0x00,0x00),(UINT16)str[x]);
 		str_x += debug_font->char_width(r.height(),debug_font_aspect,(UINT16)str[x]) + 2*BORDER_XTHICKNESS;
 	}
 }
