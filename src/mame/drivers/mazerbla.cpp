@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Jarek Burczynski
+// copyright-holders:Jarek Burczynski, Angelo Salese
 /****************************************************************************
 
 Mazer Blazer by Stern Electronics (c) 1983
