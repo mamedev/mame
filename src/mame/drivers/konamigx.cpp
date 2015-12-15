@@ -1624,8 +1624,8 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 	tbyahhoo attract mode desync is caused by another matter. */
 
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
+	//MCFG_SCREEN_SIZE(64*8, 32*8)
+	//MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx)
 
 	MCFG_PALETTE_ADD("palette", 8192)
