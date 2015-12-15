@@ -8,7 +8,7 @@
 #include "debugger.h"
 #include "hphybrid.h"
 
-typedef void (*fn_dis_param)(char *buffer , offs_t pc , UINT16 opcode);
+typedef void (*fn_dis_param)(char *buffer , offs_t pc , UINT16 opcode , bool is_3001);
 
 typedef struct {
 		UINT16 m_op_mask;
@@ -18,84 +18,160 @@ typedef struct {
 		UINT32 m_dasm_flags;
 } dis_entry_t;
 
-static void addr_2_str(char *buffer , UINT16 addr , bool indirect)
+static void addr_2_str(char *buffer , UINT16 addr , bool indirect , bool is_3001)
 {
-		char *s = buffer + strlen(buffer);
+                char *s = buffer + strlen(buffer);
 
-		s += sprintf(s , "$%04x" , addr);
+                s += sprintf(s , "$%04x" , addr);
 
-		switch (addr) {
-		case HP_REG_A_ADDR:
-				strcpy(s , "(A)");
-				break;
+                if (is_3001) {
+                        switch (addr) {
+                        case HP_REG_AR1_ADDR:
+                                strcpy(s , "(Ar1)");
+                                break;
 
-		case HP_REG_B_ADDR:
-				strcpy(s , "(B)");
-				break;
+                        case HP_REG_AR1_ADDR + 1:
+                                strcpy(s , "(Ar1_2)");
+                                break;
 
-		case HP_REG_P_ADDR:
-				strcpy(s , "(P)");
-				break;
+                        case HP_REG_AR1_ADDR + 2:
+                                strcpy(s , "(Ar1_3)");
+                                break;
 
-		case HP_REG_R_ADDR:
-				strcpy(s , "(R)");
-				break;
+                        case HP_REG_AR1_ADDR + 3:
+                                strcpy(s , "(Ar1_4)");
+                                break;
 
-		case HP_REG_R4_ADDR:
-				strcpy(s , "(R4)");
-				break;
+                        case HP_REG_AR2_ADDR:
+                                strcpy(s , "(Ar2)");
+                                break;
 
-		case HP_REG_R5_ADDR:
-				strcpy(s , "(R5)");
-				break;
+                        case HP_REG_AR2_ADDR + 1:
+                                strcpy(s , "(Ar2_2)");
+                                break;
 
-		case HP_REG_R6_ADDR:
-				strcpy(s , "(R6)");
-				break;
+                        case HP_REG_AR2_ADDR + 2:
+                                strcpy(s , "(Ar2_3)");
+                                break;
 
-		case HP_REG_R7_ADDR:
-				strcpy(s , "(R7)");
-				break;
+                        case HP_REG_AR2_ADDR + 3:
+                                strcpy(s , "(Ar2_4)");
+                                break;
 
-		case HP_REG_IV_ADDR:
-				strcpy(s , "(IV)");
-				break;
+                        case HP_REG_SE_ADDR:
+                                strcpy(s , "(SE)");
+                                break;
 
-		case HP_REG_PA_ADDR:
-				strcpy(s , "(PA)");
-				break;
+                        case HP_REG_R25_ADDR:
+                                strcpy(s , "(R25)");
+                                break;
 
-		case HP_REG_DMAPA_ADDR:
-				strcpy(s , "(DMAPA)");
-				break;
+                        case HP_REG_R26_ADDR:
+                                strcpy(s , "(R26)");
+                                break;
 
-		case HP_REG_DMAMA_ADDR:
-				strcpy(s , "(DMAMA)");
-				break;
+                        case HP_REG_R27_ADDR:
+                                strcpy(s , "(R27)");
+                                break;
 
-		case HP_REG_DMAC_ADDR:
-				strcpy(s , "(DMAC)");
-				break;
+                        case HP_REG_R32_ADDR:
+                                strcpy(s , "(R32)");
+                                break;
 
-		case HP_REG_C_ADDR:
-				strcpy(s , "(C)");
-				break;
+                        case HP_REG_R33_ADDR:
+                                strcpy(s , "(R33)");
+                                break;
 
-		case HP_REG_D_ADDR:
-				strcpy(s , "(D)");
-				break;
-		}
+                        case HP_REG_R34_ADDR:
+                                strcpy(s , "(R34)");
+                                break;
 
-		if (indirect) {
-				strcat(s , ",I");
-		}
+                        case HP_REG_R35_ADDR:
+                                strcpy(s , "(R35)");
+                                break;
+
+                        case HP_REG_R36_ADDR:
+                                strcpy(s , "(R36)");
+                                break;
+
+                        case HP_REG_R37_ADDR:
+                                strcpy(s , "(R37)");
+                                break;
+                        }
+                }
+
+                switch (addr) {
+                case HP_REG_A_ADDR:
+                                strcpy(s , "(A)");
+                                break;
+
+                case HP_REG_B_ADDR:
+                                strcpy(s , "(B)");
+                                break;
+
+                case HP_REG_P_ADDR:
+                                strcpy(s , "(P)");
+                                break;
+
+                case HP_REG_R_ADDR:
+                                strcpy(s , "(R)");
+                                break;
+
+                case HP_REG_R4_ADDR:
+                                strcpy(s , "(R4)");
+                                break;
+
+                case HP_REG_R5_ADDR:
+                                strcpy(s , "(R5)");
+                                break;
+
+                case HP_REG_R6_ADDR:
+                                strcpy(s , "(R6)");
+                                break;
+
+                case HP_REG_R7_ADDR:
+                                strcpy(s , "(R7)");
+                                break;
+
+                case HP_REG_IV_ADDR:
+                                strcpy(s , "(IV)");
+                                break;
+
+                case HP_REG_PA_ADDR:
+                                strcpy(s , "(PA)");
+                                break;
+
+                case HP_REG_DMAPA_ADDR:
+                                strcpy(s , "(DMAPA)");
+                                break;
+
+                case HP_REG_DMAMA_ADDR:
+                                strcpy(s , "(DMAMA)");
+                                break;
+
+                case HP_REG_DMAC_ADDR:
+                                strcpy(s , "(DMAC)");
+                                break;
+
+                case HP_REG_C_ADDR:
+                                strcpy(s , "(C)");
+                                break;
+
+                case HP_REG_D_ADDR:
+                                strcpy(s , "(D)");
+                                break;
+                }
+
+                if (indirect) {
+                                strcat(s , ",I");
+                }
 }
 
-static void param_none(char *buffer , offs_t pc , UINT16 opcode)
+static void param_none(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
 {
 }
 
-static void param_loc(char *buffer , offs_t pc , UINT16 opcode)
+static void param_loc(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
 {
 		UINT16 base;
 		UINT16 off;
@@ -113,26 +189,26 @@ static void param_loc(char *buffer , offs_t pc , UINT16 opcode)
 				off -= 0x400;
 		}
 
-		addr_2_str(buffer , base + off , (opcode & 0x8000) != 0);
+		addr_2_str(buffer , base + off , (opcode & 0x8000) != 0 , is_3001);
 }
 
-static void param_addr32(char *buffer , offs_t pc , UINT16 opcode)
+static void param_addr32(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
 {
-		addr_2_str(buffer , opcode & 0x1f , (opcode & 0x8000) != 0);
+		addr_2_str(buffer , opcode & 0x1f , (opcode & 0x8000) != 0 , is_3001);
 }
 
-static void param_skip(char *buffer , offs_t pc , UINT16 opcode)
+static void param_skip(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
 {
 		UINT16 off = opcode & 0x3f;
 		if (off & 0x20) {
 				off -= 0x40;
 		}
-		addr_2_str(buffer , pc + off , false);
+		addr_2_str(buffer , pc + off , false , is_3001);
 }
 
-static void param_skip_sc(char *buffer , offs_t pc , UINT16 opcode)
+static void param_skip_sc(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
 {
-		param_skip(buffer, pc, opcode);
+		param_skip(buffer, pc, opcode , is_3001);
 
 		if (opcode & 0x80) {
 				if (opcode & 0x40) {
@@ -143,7 +219,7 @@ static void param_skip_sc(char *buffer , offs_t pc , UINT16 opcode)
 		}
 }
 
-static void param_ret(char *buffer , offs_t pc , UINT16 opcode)
+static void param_ret(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
 {
 		char *s = buffer + strlen(buffer);
 
@@ -159,16 +235,16 @@ static void param_ret(char *buffer , offs_t pc , UINT16 opcode)
 		}
 }
 
-static void param_n16(char *buffer , offs_t pc , UINT16 opcode)
+static void param_n16(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
 {
 		char *s = buffer + strlen(buffer);
 
 		sprintf(s , "%u" , (opcode & 0xf) + 1);
 }
 
-static void param_reg_id(char *buffer , offs_t pc , UINT16 opcode)
+static void param_reg_id(char *buffer , offs_t pc , UINT16 opcode , bool is_3001)
 {
-		addr_2_str(buffer, opcode & 7, false);
+		addr_2_str(buffer, opcode & 7, false , is_3001);
 
 		if (opcode & 0x80) {
 				strcat(buffer , ",D");
@@ -260,22 +336,78 @@ static const dis_entry_t dis_table[] = {
 		{0 , 0 , nullptr , nullptr , 0 }
 };
 
+static const dis_entry_t dis_table_emc[] = {
+        // *** EMC Instructions ***
+        {0xffff , 0x7200 , "MWA" , param_none , 0 },
+        {0xffff , 0x7220 , "CMY" , param_none , 0 },
+        {0xffff , 0x7260 , "CMX" , param_none , 0 },
+        {0xffff , 0x7280 , "FXA" , param_none , 0 },
+        {0xfff0 , 0x7300 , "XFR" , param_n16 , 0 },
+        {0xffff , 0x7340 , "NRM" , param_none , 0 },
+        {0xfff0 , 0x7380 , "CLR" , param_n16 , 0 },
+        {0xffff , 0x73c0 , "CDC" , param_none , 0 },
+        {0xffc0 , 0x74c0 , "SDS" , param_skip , 0 },
+        {0xffc0 , 0x75c0 , "SDC" , param_skip , 0 },
+        {0xffff , 0x7a00 , "FMP" , param_none , 0 },
+        {0xffff , 0x7a21 , "FDV" , param_none , 0 },
+        {0xffff , 0x7b00 , "MRX" , param_none , 0 },
+        {0xffff , 0x7b21 , "DRS" , param_none , 0 },
+        {0xffff , 0x7b40 , "MRY" , param_none , 0 },
+        {0xffff , 0x7b61 , "MLY" , param_none , 0 },
+        {0xffff , 0x7b8f , "MPY" , param_none , 0 },
+        // *** END ***
+        {0 , 0 , NULL , NULL , 0 }
+};
+
+static offs_t disassemble_table(UINT16 opcode , offs_t pc , const dis_entry_t *table , bool is_3001 , char *buffer)
+{
+    const dis_entry_t *p;
+
+    for (p = table; p->m_op_mask; p++) {
+        if ((opcode & p->m_op_mask) == p->m_opcode) {
+            strcpy(buffer , p->m_mnemonic);
+            strcat(buffer , " ");
+            p->m_param_fn(buffer , pc , opcode , is_3001);
+            return 1 | p->m_dasm_flags | DASMFLAG_SUPPORTED;
+        }
+    }
+
+    return 0;
+}
+
 CPU_DISASSEMBLE(hp_hybrid)
 {
-		UINT16 opcode = ((UINT16)oprom[ 0 ] << 8) | oprom[ 1 ];
-		const dis_entry_t *p;
+        UINT16 opcode = ((UINT16)oprom[ 0 ] << 8) | oprom[ 1 ];
+        offs_t res;
 
-		for (p = dis_table; p->m_op_mask; p++) {
-				if ((opcode & p->m_op_mask) == p->m_opcode) {
-						strcpy(buffer , p->m_mnemonic);
-						strcat(buffer , " ");
-						p->m_param_fn(buffer , pc , opcode);
-						return 1 | p->m_dasm_flags | DASMFLAG_SUPPORTED;
-				}
-		}
+        res = disassemble_table(opcode , pc , dis_table , false , buffer);
 
-		// Unknown opcode
-		strcpy(buffer , "???");
+        if (res == 0) {
+                // Unknown opcode
+                strcpy(buffer , "???");
+                res = 1 | DASMFLAG_SUPPORTED;
+        }
 
-		return 1 | DASMFLAG_SUPPORTED;
+        return res;
 }
+
+CPU_DISASSEMBLE(hp_5061_3001)
+{
+        UINT16 opcode = ((UINT16)oprom[ 0 ] << 8) | oprom[ 1 ];
+        offs_t res;
+
+        res = disassemble_table(opcode , pc , dis_table_emc , true , buffer);
+
+        if (res == 0) {
+                res = disassemble_table(opcode , pc , dis_table , true , buffer);
+        }
+
+        if (res == 0) {
+                // Unknown opcode
+                strcpy(buffer , "???");
+                res = 1 | DASMFLAG_SUPPORTED;
+        }
+
+        return res;
+}
+
