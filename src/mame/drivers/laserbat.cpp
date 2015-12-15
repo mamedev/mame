@@ -11,8 +11,8 @@
     and they don't use the collision detection provided by the s2636 chips.
 
 TODO:
-- how to use the 82S100 PLA dump
-- colors (tile_index in tilemap needs to be adjusted)
+- work out where all the magic layer offsets come from
+- correct colour intensites based on monitor gamma
 - sound in laserbat (with schematics) and in catnmous
 - cocktail support
 
@@ -22,39 +22,8 @@ TODO:
 #include "cpu/m6800/m6800.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/6821pia.h"
-#include "sound/tms3615.h"
 #include "includes/laserbat.h"
 
-
-WRITE8_MEMBER(laserbat_state::laserbat_videoram_w)
-{
-	if (m_video_page == 0)
-	{
-		m_videoram[offset] = data;
-		m_bg_tilemap->mark_tile_dirty(offset);
-	}
-	else if (m_video_page == 1)
-	{
-		m_colorram[offset] = data;
-		m_bg_tilemap->mark_tile_dirty(offset); // wrong!
-	}
-}
-
-WRITE8_MEMBER(laserbat_state::video_extra_w)
-{
-	m_video_page = (data & 0x10) >> 4;
-	m_sprite_enable = (data & 1) ^ 1;
-	m_sprite_code = (data & 0xe0) >> 5;
-	m_sprite_color = (data & 0x0e) >> 1;
-}
-
-WRITE8_MEMBER(laserbat_state::sprite_x_y_w)
-{
-	if (offset == 0)
-		m_sprite_x = 256 - data;
-	else
-		m_sprite_y = 256 - data;
-}
 
 WRITE8_MEMBER(laserbat_state::laserbat_input_mux_w)
 {
@@ -74,32 +43,6 @@ READ8_MEMBER(laserbat_state::laserbat_input_r)
 
 	return ioport(portnames[m_input_mux])->read();
 }
-
-WRITE8_MEMBER(laserbat_state::laserbat_cnteff_w)
-{
-	// 0x01 = _ABEFF1
-	// 0x02 = _ABEFF2
-	// 0x04 = MPX EFF2-_SW
-	// 0x08 = COLEFF 0
-	// 0x10 = COLEFF 1
-	// 0x20 = _NEG 1
-	// 0x40 = _NEG 2
-	// 0x80 = MPX P 1/2
-}
-
-#ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(laserbat_state::laserbat_cntmov_w)
-{
-	// 0x01 = AB MOVE
-	// 0x02 = CLH0
-	// 0x04 = CLH1
-	// 0x08 = LUM
-	// 0x10 = MPX BKEFF
-	// 0x20 = SHPA
-	// 0x40 = SHPB
-	// 0x80 = SHPC
-}
-#endif
 
 /*
 
@@ -126,37 +69,11 @@ WRITE8_MEMBER(laserbat_state::laserbat_cntmov_w)
     NAV0    D6, D4, D2, D0, 0, 0, 0, 0
     NAV1    D7, D5, D3, D1, 0, 0, 0, 0
 
-    82S100.10M lines are connected as follows:
-
-    I0  NAV0
-    I1  NAV1
-    I2  CLH0
-    I3  CLH1
-    I4  LUM
-    I5  C1*
-    I6  C2*
-    I7  C3*
-    I8  BKR
-    I9  BKG
-    I10 BKB
-    I11 SHELL
-    I12 EFF1
-    I13 EFF2
-    I14 COLEFF0
-    I15 COLEFF1
-
-    F0  -> 820R -> RED
-    F1  -> 820R -> GREEN
-    F2  -> 820R -> BLUE
-    F3  -> 270R -> RED
-    F4  -> 270R -> GREEN
-    F5  -> 270R -> BLUE
-    F6  -> 1K -> RED
-    F7  -> 1K -> GREEN
-
 */
 
 static ADDRESS_MAP_START( laserbat_map, AS_PROGRAM, 8, laserbat_state )
+	ADDRESS_MAP_UNMAP_HIGH
+
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_ROM
@@ -165,32 +82,36 @@ static ADDRESS_MAP_START( laserbat_map, AS_PROGRAM, 8, laserbat_state )
 	AM_RANGE(0x7800, 0x7bff) AM_ROM
 
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_WRITENOP // always 0 (bullet ram in Quasar)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_device, read_data, write_data)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_device, read_data, write_data)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_3", s2636_device, read_data, write_data)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_WRITE(laserbat_videoram_w)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("pvi1", s2636_device, read_data, write_data)
+	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("pvi2", s2636_device, read_data, write_data)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("pvi3", s2636_device, read_data, write_data)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_WRITE(videoram_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( laserbat_io_map, AS_IO, 8, laserbat_state )
-	AM_RANGE(0x00, 0x00) AM_WRITE(laserbat_cnteff_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(video_extra_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(cnt_eff_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(cnt_nav_w)
 	AM_RANGE(0x02, 0x02) AM_READ(laserbat_input_r) AM_WRITE(laserbat_csound1_w)
-	AM_RANGE(0x04, 0x05) AM_WRITE(sprite_x_y_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(wcoh_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(wcov_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(laserbat_input_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(laserbat_csound2_w)
+
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( catnmous_io_map, AS_IO, 8, laserbat_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_byte_w) // soundlatch ?
-	AM_RANGE(0x01, 0x01) AM_WRITE(video_extra_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(cnt_nav_w)
 	AM_RANGE(0x02, 0x02) AM_READ(laserbat_input_r)
 	AM_RANGE(0x02, 0x02) AM_WRITENOP // unknown
-	AM_RANGE(0x04, 0x05) AM_WRITE(sprite_x_y_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(wcoh_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(wcov_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(laserbat_input_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITENOP // unknown
+
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
@@ -475,63 +396,6 @@ static GFXDECODE_START( laserbat )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, sprites_layout,   0,   8 ) /* Sprites   */
 GFXDECODE_END
 
-TILE_GET_INFO_MEMBER(laserbat_state::get_tile_info)
-{
-	// wrong color index!
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], m_colorram[tile_index] & 0x7f, 0);
-}
-
-void laserbat_state::video_start()
-{
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(laserbat_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-
-	save_item(NAME(m_videoram));
-	save_item(NAME(m_colorram));
-}
-
-UINT32 laserbat_state::screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int y;
-
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-	/* update the S2636 chips */
-	bitmap_ind16 const &s2636_1_bitmap = m_s2636_1->update(cliprect);
-	bitmap_ind16 const &s2636_2_bitmap = m_s2636_2->update(cliprect);
-	bitmap_ind16 const &s2636_3_bitmap = m_s2636_3->update(cliprect);
-
-	/* copy the S2636 images into the main bitmap */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		int x;
-
-		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
-		{
-			int pixel1 = s2636_1_bitmap.pix16(y, x);
-			int pixel2 = s2636_2_bitmap.pix16(y, x);
-			int pixel3 = s2636_3_bitmap.pix16(y, x);
-
-			if (S2636_IS_PIXEL_DRAWN(pixel1))
-				bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel1);
-
-			if (S2636_IS_PIXEL_DRAWN(pixel2))
-				bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel2);
-
-			if (S2636_IS_PIXEL_DRAWN(pixel3))
-				bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel3);
-		}
-	}
-
-	if (m_sprite_enable)
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-				m_sprite_code,
-				m_sprite_color,
-				0,0,
-				m_sprite_x - 6,m_sprite_y,0);
-
-	return 0;
-}
-
 
 /* Cat'N Mouse sound ***********************************/
 
@@ -597,23 +461,37 @@ INTERRUPT_GEN_MEMBER(laserbat_state::zaccaria_cb1_toggle)
 	m_cb1_toggle ^= 1;
 }
 
-void laserbat_state::machine_start()
+DRIVER_INIT_MEMBER(laserbat_state, laserbat)
 {
 	m_pia = machine().device<pia6821_device>("pia");
 	m_tms1 = machine().device<tms3615_device>("tms1");
 	m_tms2 = machine().device<tms3615_device>("tms2");
 
-	save_item(NAME(m_video_page));
+	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+
+	save_item(NAME(m_bg_ram));
+	save_item(NAME(m_eff_ram));
+	save_item(NAME(m_mpx_bkeff));
+	save_item(NAME(m_nave));
+	save_item(NAME(m_clr_lum));
+	save_item(NAME(m_shp));
+	save_item(NAME(m_wcoh));
+	save_item(NAME(m_wcov));
+	save_item(NAME(m_abeff1));
+	save_item(NAME(m_abeff2));
+	save_item(NAME(m_mpx_eff2_sh));
+	save_item(NAME(m_coleff));
+	save_item(NAME(m_neg1));
+	save_item(NAME(m_neg2));
+}
+
+void laserbat_state::machine_start()
+{
 	save_item(NAME(m_input_mux));
 	save_item(NAME(m_active_8910));
 	save_item(NAME(m_port0a));
 	save_item(NAME(m_last_port0b));
 	save_item(NAME(m_cb1_toggle));
-	save_item(NAME(m_sprite_x));
-	save_item(NAME(m_sprite_y));
-	save_item(NAME(m_sprite_code));
-	save_item(NAME(m_sprite_color));
-	save_item(NAME(m_sprite_enable));
 	save_item(NAME(m_csound1));
 	save_item(NAME(m_ksound1));
 	save_item(NAME(m_ksound2));
@@ -627,17 +505,11 @@ void laserbat_state::machine_start()
 
 void laserbat_state::machine_reset()
 {
-	m_video_page = 0;
 	m_input_mux = 0;
 	m_active_8910 = 0;
 	m_port0a = 0;
 	m_last_port0b = 0;
 	m_cb1_toggle = 0;
-	m_sprite_x = 0;
-	m_sprite_y = 0;
-	m_sprite_code = 0;
-	m_sprite_color = 0;
-	m_sprite_enable = 0;
 	m_csound1 = 0;
 	m_ksound1 = 0;
 	m_ksound2 = 0;
@@ -649,6 +521,19 @@ void laserbat_state::machine_reset()
 	m_bit14 = 0;
 }
 
+void laserbat_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_SCANLINE:
+		video_line(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in laserbat_state::device_timer");
+	}
+}
+
+
 static MACHINE_CONFIG_START( laserbat, laserbat_state )
 
 	/* basic machine hardware */
@@ -659,24 +544,25 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 29*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_RAW_PARAMS(14318180, 227*4, 43*4-1, 227*4-1, 312, 8, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state, screen_update_laserbat)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", laserbat)
-	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(laserbat_state, laserbat)
 
-	MCFG_DEVICE_ADD("s2636_1", S2636, 0)
-	MCFG_S2636_OFFSETS(-16, -27)
+	MCFG_DEVICE_ADD("pvi1", S2636, 0)
+	MCFG_S2636_OFFSETS(-8, 0)
+	MCFG_S2636_DIVIDER(3)
 
-	MCFG_DEVICE_ADD("s2636_2", S2636, 0)
-	MCFG_S2636_OFFSETS(-16, -27)
+	MCFG_DEVICE_ADD("pvi2", S2636, 0)
+	MCFG_S2636_OFFSETS(-8, -28)
+	MCFG_S2636_DIVIDER(3)
 
-	MCFG_DEVICE_ADD("s2636_3", S2636, 0)
-	MCFG_S2636_OFFSETS(-16, -27)
+	MCFG_DEVICE_ADD("pvi3", S2636, 0)
+	MCFG_S2636_OFFSETS(-8, -28)
+	MCFG_S2636_DIVIDER(3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -733,14 +619,15 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", laserbat)
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_INIT_OWNER(laserbat_state, laserbat)
 
-	MCFG_DEVICE_ADD("s2636_1", S2636, 0)
+	MCFG_DEVICE_ADD("pvi1", S2636, 0)
 	MCFG_S2636_OFFSETS(-16, -19)
 
-	MCFG_DEVICE_ADD("s2636_2", S2636, 0)
+	MCFG_DEVICE_ADD("pvi2", S2636, 0)
 	MCFG_S2636_OFFSETS(-16, -19)
 
-	MCFG_DEVICE_ADD("s2636_3", S2636, 0)
+	MCFG_DEVICE_ADD("pvi3", S2636, 0)
 	MCFG_S2636_OFFSETS(-16, -19)
 
 	/* sound hardware */
@@ -806,7 +693,7 @@ ROM_START( laserbat )
 	ROM_LOAD( "lb02.14l",     0x0000, 0x0800, CRC(d29962d1) SHA1(5b6d0856c3ebbd5833b522f7c0240309cf3c9777) )
 
 	ROM_REGION( 0x0100, "plds", 0 )
-	ROM_LOAD( "82s100_prom",  0x0000, 0x00f5, NO_DUMP )
+	ROM_LOAD( "82s100_prom",  0x0000, 0x00f5, CRC(c3eb562a) SHA1(65dff81b2e5321d530e5171dab9aa3809ab38b4d) BAD_DUMP )
 ROM_END
 
 ROM_START( lazarian )
@@ -952,11 +839,11 @@ ROM_START( catnmousa )
 	ROM_LOAD( "catnmous.14l", 0x0000, 0x0800, CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
 
 	ROM_REGION( 0x0100, "plds", 0 )
-	ROM_LOAD( "catnmousa_82s100.13m", 0x0000, 0x00f5, NO_DUMP )
+	ROM_LOAD( "catnmousa_82s100.13m", 0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) BAD_DUMP )
 ROM_END
 
 
-GAME( 1981, laserbat, 0,        laserbat, laserbat, driver_device, 0, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, lazarian, laserbat, laserbat, lazarian, driver_device, 0, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmous, 0,        catnmous, catnmous, driver_device, 0, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE)
-GAME( 1982, catnmousa,catnmous, catnmous, catnmous, driver_device, 0, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, laserbat, 0,        laserbat, laserbat, laserbat_state, laserbat, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, lazarian, laserbat, laserbat, lazarian, laserbat_state, laserbat, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmous, 0,        catnmous, catnmous, laserbat_state, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE)
+GAME( 1982, catnmousa,catnmous, catnmous, catnmous, laserbat_state, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
