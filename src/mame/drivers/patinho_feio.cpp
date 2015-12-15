@@ -5,6 +5,9 @@
 */
 
 #include "emu.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "softlist.h"
 #include "cpu/patinhofeio/patinho_feio.h"
 
 class patinho_feio_state : public driver_device
@@ -17,11 +20,19 @@ public:
 
 	DECLARE_DRIVER_INIT(patinho_feio);
 	DECLARE_READ16_MEMBER(rc_r);
+	DECLARE_READ8_MEMBER(decwriter_status_r);
+//	DECLARE_READ8_MEMBER(decwriter_data_r);
+	DECLARE_WRITE8_MEMBER(decwriter_data_w);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( patinho_tape );
 	void load_tape(const char* name);
 	void load_raw_data(const char* name, unsigned int start_address, unsigned int data_length);
 	virtual void machine_start() override;
 //    virtual void machine_reset();
 //    required_device<patinho_feio_cpu_device> m_maincpu;
+private:
+        UINT8* paper_tape_data;
+        UINT32 paper_tape_length;
+        UINT32 paper_tape_address;
 };
 
 /*
@@ -36,6 +47,26 @@ READ16_MEMBER(patinho_feio_state::rc_r)
 	return ioport("RC_HIGH")->read() << 8 | ioport("RC_LOW")->read();
 }
 
+WRITE8_MEMBER(patinho_feio_state::decwriter_data_w)
+{
+	printf("DECWRITTER: byte value = %02X ('%c')\n", data, data);
+}
+
+READ8_MEMBER(patinho_feio_state::decwriter_status_r)
+{
+	//This should only return true after a certain delay
+	// We should verify in the DECWRITER specs what is its speed
+	// (in characters per second) in order to implement
+	// the high-level emulation of its behaviour here.
+        return true;
+}
+
+/* The hardware does not perform this checking.
+   This is implemented here only for debugging purposes.
+
+   Also, proper punched paper tape emulation does
+   not use this function at all.
+*/
 void patinho_feio_state::load_tape(const char* name){
 	UINT8 *RAM = (UINT8 *) memshare("maincpu:internalram")->ptr();
 	UINT8 *data = memregion(name)->base();
@@ -63,6 +94,18 @@ void patinho_feio_state::load_raw_data(const char* name, unsigned int start_addr
 	memcpy(&RAM[start_address], data, data_length);
 }
 
+DEVICE_IMAGE_LOAD_MEMBER( patinho_feio_state, patinho_tape )
+{
+    if (image.software_entry() != nullptr)
+    {
+        paper_tape_length = image.get_software_region_length("rom");
+        paper_tape_data = image.get_software_region("rom");
+        paper_tape_address = 0;
+    }
+
+    return IMAGE_INIT_PASS;
+}
+
 void patinho_feio_state::machine_start(){
 	// Copy some programs directly into RAM.
 	// This is a hack for setting up the computer
@@ -77,6 +120,8 @@ void patinho_feio_state::machine_start(){
 	//    Allows users to load programs from the
 	//    console into the computer memory.
 	load_raw_data("hexam", 0xE00, 0x0D5);
+
+	load_raw_data("loader", 0xF80, 0x080);
 }
 
 static INPUT_PORTS_START( patinho_feio )
@@ -102,6 +147,40 @@ static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 	/* CPU @ approx. 500 kHz (memory cycle time is 2usec) */
 	MCFG_CPU_ADD("maincpu", PATINHO_FEIO, 500000)
 	MCFG_PATINHO_RC_READ_CB(READ16(patinho_feio_state, rc_r))
+
+	/* Printer */
+//	MCFG_PATINHO_IODEV_WRITE_CB(0x5, WRITE8(patinho_feio_state, printer_data_w))
+//	MCFG_PATINHO_IODEV_STATUS_CB(0x5, READ8(patinho_feio_state, printer_status_r))
+
+	/* Papertape Puncher */
+//	MCFG_PATINHO_IODEV_WRITE_CB(0x8, WRITE8(patinho_feio_state, papertape_punch_data_w))
+//	MCFG_PATINHO_IODEV_STATUS_CB(0x8, READ8(patinho_feio_state, papertape_punch_status_r))
+
+	/* Card Reader */
+//	MCFG_PATINHO_IODEV_READ_CB(0x9, READ8(patinho_feio_state, cardreader_data_r))
+//	MCFG_PATINHO_IODEV_STATUS_CB(0x9, READ8(patinho_feio_state, cardreader_status_r))
+
+	/* DECWRITER */
+//	MCFG_PATINHO_IODEV_READ_CB(0xA, READ8(patinho_feio_state, decwriter_data_r))
+	MCFG_PATINHO_IODEV_WRITE_CB(0xA, WRITE8(patinho_feio_state, decwriter_data_w))
+	MCFG_PATINHO_IODEV_STATUS_CB(0xA, READ8(patinho_feio_state, decwriter_status_r))
+
+	/* Teletype */
+//	MCFG_PATINHO_IODEV_READ_CB(0xB, READ8(patinho_feio_state, teletype_data_r))
+//	MCFG_PATINHO_IODEV_STATUS_CB(0xB, READ8(patinho_feio_state, teletype_status_r))
+
+	/* Papertape Reader */
+//	MCFG_PATINHO_IODEV_READ_CB(0xE, READ8(patinho_feio_state, papertapereader_data_r))
+//	MCFG_PATINHO_IODEV_STATUS_CB(0xE, READ8(patinho_feio_state, papertapereader_status_r))
+
+
+	/* punched tape */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "patinho_tape")
+	MCFG_GENERIC_EXTENSIONS("bin")
+	MCFG_GENERIC_LOAD(patinho_feio_state, patinho_tape)
+
+	// software lists
+//	MCFG_SOFTWARE_LIST_ADD("tape_list", "patinho")
 MACHINE_CONFIG_END
 
 ROM_START( patinho )
@@ -110,6 +189,9 @@ ROM_START( patinho )
 
 	ROM_REGION( 0x0d5, "exemplo_16.7", 0 )
 	ROM_LOAD( "exemplo_16.7.bin", 0x000, 0x028, CRC(0a87ac8d) SHA1(7c35ac3eed9ed239f2ef56c26e6f0c59f635e1ac) )
+
+	ROM_REGION( 0x080, "loader", 0 )
+	ROM_LOAD( "loader.bin", 0x000, 0x080, BAD_DUMP CRC(c2a8fa9d) SHA1(0ae4f711ef5d6e9d26c611fd2c8c8ac45ecbf9e7) )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE        INPUT         INIT                              COMPANY                                           FULLNAME */

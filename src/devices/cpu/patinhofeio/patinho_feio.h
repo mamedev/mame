@@ -8,29 +8,22 @@
 #define MCFG_PATINHO_RC_READ_CB(_devcb) \
 	devcb = &patinho_feio_cpu_device::set_rc_read_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_PATINHO_IODEV_READ_CB(devnumber, _devcb) \
+	devcb = &patinho_feio_cpu_device::set_iodev_read_callback(*device, devnumber, DEVCB_##_devcb);
+#define MCFG_PATINHO_IODEV_WRITE_CB(devnumber, _devcb) \
+	devcb = &patinho_feio_cpu_device::set_iodev_write_callback(*device, devnumber, DEVCB_##_devcb);
+#define MCFG_PATINHO_IODEV_STATUS_CB(devnumber, _devcb) \
+	devcb = &patinho_feio_cpu_device::set_iodev_status_callback(*device, devnumber, DEVCB_##_devcb);
+
 /* register IDs */
 enum
 {
-	PATINHO_FEIO_CI=1, PATINHO_FEIO_ACC, PATINHO_FEIO_IDX, PATINHO_FEIO_RC
+	PATINHO_FEIO_CI=1, PATINHO_FEIO_ACC, PATINHO_FEIO_EXT, PATINHO_FEIO_IDX, PATINHO_FEIO_RC
 };
 
 enum {
-	DEVICE_BUSY=0,
-	DEVICE_READY=1
-};
-
-class patinho_feio_peripheral
-{
-public:
-	patinho_feio_peripheral()
-	: io_status(DEVICE_READY)
-	, device_is_ok(true)
-	, IRQ_request(false)
-	{ };
-
-	int io_status;
-	bool device_is_ok;
-	bool IRQ_request;
+       DEVICE_BUSY=0,
+       DEVICE_READY=1
 };
 
 class patinho_feio_cpu_device : public cpu_device
@@ -40,6 +33,9 @@ public:
 	patinho_feio_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
 	template<class _Object> static devcb_base &set_rc_read_callback(device_t &device, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_rc_read_cb.set_callback(object); }
+        template<class _Object> static devcb_base &set_iodev_read_callback(device_t &device, int devnumber, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_read_cb[devnumber].set_callback(object); }
+        template<class _Object> static devcb_base &set_iodev_write_callback(device_t &device, int devnumber, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_write_cb[devnumber].set_callback(object); }
+        template<class _Object> static devcb_base &set_iodev_status_callback(device_t &device, int devnumber, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_status_cb[devnumber].set_callback(object); }
 
 protected:
 
@@ -59,7 +55,8 @@ protected:
                         *       It represents the 12 bits of input data
                         *       from toggle switches in the computer panel
                         */
-	unsigned char m_idx;
+	unsigned char m_idx; /* IDX = Index Register */
+	unsigned char m_ext; /* EXT = Accumulator Extension Register */
 
 	/* processor state flip-flops */
 	bool m_run;                /* processor is running */
@@ -71,8 +68,6 @@ protected:
 	int m_flags;
 	// V = "Vai um" (Carry flag)
 	// T = "Transbordo" (Overflow flag)
-
-	patinho_feio_peripheral m_peripherals[16];
 
 	int m_address_mask;        /* address mask */
 	int m_icount;
@@ -99,6 +94,9 @@ private:
 	unsigned int compute_effective_address(unsigned int addr);
 	UINT16 read_panel_keys_register();
 	devcb_read16 m_rc_read_cb;
+        devcb_read8 m_iodev_read_cb[16];
+        devcb_write8 m_iodev_write_cb[16];
+        devcb_read8 m_iodev_status_cb[16];
 };
 
 

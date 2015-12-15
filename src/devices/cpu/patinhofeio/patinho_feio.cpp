@@ -10,6 +10,7 @@
 
 #define PC       m_pc //The program counter is called "contador de instrucoes" in portuguese
 #define ACC      m_acc
+#define EXT      m_ext
 #define RC       read_panel_keys_register()
 #define FLAGS    m_flags
 
@@ -23,6 +24,9 @@
 
 #define READ_INDEX_REG() READ_BYTE_PATINHO(0x000)
 #define WRITE_INDEX_REG(V) { WRITE_BYTE_PATINHO(0x000, V); m_idx = V; }
+
+#define READ_ACC_EXTENSION_REG() READ_BYTE_PATINHO(0x001)
+#define WRITE_ACC_EXTENSION_REG(V) { WRITE_BYTE_PATINHO(0x001, V); m_ext = V; }
 
 #define ADDRESS_MASK_4K    0xFFF
 #define INCREMENT_PC_4K    (PC = (PC+1) & ADDRESS_MASK_4K)
@@ -50,7 +54,11 @@ patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, 
 	: cpu_device(mconfig, PATINHO_FEIO, "PATINHO FEIO", tag, owner, clock, "patinho_feio_cpu", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, ADDRESS_MAP_NAME(prog_8bit)),
 		m_icount(0),
-		m_rc_read_cb(*this)
+		m_rc_read_cb(*this),
+                /* These arrays of *this are very ugly. I wonder if there's a better way of coding this... */
+		m_iodev_read_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this},
+		m_iodev_write_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this},
+		m_iodev_status_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this}
 {
 }
 
@@ -67,8 +75,22 @@ void patinho_feio_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 
+//TODO: implement handling of these special purpose registers
+//      which are also mapped to the first few main memory positions:
+//
+//      ERI: "Endereço de Retorno de Interrupção"
+//           "Interrupt Return Address"
+//           stored at addresses 002 and 003
+
+//      ETI: "início de uma rotina de tratamento de interrupção (se houver)"
+//           "start of an interrupt service routine (if any)"
+//           stored at address 004 (and 005 as well?)
+
+// It seems that the general purpose memory starts at address 006.
+
 	save_item(NAME(m_pc));
 	save_item(NAME(m_acc));
+	save_item(NAME(m_ext));
 	save_item(NAME(m_rc));
 	save_item(NAME(m_idx));
 	save_item(NAME(m_flags));
@@ -77,6 +99,7 @@ void patinho_feio_cpu_device::device_start()
 	state_add( PATINHO_FEIO_CI,         "CI",       m_pc         ).mask(0xFFF);
 	state_add( PATINHO_FEIO_RC,         "RC",       m_rc         ).mask(0xFFF);
 	state_add( PATINHO_FEIO_ACC,        "ACC",      m_acc        ).mask(0xFF);
+	state_add( PATINHO_FEIO_EXT,        "EXT",      m_ext        ).mask(0xFF);
 	state_add( PATINHO_FEIO_IDX,        "IDX",      m_idx        ).mask(0xFF);
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("0%06O").noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_flags).noshow().formatstr("%8s");
@@ -87,14 +110,24 @@ void patinho_feio_cpu_device::device_start()
 		m_rc_read_cb.resolve();
 	}
 
+	for (int i=0; i<16; i++){
+		if (!m_iodev_read_cb[i].isnull())
+			m_iodev_read_cb[i].resolve();        
+		if (!m_iodev_write_cb[i].isnull())
+			m_iodev_write_cb[i].resolve();        
+		if (!m_iodev_status_cb[i].isnull())
+			m_iodev_status_cb[i].resolve();        
+        }
+
 	m_icountptr = &m_icount;
 }
 
 void patinho_feio_cpu_device::device_reset()
 {
 	m_pc = 0x006;
-	m_acc = 0;
 	m_rc = 0;
+	m_acc = 0;
+	m_ext = READ_ACC_EXTENSION_REG();
 	m_idx = READ_INDEX_REG();
 	m_flags = 0;
 	m_run = true;
@@ -110,6 +143,7 @@ void patinho_feio_cpu_device::execute_run()
 		if ((! m_run)){
 			m_icount = 0;   /* if processor is stopped, just burn cycles */
 		} else {
+			m_ext = READ_ACC_EXTENSION_REG();
 			m_idx = READ_INDEX_REG();
 			read_panel_keys_register();
 
@@ -252,6 +286,19 @@ void patinho_feio_cpu_device::execute_instruction()
 			//PNL 7:
 			ACC = (RC & 0xFF);
 			FLAGS = V;
+			return;
+		case 0x98:
+			//PUL="Pula para /002 a limpa estado de interrupção"
+			//     Jump to address /002 and disables interrupts
+                        PC = 0x002;
+			m_interrupts_enabled = false;
+			return;
+		case 0x99:
+			//TRE="Troca conteúdos de ACC e EXT"
+			//     Exchange the value of the accumulator with the ACC extension register
+                        value = ACC;
+                        ACC = READ_ACC_EXTENSION_REG();
+                        WRITE_ACC_EXTENSION_REG(value);
 			return;
 		case 0x9A:
 			//INIB="Inibe"
@@ -471,19 +518,27 @@ void patinho_feio_cpu_device::execute_instruction()
 				case 0x20:
 					//SAL="Salta"
 					//    Skips a couple bytes if a condition is met
-					skip = false;
+                                        skip = false;
 					switch(function)
 					{
 						case 1:
-							if (m_peripherals[channel].io_status == DEVICE_READY)
-								skip = true;
+							skip = true;
+							if (! m_iodev_status_cb[channel].isnull()
+							    && m_iodev_status_cb[channel](0) == DEVICE_BUSY)
+								skip = false;
 							break;
 						case 2:
-							if (m_peripherals[channel].device_is_ok)
+							/* TODO:
+							skip = false;
+							if (! m_iodev_is_ok_cb[channel].isnull()
+							    && m_iodev_is_ok_cb[channel](0)) */
 								skip = true;
 							break;
 						case 4:
-							if (m_peripherals[channel].IRQ_request == true)
+							/*TODO:
+							skip =false;
+							if (! m_iodev_IRQ_cb[channel].isnull()
+							    && m_iodev_IRQ_cb[channel](0) == true)*/
 								skip = true;
 							break;
 					}
@@ -494,10 +549,16 @@ void patinho_feio_cpu_device::execute_instruction()
 					}
 					break;
 				case 0x40:
+					/* ENTR = "Input data from I/O device" */
 					printf("Unimplemented ENTR /%X0 instruction\n", channel);
 					break;
 				case 0x80:
-					printf("Unimplemented SAI /%X0 instruction (ACC = 0x%02X '%c')\n", channel, ACC, ACC);
+					/* SAI = "Output data to I/O device" */
+					if (m_iodev_write_cb[channel].isnull()){
+						printf("Warning: There's no device hooked up at I/O address 0x%X", channel);
+					} else {
+						m_iodev_write_cb[channel](ACC);
+					}
 					break;
 			}
 			return;
