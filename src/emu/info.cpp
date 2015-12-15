@@ -620,7 +620,7 @@ void info_xml_creator::output_sample(device_t &device)
 		for (const char *samplename = iter.first(); samplename != nullptr; samplename = iter.next())
 		{
 			// filter out duplicates
-			if (!(already_printed.insert(samplename)).second)
+			if (!already_printed.insert(samplename).second)
 				continue;
 
 			// output the sample name
