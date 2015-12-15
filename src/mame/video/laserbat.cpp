@@ -127,8 +127,8 @@ WRITE8_MEMBER(laserbat_state::cnt_eff_w)
 		|  0  | /ABEFF1     | effect 1 enable                               |
 		|  1  | /ABEFF2     | effect 2/shell enable                         |
 		|  2  | MPX EFF2 SH | select SHELL point or EFF2 area for effect 2  |
-		|  3  | COLEFF 0    | colour bit 14 for all pixels                  |
-		|  4  | COLEFF 1    | colour bit 15 for all pixels                  |
+		|  3  | COLEFF 0    | area effect colour bit 0                      |
+		|  4  | COLEFF 1    | area effect colour bit 1                      |
 		|  5  | /NEG 1      | select inside/outside area for effect 1       |
 		|  6  | /NEG 2      | select inside/outside area for effect 2       |
 		|  7  | MPX P_1/2   |                                               |
@@ -196,7 +196,7 @@ void laserbat_state::video_start()
 			UINT32 const sensitive = ((products[term] >> 16) ^ products[term]) & 0x0000ffff;
 			UINT32 const required = ~products[term] & sensitive & 0x0000ffff;
 			UINT32 const inactive = ~((products[term] >> 16) | products[term]) & 0x0000ffff;
-			printf("if (!0x%04x && ((x & 0x%04x) == 0x%04x)) y |= %02x;\n", inactive, sensitive, required, sums[term]);
+			printf("if (!0x%04x && ((x & 0x%04x) == 0x%04x)) y |= %02x; /* %u */\n", inactive, sensitive, required, sums[term], term);
 		}
 	}
 	UINT8 const mask = *bitstream;
@@ -261,8 +261,8 @@ TIMER_CALLBACK_MEMBER(laserbat_state::video_line)
 		| 11  | SHELL   | shell point                       |
 		| 12  | EFF1    | effect 1 area                     |
 		| 13  | EFF2    | effect 2 area                     |
-		| 14  | COLEFF0 | colour effect bit 0               |
-		| 15  | COLEFF1 | colour effect bit 1               |
+		| 14  | COLEFF0 | area effect colour bit 0          |
+		| 15  | COLEFF1 | area effect colour bit 1          |
 		+-----+---------+-----------------------------------+
 	*/
 
