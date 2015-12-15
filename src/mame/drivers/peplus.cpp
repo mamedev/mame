@@ -6372,7 +6372,7 @@ Overall average for the 4 of a Kind bonus is 173.35 credits
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap2283.u50", 0x0000, 0x0200, NO_DUMP ) /* Should be CAP2283 */
+	ROM_LOAD( "cap2283.u50", 0x0000, 0x0100, NO_DUMP ) /* Should be CAP2283 */
 	ROM_LOAD( "cap904.u50", 0x0000, 0x0100, CRC(0eec8336) SHA1(a6585c978dbc2f4f3818e3a5b92f8c28be23c4c0) ) /* BPROM type N82S135N verified */
 ROM_END
 
