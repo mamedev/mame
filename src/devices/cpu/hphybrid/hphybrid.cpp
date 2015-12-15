@@ -1442,7 +1442,7 @@ UINT16 hp_5061_3001_cpu_device::execute_no_bpc_ioc(UINT16 opcode)
                         } else {
                                 // Unrecognized instructions: NOP
                                 // Execution time is fictional
-                                logerror("hp-5061-3001: unknown opcode %04x\n" , opcode);
+                                logerror("hp-5061-3001: unknown opcode %04x @ %06x\n" , opcode , m_genpc);
                                 m_icount -= 6;
                         }
                         break;
