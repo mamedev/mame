@@ -8,11 +8,12 @@
 
     This is an absolutely insane arrangement of three Signetics S2623
 	PVIs and custom TTL logic.  The PVIs can each render up to four
-	(potentially duplicated) sprites.  The TTL logic renders a
-	background layer and a single 32x32 pixel sprite.  There are also
-	two symmetrical area effects where the game only needs to program
-	the horizontal distance from the screen edge for each line, and a
-	per-line single-pixel shell effect.
+	(potentially duplicated) sprites.  The TTL logic renders a single
+	32x32 pixel 4-colour sprite and an 8-colour background tilemap.
+	There are also two symmetrical area effects where the game only
+	needs to program the horizontal distance from the screen edge for
+	each line, and a per-line single-pixel shell effect.  The shell
+	effect replaces one of the area effects if used.
 
 	In order to get 30% more horizontal resolution than Signetics
 	intended, this board divides the master clock by 4 to drive the
@@ -39,11 +40,19 @@
 	However video is actually generated in a 16-bit internal colour
 	space and mapped onto the 8-bit output colour space using a PLA.
 
+	The equations in the PAL give the following graphics priorities,
+	from highest to lowest:
+	* TTL-generated sprite
+	* PVIs (colours ORed, object/score output ignored)
+	* Shell/area effect 2
+	* Background tilemap
+	* Area effect 1
+
 	There are still issues with horizontal alignment between layers.  I
 	have the schematic, yet I really can't understand where these issues
 	are coming from.  I'm pretty sure alignment between TTL background
 	and sprites is right, judging from gameplay.  I'm not sure about
-	alignment with the effect layer.
+	alignment with the effect layers.
 
 	There are definitely alignment problems with the PVI opjects, but
 	that may be a bug in the S2636 implementation.  I need to check it
@@ -75,25 +84,37 @@ PALETTE_INIT_MEMBER(laserbat_state, laserbat)
 
 		0.0000, 0.1031, 0.1324, 0.2987 , 0.7194, 1.2821, 1.4711, 3.1372
 
-		Note that it's not a pretty ramp by any means, in particular the
-		last value looks disproportionately high and is probably meant
-		to drive the monitor input into saturation.  Scaling these
-		values proportionally into the range 0..255 gives an unusually
-		dark display.  Besides that, there's arcade monitor gamma to be
-		considered when mapping this to sRGB space.
+		The game never sets the colour to any value above 4, effectively
+		treating it as 5-level red and green, and 3-level blue, for a
+		total of 75 usable colours.
 
-		The values here are made using a quadratic function.  It gives a
-		usable display, but it can't be considered accurate.
+		From the fact that there's no DC offset on red and green, and the
+		highest value used is just over 0.7V, I'm guessing the game
+		expects to drive a standard 0.7V RGB monitor, and higher colour
+		values would simply saturate the input.
+
+		However there's still that nasty DC offset on the blue caused by
+		the fact that it has no LSB.  I'm treating it as though it has
+		the same gain as the other channels but the DC offset adjusted
+		for (monitor can detect DC offset during blanking periods).
+		This could be wrong, but it works fairly well, giving roughly
+		the same intensity for medium red and medium blue as used by the
+		game.
+
+		Finally, to make it not look like the inside of a coal mine,
+		I've applied gamma decoding at 2.2, and the result doesn't look
+		too bad.
 	*/
 
-	int const weights[] = { 0, 59, 110, 154, 191, 219, 191, 255 };
+	int const weights[] = { 0, 107, 120, 173, 255, 255, 255, 255 };
+	int const blue_weights[] = { 0, 0, 60, 121, 241, 255, 255, 255, 255 };
 	for (int entry = 0; palette.entries() > entry; entry++)
 	{
 		UINT8 const bits(entry & 0xff);
 		UINT8 const r(((bits & 0x01) << 1) | ((bits & 0x08) >> 1) | ((bits & 0x40) >> 6));
 		UINT8 const g(((bits & 0x02) >> 0) | ((bits & 0x10) >> 2) | ((bits & 0x80) >> 7));
 		UINT8 const b(((bits & 0x04) >> 1) | ((bits & 0x20) >> 3) | 0x01);
-		palette.set_pen_color(entry, rgb_t(weights[r], weights[g], weights[b]));
+		palette.set_pen_color(entry, rgb_t(weights[r], weights[g], blue_weights[b]));
 	}
 }
 
