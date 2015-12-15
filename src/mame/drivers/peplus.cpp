@@ -3454,6 +3454,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "mxo-cg2135.u75",  0x18000, 0x8000, CRC(dc905cdc) SHA1(2c7032841d322a7e280a385a652f203e2fb8042e) )
 
 	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1292.u50", 0x0000, 0x0100, NO_DUMP ) /* Should be CAP1292 */
 	ROM_LOAD( "cap953.u50", 0x0000, 0x0100, CRC(6ece50ad) SHA1(bc5761303b09625850ba50263607d11871ea3ed3) )
 ROM_END
 
@@ -6147,6 +6148,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "mxo-cg2135.u75",  0x18000, 0x8000, CRC(dc905cdc) SHA1(2c7032841d322a7e280a385a652f203e2fb8042e) )
 
 	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1292.u50", 0x0000, 0x0100, NO_DUMP ) /* Should be CAP1292 */
 	ROM_LOAD( "cap953.u50", 0x0000, 0x0100, CRC(6ece50ad) SHA1(bc5761303b09625850ba50263607d11871ea3ed3) )
 ROM_END
 
@@ -6969,7 +6971,7 @@ ROM_START( peke0004 ) /* Normal board : Keno 1-10 Spot (KE0004) */
 	ROM_LOAD( "mxo-cg1273.u75",  0x18000, 0x8000, CRC(fee165ed) SHA1(26f2c35f091a496bb61789c701795eabb3e5735e) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap1267.u50", 0x0000, 0x0100, CRC(7051db57) SHA1(76751a3cc47d506983205decb07e99ca0c178a42) )
+	ROM_LOAD( "cap797.u50", 0x0000, 0x0100, CRC(1ab81779) SHA1(17e037235bb8c3f4a420d84841bac734373bf6b8) )
 ROM_END
 
 ROM_START( peke0017 ) /* Normal board : Keno 1-10 Spot (KE0017) */
@@ -11997,6 +11999,35 @@ Double Bonus Poker   P323A     99.10%
 	ROM_LOAD( "capx2174.u43", 0x0000, 0x0200, CRC(50bdad55) SHA1(958d463c7effb3457c1f9c44c9b7822339c04e8b) )
 ROM_END
 
+ROM_START( pexm002pa ) /* Superboard : Multi-Poker (XM00002P) - Bonus Poker, Bonus Poker Dlx, Deuces Wild Poker, Jacks or Better & Dbl Bonus Poker */
+/*
+Combined average payout percent: 98.14%
+
+Game Type           PayTable   Payout
+-------------------------------------
+Bonus Poker          P90A      98.00%
+Bonus Poker Deluxe   P251A     97.40%
+Deuces Wild Poker    P62A      98.90%
+Jacks or Better      BA        97.30%
+Double Bonus Poker   P323A     99.10%
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "xmp00006.u67",   0x00000, 0x10000, CRC(d61f1677) SHA1(2eca1315d6aa310a54de2dfa369e443a07495b76) ) /*  07/25/96   @ IGT  MI */
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "xm00002p.u66",   0x00000, 0x10000, CRC(96cf471c) SHA1(9597bf6a80c392ee22dc4606db610fdaf032377f) ) /*  07/18/95   @ IGT  MI */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2440.u77",  0x00000, 0x8000, CRC(a4b2c9ab) SHA1(962f86bedc5b786080cc2d8a1264b15cca9c2f2e) ) /*  05/28/99   @ IGT  MI */
+	ROM_LOAD( "mgo-cg2440.u78",  0x08000, 0x8000, CRC(82633a6b) SHA1(3651ef86cb3c33af5a20ac3b7ffceaa19c7e87d6) )
+	ROM_LOAD( "mbo-cg2440.u79",  0x10000, 0x8000, CRC(a984bf7f) SHA1(2c1c01fddafda934112f507d522710d94e30668a) )
+	ROM_LOAD( "mxo-cg2440.u80",  0x18000, 0x8000, CRC(9849096b) SHA1(65604ac2a2a27d4e458f6878aacf86f63f5f7c58) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx2440.u43", 0x0000, 0x0200, NO_DUMP ) /* Should be white cards with black logo */
+	ROM_LOAD( "capx2294.u43", 0x0000, 0x0200, CRC(641b72c0) SHA1(22f940defceee579fce8547c3469765be730ec56) )
+ROM_END
+
 ROM_START( pexm003p ) /* Superboard : Multi-Poker (XM00003P) - Bonus Poker, Bonus Poker Dlx, Deuces Wild Poker, Jacks or Better & Dbl Bonus Poker */
 /*
 Combined average payout percent: 96.78%
@@ -13008,6 +13039,7 @@ GAMEL(1995, pekoc825,  0,         peplus,  peplus_poker, peplus_state, peplussb,
 /* Superboard : Multi-Poker */
 GAMEL(1995, pexm001p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00001P+XMP00003) Multi-Poker",        0, layout_pe_poker )
 GAMEL(1995, pexm002p,  pexm001p, peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00002P+XMP00006) Multi-Poker",        0, layout_pe_poker )
+GAMEL(1995, pexm002pa, pexm001p, peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00002P+XMP00006) Multi-Poker (MGM Grand Detroit Casino)", MACHINE_WRONG_COLORS, layout_pe_poker ) /* CAPX2440 not dumped */
 GAMEL(1995, pexm003p,  pexm001p, peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00003P+XMP00024) Multi-Poker",        0, layout_pe_poker )
 GAMEL(1995, pexm004p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00004P+XMP00002) Multi-Poker",        0, layout_pe_poker )
 GAMEL(1995, pexm005p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00005P+XMP00004) Multi-Poker",        0, layout_pe_poker )
