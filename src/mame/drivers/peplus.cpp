@@ -6273,16 +6273,17 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "pp0775_a44-a73.u68",   0x00000, 0x10000, CRC(79a56642) SHA1(dfde6c12551e4f12a59e31c14fbfb9edb57e4fac) ) /* Game Version: A44, Library Version: A73 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2xxx.u72",  0x00000, 0x8000, NO_DUMP ) /* Unknown set needed for correct paytable graphics */
-	ROM_LOAD( "mgo-cg2xxx.u73",  0x08000, 0x8000, NO_DUMP )
-	ROM_LOAD( "mbo-cg2xxx.u74",  0x10000, 0x8000, NO_DUMP )
-	ROM_LOAD( "mxo-cg2xxx.u75",  0x18000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mro-cg2195.u72",  0x00000, 0x8000, NO_DUMP ) /* CG2195 set needed for correct paytable graphics */
+	ROM_LOAD( "mgo-cg2195.u73",  0x08000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mbo-cg2195.u74",  0x10000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mxo-cg2195.u75",  0x18000, 0x8000, NO_DUMP )
 	ROM_LOAD( "mro-cg2312.u77",  0x00000, 0x8000, CRC(29a9d408) SHA1(af8c18833ea268b80fabf3b539f35c6782a0309d) ) /* WRONG?!?! Use until the correct set is verified! */
 	ROM_LOAD( "mgo-cg2312.u78",  0x08000, 0x8000, CRC(b5ea2602) SHA1(82ee6d45dbc53ccf2d2a956daa83f41bb4a27384) ) /* Gives full paytable, but the hands listed are wrong */
 	ROM_LOAD( "mbo-cg2312.u79",  0x10000, 0x8000, CRC(e349202c) SHA1(ef6a904112361425aef5824ae983c15d3456dc49) )
 	ROM_LOAD( "mxo-cg2312.u80",  0x18000, 0x8000, CRC(1e0d3df8) SHA1(716d6bd2b41ef41a7da393e805651c378a16e00e) ) /* These graphics don't seem to work with anything else */
 
 	ROM_REGION( 0x200, "proms", 0 )
+//	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified - For use with CG2195 when added */
 	ROM_LOAD( "capx2312.u43", 0x0000, 0x0200, CRC(66971da6) SHA1(6984a68bc2f01009ad6a7a0705c00e715c29bb65) )
 ROM_END
 
@@ -6361,16 +6362,17 @@ Overall average for the 4 of a Kind bonus is 173.35 credits
 	ROM_LOAD( "pp0816_a5f-a7k.u68",   0x00000, 0x10000, CRC(a1e21b56) SHA1(aa0a730b2ed48612c3b20831b1aa698a45f557c0) ) /* Game Version: A5F, Library Version: A7K */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2xxx.u72",  0x00000, 0x8000, NO_DUMP ) /* Unknown set needed for Treasure Chest bonus round graphics */
-	ROM_LOAD( "mgo-cg2xxx.u73",  0x08000, 0x8000, NO_DUMP )
-	ROM_LOAD( "mbo-cg2xxx.u74",  0x10000, 0x8000, NO_DUMP )
-	ROM_LOAD( "mxo-cg2xxx.u75",  0x18000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mro-cg2283.u72",  0x00000, 0x8000, NO_DUMP ) /* CG2283 set needed for Treasure Chest bonus round graphics */
+	ROM_LOAD( "mgo-cg2283.u73",  0x08000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mbo-cg2283.u74",  0x10000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mxo-cg2283.u75",  0x18000, 0x8000, NO_DUMP )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /* WRONG CG set!! MAX Bet 4K "BONUS" graphics is missing and */
 	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) ) /* all treasure chest graphics missing for bonus & attract screens */
 	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap2283.u50", 0x0000, 0x0200, NO_DUMP ) /* Should be CAP2283 */
 	ROM_LOAD( "cap904.u50", 0x0000, 0x0100, CRC(0eec8336) SHA1(a6585c978dbc2f4f3818e3a5b92f8c28be23c4c0) ) /* BPROM type N82S135N verified */
 ROM_END
 
@@ -8890,7 +8892,8 @@ PayTable   Ks+  2P   3K   STR  FL  FH  4K  SF  5K  RF  4D   RF  (Bonus)
      Programs Available: PP0489, X000489P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* Errors with INCOMPATIBLE EPROM error, no dumped program works with this DATA set */
+	ROM_LOAD( "xp000074.u67",   0x00000, 0x10000, NO_DUMP ) /* required program XP000074 not dumped */
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* Errors with INCOMPATIBLE EPROM error */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000489p.u66",   0x00000, 0x10000, CRC(73d21c66) SHA1(0f863037a34549f4255dedda70b4401d288eee01) ) /* Double Down Stud Deuces Wild Poker - 04/21/97   @ IGT  MO */
@@ -11932,8 +11935,8 @@ ROM_START( pex1087s ) /* Superboard : Double Double Diamond Slots (X001087S+XS00
 	ROM_LOAD( "mxo-cg2415.u80",  0x18000, 0x8000, CRC(c427fff8) SHA1(5f41ff4d4598609a753c2e986f2a8cd63aa87d30) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "capx2415.u43", 0x0000, 0x0200, NO_DUMP ) /* Should be CAPX2415(?) */
-	ROM_LOAD( "capx2361.u43", 0x0000, 0x0200, CRC(93057296) SHA1(534bbf8ee80a22822d577f6685501f4c929987ef) ) /* Wrong!! Should be CAPX2415(?) */
+	ROM_LOAD( "capx2415.u43", 0x0000, 0x0200, NO_DUMP ) /* Should be CAPX2415 */
+	ROM_LOAD( "capx2361.u43", 0x0000, 0x0200, CRC(93057296) SHA1(534bbf8ee80a22822d577f6685501f4c929987ef) ) /* Wrong!! Should be CAPX2415 */
 ROM_END
 
 ROM_START( pexm001p ) /* Superboard : Multi-Poker (XM00001P) - Bonus Poker, Bonus Poker Dlx, Deuces Wild Poker, Jacks or Better & Dbl Bonus Poker */
@@ -12753,10 +12756,10 @@ GAMEL(1987, pepp0757,  pepp0250, peplus,  peplus_poker, peplus_state, peplus,   
 GAMEL(1987, pepp0760,  pepp0250, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0760) Double Down Stud Poker",        0, layout_pe_poker )
 GAMEL(1987, pepp0763,  pepp0158, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0763) 4 of a Kind Bonus Poker",       0, layout_pe_poker )
 GAMEL(1987, pepp0764,  pepp0158, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0764) 4 of a Kind Bonus Poker",       0, layout_pe_poker )
-GAMEL(1987, pepp0775,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0775) Royal Deuces Poker??",          MACHINE_IMPERFECT_GRAPHICS, layout_pe_poker ) /* Wrong CG graphics & CAP */
+GAMEL(1987, pepp0775,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0775) Royal Deuces Poker??",          MACHINE_IMPERFECT_GRAPHICS, layout_pe_poker ) /* Needs CG2195 graphics roms */
 GAMEL(1987, pepp0797,  pepp0542, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0797) One Eyed Jacks Wild Poker",     0, layout_pe_poker )
 GAMEL(1987, pepp0812,  pepp0127, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0812) Deuces Joker Wild Poker",       0, layout_pe_poker )
-GAMEL(1987, pepp0816,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0816) Treasure Chest Poker",          MACHINE_IMPERFECT_GRAPHICS, layout_pe_poker ) /* Wrong CG graphics & CAP - Missing "Bonus" at MAX Bet for 4 of a Kind & Treasure Chest graphics */
+GAMEL(1987, pepp0816,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0816) Treasure Chest Poker",          MACHINE_IMPERFECT_GRAPHICS, layout_pe_poker ) /* CG2283+CAP2283 undumped - Missing "Bonus" at MAX Bet for 4 of a Kind & Treasure Chest graphics */
 
 /* Normal board : International Poker */
 GAMEL(1987, peip0028,  0,        peplus,  peplus_poker, peplus_state, nonplus,  ROT0,  "IGT - International Game Technology", "Player's Edge Plus (IP0028) Joker Poker - French",          0, layout_pe_poker )
@@ -12887,7 +12890,7 @@ GAMEL(1995, pex0455p,  0,         peplus,  peplus_poker, peplus_state, peplussb,
 GAMEL(1995, pex0458p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000458P+XP000038) Joker Poker (Aces or Better)", 0, layout_pe_poker )
 GAMEL(1995, pex0459p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000459P+XP000038) Joker Poker",         0, layout_pe_poker )
 GAMEL(1995, pex0459pa, pex0459p,  peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000459P+XP000155) Joker Poker",         0, layout_pe_poker )
-GAMEL(1995, pex0489p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000489P+XP000038) Double Down Stud Deuces Wild Poker", MACHINE_NOT_WORKING, layout_pe_poker ) /* Needs unknown PE+ GAME POKER program to run */
+GAMEL(1995, pex0489p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000489P+XP000038) Double Down Stud Deuces Wild Poker", MACHINE_NOT_WORKING, layout_pe_poker ) /* Needs XP000074 PE+ GAME POKER program to run */
 GAMEL(1995, pex0508p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000508P+XP000038) Loose Deuce Deuces Wild! Poker", 0, layout_pe_poker )
 GAMEL(1995, pex0514p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000514P+XP000038) Double Bonus Poker",  0, layout_pe_poker )
 GAMEL(1995, pex0515p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000515P+XP000038) Double Bonus Poker",  0, layout_pe_poker )
