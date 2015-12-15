@@ -1774,6 +1774,8 @@ static MACHINE_CONFIG_START( vsdual, vsnes_state )
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsdual)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsdual)
 
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 2*8*4*16)
 	MCFG_PALETTE_INIT_OWNER(vsnes_state,vsdual)
