@@ -39,6 +39,7 @@ public:
 
         /* Optional information overrides */
         virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const; //override;
 	virtual const rom_entry *device_rom_region() const;
 
 	/* Callbacks */
@@ -64,7 +65,6 @@ public:
 	DECLARE_READ8_MEMBER(p39_r);
 	DECLARE_WRITE8_MEMBER(p50_5f_w);
 
-	DECLARE_READ8_MEMBER(ds_r); // Dip switches???
 	DECLARE_READ8_MEMBER(m68k_dma_r);
 	DECLARE_WRITE8_MEMBER(m68k_dma_w);
 

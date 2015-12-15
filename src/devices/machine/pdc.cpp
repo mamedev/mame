@@ -70,12 +70,73 @@ static ADDRESS_MAP_START( pdc_io, AS_IO, 8, pdc_device )
 	AM_RANGE(0x21, 0x2F) AM_READWRITE(fdd_68k_r,fdd_68k_w) AM_MIRROR(0xFF00)
 	AM_RANGE(0x38, 0x38) AM_READ(p38_r) AM_MIRROR(0xFF00) // Possibly UPD765 interrupt
 	AM_RANGE(0x39, 0x39) AM_READ(p39_r) AM_MIRROR(0xFF00) // HDD related
-	AM_RANGE(0x3c, 0x3d) AM_READ(ds_r) AM_MIRROR(0xFF00) // Dipswitches??
+	AM_RANGE(0x3c, 0x3c) AM_READ_PORT("SW2") AM_MIRROR(0xFF00) /* FDC Dipswitch */
+	AM_RANGE(0x3d, 0x3d) AM_READ_PORT("SW1") AM_MIRROR(0xFF00) /* HDC Dipswitch */
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE(HDC_TAG, hdc9224_device,read,write) AM_MIRROR(0xFF00)
 	AM_RANGE(0x42, 0x43) AM_DEVICE(FDC_TAG, upd765a_device, map) AM_MIRROR(0xFF00)
 	AM_RANGE(0x50, 0x5f) AM_WRITE(p50_5f_w) AM_MIRROR(0xFF00)
 	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE(FDCDMA_TAG,am9517a_device,read,write) AM_MIRROR(0xFF00)
 ADDRESS_MAP_END
+
+//-------------------------------------------------
+//  INPUT_PORTS_START( pdc )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( pdc_ports )
+	/* Hard Disk Controller SW1 */
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x80, 0x80, "SW1-1") PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "SW1-2") PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "SW1-3") PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "SW1-4") PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "SW1-5") PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "SW1-6") PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "SW1-7") PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "SW1-8") PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	/* Floppy Disk Controller SW2 */
+	PORT_START("SW2")
+	PORT_DIPNAME( 0x80, 0x80, "SW2-1") PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "SW2-2") PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "SW2-3") PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "SW2-4") PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "SW2-5") PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "SW2-6") PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "SW2-7") PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, "SW2-8") PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( pdc_floppies )
@@ -149,6 +210,11 @@ MACHINE_CONFIG_END
 machine_config_constructor pdc_device::device_mconfig_additions() const
 {
         return MACHINE_CONFIG_NAME( pdc );
+}
+
+ioport_constructor pdc_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( pdc_ports );
 }
 
 //**************************************************************************
@@ -440,22 +506,5 @@ WRITE8_MEMBER(pdc_device::p50_5f_w)
 			break;
 		default:
 			if(TRACE_PDC_FDC) logerror("PDC: Port %02x WRITE: %x\n", address, data);
-	}
-}
-
-READ8_MEMBER(pdc_device::ds_r)
-{
-	switch(offset)
-	{
-		case 0x00:
-			logerror("PDC: Dipswitch %02X READ\n", offset);
-			return 0xFE;
-			break;
-		case 0x01:
-			logerror("PDC: Dipswitch %02X READ\n", offset);
-			return 0x0;
-			break;
-		default:
-			return 0;
 	}
 }
