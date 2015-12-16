@@ -1919,6 +1919,14 @@ ROM_START(konamigx)
 
 	/* sound program */
 	ROM_REGION( 0x40000, "soundcpu", ROMREGION_ERASE00 )
+	// TODO: Bus Error, I guess?
+	//ROM_FILL( 4, 1, 0x00 )
+	//ROM_FILL( 5, 1, 0x00 )
+	ROM_FILL( 6, 1, 0x01 )
+	//ROM_FILL( 7, 1, 0x00 )
+	ROM_FILL( 0x100, 1, 0x60 )
+	ROM_FILL( 0x101, 1, 0xfe )
+
 	/* tiles */
 	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASEFF )
 	/* sprites */
