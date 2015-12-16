@@ -82,8 +82,8 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-        virtual void machine_start();
-        virtual void machine_reset();
+        virtual void machine_start() override;
+        virtual void machine_reset() override;
 
         TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 
