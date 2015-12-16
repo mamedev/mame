@@ -199,6 +199,7 @@ public:
 	int m_gx_cfgport;
 	int m_suspension_active, m_resume_trigger;
 	int m_last_prot_op, m_last_prot_clk;
+	UINT8 m_prev_pixel_clock;
 
 	UINT8 m_esc_program[4096];
 	esc_cb m_esc_cb;

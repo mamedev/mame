@@ -508,7 +508,7 @@ WRITE32_MEMBER(konamigx_state::control_w)
 	// TODO: derive from reported PCB XTALs
 	const UINT32 pixclock[4] = { XTAL_6MHz, XTAL_8MHz, XTAL_12MHz, XTAL_16MHz};
 	//logerror("write %x to control register (mask=%x)\n", data, mem_mask);
-
+	
 	// known controls:
 	// bit 23 = reset graphics chips
 	// bit 22 = 0 to halt 68000, 1 to let it run (SOUNDRESET)
@@ -546,7 +546,11 @@ WRITE32_MEMBER(konamigx_state::control_w)
 
 		m_gx_wrport2 = (data>>16)&0xff;
 		
-		m_k053252->set_unscaled_clock(pixclock[m_gx_wrport2 & 3]);
+		if(m_prev_pixel_clock != (m_gx_wrport2 & 3))
+		{
+			m_k053252->set_unscaled_clock(pixclock[m_gx_wrport2 & 3]);
+			m_prev_pixel_clock = m_gx_wrport2 & 3;
+		}
 	}
 }
 
@@ -1619,13 +1623,13 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
+	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	/* These parameters are actual value written to the CCU.
 	tbyahhoo attract mode desync is caused by another matter. */
 
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
+	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
 	// TODO: WTF, without these most games crashes? Some legacy call in video code???
-	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx)
 
@@ -1811,14 +1815,14 @@ static MACHINE_CONFIG_DERIVED( gxtype3, konamigx )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_SIZE(576, 264)
+	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx_left)
 
 	MCFG_SCREEN_ADD("screen2", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
-	MCFG_SCREEN_SIZE(576, 264)
+	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx_right)
 
@@ -1842,7 +1846,7 @@ static MACHINE_CONFIG_DERIVED( gxtype4, konamigx )
 	MCFG_SCREEN_ADD("screen2", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
-	MCFG_SCREEN_SIZE(128*8, 264)
+	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 32*8-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx_right)
 
@@ -1873,7 +1877,7 @@ static MACHINE_CONFIG_DERIVED( gxtype4_vsn, gxtype4 )
 	
 	
 	MCFG_SCREEN_MODIFY("screen2")
-	MCFG_SCREEN_SIZE(128*8, 32*8)
+	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
 
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4_vsn)
@@ -3697,7 +3701,8 @@ MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 	m_gx_rdport1_3 = 0xfc;
 	m_gx_syncen    = 0;
 	m_suspension_active = 0;
-
+	m_prev_pixel_clock = 0xff;
+	
 	// Hold sound CPUs in reset
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
