@@ -776,5 +776,5 @@ COMP( 1978, hp9845s,   hp9845a, 0,      hp9845a,       hp9845, driver_device, 0,
 COMP( 1979, hp9835a,   0,       0,      hp9835a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9835A",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1979, hp9835b,   hp9835a, 0,      hp9835a,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9835B",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1980, hp9845b,   0,       0,      hp9845b,       hp9845b,driver_device, 0,      "Hewlett-Packard",  "9845B",  MACHINE_NO_SOUND )
-COMP( 1980, hp9845t,   hp9845b, 0,      hp9845b,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9845T",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1981, hp9845c,   hp9845b, 0,      hp9845b,       hp9845, driver_device, 0,      "Hewlett-Packard",  "9845C",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1980, hp9845t,   hp9845b, 0,      hp9845b,       hp9845b,driver_device, 0,      "Hewlett-Packard",  "9845T",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, hp9845c,   hp9845b, 0,      hp9845b,       hp9845b,driver_device, 0,      "Hewlett-Packard",  "9845C",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
