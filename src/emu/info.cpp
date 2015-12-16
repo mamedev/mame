@@ -394,7 +394,7 @@ void info_xml_creator::output_devices()
 		device_iterator deviter(m_drivlist.config().root_device());
 		for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
 		{
-			if (device->owner() != nullptr && device->shortname()!= nullptr && strlen(device->shortname())!=0)
+			if (device->owner() != nullptr && device->shortname()!= nullptr && device->shortname()[0]!='\0')
 			{
 				if (shortnames.insert(device->shortname()).second)
 					output_one_device(*device, device->tag());
@@ -424,7 +424,7 @@ void info_xml_creator::output_devices()
 				device_iterator deviter2(*dev);
 				for (device_t *device = deviter2.first(); device != nullptr; device = deviter2.next())
 				{
-					if (device->owner() == dev && device->shortname()!= nullptr && strlen(device->shortname())!=0)
+					if (device->owner() == dev && device->shortname()!= nullptr && device->shortname()[0]!='\0')
 					{
 						if (shortnames.insert(device->shortname()).second)
 							output_one_device(*device, device->tag());
@@ -447,7 +447,7 @@ void info_xml_creator::output_device_roms()
 {
 	device_iterator deviter(m_drivlist.config().root_device());
 	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
-		if (device->owner() != nullptr && device->shortname()!= nullptr && strlen(device->shortname())!=0)
+		if (device->owner() != nullptr && device->shortname()!= nullptr && device->shortname()[0]!='\0')
 			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", xml_normalize_string(device->shortname()));
 }
 
