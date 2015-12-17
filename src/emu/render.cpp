@@ -1456,13 +1456,13 @@ void render_target::debug_free(render_container &container)
 
 
 //-------------------------------------------------
-//  debug_top - move a debug view container to
-//  the top of the list
+//  debug_append - move a debug view container to
+//  the end of the list
 //-------------------------------------------------
 
-void render_target::debug_top(render_container &container)
+void render_target::debug_append(render_container &container)
 {
-	m_debug_containers.prepend(m_debug_containers.detach(container));
+	m_debug_containers.append(m_debug_containers.detach(container));
 }
 
 

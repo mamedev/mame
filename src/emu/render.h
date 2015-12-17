@@ -942,7 +942,7 @@ public:
 	// debug containers
 	render_container *debug_alloc();
 	void debug_free(render_container &container);
-	void debug_top(render_container &container);
+	void debug_append(render_container &container);
 
 	// resolve tag lookups
 	void resolve_tags();
