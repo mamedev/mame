@@ -1457,7 +1457,7 @@ UINT32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb3
 					UINT16* src = &m_gxtype1_roz_dstbitmap2->pix16(y);
 					//UINT16* src = &m_gxtype1_roz_dstbitmap->pix16(y);
 
-					UINT32* dst = &bitmap.pix32(256-y);
+					UINT32* dst = &bitmap.pix32((256+16)-y);
 
 					for (x=0;x<512;x++)
 					{
