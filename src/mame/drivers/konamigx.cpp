@@ -597,7 +597,10 @@ TIMER_CALLBACK_MEMBER(konamigx_state::dmaend_callback)
 
 void konamigx_state::dmastart_callback(int data)
 {
+	int sprite_timing;
+	
 	// raise the DMA busy flag
+	// TODO: is it supposed to raise even if DMA is disabled?
 	m_gx_rdport1_3 |= 2;
 
 	// begin transfer if DMAEN(bit4 of OBJSET1) is set (see p.48)
@@ -608,7 +611,12 @@ void konamigx_state::dmastart_callback(int data)
 	}
 
 	// simulate DMA delay
-	m_dmadelay_timer->adjust(attotime::from_usec(m_gx_wrport2 & 1 ? (256+32) : (342+42)));
+	// TODO: Rushing Heroes doesn't like reported sprite timings, probably due of sprite protection being issued istantly or requires the double buffering ...
+	if(m_gx_rushingheroes_hack == 1)
+		sprite_timing = 64;
+	else
+		sprite_timing = m_gx_wrport2 & 1 ? (256+32) : (342+42);
+	m_dmadelay_timer->adjust(attotime::from_usec(sprite_timing));
 }
 
 
@@ -874,10 +882,10 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 				    known commands:
 				    rng2   rushhero  vsnet  winspike   what
 				    ------------------------------------------------------------------------------
-				        0a56   0d96  0d14   0d1c       memcpy from c01000 to c01400 for 0x400 bytes
+				    0a56   0d96      0d14   0d1c       memcpy from c01000 to c01400 for 0x400 bytes
 				    0b16                               generate sprite list at c01000 or c08400 (not sure entirely, see routine at 209922 in rungun2)
-				           0d97  0515              parse big DMA list at c10200
-				                 57a       copy 4 bytes from c00f10 to c10f00 and 4 bytes from c00f30 to c0fe00
+				           0d97      0515              parse big DMA list at c10200
+				                            057a       copy 4 bytes from c00f10 to c10f00 and 4 bytes from c00f30 to c0fe00
 				*/
 				if ((m_last_prot_op == 0xa56) || (m_last_prot_op == 0xd96) || (m_last_prot_op == 0xd14) || (m_last_prot_op == 0xd1c))
 				{
