@@ -7,56 +7,63 @@
     video emulation by Vas Crabb
 
     This is an absolutely insane arrangement of three Signetics S2623
-	PVIs and custom TTL logic.  The PVIs can each render up to four
-	(potentially duplicated) sprites.  The TTL logic renders a single
-	32x32 pixel 4-colour sprite and an 8-colour background tilemap.
-	There are also two symmetrical area effects where the game only
-	needs to program the horizontal distance from the screen edge for
-	each line, and a per-line single-pixel shell effect.  The shell
-	effect replaces one of the area effects if used.
+    PVIs and custom TTL logic.  The PVIs can each render up to four
+    (potentially duplicated) sprites.  The TTL logic renders a single
+    32x32 pixel 4-colour sprite and an 8-colour background tilemap.
+    There are also two symmetrical area effects where the game only
+    needs to program the horizontal distance from the screen edge for
+    each line, and a per-line single-pixel shell effect.  The shell
+    effect replaces one of the area effects if used.
 
-	In order to get 30% more horizontal resolution than Signetics
-	intended, this board divides the master clock by 4 to drive the
-	S2621 sync generator, but has a separate set of filp-flops to do
-	a symmetric divide by 3 to drive the rest of the video hardware.
-	There's some extra logic to align the first pixel to the end of the
-	horizontal blanking period period because the line isn't a whole
-	number of pixels.  The visible portion isn't a whole number of
-	pixels for that matter, either.
+    In order to get 30% more horizontal resolution than Signetics
+    intended, this board divides the master clock by 4 to drive the
+    S2621 sync generator, but has a separate set of filp-flops to do
+    a symmetric divide by 3 to drive the rest of the video hardware.
+    There's some extra logic to align the first pixel to the end of the
+    horizontal blanking period period because the line isn't a whole
+    number of pixels.  The visible portion isn't a whole number of
+    pixels for that matter, either.
 
-	There's some fancy logic to stretch the vertical blanking period for
-	eight additional lines after the USG deasserts VRST and then to
-	start the next vertical blanking period after 247 visible lines.
+    There's some fancy logic to stretch the vertical blanking period for
+    eight additional lines after the USG deasserts VRST and then to
+    start the next vertical blanking period after 247 visible lines.
 
-	The first visible line is line 8 from the point of view of the PVIs,
-	background generator and sprite generator.
+    The first visible line is line 8 from the point of view of the PVIs,
+    background generator and sprite generator.
 
-	The first visible column of the display is pixel 8 from the point of
-	of view of the sprite and background generation hardware, but it's
-	pixel 0 from the point of view of the PVIs.
+    The first visible column of the display is pixel 8 from the point of
+    of view of the sprite and background generation hardware, but it's
+    pixel 0 from the point of view of the PVIs.
 
-	The hardware has 8-bit RRRGGGBBB output converted to analog levels
-	with a simple resistor network driven by open-collector gates.
-	However video is actually generated in a 16-bit internal colour
-	space and mapped onto the 8-bit output colour space using a PLA.
+    The hardware has 8-bit RRRGGGBBB output converted to analog levels
+    with a simple resistor network driven by open-collector gates.
+    However video is actually generated in a 16-bit internal colour
+    space and mapped onto the 8-bit output colour space using a PLA.
 
-	The equations in the PAL give the following graphics priorities,
-	from highest to lowest:
-	* TTL-generated sprite
-	* PVIs (colours ORed, object/score output ignored)
-	* Shell/area effect 2
-	* Background tilemap
-	* Area effect 1
+    The equations in the PAL give the following graphics priorities,
+    from highest to lowest:
+    * TTL-generated sprite
+    * PVIs (colours ORed, object/score output ignored)
+    * Shell/area effect 2
+    * Background tilemap
+    * Area effect 1
 
-	There are still issues with horizontal alignment between layers.  I
-	have the schematic, yet I really can't understand where these issues
-	are coming from.  I'm pretty sure alignment between TTL background
-	and sprites is right, judging from gameplay.  I'm not sure about
-	alignment with the effect layers.
+    The game board has no logic for flipping the screen in cocktail
+    mode.  It just provides an active-low open collector out with pull-
+    up indicating when player 2 is playing.  In a cocktail cabinet this
+    goes to an "image commutation board".  It's not connected to
+    anything in an upright cabinet.  The "image commutation board" must
+    flip the image somehow, presumably by dark magic.
 
-	There are definitely alignment problems with the PVI opjects, but
-	that may be a bug in the S2636 implementation.  I need to check it
-	more detail
+    There are still issues with horizontal alignment between layers.  I
+    have the schematic, yet I really can't understand where these issues
+    are coming from.  I'm pretty sure alignment between TTL background
+    and sprites is right, judging from gameplay.  I'm not sure about
+    alignment with the effect layers.
+
+    There are definitely alignment problems with the PVI opjects, but
+    that may be a bug in the S2636 implementation.  I need to check it
+    more detail
 */
 
 #include "includes/laserbat.h"
@@ -64,46 +71,43 @@
 #define PLA_DEBUG 0
 
 
-PALETTE_INIT_MEMBER(laserbat_state, laserbat)
+PALETTE_INIT_MEMBER(laserbat_state_base, laserbat)
 {
 	/*
-		Uses GRBGRBGR pixel format.  The two topmost bist are the LSBs
-		for red and green.  LSB for blue is always effectively 1.  The
-		middle group is the MSB.  Yet another crazy thing they did.
+	    Uses GRBGRBGR pixel format.  The two topmost bist are the LSBs
+	    for red and green.  LSB for blue is always effectively 1.  The
+	    middle group is the MSB.  Yet another crazy thing they did.
 
-		Each colour channel has an emitter follower buffer amlpifier
-		biased with a 1k resistor to +5V and a 3k3 resistor to ground.
-		Output is adjusted by connecting additional resistors across the
-		leg to ground using an open collector buffer - 270R, 820R and
-		1k0 for unset MSB to LSB, respectively (blue has no LSB so it
-		has no 1k0 resistor).
+	    Each colour channel has an emitter follower buffer amlpifier
+	    biased with a 1k resistor to +5V and a 3k3 resistor to ground.
+	    Output is adjusted by connecting additional resistors across the
+	    leg to ground using an open collector buffer - 270R, 820R and
+	    1k0 for unset MSB to LSB, respectively (blue has no LSB so it
+	    has no 1k0 resistor).
 
-		Assuming 0.7V drop across the emitter follower and no drop
-		across the open collector buffer, these are the approximate
-		output voltages:
+	    Assuming 0.7V drop across the emitter follower and no drop
+	    across the open collector buffer, these are the approximate
+	    output voltages:
 
-		0.0000, 0.1031, 0.1324, 0.2987 , 0.7194, 1.2821, 1.4711, 3.1372
+	    0.0000, 0.1031, 0.1324, 0.2987 , 0.7194, 1.2821, 1.4711, 3.1372
 
-		The game never sets the colour to any value above 4, effectively
-		treating it as 5-level red and green, and 3-level blue, for a
-		total of 75 usable colours.
+	    The game never sets the colour to any value above 4, effectively
+	    treating it as 5-level red and green, and 3-level blue, for a
+	    total of 75 usable colours.
 
-		From the fact that there's no DC offset on red and green, and the
-		highest value used is just over 0.7V, I'm guessing the game
-		expects to drive a standard 0.7V RGB monitor, and higher colour
-		values would simply saturate the input.
+	    From the fact that there's no DC offset on red and green, and
+	    the highest value used is just over 0.7V, I'm guessing the game
+	    expects to drive a standard 0.7V RGB monitor, and higher colour
+	    values would simply saturate the input.  To make it not look
+	    like the inside of a coal mine, I've applied gamma decoding at
+	    2.2
 
-		However there's still that nasty DC offset on the blue caused by
-		the fact that it has no LSB.  I'm treating it as though it has
-		the same gain as the other channels but the DC offset adjusted
-		for (monitor can detect DC offset during blanking periods).
-		This could be wrong, but it works fairly well, giving roughly
-		the same intensity for medium red and medium blue as used by the
-		game.
-
-		Finally, to make it not look like the inside of a coal mine,
-		I've applied gamma decoding at 2.2, and the result doesn't look
-		too bad.
+	    However there's that nasty DC offset on the blue caused by the
+	    fact that it has no LSB, but it's eliminated at the AC-coupling
+	    of the input and output of the buffer amplifier on the monitor
+	    interface board.  I'm treating it as though it has the same gain
+	    as the other channels.  After gamma adjustment, medium red and
+	    medium blue as used by the game have almost the same intensity.
 	*/
 
 	int const weights[] = { 0, 107, 120, 173, 255, 255, 255, 255 };
@@ -119,7 +123,7 @@ PALETTE_INIT_MEMBER(laserbat_state, laserbat)
 }
 
 
-WRITE8_MEMBER(laserbat_state::videoram_w)
+WRITE8_MEMBER(laserbat_state_base::videoram_w)
 {
 	if (!m_mpx_bkeff)
 		m_bg_ram[offset] = data;
@@ -127,33 +131,33 @@ WRITE8_MEMBER(laserbat_state::videoram_w)
 		m_eff_ram[offset & 0x1ff] = data; // A9 is not connected, only half the chip is used
 }
 
-WRITE8_MEMBER(laserbat_state::wcoh_w)
+WRITE8_MEMBER(laserbat_state_base::wcoh_w)
 {
 	// sprite horizontal offset
 	m_wcoh = data;
 }
 
-WRITE8_MEMBER(laserbat_state::wcov_w)
+WRITE8_MEMBER(laserbat_state_base::wcov_w)
 {
 	// sprite vertical offset
 	m_wcov = data;
 }
 
-WRITE8_MEMBER(laserbat_state::cnt_eff_w)
+WRITE8_MEMBER(laserbat_state_base::cnt_eff_w)
 {
 	/*
-		+-----+-------------+-----------------------------------------------+
-		| bit |    name     | description                                   |
-		+-----+-------------+-----------------------------------------------+
-		|  0  | /ABEFF1     | effect 1 enable                               |
-		|  1  | /ABEFF2     | effect 2/shell enable                         |
-		|  2  | MPX EFF2 SH | select SHELL point or EFF2 area for effect 2  |
-		|  3  | COLEFF 0    | area effect colour bit 0                      |
-		|  4  | COLEFF 1    | area effect colour bit 1                      |
-		|  5  | /NEG 1      | select inside/outside area for effect 1       |
-		|  6  | /NEG 2      | select inside/outside area for effect 2       |
-		|  7  | MPX P_1/2   |                                               |
-		+-----+-------------+-----------------------------------------------+
+	    +-----+-------------+-----------------------------------------------+
+	    | bit |    name     | description                                   |
+	    +-----+-------------+-----------------------------------------------+
+	    |  0  | /ABEFF1     | effect 1 enable                               |
+	    |  1  | /ABEFF2     | effect 2/shell enable                         |
+	    |  2  | MPX EFF2 SH | select SHELL point or EFF2 area for effect 2  |
+	    |  3  | COLEFF 0    | area effect colour bit 0                      |
+	    |  4  | COLEFF 1    | area effect colour bit 1                      |
+	    |  5  | /NEG 1      | select inside/outside area for effect 1       |
+	    |  6  | /NEG 2      | select inside/outside area for effect 2       |
+	    |  7  | MPX P_1/2   | selects input row 2                           |
+	    +-----+-------------+-----------------------------------------------+
 	*/
 
 	m_abeff1 = !bool(data & 0x01);
@@ -162,25 +166,26 @@ WRITE8_MEMBER(laserbat_state::cnt_eff_w)
 	m_coleff = (data >> 3) & 0x03;
 	m_neg1 = !bool(data & 0x20);
 	m_neg2 = !bool(data & 0x40);
+	m_mpx_p_1_2 = bool(data & 0x80);
 
-	//popmessage("effect: 0x%02X", data);
+//  popmessage("effect: 0x%02X", data);
 }
 
-WRITE8_MEMBER(laserbat_state::cnt_nav_w)
+WRITE8_MEMBER(laserbat_state_base::cnt_nav_w)
 {
 	/*
-		+-----+-----------+--------------------------------------+
-		| bit |   name    | description                          |
-		+-----+-----------+--------------------------------------+
-		|  0  | /NAVE     | sprite enable                        |
-		|  1  | CLR0      | sprite colour bit 0                  |
-		|  2  | CLR1      | sprite colour bit 1                  |
-		|  3  | LUM       | sprite luminance                     |
-		|  4  | MPX BKEFF | access background RAM or effect RAM  |
-		|  5  | SHPA      | sprite select bit 0                  |
-		|  6  | SHPB      | sprite select bit 1                  |
-		|  7  | SHPC      | sprite select bit 2                  |
-		+-----+-----------+--------------------------------------+
+	    +-----+-----------+--------------------------------------+
+	    | bit |   name    | description                          |
+	    +-----+-----------+--------------------------------------+
+	    |  0  | /NAVE     | sprite enable                        |
+	    |  1  | CLR0      | sprite colour bit 0                  |
+	    |  2  | CLR1      | sprite colour bit 1                  |
+	    |  3  | LUM       | sprite luminance                     |
+	    |  4  | MPX BKEFF | access background RAM or effect RAM  |
+	    |  5  | SHPA      | sprite select bit 0                  |
+	    |  6  | SHPB      | sprite select bit 1                  |
+	    |  7  | SHPC      | sprite select bit 2                  |
+	    +-----+-----------+--------------------------------------+
 	*/
 
 	m_nave = !bool(data & 0x01);
@@ -188,52 +193,39 @@ WRITE8_MEMBER(laserbat_state::cnt_nav_w)
 	m_mpx_bkeff = bool(data & 0x10);
 	m_shp = (data >> 5) & 0x07;
 
-	//popmessage("nav: 0x%02X", data);
+//  popmessage("nav: 0x%02X", data);
 }
 
 
-void laserbat_state::video_start()
+void laserbat_state_base::video_start()
 {
 	// extract product and sum terms from video mixing PAL
-	UINT8 const *bitstream = memregion("plds")->base() + 4;
-	UINT32 products[48];
-	UINT8 sums[48];
-	for (unsigned term = 0; 48 > term; term++)
+	if (PLA_DEBUG)
 	{
-		products[term] = 0;
-		for (unsigned byte = 0; 4 > byte; byte++)
+		UINT8 const *bitstream = memregion("gfxmix")->base() + 4;
+		UINT32 products[48];
+		UINT8 sums[48];
+		for (unsigned term = 0; 48 > term; term++)
 		{
-			UINT8 bits = *bitstream++;
-			for (unsigned bit = 0; 4 > bit; bit++, bits >>= 2)
+			products[term] = 0;
+			for (unsigned byte = 0; 4 > byte; byte++)
 			{
-				products[term] >>= 1;
-				if (bits & 0x01) products[term] |= 0x80000000;
-				if (bits & 0x02) products[term] |= 0x00008000;
+				UINT8 bits = *bitstream++;
+				for (unsigned bit = 0; 4 > bit; bit++, bits >>= 2)
+				{
+					products[term] >>= 1;
+					if (bits & 0x01) products[term] |= 0x80000000;
+					if (bits & 0x02) products[term] |= 0x00008000;
+				}
 			}
-		}
-		sums[term] = ~*bitstream++;
-		if (PLA_DEBUG)
-		{
+			sums[term] = ~*bitstream++;
 			UINT32 const sensitive = ((products[term] >> 16) ^ products[term]) & 0x0000ffff;
 			UINT32 const required = ~products[term] & sensitive & 0x0000ffff;
 			UINT32 const inactive = ~((products[term] >> 16) | products[term]) & 0x0000ffff;
 			printf("if (!0x%04x && ((x & 0x%04x) == 0x%04x)) y |= %02x; /* %u */\n", inactive, sensitive, required, sums[term], term);
 		}
-	}
-	UINT8 const mask = *bitstream;
-	if (PLA_DEBUG) printf("y ^= %02x;\n", mask);
-
-	// now turn it into a truth table
-	for (UINT32 inp = 0x0000; 0xffff >= inp; inp++)
-	{
-		m_mixing_table[inp] = 0;
-		for (unsigned term = 0; 48 > term; term++)
-		{
-			if (!~(inp | (~inp << 16) | products[term]))
-				m_mixing_table[inp] |= sums[term];
-		}
-		m_mixing_table[inp] ^= mask;
-		//printf(((inp + 1) % 128) ? "%02x " : "%02x\n", m_mixing_table[inp]);
+		UINT8 const mask = *bitstream;
+		printf("y ^= %02x;\n", mask);
 	}
 
 	// we render straight from ROM
@@ -246,15 +238,19 @@ void laserbat_state::video_start()
 }
 
 
-UINT32 laserbat_state::screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 laserbat_state_base::screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bool const flip_y = flip_screen_y(), flip_x = flip_screen_x();
+	int const offs_y = m_screen->visible_area().max_y + m_screen->visible_area().min_y;
+	int const offs_x = m_screen->visible_area().max_x + m_screen->visible_area().min_x;
+
 	for (int y = cliprect.min_y; cliprect.max_y >= y; y++)
 	{
-		UINT16 const *const src = &m_bitmap.pix16(y);
+		UINT16 const *const src = &m_bitmap.pix16(flip_y ? (offs_y - y) : y);
 		UINT16 *dst = &bitmap.pix16(y);
 		for (int x = cliprect.min_x; cliprect.max_x >= x; x++)
 		{
-			dst[x] = m_mixing_table[src[x]];
+			dst[x] = UINT16(m_gfxmix->read(src[flip_x ? (offs_x - x) : x]));
 		}
 	}
 
@@ -262,29 +258,29 @@ UINT32 laserbat_state::screen_update_laserbat(screen_device &screen, bitmap_ind1
 }
 
 
-TIMER_CALLBACK_MEMBER(laserbat_state::video_line)
+TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 {
 	/*
-		+-----+---------+-----------------------------------+
-		| bit |  name   | description                       |
-		+-----+---------+-----------------------------------+
-		|  0  | NAV0    | sprite bit 0                      |
-		|  1  | NAV1    | sprite bit 1                      |
-		|  2  | CLR0    | sprite colour bit 0               |
-		|  3  | CLR1    | sprite colour bit 1               |
-		|  4  | LUM     | sprite luminance                  |
-		|  5  | C1*     | combined PVI red (active low)     |
-		|  6  | C2*     | combined PVI green (active low)   |
-		|  7  | C3*     | combined PVI blue (active low)    |
-		|  8  | BKR     | background tilemap red            |
-		|  9  | BKG     | background tilemap green          |
-		| 10  | BKB     | background tilemap blue           |
-		| 11  | SHELL   | shell point                       |
-		| 12  | EFF1    | effect 1 area                     |
-		| 13  | EFF2    | effect 2 area                     |
-		| 14  | COLEFF0 | area effect colour bit 0          |
-		| 15  | COLEFF1 | area effect colour bit 1          |
-		+-----+---------+-----------------------------------+
+	    +-----+---------+-----------------------------------+
+	    | bit |  name   | description                       |
+	    +-----+---------+-----------------------------------+
+	    |  0  | NAV0    | sprite bit 0                      |
+	    |  1  | NAV1    | sprite bit 1                      |
+	    |  2  | CLR0    | sprite colour bit 0               |
+	    |  3  | CLR1    | sprite colour bit 1               |
+	    |  4  | LUM     | sprite luminance                  |
+	    |  5  | C1*     | combined PVI red (active low)     |
+	    |  6  | C2*     | combined PVI green (active low)   |
+	    |  7  | C3*     | combined PVI blue (active low)    |
+	    |  8  | BKR     | background tilemap red            |
+	    |  9  | BKG     | background tilemap green          |
+	    | 10  | BKB     | background tilemap blue           |
+	    | 11  | SHELL   | shell point                       |
+	    | 12  | EFF1    | effect 1 area                     |
+	    | 13  | EFF2    | effect 2 area                     |
+	    | 14  | COLEFF0 | area effect colour bit 0          |
+	    | 15  | COLEFF1 | area effect colour bit 1          |
+	    +-----+---------+-----------------------------------+
 	*/
 
 	assert(m_bitmap.width() > m_screen->visible_area().max_x);
@@ -333,9 +329,9 @@ TIMER_CALLBACK_MEMBER(laserbat_state::video_line)
 	for (unsigned byte = 0, px = x_offset; max_x >= px; byte++)
 	{
 		UINT16 const tile = (UINT16(bg_src[byte & 0x1f]) << 3) & 0x7f8;
-		UINT8 red	= m_gfx1[0x0000 | tile | bg_row];
-		UINT8 green	= m_gfx1[0x0800 | tile | bg_row];
-		UINT8 blue	= m_gfx1[0x1000 | tile | bg_row];
+		UINT8 red   = m_gfx1[0x0000 | tile | bg_row];
+		UINT8 green = m_gfx1[0x0800 | tile | bg_row];
+		UINT8 blue  = m_gfx1[0x1000 | tile | bg_row];
 		for (unsigned pixel = 0; 8 > pixel; pixel++, red <<= 1, green <<= 1, blue <<= 1)
 		{
 			UINT16 const bg = ((red & 0x80) ? 0x0100 : 0x0000) | ((green & 0x80) ? 0x0200 : 0x0000) | ((blue & 0x80) ? 0x0400 : 0x0000);

@@ -1,20 +1,40 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli, Vas Crabb
 /*
-
     Laser Battle / Lazarian (c) 1981 Zaccaria
     Cat and Mouse           (c) 1982 Zaccaria
 
-    driver by Pierpaolo Prazzoli
+    original driver by Pierpaolo Prazzoli
 
-    The 2 games have a similar video hardware, but sound hardware is very different
-    and they don't use the collision detection provided by the s2636 chips.
+    The two games have a similar video hardware, but sound hardware is
+    very different and they don't use the collision detection provided
+    by the s2636 chips.
 
-TODO:
-- work out where all the magic layer offsets come from
-- sound in laserbat (with schematics) and in catnmous
-- cocktail support
+    Game board supports two different sound board interfaces: 16-bit
+    unidirectional bus on J3 and 8-bit bidirectional bus on J7.
+    Lazarian uses only the 16-bit unidirectional interface. The 16-bit
+    interface is controlled by latches at I/O addresses 2  (bits 1-8)
+    and 7 (bits 9-16).n
 
+    Laser Battle/Lazarian notes:
+    * Cocktail cabinet has an additional "image commutation board"
+      consuming the screen flip output, presumably flipping the image by
+      means of dark magic
+    * Player 2 inputs are only used in cocktail mode
+    * Tilt input resets Laser Battle, but just causes loss of one credit
+      in Lazarian
+    * Service coin 1 input grants two credits the first time it's
+      pushed, but remembers this and won't grant credits again unless
+      unless you trigger the tilt input
+    * Laser Battle has a credit limit of 61 while Lazarian has a much
+      lower credit limit of 9
+    * Laser Battle is far less forgiving, sending you back to the start
+      of an area on dying and not giving continues
+
+    TODO:
+    - work out where all the magic layer offsets come from
+    - second bank of DIP switches in laserbat
+    - sound in laserbat (with schematics) and in catnmous
 */
 
 #include "emu.h"
@@ -24,23 +44,55 @@ TODO:
 #include "includes/laserbat.h"
 
 
-WRITE8_MEMBER(laserbat_state::laserbat_input_mux_w)
+WRITE8_MEMBER(laserbat_state_base::ct_io_w)
 {
-	m_input_mux = (data & 0x30) >> 4;
+	/*
+	    Uses a hex buffer, so bits 6 and 7 are not physically present.
 
-	flip_screen_set_no_update(data & 0x08);
+	    Bits 0-2 are open collector outputs with a diode connected to
+	    the return line to suppress solenoid switching transients.
+	    These are used to drive coin counters.
 
-	coin_counter_w(machine(), 0,data & 1);
+	    Bit 3 is an open collector output with a 2k2 pull-up resistor.
+	    It is used to drive the "image commutation board" used to flip
+	    the screen for player 2 in cocktail configuration.
 
-	//data & 0x02 ?
-	//data & 0x04 ?
+	    Bits 4-5 feed the input row select decoder that switches between
+	    ROW0, ROW1, SW1 and SW2 (ROW2 is selected using a bit in the
+	    video effects register, just to be confusing).
+
+	    +-----+-----------------------------+-------------------+------------------------------+
+	    | bit | output                      | Laser Battle      | Lazarian                     |
+	    +-----+-----------------------------+-------------------+------------------------------+
+	    |  0  | J2-3 solenoid driver        | 1*Credits         | 1*Coin C                     |
+	    |     |                             |                   |                              |
+	    |  1  | J2-8 solenoid driver        |  5*Coin A         | 1*Coin A                     |
+	    |     |                             | 10*Coin B         |                              |
+	    |     |                             |  1*Coin C         |                              |
+	    |     |                             |                   |                              |
+	    |  2  | J2-6 solenoid driver        |                   | 1*Coin B                     |
+	    |     |                             |                   |                              |
+	    |  3  | J3-4 open collector output  | Connected to cocktail "image commutation board"  |
+	    |     |                             |                   |                              |
+	    |  4  | input row select A          |                   |                              |
+	    |     |                             |                   |                              |
+	    |  5  | input row select B          |                   |                              |
+	    +-----+-----------------------------+-------------------+------------------------------+
+	*/
+
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 2, data & 0x04);
+	flip_screen_set((bool(data & 0x08) && !bool(m_row1->read() & 0x10)) ? 1 : 0);
+	m_input_mux = (data >> 4) & 0x03;
+
+//  popmessage("ct io: %02X", data);
 }
 
-READ8_MEMBER(laserbat_state::laserbat_input_r)
+READ8_MEMBER(laserbat_state_base::laserbat_input_r)
 {
-	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
-
-	return ioport(portnames[m_input_mux])->read();
+	ioport_port *const mux_ports[] = { m_row0, m_row1, m_sw1, m_sw2 };
+	return (m_mpx_p_1_2 ? m_row2 : mux_ports[m_input_mux])->read();
 }
 
 /*
@@ -70,7 +122,7 @@ READ8_MEMBER(laserbat_state::laserbat_input_r)
 
 */
 
-static ADDRESS_MAP_START( laserbat_map, AS_PROGRAM, 8, laserbat_state )
+static ADDRESS_MAP_START( laserbat_map, AS_PROGRAM, 8, laserbat_state_base )
 	ADDRESS_MAP_UNMAP_HIGH
 
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
@@ -91,31 +143,31 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( laserbat_io_map, AS_IO, 8, laserbat_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(cnt_eff_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(cnt_nav_w)
-	AM_RANGE(0x02, 0x02) AM_READ(laserbat_input_r) AM_WRITE(laserbat_csound1_w)
+	AM_RANGE(0x02, 0x02) AM_READ(laserbat_input_r) AM_WRITE(csound1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(wcoh_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(wcov_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(laserbat_input_mux_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(laserbat_csound2_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(ct_io_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(csound2_w)
 
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( catnmous_io_map, AS_IO, 8, laserbat_state )
+static ADDRESS_MAP_START( catnmous_io_map, AS_IO, 8, catnmous_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_byte_w) // soundlatch ?
 	AM_RANGE(0x01, 0x01) AM_WRITE(cnt_nav_w)
 	AM_RANGE(0x02, 0x02) AM_READ(laserbat_input_r)
 	AM_RANGE(0x02, 0x02) AM_WRITENOP // unknown
 	AM_RANGE(0x04, 0x04) AM_WRITE(wcoh_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(wcov_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(laserbat_input_mux_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(ct_io_w)
 	AM_RANGE(0x07, 0x07) AM_WRITENOP // unknown
 
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 // the same as in zaccaria.c ?
-static ADDRESS_MAP_START( catnmous_sound_map, AS_PROGRAM, 8, laserbat_state )
+static ADDRESS_MAP_START( catnmous_sound_map, AS_PROGRAM, 8, catnmous_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -123,240 +175,212 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( laserbat )
-	PORT_START("IN0")
+	PORT_START("ROW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Fire Left")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Fire Right")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Fire Up")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Fire Down")
 
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("ROW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fire Left")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Fire Right")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Fire Up")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Fire Down")
+	PORT_CONFNAME( 0x10, 0x10, DEF_STR(Cabinet) ) // sense line on wiring harness
+	PORT_DIPSETTING(     0x10, DEF_STR(Upright) )
+	PORT_DIPSETTING(     0x00, DEF_STR(Cocktail) )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Reset")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0x70, 0x10, DEF_STR( Lives ) )
+	PORT_START("ROW2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR(Coin_A) )         PORT_DIPLOCATION("SW-1:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_3C) )
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_5C) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR(Coin_B) )         PORT_DIPLOCATION("SW-1:3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x04, DEF_STR(1C_3C) )
+	PORT_DIPSETTING(    0x08, DEF_STR(1C_5C) )
+	PORT_DIPSETTING(    0x0c, DEF_STR(1C_7C) )
+	PORT_DIPNAME( 0x70, 0x10, DEF_STR(Lives) )          PORT_DIPLOCATION("SW-1:5,6,7")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x30, "6" )
-	PORT_DIPSETTING(    0x40, "Infinite" )
-//  PORT_DIPSETTING(    0x50, "Infinite" )
-//  PORT_DIPSETTING(    0x60, "Infinite" )
-//  PORT_DIPSETTING(    0x70, "Infinite" )
-	PORT_DIPNAME( 0x80, 0x80, "Collision Detection" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR(Infinite) )
+//  PORT_DIPSETTING(    0x50, DEF_STR(Infinite) )
+//  PORT_DIPSETTING(    0x60, DEF_STR(Infinite) )
+//  PORT_DIPSETTING(    0x70, DEF_STR(Infinite) )
+	PORT_DIPNAME( 0x80, 0x80, "Collision Detection" )   PORT_DIPLOCATION("SW-1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x80, DEF_STR(On) )
 
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_START("SW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW-2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW-2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW-2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW-2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW-2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW-2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW-2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x80, 0x80, "Coin C" )                PORT_DIPLOCATION("SW-2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR(2C_1C) )
+	PORT_DIPSETTING(    0x80, DEF_STR(1C_1C) )
 
 	PORT_START("SENSE")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lazarian )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_INCLUDE(laserbat)
 
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Reset")
-
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Lives ) )
+	PORT_MODIFY("SW1")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR(Coin_A) )         PORT_DIPLOCATION("SW-1:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR(2C_1C) )
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_3C) )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR(Lives) )          PORT_DIPLOCATION("SW-1:5,6")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x30, "5" )
-	PORT_DIPNAME( 0x40, 0x00, "Calibration Display" )
+	PORT_DIPNAME( 0x40, 0x00, "Calibration Display" )   PORT_DIPLOCATION("SW-1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Collision Detection" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Firing" )
+	PORT_MODIFY("SW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Unused) )         PORT_DIPLOCATION("SW-2:1") // manual says not used
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x02, "Firing" )                PORT_DIPLOCATION("SW-2:2")
 	PORT_DIPSETTING(    0x02, "Rapid" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPNAME( 0x04, 0x00, "Freeze" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-
-	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )
+	PORT_DIPNAME( 0x04, 0x00, "Freeze" )                PORT_DIPLOCATION("SW-2:3")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x04, DEF_STR(On) )
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR(Difficulty) )     PORT_DIPLOCATION("SW-2:4,5")
+	PORT_DIPSETTING(    0x00, DEF_STR(Easy) )
+	PORT_DIPSETTING(    0x08, DEF_STR(Medium) )
+	PORT_DIPSETTING(    0x10, DEF_STR(Difficult) )
+	PORT_DIPSETTING(    0x18, DEF_STR(Very_Difficult) )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR(Bonus_Life) )     PORT_DIPLOCATION("SW-2:6,7")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x20, "10,000" )
+	PORT_DIPSETTING(    0x40, "14,000" )
+	PORT_DIPSETTING(    0x60, "18,000" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( catnmous )
-	PORT_START("IN0")
+	PORT_START("ROW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) // ???
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) // ???
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // ???
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // ???
 
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_START("ROW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) // ???
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) // ???
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // ???
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // ???
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Reset")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0x70, 0x10, DEF_STR( Lives ) )
+	PORT_START("ROW2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) // ???
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) // ???
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) // ???
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) // ???
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(1) // ???
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) // ???
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) // ???
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) // ???
+
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR(Coin_A) )     PORT_DIPLOCATION("SW-1:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_3C) )
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_5C) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR(Coin_B) )     PORT_DIPLOCATION("SW-1:3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x04, DEF_STR(1C_3C) )
+	PORT_DIPSETTING(    0x08, DEF_STR(1C_5C) )
+	PORT_DIPSETTING(    0x0c, DEF_STR(1C_7C) )
+	PORT_DIPNAME( 0x70, 0x10, DEF_STR(Lives) )      PORT_DIPLOCATION("SW-1:5,6,7")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x30, "5" )
-	PORT_DIPSETTING(    0x40, "Infinite" )
-//  PORT_DIPSETTING(    0x50, "Infinite" )
-//  PORT_DIPSETTING(    0x60, "Infinite" )
-//  PORT_DIPSETTING(    0x70, "Infinite" )
-	PORT_DIPNAME( 0x80, 0x80, "Game Over Melody" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR(Infinite) )
+//  PORT_DIPSETTING(    0x50, DEF_STR(Infinite) )
+//  PORT_DIPSETTING(    0x60, DEF_STR(Infinite) )
+//  PORT_DIPSETTING(    0x70, DEF_STR(Infinite) )
+	PORT_DIPNAME( 0x80, 0x80, "Game Over Melody" )  PORT_DIPLOCATION("SW-1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x80, DEF_STR(On) )
 
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("SW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Unknown) )    PORT_DIPLOCATION("SW-2:1") // ???
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Unknown) )    PORT_DIPLOCATION("SW-2:2") // ???
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Unknown) )    PORT_DIPLOCATION("SW-2:3") // ???
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR(Unknown) )    PORT_DIPLOCATION("SW-2:4") // ???
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Unknown) )    PORT_DIPLOCATION("SW-2:5") // ???
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR(Unknown) )    PORT_DIPLOCATION("SW-2:6") // ???
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Unknown) )    PORT_DIPLOCATION("SW-2:7") // ???
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x80, 0x80, "Coin C" )            PORT_DIPLOCATION("SW-2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR(2C_1C) )
+	PORT_DIPSETTING(    0x80, DEF_STR(1C_1C) )
 
 	PORT_START("SENSE")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -398,28 +422,28 @@ GFXDECODE_END
 
 /* Cat'N Mouse sound ***********************************/
 
-WRITE_LINE_MEMBER(laserbat_state::zaccaria_irq0a)
+WRITE_LINE_MEMBER(catnmous_state::zaccaria_irq0a)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(laserbat_state::zaccaria_irq0b)
+WRITE_LINE_MEMBER(catnmous_state::zaccaria_irq0b)
 {
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(laserbat_state::zaccaria_port0a_r)
+READ8_MEMBER(catnmous_state::zaccaria_port0a_r)
 {
 	ay8910_device *ay8910 = (m_active_8910 == 0) ? m_ay1 : m_ay2;
 	return ay8910->data_r(space, 0);
 }
 
-WRITE8_MEMBER(laserbat_state::zaccaria_port0a_w)
+WRITE8_MEMBER(catnmous_state::zaccaria_port0a_w)
 {
 	m_port0a = data;
 }
 
-WRITE8_MEMBER(laserbat_state::zaccaria_port0b_w)
+WRITE8_MEMBER(catnmous_state::zaccaria_port0b_w)
 {
 	/* bit 1 goes to 8910 #0 BDIR pin  */
 	if ((m_last_port0b & 0x02) == 0x02 && (data & 0x02) == 0x00)
@@ -449,33 +473,34 @@ WRITE8_MEMBER(laserbat_state::zaccaria_port0b_w)
 	m_last_port0b = data;
 }
 
-INTERRUPT_GEN_MEMBER(laserbat_state::laserbat_interrupt)
+INTERRUPT_GEN_MEMBER(laserbat_state_base::laserbat_interrupt)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x0a);
 }
 
-INTERRUPT_GEN_MEMBER(laserbat_state::zaccaria_cb1_toggle)
+INTERRUPT_GEN_MEMBER(catnmous_state::zaccaria_cb1_toggle)
 {
 	m_pia->cb1_w(m_cb1_toggle & 1);
 	m_cb1_toggle ^= 1;
 }
 
-DRIVER_INIT_MEMBER(laserbat_state, laserbat)
+DRIVER_INIT_MEMBER(laserbat_state_base, laserbat)
 {
-	m_pia = machine().device<pia6821_device>("pia");
-	m_tms1 = machine().device<tms3615_device>("tms1");
-	m_tms2 = machine().device<tms3615_device>("tms2");
-
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+
+	save_item(NAME(m_input_mux));
+	save_item(NAME(m_mpx_p_1_2));
 
 	save_item(NAME(m_bg_ram));
 	save_item(NAME(m_eff_ram));
 	save_item(NAME(m_mpx_bkeff));
+
 	save_item(NAME(m_nave));
 	save_item(NAME(m_clr_lum));
 	save_item(NAME(m_shp));
 	save_item(NAME(m_wcoh));
 	save_item(NAME(m_wcov));
+
 	save_item(NAME(m_abeff1));
 	save_item(NAME(m_abeff2));
 	save_item(NAME(m_mpx_eff2_sh));
@@ -486,41 +511,32 @@ DRIVER_INIT_MEMBER(laserbat_state, laserbat)
 
 void laserbat_state::machine_start()
 {
-	save_item(NAME(m_input_mux));
+	save_item(NAME(m_csound1));
+	save_item(NAME(m_csound2));
+	save_item(NAME(m_keys));
+}
+
+void catnmous_state::machine_start()
+{
+	laserbat_state_base::machine_start();
+
 	save_item(NAME(m_active_8910));
 	save_item(NAME(m_port0a));
 	save_item(NAME(m_last_port0b));
 	save_item(NAME(m_cb1_toggle));
-	save_item(NAME(m_csound1));
-	save_item(NAME(m_ksound1));
-	save_item(NAME(m_ksound2));
-	save_item(NAME(m_ksound3));
-	save_item(NAME(m_degr));
-	save_item(NAME(m_filt));
-	save_item(NAME(m_a));
-	save_item(NAME(m_us));
-	save_item(NAME(m_bit14));
 }
 
-void laserbat_state::machine_reset()
+void catnmous_state::machine_reset()
 {
-	m_input_mux = 0;
+	laserbat_state_base::machine_reset();
+
 	m_active_8910 = 0;
 	m_port0a = 0;
 	m_last_port0b = 0;
 	m_cb1_toggle = 0;
-	m_csound1 = 0;
-	m_ksound1 = 0;
-	m_ksound2 = 0;
-	m_ksound3 = 0;
-	m_degr = 0;
-	m_filt = 0;
-	m_a = 0;
-	m_us = 0;
-	m_bit14 = 0;
 }
 
-void laserbat_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void laserbat_state_base::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -528,108 +544,115 @@ void laserbat_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		video_line(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in laserbat_state::device_timer");
+		assert_always(FALSE, "Unknown id in laserbat_state_base::device_timer");
 	}
 }
 
 
 static MACHINE_CONFIG_START( laserbat, laserbat_state )
 
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 14318180/4) // ???
+	// basic machine hardware
+	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/4)
 	MCFG_CPU_PROGRAM_MAP(laserbat_map)
 	MCFG_CPU_IO_MAP(laserbat_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbat_state,  laserbat_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbat_state_base, laserbat_interrupt)
 
-	/* video hardware */
+	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(14318180, 227*4, 43*4-1, 227*4-1, 312, 8, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state, screen_update_laserbat)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 227*4, 43*4-1, 227*4-1, 312, 8, 255)
+	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state_base, screen_update_laserbat)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", laserbat)
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(laserbat_state, laserbat)
+	MCFG_PALETTE_INIT_OWNER(laserbat_state_base, laserbat)
 
-	MCFG_DEVICE_ADD("pvi1", S2636, 0)
+	MCFG_PLS100_ADD("gfxmix")
+
+	MCFG_DEVICE_ADD("pvi1", S2636, XTAL_14_31818MHz/3)
 	MCFG_S2636_OFFSETS(-8, -24)
 	MCFG_S2636_DIVIDER(3)
 
-	MCFG_DEVICE_ADD("pvi2", S2636, 0)
+	MCFG_DEVICE_ADD("pvi2", S2636, XTAL_14_31818MHz/3)
 	MCFG_S2636_OFFSETS(-8, -24)
 	MCFG_S2636_DIVIDER(3)
 
-	MCFG_DEVICE_ADD("pvi3", S2636, 0)
+	MCFG_DEVICE_ADD("pvi3", S2636, XTAL_14_31818MHz/3)
 	MCFG_S2636_OFFSETS(-8, -24)
 	MCFG_S2636_DIVIDER(3)
 
-	/* sound hardware */
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", laserbat)
+
+	// sound board devices
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76477, 0) // output not connected
-	MCFG_SN76477_NOISE_PARAMS(RES_K(47), 0, CAP_P(1000)) // noise + filter: R21 47K + N/C + C21 1000 pF
-	MCFG_SN76477_DECAY_RES(0)                            // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(0, 0)                     // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(47))                      // amplitude_res: R26 47K
-	MCFG_SN76477_FEEDBACK_RES(RES_K(200))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(5.0 * RES_K(2.2) / (RES_K(2.2) + RES_K(4.7)), 0, 0) // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(5.0)                      // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_U(4.7), 0)               // slf caps + res: C24 4.7 uF + (variable)
-	MCFG_SN76477_ONESHOT_PARAMS(0,0)                     // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                             // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                   // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)                   // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                               // enable
+	MCFG_SOUND_ADD("csg", SN76477, 0) // audio output not used
+	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(270), CAP_P(1000)) // R21, switchable R30/R23/R24/R25/R29/R28/R27/R26, C21
+	MCFG_SN76477_DECAY_RES(RES_INF)                 // NC
+	MCFG_SN76477_ATTACK_PARAMS(0, RES_INF)          // NC, NC
+	MCFG_SN76477_AMP_RES(RES_K(47))                 // R26 47k
+	MCFG_SN76477_FEEDBACK_RES(RES_INF)              // NC
+	MCFG_SN76477_VCO_PARAMS(5.0 * RES_VOLTAGE_DIVIDER(RES_K(4.7), RES_K(2.2)), 0, RES_K(47)) // R22/R19, NC, switchable R47/R40/R41/R42/R46/R45/R44/R43
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                 // tied to Vreg
+	MCFG_SN76477_SLF_PARAMS(CAP_U(4.7), RES_INF)    // C24, switchable NC/R54/R53/R52/R51
+	MCFG_SN76477_ONESHOT_PARAMS(0, RES_INF)         // NC, NC
+	MCFG_SN76477_VCO_MODE(1)                        // BIT15
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)              // GND, VCO/NOISE, GND
+	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)              // GND, Vreg
+	MCFG_SN76477_ENABLE(0)                          // AB SOUND
 
-	MCFG_TMS3615_ADD("tms1", 4000000/8/2) // 250 kHz, from second chip's clock out
+	MCFG_TMS3615_ADD("synth_high", XTAL_4MHz/16/2) // from the other one's /2 clock output
 	MCFG_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
 
-	MCFG_TMS3615_ADD("tms2", 4000000/8) // 500 kHz
+	MCFG_TMS3615_ADD("synth_low", XTAL_4MHz/16) // 4MHz divided down with a 74LS161
 	MCFG_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
+
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( catnmous, laserbat_state )
+static MACHINE_CONFIG_START( catnmous, catnmous_state )
 
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 14318000/4)  /* ? */
+	// basic machine hardware
+	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/4)
 	MCFG_CPU_PROGRAM_MAP(laserbat_map)
 	MCFG_CPU_IO_MAP(catnmous_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbat_state,  laserbat_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbat_state_base, laserbat_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", M6802,3580000) /* ? */
-	MCFG_CPU_PROGRAM_MAP(catnmous_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(laserbat_state, zaccaria_cb1_toggle,  (double)3580000/4096)
-
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(laserbat_state, zaccaria_port0a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(laserbat_state, zaccaria_port0a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(laserbat_state, zaccaria_port0b_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(laserbat_state, zaccaria_irq0a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(laserbat_state, zaccaria_irq0b))
-
-	/* video hardware */
+	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state, screen_update_laserbat)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 227*4, 43*4-1, 227*4-1, 312, 8, 255)
+	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state_base, screen_update_laserbat)
 	MCFG_SCREEN_PALETTE("palette")
 
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(laserbat_state_base, laserbat)
+
+	MCFG_PLS100_ADD("gfxmix")
+
+	MCFG_DEVICE_ADD("pvi1", S2636, XTAL_14_31818MHz/3)
+	MCFG_S2636_OFFSETS(-8, -24)
+	MCFG_S2636_DIVIDER(3)
+
+	MCFG_DEVICE_ADD("pvi2", S2636, XTAL_14_31818MHz/3)
+	MCFG_S2636_OFFSETS(-8, -24)
+	MCFG_S2636_DIVIDER(3)
+
+	MCFG_DEVICE_ADD("pvi3", S2636, XTAL_14_31818MHz/3)
+	MCFG_S2636_OFFSETS(-8, -24)
+	MCFG_S2636_DIVIDER(3)
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", laserbat)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INIT_OWNER(laserbat_state, laserbat)
 
-	MCFG_DEVICE_ADD("pvi1", S2636, 0)
-	MCFG_S2636_OFFSETS(-16, -19)
+	// sound board devices
+	MCFG_CPU_ADD("audiocpu", M6802,3580000) /* ? */
+	MCFG_CPU_PROGRAM_MAP(catnmous_sound_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(catnmous_state, zaccaria_cb1_toggle,  (double)3580000/4096)
 
-	MCFG_DEVICE_ADD("pvi2", S2636, 0)
-	MCFG_S2636_OFFSETS(-16, -19)
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(catnmous_state, zaccaria_port0a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(catnmous_state, zaccaria_port0a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(catnmous_state, zaccaria_port0b_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(catnmous_state, zaccaria_irq0a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(catnmous_state, zaccaria_irq0b))
 
-	MCFG_DEVICE_ADD("pvi3", S2636, 0)
-	MCFG_S2636_OFFSETS(-16, -19)
-
-	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 3580000/2) // ?
@@ -638,6 +661,7 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 
 	MCFG_SOUND_ADD("ay2", AY8910, 3580000/2) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_CONFIG_END
 
 
@@ -691,7 +715,7 @@ ROM_START( laserbat )
 	ROM_REGION( 0x0800, "gfx2", 0 )
 	ROM_LOAD( "lb02.14l",     0x0000, 0x0800, CRC(d29962d1) SHA1(5b6d0856c3ebbd5833b522f7c0240309cf3c9777) )
 
-	ROM_REGION( 0x0100, "plds", 0 )
+	ROM_REGION( 0x0100, "gfxmix", 0 )
 	ROM_LOAD( "82s100_prom",  0x0000, 0x00f5, CRC(c3eb562a) SHA1(65dff81b2e5321d530e5171dab9aa3809ab38b4d) BAD_DUMP )
 ROM_END
 
@@ -728,7 +752,7 @@ ROM_START( lazarian )
 	ROM_REGION( 0x0800, "gfx2", 0 )
 	ROM_LOAD( "laz.14l",      0x0000, 0x0800, CRC(d29962d1) SHA1(5b6d0856c3ebbd5833b522f7c0240309cf3c9777) )
 
-	ROM_REGION( 0x0100, "plds", 0 )
+	ROM_REGION( 0x0100, "gfxmix", 0 )
 	ROM_LOAD( "lz82s100.10m", 0x0000, 0x00f5, CRC(c3eb562a) SHA1(65dff81b2e5321d530e5171dab9aa3809ab38b4d) )
 ROM_END
 
@@ -796,7 +820,7 @@ ROM_START( catnmous )
 	ROM_REGION( 0x0800, "gfx2", 0 )
 	ROM_LOAD( "type01.14l",   0x0000, 0x0800, CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
 
-	ROM_REGION( 0x0100, "plds", 0 )
+	ROM_REGION( 0x0100, "gfxmix", 0 )
 	ROM_LOAD( "82s100.13m",   0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) )
 ROM_END
 
@@ -837,12 +861,12 @@ ROM_START( catnmousa )
 	ROM_REGION( 0x0800, "gfx2", 0 )
 	ROM_LOAD( "catnmous.14l", 0x0000, 0x0800, CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
 
-	ROM_REGION( 0x0100, "plds", 0 )
+	ROM_REGION( 0x0100, "gfxmix", 0 )
 	ROM_LOAD( "catnmousa_82s100.13m", 0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) BAD_DUMP )
 ROM_END
 
 
-GAME( 1981, laserbat, 0,        laserbat, laserbat, laserbat_state, laserbat, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, lazarian, laserbat, laserbat, lazarian, laserbat_state, laserbat, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmous, 0,        catnmous, catnmous, laserbat_state, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE)
-GAME( 1982, catnmousa,catnmous, catnmous, catnmous, laserbat_state, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, laserbat, 0,        laserbat, laserbat, laserbat_state_base, laserbat, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, lazarian, laserbat, laserbat, lazarian, laserbat_state_base, laserbat, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmous, 0,        catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE)
+GAME( 1982, catnmousa,catnmous, catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE)
