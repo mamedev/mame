@@ -184,7 +184,7 @@ void k053252_device::res_change()
 		if (m_slave_screen)
 			m_slave_screen->configure(m_hc, m_vc, visarea, refresh);
 
-#if 1
+#if 0
 		attoseconds_t hsync = HZ_TO_ATTOSECONDS(clock()) * (m_hc);
 		printf("H %d HFP %d HSW %d HBP %d\n",m_hc,m_hfp,m_hsw*8,m_hbp);
 		printf("V %d VFP %d VSW %d VBP %d\n",m_vc,m_vfp,m_vsw,m_vbp);

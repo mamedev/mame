@@ -114,6 +114,7 @@ static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, screen_dev
 			maxy = ctrl[0x0b] + K053936_offset[chip][1]-2 - 1;
 			if (maxy > cliprect.max_y)
 				maxy = cliprect.max_y;
+			
 		}
 		else
 		{
@@ -128,8 +129,6 @@ static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, screen_dev
 		{
 			UINT16 *lineaddr = linectrl + 4*((y - K053936_offset[chip][1]) & 0x1ff);
 			my_clip.min_y = my_clip.max_y = y;
-
-
 
 			startx = 256 * (INT16)(lineaddr[0] + ctrl[0x00]);
 			starty = 256 * (INT16)(lineaddr[1] + ctrl[0x01]);

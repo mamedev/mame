@@ -1087,10 +1087,6 @@ void k053247_device::static_set_palette_tag(device_t &device, const char *tag)
 
 void k053247_device::device_start()
 {
-//  bitmap_rgb32* blah;
-//  if (0)
-//      k053247_draw_single_sprite_gxcore(blah,
-
 	UINT32 total;
 	static const gfx_layout spritelayout =
 	{
