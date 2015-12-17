@@ -37,6 +37,16 @@ inline std::unique_ptr<T> make_unique_clear(std::size_t size)
 	return ptr;
 }
 
+template<typename T,unsigned char F>
+inline std::unique_ptr<T> make_unique_clear(std::size_t size)
+{
+	auto ptr = std::make_unique<T>(size);
+	static_assert(std::is_array<T>::value, "Type must be array");
+	memset(ptr.get(), F, sizeof(std::remove_extent<T>) * size);
+	return ptr;
+}
+
+
 template<typename T>
 inline std::unique_ptr<T> make_unique_clear()
 {
