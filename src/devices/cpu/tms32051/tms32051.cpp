@@ -492,6 +492,9 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 		case 0x28: // PDWSR
 			return 0;
 
+		case 0x37:	// ABU BKR
+			return 0;
+
 		case 0x50:	// Memory-mapped I/O ports
 		case 0x51:
 		case 0x52:

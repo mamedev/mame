@@ -93,12 +93,6 @@
 #define LOG_TLCS_TO_PPC_COMMANDS        1
 #define LOG_PPC_TO_TLCS_COMMANDS        1
 
-
-static UINT32 jc_char_ram[0x2000];
-static UINT32 jc_tile_ram[0x4000];
-//static UINT32 jc_pal_ram[0x8000];
-static UINT32 jc_screen_ram[0x10000];
-
 class taitopjc_state : public driver_device
 {
 public:
@@ -132,45 +126,92 @@ public:
 	virtual void video_start() override;
 	UINT32 screen_update_taitopjc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(taitopjc_vbi);
+	UINT32 videochip_r(offs_t address);
+	void videochip_w(offs_t address, UINT32 data);
+	void video_exit();
 
 	DECLARE_DRIVER_INIT(optiger);
 
 	UINT16 m_dsp_ram[0x1000];
 	UINT16 m_io_share_ram[0x2000];
+
+	UINT32 *m_screen_ram;
+	UINT32 *m_pal_ram;
+
+	UINT32 m_video_address;
 };
+
+void taitopjc_state::video_exit()
+{
+#if 0
+	FILE *file;
+	int i;
+
+	file = fopen("pjc_screen_ram.bin","wb");
+	for (i=0; i < 0x40000; i++)
+	{
+		fputc((UINT8)(m_screen_ram[i] >> 24), file);
+		fputc((UINT8)(m_screen_ram[i] >> 16), file);
+		fputc((UINT8)(m_screen_ram[i] >> 8), file);
+		fputc((UINT8)(m_screen_ram[i] >> 0), file);
+	}
+	fclose(file);
+
+	file = fopen("pjc_pal_ram.bin","wb");
+	for (i=0; i < 0x8000; i++)
+	{
+		fputc((UINT8)(m_pal_ram[i] >> 24), file);
+		fputc((UINT8)(m_pal_ram[i] >> 16), file);
+		fputc((UINT8)(m_pal_ram[i] >> 8), file);
+		fputc((UINT8)(m_pal_ram[i] >> 0), file);
+	}
+	fclose(file);
+#endif
+}
 
 void taitopjc_state::video_start()
 {
+	m_screen_ram = auto_alloc_array(machine(), UINT32, 0x40000);
+	m_pal_ram = auto_alloc_array(machine(), UINT32, 0x8000);
+
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitopjc_state::video_exit), this));
 }
 
 UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	UINT8 *s = (UINT8*)m_screen_ram;
+	int x,y,t,u;
+
+	bitmap.fill(0x000000, cliprect);
+
+	for (u=0; u < 24; u++)
 	{
-		UINT8 *s = (UINT8*)jc_char_ram;
-		int x,y,t,u;
-		for (u=0; u < 48; u++)
+		for (t=0; t < 32; t++)
 		{
-			for (t=0; t < 32; t++)
+			UINT32 tile = m_screen_ram[0x3f000 + (((u*32)+(t/2)) ^ 0)];
+
+			if (t & 1)
+				tile &= 0xffff;
+			else
+				tile >>= 16;
+
+			int palette = (tile >> 12) & 0xf;
+
+			tile &= 0xfff;			
+
+			for (y=0; y < 16; y++)
 			{
-				UINT32 tile = jc_tile_ram[((u*16)+(t/2)) ^ 0];
-
-				if (t & 1)
-					tile &= 0xffff;
-				else
-					tile >>= 16;
-
-				tile &= 0xff;
-				tile -= 0x40;
-
-				if (tile > 127) tile = 127;
-
-				for (y=0; y < 16; y++)
+				UINT32 *fb = &bitmap.pix32(y+(u*16));
+				for (x=0; x < 16; x++)
 				{
-					UINT32 *fb = &bitmap.pix32(y+(u*16));
-					for (x=0; x < 16; x++)
+					UINT8 p = s[((tile*256) + ((y*16)+x)) ^3];
+					if (p != 0)
 					{
-						UINT8 p = s[((tile*256) + ((y*16)+x)) ^3];
-						fb[x+(t*16)] = p ? 0xffffffff : 0;
+						UINT32 color = m_pal_ram[(palette << 8) + p];
+						UINT32 r = (color & 0xff) << 16;
+						UINT32 g = (color & 0xff00);
+						UINT32 b = (color >> 16) & 0xff;
+						fb[x+(t*16)] = 0xff000000 | r | g | b;
 					}
 				}
 			}
@@ -180,21 +221,19 @@ UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-static UINT32 video_address;
-
-static UINT32 videochip_r(address_space &space, offs_t address)
+UINT32 taitopjc_state::videochip_r( offs_t address)
 {
 	UINT32 r = 0;
 
-	if (address >= 0x10000000 && address < 0x10010000)
+	if (address >= 0x10000000 && address < 0x10040000)
 	{
-		r = jc_screen_ram[address - 0x10000000];
+		r = m_screen_ram[address - 0x10000000];
 	}
 
 	return r;
 }
 
-static void videochip_w(address_space &space, offs_t address, UINT32 data)
+void taitopjc_state::videochip_w(offs_t address, UINT32 data)
 {
 	if (address >= 0x20000000 && address < 0x20008000)
 	{
@@ -202,18 +241,11 @@ static void videochip_w(address_space &space, offs_t address, UINT32 data)
 		//UINT32 g = (data >> 8) & 0xff;
 		//UINT32 b = (data >> 0) & 0xff;
 		//palette_set_color_rgb(space.machine, address & 0x7fff, r, g, b);
+		m_pal_ram[address - 0x20000000] = data;
 	}
-	else if (address >= 0x1003d000 && address < 0x1003f000)
+	else if (address >= 0x10000000 && address < 0x10040000)
 	{
-		jc_char_ram[address - 0x1003d000] = data;
-	}
-	else if (address >= 0x1003f000 && address < 0x10040000)
-	{
-		jc_tile_ram[address - 0x1003f000] = data;
-	}
-	else if (address >= 0x10000000 && address < 0x10010000)
-	{
-		jc_screen_ram[address - 0x10000000] = data;
+		m_screen_ram[address - 0x10000000] = data;
 	}
 	else
 	{
@@ -229,7 +261,7 @@ READ64_MEMBER(taitopjc_state::video_r)
 	{
 		if (ACCESSING_BITS_32_63)
 		{
-			r |= (UINT64)(videochip_r(space, video_address)) << 32;
+			r |= (UINT64)(videochip_r(m_video_address)) << 32;
 		}
 	}
 
@@ -243,14 +275,14 @@ WRITE64_MEMBER(taitopjc_state::video_w)
 		if (ACCESSING_BITS_32_63)
 		{
 			//printf("Address %08X = %08X\n", video_address, (UINT32)(data >> 32));
-			videochip_w(space, video_address, (UINT32)(data >> 32));
+			videochip_w(m_video_address, (UINT32)(data >> 32));
 		}
 	}
 	if (offset == 1)
 	{
 		if (ACCESSING_BITS_32_63)
 		{
-			video_address = (UINT32)(data >> 32);
+			m_video_address = (UINT32)(data >> 32);
 		}
 	}
 }
@@ -372,8 +404,7 @@ static ADDRESS_MAP_START( ppc603e_mem, AS_PROGRAM, 64, taitopjc_state )
 	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE(video_r, video_w)
 	AM_RANGE(0x80000000, 0x80003fff) AM_READWRITE(dsp_r, dsp_w)
 	AM_RANGE(0xc0000000, 0xc0003fff) AM_READWRITE(ppc_common_r, ppc_common_w)
-	AM_RANGE(0xfe800000, 0xfeffffff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0xff000000, 0xff01ffff) AM_ROM AM_REGION("user2", 0)
+	AM_RANGE(0xfe800000, 0xff7fffff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -501,13 +532,59 @@ static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, taitopjc_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("user2", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitopjc_state )
+static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitopjc_state )	
+	AM_RANGE(0x4000, 0x6fff) AM_ROM AM_REGION("user2", 0x8000)
 	AM_RANGE(0x7000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE(tms_dspshare_r, tms_dspshare_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( tms_io_map, AS_IO, 16, taitopjc_state )
+	AM_RANGE(0x005f, 0x005f) AM_NOP
+ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( taitopjc )
+	PORT_START("INPUTS1")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN1 )			// Coin A
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("INPUTS2")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)		// Service switch
+	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW)		// Test Button
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START1 )		// Select 1
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_START2 )		// Select 2
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("INPUTS3")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)		// P1 trigger
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)		// P1 bomb
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)		// P2 trigger
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)		// P2 bomb
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ANALOG1")       // Player 1 X
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
+	PORT_START("ANALOG2")       // Player 1 Y
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
+	PORT_START("ANALOG3")       // Player 2 X
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
+	PORT_START("ANALOG4")       // Player 2 Y
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
 
@@ -533,6 +610,9 @@ static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 
 	/* TMP95C063F I/O CPU */
 	MCFG_CPU_ADD("iocpu", TMP95C063, 25000000)
+	MCFG_TMP95C063_PORT5_READ(IOPORT("INPUTS1"))
+	MCFG_TMP95C063_PORTD_READ(IOPORT("INPUTS2"))
+	MCFG_TMP95C063_PORTE_READ(IOPORT("INPUTS3"))
 	MCFG_CPU_PROGRAM_MAP(tlcs900h_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitopjc_state,  taitopjc_vbi)
 
@@ -540,6 +620,7 @@ static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 	MCFG_CPU_ADD("dsp", TMS32053, 40000000)
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 	MCFG_CPU_DATA_MAP(tms_data_map)
+	MCFG_CPU_IO_MAP(tms_io_map)
 
 	MCFG_CPU_ADD("mn10200", MN1020012A, 10000000) /* MN1020819DA sound CPU - NOTE: May have 64kB internal ROM */
 	MCFG_CPU_PROGRAM_MAP(mn10200_map)
@@ -551,8 +632,8 @@ static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 767)
+	MCFG_SCREEN_SIZE(512, 384)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(taitopjc_state, screen_update_taitopjc)
 
 MACHINE_CONFIG_END
@@ -575,10 +656,9 @@ ROM_START( optiger )
 	ROM_LOAD32_BYTE( "e63-31-1_p-lh.8",  0x000002, 0x080000, CRC(ad69e649) SHA1(9fc853d2cb6e7cac87dc06bad91048f191b799c5) )
 	ROM_LOAD32_BYTE( "e63-30-1_p-ll.7",  0x000003, 0x080000, CRC(a6183479) SHA1(e556c3edf100342079e680ec666f018fca7a82b0) )
 
-	ROM_REGION( 0x20000, "user2", 0 )
-	/* More PowerPC code? */
-	ROM_LOAD16_BYTE( "e63-04_l.29",  0x000000, 0x010000, CRC(eccae391) SHA1(e5293c16342cace54dc4b6dfb827558e18ac25a4) )
-	ROM_LOAD16_BYTE( "e63-03_h.28",  0x000001, 0x010000, CRC(58fce52f) SHA1(1e3d9ee034b25e658ca45a8b900de2aa54b00135) )
+	ROM_REGION16_BE( 0x20000, "user2", 0 )
+	ROM_LOAD16_BYTE( "e63-04_l.29",  0x000001, 0x010000, CRC(eccae391) SHA1(e5293c16342cace54dc4b6dfb827558e18ac25a4) )
+	ROM_LOAD16_BYTE( "e63-03_h.28",  0x000000, 0x010000, CRC(58fce52f) SHA1(1e3d9ee034b25e658ca45a8b900de2aa54b00135) )
 
 	ROM_REGION( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e63-28-1_0.59", 0x000000, 0x020000, CRC(ef41ffaf) SHA1(419621f354f548180d37961b861304c469e43a65) )

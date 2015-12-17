@@ -370,7 +370,12 @@ void tms32051_device::op_addt()
 
 void tms32051_device::op_and_mem()
 {
-	fatalerror("32051: unimplemented op and mem at %08X\n", m_pc-1);
+	UINT16 ea = GET_ADDRESS();
+	UINT16 data = DM_READ16(ea);
+	
+	m_acc &= (UINT32)(data);
+
+	CYCLES(1);
 }
 
 void tms32051_device::op_and_limm()

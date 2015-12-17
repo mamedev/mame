@@ -285,7 +285,7 @@ CPU_DISASSEMBLE( tms32051 )
 			break;
 		}
 		case 0x08:  print("lamm    %s", GET_ADDRESS(addr_mode, address)); break;
-		case 0x09:  print("smmr    %s", GET_ADDRESS(addr_mode, address)); break;
+		case 0x09:  print("smmr    %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH()); break;
 		case 0x0a:  print("subc    %s", GET_ADDRESS(addr_mode, address)); break;
 		case 0x0b:  print("rpt     %s", GET_ADDRESS(addr_mode, address)); break;
 		case 0x0c:  print("out     %s, #%04X", GET_ADDRESS(addr_mode, address), FETCH()); break;
