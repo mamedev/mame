@@ -1063,7 +1063,8 @@ WRITE16_MEMBER( k056832_device::word_w )
 	{
 		switch(offset)
 		{
-			/* -xxx ---- ---- gfx bpp select: n + 4 (1 << n), settings above 4 are undefined (probably still 8bpp)
+			/* -x-- ---- ---- hardcodes 8bpp when enabled (ignores next field)
+			 * --xx ---- ---- gfx bpp select: n + 4 (1 << n), i.e. from 7bpp to 4bpp
 			 * ---- -x-- ---- dotclock select: 0=8Mhz, 1=6Mhz (not used by GX)
 			 * ---- --x- ---- screen flip y
 			 * ---- ---x ---- screen flip x
