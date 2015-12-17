@@ -158,7 +158,7 @@ K055673_CB_MEMBER(konamigx_state::le2_sprite_callback)
 int konamigx_state::K055555GX_decode_vmixcolor(int layer, int *color) // (see p.62 7.2.6 and p.27 3.3)
 {
 	int vcb, shift, pal, vmx, von, pl45, emx;
-
+			
 	vcb    =  m_vcblk[layer]<<6;
 	shift  =  layer<<1;
 	pal    =  *color;
@@ -173,10 +173,10 @@ int konamigx_state::K055555GX_decode_vmixcolor(int layer, int *color) // (see p.
 	pal   |=  pl45;
 	emx   |=  vmx;
 	pal   |=  vcb;
-
-	if (m_gx_le2_textcolour_hack)
-		if (layer==0)
-			pal |= 0x1c0;
+	
+	//if (m_gx_le2_textcolour_hack)
+	//	if (layer==0)
+	//		pal |= 0x1c0;
 
 	if (von == 3) emx = -1; // invalidate external mix code if all bits are from internal
 	*color =  pal;
@@ -1104,7 +1104,6 @@ void konamigx_state::common_init()
 	m_gx_rozenable = 0;
 	m_gx_specialrozenable = 0;
 	m_gx_rushingheroes_hack = 0;
-	m_gx_le2_textcolour_hack = 0;
 
 	// Documented relative offsets of non-flipped games are (-2, 0, 2, 3),(0, 0, 0, 0).
 	// (+ve values move layers to the right and -ve values move layers to the left)
@@ -1148,8 +1147,6 @@ VIDEO_START_MEMBER(konamigx_state, le2)
 	common_init();
 
 	konamigx_mixer_primode(-1); // swapped layer B and C priorities?
-
-	m_gx_le2_textcolour_hack = 1; // force text layer to use the right palette
 }
 
 VIDEO_START_MEMBER(konamigx_state, konamigx_6bpp)

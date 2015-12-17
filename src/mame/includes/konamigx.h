@@ -228,7 +228,7 @@ public:
 	int m_gx_tilemode, m_gx_rozenable, m_psac_colorbase, m_last_psac_colorbase;
 	int m_gx_specialrozenable; // type 1 roz, with voxel height-map, rendered from 2 source tilemaps (which include height data) to temp bitmap for further processing
 	int m_gx_rushingheroes_hack;
-	int m_gx_le2_textcolour_hack;
+
 	tilemap_t *m_gx_psac_tilemap, *m_gx_psac_tilemap2;
 	bitmap_ind16 *m_type3_roz_temp_bitmap;
 	tilemap_t *m_gx_psac_tilemap_alt;

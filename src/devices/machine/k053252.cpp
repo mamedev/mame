@@ -180,7 +180,7 @@ void k053252_device::res_change()
 		visarea.max_y = m_offsy + m_vc - m_vfp - m_vbp - (m_vsw) - 1;
 		
 		m_screen->configure(m_hc, m_vc, visarea, refresh);
-
+		
 		if (m_slave_screen)
 			m_slave_screen->configure(m_hc, m_vc, visarea, refresh);
 

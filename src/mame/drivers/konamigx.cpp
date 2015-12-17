@@ -1688,6 +1688,11 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( konamigx_bios, konamigx )
+	MCFG_DEVICE_MODIFY("k056832")
+	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_4, 0, 0, "k055555")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( gokuparo, konamigx )
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", 0, K055673_LAYOUT_GX, -46, -23)
@@ -3906,7 +3911,7 @@ DRIVER_INIT_MEMBER(konamigx_state,posthack)
 /*     year  ROM       parent    machine   inp       init */
 
 /* dummy parent for the BIOS */
-GAME( 1994, konamigx, 0, konamigx, konamigx, konamigx_state, konamigx, ROT0, "Konami", "System GX", MACHINE_IS_BIOS_ROOT )
+GAME( 1994, konamigx, 0, 		konamigx_bios, konamigx, konamigx_state, konamigx, ROT0, "Konami", "System GX", MACHINE_IS_BIOS_ROOT )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 1: standard with an add-on 53936 on the ROM board, analog inputs, */
