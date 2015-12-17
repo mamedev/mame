@@ -48,7 +48,7 @@ static UINT16   midtunit_control;
 
 /* videoram-related variables */
 static UINT32   gfxbank_offset[2];
-static UINT16 * local_videoram;
+static std::unique_ptr<UINT16[]>  local_videoram;
 static UINT8    videobank_select;
 
 /* DMA-related variables */
@@ -91,7 +91,7 @@ static struct
 VIDEO_START_MEMBER(midtunit_state,midtunit)
 {
 	/* allocate memory */
-	local_videoram = auto_alloc_array(machine(), UINT16, 0x100000/2);
+	local_videoram = std::make_unique<UINT16[]>(0x100000/2);
 
 	/* reset all the globals */
 	gfxbank_offset[0] = 0x000000;
@@ -104,7 +104,7 @@ VIDEO_START_MEMBER(midtunit_state,midtunit)
 	/* register for state saving */
 	save_item(NAME(midtunit_control));
 	save_item(NAME(gfxbank_offset));
-	save_pointer(NAME(local_videoram), 0x100000/sizeof(local_videoram[0]));
+	save_pointer(NAME(local_videoram.get()), 0x100000/sizeof(local_videoram[0]));
 	save_item(NAME(videobank_select));
 	save_item(NAME(dma_register));
 }

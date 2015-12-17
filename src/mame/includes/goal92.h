@@ -28,7 +28,7 @@ public:
 	required_shared_ptr<UINT16> m_tx_data;
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_scrollram;
-	UINT16 *    m_buffered_spriteram;
+	std::unique_ptr<UINT16[]>    m_buffered_spriteram;
 
 	/* video-related */
 	tilemap_t     *m_bg_layer;

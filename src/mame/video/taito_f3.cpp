@@ -509,9 +509,9 @@ void taito_f3_state::screen_eof_f3(screen_device &screen, bool state)
 		{
 			if (machine().video().skip_this_frame() == 0)
 			{
-				get_sprite_info(m_spriteram16_buffered);
+				get_sprite_info(m_spriteram16_buffered.get());
 			}
-			memcpy(m_spriteram16_buffered,m_spriteram,0x10000);
+			memcpy(m_spriteram16_buffered.get(),m_spriteram,0x10000);
 		}
 		else if (m_sprite_lag==1)
 		{
@@ -624,7 +624,7 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 		m_pf8_tilemap->set_transparent_pen(0);
 	}
 
-	m_spriteram16_buffered = auto_alloc_array(machine(), UINT16, 0x10000/2);
+	m_spriteram16_buffered = std::make_unique<UINT16[]>(0x10000/2);
 	m_spritelist = auto_alloc_array(machine(), struct tempsprite, 0x400);
 	m_sprite_end = m_spritelist;
 	m_vram_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info_vram),this),TILEMAP_SCAN_ROWS,8,8,64,64);
@@ -632,9 +632,9 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 	m_pf_line_inf = auto_alloc_array(machine(), struct f3_playfield_line_inf, 5);
 	m_sa_line_inf = auto_alloc_array(machine(), struct f3_spritealpha_line_inf, 1);
 	m_screen->register_screen_bitmap(m_pri_alp_bitmap);
-	m_tile_opaque_sp = auto_alloc_array(machine(), UINT8, m_gfxdecode->gfx(2)->elements());
+	m_tile_opaque_sp = std::make_unique<UINT8[]>(m_gfxdecode->gfx(2)->elements());
 	for (i=0; i<8; i++)
-		m_tile_opaque_pf[i] = auto_alloc_array(machine(), UINT8, m_gfxdecode->gfx(1)->elements());
+		m_tile_opaque_pf[i] = std::make_unique<UINT8[]>(m_gfxdecode->gfx(1)->elements());
 
 
 	m_vram_layer->set_transparent_pen(0);
@@ -646,7 +646,7 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 	m_gfxdecode->gfx(2)->set_granularity(16);
 
 	m_flipscreen = 0;
-	memset(m_spriteram16_buffered,0,0x10000);
+	memset(m_spriteram16_buffered.get(),0,0x10000);
 	memset(m_spriteram,0,0x10000);
 
 	save_item(NAME(m_f3_control_0));

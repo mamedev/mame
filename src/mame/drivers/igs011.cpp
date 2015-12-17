@@ -104,7 +104,7 @@ public:
 	optional_shared_ptr<UINT16> m_vbowl_trackball;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 
-	UINT8 *m_layer[8];
+	std::unique_ptr<UINT8[]> m_layer[8];
 	UINT16 m_priority;
 	UINT8 m_lhb2_pen_hi;
 	UINT16 m_igs_dips_sel;
@@ -275,8 +275,8 @@ void igs011_state::video_start()
 {
 	for (int i = 0; i < 8; i++)
 	{
-		m_layer[i] = auto_alloc_array(machine(), UINT8, 512 * 256);
-		save_pointer(NAME(m_layer[i]), 512 * 256, i);
+		m_layer[i] = std::make_unique<UINT8[]>(512 * 256);
+		save_pointer(NAME(m_layer[i].get()), 512 * 256, i);
 	}
 
 	m_lhb2_pen_hi = 0;
@@ -374,8 +374,8 @@ READ16_MEMBER(igs011_state::igs011_layers_r)
 {
 	int layer0 = ((offset & (0x80000/2)) ? 4 : 0) + ((offset & 1) ? 0 : 2);
 
-	UINT8 *l0 = m_layer[layer0];
-	UINT8 *l1 = m_layer[layer0+1];
+	UINT8 *l0 = m_layer[layer0].get();
+	UINT8 *l1 = m_layer[layer0+1].get();
 
 	offset >>= 1;
 	offset &= 0x1ffff;
@@ -389,8 +389,8 @@ WRITE16_MEMBER(igs011_state::igs011_layers_w)
 
 	int layer0 = ((offset & (0x80000/2)) ? 4 : 0) + ((offset & 1) ? 0 : 2);
 
-	UINT8 *l0 = m_layer[layer0];
-	UINT8 *l1 = m_layer[layer0+1];
+	UINT8 *l0 = m_layer[layer0].get();
+	UINT8 *l1 = m_layer[layer0+1].get();
 
 	offset >>= 1;
 	offset &= 0x1ffff;
@@ -499,7 +499,7 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 					blitter.x,blitter.y,blitter.w,blitter.h,blitter.gfx_hi,blitter.gfx_lo,blitter.depth,blitter.pen,blitter.flags);
 #endif
 
-	dest    =   m_layer[   blitter.flags & 0x0007   ];
+	dest    =   m_layer[   blitter.flags & 0x0007   ].get();
 	opaque  =            !(blitter.flags & 0x0008);
 	clear   =              blitter.flags & 0x0010;
 	flipx   =              blitter.flags & 0x0020;

@@ -87,7 +87,6 @@ diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *ta
 	m_head(-1),
 	m_sector(-1),
 	m_page(-1),
-	m_cache(nullptr),
 	m_bits(nullptr),
 	m_rdfirst(-1),
 	m_rdlast(-1),
@@ -310,13 +309,12 @@ void diablo_hd_device::read_sector()
 
 	if (m_disk) {
 		// allocate a buffer for this page
-		m_cache[m_page] = auto_alloc_array(machine(), UINT8, sizeof(diablo_sector_t));
+		m_cache[m_page] = std::make_unique<UINT8[]>(sizeof(diablo_sector_t));
 		// and read the page from the hard_disk image
-		if (hard_disk_read(m_disk, m_page, m_cache[m_page])) {
+		if (hard_disk_read(m_disk, m_page, m_cache[m_page].get())) {
 			LOG_DRIVE((2,"[DHD%u]   CHS:%03d/%d/%02d => page:%d loaded\n", m_unit, m_cylinder, m_head, m_sector, m_page));
 		} else {
 			LOG_DRIVE((0,"[DHD%u]   CHS:%03d/%d/%02d => page:%d read failed\n", m_unit, m_cylinder, m_head, m_sector, m_page));
-			auto_free(machine(), m_cache[m_page]);
 			m_cache[m_page] = nullptr;
 		}
 	} else {
@@ -442,7 +440,7 @@ UINT32* diablo_hd_device::expand_sector()
 		LOG_DRIVE((0,"[DHD%u]   no image for page #%d\n", m_unit, m_page));
 		return nullptr;
 	}
-	diablo_sector_t *s = reinterpret_cast<diablo_sector_t *>(m_cache[m_page]);
+	diablo_sector_t *s = reinterpret_cast<diablo_sector_t *>(m_cache[m_page].get());
 
 	/* allocate a bits image */
 	UINT32 *bits = auto_alloc_array_clear(machine(), UINT32, 400);
@@ -727,7 +725,7 @@ void diablo_hd_device::squeeze_sector()
 	UINT32 *bits = m_bits[m_page];
 
 	// pointer to sector buffer
-	s = reinterpret_cast<diablo_sector_t *>(m_cache[m_page]);
+	s = reinterpret_cast<diablo_sector_t *>(m_cache[m_page].get());
 
 	// zap the sector first
 	memset(s, 0, sizeof(*s));
@@ -778,7 +776,7 @@ void diablo_hd_device::squeeze_sector()
 	m_bits[m_page] = nullptr;
 
 	if (m_disk) {
-		if (!hard_disk_write(m_disk, m_page, m_cache[m_page])) {
+		if (!hard_disk_write(m_disk, m_page, m_cache[m_page].get())) {
 			LOG_DRIVE((0,"[DHD%u]   write failed for page #%d\n", m_unit, m_page));
 		}
 	} else {
@@ -1334,9 +1332,7 @@ void diablo_hd_device::device_reset()
 	if (m_cache) {
 		for (int page = 0; page < m_pages; page++)
 			if (m_cache[page])
-				auto_free(machine(), m_cache[page]);
-		auto_free(machine(), m_cache);
-		m_cache = nullptr;
+				m_cache[page] = nullptr;
 	}
 	// free previous bits cache
 	if (m_bits) {
@@ -1406,7 +1402,6 @@ void diablo_hd_device::device_reset()
 	if (!m_handle)
 		return;
 	// for units with a CHD assigned to them start the timer
-	m_cache = auto_alloc_array_clear(machine(), UINT8*, m_pages);
 	m_bits = auto_alloc_array_clear(machine(), UINT32*, m_pages);
 	timer_set(m_sector_time - m_sector_mark_0_time, 1, 0);
 	read_sector();

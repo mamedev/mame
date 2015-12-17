@@ -132,8 +132,8 @@ void c140_device::device_start()
 	}
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	m_mixer_buffer_left = auto_alloc_array(machine(), INT16, 2 * m_sample_rate);
-	m_mixer_buffer_right = m_mixer_buffer_left + m_sample_rate;
+	m_mixer_buffer_left = std::make_unique<INT16[]>(m_sample_rate);
+	m_mixer_buffer_right = std::make_unique<INT16[]>(m_sample_rate);;
 
 	save_item(NAME(m_REG));
 
@@ -181,8 +181,8 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	if(samples>m_sample_rate) samples=m_sample_rate;
 
 	/* zap the contents of the mixer buffer */
-	memset(m_mixer_buffer_left, 0, samples * sizeof(INT16));
-	memset(m_mixer_buffer_right, 0, samples * sizeof(INT16));
+	memset(m_mixer_buffer_left.get(), 0, samples * sizeof(INT16));
+	memset(m_mixer_buffer_right.get(), 0, samples * sizeof(INT16));
 
 	/* get the number of voices to update */
 	voicecnt = (m_banking_type == C140_TYPE_ASIC219) ? 16 : 24;
@@ -208,8 +208,8 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			rvol=(vreg->volume_right*32)/C140_MAX_VOICE;
 
 			/* Set mixer outputs base pointers */
-			lmix = m_mixer_buffer_left;
-			rmix = m_mixer_buffer_right;
+			lmix = m_mixer_buffer_left.get();
+			rmix = m_mixer_buffer_right.get();
 
 			/* Retrieve sample start/end and calculate size */
 			st=v->sample_start;
@@ -342,8 +342,8 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	}
 
 	/* render to MAME's stream buffer */
-	lmix = m_mixer_buffer_left;
-	rmix = m_mixer_buffer_right;
+	lmix = m_mixer_buffer_left.get();
+	rmix = m_mixer_buffer_right.get();
 	{
 		stream_sample_t *dest1 = outputs[0];
 		stream_sample_t *dest2 = outputs[1];

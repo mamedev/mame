@@ -62,7 +62,7 @@ void iq151_minigraf_device::device_start()
 	m_rom = (UINT8*)memregion("minigraf")->base();
 
 	// allocate a bitmap for represent the paper
-	m_paper = auto_bitmap_ind16_alloc(machine(), PAPER_WIDTH, PAPER_HEIGHT);
+	m_paper = std::make_unique<bitmap_ind16>(PAPER_WIDTH, PAPER_HEIGHT);
 	m_paper->fill(0);
 
 	m_pen = 0;

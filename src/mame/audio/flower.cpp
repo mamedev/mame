@@ -49,7 +49,7 @@ void flower_sound_device::device_start()
 
 	m_effect_timer = timer_alloc(TIMER_CLOCK_EFFECT);
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, MIXER_SAMPLERATE);
-	m_mixer_buffer = auto_alloc_array(machine(), short, MIXER_SAMPLERATE);
+	m_mixer_buffer = std::make_unique<short[]>(MIXER_SAMPLERATE);
 	make_mixer_table(8, MIXER_DEFGAIN);
 
 	/* extract globals from the interface */
@@ -114,10 +114,10 @@ void flower_sound_device::make_mixer_table(int voices, int gain)
 	int count = voices * 128;
 
 	/* allocate memory */
-	m_mixer_table = auto_alloc_array(machine(), INT16, 256 * voices);
+	m_mixer_table = std::make_unique<INT16[]>(256 * voices);
 
 	/* find the middle of the table */
-	m_mixer_lookup = m_mixer_table + (128 * voices);
+	m_mixer_lookup = m_mixer_table.get() + (128 * voices);
 
 	/* fill in the table - 16 bit case */
 	for (int i = 0; i < count; i++)
@@ -274,7 +274,7 @@ void flower_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	int i;
 
 	/* zap the contents of the mixer buffer */
-	memset(m_mixer_buffer, 0, samples * sizeof(short));
+	memset(m_mixer_buffer.get(), 0, samples * sizeof(short));
 
 	/* loop over each voice and add its contribution */
 	for (voice = m_channel_list; voice < m_last_channel; voice++)
@@ -303,7 +303,7 @@ void flower_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 		// bit 3: not used much, maybe pitch slide the other way?
 
 		v |= voice->voltab;
-		mix = m_mixer_buffer;
+		mix = m_mixer_buffer.get();
 
 		for (i = 0; i < samples; i++)
 		{
@@ -331,7 +331,7 @@ void flower_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	}
 
 	/* mix it down */
-	mix = m_mixer_buffer;
+	mix = m_mixer_buffer.get();
 	for (i = 0; i < samples; i++)
 		*buffer++ = m_mixer_lookup[*mix++];
 }

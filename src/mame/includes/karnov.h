@@ -39,7 +39,7 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	bitmap_ind16    *m_bitmap_f;
+	std::unique_ptr<bitmap_ind16> m_bitmap_f;
 	tilemap_t     *m_fix_tilemap;
 	int         m_flipscreen;
 	UINT16      m_scroll[2];

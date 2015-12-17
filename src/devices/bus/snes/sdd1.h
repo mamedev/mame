@@ -180,7 +180,7 @@ public:
 
 	struct
 	{
-		UINT8 *data;    // pointer to decompressed S-DD1 data (65536 bytes)
+		std::unique_ptr<UINT8[]> data;    // pointer to decompressed S-DD1 data (65536 bytes)
 		UINT16 offset;  // read index into S-DD1 decompression buffer
 		UINT32 size;    // length of data buffer; reads decrement counter, set ready to false at 0
 		UINT8 ready;    // 1 when data[] is valid; 0 to invoke sdd1emu.decompress()

@@ -428,7 +428,7 @@ void sns_rom_sdd1_device::device_start()
 {
 	m_sdd1emu = auto_alloc(machine(), SDD1_emu(machine()));
 
-	m_buffer.data = (UINT8*)auto_alloc_array(machine(), UINT8, 0x10000);
+	m_buffer.data = std::make_unique<UINT8[]>(0x10000);
 	m_buffer.ready = 0;
 
 	save_item(NAME(m_sdd1_enable));
@@ -441,7 +441,7 @@ void sns_rom_sdd1_device::device_start()
 		save_item(NAME(m_dma[i].size), i);
 	}
 
-	save_pointer(NAME(m_buffer.data), 0x10000);
+	save_pointer(NAME(m_buffer.data.get()), 0x10000);
 	save_item(NAME(m_buffer.offset));
 	save_item(NAME(m_buffer.size));
 	save_item(NAME(m_buffer.ready));
@@ -567,7 +567,7 @@ UINT8 sns_rom_sdd1_device::read_helper(UINT32 addr)
 
 						// SDD1_emu calls this function; it needs to access uncompressed data;
 						// so temporarily disable decompression mode for decompress() call.
-						m_sdd1emu->SDD1emu_decompress(m_rom, m_mmc, addr, m_buffer.size, m_buffer.data);
+						m_sdd1emu->SDD1emu_decompress(m_rom, m_mmc, addr, m_buffer.size, m_buffer.data.get());
 
 						m_buffer.ready = 1;
 					}

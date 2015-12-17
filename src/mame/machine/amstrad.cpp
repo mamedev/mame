@@ -1088,7 +1088,7 @@ VIDEO_START_MEMBER(amstrad_state,amstrad)
 {
 	amstrad_init_lookups();
 
-	m_gate_array.bitmap = auto_bitmap_ind16_alloc( machine(), m_screen->width(), m_screen->height() );
+	m_gate_array.bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height() );
 	m_gate_array.hsync_after_vsync_counter = 3;
 }
 

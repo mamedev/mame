@@ -44,8 +44,8 @@ private:
 	UINT32 m_polygons;
 	offs_t m_texture_size;
 	offs_t m_texmask_size;
-	UINT8 *m_texture;
-	UINT8 *m_texmask;
+	std::unique_ptr<UINT8[]> m_texture;
+	std::unique_ptr<UINT8[]> m_texmask;
 
 	void render_noz_noperspective(INT32 scanline, const extent_t &extent, const gaelco3d_object_data &extra, int threadid);
 	void render_normal(INT32 scanline, const extent_t &extent, const gaelco3d_object_data &extra, int threadid);
@@ -97,7 +97,7 @@ public:
 	offs_t m_adsp_size;
 	dmadac_sound_device *m_dmadac[SOUND_CHANNELS];
 	rgb_t *m_palette;
-	UINT32 *m_polydata_buffer;
+	std::unique_ptr<UINT32[]> m_polydata_buffer;
 	UINT32 m_polydata_count;
 	int m_lastscan;
 	int m_video_changed;

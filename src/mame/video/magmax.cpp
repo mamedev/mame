@@ -69,7 +69,7 @@ void magmax_state::video_start()
 	/* Set up save state */
 	save_item(NAME(m_flipscreen));
 
-	m_prom_tab = auto_alloc_array(machine(), UINT32, 256);
+	m_prom_tab = std::make_unique<UINT32[]>(256);
 
 	m_screen->register_screen_bitmap(m_bitmap);
 

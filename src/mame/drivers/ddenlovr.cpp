@@ -168,7 +168,7 @@ public:
 	optional_shared_ptr<UINT16> m_protection2;
 
 
-	UINT8 *  m_ddenlovr_pixmap[8];
+	std::unique_ptr<UINT8[]>  m_ddenlovr_pixmap[8];
 
 	/* blitter (TODO: merge with the dynax.h, where possible) */
 	int m_extra_layers;
@@ -461,7 +461,7 @@ VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
 
 	for (i = 0; i < 8; i++)
 	{
-		m_ddenlovr_pixmap[i] = auto_alloc_array(machine(), UINT8, 512 * 512);
+		m_ddenlovr_pixmap[i] = std::make_unique<UINT8[]>(512 * 512);
 		m_ddenlovr_scroll[i * 2 + 0] = m_ddenlovr_scroll[i * 2 + 1] = 0;
 	}
 
@@ -542,14 +542,14 @@ VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
 	save_item(NAME(m_ddenlovr_blit_pen_mask));
 	save_item(NAME(m_ddenlovr_blit_regs));
 
-	save_pointer(NAME(m_ddenlovr_pixmap[0]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[1]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[2]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[3]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[4]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[5]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[6]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[7]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[0].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[1].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[2].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[3].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[4].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[5].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[6].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[7].get()), 512 * 512);
 }
 
 VIDEO_START_MEMBER(ddenlovr_state,mmpanic)
@@ -872,17 +872,17 @@ void ddenlovr_state::blit_rect_yh()
 		if (start + length > 512 * 512)
 			length = 512 * 512 - start;
 
-		if (m_ddenlovr_dest_layer & 0x0001) memset(m_ddenlovr_pixmap[0] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0002) memset(m_ddenlovr_pixmap[1] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0004) memset(m_ddenlovr_pixmap[2] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0008) memset(m_ddenlovr_pixmap[3] + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0001) memset(m_ddenlovr_pixmap[0].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0002) memset(m_ddenlovr_pixmap[1].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0004) memset(m_ddenlovr_pixmap[2].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0008) memset(m_ddenlovr_pixmap[3].get() + start, m_ddenlovr_blit_pen, length);
 
 		if (!m_extra_layers) return;
 
-		if (m_ddenlovr_dest_layer & 0x0100) memset(m_ddenlovr_pixmap[4] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0200) memset(m_ddenlovr_pixmap[5] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0400) memset(m_ddenlovr_pixmap[6] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0800) memset(m_ddenlovr_pixmap[7] + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0100) memset(m_ddenlovr_pixmap[4].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0200) memset(m_ddenlovr_pixmap[5].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0400) memset(m_ddenlovr_pixmap[6].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0800) memset(m_ddenlovr_pixmap[7].get() + start, m_ddenlovr_blit_pen, length);
 	}
 }
 
@@ -905,17 +905,17 @@ void ddenlovr_state::blit_fill_xy( int x, int y )
 //      popmessage("FILL command X %03x Y %03x", x, y);
 #endif
 
-	if (m_ddenlovr_dest_layer & 0x0001) memset(m_ddenlovr_pixmap[0] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0002) memset(m_ddenlovr_pixmap[1] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0004) memset(m_ddenlovr_pixmap[2] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0008) memset(m_ddenlovr_pixmap[3] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0001) memset(m_ddenlovr_pixmap[0].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0002) memset(m_ddenlovr_pixmap[1].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0004) memset(m_ddenlovr_pixmap[2].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0008) memset(m_ddenlovr_pixmap[3].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
 
 	if (!m_extra_layers) return;
 
-	if (m_ddenlovr_dest_layer & 0x0100) memset(m_ddenlovr_pixmap[4] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0200) memset(m_ddenlovr_pixmap[5] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0400) memset(m_ddenlovr_pixmap[6] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0800) memset(m_ddenlovr_pixmap[7] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0100) memset(m_ddenlovr_pixmap[4].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0200) memset(m_ddenlovr_pixmap[5].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0400) memset(m_ddenlovr_pixmap[6].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0800) memset(m_ddenlovr_pixmap[7].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
 }
 
 

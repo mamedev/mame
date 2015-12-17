@@ -187,10 +187,10 @@ void akiko_device::device_reset()
 
 		m_cdrom_numtracks = cdrom_get_last_track(m_cdrom)+3;
 
-		m_cdrom_toc = auto_alloc_array(machine(), UINT8, 13*m_cdrom_numtracks);
-		memset( m_cdrom_toc, 0, 13*m_cdrom_numtracks);
+		m_cdrom_toc = std::make_unique<UINT8[]>(13*m_cdrom_numtracks);
+		memset( m_cdrom_toc.get(), 0, 13*m_cdrom_numtracks);
 
-		p = m_cdrom_toc;
+		p = m_cdrom_toc.get();
 		p[1] = ((addrctrl & 0x0f) << 4) | ((addrctrl & 0xf0) >> 4);
 		p[3] = 0xa0; /* first track */
 		p[8] = 1;

@@ -69,7 +69,7 @@ public:
 	bitmap_ind16 m_tmpbitmap[VRAM_MAX];
 	UINT16 *m_videoram[VRAM_MAX];
 	UINT16 *m_videoworkram[VRAM_MAX];
-	UINT8 *m_clut[VRAM_MAX];
+	std::unique_ptr<UINT8[]> m_clut[VRAM_MAX];
 	int m_flipscreen_old[VRAM_MAX];
 	emu_timer *m_blitter_timer;
 

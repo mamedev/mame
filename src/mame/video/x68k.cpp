@@ -1101,10 +1101,10 @@ VIDEO_START_MEMBER(x68k_state,x68000)
 	m_bg0_16->set_transparent_pen(0);
 	m_bg1_16->set_transparent_pen(0);
 
-	m_pcgbitmap = auto_bitmap_ind16_alloc(machine(), 1024, 1024);
+	m_pcgbitmap = std::make_unique<bitmap_ind16>(1024, 1024);
 	m_pcgbitmap->fill(0);
 
-	m_gfxbitmap = auto_bitmap_ind16_alloc(machine(), 1024, 1024);
+	m_gfxbitmap = std::make_unique<bitmap_ind16>(1024, 1024);
 	m_gfxbitmap->fill(0);
 
 //  m_scanline_timer->adjust(attotime::zero, 0, attotime::from_hz(55.45)/568);

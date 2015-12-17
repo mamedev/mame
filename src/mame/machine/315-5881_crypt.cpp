@@ -29,15 +29,15 @@ sega_315_5881_crypt_device::sega_315_5881_crypt_device(const machine_config &mco
 
 void sega_315_5881_crypt_device::device_start()
 {
-	buffer = auto_alloc_array(machine(), UINT8, BUFFER_SIZE);
-	line_buffer = auto_alloc_array(machine(), UINT8, LINE_SIZE);
-	line_buffer_prev = auto_alloc_array(machine(), UINT8, LINE_SIZE);
+	buffer = std::make_unique<UINT8[]>(BUFFER_SIZE);
+	line_buffer = std::make_unique<UINT8[]>(LINE_SIZE);
+	line_buffer_prev = std::make_unique<UINT8[]>(LINE_SIZE);
 
 	m_read.bind_relative_to(*owner());
 
-	save_pointer(NAME(buffer), BUFFER_SIZE);
-	save_pointer(NAME(line_buffer), LINE_SIZE);
-	save_pointer(NAME(line_buffer_prev), LINE_SIZE);
+	save_pointer(NAME(buffer.get()), BUFFER_SIZE);
+	save_pointer(NAME(line_buffer.get()), LINE_SIZE);
+	save_pointer(NAME(line_buffer_prev.get()), LINE_SIZE);
 	save_item(NAME(prot_cur_address));
 	save_item(NAME(subkey));
 	save_item(NAME(enc_ready));
@@ -59,9 +59,9 @@ void sega_315_5881_crypt_device::device_start()
 
 void sega_315_5881_crypt_device::device_reset()
 {
-	memset(buffer, 0, BUFFER_SIZE);
-	memset(line_buffer, 0, LINE_SIZE);
-	memset(line_buffer_prev, 0, LINE_SIZE);
+	memset(buffer.get(), 0, BUFFER_SIZE);
+	memset(line_buffer.get(), 0, LINE_SIZE);
+	memset(line_buffer_prev.get(), 0, LINE_SIZE);
 
 	prot_cur_address = 0;
 	subkey = 0;
@@ -89,12 +89,12 @@ UINT16 sega_315_5881_crypt_device::do_decrypt(UINT8 *&base)
 
 			line_fill();
 		}
-		base = line_buffer + line_buffer_pos;
+		base = line_buffer.get() + line_buffer_pos;
 		line_buffer_pos += 2;
 	} else {
 		if(buffer_pos == BUFFER_SIZE)
 			enc_fill();
-		base = buffer + buffer_pos;
+		base = buffer.get() + buffer_pos;
 		buffer_pos += 2;
 	}
 
@@ -857,10 +857,11 @@ int sega_315_5881_crypt_device::get_compressed_bit()
 void sega_315_5881_crypt_device::line_fill()
 {
 	assert(line_buffer_pos == line_buffer_size);
-	UINT8 *lp = line_buffer;
-	UINT8 *lc = line_buffer_prev;
-	line_buffer = lc;
-	line_buffer_prev = lp;
+	UINT8 *lp = line_buffer.get();
+	UINT8 *lc = line_buffer_prev.get();
+	
+	line_buffer.swap(line_buffer_prev);
+
 	line_buffer_pos = 0;
 
 	for(int i=0; i != line_buffer_size;) {

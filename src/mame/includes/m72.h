@@ -69,12 +69,12 @@ public:
 	required_shared_ptr<UINT16> m_generic_paletteram2_16;
 	optional_device<pic8259_device> m_upd71059c;
 
-	UINT16 *m_protection_ram;
+	std::unique_ptr<UINT16[]> m_protection_ram;
 	emu_timer *m_scanline_timer;
 	const UINT8 *m_protection_code;
 	const UINT8 *m_protection_crc;
 	UINT32 m_raster_irq_position;
-	UINT16 *m_buffered_spriteram;
+	std::unique_ptr<UINT16[]> m_buffered_spriteram;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap_large;

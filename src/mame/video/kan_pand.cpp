@@ -93,13 +93,13 @@ void kaneko_pandora_device::device_start()
 {
 	m_bg_pen = 0;
 
-	m_spriteram = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_spriteram = std::make_unique<UINT8[]>(0x1000);
 
-	m_sprites_bitmap = auto_bitmap_ind16_alloc(machine(), m_screen->width(), m_screen->height());
+	m_sprites_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
 
 	save_item(NAME(m_clear_bitmap));
 	save_item(NAME(m_bg_pen));
-	save_pointer(NAME(m_spriteram), 0x1000);
+	save_pointer(NAME(m_spriteram.get()), 0x1000);
 	save_item(NAME(*m_sprites_bitmap));
 }
 
@@ -109,7 +109,7 @@ void kaneko_pandora_device::device_start()
 
 void kaneko_pandora_device::device_reset()
 {
-	memset(m_spriteram, 0x00, 0x1000);
+	memset(m_spriteram.get(), 0x00, 0x1000);
 
 	m_clear_bitmap = 1;
 }

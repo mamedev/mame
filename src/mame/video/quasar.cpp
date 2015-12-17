@@ -91,14 +91,14 @@ PALETTE_INIT_MEMBER(quasar_state,quasar)
 
 VIDEO_START_MEMBER(quasar_state,quasar)
 {
-	m_effectram = auto_alloc_array(machine(), UINT8, 0x400);
+	m_effectram = std::make_unique<UINT8[]>(0x400);
 
 	/* create helper bitmap */
 	m_screen->register_screen_bitmap(m_collision_background);
 
 	/* register save */
 	save_item(NAME(m_collision_background));
-	save_pointer(NAME(m_effectram), 0x400);
+	save_pointer(NAME(m_effectram.get()), 0x400);
 }
 
 UINT32 quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

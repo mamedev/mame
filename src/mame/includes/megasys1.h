@@ -82,10 +82,10 @@ public:
 	tilemap_t *m_tmap[3];
 	tilemap_t *m_tilemap[3][2][4];
 	int m_hardware_type_z;
-	UINT16 *m_buffer_objectram;
-	UINT16 *m_buffer2_objectram;
-	UINT16 *m_buffer_spriteram16;
-	UINT16 *m_buffer2_spriteram16;
+	std::unique_ptr<UINT16[]> m_buffer_objectram;
+	std::unique_ptr<UINT16[]> m_buffer2_objectram;
+	std::unique_ptr<UINT16[]> m_buffer_spriteram16;
+	std::unique_ptr<UINT16[]> m_buffer2_spriteram16;
 	int m_layers_order[16];
 
 	int m_mcu_hs;

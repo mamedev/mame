@@ -69,7 +69,7 @@ public:
 	struct
 	{
 		UINT8 trap[4];
-		UINT8 *videoram_base;
+		std::unique_ptr<UINT8[]> videoram_base;
 		UINT8 *videoram;
 		UINT8 mode_control_6a;
 		UINT8 color_select_68;

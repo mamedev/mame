@@ -377,7 +377,7 @@ VIDEO_START_MEMBER(nbmj9195_state,_1layer)
 
 	m_screen->register_screen_bitmap(m_tmpbitmap[0]);
 	m_videoram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
-	m_clut[0] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_clut[0] = std::make_unique<UINT8[]>(0x1000);
 	m_scanline[0] = m_scanline[1] = SCANLINE_MIN;
 	m_nb19010_busyflag = 1;
 	m_gfxdraw_mode = 0;
@@ -402,7 +402,7 @@ VIDEO_START_MEMBER(nbmj9195_state,_1layer)
 	save_item(NAME(m_nb19010_busyctr));
 	save_item(NAME(m_nb19010_busyflag));
 	save_pointer(NAME(m_videoram[0]), width * height);
-	save_pointer(NAME(m_clut[0]), 0x1000);
+	save_pointer(NAME(m_clut[0].get()), 0x1000);
 	save_item(NAME(m_flipscreen_old));
 	machine().save().register_postload(save_prepost_delegate(FUNC(nbmj9195_state::postload), this));
 }
@@ -418,8 +418,8 @@ void nbmj9195_state::video_start()
 	m_screen->register_screen_bitmap(m_tmpbitmap[1]);
 	m_videoram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
 	m_videoram[1] = auto_alloc_array_clear(machine(), UINT16, width * height);
-	m_clut[0] = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_clut[1] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_clut[0] = std::make_unique<UINT8[]>(0x1000);
+	m_clut[1] = std::make_unique<UINT8[]>(0x1000);
 	m_scanline[0] = m_scanline[1] = SCANLINE_MIN;
 	m_nb19010_busyflag = 1;
 	m_gfxdraw_mode = 1;
@@ -446,8 +446,8 @@ void nbmj9195_state::video_start()
 	save_item(NAME(m_nb19010_busyflag));
 	save_pointer(NAME(m_videoram[0]), width * height);
 	save_pointer(NAME(m_videoram[1]), width * height);
-	save_pointer(NAME(m_clut[0]), 0x1000);
-	save_pointer(NAME(m_clut[1]), 0x1000);
+	save_pointer(NAME(m_clut[0].get()), 0x1000);
+	save_pointer(NAME(m_clut[1].get()), 0x1000);
 	save_item(NAME(m_flipscreen_old));
 	machine().save().register_postload(save_prepost_delegate(FUNC(nbmj9195_state::postload), this));
 }

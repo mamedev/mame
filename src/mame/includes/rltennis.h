@@ -29,7 +29,7 @@ public:
 	INT32 m_sample_rom_offset_2;
 	INT32 m_offset_shift;
 	INT32 m_unk_counter;
-	bitmap_ind16 *m_tmp_bitmap[RLT_NUM_BITMAPS];
+	std::unique_ptr<bitmap_ind16> m_tmp_bitmap[RLT_NUM_BITMAPS];
 	UINT8 *m_samples_1;
 	UINT8 *m_samples_2;
 	UINT8 *m_gfx;

@@ -112,12 +112,15 @@ void exerion_state::video_start()
 	m_background_mixer = memregion("proms")->base() + 0x320;
 
 	/* allocate memory for the decoded background graphics */
-	m_background_gfx[0] = auto_alloc_array(machine(), UINT16, 256 * 256 * 4);
-	m_background_gfx[1] = m_background_gfx[0] + 256 * 256;
-	m_background_gfx[2] = m_background_gfx[1] + 256 * 256;
-	m_background_gfx[3] = m_background_gfx[2] + 256 * 256;
+	m_background_gfx[0] = std::make_unique<UINT16[]>(256 * 256);
+	m_background_gfx[1] = std::make_unique<UINT16[]>(256 * 256);
+	m_background_gfx[2] = std::make_unique<UINT16[]>(256 * 256);
+	m_background_gfx[3] = std::make_unique<UINT16[]>(256 * 256);
 
-	save_pointer(NAME(m_background_gfx[0]), 256 * 256 * 4);
+	save_pointer(NAME(m_background_gfx[0].get()), 256 * 256);
+	save_pointer(NAME(m_background_gfx[1].get()), 256 * 256);
+	save_pointer(NAME(m_background_gfx[2].get()), 256 * 256);
+	save_pointer(NAME(m_background_gfx[3].get()), 256 * 256);
 
 	/*---------------------------------
 	 * Decode the background graphics
@@ -140,7 +143,7 @@ void exerion_state::video_start()
 		int y;
 
 		UINT8 *src = gfx + i * 0x2000;
-		UINT16 *dst = m_background_gfx[i];
+		UINT16 *dst = m_background_gfx[i].get();
 
 		for (y = 0; y < 0x100; y++)
 		{

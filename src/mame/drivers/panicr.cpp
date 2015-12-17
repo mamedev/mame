@@ -97,8 +97,8 @@ public:
 	tilemap_t *m_txttilemap;
 
 	int m_scrollx;
-	bitmap_ind16 *m_temprender;
-	bitmap_ind16 *m_tempbitmap_1;
+	std::unique_ptr<bitmap_ind16> m_temprender;
+	std::unique_ptr<bitmap_ind16> m_tempbitmap_1;
 	rectangle m_tempbitmap_clip;
 
 	DECLARE_READ8_MEMBER(collision_r);
@@ -821,8 +821,8 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 		}
 	}
 
-	m_tempbitmap_1 = auto_bitmap_ind16_alloc(machine(),256,256);
-	m_temprender = auto_bitmap_ind16_alloc(machine(),256,256);
+	m_tempbitmap_1 = std::make_unique<bitmap_ind16>(256,256);
+	m_temprender = std::make_unique<bitmap_ind16>(256,256);
 	m_tempbitmap_clip.set(0, 256-1, 0, 256-1);
 
 	m_tempbitmap_1->fill(0, m_tempbitmap_clip);

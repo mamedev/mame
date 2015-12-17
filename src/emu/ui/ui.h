@@ -179,7 +179,7 @@ private:
 	bool                    m_show_profiler;
 	osd_ticks_t             m_popup_text_end;
 	bool                    m_use_natural_keyboard;
-	UINT8 *                 m_non_char_keys_down;
+	std::unique_ptr<UINT8[]> m_non_char_keys_down;
 	render_texture *        m_mouse_arrow_texture;
 	bool                    m_mouse_show;
 

@@ -959,7 +959,7 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	m_maincpu->space(AS_PROGRAM).nop_readwrite(0x04000000, 0x047fffff);
 	m_slave->space(AS_PROGRAM).nop_readwrite(0x04000000, 0x047fffff);
 
-	m_nvram->set_base(m_backupram, 0x8000);
+	m_nvram->set_base(m_backupram.get(), 0x8000);
 	m_smpc_nv->set_base(&m_smpc.SMEM, 4);
 
 	if (m_exp)
@@ -1008,8 +1008,8 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	}
 
 	// save states
-	save_pointer(NAME(m_scu_regs), 0x100/4);
-	save_pointer(NAME(m_scsp_regs), 0x1000/2);
+	save_pointer(NAME(m_scu_regs.get()), 0x100/4);
+	save_pointer(NAME(m_scsp_regs.get()), 0x1000/2);
 	save_item(NAME(m_NMI_reset));
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_smpc.IOSEL1));
@@ -1209,9 +1209,12 @@ void sat_console_state::saturn_init_driver(int rgn)
 	m_minit_boost_timeslice = attotime::zero;
 	m_sinit_boost_timeslice = attotime::zero;
 
-	m_scu_regs = auto_alloc_array_clear(machine(), UINT32, 0x100/4);
-	m_scsp_regs = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
-	m_backupram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
+	m_scu_regs = std::make_unique<UINT32[]>(0x100/4);
+	memset(m_scu_regs.get(), 0, sizeof(UINT32) * 0x100 / 4);
+	m_scsp_regs = std::make_unique<UINT16[]>(0x1000/2);
+	memset(m_scu_regs.get(), 0, sizeof(UINT16) * 0x1000 / 2);
+	m_backupram = std::make_unique<UINT8[]>(0x8000);
+	memset(m_scu_regs.get(), 0, sizeof(UINT8) * 0x8000);
 }
 
 DRIVER_INIT_MEMBER(sat_console_state,saturnus)

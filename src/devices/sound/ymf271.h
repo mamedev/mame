@@ -121,9 +121,9 @@ private:
 	inline bool check_envelope_end(YMF271Slot *slot);
 
 	// lookup tables
-	INT16 *m_lut_waves[8];
+	std::unique_ptr<INT16[]> m_lut_waves[8];
 	double *m_lut_plfo[4][8];
-	int *m_lut_alfo[4];
+	std::unique_ptr<int[]> m_lut_alfo[4];
 	double m_lut_ar[64];
 	double m_lut_dc[64];
 	double m_lut_lfo[256];
@@ -153,7 +153,7 @@ private:
 
 	emu_timer *m_timA, *m_timB;
 	sound_stream *m_stream;
-	INT32 *m_mix_buffer;
+	std::unique_ptr<INT32[]> m_mix_buffer;
 
 	devcb_write_line m_irq_handler;
 	devcb_read8 m_ext_read_handler;

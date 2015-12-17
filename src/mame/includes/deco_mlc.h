@@ -38,9 +38,9 @@ public:
 	int m_lastScanline[9];
 	UINT32 m_colour_mask;
 
-	UINT16 *m_mlc_spriteram;
-	UINT16 *m_mlc_spriteram_spare;
-	UINT16 *m_mlc_buffered_spriteram;
+	std::unique_ptr<UINT16[]> m_mlc_spriteram;
+	std::unique_ptr<UINT16[]> m_mlc_spriteram_spare;
+	std::unique_ptr<UINT16[]> m_mlc_buffered_spriteram;
 	DECLARE_READ32_MEMBER(test2_r);
 	DECLARE_READ32_MEMBER(mlc_440008_r);
 	DECLARE_READ32_MEMBER(mlc_44001c_r);

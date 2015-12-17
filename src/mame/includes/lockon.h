@@ -55,8 +55,8 @@ public:
 	UINT8           m_ground_ctrl;
 	UINT16          m_scroll_h;
 	UINT16          m_scroll_v;
-	bitmap_ind16    *m_front_buffer;
-	bitmap_ind16    *m_back_buffer;
+	std::unique_ptr<bitmap_ind16> m_front_buffer;
+	std::unique_ptr<bitmap_ind16> m_back_buffer;
 	emu_timer       *m_bufend_timer;
 	emu_timer       *m_cursor_timer;
 
@@ -72,7 +72,7 @@ public:
 
 	/* Object palette RAM control */
 	UINT32      m_iden;
-	UINT8       *m_obj_pal_ram;
+	std::unique_ptr<UINT8[]>       m_obj_pal_ram;
 	UINT32      m_obj_pal_latch;
 	UINT32      m_obj_pal_addr;
 

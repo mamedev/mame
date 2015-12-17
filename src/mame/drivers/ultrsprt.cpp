@@ -47,7 +47,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	UINT8 *m_vram;
+	std::unique_ptr<UINT8[]> m_vram;
 	UINT32 m_cpu_vram_page;
 };
 
@@ -56,7 +56,7 @@ private:
 
 UINT32 ultrsprt_state::screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *vram = m_vram + (m_cpu_vram_page ^ 1) * VRAM_PAGE_BYTES;
+	UINT8 *vram = m_vram.get() + (m_cpu_vram_page ^ 1) * VRAM_PAGE_BYTES;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
@@ -191,11 +191,11 @@ void ultrsprt_state::machine_start()
 	/* configure fast RAM regions for DRC */
 	m_maincpu->ppcdrc_add_fastram(0xff000000, 0xff01ffff, FALSE, m_workram);
 
-	m_vram = auto_alloc_array(machine(), UINT8, VRAM_PAGE_BYTES * VRAM_PAGES);
+	m_vram = std::make_unique<UINT8[]>(VRAM_PAGE_BYTES * VRAM_PAGES);
 
-	membank("vram")->configure_entries(0, VRAM_PAGES, m_vram, VRAM_PAGE_BYTES);
+	membank("vram")->configure_entries(0, VRAM_PAGES, m_vram.get(), VRAM_PAGE_BYTES);
 
-	save_pointer(NAME(m_vram), VRAM_PAGE_BYTES * VRAM_PAGES);
+	save_pointer(NAME(m_vram.get()), VRAM_PAGE_BYTES * VRAM_PAGES);
 	save_item(NAME(m_cpu_vram_page));
 }
 

@@ -41,7 +41,7 @@ public:
 	UINT16 *      m_bg_videoram;
 	UINT16 *      m_tx_videoram;
 	UINT16 *      m_rowscrollram;
-	UINT8  *      m_sprite_a_region;
+	std::unique_ptr<UINT8[]>      m_sprite_a_region;
 	size_t        m_sprite_a_region_size;
 	UINT16 *      m_spritebufferram; // buffered spriteram
 
@@ -316,7 +316,7 @@ public:
 	}
 	// svg
 	int           m_svg_ram_sel;
-	UINT32 *      m_svg_shareram[2];    //for 5585G MACHINE
+	std::unique_ptr<UINT32[]>      m_svg_shareram[2];    //for 5585G MACHINE
 
 	UINT32        m_svg_latchdata_68k_w;
 	UINT32        m_svg_latchdata_arm_w;

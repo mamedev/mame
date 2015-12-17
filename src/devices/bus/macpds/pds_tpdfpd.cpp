@@ -115,10 +115,10 @@ void macpds_sedisplay_device::device_start()
 	install_rom(this, SEDISPLAY_ROM_REGION, 0xc00000);
 	install_rom(this, SEDISPLAY_ROM_REGION, 0xf80000);
 
-	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
+	m_vram = std::make_unique<UINT8[]>(VRAM_SIZE);
 
 	static const char bankname[] = { "radpds_ram" };
-	m_macpds->install_bank(0xc40000, 0xc40000+VRAM_SIZE-1, 0, 0, bankname, m_vram);
+	m_macpds->install_bank(0xc40000, 0xc40000+VRAM_SIZE-1, 0, 0, bankname, m_vram.get());
 
 	m_macpds->install_device(0x770000, 0x77000f, read16_delegate(FUNC(macpds_sedisplay_device::ramdac_r), this), write16_delegate(FUNC(macpds_sedisplay_device::ramdac_w), this));
 	m_macpds->install_device(0xc10000, 0xc2ffff, read16_delegate(FUNC(macpds_sedisplay_device::sedisplay_r), this), write16_delegate(FUNC(macpds_sedisplay_device::sedisplay_w), this));
@@ -136,7 +136,7 @@ void macpds_sedisplay_device::device_reset()
 	m_count = 0;
 	m_clutoffs = 0;
 	m_vbl_disable = 1;
-	memset(m_vram, 0, VRAM_SIZE);
+	memset(m_vram.get(), 0, VRAM_SIZE);
 	memset(m_palette, 0, sizeof(m_palette));
 
 	m_palette[0] = rgb_t(0, 0, 0);
@@ -166,7 +166,7 @@ UINT32 macpds_sedisplay_device::screen_update(screen_device &screen, bitmap_rgb3
 	int x, y;
 	UINT8 pixels, *vram;
 
-	vram = m_vram;
+	vram = m_vram.get();
 
 	for (y = 0; y < 870; y++)
 	{

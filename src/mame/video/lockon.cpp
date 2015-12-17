@@ -891,11 +891,11 @@ void lockon_state::video_start()
 	m_tilemap->set_transparent_pen(0);
 
 	/* Allocate the two frame buffers for rotation */
-	m_back_buffer = auto_bitmap_ind16_alloc(machine(), 512, 512);
-	m_front_buffer = auto_bitmap_ind16_alloc(machine(), 512, 512);
+	m_back_buffer = std::make_unique<bitmap_ind16>(512, 512);
+	m_front_buffer = std::make_unique<bitmap_ind16>(512, 512);
 
 	/* 2kB of object ASIC palette RAM */
-	m_obj_pal_ram = auto_alloc_array(machine(), UINT8, 2048);
+	m_obj_pal_ram = std::make_unique<UINT8[]>(2048);
 
 	/* Timer for ground display list callback */
 	m_bufend_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lockon_state::bufend_callback),this));
@@ -906,7 +906,7 @@ void lockon_state::video_start()
 
 	save_item(NAME(*m_back_buffer));
 	save_item(NAME(*m_front_buffer));
-	save_pointer(NAME(m_obj_pal_ram), 2048);
+	save_pointer(NAME(m_obj_pal_ram.get()), 2048);
 }
 
 UINT32 lockon_state::screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -936,9 +936,7 @@ void lockon_state::screen_eof_lockon(screen_device &screen, bool state)
 	if (!state)
 	{
 		/* Swap the frame buffers */
-		bitmap_ind16 *tmp = m_front_buffer;
-		m_front_buffer = m_back_buffer;
-		m_back_buffer = tmp;
+		m_front_buffer.swap(m_back_buffer);
 
 		/* Draw the frame buffer layers */
 		scene_draw();

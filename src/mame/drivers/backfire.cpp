@@ -47,8 +47,8 @@ public:
 	{ }
 
 	/* memory pointers */
-	UINT16 *  m_spriteram_1;
-	UINT16 *  m_spriteram_2;
+	std::unique_ptr<UINT16[]>  m_spriteram_1;
+	std::unique_ptr<UINT16[]>  m_spriteram_2;
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_left_priority;
 	required_shared_ptr<UINT32> m_right_priority;
@@ -56,8 +56,8 @@ public:
 	optional_device<decospr_device> m_sprgen2;
 
 	/* video related */
-	bitmap_ind16  *m_left;
-	bitmap_ind16  *m_right;
+	std::unique_ptr<bitmap_ind16>  m_left;
+	std::unique_ptr<bitmap_ind16>  m_right;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -115,8 +115,8 @@ public:
 /* I'm using the functions in deco16ic.c ... same chips, why duplicate code? */
 void backfire_state::video_start()
 {
-	m_spriteram_1 = auto_alloc_array(machine(), UINT16, 0x2000/2);
-	m_spriteram_2 = auto_alloc_array(machine(), UINT16, 0x2000/2);
+	m_spriteram_1 = std::make_unique<UINT16[]>(0x2000/2);
+	m_spriteram_2 = std::make_unique<UINT16[]>(0x2000/2);
 
 	/* and register the allocated ram so that save states still work */
 	save_item(NAME(m_pf1_rowscroll));
@@ -124,11 +124,11 @@ void backfire_state::video_start()
 	save_item(NAME(m_pf3_rowscroll));
 	save_item(NAME(m_pf4_rowscroll));
 
-	m_left =  auto_bitmap_ind16_alloc(machine(), 80*8, 32*8);
-	m_right = auto_bitmap_ind16_alloc(machine(), 80*8, 32*8);
+	m_left =  std::make_unique<bitmap_ind16>(80*8, 32*8);
+	m_right = std::make_unique<bitmap_ind16>(80*8, 32*8);
 
-	save_pointer(NAME(m_spriteram_1), 0x2000/2);
-	save_pointer(NAME(m_spriteram_2), 0x2000/2);
+	save_pointer(NAME(m_spriteram_1.get()), 0x2000/2);
+	save_pointer(NAME(m_spriteram_2.get()), 0x2000/2);
 
 	save_item(NAME(*m_left));
 	save_item(NAME(*m_right));
@@ -153,13 +153,13 @@ UINT32 backfire_state::screen_update_backfire_left(screen_device &screen, bitmap
 	{
 		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 1);
 		m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
-		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram_1, 0x800);
+		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram_1.get(), 0x800);
 	}
 	else if (m_left_priority[0] == 2)
 	{
 		m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
 		m_deco_tilegen2->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
-		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram_1, 0x800);
+		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram_1.get(), 0x800);
 	}
 	else
 		popmessage( "unknown left priority %08x", m_left_priority[0]);
@@ -184,13 +184,13 @@ UINT32 backfire_state::screen_update_backfire_right(screen_device &screen, bitma
 	{
 		m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
 		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram_2, 0x800);
+		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram_2.get(), 0x800);
 	}
 	else if (m_right_priority[0] == 2)
 	{
 		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
 		m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
-		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram_2, 0x800);
+		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram_2.get(), 0x800);
 	}
 	else
 		popmessage( "unknown right priority %08x", m_right_priority[0]);

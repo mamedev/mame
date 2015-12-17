@@ -85,7 +85,7 @@ public:
 	DECLARE_WRITE16_MEMBER(videoram_1_w);
 	DECLARE_WRITE16_MEMBER(videoram_2_w);
 
-	bitmap_ind16 *m_pixbitmap;
+	std::unique_ptr<bitmap_ind16> m_pixbitmap;
 	void pixbitmap_redraw();
 	UINT16 m_pixpal;
 	DECLARE_WRITE16_MEMBER(pixram_w);
@@ -149,7 +149,7 @@ void bmcpokr_state::video_start()
 	m_tilemap_1->set_scroll_cols(1);
 	m_tilemap_2->set_scroll_cols(1);
 
-	m_pixbitmap  = auto_bitmap_ind16_alloc(machine(), 0x400, 0x200);
+	m_pixbitmap  = std::make_unique<bitmap_ind16>(0x400, 0x200);
 
 	save_state();
 }

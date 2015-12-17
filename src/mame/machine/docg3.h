@@ -82,7 +82,7 @@ private:
 	UINT32 m_pages;
 	UINT32 m_user_data_size;
 	UINT32 m_extra_area_size;
-	UINT8 *m_data[3];
+	std::unique_ptr<UINT8[]> m_data[3];
 	UINT32 m_data_size[3];
 	UINT8  m_sec_2[0x800];
 	UINT32 m_data_1036;

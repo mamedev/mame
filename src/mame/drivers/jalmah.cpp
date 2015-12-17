@@ -152,8 +152,8 @@ public:
 	optional_shared_ptr<UINT16> m_sc1_vram;
 	optional_shared_ptr<UINT16> m_sc2_vram;
 	required_shared_ptr<UINT16> m_sc3_vram;
-	UINT16 *m_jm_scrollram;
-	UINT16 *m_jm_vregs;
+	std::unique_ptr<UINT16[]>m_jm_scrollram;
+	std::unique_ptr<UINT16[]> m_jm_vregs;
 	UINT16 m_sc0bank;
 	UINT16 m_pri;
 	UINT8 m_sc0_prin;
@@ -336,8 +336,8 @@ void jalmah_state::video_start()
 	m_sc3_tilemap_2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc3_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range2_8x8),this),8,8,128,64);
 	m_sc3_tilemap_3 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc3_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range3_8x8),this),8,8,64,128);
 
-	m_jm_scrollram = auto_alloc_array(machine(), UINT16, 0x80/2);
-	m_jm_vregs = auto_alloc_array(machine(), UINT16, 0x40/2);
+	m_jm_scrollram = std::make_unique<UINT16[]>(0x80/2);
+	m_jm_vregs = std::make_unique<UINT16[]>(0x40/2);
 
 	m_sc0_tilemap_0->set_transparent_pen(15);
 	m_sc0_tilemap_1->set_transparent_pen(15);
@@ -365,8 +365,8 @@ VIDEO_START_MEMBER(jalmah_state,urashima)
 	m_sc0_tilemap_0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc0_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range0_16x16),this),16,16,256,32);
 	m_sc3_tilemap_0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc3_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range2_8x8),this),8,8,128,64);
 
-	m_jm_scrollram = auto_alloc_array(machine(), UINT16, 0x80/2);
-	m_jm_vregs = auto_alloc_array(machine(), UINT16, 0x40/2);
+	m_jm_scrollram = std::make_unique<UINT16[]>(0x80/2);
+	m_jm_vregs = std::make_unique<UINT16[]>(0x40/2);
 
 	m_sc0_tilemap_0->set_transparent_pen(15);
 	m_sc3_tilemap_0->set_transparent_pen(15);
@@ -452,7 +452,7 @@ void jalmah_state::draw_sc3_layer(screen_device &screen, bitmap_ind16 &bitmap, c
 
 UINT32 jalmah_state::screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *jm_scrollram = m_jm_scrollram;
+	UINT16 *jm_scrollram = m_jm_scrollram.get();
 	UINT8 cur_prin;
 	jalmah_priority_system();
 
@@ -512,7 +512,7 @@ UINT32 jalmah_state::screen_update_jalmah(screen_device &screen, bitmap_ind16 &b
 
 UINT32 jalmah_state::screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *jm_scrollram = m_jm_scrollram;
+	UINT16 *jm_scrollram = m_jm_scrollram.get();
 	/*this game doesn't use the RANGE register at all.*/
 	m_sc0_tilemap_0->set_scrollx(0, jm_scrollram[0]);
 	m_sc3_tilemap_0->set_scrollx(0, jm_scrollram[3]);
@@ -599,8 +599,8 @@ WRITE16_MEMBER(jalmah_state::jalmah_tilebank_w)
 
 WRITE16_MEMBER(jalmah_state::jalmah_scroll_w)
 {
-	UINT16 *jm_scrollram = m_jm_scrollram;
-	UINT16 *jm_vregs = m_jm_vregs;
+	UINT16 *jm_scrollram = m_jm_scrollram.get();
+	UINT16 *jm_vregs = m_jm_vregs.get();
 	//logerror("[%04x]<-%04x\n",(offset+0x10)*2,data);
 	switch(offset+(0x10))
 	{
@@ -655,8 +655,8 @@ WRITE16_MEMBER(jalmah_state::urashima_sc3_vram_w)
 /*Urashima Mahjong uses a bigger (and mostly unused/wasted) video register ram.*/
 WRITE16_MEMBER(jalmah_state::urashima_vregs_w)
 {
-	UINT16 *jm_scrollram = m_jm_scrollram;
-	UINT16 *jm_vregs = m_jm_vregs;
+	UINT16 *jm_scrollram = m_jm_scrollram.get();
+	UINT16 *jm_vregs = m_jm_vregs.get();
 	//logerror("[%04x]<-%04x\n",(offset)*2,data);
 	switch(offset)
 	{

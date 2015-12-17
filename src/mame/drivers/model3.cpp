@@ -5607,8 +5607,8 @@ static void interleave_vroms(running_machine &machine)
 	int vrom_length = state->memregion("user3")->bytes();
 	UINT16 *vrom;
 
-	state->m_vrom = auto_alloc_array(machine, UINT32, 0x4000000/4);
-	vrom = (UINT16 *)state->m_vrom;
+	state->m_vrom = std::make_unique<UINT32[]>(0x4000000/4);
+	vrom = (UINT16 *)state->m_vrom.get();
 
 	if( vrom_length <= 0x1000000 ) {
 		start = 0x1000000;

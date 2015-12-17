@@ -35,8 +35,8 @@ public:
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
-	UINT8    *m_local_videoram[2];
-	UINT8    *m_local_paletteram;
+	std::unique_ptr<UINT8[]>   m_local_videoram[2];
+	std::unique_ptr<UINT8[]>  m_local_paletteram;
 	UINT8    m_selected_videoram;
 	UINT8    m_selected_paletteram;
 	UINT32   m_scrollx[2];

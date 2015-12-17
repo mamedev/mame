@@ -51,7 +51,7 @@ public:
 	UINT8 m_blitter_xor;
 	UINT8 m_blitter_remap_index;
 	const UINT8 *m_blitter_remap;
-	UINT8 *m_blitter_remap_lookup;
+	std::unique_ptr<UINT8[]> m_blitter_remap_lookup;
 	DECLARE_WRITE8_MEMBER(williams_vram_select_w);
 	DECLARE_WRITE8_MEMBER(williams_cmos_w);
 	DECLARE_WRITE8_MEMBER(bubbles_cmos_w);

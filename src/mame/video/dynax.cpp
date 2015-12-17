@@ -868,52 +868,52 @@ void dynax_state::dynax_common_reset()
 
 VIDEO_START_MEMBER(dynax_state,hanamai)
 {
-	m_pixmap[0][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[0][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[1][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[1][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[2][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[2][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[3][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[3][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[0][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[0][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[1][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[1][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[2][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[2][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[3][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[3][1] = std::make_unique<UINT8[]>(256 * 256);
 
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_HANAMAI;
 
-	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][1].get()), 256 * 256);
 }
 
 VIDEO_START_MEMBER(dynax_state,hnoridur)
 {
-	m_pixmap[0][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[0][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[1][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[1][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[2][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[2][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[3][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[3][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[0][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[0][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[1][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[1][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[2][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[2][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[3][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[3][1] = std::make_unique<UINT8[]>(256 * 256);
 
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_HNORIDUR;
 
 	m_priority_table = priority_hnoridur;
 
-	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][1].get()), 256 * 256);
 }
 
 VIDEO_START_MEMBER(dynax_state,mcnpshnt)
@@ -924,76 +924,76 @@ VIDEO_START_MEMBER(dynax_state,mcnpshnt)
 
 VIDEO_START_MEMBER(dynax_state,sprtmtch)
 {
-	m_pixmap[0][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[0][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[1][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[1][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[2][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[2][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[0][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[0][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[1][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[1][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[2][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[2][1] = std::make_unique<UINT8[]>(256 * 256);
 
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_DRGPUNCH;
 
-	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][1].get()), 256 * 256);
 }
 
 VIDEO_START_MEMBER(dynax_state,jantouki)
 {
-	m_pixmap[0][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[0][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[1][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[1][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[2][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[2][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[3][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[3][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[4][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[4][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[5][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[5][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[6][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[6][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[7][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[7][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[0][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[0][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[1][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[1][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[2][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[2][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[3][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[3][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[4][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[4][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[5][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[5][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[6][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[6][1] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[7][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[7][1] = std::make_unique<UINT8[]>(256 * 256);
 
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_JANTOUKI;
 	m_update_irq_func = &dynax_state::jantouki_update_irq;
 
-	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[4][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[4][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[5][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[5][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[6][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[6][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[7][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[7][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[4][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[4][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[5][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[5][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[6][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[6][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[7][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[7][1].get()), 256 * 256);
 }
 
 VIDEO_START_MEMBER(dynax_state,mjdialq2)
 {
-	m_pixmap[0][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_pixmap[1][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_pixmap[0][0] = std::make_unique<UINT8[]>(256 * 256);
+	m_pixmap[1][0] = std::make_unique<UINT8[]>(256 * 256);
 
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_MJDIALQ2;
 	m_update_irq_func = nullptr;
 
-	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0].get()), 256 * 256);
 }
 
 VIDEO_START_MEMBER(dynax_state,mjelctrn)
@@ -1055,8 +1055,8 @@ void dynax_state::hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &clipr
 
 	{
 		int dy, length, pen;
-		UINT8 *src1 = m_pixmap[i][1];
-		UINT8 *src2 = m_pixmap[i][0];
+		UINT8 *src1 = m_pixmap[i][1].get();
+		UINT8 *src2 = m_pixmap[i][0].get();
 
 		int palbase = 16 * color;
 
@@ -1121,8 +1121,8 @@ void dynax_state::jantouki_copylayer( bitmap_ind16 &bitmap, const rectangle &cli
 
 	{
 		int dy, length, pen;
-		UINT8 *src1 = m_pixmap[i][1];
-		UINT8 *src2 = m_pixmap[i][0];
+		UINT8 *src1 = m_pixmap[i][1].get();
+		UINT8 *src2 = m_pixmap[i][0].get();
 
 		int palbase = 16 * color;
 
@@ -1184,7 +1184,7 @@ void dynax_state::mjdialq2_copylayer( bitmap_ind16 &bitmap, const rectangle &cli
 
 	{
 		int dy, length, pen;
-		UINT8 *src = m_pixmap[i][0];
+		UINT8 *src = m_pixmap[i][0].get();
 
 		int palbase = 16 * color;
 
@@ -1288,10 +1288,10 @@ int dynax_state::debug_viewer(bitmap_ind16 &bitmap, const rectangle &cliprect )
 		m_blit_palbank  = (c >>  4) & 1;
 
 		bitmap.fill(0, cliprect);
-		memset(m_pixmap[0][0], 0, sizeof(UINT8) * 0x100 * 0x100);
+		memset(m_pixmap[0][0].get(), 0, sizeof(UINT8) * 0x100 * 0x100);
 
 		if (m_layer_layout != LAYOUT_MJDIALQ2)
-			memset(m_pixmap[0][1], 0, sizeof(UINT8) * 0x100 * 0x100);
+			memset(m_pixmap[0][1].get(), 0, sizeof(UINT8) * 0x100 * 0x100);
 		for (m_hanamai_layer_half = 0; m_hanamai_layer_half < 2; m_hanamai_layer_half++)
 			blitter_drawgfx(0, 1, "gfx1", i, 0, cliprect.min_x, cliprect.min_y, 3, 0);
 

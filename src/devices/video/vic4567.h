@@ -185,7 +185,7 @@ private:
 
 	UINT16 m_chargenaddr, m_videoaddr, m_bitmapaddr;
 
-	bitmap_ind16 *m_bitmap;
+	std::unique_ptr<bitmap_ind16> m_bitmap;
 	int m_x_begin, m_x_end;
 	int m_y_begin, m_y_end;
 

@@ -67,15 +67,15 @@ public:
 
 	optional_device<cpu_device> m_dsp;
 
-	UINT8 *m_videoram;
-	UINT16 *m_winrun_dspcomram;
+	std::unique_ptr<UINT8[]> m_videoram;
+	std::unique_ptr<UINT16[]> m_winrun_dspcomram;
 	UINT16 m_winrun_poly_buf[WINRUN_MAX_POLY_PARAM];
 	int m_winrun_poly_index;
 	UINT32 m_winrun_pointrom_addr;
 	int m_winrun_dsp_alive;
 	UINT16 m_winrun_dspcomram_control[8];
 	UINT16 m_video_enable;
-	UINT8 *m_pointram;
+	std::unique_ptr<UINT8[]> m_pointram;
 	int m_pointram_idx;
 	UINT16 m_pointram_control;
 	dsp_state *m_mpDspState;
@@ -85,10 +85,10 @@ public:
 	int m_mbPointRomDataAvailable;
 	int m_irq_enable;
 	UINT8 m_depthcue[2][0x400];
-	UINT16 *m_mpPolyFrameBufferPens;
-	UINT16 *m_mpPolyFrameBufferZ;
-	UINT16 *m_mpPolyFrameBufferPens2;
-	UINT16 *m_mpPolyFrameBufferZ2;
+	std::unique_ptr<UINT16[]> m_mpPolyFrameBufferPens;
+	std::unique_ptr<UINT16[]> m_mpPolyFrameBufferZ;
+	std::unique_ptr<UINT16[]> m_mpPolyFrameBufferPens2;
+	std::unique_ptr<UINT16[]> m_mpPolyFrameBufferZ2;
 	UINT16 m_winrun_color;
 	UINT16 m_winrun_gpu_register[0x10/2];
 	DECLARE_READ16_MEMBER(namcos21_video_enable_r);

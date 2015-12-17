@@ -130,8 +130,8 @@ public:
 
 	UINT32 m_cx5510_regs[256/4];
 
-	INT16 *m_dacl;
-	INT16 *m_dacr;
+	std::unique_ptr<INT16[]> m_dacl;
+	std::unique_ptr<INT16[]> m_dacr;
 	int m_dacl_ptr;
 	int m_dacr_ptr;
 
@@ -659,8 +659,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(mediagx_state::sound_timer_callback)
 	m_ad1847_sample_counter = 0;
 	timer.adjust(attotime::from_msec(10));
 
-	dmadac_transfer(&m_dmadac[0], 1, 0, 1, m_dacl_ptr, m_dacl);
-	dmadac_transfer(&m_dmadac[1], 1, 0, 1, m_dacr_ptr, m_dacr);
+	dmadac_transfer(&m_dmadac[0], 1, 0, 1, m_dacl_ptr, m_dacl.get());
+	dmadac_transfer(&m_dmadac[1], 1, 0, 1, m_dacr_ptr, m_dacr.get());
 
 	m_dacl_ptr = 0;
 	m_dacr_ptr = 0;
@@ -847,8 +847,8 @@ INPUT_PORTS_END
 
 void mediagx_state::machine_start()
 {
-	m_dacl = auto_alloc_array(machine(), INT16, 65536);
-	m_dacr = auto_alloc_array(machine(), INT16, 65536);
+	m_dacl = std::make_unique<INT16[]>(65536);
+	m_dacr = std::make_unique<INT16[]>(65536);
 }
 
 void mediagx_state::machine_reset()

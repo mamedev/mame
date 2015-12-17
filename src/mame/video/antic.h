@@ -447,7 +447,7 @@ private:
 	UINT32  *m_pf_gtia1;          /* 1cclk gtia mode 1 */
 	UINT32  *m_pf_gtia2;          /* 1cclk gtia mode 2 */
 	UINT32  *m_pf_gtia3;          /* 1cclk gtia mode 3 */
-	UINT8   *m_used_colors;       /* shared buffer for the following: */
+	std::unique_ptr<UINT8[]>   m_used_colors;       /* shared buffer for the following: */
 	UINT8   *m_uc_21;             /* used colors for txt (2,3) */
 	UINT8   *m_uc_x10b;           /* used colors for txt 4,5, gfx D,E */
 	UINT8   *m_uc_3210b2;         /* used colors for txt 6,7, gfx 9,B,C */
@@ -457,7 +457,7 @@ private:
 	UINT8   *m_uc_g1;             /* used colors for gfx GTIA 1 */
 	UINT8   *m_uc_g2;             /* used colors for gfx GTIA 2 */
 	UINT8   *m_uc_g3;             /* used colors for gfx GTIA 3 */
-	bitmap_ind16 *m_bitmap;
+	std::unique_ptr<bitmap_ind16> m_bitmap;
 
 	void prio_init();
 	void cclk_init();

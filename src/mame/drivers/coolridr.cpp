@@ -390,8 +390,8 @@ public:
 	UINT8 sound_data, sound_fifo;
 
 	UINT8* m_compressedgfx;
-	UINT16* m_expanded_10bit_gfx;
-	UINT16* m_rearranged_16bit_gfx;
+	std::unique_ptr<UINT16[]> m_expanded_10bit_gfx;
+	std::unique_ptr<UINT16[]> m_rearranged_16bit_gfx;
 
 	UINT32 get_20bit_data(UINT32 romoffset, int _20bitwordnum);
 	UINT16 get_10bit_data(UINT32 romoffset, int _10bitwordnum);
@@ -1319,8 +1319,8 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 
 
-	UINT16* rearranged_16bit_gfx = object->state->m_rearranged_16bit_gfx;
-	UINT16* expanded_10bit_gfx = object->state->m_expanded_10bit_gfx;
+	UINT16* rearranged_16bit_gfx = object->state->m_rearranged_16bit_gfx.get();
+	UINT16* expanded_10bit_gfx = object->state->m_expanded_10bit_gfx.get();
 
 	INT16 clipminX = CLIPMINX_FULL;
 	INT16 clipmaxX = CLIPMAXX_FULL;
@@ -3621,7 +3621,7 @@ void coolridr_state::machine_start()
 	size_t  size    = memregion( "compressedgfx" )->bytes();
 
 	// we're expanding 10bit packed data to 16bits(10 used)
-	m_expanded_10bit_gfx = auto_alloc_array(machine(), UINT16, ((size/10)*16)/2);
+	m_expanded_10bit_gfx = std::make_unique<UINT16[]>(((size/10)*16)/2);
 
 	for (int i=0;i<(0x800000*8)/2;i++)
 	{
@@ -3630,7 +3630,7 @@ void coolridr_state::machine_start()
 
 	// do a rearranged version too with just the 16-bit words in a different order, palettes seem to
 	// be referenced this way?!
-	m_rearranged_16bit_gfx = auto_alloc_array(machine(), UINT16, size/2);
+	m_rearranged_16bit_gfx = std::make_unique<UINT16[]>(size/2);
 
 	UINT16* compressed = (UINT16*)memregion( "compressedgfx" )->base();
 	int count = 0;
@@ -3660,7 +3660,7 @@ void coolridr_state::machine_start()
 		{
 			for (int i=0;i<(0x800000*8);i++)
 			{
-				fwrite((UINT8*)m_expanded_10bit_gfx+(i^1), 1, 1, fp);
+				fwrite((UINT8*)m_expanded_10bit_gfx.get()+(i^1), 1, 1, fp);
 			}
 			fclose(fp);
 

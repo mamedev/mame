@@ -43,7 +43,7 @@ public:
 	UINT8    m_char_palette;
 	UINT8    m_sprite_palette;
 	UINT8    m_char_bank;
-	UINT16   *m_background_gfx[4];
+	std::unique_ptr<UINT16[]>  m_background_gfx[4];
 	UINT8    *m_background_mixer;
 	UINT8    m_background_latches[13];
 

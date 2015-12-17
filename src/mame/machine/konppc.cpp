@@ -33,7 +33,7 @@ void konppc_device::device_start()
 	for (i=0; i < num_cgboards; i++)
 	{
 		dsp_comm_ppc[i][0] = 0x00;
-		dsp_shared_ram[i] = auto_alloc_array(machine(), UINT32, DSP_BANK_SIZE * 2/4);
+		dsp_shared_ram[i] = std::make_unique<UINT32[]>(DSP_BANK_SIZE * 2/4);
 		dsp_shared_ram_bank[i] = 0;
 
 		dsp_state[i] = 0x80;
@@ -43,19 +43,19 @@ void konppc_device::device_start()
 		nwk_fifo_read_ptr[i] = 0;
 		nwk_fifo_write_ptr[i] = 0;
 
-		nwk_fifo[i] = auto_alloc_array(machine(), UINT32, 0x800);
-		nwk_ram[i] = auto_alloc_array(machine(), UINT32, 0x2000);
+		nwk_fifo[i] = std::make_unique<UINT32[]>(0x800);
+		nwk_ram[i] = std::make_unique<UINT32[]>(0x2000);
 
 		save_item(NAME(dsp_comm_ppc[i]), i);
 		save_item(NAME(dsp_comm_sharc[i]), i);
 		save_item(NAME(dsp_shared_ram_bank[i]), i);
-		save_pointer(NAME(dsp_shared_ram[i]), DSP_BANK_SIZE * 2 / sizeof(dsp_shared_ram[i][0]), i);
+		save_pointer(NAME(dsp_shared_ram[i].get()), DSP_BANK_SIZE * 2 / sizeof(dsp_shared_ram[i][0]), i);
 		save_item(NAME(dsp_state[i]), i);
 		save_item(NAME(nwk_device_sel[i]), i);
 		save_item(NAME(nwk_fifo_read_ptr[i]), i);
 		save_item(NAME(nwk_fifo_write_ptr[i]), i);
-		save_pointer(NAME(nwk_fifo[i]), 0x800, i);
-		save_pointer(NAME(nwk_ram[i]), 0x2000, i);
+		save_pointer(NAME(nwk_fifo[i].get()), 0x800, i);
+		save_pointer(NAME(nwk_ram[i].get()), 0x2000, i);
 	}
 	save_item(NAME(cgboard_id));
 
@@ -185,7 +185,7 @@ WRITE32_MEMBER( konppc_device::cgboard_dsp_shared_w_ppc )
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
 		space.machine().scheduler().trigger(10000);     // Remove the timeout (a part of the GTI Club FIFO test workaround)
-		COMBINE_DATA(dsp_shared_ram[cgboard_id] + (offset + (dsp_shared_ram_bank[cgboard_id] * DSP_BANK_SIZE_WORD)));
+		COMBINE_DATA(dsp_shared_ram[cgboard_id].get() + (offset + (dsp_shared_ram_bank[cgboard_id] * DSP_BANK_SIZE_WORD)));
 	}
 }
 

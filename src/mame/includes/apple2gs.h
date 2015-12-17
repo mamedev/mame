@@ -159,7 +159,7 @@ public:
 	UINT8 m_sndglu_ctrl;
 	int m_sndglu_addr;
 	int m_sndglu_dummy_read;
-	bitmap_ind16 *m_legacy_gfx;
+	std::unique_ptr<bitmap_ind16> m_legacy_gfx;
 	bool m_is_rom3;
 	UINT8 m_echo_bank;
 	UINT64 m_last_adb_time;

@@ -319,13 +319,13 @@ void taitojc_state::video_start()
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, taitojc_char_layout, (UINT8 *)m_char_ram, 0, m_palette->entries() / 16, 0)));
 
-	m_texture = auto_alloc_array(machine(), UINT8, 0x400000);
+	m_texture = std::make_unique<UINT8[]>(0x400000);
 
 	m_screen->register_screen_bitmap(m_framebuffer);
 	m_screen->register_screen_bitmap(m_zbuffer);
 
 	/* create renderer */
-	m_renderer = auto_alloc(machine(), taitojc_renderer(machine(), &m_framebuffer, &m_zbuffer, m_texture));
+	m_renderer = auto_alloc(machine(), taitojc_renderer(machine(), &m_framebuffer, &m_zbuffer, m_texture.get()));
 }
 
 UINT32 taitojc_state::screen_update_taitojc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

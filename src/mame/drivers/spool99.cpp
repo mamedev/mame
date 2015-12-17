@@ -454,7 +454,7 @@ ROM_END
 DRIVER_INIT_MEMBER(spool99_state,spool99)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
-//  vram = auto_alloc_array(machine(), UINT8, 0x2000);
+//  vram = std::make_unique<UINT8[]>(0x2000);
 	memcpy(m_main, ROM, 0x100);
 }
 

@@ -56,7 +56,7 @@ protected:
 
 private:
 	required_region_ptr<UINT8> m_rom;
-	UINT8* m_ram;
+	std::unique_ptr<UINT8[]> m_ram;
 	UINT8 m_low[16];
 	int m_bank;
 	int m_bankshift;

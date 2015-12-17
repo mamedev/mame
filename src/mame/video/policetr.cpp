@@ -33,7 +33,7 @@ void policetr_state::video_start()
 	m_srcbitmap_height_mask = (memregion("gfx1")->bytes() / SRCBITMAP_WIDTH) - 1;
 
 	/* the destination bitmap is not directly accessible to the CPU */
-	m_dstbitmap = auto_alloc_array(machine(), UINT8, DSTBITMAP_WIDTH * DSTBITMAP_HEIGHT);
+	m_dstbitmap = std::make_unique<UINT8[]>(DSTBITMAP_WIDTH * DSTBITMAP_HEIGHT);
 }
 
 

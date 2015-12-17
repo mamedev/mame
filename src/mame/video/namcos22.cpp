@@ -93,9 +93,9 @@ void namcos22_renderer::renderscanline_uvi_full(INT32 scanline, const extent_t &
 	UINT32 *dest = &extra.destbase->pix32(scanline);
 	UINT8 *primap = &extra.primap->pix8(scanline);
 	UINT16 *ttmap = m_state.m_texture_tilemap;
-	UINT8 *ttattr = m_state.m_texture_tileattr;
+	UINT8 *ttattr = m_state.m_texture_tileattr.get();
 	UINT8 *ttdata = m_state.m_texture_tiledata;
-	UINT8 *tt_ayx_to_pixel = m_state.m_texture_ayx_to_pixel;
+	UINT8 *tt_ayx_to_pixel = m_state.m_texture_ayx_to_pixel.get();
 
 	if (extra.cmode & 4)
 	{
@@ -2361,8 +2361,8 @@ UINT32 namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb3
 
 void namcos22_state::init_tables()
 {
-	m_dirtypal = auto_alloc_array(machine(), UINT8, 0x8000/4);
-	memset(m_dirtypal, 1, 0x8000/4);
+	m_dirtypal = std::make_unique<UINT8[]>(0x8000/4);
+	memset(m_dirtypal.get(), 1, 0x8000/4);
 	memset(m_paletteram, 0, 0x8000);
 
 	memset(m_polygonram, 0xcc, m_polygonram.bytes());
@@ -2401,11 +2401,11 @@ void namcos22_state::init_tables()
 
 	m_texture_tilemap = (UINT16 *)memregion("textilemap")->base();
 	m_texture_tiledata = (UINT8 *)m_gfxdecode->gfx(1)->get_data(0);
-	m_texture_tileattr = auto_alloc_array(machine(), UINT8, 0x080000*2);
+	m_texture_tileattr = std::make_unique<UINT8[]>(0x080000*2);
 
 	// unpack textures
 	UINT8 *packed_tileattr = 0x200000 + (UINT8 *)memregion("textilemap")->base();
-	UINT8 *unpacked_tileattr = m_texture_tileattr;
+	UINT8 *unpacked_tileattr = m_texture_tileattr.get();
 	for (int i = 0; i < 0x80000; i++)
 	{
 		*unpacked_tileattr++ = (*packed_tileattr) >> 4;
@@ -2414,7 +2414,7 @@ void namcos22_state::init_tables()
 	}
 
 	// make attr/y/x lookup table
-	m_texture_ayx_to_pixel = auto_alloc_array(machine(), UINT8, 16*16*16);
+	m_texture_ayx_to_pixel = std::make_unique<UINT8[]>(16*16*16);
 	for (int attr = 0; attr < 16; attr++)
 	{
 		for (int y = 0; y < 16; y++)
@@ -2473,7 +2473,7 @@ void namcos22_state::video_start()
 	m_is_ss22 = (m_iomcu == nullptr);
 	init_tables();
 
-	m_mix_bitmap = auto_bitmap_ind16_alloc(machine(), 640, 480);
+	m_mix_bitmap = std::make_unique<bitmap_ind16>(640, 480);
 	m_bgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos22_state::get_text_tile_info), this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_bgtilemap->set_transparent_pen(0xf);
 

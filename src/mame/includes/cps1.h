@@ -150,7 +150,7 @@ public:
 	optional_ioport m_io_in1;
 	UINT16 *     m_cps2_buffered_obj;
 	// game-specific
-	UINT16 *     m_gigaman2_dummyqsound_ram;
+	std::unique_ptr<UINT16[]>    m_gigaman2_dummyqsound_ram;
 	UINT16  sf2ceblp_prot;
 	
 	/* video-related */

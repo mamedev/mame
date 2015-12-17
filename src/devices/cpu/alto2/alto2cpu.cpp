@@ -819,10 +819,10 @@ void alto2_cpu_device::device_start()
 	m_ucode_crom = prom_load(machine(), pl_ucode, memregion("ucode_proms")->base(), ALTO2_UCODE_ROM_PAGES, 8);
 
 	// allocate micro code CRAM
-	m_ucode_cram = auto_alloc_array(machine(), UINT8, sizeof(UINT32) * ALTO2_UCODE_RAM_PAGES * ALTO2_UCODE_PAGE_SIZE);
+	m_ucode_cram = std::make_unique<UINT8[]>(sizeof(UINT32) * ALTO2_UCODE_RAM_PAGES * ALTO2_UCODE_PAGE_SIZE);
 	// fill with the micro code inverted bits value
 	for (offs_t offset = 0; offset < ALTO2_UCODE_RAM_PAGES * ALTO2_UCODE_PAGE_SIZE; offset++)
-		*reinterpret_cast<UINT32 *>(m_ucode_cram + offset * 4) = ALTO2_UCODE_INVERTED;
+		*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + offset * 4) = ALTO2_UCODE_INVERTED;
 
 	// decode constant PROMs to m_const_data
 	m_const_data = prom_load(machine(), pl_const, memregion("const_proms")->base(), 1, 4);
@@ -1028,13 +1028,13 @@ READ32_MEMBER ( alto2_cpu_device::crom_r )
 //! read microcode CRAM
 READ32_MEMBER ( alto2_cpu_device::cram_r )
 {
-	return *reinterpret_cast<UINT32 *>(m_ucode_cram + offset * 4);
+	return *reinterpret_cast<UINT32 *>(m_ucode_cram.get() + offset * 4);
 }
 
 //! write microcode CRAM
 WRITE32_MEMBER( alto2_cpu_device::cram_w )
 {
-	*reinterpret_cast<UINT32 *>(m_ucode_cram + offset * 4) = data;
+	*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + offset * 4) = data;
 }
 
 //! read constants PROM
@@ -1046,7 +1046,7 @@ READ16_MEMBER ( alto2_cpu_device::const_r )
 //! direct read access to the microcode CROM or CRAM
 #define RD_UCODE(addr) (addr < ALTO2_UCODE_RAM_BASE ? \
 	*reinterpret_cast<UINT32 *>(m_ucode_crom + addr * 4) : \
-	*reinterpret_cast<UINT32 *>(m_ucode_cram + (addr - ALTO2_UCODE_RAM_BASE) * 4))
+	*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + (addr - ALTO2_UCODE_RAM_BASE) * 4))
 
 //-------------------------------------------------
 //  device_reset - device-specific reset

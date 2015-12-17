@@ -69,7 +69,7 @@ public:
 
 	DECLARE_IOPORT_ARRAY(ports);
 
-	UINT16 *m_cmos_ram;
+	std::unique_ptr<UINT16[]> m_cmos_ram;
 	UINT32 m_cmos_page;
 	UINT16 m_prot_result;
 	UINT16 m_prot_sequence[3];

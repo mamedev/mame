@@ -67,7 +67,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	bitmap_ind16 *m_framebuffer[2];
+	std::unique_ptr<bitmap_ind16> m_framebuffer[2];
 
 	/* 3d info */
 	INT16 m_frustumLeft;

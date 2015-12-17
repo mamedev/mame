@@ -92,7 +92,7 @@ public:
 	UINT16 m_ram_adr;
 	UINT16 m_ram_latch[2];
 	UINT16 m_ram_scanadr;
-	UINT32 *m_ram_data;
+	std::unique_ptr<UINT32[]> m_ram_data;
 	float m_tgp_vr_base[4];
 	int m_puuu;
 	int m_ccount;

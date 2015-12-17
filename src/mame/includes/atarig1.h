@@ -34,7 +34,7 @@ public:
 	required_shared_ptr<UINT16> m_mo_command;
 
 	UINT16 *        m_bslapstic_base;
-	void *          m_bslapstic_bank0;
+	std::unique_ptr<UINT8[]>          m_bslapstic_bank0;
 	UINT8           m_bslapstic_bank;
 	bool            m_bslapstic_primed;
 

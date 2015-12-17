@@ -236,7 +236,7 @@ void gottlieb_state::machine_start()
 		m_laserdisc_philips_timer = timer_alloc(TIMER_LASERDISC_PHILIPS);
 
 		/* create some audio RAM */
-		m_laserdisc_audio_buffer = auto_alloc_array(machine(), UINT8, AUDIORAM_SIZE);
+		m_laserdisc_audio_buffer = std::make_unique<UINT8[]>(AUDIORAM_SIZE);
 		m_laserdisc_status = 0x38;
 
 		/* more save state registration */
@@ -244,7 +244,7 @@ void gottlieb_state::machine_start()
 		save_item(NAME(m_laserdisc_status));
 		save_item(NAME(m_laserdisc_philips_code));
 
-		save_pointer(NAME(m_laserdisc_audio_buffer), AUDIORAM_SIZE);
+		save_pointer(NAME(m_laserdisc_audio_buffer.get()), AUDIORAM_SIZE);
 		save_item(NAME(m_laserdisc_audio_address));
 		save_item(NAME(m_laserdisc_last_samples));
 		save_item(NAME(m_laserdisc_last_time));

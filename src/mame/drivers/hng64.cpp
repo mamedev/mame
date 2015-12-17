@@ -1392,11 +1392,11 @@ DRIVER_INIT_MEMBER(hng64_state,hng64_reorder_gfx)
 DRIVER_INIT_MEMBER(hng64_state,hng64)
 {
 	/* 1 meg of virtual address space for the com cpu */
-	m_com_virtual_mem = auto_alloc_array(machine(), UINT8, 0x100000);
-	m_com_op_base     = auto_alloc_array(machine(), UINT8, 0x10000);
+	m_com_virtual_mem = std::make_unique<UINT8[]>(0x100000);
+	m_com_op_base     = std::make_unique<UINT8[]>(0x10000);
 
-	m_soundram = auto_alloc_array(machine(), UINT16, 0x200000/2);
-	m_soundram2 = auto_alloc_array(machine(), UINT16, 0x200000/2);
+	m_soundram = std::make_unique<UINT16[]>(0x200000/2);
+	m_soundram2 = std::make_unique<UINT16[]>(0x200000/2);
 
 	DRIVER_INIT_CALL(hng64_reorder_gfx);
 }
@@ -1508,7 +1508,7 @@ void hng64_state::machine_start()
 	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
 
 	m_comm_rom = memregion("user2")->base();
-	m_comm_ram = auto_alloc_array(machine(),UINT8,0x10000);
+	m_comm_ram = std::make_unique<UINT8[]>(0x10000);
 
 	for (int i = 0; i < 0x38 / 4; i++)
 	{

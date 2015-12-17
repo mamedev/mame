@@ -47,7 +47,7 @@ void nes_state::machine_start()
 	// NES has 2KB of internal RAM which can be used to fill the 4x1KB banks of PPU RAM at $2000-$2fff
 	// Line A10 is exposed to the carts, so that games can change CIRAM mapping in PPU (we emulate this with the set_nt_mirroring
 	// function). CIRAM can also be disabled by the game (if e.g. VROM or cart RAM has to be used in PPU...
-	m_ciram = auto_alloc_array(machine(), UINT8, 0x800);
+	m_ciram = std::make_unique<UINT8[]>(0x800);
 	// other pointers got set in the loading routine, because they 'belong' to the cart itself
 
 	m_io_disksel = ioport("FLIPDISK");
@@ -98,13 +98,13 @@ void nes_state::machine_start()
 			space.install_write_handler(0x4020, 0x40ff, write8_delegate(FUNC(nes_cart_slot_device::write_ex), (nes_cart_slot_device *)m_cartslot));
 		}
 
-		m_cartslot->pcb_start(m_ciram);
+		m_cartslot->pcb_start(m_ciram.get());
 		m_cartslot->m_cart->pcb_reg_postload(machine());
 	}
 
 	// register saves
 	save_item(NAME(m_last_frame_flip));
-	save_pointer(NAME(m_ciram), 0x800);
+	save_pointer(NAME(m_ciram.get()), 0x800);
 }
 
 

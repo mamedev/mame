@@ -128,11 +128,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(tms_tx_timer);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
-	UINT8   *m_nvram8;
+	std::unique_ptr<UINT8[]>   m_nvram8;
 	UINT8   m_io_reg;
 	UINT8   m_irq_status;
 	UINT32  m_dpyaddr;
-	UINT16 *m_paletteram;
+	std::unique_ptr<UINT16[]> m_paletteram;
 	UINT32  m_speedup_count;
 	UINT32  m_tms_io_regs[0x80];
 	bitmap_ind16 m_update_bitmap;
@@ -158,9 +158,9 @@ protected:
 
 void rastersp_state::machine_start()
 {
-	m_nvram8 = auto_alloc_array(machine(), UINT8, NVRAM_SIZE);
-	m_nvram->set_base(m_nvram8,NVRAM_SIZE);
-	m_paletteram = auto_alloc_array(machine(), UINT16, 0x8000);
+	m_nvram8 = std::make_unique<UINT8[]>(NVRAM_SIZE);
+	m_nvram->set_base(m_nvram8.get(),NVRAM_SIZE);
+	m_paletteram = std::make_unique<UINT16[]>(0x8000);
 
 	membank("bank1")->set_base(m_dram);
 	membank("bank2")->set_base(&m_dram[0x10000/4]);

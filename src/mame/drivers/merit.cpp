@@ -99,7 +99,7 @@ public:
 	pen_t m_pens[NUM_PENS];
 	required_shared_ptr<UINT8> m_ram_attr;
 	required_shared_ptr<UINT8> m_ram_video;
-	UINT8 *m_ram_palette;
+	std::unique_ptr<UINT8[]> m_ram_palette;
 	UINT8 m_lscnblk;
 	int m_extra_video_bank_bit;
 	int m_question_address;
@@ -138,9 +138,9 @@ public:
 void merit_state::machine_start()
 {
 	m_question_address = 0;
-	m_ram_palette = auto_alloc_array(machine(), UINT8, RAM_PALETTE_SIZE);
+	m_ram_palette = std::make_unique<UINT8[]>(RAM_PALETTE_SIZE);
 
-	save_pointer(NAME(m_ram_palette), RAM_PALETTE_SIZE);
+	save_pointer(NAME(m_ram_palette.get()), RAM_PALETTE_SIZE);
 	save_item(NAME(m_lscnblk));
 	save_item(NAME(m_extra_video_bank_bit));
 	save_item(NAME(m_question_address));

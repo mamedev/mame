@@ -226,7 +226,7 @@ void ssrj_state::video_start()
 	m_tilemap2->set_transparent_pen(0);
 	m_tilemap4->set_transparent_pen(0);
 
-	m_buffer_spriteram = auto_alloc_array(machine(), UINT8, 0x0800);
+	m_buffer_spriteram = std::make_unique<UINT8[]>(0x0800);
 }
 
 
@@ -289,6 +289,6 @@ void ssrj_state::screen_eof(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		memcpy(m_buffer_spriteram, m_scrollram, 0x800);
+		memcpy(m_buffer_spriteram.get(), m_scrollram, 0x800);
 	}
 }

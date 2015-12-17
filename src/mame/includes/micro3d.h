@@ -137,8 +137,8 @@ public:
 	INT32               m_y_mid;
 	int                 m_dpram_bank;
 	UINT32              m_draw_dpram[1024];
-	UINT16              *m_frame_buffers[2];
-	UINT16              *m_tmp_buffer;
+	std::unique_ptr<UINT16[]>              m_frame_buffers[2];
+	std::unique_ptr<UINT16[]>              m_tmp_buffer;
 	int                 m_drawing_buffer;
 	int                 m_display_buffer;
 

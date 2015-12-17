@@ -31,7 +31,7 @@ public:
 	{
 	}
 
-	UINT32 *m_bios_ram;
+	std::unique_ptr<UINT32[]> m_bios_ram;
 	UINT8 m_mtxc_config_reg[256];
 	UINT8 m_piix4_config_reg[4][256];
 
@@ -67,7 +67,7 @@ static void mtxc_config_w(device_t *busdevice, device_t *device, int function, i
 			//if (data & 0x10)     // enable RAM access to region 0xf0000 - 0xfffff
 			if ((data & 0x50) | (data & 0xA0))
 			{
-				state->membank("bank1")->set_base(state->m_bios_ram);
+				state->membank("bank1")->set_base(state->m_bios_ram.get());
 			}
 			else                // disable RAM access (reads go to BIOS ROM)
 			{
@@ -213,7 +213,7 @@ WRITE32_MEMBER(voyager_state::bios_ram_w)
 	//if (m_mtxc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
 			if (m_mtxc_config_reg[0x63] & 0x50)
 	{
-		COMBINE_DATA(m_bios_ram + offset);
+		COMBINE_DATA(m_bios_ram.get() + offset);
 	}
 }
 
@@ -499,7 +499,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(voyager_state,voyager)
 {
-	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x20000/4);
+	m_bios_ram = std::make_unique<UINT32[]>(0x20000/4);
 
 	intel82439tx_init();
 }

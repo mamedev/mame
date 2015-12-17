@@ -253,7 +253,7 @@ WRITE8_MEMBER( huc6260_device::write )
 void huc6260_device::device_start()
 {
 	m_timer = timer_alloc();
-	m_bmp = auto_bitmap_ind16_alloc( machine(), HUC6260_WPF, HUC6260_LPF );
+	m_bmp = std::make_unique<bitmap_ind16>(HUC6260_WPF, HUC6260_LPF );
 
 	/* Resolve callbacks */
 	m_hsync_changed_cb.resolve();

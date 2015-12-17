@@ -27,7 +27,7 @@ public:
 
 	/* video-related */
 	tilemap_t     *m_pant[2];
-	bitmap_ind16    *m_screen_bitmap;
+	std::unique_ptr<bitmap_ind16> m_screen_bitmap;
 
 	/* misc */
 	int         m_current_bit;

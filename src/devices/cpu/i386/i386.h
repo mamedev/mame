@@ -22,6 +22,7 @@
 #define MCFG_I386_SMIACT(_devcb) \
 	i386_device::set_smiact(*device, DEVCB_##_devcb);
 
+#define X86_NUM_CPUS        4
 
 class i386_device : public cpu_device
 {
@@ -67,6 +68,10 @@ protected:
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
+
+	std::unique_ptr<UINT8[]> cycle_table_rm[X86_NUM_CPUS];
+	std::unique_ptr<UINT8[]> cycle_table_pm[X86_NUM_CPUS];
+
 
 union I386_GPR {
 	UINT32 d[8];

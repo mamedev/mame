@@ -116,7 +116,7 @@ public:
 	UINT8 m_clock_divider;
 	UINT8 m_key_select;
 
-	UINT8 *m_sysram[2];
+	std::unique_ptr<UINT8[]> m_sysram[2];
 	UINT16 m_sysram_size[2];
 	UINT16 m_sysram_end[2];
 	UINT16 m_sysram_mask[2];
@@ -523,15 +523,15 @@ void cc40_state::init_sysram(int chip, UINT16 size)
 	if (m_sysram[chip] == nullptr)
 	{
 		// init to largest possible
-		m_sysram[chip] = auto_alloc_array(machine(), UINT8, 0x2000);
-		save_pointer(NAME(m_sysram[chip]), 0x2000, chip);
+		m_sysram[chip] = std::make_unique<UINT8[]>(0x2000);
+		save_pointer(NAME(m_sysram[chip].get()), 0x2000, chip);
 
 		save_item(NAME(m_sysram_size[chip]), chip);
 		save_item(NAME(m_sysram_end[chip]), chip);
 		save_item(NAME(m_sysram_mask[chip]), chip);
 	}
 
-	m_nvram[chip]->set_base(m_sysram[chip], size);
+	m_nvram[chip]->set_base(m_sysram[chip].get(), size);
 	m_sysram_size[chip] = size;
 }
 

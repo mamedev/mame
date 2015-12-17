@@ -85,7 +85,7 @@ public:
 	int          m_spriteram_bank[4];
 	int          m_spriteram_bank_delay[4];
 
-	UINT16       *m_palette_map[4];
+	std::unique_ptr<UINT16[]>      m_palette_map[4];
 
 	int          m_layers_offs_x;
 	int          m_layers_offs_y;

@@ -145,7 +145,7 @@ private:
 	virtual void machine_start() override;
 	void m6845_change_clock(UINT8 setting);
 	UINT8 m_crtc_index;
-	UINT8 *m_extram;
+	std::unique_ptr<UINT8[]> m_extram;
 	UINT8 m_firq_mask;
 	UINT8 m_firq_status;
 	required_device<cpu_device> m_maincpu;
@@ -762,7 +762,7 @@ INTERRUPT_GEN_MEMBER(bml3_state::bml3_timer_firq)
 
 void bml3_state::machine_start()
 {
-	m_extram = auto_alloc_array(machine(),UINT8,0x10000);
+	m_extram = std::make_unique<UINT8[]>(0x10000);
 	m_p_chargen = memregion("chargen")->base();
 	m_p_videoram = memregion("vram")->base();
 	m_psg_latch = 0;

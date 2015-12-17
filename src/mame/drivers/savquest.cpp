@@ -64,13 +64,13 @@ public:
 	{
 	}
 
-	UINT32 *m_bios_f0000_ram;
-	UINT32 *m_bios_e0000_ram;
-	UINT32 *m_bios_e4000_ram;
-	UINT32 *m_bios_e8000_ram;
-	UINT32 *m_bios_ec000_ram;
+	std::unique_ptr<UINT32[]> m_bios_f0000_ram;
+	std::unique_ptr<UINT32[]> m_bios_e0000_ram;
+	std::unique_ptr<UINT32[]> m_bios_e4000_ram;
+	std::unique_ptr<UINT32[]> m_bios_e8000_ram;
+	std::unique_ptr<UINT32[]> m_bios_ec000_ram;
 
-	UINT8 *m_smram;
+	std::unique_ptr<UINT8[]> m_smram;
 
 	required_device<s3_vga_device> m_vga;
 	required_device<voodoo_2_device> m_voodoo;
@@ -148,7 +148,7 @@ static void mtxc_config_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data & 0x10)        // enable RAM access to region 0xf0000 - 0xfffff
 			{
-				state->membank("bios_f0000")->set_base(state->m_bios_f0000_ram);
+				state->membank("bios_f0000")->set_base(state->m_bios_f0000_ram.get());
 			}
 			else                    // disable RAM access (reads go to BIOS ROM)
 			{
@@ -161,7 +161,7 @@ static void mtxc_config_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data & 0x10)        // enable RAM access to region 0xe4000 - 0xe7fff
 			{
-				state->membank("bios_e4000")->set_base(state->m_bios_e4000_ram);
+				state->membank("bios_e4000")->set_base(state->m_bios_e4000_ram.get());
 			}
 			else                    // disable RAM access (reads go to BIOS ROM)
 			{
@@ -170,7 +170,7 @@ static void mtxc_config_w(device_t *busdevice, device_t *device, int function, i
 
 			if (data & 1)       // enable RAM access to region 0xe0000 - 0xe3fff
 			{
-				state->membank("bios_e0000")->set_base(state->m_bios_e0000_ram);
+				state->membank("bios_e0000")->set_base(state->m_bios_e0000_ram.get());
 			}
 			else                    // disable RAM access (reads go to BIOS ROM)
 			{
@@ -183,7 +183,7 @@ static void mtxc_config_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data & 0x10)        // enable RAM access to region 0xec000 - 0xeffff
 			{
-				state->membank("bios_ec000")->set_base(state->m_bios_ec000_ram);
+				state->membank("bios_ec000")->set_base(state->m_bios_ec000_ram.get());
 			}
 			else                    // disable RAM access (reads go to BIOS ROM)
 			{
@@ -192,7 +192,7 @@ static void mtxc_config_w(device_t *busdevice, device_t *device, int function, i
 
 			if (data & 1)       // enable RAM access to region 0xe8000 - 0xebfff
 			{
-				state->membank("bios_e8000")->set_base(state->m_bios_e8000_ram);
+				state->membank("bios_e8000")->set_base(state->m_bios_e8000_ram.get());
 			}
 			else                    // disable RAM access (reads go to BIOS ROM)
 			{
@@ -214,7 +214,7 @@ void savquest_state::intel82439tx_init()
 	m_mtxc_config_reg[0x63] = 0x02;
 	m_mtxc_config_reg[0x64] = 0x02;
 	m_mtxc_config_reg[0x65] = 0x02;
-	m_smram = auto_alloc_array(machine(), UINT8, 0x20000);
+	m_smram = std::make_unique<UINT8[]>(0x20000);
 }
 
 static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -374,7 +374,7 @@ WRITE32_MEMBER(savquest_state::bios_f0000_ram_w)
 	#if 1
 	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
-		COMBINE_DATA(m_bios_f0000_ram + offset);
+		COMBINE_DATA(m_bios_f0000_ram.get() + offset);
 	}
 	#endif
 }
@@ -385,7 +385,7 @@ WRITE32_MEMBER(savquest_state::bios_e0000_ram_w)
 	#if 1
 	if (m_mtxc_config_reg[0x5e] & 2)        // write to RAM if this region is write-enabled
 	{
-		COMBINE_DATA(m_bios_e0000_ram + offset);
+		COMBINE_DATA(m_bios_e0000_ram.get() + offset);
 	}
 	#endif
 }
@@ -396,7 +396,7 @@ WRITE32_MEMBER(savquest_state::bios_e4000_ram_w)
 	#if 1
 	if (m_mtxc_config_reg[0x5e] & 0x20)     // write to RAM if this region is write-enabled
 	{
-		COMBINE_DATA(m_bios_e4000_ram + offset);
+		COMBINE_DATA(m_bios_e4000_ram.get() + offset);
 	}
 	#endif
 }
@@ -407,7 +407,7 @@ WRITE32_MEMBER(savquest_state::bios_e8000_ram_w)
 	#if 1
 	if (m_mtxc_config_reg[0x5f] & 2)        // write to RAM if this region is write-enabled
 	{
-		COMBINE_DATA(m_bios_e8000_ram + offset);
+		COMBINE_DATA(m_bios_e8000_ram.get() + offset);
 	}
 	#endif
 }
@@ -418,7 +418,7 @@ WRITE32_MEMBER(savquest_state::bios_ec000_ram_w)
 	#if 1
 	if (m_mtxc_config_reg[0x5f] & 0x20)     // write to RAM if this region is write-enabled
 	{
-		COMBINE_DATA(m_bios_ec000_ram + offset);
+		COMBINE_DATA(m_bios_ec000_ram.get() + offset);
 	}
 	#endif
 }
@@ -769,11 +769,11 @@ INPUT_PORTS_END
 
 void savquest_state::machine_start()
 {
-	m_bios_f0000_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
-	m_bios_e0000_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
-	m_bios_e4000_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
-	m_bios_e8000_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
-	m_bios_ec000_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
+	m_bios_f0000_ram = std::make_unique<UINT32[]>(0x10000/4);
+	m_bios_e0000_ram = std::make_unique<UINT32[]>(0x4000/4);
+	m_bios_e4000_ram = std::make_unique<UINT32[]>(0x4000/4);
+	m_bios_e8000_ram = std::make_unique<UINT32[]>(0x4000/4);
+	m_bios_ec000_ram = std::make_unique<UINT32[]>(0x4000/4);
 
 	intel82439tx_init();
 	vid_3dfx_init();

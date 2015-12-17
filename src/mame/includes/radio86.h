@@ -59,7 +59,7 @@ public:
 	UINT8 m_tape_value;
 	UINT8 m_mikrosha_font_page;
 	int m_keyboard_mask;
-	UINT8* m_radio_ram_disk;
+	std::unique_ptr<UINT8[]> m_radio_ram_disk;
 	UINT8 m_romdisk_lsb;
 	UINT8 m_romdisk_msb;
 	UINT8 m_disk_sel;

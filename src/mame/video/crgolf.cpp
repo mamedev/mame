@@ -92,12 +92,12 @@ void crgolf_state::get_pens( pen_t *pens )
 VIDEO_START_MEMBER(crgolf_state,crgolf)
 {
 	/* allocate memory for the two bitmaps */
-	m_videoram_a = auto_alloc_array(machine(), UINT8, VIDEORAM_SIZE);
-	m_videoram_b = auto_alloc_array(machine(), UINT8, VIDEORAM_SIZE);
+	m_videoram_a = std::make_unique<UINT8[]>(VIDEORAM_SIZE);
+	m_videoram_b = std::make_unique<UINT8[]>(VIDEORAM_SIZE);
 
 	/* register for save states */
-	save_pointer(NAME(m_videoram_a), VIDEORAM_SIZE);
-	save_pointer(NAME(m_videoram_b), VIDEORAM_SIZE);
+	save_pointer(NAME(m_videoram_a.get()), VIDEORAM_SIZE);
+	save_pointer(NAME(m_videoram_b.get()), VIDEORAM_SIZE);
 }
 
 

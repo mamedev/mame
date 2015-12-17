@@ -151,5 +151,5 @@ public:
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;
 
-	UINT8 *m_banked_decrypted_opcodes;
+	std::unique_ptr<UINT8[]> m_banked_decrypted_opcodes;
 };

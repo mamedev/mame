@@ -41,7 +41,7 @@ public:
 	UINT8 m_ship_pic;
 	UINT8 m_torpedo_h;
 	UINT8 m_torpedo_v;
-	UINT8* m_LFSR;
+	std::unique_ptr<UINT8[]> m_LFSR;
 	bitmap_ind16 m_helper;
 	DECLARE_READ8_MEMBER(wolfpack_misc_r);
 	DECLARE_WRITE8_MEMBER(wolfpack_high_explo_w);

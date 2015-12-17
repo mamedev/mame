@@ -107,7 +107,7 @@ private:
 		int palette_index, vram_addr;
 		UINT8 palette[16];
 	} m_video;
-	UINT32 *m_videoram;
+	std::unique_ptr<UINT32[]> m_videoram;
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -158,7 +158,7 @@ void kcgd_state::video_start()
 //  screen_device *screen = machine().device<screen_device>("screen");
 
 	// 64 kwords, word size is 17 bits
-	m_videoram = auto_alloc_array(machine(), UINT32, 65536);
+	m_videoram = std::make_unique<UINT32[]>(65536);
 
 	m_tmpclip = rectangle(0, KCGD_DISP_HORZ-1, 0, KCGD_DISP_VERT-1);
 	m_tmpbmp.allocate(KCGD_DISP_HORZ, KCGD_DISP_VERT);

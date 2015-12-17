@@ -81,7 +81,7 @@ public:
 
 	UINT8 m_char_pen;
 	UINT8 m_char_pen_vreg;
-	UINT8 *m_fg_fb;
+	std::unique_ptr<UINT8[]> m_fg_fb;
 	UINT8 m_scrollx_hi;
 	UINT8 m_scrollx_lo;
 	UINT8 m_gfx_switch;
@@ -117,11 +117,11 @@ void progolf_state::video_start()
 	m_scrollx_hi = 0;
 	m_scrollx_lo = 0;
 
-	m_fg_fb = auto_alloc_array(machine(), UINT8, 0x2000*8);
+	m_fg_fb = std::make_unique<UINT8[]>(0x2000*8);
 
 	save_item(NAME(m_char_pen));
 	save_item(NAME(m_char_pen_vreg));
-	save_pointer(NAME(m_fg_fb), 0x2000*8);
+	save_pointer(NAME(m_fg_fb.get()), 0x2000*8);
 	save_item(NAME(m_scrollx_hi));
 	save_item(NAME(m_scrollx_lo));
 	save_item(NAME(m_gfx_switch));

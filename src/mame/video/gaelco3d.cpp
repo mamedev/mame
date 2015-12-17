@@ -33,15 +33,15 @@ gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
 		m_polygons(0),
 		m_texture_size(state.memregion("gfx1")->bytes()),
 		m_texmask_size(state.memregion("gfx2")->bytes() * 8),
-		m_texture(auto_alloc_array(state.machine(), UINT8, m_texture_size)),
-		m_texmask(auto_alloc_array(state.machine(), UINT8, m_texmask_size))
+		m_texture(std::make_unique<UINT8[]>(m_texture_size)),
+		m_texmask(std::make_unique<UINT8[]>(m_texmask_size))
 {
 	state.machine().save().save_item(NAME(m_screenbits));
 	state.machine().save().save_item(NAME(m_zbuffer));
 
 	/* first expand the pixel data */
 	UINT8 *src = state.memregion("gfx1")->base();
-	UINT8 *dst = m_texture;
+	UINT8 *dst = m_texture.get();
 	for (int y = 0; y < m_texture_size/4096; y += 2)
 		for (int x = 0; x < 4096; x += 2)
 		{
@@ -53,7 +53,7 @@ gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
 
 	/* then expand the mask data */
 	src = state.memregion("gfx2")->base();
-	dst = m_texmask;
+	dst = m_texmask.get();
 	for (int y = 0; y < m_texmask_size/4096; y++)
 		for (int x = 0; x < 4096; x++)
 			dst[y * 4096 + x] = (src[(x / 1024) * (m_texmask_size/8/4) + (y * 1024 + x % 1024) / 8] >> (x % 8)) & 1;
@@ -71,12 +71,12 @@ void gaelco3d_state::video_start()
 	m_poly = auto_alloc(machine(), gaelco3d_renderer(*this));
 
 	m_palette = auto_alloc_array(machine(), rgb_t, 32768);
-	m_polydata_buffer = auto_alloc_array(machine(), UINT32, MAX_POLYDATA);
+	m_polydata_buffer = std::make_unique<UINT32[]>(MAX_POLYDATA);
 
 	/* save states */
 
 	save_pointer(NAME(m_palette), 32768);
-	save_pointer(NAME(m_polydata_buffer), MAX_POLYDATA);
+	save_pointer(NAME(m_polydata_buffer.get()), MAX_POLYDATA);
 	save_item(NAME(m_polydata_count));
 	save_item(NAME(m_lastscan));
 }

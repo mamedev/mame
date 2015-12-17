@@ -126,7 +126,7 @@ public:
 	required_shared_ptr<UINT32> m_blitterregs;
 	required_shared_ptr<UINT32> m_spriteram;
 
-	bitmap_ind16 *m_sprite_bitmap;
+	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
 	rectangle m_sprite_clip;
 	int m_vblirqlevel;
 	int m_bltirqlevel;
@@ -434,7 +434,7 @@ void rabbit_state::video_start()
 	m_tilemap[3]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
 	m_tilemap[3]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);
 
-	m_sprite_bitmap = auto_bitmap_ind16_alloc(machine(),0x1000,0x1000);
+	m_sprite_bitmap = std::make_unique<bitmap_ind16>(0x1000,0x1000);
 	m_sprite_clip.set(0, 0x1000-1, 0, 0x1000-1);
 
 	save_pointer(NAME(m_tilemap_ram[0]), 0x20000/4);

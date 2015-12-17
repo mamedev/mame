@@ -71,7 +71,7 @@ private:
 
 	int     m_x;
 
-	bitmap_ind16*       m_bitmap;
+	std::unique_ptr<bitmap_ind16>       m_bitmap;
 
 	required_device<palette_device>     m_palette;
 	required_device<gfxdecode_device>   m_gfxdecode;

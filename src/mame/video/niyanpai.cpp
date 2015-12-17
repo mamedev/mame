@@ -367,10 +367,10 @@ void niyanpai_state::video_start()
 	m_videoworkram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
 	m_videoworkram[1] = auto_alloc_array_clear(machine(), UINT16, width * height);
 	m_videoworkram[2] = auto_alloc_array_clear(machine(), UINT16, width * height);
-	m_palette_ptr = auto_alloc_array(machine(), UINT16, 0x480);
-	m_clut[0] = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_clut[1] = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_clut[2] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_palette_ptr = std::make_unique<UINT16[]>(0x480);
+	m_clut[0] = std::make_unique<UINT8[]>(0x1000);
+	m_clut[1] = std::make_unique<UINT8[]>(0x1000);
+	m_clut[2] = std::make_unique<UINT8[]>(0x1000);
 	m_nb19010_busyflag = 1;
 	m_blitter_timer = timer_alloc(TIMER_BLITTER);
 
@@ -392,16 +392,16 @@ void niyanpai_state::video_start()
 	save_item(NAME(m_nb19010_busyctr));
 	save_item(NAME(m_nb19010_busyflag));
 	save_item(NAME(m_flipscreen_old));
-	save_pointer(NAME(m_palette_ptr), 0x480);
+	save_pointer(NAME(m_palette_ptr.get()), 0x480);
 	save_pointer(NAME(m_videoram[0]), width * height);
 	save_pointer(NAME(m_videoram[1]), width * height);
 	save_pointer(NAME(m_videoram[2]), width * height);
 	save_pointer(NAME(m_videoworkram[0]), width * height);
 	save_pointer(NAME(m_videoworkram[1]), width * height);
 	save_pointer(NAME(m_videoworkram[2]), width * height);
-	save_pointer(NAME(m_clut[0]), 0x1000);
-	save_pointer(NAME(m_clut[1]), 0x1000);
-	save_pointer(NAME(m_clut[2]), 0x1000);
+	save_pointer(NAME(m_clut[0].get()), 0x1000);
+	save_pointer(NAME(m_clut[1].get()), 0x1000);
+	save_pointer(NAME(m_clut[2].get()), 0x1000);
 	save_item(NAME(m_tmpbitmap[0]));
 	save_item(NAME(m_tmpbitmap[1]));
 	save_item(NAME(m_tmpbitmap[2]));

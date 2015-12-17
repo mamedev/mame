@@ -155,9 +155,9 @@ public:
 	snesb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: snes_state(mconfig, type, tag) { }
 
-	INT8 *m_shared_ram;
+	std::unique_ptr<INT8[]> m_shared_ram;
 	UINT8 m_cnt;
-	INT8 *m_shared_ram2;
+	std::unique_ptr<INT8[]> m_shared_ram2;
 	DECLARE_READ8_MEMBER(sharedram_r);
 	DECLARE_WRITE8_MEMBER(sharedram_w);
 	DECLARE_READ8_MEMBER(sb2b_75bd37_r);
@@ -744,7 +744,7 @@ DRIVER_INIT_MEMBER(snesb_state,kinstb)
 		rom[i] = BITSWAP8(rom[i], 5, 0, 6, 1, 7, 4, 3, 2);
 	}
 
-	m_shared_ram = auto_alloc_array(machine(), INT8, 0x100);
+	m_shared_ram = std::make_unique<INT8[]>(0x100);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x7810ff, read8_delegate(FUNC(snesb_state::sharedram_r),this), write8_delegate(FUNC(snesb_state::sharedram_w),this));
 
 	/* extra inputs */
@@ -987,8 +987,8 @@ DRIVER_INIT_MEMBER(snesb_state,endless)
 	/* work around missing content */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800b, 0x800c, read8_delegate(FUNC(snesb_state::endless_800b_r),this));
 
-	m_shared_ram = auto_alloc_array(machine(), INT8, 0x22);
-	m_shared_ram2 = auto_alloc_array(machine(), INT8, 0x22);
+	m_shared_ram = std::make_unique<INT8[]>(0x22);
+	m_shared_ram2 = std::make_unique<INT8[]>(0x22);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x781021, read8_delegate(FUNC(snesb_state::sharedram_r),this), write8_delegate(FUNC(snesb_state::sharedram_w),this));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781200, 0x781221, read8_delegate(FUNC(snesb_state::sharedram2_r),this), write8_delegate(FUNC(snesb_state::sharedram2_w),this));
 

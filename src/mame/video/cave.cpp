@@ -75,7 +75,7 @@ PALETTE_INIT_MEMBER(cave_state,cave)
 	for (int chip = 0; chip < 4; chip++)
 	{
 		/* create a 1:1 palette map covering everything */
-		m_palette_map[chip] = auto_alloc_array(machine(), UINT16, palette.entries());
+		m_palette_map[chip] = std::make_unique<UINT16[]>(palette.entries());
 
 		int maxpens = m_paletteram[chip].bytes() / 2;
 		if (!maxpens)

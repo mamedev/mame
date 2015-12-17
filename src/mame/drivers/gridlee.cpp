@@ -223,8 +223,9 @@ void gridlee_state::poly17_init()
 	UINT8 *p, *r;
 
 	/* allocate memory */
-	p = m_poly17 = auto_alloc_array(machine(), UINT8, 2 * (POLY17_SIZE + 1));
-	r = m_rand17 = m_poly17 + POLY17_SIZE + 1;
+	m_poly17 = std::make_unique<UINT8[]>(2 * (POLY17_SIZE + 1));
+	p = m_poly17.get();
+	r = m_rand17 = m_poly17.get() + POLY17_SIZE + 1;
 
 	/* generate the polynomial */
 	for (i = 0; i < POLY17_SIZE; i++)

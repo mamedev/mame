@@ -96,7 +96,7 @@ void cheekyms_state::video_start()
 
 	width = m_screen->width();
 	height = m_screen->height();
-	m_bitmap_buffer = auto_bitmap_ind16_alloc(machine(), width, height);
+	m_bitmap_buffer = std::make_unique<bitmap_ind16>(width, height);
 
 	m_cm_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cheekyms_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_cm_tilemap->set_transparent_pen(0);

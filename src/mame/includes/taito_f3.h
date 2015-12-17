@@ -101,7 +101,7 @@ public:
 	tilemap_t *m_pf8_tilemap;
 	tilemap_t *m_pixel_layer;
 	tilemap_t *m_vram_layer;
-	UINT16 *m_spriteram16_buffered;
+	std::unique_ptr<UINT16[]> m_spriteram16_buffered;
 	UINT16 m_f3_control_0[8];
 	UINT16 m_f3_control_1[8];
 	int m_flipscreen;
@@ -131,8 +131,8 @@ public:
 	int m_width_mask;
 	int m_twidth_mask;
 	int m_twidth_mask_bit;
-	UINT8 *m_tile_opaque_sp;
-	UINT8 *m_tile_opaque_pf[8];
+	std::unique_ptr<UINT8[]> m_tile_opaque_sp;
+	std::unique_ptr<UINT8[]> m_tile_opaque_pf[8];
 	UINT8 m_add_sat[256][256];
 	int m_alpha_s_1_1;
 	int m_alpha_s_1_2;

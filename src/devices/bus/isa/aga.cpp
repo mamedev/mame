@@ -107,7 +107,7 @@ void isa8_aga_device::device_start()
 	m_mode = AGA_COLOR;
 	m_mda_chr_gen = memregion("gfx1")->base() + 0x1000;
 	m_cga_chr_gen = memregion("gfx1")->base();
-	m_videoram = auto_alloc_array(machine(), UINT8, 0x10000);
+	m_videoram = std::make_unique<UINT8[]>(0x10000);
 
 	set_isa_device();
 	m_isa->install_memory(0xb0000, 0xbffff, 0, 0, read8_delegate(FUNC(isa8_aga_device::pc_aga_videoram_r),this), write8_delegate(FUNC(isa8_aga_device::pc_aga_videoram_w),this));
@@ -194,7 +194,7 @@ void isa8_aga_pc200_device::device_start()
 	m_mode = AGA_COLOR;
 	m_mda_chr_gen = memregion("gfx1")->base();
 	m_cga_chr_gen = memregion("gfx1")->base() + 0x1000;
-	m_videoram = auto_alloc_array(machine(), UINT8, 0x10000);
+	m_videoram = std::make_unique<UINT8[]>(0x10000);
 
 	set_isa_device();
 	m_isa->install_memory(0xb0000, 0xbffff, 0, 0, read8_delegate(FUNC(isa8_aga_pc200_device::pc200_videoram_r),this), write8_delegate(FUNC(isa8_aga_pc200_device::pc200_videoram_w),this));
@@ -315,7 +315,7 @@ machine_config_constructor isa8_aga_device::device_mconfig_additions() const
 MC6845_UPDATE_ROW( isa8_aga_device::mda_text_inten_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT16  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -375,7 +375,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::mda_text_inten_update_row )
 
 MC6845_UPDATE_ROW( isa8_aga_device::mda_text_blink_update_row )
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT16  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
@@ -437,7 +437,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::mda_text_blink_update_row )
 
 MC6845_UPDATE_ROW( isa8_aga_device::cga_text_inten_update_row )
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
@@ -469,7 +469,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_text_inten_update_row )
 MC6845_UPDATE_ROW( isa8_aga_device::cga_text_inten_alt_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
@@ -499,7 +499,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_text_inten_alt_update_row )
 MC6845_UPDATE_ROW( isa8_aga_device::cga_text_blink_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
@@ -533,7 +533,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_text_blink_update_row )
 MC6845_UPDATE_ROW( isa8_aga_device::cga_text_blink_alt_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
@@ -569,7 +569,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_text_blink_alt_update_row )
 MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_4bppl_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
@@ -594,7 +594,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_4bppl_update_row )
 
 MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_4bpph_update_row )
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
@@ -628,7 +628,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_4bpph_update_row )
 
 MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_2bpp_update_row )
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
@@ -654,7 +654,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_2bpp_update_row )
 
 MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_1bpp_update_row )
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT8   fg = m_cga_color_select & 0x0F;

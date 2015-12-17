@@ -121,17 +121,17 @@ void naomi_m2_board::device_start()
 {
 	naomi_board::device_start();
 
-	ram = auto_alloc_array(machine(), UINT8, RAM_SIZE);
+	ram = std::make_unique<UINT8[]>(RAM_SIZE);
 
 	save_item(NAME(rom_cur_address));
-	save_pointer(NAME(ram), RAM_SIZE);
+	save_pointer(NAME(ram.get()), RAM_SIZE);
 }
 
 void naomi_m2_board::device_reset()
 {
 	naomi_board::device_reset();
 
-	memset(ram, 0, RAM_SIZE);
+	memset(ram.get(), 0, RAM_SIZE);
 
 	rom_cur_address = 0;
 }

@@ -24,7 +24,7 @@ public:
 		m_screen(*this, "screen") { }
 
 	/* memory pointers */
-	UINT16 *    m_video_ram;
+	std::unique_ptr<UINT16[]>    m_video_ram;
 	UINT8  *    m_cchip_ram;
 
 	/* video-related */

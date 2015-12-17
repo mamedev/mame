@@ -52,7 +52,7 @@ protected:
 	void play_sample(int start,int freq,int volume);
 
 private:
-	INT16 *m_sample_buf;    /* buffer to decode samples at run time */
+	std::unique_ptr<INT16[]> m_sample_buf;    /* buffer to decode samples at run time */
 	int m_sample_num;
 	int m_sample_freq;
 	int m_sample_volume;

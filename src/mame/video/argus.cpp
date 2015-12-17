@@ -270,12 +270,12 @@ VIDEO_START_MEMBER(argus_state,argus)
 	m_tx_tilemap->set_transparent_pen(15);
 
 	/* dummy RAM for back ground */
-	m_dummy_bg0ram = auto_alloc_array(machine(), UINT8, 0x800);
+	m_dummy_bg0ram = std::make_unique<UINT8[]>(0x800);
 
 	save_item(NAME(m_bg_status));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_palette_intensity));
-	save_pointer(NAME(m_dummy_bg0ram), 0x800);
+	save_pointer(NAME(m_dummy_bg0ram.get()), 0x800);
 	save_item(NAME(m_lowbitscroll));
 	save_item(NAME(m_prvscrollx));
 }
@@ -286,7 +286,7 @@ VIDEO_RESET_MEMBER(argus_state,argus)
 	m_prvscrollx = 0;
 	m_bg0_scrollx[0] = 0;
 	m_bg0_scrollx[1] = 0;
-	memset(m_dummy_bg0ram, 0, 0x800);
+	memset(m_dummy_bg0ram.get(), 0, 0x800);
 	reset_common();
 }
 
@@ -324,8 +324,8 @@ VIDEO_START_MEMBER(argus_state,butasan)
 	m_bg1_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);
 
-	m_butasan_pagedram[0] = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_butasan_pagedram[1] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_butasan_pagedram[0] = std::make_unique<UINT8[]>(0x1000);
+	m_butasan_pagedram[1] = std::make_unique<UINT8[]>(0x1000);
 
 	m_butasan_bg0ram     = &m_butasan_pagedram[0][0x000];
 	m_butasan_bg0backram = &m_butasan_pagedram[0][0x800];
@@ -335,8 +335,8 @@ VIDEO_START_MEMBER(argus_state,butasan)
 	save_item(NAME(m_bg_status));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_palette_intensity));
-	save_pointer(NAME(m_butasan_pagedram[0]), 0x1000);
-	save_pointer(NAME(m_butasan_pagedram[1]), 0x1000);
+	save_pointer(NAME(m_butasan_pagedram[0].get()), 0x1000);
+	save_pointer(NAME(m_butasan_pagedram[1].get()), 0x1000);
 	save_item(NAME(m_butasan_page_latch));
 	save_item(NAME(m_butasan_bg1_status));
 	save_item(NAME(m_butasan_unknown));
@@ -346,8 +346,8 @@ VIDEO_RESET_MEMBER(argus_state,butasan)
 {
 	m_butasan_page_latch = 0;
 	m_butasan_bg1_status = 0x01;
-	memset(m_butasan_pagedram[0], 0, 0x1000);
-	memset(m_butasan_pagedram[1], 0, 0x1000);
+	memset(m_butasan_pagedram[0].get(), 0, 0x1000);
+	memset(m_butasan_pagedram[1].get(), 0, 0x1000);
 	reset_common();
 }
 

@@ -28,10 +28,10 @@ public:
 	UINT16 m_sprite_character_bank_select[8];
 	UINT16 m_video_bank_select[8];
 	tilemap_t *m_bg_tilemap;
-	UINT16 *m_spriteram_old;
-	UINT16 *m_spriteram_older;
-	UINT16 *m_spriteram2_old;
-	UINT16 *m_spriteram2_older;
+	std::unique_ptr<UINT16[]> m_spriteram_old;
+	std::unique_ptr<UINT16[]> m_spriteram_older;
+	std::unique_ptr<UINT16[]> m_spriteram2_old;
+	std::unique_ptr<UINT16[]> m_spriteram2_older;
 
 	DECLARE_READ16_MEMBER(pending_command_r);
 	DECLARE_WRITE16_MEMBER(sound_command_w);

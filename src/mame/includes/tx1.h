@@ -146,10 +146,10 @@ public:
 	sn74s516_t m_sn74s516;
 
 	vregs_t m_vregs;
-	UINT8 *m_chr_bmp;
-	UINT8 *m_obj_bmp;
-	UINT8 *m_rod_bmp;
-	bitmap_ind16 *m_bitmap;
+	std::unique_ptr<UINT8[]> m_chr_bmp;
+	std::unique_ptr<UINT8[]> m_obj_bmp;
+	std::unique_ptr<UINT8[]> m_rod_bmp;
+	std::unique_ptr<bitmap_ind16> m_bitmap;
 
 	bool m_needs_update;
 

@@ -131,9 +131,9 @@ struct SVF {
 };
 
 struct DSPP {
-	UINT16 *N;
-	UINT16 *EI;
-	UINT16 *EO;
+	std::unique_ptr<UINT16[]> N;
+	std::unique_ptr<UINT16[]> EI;
+	std::unique_ptr<UINT16[]> EO;
 };
 
 class _3do_state : public driver_device

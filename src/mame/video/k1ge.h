@@ -55,7 +55,7 @@ protected:
 
 	emu_timer *m_timer;
 	emu_timer *m_hblank_on_timer;
-	bitmap_ind16 *m_bitmap;
+	std::unique_ptr<bitmap_ind16> m_bitmap;
 
 	virtual void draw(int line);
 

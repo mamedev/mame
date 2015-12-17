@@ -18,8 +18,8 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_generic_paletteram_8;
 
-	UINT8 *m_bg_ram;
-	UINT8 *m_fg_ram;
+	std::unique_ptr<UINT8[]> m_bg_ram;
+	std::unique_ptr<UINT8[]> m_fg_ram;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	UINT8 m_bg_xscroll[2];

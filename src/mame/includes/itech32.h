@@ -47,7 +47,7 @@ public:
 
 	void nvram_init(nvram_device &nvram, void *base, size_t length);
 
-	UINT16 *m_videoram;
+	std::unique_ptr<UINT16[]> m_videoram;
 	UINT8 m_vint_state;
 	UINT8 m_xint_state;
 	UINT8 m_qint_state;

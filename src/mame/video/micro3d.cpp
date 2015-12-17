@@ -40,9 +40,9 @@ enum
 void micro3d_state::video_start()
 {
 	/* Allocate 512x12 x 2 3D frame buffers */
-	m_frame_buffers[0] = auto_alloc_array(machine(), UINT16, 1024 * 512);
-	m_frame_buffers[1] = auto_alloc_array(machine(), UINT16, 1024 * 512);
-	m_tmp_buffer = auto_alloc_array(machine(), UINT16, 1024 * 512);
+	m_frame_buffers[0] = std::make_unique<UINT16[]>(1024 * 512);
+	m_frame_buffers[1] = std::make_unique<UINT16[]>(1024 * 512);
+	m_tmp_buffer = std::make_unique<UINT16[]>(1024 * 512);
 }
 
 
@@ -73,7 +73,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(micro3d_state::scanline_update)
 	UINT16 *frame_src;
 
 	scanline = MAX((scanline - params->veblnk), 0);
-	frame_src = m_frame_buffers[m_display_buffer] + (scanline << 10);
+	frame_src = m_frame_buffers[m_display_buffer].get() + (scanline << 10);
 
 	/* TODO: XFER3DK - X/Y offsets for 3D */
 
@@ -672,7 +672,7 @@ WRITE32_MEMBER(micro3d_state::micro3d_fifo_w)
 				case 0xd8:
 				{
 					/* TODO: We shouldn't need this extra buffer - is there some sort of sync missing? */
-					memcpy(m_frame_buffers[m_drawing_buffer], m_tmp_buffer, 512*1024*2);
+					memcpy(m_frame_buffers[m_drawing_buffer].get(), m_tmp_buffer.get(), 512*1024*2);
 					m_drawing_buffer ^= 1;
 					m_vgb->set_input_line(0, ASSERT_LINE);
 					break;

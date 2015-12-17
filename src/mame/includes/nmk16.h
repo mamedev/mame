@@ -67,7 +67,7 @@ public:
 	tilemap_t *m_bg_tilemap3;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_fg_tilemap;
-	bitmap_ind16 *m_background_bitmap;
+	std::unique_ptr<bitmap_ind16> m_background_bitmap;
 	int m_mustang_bg_xscroll;
 	UINT8 m_scroll[4];
 	UINT8 m_scroll_2[4];

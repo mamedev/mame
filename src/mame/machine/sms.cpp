@@ -1301,12 +1301,12 @@ VIDEO_START_MEMBER(sms_state,gamegear)
 	m_prev_bitmap_copied = false;
 	m_main_scr->register_screen_bitmap(m_prev_bitmap);
 	m_main_scr->register_screen_bitmap(m_gg_sms_mode_bitmap);
-	m_line_buffer = auto_alloc_array(machine(), int, 160 * 4);
+	m_line_buffer = std::make_unique<int[]>(160 * 4);
 
 	save_item(NAME(m_prev_bitmap_copied));
 	save_item(NAME(m_prev_bitmap));
 	save_item(NAME(m_gg_sms_mode_bitmap));
-	save_pointer(NAME(m_line_buffer), 160 * 4);
+	save_pointer(NAME(m_line_buffer.get()), 160 * 4);
 }
 
 VIDEO_RESET_MEMBER(sms_state,gamegear)
@@ -1319,7 +1319,7 @@ VIDEO_RESET_MEMBER(sms_state,gamegear)
 	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
 	{
 		m_gg_sms_mode_bitmap.fill(rgb_t::black);
-		memset(m_line_buffer, 0, 160 * 4 * sizeof(int));
+		memset(m_line_buffer.get(), 0, 160 * 4 * sizeof(int));
 	}
 }
 
@@ -1370,7 +1370,7 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 			/* Process lines, but skip those already processed before */
 			for (sms_y2 = MAX(sms_min_y2, sms_y2); sms_y2 <= sms_max_y2; sms_y2++)
 			{
-				int *combineline_buffer =  m_line_buffer + (sms_y2 & 0x03) * 160;
+				int *combineline_buffer =  m_line_buffer.get() + (sms_y2 & 0x03) * 160;
 
 				if (sms_y2 >= vdp_bitmap.cliprect().min_y && sms_y2 <= vdp_bitmap.cliprect().max_y)
 				{
@@ -1432,10 +1432,10 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 				int *line1, *line2, *line3, *line4;
 
 				/* Setup our source lines */
-				line1 = m_line_buffer + ((sms_y + y_i - 1) & 0x03) * 160;
-				line2 = m_line_buffer + ((sms_y + y_i - 0) & 0x03) * 160;
-				line3 = m_line_buffer + ((sms_y + y_i + 1) & 0x03) * 160;
-				line4 = m_line_buffer + ((sms_y + y_i + 2) & 0x03) * 160;
+				line1 = m_line_buffer.get() + ((sms_y + y_i - 1) & 0x03) * 160;
+				line2 = m_line_buffer.get() + ((sms_y + y_i - 0) & 0x03) * 160;
+				line3 = m_line_buffer.get() + ((sms_y + y_i + 1) & 0x03) * 160;
+				line4 = m_line_buffer.get() + ((sms_y + y_i + 2) & 0x03) * 160;
 
 				UINT32 *p_bitmap = &bitmap.pix32(visarea.min_y + plot_y_group + y_i, visarea.min_x);
 

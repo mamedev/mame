@@ -50,7 +50,7 @@
  ****************************/
 struct gate_array_t
 {
-	bitmap_ind16    *bitmap;        /* The bitmap we work on */
+	std::unique_ptr<bitmap_ind16>    bitmap;        /* The bitmap we work on */
 	UINT8   pen_selected;       /* Pen selection */
 	UINT8   mrer;               /* Mode and ROM Enable Register */
 	UINT8   upper_bank;

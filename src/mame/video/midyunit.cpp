@@ -42,11 +42,11 @@ enum
 VIDEO_START_MEMBER(midyunit_state,common)
 {
 	/* allocate memory */
-	m_cmos_ram = auto_alloc_array(machine(), UINT16, (0x2000 * 4)/2);
+	m_cmos_ram = std::make_unique<UINT16[]>((0x2000 * 4)/2);
 	m_local_videoram = auto_alloc_array_clear(machine(), UINT16, 0x80000/2);
 	m_pen_map = auto_alloc_array(machine(), pen_t, 65536);
 
-	machine().device<nvram_device>("nvram")->set_base(m_cmos_ram, 0x2000 * 4);
+	machine().device<nvram_device>("nvram")->set_base(m_cmos_ram.get(), 0x2000 * 4);
 
 	/* reset all the globals */
 	m_cmos_page = 0;
@@ -60,7 +60,7 @@ VIDEO_START_MEMBER(midyunit_state,common)
 	/* register for state saving */
 	save_item(NAME(m_autoerase_enable));
 	save_pointer(NAME(m_local_videoram), 0x80000/2);
-	save_pointer(NAME(m_cmos_ram), (0x2000 * 4)/2);
+	save_pointer(NAME(m_cmos_ram.get()), (0x2000 * 4)/2);
 	save_item(NAME(m_videobank_select));
 	save_item(NAME(m_dma_register));
 }

@@ -242,10 +242,10 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	INT32 *m_zoom_table;
-	UINT16 *m_blitter_data;
+	std::unique_ptr<INT32[]> m_zoom_table;
+	std::unique_ptr<UINT16[]> m_blitter_data;
 
-	UINT8 *m_palette_ptr;
+	std::unique_ptr<UINT8[]> m_palette_ptr;
 	INT32 m_palpos;
 
 	INT32 m_current_scanline;
@@ -263,7 +263,7 @@ public:
 	INT16 m_scanline_cnt;
 
 
-	bitmap_ind16 *m_tmp_bitmap[2];
+	std::unique_ptr<bitmap_ind16> m_tmp_bitmap[2];
 
 	INT32 get_scale(INT32 index)
 	{
@@ -572,8 +572,8 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_blit_w)
 
 void wheelfir_state::video_start()
 {
-	m_tmp_bitmap[0] = auto_bitmap_ind16_alloc(machine(), 512, 512);
-	m_tmp_bitmap[1] = auto_bitmap_ind16_alloc(machine(), 512, 512);
+	m_tmp_bitmap[0] = std::make_unique<bitmap_ind16>(512, 512);
+	m_tmp_bitmap[1] = std::make_unique<bitmap_ind16>(512, 512);
 }
 
 UINT32 wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -769,11 +769,11 @@ void wheelfir_state::machine_reset()
 
 void wheelfir_state::machine_start()
 {
-	m_zoom_table = auto_alloc_array(machine(), INT32, ZOOM_TABLE_SIZE);
-	m_blitter_data = auto_alloc_array(machine(), UINT16, 16);
+	m_zoom_table = std::make_unique<INT32[]>(ZOOM_TABLE_SIZE);
+	m_blitter_data = std::make_unique<UINT16[]>(16);
 
 	m_scanlines = reinterpret_cast<scroll_info*>(auto_alloc_array(machine(), UINT8, sizeof(scroll_info)*(NUM_SCANLINES+NUM_VBLANK_LINES)));
-	m_palette_ptr = auto_alloc_array(machine(), UINT8, NUM_COLORS*3);
+	m_palette_ptr = std::make_unique<UINT8[]>(NUM_COLORS*3);
 
 
 	for(int i=0;i<(ZOOM_TABLE_SIZE);++i)

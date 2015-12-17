@@ -2336,8 +2336,8 @@ MACHINE_START_MEMBER(apple2_state,laser128)
 	apple2_init_common();
 
 	// 1 MB of expansion RAM in slot 5
-	m_exp_ram = auto_alloc_array(machine(), UINT8, 1024*1024);
-	memset(m_exp_ram, 0xff, 1024*1024);
+	m_exp_ram = std::make_unique<UINT8[]>(1024*1024);
+	memset(m_exp_ram.get(), 0xff, 1024*1024);
 
 	m_exp_bankhior = 0xf0;
 	m_exp_addrmask = 0xfffff;

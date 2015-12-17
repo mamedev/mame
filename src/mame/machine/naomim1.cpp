@@ -41,9 +41,9 @@ void naomi_m1_board::device_start()
 		key = 0;
 	}
 
-	buffer = auto_alloc_array(machine(), UINT8, BUFFER_SIZE);
+	buffer = std::make_unique<UINT8[]>(BUFFER_SIZE);
 
-	save_pointer(NAME(buffer), BUFFER_SIZE);
+	save_pointer(NAME(buffer.get()), BUFFER_SIZE);
 	save_item(NAME(dict));
 	save_item(NAME(hist));
 	save_item(NAME(rom_cur_address));
@@ -84,7 +84,7 @@ void naomi_m1_board::board_setup_address(UINT32 address, bool is_dma)
 void naomi_m1_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 {
 	if(encryption) {
-		base = buffer;
+		base = buffer.get();
 		limit = BUFFER_SIZE;
 
 	} else {
@@ -97,7 +97,7 @@ void naomi_m1_board::board_advance(UINT32 size)
 {
 	if(encryption) {
 		if(size < buffer_actual_size) {
-			memmove(buffer, buffer + size, buffer_actual_size - size);
+			memmove(buffer.get(), buffer.get() + size, buffer_actual_size - size);
 			buffer_actual_size -= size;
 		} else {
 			hist[0] = buffer[buffer_actual_size-2];

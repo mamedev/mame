@@ -25,7 +25,7 @@ public:
 
 	/* video-related */
 	bitmap_ind16 m_tmp_bitmap[4];
-	UINT8    *m_vidram;
+	std::unique_ptr<UINT8[]>    m_vidram;
 	UINT32   m_vidram_bank;
 	UINT32   m_plane_selected;
 	UINT32   m_plane_visible;

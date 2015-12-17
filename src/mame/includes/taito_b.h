@@ -45,9 +45,9 @@ public:
 
 	/* video-related */
 	/* framebuffer is a raw bitmap, remapped as a last step */
-	bitmap_ind16      *m_framebuffer[2];
-	bitmap_ind16      *m_pixel_bitmap;
-	bitmap_ind16      *m_realpunc_bitmap;
+	std::unique_ptr<bitmap_ind16> m_framebuffer[2];
+	std::unique_ptr<bitmap_ind16> m_pixel_bitmap;
+	std::unique_ptr<bitmap_ind16> m_realpunc_bitmap;
 
 	UINT16        m_pixel_scroll[2];
 

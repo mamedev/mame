@@ -96,8 +96,8 @@ void thief_state::video_start(){
 
 	m_videoram = auto_alloc_array_clear(machine(), UINT8, 0x2000*4*2 );
 
-	m_coprocessor.image_ram = auto_alloc_array(machine(), UINT8, 0x2000 );
-	m_coprocessor.context_ram = auto_alloc_array(machine(), UINT8, 0x400 );
+	m_coprocessor.image_ram = std::make_unique<UINT8[]>(0x2000 );
+	m_coprocessor.context_ram = std::make_unique<UINT8[]>(0x400 );
 }
 
 UINT32 thief_state::screen_update_thief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){

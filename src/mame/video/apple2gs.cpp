@@ -19,7 +19,7 @@ VIDEO_START_MEMBER(apple2gs_state,apple2gs)
 {
 	m_bordercolor = 0;
 	apple2_video_start(m_slowmem, m_slowmem+0x10000, 0, 8);
-	m_legacy_gfx = auto_bitmap_ind16_alloc(machine(), 560, 192);
+	m_legacy_gfx = std::make_unique<bitmap_ind16>(560, 192);
 
 	save_item(m_bordercolor, "BORDERCLR");
 	save_item(NAME(m_fgcolor));

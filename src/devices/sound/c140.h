@@ -106,8 +106,8 @@ private:
 	sound_stream *m_stream;
 	int m_banking_type;
 	/* internal buffers */
-	INT16 *m_mixer_buffer_left;
-	INT16 *m_mixer_buffer_right;
+	std::unique_ptr<INT16[]> m_mixer_buffer_left;
+	std::unique_ptr<INT16[]> m_mixer_buffer_right;
 
 	int m_baserate;
 	INT8 *m_pRom;

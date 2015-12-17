@@ -13,8 +13,8 @@
 SAMPLES_START_CB_MEMBER( cclimber_audio_device::sh_start )
 {
 	if (machine().root_device().memregion("samples")->base())
-		m_sample_buf = auto_alloc_array(machine(), INT16, 2 * machine().root_device().memregion("samples")->bytes());
-		save_pointer(NAME(m_sample_buf), 2 * machine().root_device().memregion("samples")->bytes());
+		m_sample_buf = std::make_unique<INT16[]>(2 * machine().root_device().memregion("samples")->bytes());
+		save_pointer(NAME(m_sample_buf.get()), 2 * machine().root_device().memregion("samples")->bytes());
 }
 
 MACHINE_CONFIG_FRAGMENT( cclimber_audio )
@@ -122,5 +122,5 @@ void cclimber_audio_device::play_sample(int start,int freq,int volume)
 		len++;
 	}
 
-	m_samples->start_raw(0,m_sample_buf,2 * len,freq);
+	m_samples->start_raw(0,m_sample_buf.get(),2 * len,freq);
 }

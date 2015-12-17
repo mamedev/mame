@@ -782,8 +782,8 @@ void cps3_state::init_common(void)
 		for (int chipnum = 0; chipnum < 8; chipnum++)
 			m_simm[simmnum][chipnum] = machine().device<fujitsu_29f016a_device>(strformat(tempstr,"simm%d.%d", simmnum + 1, chipnum).c_str());
 
-	m_eeprom = auto_alloc_array(machine(), UINT32, 0x400/4);
-	machine().device<nvram_device>("eeprom")->set_base(m_eeprom, 0x400);
+	m_eeprom = std::make_unique<UINT32[]>(0x400/4);
+	machine().device<nvram_device>("eeprom")->set_base(m_eeprom.get(), 0x400);
 }
 
 
@@ -894,27 +894,27 @@ void cps3_state::cps3_set_mame_colours(int colournum, UINT16 data, UINT32 fadeva
 
 void cps3_state::video_start()
 {
-	m_ss_ram       = auto_alloc_array(machine(), UINT32, 0x10000/4);
-	memset(m_ss_ram, 0x00, 0x10000);
-	save_pointer(NAME(m_ss_ram), 0x10000/4);
+	m_ss_ram       = std::make_unique<UINT32[]>(0x10000/4);
+	memset(m_ss_ram.get(), 0x00, 0x10000);
+	save_pointer(NAME(m_ss_ram.get()), 0x10000/4);
 
-	m_char_ram = auto_alloc_array(machine(), UINT32, 0x800000/4);
-	memset(m_char_ram, 0x00, 0x800000);
-	save_pointer(NAME(m_char_ram), 0x800000 /4);
+	m_char_ram = std::make_unique<UINT32[]>(0x800000/4);
+	memset(m_char_ram.get(), 0x00, 0x800000);
+	save_pointer(NAME(m_char_ram.get()), 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, cps3_tiles8x8_layout, (UINT8 *)m_ss_ram, 0, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, cps3_tiles8x8_layout, (UINT8 *)m_ss_ram.get(), 0, m_palette->entries() / 16, 0)));
 
 	//decode_ssram();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(1, global_alloc(gfx_element(m_palette, cps3_tiles16x16_layout, (UINT8 *)m_char_ram, 0, m_palette->entries() / 64, 0)));
+	m_gfxdecode->set_gfx(1, global_alloc(gfx_element(m_palette, cps3_tiles16x16_layout, (UINT8 *)m_char_ram.get(), 0, m_palette->entries() / 64, 0)));
 	m_gfxdecode->gfx(1)->set_granularity(64);
 
 	//decode_charram();
 
-	m_mame_colours = auto_alloc_array(machine(), UINT32, 0x80000/4);
-	memset(m_mame_colours, 0x00, 0x80000);
+	m_mame_colours = std::make_unique<UINT32[]>(0x80000/4);
+	memset(m_mame_colours.get(), 0x00, 0x80000);
 
 	m_screenwidth = 384;
 
@@ -1835,7 +1835,7 @@ WRITE32_MEMBER(cps3_state::cps3_palettedma_w)
 
 UINT32 cps3_state::process_byte( UINT8 real_byte, UINT32 destination, int max_length )
 {
-	UINT8* dest       = (UINT8*)m_char_ram;
+	UINT8* dest       = (UINT8*)m_char_ram.get();
 
 	//printf("process byte for destination %08x\n", destination);
 
@@ -1930,7 +1930,7 @@ void cps3_state::cps3_do_char_dma( UINT32 real_source, UINT32 real_destination, 
 
 UINT32 cps3_state::ProcessByte8(UINT8 b,UINT32 dst_offset)
 {
-	UINT8* destRAM = (UINT8*)m_char_ram;
+	UINT8* destRAM = (UINT8*)m_char_ram.get();
 	int l=0;
 
 	if(m_lastb==m_lastb2) //rle

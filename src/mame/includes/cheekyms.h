@@ -35,7 +35,7 @@ public:
 
 	/* video-related */
 	tilemap_t        *m_cm_tilemap;
-	bitmap_ind16       *m_bitmap_buffer;
+	std::unique_ptr<bitmap_ind16>       m_bitmap_buffer;
 
 	UINT8          m_irq_mask;
 

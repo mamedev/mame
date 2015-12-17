@@ -147,8 +147,8 @@ void contra_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(contra_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(contra_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_buffered_spriteram = auto_alloc_array(machine(), UINT8, 0x800);
-	m_buffered_spriteram_2 = auto_alloc_array(machine(), UINT8, 0x800);
+	m_buffered_spriteram = std::make_unique<UINT8[]>(0x800);
+	m_buffered_spriteram_2 = std::make_unique<UINT8[]>(0x800);
 
 	m_bg_clip = m_screen->visible_area();
 	m_bg_clip.min_x += 40;
@@ -161,8 +161,8 @@ void contra_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 
-	save_pointer(NAME(m_buffered_spriteram), 0x800);
-	save_pointer(NAME(m_buffered_spriteram_2), 0x800);
+	save_pointer(NAME(m_buffered_spriteram.get()), 0x800);
+	save_pointer(NAME(m_buffered_spriteram_2.get()), 0x800);
 }
 
 
@@ -215,9 +215,9 @@ WRITE8_MEMBER(contra_state::contra_K007121_ctrl_0_w)
 	if (offset == 3)
 	{
 		if ((data & 0x8) == 0)
-			memcpy(m_buffered_spriteram, m_spriteram + 0x800, 0x800);
+			memcpy(m_buffered_spriteram.get(), m_spriteram + 0x800, 0x800);
 		else
-			memcpy(m_buffered_spriteram, m_spriteram, 0x800);
+			memcpy(m_buffered_spriteram.get(), m_spriteram, 0x800);
 	}
 
 	if (offset == 6)
@@ -239,9 +239,9 @@ WRITE8_MEMBER(contra_state::contra_K007121_ctrl_1_w)
 	if (offset == 3)
 	{
 		if ((data & 0x8) == 0)
-			memcpy(m_buffered_spriteram_2, m_spriteram + 0x2800, 0x800);
+			memcpy(m_buffered_spriteram_2.get(), m_spriteram + 0x2800, 0x800);
 		else
-			memcpy(m_buffered_spriteram_2, m_spriteram + 0x2000, 0x800);
+			memcpy(m_buffered_spriteram_2.get(), m_spriteram + 0x2000, 0x800);
 	}
 	if (offset == 6)
 	{
@@ -270,9 +270,9 @@ void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	const UINT8 *source;
 
 	if (bank == 0)
-		source = m_buffered_spriteram;
+		source = m_buffered_spriteram.get();
 	else
-		source = m_buffered_spriteram_2;
+		source = m_buffered_spriteram_2.get();
 
 	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(bank), m_palette, source, base_color, 40, 0, priority_bitmap, (UINT32)-1);
 }

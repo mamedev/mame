@@ -900,7 +900,7 @@ WRITE16_MEMBER(taitojc_state::dsp_unk2_w)
 	if (offset == 0)
 	{
 		taitojc_clear_frame();
-		m_renderer->render_polygons(m_polygon_fifo, m_polygon_fifo_ptr);
+		m_renderer->render_polygons(m_polygon_fifo.get(), m_polygon_fifo_ptr);
 
 		m_polygon_fifo_ptr = 0;
 	}
@@ -1225,7 +1225,7 @@ READ16_MEMBER(taitojc_state::dendego2_dsp_idle_skip_r)
 
 DRIVER_INIT_MEMBER(taitojc_state,taitojc)
 {
-	m_polygon_fifo = auto_alloc_array(machine(), UINT16, TAITOJC_POLYGON_FIFO_SIZE);
+	m_polygon_fifo = std::make_unique<UINT16[]>(TAITOJC_POLYGON_FIFO_SIZE);
 
 	m_has_dsp_hack = 1;
 

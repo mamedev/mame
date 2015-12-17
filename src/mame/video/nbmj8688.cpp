@@ -550,15 +550,15 @@ void nbmj8688_state::common_video_start()
 {
 	m_blitter_timer = timer_alloc(TIMER_BLITTER);
 
-	m_tmpbitmap = auto_bitmap_ind16_alloc(machine(), 512, 256);
+	m_tmpbitmap = std::make_unique<bitmap_ind16>(512, 256);
 	m_videoram = auto_alloc_array_clear(machine(), UINT16, 512 * 256);
-	m_clut = auto_alloc_array(machine(), UINT8, 0x20);
+	m_clut = std::make_unique<UINT8[]>(0x20);
 
 	m_scrolly = 0;  // reset because crystalg/crystal2 don't write to this register
 	m_screen_refresh = 1;
 
 	save_pointer(NAME(m_videoram), 512 * 256);
-	save_pointer(NAME(m_clut), 0x20);
+	save_pointer(NAME(m_clut.get()), 0x20);
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_blitter_destx));
 	save_item(NAME(m_blitter_desty));

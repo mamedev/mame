@@ -94,7 +94,7 @@ public:
 	UINT8 m_funkball_config_reg_sel;
 	UINT8 m_funkball_config_regs[256];
 	UINT32 m_cx5510_regs[256/4];
-	UINT8 *m_bios_ram;
+	std::unique_ptr<UINT8[]> m_bios_ram;
 
 	UINT32 m_biu_ctrl_reg[256/4];
 
@@ -308,7 +308,7 @@ WRITE32_MEMBER(funkball_state::biu_ctrl_w)
 		for(i=0;i<8;i++)
 		{
 			if (data & 0x1 << i*4)      // enable RAM access to region 0xe0000 - 0xfffff
-				membank(banknames[i])->set_base(m_bios_ram + (0x4000 * i));
+				membank(banknames[i])->set_base(m_bios_ram.get() + (0x4000 * i));
 			else                    // disable RAM access (reads go to BIOS ROM)
 				membank(banknames[i])->set_base(memregion("bios")->base() + (0x4000 * i));
 		}
@@ -781,7 +781,7 @@ INPUT_PORTS_END
 
 void funkball_state::machine_start()
 {
-	m_bios_ram = auto_alloc_array(machine(), UINT8, 0x20000);
+	m_bios_ram = std::make_unique<UINT8[]>(0x20000);
 
 	/* defaults, otherwise it won't boot */
 	m_unk_ram[0x010/4] = 0x2f8d85ff;

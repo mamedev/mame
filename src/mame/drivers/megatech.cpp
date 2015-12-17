@@ -156,7 +156,7 @@ private:
 
 	void switch_cart(int gameno);
 
-	UINT8* m_banked_ram;
+	std::unique_ptr<UINT8[]> m_banked_ram;
 	UINT8* sms_mainram;
 	UINT8* sms_rom;
 
@@ -398,9 +398,9 @@ void mtech_state::set_genz80_as_md()
 	address_space &prg = m_z80snd->space(AS_PROGRAM);
 
 	prg.install_readwrite_bank(0x0000, 0x1fff, "bank1");
-	machine().root_device().membank("bank1")->set_base(m_genz80.z80_prgram);
+	machine().root_device().membank("bank1")->set_base(m_genz80.z80_prgram.get());
 
-	prg.install_ram(0x0000, 0x1fff, m_genz80.z80_prgram);
+	prg.install_ram(0x0000, 0x1fff, m_genz80.z80_prgram.get());
 
 	prg.install_readwrite_handler(0x4000, 0x4003, read8_delegate(FUNC(ym2612_device::read), (ym2612_device *)m_ymsnd), write8_delegate(FUNC(ym2612_device::write), (ym2612_device *)m_ymsnd));
 	prg.install_write_handler    (0x6000, 0x6000, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
@@ -595,7 +595,7 @@ ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(mtech_state,mt_slot)
 {
-	m_banked_ram = auto_alloc_array(machine(), UINT8, 0x1000*8);
+	m_banked_ram = std::make_unique<UINT8[]>(0x1000*8);
 
 	DRIVER_INIT_CALL(megadriv);
 

@@ -94,7 +94,7 @@ private:
 	int flags;
 
 	unsigned char regs[0x230];
-	unsigned char *ram;
+	std::unique_ptr<UINT8[]> ram;
 	int reverb_pos;
 
 	INT32 cur_ptr;

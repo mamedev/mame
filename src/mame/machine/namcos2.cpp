@@ -102,8 +102,8 @@ void namcos2_shared_state::reset_all_subcpus(int state)
 MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 {
 	namcos2_kickstart = nullptr;
-	m_eeprom = auto_alloc_array(machine(), UINT8, m_eeprom_size);
-	machine().device<nvram_device>("nvram")->set_base(m_eeprom, m_eeprom_size);
+	m_eeprom = std::make_unique<UINT8[]>(m_eeprom_size);
+	machine().device<nvram_device>("nvram")->set_base(m_eeprom.get(), m_eeprom_size);
 	m_posirq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos2_shared_state::namcos2_posirq_tick),this));
 }
 

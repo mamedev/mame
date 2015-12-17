@@ -256,8 +256,8 @@ public:
 	UINT16 door_wait;
 	UINT8 m_jumper_e16_e17;
 	UINT16 m_vid_address;
-	UINT8 *m_palette_ram;
-	UINT8 *m_palette_ram2;
+	std::unique_ptr<UINT8[]> m_palette_ram;
+	std::unique_ptr<UINT8[]> m_palette_ram2;
 	UINT64 m_last_cycles;
 	UINT8 m_coin_state;
 	UINT64 m_last_door;
@@ -903,10 +903,10 @@ TILE_GET_INFO_MEMBER(peplus_state::get_bg_tile_info)
 void peplus_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(peplus_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
-	m_palette_ram = auto_alloc_array(machine(), UINT8, 0x3000);
-	memset(m_palette_ram, 0, 0x3000);
-	m_palette_ram2 = auto_alloc_array(machine(), UINT8, 0x3000);
-	memset(m_palette_ram2, 0, 0x3000);
+	m_palette_ram = std::make_unique<UINT8[]>(0x3000);
+	memset(m_palette_ram.get(), 0, 0x3000);
+	m_palette_ram2 = std::make_unique<UINT8[]>(0x3000);
+	memset(m_palette_ram2.get(), 0, 0x3000);
 }
 
 UINT32 peplus_state::screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

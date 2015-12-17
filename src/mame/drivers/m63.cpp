@@ -163,7 +163,7 @@ public:
 	int      m_sound_status;
 	int      m_p1;
 	int      m_p2;
-	INT16    *m_samplebuf;
+	std::unique_ptr<INT16[]>    m_samplebuf;
 
 	/* sound devices */
 	required_device<cpu_device> m_soundcpu;
@@ -449,7 +449,7 @@ READ8_MEMBER(m63_state::snddata_r)
 WRITE8_MEMBER(m63_state::fghtbskt_samples_w)
 {
 	if (data & 1)
-		m_samples->start_raw(0, m_samplebuf + ((data & 0xf0) << 8), 0x2000, 8000);
+		m_samples->start_raw(0, m_samplebuf.get() + ((data & 0xf0) << 8), 0x2000, 8000);
 }
 
 WRITE8_MEMBER(m63_state::nmi_mask_w)
@@ -704,8 +704,8 @@ SAMPLES_START_CB_MEMBER(m63_state::fghtbskt_sh_start)
 	int i, len = memregion("samples")->bytes();
 	UINT8 *ROM = memregion("samples")->base();
 
-	m_samplebuf = auto_alloc_array(machine(), INT16, len);
-	save_pointer(NAME(m_samplebuf), len);
+	m_samplebuf = std::make_unique<INT16[]>(len);
+	save_pointer(NAME(m_samplebuf.get()), len);
 
 	for(i = 0; i < len; i++)
 		m_samplebuf[i] = ((INT8)(ROM[i] ^ 0x80)) * 256;

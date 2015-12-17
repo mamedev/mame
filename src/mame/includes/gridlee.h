@@ -41,7 +41,7 @@ public:
 
 	UINT8 m_last_analog_input[2];
 	UINT8 m_last_analog_output[2];
-	UINT8 *m_poly17;
+	std::unique_ptr<UINT8[]> m_poly17;
 	UINT8 *m_rand17;
 	emu_timer *m_irq_off;
 	emu_timer *m_irq_timer;

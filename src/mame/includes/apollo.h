@@ -532,7 +532,7 @@ protected:
 	int m_p_clock;
 	int m_data_clock;
 
-	UINT16 *m_image_memory;
+	std::unique_ptr<UINT16[]> m_image_memory;
 	int m_image_plane_size;
 	int m_image_memory_size;
 

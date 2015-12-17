@@ -34,7 +34,7 @@ WRITE8_MEMBER(metlclsh_state::metlclsh_rambank_w)
 	else
 	{
 		m_write_mask = 1 << (data >> 1);
-		membank("bank1")->set_base(m_otherram);
+		membank("bank1")->set_base(m_otherram.get());
 	}
 }
 
@@ -133,7 +133,7 @@ WRITE8_MEMBER(metlclsh_state::metlclsh_fgram_w)
 
 void metlclsh_state::video_start()
 {
-	m_otherram = auto_alloc_array(machine(), UINT8, 0x800); // banked ram
+	m_otherram = std::make_unique<UINT8[]>(0x800); // banked ram
 
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(metlclsh_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(metlclsh_state::metlclsh_bgtilemap_scan),this), 16, 16, 32, 16);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(metlclsh_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -141,7 +141,7 @@ void metlclsh_state::video_start()
 	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	save_pointer(NAME(m_otherram), 0x800);
+	save_pointer(NAME(m_otherram.get()), 0x800);
 }
 
 

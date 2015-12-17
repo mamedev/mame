@@ -59,7 +59,7 @@ public:
 	int m_shadow_pen_shift;
 	UINT8 m_requested_int;
 	UINT16 m_irq_enable;
-	UINT16 *m_eaglshot_gfxram;
+	std::unique_ptr<UINT16[]> m_eaglshot_gfxram;
 	tilemap_t *m_gdfs_tmap;
 	int m_interrupt_ultrax;
 	int m_gdfs_lightgun_select;

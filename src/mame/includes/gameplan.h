@@ -50,7 +50,7 @@ public:
 	optional_shared_ptr<UINT8> m_trvquest_question;
 
 	/* video state */
-	UINT8   *m_videoram;
+	std::unique_ptr<UINT8[]>   m_videoram;
 	size_t   m_videoram_size;
 	UINT8    m_video_x;
 	UINT8    m_video_y;

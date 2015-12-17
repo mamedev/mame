@@ -80,7 +80,7 @@ void pgm_state::draw_sprite_line( int wide, UINT16* dest, UINT8* destpri, int xz
 	int xoffset = 0;
 	int xdrawpos = 0;
 
-	UINT8 *adata = m_sprite_a_region;
+	UINT8 *adata = m_sprite_a_region.get();
 	size_t  adatasize = m_sprite_a_region_size - 1;
 
 	UINT16 msk;
@@ -328,7 +328,7 @@ void pgm_state::draw_sprite_line_basic( int wide, UINT16* dest, UINT8* destpri, 
 	int xcnt,xcntdraw;
 	int xoffset = 0;
 	int xdrawpos = 0;
-	UINT8 *adata = m_sprite_a_region;
+	UINT8 *adata = m_sprite_a_region.get();
 	size_t  adatasize = m_sprite_a_region_size - 1;
 
 	UINT16 msk;

@@ -125,8 +125,8 @@ void sp0256_device::device_start()
 	/* -------------------------------------------------------------------- */
 	/*  Allocate a scratch buffer for generating ~10kHz samples.             */
 	/* -------------------------------------------------------------------- */
-	m_scratch = auto_alloc_array(machine(), INT16, SCBUF_SIZE);
-	save_pointer(NAME(m_scratch), SCBUF_SIZE);
+	m_scratch = std::make_unique<INT16[]>(SCBUF_SIZE);
+	save_pointer(NAME(m_scratch.get()), SCBUF_SIZE);
 
 	m_sc_head = m_sc_tail = 0;
 
@@ -1357,7 +1357,7 @@ void sp0256_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			else
 			{
 				did_samp += lpc12_update(&m_filt, do_samp,
-											m_scratch, &m_sc_head);
+											m_scratch.get(), &m_sc_head);
 			}
 
 			m_sc_head &= SCBUF_MASK;

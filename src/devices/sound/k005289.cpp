@@ -77,7 +77,7 @@ void k005289_device::device_start()
 	m_stream = stream_alloc(0, 1, m_rate);
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	m_mixer_buffer = auto_alloc_array(machine(), short, 2 * m_rate);
+	m_mixer_buffer = std::make_unique<short[]>(2 * m_rate);
 
 	/* build the mixer table */
 	make_mixer_table(2);
@@ -113,7 +113,7 @@ void k005289_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	int i,v,f;
 
 	/* zap the contents of the mixer buffer */
-	memset(m_mixer_buffer, 0, samples * sizeof(INT16));
+	memset(m_mixer_buffer.get(), 0, samples * sizeof(INT16));
 
 	v=m_volume[0];
 	f=m_frequency[0];
@@ -122,7 +122,7 @@ void k005289_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		const unsigned char *w = m_sound_prom + m_waveform[0];
 		int c = m_counter[0];
 
-		mix = m_mixer_buffer;
+		mix = m_mixer_buffer.get();
 
 		/* add our contribution */
 		for (i = 0; i < samples; i++)
@@ -145,7 +145,7 @@ void k005289_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		const unsigned char *w = m_sound_prom + m_waveform[1];
 		int c = m_counter[1];
 
-		mix = m_mixer_buffer;
+		mix = m_mixer_buffer.get();
 
 		/* add our contribution */
 		for (i = 0; i < samples; i++)
@@ -162,7 +162,7 @@ void k005289_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	}
 
 	/* mix it down */
-	mix = m_mixer_buffer;
+	mix = m_mixer_buffer.get();
 	for (i = 0; i < samples; i++)
 		*buffer++ = m_mixer_lookup[*mix++];
 }
@@ -180,10 +180,10 @@ void k005289_device::make_mixer_table(int voices)
 	int gain = 16;
 
 	/* allocate memory */
-	m_mixer_table = auto_alloc_array(machine(), INT16, 256 * voices);
+	m_mixer_table = std::make_unique<INT16[]>(256 * voices);
 
 	/* find the middle of the table */
-	m_mixer_lookup = m_mixer_table + (128 * voices);
+	m_mixer_lookup = m_mixer_table.get() + (128 * voices);
 
 	/* fill in the table - 16 bit case */
 	for (i = 0; i < count; i++)

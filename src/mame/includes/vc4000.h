@@ -118,7 +118,7 @@ public:
 	UINT8 m_joy2_y;
 	UINT8 m_objects[512];
 	UINT8 m_irq_pause;
-	bitmap_ind16 *m_bitmap;
+	std::unique_ptr<bitmap_ind16> m_bitmap;
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(vc4000);

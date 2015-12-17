@@ -120,7 +120,7 @@ protected:
 	virtual void device_reset() override;
 
 public:
-	UINT8   *m_soft_chr_gen;
+	std::unique_ptr<UINT8[]>   m_soft_chr_gen;
 
 };
 

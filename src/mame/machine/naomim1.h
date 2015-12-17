@@ -29,7 +29,7 @@ private:
 	enum { BUFFER_SIZE = 32768 };
 	UINT32 key;
 
-	UINT8 *buffer;
+	std::unique_ptr<UINT8[]> buffer;
 	UINT8 dict[111], hist[2];
 	UINT64 avail_val;
 	UINT32 rom_cur_address, buffer_actual_size, avail_bits;

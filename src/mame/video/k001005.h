@@ -72,12 +72,12 @@ public:
 	static const int POLY_B = 5;
 
 private:
-	bitmap_rgb32 *m_fb[2];
-	bitmap_ind32 *m_zb;
+	std::unique_ptr<bitmap_rgb32> m_fb[2];
+	std::unique_ptr<bitmap_ind32> m_zb;
 	rectangle m_cliprect;
 	int m_fb_page;
 
-	UINT32 *m_3dfifo;
+	std::unique_ptr<UINT32[]> m_3dfifo;
 	int m_3dfifo_ptr;
 
 	vertex_t m_prev_v[4];
@@ -95,7 +95,7 @@ private:
 
 	device_t *m_k001006;
 
-	int *m_tex_mirror_table[2][8];
+	std::unique_ptr<int[]> m_tex_mirror_table[2][8];
 };
 
 
@@ -128,8 +128,8 @@ private:
 	device_t *m_k001006;
 	const char *m_k001006_tag;
 
-	UINT16 *     m_ram[2];
-	UINT32 *     m_fifo;
+	std::unique_ptr<UINT16[]>    m_ram[2];
+	std::unique_ptr<UINT32[]>     m_fifo;
 	UINT32 m_status;
 
 	int m_ram_ptr;

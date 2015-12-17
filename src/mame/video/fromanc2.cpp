@@ -286,20 +286,20 @@ VIDEO_START_MEMBER(fromanc2_state,fromanc2)
 		palette_device *palette = (screen == 0 ? m_lpalette : m_rpalette);
 		for (int tmap = 0; tmap < 4; tmap++)
 		{
-			m_videoram[screen][tmap] = auto_alloc_array(machine(), UINT16, (64 * 64));
+			m_videoram[screen][tmap] = std::make_unique<UINT16[]>((64 * 64));
 			m_tilemap[screen][tmap]->set_palette(palette);
 			if (tmap != 0) m_tilemap[screen][tmap]->set_transparent_pen(0x000);
 		}
 	}
 
-	save_pointer(NAME(m_videoram[0][0]), (64 * 64));
-	save_pointer(NAME(m_videoram[0][1]), (64 * 64));
-	save_pointer(NAME(m_videoram[0][2]), (64 * 64));
-	save_pointer(NAME(m_videoram[0][3]), (64 * 64));
-	save_pointer(NAME(m_videoram[1][0]), (64 * 64));
-	save_pointer(NAME(m_videoram[1][1]), (64 * 64));
-	save_pointer(NAME(m_videoram[1][2]), (64 * 64));
-	save_pointer(NAME(m_videoram[1][3]), (64 * 64));
+	save_pointer(NAME(m_videoram[0][0].get()), (64 * 64));
+	save_pointer(NAME(m_videoram[0][1].get()), (64 * 64));
+	save_pointer(NAME(m_videoram[0][2].get()), (64 * 64));
+	save_pointer(NAME(m_videoram[0][3].get()), (64 * 64));
+	save_pointer(NAME(m_videoram[1][0].get()), (64 * 64));
+	save_pointer(NAME(m_videoram[1][1].get()), (64 * 64));
+	save_pointer(NAME(m_videoram[1][2].get()), (64 * 64));
+	save_pointer(NAME(m_videoram[1][3].get()), (64 * 64));
 	save_item(NAME(m_scrollx[0]));
 	save_item(NAME(m_scrollx[1]));
 	save_item(NAME(m_scrolly[0]));
@@ -324,18 +324,18 @@ VIDEO_START_MEMBER(fromanc2_state,fromancr)
 		palette_device *palette = (screen == 0 ? m_lpalette : m_rpalette);
 		for (int tmap = 0; tmap < 3; tmap++)
 		{
-			m_videoram[screen][tmap] = auto_alloc_array(machine(), UINT16, (64 * 64));
+			m_videoram[screen][tmap] = std::make_unique<UINT16[]>((64 * 64));
 			m_tilemap[screen][tmap]->set_palette(palette);
 			if (tmap != 0) m_tilemap[screen][tmap]->set_transparent_pen(0x0ff);
 		}
 	}
 
-	save_pointer(NAME(m_videoram[0][0]), (64 * 64));
-	save_pointer(NAME(m_videoram[0][1]), (64 * 64));
-	save_pointer(NAME(m_videoram[0][2]), (64 * 64));
-	save_pointer(NAME(m_videoram[1][0]), (64 * 64));
-	save_pointer(NAME(m_videoram[1][1]), (64 * 64));
-	save_pointer(NAME(m_videoram[1][2]), (64 * 64));
+	save_pointer(NAME(m_videoram[0][0].get()), (64 * 64));
+	save_pointer(NAME(m_videoram[0][1].get()), (64 * 64));
+	save_pointer(NAME(m_videoram[0][2].get()), (64 * 64));
+	save_pointer(NAME(m_videoram[1][0].get()), (64 * 64));
+	save_pointer(NAME(m_videoram[1][1].get()), (64 * 64));
+	save_pointer(NAME(m_videoram[1][2].get()), (64 * 64));
 	save_item(NAME(m_scrollx[0]));
 	save_item(NAME(m_scrollx[1]));
 	save_item(NAME(m_scrolly[0]));
@@ -360,18 +360,18 @@ VIDEO_START_MEMBER(fromanc2_state,fromanc4)
 		palette_device *palette = (screen == 0 ? m_lpalette : m_rpalette);
 		for (int tmap = 0; tmap < 3; tmap++)
 		{
-			m_videoram[screen][tmap] = auto_alloc_array(machine(), UINT16, (256 * 64));
+			m_videoram[screen][tmap] = std::make_unique<UINT16[]>((256 * 64));
 			m_tilemap[screen][tmap]->set_palette(palette);
 			if (tmap != 0) m_tilemap[screen][tmap]->set_transparent_pen(0x000);
 		}
 	}
 
-	save_pointer(NAME(m_videoram[0][0]), (256 * 64));
-	save_pointer(NAME(m_videoram[0][1]), (256 * 64));
-	save_pointer(NAME(m_videoram[0][2]), (256 * 64));
-	save_pointer(NAME(m_videoram[1][0]), (256 * 64));
-	save_pointer(NAME(m_videoram[1][1]), (256 * 64));
-	save_pointer(NAME(m_videoram[1][2]), (256 * 64));
+	save_pointer(NAME(m_videoram[0][0].get()), (256 * 64));
+	save_pointer(NAME(m_videoram[0][1].get()), (256 * 64));
+	save_pointer(NAME(m_videoram[0][2].get()), (256 * 64));
+	save_pointer(NAME(m_videoram[1][0].get()), (256 * 64));
+	save_pointer(NAME(m_videoram[1][1].get()), (256 * 64));
+	save_pointer(NAME(m_videoram[1][2].get()), (256 * 64));
 	save_item(NAME(m_scrollx[0]));
 	save_item(NAME(m_scrollx[1]));
 	save_item(NAME(m_scrolly[0]));

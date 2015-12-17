@@ -169,8 +169,8 @@ void wswan_state::register_save()
 
 void wswan_state::common_start()
 {
-	m_ws_bios_bank = auto_alloc_array(machine(), UINT8, 0x10000);
-	memcpy(m_ws_bios_bank + 0xffc0, ws_fake_bios_code, 0x40);
+	m_ws_bios_bank = std::make_unique<UINT8[]>(0x10000);
+	memcpy(m_ws_bios_bank.get() + 0xffc0, ws_fake_bios_code, 0x40);
 
 	register_save();
 

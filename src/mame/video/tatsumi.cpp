@@ -129,7 +129,7 @@ VIDEO_START_MEMBER(tatsumi_state,apache3)
 	m_tx_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_shadow_pen_array = auto_alloc_array_clear(machine(), UINT8, 8192);
 	m_temp_bitmap.allocate(512, 512);
-	m_apache3_road_x_ram = auto_alloc_array(machine(), UINT8, 512);
+	m_apache3_road_x_ram = std::make_unique<UINT8[]>(512);
 
 	m_tx_layer->set_transparent_pen(0);
 }
@@ -138,11 +138,11 @@ VIDEO_START_MEMBER(tatsumi_state,roundup5)
 {
 	m_tx_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
 	m_shadow_pen_array = auto_alloc_array_clear(machine(), UINT8, 8192);
-	m_roundup5_vram = auto_alloc_array(machine(), UINT16, (0x48000 * 4)/2);
+	m_roundup5_vram = std::make_unique<UINT16[]>((0x48000 * 4)/2);
 
 	m_tx_layer->set_transparent_pen(0);
 
-	m_gfxdecode->gfx(1)->set_source((UINT8 *)m_roundup5_vram);
+	m_gfxdecode->gfx(1)->set_source((UINT8 *)m_roundup5_vram.get());
 }
 
 VIDEO_START_MEMBER(tatsumi_state,cyclwarr)

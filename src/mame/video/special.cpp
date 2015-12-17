@@ -83,7 +83,7 @@ PALETTE_INIT_MEMBER(special_state,specimx)
 
 VIDEO_START_MEMBER(special_state,specimx)
 {
-	m_specimx_colorram = auto_alloc_array(machine(), UINT8, 0x3000);
+	m_specimx_colorram = std::make_unique<UINT8[]>(0x3000);
 }
 
 UINT32 special_state::screen_update_specimx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

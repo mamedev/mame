@@ -286,7 +286,7 @@ void alto2_cpu_device::unload_word()
 		m_unload_time = -1;
 		return;
 	}
-	UINT16* bitmap = m_dsp.raw_bitmap  + y * ALTO2_DISPLAY_SCANLINE_WORDS;
+	UINT16* bitmap = m_dsp.raw_bitmap.get()  + y * ALTO2_DISPLAY_SCANLINE_WORDS;
 	UINT16 word = m_dsp.inverse;
 	UINT8 a38 = m_disp_a38[m_dsp.ra * 16 + m_dsp.wa];
 	if (FIFO_MBEMPTY(a38))
@@ -532,12 +532,12 @@ void alto2_cpu_device::init_disp()
 
 	m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
 
-	m_dsp.raw_bitmap = auto_alloc_array(machine(), UINT16, ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
+	m_dsp.raw_bitmap = std::make_unique<UINT16[]>(ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
 	m_dsp.scanline = auto_alloc_array(machine(), UINT8*, ALTO2_DISPLAY_HEIGHT + ALTO2_FAKE_STATUS_H);
 	for (int y = 0; y < ALTO2_DISPLAY_HEIGHT + ALTO2_FAKE_STATUS_H; y++)
 		m_dsp.scanline[y] = auto_alloc_array(machine(), UINT8, ALTO2_DISPLAY_TOTAL_WIDTH);
 
-	m_dsp.bitmap = auto_bitmap_ind16_alloc(machine(), ALTO2_DISPLAY_WIDTH, ALTO2_DISPLAY_HEIGHT + ALTO2_FAKE_STATUS_H);
+	m_dsp.bitmap = std::make_unique<bitmap_ind16>(ALTO2_DISPLAY_WIDTH, ALTO2_DISPLAY_HEIGHT + ALTO2_FAKE_STATUS_H);
 	m_dsp.state = 0;
 }
 
@@ -567,7 +567,7 @@ void alto2_cpu_device::reset_disp()
 	m_dsp.curxpos = 0;
 	m_dsp.cursor0 = 0;
 	m_dsp.cursor1 = 0;
-	memset(m_dsp.raw_bitmap, 0, sizeof(UINT16) * ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
+	memset(m_dsp.raw_bitmap.get(), 0, sizeof(UINT16) * ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
 	for (int y = 0; y < ALTO2_DISPLAY_HEIGHT; y++)
 		memset(m_dsp.scanline[y], 0, sizeof(UINT8) * ALTO2_DISPLAY_TOTAL_WIDTH);
 	m_dsp.odd_frame = false;

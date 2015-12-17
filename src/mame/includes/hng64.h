@@ -118,14 +118,14 @@ public:
 
 	hng64_state& state() { return m_state; }
 	bitmap_rgb32& colorBuffer3d() { return m_colorBuffer3d; }
-	float* depthBuffer3d() { return m_depthBuffer3d; }
+	float* depthBuffer3d() { return m_depthBuffer3d.get(); }
 
 private:
 	hng64_state& m_state;
 
 	// (Temporarily class members - someday they will live in the memory map)
 	bitmap_rgb32 m_colorBuffer3d;
-	float* m_depthBuffer3d;
+	std::unique_ptr<float[]> m_depthBuffer3d;
 };
 
 
@@ -174,7 +174,7 @@ public:
 	required_shared_ptr<UINT32> m_videoregs;
 	required_shared_ptr<UINT32> m_tcram;
 
-	UINT16* m_dl;
+	std::unique_ptr<UINT16[]> m_dl;
 	required_shared_ptr<UINT32> m_3dregs;
 	required_shared_ptr<UINT32> m_3d_1;
 	required_shared_ptr<UINT32> m_3d_2;
@@ -188,12 +188,12 @@ public:
 
 	int m_mcu_type;
 
-	UINT16 *m_soundram;
-	UINT16 *m_soundram2;
+	std::unique_ptr<UINT16[]> m_soundram;
+	std::unique_ptr<UINT16[]> m_soundram2;
 
 	/* Communications stuff */
-	UINT8 *m_com_op_base;
-	UINT8 *m_com_virtual_mem;
+	std::unique_ptr<UINT8[]> m_com_op_base;
+	std::unique_ptr<UINT8[]> m_com_virtual_mem;
 	UINT8 m_com_shared[8];
 
 	INT32 m_dma_start;
@@ -295,7 +295,7 @@ public:
 	void set_irq(UINT32 irq_vector);
 	UINT32 m_irq_pending;
 	UINT8 *m_comm_rom;
-	UINT8 *m_comm_ram;
+	std::unique_ptr<UINT8[]> m_comm_ram;
 	UINT8 m_mmu_regs[8];
 	UINT32 m_mmua[6];
 	UINT16 m_mmub[6];

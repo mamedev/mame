@@ -71,8 +71,8 @@ public:
 	required_shared_ptr<UINT8> m_bg_scroll;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	UINT8 *m_ram_1;
-	UINT8 *m_ram_2;
+	std::unique_ptr<UINT8[]> m_ram_1;
+	std::unique_ptr<UINT8[]> m_ram_2;
 	UINT8 m_ram_bank;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
@@ -316,14 +316,14 @@ MACHINE_CONFIG_END
 
 void safarir_state::machine_start()
 {
-	m_ram_1 = auto_alloc_array(machine(), UINT8, m_ram.bytes());
-	m_ram_2 = auto_alloc_array(machine(), UINT8, m_ram.bytes());
+	m_ram_1 = std::make_unique<UINT8[]>(m_ram.bytes());
+	m_ram_2 = std::make_unique<UINT8[]>(m_ram.bytes());
 	m_port_last = 0;
 	m_port_last2 = 0;
 
 	/* setup for save states */
-	save_pointer(NAME(m_ram_1), m_ram.bytes());
-	save_pointer(NAME(m_ram_2), m_ram.bytes());
+	save_pointer(NAME(m_ram_1.get()), m_ram.bytes());
+	save_pointer(NAME(m_ram_2.get()), m_ram.bytes());
 	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_port_last));
 	save_item(NAME(m_port_last2));

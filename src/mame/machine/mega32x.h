@@ -193,11 +193,11 @@ private:
 
 	UINT16 m_commsram[8];
 
-	UINT16* m_32x_dram0;
-	UINT16* m_32x_dram1;
+	std::unique_ptr<UINT16[]> m_32x_dram0;
+	std::unique_ptr<UINT16[]> m_32x_dram1;
 	UINT16 *m_32x_display_dram, *m_32x_access_dram;
-	UINT16* m_32x_palette;
-	UINT16* m_32x_palette_lookup;
+	std::unique_ptr<UINT16[]> m_32x_palette;
+	std::unique_ptr<UINT16[]> m_32x_palette_lookup;
 
 	UINT16 m_fifo_block_a[4];
 	UINT16 m_fifo_block_b[4];

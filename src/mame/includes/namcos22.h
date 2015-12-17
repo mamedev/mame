@@ -271,9 +271,9 @@ public:
 	int m_cz_adjust;
 	namcos22_renderer *m_poly;
 	UINT16 *m_texture_tilemap;
-	UINT8 *m_texture_tileattr;
+	std::unique_ptr<UINT8[]> m_texture_tileattr;
 	UINT8 *m_texture_tiledata;
-	UINT8 *m_texture_ayx_to_pixel;
+	std::unique_ptr<UINT8[]> m_texture_ayx_to_pixel;
 	UINT16 m_dspram_bank;
 	UINT16 m_dspram16_latch;
 	bool m_slave_simulation_active;
@@ -287,8 +287,8 @@ public:
 	unsigned m_LitSurfaceIndex;
 	int m_pointrom_size;
 	INT32 *m_pointrom;
-	UINT8 *m_dirtypal;
-	bitmap_ind16 *m_mix_bitmap;
+	std::unique_ptr<UINT8[]> m_dirtypal;
+	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
 	tilemap_t *m_bgtilemap;
 
 	int m_mixer_flags;

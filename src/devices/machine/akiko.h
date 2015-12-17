@@ -113,7 +113,7 @@ private:
 	cdda_device *m_cdda;
 	cdrom_file *m_cdrom;
 
-	UINT8 *m_cdrom_toc;
+	std::unique_ptr<UINT8[]> m_cdrom_toc;
 
 	emu_timer *m_dma_timer;
 	emu_timer *m_frame_timer;

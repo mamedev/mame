@@ -69,7 +69,7 @@ public:
 		, m_bank8(*this, "bank8")
 	{ }
 
-	UINT8* m_ram;
+	std::unique_ptr<UINT8[]> m_ram;
 	UINT8 m_sexyboom_bank[8];
 	UINT8 m_pzlestar_mem_bank;
 	UINT8 m_pzlestar_rom_bank;
@@ -118,8 +118,8 @@ void sangho_state::pzlestar_map_banks()
 		case 0:
 			m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, m_bank1);
 			m_maincpu->space(AS_PROGRAM).install_write_bank(0x0000, 0x3fff, m_bank5);
-			m_bank1->set_base(m_ram);
-			m_bank5->set_base(m_ram);
+			m_bank1->set_base(m_ram.get());
+			m_bank5->set_base(m_ram.get());
 			break;
 		case 2:
 			m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, m_bank1);
@@ -140,8 +140,8 @@ void sangho_state::pzlestar_map_banks()
 		case 0:
 			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, m_bank2);
 			m_maincpu->space(AS_PROGRAM).install_write_bank(0x4000, 0x7fff, m_bank6);
-			m_bank2->set_base(m_ram + 0x4000);
-			m_bank6->set_base(m_ram + 0x4000);
+			m_bank2->set_base(m_ram.get() + 0x4000);
+			m_bank6->set_base(m_ram.get() + 0x4000);
 			break;
 		case 2:
 			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, m_bank2);
@@ -166,8 +166,8 @@ void sangho_state::pzlestar_map_banks()
 		case 0:
 			m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, m_bank3);
 			m_maincpu->space(AS_PROGRAM).install_write_bank(0x8000, 0xbfff, m_bank7);
-			m_bank3->set_base(m_ram + 0x8000);
-			m_bank7->set_base(m_ram + 0x8000);
+			m_bank3->set_base(m_ram.get() + 0x8000);
+			m_bank7->set_base(m_ram.get() + 0x8000);
 			break;
 		case 3:
 			m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, m_bank3);
@@ -188,8 +188,8 @@ void sangho_state::pzlestar_map_banks()
 		case 0:
 			m_maincpu->space(AS_PROGRAM).install_read_bank(0xc000, 0xffff, m_bank4);
 			m_maincpu->space(AS_PROGRAM).install_write_bank(0xc000, 0xffff, m_bank8);
-			m_bank4->set_base(m_ram + 0xc000);
-			m_bank8->set_base(m_ram + 0xc000);
+			m_bank4->set_base(m_ram.get() + 0xc000);
+			m_bank8->set_base(m_ram.get() + 0xc000);
 			break;
 		case 1:
 		case 2:
@@ -425,7 +425,7 @@ INPUT_PORTS_END
 
 void sangho_state::machine_start()
 {
-	m_ram = auto_alloc_array(machine(), UINT8, 0x20000); // TODO: define how much RAM these ones have (MSX2+ can potentially go up to 4MB)
+	m_ram = std::make_unique<UINT8[]>(0x20000); // TODO: define how much RAM these ones have (MSX2+ can potentially go up to 4MB)
 }
 
 MACHINE_RESET_MEMBER(sangho_state,pzlestar)

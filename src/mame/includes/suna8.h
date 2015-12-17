@@ -67,7 +67,7 @@ public:
 	bool m_has_text; // has text sprites (older games)
 
 	// samples
-	INT16 *m_samplebuf;
+	std::unique_ptr<INT16[]> m_samplebuf;
 	int m_sample, m_play;
 	int m_numsamples;
 

@@ -222,7 +222,8 @@ public:
 	UINT16 m_gx_wrport2;
 
 	// 2nd-Tier GX/MW Graphics Variables
-	UINT8 *m_gx_objzbuf, *m_gx_shdzbuf;
+	UINT8 *m_gx_objzbuf;
+	std::unique_ptr<UINT8[]> m_gx_shdzbuf;
 	int m_layer_colorbase[4];
 	INT32 m_gx_tilebanks[8], m_gx_oldbanks[8];
 	int m_gx_tilemode, m_gx_rozenable, m_psac_colorbase, m_last_psac_colorbase;
@@ -230,12 +231,12 @@ public:
 	int m_gx_rushingheroes_hack;
 
 	tilemap_t *m_gx_psac_tilemap, *m_gx_psac_tilemap2;
-	bitmap_ind16 *m_type3_roz_temp_bitmap;
+	std::unique_ptr<bitmap_ind16> m_type3_roz_temp_bitmap;
 	tilemap_t *m_gx_psac_tilemap_alt;
 	int m_konamigx_has_dual_screen;
 	int m_konamigx_palformat;
-	bitmap_rgb32 *m_dualscreen_left_tempbitmap;
-	bitmap_rgb32 *m_dualscreen_right_tempbitmap;
+	std::unique_ptr<bitmap_rgb32> m_dualscreen_left_tempbitmap;
+	std::unique_ptr<bitmap_rgb32> m_dualscreen_right_tempbitmap;
 
 	/* On Type-1 the K053936 output is rendered to these temporary bitmaps as raw data
 	the 'voxel' effect to give the pixels height is a post-process operation on the
@@ -253,8 +254,8 @@ public:
 
 
 	*/
-	bitmap_ind16 *m_gxtype1_roz_dstbitmap;
-	bitmap_ind16 *m_gxtype1_roz_dstbitmap2;
+	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap;
+	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap2;
 	rectangle m_gxtype1_roz_dstbitmapclip;
 
 	int m_konamigx_type3_psac2_actual_bank;

@@ -103,7 +103,7 @@ private:
 	attotime m_decode_period;
 
 	int m_xa_last[4];
-	UINT16 *m_ram;
+	std::unique_ptr<UINT16[]> m_ram;
 
 	// static internal members
 	static void decode_xa_mono(INT32 *cdic_xa_last, const UINT8 *xa, INT16 *dp);

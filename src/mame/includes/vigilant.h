@@ -31,7 +31,7 @@ public:
 	int m_rear_color;
 	int m_rear_disable;
 	int m_rear_refresh;
-	bitmap_ind16 *m_bg_bitmap;
+	std::unique_ptr<bitmap_ind16> m_bg_bitmap;
 
 	// common
 	DECLARE_WRITE8_MEMBER(bank_select_w);

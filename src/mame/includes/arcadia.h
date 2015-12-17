@@ -94,7 +94,7 @@ public:
 			UINT8 ram3[3][16];
 		} d;
 	} m_reg;
-	bitmap_ind16 *m_bitmap;
+	std::unique_ptr<bitmap_ind16> m_bitmap;
 	DECLARE_DRIVER_INIT(arcadia);
 	virtual void machine_start() override;
 	virtual void video_start() override;

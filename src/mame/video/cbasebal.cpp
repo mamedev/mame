@@ -38,16 +38,16 @@ TILE_GET_INFO_MEMBER(cbasebal_state::get_fg_tile_info)
 
 void cbasebal_state::video_start()
 {
-	m_textram = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_scrollram = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_textram = std::make_unique<UINT8[]>(0x1000);
+	m_scrollram = std::make_unique<UINT8[]>(0x1000);
 
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cbasebal_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cbasebal_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(3);
 
-	save_pointer(NAME(m_textram), 0x1000);
-	save_pointer(NAME(m_scrollram), 0x1000);
+	save_pointer(NAME(m_textram.get()), 0x1000);
+	save_pointer(NAME(m_scrollram.get()), 0x1000);
 }
 
 

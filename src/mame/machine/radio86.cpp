@@ -36,8 +36,8 @@ DRIVER_INIT_MEMBER(radio86_state,radio86)
 DRIVER_INIT_MEMBER(radio86_state,radioram)
 {
 	DRIVER_INIT_CALL(radio86);
-	m_radio_ram_disk = auto_alloc_array(machine(), UINT8, 0x20000);
-	memset(m_radio_ram_disk,0,0x20000);
+	m_radio_ram_disk = std::make_unique<UINT8[]>(0x20000);
+	memset(m_radio_ram_disk.get(),0,0x20000);
 }
 READ8_MEMBER(radio86_state::radio86_8255_portb_r2)
 {

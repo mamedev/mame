@@ -300,7 +300,7 @@ static const UINT8 spc7110_mode2_context_table[32][2] =
 SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
 				:  m_machine(machine)
 {
-	m_decomp_buffer = (UINT8*)auto_alloc_array(machine, UINT8, SPC7110_DECOMP_BUFFER_SIZE);
+	m_decomp_buffer = std::make_unique<UINT8[]>(SPC7110_DECOMP_BUFFER_SIZE);
 	reset();
 
 	for (int i = 0; i < 256; i++)
@@ -325,7 +325,7 @@ SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
 
 	m_machine.save().save_item(m_decomp_mode, "SNES_SPC7110/m_decomp_mode");
 	m_machine.save().save_item(m_decomp_offset, "SNES_SPC7110/m_decomp_offset");
-	m_machine.save().save_pointer(m_decomp_buffer, "SNES_SPC7110/m_decomp_buffer", SPC7110_DECOMP_BUFFER_SIZE);
+	m_machine.save().save_pointer(m_decomp_buffer.get(), "SNES_SPC7110/m_decomp_buffer", SPC7110_DECOMP_BUFFER_SIZE);
 	m_machine.save().save_item(m_decomp_buffer_rdoffset, "SNES_SPC7110/m_decomp_buffer_rdoffset");
 	m_machine.save().save_item(m_decomp_buffer_wroffset, "SNES_SPC7110/m_decomp_buffer_wroffset");
 	m_machine.save().save_item(m_decomp_buffer_length, "SNES_SPC7110/m_decomp_buffer_length");

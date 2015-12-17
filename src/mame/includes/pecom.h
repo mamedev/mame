@@ -31,7 +31,7 @@ public:
 	required_device<cosmac_device> m_cdp1802;
 	required_device<cdp1869_device> m_cdp1869;
 
-	UINT8 *m_charram;           /* character generator ROM */
+	std::unique_ptr<UINT8[]> m_charram;           /* character generator ROM */
 	int m_reset;                /* CPU mode */
 	int m_dma;              /* memory refresh DMA */
 

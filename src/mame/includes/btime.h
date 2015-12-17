@@ -39,7 +39,7 @@ public:
 	optional_shared_ptr<UINT8> m_audio_rambase;
 
 	/* video-related */
-	bitmap_ind16 *m_background_bitmap;
+	std::unique_ptr<bitmap_ind16> m_background_bitmap;
 	UINT8    m_btime_palette;
 	UINT8    m_bnj_scroll1;
 	UINT8    m_bnj_scroll2;

@@ -61,8 +61,8 @@ public:
 	const irmb_ops *m_irmb_stack[16];
 	UINT32 m_irmb_regs[16];
 	UINT32 m_irmb_latch;
-	UINT8 *m_polybitmap1;
-	UINT8 *m_polybitmap2;
+	std::unique_ptr<UINT8[]> m_polybitmap1;
+	std::unique_ptr<UINT8[]> m_polybitmap2;
 	int m_ir_xmin;
 	int m_ir_ymin;
 	int m_ir_xmax;

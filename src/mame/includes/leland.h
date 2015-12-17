@@ -78,7 +78,7 @@ public:
 	UINT32 m_xrom2_addr;
 	UINT8 m_battery_ram_enable;
 	UINT8 *m_battery_ram;
-	UINT8 *m_extra_tram;
+	std::unique_ptr<UINT8[]> m_extra_tram;
 	UINT8 *m_video_ram;
 	struct vram_state_data m_vram_state[2];
 	UINT16 m_xscroll;

@@ -46,9 +46,9 @@ void k001006_device::device_start()
 	m_palette = auto_alloc_array_clear(machine(), UINT32, 0x800);
 
 	m_gfxrom = machine().root_device().memregion(m_gfx_region)->base();
-	m_texrom = auto_alloc_array(machine(), UINT8, 0x800000);
+	m_texrom = std::make_unique<UINT8[]>(0x800000);
 
-	preprocess_texture_data(m_texrom, m_gfxrom, 0x800000, m_tex_layout);
+	preprocess_texture_data(m_texrom.get(), m_gfxrom, 0x800000, m_tex_layout);
 
 	save_pointer(NAME(m_pal_ram), 0x800*sizeof(UINT16));
 	save_pointer(NAME(m_unknown_ram), 0x1000*sizeof(UINT16));
@@ -155,7 +155,7 @@ WRITE32_MEMBER( k001006_device::write )
 
 UINT32 k001006_device::fetch_texel(int page, int pal_index, int u, int v)
 {
-	UINT8 *tex = m_texrom + page;
+	UINT8 *tex = m_texrom.get() + page;
 	int texel = tex[((v & 0x1ff) * 512) + (u & 0x1ff)];
 	return m_palette[pal_index + texel];
 }

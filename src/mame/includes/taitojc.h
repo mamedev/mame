@@ -99,7 +99,7 @@ public:
 	INT16 m_projection_data[3];
 	INT16 m_intersection_data[3];
 
-	UINT8 *m_texture;
+	std::unique_ptr<UINT8[]> m_texture;
 	bitmap_ind16 m_framebuffer;
 	bitmap_ind16 m_zbuffer;
 
@@ -109,7 +109,7 @@ public:
 	UINT32 *m_tile_ram;
 	tilemap_t *m_tilemap;
 
-	UINT16 *m_polygon_fifo;
+	std::unique_ptr<UINT16[]> m_polygon_fifo;
 	int m_polygon_fifo_ptr;
 
 	UINT8 m_mcu_comm_main;

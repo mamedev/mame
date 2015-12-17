@@ -78,7 +78,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 
-	UINT8* m_nt_ram;
+	std::unique_ptr<UINT8[]> m_nt_ram;
 	UINT8* m_nt_page[4];
 
 	UINT32 m_in_0;
@@ -523,11 +523,11 @@ void famibox_state::machine_reset()
 
 void famibox_state::machine_start()
 {
-	m_nt_ram = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_nt_page[0] = m_nt_ram;
-	m_nt_page[1] = m_nt_ram + 0x400;
-	m_nt_page[2] = m_nt_ram + 0x800;
-	m_nt_page[3] = m_nt_ram + 0xc00;
+	m_nt_ram = std::make_unique<UINT8[]>(0x1000);
+	m_nt_page[0] = m_nt_ram.get();
+	m_nt_page[1] = m_nt_ram.get() + 0x400;
+	m_nt_page[2] = m_nt_ram.get() + 0x800;
+	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(famibox_state::famibox_nt_r), this), write8_delegate(FUNC(famibox_state::famibox_nt_w), this));
 	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "ppubank1");

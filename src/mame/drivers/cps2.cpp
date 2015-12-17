@@ -9368,8 +9368,8 @@ DRIVER_INIT_MEMBER(cps_state,gigaman2)
 
 	DRIVER_INIT_CALL(cps2nc);
 
-	m_gigaman2_dummyqsound_ram = auto_alloc_array(machine(), UINT16, 0x20000 / 2);
-	save_pointer(NAME(m_gigaman2_dummyqsound_ram), 0x20000 / 2);
+	m_gigaman2_dummyqsound_ram = std::make_unique<UINT16[]>(0x20000 / 2);
+	save_pointer(NAME(m_gigaman2_dummyqsound_ram.get()), 0x20000 / 2);
 
 	space.install_readwrite_handler(0x618000, 0x619fff, read16_delegate(FUNC(cps_state::gigaman2_dummyqsound_r),this), write16_delegate(FUNC(cps_state::gigaman2_dummyqsound_w), this)); // no qsound..
 

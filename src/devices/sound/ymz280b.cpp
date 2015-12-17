@@ -451,7 +451,7 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		struct YMZ280BVoice *voice = &m_voice[v];
 		INT16 prev = voice->last_sample;
 		INT16 curr = voice->curr_sample;
-		INT16 *curr_data = m_scratch;
+		INT16 *curr_data = m_scratch.get();
 		INT32 *ldest = lacc;
 		INT32 *rdest = racc;
 		UINT32 new_samples, samples_left;
@@ -496,10 +496,10 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		/* generate them into our buffer */
 		switch (voice->playing << 7 | voice->mode)
 		{
-			case 0x81:  samples_left = generate_adpcm(voice, m_scratch, new_samples); break;
-			case 0x82:  samples_left = generate_pcm8(voice, m_scratch, new_samples); break;
-			case 0x83:  samples_left = generate_pcm16(voice, m_scratch, new_samples); break;
-			default:    samples_left = 0; memset(m_scratch, 0, new_samples * sizeof(m_scratch[0])); break;
+			case 0x81:  samples_left = generate_adpcm(voice, m_scratch.get(), new_samples); break;
+			case 0x82:  samples_left = generate_pcm8(voice, m_scratch.get(), new_samples); break;
+			case 0x83:  samples_left = generate_pcm16(voice, m_scratch.get(), new_samples); break;
+			default:    samples_left = 0; memset(m_scratch.get(), 0, new_samples * sizeof(m_scratch[0])); break;
 		}
 
 		if (samples_left || voice->ended)
@@ -595,7 +595,7 @@ void ymz280b_device::device_start()
 
 	/* allocate memory */
 	assert(MAX_SAMPLE_CHUNK < 0x10000);
-	m_scratch = auto_alloc_array(machine(), INT16, MAX_SAMPLE_CHUNK);
+	m_scratch = std::make_unique<INT16[]>(MAX_SAMPLE_CHUNK);
 
 	/* state save */
 	save_item(NAME(m_current_register));

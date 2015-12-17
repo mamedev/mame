@@ -71,7 +71,7 @@ void crt_device::device_start()
 {
 	/* alloc the arrays */
 	m_list = auto_alloc_array(machine(), crt_point, m_window_width * m_window_height);
-	m_list_head = auto_alloc_array(machine(), int, m_window_height);
+	m_list_head = std::make_unique<int[]>(m_window_height);
 
 	/* fill with black and set up list as empty */
 	for (int i = 0; i < (m_window_width * m_window_height); i++)

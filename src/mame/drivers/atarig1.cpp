@@ -118,7 +118,7 @@ void atarig1_state::update_bank(int bank)
 	{
 		/* bank 0 comes from the copy we made earlier */
 		if (bank == 0)
-			memcpy(m_bslapstic_base, m_bslapstic_bank0, 0x2000);
+			memcpy(m_bslapstic_base, m_bslapstic_bank0.get(), 0x2000);
 		else
 			memcpy(m_bslapstic_base, &m_bslapstic_base[bank * 0x1000], 0x2000);
 
@@ -172,8 +172,8 @@ void atarig1_state::pitfightb_cheap_slapstic_init()
 	m_bslapstic_base = m_maincpu->space(AS_PROGRAM).install_read_handler(0x038000, 0x03ffff, read16_delegate(FUNC(atarig1_state::pitfightb_cheap_slapstic_r),this));
 
 	/* allocate memory for a copy of bank 0 */
-	m_bslapstic_bank0 = auto_alloc_array(machine(), UINT8, 0x2000);
-	memcpy(m_bslapstic_bank0, m_bslapstic_base, 0x2000);
+	m_bslapstic_bank0 = std::make_unique<UINT8[]>(0x2000);
+	memcpy(m_bslapstic_bank0.get(), m_bslapstic_base, 0x2000);
 
 	/* not primed by default */
 	m_bslapstic_primed = false;

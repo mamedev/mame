@@ -116,7 +116,7 @@ SAMPLES_START_CB_MEMBER(superqix_state::pbillian_sh_start)
 	int i, len = memregion("samples")->bytes();
 
 	/* convert 8-bit unsigned samples to 8-bit signed */
-	m_samplebuf = auto_alloc_array(machine(), INT16, len);
+	m_samplebuf = std::make_unique<INT16[]>(len);
 	for (i = 0;i < len;i++)
 		m_samplebuf[i] = (INT8)(src[i] ^ 0x80) * 256;
 }
@@ -133,7 +133,7 @@ WRITE8_MEMBER(superqix_state::pbillian_sample_trigger_w)
 	while (end < len && src[end] != 0xff)
 		end++;
 
-	m_samples->start_raw(0, m_samplebuf + start, end - start, 5000); // 5khz ?
+	m_samples->start_raw(0, m_samplebuf.get() + start, end - start, 5000); // 5khz ?
 }
 
 

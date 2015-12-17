@@ -138,8 +138,8 @@ void zx_state::video_start()
 	m_ula_hsync = timer_alloc(TIMER_ULA_HSYNC);
 	m_ula_char_buffer = 0xffff;
 
-	m_bitmap_render = auto_bitmap_ind16_alloc(machine(), 384, 311);
-	m_bitmap_buffer = auto_bitmap_ind16_alloc(machine(), 384, 311);
+	m_bitmap_render = std::make_unique<bitmap_ind16>(384, 311);
+	m_bitmap_buffer = std::make_unique<bitmap_ind16>(384, 311);
 }
 
 UINT32 zx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

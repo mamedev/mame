@@ -25,7 +25,7 @@ public:
 	/* video-related */
 	required_shared_ptr<UINT8> m_videoram;
 
-	UINT8 *    m_colorram;
+	std::unique_ptr<UINT8[]>    m_colorram;
 	required_shared_ptr<UINT8> m_astrof_color;
 	optional_shared_ptr<UINT8> m_tomahawk_protection;
 

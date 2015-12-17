@@ -22,7 +22,7 @@ static struct
 	 * 0x30/2 color
 	 */
 	tilemap_t *tmap[6];
-	UINT16 *videoram;
+	std::unique_ptr<UINT16[]> videoram;
 	int gfxbank;
 	UINT8 *maskBaseAddr;
 	void (*cb)( running_machine &machine, UINT16 code, int *gfx, int *mask);
@@ -59,7 +59,7 @@ void namcos2_shared_state::namco_tilemap_init( int gfxbank, void *maskBaseAddr,
 	mTilemapInfo.gfxbank = gfxbank;
 	mTilemapInfo.maskBaseAddr = (UINT8 *)maskBaseAddr;
 	mTilemapInfo.cb = cb;
-	mTilemapInfo.videoram = auto_alloc_array(machine(), UINT16,  0x10000 );
+	mTilemapInfo.videoram = std::make_unique<UINT16[]>( 0x10000 );
 
 		/* four scrolling tilemaps */
 		mTilemapInfo.tmap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info0),this),TILEMAP_SCAN_ROWS,8,8,64,64);

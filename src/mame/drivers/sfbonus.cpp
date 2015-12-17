@@ -308,18 +308,18 @@ public:
 	required_shared_ptr<UINT8> m_3000_regs;
 	required_shared_ptr<UINT8> m_3800_regs;
 
-	bitmap_ind16 *m_temp_reel_bitmap;
+	std::unique_ptr<bitmap_ind16> m_temp_reel_bitmap;
 	tilemap_t *m_tilemap;
 	tilemap_t *m_reel_tilemap;
 	tilemap_t *m_reel2_tilemap;
 	tilemap_t *m_reel3_tilemap;
 	tilemap_t *m_reel4_tilemap;
-	UINT8 *m_tilemap_ram;
-	UINT8 *m_reel_ram;
-	UINT8 *m_reel2_ram;
-	UINT8 *m_reel3_ram;
-	UINT8 *m_reel4_ram;
-	UINT8* m_videoram;
+	std::unique_ptr<UINT8[]> m_tilemap_ram;
+	std::unique_ptr<UINT8[]> m_reel_ram;
+	std::unique_ptr<UINT8[]> m_reel2_ram;
+	std::unique_ptr<UINT8[]> m_reel3_ram;
+	std::unique_ptr<UINT8[]> m_reel4_ram;
+	std::unique_ptr<UINT8[]> m_videoram;
 
 	DECLARE_WRITE8_MEMBER(sfbonus_videoram_w);
 	DECLARE_WRITE8_MEMBER(sfbonus_bank_w);
@@ -907,7 +907,7 @@ WRITE8_MEMBER(sfbonus_state::sfbonus_videoram_w)
 
 void sfbonus_state::video_start()
 {
-	m_temp_reel_bitmap = auto_bitmap_ind16_alloc(machine(),1024,512);
+	m_temp_reel_bitmap = std::make_unique<bitmap_ind16>(1024,512);
 
 	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 128, 64);
 	m_reel_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
@@ -5848,31 +5848,31 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sfbonus_state,sfbonus_common)
 {
-	m_tilemap_ram = auto_alloc_array(machine(), UINT8, 0x4000);
-	memset(m_tilemap_ram, 0xff, 0x4000);
-	save_pointer(NAME(m_tilemap_ram), 0x4000);
+	m_tilemap_ram = std::make_unique<UINT8[]>(0x4000);
+	memset(m_tilemap_ram.get(), 0xff, 0x4000);
+	save_pointer(NAME(m_tilemap_ram.get()), 0x4000);
 
-	m_reel_ram = auto_alloc_array(machine(), UINT8, 0x0800);
-	memset(m_reel_ram, 0xff ,0x0800);
-	save_pointer(NAME(m_reel_ram), 0x0800);
+	m_reel_ram = std::make_unique<UINT8[]>(0x0800);
+	memset(m_reel_ram.get(), 0xff ,0x0800);
+	save_pointer(NAME(m_reel_ram.get()), 0x0800);
 
-	m_reel2_ram = auto_alloc_array(machine(), UINT8, 0x0800);
-	memset(m_reel2_ram, 0xff, 0x0800);
-	save_pointer(NAME(m_reel2_ram), 0x0800);
+	m_reel2_ram = std::make_unique<UINT8[]>(0x0800);
+	memset(m_reel2_ram.get(), 0xff, 0x0800);
+	save_pointer(NAME(m_reel2_ram.get()), 0x0800);
 
-	m_reel3_ram = auto_alloc_array(machine(), UINT8, 0x0800);
-	memset(m_reel3_ram, 0xff, 0x0800);
-	save_pointer(NAME(m_reel3_ram), 0x0800);
+	m_reel3_ram = std::make_unique<UINT8[]>(0x0800);
+	memset(m_reel3_ram.get(), 0xff, 0x0800);
+	save_pointer(NAME(m_reel3_ram.get()), 0x0800);
 
-	m_reel4_ram = auto_alloc_array(machine(), UINT8, 0x0800);
-	memset(m_reel4_ram, 0xff, 0x0800);
-	save_pointer(NAME(m_reel4_ram), 0x0800);
+	m_reel4_ram = std::make_unique<UINT8[]>(0x0800);
+	memset(m_reel4_ram.get(), 0xff, 0x0800);
+	save_pointer(NAME(m_reel4_ram.get()), 0x0800);
 
-	m_videoram = auto_alloc_array(machine(), UINT8, 0x10000);
+	m_videoram = std::make_unique<UINT8[]>(0x10000);
 
-	memset(m_videoram, 0xff, 0x10000);
+	memset(m_videoram.get(), 0xff, 0x10000);
 
-	save_pointer(NAME(m_videoram), 0x10000);
+	save_pointer(NAME(m_videoram.get()), 0x10000);
 
 	// dummy.rom helper
 	{

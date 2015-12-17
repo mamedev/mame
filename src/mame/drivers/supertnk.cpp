@@ -114,7 +114,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	UINT8 *m_videoram[3];
+	std::unique_ptr<UINT8[]> m_videoram[3];
 	UINT8 m_rom_bank;
 	UINT8 m_bitplane_select;
 	pen_t m_pens[NUM_PENS];
@@ -199,9 +199,9 @@ void supertnk_state::video_start()
 		m_pens[i] = rgb_t(pal1bit(data >> 2), pal1bit(data >> 5), pal1bit(data >> 6));
 	}
 
-	m_videoram[0] = auto_alloc_array(machine(), UINT8, 0x2000);
-	m_videoram[1] = auto_alloc_array(machine(), UINT8, 0x2000);
-	m_videoram[2] = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_videoram[0] = std::make_unique<UINT8[]>(0x2000);
+	m_videoram[1] = std::make_unique<UINT8[]>(0x2000);
+	m_videoram[2] = std::make_unique<UINT8[]>(0x2000);
 }
 
 

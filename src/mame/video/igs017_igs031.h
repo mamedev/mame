@@ -49,7 +49,7 @@ public:
 	UINT8 m_video_disable;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
-	UINT8 *m_sprites_gfx;
+	std::unique_ptr<UINT8[]> m_sprites_gfx;
 	int m_sprites_gfx_size;
 
 	int get_nmi_enable() { return m_nmi_enable; }

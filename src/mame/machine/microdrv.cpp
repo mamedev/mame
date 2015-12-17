@@ -77,8 +77,8 @@ void microdrive_image_device::device_start()
 	m_write_comms_out.resolve_safe();
 
 	// allocate track buffers
-	m_left = auto_alloc_array(machine(), UINT8, MDV_IMAGE_LENGTH / 2);
-	m_right = auto_alloc_array(machine(), UINT8, MDV_IMAGE_LENGTH / 2);
+	m_left = std::make_unique<UINT8[]>(MDV_IMAGE_LENGTH / 2);
+	m_right = std::make_unique<UINT8[]>(MDV_IMAGE_LENGTH / 2);
 
 	// allocate timers
 	m_bit_timer = timer_alloc();
@@ -97,8 +97,8 @@ bool microdrive_image_device::call_load()
 
 	for (int i = 0; i < MDV_IMAGE_LENGTH / 2; i++)
 	{
-		fread(m_left, 1);
-		fread(m_right, 1);
+		fread(m_left.get(), 1);
+		fread(m_right.get(), 1);
 	}
 
 	m_bit_offset = 0;
@@ -109,8 +109,8 @@ bool microdrive_image_device::call_load()
 
 void microdrive_image_device::call_unload()
 {
-	memset(m_left, 0, MDV_IMAGE_LENGTH / 2);
-	memset(m_right, 0, MDV_IMAGE_LENGTH / 2);
+	memset(m_left.get(), 0, MDV_IMAGE_LENGTH / 2);
+	memset(m_right.get(), 0, MDV_IMAGE_LENGTH / 2);
 }
 
 void microdrive_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

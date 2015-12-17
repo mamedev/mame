@@ -131,7 +131,7 @@ private:
 	UINT16 m_bam2_mcu_command;
 	int m_jdredd_gun_mux;
 
-	UINT8* m_fx1b_fram;
+	std::unique_ptr<UINT8[]> m_fx1b_fram;
 
 	UINT16 m_vt83c461_latch;
 
@@ -1228,8 +1228,8 @@ ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(zn_state,coh1000tb)
 {
-	m_fx1b_fram = auto_alloc_array(machine(), UINT8, 0x200);
-	machine().device<nvram_device>("fm1208s")->set_base(m_fx1b_fram, 0x200);
+	m_fx1b_fram = std::make_unique<UINT8[]>(0x200);
+	machine().device<nvram_device>("fm1208s")->set_base(m_fx1b_fram.get(), 0x200);
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1000tb)

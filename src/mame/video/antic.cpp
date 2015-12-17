@@ -65,7 +65,7 @@ void antic_device::device_start()
 	m_gtia = machine().device<gtia_device>(m_gtia_tag);
 	assert(m_gtia);
 
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), m_screen->width(), m_screen->height());
+	m_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
 
 	m_cclk_expand = auto_alloc_array_clear(machine(), UINT32, 21 * 256);
 
@@ -79,9 +79,9 @@ void antic_device::device_start()
 	m_pf_gtia2    = &m_cclk_expand[19 * 256];
 	m_pf_gtia3    = &m_cclk_expand[20 * 256];
 
-	m_used_colors = auto_alloc_array(machine(), UINT8, 21 * 256);
+	m_used_colors = std::make_unique<UINT8[]>(21 * 256);
 
-	memset(m_used_colors, 0, 21 * 256 * sizeof(UINT8));
+	memset(m_used_colors.get(), 0, 21 * 256 * sizeof(UINT8));
 
 	m_uc_21       = &m_used_colors[ 0 * 256];
 	m_uc_x10b     = &m_used_colors[ 1 * 256];
@@ -134,7 +134,7 @@ void antic_device::device_start()
 	save_item(NAME(m_pmbits));
 
 	save_pointer(NAME(m_cclk_expand), 21 * 256);
-	save_pointer(NAME(m_used_colors), 21 * 256);
+	save_pointer(NAME(m_used_colors.get()), 21 * 256);
 }
 
 

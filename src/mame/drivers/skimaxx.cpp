@@ -62,7 +62,7 @@ public:
 	required_shared_ptr<UINT32> m_fpga_ctrl;
 	required_shared_ptr<UINT16> m_fg_buffer;
 
-	UINT32 *m_bg_buffer;
+	std::unique_ptr<UINT32[]> m_bg_buffer;
 	UINT32 *m_bg_buffer_front;
 	UINT32 *m_bg_buffer_back;
 	UINT16 *m_blitter_gfx;
@@ -157,9 +157,9 @@ void skimaxx_state::video_start()
 	m_blitter_gfx = (UINT16 *) memregion( "blitter" )->base();
 	m_blitter_gfx_len = memregion( "blitter" )->bytes() / 2;
 
-	m_bg_buffer = auto_alloc_array(machine(), UINT32, 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 2); // 2 buffers
-	m_bg_buffer_back  = m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 0;
-	m_bg_buffer_front = m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 1;
+	m_bg_buffer = std::make_unique<UINT32[]>(0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 2); // 2 buffers
+	m_bg_buffer_back  = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 0;
+	m_bg_buffer_front = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * 1;
 	membank("bank1")->configure_entry(0, m_bg_buffer_back);
 	membank("bank1")->configure_entry(1, m_bg_buffer_front);
 }
@@ -250,8 +250,8 @@ WRITE32_MEMBER(skimaxx_state::skimaxx_fpga_ctrl_w)
 		// double buffering
 		UINT8 bank_bg_buffer = (newdata & 0x40) ? 1 : 0;
 
-		m_bg_buffer_back  = m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * bank_bg_buffer;
-		m_bg_buffer_front = m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * (1 - bank_bg_buffer);
+		m_bg_buffer_back  = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * bank_bg_buffer;
+		m_bg_buffer_front = m_bg_buffer.get() + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * (1 - bank_bg_buffer);
 
 		membank("bank1")->set_entry(bank_bg_buffer);
 	}

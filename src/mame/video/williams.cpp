@@ -432,7 +432,7 @@ WRITE8_MEMBER(williams2_state::williams2_xscroll_high_w)
 WRITE8_MEMBER(blaster_state::blaster_remap_select_w)
 {
 	m_blitter_remap_index = data;
-	m_blitter_remap = m_blitter_remap_lookup + data * 256;
+	m_blitter_remap = m_blitter_remap_lookup.get() + data * 256;
 }
 
 
@@ -461,9 +461,9 @@ void williams_state::blitter_init(int blitter_config, const UINT8 *remap_prom)
 	m_blitter_xor = (blitter_config == WILLIAMS_BLITTER_SC01) ? 4 : 0;
 
 	/* create the remap table; if no PROM, make an identity remap table */
-	m_blitter_remap_lookup = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_blitter_remap_lookup = std::make_unique<UINT8[]>(256 * 256);
 	m_blitter_remap_index = 0;
-	m_blitter_remap = m_blitter_remap_lookup;
+	m_blitter_remap = m_blitter_remap_lookup.get();
 	for (i = 0; i < 256; i++)
 	{
 		const UINT8 *table = remap_prom ? (remap_prom + (i & 0x7f) * 16) : dummy_table;

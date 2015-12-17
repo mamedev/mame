@@ -398,7 +398,7 @@ void huc6261_device::device_start()
 	m_huc6270_a = machine().device<huc6270_device>(m_huc6270_a_tag);
 	m_huc6270_b = machine().device<huc6270_device>(m_huc6270_b_tag);
 
-	m_bmp = auto_bitmap_rgb32_alloc( machine(), HUC6261_WPF, HUC6261_LPF );
+	m_bmp = std::make_unique<bitmap_rgb32>(HUC6261_WPF, HUC6261_LPF );
 
 	/* We want to have valid devices */
 	assert( m_huc6270_a != nullptr );

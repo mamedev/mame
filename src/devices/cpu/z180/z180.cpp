@@ -755,8 +755,8 @@ static UINT8 SZP[256];      /* zero, sign and parity flags */
 static UINT8 SZHV_inc[256]; /* zero, sign, half carry and overflow flags INC r8 */
 static UINT8 SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r8 */
 
-static UINT8 *SZHVC_add;
-static UINT8 *SZHVC_sub;
+static std::unique_ptr<UINT8[]> SZHVC_add;
+static std::unique_ptr<UINT8[]> SZHVC_sub;
 
 #include "z180ops.h"
 #include "z180tbl.h"
@@ -1894,8 +1894,8 @@ void z180_device::device_start()
 	}
 
 	/* allocate big flag arrays once */
-	SZHVC_add = auto_alloc_array(machine(), UINT8, 2*256*256);
-	SZHVC_sub = auto_alloc_array(machine(), UINT8, 2*256*256);
+	SZHVC_add = std::make_unique<UINT8[]>(2*256*256);
+	SZHVC_sub = std::make_unique<UINT8[]>(2*256*256);
 
 	padd = &SZHVC_add[  0*256];
 	padc = &SZHVC_add[256*256];

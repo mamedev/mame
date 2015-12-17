@@ -56,7 +56,7 @@ public:
 	int m_whitescreen;
 	lordgun_gun_data m_gun[2];
 	tilemap_t *m_tilemap[4];
-	bitmap_ind16 *m_bitmaps[5];
+	std::unique_ptr<bitmap_ind16> m_bitmaps[5];
 
 	UINT16 m_protection_data;
 	DECLARE_WRITE16_MEMBER(lordgun_protection_w);

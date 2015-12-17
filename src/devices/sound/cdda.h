@@ -46,7 +46,7 @@ private:
 	INT8                m_audio_playing, m_audio_pause, m_audio_ended_normally;
 	UINT32              m_audio_lba, m_audio_length;
 
-	UINT8 *             m_audio_cache;
+	std::unique_ptr<UINT8[]>   m_audio_cache;
 	UINT32              m_audio_samples;
 	UINT32              m_audio_bptr;
 	INT16               m_audio_volume[2];

@@ -146,12 +146,12 @@ class towns_state : public driver_device
 	UINT32 m_towns_ankcg_enable;
 	UINT32 m_towns_mainmem_enable;
 	UINT32 m_towns_ram_enable;
-	UINT32* m_towns_vram;
-	UINT8* m_towns_gfxvram;
-	UINT8* m_towns_txtvram;
+	std::unique_ptr<UINT32[]> m_towns_vram;
+	std::unique_ptr<UINT8[]> m_towns_gfxvram;
+	std::unique_ptr<UINT8[]> m_towns_txtvram;
 	int m_towns_selected_drive;
 	UINT8 m_towns_fdc_irq6mask;
-	UINT8* m_towns_serial_rom;
+	std::unique_ptr<UINT8[]> m_towns_serial_rom;
 	int m_towns_srom_position;
 	UINT8 m_towns_srom_clk;
 	UINT8 m_towns_srom_reset;

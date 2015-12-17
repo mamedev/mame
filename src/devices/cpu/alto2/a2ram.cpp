@@ -10,11 +10,11 @@
 #define DEBUG_WRTRAM        0       //!< define to 1 to printf disassembled CRAM writes
 
 //! direct read access to the microcode CRAM
-#define RD_CRAM(addr) (*reinterpret_cast<UINT32 *>(m_ucode_cram + addr * 4))
+#define RD_CRAM(addr) (*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + addr * 4))
 
 //! direct write access to the microcode CRAM
 #define WR_CRAM(addr,data) do { \
-	*reinterpret_cast<UINT32 *>(m_ucode_cram + addr * 4) = data; \
+	*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + addr * 4) = data; \
 } while (0)
 
 /**

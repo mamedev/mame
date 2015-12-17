@@ -194,7 +194,7 @@ public:
 	fm7_encoder_t m_encoder;
 	fm7_mmr_t m_mmr;
 	UINT8 m_cp_prev;
-	UINT8* m_video_ram;
+	std::unique_ptr<UINT8[]> m_video_ram;
 	emu_timer* m_fm77av_vsync_timer;
 	UINT8 m_type;
 	fm7_video_t m_video;

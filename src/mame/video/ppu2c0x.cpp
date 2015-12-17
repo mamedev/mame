@@ -222,7 +222,7 @@ void ppu2c0x_device::device_start()
 	m_nmi_timer->adjust(attotime::never);
 
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
+	m_bitmap = std::make_unique<bitmap_ind16>(VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
 	m_spriteram = auto_alloc_array_clear(machine(), UINT8, SPRITERAM_SIZE);
 	m_colortable = auto_alloc_array(machine(), pen_t, ARRAY_LENGTH(default_colortable));
 	m_colortable_mono = auto_alloc_array(machine(), pen_t, ARRAY_LENGTH(default_colortable_mono));

@@ -211,7 +211,7 @@ void ti85_state::update_ti86_memory ()
 
 	if (m_ti8x_memory_page_1 & 0x40)
 	{
-		ti8x_update_bank(space, 1, m_ti8x_ram, m_ti8x_memory_page_1 & 0x07, true);
+		ti8x_update_bank(space, 1, m_ti8x_ram.get(), m_ti8x_memory_page_1 & 0x07, true);
 	}
 	else
 	{
@@ -220,7 +220,7 @@ void ti85_state::update_ti86_memory ()
 
 	if (m_ti8x_memory_page_2 & 0x40)
 	{
-		ti8x_update_bank(space, 2, m_ti8x_ram, m_ti8x_memory_page_2 & 0x07, true);
+		ti8x_update_bank(space, 2, m_ti8x_ram.get(), m_ti8x_memory_page_2 & 0x07, true);
 	}
 	else
 	{
@@ -438,16 +438,16 @@ MACHINE_START_MEMBER(ti85_state,ti86)
 	m_interrupt_speed = 0;
 	m_port4_bit0 = 0;
 
-	m_ti8x_ram = auto_alloc_array(machine(), UINT8, 128*1024);
-	memset(m_ti8x_ram, 0, sizeof(UINT8)*128*1024);
+	m_ti8x_ram = std::make_unique<UINT8[]>(128*1024);
+	memset(m_ti8x_ram.get(), 0, sizeof(UINT8)*128*1024);
 
 	space.unmap_write(0x0000, 0x3fff);
 
 	membank("bank1")->set_base(m_bios);
 	membank("bank2")->set_base(m_bios + 0x04000);
 
-	membank("bank4")->set_base(m_ti8x_ram);
-	machine().device<nvram_device>("nvram")->set_base(m_ti8x_ram, sizeof(UINT8)*128*1024);
+	membank("bank4")->set_base(m_ti8x_ram.get());
+	machine().device<nvram_device>("nvram")->set_base(m_ti8x_ram.get(), sizeof(UINT8)*128*1024);
 
 	machine().scheduler().timer_pulse(attotime::from_hz(256), timer_expired_delegate(FUNC(ti85_state::ti85_timer_callback),this));
 }
@@ -1129,7 +1129,7 @@ void ti85_state::ti86_setup_snapshot (UINT8 * data)
 	ti8x_snapshot_setup_registers ( data);
 
 	/* Memory dump */
-	memcpy(m_ti8x_ram, data+0x94, 0x20000);
+	memcpy(m_ti8x_ram.get(), data+0x94, 0x20000);
 
 	m_keypad_mask = hdw[0x00]&0x7f;
 

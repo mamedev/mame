@@ -50,7 +50,7 @@ private:
 	UINT32 m_decomp_mode;
 	UINT32 m_decomp_offset;
 
-	UINT8 *m_decomp_buffer;
+	std::unique_ptr<UINT8[]> m_decomp_buffer;
 	UINT32 m_decomp_buffer_rdoffset;
 	UINT32 m_decomp_buffer_wroffset;
 	UINT32 m_decomp_buffer_length;

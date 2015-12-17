@@ -16,7 +16,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<pleiads_sound_device> m_pleiads_custom;
 	required_device<gfxdecode_device> m_gfxdecode;
-	UINT8 *m_videoram_pg[2];
+	std::unique_ptr<UINT8[]> m_videoram_pg[2];
 	UINT8 m_videoram_pg_index;
 	UINT8 m_palette_bank;
 	UINT8 m_cocktail_mode;
@@ -103,7 +103,7 @@ private:
 	struct n_state      m_noise_state;
 	UINT8               m_sound_latch_a;
 	sound_stream *      m_channel;
-	UINT32 *                m_poly18;
+	std::unique_ptr<UINT32[]>                m_poly18;
 	discrete_device *m_discrete;
 	tms36xx_device *m_tms;
 

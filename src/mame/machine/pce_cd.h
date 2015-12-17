@@ -96,7 +96,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 
 	UINT8   m_regs[16];
-	UINT8   *m_bram;
+	std::unique_ptr<UINT8[]>   m_bram;
 	UINT8   *m_adpcm_ram;
 	int     m_bram_locked;
 	int     m_adpcm_read_ptr;
@@ -150,7 +150,7 @@ private:
 	UINT32  m_last_frame;
 	UINT8   m_cdda_status;
 	UINT8   m_cdda_play_mode;
-	UINT8   *m_subcode_buffer;
+	std::unique_ptr<UINT8[]>   m_subcode_buffer;
 	UINT8   m_end_mark;
 
 	required_device<msm5205_device> m_msm;

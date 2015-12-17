@@ -231,7 +231,7 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		return;
 	}
 
-	memset(m_mix_buffer, 0, sizeof(m_mix_buffer[0])*samples*2);
+	memset(m_mix_buffer.get(), 0, sizeof(m_mix_buffer[0])*samples*2);
 
 	for (i = 0; i < 24; i++)
 	{
@@ -239,7 +239,7 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 		if (slot->active)
 		{
-			mixp = m_mix_buffer;
+			mixp = m_mix_buffer.get();
 
 			for (j = 0; j < samples; j++)
 			{
@@ -299,7 +299,7 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		}
 	}
 
-	mixp = m_mix_buffer;
+	mixp = m_mix_buffer.get();
 	vl = m_mix_level[m_pcm_l];
 	vr = m_mix_level[m_pcm_r];
 	for (i = 0; i < samples; i++)
@@ -985,7 +985,7 @@ void ymf278b_device::device_start()
 	}
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock()/768);
-	m_mix_buffer = auto_alloc_array(machine(), INT32, 44100*2);
+	m_mix_buffer = std::make_unique<INT32[]>(44100*2);
 
 	// rate tables
 	precompute_rate_tables();

@@ -46,7 +46,7 @@ public:
 
 	UINT8 m_sound_latch;
 	emu_timer *m_interrupt_timer;
-	UINT8 *m_object_present_map;
+	std::unique_ptr<UINT8[]> m_object_present_map;
 	UINT8 m_port_0;
 	UINT8 m_port_2;
 	UINT32 m_star_shift_reg;

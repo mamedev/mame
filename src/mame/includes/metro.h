@@ -95,7 +95,7 @@ public:
 	int         m_sprite_yoffs;
 	int         m_sprite_xoffs_dx;
 
-	UINT8       *m_expanded_gfx1;
+	std::unique_ptr<UINT8[]>      m_expanded_gfx1;
 
 	/* irq_related */
 	int         m_vblank_bit;

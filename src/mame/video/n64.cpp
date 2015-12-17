@@ -2106,7 +2106,7 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 				if(new_object)
 				{
 					object = &object_data_alloc();
-					memcpy(object->m_tmem, m_tmem, 0x1000);
+					memcpy(object->m_tmem, m_tmem.get(), 0x1000);
 					new_object = false;
 				}
 

@@ -111,9 +111,9 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 	// DISPLAY BANK
 	if (BIT(data, 6) != BIT(m_video.color_select_68, 6)) {
 		if (BIT(data, 6))
-			m_video.videoram = m_video.videoram_base + 0x4000;
+			m_video.videoram = m_video.videoram_base.get() + 0x4000;
 		else
-			m_video.videoram = m_video.videoram_base;
+			m_video.videoram = m_video.videoram_base.get();
 	}
 	// HIRES -- XXX
 	if (BIT(data, 7) != BIT(m_video.color_select_68, 7)) {
@@ -290,7 +290,8 @@ void p1_state::video_start()
 	DBG_LOG(0,"init",("video_start()\n"));
 
 	memset(&m_video, 0, sizeof(m_video));
-	m_video.videoram = m_video.videoram_base = auto_alloc_array(machine(), UINT8, 0x8000);
+	m_video.videoram_base = std::make_unique<UINT8[]>(0x8000);
+	m_video.videoram = m_video.videoram_base.get();
 	m_video.stride = 80;
 
 	space.install_readwrite_bank(0xb8000, 0xbffff, "bank11" );

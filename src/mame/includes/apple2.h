@@ -186,8 +186,8 @@ public:
 	int m_bgcolor;
 	int m_flash;
 	int m_alt_charset_value;
-	UINT16 *m_hires_artifact_map;
-	UINT16 *m_dhires_artifact_map;
+	std::unique_ptr<UINT16[]> m_hires_artifact_map;
+	std::unique_ptr<UINT16[]> m_dhires_artifact_map;
 	bool m_monochrome_dhr;
 	int m_inh_slot;
 	int m_reset_flag;
@@ -371,7 +371,7 @@ private:
 	UINT8 m_exp_bankhior;
 	int m_exp_addrmask;
 	UINT8 m_exp_regs[0x10];
-	UINT8 *m_exp_ram;
+	std::unique_ptr<UINT8[]> m_exp_ram;
 	int m_exp_wptr, m_exp_liveptr;
 };
 /*----------- defined in drivers/apple2.c -----------*/

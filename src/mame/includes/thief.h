@@ -4,9 +4,9 @@
 #include "video/tms9927.h"
 
 struct coprocessor_t {
-	UINT8 *context_ram;
+	std::unique_ptr<UINT8[]> context_ram;
 	UINT8 bank;
-	UINT8 *image_ram;
+	std::unique_ptr<UINT8[]> image_ram;
 	UINT8 param[0x9];
 };
 

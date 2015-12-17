@@ -22,8 +22,8 @@ public:
 	/* video-related */
 	tilemap_t    *m_fg_tilemap;
 	tilemap_t    *m_bg_tilemap;
-	UINT8      *m_textram;
-	UINT8      *m_scrollram;
+	std::unique_ptr<UINT8[]>    m_textram;
+	std::unique_ptr<UINT8[]>      m_scrollram;
 	UINT8      m_scroll_x[2];
 	UINT8      m_scroll_y[2];
 	int        m_tilebank;

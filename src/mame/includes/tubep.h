@@ -34,7 +34,7 @@ public:
 	optional_shared_ptr<UINT8> m_backgroundram;
 	required_shared_ptr<UINT8> m_sprite_colorsharedram;
 	optional_shared_ptr<UINT8> m_rjammer_backgroundram;
-	UINT8 *m_spritemap;
+	std::unique_ptr<UINT8[]> m_spritemap;
 	UINT8 m_prom2[32];
 	UINT32 m_romD_addr;
 	UINT32 m_romEF_addr;

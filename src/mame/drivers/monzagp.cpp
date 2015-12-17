@@ -80,8 +80,8 @@ private:
 	bool  m_time_tick;
 	bool  m_cp_ruote;
 	UINT8 m_mycar_pos;
-	UINT8 *m_vram;
-	UINT8 *m_score_ram;
+	std::unique_ptr<UINT8[]> m_vram;
+	std::unique_ptr<UINT8[]> m_score_ram;
 };
 
 
@@ -97,15 +97,15 @@ PALETTE_INIT_MEMBER(monzagp_state, monzagp)
 
 void monzagp_state::video_start()
 {
-	m_vram = auto_alloc_array(machine(), UINT8, 0x800);
-	m_score_ram = auto_alloc_array(machine(), UINT8, 0x100);
+	m_vram = std::make_unique<UINT8[]>(0x800);
+	m_score_ram = std::make_unique<UINT8[]>(0x100);
 	m_time_tick = 0;
 	m_cp_ruote = 0;
 	m_mycar_pos = 7*16;
-	save_pointer(NAME(m_vram), 0x800);
-	save_pointer(NAME(m_score_ram), 0x100);
+	save_pointer(NAME(m_vram.get()), 0x800);
+	save_pointer(NAME(m_score_ram.get()), 0x100);
 
-	m_nvram->set_base(m_score_ram, 0x100);
+	m_nvram->set_base(m_score_ram.get(), 0x100);
 }
 
 UINT32 monzagp_state::screen_update_monzagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

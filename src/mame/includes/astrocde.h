@@ -94,7 +94,7 @@ public:
 	UINT8 m_port_2_last;
 	UINT8 m_ram_write_enable;
 	UINT8 m_input_select;
-	UINT8 *m_sparklestar;
+	std::unique_ptr<UINT8[]> m_sparklestar;
 	UINT8 m_interrupt_enabl;
 	UINT8 m_interrupt_vector;
 	UINT8 m_interrupt_scanline;
@@ -120,7 +120,7 @@ public:
 	UINT8 m_pattern_skip;
 	UINT8 m_pattern_width;
 	UINT8 m_pattern_height;
-	UINT16 *m_profpac_videoram;
+	std::unique_ptr<UINT16[]> m_profpac_videoram;
 	UINT16 m_profpac_palette[16];
 	UINT8 m_profpac_colormap[4];
 	UINT8 m_profpac_intercept;

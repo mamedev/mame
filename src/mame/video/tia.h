@@ -198,7 +198,7 @@ private:
 	UINT8 REFLECT;      /* Should playfield be reflected or not */
 	UINT8 NUSIZx_changed;
 
-	bitmap_ind16 *helper[3];
+	std::unique_ptr<bitmap_ind16> helper[3];
 
 	UINT16 screen_height;
 

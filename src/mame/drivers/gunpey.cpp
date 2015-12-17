@@ -210,7 +210,7 @@ public:
 	required_shared_ptr<UINT16> m_wram;
 	required_device<palette_device> m_palette;
 
-	UINT16 *m_blit_buffer;
+	std::unique_ptr<UINT16[]> m_blit_buffer;
 	UINT16 m_blit_ram[0x10];
 	UINT8 m_irq_cause, m_irq_mask;
 	DECLARE_WRITE8_MEMBER(gunpey_status_w);
@@ -268,7 +268,7 @@ public:
 
 void gunpey_state::video_start()
 {
-	m_blit_buffer = auto_alloc_array(machine(), UINT16, 512*512);
+	m_blit_buffer = std::make_unique<UINT16[]>(512*512);
 }
 
 UINT8 gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count,UINT8 scene_gradient)

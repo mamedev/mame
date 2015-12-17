@@ -25,11 +25,11 @@ public:
 	UINT8 m_bitmap_videoram_selected;
 	UINT8 m_bitmap_videoram_address_x;
 	UINT8 m_bitmap_videoram_address_y;
-	UINT8 *m_bitmap_videoram1;
-	UINT8 *m_bitmap_videoram2;
+	std::unique_ptr<UINT8[]> m_bitmap_videoram1;
+	std::unique_ptr<UINT8[]> m_bitmap_videoram2;
 	UINT8 *m_current_bitmap_videoram_accessed;
 	UINT8 *m_current_bitmap_videoram_displayed;
-	UINT16 *m_palette_ram;
+	std::unique_ptr<UINT16[]>  m_palette_ram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(cloak_led_w);
 	DECLARE_WRITE8_MEMBER(cloak_coin_counter_w);

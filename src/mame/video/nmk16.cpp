@@ -127,7 +127,7 @@ VIDEO_START_MEMBER(nmk16_state,bioship)
 	m_tx_tilemap->set_transparent_pen(15);
 
 	nmk16_video_init();
-	m_background_bitmap = auto_bitmap_ind16_alloc(machine(),8192,512);
+	m_background_bitmap = std::make_unique<bitmap_ind16>(8192,512);
 	m_bioship_background_bank=0;
 	m_redraw_bitmap = 1;
 

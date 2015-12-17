@@ -188,12 +188,12 @@ MACHINE_START_MEMBER(vsnes_state,vsnes)
 	int i;
 
 	/* establish nametable ram */
-	m_nt_ram[0] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_nt_ram[0] = std::make_unique<UINT8[]>(0x1000);
 	/* set mirroring */
-	m_nt_page[0][0] = m_nt_ram[0];
-	m_nt_page[0][1] = m_nt_ram[0] + 0x400;
-	m_nt_page[0][2] = m_nt_ram[0] + 0x800;
-	m_nt_page[0][3] = m_nt_ram[0] + 0xc00;
+	m_nt_page[0][0] = m_nt_ram[0].get();
+	m_nt_page[0][1] = m_nt_ram[0].get() + 0x400;
+	m_nt_page[0][2] = m_nt_ram[0].get() + 0x800;
+	m_nt_page[0][3] = m_nt_ram[0].get() + 0xc00;
 
 	ppu1_space.install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(vsnes_state::vsnes_nt0_r),this), write8_delegate(FUNC(vsnes_state::vsnes_nt0_w),this));
 
@@ -215,7 +215,7 @@ MACHINE_START_MEMBER(vsnes_state,vsnes)
 	}
 	else
 	{
-		ppu1_space.install_ram(0x0000, 0x1fff, m_vram);
+		ppu1_space.install_ram(0x0000, 0x1fff, m_vram.get());
 	}
 }
 
@@ -227,17 +227,17 @@ MACHINE_START_MEMBER(vsnes_state,vsdual)
 	m_vrom_size[1] = memregion("gfx2")->bytes();
 
 	/* establish nametable ram */
-	m_nt_ram[0] = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_nt_ram[1] = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_nt_ram[0] = std::make_unique<UINT8[]>(0x1000);
+	m_nt_ram[1] = std::make_unique<UINT8[]>(0x1000);
 	/* set mirroring */
-	m_nt_page[0][0] = m_nt_ram[0];
-	m_nt_page[0][1] = m_nt_ram[0] + 0x400;
-	m_nt_page[0][2] = m_nt_ram[0] + 0x800;
-	m_nt_page[0][3] = m_nt_ram[0] + 0xc00;
-	m_nt_page[1][0] = m_nt_ram[1];
-	m_nt_page[1][1] = m_nt_ram[1] + 0x400;
-	m_nt_page[1][2] = m_nt_ram[1] + 0x800;
-	m_nt_page[1][3] = m_nt_ram[1] + 0xc00;
+	m_nt_page[0][0] = m_nt_ram[0].get();
+	m_nt_page[0][1] = m_nt_ram[0].get() + 0x400;
+	m_nt_page[0][2] = m_nt_ram[0].get() + 0x800;
+	m_nt_page[0][3] = m_nt_ram[0].get() + 0xc00;
+	m_nt_page[1][0] = m_nt_ram[1].get();
+	m_nt_page[1][1] = m_nt_ram[1].get() + 0x400;
+	m_nt_page[1][2] = m_nt_ram[1].get() + 0x800;
+	m_nt_page[1][3] = m_nt_ram[1].get() + 0xc00;
 
 	machine().device("ppu1")->memory().space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(vsnes_state::vsnes_nt0_r),this), write8_delegate(FUNC(vsnes_state::vsnes_nt0_w),this));
 	machine().device("ppu2")->memory().space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(vsnes_state::vsnes_nt1_r),this), write8_delegate(FUNC(vsnes_state::vsnes_nt1_w),this));
@@ -286,29 +286,29 @@ void vsnes_state::v_set_mirroring(int ppu, int mirroring)
 	switch (mirroring)
 	{
 	case PPU_MIRROR_LOW:
-		m_nt_page[ppu][0] = m_nt_page[ppu][1] = m_nt_page[ppu][2] = m_nt_page[ppu][3] = m_nt_ram[ppu];
+		m_nt_page[ppu][0] = m_nt_page[ppu][1] = m_nt_page[ppu][2] = m_nt_page[ppu][3] = m_nt_ram[ppu].get();
 		break;
 	case PPU_MIRROR_HIGH:
-		m_nt_page[ppu][0] = m_nt_page[ppu][1] = m_nt_page[ppu][2] = m_nt_page[ppu][3] = m_nt_ram[ppu] + 0x400;
+		m_nt_page[ppu][0] = m_nt_page[ppu][1] = m_nt_page[ppu][2] = m_nt_page[ppu][3] = m_nt_ram[ppu].get() + 0x400;
 		break;
 	case PPU_MIRROR_HORZ:
-		m_nt_page[ppu][0] = m_nt_ram[ppu];
-		m_nt_page[ppu][1] = m_nt_ram[ppu];
-		m_nt_page[ppu][2] = m_nt_ram[ppu] + 0x400;
-		m_nt_page[ppu][3] = m_nt_ram[ppu] + 0x400;
+		m_nt_page[ppu][0] = m_nt_ram[ppu].get();
+		m_nt_page[ppu][1] = m_nt_ram[ppu].get();
+		m_nt_page[ppu][2] = m_nt_ram[ppu].get() + 0x400;
+		m_nt_page[ppu][3] = m_nt_ram[ppu].get() + 0x400;
 		break;
 	case PPU_MIRROR_VERT:
-		m_nt_page[ppu][0] = m_nt_ram[ppu];
-		m_nt_page[ppu][1] = m_nt_ram[ppu] + 0x400;
-		m_nt_page[ppu][2] = m_nt_ram[ppu];
-		m_nt_page[ppu][3] = m_nt_ram[ppu] + 0x400;
+		m_nt_page[ppu][0] = m_nt_ram[ppu].get();
+		m_nt_page[ppu][1] = m_nt_ram[ppu].get() + 0x400;
+		m_nt_page[ppu][2] = m_nt_ram[ppu].get();
+		m_nt_page[ppu][3] = m_nt_ram[ppu].get() + 0x400;
 		break;
 	case PPU_MIRROR_NONE:
 	default:
-		m_nt_page[ppu][0] = m_nt_ram[ppu];
-		m_nt_page[ppu][1] = m_nt_ram[ppu] + 0x400;
-		m_nt_page[ppu][2] = m_nt_ram[ppu] + 0x800;
-		m_nt_page[ppu][3] = m_nt_ram[ppu] + 0xc00;
+		m_nt_page[ppu][0] = m_nt_ram[ppu].get();
+		m_nt_page[ppu][1] = m_nt_ram[ppu].get() + 0x400;
+		m_nt_page[ppu][2] = m_nt_ram[ppu].get() + 0x800;
+		m_nt_page[ppu][3] = m_nt_ram[ppu].get() + 0xc00;
 		break;
 	}
 
@@ -638,7 +638,7 @@ DRIVER_INIT_MEMBER(vsnes_state,vsvram)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(vsnes_state::vsvram_rom_banking),this));
 
 	/* allocate m_vram */
-	m_vram = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_vram = std::make_unique<UINT8[]>(0x2000);
 }
 
 /**********************************************************************************/

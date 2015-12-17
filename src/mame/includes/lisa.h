@@ -161,7 +161,7 @@ public:
 	UINT16 m_mem_err_addr_latch;
 	int m_parity_error_pending;
 	int m_bad_parity_count;
-	UINT8 *m_bad_parity_table;
+	std::unique_ptr<UINT8[]> m_bad_parity_table;
 	int m_VTMSK;
 	int m_VTIR;
 	UINT16 m_video_address_latch;

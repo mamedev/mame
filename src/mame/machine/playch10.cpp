@@ -42,7 +42,7 @@ void playch10_state::machine_start()
 
 	/* allocate 4K of nametable ram here */
 	/* move to individual boards as documentation of actual boards allows */
-	m_nt_ram = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_nt_ram = std::make_unique<UINT8[]>(0x1000);
 
 	machine().device("ppu")->memory().space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(playch10_state::pc10_chr_r),this), write8_delegate(FUNC(playch10_state::pc10_chr_w),this));
 	machine().device("ppu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(playch10_state::pc10_nt_r),this),write8_delegate(FUNC(playch10_state::pc10_nt_w),this));
@@ -62,10 +62,10 @@ MACHINE_START_MEMBER(playch10_state,playch10_hboard)
 
 	/* allocate 4K of nametable ram here */
 	/* move to individual boards as documentation of actual boards allows */
-	m_nt_ram = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_nt_ram = std::make_unique<UINT8[]>(0x1000);
 	/* allocate vram */
 
-	m_vram = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_vram = std::make_unique<UINT8[]>(0x2000);
 
 	machine().device("ppu")->memory().space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(playch10_state::pc10_chr_r),this), write8_delegate(FUNC(playch10_state::pc10_chr_w),this));
 	machine().device("ppu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(playch10_state::pc10_nt_r),this), write8_delegate(FUNC(playch10_state::pc10_nt_w),this));
@@ -299,29 +299,29 @@ void playch10_state::pc10_set_mirroring(int mirroring )
 	switch (mirroring)
 	{
 	case PPU_MIRROR_LOW:
-		m_nametable[0] = m_nametable[1] = m_nametable[2] = m_nametable[3] = m_nt_ram;
+		m_nametable[0] = m_nametable[1] = m_nametable[2] = m_nametable[3] = m_nt_ram.get();
 		break;
 	case PPU_MIRROR_HIGH:
-		m_nametable[0] = m_nametable[1] = m_nametable[2] = m_nametable[3] = m_nt_ram + 0x400;
+		m_nametable[0] = m_nametable[1] = m_nametable[2] = m_nametable[3] = m_nt_ram.get() + 0x400;
 		break;
 	case PPU_MIRROR_HORZ:
-		m_nametable[0] = m_nt_ram;
-		m_nametable[1] = m_nt_ram;
-		m_nametable[2] = m_nt_ram + 0x400;
-		m_nametable[3] = m_nt_ram + 0x400;
+		m_nametable[0] = m_nt_ram.get();
+		m_nametable[1] = m_nt_ram.get();
+		m_nametable[2] = m_nt_ram.get() + 0x400;
+		m_nametable[3] = m_nt_ram.get() + 0x400;
 		break;
 	case PPU_MIRROR_VERT:
-		m_nametable[0] = m_nt_ram;
-		m_nametable[1] = m_nt_ram + 0x400;
-		m_nametable[2] = m_nt_ram;
-		m_nametable[3] = m_nt_ram + 0x400;
+		m_nametable[0] = m_nt_ram.get();
+		m_nametable[1] = m_nt_ram.get() + 0x400;
+		m_nametable[2] = m_nt_ram.get();
+		m_nametable[3] = m_nt_ram.get()+ 0x400;
 		break;
 	case PPU_MIRROR_NONE:
 	default:
-		m_nametable[0] = m_nt_ram;
-		m_nametable[1] = m_nt_ram + 0x400;
-		m_nametable[2] = m_nt_ram + 0x800;
-		m_nametable[3] = m_nt_ram + 0xc00;
+		m_nametable[0] = m_nt_ram.get();
+		m_nametable[1] = m_nt_ram.get() + 0x400;
+		m_nametable[2] = m_nt_ram.get() + 0x800;
+		m_nametable[3] = m_nt_ram.get() + 0xc00;
 		break;
 	}
 }
@@ -375,7 +375,7 @@ void playch10_state::set_videoram_bank( int first, int count, int bank, int size
 	for (i = 0; i < count; i++)
 	{
 		m_chr_page[i + first].writable = 1;
-		m_chr_page[i + first].chr = m_vram + (((i * 0x400) + (bank * size * 0x400)) & 0x1fff);
+		m_chr_page[i + first].chr = m_vram.get() + (((i * 0x400) + (bank * size * 0x400)) & 0x1fff);
 	}
 }
 
@@ -596,7 +596,7 @@ DRIVER_INIT_MEMBER(playch10_state,pcbboard)
 	DRIVER_INIT_CALL(playch10);
 
 	/* allocate vram */
-	m_vram = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_vram = std::make_unique<UINT8[]>(0x2000);
 
 	/* set the mirroring here */
 	m_mirroring = PPU_MIRROR_VERT;
@@ -644,7 +644,7 @@ DRIVER_INIT_MEMBER(playch10_state,pcdboard)
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
 	/* allocate vram */
-	m_vram = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_vram = std::make_unique<UINT8[]>(0x2000);
 	/* special init */
 	set_videoram_bank(0, 8, 0, 8);
 }
@@ -660,7 +660,7 @@ DRIVER_INIT_MEMBER(playch10_state,pcdboard_2)
 	DRIVER_INIT_CALL(pcdboard);
 
 	/* allocate vram */
-	m_vram = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_vram = std::make_unique<UINT8[]>(0x2000);
 	/* special init */
 	set_videoram_bank(0, 8, 0, 8);
 }
@@ -1025,7 +1025,7 @@ DRIVER_INIT_MEMBER(playch10_state,pciboard)
 	DRIVER_INIT_CALL(playch10);
 
 	/* allocate vram */
-	m_vram = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_vram = std::make_unique<UINT8[]>(0x2000);
 	/* special init */
 	set_videoram_bank(0, 8, 0, 8);
 }
@@ -1125,7 +1125,7 @@ DRIVER_INIT_MEMBER(playch10_state,pckboard)
 	DRIVER_INIT_CALL(playch10);
 
 	/* allocate vram */
-	m_vram = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_vram = std::make_unique<UINT8[]>(0x2000);
 	/* special init */
 	set_videoram_bank(0, 8, 0, 8);
 }

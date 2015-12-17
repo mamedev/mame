@@ -76,7 +76,7 @@ public:
 	DECLARE_READ8_MEMBER(rsw_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	UINT32 screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	bitmap_ind16 *m_tile_bitmap;
+	std::unique_ptr<bitmap_ind16> m_tile_bitmap;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_shared_ptr<UINT8> m_p_objectram;
@@ -299,7 +299,7 @@ READ8_MEMBER( mrgame_state::portc_r )
 
 void mrgame_state::machine_start()
 {
-	m_tile_bitmap=auto_bitmap_ind16_alloc(machine(),256,256);
+	m_tile_bitmap=std::make_unique<bitmap_ind16>(256,256);
 }
 
 void mrgame_state::machine_reset()

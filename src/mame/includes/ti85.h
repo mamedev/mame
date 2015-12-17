@@ -100,7 +100,7 @@ public:
 	UINT8 m_interrupt_speed;
 	UINT8 m_port4_bit0;
 	UINT8 m_ti81_port_7_data;
-	UINT8 *m_ti8x_ram;
+	std::unique_ptr<UINT8[]> m_ti8x_ram;
 	UINT8 m_PCR;
 	UINT8 m_red_out;
 	UINT8 m_white_out;

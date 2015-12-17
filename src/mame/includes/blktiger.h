@@ -32,7 +32,7 @@ public:
 	UINT32  m_scroll_bank;
 	UINT8   m_scroll_x[2];
 	UINT8   m_scroll_y[2];
-	UINT8   *m_scroll_ram;
+	std::unique_ptr<UINT8[]>   m_scroll_ram;
 	UINT8   m_screen_layout;
 	UINT8   m_chon;
 	UINT8   m_objon;

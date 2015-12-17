@@ -626,7 +626,7 @@ void mos6560_device::sound_start()
 
 	/* buffer for fastest played sample for 5 second so we have enough data for min 5 second */
 	m_noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;
-	m_noise = auto_alloc_array(machine(), INT8, m_noisesize);
+	m_noise = std::make_unique<INT8[]>(m_noisesize);
 	{
 		int noiseshift = 0x7ffff8;
 		char data;
@@ -661,7 +661,7 @@ void mos6560_device::sound_start()
 
 	if (m_tonesize > 0)
 	{
-		m_tone = auto_alloc_array(machine(), INT16, m_tonesize);
+		m_tone = std::make_unique<INT16[]>(m_tonesize);
 
 		for (i = 0; i < m_tonesize; i++)
 		{

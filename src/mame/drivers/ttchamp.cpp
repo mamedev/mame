@@ -106,7 +106,7 @@ public:
 	int m_pic_latched;
 	int m_pic_writelatched;
 
-	UINT8* m_bakram;
+	std::unique_ptr<UINT8[]> m_bakram;
 
 	UINT16 m_mainram[0x10000 / 2];
 
@@ -153,8 +153,8 @@ void ttchamp_state::machine_start()
 
 	m_picmodex = PIC_IDLE;
 
-	m_bakram = auto_alloc_array(machine(), UINT8, 0x100);
-	machine().device<nvram_device>("backram")->set_base(m_bakram, 0x100);
+	m_bakram = std::make_unique<UINT8[]>(0x100);
+	machine().device<nvram_device>("backram")->set_base(m_bakram.get(), 0x100);
 
 	save_item(NAME(m_paloff));
 	save_item(NAME(m_port10));

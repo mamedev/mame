@@ -27,7 +27,7 @@ public:
 	/* video-related */
 	bitmap_ind16 m_pixbitmap;
 	tilemap_t   *m_bg_tilemap;
-	UINT8     *m_bitmapram;
+	std::unique_ptr<UINT8[]>     m_bitmapram;
 	int       m_bm_plane;
 	int       m_pixcolor;
 	int       m_scroll[4];

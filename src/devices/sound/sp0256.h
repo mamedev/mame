@@ -108,7 +108,7 @@ private:
 
 	int            m_silent;          /* Flag: SP0256 is silent.                      */
 
-	INT16         *m_scratch;         /* Scratch buffer for audio.                    */
+	std::unique_ptr<INT16[]>    m_scratch;         /* Scratch buffer for audio.                    */
 	UINT32         m_sc_head;         /* Head pointer into scratch circular buf       */
 	UINT32         m_sc_tail;         /* Tail pointer into scratch circular buf       */
 

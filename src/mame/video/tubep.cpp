@@ -340,7 +340,7 @@ PALETTE_INIT_MEMBER(tubep_state,tubep)
 
 VIDEO_START_MEMBER(tubep_state,tubep)
 {
-	m_spritemap = auto_alloc_array(machine(), UINT8, 256*256*2);
+	m_spritemap = std::make_unique<UINT8[]>(256*256*2);
 
 	/* Set up save state */
 	save_item(NAME(m_romD_addr));
@@ -369,7 +369,7 @@ VIDEO_START_MEMBER(tubep_state,tubep)
 
 VIDEO_RESET_MEMBER(tubep_state,tubep)
 {
-	memset(m_spritemap,0,256*256*2);
+	memset(m_spritemap.get(),0,256*256*2);
 
 	m_romD_addr = 0;
 	m_romEF_addr = 0;
@@ -567,7 +567,7 @@ void tubep_state::tubep_vblank_end()
 	m_DISP = m_DISP ^ 1;
 	/* logerror("EOF: DISP after this is=%i, and clearing it now.\n", m_DISP); */
 	/* clear the new frame (the one that was (just) displayed)*/
-	memset(m_spritemap+m_DISP*256*256, 0x0f, 256*256);
+	memset(m_spritemap.get()+m_DISP*256*256, 0x0f, 256*256);
 }
 
 

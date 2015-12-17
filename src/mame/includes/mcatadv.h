@@ -25,7 +25,7 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	UINT16 *     m_spriteram_old;
 	required_shared_ptr<UINT16> m_vidregs;
-	UINT16 *     m_vidregs_old;
+	std::unique_ptr<UINT16[]>     m_vidregs_old;
 
 	/* video-related */
 	tilemap_t    *m_tilemap1;

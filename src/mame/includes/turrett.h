@@ -59,7 +59,7 @@ public:
 	// members
 	emu_timer *m_dma_timer;
 	UINT32  m_inputs_active;
-	UINT16  *m_video_ram[2];
+	std::unique_ptr<UINT16[]>  m_video_ram[2];
 	UINT16  m_last_pixel;
 	INT32   m_video_ctrl;
 	UINT16  m_video_fade;

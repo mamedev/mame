@@ -23,7 +23,7 @@ public:
 	optional_shared_ptr<UINT8> m_scratchram;
 
 	UINT8 *m_fg_gfx;   /* prosoccr */
-	UINT8 *m_charram;   /* prosoccr */
+	std::unique_ptr<UINT8[]> m_charram;   /* prosoccr */
 	UINT8 m_io_ram[16];
 
 	int m_bank;

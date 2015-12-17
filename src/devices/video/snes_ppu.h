@@ -267,9 +267,9 @@ public:
 	DECLARE_WRITE8_MEMBER( cgram_write );
 	DECLARE_READ8_MEMBER( vram_read );
 	DECLARE_WRITE8_MEMBER( vram_write );
-	UINT16 *m_oam_ram;     /* Object Attribute Memory */
-	UINT16 *m_cgram;   /* Palette RAM */
-	UINT8  *m_vram;    /* Video RAM (TODO: Should be 16-bit, but it's easier this way) */
+	std::unique_ptr<UINT16[]> m_oam_ram;     /* Object Attribute Memory */
+	std::unique_ptr<UINT16[]> m_cgram;   /* Palette RAM */
+	std::unique_ptr<UINT8[]> m_vram;    /* Video RAM (TODO: Should be 16-bit, but it's easier this way) */
 
 protected:
 	// device-level overrides

@@ -95,7 +95,8 @@ protected:
 	UINT8 m_prev_refresh;
 	UINT8 m_speaker_state;
 
-	bitmap_ind16 *m_bitmap_render, *m_bitmap_buffer;
+	std::unique_ptr<bitmap_ind16> m_bitmap_render;
+	std::unique_ptr<bitmap_ind16> m_bitmap_buffer;
 
 	UINT16 m_ula_char_buffer;
 	double m_cassette_cur_level;

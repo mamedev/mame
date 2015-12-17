@@ -182,7 +182,7 @@ void m58_state::video_start()
 	m_bg_tilemap->set_scrolldx(visarea.min_x, width - (visarea.max_x + 1));
 	m_bg_tilemap->set_scrolldy(visarea.min_y - 8, height + 16 - (visarea.max_y + 1));
 
-	//m_scroll_panel_bitmap = auto_bitmap_ind16_alloc(machine(), SCROLL_PANEL_WIDTH, height);
+	//m_scroll_panel_bitmap = std::make_unique<bitmap_ind16>(SCROLL_PANEL_WIDTH, height);
 	m_screen->register_screen_bitmap(m_scroll_panel_bitmap);
 	save_item(NAME(m_scroll_panel_bitmap));
 }

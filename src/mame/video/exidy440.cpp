@@ -44,12 +44,12 @@ VIDEO_START_MEMBER(exidy440_state,exidy440)
 	m_firq_beam = 0;
 
 	/* allocate a buffer for VRAM */
-	m_local_videoram = auto_alloc_array(machine(), UINT8, 256 * 256 * 2);
-	memset(m_local_videoram, 0, 256 * 256 * 2);
+	m_local_videoram = std::make_unique<UINT8[]>(256 * 256 * 2);
+	memset(m_local_videoram.get(), 0, 256 * 256 * 2);
 
 	/* allocate a buffer for palette RAM */
-	m_local_paletteram = auto_alloc_array(machine(), UINT8, 512 * 2);
-	memset(m_local_paletteram, 0, 512 * 2);
+	m_local_paletteram = std::make_unique<UINT8[]>(512 * 2);
+	memset(m_local_paletteram.get(), 0, 512 * 2);
 }
 
 

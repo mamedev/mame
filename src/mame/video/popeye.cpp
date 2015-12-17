@@ -337,8 +337,8 @@ TILE_GET_INFO_MEMBER(popeye_state::get_fg_tile_info)
 
 void popeye_state::video_start()
 {
-	m_bitmapram = auto_alloc_array(machine(), UINT8, popeye_bitmapram_size);
-	m_tmpbitmap2 = auto_bitmap_ind16_alloc(machine(),1024,1024);    /* actually 1024x512 but not rolling over vertically? */
+	m_bitmapram = std::make_unique<UINT8[]>(popeye_bitmapram_size);
+	m_tmpbitmap2 = std::make_unique<bitmap_ind16>(1024,1024);    /* actually 1024x512 but not rolling over vertically? */
 
 	m_bitmap_type = TYPE_SKYSKIPR;
 
@@ -351,13 +351,13 @@ void popeye_state::video_start()
 	save_item(NAME(m_field));
 	save_item(NAME(m_lastflip));
 	save_item(NAME(*m_tmpbitmap2));
-	save_pointer(NAME(m_bitmapram), popeye_bitmapram_size);
+	save_pointer(NAME(m_bitmapram.get()), popeye_bitmapram_size);
 }
 
 VIDEO_START_MEMBER(popeye_state,popeye)
 {
-	m_bitmapram = auto_alloc_array(machine(), UINT8, popeye_bitmapram_size);
-	m_tmpbitmap2 = auto_bitmap_ind16_alloc(machine(),512,512);
+	m_bitmapram = std::make_unique<UINT8[]>(popeye_bitmapram_size);
+	m_tmpbitmap2 = std::make_unique<bitmap_ind16>(512,512);
 
 	m_bitmap_type = TYPE_POPEYE;
 
@@ -370,7 +370,7 @@ VIDEO_START_MEMBER(popeye_state,popeye)
 	save_item(NAME(m_field));
 	save_item(NAME(m_lastflip));
 	save_item(NAME(*m_tmpbitmap2));
-	save_pointer(NAME(m_bitmapram), popeye_bitmapram_size);
+	save_pointer(NAME(m_bitmapram.get()), popeye_bitmapram_size);
 }
 
 void popeye_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)

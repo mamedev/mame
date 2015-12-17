@@ -125,7 +125,7 @@ public:
 	UINT64 m_real3d_status;
 	UINT64 *m_network_ram;
 	int m_prot_data_ptr;
-	UINT32 *m_vrom;
+	std::unique_ptr<UINT32[]> m_vrom;
 	int m_step;
 	int m_m3_step;
 	INT32 m_tap_state;
@@ -144,7 +144,7 @@ public:
 	UINT64 *m_m3_tile_ram;
 	UINT32 *m_texture_fifo;
 	int m_texture_fifo_pos;
-	UINT16 *m_texture_ram[2];
+	std::unique_ptr<UINT16[]> m_texture_ram[2];
 	UINT32 *m_display_list_ram;
 	UINT32 *m_culling_ram;
 	UINT32 *m_polygon_ram;

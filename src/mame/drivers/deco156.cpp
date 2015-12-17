@@ -51,7 +51,7 @@ public:
 	/* memory */
 	UINT16   m_pf1_rowscroll[0x800/2];
 	UINT16   m_pf2_rowscroll[0x800/2];
-	UINT16* m_spriteram;
+	std::unique_ptr<UINT16[]> m_spriteram;
 	DECLARE_WRITE32_MEMBER(hvysmsh_eeprom_w);
 	DECLARE_WRITE32_MEMBER(wcvol95_nonbuffered_palette_w);
 	DECLARE_WRITE32_MEMBER(deco156_nonbuffered_palette_w);
@@ -75,12 +75,12 @@ public:
 
 void deco156_state::video_start()
 {
-	m_spriteram = auto_alloc_array(machine(), UINT16, 0x2000/2);
+	m_spriteram = std::make_unique<UINT16[]>(0x2000/2);
 
 	/* and register the allocated ram so that save states still work */
 	save_item(NAME(m_pf1_rowscroll));
 	save_item(NAME(m_pf2_rowscroll));
-	save_pointer(NAME(m_spriteram), 0x2000/2);
+	save_pointer(NAME(m_spriteram.get()), 0x2000/2);
 }
 
 
@@ -95,7 +95,7 @@ UINT32 deco156_state::screen_update_wcvol95(screen_device &screen, bitmap_rgb32 
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
 	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x800);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram.get(), 0x800);
 	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

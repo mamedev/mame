@@ -69,7 +69,7 @@ void blktiger_state::video_start()
 	m_objon = 1;
 	m_screen_layout = 0;
 
-	m_scroll_ram = auto_alloc_array(machine(), UINT8, BGRAM_BANK_SIZE * BGRAM_BANKS);
+	m_scroll_ram = std::make_unique<UINT8[]>(BGRAM_BANK_SIZE * BGRAM_BANKS);
 
 	m_tx_tilemap =    &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blktiger_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap8x4 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blktiger_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(blktiger_state::bg8x4_scan),this), 16, 16, 128, 64);
@@ -86,7 +86,7 @@ void blktiger_state::video_start()
 	m_bg_tilemap4x8->set_transmask(2, 0xff00, 0x80ff);
 	m_bg_tilemap4x8->set_transmask(3, 0xf000, 0x8fff);
 
-	save_pointer(NAME(m_scroll_ram), BGRAM_BANK_SIZE * BGRAM_BANKS);
+	save_pointer(NAME(m_scroll_ram.get()), BGRAM_BANK_SIZE * BGRAM_BANKS);
 }
 
 

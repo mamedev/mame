@@ -623,8 +623,8 @@ WRITE8_MEMBER(scramble_state::harem_decrypt_clk_w)
 				bank = 0;
 		}
 
-		membank("rombank")->set_base            (m_harem_decrypted_data     + 0x2000 * bank);
-		membank("rombank_decrypted")->set_base  (m_harem_decrypted_opcodes  + 0x2000 * bank);
+		membank("rombank")->set_base            (m_harem_decrypted_data.get()     + 0x2000 * bank);
+		membank("rombank_decrypted")->set_base  (m_harem_decrypted_opcodes.get()  + 0x2000 * bank);
 
 //      logerror("%s: decrypt mode = %02x (bank %x) active\n", machine().describe_context(), m_harem_decrypt_mode, bank);
 
@@ -645,10 +645,11 @@ DRIVER_INIT_MEMBER(scramble_state,harem)
 {
 	UINT8 *ROM      =   memregion("maincpu")->base() + 0x8000;
 	size_t size     =   0x2000;
-
-	UINT8 *data     =   m_harem_decrypted_data      = auto_alloc_array(machine(), UINT8, size * 3);
-	UINT8 *opcodes  =   m_harem_decrypted_opcodes   = auto_alloc_array(machine(), UINT8, size * 3);
-
+	
+	m_harem_decrypted_data      = std::make_unique<UINT8[]>(size * 3);
+	UINT8 *data = m_harem_decrypted_data.get();
+	m_harem_decrypted_opcodes   = std::make_unique<UINT8[]>(size * 3);
+	UINT8 *opcodes = m_harem_decrypted_opcodes.get();
 	// decryption 03
 	for (int i = 0; i < size; i++)
 	{
@@ -673,8 +674,8 @@ DRIVER_INIT_MEMBER(scramble_state,harem)
 		data   [size * 2 + i]   =   BITSWAP8(x, 7,2,5,4,3,0,1,6);
 	}
 
-	membank("rombank")->set_base            (m_harem_decrypted_data);
-	membank("rombank_decrypted")->set_base  (m_harem_decrypted_opcodes);
+	membank("rombank")->set_base            (m_harem_decrypted_data.get());
+	membank("rombank_decrypted")->set_base  (m_harem_decrypted_opcodes.get());
 
 	save_item(NAME(m_harem_decrypt_mode));
 	save_item(NAME(m_harem_decrypt_bit));

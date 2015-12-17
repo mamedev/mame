@@ -127,7 +127,7 @@ void psxgpu_device::DebugMeshInit( void )
 	m_debug.b_clear = 1;
 	m_debug.n_coord = 0;
 	m_debug.n_skip = 0;
-	m_debug.mesh = auto_bitmap_ind16_alloc( machine(), width, height );
+	m_debug.mesh = std::make_unique<bitmap_ind16>(width, height );
 }
 
 void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )

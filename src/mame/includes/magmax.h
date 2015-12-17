@@ -28,7 +28,7 @@ public:
 	UINT8 m_gain_control;
 	emu_timer *m_interrupt_timer;
 	int m_flipscreen;
-	UINT32 *m_prom_tab;
+	std::unique_ptr<UINT32[]> m_prom_tab;
 	bitmap_ind16 m_bitmap;
 	DECLARE_WRITE16_MEMBER(magmax_sound_w);
 	DECLARE_READ8_MEMBER(magmax_sound_irq_ack);

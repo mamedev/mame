@@ -29,9 +29,9 @@ public:
 	int m_input_latch[4];
 	int m_sound_fix;
 	UINT8 m_last_bank;
-	UINT8* m_vram;
+	std::unique_ptr<UINT8[]> m_vram;
 	UINT8* m_vrom[2];
-	UINT8* m_nt_ram[2];
+	std::unique_ptr<UINT8[]> m_nt_ram[2];
 	UINT8* m_nt_page[2][4];
 	UINT32 m_vrom_size[2];
 	int m_vrom_banks;

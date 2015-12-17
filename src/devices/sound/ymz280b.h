@@ -121,7 +121,7 @@ private:
 	UINT8 *m_mem_base;                /* pointer to the base of external memory */
 	UINT32 m_mem_size;
 	sound_stream *m_stream;           /* which stream are we using */
-	INT16 *m_scratch;
+	std::unique_ptr<INT16[]> m_scratch;
 #if MAKE_WAVS
 	void *m_wavresample;              /* resampled waveform */
 #endif

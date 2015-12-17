@@ -97,7 +97,7 @@ public:
 	/* 80 column device */
 	optional_device<mc6845_device> m_mc6845;
 	optional_device<screen_device> m_crtc_screen;
-	UINT8 *m_crtc_ram;
+	std::unique_ptr<UINT8[]> m_crtc_ram;
 	UINT8   m_de;
 
 	int m_centronics_busy;

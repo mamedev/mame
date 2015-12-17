@@ -563,12 +563,12 @@ void cdicdic_device::sample_trigger()
 		m_decode_delay = 0;
 	}
 
-	if(CDIC_IS_VALID_SAMPLE_BUF(m_ram, m_decode_addr & 0x3ffe))
+	if(CDIC_IS_VALID_SAMPLE_BUF(m_ram.get(), m_decode_addr & 0x3ffe))
 	{
 		verboselog(machine(), 0, "Hit audio_sample_trigger, with m_decode_addr == %04x, calling decode_audio_sector\n", m_decode_addr );
 
 		// Decode the data at Z+4, the same offset as a normal CD sector.
-		decode_audio_sector(((UINT8*)m_ram) + (m_decode_addr & 0x3ffe) + 4, 1);
+		decode_audio_sector(((UINT8*)m_ram.get()) + (m_decode_addr & 0x3ffe) + 4, 1);
 
 		// Swap buffer positions to indicate our new buffer position at the next read
 		m_decode_addr ^= 0x1a00;
@@ -577,7 +577,7 @@ void cdicdic_device::sample_trigger()
 
 		//// Delay for Frequency * (18*28*2*size in bytes) before requesting more data
 		verboselog(machine(), 0, "%s", "Data is valid, setting up a new callback\n" );
-		m_decode_period = attotime::from_hz(CDIC_SAMPLE_BUF_FREQ(m_ram, m_decode_addr & 0x3ffe)) * (18*28*2*CDIC_SAMPLE_BUF_SIZE(m_ram, m_decode_addr & 0x3ffe));
+		m_decode_period = attotime::from_hz(CDIC_SAMPLE_BUF_FREQ(m_ram.get(), m_decode_addr & 0x3ffe)) * (18*28*2*CDIC_SAMPLE_BUF_SIZE(m_ram.get(), m_decode_addr & 0x3ffe));
 		m_audio_sample_timer->adjust(m_decode_period);
 		//dmadac_enable(&dmadac[0], 2, 0);
 	}
@@ -706,7 +706,7 @@ void cdicdic_device::process_delayed_command()
 						m_ram[(m_data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
 					}
 
-					decode_audio_sector(((UINT8*)m_ram) + ((m_data_buffer & 5) * 0xa00 + 4), 0);
+					decode_audio_sector(((UINT8*)m_ram.get()) + ((m_data_buffer & 5) * 0xa00 + 4), 0);
 
 					//printf( "Setting CDIC interrupt line\n" );
 					verboselog(machine(), 0, "%s", "Setting CDIC interrupt line for audio sector\n" );
@@ -1193,7 +1193,7 @@ void cdicdic_device::device_start()
 	m_audio_sample_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdicdic_device::audio_sample_trigger), this));
 	m_audio_sample_timer->adjust(attotime::never);
 
-	m_ram = auto_alloc_array(machine(), UINT16, 0x3c00/2);
+	m_ram = std::make_unique<UINT16[]>(0x3c00/2);
 }
 
 //-------------------------------------------------

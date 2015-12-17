@@ -76,7 +76,7 @@ public:
 	UINT8 m_laserdisc_select;
 	UINT8 m_laserdisc_status;
 	UINT16 m_laserdisc_philips_code;
-	UINT8 *m_laserdisc_audio_buffer;
+	std::unique_ptr<UINT8[]> m_laserdisc_audio_buffer;
 	UINT16 m_laserdisc_audio_address;
 	INT16 m_laserdisc_last_samples[2];
 	attotime m_laserdisc_last_time;

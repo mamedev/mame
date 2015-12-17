@@ -39,8 +39,8 @@ WRITE16_MEMBER(taitob_state::realpunc_video_ctrl_w)
 
 VIDEO_START_MEMBER(taitob_state,taitob_core)
 {
-	m_framebuffer[0] = auto_bitmap_ind16_alloc(machine(), 512, 256);
-	m_framebuffer[1] = auto_bitmap_ind16_alloc(machine(), 512, 256);
+	m_framebuffer[0] = std::make_unique<bitmap_ind16>(512, 256);
+	m_framebuffer[1] = std::make_unique<bitmap_ind16>(512, 256);
 	m_pixel_bitmap = nullptr;  /* only hitice needs this */
 
 	save_item(NAME(m_pixel_scroll));
@@ -86,7 +86,7 @@ VIDEO_START_MEMBER(taitob_state,hitice)
 
 	m_b_fg_color_base = 0x80;       /* hitice also uses this for the pixel_bitmap */
 
-	m_pixel_bitmap = auto_bitmap_ind16_alloc(machine(), 1024, 512);
+	m_pixel_bitmap = std::make_unique<bitmap_ind16>(1024, 512);
 
 	save_item(NAME(*m_pixel_bitmap));
 }
@@ -100,7 +100,7 @@ VIDEO_RESET_MEMBER(taitob_state,hitice)
 
 VIDEO_START_MEMBER(taitob_state,realpunc)
 {
-	m_realpunc_bitmap = auto_bitmap_ind16_alloc(machine(), m_screen->width(), m_screen->height());
+	m_realpunc_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
 
 	VIDEO_START_CALL_MEMBER(taitob_color_order0);
 }

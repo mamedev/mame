@@ -381,8 +381,8 @@ void system1_state::machine_start()
 
 	if (m_banked_decrypted_opcodes)
 	{
-		m_bank0d->set_base(m_banked_decrypted_opcodes);
-		m_bank1d->configure_entries(0, numbanks, m_banked_decrypted_opcodes + 0x10000, 0x4000);
+		m_bank0d->set_base(m_banked_decrypted_opcodes.get());
+		m_bank1d->configure_entries(0, numbanks, m_banked_decrypted_opcodes.get() + 0x10000, 0x4000);
 		m_bank1d->set_entry(0);
 	}
 
@@ -5413,15 +5413,15 @@ DRIVER_INIT_MEMBER(system1_state,gardiab)
 DRIVER_INIT_MEMBER(system1_state,wbml)
 {
 	DRIVER_INIT_CALL(bank0c);
-	m_banked_decrypted_opcodes = auto_alloc_array(machine(), UINT8, m_maincpu_region->bytes());
-	mc8123_decode(m_maincpu_region->base(), m_banked_decrypted_opcodes, memregion("key")->base(), m_maincpu_region->bytes());
+	m_banked_decrypted_opcodes = std::make_unique<UINT8[]>(m_maincpu_region->bytes());
+	mc8123_decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), memregion("key")->base(), m_maincpu_region->bytes());
 }
 
 DRIVER_INIT_MEMBER(system1_state,ufosensi)
 {
 	DRIVER_INIT_CALL(bank0c);
-	m_banked_decrypted_opcodes = auto_alloc_array(machine(), UINT8, m_maincpu_region->bytes());
-	mc8123_decode(m_maincpu_region->base(), m_banked_decrypted_opcodes, memregion("key")->base(), m_maincpu_region->bytes());
+	m_banked_decrypted_opcodes = std::make_unique<UINT8[]>(m_maincpu_region->bytes());
+	mc8123_decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), memregion("key")->base(), m_maincpu_region->bytes());
 }
 
 DRIVER_INIT_MEMBER(system1_state,wboysys2)
@@ -5486,8 +5486,8 @@ DRIVER_INIT_MEMBER(system1_state,wboysys2)
 DRIVER_INIT_MEMBER(system1_state,dakkochn)
 {
 	m_videomode_custom = &system1_state::dakkochn_custom_w;
-	m_banked_decrypted_opcodes = auto_alloc_array(machine(), UINT8, m_maincpu_region->bytes());
-	mc8123_decode(m_maincpu_region->base(), m_banked_decrypted_opcodes, memregion("key")->base(), m_maincpu_region->bytes());
+	m_banked_decrypted_opcodes = std::make_unique<UINT8[]>(m_maincpu_region->bytes());
+	mc8123_decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), memregion("key")->base(), m_maincpu_region->bytes());
 }
 
 

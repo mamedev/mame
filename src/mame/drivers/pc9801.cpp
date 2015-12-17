@@ -516,7 +516,7 @@ public:
 	UINT8 m_txt_scroll_reg[8];
 	UINT8 m_pal_clut[4];
 
-	UINT16 *m_tvram;
+	std::unique_ptr<UINT16[]> m_tvram;
 
 	UINT16 m_font_addr;
 	UINT8 m_font_line;
@@ -749,7 +749,7 @@ void pc9801_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 void pc9801_state::video_start()
 {
-	m_tvram = auto_alloc_array(machine(), UINT16, 0x2000);
+	m_tvram = std::make_unique<UINT16[]>(0x2000);
 
 	// find memory regions
 	m_char_rom = memregion("chargen")->base();
@@ -3068,7 +3068,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9821ap2)
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 {
-	memset(m_tvram, 0, sizeof(UINT16) * 0x2000);
+	memset(m_tvram.get(), 0, sizeof(UINT16) * 0x2000);
 	/* this looks like to be some kind of backup ram, system will boot with green colors otherwise */
 	{
 		int i;

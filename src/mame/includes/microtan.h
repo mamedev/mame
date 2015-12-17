@@ -42,7 +42,7 @@ public:
 
 	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_chunky_graphics;
-	UINT8 *m_chunky_buffer;
+	std::unique_ptr<UINT8[]> m_chunky_buffer;
 	UINT8 m_keypad_column;
 	UINT8 m_keyboard_ascii;
 	emu_timer *m_timer;

@@ -16,7 +16,7 @@ public:
 	naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	UINT32 rom_cur_address;
 	static const int RAM_SIZE = 65536;
-	UINT8* ram;
+	std::unique_ptr<UINT8[]> ram;
 
 	UINT16 read_callback(UINT32 addr);
 

@@ -79,9 +79,9 @@ public:
 	tilemap_t *m_layer2;
 	tilemap_t *m_layer3;
 	bitmap_rgb32 m_temp_bitmap;
-	UINT8 *m_apache3_road_x_ram;
+	std::unique_ptr<UINT8[]> m_apache3_road_x_ram;
 	UINT8 m_apache3_road_z;
-	UINT16* m_roundup5_vram;
+	std::unique_ptr<UINT16[]> m_roundup5_vram;
 	UINT16 m_bigfight_bank;
 	UINT16 m_bigfight_last_bank;
 	UINT8 m_roundupt_crt_selected_reg;

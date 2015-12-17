@@ -216,9 +216,9 @@ void snes_ppu_device::device_start()
 {
 	m_openbus_cb.resolve_safe(0);
 
-	m_vram = auto_alloc_array(machine(), UINT8, SNES_VRAM_SIZE);
-	m_cgram = auto_alloc_array(machine(), UINT16, SNES_CGRAM_SIZE/2);
-	m_oam_ram = auto_alloc_array(machine(), UINT16, SNES_OAM_SIZE/2);
+	m_vram = std::make_unique<UINT8[]>(SNES_VRAM_SIZE);
+	m_cgram = std::make_unique<UINT16[]>(SNES_CGRAM_SIZE/2);
+	m_oam_ram = std::make_unique<UINT16[]>(SNES_OAM_SIZE/2);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -355,9 +355,9 @@ void snes_ppu_device::device_start()
 
 	save_item(NAME(m_regs));
 
-	save_pointer(NAME(m_vram), SNES_VRAM_SIZE);
-	save_pointer(NAME(m_cgram), SNES_CGRAM_SIZE/2);
-	save_pointer(NAME(m_oam_ram), SNES_OAM_SIZE/2);
+	save_pointer(NAME(m_vram.get()), SNES_VRAM_SIZE);
+	save_pointer(NAME(m_cgram.get()), SNES_CGRAM_SIZE/2);
+	save_pointer(NAME(m_oam_ram.get()), SNES_OAM_SIZE/2);
 }
 
 void snes_ppu_device::device_reset()
@@ -393,13 +393,13 @@ void snes_ppu_device::device_reset()
 	}
 
 	/* Init VRAM */
-	memset(m_vram, 0, SNES_VRAM_SIZE);
+	memset(m_vram.get(), 0, SNES_VRAM_SIZE);
 
 	/* Init Palette RAM */
-	memset((UINT8 *)m_cgram, 0, SNES_CGRAM_SIZE);
+	memset((UINT8 *)m_cgram.get(), 0, SNES_CGRAM_SIZE);
 
 	/* Init oam RAM */
-	memset((UINT8 *)m_oam_ram, 0xff, SNES_OAM_SIZE);
+	memset((UINT8 *)m_oam_ram.get(), 0xff, SNES_OAM_SIZE);
 
 	m_stat78 = 0;
 
@@ -1156,7 +1156,7 @@ void snes_ppu_device::update_obsel( void )
 
 void snes_ppu_device::oam_list_build( void )
 {
-	UINT8 *oamram = (UINT8 *)m_oam_ram;
+	UINT8 *oamram = (UINT8 *)m_oam_ram.get();
 	INT16 oam = 0x1ff;
 	UINT16 oam_extra = oam + 0x20;
 	UINT16 extra = 0;
@@ -2222,7 +2222,7 @@ READ8_MEMBER( snes_ppu_device::cgram_read )
 	}
 #endif
 
-	res = ((UINT8 *)m_cgram)[offset];
+	res = ((UINT8 *)m_cgram.get())[offset];
 
 	// CGRAM palette data format is 15-bits (0,bbbbb,ggggg,rrrrr).
 	// Highest bit is simply ignored.
@@ -2255,7 +2255,7 @@ WRITE8_MEMBER( snes_ppu_device::cgram_write )
 	if (offset & 0x01)
 		data &= 0x7f;
 
-	((UINT8 *)m_cgram)[offset] = data;
+	((UINT8 *)m_cgram.get())[offset] = data;
 }
 
 UINT8 snes_ppu_device::read(address_space &space, UINT32 offset, UINT8 wrio_bit7)

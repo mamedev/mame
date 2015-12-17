@@ -100,7 +100,7 @@ public:
 	bitmap_rgb32 m_gg_sms_mode_bitmap;
 	// line_buffer will be used to hold 4 lines of line data as a kind of cache for
 	// vertical scaling in the gamegear sms compatibility mode.
-	int *m_line_buffer;
+	std::unique_ptr<int[]> m_line_buffer;
 
 	// model identifiers
 	UINT8 m_is_gamegear;

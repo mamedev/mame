@@ -35,7 +35,7 @@ private:
 	UINT32       m_addr;
 	int          m_device_sel;
 
-	UINT8 *      m_texrom;
+	std::unique_ptr<UINT8[]>     m_texrom;
 
 	UINT32 *     m_palette;
 

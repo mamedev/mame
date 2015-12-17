@@ -118,7 +118,7 @@ public:
 	UINT32 m_star_rng_origin;
 	UINT32 m_star_rng_origin_frame;
 	rgb_t m_star_color[64];
-	UINT8 *m_stars;
+	std::unique_ptr<UINT8[]> m_stars;
 	UINT8 m_stars_enabled;
 	UINT8 m_stars_blink_state;
 	rgb_t m_bullet_color[8];

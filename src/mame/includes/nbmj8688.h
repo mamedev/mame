@@ -41,9 +41,9 @@ public:
 	int m_gfxflag3;
 	int m_flipscreen;
 	int m_screen_refresh;
-	bitmap_ind16 *m_tmpbitmap;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
 	UINT16 *m_videoram;
-	UINT8 *m_clut;
+	std::unique_ptr<UINT8[]> m_clut;
 	int m_flipscreen_old;
 	emu_timer *m_blitter_timer;
 

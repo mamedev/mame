@@ -28,7 +28,7 @@ public:
 	tilemap_t *m_tilemap1;
 	tilemap_t *m_tilemap2;
 	tilemap_t *m_tilemap4;
-	UINT8 *m_buffer_spriteram;
+	std::unique_ptr<UINT8[]> m_buffer_spriteram;
 
 	DECLARE_READ8_MEMBER(wheel_r);
 	DECLARE_WRITE8_MEMBER(vram1_w);

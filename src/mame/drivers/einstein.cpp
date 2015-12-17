@@ -437,8 +437,8 @@ MACHINE_RESET_MEMBER(einstein_state,einstein2)
 
 MACHINE_START_MEMBER(einstein_state,einstein2)
 {
-	m_crtc_ram = auto_alloc_array(machine(), UINT8, 2048);
-	memset(m_crtc_ram, 0, sizeof(UINT8) * 2048);
+	m_crtc_ram = std::make_unique<UINT8[]>(2048);
+	memset(m_crtc_ram.get(), 0, sizeof(UINT8) * 2048);
 	einstein_state::machine_start();
 }
 

@@ -72,8 +72,8 @@ public:
 
 	UINT8 m_bank;
 	UINT8 m_irq_src;
-	UINT8 *m_pal_ram;
-	UINT8 *m_vram;
+	std::unique_ptr<UINT8[]> m_pal_ram;
+	std::unique_ptr<UINT8[]> m_vram;
 	UINT8 m_vram_bank[2];
 	UINT8 m_mux_data;
 	UINT8 m_lamps_data;
@@ -110,10 +110,10 @@ protected:
 
 void dblcrown_state::video_start()
 {
-	m_pal_ram = auto_alloc_array(machine(), UINT8, 0x200 * 2);
-	m_vram = auto_alloc_array(machine(), UINT8, 0x1000 * 0x10);
+	m_pal_ram = std::make_unique<UINT8[]>(0x200 * 2);
+	m_vram = std::make_unique<UINT8[]>(0x1000 * 0x10);
 
-	save_pointer(NAME(m_vram), 0x1000 * 0x10);
+	save_pointer(NAME(m_vram.get()), 0x1000 * 0x10);
 }
 
 UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )

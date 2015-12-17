@@ -238,7 +238,7 @@ void konamigx_state::wipezbuf(int noshadow)
 
 	if (!noshadow)
 	{
-		zptr = m_gx_shdzbuf;
+		zptr = m_gx_shdzbuf.get();
 		w <<= 1;
 		ecx = h;
 		do { memset(zptr, -1, w); zptr += (GX_ZBUFW<<1); } while (--ecx);
@@ -285,7 +285,7 @@ void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 	m_gx_primode = 0;
 
 	m_gx_objzbuf = &screen.priority().pix8(0);
-	m_gx_shdzbuf = auto_alloc_array(machine(), UINT8, GX_ZBUFSIZE);
+	m_gx_shdzbuf = std::make_unique<UINT8[]>(GX_ZBUFSIZE);
 	gx_objpool = auto_alloc_array(machine(), struct GX_OBJ, GX_MAX_OBJECTS);
 
 	m_k054338->export_config(&m_K054338_shdRGB);
@@ -861,7 +861,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 
 
 			m_k055673->k053247_draw_single_sprite_gxcore(bitmap, cliprect,
-				m_gx_objzbuf, m_gx_shdzbuf, code, m_gx_spriteram, offs,
+				m_gx_objzbuf, m_gx_shdzbuf.get(), code, m_gx_spriteram, offs,
 				color, alpha, drawmode, zcode, pri,
 				/* non-gx only */
 				0,0,nullptr,nullptr,0
@@ -1160,8 +1160,8 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type3)
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
-	m_dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
+	m_dualscreen_left_tempbitmap = std::make_unique<bitmap_rgb32>( width, height);
+	m_dualscreen_right_tempbitmap = std::make_unique<bitmap_rgb32>( width, height);
 
 	common_init();
 
@@ -1173,7 +1173,7 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type3)
 
 
 	/* set up tile layers */
-	m_type3_roz_temp_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
+	m_type3_roz_temp_bitmap = std::make_unique<bitmap_ind16>(width, height);
 
 
 	//m_gx_psac_tilemap->set_flip(TILEMAP_FLIPX| TILEMAP_FLIPY);
@@ -1196,8 +1196,8 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type4)
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
-	m_dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
+	m_dualscreen_left_tempbitmap = std::make_unique<bitmap_rgb32>( width, height);
+	m_dualscreen_right_tempbitmap = std::make_unique<bitmap_rgb32>( width, height);
 
 	common_init();
 
@@ -1224,8 +1224,8 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type4_vsn)
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
-	m_dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
+	m_dualscreen_left_tempbitmap = std::make_unique<bitmap_rgb32>( width, height);
+	m_dualscreen_right_tempbitmap = std::make_unique<bitmap_rgb32>( width, height);
 
 	common_init();
 
@@ -1251,8 +1251,8 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type4_sd2)
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
-	m_dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
+	m_dualscreen_left_tempbitmap = std::make_unique<bitmap_rgb32>( width, height);
+	m_dualscreen_right_tempbitmap = std::make_unique<bitmap_rgb32>( width, height);
 
 	common_init();
 
@@ -1295,8 +1295,8 @@ VIDEO_START_MEMBER(konamigx_state, opengolf)
 	m_gx_rozenable = 0;
 	m_gx_specialrozenable = 1;
 
-	m_gxtype1_roz_dstbitmap =  auto_bitmap_ind16_alloc(machine(),512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
-	m_gxtype1_roz_dstbitmap2 = auto_bitmap_ind16_alloc(machine(),512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
+	m_gxtype1_roz_dstbitmap =  std::make_unique<bitmap_ind16>(512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
+	m_gxtype1_roz_dstbitmap2 = std::make_unique<bitmap_ind16>(512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
 
 
 	m_gxtype1_roz_dstbitmapclip.set(0, 512-1, 0, 512-1);
@@ -1330,8 +1330,8 @@ VIDEO_START_MEMBER(konamigx_state, racinfrc)
 	m_gx_rozenable = 0;
 	m_gx_specialrozenable = 1;
 
-	m_gxtype1_roz_dstbitmap =  auto_bitmap_ind16_alloc(machine(),512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
-	m_gxtype1_roz_dstbitmap2 = auto_bitmap_ind16_alloc(machine(),512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
+	m_gxtype1_roz_dstbitmap =  std::make_unique<bitmap_ind16>(512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
+	m_gxtype1_roz_dstbitmap2 = std::make_unique<bitmap_ind16>(512,512); // BITMAP_FORMAT_IND16 because we NEED the raw pen data for post-processing
 
 
 	m_gxtype1_roz_dstbitmapclip.set(0, 512-1, 0, 512-1);
@@ -1424,7 +1424,7 @@ UINT32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb3
 		else K053936_0_zoom_draw(screen, *m_type3_roz_temp_bitmap, temprect,m_gx_psac_tilemap, 0,0,0); // soccerss playfield
 
 
-		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, 0, m_type3_roz_temp_bitmap, m_gx_rushingheroes_hack);
+		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, 0, m_type3_roz_temp_bitmap.get(), m_gx_rushingheroes_hack);
 	}
 	else
 	{

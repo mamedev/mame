@@ -206,7 +206,7 @@ VIDEO_START_MEMBER(legionna_state,legionna)
 	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_text_layer =       &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
 
-	m_scrollram16 = auto_alloc_array(machine(), UINT16, 0x60/2);
+	m_scrollram16 = std::make_unique<UINT16[]>(0x60/2);
 	m_sprite_xoffs = 0;
 	m_sprite_yoffs = 0;
 
@@ -231,7 +231,7 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_denji),this), TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_text_layer =       &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
 
-	m_scrollram16 = auto_alloc_array(machine(), UINT16, 0x60/2);
+	m_scrollram16 = std::make_unique<UINT16[]>(0x60/2);
 	m_sprite_xoffs = 0;
 	m_sprite_yoffs = 0;
 
@@ -256,7 +256,7 @@ VIDEO_START_MEMBER(legionna_state,cupsoc)
 	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_cupsoc),this), TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_text_layer =       &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
 
-	m_scrollram16 = auto_alloc_array(machine(), UINT16, 0x60/2);
+	m_scrollram16 = std::make_unique<UINT16[]>(0x60/2);
 	m_sprite_xoffs = 0;
 	m_sprite_yoffs = 0;
 

@@ -39,7 +39,7 @@ public:
 			m_screen(*this, "screen"),
 			m_generic_paletteram_16(*this, "paletteram") { }
 
-	UINT8 *m_depth_buffer;
+	std::unique_ptr<UINT8[]> m_depth_buffer;
 	int m_video_field;
 	UINT8 m_io_latch;
 	UINT8 m_reset_latch;
@@ -96,7 +96,7 @@ public:
 void cubeqst_state::video_start()
 {
 	m_video_field = 0;
-	m_depth_buffer = auto_alloc_array(machine(), UINT8, 512);
+	m_depth_buffer = std::make_unique<UINT8[]>(512);
 }
 
 WRITE16_MEMBER(cubeqst_state::palette_w)
@@ -130,7 +130,7 @@ UINT32 cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb32 
 		UINT32 pen;
 
 		/* Zap the depth buffer */
-		memset(m_depth_buffer, 0xff, 512);
+		memset(m_depth_buffer.get(), 0xff, 512);
 
 		/* Process all the spans on this scanline */
 		if (y < 256)

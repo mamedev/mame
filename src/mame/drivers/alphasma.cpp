@@ -62,7 +62,7 @@ protected:
 	UINT8           m_matrix[2];
 	UINT8           m_port_a;
 	UINT8           m_port_d;
-	bitmap_ind16 *  m_tmp_bitmap;
+	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 };
 
 class asma2k_state : public alphasmart_state
@@ -404,7 +404,7 @@ void alphasmart_state::machine_start()
 	m_rambank->configure_entries(0, 4, ram, 0x8000);
 	m_nvram->set_base(ram, 0x8000*4);
 
-	m_tmp_bitmap = auto_bitmap_ind16_alloc(machine(), 6*40, 9*4);
+	m_tmp_bitmap = std::make_unique<bitmap_ind16>(6 * 40, 9 * 4);
 }
 
 void alphasmart_state::machine_reset()

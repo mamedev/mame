@@ -39,10 +39,10 @@ public:
 	int m_gfxdraw_mode;
 	bitmap_ind16 m_tmpbitmap0;
 	bitmap_ind16 m_tmpbitmap1;
-	UINT8 *m_videoram0;
-	UINT8 *m_videoram1;
-	UINT8 *m_palette_ptr;
-	UINT8 *m_clut;
+	std::unique_ptr<UINT8[]> m_videoram0;
+	std::unique_ptr<UINT8[]> m_videoram1;
+	std::unique_ptr<UINT8[]> m_palette_ptr;
+	std::unique_ptr<UINT8[]> m_clut;
 	int m_param_old[0x10];
 	int m_param_cnt;
 	int m_flipscreen_old;

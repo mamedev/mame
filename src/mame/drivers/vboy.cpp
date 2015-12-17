@@ -183,7 +183,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rfb0_w);
 	DECLARE_WRITE8_MEMBER(rfb1_w);
 	UINT16 *m_font;
-	UINT16 *m_bgmap;
+	std::unique_ptr<UINT16[]> m_bgmap;
 	UINT8 *m_l_frame_0;
 	UINT8 *m_l_frame_1;
 	UINT8 *m_r_frame_0;
@@ -235,8 +235,8 @@ void vboy_state::video_start()
 	m_r_frame_1 = auto_alloc_array_clear(machine(), UINT8, 0x6000);
 
 	m_font  = auto_alloc_array_clear(machine(), UINT16, (0x8000 >> 1)*4 * 2);
-	m_bgmap = auto_alloc_array(machine(), UINT16, 0x20000 >> 1);
-	memset(m_bgmap, 0, sizeof(UINT16) * (0x20000 >> 1));
+	m_bgmap = std::make_unique<UINT16[]>(0x20000 >> 1);
+	memset(m_bgmap.get(), 0, sizeof(UINT16) * (0x20000 >> 1));
 }
 
 void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, UINT16 code, UINT8 pal)

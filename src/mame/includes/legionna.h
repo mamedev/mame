@@ -32,7 +32,7 @@ public:
 	UINT16* m_fore_data;
 	UINT16* m_mid_data;
 	UINT16* m_textram;
-	UINT16 *m_scrollram16;
+	std::unique_ptr<UINT16[]> m_scrollram16;
 	UINT16 m_layer_disable;
 	int m_sprite_xoffs;
 	int m_sprite_yoffs;

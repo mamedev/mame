@@ -43,8 +43,8 @@ public:
 	model3_renderer(model3_state &state, int width, int height)
 		: poly_manager<float, model3_polydata, 6, 50000>(state.machine())
 	{
-		m_fb = auto_bitmap_rgb32_alloc(state.machine(), width, height);
-		m_zb = auto_bitmap_ind32_alloc(state.machine(), width, height);
+		m_fb = std::make_unique<bitmap_rgb32>(width, height);
+		m_zb = std::make_unique<bitmap_ind32>(width, height);
 	}
 
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -62,8 +62,8 @@ public:
 	void wait_for_polys();
 
 private:
-	bitmap_rgb32 *m_fb;
-	bitmap_ind32 *m_zb;
+	std::unique_ptr<bitmap_rgb32> m_fb;
+	std::unique_ptr<bitmap_ind32> m_zb;
 };
 
 
@@ -185,8 +185,8 @@ void model3_state::video_start()
 	m_texture_fifo = auto_alloc_array_clear(machine(), UINT32, 0x100000/4);
 
 	/* 2x 4MB texture sheets */
-	m_texture_ram[0] = auto_alloc_array(machine(), UINT16, 0x400000/2);
-	m_texture_ram[1] = auto_alloc_array(machine(), UINT16, 0x400000/2);
+	m_texture_ram[0] = std::make_unique<UINT16[]>(0x400000/2);
+	m_texture_ram[1] = std::make_unique<UINT16[]>(0x400000/2);
 
 	/* 1MB Display List RAM */
 	m_display_list_ram = auto_alloc_array_clear(machine(), UINT32, 0x100000/4);

@@ -297,7 +297,7 @@ void mos7360_device::device_start()
 
 	// buffer for fastest played sample for 5 second so we have enough data for min 5 second
 	m_noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;
-	m_noise = auto_alloc_array(machine(), UINT8, m_noisesize);
+	m_noise = std::make_unique<UINT8[]>(m_noisesize);
 
 	{
 		int noiseshift = 0x7ffff8;

@@ -126,7 +126,7 @@ private:
 	attotime m_last_vsync_time;
 	attotime m_refresh;
 	attotime  m_clock_period;
-	bitmap_rgb32 *m_bitmap[2];
+	std::unique_ptr<bitmap_rgb32> m_bitmap[2];
 	int m_cur_bm;
 
 	/* adjustable by drivers */

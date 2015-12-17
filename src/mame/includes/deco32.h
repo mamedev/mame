@@ -83,9 +83,9 @@ public:
 	int m_byteAddr; // tattass
 	int m_ace_ram_dirty; // nslasher and tattass
 	int m_has_ace_ram; // all - config
-	UINT8 *m_dirty_palette; // all but captaven
+	std::unique_ptr<UINT8[]> m_dirty_palette; // all but captaven
 	int m_pri; // captaven, fghthist, nslasher and tattass
-	bitmap_ind16 *m_tilemap_alpha_bitmap; // nslasher
+	std::unique_ptr<bitmap_ind16> m_tilemap_alpha_bitmap; // nslasher
 	UINT16 m_spriteram16[0x1000]; // captaven, fghthist, nslasher and tattass
 	UINT16 m_spriteram16_buffered[0x1000]; // captaven, fghthist, nslasher and tattass
 	UINT16 m_spriteram16_2[0x1000]; //nslasher and tattass

@@ -93,7 +93,7 @@ public:
 	DECLARE_WRITE32_MEMBER(a0000000_w);
 	DECLARE_READ32_MEMBER(b0000000_r);
 
-	UINT8 *m_texture;
+	std::unique_ptr<UINT8[]> m_texture;
 
 	void draw_line(bitmap_rgb32 &bitmap, const rectangle &visarea, int v1x, int v1y, int v2x, int v2y);
 
@@ -178,7 +178,7 @@ void rollext_state::draw_line(bitmap_rgb32 &bitmap, const rectangle &visarea, in
 
 void rollext_state::video_start()
 {
-	m_texture = auto_alloc_array(machine(), UINT8, 0x2000000);
+	m_texture = std::make_unique<UINT8[]>(0x2000000);
 
 	preprocess_texture_data();
 }

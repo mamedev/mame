@@ -49,9 +49,9 @@ public:
 	optional_ioport m_fake_comms;
 
 	memory_region *m_cart_reg[4];
-	UINT8     *m_backupram;
-	UINT32    *m_scu_regs;
-	UINT16    *m_scsp_regs;
+	std::unique_ptr<UINT8[]>     m_backupram;
+	std::unique_ptr<UINT32[]>    m_scu_regs;
+	std::unique_ptr<UINT16[]>    m_scsp_regs;
 	UINT16    *m_vdp2_regs;
 	UINT32    *m_vdp2_vram;
 	UINT32    *m_vdp2_cram;
@@ -96,9 +96,9 @@ public:
 		int       framebuffer_clear_on_next_frame;
 		rectangle system_cliprect;
 		rectangle user_cliprect;
-		UINT16    *framebuffer[2];
+		std::unique_ptr<UINT16[]>   framebuffer[2];
 		UINT16    **framebuffer_draw_lines;
-		UINT8     *gfx_decode;
+		std::unique_ptr<UINT8[]>     gfx_decode;
 		UINT16    lopr;
 		UINT16    copr;
 		UINT16    ewdr;
@@ -108,7 +108,7 @@ public:
 	}m_vdp1;
 
 	struct {
-		UINT8     *gfx_decode;
+		std::unique_ptr<UINT8[]>      gfx_decode;
 		bitmap_rgb32 roz_bitmap[2];
 		UINT8     dotsel;
 		UINT8     pal;

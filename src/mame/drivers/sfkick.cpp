@@ -87,7 +87,7 @@ public:
 		m_dsw2(*this, "DSW2")
 	{ }
 
-	UINT8 *m_main_mem;
+	std::unique_ptr<UINT8[]> m_main_mem;
 	int m_bank_cfg;
 	int m_bank[8];
 	int m_input_mux;
@@ -261,8 +261,8 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 3: /* RAM */
 		{
-			m_bank7->set_base(m_main_mem);
-			m_bank8->set_base(m_main_mem+0x2000);
+			m_bank7->set_base(m_main_mem.get());
+			m_bank8->set_base(m_main_mem.get()+0x2000);
 		}
 		break;
 	}
@@ -513,7 +513,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(sfkick_state,sfkick)
 {
-	m_main_mem=auto_alloc_array(machine(), UINT8, 0x4000);
+	m_main_mem=std::make_unique<UINT8[]>(0x4000);
 }
 
 

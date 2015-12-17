@@ -185,7 +185,7 @@ protected:
 	double m_rastertime;
 
 	/* sound part */
-	UINT8 *m_noise;
+	std::unique_ptr<UINT8[]> m_noise;
 	int m_tone1pos, m_tone2pos,
 	m_tone1samples, m_tone2samples,
 	m_noisesize,          /* number of samples */

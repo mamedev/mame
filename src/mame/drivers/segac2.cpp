@@ -1385,7 +1385,7 @@ UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb3
 		UINT32* desty = &bitmap.pix32(y, 0);
 		UINT16* srcy;
 
-		srcy = m_vdp->m_render_line_raw;
+		srcy = m_vdp->m_render_line_raw.get();
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{

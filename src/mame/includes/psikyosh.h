@@ -49,7 +49,7 @@ public:
 	bitmap_ind8 m_zoom_bitmap;
 	bitmap_ind16 m_z_bitmap;
 	bitmap_rgb32   m_bg_bitmap;
-	UINT16         *m_bg_zoom;
+	std::unique_ptr<UINT16[]>   m_bg_zoom;
 	UINT8          m_alphatable[256];
 
 	/* devices */

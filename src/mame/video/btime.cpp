@@ -128,7 +128,7 @@ VIDEO_START_MEMBER(btime_state,bnj)
 	/* the background area is twice as wide as the screen */
 	int width = 256;
 	int height = 256;
-	m_background_bitmap = auto_bitmap_ind16_alloc(machine(), 2 * width, height);
+	m_background_bitmap = std::make_unique<bitmap_ind16>(2 * width, height);
 
 	save_item(NAME(*m_background_bitmap));
 }

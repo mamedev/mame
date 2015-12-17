@@ -30,8 +30,8 @@ public:
 	int        m_layerpri[3];
 
 	/* for xmen6p */
-	bitmap_ind16   *m_screen_right;
-	bitmap_ind16   *m_screen_left;
+	std::unique_ptr<bitmap_ind16> m_screen_right;
+	std::unique_ptr<bitmap_ind16> m_screen_left;
 	optional_shared_ptr<UINT16> m_xmen6p_spriteramleft;
 	optional_shared_ptr<UINT16> m_xmen6p_spriteramright;
 	optional_shared_ptr<UINT16> m_xmen6p_tilemapleft;

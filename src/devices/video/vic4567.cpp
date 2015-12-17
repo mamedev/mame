@@ -172,7 +172,7 @@ void vic3_device::device_start()
 	width = m_screen->width();
 	height = m_screen->height();
 
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
+	m_bitmap = std::make_unique<bitmap_ind16>(width, height);
 
 	m_dma_read_cb.resolve_safe(0);
 	m_dma_read_color_cb.resolve_safe(0);

@@ -129,7 +129,7 @@ public:
 	int m_mcu_analog_ctrl;
 	int m_mcu_analog_data;
 	int m_mcu_analog_complete;
-	UINT8 *m_eeprom;
+	std::unique_ptr<UINT8[]> m_eeprom;
 	UINT16  m_68k_master_C148[0x20];
 	UINT16  m_68k_slave_C148[0x20];
 	UINT16  m_68k_gpu_C148[0x20];

@@ -188,7 +188,7 @@ public:
 
 	required_device<cpu_device> m_cpu;
 
-	bitmap_ind16                *m_bitmap;          /* target bitmap */
+	std::unique_ptr<bitmap_ind16>                m_bitmap;          /* target bitmap */
 	UINT8                       *m_spriteram;           /* sprite ram */
 	pen_t                       *m_colortable;          /* color table modified at run time */
 	pen_t                       *m_colortable_mono;     /* monochromatic color table modified at run time */

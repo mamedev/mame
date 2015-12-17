@@ -369,7 +369,7 @@ public:
 	int m_rtc_data_strobe;
 	UINT8 *m_shapeRomPtr;
 	UINT8 m_shapeRom[0xc000];
-	UINT8 *m_nvram;
+	std::unique_ptr<UINT8[]> m_nvram;
 	UINT8 m_psg_data;
 	int m_ay8910_1;
 	int m_ay8910_2;
@@ -1661,12 +1661,12 @@ DRIVER_INIT_MEMBER(aristmk4_state,aristmk4)
 {
 	m_shapeRomPtr = (UINT8 *)memregion("tile_gfx")->base();
 	memcpy(m_shapeRom,m_shapeRomPtr,sizeof(m_shapeRom)); // back up
-	m_nvram = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_nvram = std::make_unique<UINT8[]>(0x1000);
 }
 
 void aristmk4_state::machine_start()
 {
-	save_pointer(NAME(m_nvram), 0x1000); // m_nvram
+	save_pointer(NAME(m_nvram.get()), 0x1000); // m_nvram
 }
 
 void aristmk4_state::machine_reset()

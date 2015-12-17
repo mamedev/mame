@@ -3625,7 +3625,7 @@ void powervr2_device::device_start()
 	endofrender_timer_tsp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_tsp),this));
 	endofrender_timer_video = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_video),this));
 
-	fake_accumulationbuffer_bitmap = auto_bitmap_rgb32_alloc(machine(),2048,2048);
+	fake_accumulationbuffer_bitmap = std::make_unique<bitmap_rgb32>(2048,2048);
 
 	softreset = 0;
 	param_base = 0;

@@ -33,8 +33,8 @@ public:
 	UINT8 m_harem_decrypt_bit;
 	UINT8 m_harem_decrypt_clk;
 	UINT8 m_harem_decrypt_count;
-	UINT8 *m_harem_decrypted_data;
-	UINT8 *m_harem_decrypted_opcodes;
+	std::unique_ptr<UINT8[]> m_harem_decrypted_data;
+	std::unique_ptr<UINT8[]> m_harem_decrypted_opcodes;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_custom_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ckongs_coinage_r);

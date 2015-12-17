@@ -73,13 +73,6 @@ const int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is e
 #define auto_alloc_array_clear(m, t, c) pool_alloc_array_clear(static_cast<running_machine &>(m).respool(), t, c)
 #define auto_free(m, v)                 pool_free(static_cast<running_machine &>(m).respool(), v)
 
-#define auto_bitmap_ind8_alloc(m, w, h) auto_alloc(m, bitmap_ind8(w, h))
-#define auto_bitmap_ind16_alloc(m, w, h)    auto_alloc(m, bitmap_ind16(w, h))
-#define auto_bitmap_ind32_alloc(m, w, h)    auto_alloc(m, bitmap_ind32(w, h))
-#define auto_bitmap_rgb32_alloc(m, w, h)    auto_alloc(m, bitmap_rgb32(w, h))
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************

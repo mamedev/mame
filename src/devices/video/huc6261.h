@@ -70,7 +70,7 @@ private:
 	UINT8   m_pixel_clock;
 
 	emu_timer   *m_timer;
-	bitmap_rgb32    *m_bmp;
+	std::unique_ptr<bitmap_rgb32>  m_bmp;
 	INT32   m_uv_lookup[65536][3];
 };
 

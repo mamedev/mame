@@ -31,8 +31,8 @@ public:
 	optional_shared_ptr<UINT8> m_mcu_ram;
 
 	/* video-related */
-	bitmap_ind16    *m_tmp_bitmap1;
-	bitmap_ind16    *m_tmp_bitmap2;
+	std::unique_ptr<bitmap_ind16>    m_tmp_bitmap1;
+	std::unique_ptr<bitmap_ind16>    m_tmp_bitmap2;
 	tilemap_t     *m_bg_tilemap;
 	UINT8       m_flipscreen;
 	UINT8       m_pix_redraw;

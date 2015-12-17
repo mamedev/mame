@@ -23,7 +23,7 @@ static const UINT8* waveform70;
 	static UINT8 noiseTableLSB[1<<8];
 #endif
 
-static INT8* ampMod1x8;
+static std::unique_ptr<INT8[]> ampMod1x8;
 
 static const UINT32 noiseSeed = 0x7ffff8;
 
@@ -35,7 +35,7 @@ void sidInitMixerEngine(running_machine &machine)
 	/* 8-bit volume modulation tables. */
 	float filterAmpl = 0.7f;
 
-	ampMod1x8=auto_alloc_array(machine, INT8, 256*256);
+	ampMod1x8=std::make_unique<INT8[]>(256*256);
 
 	uk = 0;
 	for ( si = 0; si < 256; si++ )

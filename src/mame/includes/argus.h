@@ -46,7 +46,7 @@ public:
 	UINT16 m_palette_intensity;
 
 	// argus specific
-	UINT8 *m_dummy_bg0ram;
+	std::unique_ptr<UINT8[]> m_dummy_bg0ram;
 	int m_lowbitscroll;
 	int m_prvscrollx;
 
@@ -55,7 +55,7 @@ public:
 	UINT8 *m_butasan_bg0ram;
 	UINT8 *m_butasan_bg0backram;
 	UINT8 *m_butasan_txbackram;
-	UINT8 *m_butasan_pagedram[2];
+	std::unique_ptr<UINT8[]> m_butasan_pagedram[2];
 	UINT8 m_butasan_page_latch;
 	UINT8 m_butasan_bg1_status;
 	UINT8 m_butasan_unknown;

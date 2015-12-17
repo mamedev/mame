@@ -41,10 +41,10 @@ public:
 	int m_screen_width;
 	bitmap_ind16 m_tmpbitmap0;
 	bitmap_ind16 m_tmpbitmap1;
-	UINT8 *m_videoram0;
-	UINT8 *m_videoram1;
-	UINT8 *m_palette_ptr;
-	UINT8 *m_clut;
+	std::unique_ptr<UINT8[]> m_videoram0;
+	std::unique_ptr<UINT8[]> m_videoram1;
+	std::unique_ptr<UINT8[]> m_palette_ptr;
+	std::unique_ptr<UINT8[]> m_clut;
 	int m_flipscreen_old;
 	emu_timer *m_blitter_timer;
 

@@ -544,12 +544,12 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	int op;
 	INT32 *mixp;
 
-	memset(m_mix_buffer, 0, sizeof(m_mix_buffer[0])*samples*2);
+	memset(m_mix_buffer.get(), 0, sizeof(m_mix_buffer[0])*samples*2);
 
 	for (j = 0; j < 12; j++)
 	{
 		YMF271Group *slot_group = &m_groups[j];
-		mixp = m_mix_buffer;
+		mixp = m_mix_buffer.get();
 
 		if (slot_group->pfm && slot_group->sync != 3)
 		{
@@ -567,7 +567,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				int slot2 = j + (1*12);
 				int slot3 = j + (2*12);
 				int slot4 = j + (3*12);
-				mixp = m_mix_buffer;
+				mixp = m_mix_buffer.get();
 
 				if (m_slots[slot1].active)
 				{
@@ -794,7 +794,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					int slot1 = j + ((op + 0) * 12);
 					int slot3 = j + ((op + 2) * 12);
 
-					mixp = m_mix_buffer;
+					mixp = m_mix_buffer.get();
 					if (m_slots[slot1].active)
 					{
 						for (i = 0; i < samples; i++)
@@ -856,7 +856,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				int slot1 = j + (0*12);
 				int slot2 = j + (1*12);
 				int slot3 = j + (2*12);
-				mixp = m_mix_buffer;
+				mixp = m_mix_buffer.get();
 
 				if (m_slots[slot1].active)
 				{
@@ -959,7 +959,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					}
 				}
 
-				mixp = m_mix_buffer;
+				mixp = m_mix_buffer.get();
 				update_pcm(j + (3*12), mixp, samples);
 				break;
 			}
@@ -976,7 +976,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		}
 	}
 
-	mixp = m_mix_buffer;
+	mixp = m_mix_buffer.get();
 	for (i = 0; i < samples; i++)
 	{
 		outputs[0][i] = (*mixp++)>>2;
@@ -1505,13 +1505,13 @@ void ymf271_device::init_tables()
 	int i, j;
 
 	for (i = 0; i < 8; i++)
-		m_lut_waves[i] = auto_alloc_array(machine(), INT16, SIN_LEN);
+		m_lut_waves[i] = std::make_unique<INT16[]>(SIN_LEN);
 
 	for (i = 0; i < 4*8; i++)
 		m_lut_plfo[i>>3][i&7] = auto_alloc_array(machine(), double, LFO_LENGTH);
 
 	for (i = 0; i < 4; i++)
-		m_lut_alfo[i] = auto_alloc_array(machine(), int, LFO_LENGTH);
+		m_lut_alfo[i] = std::make_unique<int[]>(LFO_LENGTH);
 
 	for (i = 0; i < SIN_LEN; i++)
 	{
@@ -1717,7 +1717,7 @@ void ymf271_device::device_start()
 	init_state();
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock()/384);
-	m_mix_buffer = auto_alloc_array(machine(), INT32, 44100*2);
+	m_mix_buffer = std::make_unique<INT32[]>(44100*2);
 }
 
 //-------------------------------------------------

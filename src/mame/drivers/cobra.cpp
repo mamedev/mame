@@ -358,15 +358,15 @@ public:
 	cobra_renderer(screen_device &screen)
 		: poly_manager<float, cobra_polydata, 8, 10000>(screen)
 	{
-		m_texture_ram = auto_alloc_array(machine(), UINT32, 0x100000);
+		m_texture_ram = std::make_unique<UINT32[]>(0x100000);
 
-		m_framebuffer = auto_bitmap_rgb32_alloc(machine(), 1024, 1024);
-		m_backbuffer = auto_bitmap_rgb32_alloc(machine(), 1024, 1024);
-		m_overlay = auto_bitmap_rgb32_alloc(machine(), 1024, 1024);
-		m_zbuffer = auto_bitmap_ind32_alloc(machine(), 1024, 1024);
-		m_stencil = auto_bitmap_ind32_alloc(machine(), 1024, 1024);
+		m_framebuffer = std::make_unique<bitmap_rgb32>( 1024, 1024);
+		m_backbuffer = std::make_unique<bitmap_rgb32>( 1024, 1024);
+		m_overlay = std::make_unique<bitmap_rgb32>( 1024, 1024);
+		m_zbuffer = std::make_unique<bitmap_ind32>(1024, 1024);
+		m_stencil = std::make_unique<bitmap_ind32>(1024, 1024);
 
-		m_gfx_regmask = auto_alloc_array(machine(), UINT32, 0x100);
+		m_gfx_regmask = std::make_unique<UINT32[]>(0x100);
 		for (int i=0; i < 0x100; i++)
 		{
 			UINT32 mask = 0;
@@ -400,19 +400,19 @@ public:
 	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
 	inline rgb_t texture_fetch(UINT32 *texture, int u, int v, int width, int format);
 private:
-	bitmap_rgb32 *m_framebuffer;
-	bitmap_rgb32 *m_backbuffer;
-	bitmap_rgb32 *m_overlay;
-	bitmap_ind32 *m_zbuffer;
-	bitmap_ind32 *m_stencil;
+	std::unique_ptr<bitmap_rgb32> m_framebuffer;
+	std::unique_ptr<bitmap_rgb32> m_backbuffer;
+	std::unique_ptr<bitmap_rgb32> m_overlay;
+	std::unique_ptr<bitmap_ind32> m_zbuffer;
+	std::unique_ptr<bitmap_ind32> m_stencil;
 
-	UINT32 *m_texture_ram;
+	std::unique_ptr<UINT32[]> m_texture_ram;
 
-	UINT32 *m_gfx_gram;
-	UINT32 *m_gfx_regmask;
+	std::unique_ptr<UINT32[]> m_gfx_gram;
+	std::unique_ptr<UINT32[]> m_gfx_regmask;
 
 	UINT32 m_gfx_register_select;
-	UINT64 *m_gfx_register;
+	std::unique_ptr<UINT64[]> m_gfx_register;
 
 	UINT32 m_texram_ptr;
 
@@ -451,7 +451,7 @@ public:
 
 	cobra_fifo(running_machine &machine, int capacity, const char *name, bool verbose, event_delegate event_callback)
 	{
-		m_data = auto_alloc_array(machine, UINT64, capacity);
+		m_data = std::make_unique<UINT64[]>(capacity);
 
 		m_name = name;
 		m_size = capacity;
@@ -481,7 +481,7 @@ private:
 	int m_num;
 	bool m_verbose;
 	const char *m_name;
-	UINT64 *m_data;
+	std::unique_ptr<UINT64[]> m_data;
 	event_delegate m_event_callback;
 };
 
@@ -708,7 +708,7 @@ public:
 	UINT8 m_main_int_active;
 
 
-	UINT32 *m_comram[2];
+	std::unique_ptr<UINT32[]> m_comram[2];
 	int m_comram_page;
 
 	int m_main_debug_state;
@@ -737,8 +737,8 @@ public:
 
 	bool m_has_psac;
 
-	INT16 *m_sound_dma_buffer_l;
-	INT16 *m_sound_dma_buffer_r;
+	std::unique_ptr<INT16[]> m_sound_dma_buffer_l;
+	std::unique_ptr<INT16[]> m_sound_dma_buffer_r;
 	UINT32 m_sound_dma_ptr;
 
 	dmadac_sound_device *m_dmadac[2];
@@ -1895,7 +1895,7 @@ WRITE32_MEMBER(cobra_state::sub_comram_w)
 {
 	int page = m_comram_page ^ 1;
 
-	COMBINE_DATA(m_comram[page] + offset);
+	COMBINE_DATA(m_comram[page].get() + offset);
 }
 
 WRITE32_MEMBER(cobra_state::sub_psac_palette_w)
@@ -1946,8 +1946,8 @@ WRITE32_MEMBER(cobra_state::sub_sound_dma_w)
 	{
 		m_sound_dma_ptr = 0;
 
-		dmadac_transfer(&m_dmadac[0], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_l);
-		dmadac_transfer(&m_dmadac[1], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_r);
+		dmadac_transfer(&m_dmadac[0], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_l.get());
+		dmadac_transfer(&m_dmadac[1], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_r.get());
 	}
 }
 
@@ -2052,9 +2052,9 @@ void cobra_renderer::gfx_init()
 {
 	const rectangle& visarea = screen().visible_area();
 
-	m_gfx_gram = auto_alloc_array(machine(), UINT32, 0x40000);
+	m_gfx_gram = std::make_unique<UINT32[]>(0x40000);
 
-	m_gfx_register = auto_alloc_array(machine(), UINT64, 0x3000);
+	m_gfx_register = std::make_unique<UINT64[]>(0x3000);
 	m_gfx_register_select = 0;
 
 	float zvalue = 10000000.0f;
@@ -3298,13 +3298,13 @@ DRIVER_INIT_MEMBER(cobra_state, cobra)
 	m_subcpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(cobra_state::sub_jvs_w), this));
 
 
-	m_comram[0] = auto_alloc_array(machine(), UINT32, 0x40000/4);
-	m_comram[1] = auto_alloc_array(machine(), UINT32, 0x40000/4);
+	m_comram[0] = std::make_unique<UINT32[]>(0x40000/4);
+	m_comram[1] = std::make_unique<UINT32[]>(0x40000/4);
 
 	m_comram_page = 0;
 
-	m_sound_dma_buffer_l = auto_alloc_array(machine(), INT16, DMA_SOUND_BUFFER_SIZE);
-	m_sound_dma_buffer_r = auto_alloc_array(machine(), INT16, DMA_SOUND_BUFFER_SIZE);
+	m_sound_dma_buffer_l = std::make_unique<INT16[]>(DMA_SOUND_BUFFER_SIZE);
+	m_sound_dma_buffer_r = std::make_unique<INT16[]>(DMA_SOUND_BUFFER_SIZE);
 
 	// setup fake pagetable until we figure out what really maps there...
 	//m_gfx_pagetable[0x80 / 8] = U64(0x800001001e0001a8);

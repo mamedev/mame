@@ -73,7 +73,7 @@ protected:
 private:
 	devcb_write8 output_cb;
 
-	UINT16 *ram;
+	std::unique_ptr<UINT16[]> ram;
 	UINT32 ram_adr;
 	UINT8 output_data[8];
 
