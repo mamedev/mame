@@ -244,10 +244,8 @@ void segas32_state::common_start(int multi32)
 	}
 
 	/* allocate pre-rendered solid lines of 0's and ffff's */
-	m_solid_0000 = std::make_unique<UINT16[]>(512);
-	memset(m_solid_0000.get(), 0x00, sizeof(m_solid_0000[0]) * 512);
-	m_solid_ffff = std::make_unique<UINT16[]>(512);
-	memset(m_solid_ffff.get(), 0xff, sizeof(m_solid_ffff[0]) * 512);
+	m_solid_0000 = make_unique_clear<UINT16[]>(512);
+	m_solid_ffff = make_unique_clear<UINT16[]>(512);
 
 	memset(m_system32_videoram, 0x00, 0x20000);
 
