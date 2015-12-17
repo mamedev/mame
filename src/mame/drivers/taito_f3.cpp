@@ -1011,7 +1011,39 @@ ROM_START( hthero93 )
 	ROM_LOAD32_BYTE("d49-13.20", 0x000000, 0x20000, CRC(ccee5e73) SHA1(5273e3b9bc6fc4fa0c63d9c62aa6b638e9780c24) )
 	ROM_LOAD32_BYTE("d49-14.19", 0x000001, 0x20000, CRC(2323bf2e) SHA1(e43f9eac6887e39d5c0f39264aa914a5d5f84cca) )
 	ROM_LOAD32_BYTE("d49-16.18", 0x000002, 0x20000, CRC(8e73f739) SHA1(620a4d52abc00908cd1393babdc600b929019a51) )
-	ROM_LOAD32_BYTE("d49-19.17",  0x000003, 0x20000, CRC(f0925800) SHA1(e8d91b216a0409080b77cc1e832b7d15c66a5eef) )
+	ROM_LOAD32_BYTE("d49-19.17", 0x000003, 0x20000, CRC(f0925800) SHA1(e8d91b216a0409080b77cc1e832b7d15c66a5eef) ) /* Need to verify chip ID#: D49-19 is US and follows correct numbering scheme, should be D49-15 */
+
+	ROM_REGION(0xc00000, "gfx1" , 0) /* Sprites */
+	ROM_LOAD16_BYTE("d49-01.12", 0x000000, 0x200000, CRC(1dc89f1c) SHA1(9597b1d8c9b447080ca9401aee83bb4a64bb8332) )
+	ROM_LOAD16_BYTE("d49-02.8",  0x000001, 0x200000, CRC(1e4c374f) SHA1(512edc6a934578d0e7371410a041150d3b13aaad) )
+	ROM_LOAD16_BYTE("d49-06.11", 0x400000, 0x100000, CRC(71ef4ee1) SHA1(1d7729dbc77f7201ff574e8aef65a55bd81c25a7) )
+	ROM_LOAD16_BYTE("d49-07.7",  0x400001, 0x100000, CRC(e5655b8f) SHA1(2c21745370bfe9dbf0e95f7ce42ed34a162bff64) )
+	ROM_LOAD       ("d49-03.4",  0x900000, 0x200000, CRC(cf9a8727) SHA1(f21787fdcdd8be2009c2d481a9b2d7fc03ce782e) )
+	ROM_LOAD       ("d49-08.3",  0xb00000, 0x100000, CRC(7d3c6536) SHA1(289b4bf79ebd9cbdf64ab956784d226e6d546654) )
+	ROM_FILL       (             0x600000, 0x300000, 0x00 )
+
+	ROM_REGION(0x200000, "gfx2" , 0) /* Tiles */
+	ROM_LOAD16_BYTE("d49-09.47", 0x000000, 0x080000, CRC(257ede01) SHA1(c36397d95706c5e68a7738c84829a51c5e8f5ef7) )
+	ROM_LOAD16_BYTE("d49-10.45", 0x000001, 0x080000, CRC(f587b787) SHA1(22db4904c134756ddd0f753f197419d27e60a827) )
+	ROM_LOAD       ("d49-11.43", 0x180000, 0x080000, CRC(11318b26) SHA1(a7153f9f406d52189f59cbe58d65f88f4e2e6fcc) )
+	ROM_FILL       (             0x100000, 0x080000, 0x00 )
+
+	ROM_REGION(0x140000, "audiocpu", 0) /* 68000 sound CPU */
+	ROM_LOAD16_BYTE("d49-17.32", 0x100000, 0x20000, CRC(f2058eba) SHA1(7faaa94fadf02b6304287b61fb9613f9f4169fef) )
+	ROM_LOAD16_BYTE("d49-18.33", 0x100001, 0x20000, CRC(a0fdd270) SHA1(9b5a2c8d35ea3bc6842e3c328447c3bf641b9237) )
+
+	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 ) // V1: 2 banks
+	ROM_LOAD16_BYTE("d49-04.38", 0x000000, 0x200000, CRC(44b365a9) SHA1(14c4a6b193a0069360406c74c500ba24f2a55b62) ) // C8 C9 CA CB
+	// half empty
+	ROM_LOAD16_BYTE("d49-05.41", 0x600000, 0x100000, CRC(ed894fe1) SHA1(5bf2fb6abdcf25bc525a2c3b29dbf7aca0b18fea) ) // -std-
+ROM_END
+
+ROM_START( hthero93u )
+	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
+	ROM_LOAD32_BYTE("d49-13.24", 0x000000, 0x20000, CRC(ccee5e73) SHA1(5273e3b9bc6fc4fa0c63d9c62aa6b638e9780c24) ) /* Dumped from the single board PCB, not a stardard F3 cart */
+	ROM_LOAD32_BYTE("d49-14.26", 0x000001, 0x20000, CRC(2323bf2e) SHA1(e43f9eac6887e39d5c0f39264aa914a5d5f84cca) )
+	ROM_LOAD32_BYTE("d49-16.37", 0x000002, 0x20000, CRC(8e73f739) SHA1(620a4d52abc00908cd1393babdc600b929019a51) )
+	ROM_LOAD32_BYTE("d49-19.35", 0x000003, 0x20000, CRC(699b09ba) SHA1(b8bf24571cdc0c4b295e0f3d2fdaa1e28ff111e3) )
 
 	ROM_REGION(0xc00000, "gfx1" , 0) /* Sprites */
 	ROM_LOAD16_BYTE("d49-01.12", 0x000000, 0x200000, CRC(1dc89f1c) SHA1(9597b1d8c9b447080ca9401aee83bb4a64bb8332) )
@@ -4135,6 +4167,7 @@ GAME( 1992, commandw, 0,        f3_224b, f3, taito_f3_state, commandw, ROT0,   "
 /* Most of the football games share some GFX roms but shouldn't be considered clones unless they have the same Taito game code for the program roms */
 GAME( 1993, cupfinal, 0,        f3_224a, f3, taito_f3_state, cupfinal, ROT0,   "Taito Corporation Japan",   "Taito Cup Finals (Ver 1.0O 1993/02/28)", 0 )
 GAME( 1993, hthero93, cupfinal, f3_224a, f3, taito_f3_state, cupfinal, ROT0,   "Taito Corporation",         "Hat Trick Hero '93 (Ver 1.0J 1993/02/28)", 0 )
+GAME( 1993, hthero93u,cupfinal, f3_224a, f3, taito_f3_state, cupfinal, ROT0,   "Taito Corporation",         "Hat Trick Hero '93 (Ver 1.0A 1993/02/28)", 0 )
 GAME( 1993, trstar,   0,        f3,      f3, taito_f3_state, trstaroj, ROT0,   "Taito Corporation Japan",   "Top Ranking Stars (Ver 2.1O 1993/05/21) (New Version)", 0 )
 GAME( 1993, trstarj,  trstar,   f3,      f3, taito_f3_state, trstaroj, ROT0,   "Taito Corporation",         "Top Ranking Stars (Ver 2.1J 1993/05/21) (New Version)", 0 )
 GAME( 1993, trstaro,  trstar,   f3,      f3, taito_f3_state, trstaroj, ROT0,   "Taito Corporation Japan",   "Top Ranking Stars (Ver 2.1O 1993/05/21) (Old Version)", 0 )
