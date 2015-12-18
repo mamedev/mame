@@ -1129,8 +1129,7 @@ void k053247_device::device_start()
 
 	m_gfx = m_gfxdecode->gfx(m_gfx_num);
 
-	m_ram = std::make_unique<UINT16[]>(0x1000 / 2);
-	memset(m_ram.get(), 0, sizeof(UINT16) * 0x1000 / 2);
+	m_ram = make_unique_clear<UINT16[]>(0x1000 / 2);
 
 	save_pointer(NAME(m_ram.get()), 0x1000 / 2);
 	save_item(NAME(m_kx46_regs));

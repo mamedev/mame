@@ -1209,12 +1209,9 @@ void sat_console_state::saturn_init_driver(int rgn)
 	m_minit_boost_timeslice = attotime::zero;
 	m_sinit_boost_timeslice = attotime::zero;
 
-	m_scu_regs = std::make_unique<UINT32[]>(0x100/4);
-	memset(m_scu_regs.get(), 0, sizeof(UINT32) * 0x100 / 4);
-	m_scsp_regs = std::make_unique<UINT16[]>(0x1000/2);
-	memset(m_scu_regs.get(), 0, sizeof(UINT16) * 0x1000 / 2);
-	m_backupram = std::make_unique<UINT8[]>(0x8000);
-	memset(m_scu_regs.get(), 0, sizeof(UINT8) * 0x8000);
+	m_scu_regs = make_unique_clear<UINT32[]>(0x100/4);
+	m_scsp_regs = make_unique_clear<UINT16[]>(0x1000/2);
+	m_backupram = make_unique_clear<UINT8[]>(0x8000);
 }
 
 DRIVER_INIT_MEMBER(sat_console_state,saturnus)
