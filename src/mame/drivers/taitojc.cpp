@@ -860,63 +860,17 @@ WRITE16_MEMBER(taitojc_state::dsp_rom_w)
 	}
 }
 
-WRITE16_MEMBER(taitojc_state::dsp_texture_w)
-{
-	int index;
-	int x, y;
-
-	x = (m_dsp_tex_offset >> 0 & 0x1f) | (m_dsp_tex_offset >> 5 & 0x20);
-	y = (m_dsp_tex_offset >> 5 & 0x1f) | (m_dsp_tex_offset >> 6 & 0x20);
-
-	index = (((m_texture_y * 32) + y) * 2048) + ((m_texture_x * 32) + x);
-	m_texture[index] = data & 0xff;
-
-	m_dsp_tex_offset++;
-}
-
-READ16_MEMBER(taitojc_state::dsp_texaddr_r)
-{
-	return m_dsp_tex_address;
-}
-
-WRITE16_MEMBER(taitojc_state::dsp_texaddr_w)
-{
-	m_dsp_tex_address = data;
-
-	m_texture_x = (((data >> 0) & 0x1f) << 1) | ((data >> 12) & 0x1);
-	m_texture_y = (((data >> 5) & 0x1f) << 1) | ((data >> 13) & 0x1);
-
-	m_dsp_tex_offset = 0;
-}
-
-WRITE16_MEMBER(taitojc_state::dsp_polygon_fifo_w)
-{
-	assert (m_polygon_fifo_ptr < TAITOJC_POLYGON_FIFO_SIZE); // never happens
-	m_polygon_fifo[m_polygon_fifo_ptr++] = data;
-}
-
-WRITE16_MEMBER(taitojc_state::dsp_unk2_w)
-{
-	if (offset == 0)
-	{
-		taitojc_clear_frame();
-		m_renderer->render_polygons(m_polygon_fifo.get(), m_polygon_fifo_ptr);
-
-		m_polygon_fifo_ptr = 0;
-	}
-}
-
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, taitojc_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_MIRROR(0x4000)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitojc_state )
-	AM_RANGE(0x6a01, 0x6a02) AM_WRITE(dsp_unk2_w)
+	AM_RANGE(0x6a01, 0x6a02) AM_DEVWRITE("tc0780fpa", tc0780fpa_device, render_w)
 	AM_RANGE(0x6a11, 0x6a12) AM_NOP     // same as 0x6a01..02 for the second renderer chip?
-	AM_RANGE(0x6b20, 0x6b20) AM_WRITE(dsp_polygon_fifo_w)
-	AM_RANGE(0x6b22, 0x6b22) AM_WRITE(dsp_texture_w)
-	AM_RANGE(0x6b23, 0x6b23) AM_READWRITE(dsp_texaddr_r, dsp_texaddr_w)
+	AM_RANGE(0x6b20, 0x6b20) AM_DEVWRITE("tc0780fpa", tc0780fpa_device, poly_fifo_w)
+	AM_RANGE(0x6b22, 0x6b22) AM_DEVWRITE("tc0780fpa", tc0780fpa_device, tex_w)
+	AM_RANGE(0x6b23, 0x6b23) AM_DEVREADWRITE("tc0780fpa", tc0780fpa_device, tex_addr_r, tex_addr_w)
 	AM_RANGE(0x6c00, 0x6c01) AM_READWRITE(dsp_rom_r, dsp_rom_w)
 	AM_RANGE(0x7000, 0x7002) AM_WRITE(dsp_math_projection_w)
 	AM_RANGE(0x7010, 0x7012) AM_WRITE(dsp_math_intersection_w)
@@ -1098,13 +1052,7 @@ void taitojc_state::machine_reset()
 	m_mcu_data_main = 0;
 	m_mcu_data_hc11 = 0;
 
-	m_texture_x = 0;
-	m_texture_y = 0;
-
 	m_dsp_rom_pos = 0;
-	m_dsp_tex_address = 0;
-	m_dsp_tex_offset = 0;
-	m_polygon_fifo_ptr = 0;
 
 	memset(m_viewport_data, 0, sizeof(m_viewport_data));
 	memset(m_projection_data, 0, sizeof(m_projection_data));
@@ -1117,17 +1065,12 @@ void taitojc_state::machine_reset()
 void taitojc_state::machine_start()
 {
 	// register for savestates
-	save_item(NAME(m_texture_x));
-	save_item(NAME(m_texture_y));
 	save_item(NAME(m_dsp_rom_pos));
-	save_item(NAME(m_dsp_tex_address));
-	save_item(NAME(m_dsp_tex_offset));
 	save_item(NAME(m_first_dsp_reset));
 	save_item(NAME(m_viewport_data));
 	save_item(NAME(m_projection_data));
 	save_item(NAME(m_intersection_data));
 	save_item(NAME(m_gfx_index));
-	save_item(NAME(m_polygon_fifo_ptr));
 
 	save_item(NAME(m_mcu_comm_main));
 	save_item(NAME(m_mcu_comm_hc11));
@@ -1177,6 +1120,8 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 
 	MCFG_PALETTE_ADD("palette", 32768)
 
+	MCFG_DEVICE_ADD("tc0780fpa", TC0780FPA, 0)
+
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(taito_en_sound)
 MACHINE_CONFIG_END
@@ -1225,8 +1170,6 @@ READ16_MEMBER(taitojc_state::dendego2_dsp_idle_skip_r)
 
 DRIVER_INIT_MEMBER(taitojc_state,taitojc)
 {
-	m_polygon_fifo = std::make_unique<UINT16[]>(TAITOJC_POLYGON_FIFO_SIZE);
-
 	m_has_dsp_hack = 1;
 
 	if (DSP_IDLESKIP)

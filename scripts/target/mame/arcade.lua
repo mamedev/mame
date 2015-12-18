@@ -3662,6 +3662,8 @@ files {
 	MAME_DIR .. "src/mame/video/tc0110pcr.h",
 	MAME_DIR .. "src/mame/video/tc0180vcu.cpp",
 	MAME_DIR .. "src/mame/video/tc0180vcu.h",
+	MAME_DIR .. "src/mame/video/tc0780fpa.cpp",
+	MAME_DIR .. "src/mame/video/tc0780fpa.h",
 }
 
 createMAMEProjects(_target, _subtarget, "tatsumi")

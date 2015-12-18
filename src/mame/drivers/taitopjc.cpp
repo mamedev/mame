@@ -530,6 +530,7 @@ WRITE16_MEMBER(taitopjc_state::tms_dspshare_w)
 
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, taitopjc_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("user2", 0)
+	AM_RANGE(0x5000, 0xefff) AM_ROM AM_REGION("user2", 0xa000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitopjc_state )	
