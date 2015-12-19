@@ -757,20 +757,18 @@ static void dview_draw(DView *dv)
 			UINT16 s = ' ';
 			unsigned char v = viewdata->byte;
 
-//			if (v != ' ')
-			{
-				if(v < 128) {
-					s = v;
-				} else {
-					s = 0xc0 | (v>>6);
-					s |= (0x80 | (v & 0x3f));
-				}
-				map_attr_to_fg_bg(viewdata->attrib, &fg, &bg);
-				if (bg != bg_base)
-					dview_draw_box(dv, RECT_DVIEW_CLIENT, xx, yy,
-							debug_font_width, debug_font_height, bg);
-				dview_draw_char(dv, RECT_DVIEW_CLIENT, xx, yy, debug_font_height, fg, s);
+			if(v < 128) {
+				s = v;
+			} else {
+				s = 0xc0 | (v>>6);
+				s |= (0x80 | (v & 0x3f));
 			}
+			map_attr_to_fg_bg(viewdata->attrib, &fg, &bg);
+			if (bg != bg_base)
+				dview_draw_box(dv, RECT_DVIEW_CLIENT, xx, yy,
+						debug_font_width, debug_font_height, bg);
+			if (v != ' ')
+				dview_draw_char(dv, RECT_DVIEW_CLIENT, xx, yy, debug_font_height, fg, s);
 			xx += debug_font_width;
 			viewdata++;
 		}
