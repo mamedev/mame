@@ -24,6 +24,7 @@ public:
 	tilemap_t    *m_bg_tilemap;
 	std::unique_ptr<UINT8[]>    m_textram;
 	std::unique_ptr<UINT8[]>      m_scrollram;
+	std::unique_ptr<UINT8[]>    m_decoded;
 	UINT8      m_scroll_x[2];
 	UINT8      m_scroll_y[2];
 	int        m_tilebank;

@@ -141,6 +141,7 @@ public:
 	std::unique_ptr<UINT16[]>     m_buffered_obj;
 	optional_shared_ptr<UINT8> m_qsound_sharedram1;
 	optional_shared_ptr<UINT8> m_qsound_sharedram2;
+	std::unique_ptr<UINT8[]> m_decrypt_kabuki;
 	// cps2
 	optional_shared_ptr<UINT16> m_objram1;
 	optional_shared_ptr<UINT16> m_objram2;

@@ -399,13 +399,13 @@ ROM_END
 
 DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
 {
-	UINT8 *buffer;
+	std::unique_ptr<UINT8[]> buffer;
 	UINT8 *rom = memregion("gfx1")->base();
 	int i;
 
 	m_tilexor = 0x7f00;
 
-	buffer = auto_alloc_array(machine(), UINT8, 0x100000);
+	buffer = std::make_unique<UINT8[]>(0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{
@@ -416,18 +416,18 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
 		buffer[j] = rom[i];
 	}
 
-	memcpy(rom,buffer,0x100000);
+	memcpy(rom,buffer.get(),0x100000);
 }
 
 DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
 {
-	UINT8 *buffer;
+	std::unique_ptr<UINT8[]> buffer;
 	UINT8 *rom = memregion("gfx1")->base();
 	int i;
 
 	m_tilexor = 0x0e00;
 
-	buffer = auto_alloc_array(machine(), UINT8, 0x100000);
+	buffer = std::make_unique<UINT8[]>(0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{
@@ -438,18 +438,18 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
 		buffer[j] = rom[i];
 	}
 
-	memcpy(rom,buffer,0x100000);
+	memcpy(rom,buffer.get(),0x100000);
 }
 
 DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
 {
-	UINT8 *buffer;
+	std::unique_ptr<UINT8[]> buffer;
 	UINT8 *rom = memregion("gfx1")->base();
 	int i;
 
 	m_tilexor = 0x1800;
 
-	buffer = auto_alloc_array(machine(), UINT8, 0x100000);
+	buffer = std::make_unique<UINT8[]>(0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{
@@ -464,7 +464,7 @@ DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
 		buffer[j] = rom[i];
 	}
 
-	memcpy(rom,buffer,0x100000);
+	memcpy(rom,buffer.get(),0x100000);
 }
 
 

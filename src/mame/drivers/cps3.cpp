@@ -771,11 +771,6 @@ void cps3_state::cps3_decrypt_bios()
 
 void cps3_state::init_common(void)
 {
-	/* just some NOPs for the game to execute if it crashes and starts executing unmapped addresses
-	 - this prevents MAME from crashing */
-	m_nops = auto_alloc(machine(), UINT32);
-	m_nops[0] = 0x00090009;
-
 	// flash roms
 	std::string tempstr;
 	for (int simmnum = 0; simmnum < 7; simmnum++)

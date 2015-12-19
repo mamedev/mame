@@ -11809,10 +11809,10 @@ DRIVER_INIT_MEMBER( cps_state, sf2m8 )
 
 void cps_state::kabuki_setup(void (*decode)(UINT8 *src, UINT8 *dst))
 {
-	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
+	m_decrypt_kabuki = std::make_unique<UINT8[]>(0x8000);
 	UINT8 *rom = memregion("audiocpu")->base();
-	decode(rom, decrypt);
-	membank("decrypted")->set_base(decrypt);
+	decode(rom, m_decrypt_kabuki.get());
+	membank("decrypted")->set_base(m_decrypt_kabuki.get());
 }
 
 DRIVER_INIT_MEMBER(cps_state,wof)

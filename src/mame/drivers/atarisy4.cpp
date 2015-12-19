@@ -69,7 +69,7 @@ public:
 	required_memory_bank m_dsp0_bank1;
 	optional_memory_bank m_dsp1_bank1;
 
-	atarisy4_renderer *m_renderer;
+	std::unique_ptr<atarisy4_renderer> m_renderer;
 
 	UINT8 m_r_color_table[256];
 	UINT8 m_g_color_table[256];
@@ -179,9 +179,9 @@ atarisy4_renderer::atarisy4_renderer(atarisy4_state &state, screen_device &scree
 {
 }
 
-	void atarisy4_state::video_start()
+void atarisy4_state::video_start()
 {
-	m_renderer = auto_alloc(machine(), atarisy4_renderer(*this, *m_screen));
+	m_renderer = std::make_unique<atarisy4_renderer>(*this, *m_screen);
 }
 
 void atarisy4_state::video_reset()

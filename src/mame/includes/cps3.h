@@ -52,7 +52,6 @@ public:
 
 	fujitsu_29f016a_device *m_simm[7][8];
 	UINT32 m_cram_gfxflash_bank;
-	UINT32* m_nops;
 	std::unique_ptr<UINT32[]> m_char_ram;
 	std::unique_ptr<UINT32[]> m_eeprom;
 	UINT32 m_ss_pal_base;

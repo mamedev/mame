@@ -680,7 +680,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 
-	cobra_renderer *m_renderer;
+	std::unique_ptr<cobra_renderer> m_renderer;
 
 	cobra_fifo *m_gfxfifo_in;
 	cobra_fifo *m_gfxfifo_out;
@@ -1020,7 +1020,7 @@ void cobra_state::video_start()
 {
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cobra_state::cobra_video_exit), this));
 
-	m_renderer = auto_alloc(machine(), cobra_renderer(*m_screen));
+	m_renderer = std::make_unique<cobra_renderer>(*m_screen);
 	m_renderer->gfx_init();
 }
 
