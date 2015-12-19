@@ -212,6 +212,7 @@ public:
 	DECLARE_DRIVER_INIT(xymg);
 	DECLARE_DRIVER_INIT(drgnwrldv10c);
 	DECLARE_DRIVER_INIT(drgnwrldv20j);
+	DECLARE_DRIVER_INIT(drgnwrldv40k);
 	DECLARE_DRIVER_INIT(vbowl);
 	DECLARE_DRIVER_INIT(vbowlj);
 	DECLARE_DRIVER_INIT(ryukobou);
@@ -2090,6 +2091,14 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv20j)
     rom[0x276a0/2]  =   0x606c;     // 0276A0: 676C        beq 2770e    (CHECK PORT ERROR 3)
     rom[0x2a86e/2]  =   0x606c;     // 02A86E: 676C        beq 2a8dc    (ASIC11 CHECK PORT ERROR 2)
 */
+}
+
+DRIVER_INIT_MEMBER(igs011_state,drgnwrldv40k)
+{
+	//drgnwrld_type3_decrypt(); // wrong
+	drgnwrld_gfx_decrypt();
+
+	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16_delegate(FUNC(igs011_state::drgnwrldv21_igs011_prot2_r), this)); // wrong
 }
 
 DRIVER_INIT_MEMBER(igs011_state,drgnwrldv11h)
@@ -4372,6 +4381,25 @@ ROM_START( drgnwrldv10c )
 	ROM_LOAD( "ccdu45.u45", 0x000, 0x2e5, CRC(a15fce69) SHA1(3e38d75c7263bfb36aebdbbd55ebbdd7ca601633) )
 ROM_END
 
+
+ROM_START( drgnwrldv40k )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "v-040k.u3", 0x00000, 0x80000, CRC(397404ef) SHA1(5228558760be7c103d4b9e2e2a31ca5619ca8055) )
+
+	ROM_REGION( 0x400000, "blitter", 0 )
+	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
+	// u44 unpopulated
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
+
+	ROM_REGION( 0x40000, "plds", 0 )
+	ROM_LOAD( "ccdu15.u15", 0x000, 0x2e5, CRC(a15fce69) SHA1(3e38d75c7263bfb36aebdbbd55ebbdd7ca601633) )
+	//ROM_LOAD( "ccdu17.u17.bad.dump", 0x000, 0x104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	//ROM_LOAD( "ccdu18.u18.bad.dump", 0x000, 0x104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "ccdu45.u45", 0x000, 0x2e5, CRC(a15fce69) SHA1(3e38d75c7263bfb36aebdbbd55ebbdd7ca601633) )
+ROM_END
+
 /***************************************************************************
 
     Wan Li Chang Cheng (The Great Wall)
@@ -4803,6 +4831,7 @@ GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, dr
 GAME( 1995, drgnwrldv20j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, drgnwrldv20j, ROT0, "IGS / Alta", "Zhong Guo Long (Japan, V020J)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv10c, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv10c, ROT0, "IGS",        "Zhong Guo Long (China, V010C)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv11h, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv11h, ROT0, "IGS",        "Dong Fang Zhi Zhu (Hong Kong, V011H)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv40k, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, drgnwrldv40k, ROT0, "IGS",        "Dragon World (Korea, V040K)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, lhb,          0,        lhb,             lhb, igs011_state,       lhb,          ROT0, "IGS",        "Long Hu Bang (China, V035C)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, lhbv33c,      lhb,      lhb,             lhb, igs011_state,       lhbv33c,      ROT0, "IGS",        "Long Hu Bang (China, V033C)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, dbc,          lhb,      lhb,             lhb, igs011_state,       dbc,          ROT0, "IGS",        "Da Ban Cheng (Hong Kong, V027H)",      MACHINE_SUPPORTS_SAVE )
