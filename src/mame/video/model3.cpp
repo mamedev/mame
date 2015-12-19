@@ -207,10 +207,10 @@ void model3_state::video_start()
 	m_layer8[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer3_8bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	// 4-bit tiles
-	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, char4_layout, (UINT8*)m_m3_char_ram.get(), 0, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, char4_layout, (UINT8*)m_m3_char_ram.get(), 0, m_palette->entries() / 16, 0));
 
 	// 8-bit tiles
-	m_gfxdecode->set_gfx(1, global_alloc(gfx_element(m_palette, char8_layout, (UINT8*)m_m3_char_ram.get(), 0, m_palette->entries() / 256, 0)));
+	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, char8_layout, (UINT8*)m_m3_char_ram.get(), 0, m_palette->entries() / 256, 0));
 
 	init_matrix_stack();
 }

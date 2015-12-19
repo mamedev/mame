@@ -1771,8 +1771,8 @@ void mz2500_state::machine_start()
 	save_pointer(NAME(m_emm_ram.get()), 0x100000);
 
 	/* TODO: gfx[4] crashes as per now */
-	m_gfxdecode->set_gfx(3, global_alloc(gfx_element(m_palette, mz2500_pcg_layout_1bpp, m_pcg_ram.get(), 0, 0x10, 0)));
-	m_gfxdecode->set_gfx(4, global_alloc(gfx_element(m_palette, mz2500_pcg_layout_3bpp, m_pcg_ram.get(), 0, 4, 0)));
+	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, mz2500_pcg_layout_1bpp, m_pcg_ram.get(), 0, 0x10, 0));
+	m_gfxdecode->set_gfx(4, std::make_unique<gfx_element>(m_palette, mz2500_pcg_layout_3bpp, m_pcg_ram.get(), 0, 4, 0));
 }
 
 void mz2500_state::machine_reset()

@@ -2420,7 +2420,7 @@ MACHINE_START_MEMBER(x1_state,x1)
 	save_pointer(NAME(m_emm_ram.get()), 0x1000000);
 	save_pointer(NAME(m_pcg_ram.get()), 0x1800);
 
-	m_gfxdecode->set_gfx(3, global_alloc(gfx_element(m_palette, x1_pcg_8x8, m_pcg_ram.get(), 0, 1, 0)));
+	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, x1_pcg_8x8, m_pcg_ram.get(), 0, 1, 0));
 }
 
 PALETTE_INIT_MEMBER(x1_state,x1)

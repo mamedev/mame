@@ -297,7 +297,7 @@ void tc0091lvc_device::device_start()
 
 	//printf("m_gfx_index %d\n", m_gfx_index);
 
-	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, char_layout, (UINT8 *)m_pcg_ram, 0, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(m_palette, char_layout, (UINT8 *)m_pcg_ram, 0, m_palette->entries() / 16, 0));
 }
 
 void tc0091lvc_device::device_reset()

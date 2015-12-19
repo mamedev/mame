@@ -573,7 +573,7 @@ void coolridr_state::video_start()
 	m_screen->register_screen_bitmap(m_screen1_bitmap);
 	m_screen->register_screen_bitmap(m_screen2_bitmap);
 
-	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, h1_tile_layout, m_h1_pcg.get(), 0, 8, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(m_palette, h1_tile_layout, m_h1_pcg.get(), 0, 8, 0));
 }
 
 /*

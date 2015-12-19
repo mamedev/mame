@@ -176,7 +176,7 @@ void peoplepc_state::machine_reset()
 
 void peoplepc_state::machine_start()
 {
-	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(machine().device<palette_device>("palette"), peoplepc_charlayout, &m_charram[0], 0, 1, 0)));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(machine().device<palette_device>("palette"), peoplepc_charlayout, &m_charram[0], 0, 1, 0));
 	m_dma0pg = 0;
 
 	// FIXME: cheat as there no docs about how or obvious ports that set to control the motor

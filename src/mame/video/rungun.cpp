@@ -95,7 +95,7 @@ void rungun_state::video_start()
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	// decode the ttl layer's gfx
-	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_palette, charlayout, memregion("gfx3")->base(), 0, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(m_palette, charlayout, memregion("gfx3")->base(), 0, m_palette->entries() / 16, 0));
 	m_ttl_gfx_index = gfx_index;
 
 	// create the tilemaps

@@ -77,7 +77,7 @@ void k037122_device::device_start()
 	m_layer[0]->set_transparent_pen(0);
 	m_layer[1]->set_transparent_pen(0);
 
-	m_gfxdecode->set_gfx(m_gfx_index,global_alloc(gfx_element(m_palette, k037122_char_layout, (UINT8*)m_char_ram.get(), 0, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index,std::make_unique<gfx_element>(m_palette, k037122_char_layout, (UINT8*)m_char_ram.get(), 0, m_palette->entries() / 16, 0));
 
 	save_pointer(NAME(m_reg.get()), 0x400 / 4);
 	save_pointer(NAME(m_char_ram.get()), 0x200000 / 4);

@@ -252,13 +252,13 @@ void tceptor_state::decode_bg(const char * region)
 	memcpy(src, &buffer[0], len);
 
 	/* decode the graphics */
-	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_palette, bg_layout, memregion(region)->base(), 0, 64, 0x0a00)));
+	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(m_palette, bg_layout, memregion(region)->base(), 0, 64, 0x0a00));
 }
 
 void tceptor_state::decode_sprite(int gfx_index, const gfx_layout *layout, const void *data)
 {
 	/* decode the graphics */
-	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_palette, *layout, (const UINT8 *)data, 0, 64, 1024)));
+	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(m_palette, *layout, (const UINT8 *)data, 0, 64, 1024));
 }
 
 // fix sprite order

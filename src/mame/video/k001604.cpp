@@ -107,8 +107,8 @@ void k001604_device::device_start()
 	m_layer_8x8[0]->set_transparent_pen(0);
 	m_layer_8x8[1]->set_transparent_pen(0);
 
-	m_gfxdecode->set_gfx(m_gfx_index[0], global_alloc(gfx_element(m_palette, k001604_char_layout_layer_8x8, (UINT8*)&m_char_ram[0], 0, m_palette->entries() / 16, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index[1], global_alloc(gfx_element(m_palette, k001604_char_layout_layer_16x16, (UINT8*)&m_char_ram[0], 0, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index[0], std::make_unique<gfx_element>(m_palette, k001604_char_layout_layer_8x8, (UINT8*)&m_char_ram[0], 0, m_palette->entries() / 16, 0));
+	m_gfxdecode->set_gfx(m_gfx_index[1], std::make_unique<gfx_element>(m_palette, k001604_char_layout_layer_16x16, (UINT8*)&m_char_ram[0], 0, m_palette->entries() / 16, 0));
 
 	save_pointer(NAME(m_reg.get()), 0x400 / 4);
 	save_pointer(NAME(m_char_ram.get()), 0x200000 / 4);

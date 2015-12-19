@@ -289,7 +289,7 @@ void tc0100scn_device::device_start()
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, tc0100scn_charlayout, (UINT8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 256, 0)));
+	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(m_palette, tc0100scn_charlayout, (UINT8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 256, 0));
 
 	gfx_element *gfx = m_gfxdecode->gfx(m_gfxnum);
 	gfx_element *txt = m_gfxdecode->gfx(m_txnum);

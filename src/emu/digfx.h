@@ -206,7 +206,7 @@ public:
 	void decode_gfx(const gfx_decode_entry *gfxdecodeinfo);
 	void decode_gfx() { decode_gfx(m_gfxdecodeinfo); }
 
-	void set_gfx(int index, gfx_element *element) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index].reset(element); }
+	void set_gfx(int index, std::unique_ptr<gfx_element> &&element) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index] = std::move(element); }
 
 protected:
 	// interface-level overrides

@@ -120,7 +120,7 @@ void segas24_tile::device_start()
 	memset(char_ram.get(), 0, 0x80000);
 	memset(tile_ram.get(), 0, 0x10000);
 
-	m_gfxdecode->set_gfx(char_gfx_index, global_alloc(gfx_element(m_palette, char_layout, (UINT8 *)char_ram.get(), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(char_gfx_index, std::make_unique<gfx_element>(m_palette, char_layout, (UINT8 *)char_ram.get(), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0));
 
 	save_pointer(NAME(tile_ram.get()), 0x10000/2);
 	save_pointer(NAME(char_ram.get()), 0x80000/2);
