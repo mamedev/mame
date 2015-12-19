@@ -232,18 +232,24 @@ READ8_MEMBER( squale_state::pia_u75_porta_r )
 READ8_MEMBER( squale_state::pia_u75_portb_r )
 {
 	// U75 PIA Port B : Keyboard column input
-	char kbdrow[6];
+	char kbdrow[3];
+	unsigned char kbdrow_state;
 	UINT8 data = 0xFF;
+
+	kbdrow[0] = 'X';
+	kbdrow[1] = '0';
+	kbdrow[2] = 0;
 
 	for (int i = 0; i < 8; i++)
 	{
-		sprintf(kbdrow,"X%X",i);
+		kbdrow[1] = '0' + i;
+		kbdrow_state = ioport(kbdrow)->read();
 
 		for( int j = 0; j < 8 ; j++)
 		{
 			if( !(keyboard_line & (0x01<<j)) )
 			{
-				if ( ioport(kbdrow)->read() & (0x01<<j) )
+				if ( kbdrow_state & (0x01<<j) )
 				{
 					data &= ~( 0x01 << i);
 				}
