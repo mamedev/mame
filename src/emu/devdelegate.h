@@ -74,7 +74,10 @@ public:
 	device_delegate(const thistype &src, device_t &search_root) : basetype(src), device_delegate_helper(src.m_device_name) { bind_relative_to(search_root); }
 
 	// perform the binding
-	void bind_relative_to(device_t &search_root) { if (!basetype::isnull()) basetype::late_bind(bound_object(search_root)); }
+	void bind_relative_to(device_t &search_root) { assert(&search_root != nullptr); if (!basetype::isnull()) basetype::late_bind(bound_object(search_root)); }
+
+	// getter (for validation purposes)
+	const char *device_name() const { return m_device_name; }
 };
 
 
