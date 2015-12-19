@@ -359,7 +359,7 @@
 
 		if #cfg.forcedincludes > 0 then
 			_p('  FORCE_INCLUDE += -include %s'
-					,_MAKE.esc(table.concat(cfg.forcedincludes, ";")))
+					,premake.esc(table.concat(cfg.forcedincludes, ";")))
 		end
 
 		_p('  ALL_CPPFLAGS  += $(CPPFLAGS) %s $(DEFINES) $(INCLUDES)', table.concat(cc.getcppflags(cfg), " "))
