@@ -128,6 +128,30 @@ static char *GET_SHIFT(int shift)
 	return buffer;
 }
 
+static void print_condition_codes(bool pp, int zl, int cv, int tp)
+{
+	if (*(zl_condition_codes[zl]) != 0)
+	{
+		if (pp)
+			print(", ");
+		print("%s", zl_condition_codes[zl]);
+		pp = true;
+	}
+	if (*(cv_condition_codes[cv]) != 0)
+	{
+		if (pp)
+			print(", ");
+		print("%s", cv_condition_codes[cv]);
+		pp = true;
+	}
+	if (*(tp_condition_codes[tp]) != 0)
+	{
+		if (pp)
+			print(", ");
+		print("%s", tp_condition_codes[tp]);
+	}
+}
+
 static void dasm_group_be(UINT16 opcode)
 {
 	int subop = opcode & 0xff;
@@ -463,19 +487,7 @@ CPU_DISASSEMBLE( tms32051 )
 			int tp = (opcode >> 8) & 0x3;
 
 			print("bcnd    %04X", FETCH());
-
-			if (*(zl_condition_codes[zl]) != 0)
-			{
-				print(", %s", zl_condition_codes[zl]);
-			}
-			if (*(cv_condition_codes[cv]) != 0)
-			{
-				print(", %s", cv_condition_codes[cv]);
-			}
-			if (*(tp_condition_codes[tp]) != 0)
-			{
-				print(", %s", tp_condition_codes[tp]);
-			}
+			print_condition_codes(true, zl, cv, tp);
 			break;
 		}
 
@@ -490,19 +502,7 @@ CPU_DISASSEMBLE( tms32051 )
 			int n = ((opcode >> 12) & 0x1) + 1;
 
 			print("xc      %d", n);
-
-			if (*(zl_condition_codes[zl]) != 0)
-			{
-				print(", %s", zl_condition_codes[zl]);
-			}
-			if (*(cv_condition_codes[cv]) != 0)
-			{
-				print(", %s", cv_condition_codes[cv]);
-			}
-			if (*(tp_condition_codes[tp]) != 0)
-			{
-				print(", %s", tp_condition_codes[tp]);
-			}
+			print_condition_codes(true, zl, cv, tp);
 			break;
 		}
 
@@ -515,23 +515,11 @@ CPU_DISASSEMBLE( tms32051 )
 			int tp = (opcode >> 8) & 0x3;
 
 			print("cc      %04X", FETCH());
-
-			if (*(zl_condition_codes[zl]) != 0)
-			{
-				print(", %s", zl_condition_codes[zl]);
-			}
-			if (*(cv_condition_codes[cv]) != 0)
-			{
-				print(", %s", cv_condition_codes[cv]);
-			}
-			if (*(tp_condition_codes[tp]) != 0)
-			{
-				print(", %s", tp_condition_codes[tp]);
-			}
+			print_condition_codes(true, zl, cv, tp);
 			break;
 		}
 
-		case 0xec: case 0xed: case 0xee:
+		case 0xec: case 0xed: case 0xee: case 0xef:
 		{
 			int zlcvmask = opcode & 0xf;
 			int zlcv = (opcode >> 4) & 0xf;
@@ -539,25 +527,18 @@ CPU_DISASSEMBLE( tms32051 )
 			int cv = ((zlcv << 2) & 0xc) | (zlcvmask & 0x3);
 			int tp = (opcode >> 8) & 0x3;
 
-			print("retc    ");
-
-			if (*(zl_condition_codes[zl]) != 0)
+			if (opcode == 0xef00)
 			{
-				print(", %s", zl_condition_codes[zl]);
+				print("ret");
 			}
-			if (*(cv_condition_codes[cv]) != 0)
+			else
 			{
-				print(", %s", cv_condition_codes[cv]);
-			}
-			if (*(tp_condition_codes[tp]) != 0)
-			{
-				print(", %s", tp_condition_codes[tp]);
+				print("retc    ");
+				print_condition_codes(false, zl, cv, tp);
 			}
 			flags = DASMFLAG_STEP_OUT;
 			break;
 		}
-
-		case 0xef:  print("ret"); flags = DASMFLAG_STEP_OUT; break;
 
 		case 0xf0: case 0xf1: case 0xf2: case 0xf3:
 		{
@@ -568,19 +549,7 @@ CPU_DISASSEMBLE( tms32051 )
 			int tp = (opcode >> 8) & 0x3;
 
 			print("bcndd   %04X", FETCH());
-
-			if (*(zl_condition_codes[zl]) != 0)
-			{
-				print(", %s", zl_condition_codes[zl]);
-			}
-			if (*(cv_condition_codes[cv]) != 0)
-			{
-				print(", %s", cv_condition_codes[cv]);
-			}
-			if (*(tp_condition_codes[tp]) != 0)
-			{
-				print(", %s", tp_condition_codes[tp]);
-			}
+			print_condition_codes(true, zl, cv, tp);
 			break;
 		}
 
@@ -593,19 +562,7 @@ CPU_DISASSEMBLE( tms32051 )
 			int tp = (opcode >> 8) & 0x3;
 
 			print("ccd     %04X", FETCH());
-
-			if (*(zl_condition_codes[zl]) != 0)
-			{
-				print(", %s", zl_condition_codes[zl]);
-			}
-			if (*(cv_condition_codes[cv]) != 0)
-			{
-				print(", %s", cv_condition_codes[cv]);
-			}
-			if (*(tp_condition_codes[tp]) != 0)
-			{
-				print(", %s", tp_condition_codes[tp]);
-			}
+			print_condition_codes(true, zl, cv, tp);
 			break;
 		}
 
@@ -618,19 +575,7 @@ CPU_DISASSEMBLE( tms32051 )
 			int tp = (opcode >> 8) & 0x3;
 
 			print("retcd   ");
-
-			if (*(zl_condition_codes[zl]) != 0)
-			{
-				print(", %s", zl_condition_codes[zl]);
-			}
-			if (*(cv_condition_codes[cv]) != 0)
-			{
-				print(", %s", cv_condition_codes[cv]);
-			}
-			if (*(tp_condition_codes[tp]) != 0)
-			{
-				print(", %s", tp_condition_codes[tp]);
-			}
+			print_condition_codes(false, zl, cv, tp);
 			flags = DASMFLAG_STEP_OUT;
 			break;
 		}
