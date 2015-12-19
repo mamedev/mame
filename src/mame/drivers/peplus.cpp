@@ -5311,12 +5311,13 @@ ROM_END
 
 ROM_START( pepp0488 ) /* Normal board : Standard Draw Poker (PP0488) - 01/12/95   @ IGT  L95-0175 */
 /*
-PayTable   Js+  TP  3K  STR  FL  FH  4K  SF  RF  (Bonus)
---------------------------------------------------------
-  ????      1    1   2   4    5   8  25  50 250   1000
+PayTable   Js+  TP  3K  STR  FL  FH  4K  4A  SF  RF  (Bonus)
+-----------------------------------------------------------
+  ????      1    1   3   4    5   8  25 250  50 250    800
   % Range: 98.4-100.4%  Optimum: 102.4%  Hit Frequency: ???
 
-NOTE: Will work with the standard CG740 + CAP740 graphics for a non-localized game.
+NOTE: This build / version is exclusive to Arizona Charlies
+      Use CG2004 + CAP740 graphics for a non-localized game
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0488_a30-a4v.u68",   0x00000, 0x10000, CRC(99849f5d) SHA1(643a303beda1c4a4619803071df5e612ab922eb9) ) /* Game Version: A30, Library Version: A4V */
