@@ -72,8 +72,8 @@ public:
 
 	UINT8 *m_file_rom;
 	UINT8 *m_app_rom;
-	UINT8 *m_file_ram;
-	UINT8 *m_app_ram;
+	std::unique_ptr<UINT8[]> m_file_ram;
+	std::unique_ptr<UINT8[]> m_app_ram;
 	DECLARE_READ8_MEMBER(file_r);
 	DECLARE_WRITE8_MEMBER(file_w);
 
@@ -267,8 +267,8 @@ void molecula_state::machine_start()
 	m_file_rom = memregion("fileipl")->base();
 	m_app_rom = memregion("appipl")->base();
 
-	m_file_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
-	m_app_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
+	m_file_ram = make_unique_clear<UINT8[]>(0x10000);
+	m_app_ram = make_unique_clear<UINT8[]>(0x10000);
 }
 
 void molecula_state::machine_reset()

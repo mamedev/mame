@@ -2121,8 +2121,8 @@ void saturn_state::stv_vdp1_state_save_postload( void )
 
 int saturn_state::stv_vdp1_start ( void )
 {
-	m_vdp1_regs = auto_alloc_array_clear(machine(), UINT16, 0x020/2 );
-	m_vdp1_vram = auto_alloc_array_clear(machine(), UINT32, 0x100000/4 );
+	m_vdp1_regs = make_unique_clear<UINT16[]>(0x020/2 );
+	m_vdp1_vram = make_unique_clear<UINT32[]>(0x100000/4 );
 	m_vdp1.gfx_decode = std::make_unique<UINT8[]>(0x100000 );
 
 	stv_vdp1_shading_data = auto_alloc(machine(), struct stv_vdp1_poly_scanline_data);
@@ -2147,8 +2147,8 @@ int saturn_state::stv_vdp1_start ( void )
 	m_vdp1.user_cliprect.set(0, 512, 0, 256);
 
 	// save state
-	save_pointer(NAME(m_vdp1_regs), 0x020/2);
-	save_pointer(NAME(m_vdp1_vram), 0x100000/4);
+	save_pointer(NAME(m_vdp1_regs.get()), 0x020/2);
+	save_pointer(NAME(m_vdp1_vram.get()), 0x100000/4);
 	save_item(NAME(m_vdp1.fbcr_accessed));
 	save_item(NAME(m_vdp1.framebuffer_current_display));
 	save_item(NAME(m_vdp1.framebuffer_current_draw));

@@ -892,8 +892,8 @@ MACHINE_START_MEMBER(sms_state,sms)
 
 	if (m_mainram == nullptr)
 	{
-		m_mainram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
-		save_pointer(NAME(m_mainram), 0x2000);
+		m_mainram = make_unique_clear<UINT8[]>(0x2000);
+		save_pointer(NAME(m_mainram.get()), 0x2000);
 
 		// alibaba and blockhol are ports of games for the MSX system. The
 		// MSX bios usually initializes callback "vectors" at the top of RAM.
@@ -909,7 +909,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 		// cartridge slot.
 		if (m_has_jpn_sms_cart_slot)
 		{
-			memset(m_mainram, 0xf0, 0x2000);
+			memset(m_mainram.get(), 0xf0, 0x2000);
 		}
 	}
 

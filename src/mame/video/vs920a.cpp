@@ -48,8 +48,8 @@ void vs920a_text_tilemap_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_vram = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x1000/2);
-	save_pointer(NAME(m_vram), 0x1000/2);
+	m_vram = make_unique_clear<UINT16[]>(0x1000/2);
+	save_pointer(NAME(m_vram.get()), 0x1000/2);
 	save_item(NAME(m_pal_base));
 
 

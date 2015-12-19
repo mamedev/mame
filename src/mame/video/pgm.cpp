@@ -493,7 +493,7 @@ void pgm_state::draw_sprites( bitmap_ind16& spritebitmap, UINT16 *sprite_source,
 	   wwww wwwh hhhh hhhh
 	*/
 
-	const UINT16 *finish = m_spritebufferram + (0xa00 / 2);
+	const UINT16 *finish = m_spritebufferram.get() + (0xa00 / 2);
 
 	UINT16* start = sprite_source;
 
@@ -629,9 +629,9 @@ VIDEO_START_MEMBER(pgm_state,pgm)
 	for (i = 0; i < 0x1200 / 2; i++)
 		m_palette->set_pen_color(i, rgb_t(0, 0, 0));
 
-	m_spritebufferram = auto_alloc_array_clear(machine(), UINT16, 0xa00/2);
+	m_spritebufferram = make_unique_clear<UINT16[]>(0xa00/2);
 
-	save_pointer(NAME(m_spritebufferram), 0xa00/2);
+	save_pointer(NAME(m_spritebufferram.get()), 0xa00/2);
 }
 
 UINT32 pgm_state::screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -650,7 +650,7 @@ UINT32 pgm_state::screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap,
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
 
-	draw_sprites(bitmap, m_spritebufferram, screen.priority());
+	draw_sprites(bitmap, m_spritebufferram.get(), screen.priority());
 
 	m_tx_tilemap->set_scrolly(0, m_videoregs[0x5000/2]);
 	m_tx_tilemap->set_scrollx(0, m_videoregs[0x6000/2]); // Check
@@ -669,6 +669,6 @@ void pgm_state::screen_eof_pgm(screen_device &screen, bool state)
 	if (state)
 	{
 		/* first 0xa00 of main ram = sprites, seems to be buffered, DMA? */
-		memcpy(m_spritebufferram, m_mainram, 0xa00);
+		memcpy(m_spritebufferram.get(), m_mainram, 0xa00);
 	}
 }

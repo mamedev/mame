@@ -469,7 +469,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	n_lightgun_y = 0;
 	b_reverseflag = 0;
 
-	p_vram = auto_alloc_array_clear( machine(), UINT16, width * height );
+	p_vram = make_unique_clear<UINT16[]>(width * height );
 
 	for( n_line = 0; n_line < 1024; n_line++ )
 	{
@@ -570,7 +570,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	// icky!!!
 	machine().save().save_memory( this, "globals", nullptr, 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
 
-	save_pointer(NAME(p_vram), width * height );
+	save_pointer(NAME(p_vram.get()), width * height );
 	save_item(NAME(n_gpu_buffer_offset));
 	save_item(NAME(n_vramx));
 	save_item(NAME(n_vramy));

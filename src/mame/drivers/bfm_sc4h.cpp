@@ -1031,7 +1031,7 @@ MACHINE_CONFIG_END
 MACHINE_START_MEMBER(sc4_adder4_state,adder4)
 {
 	m_adder4cpuregion = (UINT32*)memregion( "adder4" )->base();
-	m_adder4ram = (UINT32*)auto_alloc_array_clear(machine(), UINT32, 0x10000);
+	m_adder4ram = make_unique_clear<UINT32[]>(0x10000);
 	MACHINE_START_CALL_MEMBER(sc4);
 }
 

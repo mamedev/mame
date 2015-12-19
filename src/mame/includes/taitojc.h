@@ -64,8 +64,8 @@ public:
 
 	int m_gfx_index;
 
-	UINT32 *m_char_ram;
-	UINT32 *m_tile_ram;
+	std::unique_ptr<UINT32[]> m_char_ram;
+	std::unique_ptr<UINT32[]> m_tile_ram;
 	tilemap_t *m_tilemap;
 
 	UINT8 m_mcu_comm_main;

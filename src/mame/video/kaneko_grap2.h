@@ -74,10 +74,10 @@ public:
 	DECLARE_READ16_MEMBER(  unk2_r ) { return m_framebuffer_unk2[offset]; }
 	DECLARE_WRITE16_MEMBER( unk2_w ) { COMBINE_DATA(&m_framebuffer_unk2[offset]); }
 
-	UINT16* m_framebuffer;
-	UINT16* m_framebuffer_palette;
-	UINT16* m_framebuffer_unk1;
-	UINT16* m_framebuffer_unk2;
+	std::unique_ptr<UINT16[]> m_framebuffer;
+	std::unique_ptr<UINT16[]> m_framebuffer_palette;
+	std::unique_ptr<UINT16[]> m_framebuffer_unk1;
+	std::unique_ptr<UINT16[]> m_framebuffer_unk2;
 
 
 

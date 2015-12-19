@@ -68,9 +68,9 @@ public:
 	int m_back_layer_d14;
 	int m_midl_layer_d14;
 	int m_fore_layer_d14;
-	UINT32 *m_tilemap_ram;
-	UINT32 *m_palette_ram;
-	UINT32 *m_sprite_ram;
+	std::unique_ptr<UINT32[]> m_tilemap_ram;
+	std::unique_ptr<UINT32[]> m_palette_ram;
+	std::unique_ptr<UINT32[]> m_sprite_ram;
 	UINT32 m_tilemap_ram_size;
 	UINT32 m_palette_ram_size;
 	UINT32 m_sprite_ram_size;

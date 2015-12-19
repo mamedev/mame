@@ -52,12 +52,12 @@ taito_zoom_device::taito_zoom_device(const machine_config &mconfig, const char *
 
 void taito_zoom_device::device_start()
 {
-	m_snd_shared_ram = auto_alloc_array_clear(machine(), UINT8, 0x100);
+	m_snd_shared_ram = make_unique_clear<UINT8[]>(0x100);
 
 	// register for savestates
 	save_item(NAME(m_reg_address));
 	save_item(NAME(m_tms_ctrl));
-	save_pointer(NAME(m_snd_shared_ram), 0x100);
+	save_pointer(NAME(m_snd_shared_ram.get()), 0x100);
 }
 
 //-------------------------------------------------

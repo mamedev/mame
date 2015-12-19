@@ -307,7 +307,7 @@ public:
 
 	void            draw_triangle(bool shade, bool texture, bool zbuffer, bool rect);
 
-	void*           m_aux_buf;
+	std::unique_ptr<UINT8[]>  m_aux_buf;
 	UINT32          m_aux_buf_ptr;
 	UINT32          m_aux_buf_index;
 

@@ -377,7 +377,7 @@ public:
 	emu_timer *m_sound_irq_timer;
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
-	UINT8 *m_jvs_sdata;
+	std::unique_ptr<UINT8[]> m_jvs_sdata;
 	UINT32 m_jvs_sdata_ptr;
 	UINT16 m_gn680_latch;
 	UINT16 m_gn680_ret0;
@@ -928,7 +928,7 @@ INPUT_PORTS_END
 void hornet_state::machine_start()
 {
 	m_jvs_sdata_ptr = 0;
-	m_jvs_sdata = auto_alloc_array_clear(machine(), UINT8, 1024);
+	m_jvs_sdata = make_unique_clear<UINT8[]>(1024);
 
 	/* set conservative DRC options */
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
@@ -938,7 +938,7 @@ void hornet_state::machine_start()
 
 	save_item(NAME(m_led_reg0));
 	save_item(NAME(m_led_reg1));
-	save_pointer(NAME(m_jvs_sdata), 1024);
+	save_pointer(NAME(m_jvs_sdata.get()), 1024);
 	save_item(NAME(m_jvs_sdata_ptr));
 
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hornet_state::sound_irq), this));

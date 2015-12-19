@@ -225,7 +225,7 @@ void k052109_device::device_start()
 	decode_gfx();
 	m_gfx[0]->set_colors(m_palette->entries() / m_gfx[0]->depth());
 
-	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x6000);
+	m_ram = make_unique_clear<UINT8[]>(0x6000);
 
 	m_colorram_F = &m_ram[0x0000];
 	m_colorram_A = &m_ram[0x0800];
@@ -253,7 +253,7 @@ void k052109_device::device_start()
 	m_firq_handler.resolve_safe();
 	m_nmi_handler.resolve_safe();
 
-	save_pointer(NAME(m_ram), 0x6000);
+	save_pointer(NAME(m_ram.get()), 0x6000);
 	save_item(NAME(m_rmrd_line));
 	save_item(NAME(m_romsubbank));
 	save_item(NAME(m_scrollctrl));

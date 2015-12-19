@@ -330,7 +330,7 @@ public:
 	UINT8 m_blitter_y_reg;
 	UINT8 m_blitter_aux_reg;
 	UINT8 m_blitter_unk_reg;
-	UINT8 *m_videobuf;
+	std::unique_ptr<UINT8[]> m_videobuf;
 	UINT8 m_lamp;
 	UINT8 m_lamp_old;
 	int m_input_selector;
@@ -462,7 +462,7 @@ WRITE8_MEMBER(corona_state::blitter_trig_wdht_w)
 
 void corona_state::video_start()
 {
-	m_videobuf = auto_alloc_array_clear(machine(), UINT8, VIDEOBUF_SIZE);
+	m_videobuf = make_unique_clear<UINT8[]>(VIDEOBUF_SIZE);
 }
 
 UINT32 corona_state::screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

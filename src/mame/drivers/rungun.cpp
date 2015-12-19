@@ -388,7 +388,7 @@ void rungun_state::machine_start()
 	m_roz_rom = memregion("gfx1")->base();
 	membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
-	m_banked_ram = auto_alloc_array_clear(machine(), UINT16, 0x2000);
+	m_banked_ram = make_unique_clear<UINT16[]>(0x2000);
 	m_pal_ram = make_unique_clear<UINT16[]>(0x800*2);
 	membank("spriteram_bank")->configure_entries(0,2,&m_banked_ram[0],0x2000);
 	

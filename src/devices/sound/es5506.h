@@ -154,10 +154,10 @@ protected:
 
 	es550x_voice m_voice[32];             /* the 32 voices */
 
-	INT32 *     m_scratch;
+	std::unique_ptr<INT32[]>     m_scratch;
 
-	INT16 *     m_ulaw_lookup;
-	UINT16 *    m_volume_lookup;
+	std::unique_ptr<INT16[]>     m_ulaw_lookup;
+	std::unique_ptr<UINT16[]>    m_volume_lookup;
 
 	#if MAKE_WAVS
 	void *      m_wavraw;                 /* raw waveform */

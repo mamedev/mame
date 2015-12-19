@@ -44,7 +44,10 @@ public:
 
 	}
 
-	UINT16 *back_data, *fore_data, *mid_data, *text_data; // private buffers, allocated in init
+	std::unique_ptr<UINT16[]> back_data;
+	std::unique_ptr<UINT16[]> fore_data;
+	std::unique_ptr<UINT16[]> mid_data;
+	std::unique_ptr<UINT16[]> text_data; // private buffers, allocated in init
 	required_shared_ptr<UINT16> sprites;
 	required_device<cpu_device> m_maincpu;
 	optional_device<seibu_sound_device> m_seibu_sound;

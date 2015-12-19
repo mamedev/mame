@@ -42,7 +42,7 @@ private:
 	UINT16 m_mcu_address;           // MCU side RAM address
 	UINT16 m_mcu_d;                 // MCU D output data
 	UINT8 m_mcu_r[4];               // MCU R0-R3 output data
-	UINT8* m_shared_ram;            // 1KB RAM
+	std::unique_ptr<UINT8[]> m_shared_ram;            // 1KB RAM
 
 	void mcu_update_address();
 	void mcu_writeram();

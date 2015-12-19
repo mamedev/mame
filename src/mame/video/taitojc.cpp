@@ -63,13 +63,13 @@ READ32_MEMBER(taitojc_state::taitojc_char_r)
 
 WRITE32_MEMBER(taitojc_state::taitojc_tile_w)
 {
-	COMBINE_DATA(m_tile_ram + offset);
+	COMBINE_DATA(m_tile_ram.get() + offset);
 	m_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE32_MEMBER(taitojc_state::taitojc_char_w)
 {
-	COMBINE_DATA(m_char_ram + offset);
+	COMBINE_DATA(m_char_ram.get() + offset);
 	m_gfxdecode->gfx(m_gfx_index)->mark_dirty(offset/32);
 }
 
@@ -313,11 +313,11 @@ void taitojc_state::video_start()
 
 	m_tilemap->set_transparent_pen(0);
 
-	m_char_ram = auto_alloc_array_clear(machine(), UINT32, 0x4000/4);
-	m_tile_ram = auto_alloc_array_clear(machine(), UINT32, 0x4000/4);
+	m_char_ram = make_unique_clear<UINT32[]>(0x4000/4);
+	m_tile_ram = make_unique_clear<UINT32[]>(0x4000/4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, taitojc_char_layout, (UINT8 *)m_char_ram, 0, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, taitojc_char_layout, (UINT8 *)m_char_ram.get(), 0, m_palette->entries() / 16, 0)));
 }
 
 UINT32 taitojc_state::screen_update_taitojc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -240,7 +240,7 @@ void segas32_state::common_start(int multi32)
 	for (tmap = 0; tmap < 9 + 2 * multi32; tmap++)
 	{
 		m_layer_data[tmap].bitmap = auto_alloc(machine(), bitmap_ind16(416, 224));
-		m_layer_data[tmap].transparent = auto_alloc_array_clear(machine(), UINT8, 256);
+		m_layer_data[tmap].transparent = make_unique_clear<UINT8[]>(256);
 	}
 
 	/* allocate pre-rendered solid lines of 0's and ffff's */

@@ -54,9 +54,9 @@ public:
 	UINT8 m_robokid_bg0_bank;
 	UINT8 m_robokid_bg1_bank;
 	UINT8 m_robokid_bg2_bank;
-	UINT8* m_robokid_bg0_videoram;
-	UINT8* m_robokid_bg1_videoram;
-	UINT8* m_robokid_bg2_videoram;
+	std::unique_ptr<UINT8[]> m_robokid_bg0_videoram;
+	std::unique_ptr<UINT8[]> m_robokid_bg1_videoram;
+	std::unique_ptr<UINT8[]> m_robokid_bg2_videoram;
 	UINT8 m_rom_bank_mask;
 
 	void omegaf_io_protection_start();

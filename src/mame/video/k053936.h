@@ -46,8 +46,8 @@ protected:
 
 private:
 	// internal state
-	UINT16    *m_ctrl;
-	UINT16    *m_linectrl;
+	std::unique_ptr<UINT16[]>    m_ctrl;
+	std::unique_ptr<UINT16[]>    m_linectrl;
 	int       m_wrap, m_xoff, m_yoff;
 };
 

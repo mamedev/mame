@@ -39,9 +39,9 @@ protected:
 private:
 
 	int m_st0020_gfxram_bank;
-	UINT16* m_st0020_gfxram;
-	UINT16* m_st0020_spriteram;
-	UINT16* m_st0020_blitram;
+	std::unique_ptr<UINT16[]> m_st0020_gfxram;
+	std::unique_ptr<UINT16[]> m_st0020_spriteram;
+	std::unique_ptr<UINT16[]> m_st0020_blitram;
 	void st0020_draw_zooming_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	DECLARE_READ16_MEMBER(st0020_blit_r);
 	DECLARE_WRITE16_MEMBER(st0020_blit_w);

@@ -23,7 +23,7 @@ public:
 	required_shared_ptr<UINT16> m_scroll1;
 	required_shared_ptr<UINT16> m_scroll2;
 	required_shared_ptr<UINT16> m_spriteram;
-	UINT16 *     m_spriteram_old;
+	std::unique_ptr<UINT16[]>     m_spriteram_old;
 	required_shared_ptr<UINT16> m_vidregs;
 	std::unique_ptr<UINT16[]>     m_vidregs_old;
 

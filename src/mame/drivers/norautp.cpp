@@ -567,7 +567,7 @@
 
 void norautp_state::video_start()
 {
-	m_np_vram = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
+	m_np_vram = make_unique_clear<UINT16[]>(0x1000/2);
 }
 
 

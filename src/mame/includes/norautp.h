@@ -18,7 +18,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	UINT16 *m_np_vram;
+	std::unique_ptr<UINT16[]> m_np_vram;
 	UINT16 m_np_addr;
 	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_READ8_MEMBER(vram_data_r);

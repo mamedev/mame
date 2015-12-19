@@ -42,7 +42,7 @@ public:
 	int m_tilexor;
 	UINT8 m_blacklamp;
 	UINT8 m_redlamp;
-	UINT8 *m_vram;
+	std::unique_ptr<UINT8[]> m_vram;
 
 	required_device<z180_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -65,7 +65,7 @@ public:
 
 void chsuper_state::video_start()
 {
-	m_vram = auto_alloc_array_clear(machine(), UINT8, 1 << 14);
+	m_vram = make_unique_clear<UINT8[]>(1 << 14);
 }
 
 UINT32 chsuper_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )

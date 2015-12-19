@@ -159,7 +159,8 @@ private:
 	UINT32 m_AICARAM_LENGTH, m_RAM_MASK, m_RAM_MASK16;
 	sound_stream * m_stream;
 
-	INT32 *m_buffertmpl, *m_buffertmpr;
+	std::unique_ptr<INT32[]> m_buffertmpl;
+	std::unique_ptr<INT32[]> m_buffertmpr;
 
 	UINT32 m_IrqTimA;
 	UINT32 m_IrqTimBC;

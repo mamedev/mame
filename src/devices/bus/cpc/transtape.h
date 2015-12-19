@@ -41,7 +41,7 @@ private:
 	cpc_expansion_slot_device *m_slot;
 	cpu_device* m_cpu;
 	address_space* m_space;
-	UINT8* m_ram;  // 8kB internal RAM
+	std::unique_ptr<UINT8[]> m_ram;  // 8kB internal RAM
 	bool m_rom_active;
 	bool m_romen;
 	UINT8 m_output;

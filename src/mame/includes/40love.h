@@ -37,8 +37,8 @@ public:
 	UINT8       m_flipscreen;
 	UINT8       m_pix_redraw;
 	UINT8       m_xoffset;
-	UINT8       *m_pixram1;
-	UINT8       *m_pixram2;
+	std::unique_ptr<UINT8[]>       m_pixram1;
+	std::unique_ptr<UINT8[]>       m_pixram2;
 	bitmap_ind16    *m_pixel_bitmap1;
 	bitmap_ind16    *m_pixel_bitmap2;
 	int         m_pixram_sel;

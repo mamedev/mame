@@ -86,7 +86,7 @@ public:
 	DECLARE_VIDEO_START(primella);
 
 	required_shared_ptr<UINT8> m_txvideoram;
-	UINT8* m_paletteram_flytiger;
+	std::unique_ptr<UINT8[]> m_paletteram_flytiger;
 	UINT8 m_sprites_disabled;
 	UINT8 m_flytiger_pri;
 	UINT8 m_tx_pri;

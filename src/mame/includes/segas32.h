@@ -42,7 +42,7 @@ public:
 	struct layer_info
 	{
 		bitmap_ind16 *bitmap;
-		UINT8 *transparent;
+		std::unique_ptr<UINT8[]> transparent;
 	};
 
 	struct extents_list

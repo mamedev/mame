@@ -479,15 +479,15 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 
 VIDEO_START_MEMBER(raiden2_state,raiden2)
 {
-	back_data = auto_alloc_array_clear(machine(), UINT16, 0x800/2);
-	fore_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
-	mid_data =  auto_alloc_array_clear(machine(), UINT16, 0x800/2);
-	text_data =  auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
+	back_data = make_unique_clear<UINT16[]>(0x800/2);
+	fore_data =  make_unique_clear<UINT16[]>(0x800/2);
+	mid_data =  make_unique_clear<UINT16[]>(0x800/2);
+	text_data =  make_unique_clear<UINT16[]>(0x1000/2);
 
-	save_pointer(NAME(back_data), 0x800/2);
-	save_pointer(NAME(fore_data), 0x800/2);
-	save_pointer(NAME(mid_data), 0x800/2);
-	save_pointer(NAME(text_data), 0x1000/2);
+	save_pointer(NAME(back_data.get()), 0x800/2);
+	save_pointer(NAME(fore_data.get()), 0x800/2);
+	save_pointer(NAME(mid_data.get()), 0x800/2);
+	save_pointer(NAME(text_data.get()), 0x1000/2);
 
 	text_layer       = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
 	background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );

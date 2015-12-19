@@ -175,7 +175,7 @@ private:
 	sound_stream *m_mac_stream;
 	int m_sample_enable;
 	UINT16 *m_mac_snd_buf_ptr;
-	UINT8 *m_snd_cache;
+	std::unique_ptr<UINT8[]> m_snd_cache;
 	int m_snd_cache_len;
 	int m_snd_cache_head;
 	int m_snd_cache_tail;

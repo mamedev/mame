@@ -31,13 +31,13 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<okim6295_device> m_okimusic;
 	/* memory pointers */
-	UINT16 *  m_pf1_rowscroll;
-	UINT16 *  m_pf2_rowscroll;
+	std::unique_ptr<UINT16[]>  m_pf1_rowscroll;
+	std::unique_ptr<UINT16[]>  m_pf2_rowscroll;
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_systemram;
 	optional_device<decospr_device> m_sprgen;
 	required_device<palette_device> m_palette;
-	UINT16 *m_spriteram;
+	std::unique_ptr<UINT16[]> m_spriteram;
 	size_t m_spriteram_size;
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);

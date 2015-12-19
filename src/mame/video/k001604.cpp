@@ -24,7 +24,8 @@ k001604_device::k001604_device(const machine_config &mconfig, const char *tag, d
 	m_layer_size(0),
 	m_roz_size(0),
 	m_txt_mem_offset(0),
-	m_roz_mem_offset(0),
+	m_roz_mem_offset(0), 
+	m_layer_roz(nullptr),
 	m_tile_ram(nullptr),
 	m_char_ram(nullptr),
 	m_reg(nullptr),
@@ -81,9 +82,9 @@ void k001604_device::device_start()
 	m_gfx_index[0] = m_gfx_index_1;
 	m_gfx_index[1] = m_gfx_index_2;
 
-	m_char_ram = auto_alloc_array_clear(machine(), UINT32, 0x200000 / 4);
-	m_tile_ram = auto_alloc_array_clear(machine(), UINT32, 0x20000 / 4);
-	m_reg = auto_alloc_array_clear(machine(), UINT32, 0x400 / 4);
+	m_char_ram = make_unique_clear<UINT32[]>(0x200000 / 4);
+	m_tile_ram = make_unique_clear<UINT32[]>(0x20000 / 4);
+	m_reg = make_unique_clear<UINT32[]>(0x400 / 4);
 
 	/* create tilemaps */
 	roz_tile_size = m_roz_size ? 16 : 8;
@@ -109,9 +110,9 @@ void k001604_device::device_start()
 	m_gfxdecode->set_gfx(m_gfx_index[0], global_alloc(gfx_element(m_palette, k001604_char_layout_layer_8x8, (UINT8*)&m_char_ram[0], 0, m_palette->entries() / 16, 0)));
 	m_gfxdecode->set_gfx(m_gfx_index[1], global_alloc(gfx_element(m_palette, k001604_char_layout_layer_16x16, (UINT8*)&m_char_ram[0], 0, m_palette->entries() / 16, 0)));
 
-	save_pointer(NAME(m_reg), 0x400 / 4);
-	save_pointer(NAME(m_char_ram), 0x200000 / 4);
-	save_pointer(NAME(m_tile_ram), 0x20000 / 4);
+	save_pointer(NAME(m_reg.get()), 0x400 / 4);
+	save_pointer(NAME(m_char_ram.get()), 0x200000 / 4);
+	save_pointer(NAME(m_tile_ram.get()), 0x20000 / 4);
 
 }
 
@@ -121,9 +122,9 @@ void k001604_device::device_start()
 
 void k001604_device::device_reset()
 {
-	memset(m_char_ram, 0, 0x200000);
-	memset(m_tile_ram, 0, 0x10000);
-	memset(m_reg, 0, 0x400);
+	memset(m_char_ram.get(), 0, 0x200000);
+	memset(m_tile_ram.get(), 0, 0x10000);
+	memset(m_reg.get(), 0, 0x400);
 }
 
 /*****************************************************************************
@@ -337,7 +338,7 @@ READ32_MEMBER( k001604_device::reg_r )
 WRITE32_MEMBER( k001604_device::tile_w )
 {
 	int x/*, y*/;
-	COMBINE_DATA(m_tile_ram + offset);
+	COMBINE_DATA(m_tile_ram.get() + offset);
 
 	if (m_layer_size)
 	{
@@ -394,7 +395,7 @@ WRITE32_MEMBER( k001604_device::char_w )
 
 	addr = offset + ((set + (bank * 0x40000)) / 4);
 
-	COMBINE_DATA(m_char_ram + addr);
+	COMBINE_DATA(m_char_ram.get() + addr);
 
 	m_gfxdecode->gfx(m_gfx_index[0])->mark_dirty(addr / 32);
 	m_gfxdecode->gfx(m_gfx_index[1])->mark_dirty(addr / 128);
@@ -402,7 +403,7 @@ WRITE32_MEMBER( k001604_device::char_w )
 
 WRITE32_MEMBER( k001604_device::reg_w )
 {
-	COMBINE_DATA(m_reg + offset);
+	COMBINE_DATA(m_reg.get() + offset);
 
 	switch (offset)
 	{

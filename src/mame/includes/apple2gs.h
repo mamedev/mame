@@ -113,7 +113,7 @@ public:
 	required_ioport  m_adb_mousex, m_adb_mousey;
 	required_device<palette_device> m_palette;
 
-	UINT8 *m_slowmem;
+	std::unique_ptr<UINT8[]> m_slowmem;
 	UINT8 m_newvideo;
 	UINT16 m_bordercolor;
 	UINT8 m_vgcint;

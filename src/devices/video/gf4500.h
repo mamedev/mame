@@ -35,7 +35,7 @@ private:
 
 	void vram_write16(UINT16 data);
 
-	UINT32 *m_data;
+	std::unique_ptr<UINT32[]> m_data;
 	int m_screen_x;
 	int m_screen_y;
 	int m_screen_x_max;

@@ -123,7 +123,8 @@ private:
 	char m_Master;
 	sound_stream * m_stream;
 
-	INT32 *m_buffertmpl,*m_buffertmpr;
+	std::unique_ptr<INT32[]> m_buffertmpl;
+	std::unique_ptr<INT32[]> m_buffertmpr;
 
 	UINT32 m_IrqTimA;
 	UINT32 m_IrqTimBC;

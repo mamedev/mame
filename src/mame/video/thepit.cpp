@@ -104,7 +104,7 @@ TILE_GET_INFO_MEMBER(thepit_state::solid_get_tile_info)
 {
 	UINT8 back_color = (m_colorram[tile_index] & 0x70) >> 4;
 	int priority = (back_color != 0) && ((m_colorram[tile_index] & 0x80) == 0);
-	tileinfo.pen_data = m_dummy_tile;
+	tileinfo.pen_data = m_dummy_tile.get();
 	tileinfo.palette_base = back_color + 32;
 	tileinfo.category = priority;
 }
@@ -135,7 +135,7 @@ void thepit_state::video_start()
 	m_solid_tilemap->set_scroll_cols(32);
 	m_tilemap->set_scroll_cols(32);
 
-	m_dummy_tile = auto_alloc_array_clear(machine(), UINT8, 8*8);
+	m_dummy_tile = make_unique_clear<UINT8[]>(8*8);
 
 	m_graphics_bank = 0;    /* only used in intrepid */
 

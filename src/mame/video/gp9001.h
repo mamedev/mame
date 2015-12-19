@@ -26,7 +26,7 @@ struct gp9001tilemaplayer : gp9001layer
 struct gp9001spritelayer : gp9001layer
 {
 	bool use_sprite_buffer;
-	UINT16 *vram16_buffer; // vram buffer for this layer
+	std::unique_ptr<UINT16[]> vram16_buffer; // vram buffer for this layer
 };
 
 

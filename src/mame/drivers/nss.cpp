@@ -315,7 +315,7 @@ public:
 	optional_device<palette_device> m_palette;
 
 	UINT8 m_wram_wp_flag;
-	UINT8 *m_wram;
+	std::unique_ptr<UINT8[]> m_wram;
 	UINT8 m_nmi_enable;
 	UINT8 m_cart_sel;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -623,7 +623,7 @@ void nss_state::machine_start()
 	snes_state::machine_start();
 
 	m_is_nss = 1;
-	m_wram = auto_alloc_array_clear(machine(), UINT8, 0x1000);
+	m_wram = make_unique_clear<UINT8[]>(0x1000);
 }
 
 

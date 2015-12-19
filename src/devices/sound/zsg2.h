@@ -70,9 +70,9 @@ private:
 
 	required_region_ptr<UINT32> m_mem_base;
 	UINT32 m_read_address;
-	UINT32 *m_mem_copy;
+	std::unique_ptr<UINT32[]> m_mem_copy;
 	UINT32 m_mem_blocks;
-	INT16 *m_full_samples;
+	std::unique_ptr<INT16[]> m_full_samples;
 
 	sound_stream *m_stream;
 

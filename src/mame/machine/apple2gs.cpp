@@ -1821,8 +1821,8 @@ void apple2gs_state::apple2gs_setup_memory()
 	apple2_memmap_config cfg;
 
 	/* allocate memory for E00000-E1FFFF */
-	m_slowmem = auto_alloc_array_clear(machine(), UINT8, 128*1024);
-	save_pointer(m_slowmem, "APPLE2GS_SLOWMEM", 128*1024);
+	m_slowmem = make_unique_clear<UINT8[]>(128*1024);
+	save_pointer(m_slowmem.get(), "APPLE2GS_SLOWMEM", 128*1024);
 
 	// install expanded memory
 	// fair warning: other code assumes banks 0 and 1 are the first 128k of the RAM device, so you must install bank 1 at 0x10000
@@ -1857,7 +1857,7 @@ void apple2gs_state::apple2gs_setup_memory()
 	space.install_write_handler(0xe02000, 0xe03fff, write8_delegate(FUNC(apple2gs_state::apple2gs_E02xxx_w),this));
 	space.install_write_handler(0xe10400, 0xe107ff, write8_delegate(FUNC(apple2gs_state::apple2gs_E104xx_w),this));
 	space.install_write_handler(0xe12000, 0xe13fff, write8_delegate(FUNC(apple2gs_state::apple2gs_E12xxx_w),this));
-	membank("bank2")->set_base(m_slowmem);
+	membank("bank2")->set_base(m_slowmem.get());
 
 	/* install alternate ROM bank */
 	begin = 0x1000000 - memregion("maincpu")->bytes();
@@ -1885,7 +1885,7 @@ void apple2gs_state::apple2gs_setup_memory()
 	memset(&cfg, 0, sizeof(cfg));
 	cfg.first_bank = 4;
 	cfg.memmap = apple2gs_memmap_entries;
-	cfg.auxmem = m_slowmem;
+	cfg.auxmem = m_slowmem.get();
 	cfg.auxmem_length = 0x20000;
 	apple2_setup_memory(&cfg);
 }

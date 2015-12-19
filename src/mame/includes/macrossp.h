@@ -52,8 +52,8 @@ public:
 	required_shared_ptr<UINT32> m_text_linezoom;
 	required_shared_ptr<UINT32> m_text_videoregs;
 	required_shared_ptr<UINT32> m_mainram;
-	UINT32 *         m_spriteram_old;
-	UINT32 *         m_spriteram_old2;
+	std::unique_ptr<UINT32[]>         m_spriteram_old;
+	std::unique_ptr<UINT32[]>         m_spriteram_old2;
 
 	/* video-related */
 	tilemap_t  *m_scra_tilemap;

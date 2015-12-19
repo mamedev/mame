@@ -52,11 +52,11 @@ public:
 	std::unique_ptr<UINT8[]>     m_backupram;
 	std::unique_ptr<UINT32[]>    m_scu_regs;
 	std::unique_ptr<UINT16[]>    m_scsp_regs;
-	UINT16    *m_vdp2_regs;
-	UINT32    *m_vdp2_vram;
-	UINT32    *m_vdp2_cram;
-	UINT32    *m_vdp1_vram;
-	UINT16    *m_vdp1_regs;
+	std::unique_ptr<UINT16[]>    m_vdp2_regs;
+	std::unique_ptr<UINT32[]>    m_vdp2_vram;
+	std::unique_ptr<UINT32[]>    m_vdp2_cram;
+	std::unique_ptr<UINT32[]>    m_vdp1_vram;
+	std::unique_ptr<UINT16[]>    m_vdp1_regs;
 
 	UINT8     m_NMI_reset;
 	UINT8     m_en_68k;

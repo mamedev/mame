@@ -53,11 +53,11 @@ void tc0180vcu_device::device_start()
 	m_tilemap[1]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
 
-	m_ram = auto_alloc_array_clear(machine(), UINT16, TC0180VCU_RAM_SIZE / 2);
-	m_scrollram = auto_alloc_array_clear(machine(), UINT16, TC0180VCU_SCROLLRAM_SIZE / 2);
+	m_ram = make_unique_clear<UINT16[]>(TC0180VCU_RAM_SIZE / 2);
+	m_scrollram = make_unique_clear<UINT16[]>(TC0180VCU_SCROLLRAM_SIZE / 2);
 
-	save_pointer(NAME(m_ram), TC0180VCU_RAM_SIZE / 2);
-	save_pointer(NAME(m_scrollram), TC0180VCU_SCROLLRAM_SIZE / 2);
+	save_pointer(NAME(m_ram.get()), TC0180VCU_RAM_SIZE / 2);
+	save_pointer(NAME(m_scrollram.get()), TC0180VCU_SCROLLRAM_SIZE / 2);
 
 	save_item(NAME(m_bg_rambank));
 	save_item(NAME(m_fg_rambank));

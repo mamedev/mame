@@ -91,7 +91,7 @@ public:
 	required_device<rs232_port_device> m_kbd;
 	UINT8 m_vram_bank;
 	//required_shared_ptr<UINT8> m_video_ram;
-	UINT16 *m_video_ram;
+	std::unique_ptr<UINT16[]> m_video_ram;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -620,7 +620,7 @@ GFXDECODE_END
 void qx10_state::video_start()
 {
 	// allocate memory
-	m_video_ram = auto_alloc_array_clear(machine(), UINT16, 0x30000);
+	m_video_ram = make_unique_clear<UINT16[]>(0x30000);
 
 	// find memory regions
 	m_char_rom = memregion("chargen")->base();

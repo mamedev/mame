@@ -327,7 +327,7 @@ pri_alp_bitmap
 
 void taito_f3_state::print_debug_info(bitmap_rgb32 &bitmap)
 {
-	UINT16 *f3_line_ram = m_f3_line_ram;
+	UINT16 *f3_line_ram = m_f3_line_ram.get();
 	int l[16];
 	char buf[64*16];
 	char *bufptr = buf;
@@ -511,13 +511,13 @@ void taito_f3_state::screen_eof_f3(screen_device &screen, bool state)
 			{
 				get_sprite_info(m_spriteram16_buffered.get());
 			}
-			memcpy(m_spriteram16_buffered.get(),m_spriteram,0x10000);
+			memcpy(m_spriteram16_buffered.get(),m_spriteram.get(),0x10000);
 		}
 		else if (m_sprite_lag==1)
 		{
 			if (machine().video().skip_this_frame() == 0)
 			{
-				get_sprite_info(m_spriteram);
+				get_sprite_info(m_spriteram.get());
 			}
 		}
 	}
@@ -563,12 +563,12 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 
 	m_f3_game_config=pCFG;
 
-	m_f3_vram =      auto_alloc_array_clear(machine(), UINT16, 0x2000/2);
-	m_f3_pf_data =   auto_alloc_array_clear(machine(), UINT16, 0xc000/2);
-	m_videoram =     auto_alloc_array_clear(machine(), UINT16, 0x2000/2);
-	m_f3_line_ram =  auto_alloc_array_clear(machine(), UINT16, 0x10000/2);
-	m_f3_pivot_ram = auto_alloc_array_clear(machine(), UINT16, 0x10000/2);
-	m_spriteram =    auto_alloc_array_clear(machine(), UINT16, 0x10000/2);
+	m_f3_vram =      make_unique_clear<UINT16[]>(0x2000/2);
+	m_f3_pf_data =   make_unique_clear<UINT16[]>(0xc000/2);
+	m_videoram =     make_unique_clear<UINT16[]>(0x2000/2);
+	m_f3_line_ram =  make_unique_clear<UINT16[]>(0x10000/2);
+	m_f3_pivot_ram = make_unique_clear<UINT16[]>(0x10000/2);
+	m_spriteram =    make_unique_clear<UINT16[]>(0x10000/2);
 
 	if (m_f3_game_config->extend) {
 		m_pf1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,16,16,64,32);
@@ -576,10 +576,10 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 		m_pf3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info3),this),TILEMAP_SCAN_ROWS,16,16,64,32);
 		m_pf4_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info4),this),TILEMAP_SCAN_ROWS,16,16,64,32);
 
-		m_f3_pf_data_1=m_f3_pf_data+(0x0000/2);
-		m_f3_pf_data_2=m_f3_pf_data+(0x2000/2);
-		m_f3_pf_data_3=m_f3_pf_data+(0x4000/2);
-		m_f3_pf_data_4=m_f3_pf_data+(0x6000/2);
+		m_f3_pf_data_1=m_f3_pf_data.get()+(0x0000/2);
+		m_f3_pf_data_2=m_f3_pf_data.get()+(0x2000/2);
+		m_f3_pf_data_3=m_f3_pf_data.get()+(0x4000/2);
+		m_f3_pf_data_4=m_f3_pf_data.get()+(0x6000/2);
 
 		m_width_mask=0x3ff;
 		m_twidth_mask=0x7f;
@@ -601,14 +601,14 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 		m_pf7_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info7),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 		m_pf8_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info8),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 
-		m_f3_pf_data_1=m_f3_pf_data+(0x0000/2);
-		m_f3_pf_data_2=m_f3_pf_data+(0x1000/2);
-		m_f3_pf_data_3=m_f3_pf_data+(0x2000/2);
-		m_f3_pf_data_4=m_f3_pf_data+(0x3000/2);
-		m_f3_pf_data_5=m_f3_pf_data+(0x4000/2);
-		m_f3_pf_data_6=m_f3_pf_data+(0x5000/2);
-		m_f3_pf_data_7=m_f3_pf_data+(0x6000/2);
-		m_f3_pf_data_8=m_f3_pf_data+(0x7000/2);
+		m_f3_pf_data_1=m_f3_pf_data.get()+(0x0000/2);
+		m_f3_pf_data_2=m_f3_pf_data.get()+(0x1000/2);
+		m_f3_pf_data_3=m_f3_pf_data.get()+(0x2000/2);
+		m_f3_pf_data_4=m_f3_pf_data.get()+(0x3000/2);
+		m_f3_pf_data_5=m_f3_pf_data.get()+(0x4000/2);
+		m_f3_pf_data_6=m_f3_pf_data.get()+(0x5000/2);
+		m_f3_pf_data_7=m_f3_pf_data.get()+(0x6000/2);
+		m_f3_pf_data_8=m_f3_pf_data.get()+(0x7000/2);
 
 		m_width_mask=0x1ff;
 		m_twidth_mask=0x3f;
@@ -647,13 +647,13 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 
 	m_flipscreen = 0;
 	memset(m_spriteram16_buffered.get(),0,0x10000);
-	memset(m_spriteram,0,0x10000);
+	memset(m_spriteram.get(),0,0x10000);
 
 	save_item(NAME(m_f3_control_0));
 	save_item(NAME(m_f3_control_1));
 
-	m_gfxdecode->gfx(0)->set_source((UINT8 *)m_f3_vram);
-	m_gfxdecode->gfx(3)->set_source((UINT8 *)m_f3_pivot_ram);
+	m_gfxdecode->gfx(0)->set_source((UINT8 *)m_f3_vram.get());
+	m_gfxdecode->gfx(3)->set_source((UINT8 *)m_f3_pivot_ram.get());
 
 	m_f3_skip_this_frame=0;
 
@@ -3172,7 +3172,7 @@ UINT32 taito_f3_state::screen_update_f3(screen_device &screen, bitmap_rgb32 &bit
 
 	/* sprites */
 	if (m_sprite_lag==0)
-		get_sprite_info(m_spriteram);
+		get_sprite_info(m_spriteram.get());
 
 	/* Update sprite buffer */
 	draw_sprites(bitmap,cliprect);

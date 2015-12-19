@@ -435,9 +435,9 @@ private:
 	ANTIC_W m_w;                  /* ANTIC write registers */
 	UINT8   m_cclock[256+32];     /* color clock buffer filled by ANTIC */
 	UINT8   m_pmbits[256+32];     /* player missile buffer filled by GTIA */
-	UINT8   *m_prio_table[64];    /* player/missile priority tables */
+	std::unique_ptr<UINT8[]>   m_prio_table[64];    /* player/missile priority tables */
 	VIDEO   *m_video[312];        /* video buffer */
-	UINT32  *m_cclk_expand;       /* shared buffer for the following: */
+	std::unique_ptr<UINT32[]>  m_cclk_expand;       /* shared buffer for the following: */
 	UINT32  *m_pf_21;             /* 1cclk 2 color txt 2,3 */
 	UINT32  *m_pf_x10b;           /* 1cclk 4 color txt 4,5, gfx D,E */
 	UINT32  *m_pf_3210b2;         /* 1cclk 5 color txt 6,7, gfx 9,B,C */

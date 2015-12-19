@@ -179,21 +179,21 @@ void model3_state::video_start()
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_state::model3_exit), this));
 
-	m_m3_char_ram = auto_alloc_array_clear(machine(), UINT64, 0x100000/8);
-	m_m3_tile_ram = auto_alloc_array_clear(machine(), UINT64, 0x8000/8);
+	m_m3_char_ram = make_unique_clear<UINT64[]>(0x100000/8);
+	m_m3_tile_ram = make_unique_clear<UINT64[]>(0x8000/8);
 
-	m_texture_fifo = auto_alloc_array_clear(machine(), UINT32, 0x100000/4);
+	m_texture_fifo = make_unique_clear<UINT32[]>(0x100000/4);
 
 	/* 2x 4MB texture sheets */
 	m_texture_ram[0] = std::make_unique<UINT16[]>(0x400000/2);
 	m_texture_ram[1] = std::make_unique<UINT16[]>(0x400000/2);
 
 	/* 1MB Display List RAM */
-	m_display_list_ram = auto_alloc_array_clear(machine(), UINT32, 0x100000/4);
+	m_display_list_ram = make_unique_clear<UINT32[]>(0x100000/4);
 	/* 4MB for nodes (< Step 2.0 have only 2MB) */
-	m_culling_ram = auto_alloc_array_clear(machine(), UINT32, 0x400000/4);
+	m_culling_ram = make_unique_clear<UINT32[]>(0x400000/4);
 	/* 4MB Polygon RAM */
-	m_polygon_ram = auto_alloc_array_clear(machine(), UINT32, 0x400000/4);
+	m_polygon_ram = make_unique_clear<UINT32[]>(0x400000/4);
 
 	m_vid_reg0 = 0;
 
@@ -207,10 +207,10 @@ void model3_state::video_start()
 	m_layer8[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer3_8bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	// 4-bit tiles
-	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, char4_layout, (UINT8*)m_m3_char_ram, 0, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, char4_layout, (UINT8*)m_m3_char_ram.get(), 0, m_palette->entries() / 16, 0)));
 
 	// 8-bit tiles
-	m_gfxdecode->set_gfx(1, global_alloc(gfx_element(m_palette, char8_layout, (UINT8*)m_m3_char_ram, 0, m_palette->entries() / 256, 0)));
+	m_gfxdecode->set_gfx(1, global_alloc(gfx_element(m_palette, char8_layout, (UINT8*)m_m3_char_ram.get(), 0, m_palette->entries() / 256, 0)));
 
 	init_matrix_stack();
 }

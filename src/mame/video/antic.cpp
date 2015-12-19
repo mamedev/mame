@@ -67,7 +67,7 @@ void antic_device::device_start()
 
 	m_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
 
-	m_cclk_expand = auto_alloc_array_clear(machine(), UINT32, 21 * 256);
+	m_cclk_expand = make_unique_clear<UINT32[]>(21 * 256);
 
 	m_pf_21       = &m_cclk_expand[ 0 * 256];
 	m_pf_x10b     = &m_cclk_expand[ 1 * 256];
@@ -97,7 +97,7 @@ void antic_device::device_start()
 	cclk_init();
 
 	for (auto & elem : m_prio_table)
-		elem = auto_alloc_array_clear(machine(), UINT8, 8*256);
+		elem = make_unique_clear<UINT8[]>(8*256);
 
 	LOG(("atari prio_init\n"));
 	prio_init();
@@ -133,7 +133,7 @@ void antic_device::device_start()
 	save_item(NAME(m_cclock));
 	save_item(NAME(m_pmbits));
 
-	save_pointer(NAME(m_cclk_expand), 21 * 256);
+	save_pointer(NAME(m_cclk_expand.get()), 21 * 256);
 	save_pointer(NAME(m_used_colors.get()), 21 * 256);
 }
 
@@ -1804,7 +1804,7 @@ TIMER_CALLBACK_MEMBER( antic_device::scanline_render )
 	}
 
 	if (m_scanline >= VBL_END && m_scanline < 256)
-		m_gtia->render((UINT8 *)m_pmbits + PMOFFSET, (UINT8 *)m_cclock + PMOFFSET - m_hscrol_old, (UINT8 *)m_prio_table[m_gtia->get_w_prior() & 0x3f], (UINT8 *)&m_pmbits);
+		m_gtia->render((UINT8 *)m_pmbits + PMOFFSET, (UINT8 *)m_cclock + PMOFFSET - m_hscrol_old, m_prio_table[m_gtia->get_w_prior() & 0x3f].get(), (UINT8 *)&m_pmbits);
 
 	m_steal_cycles += CYCLES_REFRESH;
 	LOG(("           run CPU for %d cycles\n", CYCLES_HSYNC - CYCLES_HSTART - m_steal_cycles));

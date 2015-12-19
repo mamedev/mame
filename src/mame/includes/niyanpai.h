@@ -47,8 +47,8 @@ public:
 	int m_nb19010_busyctr;
 	int m_nb19010_busyflag;
 	bitmap_ind16 m_tmpbitmap[VRAM_MAX];
-	UINT16 *m_videoram[VRAM_MAX];
-	UINT16 *m_videoworkram[VRAM_MAX];
+	std::unique_ptr<UINT16[]> m_videoram[VRAM_MAX];
+	std::unique_ptr<UINT16[]> m_videoworkram[VRAM_MAX];
 	std::unique_ptr<UINT16[]> m_palette_ptr;
 	std::unique_ptr<UINT8[]> m_clut[VRAM_MAX];
 	int m_flipscreen_old[VRAM_MAX];

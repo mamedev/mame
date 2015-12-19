@@ -50,7 +50,7 @@ protected:
 
 	devcb_write_line m_vblank_pin_w;
 	devcb_write_line m_hblank_pin_w;
-	UINT8 *m_vram;
+	std::unique_ptr<UINT8[]> m_vram;
 	UINT8 m_wba_h, m_wba_v, m_wsi_h, m_wsi_v;
 
 	emu_timer *m_timer;

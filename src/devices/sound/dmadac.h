@@ -35,7 +35,7 @@ private:
 	// internal state
 	/* sound stream and buffers */
 	sound_stream *  m_channel;
-	INT16 *         m_buffer;
+	std::unique_ptr<INT16[]>         m_buffer;
 	UINT32          m_bufin;
 	UINT32          m_bufout;
 

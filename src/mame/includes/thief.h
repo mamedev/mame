@@ -20,7 +20,7 @@ public:
 		m_tms(*this, "tms"),
 		m_palette(*this, "palette") { }
 
-	UINT8 *m_videoram;
+	std::unique_ptr<UINT8[]> m_videoram;
 	UINT8 m_input_select;
 	UINT8 m_read_mask;
 	UINT8 m_write_mask;

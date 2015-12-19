@@ -245,11 +245,11 @@ k053936_device::k053936_device(const machine_config &mconfig, const char *tag, d
 
 void k053936_device::device_start()
 {
-	m_ctrl = auto_alloc_array_clear(machine(), UINT16, 0x20);
-	m_linectrl = auto_alloc_array_clear(machine(), UINT16, 0x4000);
+	m_ctrl = make_unique_clear<UINT16[]>(0x20);
+	m_linectrl = make_unique_clear<UINT16[]>(0x4000);
 
-	save_pointer(NAME(m_ctrl), 0x20);
-	save_pointer(NAME(m_linectrl), 0x4000);
+	save_pointer(NAME(m_ctrl.get()), 0x20);
+	save_pointer(NAME(m_linectrl.get()), 0x4000);
 }
 
 //-------------------------------------------------
@@ -258,7 +258,7 @@ void k053936_device::device_start()
 
 void k053936_device::device_reset()
 {
-	memset(m_ctrl, 0, 0x20);
+	memset(m_ctrl.get(), 0, 0x20);
 }
 
 
@@ -335,7 +335,7 @@ void k053936_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, con
 
 		while (y <= maxy)
 		{
-			UINT16 *lineaddr = m_linectrl + 4 * ((y - m_yoff) & 0x1ff);
+			UINT16 *lineaddr = m_linectrl.get() + 4 * ((y - m_yoff) & 0x1ff);
 
 			my_clip.min_y = my_clip.max_y = y;
 

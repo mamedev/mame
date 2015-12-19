@@ -4576,11 +4576,11 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 	{
 		if ( STV_VDP2_CRKTE == 0 )
 		{
-			coeff_table_base = m_vdp2_vram;
+			coeff_table_base = m_vdp2_vram.get();
 		}
 		else
 		{
-			coeff_table_base = m_vdp2_cram;
+			coeff_table_base = m_vdp2_cram.get();
 		}
 		if ( coeff_table_size == 0 )
 		{
@@ -6101,9 +6101,9 @@ int saturn_state::stv_vdp2_start ( void )
 {
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(saturn_state::stv_vdp2_exit), this));
 
-	m_vdp2_regs = auto_alloc_array_clear(machine(), UINT16, 0x040000/2 );
-	m_vdp2_vram = auto_alloc_array_clear(machine(), UINT32, 0x100000/4 );
-	m_vdp2_cram = auto_alloc_array_clear(machine(), UINT32, 0x080000/4 );
+	m_vdp2_regs = make_unique_clear<UINT16[]>(0x040000/2 );
+	m_vdp2_vram = make_unique_clear<UINT32[]>(0x100000/4 );
+	m_vdp2_cram = make_unique_clear<UINT32[]>(0x080000/4 );
 	m_vdp2.gfx_decode = std::make_unique<UINT8[]>(0x100000 );
 
 //  m_gfxdecode->gfx(0)->granularity()=4;
@@ -6113,9 +6113,9 @@ int saturn_state::stv_vdp2_start ( void )
 	stv_rbg_cache_data.is_cache_dirty = 3;
 	memset( &stv_vdp2_layer_data_placement, 0, sizeof(stv_vdp2_layer_data_placement));
 
-	save_pointer(NAME(m_vdp2_regs), 0x040000/2);
-	save_pointer(NAME(m_vdp2_vram), 0x100000/4);
-	save_pointer(NAME(m_vdp2_cram), 0x080000/4);
+	save_pointer(NAME(m_vdp2_regs.get()), 0x040000/2);
+	save_pointer(NAME(m_vdp2_vram.get()), 0x100000/4);
+	save_pointer(NAME(m_vdp2_cram.get()), 0x080000/4);
 	machine().save().register_postload(save_prepost_delegate(FUNC(saturn_state::stv_vdp2_state_save_postload), this));
 
 	return 0;

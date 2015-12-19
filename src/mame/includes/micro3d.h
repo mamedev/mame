@@ -213,8 +213,8 @@ struct biquad
 
 struct lp_filter
 {
-	float *history;
-	float *coef;
+	std::unique_ptr<float[]> history;
+	std::unique_ptr<float[]> coef;
 	double fs;
 	biquad ProtoCoef[2];
 };

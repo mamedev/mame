@@ -70,9 +70,9 @@ hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, d
 
 void hd63484_device::device_start()
 {
-	m_ram = auto_alloc_array_clear(machine(), UINT16, HD63484_RAM_SIZE);
+	m_ram = make_unique_clear<UINT16[]>(HD63484_RAM_SIZE);
 
-	save_pointer(NAME(m_ram), HD63484_RAM_SIZE);
+	save_pointer(NAME(m_ram.get()), HD63484_RAM_SIZE);
 	save_item(NAME(m_reg));
 	save_item(NAME(m_fifo_counter));
 	save_item(NAME(m_fifo));

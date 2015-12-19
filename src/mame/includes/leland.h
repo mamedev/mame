@@ -49,7 +49,7 @@ public:
 
 	UINT8 m_dac_control;
 	UINT8 *m_alleymas_kludge_mem;
-	UINT8 *m_ataxx_qram;
+	std::unique_ptr<UINT8[]> m_ataxx_qram;
 	UINT8 m_gfx_control;
 	UINT8 m_wcol_enable;
 	emu_timer *m_master_int_timer;
@@ -79,7 +79,7 @@ public:
 	UINT8 m_battery_ram_enable;
 	UINT8 *m_battery_ram;
 	std::unique_ptr<UINT8[]> m_extra_tram;
-	UINT8 *m_video_ram;
+	std::unique_ptr<UINT8[]> m_video_ram;
 	struct vram_state_data m_vram_state[2];
 	UINT16 m_xscroll;
 	UINT16 m_yscroll;

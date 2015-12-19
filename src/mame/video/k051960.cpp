@@ -201,7 +201,7 @@ void k051960_device::device_start()
 	if (VERBOSE && !(m_palette->shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
-	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x400);
+	m_ram = make_unique_clear<UINT8[]>(0x400);
 
 	// bind callbacks
 	m_k051960_cb.bind_relative_to(*owner());
@@ -217,7 +217,7 @@ void k051960_device::device_start()
 	save_item(NAME(m_readroms));
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_spriterombank));
-	save_pointer(NAME(m_ram), 0x400);
+	save_pointer(NAME(m_ram.get()), 0x400);
 }
 
 //-------------------------------------------------

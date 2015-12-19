@@ -30,14 +30,14 @@ protected:
 
 private:
 	// internal state
-	UINT16 *     m_pal_ram;
-	UINT16 *     m_unknown_ram;
+	std::unique_ptr<UINT16[]>      m_pal_ram;
+	std::unique_ptr<UINT16[]>     m_unknown_ram;
 	UINT32       m_addr;
 	int          m_device_sel;
 
 	std::unique_ptr<UINT8[]>     m_texrom;
 
-	UINT32 *     m_palette;
+	std::unique_ptr<UINT32[]>     m_palette;
 
 	const char * m_gfx_region;
 	UINT8 *      m_gfxrom;

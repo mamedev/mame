@@ -97,7 +97,7 @@ private:
 
 	UINT8   m_regs[16];
 	std::unique_ptr<UINT8[]>   m_bram;
-	UINT8   *m_adpcm_ram;
+	std::unique_ptr<UINT8[]>   m_adpcm_ram;
 	int     m_bram_locked;
 	int     m_adpcm_read_ptr;
 	UINT8   m_adpcm_read_buf;
@@ -125,18 +125,18 @@ private:
 	int     m_scsi_last_RST;  /* To catch setting of RST signal */
 	int     m_cd_motor_on;
 	int     m_selected;
-	UINT8   *m_command_buffer;
+	std::unique_ptr<UINT8[]>  m_command_buffer;
 	int     m_command_buffer_index;
 	int     m_status_sent;
 	int     m_message_after_status;
 	int     m_message_sent;
-	UINT8   *m_data_buffer;
+	std::unique_ptr<UINT8[]> m_data_buffer;
 	int     m_data_buffer_size;
 	int     m_data_buffer_index;
 	int     m_data_transferred;
 
 	/* Arcade Card specific */
-	UINT8   *m_acard_ram;
+	std::unique_ptr<UINT8[]>  m_acard_ram;
 	UINT8   m_acard_latch;
 	UINT8   m_acard_ctrl[4];
 	UINT32  m_acard_base_addr[4];

@@ -101,7 +101,7 @@ void n64_state::video_start()
 
 	m_rdp->m_tex_pipe.set_machine(machine());
 
-	m_rdp->m_aux_buf = auto_alloc_array_clear(machine(), UINT8, EXTENT_AUX_COUNT);
+	m_rdp->m_aux_buf = make_unique_clear<UINT8[]>(EXTENT_AUX_COUNT);
 
 	if (LOG_RDP_EXECUTION)
 	{
@@ -2110,7 +2110,7 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 					new_object = false;
 				}
 
-				spans[spanidx].userdata = (void*)((UINT8*)m_aux_buf + m_aux_buf_ptr);
+				spans[spanidx].userdata = (void*)((UINT8*)m_aux_buf.get() + m_aux_buf_ptr);
 				valid = true;
 				m_aux_buf_ptr += sizeof(rdp_span_aux);
 

@@ -27,7 +27,7 @@ public:
 	UINT8 *    m_videoram;
 	UINT8 *    m_scrollram;
 	UINT8 *    m_io_ram;
-	UINT8 *    m_spriteram[2];
+	std::unique_ptr<UINT8[]>    m_spriteram[2];
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap[2];

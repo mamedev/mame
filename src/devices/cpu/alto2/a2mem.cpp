@@ -838,11 +838,9 @@ void alto2_cpu_device::exit_memory()
 void alto2_cpu_device::reset_memory()
 {
 	if (m_mem.ram) {
-		auto_free(machine(), m_mem.ram);
 		m_mem.ram = nullptr;
 	}
 	if (m_mem.hpb) {
-		auto_free(machine(), m_mem.hpb);
 		m_mem.hpb = nullptr;
 	}
 	// allocate 64K or 128K words of main memory
@@ -854,8 +852,8 @@ void alto2_cpu_device::reset_memory()
 		m_mem.size = ALTO2_RAM_SIZE;
 	logerror("Main memory %u KiB\n", static_cast<UINT32>(sizeof(UINT16) * m_mem.size / 1024));
 
-	m_mem.ram = auto_alloc_array_clear(machine(), UINT32, sizeof(UINT16) * m_mem.size);
-	m_mem.hpb = auto_alloc_array_clear(machine(), UINT8,  sizeof(UINT16) * m_mem.size);
+	m_mem.ram = make_unique_clear<UINT32[]>(sizeof(UINT16) * m_mem.size);
+	m_mem.hpb = make_unique_clear<UINT8[]>( sizeof(UINT16) * m_mem.size);
 
 #if USE_HAMMING_CHECK
 	// Initialize the hamming codes and parity bit

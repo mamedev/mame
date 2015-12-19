@@ -570,9 +570,9 @@ void st0016_cpu_device::st0016_save_init()
 	save_item(NAME(st0016_char_bank));
 	//save_item(NAME(st0016_rom_bank));
 	save_item(NAME(st0016_vregs));
-	save_pointer(NAME(m_charram), ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
-	save_pointer(NAME(st0016_paletteram), ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
-	save_pointer(NAME(st0016_spriteram), ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
+	save_pointer(NAME(m_charram.get()), ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
+	save_pointer(NAME(st0016_paletteram.get()), ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
+	save_pointer(NAME(st0016_spriteram.get()), ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
 }
 
 
@@ -581,9 +581,9 @@ void st0016_cpu_device::startup()
 	int gfx_index=0;
 
 	macs_cart_slot = 0;
-	m_charram=auto_alloc_array_clear(machine(), UINT8, ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
-	st0016_spriteram=auto_alloc_array_clear(machine(), UINT8, ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
-	st0016_paletteram=auto_alloc_array_clear(machine(), UINT8, ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
+	m_charram=make_unique_clear<UINT8[]>(ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
+	st0016_spriteram=make_unique_clear<UINT8[]>(ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
+	st0016_paletteram=make_unique_clear<UINT8[]>(ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -593,7 +593,7 @@ void st0016_cpu_device::startup()
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_palette, charlayout, (UINT8 *) m_charram, 0, 0x40, 0)));
+	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_palette, charlayout, m_charram.get(), 0, 0x40, 0)));
 	st0016_ramgfx = gfx_index;
 
 	spr_dx=0;
@@ -718,7 +718,7 @@ UINT32 st0016_cpu_device::update(screen_device &screen, bitmap_ind16 &bitmap, co
 	{
 		int h,j;
 		FILE *p=fopen("vram.bin","wb");
-		fwrite(st0016_spriteram,1,0x1000*ST0016_MAX_SPR_BANK,p);
+		fwrite(st0016_spriteram.get(),1,0x1000*ST0016_MAX_SPR_BANK,p);
 		fclose(p);
 
 		p=fopen("vram.txt","wt");

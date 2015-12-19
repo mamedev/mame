@@ -1670,7 +1670,7 @@ READ64_MEMBER(model3_state::network_r)
 
 WRITE64_MEMBER(model3_state::network_w)
 {
-	COMBINE_DATA(m_network_ram + offset);
+	COMBINE_DATA(m_network_ram.get() + offset);
 	osd_printf_debug("network_w: %02X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), space.device().safe_pc());
 }
 
@@ -5820,7 +5820,7 @@ DRIVER_INIT_MEMBER(model3_state,harley)
 {
 	DRIVER_INIT_CALL(model3_20);
 
-	m_network_ram = auto_alloc_array_clear(machine(), UINT64, 0x10000);
+	m_network_ram = make_unique_clear<UINT64[]>(0x10000);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),this), write64_delegate(FUNC(model3_state::network_w),this));
 }
 
@@ -5828,7 +5828,7 @@ DRIVER_INIT_MEMBER(model3_state,harleya)
 {
 	DRIVER_INIT_CALL(model3_20);
 
-	m_network_ram = auto_alloc_array_clear(machine(), UINT64, 0x10000);
+	m_network_ram = make_unique_clear<UINT64[]>(0x10000);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00fffff, read64_delegate(FUNC(model3_state::network_r),this), write64_delegate(FUNC(model3_state::network_w),this));
 }
 

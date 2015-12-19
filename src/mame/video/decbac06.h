@@ -21,8 +21,9 @@ public:
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void set_gfx_region_wide(device_t &device, int region8x8, int region16x16, int wide);
 
-	UINT16* m_pf_data;
-	UINT16* m_pf_rowscroll, *m_pf_colscroll;
+	std::unique_ptr<UINT16[]> m_pf_data;
+	std::unique_ptr<UINT16[]> m_pf_rowscroll;
+	std::unique_ptr<UINT16[]> m_pf_colscroll;
 
 	tilemap_t* m_pf8x8_tilemap[3];
 	tilemap_t* m_pf16x16_tilemap[3];

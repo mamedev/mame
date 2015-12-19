@@ -25,7 +25,7 @@ public:
 
 	/* memory pointers */
 	std::unique_ptr<UINT16[]>    m_video_ram;
-	UINT8  *    m_cchip_ram;
+	std::unique_ptr<UINT8[]>    m_cchip_ram;
 
 	/* video-related */
 	UINT16      m_video_ctrl;

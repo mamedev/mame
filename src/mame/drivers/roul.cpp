@@ -81,7 +81,7 @@ public:
 	required_device<cpu_device> m_soundcpu;
 
 	UINT8 m_reg[0x10];
-	UINT8 *m_videobuf;
+	std::unique_ptr<UINT8[]> m_videobuf;
 	UINT8 m_lamp_old;
 
 	DECLARE_READ8_MEMBER(blitter_status_r);
@@ -222,10 +222,10 @@ ADDRESS_MAP_END
 
 void roul_state::video_start()
 {
-	m_videobuf = auto_alloc_array_clear(machine(), UINT8, VIDEOBUF_SIZE);
+	m_videobuf = make_unique_clear<UINT8[]>(VIDEOBUF_SIZE);
 
 	save_item(NAME(m_reg));
-	save_pointer(NAME(m_videobuf), VIDEOBUF_SIZE);
+	save_pointer(NAME(m_videobuf.get()), VIDEOBUF_SIZE);
 	save_item(NAME(m_lamp_old));
 }
 

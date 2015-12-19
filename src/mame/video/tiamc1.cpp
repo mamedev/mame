@@ -124,19 +124,17 @@ TILE_GET_INFO_MEMBER(tiamc1_state::get_bg2_tile_info)
 
 void tiamc1_state::video_start()
 {
-	UINT8 *video_ram;
+	m_videoram = make_unique_clear<UINT8[]>(0x3040);
 
-	video_ram = auto_alloc_array_clear(machine(), UINT8, 0x3040);
+		m_charram = m_videoram.get() + 0x0800;     /* Ram is banked */
+		m_tileram = m_videoram.get() + 0x0000;
 
-		m_charram = video_ram + 0x0800;     /* Ram is banked */
-		m_tileram = video_ram + 0x0000;
+	m_spriteram_y = m_videoram.get() + 0x3000;
+	m_spriteram_x = m_videoram.get() + 0x3010;
+	m_spriteram_n = m_videoram.get() + 0x3020;
+	m_spriteram_a = m_videoram.get() + 0x3030;
 
-	m_spriteram_y = video_ram + 0x3000;
-	m_spriteram_x = video_ram + 0x3010;
-	m_spriteram_n = video_ram + 0x3020;
-	m_spriteram_a = video_ram + 0x3030;
-
-	save_pointer(NAME(video_ram), 0x3040);
+	save_pointer(NAME(m_videoram.get()), 0x3040);
 
 	m_bg_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);

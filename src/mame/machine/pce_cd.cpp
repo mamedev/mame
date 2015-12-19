@@ -99,17 +99,17 @@ void pce_cd_device::device_start()
 	m_nvram->set_base(m_bram.get(), PCE_BRAM_SIZE);
 
 	/* set up adpcm related things */
-	m_adpcm_ram = auto_alloc_array_clear(machine(), UINT8, PCE_ADPCM_RAM_SIZE);
+	m_adpcm_ram = make_unique_clear<UINT8[]>(PCE_ADPCM_RAM_SIZE);
 	m_adpcm_clock_divider = 1;
 
 	/* Set up cd command buffer */
-	m_command_buffer = auto_alloc_array_clear(machine(), UINT8, PCE_CD_COMMAND_BUFFER_SIZE);
+	m_command_buffer = make_unique_clear<UINT8[]>(PCE_CD_COMMAND_BUFFER_SIZE);
 	m_command_buffer_index = 0;
 
 	/* Set up Arcade Card RAM buffer */
-	m_acard_ram = auto_alloc_array_clear(machine(), UINT8, PCE_ACARD_RAM_SIZE);
+	m_acard_ram = make_unique_clear<UINT8[]>(PCE_ACARD_RAM_SIZE);
 
-	m_data_buffer = auto_alloc_array_clear(machine(), UINT8, 8192);
+	m_data_buffer = make_unique_clear<UINT8[]>(8192);
 	m_data_buffer_size = 0;
 	m_data_buffer_index = 0;
 
@@ -135,7 +135,7 @@ void pce_cd_device::device_start()
 	// TODO: add proper restore for the cd data...
 	save_item(NAME(m_regs));
 	save_pointer(NAME(m_bram.get()), PCE_BRAM_SIZE * 2);
-	save_pointer(NAME(m_adpcm_ram), PCE_ADPCM_RAM_SIZE);
+	save_pointer(NAME(m_adpcm_ram.get()), PCE_ADPCM_RAM_SIZE);
 	save_item(NAME(m_bram_locked));
 	save_item(NAME(m_adpcm_read_ptr));
 	save_item(NAME(m_adpcm_read_buf));
@@ -161,16 +161,16 @@ void pce_cd_device::device_start()
 	save_item(NAME(m_scsi_last_RST));
 	save_item(NAME(m_cd_motor_on));
 	save_item(NAME(m_selected));
-	save_pointer(NAME(m_command_buffer), PCE_CD_COMMAND_BUFFER_SIZE);
+	save_pointer(NAME(m_command_buffer.get()), PCE_CD_COMMAND_BUFFER_SIZE);
 	save_item(NAME(m_command_buffer_index));
 	save_item(NAME(m_status_sent));
 	save_item(NAME(m_message_after_status));
 	save_item(NAME(m_message_sent));
-	save_pointer(NAME(m_data_buffer), 8192);
+	save_pointer(NAME(m_data_buffer.get()), 8192);
 	save_item(NAME(m_data_buffer_size));
 	save_item(NAME(m_data_buffer_index));
 	save_item(NAME(m_data_transferred));
-	save_pointer(NAME(m_acard_ram), PCE_ACARD_RAM_SIZE);
+	save_pointer(NAME(m_acard_ram.get()), PCE_ACARD_RAM_SIZE);
 	save_item(NAME(m_acard_latch));
 	save_item(NAME(m_acard_ctrl));
 	save_item(NAME(m_acard_base_addr));
@@ -945,7 +945,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::data_timer_callback)
 	{
 		/* Read next data sector */
 		logerror("read sector %d\n", m_current_frame);
-		if (! cdrom_read_data(m_cd_file, m_current_frame, m_data_buffer, CD_TRACK_MODE1))
+		if (! cdrom_read_data(m_cd_file, m_current_frame, m_data_buffer.get(), CD_TRACK_MODE1))
 		{
 			logerror("Mode1 CD read failed for frame #%d\n", m_current_frame);
 		}

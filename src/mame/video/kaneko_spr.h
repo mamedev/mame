@@ -79,7 +79,7 @@ private:
 	// registers
 	UINT16 m_sprite_flipx;
 	UINT16 m_sprite_flipy;
-	UINT16* m_sprites_regs;
+	std::unique_ptr<UINT16[]> m_sprites_regs;
 
 	struct kan_tempsprite *m_first_sprite;
 	int m_keep_sprites;

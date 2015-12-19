@@ -46,7 +46,7 @@ protected:
 
 private:
 	// internal state
-	UINT16 *   m_ram;
+	std::unique_ptr<UINT16[]>   m_ram;
 	UINT16 m_reg[256/2];
 
 	int          m_fifo_counter;

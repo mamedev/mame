@@ -67,8 +67,8 @@ private:
 	UINT8 m_sound_banks[4];
 	//UINT8 m_m6844_data[0x20];
 	UINT8 m_sound_volume[0x10];
-	INT32 *m_mixer_buffer_left;
-	INT32 *m_mixer_buffer_right;
+	std::unique_ptr<INT32[]> m_mixer_buffer_left;
+	std::unique_ptr<INT32[]> m_mixer_buffer_right;
 	sound_cache_entry *m_sound_cache;
 	sound_cache_entry *m_sound_cache_end;
 	sound_cache_entry *m_sound_cache_max;

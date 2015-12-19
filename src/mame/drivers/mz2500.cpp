@@ -93,12 +93,12 @@ public:
 
 	floppy_image_device *m_floppy;
 
-	UINT8 *m_main_ram;
+	std::unique_ptr<UINT8[]> m_main_ram;
 	UINT8 *m_ipl_rom;
 	UINT8 *m_kanji_rom;
 	UINT8 *m_kanji2_rom;
-	UINT8 *m_pcg_ram;
-	UINT8 *m_emm_ram;
+	std::unique_ptr<UINT8[]> m_pcg_ram;
+	std::unique_ptr<UINT8[]> m_emm_ram;
 	UINT8 *m_dic_rom;
 	UINT8 *m_phone_rom;
 	UINT8 *m_iplpro_rom;
@@ -292,7 +292,7 @@ void mz2500_state::mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,UINT16  pe
 
 void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,UINT16 map_addr)
 {
-	UINT8 *vram = m_main_ram; // TODO
+	UINT8 *vram = m_main_ram.get(); // TODO
 	int x,y,count,xi,yi;
 	UINT8 *gfx_data;
 	UINT8 y_step;
@@ -317,7 +317,7 @@ void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,UIN
 			int inv_col = (attr & 0x40) >> 6;
 
 			if(gfx_sel & 8) // Xevious, PCG 8 colors have priority above kanji roms
-				gfx_data = m_pcg_ram;
+				gfx_data = m_pcg_ram.get();
 			else if(gfx_sel == 0x80)
 			{
 				gfx_data = m_kanji_rom;
@@ -335,7 +335,7 @@ void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,UIN
 			}
 			else
 			{
-				gfx_data = m_pcg_ram;
+				gfx_data = m_pcg_ram.get();
 			}
 
 			for(yi=0;yi<8*y_step;yi++)
@@ -381,7 +381,7 @@ void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,UIN
 
 void mz2500_state::draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,UINT16 map_addr)
 {
-	UINT8 *vram = m_main_ram; // TODO
+	UINT8 *vram = m_main_ram.get(); // TODO
 	int x,y,count,xi,yi;
 	UINT8 *gfx_data;
 	UINT8 y_step;
@@ -407,7 +407,7 @@ void mz2500_state::draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int
 			int inv_col = (attr & 0x40) >> 6;
 
 			if(gfx_sel & 8) // Xevious, PCG 8 colors have priority above kanji roms
-				gfx_data = m_pcg_ram;
+				gfx_data = m_pcg_ram.get();
 			else if(gfx_sel == 0x80)
 			{
 				gfx_data = m_kanji_rom;
@@ -425,7 +425,7 @@ void mz2500_state::draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int
 			}
 			else
 			{
-				gfx_data = m_pcg_ram;
+				gfx_data = m_pcg_ram.get();
 			}
 
 			for(yi=0;yi<8*y_step;yi++)
@@ -472,7 +472,7 @@ void mz2500_state::draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int
 void mz2500_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
 	UINT32 count;
-	UINT8 *vram = m_main_ram; // TODO
+	UINT8 *vram = m_main_ram.get(); // TODO
 	UINT8 pen,pen_bit[2];
 	int x,y,xi,pen_i;
 	int res_x,res_y;
@@ -513,7 +513,7 @@ void mz2500_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprec
 void mz2500_state::draw_cg16_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int x_size,int pri)
 {
 	UINT32 count;
-	UINT8 *vram = m_main_ram; //TODO
+	UINT8 *vram = m_main_ram.get(); //TODO
 	UINT8 pen,pen_bit[4];
 	int x,y,xi,pen_i;
 	UINT32 wa_reg;
@@ -570,7 +570,7 @@ void mz2500_state::draw_cg16_screen(bitmap_ind16 &bitmap,const rectangle &clipre
 void mz2500_state::draw_cg256_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int pri)
 {
 	UINT32 count;
-	UINT8 *vram = m_main_ram;
+	UINT8 *vram = m_main_ram.get();
 	UINT8 pen,pen_bit[8];
 	int x,y,xi,pen_i;
 	UINT32 wa_reg;
@@ -801,7 +801,7 @@ UINT8 mz2500_state::mz2500_cg_latch_compare()
 
 UINT8 mz2500_state::mz2500_ram_read(UINT16 offset, UINT8 bank_num)
 {
-	UINT8 *ram = m_main_ram; // TODO
+	UINT8 *ram = m_main_ram.get(); // TODO
 	UINT8 cur_bank = m_bank_val[bank_num];
 
 	switch(cur_bank)
@@ -859,7 +859,7 @@ UINT8 mz2500_state::mz2500_ram_read(UINT16 offset, UINT8 bank_num)
 
 void mz2500_state::mz2500_ram_write(UINT16 offset, UINT8 data, UINT8 bank_num)
 {
-	UINT8 *ram = m_main_ram; // TODO
+	UINT8 *ram = m_main_ram.get(); // TODO
 	UINT8 cur_bank = m_bank_val[bank_num];
 
 //  if(cur_bank >= 0x30 && cur_bank <= 0x33)
@@ -1361,7 +1361,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_cg_data_w)
 	if((m_cg_reg_index & 0x1f) == 0x05 && (m_cg_reg[0x05] & 0xc0) == 0x80) //clear bitmap buffer
 	{
 		UINT32 i;
-		UINT8 *vram = m_main_ram; // TODO
+		UINT8 *vram = m_main_ram.get(); // TODO
 		UINT32 layer_bank;
 
 		layer_bank = (m_cg_reg[0x0e] & 0x80) ? 0x10000 : 0x00000;
@@ -1756,23 +1756,23 @@ static const gfx_layout mz2500_pcg_layout_3bpp =
 void mz2500_state::machine_start()
 {
 	/* TODO: main RAM actually needs to be splitted */
-	m_main_ram = auto_alloc_array_clear(machine(), UINT8, 0x80000);
-	m_pcg_ram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
+	m_main_ram = make_unique_clear<UINT8[]>(0x80000);
+	m_pcg_ram = make_unique_clear<UINT8[]>(0x2000);
 	m_ipl_rom = memregion("ipl")->base();
 	m_kanji_rom = memregion("kanji")->base();
 	m_kanji2_rom = memregion("kanji2")->base();
-	m_emm_ram = auto_alloc_array_clear(machine(), UINT8, 0x100000);
+	m_emm_ram = make_unique_clear<UINT8[]>(0x100000);
 	m_dic_rom = memregion("dictionary")->base();
 	m_phone_rom = memregion("phone")->base();
 	m_iplpro_rom = memregion("iplpro")->base();
 
-	save_pointer(NAME(m_main_ram), 0x80000);
-	save_pointer(NAME(m_pcg_ram), 0x2000);
-	save_pointer(NAME(m_emm_ram), 0x100000);
+	save_pointer(NAME(m_main_ram.get()), 0x80000);
+	save_pointer(NAME(m_pcg_ram.get()), 0x2000);
+	save_pointer(NAME(m_emm_ram.get()), 0x100000);
 
 	/* TODO: gfx[4] crashes as per now */
-	m_gfxdecode->set_gfx(3, global_alloc(gfx_element(m_palette, mz2500_pcg_layout_1bpp, (UINT8 *)m_pcg_ram, 0, 0x10, 0)));
-	m_gfxdecode->set_gfx(4, global_alloc(gfx_element(m_palette, mz2500_pcg_layout_3bpp, (UINT8 *)m_pcg_ram, 0, 4, 0)));
+	m_gfxdecode->set_gfx(3, global_alloc(gfx_element(m_palette, mz2500_pcg_layout_1bpp, m_pcg_ram.get(), 0, 0x10, 0)));
+	m_gfxdecode->set_gfx(4, global_alloc(gfx_element(m_palette, mz2500_pcg_layout_3bpp, m_pcg_ram.get(), 0, 4, 0)));
 }
 
 void mz2500_state::machine_reset()

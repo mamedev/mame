@@ -80,8 +80,8 @@ public:
 	int m_cdp1869_pcb;
 
 	UINT8 *m_pageram;
-	UINT8 *m_pcbram;
-	UINT8 *m_charram;
+	std::unique_ptr<UINT8[]> m_pcbram;
+	std::unique_ptr<UINT8[]> m_charram;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

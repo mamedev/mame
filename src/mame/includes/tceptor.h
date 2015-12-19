@@ -44,7 +44,7 @@ public:
 	INT32 m_bg2_scroll_x;
 	INT32 m_bg2_scroll_y;
 	bitmap_ind16 m_temp_bitmap;
-	UINT16 *m_sprite_ram_buffered;
+	std::unique_ptr<UINT16[]> m_sprite_ram_buffered;
 	int m_is_mask_spr[1024/16];
 	DECLARE_READ8_MEMBER(m68k_shared_r);
 	DECLARE_WRITE8_MEMBER(m68k_shared_w);

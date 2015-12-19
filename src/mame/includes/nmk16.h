@@ -55,8 +55,8 @@ public:
 	int mask[4*2];
 	int m_simple_scroll;
 	int m_redraw_bitmap;
-	UINT16 *m_spriteram_old;
-	UINT16 *m_spriteram_old2;
+	std::unique_ptr<UINT16[]> m_spriteram_old;
+	std::unique_ptr<UINT16[]> m_spriteram_old2;
 	int m_bgbank;
 	int m_videoshift;
 	int m_bioship_background_bank;

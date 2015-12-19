@@ -115,13 +115,13 @@ void seibu_sound_device::device_start()
 
 	case 1:
 		get_custom_decrypt();
-		memcpy(m_decrypted_opcodes, rom, length);
-		apply_decrypt(rom, m_decrypted_opcodes, 0x2000);
+		memcpy(m_decrypted_opcodes.get(), rom, length);
+		apply_decrypt(rom, m_decrypted_opcodes.get(), 0x2000);
 		break;
 
 	case 2:
 		get_custom_decrypt();
-		apply_decrypt(rom, m_decrypted_opcodes, length);
+		apply_decrypt(rom, m_decrypted_opcodes.get(), length);
 		break;
 	}
 
@@ -182,18 +182,18 @@ static UINT8 decrypt_opcode(int a,int src)
 UINT8 *seibu_sound_device::get_custom_decrypt()
 {
 	if (m_decrypted_opcodes)
-		return m_decrypted_opcodes;
+		return m_decrypted_opcodes.get();
 
 	int size = memregion(":audiocpu")->bytes();
-	m_decrypted_opcodes = auto_alloc_array_clear(machine(), UINT8, size);
-	membank(":seibu_bank0d")->set_base(m_decrypted_opcodes);
+	m_decrypted_opcodes = make_unique_clear<UINT8[]>(size);
+	membank(":seibu_bank0d")->set_base(m_decrypted_opcodes.get());
 	if (size > 0x10000) {
-		membank(":seibu_bank1d")->configure_entries(0, (size - 0x10000) / 0x8000, m_decrypted_opcodes + 0x10000, 0x8000);
+		membank(":seibu_bank1d")->configure_entries(0, (size - 0x10000) / 0x8000, m_decrypted_opcodes.get() + 0x10000, 0x8000);
 		membank(":seibu_bank1d")->set_entry(0);
 	} else
-		membank(":seibu_bank1d")->set_base(m_decrypted_opcodes + 0x8000);
+		membank(":seibu_bank1d")->set_base(m_decrypted_opcodes.get() + 0x8000);
 
-	return m_decrypted_opcodes;
+	return m_decrypted_opcodes.get();
 }
 
 void seibu_sound_device::apply_decrypt(UINT8 *rom, UINT8 *opcodes, int length)

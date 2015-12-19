@@ -111,7 +111,7 @@ public:
 	int m_ti_screen_x_size;
 	int m_ti_screen_y_size;
 	int m_ti_number_of_frames;
-	UINT8 * m_frames;
+	std::unique_ptr<UINT8[]> m_frames;
 	UINT8 * m_bios;
 	DECLARE_READ8_MEMBER(ti85_port_0000_r);
 	DECLARE_READ8_MEMBER(ti8x_keypad_r);

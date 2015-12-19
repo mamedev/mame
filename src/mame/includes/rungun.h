@@ -66,7 +66,7 @@ public:
 	UINT8       m_sound_nmi_clk;
 	
 	bool		m_video_priority_mode;
-	UINT16		*m_banked_ram;
+	std::unique_ptr<UINT16[]> m_banked_ram;
 	bool		m_single_screen_mode;
 	UINT8		m_video_mux_bank;
 	

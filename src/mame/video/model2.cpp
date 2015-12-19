@@ -2601,7 +2601,7 @@ VIDEO_START_MEMBER(model2_state,model2)
 	geo_init( machine(), (UINT32*)memregion("user2")->base() );
 
 	/* init various video-related pointers */
-	m_palram = auto_alloc_array_clear(machine(), UINT16, 0x2000);
+	m_palram = make_unique_clear<UINT16[]>(0x2000);
 }
 
 UINT32 model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

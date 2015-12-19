@@ -122,7 +122,7 @@ public:
 	required_shared_ptr<UINT32> m_vregs;
 	required_shared_ptr<UINT32> m_workram;
 
-	UINT16* m_lineram16;
+	std::unique_ptr<UINT16[]> m_lineram16;
 
 	DECLARE_READ16_MEMBER(lineram16_r) { return m_lineram16[offset]; }
 	DECLARE_WRITE16_MEMBER(lineram16_w) { COMBINE_DATA(&m_lineram16[offset]); }
@@ -274,8 +274,8 @@ void dreamwld_state::video_start()
 	m_spritebuf1 = std::make_unique<UINT32[]>(0x2000 / 4);
 	m_spritebuf2 = std::make_unique<UINT32[]>(0x2000 / 4);
 
-	m_lineram16 = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x400 / 2);
-	save_pointer(NAME(m_lineram16), 0x400/2);
+	m_lineram16 = make_unique_clear<UINT16[]>(0x400 / 2);
+	save_pointer(NAME(m_lineram16.get()), 0x400/2);
 
 }
 

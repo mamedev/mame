@@ -82,12 +82,12 @@ public:
 	optional_ioport m_eepromin;
 
 
-	UINT16 *m_videoram;
-	UINT16 *m_spriteram;
-	UINT16 *m_f3_vram;
-	UINT16 *m_f3_line_ram;
-	UINT16 *m_f3_pf_data;
-	UINT16 *m_f3_pivot_ram;
+	std::unique_ptr<UINT16[]> m_videoram;
+	std::unique_ptr<UINT16[]> m_spriteram;
+	std::unique_ptr<UINT16[]> m_f3_vram;
+	std::unique_ptr<UINT16[]> m_f3_line_ram;
+	std::unique_ptr<UINT16[]> m_f3_pf_data;
+	std::unique_ptr<UINT16[]> m_f3_pivot_ram;
 
 	UINT32 m_coin_word[2];
 	int m_f3_game;

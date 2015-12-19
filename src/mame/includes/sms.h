@@ -83,7 +83,7 @@ public:
 
 	required_memory_region m_region_maincpu;
 	address_space *m_space;
-	UINT8 *m_mainram;
+	std::unique_ptr<UINT8[]> m_mainram;
 	UINT8 *m_BIOS;
 
 	// for 3D glass binocular hack

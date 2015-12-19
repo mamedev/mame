@@ -250,8 +250,8 @@ public:
 	}
 
 	UINT8 m_bank_data[4];
-	UINT8 *m_work_ram;
-	UINT8 *m_video_ram;
+	std::unique_ptr<UINT8[]> m_work_ram;
+	std::unique_ptr<UINT8[]> m_video_ram;
 	UINT8 m_h_scroll;
 	UINT8 m_v_scroll;
 	UINT8 m_flip_8;
@@ -1615,10 +1615,10 @@ INPUT_PORTS_END
 void bfcobra_state::init_ram()
 {
 	/* 768kB work RAM */
-	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0xC0000);
+	m_work_ram = make_unique_clear<UINT8[]>(0xC0000);
 
 	/* 128kB video RAM */
-	m_video_ram = auto_alloc_array_clear(machine(), UINT8, 0x20000);
+	m_video_ram = make_unique_clear<UINT8[]>(0x20000);
 }
 
 
@@ -1708,8 +1708,8 @@ DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 	save_item(NAME(m_z80_int));
 	save_item(NAME(m_z80_inten));
 	save_item(NAME(m_bank_data));
-	save_pointer(NAME(m_work_ram), 0xc0000);
-	save_pointer(NAME(m_video_ram), 0x20000);
+	save_pointer(NAME(m_work_ram.get()), 0xc0000);
+	save_pointer(NAME(m_video_ram.get()), 0x20000);
 }
 
 /* TODO */

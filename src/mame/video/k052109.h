@@ -76,7 +76,7 @@ protected:
 
 private:
 	// internal state
-	UINT8    *m_ram;
+	std::unique_ptr<UINT8[]>   m_ram;
 	UINT8    *m_videoram_F;
 	UINT8    *m_videoram_A;
 	UINT8    *m_videoram_B;

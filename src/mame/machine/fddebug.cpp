@@ -496,7 +496,7 @@ void fd1094_init_debugging(running_machine &machine, const char *cpureg, const c
 	assert(coderegion_words == keystatus_words);
 
 	/* allocate memory for the ignore table */
-	ignorepc = auto_alloc_array_clear(machine, UINT8, 1 << 23);
+	ignorepc = make_unique_clear<UINT8>(1 << 23);
 
 	/* allocate memory for the undo buffer */
 	undobuff = std::make_unique<UINT8[]>(keystatus_words * 2);

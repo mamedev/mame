@@ -76,7 +76,7 @@ public:
 	UINT8 m_b_color_table[256];
 	UINT16 m_dsp_bank[2];
 	UINT8 m_csr[2];
-	UINT16 *m_shared_ram[2];
+	std::unique_ptr<UINT16[]> m_shared_ram[2];
 
 	DECLARE_WRITE16_MEMBER(gpu_w);
 	DECLARE_READ16_MEMBER(gpu_r);
@@ -997,14 +997,14 @@ DRIVER_INIT_MEMBER(atarisy4_state,laststar)
 	address_space &main = m_maincpu->space(AS_PROGRAM);
 
 	/* Allocate 16kB of shared RAM */
-	m_shared_ram[0] = auto_alloc_array_clear(machine(), UINT16, 0x2000);
+	m_shared_ram[0] = make_unique_clear<UINT16[]>(0x2000);
 
 	/* Populate the 68000 address space with data from the HEX files */
 	load_hexfile(main, memregion("code")->base());
 	load_hexfile(main, memregion("data")->base());
 
 	/* Set up the DSP */
-	membank("dsp0_bank0")->set_base(m_shared_ram[0]);
+	membank("dsp0_bank0")->set_base(m_shared_ram[0].get());
 	m_dsp0_bank1->set_base(&m_shared_ram[0][0x800]);
 	load_ldafile(m_dsp0->space(AS_PROGRAM), memregion("dsp")->base());
 }
@@ -1012,19 +1012,19 @@ DRIVER_INIT_MEMBER(atarisy4_state,laststar)
 DRIVER_INIT_MEMBER(atarisy4_state,airrace)
 {
 	/* Allocate two sets of 32kB shared RAM */
-	m_shared_ram[0] = auto_alloc_array_clear(machine(), UINT16, 0x4000);
-	m_shared_ram[1] = auto_alloc_array_clear(machine(), UINT16, 0x4000);
+	m_shared_ram[0] = make_unique_clear<UINT16[]>(0x4000);
+	m_shared_ram[1] = make_unique_clear<UINT16[]>(0x4000);
 
 	/* Populate RAM with data from the HEX files */
 	load_hexfile(m_maincpu->space(AS_PROGRAM), memregion("code")->base());
 
 	/* Set up the first DSP */
-	membank("dsp0_bank0")->set_base(m_shared_ram[0]);
+	membank("dsp0_bank0")->set_base(m_shared_ram[0].get());
 	m_dsp0_bank1->set_base(&m_shared_ram[0][0x800]);
 	load_ldafile(m_dsp0->space(AS_PROGRAM), memregion("dsp")->base());
 
 	/* Set up the second DSP */
-	membank("dsp1_bank0")->set_base(m_shared_ram[1]);
+	membank("dsp1_bank0")->set_base(m_shared_ram[1].get());
 	m_dsp1_bank1->set_base(&m_shared_ram[1][0x800]);
 	load_ldafile(m_dsp1->space(AS_PROGRAM), memregion("dsp")->base());
 }

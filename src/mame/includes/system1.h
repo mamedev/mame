@@ -34,7 +34,7 @@ public:
 	optional_shared_ptr<UINT8> m_nob_mcu_status;
 	required_shared_ptr<UINT8> m_paletteram;
 
-	UINT8 *m_videoram;
+	std::unique_ptr<UINT8[]> m_videoram;
 	void (system1_state::*m_videomode_custom)(UINT8 data, UINT8 prevdata);
 	UINT8 m_mute_xor;
 	UINT8 m_dakkochn_mux_data;
@@ -42,9 +42,9 @@ public:
 	UINT8 m_mcu_control;
 	UINT8 m_nob_maincpu_latch;
 	int m_nobb_inport23_step;
-	UINT8 *m_mix_collide;
+	std::unique_ptr<UINT8[]> m_mix_collide;
 	UINT8 m_mix_collide_summary;
-	UINT8 *m_sprite_collide;
+	std::unique_ptr<UINT8[]> m_sprite_collide;
 	UINT8 m_sprite_collide_summary;
 	bitmap_ind16 m_sprite_bitmap;
 	UINT8 m_video_mode;

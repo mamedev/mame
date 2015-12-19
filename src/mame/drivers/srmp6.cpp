@@ -85,13 +85,13 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	UINT16* m_tileram;
+	std::unique_ptr<UINT16[]> m_tileram;
 	required_shared_ptr<UINT16> m_sprram;
 	required_shared_ptr<UINT16> m_chrram;
 	optional_shared_ptr<UINT16> m_dmaram;
 	required_shared_ptr<UINT16> m_video_regs;
 
-	UINT16 *m_sprram_old;
+	std::unique_ptr<UINT16[]> m_sprram_old;
 
 	int m_brightness;
 	UINT16 m_input_select;
@@ -167,12 +167,12 @@ void srmp6_state::update_palette()
 
 void srmp6_state::video_start()
 {
-	m_tileram = auto_alloc_array_clear(machine(), UINT16, 0x100000*16/2);
+	m_tileram = make_unique_clear<UINT16[]>(0x100000*16/2);
 	m_dmaram.allocate(0x100/2);
-	m_sprram_old = auto_alloc_array_clear(machine(), UINT16, 0x80000/2);
+	m_sprram_old = make_unique_clear<UINT16[]>(0x80000/2);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, tiles8x8_layout, (UINT8*)m_tileram, 0, m_palette->entries() / 256, 0)));
+	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, tiles8x8_layout, (UINT8*)m_tileram.get(), 0, m_palette->entries() / 256, 0)));
 	m_gfxdecode->gfx(0)->set_granularity(256);
 
 	m_brightness = 0x60;
@@ -186,7 +186,7 @@ UINT32 srmp6_state::screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bit
 {
 	int alpha;
 	int x,y,tileno,height,width,xw,yw,sprite,xb,yb;
-	UINT16 *sprite_list = m_sprram_old;
+	UINT16 *sprite_list = m_sprram_old.get();
 	UINT16 mainlist_offset = 0;
 
 	union
@@ -292,12 +292,12 @@ UINT32 srmp6_state::screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bit
 		mainlist_offset+=8;
 	}
 
-	memcpy(m_sprram_old, m_sprram, 0x80000);
+	memcpy(m_sprram_old.get(), m_sprram, 0x80000);
 
 	if(machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		FILE *p=fopen("tileram.bin","wb");
-		fwrite(m_tileram, 1, 0x100000*16, p);
+		fwrite(m_tileram.get(), 1, 0x100000*16, p);
 		fclose(p);
 	}
 
@@ -386,7 +386,7 @@ UINT32 srmp6_state::process(UINT8 b,UINT32 dst_offset)
 {
 	int l=0;
 
-	UINT8 *tram=(UINT8*)m_tileram;
+	UINT8 *tram=(UINT8*)m_tileram.get();
 
 	if (m_lastb == m_lastb2)  //rle
 	{

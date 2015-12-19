@@ -35,7 +35,7 @@ public:
 	int       m_bg_raster;
 	int       m_bg_palettebank;
 	int       m_tx_palettebank;
-	UINT16*     m_spriteram1_old;
+	std::unique_ptr<UINT16[]>     m_spriteram1_old;
 	UINT32  inufuku_tile_callback( UINT32 code );
 
 	/* misc */

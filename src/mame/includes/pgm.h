@@ -43,7 +43,7 @@ public:
 	UINT16 *      m_rowscrollram;
 	std::unique_ptr<UINT8[]>      m_sprite_a_region;
 	size_t        m_sprite_a_region_size;
-	UINT16 *      m_spritebufferram; // buffered spriteram
+	std::unique_ptr<UINT16[]>     m_spritebufferram; // buffered spriteram
 
 	/* video-related */
 	tilemap_t       *m_bg_tilemap;

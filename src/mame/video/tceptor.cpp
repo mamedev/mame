@@ -361,7 +361,7 @@ void tceptor_state::video_start()
 {
 	int gfx_index;
 
-	m_sprite_ram_buffered = auto_alloc_array_clear(machine(), UINT16, 0x200/2);
+	m_sprite_ram_buffered = make_unique_clear<UINT16[]>(0x200/2);
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -392,7 +392,7 @@ void tceptor_state::video_start()
 	m_bg1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
-	save_pointer(NAME(m_sprite_ram_buffered), 0x200 / 2);
+	save_pointer(NAME(m_sprite_ram_buffered.get()), 0x200 / 2);
 	save_item(NAME(m_bg1_scroll_x));
 	save_item(NAME(m_bg1_scroll_y));
 	save_item(NAME(m_bg2_scroll_x));
@@ -553,6 +553,6 @@ void tceptor_state::screen_eof_tceptor(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		memcpy(m_sprite_ram_buffered, m_sprite_ram, 0x200);
+		memcpy(m_sprite_ram_buffered.get(), m_sprite_ram, 0x200);
 	}
 }

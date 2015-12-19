@@ -238,7 +238,7 @@ public:
 	bool m_dsp_irq_enabled;
 	emu_timer *m_ar_tb_interrupt[2];
 	UINT16 m_dsp_master_bioz;
-	UINT32 *m_pointram;
+	std::unique_ptr<UINT32[]> m_pointram;
 	UINT32 m_old_coin_state;
 	UINT32 m_credits1;
 	UINT32 m_credits2;
@@ -264,9 +264,9 @@ public:
 	int m_spot_enable;
 	int m_spot_read_address;
 	int m_spot_write_address;
-	UINT16 *m_spotram;
-	UINT16 *m_banked_czram[4];
-	UINT8 *m_recalc_czram[4];
+	std::unique_ptr<UINT16[]> m_spotram;
+	std::unique_ptr<UINT16[]> m_banked_czram[4];
+	std::unique_ptr<UINT8[]> m_recalc_czram[4];
 	UINT32 m_cz_was_written[4];
 	int m_cz_adjust;
 	namcos22_renderer *m_poly;

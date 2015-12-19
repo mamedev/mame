@@ -18,9 +18,9 @@ public:
 	int m_dx, m_dy, m_xdim, m_ydim;
 	int m_invert_flip;
 
-	UINT16* m_vram[2];
-	UINT16* m_vscroll[2];
-	UINT16* m_regs;
+	std::unique_ptr<UINT16[]> m_vram[2];
+	std::unique_ptr<UINT16[]> m_vscroll[2];
+	std::unique_ptr<UINT16[]> m_regs;
 	tilemap_t* m_tmap[2];
 	UINT16 m_vram_tile_addition[2]; // galsnew
 

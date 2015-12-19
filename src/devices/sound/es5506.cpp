@@ -228,7 +228,7 @@ void es5506_device::device_start()
 	}
 
 	/* allocate memory */
-	m_scratch = auto_alloc_array_clear(machine(), INT32, 2 * MAX_SAMPLE_CHUNK);
+	m_scratch = make_unique_clear<INT32[]>(2 * MAX_SAMPLE_CHUNK);
 
 	/* register save */
 	save_item(NAME(m_sample_rate));
@@ -243,7 +243,7 @@ void es5506_device::device_start()
 	save_item(NAME(m_lrend));
 	save_item(NAME(m_irqv));
 
-	save_pointer(NAME(m_scratch), 2 * MAX_SAMPLE_CHUNK);
+	save_pointer(NAME(m_scratch.get()), 2 * MAX_SAMPLE_CHUNK);
 
 	for (j = 0; j < 32; j++)
 	{
@@ -363,7 +363,7 @@ void es5505_device::device_start()
 	}
 
 	/* allocate memory */
-	m_scratch = auto_alloc_array_clear(machine(), INT32, 2 * MAX_SAMPLE_CHUNK);
+	m_scratch = make_unique_clear<INT32[]>(2 * MAX_SAMPLE_CHUNK);
 
 	/* register save */
 	save_item(NAME(m_sample_rate));
@@ -378,7 +378,7 @@ void es5505_device::device_start()
 	save_item(NAME(m_lrend));
 	save_item(NAME(m_irqv));
 
-	save_pointer(NAME(m_scratch), 2 * MAX_SAMPLE_CHUNK);
+	save_pointer(NAME(m_scratch.get()), 2 * MAX_SAMPLE_CHUNK);
 
 	for (j = 0; j < 32; j++)
 	{
@@ -452,7 +452,7 @@ void es550x_device::compute_tables()
 	int i;
 
 	/* allocate ulaw lookup table */
-	m_ulaw_lookup = auto_alloc_array_clear(machine(), INT16, 1 << ULAW_MAXBITS);
+	m_ulaw_lookup = make_unique_clear<INT16[]>(1 << ULAW_MAXBITS);
 
 	/* generate ulaw lookup table */
 	for (i = 0; i < (1 << ULAW_MAXBITS); i++)
@@ -471,7 +471,7 @@ void es550x_device::compute_tables()
 	}
 
 	/* allocate volume lookup table */
-	m_volume_lookup = auto_alloc_array_clear(machine(), UINT16, 4096);
+	m_volume_lookup = make_unique_clear<UINT16[]>(4096);
 
 	/* generate volume lookup table */
 	for (i = 0; i < 4096; i++)

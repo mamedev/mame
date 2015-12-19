@@ -46,7 +46,7 @@ public:
 
 	required_shared_ptr<UINT32> m_workram;
 	required_shared_ptr<UINT32> m_bufferram;
-	UINT16 *m_palram;
+	std::unique_ptr<UINT16[]> m_palram;
 	required_shared_ptr<UINT32> m_colorxlat;
 	required_shared_ptr<UINT32> m_textureram0;
 	required_shared_ptr<UINT32> m_textureram1;
@@ -85,11 +85,11 @@ public:
 	int m_dsp_type;
 	int m_copro_fifoin_rpos;
 	int m_copro_fifoin_wpos;
-	UINT32 *m_copro_fifoin_data;
+	std::unique_ptr<UINT32[]> m_copro_fifoin_data;
 	int m_copro_fifoin_num;
 	int m_copro_fifoout_rpos;
 	int m_copro_fifoout_wpos;
-	UINT32 *m_copro_fifoout_data;
+	std::unique_ptr<UINT32[]> m_copro_fifoout_data;
 	int m_copro_fifoout_num;
 	UINT16 m_cmd_data;
 	UINT8 m_driveio_comm_data;

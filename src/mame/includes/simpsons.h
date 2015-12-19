@@ -26,7 +26,7 @@ public:
 		m_k053251(*this, "k053251") { }
 
 	/* memory pointers */
-	UINT16 *   m_spriteram;
+	std::unique_ptr<UINT16[]>   m_spriteram;
 
 	/* video-related */
 	int        m_sprite_colorbase;

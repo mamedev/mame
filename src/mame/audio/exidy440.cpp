@@ -128,8 +128,8 @@ void exidy440_sound_device::device_start()
 	reset_sound_cache();
 
 	/* allocate the mixer buffer */
-	m_mixer_buffer_left = auto_alloc_array_clear(machine(), INT32, 2 * clock());
-	m_mixer_buffer_right = m_mixer_buffer_left + clock();
+	m_mixer_buffer_left = make_unique_clear<INT32[]>(clock());
+	m_mixer_buffer_right = make_unique_clear<INT32[]>(clock());
 
 	if (SOUND_LOG)
 		m_debuglog = fopen("sound.log", "w");
@@ -197,8 +197,8 @@ void exidy440_sound_device::add_and_scale_samples(int ch, INT32 *dest, int sampl
 
 void exidy440_sound_device::mix_to_16(int length, stream_sample_t *dest_left, stream_sample_t *dest_right)
 {
-	INT32 *mixer_left = m_mixer_buffer_left;
-	INT32 *mixer_right = m_mixer_buffer_right;
+	INT32 *mixer_left = m_mixer_buffer_left.get();
+	INT32 *mixer_right = m_mixer_buffer_right.get();
 	int i, clippers = 0;
 
 	for (i = 0; i < length; i++)
@@ -804,8 +804,8 @@ void exidy440_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 	int ch;
 
 	/* reset the mixer buffers */
-	memset(m_mixer_buffer_left, 0, samples * sizeof(INT32));
-	memset(m_mixer_buffer_right, 0, samples * sizeof(INT32));
+	memset(m_mixer_buffer_left.get(), 0, samples * sizeof(INT32));
+	memset(m_mixer_buffer_right.get(), 0, samples * sizeof(INT32));
 
 	/* loop over channels */
 	for (ch = 0; ch < 4; ch++)
@@ -824,12 +824,12 @@ void exidy440_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 		/* get a pointer to the sample data and copy to the left */
 		volume = m_sound_volume[2 * ch + 0];
 		if (volume)
-			add_and_scale_samples(ch, m_mixer_buffer_left, length, volume);
+			add_and_scale_samples(ch, m_mixer_buffer_left.get(), length, volume);
 
 		/* get a pointer to the sample data and copy to the left */
 		volume = m_sound_volume[2 * ch + 1];
 		if (volume)
-			add_and_scale_samples(ch, m_mixer_buffer_right, length, volume);
+			add_and_scale_samples(ch, m_mixer_buffer_right.get(), length, volume);
 
 		/* update our counters */
 		channel->offset += length;

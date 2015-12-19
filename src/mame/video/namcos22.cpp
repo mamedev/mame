@@ -459,7 +459,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 				{
 					extra.zfog_enabled = 1;
 					extra.cz_sdelta = delta;
-					extra.czram = m_state.m_recalc_czram[cztype];
+					extra.czram = m_state.m_recalc_czram[cztype].get();
 				}
 			}
 		}
@@ -2369,15 +2369,15 @@ void namcos22_state::init_tables()
 
 	// init spotram (super22 only)
 	if (m_is_ss22)
-		m_spotram = auto_alloc_array_clear(machine(), UINT16, SPOTRAM_SIZE);
+		m_spotram = make_unique_clear<UINT16[]>(SPOTRAM_SIZE);
 
 	// init czram tables (super22 only)
 	if (m_is_ss22)
 	{
 		for (int table = 0; table < 4; table++)
 		{
-			m_banked_czram[table] = auto_alloc_array_clear(machine(), UINT16, 0x100);
-			m_recalc_czram[table] = auto_alloc_array_clear(machine(), UINT8, 0x2000);
+			m_banked_czram[table] = make_unique_clear<UINT16[]>(0x100);
+			m_recalc_czram[table] = make_unique_clear<UINT8[]>(0x2000);
 			m_cz_was_written[table] = 1;
 		}
 	}
@@ -2393,7 +2393,7 @@ void namcos22_state::init_tables()
 		m_pointrom[i] = signed24(pointrom_high[i] << 16 | pointrom_mid[i] << 8 | pointrom_low[i]);
 	}
 
-	m_pointram = auto_alloc_array_clear(machine(), UINT32, 0x20000);
+	m_pointram = make_unique_clear<UINT32[]>(0x20000);
 
 	// force all texture tiles to be decoded now
 	for (int i = 0; i < m_gfxdecode->gfx(1)->elements(); i++)

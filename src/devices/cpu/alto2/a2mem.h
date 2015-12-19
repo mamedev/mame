@@ -25,8 +25,8 @@ enum {
 
 struct {
 	UINT32 size;                        //!< main memory size (64K or 128K)
-	UINT32* ram;                        //!< main memory organized as double-words
-	UINT8* hpb;                         //!< Hamming Code bits (6) and Parity bits (1) per double word
+	std::unique_ptr<UINT32[]> ram;                        //!< main memory organized as double-words
+	std::unique_ptr<UINT8[]> hpb;                         //!< Hamming Code bits (6) and Parity bits (1) per double word
 	UINT32 mar;                         //!< memory address register
 	UINT32 rmdd;                        //!< read memory data double-word
 	UINT32 wmdd;                        //!< write memory data double-word

@@ -10,6 +10,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	std::unique_ptr<UINT8[]> m_videoram;
 	UINT8 *m_tileram;
 	UINT8 *m_charram;
 	UINT8 *m_spriteram_x;

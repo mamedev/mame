@@ -138,7 +138,7 @@ public:
 	UINT16 *     m_scroll3;
 	UINT16 *     m_obj;
 	UINT16 *     m_other;
-	UINT16 *     m_buffered_obj;
+	std::unique_ptr<UINT16[]>     m_buffered_obj;
 	optional_shared_ptr<UINT8> m_qsound_sharedram1;
 	optional_shared_ptr<UINT8> m_qsound_sharedram2;
 	// cps2
@@ -148,7 +148,7 @@ public:
 	
 	optional_ioport m_io_in0;
 	optional_ioport m_io_in1;
-	UINT16 *     m_cps2_buffered_obj;
+	std::unique_ptr<UINT16[]>     m_cps2_buffered_obj;
 	// game-specific
 	std::unique_ptr<UINT16[]>    m_gigaman2_dummyqsound_ram;
 	UINT16  sf2ceblp_prot;

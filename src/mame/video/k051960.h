@@ -87,7 +87,7 @@ protected:
 
 private:
 	// internal state
-	UINT8    *m_ram;
+	std::unique_ptr<UINT8[]>   m_ram;
 
 	UINT8 *m_sprite_rom;
 	UINT32 m_sprite_size;

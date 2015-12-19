@@ -34,7 +34,7 @@ public:
 	int m_blitter_direction_x;
 	int m_blitter_direction_y;
 	int m_palbank;
-	UINT8 *m_videoram;
+	std::unique_ptr<UINT8[]> m_videoram;
 	int m_flipscreen_old;
 
 	DECLARE_READ8_MEMBER(pastelg_sndrom_r);

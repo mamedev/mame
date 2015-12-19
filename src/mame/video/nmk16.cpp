@@ -109,8 +109,8 @@ TILE_GET_INFO_MEMBER(nmk16_state::get_tile_info_0_8bit)
 
 void nmk16_state::nmk16_video_init()
 {
-	m_spriteram_old = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
-	m_spriteram_old2 = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
+	m_spriteram_old = make_unique_clear<UINT16[]>(0x1000/2);
+	m_spriteram_old2 = make_unique_clear<UINT16[]>(0x1000/2);
 
 	m_videoshift = 0;        /* 256x224 screen, no shift */
 	m_background_bitmap = nullptr;
@@ -487,7 +487,7 @@ void nmk16_state::nmk16_draw_sprites_swap(bitmap_ind16 &bitmap, const rectangle 
 	for (i = 0; i < 0x100; i++)
 	{
 		int spr = BITSWAP8(i, bittbl[0], bittbl[1], bittbl[2], bittbl[3], bittbl[4], bittbl[5], bittbl[6], bittbl[7]);
-		nmk16_draw_sprite(bitmap, cliprect, m_spriteram_old2 + (spr * 16/2));
+		nmk16_draw_sprite(bitmap, cliprect, m_spriteram_old2.get() + (spr * 16/2));
 	}
 }
 
@@ -498,7 +498,7 @@ void nmk16_state::nmk16_draw_sprites_swap_flipsupported(bitmap_ind16 &bitmap, co
 	for ( i = 0; i < 0x100; i++ )
 	{
 		int spr = BITSWAP8(i, bittbl[0], bittbl[1], bittbl[2], bittbl[3], bittbl[4], bittbl[5], bittbl[6], bittbl[7]);
-		nmk16_draw_sprite_flipsupported(bitmap, cliprect, m_spriteram_old2 + (spr * 16/2));
+		nmk16_draw_sprite_flipsupported(bitmap, cliprect, m_spriteram_old2.get() + (spr * 16/2));
 	}
 }
 
@@ -508,7 +508,7 @@ void nmk16_state::nmk16_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 
 	for (offs = 0; offs < 0x1000/2; offs += 8)
 	{
-		nmk16_draw_sprite(bitmap, cliprect, m_spriteram_old2 + offs);
+		nmk16_draw_sprite(bitmap, cliprect, m_spriteram_old2.get() + offs);
 	}
 }
 
@@ -518,7 +518,7 @@ void nmk16_state::nmk16_draw_sprites_flipsupported(bitmap_ind16 &bitmap, const r
 
 	for (offs = 0; offs < 0x1000/2; offs += 8)
 	{
-		nmk16_draw_sprite_flipsupported(bitmap, cliprect, m_spriteram_old2 + offs);
+		nmk16_draw_sprite_flipsupported(bitmap, cliprect, m_spriteram_old2.get() + offs);
 	}
 }
 
@@ -796,8 +796,8 @@ UINT32 nmk16_state::screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bi
 
 VIDEO_START_MEMBER(nmk16_state,afega)
 {
-	m_spriteram_old = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
-	m_spriteram_old2 = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
+	m_spriteram_old = make_unique_clear<UINT16[]>(0x1000/2);
+	m_spriteram_old2 = make_unique_clear<UINT16[]>(0x1000/2);
 
 	m_bg_tilemap0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::macross_get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(nmk16_state::afega_tilemap_scan_pages),this),
 								16,16,
@@ -813,8 +813,8 @@ VIDEO_START_MEMBER(nmk16_state,afega)
 
 VIDEO_START_MEMBER(nmk16_state,grdnstrm)
 {
-	m_spriteram_old = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
-	m_spriteram_old2 = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
+	m_spriteram_old = make_unique_clear<UINT16[]>(0x1000/2);
+	m_spriteram_old2 = make_unique_clear<UINT16[]>(0x1000/2);
 
 
 	m_bg_tilemap0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::get_tile_info_0_8bit),this), tilemap_mapper_delegate(FUNC(nmk16_state::afega_tilemap_scan_pages),this),
@@ -831,8 +831,8 @@ VIDEO_START_MEMBER(nmk16_state,grdnstrm)
 
 VIDEO_START_MEMBER(nmk16_state,firehawk)
 {
-	m_spriteram_old = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
-	m_spriteram_old2 = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
+	m_spriteram_old = make_unique_clear<UINT16[]>(0x1000/2);
+	m_spriteram_old2 = make_unique_clear<UINT16[]>(0x1000/2);
 
 
 	m_bg_tilemap0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::get_tile_info_0_8bit),this), tilemap_mapper_delegate(FUNC(nmk16_state::afega_tilemap_scan_pages),this),

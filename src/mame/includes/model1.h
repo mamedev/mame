@@ -111,11 +111,11 @@ public:
 	UINT16 m_listctl[2];
 	UINT16 *m_glist;
 	int m_render_done;
-	UINT16 *m_tgp_ram;
+	std::unique_ptr<UINT16[]> m_tgp_ram;
 	optional_shared_ptr<UINT16> m_paletteram16;
 	required_device<palette_device> m_palette;
 	UINT32 *m_poly_rom;
-	UINT32 *m_poly_ram;
+	std::unique_ptr<UINT32[]> m_poly_ram;
 	UINT16 m_lamp_state;
 	DECLARE_READ16_MEMBER(io_r);
 	DECLARE_WRITE16_MEMBER(io_w);

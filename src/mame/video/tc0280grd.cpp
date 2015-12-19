@@ -59,9 +59,9 @@ void tc0280grd_device::device_start()
 	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0280grd_device::tc0280grd_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap->set_transparent_pen(0);
 
-	m_ram = auto_alloc_array_clear(machine(), UINT16, TC0280GRD_RAM_SIZE / 2);
+	m_ram = make_unique_clear<UINT16[]>(TC0280GRD_RAM_SIZE / 2);
 
-	save_pointer(NAME(m_ram), TC0280GRD_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram.get()), TC0280GRD_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
 }
 

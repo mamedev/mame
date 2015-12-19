@@ -558,8 +558,8 @@ VIDEO_START_MEMBER(dooyong_z80_ym2203_state, pollux)
 	m_fg_gfx = 3;
 	m_tx_tilemap_mode = 0;
 
-	m_paletteram_flytiger = auto_alloc_array_clear(machine(), UINT8, 0x1000);
-	save_pointer(NAME(m_paletteram_flytiger), 0x1000);
+	m_paletteram_flytiger = make_unique_clear<UINT8[]>(0x1000);
+	save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
 
 	/* Create tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
@@ -631,8 +631,8 @@ VIDEO_START_MEMBER(dooyong_z80_state, flytiger)
 	m_fg_gfx = 3;
 	m_tx_tilemap_mode = 0;
 
-	m_paletteram_flytiger = auto_alloc_array_clear(machine(), UINT8, 0x1000);
-	save_pointer(NAME(m_paletteram_flytiger), 0x1000);
+	m_paletteram_flytiger = make_unique_clear<UINT8[]>(0x1000);
+	save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
 
 	/* Create tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,

@@ -34,8 +34,8 @@ void taitof2_state::taitof2_core_vh_start (int sprite_type, int hide, int flip_h
 	m_hide_pixels = hide;
 	m_flip_hide_pixels = flip_hide;
 
-	m_spriteram_delayed = auto_alloc_array_clear(machine(), UINT16, m_spriteram.bytes() / 2);
-	m_spriteram_buffered = auto_alloc_array_clear(machine(), UINT16, m_spriteram.bytes() / 2);
+	m_spriteram_delayed = make_unique_clear<UINT16[]>(m_spriteram.bytes() / 2);
+	m_spriteram_buffered = make_unique_clear<UINT16[]>(m_spriteram.bytes() / 2);
 	m_spritelist = auto_alloc_array_clear(machine(), struct f2_tempsprite, 0x400);
 
 	for (i = 0; i < 8; i ++)
@@ -67,8 +67,8 @@ void taitof2_state::taitof2_core_vh_start (int sprite_type, int hide, int flip_h
 	save_item(NAME(m_spritepri));
 	save_item(NAME(m_spriteblendmode));
 	save_item(NAME(m_prepare_sprites));
-	save_pointer(NAME(m_spriteram_delayed), m_spriteram.bytes() / 2);
-	save_pointer(NAME(m_spriteram_buffered), m_spriteram.bytes() / 2);
+	save_pointer(NAME(m_spriteram_delayed.get()), m_spriteram.bytes() / 2);
+	save_pointer(NAME(m_spriteram_buffered.get()), m_spriteram.bytes() / 2);
 }
 
 /**************************************************************************************/
@@ -820,7 +820,7 @@ void taitof2_state::taitof2_handle_sprite_buffering(  )
 {
 	if (m_prepare_sprites)   /* no buffering */
 	{
-		memcpy(m_spriteram_buffered, m_spriteram, m_spriteram.bytes());
+		memcpy(m_spriteram_buffered.get(), m_spriteram, m_spriteram.bytes());
 		m_prepare_sprites = 0;
 	}
 }
@@ -892,10 +892,10 @@ void taitof2_state::screen_eof_taitof2_full_buffer_delayed(screen_device &screen
 		taitof2_update_sprites_active_area();
 
 		m_prepare_sprites = 0;
-		memcpy(m_spriteram_buffered, m_spriteram_delayed, m_spriteram.bytes());
+		memcpy(m_spriteram_buffered.get(), m_spriteram_delayed.get(), m_spriteram.bytes());
 		for (i = 0; i < m_spriteram.bytes() / 2; i++)
 			m_spriteram_buffered[i] = spriteram[i];
-		memcpy(m_spriteram_delayed, spriteram, m_spriteram.bytes());
+		memcpy(m_spriteram_delayed.get(), spriteram, m_spriteram.bytes());
 	}
 }
 
@@ -910,10 +910,10 @@ void taitof2_state::screen_eof_taitof2_partial_buffer_delayed(screen_device &scr
 		taitof2_update_sprites_active_area();
 
 		m_prepare_sprites = 0;
-		memcpy(m_spriteram_buffered, m_spriteram_delayed, m_spriteram.bytes());
+		memcpy(m_spriteram_buffered.get(), m_spriteram_delayed.get(), m_spriteram.bytes());
 		for (i = 0;i < m_spriteram.bytes() / 2; i += 4)
 			m_spriteram_buffered[i] = spriteram[i];
-		memcpy(m_spriteram_delayed, spriteram, m_spriteram.bytes());
+		memcpy(m_spriteram_delayed.get(), spriteram, m_spriteram.bytes());
 	}
 }
 
@@ -928,14 +928,14 @@ void taitof2_state::screen_eof_taitof2_partial_buffer_delayed_thundfox(screen_de
 		taitof2_update_sprites_active_area();
 
 		m_prepare_sprites = 0;
-		memcpy(m_spriteram_buffered, m_spriteram_delayed, m_spriteram.bytes());
+		memcpy(m_spriteram_buffered.get(), m_spriteram_delayed.get(), m_spriteram.bytes());
 		for (i = 0; i < m_spriteram.bytes() / 2; i += 8)
 		{
 			m_spriteram_buffered[i]     = spriteram[i];
 			m_spriteram_buffered[i + 1] = spriteram[i + 1];
 			m_spriteram_buffered[i + 4] = spriteram[i + 4];
 		}
-		memcpy(m_spriteram_delayed, spriteram, m_spriteram.bytes());
+		memcpy(m_spriteram_delayed.get(), spriteram, m_spriteram.bytes());
 	}
 }
 
@@ -953,7 +953,7 @@ void taitof2_state::screen_eof_taitof2_partial_buffer_delayed_qzchikyu(screen_de
 		taitof2_update_sprites_active_area();
 
 		m_prepare_sprites = 0;
-		memcpy(m_spriteram_buffered, m_spriteram_delayed, m_spriteram.bytes());
+		memcpy(m_spriteram_buffered.get(), m_spriteram_delayed.get(), m_spriteram.bytes());
 		for (i = 0; i < m_spriteram.bytes() / 2; i += 8)
 		{
 			m_spriteram_buffered[i]     = spriteram[i];
@@ -963,7 +963,7 @@ void taitof2_state::screen_eof_taitof2_partial_buffer_delayed_qzchikyu(screen_de
 			m_spriteram_buffered[i + 6] = spriteram[i + 6]; // not needed?
 			m_spriteram_buffered[i + 7] = spriteram[i + 7]; // not needed?
 		}
-		memcpy(m_spriteram_delayed, spriteram, m_spriteram.bytes());
+		memcpy(m_spriteram_delayed.get(), spriteram, m_spriteram.bytes());
 	}
 }
 

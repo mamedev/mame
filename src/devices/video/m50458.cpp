@@ -205,7 +205,7 @@ void m50458_device::device_start()
 
 	/* Create an array for shadow gfx */
 	/* this will spread the source ROM into four directions (up-left, up-right, down-left, down-right) thus creating a working shadow copy */
-	m_shadow_gfx = auto_alloc_array_clear(machine(), UINT8, 0x1200);
+	m_shadow_gfx = make_unique_clear<UINT8[]>(0x1200);
 
 	for(tile=0;tile<0x80;tile++)
 	{

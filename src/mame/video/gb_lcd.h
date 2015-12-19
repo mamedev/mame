@@ -73,7 +73,7 @@ protected:
 	UINT16 m_sgb_pal_data[4096];
 	UINT8 m_sgb_pal_map[20][18];
 	UINT16 m_sgb_pal[128];
-	UINT8 *m_sgb_tile_data;
+	std::unique_ptr<UINT8[]> m_sgb_tile_data;
 	UINT8 m_sgb_tile_map[2048];
 	UINT8 m_sgb_window_mask;
 
@@ -119,8 +119,8 @@ protected:
 	emu_timer *m_lcd_timer;
 	int m_gbc_mode;
 
-	UINT8   *m_vram;     // Pointer to VRAM
-	UINT8   *m_oam;      // Pointer to OAM memory
+	std::unique_ptr<UINT8[]>   m_vram;     // Pointer to VRAM
+	std::unique_ptr<UINT8[]>   m_oam;      // Pointer to OAM memory
 	UINT8   m_gb_tile_no_mod;
 	UINT32  m_gb_chrgen_offs;     // GB Character generator
 	UINT32  m_gb_bgdtab_offs;     // GB Background character table

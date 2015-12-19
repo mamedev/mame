@@ -48,7 +48,7 @@ public:
 	emu_timer *m_firq_off;
 	emu_timer *m_firq_timer;
 	UINT8 m_cocktail_flip;
-	UINT8 *m_local_videoram;
+	std::unique_ptr<UINT8[]> m_local_videoram;
 	UINT8 m_palettebank_vis;
 
 	DECLARE_READ8_MEMBER(analog_port_r);

@@ -33,8 +33,8 @@ protected:
 	virtual void device_reset() override;
 private:
 	// internal state
-	UINT8    *m_ram;
-	UINT8    *m_scroll_ram;
+	std::unique_ptr<UINT8[]>    m_ram;
+	std::unique_ptr<UINT8[]>    m_scroll_ram;
 	UINT8    *m_videoram_0;
 	UINT8    *m_videoram_1;
 	UINT8    *m_colorram_0;

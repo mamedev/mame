@@ -42,7 +42,7 @@ private:
 	// internal state
 	UINT16 m_reg_address;
 	UINT8 m_tms_ctrl;
-	UINT8* m_snd_shared_ram;
+	std::unique_ptr<UINT8[]> m_snd_shared_ram;
 };
 
 extern const device_type TAITO_ZOOM;

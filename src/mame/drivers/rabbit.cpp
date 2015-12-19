@@ -131,7 +131,7 @@ public:
 	int m_vblirqlevel;
 	int m_bltirqlevel;
 	int m_banking;
-	UINT32 *m_tilemap_ram[4];
+	std::unique_ptr<UINT32[]> m_tilemap_ram[4];
 	tilemap_t *m_tilemap[4];
 
 	DECLARE_WRITE32_MEMBER(tilemap0_w);
@@ -414,10 +414,10 @@ void rabbit_state::video_start()
 {
 	/* the tilemaps are bigger than the regions the cpu can see, need to allocate the ram here */
 	/* or maybe not for this game/hw .... */
-	m_tilemap_ram[0] = auto_alloc_array_clear(machine(), UINT32, 0x20000/4);
-	m_tilemap_ram[1] = auto_alloc_array_clear(machine(), UINT32, 0x20000/4);
-	m_tilemap_ram[2] = auto_alloc_array_clear(machine(), UINT32, 0x20000/4);
-	m_tilemap_ram[3] = auto_alloc_array_clear(machine(), UINT32, 0x20000/4);
+	m_tilemap_ram[0] = make_unique_clear<UINT32[]>(0x20000/4);
+	m_tilemap_ram[1] = make_unique_clear<UINT32[]>(0x20000/4);
+	m_tilemap_ram[2] = make_unique_clear<UINT32[]>(0x20000/4);
+	m_tilemap_ram[3] = make_unique_clear<UINT32[]>(0x20000/4);
 
 	m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(rabbit_state::get_tilemap0_tile_info),this),TILEMAP_SCAN_ROWS,16, 16, 128,32);
 	m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(rabbit_state::get_tilemap1_tile_info),this),TILEMAP_SCAN_ROWS,16, 16, 128,32);
@@ -437,10 +437,10 @@ void rabbit_state::video_start()
 	m_sprite_bitmap = std::make_unique<bitmap_ind16>(0x1000,0x1000);
 	m_sprite_clip.set(0, 0x1000-1, 0, 0x1000-1);
 
-	save_pointer(NAME(m_tilemap_ram[0]), 0x20000/4);
-	save_pointer(NAME(m_tilemap_ram[1]), 0x20000/4);
-	save_pointer(NAME(m_tilemap_ram[2]), 0x20000/4);
-	save_pointer(NAME(m_tilemap_ram[3]), 0x20000/4);
+	save_pointer(NAME(m_tilemap_ram[0].get()), 0x20000/4);
+	save_pointer(NAME(m_tilemap_ram[1].get()), 0x20000/4);
+	save_pointer(NAME(m_tilemap_ram[2].get()), 0x20000/4);
+	save_pointer(NAME(m_tilemap_ram[3].get()), 0x20000/4);
 }
 
 /*

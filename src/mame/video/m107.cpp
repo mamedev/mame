@@ -142,12 +142,12 @@ void m107_state::video_start()
 			layer->tmap->set_transparent_pen(0);
 	}
 
-	m_buffered_spriteram = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
+	m_buffered_spriteram = make_unique_clear<UINT16[]>(0x1000/2);
 
 	save_item(NAME(m_sprite_display));
 	save_item(NAME(m_raster_irq_position));
 	save_item(NAME(m_control));
-	save_pointer(NAME(m_buffered_spriteram), 0x1000/2);
+	save_pointer(NAME(m_buffered_spriteram.get()), 0x1000/2);
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -159,7 +159,7 @@ void m107_state::video_start()
 
 void m107_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *spriteram = m_buffered_spriteram;
+	UINT16 *spriteram = m_buffered_spriteram.get();
 	int offs;
 	UINT8 *rom = memregion("user1")->base();
 
@@ -381,7 +381,7 @@ WRITE16_MEMBER(m107_state::spritebuffer_w)
 //      logerror("%04x: buffered spriteram\n",space.device().safe_pc());
 		m_sprite_display    = (!(data & 0x1000));
 
-		memcpy(m_buffered_spriteram, m_spriteram, 0x1000);
+		memcpy(m_buffered_spriteram.get(), m_spriteram, 0x1000);
 	}
 }
 

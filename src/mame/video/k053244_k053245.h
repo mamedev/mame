@@ -64,8 +64,8 @@ protected:
 
 private:
 	// internal state
-	UINT16    *m_ram;
-	UINT16    *m_buffer;
+	std::unique_ptr<UINT16[]>  m_ram;
+	std::unique_ptr<UINT16[]>  m_buffer;
 	UINT8     *m_sprite_rom;
 	UINT32    m_sprite_size;
 
