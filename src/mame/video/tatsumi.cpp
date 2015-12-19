@@ -193,7 +193,7 @@ static inline void roundupt_drawgfxzoomrotate(tatsumi_state *state,
 		if( gfx )
 		{
 			const pen_t *pal = &state->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-			const UINT8 *shadow_pens = state->m_shadow_pen_array + (gfx->granularity() * (color % gfx->colors()));
+			const UINT8 *shadow_pens = state->m_shadow_pen_array.get() + (gfx->granularity() * (color % gfx->colors()));
 			const UINT8 *code_base = gfx->get_data(code % gfx->elements());
 
 			int block_size = 8 * scalex;
