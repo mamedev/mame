@@ -865,7 +865,7 @@ ROM_START(sms1pal)
 	ROM_REGION(0x20000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "bios13", "US/European BIOS v1.3 (1986)" )
 	ROMX_LOAD("mpr-10052.rom", 0x0000, 0x2000, CRC(0072ed54) SHA1(c315672807d8ddb8d91443729405c766dd95cae7), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "bios20", "European BIOS v2.0 (198?)" )
+	ROM_SYSTEM_BIOS( 1, "bios20", "European BIOS v2.0 (1987?)" ) //Chinese (PAL-D)?
 	ROMX_LOAD("mpr-10883.rom", 0x0000, 0x2000, CRC(b3d854f8) SHA1(fc7eb9141f38c92bf98d9134816f64b45e811112), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "hangonsh", "US/European BIOS v2.4 with Hang On and Safari Hunt (1988)" )
 	ROMX_LOAD("mpr-11459a.rom", 0x0000, 0x20000, CRC(91e93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(3))
