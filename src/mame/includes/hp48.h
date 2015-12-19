@@ -69,7 +69,7 @@ public:
 	*/
 	UINT32 m_port_size[2];
 	UINT8 m_port_write[2];
-	UINT8* m_port_data[2];
+	std::unique_ptr<UINT8[]> m_port_data[2];
 
 	UINT32 m_bank_switch;
 	UINT32 m_io_addr;

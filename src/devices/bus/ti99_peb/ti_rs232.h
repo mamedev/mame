@@ -80,7 +80,7 @@ private:
 
 	// Input buffer for each UART. We have to copy the contents of sdlsocket here
 	// because the buffer in corefile will be lost on the next write operation
-	UINT8*      m_recvbuf[2];
+	std::unique_ptr<UINT8[]>      m_recvbuf[2];
 	int         m_bufpos[2], m_buflen[2];
 
 	// Latches the state of the output lines for UART0/UART1

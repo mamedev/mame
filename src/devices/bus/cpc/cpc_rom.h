@@ -39,7 +39,7 @@ public:
 	virtual const char *file_extensions() const override { return "rom,bin"; }
 	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	UINT8* base() { return m_base; }
+	UINT8* base() { return m_base.get(); }
 
 protected:
 	// device-level overrides
@@ -47,7 +47,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	UINT8* m_base;
+	std::unique_ptr<UINT8[]> m_base;
 };
 
 

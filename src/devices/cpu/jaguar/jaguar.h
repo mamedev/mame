@@ -164,6 +164,10 @@ protected:
 	static const UINT32 convert_zero[32];
 	bool m_tables_referenced;
 
+	UINT32       table_refcount;
+	std::unique_ptr<UINT16[]>  mirror_table;
+	std::unique_ptr<UINT8[]>   condition_table;
+
 	const op_func *m_table;
 
 	void abs_rn(UINT16 op);

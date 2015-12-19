@@ -613,8 +613,8 @@ void snug_high_speed_gpl_device::grom_write(address_space& space, offs_t offset,
 
 void snug_high_speed_gpl_device::device_start()
 {
-	m_ram6_memory = global_alloc_array(UINT8, RAMSIZE);
-	m_gram_memory = global_alloc_array(UINT8, GRAMSIZE);
+	m_ram6_memory = std::make_unique<UINT8[]>(RAMSIZE);
+	m_gram_memory = std::make_unique<UINT8[]>(GRAMSIZE);
 }
 
 void snug_high_speed_gpl_device::device_reset()
@@ -651,8 +651,8 @@ void snug_high_speed_gpl_device::device_config_complete(void)
 
 void snug_high_speed_gpl_device::device_stop()
 {
-	global_free_array(m_ram6_memory);
-	global_free_array(m_gram_memory);
+	m_ram6_memory = nullptr;
+	m_gram_memory = nullptr;
 }
 
 // Flash setting is used to flash an empty HSGPL DSR ROM

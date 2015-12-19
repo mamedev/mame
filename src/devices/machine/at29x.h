@@ -63,7 +63,7 @@ protected:
 private:
 	void        sync_flags(void);
 
-	UINT8*      m_eememory;
+	std::unique_ptr<UINT8[]>      m_eememory;
 
 	bool        m_lower_bbl;              // set when lower boot block lockout is enabled
 	bool        m_higher_bbl;             // set when upper boot block lockout is enabled
@@ -78,7 +78,7 @@ private:
 	bool        m_disabling_sdb;          // set when a sdp disable command is in progress
 	bool        m_toggle_bit;             // indicates flashing in progress (toggles for each query)
 
-	UINT8*      m_programming_buffer;
+	std::unique_ptr<UINT8[]>      m_programming_buffer;
 	int         m_programming_last_offset;
 	emu_timer*  m_programming_timer;
 };

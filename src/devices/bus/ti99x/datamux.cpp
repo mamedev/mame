@@ -393,7 +393,7 @@ void ti99_datamux_device::device_start(void)
 
 void ti99_datamux_device::device_stop(void)
 {
-	if (m_ram16b) global_free_array(m_ram16b);
+	m_ram16b = nullptr;
 }
 
 void ti99_datamux_device::device_reset(void)
@@ -411,7 +411,7 @@ void ti99_datamux_device::device_reset(void)
 	// better use a region?
 	if (m_ram16b==nullptr)
 	{
-		m_ram16b = global_alloc_array_clear(UINT16, 32768/2);
+		m_ram16b = make_unique_clear<UINT16[]>(32768/2);
 	}
 
 	// Now building the list of active devices at this databus multiplex.
