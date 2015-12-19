@@ -9,7 +9,6 @@ newoption {
 premake.check_paths = true
 premake.make.override = { "TARGET" }
 MAME_DIR = (path.getabsolute("..") .. "/")
-MAME_DIR = string.gsub(MAME_DIR, "(%s)", "\\%1")
 local MAME_BUILD_DIR = (MAME_DIR .. _OPTIONS["build-dir"] .. "/")
 local naclToolchain = ""
 
@@ -527,9 +526,9 @@ if (_OPTIONS["SOURCES"] == nil) then
 	end
 	dofile (path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
 else
-	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " target " .. _OPTIONS["subtarget"])
+	OUT_STR = os.outputof( PYTHON .. " " .. _MAKE.esc(MAME_DIR) .. "scripts/build/makedep.py " .. _MAKE.esc(MAME_DIR) .. " " .. _OPTIONS["SOURCES"] .. " target " .. _OPTIONS["subtarget"])
 	load(OUT_STR)()
-	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.cpp")
+	os.outputof( PYTHON .. " " .. _MAKE.esc(MAME_DIR) .. "scripts/build/makedep.py " .. _MAKE.esc(MAME_DIR).. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. _MAKE.esc(GEN_DIR) .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.cpp")
 end
 configuration { "gmake" }
 	flags {
