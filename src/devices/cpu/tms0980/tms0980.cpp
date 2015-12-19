@@ -173,7 +173,7 @@ const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 
 // - RAM, ROM, and main instructions PLA is exactly the same as TMS0980
 // - one of the microinstructions redirects to a RSTR instruction, like on TMS0270
 // - 32-term output PLA above the RAM, 7 bits! (rotate opla 270 degrees)
-const device_type TMS1980 = &device_creator<tms1980_cpu_device>; // 28-pin DIP, 7 O pins, ? R pins, high voltage
+const device_type TMS1980 = &device_creator<tms1980_cpu_device>; // 28-pin DIP, 7 O pins, 10 R pins, high voltage
 // TMS0260 is same?
 
 // TMS0970 is a stripped-down version of the TMS0980, itself acting more like a TMS1000
@@ -316,7 +316,7 @@ tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_typ
 { }
 
 tms1980_cpu_device::tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms0980_cpu_device(mconfig, TMS1980, "TMS1980", tag, owner, clock, 7, 11, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_64x9_as4), "tms1980", __FILE__)
+	: tms0980_cpu_device(mconfig, TMS1980, "TMS1980", tag, owner, clock, 7, 10, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_64x9_as4), "tms1980", __FILE__)
 { }
 
 
@@ -763,7 +763,7 @@ UINT32 tms0980_cpu_device::decode_micro(UINT8 sel)
 	mask ^= 0x43fc3; // invert active-negative
 
 	// M_RSTR is specific to TMS02x0/TMS1980, it redirects to F_RSTR
-	// M_UNK1 is specific to TMS0270, unknown yet
+	// M_UNK1 is specific to TMS0270, unknown/unused yet and apparently not connected on every TMS0270
 	//                      _______  ______                                _____  _____  _____  _____  ______  _____  ______  _____                            _____
 	const UINT32 md[22] = { M_NDMTP, M_DMTP, M_AUTY, M_AUTA, M_CKM, M_SSE, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_SSS, M_CME, M_CIN, M_STO, M_RSTR, M_UNK1 };
 
@@ -1238,6 +1238,7 @@ void tms1xxx_cpu_device::op_tpc()
 
 
 // TMS0970-specific (and possibly child classes)
+
 void tms0970_cpu_device::op_setr()
 {
 	// SETR: set output register
