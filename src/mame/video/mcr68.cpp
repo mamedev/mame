@@ -71,9 +71,7 @@ VIDEO_START_MEMBER(mcr68_state,zwackery)
 	const UINT8 *colordatabase = (const UINT8 *)memregion("gfx3")->base();
 	gfx_element *gfx0 = m_gfxdecode->gfx(0);
 	gfx_element *gfx2 = m_gfxdecode->gfx(2);
-	std::unique_ptr<UINT8[]> srcdata0;
 	UINT8 *dest0;
-	std::unique_ptr<UINT8[]> srcdata2;
 	UINT8 *dest2;
 	int code, y, x;
 
@@ -85,12 +83,12 @@ VIDEO_START_MEMBER(mcr68_state,zwackery)
 	m_fg_tilemap->set_transparent_pen(0);
 
 	/* allocate memory for the assembled gfx data */
-	srcdata0 = std::make_unique<UINT8[]>(gfx0->elements() * gfx0->width() * gfx0->height());
-	srcdata2 = std::make_unique<UINT8[]>(gfx2->elements() * gfx2->width() * gfx2->height());
+	m_srcdata0 = std::make_unique<UINT8[]>(gfx0->elements() * gfx0->width() * gfx0->height());
+	m_srcdata2 = std::make_unique<UINT8[]>(gfx2->elements() * gfx2->width() * gfx2->height());
 
 	/* "colorize" each code */
-	dest0 = srcdata0.get();
-	dest2 = srcdata2.get();
+	dest0 = m_srcdata0.get();
+	dest2 = m_srcdata2.get();
 	for (code = 0; code < gfx0->elements(); code++)
 	{
 		const UINT8 *coldata = colordatabase + code * 32;
@@ -127,8 +125,8 @@ VIDEO_START_MEMBER(mcr68_state,zwackery)
 	}
 
 	/* make the assembled data our new source data */
-	gfx0->set_raw_layout(srcdata0.get(), gfx0->width(), gfx0->height(), gfx0->elements(), 8 * gfx0->width(), 8 * gfx0->width() * gfx0->height());
-	gfx2->set_raw_layout(srcdata2.get(), gfx2->width(), gfx2->height(), gfx2->elements(), 8 * gfx2->width(), 8 * gfx2->width() * gfx2->height());
+	gfx0->set_raw_layout(m_srcdata0.get(), gfx0->width(), gfx0->height(), gfx0->elements(), 8 * gfx0->width(), 8 * gfx0->width() * gfx0->height());
+	gfx2->set_raw_layout(m_srcdata2.get(), gfx2->width(), gfx2->height(), gfx2->elements(), 8 * gfx2->width(), 8 * gfx2->width() * gfx2->height());
 }
 
 
