@@ -988,7 +988,11 @@ int shaders::create_resources(bool reset)
 
 	focus_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 	focus_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
+	focus_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
+	focus_effect->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS);
 	focus_effect->add_uniform("Defocus", uniform::UT_VEC2, uniform::CU_FOCUS_SIZE);
+	focus_effect->add_uniform("OrientationSwapXY", uniform::UT_BOOL, uniform::CU_ORIENTATION_SWAP);
+	focus_effect->add_uniform("RotationSwapXY", uniform::UT_BOOL, uniform::CU_ROTATION_SWAP);
 
 	phosphor_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 	phosphor_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
@@ -1025,6 +1029,10 @@ int shaders::create_resources(bool reset)
 	post_effect->add_uniform("Power", uniform::UT_VEC3, uniform::CU_POST_POWER);
 	post_effect->add_uniform("Floor", uniform::UT_VEC3, uniform::CU_POST_FLOOR);
 
+	post_effect->add_uniform("OrientationSwapXY", uniform::UT_BOOL, uniform::CU_ORIENTATION_SWAP);
+	post_effect->add_uniform("RotationSwapXY", uniform::UT_BOOL, uniform::CU_ROTATION_SWAP);
+	post_effect->add_uniform("RotationType", uniform::UT_INT, uniform::CU_ROTATION_TYPE);
+
 	distortion_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 	distortion_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
 	distortion_effect->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS);
@@ -1034,6 +1042,10 @@ int shaders::create_resources(bool reset)
 	distortion_effect->add_uniform("RoundCornerAmount", uniform::UT_FLOAT, uniform::CU_POST_ROUND_CORNER);
 	distortion_effect->add_uniform("SmoothBorderAmount", uniform::UT_FLOAT, uniform::CU_POST_SMOOTH_BORDER);
 	distortion_effect->add_uniform("ReflectionAmount", uniform::UT_FLOAT, uniform::CU_POST_REFLECTION);
+
+	distortion_effect->add_uniform("OrientationSwapXY", uniform::UT_BOOL, uniform::CU_ORIENTATION_SWAP);
+	distortion_effect->add_uniform("RotationSwapXY", uniform::UT_BOOL, uniform::CU_ROTATION_SWAP);
+	distortion_effect->add_uniform("RotationType", uniform::UT_INT, uniform::CU_ROTATION_TYPE);
 
 	vector_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 
@@ -1369,19 +1381,6 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 		(machine->first_screen()->screen_type() &  SCREEN_TYPE_VECTOR) == SCREEN_TYPE_VECTOR;
 	bool prepare_raster =
 		(machine->first_screen()->screen_type() &  SCREEN_TYPE_RASTER) == SCREEN_TYPE_RASTER;
-	bool orientation_swap_xy =
-		(d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
-	bool rotation_swap_xy =
-		(d3d->window().target()->orientation() & ROT90) == ROT90 ||
-		(d3d->window().target()->orientation() & ROT270) == ROT270;
-	int rotation_type =
-		(d3d->window().target()->orientation() & ROT90) == ROT90
-			? 1
-			: (d3d->window().target()->orientation() & ROT180) == ROT180
-				? 2
-				: (d3d->window().target()->orientation() & ROT270) == ROT270
-					? 3
-					: 0;
 
 	screen_device_iterator screen_iterator(machine->root_device());
 	screen_device *screen = screen_iterator.first();
@@ -1406,9 +1405,6 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	curr_effect->set_vector("ScreenScale", 2, screen_scale);
 	curr_effect->set_vector("ScreenOffset", 2, screen_offset);
 	curr_effect->set_float("ScanlineOffset", texture->get_cur_frame() == 0 ? 0.0f : options->scanline_offset);
-	curr_effect->set_bool("OrientationSwapXY", orientation_swap_xy);
-	curr_effect->set_bool("RotationSwapXY", rotation_swap_xy);
-	curr_effect->set_int("RotationType", rotation_type); // backward compatibility
 	curr_effect->set_bool("PrepareBloom", prepare_bloom);
 	curr_effect->set_bool("PrepareVector", prepare_vector);
 	curr_effect->set_bool("PrepareRaster", prepare_raster);
@@ -1563,26 +1559,9 @@ int shaders::distortion_pass(render_target *rt, int source_index, poly_info *pol
 		return next_index;
 	}
 
-	bool orientation_swap_xy =
-		(d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
-	bool rotation_swap_xy =
-		(d3d->window().target()->orientation() & ROT90) == ROT90 ||
-		(d3d->window().target()->orientation() & ROT270) == ROT270;
-	int rotation_type =
-		(d3d->window().target()->orientation() & ROT90) == ROT90
-			? 1
-			: (d3d->window().target()->orientation() & ROT180) == ROT180
-				? 2
-				: (d3d->window().target()->orientation() & ROT270) == ROT270
-					? 3
-					: 0;
-
 	curr_effect = distortion_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[next_index]);
-	curr_effect->set_bool("OrientationSwapXY", orientation_swap_xy);
-	curr_effect->set_bool("RotationSwapXY", rotation_swap_xy);
-	curr_effect->set_int("RotationType", rotation_type);
 
 	next_index = rt->next_index(next_index);
 	blit(rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
@@ -1766,7 +1745,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		int next_index = 0;
 
 		next_index = vector_buffer_pass(rt, next_index, poly, vertnum);
-		next_index = defocus_pass(rt, next_index, poly, vertnum);
+		next_index = defocus_pass(rt, next_index, poly, vertnum); // 1st pass
+		next_index = defocus_pass(rt, next_index, poly, vertnum); // 2nd pass
 		next_index = phosphor_pass(rt, ct, next_index, poly, vertnum);
 
 		// create bloom textures
@@ -2732,8 +2712,8 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Scanline Brightness",                 0,    20,    40, 1, 1, slider_scanline_bright_scale },
 	{ "Scanline Brightness Overdrive",       0,     0,    20, 1, 1, slider_scanline_bright_offset },
 	{ "Scanline Jitter",                     0,     0,    40, 1, 1, slider_scanline_offset },
-	{ "Defocus X",                           0,     0,    64, 1, 3, slider_defocus_x },
-	{ "Defocus Y",                           0,     0,    64, 1, 3, slider_defocus_y },
+	{ "Defocus X",                           0,     0,    20, 1, 3, slider_defocus_x },
+	{ "Defocus Y",                           0,     0,    20, 1, 3, slider_defocus_y },
 	{ "Red Position Offset X",           -1500,     0,  1500, 1, 3, slider_red_converge_x },
 	{ "Red Position Offset Y",           -1500,     0,  1500, 1, 3, slider_red_converge_y },
 	{ "Green Position Offset X",         -1500,     0,  1500, 1, 3, slider_green_converge_x },
@@ -2834,6 +2814,7 @@ uniform::uniform(effect *shader, const char *name, uniform_type type, int id)
 	m_next = NULL;
 	m_handle = m_shader->get_parameter(NULL, name);
 	m_ival = 0;
+	m_bval = false;
 	memset(m_vec, 0, sizeof(float) * 4);
 	m_mval = NULL;
 	m_texture = NULL;
@@ -2841,6 +2822,7 @@ uniform::uniform(effect *shader, const char *name, uniform_type type, int id)
 
 	switch (type)
 	{
+		case UT_BOOL:
 		case UT_INT:
 		case UT_FLOAT:
 		case UT_MATRIX:
@@ -2917,6 +2899,33 @@ void uniform::update()
 			float quaddims[2] = { shadersys->curr_poly->get_prim_width(), shadersys->curr_poly->get_prim_height() };
 			m_shader->set_vector("QuadDims", 2, quaddims);
 			break;
+		}
+
+		case CU_ORIENTATION_SWAP:
+		{			
+			bool orientation_swap_xy =
+				(d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+			m_shader->set_bool("OrientationSwapXY", orientation_swap_xy);
+			
+		}
+		case CU_ROTATION_SWAP:
+		{
+			bool rotation_swap_xy =
+				(d3d->window().target()->orientation() & ROT90) == ROT90 ||
+				(d3d->window().target()->orientation() & ROT270) == ROT270;
+			m_shader->set_bool("RotationSwapXY", rotation_swap_xy);
+		}
+		case CU_ROTATION_TYPE:
+		{
+			int rotation_type =
+				(d3d->window().target()->orientation() & ROT90) == ROT90
+					? 1
+					: (d3d->window().target()->orientation() & ROT180) == ROT180
+						? 2
+						: (d3d->window().target()->orientation() & ROT270) == ROT270
+							? 3
+							: 0;
+			m_shader->set_int("RotationType", rotation_type);
 		}
 
 		case CU_NTSC_CCFREQ:
@@ -3123,6 +3132,11 @@ void uniform::set(int x)
 	m_ival = x;
 }
 
+void uniform::set(bool x)
+{
+	m_bval = x;
+}
+
 void uniform::set(matrix *mat)
 {
 	m_mval = mat;
@@ -3137,6 +3151,9 @@ void uniform::upload()
 {
 	switch (m_type)
 	{
+		case UT_BOOL:
+			m_shader->set_bool(m_handle, m_bval);
+			break;
 		case UT_INT:
 			m_shader->set_int(m_handle, m_ival);
 			break;

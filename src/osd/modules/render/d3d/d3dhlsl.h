@@ -37,6 +37,7 @@ public:
 		UT_VEC2,
 		UT_FLOAT,
 		UT_INT,
+		UT_BOOL,
 		UT_MATRIX,
 		UT_SAMPLER
 	} uniform_type;
@@ -48,6 +49,10 @@ public:
 		CU_SOURCE_RECT,
 		CU_TARGET_DIMS,
 		CU_QUAD_DIMS,
+
+		CU_ORIENTATION_SWAP,
+		CU_ROTATION_SWAP,
+		CU_ROTATION_TYPE,
 
 		CU_NTSC_CCFREQ,
 		CU_NTSC_A,
@@ -114,6 +119,7 @@ public:
 	void        set(float x, float y);
 	void        set(float x);
 	void        set(int x);
+	void        set(bool x);
 	void        set(matrix *mat);
 	void        set(texture *tex);
 
@@ -125,6 +131,7 @@ protected:
 
 	float       m_vec[4];
 	int         m_ival;
+	bool        m_bval;
 	matrix      *m_mval;
 	texture     *m_texture;
 	int         m_count;
