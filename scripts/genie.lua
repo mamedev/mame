@@ -528,7 +528,7 @@ if (_OPTIONS["SOURCES"] == nil) then
 else
 	OUT_STR = os.outputof( PYTHON .. " " .. _MAKE.esc(MAME_DIR) .. "scripts/build/makedep.py " .. _MAKE.esc(MAME_DIR) .. " " .. _OPTIONS["SOURCES"] .. " target " .. _OPTIONS["subtarget"])
 	load(OUT_STR)()
-	os.outputof( PYTHON .. " " .. _MAKE.esc(MAME_DIR) .. "scripts/build/makedep.py " .. _MAKE.esc(MAME_DIR).. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. _MAKE.esc(GEN_DIR) .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"].."/drivlist.cpp")
+	os.outputof( PYTHON .. " " .. _MAKE.esc(MAME_DIR) .. "scripts/build/makedep.py " .. _MAKE.esc(MAME_DIR) .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > " .. _MAKE.esc(GEN_DIR) .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"] .. "/drivlist.cpp")
 end
 configuration { "gmake" }
 	flags {
