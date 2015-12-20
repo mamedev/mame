@@ -213,8 +213,22 @@
 		keyEquivalent:@"F"
 		atIndex:index++];
 	[chunkItem setTarget:self];
-	[chunkItem setTag:tag];
+	[chunkItem setTag:9];
+	
+	NSMenuItem *chunkItem2 = [menu insertItemWithTitle:@"64-bit floats"
+		action:@selector(showChunkSize:)
+		keyEquivalent:@"D"
+		atIndex:index++];
+	[chunkItem2 setTarget:self];
+	[chunkItem2 setTag:10];
 
+	NSMenuItem *chunkItem3 = [menu insertItemWithTitle:@"80-bit floats"
+		action:@selector(showChunkSize:)
+		keyEquivalent:@"E"
+		atIndex:index++];
+	[chunkItem3 setTarget:self];
+	[chunkItem3 setTag:11];
+	
 	[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
 
 	NSMenuItem *logicalItem = [menu insertItemWithTitle:@"Logical Addresses"
