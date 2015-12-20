@@ -7,7 +7,88 @@
 **********************************************************************/
 
 /*
-	Notes
+	Device PDCN
+	Board Copyright - IBM Corp 1989 Made in USA
+
+	Labels:
+		* 96D1975
+		  MN 90594C
+
+		* EC# A6466SP
+		  MFG 85575
+
+	Hardware:
+		* CPU - Zilog Z0840006PSC Z80 @ 5MHz - U19
+		* FDC - NEC D765AC-2 9002P7004 - U35
+		* HDC - HDC9224 SMC E8838 8/90 - U59
+		* DMA - P8237A-5 L1041330 - U34
+			* Channel 0 - FDC
+			* Channel 1 - Main system ram
+		* Memory - HM6264ALP-12 SRAM 8KB - U16
+		* Memory - HM6116P-2 SRAM 2KB - U33
+	Logic:
+		* U1 - PLS105AN Label: 59D9101
+		* U11 - ?? Label: 59D10001
+		* U27 - ?? Label: 96D1978
+		* U28 - ?? Label: 97D8750
+		* U31 - TIBPAL20L8-25CNT Label: 96D1987
+		* U32 - ?? Label: 59D1001
+		* U37 - PLS100N Label: 72D2701
+		* U38 - PLS100N Label: 58D9201
+		* U39 - ?? Label: 96D1981
+		* U40 - ?? Label: 96D1984
+		* U68 - ?? Label: 91D4301
+		* U69 - ?? Label: 59D1001
+		* U70 - ?? Label: 59D1001
+
+	Switches:
+		* S1 - Hard drive format configuration (Default all off)
+		* S2 - Floppy drive format configuration (Default 1-7 off, 8 on)
+
+	Program Memory:
+		* 0x0000 - 0x3FFF : ROM 27128 Label: 97D9988
+		* 0x8000 - 0x9FFF : SRAM HM6264ALP-12 8KB
+		* 0xC000 - 0xC7FF : SRAM HM6116P-2 2KB
+
+	IO Memory:
+		* 0x00 - 0x01 : Old style command [0x5FF041B0]
+		* 0x02 - 0x03 : FDC command address [0x5FF0C0B0][0x5FF0C1B0]
+		* 0x04 - 0x05 : FDC command completion status [0x5FF030B0]
+		* 0x06 - 0x07 : FDC data address [0x5FF080B0]
+		* 0x10 - 0x18 : HDC registers (unknown)
+		* 0x21 - 0x21 : FDC unknown, resets bit 1 on 0x38
+		* 0x22 - 0x22 : FDC unknown
+		* 0x23 - 0x24 : FDC Active DMA host address (auto increments)
+		* 0x25 - 0x25 : FDC unknown
+		* 0x26 - 0x26 : DREQ1 on
+		* 0x27 - 0x27 : FDC unknown
+		* 0x28 - 0x2A : Possibly LED lights
+		* 0x2C - 0x2C : DREQ1 off
+		* 0x2D - 0x2D : Unknown
+		* 0x2E - 0x2E : Transfer direction 0x80 = PDC -> Host (read data)
+						   0x00 = Host -> PDC (Commands, write data)
+		* 0x2F - 0x2F : Unknown
+		* 0x38 - 0x38 : FDC command request
+				Bit 1: Debug?
+				Bit 2: Command complete
+				Bit 3: Unknown
+				Bit 5: Unknown
+				Bit 6-7: Error conditions
+		* 0x39 - 0x39 : Interrupt status
+				Bit 0: HDC9224 interrupt
+				Bit 1: Incoming command
+				Bit 3: FDD related, maybe uPD interrupt pin?
+		* 0x3C - 0x3D : Dipswitch 2 and 1
+		* 0x40 - 0x40 : HDC9224 DATA register
+		* 0x41 - 0x41 : HDC9224 COMMAND register
+		* 0x42 - 0x42 : uPD765 STATUS register
+		* 0x43 - 0x43 : uPD765 DATA register
+		* 0x50 - 0x51 : Unknown - reset latch maybe?
+		* 0x52 - 0x52 : FDD Master motor control
+		* 0x53 - 0x53 : Unknown
+		* 0x54 - 0x57 : FDD motor control (Units 1-4)
+		* 0x60 - 0x6F : P8237A DMA controller register set
+
 */
 
 #include "pdc.h"
