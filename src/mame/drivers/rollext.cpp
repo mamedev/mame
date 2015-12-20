@@ -61,6 +61,8 @@
         [0x00000320] 2000000-TCOUNT in XINT3 handler
         [0x01010668] copied from (word)0xb0000004 in XINT3 handler
 
+		ROM [0xc0050000] 0x10000 floats copied to [0x40180000]
+
 
     Texture ROM decode:
 
@@ -71,6 +73,208 @@
 
 #include "emu.h"
 #include "cpu/tms32082/tms32082.h"
+#include "video/poly.h"
+
+struct rollext_polydata
+{
+	UINT32 tex_bottom;
+	UINT32 tex_left;
+	UINT32 pal;
+};
+
+class rollext_renderer : public poly_manager<float, rollext_polydata, 4, 10000>
+{
+public:
+	rollext_renderer(screen_device &screen)
+		: poly_manager<float, rollext_polydata, 4, 10000>(screen)
+	{
+		m_fb = std::make_unique<bitmap_rgb32>(1024, 1024);
+	}
+
+	void render_texture_scan(INT32 scanline, const extent_t &extent, const rollext_polydata &extradata, int threadid);
+
+	void set_texture_ram(UINT8* texture_ram);
+	void set_palette_ram(UINT16* palette_ram);
+	void process_display_list(UINT32* dispram);
+
+	void clear_fb();
+	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
+private:
+	std::unique_ptr<bitmap_rgb32> m_fb;
+
+	UINT8 *m_texture_ram;
+	UINT16 *m_palette_ram;
+};
+
+void rollext_renderer::set_texture_ram(UINT8* texture_ram)
+{
+	m_texture_ram = texture_ram;
+}
+
+void rollext_renderer::set_palette_ram(UINT16* palette_ram)
+{
+	m_palette_ram = palette_ram;
+}
+
+void rollext_renderer::render_texture_scan(INT32 scanline, const extent_t &extent, const rollext_polydata &extradata, int threadid)
+{
+	float u = extent.param[0].start;
+	float v = extent.param[1].start;
+	float du = extent.param[0].dpdx;
+	float dv = extent.param[1].dpdx;
+
+	UINT32 *fb = &m_fb->pix32(scanline);
+
+	UINT32 texbot = extradata.tex_bottom;
+	UINT32 texleft = extradata.tex_left;
+
+	int palnum = extradata.pal;
+
+	for (int x = extent.startx; x < extent.stopx; x++)
+	{
+		int iu = (int)(u * 29.0f);
+		int iv = (int)(v * 29.0f);
+
+		UINT8 p = m_texture_ram[((texbot - iv) * 2048) + texleft + iu];
+
+		UINT16 texel = m_palette_ram[(palnum * 256) + BYTE_XOR_BE(p)];
+		int r = ((texel >> 10) & 0x1f) << 3;
+		int g = ((texel >> 5) & 0x1f) << 3;
+		int b = (texel & 0x1f) << 3;
+
+		fb[x] = 0xff000000 | (r << 16) | (g << 8) | b;
+
+		u += du;
+		v += dv;
+	}
+}
+
+void rollext_renderer::process_display_list(UINT32* disp_ram)
+{
+	const rectangle& visarea = screen().visible_area();
+
+	render_delegate rd = render_delegate(FUNC(rollext_renderer::render_texture_scan), this);
+
+	int num = disp_ram[0xffffc/4];
+
+	for (int i=0; i < num; i++)
+	{
+		int ii = i * 0x60;
+
+		vertex_t vert[4];
+
+		//int x[4];
+		//int y[4];
+
+		// Poly data:
+		// Word 0:   xxxxxxxx -------- -------- --------   Command? 0xFC for quads
+		//           -------- -------- xxxxxxxx --------   Palette?
+		//           -------- -------- -------- xxxxxxxx   Number of verts? (4 for quads)
+		
+		// Word 1:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 1 X
+
+		// Word 2:   xxxxxxxx xxxxx--- -------- --------   Texture Origin Bottom
+		//           -------- -----xxx xxxxxxxx --------   Texture Origin Left
+
+		// Word 3:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 1 Y
+
+		// Word 4:   -------- -------- xxxxxxxx xxxxxxxx   ?
+
+		// Word 5:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 2 X
+
+		// Word 6:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Unknown float
+
+		// Word 7:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 2 Y
+
+		// Word 8:   -------- -------- -------- --------   ?
+
+		// Word 9:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 3 X
+
+		// Word 10:  -------- -------- -------- --------   ?
+
+		// Word 11:  xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 3 Y
+
+		// Word 12:  -------- -------- -------- --------   ?
+
+		// Word 13:  xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 4 X
+
+		// Word 14:  -------- -------- -------- --------   ?
+
+		// Word 15:  xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 4 Y
+
+		// Word 16:  xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Unknown float
+
+		// Word 17:  -------- -------- -------- --------   ?
+
+		// Word 18:  xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Unknown float
+
+		// Word 19:  -------- -------- -------- --------   ?
+
+		// Word 20:  xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Unknown float
+
+		// Word 21:  -------- -------- -------- --------   ?
+
+		// Word 22:  xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Unknown float
+
+		// Word 23:  -------- -------- -------- --------   ?
+
+		for (int j=0; j < 4; j++)
+		{
+			UINT32 ix = disp_ram[(ii + (j*0x10) + 0x4) / 4];
+			UINT32 iy = disp_ram[(ii + (j*0x10) + 0xc) / 4];
+
+			vert[j].x = (int)((u2f(ix) / 2.0f) + 256.0f);
+			vert[j].y = (int)((u2f(iy) / 2.0f) + 192.0f);
+		}
+
+		vert[0].p[0] = 0.0f;		vert[0].p[1] = 1.0f;
+		vert[1].p[0] = 0.0f;		vert[1].p[1] = 0.0f;
+		vert[2].p[0] = 1.0f;		vert[2].p[1] = 0.0f;
+		vert[3].p[0] = 1.0f;		vert[3].p[1] = 1.0f;
+
+		rollext_polydata &extra = object_data_alloc();
+
+		extra.tex_bottom = (disp_ram[(ii + 8) / 4] >> 19) & 0x1fff;
+		extra.tex_left = (disp_ram[(ii + 8) / 4] >> 8) & 0x7ff;
+		extra.pal = (disp_ram[(ii + 0) / 4] >> 8) & 0x1f;
+
+#if 0		
+		printf("P%d\n", i);
+		for (int j=0; j < 6; j++)
+		{
+			printf("   %08X %08X %08X %08X", disp_ram[(ii + (j*0x10) + 0) / 4], disp_ram[(ii + (j*0x10) + 4) / 4], disp_ram[(ii + (j*0x10) + 8) / 4], disp_ram[(ii + (j*0x10) + 12) / 4]);
+			printf("   %f %f %f %f\n", u2f(disp_ram[(ii + (j*0x10) + 0) / 4]), u2f(disp_ram[(ii + (j*0x10) + 4) / 4]), u2f(disp_ram[(ii + (j*0x10) + 8) / 4]), u2f(disp_ram[(ii + (j*0x10) + 12) / 4]));
+		}
+#endif	
+
+		render_triangle(visarea, rd, 4, vert[0], vert[1], vert[2]);
+		render_triangle(visarea, rd, 4, vert[0], vert[2], vert[3]);
+		
+	}
+
+	wait();
+}
+
+void rollext_renderer::clear_fb()
+{
+	rectangle visarea;
+	visarea.min_x = 0;
+	visarea.max_x = 511;
+	visarea.min_y = 0;
+	visarea.max_y = 383;
+
+	m_fb->fill(0xff000000, visarea);
+
+}
+
+void rollext_renderer::display(bitmap_rgb32 *bitmap, const rectangle &cliprect)
+{
+	copybitmap_trans(*bitmap, *m_fb, 0, 0, 0, 0, cliprect, 0);
+}
+
+
+
+
 
 class rollext_state : public driver_device
 {
@@ -80,22 +284,25 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette_ram(*this, "palette_ram"),
 		m_texture_mask(*this, "texture_mask"),
-		m_disp_ram(*this, "disp_ram")
+		m_disp_ram(*this, "disp_ram"),
+		m_screen(*this, "screen")
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tms32082_mp_device> m_maincpu;
 	required_shared_ptr<UINT32> m_palette_ram;
 	required_shared_ptr<UINT32> m_texture_mask;
 	required_shared_ptr<UINT32> m_disp_ram;
+	required_device<screen_device> m_screen;
 
 	DECLARE_READ32_MEMBER(a0000000_r);
 	DECLARE_WRITE32_MEMBER(a0000000_w);
 	DECLARE_READ32_MEMBER(b0000000_r);
 
-	std::unique_ptr<UINT8[]> m_texture;
+	DECLARE_WRITE32_MEMBER(cmd_callback);
 
-	void draw_line(bitmap_rgb32 &bitmap, const rectangle &visarea, int v1x, int v1y, int v2x, int v2y);
+	std::unique_ptr<UINT8[]> m_texture;
+	rollext_renderer* m_renderer;
 
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 	DECLARE_DRIVER_INIT(rollext);
@@ -105,8 +312,6 @@ public:
 	void preprocess_texture_data();
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
-
-
 
 void rollext_state::preprocess_texture_data()
 {
@@ -128,65 +333,19 @@ void rollext_state::preprocess_texture_data()
 	}
 }
 
-void rollext_state::draw_line(bitmap_rgb32 &bitmap, const rectangle &visarea, int v1x, int v1y, int v2x, int v2y)
-{
-	int dx = (v2x - v1x);
-	int dy = (v2y - v1y);
-
-	int x1 = v1x;
-	int y1 = v1y;
-
-	if (v1x < visarea.min_x || v1x > visarea.max_x ||
-		v1y < visarea.min_y || v1y > visarea.max_y ||
-		v2x < visarea.min_x || v2x > visarea.max_x ||
-		v2y < visarea.min_y || v2y > visarea.max_x)
-		return;
-
-	if (dx > dy)
-	{
-		int x = x1;
-		for (int i=0; i < abs(dx); i++)
-		{
-			int y = y1 + (dy * (float)(x - x1) / (float)(dx));
-
-			if (x >= 0 && x < 512 && y >= 0 && y < 384)
-			{
-				UINT32 *fb = &bitmap.pix32(y);
-				fb[x] = 0xffffffff;
-			}
-
-			x++;
-		}
-	}
-	else
-	{
-		int y = y1;
-		for (int i=0; i < abs(dy); i++)
-		{
-			int x = x1 + (dx * (float)(y - y1) / (float)(dy));
-
-			if (x >= 0 && x < 512 && y >= 0 && y < 384)
-			{
-				UINT32 *fb = &bitmap.pix32(y);
-				fb[x] = 0xffffffff;
-			}
-
-			y++;
-		}
-	}
-}
-
 void rollext_state::video_start()
 {
 	m_texture = std::make_unique<UINT8[]>(0x2000000);
 
 	preprocess_texture_data();
+
+	m_renderer = auto_alloc(machine(), rollext_renderer(*m_screen));
+	m_renderer->set_texture_ram(m_texture.get());
+	m_renderer->set_palette_ram((UINT16*)&m_palette_ram[0]);
 }
 
 UINT32 rollext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0xff000000, cliprect);
-
 #if 0
 	UINT16 *pal = (UINT16*)&m_palette_ram[0];
 
@@ -212,34 +371,12 @@ UINT32 rollext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		ii += 1536;
 	}
 #endif
+	
+	m_renderer->display(&bitmap, cliprect);
 
-	int num = m_disp_ram[0xffffc/4];
+	//m_renderer->clear_fb();
 
-	for (int i=0; i < num; i++)
-	{
-		int ii = i * 0x60;
-
-		int x[4];
-		int y[4];
-
-		for (int j=0; j < 4; j++)
-		{
-			UINT32 ix = m_disp_ram[(ii + (j*0x10) + 0x4) / 4];
-			UINT32 iy = m_disp_ram[(ii + (j*0x10) + 0xc) / 4];
-
-			x[j] = (int)((u2f(ix) / 2.0f) + 256.0f);
-			y[j] = (int)((u2f(iy) / 2.0f) + 192.0f);
-		}
-
-
-		draw_line(bitmap, cliprect, x[0], y[0], x[1], y[1]);
-		draw_line(bitmap, cliprect, x[1], y[1], x[2], y[2]);
-		draw_line(bitmap, cliprect, x[3], y[3], x[2], y[2]);
-		draw_line(bitmap, cliprect, x[0], y[0], x[3], y[3]);
-
-	}
-
-	m_disp_ram[0xffffc/4] = 0;
+	//m_disp_ram[0xffffc/4] = 0;
 
 
 	return 0;
@@ -277,12 +414,95 @@ READ32_MEMBER(rollext_state::b0000000_r)
 	switch (offset)
 	{
 		case 0:     // ??
-			return 0xffff;
+			return 0x0000ffff;
 		case 1:     // ??
 			return 0;
 	}
 
 	return 0;
+}
+
+WRITE32_MEMBER(rollext_state::cmd_callback)
+{
+	UINT32 command = data;
+
+	// PP0
+	if (command & 1)
+	{
+		if (command & 0x00004000)
+		{
+			// simulate PP behavior for now...
+			space.write_dword(0x00000084, 3);
+
+			UINT32 num = space.read_dword(0x90);
+
+			int consume_num = num;
+			if (consume_num > 32)
+				consume_num = 32;
+
+			printf("PP num %d\n", num);
+			printf("0x00000084 = %08X\n", space.read_dword(0x84));
+
+			
+			UINT32 ra = 0x1000280;
+
+			/*
+			printf("FIFO push:\n");
+
+			for (int i=0; i < consume_num; i++)
+			{
+			    printf("Entry %d:\n", i);
+			    for (int k=0; k < 6; k++)
+			    {
+			        for (int l=0; l < 4; l++)
+			        {
+			            UINT32 dd = m_program->read_dword(ra);
+			            ra += 4;
+
+			            printf("%08X(%f) ", dd, u2f(dd));
+			        }
+			        printf("\n");
+			    }
+			    printf("\n");
+			}
+			*/
+
+			ra = 0x1000280;
+
+			int oldnum = space.read_dword(0x600ffffc);
+			UINT32 rb = 0x60000000 + (oldnum * 0x60);
+
+			for (int i=0; i < consume_num; i++)
+			{
+				for (int k=0; k < 24; k++)
+				{
+					UINT32 dd = space.read_dword(ra);
+					ra += 4;
+
+					space.write_dword(rb, dd);
+					rb += 4;
+				}
+			}
+			space.write_dword(0x600ffffc, oldnum+consume_num);
+
+			m_renderer->process_display_list(m_disp_ram);
+
+			space.write_dword(0x600ffffc, 0);
+
+			space.write_dword(0x00000090, 0);
+			space.write_dword(0x00000094, 0);
+
+		}
+	}
+	// PP1
+	if (command & 2)
+	{
+		if (command & 0x00004000)
+		{
+			// simulate PP behavior for now...
+			space.write_dword(0x00001014, 3);
+		}
+	}
 }
 
 
@@ -320,8 +540,9 @@ void rollext_state::machine_start()
 static MACHINE_CONFIG_START(rollext, rollext_state)
 	MCFG_CPU_ADD("maincpu", TMS32082_MP, 60000000)
 	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rollext_state, vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(rollext_state, irq3_line_assert,  60)
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", rollext_state, vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(rollext_state, irq1_line_assert, 60)
+	//MCFG_CPU_PERIODIC_INT_DRIVER(rollext_state, irq3_line_assert, 500)
 
 	MCFG_CPU_ADD("pp0", TMS32082_PP, 60000000)
 	MCFG_CPU_PROGRAM_MAP(memmap);
@@ -344,6 +565,7 @@ INTERRUPT_GEN_MEMBER(rollext_state::vblank_interrupt)
 
 DRIVER_INIT_MEMBER(rollext_state, rollext)
 {
+	m_maincpu->set_command_callback(write32_delegate(FUNC(rollext_state::cmd_callback),this));
 }
 
 
