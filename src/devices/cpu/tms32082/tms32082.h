@@ -71,6 +71,8 @@ public:
 	DECLARE_READ32_MEMBER(mp_param_r);
 	DECLARE_WRITE32_MEMBER(mp_param_w);
 
+	void set_command_callback(write32_delegate callback);
+
 
 protected:
 	// device level overrides
@@ -138,6 +140,8 @@ protected:
 
 	address_space *m_program;
 	direct_read_data* m_direct;
+
+	write32_delegate m_cmd_callback;
 
 	void check_interrupts();
 	void processor_command(UINT32 command);
