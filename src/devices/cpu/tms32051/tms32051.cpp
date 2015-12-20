@@ -557,6 +557,7 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 		}
 
 		case 0x09: m_brcr = data; break;
+		case 0x0d: m_treg1 = data; break;
 		case 0x0e: m_treg2 = data; break;
 		case 0x0f: m_dbmr = data; break;
 		case 0x10: m_ar[0] = data; break;

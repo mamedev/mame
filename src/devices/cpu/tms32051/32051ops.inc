@@ -663,7 +663,17 @@ void tms32051_device::op_sath()
 
 void tms32051_device::op_satl()
 {
-	fatalerror("32051: unimplemented op satl at %08X\n", m_pc-1);
+	int count = m_treg1 & 0xf;
+	if (m_st1.sxm)
+	{
+		m_acc = (INT32)(m_acc) >> count;
+	}
+	else
+	{
+		m_acc = (UINT32)(m_acc) >> count;
+	}
+
+	CYCLES(1);
 }
 
 void tms32051_device::op_sbb()
@@ -1093,7 +1103,19 @@ void tms32051_device::op_calld()
 
 void tms32051_device::op_cc()
 {
-	fatalerror("32051: unimplemented op cc at %08X\n", m_pc-1);
+	UINT16 pma = ROPCODE();
+
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
+	{
+		PUSH_STACK(m_pc);
+
+		CHANGE_PC(pma);
+		CYCLES(4);
+	}
+	else
+	{
+		CYCLES(2);
+	}
 }
 
 void tms32051_device::op_ccd()
@@ -1590,7 +1612,11 @@ void tms32051_device::op_sph()
 
 void tms32051_device::op_spl()
 {
-	fatalerror("32051: unimplemented op spl at %08X\n", m_pc-1);
+	UINT16 ea = GET_ADDRESS();
+	UINT16 spreg = (UINT16)(PREG_PSCALER(m_preg));
+	DM_WRITE16(ea, spreg);
+
+	CYCLES(1);
 }
 
 void tms32051_device::op_spm()
@@ -1794,7 +1820,9 @@ void tms32051_device::op_setc_hold()
 
 void tms32051_device::op_setc_tc()
 {
-	fatalerror("32051: unimplemented op setc tc at %08X\n", m_pc-1);
+	m_st1.tc = 1;
+
+	CYCLES(1);
 }
 
 void tms32051_device::op_setc_carry()

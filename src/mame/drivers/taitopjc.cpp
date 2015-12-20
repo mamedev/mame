@@ -88,6 +88,7 @@
 #include "cpu/tlcs900/tlcs900.h"
 #include "cpu/mn10200/mn10200.h"
 #include "cpu/tms32051/tms32051.h"
+#include "video/tc0780fpa.h"
 #include "machine/nvram.h"
 
 #define LOG_TLCS_TO_PPC_COMMANDS        1
@@ -101,13 +102,19 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_iocpu(*this, "iocpu"),
 		m_soundcpu(*this, "mn10200"),
-		m_dsp(*this, "dsp")
+		m_dsp(*this, "dsp"),
+		m_tc0780fpa(*this, "tc0780fpa"),
+		m_palette(*this, "palette"),
+		m_polyrom(*this, "poly")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_iocpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<cpu_device> m_dsp;
+	required_device<tc0780fpa_device> m_tc0780fpa;
+	required_device<palette_device> m_palette;
+	required_memory_region m_polyrom;
 
 	DECLARE_READ64_MEMBER(video_r);
 	DECLARE_WRITE64_MEMBER(video_w);
@@ -122,9 +129,12 @@ public:
 	DECLARE_WRITE16_MEMBER(tlcs_unk_w);
 	DECLARE_READ16_MEMBER(tms_dspshare_r);
 	DECLARE_WRITE16_MEMBER(tms_dspshare_w);
+	DECLARE_READ16_MEMBER(dsp_rom_r);
+	DECLARE_WRITE16_MEMBER(dsp_roml_w);
+	DECLARE_WRITE16_MEMBER(dsp_romh_w);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_taitopjc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_taitopjc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(taitopjc_vbi);
 	UINT32 videochip_r(offs_t address);
 	void videochip_w(offs_t address, UINT32 data);
@@ -139,6 +149,8 @@ public:
 	UINT32 *m_pal_ram;
 
 	UINT32 m_video_address;
+
+	UINT32 m_dsp_rom_address;
 };
 
 void taitopjc_state::video_exit()
@@ -177,7 +189,7 @@ void taitopjc_state::video_start()
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitopjc_state::video_exit), this));
 }
 
-UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *s = (UINT8*)m_screen_ram;
 	int x,y,t,u;
@@ -201,22 +213,20 @@ UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_rgb3
 
 			for (y=0; y < 16; y++)
 			{
-				UINT32 *fb = &bitmap.pix32(y+(u*16));
+				UINT16 *fb = &bitmap.pix16(y+(u*16));
 				for (x=0; x < 16; x++)
 				{
 					UINT8 p = s[((tile*256) + ((y*16)+x)) ^3];
 					if (p != 0)
 					{
-						UINT32 color = m_pal_ram[(palette << 8) + p];
-						UINT32 r = (color & 0xff) << 16;
-						UINT32 g = (color & 0xff00);
-						UINT32 b = (color >> 16) & 0xff;
-						fb[x+(t*16)] = 0xff000000 | r | g | b;
+						fb[x+(t*16)] = (palette << 8) + p;
 					}
 				}
 			}
 		}
 	}
+
+	m_tc0780fpa->draw(bitmap, cliprect);
 
 	return 0;
 }
@@ -237,11 +247,12 @@ void taitopjc_state::videochip_w(offs_t address, UINT32 data)
 {
 	if (address >= 0x20000000 && address < 0x20008000)
 	{
-		//UINT32 r = (data >> 16) & 0xff;
-		//UINT32 g = (data >> 8) & 0xff;
-		//UINT32 b = (data >> 0) & 0xff;
-		//palette_set_color_rgb(space.machine, address & 0x7fff, r, g, b);
 		m_pal_ram[address - 0x20000000] = data;
+
+		int b = (data >> 16) & 0xff;
+		int g = (data >>  8) & 0xff;		
+		int r = (data >>  0) & 0xff;
+		m_palette->set_pen_color(address - 0x20000000, rgb_t(r, g, b));
 	}
 	else if (address >= 0x10000000 && address < 0x10040000)
 	{
@@ -357,7 +368,7 @@ READ64_MEMBER(taitopjc_state::dsp_r)
 
 WRITE64_MEMBER(taitopjc_state::dsp_w)
 {
-	logerror("dsp_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask), space.device().safe_pc());
+	//logerror("dsp_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask), space.device().safe_pc());
 
 	if (offset == 0x7fe)
 	{
@@ -527,10 +538,31 @@ WRITE16_MEMBER(taitopjc_state::tms_dspshare_w)
 	m_dsp_ram[offset] = data;
 }
 
+READ16_MEMBER(taitopjc_state::dsp_rom_r)
+{
+	assert(m_dsp_rom_address < 0x800000);
+
+	UINT16 data = ((UINT16*)m_polyrom->base())[m_dsp_rom_address];
+	m_dsp_rom_address++;
+	return data;
+}
+
+WRITE16_MEMBER(taitopjc_state::dsp_roml_w)
+{
+	m_dsp_rom_address &= 0xffff0000;
+	m_dsp_rom_address |= data;
+}
+
+WRITE16_MEMBER(taitopjc_state::dsp_romh_w)
+{
+	m_dsp_rom_address &= 0xffff;
+	m_dsp_rom_address |= (UINT32)(data) << 16;
+}
+
 
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, taitopjc_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x5000, 0xefff) AM_ROM AM_REGION("user2", 0xa000)
+	AM_RANGE(0x4c00, 0xefff) AM_ROM AM_REGION("user2", 0x9800)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitopjc_state )	
@@ -540,7 +572,12 @@ static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitopjc_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tms_io_map, AS_IO, 16, taitopjc_state )
-	AM_RANGE(0x005f, 0x005f) AM_NOP
+	AM_RANGE(0x0053, 0x0053) AM_WRITE(dsp_roml_w)
+	AM_RANGE(0x0057, 0x0057) AM_WRITE(dsp_romh_w)
+	AM_RANGE(0x0058, 0x0058) AM_DEVWRITE("tc0780fpa", tc0780fpa_device, poly_fifo_w)
+	AM_RANGE(0x005a, 0x005a) AM_DEVWRITE("tc0780fpa", tc0780fpa_device, tex_w)
+	AM_RANGE(0x005b, 0x005b) AM_DEVREADWRITE("tc0780fpa", tc0780fpa_device, tex_addr_r, tex_addr_w)
+	AM_RANGE(0x005f, 0x005f) AM_READ(dsp_rom_r)
 ADDRESS_MAP_END
 
 
@@ -595,6 +632,8 @@ void taitopjc_state::machine_reset()
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+	m_dsp_rom_address = 0;
 }
 
 
@@ -636,6 +675,11 @@ static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(taitopjc_state, screen_update_taitopjc)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", 32768)
+
+	MCFG_DEVICE_ADD("tc0780fpa", TC0780FPA, 0)
 
 MACHINE_CONFIG_END
 
@@ -675,10 +719,10 @@ ROM_START( optiger )
 	ROM_LOAD32_WORD_SWAP( "e63-22_m-h.25", 0x800000, 0x400000, CRC(6d895eb6) SHA1(473795da42fd29841a926f18a93e5992f4feb27c) )
 	ROM_LOAD32_WORD_SWAP( "e63-16_m-l.10", 0x800002, 0x400000, CRC(d39c1e34) SHA1(6db0ce2251841db3518a9bd9c4520c3c666d19a0) )
 
-	ROM_REGION( 0xc00000, "poly", 0 )
-	ROM_LOAD( "e63-09_poly0.3", 0x000000, 0x400000, CRC(c3e2b1e0) SHA1(ee71f3f59b46e26dbe2ff724da2c509267c8bf2f) )
-	ROM_LOAD( "e63-10_poly1.4", 0x400000, 0x400000, CRC(f4a56390) SHA1(fc3c51a7f4639479e66ad50dcc94255d94803c97) )
-	ROM_LOAD( "e63-11_poly2.5", 0x800000, 0x400000, CRC(2293d9f8) SHA1(16adaa0523168ee63a7a34b29622c623558fdd82) )
+	ROM_REGION16_BE( 0xc00000, "poly", 0 )
+	ROM_LOAD16_WORD_SWAP( "e63-09_poly0.3", 0x000000, 0x400000, CRC(c3e2b1e0) SHA1(ee71f3f59b46e26dbe2ff724da2c509267c8bf2f) )
+	ROM_LOAD16_WORD_SWAP( "e63-10_poly1.4", 0x400000, 0x400000, CRC(f4a56390) SHA1(fc3c51a7f4639479e66ad50dcc94255d94803c97) )
+	ROM_LOAD16_WORD_SWAP( "e63-11_poly2.5", 0x800000, 0x400000, CRC(2293d9f8) SHA1(16adaa0523168ee63a7a34b29622c623558fdd82) )	
 // Poly 3 is not populated
 
 	ROM_REGION( 0x800000, "sound_data", 0 )
