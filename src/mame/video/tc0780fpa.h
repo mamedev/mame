@@ -27,16 +27,18 @@ public:
 	void render_shade_scan(INT32 scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid);
 	void render_texture_scan(INT32 scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid);
 
-	void render_polygons(UINT16 *polygon_fifo, int length);
+	void render(UINT16 *polygon_fifo, int length);
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void clear_frame();
+	void swap_buffers();
 
 private:
-	std::unique_ptr<bitmap_ind16> m_fb;
+	std::unique_ptr<bitmap_ind16> m_fb[2];
 	std::unique_ptr<bitmap_ind16> m_zb;
 	const UINT8 *m_texture;
 
 	rectangle m_cliprect;
+
+	int m_current_fb;
 };
 
 

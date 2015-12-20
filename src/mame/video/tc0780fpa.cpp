@@ -7,7 +7,7 @@
 #include "tc0780fpa.h"
 
 
-#define POLY_FIFO_SIZE	0x20000
+#define POLY_FIFO_SIZE	32
 
 
 tc0780fpa_renderer::tc0780fpa_renderer(device_t &parent, screen_device &screen, const UINT8 *texture_ram)
@@ -16,27 +16,35 @@ tc0780fpa_renderer::tc0780fpa_renderer(device_t &parent, screen_device &screen, 
 	int width = screen.width();
 	int height = screen.height();
 
-	m_fb = std::make_unique<bitmap_ind16>(width, height);
+	m_fb[0] = std::make_unique<bitmap_ind16>(width, height);
+	m_fb[1] = std::make_unique<bitmap_ind16>(width, height);
 	m_zb = std::make_unique<bitmap_ind16>(width, height);
 	
 	m_texture = texture_ram;
 
 	m_cliprect = screen.cliprect();
 
+	m_current_fb = 0;
+
 	// save state
-	parent.save_item(NAME(*m_fb));
+	parent.save_item(NAME(*m_fb[0]));
+	parent.save_item(NAME(*m_fb[1]));
 	parent.save_item(NAME(*m_zb));
 }
 
-void tc0780fpa_renderer::clear_frame()
+void tc0780fpa_renderer::swap_buffers()
 {
-	m_fb->fill(0, m_cliprect);
+	wait("Finished render");
+
+	m_current_fb ^= 1;
+
+	m_fb[m_current_fb]->fill(0, m_cliprect);
 	m_zb->fill(0xffff, m_cliprect);
 }
 
 void tc0780fpa_renderer::draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	copybitmap_trans(bitmap, *m_fb, 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, *m_fb[m_current_fb^1], 0, 0, 0, 0, cliprect, 0);
 }
 
 void tc0780fpa_renderer::render_solid_scan(INT32 scanline, const extent_t &extent, const tc0780fpa_polydata &extradata, int threadid)
@@ -44,7 +52,7 @@ void tc0780fpa_renderer::render_solid_scan(INT32 scanline, const extent_t &exten
 	float z = extent.param[0].start;
 	int color = extent.param[1].start;
 	float dz = extent.param[0].dpdx;
-	UINT16 *fb = &m_fb->pix16(scanline);
+	UINT16 *fb = &m_fb[m_current_fb]->pix16(scanline);
 	UINT16 *zb = &m_zb->pix16(scanline);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
@@ -67,7 +75,7 @@ void tc0780fpa_renderer::render_shade_scan(INT32 scanline, const extent_t &exten
 	float color = extent.param[1].start;
 	float dz = extent.param[0].dpdx;
 	float dcolor = extent.param[1].dpdx;
-	UINT16 *fb = &m_fb->pix16(scanline);
+	UINT16 *fb = &m_fb[m_current_fb]->pix16(scanline);
 	UINT16 *zb = &m_zb->pix16(scanline);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
@@ -96,7 +104,7 @@ void tc0780fpa_renderer::render_texture_scan(INT32 scanline, const extent_t &ext
 	float du = extent.param[1].dpdx;
 	float dv = extent.param[2].dpdx;
 	float dcolor = extent.param[3].dpdx;
-	UINT16 *fb = &m_fb->pix16(scanline);
+	UINT16 *fb = &m_fb[m_current_fb]->pix16(scanline);
 	UINT16 *zb = &m_zb->pix16(scanline);
 	int tex_wrap_x = extradata.tex_wrap_x;
 	int tex_wrap_y = extradata.tex_wrap_y;
@@ -143,287 +151,243 @@ void tc0780fpa_renderer::render_texture_scan(INT32 scanline, const extent_t &ext
 	}
 }
 
-void tc0780fpa_renderer::render_polygons(UINT16 *polygon_fifo, int length)
-{
+
+void tc0780fpa_renderer::render(UINT16 *polygon_fifo, int length)
+{	
 	vertex_t vert[4];
 	int i;
-	int ptr;
 
-	ptr = 0;
-	while (ptr < length)
+	UINT16 cmd = polygon_fifo[0];
+
+	int ptr = 1;
+	switch (cmd & 0x7)
 	{
-		UINT16 cmd = polygon_fifo[ptr++];
-
-		switch (cmd & 0x7)
+		// screen global clipping for 3d(?)
+		case 0x00:
 		{
-			// screen global clipping for 3d(?)
-			case 0x00:
+			UINT16 min_x,min_y,min_z,max_x,max_y,max_z;
+
+			min_x = polygon_fifo[ptr+1];
+			min_y = polygon_fifo[ptr+0];
+			min_z = polygon_fifo[ptr+2];
+			max_x = polygon_fifo[ptr+4];
+			max_y = polygon_fifo[ptr+3];
+			max_z = polygon_fifo[ptr+5];
+
+			if(min_x != 0 || min_y != 0 || min_z != 0 || max_x != 512 || max_y != 400 || max_z != 0x7fff)
 			{
-				UINT16 min_x,min_y,min_z,max_x,max_y,max_z;
-
-				min_x = polygon_fifo[ptr+1];
-				min_y = polygon_fifo[ptr+0];
-				min_z = polygon_fifo[ptr+2];
-				max_x = polygon_fifo[ptr+4];
-				max_y = polygon_fifo[ptr+3];
-				max_z = polygon_fifo[ptr+5];
-
-				/* let's check if we need to implement this ... */
-				if(min_x != 0 || min_y != 0 || min_z != 0 || max_x != 512 || max_y != 400 || max_z != 0x7fff)
-				{
-					printf("CMD %04x\n",cmd);
-					printf("MIN Y %04x\n",polygon_fifo[ptr+0]);
-					printf("MIN X %04x\n",polygon_fifo[ptr+1]);
-					printf("MIN Z %04x\n",polygon_fifo[ptr+2]);
-					printf("MAX Y %04x\n",polygon_fifo[ptr+3]);
-					printf("MAX X %04x\n",polygon_fifo[ptr+4]);
-					printf("MAX Z %04x\n",polygon_fifo[ptr+5]);
-				}
-				ptr += 6;
-				break;
+				printf("CMD %04x\n",cmd);
+				printf("MIN Y %04x\n",polygon_fifo[ptr+0]);
+				printf("MIN X %04x\n",polygon_fifo[ptr+1]);
+				printf("MIN Z %04x\n",polygon_fifo[ptr+2]);
+				printf("MAX Y %04x\n",polygon_fifo[ptr+3]);
+				printf("MAX X %04x\n",polygon_fifo[ptr+4]);
+				printf("MAX Z %04x\n",polygon_fifo[ptr+5]);
 			}
 
-			// Gouraud Shaded Triangle (Landing Gear)
-			case 0x01:
+			break;
+		}
+
+		// Gouraud Shaded Triangle (Landing Gear)
+		case 0x01:
+		{
+			// 0x00: Command ID (0x0001)
+			// 0x01: Vertex 1 color
+			// 0x02: Vertex 1 Y
+			// 0x03: Vertex 1 X
+			// 0x04: Vertex 1 Z
+			// 0x05: Vertex 2 color
+			// 0x06: Vertex 2 Y
+			// 0x07: Vertex 2 X
+			// 0x08: Vertex 2 Z
+			// 0x09: Vertex 3 color
+			// 0x0a: Vertex 3 Y
+			// 0x0b: Vertex 3 X
+			// 0x0c: Vertex 3 Z
+
+			for (i=0; i < 3; i++)
 			{
-				// 0x00: Command ID (0x0001)
-				// 0x01: Vertex 1 color
-				// 0x02: Vertex 1 Y
-				// 0x03: Vertex 1 X
-				// 0x04: Vertex 1 Z
-				// 0x05: Vertex 2 color
-				// 0x06: Vertex 2 Y
-				// 0x07: Vertex 2 X
-				// 0x08: Vertex 2 Z
-				// 0x09: Vertex 3 color
-				// 0x0a: Vertex 3 Y
-				// 0x0b: Vertex 3 X
-				// 0x0c: Vertex 3 Z
-
-#if 0
-				printf("CMD1: ");
-				for (i=0; i < 0x0c; i++)
-				{
-					printf("%04X ", polygon_fifo[ptr+i]);
-				}
-				printf("\n");
-#endif
-
-				for (i=0; i < 3; i++)
-				{
-					vert[i].p[1] = polygon_fifo[ptr++];
-					vert[i].y =  (INT16)(polygon_fifo[ptr++]);
-					vert[i].x =  (INT16)(polygon_fifo[ptr++]);
-					vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
-				}
-
-				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000)
-				{
-					if (vert[0].p[1] == vert[1].p[1] &&
-						vert[1].p[1] == vert[2].p[1])
-					{
-						// optimization: all colours the same -> render solid
-						render_triangle(m_cliprect, render_delegate(FUNC(tc0780fpa_renderer::render_solid_scan), this), 2, vert[0], vert[1], vert[2]);
-					}
-					else
-					{
-						render_triangle(m_cliprect, render_delegate(FUNC(tc0780fpa_renderer::render_shade_scan), this), 2, vert[0], vert[1], vert[2]);
-					}
-				}
-				break;
+				vert[i].p[1] = polygon_fifo[ptr++];
+				vert[i].y =  (INT16)(polygon_fifo[ptr++]);
+				vert[i].x =  (INT16)(polygon_fifo[ptr++]);
+				vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
 			}
 
-			// Textured Triangle
-			case 0x03:
+			if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000)
 			{
-				// 0x00: Command ID (0x0003)
-				// 0x01: Texture base
-				// 0x02: Vertex 1 Palette
-				// 0x03: Vertex 1 V
-				// 0x04: Vertex 1 U
-				// 0x05: Vertex 1 Y
-				// 0x06: Vertex 1 X
-				// 0x07: Vertex 1 Z
-				// 0x08: Vertex 2 Palette
-				// 0x09: Vertex 2 V
-				// 0x0a: Vertex 2 U
-				// 0x0b: Vertex 2 Y
-				// 0x0c: Vertex 2 X
-				// 0x0d: Vertex 2 Z
-				// 0x0e: Vertex 3 Palette
-				// 0x0f: Vertex 3 V
-				// 0x10: Vertex 3 U
-				// 0x11: Vertex 3 Y
-				// 0x12: Vertex 3 X
-				// 0x13: Vertex 3 Z
-
-#if 0
-				printf("CMD3: ");
-				for (i=0; i < 0x13; i++)
+				if (vert[0].p[1] == vert[1].p[1] &&
+					vert[1].p[1] == vert[2].p[1])
 				{
-					printf("%04X ", polygon_fifo[ptr+i]);
+					// optimization: all colours the same -> render solid
+					render_triangle(m_cliprect, render_delegate(FUNC(tc0780fpa_renderer::render_solid_scan), this), 2, vert[0], vert[1], vert[2]);
 				}
-				printf("\n");
-#endif
-
-				tc0780fpa_polydata &extra = object_data_alloc();
-				UINT16 texbase = polygon_fifo[ptr++];
-
-				extra.tex_base_x = ((texbase >> 0) & 0xff) << 4;
-				extra.tex_base_y = ((texbase >> 8) & 0xff) << 4;
-
-				extra.tex_wrap_x = (cmd & 0xc0) ? 1 : 0;
-				extra.tex_wrap_y = (cmd & 0x30) ? 1 : 0;
-
-				for (i=0; i < 3; i++)
+				else
 				{
-					vert[i].p[3] = polygon_fifo[ptr++] + 0.5;   // palette
-					vert[i].p[2] = (UINT16)(polygon_fifo[ptr++]);
-					vert[i].p[1] = (UINT16)(polygon_fifo[ptr++]);
-					vert[i].y =  (INT16)(polygon_fifo[ptr++]);
-					vert[i].x =  (INT16)(polygon_fifo[ptr++]);
-					vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
+					render_triangle(m_cliprect, render_delegate(FUNC(tc0780fpa_renderer::render_shade_scan), this), 2, vert[0], vert[1], vert[2]);
 				}
+			}
+			break;
+		}
 
-				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000)
-				{
-					render_triangle(m_cliprect, render_delegate(FUNC(tc0780fpa_renderer::render_texture_scan), this), 4, vert[0], vert[1], vert[2]);
-				}
-				break;
+		// Textured Triangle
+		case 0x03:
+		{
+			// 0x00: Command ID (0x0003)
+			// 0x01: Texture base
+			// 0x02: Vertex 1 Palette
+			// 0x03: Vertex 1 V
+			// 0x04: Vertex 1 U
+			// 0x05: Vertex 1 Y
+			// 0x06: Vertex 1 X
+			// 0x07: Vertex 1 Z
+			// 0x08: Vertex 2 Palette
+			// 0x09: Vertex 2 V
+			// 0x0a: Vertex 2 U
+			// 0x0b: Vertex 2 Y
+			// 0x0c: Vertex 2 X
+			// 0x0d: Vertex 2 Z
+			// 0x0e: Vertex 3 Palette
+			// 0x0f: Vertex 3 V
+			// 0x10: Vertex 3 U
+			// 0x11: Vertex 3 Y
+			// 0x12: Vertex 3 X
+			// 0x13: Vertex 3 Z
+
+			tc0780fpa_polydata &extra = object_data_alloc();
+			UINT16 texbase = polygon_fifo[ptr++];
+
+			extra.tex_base_x = ((texbase >> 0) & 0xff) << 4;
+			extra.tex_base_y = ((texbase >> 8) & 0xff) << 4;
+
+			extra.tex_wrap_x = (cmd & 0xc0) ? 1 : 0;
+			extra.tex_wrap_y = (cmd & 0x30) ? 1 : 0;
+
+			for (i=0; i < 3; i++)
+			{
+				vert[i].p[3] = polygon_fifo[ptr++] + 0.5;   // palette
+				vert[i].p[2] = (UINT16)(polygon_fifo[ptr++]);
+				vert[i].p[1] = (UINT16)(polygon_fifo[ptr++]);
+				vert[i].y =  (INT16)(polygon_fifo[ptr++]);
+				vert[i].x =  (INT16)(polygon_fifo[ptr++]);
+				vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
 			}
 
-			// Gouraud shaded Quad
-			case 0x04:
+			if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000)
 			{
-				// 0x00: Command ID (0x0004)
-				// 0x01: Vertex 1 color
-				// 0x02: Vertex 1 Y
-				// 0x03: Vertex 1 X
-				// 0x04: Vertex 1 Z
-				// 0x05: Vertex 2 color
-				// 0x06: Vertex 2 Y
-				// 0x07: Vertex 2 X
-				// 0x08: Vertex 2 Z
-				// 0x09: Vertex 3 color
-				// 0x0a: Vertex 3 Y
-				// 0x0b: Vertex 3 X
-				// 0x0c: Vertex 3 Z
-				// 0x0d: Vertex 4 color
-				// 0x0e: Vertex 4 Y
-				// 0x0f: Vertex 4 X
-				// 0x10: Vertex 4 Z
+				render_triangle(m_cliprect, render_delegate(FUNC(tc0780fpa_renderer::render_texture_scan), this), 4, vert[0], vert[1], vert[2]);
+			}
+			break;
+		}
 
-#if 0
-				printf("CMD4: ");
-				for (i=0; i < 0x10; i++)
-				{
-					printf("%04X ", polygon_fifo[ptr+i]);
-				}
-				printf("\n");
-#endif
+		// Gouraud shaded Quad
+		case 0x04:
+		{
+			// 0x00: Command ID (0x0004)
+			// 0x01: Vertex 1 color
+			// 0x02: Vertex 1 Y
+			// 0x03: Vertex 1 X
+			// 0x04: Vertex 1 Z
+			// 0x05: Vertex 2 color
+			// 0x06: Vertex 2 Y
+			// 0x07: Vertex 2 X
+			// 0x08: Vertex 2 Z
+			// 0x09: Vertex 3 color
+			// 0x0a: Vertex 3 Y
+			// 0x0b: Vertex 3 X
+			// 0x0c: Vertex 3 Z
+			// 0x0d: Vertex 4 color
+			// 0x0e: Vertex 4 Y
+			// 0x0f: Vertex 4 X
+			// 0x10: Vertex 4 Z
 
-				for (i=0; i < 4; i++)
-				{
-					vert[i].p[1] = polygon_fifo[ptr++];
-					vert[i].y =  (INT16)(polygon_fifo[ptr++]);
-					vert[i].x =  (INT16)(polygon_fifo[ptr++]);
-					vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
-				}
-
-				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000 && vert[3].p[0] < 0x8000)
-				{
-					if (vert[0].p[1] == vert[1].p[1] &&
-						vert[1].p[1] == vert[2].p[1] &&
-						vert[2].p[1] == vert[3].p[1])
-					{
-						// optimization: all colours the same -> render solid
-						render_polygon<4>(m_cliprect, render_delegate(FUNC(tc0780fpa_renderer::render_solid_scan), this), 2, vert);
-					}
-					else
-					{
-						render_polygon<4>(m_cliprect, render_delegate(FUNC(tc0780fpa_renderer::render_shade_scan), this), 2, vert);
-					}
-				}
-				break;
+			for (i=0; i < 4; i++)
+			{
+				vert[i].p[1] = polygon_fifo[ptr++];
+				vert[i].y =  (INT16)(polygon_fifo[ptr++]);
+				vert[i].x =  (INT16)(polygon_fifo[ptr++]);
+				vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
 			}
 
-			// Textured Quad
-			case 0x06:
+			if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000 && vert[3].p[0] < 0x8000)
 			{
-				// 0x00: Command ID (0x0006)
-				// 0x01: Texture base
-				// 0x02: Vertex 1 Palette
-				// 0x03: Vertex 1 V
-				// 0x04: Vertex 1 U
-				// 0x05: Vertex 1 Y
-				// 0x06: Vertex 1 X
-				// 0x07: Vertex 1 Z
-				// 0x08: Vertex 2 Palette
-				// 0x09: Vertex 2 V
-				// 0x0a: Vertex 2 U
-				// 0x0b: Vertex 2 Y
-				// 0x0c: Vertex 2 X
-				// 0x0d: Vertex 2 Z
-				// 0x0e: Vertex 3 Palette
-				// 0x0f: Vertex 3 V
-				// 0x10: Vertex 3 U
-				// 0x11: Vertex 3 Y
-				// 0x12: Vertex 3 X
-				// 0x13: Vertex 3 Z
-				// 0x14: Vertex 4 Palette
-				// 0x15: Vertex 4 V
-				// 0x16: Vertex 4 U
-				// 0x17: Vertex 4 Y
-				// 0x18: Vertex 4 X
-				// 0x19: Vertex 4 Z
-
-#if 0
-				printf("CMD6: ");
-				for (i=0; i < 0x19; i++)
+				if (vert[0].p[1] == vert[1].p[1] &&
+					vert[1].p[1] == vert[2].p[1] &&
+					vert[2].p[1] == vert[3].p[1])
 				{
-					printf("%04X ", polygon_fifo[ptr+i]);
+					// optimization: all colours the same -> render solid
+					render_polygon<4>(m_cliprect, render_delegate(FUNC(tc0780fpa_renderer::render_solid_scan), this), 2, vert);
 				}
-				printf("\n");
-#endif
-
-				tc0780fpa_polydata &extra = object_data_alloc();
-				UINT16 texbase = polygon_fifo[ptr++];
-
-				extra.tex_base_x = ((texbase >> 0) & 0xff) << 4;
-				extra.tex_base_y = ((texbase >> 8) & 0xff) << 4;
-
-				extra.tex_wrap_x = (cmd & 0xc0) ? 1 : 0;
-				extra.tex_wrap_y = (cmd & 0x30) ? 1 : 0;
-
-				for (i=0; i < 4; i++)
+				else
 				{
-					vert[i].p[3] = polygon_fifo[ptr++] + 0.5;   // palette
-					vert[i].p[2] = (UINT16)(polygon_fifo[ptr++]);
-					vert[i].p[1] = (UINT16)(polygon_fifo[ptr++]);
-					vert[i].y =  (INT16)(polygon_fifo[ptr++]);
-					vert[i].x =  (INT16)(polygon_fifo[ptr++]);
-					vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
+					render_polygon<4>(m_cliprect, render_delegate(FUNC(tc0780fpa_renderer::render_shade_scan), this), 2, vert);
 				}
+			}
+			break;
+		}
 
-				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000 && vert[3].p[0] < 0x8000)
-				{
-					render_polygon<4>(m_cliprect, render_delegate(FUNC(tc0780fpa_renderer::render_texture_scan), this), 4, vert);
-				}
-				break;
+		// Textured Quad
+		case 0x06:
+		{
+			// 0x00: Command ID (0x0006)
+			// 0x01: Texture base
+			// 0x02: Vertex 1 Palette
+			// 0x03: Vertex 1 V
+			// 0x04: Vertex 1 U
+			// 0x05: Vertex 1 Y
+			// 0x06: Vertex 1 X
+			// 0x07: Vertex 1 Z
+			// 0x08: Vertex 2 Palette
+			// 0x09: Vertex 2 V
+			// 0x0a: Vertex 2 U
+			// 0x0b: Vertex 2 Y
+			// 0x0c: Vertex 2 X
+			// 0x0d: Vertex 2 Z
+			// 0x0e: Vertex 3 Palette
+			// 0x0f: Vertex 3 V
+			// 0x10: Vertex 3 U
+			// 0x11: Vertex 3 Y
+			// 0x12: Vertex 3 X
+			// 0x13: Vertex 3 Z
+			// 0x14: Vertex 4 Palette
+			// 0x15: Vertex 4 V
+			// 0x16: Vertex 4 U
+			// 0x17: Vertex 4 Y
+			// 0x18: Vertex 4 X
+			// 0x19: Vertex 4 Z
+
+			tc0780fpa_polydata &extra = object_data_alloc();
+			UINT16 texbase = polygon_fifo[ptr++];
+
+			extra.tex_base_x = ((texbase >> 0) & 0xff) << 4;
+			extra.tex_base_y = ((texbase >> 8) & 0xff) << 4;
+
+			extra.tex_wrap_x = (cmd & 0xc0) ? 1 : 0;
+			extra.tex_wrap_y = (cmd & 0x30) ? 1 : 0;
+
+			for (i=0; i < 4; i++)
+			{
+				vert[i].p[3] = polygon_fifo[ptr++] + 0.5;   // palette
+				vert[i].p[2] = (UINT16)(polygon_fifo[ptr++]);
+				vert[i].p[1] = (UINT16)(polygon_fifo[ptr++]);
+				vert[i].y =  (INT16)(polygon_fifo[ptr++]);
+				vert[i].x =  (INT16)(polygon_fifo[ptr++]);
+				vert[i].p[0] = (UINT16)(polygon_fifo[ptr++]);
 			}
 
-			default:
+			if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000 && vert[3].p[0] < 0x8000)
 			{
-				printf("tc0780fpa::render_polygons(): unknown command %04X %d\n", cmd,ptr);
-				break;
+				render_polygon<4>(m_cliprect, render_delegate(FUNC(tc0780fpa_renderer::render_texture_scan), this), 4, vert);
 			}
+			break;
+		}
+
+		default:
+		{
+			printf("tc0780fpa::render(): unknown command %04X %d, %d\n", cmd,ptr,length);
+			break;
 		}
 	}
-
-	wait("Finished render");
 }
-
-
 
 const device_type TC0780FPA = &device_creator<tc0780fpa_device>;
 
@@ -515,16 +479,23 @@ WRITE16_MEMBER(tc0780fpa_device::poly_fifo_w)
 {
 	assert (m_poly_fifo_ptr < POLY_FIFO_SIZE); // never happens
 	m_poly_fifo[m_poly_fifo_ptr++] = data;
+	
+	static const int cmd_length[8] = { 7, 13, -1, 20, 17, -1, 26, -1 };
+	UINT16 cmd = m_poly_fifo[0] & 0x7;
+
+	if (m_poly_fifo_ptr >= cmd_length[cmd])
+	{
+		m_renderer->render(m_poly_fifo.get(), m_poly_fifo_ptr);	
+		m_poly_fifo_ptr = 0;
+	}
+	
 }
 
 WRITE16_MEMBER(tc0780fpa_device::render_w)
 {
 	if (offset == 0)
 	{
-		m_renderer->clear_frame();
-		m_renderer->render_polygons(m_poly_fifo.get(), m_poly_fifo_ptr);
-
-		m_poly_fifo_ptr = 0;
+		m_renderer->swap_buffers();
 	}
 }
 
