@@ -2385,6 +2385,7 @@ files {
 createMESSProjects(_target, _subtarget, "samsung")
 files {
 	MAME_DIR .. "src/mame/drivers/spc1000.cpp",
+	MAME_DIR .. "src/mame/drivers/spc1500.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "sanyo")
