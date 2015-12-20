@@ -181,6 +181,22 @@ void ef9365_device::draw_border(UINT16 line)
 
 }
 
+void ef9365_device::plot(int x_pos,int y_pos)
+{
+	int p;
+
+	y_pos = ( 255 - y_pos );
+
+	for( p = 0 ; p < 4 ; p++ )
+	{
+		if( m_current_color & (0x01 << p) )
+			m_videoram->write_byte ( (0x2000*p) + (((y_pos*256) + x_pos)>>3), m_videoram->read_byte( (0x2000*p) + (((y_pos*256) + x_pos)>>3)) |  (0x80 >> (((y_pos*256) + x_pos)&7) ) );
+		else
+			m_videoram->write_byte ( (0x2000*p) + (((y_pos*256) + x_pos)>>3), m_videoram->read_byte( (0x2000*p) + (((y_pos*256) + x_pos)>>3)) & ~(0x80 >> (((y_pos*256) + x_pos)&7) ) );
+	}
+
+}
+
 void ef9365_device::draw_character( unsigned char c, int block, int smallblock )
 {
 	int x_char,y_char;
@@ -300,8 +316,6 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 {
 	m_state = 0;
 
-	set_busy_flag(4);
-
 	if( ( cmd>>4 ) == 0 )
 	{
 		switch(cmd & 0xF)
@@ -311,30 +325,35 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 				printf("Set bit 1 of CTRL1 : Pen Selection\n");
 			#endif
 				m_registers[EF9365_REG_CTRL1] |= 0x02;
+				set_busy_flag(10); // Timing to check on the real hardware
 			break;
 			case 0x1: // Clear bit 1 of CTRL1 : Eraser Selection
 			#ifdef DBGMODE
 				printf("Clear bit 1 of CTRL1 : Eraser Selection\n");
 			#endif
 				m_registers[EF9365_REG_CTRL1] &= (~0x02);
+				set_busy_flag(10); // Timing to check on the real hardware
 			break;
 			case 0x2: // Set bit 0 of CTRL1 : Pen/Eraser down selection
 			#ifdef DBGMODE
 				printf("Set bit 0 of CTRL1 : Pen/Eraser down selection\n");
 			#endif
 				m_registers[EF9365_REG_CTRL1] |= 0x01;
+				set_busy_flag(10); // Timing to check on the real hardware
 			break;
 			case 0x3: // Clear bit 0 of CTRL1 : Pen/Eraser up selection
 			#ifdef DBGMODE
 				printf("Clear bit 0 of CTRL1 : Pen/Eraser up selection\n");
 			#endif
 				m_registers[EF9365_REG_CTRL1] &= (~0x01);
+				set_busy_flag(10); // Timing to check on the real hardware
 			break;
 			case 0x4: // Clear screen
 			#ifdef DBGMODE
 				printf("Clear screen\n");
 			#endif
 				screen_scanning(1);
+				set_busy_flag(30*40*25); // Timing to check on the real hardware
 			break;
 			case 0x5: // X and Y registers reset to 0
 			#ifdef DBGMODE
@@ -345,6 +364,7 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 
 				m_registers[EF9365_REG_Y_MSB] = 0;
 				m_registers[EF9365_REG_Y_LSB] = 0;
+				set_busy_flag(80); // Timing to check on the real hardware
 			break;
 			case 0x6: // X and Y registers reset to 0 and clear screen
 			#ifdef DBGMODE
@@ -355,40 +375,48 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 
 				m_registers[EF9365_REG_Y_MSB] = 0;
 				m_registers[EF9365_REG_Y_LSB] = 0;
+				screen_scanning(1);
+				set_busy_flag(30*40*25); // Timing to check on the real hardware
 			break;
 			case 0x7: // Clear screen, set CSIZE to code "minsize". All other registers reset to 0
 			#ifdef DBGMODE
 				printf("Clear screen, set CSIZE to code \"minsize\". All other registers reset to 0\n");
 			#endif
 				screen_scanning(1);
+				set_busy_flag(30*40*25); // Timing to check on the real hardware
 			break;
 			case 0x8: // Light-pen initialization (/White forced low)
 			#ifdef DBGMODE
 				printf("Light-pen initialization (/White forced low)\n");
 			#endif
+				set_busy_flag(10); // Timing to check on the real hardware
 			break;
 			case 0x9: // Light-pen initialization
 			#ifdef DBGMODE
 				printf("Light-pen initialization\n");
 			#endif
+				set_busy_flag(10); // Timing to check on the real hardware
 			break;
 			case 0xA: // 5x8 block drawing (size according to CSIZE)
 			#ifdef DBGMODE
 				printf("5x8 block drawing (size according to CSIZE)\n");
 			#endif
 				draw_character( 0x00 , 1 , 0 );
+				set_busy_flag(72); // Value measured from the Apollo Squale
 			break;
 			case 0xB: // 4x4 block drawing (size according to CSIZE)
 			#ifdef DBGMODE
 				printf("4x4 block drawing (size according to CSIZE)\n");
 			#endif
 				draw_character( 0x00 , 1 , 1 );
+				set_busy_flag(72); // Timing to check on the real hardware
 			break;
 			case 0xC: // Screen scanning : pen or Eraser as defined by CTRL1
 			#ifdef DBGMODE
 				printf("Screen scanning : pen or Eraser as defined by CTRL1\n");
 			#endif
 				screen_scanning(0);
+				set_busy_flag(30*40*25); // Timing to check
 			break;
 			case 0xD: // X  reset to 0
 			#ifdef DBGMODE
@@ -396,6 +424,7 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 			#endif
 				m_registers[EF9365_REG_X_MSB] = 0;
 				m_registers[EF9365_REG_X_LSB] = 0;
+				set_busy_flag(5); // Timing to check on the real hardware
 			break;
 			case 0xE: // Y  reset to 0
 			#ifdef DBGMODE
@@ -403,11 +432,13 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 			#endif
 				m_registers[EF9365_REG_Y_MSB] = 0;
 				m_registers[EF9365_REG_Y_LSB] = 0;
+				set_busy_flag(5); // Timing to check on the real hardware
 			break;
 			case 0xF: // Direct image memory access request for the next free cycle.
 			#ifdef DBGMODE
 				printf("Direct image memory access request for the next free cycle.\n");
 			#endif
+				set_busy_flag(30); // Timing to check on the real hardware
 			break;
 			default:
 				logerror("Unemulated EF9365 cmd: %02x\n", cmd);
@@ -423,6 +454,12 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 				#ifdef DBGMODE
 				printf("Vector generation ( for b2,b1,0 see small vector definition)\n");
 				#endif
+
+				//  WIP : Vector drawing. One dot only at the origin point for the moment
+				plot( ( (m_registers[EF9365_REG_X_MSB]<<8) | m_registers[EF9365_REG_X_LSB]),
+					  ( (m_registers[EF9365_REG_Y_MSB]<<8) | m_registers[EF9365_REG_Y_LSB]));
+
+				set_busy_flag(30); // Timing to check
 			}
 			else
 			{
@@ -430,6 +467,12 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 				#ifdef DBGMODE
 				printf("Special direction vectors generation ( for b2,b1,0 see small vector definition)\n");
 				#endif
+
+				//  WIP : Vector drawing. One dot only at the origin point for the moment
+				plot( ( (m_registers[EF9365_REG_X_MSB]<<8) | m_registers[EF9365_REG_X_LSB]),
+					  ( (m_registers[EF9365_REG_Y_MSB]<<8) | m_registers[EF9365_REG_Y_LSB]));
+
+				set_busy_flag(30); // Timing to check
 			}
 		}
 		else
@@ -440,6 +483,10 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 				#ifdef DBGMODE
 				printf("Small vector definition.\n");
 				#endif
+
+				//  WIP : Vector drawing. One dot only at the origin point for the moment
+				plot( ( (m_registers[EF9365_REG_X_MSB]<<8) | m_registers[EF9365_REG_X_LSB]),
+					  ( (m_registers[EF9365_REG_Y_MSB]<<8) | m_registers[EF9365_REG_Y_LSB]));
 			}
 			else
 			{
@@ -448,6 +495,7 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 				printf("Draw character\n");
 				#endif
 				draw_character( cmd - 0x20, 0 , 0 );
+				set_busy_flag(30); // Value measured from the Squale
 			}
 		}
 	}
