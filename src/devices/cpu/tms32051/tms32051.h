@@ -175,8 +175,8 @@ protected:
 	inline void DM_WRITE16(UINT16 address, UINT16 data);
 	inline void PUSH_STACK(UINT16 pc);
 	inline UINT16 POP_STACK();
-	inline INT32 SUB(UINT32 a, UINT32 b);
-	inline INT32 ADD(UINT32 a, UINT32 b);
+	inline INT32 SUB(UINT32 a, UINT32 b, int shift);
+	inline INT32 ADD(UINT32 a, UINT32 b, int shift);
 	inline void UPDATE_AR(int ar, int step);
 	inline void UPDATE_ARP(int nar);
 	UINT16 GET_ADDRESS();
