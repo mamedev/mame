@@ -1528,6 +1528,27 @@ ROM_START( missw96b )
 	ROM_LOAD( "mw96_02.bin",  0xc0000, 0x80000, CRC(60fa0c00) SHA1(391aa31e61663cc083a8a2320ba48a9859f3fd4e) )
 ROM_END
 
+ROM_START( missw96c )
+	ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "10_PROG2.UE17", 0x000000, 0x80000, CRC(36a7beb6) SHA1(11f6aef506a4e357442207fef760401757deaaeb) )
+	ROM_LOAD16_BYTE( "6_PROG1.UD17",  0x000001, 0x80000, CRC(e70b562f) SHA1(4affd40ab7f962824d1c7be22ea6819cf06d6347) )
+	ROM_LOAD16_BYTE( "9_IM1-B.UE16B",  0x100000, 0x80000, CRC(eedc24f8) SHA1(cef822c1e3f09c484d03964f02d761139aac9d76) )
+	ROM_LOAD16_BYTE( "5_IM1-A.UE16A",  0x100001, 0x80000, CRC(bb0eb7d7) SHA1(6952d153afa90924754c11872497ec83ae650220) )
+	ROM_LOAD16_BYTE( "8_IM2-B.UE15B",  0x200000, 0x80000, CRC(68dd67b2) SHA1(322f3eb84277568356ae0a09f71337bd525f379a) )
+	ROM_LOAD16_BYTE( "4_IM2-A.UE15A",  0x200001, 0x80000, CRC(2b39ec56) SHA1(8ea1483050287c68063e54c4de27bd82ad942c53) )
+	ROM_LOAD16_BYTE( "7_IM3_B.UE14B",  0x300000, 0x80000, CRC(7fd5ca2c) SHA1(7733bd0529953bdae718bf28053d173e5ec3ca92) )
+	ROM_LOAD16_BYTE( "3_IM3-A.UE14A",  0x300001, 0x80000, CRC(4ba5dab7) SHA1(81d7b6fde6d9405793f60ee7d15a15a511396332) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_LOAD( "20_OBJ1.U5",  0x00000, 0x80000, CRC(3983152f) SHA1(6308e936ba54e88b34253f1d4fbd44725e9d88ae) )
+
+	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "1_MUSIC1.UB6",  0x00000, 0x80000, CRC(e78a659e) SHA1(d209184c70e0d7e6d17034c6f536535cda782d42) )
+	ROM_RELOAD(               0x40000, 0x80000 )
+	ROM_LOAD( "2_MUSIC2.UC6",  0xc0000, 0x80000, CRC(60fa0c00) SHA1(391aa31e61663cc083a8a2320ba48a9859f3fd4e) )
+ROM_END
+
 
 ROM_START( missmw96 )
 	ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
@@ -1851,6 +1872,8 @@ GAME( 1995, fantsy95, newfant,  fantasia, fantasiaa, driver_device, 0, ROT90, "H
 GAME( 1996, missw96,  0,        fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (set 1)", MACHINE_NO_COCKTAIL )
 GAME( 1996, missw96a, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (set 2)", MACHINE_NO_COCKTAIL )
 GAME( 1996, missw96b, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (set 3)", MACHINE_NO_COCKTAIL )
+GAME( 1996, missw96c, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (set 4)", MACHINE_NO_COCKTAIL )
+
 GAME( 1996, missmw96, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss Mister World '96 (Nude)", MACHINE_NO_COCKTAIL )
 
 GAME( 1996, smissw,   0,        smissw,   missw96,   driver_device, 0, ROT0,  "Comad",                    "Super Miss World", MACHINE_NO_COCKTAIL ) // 951127 PCB
