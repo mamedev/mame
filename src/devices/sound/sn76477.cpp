@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
+// thanks-to:Derrick Renaud
 /*****************************************************************************
 
     Texas Instruments SN76477 emulator
