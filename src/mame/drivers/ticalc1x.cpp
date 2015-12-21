@@ -4,9 +4,11 @@
 
   ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.c) **
 
-  Texas Instruments TMS1xxx family handheld calculators (mostly single-chip)
+  Texas Instruments TMS1xxx family handheld calculators (mostly single-chip).
+  For a comprehensive list of MCU serials, see Joerg Woerner's datamath.org:
+  http://www.datamath.org/IC_List.htm
 
-  Refer to their official manuals on how to use them.
+  Refer to the calculators/toys official manuals on how to use them.
 
 
   TODO:
@@ -1230,8 +1232,8 @@ ROM_START( dataman )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
-	ROM_REGION( 2056, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1980_common1_micro.pla", 0, 2056, CRC(b733b621) SHA1(7897d7db72c0c24555e58738a09ebe0f7f7689b0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 525, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1980_dataman_output.pla", 0, 525, CRC(5fc6f451) SHA1(11475c785c34eab5b13c5dc67f413c709cd4bd4d) )
 ROM_END
