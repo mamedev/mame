@@ -28,7 +28,7 @@ Japanese Releases - Pyuuta
 018E Tron ~ トロン
 019E Mr. Do! ~ Mr.DO!    [dumped]
 020E Bermuda Triangle ~ バミューダ・ トライアングル  [dumped]
-021E 4-nin Mahjan ~ 四人麻雀
+021E 4-nin Mahjan ~ 四人麻雀 [dumped]
 022E Triplecommand ~ トリプルコマンド   [dumped]
 023E SuperBike ~ スーパーバイク
 024E Rescue Copter [3D] ~ レスキュー コプター   [dumped]
@@ -80,6 +80,19 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 
 <softwarelist name="tutor" description="Tomy Tutor &amp; Pyuuta cartridges">
 
+  <software name="4ninmj">
+    <description>4-nin Mahjan (Jpn)</description>
+    <year>1984</year>
+    <publisher>Tomy</publisher>
+    <info name="alt_title" value="四人麻雀 "/>
+    <info name="serial" value="021E"/>
+    <part name="cart" interface="tutor_cart">
+      <dataarea name="rom" size="0x4000">
+        <rom name="Yonnin Majan.bin" size="0x4000" crc="1c2eb2f0" sha1="4e9a0ce55f479c4b1a5fee9320561ce93765c4d7" offset="0" /> <!-- needs splitting into 2 files? there are 2 roms, marked 1 and 2 in the cart?? -->
+      </dataarea>
+    </part>
+  </software>  
+  
 	<software name="baseball">
 		<description>Baseball (Jpn)</description>
 		<year>1984</year>
