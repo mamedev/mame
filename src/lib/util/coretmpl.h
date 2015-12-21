@@ -62,25 +62,25 @@ inline std::unique_ptr<T> make_unique_clear()
 // a simple_list is a singly-linked list whose 'next' pointer is owned
 // by the object
 template<class _ElementType>
-class simple_list
+class simple_list final
 {
-	// we don't support deep copying
-	simple_list(const simple_list &);
-	simple_list &operator=(const simple_list &);
-
 public:
+	// we don't support deep copying
+	simple_list(const simple_list &) = delete;
+	simple_list &operator=(const simple_list &) = delete;
+
 	// construction/destruction
-	simple_list()
+	simple_list() noexcept
 		: m_head(nullptr),
 			m_tail(nullptr),
 			m_count(0) { }
 
-	virtual ~simple_list() { reset(); }
+	~simple_list() noexcept { reset(); }
 
 	// simple getters
-	_ElementType *first() const { return m_head; }
-	_ElementType *last() const { return m_tail; }
-	int count() const { return m_count; }
+	_ElementType *first() const noexcept { return m_head; }
+	_ElementType *last() const noexcept { return m_tail; }
+	int count() const noexcept { return m_count; }
 
 	// remove (free) all objects in the list, leaving an empty list
 	void reset()
@@ -101,7 +101,7 @@ public:
 	}
 
 	// add the given list to the head of the list
-	void prepend_list(simple_list<_ElementType> &list)
+	void prepend_list(simple_list<_ElementType> &list) noexcept
 	{
 		int count = list.count();
 		if (count == 0)
@@ -116,7 +116,7 @@ public:
 	}
 
 	// add the given object to the tail of the list
-	_ElementType &append(_ElementType &object)
+	_ElementType &append(_ElementType &object) noexcept
 	{
 		object.m_next = nullptr;
 		if (m_tail != nullptr)
@@ -128,7 +128,7 @@ public:
 	}
 
 	// add the given list to the tail of the list
-	void append_list(simple_list<_ElementType> &list)
+	void append_list(simple_list<_ElementType> &list) noexcept
 	{
 		int count = list.count();
 		if (count == 0)
@@ -144,7 +144,7 @@ public:
 	}
 
 	// insert the given object after a particular object (NULL means prepend)
-	_ElementType &insert_after(_ElementType &object, _ElementType *insert_after)
+	_ElementType &insert_after(_ElementType &object, _ElementType *insert_after) noexcept
 	{
 		if (insert_after == nullptr)
 			return prepend(object);
@@ -157,7 +157,7 @@ public:
 	}
 
 	// insert the given object before a particular object (NULL means append)
-	_ElementType &insert_before(_ElementType &object, _ElementType *insert_before)
+	_ElementType &insert_before(_ElementType &object, _ElementType *insert_before) noexcept
 	{
 		if (insert_before == nullptr)
 			return append(object);
@@ -175,7 +175,7 @@ public:
 	}
 
 	// replace an item in the list at the same location, and remove it
-	_ElementType &replace_and_remove(_ElementType &object, _ElementType &toreplace)
+	_ElementType &replace_and_remove(_ElementType &object, _ElementType &toreplace) noexcept
 	{
 		_ElementType *prev = nullptr;
 		for (_ElementType *cur = m_head; cur != nullptr; prev = cur, cur = cur->m_next)
@@ -195,7 +195,7 @@ public:
 	}
 
 	// detach the head item from the list, but don't free its memory
-	_ElementType *detach_head()
+	_ElementType *detach_head() noexcept
 	{
 		_ElementType *result = m_head;
 		if (result != nullptr)
@@ -209,7 +209,7 @@ public:
 	}
 
 	// detach the given item from the list, but don't free its memory
-	_ElementType &detach(_ElementType &object)
+	_ElementType &detach(_ElementType &object) noexcept
 	{
 		_ElementType *prev = nullptr;
 		for (_ElementType *cur = m_head; cur != nullptr; prev = cur, cur = cur->m_next)
@@ -228,7 +228,7 @@ public:
 	}
 
 	// deatch the entire list, returning the head, but don't free memory
-	_ElementType *detach_all()
+	_ElementType *detach_all() noexcept
 	{
 		_ElementType *result = m_head;
 		m_head = m_tail = nullptr;
@@ -237,13 +237,13 @@ public:
 	}
 
 	// remove the given object and free its memory
-	void remove(_ElementType &object)
+	void remove(_ElementType &object) noexcept
 	{
 		global_free(&detach(object));
 	}
 
 	// find an object by index in the list
-	_ElementType *find(int index) const
+	_ElementType *find(int index) const noexcept
 	{
 		for (_ElementType *cur = m_head; cur != nullptr; cur = cur->m_next)
 			if (index-- == 0)
@@ -252,7 +252,7 @@ public:
 	}
 
 	// return the index of the given object in the list
-	int indexof(const _ElementType &object) const
+	int indexof(const _ElementType &object) const noexcept
 	{
 		int index = 0;
 		for (_ElementType *cur = m_head; cur != nullptr; cur = cur->m_next)
