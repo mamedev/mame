@@ -50,12 +50,15 @@
 ----------------------------------------------------------------------------
 
   TODO:
-  - unexpected pigeon
+  - spellb numbers don't match with picture book
+  - spellb random lockups
+  - rev2 hardware needs 4-bit read support for tms6100 device
 
 
 ***************************************************************************/
 
 #include "includes/hh_tms1k.h"
+#include "machine/tms6100.h"
 
 // internal artwork
 #include "spellb.lh"
@@ -66,11 +69,13 @@ class tispellb_state : public hh_tms1k_state
 public:
 	tispellb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag),
-		m_subcpu(*this, "subcpu")
+		m_subcpu(*this, "subcpu"),
+		m_tms6100(*this, "tms6100")
 	{ }
 
 	// devices
 	optional_device<cpu_device> m_subcpu;
+	optional_device<tms6100_device> m_tms6100;
 
 	UINT8 m_rev1_ctl;
 	UINT16 m_sub_o;
@@ -125,7 +130,10 @@ void tispellb_state::machine_start()
 void tispellb_state::power_off()
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	//m_tms6100->reset();
+	if (m_subcpu)
+		m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	if (m_tms6100)
+		m_tms6100->reset();
 
 	m_power_on = false;
 }
@@ -196,6 +204,11 @@ WRITE16_MEMBER(tispellb_state::sub_write_r)
 }
 
 
+// 2nd revision specifics
+
+//..
+
+
 
 /***************************************************************************
 
@@ -211,6 +224,9 @@ INPUT_CHANGED_MEMBER(tispellb_state::power_button)
 	{
 		m_power_on = true;
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		
+		if (m_subcpu)
+			m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else if (!on && m_power_on)
 		power_off();
@@ -275,6 +291,13 @@ static INPUT_PORTS_START( spellb )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( mrchalgr )
+	PORT_INCLUDE( spellb )
+	
+	//PORT_MODIFY ...
+INPUT_PORTS_END
+
+
 
 /***************************************************************************
 
@@ -303,6 +326,23 @@ static MACHINE_CONFIG_START( rev1, tispellb_state )
 	MCFG_DEFAULT_LAYOUT(layout_spellb)
 
 	/* no sound! */
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( rev2, tispellb_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS0270, 300000) // approximation
+
+	MCFG_DEVICE_ADD("tms6100", TMS6100, 300000)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_spellb)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -336,6 +376,24 @@ ROM_START( spellb )
 ROM_END
 
 
+ROM_START( mrchalgr )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tmc0273nll", 0x0000, 0x1000, CRC(ef6d23bd) SHA1(194e3b022c299e99a731bbcfba5bf8a3a9f0d07e) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
+	ROM_REGION( 1246, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0270_mrchalgr_output.pla", 0, 1246, CRC(4785289c) SHA1(60567af0ea120872a4ccf3128e1365fe84722aa8) )
+
+	ROM_REGION( 0x1000, "tms6100", 0 )
+	ROM_LOAD( "cd2601.vsm", 0x0000, 0x1000, CRC(a9fbe7e9) SHA1(9d480cb30313b8cbce2d048140c1e5e6c5b92452) )
+ROM_END
+
+
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 COMP( 1978, spellb,    0,        0,  rev1,   spellb,    driver_device, 0, "Texas Instruments", "Spelling B (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+
+COMP( 1979, mrchalgr,  0,        0,  rev2,   mrchalgr,  driver_device, 0, "Texas Instruments", "Mr. Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
