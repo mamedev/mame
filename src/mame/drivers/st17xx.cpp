@@ -28,6 +28,11 @@
 	http://www.sigmatek-xm600.borec.cz/Info%20-%20MT1389%20v0.3b%20English.doc (rename to .rtf)
 	Includes an 8032, ARM7TDMI, and unknown DSP
 
+	SUNPLUS SPHE8200A:
+	http://pdf.datasheetcatalog.com/datasheets/2300/499420_DS.pdf
+	https://004code.googlecode.com/svn/trunk/h/regmapo_8200.h
+	"32-bit RISC" architecture, but which one?
+
 */
 
 
@@ -135,6 +140,32 @@ ROM_START( st1705 )
 	ROM_LOAD32_DWORD( "st1705.bin", 0x000000, 0x100000, CRC(efda2beb) SHA1(d30505552fc9ffd37ac12f576d792212deb10d84) )
 ROM_END
 
+/*
+SATURN
+ST 1706, 1707, 1708.
+Chip: SUNPLUS SPHE 8200A
+Servo: SUNPLUS SPHE 6300A
+Flash: EN29F040A-70P or ID39F040-70P
+Eeprom: 24C02
+Driver: CD5954CB
+Indication & Key processor : CS16312EN
+Laser head: CSQCL33EI38 (requires clarification)
+*/
+ROM_START( st1706 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD32_DWORD( "1706_sphe8200.bin", 0x000000, 0x080000, CRC(6a92fa45) SHA1(d40327ebfacd0c3690b170f802d8059e22848aa0) )
+ROM_END
+
+ROM_START( st1707 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD32_DWORD( "1707_sphe8200.bin", 0x000000, 0x080000, CRC(4d90d176) SHA1(7058b37413c90fd9e7f845944191f7ebe9e03250) )
+ROM_END
+
+ROM_START( st1708 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD32_DWORD( "1708_sphe8200.bin", 0x000000, 0x080000, CRC(5176c819) SHA1(2f1ae3389380be27fdd6a66da119e3ccdaa2fd59) )
+ROM_END
+
 ROM_START( st1714 )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD32_DWORD( "st1714.bin", 0x000000, 0x200000, CRC(08fc0a1b) SHA1(74dfd5595e1ab45fb9aff50a6c365fd9c9b33c33) )
@@ -149,4 +180,7 @@ CONS( 200?, st1702,     0,          0,      st17xx,     st17xx,   driver_device,
 CONS( 200?, st1703,     0,          0,      st17xx,     st17xx,   driver_device,   0,    "Saturn",    "ST-1703", MACHINE_IS_SKELETON )
 CONS( 200?, st1704,     0,          0,      st17xx,     st17xx,   driver_device,   0,    "Saturn",    "ST-1704", MACHINE_IS_SKELETON )
 CONS( 200?, st1705,     0,          0,      st17xx,     st17xx,   driver_device,   0,    "Saturn",    "ST-1705", MACHINE_IS_SKELETON )
+CONS( 200?, st1706,     0,          0,      st17xx,     st17xx,   driver_device,   0,    "Saturn",    "ST-1706", MACHINE_IS_SKELETON )
+CONS( 200?, st1707,     0,          0,      st17xx,     st17xx,   driver_device,   0,    "Saturn",    "ST-1707", MACHINE_IS_SKELETON )
+CONS( 200?, st1708,     0,          0,      st17xx,     st17xx,   driver_device,   0,    "Saturn",    "ST-1708", MACHINE_IS_SKELETON )
 CONS( 200?, st1714,     0,          0,      st17xx,     st17xx,   driver_device,   0,    "Saturn",    "ST-1714", MACHINE_IS_SKELETON )
