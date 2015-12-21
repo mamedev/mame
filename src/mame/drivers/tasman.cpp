@@ -565,15 +565,8 @@ static const gfx_layout charlayout8_tasman =
 	RGN_FRAC(1,1),
 	8,
 	// 0,8,16,24,32,40,48,56
-	// 0 = 1
-	// 8 = n
-	// 16 = 4
-	// 24 = unused
-	// 32 = 2
-	// 40 = nn
-	// 48 = 8?
 	{ 56,24,40,8,48,16,32,0 },
-	{ 0,1,2,3,4,5,6,7 },    // bit order probably not exact - note ramp in first 16 tiles
+	{ 0,1,2,3,4,5,6,7 },  
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64},
 	8*64
 };

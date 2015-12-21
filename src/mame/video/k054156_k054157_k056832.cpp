@@ -2027,16 +2027,7 @@ void k056832_device::create_gfx(const char *gfx_memory_region, int bpp, int big)
 	int gfx_index;
 	int i;
 	UINT32 total;
-	static const gfx_layout charlayout8_tasman =
-	{
-		8,8,
-		RGN_FRAC(1,1),
-		8,
-		{ 0,8,16,24,32,40,48,56 },
-		{ 0,1,2,3,4,5,6,7 },
-		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64},
-		8*64
-	};
+
 	static const gfx_layout charlayout8 =
 	{
 		8, 8,
@@ -2141,7 +2132,7 @@ void k056832_device::create_gfx(const char *gfx_memory_region, int bpp, int big)
 
 		case K056832_BPP_8TASMAN:
 			total = machine().root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout8_tasman, 8);
+			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout8, 8);
 			break;
 
 		case K056832_BPP_4dj:
