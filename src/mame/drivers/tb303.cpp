@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  ** subclass of hh_ucom4_state (includes/hh_ucom4.h, drivers/hh_ucom4.c) **
+  ** subclass of hh_ucom4_state (includes/hh_ucom4.h, drivers/hh_ucom4.cpp) **
 
   Roland TB-303 Bass Line, 1982, designed by Tadao Kikumoto
   * NEC uCOM-43 MCU, labeled D650C 133

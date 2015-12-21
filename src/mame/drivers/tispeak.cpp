@@ -2,7 +2,7 @@
 // copyright-holders:hap, Jonathan Gevaryahu, Sean Riddle
 /***************************************************************************
 
-  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.c) **
+  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
 
   Texas Instruments 1st-gen. handheld speech devices.
 

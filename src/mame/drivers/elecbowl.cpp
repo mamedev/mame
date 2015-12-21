@@ -2,7 +2,7 @@
 // copyright-holders:hap, Kevin Horton
 /***************************************************************************
 
-  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.c) **
+  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
 
   Marx Series 300 Electronic Bowling Game
   Main board:

@@ -2,7 +2,7 @@
 // copyright-holders:hap, Sean Riddle
 /***************************************************************************
 
-  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.c) **
+  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
 
   Texas Instruments TMS1xxx family handheld calculators (mostly single-chip).
   For a comprehensive list of MCU serials, see Joerg Woerner's datamath.org:
@@ -55,8 +55,8 @@ void ticalc1x_state::machine_start()
 /***************************************************************************
 
   TI SR-16, SR-16 II
-  * SR-16: TMS1000 MCU labeled TMS1001NL. die labeled 1000, 1001A
-  * SR-16 II: TMS1000 MCU labeled TMS1016NL. die labeled 1000B, 1016A
+  * SR-16: TMS1000 MCU labeled TMS1001NL (die labeled 1000, 1001A)
+  * SR-16 II: TMS1000 MCU labeled TMS1016NL (die labeled 1000B, 1016A)
   * 12-digit 7seg LED display
 
   SR-16 II is a cost-reduced 'sequel', [10^x] was removed, and [pi] was added.
@@ -275,7 +275,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI-1270
-  * TMS0970 MCU labeled TMC0974NL ZA0355, DP0974A. die labeled 0970D-74A
+  * TMS0970 MCU labeled TMC0974NL ZA0355, DP0974A (die labeled 0970D-74A)
   * 8-digit 7seg LED display
 
 ***************************************************************************/
@@ -376,7 +376,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI-1000
-  * TMS1990 MCU labeled TMC1991NL, die labeled 1991-91A
+  * TMS1990 MCU labeled TMC1991NL (die labeled 1991-91A)
   * 8-digit 7seg LED display
 
 ***************************************************************************/
@@ -473,7 +473,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI WIZ-A-TRON
-  * TMS0970 MCU labeled TMC0907NL ZA0379, DP0907BS. die labeled 0970F-07B
+  * TMS0970 MCU labeled TMC0907NL ZA0379, DP0907BS (die labeled 0970F-07B)
   * 9-digit 7seg LED display(one custom digit)
 
 ***************************************************************************/
@@ -572,7 +572,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI Little Professor (1976 version)
-  * TMS0970 MCU labeled TMS0975NL ZA0356, GP0975CS. die labeled 0970D-75C
+  * TMS0970 MCU labeled TMS0975NL ZA0356, GP0975CS (die labeled 0970D-75C)
   * 9-digit 7seg LED display(one custom digit)
 
   The hardware is nearly identical to Wiz-A-Tron (or vice versa, since this
@@ -646,7 +646,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI Little Professor (1978 version)
-  * TMS1990 MCU labeled TMC1993NL. die labeled 1990C-c3C
+  * TMS1990 MCU labeled TMC1993NL (die labeled 1990C-c3C)
   * 9-digit 7seg LED display(one custom digit)
 
   1978 re-release, with on/off and level select on buttons instead of
@@ -759,7 +759,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI DataMan
-  * TMS1980 MCU labeled TMC1982NL. die labeled 1980A 82B
+  * TMS1980 MCU labeled TMC1982NL (die labeled 1980A 82B)
   * 10-digit cyan VFD display(3 digits are custom)
 
 ***************************************************************************/
@@ -871,9 +871,9 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Majestic-line calculators:
-  * TI-30(aka SR-40): TMS0980 MCU labeled TMC0981NL. die labeled 0980B-81F
-  * TI Programmer: TMS0980 MCU labeled ZA0675NL, JP0983AT. die labeled 0980B-83
-  * TI Business Analyst-I: TMS0980 MCU labeled TMC0982NL. die labeled 0980B-82F
+  * TI-30(aka SR-40): TMS0980 MCU labeled TMC0981NL (die labeled 0980B-81F)
+  * TI Programmer: TMS0980 MCU labeled ZA0675NL, JP0983AT (die labeled 0980B-83)
+  * TI Business Analyst-I: TMS0980 MCU labeled TMC0982NL (die labeled 0980B-82F)
   * 9-digit 7seg LED display
 
   Of note is a peripheral by Schoenherr, called the Braillotron. It acts as

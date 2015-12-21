@@ -2,7 +2,55 @@
 // copyright-holders:hap, Sean Riddle
 /***************************************************************************
 
-  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.c) **
+  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
+  
+  Texas Instruments Spelling B hardware
+  
+  The Spelling B was introduced together with the Speak & Spell. It is a
+  handheld educational toy. Two revisions of the hardware exist. (* indicates not dumped)
+  
+  1st revision:
+  
+  Spelling B (US), 1978
+  - TMS0270 MCU TMC0272 (die labeled 0272A T0270B)
+  - TMS1980 MCU TMC1984 (die labeled 1980A 84A)
+  - 8-digit cyan VFD display (seen with and without apostrophe)
+  
+  Spelling ABC (UK), 1979: exact same hardware as US version
+  
+  2nd revision:
+  
+  Spelling B (US), 1980
+  - TMS0270 MCU TMC0274*
+  - TMC0355 4KB VSM ROM CD2602*
+  - 8-digit cyan VFD display
+  - 1-bit sound (indicated by a music note symbol on the top-right of the casing)
+
+  Spelling ABC (UK), 1980: exact same hardware as US version
+
+  Spelling ABC (Germany), 1980: different VSM
+  - TMC0355 4KB VSM ROM CD2607*
+  
+  Mr. Challenger (US), 1979
+  - TMS0270 MCU TMC0273
+  - TMC0355 4KB VSM ROM CD2601
+  - 8-digit cyan VFD display
+  - 1-bit sound
+
+  Letterlogic (UK), 1980: exact same hardware as US Mr. Challenger
+
+  Letterlogic (France), 1980: different VSM
+  - TMC0355 4KB VSM ROM CD2603*
+
+  Letterlogic (Germany), 1980: different VSM
+  - TMC0355 4KB VSM ROM CD2604*
+
+
+----------------------------------------------------------------------------
+
+  TODO:
+  - unexpected pigeon
+
 
 ***************************************************************************/
 
