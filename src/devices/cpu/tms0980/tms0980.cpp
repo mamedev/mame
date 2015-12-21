@@ -908,7 +908,7 @@ void tms0270_cpu_device::dynamic_output()
 
 	if (m_chipsel)
 	{
-		// ACC via SEG B,C,D,G: TMS5100 CTL pins
+		// ACC via SEG G,B,C,D: TMS5100 CTL pins
 		if (m_ctl_dir && m_a != m_ctl_out)
 		{
 			m_ctl_out = m_a;
@@ -956,7 +956,7 @@ UINT8 tms0980_cpu_device::read_k_input()
 
 UINT8 tms0270_cpu_device::read_k_input()
 {
-	// external: TMS5100 CTL port via SEG B,C,D,G
+	// external: TMS5100 CTL port via SEG G,B,C,D
 	if (m_chipsel)
 		return (m_ctl_dir) ? m_ctl_out : m_read_ctl(0, 0xff) & 0xf;
 
