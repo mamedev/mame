@@ -661,7 +661,7 @@ inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bi
 
 //	if (sy >= nScreenHeight || sy < -15 || sx >= nScreenWidth || sx < -15) return;
 	gfx_element *decodegfx = m_gfxdecode->gfx(3);
-	sy = sy + cliprect.min_y;
+	sy = sy + 16;
 
 	const UINT8* gfx = decodegfx->get_data(code);
 
