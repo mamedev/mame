@@ -141,6 +141,7 @@ public:
 	DECLARE_DRIVER_INIT(brickznv4);
 	DECLARE_DRIVER_INIT(starfigh);
 	DECLARE_DRIVER_INIT(hardhea2);
+	DECLARE_DRIVER_INIT(hardhea2b);
 	DECLARE_DRIVER_INIT(hardhedb);
 	DECLARE_DRIVER_INIT(sparkman);
 	DECLARE_DRIVER_INIT(brickzn);
