@@ -1501,10 +1501,9 @@ static MACHINE_CONFIG_START( system_A, megasys1_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(56.18) // same as nmk16.cpp based on YT videos.
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	//MCFG_SCREEN_REFRESH_RATE(56.18) // same as nmk16.cpp based on YT videos.
+	MCFG_SCREEN_RAW_PARAMS(SYS_A_CPU_CLOCK,406,0,256,263,16,240)
+
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update_megasys1)
 	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof_megasys1)
 	MCFG_SCREEN_PALETTE("palette")

@@ -415,6 +415,9 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_A_w)
 {
 	UINT16 new_data = COMBINE_DATA(&m_vregs[offset]);
 
+	if(((offset*2) & 0x300) == 0)
+		m_screen->update_partial(m_screen->vpos());
+	
 	switch (offset)
 	{
 		case 0x000/2   :    m_active_layers = new_data; break;
