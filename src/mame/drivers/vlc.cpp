@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Yves
 /*     vlc.c
 Multi-games from VLC Nevada 1995
