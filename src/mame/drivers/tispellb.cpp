@@ -17,7 +17,8 @@
   - 8-digit cyan VFD display (seen with and without apostrophe)
   
   Spelling ABC (UK), 1979: exact same hardware as US version
-  
+
+
   2nd revision:
   
   Spelling B (US), 1980
@@ -57,7 +58,7 @@
 #include "includes/hh_tms1k.h"
 
 // internal artwork
-//#include "spellb.lh"
+#include "spellb.lh"
 
 
 class tispellb_state : public hh_tms1k_state
@@ -110,6 +111,9 @@ static MACHINE_CONFIG_START( spellb, tispellb_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0270, 300000) // guessed
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_spellb)
 
 	/* no sound! */
 MACHINE_CONFIG_END

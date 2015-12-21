@@ -3,6 +3,8 @@
 
 <!-- define elements -->
 
+<!-- file is copied from, and identical to snspell.lay -->
+
 <!-- note: TI's alphanumeric 14seg digits look different from MAME's default, most notably the right half is wider -->
 
 	<element name="digit" defstate="0">
