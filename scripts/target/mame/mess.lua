@@ -486,6 +486,7 @@ MACHINES["PC_LPT"] = true
 MACHINES["PCCARD"] = true
 MACHINES["PCF8593"] = true
 MACHINES["PCKEYBRD"] = true
+MACHINES["PDC"] = true
 MACHINES["PIC8259"] = true
 MACHINES["PIT68230"] = true
 MACHINES["PIT8253"] = true
@@ -808,6 +809,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"robotron",
 		"rockwell",
 		"roland",
+		"rolm",
 		"sage",
 		"samcoupe",
 		"samsung",
@@ -2359,6 +2361,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/rd110.cpp",
 	MAME_DIR .. "src/mame/drivers/rsc55.cpp",
 	MAME_DIR .. "src/mame/drivers/tb303.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "rolm")
+files {
+	MAME_DIR .. "src/mame/drivers/r9751.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "rockwell")
