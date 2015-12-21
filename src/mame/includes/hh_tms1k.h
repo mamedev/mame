@@ -41,8 +41,8 @@ public:
 	bool m_power_led;
 
 	UINT8 read_inputs(int columns);
-	DECLARE_INPUT_CHANGED_MEMBER(power_button);
-	DECLARE_WRITE_LINE_MEMBER(auto_power_off);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
+	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)

@@ -76,6 +76,9 @@ public:
 	UINT16 m_sub_o;
 	UINT16 m_sub_r;
 
+	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
+	void power_off();
+
 	DECLARE_READ8_MEMBER(main_read_k);
 	DECLARE_WRITE16_MEMBER(main_write_o);
 	DECLARE_WRITE16_MEMBER(main_write_r);
@@ -119,6 +122,14 @@ void tispellb_state::machine_start()
 
 // common
 
+void tispellb_state::power_off()
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	//m_tms6100->reset();
+
+	m_power_on = false;
+}
+
 void tispellb_state::prepare_display()
 {
 	display_matrix_seg(16, 8, m_plate, m_grid, 0x3fff);
@@ -133,6 +144,10 @@ WRITE16_MEMBER(tispellb_state::main_write_o)
 
 WRITE16_MEMBER(tispellb_state::main_write_r)
 {
+	// R13: power-off request, on falling edge
+	if ((m_r >> 13 & 1) && !(data >> 13 & 1))
+		power_off();
+
 	// R0-R6: input mux
 	// R0-R7: select digit
 	m_r = data;
@@ -188,6 +203,19 @@ WRITE16_MEMBER(tispellb_state::sub_write_r)
 
 ***************************************************************************/
 
+INPUT_CHANGED_MEMBER(tispellb_state::power_button)
+{
+	int on = (int)(FPTR)param;
+
+	if (on && !m_power_on)
+	{
+		m_power_on = true;
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	}
+	else if (!on && m_power_on)
+		power_off();
+}
+
 static INPUT_PORTS_START( spellb )
 	PORT_START("IN.0") // R0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
@@ -242,7 +270,7 @@ static INPUT_PORTS_START( spellb )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Missing Letter")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Mystery Word")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("Scramble")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spelling B/On") //PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, (void *)true)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spelling B/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, (void *)true)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Starts With")
 INPUT_PORTS_END
 

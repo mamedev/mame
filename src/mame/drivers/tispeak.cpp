@@ -381,8 +381,8 @@ public:
 	required_device<tms6100_device> m_tms6100;
 	optional_device<generic_slot_device> m_cart;
 
-	DECLARE_INPUT_CHANGED_MEMBER(snspell_power_button);
-	void snspell_power_off();
+	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
+	void power_off();
 	void prepare_display();
 
 	DECLARE_READ8_MEMBER(snspell_read_k);
@@ -496,7 +496,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_r)
 {
 	// R13: power-off request, on falling edge
 	if ((m_r >> 13 & 1) && !(data >> 13 & 1))
-		snspell_power_off();
+		power_off();
 
 	// R0-R7: input mux and select digit (+R8 if the device has 9 digits)
 	// R15: filament on
@@ -522,7 +522,7 @@ READ8_MEMBER(tispeak_state::snspell_read_k)
 }
 
 
-void tispeak_state::snspell_power_off()
+void tispeak_state::power_off()
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_tms5100->reset();
@@ -563,7 +563,7 @@ WRITE16_MEMBER(tispeak_state::tntell_write_r)
 
 	// R9: power-off request, on falling edge
 	if ((m_r >> 9 & 1) && !(data >> 9 & 1))
-		snspell_power_off();
+		power_off();
 
 	// R0-R8: input mux
 	m_r = m_inp_mux = data;
@@ -617,7 +617,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 
 ***************************************************************************/
 
-INPUT_CHANGED_MEMBER(tispeak_state::snspell_power_button)
+INPUT_CHANGED_MEMBER(tispeak_state::power_button)
 {
 	int on = (int)(FPTR)param;
 
@@ -627,7 +627,7 @@ INPUT_CHANGED_MEMBER(tispeak_state::snspell_power_button)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else if (!on && m_power_on)
-		snspell_power_off();
+		power_off();
 }
 
 static INPUT_PORTS_START( snspell )
@@ -688,7 +688,7 @@ static INPUT_PORTS_START( snspell )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Secret Code")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Say It")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, snspell_power_button, (void *)true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
 INPUT_PORTS_END
 
 
@@ -740,7 +740,7 @@ static INPUT_PORTS_START( snmath )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Write It")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Greater/Less")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Word Problems")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Solve It/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, snspell_power_button, (void *)true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Solve It/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
 
 	PORT_START("IN.7")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -762,7 +762,7 @@ static INPUT_PORTS_START( snread )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Picture Read")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter Stumper")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Hear It")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Word Zap/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, snspell_power_button, (void *)true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Word Zap/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
 INPUT_PORTS_END
 
 
@@ -853,7 +853,7 @@ static INPUT_PORTS_START( tntell )
 
 	PORT_START("IN.9") // Vss!
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Grid 6-6 (On)") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, snspell_power_button, (void *)true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Grid 6-6 (On)") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
 
 	PORT_START("IN.10")
 	PORT_CONFNAME( 0x1f, 0x04, "Overlay Code" ) // only if not provided by external artwork
