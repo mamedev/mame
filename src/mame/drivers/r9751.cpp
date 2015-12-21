@@ -99,7 +99,7 @@ private:
 	// functions
 	UINT32 swap_uint32( UINT32 val );
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 

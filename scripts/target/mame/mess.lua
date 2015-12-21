@@ -809,6 +809,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"robotron",
 		"rockwell",
 		"roland",
+		"rolm",
 		"sage",
 		"samcoupe",
 		"samsung",
@@ -2361,6 +2362,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/tb303.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "rolm")
+files {
+	MAME_DIR .. "src/mame/drivers/r9751.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "rockwell")
 files {
 	MAME_DIR .. "src/mame/drivers/aim65.cpp",
@@ -3121,7 +3127,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/pulsar.cpp",
 	MAME_DIR .. "src/mame/drivers/pv9234.cpp",
 	MAME_DIR .. "src/mame/drivers/qtsbc.cpp",
-	MAME_DIR .. "src/mame/drivers/r9751.cpp",
 	MAME_DIR .. "src/mame/drivers/rd100.cpp",
 	MAME_DIR .. "src/mame/drivers/rvoice.cpp",
 	MAME_DIR .. "src/mame/drivers/sacstate.cpp",
