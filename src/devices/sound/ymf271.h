@@ -122,7 +122,7 @@ private:
 
 	// lookup tables
 	std::unique_ptr<INT16[]> m_lut_waves[8];
-	double *m_lut_plfo[4][8];
+	std::unique_ptr<double[]> m_lut_plfo[4][8];
 	std::unique_ptr<int[]> m_lut_alfo[4];
 	double m_lut_ar[64];
 	double m_lut_dc[64];

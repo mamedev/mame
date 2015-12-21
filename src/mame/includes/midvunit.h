@@ -90,7 +90,7 @@ public:
 	UINT16 m_page_control;
 	UINT8 m_video_changed;
 	emu_timer *m_scanline_timer;
-	midvunit_renderer *m_poly;
+	std::unique_ptr<midvunit_renderer> m_poly;
 	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
 	DECLARE_READ32_MEMBER(midvunit_dma_queue_entries_r);
 	DECLARE_READ32_MEMBER(midvunit_dma_trigger_r);

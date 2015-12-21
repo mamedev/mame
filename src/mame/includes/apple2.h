@@ -177,7 +177,7 @@ public:
 	double m_joystick_x2_time;
 	double m_joystick_y2_time;
 	apple2_memmap_config m_mem_config;
-	apple2_meminfo *m_current_meminfo;
+	std::unique_ptr<apple2_meminfo[]> m_current_meminfo;
 	int m_fdc_diskreg;
 	const UINT8 *m_a2_videoram, *m_a2_videoaux, *m_textgfx_data;
 	UINT32 m_a2_videomask, m_textgfx_datalen;

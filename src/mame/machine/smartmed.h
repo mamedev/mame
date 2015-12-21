@@ -160,8 +160,8 @@ protected:
 						// 0 means no card loaded
 	int m_log2_pages_per_block; // log2 of number of pages per erase block (usually 4 or 5)
 
-	UINT8 *m_data_ptr;  // FEEPROM data area
-	UINT8 *m_data_uid_ptr;
+	UINT8* m_data_ptr;  // FEEPROM data area
+	std::unique_ptr<UINT8[]> m_data_uid_ptr;
 
 	sm_mode_t m_mode;               // current operation mode
 	pointer_sm_mode_t m_pointer_mode;       // pointer mode
@@ -173,7 +173,7 @@ protected:
 	int m_status;           // current status
 	int m_accumulated_status;   // accumulated status
 
-	UINT8 *m_pagereg;   // page register used by program command
+	std::unique_ptr<UINT8[]> m_pagereg;   // page register used by program command
 	UINT8 m_id[5];      // chip ID
 	UINT8 m_mp_opcode;  // multi-plane operation code
 

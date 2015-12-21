@@ -44,7 +44,7 @@ VIDEO_START_MEMBER(midyunit_state,common)
 	/* allocate memory */
 	m_cmos_ram = std::make_unique<UINT16[]>((0x2000 * 4)/2);
 	m_local_videoram = make_unique_clear<UINT16[]>(0x80000/2);
-	m_pen_map = auto_alloc_array(machine(), pen_t, 65536);
+	m_pen_map = std::make_unique<pen_t[]>(65536);
 
 	machine().device<nvram_device>("nvram")->set_base(m_cmos_ram.get(), 0x2000 * 4);
 

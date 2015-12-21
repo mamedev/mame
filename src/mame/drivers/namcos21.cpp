@@ -811,7 +811,7 @@ int namcos21_state::init_dsp()
 	pMem[0x8000] = 0xFF80;
 	pMem[0x8001] = 0x0000;
 
-	m_mpDspState = auto_alloc_clear(machine(), dsp_state);
+	m_mpDspState = make_unique_clear<dsp_state>();
 
 	return 0;
 }

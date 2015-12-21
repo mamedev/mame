@@ -217,8 +217,8 @@ private:
 
 	/* core state */
 	drc_cache           m_cache;                      /* pointer to the DRC code cache */
-	drcuml_state *      m_drcuml;                     /* DRC UML generator state */
-	rsp_frontend *      m_drcfe;                      /* pointer to the DRC front-end state */
+	std::unique_ptr<drcuml_state>      m_drcuml;                     /* DRC UML generator state */
+	std::unique_ptr<rsp_frontend>      m_drcfe;                      /* pointer to the DRC front-end state */
 	UINT32              m_drcoptions;                 /* configurable DRC options */
 
 	/* internal stuff */
@@ -269,7 +269,7 @@ protected:
 	direct_read_data *m_direct;
 
 private:
-	rsp_cop2    *m_cop2;
+	std::unique_ptr<rsp_cop2>    m_cop2;
 
 	UINT32 *m_dmem32;
 	UINT16 *m_dmem16;

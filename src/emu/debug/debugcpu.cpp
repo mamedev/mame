@@ -1690,8 +1690,6 @@ device_debug::device_debug(device_t &device)
 
 device_debug::~device_debug()
 {
-	auto_free(m_device.machine(), m_trace);
-
 	// free breakpoints and watchpoints
 	breakpoint_clear_all();
 	watchpoint_clear_all();
@@ -2759,12 +2757,11 @@ UINT32 device_debug::compute_opcode_crc32(offs_t pc) const
 void device_debug::trace(FILE *file, bool trace_over, const char *action)
 {
 	// delete any existing tracers
-	auto_free(m_device.machine(), m_trace);
 	m_trace = nullptr;
 
 	// if we have a new file, make a new tracer
 	if (file != nullptr)
-		m_trace = auto_alloc(m_device.machine(), tracer(*this, *file, trace_over, action));
+		m_trace = std::make_unique<tracer>(*this, *file, trace_over, action);
 }
 
 

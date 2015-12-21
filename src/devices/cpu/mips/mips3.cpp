@@ -203,12 +203,10 @@ void mips3_device::device_stop()
 
 	if (m_drcfe != nullptr)
 	{
-		auto_free(machine(), m_drcfe);
 		m_drcfe = nullptr;
 	}
 	if (m_drcuml != nullptr)
 	{
-		auto_free(machine(), m_drcuml);
 		m_drcuml = nullptr;
 	}
 }
@@ -357,7 +355,7 @@ void mips3_device::device_start()
 
 	UINT32 flags = 0;
 	/* initialize the UML generator */
-	m_drcuml = auto_alloc(machine(), drcuml_state(*this, m_cache, flags, 8, 32, 2));
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 8, 32, 2);
 
 	/* add symbols for our stuff */
 	m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");
@@ -403,7 +401,7 @@ void mips3_device::device_start()
 	m_drcuml->symbol_add(&m_fpmode, sizeof(m_fpmode), "fpmode");
 
 	/* initialize the front-end helper */
-	m_drcfe = auto_alloc(machine(), mips3_frontend(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
+	m_drcfe = std::make_unique<mips3_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 	/* allocate memory for cache-local state and initialize it */
 	memcpy(m_fpmode, fpmode_source, sizeof(fpmode_source));

@@ -373,11 +373,11 @@ void rsp_device::device_start()
 
 	if (m_isdrc)
 	{
-		m_cop2 = auto_alloc(machine(), rsp_cop2_drc(*this, machine()));
+		m_cop2 = std::make_unique<rsp_cop2_drc>(*this, machine());
 	}
 	else
 	{
-		m_cop2 = auto_alloc(machine(), rsp_cop2(*this, machine()));
+		m_cop2 = std::make_unique<rsp_cop2>(*this, machine());
 	}
 	m_cop2->init();
 	m_cop2->start();
@@ -393,7 +393,7 @@ void rsp_device::device_start()
 
 	/* initialize the UML generator */
 	UINT32 drc_flags = 0;
-	m_drcuml = auto_alloc(machine(), drcuml_state(*this, m_cache, drc_flags, 8, 32, 2));
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, drc_flags, 8, 32, 2);
 
 	/* add symbols for our stuff */
 	m_drcuml->symbol_add(&m_rsp_state->pc, sizeof(m_rsp_state->pc), "pc");
@@ -411,7 +411,7 @@ void rsp_device::device_start()
 	m_drcuml->symbol_add(&m_numcycles, sizeof(m_numcycles), "numcycles");
 
 	/* initialize the front-end helper */
-	m_drcfe = auto_alloc(machine(), rsp_frontend(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
+	m_drcfe = std::make_unique<rsp_frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 	/* compute the register parameters */
 	for (int regnum = 0; regnum < 32; regnum++)
@@ -596,21 +596,6 @@ void rsp_device::device_stop()
 	if (m_exec_output)
 		fclose(m_exec_output);
 	m_exec_output = nullptr;
-
-	/* clean up the DRC */
-	if (m_drcuml)
-	{
-		auto_free(machine(), m_drcuml);
-	}
-	if (m_drcfe)
-	{
-		auto_free(machine(), m_drcfe);
-	}
-
-	if (m_cop2)
-	{
-		auto_free(machine(), m_cop2);
-	}
 }
 
 void rsp_device::device_reset()

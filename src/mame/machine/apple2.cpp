@@ -72,7 +72,7 @@ void apple2_state::apple2_update_memory()
 	{
 		for (i = 0; m_mem_config.memmap[i].end; i++)
 			;
-		m_current_meminfo = auto_alloc_array(machine(), apple2_meminfo, i);
+		m_current_meminfo = std::make_unique<apple2_meminfo[]>(i);
 		full_update = 1;
 	}
 

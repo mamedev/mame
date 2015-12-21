@@ -36,7 +36,7 @@ void taitof2_state::taitof2_core_vh_start (int sprite_type, int hide, int flip_h
 
 	m_spriteram_delayed = make_unique_clear<UINT16[]>(m_spriteram.bytes() / 2);
 	m_spriteram_buffered = make_unique_clear<UINT16[]>(m_spriteram.bytes() / 2);
-	m_spritelist = auto_alloc_array_clear(machine(), struct f2_tempsprite, 0x400);
+	m_spritelist = make_unique_clear<struct f2_tempsprite[]>(0x400);
 
 	for (i = 0; i < 8; i ++)
 	{
@@ -487,7 +487,7 @@ void taitof2_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
-	struct f2_tempsprite *sprite_ptr = m_spritelist;
+	struct f2_tempsprite *sprite_ptr = m_spritelist.get();
 
 	/* must remember enable status from last frame because driftout fails to
 	   reactivate them from a certain point onwards. */
@@ -775,7 +775,7 @@ void taitof2_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 
 
 	/* this happens only if primsks != NULL */
-	while (sprite_ptr != m_spritelist)
+	while (sprite_ptr != m_spritelist.get())
 	{
 		sprite_ptr--;
 

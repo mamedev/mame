@@ -537,8 +537,8 @@ protected:
 
 	/* core state */
 	drc_cache           m_cache;                      /* pointer to the DRC code cache */
-	drcuml_state *      m_drcuml;                     /* DRC UML generator state */
-	ppc_frontend *      m_drcfe;                      /* pointer to the DRC front-end state */
+	std::unique_ptr<drcuml_state>      m_drcuml;                     /* DRC UML generator state */
+	std::unique_ptr<ppc_frontend>      m_drcfe;                      /* pointer to the DRC front-end state */
 	UINT32              m_drcoptions;                 /* configurable DRC options */
 
 	/* parameters for subroutines */

@@ -51,7 +51,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
 
 	// base regs
-	BSX_base *m_base_unit;
+	std::unique_ptr<BSX_base> m_base_unit;
 
 	// cart regs
 	UINT8 m_cart_regs[16];

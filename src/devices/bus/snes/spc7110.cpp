@@ -50,7 +50,7 @@ sns_rom_spc7110rtc_device::sns_rom_spc7110rtc_device(const machine_config &mconf
 
 void sns_rom_spc7110_device::spc7110_start()
 {
-	m_decomp = auto_alloc(machine(), SPC7110_Decomp(machine()));
+	m_decomp = std::make_unique<SPC7110_Decomp>(machine());
 
 	// The SPC7110 works in conjunction with 0x2000 of RAM, which is battery backed up (and hence emulated by our m_nvram)
 

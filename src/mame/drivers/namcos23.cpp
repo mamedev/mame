@@ -1384,7 +1384,7 @@ struct c404_t
 
 struct render_t
 {
-	namcos23_renderer *polymgr;
+	std::unique_ptr<namcos23_renderer> polymgr;
 	int cur;
 	int poly_count;
 	int count[2];
@@ -2380,7 +2380,7 @@ VIDEO_START_MEMBER(namcos23_state,s23)
 	m_bgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_bgtilemap->set_transparent_pen(0xf);
 	m_bgtilemap->set_scrolldx(860, 860);
-	m_render.polymgr = auto_alloc(machine(), namcos23_renderer(*this));
+	m_render.polymgr = std::make_unique<namcos23_renderer>(*this);
 }
 
 

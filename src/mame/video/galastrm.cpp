@@ -21,7 +21,7 @@ void galastrm_state::video_start()
 {
 	m_spritelist = auto_alloc_array(machine(), struct gs_tempsprite, 0x4000);
 
-	m_poly = auto_alloc(machine(), galastrm_renderer(*this));
+	m_poly = std::make_unique<galastrm_renderer>(*this);
 
 	m_screen->register_screen_bitmap(m_tmpbitmaps);
 	m_screen->register_screen_bitmap(m_poly->screenbits());

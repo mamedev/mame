@@ -310,7 +310,7 @@ public:
 		OHCIIsochronousTransferDescriptor isochronous_transfer_descriptor;
 	} ohcist;
 	UINT8 pic16lc_buffer[0xff];
-	nv2a_renderer *nvidia_nv2a;
+	std::unique_ptr<nv2a_renderer> nvidia_nv2a;
 	bool debug_irq_active;
 	int debug_irq_number;
 	required_device<cpu_device> m_maincpu;

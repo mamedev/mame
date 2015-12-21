@@ -81,7 +81,7 @@ public:
 	struct gs_tempsprite *m_spritelist;
 	struct gs_tempsprite *m_sprite_ptr_pre;
 	bitmap_ind16 m_tmpbitmaps;
-	galastrm_renderer *m_poly;
+	std::unique_ptr<galastrm_renderer> m_poly;
 
 	int m_rsxb;
 	int m_rsyb;

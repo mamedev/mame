@@ -69,7 +69,7 @@ private:
 	std::unique_ptr<UINT16[]> m_poly_fifo;
 	int m_poly_fifo_ptr;
 
-	tc0780fpa_renderer *m_renderer;
+	std::unique_ptr<tc0780fpa_renderer> m_renderer;
 
 	UINT16 m_tex_address;
 	UINT16 m_tex_offset;

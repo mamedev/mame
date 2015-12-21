@@ -293,7 +293,7 @@ public:
 		struct  stv_vdp1_poly_scanline scanline[512];
 	};
 
-	struct stv_vdp1_poly_scanline_data* stv_vdp1_shading_data;
+	std::unique_ptr<struct stv_vdp1_poly_scanline_data> stv_vdp1_shading_data;
 
 	struct stv_vdp2_sprite_list
 	{

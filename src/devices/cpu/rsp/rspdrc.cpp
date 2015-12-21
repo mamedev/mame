@@ -260,7 +260,7 @@ void cfunc_sp_set_status_cb(void *param)
 
 void rsp_device::execute_run_drc()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	int execute_result;
 
 	/* reset the cache if dirty */
@@ -350,7 +350,7 @@ void rsp_device::code_flush_cache()
 
 void rsp_device::code_compile_block(offs_t pc)
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	compiler_state compiler = { 0 };
 	const opcode_desc *seqhead, *seqlast;
 	const opcode_desc *desclist;
@@ -490,7 +490,7 @@ static void cfunc_fatalerror(void *param)
 
 void rsp_device::static_generate_entry_point()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	drcuml_block *block;
 
 	/* begin generating */
@@ -518,7 +518,7 @@ void rsp_device::static_generate_entry_point()
 
 void rsp_device::static_generate_nocode_handler()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	drcuml_block *block;
 
 	/* begin generating */
@@ -543,7 +543,7 @@ void rsp_device::static_generate_nocode_handler()
 
 void rsp_device::static_generate_out_of_cycles()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	drcuml_block *block;
 
 	/* begin generating */
@@ -569,7 +569,7 @@ void rsp_device::static_generate_memory_accessor(int size, int iswrite, const ch
 	/* on entry, address is in I0; data for writes is in I1 */
 	/* on exit, read result is in I0 */
 	/* routine trashes I0-I1 */
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	drcuml_block *block;
 
 	/* begin generating */

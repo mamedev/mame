@@ -145,8 +145,8 @@ public:
 	UINT16 m_dsp_ram[0x1000];
 	UINT16 m_io_share_ram[0x2000];
 
-	UINT32 *m_screen_ram;
-	UINT32 *m_pal_ram;
+	std::unique_ptr<UINT32[]> m_screen_ram;
+	std::unique_ptr<UINT32[]> m_pal_ram;
 
 	UINT32 m_video_address;
 
@@ -183,15 +183,15 @@ void taitopjc_state::video_exit()
 
 void taitopjc_state::video_start()
 {
-	m_screen_ram = auto_alloc_array(machine(), UINT32, 0x40000);
-	m_pal_ram = auto_alloc_array(machine(), UINT32, 0x8000);
+	m_screen_ram = std::make_unique<UINT32[]>(0x40000);
+	m_pal_ram = std::make_unique<UINT32[]>(0x8000);
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitopjc_state::video_exit), this));
 }
 
 UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *s = (UINT8*)m_screen_ram;
+	UINT8 *s = (UINT8*)m_screen_ram.get();
 	int x,y,t,u;
 
 	bitmap.fill(0x000000, cliprect);

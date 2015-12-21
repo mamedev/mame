@@ -276,7 +276,7 @@ void williams_state::create_palette_lookup()
 			2, resistances_b,  weights_b, 0, 0);
 
 	/* build a palette lookup */
-	m_palette_lookup = auto_alloc_array(machine(), rgb_t, 256);
+	m_palette_lookup = std::make_unique<rgb_t[]>(256);
 	for (i = 0; i < 256; i++)
 	{
 		int r = combine_3_weights(weights_r, BIT(i,0), BIT(i,1), BIT(i,2));

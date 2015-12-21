@@ -99,7 +99,7 @@ public:
 			m_uart(*this, "ns16450_0"),
 			m_microtouch(*this, "microtouch") { }
 
-	UINT8 *m_banked_nvram;
+	std::unique_ptr<UINT8[]> m_banked_nvram;
 	required_device<ns16450_device> m_uart;
 	required_device<microtouch_device> m_microtouch;
 
@@ -140,7 +140,7 @@ WRITE8_MEMBER(pcat_nit_state::pcat_nit_rombank_w)
 
 		space.install_readwrite_bank(0x000d8000, 0x000d9fff, "nvrambank" );
 
-		membank("nvrambank")->set_base(m_banked_nvram);
+		membank("nvrambank")->set_base(m_banked_nvram.get());
 
 	}
 }
@@ -413,8 +413,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(pcat_nit_state,pcat_nit)
 {
-	m_banked_nvram = auto_alloc_array(machine(), UINT8, 0x2000);
-	machine().device<nvram_device>("nvram")->set_base(m_banked_nvram, 0x2000);
+	m_banked_nvram = std::make_unique<UINT8[]>(0x2000);
+	machine().device<nvram_device>("nvram")->set_base(m_banked_nvram.get(), 0x2000);
 }
 
 GAME( 1993, streetg,    0,         pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 4)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

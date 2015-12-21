@@ -82,7 +82,7 @@ public:
 	UINT8 *m_cvsd_protection_base;
 	UINT8 m_autoerase_enable;
 	UINT32 m_palette_mask;
-	pen_t * m_pen_map;
+	std::unique_ptr<pen_t[]> m_pen_map;
 	std::unique_ptr<UINT16[]>   m_local_videoram;
 	UINT8 m_videobank_select;
 	UINT8 m_yawdim_dma;

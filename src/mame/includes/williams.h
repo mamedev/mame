@@ -46,7 +46,7 @@ public:
 	UINT8 m_blitter_window_enable;
 	UINT8 m_cocktail;
 	UINT8 m_port_select;
-	rgb_t *m_palette_lookup;
+	std::unique_ptr<rgb_t[]> m_palette_lookup;
 	UINT8 m_blitterram[8];
 	UINT8 m_blitter_xor;
 	UINT8 m_blitter_remap_index;

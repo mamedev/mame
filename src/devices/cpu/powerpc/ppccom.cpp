@@ -882,7 +882,7 @@ void ppc_device::device_start()
 
 	UINT32 flags = 0;
 	/* initialize the UML generator */
-	m_drcuml = auto_alloc(machine(), drcuml_state(*this, m_cache, flags, 8, 32, 2));
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 8, 32, 2);
 
 	/* add symbols for our stuff */
 	m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");
@@ -928,7 +928,7 @@ void ppc_device::device_start()
 	m_drcuml->symbol_add(&m_fcmp_cr_table, sizeof(m_fcmp_cr_table), "fcmp_cr_table");
 
 	/* initialize the front-end helper */
-	m_drcfe = auto_alloc(machine(), ppc_frontend(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
+	m_drcfe = std::make_unique<ppc_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 	/* compute the register parameters */
 	for (int regnum = 0; regnum < 32; regnum++)
@@ -1151,10 +1151,6 @@ void ppc_device::device_stop()
 	if (m_vtlb != nullptr)
 		vtlb_free(m_vtlb);
 	m_vtlb = nullptr;
-
-	/* clean up the DRC */
-	auto_free(machine(), m_drcfe);
-	auto_free(machine(), m_drcuml);
 }
 
 

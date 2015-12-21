@@ -172,7 +172,7 @@ UINT16 ns10_decrypter_device::decrypt(UINT16 cipherword)
 void ns10_decrypter_device::device_start()
 {
 	_active = false;
-	_reducer = auto_alloc(machine(), gf2_reducer());
+	_reducer = std::make_unique<gf2_reducer>();
 }
 
 void ns10_decrypter_device::init(int iv)

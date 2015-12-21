@@ -369,7 +369,7 @@ void ppc_device::code_compile_block(UINT8 mode, offs_t pc)
 	/* get a description of this sequence */
 	desclist = m_drcfe->describe_code(pc);
 	if (m_drcuml->logging() || m_drcuml->logging_native())
-		log_opcode_desc(m_drcuml, desclist, 0);
+		log_opcode_desc(m_drcuml.get(), desclist, 0);
 
 	bool succeeded = false;
 	while (!succeeded)
@@ -641,10 +641,10 @@ void ppc_device::static_generate_entry_point()
 	block = m_drcuml->begin_block(20);
 
 	/* forward references */
-	alloc_handle(m_drcuml, &m_nocode, "nocode");
-	alloc_handle(m_drcuml, &m_exception_norecover[EXCEPTION_EI], "exception_ei_norecover");
+	alloc_handle(m_drcuml.get(), &m_nocode, "nocode");
+	alloc_handle(m_drcuml.get(), &m_exception_norecover[EXCEPTION_EI], "exception_ei_norecover");
 
-	alloc_handle(m_drcuml, &m_entry, "entry");
+	alloc_handle(m_drcuml.get(), &m_entry, "entry");
 	UML_HANDLE(block, *m_entry);                                               // handle  entry
 
 	/* reset the FPU mode */
@@ -685,7 +685,7 @@ void ppc_device::static_generate_nocode_handler()
 	block = m_drcuml->begin_block(10);
 
 	/* generate a hash jump via the current mode and PC */
-	alloc_handle(m_drcuml, &m_nocode, "nocode");
+	alloc_handle(m_drcuml.get(), &m_nocode, "nocode");
 	UML_HANDLE(block, *m_nocode);                                              // handle  nocode
 	UML_GETEXP(block, I0);                                                              // getexp  i0
 	UML_MOV(block, mem(&m_core->pc), I0);                                                  // mov     [pc],i0
@@ -709,7 +709,7 @@ void ppc_device::static_generate_out_of_cycles()
 	block = m_drcuml->begin_block(10);
 
 	/* generate a hash jump via the current mode and PC */
-	alloc_handle(m_drcuml, &m_out_of_cycles, "out_of_cycles");
+	alloc_handle(m_drcuml.get(), &m_out_of_cycles, "out_of_cycles");
 	UML_HANDLE(block, *m_out_of_cycles);                                       // handle  out_of_cycles
 	UML_GETEXP(block, I0);                                                              // getexp  i0
 	UML_MOV(block, mem(&m_core->pc), I0);                                                  // mov     <pc>,i0
@@ -731,15 +731,15 @@ void ppc_device::static_generate_tlb_mismatch()
 	int isi, exit, label = 1;
 
 	/* forward references */
-	alloc_handle(m_drcuml, &m_exception[EXCEPTION_ISI], "exception_isi");
+	alloc_handle(m_drcuml.get(), &m_exception[EXCEPTION_ISI], "exception_isi");
 	if (m_cap & PPCCAP_603_MMU)
-		alloc_handle(m_drcuml, &m_exception[EXCEPTION_ITLBMISS], "exception_itlb_miss");
+		alloc_handle(m_drcuml.get(), &m_exception[EXCEPTION_ITLBMISS], "exception_itlb_miss");
 
 	/* begin generating */
 	block = m_drcuml->begin_block(20);
 
 	/* generate a hash jump via the current mode and PC */
-	alloc_handle(m_drcuml, &m_tlb_mismatch, "tlb_mismatch");
+	alloc_handle(m_drcuml.get(), &m_tlb_mismatch, "tlb_mismatch");
 	UML_HANDLE(block, *m_tlb_mismatch);                                            // handle  tlb_mismatch
 	UML_RECOVER(block, I0, MAPVAR_PC);                                                  // recover i0,PC
 	UML_SHR(block, I1, I0, 12);                                             // shr     i1,i0,12
@@ -792,7 +792,7 @@ void ppc_device::static_generate_exception(UINT8 exception, int recover, const c
 	block = m_drcuml->begin_block(1024);
 
 	/* add a global entry for this */
-	alloc_handle(m_drcuml, &exception_handle, name);
+	alloc_handle(m_drcuml.get(), &exception_handle, name);
 	UML_HANDLE(block, *exception_handle);                                                   // handle  name
 
 	/* exception parameter is expected to be the fault address in this case */
@@ -981,7 +981,7 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 	block = m_drcuml->begin_block(1024);
 
 	/* add a global entry for this */
-	alloc_handle(m_drcuml, &handleptr, name);
+	alloc_handle(m_drcuml.get(), &handleptr, name);
 	UML_HANDLE(block, *handleptr);                                                          // handle  *handleptr
 
 	/* check for unaligned accesses and break into two */
@@ -1388,7 +1388,7 @@ void ppc_device::static_generate_swap_tgpr()
 	block = m_drcuml->begin_block(30);
 
 	/* generate a hash jump via the current mode and PC */
-	alloc_handle(m_drcuml, &m_swap_tgpr, "swap_tgpr");
+	alloc_handle(m_drcuml.get(), &m_swap_tgpr, "swap_tgpr");
 	UML_HANDLE(block, *m_swap_tgpr);                                           // handle  swap_tgpr
 	for (regnum = 0; regnum < 4; regnum++)
 	{
@@ -1423,7 +1423,7 @@ void ppc_device::static_generate_lsw_entries(int mode)
 
 		/* allocate a handle */
 		sprintf(temp, "lsw%d", regnum);
-		alloc_handle(m_drcuml, &m_lsw[mode][regnum], temp);
+		alloc_handle(m_drcuml.get(), &m_lsw[mode][regnum], temp);
 		UML_HANDLE(block, *m_lsw[mode][regnum]);                               // handle  lsw<regnum>
 		UML_LABEL(block, regnum);                                                       // regnum:
 		UML_ADD(block, I0, mem(&m_core->updateaddr), 0);                 // add     i0,[updateaddr],0
@@ -1477,7 +1477,7 @@ void ppc_device::static_generate_stsw_entries(int mode)
 
 		/* allocate a handle */
 		sprintf(temp, "stsw%d", regnum);
-		alloc_handle(m_drcuml, &m_stsw[mode][regnum], temp);
+		alloc_handle(m_drcuml.get(), &m_stsw[mode][regnum], temp);
 		UML_HANDLE(block, *m_stsw[mode][regnum]);                              // handle  stsw<regnum>
 		UML_LABEL(block, regnum);                                                       // regnum:
 		UML_ADD(block, I0, mem(&m_core->updateaddr), 0);                 // add     i0,[updateaddr],0

@@ -1427,7 +1427,7 @@ ADDRESS_MAP_END
 
 void xbox_base_state::machine_start()
 {
-	nvidia_nv2a = auto_alloc(machine(), nv2a_renderer(machine()));
+	nvidia_nv2a = std::make_unique<nv2a_renderer>(machine());
 	memset(pic16lc_buffer, 0, sizeof(pic16lc_buffer));
 	pic16lc_buffer[0] = 'B';
 	pic16lc_buffer[4] = 0; // A/V connector, 2=vga

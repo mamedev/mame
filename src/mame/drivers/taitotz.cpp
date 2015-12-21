@@ -593,7 +593,7 @@ public:
 	UINT32 m_displist_addr;
 	int m_count;
 
-	taitotz_renderer *m_renderer;
+	std::unique_ptr<taitotz_renderer> m_renderer;
 	DECLARE_DRIVER_INIT(batlgr2a);
 	DECLARE_DRIVER_INIT(batlgr2);
 	DECLARE_DRIVER_INIT(pwrshovl);
@@ -747,7 +747,7 @@ void taitotz_state::video_start()
 	m_texture_ram = std::make_unique<UINT32[]>(0x800000);
 
 	/* create renderer */
-	m_renderer = auto_alloc(machine(), taitotz_renderer(*this, width, height, m_texture_ram.get()));
+	m_renderer = std::make_unique<taitotz_renderer>(*this, width, height, m_texture_ram.get());
 
 	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitotz_exit), &machine()));
 }

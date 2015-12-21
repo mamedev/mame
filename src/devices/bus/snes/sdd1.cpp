@@ -369,20 +369,20 @@ void SDD1_OL::OL_launch(UINT8 *ROM, UINT32 *mmc)
 SDD1_emu::SDD1_emu(running_machine &machine)
 		: m_machine(machine)
 {
-	m_IM = auto_alloc(machine, SDD1_IM());
-	m_GCD = auto_alloc(machine, SDD1_GCD(m_IM));
-	m_BG0 = auto_alloc(machine, SDD1_BG(m_GCD, 0));
-	m_BG1 = auto_alloc(machine, SDD1_BG(m_GCD, 1));
-	m_BG2 = auto_alloc(machine, SDD1_BG(m_GCD, 2));
-	m_BG3 = auto_alloc(machine, SDD1_BG(m_GCD, 3));
-	m_BG4 = auto_alloc(machine, SDD1_BG(m_GCD, 4));
-	m_BG5 = auto_alloc(machine, SDD1_BG(m_GCD, 5));
-	m_BG6 = auto_alloc(machine, SDD1_BG(m_GCD, 6));
-	m_BG7 = auto_alloc(machine, SDD1_BG(m_GCD, 7));
-	m_PEM = auto_alloc(machine, SDD1_PEM(m_BG0, m_BG1, m_BG2, m_BG3,
-											m_BG4, m_BG5, m_BG6, m_BG7));
-	m_CM = auto_alloc(machine, SDD1_CM(m_PEM));
-	m_OL = auto_alloc(machine, SDD1_OL(m_CM));
+	m_IM = std::make_unique<SDD1_IM>();
+	m_GCD = std::make_unique<SDD1_GCD>(m_IM.get());
+	m_BG0 = std::make_unique<SDD1_BG>(m_GCD.get(), 0);
+	m_BG1 = std::make_unique<SDD1_BG>(m_GCD.get(), 1);
+	m_BG2 = std::make_unique<SDD1_BG>(m_GCD.get(), 2);
+	m_BG3 = std::make_unique<SDD1_BG>(m_GCD.get(), 3);
+	m_BG4 = std::make_unique<SDD1_BG>(m_GCD.get(), 4);
+	m_BG5 = std::make_unique<SDD1_BG>(m_GCD.get(), 5);
+	m_BG6 = std::make_unique<SDD1_BG>(m_GCD.get(), 6);
+	m_BG7 = std::make_unique<SDD1_BG>(m_GCD.get(), 7);
+	m_PEM = std::make_unique<SDD1_PEM>(m_BG0.get(), m_BG1.get(), m_BG2.get(), m_BG3.get(),
+											m_BG4.get(), m_BG5.get(), m_BG6.get(), m_BG7.get());
+	m_CM = std::make_unique<SDD1_CM>(m_PEM.get());
+	m_OL = std::make_unique<SDD1_OL>(m_CM.get());
 }
 
 void SDD1_emu::SDD1emu_decompress(UINT8 *ROM, UINT32 *mmc, UINT32 in_buf, UINT16 out_len, UINT8 *out_buf)
@@ -426,7 +426,7 @@ sns_rom_sdd1_device::sns_rom_sdd1_device(const machine_config &mconfig, const ch
 
 void sns_rom_sdd1_device::device_start()
 {
-	m_sdd1emu = auto_alloc(machine(), SDD1_emu(machine()));
+	m_sdd1emu = std::make_unique<SDD1_emu>(machine());
 
 	m_buffer.data = std::make_unique<UINT8[]>(0x10000);
 	m_buffer.ready = 0;

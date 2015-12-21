@@ -1285,7 +1285,7 @@ void hng64_state::video_start()
 	m_additive_tilemap_debug = 0;
 
 	// Rasterizer creation
-	m_poly_renderer = auto_alloc(machine(), hng64_poly_renderer(*this));
+	m_poly_renderer = std::make_unique<hng64_poly_renderer>(*this);
 
 	// 3d information
 	m_dl = std::make_unique<UINT16[]>(0x100);

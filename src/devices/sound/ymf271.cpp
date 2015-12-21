@@ -399,7 +399,7 @@ void ymf271_device::update_lfo(YMF271Slot *slot)
 	slot->lfo_phase += slot->lfo_step;
 
 	slot->lfo_amplitude = m_lut_alfo[slot->lfowave][(slot->lfo_phase >> LFO_SHIFT) & (LFO_LENGTH-1)];
-	slot->lfo_phasemod = m_lut_plfo[slot->lfowave][slot->pms][(slot->lfo_phase >> LFO_SHIFT) & (LFO_LENGTH-1)];
+	slot->lfo_phasemod = m_lut_plfo[slot->lfowave][slot->pms].get()[(slot->lfo_phase >> LFO_SHIFT) & (LFO_LENGTH-1)];
 
 	calculate_step(slot);
 }
@@ -1508,7 +1508,7 @@ void ymf271_device::init_tables()
 		m_lut_waves[i] = std::make_unique<INT16[]>(SIN_LEN);
 
 	for (i = 0; i < 4*8; i++)
-		m_lut_plfo[i>>3][i&7] = auto_alloc_array(machine(), double, LFO_LENGTH);
+		m_lut_plfo[i>>3][i&7] = std::make_unique<double[]>(LFO_LENGTH);
 
 	for (i = 0; i < 4; i++)
 		m_lut_alfo[i] = std::make_unique<int[]>(LFO_LENGTH);
@@ -1568,14 +1568,14 @@ void ymf271_device::init_tables()
 
 		for (j = 0; j < 4; j++)
 		{
-			m_lut_plfo[j][0][i] = pow(2.0, 0.0);
-			m_lut_plfo[j][1][i] = pow(2.0, (3.378 * plfo[j]) / 1200.0);
-			m_lut_plfo[j][2][i] = pow(2.0, (5.0646 * plfo[j]) / 1200.0);
-			m_lut_plfo[j][3][i] = pow(2.0, (6.7495 * plfo[j]) / 1200.0);
-			m_lut_plfo[j][4][i] = pow(2.0, (10.1143 * plfo[j]) / 1200.0);
-			m_lut_plfo[j][5][i] = pow(2.0, (20.1699 * plfo[j]) / 1200.0);
-			m_lut_plfo[j][6][i] = pow(2.0, (40.1076 * plfo[j]) / 1200.0);
-			m_lut_plfo[j][7][i] = pow(2.0, (79.307 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][0].get()[i] = pow(2.0, 0.0);
+			m_lut_plfo[j][1].get()[i] = pow(2.0, (3.378 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][2].get()[i] = pow(2.0, (5.0646 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][3].get()[i] = pow(2.0, (6.7495 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][4].get()[i] = pow(2.0, (10.1143 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][5].get()[i] = pow(2.0, (20.1699 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][6].get()[i] = pow(2.0, (40.1076 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][7].get()[i] = pow(2.0, (79.307 * plfo[j]) / 1200.0);
 		}
 
 		// LFO amplitude modulation

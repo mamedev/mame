@@ -302,7 +302,7 @@ public:
 	DECLARE_WRITE32_MEMBER(cmd_callback);
 
 	std::unique_ptr<UINT8[]> m_texture;
-	rollext_renderer* m_renderer;
+	std::unique_ptr<rollext_renderer> m_renderer;
 
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 	DECLARE_DRIVER_INIT(rollext);
@@ -339,7 +339,7 @@ void rollext_state::video_start()
 
 	preprocess_texture_data();
 
-	m_renderer = auto_alloc(machine(), rollext_renderer(*m_screen));
+	m_renderer = std::make_unique<rollext_renderer>(*m_screen);
 	m_renderer->set_texture_ram(m_texture.get());
 	m_renderer->set_palette_ram((UINT16*)&m_palette_ram[0]);
 }
