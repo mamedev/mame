@@ -2268,7 +2268,20 @@ phpball     // Tomy
 elecbowl    // Marx
 mbdtower    // Milton Bradley
 
-// hh_tms1k tispeak.c
+// hh_tms1k ticalc1x.cpp
+tisr16
+tisr16ii
+ti1270
+ti1000
+ti30
+tiprog
+tibusan1
+wizatron
+lilprof
+lilprof78
+dataman
+
+// hh_tms1k tispeak.cpp
 snspell
 snspellp
 snspella
@@ -2288,18 +2301,8 @@ tntellfr
 tntellp
 vocaid
 
-// hh_tms1k ticalc1x.c
-tisr16
-tisr16ii
-ti1270
-ti1000
-ti30
-tiprog
-tibusan1
-wizatron
-lilprof
-lilprof78
-dataman
+// hh_tms1k tispellb.cpp
+spellb
 
 // hh_ucom4
 ufombs      // Bambino

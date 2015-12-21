@@ -7,7 +7,7 @@
   part of a series is (or will be) in its own driver.
 
   Let's use this driver for a list of known devices and their serials,
-  excluding TI's own products (see ticalc1x.c, tispeak.c)
+  excluding TI's own products (see ticalc1x.cpp, tispeak.cpp, tispellb.cpp)
 
   serial   device    etc.
 --------------------------------------------------------------------

@@ -2719,6 +2719,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/geneve.cpp",
 	MAME_DIR .. "src/mame/drivers/ticalc1x.cpp",
 	MAME_DIR .. "src/mame/drivers/tispeak.cpp",
+	MAME_DIR .. "src/mame/drivers/tispellb.cpp",
 	MAME_DIR .. "src/mame/drivers/ti74.cpp",
 	MAME_DIR .. "src/mame/drivers/ti85.cpp",
 	MAME_DIR .. "src/mame/includes/ti85.h",
