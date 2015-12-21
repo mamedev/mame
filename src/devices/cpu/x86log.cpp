@@ -8,9 +8,9 @@
 
 ***************************************************************************/
 
-#include <cstdint>
 #include "emu.h"
 #include "x86log.h"
+
 
 
 /***************************************************************************
@@ -18,9 +18,10 @@
 ***************************************************************************/
 
 /* comment parameters */
-constexpr std::size_t MAX_COMMENTS{4000};
-constexpr std::size_t MAX_DATA_RANGES{1000};
-constexpr std::size_t COMMENT_POOL_SIZE{MAX_COMMENTS * 40};
+#define MAX_COMMENTS        4000
+#define MAX_DATA_RANGES     1000
+#define COMMENT_POOL_SIZE   (MAX_COMMENTS * 40)
+
 
 
 /***************************************************************************
@@ -66,7 +67,7 @@ struct x86log_context
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void reset_log(x86log_context *log) noexcept;
+static void reset_log(x86log_context *log);
 extern int i386_dasm_one_ex(char *buffer, UINT64 eip, const UINT8 *oprom, int mode);
 
 
@@ -99,7 +100,7 @@ x86log_context *x86log_create_context(const char *filename)
     x86log_free_context - release a context
 -------------------------------------------------*/
 
-void x86log_free_context(x86log_context *log) noexcept
+void x86log_free_context(x86log_context *log)
 {
 	/* close any open files */
 	if (log->file != nullptr)
@@ -111,11 +112,46 @@ void x86log_free_context(x86log_context *log) noexcept
 
 
 /*-------------------------------------------------
+    x86log_add_comment - add a comment associated
+    with a given code pointer
+-------------------------------------------------*/
+
+void x86log_add_comment(x86log_context *log, x86code *base, const char *format, ...)
+{
+	char *string = log->comment_pool_next;
+	log_comment *comment;
+	va_list va;
+
+	assert(log->comment_count < MAX_COMMENTS);
+	assert(log->comment_pool_next + strlen(format) + 256 < log->comment_pool + COMMENT_POOL_SIZE);
+
+	/* we assume comments are registered in order; enforce this */
+	assert(log->comment_count == 0 || base >= log->comment_list[log->comment_count - 1].base);
+
+	/* if we exceed the maxima, skip it */
+	if (log->comment_count >= MAX_COMMENTS)
+		return;
+	if (log->comment_pool_next + strlen(format) + 256 >= log->comment_pool + COMMENT_POOL_SIZE)
+		return;
+
+	/* do the printf to the string pool */
+	va_start(va, format);
+	log->comment_pool_next += vsprintf(log->comment_pool_next, format, va) + 1;
+	va_end(va);
+
+	/* fill in the new comment */
+	comment = &log->comment_list[log->comment_count++];
+	comment->base = base;
+	comment->string = string;
+}
+
+
+/*-------------------------------------------------
     x86log_mark_as_data - mark a given range as
     data for logging purposes
 -------------------------------------------------*/
 
-void x86log_mark_as_data(x86log_context *log, x86code *base, x86code *end, int size) noexcept
+void x86log_mark_as_data(x86log_context *log, x86code *base, x86code *end, int size)
 {
 	data_range_t *data;
 
@@ -222,6 +258,31 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 }
 
 
+/*-------------------------------------------------
+    x86log_printf - manually printf information to
+    the log file
+-------------------------------------------------*/
+
+void x86log_printf(x86log_context *log, const char *format, ...)
+{
+	va_list va;
+
+	/* open the file, creating it if necessary */
+	if (log->file == nullptr)
+		log->file = fopen(log->filename.c_str(), "w");
+	if (log->file == nullptr)
+		return;
+
+	/* do the printf */
+	va_start(va, format);
+	vfprintf(log->file, format, va);
+	va_end(va);
+
+	/* flush the file */
+	fflush(log->file);
+}
+
+
 
 /***************************************************************************
     LOCAL FUNCTIONS
@@ -231,7 +292,7 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
     reset_log - reset the state of the log
 -------------------------------------------------*/
 
-static void reset_log(x86log_context *log) noexcept
+static void reset_log(x86log_context *log)
 {
 	log->data_range_count = 0;
 	log->comment_count = 0;
