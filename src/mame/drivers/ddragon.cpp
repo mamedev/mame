@@ -1728,7 +1728,7 @@ ROM_START( ddragon2u )
 	ROM_LOAD( "26ad-0.bin",   0x00000, 0x8000, CRC(75e36cd6) SHA1(f24805f4f6925b3ac508e66a6fc25c275b05f3b9) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "26a8-0.bin",   0x00000, 0x10000, CRC(3ad1049c) SHA1(11d9544a56f8e6a84beb307a5c8a9ff8afc55c66) )  /* chars */
+    ROM_LOAD( "26a8-0.bin",   0x00000, 0x10000, CRC(3ad1049c) SHA1(11d9544a56f8e6a84beb307a5c8a9ff8afc55c66) )  /* chars */
 
 	ROM_REGION( 0xc0000, "gfx2", 0 )
 	ROM_LOAD( "26j0-0.bin",   0x00000, 0x20000, CRC(db309c84) SHA1(ee095e4a3bc86737539784945decb1f63da47b9b) )  /* sprites */
@@ -1750,6 +1750,51 @@ ROM_START( ddragon2u )
 	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon) */
 ROM_END
 
+ROM_START( ddragon2b )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "3",   0x08000, 0x8000, CRC(5cc38bad) SHA1(8ebbb998cce48b5baa4a738c2d4c2e481e2637fb) )
+	ROM_LOAD( "4",   0x10000, 0x8000, CRC(78750947) SHA1(6b8349c3cd27c37a4329cea213b6ff0167c4edee) )
+	ROM_LOAD( "5",   0x18000, 0x8000, CRC(49ddddcd) SHA1(91dc53718d04718b313f23d86e241027c89d1a03) )
+	ROM_LOAD( "6",   0x20000, 0x8000, CRC(097eaf26) SHA1(60504abd30fec44c45197cdf3832c87d05ef577d) )
+
+	ROM_REGION( 0x10000, "sub", 0 ) /* sprite CPU 64kb (Upper 16kb = 0) */
+	ROM_LOAD( "2",   0x00000, 0x10000, CRC(ea437867) SHA1(cd910203af0565f981b9bdef51ea6e9c33ee82d3) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* music CPU, 64kb */
+	ROM_LOAD( "11",   0x00000, 0x8000, CRC(75e36cd6) SHA1(f24805f4f6925b3ac508e66a6fc25c275b05f3b9) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "1",   0x00000, 0x10000, CRC(3ad1049c) SHA1(11d9544a56f8e6a84beb307a5c8a9ff8afc55c66) )  /* chars */
+
+	ROM_REGION( 0xc0000, "gfx2", 0 )
+	ROM_LOAD( "27",   0x00000, 0x10000, CRC(fe42df5d) SHA1(aab801346c2db04263cb61c97c6e086387675586) )  /* sprites */
+	ROM_LOAD( "26",   0x10000, 0x10000, CRC(42f582c6) SHA1(bb269f677321f706043aa33a12bd3ddda4c32e55) )
+	ROM_LOAD( "23",   0x20000, 0x10000, CRC(e157319f) SHA1(8b898fa20329b12293e7cb7ffc2e1b17304f826f) )
+	ROM_LOAD( "22",   0x30000, 0x10000, CRC(82e952c9) SHA1(d340262c11f3c0ef3640c487e6a78745a2fe97d4) )
+	ROM_LOAD( "25",   0x40000, 0x10000, CRC(4a4a085d) SHA1(80786c6fda135af1f9e9d8191879ab27baf36167) )
+	ROM_LOAD( "24",   0x50000, 0x10000, CRC(c9d52536) SHA1(54f9236c4d22e3fd79d66c3f45b134f1fc9a1d32) )
+	ROM_LOAD( "21",   0x60000, 0x10000, CRC(32ab0897) SHA1(f992dc3876621896b6e1fd6518f576b48d54a631) )
+	ROM_LOAD( "20",   0x70000, 0x10000, CRC(a68e168f) SHA1(6ae596c097d7d435b767207012de1d23316d86d4) )
+	ROM_LOAD( "17",   0x80000, 0x10000, CRC(882f99b1) SHA1(2fbb9171a2c9ddab177efe1e89e96426643d382b) )
+	ROM_LOAD( "16",   0x90000, 0x10000, CRC(e2fe3eca) SHA1(bfd2e91261b9a002a99998486a2b606d4ee2e59b) )
+	ROM_LOAD( "18",   0xa0000, 0x10000, CRC(0e1c6c63) SHA1(506e43161992c41d9b77c1df11228117f0587cbd) )
+	ROM_LOAD( "19",   0xb0000, 0x10000, CRC(0e21eae0) SHA1(0cde9cdc6dbe2015e7f38b391c78cf3f16658e5c) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "15",   0x00000, 0x10000, CRC(3c3f16f6) SHA1(2fccbf1dd072c59b5923631fc1c6d40f7ea63996))
+	ROM_LOAD( "13",   0x10000, 0x10000, CRC(7c21be72) SHA1(9935c983d0f7613ee192758ddcd8d8592e8bf78a) )
+	ROM_LOAD( "14",   0x20000, 0x10000, CRC(e92f91f4) SHA1(4351b2b117c1104dcdb6f48531ddad385691c945) )
+	ROM_LOAD( "12",   0x30000, 0x10000, CRC(6896e2f7) SHA1(d230d2406ae451f59d1d0783b1d670a0d3e28d8c) )
+	
+	ROM_REGION( 0x40000, "oki", 0 ) /* adpcm samples */
+	ROM_LOAD( "7",   0x00000, 0x10000, CRC(6d9e3f0f) SHA1(5c3e7fb2e46939dd3c540b9e1af9591dbfd15b19) )
+	ROM_LOAD( "9",   0x10000, 0x10000, CRC(0c15dec9) SHA1(b0a6bb13216f4321b5fc01a649ea84d2d1d51088) )
+	ROM_LOAD( "8",   0x20000, 0x10000, CRC(151b22b4) SHA1(3b0470df9b719dd76115d8c549010ec92e28d0d0) )
+	ROM_LOAD( "10",  0x30000, 0x10000, CRC(ae2fc028) SHA1(94fea9088b7b412706b6aaf7aac856709649fb63) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // wasn't in this set, is it still present?
+	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon) */
+ROM_END
 
 ROM_START( tstrike )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + bankswitched memory */
@@ -2145,6 +2190,7 @@ GAME( 1987, ddragon6809a,ddragon,  ddragon6809, ddragon, ddragon_state,  ddragon
 GAME( 1988, ddragon2,    0,        ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ddragon2u,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ddragon2j,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump
+GAME( 1988, ddragon2b,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these were conversions of double dragon */
 GAME( 1991, tstrike,  0,        darktowr, tstrike, ddragon_state,  darktowr, ROT0, "East Coast Coin Company", "Thunder Strike (set 1)", MACHINE_SUPPORTS_SAVE ) // same manufacturer as The Game Room?
