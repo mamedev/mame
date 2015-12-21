@@ -32,6 +32,7 @@ Lower board (MGP_01):
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/nvram.h"
+#include "video/resnet.h"
 
 #include "monzagp.lh"
 
@@ -45,8 +46,11 @@ public:
 		m_palette(*this, "palette"),
 		m_nvram(*this, "nvram"),
 		m_gfx1(*this, "gfx1"),
+		m_gfx2(*this, "gfx2"),
+		m_gfx3(*this, "gfx3"),
 		m_tile_attr(*this, "unk1"),
 		m_proms(*this, "proms"),
+		m_steering_wheel(*this, "WHEEL"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_dsw(*this, "DSW")
@@ -67,8 +71,11 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<nvram_device> m_nvram;
 	required_memory_region m_gfx1;
+	required_memory_region m_gfx2;
+	required_memory_region m_gfx3;
 	required_memory_region m_tile_attr;
 	required_memory_region m_proms;
+	required_ioport m_steering_wheel;
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_ioport m_dsw;
@@ -79,6 +86,8 @@ private:
 	UINT8 m_video_ctrl[2][8];
 	bool  m_time_tick;
 	bool  m_cp_ruote;
+	UINT8 m_collisions_ff;
+	UINT8 m_collisions_clk;
 	UINT8 m_mycar_pos;
 	std::unique_ptr<UINT8[]> m_vram;
 	std::unique_ptr<UINT8[]> m_score_ram;
@@ -93,6 +102,42 @@ TIMER_DEVICE_CALLBACK_MEMBER(monzagp_state::time_tick_timer)
 
 PALETTE_INIT_MEMBER(monzagp_state, monzagp)
 {
+	static const int r_resistances[3] = { 220, 1000, 3300 };
+	static const int g_resistances[3] = { 100, 470 , 1500 };
+	static const int b_resistances[3] = { 100, 470 , 1500 };
+	double rweights[3], gweights[3], bweights[3];
+
+	// compute the color output resistor weights
+	compute_resistor_weights(0, 255, -1.0,
+			3, &r_resistances[0], rweights, 0, 0,
+			3, &g_resistances[0], gweights, 0, 0,
+			3, &b_resistances[0], bweights, 0, 0);
+
+	for (int i = 0; i < 0x100; i++)
+	{
+		int bit0 = 0, bit1 = 0, bit2 = 0;
+		UINT8 d = m_proms->base()[0x400 + i] ^ 0x0f;
+
+		if (d & 0x08)
+		{
+			bit1 = BIT(i, 0);
+			bit2 = BIT(i, 1);
+		}
+
+		// red component
+		bit0 = (d >> 2) & 0x01;
+		int r = combine_3_weights(rweights, bit0, bit1, bit2);
+
+		// green component
+		bit0 = (d >> 1) & 0x01;
+		int g = combine_3_weights(gweights, bit0, bit1, bit2);
+
+		// blue component
+		bit0 = (d >> 0) & 0x01;
+		int b = combine_3_weights(bweights, bit0, bit1, bit2);
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
 }
 
 void monzagp_state::video_start()
@@ -101,7 +146,9 @@ void monzagp_state::video_start()
 	m_score_ram = std::make_unique<UINT8[]>(0x100);
 	m_time_tick = 0;
 	m_cp_ruote = 0;
-	m_mycar_pos = 7*16;
+	m_mycar_pos = 0;
+	m_collisions_ff = 0;
+	m_collisions_clk = 0;
 	save_pointer(NAME(m_vram.get()), 0x800);
 	save_pointer(NAME(m_score_ram.get()), 0x100);
 
@@ -123,59 +170,75 @@ UINT32 monzagp_state::screen_update_monzagp(screen_device &screen, bitmap_ind16 
 
 	// background tilemap
 	UINT8 *tile_table = m_proms->base() + 0x100;
-	UINT8 start_tile = m_video_ctrl[0][0] >> 5;
+	UINT8 *collisions_prom = m_proms->base() + 0x200;
 
-	for(int y=0; y<8; y++)
+	UINT8 start_tile = m_video_ctrl[0][0] ^ 0xff;
+	UINT8 inv_counter = m_video_ctrl[0][1] ^ 0xff;
+	UINT8 mycar_y = m_mycar_pos;
+	bool inv = false;
+
+	for(int y=0; y<=256; y++, start_tile += inv ? -1 : +1)
 	{
-		UINT16 start_x = ((m_video_ctrl[0][3] << 8) | m_video_ctrl[0][2]) ^ 0xffff;
-		bool inv = y > 3;
+		if (inv_counter++ == 0xff)
+			inv = true;
 
-		for(int x=0;x<64;x++)
+		UINT16 start_x = (((m_video_ctrl[0][3] << 8) | m_video_ctrl[0][2]) ^ 0xffff);
+		UINT8 mycar_x = m_video_ctrl[1][2];
+
+		for(int x=0; x<=256; x++, start_x++)
 		{
-			UINT8 tile_attr = m_tile_attr->base()[((start_x >> 5) & 0x07) | (((start_x >> 8) & 0x3f) << 3) | ((start_x >> 6) & 0x200)];
+			UINT8 tile_attr = m_tile_attr->base()[((start_x >> 5) & 0x1ff) | ((m_video_ctrl[0][3] & 0x80) ? 0 : 0x200)];
 
 			//if (tile_attr & 0x10)         printf("dark on\n");
 			//if (tile_attr & 0x20)         printf("light on\n");
 			//if (tile_attr & 0x40)         printf("bridge\n");
 
-			int tile_idx = tile_table[((tile_attr & 0x0f) << 4) | (inv ? 0x08 : 0) | (start_tile & 0x07)];
-			int tile = (tile_idx << 3) | (((start_x) >> 2) & 0x07);
+			int tile_idx = tile_table[((tile_attr & 0x0f) << 4) | (inv ? 0x08 : 0) | ((start_tile >> 5) & 0x07)];
 
-			m_gfxdecode->gfx(2)->opaque(bitmap,cliprect,
-				tile ^ 4,
-				0,
-				0, inv,
-				x*4,y*32);
+			int bit_pos = 3 - (start_x & 3);
+			UINT8 tile_data = m_gfx3->base()[(tile_idx << 8) | (((start_x << 3) & 0xe0) ^ 0x80) | (start_tile & 0x1f)];
+			UINT8 tile_color = (BIT(tile_data, 4 + bit_pos) << 1) | BIT(tile_data, bit_pos);
+			int color = (tile_idx << 2) | tile_color;
 
-			start_x += 4;
-		}
 
-		if (y < 3)
-			start_tile++;
-		else if (y > 3)
-			start_tile--;
-	}
+			// other cars sprites
+			bool othercars = false;
+			// TODO: other cars sprites
 
-	// my car sprite
-	if (m_video_ctrl[1][3] & 0x18)
-	{
-		int start_sprite = (((m_video_ctrl[1][3] & 0x18)) << 3) | (m_video_ctrl[1][3] & 0x06);
 
-		if (m_cp_ruote && (m_video_ctrl[1][3] & 0x0e) == 0)
-			start_sprite |= 0x02;
-
-		for(int y=0; y<2; y++)
-			for(int x=0; x<4*8; x+=4)
+			// my car sprite
+			bool mycar = false;
+			int mycar_size = m_video_ctrl[1][3] & 0x20 ? 16 : 32;
+			if ((m_video_ctrl[1][3] & 0x18) && x >= m_video_ctrl[1][2] && x < m_video_ctrl[1][2] + 4*8 && y > m_mycar_pos - mycar_size  && y < m_mycar_pos + mycar_size)
 			{
-				int sprite = start_sprite | ((x << 1) & 0x38);
+				int hpos = x - mycar_x;
+				int vpos = y > mycar_y ? ((y - mycar_y) ^ 0x1f) : mycar_y - y;
+				int sprite_idx = (((m_video_ctrl[1][3] & 0x18)) << 2) | (hpos & 0x1c) | (((m_video_ctrl[1][3] & 0x06) >> 1) ^ 0x03);
 
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-					(sprite ^ 0x06) + y,
-					0,
-					0, 0,
-					m_video_ctrl[1][2] + x, m_mycar_pos + (1 - y) * 16,
-					3);
+				if (y <= mycar_y - 16  || y >= mycar_y + 16)            sprite_idx ^= 0x61;
+				else if (m_cp_ruote && (m_video_ctrl[1][3] & 0x10))     sprite_idx ^= 0x01;
+
+				int bitpos = 3 - (hpos & 3);
+				UINT8 sprite_data = m_gfx2->base()[(sprite_idx << 5) | (vpos & 0x1f)];
+				UINT8 sprite_color = (BIT(sprite_data, 4 + bitpos) << 1) | BIT(sprite_data, bitpos);
+
+				if ((sprite_color & 3) != 3)
+				{
+					color = 0x100 + sprite_color;
+					if (y > mycar_y - 16 && y < mycar_y + 16)
+						mycar = true;
+				}
 			}
+
+			if (cliprect.contains(x, y))
+				bitmap.pix16(y, x) = color;
+
+			// collisions
+			UINT8 coll_prom_addr = BITSWAP8(tile_idx, 7, 6, 5, 4, 2, 0, 1, 3);
+			UINT8 collisions = collisions_prom[((mycar && othercars) ? 0 : 0x80) | (inv ? 0x40 : 0) | (coll_prom_addr << 2) | (mycar ? 0 : 0x02) | (tile_color & 0x01)];
+			m_collisions_ff |= ((m_collisions_clk ^ collisions) & collisions);
+			m_collisions_clk = collisions;
+		}
 	}
 
 	// characters
@@ -241,14 +304,7 @@ READ8_MEMBER(monzagp_state::port_r)
 	if (!(m_p1 & 0x80))
 	{
 		//printf("ext 7 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
-		data = 0;
-		if(machine().input().code_pressed(KEYCODE_1_PAD))      data |= 0x01;
-		if(machine().input().code_pressed(KEYCODE_2_PAD))      data |= 0x02;
-		if(machine().input().code_pressed(KEYCODE_3_PAD))      data |= 0x04;
-		if(machine().input().code_pressed(KEYCODE_4_PAD))      data |= 0x08;
-
-		if (m_time_tick)
-			data |= 0x10;
+		data = m_collisions_ff | (m_time_tick ? 0x10 : 0);
 	}
 
 	return data;
@@ -308,6 +364,22 @@ WRITE8_MEMBER(monzagp_state::port_w)
 		//printf("ext 7 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
 		m_video_ctrl[0][(offset>>0) & 0x07] = data;
 		m_video_ctrl[1][(offset>>3) & 0x07] = data;
+
+		if (((offset>>0) & 0x07) == 0x04)           m_collisions_ff = 0;
+		if (((offset>>3) & 0x07) == 0x04)           m_mycar_pos = 0xbf;
+
+		if ((m_video_ctrl[1][3] & 1) == 0)
+		{
+			if (((offset>>3) & 0x07) == 0x00)       m_mycar_pos++;
+			if (((offset>>3) & 0x07) == 0x01)       m_mycar_pos--;
+		}
+
+		if ((offset & 0x80) && (m_video_ctrl[1][3] & 0x01))
+		{
+			UINT8 steering_wheel = m_steering_wheel->read();
+			if (steering_wheel & 0x01)              m_mycar_pos--;
+			if (steering_wheel & 0x02)              m_mycar_pos++;
+		}
 	}
 }
 
@@ -336,6 +408,10 @@ static ADDRESS_MAP_START( monzagp_io, AS_IO, 8, monzagp_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( monzagp )
+	PORT_START("WHEEL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+
 	PORT_START("IN0")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
