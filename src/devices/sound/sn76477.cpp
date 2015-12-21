@@ -16,6 +16,9 @@
           application at http://zunzun.com to come up with the functions.
 
     Known issues/to-do's:
+        * Use RES_INF for unconnected resistor pins and treat 0 as a short
+          circuit
+
         * VCO
             * confirm value of VCO_MAX_EXT_VOLTAGE, VCO_TO_SLF_VOLTAGE_DIFF
               VCO_CAP_VOLTAGE_MIN and VCO_CAP_VOLTAGE_MAX
@@ -23,10 +26,14 @@
             * get real formulas for VCO cap charging and discharging
             * get real formula for VCO duty cycle
             * what happens if no vco_res
-            * what happens if no vco_cap
+            * what happens if no vco_cap (needed for laserbat/lazarian)
 
         * Attack/Decay
             * get real formulas for a/d cap charging and discharging
+
+        * Output
+            * what happens if output is taken at pin 12 with no feedback_res
+              (needed for laserbat/lazarian)
 
  *****************************************************************************/
 
@@ -159,28 +166,28 @@ sn76477_device::sn76477_device(const machine_config &mconfig, const char *tag, d
 		m_envelope_mode(0),
 		m_vco_mode(0),
 		m_mixer_mode(0),
-		m_one_shot_res(0),
+		m_one_shot_res(RES_INF),
 		m_one_shot_cap(0),
 		m_one_shot_cap_voltage_ext(0),
-		m_slf_res(0),
+		m_slf_res(RES_INF),
 		m_slf_cap(0),
 		m_slf_cap_voltage_ext(0),
 		m_vco_voltage(0),
-		m_vco_res(0),
+		m_vco_res(RES_INF),
 		m_vco_cap(0),
 		m_vco_cap_voltage_ext(0),
-		m_noise_clock_res(0),
+		m_noise_clock_res(RES_INF),
 		m_noise_clock_ext(0),
 		m_noise_clock(0),
-		m_noise_filter_res(0),
+		m_noise_filter_res(RES_INF),
 		m_noise_filter_cap(0),
 		m_noise_filter_cap_voltage_ext(0),
-		m_attack_res(0),
-		m_decay_res(0),
+		m_attack_res(RES_INF),
+		m_decay_res(RES_INF),
 		m_attack_decay_cap(0),
 		m_attack_decay_cap_voltage_ext(0),
-		m_amplitude_res(0),
-		m_feedback_res(0),
+		m_amplitude_res(RES_INF),
+		m_feedback_res(RES_INF),
 		m_pitch_voltage(0),
 		m_one_shot_cap_voltage(0),
 		m_one_shot_running_ff(0),

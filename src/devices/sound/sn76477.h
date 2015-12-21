@@ -63,7 +63,7 @@
 	sn76477_device::set_amp_res(*device, _amp_res);
 
 #define MCFG_SN76477_FEEDBACK_RES(_feedback_res) \
-	sn76477_device::set_feedack_res(*device, _feedback_res);
+	sn76477_device::set_feedback_res(*device, _feedback_res);
 
 #define MCFG_SN76477_VCO_PARAMS(_volt, _cap, _res) \
 	sn76477_device::set_vco_params(*device, _volt, _cap, _res);
@@ -111,7 +111,7 @@ public:
 		dev.m_attack_res = res;
 	}
 	static void set_amp_res(device_t &device, double amp_res) { downcast<sn76477_device &>(device).m_amplitude_res = amp_res; }
-	static void set_feedack_res(device_t &device, double feedback_res) { downcast<sn76477_device &>(device).m_feedback_res = feedback_res; }
+	static void set_feedback_res(device_t &device, double feedback_res) { downcast<sn76477_device &>(device).m_feedback_res = feedback_res; }
 	static void set_vco_params(device_t &device, double volt, double cap, double res)
 	{
 		sn76477_device &dev = downcast<sn76477_device &>(device);
