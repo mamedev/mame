@@ -662,7 +662,7 @@ ROM_START( xexexa ) /* Asia, Version AA */
 	ROM_LOAD( "067b07.1e",   0x200000, 0x100000, CRC(ec87fe1b) SHA1(ec9823aea5a1fc5c47c8262e15e10b28be87231c) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "er5911.19b",  0x0000, 0x0080, CRC(051c14c6) SHA1(23addbaa2ce323c06551b343ca45dea4fd2b9eee) ) // sldh - No actual label so create a unique one for this set
+	ROM_LOAD( "er5911.19b",  0x0000, 0x0080, CRC(051c14c6) SHA1(23addbaa2ce323c06551b343ca45dea4fd2b9eee) )
 ROM_END
 
 ROM_START( xexexj ) /* Japan, Version AA */
@@ -693,7 +693,7 @@ ROM_START( xexexj ) /* Japan, Version AA */
 	ROM_LOAD( "067b07.1e",   0x200000, 0x100000, CRC(ec87fe1b) SHA1(ec9823aea5a1fc5c47c8262e15e10b28be87231c) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "er5911.19b",  0x0000, 0x0080, CRC(79a79c7b) SHA1(02eb235226949af0147d6d0fd2bd3d7a68083ae6) ) // sldh - No actual label so create a unique one for this set
+	ROM_LOAD( "er5911.19b",  0x0000, 0x0080, CRC(79a79c7b) SHA1(02eb235226949af0147d6d0fd2bd3d7a68083ae6) )
 ROM_END
 
 
