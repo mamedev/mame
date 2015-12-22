@@ -2503,6 +2503,18 @@ ROM_START(wcombatk) //*
 	DISK_IMAGE( "c22c02", 0, BAD_DUMP SHA1(8bd1dfbf926ad5b28fa7dafd7e31c475325ec569) )
 ROM_END
 
+ROM_START(wcombatu) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("Warzaid u39 c22d02", 0x00000, 0x2000, CRC(71744990) SHA1(19ed07572f183e7b3a712704ebddf7a848c48a78) )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	// CHD image provided had evidence of being altered by Windows, probably was put in a Windows machine without write protection hardware (bad idea)
+	// label was the same as this, so this should be a clean and correct version.
+	DISK_IMAGE( "c22d02", 0, SHA1(69a24c9e36b073021d55bec27d89fcc0254a60cc) ) // chs 978,8,3
+ROM_END
+
 ROM_START(wcombatj) //*
 	VIPER_BIOS
 
@@ -2635,8 +2647,9 @@ GAME(2001, thrild2a,  thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Ko
 GAME(2001, thrild2c,  thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, tsurugi,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, tsurugij,  tsurugi,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, wcombat,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver UAA?)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME(2002, wcombatk,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver KBC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombat,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombatk,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver KBC:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombatu,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat / Warzaid (ver UCD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombatj,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, xtrial,    kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Xtrial Racing (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 
