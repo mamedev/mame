@@ -8,7 +8,6 @@
 
      Todo:
         - implement CS
-        - implement 4 bit mode (mask programmed)
         - implement chip addressing (0-15 mask programmed)
 
      TMS6100:
@@ -74,7 +73,6 @@
 
 ***********************************************************************************************/
 
-#include "emu.h"
 #include "tms6100.h"
 
 #define VERBOSE     (0)
@@ -88,23 +86,21 @@
 #define TMS6100_READ_PENDING        0x01
 #define TMS6100_NEXT_READ_IS_DUMMY  0x02
 
-/* Variants */
-
-#define TMS6110_IS_TMS6100    (1)
-#define TMS6110_IS_M58819     (2)
-
-
 const device_type TMS6100 = &device_creator<tms6100_device>;
 
 tms6100_device::tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_rom(*this, DEVICE_SELF)
+	m_rom(*this, DEVICE_SELF),
+	m_reverse_bits(false),
+	m_4bit_read(false)
 {
 }
 
 tms6100_device::tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS6100, "TMS6100", tag, owner, clock, "tms6100", __FILE__),
-	m_rom(*this, DEVICE_SELF)
+	m_rom(*this, DEVICE_SELF),
+	m_reverse_bits(false),
+	m_4bit_read(false)
 {
 }
 
@@ -116,49 +112,12 @@ m58819_device::m58819_device(const machine_config &mconfig, const char *tag, dev
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tms6100_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void tms6100_device::device_start()
 {
-	// save device variables
-	save_item(NAME(m_addr_bits));
-	save_item(NAME(m_address));
-	save_item(NAME(m_address_latch));
-	save_item(NAME(m_tms_clock));
-	save_item(NAME(m_data));
-	save_item(NAME(m_loadptr));
-	save_item(NAME(m_m0));
-	save_item(NAME(m_m1));
-	save_item(NAME(m_state));
-	save_item(NAME(m_variant));
-	set_variant(TMS6110_IS_TMS6100);
-
-}
-
-void m58819_device::device_start()
-{
-	tms6100_device::device_start();
-	set_variant(TMS6110_IS_M58819);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void tms6100_device::device_reset()
-{
-	/* initialize the chip */
+	// zerofill
 	m_addr_bits = 0;
 	m_address = 0;
 	m_address_latch = 0;
@@ -166,36 +125,67 @@ void tms6100_device::device_reset()
 	m_m0 = 0;
 	m_m1 = 0;
 	m_state = 0;
-	m_tms_clock = 0;
 	m_data = 0;
+	m_tms_clock = 0;
+
+	// save device variables
+	save_item(NAME(m_addr_bits));
+	save_item(NAME(m_address));
+	save_item(NAME(m_address_latch));
+	save_item(NAME(m_loadptr));
+	save_item(NAME(m_m0));
+	save_item(NAME(m_m1));
+	save_item(NAME(m_state));
+	save_item(NAME(m_data));
+	save_item(NAME(m_tms_clock));
 }
 
-void tms6100_device::set_variant(int variant)
+void m58819_device::device_start()
 {
-	m_variant = variant;
+	tms6100_device::device_start();
+	m_reverse_bits = true; // m58819 'vsm-emulator' chip expects ROM bit order backwards
 }
 
-WRITE_LINE_MEMBER(tms6100_device::tms6100_m0_w)
+
+// external i/o
+
+WRITE_LINE_MEMBER(tms6100_device::m0_w)
 {
-	if (state != m_m0)
-		m_m0 = state;
+	m_m0 = (state) ? 1 : 0;
 }
 
-WRITE_LINE_MEMBER(tms6100_device::tms6100_m1_w)
+WRITE_LINE_MEMBER(tms6100_device::m1_w)
 {
-	if (state != m_m1)
-		m_m1 = state;
+	m_m1 = (state) ? 1 : 0;
 }
 
-WRITE_LINE_MEMBER(tms6100_device::tms6100_romclock_w)
+WRITE8_MEMBER(tms6100_device::addr_w)
 {
-	/* process on falling edge */
+	m_addr_bits = data & 0xf;
+}
+
+READ8_MEMBER(tms6100_device::data_r)
+{
+	return m_data;
+}
+
+READ_LINE_MEMBER(tms6100_device::data_line_r)
+{
+	return m_data;
+}
+
+
+// CLK line
+
+WRITE_LINE_MEMBER(tms6100_device::romclock_w)
+{
+	// process on falling edge
 	if (m_tms_clock && !state)
 	{
-		switch ((m_m1<<1) | m_m0)
+		switch (m_m1 << 1 | m_m0)
 		{
 		case 0x00:
-			/* NOP in datasheet, not really ... */
+			// NOP in datasheet, not really ...
 			if (m_state & TMS6100_READ_PENDING)
 			{
 				if (m_state & TMS6100_NEXT_READ_IS_DUMMY)
@@ -208,38 +198,46 @@ WRITE_LINE_MEMBER(tms6100_device::tms6100_romclock_w)
 				}
 				else
 				{
-					/* read bit at address */
-					if (m_variant == TMS6110_IS_M58819)
+					// read bit(s) at address
+					UINT8 word = m_rom[m_address >> 3];
+					if (m_reverse_bits)
+						word = BITSWAP8(word,0,1,2,3,4,5,6,7);
+					
+					if (m_4bit_read)
 					{
-						m_data = (m_rom[m_address >> 3] >> (7-(m_address & 0x07))) & 1;
+						m_data = word >> (m_address & 7) & 0xf;
+						m_address += 4;
 					}
-					else // m_variant == (TMS6110_IS_TMS6100 || TMS6110_IS_TMS6125)
+					else
 					{
-						m_data = (m_rom[m_address >> 3] >> (m_address & 0x07)) & 1;
+						m_data = word >> (m_address & 7) & 1;
+						m_address++;
 					}
-					m_address++;
 				}
 				m_state &= ~TMS6100_READ_PENDING;
 			}
 			break;
+
 		case 0x01:
-			/* READ */
+			// READ
 			m_state |= TMS6100_READ_PENDING;
 			break;
+
 		case 0x02:
-			/* LOAD ADDRESS */
+			// LOAD ADDRESS
 			m_state |= TMS6100_NEXT_READ_IS_DUMMY;
 			m_address_latch |= (m_addr_bits << m_loadptr);
 			LOG(("loaded address latch %08x\n", m_address_latch));
 			m_loadptr += 4;
 			break;
+
 		case 0x03:
-			/* READ AND BRANCH */
+			// READ AND BRANCH
 			if (m_state & TMS6100_NEXT_READ_IS_DUMMY)
 			{
-				m_state &= ~TMS6100_NEXT_READ_IS_DUMMY;  // clear - no dummy read according to datasheet
+				m_state &= ~TMS6100_NEXT_READ_IS_DUMMY; // clear - no dummy read according to datasheet
 				LOG(("loaded address latch %08x\n", m_address_latch));
-				m_address = m_rom[m_address_latch] | (m_rom[m_address_latch+1]<<8);
+				m_address = m_rom[m_address_latch] | (m_rom[m_address_latch+1] << 8);
 				m_address &= 0x3fff; // 14 bits
 				LOG(("loaded indirect address %04x\n", m_address));
 				m_address = (m_address << 3);
@@ -250,15 +248,4 @@ WRITE_LINE_MEMBER(tms6100_device::tms6100_romclock_w)
 		}
 	}
 	m_tms_clock = state;
-}
-
-WRITE8_MEMBER(tms6100_device::tms6100_addr_w)
-{
-	if (data != m_addr_bits)
-		m_addr_bits = data;
-}
-
-READ_LINE_MEMBER(tms6100_device::tms6100_data_r)
-{
-	return m_data;
 }

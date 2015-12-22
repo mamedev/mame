@@ -526,7 +526,6 @@ void tispeak_state::power_off()
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_tms5100->reset();
-	m_tms6100->reset();
 
 	m_power_on = false;
 }
@@ -902,11 +901,11 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_FRAGMENT( tms5110_route )
 
 	/* sound hardware */
-	MCFG_TMS5110_M0_CB(DEVWRITELINE("tms6100", tms6100_device, tms6100_m0_w))
-	MCFG_TMS5110_M1_CB(DEVWRITELINE("tms6100", tms6100_device, tms6100_m1_w))
-	MCFG_TMS5110_ADDR_CB(DEVWRITE8("tms6100", tms6100_device, tms6100_addr_w))
-	MCFG_TMS5110_DATA_CB(DEVREADLINE("tms6100", tms6100_device, tms6100_data_r))
-	MCFG_TMS5110_ROMCLK_CB(DEVWRITELINE("tms6100", tms6100_device, tms6100_romclock_w))
+	MCFG_TMS5110_M0_CB(DEVWRITELINE("tms6100", tms6100_device, m0_w))
+	MCFG_TMS5110_M1_CB(DEVWRITELINE("tms6100", tms6100_device, m1_w))
+	MCFG_TMS5110_ADDR_CB(DEVWRITE8("tms6100", tms6100_device, addr_w))
+	MCFG_TMS5110_DATA_CB(DEVREADLINE("tms6100", tms6100_device, data_line_r))
+	MCFG_TMS5110_ROMCLK_CB(DEVWRITELINE("tms6100", tms6100_device, romclock_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
