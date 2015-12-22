@@ -93,6 +93,7 @@
 
 #define LOG_TLCS_TO_PPC_COMMANDS        1
 #define LOG_PPC_TO_TLCS_COMMANDS        1
+#define LOG_DISPLAY_LIST					0
 
 class taitopjc_state : public driver_device
 {
@@ -139,6 +140,7 @@ public:
 	UINT32 videochip_r(offs_t address);
 	void videochip_w(offs_t address, UINT32 data);
 	void video_exit();
+	void print_display_list();
 
 	DECLARE_DRIVER_INIT(optiger);
 
@@ -196,16 +198,13 @@ UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_ind1
 
 	bitmap.fill(0x000000, cliprect);
 
+	UINT16 *s16 = (UINT16*)m_screen_ram.get();
+
 	for (u=0; u < 24; u++)
 	{
 		for (t=0; t < 32; t++)
 		{
-			UINT32 tile = m_screen_ram[0x3f000 + (((u*32)+(t/2)) ^ 0)];
-
-			if (t & 1)
-				tile &= 0xffff;
-			else
-				tile >>= 16;
+			UINT16 tile = s16[(0x7e000 + (u*64) + t) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
 
 			int palette = (tile >> 12) & 0xf;
 
@@ -216,7 +215,7 @@ UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_ind1
 				UINT16 *fb = &bitmap.pix16(y+(u*16));
 				for (x=0; x < 16; x++)
 				{
-					UINT8 p = s[((tile*256) + ((y*16)+x)) ^3];
+					UINT8 p = s[((tile*256) + ((y*16)+x)) ^ NATIVE_ENDIAN_VALUE_LE_BE(3,0)];
 					if (p != 0)
 					{
 						fb[x+(t*16)] = (palette << 8) + p;
@@ -366,6 +365,79 @@ READ64_MEMBER(taitopjc_state::dsp_r)
 	return r;
 }
 
+void taitopjc_state::print_display_list()
+{
+	int ptr = 0;
+
+	UINT16 cmd = m_dsp_ram[0xffe];
+	if (cmd == 0x5245)
+	{
+		printf("DSP command RE\n");
+		bool end = false;
+		do
+		{
+			UINT16 w = m_dsp_ram[ptr++];
+			if (w & 0x8000)
+			{
+				int count = (w & 0x7fff) + 1;
+				UINT16 d = m_dsp_ram[ptr++];
+				for (int i=0; i < count; i++)
+				{					
+					UINT16 s = m_dsp_ram[ptr++];
+					printf("   %04X -> [%04X]\n", s, d);
+					d++;
+				}
+			}
+			else if (w == 0)
+			{
+				end = true;
+			}
+			else
+			{
+				switch (w)
+				{
+					case 0x406d:
+						printf("   Call %04X [%04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1]);
+						ptr += 2;
+						break;
+					case 0x40cd:
+						printf("   Call %04X [%04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1]);
+						ptr += 2;
+						break;
+					case 0x40ac:
+						printf("   Call %04X [%04X %04X %04X %04X %04X %04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2], m_dsp_ram[ptr+3], m_dsp_ram[ptr+4], m_dsp_ram[ptr+5], m_dsp_ram[ptr+6], m_dsp_ram[ptr+7]);
+						ptr += 8;
+						break;
+					case 0x4774:
+						printf("   Call %04X [%04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2]);
+						ptr += 3;
+						break;
+					case 0x47d9:
+						printf("   Call %04X [%04X %04X %04X %04X %04X %04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2], m_dsp_ram[ptr+3], m_dsp_ram[ptr+4], m_dsp_ram[ptr+5], m_dsp_ram[ptr+6], m_dsp_ram[ptr+7]);
+						ptr += 8;
+						break;
+					default:
+					{
+						printf("Unknown call %04X\n", w);
+						for (int i=0; i < 10; i++)
+						{
+							printf("%04X\n", m_dsp_ram[ptr++]);
+						}
+						fatalerror("Unknown call %04X\n", w);
+						break;
+					}
+				}
+			}
+		} while(!end);
+	}
+	else
+	{
+		if (cmd != 0)
+			printf("DSP command %04X\n", cmd);
+		return;
+	}
+}
+
 WRITE64_MEMBER(taitopjc_state::dsp_w)
 {
 	//logerror("dsp_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask), space.device().safe_pc());
@@ -385,7 +457,9 @@ WRITE64_MEMBER(taitopjc_state::dsp_w)
 		}
 		#endif
 
-		printf("DSP command %04X\n", (UINT16)(data >> 48) & 0xffff);
+#if LOG_DISPLAY_LIST
+		print_display_list();
+#endif
 	}
 
 	if (ACCESSING_BITS_48_63)
