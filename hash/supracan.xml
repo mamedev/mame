@@ -3,7 +3,8 @@
 <softwarelist name="supracan" description="Funtech Super A'Can cartridges">
 	
   
-  <software name="formduel"> <!-- F001 - 福爾摩沙大對決 (Formosa Da Dui Jue) - aka Formosa Duel -->
+  <!-- appears to work, but gameplay logic is broken, attack pieces don't drop down, game can get stuck, can sometimes rotate pieces through other pieces too! -->
+  <software name="formduel" supported="no"> <!-- F001 - 福爾摩沙大對決 (Formosa Da Dui Jue) - aka Formosa Duel -->
 		<description>Formosa Duel</description>
 		<year>1995</year>
 		<publisher>AV Artisan Corp.</publisher>
