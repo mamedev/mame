@@ -19,8 +19,20 @@ ToDo:
 #include "imagedev/cassette.h"
 #include "formats/spc1000_cas.h"
 #include "bus/centronics/ctronics.h"
-
+#define VDP_CLOCK  XTAL_42_9545MHz
 #include "softlist.h"
+
+struct scrn_reg_t
+{
+	UINT8 gfx_bank;
+	UINT8 disp_bank;
+	UINT8 pcg_mode;
+	UINT8 v400_mode;
+	UINT8 ank_sel;
+
+	UINT8 pri;
+	UINT8 blackclip; // x1 turbo specific
+};
 
 class spc1500_state : public driver_device
 {
@@ -61,6 +73,12 @@ public:
 	DECLARE_WRITE8_MEMBER(romsel_w);
 	DECLARE_WRITE8_MEMBER(ramsel_w);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void video_start_crtc();
+	void draw_pixel(bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height);
+	UINT8 check_prev_height(int x,int y,int x_size);
+	UINT8 check_line_valid_height(int y,int x_size,int height);	
+	void draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprect);
+	int priority_mixer_pri(int color);
 private:
 	UINT8 m_IPLK;
 	UINT8 m_GMODE;
@@ -80,6 +98,17 @@ private:
 	required_ioport m_io_joy;
 	required_device<centronics_device> m_centronics;
 	required_device<i8255_device> m_pio;
+	required_device<palette_device> m_palette;	
+	std::unique_ptr<UINT8[]> m_tvram;         /**< Pointer for Text Video RAM */
+	std::unique_ptr<UINT8[]> m_avram;         /**< Pointer for Attribute Video RAM */
+	std::unique_ptr<UINT8[]> m_kvram;         /**< Pointer for Extended Kanji Video RAM (X1 Turbo) */	
+	std::unique_ptr<UINT8[]> m_gfx_bitmap_ram;    /**< Pointer for bitmap layer RAM. */
+	std::unique_ptr<UINT8[]> m_pcg_ram;       /**< Pointer for PCG GFX RAM */		
+	UINT8 m_is_turbo;       /**< Machine type: (0) X1 Vanilla, (1) X1 Turbo */
+	int m_xstart,           /**< Start X offset for screen drawing. */
+		m_ystart;           /**< Start Y offset for screen drawing. */
+	UINT8 *m_Hangul_rom;     /**< Pointer for Kanji ROMs */		
+	scrn_reg_t m_scrn_reg;      /**< Base Video Registers. */	
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -144,16 +173,15 @@ WRITE8_MEMBER( spc1500_state::ramsel_w)
  *
  *************************************/
 
-VIDEO_START_MEMBER(spc1500_state,x1)
+VIDEO_START_MEMBER(spc1500_state,crtc)
 {
 	m_avram = make_unique_clear<UINT8[]>(0x800);
 	m_tvram = make_unique_clear<UINT8[]>(0x800);
 	m_kvram = make_unique_clear<UINT8[]>(0x800);
 	m_gfx_bitmap_ram = make_unique_clear<UINT8[]>(0xc000*2);
-	m_pal_4096 = make_unique_clear<UINT8[]>(0x1000*3);
 }
 
-void spc1500_state::x1_draw_pixel(bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height)
+void spc1500_state::draw_pixel(bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height)
 {
 	if(!machine().first_screen()->visible_area().contains(x, y))
 		return;
@@ -248,20 +276,6 @@ void spc1500_state::draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprec
 			int knj_side = 0;
 			int knj_bank = 0;
 			int knj_uline = 0;
-			if(m_is_turbo)
-			{
-				knj_enable = BIT(m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 7);
-				knj_side = BIT(m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 6);
-				knj_uline = BIT(m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 5);
-				//knj_lv2 = BIT(m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 4);
-				knj_bank = m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x0f;
-				if(knj_enable)
-				{
-					gfx_data = m_Hangul_rom;
-					tile = ((tile + (knj_bank << 8)) << 1) + (knj_side & 1);
-				}
-			}
-
 			{
 				int pen[3],pen_mask,pcg_pen,xi,yi,dy;
 
@@ -352,7 +366,7 @@ void spc1500_state::draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprec
 						if(res_y < cliprect.min_y || res_y > cliprect.max_y) // partial update, TODO: optimize
 							continue;
 
-						x1_draw_pixel(bitmap,res_y,res_x,pcg_pen,width,0);
+						draw_pixel(bitmap,res_y,res_x,pcg_pen,width,0);
 					}
 				}
 			}
@@ -435,7 +449,7 @@ void spc1500_state::draw_gfxbitmap(bitmap_rgb32 &bitmap,const rectangle &cliprec
 					if(y*(mc6845_tile_height)+yi < cliprect.min_y || y*(mc6845_tile_height)+yi > cliprect.max_y) // partial update TODO: optimize
 						continue;
 
-					x1_draw_pixel(bitmap,y*(mc6845_tile_height)+yi,x*8+xi,color,0,0);
+					draw_pixel(bitmap,y*(mc6845_tile_height)+yi,x*8+xi,color,0,0);
 				}
 			}
 		}
@@ -664,6 +678,17 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 
 	MCFG_PALETTE_ADD("palette", /* CGA_PALETTE_SETS * 16*/ 65536 )
 
+#if 1	
+	MCFG_MC6845_ADD("crtc", H46505, "screen", (VDP_CLOCK/48)) //unknown divider
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
+	MCFG_PALETTE_INIT_OWNER(x1_state,x1)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x1)
+
+	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)	
+#else	
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_14_31818MHz/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
@@ -672,6 +697,7 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(spc1500_state, vsync_changed))
 	MCFG_MC6845_RECONFIGURE_CB(spc1500_state, reconfigure)
 	MCFG_VIDEO_SET_SCREEN(nullptr)
+#endif
 	
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(m_pio, data_w))
