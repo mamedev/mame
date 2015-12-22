@@ -52,7 +52,7 @@
   TODO:
   - spellb numbers don't match with picture book
   - spellb random lockups
-  - rev2 hardware needs 4-bit read support for tms6100 device
+  - rev2 hardware almost works
 
 
 ***************************************************************************/
@@ -83,6 +83,7 @@ public:
 
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
 	void power_off();
+	void prepare_display();
 
 	DECLARE_READ8_MEMBER(main_read_k);
 	DECLARE_WRITE16_MEMBER(main_write_o);
@@ -94,7 +95,8 @@ public:
 	DECLARE_WRITE16_MEMBER(sub_write_o);
 	DECLARE_WRITE16_MEMBER(sub_write_r);
 
-	void prepare_display();
+	DECLARE_WRITE16_MEMBER(rev2_write_o);
+	DECLARE_WRITE16_MEMBER(rev2_write_r);
 
 protected:
 	virtual void machine_start() override;
@@ -132,15 +134,15 @@ void tispellb_state::power_off()
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	if (m_subcpu)
 		m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	if (m_tms6100)
-		m_tms6100->reset();
 
 	m_power_on = false;
 }
 
 void tispellb_state::prepare_display()
 {
-	display_matrix_seg(16, 8, m_plate, m_grid, 0x3fff);
+	// same as snspell
+	UINT16 gridmask = (m_display_decay[15][16] != 0) ? 0xffff : 0x8000;
+	display_matrix_seg(16+1, 16, m_plate | 0x10000, m_grid & gridmask, 0x3fff);
 }
 
 WRITE16_MEMBER(tispellb_state::main_write_o)
@@ -158,9 +160,10 @@ WRITE16_MEMBER(tispellb_state::main_write_r)
 
 	// R0-R6: input mux
 	// R0-R7: select digit
+	// R15: filament on
 	m_r = data;
 	m_inp_mux = data & 0x7f;
-	m_grid = data & 0xff;
+	m_grid = data & 0x80ff;
 	prepare_display();
 }
 
@@ -206,7 +209,31 @@ WRITE16_MEMBER(tispellb_state::sub_write_r)
 
 // 2nd revision specifics
 
-//..
+WRITE16_MEMBER(tispellb_state::rev2_write_o)
+{
+	// SEG DP: speaker out
+	m_speaker->level_w(data >> 15 & 1);
+	
+	// SEG DP and SEG AP are not connected to VFD, rest is same as rev1
+	main_write_o(space, offset, data & 0x6fff);
+}
+
+WRITE16_MEMBER(tispellb_state::rev2_write_r)
+{
+	// R12: TMC0355 CS
+	// R4: TMC0355 M1
+	// R6: TMC0355 M0
+	if (data & 0x1000)
+	{
+		m_tms6100->m1_w(data >> 4 & 1);
+		m_tms6100->m0_w(data >> 6 & 1);
+		m_tms6100->romclock_w(1);
+		m_tms6100->romclock_w(0);
+	}
+	
+	// rest is same as rev1
+	main_write_r(space, offset, data);
+}
 
 
 
@@ -333,8 +360,14 @@ static MACHINE_CONFIG_START( rev2, tispellb_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0270, 300000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(tispellb_state, main_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispellb_state, rev2_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispellb_state, rev2_write_r))
+	MCFG_TMS0270_READ_CTL_CB(DEVREAD8("tms6100", tms6100_device, data_r))
+	MCFG_TMS0270_WRITE_CTL_CB(DEVWRITE8("tms6100", tms6100_device, addr_w))
 
 	MCFG_DEVICE_ADD("tms6100", TMS6100, 300000)
+	MCFG_TMS6100_4BIT_MODE()
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_spellb)
@@ -387,7 +420,7 @@ ROM_START( mrchalgr )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_mrchalgr_output.pla", 0, 1246, CRC(4785289c) SHA1(60567af0ea120872a4ccf3128e1365fe84722aa8) )
 
-	ROM_REGION( 0x1000, "tms6100", 0 )
+	ROM_REGION( 0x4000, "tms6100", ROMREGION_ERASEFF )
 	ROM_LOAD( "cd2601.vsm", 0x0000, 0x1000, CRC(a9fbe7e9) SHA1(9d480cb30313b8cbce2d048140c1e5e6c5b92452) )
 ROM_END
 

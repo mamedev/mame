@@ -8,6 +8,7 @@
 
      Todo:
         - implement CS
+        - implement clock pin(CLK) and gating(RCK) properly
         - implement chip addressing (0-15 mask programmed)
 
      TMS6100:
@@ -175,7 +176,7 @@ READ_LINE_MEMBER(tms6100_device::data_line_r)
 }
 
 
-// CLK line
+// CLK/RCK pin
 
 WRITE_LINE_MEMBER(tms6100_device::romclock_w)
 {
@@ -190,11 +191,11 @@ WRITE_LINE_MEMBER(tms6100_device::romclock_w)
 			{
 				if (m_state & TMS6100_NEXT_READ_IS_DUMMY)
 				{
+					LOG(("loaded address %08x\n", m_address_latch));
 					m_address = (m_address_latch << 3);
 					m_address_latch = 0;
 					m_loadptr = 0;
 					m_state &= ~TMS6100_NEXT_READ_IS_DUMMY;
-					LOG(("loaded address %08x\n", m_address));
 				}
 				else
 				{
@@ -205,7 +206,8 @@ WRITE_LINE_MEMBER(tms6100_device::romclock_w)
 					
 					if (m_4bit_read)
 					{
-						m_data = word >> (m_address & 7) & 0xf;
+						// high nibble 1st?
+						m_data = word >> (~m_address & 4) & 0xf;
 						m_address += 4;
 					}
 					else
@@ -236,7 +238,6 @@ WRITE_LINE_MEMBER(tms6100_device::romclock_w)
 			if (m_state & TMS6100_NEXT_READ_IS_DUMMY)
 			{
 				m_state &= ~TMS6100_NEXT_READ_IS_DUMMY; // clear - no dummy read according to datasheet
-				LOG(("loaded address latch %08x\n", m_address_latch));
 				m_address = m_rom[m_address_latch] | (m_rom[m_address_latch+1] << 8);
 				m_address &= 0x3fff; // 14 bits
 				LOG(("loaded indirect address %04x\n", m_address));
