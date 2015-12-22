@@ -1,5 +1,10 @@
 /* Sansa Fuze */
 
+// info can be found at
+// http://www.rockbox.org/wiki/SansaFuze / http://www.rockbox.org/wiki/SansaAMSFirmware
+// http://forums.rockbox.org/index.php?topic=14064
+// http://daniel.haxx.se/sansa/ams.html
+
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
@@ -20,6 +25,9 @@ public:
 
 static ADDRESS_MAP_START( sansa_fuze_map, AS_PROGRAM, 32, sansa_fuze_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
+
+	AM_RANGE(0x80000000, 0x8001ffff) AM_ROM  AM_REGION("maincpu", 0x00000)
+	AM_RANGE(0x81000000, 0x81ffffff) AM_RAM
 ADDRESS_MAP_END
 
 
