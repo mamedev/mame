@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /****************************************************************************
 
-    drivers/sgi_ip6.c
+    drivers/4dpi.cpp
     SGI 4D/PI IP6 family skeleton driver
 
     by Ryan Holtz

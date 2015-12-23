@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /****************************************************************************
 
-    drivers/sgi_ip2.c
+    drivers/sgi_ip2.cpp
     SGI IRIS 3130 skeleton driver with some meat on its bones
 
     by Ryan Holtz
