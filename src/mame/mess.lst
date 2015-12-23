@@ -1022,9 +1022,10 @@ zslc3000 // Sharp Zaurus SL-C3000 "Spitz"
 zslc1000 // Sharp Zaurus SL-C1000 "Akita"
 
 // Silicon Graphics
-sgi_ip2 // IP2: IRIS 2x00, 68020, 16MHz
-sgi_ip6   // IP6: 4D/PI, R2000, 20MHz
-ip204415  // IP20: Indigo 1, R4400, 150MHz
+iris3130 // IP2: IRIS 3xx0, 68020, 16MHz
+4dpi   // IP6: 4D/PI, R2000, 20MHz
+indigo3k  // IP12: Indigo 1, R3000, 33MHz
+indigo4k  // IP20: Indigo 1, R4400, 150MHz
 ip225015  // IP22: Indy, R5000, 150MHz
 ip224613    // IP22: Indy, R4600, 133MHz
 ip244415    // IP24: Indigo 2, R4400, 150MHz
