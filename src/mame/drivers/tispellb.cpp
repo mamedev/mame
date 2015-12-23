@@ -21,18 +21,18 @@
 
   2nd revision:
   
-  Spelling B (US), 1980
+  Spelling B (US), 1979
   - TMS0270 MCU TMC0274*
   - TMC0355 4KB VSM ROM CD2602*
   - 8-digit cyan VFD display
   - 1-bit sound (indicated by a music note symbol on the top-right of the casing)
 
-  Spelling ABC (UK), 1980: exact same hardware as US version
+  Spelling ABC (UK), 1979: exact same hardware as US version
 
-  Spelling ABC (Germany), 1980: different VSM
+  Spelling ABC (Germany), 1979: different VSM
   - TMC0355 4KB VSM ROM CD2607*
   
-  Mr. Challenger (US), 1980
+  Mr. Challenger (US), 1979
   - TMS0270 MCU TMC0273
   - TMC0355 4KB VSM ROM CD2601
   - 8-digit cyan VFD display
@@ -437,4 +437,4 @@ ROM_END
 /*    YEAR  NAME       PARENT COMPAT MACHINE INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 COMP( 1978, spellb,    0,        0,  rev1,   spellb,    driver_device, 0, "Texas Instruments", "Spelling B (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 
-COMP( 1980, mrchalgr,  0,        0,  rev2,   mrchalgr,  driver_device, 0, "Texas Instruments", "Mr. Challenger", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, mrchalgr,  0,        0,  rev2,   mrchalgr,  driver_device, 0, "Texas Instruments", "Mr. Challenger", MACHINE_SUPPORTS_SAVE )
