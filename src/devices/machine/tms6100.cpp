@@ -206,8 +206,7 @@ WRITE_LINE_MEMBER(tms6100_device::romclock_w)
 					
 					if (m_4bit_read)
 					{
-						// high nibble 1st?
-						m_data = word >> (~m_address & 4) & 0xf;
+						m_data = word >> (m_address & 4) & 0xf;
 						m_address += 4;
 					}
 					else
@@ -237,6 +236,7 @@ WRITE_LINE_MEMBER(tms6100_device::romclock_w)
 			// READ AND BRANCH
 			if (m_state & TMS6100_NEXT_READ_IS_DUMMY)
 			{
+				m_state |= TMS6100_READ_PENDING;
 				m_state &= ~TMS6100_NEXT_READ_IS_DUMMY; // clear - no dummy read according to datasheet
 				m_address = m_rom[m_address_latch] | (m_rom[m_address_latch+1] << 8);
 				m_address &= 0x3fff; // 14 bits
