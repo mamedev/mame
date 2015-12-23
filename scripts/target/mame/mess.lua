@@ -2441,10 +2441,10 @@ createMESSProjects(_target, _subtarget, "sgi")
 files {
 	MAME_DIR .. "src/mame/machine/sgi.cpp",
 	MAME_DIR .. "src/mame/machine/sgi.h",
-	MAME_DIR .. "src/mame/drivers/sgi_ip2.cpp",
-	MAME_DIR .. "src/mame/drivers/sgi_ip6.cpp",
-	MAME_DIR .. "src/mame/drivers/ip20.cpp",
-	MAME_DIR .. "src/mame/drivers/ip22.cpp",
+	MAME_DIR .. "src/mame/drivers/iris3130.cpp",
+	MAME_DIR .. "src/mame/drivers/4dpi.cpp",
+	MAME_DIR .. "src/mame/drivers/indigo.cpp",
+	MAME_DIR .. "src/mame/drivers/indy_indigo2.cpp",
 	MAME_DIR .. "src/mame/video/newport.cpp",
 	MAME_DIR .. "src/mame/video/newport.h",
 }
