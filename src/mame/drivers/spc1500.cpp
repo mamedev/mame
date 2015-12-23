@@ -47,7 +47,8 @@ public:
 		, m_io_kb(*this, "LINE")
 		, m_io_joy(*this, "JOY")
 		, m_centronics(*this, "centronics")
-		, m_pio(*this, "i8255")
+		, m_pio(*this, "8255")
+		, m_palette(*this, "palette")
 	{}
 
 	DECLARE_WRITE8_MEMBER(bank0_rom);
@@ -72,12 +73,17 @@ public:
 	DECLARE_READ8_MEMBER(crtc_r);
 	DECLARE_WRITE8_MEMBER(romsel_w);
 	DECLARE_WRITE8_MEMBER(ramsel_w);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void video_start_crtc();
+	DECLARE_WRITE8_MEMBER(porta_w);
+	DECLARE_WRITE8_MEMBER(portc_w);
+	DECLARE_READ8_MEMBER(portb_r);
+	DECLARE_PALETTE_INIT(spc);
+	DECLARE_VIDEO_START(spc);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_pixel(bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height);
 	UINT8 check_prev_height(int x,int y,int x_size);
 	UINT8 check_line_valid_height(int y,int x_size,int height);	
 	void draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprect);
+	void draw_gfxbitmap(bitmap_rgb32 &bitmap,const rectangle &cliprect, int plane,int pri);	
 	int priority_mixer_pri(int color);
 private:
 	UINT8 m_IPLK;
@@ -104,6 +110,7 @@ private:
 	std::unique_ptr<UINT8[]> m_kvram;         /**< Pointer for Extended Kanji Video RAM (X1 Turbo) */	
 	std::unique_ptr<UINT8[]> m_gfx_bitmap_ram;    /**< Pointer for bitmap layer RAM. */
 	std::unique_ptr<UINT8[]> m_pcg_ram;       /**< Pointer for PCG GFX RAM */		
+	UINT8 *m_cg_rom;        /**< Pointer for GFX ROM */
 	UINT8 m_is_turbo;       /**< Machine type: (0) X1 Vanilla, (1) X1 Turbo */
 	int m_xstart,           /**< Start X offset for screen drawing. */
 		m_ystart;           /**< Start Y offset for screen drawing. */
@@ -167,13 +174,29 @@ WRITE8_MEMBER( spc1500_state::ramsel_w)
 	
 }
 
+WRITE8_MEMBER( spc1500_state::porta_w)
+{
+	
+}
+
+WRITE8_MEMBER( spc1500_state::portc_w)
+{
+	
+}
+
+READ8_MEMBER( spc1500_state::portb_r)
+{
+	return 0;
+}
+
+
 /*************************************
  *
  *  Video Functions
  *
  *************************************/
 
-VIDEO_START_MEMBER(spc1500_state,crtc)
+VIDEO_START_MEMBER(spc1500_state, spc)
 {
 	m_avram = make_unique_clear<UINT8[]>(0x800);
 	m_tvram = make_unique_clear<UINT8[]>(0x800);
@@ -273,8 +296,8 @@ void spc1500_state::draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprec
 			int pcg_bank = BIT(m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 5);
 			UINT8 *gfx_data = pcg_bank ? m_pcg_ram.get() : m_cg_rom; //machine.root_device().memregion(pcg_bank ? "pcg" : "cgrom")->base();
 			int knj_enable = 0;
-			int knj_side = 0;
-			int knj_bank = 0;
+			//int knj_side = 0;
+			//int knj_bank = 0;
 			int knj_uline = 0;
 			{
 				int pen[3],pen_mask,pcg_pen,xi,yi,dy;
@@ -619,6 +642,7 @@ void spc1500_state::machine_start()
 	UINT8 *mem_ipl = memregion("ipl")->base();
 	UINT8 *mem_basic = memregion("basic")->base();
 	UINT8 *ram = m_ram->pointer();
+	m_cg_rom = memregion("cgrom")->base();	
 
 	// configure and intialize banks 1 & 3 (read banks)
 	membank("bank1")->configure_entry(0, ram);
@@ -661,6 +685,22 @@ WRITE_LINE_MEMBER( spc1500_state::irq_w )
 	m_maincpu->set_input_line(0, state ? CLEAR_LINE : HOLD_LINE);
 }
 
+PALETTE_INIT_MEMBER(spc1500_state,spc)
+{
+	int i;
+
+	for(i=0;i<(0x10+0x1000);i++)
+		palette.set_pen_color(i,rgb_t(0x00,0x00,0x00));
+}
+
+// /* decoded for debugging purpose, this will be nuked in the end... */
+// static GFXDECODE_START( x1 )
+	// GFXDECODE_ENTRY( "cgrom",   0x00000, x1_chars_8x8,    0, 1 )
+	// GFXDECODE_ENTRY( "font",    0x00000, x1_chars_8x16,   0, 1 )
+	// GFXDECODE_ENTRY( "kanji",   0x00000, x1_chars_16x16,  0, 1 )
+// GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0, 1 )
+// GFXDECODE_END
+
 //-------------------------------------------------
 //  address maps
 //-------------------------------------------------
@@ -683,11 +723,11 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
-	MCFG_PALETTE_INIT_OWNER(x1_state,x1)
+	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x1)
+	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", spc)
 
-	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)	
+	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)	
 #else	
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_14_31818MHz/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -700,9 +740,9 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 #endif
 	
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(m_pio, data_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(m_pio, data_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(m_pio, data_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(spc1500_state, porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(spc1500_state, portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(spc1500_state, portc_w))
 	
 	// other lines not connected
 
