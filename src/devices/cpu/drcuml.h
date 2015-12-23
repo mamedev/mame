@@ -226,6 +226,7 @@ private:
 	// internal state
 	device_t &                  m_device;           // CPU device we are associated with
 	drc_cache &                 m_cache;            // pointer to the codegen cache
+	std::unique_ptr<drcbe_interface> m_drcbe_interface;
 	drcbe_interface &           m_beintf;           // backend interface pointer
 	FILE *                      m_umllog;           // handle to the UML logfile
 	simple_list<drcuml_block>   m_blocklist;        // list of active blocks

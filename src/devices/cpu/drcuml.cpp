@@ -121,11 +121,12 @@ drcbe_interface::~drcbe_interface()
 drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int modes, int addrbits, int ignorebits)
 	: m_device(device),
 		m_cache(cache),
-		m_beintf(device.machine().options().drc_use_c() ?
-			*static_cast<drcbe_interface *>(auto_alloc(device.machine(), drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits))) :
-			*static_cast<drcbe_interface *>(auto_alloc(device.machine(), drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits)))),
+		m_drcbe_interface(device.machine().options().drc_use_c() ?
+			std::unique_ptr<drcbe_interface>{ std::make_unique<drcbe_c>(*this, device, cache, flags, modes, addrbits, ignorebits) } :
+			std::unique_ptr<drcbe_interface>{ std::make_unique<drcbe_native>(*this, device, cache, flags, modes, addrbits, ignorebits) }),
+		m_beintf(*m_drcbe_interface.get()),
 		m_umllog(nullptr)
-{
+{	
 	// if we're to log, create the logfile
 	if (device.machine().options().drc_log_uml())
 	{
@@ -141,9 +142,6 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int
 
 drcuml_state::~drcuml_state()
 {
-	// free the back-end
-	auto_free(m_device.machine(), &m_beintf);
-
 	// close any files
 	if (m_umllog != nullptr)
 		fclose(m_umllog);
