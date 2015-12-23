@@ -71,9 +71,10 @@ public:
 	DECLARE_READ8_MEMBER(pcgr_r);
 	DECLARE_WRITE8_MEMBER(crtc_w);
 	DECLARE_READ8_MEMBER(crtc_r);
-	DECLARE_WRITE8_MEMBER(romsel_w);
-	DECLARE_WRITE8_MEMBER(ramsel_w);
+	DECLARE_WRITE8_MEMBER(romsel);
+	DECLARE_WRITE8_MEMBER(ramsel);
 	DECLARE_WRITE8_MEMBER(porta_w);
+	DECLARE_WRITE8_MEMBER(portb_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_PALETTE_INIT(spc);
@@ -86,7 +87,7 @@ public:
 	void draw_gfxbitmap(bitmap_rgb32 &bitmap,const rectangle &cliprect, int plane,int pri);	
 	int priority_mixer_pri(int color);
 private:
-	UINT8 m_IPLK;
+	UINT8 m_ipl;
 	UINT8 m_GMODE;
 	UINT16 m_page;
 	UINT8 *m_work_ram;
@@ -164,19 +165,27 @@ READ8_MEMBER( spc1500_state::keyboard_r )
 		return 0xff;
 }
 
-WRITE8_MEMBER( spc1500_state::romsel_w)
+WRITE8_MEMBER( spc1500_state::romsel)
 {
-	
+	if (m_ipl)
+		membank("bank1")->set_entry(1);
+	else
+		membank("bank1")->set_entry(2);		
 }
 
-WRITE8_MEMBER( spc1500_state::ramsel_w)
+WRITE8_MEMBER( spc1500_state::ramsel)
 {
-	
+	membank("bank1")->set_entry(0);
 }
 
 WRITE8_MEMBER( spc1500_state::porta_w)
 {
 	
+}
+
+WRITE8_MEMBER( spc1500_state::portb_w)
+{
+	m_ipl = data & 1 << 1;
 }
 
 WRITE8_MEMBER( spc1500_state::portc_w)
@@ -187,6 +196,66 @@ WRITE8_MEMBER( spc1500_state::portc_w)
 READ8_MEMBER( spc1500_state::portb_r)
 {
 	return 0;
+}
+
+WRITE8_MEMBER( spc1500_state::crtc_w)
+{
+	
+}
+
+READ8_MEMBER( spc1500_state::crtc_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER( spc1500_state::pcgg_w)
+{
+	
+}
+
+READ8_MEMBER( spc1500_state::pcgg_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER( spc1500_state::pcgr_w)
+{
+	
+}
+
+READ8_MEMBER( spc1500_state::pcgr_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER( spc1500_state::pcgb_w)
+{
+	
+}
+
+READ8_MEMBER( spc1500_state::pcgb_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER( spc1500_state::priority_w)
+{
+	
+}
+
+WRITE8_MEMBER( spc1500_state::paletg_w)
+{
+	
+}
+
+WRITE8_MEMBER( spc1500_state::paletb_w)
+{
+	
+}
+
+WRITE8_MEMBER( spc1500_state::paletr_w)
+{
+	
 }
 
 
@@ -519,8 +588,8 @@ static ADDRESS_MAP_START( spc1500_io , AS_IO, 8, spc1500_state )
 // 	AM_RANGE(0x1a00, 0x1a03) AM_DEVREADWRITE("i8255", m_pio, data_r, data_w)
 	AM_RANGE(0x1b00, 0x1b00) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
 	AM_RANGE(0x1c00, 0x1c00) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(romsel_w)
-	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(ramsel_w)
+	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(romsel)
+	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(ramsel)
 	AM_RANGE(0x2000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
@@ -648,12 +717,11 @@ void spc1500_state::machine_start()
 	membank("bank1")->configure_entry(0, ram);
 	membank("bank1")->configure_entry(1, mem_ipl);
 	membank("bank1")->configure_entry(2, mem_basic);
-	membank("bank3")->configure_entry(0, ram + 0x8000);
 	membank("bank1")->set_entry(1);
-	membank("bank3")->set_entry(0);
 
-	// intialize banks 2 & 4 (write banks)
+	// intialize banks 2, 3, 4 (write banks)
 	membank("bank2")->set_base(ram);
+	membank("bank3")->set_base(ram + 0x8000);
 	membank("bank4")->set_base(ram + 0x8000);
 	
    	m_time = machine().scheduler().time();	
@@ -742,6 +810,7 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(spc1500_state, porta_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(spc1500_state, portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(spc1500_state, portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(spc1500_state, portc_w))
 	
 	// other lines not connected
@@ -773,10 +842,19 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( spc1500 )
-	ROM_REGION(0x10000, "ipl", ROMREGION_ERASEFF)
-	ROM_LOAD("spc1500_ipl.rom", 0x0000, 0x8000, CRC(19638fc9) SHA1(489f1baa7aebf3c8c660325fb1fd790d84203284))
-	ROM_REGION(0x10000, "basic", ROMREGION_ERASEFF)
-	ROM_LOAD("spc1500_basic.rom", 0x0000, 0x8000, CRC(19638fc9) SHA1(489f1baa7aebf3c8c660325fb1fd790d84203284))
+	ROM_REGION(0x1000, "ipl", ROMREGION_ERASEFF)
+	ROM_LOAD("ipl.rom", 0x0000, 0x8000, CRC(19638fc9) SHA1(489f1baa7aebf3c8c660325fb1fd790d84203284))
+	ROM_REGION(0x2000, "basic", ROMREGION_ERASEFF)
+	ROM_LOAD("basic.rom", 0x0000, 0x8000, CRC(19638fc9) SHA1(489f1baa7aebf3c8c660325fb1fd790d84203284))
+	ROM_REGION(0x10000, "font1", 0) 
+	ROM_LOAD( "ss150fnt.bin", 0x0000, 0x2000, CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )
+	ROM_REGION(0x12000, "font2", 0) 
+	ROM_LOAD( "ss151fnt.bin", 0x2000, 0x2000, CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )
+	ROM_REGION(0x14000, "font3", 0) 
+	ROM_LOAD( "ss152fnt.bin", 0x4000, 0x2000, CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )
+	ROM_REGION(0x16000, "font4", 0) 
+	ROM_LOAD( "ss153fnt.bin", 0x6000, 0x2000, CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )
+	
 ROM_END
 
 
