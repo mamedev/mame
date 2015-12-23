@@ -32,7 +32,7 @@
   Spelling ABC (Germany), 1980: different VSM
   - TMC0355 4KB VSM ROM CD2607*
   
-  Mr. Challenger (US), 1979
+  Mr. Challenger (US), 1980
   - TMS0270 MCU TMC0273
   - TMC0355 4KB VSM ROM CD2601
   - 8-digit cyan VFD display
@@ -52,7 +52,6 @@
   TODO:
   - spellb numbers don't match with picture book
   - spellb random lockups
-  - rev2 hardware almost works
 
 
 ***************************************************************************/
@@ -319,9 +318,18 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mrchalgr )
-	PORT_INCLUDE( spellb )
+	PORT_INCLUDE( spellb ) // same key layout as spellb
 	
-	//PORT_MODIFY ...
+	PORT_MODIFY("IN.5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("2nd Player")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Score")
+
+	PORT_MODIFY("IN.7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Crazy Letters")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Letter Guesser")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("Word Challenge")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Mystery Word/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, (void *)true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Replay")
 INPUT_PORTS_END
 
 
@@ -335,14 +343,14 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( rev1, tispellb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0270, 300000) // approximation
+	MCFG_CPU_ADD("maincpu", TMS0270, 350000) // approximation
 	MCFG_TMS1XXX_READ_K_CB(READ8(tispellb_state, main_read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispellb_state, main_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispellb_state, main_write_r))
 	MCFG_TMS0270_READ_CTL_CB(READ8(tispellb_state, rev1_ctl_r))
 	MCFG_TMS0270_WRITE_CTL_CB(WRITE8(tispellb_state, rev1_ctl_w))
 
-	MCFG_CPU_ADD("subcpu", TMS1980, 300000) // approximation
+	MCFG_CPU_ADD("subcpu", TMS1980, 350000) // approximation
 	MCFG_TMS1XXX_READ_K_CB(READ8(tispellb_state, sub_read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispellb_state, sub_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispellb_state, sub_write_r))
@@ -359,14 +367,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( rev2, tispellb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0270, 300000) // approximation
+	MCFG_CPU_ADD("maincpu", TMS0270, 350000) // approximation
 	MCFG_TMS1XXX_READ_K_CB(READ8(tispellb_state, main_read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispellb_state, rev2_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispellb_state, rev2_write_r))
 	MCFG_TMS0270_READ_CTL_CB(DEVREAD8("tms6100", tms6100_device, data_r))
 	MCFG_TMS0270_WRITE_CTL_CB(DEVWRITE8("tms6100", tms6100_device, addr_w))
 
-	MCFG_DEVICE_ADD("tms6100", TMS6100, 300000)
+	MCFG_DEVICE_ADD("tms6100", TMS6100, 350000)
 	MCFG_TMS6100_4BIT_MODE()
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
@@ -398,7 +406,7 @@ ROM_START( spellb )
 	ROM_LOAD( "tms0270_spellb_output.pla", 0, 1246, CRC(3e021cbd) SHA1(c9bdfe10601b8a5a70442fe4805e4bfed8bbed35) )
 
 	ROM_REGION( 0x1000, "subcpu", 0 )
-	ROM_LOAD( "tmc1984nl", 0x0000, 0x1000, CRC(ad417878) SHA1(d02ca44db104d34e8089037ddd514958eb007e27) )
+	ROM_LOAD( "tmc1984nl", 0x0000, 0x1000, CRC(78c9c83a) SHA1(6307fe2a0228fd1b8d308fcaae1b8e856d40fe57) )
 
 	ROM_REGION( 1246, "subcpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
@@ -429,4 +437,4 @@ ROM_END
 /*    YEAR  NAME       PARENT COMPAT MACHINE INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 COMP( 1978, spellb,    0,        0,  rev1,   spellb,    driver_device, 0, "Texas Instruments", "Spelling B (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 
-COMP( 1979, mrchalgr,  0,        0,  rev2,   mrchalgr,  driver_device, 0, "Texas Instruments", "Mr. Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1980, mrchalgr,  0,        0,  rev2,   mrchalgr,  driver_device, 0, "Texas Instruments", "Mr. Challenger", MACHINE_SUPPORTS_SAVE )
