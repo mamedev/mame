@@ -5766,24 +5766,17 @@ initdv3e        // 2004.05.18 Initial D Arcade Stage Ver. 3 (Export)
 vf4tuneda       // 2004.09 Virtua Fighter 4 Final Tuned (Rev A)
 vf4tunedd       // 2004.10 Virtua Fighter 4 Final Tuned (Rev D)
 vf4tuned        // 2004.12 Virtua Fighter 4 Final Tuned (Rev F)
-				// 2004.12 World Club Champion Football Serie A 2002-2003 Ver.2.12
-				// 2004.12 World Club Champion Football Serie A 2002-2003 Ver.2.34
-				// 2005.04 Menkyo no Tetsujin
-				// 2005.06 World Club Champion Football European Clubs 2004-2005
-				// 2005.06 World Club Champion Football European Clubs 2004-2005 Ver.1.1
+wccf212e        // 2004.12 World Club Champion Football Serie A 2002-2003 Ver.2.12
+wccf234j        // 2004.12 World Club Champion Football Serie A 2002-2003 Ver.2.34
+				// 2005.04 Menkyo no Tetsujin / Sega Driving Simulator
+wccf310j        // 2005.06 World Club Champion Football European Clubs 2004-2005
+wccf331e        // 2005.06 World Club Champion Football European Clubs 2004-2005 Ver.1.1
 				// 2005.06 World Club Champion Football European Clubs 2004-2005 Ver.1.2
-				// 2005.11 World Club Champion Football European Clubs 2004-2005 Ver.3.22
-				// 2005.12 Mobile Suit Gundam 0079 Card Builder
-				// 2006.03 Mobile Suit Gundam 0079 Card Builder Ver.1.007
-				// 2006.07 Mobile Suit Gundam 0079 Card Builder Ver.2.00
-				// 2006.08 World Club Champion Football European Clubs 2005-2006
-				// 2006.09 Mobile Suit Gundam 0079 Card Builder Ver.2.01
+wccf322e        // 2005.11 World Club Champion Football European Clubs 2004-2005 Ver.3.22
+wccf420e        // 2006.08 World Club Champion Football European Clubs 2005-2006
 				// 2006.10 World Club Champion Football European Clubs 2005-2006 bugfix
-				// 2006.11 Mobile Suit Gundam 0079 Card Builder Ver.2.02
 inidv3ca        // 2006.?? Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev A)
 inidv3cy        // 2006.?? Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev B)
-				// 2007.03 Mobile Suit Gundam 0083 Card Builder
-				// 2007.10 Mobile Suit Gundam 0083 Card Builder Ryouyuu Gekitotsu
 
 
 // Atomiswave (Dreamcast-based) games
@@ -5913,6 +5906,7 @@ wangmid2        // 2005.04 Wangan Midnight Maximum Tune 2 (Japan)
 				// 2005.10 Sangokushi Taisen Ver.1.100
 wangmd2b        // 2005.10 Wangan Midnight Maximum Tune 2 (Export) (Rev A)
 				// 2005.11 Sangokushi Taisen Ver.1.110
+				// 2005.12 Mobile Suit Gundam 0079 Card Builder
 				// 2005.12 Quest of D Gofu no Keisyousya Ver.2.00
 				// 2005.12 Quest of D Gofu no Keisyousya Ver.2.01
 				// 2005.12 Sega Network Taisen Mahjong MJ 3
@@ -5926,15 +5920,21 @@ mj3             // 2005.12 Sega Network Taisen Mahjong MJ 3 (Rev F)
 scg06nt         // 2005.12 Sega Golf Club 2006: Next Tours (Rev A)
 				// 2006.02 Sangokushi Taisen Ver.1.12
 				// 2006.03 Quest of D Gofu no Keisyousya Ver.2.02b
+				// 2006.03 Mobile Suit Gundam 0079 Card Builder Ver.1.007
 				// 2006.04 Sega Network Taisen Mahjong MJ 3 Evolution
 				// 2006.05 Sangokushi Taisen 2
 				// 2006.05 Sangokushi Taisen 2 Firmware Update
+				// 2006.07 Mobile Suit Gundam 0079 Card Builder Ver.2.00
+				// 2006.09 Mobile Suit Gundam 0079 Card Builder Ver.2.01
 				// 2006.09 Sangokushi Taisen 2 Ver.2.007
 				// 2006.09 Sangokushi Taisen 2 Ver.2.01
 				// 2006.09 Sega Network Taisen Mahjong MJ 3 Evolution (Rev A)
 				// 2006.10 Quest of D Oukoku no Syugosya Ver.3.00
 				// 2006.11 Quest of D Oukoku no Syugosya Ver.3.01
+				// 2006.11 Mobile Suit Gundam 0079 Card Builder Ver.2.02
+				// 2007.03 Mobile Suit Gundam 0083 Card Builder
 mj3evo      // 2007.06 Sega Network Taisen Mahjong MJ 3 Evolution (Rev B)
+				// 2007.10 Mobile Suit Gundam 0083 Card Builder Ryouyuu Gekitotsu
 				// 2007.11 Quest of D The Battle Kingdom Ver.4.00
 				// 2008.01 Quest of D The Battle Kingdom Ver.4.00b
 				// 2008.02 Quest of D The Battle Kingdom Ver.4.00c
