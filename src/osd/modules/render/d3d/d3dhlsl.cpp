@@ -1378,9 +1378,7 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	texture_info *texture = poly->get_texture();
 
 	bool prepare_vector =
-		(machine->first_screen()->screen_type() &  SCREEN_TYPE_VECTOR) == SCREEN_TYPE_VECTOR;
-	bool prepare_raster =
-		(machine->first_screen()->screen_type() &  SCREEN_TYPE_RASTER) == SCREEN_TYPE_RASTER;
+		machine->first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
 
 	screen_device_iterator screen_iterator(machine->root_device());
 	screen_device *screen = screen_iterator.first();
@@ -1407,7 +1405,6 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	curr_effect->set_float("ScanlineOffset", texture->get_cur_frame() == 0 ? 0.0f : options->scanline_offset);
 	curr_effect->set_bool("PrepareBloom", prepare_bloom);
 	curr_effect->set_bool("PrepareVector", prepare_vector);
-	curr_effect->set_bool("PrepareRaster", prepare_raster);
 
 	next_index = rt->next_index(next_index);
 	blit(prepare_bloom ? rt->native_target[next_index] : rt->prescale_target[next_index], true, poly->get_type(), vertnum, poly->get_count());
@@ -1420,7 +1417,7 @@ int shaders::downsample_pass(render_target *rt, int source_index, poly_info *pol
 	int next_index = source_index;
 
 	bool prepare_vector =
-		(machine->first_screen()->screen_type() &  SCREEN_TYPE_VECTOR) == SCREEN_TYPE_VECTOR;
+		machine->first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
 	float bloom_rescale = options->bloom_scale;
 
 	// skip downsample if no influencing settings
@@ -1608,7 +1605,7 @@ int shaders::screen_pass(render_target *rt, int source_index, poly_info *poly, i
 	int next_index = source_index;
 
 	bool prepare_vector =
-		(machine->first_screen()->screen_type() &  SCREEN_TYPE_VECTOR) == SCREEN_TYPE_VECTOR;
+		machine->first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
 
 	curr_effect = default_effect;
 	curr_effect->update_uniforms();
@@ -2706,26 +2703,26 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Screen Smooth Border",                0,     0,   100, 1, 7, slider_smooth_border },
 	{ "Screen Reflection",                   0,     0,   100, 1, 7, slider_reflection },
 	{ "Image Vignetting",                    0,     0,   100, 1, 7, slider_vignetting },
-	{ "Scanline Darkness",                   0,     0,   100, 1, 1, slider_scanline_alpha },
-	{ "Scanline Screen Height",              1,    20,    80, 1, 1, slider_scanline_scale },
-	{ "Scanline Indiv. Height",              1,    20,    80, 1, 1, slider_scanline_height },
-	{ "Scanline Brightness",                 0,    20,    40, 1, 1, slider_scanline_bright_scale },
-	{ "Scanline Brightness Overdrive",       0,     0,    20, 1, 1, slider_scanline_bright_offset },
-	{ "Scanline Jitter",                     0,     0,    40, 1, 1, slider_scanline_offset },
-	{ "Defocus X",                           0,     0,    20, 1, 3, slider_defocus_x },
-	{ "Defocus Y",                           0,     0,    20, 1, 3, slider_defocus_y },
-	{ "Red Position Offset X",           -1500,     0,  1500, 1, 3, slider_red_converge_x },
-	{ "Red Position Offset Y",           -1500,     0,  1500, 1, 3, slider_red_converge_y },
-	{ "Green Position Offset X",         -1500,     0,  1500, 1, 3, slider_green_converge_x },
-	{ "Green Position Offset Y",         -1500,     0,  1500, 1, 3, slider_green_converge_y },
-	{ "Blue Position Offset X",          -1500,     0,  1500, 1, 3, slider_blue_converge_x },
-	{ "Blue Position Offset Y",          -1500,     0,  1500, 1, 3, slider_blue_converge_y },
-	{ "Red Convergence X",               -1500,     0,  1500, 1, 3, slider_red_radial_converge_x },
-	{ "Red Convergence Y",               -1500,     0,  1500, 1, 3, slider_red_radial_converge_y },
-	{ "Green Convergence X",             -1500,     0,  1500, 1, 3, slider_green_radial_converge_x },
-	{ "Green Convergence Y",             -1500,     0,  1500, 1, 3, slider_green_radial_converge_y },
-	{ "Blue Convergence X",              -1500,     0,  1500, 1, 3, slider_blue_radial_converge_x },
-	{ "Blue Convergence Y",              -1500,     0,  1500, 1, 3, slider_blue_radial_converge_y },
+	{ "Scanline Darkness",                   0,     0,   100, 1, 5, slider_scanline_alpha },
+	{ "Scanline Screen Height",              1,    20,    80, 1, 5, slider_scanline_scale },
+	{ "Scanline Indiv. Height",              1,    20,    80, 1, 5, slider_scanline_height },
+	{ "Scanline Brightness",                 0,    20,    40, 1, 5, slider_scanline_bright_scale },
+	{ "Scanline Brightness Overdrive",       0,     0,    20, 1, 5, slider_scanline_bright_offset },
+	{ "Scanline Jitter",                     0,     0,    40, 1, 5, slider_scanline_offset },
+	{ "Defocus X",                           0,     0,    20, 1, 7, slider_defocus_x },
+	{ "Defocus Y",                           0,     0,    20, 1, 7, slider_defocus_y },
+	{ "Red Position Offset X",           -1500,     0,  1500, 1, 7, slider_red_converge_x },
+	{ "Red Position Offset Y",           -1500,     0,  1500, 1, 7, slider_red_converge_y },
+	{ "Green Position Offset X",         -1500,     0,  1500, 1, 7, slider_green_converge_x },
+	{ "Green Position Offset Y",         -1500,     0,  1500, 1, 7, slider_green_converge_y },
+	{ "Blue Position Offset X",          -1500,     0,  1500, 1, 7, slider_blue_converge_x },
+	{ "Blue Position Offset Y",          -1500,     0,  1500, 1, 7, slider_blue_converge_y },
+	{ "Red Convergence X",               -1500,     0,  1500, 1, 7, slider_red_radial_converge_x },
+	{ "Red Convergence Y",               -1500,     0,  1500, 1, 7, slider_red_radial_converge_y },
+	{ "Green Convergence X",             -1500,     0,  1500, 1, 7, slider_green_radial_converge_x },
+	{ "Green Convergence Y",             -1500,     0,  1500, 1, 7, slider_green_radial_converge_y },
+	{ "Blue Convergence X",              -1500,     0,  1500, 1, 7, slider_blue_radial_converge_x },
+	{ "Blue Convergence Y",              -1500,     0,  1500, 1, 7, slider_blue_radial_converge_y },
 	{ "Red Output from Red Input",        -400,     0,   400, 5, 7, slider_red_from_r },
 	{ "Red Output from Green Input",      -400,     0,   400, 5, 7, slider_red_from_g },
 	{ "Red Output from Blue Input",       -400,     0,   400, 5, 7, slider_red_from_b },
