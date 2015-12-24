@@ -24,6 +24,7 @@
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/mc146818.h"
+#include "machine/apollo_dbg.h"
 #include "machine/apollo_kbd.h"
 #include "machine/clock.h"
 #include "bus/isa/isa.h"
@@ -55,10 +56,6 @@
 // Enabling this is >NOT< supported by MESSdev
 // Do *not* report any issues on Mametesters if this is enabled!
 // #define APOLLO_XXL
-
-/*----------- machine/apollo_dbg.c -----------*/
-
-int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc);
 
 /*----------- drivers/apollo.c -----------*/
 

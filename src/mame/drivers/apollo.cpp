@@ -905,13 +905,13 @@ void apollo_state::machine_reset()
 	// set configuration
 	omti8621_device::set_verbose(apollo_config(APOLLO_CONF_DISK_TRACE));
 	threecom3c505_device::set_verbose(apollo_config(APOLLO_CONF_NET_TRACE));
+#endif
 
 	if (apollo_config(APOLLO_CONF_NODE_ID))
 	{
 		// set node ID from UID of logical volume 1 of logical unit 0
 		m_node_id->set_node_id_from_disk();
 	}
-#endif
 
 	m_maincpu->set_instruction_hook(read32_delegate(FUNC(apollo_state::apollo_instruction_hook),this));
 }

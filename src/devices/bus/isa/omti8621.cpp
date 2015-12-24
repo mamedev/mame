@@ -231,13 +231,8 @@ FLOPPY_FORMATS_END
 ROM_START( omti8621 )
 	ROM_REGION(0x4000, OMTI_CPU_REGION, 0)  // disassembles fine as Z8 code
 	ROM_LOAD( "omti_8621_102640-b.bin", 0x000000, 0x004000, CRC(e6f20dbb) SHA1(cf1990ad72eac6b296485410f5fa3309a0d6d078) )
-
-#if 1
-	// OMTI 8621 boards for Apollo workstations never use a BIOS ROM
-	// They don't even have a socket for the BIOS ROM
 	ROM_REGION(0x1000, OMTI_BIOS_REGION, 0)
 	ROM_LOAD_OPTIONAL("omti_bios", 0x0000, 0x1000, NO_DUMP)
-#endif
 ROM_END
 
 static INPUT_PORTS_START( omti_port )
@@ -272,6 +267,13 @@ machine_config_constructor omti8621_device::device_mconfig_additions() const
 const rom_entry *omti8621_device::device_rom_region() const
 {
 	return ROM_NAME( omti8621 );
+}
+
+const rom_entry *omti8621_apollo_device::device_rom_region() const
+{
+	// OMTI 8621 boards for Apollo workstations never use a BIOS ROM
+	// They don't even have a socket for the BIOS ROM
+	return NULL;
 }
 
 ioport_constructor omti8621_device::device_input_ports() const
@@ -369,10 +371,22 @@ void omti8621_device::device_reset()
 	alternate_track_address[1] = 0;
 }
 
-const device_type ISA16_OMTI8621 = &device_creator<omti8621_device>;
+const device_type ISA16_OMTI8621 = &device_creator<omti8621_pc_device>;
 
-omti8621_device::omti8621_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ISA16_OMTI8621, "OMTI 8621 ESDI/floppy controller", tag, owner, clock, "omti8621", __FILE__),
+omti8621_pc_device::omti8621_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: omti8621_device(mconfig, ISA16_OMTI8621, tag, owner, clock)
+{
+}
+
+const device_type ISA16_OMTI8621_APOLLO = &device_creator<omti8621_apollo_device>;
+
+omti8621_apollo_device::omti8621_apollo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: omti8621_device(mconfig, ISA16_OMTI8621_APOLLO, tag, owner, clock)
+{
+}
+
+omti8621_device::omti8621_device(const machine_config &mconfig, device_type type,const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, "OMTI 8621 ESDI/floppy controller", tag, owner, clock, "omti8621", __FILE__),
 	device_isa16_card_interface(mconfig, *this),
 	m_fdc(*this, OMTI_FDC_TAG),
 	m_iobase(*this, "IO_BASE"),
@@ -679,80 +693,83 @@ void omti8621_device::log_command(const UINT8 cdb[], const UINT16 cdb_length)
 {
 	if (verbose > 0) {
 		int i;
-		logerror("%s: OMTI command ", cpu_context(this));
+		char sb[100];
+		std::string text(cpu_context(this));
+		text += ": OMTI command ";
 		switch (cdb[0]) {
 		case OMTI_CMD_TEST_DRIVE_READY: // 0x00
-			logerror("Test Drive Ready");
+			text += "Test Drive Ready";
 			break;
 		case OMTI_CMD_RECALIBRATE: // 0x01
-			logerror("Recalibrate");
+			text += "Recalibrate";
 			break;
 		case OMTI_CMD_REQUEST_SENSE: // 0x03
-			logerror("Request Sense");
+			text += "Request Sense";
 			break;
 		case OMTI_CMD_READ_VERIFY: // 0x05
-			logerror("Read Verify");
+			text += "Read Verify";
 			break;
 		case OMTI_CMD_FORMAT_TRACK: // 0x06
-			logerror("Format Track");
+			text += "Format Track";
 			break;
 		case OMTI_CMD_FORMAT_BAD_TRACK: // 0x07
-			logerror("Format Bad Track");
+			text += "Format Bad Track";
 			break;
 		case OMTI_CMD_READ: // 0x08
-			logerror("Read");
+			text += "Read";
 			break;
 		case OMTI_CMD_WRITE: // 0x0A
-			logerror("Write");
+			text += "Write";
 			break;
 		case OMTI_CMD_SEEK: // 0x0B
-			logerror("Seek");
+			text += "Seek";
 			break;
 		case OMTI_CMD_READ_SECTOR_BUFFER: // 0x0E
-			logerror("Read Sector Buffer");
+			text += "Read Sector Buffer";
 			break;
 		case OMTI_CMD_WRITE_SECTOR_BUFFER: // 0x0F
-			logerror("Write Sector Buffer");
+			text += "Write Sector Buffer";
 			break;
 		case OMTI_CMD_ASSIGN_ALTERNATE_TRACK: // 0x11
-			logerror("Assign Alternate Track");
+			text += "Assign Alternate Track";
 			break;
 		case OMTI_CMD_READ_DATA_TO_BUFFER: // 0x1E
-			logerror("Read Data to Buffer");
+			text += "Read Data to Buffer";
 			break;
 		case OMTI_CMD_WRITE_DATA_FROM_BUFFER: // 0x1F
-			logerror("Write Data from Buffer");
+			text += "Write Data from Buffer";
 			break;
 		case OMTI_CMD_COPY: // 0x20
-			logerror("Copy");
+			text += "Copy";
 			break;
 		case OMTI_CMD_READ_ESDI_DEFECT_LIST: // 0x37
-			logerror("Read ESDI Defect List");
+			text += "Read ESDI Defect List";
 			break;
 		case OMTI_CMD_RAM_DIAGNOSTICS: // 0xE0
-			logerror("RAM. Diagnostic");
+			text += "RAM. Diagnostic";
 			break;
 		case OMTI_CMD_CONTROLLER_INT_DIAGNOSTIC: // 0xE4
-			logerror("Controller Int. Diagnostic");
+			text += "Controller Int. Diagnostic";
 			break;
 		case OMTI_CMD_READ_LONG: // 0xE5
-			logerror("Read Long");
+			text += "Read Long";
 			break;
 		case OMTI_CMD_WRITE_LONG: // 0xE6
-			logerror("Write Long");
+			text += "Write Long";
 			break;
 		case OMTI_CMD_READ_CONFIGURATION: // 0xEC
-			logerror("Read Configuration");
+			text += "Read Configuration";
 			break;
 		case OMTI_CMD_INVALID_COMMAND: // 0xFF
-			logerror("Invalid Command");
+			text += "Invalid Command";
 			break;
 		default:
-			logerror("!!! Unexpected Command !!!");
+			text += "!!! Unexpected Command !!!";
 		}
 //      logerror(" (%02x, length=%02x)", cdb[0], cdb_length);
 		for (i = 0; i < cdb_length; i++) {
-			logerror(" %02x", cdb[i]);
+			sprintf(sb, " %02x", cdb[i]);
+			text += sb;
 		}
 
 		switch (cdb[0]) {
@@ -763,10 +780,12 @@ void omti8621_device::log_command(const UINT8 cdb[], const UINT16 cdb_length)
 		case OMTI_CMD_READ_DATA_TO_BUFFER: // 0x1E
 		case OMTI_CMD_WRITE_DATA_FROM_BUFFER: // 0x1F
 		case OMTI_CMD_COPY: // 0x20
-			logerror(" (diskaddr=%x count=%x)", get_disk_address(cdb), cdb[4]);
+			sprintf(sb, " (diskaddr=%x count=%x)", get_disk_address(cdb), cdb[4]);
+			text += sb;
 			break;
 		}
-		logerror("\n");
+		text += "\n";
+		logerror(text.c_str());
 	}
 }
 
@@ -776,18 +795,25 @@ void omti8621_device::log_command(const UINT8 cdb[], const UINT16 cdb_length)
 
 void omti8621_device::log_data()
 {
-	if (verbose > 0) {
+	if (verbose > 0)
+	{
 		int i;
-		logerror("%s: OMTI data (length=%02x)", cpu_context(this),
+		char sb[100];
+		sprintf(sb, "%s: OMTI data (length=%02x)", cpu_context(this),
 				data_length);
-		for (i = 0; i < data_length && i < OMTI_DISK_SECTOR_SIZE; i++) {
-			logerror(" %02x", data_buffer[i]);
+		std::string text(sb);
+		for (i = 0; i < data_length && i < OMTI_DISK_SECTOR_SIZE; i++)
+		{
+			sprintf(sb, " %02x", data_buffer[i]);
+			text += sb;
 		}
 
-		if (i < data_length) {
-			logerror(" ...");
+		if (i < data_length)
+		{
+			text += " ...";
 		}
-		logerror("\n");
+		text += "\n";
+		logerror(text.c_str());
 	}
 }
 
@@ -1209,11 +1235,9 @@ void omti8621_device::set_verbose(int on_off)
  get_sector - get sector diskaddr of logical unit lun into data_buffer
  ***************************************************************************/
 
-// FIXME: this will work, but is not supported by MESS
-#if 0 // APOLLO_XXL
-UINT32 omti8621_device::get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 length, UINT8 lun)
+UINT32 omti8621_apollo_device::get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 length, UINT8 lun)
 {
-	omti_disk_image_device *disk = omti8621_device_1->our_disks[lun];
+	omti_disk_image_device *disk = our_disks[lun];
 
 	if (disk == NULL || disk->m_image == NULL || !disk->m_image->exists())
 	{
@@ -1232,10 +1256,9 @@ UINT32 omti8621_device::get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 le
 		return length;
 	}
 }
-#endif
 
 /***************************************************************************
- omti_set_jumper - set OMI jumpers
+ omti_set_jumper - set OMTI jumpers
  ***************************************************************************/
 
 void omti8621_device::set_jumper(UINT16 disk_type)
