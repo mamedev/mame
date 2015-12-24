@@ -145,7 +145,7 @@ public:
 	// get sector diskaddr of logical unit lun into data_buffer
 	UINT32 get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 length, UINT8 lun);
 protected:
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 extern const device_type ISA16_OMTI8621_APOLLO;
