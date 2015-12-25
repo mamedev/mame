@@ -34,10 +34,6 @@ class debug_view_breakpoints : public debug_view
 	debug_view_breakpoints(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate);
 	virtual ~debug_view_breakpoints();
 
-public:
-	// getters
-	// setters
-
 protected:
 	// view overrides
 	virtual void view_update() override;

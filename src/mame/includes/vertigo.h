@@ -49,8 +49,6 @@ public:
 	UINT32 vud2;      /* v-counter up or down (stored in L2) */
 	UINT32 hc1;       /* use h- or v-counter in L1 mode */
 	UINT32 ven;       /* vector intensity enable */
-
-private:
 };
 
 struct microcode
