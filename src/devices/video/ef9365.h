@@ -59,6 +59,7 @@ protected:
 
 private:
 	void draw_character( unsigned char c, int block, int smallblock );
+	void plot(int x_pos,int y_pos);
 	void screen_scanning( int force_clear );
 	void set_busy_flag(int period);
 	void set_video_mode(void);
