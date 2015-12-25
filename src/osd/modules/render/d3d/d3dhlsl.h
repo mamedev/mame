@@ -195,6 +195,7 @@ struct hlsl_options
 {
 	bool                    params_init;
 	bool                    params_dirty;
+	int                     shadow_mask_type;
 	float                   shadow_mask_alpha;
 	char                    shadow_mask_texture[1024];
 	int                     shadow_mask_count_x;
@@ -248,6 +249,7 @@ struct hlsl_options
 	float                   vector_length_ratio;
 
 	// Bloom
+	int                     bloom_type;
 	float                   bloom_scale;
 	float                   bloom_overdrive[3];
 	float                   bloom_level0_weight;
@@ -348,6 +350,8 @@ private:
 	render_target*          find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
 	cache_target *          find_cache_target(UINT32 screen_index, int width, int height);
 	void                    remove_cache_target(cache_target *cache);
+
+	rgb_t                   apply_color_convolution(rgb_t color);
 
 	// Shader passes
 	int                     ntsc_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);

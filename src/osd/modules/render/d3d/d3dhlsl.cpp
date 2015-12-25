@@ -688,6 +688,7 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 	if (!options->params_init)
 	{
 		strncpy(options->shadow_mask_texture, winoptions.screen_shadow_mask_texture(), sizeof(options->shadow_mask_texture));
+		options->shadow_mask_type = winoptions.screen_shadow_mask_type();
 		options->shadow_mask_alpha = winoptions.screen_shadow_mask_alpha();
 		options->shadow_mask_count_x = winoptions.screen_shadow_mask_count_x();
 		options->shadow_mask_count_y = winoptions.screen_shadow_mask_count_y();
@@ -734,6 +735,7 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 		options->yiq_phase_count = winoptions.screen_yiq_phase_count();
 		options->vector_length_scale = winoptions.screen_vector_length_scale();
 		options->vector_length_ratio = winoptions.screen_vector_length_ratio();
+		options->bloom_type = winoptions.screen_bloom_type();
 		options->bloom_scale = winoptions.screen_bloom_scale();
 		get_vector(winoptions.screen_bloom_overdrive(), 3, options->bloom_overdrive, TRUE);
 		options->bloom_level0_weight = winoptions.screen_bloom_lvl0_weight();
@@ -968,7 +970,6 @@ int shaders::create_resources(bool reset)
 	color_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 	color_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 
-	color_effect->add_uniform("YIQEnable", uniform::UT_FLOAT, uniform::CU_NTSC_ENABLE);
 	color_effect->add_uniform("RedRatios", uniform::UT_VEC3, uniform::CU_COLOR_RED_RATIOS);
 	color_effect->add_uniform("GrnRatios", uniform::UT_VEC3, uniform::CU_COLOR_GRN_RATIOS);
 	color_effect->add_uniform("BluRatios", uniform::UT_VEC3, uniform::CU_COLOR_BLU_RATIOS);
@@ -1280,6 +1281,46 @@ int shaders::ntsc_pass(render_target *rt, int source_index, poly_info *poly, int
 	return next_index;
 }
 
+rgb_t shaders::apply_color_convolution(rgb_t color)
+{
+	// this function uses the same algorithm as the color convolution shader pass
+
+	float r = static_cast<float>(color.r()) / 255.0f;
+	float g = static_cast<float>(color.g()) / 255.0f;
+	float b = static_cast<float>(color.b()) / 255.0f;
+
+	float *rRatio = options->red_ratio;
+	float *gRatio = options->grn_ratio;
+	float *bRatio = options->blu_ratio;
+	float *offset = options->offset;
+	float *scale = options->scale;
+	float saturation = options->saturation;
+
+	// RGB Tint & Shift
+	float rShifted = r * rRatio[0] + g * rRatio[1] + b * rRatio[2];
+	float gShifted = r * gRatio[0] + g * gRatio[1] + b * gRatio[2];
+	float bShifted = r * bRatio[0] + g * bRatio[1] + b * bRatio[2];
+	
+	// RGB Scale & Offset
+	r = rShifted * scale[0] + offset[0];
+	g = gShifted * scale[1] + offset[1];
+	b = bShifted * scale[2] + offset[2];
+	
+	// Saturation
+	float grayscale[3] = { 0.299f, 0.587f, 0.114f };
+	float luma = r * grayscale[0] + g * grayscale[1] + b * grayscale[2];
+	float chroma[3] = { r - luma, g - luma, b - luma };
+
+	r = chroma[0] * saturation + luma;
+	g = chroma[1] * saturation + luma;
+	b = chroma[2] * saturation + luma;
+
+	return rgb_t(
+		MAX(0, MIN(255, static_cast<int>(r * 255.0f))),
+		MAX(0, MIN(255, static_cast<int>(g * 255.0f))),
+		MAX(0, MIN(255, static_cast<int>(b * 255.0f))));
+}
+
 int shaders::color_convolution_pass(render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
@@ -1396,10 +1437,21 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	float screen_scale[2] = { xscale, yscale };
 	float screen_offset[2] = { xoffset, yoffset };
 
+	rgb_t back_color_rgb = machine->first_screen()->palette() == NULL
+		? rgb_t(0, 0, 0)
+		: machine->first_screen()->palette()->palette()->entry_color(0);
+	back_color_rgb = apply_color_convolution(back_color_rgb);	
+	float back_color[3] = { 
+		static_cast<float>(back_color_rgb.r()) / 255.0f,
+		static_cast<float>(back_color_rgb.g()) / 255.0f,
+		static_cast<float>(back_color_rgb.b()) / 255.0f };
+
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
+	curr_effect->set_int("ShadowType", options->shadow_mask_type);
 	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[next_index]);
+	curr_effect->set_vector("BackColor", 3, back_color);
 	curr_effect->set_vector("ScreenScale", 2, screen_scale);
 	curr_effect->set_vector("ScreenOffset", 2, screen_offset);
 	curr_effect->set_float("ScanlineOffset", texture->get_cur_frame() == 0 ? 0.0f : options->scanline_offset);
@@ -1475,20 +1527,20 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 
 	float weight0123[4] = {
 		options->bloom_level0_weight,
-		options->bloom_level1_weight * bloom_rescale,
-		options->bloom_level2_weight * bloom_rescale,
-		options->bloom_level3_weight * bloom_rescale
+		options->bloom_level1_weight,
+		options->bloom_level2_weight,
+		options->bloom_level3_weight
 	};
 	float weight4567[4] = {
-		options->bloom_level4_weight * bloom_rescale,
-		options->bloom_level5_weight * bloom_rescale,
-		options->bloom_level6_weight * bloom_rescale,
-		options->bloom_level7_weight * bloom_rescale
+		options->bloom_level4_weight,
+		options->bloom_level5_weight,
+		options->bloom_level6_weight,
+		options->bloom_level7_weight
 	};
 	float weight89A[3]  = {
-		options->bloom_level8_weight * bloom_rescale,
-		options->bloom_level9_weight * bloom_rescale,
-		options->bloom_level10_weight * bloom_rescale
+		options->bloom_level8_weight,
+		options->bloom_level9_weight,
+		options->bloom_level10_weight
 	};
 	curr_effect->set_vector("Level0123Weight", 4, weight0123);
 	curr_effect->set_vector("Level4567Weight", 4, weight4567);
@@ -1500,7 +1552,9 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 	curr_effect->set_vector("Level89Size", 4, bloom_dims[8]);
 	curr_effect->set_vector("LevelASize", 2, bloom_dims[10]);
 
-	curr_effect->set_vector("OverdriveWeight", 3, options->bloom_overdrive);
+	curr_effect->set_int("BloomType", options->bloom_type);
+	curr_effect->set_float("BloomScale", bloom_rescale);
+	curr_effect->set_vector("BloomOverdrive", 3, options->bloom_overdrive);
 
 	curr_effect->set_texture("DiffuseA", rt->prescale_texture[next_index]);
 
@@ -2222,8 +2276,25 @@ static INT32 slider_set(float *option, float scale, const char *fmt, std::string
 	return floor(*option / scale + 0.5f);
 }
 
+static INT32 slider_shadow_mask_type(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	hlsl_options *options = (hlsl_options*)arg;
+	if (newval != SLIDER_NOCHANGE)
+	{
+		options->shadow_mask_type = newval;
+	}
+	if (str != NULL)
+	{
+		strprintf(*str, "%s", options->shadow_mask_type == 0 ? "Screen" : "Source");
+	}
+	options->params_dirty = true;
+
+	return options->shadow_mask_type;
+}
+
 static INT32 slider_shadow_mask_alpha(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
+	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->shadow_mask_alpha), 0.01f, "%2.2f", str, newval);
 }
 
@@ -2595,6 +2666,22 @@ static INT32 slider_vector_length_max(running_machine &machine, void *arg, std::
 	return slider_set(&(((hlsl_options*)arg)->vector_length_ratio), 1.0f, "%4f", str, newval);
 }
 
+static INT32 slider_bloom_type(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	hlsl_options *options = (hlsl_options*)arg;
+	if (newval != SLIDER_NOCHANGE)
+	{
+		options->bloom_type = newval;
+	}
+	if (str != NULL)
+	{
+		strprintf(*str, "%s", options->bloom_type == 0 ? "Addition" : "Darken");
+	}
+	options->params_dirty = true;
+
+	return options->bloom_type;
+}
+
 static INT32 slider_bloom_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	((hlsl_options*)arg)->params_dirty = true;
@@ -2691,6 +2778,7 @@ shaders::slider_desc shaders::s_sliders[] =
 {
 	{ "Vector Length Attenuation",           0,    50,   100, 1, 2, slider_vector_attenuation },
 	{ "Vector Attenuation Length Limit",     1,   500,  1000, 1, 2, slider_vector_length_max },
+	{ "Shadow Mask Type",                    0,     0,     1, 1, 7, slider_shadow_mask_type },
 	{ "Shadow Mask Darkness",                0,     0,   100, 1, 7, slider_shadow_mask_alpha },
 	{ "Shadow Mask X Count",                 1,     1,  1024, 1, 7, slider_shadow_mask_x_count },
 	{ "Shadow Mask Y Count",                 1,     1,  1024, 1, 7, slider_shadow_mask_y_count },
@@ -2748,6 +2836,7 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Red Phosphor Life",                   0,     0,   100, 1, 7, slider_red_phosphor_life },
 	{ "Green Phosphor Life",                 0,     0,   100, 1, 7, slider_green_phosphor_life },
 	{ "Blue Phosphor Life",                  0,     0,   100, 1, 7, slider_blue_phosphor_life },
+	{ "Bloom Type",                          0,     0,     1, 1, 7, slider_bloom_type },
 	{ "Bloom Scale",                         0,     0,  2000, 5, 7, slider_bloom_scale },
 	{ "Bloom Red Overdrive",                 0,     0,  2000, 5, 7, slider_bloom_red_overdrive },
 	{ "Bloom Green Overdrive",               0,     0,  2000, 5, 7, slider_bloom_green_overdrive },
