@@ -540,10 +540,9 @@ class input_device
 {
 	friend class input_class;
 
+public:
 	// construction/destruction
 	input_device(input_class &_class, int _devindex, const char *_name, void *_internal);
-
-public:
 	// getters
 	input_class &device_class() const { return m_class; }
 	input_manager &manager() const;
@@ -551,7 +550,7 @@ public:
 	input_device_class devclass() const;
 	const char *name() const { return m_name.c_str(); }
 	int devindex() const { return m_devindex; }
-	input_device_item *item(input_item_id index) const { return m_item[index]; }
+	input_device_item *item(input_item_id index) const { return m_item[index].get(); }
 	input_item_id maxitem() const { return m_maxitem; }
 	void *internal() const { return m_internal; }
 	joystick_map &joymap() { return m_joymap; }
@@ -559,7 +558,7 @@ public:
 	bool lightgun_reload_button() const { return m_lightgun_reload_button; }
 
 	// item management
-	input_item_id add_item(const char *name, input_item_id itemid, item_get_state_func getstate, void *internal = NULL);
+	input_item_id add_item(const char *name, input_item_id itemid, item_get_state_func getstate, void *internal = nullptr);
 	void set_joystick_map(const joystick_map &map) { m_joymap = map; }
 
 	// helpers
@@ -571,7 +570,7 @@ private:
 	input_class &           m_class;                // reference to our class
 	std::string             m_name;                 // string name of device
 	int                     m_devindex;             // device index of this device
-	auto_pointer<input_device_item> m_item[ITEM_ID_ABSOLUTE_MAXIMUM+1]; // array of pointers to items
+	std::unique_ptr<input_device_item> m_item[ITEM_ID_ABSOLUTE_MAXIMUM+1]; // array of pointers to items
 	input_item_id           m_maxitem;              // maximum item index
 	void *                  m_internal;             // internal callback pointer
 
@@ -596,7 +595,7 @@ public:
 	// getters
 	input_manager &manager() const { return m_manager; }
 	running_machine &machine() const;
-	input_device *device(int index) const { return (index <= m_maxindex) ? m_device[index].get() : NULL; }
+	input_device *device(int index) const { return (index <= m_maxindex) ? m_device[index].get() : nullptr; }
 	input_device_class devclass() const { return m_devclass; }
 	int maxindex() const { return m_maxindex; }
 	bool enabled() const { return m_enabled; }
@@ -607,8 +606,8 @@ public:
 	void set_multi(bool multi = true) { m_multi = multi; }
 
 	// device management
-	input_device *add_device(const char *name, void *internal = NULL);
-	input_device *add_device(int devindex, const char *name, void *internal = NULL);
+	input_device *add_device(const char *name, void *internal = nullptr);
+	input_device *add_device(int devindex, const char *name, void *internal = nullptr);
 
 	// misc helpers
 	input_item_class standard_item_class(input_item_id itemid);
@@ -619,7 +618,7 @@ private:
 
 	// internal state
 	input_manager &         m_manager;              // reference to our manager
-	auto_pointer<input_device> m_device[DEVICE_INDEX_MAXIMUM]; // array of devices in this class
+	std::unique_ptr<input_device> m_device[DEVICE_INDEX_MAXIMUM]; // array of devices in this class
 	input_device_class      m_devclass;             // our device class
 	int                     m_maxindex;             // maximum populated index
 	bool                    m_enabled;              // is this class enabled?
@@ -638,7 +637,7 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	input_class &device_class(input_device_class devclass) { assert(devclass < ARRAY_LENGTH(m_class)); assert(m_class[devclass] != NULL); return *m_class[devclass]; }
+	input_class &device_class(input_device_class devclass) { assert(devclass < ARRAY_LENGTH(m_class)); assert(m_class[devclass] != nullptr); return *m_class[devclass]; }
 
 	// input code readers
 	INT32 code_value(input_code code);
@@ -664,7 +663,7 @@ public:
 	INT32 seq_axis_value(const input_seq &seq, input_item_class &itemclass);
 
 	// input sequence polling
-	void seq_poll_start(input_item_class itemclass, const input_seq *startseq = NULL);
+	void seq_poll_start(input_item_class itemclass, const input_seq *startseq = nullptr);
 	bool seq_poll();
 	const input_seq &seq_poll_final() const { return m_poll_seq; }
 

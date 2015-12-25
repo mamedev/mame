@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Derrick Renaud
 /************************************************************************
  * skyraid Sound System Analog emulation
@@ -248,7 +248,7 @@ DISCRETE_SOUND_START( skyraid )
 	/************************************************
 	 * Missle sound
 	 ************************************************/
-	DISCRETE_CUSTOM5(NODE_40, skyraid_missle_custom_charge, SKYRAID_MISSILE_EN, SKYRAID_R12, SKYRAID_R14, SKYRAID_R13, SKYRAID_C44, NULL)
+	DISCRETE_CUSTOM5(NODE_40, skyraid_missle_custom_charge, SKYRAID_MISSILE_EN, SKYRAID_R12, SKYRAID_R14, SKYRAID_R13, SKYRAID_C44, nullptr)
 	DISCRETE_566(NODE_41,                   /* IC K6, pin 3 */
 		NODE_40,                            /* VMOD */
 		SKYRAID_R16, SKYRAID_C45,

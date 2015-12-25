@@ -35,24 +35,33 @@ enum
 	TMS32051_AR4,
 	TMS32051_AR5,
 	TMS32051_AR6,
-	TMS32051_AR7
+	TMS32051_AR7,
+	TMS32051_IFR,
+	TMS32051_IMR,
+	TMS32051_ST0_ARP,
+	TMS32051_ST0_INTM,
+	TMS32051_ST0_DP,
+	TMS32051_ST1_ARB,
+	TMS32051_TIM,
+	TMS32051_PSC
 };
 
 
 const device_type TMS32051 = &device_creator<tms32051_device>;
+const device_type TMS32053 = &device_creator<tms32053_device>;
 
 
 /**************************************************************************
- * Internal memory map
+ * TMS32051 Internal memory map
  **************************************************************************/
 
-static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 16, tms32051_device )
+static ADDRESS_MAP_START( tms32051_internal_pgm, AS_PROGRAM, 16, tms32051_device )
 //  AM_RANGE(0x0000, 0x1fff) AM_ROM                         // ROM          TODO: is off-chip if MP/_MC = 0
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("saram")       // SARAM        TODO: is off-chip if RAM bit = 0
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is off-chip if CNF = 0
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( internal_data, AS_DATA, 16, tms32051_device )
+static ADDRESS_MAP_START( tms32051_internal_data, AS_DATA, 16, tms32051_device )
 	AM_RANGE(0x0000, 0x005f) AM_READWRITE(cpuregs_r, cpuregs_w)
 	AM_RANGE(0x0060, 0x007f) AM_RAM                         // DARAM B2
 	AM_RANGE(0x0100, 0x02ff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is unconnected if CNF = 1
@@ -63,8 +72,43 @@ ADDRESS_MAP_END
 
 tms32051_device::tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, TMS32051, "TMS32051", tag, owner, clock, "tms32051", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(internal_pgm))
-	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(internal_data))
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32051_internal_pgm))
+	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32051_internal_data))
+	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, -1)
+{
+}
+
+tms32051_device::tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char* shortname, const char* source)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1)
+	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1)
+	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, -1)
+{
+}
+
+
+
+/**************************************************************************
+ * TMS32053 Internal memory map
+ **************************************************************************/
+
+static ADDRESS_MAP_START( tms32053_internal_pgm, AS_PROGRAM, 16, tms32053_device )
+//  AM_RANGE(0x0000, 0x3fff) AM_ROM                         // ROM          TODO: is off-chip if MP/_MC = 0
+	AM_RANGE(0x4000, 0x4bff) AM_RAM AM_SHARE("saram")       // SARAM        TODO: is off-chip if RAM bit = 0
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is off-chip if CNF = 0
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tms32053_internal_data, AS_DATA, 16, tms32053_device )
+	AM_RANGE(0x0000, 0x005f) AM_READWRITE(cpuregs_r, cpuregs_w)
+	AM_RANGE(0x0060, 0x007f) AM_RAM                         // DARAM B2
+	AM_RANGE(0x0100, 0x02ff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is unconnected if CNF = 1
+	AM_RANGE(0x0300, 0x04ff) AM_RAM                         // DARAM B1
+	AM_RANGE(0x0800, 0x13ff) AM_RAM AM_SHARE("saram")       // SARAM        TODO: is off-chip if OVLY = 0
+ADDRESS_MAP_END
+
+
+tms32053_device::tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms32051_device(mconfig, TMS32053, "TMS32053", tag, owner, clock, "tms32053", __FILE__)
 {
 }
 
@@ -137,6 +181,7 @@ void tms32051_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_data = &space(AS_DATA);
+	m_io = &space(AS_IO);
 
 	m_pcstack_ptr = 0;
 	m_op = 0;
@@ -191,6 +236,15 @@ void tms32051_device::device_start()
 	state_add( TMS32051_AR6,   "AR6", m_ar[6]).formatstr("%04X");
 	state_add( TMS32051_AR7,   "AR7", m_ar[7]).formatstr("%04X");
 
+	state_add( TMS32051_IFR,      "IFR", m_ifr).formatstr("%04X");
+	state_add( TMS32051_IMR,      "IMR", m_imr).formatstr("%04X");
+	state_add( TMS32051_ST0_ARP,  "ST0 ARP", m_st0.arp).formatstr("%1d");
+	state_add( TMS32051_ST0_INTM, "ST0 INTM", m_st0.intm).formatstr("%1d");
+	state_add( TMS32051_ST0_DP,   "ST0 DP", m_st0.dp).formatstr("%04X");
+	state_add( TMS32051_ST1_ARB,  "ST1 ARB", m_st1.arb).formatstr("%04X");
+	state_add( TMS32051_TIM,      "TIM", m_timer.tim).formatstr("%04X");
+	state_add( TMS32051_PSC,      "PSC", m_timer.psc).formatstr("%04X");
+
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
 
 	m_icountptr = &m_icount;
@@ -218,6 +272,8 @@ void tms32051_device::device_reset()
 	m_ifr       = 0;
 	m_cbcr      = 0;
 	m_rptc      = -1;
+
+	m_idle = false;
 
 	// simulate internal rom boot loader (can be removed when the dsp rom(s) is dumped)
 	m_st0.intm  = 1;
@@ -255,6 +311,8 @@ void tms32051_device::check_interrupts()
 
 				m_pc = (m_pmst.iptr << 11) | ((i+1) << 1);
 				m_ifr &= ~(1 << i);
+
+				m_idle = false;
 
 				save_interrupt_context();
 				break;
@@ -313,42 +371,50 @@ void tms32051_device::execute_run()
 	{
 		UINT16 ppc;
 
-		// handle block repeat
-		if (m_pmst.braf)
+		if (m_idle)
 		{
-			if (m_pc == m_paer)
-			{
-				if (m_brcr > 0)
-				{
-					CHANGE_PC(m_pasr);
-				}
-
-				m_brcr--;
-				if (m_brcr <= 0)
-				{
-					m_pmst.braf = 0;
-				}
-			}
-		}
-
-		ppc = m_pc;
-		debugger_instruction_hook(this, m_pc);
-
-		m_op = ROPCODE();
-		(this->*s_opcode_table[m_op >> 8])();
-
-		// handle single repeat
-		if (m_rptc > 0)
-		{
-			if (ppc == m_rpt_end)
-			{
-				CHANGE_PC(m_rpt_start);
-				m_rptc--;
-			}
+			debugger_instruction_hook(this, m_pc);
+			CYCLES(1);
 		}
 		else
 		{
-			m_rptc = 0;
+			// handle block repeat
+			if (m_pmst.braf)
+			{
+				if (m_pc == m_paer)
+				{
+					if (m_brcr > 0)
+					{
+						CHANGE_PC(m_pasr);
+					}
+						
+					m_brcr--;
+					if (m_brcr <= 0)
+					{
+						m_pmst.braf = 0;
+					}
+				}
+			}
+
+			ppc = m_pc;
+			debugger_instruction_hook(this, m_pc);
+
+			m_op = ROPCODE();
+			(this->*s_opcode_table[m_op >> 8])();
+
+			// handle single repeat
+			if (m_rptc > 0)
+			{
+				if (ppc == m_rpt_end)
+				{
+					CHANGE_PC(m_rpt_start);
+					m_rptc--;
+				}
+			}
+			else
+			{
+				m_rptc = 0;
+			}
 		}
 
 		m_timer.psc--;
@@ -426,6 +492,27 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 		case 0x28: // PDWSR
 			return 0;
 
+		case 0x37:	// ABU BKR
+			return 0;
+
+		case 0x50:	// Memory-mapped I/O ports
+		case 0x51:
+		case 0x52:
+		case 0x53:
+		case 0x54:
+		case 0x55:
+		case 0x56:
+		case 0x57:
+		case 0x58:
+		case 0x59:
+		case 0x5a:
+		case 0x5b:
+		case 0x5c:
+		case 0x5d:
+		case 0x5e:
+		case 0x5f:
+			return m_io->read_word(offset << 1);
+
 		default:
 			if (!space.debugger_access())
 				fatalerror("32051: cpuregs_r: unimplemented memory-mapped register %02X at %04X\n", offset, m_pc-1);
@@ -440,6 +527,9 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 	{
 		case 0x00: break;
 		case 0x04: m_imr = data; break;
+
+		case 0x05: // GREG
+			break;
 
 		case 0x06: // IFR
 		{
@@ -467,6 +557,7 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 		}
 
 		case 0x09: m_brcr = data; break;
+		case 0x0d: m_treg1 = data; break;
 		case 0x0e: m_treg2 = data; break;
 		case 0x0f: m_dbmr = data; break;
 		case 0x10: m_ar[0] = data; break;
@@ -509,6 +600,31 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 		case 0x28: // PDWSR
 			break;
 
+		case 0x29: // IOWSR
+			break;
+
+		case 0x2a: // CWSR
+			break;
+
+		case 0x50:	// Memory-mapped I/O ports
+		case 0x51:
+		case 0x52:
+		case 0x53:
+		case 0x54:
+		case 0x55:
+		case 0x56:
+		case 0x57:
+		case 0x58:
+		case 0x59:
+		case 0x5a:
+		case 0x5b:
+		case 0x5c:
+		case 0x5d:
+		case 0x5e:
+		case 0x5f:
+			m_io->write_word(offset << 1, data);
+			break;
+
 		default:
 			if (!space.debugger_access())
 				fatalerror("32051: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, m_pc-1);
@@ -527,5 +643,45 @@ bool tms32051_device::memory_read(address_spacenum spacenum, offs_t offset, int 
 	{
 		value = (DM_READ16(offset>>1));
 	}
+	else if (spacenum == AS_IO)
+	{
+		value = m_io->read_word(offset);
+	}
 	return 1;
+}
+
+
+
+void tms32053_device::device_reset()
+{
+	// reset registers
+	m_st0.intm  = 1;
+	m_st0.ov    = 0;
+	m_st1.c     = 1;
+	m_st1.cnf   = 0;
+	m_st1.hm    = 1;
+	m_st1.pm    = 0;
+	m_st1.sxm   = 1;
+	m_st1.xf    = 1;
+	m_pmst.avis = 0;
+	m_pmst.braf = 0;
+	m_pmst.iptr = 0;
+	m_pmst.ndx  = 0;
+	m_pmst.ovly = 0;
+	m_pmst.ram  = 0;
+	m_pmst.mpmc = 0; // TODO: this is set to logical pin state at reset
+	m_pmst.trm  = 0;
+	m_ifr       = 0;
+	m_cbcr      = 0;
+	m_rptc      = -1;
+
+	m_idle = false;
+
+	CHANGE_PC(0);
+}
+
+void tms32053_device::device_config_complete()
+{
+	m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32053_internal_pgm));
+	m_data_config = address_space_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32053_internal_data));
 }

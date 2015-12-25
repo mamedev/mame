@@ -415,7 +415,7 @@ WRITE8_MEMBER( bw2_state::ppi_pa_w )
 	m_kb = data & 0x0f;
 
 	// drive select
-	m_floppy = NULL;
+	m_floppy = nullptr;
 	if (BIT(data, 4)) m_floppy = m_floppy0->get_device();
 	if (BIT(data, 5)) m_floppy = m_floppy1->get_device();
 
@@ -628,7 +628,7 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 
@@ -637,8 +637,8 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bw2_state, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", bw2_floppies, NULL,   bw2_state::floppy_formats)
-	MCFG_BW2_EXPANSION_SLOT_ADD(BW2_EXPANSION_SLOT_TAG, XTAL_16MHz, bw2_expansion_cards, NULL)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", bw2_floppies, nullptr,   bw2_state::floppy_formats)
+	MCFG_BW2_EXPANSION_SLOT_ADD(BW2_EXPANSION_SLOT_TAG, XTAL_16MHz, bw2_expansion_cards, nullptr)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list","bw2")

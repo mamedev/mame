@@ -111,7 +111,7 @@ bool vic20_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			if (!core_stricmp(filetype(), "20")) fread(m_card->m_blk1, 0x2000);
 			else if (!core_stricmp(filetype(), "40")) fread(m_card->m_blk2, 0x2000);
@@ -179,7 +179,7 @@ void vic20_expansion_slot_device::get_default_card_software(std::string &result)
 
 UINT8 vic20_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		data = m_card->vic20_cd_r(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 	}
@@ -194,7 +194,7 @@ UINT8 vic20_expansion_slot_device::cd_r(address_space &space, offs_t offset, UIN
 
 void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		m_card->vic20_cd_w(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 	}

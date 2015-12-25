@@ -341,7 +341,7 @@ const address_space_config *esrip_device::memory_space_config(address_spacenum s
 	{
 		return &m_program_config;
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1696,7 +1696,7 @@ esrip_device::esrip_device(const machine_config &mconfig, const char *tag, devic
 		m_fdt_r(*this),
 		m_fdt_w(*this),
 		m_status_in(*this),
-		m_lbrm_prom(NULL)
+		m_lbrm_prom(nullptr)
 {
 	// build the opcode table
 	for (int op = 0; op < 24; op++)

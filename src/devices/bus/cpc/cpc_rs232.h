@@ -24,7 +24,7 @@ public:
 	cpc_rs232_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 			// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_WRITE_LINE_MEMBER(pit_out0_w);
 	DECLARE_WRITE_LINE_MEMBER(pit_out1_w);
@@ -40,9 +40,9 @@ public:
 	required_device<rs232_port_device> m_rs232;
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual const rom_entry *device_rom_region() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const rom_entry *device_rom_region() const override;
 
 private:
 	cpc_expansion_slot_device *m_slot;
@@ -55,7 +55,7 @@ public:
 	cpc_ams_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 // device type definition

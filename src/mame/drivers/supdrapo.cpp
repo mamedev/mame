@@ -98,9 +98,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ay8910_outputa_w);
 	DECLARE_WRITE8_MEMBER(ay8910_outputb_w);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(supdrapo);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

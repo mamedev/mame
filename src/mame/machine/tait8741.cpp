@@ -127,7 +127,7 @@ void taito8741_4pack_device::update(int num)
 		st = &m_taito8741[num];
 		if( st->connect != -1 )
 				sst = &m_taito8741[st->connect];
-		else sst = 0;
+		else sst = nullptr;
 		next = -1;
 		/* check pending command */
 		switch(st->phase)
@@ -381,15 +381,15 @@ void josvolly8741_4pack_device::device_reset()
 {
 	m_nmi_enable = 0;
 
-	for(int i=0;i<4;i++)
+	for(auto & elem : m_i8741)
 	{
-		m_i8741[i].cmd = 0;
-		m_i8741[i].sts = 0; // 0xf0; /* init flag */
-		m_i8741[i].txd = 0;
-		m_i8741[i].outport = 0xff;
-		m_i8741[i].rxd = 0;
+		elem.cmd = 0;
+		elem.sts = 0; // 0xf0; /* init flag */
+		elem.txd = 0;
+		elem.outport = 0xff;
+		elem.rxd = 0;
 
-		m_i8741[i].rst = 1;
+		elem.rst = 1;
 	}
 }
 

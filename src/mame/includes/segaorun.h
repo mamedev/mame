@@ -37,9 +37,9 @@ public:
 		m_digital_ports(*this, digital_ports),
 		m_adc_ports(*this, "ADC"),
 		m_workram(*this, "workram"),
-		m_custom_map(NULL),
+		m_custom_map(nullptr),
 		m_shangon_video(false),
-		m_scanline_timer(NULL),
+		m_scanline_timer(nullptr),
 		m_irq2_state(0),
 		m_adc_select(0),
 		m_vblank_irq_state(0),
@@ -98,9 +98,9 @@ protected:
 	};
 
 	// device overrides
-	virtual void machine_reset();
-	virtual void video_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// internal helpers
 	void update_main_irqs();

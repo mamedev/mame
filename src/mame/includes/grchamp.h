@@ -87,9 +87,9 @@ public:
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 
 	DECLARE_PALETTE_INIT(grchamp);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	INTERRUPT_GEN_MEMBER(cpu0_interrupt);
 	INTERRUPT_GEN_MEMBER(cpu1_interrupt);

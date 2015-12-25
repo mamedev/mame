@@ -60,16 +60,16 @@ public:
 	DECLARE_WRITE8_MEMBER(dai_pit_w);
 	DECLARE_READ8_MEMBER(dai_keyboard_r);
 	DECLARE_WRITE8_MEMBER(dai_keyboard_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(dai);
 	UINT32 screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void dai_update_memory(int dai_rom_bank);
 	IRQ_CALLBACK_MEMBER(int_ack);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

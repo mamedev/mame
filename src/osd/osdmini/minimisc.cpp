@@ -79,7 +79,7 @@ void osd_break_into_debugger(const char *message)
 char *osd_get_clipboard_text(void)
 {
 	// can't support clipboards generically
-	return NULL;
+	return nullptr;
 }
 
 //============================================================
@@ -88,7 +88,7 @@ char *osd_get_clipboard_text(void)
 
 const char *osd_getenv(const char *name)
 {
-	return NULL;
+	return nullptr;
 }
 
 //============================================================

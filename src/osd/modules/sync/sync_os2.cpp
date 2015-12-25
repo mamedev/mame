@@ -167,7 +167,7 @@ void osd_scalable_lock_free(osd_scalable_lock *lock)
 	free(lock);
 }
 
-INLINE pthread_t osd_compare_exchange_pthread_t(pthread_t volatile *ptr, pthread_t compare, pthread_t exchange)
+static inline pthread_t osd_compare_exchange_pthread_t(pthread_t volatile *ptr, pthread_t compare, pthread_t exchange)
 {
 #ifdef PTR64
 	INT64 result = compare_exchange64((INT64 volatile *)ptr, (INT64)compare, (INT64)exchange);
@@ -177,7 +177,7 @@ INLINE pthread_t osd_compare_exchange_pthread_t(pthread_t volatile *ptr, pthread
 	return (pthread_t)result;
 }
 
-INLINE pthread_t osd_exchange_pthread_t(pthread_t volatile *ptr, pthread_t exchange)
+static inline pthread_t osd_exchange_pthread_t(pthread_t volatile *ptr, pthread_t exchange)
 {
 #ifdef PTR64
 	INT64 result = osd_exchange64((INT64 volatile *)ptr, (INT64)exchange);

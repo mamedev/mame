@@ -2,7 +2,7 @@
 // copyright-holders:hap, Sean Riddle
 /***************************************************************************
 
-  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.c) **
+  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
 
   Milton Bradley Dark Tower
   * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C), die labeled MP7332
@@ -48,7 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(read_k);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 
@@ -254,8 +254,6 @@ static MACHINE_CONFIG_START( mbdtower, mbdtower_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tower_motor", mbdtower_state, motor_sim_tick, attotime::from_msec(3500/0x80)) // ~3.5sec for a full rotation
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_mbdtower)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

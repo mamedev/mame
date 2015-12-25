@@ -76,7 +76,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(binbug_serial_w);
 	const UINT8 *m_p_chargen;
 	UINT8 m_framecnt;
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	optional_device<rs232_port_device> m_rs232;
 	required_device<cassette_image_device> m_cass;
@@ -330,7 +330,7 @@ ROM_START( binbug )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "6574.bin", 0x0000, 0x0800, CRC(fd75df4f) SHA1(4d09aae2f933478532b7d3d1a2dee7123d9828ca) )
-	ROM_FILL(0, 16, 0)
+	ROM_FILL(0, 16, 0x00)
 ROM_END
 
 /* Driver */
@@ -426,7 +426,7 @@ public:
 	UINT8 m_pio_b;
 	UINT8 m_term_data;
 	UINT8 m_protection[0x100];
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80pio_device> m_pio;
@@ -462,7 +462,7 @@ static const z80_daisy_config dg680_daisy_chain[] =
 {
 	{ "z80ctc" },
 	{ "z80pio" },
-	{ NULL }
+	{ 0x00 }
 };
 
 

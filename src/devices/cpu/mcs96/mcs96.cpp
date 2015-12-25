@@ -117,7 +117,7 @@ void mcs96_device::execute_set_input(int inputnum, int state)
 
 const address_space_config *mcs96_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_PROGRAM) ? &program_config : NULL;
+	return (spacenum == AS_PROGRAM) ? &program_config : nullptr;
 }
 
 void mcs96_device::state_import(const device_state_entry &entry)

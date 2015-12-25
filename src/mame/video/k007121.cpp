@@ -235,7 +235,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 	//  gfx_element *gfx = gfxs[chip];
 	int flipscreen = m_flipscreen;
 	int i, num, inc, offs[5];
-	int is_flakatck = (palette == NULL);
+	int is_flakatck = (palette == nullptr);
 
 	if (is_flakatck)
 	{

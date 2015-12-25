@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /****************************************************************************
 
-    drivers/sgi_ip2.c
+    drivers/sgi_ip2.cpp
     SGI IRIS 3130 skeleton driver with some meat on its bones
 
     by Ryan Holtz
@@ -110,8 +110,8 @@ private:
 	UINT16 m_stklmt;
 	UINT8 m_parctl;
 	UINT8 m_mbp;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 };
 

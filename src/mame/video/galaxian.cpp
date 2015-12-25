@@ -446,7 +446,7 @@ UINT32 galaxian_state::screen_update_galaxian(screen_device &screen, bitmap_rgb3
 		sprites_draw(bitmap, cliprect, &m_spriteram[m_sprites_base + i * 0x20]);
 
 	/* if we have bullets to draw, render them following */
-	if (m_draw_bullet_ptr != NULL)
+	if (m_draw_bullet_ptr != nullptr)
 		bullets_draw(bitmap, cliprect, &m_spriteram[m_bullets_base]);
 
 	return 0;
@@ -469,7 +469,7 @@ TILE_GET_INFO_MEMBER(galaxian_state::bg_get_tile_info)
 	UINT8 attrib = m_spriteram[x*2+1];
 	UINT8 color = attrib & 7;
 
-	if (m_extend_tile_info_ptr != NULL)
+	if (m_extend_tile_info_ptr != nullptr)
 		(this->*m_extend_tile_info_ptr)(&code, &color, attrib, x);
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
@@ -561,7 +561,7 @@ void galaxian_state::sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		UINT8 sx = base[3] + hoffset;
 
 		/* extend the sprite information */
-		if (m_extend_sprite_info_ptr != NULL)
+		if (m_extend_sprite_info_ptr != nullptr)
 			(this->*m_extend_sprite_info_ptr)(base, &sx, &sy, &flipx, &flipy, &code, &color);
 
 		/* apply flipscreen in X direction */
@@ -786,7 +786,7 @@ void galaxian_state::stars_init()
 	m_stars_blink_state = 0;
 
 	/* precalculate the RNG */
-	m_stars = auto_alloc_array(machine(), UINT8, STAR_RNG_PERIOD);
+	m_stars = std::make_unique<UINT8[]>(STAR_RNG_PERIOD);
 	shiftreg = 0;
 	for (i = 0; i < STAR_RNG_PERIOD; i++)
 	{

@@ -55,7 +55,7 @@ public:
 
 	// the real accumulation buffer is a 32x32x8bpp buffer into which tiles get rendered before they get copied to the framebuffer
 	//  our implementation is not currently tile based, and thus the accumulation buffer is screen sized
-	bitmap_rgb32 *fake_accumulationbuffer_bitmap;
+	std::unique_ptr<bitmap_rgb32> fake_accumulationbuffer_bitmap;
 
 	struct texinfo  {
 		UINT32 address, vqbase;
@@ -280,8 +280,8 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	devcb_write8 irq_cb;

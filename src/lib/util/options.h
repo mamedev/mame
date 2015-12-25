@@ -12,7 +12,7 @@
 #define __OPTIONS_H__
 
 #include "corefile.h"
-#include "tagmap.h"
+#include <unordered_map>
 
 
 
@@ -70,12 +70,12 @@ public:
 		friend class simple_list<entry>;
 
 		// construction/destruction
-		entry(const char *name, const char *description, UINT32 flags = 0, const char *defvalue = NULL);
+		entry(const char *name, const char *description, UINT32 flags = 0, const char *defvalue = nullptr);
 
 	public:
 		// getters
 		entry *next() const { return m_next; }
-		const char *name(int index = 0) const { return (index < ARRAY_LENGTH(m_name) && !m_name[index].empty()) ? m_name[index].c_str() : NULL; }
+		const char *name(int index = 0) const { return (index < ARRAY_LENGTH(m_name) && !m_name[index].empty()) ? m_name[index].c_str() : nullptr; }
 		const char *description() const { return m_description; }
 		const char *value() const { return m_data.c_str(); }
 		const char *default_value() const { return m_defdata.c_str(); }
@@ -130,7 +130,7 @@ public:
 	const char *command() const { return m_command.c_str(); }
 
 	// configuration
-	void add_entry(const char *name, const char *description, UINT32 flags = 0, const char *defvalue = NULL, bool override_existing = false);
+	void add_entry(const char *name, const char *description, UINT32 flags = 0, const char *defvalue = nullptr, bool override_existing = false);
 	void add_entry(const options_entry &data, bool override_existing = false) { add_entry(data.name, data.description, data.flags, data.defvalue, override_existing); }
 	void add_entries(const options_entry *entrylist, bool override_existing = false);
 	void set_default_value(const char *name, const char *defvalue);
@@ -145,7 +145,7 @@ public:
 	void revert(int priority = OPTION_PRIORITY_MAXIMUM);
 
 	// output
-	const char *output_ini(std::string &buffer, const core_options *diff = NULL);
+	const char *output_ini(std::string &buffer, const core_options *diff = nullptr);
 	const char *output_help(std::string &buffer);
 
 	// reading
@@ -178,7 +178,7 @@ private:
 
 	// internal state
 	simple_list<entry>      m_entrylist;            // head of list of entries
-	tagmap_t<entry *>       m_entrymap;             // map for fast lookup
+	std::unordered_map<std::string,entry *>       m_entrymap;             // map for fast lookup
 	std::string             m_command;              // command found
 	static const char *const s_option_unadorned[];  // array of unadorned option "names"
 };

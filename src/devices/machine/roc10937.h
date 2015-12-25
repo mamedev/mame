@@ -81,26 +81,20 @@ protected:
 	UINT32 m_chars[16];
 	UINT32 m_outputs[16];
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
 };
 
 
 class roc10937_t : public rocvfd_t {
 public:
 	roc10937_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-
 };
 
 class msc1937_t : public rocvfd_t {
 public:
 	msc1937_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-
 };
 
 class roc10957_t : public rocvfd_t {
@@ -108,16 +102,11 @@ public:
 	roc10957_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void write_char(int data);
-
-protected:
-
 };
 
 class s16lf01_t : public rocvfd_t {
 public:
 	s16lf01_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-protected:
-
 };
 
 extern const device_type ROC10937;

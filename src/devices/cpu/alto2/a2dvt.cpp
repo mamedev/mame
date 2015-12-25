@@ -30,8 +30,8 @@ void alto2_cpu_device::activate_dvt()
  */
 void alto2_cpu_device::init_dvt(int task)
 {
-	set_f1(task, f1_block,          &alto2_cpu_device::f1_early_dvt_block, 0);
-	set_f2(task, f2_dvt_evenfield,  0, &alto2_cpu_device::f2_late_evenfield);
+	set_f1(task, f1_block,          &alto2_cpu_device::f1_early_dvt_block, nullptr);
+	set_f2(task, f2_dvt_evenfield,  nullptr, &alto2_cpu_device::f2_late_evenfield);
 	m_active_callback[task] = &alto2_cpu_device::activate_dvt;
 }
 

@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Alex Pasadyn, Zsolt Vasvari, Kurt Mahan, Ernesto Corvi, Aaron Giles
+// license:BSD-3-Clause
+// copyright-holders:Alex Pasadyn, Zsolt Vasvari, Ernesto Corvi, Aaron Giles
+// thanks-to:Kurt Mahan
 /*************************************************************************
 
     Williams/Midway Y/Z-unit system
@@ -41,11 +42,11 @@ enum
 VIDEO_START_MEMBER(midyunit_state,common)
 {
 	/* allocate memory */
-	m_cmos_ram = auto_alloc_array(machine(), UINT16, (0x2000 * 4)/2);
-	m_local_videoram = auto_alloc_array_clear(machine(), UINT16, 0x80000/2);
-	m_pen_map = auto_alloc_array(machine(), pen_t, 65536);
+	m_cmos_ram = std::make_unique<UINT16[]>((0x2000 * 4)/2);
+	m_local_videoram = make_unique_clear<UINT16[]>(0x80000/2);
+	m_pen_map = std::make_unique<pen_t[]>(65536);
 
-	machine().device<nvram_device>("nvram")->set_base(m_cmos_ram, 0x2000 * 4);
+	machine().device<nvram_device>("nvram")->set_base(m_cmos_ram.get(), 0x2000 * 4);
 
 	/* reset all the globals */
 	m_cmos_page = 0;
@@ -58,8 +59,8 @@ VIDEO_START_MEMBER(midyunit_state,common)
 
 	/* register for state saving */
 	save_item(NAME(m_autoerase_enable));
-	save_pointer(NAME(m_local_videoram), 0x80000/2);
-	save_pointer(NAME(m_cmos_ram), (0x2000 * 4)/2);
+	save_pointer(NAME(m_local_videoram.get()), 0x80000/2);
+	save_pointer(NAME(m_cmos_ram.get()), (0x2000 * 4)/2);
 	save_item(NAME(m_videobank_select));
 	save_item(NAME(m_dma_register));
 }
@@ -563,7 +564,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(midyunit_state::scanline_update)
 		dest[x] = m_pen_map[src[coladdr++ & 0x1ff]];
 
 	/* handle autoerase on the previous line */
-	autoerase_line(NULL, params->rowaddr - 1);
+	autoerase_line(nullptr, params->rowaddr - 1);
 
 	/* if this is the last update of the screen, set a timer to clear out the final line */
 	/* (since we update one behind) */

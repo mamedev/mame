@@ -224,7 +224,7 @@ WRITE16_MEMBER(seibuspi_state::sprite_dma_start_w)
 	if (m_video_dma_address < 0x800)
 		logerror("sprite_dma_start_w in I/O area: %X\n", m_video_dma_address);
 
-	memcpy(m_sprite_ram, &m_mainram[m_video_dma_address / 4], m_sprite_ram_size);
+	memcpy(m_sprite_ram.get(), &m_mainram[m_video_dma_address / 4], m_sprite_ram_size);
 }
 
 
@@ -470,9 +470,9 @@ UINT32 seibuspi_state::screen_update_spi(screen_device &screen, bitmap_rgb32 &bi
 	}
 	else
 	{
-		back_rowscroll = NULL;
-		midl_rowscroll = NULL;
-		fore_rowscroll = NULL;
+		back_rowscroll = nullptr;
+		midl_rowscroll = nullptr;
+		fore_rowscroll = nullptr;
 	}
 
 	screen.priority().fill(0, cliprect);
@@ -507,7 +507,7 @@ UINT32 seibuspi_state::screen_update_spi(screen_device &screen, bitmap_rgb32 &bi
 	draw_sprites(bitmap, cliprect, screen.priority(), 3);
 
 	if (~m_layer_enable & 8)
-		combine_tilemap(bitmap, cliprect, m_text_layer, 0, 0, 0, NULL);
+		combine_tilemap(bitmap, cliprect, m_text_layer, 0, 0, 0, nullptr);
 
 	return 0;
 }
@@ -603,9 +603,9 @@ void seibuspi_state::video_start()
 	m_sprite_ram_size = 0x1000;
 	m_sprite_bpp = 6;
 
-	m_tilemap_ram = auto_alloc_array_clear(machine(), UINT32, m_tilemap_ram_size/4);
-	m_palette_ram = auto_alloc_array_clear(machine(), UINT32, m_palette_ram_size/4);
-	m_sprite_ram = auto_alloc_array_clear(machine(), UINT32, m_sprite_ram_size/4);
+	m_tilemap_ram = make_unique_clear<UINT32[]>(m_tilemap_ram_size/4);
+	m_palette_ram = make_unique_clear<UINT32[]>(m_palette_ram_size/4);
+	m_sprite_ram = make_unique_clear<UINT32[]>(m_sprite_ram_size/4);
 
 	m_text_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seibuspi_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64,32);
 	m_back_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seibuspi_state::get_back_tile_info),this), TILEMAP_SCAN_COLS, 16,16,32,32);
@@ -665,9 +665,9 @@ VIDEO_START_MEMBER(seibuspi_state,sys386f)
 	m_sprite_ram_size = 0x2000;
 	m_sprite_bpp = 8;
 
-	m_tilemap_ram = NULL;
-	m_palette_ram = auto_alloc_array_clear(machine(), UINT32, m_palette_ram_size/4);
-	m_sprite_ram = auto_alloc_array_clear(machine(), UINT32, m_sprite_ram_size/4);
+	m_tilemap_ram = nullptr;
+	m_palette_ram = make_unique_clear<UINT32[]>(m_palette_ram_size/4);
+	m_sprite_ram = make_unique_clear<UINT32[]>(m_sprite_ram_size/4);
 
 	memset(m_alpha_table, 0, 0x2000); // no alpha blending
 
@@ -691,7 +691,7 @@ void seibuspi_state::register_video_state()
 	save_item(NAME(m_midl_layer_d14));
 	save_item(NAME(m_fore_layer_d14));
 
-	if (m_tilemap_ram != NULL) save_pointer(NAME(m_tilemap_ram), m_tilemap_ram_size/4);
-	save_pointer(NAME(m_palette_ram), m_palette_ram_size/4);
-	save_pointer(NAME(m_sprite_ram), m_sprite_ram_size/4);
+	if (m_tilemap_ram != nullptr) save_pointer(NAME(m_tilemap_ram.get()), m_tilemap_ram_size/4);
+	save_pointer(NAME(m_palette_ram.get()), m_palette_ram_size/4);
+	save_pointer(NAME(m_sprite_ram.get()), m_sprite_ram_size/4);
 }

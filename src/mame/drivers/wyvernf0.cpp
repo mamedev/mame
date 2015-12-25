@@ -58,7 +58,7 @@ public:
 	// video-related
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
-	UINT8      *m_objram;
+	std::unique_ptr<UINT8[]>      m_objram;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -603,9 +603,9 @@ MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
 	membank("rombank")->configure_entries(0, 8, ROM, 0x2000);
 
 	// sprite codes lookup in banked RAM
-	m_objram = auto_alloc_array(machine(), UINT8, 0x1000 * 2);
-	save_pointer(NAME(m_objram), 0x1000 * 2);
-	membank("rambank")->configure_entries(0, 2, m_objram, 0x1000);
+	m_objram = std::make_unique<UINT8[]>(0x1000 * 2);
+	save_pointer(NAME(m_objram.get()), 0x1000 * 2);
+	membank("rambank")->configure_entries(0, 2, m_objram.get(), 0x1000);
 
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));

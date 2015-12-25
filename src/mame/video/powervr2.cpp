@@ -921,9 +921,9 @@ WRITE32_MEMBER( powervr2_device::softreset_w )
 		logerror("%s: Core Pipeline soft reset\n", tag());
 #endif
 		if (start_render_received == 1) {
-			for (int a=0;a < NUM_BUFFERS;a++)
-				if (grab[a].busy == 1)
-					grab[a].busy = 0;
+			for (auto & elem : grab)
+				if (elem.busy == 1)
+					elem.busy = 0;
 			start_render_received = 0;
 		}
 	}
@@ -3625,7 +3625,7 @@ void powervr2_device::device_start()
 	endofrender_timer_tsp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_tsp),this));
 	endofrender_timer_video = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_video),this));
 
-	fake_accumulationbuffer_bitmap = auto_bitmap_rgb32_alloc(machine(),2048,2048);
+	fake_accumulationbuffer_bitmap = std::make_unique<bitmap_rgb32>(2048,2048);
 
 	softreset = 0;
 	param_base = 0;

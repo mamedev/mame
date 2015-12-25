@@ -212,12 +212,12 @@ public:
 	void SegaCD_CDC_Do_DMA( int &dmacount, UINT8 *CDC_BUFFER, UINT16 &dma_addrc, UINT16 &destination );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// optional information overrides
 //  virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 private:
 //  virtual void device_config_complete();
 

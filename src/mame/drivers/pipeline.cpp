@@ -96,7 +96,7 @@ public:
 	tilemap_t *m_tilemap2;
 
 	UINT8 m_vidctrl;
-	UINT8 *m_palram;
+	std::unique_ptr<UINT8[]> m_palram;
 	UINT8 m_toMCU;
 	UINT8 m_fromMCU;
 	UINT8 m_ddrA;
@@ -113,8 +113,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pipeline);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -151,13 +151,13 @@ TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info2)
 
 void pipeline_state::video_start()
 {
-	m_palram=auto_alloc_array(machine(), UINT8, 0x1000);
+	m_palram=std::make_unique<UINT8[]>(0x1000);
 	m_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
 	m_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
 	m_tilemap2->set_transparent_pen(0);
 
 	save_item(NAME(m_vidctrl));
-	save_pointer(NAME(m_palram), 0x1000);
+	save_pointer(NAME(m_palram.get()), 0x1000);
 }
 
 UINT32 pipeline_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -339,7 +339,7 @@ GFXDECODE_END
 static const z80_daisy_config daisy_chain_sound[] =
 {
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 PALETTE_INIT_MEMBER(pipeline_state, pipeline)

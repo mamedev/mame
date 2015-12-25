@@ -120,7 +120,7 @@ WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch3)
 static const z80_daisy_config daisy_chain[] =
 {
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 

@@ -88,7 +88,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cartslot_w);
 	DECLARE_READ8_MEMBER(cartslot_io_r);
 	DECLARE_WRITE8_MEMBER(cartslot_io_w);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	UINT8 m_vblank_irq_state;
@@ -170,32 +170,32 @@ READ8_MEMBER(iq151_state::cartslot_r)
 {
 	UINT8 data = 0xff;
 
-	for (int i=0; i<5; i++)
-		m_carts[i]->read(offset, data);
+	for (auto & elem : m_carts)
+		elem->read(offset, data);
 
 	return data;
 }
 
 WRITE8_MEMBER(iq151_state::cartslot_w)
 {
-	for (int i=0; i<5; i++)
-		m_carts[i]->write(offset, data);
+	for (auto & elem : m_carts)
+		elem->write(offset, data);
 }
 
 READ8_MEMBER(iq151_state::cartslot_io_r)
 {
 	UINT8 data = 0xff;
 
-	for (int i=0; i<5; i++)
-		m_carts[i]->io_read(offset, data);
+	for (auto & elem : m_carts)
+		elem->io_read(offset, data);
 
 	return data;
 }
 
 WRITE8_MEMBER(iq151_state::cartslot_io_w)
 {
-	for (int i=0; i<5; i++)
-		m_carts[i]->io_write(offset, data);
+	for (auto & elem : m_carts)
+		elem->io_write(offset, data);
 }
 
 static ADDRESS_MAP_START(iq151_mem, AS_PROGRAM, 8, iq151_state)
@@ -355,8 +355,8 @@ UINT32 iq151_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	bitmap.fill(0, cliprect);
 
-	for (int i=0; i<5; i++)
-		m_carts[i]->video_update(bitmap, cliprect);
+	for (auto & elem : m_carts)
+		elem->video_update(bitmap, cliprect);
 
 	return 0;
 }
@@ -416,28 +416,28 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 
 	/* cartridge */
 	MCFG_DEVICE_ADD("slot1", IQ151CART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(iq151_cart, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(iq151_cart, nullptr, false)
 	MCFG_IQ151CART_SLOT_OUT_IRQ0_CB(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
 	MCFG_IQ151CART_SLOT_OUT_IRQ1_CB(DEVWRITELINE("pic8259", pic8259_device, ir1_w))
 	MCFG_IQ151CART_SLOT_OUT_IRQ2_CB(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
 	MCFG_IQ151CART_SLOT_OUT_IRQ3_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
 	MCFG_IQ151CART_SLOT_OUT_IRQ4_CB(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
 	MCFG_DEVICE_ADD("slot2", IQ151CART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(iq151_cart, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(iq151_cart, nullptr, false)
 	MCFG_IQ151CART_SLOT_OUT_IRQ0_CB(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
 	MCFG_IQ151CART_SLOT_OUT_IRQ1_CB(DEVWRITELINE("pic8259", pic8259_device, ir1_w))
 	MCFG_IQ151CART_SLOT_OUT_IRQ2_CB(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
 	MCFG_IQ151CART_SLOT_OUT_IRQ3_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
 	MCFG_IQ151CART_SLOT_OUT_IRQ4_CB(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
 	MCFG_DEVICE_ADD("slot3", IQ151CART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(iq151_cart, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(iq151_cart, nullptr, false)
 	MCFG_IQ151CART_SLOT_OUT_IRQ0_CB(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
 	MCFG_IQ151CART_SLOT_OUT_IRQ1_CB(DEVWRITELINE("pic8259", pic8259_device, ir1_w))
 	MCFG_IQ151CART_SLOT_OUT_IRQ2_CB(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
 	MCFG_IQ151CART_SLOT_OUT_IRQ3_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
 	MCFG_IQ151CART_SLOT_OUT_IRQ4_CB(DEVWRITELINE("pic8259", pic8259_device, ir4_w))
 	MCFG_DEVICE_ADD("slot4", IQ151CART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(iq151_cart, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(iq151_cart, nullptr, false)
 	MCFG_IQ151CART_SLOT_OUT_IRQ0_CB(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
 	MCFG_IQ151CART_SLOT_OUT_IRQ1_CB(DEVWRITELINE("pic8259", pic8259_device, ir1_w))
 	MCFG_IQ151CART_SLOT_OUT_IRQ2_CB(DEVWRITELINE("pic8259", pic8259_device, ir2_w))

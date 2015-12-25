@@ -423,7 +423,7 @@ WRITE_LINE_MEMBER( grip_device::speaker_w )
 static const z80_daisy_config grip_daisy_chain[] =
 {
 	{ Z80STI_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 

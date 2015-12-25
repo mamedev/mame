@@ -30,18 +30,18 @@ public:
 	s100_mm65k16s_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_s100_card_interface overrides
-	virtual UINT8 s100_smemr_r(address_space &space, offs_t offset);
-	virtual void s100_mwrt_w(address_space &space, offs_t offset, UINT8 data);
-	virtual void s100_phantom_w(int state);
+	virtual UINT8 s100_smemr_r(address_space &space, offs_t offset) override;
+	virtual void s100_mwrt_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual void s100_phantom_w(int state) override;
 
 private:
 	optional_shared_ptr<UINT8> m_ram;

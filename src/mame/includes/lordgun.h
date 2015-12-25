@@ -56,7 +56,7 @@ public:
 	int m_whitescreen;
 	lordgun_gun_data m_gun[2];
 	tilemap_t *m_tilemap[4];
-	bitmap_ind16 *m_bitmaps[5];
+	std::unique_ptr<bitmap_ind16> m_bitmaps[5];
 
 	UINT16 m_protection_data;
 	DECLARE_WRITE16_MEMBER(lordgun_protection_w);
@@ -91,8 +91,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
 	TILE_GET_INFO_MEMBER(get_tile_info_3);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	UINT32 screen_update_lordgun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);

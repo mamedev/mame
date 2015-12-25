@@ -231,7 +231,14 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const UINT8 *oprom)
 				case 0x00:  print("illop0      "); break;
 				case 0x01:  print("trap        %d", UIMM15(uimm15)); break;
 				case 0x02:  print("cmnd        0x%04X", UIMM15(uimm15)); break;
-				case 0x04:  print("rdcr        %s, R%d", get_creg_name(UIMM15(uimm15)), rd); break;
+				
+				case 0x04:
+					if (op == 0x00020000)
+						print("nop         ");
+					else
+						print("rdcr        %s, R%d", get_creg_name(UIMM15(uimm15)), rd);
+					break;
+								
 				case 0x05:  print("swcr        R%d, %s, R%d", rd, get_creg_name(UIMM15(uimm15)), rs); break;
 				case 0x06:  print("brcr        %s", get_creg_name(UIMM15(uimm15))); break;
 				case 0x08:  print("shift%s.dz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;

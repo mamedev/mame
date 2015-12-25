@@ -17,7 +17,7 @@ const device_type DECO16 = &device_creator<deco16_device>;
 
 deco16_device::deco16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	m6502_device(mconfig, DECO16, "DECO16", tag, owner, clock, "deco16", __FILE__),
-	io(NULL),
+	io(nullptr),
 	io_config("io", ENDIANNESS_LITTLE, 8, 16)
 {
 }
@@ -46,8 +46,8 @@ const address_space_config *deco16_device::memory_space_config(address_spacenum 
 	{
 	case AS_PROGRAM:           return &program_config;
 	case AS_IO:                return &io_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &sprogram_config : NULL;
-	default:                   return NULL;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &sprogram_config : nullptr;
+	default:                   return nullptr;
 	}
 }
 

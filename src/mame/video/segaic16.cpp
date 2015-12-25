@@ -1082,8 +1082,8 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 			get_tile_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16a_tile_info),this);
 			info->numpages = 4;
 			info->draw_layer = tilemap_16a_draw_layer;
-			info->reset = NULL;
-			info->latch_timer = NULL;
+			info->reset = nullptr;
+			info->latch_timer = nullptr;
 			break;
 
 		case SEGAIC16_TILEMAP_16A:
@@ -1091,8 +1091,8 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 			get_tile_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16a_tile_info),this);
 			info->numpages = 8;
 			info->draw_layer = tilemap_16a_draw_layer;
-			info->reset = NULL;
-			info->latch_timer = NULL;
+			info->reset = nullptr;
+			info->latch_timer = nullptr;
 			break;
 
 		case SEGAIC16_TILEMAP_16B:
@@ -1359,10 +1359,10 @@ void segaic16_video_device::rotate_init(int which, int type, int colorbase)
 	}
 
 	/* allocate a buffer for swapping */
-	info->buffer = auto_alloc_array(machine(), UINT16, info->ramsize/2);
+	info->buffer = std::make_unique<UINT16[]>(info->ramsize/2);
 
 	save_item(NAME(info->colorbase), which);
-	save_pointer(NAME((UINT8 *) info->buffer), info->ramsize, which);
+	save_pointer(NAME((UINT8 *) info->buffer.get()), info->ramsize, which);
 }
 
 
@@ -1443,7 +1443,7 @@ READ16_MEMBER( segaic16_video_device::rotate_control_r )
 	if (info->buffer)
 	{
 		UINT32 *src = (UINT32 *)info->rotateram;
-		UINT32 *dst = (UINT32 *)info->buffer;
+		UINT32 *dst = (UINT32 *)info->buffer.get();
 		int i;
 
 		/* swap the halves of the rotation RAM */

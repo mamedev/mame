@@ -350,7 +350,7 @@ WRITE8_MEMBER( abc1600_state::fw0_w )
 	if (LOG) logerror("FW0 %02x\n", data);
 
 	// drive select
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) floppy = m_floppy1->get_device();
@@ -899,13 +899,13 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pb7_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(abc1600_state, fdc_drq_w))
 
-	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":0", abc1600_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":1", abc1600_floppies, NULL,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":0", abc1600_floppies, nullptr,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":1", abc1600_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":2", abc1600_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z8470AB1_TAG, z80dart_device, rxa_w))
 
 	MCFG_ABC_KEYBOARD_PORT_ADD(ABC_KEYBOARD_PORT_TAG, "abc99")
@@ -913,16 +913,16 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(DEVWRITELINE(Z8470AB1_TAG, z80dart_device, rxtxcb_w))
 	MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(DEVWRITELINE(Z8470AB1_TAG, z80dart_device, dcdb_w))
 
-	MCFG_ABCBUS_SLOT_ADD("bus0i", abc1600bus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("bus0i", abc1600bus_cards, nullptr)
 	MCFG_ABCBUS_SLOT_IRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa7_w))
-	MCFG_ABCBUS_SLOT_ADD("bus0x", abc1600bus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("bus0x", abc1600bus_cards, nullptr)
 	MCFG_ABCBUS_SLOT_IRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa6_w))
 	MCFG_ABCBUS_SLOT_NMI_CALLBACK(WRITELINE(abc1600_state, nmi_w))
 	MCFG_ABCBUS_SLOT_XINT2_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa2_w))
 	MCFG_ABCBUS_SLOT_XINT3_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa3_w))
 	MCFG_ABCBUS_SLOT_XINT4_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa4_w))
 	MCFG_ABCBUS_SLOT_XINT5_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa5_w))
-	MCFG_ABCBUS_SLOT_ADD("bus1", abc1600bus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("bus1", abc1600bus_cards, nullptr)
 	MCFG_ABCBUS_SLOT_IRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa1_w))
 	MCFG_ABCBUS_SLOT_ADD("bus2", abc1600bus_cards, "4105")
 	MCFG_ABCBUS_SLOT_IRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa0_w))

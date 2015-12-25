@@ -17,15 +17,15 @@ public:
 	cpc_brunword4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 
 	DECLARE_WRITE8_MEMBER(rombank_w);
-	virtual void set_mapping(UINT8 type);
+	virtual void set_mapping(UINT8 type) override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	cpc_expansion_slot_device *m_slot;

@@ -141,9 +141,9 @@ void* dsp16_device::registerFromRImmediateField(const UINT8& R)
 		case 0x06: return (void*)&m_r2;
 		case 0x07: return (void*)&m_r3;
 
-		default: return NULL;
+		default: return nullptr;
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -180,9 +180,9 @@ void* dsp16_device::registerFromRTable(const UINT8 &R)
 		case 0x1d: return (void*)&m_pdx0;
 		case 0x1e: return (void*)&m_pdx1;
 
-		default: return NULL;
+		default: return nullptr;
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -195,7 +195,7 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 	// implementation details  (page 3-9)
 
 	// Where is are the results going?
-	UINT64* destinationReg = NULL;
+	UINT64* destinationReg = nullptr;
 	switch (D)
 	{
 		case 0x00: destinationReg = &m_a0; break;
@@ -204,7 +204,7 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 	}
 
 	// Which source is being used?
-	UINT64* sourceReg = NULL;
+	UINT64* sourceReg = nullptr;
 	switch (S)
 	{
 		case 0x00: sourceReg = &m_a0; break;
@@ -377,7 +377,7 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 
 UINT16* dsp16_device::registerFromYFieldUpper(const UINT8& Y)
 {
-	UINT16* destinationReg = NULL;
+	UINT16* destinationReg = nullptr;
 	const UINT8 N = (Y & 0x0c) >> 2;
 	switch (N)
 	{
@@ -605,7 +605,7 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 			const UINT8 aT = (op & 0x0400) >> 10;
 			const UINT8 F1 = (op & 0x01e0) >> 5;
 			executeF1Field(F1, !aT, S);
-			UINT64* destinationReg = NULL;
+			UINT64* destinationReg = nullptr;
 			switch(aT)
 			{
 				case 0: destinationReg = &m_a1; break;
@@ -783,7 +783,7 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 			// aT = R  :  (page 3-30)
 			const UINT8 R  = (op & 0x03f0) >> 4;
 			const UINT8 aT = (op & 0x0400) >> 10;
-			UINT64* destinationReg = NULL;
+			UINT64* destinationReg = nullptr;
 			switch(aT)
 			{
 				case 0: destinationReg = &m_a1; break;

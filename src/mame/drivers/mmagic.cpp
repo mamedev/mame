@@ -87,7 +87,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;

@@ -20,7 +20,7 @@ const device_type CPC_MFACE2 = &device_creator<cpc_multiface2_device>;
 static MACHINE_CONFIG_FRAGMENT( cpc_mface2 )
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
@@ -74,7 +74,7 @@ DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_multiface_directoverride )
 
 int cpc_multiface2_device::multiface_hardware_enabled()
 {
-	if (m_multiface_ram!=NULL)
+	if (m_multiface_ram!=nullptr)
 	{
 		if ((ioport("multiface")->read() & 0x01)!=0)
 		{
@@ -107,9 +107,9 @@ void cpc_multiface2_device::multiface_rethink_memory()
 	{
 		/* set bank addressess */
 		machine().root_device().membank("bank1")->set_base(multiface_rom);
-		machine().root_device().membank("bank2")->set_base(m_multiface_ram);
+		machine().root_device().membank("bank2")->set_base(m_multiface_ram.get());
 		machine().root_device().membank("bank9")->set_base(multiface_rom);
-		machine().root_device().membank("bank10")->set_base(m_multiface_ram);
+		machine().root_device().membank("bank10")->set_base(m_multiface_ram.get());
 	}
 }
 
@@ -326,7 +326,7 @@ void cpc_multiface2_device::device_start()
 	m_multiface_flags = MULTIFACE_VISIBLE;
 
 	/* allocate ram */
-	m_multiface_ram = auto_alloc_array(machine(), UINT8, 8192);
+	m_multiface_ram = std::make_unique<UINT8[]>(8192);
 }
 
 //-------------------------------------------------

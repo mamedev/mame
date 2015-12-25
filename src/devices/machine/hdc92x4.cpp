@@ -425,7 +425,7 @@ const hdc92x4_device::cmddef hdc92x4_device::s_command[] =
 	{ 0x5c, 0xfc, &hdc92x4_device::read_sectors },
 	{ 0x60, 0xe0, &hdc92x4_device::format_track },
 	{ 0x80, 0x80, &hdc92x4_device::write_sectors },
-	{ 0, 0, 0 }
+	{ 0, 0, nullptr }
 };
 
 /*
@@ -2004,7 +2004,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 	if (limit == attotime::never)
 	{
 		// We did not specify an upper time bound, so we take the next index pulse
-		if (m_floppy != NULL) limit = m_floppy->time_next_index();
+		if (m_floppy != nullptr) limit = m_floppy->time_next_index();
 
 		if (limit == attotime::never)
 		{
@@ -2721,8 +2721,8 @@ void hdc92x4_device::live_run_until(attotime limit)
 			m_out_dip(ASSERT_LINE);
 
 			// Write the header via DMA
-			for (int slot = 0; slot < 6; slot++)
-				m_out_dma(0, m_register_r[id_field[slot]], 0xff);
+			for (auto & elem : id_field)
+				m_out_dma(0, m_register_r[elem], 0xff);
 
 			m_out_dip(CLEAR_LINE);
 			m_out_dmarq(CLEAR_LINE);
@@ -2834,7 +2834,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 	}
 
 	// We did not specify an upper time bound, so we take the next index pulse
-	if (limit == attotime::never && m_harddisk != NULL)
+	if (limit == attotime::never && m_harddisk != nullptr)
 	{
 		limit = m_harddisk->track_end_time();
 		if (TRACE_LIVE) logerror("%s: [%s live] live_run_hd new limit %s\n", tag(), tts(m_live_state.time).c_str(), tts(limit).c_str());
@@ -3296,8 +3296,8 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 			m_out_dip(ASSERT_LINE);
 
 			// Write the header via DMA
-			for (int slot = 0; slot < 6; slot++)
-				m_out_dma(0, m_register_r[id_field[slot]], 0xff);
+			for (auto & elem : id_field)
+				m_out_dma(0, m_register_r[elem], 0xff);
 
 			// Continue with reading the sector data
 			m_live_state.state = SEARCH_DAM;
@@ -3721,7 +3721,7 @@ bool hdc92x4_device::read_from_mfmhd(const attotime &limit)
 	UINT16 data = 0;
 	bool offlimit = false;
 
-	if (m_harddisk != NULL)
+	if (m_harddisk != nullptr)
 	{
 		offlimit = m_harddisk->read(m_live_state.time, limit, data);
 	}
@@ -3811,7 +3811,7 @@ bool hdc92x4_device::write_to_mfmhd(const attotime &limit)
 		count = 16;
 	}
 
-	if (m_harddisk != NULL)
+	if (m_harddisk != nullptr)
 	{
 		offlimit = m_harddisk->write(m_live_state.time, limit, data, m_precompensation != 0, m_reduced_write_current);
 	}
@@ -4434,8 +4434,8 @@ void hdc92x4_device::device_reset()
 	m_executing = false;
 	m_event_line = UNDEF;
 	m_first_sector_found = false;
-	m_floppy = NULL;
-	m_harddisk = NULL;
+	m_floppy = nullptr;
+	m_harddisk = nullptr;
 	m_initialized = true;
 	m_line_level = CLEAR_LINE;
 	m_live_state.state = IDLE;

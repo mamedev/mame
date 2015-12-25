@@ -68,8 +68,8 @@ void m6m80011ap_device::device_reset()
 
 void m6m80011ap_device::nvram_default()
 {
-	for (offs_t offs = 0; offs < 0x80; offs++)
-		m_eeprom_data[offs] = 0xffff;
+	for (auto & elem : m_eeprom_data)
+		elem = 0xffff;
 }
 
 

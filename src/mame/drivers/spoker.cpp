@@ -74,9 +74,9 @@ public:
 
 	DECLARE_DRIVER_INIT(spk116it);
 	DECLARE_DRIVER_INIT(3super8);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -348,7 +348,7 @@ static INPUT_PORTS_START( spoker )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Memory Clear") // stats, memory
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,spoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")   // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,spoker_state,hopper_r, (void *)nullptr ) PORT_NAME("HPSW")   // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
@@ -417,7 +417,7 @@ static INPUT_PORTS_START( 3super8 )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,spoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")   // hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,spoker_state,hopper_r, (void *)nullptr ) PORT_NAME("HPSW")   // hopper sensor
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1   )

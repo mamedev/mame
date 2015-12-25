@@ -72,7 +72,7 @@ static MACHINE_CONFIG_FRAGMENT( pf10 )
 	MCFG_UPD765A_ADD("upd765a", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", pf10_floppies, "smd165", floppy_image_device::default_floppy_formats)
 
-	MCFG_EPSON_SIO_ADD("sio", NULL)
+	MCFG_EPSON_SIO_ADD("sio", nullptr)
 	MCFG_EPSON_SIO_RX(DEVWRITELINE(DEVICE_SELF, epson_pf10_device, rxc_w))
 	MCFG_EPSON_SIO_PIN(DEVWRITELINE(DEVICE_SELF, epson_pf10_device, pinc_w))
 MACHINE_CONFIG_END
@@ -111,7 +111,7 @@ epson_pf10_device::epson_pf10_device(const machine_config &mconfig, const char *
 
 void epson_pf10_device::device_start()
 {
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 	m_floppy = subdevice<floppy_connector>("upd765a:0")->get_device();
 }
 

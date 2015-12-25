@@ -771,19 +771,14 @@ void cps3_state::cps3_decrypt_bios()
 
 void cps3_state::init_common(void)
 {
-	/* just some NOPs for the game to execute if it crashes and starts executing unmapped addresses
-	 - this prevents MAME from crashing */
-	m_nops = auto_alloc(machine(), UINT32);
-	m_nops[0] = 0x00090009;
-
 	// flash roms
 	std::string tempstr;
 	for (int simmnum = 0; simmnum < 7; simmnum++)
 		for (int chipnum = 0; chipnum < 8; chipnum++)
 			m_simm[simmnum][chipnum] = machine().device<fujitsu_29f016a_device>(strformat(tempstr,"simm%d.%d", simmnum + 1, chipnum).c_str());
 
-	m_eeprom = auto_alloc_array(machine(), UINT32, 0x400/4);
-	machine().device<nvram_device>("eeprom")->set_base(m_eeprom, 0x400);
+	m_eeprom = std::make_unique<UINT32[]>(0x400/4);
+	machine().device<nvram_device>("eeprom")->set_base(m_eeprom.get(), 0x400);
 }
 
 
@@ -894,27 +889,27 @@ void cps3_state::cps3_set_mame_colours(int colournum, UINT16 data, UINT32 fadeva
 
 void cps3_state::video_start()
 {
-	m_ss_ram       = auto_alloc_array(machine(), UINT32, 0x10000/4);
-	memset(m_ss_ram, 0x00, 0x10000);
-	save_pointer(NAME(m_ss_ram), 0x10000/4);
+	m_ss_ram       = std::make_unique<UINT32[]>(0x10000/4);
+	memset(m_ss_ram.get(), 0x00, 0x10000);
+	save_pointer(NAME(m_ss_ram.get()), 0x10000/4);
 
-	m_char_ram = auto_alloc_array(machine(), UINT32, 0x800000/4);
-	memset(m_char_ram, 0x00, 0x800000);
-	save_pointer(NAME(m_char_ram), 0x800000 /4);
+	m_char_ram = std::make_unique<UINT32[]>(0x800000/4);
+	memset(m_char_ram.get(), 0x00, 0x800000);
+	save_pointer(NAME(m_char_ram.get()), 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, cps3_tiles8x8_layout, (UINT8 *)m_ss_ram, 0, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, cps3_tiles8x8_layout, (UINT8 *)m_ss_ram.get(), 0, m_palette->entries() / 16, 0));
 
 	//decode_ssram();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(1, global_alloc(gfx_element(m_palette, cps3_tiles16x16_layout, (UINT8 *)m_char_ram, 0, m_palette->entries() / 64, 0)));
+	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, cps3_tiles16x16_layout, (UINT8 *)m_char_ram.get(), 0, m_palette->entries() / 64, 0));
 	m_gfxdecode->gfx(1)->set_granularity(64);
 
 	//decode_charram();
 
-	m_mame_colours = auto_alloc_array(machine(), UINT32, 0x80000/4);
-	memset(m_mame_colours, 0x00, 0x80000);
+	m_mame_colours = std::make_unique<UINT32[]>(0x80000/4);
+	memset(m_mame_colours.get(), 0x00, 0x80000);
 
 	m_screenwidth = 384;
 
@@ -1003,7 +998,7 @@ void cps3_state::cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rg
 			if (!bpp) m_gfxdecode->gfx(1)->set_granularity(256);
 			else m_gfxdecode->gfx(1)->set_granularity(64);
 
-			cps3_drawgfxzoom(bitmap,clip,m_gfxdecode->gfx(1),tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, NULL, 0);
+			cps3_drawgfxzoom(bitmap,clip,m_gfxdecode->gfx(1),tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, nullptr, 0);
 		}
 	}
 }
@@ -1243,11 +1238,11 @@ UINT32 cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitma
 
 									if (global_alpha || alpha)
 									{
-										cps3_drawgfxzoom(m_renderbuffer_bitmap,m_renderbuffer_clip,m_gfxdecode->gfx(1),realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(m_renderbuffer_bitmap,m_renderbuffer_clip,m_gfxdecode->gfx(1),realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, nullptr, 0);
 									}
 									else
 									{
-										cps3_drawgfxzoom(m_renderbuffer_bitmap,m_renderbuffer_clip,m_gfxdecode->gfx(1),realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(m_renderbuffer_bitmap,m_renderbuffer_clip,m_gfxdecode->gfx(1),realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, nullptr, 0);
 									}
 									count++;
 								}
@@ -1313,7 +1308,7 @@ UINT32 cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitma
 				pal += m_ss_pal_base << 5;
 				tile+=0x200;
 
-				cps3_drawgfxzoom(bitmap, cliprect, m_gfxdecode->gfx(0),tile,pal,flipx,flipy,x*8,y*8,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,NULL,0);
+				cps3_drawgfxzoom(bitmap, cliprect, m_gfxdecode->gfx(0),tile,pal,flipx,flipy,x*8,y*8,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,nullptr,0);
 				count++;
 			}
 		}
@@ -1403,7 +1398,7 @@ READ32_MEMBER(cps3_state::cps3_gfxflash_r)
 
 	fujitsu_29f016a_device *chip0 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) & ~1];
 	fujitsu_29f016a_device *chip1 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) |  1];
-	if (chip0 == NULL || chip1 == NULL)
+	if (chip0 == nullptr || chip1 == nullptr)
 		return 0xffffffff;
 
 	if(DEBUG_PRINTF) printf("gfxflash_r\n");
@@ -1441,7 +1436,7 @@ WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
 
 	fujitsu_29f016a_device *chip0 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) & ~1];
 	fujitsu_29f016a_device *chip1 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) |  1];
-	if (chip0 == NULL || chip1 == NULL)
+	if (chip0 == nullptr || chip1 == nullptr)
 		return;
 
 //  if(DEBUG_PRINTF) printf("cps3_gfxflash_w %08x %08x %08x\n", offset *2, data, mem_mask);
@@ -1496,7 +1491,7 @@ UINT32 cps3_state::cps3_flashmain_r(address_space &space, int which, UINT32 offs
 {
 	UINT32 result = 0;
 
-	if (m_simm[which][0] == NULL || m_simm[which][1] == NULL || m_simm[which][2] == NULL || m_simm[which][3] == NULL)
+	if (m_simm[which][0] == nullptr || m_simm[which][1] == nullptr || m_simm[which][2] == nullptr || m_simm[which][3] == nullptr)
 		return 0xffffffff;
 
 	if (ACCESSING_BITS_24_31)   // Flash 1
@@ -1551,7 +1546,7 @@ void cps3_state::cps3_flashmain_w(int which, UINT32 offset, UINT32 data, UINT32 
 {
 	int command;
 
-	if (m_simm[which][0] == NULL || m_simm[which][1] == NULL || m_simm[which][2] == NULL || m_simm[which][3] == NULL)
+	if (m_simm[which][0] == nullptr || m_simm[which][1] == nullptr || m_simm[which][2] == nullptr || m_simm[which][3] == nullptr)
 		return;
 
 	if (ACCESSING_BITS_24_31)   // Flash 1
@@ -1835,7 +1830,7 @@ WRITE32_MEMBER(cps3_state::cps3_palettedma_w)
 
 UINT32 cps3_state::process_byte( UINT8 real_byte, UINT32 destination, int max_length )
 {
-	UINT8* dest       = (UINT8*)m_char_ram;
+	UINT8* dest       = (UINT8*)m_char_ram.get();
 
 	//printf("process byte for destination %08x\n", destination);
 
@@ -1930,7 +1925,7 @@ void cps3_state::cps3_do_char_dma( UINT32 real_source, UINT32 real_destination, 
 
 UINT32 cps3_state::ProcessByte8(UINT8 b,UINT32 dst_offset)
 {
-	UINT8* destRAM = (UINT8*)m_char_ram;
+	UINT8* destRAM = (UINT8*)m_char_ram.get();
 	int l=0;
 
 	if(m_lastb==m_lastb2) //rle
@@ -2324,7 +2319,7 @@ void cps3_state::copy_from_nvram()
 	romdata  += 0x800000/4;
 	romdata2 += 0x800000/4;
 
-	if (m_simm[1][0] != NULL)
+	if (m_simm[1][0] != nullptr)
 		for (i=0;i<0x800000;i+=4)
 		{
 			UINT32 data;
@@ -2349,9 +2344,9 @@ void cps3_state::copy_from_nvram()
 
 			fujitsu_29f016a_device *flash0 = m_simm[2 + flashnum/8][flashnum % 8 + 0];
 			fujitsu_29f016a_device *flash1 = m_simm[2 + flashnum/8][flashnum % 8 + 1];
-			if (flash0 == NULL || flash1 == NULL)
+			if (flash0 == nullptr || flash1 == nullptr)
 				continue;
-			if (flash0 != NULL && flash1 != NULL)
+			if (flash0 != nullptr && flash1 != nullptr)
 			{
 				for (i=0;i<0x200000;i+=2)
 				{

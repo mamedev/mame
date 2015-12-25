@@ -277,7 +277,7 @@ static const char *get_data_address( const char **mem_names, UINT8 arg )
 	static int whichbuf;
 	char *buffer = &buffer_array[++whichbuf % 4][0];
 
-	if (mem_names[arg] == NULL)
+	if (mem_names[arg] == nullptr)
 		sprintf(buffer,"$%02X",arg);
 	else
 		sprintf(buffer,"%s", mem_names[arg]);
@@ -298,9 +298,9 @@ static const char *get_bit_address( const char **mem_names, UINT8 arg )
 	}
 	else
 	{
-		if (mem_names[arg | 0x100] == NULL)
+		if (mem_names[arg | 0x100] == nullptr)
 		{
-			if (mem_names[arg & 0xf8] == NULL)
+			if (mem_names[arg & 0xf8] == nullptr)
 				sprintf(buffer,"$%02X.%d", arg & 0xf8, arg & 0x07);
 			else
 				sprintf(buffer,"%s.%d", mem_names[arg & 0xf8], arg & 0x07);

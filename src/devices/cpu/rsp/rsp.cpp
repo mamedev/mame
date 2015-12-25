@@ -102,36 +102,36 @@ rsp_device::rsp_device(const machine_config &mconfig, const char *tag, device_t 
 	: cpu_device(mconfig, RSP, "RSP", tag, owner, clock, "rsp", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32)
 	, m_cache(CACHE_SIZE + sizeof(internal_rsp_state))
-	, m_drcuml(NULL)
+	, m_drcuml(nullptr)
 //  , m_drcuml(*this, m_cache, 0, 8, 32, 2)
-	, m_drcfe(NULL)
+	, m_drcfe(nullptr)
 	, m_drcoptions(0)
 	, m_cache_dirty(TRUE)
 	, m_numcycles(0)
-	, m_format(NULL)
+	, m_format(nullptr)
 	, m_arg2(0)
 	, m_arg3(0)
-	, m_entry(NULL)
-	, m_nocode(NULL)
-	, m_out_of_cycles(NULL)
-	, m_read8(NULL)
-	, m_write8(NULL)
-	, m_read16(NULL)
-	, m_write16(NULL)
-	, m_read32(NULL)
-	, m_write32(NULL)
-	, m_rsp_state(NULL)
-	, m_exec_output(NULL)
+	, m_entry(nullptr)
+	, m_nocode(nullptr)
+	, m_out_of_cycles(nullptr)
+	, m_read8(nullptr)
+	, m_write8(nullptr)
+	, m_read16(nullptr)
+	, m_write16(nullptr)
+	, m_read32(nullptr)
+	, m_write32(nullptr)
+	, m_rsp_state(nullptr)
+	, m_exec_output(nullptr)
 	, m_sr(0)
 	, m_step_count(0)
 	, m_ppc(0)
 	, m_nextpc(0)
-	, m_dmem32(NULL)
-	, m_dmem16(NULL)
-	, m_dmem8(NULL)
-	, m_imem32(NULL)
-	, m_imem16(NULL)
-	, m_imem8(NULL)
+	, m_dmem32(nullptr)
+	, m_dmem16(nullptr)
+	, m_dmem8(nullptr)
+	, m_imem32(nullptr)
+	, m_imem16(nullptr)
+	, m_imem8(nullptr)
 	, m_debugger_temp(0)
 	, m_dp_reg_r_func(*this)
 	, m_dp_reg_w_func(*this)
@@ -373,11 +373,11 @@ void rsp_device::device_start()
 
 	if (m_isdrc)
 	{
-		m_cop2 = auto_alloc(machine(), rsp_cop2_drc(*this, machine()));
+		m_cop2 = std::make_unique<rsp_cop2_drc>(*this, machine());
 	}
 	else
 	{
-		m_cop2 = auto_alloc(machine(), rsp_cop2(*this, machine()));
+		m_cop2 = std::make_unique<rsp_cop2>(*this, machine());
 	}
 	m_cop2->init();
 	m_cop2->start();
@@ -393,7 +393,7 @@ void rsp_device::device_start()
 
 	/* initialize the UML generator */
 	UINT32 drc_flags = 0;
-	m_drcuml = auto_alloc(machine(), drcuml_state(*this, m_cache, drc_flags, 8, 32, 2));
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, drc_flags, 8, 32, 2);
 
 	/* add symbols for our stuff */
 	m_drcuml->symbol_add(&m_rsp_state->pc, sizeof(m_rsp_state->pc), "pc");
@@ -411,7 +411,7 @@ void rsp_device::device_start()
 	m_drcuml->symbol_add(&m_numcycles, sizeof(m_numcycles), "numcycles");
 
 	/* initialize the front-end helper */
-	m_drcfe = auto_alloc(machine(), rsp_frontend(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
+	m_drcfe = std::make_unique<rsp_frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 	/* compute the register parameters */
 	for (int regnum = 0; regnum < 32; regnum++)
@@ -595,22 +595,7 @@ void rsp_device::device_stop()
 
 	if (m_exec_output)
 		fclose(m_exec_output);
-	m_exec_output = NULL;
-
-	/* clean up the DRC */
-	if (m_drcuml)
-	{
-		auto_free(machine(), m_drcuml);
-	}
-	if (m_drcfe)
-	{
-		auto_free(machine(), m_drcfe);
-	}
-
-	if (m_cop2)
-	{
-		auto_free(machine(), m_cop2);
-	}
+	m_exec_output = nullptr;
 }
 
 void rsp_device::device_reset()

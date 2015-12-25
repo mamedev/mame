@@ -27,7 +27,7 @@ void hnayayoi_state::common_vh_start( int num_pixmaps )
 			m_pixmap[i] = auto_alloc_array(machine(), UINT8, 256 * 256);
 		}
 		else
-			m_pixmap[i] = NULL;
+			m_pixmap[i] = nullptr;
 	}
 }
 

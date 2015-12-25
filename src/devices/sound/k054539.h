@@ -70,13 +70,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	struct channel {
@@ -94,7 +94,7 @@ private:
 	int flags;
 
 	unsigned char regs[0x230];
-	unsigned char *ram;
+	std::unique_ptr<UINT8[]> ram;
 	int reverb_pos;
 
 	INT32 cur_ptr;

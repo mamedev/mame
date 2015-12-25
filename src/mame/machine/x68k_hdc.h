@@ -85,25 +85,25 @@ public:
 	x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_HARDDISK; }
+	virtual iodevice_t image_type() const override { return IO_HARDDISK; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
-	virtual const char *file_extensions() const { return "hdf"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
-	virtual bool call_create(int format_type, option_resolution *format_options);
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 1; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return nullptr; }
+	virtual const char *file_extensions() const override { return "hdf"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
+	virtual bool call_create(int format_type, option_resolution *format_options) override;
 
 	DECLARE_WRITE16_MEMBER( hdc_w );
 	DECLARE_READ16_MEMBER( hdc_r );
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 private:
 	int m_phase;
 	unsigned char m_status_port;  // read at 0xe96003

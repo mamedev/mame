@@ -53,9 +53,9 @@ public:
 	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<wangpc_keyboard_device &>(device).m_txd_handler.set_callback(object); }
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 
@@ -70,8 +70,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_serial_interface overrides
 

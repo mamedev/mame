@@ -811,7 +811,7 @@ static const char *const elim_sample_names[] =
 	"elim10",
 	"elim11",
 	"elim12",
-	0   /* end of array */
+	nullptr   /* end of array */
 };
 
 
@@ -835,7 +835,7 @@ static const char *const spacfury_sample_names[] =
 	"sfury8",
 	"sfury9",
 	"sfury10",
-	0   /* end of array */
+	nullptr   /* end of array */
 };
 
 /*************************************
@@ -858,7 +858,7 @@ static const char *const zektor_sample_names[] =
 	"elim9",  /*  8 small explosion */
 	"elim10", /*  9 med explosion */
 	"elim11", /* 10 big explosion */
-	0
+	nullptr
 };
 
 

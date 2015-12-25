@@ -494,6 +494,37 @@ The arrows denote direction of data flow.
             8085 sets f8008 to keyboard row 0 AND 0xf3
              "     "  f8009 to keyboard row 1
 
+
+Keyboard Matrix (preliminary)
+---------------
+Row select
+|         Columns Key by bit
+|         D0   D1   D2   D3   D4   D5   D6   D7
+V         V    V    V    V    V    V    V    V
+0x??      F0   F1   F2   F3   F4   F5   F6   F7
+0x??      F8   F9   F10  F11  F12  F13  F14  F15
+0x30      0    1    2    3    4    5    6    7
+0x38      8    9    :    ;    <    -    >    ?
+0x40      @    A    B    C    D    E    F    G
+0x48      H    I    J    K    L    M    N    O
+0x50      P    Q    R    S    T    U    V    W
+0x58      X    Y    Z    [    Yen  ]    ^    _
+0x??      KP0  KP1  KP2  KP3  KP4  KP5  KP6  KP7
+0x??      KP8  KP9  KP.  KP,  N/A  N/A  N/A  SPACE
+0x??      K+   K-   K*   K/   N/A  N/A  N/A  DEL
+0x??      BS  (K)NL CAN  N/A  N/A  N/A  N/A  N/A
+0x??      K0   K1   K2   K3   N/A  N/A  N/A  N/A
+
+The following keys I have no idea where they map as they don't show a consistent column bit in the diagram:
+LOAD UC LC R0 R1 R2 R3
+Also any keys which are N/A may actually have something else mapped there.
+
+In short: this keyboard seems to follow some sort of ASCII-derived row/column pattern
+If this is a true ascii keyboard, then UC, LC probably do not connect to the matrix at all,
+but instead make it so rows 0x40, 0x48 0x50 and 0x58 produce characters from ascii rows 0x60, 0x68, 0x70 and 0x78 (uppercase becomes lowercase)
+likewise 0x30 and 0x38 will produce chars from 0x20 and 0x28 (numbers become symbols)
+the keypad symbols seem to use a different matrix pattern from the rest?
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -600,7 +631,7 @@ public:
 	UINT8 m_video_ctrl;
 
 private:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	INT32 m_vram_bank;
 	UINT8 m_vbl_ctrl;
 	UINT8 m_keyboard_row;

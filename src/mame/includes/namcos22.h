@@ -238,7 +238,7 @@ public:
 	bool m_dsp_irq_enabled;
 	emu_timer *m_ar_tb_interrupt[2];
 	UINT16 m_dsp_master_bioz;
-	UINT32 *m_pointram;
+	std::unique_ptr<UINT32[]> m_pointram;
 	UINT32 m_old_coin_state;
 	UINT32 m_credits1;
 	UINT32 m_credits2;
@@ -264,16 +264,16 @@ public:
 	int m_spot_enable;
 	int m_spot_read_address;
 	int m_spot_write_address;
-	UINT16 *m_spotram;
-	UINT16 *m_banked_czram[4];
-	UINT8 *m_recalc_czram[4];
+	std::unique_ptr<UINT16[]> m_spotram;
+	std::unique_ptr<UINT16[]> m_banked_czram[4];
+	std::unique_ptr<UINT8[]> m_recalc_czram[4];
 	UINT32 m_cz_was_written[4];
 	int m_cz_adjust;
 	namcos22_renderer *m_poly;
 	UINT16 *m_texture_tilemap;
-	UINT8 *m_texture_tileattr;
+	std::unique_ptr<UINT8[]> m_texture_tileattr;
 	UINT8 *m_texture_tiledata;
-	UINT8 *m_texture_ayx_to_pixel;
+	std::unique_ptr<UINT8[]> m_texture_ayx_to_pixel;
 	UINT16 m_dspram_bank;
 	UINT16 m_dspram16_latch;
 	bool m_slave_simulation_active;
@@ -287,8 +287,8 @@ public:
 	unsigned m_LitSurfaceIndex;
 	int m_pointrom_size;
 	INT32 *m_pointrom;
-	UINT8 *m_dirtypal;
-	bitmap_ind16 *m_mix_bitmap;
+	std::unique_ptr<UINT8[]> m_dirtypal;
+	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
 	tilemap_t *m_bgtilemap;
 
 	int m_mixer_flags;
@@ -481,9 +481,9 @@ public:
 	DECLARE_DRIVER_INIT(alpinesa);
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	virtual void machine_reset();
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(adillor);
 	UINT32 screen_update_namcos22s(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

@@ -17,7 +17,7 @@ rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *
 	m_dsr_handler(*this),
 	m_ri_handler(*this),
 	m_cts_handler(*this),
-	m_dev(NULL)
+	m_dev(nullptr)
 {
 }
 
@@ -34,7 +34,7 @@ rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type 
 	m_dsr_handler(*this),
 	m_ri_handler(*this),
 	m_cts_handler(*this),
-	m_dev(NULL)
+	m_dev(nullptr)
 {
 }
 

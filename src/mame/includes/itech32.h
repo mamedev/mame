@@ -47,7 +47,7 @@ public:
 
 	void nvram_init(nvram_device &nvram, void *base, size_t length);
 
-	UINT16 *m_videoram;
+	std::unique_ptr<UINT16[]> m_videoram;
 	UINT8 m_vint_state;
 	UINT8 m_xint_state;
 	UINT8 m_qint_state;
@@ -161,8 +161,8 @@ public:
 	DECLARE_DRIVER_INIT(timekill);
 	DECLARE_DRIVER_INIT(gt3d);
 	DECLARE_DRIVER_INIT(gt3dl);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(drivedge);
 	UINT32 screen_update_itech32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(generate_int1);

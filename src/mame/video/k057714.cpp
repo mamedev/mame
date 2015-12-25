@@ -23,8 +23,8 @@ void k057714_device::device_start()
 {
 	m_irq.resolve_safe();
 
-	m_vram = auto_alloc_array(machine(), UINT32, 0x2000000/4);
-	memset(m_vram, 0, 0x2000000);
+	m_vram = std::make_unique<UINT32[]>(0x2000000/4);
+	memset(m_vram.get(), 0, 0x2000000);
 }
 
 void k057714_device::device_reset()
@@ -35,11 +35,11 @@ void k057714_device::device_reset()
 	m_vram_fifo0_addr = 0;
 	m_vram_fifo1_addr = 0;
 
-	for (int i=0; i < 4; i++)
+	for (auto & elem : m_frame)
 	{
-		m_frame[i].base = 0;
-		m_frame[i].width = 0;
-		m_frame[i].height = 0;
+		elem.base = 0;
+		elem.width = 0;
+		elem.height = 0;
 	}
 }
 
@@ -306,7 +306,7 @@ WRITE32_MEMBER(k057714_device::fifo_w)
 
 int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *vram16 = (UINT16*)m_vram;
+	UINT16 *vram16 = (UINT16*)m_vram.get();
 
 	int x = 0;
 	int y = 0;
@@ -408,7 +408,7 @@ void k057714_device::draw_object(UINT32 *cmd)
 		y += m_fb_origin_y;
 	}
 
-	UINT16 *vram16 = (UINT16*)m_vram;
+	UINT16 *vram16 = (UINT16*)m_vram.get();
 
 	if (xscale == 0 || yscale == 0)
 	{
@@ -543,7 +543,7 @@ void k057714_device::fill_rect(UINT32 *cmd)
 	int y1 = y;
 	int y2 = y + height;
 
-	UINT16 *vram16 = (UINT16*)m_vram;
+	UINT16 *vram16 = (UINT16*)m_vram.get();
 
 	int fb_pitch = 1024;
 
@@ -598,7 +598,7 @@ void k057714_device::draw_character(UINT32 *cmd)
 	printf("%s Draw Char %08X, x %d, y %d\n", basetag(), address, x, y);
 #endif
 
-	UINT16 *vram16 = (UINT16*)m_vram;
+	UINT16 *vram16 = (UINT16*)m_vram.get();
 	int fb_pitch = 1024;
 	int height = double_height ? 16 : 8;
 

@@ -337,7 +337,7 @@ READ32_MEMBER ( saturn_state::saturn_vdp1_vram_r )
 
 WRITE32_MEMBER ( saturn_state::saturn_vdp1_vram_w )
 {
-	UINT8 *vdp1 = m_vdp1.gfx_decode;
+	UINT8 *vdp1 = m_vdp1.gfx_decode.get();
 
 	COMBINE_DATA (&m_vdp1_vram[offset]);
 
@@ -533,7 +533,7 @@ UINT8 saturn_state::stv_read_gouraud_table( void )
 	}
 }
 
-INLINE INT32 _shading( INT32 color, INT32 correction )
+static inline INT32 _shading( INT32 color, INT32 correction )
 {
 	correction = (correction >> 16) & 0x1f;
 	color += (correction - 16);
@@ -2099,7 +2099,7 @@ void saturn_state::video_update_vdp1( void )
 
 void saturn_state::stv_vdp1_state_save_postload( void )
 {
-	UINT8 *vdp1 = m_vdp1.gfx_decode;
+	UINT8 *vdp1 = m_vdp1.gfx_decode.get();
 	int offset;
 	UINT32 data;
 
@@ -2121,14 +2121,14 @@ void saturn_state::stv_vdp1_state_save_postload( void )
 
 int saturn_state::stv_vdp1_start ( void )
 {
-	m_vdp1_regs = auto_alloc_array_clear(machine(), UINT16, 0x020/2 );
-	m_vdp1_vram = auto_alloc_array_clear(machine(), UINT32, 0x100000/4 );
-	m_vdp1.gfx_decode = auto_alloc_array(machine(), UINT8, 0x100000 );
+	m_vdp1_regs = make_unique_clear<UINT16[]>(0x020/2 );
+	m_vdp1_vram = make_unique_clear<UINT32[]>(0x100000/4 );
+	m_vdp1.gfx_decode = std::make_unique<UINT8[]>(0x100000 );
 
-	stv_vdp1_shading_data = auto_alloc(machine(), struct stv_vdp1_poly_scanline_data);
+	stv_vdp1_shading_data = std::make_unique<struct stv_vdp1_poly_scanline_data>();
 
-	m_vdp1.framebuffer[0] = auto_alloc_array(machine(), UINT16, 1024 * 256 * 2 ); /* *2 is for double interlace */
-	m_vdp1.framebuffer[1] = auto_alloc_array(machine(), UINT16, 1024 * 256 * 2 );
+	m_vdp1.framebuffer[0] = std::make_unique<UINT16[]>(1024 * 256 * 2 ); /* *2 is for double interlace */
+	m_vdp1.framebuffer[1] = std::make_unique<UINT16[]>(1024 * 256 * 2 );
 
 	m_vdp1.framebuffer_display_lines = auto_alloc_array(machine(), UINT16 *, 512);
 	m_vdp1.framebuffer_draw_lines = auto_alloc_array(machine(), UINT16 *, 512);
@@ -2147,8 +2147,8 @@ int saturn_state::stv_vdp1_start ( void )
 	m_vdp1.user_cliprect.set(0, 512, 0, 256);
 
 	// save state
-	save_pointer(NAME(m_vdp1_regs), 0x020/2);
-	save_pointer(NAME(m_vdp1_vram), 0x100000/4);
+	save_pointer(NAME(m_vdp1_regs.get()), 0x020/2);
+	save_pointer(NAME(m_vdp1_vram.get()), 0x100000/4);
 	save_item(NAME(m_vdp1.fbcr_accessed));
 	save_item(NAME(m_vdp1.framebuffer_current_display));
 	save_item(NAME(m_vdp1.framebuffer_current_draw));

@@ -152,7 +152,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg5_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg6_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg7_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_strip(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int column);
 	void draw_page(bitmap_ind16 &bitmap, const rectangle &cliprect, int page);

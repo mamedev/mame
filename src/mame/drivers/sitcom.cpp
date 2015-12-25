@@ -52,7 +52,7 @@ public:
 	required_device<dl1416_device> m_ds1;
 	DECLARE_WRITE_LINE_MEMBER(sod_led);
 	DECLARE_READ_LINE_MEMBER(sid_line);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_WRITE16_MEMBER(sitcom_update_ds0);
 	DECLARE_WRITE16_MEMBER(sitcom_update_ds1);
 };

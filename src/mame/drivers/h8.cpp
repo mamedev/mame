@@ -85,7 +85,7 @@ private:
 	UINT8 m_cass_data[4];
 	bool m_cass_state;
 	bool m_cassold;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<cassette_image_device> m_cass;

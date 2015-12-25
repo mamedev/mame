@@ -127,7 +127,7 @@ msx_cart_disk::msx_cart_disk(const machine_config &mconfig, device_type type, co
 	, msx_cart_interface(mconfig, *this)
 	, m_floppy0(*this, "fdc:0")
 	, m_floppy1(*this, "fdc:1")
-	, m_floppy(NULL)
+	, m_floppy(nullptr)
 {
 }
 
@@ -313,15 +313,15 @@ void msx_cart_disk_type1::set_control(UINT8 data)
 	{
 		case 0:
 		case 2:
-			m_floppy = m_floppy0 ? m_floppy0->get_device() : NULL;
+			m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
 			break;
 
 		case 1:
-			m_floppy = m_floppy1 ? m_floppy1->get_device() : NULL;
+			m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
 			break;
 
 		default:
-			m_floppy = NULL;
+			m_floppy = nullptr;
 			break;
 	}
 
@@ -473,15 +473,15 @@ void msx_cart_disk_type2::set_control(UINT8 data)
 	switch (m_control & 3)
 	{
 		case 1:
-			m_floppy = m_floppy0 ? m_floppy0->get_device() : NULL;
+			m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
 			break;
 
 		case 2:
-			m_floppy = m_floppy1 ? m_floppy1->get_device() : NULL;
+			m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
 			break;
 
 		default:
-			m_floppy = NULL;
+			m_floppy = nullptr;
 			break;
 	}
 

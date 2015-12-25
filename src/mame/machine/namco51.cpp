@@ -97,7 +97,7 @@ WRITE8_MEMBER( namco_51xx_device::write )
 
 				{
 					/* kludge for a possible bug in Xevious */
-					static const game_driver *namcoio_51XX_driver = NULL;
+					static const game_driver *namcoio_51XX_driver = nullptr;
 					static int namcoio_51XX_kludge = 0;
 
 					/* Only compute namcoio_51XX_kludge when gamedrv changes */

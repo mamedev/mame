@@ -87,34 +87,34 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 12 - 1) / 12; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 12); }
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 20; }
-	virtual UINT32 execute_input_lines() const { return 6; }
-	virtual UINT32 execute_default_irq_vector() const { return 0; }
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 12 - 1) / 12; }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 12); }
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 20; }
+	virtual UINT32 execute_input_lines() const override { return 6; }
+	virtual UINT32 execute_default_irq_vector() const override { return 0; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
 	{
-		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : NULL ) );
+		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ) );
 	}
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	void state_string_export(const device_state_entry &entry, std::string &str) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 5; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 5; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 protected:
 	address_space_config m_program_config;
@@ -388,11 +388,11 @@ public:
 	i8052_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features = 0);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	/* SFR Callbacks */
-	virtual void sfr_write(size_t offset, UINT8 data);
-	virtual UINT8 sfr_read(size_t offset);
+	virtual void sfr_write(size_t offset, UINT8 data) override;
+	virtual UINT8 sfr_read(size_t offset) override;
 };
 
 class i8032_device : public i8052_device
@@ -416,7 +416,7 @@ public:
 	i80c31_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 };
 
 
@@ -428,7 +428,7 @@ public:
 	i80c51_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features = 0);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 };
 
 class i87c51_device : public i80c51_device
@@ -447,11 +447,11 @@ public:
 	i80c52_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features = 0);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	/* SFR Callbacks */
-	virtual void sfr_write(size_t offset, UINT8 data);
-	virtual UINT8 sfr_read(size_t offset);
+	virtual void sfr_write(size_t offset, UINT8 data) override;
+	virtual UINT8 sfr_read(size_t offset) override;
 };
 
 class i80c32_device : public i80c52_device
@@ -507,11 +507,11 @@ public:
 	static void set_crc(device_t &device, UINT8 crc) { downcast<ds5002fp_device &>(device).m_ds5002fp.crc = crc; }
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	/* SFR Callbacks */
-	virtual void sfr_write(size_t offset, UINT8 data);
-	virtual UINT8 sfr_read(size_t offset);
+	virtual void sfr_write(size_t offset, UINT8 data) override;
+	virtual UINT8 sfr_read(size_t offset) override;
 };
 
 

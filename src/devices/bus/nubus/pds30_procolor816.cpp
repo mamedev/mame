@@ -108,7 +108,7 @@ void nubus_procolor816_device::device_start()
 	m_nubus->install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(FUNC(nubus_procolor816_device::vram_r), this), write32_delegate(FUNC(nubus_procolor816_device::vram_w), this));
 	m_nubus->install_device(slotspace+0xf00000, slotspace+0xff7fff, read32_delegate(FUNC(nubus_procolor816_device::procolor816_r), this), write32_delegate(FUNC(nubus_procolor816_device::procolor816_w), this));
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
 }
 

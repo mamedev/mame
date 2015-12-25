@@ -67,8 +67,8 @@ public:
 
 	UINT8 *m_ipl_rom;
 	UINT8 *m_basic_rom;
-	UINT8 *m_work_ram;
-	UINT8 *m_shared_ram;
+	std::unique_ptr<UINT8[]> m_work_ram;
+	std::unique_ptr<UINT8[]> m_shared_ram;
 	UINT8 *m_char_rom;
 
 	UINT8 m_ma,m_mo,m_ms,m_me2,m_me1;
@@ -103,10 +103,10 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 private:
 	required_ioport m_system_dsw;
@@ -741,8 +741,8 @@ void mz3500_state::machine_start()
 	m_ipl_rom = memregion("ipl")->base();
 	m_basic_rom = memregion("basic")->base();
 	m_char_rom = memregion("gfx1")->base();
-	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x40000);
-	m_shared_ram = auto_alloc_array_clear(machine(), UINT8, 0x800);
+	m_work_ram = make_unique_clear<UINT8[]>(0x40000);
+	m_shared_ram = make_unique_clear<UINT8[]>(0x800);
 
 	static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
 
@@ -770,10 +770,10 @@ void mz3500_state::machine_reset()
 	{
 		m_fdd_sel = 0;
 		{
-			for(int i=0;i<4;i++)
+			for(auto & elem : m_floppy_connector)
 			{
-				m_floppy_connector[i]->get_device()->mon_w(ASSERT_LINE);
-				m_floppy_connector[i]->get_device()->set_rpm(300);
+				elem->get_device()->mon_w(ASSERT_LINE);
+				elem->get_device()->set_rpm(300);
 			}
 
 			machine().device<upd765a_device>("upd765a")->set_rate(250000);

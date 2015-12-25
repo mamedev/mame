@@ -12,7 +12,7 @@ extern const device_type PVC_PROT = &device_creator<pvc_prot_device>;
 
 pvc_prot_device::pvc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PVC_PROT, "NeoGeo Protection (PVC)", tag, owner, clock, "pvc_prot", __FILE__),
-	m_bankdev(NULL)
+	m_bankdev(nullptr)
 {
 }
 

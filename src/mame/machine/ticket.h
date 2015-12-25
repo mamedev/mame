@@ -67,9 +67,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() ATTR_COLD;
-	virtual void device_reset() ATTR_COLD;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// configuration state
 	UINT8 m_motor_sense;

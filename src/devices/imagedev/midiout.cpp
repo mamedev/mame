@@ -26,7 +26,7 @@ midiout_device::midiout_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, MIDIOUT, "MIDI Out image device", tag, owner, clock, "midiout", __FILE__),
 		device_image_interface(mconfig, *this),
 		device_serial_interface(mconfig, *this),
-		m_midi(NULL)
+		m_midi(nullptr)
 {
 }
 
@@ -36,7 +36,7 @@ midiout_device::midiout_device(const machine_config &mconfig, const char *tag, d
 
 void midiout_device::device_start()
 {
-	m_midi = NULL;
+	m_midi = nullptr;
 }
 
 void midiout_device::device_reset()
@@ -72,7 +72,7 @@ bool midiout_device::call_load(void)
 	if (!m_midi->open_output(filename()))
 	{
 		global_free(m_midi);
-		m_midi = NULL;
+		m_midi = nullptr;
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -89,7 +89,7 @@ void midiout_device::call_unload(void)
 	{
 		m_midi->close();
 		global_free(m_midi);
-		m_midi = NULL;
+		m_midi = nullptr;
 	}
 }
 

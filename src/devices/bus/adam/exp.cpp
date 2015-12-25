@@ -92,7 +92,7 @@ bool adam_expansion_slot_device::call_load()
 	{
 		size_t size = 0;
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			size = length();
 
@@ -136,7 +136,7 @@ void adam_expansion_slot_device::get_default_card_software(std::string &result)
 
 UINT8 adam_expansion_slot_device::bd_r(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		data = m_card->adam_bd_r(space, offset, data, bmreq, biorq, aux_rom_cs, cas1, cas2);
 	}
@@ -151,7 +151,7 @@ UINT8 adam_expansion_slot_device::bd_r(address_space &space, offs_t offset, UINT
 
 void adam_expansion_slot_device::bd_w(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		m_card->adam_bd_w(space, offset, data, bmreq, biorq, aux_rom_cs, cas1, cas2);
 	}

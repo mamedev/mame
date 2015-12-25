@@ -24,8 +24,8 @@ const device_type YM2151 = &device_creator<ym2151_device>;
 ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM2151, "YM2151", tag, owner, clock, "ym2151", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_stream(NULL),
-		m_chip(NULL),
+		m_stream(nullptr),
+		m_chip(nullptr),
 		m_lastreg(0),
 		m_irqhandler(*this),
 		m_portwritehandler(*this)
@@ -85,7 +85,7 @@ void ym2151_device::device_start()
 	m_stream = stream_alloc(0, 2, rate);
 
 	m_chip = ym2151_init(this, clock(), rate);
-	assert_always(m_chip != NULL, "Error creating YM2151 chip");
+	assert_always(m_chip != nullptr, "Error creating YM2151 chip");
 
 	ym2151_set_irq_handler(m_chip, irq_frontend);
 	ym2151_set_port_write_handler(m_chip, port_write_frontend);

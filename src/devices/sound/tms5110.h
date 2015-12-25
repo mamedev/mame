@@ -72,13 +72,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	void set_variant(int variant);
 
@@ -206,7 +206,7 @@ public:
 	tms5100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type TMS5100;
@@ -217,7 +217,7 @@ public:
 	tmc0281_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type TMC0281;
@@ -228,7 +228,7 @@ public:
 	tms5100a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type TMS5100A;
@@ -239,7 +239,7 @@ public:
 	tmc0281d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type TMC0281D;
@@ -250,7 +250,7 @@ public:
 	cd2801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type CD2801;
@@ -261,7 +261,7 @@ public:
 	cd2802_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type CD2802;
@@ -272,7 +272,7 @@ public:
 	tms5110a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type TMS5110A;
@@ -286,7 +286,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 extern const device_type M58817;
@@ -322,9 +322,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	void register_for_save_states();

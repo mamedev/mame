@@ -22,10 +22,10 @@ const device_type C64_16KB = &device_creator<c64_16kb_cartridge_device>;
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_16kb )
-	MCFG_GENERIC_CARTSLOT_ADD("roml", generic_linear_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD("roml", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("rom,bin,80")
 
-	MCFG_GENERIC_CARTSLOT_ADD("romh", generic_linear_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD("romh", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("rom,bin,a0,e0")
 MACHINE_CONFIG_END
 

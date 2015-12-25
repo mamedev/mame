@@ -153,8 +153,8 @@ const device_type TC0480SCP = &device_creator<tc0480scp_device>;
 
 tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0480SCP, "Taito TC0480SCP", tag, owner, clock, "tc0480scp", __FILE__),
-	m_tx_ram(NULL),
-	m_char_ram(NULL),
+	m_tx_ram(nullptr),
+	m_char_ram(nullptr),
 	m_pri_reg(0),
 	m_dblwidth(0),
 	m_gfxnum(0),
@@ -173,10 +173,10 @@ tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *ta
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_bg_ram[i] = NULL;
-		m_bgscroll_ram[i] = NULL;
-		m_rowzoom_ram[i] = NULL;
-		m_bgcolumn_ram[i] = NULL;
+		m_bg_ram[i] = nullptr;
+		m_bgscroll_ram[i] = nullptr;
+		m_rowzoom_ram[i] = nullptr;
+		m_bgcolumn_ram[i] = nullptr;
 		m_bgscrollx[i] = 0;
 		m_bgscrolly[i] = 0;
 	}
@@ -297,7 +297,7 @@ void tc0480scp_device::device_start()
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, tc0480scp_charlayout, (UINT8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, m_col_base)));
+	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(m_palette, tc0480scp_charlayout, (UINT8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, m_col_base));
 	m_gfxdecode->gfx(m_gfxnum)->set_colorbase(m_col_base);
 
 	save_item(NAME(m_ram));
@@ -317,8 +317,8 @@ void tc0480scp_device::device_reset()
 {
 	m_dblwidth = 0;
 
-	for (int i = 0; i < 0x18; i++)
-		m_ctrl[i] = 0;
+	for (auto & elem : m_ctrl)
+		elem = 0;
 
 }
 

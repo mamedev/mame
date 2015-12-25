@@ -139,7 +139,7 @@ const address_space_config *i8089_device::memory_space_config(address_spacenum s
 	{
 	case AS_PROGRAM: return &m_program_config;
 	case AS_IO:      return &m_io_config;
-	default:         return NULL;
+	default:         return nullptr;
 	}
 }
 

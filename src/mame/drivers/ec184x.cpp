@@ -237,10 +237,10 @@ static MACHINE_CONFIG_START( ec1840, ec184x_state )
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", ec184x_isa8_cards, "ec1840.0002", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", ec184x_isa8_cards, "ec1841.0003", false)   // actually ec1840.0003 -- w/o mouse port
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", ec184x_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", ec184x_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", ec184x_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", ec184x_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", ec184x_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", ec184x_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", ec184x_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", ec184x_isa8_cards, nullptr, false)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","ec1841")
 
@@ -264,9 +264,9 @@ static MACHINE_CONFIG_START( ec1841, ec184x_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", ec184x_isa8_cards, "ec1841.0002", false)   // cga
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", ec184x_isa8_cards, "ec1841.0003", false)   // fdc + mouse port
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", ec184x_isa8_cards, "hdc", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", ec184x_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", ec184x_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", ec184x_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", ec184x_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", ec184x_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", ec184x_isa8_cards, nullptr, false)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","ec1841")
 
@@ -289,10 +289,10 @@ static MACHINE_CONFIG_START( ec1847, ec184x_state )
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "hercules", false)  // cga, ega and vga(?) are options too
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, NULL, false)    // native variant (wd1010 + z80) not emulated
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, NULL, false)    // native serial (2x8251) not emulated
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, nullptr, false)    // native variant (wd1010 + z80) not emulated
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, nullptr, false)    // native serial (2x8251) not emulated
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 

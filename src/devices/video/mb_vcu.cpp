@@ -97,7 +97,7 @@ const address_space_config *mb_vcu_device::memory_space_config(address_spacenum 
 	{
 		case AS_0: return &m_videoram_space_config;
 		case AS_1: return &m_paletteram_space_config;
-		default: return NULL;
+		default: return nullptr;
 	}
 }
 
@@ -154,8 +154,8 @@ mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, MB_VCU, "Mazer Blazer custom VCU", tag, owner, clock, "mb_vcu", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_vram)),
-		m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_pal_ram)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, nullptr, *ADDRESS_MAP_NAME(mb_vcu_vram)),
+		m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mb_vcu_pal_ram)),
 		m_cpu(*this),
 		m_palette(*this)
 {
@@ -178,8 +178,8 @@ void mb_vcu_device::device_validity_check(validity_checker &valid) const
 void mb_vcu_device::device_start()
 {
 	// TODO: m_screen_tag
-	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x800);
-	m_palram = auto_alloc_array_clear(machine(), UINT8, 0x100);
+	m_ram = make_unique_clear<UINT8[]>(0x800);
+	m_palram = make_unique_clear<UINT8[]>(0x100);
 
 	{
 		static const int resistances_r[2]  = { 4700, 2200 };
@@ -193,8 +193,8 @@ void mb_vcu_device::device_start()
 	}
 
 	save_item(NAME(m_status));
-	save_pointer(NAME(m_ram), 0x800);
-	save_pointer(NAME(m_palram), 0x100);
+	save_pointer(NAME(m_ram.get()), 0x800);
+	save_pointer(NAME(m_palram.get()), 0x100);
 	save_item(NAME(m_param_offset_latch));
 	save_item(NAME(m_xpos));
 	save_item(NAME(m_ypos));

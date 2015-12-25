@@ -388,19 +388,19 @@ public:
 		xbox_base_state(mconfig, type, tag),
 		usbhack_index(-1),
 		usbhack_counter(0),
-		dimm_board_memory(NULL),
+		dimm_board_memory(nullptr),
 		dimm_board_memory_size(0) { }
 
 	DECLARE_READ32_MEMBER(mediaboard_r);
 	DECLARE_WRITE32_MEMBER(mediaboard_w);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	void baseboard_ide_event(int type, UINT8 *read, UINT8 *write);
 	UINT8 *baseboard_ide_dimmboard(UINT32 lba);
 	void dword_write_le(UINT8 *addr, UINT32 d);
 	void word_write_le(UINT8 *addr, UINT16 d);
-	virtual void hack_eeprom();
-	virtual void hack_usb();
+	virtual void hack_eeprom() override;
+	virtual void hack_usb() override;
 
 	struct chihiro_devices {
 		bus_master_ide_controller_device    *ide;
@@ -602,12 +602,12 @@ public:
 	// construction/destruction
 	ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual int  read_sector(UINT32 lba, void *buffer);
-	virtual int  write_sector(UINT32 lba, const void *buffer);
+	virtual int  read_sector(UINT32 lba, void *buffer) override;
+	virtual int  write_sector(UINT32 lba, const void *buffer) override;
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	UINT8 read_buffer[0x20];
 	UINT8 write_buffer[0x20];
 	chihiro_state *chihirosystem;
@@ -703,7 +703,7 @@ int ide_baseboard_device::read_sector(UINT32 lba, void *buffer)
 	}
 	// in a type 1 chihiro this gets data from the dimm board memory
 	data = chihirosystem->baseboard_ide_dimmboard(lba);
-	if (data != NULL)
+	if (data != nullptr)
 		memcpy(buffer, data, 512);
 	return 1;
 }
@@ -795,9 +795,9 @@ void chihiro_state::baseboard_ide_event(int type, UINT8 *read_buffer, UINT8 *wri
 UINT8 *chihiro_state::baseboard_ide_dimmboard(UINT32 lba)
 {
 	// return pointer to memory containing decrypted gdrom data (contains an image of a fatx partition)
-	if (chihiro_devs.dimmboard != NULL)
+	if (chihiro_devs.dimmboard != nullptr)
 		return dimm_board_memory + lba * 512;
-	return NULL;
+	return nullptr;
 }
 
 READ32_MEMBER(chihiro_state::mediaboard_r)
@@ -846,7 +846,7 @@ void chihiro_state::machine_start()
 	xbox_base_state::machine_start();
 	chihiro_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
 	chihiro_devs.dimmboard = machine().device<naomi_gdrom_board>("rom_board");
-	if (chihiro_devs.dimmboard != NULL) {
+	if (chihiro_devs.dimmboard != nullptr) {
 		dimm_board_memory = chihiro_devs.dimmboard->memory(dimm_board_memory_size);
 	}
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
@@ -873,13 +873,13 @@ static MACHINE_CONFIG_DERIVED_CLASS(chihiro_base, xbox_base, chihiro_state)
 
 	//MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ide_baseboard, NULL, "bb", true)
 	MCFG_DEVICE_MODIFY("ide:0")
-	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, NULL, true)
+	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, nullptr, true)
 	MCFG_DEVICE_MODIFY("ide:1")
 	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, "bb", true)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(chihirogd, chihiro_base)
-	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", NULL, NOOP)
+	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", nullptr, NOOP)
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

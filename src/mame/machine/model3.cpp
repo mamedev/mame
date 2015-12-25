@@ -154,9 +154,9 @@ void model3_state::tap_write(int tck, int tms, int tdi, int trst)
 
 		if (m_ir == U64(0x000023fffffffffe))
 		{
-			for (int i=0; i < 32; i++)
+			for (auto & elem : m_id_data)
 			{
-				m_id_data[i] = 0;
+				elem = 0;
 			}
 
 			m_id_size = 41;
@@ -237,9 +237,9 @@ void model3_state::tap_set_asic_ids()
 	 * data on TAP reset and when the instruction is issued.
 	 */
 
-	for (int i=0; i < 32; i++)
+	for (auto & elem : m_id_data)
 	{
-		m_id_data[i] = 0;
+		elem = 0;
 	}
 
 	if (m_m3_step == 0x10)

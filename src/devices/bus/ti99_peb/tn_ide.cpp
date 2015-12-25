@@ -336,7 +336,7 @@ void nouspikel_ide_interface_device::device_reset()
 MACHINE_CONFIG_FRAGMENT( tn_ide )
 	MCFG_DEVICE_ADD( "ide_rtc", RTC65271, 0 )
 	MCFG_RTC65271_INTERRUPT_CB(WRITELINE(nouspikel_ide_interface_device, clock_interrupt_callback))
-	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(nouspikel_ide_interface_device, ide_interrupt_callback))
 MACHINE_CONFIG_END
 

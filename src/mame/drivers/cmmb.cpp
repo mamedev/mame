@@ -73,8 +73,8 @@ public:
 	DECLARE_READ8_MEMBER(cmmb_input_r);
 	DECLARE_WRITE8_MEMBER(cmmb_output_w);
 	DECLARE_READ8_MEMBER(kludge_r);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cmmb_irq);
 };

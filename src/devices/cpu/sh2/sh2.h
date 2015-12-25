@@ -113,30 +113,30 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_stop();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 4; }
-	virtual UINT32 execute_input_lines() const { return 16; }
-	virtual UINT32 execute_default_irq_vector() const { return 0; }
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 4; }
+	virtual UINT32 execute_input_lines() const override { return 16; }
+	virtual UINT32 execute_default_irq_vector() const override { return 0; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	void state_string_export(const device_state_entry &entry, std::string &str) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 	address_space *m_program, *m_decrypted_program;
 
 private:
@@ -219,8 +219,8 @@ private:
 	sh2_ftcsr_read_delegate              m_ftcsr_read_cb;
 
 	drc_cache           m_cache;                  /* pointer to the DRC code cache */
-	drcuml_state *      m_drcuml;                 /* DRC UML generator state */
-	sh2_frontend *      m_drcfe;                  /* pointer to the DRC front-end state */
+	std::unique_ptr<drcuml_state>      m_drcuml;                 /* DRC UML generator state */
+	std::unique_ptr<sh2_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
 	UINT32              m_drcoptions;         /* configurable DRC options */
 
 	internal_sh2_state *m_sh2_state;
@@ -534,7 +534,7 @@ public:
 	sh2_frontend(sh2_device *device, UINT32 window_start, UINT32 window_end, UINT32 max_sequence);
 
 protected:
-	virtual bool describe(opcode_desc &desc, const opcode_desc *prev);
+	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
 
 private:
 	bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, UINT16 opcode);

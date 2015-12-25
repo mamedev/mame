@@ -103,11 +103,11 @@ void fortyl_state::redraw_pixels()
 
 void fortyl_state::video_start()
 {
-	m_pixram1 = auto_alloc_array_clear(machine(), UINT8, 0x4000);
-	m_pixram2 = auto_alloc_array_clear(machine(), UINT8, 0x4000);
+	m_pixram1 = make_unique_clear<UINT8[]>(0x4000);
+	m_pixram2 = make_unique_clear<UINT8[]>(0x4000);
 
-	m_tmp_bitmap1 = auto_bitmap_ind16_alloc(machine(), 256, 256);
-	m_tmp_bitmap2 = auto_bitmap_ind16_alloc(machine(), 256, 256);
+	m_tmp_bitmap1 = std::make_unique<bitmap_ind16>(256, 256);
+	m_tmp_bitmap2 = std::make_unique<bitmap_ind16>(256, 256);
 
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fortyl_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
@@ -118,8 +118,8 @@ void fortyl_state::video_start()
 
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_pix_color));
-	save_pointer(NAME(m_pixram1), 0x4000);
-	save_pointer(NAME(m_pixram2), 0x4000);
+	save_pointer(NAME(m_pixram1.get()), 0x4000);
+	save_pointer(NAME(m_pixram2.get()), 0x4000);
 	save_item(NAME(*m_tmp_bitmap1));
 	save_item(NAME(*m_tmp_bitmap2));
 	save_item(NAME(m_pixram_sel));

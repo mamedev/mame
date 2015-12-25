@@ -40,7 +40,7 @@ Up to 4096 bytes can be addressed.
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level, const char *s_fmt, ... )
+static inline void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -159,7 +159,7 @@ void i2cmem_device::device_reset()
 
 const address_space_config *i2cmem_device::memory_space_config( address_spacenum spacenum ) const
 {
-	return ( spacenum == 0 ) ? &m_space_config : NULL;
+	return ( spacenum == 0 ) ? &m_space_config : nullptr;
 }
 
 
@@ -179,7 +179,7 @@ void i2cmem_device::nvram_default()
 	}
 
 	/* populate from a memory region if present */
-	if( m_region != NULL )
+	if( m_region != nullptr )
 	{
 		if( m_region->bytes() != i2cmem_bytes )
 		{

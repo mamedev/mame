@@ -11,7 +11,7 @@ void undrfire_state::video_start()
 {
 	int i;
 
-	m_spritelist = auto_alloc_array(machine(), struct uf_tempsprite, 0x4000);
+	m_spritelist = std::make_unique<uf_tempsprite[]>(0x4000);
 
 	for (i = 0; i < 16384; i++) /* Fix later - some weird colours in places */
 		m_palette->set_pen_color(i, rgb_t(0,0,0));
@@ -77,7 +77,7 @@ void undrfire_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
-	struct uf_tempsprite *sprite_ptr = m_spritelist;
+	struct uf_tempsprite *sprite_ptr = m_spritelist.get();
 
 	for (offs = (m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
 	{
@@ -192,7 +192,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 
 	/* this happens only if primsks != NULL */
-	while (sprite_ptr != m_spritelist)
+	while (sprite_ptr != m_spritelist.get())
 	{
 		sprite_ptr--;
 
@@ -222,7 +222,7 @@ void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
-	struct uf_tempsprite *sprite_ptr = m_spritelist;
+	struct uf_tempsprite *sprite_ptr = m_spritelist.get();
 
 	for (offs = (m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
 	{
@@ -326,7 +326,7 @@ void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &
 	}
 
 	/* this happens only if primsks != NULL */
-	while (sprite_ptr != m_spritelist)
+	while (sprite_ptr != m_spritelist.get())
 	{
 		sprite_ptr--;
 

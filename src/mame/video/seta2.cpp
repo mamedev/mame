@@ -218,7 +218,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 	// Sprites list
 
 	// When debugging, use m_spriteram here, and run mame -update_in_pause
-	UINT16 *buffered_spriteram16 = m_buffered_spriteram;
+	UINT16 *buffered_spriteram16 = m_buffered_spriteram.get();
 	UINT16 *s1  = buffered_spriteram16 + 0x3000/2;
 	UINT16 *end = &buffered_spriteram16[m_spriteram.bytes()/2];
 
@@ -450,7 +450,7 @@ void seta2_state::video_start()
 	m_gfxdecode->gfx(4)->set_granularity(16);
 	m_gfxdecode->gfx(5)->set_granularity(16);
 
-	m_buffered_spriteram = auto_alloc_array(machine(), UINT16, m_spriteram.bytes()/2);
+	m_buffered_spriteram = std::make_unique<UINT16[]>(m_spriteram.bytes()/2);
 
 	m_xoffset = 0;
 	m_yoffset = 0;
@@ -487,6 +487,6 @@ void seta2_state::screen_eof(screen_device &screen, bool state)
 	if (state)
 	{
 		// Buffer sprites by 1 frame
-		memcpy(m_buffered_spriteram, m_spriteram, m_spriteram.bytes());
+		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
 	}
 }

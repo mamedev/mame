@@ -29,8 +29,8 @@ public:
 	p1_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_READ8_MEMBER(p1_fdc_r);
@@ -38,8 +38,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( p1_fdc_irq_drq );
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	required_device<fd1793_t> m_fdc;

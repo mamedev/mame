@@ -25,6 +25,7 @@ public:
 	required_device<k055673_device> m_k055673;
 	required_shared_ptr<UINT16> m_gx_workram;
 	optional_shared_ptr<UINT16> m_spriteram;
+	std::unique_ptr<UINT8[]> m_decoded;
 
 	UINT8 m_mw_irq_control;
 	int m_cur_sound_region;

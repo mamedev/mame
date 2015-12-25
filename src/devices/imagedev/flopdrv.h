@@ -98,21 +98,21 @@ public:
 
 	template<class _Object> static devcb_base &set_out_idx_func(device_t &device, _Object object) { return downcast<legacy_floppy_image_device &>(device).m_out_idx_func.set_callback(object); }
 
-	virtual bool call_load();
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) {   return load_software(swlist, swname, start_entry); }
-	virtual bool call_create(int format_type, option_resolution *format_options);
-	virtual void call_unload();
+	virtual bool call_load() override;
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override {   return load_software(swlist, swname, start_entry); }
+	virtual bool call_create(int format_type, option_resolution *format_options) override;
+	virtual void call_unload() override;
 
-	virtual iodevice_t image_type() const { return IO_FLOPPY; }
+	virtual iodevice_t image_type() const override { return IO_FLOPPY; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const;
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const;
-	virtual const char *file_extensions() const { return m_extension_list; }
-	virtual const option_guide *create_option_guide() const { return floppy_option_guide; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override;
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override;
+	virtual const char *file_extensions() const override { return m_extension_list; }
+	virtual const option_guide *create_option_guide() const override { return floppy_option_guide; }
 
 	floppy_image_legacy *flopimg_get_image();
 	void floppy_drive_set_geometry(floppy_type_t type);
@@ -166,8 +166,8 @@ private:
 
 protected:
 	// device overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 	/* callbacks */
 	devcb_write_line m_out_idx_func;

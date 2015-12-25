@@ -10,7 +10,7 @@ msx_cart_msxdos2::msx_cart_msxdos2(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, MSX_CART_MSXDOS2, "MSX Cartridge - MSXDOS2", tag, owner, clock, "msx_cart_msxdos2", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_selected_bank(0)
-	, m_bank_base(NULL)
+	, m_bank_base(nullptr)
 {
 }
 

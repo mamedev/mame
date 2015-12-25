@@ -66,7 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ptm_o3_callback );
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 private:
 	required_device<cpu_device> m_maincpu;

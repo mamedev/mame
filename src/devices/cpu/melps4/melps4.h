@@ -141,26 +141,26 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 6 - 1) / 6; } // 6 t-states per machine cycle
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 6); } // "
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 1+1; } // max opcode cycles + interrupt duration
-	virtual UINT32 execute_input_lines() const { return 3; } // up to 3 (some internal)
-	virtual void execute_set_input(int line, int state);
-	virtual void execute_run();
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override { return (clocks + 6 - 1) / 6; } // 6 t-states per machine cycle
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override { return (cycles * 6); } // "
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 1+1; } // max opcode cycles + interrupt duration
+	virtual UINT32 execute_input_lines() const override { return 3; } // up to 3 (some internal)
+	virtual void execute_set_input(int line, int state) override;
+	virtual void execute_run() override;
 	virtual void execute_one();
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : NULL); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;

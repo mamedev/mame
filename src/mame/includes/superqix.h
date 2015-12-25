@@ -27,7 +27,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	INT16 *m_samplebuf;
+	std::unique_ptr<INT16[]> m_samplebuf;
 	UINT8 m_port1;
 	UINT8 m_port2;
 	UINT8 m_port3;
@@ -45,7 +45,7 @@ public:
 	UINT8 m_portC;
 	int m_curr_player;
 	int m_gfxbank;
-	bitmap_ind16 *m_fg_bitmap[2];
+	std::unique_ptr<bitmap_ind16> m_fg_bitmap[2];
 	int m_show_bitmap;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_nmi_mask;

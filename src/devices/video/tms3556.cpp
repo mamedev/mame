@@ -44,7 +44,7 @@ ADDRESS_MAP_END
 
 const address_space_config *tms3556_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 
@@ -83,7 +83,7 @@ inline void tms3556_device::writebyte(offs_t address, UINT8 data)
 tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS3556, "Texas Instruments VDP TMS3556", tag, owner, clock, "tms3556", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(tms3556)),
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(tms3556)),
 		m_reg_access_phase(0),
 		m_row_col_written(0),
 		m_bamp_written(0),
@@ -558,7 +558,7 @@ void tms3556_device::draw_line_mixed(UINT16 *ln)
 void tms3556_device::draw_line(bitmap_ind16 &bmp, int line)
 {
 	int double_lines = 0;
-	UINT16 *ln, *ln2 = NULL;
+	UINT16 *ln, *ln2 = nullptr;
 
 //  if (m_control_regs[4] & 0x??)
 //  {   // interlaced mode

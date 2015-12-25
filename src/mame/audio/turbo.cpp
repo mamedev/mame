@@ -178,7 +178,7 @@ static const char *const turbo_sample_names[] =
 	"skidding", /* 6: Spin */
 	"idle",     /* 7: Idle */
 	"ambulanc", /* 8: Ambulance */
-	0
+	nullptr
 };
 
 
@@ -425,7 +425,7 @@ static const char *const subroc3d_sample_names[] =
 	"09",   /*  8: prolog sound */
 	"11",   /*  9: alarm 0 */
 	"12",   /* 10: alarm 1 */
-	0
+	nullptr
 };
 
 MACHINE_CONFIG_FRAGMENT( subroc3d_samples )
@@ -569,7 +569,7 @@ static const char *const buckrog_sample_names[]=
 	"shipsnd1", /* 8 */
 	"shipsnd2", /* 9 */
 	"shipsnd3", /* 10 */
-	0
+	nullptr
 };
 
 

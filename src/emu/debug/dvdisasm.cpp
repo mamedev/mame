@@ -47,8 +47,8 @@ debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_up
 		m_right_column(DASM_RIGHTCOL_RAW),
 		m_backwards_steps(3),
 		m_dasm_width(DEFAULT_DASM_WIDTH),
-		m_last_direct_raw(NULL),
-		m_last_direct_decrypted(NULL),
+		m_last_direct_raw(nullptr),
+		m_last_direct_decrypted(nullptr),
 		m_last_change_count(0),
 		m_last_pcbyte(0),
 		m_divider1(0),
@@ -63,7 +63,7 @@ debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_up
 
 	// count the number of comments
 	int total_comments = 0;
-	for (const debug_view_source *source = m_source_list.first(); source != NULL; source = source->next())
+	for (const debug_view_source *source = m_source_list.first(); source != nullptr; source = source->next())
 	{
 		const debug_view_disasm_source &dasmsource = downcast<const debug_view_disasm_source &>(*source);
 		total_comments += dasmsource.m_device.debug()->comment_count();
@@ -97,7 +97,7 @@ void debug_view_disasm::enumerate_sources()
 	// iterate over devices with disassembly interfaces
 	disasm_interface_iterator iter(machine().root_device());
 	std::string name;
-	for (device_disasm_interface *dasm = iter.first(); dasm != NULL; dasm = iter.next())
+	for (device_disasm_interface *dasm = iter.first(); dasm != nullptr; dasm = iter.next())
 	{
 		strprintf(name,"%s '%s'", dasm->device().name(), dasm->device().tag());
 		m_source_list.append(*global_alloc(debug_view_disasm_source(name.c_str(), dasm->device())));
@@ -420,7 +420,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 			// get and add the comment, if present
 			offs_t comment_address = source.m_space.byte_to_address(m_byteaddress[instr]);
 			const char *text = source.m_device.debug()->comment_text(comment_address);
-			if (text != NULL)
+			if (text != nullptr)
 				sprintf(&destbuf[m_divider2], "// %.*s", row_width - m_divider2 - 4, text);
 		}
 
@@ -560,7 +560,7 @@ recompute:
 			// if we're on a line with a breakpoint, tag it changed
 			else
 			{
-				for (device_debug::breakpoint *bp = source.m_device.debug()->breakpoint_first(); bp != NULL; bp = bp->next())
+				for (device_debug::breakpoint *bp = source.m_device.debug()->breakpoint_first(); bp != nullptr; bp = bp->next())
 					if (m_byteaddress[effrow] == (source.m_space.address_to_byte(bp->address()) & source.m_space.logbytemask()))
 						attrib = DCA_CHANGED;
 			}

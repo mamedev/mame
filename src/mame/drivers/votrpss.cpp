@@ -112,7 +112,7 @@ private:
 	UINT8 m_porta;
 	UINT8 m_portb;
 	UINT8 m_portc;
-	virtual void machine_start();
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<i8255_device> m_ppi;
@@ -278,7 +278,7 @@ static MACHINE_CONFIG_START( votrpss, votrpss_state )
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
 

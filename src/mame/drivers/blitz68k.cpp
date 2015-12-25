@@ -73,7 +73,7 @@ public:
 		m_palette(*this, "palette")  { }
 
 	optional_shared_ptr<UINT16> m_nvram;
-	UINT8 *m_blit_buffer;
+	std::unique_ptr<UINT8[]> m_blit_buffer;
 	optional_shared_ptr<UINT16> m_frame_buffer;
 	optional_shared_ptr<UINT16> m_blit_romaddr;
 	optional_shared_ptr<UINT16> m_blit_attr1_ram;
@@ -206,7 +206,7 @@ struct blit_t
 
 VIDEO_START_MEMBER(blitz68k_state,blitz68k)
 {
-	m_blit_buffer = auto_alloc_array(machine(), UINT8, 512*256);
+	m_blit_buffer = std::make_unique<UINT8[]>(512*256);
 	blit.addr_factor = 2;
 }
 
@@ -220,7 +220,7 @@ UINT32 blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rgb3
 {
 	int x,y;
 
-	UINT8 *src = m_blit_buffer;
+	UINT8 *src = m_blit_buffer.get();
 
 	for(y = 0; y < 256; y++)
 	{

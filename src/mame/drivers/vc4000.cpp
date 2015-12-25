@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Peter Trauner, Manfred Schneider, Robbbert
+// license:GPL-2.0+
+// copyright-holders:Peter Trauner, Robbbert
+// thanks-to:Manfred Schneider
 /******************************************************************************
  Peter Trauner May 2001
 
@@ -551,7 +552,7 @@ static MACHINE_CONFIG_START( vc4000, vc4000_state )
 	MCFG_QUICKLOAD_ADD("quickload", vc4000_state, vc4000, "pgm,tvc", 0)
 
 	/* cartridge */
-	MCFG_VC4000_CARTRIDGE_ADD("cartslot", vc4000_cart, NULL)
+	MCFG_VC4000_CARTRIDGE_ADD("cartslot", vc4000_cart, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vc4000")
@@ -579,7 +580,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( h21, vc4000 )
 	MCFG_DEVICE_REMOVE("cartslot")
-	MCFG_H21_CARTRIDGE_ADD("cartslot", vc4000_cart, NULL)
+	MCFG_H21_CARTRIDGE_ADD("cartslot", vc4000_cart, nullptr)
 
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "h21")

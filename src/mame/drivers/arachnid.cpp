@@ -90,7 +90,7 @@ public:
 	required_device<pia6821_device> m_pia_u17;
 	required_device<speaker_sound_device> m_speaker;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_READ8_MEMBER( pia_u4_pa_r );
 	DECLARE_READ8_MEMBER( pia_u4_pb_r );
 	DECLARE_READ_LINE_MEMBER( pia_u4_pca_r );

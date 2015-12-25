@@ -33,7 +33,7 @@ using namespace uml;
 drc_hash_table::drc_hash_table(drc_cache &cache, UINT32 modes, UINT8 addrbits, UINT8 ignorebits)
 	: m_cache(cache),
 		m_modes(modes),
-		m_nocodeptr(NULL),
+		m_nocodeptr(nullptr),
 		m_l1bits((addrbits - ignorebits) / 2),
 		m_l2bits((addrbits - ignorebits) - m_l1bits),
 		m_l1shift(ignorebits + m_l2bits),
@@ -41,8 +41,8 @@ drc_hash_table::drc_hash_table(drc_cache &cache, UINT32 modes, UINT8 addrbits, U
 		m_l1mask((1 << m_l1bits) - 1),
 		m_l2mask((1 << m_l2bits) - 1),
 		m_base(reinterpret_cast<drccodeptr ***>(cache.alloc(modes * sizeof(**m_base)))),
-		m_emptyl1(NULL),
-		m_emptyl2(NULL)
+		m_emptyl1(nullptr),
+		m_emptyl2(nullptr)
 {
 	reset();
 }
@@ -57,7 +57,7 @@ bool drc_hash_table::reset()
 {
 	// allocate an empty l2 hash table
 	m_emptyl2 = (drccodeptr *)m_cache.alloc_temporary(sizeof(drccodeptr) << m_l2bits);
-	if (m_emptyl2 == NULL)
+	if (m_emptyl2 == nullptr)
 		return false;
 
 	// populate it with pointers to the recompile_exit code
@@ -66,7 +66,7 @@ bool drc_hash_table::reset()
 
 	// allocate an empty l1 hash table
 	m_emptyl1 = (drccodeptr **)m_cache.alloc_temporary(sizeof(drccodeptr *) << m_l1bits);
-	if (m_emptyl1 == NULL)
+	if (m_emptyl1 == nullptr)
 		return false;
 
 	// populate it with pointers to the empty l2 table
@@ -98,7 +98,7 @@ void drc_hash_table::block_begin(drcuml_block &block, const uml::instruction *in
 			assert(inst.numparams() == 2);
 
 			// if we fail to allocate, we must abort the block
-			if (!set_codeptr(inst.param(0).immediate(), inst.param(1).immediate(), NULL))
+			if (!set_codeptr(inst.param(0).immediate(), inst.param(1).immediate(), nullptr))
 				block.abort();
 		}
 
@@ -164,7 +164,7 @@ bool drc_hash_table::set_codeptr(UINT32 mode, UINT32 pc, drccodeptr code)
 	if (m_base[mode] == m_emptyl1)
 	{
 		drccodeptr **newtable = (drccodeptr **)m_cache.alloc_temporary(sizeof(drccodeptr *) << m_l1bits);
-		if (newtable == NULL)
+		if (newtable == nullptr)
 			return false;
 		memcpy(newtable, m_emptyl1, sizeof(drccodeptr *) << m_l1bits);
 		m_base[mode] = newtable;
@@ -175,7 +175,7 @@ bool drc_hash_table::set_codeptr(UINT32 mode, UINT32 pc, drccodeptr code)
 	if (m_base[mode][l1] == m_emptyl2)
 	{
 		drccodeptr *newtable = (drccodeptr *)m_cache.alloc_temporary(sizeof(drccodeptr) << m_l2bits);
-		if (newtable == NULL)
+		if (newtable == nullptr)
 			return false;
 		memcpy(newtable, m_emptyl2, sizeof(drccodeptr) << m_l2bits);
 		m_base[mode][l1] = newtable;
@@ -225,7 +225,7 @@ void drc_map_variables::block_begin(drcuml_block &block)
 {
 	// release any remaining live entries
 	map_entry *entry;
-	while ((entry = m_entry_list.detach_head()) != NULL)
+	while ((entry = m_entry_list.detach_head()) != nullptr)
 		m_cache.dealloc(entry, sizeof(*entry));
 
 	// reset the variable values
@@ -240,12 +240,12 @@ void drc_map_variables::block_begin(drcuml_block &block)
 void drc_map_variables::block_end(drcuml_block &block)
 {
 	// only process if we have data
-	if (m_entry_list.first() == NULL)
+	if (m_entry_list.first() == nullptr)
 		return;
 
 	// begin "code generation" aligned to an 8-byte boundary
 	drccodeptr *top = m_cache.begin_codegen(sizeof(UINT64) + sizeof(UINT32) + 2 * sizeof(UINT32) * m_entry_list.count());
-	if (top == NULL)
+	if (top == nullptr)
 		block.abort();
 	UINT32 *dest = (UINT32 *)(((FPTR)*top + 7) & ~7);
 
@@ -261,7 +261,7 @@ void drc_map_variables::block_end(drcuml_block &block)
 	// now iterate over entries and store them
 	UINT32 curvalue[MAPVAR_COUNT] = { 0 };
 	bool changed[MAPVAR_COUNT] = { false };
-	for (map_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())
+	for (map_entry *entry = m_entry_list.first(); entry != nullptr; entry = entry->next())
 	{
 		// update the current value of the variable and detect changes
 		if (curvalue[entry->m_mapvar] != entry->m_newval)
@@ -271,7 +271,7 @@ void drc_map_variables::block_end(drcuml_block &block)
 		}
 
 		// if the next code pointer is different, or if we're at the end, flush changes
-		if (entry->next() == NULL || entry->next()->m_codeptr != entry->m_codeptr)
+		if (entry->next() == nullptr || entry->next()->m_codeptr != entry->m_codeptr)
 		{
 			// build a mask of changed variables
 			int numchanged = 0;
@@ -331,7 +331,7 @@ void drc_map_variables::set_value(drccodeptr codebase, UINT32 mapvar, UINT32 new
 
 	// allocate a new entry and fill it in
 	map_entry *entry = (map_entry *)m_cache.alloc(sizeof(*entry));
-	entry->m_next = NULL;
+	entry->m_next = nullptr;
 	entry->m_codeptr = codebase;
 	entry->m_mapvar = mapvar - MAPVAR_M0;
 	entry->m_newval = newvalue;
@@ -474,7 +474,7 @@ void drc_label_list::block_end(drcuml_block &block)
 
 	// free all of the pending fixup requests
 	label_fixup *fixup;
-	while ((fixup = m_fixup_list.detach_head()) != NULL)
+	while ((fixup = m_fixup_list.detach_head()) != nullptr)
 		m_cache.dealloc(fixup, sizeof(*fixup));
 
 	// make sure the label list is clear, and fatalerror if we missed anything
@@ -493,7 +493,7 @@ drccodeptr drc_label_list::get_codeptr(uml::code_label label, drc_label_fixup_de
 	label_entry *curlabel = find_or_allocate(label);
 
 	// if no code pointer, request an OOB callback
-	if (curlabel->m_codeptr == NULL && !callback.isnull())
+	if (curlabel->m_codeptr == nullptr && !callback.isnull())
 	{
 		label_fixup *fixup = reinterpret_cast<label_fixup *>(m_cache.alloc(sizeof(*fixup)));
 		fixup->m_callback = callback;
@@ -514,7 +514,7 @@ void drc_label_list::set_codeptr(uml::code_label label, drccodeptr codeptr)
 {
 	// set the code pointer
 	label_entry *curlabel = find_or_allocate(label);
-	assert(curlabel->m_codeptr == NULL);
+	assert(curlabel->m_codeptr == nullptr);
 	curlabel->m_codeptr = codeptr;
 }
 
@@ -528,10 +528,10 @@ void drc_label_list::reset(bool fatal_on_leftovers)
 {
 	// loop until out of labels
 	label_entry *curlabel;
-	while ((curlabel = m_list.detach_head()) != NULL)
+	while ((curlabel = m_list.detach_head()) != nullptr)
 	{
 		// fatal if we were a leftover
-		if (fatal_on_leftovers && curlabel->m_codeptr == NULL)
+		if (fatal_on_leftovers && curlabel->m_codeptr == nullptr)
 			fatalerror("Label %08X never defined!\n", curlabel->m_label.label());
 
 		// free the label
@@ -549,16 +549,16 @@ drc_label_list::label_entry *drc_label_list::find_or_allocate(uml::code_label la
 {
 	// find the label, or else allocate a new one
 	label_entry *curlabel;
-	for (curlabel = m_list.first(); curlabel != NULL; curlabel = curlabel->next())
+	for (curlabel = m_list.first(); curlabel != nullptr; curlabel = curlabel->next())
 		if (curlabel->m_label == label)
 			break;
 
 	// if none found, allocate
-	if (curlabel == NULL)
+	if (curlabel == nullptr)
 	{
 		curlabel = (label_entry *)m_cache.alloc(sizeof(*curlabel));
 		curlabel->m_label = label;
-		curlabel->m_codeptr = NULL;
+		curlabel->m_codeptr = nullptr;
 		m_list.append(*curlabel);
 	}
 	return curlabel;

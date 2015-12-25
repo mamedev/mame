@@ -200,7 +200,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	MCFG_LSI53C810_FETCH_CB(bebox_state, scsi_fetch)
 	MCFG_LEGACY_SCSI_PORT("scsi")
 
-	MCFG_IDE_CONTROLLER_ADD( "ide", ata_devices, "hdd", NULL, false ) /* FIXME */
+	MCFG_IDE_CONTROLLER_ADD( "ide", ata_devices, "hdd", nullptr, false ) /* FIXME */
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(bebox_state, bebox_ide_interrupt))
 
 	/* pci */

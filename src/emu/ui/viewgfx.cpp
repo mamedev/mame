@@ -192,7 +192,7 @@ static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 				i < tempcount && state.gfxset.devcount < MAX_GFX_DECODERS;
 				i++, interface = gfx_iter.next())
 		{
-			for (count = 0; count < MAX_GFX_ELEMENTS && interface->gfx(count) != NULL; count++) { }
+			for (count = 0; count < MAX_GFX_ELEMENTS && interface->gfx(count) != nullptr; count++) { }
 
 			// count = index of first NULL
 			if (count > 0)
@@ -216,11 +216,11 @@ static void ui_gfx_exit(running_machine &machine)
 {
 	// free the texture
 	machine.render().texture_free(ui_gfx.texture);
-	ui_gfx.texture = NULL;
+	ui_gfx.texture = nullptr;
 
 	// free the bitmap
 	global_free(ui_gfx.bitmap);
-	ui_gfx.bitmap = NULL;
+	ui_gfx.bitmap = nullptr;
 }
 
 
@@ -835,7 +835,7 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state &state, 
 	cellypix = 1 + ((info.rotate[set] & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height());
 
 	// realloc the bitmap if it is too small
-	if (state.bitmap == NULL || state.texture == NULL || state.bitmap->bpp() != 32 || state.bitmap->width() != cellxpix * xcells || state.bitmap->height() != cellypix * ycells)
+	if (state.bitmap == nullptr || state.texture == nullptr || state.bitmap->bpp() != 32 || state.bitmap->width() != cellxpix * xcells || state.bitmap->height() != cellypix * ycells)
 	{
 		// free the old stuff
 		machine.render().texture_free(state.texture);
@@ -1144,7 +1144,7 @@ static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state &state,
 		{ UINT32 temp = width; width = height; height = temp; }
 
 	// realloc the bitmap if it is too small
-	if (state.bitmap == NULL || state.texture == NULL || state.bitmap->width() != width || state.bitmap->height() != height)
+	if (state.bitmap == nullptr || state.texture == nullptr || state.bitmap->width() != width || state.bitmap->height() != height)
 	{
 		// free the old stuff
 		machine.render().texture_free(state.texture);

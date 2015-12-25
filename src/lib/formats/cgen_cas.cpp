@@ -111,7 +111,7 @@ static int cgenie_cas_to_wav_size(const UINT8 *casdata, int caslen)
 {
 	cas_size = caslen;
 
-	return cgenie_handle_cas( NULL, casdata );
+	return cgenie_handle_cas( nullptr, casdata );
 }
 
 static const struct CassetteLegacyWaveFiller cgenie_cas_legacy_fill_wave =
@@ -143,7 +143,7 @@ static const struct CassetteFormat cgenie_cas_format =
 	"cas",
 	cgenie_cas_identify,
 	cgenie_cas_load,
-	NULL
+	nullptr
 };
 
 

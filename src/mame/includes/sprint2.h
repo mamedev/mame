@@ -72,7 +72,7 @@ public:
 	DECLARE_DRIVER_INIT(dominos);
 	DECLARE_DRIVER_INIT(dominos4);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sprint2);
 	UINT32 screen_update_sprint2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sprint2(screen_device &screen, bool state);

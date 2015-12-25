@@ -85,7 +85,7 @@ static MACHINE_CONFIG_FRAGMENT( mshark )
 
 	// devices
 	MCFG_HARDDISK_ADD("harddisk1")
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 MACHINE_CONFIG_END
 
 

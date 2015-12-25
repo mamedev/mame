@@ -170,11 +170,11 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	UINT8 m_sol20_fa;
-	virtual void machine_reset();
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT8 m_sol20_fc;
 	UINT8 m_sol20_fe;
 	const UINT8 *m_p_chargen;

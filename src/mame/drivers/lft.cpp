@@ -28,7 +28,7 @@ public:
 
 private:
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };

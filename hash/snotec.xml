@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="snotec" description="Bandai Super Note Club cartridges">
+
+	<software name="conan2">
+		<description>Detective Conan 2</description>
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x40000">
+				<rom name="SNC_Conan2.ic" size="0x40000" crc="47a3ce5e" sha1="2f9653ef01026d8a8f8c3036bda533336ebc7e0a" offset="0" />
+			</dataarea>
+			<dataarea name="eeprom" size="0x4000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tamago">
+		<description>Tamagotchi</description>
+		<year>1997</year>
+		<publisher>Bandai</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x40000">
+				<rom name="SNC_Tamago.ic1" size="0x40000" crc="3900e281" sha1="8b2faf3961e4a873a513f426056da188af37b2b5" offset="0" />
+			</dataarea>
+			<dataarea name="eeprom" size="0x4000">
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

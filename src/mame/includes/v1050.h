@@ -153,10 +153,10 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 private:
 	void bankswitch();

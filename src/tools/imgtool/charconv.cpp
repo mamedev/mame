@@ -24,7 +24,7 @@ static char *utf8_from_latin1(const char *src)
 	/* validate input */
 	if (!src)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	/* allocate space for result, twice the source len to be safe */
@@ -69,7 +69,7 @@ static char *latin1_from_utf8(const char *src)
 	/* validate input */
 	if (!src)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	/* allocate space for result */
@@ -128,7 +128,7 @@ char *utf8_from_native(imgtool_charset charset, const char *src)
 			break;
 
 		default:
-			result = NULL;
+			result = nullptr;
 			break;
 	}
 	return result;
@@ -155,7 +155,7 @@ char *native_from_utf8(imgtool_charset charset, const char *src)
 			break;
 
 		default:
-			result = NULL;
+			result = nullptr;
 			break;
 	}
 	return result;

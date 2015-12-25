@@ -292,8 +292,8 @@ VIDEO_START_MEMBER( mbee_state, mono )
 {
 	m_p_videoram = memregion("videoram")->base();
 	m_p_gfxram = memregion("gfx")->base()+0x1000;
-	m_p_colorram = 0;
-	m_p_attribram = 0;
+	m_p_colorram = nullptr;
+	m_p_attribram = nullptr;
 	m_is_premium = 0;
 }
 
@@ -302,7 +302,7 @@ VIDEO_START_MEMBER( mbee_state, standard )
 	m_p_videoram = memregion("videoram")->base();
 	m_p_gfxram = memregion("gfx")->base()+0x1000;
 	m_p_colorram = memregion("colorram")->base();
-	m_p_attribram = 0;
+	m_p_attribram = nullptr;
 	m_is_premium = 0;
 }
 

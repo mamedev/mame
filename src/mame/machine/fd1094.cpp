@@ -500,8 +500,8 @@ fd1094_decryption_cache::fd1094_decryption_cache(fd1094_device &fd1094)
 void fd1094_decryption_cache::reset()
 {
 	// reset all allocated cache buffers
-	for (int cache = 0; cache < 256; cache++)
-		m_decrypted_opcodes[cache].clear();
+	for (auto & elem : m_decrypted_opcodes)
+		elem.clear();
 }
 
 
@@ -558,9 +558,9 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 		m_state(0x00),
 		m_irqmode(false),
 		m_cache(*this),
-		m_srcbase(NULL),
+		m_srcbase(nullptr),
 		m_srcbytes(0),
-		m_key(NULL)
+		m_key(nullptr)
 {
 	// override the name after the m68000 initializes
 	m_name.assign("FD1094");
@@ -570,9 +570,9 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 
 	// create the initial masked opcode table
 	memset(m_masked_opcodes_lookup, 0, sizeof(m_masked_opcodes_lookup));
-	for (int index = 0; index < ARRAY_LENGTH(s_masked_opcodes); index++)
+	for (auto opcode : s_masked_opcodes)
 	{
-		UINT16 opcode = s_masked_opcodes[index];
+		
 		m_masked_opcodes_lookup[0][opcode >> 4] |= 1 << ((opcode >> 1) & 7);
 		m_masked_opcodes_lookup[1][opcode >> 4] |= 1 << ((opcode >> 1) & 7);
 	}
@@ -637,11 +637,11 @@ void fd1094_device::device_start()
 {
 	// find the key
 	m_key = memregion("key")->base();
-	if (m_key == NULL)
+	if (m_key == nullptr)
 		throw emu_fatalerror("FD1094 key region not found!");
 
 	// get a pointer to the ROM region
-	if (region() != NULL)
+	if (region() != nullptr)
 	{
 		m_srcbase = reinterpret_cast<UINT16 *>(region()->base());
 		m_srcbytes = region()->bytes();
@@ -651,7 +651,7 @@ void fd1094_device::device_start()
 	else
 	{
 		memory_share *share = owner()->memshare(tag());
-		if (share != NULL)
+		if (share != nullptr)
 		{
 			m_srcbase = reinterpret_cast<UINT16 *>(share->ptr());
 			m_srcbytes = share->bytes();
@@ -659,7 +659,7 @@ void fd1094_device::device_start()
 	}
 
 	// if we got nothing, error
-	if (m_srcbase == NULL)
+	if (m_srcbase == nullptr)
 		throw emu_fatalerror("FD1094 found no data to decrypt!");
 
 	// determine length and configure our cache

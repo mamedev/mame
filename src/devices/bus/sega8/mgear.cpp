@@ -37,7 +37,7 @@ void sega8_mgear_device::device_reset()
  -------------------------------------------------*/
 
 static MACHINE_CONFIG_FRAGMENT( sub_slot )
-	MCFG_SMS_CARTRIDGE_ADD("subslot", sms_cart, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("subslot", sms_cart, nullptr)
 MACHINE_CONFIG_END
 
 machine_config_constructor sega8_mgear_device::device_mconfig_additions() const

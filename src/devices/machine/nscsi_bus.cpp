@@ -156,7 +156,7 @@ nscsi_device::nscsi_device(const machine_config &mconfig, device_type type, cons
 	device_slot_card_interface(mconfig, *this)
 {
 	scsi_id = scsi_refid = -1;
-	scsi_bus = 0;
+	scsi_bus = nullptr;
 }
 
 void nscsi_device::connect_to_bus(nscsi_bus_device *bus, int refid, int default_scsi_id)

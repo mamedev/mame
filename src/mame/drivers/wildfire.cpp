@@ -67,7 +67,7 @@ public:
 	void write_a12(int state);
 	void sound_update();
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 

@@ -31,11 +31,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	void get_audio_data(stream_sample_t *bufL, stream_sample_t *bufR, UINT32 samples_wanted);
@@ -46,7 +46,7 @@ private:
 	INT8                m_audio_playing, m_audio_pause, m_audio_ended_normally;
 	UINT32              m_audio_lba, m_audio_length;
 
-	UINT8 *             m_audio_cache;
+	std::unique_ptr<UINT8[]>   m_audio_cache;
 	UINT32              m_audio_samples;
 	UINT32              m_audio_bptr;
 	INT16               m_audio_volume[2];

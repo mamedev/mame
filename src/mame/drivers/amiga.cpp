@@ -44,8 +44,8 @@ public:
 	DECLARE_WRITE16_MEMBER( write_protect_w );
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<address_map_bank_device> m_bootrom;
@@ -74,11 +74,11 @@ public:
 	DECLARE_WRITE16_MEMBER( clock_w );
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	// amiga_state overrides
-	virtual bool int2_pending();
-	virtual bool int6_pending();
+	virtual bool int2_pending() override;
+	virtual bool int6_pending() override;
 
 private:
 	// devices
@@ -104,11 +104,11 @@ public:
 	DECLARE_DRIVER_INIT( ntsc );
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	// amiga_state overrides
-	virtual bool int2_pending();
-	virtual bool int6_pending();
+	virtual bool int2_pending() override;
+	virtual bool int6_pending() override;
 
 private:
 	// devices
@@ -149,11 +149,11 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	// amiga_state overrides
-	virtual bool int2_pending();
-	virtual bool int6_pending();
+	virtual bool int2_pending() override;
+	virtual bool int6_pending() override;
 
 private:
 	// devices
@@ -205,11 +205,11 @@ public:
 	DECLARE_DRIVER_INIT( ntsc );
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	// amiga_state overrides
-	virtual bool int2_pending();
-	virtual bool int6_pending();
+	virtual bool int2_pending() override;
+	virtual bool int6_pending() override;
 
 private:
 	// devices
@@ -237,7 +237,7 @@ public:
 	static const UINT8 GAYLE_ID = 0xd0;
 
 protected:
-	virtual bool int2_pending();
+	virtual bool int2_pending() override;
 
 private:
 	int m_gayle_int2;
@@ -259,7 +259,7 @@ public:
 	static const UINT8 GAYLE_ID = 0xd1;
 
 protected:
-	virtual bool int2_pending();
+	virtual bool int2_pending() override;
 
 private:
 	int m_gayle_int2;
@@ -328,7 +328,7 @@ public:
 
 protected:
 	// amiga_state overrides
-	virtual void potgo_w(UINT16 data);
+	virtual void potgo_w(UINT16 data) override;
 
 private:
 	required_device<cdda_device> m_cdda;
@@ -1329,12 +1329,12 @@ static MACHINE_CONFIG_START( amiga_base, amiga_state )
 	// floppy drives
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_PAL)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amiga_floppies, "35dd", amiga_fdc::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amiga_floppies, 0, amiga_fdc::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", amiga_floppies, 0, amiga_fdc::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", amiga_floppies, 0, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amiga_floppies, nullptr, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", amiga_floppies, nullptr, amiga_fdc::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", amiga_floppies, nullptr, amiga_fdc::floppy_formats)
 
 	// rs232
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(amiga_state, rs232_rx_w))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(amiga_state, rs232_dcd_w))
 	MCFG_RS232_DSR_HANDLER(WRITELINE(amiga_state, rs232_dsr_w))
@@ -1414,17 +1414,17 @@ static MACHINE_CONFIG_DERIVED_CLASS( a2000, amiga_base, a2000_state )
 	MCFG_DEVICE_ADD("u65", MSM6242, XTAL_32_768kHz)
 
 	// cpu slot
-	MCFG_EXPANSION_SLOT_ADD("maincpu", a2000_expansion_cards, NULL)
+	MCFG_EXPANSION_SLOT_ADD("maincpu", a2000_expansion_cards, nullptr)
 
 	// zorro slots
 	MCFG_ZORRO2_ADD("maincpu")
 	MCFG_ZORRO2_INT2_HANDLER(WRITELINE(a2000_state, zorro2_int2_w))
 	MCFG_ZORRO2_INT6_HANDLER(WRITELINE(a2000_state, zorro2_int6_w))
-	MCFG_ZORRO2_SLOT_ADD("zorro1", zorro2_cards, NULL)
-	MCFG_ZORRO2_SLOT_ADD("zorro2", zorro2_cards, NULL)
-	MCFG_ZORRO2_SLOT_ADD("zorro3", zorro2_cards, NULL)
-	MCFG_ZORRO2_SLOT_ADD("zorro4", zorro2_cards, NULL)
-	MCFG_ZORRO2_SLOT_ADD("zorro5", zorro2_cards, NULL)
+	MCFG_ZORRO2_SLOT_ADD("zorro1", zorro2_cards, nullptr)
+	MCFG_ZORRO2_SLOT_ADD("zorro2", zorro2_cards, nullptr)
+	MCFG_ZORRO2_SLOT_ADD("zorro3", zorro2_cards, nullptr)
+	MCFG_ZORRO2_SLOT_ADD("zorro4", zorro2_cards, nullptr)
+	MCFG_ZORRO2_SLOT_ADD("zorro5", zorro2_cards, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( a2000n, a2000, a2000_state )
@@ -1456,7 +1456,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a500, amiga_base, a500_state )
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
 
 	// cpu slot
-	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, NULL)
+	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( a500n, a500, a500_state )
@@ -1594,7 +1594,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a500p, amiga_base, a500p_state )
 	MCFG_DEVICE_ADD("u9", MSM6242, XTAL_32_768kHz)
 
 	// cpu slot
-	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, NULL)
+	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( a500pn, a500p, a500p_state )
@@ -1631,7 +1631,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a600, amiga_base, a600_state )
 	MCFG_GAYLE_CS1_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs1))
 	MCFG_GAYLE_CS1_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs1))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("gayle", gayle_device, ide_interrupt_w))
 
 	// todo: pcmcia
@@ -1680,7 +1680,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a1200, amiga_base, a1200_state )
 	MCFG_GAYLE_CS1_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs1))
 	MCFG_GAYLE_CS1_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs1))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("gayle", gayle_device, ide_interrupt_w))
 
 	// todo: pcmcia
@@ -1728,7 +1728,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( a4000, amiga_base, a4000_state )
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
 
 	// ide
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(a4000_state, ide_interrupt_w))
 
 	// todo: zorro3

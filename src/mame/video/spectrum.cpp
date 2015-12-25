@@ -118,11 +118,11 @@ UINT32 spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 	static const rectangle rect(SPEC_LEFT_BORDER, SPEC_LEFT_BORDER + SPEC_DISPLAY_XSIZE - 1, SPEC_TOP_BORDER, SPEC_TOP_BORDER + SPEC_DISPLAY_YSIZE - 1);
 
 	if (m_border_bitmap.valid())
-		copyscrollbitmap(bitmap, m_border_bitmap, 0, 0, 0, 0, cliprect);
+		copyscrollbitmap(bitmap, m_border_bitmap, 0, nullptr, 0, nullptr, cliprect);
 
 	spectrum_UpdateScreenBitmap();
 	if (m_screen_bitmap.valid())
-		copyscrollbitmap(bitmap, m_screen_bitmap, 0, 0, 0, 0, rect);
+		copyscrollbitmap(bitmap, m_screen_bitmap, 0, nullptr, 0, nullptr, rect);
 
 #if 0
 	// note, don't update borders in here, this can time travel w/regards to other timers and may end up giving you

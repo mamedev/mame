@@ -45,8 +45,8 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* video-related */
-	bitmap_ind16 *m_tmpbitmap;
-	bitmap_ind16 *m_tmpbitmap2;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap2;
 
 	/* maniach 68705 protection */
 	UINT8 m_port_a_in;
@@ -79,7 +79,7 @@ public:
 	DECLARE_WRITE8_MEMBER(matmania_sh_command_w);
 	DECLARE_WRITE8_MEMBER(maniach_sh_command_w);
 	DECLARE_WRITE8_MEMBER(matmania_paletteram_w);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(matmania);
 	DECLARE_MACHINE_START(maniach);
 	DECLARE_MACHINE_RESET(maniach);

@@ -101,8 +101,8 @@ public:
 	optional_ioport m_row7;
 	optional_ioport m_lock;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void check_interrupts();
 	int read_pla(offs_t offset, offs_t va, int rw, int aec, int ba);

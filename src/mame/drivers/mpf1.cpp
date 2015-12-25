@@ -302,7 +302,7 @@ static const z80_daisy_config mpf1_daisy_chain[] =
 {
 	{ Z80CTC_TAG },
 	{ Z80PIO_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 /* Machine Initialization */

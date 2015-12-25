@@ -23,7 +23,7 @@ public:
 	s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// single bit registers (74LS74)
 	DECLARE_READ8_MEMBER(zfg_r);
@@ -53,8 +53,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	UINT8 m_shared[0x800];  // 2k shared memory

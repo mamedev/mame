@@ -10,7 +10,7 @@ inline void dooyong_state::scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, t
 	if (old != data)
 	{
 		scroll[offset] = data;
-		if (map != NULL) switch (offset)
+		if (map != nullptr) switch (offset)
 		{
 		case 0: /* Low byte of x scroll - scroll tilemap */
 			map->set_scrollx(0, data);
@@ -101,6 +101,8 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::lastday_ctrl_w)
 
 WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 {
+//	printf("pollux_ctrl_w %02x\n", data);
+
 	/* bit 0 is flip screen */
 	flip_screen_set(data & 0x01);
 
@@ -108,11 +110,23 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 	coin_counter_w(machine(), 0, data & 0x80);
 	coin_counter_w(machine(), 1, data & 0x40);
 
-	/* bit 1 is used but unknown */
+	/* bit 1 is used but unknown - palette banking (both write and display based on pollux bombs) */
+	int last_palbank = m_palette_bank;
+	if (m_paletteram_flytiger) m_palette_bank = (data & 0x02)>>1;
+
+	if (last_palbank != m_palette_bank)
+	{
+		m_bg_tilemap->mark_all_dirty();
+		m_fg_tilemap->mark_all_dirty();
+		m_tx_tilemap->mark_all_dirty();
+	}
 
 	/* bit 2 is continuously toggled (unknown) */
-	/* bit 4 is used but unknown */
+
+	/* bit 4 is used but unknown - display disable? */
 }
+	
+
 
 WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
 {
@@ -130,14 +144,22 @@ WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
 //  logerror("%04x: bankswitch = %02x\n",space.device().safe_pc(),data&0xe0);
 }
 
+READ8_MEMBER(dooyong_z80_state::paletteram_flytiger_r)
+{
+	if (m_palette_bank) offset+= 0x800;
+	
+	return m_paletteram_flytiger[offset];
+}
+
+
 WRITE8_MEMBER(dooyong_z80_state::paletteram_flytiger_w)
 {
-	if (m_flytiger_palette_bank)
-	{
-		m_paletteram_flytiger[offset] = data;
-		UINT16 const value = m_paletteram_flytiger[offset & ~1] | (m_paletteram_flytiger[offset | 1] << 8);
-		m_palette->set_pen_color(offset/2, pal5bit(value >> 10), pal5bit(value >> 5), pal5bit(value >> 0));
-	}
+	if (m_palette_bank) offset+= 0x800;
+	
+	m_paletteram_flytiger[offset] = data;
+	UINT16 const value = m_paletteram_flytiger[offset & ~1] | (m_paletteram_flytiger[offset | 1] << 8);
+	m_palette->set_pen_color(offset/2, pal5bit(value >> 10), pal5bit(value >> 5), pal5bit(value >> 0));
+	
 }
 
 WRITE8_MEMBER(dooyong_z80_state::flytiger_ctrl_w)
@@ -147,8 +169,16 @@ WRITE8_MEMBER(dooyong_z80_state::flytiger_ctrl_w)
 
 	/* bits 1, 2 used but unknown */
 
-	/* bit 3 fg palette banking: trash protection? */
-	m_flytiger_palette_bank = data & 0x08;
+	/* bit 3 palette banking  */
+	int last_palbank = m_palette_bank;
+	m_palette_bank = (data & 0x08)>>3;
+
+	if (last_palbank != m_palette_bank)
+	{
+		m_bg_tilemap->mark_all_dirty();
+		m_fg_tilemap->mark_all_dirty();
+		m_tx_tilemap->mark_all_dirty();
+	}
 
 	/* bit 4 changes tilemaps priority */
 	m_flytiger_pri = data & 0x10;
@@ -183,6 +213,7 @@ inline void dooyong_state::get_tile_info(tile_data &tileinfo, int tile_index,
 		   Y = y flip */
 		code = tilerom[offs + 1] | ((attr & 0x01) << 8) | ((attr & 0x80) << 2);
 		color = (attr & 0x78) >> 3;
+		color += m_palette_bank * 0x40;
 		flags = TILE_FLIPYX((attr & 0x06) >> 1);
 	}
 	else
@@ -254,7 +285,7 @@ TILE_GET_INFO_MEMBER(dooyong_z80_state::get_tx_tile_info)
 	int const code = m_txvideoram[offs] | ((attr & 0x0f) << 8);
 	int const color = (attr & 0xf0) >> 4;
 
-	tileinfo.set(0, code, color, 0);
+	tileinfo.set(0, code, color + m_palette_bank *0x40, 0);
 }
 
 
@@ -289,7 +320,8 @@ void dooyong_z80_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 		int sx = buffered_spriteram[offs+3] | ((buffered_spriteram[offs+1] & 0x10) << 4);
 		int sy = buffered_spriteram[offs+2];
 		int code = buffered_spriteram[offs] | ((buffered_spriteram[offs+1] & 0xe0) << 3);
-		int const color = buffered_spriteram[offs+1] & 0x0f;
+		int color = buffered_spriteram[offs+1] & 0x0f;
+
 		//TODO: This priority mechanism works for known games, but seems a bit strange.
 		//Are we missing something?  (The obvious spare palette bit isn't it.)
 		int const pri = (((color == 0x00) || (color == 0x0f)) ? 0xfc : 0xf0);
@@ -326,6 +358,8 @@ void dooyong_z80_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 			flipx = !flipx;
 			flipy = !flipy;
 		}
+
+		color += m_palette_bank * 0x40;
 
 		for (int y = 0; y <= height; y++)
 		{
@@ -446,6 +480,8 @@ UINT32 dooyong_z80_state::screen_update_primella(screen_device &screen, bitmap_i
 	return 0;
 }
 
+
+
 VIDEO_START_MEMBER(dooyong_z80_ym2203_state, lastday)
 {
 	/* Configure tilemap callbacks */
@@ -522,6 +558,9 @@ VIDEO_START_MEMBER(dooyong_z80_ym2203_state, pollux)
 	m_fg_gfx = 3;
 	m_tx_tilemap_mode = 0;
 
+	m_paletteram_flytiger = make_unique_clear<UINT8[]>(0x1000);
+	save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
+
 	/* Create tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
@@ -591,6 +630,9 @@ VIDEO_START_MEMBER(dooyong_z80_state, flytiger)
 	m_bg_gfx = 2;
 	m_fg_gfx = 3;
 	m_tx_tilemap_mode = 0;
+
+	m_paletteram_flytiger = make_unique_clear<UINT8[]>(0x1000);
+	save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
 
 	/* Create tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
@@ -797,6 +839,7 @@ UINT32 dooyong_68k_state::screen_update_popbingo(screen_device &screen, bitmap_i
 }
 
 
+
 VIDEO_START_MEMBER(dooyong_68k_state, rshark)
 {
 	/* Configure tilemap callbacks */
@@ -850,7 +893,7 @@ VIDEO_START_MEMBER(dooyong_68k_state, popbingo)
 	/* Create tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
-	m_bg2_tilemap = m_fg_tilemap = m_fg2_tilemap = NULL;    /* Stop scroll handler from crashing on these */
+	m_bg2_tilemap = m_fg_tilemap = m_fg2_tilemap = nullptr;    /* Stop scroll handler from crashing on these */
 
 	memset(m_bgscroll8, 0, 0x10);
 	memset(m_bg2scroll8, 0, 0x10);

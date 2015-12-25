@@ -115,8 +115,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cliff_sound_overlay_w);
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 	DECLARE_DRIVER_INIT(cliff);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(cliff_irq_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;

@@ -40,8 +40,8 @@ public:
 	luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( write_sasi_bsy );
@@ -51,18 +51,18 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_abcbus_interface overrides
-	virtual void abcbus_cs(UINT8 data);
-	virtual int abcbus_csb();
-	virtual UINT8 abcbus_inp();
-	virtual void abcbus_out(UINT8 data);
-	virtual UINT8 abcbus_stat();
-	virtual void abcbus_c1(UINT8 data);
-	virtual void abcbus_c3(UINT8 data);
-	virtual void abcbus_c4(UINT8 data);
+	virtual void abcbus_cs(UINT8 data) override;
+	virtual int abcbus_csb() override;
+	virtual UINT8 abcbus_inp() override;
+	virtual void abcbus_out(UINT8 data) override;
+	virtual UINT8 abcbus_stat() override;
+	virtual void abcbus_c1(UINT8 data) override;
+	virtual void abcbus_c3(UINT8 data) override;
+	virtual void abcbus_c4(UINT8 data) override;
 
 private:
 	inline void update_trrq_int();

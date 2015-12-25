@@ -75,7 +75,7 @@ public:
 	UINT8 m_flipscreen_y;
 	UINT8 m_color_mask;
 	tilemap_t *m_dambustr_tilemap2;
-	UINT8 *m_dambustr_videoram2;
+	std::unique_ptr<UINT8[]> m_dambustr_videoram2;
 	int m_leftclip;
 
 	void (galaxold_state::*m_modify_charcode)(UINT16 *code, UINT8 x);     /* function to call to do character banking */
@@ -99,7 +99,7 @@ public:
 	int m_dambustr_bg_color_2;
 	int m_dambustr_bg_priority;
 	int m_dambustr_char_bank;
-	bitmap_ind16 *m_dambustr_tmpbitmap;
+	std::unique_ptr<bitmap_ind16> m_dambustr_tmpbitmap;
 
 	void (galaxold_state::*m_draw_stars)(bitmap_ind16 &, const rectangle &);      /* function to call to draw the star layer */
 	int m_stars_colors_start;

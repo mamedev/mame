@@ -68,7 +68,7 @@ struct osd_scalable_lock
 //  GLOBAL VARIABLES
 //============================================================
 
-static try_enter_critical_section_ptr try_enter_critical_section = NULL;
+static try_enter_critical_section_ptr try_enter_critical_section = nullptr;
 static int checked_for_try_enter = FALSE;
 
 
@@ -80,8 +80,8 @@ static int checked_for_try_enter = FALSE;
 osd_lock *osd_lock_alloc(void)
 {
 	osd_lock *lock = (osd_lock *)malloc(sizeof(*lock));
-	if (lock == NULL)
-		return NULL;
+	if (lock == nullptr)
+		return nullptr;
 	InitializeCriticalSection(&lock->critsect);
 	return lock;
 }
@@ -121,13 +121,13 @@ int osd_lock_try(osd_lock *lock)
 	{
 		// see if we can use TryEnterCriticalSection
 		HMODULE library = LoadLibrary(TEXT("kernel32.dll"));
-		if (library != NULL)
+		if (library != nullptr)
 			try_enter_critical_section = (try_enter_critical_section_ptr)GetProcAddress(library, "TryEnterCriticalSection");
 		checked_for_try_enter = TRUE;
 	}
 
 	// if we have it, use it, otherwise just block
-	if (try_enter_critical_section != NULL)
+	if (try_enter_critical_section != nullptr)
 		result = (*try_enter_critical_section)(&lock->critsect);
 	else
 		EnterCriticalSection(&lock->critsect);
@@ -203,7 +203,7 @@ INT32 win_atomic_add32(INT32 volatile *ptr, INT32 delta)
 
 osd_event *osd_event_alloc(int manualreset, int initialstate)
 {
-	return (osd_event *) CreateEvent(NULL, manualreset, initialstate, NULL);
+	return (osd_event *) CreateEvent(nullptr, manualreset, initialstate, nullptr);
 }
 
 //============================================================
@@ -271,15 +271,15 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 	uintptr_t handle;
 
 	thread = (osd_thread *)calloc(1, sizeof(osd_thread));
-	if (thread == NULL)
-		return NULL;
+	if (thread == nullptr)
+		return nullptr;
 	thread->callback = callback;
 	thread->param = cbparam;
-	handle = _beginthreadex(NULL, 0, worker_thread_entry, thread, 0, NULL);
+	handle = _beginthreadex(nullptr, 0, worker_thread_entry, thread, 0, nullptr);
 	if (handle == 0)
 	{
 		free(thread);
-		return NULL;
+		return nullptr;
 	}
 	thread->handle = (HANDLE) handle;
 	return thread;
@@ -327,8 +327,8 @@ osd_scalable_lock *osd_scalable_lock_alloc(void)
 	osd_scalable_lock *lock;
 
 	lock = (osd_scalable_lock *)calloc(1, sizeof(*lock));
-	if (lock == NULL)
-		return NULL;
+	if (lock == nullptr)
+		return nullptr;
 
 	memset(lock, 0, sizeof(*lock));
 #if USE_SCALABLE_LOCKS

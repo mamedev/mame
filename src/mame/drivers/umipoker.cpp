@@ -69,9 +69,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
 	TILE_GET_INFO_MEMBER(get_tile_info_3);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_umipoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

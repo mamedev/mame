@@ -51,7 +51,7 @@ eeprom_base_device::eeprom_base_device(const machine_config &mconfig, device_typ
 		m_cells(0),
 		m_address_bits(0),
 		m_data_bits(0),
-		m_default_data(0),
+		m_default_data(nullptr),
 		m_default_data_size(0),
 		m_default_value(0),
 		m_default_value_set(false),
@@ -253,7 +253,7 @@ void eeprom_base_device::device_reset()
 
 const address_space_config *eeprom_base_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 
@@ -276,7 +276,7 @@ void eeprom_base_device::nvram_default()
 			m_addrspace[0]->write_word(offs * 2, default_value);
 
 	// handle hard-coded data from the driver
-	if (m_default_data.u8 != NULL)
+	if (m_default_data.u8 != nullptr)
 	{
 		osd_printf_verbose("Warning: Driver-specific EEPROM defaults are going away soon.\n");
 		for (offs_t offs = 0; offs < m_default_data_size; offs++)
@@ -289,7 +289,7 @@ void eeprom_base_device::nvram_default()
 	}
 
 	// populate from a memory region if present
-	if (m_region != NULL)
+	if (m_region != nullptr)
 	{
 		if (m_region->bytes() != eeprom_bytes)
 			fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)\n", tag(), eeprom_bytes);

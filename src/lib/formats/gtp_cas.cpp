@@ -33,7 +33,7 @@ static INT16    len;
 
 
 static void gtp_output_wave( INT16 **buffer, int length ) {
-	if ( buffer == NULL ) {
+	if ( buffer == nullptr ) {
 		return;
 	}
 
@@ -111,7 +111,7 @@ static int gtp_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 	int size,n;
 	size = 0;
 	n = 0;
-	if (casdata == NULL) return -1;
+	if (casdata == nullptr) return -1;
 	while(n<caslen) {
 		int block_type = casdata[n];
 		int block_size = casdata[n+2]*256 + casdata[n+1];
@@ -132,7 +132,7 @@ static int gtp_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 	int i,size,n;
 	size = 0;
 	n = 0;
-	if (bytes == NULL) return -1;
+	if (bytes == nullptr) return -1;
 	while(n<len)
 	{
 		int block_type = bytes[n];
@@ -192,7 +192,7 @@ static const struct CassetteFormat gtp_cassette_format = {
 	"gtp",
 	gtp_cassette_identify,
 	gtp_cassette_load,
-	NULL
+	nullptr
 };
 
 

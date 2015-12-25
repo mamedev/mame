@@ -105,7 +105,7 @@ void m72_state::register_savestate()
 	save_item(NAME(m_scrolly1));
 	save_item(NAME(m_scrollx2));
 	save_item(NAME(m_scrolly2));
-	save_pointer(NAME(m_buffered_spriteram), m_spriteram.bytes()/2);
+	save_pointer(NAME(m_buffered_spriteram.get()), m_spriteram.bytes()/2);
 }
 
 
@@ -114,7 +114,7 @@ VIDEO_START_MEMBER(m72_state,m72)
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
-	m_buffered_spriteram = auto_alloc_array(machine(), UINT16, m_spriteram.bytes()/2);
+	m_buffered_spriteram = std::make_unique<UINT16[]>(m_spriteram.bytes()/2);
 
 	m_fg_tilemap->set_transmask(0,0xffff,0x0001);
 	m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
@@ -128,7 +128,7 @@ VIDEO_START_MEMBER(m72_state,m72)
 	//m_bg_tilemap->set_transmask(2,0x001f,0xffe0); // needed for nspiritj japan warning to look correct
 	// not sure what is needed to be able to see the imgfghto warning message
 
-	memset(m_buffered_spriteram,0,m_spriteram.bytes());
+	memset(m_buffered_spriteram.get(),0,m_spriteram.bytes());
 
 	m_fg_tilemap->set_scrolldx(0,0);
 	m_fg_tilemap->set_scrolldy(-128,-128);
@@ -209,8 +209,8 @@ VIDEO_START_MEMBER(m72_state,m82)
 	m_bg_tilemap_large->set_scrolldx(4,0);
 	m_bg_tilemap_large->set_scrolldy(-128,-128);
 
-	m_buffered_spriteram = auto_alloc_array(machine(), UINT16, m_spriteram.bytes()/2);
-	memset(m_buffered_spriteram,0,m_spriteram.bytes());
+	m_buffered_spriteram = std::make_unique<UINT16[]>(m_spriteram.bytes()/2);
+	memset(m_buffered_spriteram.get(),0,m_spriteram.bytes());
 
 	register_savestate();
 	save_item(NAME(m_m82_rowscroll));
@@ -224,7 +224,7 @@ VIDEO_START_MEMBER(m72_state,rtype2)
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
-	m_buffered_spriteram = auto_alloc_array(machine(), UINT16, m_spriteram.bytes()/2);
+	m_buffered_spriteram = std::make_unique<UINT16[]>(m_spriteram.bytes()/2);
 
 	m_fg_tilemap->set_transmask(0,0xffff,0x0001);
 	m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
@@ -234,7 +234,7 @@ VIDEO_START_MEMBER(m72_state,rtype2)
 	m_bg_tilemap->set_transmask(1,0x00ff,0xff00);
 	m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
 
-	memset(m_buffered_spriteram,0,m_spriteram.bytes());
+	memset(m_buffered_spriteram.get(),0,m_spriteram.bytes());
 
 	m_fg_tilemap->set_scrolldx(4,0);
 	m_fg_tilemap->set_scrolldy(-128,16);
@@ -375,7 +375,7 @@ WRITE16_MEMBER(m72_state::scrolly2_w)
 WRITE16_MEMBER(m72_state::dmaon_w)
 {
 	if (ACCESSING_BITS_0_7)
-		memcpy(m_buffered_spriteram, m_spriteram, m_spriteram.bytes());
+		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
 }
 
 
@@ -454,7 +454,7 @@ WRITE16_MEMBER(m72_state::m82_tm_ctrl_w)
 
 void m72_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 *spriteram = m_buffered_spriteram;
+	UINT16 *spriteram = m_buffered_spriteram.get();
 	int offs;
 
 	offs = 0;

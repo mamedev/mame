@@ -108,8 +108,8 @@ public:
 	UINT8 m_led7;
 	UINT8 m_allowNMI;
 	DECLARE_DRIVER_INIT(mephisto);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(mm2);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi_r5);

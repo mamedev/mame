@@ -105,7 +105,7 @@ public:
 	DECLARE_DRIVER_INIT(splash);
 	DECLARE_DRIVER_INIT(rebus);
 	DECLARE_DRIVER_INIT(funystrp);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(splash);
 	DECLARE_MACHINE_START(roldfrog);
 	DECLARE_MACHINE_START(funystrp);

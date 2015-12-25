@@ -51,8 +51,8 @@ const device_type CRT = &device_creator<crt_device>;
 
 crt_device::crt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CRT, "CRT Video", tag, owner, clock, "crt", __FILE__),
-		m_list(NULL),
-		m_list_head(NULL),
+		m_list(nullptr),
+		m_list_head(nullptr),
 		m_decay_counter(0),
 		m_num_intensity_levels(0),
 		m_window_offset_x(0),
@@ -71,7 +71,7 @@ void crt_device::device_start()
 {
 	/* alloc the arrays */
 	m_list = auto_alloc_array(machine(), crt_point, m_window_width * m_window_height);
-	m_list_head = auto_alloc_array(machine(), int, m_window_height);
+	m_list_head = std::make_unique<int[]>(m_window_height);
 
 	/* fill with black and set up list as empty */
 	for (int i = 0; i < (m_window_width * m_window_height); i++)

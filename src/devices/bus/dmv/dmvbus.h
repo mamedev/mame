@@ -65,7 +65,7 @@ public:
 	template<class _Object> static devcb_base &set_out_thold_callback(device_t &device, _Object object) { return downcast<dmvcart_slot_device &>(device).m_out_thold_cb.set_callback(object); }
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// reading and writing
 	virtual bool read(offs_t offset, UINT8 &data);

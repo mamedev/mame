@@ -266,8 +266,8 @@ const device_type DIGITALKER = &device_creator<digitalker_device>;
 digitalker_device::digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DIGITALKER, "Digitalker", tag, owner, clock, "digitalker", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_rom(NULL),
-		m_stream(NULL),
+		m_rom(nullptr),
+		m_stream(nullptr),
 		m_data(0),
 		m_cs(0),
 		m_cms(0),

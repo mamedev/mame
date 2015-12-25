@@ -32,8 +32,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 private:
 	// internal state
 	int            m_gfx_index_1;
@@ -47,9 +47,9 @@ private:
 	tilemap_t      *m_layer_roz;
 	int            m_gfx_index[2];
 
-	UINT32 *       m_tile_ram;
-	UINT32 *       m_char_ram;
-	UINT32 *       m_reg;
+	std::unique_ptr<UINT32[]>       m_tile_ram;
+	std::unique_ptr<UINT32[]>       m_char_ram;
+	std::unique_ptr<UINT32[]>       m_reg;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

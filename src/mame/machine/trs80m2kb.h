@@ -49,9 +49,9 @@ public:
 	template<class _Object> static devcb_base &set_clock_wr_callback(device_t &device, _Object object) { return downcast<trs80m2_keyboard_device &>(device).m_write_clock.set_callback(object); }
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_WRITE_LINE_MEMBER( busy_w );
 	DECLARE_READ_LINE_MEMBER( data_r );
@@ -64,8 +64,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	enum

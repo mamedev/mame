@@ -26,7 +26,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_READ16_MEMBER(io_r);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	UINT32 screen_update_parentj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(parentj_interrupt);
 	void parentj_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );

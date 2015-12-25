@@ -73,9 +73,9 @@ public:
 	DECLARE_READ8_MEMBER(lbeach_in1_r);
 	DECLARE_READ8_MEMBER(lbeach_in2_r);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lbeach);
 	UINT32 screen_update_lbeach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

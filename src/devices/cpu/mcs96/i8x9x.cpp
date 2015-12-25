@@ -25,7 +25,7 @@ offs_t i8x9x_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
 
 const address_space_config *i8x9x_device::memory_space_config(address_spacenum spacenum) const
 {
-	return spacenum == AS_PROGRAM ? &program_config : spacenum == AS_IO ? &io_config : NULL;
+	return spacenum == AS_PROGRAM ? &program_config : spacenum == AS_IO ? &io_config : nullptr;
 }
 
 void i8x9x_device::device_start()

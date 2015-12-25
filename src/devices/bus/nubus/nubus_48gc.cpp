@@ -118,8 +118,8 @@ void jmfb_device::device_start()
 
 	m_nubus->install_device(slotspace+0x200000, slotspace+0x2003ff, read32_delegate(FUNC(jmfb_device::mac_48gc_r), this), write32_delegate(FUNC(jmfb_device::mac_48gc_w), this));
 
-	m_timer = timer_alloc(0, NULL);
-	m_screen = NULL;    // can we look this up now?
+	m_timer = timer_alloc(0, nullptr);
+	m_screen = nullptr;    // can we look this up now?
 }
 
 //-------------------------------------------------

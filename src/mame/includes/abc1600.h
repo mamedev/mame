@@ -98,8 +98,8 @@ public:
 	required_device<abcbus_slot_t> m_bus1;
 	required_device<abcbus_slot_t> m_bus2;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( bus_r );
 	DECLARE_WRITE8_MEMBER( bus_w );

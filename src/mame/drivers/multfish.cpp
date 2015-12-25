@@ -480,7 +480,7 @@ A12 <-> A13
 	}
 }
 
-INLINE void rom_decodel(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor_add)
+static inline void rom_decodel(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor_add)
 {
 	UINT32 i, jscr;
 
@@ -491,7 +491,7 @@ INLINE void rom_decodel(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor
 	}
 	memcpy(romptr,tmprom,igrosoft_gamble_ROM_SIZE);
 }
-INLINE void rom_decodeh(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor_add)
+static inline void rom_decodeh(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor_add)
 {
 	UINT32 i, jscr;
 
@@ -519,7 +519,7 @@ static void lottery_decode(running_machine &machine, UINT8 xor12, UINT8 xor34, U
 	rom_decodeh(&igrosoft_gamble_gfx[0x380000], &temprom[0], xor78, xor_addr);
 }
 
-INLINE void roment_decodel(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor_add)
+static inline void roment_decodel(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor_add)
 {
 	UINT32 i, jscr;
 
@@ -530,7 +530,7 @@ INLINE void roment_decodel(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 
 	}
 	memcpy(romptr,tmprom,igrosoft_gamble_ROM_SIZE);
 }
-INLINE void roment_decodeh(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor_add)
+static inline void roment_decodeh(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor_add)
 {
 	UINT32 i, jscr;
 

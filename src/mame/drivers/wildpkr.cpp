@@ -176,8 +176,8 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_DRIVER_INIT(wildpkr);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(wildpkr);
 	UINT32 screen_update_wildpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

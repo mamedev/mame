@@ -155,7 +155,7 @@ int aim65_state::load_cart(device_image_interface &image, generic_slot_device *s
 		return IMAGE_INIT_FAIL;
 	}
 
-	if (image.software_entry() != NULL && image.get_software_region(slot_tag) == NULL)
+	if (image.software_entry() != nullptr && image.get_software_region(slot_tag) == nullptr)
 	{
 		std::string errmsg;
 		strprintf(errmsg,"Attempted to load file with wrong extension\nSocket '%s' only accepts files with '.%s' extension",

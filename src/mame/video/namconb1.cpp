@@ -10,7 +10,7 @@
 /* nth_word32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
  */
-INLINE UINT16
+static inline UINT16
 nth_word32( const UINT32 *source, int which )
 {
 	source += which/2;
@@ -27,7 +27,7 @@ nth_word32( const UINT32 *source, int which )
 /* nth_byte32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of bytes.
  */
-INLINE UINT8
+static inline UINT8
 nth_byte32( const UINT32 *pSource, int which )
 {
 	UINT32 data = pSource[which/4];

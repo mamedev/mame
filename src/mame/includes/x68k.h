@@ -113,8 +113,8 @@ public:
 	std::vector<UINT16> m_gvram;
 	std::vector<UINT16> m_spritereg;
 
-	bitmap_ind16 *m_pcgbitmap;
-	bitmap_ind16 *m_gfxbitmap;
+	std::unique_ptr<bitmap_ind16> m_pcgbitmap;
+	std::unique_ptr<bitmap_ind16> m_gfxbitmap;
 
 	void floppy_load_unload(bool load, floppy_image_device *dev);
 	int floppy_load(floppy_image_device *dev);
@@ -352,7 +352,7 @@ public:
 	DECLARE_PALETTE_DECODER(GGGGGRRRRRBBBBBI);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void set_bus_error(UINT32 address, bool write, UINT16 mem_mask);
 	bool m_bus_error;
 };

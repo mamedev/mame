@@ -56,7 +56,7 @@ public:
 
 	required_shared_ptr<UINT8> m_video;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(murogmbl);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

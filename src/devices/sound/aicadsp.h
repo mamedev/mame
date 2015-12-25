@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:ElSemi, kingshriek, Deunan Knute, R. Belmont
+// license:BSD-3-Clause
+// copyright-holders:ElSemi, Deunan Knute, R. Belmont
 #pragma once
 
 #ifndef __AICADSP_H__

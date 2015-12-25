@@ -97,8 +97,8 @@ private:
 	bool m_cassold;
 	UINT8 m_cass_data[4];
 	UINT8 m_portb;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 

@@ -50,12 +50,12 @@ public:
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_sprite_extension;
 	required_shared_ptr<UINT16> m_spriteram;
-	UINT16 *        m_spriteram_buffered;
-	UINT16 *        m_spriteram_delayed;
+	std::unique_ptr<UINT16[]>        m_spriteram_buffered;
+	std::unique_ptr<UINT16[]>        m_spriteram_delayed;
 	optional_shared_ptr<UINT16> m_cchip2_ram;           // for megablst only
 
 	/* video-related */
-	struct f2_tempsprite *m_spritelist;
+	std::unique_ptr<struct f2_tempsprite[]> m_spritelist;
 	int             m_sprite_type;
 
 	UINT16          m_spritebank[8];
@@ -187,5 +187,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

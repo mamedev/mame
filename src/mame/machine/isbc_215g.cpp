@@ -358,7 +358,7 @@ static MACHINE_CONFIG_FRAGMENT( isbc_215g )
 	MCFG_HARDDISK_ADD("drive0")
 	MCFG_HARDDISK_ADD("drive1")
 
-	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, NULL)
+	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, nullptr)
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE(isbc_215g_device, isbx_irq_00_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(isbc_215g_device, isbx_irq_01_w))
 	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, "fdc_218a")
@@ -387,11 +387,11 @@ void isbc_215g_device::device_reset()
 	if(m_hdd0->get_hard_disk_file())
 		m_geom[0] = hard_disk_get_info(m_hdd0->get_hard_disk_file());
 	else
-		m_geom[0] = 0;
+		m_geom[0] = nullptr;
 	if(m_hdd1->get_hard_disk_file())
 		m_geom[1] = hard_disk_get_info(m_hdd1->get_hard_disk_file());
 	else
-		m_geom[1] = 0;
+		m_geom[1] = nullptr;
 
 	m_reset = false;
 	m_fdctc = false;

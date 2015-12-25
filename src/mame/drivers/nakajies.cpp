@@ -291,8 +291,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void nakajies_update_irqs();
@@ -649,9 +649,9 @@ void nakajies_state::machine_reset()
 	m_matrix = 0;
 
 	/* Initialize banks */
-	for ( int i = 0; i < 8; i++ )
+	for (auto & elem : m_bank)
 	{
-		m_bank[i] = 0;
+		elem = 0;
 	}
 	memset(m_ram_base, 0, m_ram_size);
 	update_banks();

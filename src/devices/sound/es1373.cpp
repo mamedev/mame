@@ -45,7 +45,7 @@ void es1373_device::device_stop()
 	if (LOG_ES_FILE && m_eslog)
 	{
 		fclose(m_eslog);
-		m_eslog = NULL;
+		m_eslog = nullptr;
 	}
 }
 
@@ -61,7 +61,7 @@ void es1373_device::device_start()
 	// create the stream
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100/2);
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(attotime::zero, 0, attotime::from_hz(44100/2/16));
 
 }
@@ -73,7 +73,7 @@ void es1373_device::device_reset()
 	if (LOG_ES_FILE && m_eslog)
 	{
 		fclose(m_eslog);
-		m_eslog = NULL;
+		m_eslog = nullptr;
 	}
 	if (LOG_ES_FILE && !m_eslog)
 		m_eslog = fopen("es.log", "w");

@@ -36,7 +36,7 @@ public:
 	optional_device<msm6242_device> m_rtc;
 
 	// up to 8 layers, 2 images per layer (interleaved on screen)
-	UINT8 *  m_pixmap[8][2];
+	std::unique_ptr<UINT8[]>  m_pixmap[8][2];
 
 	/* irq */
 	typedef void (dynax_state::*irq_func)();    // some games trigger IRQ at blitter end, some don't

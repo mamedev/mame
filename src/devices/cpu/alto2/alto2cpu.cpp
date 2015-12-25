@@ -142,8 +142,8 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2 ),
 	m_const_config("const", ENDIANNESS_BIG, 16,  8, -1 ),
 	m_iomem_config("iomem", ENDIANNESS_BIG, 16, 17, -1 ),
-	m_ucode_crom(0),
-	m_const_data(0),
+	m_ucode_crom(nullptr),
+	m_const_data(nullptr),
 	m_icount(0),
 	m_task(0),
 	m_next_task(0),
@@ -180,28 +180,28 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_unload_word(0),
 	m_bitclk_time(0),
 	m_bitclk_index(0),
-	m_ctl2k_u3(0),
-	m_ctl2k_u38(0),
-	m_ctl2k_u76(0),
-	m_cram3k_a37(0),
-	m_madr_a64(0),
-	m_madr_a65(0),
-	m_madr_a90(0),
-	m_madr_a91(0),
+	m_ctl2k_u3(nullptr),
+	m_ctl2k_u38(nullptr),
+	m_ctl2k_u76(nullptr),
+	m_cram3k_a37(nullptr),
+	m_madr_a64(nullptr),
+	m_madr_a65(nullptr),
+	m_madr_a90(nullptr),
+	m_madr_a91(nullptr),
 	m_cycle(0),
 	m_ether_id(0),
 	m_hw(),
 	m_mouse(),
 	m_dsk(),
 	m_dsp(),
-	m_disp_a38(0),
-	m_disp_a63(0),
-	m_disp_a66(0),
+	m_disp_a38(nullptr),
+	m_disp_a63(nullptr),
+	m_disp_a66(nullptr),
 	m_mem(),
 	m_emu(),
-	m_ether_a41(0),
-	m_ether_a42(0),
-	m_ether_a49(0),
+	m_ether_a41(nullptr),
+	m_ether_a42(nullptr),
+	m_ether_a49(nullptr),
 	m_eth()
 {
 	m_is_octal = true;
@@ -358,7 +358,7 @@ const rom_entry *alto2_cpu_device::device_rom_region() const
 static const prom_load_t pl_ucode[] = {
 	{   // 0000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
 		"55x.3",
-		0,
+		nullptr,
 		"de870d75",
 		"2b98cc769d8302cb39948711424d987d94e4159b",
 /* size */  ALTO2_UCODE_PAGE_SIZE,
@@ -373,7 +373,7 @@ static const prom_load_t pl_ucode[] = {
 	},
 	{   // 0000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
 		"64x.3",
-		0,
+		nullptr,
 		"51b444c0",
 		"8756e51f7f3253a55d75886465beb7ee1be6e1c4",
 /* size */  ALTO2_UCODE_PAGE_SIZE,
@@ -388,7 +388,7 @@ static const prom_load_t pl_ucode[] = {
 	},
 	{   // 0000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
 		"65x.3",
-		0,
+		nullptr,
 		"741d1437",
 		"01f7cf07c2173ac93799b2475180bfbbe7e0149b",
 /* size */  ALTO2_UCODE_PAGE_SIZE,
@@ -403,7 +403,7 @@ static const prom_load_t pl_ucode[] = {
 	},
 	{   // 0000-01777 F1(0),F1(1)',F1(2)',F1(3)'
 		"63x.3",
-		0,
+		nullptr,
 		"f22d5028",
 		"c65a42baef702d4aff2d9ad8e363daec27de6801",
 /* size */  ALTO2_UCODE_PAGE_SIZE,
@@ -418,7 +418,7 @@ static const prom_load_t pl_ucode[] = {
 	},
 	{   // 0000-01777 F2(0),F2(1)',F2(2)',F2(3)'
 		"53x.3",
-		0,
+		nullptr,
 		"3c89a740",
 		"95d812d489b2bde03884b2f126f961caa6c8ec45",
 /* size */  ALTO2_UCODE_PAGE_SIZE,
@@ -433,7 +433,7 @@ static const prom_load_t pl_ucode[] = {
 	},
 	{   // 0000-01777 LOADT',LOADL,NEXT(0)',NEXT(1)'
 		"60x.3",
-		0,
+		nullptr,
 		"a35de0bf",
 		"7fa4aead44dcf5393bbfd1706c0ada24aa6fd3ac",
 /* size */  ALTO2_UCODE_PAGE_SIZE,
@@ -448,7 +448,7 @@ static const prom_load_t pl_ucode[] = {
 	},
 	{   // 0000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
 		"61x.3",
-		0,
+		nullptr,
 		"f25bcb2d",
 		"acb57f3104a8dc4ba750dd1bf22ccc81cce9f084",
 /* size */  ALTO2_UCODE_PAGE_SIZE,
@@ -463,7 +463,7 @@ static const prom_load_t pl_ucode[] = {
 	},
 	{   // 0000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
 		"62x.3",
-		0,
+		nullptr,
 		"1b20a63f",
 		"41dc86438e91c12b0fe42ffcce6b2ac2eb9e714a",
 /* size */  ALTO2_UCODE_PAGE_SIZE,
@@ -481,7 +481,7 @@ static const prom_load_t pl_ucode[] = {
 	,
 	{   // 02000-03777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
 		"xm51.u54",
-		0,
+		nullptr,
 		"11086ae9",
 		"c394e3fadbfb91801ddc1a70cb25dc6f606c4f76",
 /* size */  ALTO2_UCODE_PAGE_SIZE,
@@ -496,7 +496,7 @@ static const prom_load_t pl_ucode[] = {
 	},
 	{   // 02000-03777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
 		"xm51.u74",
-		0,
+		nullptr,
 		"be8224f2",
 		"ea9abcc3832b26a094319796901237e1e3f238b6",
 /* size */  ALTO2_UCODE_PAGE_SIZE,
@@ -511,7 +511,7 @@ static const prom_load_t pl_ucode[] = {
 	},
 	{   // 02000-03777 ALUF(3)',BS(0)',BS(1)',BS(2)'
 		"xm51.u75",
-		0,
+		nullptr,
 		"dfe3e3ac",
 		"246fd29f92150a5d5d7627fbb4f2504c7b6cd5ec",
 /* size */  ALTO2_UCODE_PAGE_SIZE,
@@ -526,7 +526,7 @@ static const prom_load_t pl_ucode[] = {
 	},
 	{   // 02000-03777 F1(0),F1(1)',F1(2)',F1(3)'
 		"xm51.u73",
-		0,
+		nullptr,
 		"6c20fa46",
 		"a054330c65048011f12209aaed5c6da73d95f029",
 /* size */  ALTO2_UCODE_PAGE_SIZE,
@@ -541,7 +541,7 @@ static const prom_load_t pl_ucode[] = {
 	},
 	{   // 02000-03777 F2(0),F2(1)',F2(2)',F2(3)'
 		"xm51.u52",
-		0,
+		nullptr,
 		"0a31eec8",
 		"4e2ad5daa5e6a6f2143ee4de00c7b625d096fb02",
 /* size */  ALTO2_UCODE_PAGE_SIZE,
@@ -556,7 +556,7 @@ static const prom_load_t pl_ucode[] = {
 	},
 	{   // 02000-03777 LOADT',LOADL,NEXT(0)',NEXT(1)'
 		"xm51.u70",
-		0,
+		nullptr,
 		"5c64ee54",
 		"0eb16d1b5e5967be7c1bf8c8ef6efdf0518a752c",
 /* size */  ALTO2_UCODE_PAGE_SIZE,
@@ -571,7 +571,7 @@ static const prom_load_t pl_ucode[] = {
 	},
 	{   // 02000-03777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
 		"xm51.u71",
-		0,
+		nullptr,
 		"7283bf71",
 		"819fdcc407ed0acdd8f12b02db6efbcab7bec19a",
 /* size */  ALTO2_UCODE_PAGE_SIZE,
@@ -586,7 +586,7 @@ static const prom_load_t pl_ucode[] = {
 	},
 	{   // 02000-03777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
 		"xm51.u72",
-		0,
+		nullptr,
 		"a28e5251",
 		"44dd8ad4ad56541b5394d30ce3521b4d1d561394",
 /* size */  ALTO2_UCODE_PAGE_SIZE,
@@ -672,7 +672,7 @@ static const prom_load_t pl_const[] = {
 static const prom_load_t pl_2kctl_u3 =
 {
 	"2kctl.u3",
-	0,
+	nullptr,
 	"5f8d89e8",
 	"487cd944ab074290aea73425e81ef4900d92e250",
 	/* size */  0400,
@@ -690,7 +690,7 @@ static const prom_load_t pl_2kctl_u3 =
 static const prom_load_t pl_2kctl_u38 =
 {
 	"2kctl.u38",
-	0,
+	nullptr,
 	"fc51b1d1",
 	"e36c2a12a5da377394264899b5ae504e2ffda46e",
 	/* size */  0040,
@@ -708,7 +708,7 @@ static const prom_load_t pl_2kctl_u38 =
 static const prom_load_t pl_2kctl_u76 =
 {
 	"2kctl.u76",
-	0,
+	nullptr,
 	"1edef867",
 	"928b8a15ac515a99109f32672441832173883b81",
 	/* size */  0400,
@@ -726,7 +726,7 @@ static const prom_load_t pl_2kctl_u76 =
 static const prom_load_t pl_alu_a10 =
 {
 	"alu.a10",
-	0,
+	nullptr,
 	"e0857892",
 	"dcd389767139f0acc1f87cf074459115abc5b90b",
 	/* size */  0040,
@@ -743,7 +743,7 @@ static const prom_load_t pl_alu_a10 =
 static const prom_load_t pl_3kcram_a37 =
 {
 	"3kcram.a37",
-	0,
+	nullptr,
 	"9417360d",
 	"bfcdbc56ee4ffafd0f2f672c0c869a55d6dd194b",
 	/* size */  0400,
@@ -760,7 +760,7 @@ static const prom_load_t pl_3kcram_a37 =
 static const prom_load_t pl_madr_a90 =
 {
 	"madr.a90",
-	0,
+	nullptr,
 	"7a2d8799",
 	"c3760dba147740729d33b9b88e59088a4cc7437a",
 	/* size */  0400,
@@ -777,7 +777,7 @@ static const prom_load_t pl_madr_a90 =
 static const prom_load_t pl_madr_a91 =
 {
 	"madr.a91",
-	0,
+	nullptr,
 	"dd556aeb",
 	"900f333a091e3ccde0843019c25f25fba62e6023",
 	/* size */  0400,
@@ -803,7 +803,7 @@ const address_space_config*alto2_cpu_device::memory_space_config(address_spacenu
 		return &m_const_config;
 	if (AS_2 == spacenum)
 		return &m_iomem_config;
-	return NULL;
+	return nullptr;
 }
 
 //-------------------------------------------------
@@ -819,10 +819,10 @@ void alto2_cpu_device::device_start()
 	m_ucode_crom = prom_load(machine(), pl_ucode, memregion("ucode_proms")->base(), ALTO2_UCODE_ROM_PAGES, 8);
 
 	// allocate micro code CRAM
-	m_ucode_cram = auto_alloc_array(machine(), UINT8, sizeof(UINT32) * ALTO2_UCODE_RAM_PAGES * ALTO2_UCODE_PAGE_SIZE);
+	m_ucode_cram = std::make_unique<UINT8[]>(sizeof(UINT32) * ALTO2_UCODE_RAM_PAGES * ALTO2_UCODE_PAGE_SIZE);
 	// fill with the micro code inverted bits value
 	for (offs_t offset = 0; offset < ALTO2_UCODE_RAM_PAGES * ALTO2_UCODE_PAGE_SIZE; offset++)
-		*reinterpret_cast<UINT32 *>(m_ucode_cram + offset * 4) = ALTO2_UCODE_INVERTED;
+		*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + offset * 4) = ALTO2_UCODE_INVERTED;
 
 	// decode constant PROMs to m_const_data
 	m_const_data = prom_load(machine(), pl_const, memregion("const_proms")->base(), 1, 4);
@@ -1028,13 +1028,13 @@ READ32_MEMBER ( alto2_cpu_device::crom_r )
 //! read microcode CRAM
 READ32_MEMBER ( alto2_cpu_device::cram_r )
 {
-	return *reinterpret_cast<UINT32 *>(m_ucode_cram + offset * 4);
+	return *reinterpret_cast<UINT32 *>(m_ucode_cram.get() + offset * 4);
 }
 
 //! write microcode CRAM
 WRITE32_MEMBER( alto2_cpu_device::cram_w )
 {
-	*reinterpret_cast<UINT32 *>(m_ucode_cram + offset * 4) = data;
+	*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + offset * 4) = data;
 }
 
 //! read constants PROM
@@ -1046,7 +1046,7 @@ READ16_MEMBER ( alto2_cpu_device::const_r )
 //! direct read access to the microcode CROM or CRAM
 #define RD_UCODE(addr) (addr < ALTO2_UCODE_RAM_BASE ? \
 	*reinterpret_cast<UINT32 *>(m_ucode_crom + addr * 4) : \
-	*reinterpret_cast<UINT32 *>(m_ucode_cram + (addr - ALTO2_UCODE_RAM_BASE) * 4))
+	*reinterpret_cast<UINT32 *>(m_ucode_cram.get() + (addr - ALTO2_UCODE_RAM_BASE) * 4))
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -1725,14 +1725,14 @@ void alto2_cpu_device::f1_early_task()
 {
 #if USE_PRIO_F9318
 	/* Doesn't work yet */
-	register f9318_in_t wakeup_hi;
-	register f9318_out_t u1;
-	register f9318_in_t wakeup_lo;
-	register f9318_out_t u2;
-	register int addr = 017;
-	register int rdct1, rdct2, rdct4, rdct8;
-	register int ct1, ct2, ct4, ct8;
-	register int wakeup, ct;
+	f9318_in_t wakeup_hi;
+	f9318_out_t u1;
+	f9318_in_t wakeup_lo;
+	f9318_out_t u2;
+	int addr = 017;
+	int rdct1, rdct2, rdct4, rdct8;
+	int ct1, ct2, ct4, ct8;
+	int wakeup, ct;
 
 	LOG((this,LOG_CPU,2, "   TASK %02o:%s\n", m_task, task_name(m_task)));
 
@@ -2024,8 +2024,8 @@ void alto2_cpu_device::f2_late_load_md()
 #if 1
 UINT32 alto2_cpu_device::alu_74181(UINT32 a, UINT32 b, UINT8 smc)
 {
-	register UINT32 f;
-	register const UINT32 cout = 1 << 16;
+	UINT32 f;
+	const UINT32 cout = 1 << 16;
 
 	switch (smc & A10_ALUIN) {
 	case SMC(0,0,0,0, 0, 0): // 0000: A + 1
@@ -2701,7 +2701,7 @@ void alto2_cpu_device::execute_run()
 			 * the bitclk sequence by leaving m_bitclk_time at -1.
 			 */
 			m_bitclk_time -= ALTO2_UCYCLE;
-			disk_bitclk(0, m_bitclk_index);
+			disk_bitclk(nullptr, m_bitclk_index);
 		}
 #endif
 	} while (m_icount-- > 0);

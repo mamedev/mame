@@ -110,27 +110,27 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 		m_samps_per_sync(0),
 		m_buffer_size(0),
 		m_real_rate(0),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_cpu_tag("")
 {
-	for (int i = 0; i < NOISE_LONG; i++)
+	for (auto & elem : m_noise_lut)
 	{
-		m_noise_lut[i] = 0;
+		elem = 0;
 	}
 
-	for (int i = 0; i < 0X20; i++)
+	for (auto & elem : m_vbl_times)
 	{
-		m_vbl_times[i] = 0;
+		elem = 0;
 	}
 
-	for (int i = 0; i < SYNCS_MAX1; i++)
+	for (auto & elem : m_sync_times1)
 	{
-		m_sync_times1[i] = 0;
+		elem = 0;
 	}
 
-	for (int i = 0; i < SYNCS_MAX2; i++)
+	for (auto & elem : m_sync_times2)
 	{
-		m_sync_times2[i] = 0;
+		elem = 0;
 	}
 }
 
@@ -427,7 +427,7 @@ int8 nesapu_device::apu_noise(noise_t *chan)
 }
 
 /* RESET DPCM PARAMETERS */
-INLINE void apu_dpcmreset(dpcm_t *chan)
+static inline void apu_dpcmreset(dpcm_t *chan)
 {
 	chan->address = 0xC000 + (uint16) (chan->regs[2] << 6);
 	chan->length = (uint16) (chan->regs[3] << 4) + 1;

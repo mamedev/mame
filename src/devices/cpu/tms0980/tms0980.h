@@ -105,7 +105,7 @@ public:
 		, m_pc_bits(pc_bits)
 		, m_byte_bits(byte_bits)
 		, m_x_bits(x_bits)
-		, m_output_pla_table(NULL)
+		, m_output_pla_table(nullptr)
 		, m_read_k(*this)
 		, m_write_o(*this)
 		, m_write_r(*this)
@@ -121,23 +121,23 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 6; }
-	virtual UINT32 execute_input_lines() const { return 1; }
-	virtual void execute_run();
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 6; }
+	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : NULL); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : nullptr); }
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 1; }
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 1; }
 
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	void state_string_export(const device_state_entry &entry, std::string &str) override;
 
 	void next_pc();
 
@@ -254,11 +254,11 @@ public:
 
 protected:
 	// overrides
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 };
 
 class tms1070_cpu_device : public tms1000_cpu_device
@@ -289,12 +289,12 @@ public:
 
 protected:
 	// overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual void op_setr();
-	virtual void op_rstr();
+	virtual void op_setr() override;
+	virtual void op_rstr() override;
 };
 
 class tms1170_cpu_device : public tms1100_cpu_device
@@ -324,15 +324,15 @@ public:
 
 protected:
 	// overrides
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void op_br();
-	virtual void op_call();
-	virtual void op_retn();
+	virtual void op_br() override;
+	virtual void op_call() override;
+	virtual void op_retn() override;
 
-	virtual void op_setr() { tms1xxx_cpu_device::op_setr(); } // no anomaly with MSB of X register
-	virtual void op_rstr() { tms1xxx_cpu_device::op_rstr(); } // "
+	virtual void op_setr() override { tms1xxx_cpu_device::op_setr(); } // no anomaly with MSB of X register
+	virtual void op_rstr() override { tms1xxx_cpu_device::op_rstr(); } // "
 };
 
 class tms1470_cpu_device : public tms1400_cpu_device
@@ -364,13 +364,13 @@ public:
 
 protected:
 	// overrides
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void write_o_output(UINT8 index);
+	virtual void write_o_output(UINT8 index) override;
 
-	virtual void op_setr();
-	virtual void op_tdo();
+	virtual void op_setr() override;
+	virtual void op_tdo() override;
 };
 
 class tms1990_cpu_device : public tms0970_cpu_device
@@ -388,19 +388,19 @@ public:
 
 protected:
 	// overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-	virtual UINT8 read_k_input();
-	virtual void set_cki_bus();
-	virtual void read_opcode();
+	virtual UINT8 read_k_input() override;
+	virtual void set_cki_bus() override;
+	virtual void read_opcode() override;
 
-	virtual void op_comx();
+	virtual void op_comx() override;
 
 	UINT32 decode_micro(UINT8 sel);
 };
@@ -412,13 +412,13 @@ public:
 
 protected:
 	// overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void write_o_output(UINT8 index) { tms1xxx_cpu_device::write_o_output(index); }
-	virtual UINT8 read_k_input() { return tms1xxx_cpu_device::read_k_input(); }
+	virtual void write_o_output(UINT8 index) override { tms1xxx_cpu_device::write_o_output(index); }
+	virtual UINT8 read_k_input() override { return tms1xxx_cpu_device::read_k_input(); }
 
-	virtual void op_setr() { tms1xxx_cpu_device::op_setr(); }
-	virtual void op_tdo();
+	virtual void op_setr() override { tms1xxx_cpu_device::op_setr(); }
+	virtual void op_tdo() override;
 };
 
 
@@ -434,18 +434,18 @@ public:
 
 protected:
 	// overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void write_o_output(UINT8 index) { tms1xxx_cpu_device::write_o_output(index); }
-	virtual UINT8 read_k_input();
-	virtual void dynamic_output();
+	virtual void write_o_output(UINT8 index) override { tms1xxx_cpu_device::write_o_output(index); }
+	virtual UINT8 read_k_input() override;
+	virtual void dynamic_output() override;
 
-	virtual void op_setr();
-	virtual void op_rstr();
-	virtual void op_tdo();
+	virtual void op_setr() override;
+	virtual void op_rstr() override;
+	virtual void op_tdo() override;
 
 private:
 	// state specific to interface with TMS5100

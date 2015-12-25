@@ -104,23 +104,23 @@ struct bank_info_entry
 
 static const struct bank_info_entry bank_info[] =
 {
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b0_w),(dgn_beta_state*)0), 0x0000, 0x0fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b1_w),(dgn_beta_state*)0), 0x1000, 0x1fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b2_w),(dgn_beta_state*)0), 0x2000, 0x2fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b3_w),(dgn_beta_state*)0), 0x3000, 0x3fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b4_w),(dgn_beta_state*)0), 0x4000, 0x4fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b5_w),(dgn_beta_state*)0), 0x5000, 0x5fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b6_w),(dgn_beta_state*)0), 0x6000, 0x6fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b7_w),(dgn_beta_state*)0), 0x7000, 0x7fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b8_w),(dgn_beta_state*)0), 0x8000, 0x8fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b9_w),(dgn_beta_state*)0), 0x9000, 0x9fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bA_w),(dgn_beta_state*)0), 0xA000, 0xAfff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bB_w),(dgn_beta_state*)0), 0xB000, 0xBfff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bC_w),(dgn_beta_state*)0), 0xC000, 0xCfff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bD_w),(dgn_beta_state*)0), 0xD000, 0xDfff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bE_w),(dgn_beta_state*)0), 0xE000, 0xEfff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bF_w),(dgn_beta_state*)0), 0xF000, 0xFBff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bG_w),(dgn_beta_state*)0), 0xFF00, 0xFfff }
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b0_w),(dgn_beta_state*)nullptr), 0x0000, 0x0fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b1_w),(dgn_beta_state*)nullptr), 0x1000, 0x1fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b2_w),(dgn_beta_state*)nullptr), 0x2000, 0x2fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b3_w),(dgn_beta_state*)nullptr), 0x3000, 0x3fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b4_w),(dgn_beta_state*)nullptr), 0x4000, 0x4fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b5_w),(dgn_beta_state*)nullptr), 0x5000, 0x5fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b6_w),(dgn_beta_state*)nullptr), 0x6000, 0x6fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b7_w),(dgn_beta_state*)nullptr), 0x7000, 0x7fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b8_w),(dgn_beta_state*)nullptr), 0x8000, 0x8fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b9_w),(dgn_beta_state*)nullptr), 0x9000, 0x9fff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bA_w),(dgn_beta_state*)nullptr), 0xA000, 0xAfff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bB_w),(dgn_beta_state*)nullptr), 0xB000, 0xBfff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bC_w),(dgn_beta_state*)nullptr), 0xC000, 0xCfff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bD_w),(dgn_beta_state*)nullptr), 0xD000, 0xDfff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bE_w),(dgn_beta_state*)nullptr), 0xE000, 0xEfff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bF_w),(dgn_beta_state*)nullptr), 0xF000, 0xFBff },
+	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bG_w),(dgn_beta_state*)nullptr), 0xFF00, 0xFfff }
 };
 
 #define is_last_page(page)  (((page==LastPage) || (page==LastPage+1)) ? 1 : 0)
@@ -587,7 +587,7 @@ WRITE8_MEMBER(dgn_beta_state::d_pia1_pa_w)
 	}
 
 	/* Drive selects are binary encoded on PA0 & PA1 */
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	switch (~data & 0x03)
 	{
@@ -990,12 +990,12 @@ static const char *const os9syscalls[] =
 	"F$SUser",         /* Set User ID number */
 	"F$UnLoad",        /* Unlink Module by name */
 	"F$Alarm",         /* Color Computer Alarm Call (system wide) */
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 	"F$NMLink",        /* Color Computer NonMapping Link */
 	"F$NMLoad",        /* Color Computer NonMapping Load */
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 	"F$TPS",           /* Return System's Ticks Per Second */
 	"F$TimAlm",        /* COCO individual process alarm call */
 	"F$VIRQ",          /* Install/Delete Virtual IRQ */
@@ -1043,50 +1043,50 @@ static const char *const os9syscalls[] =
 	"F$DelRAM",        /* Deallocate RAM blocks */
 	"F$GCMDir",        /* Pack module directory */
 	"F$AlHRam",        /* Allocate HIGH RAM Blocks */
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	"F$RegDmp",        /* Ron Lammardo's debugging register dump call */
 	"F$NVRAM",         /* Non Volatile RAM (RTC battery backed static) read/write */
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	"I$Attach",        /* Attach I/O Device */
 	"I$Detach",        /* Detach I/O Device */
 	"I$Dup",           /* Duplicate Path */

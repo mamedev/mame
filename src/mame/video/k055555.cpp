@@ -93,26 +93,21 @@ WRITE32_MEMBER( k055555_device::K055555_long_w )
 {
 	UINT8 regnum, regdat;
 
+	// le2 accesses this area with a dword write ...
 	if (ACCESSING_BITS_24_31)
 	{
 		regnum = offset<<1;
 		regdat = data>>24;
+		K055555_write_reg(regnum, regdat);
 	}
-	else
+		
+	if (ACCESSING_BITS_8_15)
 	{
-		if (ACCESSING_BITS_8_15)
-		{
-			regnum = (offset<<1)+1;
-			regdat = data>>8;
-		}
-		else
-		{
-//          logerror("5^5: unknown mem_mask %08x\n", mem_mask);
-			return;
-		}
+		regnum = (offset<<1)+1;
+		regdat = data>>8;
+		K055555_write_reg(regnum, regdat);
 	}
 
-	K055555_write_reg(regnum, regdat);
 }
 
 WRITE16_MEMBER( k055555_device::K055555_word_w )

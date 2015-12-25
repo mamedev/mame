@@ -131,20 +131,20 @@ public:
 
 	void dvg_draw_to(int x, int y, int intensity);
 
-	virtual int handler_0();
-	virtual int handler_1();
-	virtual int handler_2();
-	virtual int handler_3();
-	virtual int handler_4();
-	virtual int handler_5();
-	virtual int handler_6();
-	virtual int handler_7();
-	virtual UINT8 state_addr();
-	virtual void update_databus();
-	virtual void vggo();
-	virtual void vgrst();
+	virtual int handler_0() override;
+	virtual int handler_1() override;
+	virtual int handler_2() override;
+	virtual int handler_3() override;
+	virtual int handler_4() override;
+	virtual int handler_5() override;
+	virtual int handler_6() override;
+	virtual int handler_7() override;
+	virtual UINT8 state_addr() override;
+	virtual void update_databus() override;
+	virtual void vggo() override;
+	virtual void vgrst() override;
 
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 // device type definition
@@ -161,20 +161,20 @@ public:
 	int avg_common_strobe2();
 	int avg_common_strobe3();
 
-	virtual int handler_0();
-	virtual int handler_1();
-	virtual int handler_2();
-	virtual int handler_3();
-	virtual int handler_4();
-	virtual int handler_5();
-	virtual int handler_6();
-	virtual int handler_7();
-	virtual UINT8 state_addr();
-	virtual void update_databus();
-	virtual void vggo();
-	virtual void vgrst();
+	virtual int handler_0() override;
+	virtual int handler_1() override;
+	virtual int handler_2() override;
+	virtual int handler_3() override;
+	virtual int handler_4() override;
+	virtual int handler_5() override;
+	virtual int handler_6() override;
+	virtual int handler_7() override;
+	virtual UINT8 state_addr() override;
+	virtual void update_databus() override;
+	virtual void vggo() override;
+	virtual void vgrst() override;
 
-	virtual void device_start();
+	virtual void device_start() override;
 	void avg_start_common();
 };
 
@@ -187,8 +187,8 @@ public:
 	// construction/destruction
 	avg_tempest_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual int handler_6();
-	virtual int handler_7();
+	virtual int handler_6() override;
+	virtual int handler_7() override;
 	//virtual void vggo();
 };
 
@@ -201,11 +201,11 @@ public:
 	// construction/destruction
 	avg_mhavoc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual int handler_1();
-	virtual int handler_6();
-	virtual int handler_7();
-	virtual void update_databus();
-	virtual void vgrst();
+	virtual int handler_1() override;
+	virtual int handler_6() override;
+	virtual int handler_7() override;
+	virtual void update_databus() override;
+	virtual void vgrst() override;
 };
 
 // device type definition
@@ -216,9 +216,9 @@ class avg_starwars_device : public avg_device
 public:
 	// construction/destruction
 	avg_starwars_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual int handler_6();
-	virtual int handler_7();
-	virtual void update_databus();
+	virtual int handler_6() override;
+	virtual int handler_7() override;
+	virtual void update_databus() override;
 };
 
 // device type definition
@@ -229,16 +229,16 @@ class avg_quantum_device : public avg_device
 public:
 	// construction/destruction
 	avg_quantum_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual int handler_0();
-	virtual int handler_1();
-	virtual int handler_2();
-	virtual int handler_3();
-	virtual int handler_4();
-	virtual int handler_5();
-	virtual int handler_6();
-	virtual int handler_7();
-	virtual void update_databus();
-	virtual void vggo();
+	virtual int handler_0() override;
+	virtual int handler_1() override;
+	virtual int handler_2() override;
+	virtual int handler_3() override;
+	virtual int handler_4() override;
+	virtual int handler_5() override;
+	virtual int handler_6() override;
+	virtual int handler_7() override;
+	virtual void update_databus() override;
+	virtual void vggo() override;
 };
 
 // device type definition
@@ -249,9 +249,9 @@ class avg_bzone_device : public avg_device
 public:
 	// construction/destruction
 	avg_bzone_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual int handler_1();
-	virtual int handler_6();
-	virtual int handler_7();
+	virtual int handler_1() override;
+	virtual int handler_6() override;
+	virtual int handler_7() override;
 };
 
 // device type definition
@@ -263,8 +263,8 @@ public:
 	// construction/destruction
 	avg_tomcat_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual int handler_6();
-	virtual int handler_7();
+	virtual int handler_6() override;
+	virtual int handler_7() override;
 };
 
 // device type definition

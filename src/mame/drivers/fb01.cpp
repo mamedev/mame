@@ -38,8 +38,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(upd71051_txrdy_w);
 	DECLARE_WRITE_LINE_MEMBER(upd71051_rxrdy_w);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_PALETTE_INIT(fb01);
 

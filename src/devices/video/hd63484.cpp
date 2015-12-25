@@ -29,7 +29,7 @@ const device_type HD63484 = &device_creator<hd63484_device>;
 
 hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HD63484, "HD63484 CRTC", tag, owner, clock, "hd63484", __FILE__),
-	m_ram(NULL),
+	m_ram(nullptr),
 	m_fifo_counter(0),
 	m_readfifo(0),
 	m_org(0),
@@ -70,9 +70,9 @@ hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, d
 
 void hd63484_device::device_start()
 {
-	m_ram = auto_alloc_array_clear(machine(), UINT16, HD63484_RAM_SIZE);
+	m_ram = make_unique_clear<UINT16[]>(HD63484_RAM_SIZE);
 
-	save_pointer(NAME(m_ram), HD63484_RAM_SIZE);
+	save_pointer(NAME(m_ram.get()), HD63484_RAM_SIZE);
 	save_item(NAME(m_reg));
 	save_item(NAME(m_fifo_counter));
 	save_item(NAME(m_fifo));

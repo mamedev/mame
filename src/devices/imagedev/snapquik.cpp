@@ -21,22 +21,22 @@ const device_type SNAPSHOT = &device_creator<snapshot_image_device>;
 snapshot_image_device::snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SNAPSHOT, "Snapshot", tag, owner, clock, "snapshot_image", __FILE__),
 		device_image_interface(mconfig, *this),
-		m_file_extensions(NULL),
-		m_interface(NULL),
+		m_file_extensions(nullptr),
+		m_interface(nullptr),
 		m_delay_seconds(0),
 		m_delay_attoseconds(0),
-		m_timer(NULL)
+		m_timer(nullptr)
 {
 }
 
 snapshot_image_device::snapshot_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_image_interface(mconfig, *this),
-	m_file_extensions(NULL),
-	m_interface(NULL),
+	m_file_extensions(nullptr),
+	m_interface(nullptr),
 	m_delay_seconds(0),
 	m_delay_attoseconds(0),
-	m_timer(NULL)
+	m_timer(nullptr)
 {
 }
 //-------------------------------------------------

@@ -154,8 +154,8 @@ void realbrk_state::video_start()
 	m_tilemap_1->set_transparent_pen(0);
 	m_tilemap_2->set_transparent_pen(0);
 
-	m_tmpbitmap0 = auto_bitmap_ind16_alloc(machine(),32,32);
-	m_tmpbitmap1 = auto_bitmap_ind16_alloc(machine(),32,32);
+	m_tmpbitmap0 = std::make_unique<bitmap_ind16>(32,32);
+	m_tmpbitmap1 = std::make_unique<bitmap_ind16>(32,32);
 
 	save_item(NAME(m_disable_video));
 }
@@ -306,7 +306,7 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 							(UINT32)0<<16,
 							(UINT32)16<<16,
 							0 << 16,
-							-1 << 16,
+							0xffff << 16,
 							1 << 16,
 							0 << 16,
 							0, 0 );
@@ -321,10 +321,10 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 						copyrozbitmap_trans( *m_tmpbitmap1, m_tmpbitmap1->cliprect(), *m_tmpbitmap0,
 							(UINT32)16<<16,
 							(UINT32)16<<16,
-							-1 << 16,
+							0xffff << 16,
 							0 << 16,
 							0 << 16,
-							-1 << 16,
+							0xffff << 16,
 							0, 0 );
 
 							currx = (sx - (x+1) * xdim) / 0x10000;
@@ -339,7 +339,7 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 							(UINT32)0<<16,
 							0 << 16,
 							1 << 16,
-							-1 << 16,
+							0xffff << 16,
 							0 << 16,
 							0, 0 );
 

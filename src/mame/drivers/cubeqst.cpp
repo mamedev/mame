@@ -39,7 +39,7 @@ public:
 			m_screen(*this, "screen"),
 			m_generic_paletteram_16(*this, "paletteram") { }
 
-	UINT8 *m_depth_buffer;
+	std::unique_ptr<UINT8[]> m_depth_buffer;
 	int m_video_field;
 	UINT8 m_io_latch;
 	UINT8 m_reset_latch;
@@ -49,7 +49,7 @@ public:
 	required_device<cquestsnd_cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
-	rgb_t *m_colormap;
+	std::unique_ptr<rgb_t[]> m_colormap;
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_READ16_MEMBER(line_r);
 	DECLARE_WRITE16_MEMBER(laserdisc_w);
@@ -65,9 +65,9 @@ public:
 	DECLARE_READ16_MEMBER(read_sndram);
 	DECLARE_WRITE16_MEMBER(write_sndram);
 	DECLARE_WRITE16_MEMBER(sound_dac_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
@@ -96,7 +96,7 @@ public:
 void cubeqst_state::video_start()
 {
 	m_video_field = 0;
-	m_depth_buffer = auto_alloc_array(machine(), UINT8, 512);
+	m_depth_buffer = std::make_unique<UINT8[]>(512);
 }
 
 WRITE16_MEMBER(cubeqst_state::palette_w)
@@ -130,7 +130,7 @@ UINT32 cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb32 
 		UINT32 pen;
 
 		/* Zap the depth buffer */
-		memset(m_depth_buffer, 0xff, 512);
+		memset(m_depth_buffer.get(), 0xff, 512);
 
 		/* Process all the spans on this scanline */
 		if (y < 256)
@@ -444,7 +444,7 @@ void cubeqst_state::machine_start()
 	/* TODO: Use resistor values */
 	int i;
 
-	m_colormap = auto_alloc_array(machine(), rgb_t, 65536);
+	m_colormap = std::make_unique<rgb_t[]>(65536);
 	for (i = 0; i < 65536; ++i)
 	{
 		UINT8 a, r, g, b, y;

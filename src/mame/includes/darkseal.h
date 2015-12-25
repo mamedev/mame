@@ -44,7 +44,7 @@ public:
 	DECLARE_WRITE16_MEMBER(palette_24bit_b_w);
 
 	DECLARE_DRIVER_INIT(darkseal);
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_24bitcol(int offset);

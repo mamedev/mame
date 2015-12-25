@@ -56,7 +56,7 @@ public:
 	required_memory_region m_rom;
 	optional_device<sega8_cart_slot_device> m_cart;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( joysel_r );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
@@ -112,7 +112,7 @@ public:
 	required_ioport m_pb6;
 	required_ioport m_pb7;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_READ8_MEMBER( ppi_pb_r );
@@ -135,8 +135,8 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<floppy_image_device> m_floppy0;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );

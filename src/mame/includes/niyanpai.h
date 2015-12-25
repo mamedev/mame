@@ -47,10 +47,10 @@ public:
 	int m_nb19010_busyctr;
 	int m_nb19010_busyflag;
 	bitmap_ind16 m_tmpbitmap[VRAM_MAX];
-	UINT16 *m_videoram[VRAM_MAX];
-	UINT16 *m_videoworkram[VRAM_MAX];
-	UINT16 *m_palette_ptr;
-	UINT8 *m_clut[VRAM_MAX];
+	std::unique_ptr<UINT16[]> m_videoram[VRAM_MAX];
+	std::unique_ptr<UINT16[]> m_videoworkram[VRAM_MAX];
+	std::unique_ptr<UINT16[]> m_palette_ptr;
+	std::unique_ptr<UINT8[]> m_clut[VRAM_MAX];
 	int m_flipscreen_old[VRAM_MAX];
 	emu_timer *m_blitter_timer;
 
@@ -86,7 +86,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(musobana_outcoin_flag_r);
 
 	DECLARE_DRIVER_INIT(niyanpai);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(musobana);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -101,5 +101,5 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

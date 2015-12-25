@@ -377,9 +377,10 @@ DRIVER_INIT_MEMBER(stv_state,stv)
 	m_minit_boost_timeslice = attotime::zero;
 	m_sinit_boost_timeslice = attotime::zero;
 
-	m_scu_regs = auto_alloc_array(machine(), UINT32, 0x100/4);
-	m_scsp_regs  = auto_alloc_array(machine(), UINT16, 0x1000/2);
-	m_backupram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
+	m_scu_regs = std::make_unique<UINT32[]>(0x100/4);
+	m_scsp_regs  = std::make_unique<UINT16[]>(0x1000/2);
+	m_backupram = std::make_unique<UINT8[]>(0x8000);
+	memset(m_backupram.get(), 0, sizeof(UINT8) * 0x8000);
 
 	install_stvbios_speedups();
 
@@ -1273,7 +1274,7 @@ int stv_state::load_cart(device_image_interface &image, generic_slot_device *slo
 	UINT8 *ROM;
 	UINT32 size = slot->common_get_size("rom");
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 		return IMAGE_INIT_FAIL;
 
 	slot->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_BIG);
@@ -1309,8 +1310,8 @@ MACHINE_START_MEMBER(stv_state,stv)
 	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
 
 	// save states
-	save_pointer(NAME(m_scu_regs), 0x100/4);
-	save_pointer(NAME(m_scsp_regs), 0x1000/2);
+	save_pointer(NAME(m_scu_regs.get()), 0x100/4);
+	save_pointer(NAME(m_scsp_regs.get()), 0x1000/2);
 	save_item(NAME(m_NMI_reset));
 	save_item(NAME(m_en_68k));
 //  save_item(NAME(scanline));
@@ -2730,7 +2731,7 @@ ROM_START( sfish2 )
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr18343.bin",   0x000000, 0x080000, CRC(48e2eecf) SHA1(a38bfbd5f279525e413b18b5ed3f37f6e9e31cdc) ) /* sport fishing 2 bios */
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "maincpu",0,0,0x080000)
+	ROM_COPY( "maincpu",0x000000,0,0x080000)
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	ROM_LOAD16_BYTE( "epr-18427.ic13",  0x0000001, 0x0100000, CRC(3f25bec8) SHA1(43a5342b882d5aec0f35a8777cb475659f43b1c4) )
@@ -2752,7 +2753,7 @@ ROM_START( sfish2j )
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr18343.bin",   0x000000, 0x080000, CRC(48e2eecf) SHA1(a38bfbd5f279525e413b18b5ed3f37f6e9e31cdc) ) /* sport fishing 2 bios */
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "maincpu",0,0,0x080000)
+	ROM_COPY( "maincpu",0x000000,0,0x080000)
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
 	ROM_LOAD16_BYTE( "epr18344.a",      0x0000001, 0x0100000, CRC(5a7de018) SHA1(88e0c2a9a9d4ebf699878c0aa9737af85f95ccf8) )
@@ -3075,8 +3076,8 @@ GAME( 1996, diehard,   stvbios, stv,      stv, stv_state,        diehard,    ROT
 GAME( 1996, dnmtdeka,  diehard, stv,      stv, stv_state,        dnmtdeka,   ROT0,   "Sega",                         "Dynamite Deka (J 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
 GAME( 1995, ejihon,    stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Sega",                         "Ejihon Tantei Jimusyo (J 950613 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, elandore,  stvbios, stv_5881, stv6b, stv_state,      elandore,   ROT0,   "Sai-Mate",                     "Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, ffrevng10, ffreveng,stv_5881, stv, stv_state,        ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990714 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, ffreveng,  stvbios, stv_5881, stv, stv_state,        ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990930 V1.100)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ffrevng10, ffreveng,stv_5881, stv6b, stv_state,      ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990714 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ffreveng,  stvbios, stv_5881, stv6b, stv_state,      ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990930 V1.100)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, fhboxers,  stvbios, stv,      stv, stv_state,        fhboxers,   ROT0,   "Sega",                         "Funky Head Boxers (JUETBKAL 951218 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, findlove,  stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Daiki / FCF",                  "Zenkoku Seifuku Bishoujo Grand Prix Find Love (J 971212 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, gaxeduel,  stvbios, stv,      stv6b, stv_state,      gaxeduel,   ROT0,   "Sega",                         "Golden Axe - The Duel (JUETL 950117 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)

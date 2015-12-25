@@ -93,8 +93,8 @@ public:
 	UINT8 *m_p_chargen;
 	bool m_cone;
 	required_shared_ptr<UINT8> m_p_videoram;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	UINT8 m_85;
@@ -228,7 +228,7 @@ static const z80_daisy_config pcm_daisy_chain[] =
 	{ "z80sio" },       /* sio */
 	{ "z80pio_u" },     /* User pio */
 	{ "z80ctc_u" },     /* User ctc */
-	{ NULL }
+	{ nullptr }
 };
 
 

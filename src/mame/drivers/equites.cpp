@@ -616,7 +616,7 @@ READ16_MEMBER(equites_state::equites_spriteram_kludge_r)
 
 READ8_MEMBER(equites_state::mcu_ram_r)
 {
-	if (m_fakemcu == NULL)
+	if (m_fakemcu == nullptr)
 		return m_alpha_8201->ext_ram_r(space, offset);
 	else
 		return m_mcuram[offset];
@@ -624,7 +624,7 @@ READ8_MEMBER(equites_state::mcu_ram_r)
 
 WRITE8_MEMBER(equites_state::mcu_ram_w)
 {
-	if (m_fakemcu == NULL)
+	if (m_fakemcu == nullptr)
 		m_alpha_8201->ext_ram_w(space, offset, data);
 	else
 		m_mcuram[offset] = data;
@@ -633,7 +633,7 @@ WRITE8_MEMBER(equites_state::mcu_ram_w)
 WRITE16_MEMBER(equites_state::mcu_start_w)
 {
 	// data bit is A16 (offset)
-	if (m_fakemcu == NULL)
+	if (m_fakemcu == nullptr)
 		m_alpha_8201->mcu_start_w(offset != 0);
 	else
 		m_fakemcu->set_input_line(INPUT_LINE_HALT, (offset != 0) ? ASSERT_LINE : CLEAR_LINE);
@@ -642,7 +642,7 @@ WRITE16_MEMBER(equites_state::mcu_start_w)
 WRITE16_MEMBER(equites_state::mcu_switch_w)
 {
 	// data bit is A16 (offset)
-	if (m_fakemcu == NULL)
+	if (m_fakemcu == nullptr)
 		m_alpha_8201->bus_dir_w(offset == 0);
 }
 
@@ -1036,7 +1036,7 @@ static const char *const alphamc07_sample_names[] =
 	"bongo1",
 	"bongo2",
 	"bongo3",
-	0
+	nullptr
 };
 
 
@@ -1366,7 +1366,7 @@ ROM_START( bullfgtr )
 	ROM_LOAD16_BYTE( "hp6vr.bin",  0x04000, 0x2000, CRC(3dfadcf4) SHA1(724d45df0be7073bbe2767f3c0d050c8b45c9d27) )
 	ROM_LOAD16_BYTE( "hp3vr.bin",  0x08001, 0x2000, CRC(d3a21f8a) SHA1(2b3135aaae798eeee5850e616ed6ad8987fbc01b) )
 	ROM_LOAD16_BYTE( "hp7vr.bin",  0x08000, 0x2000, CRC(665cc015) SHA1(17fe18c8f22808a102f48bc4cbc8e4a1f6f9eaf1) )
-	ROM_FILL(                      0x0c000, 0x4000, 0 )
+	ROM_FILL(                      0x0c000, 0x4000, 0x00 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // 8085A ROMs
 	ROM_LOAD( "hv1vr.bin", 0x00000, 0x2000, CRC(2a8e6fcf) SHA1(866903408e05938a982ffef4c9b849203c6cc060) )
@@ -1448,7 +1448,7 @@ ROM_START( bullfgtrs )
 	ROM_LOAD16_BYTE( "m_b12.bin",  0x04000, 0x2000, CRC(d98390ef) SHA1(17006503325627055c8b22052d7ed94e474f4ef7) )
 	ROM_LOAD16_BYTE( "m_d10.bin",  0x08001, 0x2000, CRC(21875752) SHA1(016db4125b1a4584ae277af427370780d96a17c5) )
 	ROM_LOAD16_BYTE( "m_b10.bin",  0x08000, 0x2000, CRC(9d84f678) SHA1(32584d54788cb570bd5210992836f28ba9c87aac) )
-	ROM_FILL(                      0x0c000, 0x4000, 0 )
+	ROM_FILL(                      0x0c000, 0x4000, 0x00 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // 8085A ROMs
 	ROM_LOAD( "hv1vr.bin", 0x00000, 0x2000, CRC(2a8e6fcf) SHA1(866903408e05938a982ffef4c9b849203c6cc060) )
@@ -1516,7 +1516,7 @@ ROM_START( kouyakyu )
 	ROM_LOAD16_BYTE( "epr-6708.bin", 0x04000, 0x2000, CRC(f8863dc5) SHA1(bfdd294d51420dd70aa97942909a9b8a95ffc05c) )
 	ROM_LOAD16_BYTE( "epr-6706.bin", 0x08001, 0x2000, BAD_DUMP CRC(79e94cd2) SHA1(f44c2292614b46116818fad9a7eb48cceeb3b819)  )  // was bad, manually patched
 	ROM_LOAD16_BYTE( "epr-6709.bin", 0x08000, 0x2000, CRC(f41cb58c) SHA1(f0d1048e949d51432739755f985e4df65b8e918b) )
-	ROM_FILL(                        0x0c000, 0x4000, 0 )
+	ROM_FILL(                        0x0c000, 0x4000, 0x00 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // 8085A ROMs
 	ROM_LOAD( "epr-6703.bin", 0x00000, 0x2000, CRC(fbff3a86) SHA1(4ed2887b1e4509ded853a230f735d4d2aa475886) )

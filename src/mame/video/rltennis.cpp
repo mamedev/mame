@@ -222,10 +222,10 @@ WRITE16_MEMBER(rltennis_state::blitter_w)
 
 void rltennis_state::video_start()
 {
-	m_tmp_bitmap[BITMAP_BG] = auto_bitmap_ind16_alloc(machine(), 512, 256);
-	m_tmp_bitmap[BITMAP_FG_1] = auto_bitmap_ind16_alloc(machine(), 512, 256);
-	m_tmp_bitmap[BITMAP_FG_2] = auto_bitmap_ind16_alloc(machine(), 512, 256);
-	m_tmp_bitmap[BITMAP_FG_DISPLAY] = auto_bitmap_ind16_alloc(machine(), 512, 256);
+	m_tmp_bitmap[BITMAP_BG] = std::make_unique<bitmap_ind16>(512, 256);
+	m_tmp_bitmap[BITMAP_FG_1] = std::make_unique<bitmap_ind16>(512, 256);
+	m_tmp_bitmap[BITMAP_FG_2] = std::make_unique<bitmap_ind16>(512, 256);
+	m_tmp_bitmap[BITMAP_FG_DISPLAY] = std::make_unique<bitmap_ind16>(512, 256);
 
 	save_item(NAME(m_blitter));
 }

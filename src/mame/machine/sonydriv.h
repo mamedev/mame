@@ -40,9 +40,9 @@ public:
 	// construction/destruction
 	sonydriv_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void call_unload();
+	virtual void call_unload() override;
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 // device type definition

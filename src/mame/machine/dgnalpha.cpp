@@ -315,7 +315,7 @@ WRITE8_MEMBER( dragon_alpha_state::psg_porta_write )
 	/* Bit 4 is the motor on, in the real hardware these are inverted on their way to the drive */
 	/* Bits 5,6,7 are connected to /DDEN, ENP and 5/8 on the WD2797 */
 
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) floppy = m_floppy1->get_device();

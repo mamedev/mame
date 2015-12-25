@@ -226,7 +226,7 @@ value:   START, REC, MEMDAT, REPEAT, SPOFF, x,x,RESET   meaning:
 			DELTAT->memread = 2;    /* two dummy reads needed before accesing external memory via register $08*/
 
 			/* if yes, then let's check if ADPCM memory is mapped and big enough */
-			if(DELTAT->memory == 0)
+			if(DELTAT->memory == nullptr)
 			{
 				DELTAT->device->logerror("YM Delta-T ADPCM rom not mapped\n");
 				DELTAT->portstate = 0x00;
@@ -476,7 +476,7 @@ void YM_DELTAT_savestate(device_t *device,YM_DELTAT *DELTAT)
 	else if ( val < min ) val = min;    \
 }
 
-INLINE void YM_DELTAT_synthesis_from_external_memory(YM_DELTAT *DELTAT)
+static inline void YM_DELTAT_synthesis_from_external_memory(YM_DELTAT *DELTAT)
 {
 	UINT32 step;
 	int data;
@@ -557,7 +557,7 @@ INLINE void YM_DELTAT_synthesis_from_external_memory(YM_DELTAT *DELTAT)
 
 
 
-INLINE void YM_DELTAT_synthesis_from_CPU_memory(YM_DELTAT *DELTAT)
+static inline void YM_DELTAT_synthesis_from_CPU_memory(YM_DELTAT *DELTAT)
 {
 	UINT32 step;
 	int data;

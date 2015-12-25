@@ -68,7 +68,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT8> m_videoram;
 
-	UINT8 *    m_colorram;
+	std::unique_ptr<UINT8[]>    m_colorram;
 	emu_timer  *m_int_timer;
 	UINT8      m_sound_state[2];
 	UINT8      m_screen_flip;
@@ -105,7 +105,7 @@ public:
 	void plot_byte( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 color );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -117,10 +117,10 @@ protected:
 
 VIDEO_START_MEMBER(astinvad_state,spaceint)
 {
-	m_colorram = auto_alloc_array(machine(), UINT8, m_videoram.bytes());
+	m_colorram = std::make_unique<UINT8[]>(m_videoram.bytes());
 
 	save_item(NAME(m_color_latch));
-	save_pointer(NAME(m_colorram), m_videoram.bytes());
+	save_pointer(NAME(m_colorram.get()), m_videoram.bytes());
 }
 
 
@@ -618,7 +618,7 @@ static const char *const astinvad_sample_names[] =
 	"6",
 	"7",
 	"8",
-	0
+	nullptr
 };
 
 

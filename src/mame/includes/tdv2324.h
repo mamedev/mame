@@ -69,7 +69,7 @@ public:
 	required_device<pit8253_device> m_pit1;
 	required_device<tms9927_device> m_tms;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( tdv2324_main_io_30 );

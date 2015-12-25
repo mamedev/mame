@@ -43,7 +43,7 @@ PALETTE_INIT_MEMBER(gyruss_state, gyruss)
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 470, 0,
 			2, resistances_b,  weights_b,  470, 0,
-			0, 0, 0, 0, 0);
+			0, nullptr, nullptr, 0, 0);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)

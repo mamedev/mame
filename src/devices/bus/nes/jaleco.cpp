@@ -620,7 +620,7 @@ static const char *const jf13_sample_names[] =
 	"13",   // ??
 	"14",   // (bat hits the ball)
 	"15",   // (crowd)
-	0
+	nullptr
 };
 
 static const char *const jf17_sample_names[] =
@@ -646,7 +646,7 @@ static const char *const jf17_sample_names[] =
 	"17",   // ??
 	"18",   // (ball hits player)
 	"19",   // NOT EXISTING?
-	0
+	nullptr
 };
 
 static const char *const jf19_sample_names[] =
@@ -672,7 +672,7 @@ static const char *const jf19_sample_names[] =
 	"17",   // (catcher obtains the ball)
 	"18",   // (pitcher obtains the ball)
 	"19",   // (crowd)
-	0
+	nullptr
 };
 
 static const char *const jf23_sample_names[] =
@@ -698,7 +698,7 @@ static const char *const jf23_sample_names[] =
 	"17",   // fair
 	"18",   // (catcher obtains the ball, alt)
 	"19",   // (crowd)
-	0
+	nullptr
 };
 
 static const char *const jf24_sample_names[] =
@@ -710,7 +710,7 @@ static const char *const jf24_sample_names[] =
 	"03",   // Matta Nashi
 	"04",   // Nokotta Nokotta
 	"05",   // Matta Arimasen
-	0
+	nullptr
 };
 
 static const char *const jf29_sample_names[] =
@@ -736,7 +736,7 @@ static const char *const jf29_sample_names[] =
 	"17",   // (catcher obtains the ball)
 	"18",   // (catcher obtains the ball, alt 2)
 	"19",   // (crowd)
-	0
+	nullptr
 };
 
 static const char *const jf33_sample_names[] =
@@ -762,7 +762,7 @@ static const char *const jf33_sample_names[] =
 	"17",   // (catcher obtains the ball, alt)
 	"18",   // ??
 	"19",   // (crowd)
-	0
+	nullptr
 };
 
 //-------------------------------------------------

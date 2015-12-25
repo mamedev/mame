@@ -99,7 +99,7 @@ static MACHINE_CONFIG_START( nes, nes_state )
 	MCFG_NES_CONTROL_PORT_ADD("ctrl2", nes_control_port2_devices, "joypad")
 	MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)
 
-	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_cart, NULL)
+	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "nes")
 	MCFG_SOFTWARE_LIST_ADD("ade_list", "nes_ade")         // Camerica/Codemasters Aladdin Deck Enhancer mini-carts
 	MCFG_SOFTWARE_LIST_ADD("ntb_list", "nes_ntbrom")      // Sunsoft Nantettate! Baseball mini-carts
@@ -158,7 +158,7 @@ static MACHINE_CONFIG_DERIVED( famicom, nes )
 	MCFG_DEVICE_REMOVE("ctrl2")
 	MCFG_NES_CONTROL_PORT_ADD("ctrl1", fc_control_port1_devices, "joypad")
 	MCFG_NES_CONTROL_PORT_ADD("ctrl2", fc_control_port2_devices, "joypad")
-	MCFG_FC_EXPANSION_PORT_ADD("exp", fc_expansion_devices, NULL)
+	MCFG_FC_EXPANSION_PORT_ADD("exp", fc_expansion_devices, nullptr)
 	MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "famicom_flop")
@@ -184,7 +184,7 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 		slot->vram_alloc(0x2000);
 		slot->prgram_alloc(0x8000);
 
-		slot->pcb_start(machine(), m_ciram, FALSE);
+		slot->pcb_start(machine(), m_ciram.get(), FALSE);
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::chr_w),(device_nes_cart_interface *)slot));
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(device_nes_cart_interface::nt_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::nt_w),(device_nes_cart_interface *)slot));
 		m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(device_nes_cart_interface::scanline_irq),(device_nes_cart_interface *)slot));
@@ -196,13 +196,13 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 
 MACHINE_START_MEMBER( nes_state, fds )
 {
-	m_ciram = auto_alloc_array(machine(), UINT8, 0x800);
+	m_ciram = std::make_unique<UINT8[]>(0x800);
 	m_io_disksel = ioport("FLIPDISK");
 	setup_disk(m_disk);
 
 	// register saves
 	save_item(NAME(m_last_frame_flip));
-	save_pointer(NAME(m_ciram), 0x800);
+	save_pointer(NAME(m_ciram.get()), 0x800);
 }
 
 MACHINE_RESET_MEMBER( nes_state, fds )

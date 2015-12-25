@@ -222,15 +222,15 @@ void towns_state::init_serial_rom()
 	// TODO: init serial ROM contents
 	int x;
 	static const UINT8 code[8] = { 0x04,0x65,0x54,0xA4,0x95,0x45,0x35,0x5F };
-	UINT8* srom = NULL;
+	UINT8* srom = nullptr;
 
 	if(m_serial)
 		srom = m_serial->base();
-	memset(m_towns_serial_rom,0,256/8);
+	memset(m_towns_serial_rom.get(),0,256/8);
 
 	if(srom)
 	{
-		memcpy(m_towns_serial_rom,srom,32);
+		memcpy(m_towns_serial_rom.get(),srom,32);
 		m_towns_machine_id = (m_towns_serial_rom[0x18] << 8) | m_towns_serial_rom[0x17];
 		logerror("Machine ID in serial ROM: %04x\n",m_towns_machine_id);
 		return;
@@ -553,7 +553,7 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 
 WRITE8_MEMBER(towns_state::towns_floppy_w)
 {
-	floppy_image_device* sel[4] = { m_flop0->get_device(), m_flop1->get_device(), NULL, NULL };
+	floppy_image_device* sel[4] = { m_flop0->get_device(), m_flop1->get_device(), nullptr, nullptr };
 
 	switch(offset)
 	{
@@ -582,7 +582,7 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 			// bit 5 - CLKSEL
 			if(m_towns_selected_drive != 0)
 			{
-				if(sel[m_towns_selected_drive-1] != NULL)
+				if(sel[m_towns_selected_drive-1] != nullptr)
 				{
 					sel[m_towns_selected_drive-1]->mon_w((~data & 0x10)>>4);
 					sel[m_towns_selected_drive-1]->ss_w((data & 0x04)>>2);
@@ -602,22 +602,22 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 					break;
 				case 0x01:
 					m_towns_selected_drive = 1;
-					if(sel[0] != NULL)
+					if(sel[0] != nullptr)
 						m_fdc->set_floppy(sel[0]);
 					break;
 				case 0x02:
 					m_towns_selected_drive = 2;
-					if(sel[1] != NULL)
+					if(sel[1] != nullptr)
 						m_fdc->set_floppy(sel[1]);
 					break;
 				case 0x04:
 					m_towns_selected_drive = 3;
-					if(sel[2] != NULL)
+					if(sel[2] != nullptr)
 						m_fdc->set_floppy(sel[2]);
 					break;
 				case 0x08:
 					m_towns_selected_drive = 4;
-					if(sel[3] != NULL)
+					if(sel[3] != nullptr)
 						m_fdc->set_floppy(sel[3]);
 					break;
 			}
@@ -1590,7 +1590,7 @@ void towns_state::towns_delay_cdda(cdrom_image_device* dev)
 
 void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 {
-	if(device->get_cdrom_file() == NULL)
+	if(device->get_cdrom_file() == nullptr)
 	{  // No CD in drive
 		if(m_towns_cd.command & 0x20)
 		{
@@ -2564,12 +2564,12 @@ INPUT_PORTS_END
 
 void towns_state::driver_start()
 {
-	m_towns_vram = auto_alloc_array(machine(),UINT32,0x20000);
-	m_towns_gfxvram = auto_alloc_array(machine(),UINT8,0x80000);
-	m_towns_txtvram = auto_alloc_array(machine(),UINT8,0x20000);
-	memset(m_towns_txtvram, 0, sizeof(UINT8)*0x20000);
-	//towns_sprram = auto_alloc_array(machine(),UINT8,0x20000);
-	m_towns_serial_rom = auto_alloc_array(machine(),UINT8,256/8);
+	m_towns_vram = std::make_unique<UINT32[]>(0x20000);
+	m_towns_gfxvram = std::make_unique<UINT8[]>(0x80000);
+	m_towns_txtvram = std::make_unique<UINT8[]>(0x20000);
+	memset(m_towns_txtvram.get(), 0, sizeof(UINT8)*0x20000);
+	//towns_sprram = std::make_unique<UINT8[]>(0x20000);
+	m_towns_serial_rom = std::make_unique<UINT8[]>(256/8);
 	init_serial_rom();
 	init_rtc();
 	m_towns_rtc_timer = timer_alloc(TIMER_RTC);
@@ -2584,7 +2584,7 @@ void towns_state::driver_start()
 	// CD-ROM init
 	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this), (void*)machine().device("dma_1"));
 
-	m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,0xffffffff,0,NULL);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,0xffffffff,0,nullptr);
 }
 
 void marty_state::driver_start()

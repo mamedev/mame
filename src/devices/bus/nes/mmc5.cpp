@@ -122,8 +122,8 @@ void nes_exrom_device::pcb_reset()
 	m_ex1_bank = 0;
 	m_vcount = 0;
 
-	for (int i = 0; i < 12; i++)
-		m_vrom_bank[i] = 0x3ff;
+	for (auto & elem : m_vrom_bank)
+		elem = 0x3ff;
 
 	m_prg_regs[0] = 0xfc;
 	m_prg_regs[1] = 0xfd;
@@ -468,8 +468,8 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 
 	if ((offset >= 0x1000) && (offset <= 0x1015))
 	{
-		// SOUND
-		nesapu_device *m_sound = machine().device<nesapu_device>("maincpu::nessound");
+		// SOUND (this is a hack, it should have extra channels, not pass to the existing APU!!!)
+		nesapu_device *m_sound = machine().device<nesapu_device>("maincpu:nesapu");
 		m_sound->write(space, offset & 0x1f, data);
 		return;
 	}

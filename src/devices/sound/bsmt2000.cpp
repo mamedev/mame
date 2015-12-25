@@ -80,11 +80,11 @@ bsmt2000_device::bsmt2000_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, BSMT2000, "BSMT2000", tag, owner, clock, "bsmt2000", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
-		m_space_config("samples", ENDIANNESS_LITTLE, 8, 32, 0, NULL),
-		m_ready_callback(NULL),
-		m_stream(NULL),
-		m_direct(NULL),
-		m_cpu(NULL),
+		m_space_config("samples", ENDIANNESS_LITTLE, 8, 32, 0, nullptr),
+		m_ready_callback(nullptr),
+		m_stream(nullptr),
+		m_direct(nullptr),
+		m_cpu(nullptr),
 		m_register_select(0),
 		m_write_data(0),
 		m_rom_address(0),
@@ -177,7 +177,7 @@ void bsmt2000_device::device_reset()
 
 const address_space_config *bsmt2000_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 
@@ -282,7 +282,7 @@ READ16_MEMBER( bsmt2000_device::tms_data_r )
 {
 	// also implicitly clear the write pending flag
 	m_write_pending = false;
-	if (m_ready_callback != NULL)
+	if (m_ready_callback != nullptr)
 		(*m_ready_callback)(*this);
 	return m_write_data;
 }

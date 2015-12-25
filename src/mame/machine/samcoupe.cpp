@@ -87,7 +87,7 @@ void samcoupe_state::samcoupe_update_bank(address_space &space, int bank_num, UI
 	if (!is_readonly)
 		sam_bank_write_ptr[bank_num-1] = memory;
 	else
-		sam_bank_write_ptr[bank_num-1] = NULL;
+		sam_bank_write_ptr[bank_num-1] = nullptr;
 
 	// installing banks on the fly is too slow (20% speed in Manic Miner gameplay vs 300% speed)
 #if 0
@@ -117,7 +117,7 @@ void samcoupe_state::samcoupe_install_ext_mem(address_space &space)
 	if (m_lext >> 6 < m_ram->size() >> 20)
 		mem = &m_ram->pointer()[(m_ram->size() & 0xfffff) + (m_lext >> 6) * 0x100000 + (m_lext & 0x3f) * 0x4000];
 	else
-		mem = NULL;
+		mem = nullptr;
 
 	samcoupe_update_bank(space, 3, mem, FALSE);
 
@@ -125,7 +125,7 @@ void samcoupe_state::samcoupe_install_ext_mem(address_space &space)
 	if (m_hext >> 6 < m_ram->size() >> 20)
 		mem = &m_ram->pointer()[(m_ram->size() & 0xfffff) + (m_hext >> 6) * 0x100000 + (m_hext & 0x3f) * 0x4000];
 	else
-		mem = NULL;
+		mem = nullptr;
 
 	samcoupe_update_bank(space, 4, mem, FALSE);
 }
@@ -144,7 +144,7 @@ void samcoupe_state::samcoupe_update_memory(address_space &space)
 		if ((m_lmpr & 0x1F) <= PAGE_MASK)
 			memory = &m_ram->pointer()[(m_lmpr & PAGE_MASK) * 0x4000];
 		else
-			memory = NULL;  /* Attempt to page in non existant ram region */
+			memory = nullptr;  /* Attempt to page in non existant ram region */
 		is_readonly = FALSE;
 	}
 	else
@@ -159,7 +159,7 @@ void samcoupe_state::samcoupe_update_memory(address_space &space)
 	if (((m_lmpr + 1) & 0x1f) <= PAGE_MASK)
 		memory = &m_ram->pointer()[((m_lmpr + 1) & PAGE_MASK) * 0x4000];
 	else
-		memory = NULL;  /* Attempt to page in non existant ram region */
+		memory = nullptr;  /* Attempt to page in non existant ram region */
 	samcoupe_update_bank(space, 2, memory, FALSE);
 
 	/* only update bank 3 and 4 when external memory is not enabled */
@@ -173,7 +173,7 @@ void samcoupe_state::samcoupe_update_memory(address_space &space)
 		if ((m_hmpr & 0x1F) <= PAGE_MASK )
 			memory = &m_ram->pointer()[(m_hmpr & PAGE_MASK)*0x4000];
 		else
-			memory = NULL;  /* Attempt to page in non existant ram region */
+			memory = nullptr;  /* Attempt to page in non existant ram region */
 		samcoupe_update_bank(space, 3, memory, FALSE);
 
 
@@ -188,7 +188,7 @@ void samcoupe_state::samcoupe_update_memory(address_space &space)
 			if (((m_hmpr + 1) & 0x1f) <= PAGE_MASK)
 				memory = &m_ram->pointer()[((m_hmpr + 1) & PAGE_MASK) * 0x4000];
 			else
-				memory = NULL;  /* Attempt to page in non existant ram region */
+				memory = nullptr;  /* Attempt to page in non existant ram region */
 			is_readonly = FALSE;
 		}
 		samcoupe_update_bank(space, 4, memory, FALSE);

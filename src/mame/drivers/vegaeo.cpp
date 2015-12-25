@@ -26,7 +26,7 @@ public:
 	vegaeo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: eolith_state(mconfig, type, tag) { }
 
-	UINT32 *m_vega_vram;
+	std::unique_ptr<UINT32[]> m_vega_vram;
 	UINT8 m_vega_vbuffer;
 
 	DECLARE_WRITE32_MEMBER(vega_vram_w);
@@ -177,8 +177,8 @@ INPUT_PORTS_END
 
 VIDEO_START_MEMBER(vegaeo_state,vega)
 {
-	m_vega_vram = auto_alloc_array(machine(), UINT32, 0x14000*2/4);
-	save_pointer(NAME(m_vega_vram), 0x14000*2/4);
+	m_vega_vram = std::make_unique<UINT32[]>(0x14000*2/4);
+	save_pointer(NAME(m_vega_vram.get()), 0x14000*2/4);
 	save_item(NAME(m_vega_vbuffer));
 }
 

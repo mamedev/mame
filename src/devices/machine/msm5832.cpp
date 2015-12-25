@@ -96,8 +96,8 @@ msm5832_device::msm5832_device(const machine_config &mconfig, const char *tag, d
 		m_write(0),
 		m_cs(0)
 {
-	for (int i = 0; i < 13; i++)
-		m_reg[i] = 0;
+	for (auto & elem : m_reg)
+		elem = 0;
 }
 
 

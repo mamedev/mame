@@ -159,8 +159,8 @@ void lynx_sound_device::register_save()
 
 void lynx_sound_device::init()
 {
-	m_shift_mask = auto_alloc_array_clear(machine(), int, 512);
-	m_shift_xor = auto_alloc_array_clear(machine(), int, 4096);
+	m_shift_mask = make_unique_clear<int[]>(512);
+	m_shift_xor = make_unique_clear<int[]>(4096);
 
 	for (int i = 0; i < 512; i++)
 	{
@@ -212,9 +212,9 @@ void lynx2_sound_device::device_start()
 
 void lynx_sound_device::device_reset()
 {
-	for (int i = 0; i < LYNX_AUDIO_CHANNELS; i++)
+	for (auto & elem : m_audio)
 	{
-		reset_channel(&m_audio[i]);
+		reset_channel(&elem);
 	}
 }
 

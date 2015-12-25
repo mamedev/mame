@@ -115,8 +115,8 @@ public:
 	void connect_hard_drive(mfm_harddisk_device *harddisk);
 
 protected:
-	void device_start();
-	void device_reset();
+	void device_start() override;
+	void device_reset() override;
 
 	bool m_is_hdc9234;
 
@@ -173,7 +173,7 @@ protected:
 	// emu_timer *m_live_timer;
 
 	// Timer callback
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// Handlers for incoming signals
 	void ready_handler();

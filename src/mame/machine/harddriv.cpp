@@ -57,8 +57,8 @@ void  harddriv_state::device_reset()
 	m_slapstic_device->slapstic_reset();
 
 	/* halt several of the DSPs to start */
-	if (m_adsp != NULL) m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	if (m_dsp32 != NULL) m_dsp32->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	if (m_adsp != nullptr) m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	if (m_dsp32 != nullptr) m_dsp32->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	m_last_gsp_shiftreg = 0;
 
@@ -72,14 +72,14 @@ void  harddriv_state::device_reset()
 	m_adsp_br = 0;
 	m_adsp_xflag = 0;
 
-	if (m_ds3sdsp != NULL)
+	if (m_ds3sdsp != nullptr)
 	{
 		m_ds3sdsp->load_boot_data(m_ds3sdsp->region()->base(), m_ds3sdsp_pgm_memory);
 		m_ds3sdsp_timer_en = 0;
 		m_ds3sdsp_internal_timer->adjust(attotime::never);
 	}
 
-	if (m_ds3xdsp != NULL)
+	if (m_ds3xdsp != nullptr)
 	{
 		m_ds3xdsp->load_boot_data(m_ds3xdsp->region()->base(), m_ds3xdsp_pgm_memory);
 		m_ds3xdsp_timer_en = 0;
@@ -173,7 +173,7 @@ READ16_MEMBER( harddriv_state::hd68k_msp_io_r )
 	UINT16 result;
 	offset = (offset / 2) ^ 1;
 	m_hd34010_host_access = TRUE;
-	result = (m_msp != NULL) ? m_msp->host_r(space, offset, 0xffff) : 0xffff;
+	result = (m_msp != nullptr) ? m_msp->host_r(space, offset, 0xffff) : 0xffff;
 	m_hd34010_host_access = FALSE;
 	return result;
 }
@@ -182,7 +182,7 @@ READ16_MEMBER( harddriv_state::hd68k_msp_io_r )
 WRITE16_MEMBER( harddriv_state::hd68k_msp_io_w )
 {
 	offset = (offset / 2) ^ 1;
-	if (m_msp != NULL)
+	if (m_msp != nullptr)
 	{
 		m_hd34010_host_access = TRUE;
 		m_msp->host_w(space, offset, data, 0xffff);
@@ -302,7 +302,7 @@ READ16_MEMBER( harddriv_state::hd68k_adc12_r )
 
 READ16_MEMBER( harddriv_state::hd68k_sound_reset_r )
 {
-	if (m_jsa != NULL)
+	if (m_jsa != nullptr)
 		m_jsa->reset();
 	return ~0;
 }
@@ -404,12 +404,12 @@ WRITE16_MEMBER( harddriv_state::hd68k_nwr_w )
 			break;
 		case 6: /* /GSPRES */
 			logerror("Write to /GSPRES(%d)\n", data);
-			if (m_gsp != NULL)
+			if (m_gsp != nullptr)
 				m_gsp->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 		case 7: /* /MSPRES */
 			logerror("Write to /MSPRES(%d)\n", data);
-			if (m_msp != NULL)
+			if (m_msp != nullptr)
 				m_msp->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 	}

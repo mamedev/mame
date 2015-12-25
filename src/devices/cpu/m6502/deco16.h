@@ -19,16 +19,16 @@ public:
 
 	static const disasm_entry disasm_entries[0x100];
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	virtual void do_exec_full();
-	virtual void do_exec_partial();
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual void do_exec_full() override;
+	virtual void do_exec_partial() override;
 
 protected:
 	address_space *io;
 	address_space_config io_config;
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-	virtual void device_start();
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual void device_start() override;
 
 #define O(o) void o ## _full(); void o ## _partial()
 

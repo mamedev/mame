@@ -25,7 +25,7 @@ unsigned short ccitt_crc16_one( unsigned short crc, const unsigned char data );
  * Alignment-friendly integer placement
  * ----------------------------------------------------------------------- */
 
-INLINE void place_integer_be(void *ptr, size_t offset, size_t size, UINT64 value)
+static inline void place_integer_be(void *ptr, size_t offset, size_t size, UINT64 value)
 {
 	UINT8 *byte_ptr = ((UINT8 *) ptr) + offset;
 	UINT16 val16;
@@ -56,7 +56,7 @@ INLINE void place_integer_be(void *ptr, size_t offset, size_t size, UINT64 value
 	}
 }
 
-INLINE UINT64 pick_integer_be(const void *ptr, size_t offset, size_t size)
+static inline UINT64 pick_integer_be(const void *ptr, size_t offset, size_t size)
 {
 	UINT64 result = 0;
 	const UINT8 *byte_ptr = ((const UINT8 *) ptr) + offset;
@@ -93,7 +93,7 @@ INLINE UINT64 pick_integer_be(const void *ptr, size_t offset, size_t size)
 	return result;
 }
 
-INLINE void place_integer_le(void *ptr, size_t offset, size_t size, UINT64 value)
+static inline void place_integer_le(void *ptr, size_t offset, size_t size, UINT64 value)
 {
 	UINT8 *byte_ptr = ((UINT8 *) ptr) + offset;
 	UINT16 val16;
@@ -124,7 +124,7 @@ INLINE void place_integer_le(void *ptr, size_t offset, size_t size, UINT64 value
 	}
 }
 
-INLINE UINT64 pick_integer_le(const void *ptr, size_t offset, size_t size)
+static inline UINT64 pick_integer_le(const void *ptr, size_t offset, size_t size)
 {
 	UINT64 result = 0;
 	const UINT8 *byte_ptr = ((const UINT8 *) ptr) + offset;

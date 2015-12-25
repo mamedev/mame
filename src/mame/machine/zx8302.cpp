@@ -149,7 +149,7 @@ zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, dev
 		m_cts2(0),
 		m_idr(1),
 		m_irq(0),
-		m_ctr(time(NULL) + RTC_BASE_ADJUST),
+		m_ctr(time(nullptr) + RTC_BASE_ADJUST),
 		m_status(0),
 		m_comdata_from_ipc(1),
 		m_comdata_to_cpu(1),

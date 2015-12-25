@@ -195,7 +195,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
-	UINT8 *m_videoram;
+	std::unique_ptr<UINT8[]> m_videoram;
 	UINT8 m_videobank;
 
 	DECLARE_READ8_MEMBER(vram_r);
@@ -206,7 +206,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cocoloco);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -290,9 +290,9 @@ PALETTE_INIT_MEMBER(cocoloco_state, cocoloco)
 
 void cocoloco_state::video_start()
 {
-	m_videoram = auto_alloc_array(machine(), UINT8, 0x2000 * 8);
+	m_videoram = std::make_unique<UINT8[]>(0x2000 * 8);
 
-	save_pointer(NAME(m_videoram), 0x2000 * 8);
+	save_pointer(NAME(m_videoram.get()), 0x2000 * 8);
 	save_item(NAME(m_videobank));
 }
 

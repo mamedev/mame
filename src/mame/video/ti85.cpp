@@ -140,7 +140,7 @@ PALETTE_INIT_MEMBER(ti85_state, ti85)
 		return;
 	}
 
-	m_frames = auto_alloc_array_clear(machine(), UINT8, m_ti_number_of_frames*m_ti_video_memory_size);
+	m_frames = make_unique_clear<UINT8[]>(m_ti_number_of_frames*m_ti_video_memory_size);
 }
 
 void ti85_state::video_start()
@@ -165,22 +165,22 @@ UINT32 ti85_state::screen_update_ti85(screen_device &screen, bitmap_ind16 &bitma
 
 	lcdmem =  ((m_LCD_memory_base & 0x3F) + 0xc0) << 0x08;
 
-	memcpy (m_frames, m_frames+m_ti_video_memory_size, sizeof (UINT8) * (m_ti_number_of_frames-1) * m_ti_video_memory_size);
+	memcpy (m_frames.get(), m_frames.get()+m_ti_video_memory_size, sizeof (UINT8) * (m_ti_number_of_frames-1) * m_ti_video_memory_size);
 
 		for (y=0; y<m_ti_screen_y_size; y++)
 		for (x=0; x<m_ti_screen_x_size; x++)
-			*(m_frames+(m_ti_number_of_frames-1)*m_ti_video_memory_size+y*m_ti_screen_x_size+x) = space.read_byte(lcdmem+y*m_ti_screen_x_size+x);
+			*(m_frames.get()+(m_ti_number_of_frames-1)*m_ti_video_memory_size+y*m_ti_screen_x_size+x) = space.read_byte(lcdmem+y*m_ti_screen_x_size+x);
 
 		for (y=0; y<m_ti_screen_y_size; y++)
 		for (x=0; x<m_ti_screen_x_size; x++)
 			for (b=0; b<8; b++)
 			{
-				brightnes = ((*(m_frames+0*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01)
-						+ ((*(m_frames+1*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01)
-						+ ((*(m_frames+2*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01)
-						+ ((*(m_frames+3*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01)
-						+ ((*(m_frames+4*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01)
-						+ ((*(m_frames+5*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01);
+				brightnes = ((*(m_frames.get()+0*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01)
+						+ ((*(m_frames.get()+1*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01)
+						+ ((*(m_frames.get()+2*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01)
+						+ ((*(m_frames.get()+3*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01)
+						+ ((*(m_frames.get()+4*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01)
+						+ ((*(m_frames.get()+5*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01);
 
 				bitmap.pix16(y, x*8+b) = ti85_palette[m_LCD_contrast&0x1f][brightnes];
 			}

@@ -29,7 +29,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_clock);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	UINT8 compute_sbox_coef(int sel, int bit);

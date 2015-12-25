@@ -113,8 +113,8 @@ public:
 	DECLARE_WRITE16_MEMBER(dblewing_prot_w);
 	DECLARE_READ8_MEMBER(irq_latch_r);
 	DECLARE_DRIVER_INIT(dblewing);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);

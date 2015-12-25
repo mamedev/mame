@@ -43,7 +43,7 @@
 
 #define VERBOSE_LEVEL ( 9 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{

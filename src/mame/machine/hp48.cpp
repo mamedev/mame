@@ -666,7 +666,7 @@ void hp48_state::hp48_apply_modules()
 		{
 			int off = (m_bank_switch << 16) % m_port_size[1];
 			LOG(( "hp48_apply_modules: port 2 offset is %i\n", off ));
-			m_modules[HP48_NCE3].data = m_port_data[1] + off;
+			m_modules[HP48_NCE3].data = m_port_data[1].get() + off;
 		}
 
 		/* ROM A19 (hi 256 KB) / NCE3 (port 2) control switch */
@@ -922,13 +922,12 @@ void hp48_port_image_device::hp48_fill_port()
 	hp48_state *state = machine().driver_data<hp48_state>();
 	int size = state->m_port_size[m_port];
 	LOG(( "hp48_fill_port: %s module=%i size=%i rw=%i\n", tag(), m_module, size, state->m_port_write[m_port] ));
-	state->m_port_data[m_port] = global_alloc_array(UINT8, 2 * size);
-	memset( state->m_port_data[m_port], 0, 2 * size );
+	state->m_port_data[m_port] = make_unique_clear<UINT8[]>(2 * size);
 	state->m_modules[m_module].off_mask = 2 * (( size > 128 * 1024 ) ? 128 * 1024 : size) - 1;
 	state->m_modules[m_module].read     = read8_delegate();
 	state->m_modules[m_module].write    = write8_delegate();
 	state->m_modules[m_module].isnop    = state->m_port_write[m_port] ? 0 : 1;
-	state->m_modules[m_module].data     = state->m_port_data[m_port];
+	state->m_modules[m_module].data     = (void*)state->m_port_data[m_port].get();
 	state->hp48_apply_modules();
 }
 
@@ -940,7 +939,7 @@ void hp48_port_image_device::hp48_unfill_port()
 	state->m_modules[m_module].off_mask = 0x00fff;  /* 2 KB */
 	state->m_modules[m_module].read     = read8_delegate();
 	state->m_modules[m_module].write    = write8_delegate();
-	state->m_modules[m_module].data     = NULL;
+	state->m_modules[m_module].data     = nullptr;
 	state->m_modules[m_module].isnop    = 1;
 	state->m_port_size[m_port]          = 0;
 }
@@ -963,8 +962,8 @@ bool hp48_port_image_device::call_load()
 	state->m_port_size[m_port] = size;
 	state->m_port_write[m_port] = !is_readonly();
 	hp48_fill_port( );
-	fread(state->m_port_data[m_port], state->m_port_size[m_port] );
-	state->hp48_decode_nibble( state->m_port_data[m_port], state->m_port_data[m_port], state->m_port_size[m_port] );
+	fread(state->m_port_data[m_port].get(), state->m_port_size[m_port] );
+	state->hp48_decode_nibble( state->m_port_data[m_port].get(), state->m_port_data[m_port].get(), state->m_port_size[m_port] );
 	return IMAGE_INIT_PASS;
 }
 
@@ -996,11 +995,11 @@ void hp48_port_image_device::call_unload()
 			tag(), state->m_port_size[m_port], state->m_port_write[m_port] ));
 	if ( state->m_port_write[m_port] )
 	{
-		state->hp48_encode_nibble( state->m_port_data[m_port], state->m_port_data[m_port], state->m_port_size[m_port] );
+		state->hp48_encode_nibble( state->m_port_data[m_port].get(), state->m_port_data[m_port].get(), state->m_port_size[m_port] );
 		fseek( 0, SEEK_SET );
-		fwrite( state->m_port_data[m_port], state->m_port_size[m_port] );
+		fwrite( state->m_port_data[m_port].get(), state->m_port_size[m_port] );
 	}
-	global_free_array( state->m_port_data[m_port] );
+	state->m_port_data[m_port] = nullptr;
 	hp48_unfill_port();
 	state->hp48_apply_modules();
 }
@@ -1035,12 +1034,12 @@ DRIVER_INIT_MEMBER(hp48_state,hp48)
 		m_modules[i].off_mask = 0x00fff;  /* 2 KB */
 		m_modules[i].read     = read8_delegate();
 		m_modules[i].write    = write8_delegate();
-		m_modules[i].data     = NULL;
+		m_modules[i].data     = nullptr;
 		m_modules[i].isnop    = 0;
 	}
 	m_port_size[0] = 0;
 	m_port_size[1] = 0;
-	m_rom = NULL;
+	m_rom = nullptr;
 }
 
 void hp48_state::machine_reset()

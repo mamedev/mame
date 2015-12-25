@@ -261,9 +261,9 @@ static void read_insert(char* insert);
 static char g_input_filename[M68K_MAX_PATH];
 
 /* File handles */
-static FILE* g_input_file = NULL;
-static FILE* g_prototype_file = NULL;
-static FILE* g_table_file = NULL;
+static FILE* g_input_file = nullptr;
+static FILE* g_prototype_file = nullptr;
+static FILE* g_table_file = nullptr;
 
 static int g_num_functions = 0;  /* Number of functions processed */
 static int g_num_primitives = 0; /* Number of function primitives read */
@@ -601,7 +601,7 @@ static int fgetline(char* buff, int nchars, FILE* file)
 {
 	int length;
 
-	if(fgets(buff, nchars, file) == NULL)
+	if(fgets(buff, nchars, file) == nullptr)
 		return -1;
 	if(buff[0] == '\r')
 		memmove(buff, buff + 1, nchars - 1);
@@ -670,7 +670,7 @@ static opcode_struct* find_opcode(char* name, int size, char* spec_proc, char* s
 	opcode_struct* op;
 
 
-	for(op = g_opcode_input_table;op->name != NULL;op++)
+	for(op = g_opcode_input_table;op->name != nullptr;op++)
 	{
 		if( strcmp(name, op->name) == 0 &&
 			(size == op->size) &&
@@ -678,7 +678,7 @@ static opcode_struct* find_opcode(char* name, int size, char* spec_proc, char* s
 			strcmp(spec_ea, op->spec_ea) == 0)
 				return op;
 	}
-	return NULL;
+	return nullptr;
 }
 
 #ifdef UNUSED_FUNCTION
@@ -701,7 +701,7 @@ static int extract_opcode_info(char* src, char* name, int* size, char* spec_proc
 {
 	char* ptr = strstr(src, ID_OPHANDLER_NAME);
 
-	if(ptr == NULL)
+	if(ptr == nullptr)
 		return 0;
 
 	ptr += strlen(ID_OPHANDLER_NAME) + 1;
@@ -713,7 +713,7 @@ static int extract_opcode_info(char* src, char* name, int* size, char* spec_proc
 
 	*size = atoi(ptr);
 	ptr = strstr(ptr, ",");
-	if(ptr == NULL) return 0;
+	if(ptr == nullptr) return 0;
 	ptr++;
 	ptr += skip_spaces(ptr);
 
@@ -755,7 +755,7 @@ static void write_body(FILE* filep, body_struct* body, replace_struct* replace)
 	{
 		strcpy(output, body->body[i]);
 		/* Check for the base directive header */
-		if(strstr(output, ID_BASE) != NULL)
+		if(strstr(output, ID_BASE) != nullptr)
 		{
 			/* Search for any text we need to replace */
 			found = 0;
@@ -1014,7 +1014,7 @@ static void process_opcode_handlers(FILE* filep)
 	{
 		/* Find the first line of the function */
 		func_name[0] = 0;
-		while(strstr(func_name, ID_OPHANDLER_NAME) == NULL)
+		while(strstr(func_name, ID_OPHANDLER_NAME) == nullptr)
 		{
 			if(strcmp(func_name, ID_INPUT_SEPARATOR) == 0)
 			{
@@ -1049,7 +1049,7 @@ static void process_opcode_handlers(FILE* filep)
 
 		/* Find the corresponding table entry */
 		opinfo = find_opcode(oper_name, oper_size, oper_spec_proc, oper_spec_ea);
-		if(opinfo == NULL)
+		if(opinfo == nullptr)
 			error_exit("Unable to find matching table entry for %s", func_name);
 
 		replace->length = 0;
@@ -1174,9 +1174,9 @@ static void read_insert(char* insert)
 	char* ptr = insert;
 	char* overflow = insert + MAX_INSERT_LENGTH - MAX_LINE_LENGTH;
 	int length;
-	char* first_blank = NULL;
+	char* first_blank = nullptr;
 
-	first_blank = NULL;
+	first_blank = nullptr;
 
 	/* Skip any leading blank lines */
 	for(length = 0;length == 0;length = fgetline(ptr, MAX_LINE_LENGTH, g_input_file))
@@ -1205,11 +1205,11 @@ static void read_insert(char* insert)
 		/* keep track in case there are trailing blanks */
 		if(length == 0)
 		{
-			if(first_blank == NULL)
+			if(first_blank == nullptr)
 				first_blank = ptr;
 		}
 		else
-			first_blank = NULL;
+			first_blank = nullptr;
 
 		/* Advance and append newline */
 		ptr += length;
@@ -1269,14 +1269,14 @@ int main(int argc, char *argv[])
 
 	/* Open the files we need */
 	sprintf(filename, "%s/%s", output_path, FILENAME_PROTOTYPE);
-	if((g_prototype_file = fopen(filename, "wt")) == NULL)
+	if((g_prototype_file = fopen(filename, "wt")) == nullptr)
 		perror_exit("Unable to create prototype file (%s)\n", filename);
 
 	sprintf(filename, "%s/%s", output_path, FILENAME_TABLE);
-	if((g_table_file = fopen(filename, "wt")) == NULL)
+	if((g_table_file = fopen(filename, "wt")) == nullptr)
 		perror_exit("Unable to create table file (%s)\n", filename);
 
-	if((g_input_file=fopen(g_input_filename, "rt")) == NULL)
+	if((g_input_file=fopen(g_input_filename, "rt")) == nullptr)
 		perror_exit("can't open %s for input", g_input_filename);
 
 

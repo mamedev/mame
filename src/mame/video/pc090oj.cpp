@@ -78,8 +78,8 @@ pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, PC090OJ, "Taito PC090OJ", tag, owner, clock, "pc090oj", __FILE__),
 	m_ctrl(0),
 	m_sprite_ctrl(0),
-	m_ram(NULL),
-	m_ram_buffered(0),
+	m_ram(nullptr),
+	m_ram_buffered(nullptr),
 	m_gfxnum(0),
 	m_x_offset(0),
 	m_y_offset(0),
@@ -115,11 +115,11 @@ void pc090oj_device::static_set_palette_tag(device_t &device, const char *tag)
 
 void pc090oj_device::device_start()
 {
-	m_ram = auto_alloc_array_clear(machine(), UINT16, PC090OJ_RAM_SIZE / 2);
-	m_ram_buffered = auto_alloc_array_clear(machine(), UINT16, PC090OJ_RAM_SIZE / 2);
+	m_ram = make_unique_clear<UINT16[]>(PC090OJ_RAM_SIZE / 2);
+	m_ram_buffered = make_unique_clear<UINT16[]>(PC090OJ_RAM_SIZE / 2);
 
-	save_pointer(NAME(m_ram), PC090OJ_RAM_SIZE / 2);
-	save_pointer(NAME(m_ram_buffered), PC090OJ_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram.get()), PC090OJ_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram_buffered.get()), PC090OJ_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
 	save_item(NAME(m_sprite_ctrl));  // should this be set in intf?!?
 }

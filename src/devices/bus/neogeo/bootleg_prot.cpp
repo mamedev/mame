@@ -12,9 +12,9 @@ extern const device_type NGBOOTLEG_PROT = &device_creator<ngbootleg_prot_device>
 ngbootleg_prot_device::ngbootleg_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NGBOOTLEG_PROT, "NeoGeo Protection (Bootleg)", tag, owner, clock, "ngbootleg_prot", __FILE__),
 	kof2k3_overlay(0),
-	m_mainrom(NULL),
-	m_fixedrom(NULL),
-	m_bankdev(NULL)
+	m_mainrom(nullptr),
+	m_fixedrom(nullptr),
+	m_bankdev(nullptr)
 {
 }
 

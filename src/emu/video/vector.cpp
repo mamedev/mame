@@ -131,7 +131,7 @@ const device_type VECTOR = &device_creator<vector_device>;
 vector_device::vector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
-		m_vector_list(NULL),
+		m_vector_list(nullptr),
 		m_min_intensity(255),
 		m_max_intensity(0)
 {
@@ -140,7 +140,7 @@ vector_device::vector_device(const machine_config &mconfig, device_type type, co
 vector_device::vector_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VECTOR, "VECTOR", tag, owner, clock, "vector_device", __FILE__),
 		device_video_interface(mconfig, *this),
-		m_vector_list(NULL),
+		m_vector_list(nullptr),
 		m_min_intensity(255),
 		m_max_intensity(0)
 {
@@ -163,7 +163,7 @@ void vector_device::device_start()
 	m_vector_index = 0;
 
 	/* allocate memory for tables */
-	m_vector_list = auto_alloc_array_clear(machine(), point, MAX_POINTS);
+	m_vector_list = make_unique_clear<point[]>(MAX_POINTS);
 }
 
 void vector_device::set_flicker(float newval)
@@ -306,7 +306,7 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	int lastx = 0;
 	int lasty = 0;
 
-	curpoint = m_vector_list;
+	curpoint = m_vector_list.get();
 
 	screen.container().empty();
 	screen.container().add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(0xff,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_VECTORBUF(1));

@@ -35,7 +35,7 @@ public:
 	UINT8 m_palette_data[3];
 	rectangle m_render_clip;
 	UINT8 *m_srcbitmap;
-	UINT8 *m_dstbitmap;
+	std::unique_ptr<UINT8[]> m_dstbitmap;
 	UINT16 m_src_xoffs;
 	UINT16 m_src_yoffs;
 	UINT16 m_dst_xoffs;
@@ -56,7 +56,7 @@ public:
 	DECLARE_DRIVER_INIT(policetr);
 	DECLARE_DRIVER_INIT(sshooter);
 	DECLARE_DRIVER_INIT(plctr13b);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_policetr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq4_gen);
 	void render_display_list(offs_t offset);
@@ -65,5 +65,5 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

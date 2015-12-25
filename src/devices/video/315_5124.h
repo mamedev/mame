@@ -109,12 +109,12 @@ protected:
 	void check_pending_flags();
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_0) ? &m_space_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_0) ? &m_space_config : nullptr; }
 
 	void vdp_postload();
 
@@ -188,7 +188,7 @@ public:
 	sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual UINT16 get_name_table_row(int row);
+	virtual UINT16 get_name_table_row(int row) override;
 };
 
 
@@ -199,16 +199,16 @@ public:
 
 	DECLARE_PALETTE_INIT( sega315_5378 );
 
-	virtual void set_sega315_5124_compatibility_mode( bool sega315_5124_compatibility_mode );
+	virtual void set_sega315_5124_compatibility_mode( bool sega315_5124_compatibility_mode ) override;
 
 protected:
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void update_palette();
-	virtual void cram_write(UINT8 data);
-	virtual void blit_scanline( int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line );
-	virtual UINT16 get_name_table_row(int row);
+	virtual void update_palette() override;
+	virtual void cram_write(UINT8 data) override;
+	virtual void blit_scanline( int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line ) override;
+	virtual UINT16 get_name_table_row(int row) override;
 };
 
 

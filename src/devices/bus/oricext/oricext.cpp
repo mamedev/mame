@@ -10,7 +10,7 @@ oricext_connector::oricext_connector(const machine_config &mconfig, const char *
 	device_t(mconfig, ORICEXT_CONNECTOR, "ORIC extension connector", tag, owner, clock, "oricext_connector", __FILE__),
 	device_slot_interface(mconfig, *this),
 	irq_handler(*this),
-	cputag(NULL)
+	cputag(nullptr)
 {
 }
 

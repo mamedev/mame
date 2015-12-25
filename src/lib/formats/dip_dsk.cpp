@@ -61,7 +61,7 @@ bool dip_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	int cell_count = form_factor == floppy_image::FF_35 ? 200000 : 166666;
 
 	int ssize;
-	for (ssize = 0; (128 << ssize) < bps; ssize++);
+	for (ssize = 0; (128 << ssize) < bps; ssize++) {};
 
 	desc_pc_sector sects[256];
 	UINT8 sect_data[65536];

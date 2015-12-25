@@ -285,7 +285,7 @@ void simpsons_state::simpsons_objdma(  )
 
 	m_k053246->k053247_get_ram(&dst);
 
-	src = m_spriteram;
+	src = m_spriteram.get();
 	num_inactive = counter = 256;
 
 	do {

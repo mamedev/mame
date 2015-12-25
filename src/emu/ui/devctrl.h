@@ -82,7 +82,7 @@ template<class _DeviceType>
 void ui_menu_device_control<_DeviceType>::previous()
 {
 	// left arrow - rotate left through cassette devices
-	if (m_device != NULL)
+	if (m_device != nullptr)
 	{
 		iterator iter(machine().root_device());
 		int index = iter.indexof(*m_device);
@@ -103,7 +103,7 @@ template<class _DeviceType>
 void ui_menu_device_control<_DeviceType>::next()
 {
 	// right arrow - rotate right through cassette devices
-	if (m_device != NULL)
+	if (m_device != nullptr)
 	{
 		iterator iter(machine().root_device());
 		int index = iter.indexof(*m_device);

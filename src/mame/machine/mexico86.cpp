@@ -18,7 +18,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_f008_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 
-	if (m_mcu != NULL)
+	if (m_mcu != nullptr)
 	{
 		// mexico 86, knight boy
 		m_mcu->set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);

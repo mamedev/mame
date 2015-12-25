@@ -87,7 +87,7 @@ public:
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(rapidfir_scanline_update);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 

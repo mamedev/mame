@@ -68,7 +68,7 @@ public:
 	DECLARE_WRITE8_MEMBER(adpcm_w);
 
 	DECLARE_DRIVER_INIT(rmhaihai);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(themj);
 	DECLARE_MACHINE_RESET(themj);
 

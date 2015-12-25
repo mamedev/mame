@@ -59,7 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
 	UINT8 m_val;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 READ8_MEMBER( sacstate_state::port01_r )

@@ -25,10 +25,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// internal state
@@ -45,10 +45,10 @@ private:
 	sound_stream *m_stream;
 
 	/* mixer tables and internal buffers */
-	INT16 *m_mixer_table;
+	std::unique_ptr<INT16[]> m_mixer_table;
 	INT16 *m_mixer_lookup;
-	short *m_mixer_buffer;
-	short *m_mixer_buffer_2;
+	std::unique_ptr<short[]> m_mixer_buffer;
+	std::unique_ptr<short[]> m_mixer_buffer_2;
 
 	UINT8 m_soundregs[0x4000];
 

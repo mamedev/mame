@@ -475,7 +475,7 @@ if _OPTIONS["with-tools"] then
 		flags {
 			"Symbols", -- always include minimum symbols for executables 	
 		}
-
+		
 		dofile("sdl_cfg.lua")
 
 		includedirs {

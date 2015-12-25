@@ -171,7 +171,7 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 			break;
 
 		case CS0_FUNCTION_LO:
-			if (m_function != NULL)
+			if (m_function != nullptr)
 			{
 				data = m_function->base()[offset & 0x7fff];
 			}
@@ -184,7 +184,7 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 		case CS0_C2_LOW:
 			c2l = 0;
 
-			if (m_c2 != NULL)
+			if (m_c2 != nullptr)
 			{
 				data = m_c2->base()[offset & 0x7fff];
 			}
@@ -206,7 +206,7 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 				break;
 
 			case CS1_FUNCTION_HI:
-				if (m_function != NULL)
+				if (m_function != nullptr)
 				{
 					data = m_function->base()[offset & 0x7fff];
 				}
@@ -219,7 +219,7 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 			case CS1_C2_HIGH:
 				c2h = 0;
 
-				if (m_c2 != NULL)
+				if (m_c2 != nullptr)
 				{
 					data = m_c2->base()[offset & 0x7fff];
 				}
@@ -749,7 +749,7 @@ static MACHINE_CONFIG_START( plus4, plus4_state )
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
 
-	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, plus4_user_port_cards, NULL)
+	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, plus4_user_port_cards, nullptr)
 	MCFG_PET_USER_PORT_4_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p2)) // cassette sense
 	MCFG_PET_USER_PORT_5_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p3))
 	MCFG_PET_USER_PORT_6_HANDLER(DEVWRITELINE(MOS6529_USER_TAG, mos6529_device, write_p4))
@@ -796,9 +796,9 @@ static MACHINE_CONFIG_START( plus4, plus4_state )
 	MCFG_CBM_IEC_ADD("c1541")
 	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_9))
 
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
-	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_14_31818MHz/16, plus4_expansion_cards, NULL)
+	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_14_31818MHz/16, plus4_expansion_cards, nullptr)
 	MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(plus4_state, exp_irq_w))
 	MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(plus4_state, read))
 	MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(plus4_state, write))

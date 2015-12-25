@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Zsolt Vasvari
+// copyright-holders:Derrick Renaud
 /************************************************************************
  * copsnrob Sound System Analog emulation
  * Nov 2010, Derrick Renaud
@@ -628,7 +628,7 @@ DISCRETE_SOUND_START(copsnrob)
 	 ************************************************/
 	DISCRETE_CUSTOM1(COPSNROB_NOISE_1,  copsnrob_custom_noise,                  /* IC J2, pin 10 */
 		COPSNROB_2V,                                        /* CLK */
-		NULL)
+		nullptr)
 	/* COPSNROB_NOISE_2 derived from sub out of above custom module - IC J2, pin 11 */
 	/* We use the measured 555 timer frequency (IC M3) for speed */
 	DISCRETE_COUNTER(NODE_40,                               /* IC L2 */
@@ -656,12 +656,12 @@ DISCRETE_SOUND_START(copsnrob)
 		/* We can ignore R47 & R48 */
 		COPSNROB_ZINGS_INV,                             /* IC D3, pin 6 */
 		COPSNROB_R38, COPSNROB_C19,
-		NULL)
+		nullptr)
 	DISCRETE_CUSTOM5(NODE_61, copsnrob_zings_555_astable,                           /* IC D3, pin 8 & 12 */
 		NODE_60,                                        /* IC D3, pin 10 */
 		COPSNROB_R36, COPSNROB_R37,
 		COPSNROB_C3, COPSNROB_C13,
-		NULL)
+		nullptr)
 	/* FIX - do a better implemetation of IC L4 */
 	DISCRETE_CRFILTER_VREF(NODE_62,                     /* IC L4, pin 9 */
 		NODE_61,                                        /* IN0 */

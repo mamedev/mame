@@ -21,9 +21,9 @@ public:
 
 	static const disasm_entry disasm_entries[0x100];
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	virtual void do_exec_full();
-	virtual void do_exec_partial();
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual void do_exec_full() override;
+	virtual void do_exec_partial() override;
 
 protected:
 #define O(o) void o ## _full(); void o ## _partial()

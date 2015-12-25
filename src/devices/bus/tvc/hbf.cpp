@@ -161,7 +161,7 @@ WRITE8_MEMBER(tvc_hbf_device::io_write)
 			// bit 5     DDEN
 			// bit 6     floppy motor
 			// bit 7     side select
-			floppy_image_device *floppy = NULL;
+			floppy_image_device *floppy = nullptr;
 
 			if (BIT(data, 0)) floppy = subdevice<floppy_connector>("fdc:0")->get_device();
 			if (BIT(data, 1)) floppy = subdevice<floppy_connector>("fdc:1")->get_device();

@@ -511,8 +511,8 @@ public:
 	DECLARE_DRIVER_INIT(nbanfl);
 	DECLARE_DRIVER_INIT(sf2049);
 	DECLARE_DRIVER_INIT(sf2049se);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nile_timer_callback);
 	void remap_dynamic_addresses();
@@ -588,9 +588,9 @@ void vegas_state::machine_start()
 	m_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vegas_state::nile_timer_callback),this));
 
 	/* identify our sound board */
-	if (machine().device("dsio") != NULL)
+	if (machine().device("dsio") != nullptr)
 		m_dcs_idma_cs = 6;
-	else if (machine().device("denver") != NULL)
+	else if (machine().device("denver") != nullptr)
 		m_dcs_idma_cs = 7;
 	else
 		m_dcs_idma_cs = 0;
@@ -628,7 +628,7 @@ void vegas_state::machine_reset()
 	memset(m_pci_3dfx_regs, 0, sizeof(m_pci_3dfx_regs));
 
 	/* reset the DCS system if we have one */
-	if (machine().device("dcs") != NULL)
+	if (machine().device("dcs") != nullptr)
 	{
 		m_dcs->reset_w(1);
 		m_dcs->reset_w(0);
@@ -2225,7 +2225,7 @@ static MACHINE_CONFIG_START( vegascore, vegas_state )
 
 	MCFG_M48T37_ADD("timekeeper")
 
-	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(vegas_state, ide_interrupt))
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)
 

@@ -89,8 +89,8 @@ public:
 
 	device_t *m_terminal;
 	DECLARE_DRIVER_INIT(ti990_10);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	DECLARE_WRITE_LINE_MEMBER( key_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( line_interrupt );

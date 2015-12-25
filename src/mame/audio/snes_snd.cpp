@@ -179,7 +179,7 @@ void snes_sound_device::device_start()
 {
 	m_channel = machine().sound().stream_alloc(*this, 0, 2, 32000);
 
-	m_ram = auto_alloc_array_clear(machine(), UINT8, SNES_SPCRAM_SIZE);
+	m_ram = make_unique_clear<UINT8[]>(SNES_SPCRAM_SIZE);
 
 	/* put IPL image at the top of RAM */
 	memcpy(m_ipl_region, machine().root_device().memregion("sound_ipl")->base(), 64);
@@ -196,7 +196,7 @@ void snes_sound_device::device_start()
 	m_timer[2]->enable(false);
 
 	state_register();
-	save_pointer(NAME(m_ram), SNES_SPCRAM_SIZE);
+	save_pointer(NAME(m_ram.get()), SNES_SPCRAM_SIZE);
 }
 
 //-------------------------------------------------
@@ -703,7 +703,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 	}
 #endif                              /* !defined( NO_ECHO ) */
 
-	if (sound_ptr != NULL)
+	if (sound_ptr != nullptr)
 	{
 		if (m_dsp_regs[0x6c] & 0x40)
 		{

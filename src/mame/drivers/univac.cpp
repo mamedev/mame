@@ -50,8 +50,8 @@ private:
 	const UINT8 *m_p_chargen;
 	bool m_screen_num;
 	UINT8 m_framecnt;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_device<nvram_device> m_nvram;
@@ -163,7 +163,7 @@ static const z80_daisy_config daisy_chain[] =
 {
 	{ "dart" },
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 static MACHINE_CONFIG_START( uts20, univac_state )
@@ -201,7 +201,7 @@ ROM_START( uts20 )
 	ROM_LOAD( "uts20e.rom", 0x4000, 0x1000, CRC(0dfc8062) SHA1(cd681020bfb4829d4cebaf1b5bf618e67b55bda3) )
 	ROM_FILL(0x2bd,1,0xaf) // test 2
 	ROM_FILL(0x3c1,2,0xaf) // test 5
-	ROM_FILL(0x928,1,0)
+	ROM_FILL(0x928,1,0x00)
 
 	/* character generator not dumped, using the one from 'c10' for now */
 	ROM_REGION( 0x2000, "chargen", 0 )

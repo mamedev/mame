@@ -35,7 +35,7 @@ const device_type NB1414M4 = &device_creator<nb1414m4_device>;
 nb1414m4_device::nb1414m4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NB1414M4, "NB1414M4 Mahjong Custom", tag, owner, clock, "nb1414m4", __FILE__),
 	device_video_interface(mconfig, *this),
-	m_data(NULL)
+	m_data(nullptr)
 {
 }
 

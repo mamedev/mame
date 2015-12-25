@@ -463,7 +463,7 @@ static const char *const gaplus_sample_names[] =
 {
 	"*gaplus",
 	"bang",
-	0
+	nullptr
 };
 
 /***************************************************************************

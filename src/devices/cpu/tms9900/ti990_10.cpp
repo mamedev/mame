@@ -45,8 +45,8 @@ ti990_10_device::ti990_10_device(const machine_config &mconfig, const char *tag,
 	: cpu_device(mconfig, TI990_10, "TI990/10 CPU", tag, owner, clock, "ti990_10_cpu",  __FILE__),
 		m_program_config("program", ENDIANNESS_BIG, 16, 16),
 		m_io_config("cru", ENDIANNESS_BIG, 8, 12),
-		m_prgspace(NULL),
-		m_cru(NULL)
+		m_prgspace(nullptr),
+		m_cru(nullptr)
 {
 }
 
@@ -92,7 +92,7 @@ const address_space_config *ti990_10_device::memory_space_config(address_spacenu
 		return &m_io_config;
 
 	default:
-		return NULL;
+		return nullptr;
 	}
 }
 

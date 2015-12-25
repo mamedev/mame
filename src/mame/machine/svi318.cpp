@@ -63,7 +63,7 @@ DEVICE_IMAGE_LOAD_MEMBER( svi318_state, svi318_cart )
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	if (image.software_entry() == NULL && !cart_verify(m_cart->get_rom_base()))
+	if (image.software_entry() == nullptr && !cart_verify(m_cart->get_rom_base()))
 		return IMAGE_INIT_FAIL;
 
 	return IMAGE_INIT_PASS;
@@ -222,7 +222,7 @@ WRITE_LINE_MEMBER(svi318_state::fdc_drq_w)
 
 WRITE8_MEMBER(svi318_state::fdc_drive_motor_w)
 {
-	m_floppy = NULL;
+	m_floppy = nullptr;
 
 	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();
@@ -409,12 +409,12 @@ DRIVER_INIT_MEMBER(svi318_state, svi318)
 	m_maincpu->set_input_line_vector(0, 0xff);
 
 	/* memory */
-	m_empty_bank = auto_alloc_array(machine(), UINT8, 0x8000);
-	memset(m_empty_bank, 0xff, 0x8000);
+	m_empty_bank = std::make_unique<UINT8[]>(0x8000);
+	memset(m_empty_bank.get(), 0xff, 0x8000);
 
-	m_bank_low_ptr = m_empty_bank;
-	m_bank_high1_ptr = m_empty_bank;
-	m_bank_high2_ptr = m_empty_bank;
+	m_bank_low_ptr = m_empty_bank.get();
+	m_bank_high1_ptr = m_empty_bank.get();
+	m_bank_high2_ptr = m_empty_bank.get();
 }
 
 DRIVER_INIT_MEMBER(svi318_state, svi328_806)
@@ -535,7 +535,7 @@ void svi318_state::set_banks()
 	m_bank_low = (v & 1) ? ((v & 2) ? ((v & 8) ? SVI_INTERNAL : SVI_EXPRAM3) : SVI_EXPRAM2) : SVI_CART;
 	m_bank_high = (v & 4) ? ((v & 16) ? SVI_INTERNAL : SVI_EXPRAM3) : SVI_EXPRAM2;
 
-	m_bank_low_ptr = m_empty_bank;
+	m_bank_low_ptr = m_empty_bank.get();
 	m_bank_low_read_only = 1;
 
 	switch (m_bank_low)
@@ -563,9 +563,9 @@ void svi318_state::set_banks()
 		break;
 	}
 
-	m_bank_high1_ptr = m_empty_bank;
+	m_bank_high1_ptr = m_empty_bank.get();
 	m_bank_high1_read_only = 1;
-	m_bank_high2_ptr = m_empty_bank;
+	m_bank_high2_ptr = m_empty_bank.get();
 	m_bank_high2_read_only = 1;
 
 	switch (m_bank_high)
@@ -607,9 +607,9 @@ void svi318_state::set_banks()
 	/* Check for special CART based banking */
 	if (m_bank_low == SVI_CART && (v & 0xc0 ) != 0xc0)
 	{
-		m_bank_high1_ptr = m_empty_bank;
+		m_bank_high1_ptr = m_empty_bank.get();
 		m_bank_high1_read_only = 1;
-		m_bank_high2_ptr = m_empty_bank;
+		m_bank_high2_ptr = m_empty_bank.get();
 		m_bank_high2_read_only = 1;
 
 		if (m_cart_rom && !(v & 0x80))

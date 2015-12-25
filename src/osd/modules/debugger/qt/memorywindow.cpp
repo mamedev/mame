@@ -68,21 +68,29 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 	QAction* formatActFour = new QAction("4-byte chunks", this);
 	QAction* formatActEight = new QAction("8-byte chunks", this);
 	QAction* formatAct32bitFloat = new QAction("32 bit floating point", this);
+	QAction* formatAct64bitFloat = new QAction("64 bit floating point", this);
+	QAction* formatAct80bitFloat = new QAction("80 bit floating point", this);
 	formatActOne->setObjectName("formatActOne");
 	formatActTwo->setObjectName("formatActTwo");
 	formatActFour->setObjectName("formatActFour");
 	formatActEight->setObjectName("formatActEight");
 	formatAct32bitFloat->setObjectName("formatAct32bitFloat");
+	formatAct64bitFloat->setObjectName("formatAct64bitFloat");
+	formatAct80bitFloat->setObjectName("formatAct80bitFloat");
 	formatActOne->setCheckable(true);
 	formatActTwo->setCheckable(true);
 	formatActFour->setCheckable(true);
 	formatActEight->setCheckable(true);
 	formatAct32bitFloat->setCheckable(true);
+	formatAct64bitFloat->setCheckable(true);
+	formatAct80bitFloat->setCheckable(true);
 	formatActOne->setActionGroup(dataFormat);
 	formatActTwo->setActionGroup(dataFormat);
 	formatActFour->setActionGroup(dataFormat);
 	formatActEight->setActionGroup(dataFormat);
 	formatAct32bitFloat->setActionGroup(dataFormat);
+	formatAct64bitFloat->setActionGroup(dataFormat);
+	formatAct80bitFloat->setActionGroup(dataFormat);
 	formatActOne->setShortcut(QKeySequence("Ctrl+1"));
 	formatActTwo->setShortcut(QKeySequence("Ctrl+2"));
 	formatActFour->setShortcut(QKeySequence("Ctrl+4"));
@@ -90,7 +98,6 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 	formatAct32bitFloat->setShortcut(QKeySequence("Ctrl+9"));
 	formatActOne->setChecked(true);
 	connect(dataFormat, SIGNAL(triggered(QAction*)), this, SLOT(formatChanged(QAction*)));
-
 	// Create a address display group
 	QActionGroup* addressGroup = new QActionGroup(this);
 	addressGroup->setObjectName("addressgroup");
@@ -161,6 +168,8 @@ void MemoryWindow::memoryRegionChanged(int index)
 		case 4: dataFormatMenuItem("formatActFour")->setChecked(true); break;
 		case 8: dataFormatMenuItem("formatActEight")->setChecked(true); break;
 		case 9: dataFormatMenuItem("formatAct32bitFloat")->setChecked(true); break;
+		case 10: dataFormatMenuItem("formatAct64bitFloat")->setChecked(true); break;
+		case 11: dataFormatMenuItem("formatAct80bitFloat")->setChecked(true); break;
 		default: break;
 	}
 }
@@ -206,6 +215,14 @@ void MemoryWindow::formatChanged(QAction* changedTo)
 	else if (changedTo->text() == "32 bit floating point")
 	{
 		memView->set_data_format(9);
+	}
+	else if (changedTo->text() == "64 bit floating point")
+	{
+		memView->set_data_format(10);
+	}
+	else if (changedTo->text() == "80 bit floating point")
+	{
+		memView->set_data_format(11);
 	}
 	m_memTable->viewport()->update();
 }
@@ -381,6 +398,10 @@ void MemoryWindowQtConfig::buildFromQWidget(QWidget* widget)
 		m_dataFormat = 3;
 	else if (dataFormat->checkedAction()->text() == "32 bit floating point")
 		m_dataFormat = 4;
+	else if (dataFormat->checkedAction()->text() == "64 bit floating point")
+		m_dataFormat = 5;
+	else if (dataFormat->checkedAction()->text() == "80 bit floating point")
+		m_dataFormat = 6;
 }
 
 

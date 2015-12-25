@@ -19,7 +19,7 @@ naomi_m1_board::naomi_m1_board(const machine_config &mconfig, const char *tag, d
 
 READ16_MEMBER(naomi_m1_board::actel_id_r)
 {
-	if (rombdid_tag && memregion(rombdid_tag) != NULL)
+	if (rombdid_tag && memregion(rombdid_tag) != nullptr)
 	{
 		const UINT8 *bdid = memregion(rombdid_tag)->base();
 		return bdid[0] | (bdid[1] << 8);
@@ -34,16 +34,16 @@ void naomi_m1_board::device_start()
 
 	std::string skey = parameter("key");
 	if(!skey.empty())
-		key = strtoll(skey.c_str(), 0, 16);
+		key = strtoll(skey.c_str(), nullptr, 16);
 	else
 	{
 		logerror("%s: Warning: key not provided\n", tag());
 		key = 0;
 	}
 
-	buffer = auto_alloc_array(machine(), UINT8, BUFFER_SIZE);
+	buffer = std::make_unique<UINT8[]>(BUFFER_SIZE);
 
-	save_pointer(NAME(buffer), BUFFER_SIZE);
+	save_pointer(NAME(buffer.get()), BUFFER_SIZE);
 	save_item(NAME(dict));
 	save_item(NAME(hist));
 	save_item(NAME(rom_cur_address));
@@ -84,7 +84,7 @@ void naomi_m1_board::board_setup_address(UINT32 address, bool is_dma)
 void naomi_m1_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 {
 	if(encryption) {
-		base = buffer;
+		base = buffer.get();
 		limit = BUFFER_SIZE;
 
 	} else {
@@ -97,7 +97,7 @@ void naomi_m1_board::board_advance(UINT32 size)
 {
 	if(encryption) {
 		if(size < buffer_actual_size) {
-			memmove(buffer, buffer + size, buffer_actual_size - size);
+			memmove(buffer.get(), buffer.get() + size, buffer_actual_size - size);
 			buffer_actual_size -= size;
 		} else {
 			hist[0] = buffer[buffer_actual_size-2];
@@ -159,8 +159,8 @@ void naomi_m1_board::enc_reset()
 	has_history = false;
 	buffer_actual_size = 0;
 
-	for(int i=0; i<111; i++)
-		dict[i] = getb(8);
+	for(auto & elem : dict)
+		elem = getb(8);
 }
 
 void naomi_m1_board::wb(UINT8 byte)

@@ -52,8 +52,8 @@ public:
 	DECLARE_READ8_MEMBER(port_d_r);
 	DECLARE_WRITE8_MEMBER(port_d_w);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void line_update();
 	UINT32 screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(uzebox_cart);
@@ -247,7 +247,7 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		dynamic_buffer data(size);
 		image.fread(&data[0], size);

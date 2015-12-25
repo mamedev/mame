@@ -33,7 +33,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	typedef delegate<void (void)> opcode_handler_delegate;

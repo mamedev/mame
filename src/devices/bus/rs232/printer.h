@@ -15,19 +15,19 @@ class serial_printer_device : public device_t,
 public:
 	serial_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) { device_serial_interface::rx_w(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
 
 	DECLARE_WRITE_LINE_MEMBER(update_serial);
 	DECLARE_WRITE_LINE_MEMBER(printer_online);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual void rcv_complete();
+	virtual void rcv_complete() override;
 
 private:
 	required_device<printer_image_device> m_printer;

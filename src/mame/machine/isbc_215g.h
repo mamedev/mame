@@ -14,8 +14,8 @@ class isbc_215g_device : public device_t
 public:
 	isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual machine_config_constructor device_mconfig_additions() const;
-	const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	const rom_entry *device_rom_region() const override;
 
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ16_MEMBER(io_r);
@@ -33,8 +33,8 @@ public:
 	template<class _Object> static devcb_base &static_set_irq_callback(device_t &device, _Object object) { return downcast<isbc_215g_device &>(device).m_out_irq_func.set_callback(object); }
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	void find_sector();

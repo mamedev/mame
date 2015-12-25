@@ -119,8 +119,8 @@ TILE_GET_INFO_MEMBER(equites_state::splndrbt_bg_info)
 
 VIDEO_START_MEMBER(equites_state,equites)
 {
-	m_fg_videoram = auto_alloc_array(machine(), UINT8, 0x800);
-	save_pointer(NAME(m_fg_videoram), 0x800);
+	m_fg_videoram = std::make_unique<UINT8[]>(0x800);
+	save_pointer(NAME(m_fg_videoram.get()), 0x800);
 
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(equites_state::equites_fg_info),this), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -134,8 +134,8 @@ VIDEO_START_MEMBER(equites_state,splndrbt)
 {
 	assert(m_screen->format() == BITMAP_FORMAT_IND16);
 
-	m_fg_videoram = auto_alloc_array(machine(), UINT8, 0x800);
-	save_pointer(NAME(m_fg_videoram), 0x800);
+	m_fg_videoram = std::make_unique<UINT8[]>(0x800);
+	save_pointer(NAME(m_fg_videoram.get()), 0x800);
 
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(equites_state::splndrbt_fg_info),this), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);

@@ -168,8 +168,8 @@ VIDEO_START_MEMBER(psikyo_state,psikyo)
 	m_tilemap_1_size2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, 0x80, 0x20);
 	m_tilemap_1_size3 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psikyo_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, 0x100, 0x10);
 
-	m_spritebuf1 = auto_alloc_array(machine(), UINT32, 0x2000 / 4);
-	m_spritebuf2 = auto_alloc_array(machine(), UINT32, 0x2000 / 4);
+	m_spritebuf1 = std::make_unique<UINT32[]>(0x2000 / 4);
+	m_spritebuf2 = std::make_unique<UINT32[]>(0x2000 / 4);
 
 	m_tilemap_0_size0->set_scroll_rows(0x80 * 16);  // line scrolling
 	m_tilemap_0_size0->set_scroll_cols(1);
@@ -195,8 +195,8 @@ VIDEO_START_MEMBER(psikyo_state,psikyo)
 	m_tilemap_1_size3->set_scroll_rows(0x10 * 16);  // line scrolling
 	m_tilemap_1_size3->set_scroll_cols(1);
 
-	save_pointer(NAME(m_spritebuf1), 0x2000 / 4);
-	save_pointer(NAME(m_spritebuf2), 0x2000 / 4);
+	save_pointer(NAME(m_spritebuf1.get()), 0x2000 / 4);
+	save_pointer(NAME(m_spritebuf2.get()), 0x2000 / 4);
 }
 
 VIDEO_START_MEMBER(psikyo_state,sngkace)
@@ -258,7 +258,7 @@ void psikyo_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 	/* tile layers 0 & 1 have priorities 1 & 2 */
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	int offs;
-	UINT16 *spritelist = (UINT16 *)(m_spritebuf2 + 0x1800 / 4);
+	UINT16 *spritelist = (UINT16 *)(m_spritebuf2.get() + 0x1800 / 4);
 	UINT8 *TILES = memregion("spritelut")->base();    // Sprites LUT
 	int TILES_LEN = memregion("spritelut")->bytes();
 
@@ -375,7 +375,7 @@ void psikyo_state::draw_sprites_bootleg( screen_device &screen, bitmap_ind16 &bi
 	/* tile layers 0 & 1 have priorities 1 & 2 */
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	int offs;
-	UINT16 *spritelist = (UINT16 *)(m_spritebuf2 + 0x1800 / 4);
+	UINT16 *spritelist = (UINT16 *)(m_spritebuf2.get()+ 0x1800 / 4);
 	UINT8 *TILES = memregion("spritelut")->base();    // Sprites LUT
 	int TILES_LEN = memregion("spritelut")->bytes();
 
@@ -850,7 +850,7 @@ void psikyo_state::screen_eof_psikyo(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		memcpy(m_spritebuf2, m_spritebuf1, 0x2000);
-		memcpy(m_spritebuf1, m_spriteram, 0x2000);
+		memcpy(m_spritebuf2.get(), m_spritebuf1.get(), 0x2000);
+		memcpy(m_spritebuf1.get(), m_spriteram, 0x2000);
 	}
 }

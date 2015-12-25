@@ -403,10 +403,10 @@ static const gfx_layout tile_layout =
 };
 
 static GFXDECODE_START( 2mindril )
-	GFXDECODE_ENTRY( NULL,   0x000000, charlayout,       0x0000, 0x0400>>4 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( nullptr,   0x000000, charlayout,       0x0000, 0x0400>>4 ) /* Dynamically modified */
 	GFXDECODE_ENTRY( "gfx2", 0x000000, tile_layout,      0x0000, 0x2000>>4 ) /* Tiles area */
 	GFXDECODE_ENTRY( "gfx1", 0x000000, spriteram_layout, 0x1000, 0x1000>>4 ) /* Sprites area */
-	GFXDECODE_ENTRY( NULL,   0x000000, pivotlayout,      0x0000,  0x400>>4 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( nullptr,   0x000000, pivotlayout,      0x0000,  0x400>>4 ) /* Dynamically modified */
 GFXDECODE_END
 
 

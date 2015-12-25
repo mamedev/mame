@@ -337,8 +337,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	DECLARE_DRIVER_INIT(qc);
 	DECLARE_DRIVER_INIT(dwarfd);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(dwarfd);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(qc_display_pixels);
@@ -843,7 +843,7 @@ ROM_START( dwarfd )
 	ROM_LOAD16_BYTE( "6d_pd_50-1994_tms2732ajl.bin",0x2001, 0x1000, CRC(ef52b88c) SHA1(3405152da3194a71f6dac6492f275c746e781ee7) )
 
 	ROM_REGION( 0x4000*2, "gfx2", 0 )
-	ROM_FILL(0,  0x4000*2, 0)
+	ROM_FILL(0,  0x4000*2, 0x00)
 
 	ROM_REGION( 0x40, "proms", 0 )
 	/* ??? colors */
@@ -866,7 +866,7 @@ ROM_START( dwarfda )
 	ROM_LOAD16_BYTE( "50-1815-tms2732ajl.6d",0x2001, 0x1000, CRC(303d2d16) SHA1(885df57f253d92f96692256325ffcf2ca71dc64f) )
 
 	ROM_REGION( 0x4000*2, "gfx2", 0 )
-	ROM_FILL(0,  0x4000*2, 0)
+	ROM_FILL(0,  0x4000*2, 0x00)
 
 	ROM_REGION( 0x40, "proms", 0 )
 	/* ??? colors */
@@ -893,7 +893,7 @@ ROM_START( quarterh )
 	ROM_LOAD16_BYTE( "6d_qh_01-2398_11193.bin",0x0001, 0x0800, CRC(1db80656) SHA1(5cbfc2e4ba0c8028ff5e0ba2ec6220d8afb8cfc2) )
 
 	ROM_REGION( 0x4000*2, "gfx2", 0 )
-	ROM_FILL(0,  0x4000*2, 0)
+	ROM_FILL(0,  0x4000*2, 0x00)
 
 	ROM_REGION( 0x800, "ld_data", 0 )
 	ROM_LOAD( "-g_l-.bin",  0x0000, 0x0800, CRC(05c09fa6) SHA1(92ec4c225e477194d2c134403d9ebf922149b51c) )
@@ -922,7 +922,7 @@ ROM_START( quarterha )
 	ROM_LOAD16_BYTE( "6d_qh_01-2398_11193.bin",0x0001, 0x0800, CRC(1db80656) SHA1(5cbfc2e4ba0c8028ff5e0ba2ec6220d8afb8cfc2) )
 
 	ROM_REGION( 0x4000*2, "gfx2", 0 )
-	ROM_FILL(0,  0x4000*2, 0)
+	ROM_FILL(0,  0x4000*2, 0x00)
 
 	ROM_REGION( 0x800, "ld_data", 0 )
 	ROM_LOAD( "-g_l-.bin",  0x0000, 0x0800, CRC(05c09fa6) SHA1(92ec4c225e477194d2c134403d9ebf922149b51c) )
@@ -952,7 +952,7 @@ ROM_START( quarterhb )
 	ROM_COPY("gfx_data", 0x1800, 0x0800, 0x0800 )
 
 	ROM_REGION( 0x4000*2, "gfx2", 0 )
-	ROM_FILL(0,  0x4000*2, 0)
+	ROM_FILL(0,  0x4000*2, 0x00)
 
 	ROM_REGION( 0x800, "ld_data", ROMREGION_ERASEFF )
 
@@ -983,7 +983,7 @@ ROM_START( qc )
 	ROM_COPY("gfx1", 0x0000, 0x2000, 0x2000 )
 
 	ROM_REGION( 0x4000*2, "gfx2", 0 )
-	ROM_FILL(0,  0x4000*2, 0)
+	ROM_FILL(0,  0x4000*2, 0x00)
 
 	// borrowed from above and slightly edited
 	ROM_REGION( 0x40, "proms", 0 )

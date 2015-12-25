@@ -24,7 +24,7 @@ void vt82c496_device::device_start()
 {
 	/* get address space we are working on */
 	device_t *cpu = machine().device(m_cpu_tag);
-	assert(cpu != NULL);
+	assert(cpu != nullptr);
 
 	m_space = &cpu->memory().space(AS_PROGRAM);
 

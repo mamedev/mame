@@ -43,7 +43,7 @@ private:
 	bool m_timer_a;
 	UINT8 m_sndcmd;
 	UINT8 m_digit;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_cpu2;
 	required_device<tms5110_device> m_tms;

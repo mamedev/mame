@@ -33,15 +33,15 @@ public:
 	wozfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	floppy_connector *floppy0, *floppy1, *floppy2, *floppy3;
 	floppy_image_device *floppy;
@@ -85,7 +85,7 @@ class diskii_fdc : public wozfdc_device
 public:
 	diskii_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void device_reset();
+	virtual void device_reset() override;
 
 	void set_floppies(floppy_connector *f0, floppy_connector *f1);
 };
@@ -95,7 +95,7 @@ class appleiii_fdc : public wozfdc_device
 public:
 	appleiii_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void device_reset();
+	virtual void device_reset() override;
 
 	void set_floppies_4(floppy_connector *f0, floppy_connector *f1, floppy_connector *f2, floppy_connector *f3);
 

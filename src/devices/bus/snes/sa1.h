@@ -17,19 +17,19 @@ public:
 	sns_sa1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual DECLARE_WRITE8_MEMBER(write_l) override;
+	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read);
-	virtual DECLARE_WRITE8_MEMBER(chip_write);
+	virtual DECLARE_READ8_MEMBER(chip_read) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
 
 	DECLARE_READ8_MEMBER(sa1_lo_r);
 	DECLARE_READ8_MEMBER(sa1_hi_r);

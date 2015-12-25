@@ -39380,5 +39380,39 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		</part>
 	</software>
 
+<!-- These are not yet verified as good, mapper is not emulated -->
+
+	<software name="shrekmv">
+		<description>Shrek</description>
+		<year>200?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="0x4000000">
+				<rom name="shrek-mske.gba" size="0x4000000" crc="e698c9ae" sha1="95d57c0a825b5f6531c8a098c8b9f8b6eb3f8eb5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrek2mv">
+		<description>Shrek 2</description>
+		<year>200?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="0x4000000">
+				<rom name="shrek2-m2se.gba" size="0x4000000" crc="0d353654" sha1="5cd627e205020297b25d707131883be5850515fe" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sharkmv">
+		<description>Shark's Tale</description>
+		<year>200?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="0x4000000">
+				<rom name="sharkstale-msae.gba" size="0x4000000" crc="d2cf417a" sha1="9bc5b60793b8a6de3b80eb2c213cd125e1fa468e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

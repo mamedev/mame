@@ -25,8 +25,8 @@ public:
 	{ }
 
 	DECLARE_DRIVER_INIT(ac1);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_ac1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ac1_32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(ac1_port_b_r);

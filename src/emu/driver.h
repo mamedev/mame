@@ -106,7 +106,7 @@ public:
 	virtual ~driver_device();
 
 	// getters
-	const game_driver &system() const { assert(m_system != NULL); return *m_system; }
+	const game_driver &system() const { assert(m_system != nullptr); return *m_system; }
 
 	// indexes into our generic callbacks
 	enum callback_type
@@ -247,13 +247,13 @@ protected:
 	virtual void video_reset();
 
 	// device-level overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual void device_start();
-	virtual void device_reset_after_children();
+	virtual const rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset_after_children() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 private:
 	// helpers
 	void irq_pulse_clear(void *ptr, INT32 param);
@@ -282,7 +282,7 @@ private:
 template<class _DriverClass>
 device_t *driver_device_creator(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 {
-	assert(owner == NULL);
+	assert(owner == nullptr);
 	assert(clock == 0);
 	return global_alloc_clear(_DriverClass(mconfig, &driver_device_creator<_DriverClass>, tag));
 }

@@ -29,7 +29,7 @@ void ata_flash_pccard_device::device_reset()
 	memset(m_key, 0, sizeof(m_key));
 	memset(m_cis, 0xff, 512);
 
-	if (m_handle != NULL)
+	if (m_handle != nullptr)
 	{
 		m_handle->read_metadata(PCMCIA_CIS_METADATA_TAG, 0, m_cis, 512, metalength);
 
@@ -97,7 +97,7 @@ READ16_MEMBER( ata_flash_pccard_device::read_reg )
 
 WRITE16_MEMBER( ata_flash_pccard_device::write_reg )
 {
-	if(offset >= 0x280 && offset <= 0x288 && m_handle != NULL)
+	if(offset >= 0x280 && offset <= 0x288 && m_handle != nullptr)
 	{
 		UINT8 v = data;
 		int pos = offset - 0x280;

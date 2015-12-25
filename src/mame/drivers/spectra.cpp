@@ -65,7 +65,7 @@ private:
 	UINT8 m_portb;
 	UINT8 m_t_c;
 	UINT8 m_out_offs;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<sn76477_device> m_snsnd;
 	required_ioport_array<4> m_switch;

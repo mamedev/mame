@@ -1525,7 +1525,7 @@ INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
 //============================================================
 
 #if (SDLMAME_SDL2)
-INLINE sdl_window_info * window_from_id(Uint32 windowID)
+static inline sdl_window_info * window_from_id(Uint32 windowID)
 {
 	sdl_window_info *w;
 	SDL_Window *window = SDL_GetWindowFromID(windowID);
@@ -1541,7 +1541,7 @@ INLINE sdl_window_info * window_from_id(Uint32 windowID)
 	return NULL;
 }
 
-INLINE void resize_all_windows(void)
+static inline void resize_all_windows(void)
 {
 	sdl_window_info *w;
 	osd_ticks_t now = osd_ticks();

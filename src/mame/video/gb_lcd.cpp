@@ -218,13 +218,13 @@ void gb_lcd_device::common_start()
 {
 	m_screen->register_screen_bitmap(m_bitmap);
 	save_item(NAME(m_bitmap));
-	m_oam = auto_alloc_array_clear(machine(), UINT8, 0x100);
+	m_oam = make_unique_clear<UINT8[]>(0x100);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(gb_lcd_device::videoptr_restore), this));
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
-	save_pointer(NAME(m_oam), 0x100);
+	save_pointer(NAME(m_oam.get()), 0x100);
 	save_item(NAME(m_window_lines_drawn));
 	save_item(NAME(m_vid_regs));
 	save_item(NAME(m_bg_zbuf));
@@ -286,18 +286,18 @@ void gb_lcd_device::common_start()
 
 void gb_lcd_device::videoptr_restore()
 {
-	m_layer[0].bg_map = m_vram + m_gb_bgdtab_offs;
-	m_layer[0].bg_tiles = m_vram + m_gb_chrgen_offs;
-	m_layer[1].bg_map = m_vram + m_gb_wndtab_offs;
-	m_layer[1].bg_tiles = m_vram + m_gb_chrgen_offs;
+	m_layer[0].bg_map = m_vram.get() + m_gb_bgdtab_offs;
+	m_layer[0].bg_tiles = m_vram.get() + m_gb_chrgen_offs;
+	m_layer[1].bg_map = m_vram.get() + m_gb_wndtab_offs;
+	m_layer[1].bg_tiles = m_vram.get() + m_gb_chrgen_offs;
 }
 
 void cgb_lcd_device::videoptr_restore()
 {
-	m_layer[0].bg_map = m_vram + m_gb_bgdtab_offs;
-	m_layer[0].gbc_map = m_vram + m_gbc_bgdtab_offs;
-	m_layer[1].bg_map = m_vram + m_gb_wndtab_offs;
-	m_layer[1].gbc_map = m_vram + m_gbc_wndtab_offs;
+	m_layer[0].bg_map = m_vram.get() + m_gb_bgdtab_offs;
+	m_layer[0].gbc_map = m_vram.get() + m_gbc_bgdtab_offs;
+	m_layer[1].bg_map = m_vram.get() + m_gb_wndtab_offs;
+	m_layer[1].gbc_map = m_vram.get() + m_gbc_wndtab_offs;
 }
 
 
@@ -306,10 +306,10 @@ void gb_lcd_device::device_start()
 	common_start();
 	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_lcd_device::lcd_timer_proc),this));
 
-	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
-	save_pointer(NAME(m_vram), 0x2000);
+	m_vram = make_unique_clear<UINT8[]>(0x2000);
+	save_pointer(NAME(m_vram.get()), 0x2000);
 
-	memcpy(m_oam, dmg_oam_fingerprint, 0x100);
+	memcpy(m_oam.get(), dmg_oam_fingerprint, 0x100);
 }
 
 void mgb_lcd_device::device_start()
@@ -317,10 +317,10 @@ void mgb_lcd_device::device_start()
 	common_start();
 	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mgb_lcd_device::lcd_timer_proc),this));
 
-	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
-	save_pointer(NAME(m_vram), 0x2000);
+	m_vram = make_unique_clear<UINT8[]>(0x2000);
+	save_pointer(NAME(m_vram.get()), 0x2000);
 
-	memcpy(m_oam, mgb_oam_fingerprint, 0x100);
+	memcpy(m_oam.get(), mgb_oam_fingerprint, 0x100);
 }
 
 void sgb_lcd_device::device_start()
@@ -328,11 +328,11 @@ void sgb_lcd_device::device_start()
 	common_start();
 	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sgb_lcd_device::lcd_timer_proc),this));
 
-	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
-	save_pointer(NAME(m_vram), 0x2000);
+	m_vram = make_unique_clear<UINT8[]>(0x2000);
+	save_pointer(NAME(m_vram.get()), 0x2000);
 
-	m_sgb_tile_data = auto_alloc_array_clear(machine(), UINT8, 0x2000);
-	save_pointer(NAME(m_sgb_tile_data), 0x2000);
+	m_sgb_tile_data = make_unique_clear<UINT8[]>(0x2000);
+	save_pointer(NAME(m_sgb_tile_data.get()), 0x2000);
 
 	memset(m_sgb_tile_map, 0, sizeof(m_sgb_tile_map));
 
@@ -359,10 +359,10 @@ void cgb_lcd_device::device_start()
 	common_start();
 	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cgb_lcd_device::lcd_timer_proc),this));
 
-	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x4000);
-	save_pointer(NAME(m_vram), 0x4000);
+	m_vram = make_unique_clear<UINT8[]>(0x4000);
+	save_pointer(NAME(m_vram.get()), 0x4000);
 
-	memcpy(m_oam, cgb_oam_fingerprint, 0x100);
+	memcpy(m_oam.get(), cgb_oam_fingerprint, 0x100);
 
 	/* Background is initialised as white */
 	for (int i = 0; i < 32; i++)
@@ -447,7 +447,7 @@ void sgb_lcd_device::device_reset()
 {
 	common_reset();
 
-	memset(m_sgb_tile_data, 0, 0x2000);
+	memset(m_sgb_tile_data.get(), 0, 0x2000);
 
 	m_sgb_window_mask = 0;
 
@@ -484,7 +484,7 @@ inline void gb_lcd_device::plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32
 void gb_lcd_device::select_sprites()
 {
 	int /*yindex,*/ line, height;
-	UINT8 *oam = m_oam + 39 * 4;
+	UINT8 *oam = m_oam.get() + 39 * 4;
 
 	m_sprCount = 0;
 
@@ -537,8 +537,8 @@ void gb_lcd_device::update_sprites()
 	yindex = m_current_line;
 	line = m_current_line + 16;
 
-	oam = m_oam + 39 * 4;
-	vram = m_vram;
+	oam = m_oam.get() + 39 * 4;
+	vram = m_vram.get();
 	for (int i = 39; i >= 0; i--)
 	{
 		/* if sprite is on current line && x-coordinate && x-coordinate is < 168 */
@@ -565,7 +565,7 @@ void gb_lcd_device::update_sprites()
 			case 0xA0:                 /* priority is set (behind bgnd & wnd, flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 						plot_pixel(bitmap, xindex, yindex, spal[colour]);
 					data >>= 1;
@@ -574,7 +574,7 @@ void gb_lcd_device::update_sprites()
 			case 0x20:                 /* priority is not set (overlaps bgnd & wnd, flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if (colour && xindex >= 0 && xindex < 160)
 						plot_pixel(bitmap, xindex, yindex, spal[colour]);
 					data >>= 1;
@@ -583,7 +583,7 @@ void gb_lcd_device::update_sprites()
 			case 0x80:                 /* priority is set (behind bgnd & wnd, don't flip x) */
 				for (bit = 0; bit < 8 && xindex < 160; bit++, xindex++)
 				{
-					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+					int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 						plot_pixel(bitmap, xindex, yindex, spal[colour]);
 					data <<= 1;
@@ -592,7 +592,7 @@ void gb_lcd_device::update_sprites()
 			case 0x00:                 /* priority is not set (overlaps bgnd & wnd, don't flip x) */
 				for (bit = 0; bit < 8 && xindex < 160; bit++, xindex++)
 				{
-					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+					int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if (colour && xindex >= 0 && xindex < 160)
 						plot_pixel(bitmap, xindex, yindex, spal[colour]);
 					data <<= 1;
@@ -630,8 +630,8 @@ void gb_lcd_device::update_scanline()
 			if (m_layer[0].enabled)
 			{
 				m_layer[0].bgline = (SCROLLY + m_current_line) & 0xFF;
-				m_layer[0].bg_map = m_vram + m_gb_bgdtab_offs;
-				m_layer[0].bg_tiles = m_vram + m_gb_chrgen_offs;
+				m_layer[0].bg_map = m_vram.get() + m_gb_bgdtab_offs;
+				m_layer[0].bg_tiles = m_vram.get() + m_gb_chrgen_offs;
 				m_layer[0].xindex = SCROLLX >> 3;
 				m_layer[0].xshift = SCROLLX & 7;
 				m_layer[0].xstart = 0;
@@ -645,8 +645,8 @@ void gb_lcd_device::update_scanline()
 					xpos = 0;
 
 				m_layer[1].bgline = m_window_lines_drawn;
-				m_layer[1].bg_map = m_vram + m_gb_wndtab_offs;
-				m_layer[1].bg_tiles = m_vram + m_gb_chrgen_offs;
+				m_layer[1].bg_map = m_vram.get() + m_gb_wndtab_offs;
+				m_layer[1].bg_tiles = m_vram.get() + m_gb_chrgen_offs;
 				m_layer[1].xindex = 0;
 				m_layer[1].xshift = 0;
 				m_layer[1].xstart = xpos;
@@ -694,7 +694,7 @@ void gb_lcd_device::update_scanline()
 				{
 					while ((m_layer[l].xshift < 8) && i)
 					{
-						register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+						int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 						plot_pixel(bitmap, xindex, m_current_line, m_gb_bpal[colour]);
 						m_bg_zbuf[xindex] = colour;
 						xindex++;
@@ -771,8 +771,8 @@ void sgb_lcd_device::update_sprites()
 	yindex = m_current_line + SGB_YOFFSET;
 	line = m_current_line + 16;
 
-	oam = m_oam + 39 * 4;
-	vram = m_vram;
+	oam = m_oam.get() + 39 * 4;
+	vram = m_vram.get();
 	for (int i = 39; i >= 0; i--)
 	{
 		/* if sprite is on current line && x-coordinate && x-coordinate is < 168 */
@@ -807,7 +807,7 @@ void sgb_lcd_device::update_sprites()
 			case 0xA0:                 /* priority is set (behind bgnd & wnd, flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour && !m_bg_zbuf[xindex - SGB_XOFFSET])
 						plot_pixel(bitmap, xindex, yindex, m_sgb_pal[pal + spal[colour]]);
 					data >>= 1;
@@ -816,7 +816,7 @@ void sgb_lcd_device::update_sprites()
 			case 0x20:                 /* priority is not set (overlaps bgnd & wnd, flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour)
 						plot_pixel(bitmap, xindex, yindex, m_sgb_pal[pal + spal[colour]]);
 					data >>= 1;
@@ -825,7 +825,7 @@ void sgb_lcd_device::update_sprites()
 			case 0x80:                 /* priority is set (behind bgnd & wnd, don't flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+					int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour && !m_bg_zbuf[xindex - SGB_XOFFSET])
 						plot_pixel(bitmap, xindex, yindex, m_sgb_pal[pal + spal[colour]]);
 					data <<= 1;
@@ -834,7 +834,7 @@ void sgb_lcd_device::update_sprites()
 			case 0x00:                 /* priority is not set (overlaps bgnd & wnd, don't flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+					int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if ((xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160) && colour)
 						plot_pixel(bitmap, xindex, yindex, m_sgb_pal[pal + spal[colour]]);
 					data <<= 1;
@@ -860,9 +860,9 @@ void sgb_lcd_device::refresh_border()
 		for (UINT16 xidx = 0; xidx < 64; xidx += 2)
 		{
 			if (map[xidx + 1] & 0x80) /* Vertical flip */
-				tiles = m_sgb_tile_data + ((7 - (yidx % 8)) << 1);
+				tiles = m_sgb_tile_data.get() + ((7 - (yidx % 8)) << 1);
 			else /* No vertical flip */
-				tiles = m_sgb_tile_data + ((yidx % 8) << 1);
+				tiles = m_sgb_tile_data.get() + ((yidx % 8) << 1);
 			tiles2 = tiles + 16;
 
 			UINT8 pal = (map[xidx + 1] & 0x1C) >> 2;
@@ -886,7 +886,7 @@ void sgb_lcd_device::refresh_border()
 
 			for (int i = 0; i < 8; i++)
 			{
-				register UINT8 colour;
+				UINT8 colour;
 				if ((map[xidx + 1] & 0x40))  /* Horizontal flip */
 				{
 					colour = ((data  & 0x0001) ? 1 : 0) | ((data  & 0x0100) ? 2 : 0) |
@@ -941,8 +941,8 @@ void sgb_lcd_device::update_scanline()
 			if (m_layer[0].enabled)
 			{
 				m_layer[0].bgline = (SCROLLY + m_current_line) & 0xFF;
-				m_layer[0].bg_map = m_vram + m_gb_bgdtab_offs;
-				m_layer[0].bg_tiles = m_vram + m_gb_chrgen_offs;
+				m_layer[0].bg_map = m_vram.get() + m_gb_bgdtab_offs;
+				m_layer[0].bg_tiles = m_vram.get() + m_gb_chrgen_offs;
 				m_layer[0].xindex = SCROLLX >> 3;
 				m_layer[0].xshift = SCROLLX & 7;
 				m_layer[0].xstart = 0;
@@ -959,8 +959,8 @@ void sgb_lcd_device::update_scanline()
 					xpos = 0;
 
 				m_layer[1].bgline = m_window_lines_drawn;
-				m_layer[1].bg_map = m_vram + m_gb_wndtab_offs;
-				m_layer[1].bg_tiles = m_vram + m_gb_chrgen_offs;
+				m_layer[1].bg_map = m_vram.get() + m_gb_wndtab_offs;
+				m_layer[1].bg_tiles = m_vram.get() + m_gb_chrgen_offs;
 				m_layer[1].xindex = 0;
 				m_layer[1].xshift = 0;
 				m_layer[1].xstart = xpos;
@@ -1041,7 +1041,7 @@ void sgb_lcd_device::update_scanline()
 
 					while ((m_layer[l].xshift < 8) && i)
 					{
-						register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+						int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 						plot_pixel(bitmap, xindex + SGB_XOFFSET, m_current_line + SGB_YOFFSET, m_sgb_pal[sgb_palette + m_gb_bpal[colour]]);
 						m_bg_zbuf[xindex] = colour;
 						xindex++;
@@ -1117,7 +1117,7 @@ void cgb_lcd_device::update_sprites()
 	yindex = m_current_line;
 	line = m_current_line + 16;
 
-	oam = m_oam + 39 * 4;
+	oam = m_oam.get() + 39 * 4;
 	for (int i = 39; i >= 0; i--)
 	{
 		/* if sprite is on current line && x-coordinate && x-coordinate is < 168 */
@@ -1149,7 +1149,7 @@ void cgb_lcd_device::update_sprites()
 			case 0xA0:                 /* priority is set (behind bgnd & wnd, flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 					{
 						if (!m_gbc_mode)
@@ -1162,7 +1162,7 @@ void cgb_lcd_device::update_sprites()
 			case 0x20:                 /* priority is not set (overlaps bgnd & wnd, flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
+					int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if ((m_bg_zbuf[xindex] & 0x80) && (m_bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
 						colour = 0;
 					if (colour && xindex >= 0 && xindex < 160)
@@ -1177,7 +1177,7 @@ void cgb_lcd_device::update_sprites()
 			case 0x80:                 /* priority is set (behind bgnd & wnd, don't flip x) */
 				for (bit = 0; bit < 8; bit++, xindex++)
 				{
-					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+					int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if (colour && !m_bg_zbuf[xindex] && xindex >= 0 && xindex < 160)
 					{
 						if (!m_gbc_mode)
@@ -1192,7 +1192,7 @@ void cgb_lcd_device::update_sprites()
 				{
 					if (xindex >= 0 && xindex < 160)
 					{
-						register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
+						int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 						if ((m_bg_zbuf[xindex] & 0x80) && (m_bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
 							colour = 0;
 						if (colour)
@@ -1236,8 +1236,8 @@ void cgb_lcd_device::update_scanline()
 			if (m_layer[0].enabled)
 			{
 				m_layer[0].bgline = (SCROLLY + m_current_line) & 0xFF;
-				m_layer[0].bg_map = m_vram + m_gb_bgdtab_offs;
-				m_layer[0].gbc_map = m_vram + m_gbc_bgdtab_offs;
+				m_layer[0].bg_map = m_vram.get() + m_gb_bgdtab_offs;
+				m_layer[0].gbc_map = m_vram.get() + m_gbc_bgdtab_offs;
 				m_layer[0].xindex = SCROLLX >> 3;
 				m_layer[0].xshift = SCROLLX & 7;
 				m_layer[0].xstart = 0;
@@ -1254,8 +1254,8 @@ void cgb_lcd_device::update_scanline()
 					xpos = 0;
 
 				m_layer[1].bgline = m_window_lines_drawn;
-				m_layer[1].bg_map = m_vram + m_gb_wndtab_offs;
-				m_layer[1].gbc_map = m_vram + m_gbc_wndtab_offs;
+				m_layer[1].bg_map = m_vram.get() + m_gb_wndtab_offs;
+				m_layer[1].gbc_map = m_vram.get() + m_gbc_wndtab_offs;
 				m_layer[1].xindex = 0;
 				m_layer[1].xshift = 0;
 				m_layer[1].xstart = xpos;
@@ -1287,7 +1287,7 @@ void cgb_lcd_device::update_scanline()
 				}
 				map = m_layer[l].bg_map + ((m_layer[l].bgline << 2) & 0x3E0);
 				gbcmap = m_layer[l].gbc_map + ((m_layer[l].bgline << 2) & 0x3E0);
-				tiles = (gbcmap[m_layer[l].xindex] & 0x08) ? (m_vram + m_gbc_chrgen_offs) : (m_vram + m_gb_chrgen_offs);
+				tiles = (gbcmap[m_layer[l].xindex] & 0x08) ? (m_vram.get() + m_gbc_chrgen_offs) : (m_vram.get() + m_gb_chrgen_offs);
 
 				/* Check for vertical flip */
 				if (gbcmap[m_layer[l].xindex] & 0x40)
@@ -1352,7 +1352,7 @@ void cgb_lcd_device::update_scanline()
 
 						m_layer[l].xindex = (m_layer[l].xindex + 1) & 31;
 						m_layer[l].xshift = 0;
-						tiles = (gbcmap[m_layer[l].xindex] & 0x08) ? (m_vram + m_gbc_chrgen_offs) : (m_vram + m_gb_chrgen_offs);
+						tiles = (gbcmap[m_layer[l].xindex] & 0x08) ? (m_vram.get() + m_gbc_chrgen_offs) : (m_vram.get() + m_gb_chrgen_offs);
 
 						/* Check for vertical flip */
 						if (gbcmap[m_layer[l].xindex] & 0x40)
@@ -2181,7 +2181,7 @@ WRITE8_MEMBER(gb_lcd_device::video_w)
 		break;
 	case 0x06:                      /* DMA - DMA Transfer and Start Address */
 		{
-			UINT8 *P = m_oam;
+			UINT8 *P = m_oam.get();
 			offset = (UINT16) data << 8;
 			for (data = 0; data < 0xA0; data++)
 				*P++ = space.read_byte(offset++);
@@ -2782,16 +2782,16 @@ void sgb_lcd_device::sgb_io_write_pal(int offs, UINT8 *data)
 			break;
 		case 0x13:  /* CHR_TRN */
 			if (data[1] & 0x1)
-				memcpy(m_sgb_tile_data + 4096, m_vram + 0x0800, 4096);
+				memcpy(m_sgb_tile_data.get() + 4096, m_vram.get() + 0x0800, 4096);
 			else
-				memcpy(m_sgb_tile_data, m_vram + 0x0800, 4096);
+				memcpy(m_sgb_tile_data.get(), m_vram.get() + 0x0800, 4096);
 			break;
 		case 0x14:  /* PCT_TRN */
 		{
 			UINT16 col;
 			if (m_sgb_border_hack)
 			{
-				memcpy(m_sgb_tile_map, m_vram + 0x1000, 2048);
+				memcpy(m_sgb_tile_map, m_vram.get() + 0x1000, 2048);
 				for (int i = 0; i < 64; i++)
 				{
 					col = (m_vram[0x0800 + (i * 2) + 1 ] << 8) | m_vram[0x0800 + (i * 2)];
@@ -2800,7 +2800,7 @@ void sgb_lcd_device::sgb_io_write_pal(int offs, UINT8 *data)
 			}
 			else /* Do things normally */
 			{
-				memcpy(m_sgb_tile_map, m_vram + 0x0800, 2048);
+				memcpy(m_sgb_tile_map, m_vram.get() + 0x0800, 2048);
 				for (int i = 0; i < 64; i++)
 				{
 					col = (m_vram[0x1000 + (i * 2) + 1] << 8) | m_vram[0x1000 + (i * 2)];
@@ -2810,7 +2810,7 @@ void sgb_lcd_device::sgb_io_write_pal(int offs, UINT8 *data)
 		}
 			break;
 		case 0x15:  /* ATTR_TRN */
-			memcpy(m_sgb_atf_data, m_vram + 0x0800, 4050);
+			memcpy(m_sgb_atf_data, m_vram.get() + 0x0800, 4050);
 			break;
 		case 0x16:  /* ATTR_SET */
 		{

@@ -108,8 +108,8 @@ public:
 	UINT8 m_adpcm_data;
 	DECLARE_WRITE8_MEMBER(controls_w);
 	DECLARE_READ8_MEMBER(controls_r);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(pachifev_vblank_irq);
 	required_device<cpu_device> m_maincpu;
 };

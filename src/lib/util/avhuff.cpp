@@ -754,7 +754,7 @@ avhuff_error avhuff_decoder::decode_data(const UINT8 *source, UINT32 complength,
 	// if we are decoding raw, set up the output parameters
 	UINT8 *metastart, *videostart, *audiostart[16];
 	UINT32 audioxor, videoxor, videostride;
-	if (dest != NULL)
+	if (dest != nullptr)
 	{
 		// create a header
 		dest[0] = 'c';
@@ -793,7 +793,7 @@ avhuff_error avhuff_decoder::decode_data(const UINT8 *source, UINT32 complength,
 		metastart = m_config.metadata;
 		for (int chnum = 0; chnum < channels; chnum++)
 			audiostart[chnum] = (UINT8 *)m_config.audio[chnum];
-		videostart = (m_config.video.valid()) ? reinterpret_cast<UINT8 *>(&m_config.video.pix(0)) : NULL;
+		videostart = (m_config.video.valid()) ? reinterpret_cast<UINT8 *>(&m_config.video.pix(0)) : nullptr;
 		videostride = (m_config.video.valid()) ? m_config.video.rowpixels() * 2 : 0;
 
 		// data is assumed to be native-endian
@@ -805,22 +805,22 @@ avhuff_error avhuff_decoder::decode_data(const UINT8 *source, UINT32 complength,
 		if (m_config.video.valid() && (m_config.video.width() < width || m_config.video.height() < height))
 			return AVHERR_VIDEO_TOO_LARGE;
 		for (int chnum = 0; chnum < channels; chnum++)
-			if (m_config.audio[chnum] != NULL && m_config.maxsamples < samples)
+			if (m_config.audio[chnum] != nullptr && m_config.maxsamples < samples)
 				return AVHERR_AUDIO_TOO_LARGE;
-		if (m_config.metadata != NULL && m_config.maxmetalength < metasize)
+		if (m_config.metadata != nullptr && m_config.maxmetalength < metasize)
 			return AVHERR_METADATA_TOO_LARGE;
 
 		// set the output values
-		if (m_config.actsamples != NULL)
+		if (m_config.actsamples != nullptr)
 			*m_config.actsamples = samples;
-		if (m_config.actmetalength != NULL)
+		if (m_config.actmetalength != nullptr)
 			*m_config.actmetalength = metasize;
 	}
 
 	// copy the metadata first
 	if (metasize > 0)
 	{
-		if (metastart != NULL)
+		if (metastart != nullptr)
 			memcpy(metastart, source + srcoffs, metasize);
 		srcoffs += metasize;
 	}
@@ -842,7 +842,7 @@ avhuff_error avhuff_decoder::decode_data(const UINT8 *source, UINT32 complength,
 	}
 
 	// decode the video data
-	if (width > 0 && height > 0 && videostart != NULL)
+	if (width > 0 && height > 0 && videostart != nullptr)
 	{
 		// decode the video
 		avhuff_error err = decode_video(width, height, source + srcoffs, complength - srcoffs, videostart, videostride, videoxor);
@@ -897,7 +897,7 @@ avhuff_error avhuff_decoder::decode_audio(int channels, int samples, const UINT8
 
 			// only process if the data is requested
 			UINT8 *curdest = dest[chnum];
-			if (curdest != NULL)
+			if (curdest != nullptr)
 			{
 				// reset and decode
 				if (!m_flac_decoder.reset(48000, 1, samples, source, size))
@@ -941,7 +941,7 @@ avhuff_error avhuff_decoder::decode_audio(int channels, int samples, const UINT8
 
 		// only process if the data is requested
 		UINT8 *curdest = dest[chnum];
-		if (curdest != NULL)
+		if (curdest != nullptr)
 		{
 			INT16 prevsample = 0;
 

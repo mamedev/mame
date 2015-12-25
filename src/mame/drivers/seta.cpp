@@ -1397,7 +1397,7 @@ static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int 
 	} else {
 		uPD71054->timer[no]->adjust( attotime::never, no);
 		state->logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
-				(cpu != NULL) ? cpu->safe_pc() : -1, no );
+				(cpu != nullptr) ? cpu->safe_pc() : -1, no );
 	}
 }
 
@@ -1409,7 +1409,7 @@ static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int 
 TIMER_CALLBACK_MEMBER(seta_state::uPD71054_timer_callback)
 {
 	m_maincpu->set_input_line(4, HOLD_LINE );
-	uPD71054_update_timer( machine(), NULL, param );
+	uPD71054_update_timer( machine(), nullptr, param );
 }
 
 
@@ -9396,7 +9396,7 @@ static MACHINE_CONFIG_START( zingzip, seta_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(57.42) // taken from other games but seems to better match PCB videos
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
@@ -11100,7 +11100,7 @@ ROM_START( magspeed )
 	ROM_LOAD( "fu001006.152", 0x000000, 0x100000, CRC(70855139) SHA1(24d635aceb823b0569169c8ecced13ac82c17d6a) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* Layer 1 */
-	ROM_COPY( "user1", 0x00000, 0x00000, 0x80000 )
+	ROM_COPY( "user1", 0x000000, 0x00000, 0x80000 )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* Layer 2 */
 	ROM_COPY( "user1", 0x80000, 0x00000, 0x80000 )

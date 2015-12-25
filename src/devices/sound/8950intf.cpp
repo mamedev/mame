@@ -147,7 +147,7 @@ void y8950_device::device_start()
 
 	/* stream system initialize */
 	m_chip = y8950_init(this,clock(),rate);
-	assert_always(m_chip != NULL, "Error creating Y8950 chip");
+	assert_always(m_chip != nullptr, "Error creating Y8950 chip");
 
 	/* ADPCM ROM data */
 	y8950_set_delta_t_memory(m_chip, region()->base(), region()->bytes());
@@ -206,8 +206,8 @@ const device_type Y8950 = &device_creator<y8950_device>;
 y8950_device::y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, Y8950, "Y8950", tag, owner, clock, "y8950", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_stream(NULL),
-		m_chip(NULL),
+		m_stream(nullptr),
+		m_chip(nullptr),
 		m_irq_handler(*this),
 		m_keyboard_read_handler(*this),
 		m_keyboard_write_handler(*this),

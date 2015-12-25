@@ -78,7 +78,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
 	DECLARE_WRITE8_MEMBER(pia_comp_w);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_WRITE8_MEMBER(ttl74123_output_changed);
 
 	MC6845_UPDATE_ROW(crtc_update_row);

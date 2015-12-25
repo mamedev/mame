@@ -48,7 +48,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	DECLARE_DRIVER_INIT(poolshrk);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(poolshrk);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

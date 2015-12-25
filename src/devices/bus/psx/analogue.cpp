@@ -255,7 +255,7 @@ static INPUT_PORTS_START( psx_analog_controller )
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Left Analog Y") PORT_SENSITIVITY(100)
 
 	PORT_START("PSXMISC")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Analog") PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, psx_analog_controller_device, change_mode, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Analog") PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, psx_analog_controller_device, change_mode, nullptr)
 INPUT_PORTS_END
 
 ioport_constructor psx_analog_controller_device::device_input_ports() const

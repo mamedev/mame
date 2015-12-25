@@ -121,13 +121,13 @@ const floppy_format_type floppy_image_device::default_floppy_formats[] = {
 	FLOPPY_TD0_FORMAT,
 	FLOPPY_CQM_FORMAT,
 	FLOPPY_DSK_FORMAT,
-	NULL
+	nullptr
 };
 
 floppy_connector::floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, FLOPPY_CONNECTOR, "Floppy drive connector abstraction", tag, owner, clock, "floppy_connector", __FILE__),
 	device_slot_interface(mconfig, *this),
-	formats(NULL),
+	formats(nullptr),
 	m_enable_sound(false)
 {
 }
@@ -168,11 +168,11 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_image_interface(mconfig, *this),
 		device_slot_card_interface(mconfig, *this),
-		input_format(NULL),
-		output_format(NULL),
-		image(NULL),
-		fif_list(NULL),
-		index_timer(NULL),
+		input_format(nullptr),
+		output_format(nullptr),
+		image(nullptr),
+		fif_list(nullptr),
+		index_timer(nullptr),
 		tracks(0),
 		sides(0),
 		form_factor(0),
@@ -187,7 +187,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		image_dirty(false),
 		ready_counter(0),
 		m_make_sound(false),
-		m_sound_out(NULL)
+		m_sound_out(nullptr)
 {
 	extension_list[0] = '\0';
 	m_err = IMAGE_ERROR_INVALIDIMAGE;
@@ -204,7 +204,7 @@ floppy_image_device::~floppy_image_device()
 		format = format->next;
 		delete tmp_format;
 	}
-	fif_list = NULL;
+	fif_list = nullptr;
 }
 
 void floppy_image_device::setup_load_cb(load_cb cb)
@@ -235,7 +235,7 @@ void floppy_image_device::setup_wpt_cb(wpt_cb cb)
 void floppy_image_device::set_formats(const floppy_format_type *formats)
 {
 	extension_list[0] = '\0';
-	fif_list = NULL;
+	fif_list = nullptr;
 	for(int cnt=0; formats[cnt]; cnt++)
 	{
 		// allocate a new format
@@ -369,7 +369,7 @@ floppy_image_format_t *floppy_image_device::identify(std::string filename)
 	file_error err = zippath_fopen(filename.c_str(), OPEN_FLAG_READ, fd, revised_path);
 	if(err) {
 		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to open the image file");
-		return 0;
+		return nullptr;
 	}
 
 	io_generic io;
@@ -377,7 +377,7 @@ floppy_image_format_t *floppy_image_device::identify(std::string filename)
 	io.procs = &corefile_ioprocs_noclose;
 	io.filler = 0xff;
 	int best = 0;
-	floppy_image_format_t *best_format = 0;
+	floppy_image_format_t *best_format = nullptr;
 	for(floppy_image_format_t *format = fif_list; format; format = format->next) {
 		int score = format->identify(&io, form_factor);
 		if(score > best) {
@@ -398,7 +398,7 @@ bool floppy_image_device::call_load()
 	io.procs = &image_ioprocs;
 	io.filler = 0xff;
 	int best = 0;
-	floppy_image_format_t *best_format = 0;
+	floppy_image_format_t *best_format = nullptr;
 	for(floppy_image_format_t *format = fif_list; format; format = format->next) {
 		int score = format->identify(&io, form_factor);
 		if(score > best) {
@@ -415,7 +415,7 @@ bool floppy_image_device::call_load()
 
 	image = global_alloc(floppy_image(tracks, sides, form_factor));
 	best_format->load(&io, form_factor, image);
-	output_format = is_readonly() ? 0 : best_format;
+	output_format = is_readonly() ? nullptr : best_format;
 
 	revolution_start_time = mon ? attotime::never : machine().time();
 	revolution_count = 0;
@@ -427,7 +427,7 @@ bool floppy_image_device::call_load()
 	if (!cur_wpt_cb.isnull())
 		cur_wpt_cb(this, wpt);
 
-	wpt = is_readonly() || (output_format == 0);
+	wpt = is_readonly() || (output_format == nullptr);
 	if (!cur_wpt_cb.isnull())
 		cur_wpt_cb(this, wpt);
 
@@ -451,7 +451,7 @@ void floppy_image_device::call_unload()
 		if(image_dirty)
 			commit_image();
 		global_free(image);
-		image = 0;
+		image = nullptr;
 	}
 
 	wpt = 1; // disk sleeve is covering the sensor
@@ -478,7 +478,7 @@ void floppy_image_device::call_unload()
 bool floppy_image_device::call_create(int format_type, option_resolution *format_options)
 {
 	image = global_alloc(floppy_image(tracks, sides, form_factor));
-	output_format = 0;
+	output_format = nullptr;
 
 	// search for a suitable format based on the extension
 	for(floppy_image_format_t *i = fif_list; i; i = i->next)
@@ -495,7 +495,7 @@ bool floppy_image_device::call_create(int format_type, option_resolution *format
 	}
 
 	// did we find a suitable format?
-	if (output_format == 0)
+	if (output_format == nullptr)
 	{
 		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to identify the image format");
 		return IMAGE_INIT_FAIL;
@@ -946,7 +946,7 @@ ui_menu_control_floppy_image::ui_menu_control_floppy_image(running_machine &mach
 		fcnt++;
 
 	format_array = global_alloc_array(floppy_image_format_t *, fcnt);
-	input_format = output_format = 0;
+	input_format = output_format = nullptr;
 	input_filename = output_filename = "";
 }
 
@@ -959,7 +959,7 @@ void ui_menu_control_floppy_image::do_load_create()
 {
 	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
 	if(input_filename.compare("")==0) {
-		int err = fd->create(output_filename.c_str(), 0, NULL);
+		int err = fd->create(output_filename.c_str(), nullptr, nullptr);
 		if (err != 0) {
 			machine().popmessage("Error: %s", fd->error());
 			return;
@@ -1104,7 +1104,7 @@ void ui_menu_control_floppy_image::handle()
 
 floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: samples_device(mconfig, FLOPPYSOUND, "Floppy sound", tag, owner, clock, "flopsnd", __FILE__),
-		m_sound(NULL),
+		m_sound(nullptr),
 		m_is525(false),
 		m_sampleindex_motor_start(0),
 		m_sampleindex_motor_loop(0),
@@ -1149,7 +1149,7 @@ void floppy_sound_device::device_start()
 	m_step_playback_state = 0;  // 0 == currently not playing, > 0 = playing one of the step samples from start to end
 
 	m_motor_on = false;
-	m_is525 = strstr(tag(), "525") != NULL;
+	m_is525 = strstr(tag(), "525") != nullptr;
 	if (m_is525)
 	{
 		m_sampleindex_motor_start = 2;
@@ -1171,7 +1171,7 @@ void floppy_sound_device::device_start()
 	m_samplesize_motor_start = 0;
 	m_samplesize_motor_loop = 0;
 	m_samplesize_motor_end = 0;
-	for (int i = 0; i < MAX_STEP_SAMPLES; ++i) m_samplesize_step[i] = 0;
+	for (auto & elem : m_samplesize_step) elem = 0;
 
 	// Read audio samples. The samples are stored in the list m_samples.
 	m_loaded = load_samples();
@@ -1310,7 +1310,7 @@ static const char *const floppy_sample_names[] =
 	"floppy_525_step3",
 	"floppy_525_step4",
 	"floppy_525_step5",
-	0
+	nullptr
 };
 
 #define FLOPSPK "flopsndout"

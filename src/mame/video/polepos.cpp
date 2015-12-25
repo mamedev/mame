@@ -408,7 +408,7 @@ void polepos_state::draw_road(bitmap_ind16 &bitmap)
 		}
 
 		/* draw the scanline */
-		draw_scanline16(bitmap, 0, y, 256, &scanline[xscroll], NULL);
+		draw_scanline16(bitmap, 0, y, 256, &scanline[xscroll], nullptr);
 	}
 }
 

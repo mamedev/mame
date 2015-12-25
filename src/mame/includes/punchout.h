@@ -78,7 +78,7 @@ public:
 	TILE_GET_INFO_MEMBER(armwrest_fg_get_info);
 	TILEMAP_MAPPER_MEMBER(armwrest_bs1_scan);
 	TILEMAP_MAPPER_MEMBER(armwrest_bs1_scan_flipx);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(armwrest);
 	DECLARE_MACHINE_RESET(spnchout);
 	UINT32 screen_update_punchout_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -70,7 +70,7 @@ const address_space_config *lpc210x_device::memory_space_config(address_spacenum
 	switch(spacenum)
 	{
 	case AS_PROGRAM:           return &m_program_config;
-	default:                   return NULL;
+	default:                   return nullptr;
 	}
 }
 

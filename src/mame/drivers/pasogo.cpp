@@ -160,8 +160,8 @@ public:
 		} pmu;
 	} m_vg230;
 
-	void machine_reset();
-	void machine_start();
+	void machine_reset() override;
+	void machine_start() override;
 
 	UINT32 screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
@@ -527,7 +527,7 @@ void pasogo_state::machine_reset()
 	membank("bank27")->set_base(m_cart_rom->base());
 	m_ems_index = 0;
 	memset(m_ems_bank, 0, sizeof(m_ems_bank));
-	contrast(*color->first_field(), NULL, 0, color->read());
+	contrast(*color->first_field(), nullptr, 0, color->read());
 }
 
 static MACHINE_CONFIG_START( pasogo, pasogo_state )

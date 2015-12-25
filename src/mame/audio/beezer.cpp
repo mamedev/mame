@@ -83,7 +83,7 @@ beezer_sound_device::beezer_sound_device(const machine_config &mconfig, const ch
 		m_sh6840_latchwriteold(0),
 		m_sh6840_noiselatch1(0),
 		m_sh6840_noiselatch3(0),
-		m_stream(NULL)/*,
+		m_stream(nullptr)/*,
         m_freq_to_step(0)*/
 {
 	memset(m_sh6840_timer, 0, sizeof(m_sh6840_timer));
@@ -192,7 +192,7 @@ void beezer_sound_device::device_reset()
  *
  *************************************/
 // need to set int_flag properly here
-INLINE void sh6840_apply_clock(struct sh6840_timer_channel_beez *t, int clocks)
+static inline void sh6840_apply_clock(struct sh6840_timer_channel_beez *t, int clocks)
 {
 	/* dual 8-bit case */
 	if (t->cr & 0x04)

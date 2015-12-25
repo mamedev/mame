@@ -26,7 +26,7 @@ void igs028_device::device_validity_check(validity_checker &valid) const
 
 void igs028_device::device_start()
 {
-	m_sharedprotram = 0;
+	m_sharedprotram = nullptr;
 
 
 }

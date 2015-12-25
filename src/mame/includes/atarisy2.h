@@ -68,10 +68,10 @@ public:
 
 	UINT16          m_vram[0x8000/2];
 
-	virtual void device_post_load();
+	virtual void device_post_load() override;
 
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(int0_ack_w);
 	DECLARE_WRITE16_MEMBER(int1_ack_w);
 	DECLARE_WRITE16_MEMBER(int_enable_w);

@@ -36,6 +36,8 @@ memorywin_info::memorywin_info(debugger_windows_interface &debugger) :
 	AppendMenu(optionsmenu, MF_ENABLED, ID_4_BYTE_CHUNKS, TEXT("4-byte chunks\tCtrl+4"));
 	AppendMenu(optionsmenu, MF_ENABLED, ID_8_BYTE_CHUNKS, TEXT("8-byte chunks\tCtrl+8"));
 	AppendMenu(optionsmenu, MF_ENABLED, ID_FLOATING_POINT_32BIT, TEXT("32 bit floating point\tCtrl+9"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_FLOATING_POINT_64BIT, TEXT("64 bit floating point"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_FLOATING_POINT_80BIT, TEXT("80 bit floating point"));
 	AppendMenu(optionsmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
 	AppendMenu(optionsmenu, MF_ENABLED, ID_LOGICAL_ADDRESSES, TEXT("Logical Addresses\tCtrl+L"));
 	AppendMenu(optionsmenu, MF_ENABLED, ID_PHYSICAL_ADDRESSES, TEXT("Physical Addresses\tCtrl+Y"));
@@ -182,6 +184,8 @@ void memorywin_info::update_menu()
 	CheckMenuItem(menu, ID_4_BYTE_CHUNKS, MF_BYCOMMAND | (memview->data_format() == 4 ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(menu, ID_8_BYTE_CHUNKS, MF_BYCOMMAND | (memview->data_format() == 8 ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(menu, ID_FLOATING_POINT_32BIT, MF_BYCOMMAND | (memview->data_format() == 9 ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_FLOATING_POINT_64BIT, MF_BYCOMMAND | (memview->data_format() == 10 ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_FLOATING_POINT_80BIT, MF_BYCOMMAND | (memview->data_format() == 11 ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(menu, ID_LOGICAL_ADDRESSES, MF_BYCOMMAND | (memview->physical() ? MF_UNCHECKED : MF_CHECKED));
 	CheckMenuItem(menu, ID_PHYSICAL_ADDRESSES, MF_BYCOMMAND | (memview->physical() ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(menu, ID_REVERSE_VIEW, MF_BYCOMMAND | (memview->reverse() ? MF_CHECKED : MF_UNCHECKED));
@@ -232,6 +236,14 @@ bool memorywin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 		case ID_FLOATING_POINT_32BIT:
 			memview->set_data_format(9);
+			return true;
+
+		case ID_FLOATING_POINT_64BIT:
+			memview->set_data_format(10);
+			return true;
+
+		case ID_FLOATING_POINT_80BIT:
+			memview->set_data_format(11);
 			return true;
 
 		case ID_LOGICAL_ADDRESSES:

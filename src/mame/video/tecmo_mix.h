@@ -19,8 +19,8 @@ public:
 	static void set_bgpen(device_t &device, int bgpen);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// mixer shifts
 	int m_sprpri_shift;

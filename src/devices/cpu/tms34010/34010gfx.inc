@@ -1820,7 +1820,7 @@ void FUNCTION_NAME(tms340x0_device::fill)(int dst_is_linear)
 		if (!dst_is_linear)
 		{
 			dstxy = DADDR_XY();
-			m_gfxcycles += 2 + apply_window("FILL", 0, NULL, &dstxy, &dx, &dy);
+			m_gfxcycles += 2 + apply_window("FILL", 0, nullptr, &dstxy, &dx, &dy);
 			daddr = DXYTOL(dstxy);
 		}
 		else

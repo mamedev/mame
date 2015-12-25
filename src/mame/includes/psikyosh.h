@@ -49,7 +49,7 @@ public:
 	bitmap_ind8 m_zoom_bitmap;
 	bitmap_ind16 m_z_bitmap;
 	bitmap_rgb32   m_bg_bitmap;
-	UINT16         *m_bg_zoom;
+	std::unique_ptr<UINT16[]>   m_bg_zoom;
 	UINT8          m_alphatable[256];
 
 	/* devices */
@@ -67,8 +67,8 @@ public:
 	DECLARE_DRIVER_INIT(ps3);
 	DECLARE_DRIVER_INIT(ps5);
 	DECLARE_DRIVER_INIT(mjgtaste);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	void ps3_init();
 	void ps5_init();
 	UINT32 screen_update_psikyosh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

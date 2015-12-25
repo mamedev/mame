@@ -37,7 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 private:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 

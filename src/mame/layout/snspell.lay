@@ -3,7 +3,7 @@
 
 <!-- define elements -->
 
-<!-- note: the TI Speak & Spell 14seg digits look different from MAME's default, most notably the right half is wider -->
+<!-- note: TI's alphanumeric 14seg digits look different from MAME's default, most notably the right half is wider -->
 
 	<element name="digit" defstate="0">
 		<led14seg><color red="0.2" green="1.0" blue="0.85" /></led14seg>

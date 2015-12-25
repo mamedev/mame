@@ -36,7 +36,7 @@ const device_type AMIGA = &device_creator<amiga_sound_device>;
 amiga_sound_device::amiga_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AMIGA, "Amiga Paula", tag, owner, clock, "amiga_paula", __FILE__),
 	device_sound_interface(mconfig, *this),
-	m_stream(NULL)
+	m_stream(nullptr)
 {
 }
 
@@ -232,7 +232,7 @@ void amiga_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 				// if we're in manual mode, signal an interrupt once we latch the low byte
 				if (!chan->dma_enabled && chan->manualmode && (chan->curlocation & 1))
 				{
-					signal_irq(NULL, channum);
+					signal_irq(nullptr, channum);
 					chan->manualmode = false;
 				}
 			}

@@ -23,18 +23,18 @@ ui_menu_pty_info::~ui_menu_pty_info()
 
 void ui_menu_pty_info::populate()
 {
-	item_append("Pseudo terminals", NULL, MENU_FLAG_DISABLE, NULL);
-	item_append("", NULL, MENU_FLAG_DISABLE, NULL);
+	item_append("Pseudo terminals", nullptr, MENU_FLAG_DISABLE, nullptr);
+	item_append("", nullptr, MENU_FLAG_DISABLE, nullptr);
 
 	pty_interface_iterator iter(machine().root_device());
-	for (device_pty_interface *pty = iter.first(); pty != NULL; pty = iter.next()) {
+	for (device_pty_interface *pty = iter.first(); pty != nullptr; pty = iter.next()) {
 		const char *port_name = pty->device().owner()->tag() + 1;
 		if (pty->is_open()) {
-			item_append(port_name , pty->slave_name() , MENU_FLAG_DISABLE , NULL);
+			item_append(port_name , pty->slave_name() , MENU_FLAG_DISABLE , nullptr);
 		} else {
-			item_append(port_name , "[failed]" , MENU_FLAG_DISABLE , NULL);
+			item_append(port_name , "[failed]" , MENU_FLAG_DISABLE , nullptr);
 		}
-		item_append("", NULL, MENU_FLAG_DISABLE, NULL);
+		item_append("", nullptr, MENU_FLAG_DISABLE, nullptr);
 	}
 }
 

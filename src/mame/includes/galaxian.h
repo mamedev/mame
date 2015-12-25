@@ -118,7 +118,7 @@ public:
 	UINT32 m_star_rng_origin;
 	UINT32 m_star_rng_origin_frame;
 	rgb_t m_star_color[64];
-	UINT8 *m_stars;
+	std::unique_ptr<UINT8[]> m_stars;
 	UINT8 m_stars_enabled;
 	UINT8 m_stars_blink_state;
 	rgb_t m_bullet_color[8];
@@ -258,8 +258,9 @@ public:
 	DECLARE_DRIVER_INIT(moonwar);
 	DECLARE_DRIVER_INIT(ghostmun);
 	DECLARE_DRIVER_INIT(froggrs);
+	DECLARE_DRIVER_INIT(warofbugg);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(galaxian);
 	DECLARE_PALETTE_INIT(moonwar);
 	void tenspot_set_game_bank(int bank, int from_game);

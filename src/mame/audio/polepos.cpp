@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Derrick Renaud
 /***************************************************************************
     polepos.c
@@ -58,7 +58,7 @@ polepos_sound_device::polepos_sound_device(const machine_config &mconfig, const 
 		m_sample_msb(0),
 		m_sample_lsb(0),
 		m_sample_enable(0),
-		m_stream(NULL)
+		m_stream(nullptr)
 {
 }
 

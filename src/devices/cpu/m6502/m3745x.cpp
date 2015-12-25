@@ -90,7 +90,7 @@ void m3745x_device::device_start()
 
 	for (int i = 0; i < NUM_TIMERS; i++)
 	{
-		m_timers[i] = timer_alloc(i, NULL);
+		m_timers[i] = timer_alloc(i, nullptr);
 	}
 
 	m740_device::device_start();
@@ -123,9 +123,9 @@ void m3745x_device::device_reset()
 
 	SP = 0x01ff;    // we have the "traditional" stack in page 1, not 0 like some M740 derivatives
 
-	for (int i = 0; i < NUM_TIMERS; i++)
+	for (auto & elem : m_timers)
 	{
-		m_timers[i]->adjust(attotime::never);
+		elem->adjust(attotime::never);
 	}
 
 	// all ports reset to input on startup

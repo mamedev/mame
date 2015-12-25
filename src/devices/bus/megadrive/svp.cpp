@@ -60,7 +60,7 @@ md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, const char *
 
 // HELPERS
 
-INLINE int get_inc(int mode)
+static inline int get_inc(int mode)
 {
 	int inc = (mode >> 11) & 7;
 	if (inc != 0) {
@@ -71,7 +71,7 @@ INLINE int get_inc(int mode)
 	return inc;
 }
 
-INLINE void overwrite_write(UINT16 *dst, UINT16 d)
+static inline void overwrite_write(UINT16 *dst, UINT16 d)
 {
 	if (d & 0xf000) { *dst &= ~0xf000; *dst |= d & 0xf000; }
 	if (d & 0x0f00) { *dst &= ~0x0f00; *dst |= d & 0x0f00; }

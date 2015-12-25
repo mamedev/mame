@@ -34,7 +34,7 @@ public:
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	required_shared_ptr<UINT8> m_p_ram;
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 

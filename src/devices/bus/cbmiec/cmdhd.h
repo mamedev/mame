@@ -43,21 +43,21 @@ public:
 	cmd_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_WRITE8_MEMBER( led_w );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_cbm_iec_interface overrides
-	void cbm_iec_srq(int state);
-	void cbm_iec_atn(int state);
-	void cbm_iec_data(int state);
-	void cbm_iec_reset(int state);
+	void cbm_iec_srq(int state) override;
+	void cbm_iec_atn(int state) override;
+	void cbm_iec_data(int state) override;
+	void cbm_iec_reset(int state) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<SCSI_PORT_DEVICE> m_scsibus;

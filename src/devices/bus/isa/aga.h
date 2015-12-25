@@ -40,11 +40,11 @@ public:
 	isa8_aga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	isa8_aga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
 	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
@@ -93,7 +93,7 @@ public:
 
 	UINT8   m_cga_palette_lut_2bpp[4];
 
-	UINT8  *m_videoram;
+	std::unique_ptr<UINT8[]>  m_videoram;
 };
 
 // device type definition
@@ -108,9 +108,9 @@ public:
 	// construction/destruction
 	isa8_aga_pc200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 
 	UINT8 m_port8;
 	UINT8 m_portd;

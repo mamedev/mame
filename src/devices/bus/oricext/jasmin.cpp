@@ -23,14 +23,14 @@ static MACHINE_CONFIG_FRAGMENT( jasmin )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(oricext_device, irq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", jasmin_floppies, "3dsdd", jasmin_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", jasmin_floppies, NULL,    jasmin_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", jasmin_floppies, NULL,    jasmin_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", jasmin_floppies, NULL,    jasmin_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", jasmin_floppies, nullptr,    jasmin_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", jasmin_floppies, nullptr,    jasmin_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", jasmin_floppies, nullptr,    jasmin_device::floppy_formats)
 MACHINE_CONFIG_END
 
 INPUT_PORTS_START( jasmin )
 	PORT_START("JASMIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Boot") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHANGED_MEMBER(DEVICE_SELF, jasmin_device, boot_pressed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Boot") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHANGED_MEMBER(DEVICE_SELF, jasmin_device, boot_pressed, nullptr)
 INPUT_PORTS_END
 
 DEVICE_ADDRESS_MAP_START(map, 8, jasmin_device)
@@ -70,8 +70,8 @@ void jasmin_device::device_reset()
 	side_sel = fdc_reset = ram_access = rom_access = false;
 	select[0] = select[1] = select[2] = select[3] = false;
 	remap();
-	cur_floppy = NULL;
-	fdc->set_floppy(NULL);
+	cur_floppy = nullptr;
+	fdc->set_floppy(nullptr);
 }
 
 const rom_entry *jasmin_device::device_rom_region() const
@@ -164,7 +164,7 @@ WRITE8_MEMBER(jasmin_device::rom_access_w)
 WRITE8_MEMBER(jasmin_device::select_w)
 {
 	select[offset] = data & 1;
-	cur_floppy = NULL;
+	cur_floppy = nullptr;
 	for(int i=0; i != 4; i++)
 		if(select[i]) {
 			cur_floppy = floppies[i];

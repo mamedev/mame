@@ -39,7 +39,9 @@ public:
 		m_io_dsw1(*this, "DSW1"),
 		m_io_dsw2(*this, "DSW2"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen")
+		{ }
 
 	required_shared_ptr<UINT16> m_vregs;
 	required_shared_ptr<UINT16> m_objectram;
@@ -58,6 +60,9 @@ public:
 	optional_ioport m_io_dsw2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+
+	bitmap_ind16 m_sprite_buffer_bitmap;
 
 	UINT16 *m_spriteram;
 	UINT16 m_ip_select;
@@ -77,10 +82,10 @@ public:
 	tilemap_t *m_tmap[3];
 	tilemap_t *m_tilemap[3][2][4];
 	int m_hardware_type_z;
-	UINT16 *m_buffer_objectram;
-	UINT16 *m_buffer2_objectram;
-	UINT16 *m_buffer_spriteram16;
-	UINT16 *m_buffer2_spriteram16;
+	std::unique_ptr<UINT16[]> m_buffer_objectram;
+	std::unique_ptr<UINT16[]> m_buffer2_objectram;
+	std::unique_ptr<UINT16[]> m_buffer_spriteram16;
+	std::unique_ptr<UINT16[]> m_buffer2_spriteram16;
 	int m_layers_order[16];
 
 	int m_mcu_hs;
@@ -149,10 +154,15 @@ public:
 	INTERRUPT_GEN_MEMBER(megasys1D_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1B_scanline);
+	DECLARE_WRITE16_MEMBER(ms1_ram_w);
+
 	inline void scrollram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int which);
 	void create_tilemaps();
 	void megasys1_priority_create();
+	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void partial_clear_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 param);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
+	inline void draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, INT32 code, INT32 color, INT32 sx, INT32 sy, INT32 flipx, INT32 flipy, UINT8 mosaic, UINT8 mosaicsol, INT32 priority);
 	void rodland_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);
 	void stdragona_gfx_unmangle(const char *region);

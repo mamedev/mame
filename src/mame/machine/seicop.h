@@ -14,9 +14,9 @@ seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_
 	DECLARE_WRITE16_MEMBER( copdxbl_0_w );
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	UINT16 *m_cop_mcu_ram;

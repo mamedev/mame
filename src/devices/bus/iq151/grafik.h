@@ -24,7 +24,7 @@ public:
 	iq151_grafik_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// ppi8255 callback
 	DECLARE_WRITE8_MEMBER(x_write);
@@ -33,13 +33,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// iq151cart_interface overrides
-	virtual void io_read(offs_t offset, UINT8 &data);
-	virtual void io_write(offs_t offset, UINT8 data);
-	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void io_read(offs_t offset, UINT8 &data) override;
+	virtual void io_write(offs_t offset, UINT8 data) override;
+	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
 

@@ -41,7 +41,7 @@ void eprom_state::update_interrupts()
 {
 	m_maincpu->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 
-	if (m_extra != NULL)
+	if (m_extra != nullptr)
 		m_extra->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 
 	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
@@ -89,7 +89,7 @@ READ16_MEMBER(eprom_state::adc_r)
 
 WRITE16_MEMBER(eprom_state::eprom_latch_w)
 {
-	if (ACCESSING_BITS_0_7 && (m_extra != NULL))
+	if (ACCESSING_BITS_0_7 && (m_extra != nullptr))
 	{
 		/* bit 0: reset extra CPU */
 		if (data & 1)

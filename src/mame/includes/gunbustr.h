@@ -44,7 +44,7 @@ public:
 
 	bool m_coin_lockout;
 	UINT16 m_coin_word;
-	struct gb_tempsprite *m_spritelist;
+	std::unique_ptr<gb_tempsprite[]> m_spritelist;
 	UINT32 m_mem[2];
 
 	DECLARE_WRITE32_MEMBER(gunbustr_input_w);
@@ -55,11 +55,11 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
 	DECLARE_DRIVER_INIT(gunbustrj);
 	DECLARE_DRIVER_INIT(gunbustr);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_gunbustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gunbustr_interrupt);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

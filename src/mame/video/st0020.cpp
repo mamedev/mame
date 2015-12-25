@@ -73,21 +73,21 @@ static const gfx_layout layout_16x8x8_2 =
 
 void st0020_device::device_start()
 {
-	m_st0020_gfxram = auto_alloc_array_clear(machine(), UINT16, 4 * 0x100000 / 2);
-	m_st0020_spriteram = auto_alloc_array_clear(machine(), UINT16, 0x80000 / 2);
-	m_st0020_blitram = auto_alloc_array_clear(machine(), UINT16, 0x100 / 2);
+	m_st0020_gfxram = make_unique_clear<UINT16[]>(4 * 0x100000 / 2);
+	m_st0020_spriteram = make_unique_clear<UINT16[]>(0x80000 / 2);
+	m_st0020_blitram = make_unique_clear<UINT16[]>(0x100 / 2);
 
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
-		if (m_gfxdecode->gfx(m_gfx_index) == 0)
+		if (m_gfxdecode->gfx(m_gfx_index) == nullptr)
 			break;
 
-	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, layout_16x8x8_2, (UINT8 *)m_st0020_gfxram, 0, m_palette->entries() / 64, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(m_palette, layout_16x8x8_2, (UINT8 *)m_st0020_gfxram.get(), 0, m_palette->entries() / 64, 0));
 
 	m_gfxdecode->gfx(m_gfx_index)->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
 
-	save_pointer(NAME(m_st0020_gfxram), 4 * 0x100000/2);
-	save_pointer(NAME(m_st0020_spriteram), 0x80000/2);
-	save_pointer(NAME(m_st0020_blitram), 0x100/2);
+	save_pointer(NAME(m_st0020_gfxram.get()), 4 * 0x100000/2);
+	save_pointer(NAME(m_st0020_spriteram.get()), 0x80000/2);
+	save_pointer(NAME(m_st0020_blitram.get()), 0x100/2);
 	save_item(NAME(m_st0020_gfxram_bank));
 }
 
@@ -154,7 +154,7 @@ READ16_MEMBER(st0020_device::st0020_blitram_r)
 
 WRITE16_MEMBER(st0020_device::st0020_blit_w)
 {
-	UINT16 *st0020_blitram = m_st0020_blitram;
+	UINT16 *st0020_blitram = m_st0020_blitram.get();
 
 	COMBINE_DATA(&st0020_blitram[offset]);
 
@@ -283,7 +283,7 @@ WRITE16_MEMBER(st0020_device::st0020_blitram_w)
 void st0020_device::st0020_draw_zooming_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	/* Sprites list */
-	UINT16 *spriteram16_2 = m_st0020_spriteram;
+	UINT16 *spriteram16_2 = m_st0020_spriteram.get();
 	UINT16 *s1  =   spriteram16_2;
 	UINT16 *end1    =   spriteram16_2 + 0x02000/2;
 

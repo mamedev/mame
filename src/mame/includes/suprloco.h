@@ -33,7 +33,7 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(suprloco);
 	DECLARE_DRIVER_INIT(suprloco);
 

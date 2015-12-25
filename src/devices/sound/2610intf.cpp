@@ -161,7 +161,7 @@ void ym2610_device::device_start()
 	name.append(".deltat");
 	pcmbufb = (void *)(machine().root_device().memregion(name.c_str())->base());
 	pcmsizeb = machine().root_device().memregion(name.c_str())->bytes();
-	if (pcmbufb == NULL || pcmsizeb == 0)
+	if (pcmbufb == nullptr || pcmsizeb == 0)
 	{
 		pcmbufb = pcmbufa;
 		pcmsizeb = pcmsizea;
@@ -171,7 +171,7 @@ void ym2610_device::device_start()
 	m_chip = ym2610_init(this,this,clock(),rate,
 					pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 					timer_handler,IRQHandler,&psgintf);
-	assert_always(m_chip != NULL, "Error creating YM2610 chip");
+	assert_always(m_chip != nullptr, "Error creating YM2610 chip");
 }
 
 //-------------------------------------------------

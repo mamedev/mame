@@ -135,7 +135,7 @@ public:
 		m_fdc(*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
 		m_floppy1(*this, "fdc:1"),
-		m_floppy(NULL),
+		m_floppy(nullptr),
 		m_kanji(*this, "kanji1"),
 		m_key1(*this, "key1"),
 		m_key2(*this, "key2"),
@@ -194,7 +194,7 @@ public:
 	fm7_encoder_t m_encoder;
 	fm7_mmr_t m_mmr;
 	UINT8 m_cp_prev;
-	UINT8* m_video_ram;
+	std::unique_ptr<UINT8[]> m_video_ram;
 	emu_timer* m_fm77av_vsync_timer;
 	UINT8 m_type;
 	fm7_video_t m_video;
@@ -289,8 +289,8 @@ public:
 	void fm77av_encoder_setup_command();
 	void fm77av_encoder_handle_command();
 	DECLARE_DRIVER_INIT(fm7);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(fm7);
 	DECLARE_MACHINE_START(fm77av);
 	DECLARE_MACHINE_START(fm11);
@@ -384,7 +384,7 @@ public:
 	optional_device<address_map_bank_device> m_avbank16;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif /*FM7_H_*/

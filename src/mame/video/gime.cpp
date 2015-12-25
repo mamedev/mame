@@ -113,9 +113,9 @@ gime_base_device::gime_base_device(const machine_config &mconfig, device_type ty
 		m_write_irq(*this),
 		m_write_firq(*this),
 		m_read_floating_bus(*this),
-		m_maincpu_tag(NULL),
-		m_ram_tag(NULL),
-		m_ext_tag(NULL)
+		m_maincpu_tag(nullptr),
+		m_ram_tag(nullptr),
+		m_ext_tag(nullptr)
 {
 }
 
@@ -620,7 +620,7 @@ void gime_base_device::update_memory(int bank)
 		// are we in onboard ROM or cart ROM?
 		UINT8 *rom_ptr = (block & 4) ? m_cart_rom : m_rom;
 		// TODO: make this unmapped
-		if (rom_ptr==NULL) rom_ptr = m_rom;
+		if (rom_ptr==nullptr) rom_ptr = m_rom;
 		// perform the look up
 		memory = &rom_ptr[(block & 3) * 0x2000];
 		is_read_only = true;
@@ -1738,7 +1738,7 @@ inline void gime_base_device::render_scanline(const scanline_record *scanline, p
 	int left_border, right_border;
 	int x, x2, pixel_position;
 	pixel_t border_color = resolver->lookup(scanline->m_border);
-	const pixel_t *resolved_palette = NULL;
+	const pixel_t *resolved_palette = nullptr;
 
 	/* is this a wide video mode? */
 	bool wide = !m_legacy_video && (scanline->m_ff99_value & 0x04);

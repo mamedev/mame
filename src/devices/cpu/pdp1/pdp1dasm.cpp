@@ -7,7 +7,7 @@
 static int ib;
 static int y;
 
-INLINE void ea (void)
+static inline void ea (void)
 {
 /*  while (1)
     {

@@ -253,12 +253,12 @@ void fd1089_base_device::device_start()
 
 	// find the key
 	m_key = memregion("key")->base();
-	if (m_key == NULL)
+	if (m_key == nullptr)
 		throw emu_fatalerror("FD1089 key region not found!");
 
 	// get a pointer to the ROM region
 	UINT16 *rombase = reinterpret_cast<UINT16 *>(region()->base());
-	if (rombase == NULL)
+	if (rombase == nullptr)
 		throw emu_fatalerror("FD1089 found no ROM data to decrypt!");
 
 	// determine length and resize our internal buffers

@@ -58,7 +58,7 @@ TIMER_CALLBACK_MEMBER(leland_state::scanline_callback)
 VIDEO_START_MEMBER(leland_state,leland)
 {
 	/* allocate memory */
-	m_video_ram = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
+	m_video_ram = make_unique_clear<UINT8[]>(VRAM_SIZE);
 
 	/* scanline timer */
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::scanline_callback),this));
@@ -68,10 +68,10 @@ VIDEO_START_MEMBER(leland_state,leland)
 VIDEO_START_MEMBER(leland_state,ataxx)
 {
 	/* first do the standard stuff */
-	m_video_ram = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
+	m_video_ram = make_unique_clear<UINT8[]>(VRAM_SIZE);
 
 	/* allocate memory */
-	m_ataxx_qram = auto_alloc_array_clear(machine(), UINT8, QRAM_SIZE);
+	m_ataxx_qram = make_unique_clear<UINT8[]>(QRAM_SIZE);
 }
 
 
@@ -197,7 +197,7 @@ int leland_state::leland_vram_port_r(address_space &space, int offset, int num)
 
 void leland_state::leland_vram_port_w(address_space &space, int offset, int data, int num)
 {
-	UINT8 *video_ram = m_video_ram;
+	UINT8 *video_ram = m_video_ram.get();
 	struct vram_state_data *state = m_vram_state + num;
 	int addr = state->m_addr;
 	int inc = (offset >> 2) & 2;

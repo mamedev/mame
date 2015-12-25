@@ -43,12 +43,12 @@ static const int rel[0x100] = {
 };
 
 typedef char* (*callback) (int addr);
-static callback find_symbol = 0;
+static callback find_symbol = nullptr;
 
 static char *SYM(int addr)
 {
 	static char buff[8+1];
-	char * s = NULL;
+	char * s = nullptr;
 
 	if (find_symbol) s = (*find_symbol)(addr);
 	if (s) return s;

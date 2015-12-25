@@ -42,8 +42,8 @@ public:
 	DECLARE_READ8_MEMBER(v128_r);
 	UINT32 screen_update_dorachan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 

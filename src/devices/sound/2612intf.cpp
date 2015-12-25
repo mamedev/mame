@@ -114,7 +114,7 @@ void ym2612_device::device_start()
 
 	/**** initialize YM2612 ****/
 	m_chip = ym2612_init(this,this,clock(),rate,timer_handler,IRQHandler);
-	assert_always(m_chip != NULL, "Error creating YM2612 chip");
+	assert_always(m_chip != nullptr, "Error creating YM2612 chip");
 }
 
 

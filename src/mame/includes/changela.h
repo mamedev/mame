@@ -25,8 +25,8 @@ public:
 	bitmap_ind16 m_river_bitmap;
 	bitmap_ind16 m_tree0_bitmap;
 	bitmap_ind16 m_tree1_bitmap;
-	UINT8*   m_tree_ram;
-	UINT8*   m_memory_devices;
+	std::unique_ptr<UINT8[]>   m_tree_ram;
+	std::unique_ptr<UINT8[]>   m_memory_devices;
 	UINT32   m_mem_dev_selected;    /* an offset within memory_devices area */
 	UINT32   m_slopeROM_bank;
 	UINT8    m_tree_en;
@@ -91,9 +91,9 @@ public:
 	DECLARE_READ8_MEMBER(changela_mem_device_r);
 	DECLARE_WRITE8_MEMBER(changela_slope_rom_addr_hi_w);
 	DECLARE_WRITE8_MEMBER(changela_slope_rom_addr_lo_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_changela(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(chl_mcu_irq);
 	TIMER_CALLBACK_MEMBER(changela_scanline_callback);

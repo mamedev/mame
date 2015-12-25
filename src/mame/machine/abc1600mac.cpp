@@ -125,7 +125,7 @@ void abc1600_mac_device::device_start()
 {
 	// get the CPU device
 	m_cpu = machine().device<m68000_base_device>(m_cpu_tag);
-	assert(m_cpu != NULL);
+	assert(m_cpu != nullptr);
 
 	// allocate memory
 	m_segment_ram.allocate(0x400);
@@ -160,7 +160,7 @@ void abc1600_mac_device::device_reset()
 
 const address_space_config *abc1600_mac_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_PROGRAM) ? &m_space_config : NULL;
+	return (spacenum == AS_PROGRAM) ? &m_space_config : nullptr;
 }
 
 

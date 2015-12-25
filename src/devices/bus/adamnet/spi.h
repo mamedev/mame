@@ -34,8 +34,8 @@ public:
 	adam_spi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// not really public
 	DECLARE_READ8_MEMBER( p2_r );
@@ -43,10 +43,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_adamnet_card_interface overrides
-	virtual void adamnet_reset_w(int state);
+	virtual void adamnet_reset_w(int state) override;
 
 	required_device<cpu_device> m_maincpu;
 };

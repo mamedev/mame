@@ -61,7 +61,7 @@ static MACHINE_CONFIG_FRAGMENT( msx_sfg )
 	MCFG_YM2148_PORT_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))
 	MCFG_YM2148_IRQ_HANDLER(WRITELINE(msx_cart_sfg,ym2148_irq_w))
 
-	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, NULL)
+	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 

@@ -72,7 +72,7 @@ public:
 	DECLARE_READ16_MEMBER(sun1_upd7201_r);
 	DECLARE_WRITE16_MEMBER(sun1_upd7201_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_shared_ptr<UINT16> m_p_ram;
 	UINT8 m_term_data;
 };

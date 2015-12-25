@@ -831,7 +831,7 @@ const device_type MCF5206E_PERIPHERAL = &device_creator<mcf5206e_peripheral_devi
 mcf5206e_peripheral_device::mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MCF5206E_PERIPHERAL, "MCF5206E Peripheral", tag, owner, clock, "mcf5206e_peripheral", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_space_config("coldfire_regs", ENDIANNESS_BIG, 32,10, 0, NULL, *ADDRESS_MAP_NAME(coldfire_regs_map))
+		m_space_config("coldfire_regs", ENDIANNESS_BIG, 32,10, 0, nullptr, *ADDRESS_MAP_NAME(coldfire_regs_map))
 
 {
 }
@@ -848,7 +848,7 @@ void mcf5206e_peripheral_device::device_config_complete()
 
 const address_space_config *mcf5206e_peripheral_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 //-------------------------------------------------

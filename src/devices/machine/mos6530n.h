@@ -248,9 +248,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	enum
 	{
@@ -383,11 +383,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
-	void update_pb();
-	void update_irq();
-	UINT8 get_irq_flags();
+	void update_pb() override;
+	void update_irq() override;
+	UINT8 get_irq_flags() override;
 };
 
 
@@ -406,7 +406,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 

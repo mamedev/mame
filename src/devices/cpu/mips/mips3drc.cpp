@@ -91,7 +91,7 @@ static const UINT8 fcc_shift[8] = { 23, 25, 26, 27, 28, 29, 30, 31 };
     descriptor
 -------------------------------------------------*/
 
-INLINE UINT32 epc(const opcode_desc *desc)
+static inline UINT32 epc(const opcode_desc *desc)
 {
 	return (desc->flags & OPFLAG_IN_DELAY_SLOT) ? (desc->pc - 3) : desc->pc;
 }
@@ -102,9 +102,9 @@ INLINE UINT32 epc(const opcode_desc *desc)
     already allocated
 -------------------------------------------------*/
 
-INLINE void alloc_handle(drcuml_state *drcuml, code_handle **handleptr, const char *name)
+static inline void alloc_handle(drcuml_state *drcuml, code_handle **handleptr, const char *name)
 {
-	if (*handleptr == NULL)
+	if (*handleptr == nullptr)
 		*handleptr = drcuml->handle_alloc(name);
 }
 
@@ -164,7 +164,7 @@ void mips3_device::clear_fastram(UINT32 select_start)
 		m_fastram[i].start = 0;
 		m_fastram[i].end = 0;
 		m_fastram[i].readonly = false;
-		m_fastram[i].base = NULL;
+		m_fastram[i].base = nullptr;
 	}
 		m_fastram_select=select_start;
 }
@@ -280,7 +280,7 @@ void mips3_device::code_flush_cache()
 
 void mips3_device::code_compile_block(UINT8 mode, offs_t pc)
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	compiler_state compiler = { 0 };
 	const opcode_desc *seqhead, *seqlast;
 	const opcode_desc *desclist;
@@ -304,7 +304,7 @@ void mips3_device::code_compile_block(UINT8 mode, offs_t pc)
 			block = drcuml->begin_block(4096);
 
 			/* loop until we get through all instruction sequences */
-			for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next())
+			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
 			{
 				const opcode_desc *curdesc;
 				UINT32 nextpc;
@@ -314,10 +314,10 @@ void mips3_device::code_compile_block(UINT8 mode, offs_t pc)
 					block->append_comment("-------------------------");                     // comment
 
 				/* determine the last instruction in this sequence */
-				for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next())
+				for (seqlast = seqhead; seqlast != nullptr; seqlast = seqlast->next())
 					if (seqlast->flags & OPFLAG_END_SEQUENCE)
 						break;
-				assert(seqlast != NULL);
+				assert(seqlast != nullptr);
 
 				/* if we don't have a hash for this mode/pc, or if we are overriding all, add one */
 				if (override || !drcuml->hash_exists(mode, seqhead->pc))
@@ -341,7 +341,7 @@ void mips3_device::code_compile_block(UINT8 mode, offs_t pc)
 				}
 
 				/* validate this code block if we're not pointing into ROM */
-				if (m_program->get_write_ptr(seqhead->physpc) != NULL)
+				if (m_program->get_write_ptr(seqhead->physpc) != nullptr)
 					generate_checksum_block(block, &compiler, seqhead, seqlast);
 
 				/* label this instruction, if it may be jumped to locally */
@@ -367,7 +367,7 @@ void mips3_device::code_compile_block(UINT8 mode, offs_t pc)
 				if (seqlast->flags & OPFLAG_CAN_CHANGE_MODES)
 					UML_HASHJMP(block, mem(&m_core->mode), nextpc, *m_nocode);
 																							// hashjmp <mode>,nextpc,nocode
-				else if (seqlast->next() == NULL || seqlast->next()->pc != nextpc)
+				else if (seqlast->next() == nullptr || seqlast->next()->pc != nextpc)
 					UML_HASHJMP(block, m_core->mode, nextpc, *m_nocode);
 																							// hashjmp <mode>,nextpc,nocode
 			}
@@ -553,7 +553,7 @@ static void cfunc_unimplemented(void *param)
 
 void mips3_device::static_generate_entry_point()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	code_label skip = 1;
 	drcuml_block *block;
 
@@ -601,7 +601,7 @@ void mips3_device::static_generate_entry_point()
 
 void mips3_device::static_generate_nocode_handler()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	drcuml_block *block;
 
 	/* begin generating */
@@ -626,7 +626,7 @@ void mips3_device::static_generate_nocode_handler()
 
 void mips3_device::static_generate_out_of_cycles()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	drcuml_block *block;
 
 	/* begin generating */
@@ -651,7 +651,7 @@ void mips3_device::static_generate_out_of_cycles()
 
 void mips3_device::static_generate_tlb_mismatch()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	drcuml_block *block;
 
 	/* forward references */
@@ -702,7 +702,7 @@ void mips3_device::static_generate_tlb_mismatch()
 void mips3_device::static_generate_exception(UINT8 exception, int recover, const char *name)
 {
 	code_handle *&exception_handle = recover ? m_exception[exception] : m_exception_norecover[exception];
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	UINT32 offset = 0x180;
 	code_label next = 1;
 	code_label skip = 2;
@@ -805,7 +805,7 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 	code_handle &exception_tlb = *m_exception[iswrite ? EXCEPTION_TLBSTORE : EXCEPTION_TLBLOAD];
 	code_handle &exception_tlbfill = *m_exception[iswrite ? EXCEPTION_TLBSTORE_FILL : EXCEPTION_TLBLOAD_FILL];
 	code_handle &exception_addrerr = *m_exception[iswrite ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD];
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	drcuml_block *block;
 	int tlbmiss = 0;
 	int label = 1;
@@ -846,7 +846,7 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
 		for (ramnum = 0; ramnum < MIPS3_MAX_FASTRAM; ramnum++)
-			if (m_fastram[ramnum].base != NULL && (!iswrite || !m_fastram[ramnum].readonly))
+			if (m_fastram[ramnum].base != nullptr && (!iswrite || !m_fastram[ramnum].readonly))
 			{
 				void *fastbase = (UINT8 *)m_fastram[ramnum].base - m_fastram[ramnum].start;
 				UINT32 skip = label++;
@@ -1090,7 +1090,7 @@ void mips3_device::generate_checksum_block(drcuml_block *block, compiler_state *
 		block->append_comment("[Validation for %08X]", seqhead->pc);                // comment
 
 	/* loose verify or single instruction: just compare and fail */
-	if (!(m_drcoptions & MIPS3DRC_STRICT_VERIFY) || seqhead->next() == NULL)
+	if (!(m_drcoptions & MIPS3DRC_STRICT_VERIFY) || seqhead->next() == nullptr)
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
@@ -1098,10 +1098,10 @@ void mips3_device::generate_checksum_block(drcuml_block *block, compiler_state *
 			void *base = m_direct->read_ptr(seqhead->physpc);
 			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);         // load    i0,base,0,dword
 
-			if (seqhead->delay.first() != NULL && seqhead->physpc != seqhead->delay.first()->physpc)
+			if (seqhead->delay.first() != nullptr && seqhead->physpc != seqhead->delay.first()->physpc)
 			{
 				base = m_direct->read_ptr(seqhead->delay.first()->physpc);
-				assert(base != NULL);
+				assert(base != nullptr);
 				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
 
@@ -1134,15 +1134,15 @@ void mips3_device::generate_checksum_block(drcuml_block *block, compiler_state *
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				base = m_direct->read_ptr(curdesc->physpc);
-				assert(base != NULL);
+				assert(base != nullptr);
 				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);     // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
 
-				if (curdesc->delay.first() != NULL && (curdesc == seqlast || (curdesc->next() != NULL && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
+				if (curdesc->delay.first() != nullptr && (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
 					base = m_direct->read_ptr(curdesc->delay.first()->physpc);
-					assert(base != NULL);
+					assert(base != nullptr);
 					UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4); // load    i1,base,dword
 					UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
 					sum += curdesc->delay.first()->opptr.l[0];
@@ -1298,7 +1298,7 @@ void mips3_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_
 	}
 
 	/* compile the delay slot using temporary compiler state */
-	assert(desc->delay.first() != NULL);
+	assert(desc->delay.first() != nullptr);
 	generate_sequence_instruction(block, &compiler_temp, desc->delay.first());       // <next instruction>
 
 	/* update the cycles and jump through the hash table to the target */
@@ -3232,7 +3232,7 @@ void mips3_device::log_register_list(drcuml_state *drcuml, const char *string, c
 		if (reglist[0] & REGFLAG_R(regnum))
 		{
 			drcuml->log_printf("%sr%d", (count++ == 0) ? "" : ",", regnum);
-			if (regnostarlist != NULL && !(regnostarlist[0] & REGFLAG_R(regnum)))
+			if (regnostarlist != nullptr && !(regnostarlist[0] & REGFLAG_R(regnum)))
 				drcuml->log_printf("*");
 		}
 
@@ -3240,26 +3240,26 @@ void mips3_device::log_register_list(drcuml_state *drcuml, const char *string, c
 		if (reglist[1] & REGFLAG_CPR1(regnum))
 		{
 			drcuml->log_printf("%sfr%d", (count++ == 0) ? "" : ",", regnum);
-			if (regnostarlist != NULL && !(regnostarlist[1] & REGFLAG_CPR1(regnum)))
+			if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_CPR1(regnum)))
 				drcuml->log_printf("*");
 		}
 
 	if (reglist[2] & REGFLAG_LO)
 	{
 		drcuml->log_printf("%slo", (count++ == 0) ? "" : ",");
-		if (regnostarlist != NULL && !(regnostarlist[2] & REGFLAG_LO))
+		if (regnostarlist != nullptr && !(regnostarlist[2] & REGFLAG_LO))
 			drcuml->log_printf("*");
 	}
 	if (reglist[2] & REGFLAG_HI)
 	{
 		drcuml->log_printf("%shi", (count++ == 0) ? "" : ",");
-		if (regnostarlist != NULL && !(regnostarlist[2] & REGFLAG_HI))
+		if (regnostarlist != nullptr && !(regnostarlist[2] & REGFLAG_HI))
 			drcuml->log_printf("*");
 	}
 	if (reglist[2] & REGFLAG_FCC)
 	{
 		drcuml->log_printf("%sfcc", (count++ == 0) ? "" : ",");
-		if (regnostarlist != NULL && !(regnostarlist[2] & REGFLAG_FCC))
+		if (regnostarlist != nullptr && !(regnostarlist[2] & REGFLAG_FCC))
 			drcuml->log_printf("*");
 	}
 
@@ -3278,7 +3278,7 @@ void mips3_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desc
 		drcuml->log_printf("\nDescriptor list @ %08X\n", desclist->pc);
 
 	/* output each descriptor */
-	for ( ; desclist != NULL; desclist = desclist->next())
+	for ( ; desclist != nullptr; desclist = desclist->next())
 	{
 		char buffer[100];
 
@@ -3295,12 +3295,12 @@ void mips3_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desc
 		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer);
 
 		/* output register states */
-		log_register_list(drcuml, "use", desclist->regin, NULL);
+		log_register_list(drcuml, "use", desclist->regin, nullptr);
 		log_register_list(drcuml, "mod", desclist->regout, desclist->regreq);
 		drcuml->log_printf("\n");
 
 		/* if we have a delay slot, output it recursively */
-		if (desclist->delay.first() != NULL)
+		if (desclist->delay.first() != nullptr)
 			log_opcode_desc(drcuml, desclist->delay.first(), indent + 1);
 
 		/* at the end of a sequence add a dividing line */

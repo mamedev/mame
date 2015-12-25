@@ -42,7 +42,7 @@ public:
 	int m_tilexor;
 	UINT8 m_blacklamp;
 	UINT8 m_redlamp;
-	UINT8 *m_vram;
+	std::unique_ptr<UINT8[]> m_vram;
 
 	required_device<z180_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -54,7 +54,7 @@ protected:
 	//virtual void machine_start();
 	//virtual void machine_reset();
 
-	virtual void video_start();
+	virtual void video_start() override;
 public:
 	DECLARE_DRIVER_INIT(chsuper3);
 	DECLARE_DRIVER_INIT(chmpnum);
@@ -65,7 +65,7 @@ public:
 
 void chsuper_state::video_start()
 {
-	m_vram = auto_alloc_array_clear(machine(), UINT8, 1 << 14);
+	m_vram = make_unique_clear<UINT8[]>(1 << 14);
 }
 
 UINT32 chsuper_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -399,13 +399,13 @@ ROM_END
 
 DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
 {
-	UINT8 *buffer;
+	std::unique_ptr<UINT8[]> buffer;
 	UINT8 *rom = memregion("gfx1")->base();
 	int i;
 
 	m_tilexor = 0x7f00;
 
-	buffer = auto_alloc_array(machine(), UINT8, 0x100000);
+	buffer = std::make_unique<UINT8[]>(0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{
@@ -416,18 +416,18 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
 		buffer[j] = rom[i];
 	}
 
-	memcpy(rom,buffer,0x100000);
+	memcpy(rom,buffer.get(),0x100000);
 }
 
 DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
 {
-	UINT8 *buffer;
+	std::unique_ptr<UINT8[]> buffer;
 	UINT8 *rom = memregion("gfx1")->base();
 	int i;
 
 	m_tilexor = 0x0e00;
 
-	buffer = auto_alloc_array(machine(), UINT8, 0x100000);
+	buffer = std::make_unique<UINT8[]>(0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{
@@ -438,18 +438,18 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
 		buffer[j] = rom[i];
 	}
 
-	memcpy(rom,buffer,0x100000);
+	memcpy(rom,buffer.get(),0x100000);
 }
 
 DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
 {
-	UINT8 *buffer;
+	std::unique_ptr<UINT8[]> buffer;
 	UINT8 *rom = memregion("gfx1")->base();
 	int i;
 
 	m_tilexor = 0x1800;
 
-	buffer = auto_alloc_array(machine(), UINT8, 0x100000);
+	buffer = std::make_unique<UINT8[]>(0x100000);
 
 	for (i=0;i<0x100000;i++)
 	{
@@ -464,7 +464,7 @@ DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
 		buffer[j] = rom[i];
 	}
 
-	memcpy(rom,buffer,0x100000);
+	memcpy(rom,buffer.get(),0x100000);
 }
 
 

@@ -48,7 +48,7 @@ void msm6222b_device::device_start()
 	else if(m_region)
 		cgrom = m_region->base();
 	else
-		cgrom = NULL;
+		cgrom = nullptr;
 
 	memset(cgram, 0, sizeof(cgram));
 	memset(ddram, 0x20, sizeof(ddram));

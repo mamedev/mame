@@ -32,22 +32,22 @@ public:
 	comx_fd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_comx_expansion_card_interface overrides
-	virtual int comx_ef4_r();
-	virtual void comx_q_w(int state);
-	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom);
-	virtual UINT8 comx_io_r(address_space &space, offs_t offset);
-	virtual void comx_io_w(address_space &space, offs_t offset, UINT8 data);
+	virtual int comx_ef4_r() override;
+	virtual void comx_q_w(int state) override;
+	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom) override;
+	virtual UINT8 comx_io_r(address_space &space, offs_t offset) override;
+	virtual void comx_io_w(address_space &space, offs_t offset, UINT8 data) override;
 
 private:
 	// internal state

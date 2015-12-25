@@ -113,7 +113,7 @@ public:
 	required_ioport  m_adb_mousex, m_adb_mousey;
 	required_device<palette_device> m_palette;
 
-	UINT8 *m_slowmem;
+	std::unique_ptr<UINT8[]> m_slowmem;
 	UINT8 m_newvideo;
 	UINT16 m_bordercolor;
 	UINT8 m_vgcint;
@@ -159,7 +159,7 @@ public:
 	UINT8 m_sndglu_ctrl;
 	int m_sndglu_addr;
 	int m_sndglu_dummy_read;
-	bitmap_ind16 *m_legacy_gfx;
+	std::unique_ptr<bitmap_ind16> m_legacy_gfx;
 	bool m_is_rom3;
 	UINT8 m_echo_bank;
 	UINT64 m_last_adb_time;

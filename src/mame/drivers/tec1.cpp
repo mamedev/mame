@@ -118,8 +118,8 @@ public:
 	UINT8 m_kbd_row;
 	UINT8 m_refresh[6];
 	UINT8 tec1_convert_col_to_bin( UINT8 col, UINT8 row );
-	virtual void machine_reset();
-	virtual void machine_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(tec1_kbd_callback);
 };
 

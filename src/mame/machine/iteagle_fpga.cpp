@@ -49,7 +49,7 @@ void iteagle_fpga_device::device_start()
 	// RAM defaults to base address 0x000e0000
 	bank_infos[2].adr = 0x000e0000 & (~(bank_infos[2].size - 1));
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 
 	// virtpool nvram
 	memset(m_ram, 0, sizeof(m_ram));
@@ -599,10 +599,10 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_FRAGMENT( iteagle_ide )
-	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(iteagle_ide_device, ide_interrupt))
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
-	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide2", ata_devices, NULL, "cdrom", true)
+	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide2", ata_devices, nullptr, "cdrom", true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(iteagle_ide_device, ide2_interrupt))
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
 MACHINE_CONFIG_END

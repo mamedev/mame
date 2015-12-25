@@ -153,10 +153,10 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	inline void set_dma_channel(int channel, int state);
 };
 
@@ -900,7 +900,7 @@ static const floppy_format_type apc_floppy_formats[] = {
 	FLOPPY_D88_FORMAT,
 	FLOPPY_IMD_FORMAT,
 	FLOPPY_MFI_FORMAT,
-	NULL
+	nullptr
 };
 
 static SLOT_INTERFACE_START( apc_floppies )

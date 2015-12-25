@@ -42,9 +42,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_text_info);
 	TILEMAP_MAPPER_MEMBER(back_scan);
 	TILE_GET_INFO_MEMBER(get_back_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(compgolf);
 	UINT32 screen_update_compgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

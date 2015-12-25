@@ -94,7 +94,7 @@ public:
 	template<class _Object> static devcb_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<tvcexp_slot_device &>(device).m_out_nmi_cb.set_callback(object); }
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// reading and writing
 	virtual UINT8 id_r();

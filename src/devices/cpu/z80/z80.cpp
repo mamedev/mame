@@ -3387,7 +3387,7 @@ void z80_device::device_start()
 	m_decrypted_opcodes_direct = &m_decrypted_opcodes->direct();
 	m_io = &space(AS_IO);
 
-	if (static_config() != NULL)
+	if (static_config() != nullptr)
 		m_daisy.init(this, (const z80_daisy_config *)static_config());
 	m_irq_callback = device_irq_acknowledge_delegate(FUNC(z80_device::standard_irq_callback_member), this);
 
@@ -3702,12 +3702,12 @@ offs_t z80_device::disasm_disassemble( char *buffer, offs_t pc, const UINT8 *opr
 
 void z80_device::z80_set_cycle_tables(const UINT8 *op, const UINT8 *cb, const UINT8 *ed, const UINT8 *xy, const UINT8 *xycb, const UINT8 *ex)
 {
-	m_cc_op = (op != NULL) ? op : cc_op;
-	m_cc_cb = (cb != NULL) ? cb : cc_cb;
-	m_cc_ed = (ed != NULL) ? ed : cc_ed;
-	m_cc_xy = (xy != NULL) ? xy : cc_xy;
-	m_cc_xycb = (xycb != NULL) ? xycb : cc_xycb;
-	m_cc_ex = (ex != NULL) ? ex : cc_ex;
+	m_cc_op = (op != nullptr) ? op : cc_op;
+	m_cc_cb = (cb != nullptr) ? cb : cc_cb;
+	m_cc_ed = (ed != nullptr) ? ed : cc_ed;
+	m_cc_xy = (xy != nullptr) ? xy : cc_xy;
+	m_cc_xycb = (xycb != nullptr) ? xycb : cc_xycb;
+	m_cc_ex = (ex != nullptr) ? ex : cc_ex;
 }
 
 
@@ -3737,8 +3737,8 @@ const address_space_config *z80_device::memory_space_config(address_spacenum spa
 	{
 	case AS_PROGRAM:           return &m_program_config;
 	case AS_IO:                return &m_io_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_opcodes_config : NULL;
-	default:                   return NULL;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_opcodes_config : nullptr;
+	default:                   return nullptr;
 	}
 }
 

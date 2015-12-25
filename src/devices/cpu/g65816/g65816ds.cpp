@@ -141,26 +141,26 @@ static const g65816_opcode_struct g_opcodes[256] =
 static const UINT8 *base_oprom;
 static UINT32 base_pc;
 
-INLINE unsigned int read_8(unsigned int address)
+static inline unsigned int read_8(unsigned int address)
 {
 	address = ADDRESS_65816(address);
 	return base_oprom[address - base_pc];
 }
 
-INLINE unsigned int read_16(unsigned int address)
+static inline unsigned int read_16(unsigned int address)
 {
 	unsigned int val = read_8(address);
 	return val | (read_8(address+1)<<8);
 }
 
-INLINE unsigned int read_24(unsigned int address)
+static inline unsigned int read_24(unsigned int address)
 {
 	unsigned int val = read_8(address);
 	val |= (read_8(address+1)<<8);
 	return val | (read_8(address+2)<<16);
 }
 
-INLINE char* int_8_str(unsigned int val)
+static inline char* int_8_str(unsigned int val)
 {
 	static char str[20];
 
@@ -174,7 +174,7 @@ INLINE char* int_8_str(unsigned int val)
 	return str;
 }
 
-INLINE char* int_16_str(unsigned int val)
+static inline char* int_16_str(unsigned int val)
 {
 	static char str[20];
 

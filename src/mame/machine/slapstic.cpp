@@ -716,7 +716,7 @@ static const struct slapstic_data slapstic118 =
 static const struct slapstic_data *const slapstic_table[] =
 {
 	&slapstic101,   /* NOT confirmed! */
-	NULL,           /* never seen */
+	nullptr,           /* never seen */
 	&slapstic103,
 	&slapstic104,
 	&slapstic105,

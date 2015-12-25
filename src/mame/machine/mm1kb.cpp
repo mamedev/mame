@@ -45,7 +45,7 @@ static const char *const mm1_kb_sample_names[] =
 	"*MM1_keyboard",
 	"beep",         // beep at 2.6 kHz
 	"power_switch", // not actually on the keyboard, but close enough :)
-	0
+	nullptr
 };
 
 bool mm1_keyboard_t::first_time = true;

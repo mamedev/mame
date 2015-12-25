@@ -213,8 +213,8 @@ void hd6309_device::device_pre_save()
 
 void hd6309_device::device_post_load()
 {
-	m_reg8 = NULL;
-	m_reg16 = NULL;
+	m_reg8 = nullptr;
+	m_reg16 = nullptr;
 
 	switch(m_reg)
 	{

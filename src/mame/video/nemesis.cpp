@@ -188,8 +188,8 @@ void nemesis_state::create_palette_lookups()
 	// normalize black/white levels
 	double black = m_palette_lookup[0];
 	double white = 255.0 / (m_palette_lookup[31] - black);
-	for (int i = 0; i < 32; i++)
-		m_palette_lookup[i] = (m_palette_lookup[i] - black) * white + 0.5;
+	for (auto & elem : m_palette_lookup)
+		elem = (elem - black) * white + 0.5;
 }
 
 

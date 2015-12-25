@@ -43,7 +43,7 @@ const device_type RAMDAC = &device_creator<ramdac_device>;
 ramdac_device::ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RAMDAC, "RAMDAC", tag, owner, clock, "ramdac", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(ramdac_palram)),
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(ramdac_palram)),
 		m_palette(*this),
 		m_split_read_reg(0)
 {
@@ -66,7 +66,7 @@ void ramdac_device::static_set_palette_tag(device_t &device, const char *tag)
 
 const address_space_config *ramdac_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 //-------------------------------------------------
@@ -103,7 +103,7 @@ void ramdac_device::device_validity_check(validity_checker &valid) const
 
 void ramdac_device::device_start()
 {
-	m_palram = auto_alloc_array_clear(machine(), UINT8, 1 << 10);
+	m_palram = make_unique_clear<UINT8[]>(1 << 10);
 
 }
 

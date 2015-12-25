@@ -153,7 +153,7 @@ const unif *nes_unif_lookup( const char *board )
 		if (!core_stricmp(unif_list[i].board, board))
 			return &unif_list[i];
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*************************************************************
@@ -168,7 +168,7 @@ const unif *nes_unif_lookup( const char *board )
 void unif_mapr_setup( const char *board, int *pcb_id, int *battery, int *prgram, int *vram_chunks )
 {
 	const unif *unif_board = nes_unif_lookup(board);
-	if (unif_board == NULL)
+	if (unif_board == nullptr)
 		fatalerror("Unknown UNIF board %s.\n", board);
 
 	*pcb_id = unif_board->board_idx;

@@ -127,8 +127,8 @@ public:
 	DECLARE_DRIVER_INIT(m1);
 	DECLARE_DRIVER_INIT(m1common);
 	DECLARE_DRIVER_INIT(m1nec);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void cpu0_firq(int data);
 	void cpu0_nmi();
 };

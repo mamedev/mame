@@ -46,9 +46,9 @@ public:
 	DECLARE_WRITE16_MEMBER(tail2nos_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_tail2nos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tail2nos_postload();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

@@ -25,7 +25,7 @@ public:
 	/* video-related */
 	required_shared_ptr<UINT8> m_videoram;
 
-	UINT8 *    m_colorram;
+	std::unique_ptr<UINT8[]>    m_colorram;
 	required_shared_ptr<UINT8> m_astrof_color;
 	optional_shared_ptr<UINT8> m_tomahawk_protection;
 
@@ -71,7 +71,7 @@ public:
 	DECLARE_DRIVER_INIT(abattle);
 	DECLARE_DRIVER_INIT(sstarbtl);
 	DECLARE_DRIVER_INIT(acombat3);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(astrof);
 	DECLARE_MACHINE_START(abattle);
 	DECLARE_MACHINE_RESET(abattle);

@@ -52,11 +52,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( horizontal_sync );
 	DECLARE_WRITE_LINE_MEMBER( field_sync );
 protected:
-	virtual void device_start();
-	virtual void update_cart_base(UINT8 *cart_base);
+	virtual void device_start() override;
+	virtual void update_cart_base(UINT8 *cart_base) override;
 
 	/* PIA1 */
-	virtual void pia1_pb_changed(UINT8 data);
+	virtual void pia1_pb_changed(UINT8 data) override;
 
 private:
 

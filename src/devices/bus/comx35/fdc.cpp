@@ -98,7 +98,7 @@ static MACHINE_CONFIG_FRAGMENT( comx_fd )
 	MCFG_WD1770_ADD(WD1770_TAG, XTAL_8MHz)
 
 	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", comx_fd_floppies, "525sd35t", comx_fd_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":1", comx_fd_floppies, NULL,       comx_fd_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":1", comx_fd_floppies, nullptr,       comx_fd_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -158,7 +158,7 @@ void comx_fd_device::device_reset()
 {
 	m_fdc->reset();
 	m_fdc->dden_w(1);
-	m_fdc->set_floppy(NULL);
+	m_fdc->set_floppy(nullptr);
 
 	m_addr = 0;
 	m_disb = 1;
@@ -266,7 +266,7 @@ void comx_fd_device::comx_io_w(address_space &space, offs_t offset, UINT8 data)
 			m_addr = data & 0x03;
 
 			// drive select
-			floppy_image_device *floppy = NULL;
+			floppy_image_device *floppy = nullptr;
 
 			if (BIT(data, 2)) floppy = m_floppy0->get_device();
 			if (BIT(data, 3)) floppy = m_floppy1->get_device();

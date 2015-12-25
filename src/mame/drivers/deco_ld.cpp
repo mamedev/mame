@@ -153,7 +153,7 @@ public:
 	DECLARE_WRITE8_MEMBER(decold_palette_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	UINT32 screen_update_rblaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 *spriteram, UINT16 tile_bank );

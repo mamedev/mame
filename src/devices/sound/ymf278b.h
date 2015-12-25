@@ -29,18 +29,18 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_stop();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_0) ? &m_space_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_0) ? &m_space_config : nullptr; }
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	struct YMF278BSlot
@@ -130,7 +130,7 @@ private:
 	int m_clock;
 
 	sound_stream * m_stream;
-	INT32 *m_mix_buffer;
+	std::unique_ptr<INT32[]> m_mix_buffer;
 	direct_read_data * m_direct;
 	const address_space_config m_space_config;
 	devcb_write_line m_irq_handler;

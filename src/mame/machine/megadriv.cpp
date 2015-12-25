@@ -798,7 +798,7 @@ UINT32 md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb32
 		if (!m_vdp->m_use_alt_timing)
 			srcy = &m_vdp->m_render_bitmap->pix(y, 0);
 		else
-			srcy = m_vdp->m_render_line;
+			srcy = m_vdp->m_render_line.get();
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -1030,12 +1030,12 @@ void md_base_state::megadriv_init_common()
 	if (m_z80snd)
 	{
 		//printf("GENESIS Sound Z80 cpu found '%s'\n", machine().device("genesis_snd_z80")->tag());
-		m_genz80.z80_prgram = auto_alloc_array(machine(), UINT8, 0x2000);
-		membank("bank1")->set_base(m_genz80.z80_prgram);
+		m_genz80.z80_prgram = std::make_unique<UINT8[]>(0x2000);
+		membank("bank1")->set_base(m_genz80.z80_prgram.get());
 		save_item(NAME(m_genz80.z80_is_reset));
 		save_item(NAME(m_genz80.z80_has_bus));
 		save_item(NAME(m_genz80.z80_bank_addr));
-		save_pointer(NAME(m_genz80.z80_prgram), 0x2000);
+		save_pointer(NAME(m_genz80.z80_prgram.get()), 0x2000);
 	}
 
 	m_maincpu->set_tas_write_callback(write8_delegate(FUNC(md_base_state::megadriv_tas_callback),this));

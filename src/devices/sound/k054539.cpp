@@ -22,7 +22,7 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
 		device_sound_interface(mconfig, *this), flags(0), ram(nullptr), reverb_pos(0), cur_ptr(0), cur_limit(0),
 	cur_zone(nullptr), rom(nullptr), rom_size(0), rom_mask(0), stream(nullptr), m_timer(nullptr), m_timer_state(0),
 		m_timer_handler(*this),
-		m_rgnoverride(NULL)
+		m_rgnoverride(nullptr)
 {
 }
 
@@ -100,12 +100,12 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 #define VOL_CAP 1.80
 
 	static const INT16 dpcm[16] = {
-		0<<8, 1<<8, 4<<8, 9<<8, 16<<8, 25<<8, 36<<8, 49<<8,
-		-64<<8, -49<<8, -36<<8, -25<<8, -16<<8, -9<<8, -4<<8, -1<<8
+		0 * 0x100,     1 * 0x100,   4 * 0x100,   9 * 0x100,  16 * 0x100, 25 * 0x100, 36 * 0x100, 49 * 0x100,
+		-64 * 0x100, -49 * 0x100, -36 * 0x100, -25 * 0x100, -16 * 0x100, -9 * 0x100, -4 * 0x100, -1 * 0x100
 	};
 
 
-	INT16 *rbase = (INT16 *)ram;
+	INT16 *rbase = (INT16 *)ram.get();
 
 	if(!(regs[0x22f] & 1))
 		return;
@@ -306,12 +306,12 @@ void k054539_device::init_chip()
 	memset(posreg_latch, 0, sizeof(posreg_latch)); //*
 	flags |= UPDATE_AT_KEYON; //* make it default until proven otherwise
 
-	ram = auto_alloc_array(machine(), unsigned char, 0x4000);
+	ram = std::make_unique<UINT8[]>(0x4000);
 	reverb_pos = 0;
 	cur_ptr = 0;
-	memset(ram, 0, 0x4000);
+	memset(ram.get(), 0, 0x4000);
 
-	memory_region *reg = (m_rgnoverride != NULL) ? owner()->memregion(m_rgnoverride) : region();
+	memory_region *reg = (m_rgnoverride != nullptr) ? owner()->memregion(m_rgnoverride) : region();
 	rom = reg->base();
 	rom_size = reg->bytes();
 	rom_mask = 0xffffffffU;
@@ -324,7 +324,7 @@ void k054539_device::init_chip()
 	stream = stream_alloc(0, 2, clock() / 384);
 
 	save_item(NAME(regs));
-	save_pointer(NAME(ram), 0x4000);
+	save_pointer(NAME(ram.get()), 0x4000);
 	save_item(NAME(cur_ptr));
 }
 
@@ -428,7 +428,7 @@ WRITE8_MEMBER(k054539_device::write)
 
 		case 0x22e:
 			cur_zone =
-				data == 0x80 ? ram :
+				data == 0x80 ? ram.get() :
 				rom + 0x20000*data;
 			cur_limit = data == 0x80 ? 0x4000 : 0x20000;
 			cur_ptr = 0;
@@ -466,7 +466,7 @@ WRITE8_MEMBER(k054539_device::write)
 void k054539_device::device_post_load()
 {
 	int data = regs[0x22e];
-	cur_zone = data == 0x80 ? ram : rom + 0x20000*data;
+	cur_zone = data == 0x80 ? ram.get() : rom + 0x20000*data;
 	cur_limit = data == 0x80 ? 0x4000 : 0x20000;
 }
 
@@ -499,8 +499,8 @@ void k054539_device::device_start()
 	m_timer_handler.resolve_safe();
 	m_apan_cb.bind_relative_to(*owner());
 
-	for (int i = 0; i < 8; i++)
-		gain[i] = 1.0;
+	for (auto & elem : gain)
+		elem = 1.0;
 
 	flags = RESET_FLAGS;
 

@@ -195,9 +195,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(x2222_toggle_r);
 	DECLARE_DRIVER_INIT(gstream);
 	DECLARE_DRIVER_INIT(x2222);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_gstream(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_bg_gstream(bitmap_rgb32 &bitmap, const rectangle &cliprect, int xscrl, int yscrl, int map, UINT32* ram, int palbase);
 
@@ -612,7 +612,7 @@ void drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_e
 			INT32 dy;
 
 			assert(dest.valid());
-			assert(gfx != NULL);
+			assert(gfx != nullptr);
 			assert(dest.cliprect().contains(cliprect));
 			assert(code < gfx->elements());
 

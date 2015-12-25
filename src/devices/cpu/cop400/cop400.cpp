@@ -229,7 +229,7 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 }
 
 cop401_cpu_device::cop401_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cop400_cpu_device(mconfig, COP401, "COP401", tag, owner, clock, "cop401", __FILE__, 9, 5, COP410_FEATURE, 0xf, 0xf, 0, false, false, NULL, ADDRESS_MAP_NAME(data_32b))
+	: cop400_cpu_device(mconfig, COP401, "COP401", tag, owner, clock, "cop401", __FILE__, 9, 5, COP410_FEATURE, 0xf, 0xf, 0, false, false, nullptr, ADDRESS_MAP_NAME(data_32b))
 {
 }
 
@@ -244,7 +244,7 @@ cop411_cpu_device::cop411_cpu_device(const machine_config &mconfig, const char *
 }
 
 cop402_cpu_device::cop402_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cop400_cpu_device(mconfig, COP402, "COP402", tag, owner, clock, "cop402", __FILE__, 10, 6, COP420_FEATURE, 0xf, 0xf, 0xf, true, true, NULL, ADDRESS_MAP_NAME(data_64b))
+	: cop400_cpu_device(mconfig, COP402, "COP402", tag, owner, clock, "cop402", __FILE__, 10, 6, COP420_FEATURE, 0xf, 0xf, 0xf, true, true, nullptr, ADDRESS_MAP_NAME(data_64b))
 {
 }
 
@@ -264,7 +264,7 @@ cop422_cpu_device::cop422_cpu_device(const machine_config &mconfig, const char *
 }
 
 cop404_cpu_device::cop404_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cop400_cpu_device(mconfig, COP404, "COP404", tag, owner, clock, "cop404", __FILE__, 11, 7, COP444_FEATURE, 0xf, 0xf, 0xf, true, true, NULL, ADDRESS_MAP_NAME(data_128b))
+	: cop400_cpu_device(mconfig, COP404, "COP404", tag, owner, clock, "cop404", __FILE__, 11, 7, COP444_FEATURE, 0xf, 0xf, 0xf, true, true, nullptr, ADDRESS_MAP_NAME(data_128b))
 {
 }
 
@@ -955,7 +955,7 @@ void cop400_cpu_device::device_start()
 
 	/* allocate counter timer */
 
-	m_counter_timer = NULL;
+	m_counter_timer = nullptr;
 	if (m_has_counter)
 	{
 		m_counter_timer = timer_alloc(TIMER_COUNTER);
@@ -964,7 +964,7 @@ void cop400_cpu_device::device_start()
 
 	/* allocate IN latch timer */
 
-	m_inil_timer = NULL;
+	m_inil_timer = nullptr;
 	if (m_has_inil)
 	{
 		m_inil_timer = timer_alloc(TIMER_INIL);
@@ -973,7 +973,7 @@ void cop400_cpu_device::device_start()
 
 	/* allocate Microbus timer */
 
-	m_microbus_timer = NULL;
+	m_microbus_timer = nullptr;
 	if (m_microbus == COP400_MICROBUS_ENABLED)
 	{
 		m_microbus_timer = timer_alloc(TIMER_MICROBUS);

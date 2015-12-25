@@ -128,7 +128,7 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	screen_device &screen() const { assert(m_screen != NULL); return *m_screen; }
+	screen_device &screen() const { assert(m_screen != nullptr); return *m_screen; }
 
 	// synchronization
 	void wait(const char *debug_reason = "general");
@@ -186,16 +186,16 @@ private:
 		// construction
 		poly_array(running_machine &machine, poly_manager &manager)
 			: m_manager(manager),
-				m_base(auto_alloc_array_clear(machine, UINT8, k_itemsize * _Count)),
+				m_base(make_unique_clear<UINT8[]>(k_itemsize * _Count)),
 				m_next(0),
 				m_max(0),
 				m_waits(0) { }
 
 		// destruction
-		~poly_array() { auto_free(m_manager.machine(), m_base); }
+		~poly_array() { m_base = nullptr; }
 
 		// operators
-		_Type &operator[](int index) const { assert(index >= 0 && index < _Count); return *reinterpret_cast<_Type *>(m_base + index * k_itemsize); }
+		_Type &operator[](int index) const { assert(index >= 0 && index < _Count); return *reinterpret_cast<_Type *>(m_base.get() + index * k_itemsize); }
 
 		// getters
 		int count() const { return m_next; }
@@ -203,18 +203,18 @@ private:
 		int waits() const { return m_waits; }
 		int itemsize() const { return k_itemsize; }
 		int allocated() const { return _Count; }
-		int indexof(_Type &item) const { int result = (reinterpret_cast<UINT8 *>(&item) - m_base) / k_itemsize; assert(result >= 0 && result < _Count); return result; }
+		int indexof(_Type &item) const { int result = (reinterpret_cast<UINT8 *>(&item) - m_base.get()) / k_itemsize; assert(result >= 0 && result < _Count); return result; }
 
 		// operations
 		void reset() { m_next = 0; }
-		_Type &next() { if (m_next > m_max) m_max = m_next; assert(m_next < _Count); return *new(m_base + m_next++ * k_itemsize) _Type; }
+		_Type &next() { if (m_next > m_max) m_max = m_next; assert(m_next < _Count); return *new(m_base.get() + m_next++ * k_itemsize) _Type; }
 		_Type &last() const { return (*this)[m_next - 1]; }
 		void wait_for_space(int count = 1) { while ((m_next + count) >= _Count) { m_waits++; m_manager.wait(""); }  }
 
 	private:
 		// internal state
 		poly_manager &      m_manager;
-		UINT8 *             m_base;
+		std::unique_ptr<UINT8[]>             m_base;
 		int                 m_next;
 		int                 m_max;
 		int                 m_waits;
@@ -288,8 +288,8 @@ private:
 template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(running_machine &machine, UINT8 flags)
 	: m_machine(machine),
-		m_screen(NULL),
-		m_queue(NULL),
+		m_screen(nullptr),
+		m_queue(nullptr),
 		m_polygon(machine, *this),
 		m_object(machine, *this),
 		m_unit(machine, *this),
@@ -316,7 +316,7 @@ template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(screen_device &screen, UINT8 flags)
 	: m_machine(screen.machine()),
 		m_screen(&screen),
-		m_queue(NULL),
+		m_queue(nullptr),
 		m_polygon(screen.machine(), *this),
 		m_object(screen.machine(), *this),
 		m_unit(screen.machine(), *this),
@@ -372,7 +372,7 @@ poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::~poly_manager()
 #endif
 
 	// free the work queue
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_queue_free(m_queue);
 }
 
@@ -435,7 +435,7 @@ void *poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::work_item_cal
 			break;
 		param = &polygon.m_owner->m_unit[orig_count_next];
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -453,7 +453,7 @@ void poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::wait(const cha
 		time = get_profile_ticks();
 
 	// wait for all pending work items to complete
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_queue_wait(m_queue, osd_ticks_per_second() * 100);
 
 	// if we don't have a queue, just run the whole list now
@@ -620,7 +620,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tile(
 	}
 
 	// enqueue the work items
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_item_queue_multiple(m_queue, work_item_callback, m_unit.count() - startunit, &m_unit[startunit], m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	// return the total number of pixels in the triangle
@@ -794,7 +794,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 			extent_t &extent = unit.extent[extnum];
 			extent.startx = istartx;
 			extent.stopx = istopx;
-			extent.userdata = NULL;
+			extent.userdata = nullptr;
 			pixels += istopx - istartx;
 
 			// fill in the parameters for the extent
@@ -808,7 +808,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 	}
 
 	// enqueue the work items
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_item_queue_multiple(m_queue, work_item_callback, m_unit.count() - startunit, &m_unit[startunit], m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	// return the total number of pixels in the triangle
@@ -924,7 +924,7 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_trian
 	}
 
 	// enqueue the work items
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_item_queue_multiple(m_queue, work_item_callback, m_unit.count() - startunit, &m_unit[startunit], m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	// return the total number of pixels in the object
@@ -1117,13 +1117,13 @@ UINT32 poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_polyg
 				istartx = istopx = 0;
 			extent.startx = istartx;
 			extent.stopx = istopx;
-			extent.userdata = NULL;
+			extent.userdata = nullptr;
 			pixels += istopx - istartx;
 		}
 	}
 
 	// enqueue the work items
-	if (m_queue != NULL)
+	if (m_queue != nullptr)
 		osd_work_item_queue_multiple(m_queue, work_item_callback, m_unit.count() - startunit, &m_unit[startunit], m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
 
 	// return the total number of pixels in the triangle

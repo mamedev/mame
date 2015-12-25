@@ -351,7 +351,7 @@ public:
 	IRQ_CALLBACK_MEMBER(cat_int_ack);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 // TODO: this init doesn't actually work yet! please fix me!

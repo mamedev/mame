@@ -26,8 +26,8 @@ public:
 	required_device<upd7220_device> m_hgdc;
 
 	required_shared_ptr<UINT16> m_video_ram;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );

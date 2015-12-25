@@ -131,7 +131,7 @@ void debug_cpu_init(running_machine &machine)
 	/* add "wpaddr", "wpdata", "cycles", "cpunum", "logunmap" to the global symbol table */
 	global->symtable->add("wpaddr", symbol_table::READ_ONLY, &global->wpaddr);
 	global->symtable->add("wpdata", symbol_table::READ_ONLY, &global->wpdata);
-	global->symtable->add("cpunum", NULL, get_cpunum);
+	global->symtable->add("cpunum", nullptr, get_cpunum);
 	global->symtable->add("beamx", (void *)first_screen, get_beamx);
 	global->symtable->add("beamy", (void *)first_screen, get_beamy);
 	global->symtable->add("frame", (void *)first_screen, get_frame);
@@ -148,7 +148,7 @@ void debug_cpu_init(running_machine &machine)
 	global->visiblecpu = machine.firstcpu;
 
 	/* add callback for breaking on VBLANK */
-	if (machine.first_screen() != NULL)
+	if (machine.first_screen() != nullptr)
 		machine.first_screen()->register_vblank_callback(vblank_state_delegate(FUNC(on_vblank), &machine));
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debug_cpu_exit), &machine));
@@ -172,8 +172,8 @@ void debug_cpu_flush_traces(running_machine &machine)
 	/* this can be called on exit even when no debugging is enabled, so
 	 make sure the devdebug is valid before proceeding */
 	device_iterator iter(machine.root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
-		if (device->debug() != NULL)
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
+		if (device->debug() != nullptr)
 			device->debug()->trace_flush();
 }
 
@@ -213,7 +213,7 @@ int debug_cpu_within_instruction_hook(running_machine &machine)
 int debug_cpu_is_stopped(running_machine &machine)
 {
 	debugcpu_private *global = machine.debugcpu_data;
-	return (global != NULL) ? (global->execution_state == EXECUTION_STATE_STOPPED) : false;
+	return (global != nullptr) ? (global->execution_state == EXECUTION_STATE_STOPPED) : false;
 }
 
 
@@ -254,14 +254,14 @@ void debug_cpu_source_script(running_machine &machine, const char *file)
 	debugcpu_private *global = machine.debugcpu_data;
 
 	/* close any existing source file */
-	if (global->source_file != NULL)
+	if (global->source_file != nullptr)
 	{
 		fclose(global->source_file);
-		global->source_file = NULL;
+		global->source_file = nullptr;
 	}
 
 	/* open a new one if requested */
-	if (file != NULL)
+	if (file != nullptr)
 	{
 		global->source_file = fopen(file, "r");
 		if (!global->source_file)
@@ -291,33 +291,33 @@ bool debug_comment_save(running_machine &machine)
 
 	// if we don't have a root, bail
 	xml_data_node *root = xml_file_create();
-	if (root == NULL)
+	if (root == nullptr)
 		return false;
 
 	// wrap in a try/catch to handle errors
 	try
 	{
 		// create a comment node
-		xml_data_node *commentnode = xml_add_child(root, "mamecommentfile", NULL);
-		if (commentnode == NULL)
+		xml_data_node *commentnode = xml_add_child(root, "mamecommentfile", nullptr);
+		if (commentnode == nullptr)
 			throw emu_exception();
 		xml_set_attribute_int(commentnode, "version", COMMENT_VERSION);
 
 		// create a system node
-		xml_data_node *systemnode = xml_add_child(commentnode, "system", NULL);
-		if (systemnode == NULL)
+		xml_data_node *systemnode = xml_add_child(commentnode, "system", nullptr);
+		if (systemnode == nullptr)
 			throw emu_exception();
 		xml_set_attribute(systemnode, "name", machine.system().name);
 
 		// for each device
 		device_iterator iter(machine.root_device());
 		bool found_comments = false;
-		for (device_t *device = iter.first(); device != NULL; device = iter.next())
+		for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 			if (device->debug() && device->debug()->comment_count() > 0)
 			{
 				// create a node for this device
-				xml_data_node *curnode = xml_add_child(systemnode, "cpu", NULL);
-				if (curnode == NULL)
+				xml_data_node *curnode = xml_add_child(systemnode, "cpu", nullptr);
+				if (curnode == nullptr)
 					throw emu_exception();
 				xml_set_attribute(curnode, "tag", device->tag());
 
@@ -367,16 +367,16 @@ bool debug_comment_load(running_machine &machine)
 		return false;
 
 	// wrap in a try/catch to handle errors
-	xml_data_node *root = xml_file_read(file, NULL);
+	xml_data_node *root = xml_file_read(file, nullptr);
 	try
 	{
 		// read the file
-		if (root == NULL)
+		if (root == nullptr)
 			throw emu_exception();
 
 		// find the config node
 		xml_data_node *commentnode = xml_get_sibling(root->child, "mamecommentfile");
-		if (commentnode == NULL)
+		if (commentnode == nullptr)
 			throw emu_exception();
 
 		// validate the config data version
@@ -394,7 +394,7 @@ bool debug_comment_load(running_machine &machine)
 		for (xml_data_node *cpunode = xml_get_sibling(systemnode->child, "cpu"); cpunode; cpunode = xml_get_sibling(cpunode->next, "cpu"))
 		{
 			device_t *device = machine.device(xml_get_attribute_string(cpunode, "tag", ""));
-			if (device != NULL)
+			if (device != nullptr)
 				if (!device->debug()->comment_import(*cpunode))
 					throw emu_exception();
 		}
@@ -402,7 +402,7 @@ bool debug_comment_load(running_machine &machine)
 	catch (emu_exception &)
 	{
 		// clean up in case of error
-		if (root != NULL)
+		if (root != nullptr)
 			xml_file_free(root);
 		return false;
 	}
@@ -1023,7 +1023,7 @@ static void debug_cpu_exit(running_machine &machine)
 	debugcpu_private *global = machine.debugcpu_data;
 
 	/* free the global symbol table */
-	if (global != NULL)
+	if (global != nullptr)
 		global_free(global->symtable);
 }
 
@@ -1049,9 +1049,9 @@ static void reset_transient_flags(running_machine &machine)
 {
 	/* loop over CPUs and reset the transient flags */
 	device_iterator iter(machine.root_device());
-	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
 		device->debug()->reset_transient_flag();
-	machine.debugcpu_data->m_stop_when_not_device = NULL;
+	machine.debugcpu_data->m_stop_when_not_device = nullptr;
 }
 
 
@@ -1065,7 +1065,7 @@ static void process_source_file(running_machine &machine)
 	debugcpu_private *global = machine.debugcpu_data;
 
 	/* loop until the file is exhausted or until we are executing again */
-	while (global->source_file != NULL && global->execution_state == EXECUTION_STATE_STOPPED)
+	while (global->source_file != nullptr && global->execution_state == EXECUTION_STATE_STOPPED)
 	{
 		char buf[512];
 		int i;
@@ -1075,7 +1075,7 @@ static void process_source_file(running_machine &machine)
 		if (feof(global->source_file))
 		{
 			fclose(global->source_file);
-			global->source_file = NULL;
+			global->source_file = nullptr;
 			return;
 		}
 
@@ -1129,7 +1129,7 @@ static UINT64 expression_read_memory(void *param, const char *name, expression_s
 {
 	running_machine &machine = *(running_machine *)param;
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
-	device_t *device = NULL;
+	device_t *device = nullptr;
 
 	switch (spacenum)
 	{
@@ -1137,9 +1137,9 @@ static UINT64 expression_read_memory(void *param, const char *name, expression_s
 		case EXPSPACE_DATA_LOGICAL:
 		case EXPSPACE_IO_LOGICAL:
 		case EXPSPACE_SPACE3_LOGICAL:
-			if (name != NULL)
+			if (name != nullptr)
 				device = expression_get_device(machine, name);
-			if (device == NULL)
+			if (device == nullptr)
 				device = debug_cpu_get_visible_cpu(machine);
 			if (device->memory().has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
 			{
@@ -1152,9 +1152,9 @@ static UINT64 expression_read_memory(void *param, const char *name, expression_s
 		case EXPSPACE_DATA_PHYSICAL:
 		case EXPSPACE_IO_PHYSICAL:
 		case EXPSPACE_SPACE3_PHYSICAL:
-			if (name != NULL)
+			if (name != nullptr)
 				device = expression_get_device(machine, name);
-			if (device == NULL)
+			if (device == nullptr)
 				device = debug_cpu_get_visible_cpu(machine);
 			if (device->memory().has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
 			{
@@ -1165,15 +1165,15 @@ static UINT64 expression_read_memory(void *param, const char *name, expression_s
 
 		case EXPSPACE_OPCODE:
 		case EXPSPACE_RAMWRITE:
-			if (name != NULL)
+			if (name != nullptr)
 				device = expression_get_device(machine, name);
-			if (device == NULL)
+			if (device == nullptr)
 				device = debug_cpu_get_visible_cpu(machine);
 			result = expression_read_program_direct(device->memory().space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
 			break;
 
 		case EXPSPACE_REGION:
-			if (name == NULL)
+			if (name == nullptr)
 				break;
 			result = expression_read_memory_region(machine, name, address, size);
 			break;
@@ -1226,7 +1226,7 @@ static UINT64 expression_read_program_direct(address_space &space, int opcode, o
 		base = (UINT8 *)space.get_read_ptr(address & ~lowmask);
 
 		/* if we have a valid base, return the appropriate byte */
-		if (base != NULL)
+		if (base != nullptr)
 		{
 			if (space.endianness() == ENDIANNESS_LITTLE)
 				result = base[BYTE8_XOR_LE(address) & lowmask];
@@ -1249,7 +1249,7 @@ static UINT64 expression_read_memory_region(running_machine &machine, const char
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
 
 	/* make sure we get a valid base before proceeding */
-	if (region != NULL)
+	if (region != nullptr)
 	{
 		/* call ourself recursively until we are byte-sized */
 		if (size > 1)
@@ -1295,7 +1295,7 @@ static UINT64 expression_read_memory_region(running_machine &machine, const char
 static void expression_write_memory(void *param, const char *name, expression_space spacenum, UINT32 address, int size, UINT64 data)
 {
 	running_machine &machine = *(running_machine *)param;
-	device_t *device = NULL;
+	device_t *device = nullptr;
 
 	switch (spacenum)
 	{
@@ -1303,9 +1303,9 @@ static void expression_write_memory(void *param, const char *name, expression_sp
 		case EXPSPACE_DATA_LOGICAL:
 		case EXPSPACE_IO_LOGICAL:
 		case EXPSPACE_SPACE3_LOGICAL:
-			if (name != NULL)
+			if (name != nullptr)
 				device = expression_get_device(machine, name);
-			if (device == NULL)
+			if (device == nullptr)
 				device = debug_cpu_get_visible_cpu(machine);
 			if (device->memory().has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
 			{
@@ -1318,9 +1318,9 @@ static void expression_write_memory(void *param, const char *name, expression_sp
 		case EXPSPACE_DATA_PHYSICAL:
 		case EXPSPACE_IO_PHYSICAL:
 		case EXPSPACE_SPACE3_PHYSICAL:
-			if (name != NULL)
+			if (name != nullptr)
 				device = expression_get_device(machine, name);
-			if (device == NULL)
+			if (device == nullptr)
 				device = debug_cpu_get_visible_cpu(machine);
 			if (device->memory().has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
 			{
@@ -1331,15 +1331,15 @@ static void expression_write_memory(void *param, const char *name, expression_sp
 
 		case EXPSPACE_OPCODE:
 		case EXPSPACE_RAMWRITE:
-			if (name != NULL)
+			if (name != nullptr)
 				device = expression_get_device(machine, name);
-			if (device == NULL)
+			if (device == nullptr)
 				device = debug_cpu_get_visible_cpu(machine);
 			expression_write_program_direct(device->memory().space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
 			break;
 
 		case EXPSPACE_REGION:
-			if (name == NULL)
+			if (name == nullptr)
 				break;
 			expression_write_memory_region(machine, name, address, size, data);
 			break;
@@ -1398,7 +1398,7 @@ static void expression_write_program_direct(address_space &space, int opcode, of
 		base = (UINT8 *)space.get_read_ptr(address & ~lowmask);
 
 		/* if we have a valid base, write the appropriate byte */
-		if (base != NULL)
+		if (base != nullptr)
 		{
 			if (space.endianness() == ENDIANNESS_LITTLE)
 				base[BYTE8_XOR_LE(address) & lowmask] = data;
@@ -1421,7 +1421,7 @@ static void expression_write_memory_region(running_machine &machine, const char 
 	memory_region *region = machine.root_device().memregion(rgntag);
 
 	/* make sure we get a valid base before proceeding */
-	if (region != NULL)
+	if (region != nullptr)
 	{
 		/* call ourself recursively until we are byte-sized */
 		if (size > 1)
@@ -1474,7 +1474,7 @@ static void expression_write_memory_region(running_machine &machine, const char 
 static expression_error::error_code expression_validate(void *param, const char *name, expression_space space)
 {
 	running_machine &machine = *(running_machine *)param;
-	device_t *device = NULL;
+	device_t *device = nullptr;
 
 	switch (space)
 	{
@@ -1482,13 +1482,13 @@ static expression_error::error_code expression_validate(void *param, const char 
 		case EXPSPACE_DATA_LOGICAL:
 		case EXPSPACE_IO_LOGICAL:
 		case EXPSPACE_SPACE3_LOGICAL:
-			if (name != NULL)
+			if (name != nullptr)
 			{
 				device = expression_get_device(machine, name);
-				if (device == NULL)
+				if (device == nullptr)
 					return expression_error::INVALID_MEMORY_NAME;
 			}
-			if (device == NULL)
+			if (device == nullptr)
 				device = debug_cpu_get_visible_cpu(machine);
 			if (!device->memory().has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL)))
 				return expression_error::NO_SUCH_MEMORY_SPACE;
@@ -1498,13 +1498,13 @@ static expression_error::error_code expression_validate(void *param, const char 
 		case EXPSPACE_DATA_PHYSICAL:
 		case EXPSPACE_IO_PHYSICAL:
 		case EXPSPACE_SPACE3_PHYSICAL:
-			if (name != NULL)
+			if (name != nullptr)
 			{
 				device = expression_get_device(machine, name);
-				if (device == NULL)
+				if (device == nullptr)
 					return expression_error::INVALID_MEMORY_NAME;
 			}
-			if (device == NULL)
+			if (device == nullptr)
 				device = debug_cpu_get_visible_cpu(machine);
 			if (!device->memory().has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL)))
 				return expression_error::NO_SUCH_MEMORY_SPACE;
@@ -1512,22 +1512,22 @@ static expression_error::error_code expression_validate(void *param, const char 
 
 		case EXPSPACE_OPCODE:
 		case EXPSPACE_RAMWRITE:
-			if (name != NULL)
+			if (name != nullptr)
 			{
 				device = expression_get_device(machine, name);
-				if (device == NULL)
+				if (device == nullptr)
 					return expression_error::INVALID_MEMORY_NAME;
 			}
-			if (device == NULL)
+			if (device == nullptr)
 				device = debug_cpu_get_visible_cpu(machine);
 			if (!device->memory().has_space(AS_PROGRAM))
 				return expression_error::NO_SUCH_MEMORY_SPACE;
 			break;
 
 		case EXPSPACE_REGION:
-			if (name == NULL)
+			if (name == nullptr)
 				return expression_error::MISSING_MEMORY_NAME;
-			if (machine.root_device().memregion(name)->base() == NULL)
+			if (machine.root_device().memregion(name)->base() == nullptr)
 				return expression_error::INVALID_MEMORY_NAME;
 			break;
 
@@ -1550,7 +1550,7 @@ static expression_error::error_code expression_validate(void *param, const char 
 static UINT64 get_beamx(symbol_table &table, void *ref)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(ref);
-	return (screen != NULL) ? screen->hpos() : 0;
+	return (screen != nullptr) ? screen->hpos() : 0;
 }
 
 
@@ -1561,7 +1561,7 @@ static UINT64 get_beamx(symbol_table &table, void *ref)
 static UINT64 get_beamy(symbol_table &table, void *ref)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(ref);
-	return (screen != NULL) ? screen->vpos() : 0;
+	return (screen != nullptr) ? screen->vpos() : 0;
 }
 
 
@@ -1572,7 +1572,7 @@ static UINT64 get_beamy(symbol_table &table, void *ref)
 static UINT64 get_frame(symbol_table &table, void *ref)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(ref);
-	return (screen != NULL) ? screen->frame_number() : 0;
+	return (screen != nullptr) ? screen->frame_number() : 0;
 }
 
 
@@ -1602,14 +1602,14 @@ static UINT64 get_cpunum(symbol_table &table, void *ref)
 
 device_debug::device_debug(device_t &device)
 	: m_device(device),
-		m_exec(NULL),
-		m_memory(NULL),
-		m_state(NULL),
-		m_disasm(NULL),
+		m_exec(nullptr),
+		m_memory(nullptr),
+		m_state(nullptr),
+		m_disasm(nullptr),
 		m_flags(0),
 		m_symtable(&device, debug_cpu_get_global_symtable(device.machine())),
-		m_instrhook(NULL),
-		m_dasm_override(NULL),
+		m_instrhook(nullptr),
+		m_dasm_override(nullptr),
 		m_opwidth(0),
 		m_stepaddr(0),
 		m_stepsleft(0),
@@ -1621,9 +1621,9 @@ device_debug::device_debug(device_t &device)
 		m_total_cycles(0),
 		m_last_total_cycles(0),
 		m_pc_history_index(0),
-		m_bplist(NULL),
-		m_rplist(NULL),
-		m_trace(NULL),
+		m_bplist(nullptr),
+		m_rplist(nullptr),
+		m_trace(nullptr),
 		m_hotspot_threshhold(0),
 		m_track_pc_set(),
 		m_track_pc(false),
@@ -1642,18 +1642,18 @@ device_debug::device_debug(device_t &device)
 	device.interface(m_disasm);
 
 	// set up state-related stuff
-	if (m_state != NULL)
+	if (m_state != nullptr)
 	{
 		// add global symbol for cycles and totalcycles
-		if (m_exec != NULL)
+		if (m_exec != nullptr)
 		{
-			m_symtable.add("cycles", NULL, get_cycles);
-			m_symtable.add("totalcycles", NULL, get_totalcycles);
-			m_symtable.add("lastinstructioncycles", NULL, get_lastinstructioncycles);
+			m_symtable.add("cycles", nullptr, get_cycles);
+			m_symtable.add("totalcycles", nullptr, get_totalcycles);
+			m_symtable.add("lastinstructioncycles", nullptr, get_lastinstructioncycles);
 		}
 
 		// add entries to enable/disable unmap reporting for each space
-		if (m_memory != NULL)
+		if (m_memory != nullptr)
 		{
 			if (m_memory->has_space(AS_PROGRAM))
 				m_symtable.add("logunmap", (void *)&m_memory->space(AS_PROGRAM), get_logunmap, set_logunmap);
@@ -1665,21 +1665,21 @@ device_debug::device_debug(device_t &device)
 
 		// add all registers into it
 		std::string tempstr;
-		for (const device_state_entry *entry = m_state->state_first(); entry != NULL; entry = entry->next()) {
+		for (const device_state_entry *entry = m_state->state_first(); entry != nullptr; entry = entry->next()) {
 			strmakelower(tempstr.assign(entry->symbol()));
 			m_symtable.add(tempstr.c_str(), (void *)(FPTR)entry->index(), get_state, set_state);
 		}
 	}
 
 	// set up execution-related stuff
-	if (m_exec != NULL)
+	if (m_exec != nullptr)
 	{
 		m_flags = DEBUG_FLAG_OBSERVING | DEBUG_FLAG_HISTORY;
 		m_opwidth = min_opcode_bytes();
 
 		// if no curpc, add one
-		if (m_state != NULL && m_symtable.find("curpc") == NULL)
-			m_symtable.add("curpc", NULL, get_current_pc);
+		if (m_state != nullptr && m_symtable.find("curpc") == nullptr)
+			m_symtable.add("curpc", nullptr, get_current_pc);
 	}
 }
 
@@ -1690,8 +1690,6 @@ device_debug::device_debug(device_t &device)
 
 device_debug::~device_debug()
 {
-	auto_free(m_device.machine(), m_trace);
-
 	// free breakpoints and watchpoints
 	breakpoint_clear_all();
 	watchpoint_clear_all();
@@ -1711,13 +1709,13 @@ void device_debug::start_hook(const attotime &endtime)
 	assert((m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
 	// stash a pointer to the current live CPU
-	assert(global->livecpu == NULL);
+	assert(global->livecpu == nullptr);
 	global->livecpu = &m_device;
 
 	// if we're a new device, stop now
-	if (global->m_stop_when_not_device != NULL && global->m_stop_when_not_device != &m_device)
+	if (global->m_stop_when_not_device != nullptr && global->m_stop_when_not_device != &m_device)
 	{
-		global->m_stop_when_not_device = NULL;
+		global->m_stop_when_not_device = nullptr;
 		global->execution_state = EXECUTION_STATE_STOPPED;
 		reset_transient_flags(m_device.machine());
 	}
@@ -1740,7 +1738,7 @@ void device_debug::start_hook(const attotime &endtime)
 		else if (&m_device == global->breakcpu)
 		{
 			global->execution_state = EXECUTION_STATE_STOPPED;
-			global->breakcpu = NULL;
+			global->breakcpu = nullptr;
 		}
 
 		// if a VBLANK occurred, check on things
@@ -1777,7 +1775,7 @@ void device_debug::stop_hook()
 	assert(global->livecpu == &m_device);
 
 	// clear the live CPU
-	global->livecpu = NULL;
+	global->livecpu = nullptr;
 }
 
 
@@ -1847,7 +1845,7 @@ void device_debug::instruction_hook(offs_t curpc)
 	}
 
 	// are we tracing?
-	if (m_trace != NULL)
+	if (m_trace != nullptr)
 		m_trace->update(curpc);
 
 	// per-instruction hook?
@@ -1914,7 +1912,7 @@ void device_debug::instruction_hook(offs_t curpc)
 
 		// reset any transient state
 		reset_transient_flags(m_device.machine());
-		global->breakcpu = NULL;
+		global->breakcpu = nullptr;
 
 		// remember the last visible CPU in the debugger
 		global->visiblecpu = &m_device;
@@ -2010,7 +2008,7 @@ void device_debug::set_instruction_hook(debug_instruction_hook_func hook)
 {
 	// set the hook and also the CPU's flag for fast knowledge of the hook
 	m_instrhook = hook;
-	if (hook != NULL)
+	if (hook != nullptr)
 		m_flags |= DEBUG_FLAG_HOOKED;
 	else
 		m_flags &= ~DEBUG_FLAG_HOOKED;
@@ -2027,17 +2025,17 @@ offs_t device_debug::disassemble(char *buffer, offs_t pc, const UINT8 *oprom, co
 	offs_t result = 0;
 
 	// check for disassembler override
-	if (m_dasm_override != NULL)
+	if (m_dasm_override != nullptr)
 		result = (*m_dasm_override)(m_device, buffer, pc, oprom, opram, 0);
 
 	// if we have a disassembler, run it
-	if (result == 0 && m_disasm != NULL)
+	if (result == 0 && m_disasm != nullptr)
 		result = m_disasm->disassemble(buffer, pc, oprom, opram, 0);
 
 	// make sure we get good results
 	assert((result & DASMFLAG_LENGTHMASK) != 0);
 #ifdef MAME_DEBUG
-	if (m_memory != NULL && m_disasm != NULL)
+	if (m_memory != nullptr && m_disasm != nullptr)
 	{
 		address_space &space = m_memory->space(AS_PROGRAM);
 		int bytes = space.address_to_byte(result & DASMFLAG_LENGTHMASK);
@@ -2059,7 +2057,7 @@ void device_debug::ignore(bool ignore)
 {
 	debugcpu_private *global = m_device.machine().debugcpu_data;
 
-	assert(m_exec != NULL);
+	assert(m_exec != nullptr);
 
 	if (ignore)
 		m_flags &= ~DEBUG_FLAG_OBSERVING;
@@ -2080,7 +2078,7 @@ void device_debug::single_step(int numsteps)
 {
 	debugcpu_private *global = m_device.machine().debugcpu_data;
 
-	assert(m_exec != NULL);
+	assert(m_exec != nullptr);
 
 	m_stepsleft = numsteps;
 	m_stepaddr = ~0;
@@ -2098,7 +2096,7 @@ void device_debug::single_step_over(int numsteps)
 {
 	debugcpu_private *global = m_device.machine().debugcpu_data;
 
-	assert(m_exec != NULL);
+	assert(m_exec != nullptr);
 
 	m_stepsleft = numsteps;
 	m_stepaddr = ~0;
@@ -2116,7 +2114,7 @@ void device_debug::single_step_out()
 {
 	debugcpu_private *global = m_device.machine().debugcpu_data;
 
-	assert(m_exec != NULL);
+	assert(m_exec != nullptr);
 
 	m_stepsleft = 100;
 	m_stepaddr = ~0;
@@ -2134,7 +2132,7 @@ void device_debug::go(offs_t targetpc)
 {
 	debugcpu_private *global = m_device.machine().debugcpu_data;
 
-	assert(m_exec != NULL);
+	assert(m_exec != nullptr);
 
 	m_stopaddr = targetpc;
 	m_flags |= DEBUG_FLAG_STOP_PC;
@@ -2150,7 +2148,7 @@ void device_debug::go_vblank()
 {
 	debugcpu_private *global = m_device.machine().debugcpu_data;
 
-	assert(m_exec != NULL);
+	assert(m_exec != nullptr);
 
 	global->vblank_occurred = false;
 	m_flags |= DEBUG_FLAG_STOP_VBLANK;
@@ -2167,7 +2165,7 @@ void device_debug::go_interrupt(int irqline)
 {
 	debugcpu_private *global = m_device.machine().debugcpu_data;
 
-	assert(m_exec != NULL);
+	assert(m_exec != nullptr);
 
 	m_stopirq = irqline;
 	m_flags |= DEBUG_FLAG_STOP_INTERRUPT;
@@ -2184,7 +2182,7 @@ void device_debug::go_exception(int exception)
 {
 	debugcpu_private *global = m_device.machine().debugcpu_data;
 
-	assert(m_exec != NULL);
+	assert(m_exec != nullptr);
 
 	m_stopexception = exception;
 	m_flags |= DEBUG_FLAG_STOP_EXCEPTION;
@@ -2201,7 +2199,7 @@ void device_debug::go_milliseconds(UINT64 milliseconds)
 {
 	debugcpu_private *global = m_device.machine().debugcpu_data;
 
-	assert(m_exec != NULL);
+	assert(m_exec != nullptr);
 
 	m_stoptime = m_device.machine().time() + attotime::from_msec(milliseconds);
 	m_flags |= DEBUG_FLAG_STOP_TIME;
@@ -2218,7 +2216,7 @@ void device_debug::go_next_device()
 {
 	debugcpu_private *global = m_device.machine().debugcpu_data;
 
-	assert(m_exec != NULL);
+	assert(m_exec != nullptr);
 
 	global->m_stop_when_not_device = &m_device;
 	global->execution_state = EXECUTION_STATE_RUNNING;
@@ -2235,7 +2233,7 @@ void device_debug::halt_on_next_instruction(const char *fmt, ...)
 	debugcpu_private *global = m_device.machine().debugcpu_data;
 	va_list arg;
 
-	assert(m_exec != NULL);
+	assert(m_exec != nullptr);
 
 	// if something is pending on this CPU already, ignore this request
 	if (&m_device == global->breakcpu)
@@ -2250,7 +2248,7 @@ void device_debug::halt_on_next_instruction(const char *fmt, ...)
 	if (&m_device == global->livecpu)
 	{
 		global->execution_state = EXECUTION_STATE_STOPPED;
-		if (global->livecpu != NULL)
+		if (global->livecpu != nullptr)
 			global->livecpu->debug()->compute_debug_flags();
 	}
 	else
@@ -2286,7 +2284,7 @@ int device_debug::breakpoint_set(offs_t address, const char *condition, const ch
 bool device_debug::breakpoint_clear(int index)
 {
 	// scan the list to see if we own this breakpoint
-	for (breakpoint **bp = &m_bplist; *bp != NULL; bp = &(*bp)->m_next)
+	for (breakpoint **bp = &m_bplist; *bp != nullptr; bp = &(*bp)->m_next)
 		if ((*bp)->m_index == index)
 		{
 			breakpoint *deleteme = *bp;
@@ -2308,7 +2306,7 @@ bool device_debug::breakpoint_clear(int index)
 void device_debug::breakpoint_clear_all()
 {
 	// clear the head until we run out
-	while (m_bplist != NULL)
+	while (m_bplist != nullptr)
 		breakpoint_clear(m_bplist->index());
 }
 
@@ -2321,7 +2319,7 @@ void device_debug::breakpoint_clear_all()
 bool device_debug::breakpoint_enable(int index, bool enable)
 {
 	// scan the list to see if we own this breakpoint
-	for (breakpoint *bp = m_bplist; bp != NULL; bp = bp->next())
+	for (breakpoint *bp = m_bplist; bp != nullptr; bp = bp->next())
 		if (bp->m_index == index)
 		{
 			bp->m_enabled = enable;
@@ -2342,7 +2340,7 @@ bool device_debug::breakpoint_enable(int index, bool enable)
 void device_debug::breakpoint_enable_all(bool enable)
 {
 	// apply the enable to all breakpoints we own
-	for (breakpoint *bp = m_bplist; bp != NULL; bp = bp->next())
+	for (breakpoint *bp = m_bplist; bp != nullptr; bp = bp->next())
 		breakpoint_enable(bp->index(), enable);
 }
 
@@ -2378,7 +2376,7 @@ bool device_debug::watchpoint_clear(int index)
 {
 	// scan the list to see if we own this breakpoint
 	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_wplist); ++spacenum)
-		for (watchpoint **wp = &m_wplist[spacenum]; *wp != NULL; wp = &(*wp)->m_next)
+		for (watchpoint **wp = &m_wplist[spacenum]; *wp != nullptr; wp = &(*wp)->m_next)
 			if ((*wp)->m_index == index)
 			{
 				watchpoint *deleteme = *wp;
@@ -2402,7 +2400,7 @@ void device_debug::watchpoint_clear_all()
 {
 	// clear the head until we run out
 	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_wplist); ++spacenum)
-		while (m_wplist[spacenum] != NULL)
+		while (m_wplist[spacenum] != nullptr)
 			watchpoint_clear(m_wplist[spacenum]->index());
 }
 
@@ -2416,7 +2414,7 @@ bool device_debug::watchpoint_enable(int index, bool enable)
 {
 	// scan the list to see if we own this watchpoint
 	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_wplist); ++spacenum)
-		for (watchpoint *wp = m_wplist[spacenum]; wp != NULL; wp = wp->next())
+		for (watchpoint *wp = m_wplist[spacenum]; wp != nullptr; wp = wp->next())
 			if (wp->m_index == index)
 			{
 				wp->m_enabled = enable;
@@ -2438,7 +2436,7 @@ void device_debug::watchpoint_enable_all(bool enable)
 {
 	// apply the enable to all watchpoints we own
 	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_wplist); ++spacenum)
-		for (watchpoint *wp = m_wplist[spacenum]; wp != NULL; wp = wp->next())
+		for (watchpoint *wp = m_wplist[spacenum]; wp != nullptr; wp = wp->next())
 			watchpoint_enable(wp->index(), enable);
 }
 
@@ -2471,7 +2469,7 @@ int device_debug::registerpoint_set(const char *condition, const char *action)
 bool device_debug::registerpoint_clear(int index)
 {
 	// scan the list to see if we own this registerpoint
-	for (registerpoint **rp = &m_rplist; *rp != NULL; rp = &(*rp)->m_next)
+	for (registerpoint **rp = &m_rplist; *rp != nullptr; rp = &(*rp)->m_next)
 		if ((*rp)->m_index == index)
 		{
 			registerpoint *deleteme = *rp;
@@ -2493,7 +2491,7 @@ bool device_debug::registerpoint_clear(int index)
 void device_debug::registerpoint_clear_all()
 {
 	// clear the head until we run out
-	while (m_rplist != NULL)
+	while (m_rplist != nullptr)
 		registerpoint_clear(m_rplist->index());
 }
 
@@ -2506,7 +2504,7 @@ void device_debug::registerpoint_clear_all()
 bool device_debug::registerpoint_enable(int index, bool enable)
 {
 	// scan the list to see if we own this conditionpoint
-	for (registerpoint *rp = m_rplist; rp != NULL; rp = rp->next())
+	for (registerpoint *rp = m_rplist; rp != nullptr; rp = rp->next())
 		if (rp->m_index == index)
 		{
 			rp->m_enabled = enable;
@@ -2527,7 +2525,7 @@ bool device_debug::registerpoint_enable(int index, bool enable)
 void device_debug::registerpoint_enable_all(bool enable)
 {
 	// apply the enable to all registerpoints we own
-	for (registerpoint *rp = m_rplist; rp != NULL; rp = rp->next())
+	for (registerpoint *rp = m_rplist; rp != nullptr; rp = rp->next())
 		registerpoint_enable(rp->index(), enable);
 }
 
@@ -2554,7 +2552,7 @@ void device_debug::hotspot_track(int numspots, int threshhold)
 	}
 
 	// update the watchpoint flags to include us
-	if (m_memory != NULL && m_memory->has_space(AS_PROGRAM))
+	if (m_memory != nullptr && m_memory->has_space(AS_PROGRAM))
 		watchpoint_update_flags(m_memory->space(AS_PROGRAM));
 }
 
@@ -2665,8 +2663,8 @@ bool device_debug::comment_remove(offs_t addr)
 const char *device_debug::comment_text(offs_t addr) const
 {
 	const UINT32 crc = compute_opcode_crc32(addr);
-	std::set<dasm_comment>::iterator comment = m_comment_set.find(dasm_comment(addr, crc, "", 0));
-	if (comment == m_comment_set.end()) return NULL;
+	auto comment = m_comment_set.find(dasm_comment(addr, crc, "", 0));
+	if (comment == m_comment_set.end()) return nullptr;
 	return comment->m_text.c_str();
 }
 
@@ -2680,14 +2678,14 @@ bool device_debug::comment_export(xml_data_node &curnode)
 {
 	// iterate through the comments
 	std::string crc_buf;
-	for (std::set<dasm_comment>::iterator item = m_comment_set.begin(); item != m_comment_set.end(); ++item)
+	for (const auto & elem : m_comment_set)
 	{
-		xml_data_node *datanode = xml_add_child(&curnode, "comment", xml_normalize_string(item->m_text.c_str()));
-		if (datanode == NULL)
+		xml_data_node *datanode = xml_add_child(&curnode, "comment", xml_normalize_string(elem.m_text.c_str()));
+		if (datanode == nullptr)
 			return false;
-		xml_set_attribute_int(datanode, "address", item->m_address);
-		xml_set_attribute_int(datanode, "color", item->m_color);
-		strprintf(crc_buf,"%08X", item->m_crc);
+		xml_set_attribute_int(datanode, "address", elem.m_address);
+		xml_set_attribute_int(datanode, "color", elem.m_color);
+		strprintf(crc_buf,"%08X", elem.m_crc);
 		xml_set_attribute(datanode, "crc", crc_buf.c_str());
 	}
 	return true;
@@ -2709,7 +2707,7 @@ bool device_debug::comment_import(xml_data_node &cpunode)
 		rgb_t color = xml_get_attribute_int(datanode, "color", 0);
 
 		UINT32 crc;
-		sscanf(xml_get_attribute_string(datanode, "crc", 0), "%08X", &crc);
+		sscanf(xml_get_attribute_string(datanode, "crc", nullptr), "%08X", &crc);
 
 		// add the new comment
 		m_comment_set.insert(dasm_comment(address, crc, datanode->value, color));
@@ -2726,7 +2724,7 @@ bool device_debug::comment_import(xml_data_node &cpunode)
 UINT32 device_debug::compute_opcode_crc32(offs_t pc) const
 {
 	// Basically the same thing as dasm_wrapped, but with some tiny savings
-	assert(m_memory != NULL);
+	assert(m_memory != nullptr);
 
 	// determine the adjusted PC
 	address_space &decrypted_space = m_memory->has_space(AS_DECRYPTED_OPCODES) ? m_memory->space(AS_DECRYPTED_OPCODES) : m_memory->space(AS_PROGRAM);
@@ -2759,12 +2757,11 @@ UINT32 device_debug::compute_opcode_crc32(offs_t pc) const
 void device_debug::trace(FILE *file, bool trace_over, const char *action)
 {
 	// delete any existing tracers
-	auto_free(m_device.machine(), m_trace);
-	m_trace = NULL;
+	m_trace = nullptr;
 
 	// if we have a new file, make a new tracer
-	if (file != NULL)
-		m_trace = auto_alloc(m_device.machine(), tracer(*this, *file, trace_over, action));
+	if (file != nullptr)
+		m_trace = std::make_unique<tracer>(*this, *file, trace_over, action);
 }
 
 
@@ -2775,7 +2772,7 @@ void device_debug::trace(FILE *file, bool trace_over, const char *action)
 
 void device_debug::trace_printf(const char *fmt, ...)
 {
-	if (m_trace != NULL)
+	if (m_trace != nullptr)
 	{
 		va_list va;
 		va_start(va, fmt);
@@ -2813,7 +2810,7 @@ void device_debug::compute_debug_flags()
 		machine.debug_flags |= DEBUG_FLAG_CALL_HOOK;
 
 	// also call if we are tracing
-	if (m_trace != NULL)
+	if (m_trace != nullptr)
 		machine.debug_flags |= DEBUG_FLAG_CALL_HOOK;
 
 	// if we are stopping at a particular time and that time is within the current timeslice, we need to be called
@@ -2865,7 +2862,7 @@ void device_debug::breakpoint_update_flags()
 {
 	// see if there are any enabled breakpoints
 	m_flags &= ~DEBUG_FLAG_LIVE_BP;
-	for (breakpoint *bp = m_bplist; bp != NULL; bp = bp->m_next)
+	for (breakpoint *bp = m_bplist; bp != nullptr; bp = bp->m_next)
 		if (bp->m_enabled)
 		{
 			m_flags |= DEBUG_FLAG_LIVE_BP;
@@ -2875,7 +2872,7 @@ void device_debug::breakpoint_update_flags()
 	if ( ! ( m_flags & DEBUG_FLAG_LIVE_BP ) )
 	{
 		// see if there are any enabled registerpoints
-		for (registerpoint *rp = m_rplist; rp != NULL; rp = rp->m_next)
+		for (registerpoint *rp = m_rplist; rp != nullptr; rp = rp->m_next)
 		{
 			if (rp->m_enabled)
 			{
@@ -2886,7 +2883,7 @@ void device_debug::breakpoint_update_flags()
 
 	// push the flags out globally
 	debugcpu_private *global = m_device.machine().debugcpu_data;
-	if (global->livecpu != NULL)
+	if (global->livecpu != nullptr)
 		global->livecpu->debug()->compute_debug_flags();
 }
 
@@ -2899,7 +2896,7 @@ void device_debug::breakpoint_update_flags()
 void device_debug::breakpoint_check(offs_t pc)
 {
 	// see if we match
-	for (breakpoint *bp = m_bplist; bp != NULL; bp = bp->m_next)
+	for (breakpoint *bp = m_bplist; bp != nullptr; bp = bp->m_next)
 		if (bp->hit(pc))
 		{
 			// halt in the debugger by default
@@ -2917,7 +2914,7 @@ void device_debug::breakpoint_check(offs_t pc)
 		}
 
 	// see if we have any matching registerpoints
-	for (registerpoint *rp = m_rplist; rp != NULL; rp = rp->m_next)
+	for (registerpoint *rp = m_rplist; rp != nullptr; rp = rp->m_next)
 	{
 		if (rp->hit())
 		{
@@ -2956,7 +2953,7 @@ void device_debug::watchpoint_update_flags(address_space &space)
 
 	// see if there are any enabled breakpoints
 	bool enablewrite = false;
-	for (watchpoint *wp = m_wplist[space.spacenum()]; wp != NULL; wp = wp->m_next)
+	for (watchpoint *wp = m_wplist[space.spacenum()]; wp != nullptr; wp = wp->m_next)
 		if (wp->m_enabled)
 		{
 			if (wp->m_type & WATCHPOINT_READ)
@@ -3029,7 +3026,7 @@ void device_debug::watchpoint_check(address_space &space, int type, offs_t addre
 		global->wpdata = value_to_write;
 
 	// see if we match
-	for (watchpoint *wp = m_wplist[space.spacenum()]; wp != NULL; wp = wp->m_next)
+	for (watchpoint *wp = m_wplist[space.spacenum()]; wp != nullptr; wp = wp->m_next)
 		if (wp->hit(type, address, size))
 		{
 			// halt in the debugger by default
@@ -3046,7 +3043,7 @@ void device_debug::watchpoint_check(address_space &space, int type, offs_t addre
 				{
 					"0bytes", "byte", "word", "3bytes", "dword", "5bytes", "6bytes", "7bytes", "qword"
 				};
-				offs_t pc = (space.device().debug()->m_state != NULL) ? space.device().debug()->m_state->pc() : 0;
+				offs_t pc = (space.device().debug()->m_state != nullptr) ? space.device().debug()->m_state->pc() : 0;
 				std::string buffer;
 
 				if (type & WATCHPOINT_WRITE)
@@ -3122,7 +3119,7 @@ void device_debug::hotspot_check(address_space &space, offs_t address)
 
 UINT32 device_debug::dasm_wrapped(std::string &buffer, offs_t pc)
 {
-	assert(m_memory != NULL && m_disasm != NULL);
+	assert(m_memory != nullptr && m_disasm != nullptr);
 
 	// determine the adjusted PC
 	address_space &decrypted_space = m_memory->has_space(AS_DECRYPTED_OPCODES) ? m_memory->space(AS_DECRYPTED_OPCODES) : m_memory->space(AS_PROGRAM);
@@ -3260,12 +3257,12 @@ device_debug::breakpoint::breakpoint(device_debug* debugInterface,
 										const char *condition,
 										const char *action)
 	: m_debugInterface(debugInterface),
-		m_next(NULL),
+		m_next(nullptr),
 		m_index(index),
 		m_enabled(true),
 		m_address(address),
-		m_condition(&symbols, (condition != NULL) ? condition : "1"),
-		m_action((action != NULL) ? action : "")
+		m_condition(&symbols, (condition != nullptr) ? condition : "1"),
+		m_action((action != nullptr) ? action : "")
 {
 }
 
@@ -3320,15 +3317,15 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 										const char *condition,
 										const char *action)
 	: m_debugInterface(debugInterface),
-		m_next(NULL),
+		m_next(nullptr),
 		m_space(space),
 		m_index(index),
 		m_enabled(true),
 		m_type(type),
 		m_address(space.address_to_byte(address) & space.bytemask()),
 		m_length(space.address_to_byte(length)),
-		m_condition(&symbols, (condition != NULL) ? condition : "1"),
-		m_action((action != NULL) ? action : "")
+		m_condition(&symbols, (condition != nullptr) ? condition : "1"),
+		m_action((action != nullptr) ? action : "")
 {
 }
 
@@ -3377,11 +3374,11 @@ bool device_debug::watchpoint::hit(int type, offs_t address, int size)
 //-------------------------------------------------
 
 device_debug::registerpoint::registerpoint(symbol_table &symbols, int index, const char *condition, const char *action)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_index(index),
 		m_enabled(true),
-		m_condition(&symbols, (condition != NULL) ? condition : "1"),
-		m_action((action != NULL) ? action : "")
+		m_condition(&symbols, (condition != nullptr) ? condition : "1"),
+		m_action((action != nullptr) ? action : "")
 {
 }
 
@@ -3425,7 +3422,7 @@ bool device_debug::registerpoint::hit()
 device_debug::tracer::tracer(device_debug &debug, FILE &file, bool trace_over, const char *action)
 	: m_debug(debug),
 		m_file(file),
-		m_action((action != NULL) ? action : ""),
+		m_action((action != nullptr) ? action : ""),
 		m_loops(0),
 		m_nextdex(0),
 		m_trace_over(trace_over),
@@ -3463,8 +3460,8 @@ void device_debug::tracer::update(offs_t pc)
 
 	// check for a loop condition
 	int count = 0;
-	for (int index = 0; index < ARRAY_LENGTH(m_history); index++)
-		if (m_history[index] == pc)
+	for (auto & elem : m_history)
+		if (elem == pc)
 			count++;
 
 	// if more than 1 hit, just up the loop count and get out
@@ -3569,6 +3566,6 @@ device_debug::dasm_memory_access::dasm_memory_access(const address_spacenum& add
 device_debug::dasm_comment::dasm_comment(offs_t address, UINT32 crc, const char *text, rgb_t color)
 	: dasm_pc_tag(address, crc),
 		m_text(text),
-		m_color(color)
+		m_color(std::move(color))
 {
 }

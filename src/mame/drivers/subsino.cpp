@@ -269,14 +269,14 @@ public:
 	tilemap_t *m_reel3_tilemap;
 	int m_tiles_offset;
 	UINT8 m_out_c;
-	UINT8 *m_reel1_attr;
-	UINT8 *m_reel2_attr;
-	UINT8 *m_reel3_attr;
+	std::unique_ptr<UINT8[]> m_reel1_attr;
+	std::unique_ptr<UINT8[]> m_reel2_attr;
+	std::unique_ptr<UINT8[]> m_reel3_attr;
 	UINT8 m_flash_val;
 	UINT8 m_flash_packet;
 	UINT8 m_flash_packet_start;
 	int m_colordac_offs;
-	UINT8 *m_stbsub_colorram;
+	std::unique_ptr<UINT8[]> m_stbsub_colorram;
 
 	ticket_dispenser_device *m_hopper;
 
@@ -325,7 +325,7 @@ public:
 	UINT32 screen_update_subsino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_subsino_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_stbsub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -3759,11 +3759,11 @@ ROM_START( mtrainnv )
 
 	ROM_REGION( 0x10000, "tilemap", 0 )
 	ROM_LOAD( "mtrain_tilemap.bin", 0x00000, 0x10000, NO_DUMP )
-	ROM_COPY( "maincpu", 0x0000, 0x00000, 0x10000 ) // just to show something
+	ROM_COPY( "maincpu", 0x000000, 0x00000, 0x10000 ) // just to show something
 
 	ROM_REGION( 0x10000, "reels", 0 )
 	ROM_LOAD( "mtrain_reels.bin", 0x00000, 0x10000, NO_DUMP )
-	ROM_COPY( "maincpu", 0x0000, 0x00000, 0x10000 ) // just to show something
+	ROM_COPY( "maincpu", 0x000000, 0x00000, 0x10000 ) // just to show something
 ROM_END
 
 
@@ -3841,15 +3841,15 @@ DRIVER_INIT_MEMBER(subsino_state,stbsub)
 	rom[0x957] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stbsub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+	m_stbsub_colorram = std::make_unique<UINT8[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
 
-	m_reel1_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel2_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel3_attr = auto_alloc_array(machine(), UINT8, 0x200);
+	m_reel1_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel2_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel3_attr = std::make_unique<UINT8[]>(0x200);
 }
 
 DRIVER_INIT_MEMBER(subsino_state, stisub)
@@ -3858,15 +3858,15 @@ DRIVER_INIT_MEMBER(subsino_state, stisub)
 	rom[0x0FA0] = 0x28;
 	rom[0x0FA1] = 0x1d; //patch protection check
 
-	m_stbsub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+	m_stbsub_colorram = std::make_unique<UINT8[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
 
-	m_reel1_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel2_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel3_attr = auto_alloc_array(machine(), UINT8, 0x200);
+	m_reel1_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel2_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel3_attr = std::make_unique<UINT8[]>(0x200);
 }
 
 DRIVER_INIT_MEMBER(subsino_state,tesorone)
@@ -3879,15 +3879,15 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone)
 	rom[0xa84] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stbsub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+	m_stbsub_colorram = std::make_unique<UINT8[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
 
-	m_reel1_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel2_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel3_attr = auto_alloc_array(machine(), UINT8, 0x200);
+	m_reel1_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel2_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel3_attr = std::make_unique<UINT8[]>(0x200);
 }
 
 DRIVER_INIT_MEMBER(subsino_state,tesorone230)
@@ -3900,29 +3900,29 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone230)
 	rom[0xa88] = 0x18; //patch "losing protection" check
 #endif
 
-	m_stbsub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+	m_stbsub_colorram = std::make_unique<UINT8[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
 
-	m_reel1_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel2_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel3_attr = auto_alloc_array(machine(), UINT8, 0x200);
+	m_reel1_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel2_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel3_attr = std::make_unique<UINT8[]>(0x200);
 }
 
 
 DRIVER_INIT_MEMBER(subsino_state,mtrainnv)
 {
-	m_stbsub_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+	m_stbsub_colorram = std::make_unique<UINT8[]>(256*3);
 
 	m_reel1_scroll.allocate(0x40);
 	m_reel2_scroll.allocate(0x40);
 	m_reel3_scroll.allocate(0x40);
 
-	m_reel1_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel2_attr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_reel3_attr = auto_alloc_array(machine(), UINT8, 0x200);
+	m_reel1_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel2_attr = std::make_unique<UINT8[]>(0x200);
+	m_reel3_attr = std::make_unique<UINT8[]>(0x200);
 }
 
 /***************************************************************************

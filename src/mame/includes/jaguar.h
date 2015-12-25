@@ -49,14 +49,14 @@ public:
 			m_using_cart(false),
 			m_misc_control_data(0),
 			m_eeprom_enable(true),
-			m_gpu_jump_address(NULL),
+			m_gpu_jump_address(nullptr),
 			m_gpu_command_pending(false),
 			m_gpu_spin_pc(0),
-			m_main_speedup(NULL),
+			m_main_speedup(nullptr),
 			m_main_speedup_hits(0),
 			m_main_speedup_last_cycles(0),
 			m_main_speedup_max_cycles(0),
-			m_main_gpu_wait(NULL),
+			m_main_gpu_wait(nullptr),
 			m_joystick_data(0),
 			m_eeprom_bit_count(0),
 			m_protection_check(0) ,
@@ -255,11 +255,11 @@ protected:
 	};
 
 	// device overrides
-	virtual void machine_reset();
-	virtual void sound_start();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void sound_start() override;
+	virtual void video_start() override;
 	virtual void device_postload();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void gpu_suspend() { m_gpu->suspend(SUSPEND_REASON_SPIN, 1); }
 	void gpu_resume() { m_gpu->resume(SUSPEND_REASON_SPIN); }

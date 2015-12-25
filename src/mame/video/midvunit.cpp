@@ -70,7 +70,7 @@ void midvunit_state::video_start()
 {
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
 
-	m_poly = auto_alloc(machine(), midvunit_renderer(*this));
+	m_poly = std::make_unique<midvunit_renderer>(*this);
 
 	save_item(NAME(m_video_regs));
 	save_item(NAME(m_dma_data));

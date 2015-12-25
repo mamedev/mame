@@ -28,8 +28,8 @@ public:
 	DECLARE_WRITE8_MEMBER(avalance_credit_1_lamp_w);
 	DECLARE_WRITE8_MEMBER(avalance_credit_2_lamp_w);
 	DECLARE_WRITE8_MEMBER(avalance_start_lamp_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_avalnche(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(avalnche_noise_amplitude_w);
 	DECLARE_WRITE8_MEMBER(avalnche_attract_enable_w);

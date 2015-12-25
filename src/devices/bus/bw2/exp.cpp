@@ -83,7 +83,7 @@ void bw2_expansion_slot_device::device_start()
 
 void bw2_expansion_slot_device::device_reset()
 {
-	if (m_cart != NULL)
+	if (m_cart != nullptr)
 	{
 		m_cart->device().reset();
 	}
@@ -96,7 +96,7 @@ void bw2_expansion_slot_device::device_reset()
 
 UINT8 bw2_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int ram2, int ram3, int ram4, int ram5, int ram6)
 {
-	if (m_cart != NULL)
+	if (m_cart != nullptr)
 	{
 		data = m_cart->bw2_cd_r(space, offset, data, ram2, ram3, ram4, ram5, ram6);
 	}
@@ -111,7 +111,7 @@ UINT8 bw2_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8
 
 void bw2_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int ram2, int ram3, int ram4, int ram5, int ram6)
 {
-	if (m_cart != NULL)
+	if (m_cart != nullptr)
 	{
 		m_cart->bw2_cd_w(space, offset, data, ram2, ram3, ram4, ram5, ram6);
 	}
@@ -126,7 +126,7 @@ READ8_MEMBER( bw2_expansion_slot_device::slot_r )
 {
 	UINT8 data = 0xff;
 
-	if (m_cart != NULL)
+	if (m_cart != nullptr)
 	{
 		data = m_cart->bw2_slot_r(space, offset);
 	}
@@ -141,7 +141,7 @@ READ8_MEMBER( bw2_expansion_slot_device::slot_r )
 
 WRITE8_MEMBER( bw2_expansion_slot_device::slot_w )
 {
-	if (m_cart != NULL)
+	if (m_cart != nullptr)
 	{
 		m_cart->bw2_slot_w(space, offset, data);
 	}
@@ -156,7 +156,7 @@ READ8_MEMBER( bw2_expansion_slot_device::modsel_r )
 {
 	UINT8 data = 0xff;
 
-	if (m_cart != NULL)
+	if (m_cart != nullptr)
 	{
 		data = m_cart->bw2_modsel_r(space, offset);
 	}
@@ -171,7 +171,7 @@ READ8_MEMBER( bw2_expansion_slot_device::modsel_r )
 
 WRITE8_MEMBER( bw2_expansion_slot_device::modsel_w )
 {
-	if (m_cart != NULL)
+	if (m_cart != nullptr)
 	{
 		m_cart->bw2_modsel_w(space, offset, data);
 	}

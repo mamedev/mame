@@ -128,8 +128,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset() { if (get_card_device()) get_card_device()->reset(); }
+	virtual void device_start() override;
+	virtual void device_reset() override { if (get_card_device()) get_card_device()->reset(); }
 
 	devcb_write_line   m_write_ipl0l;
 	devcb_write_line   m_write_ipl1l;

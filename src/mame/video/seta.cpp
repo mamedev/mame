@@ -209,7 +209,7 @@ static const game_offset game_offsets[] =
 	{ "crazyfgt", {  0,  0 }, { -2,  0 } }, // wrong (empty background column in title screen, but aligned sprites in screen select)
 	{ "magspeed", {  0,  0 }, { -2,  0 } }, // floating tilemap maybe 1px off in test grid
 
-	{ NULL }
+	{ nullptr }
 };
 
 
@@ -270,7 +270,7 @@ WRITE16_MEMBER(seta_state::seta_vregs_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				seta_coin_lockout_w (data & 0x0f);
-				if (m_x1 != NULL)
+				if (m_x1 != nullptr)
 					m_x1->enable_w (data & 0x20);
 				coin_counter_w(machine(), 0,data & 0x01);
 				coin_counter_w(machine(), 1,data & 0x02);
@@ -386,7 +386,7 @@ inline void seta_state::get_tile_info( tile_data &tileinfo, int tile_index, int 
 	UINT16 code =   vram[ tile_index ];
 	UINT16 attr =   vram[ tile_index + 0x800 ];
 
-	if(m_gfxdecode->gfx(gfx + ((vctrl[ 4/2 ] & 0x10) >> m_color_mode_shift)) != NULL)
+	if(m_gfxdecode->gfx(gfx + ((vctrl[ 4/2 ] & 0x10) >> m_color_mode_shift)) != nullptr)
 	{
 		gfx += (vctrl[ 4/2 ] & 0x10) >> m_color_mode_shift;
 	}
@@ -538,10 +538,10 @@ SETA001_SPRITE_GFXBANK_CB_MEMBER(seta_state::setac_gfxbank_callback)
 /* NO layers, only sprites */
 VIDEO_START_MEMBER(seta_state,seta_no_layers)
 {
-	m_tilemap_0 = 0;
-	m_tilemap_1 = 0;
-	m_tilemap_2 = 0;
-	m_tilemap_3 = 0;
+	m_tilemap_0 = nullptr;
+	m_tilemap_1 = nullptr;
+	m_tilemap_2 = nullptr;
+	m_tilemap_3 = nullptr;
 
 	m_tilemaps_flip = 0;
 
@@ -722,7 +722,7 @@ void seta_state::set_pens()
 			m_palette->set_pen_color(i, color);
 	}
 
-	if(m_paletteram2 != NULL)
+	if(m_paletteram2 != nullptr)
 	{
 		for (i = 0; i < m_paletteram2.bytes() / 2; i++)
 		{
@@ -848,7 +848,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 		m_tilemap_1->mark_all_dirty();
 	}
 
-	if(m_tilemap_2 != NULL && m_tilemap_3 != NULL)
+	if(m_tilemap_2 != nullptr && m_tilemap_3 != nullptr)
 	{
 		if(m_current_tilemap_mode[1] != (m_vctrl_2[ 4/2 ] & 0x10))
 		{
@@ -976,7 +976,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 		{
 			if (layers_ctrl & 8)        m_seta001->draw_sprites(screen, bitmap,cliprect,sprite_bank_size, sprite_setac);
 
-			if((order & 4) && m_paletteram2 != NULL)
+			if((order & 4) && m_paletteram2 != nullptr)
 			{
 				if(m_tilemap_2->enabled())
 				{
@@ -1003,7 +1003,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 		}
 		else
 		{
-			if((order & 4) && m_paletteram2 != NULL)
+			if((order & 4) && m_paletteram2 != nullptr)
 			{
 				if(m_tilemap_2->enabled())
 				{

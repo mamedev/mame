@@ -26,9 +26,9 @@ static MACHINE_CONFIG_FRAGMENT( microdisc )
 	MCFG_WD_FDC_FORCE_READY
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", microdisc_floppies, "3dsdd", microdisc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", microdisc_floppies, NULL,    microdisc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", microdisc_floppies, NULL,    microdisc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", microdisc_floppies, NULL,    microdisc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
 MACHINE_CONFIG_END
 
 DEVICE_ADDRESS_MAP_START(map, 8, microdisc_device)

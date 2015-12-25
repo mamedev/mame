@@ -47,10 +47,10 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 
 	tilemap_t *m_tilemap;
-	UINT8 *m_paletteram;
-	UINT8 *m_bg_vram;
-	UINT16 *m_bg_fb;
-	UINT16 *m_fg_fb;
+	std::unique_ptr<UINT8[]> m_paletteram;
+	std::unique_ptr<UINT8[]> m_bg_vram;
+	std::unique_ptr<UINT16[]> m_bg_fb;
+	std::unique_ptr<UINT16[]> m_fg_fb;
 	UINT8 m_rom_bank;
 	UINT8 m_bg_bank;
 	UINT8 m_vreg_bank;
@@ -82,9 +82,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	DECLARE_DRIVER_INIT(suprgolf);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -103,10 +103,10 @@ TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
 void suprgolf_state::video_start()
 {
 	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(suprgolf_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
-	m_paletteram = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_bg_vram = auto_alloc_array(machine(), UINT8, 0x2000*0x20);
-	m_bg_fb = auto_alloc_array(machine(), UINT16, 0x2000*0x20);
-	m_fg_fb = auto_alloc_array(machine(), UINT16, 0x2000*0x20);
+	m_paletteram = std::make_unique<UINT8[]>(0x1000);
+	m_bg_vram = std::make_unique<UINT8[]>(0x2000*0x20);
+	m_bg_fb = std::make_unique<UINT16[]>(0x2000*0x20);
+	m_fg_fb = std::make_unique<UINT16[]>(0x2000*0x20);
 
 	m_tilemap->set_transparent_pen(15);
 
@@ -115,10 +115,10 @@ void suprgolf_state::video_start()
 	save_item(NAME(m_vreg_pen));
 	save_item(NAME(m_palette_switch));
 	save_item(NAME(m_bg_vreg_test));
-	save_pointer(NAME(m_paletteram), 0x1000);
-	save_pointer(NAME(m_bg_vram), 0x2000*0x20);
-	save_pointer(NAME(m_bg_fb), 0x2000*0x20);
-	save_pointer(NAME(m_fg_fb), 0x2000*0x20);
+	save_pointer(NAME(m_paletteram.get()), 0x1000);
+	save_pointer(NAME(m_bg_vram.get()), 0x2000*0x20);
+	save_pointer(NAME(m_bg_fb.get()), 0x2000*0x20);
+	save_pointer(NAME(m_fg_fb.get()), 0x2000*0x20);
 }
 
 UINT32 suprgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

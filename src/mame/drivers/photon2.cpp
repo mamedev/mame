@@ -39,8 +39,8 @@ public:
 	DECLARE_WRITE8_MEMBER(fe_w);
 	DECLARE_WRITE8_MEMBER(misc_w);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(photon2);
 
 	UINT32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -113,7 +113,7 @@ void photon2_state::video_start()
 
 #if 0
 /* return the color to be used inverting FLASHing colors if necessary */
-INLINE unsigned char get_display_color (unsigned char color, int invert)
+static inline unsigned char get_display_color (unsigned char color, int invert)
 {
 	if (invert && (color & 0x80))
 			return (color & 0xc0) + ((color & 0x38) >> 3) + ((color & 0x07) << 3);
@@ -138,7 +138,7 @@ void photon2_state::screen_eof_spectrum(screen_device &screen, bool state)
 	}
 }
 
-INLINE void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+static inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = (UINT16)color;
 }

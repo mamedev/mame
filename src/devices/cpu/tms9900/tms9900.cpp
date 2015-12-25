@@ -172,8 +172,8 @@ tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type, 
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_BIG, databus_width, prg_addr_bits),
 		m_io_config("cru", ENDIANNESS_BIG, 8, cru_addr_bits),
-		m_prgspace(NULL),
-		m_cru(NULL),
+		m_prgspace(nullptr),
+		m_cru(nullptr),
 		m_prgaddr_mask((1<<prg_addr_bits)-1),
 		m_cruaddr_mask((1<<cru_addr_bits)-1),
 		m_clock_out_line(*this),
@@ -234,14 +234,14 @@ void tms99xx_device::device_start()
 
 	build_command_lookup_table();
 
-	m_program = NULL;
+	m_program = nullptr;
 }
 
 void tms99xx_device::device_stop()
 {
 	int k = 0;
 	if (TRACE_SETUP) logerror("tms99xx: Deleting lookup tables\n");
-	while (m_lotables[k]!=NULL) delete[] m_lotables[k++];
+	while (m_lotables[k]!=nullptr) delete[] m_lotables[k++];
 }
 
 /*
@@ -398,7 +398,7 @@ const address_space_config *tms99xx_device::memory_space_config(address_spacenum
 		return &m_io_config;
 
 	default:
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -1053,8 +1053,8 @@ void tms99xx_device::build_command_lookup_table()
 	lookup_entry* table = m_command_lookup_table;
 	for (int j=0; j < 16; j++)
 	{
-		table[j].entry = NULL;
-		table[j].next_digit = NULL;
+		table[j].entry = nullptr;
+		table[j].next_digit = nullptr;
 	}
 
 	do
@@ -1069,15 +1069,15 @@ void tms99xx_device::build_command_lookup_table()
 		while (bitcount < format_mask_len[inst->format])
 		{
 			// Descend
-			if (table[cmdindex].next_digit == NULL)
+			if (table[cmdindex].next_digit == nullptr)
 			{
 				if (TRACE_SETUP) logerror("tms99xx: create new table at bitcount=%d for index=%d\n", bitcount, cmdindex);
 				table[cmdindex].next_digit = new lookup_entry[16];
 				m_lotables[k++] = table[cmdindex].next_digit;
 				for (int j=0; j < 16; j++)
 				{
-					table[cmdindex].next_digit[j].next_digit = NULL;
-					table[cmdindex].next_digit[j].entry = NULL;
+					table[cmdindex].next_digit[j].next_digit = nullptr;
+					table[cmdindex].next_digit[j].entry = nullptr;
 				}
 			}
 			else
@@ -1107,7 +1107,7 @@ void tms99xx_device::build_command_lookup_table()
 		i++;
 	} while (inst->opcode != 0xf000);
 
-	m_lotables[k++] = NULL;
+	m_lotables[k++] = nullptr;
 	if (TRACE_SETUP) logerror("tms99xx: Allocated %d tables\n", k);
 }
 
@@ -1155,7 +1155,7 @@ void tms99xx_device::execute_run()
 	do
 	{
 		// Only when last instruction has completed
-		if (m_program == NULL)
+		if (m_program == nullptr)
 		{
 			if (m_load_state)
 			{
@@ -1175,7 +1175,7 @@ void tms99xx_device::execute_run()
 			}
 		}
 
-		if (m_program == NULL && m_idle_state)
+		if (m_program == nullptr && m_idle_state)
 		{
 			if (TRACE_WAIT) logerror("tms99xx: idle state\n");
 			pulse_clock(1);
@@ -1191,7 +1191,7 @@ void tms99xx_device::execute_run()
 			// A HOLD request is signalled through the input line HOLD.
 			// The hold state will be entered with the next non-memory access cycle.
 			if (m_hold_state &&
-				(m_program==NULL ||
+				(m_program==nullptr ||
 				(m_program[MPC] != IAQ &&
 				m_program[MPC] != MEMORY_READ && m_program[MPC] != MEMORY_WRITE &&
 				m_program[MPC] != REG_READ && m_program[MPC] != REG_WRITE)))
@@ -1217,7 +1217,7 @@ void tms99xx_device::execute_run()
 					set_wait_state(false);
 					m_check_ready = false;
 
-					if (m_program==NULL) m_op = IAQ;
+					if (m_program==nullptr) m_op = IAQ;
 					else
 					{
 						m_op = m_program[MPC];
@@ -1417,7 +1417,7 @@ void tms99xx_device::decode(UINT16 inst)
 	{
 		index = (opcode >> 12) & 0x000f;
 		if (TRACE_MICRO) logerror("tms99xx: Check next hex digit of instruction %x\n", index);
-		if (table[index].next_digit != NULL)
+		if (table[index].next_digit != nullptr)
 		{
 			table = table[index].next_digit;
 			opcode = opcode << 4;
@@ -1425,14 +1425,14 @@ void tms99xx_device::decode(UINT16 inst)
 		else complete = true;
 	}
 	decoded = table[index].entry;
-	if (decoded == NULL)
+	if (decoded == nullptr)
 	{
 		// not found
 		logerror("tms99xx: Illegal opcode %04x\n", inst);
 		IR = 0;
 		// This will cause another instruction acquisition in the next machine cycle
 		// with an asserted IAQ line (can be used to indicate this illegal opcode detection).
-		m_program = NULL;
+		m_program = nullptr;
 	}
 	else
 	{
@@ -1661,7 +1661,7 @@ void tms99xx_device::command_completed()
 		if (cycles > 0 && cycles < 10000) logerror(" %d cycles", cycles);
 		logerror("\n");
 	}
-	m_program = NULL;
+	m_program = nullptr;
 }
 
 /*

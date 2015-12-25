@@ -30,13 +30,13 @@ struct UINT32BE
 	UINT8 bytes[4];
 };
 
-INLINE UINT32 get_UINT32BE(UINT32BE word)
+static inline UINT32 get_UINT32BE(UINT32BE word)
 {
 	return (word.bytes[0] << 24) | (word.bytes[1] << 16) | (word.bytes[2] << 8) | word.bytes[3];
 }
 
 #ifdef UNUSED_FUNCTION
-INLINE void set_UINT32BE(UINT32BE *word, UINT32 data)
+static inline void set_UINT32BE(UINT32BE *word, UINT32 data)
 {
 	word->bytes[0] = (data >> 24) & 0xff;
 	word->bytes[1] = (data >> 16) & 0xff;
@@ -78,7 +78,7 @@ nand_device::nand_device(const machine_config &mconfig, const char *tag, device_
 		m_page_total_size(0),
 		m_num_pages(0),
 		m_log2_pages_per_block(0),
-		m_pagereg(NULL),
+		m_pagereg(nullptr),
 		m_id_len(0),
 		m_col_address_cycles(0),
 		m_row_address_cycles(0),
@@ -94,7 +94,7 @@ nand_device::nand_device(const machine_config &mconfig, device_type type, const 
 		m_page_total_size(0),
 		m_num_pages(0),
 		m_log2_pages_per_block(0),
-		m_pagereg(NULL),
+		m_pagereg(nullptr),
 		m_id_len(0),
 		m_col_address_cycles(0),
 		m_row_address_cycles(0),
@@ -109,8 +109,8 @@ nand_device::nand_device(const machine_config &mconfig, device_type type, const 
 */
 void nand_device::device_start()
 {
-	m_data_ptr = NULL;
-	m_data_uid_ptr = NULL;
+	m_data_ptr = nullptr;
+	m_data_uid_ptr = nullptr;
 	m_mode = SM_M_INIT;
 	m_pointer_mode = SM_PM_A;
 	m_page_addr = 0;
@@ -119,7 +119,7 @@ void nand_device::device_start()
 	m_accumulated_status = 0;
 	m_mp_opcode = 0;
 	m_mode_3065 = 0;
-	m_pagereg = auto_alloc_array(machine(), UINT8, m_page_total_size);
+	m_pagereg = std::make_unique<UINT8[]>(m_page_total_size);
 
 	#ifdef SMARTMEDIA_IMAGE_SAVE
 	m_image_format = 0;
@@ -151,7 +151,7 @@ bool smartmedia_image_device::smartmedia_format_1()
 	m_num_pages = get_UINT32BE(custom_header.num_pages);
 	m_log2_pages_per_block = get_UINT32BE(custom_header.log2_pages_per_block);
 	m_data_ptr = auto_alloc_array(machine(), UINT8, m_page_total_size*m_num_pages);
-	m_data_uid_ptr = auto_alloc_array(machine(), UINT8, 256 + 16);
+	m_data_uid_ptr = std::make_unique<UINT8[]>(256 + 16);
 	m_mode = SM_M_INIT;
 	m_pointer_mode = SM_PM_A;
 	m_page_addr = 0;
@@ -160,7 +160,7 @@ bool smartmedia_image_device::smartmedia_format_1()
 	if (!is_readonly())
 		m_status |= 0x80;
 	m_accumulated_status = 0;
-	m_pagereg = auto_alloc_array(machine(), UINT8, m_page_total_size);
+	m_pagereg = std::make_unique<UINT8[]>(m_page_total_size);
 	memset( m_id, 0, sizeof( m_id));
 	m_id_len = 0;
 	m_col_address_cycles = 1;
@@ -178,7 +178,7 @@ bool smartmedia_image_device::smartmedia_format_1()
 		m_id_len = 3;
 		fread(m_id, m_id_len);
 		fread(&m_mp_opcode, 1);
-		fread(m_data_uid_ptr, 256 + 16);
+		fread(m_data_uid_ptr.get(), 256 + 16);
 	}
 	fread(m_data_ptr, m_page_total_size*m_num_pages);
 
@@ -246,7 +246,7 @@ bool smartmedia_image_device::smartmedia_format_2()
 	}
 
 	m_data_ptr = auto_alloc_array(machine(), UINT8, m_page_total_size*m_num_pages);
-	m_data_uid_ptr = auto_alloc_array(machine(), UINT8, 256 + 16);
+	m_data_uid_ptr = std::make_unique<UINT8[]>(256 + 16);
 	m_mode = SM_M_INIT;
 	m_pointer_mode = SM_PM_A;
 	m_page_addr = 0;
@@ -255,7 +255,7 @@ bool smartmedia_image_device::smartmedia_format_2()
 	if (!is_readonly())
 		m_status |= 0x80;
 	m_accumulated_status = 0;
-	m_pagereg = auto_alloc_array(machine(), UINT8, m_page_total_size);
+	m_pagereg = std::make_unique<UINT8[]>(m_page_total_size);
 	m_id_len = 3;
 	memcpy( m_id, custom_header.data1, m_id_len);
 	m_mp_opcode = 0;
@@ -265,10 +265,10 @@ bool smartmedia_image_device::smartmedia_format_2()
 
 	for (i=0;i<8;i++)
 	{
-		memcpy( m_data_uid_ptr + i * 32, custom_header.data2, 16);
+		memcpy( m_data_uid_ptr.get() + i * 32, custom_header.data2, 16);
 		for (j=0;j<16;j++) m_data_uid_ptr[i*32+16+j] = custom_header.data2[j] ^ 0xFF;
 	}
-	memcpy( m_data_uid_ptr + 256, custom_header.data3, 16);
+	memcpy( m_data_uid_ptr.get() + 256, custom_header.data3, 16);
 
 	fread(m_data_ptr, m_page_total_size*m_num_pages);
 
@@ -335,15 +335,15 @@ void smartmedia_image_device::call_unload()
 	m_page_total_size = 0;
 	m_num_pages = 0;
 	m_log2_pages_per_block = 0;
-	m_data_ptr = NULL;
-	m_data_uid_ptr = NULL;
+	m_data_ptr = nullptr;
+	m_data_uid_ptr = nullptr;
 	m_mode = SM_M_INIT;
 	m_pointer_mode = SM_PM_A;
 	m_page_addr = 0;
 	m_byte_addr = 0;
 	m_status = 0xC0;
 	m_accumulated_status = 0;
-	m_pagereg = auto_alloc_array(machine(), UINT8, m_page_total_size);
+	m_pagereg = std::make_unique<UINT8[]>(m_page_total_size);
 	memset( m_id, 0, sizeof( m_id));
 	m_id_len = 0;
 	m_mp_opcode = 0;
@@ -440,7 +440,7 @@ void nand_device::command_w(UINT8 data)
 		m_page_addr = 0;
 		m_addr_load_ptr = 0;
 		m_program_byte_count = 0;
-		memset(m_pagereg, 0xff, m_page_total_size);
+		memset(m_pagereg.get(), 0xff, m_page_total_size);
 		break;
 	case 0x10: // Page Program (2nd cycle)
 	case 0x15:

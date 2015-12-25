@@ -149,7 +149,7 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( arcstick )
 	// expansion port to allow daisy chaining
-	MCFG_FC_EXPANSION_PORT_ADD("subexp", arcstick_daisy, NULL)
+	MCFG_FC_EXPANSION_PORT_ADD("subexp", arcstick_daisy, nullptr)
 MACHINE_CONFIG_END
 
 

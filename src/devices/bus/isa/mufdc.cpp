@@ -50,8 +50,8 @@ static MACHINE_CONFIG_FRAGMENT( mufdc_device )
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(mufdc_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", drives, "35hd", mufdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", drives, "35hd", mufdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", drives, NULL, mufdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", drives, NULL, mufdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", drives, nullptr, mufdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", drives, nullptr, mufdc_device::floppy_formats)
 MACHINE_CONFIG_END
 
 machine_config_constructor mufdc_device::device_mconfig_additions() const

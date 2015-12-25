@@ -41,9 +41,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_fgtile_info);
 	TILE_GET_INFO_MEMBER(get_txttile_info);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_DRIVER_INIT(darkmist);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(darkmist);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

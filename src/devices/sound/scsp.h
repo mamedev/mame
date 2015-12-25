@@ -95,10 +95,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	int m_roffset;                /* offset in the region */
@@ -123,7 +123,8 @@ private:
 	char m_Master;
 	sound_stream * m_stream;
 
-	INT32 *m_buffertmpl,*m_buffertmpr;
+	std::unique_ptr<INT32[]> m_buffertmpl;
+	std::unique_ptr<INT32[]> m_buffertmpr;
 
 	UINT32 m_IrqTimA;
 	UINT32 m_IrqTimBC;

@@ -3719,7 +3719,7 @@ static const opcode_struct g_opcode_info[] =
 	{d68851_p001         , 0xffc0, 0xf040, 0x000},
 	{d68040_fbcc_16      , 0xffc0, 0xf280, 0x000},
 	{d68040_fbcc_32      , 0xffc0, 0xf2c0, 0x000},
-	{0, 0, 0, 0}
+	{nullptr, 0, 0, 0}
 };
 
 /* Check if opcode is using a valid ea mode */
@@ -3801,7 +3801,7 @@ static void build_opcode_table(void)
 		g_instruction_table[i] = d68000_illegal; /* default to illegal */
 		opcode = i;
 		/* search through opcode info for a match */
-		for(ostruct = opcode_info;ostruct->opcode_handler != 0;ostruct++)
+		for(ostruct = opcode_info;ostruct->opcode_handler != nullptr;ostruct++)
 		{
 			/* match opcode mask and allowed ea modes */
 			if((opcode & ostruct->mask) == ostruct->match)
@@ -3896,7 +3896,7 @@ unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigne
 	g_rawop = opdata;
 	g_rawbasepc = pc;
 	result = m68k_disassemble(str_buff, pc, cpu_type);
-	g_rawop = NULL;
+	g_rawop = nullptr;
 	return result;
 }
 

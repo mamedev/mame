@@ -60,10 +60,10 @@ public:
 	}
 	virtual ~pcap_module() { }
 
-	virtual int init(const osd_options &options);
-	virtual void exit();
+	virtual int init(const osd_options &options) override;
+	virtual void exit() override;
 
-	virtual bool probe();
+	virtual bool probe() override;
 
 	HMODULE handle;
 };
@@ -109,10 +109,10 @@ public:
 	netdev_pcap(const char *name, class device_network_interface *ifdev, int rate);
 	~netdev_pcap();
 
-	int send(UINT8 *buf, int len);
-	void set_mac(const char *mac);
+	virtual int send(UINT8 *buf, int len) override;
+	virtual void set_mac(const char *mac) override;
 protected:
-	int recv_dev(UINT8 **buf);
+	virtual int recv_dev(UINT8 **buf) override;
 private:
 	pcap_t *m_p;
 #ifdef SDLMAME_MACOSX

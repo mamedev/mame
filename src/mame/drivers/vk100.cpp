@@ -239,8 +239,8 @@ public:
 	DECLARE_READ8_MEMBER(SYSTAT_A);
 	DECLARE_READ8_MEMBER(SYSTAT_B);
 	DECLARE_DRIVER_INIT(vk100);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	TIMER_CALLBACK_MEMBER(execute_vg);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
@@ -252,7 +252,7 @@ public:
 	void vram_write(UINT8 data);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 // vram access functions:
@@ -1052,7 +1052,7 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(vk100_state, i8251_rxrdy_int))
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE(vk100_state, i8251_txrdy_int))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
 

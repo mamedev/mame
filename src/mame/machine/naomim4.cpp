@@ -49,7 +49,7 @@ ADDRESS_MAP_END
 naomi_m4_board::naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: naomi_board(mconfig, NAOMI_M4_BOARD, "Sega NAOMI M4 Board", tag, owner, clock, "naomi_m4_board", __FILE__)
 {
-	key_tag = 0;
+	key_tag = nullptr;
 }
 
 void naomi_m4_board::static_set_tags(device_t &device, const char *_key_tag)
@@ -66,10 +66,10 @@ void naomi_m4_board::device_start()
 	subkey1 = (key_data[0x5e2] << 8) | key_data[0x5e0];
 	subkey2 = (key_data[0x5e6] << 8) | key_data[0x5e4];
 
-	buffer = auto_alloc_array(machine(), UINT8, BUFFER_SIZE);
+	buffer = std::make_unique<UINT8[]>(BUFFER_SIZE);
 	enc_init();
 
-	save_pointer(NAME(buffer), BUFFER_SIZE);
+	save_pointer(NAME(buffer.get()), BUFFER_SIZE);
 	save_item(NAME(rom_cur_address));
 	save_item(NAME(buffer_actual_size));
 	save_item(NAME(encryption));
@@ -79,7 +79,7 @@ void naomi_m4_board::device_start()
 
 void naomi_m4_board::enc_init()
 {
-	one_round = auto_alloc_array(machine(), UINT16, 0x10000);
+	one_round = std::make_unique<UINT16[]>(0x10000);
 
 	for(int round_input = 0; round_input < 0x10000; round_input++) {
 		UINT8 input_nibble[4];
@@ -134,7 +134,7 @@ void naomi_m4_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 	if (cfi_mode) {
 		int fpr_num = 0;
 
-		if (rombdid_tag && memregion(rombdid_tag) != NULL)
+		if (rombdid_tag && memregion(rombdid_tag) != nullptr)
 		{
 			fpr_num = *memregion(rombdid_tag)->base() & 0x7f;
 
@@ -148,7 +148,7 @@ void naomi_m4_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 	}
 
 	if(encryption) {
-		base = buffer;
+		base = buffer.get();
 		limit = BUFFER_SIZE;
 
 	} else {
@@ -168,7 +168,7 @@ void naomi_m4_board::board_advance(UINT32 size)
 {
 	if(encryption) {
 		if(size < buffer_actual_size) {
-			memmove(buffer, buffer + size, buffer_actual_size - size);
+			memmove(buffer.get(), buffer.get() + size, buffer_actual_size - size);
 			buffer_actual_size -= size;
 		} else
 			buffer_actual_size = 0;
@@ -217,7 +217,7 @@ READ16_MEMBER(naomi_m4_board::m4_id_r)
 {
 	UINT16 epr_flag = 0;
 
-	if (rombdid_tag && memregion(rombdid_tag) != NULL)
+	if (rombdid_tag && memregion(rombdid_tag) != nullptr)
 	{
 		epr_flag = *memregion(rombdid_tag)->base() & 0x80;
 

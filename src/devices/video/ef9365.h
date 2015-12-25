@@ -40,16 +40,17 @@ public:
 
 	void update_scanline(UINT16 scanline);
 	void static_set_color_filler( UINT8 color );
+	void static_set_color_entry( int index, UINT8 r, UINT8 g, UINT8 b );
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// address space configurations
 	const address_space_config      m_space_config;
@@ -57,7 +58,8 @@ protected:
 	// inline helper
 
 private:
-	void draw_character( unsigned char c );
+	void draw_character( unsigned char c, int block, int smallblock );
+	void screen_scanning( int force_clear );
 	void set_busy_flag(int period);
 	void set_video_mode(void);
 	void draw_border(UINT16 line);
@@ -74,6 +76,7 @@ private:
 	UINT8 m_registers[0x10];                //registers
 	UINT8 m_state;                          //status register
 	UINT8 m_border[80];                     //border color
+	rgb_t palette[16];
 
 	bitmap_rgb32 m_screen_out;
 
@@ -99,8 +102,5 @@ extern const device_type EF9365;
 #define EF9365_REG_Y_LSB  0x0B
 #define EF9365_REG_XLP    0x0C
 #define EF9365_REG_YLP    0x0D
-
-#define EF9365_REG_CTRL1  0x01
-#define EF9365_REG_CTRL1  0x01
 
 #endif

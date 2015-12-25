@@ -22,20 +22,20 @@
  *************************************/
 
 /* Borrowed from segasnd.c */
-INLINE void configure_filter(m3d_filter_state *state, double r, double c)
+static inline void configure_filter(m3d_filter_state *state, double r, double c)
 {
 	state->capval = 0;
 	state->exponent = 1.0 - exp(-1.0 / (r * c * 2000000/8));
 }
 
 #if 0
-INLINE double step_rc_filter(m3d_filter_state *state, double input)
+static inline double step_rc_filter(m3d_filter_state *state, double input)
 {
 	state->capval += (input - state->capval) * state->exponent;
 	return state->capval;
 }
 
-INLINE double step_cr_filter(m3d_filter_state *state, double input)
+static inline double step_cr_filter(m3d_filter_state *state, double input)
 {
 	double result = (input - state->capval);
 	state->capval += (input - state->capval) * state->exponent;
@@ -68,9 +68,9 @@ static void filter_init(running_machine &machine, lp_filter *iir, double fs)
 	iir->ProtoCoef[1].b1 = 1.847759;
 	iir->ProtoCoef[1].b2 = 1.0;
 
-	iir->coef = (float *)auto_alloc_array_clear(machine, float, 4 * 2 + 1);
+	iir->coef = make_unique_clear<float[]>(4 * 2 + 1);
 	iir->fs = fs;
-	iir->history = (float *)auto_alloc_array_clear(machine, float, 2 * 2);
+	iir->history = make_unique_clear<float[]>(2 * 2);
 }
 
 static void prewarp(double *a0, double *a1, double *a2,double fc, double fs)
@@ -107,7 +107,7 @@ static void recompute_filter(lp_filter *iir, double k, double q, double fc)
 	int nInd;
 	double a0, a1, a2, b0, b1, b2;
 
-	float *coef = iir->coef + 1;
+	float *coef = iir->coef.get() + 1;
 
 	for (nInd = 0; nInd < 2; nInd++)
 	{
@@ -174,7 +174,7 @@ micro3d_sound_device::micro3d_sound_device(const machine_config &mconfig, const 
 		m_noise_shift(0),
 		m_noise_value(0),
 		m_noise_subcount(0),
-		m_stream(NULL)
+		m_stream(nullptr)
 
 {
 		memset(m_dac, 0, sizeof(UINT8)*4);
@@ -270,9 +270,9 @@ void micro3d_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 		input += white;
 		input *= 200.0f;
 
-		coef_ptr = iir->coef;
+		coef_ptr = iir->coef.get();
 
-		hist1_ptr = iir->history;
+		hist1_ptr = iir->history.get();
 		hist2_ptr = hist1_ptr + 1;
 
 		/* 1st number of coefficients array is overall input scale factor, * or filter gain */

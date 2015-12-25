@@ -17,7 +17,7 @@
 #include "formats/basicdsk.h"
 
 static LEGACY_FLOPPY_OPTIONS_START( rx01 )
-	LEGACY_FLOPPY_OPTION(rx01, "img", "RX01 image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+	LEGACY_FLOPPY_OPTION(rx01, "img", "RX01 image", basicdsk_identify_default, basicdsk_construct_default, nullptr,
 		HEADS([1])
 		TRACKS([77])
 		SECTORS([26])
@@ -80,11 +80,11 @@ void rx01_device::device_start()
 
 void rx01_device::device_reset()
 {
-	for(int i=0;i<2;i++)
+	for(auto & elem : m_image)
 	{
-		m_image[i]->floppy_mon_w(0); // turn it on
-		m_image[i]->floppy_drive_set_controller(this);
-		m_image[i]->floppy_drive_set_rpm(360.);
+		elem->floppy_mon_w(0); // turn it on
+		elem->floppy_drive_set_controller(this);
+		elem->floppy_drive_set_rpm(360.);
 	}
 	m_rxes = 0;
 	m_rxcs = 0;

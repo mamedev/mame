@@ -30,7 +30,7 @@ static MACHINE_CONFIG_FRAGMENT( cpc_rom )
 
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
@@ -99,7 +99,7 @@ rom_image_device::~rom_image_device()
 
 void rom_image_device::device_start()
 {
-	m_base = NULL;
+	m_base = nullptr;
 }
 
 /*-------------------------------------------------
@@ -110,15 +110,15 @@ bool rom_image_device::call_load()
 	device_image_interface* image = this;
 	UINT64 size = image->length();
 
-	m_base = global_alloc_array(UINT8, 16384);
+	m_base = std::make_unique<UINT8[]>(16384);
 	if(size <= 16384)
 	{
-		image->fread(m_base,size);
+		image->fread(m_base.get(),size);
 	}
 	else
 	{
 		image->fseek(size-16384,SEEK_SET);
-		image->fread(m_base,16384);
+		image->fread(m_base.get(),16384);
 	}
 
 	return IMAGE_INIT_PASS;
@@ -130,6 +130,5 @@ bool rom_image_device::call_load()
 -------------------------------------------------*/
 void rom_image_device::call_unload()
 {
-	global_free_array(m_base);
-	m_base = NULL;
+	m_base = nullptr;
 }

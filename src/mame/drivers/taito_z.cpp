@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves
+// thanks-to:Richard Bush
 /***************************************************************************
 
 Taito Z System [twin 68K with optional Z80]

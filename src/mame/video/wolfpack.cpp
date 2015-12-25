@@ -100,7 +100,7 @@ void wolfpack_state::video_start()
 
 	int i;
 
-	m_LFSR = auto_alloc_array(machine(), UINT8, 0x8000);
+	m_LFSR = std::make_unique<UINT8[]>(0x8000);
 
 	m_screen->register_screen_bitmap(m_helper);
 

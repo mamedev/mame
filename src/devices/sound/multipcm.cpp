@@ -457,25 +457,25 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, MULTIPCM, "Sega/Yamaha 315-5560", tag, owner, clock, "multipcm", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
-		m_space_config("mpcm_samples", ENDIANNESS_LITTLE, 8, 24, 0, NULL),
-		m_stream(NULL),
-		m_samples(NULL),
-		m_slots(NULL),
+		m_space_config("mpcm_samples", ENDIANNESS_LITTLE, 8, 24, 0, nullptr),
+		m_stream(nullptr),
+		m_samples(nullptr),
+		m_slots(nullptr),
 		m_cur_slot(0),
 		m_address(0),
 		m_bank_right(0),
 		m_bank_left(0),
 		m_rate(0),
-		m_attack_step(NULL),
-		m_decay_release_step(NULL),
-		m_freq_step_table(NULL),
-		m_direct(NULL),
-		m_left_pan_table(NULL),
-		m_right_pan_table(NULL),
-		m_linear_to_exp_volume(NULL),
-		m_total_level_steps(NULL),
-		m_pitch_scale_tables(NULL),
-		m_amplitude_scale_tables(NULL)
+		m_attack_step(nullptr),
+		m_decay_release_step(nullptr),
+		m_freq_step_table(nullptr),
+		m_direct(nullptr),
+		m_left_pan_table(nullptr),
+		m_right_pan_table(nullptr),
+		m_linear_to_exp_volume(nullptr),
+		m_total_level_steps(nullptr),
+		m_pitch_scale_tables(nullptr),
+		m_amplitude_scale_tables(nullptr)
 {
 	m_address_map[0] = *ADDRESS_MAP_NAME(multipcm);
 }
@@ -487,7 +487,7 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 
 const address_space_config *multipcm_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 //-------------------------------------------------

@@ -241,7 +241,7 @@ static const struct CassetteFormat primo_ptp_image_format =
 	"ptp",
 	primo_ptp_identify,
 	primo_ptp_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(primo_ptp_format)

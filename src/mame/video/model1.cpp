@@ -742,7 +742,7 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size)
 	float *poly_data;
 
 	if(poly_adr & 0x800000)
-		poly_data=(float *) m_poly_ram;
+		poly_data=(float *) m_poly_ram.get();
 	else
 		poly_data=(float *) m_poly_rom;
 
@@ -1445,8 +1445,8 @@ VIDEO_START_MEMBER(model1_state,model1)
 	m_view = auto_alloc_clear(machine(), struct view);
 
 	m_poly_rom = (UINT32 *)memregion("user1")->base();
-	m_poly_ram = auto_alloc_array_clear(machine(), UINT32, 0x400000);
-	m_tgp_ram = auto_alloc_array_clear(machine(), UINT16, 0x100000-0x40000);
+	m_poly_ram = make_unique_clear<UINT32[]>(0x400000);
+	m_tgp_ram = make_unique_clear<UINT16[]>(0x100000-0x40000);
 	m_pointdb = auto_alloc_array_clear(machine(), struct m1_point, 1000000*2);
 	m_quaddb  = auto_alloc_array_clear(machine(), struct quad_m1, 1000000);
 	m_quadind = auto_alloc_array_clear(machine(), struct quad_m1 *, 1000000);
@@ -1455,8 +1455,8 @@ VIDEO_START_MEMBER(model1_state,model1)
 	m_quadpt = m_quaddb;
 	m_listctl[0] = m_listctl[1] = 0;
 
-	save_pointer(NAME(m_tgp_ram), 0x100000-0x40000);
-	save_pointer(NAME(m_poly_ram), 0x40000);
+	save_pointer(NAME(m_tgp_ram.get()), 0x100000-0x40000);
+	save_pointer(NAME(m_poly_ram.get()), 0x40000);
 	save_item(NAME(m_listctl));
 }
 

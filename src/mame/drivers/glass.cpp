@@ -78,7 +78,7 @@ WRITE16_MEMBER(glass_state::glass_coin_w)
 }
 
 static ADDRESS_MAP_START( glass_map, AS_PROGRAM, 16, glass_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                     /* ROM */
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                     /* ROM */
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(glass_vram_w) AM_SHARE("videoram")                            /* Video RAM */
 	AM_RANGE(0x102000, 0x102fff) AM_RAM                                                                     /* Extra Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                                             /* Video Registers */
@@ -193,7 +193,7 @@ void glass_state::machine_reset()
 static MACHINE_CONFIG_START( glass, glass_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000/2)      /* 12 MHz (M680000 P12) */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)      /* 12 MHz verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(glass_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", glass_state,  glass_interrupt)
 
@@ -214,12 +214,12 @@ static MACHINE_CONFIG_START( glass, glass_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH) /* 1MHz Resonator & pin 7 high verified on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 ROM_START( glass ) /* Version 1.1 */
-	ROM_REGION( 0x080000, "maincpu", 0 )    /* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "1.c23", 0x000000, 0x040000, CRC(aeebd4ed) SHA1(04759dc146dff0fc74b78d70e79dfaebe68328f9) )
 	ROM_LOAD16_BYTE( "2.c22", 0x000001, 0x040000, CRC(165e2e01) SHA1(180a2e2b5151f2321d85ac23eff7fbc9f52023a5) )
 
@@ -240,7 +240,7 @@ ROM_START( glass ) /* Version 1.1 */
 ROM_END
 
 ROM_START( glass10 ) /* Version 1.0 */
-	ROM_REGION( 0x080000, "maincpu", 0 )    /* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "c23.bin", 0x000000, 0x040000, CRC(688cdf33) SHA1(b59dcc3fc15f72037692b745927b110e97d8282e) )
 	ROM_LOAD16_BYTE( "c22.bin", 0x000001, 0x040000, CRC(ab17c992) SHA1(1509b5b4bbfb4e022e0ab6fbbc0ffc070adfa531) )
 
@@ -260,8 +260,8 @@ ROM_START( glass10 ) /* Version 1.0 */
 	ROM_RELOAD(         0x040000, 0x100000 )
 ROM_END
 
-ROM_START( glassbrk ) /* Title screen shows "GLASS" and under that "Break Edition" on a real PCB */
-	ROM_REGION( 0x080000, "maincpu", 0 )    /* 68000 code */
+ROM_START( glass10a ) /* Title screen shows "GLASS" and under that "Break Edition" on a real PCB */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "spl-c23.bin", 0x000000, 0x040000, CRC(c1393bea) SHA1(a5f877ba38305a7b49fa3c96b9344cbf71e8c9ef) )
 	ROM_LOAD16_BYTE( "spl-c22.bin", 0x000001, 0x040000, CRC(0d6fa33e) SHA1(37e9258ef7e108d034c80abc8e5e5ab6dacf0a61) )
 
@@ -274,6 +274,27 @@ ROM_START( glassbrk ) /* Title screen shows "GLASS" and under that "Break Editio
 
 	ROM_REGION( 0x100000, "gfx3", 0 )   /* 16 bitmaps (320x200, indexed colors) */
 	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
+
+	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
+	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
+	ROM_RELOAD(         0x040000, 0x100000 )
+ROM_END
+
+ROM_START( glasskr )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "glassk.c23", 0x000000, 0x080000, CRC(6ee19376) SHA1(8a8fdeebe094bd3e29c35cf59584e3cab708732d) )
+	ROM_LOAD16_BYTE( "glassk.c22", 0x000001, 0x080000, CRC(bd546568) SHA1(bcd5e7591f4e68c9470999b8a0ef1ee4392c907c) )
+
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
+	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
+
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* Graphics */
+	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
+	ROM_LOAD( "h11.bin", 0x200000, 0x200000, CRC(c6ac41c8) SHA1(22408ef1e35c66d0fba0c72972c46fad891d1193) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )   /* 16 bitmaps (320x200, indexed colors) */
+	ROM_LOAD( "glassk.h9", 0x000000, 0x100000, CRC(d499be4c) SHA1(204f754813be687e8dc00bfe7b5dbc4857ac8738) )
 
 	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
@@ -391,8 +412,7 @@ WRITE16_MEMBER( glass_state::glass_mainram_w )
 
 }
 
-
-DRIVER_INIT_MEMBER(glass_state,glass)
+DRIVER_INIT_MEMBER(glass_state, glass)
 {
 	/*
 	For "gfx2" we have this memory map:
@@ -412,11 +432,24 @@ DRIVER_INIT_MEMBER(glass_state,glass)
 	/* split ROM H11 */
 	glass_ROM16_split_gfx("gfx2", "gfx1", 0x0200000, 0x0200000, 0x0200000, 0x0300000);
 
+}
+
+
+DRIVER_INIT_MEMBER(glass_state,glassp)
+{
+	DRIVER_INIT_CALL(glass);
+
 	/* install custom handler over RAM for protection */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec000, 0xfeffff, read16_delegate(FUNC(glass_state::glass_mainram_r), this), write16_delegate(FUNC(glass_state::glass_mainram_w),this));
 
 }
 
-GAME( 1993, glass,    0,     glass, glass, glass_state, glass, ROT0, "OMK / Gaelco", "Glass (Ver 1.1)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, glass10,  glass, glass, glass, glass_state, glass, ROT0, "OMK / Gaelco", "Glass (Ver 1.0)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, glassbrk, glass, glass, glass, glass_state, glass, ROT0, "OMK / Gaelco", "Glass (Ver 1.0, Break Edition)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+// ALL versions of Glass contain the 'Break Edition' string (it just seems to be part of the title?)
+// The 2 version 1.0 releases are very similar code, it was thought that one was a break edition and the other wasn't, but as both contain the string this seems unlikely.
+// Version 1.1 releases also show Version 1994 on the title screen.  These versions do not have skulls in the playfield (at least not on early stages)
+// The unprotected version appears to be a Korean set, is censored, and has different girl pictures.
+
+GAME( 1994, glass,    0,     glass, glass, glass_state, glassp, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.1, Break Edition, Version 1994)",                           MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, glasskr,  glass, glass, glass, glass_state, glass,  ROT0, "OMK / Gaelco (Promat license)", "Glass (Ver 1.1, Break Edition, Version 1994) (censored, unprotected)",   MACHINE_SUPPORTS_SAVE ) // promat stickers on program roms
+GAME( 1993, glass10,  glass, glass, glass, glass_state, glassp, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition) (set 1)",                                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, glass10a, glass, glass, glass, glass_state, glassp, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition) (set 2)",                                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

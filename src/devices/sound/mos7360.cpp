@@ -177,7 +177,7 @@ const address_space_config *mos7360_device::memory_space_config(address_spacenum
 	switch (spacenum)
 	{
 		case AS_0: return &m_videoram_space_config;
-		default: return NULL;
+		default: return nullptr;
 	}
 }
 
@@ -258,10 +258,10 @@ mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, d
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos7360_videoram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos7360_videoram_map)),
 		m_write_irq(*this),
 		m_read_k(*this),
-		m_stream(NULL)
+		m_stream(nullptr)
 {
 }
 
@@ -274,7 +274,7 @@ void mos7360_device::device_start()
 {
 	// get the CPU device
 	m_cpu = machine().device<cpu_device>(m_cpu_tag);
-	assert(m_cpu != NULL);
+	assert(m_cpu != nullptr);
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();
@@ -297,7 +297,7 @@ void mos7360_device::device_start()
 
 	// buffer for fastest played sample for 5 second so we have enough data for min 5 second
 	m_noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;
-	m_noise = auto_alloc_array(machine(), UINT8, m_noisesize);
+	m_noise = std::make_unique<UINT8[]>(m_noisesize);
 
 	{
 		int noiseshift = 0x7ffff8;

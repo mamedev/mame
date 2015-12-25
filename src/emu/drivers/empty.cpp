@@ -26,7 +26,7 @@ public:
 	{
 	}
 
-	virtual void machine_start()
+	virtual void machine_start() override
 	{
 		// force the UI to show the game select screen
 		ui_menu_select_game::force_game_select(machine(), &machine().render().ui_container());

@@ -84,7 +84,7 @@ public:
 	DECLARE_READ32_MEMBER(in0_r);
 	DECLARE_WRITE32_MEMBER(output_w);
 	DECLARE_DRIVER_INIT(feversoc);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(feversoc_irq);
 	required_device<sh2_device> m_maincpu;

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Zsolt Vasvari
+// copyright-holders:K.Wilkins,Zsolt Vasvari
 /***************************************************************************
 
     Sigma Spiders hardware

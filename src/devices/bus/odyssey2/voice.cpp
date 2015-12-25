@@ -49,7 +49,7 @@ static MACHINE_CONFIG_FRAGMENT( o2voice )
 	// The Voice uses a speaker with its own volume control so the relative volumes to use are subjective, these sound good
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_O2_CARTRIDGE_ADD("subslot", o2_cart, NULL)
+	MCFG_O2_CARTRIDGE_ADD("subslot", o2_cart, nullptr)
 MACHINE_CONFIG_END
 
 

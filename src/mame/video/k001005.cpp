@@ -32,12 +32,12 @@ k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, devi
 	int width = screen.width();
 	int height = screen.height();
 
-	m_fb[0] = auto_bitmap_rgb32_alloc(machine(), width, height);
-	m_fb[1] = auto_bitmap_rgb32_alloc(machine(), width, height);
+	m_fb[0] = std::make_unique<bitmap_rgb32>( width, height);
+	m_fb[1] = std::make_unique<bitmap_rgb32>( width, height);
 
-	m_zb = auto_bitmap_ind32_alloc(machine(), width, height);
+	m_zb = std::make_unique<bitmap_ind32>(width, height);
 
-	m_3dfifo = auto_alloc_array(machine(), UINT32, 0x10000);
+	m_3dfifo = std::make_unique<UINT32[]>(0x10000);
 	m_3dfifo_ptr = 0;
 	m_fb_page = 0;
 
@@ -45,8 +45,8 @@ k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, devi
 
 	for (int k=0; k < 8; k++)
 	{
-		m_tex_mirror_table[0][k] = auto_alloc_array(machine(), int, 128);
-		m_tex_mirror_table[1][k] = auto_alloc_array(machine(), int, 128);
+		m_tex_mirror_table[0][k] = std::make_unique<int[]>(128);
+		m_tex_mirror_table[1][k] = std::make_unique<int[]>(128);
 
 		int size = (k+1)*8;
 
@@ -58,7 +58,7 @@ k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, devi
 	}
 
 	// save state
-	parent.save_pointer(NAME(m_3dfifo), 0x10000);
+	parent.save_pointer(NAME(m_3dfifo.get()), 0x10000);
 	parent.save_item(NAME(m_3dfifo_ptr));
 	parent.save_item(NAME(*m_fb[0]));
 	parent.save_item(NAME(*m_fb[1]));
@@ -143,7 +143,7 @@ void k001005_renderer::render_polygons()
 	vertex_t *vertex3;
 	vertex_t *vertex4;
 
-	UINT32 *fifo = m_3dfifo;
+	UINT32 *fifo = m_3dfifo.get();
 
 	const rectangle& visarea = screen().visible_area();
 
@@ -917,8 +917,8 @@ void k001005_renderer::draw_scanline_2d_tex(INT32 scanline, const extent_t &exte
 	int texture_width = extradata.texture_width;
 	int texture_height = extradata.texture_height;
 
-	int *x_mirror_table = m_tex_mirror_table[texture_mirror_x][texture_width];
-	int *y_mirror_table = m_tex_mirror_table[texture_mirror_y][texture_height];
+	int *x_mirror_table = m_tex_mirror_table[texture_mirror_x][texture_width].get();
+	int *y_mirror_table = m_tex_mirror_table[texture_mirror_y][texture_height].get();
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -1038,8 +1038,8 @@ void k001005_renderer::draw_scanline_tex(INT32 scanline, const extent_t &extent,
 	UINT32 *fb = &m_fb[m_fb_page]->pix32(scanline);
 	float *zb = (float*)&m_zb->pix32(scanline);
 
-	int *x_mirror_table = m_tex_mirror_table[texture_mirror_x][texture_width];
-	int *y_mirror_table = m_tex_mirror_table[texture_mirror_y][texture_height];
+	int *x_mirror_table = m_tex_mirror_table[texture_mirror_x][texture_width].get();
+	int *y_mirror_table = m_tex_mirror_table[texture_mirror_y][texture_height].get();
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -1173,16 +1173,16 @@ const device_type K001005 = &device_creator<k001005_device>;
 k001005_device::k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K001005, "K001005 Polygon Renderer", tag, owner, clock, "k001005", __FILE__),
 		device_video_interface(mconfig, *this),
-		m_k001006(NULL),
-		m_fifo(NULL),
+		m_k001006(nullptr),
+		m_fifo(nullptr),
 		m_status(0),
 		m_ram_ptr(0),
 		m_fifo_read_ptr(0),
 		m_fifo_write_ptr(0),
 		m_reg_far_z(0)
 {
-		m_ram[0] = 0;
-		m_ram[1] = 0;
+		m_ram[0] = nullptr;
+		m_ram[1] = nullptr;
 }
 
 //-------------------------------------------------
@@ -1203,16 +1203,16 @@ void k001005_device::device_start()
 {
 	m_k001006 = machine().device(m_k001006_tag);
 
-	m_ram[0] = auto_alloc_array(machine(), UINT16, 0x140000);
-	m_ram[1] = auto_alloc_array(machine(), UINT16, 0x140000);
+	m_ram[0] = std::make_unique<UINT16[]>(0x140000);
+	m_ram[1] = std::make_unique<UINT16[]>(0x140000);
 
-	m_fifo = auto_alloc_array(machine(), UINT32, 0x800);
+	m_fifo = std::make_unique<UINT32[]>(0x800);
 
 	m_renderer = auto_alloc(machine(), k001005_renderer(*this, *m_screen, m_k001006));
 
-	save_pointer(NAME(m_ram[0]), 0x140000);
-	save_pointer(NAME(m_ram[1]), 0x140000);
-	save_pointer(NAME(m_fifo), 0x800);
+	save_pointer(NAME(m_ram[0].get()), 0x140000);
+	save_pointer(NAME(m_ram[1].get()), 0x140000);
+	save_pointer(NAME(m_fifo.get()), 0x800);
 	save_item(NAME(m_status));
 	save_item(NAME(m_ram_ptr));
 	save_item(NAME(m_fifo_read_ptr));

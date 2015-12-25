@@ -43,7 +43,7 @@ public:
 	UINT8    m_char_palette;
 	UINT8    m_sprite_palette;
 	UINT8    m_char_bank;
-	UINT16   *m_background_gfx[4];
+	std::unique_ptr<UINT16[]>  m_background_gfx[4];
 	UINT8    *m_background_mixer;
 	UINT8    m_background_latches[13];
 
@@ -67,9 +67,9 @@ public:
 	DECLARE_WRITE8_MEMBER(exerion_portb_w);
 	DECLARE_DRIVER_INIT(exerion);
 	DECLARE_DRIVER_INIT(exerionb);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(exerion);
 	UINT32 screen_update_exerion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect);

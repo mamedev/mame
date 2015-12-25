@@ -94,10 +94,10 @@ public:
 			UINT8 ram3[3][16];
 		} d;
 	} m_reg;
-	bitmap_ind16 *m_bitmap;
+	std::unique_ptr<bitmap_ind16> m_bitmap;
 	DECLARE_DRIVER_INIT(arcadia);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(arcadia);
 	UINT32 screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(video_line);

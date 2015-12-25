@@ -105,8 +105,8 @@ void sega_315_5296_device::device_reset()
 
 	for (int i = 0; i < 8; i++)
 		(*m_out_port_cb[i])((offs_t)i, 0);
-	for (int i = 0; i < 3; i++)
-		(*m_out_cnt_cb[i])(0);
+	for (auto & elem : m_out_cnt_cb)
+		(*elem)(0);
 }
 
 

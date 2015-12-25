@@ -69,15 +69,15 @@ beckerport_device::beckerport_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, COCO_DWSOCK, "Virtual Becker Port", tag, owner, clock, "coco_dwsock", __FILE__), m_hostname(nullptr),
 	m_dwconfigport(*this, DRIVEWIRE_PORT_TAG), m_dwtcpport(0)
 {
-	m_pSocket = NULL;
+	m_pSocket = nullptr;
 	m_head = 0;
 	m_rx_pending = 0;
 }
 
 beckerport_device::~beckerport_device()
 {
-	if (m_pSocket != NULL)
-		device_stop();
+	if (m_pSocket != nullptr)
+		beckerport_device::device_stop();
 }
 
 /*-------------------------------------------------
@@ -110,11 +110,11 @@ void beckerport_device::device_start(void)
 
 void beckerport_device::device_stop(void)
 {
-	if (m_pSocket != NULL)
+	if (m_pSocket != nullptr)
 	{
 		printf("Closing connection to Drivewire server\n");
 		osd_close(m_pSocket);
-		m_pSocket = NULL;
+		m_pSocket = nullptr;
 	}
 }
 
@@ -136,7 +136,7 @@ READ8_MEMBER(beckerport_device::read)
 {
 	unsigned char data = 0x5a;
 
-	if (m_pSocket == NULL)
+	if (m_pSocket == nullptr)
 		return data;
 
 	switch (offset)
@@ -179,7 +179,7 @@ WRITE8_MEMBER(beckerport_device::write)
 	char d = (char)data;
 	file_error filerr;
 
-	if (m_pSocket == NULL)
+	if (m_pSocket == nullptr)
 		return;
 
 	switch (offset)
@@ -188,7 +188,7 @@ WRITE8_MEMBER(beckerport_device::write)
 			//printf("beckerport_write: error: write (0x%02x) to status register\n", d);
 			break;
 		case DWS_DATA:
-			filerr = osd_write(m_pSocket, &d, 0, 1, NULL);
+			filerr = osd_write(m_pSocket, &d, 0, 1, nullptr);
 			if (filerr != FILERR_NONE)
 				fprintf(stderr, "coco_dwsock.c: beckerport_device::write() socket write operation failed with file_error %i\n", filerr);
 			//printf("beckerport_write: data write one byte (0x%02x)\n", d & 0xff);

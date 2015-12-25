@@ -113,8 +113,8 @@ public:
 	DECLARE_WRITE8_MEMBER(jamma_if_control_latch_w);
 	DECLARE_READ8_MEMBER(jamma_if_control_latch_r);
 	DECLARE_READ8_MEMBER(jamma_if_read_dsw);
-	virtual UINT8 joy_read();
-	virtual void machine_reset();
+	virtual UINT8 joy_read() override;
+	virtual void machine_reset() override;
 	required_device<discrete_device> m_discrete;
 	DECLARE_WRITE_LINE_MEMBER(pce_irq_changed);
 };

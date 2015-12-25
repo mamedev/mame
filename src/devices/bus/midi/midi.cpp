@@ -9,7 +9,7 @@ midi_port_device::midi_port_device(const machine_config &mconfig, const char *ta
 	device_slot_interface(mconfig, *this),
 	m_rxd(0),
 	m_rxd_handler(*this),
-	m_dev(NULL)
+	m_dev(nullptr)
 {
 }
 

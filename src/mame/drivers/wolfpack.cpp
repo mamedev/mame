@@ -163,7 +163,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wolfpack )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)0)    /* dial connects here */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)nullptr)    /* dial connects here */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wolfpack_state,wolfpack_dial_r, (void *)1)    /* dial connects here */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -241,7 +241,7 @@ static const gfx_layout ship_layout =
 	},
 	0x800,
 	ship_layout_xoffset,
-	NULL
+	nullptr
 };
 
 static const UINT32 pt_layout_xoffset[64] =
@@ -266,7 +266,7 @@ static const gfx_layout pt_layout =
 	{ 0x000, 0x040, 0x080, 0x0c0, 0x100, 0x140, 0x180, 0x1c0 },
 	0x200,
 	pt_layout_xoffset,
-	NULL
+	nullptr
 };
 
 

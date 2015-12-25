@@ -32,8 +32,8 @@ public:
 
 		required_device<cpu_device> m_maincpu;
 
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 };

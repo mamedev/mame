@@ -1165,7 +1165,7 @@ void i386_device::i386_jmp_abs16()         // Opcode 0xea
 void i386_device::i386_lea16()             // Opcode 0x8d
 {
 	UINT8 modrm = FETCH();
-	UINT32 ea = GetNonTranslatedEA(modrm,NULL);
+	UINT32 ea = GetNonTranslatedEA(modrm,nullptr);
 	STORE_REG16(modrm, ea);
 	CYCLES(CYCLES_LEA);
 }
@@ -3173,7 +3173,7 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 				}
 				memset(&seg, 0, sizeof(seg));
 				seg.selector = m_ldtr.segment;
-				i386_load_protected_mode_segment(&seg,NULL);
+				i386_load_protected_mode_segment(&seg,nullptr);
 				m_ldtr.limit = seg.limit;
 				m_ldtr.base = seg.base;
 				m_ldtr.flags = seg.flags;
@@ -3200,10 +3200,10 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 				}
 				memset(&seg, 0, sizeof(seg));
 				seg.selector = m_task.segment;
-				i386_load_protected_mode_segment(&seg,NULL);
+				i386_load_protected_mode_segment(&seg,nullptr);
 
 				UINT32 addr = ((seg.selector & 4) ? m_ldtr.base : m_gdtr.base) + (seg.selector & ~7) + 5;
-				i386_translate_address(TRANSLATE_READ, &addr, NULL);
+				i386_translate_address(TRANSLATE_READ, &addr, nullptr);
 				m_program->write_byte(addr, (seg.flags & 0xff) | 2);
 
 				m_task.limit = seg.limit;
@@ -3230,7 +3230,7 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 				}
 				memset(&seg, 0, sizeof(seg));
 				seg.selector = address;
-				result = i386_load_protected_mode_segment(&seg,NULL);
+				result = i386_load_protected_mode_segment(&seg,nullptr);
 				// check if the segment is a code or data segment (not a special segment type, like a TSS, gate, LDT...)
 				if(!(seg.flags & 0x10))
 					result = 0;
@@ -3278,7 +3278,7 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 				}
 				memset(&seg, 0, sizeof(seg));
 				seg.selector = address;
-				result = i386_load_protected_mode_segment(&seg,NULL);
+				result = i386_load_protected_mode_segment(&seg,nullptr);
 				// check if the segment is a code or data segment (not a special segment type, like a TSS, gate, LDT...)
 				if(!(seg.flags & 0x10))
 					result = 0;
@@ -3564,7 +3564,7 @@ void i386_device::i386_lar_r16_rm16()  // Opcode 0x0f 0x02
 		}
 		else
 		{
-			if(!i386_load_protected_mode_segment(&seg,NULL))
+			if(!i386_load_protected_mode_segment(&seg,nullptr))
 			{
 				SetZF(0);
 				return;
@@ -3629,7 +3629,7 @@ void i386_device::i386_lsl_r16_rm16()  // Opcode 0x0f 0x03
 		else
 		{
 			UINT8 type;
-			if(!i386_load_protected_mode_segment(&seg,NULL))
+			if(!i386_load_protected_mode_segment(&seg,nullptr))
 			{
 				SetZF(0);
 				return;
@@ -3747,7 +3747,7 @@ bool i386_device::i386_load_far_pointer16(int s)
 		UINT32 ea = GetEA(modrm,0);
 		STORE_REG16(modrm, READ16(ea + 0));
 		selector = READ16(ea + 2);
-		i386_sreg_load(selector,s,NULL);
+		i386_sreg_load(selector,s,nullptr);
 	}
 	return true;
 }

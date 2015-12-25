@@ -41,8 +41,8 @@ public:
 	UINT8 m_row_reg;
 	UINT8 m_col_reg;
 	UINT8 port_read_with_latch(UINT8 ext, UINT8 latch_state);
-	virtual void video_start();
-	virtual void machine_start();
+	virtual void video_start() override;
+	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(channelf);
 	UINT32 screen_update_channelf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

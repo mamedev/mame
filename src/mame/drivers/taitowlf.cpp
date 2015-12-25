@@ -45,7 +45,7 @@ public:
 		m_bank1(*this, "bank1"),
 		m_palette(*this, "palette") { }
 
-	UINT32 *m_bios_ram;
+	std::unique_ptr<UINT32[]> m_bios_ram;
 	UINT8 m_mtxc_config_reg[256];
 	UINT8 m_piix4_config_reg[4][256];
 
@@ -56,8 +56,8 @@ public:
 	DECLARE_WRITE32_MEMBER(pnp_data_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
 	DECLARE_DRIVER_INIT(taitowlf);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	#if !ENABLE_VGA
 	DECLARE_PALETTE_INIT(taitowlf);
 	#endif
@@ -261,7 +261,7 @@ WRITE32_MEMBER(taitowlf_state::bios_ram_w)
 {
 	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
-		COMBINE_DATA(m_bios_ram + offset);
+		COMBINE_DATA(m_bios_ram.get() + offset);
 	}
 }
 
@@ -373,8 +373,8 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 
@@ -396,9 +396,9 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(taitowlf_state,taitowlf)
 {
-	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
+	m_bios_ram = std::make_unique<UINT32[]>(0x10000/4);
 
-	m_bank1->configure_entry(1, m_bios_ram);
+	m_bank1->configure_entry(1, m_bios_ram.get());
 	m_bank1->configure_entry(0, memregion("bios")->base() + 0x30000);
 	intel82439tx_init();
 }

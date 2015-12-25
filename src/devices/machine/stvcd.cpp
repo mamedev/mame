@@ -309,7 +309,7 @@ void saturn_state::cd_exec_command( void )
 						for (i = xfersectpos; i < xfersectpos+xfersectnum; i++)
 						{
 							cd_free_block(transpart->blocks[i]);
-							transpart->blocks[i] = (blockT *)NULL;
+							transpart->blocks[i] = (blockT *)nullptr;
 							transpart->bnum[i] = 0xff;
 						}
 
@@ -595,7 +595,7 @@ void saturn_state::cd_exec_command( void )
 
 				if (parm == 0xff)
 				{
-					cddevice = (filterT *)NULL;
+					cddevice = (filterT *)nullptr;
 				}
 				else
 				{
@@ -755,7 +755,7 @@ void saturn_state::cd_exec_command( void )
 					for (i = 0; i < MAX_BLOCKS; i++)
 					{
 						cd_free_block(partitions[bufnum].blocks[i]);
-						partitions[bufnum].blocks[i] = (blockT *)NULL;
+						partitions[bufnum].blocks[i] = (blockT *)nullptr;
 						partitions[bufnum].bnum[i] = 0xff;
 					}
 
@@ -813,7 +813,7 @@ void saturn_state::cd_exec_command( void )
 					for (j = 0; j < MAX_BLOCKS; j++)
 					{
 						cd_free_block(partitions[i].blocks[j]);
-						partitions[i].blocks[j] = (blockT *)NULL;
+						partitions[i].blocks[j] = (blockT *)nullptr;
 						partitions[i].bnum[j] = 0xff;
 					}
 
@@ -1047,7 +1047,7 @@ void saturn_state::cd_exec_command( void )
 				{
 					partitions[bufnum].size -= partitions[bufnum].blocks[i]->size;
 					cd_free_block(partitions[bufnum].blocks[i]);
-					partitions[bufnum].blocks[i] = (blockT *)NULL;
+					partitions[bufnum].blocks[i] = (blockT *)nullptr;
 					partitions[bufnum].bnum[i] = 0xff;
 				}
 
@@ -1223,7 +1223,7 @@ void saturn_state::cd_exec_command( void )
 			if((cr3 >> 8) < 0x24)
 				cddevice = &filters[cr3 >> 8];
 			else
-				cddevice = (filterT *)NULL;
+				cddevice = (filterT *)nullptr;
 
 			/* TODO:  */
 			//read_new_dir(read_dir - 2);
@@ -1318,7 +1318,7 @@ void saturn_state::cd_exec_command( void )
 			if(file_filter < 0x24)
 				cddevice = &filters[file_filter];
 			else
-				cddevice = (filterT *)NULL;
+				cddevice = (filterT *)nullptr;
 
 			printf("Read file %08x (%08x %08x) %02x %d\n",curdir[file_id].firstfad,cd_curfad,fadstoplay,file_filter,sectlenin);
 
@@ -1455,7 +1455,7 @@ void saturn_state::stvcd_reset( void )
 
 		for (j = 0; j < MAX_BLOCKS; j++)
 		{
-			partitions[i].blocks[j] = (blockT *)NULL;
+			partitions[i].blocks[j] = (blockT *)nullptr;
 			partitions[i].bnum[j] = 0xff;
 		}
 	}
@@ -1471,11 +1471,11 @@ void saturn_state::stvcd_reset( void )
 	if (cdrom)
 	{
 		cdrom_close(cdrom);
-		cdrom = (cdrom_file *)NULL;
+		cdrom = (cdrom_file *)nullptr;
 	}
 
 	cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
-	if (cddevice!=NULL)
+	if (cddevice!=nullptr)
 	{
 		// MESS case
 		cdrom = cddevice->get_cdrom_file();
@@ -1533,7 +1533,7 @@ saturn_state::blockT *saturn_state::cd_alloc_block(UINT8 *blknum)
 	}
 
 	buffull = 1;
-	return (blockT *)NULL;
+	return (blockT *)nullptr;
 }
 
 void saturn_state::cd_free_block(blockT *blktofree)
@@ -1542,7 +1542,7 @@ void saturn_state::cd_free_block(blockT *blktofree)
 
 	CDROM_LOG(("cd_free_block: %x\n", (UINT32)(FPTR)blktofree))
 
-	if(blktofree == NULL)
+	if(blktofree == nullptr)
 	{
 		return;
 	}
@@ -1584,7 +1584,7 @@ void saturn_state::cd_defragblocks(partitionT *part)
 	{
 		for (j = i+1; j < MAX_BLOCKS; j++)
 		{
-			if ((part->blocks[i] == (blockT *)NULL) && (part->blocks[j] != (blockT *)NULL))
+			if ((part->blocks[i] == (blockT *)nullptr) && (part->blocks[j] != (blockT *)nullptr))
 			{
 				temp = part->blocks[i];
 				part->blocks[i] = part->blocks[j];
@@ -1808,7 +1808,7 @@ UINT32 saturn_state::cd_readLong(UINT32 addr)
 							for (i = xfersectpos; i < xfersectpos+xfersectnum; i++)
 							{
 								cd_free_block(transpart->blocks[i]);
-								transpart->blocks[i] = (blockT *)NULL;
+								transpart->blocks[i] = (blockT *)nullptr;
 								transpart->bnum[i] = 0xff;
 							}
 
@@ -2243,11 +2243,11 @@ void saturn_state::stvcd_exit( void )
 	if (cdrom)
 	{
 		cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
-		if (cddevice==NULL)
+		if (cddevice==nullptr)
 		{
 			cdrom_close(cdrom);
 		}
-		cdrom = (cdrom_file *)NULL;
+		cdrom = (cdrom_file *)nullptr;
 	}
 }
 
@@ -2346,7 +2346,7 @@ void saturn_state::cd_readTOC(void)
 saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype, UINT8 *p_ok)
 {
 	int match, keepgoing;
-	partitionT *filterprt = (partitionT *)NULL;
+	partitionT *filterprt = (partitionT *)nullptr;
 
 	CDROM_LOG(("cd_filterdata, trktype %d\n", trktype))
 	match = 1;
@@ -2428,7 +2428,7 @@ saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype,
 			if ((lastbuf == 0xff) || (keepgoing == 0))
 			{
 				*p_ok = 0;
-				return (partitionT *)NULL;
+				return (partitionT *)nullptr;
 			}
 
 			// try again using the filter that was on the "false" connector
@@ -2446,10 +2446,10 @@ saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype,
 	filterprt->blocks[filterprt->numblks] = cd_alloc_block(&filterprt->bnum[filterprt->numblks]);
 
 	// did the allocation succeed?
-	if (filterprt->blocks[filterprt->numblks] == (blockT *)NULL)
+	if (filterprt->blocks[filterprt->numblks] == (blockT *)nullptr)
 	{
 		*p_ok = 0;
-		return (partitionT *)NULL;
+		return (partitionT *)nullptr;
 	}
 
 	// copy working block to the newly allocated one
@@ -2503,7 +2503,7 @@ saturn_state::partitionT *saturn_state::cd_read_filtered_sector(INT32 fad, UINT8
 {
 	int trktype;
 
-	if ((cddevice != NULL) && (!buffull))
+	if ((cddevice != nullptr) && (!buffull))
 	{
 		// find out the track's type
 		trktype = cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, fad-150));
@@ -2544,7 +2544,7 @@ saturn_state::partitionT *saturn_state::cd_read_filtered_sector(INT32 fad, UINT8
 	}
 
 	*p_ok = 0;
-	return (partitionT *)NULL;
+	return (partitionT *)nullptr;
 }
 
 // loads in data set up by a CD-block PLAY command
@@ -2655,7 +2655,7 @@ void saturn_state::stvcd_set_tray_open( void )
 	hirqreg |= DCHG;
 	cd_stat = CD_STAT_OPEN;
 
-	cdrom = (cdrom_file *)NULL;
+	cdrom = (cdrom_file *)nullptr;
 	tray_is_closed = 0;
 
 	popmessage("Tray Open");
@@ -2670,7 +2670,7 @@ void saturn_state::stvcd_set_tray_close( void )
 	hirqreg |= DCHG;
 
 	cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
-	if (cddevice!=NULL)
+	if (cddevice!=nullptr)
 	{
 		// MESS case
 		cdrom = cddevice->get_cdrom_file();

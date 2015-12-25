@@ -90,7 +90,7 @@ public:
 	UINT16 m_page_control;
 	UINT8 m_video_changed;
 	emu_timer *m_scanline_timer;
-	midvunit_renderer *m_poly;
+	std::unique_ptr<midvunit_renderer> m_poly;
 	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
 	DECLARE_READ32_MEMBER(midvunit_dma_queue_entries_r);
 	DECLARE_READ32_MEMBER(midvunit_dma_trigger_r);
@@ -134,9 +134,9 @@ public:
 	DECLARE_DRIVER_INIT(crusnusa);
 	void init_crusnwld_common(offs_t speedup);
 	void init_crusnusa_common(offs_t speedup);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(midvplus);
 	UINT32 screen_update_midvunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_timer_cb);
@@ -151,5 +151,5 @@ public:
 	void postload();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

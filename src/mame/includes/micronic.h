@@ -56,8 +56,8 @@ public:
 	required_device<nvram_device> m_nvram2;
 	required_device<ram_device> m_ram;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	DECLARE_READ8_MEMBER( keypad_r );

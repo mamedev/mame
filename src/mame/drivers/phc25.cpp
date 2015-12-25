@@ -279,7 +279,7 @@ READ8_MEMBER( phc25_state::video_ram_r )
 
 MC6847_GET_CHARROM_MEMBER(phc25_state::pal_char_rom_r)
 {
-	return m_char_rom[((ch - 2) * 12) + line + 4];
+	return m_char_rom[(((ch - 2) * 12) + line + 4) & 0xfff];
 }
 
 // irq is inverted in emulation, so we need this trampoline
@@ -290,7 +290,7 @@ WRITE_LINE_MEMBER( phc25_state::irq_w )
 
 MC6847_GET_CHARROM_MEMBER(phc25_state::ntsc_char_rom_r)
 {
-	return m_char_rom[(ch * 16) + line];
+	return m_char_rom[(ch * 16 + line) & 0xfff];
 }
 
 void phc25_state::video_start()

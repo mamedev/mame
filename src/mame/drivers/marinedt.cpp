@@ -168,9 +168,9 @@ public:
 	required_shared_ptr<UINT8> m_tx_tileram;
 
 	/* video-related */
-	bitmap_ind16 *m_tile;
-	bitmap_ind16 *m_obj1;
-	bitmap_ind16 *m_obj2;
+	std::unique_ptr<bitmap_ind16> m_tile;
+	std::unique_ptr<bitmap_ind16> m_obj1;
+	std::unique_ptr<bitmap_ind16> m_obj2;
 	tilemap_t *m_tx_tilemap;
 
 	UINT8 m_obj1_a;
@@ -208,9 +208,9 @@ public:
 	DECLARE_WRITE8_MEMBER(marinedt_pd_w);
 	DECLARE_WRITE8_MEMBER(marinedt_pf_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(marinedt);
 	UINT32 screen_update_marinedt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -561,9 +561,9 @@ void marinedt_state::video_start()
 	m_tx_tilemap->set_scrolldx(0, 4*8);
 	m_tx_tilemap->set_scrolldy(0, -4*8);
 
-	m_tile = auto_bitmap_ind16_alloc(machine(), 32 * 8, 32 * 8);
-	m_obj1 = auto_bitmap_ind16_alloc(machine(), 32, 32);
-	m_obj2 = auto_bitmap_ind16_alloc(machine(), 32, 32);
+	m_tile = std::make_unique<bitmap_ind16>(32 * 8, 32 * 8);
+	m_obj1 = std::make_unique<bitmap_ind16>(32, 32);
+	m_obj2 = std::make_unique<bitmap_ind16>(32, 32);
 }
 
 

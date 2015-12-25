@@ -1383,7 +1383,7 @@ static const gfx_layout road_layout =
 	{ 0 },
 	64*1*4,
 	road_layout_xoffset,
-	NULL
+	nullptr
 };
 
 /**************************************************************************

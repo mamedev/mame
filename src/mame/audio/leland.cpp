@@ -308,7 +308,7 @@ void leland_80186_sound_device::device_start()
 	m_ext_start = 0;
 	m_ext_stop = 0;
 	m_ext_active = 0;
-	m_ext_base = NULL;
+	m_ext_base = nullptr;
 
 	m_audiocpu = downcast<i80186_cpu_device *>(machine().device("audiocpu"));
 

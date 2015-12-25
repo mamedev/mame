@@ -304,7 +304,7 @@ GND  8A 8B GND
 class systeme_state : public driver_device
 {
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 public:
 	systeme_state(const machine_config &mconfig, device_type type, const char *tag)

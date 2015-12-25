@@ -42,16 +42,16 @@ public:
 	MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row );
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
 protected:
 	required_ioport m_cga_config;
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 public:
 	void mode_control_w(UINT8 data);
 	void set_palette_luts();
@@ -114,7 +114,7 @@ public:
 	// construction/destruction
 	isa8_cga_poisk2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 // device type definition
@@ -130,16 +130,16 @@ public:
 	// construction/destruction
 	isa8_cga_pc1512_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
-	virtual MC6845_UPDATE_ROW( crtc_update_row );
+	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 public:
 	UINT8   m_write;
@@ -154,8 +154,8 @@ public:
 	static const offs_t vram_offset[4];
 	static const UINT8 mc6845_writeonce_register[31];
 
-	virtual DECLARE_READ8_MEMBER( io_read );
-	virtual DECLARE_WRITE8_MEMBER( io_write );
+	virtual DECLARE_READ8_MEMBER( io_read ) override;
+	virtual DECLARE_WRITE8_MEMBER( io_write ) override;
 
 	DECLARE_WRITE8_MEMBER( vram_w );
 };
@@ -172,17 +172,17 @@ public:
 	// construction/destruction
 	isa8_wyse700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 public:
-	virtual DECLARE_READ8_MEMBER( io_read );
-	virtual DECLARE_WRITE8_MEMBER( io_write );
-	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual DECLARE_READ8_MEMBER( io_read ) override;
+	virtual DECLARE_WRITE8_MEMBER( io_write ) override;
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 	void change_resolution(UINT8 mode);
 
 	UINT8 m_bank_offset;
@@ -204,12 +204,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 public:
-	virtual DECLARE_READ8_MEMBER( io_read );
-	virtual DECLARE_WRITE8_MEMBER( io_write );
+	virtual DECLARE_READ8_MEMBER( io_read ) override;
+	virtual DECLARE_WRITE8_MEMBER( io_write ) override;
 
 	UINT8   m_p3df;
 	DECLARE_READ8_MEMBER( char_ram_read );
@@ -227,7 +227,7 @@ class isa8_cga_iskr1030m_device :
 public:
 	// construction/destruction
 	isa8_cga_iskr1030m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 // device type definition
@@ -241,7 +241,7 @@ class isa8_cga_iskr1031_device :
 public:
 	// construction/destruction
 	isa8_cga_iskr1031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 // device type definition
@@ -256,7 +256,7 @@ public:
 	// construction/destruction
 	isa8_cga_mc1502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 // device type definition
@@ -269,16 +269,16 @@ class isa8_cga_m24_device :
 public:
 	// construction/destruction
 	isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 	// optional information overrides
 	//virtual const rom_entry *device_rom_region() const;
-	virtual DECLARE_READ8_MEMBER( io_read );
-	virtual DECLARE_WRITE8_MEMBER( io_write );
-	virtual MC6845_UPDATE_ROW( crtc_update_row );
+	virtual DECLARE_READ8_MEMBER( io_read ) override;
+	virtual DECLARE_WRITE8_MEMBER( io_write ) override;
+	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( m24_gfx_1bpp_m24_update_row );
 	MC6845_RECONFIGURE(reconfigure);
 protected:
-	virtual void device_reset();
+	virtual void device_reset() override;
 private:
 	UINT8 m_mode2, m_index;
 };

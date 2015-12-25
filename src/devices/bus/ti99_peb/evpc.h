@@ -33,29 +33,29 @@ class snug_enhanced_video_device : public ti_expansion_card_device, public devic
 {
 public:
 	snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
 protected:
-	virtual void device_start(void);
-	virtual void device_reset(void);
-	virtual void device_stop(void);
+	virtual void device_start(void) override;
+	virtual void device_reset(void) override;
+	virtual void device_stop(void) override;
 
-	virtual const rom_entry *device_rom_region() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
-	void nvram_default();
-	void nvram_read(emu_file &file);
-	void nvram_write(emu_file &file);
+	void nvram_default() override;
+	void nvram_read(emu_file &file) override;
+	void nvram_write(emu_file &file) override;
 
 private:
 	UINT8*          m_dsrrom;
 	bool            m_RAMEN;
 	int             m_dsr_page;
-	UINT8*          m_novram;   /* NOVRAM area */
+	std::unique_ptr<UINT8[]>          m_novram;   /* NOVRAM area */
 	evpc_palette    m_palette;
 };
 

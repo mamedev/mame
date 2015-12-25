@@ -44,8 +44,8 @@ private:
 	UINT32 m_polygons;
 	offs_t m_texture_size;
 	offs_t m_texmask_size;
-	UINT8 *m_texture;
-	UINT8 *m_texmask;
+	std::unique_ptr<UINT8[]> m_texture;
+	std::unique_ptr<UINT8[]> m_texmask;
 
 	void render_noz_noperspective(INT32 scanline, const extent_t &extent, const gaelco3d_object_data &extra, int threadid);
 	void render_normal(INT32 scanline, const extent_t &extent, const gaelco3d_object_data &extra, int threadid);
@@ -96,12 +96,12 @@ public:
 	offs_t m_adsp_incs;
 	offs_t m_adsp_size;
 	dmadac_sound_device *m_dmadac[SOUND_CHANNELS];
-	rgb_t *m_palette;
-	UINT32 *m_polydata_buffer;
+	std::unique_ptr<rgb_t[]> m_palette;
+	std::unique_ptr<UINT32[]> m_polydata_buffer;
 	UINT32 m_polydata_count;
 	int m_lastscan;
 	int m_video_changed;
-	gaelco3d_renderer *m_poly;
+	std::unique_ptr<gaelco3d_renderer> m_poly;
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
 	DECLARE_WRITE32_MEMBER(irq_ack32_w);
 	DECLARE_WRITE16_MEMBER(sound_data_w);
@@ -133,9 +133,9 @@ public:
 	DECLARE_WRITE16_MEMBER(eeprom_clock_w);
 	DECLARE_WRITE16_MEMBER(eeprom_cs_w);
 	DECLARE_DRIVER_INIT(gaelco3d);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(gaelco3d2);
 	DECLARE_MACHINE_RESET(common);
 	UINT32 screen_update_gaelco3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

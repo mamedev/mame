@@ -64,17 +64,17 @@ TIMER_CALLBACK_MEMBER(sprint4_state::nmi_callback)
 
 	UINT8 wheel[4] =
 	{
-		ioport("WHEEL1")->read(),
-		ioport("WHEEL2")->read(),
-		ioport("WHEEL3")->read(),
-		ioport("WHEEL4")->read()
+		static_cast<UINT8>(ioport("WHEEL1")->read()),
+		static_cast<UINT8>(ioport("WHEEL2")->read()),
+		static_cast<UINT8>(ioport("WHEEL3")->read()),
+		static_cast<UINT8>(ioport("WHEEL4")->read())
 	};
 	UINT8 lever[4] =
 	{
-		ioport("LEVER1")->read(),
-		ioport("LEVER2")->read(),
-		ioport("LEVER3")->read(),
-		ioport("LEVER4")->read()
+		static_cast<UINT8>(ioport("LEVER1")->read()),
+		static_cast<UINT8>(ioport("LEVER2")->read()),
+		static_cast<UINT8>(ioport("LEVER3")->read()),
+		static_cast<UINT8>(ioport("LEVER4")->read())
 	};
 
 	int i;
@@ -276,7 +276,7 @@ static INPUT_PORTS_START( sprint4 )
 
 	PORT_START("COLLISION")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Player 1 Gas") PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sprint4_state, get_collision, (void *)0 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sprint4_state, get_collision, (void *)nullptr )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Player 2 Gas") PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sprint4_state, get_collision, (void *)1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Player 3 Gas") PORT_PLAYER(3)
@@ -313,8 +313,8 @@ static INPUT_PORTS_START( sprint4 )
 	PORT_DIPSETTING(    0xe0, "150 seconds" )
 
 	PORT_START("ANALOG")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sprint4_state, get_wheel, (void *)0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sprint4_state, get_lever, (void *)0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sprint4_state, get_wheel, (void *)nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sprint4_state, get_lever, (void *)nullptr)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sprint4_state, get_wheel, (void *)1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sprint4_state, get_lever, (void *)1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, sprint4_state, get_wheel, (void *)2)

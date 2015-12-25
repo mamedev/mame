@@ -32,7 +32,7 @@
 #define VERBOSE_LEVEL ( 0 )
 
 #if 0
-INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ... )
+static inline void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -105,9 +105,9 @@ void newport_video_device::device_config_complete()
 
 void newport_video_device::device_start()
 {
-	m_base = auto_alloc_array_clear(machine(), UINT32, (1280+64) * (1024+64));
+	m_base = make_unique_clear<UINT32[]>((1280+64) * (1024+64));
 
-	save_pointer(NAME(m_base), (1280+64) * (1024+64));
+	save_pointer(NAME(m_base.get()), (1280+64) * (1024+64));
 	save_item(NAME(m_VC2.nRegister));
 	save_item(NAME(m_VC2.nRAM));
 	save_item(NAME(m_VC2.nRegIdx));

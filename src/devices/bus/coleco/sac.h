@@ -30,17 +30,17 @@ public:
 	coleco_super_action_controller_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_CUSTOM_INPUT_MEMBER( keypad_r );
 	DECLARE_INPUT_CHANGED_MEMBER( slider_w );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_vcs_control_port_interface overrides
-	virtual UINT8 joy_r();
+	virtual UINT8 joy_r() override;
 
 private:
 	required_ioport m_io_common0;

@@ -103,7 +103,7 @@ public:
 	DECLARE_READ8_MEMBER(ti99_2_read_misc_cru);
 	DECLARE_DRIVER_INIT(ti99_2_24);
 	DECLARE_DRIVER_INIT(ti99_2_32);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	UINT32 screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ti99_2_vblank_interrupt);
 	required_device<cpu_device> m_maincpu;

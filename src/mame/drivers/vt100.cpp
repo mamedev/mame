@@ -63,8 +63,8 @@ public:
 	bool m_vertical_int;
 	bool m_key_scan;
 	UINT8 m_key_code;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vt100_vertical_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
@@ -431,7 +431,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
 

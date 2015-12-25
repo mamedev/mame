@@ -14,7 +14,7 @@ pc_mssw_pad_device::pc_mssw_pad_device(const machine_config& mconfig, const char
 	m_btn3(*this, "btn3"),
 	m_btn4(*this, "btn4"),
 	m_conf(*this, "CONFIG"),
-	m_timer(NULL),
+	m_timer(nullptr),
 	m_count(0),
 	m_state(0),
 	m_active(false)

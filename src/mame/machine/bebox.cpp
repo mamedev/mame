@@ -270,8 +270,8 @@ void bebox_state::bebox_set_irq_bit(unsigned int interrupt_bit, int val)
 {
 	static const char *const interrupt_names[32] =
 	{
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		"GEEKPORT",
 		"ADC",
 		"IR",
@@ -298,17 +298,17 @@ void bebox_state::bebox_set_irq_bit(unsigned int interrupt_bit, int val)
 		"COM3",
 		"COM2",
 		"COM1",
-		NULL,
+		nullptr,
 		"SMI1",
 		"SMI0",
-		NULL
+		nullptr
 	};
 	UINT32 old_interrupts;
 
 	if (LOG_INTERRUPTS)
 	{
 		/* make sure that we don't shoot ourself in the foot */
-		assert_always((interrupt_bit < ARRAY_LENGTH(interrupt_names)) && (interrupt_names[interrupt_bit] != NULL), "Raising invalid interrupt");
+		assert_always((interrupt_bit < ARRAY_LENGTH(interrupt_names)) && (interrupt_names[interrupt_bit] != nullptr), "Raising invalid interrupt");
 
 		logerror("bebox_set_irq_bit(): pc[0]=0x%08x pc[1]=0x%08x %s interrupt #%u (%s)\n",
 			(unsigned) m_ppc1->pc(),

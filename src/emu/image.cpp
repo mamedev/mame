@@ -47,7 +47,7 @@ static UINT64 image_fsize_thunk(void *file)
 
 struct io_procs image_ioprocs =
 {
-	NULL,
+	nullptr,
 	image_fseek_thunk,
 	image_fread_thunk,
 	image_fwrite_thunk,
@@ -69,20 +69,20 @@ static void image_dirs_load(running_machine &machine, int config_type, xml_data_
 	const char *dev_instance;
 	const char *working_directory;
 
-	if ((config_type == CONFIG_TYPE_GAME) && (parentnode != NULL))
+	if ((config_type == CONFIG_TYPE_GAME) && (parentnode != nullptr))
 	{
 		for (node = xml_get_sibling(parentnode->child, "device"); node; node = xml_get_sibling(node->next, "device"))
 		{
-			dev_instance = xml_get_attribute_string(node, "instance", NULL);
+			dev_instance = xml_get_attribute_string(node, "instance", nullptr);
 
-			if ((dev_instance != NULL) && (dev_instance[0] != '\0'))
+			if ((dev_instance != nullptr) && (dev_instance[0] != '\0'))
 			{
 				image_interface_iterator iter(machine.root_device());
-				for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
+				for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 				{
 					if (!strcmp(dev_instance, image->instance_name())) {
-						working_directory = xml_get_attribute_string(node, "directory", NULL);
-						if (working_directory != NULL)
+						working_directory = xml_get_attribute_string(node, "directory", nullptr);
+						if (working_directory != nullptr)
 							image->set_working_directory(working_directory);
 					}
 				}
@@ -107,12 +107,12 @@ static void image_dirs_save(running_machine &machine, int config_type, xml_data_
 	if (config_type == CONFIG_TYPE_GAME)
 	{
 		image_interface_iterator iter(machine.root_device());
-		for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
+		for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 		{
 			dev_instance = image->instance_name();
 
-			node = xml_add_child(parentnode, "device", NULL);
-			if (node != NULL)
+			node = xml_add_child(parentnode, "device", nullptr);
+			if (node != nullptr)
 			{
 				xml_set_attribute(node, "instance", dev_instance);
 				xml_set_attribute(node, "directory", image->working_directory());
@@ -131,7 +131,7 @@ static int write_config(emu_options &options, const char *filename, const game_d
 	char buffer[128];
 	int retval = 1;
 
-	if (gamedrv != NULL)
+	if (gamedrv != nullptr)
 	{
 		sprintf(buffer, "%s.ini", gamedrv->name);
 		filename = buffer;
@@ -162,7 +162,7 @@ static void image_options_extract(running_machine &machine)
 		int index = 0;
 
 		image_interface_iterator iter(machine.root_device());
-		for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
+		for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 		{
 			const char *filename = image->filename();
 
@@ -176,7 +176,7 @@ static void image_options_extract(running_machine &machine)
 
 	/* write the config, if appropriate */
 	if (machine.options().write_config())
-		write_config(machine.options(), NULL, &machine.system());
+		write_config(machine.options(), nullptr, &machine.system());
 }
 
 /*-------------------------------------------------
@@ -190,7 +190,7 @@ void image_unload_all(running_machine &machine)
 	image_options_extract(machine);
 
 	image_interface_iterator iter(machine.root_device());
-	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
+	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 	{
 		// unload this image
 		image->unload();
@@ -207,12 +207,12 @@ void image_device_init(running_machine &machine)
 
 	/* make sure that any required devices have been allocated */
 	image_interface_iterator iter(machine.root_device());
-	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
+	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 	{
 		/* is an image specified for this image */
 		image_name = machine.options().value(image->instance_name());
 
-		if ((image_name != NULL) && (image_name[0] != '\0'))
+		if ((image_name != nullptr) && (image_name[0] != '\0'))
 		{
 			/* mark init state */
 			image->set_init_phase();
@@ -249,9 +249,9 @@ std::string &image_mandatory_scan(running_machine &machine, std::string &mandato
 	mandatory.clear();
 	// make sure that any required image has a mounted file
 	image_interface_iterator iter(machine.root_device());
-	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
+	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 	{
-		if (image->filename() == NULL && image->must_be_loaded())
+		if (image->filename() == nullptr && image->must_be_loaded())
 			mandatory.append("\"").append(image->instance_name()).append("\", ");
 	}
 	return mandatory;
@@ -266,7 +266,7 @@ void image_postdevice_init(running_machine &machine)
 {
 	/* make sure that any required devices have been allocated */
 	image_interface_iterator iter(machine.root_device());
-	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
+	for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
 	{
 			int result = image->finish_load();
 			/* did the image load fail? */

@@ -42,7 +42,7 @@ protected:
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 private:
 	UINT8 *m_p_ram;
 	void pentagon_update_memory();

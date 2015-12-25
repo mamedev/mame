@@ -71,7 +71,7 @@ UINT32 segaorun_state::screen_update_shangon(screen_device &screen, bitmap_ind16
 
 	// mix in sprites
 	bitmap_ind16 &sprites = m_sprites->bitmap();
-	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			UINT16 *dest = &bitmap.pix(y);
@@ -138,7 +138,7 @@ UINT32 segaorun_state::screen_update_outrun(screen_device &screen, bitmap_ind16 
 
 	// mix in sprites
 	bitmap_ind16 &sprites = m_sprites->bitmap();
-	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			UINT16 *dest = &bitmap.pix(y);

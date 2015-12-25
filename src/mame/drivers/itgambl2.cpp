@@ -70,8 +70,8 @@ public:
 	int m_test_x;
 	int m_test_y;
 	int m_start_offs;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(itgambl2);
 	UINT32 screen_update_itgambl2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

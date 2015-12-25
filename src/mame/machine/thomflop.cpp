@@ -296,7 +296,7 @@ WRITE8_MEMBER( thomson_state::to7_5p14_w )
 	else if ( offset == 8 )
 	{
 		/* drive select */
-		floppy_image_device *floppy = NULL;
+		floppy_image_device *floppy = nullptr;
 
 		if (BIT(data, 1)) floppy = fdc->subdevice<floppy_connector>("0")->get_device();
 		if (BIT(data, 2)) floppy = fdc->subdevice<floppy_connector>("1")->get_device();
@@ -925,7 +925,7 @@ legacy_floppy_image_device * thomson_state::thmfc_floppy_image()
 
 int thomson_state::thmfc_floppy_is_qdd ( legacy_floppy_image_device *image )
 {
-	if (image==NULL) return 0;
+	if (image==nullptr) return 0;
 	if (!image->exists()) return 0;
 	return image->length()==51200; // idf QDD
 }
@@ -1894,18 +1894,18 @@ void thomson_state::thomson_index_callback(legacy_floppy_image_device *device, i
 	switch ( to7_controller_type )
 	{
 	case 1:
-		to7_5p14_index_pulse_callback(NULL, device, state);
+		to7_5p14_index_pulse_callback(nullptr, device, state);
 		break;
 
 	case 2:
 		break;
 
 	case 3:
-		thmfc_floppy_index_pulse_cb(NULL, device, state);
+		thmfc_floppy_index_pulse_cb(nullptr, device, state);
 		break;
 
 	case 4:
-		to7_qdd_index_pulse_cb(NULL, device, state);
+		to7_qdd_index_pulse_cb(nullptr, device, state);
 		break;
 
 	default:

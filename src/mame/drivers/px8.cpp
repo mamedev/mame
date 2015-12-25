@@ -789,10 +789,10 @@ static MACHINE_CONFIG_START( px8, px8_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	MCFG_GENERIC_CARTSLOT_ADD("capsule2", generic_plain_slot, NULL)
+	MCFG_GENERIC_CARTSLOT_ADD("capsule2", generic_plain_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* devices */

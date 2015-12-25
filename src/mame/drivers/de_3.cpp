@@ -83,7 +83,7 @@ public:
 protected:
 
 	// driver_device overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 private:
 //  UINT32 m_segment1;
 //  UINT32 m_segment2;

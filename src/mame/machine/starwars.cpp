@@ -156,9 +156,9 @@ void starwars_state::starwars_mproc_init()
 	UINT8 *src = memregion("user2")->base();
 	int cnt, val;
 
-	m_PROM_STR = auto_alloc_array(machine(), UINT8, 1024);
-	m_PROM_MAS = auto_alloc_array(machine(), UINT8, 1024);
-	m_PROM_AM = auto_alloc_array(machine(), UINT8, 1024);
+	m_PROM_STR = std::make_unique<UINT8[]>(1024);
+	m_PROM_MAS = std::make_unique<UINT8[]>(1024);
+	m_PROM_AM = std::make_unique<UINT8[]>(1024);
 
 	for (cnt = 0; cnt < 1024; cnt++)
 	{

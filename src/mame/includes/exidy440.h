@@ -41,8 +41,8 @@ public:
 	UINT8 m_firq_beam;
 	UINT8 *m_topsecex_yscroll;
 	UINT8 m_latched_x;
-	UINT8 *m_local_videoram;
-	UINT8 *m_local_paletteram;
+	std::unique_ptr<UINT8[]> m_local_videoram;
+	std::unique_ptr<UINT8[]> m_local_paletteram;
 	UINT8 m_firq_enable;
 	UINT8 m_firq_select;
 	UINT8 m_palettebank_io;
@@ -75,8 +75,8 @@ public:
 	DECLARE_DRIVER_INIT(yukon);
 	DECLARE_DRIVER_INIT(exidy440);
 	DECLARE_DRIVER_INIT(claypign);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(exidy440);
 	DECLARE_VIDEO_START(topsecex);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int scroll_offset, int check_collision);

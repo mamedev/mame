@@ -32,7 +32,7 @@ centronics_device::centronics_device(const machine_config &mconfig, const char *
 	m_fault_handler(*this),
 	m_init_handler(*this),
 	m_select_in_handler(*this),
-	m_dev(NULL)
+	m_dev(nullptr)
 {
 }
 

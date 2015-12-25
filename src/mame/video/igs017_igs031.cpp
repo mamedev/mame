@@ -94,7 +94,7 @@ igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const 
 
 const address_space_config *igs017_igs031_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 UINT16 igs017_igs031_device::palette_callback_straight(UINT16 bgr)
@@ -242,7 +242,7 @@ void igs017_igs031_device::expand_sprites()
 	int i;
 
 	m_sprites_gfx_size   =   size / 2 * 3;
-	m_sprites_gfx        =   auto_alloc_array(machine(), UINT8, m_sprites_gfx_size);
+	m_sprites_gfx        =   std::make_unique<UINT8[]>(m_sprites_gfx_size);
 
 	for (i = 0; i < size / 2 ; i++)
 	{
@@ -296,7 +296,7 @@ void igs017_igs031_device::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cli
 	if ( addr + dimx * dimy >= m_sprites_gfx_size )
 		return;
 
-	gfx_element gfx(m_palette, m_sprites_gfx + addr, dimx, dimy, dimx, m_palette->entries(), 0x100, 32);
+	gfx_element gfx(m_palette, m_sprites_gfx.get() + addr, dimx, dimy, dimx, m_palette->entries(), 0x100, 32);
 
 	gfx.transpen(bitmap,cliprect,
 				0, color,

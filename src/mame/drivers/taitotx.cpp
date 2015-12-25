@@ -129,9 +129,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_taito_type_x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 

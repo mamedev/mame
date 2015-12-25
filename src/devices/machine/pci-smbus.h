@@ -49,8 +49,8 @@ public:
 	DECLARE_READ8_MEMBER  (notify_dhigh_r);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	DECLARE_ADDRESS_MAP(map, 32);

@@ -33,7 +33,7 @@ public:
 	UINT8       m_jumping_latch;
 
 	/* c-chip */
-	UINT8       *m_CRAM[8];
+	std::unique_ptr<UINT8[]>    m_CRAM[8];
 	int         m_extra_version;
 	UINT8       m_current_bank;
 
@@ -58,7 +58,7 @@ public:
 	DECLARE_DRIVER_INIT(jumping);
 	DECLARE_DRIVER_INIT(rbislande);
 	DECLARE_DRIVER_INIT(rbisland);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_VIDEO_START(jumping);
 	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_jumping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

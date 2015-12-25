@@ -298,8 +298,8 @@ void msm58321_device::rtc_clock_updated(int year, int month, int day, int day_of
 
 void msm58321_device::nvram_default()
 {
-	for (int i = 0; i < 13; i++)
-		m_reg[i] = 0;
+	for (auto & elem : m_reg)
+		elem = 0;
 
 	if (m_default_24h)
 		m_reg[REGISTER_H10] = H10_24;

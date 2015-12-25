@@ -64,13 +64,13 @@ public:
 
 	virtual ~renderer_dd() { }
 
-	virtual int create();
-	virtual render_primitive_list *get_primitives();
-	virtual int draw(const int update);
-	virtual void save() {};
-	virtual void record() {};
-	virtual void toggle_fsfx() {};
-	virtual void destroy();
+	virtual int create() override;
+	virtual render_primitive_list *get_primitives() override;
+	virtual int draw(const int update) override;
+	virtual void save() override {};
+	virtual void record() override {};
+	virtual void toggle_fsfx() override {};
+	virtual void destroy() override;
 
 	int                     width, height;              // current width, height
 	int                     refresh;                    // current refresh rate
@@ -171,7 +171,7 @@ inline void renderer_dd::update_outer_rects()
 }
 
 
-INLINE int better_mode(int width0, int height0, int width1, int height1, float desired_aspect)
+static inline int better_mode(int width0, int height0, int width1, int height1, float desired_aspect)
 {
 	float aspect0 = (float)width0 / (float)height0;
 	float aspect1 = (float)width1 / (float)height1;

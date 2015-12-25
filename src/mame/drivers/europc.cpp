@@ -47,7 +47,7 @@ public:
 	int m_rtc_reg;
 	int m_rtc_state;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	emu_timer* m_rtc_timer;
 
 	enum

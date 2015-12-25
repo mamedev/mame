@@ -1159,7 +1159,7 @@ static const char *lookup_trap(UINT16 opcode)
 		if (traps[i].trap == opcode)
 			return traps[i].name;
 	}
-	return NULL;
+	return nullptr;
 }
 
 static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)

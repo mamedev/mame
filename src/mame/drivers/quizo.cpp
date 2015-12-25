@@ -39,7 +39,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	UINT8 *m_videoram;
+	std::unique_ptr<UINT8[]> m_videoram;
 	UINT8 m_port60;
 	UINT8 m_port70;
 
@@ -268,10 +268,10 @@ ROM_END
 
 DRIVER_INIT_MEMBER(quizo_state,quizo)
 {
-	m_videoram=auto_alloc_array(machine(), UINT8, 0x4000*2);
+	m_videoram=std::make_unique<UINT8[]>(0x4000*2);
 	membank("bank1")->configure_entries(0, 6, memregion("user1")->base(), 0x4000);
 
-	save_pointer(NAME(m_videoram), 0x4000*2);
+	save_pointer(NAME(m_videoram.get()), 0x4000*2);
 	//save_item(NAME(m_port60));
 	save_item(NAME(m_port70));
 }

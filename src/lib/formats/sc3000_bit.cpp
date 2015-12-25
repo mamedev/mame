@@ -98,7 +98,7 @@ const struct CassetteFormat sc3000_bit_format =
 	"bit",
 	sc3000_bit_identify,
 	sc3000_bit_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START( sc3000_cassette_formats )

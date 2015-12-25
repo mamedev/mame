@@ -41,7 +41,7 @@ public:
 	UINT8 m_ship_pic;
 	UINT8 m_torpedo_h;
 	UINT8 m_torpedo_v;
-	UINT8* m_LFSR;
+	std::unique_ptr<UINT8[]> m_LFSR;
 	bitmap_ind16 m_helper;
 	DECLARE_READ8_MEMBER(wolfpack_misc_r);
 	DECLARE_WRITE8_MEMBER(wolfpack_high_explo_w);
@@ -72,8 +72,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(wolfpack_dial_r);
 	DECLARE_WRITE8_MEMBER(wolfpack_word_w);
 	DECLARE_WRITE8_MEMBER(wolfpack_start_speech_w);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(wolfpack);
 	UINT32 screen_update_wolfpack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_wolfpack(screen_device &screen, bool state);
@@ -84,5 +84,5 @@ public:
 	void draw_water(palette_device &palette, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

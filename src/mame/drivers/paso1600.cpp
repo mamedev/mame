@@ -58,9 +58,9 @@ public:
 	}m_keyb;
 	DECLARE_READ8_MEMBER(pc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(paso1600_irq_callback);
 };

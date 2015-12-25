@@ -155,7 +155,7 @@ public:
 	static void static_set_irq_acknowledge_callback(device_t &device, device_irq_acknowledge_delegate callback);
 
 	// execution management
-	device_scheduler &scheduler() const { assert(m_scheduler != NULL); return *m_scheduler; }
+	device_scheduler &scheduler() const { assert(m_scheduler != nullptr); return *m_scheduler; }
 	bool executing() const;
 	INT32 cycles_remaining() const;
 	void eat_cycles(int cycles);
@@ -211,12 +211,12 @@ protected:
 	virtual void execute_set_input(int linenum, int state);
 
 	// interface-level overrides
-	virtual void interface_validity_check(validity_checker &valid) const;
-	virtual void interface_pre_start();
-	virtual void interface_post_start();
-	virtual void interface_pre_reset();
-	virtual void interface_post_reset();
-	virtual void interface_clock_changed();
+	virtual void interface_validity_check(validity_checker &valid) const override;
+	virtual void interface_pre_start() override;
+	virtual void interface_post_start() override;
+	virtual void interface_pre_reset() override;
+	virtual void interface_post_reset() override;
+	virtual void interface_clock_changed() override;
 
 	// for use by devcpu for now...
 	IRQ_CALLBACK_MEMBER(standard_irq_callback_member);

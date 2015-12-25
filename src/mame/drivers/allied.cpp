@@ -94,7 +94,7 @@ private:
 	UINT8 m_ic6a2;
 	UINT8 m_ic6b4;
 	UINT8 m_ic6b7;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<m6504_device> m_maincpu;
 	required_device<pia6821_device> m_ic1;
 	required_device<pia6821_device> m_ic2;

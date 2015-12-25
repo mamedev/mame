@@ -133,7 +133,7 @@ static const struct CassetteFormat sordm5_cas_format =
 	"cas",
 	sordm5_tap_identify,
 	sordm5_tap_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(sordm5_cassette_formats)

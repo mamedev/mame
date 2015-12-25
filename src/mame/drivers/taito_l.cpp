@@ -196,47 +196,47 @@ void taitol_state::taito_machine_reset()
 MACHINE_RESET_MEMBER(taitol_state,fhawk)
 {
 	taito_machine_reset();
-	m_porte0_tag = NULL;
-	m_porte1_tag = NULL;
-	m_portf0_tag = NULL;
-	m_portf1_tag = NULL;
+	m_porte0_tag = nullptr;
+	m_porte1_tag = nullptr;
+	m_portf0_tag = nullptr;
+	m_portf1_tag = nullptr;
 }
 
 MACHINE_RESET_MEMBER(taitol_state,raimais)
 {
 	taito_machine_reset();
-	m_porte0_tag = NULL;
-	m_porte1_tag = NULL;
-	m_portf0_tag = NULL;
-	m_portf1_tag = NULL;
+	m_porte0_tag = nullptr;
+	m_porte1_tag = nullptr;
+	m_portf0_tag = nullptr;
+	m_portf1_tag = nullptr;
 }
 
 MACHINE_RESET_MEMBER(taitol_state,champwr)
 {
 	taito_machine_reset();
-	m_porte0_tag = NULL;
-	m_porte1_tag = NULL;
-	m_portf0_tag = NULL;
-	m_portf1_tag = NULL;
+	m_porte0_tag = nullptr;
+	m_porte1_tag = nullptr;
+	m_portf0_tag = nullptr;
+	m_portf1_tag = nullptr;
 }
 
 
 MACHINE_RESET_MEMBER(taitol_state,kurikint)
 {
 	taito_machine_reset();
-	m_porte0_tag = NULL;
-	m_porte1_tag = NULL;
-	m_portf0_tag = NULL;
-	m_portf1_tag = NULL;
+	m_porte0_tag = nullptr;
+	m_porte1_tag = nullptr;
+	m_portf0_tag = nullptr;
+	m_portf1_tag = nullptr;
 }
 
 MACHINE_RESET_MEMBER(taitol_state,evilston)
 {
 	taito_machine_reset();
-	m_porte0_tag = NULL;
-	m_porte1_tag = NULL;
-	m_portf0_tag = NULL;
-	m_portf1_tag = NULL;
+	m_porte0_tag = nullptr;
+	m_porte1_tag = nullptr;
+	m_portf0_tag = nullptr;
+	m_portf1_tag = nullptr;
 }
 
 MACHINE_RESET_MEMBER(taitol_state,puzznic)
@@ -261,18 +261,18 @@ MACHINE_RESET_MEMBER(taitol_state,palamed)
 {
 	taito_machine_reset();
 	m_porte0_tag = "DSWA";
-	m_porte1_tag = NULL;
+	m_porte1_tag = nullptr;
 	m_portf0_tag = "DSWB";
-	m_portf1_tag = NULL;
+	m_portf1_tag = nullptr;
 }
 
 MACHINE_RESET_MEMBER(taitol_state,cachat)
 {
 	taito_machine_reset();
 	m_porte0_tag = "DSWA";
-	m_porte1_tag = NULL;
+	m_porte1_tag = nullptr;
 	m_portf0_tag = "DSWB";
-	m_portf1_tag = NULL;
+	m_portf1_tag = nullptr;
 }
 
 MACHINE_RESET_MEMBER(taitol_state,horshoes)
@@ -409,7 +409,7 @@ WRITE8_MEMBER(taitol_state::rambankswitch_w)
 		else
 		{
 			logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, space.device().safe_pc());
-			m_current_notifier[offset] = 0;
+			m_current_notifier[offset] = nullptr;
 			m_current_base[offset] = m_empty_ram;
 		}
 		membank(bankname[offset])->set_base(m_current_base[offset]);
@@ -1700,7 +1700,7 @@ static const gfx_layout char_layout =
 static GFXDECODE_START( taito_l )
 	GFXDECODE_ENTRY( "gfx1", 0, bg2_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, sp2_layout, 0, 16 )
-	GFXDECODE_ENTRY( NULL,           0, char_layout,  0, 16 )  // Ram-based
+	GFXDECODE_ENTRY( nullptr,           0, char_layout,  0, 16 )  // Ram-based
 GFXDECODE_END
 
 

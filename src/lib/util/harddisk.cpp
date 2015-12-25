@@ -44,22 +44,22 @@ hard_disk_file *hard_disk_open(chd_file *chd)
 	chd_error err;
 
 	/* punt if no CHD */
-	if (chd == NULL)
-		return NULL;
+	if (chd == nullptr)
+		return nullptr;
 
 	/* read the hard disk metadata */
 	err = chd->read_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
 	if (err != CHDERR_NONE)
-		return NULL;
+		return nullptr;
 
 	/* parse the metadata */
 	if (sscanf(metadata.c_str(), HARD_DISK_METADATA_FORMAT, &cylinders, &heads, &sectors, &sectorbytes) != 4)
-		return NULL;
+		return nullptr;
 
 	/* allocate memory for the hard disk file */
 	file = (hard_disk_file *)malloc(sizeof(hard_disk_file));
-	if (file == NULL)
-		return NULL;
+	if (file == nullptr)
+		return nullptr;
 
 	/* fill in the data */
 	file->chd = chd;

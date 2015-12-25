@@ -103,9 +103,9 @@ z80sti_device::z80sti_device(const machine_config &mconfig, const char *tag, dev
 		m_isr(0),
 		m_imr(0)
 {
-	for (int i = 0; i < 16; i++)
+	for (auto & elem : m_int_state)
 	{
-		m_int_state[i] = 0;
+		elem = 0;
 	}
 }
 

@@ -31,8 +31,8 @@ public:
 		m_dac(*this, "dac") { }
 
 	/* video-related */
-	bitmap_ind16 *m_tmpbitmap0;
-	bitmap_ind16 *m_tmpbitmap1;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap0;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap1;
 	int  m_flip_screen;
 	int  m_video_enable;
 	int  m_screen_redraw;
@@ -69,16 +69,16 @@ public:
 	DECLARE_WRITE8_MEMBER(input_sel2_w);
 	DECLARE_READ8_MEMBER(keys_r);
 	TIMER_CALLBACK_MEMBER(dac_callback);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void redraw();
 	void plot0( int offset, UINT8 data );
 	void plot1( int offset, UINT8 data );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -90,8 +90,8 @@ protected:
 
 void mjsister_state::video_start()
 {
-	m_tmpbitmap0 = auto_bitmap_ind16_alloc(machine(), 256, 256);
-	m_tmpbitmap1 = auto_bitmap_ind16_alloc(machine(), 256, 256);
+	m_tmpbitmap0 = std::make_unique<bitmap_ind16>(256, 256);
+	m_tmpbitmap1 = std::make_unique<bitmap_ind16>(256, 256);
 
 	save_item(NAME(m_videoram0));
 	save_item(NAME(m_videoram1));

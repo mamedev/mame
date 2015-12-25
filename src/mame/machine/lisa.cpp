@@ -264,7 +264,7 @@ void lisa_state::scan_keyboard()
 {
 	int i, j;
 	UINT8 keycode;
-	UINT8 keybuf[8] = { m_io_line0->read(), m_io_line1->read(), m_io_line2->read(), m_io_line3->read(),
+	UINT32 keybuf[8] = { m_io_line0->read(), m_io_line1->read(), m_io_line2->read(), m_io_line3->read(),
 						m_io_line4->read(), m_io_line5->read(), m_io_line6->read(), m_io_line7->read() };
 
 	if (! m_COPS_force_unplug)
@@ -909,7 +909,7 @@ DRIVER_INIT_MEMBER(lisa_state,lisa2)
 	m_features.has_double_sided_floppy = 0;
 	m_features.has_mac_xl_video = 0;
 
-	m_bad_parity_table = auto_alloc_array(machine(), UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
+	m_bad_parity_table = std::make_unique<UINT8[]>(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
 DRIVER_INIT_MEMBER(lisa_state,lisa210)
@@ -922,7 +922,7 @@ DRIVER_INIT_MEMBER(lisa_state,lisa210)
 	m_features.has_double_sided_floppy = 0;
 	m_features.has_mac_xl_video = 0;
 
-	m_bad_parity_table = auto_alloc_array(machine(), UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
+	m_bad_parity_table = std::make_unique<UINT8[]>(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
 DRIVER_INIT_MEMBER(lisa_state,mac_xl)
@@ -935,7 +935,7 @@ DRIVER_INIT_MEMBER(lisa_state,mac_xl)
 	m_features.has_double_sided_floppy = 0;
 	m_features.has_mac_xl_video = 1;
 
-	m_bad_parity_table = auto_alloc_array(machine(), UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
+	m_bad_parity_table = std::make_unique<UINT8[]>(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
 void lisa_state::machine_start()
@@ -967,7 +967,7 @@ void lisa_state::machine_reset()
 	m_parity_error_pending = 0;
 
 	m_bad_parity_count = 0;
-	memset(m_bad_parity_table, 0, 0x40000); /* Clear */
+	memset(m_bad_parity_table.get(), 0, 0x40000); /* Clear */
 
 	/* init video */
 

@@ -75,8 +75,8 @@ public:
 	DECLARE_WRITE8_MEMBER(psg_a_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_tape);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_w(screen_device &screen, bool state);
 
@@ -143,8 +143,8 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 protected:
 	enum {
@@ -173,7 +173,7 @@ protected:
 
 	UINT8 m_junk_read[0x4000], m_junk_write[0x4000];
 
-	virtual void update_irq();
+	virtual void update_irq() override;
 	void remap();
 };
 
@@ -808,7 +808,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(oric_state, via_irq_w))
 
 	/* extension port */
-	MCFG_ORICEXT_ADD( "ext", oricext_intf, NULL, "maincpu", WRITELINE(oric_state, ext_irq_w))
+	MCFG_ORICEXT_ADD( "ext", oricext_intf, nullptr, "maincpu", WRITELINE(oric_state, ext_irq_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( prav8d, oric )
@@ -847,9 +847,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( telstrat, oric, telestrat_state )
 	MCFG_WD_FDC_FORCE_READY
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", telestrat_floppies, "3dsdd", telestrat_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", telestrat_floppies, NULL,    telestrat_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", telestrat_floppies, NULL,    telestrat_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", telestrat_floppies, NULL,    telestrat_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
 MACHINE_CONFIG_END
 
 

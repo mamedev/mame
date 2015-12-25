@@ -277,7 +277,7 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 WRITE16_MEMBER(segac2_state::segac2_upd7759_w)
 {
 	/* make sure we have a UPD chip */
-	if (m_upd7759 == NULL)
+	if (m_upd7759 == nullptr)
 		return;
 
 	/* only works if we're accessing the low byte */
@@ -415,7 +415,7 @@ READ8_MEMBER(segac2_state::io_portc_r)
 {
 	// D7 : From MB3773P pin 1. (/RESET output)
 	// D6 : From uPD7759 pin 18. (/BUSY output)
-	int busy = (m_upd7759 != NULL) ? (m_upd7759->busy_r() << 6) : 0x40;
+	int busy = (m_upd7759 != nullptr) ? (m_upd7759->busy_r() << 6) : 0x40;
 	return 0xbf | busy;
 }
 
@@ -1385,7 +1385,7 @@ UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb3
 		UINT32* desty = &bitmap.pix32(y, 0);
 		UINT16* srcy;
 
-		srcy = m_vdp->m_render_line_raw;
+		srcy = m_vdp->m_render_line_raw.get();
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -1981,7 +1981,7 @@ void segac2_state::segac2_common_init(segac2_prot_delegate prot_func)
 	DRIVER_INIT_CALL(megadriv_c2);
 	m_prot_func = prot_func;
 
-	if (m_upd7759 != NULL)
+	if (m_upd7759 != nullptr)
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0x880000, 0x880001, 0, 0x13fefe, write16_delegate(FUNC(segac2_state::segac2_upd7759_w),this));
 }
 

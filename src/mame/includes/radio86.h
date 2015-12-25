@@ -54,12 +54,12 @@ public:
 		m_io_cline7(*this, "CLINE7"),
 		m_palette(*this, "palette") { }
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT8 m_tape_value;
 	UINT8 m_mikrosha_font_page;
 	int m_keyboard_mask;
-	UINT8* m_radio_ram_disk;
+	std::unique_ptr<UINT8[]> m_radio_ram_disk;
 	UINT8 m_romdisk_lsb;
 	UINT8 m_romdisk_msb;
 	UINT8 m_disk_sel;
@@ -114,7 +114,7 @@ protected:
 	optional_ioport m_io_cline6;
 	optional_ioport m_io_cline7;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void radio86_init_keyboard();
 public:
 	required_device<palette_device> m_palette;

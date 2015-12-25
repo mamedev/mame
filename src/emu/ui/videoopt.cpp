@@ -23,7 +23,7 @@ void ui_menu_video_targets::handle()
 {
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
-	if (menu_event != NULL && menu_event->iptkey == IPT_UI_SELECT)
+	if (menu_event != nullptr && menu_event->iptkey == IPT_UI_SELECT)
 		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_video_options(machine(), container, static_cast<render_target *>(menu_event->itemref))));
 }
 
@@ -48,12 +48,12 @@ void ui_menu_video_targets::populate()
 		char buffer[40];
 
 		/* stop when we run out */
-		if (target == NULL)
+		if (target == nullptr)
 			break;
 
 		/* add a menu item */
 		sprintf(buffer, "Screen #%d", targetnum);
-		item_append(buffer, NULL, 0, target);
+		item_append(buffer, nullptr, 0, target);
 	}
 }
 
@@ -72,7 +72,7 @@ void ui_menu_video_options::handle()
 
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
-	if (menu_event != NULL && menu_event->itemref != NULL)
+	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		switch ((FPTR)menu_event->itemref)
 		{
@@ -180,17 +180,17 @@ void ui_menu_video_options::populate()
 	for (viewnum = 0; ; viewnum++)
 	{
 		const char *name = target->view_name(viewnum);
-		if (name == NULL)
+		if (name == nullptr)
 			break;
 
 		/* create a string for the item, replacing underscores with spaces */
 		tempstring.assign(name);
 		strreplace(tempstring, "_", " ");
-		item_append(tempstring.c_str(), NULL, 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
+		item_append(tempstring.c_str(), nullptr, 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
 	}
 
 	/* add a separator */
-	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
 
 	/* add a rotate item */
 	switch (target->orientation())

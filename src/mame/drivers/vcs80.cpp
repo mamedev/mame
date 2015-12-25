@@ -187,7 +187,7 @@ WRITE8_MEMBER( vcs80_state::pio_pb_w )
 static const z80_daisy_config vcs80_daisy_chain[] =
 {
 	{ Z80PIO_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 /* Machine Initialization */

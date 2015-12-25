@@ -31,8 +31,8 @@ public:
 	required_device<atari_motion_objects_device> m_mob;
 	required_shared_ptr<UINT16> m_priorityram;
 
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(blstroid_halt_until_hblank_0_w);
 	DECLARE_READ16_MEMBER(inputs_r);
 	DECLARE_DRIVER_INIT(blstroid);
@@ -45,5 +45,5 @@ public:
 	static const atari_motion_objects_config s_mob_config;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

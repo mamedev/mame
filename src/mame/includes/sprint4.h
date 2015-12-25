@@ -47,8 +47,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint4_bang_w);
 	DECLARE_WRITE8_MEMBER(sprint4_attract_w);
 	TILE_GET_INFO_MEMBER(sprint4_tile_info);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sprint4);
 	UINT32 screen_update_sprint4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sprint4(screen_device &screen, bool state);
@@ -60,5 +60,5 @@ public:
 	required_device<palette_device> m_palette;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

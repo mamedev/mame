@@ -19,16 +19,16 @@ const device_type WIPING = &device_creator<wiping_sound_device>;
 wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WIPING, "Wiping Audio Custom", tag, owner, clock, "wiping_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
-	m_last_channel(NULL),
-	m_sound_prom(NULL),
-	m_sound_rom(NULL),
+	m_last_channel(nullptr),
+	m_sound_prom(nullptr),
+	m_sound_rom(nullptr),
 	m_num_voices(0),
 	m_sound_enable(0),
-	m_stream(NULL),
-	m_mixer_table(NULL),
-	m_mixer_lookup(NULL),
-	m_mixer_buffer(NULL),
-	m_mixer_buffer_2(NULL)
+	m_stream(nullptr),
+	m_mixer_table(nullptr),
+	m_mixer_lookup(nullptr),
+	m_mixer_buffer(nullptr),
+	m_mixer_buffer_2(nullptr)
 {
 	memset(m_channel_list, 0, sizeof(wp_sound_channel)*MAX_VOICES);
 	memset(m_soundregs, 0, sizeof(UINT8)*0x4000);
@@ -47,8 +47,8 @@ void wiping_sound_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, samplerate);
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	m_mixer_buffer = auto_alloc_array_clear(machine(), short, 2 * samplerate);
-	m_mixer_buffer_2 = m_mixer_buffer + samplerate;
+	m_mixer_buffer   = make_unique_clear<short[]>(samplerate);
+	m_mixer_buffer_2 = make_unique_clear<short[]>(samplerate);
 
 	/* build the mixer table */
 	make_mixer_table(8, defgain);
@@ -91,10 +91,10 @@ void wiping_sound_device::make_mixer_table(int voices, int gain)
 	int i;
 
 	/* allocate memory */
-	m_mixer_table = auto_alloc_array_clear(machine(), INT16, 256 * voices);
+	m_mixer_table = make_unique_clear<INT16[]>(256 * voices);
 
 	/* find the middle of the table */
-	m_mixer_lookup = m_mixer_table + (128 * voices);
+	m_mixer_lookup = m_mixer_table.get() + (128 * voices);
 
 	/* fill in the table - 16 bit case */
 	for (i = 0; i < count; i++)
@@ -174,7 +174,7 @@ void wiping_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	}
 
 	/* zap the contents of the mixer buffer */
-	memset(m_mixer_buffer, 0, samples * sizeof(short));
+	memset(m_mixer_buffer.get(), 0, samples * sizeof(short));
 
 	/* loop over each voice and add its contribution */
 	for (voice = m_channel_list; voice < m_last_channel; voice++)
@@ -188,7 +188,7 @@ void wiping_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 			const UINT8 *w = voice->wave;
 			int c = voice->counter;
 
-			mix = m_mixer_buffer;
+			mix = m_mixer_buffer.get();
 
 			/* add our contribution */
 			for (i = 0; i < samples; i++)
@@ -235,7 +235,7 @@ void wiping_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	}
 
 	/* mix it down */
-	mix = m_mixer_buffer;
+	mix = m_mixer_buffer.get();
 	for (i = 0; i < samples; i++)
 		*buffer++ = m_mixer_lookup[*mix++];
 }

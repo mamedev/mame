@@ -208,7 +208,7 @@ const at_keyboard_device::extended_keyboard_code at_keyboard_device::m_extended_
 	/* print screen */
 	{
 		"\xe0\x12\xe0\x7c",
-		0, /* I don't know the break sequence */
+		nullptr, /* I don't know the break sequence */
 
 	},
 	/* right alt */
@@ -269,7 +269,7 @@ const at_keyboard_device::extended_keyboard_code at_keyboard_device::m_extended_
 	/* pause */
 	{
 		"\xe1\x14\x77\xe1\xf0\x14\xf0\x77",
-		0, /*?? I don't know the break sequence */
+		nullptr, /*?? I don't know the break sequence */
 	}
 
 };

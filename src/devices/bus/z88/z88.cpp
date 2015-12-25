@@ -124,9 +124,9 @@ bool z88cart_slot_device::call_load()
 		offs_t read_length = 0;
 		UINT8 *cart_base = m_cart->get_cart_base();
 
-		if (cart_base != NULL)
+		if (cart_base != nullptr)
 		{
-			if (software_entry() == NULL)
+			if (software_entry() == nullptr)
 			{
 				read_length = length();
 				fread(cart_base + (m_cart->get_cart_size() - read_length), read_length);

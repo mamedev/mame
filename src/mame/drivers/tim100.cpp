@@ -25,8 +25,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
 private:

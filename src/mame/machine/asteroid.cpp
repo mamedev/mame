@@ -120,7 +120,7 @@ WRITE8_MEMBER(asteroid_state::astdelux_led_w)
 void asteroid_state::machine_start()
 {
 	/* configure RAM banks if present (not on llander) */
-	if (m_ram1.target() != NULL)
+	if (m_ram1.target() != nullptr)
 	{
 		UINT8 *ram1 = reinterpret_cast<UINT8 *>(memshare("ram1")->ptr());
 		UINT8 *ram2 = reinterpret_cast<UINT8 *>(memshare("ram2")->ptr());
@@ -139,7 +139,7 @@ void asteroid_state::machine_reset()
 	m_dvg->reset_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 
 	/* reset RAM banks if present */
-	if (m_ram1.target() != NULL)
+	if (m_ram1.target() != nullptr)
 	{
 		m_ram1->set_entry(0);
 		m_ram2->set_entry(0);

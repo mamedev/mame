@@ -310,10 +310,10 @@ std::string mfm_harddisk_device::tts(const attotime &t)
 mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: harddisk_image_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_slot_card_interface(mconfig, *this),
-		m_index_timer(NULL),
-		m_spinup_timer(NULL),
-		m_seek_timer(NULL),
-		m_cache_timer(NULL),
+		m_index_timer(nullptr),
+		m_spinup_timer(nullptr),
+		m_seek_timer(nullptr),
+		m_cache_timer(nullptr),
 		m_precomp_cyl(0),
 		m_redwc_cyl(0),
 		m_encoding(),
@@ -327,7 +327,7 @@ mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, device_t
 		m_autotruncation(false),
 		m_recalibrated(false),
 		m_step_line(),
-		m_format(NULL)
+		m_format(nullptr)
 {
 	m_spinupms = 10000;
 	m_cachelines = 5;
@@ -337,7 +337,7 @@ mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, device_t
 	m_cell_size = 100;
 	m_rpm = 3600;           // MFM drives have a revolution rate of 3600 rpm (i.e. 60/sec)
 	m_trackimage_size = (int)((60000000000ULL / (m_rpm * m_cell_size)) / 16 + 1);
-	m_cache = NULL;
+	m_cache = nullptr;
 	// We will calculate default values from the time specs later.
 	m_seeknext_time = 0;
 	m_maxseek_time = 0;
@@ -382,7 +382,7 @@ void mfm_harddisk_device::device_reset()
 
 void mfm_harddisk_device::device_stop()
 {
-	if (m_cache!=NULL) global_free(m_cache);
+	if (m_cache!=nullptr) global_free(m_cache);
 }
 
 /*
@@ -404,7 +404,7 @@ bool mfm_harddisk_device::call_load()
 		std::string metadata;
 		chd_file* chdfile = get_chd_file();
 
-		if (chdfile==NULL)
+		if (chdfile==nullptr)
 		{
 			logerror("%s: chdfile is null\n", tag());
 			return IMAGE_INIT_FAIL;
@@ -523,7 +523,7 @@ void mfm_harddisk_device::call_unload()
 	mfmhd_layout_params* params = m_format->get_current_params();
 	mfmhd_layout_params* oldparams = m_format->get_initial_params();
 
-	if (m_cache!=NULL)
+	if (m_cache!=nullptr)
 	{
 		m_cache->cleanup();
 
@@ -814,7 +814,7 @@ bool mfm_harddisk_device::read(attotime &from_when, const attotime &limit, UINT1
 {
 	UINT16* track = m_cache->get_trackimage(m_current_cylinder, m_current_head);
 
-	if (track==NULL)
+	if (track==nullptr)
 	{
 		// What shall we do in this case?
 		throw emu_fatalerror("Cannot read CHD image");
@@ -853,7 +853,7 @@ bool mfm_harddisk_device::write(attotime &from_when, const attotime &limit, UINT
 {
 	UINT16* track = m_cache->get_trackimage(m_current_cylinder, m_current_head);
 
-	if (track==NULL)
+	if (track==nullptr)
 	{
 		// What shall we do in this case?
 		throw emu_fatalerror("Cannot read CHD image");
@@ -970,8 +970,8 @@ const device_type MFMHD_ST251 = &device_creator<mfm_hd_st251_device>;
 // ===========================================================
 
 mfmhd_trackimage_cache::mfmhd_trackimage_cache(running_machine &machine):
-	m_mfmhd(NULL),
-	m_tracks(NULL),
+	m_mfmhd(nullptr),
+	m_tracks(nullptr),
 	m_machine(machine)
 {
 }
@@ -981,7 +981,7 @@ mfmhd_trackimage_cache::~mfmhd_trackimage_cache()
 	mfmhd_trackimage* current = m_tracks;
 	if (TRACE_CACHE) m_machine.logerror("%s: MFM HD cache destroy\n", m_mfmhd->tag());
 
-	while (current != NULL)
+	while (current != nullptr)
 	{
 		global_free_array(current->encdata);
 		mfmhd_trackimage* currenttmp = current->next;
@@ -994,7 +994,7 @@ void mfmhd_trackimage_cache::write_back_one()
 {
 	mfmhd_trackimage* current = m_tracks;
 
-	while (current != NULL)
+	while (current != nullptr)
 	{
 		if (current->dirty)
 		{
@@ -1013,7 +1013,7 @@ void mfmhd_trackimage_cache::cleanup()
 	if (TRACE_CACHE) m_machine.logerror("%s: MFM HD cache cleanup\n", m_mfmhd->tag());
 
 	// Still dirty?
-	while (current != NULL)
+	while (current != nullptr)
 	{
 		if (TRACE_CACHE) m_machine.logerror("%s: MFM HD cache: evict line cylinder=%d head=%d\n", m_mfmhd->tag(), current->cylinder, current->head);
 		if (current->dirty)
@@ -1047,7 +1047,7 @@ void mfmhd_trackimage_cache::init(mfm_harddisk_device* mfmhd, int tracksize, int
 	chd_error state;
 
 	mfmhd_trackimage* previous;
-	mfmhd_trackimage* current = NULL;
+	mfmhd_trackimage* current = nullptr;
 
 	m_mfmhd = mfmhd;
 
@@ -1077,9 +1077,9 @@ void mfmhd_trackimage_cache::init(mfm_harddisk_device* mfmhd, int tracksize, int
 			head = 0;
 			cylinder++;
 		}
-		current->next = NULL;
+		current->next = nullptr;
 
-		if (previous != NULL)
+		if (previous != nullptr)
 			previous->next = current;
 		else
 			// Head
@@ -1100,7 +1100,7 @@ UINT16* mfmhd_trackimage_cache::get_trackimage(int cylinder, int head)
 {
 	// Search the cached track images
 	mfmhd_trackimage* current = m_tracks;
-	mfmhd_trackimage* previous = NULL;
+	mfmhd_trackimage* previous = nullptr;
 
 	chd_error state = CHDERR_NONE;
 
@@ -1109,13 +1109,13 @@ UINT16* mfmhd_trackimage_cache::get_trackimage(int cylinder, int head)
 	while (state == CHDERR_NONE)
 	{
 		// A simple linear search
-		while (current != NULL)
+		while (current != nullptr)
 		{
 			if (current->cylinder == cylinder && current->head == head)
 			{
 				// found it
 				// move it to the front of the chain for LRU
-				if (previous != NULL)
+				if (previous != nullptr)
 				{
 					previous->next = current->next;  // pull out here
 					current->next = m_tracks;  // put the previous head into the next field
@@ -1126,7 +1126,7 @@ UINT16* mfmhd_trackimage_cache::get_trackimage(int cylinder, int head)
 			else
 			{
 				// Don't lose the pointer to the next tail
-				if (current->next != NULL) previous = current;
+				if (current->next != nullptr) previous = current;
 				current = current->next;
 			}
 		}
@@ -1152,7 +1152,7 @@ UINT16* mfmhd_trackimage_cache::get_trackimage(int cylinder, int head)
 		current->head = head;
 	}
 	// If we are here we have a CHD error.
-	return NULL;
+	return nullptr;
 }
 
 // ================================================================
@@ -1163,7 +1163,7 @@ mfm_harddisk_connector::mfm_harddisk_connector(const machine_config &mconfig, co
 	m_encoding(),
 	m_spinupms(0),
 	m_cachesize(0),
-	m_format(NULL)
+	m_format(nullptr)
 {
 }
 
@@ -1187,7 +1187,7 @@ void mfm_harddisk_connector::configure(mfmhd_enc_t encoding, int spinupms, int c
 void mfm_harddisk_connector::device_config_complete()
 {
 	mfm_harddisk_device *dev = get_device();
-	if (dev != NULL)
+	if (dev != nullptr)
 	{
 		dev->set_encoding(m_encoding);
 		dev->set_spinup_time(m_spinupms);

@@ -31,16 +31,16 @@ public:
 	alesis_dm3ag_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// device interface
 	DECLARE_WRITE8_MEMBER(write);
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	static const device_timer_id TIMER_DAC_UPDATE = 1;
@@ -79,7 +79,7 @@ public:
 	optional_device<cassette_image_device> m_cassette;
 
 	DECLARE_PALETTE_INIT(alesis);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	void update_lcd_symbols(bitmap_ind16 &bitmap, UINT8 pos, UINT8 y, UINT8 x, int state);
 	DECLARE_DRIVER_INIT(hr16);

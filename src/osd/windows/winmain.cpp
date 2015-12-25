@@ -199,7 +199,7 @@ private:
 class winui_output_error : public osd_output
 {
 public:
-	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args)
+	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args) override
 	{
 		if (channel == OSD_OUTPUT_CHANNEL_ERROR)
 		{

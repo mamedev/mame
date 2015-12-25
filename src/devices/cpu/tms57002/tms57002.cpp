@@ -912,6 +912,6 @@ const address_space_config *tms57002_device::memory_space_config(address_spacenu
 	switch(spacenum) {
 	case AS_PROGRAM: return &program_config;
 	case AS_DATA: return &data_config;
-	default: return 0;
+	default: return nullptr;
 	}
 }

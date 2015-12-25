@@ -95,8 +95,8 @@ public:
 	optional_device<ncr539x_device> m_539x_1;
 	optional_device<ncr539x_device> m_539x_2;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	model_t m_model;
 

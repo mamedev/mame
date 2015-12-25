@@ -123,7 +123,7 @@ void inufuku_state::video_start()
 	m_bg_tilemap->set_transparent_pen(255);
 	m_tx_tilemap->set_transparent_pen(255);
 
-	m_spriteram1_old = auto_alloc_array_clear(machine(), UINT16, m_spriteram1.bytes()/2);
+	m_spriteram1_old = make_unique_clear<UINT16[]>(m_spriteram1.bytes()/2);
 
 }
 
@@ -159,7 +159,7 @@ UINT32 inufuku_state::screen_update_inufuku(screen_device &screen, bitmap_ind16 
 	m_tx_tilemap->set_scrolly(0, m_tx_scrolly);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
 
-	m_spr->draw_sprites( m_spriteram1_old, m_spriteram1.bytes(), screen, bitmap, cliprect );
+	m_spr->draw_sprites( m_spriteram1_old.get(), m_spriteram1.bytes(), screen, bitmap, cliprect );
 	return 0;
 }
 
@@ -168,6 +168,6 @@ void inufuku_state::screen_eof_inufuku(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		memcpy(m_spriteram1_old,m_spriteram1,m_spriteram1.bytes());
+		memcpy(m_spriteram1_old.get(),m_spriteram1,m_spriteram1.bytes());
 	}
 }

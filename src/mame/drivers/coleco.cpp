@@ -231,18 +231,18 @@ READ8_MEMBER( coleco_state::cart_r )
 
 UINT8 coleco_state::coleco_scan_paddles(UINT8 *joy_status0, UINT8 *joy_status1)
 {
-	UINT8 ctrl_sel = (m_ctrlsel != NULL) ? m_ctrlsel->read() : 0;
+	UINT8 ctrl_sel = (m_ctrlsel != nullptr) ? m_ctrlsel->read() : 0;
 
 	/* which controller shall we read? */
 	if ((ctrl_sel & 0x07) == 0x02)          // Super Action Controller P1
-		*joy_status0 = (m_sac_slide1 != NULL) ? m_sac_slide1->read() : 0;
+		*joy_status0 = (m_sac_slide1 != nullptr) ? m_sac_slide1->read() : 0;
 	else if ((ctrl_sel & 0x07) == 0x03)     // Driving Controller P1
-		*joy_status0 = (m_driv_wheel1 != NULL) ? m_driv_wheel1->read() : 0;
+		*joy_status0 = (m_driv_wheel1 != nullptr) ? m_driv_wheel1->read() : 0;
 
 	if ((ctrl_sel & 0x70) == 0x20)          // Super Action Controller P2
-		*joy_status1 = (m_sac_slide2 != NULL) ? m_sac_slide2->read() : 0;
+		*joy_status1 = (m_sac_slide2 != nullptr) ? m_sac_slide2->read() : 0;
 	else if ((ctrl_sel & 0x70) == 0x30)     // Driving Controller P2
-		*joy_status1 = (m_driv_wheel2 != NULL) ? m_driv_wheel2->read() : 0;
+		*joy_status1 = (m_driv_wheel2 != nullptr) ? m_driv_wheel2->read() : 0;
 
 	/* In principle, even if not supported by any game, I guess we could have two Super
 	   Action Controllers plugged into the Roller controller ports. Since I found no info
@@ -250,8 +250,8 @@ UINT8 coleco_state::coleco_scan_paddles(UINT8 *joy_status0, UINT8 *joy_status1)
 	   the Roller trackball inputs and actually use the latter ones, when both are selected. */
 	if (ctrl_sel & 0x80)                    // Roller controller
 	{
-		*joy_status0 = (m_roller_x != NULL) ? m_roller_x->read() : 0;
-		*joy_status1 = (m_roller_y != NULL) ? m_roller_y->read() : 0;
+		*joy_status0 = (m_roller_x != nullptr) ? m_roller_x->read() : 0;
+		*joy_status1 = (m_roller_y != nullptr) ? m_roller_y->read() : 0;
 	}
 
 	return *joy_status0 | *joy_status1;
@@ -260,7 +260,7 @@ UINT8 coleco_state::coleco_scan_paddles(UINT8 *joy_status0, UINT8 *joy_status1)
 
 UINT8 coleco_state::coleco_paddle_read(int port, int joy_mode, UINT8 joy_status)
 {
-	UINT8 ctrl_sel = (m_ctrlsel != NULL ) ? m_ctrlsel->read() : 0;
+	UINT8 ctrl_sel = (m_ctrlsel != nullptr ) ? m_ctrlsel->read() : 0;
 	UINT8 ctrl_extra = ctrl_sel & 0x80;
 	ctrl_sel = ctrl_sel >> (port*4) & 7;
 
@@ -388,7 +388,7 @@ static MACHINE_CONFIG_START( coleco, coleco_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */
-	MCFG_COLECOVISION_CARTRIDGE_SLOT_ADD(COLECOVISION_CARTRIDGE_SLOT_TAG, colecovision_cartridges, NULL)
+	MCFG_COLECOVISION_CARTRIDGE_SLOT_ADD(COLECOVISION_CARTRIDGE_SLOT_TAG, colecovision_cartridges, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","coleco")

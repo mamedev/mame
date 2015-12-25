@@ -1634,7 +1634,7 @@ ioport_constructor mc6847_base_device::device_input_ports() const
 
 mc6847_base_device::artifacter::artifacter()
 {
-	m_config = NULL;
+	m_config = nullptr;
 	m_artifacting = 0;
 	m_saved_artifacting = 0;
 	m_saved_c0 = 0;
@@ -1853,7 +1853,7 @@ s68047_device::s68047_device(const machine_config &mconfig, const char *tag, dev
 //
 void s68047_device::hack_black_becomes_blue(bool flag)
 {
-	set_custom_palette( flag ? s_s68047_hack_palette : NULL );
+	set_custom_palette( flag ? s_s68047_hack_palette : nullptr );
 }
 
 const UINT32 s68047_device::s_s68047_hack_palette[16] =

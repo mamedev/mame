@@ -61,7 +61,7 @@ public:
 	UINT8 m_disp_1;
 	UINT8 m_disp_2;
 	UINT8 bit_to_dec(UINT8 val);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 

@@ -36,42 +36,42 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual UINT8 dack_r(int line);
-	virtual void dack_w(int line, UINT8 data);
-	virtual void eop_w(int state);
+	virtual UINT8 dack_r(int line) override;
+	virtual void dack_w(int line, UINT8 data) override;
+	virtual void eop_w(int state) override;
 };
 
 class isa8_fdc_xt_device : public isa8_fdc_device {
 public:
 	isa8_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class isa8_fdc_at_device : public isa8_fdc_device {
 public:
 	isa8_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class isa8_fdc_smc_device : public isa8_fdc_device {
 public:
 	isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class isa8_fdc_ps2_device : public isa8_fdc_device {
 public:
 	isa8_fdc_ps2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class isa8_fdc_superio_device : public isa8_fdc_device {
 public:
 	isa8_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 // device type definition

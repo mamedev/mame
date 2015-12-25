@@ -100,13 +100,13 @@ static floppy_image_format_t *find_format_by_name(const char *name)
 	for(int i=0; i != FORMAT_COUNT; i++)
 		if(!core_stricmp(name, formats[i]->name()))
 			return formats[i];
-	return 0;
+	return nullptr;
 }
 
 static floppy_image_format_t *find_format_by_identify(io_generic *image)
 {
 	int best = 0;
-	floppy_image_format_t *best_fif = 0;
+	floppy_image_format_t *best_fif = nullptr;
 
 	for(int i = 0; i != FORMAT_COUNT; i++) {
 		floppy_image_format_t *fif = formats[i];

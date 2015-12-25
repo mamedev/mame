@@ -38,7 +38,7 @@ public:
 	DECLARE_WRITE32_MEMBER(write_config);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	UINT8           m_config_unknown;

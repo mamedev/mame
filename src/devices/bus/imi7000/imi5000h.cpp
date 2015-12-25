@@ -97,7 +97,7 @@ static const z80_daisy_config z80_daisy_chain[] =
 	{ Z80PIO_0_TAG },
 	{ Z80CTC_TAG },
 	{ Z80PIO_2_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 

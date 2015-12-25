@@ -56,8 +56,8 @@ public:
 	DECLARE_DRIVER_INIT(robowresb);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(appoooh);
 	DECLARE_PALETTE_INIT(appoooh);
 	DECLARE_PALETTE_INIT(robowres);

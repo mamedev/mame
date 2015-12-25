@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 private:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	UINT8 m_term_data;

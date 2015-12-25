@@ -41,7 +41,7 @@ public:
 	virtual void pulse_clock() { };
 
 protected:
-	virtual void device_config_complete();
+	virtual void device_config_complete() override;
 	joyport_device* m_joyport;
 };
 
@@ -60,8 +60,8 @@ public:
 	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<joyport_device &>(device).m_interrupt.set_callback(object); }
 
 protected:
-	void device_start();
-	void device_config_complete();
+	void device_start() override;
+	void device_config_complete() override;
 
 private:
 	devcb_write_line           m_interrupt;

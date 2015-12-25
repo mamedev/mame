@@ -156,7 +156,7 @@ static const z80_daisy_config mc8030_daisy_chain[] =
 	{ "asp_sio" },      /* sio */
 	{ "zve_pio" },      /* User pio */
 	{ "zve_ctc" },      /* User ctc */
-	{ NULL }
+	{ nullptr }
 };
 
 static MACHINE_CONFIG_START( mc8020, mc80_state )

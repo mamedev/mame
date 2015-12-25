@@ -219,10 +219,10 @@ void segas32_state::common_start(int multi32)
 	m_is_multi32 = multi32;
 
 	/* allocate a copy of spriteram in 32-bit format */
-	m_spriteram_32bit = auto_alloc_array(machine(), UINT32, 0x20000/4);
+	m_spriteram_32bit = std::make_unique<UINT32[]>(0x20000/4);
 
 	/* allocate the tilemap cache */
-	m_cache_head = NULL;
+	m_cache_head = nullptr;
 	for (tmap = 0; tmap < TILEMAP_CACHE_SIZE; tmap++)
 	{
 		struct cache_entry *entry = auto_alloc(machine(), struct cache_entry);
@@ -239,15 +239,13 @@ void segas32_state::common_start(int multi32)
 	/* allocate the bitmaps (a few extra for multi32) */
 	for (tmap = 0; tmap < 9 + 2 * multi32; tmap++)
 	{
-		m_layer_data[tmap].bitmap = auto_bitmap_ind16_alloc(machine(), 416, 224);
+		m_layer_data[tmap].bitmap = auto_alloc(machine(), bitmap_ind16(416, 224));
 		m_layer_data[tmap].transparent = auto_alloc_array_clear(machine(), UINT8, 256);
 	}
 
 	/* allocate pre-rendered solid lines of 0's and ffff's */
-	m_solid_0000 = auto_alloc_array(machine(), UINT16, 512);
-	memset(m_solid_0000, 0x00, sizeof(m_solid_0000[0]) * 512);
-	m_solid_ffff = auto_alloc_array(machine(), UINT16, 512);
-	memset(m_solid_ffff, 0xff, sizeof(m_solid_ffff[0]) * 512);
+	m_solid_0000 = make_unique_clear<UINT16[]>(512);
+	m_solid_ffff = make_unique_clear<UINT16[],0xff>(512);
 
 	memset(m_system32_videoram, 0x00, 0x20000);
 
@@ -470,7 +468,7 @@ WRITE16_MEMBER(segas32_state::system32_videoram_w)
 		offset %= 0x200;
 
 		/* scan the cache for a matching pages */
-		for (entry = m_cache_head; entry != NULL; entry = entry->next)
+		for (entry = m_cache_head; entry != nullptr; entry = entry->next)
 			if (entry->page == page)
 				entry->tmap->mark_tile_dirty(offset);
 	}
@@ -671,7 +669,7 @@ tilemap_t *segas32_state::find_cache_entry(int page, int bank)
 	struct segas32_state::cache_entry *entry, *prev;
 
 	/* scan the list for a matching entry */
-	prev = NULL;
+	prev = nullptr;
 	entry = m_cache_head;
 	while (1)
 	{
@@ -688,7 +686,7 @@ tilemap_t *segas32_state::find_cache_entry(int page, int bank)
 		}
 
 		/* stop on the last entry */
-		if (entry->next == NULL)
+		if (entry->next == nullptr)
 			break;
 		prev = entry;
 		entry = entry->next;
@@ -1703,7 +1701,7 @@ int segas32_state::draw_one_sprite(UINT16 *data, int xoffs, int yoffs, const rec
 	/* clamp to within the memory region size */
 	if (fromram)
 	{
-		spritedata = m_spriteram_32bit;
+		spritedata = m_spriteram_32bit.get();
 		addrmask = (0x20000 / 4) - 1;
 	}
 	else
@@ -1974,7 +1972,7 @@ inline UINT16 segas32_state::compute_sprite_blend(UINT8 encoding)
 inline UINT16 *segas32_state::get_layer_scanline(int layer, int scanline)
 {
 	if (m_layer_data[layer].transparent[scanline])
-		return (layer == MIXER_LAYER_SPRITES) ? m_solid_ffff : m_solid_0000;
+		return (layer == MIXER_LAYER_SPRITES) ? m_solid_ffff.get() : m_solid_0000.get();
 	return &m_layer_data[layer].bitmap->pix16(scanline);
 }
 
@@ -1992,7 +1990,7 @@ void segas32_state::mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, c
 		UINT8       mixshift;           /* shift from control reg */
 		UINT8       coloroffs;          /* color offset index */
 	} layerorder[16][8], layersort[8];
-	struct layer_info temp_sprite_save = { 0 };
+	struct layer_info temp_sprite_save = { nullptr };
 	UINT8 sprgroup_shift, sprgroup_mask, sprgroup_or;
 	int numlayers, laynum, groupnum;
 	int rgboffs[3][3];

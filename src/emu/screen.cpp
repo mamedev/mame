@@ -55,7 +55,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 		m_yscale(1.0f),
 		m_palette(*this),
 		m_video_attributes(0),
-		m_container(NULL),
+		m_container(nullptr),
 		m_width(100),
 		m_height(100),
 		m_visarea(0, 99, 0, 99),
@@ -73,10 +73,10 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 		m_vblank_period(0),
 		m_vblank_start_time(attotime::zero),
 		m_vblank_end_time(attotime::zero),
-		m_vblank_begin_timer(NULL),
-		m_vblank_end_timer(NULL),
-		m_scanline0_timer(NULL),
-		m_scanline_timer(NULL),
+		m_vblank_begin_timer(nullptr),
+		m_vblank_end_timer(nullptr),
+		m_scanline0_timer(nullptr),
+		m_scanline_timer(nullptr),
 		m_frame_number(0),
 		m_partial_updates_this_frame(0)
 {
@@ -267,9 +267,9 @@ void screen_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("Invalid (zero) refresh rate\n");
 
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
-	if (m_palette == NULL && texformat == TEXFORMAT_PALETTE16)
+	if (m_palette == nullptr && texformat == TEXFORMAT_PALETTE16)
 		osd_printf_error("Screen does not have palette defined\n");
-	if (m_palette != NULL && texformat == TEXFORMAT_RGB32)
+	if (m_palette != nullptr && texformat == TEXFORMAT_RGB32)
 		osd_printf_warning("Screen does not need palette defined\n");
 }
 
@@ -286,16 +286,16 @@ void screen_device::device_start()
 	m_screen_vblank.bind_relative_to(*owner());
 
 	// if we have a palette and it's not started, wait for it
-	if (m_palette != NULL && !m_palette->started())
+	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
 	// configure bitmap formats and allocate screen bitmaps
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
 
-	for (int index = 0; index < ARRAY_LENGTH(m_bitmap); index++)
+	for (auto & elem : m_bitmap)
 	{
-		m_bitmap[index].set_format(format(), texformat);
-		register_screen_bitmap(m_bitmap[index]);
+		elem.set_format(format(), texformat);
+		register_screen_bitmap(elem);
 	}
 	register_screen_bitmap(m_priority);
 
@@ -348,7 +348,7 @@ void screen_device::device_start()
 
 	// load the effect overlay
 	const char *overname = machine().options().effect();
-	if (overname != NULL && strcmp(overname, "none") != 0)
+	if (overname != nullptr && strcmp(overname, "none") != 0)
 		load_effect_overlay(overname);
 
 	// register items for saving
@@ -553,11 +553,11 @@ void screen_device::realloc_screen_bitmaps()
 	INT32 effheight = MAX(m_height, m_visarea.max_y + 1);
 
 	// reize all registered screen bitmaps
-	for (auto_bitmap_item *item = m_auto_bitmap_list.first(); item != NULL; item = item->next())
+	for (auto_bitmap_item *item = m_auto_bitmap_list.first(); item != nullptr; item = item->next())
 		item->m_bitmap.resize(effwidth, effheight);
 
 	// re-set up textures
-	if (m_palette != NULL)
+	if (m_palette != nullptr)
 	{
 		m_bitmap[0].set_palette(m_palette->palette());
 		m_bitmap[1].set_palette(m_palette->palette());
@@ -899,12 +899,12 @@ void screen_device::register_vblank_callback(vblank_state_delegate vblank_callba
 
 	// check if we already have this callback registered
 	callback_item *item;
-	for (item = m_callback_list.first(); item != NULL; item = item->next())
+	for (item = m_callback_list.first(); item != nullptr; item = item->next())
 		if (item->m_callback == vblank_callback)
 			break;
 
 	// if not found, register
-	if (item == NULL)
+	if (item == nullptr)
 		m_callback_list.append(*global_alloc(callback_item(vblank_callback)));
 }
 
@@ -921,7 +921,7 @@ void screen_device::register_screen_bitmap(bitmap_t &bitmap)
 
 	// if allocating now, just do it
 	bitmap.allocate(width(), height());
-	if (m_palette != NULL)
+	if (m_palette != nullptr)
 		bitmap.set_palette(m_palette->palette());
 }
 
@@ -942,7 +942,7 @@ void screen_device::vblank_begin()
 		machine().video().frame_update();
 
 	// call the screen specific callbacks
-	for (callback_item *item = m_callback_list.first(); item != NULL; item = item->next())
+	for (callback_item *item = m_callback_list.first(); item != nullptr; item = item->next())
 		item->m_callback(*this, true);
 	if (!m_screen_vblank.isnull())
 		m_screen_vblank(*this, true);
@@ -966,7 +966,7 @@ void screen_device::vblank_begin()
 void screen_device::vblank_end()
 {
 	// call the screen specific callbacks
-	for (callback_item *item = m_callback_list.first(); item != NULL; item = item->next())
+	for (callback_item *item = m_callback_list.first(); item != nullptr; item = item->next())
 		item->m_callback(*this, false);
 	if (!m_screen_vblank.isnull())
 		m_screen_vblank(*this, false);
@@ -1143,7 +1143,7 @@ void screen_device::finalize_burnin()
 	file_error filerr = file.open(machine().basename(), PATH_SEPARATOR "burnin-", this->tag()+1, ".png") ;
 	if (filerr == FILERR_NONE)
 	{
-		png_info pnginfo = { 0 };
+		png_info pnginfo = { nullptr };
 //      png_error pngerr;
 		char text[256];
 
@@ -1154,7 +1154,7 @@ void screen_device::finalize_burnin()
 		png_add_text(&pnginfo, "System", text);
 
 		// now do the actual work
-		png_write_bitmap(file, &pnginfo, finalmap, 0, NULL);
+		png_write_bitmap(file, &pnginfo, finalmap, 0, nullptr);
 
 		// free any data allocated
 		png_free(&pnginfo);
@@ -1177,7 +1177,7 @@ void screen_device::load_effect_overlay(const char *filename)
 
 	// load the file
 	emu_file file(machine().options().art_path(), OPEN_FLAG_READ);
-	render_load_png(m_screen_overlay_bitmap, file, NULL, fullname.c_str());
+	render_load_png(m_screen_overlay_bitmap, file, nullptr, fullname.c_str());
 	if (m_screen_overlay_bitmap.valid())
 		m_container->set_overlay(&m_screen_overlay_bitmap);
 	else

@@ -78,10 +78,10 @@ public:
 	DECLARE_WRITE8_MEMBER(speech_strobe_w);
 	DECLARE_READ8_MEMBER(speech_ready_r);
 	DECLARE_WRITE8_MEMBER(speech_reset_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void sound_start();
-	virtual void sound_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void sound_start() override;
+	virtual void sound_reset() override;
 	DECLARE_VIDEO_START(jedi);
 	UINT32 screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(generate_interrupt);

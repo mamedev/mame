@@ -252,7 +252,7 @@ static void execute_one(dsp56k_core* cpustate)
 	/* Dual X Memory Data Read : 011m mKKK .rr. .... : A-142*/
 	if ((op & 0xe000) == 0x6000)
 	{
-		typed_pointer d_register = {NULL, DT_BYTE};
+		typed_pointer d_register = {nullptr, DT_BYTE};
 
 		/* Quote: (MOVE, MAC(R), MPY(R), ADD, SUB, TFR) */
 		UINT16 op_byte = op & 0x00ff;
@@ -342,7 +342,7 @@ static void execute_one(dsp56k_core* cpustate)
 
 		int parallelType = -1;
 		UINT16 op_byte = 0x0000;
-		typed_pointer d_register = {NULL, DT_BYTE};
+		typed_pointer d_register = {nullptr, DT_BYTE};
 		UINT64 prev_accum_value = U64(0x0000000000000000);
 
 		/* Note: it's important that NPDM comes before RtRDM here */
@@ -1118,15 +1118,15 @@ static size_t dsp56k_op_addsub_2(dsp56k_core* cpustate, const UINT16 op_byte, ty
 {
 	UINT64 useVal = 0;
 	UINT8 op_type = OP_OTHER;
-	typed_pointer S = {NULL, DT_BYTE};
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer S = {nullptr, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 
 	decode_uuuuF_table(cpustate, BITS(op_byte,0x0017), BITS(op_byte,0x0008), op_type, &S, &D);
 
 	/* If you gave an invalid operation type, presume it's a nop and move on with the parallel move */
 	if (op_type == OP_OTHER)
 	{
-		d_register->addr = NULL;
+		d_register->addr = nullptr;
 		d_register->data_type = DT_BYTE;
 		cycles += 2;
 		return 1;
@@ -1172,9 +1172,9 @@ static size_t dsp56k_op_mac_1(dsp56k_core* cpustate, const UINT16 op_byte, typed
 	INT32 s1 = 0;
 	INT32 s2 = 0;
 
-	void* D = NULL;
-	void* S1 = NULL;
-	void* S2 = NULL;
+	void* D = nullptr;
+	void* S1 = nullptr;
+	void* S2 = nullptr;
 
 	decode_QQF_table(cpustate, BITS(op_byte,0x0003), BITS(op_byte,0x0008), &S1, &S2, &D);
 
@@ -1238,9 +1238,9 @@ static size_t dsp56k_op_mpy_1(dsp56k_core* cpustate, const UINT16 op_byte, typed
 	INT32 s1 = 0;
 	INT32 s2 = 0;
 
-	void* D = NULL;
-	void* S1 = NULL;
-	void* S2 = NULL;
+	void* D = nullptr;
+	void* S1 = nullptr;
+	void* S2 = nullptr;
 
 	decode_QQF_table(cpustate, BITS(op_byte,0x0003), BITS(op_byte,0x0008), &S1, &S2, &D);
 
@@ -1303,8 +1303,8 @@ static size_t dsp56k_op_mac_2(dsp56k_core* cpustate, const UINT16 op_byte, UINT8
 /* CLR : .... .... 0000 F001 : A-60 */
 static size_t dsp56k_op_clr(dsp56k_core* cpustate, const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
-	typed_pointer D = {NULL, DT_LONG_WORD};
-	typed_pointer clear = {NULL, DT_LONG_WORD};
+	typed_pointer D = {nullptr, DT_LONG_WORD};
+	typed_pointer clear = {nullptr, DT_LONG_WORD};
 	UINT64 clear_val = U64(0x0000000000000000);
 
 	decode_F_table(cpustate, BITS(op_byte,0x0008), &D);
@@ -1336,8 +1336,8 @@ static size_t dsp56k_op_add(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 {
 	UINT64 addVal = 0;
 
-	typed_pointer S = {NULL, DT_BYTE};
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer S = {nullptr, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 	decode_JJJF_table(cpustate, BITS(op_byte,0x0007),BITS(op_byte,0x0008), &S, &D);
 
 	*p_accum = *((UINT64*)D.addr);
@@ -1375,7 +1375,7 @@ static size_t dsp56k_op_move(dsp56k_core* cpustate, const UINT16 op_byte, typed_
 	/* Equivalent to a nop with a parallel move */
 	/* These can't be used later.  Hopefully compilers would pick this up. */
 	*p_accum = 0;
-	d_register->addr = NULL;
+	d_register->addr = nullptr;
 	d_register->data_type = DT_BYTE;
 
 	/* S L E U N Z V C */
@@ -1388,8 +1388,8 @@ static size_t dsp56k_op_move(dsp56k_core* cpustate, const UINT16 op_byte, typed_
 /* TFR : .... .... 0001 FJJJ : A-212 */
 static size_t dsp56k_op_tfr(dsp56k_core* cpustate, const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
-	typed_pointer S = {NULL, DT_BYTE};
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer S = {nullptr, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 
 	decode_JJJF_table(cpustate, BITS(op_byte,0x0007),BITS(op_byte,0x0008), &S, &D);
 
@@ -1410,7 +1410,7 @@ static size_t dsp56k_op_tfr(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 /* RND : .... .... 0010 F000 : A-188 */
 static size_t dsp56k_op_rnd(dsp56k_core* cpustate, const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 
 	decode_F_table(cpustate, BITS(op_byte,0x0008), &D);
 
@@ -1438,7 +1438,7 @@ static size_t dsp56k_op_rnd(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 /* TST : .... .... 0010 F001 : A-218 */
 static size_t dsp56k_op_tst(dsp56k_core* cpustate, const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
-	typed_pointer D = {NULL, DT_LONG_WORD};
+	typed_pointer D = {nullptr, DT_LONG_WORD};
 
 	decode_F_table(cpustate, BITS(op_byte,0x0008), &D);
 
@@ -1462,7 +1462,7 @@ static size_t dsp56k_op_tst(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 /* INC : .... .... 0010 F010 : A-104 */
 static size_t dsp56k_op_inc(dsp56k_core* cpustate, const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 	decode_F_table(cpustate, BITS(op_byte,0x0008), &D);
 
 	/* Save some data for the parallel move */
@@ -1494,7 +1494,7 @@ static size_t dsp56k_op_inc24(dsp56k_core* cpustate, const UINT16 op_byte, typed
 {
 	UINT32 workBits24;
 
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 	decode_F_table(cpustate, BITS(op_byte,0x0008), &D);
 
 	/* Save some data for the parallel move */
@@ -1527,8 +1527,8 @@ static size_t dsp56k_op_inc24(dsp56k_core* cpustate, const UINT16 op_byte, typed
 /* OR : .... .... 0010 F1JJ : A-176 */
 static size_t dsp56k_op_or(dsp56k_core* cpustate, const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
-	typed_pointer S = {NULL, DT_BYTE};
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer S = {nullptr, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 
 	decode_JJF_table(cpustate, BITS(op_byte,0x0003), BITS(op_byte,0x0008), &S, &D);
 
@@ -1555,7 +1555,7 @@ static size_t dsp56k_op_or(dsp56k_core* cpustate, const UINT16 op_byte, typed_po
 /* ASR : .... .... 0011 F000 : A-32 */
 static size_t dsp56k_op_asr(dsp56k_core* cpustate, const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 	decode_F_table(cpustate, BITS(op_byte,0x0008), &D);
 
 	*p_accum = *((UINT64*)D.addr);
@@ -1598,7 +1598,7 @@ static size_t dsp56k_op_asl(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 /* LSR : .... .... 0011 F010 : A-120 */
 static size_t dsp56k_op_lsr(dsp56k_core* cpustate, const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 	decode_F_table(cpustate, BITS(op_byte,0x0008), &D);
 
 	*p_accum = *((UINT64*)D.addr);
@@ -1659,8 +1659,8 @@ static size_t dsp56k_op_subl(dsp56k_core* cpustate, const UINT16 op_byte, typed_
 static size_t dsp56k_op_sub(dsp56k_core* cpustate, const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
 	UINT64 useVal = 0;
-	typed_pointer S = {NULL, DT_BYTE};
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer S = {nullptr, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 
 	decode_JJJF_table(cpustate, BITS(op_byte,0x0007), BITS(op_byte,0x0008), &S, &D);
 
@@ -1721,8 +1721,8 @@ static size_t dsp56k_op_cmp(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 	UINT64 cmpVal = 0;
 	UINT64 result = 0;
 
-	typed_pointer S = {NULL, DT_BYTE};
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer S = {nullptr, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 
 	decode_JJJF_table(cpustate, BITS(op_byte,0x0007),BITS(op_byte,0x0008), &S, &D);
 
@@ -1773,7 +1773,7 @@ static size_t dsp56k_op_neg(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 /* NOT : .... .... 0110 F001 : A-174 */
 static size_t dsp56k_op_not(dsp56k_core* cpustate, const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 	decode_F_table(cpustate, BITS(op_byte,0x0008), &D);
 
 	*p_accum = *((UINT64*)D.addr);
@@ -1808,7 +1808,7 @@ static size_t dsp56k_op_dec24(dsp56k_core* cpustate, const UINT16 op_byte, typed
 {
 	UINT32 workBits24;
 
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 	decode_F_table(cpustate, BITS(op_byte,0x0008), &D);
 
 	/* Save some data for the parallel move */
@@ -1839,8 +1839,8 @@ static size_t dsp56k_op_dec24(dsp56k_core* cpustate, const UINT16 op_byte, typed
 /* AND : .... .... 0110 F1JJ : A-24 */
 static size_t dsp56k_op_and(dsp56k_core* cpustate, const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
-	typed_pointer S = {NULL, DT_BYTE};
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer S = {nullptr, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 
 	decode_JJF_table(cpustate, BITS(op_byte,0x0003), BITS(op_byte,0x0008), &S, &D);
 
@@ -1868,7 +1868,7 @@ static size_t dsp56k_op_and(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 static size_t dsp56k_op_abs(dsp56k_core* cpustate, const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
 	INT64 opD = 0;
-	typed_pointer D = {NULL, DT_LONG_WORD};
+	typed_pointer D = {nullptr, DT_LONG_WORD};
 
 	decode_F_table(cpustate, BITS(op_byte,0x0008), &D);
 
@@ -1932,8 +1932,8 @@ static size_t dsp56k_op_cmpm(dsp56k_core* cpustate, const UINT16 op_byte, typed_
 	INT64 absD;
 	INT64 absResult;
 
-	typed_pointer S = {NULL, DT_BYTE};
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer S = {nullptr, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 
 	decode_JJJF_table(cpustate, BITS(op_byte,0x0007),BITS(op_byte,0x0008), &S, &D);
 
@@ -1996,9 +1996,9 @@ static size_t dsp56k_op_mpy(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 	INT32 s1 = 0;
 	INT32 s2 = 0;
 
-	void* D = NULL;
-	void* S1 = NULL;
-	void* S2 = NULL;
+	void* D = nullptr;
+	void* S1 = nullptr;
+	void* S2 = nullptr;
 
 	decode_QQQF_table(cpustate, BITS(op_byte,0x0007), BITS(op_byte,0x0008), &S1, &S2, &D);
 
@@ -2045,9 +2045,9 @@ static size_t dsp56k_op_mac(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 	INT32 s1 = 0;
 	INT32 s2 = 0;
 
-	void* D = NULL;
-	void* S1 = NULL;
-	void* S2 = NULL;
+	void* D = nullptr;
+	void* S1 = nullptr;
+	void* S2 = nullptr;
 
 	decode_QQQF_table(cpustate, BITS(op_byte,0x0007), BITS(op_byte,0x0008), &S1, &S2, &D);
 
@@ -2103,9 +2103,9 @@ static size_t dsp56k_op_macr(dsp56k_core* cpustate, const UINT16 op_byte, typed_
 	INT32 s1 = 0;
 	INT32 s2 = 0;
 
-	void* D = NULL;
-	void* S1 = NULL;
-	void* S2 = NULL;
+	void* D = nullptr;
+	void* S1 = nullptr;
+	void* S2 = nullptr;
 
 	decode_QQQF_table(cpustate, BITS(op_byte,0x0007), BITS(op_byte,0x0008), &S1, &S2, &D);
 
@@ -2208,7 +2208,7 @@ static size_t dsp56k_op_andi(dsp56k_core* cpustate, const UINT16 op, UINT8* cycl
 static size_t dsp56k_op_asl4(dsp56k_core* cpustate, const UINT16 op, UINT8* cycles)
 {
 	UINT64 p_accum = 0;
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 	decode_F_table(cpustate, BITS(op,0x0008), &D);
 
 	p_accum = *((UINT64*)D.addr);
@@ -2235,7 +2235,7 @@ static size_t dsp56k_op_asl4(dsp56k_core* cpustate, const UINT16 op, UINT8* cycl
 static size_t dsp56k_op_asr4(dsp56k_core* cpustate, const UINT16 op, UINT8* cycles)
 {
 	UINT64 p_accum = 0;
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 	decode_F_table(cpustate, BITS(op,0x0008), &D);
 
 	p_accum = *((UINT64*)D.addr);
@@ -2266,7 +2266,7 @@ static size_t dsp56k_op_asr4(dsp56k_core* cpustate, const UINT16 op, UINT8* cycl
 static size_t dsp56k_op_asr16(dsp56k_core* cpustate, const UINT16 op, UINT8* cycles)
 {
 	UINT64 backupVal;
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 
 	decode_F_table(cpustate, BITS(op,0x0008), &D);
 
@@ -2301,7 +2301,7 @@ static size_t dsp56k_op_bfop(dsp56k_core* cpustate, const UINT16 op, const UINT1
 	UINT16 workAddr = 0x0000;
 	UINT16 workingWord = 0x0000;
 	UINT16 previousValue = 0x0000;
-	typed_pointer tempTP = { NULL, DT_BYTE };
+	typed_pointer tempTP = { nullptr, DT_BYTE };
 
 	UINT16 iVal = op2 & 0x00ff;
 	decode_BBB_bitmask(cpustate, BITS(op2,0xe000), &iVal);
@@ -2364,8 +2364,8 @@ static size_t dsp56k_op_bfop_1(dsp56k_core* cpustate, const UINT16 op, const UIN
 	UINT16 workAddr = 0x0000;
 	UINT16 workingWord = 0x0000;
 	UINT16 previousValue = 0x0000;
-	typed_pointer R = { NULL, DT_BYTE };
-	typed_pointer tempTP = { NULL, DT_BYTE };
+	typed_pointer R = { nullptr, DT_BYTE };
+	typed_pointer tempTP = { nullptr, DT_BYTE };
 
 	UINT16 iVal = op2 & 0x00ff;
 	decode_BBB_bitmask(cpustate, BITS(op2,0xe000), &iVal);
@@ -2431,7 +2431,7 @@ static size_t dsp56k_op_bfop_2(dsp56k_core* cpustate, const UINT16 op, const UIN
 	UINT16 previousValue = 0x0000;
 
 	UINT16 iVal = op2 & 0x00ff;
-	typed_pointer S = { NULL, DT_BYTE };
+	typed_pointer S = { nullptr, DT_BYTE };
 
 	decode_BBB_bitmask(cpustate, BITS(op2,0xe000), &iVal);
 	decode_DDDDD_table(cpustate, BITS(op,0x001f), &S);
@@ -2724,8 +2724,8 @@ static size_t dsp56k_op_debugcc(dsp56k_core* cpustate, const UINT16 op, UINT8* c
 static size_t dsp56k_op_div(dsp56k_core* cpustate, const UINT16 op, UINT8* cycles)
 {
 	/* WARNING : THIS DOES NOT WORK.  IT DOESN'T EVEN TRY !!! */
-	typed_pointer S = {NULL, DT_BYTE};
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer S = {nullptr, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 
 	decode_DDF_table(cpustate, BITS(op,0x0003), BITS(op,0x0008), &S, &D);
 
@@ -2744,9 +2744,9 @@ static size_t dsp56k_op_dmac(dsp56k_core* cpustate, const UINT16 op, UINT8* cycl
 	UINT8 ss = 0;
 	INT64 result = 0;
 
-	void* D = NULL;
-	void* S1 = NULL;
-	void* S2 = NULL;
+	void* D = nullptr;
+	void* S1 = nullptr;
+	void* S2 = nullptr;
 
 	decode_QQF_special_table(cpustate, BITS(op,0x0003), BITS(op,0x0008), &S1, &S2, &D);
 
@@ -2853,7 +2853,7 @@ static size_t dsp56k_op_do_2(dsp56k_core* cpustate, const UINT16 op, const UINT1
 {
 	UINT8 retSize = 0;
 	UINT16 lValue = 0x0000;
-	typed_pointer S = {NULL, DT_BYTE};
+	typed_pointer S = {nullptr, DT_BYTE};
 	decode_DDDDD_table(cpustate, BITS(op,0x001f), &S);
 
 	/* TODO: Does not properly shift-limit sources A&B - Fix per the docs. */
@@ -2975,9 +2975,9 @@ static size_t dsp56k_op_imac(dsp56k_core* cpustate, const UINT16 op, UINT8* cycl
 	INT32 s1 = 0;
 	INT32 s2 = 0;
 
-	void* D = NULL;
-	void* S1 = NULL;
-	void* S2 = NULL;
+	void* D = nullptr;
+	void* S1 = nullptr;
+	void* S2 = nullptr;
 
 	decode_QQQF_table(cpustate, BITS(op,0x0007), BITS(op,0x0008), &S1, &S2, &D);
 
@@ -3061,7 +3061,7 @@ static size_t dsp56k_op_jmp(dsp56k_core* cpustate, const UINT16 op, const UINT16
 /* JMP : 0000 0001 0010 01RR : A-110 */
 static size_t dsp56k_op_jmp_1(dsp56k_core* cpustate, const UINT16 op, UINT8* cycles)
 {
-	typed_pointer R = { NULL, DT_BYTE };
+	typed_pointer R = { nullptr, DT_BYTE };
 	decode_RR_table(cpustate, BITS(op,0x0003), &R);
 
 	cpustate->ppc = PC;
@@ -3173,9 +3173,9 @@ static size_t dsp56k_op_jsr_2(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 static size_t dsp56k_op_lea(dsp56k_core* cpustate, const UINT16 op, UINT8* cycles)
 {
 	UINT16 ea = 0;
-	UINT16 *rX = NULL;
-	UINT16 *nX = NULL;
-	typed_pointer D = {NULL, DT_BYTE};
+	UINT16 *rX = nullptr;
+	UINT16 *nX = nullptr;
+	typed_pointer D = {nullptr, DT_BYTE};
 	decode_TT_table(cpustate, BITS(op,0x0030), &D);
 
 	/* TODO: change the execute_mm_functions to return values.  Maybe */
@@ -3219,9 +3219,9 @@ static size_t dsp56k_op_macsuuu(dsp56k_core* cpustate, const UINT16 op, UINT8* c
 	UINT8 s = 0;
 	INT64 result = 0;
 
-	void* D = NULL;
-	void* S1 = NULL;
-	void* S2 = NULL;
+	void* D = nullptr;
+	void* S1 = nullptr;
+	void* S2 = nullptr;
 
 	decode_QQF_special_table(cpustate, BITS(op,0x0003), BITS(op,0x0008), &S1, &S2, &D);
 
@@ -3271,8 +3271,8 @@ static size_t dsp56k_op_move_2(dsp56k_core* cpustate, const UINT16 op, const UIN
 static size_t dsp56k_op_movec(dsp56k_core* cpustate, const UINT16 op, UINT8* cycles)
 {
 	UINT8 W;
-	typed_pointer R = { NULL, DT_BYTE };
-	typed_pointer SD = { NULL, DT_BYTE };
+	typed_pointer R = { nullptr, DT_BYTE };
+	typed_pointer SD = { nullptr, DT_BYTE };
 
 	W = BITS(op,0x0400);
 	decode_DDDDD_table(cpustate, BITS(op,0x03e0), &SD);
@@ -3314,7 +3314,7 @@ static size_t dsp56k_op_movec_1(dsp56k_core* cpustate, const UINT16 op, UINT8* c
 {
 	UINT8 W;
 	UINT16 memOffset;
-	typed_pointer SD = {NULL, DT_BYTE};
+	typed_pointer SD = {nullptr, DT_BYTE};
 
 	W = BITS(op,0x0400);
 	decode_DDDDD_table(cpustate, BITS(op,0x03e0), &SD);
@@ -3355,8 +3355,8 @@ static size_t dsp56k_op_movec_2(dsp56k_core* cpustate, const UINT16 op, UINT8* c
 {
 	UINT8 W;
 	UINT16 memOffset;
-	typed_pointer SD = {NULL, DT_BYTE};
-	typed_pointer XMemOffset = {NULL, DT_BYTE};
+	typed_pointer SD = {nullptr, DT_BYTE};
+	typed_pointer XMemOffset = {nullptr, DT_BYTE};
 
 	W = BITS(op,0x0400);
 	decode_Z_table(cpustate, BITS(op,0x0008), &XMemOffset);
@@ -3400,7 +3400,7 @@ static size_t dsp56k_op_movec_3(dsp56k_core* cpustate, const UINT16 op, const UI
 {
 	UINT8 W;
 	UINT8 t;
-	typed_pointer SD = { NULL, DT_BYTE };
+	typed_pointer SD = { nullptr, DT_BYTE };
 
 	W = BITS(op,0x0400);
 	t = BITS(op,0x0008);
@@ -3456,8 +3456,8 @@ static size_t dsp56k_op_movec_3(dsp56k_core* cpustate, const UINT16 op, const UI
 /* MOVE(C) : 0010 10dd dddD DDDD : A-144 */
 static size_t dsp56k_op_movec_4(dsp56k_core* cpustate, const UINT16 op, UINT8* cycles)
 {
-	typed_pointer S = {NULL, DT_BYTE};
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer S = {nullptr, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 
 	decode_DDDDD_table(cpustate, BITS(op,0x03e0), &S);
 	decode_DDDDD_table(cpustate, BITS(op,0x001f), &D);
@@ -3485,7 +3485,7 @@ static size_t dsp56k_op_movec_5(dsp56k_core* cpustate, const UINT16 op, const UI
 	INT8 xx;
 	UINT8 W;
 	UINT16 memOffset;
-	typed_pointer SD = { NULL, DT_BYTE };
+	typed_pointer SD = { nullptr, DT_BYTE };
 
 	xx = (INT8)(op & 0x00ff);
 	W = BITS(op2,0x0400);
@@ -3526,8 +3526,8 @@ static size_t dsp56k_op_movec_5(dsp56k_core* cpustate, const UINT16 op, const UI
 /* MOVE(I) : 0010 00DD BBBB BBBB : A-150 */
 static size_t dsp56k_op_movei(dsp56k_core* cpustate, const UINT16 op, UINT8* cycles)
 {
-	typed_pointer D = {NULL, DT_BYTE};
-	typed_pointer immTP = {NULL, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
+	typed_pointer immTP = {nullptr, DT_BYTE};
 
 	/* Typecasting to INT16 sign-extends the BBBBBBBB operand */
 	UINT16 immediateSignExtended = (INT16)(op & 0x00ff);
@@ -3548,8 +3548,8 @@ static size_t dsp56k_op_movei(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 static size_t dsp56k_op_movem(dsp56k_core* cpustate, const UINT16 op, UINT8* cycles)
 {
 	UINT8 W;
-	typed_pointer R = { NULL, DT_BYTE };
-	typed_pointer SD = { NULL, DT_BYTE };
+	typed_pointer R = { nullptr, DT_BYTE };
+	typed_pointer SD = { nullptr, DT_BYTE };
 
 	W = BITS(op,0x0100);
 	decode_RR_table(cpustate, BITS(op,0x00c0), &R);
@@ -3601,7 +3601,7 @@ static size_t dsp56k_op_movep(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 {
 	UINT16 W;
 	UINT16 pp;
-	typed_pointer SD = {NULL, DT_BYTE};
+	typed_pointer SD = {nullptr, DT_BYTE};
 
 	decode_HH_table(cpustate, BITS(op,0x00c0), &SD);
 	/* TODO: Special cases for A & B */
@@ -3641,7 +3641,7 @@ static size_t dsp56k_op_movep_1(dsp56k_core* cpustate, const UINT16 op, UINT8* c
 	UINT16 W;
 	UINT16 pp;
 
-	typed_pointer SD = {NULL, DT_BYTE};
+	typed_pointer SD = {nullptr, DT_BYTE};
 	decode_RR_table(cpustate, BITS(op,0x00c0), &SD);
 
 	pp = op & 0x001f;
@@ -3690,9 +3690,9 @@ static size_t dsp56k_op_mpysuuu(dsp56k_core* cpustate, const UINT16 op, UINT8* c
 	UINT8 s = 0;
 	INT64 result = 0;
 
-	void* D = NULL;
-	void* S1 = NULL;
-	void* S2 = NULL;
+	void* D = nullptr;
+	void* S1 = nullptr;
+	void* S2 = nullptr;
 
 	decode_QQF_special_table(cpustate, BITS(op,0x0003), BITS(op,0x0008), &S1, &S2, &D);
 
@@ -3807,7 +3807,7 @@ static size_t dsp56k_op_rep_2(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 {
 	/* TODO: This is non-interruptable, probably have to turn off interrupts here */
 	UINT16 repValue;
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 	decode_DDDDD_table(cpustate, BITS(op,0x001f), &D);
 
 	/* TODO: handle special A&B source cases */
@@ -3924,10 +3924,10 @@ static size_t dsp56k_op_tcc(dsp56k_core* cpustate, const UINT16 op, UINT8* cycle
 
 	if (shouldTransfer)
 	{
-		typed_pointer S = {NULL, DT_BYTE};
-		typed_pointer D = {NULL, DT_BYTE};
+		typed_pointer S = {nullptr, DT_BYTE};
+		typed_pointer D = {nullptr, DT_BYTE};
 		typed_pointer S2 = {&R0, DT_WORD};
-		typed_pointer D2 = {NULL, DT_BYTE};
+		typed_pointer D2 = {nullptr, DT_BYTE};
 
 		decode_h0hF_table(cpustate, BITS(op,0x0007),BITS(op,0x0008), &S, &D);
 		SetDestinationValue(S, D);
@@ -3946,8 +3946,8 @@ static size_t dsp56k_op_tcc(dsp56k_core* cpustate, const UINT16 op, UINT8* cycle
 /* TFR(2) : 0001 0101 0000 F00J : A-214 */
 static size_t dsp56k_op_tfr2(dsp56k_core* cpustate, const UINT16 op, UINT8* cycles)
 {
-	typed_pointer S = {NULL, DT_BYTE};
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer S = {nullptr, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 
 	decode_JF_table(cpustate, BITS(op,0x0001), BITS(op,0x0008), &S, &D);
 
@@ -3971,7 +3971,7 @@ static size_t dsp56k_op_tfr3(dsp56k_core* cpustate, const UINT16 op, UINT8* cycl
 /* TST(2) : 0001 0101 0001 -1DD : A-220 */
 static size_t dsp56k_op_tst2(dsp56k_core* cpustate, const UINT16 op, UINT8* cycles)
 {
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 	decode_DD_table(cpustate, BITS(op,0x0003), &D);
 
 	/* S L E U N Z V C */
@@ -4175,7 +4175,7 @@ static void decode_HHH_table(dsp56k_core* cpustate, UINT16 HHH, typed_pointer* r
 
 static void decode_IIII_table(dsp56k_core* cpustate, UINT16 IIII, typed_pointer* src_ret, typed_pointer* dst_ret, void *working)
 {
-	void *opposite = 0x00 ;
+	void *opposite = nullptr ;
 
 	if (working == &A) opposite = &B ;
 	else               opposite = &A ;
@@ -4254,7 +4254,7 @@ static void decode_JF_table(dsp56k_core* cpustate, UINT16 J, UINT16 F, typed_poi
 
 static void decode_KKK_table(dsp56k_core* cpustate, UINT16 KKK, typed_pointer* dst_ret1, typed_pointer* dst_ret2, void* working)
 {
-	void *opposite = 0x00 ;
+	void *opposite = nullptr ;
 
 	if (working == &A) opposite = &B ;
 	else               opposite = &A ;
@@ -4360,8 +4360,8 @@ static void decode_uuuuF_table(dsp56k_core* cpustate, UINT16 uuuu, UINT16 F, UIN
 
 	/* Unknown uuuuFs have been seen in the wild */
 	add_sub_other = OP_OTHER;
-	src_ret->addr = NULL; src_ret->data_type = DT_BYTE;
-	dst_ret->addr = NULL; dst_ret->data_type = DT_BYTE;
+	src_ret->addr = nullptr; src_ret->data_type = DT_BYTE;
+	dst_ret->addr = nullptr; dst_ret->data_type = DT_BYTE;
 
 	switch(switchVal)
 	{
@@ -4440,8 +4440,8 @@ static void decode_Z_table(dsp56k_core* cpustate, UINT16 Z, typed_pointer* ret)
 
 static void execute_m_table(dsp56k_core* cpustate, int x, UINT16 m)
 {
-	UINT16 *rX = 0x00 ;
-	UINT16 *nX = 0x00 ;
+	UINT16 *rX = nullptr ;
+	UINT16 *nX = nullptr ;
 
 	switch(x)
 	{
@@ -4460,8 +4460,8 @@ static void execute_m_table(dsp56k_core* cpustate, int x, UINT16 m)
 
 static void execute_mm_table(dsp56k_core* cpustate, UINT16 rnum, UINT16 mm)
 {
-	UINT16 *rX = NULL;
-	UINT16 *nX = NULL;
+	UINT16 *rX = nullptr;
+	UINT16 *nX = nullptr;
 
 	switch(rnum)
 	{
@@ -4482,8 +4482,8 @@ static void execute_mm_table(dsp56k_core* cpustate, UINT16 rnum, UINT16 mm)
 
 static void execute_MM_table(dsp56k_core* cpustate, UINT16 rnum, UINT16 MM)
 {
-	UINT16 *rX = 0x00 ;
-	UINT16 *nX = 0x00 ;
+	UINT16 *rX = nullptr ;
+	UINT16 *nX = nullptr ;
 
 	switch(rnum)
 	{
@@ -4505,8 +4505,8 @@ static void execute_MM_table(dsp56k_core* cpustate, UINT16 rnum, UINT16 MM)
 /* Returns R value */
 static UINT16 execute_q_table(dsp56k_core* cpustate, int RR, UINT16 q)
 {
-	UINT16 *rX = 0x0000;
-	UINT16 *nX = 0x0000;
+	UINT16 *rX = nullptr;
+	UINT16 *nX = nullptr;
 
 	switch(RR)
 	{
@@ -4529,8 +4529,8 @@ static UINT16 execute_q_table(dsp56k_core* cpustate, int RR, UINT16 q)
 
 static void execute_z_table(dsp56k_core* cpustate, int RR, UINT16 z)
 {
-	UINT16 *rX = 0x00;
-	UINT16 *nX = 0x00;
+	UINT16 *rX = nullptr;
+	UINT16 *nX = nullptr;
 
 	switch(RR)
 	{
@@ -4643,8 +4643,8 @@ static void dsp56k_process_rep(dsp56k_core* cpustate, size_t repSize)
 /* Register to Register Data Move : 0100 IIII .... .... : A-132 */
 static void execute_register_to_register_data_move(dsp56k_core* cpustate, const UINT16 op, typed_pointer* d_register, UINT64* prev_accum_value)
 {
-	typed_pointer S = {NULL, DT_BYTE};
-	typed_pointer D = {NULL, DT_BYTE};
+	typed_pointer S = {nullptr, DT_BYTE};
+	typed_pointer D = {nullptr, DT_BYTE};
 
 	decode_IIII_table(cpustate, BITS(op,0x0f00), &S, &D, d_register->addr);
 
@@ -4672,8 +4672,8 @@ static void execute_address_register_update(dsp56k_core* cpustate, const UINT16 
 static void execute_x_memory_data_move(dsp56k_core* cpustate, const UINT16 op, typed_pointer* d_register, UINT64* prev_accum_value)
 {
 	UINT16 W;
-	typed_pointer R = {NULL, DT_BYTE};
-	typed_pointer SD = {NULL, DT_BYTE};
+	typed_pointer R = {nullptr, DT_BYTE};
+	typed_pointer SD = {nullptr, DT_BYTE};
 
 	W = BITS(op,0x0100);
 	decode_HHH_table(cpustate, BITS(op,0x0e00), &SD);
@@ -4716,8 +4716,8 @@ static void execute_x_memory_data_move(dsp56k_core* cpustate, const UINT16 op, t
 static void execute_x_memory_data_move2(dsp56k_core* cpustate, const UINT16 op, typed_pointer* d_register)
 {
 	UINT16 W;
-	UINT16* mem_offset = NULL;
-	typed_pointer SD = {NULL, DT_BYTE};
+	UINT16* mem_offset = nullptr;
+	typed_pointer SD = {nullptr, DT_BYTE};
 
 	W = BITS(op,0x0100);
 	decode_HHH_table(cpustate, BITS(op,0x0e000), &SD);
@@ -4747,7 +4747,7 @@ static void execute_x_memory_data_move_with_short_displacement(dsp56k_core* cpus
 	INT8 xx;
 	UINT8 W;
 	UINT16 memOffset;
-	typed_pointer SD = { NULL, DT_BYTE };
+	typed_pointer SD = { nullptr, DT_BYTE };
 
 	xx = (INT8)(op & 0x00ff);
 	W = BITS(op2,0x0100);
@@ -4777,9 +4777,9 @@ static void execute_dual_x_memory_data_read(dsp56k_core* cpustate, const UINT16 
 	typed_pointer tempV;
 	UINT16 srcVal1 = 0x0000;
 	UINT16 srcVal2 = 0x0000;
-	typed_pointer R = {NULL, DT_BYTE};
-	typed_pointer D1 = {NULL, DT_BYTE};
-	typed_pointer D2 = {NULL, DT_BYTE};
+	typed_pointer R = {nullptr, DT_BYTE};
+	typed_pointer D1 = {nullptr, DT_BYTE};
+	typed_pointer D2 = {nullptr, DT_BYTE};
 
 	decode_RR_table(cpustate, BITS(op,0x0060), &R);
 	decode_KKK_table(cpustate, BITS(op,0x0700), &D1, &D2, d_register->addr);

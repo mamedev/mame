@@ -268,7 +268,7 @@ static const char *const Formats[] = {
 	FMT("1111_1101", "CLR  A"),             // FD :
 	FMT("1111_1110", "LD   A,(IX0+A)"),     // FE :
 	FMT("1111_1111", "RET"),                // FF :
-	NULL
+	nullptr
 };
 
 #define MAX_OPS ((ARRAY_LENGTH(Formats) - 1) / PTRS_PER_FORMAT)
@@ -294,7 +294,7 @@ static void InitDasm8201(void)
 	char chr , type;
 	int pmask , pdown;
 
-	for(i=0;(p=Formats[i*2])!=NULL;i++)
+	for(i=0;(p=Formats[i*2])!=nullptr;i++)
 	{
 		mask = 0;
 		bits = 0;
@@ -339,7 +339,7 @@ static void InitDasm8201(void)
 		if( (*p) )
 			Op[i].type |= 0x10;
 		/* number of param */
-		if( (p=strchr(Op[i].fmt,'%'))!=NULL )
+		if( (p=strchr(Op[i].fmt,'%'))!=nullptr )
 		{
 			Op[i].type |= 0x01;     /* single param */
 			if(strchr(p+1,'%') )

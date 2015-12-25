@@ -78,10 +78,6 @@
     PRIVATE GLOBAL VARIABLES
 ***************************************************************************/
 
-static UINT32       table_refcount = 0;
-static UINT16 *     mirror_table;
-static UINT8 *      condition_table;
-
 const UINT32 jaguar_cpu_device::convert_zero[32] =
 { 32,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 };
 
@@ -150,6 +146,7 @@ jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type 
 	, m_isdsp(isdsp)
 	, m_cpu_interrupt(*this)
 	, m_tables_referenced(false)
+	, table_refcount(0)
 	, m_table(isdsp ? dsp_op_table : gpu_op_table)
 {
 	if (isdsp)
@@ -285,13 +282,13 @@ void jaguar_cpu_device::init_tables()
 	/* if we're not the first, skip */
 	if (table_refcount++ != 0)
 	{
-		assert(mirror_table != NULL);
-		assert(condition_table != NULL);
+		assert(mirror_table != nullptr);
+		assert(condition_table != nullptr);
 		return;
 	}
 
 	/* fill in the mirror table */
-	mirror_table = global_alloc_array(UINT16, 65536);
+	mirror_table = std::make_unique<UINT16[]>(65536);
 	for (i = 0; i < 65536; i++)
 		mirror_table[i] = ((i >> 15) & 0x0001) | ((i >> 13) & 0x0002) |
 							((i >> 11) & 0x0004) | ((i >> 9)  & 0x0008) |
@@ -303,7 +300,7 @@ void jaguar_cpu_device::init_tables()
 							((i << 13) & 0x4000) | ((i << 15) & 0x8000);
 
 	/* fill in the condition table */
-	condition_table = global_alloc_array(UINT8, 32 * 8);
+	condition_table = std::make_unique<UINT8[]>(32 * 8);
 	for (i = 0; i < 8; i++)
 		for (j = 0; j < 32; j++)
 		{
@@ -440,13 +437,8 @@ jaguar_cpu_device::~jaguar_cpu_device()
 	if (--table_refcount != 0)
 		return;
 
-	if (mirror_table != NULL)
-		global_free_array(mirror_table);
-	mirror_table = NULL;
-
-	if (condition_table != NULL)
-		global_free_array(condition_table);
-	condition_table = NULL;
+	mirror_table = nullptr;
+	condition_table = nullptr;
 }
 
 

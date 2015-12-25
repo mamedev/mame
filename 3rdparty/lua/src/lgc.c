@@ -1,5 +1,5 @@
 /*
-** $Id: lgc.c,v 2.201 2014/12/20 13:58:15 roberto Exp $
+** $Id: lgc.c,v 2.210 2015/11/03 18:10:44 roberto Exp $
 ** Garbage Collector
 ** See Copyright Notice in lua.h
 */
@@ -83,8 +83,13 @@
 #define markvalue(g,o) { checkconsistency(o); \
   if (valiswhite(o)) reallymarkobject(g,gcvalue(o)); }
 
-#define markobject(g,t) \
-  { if ((t) && iswhite(t)) reallymarkobject(g, obj2gco(t)); }
+#define markobject(g,t)	{ if (iswhite(t)) reallymarkobject(g, obj2gco(t)); }
+
+/*
+** mark an object that can be NULL (either because it is really optional,
+** or it was stripped as debug info, or inside an uncompleted structure)
+*/
+#define markobjectN(g,t)	{ if (t) markobject(g,t); }
 
 static void reallymarkobject (global_State *g, GCObject *o);
 
@@ -109,8 +114,13 @@ static void reallymarkobject (global_State *g, GCObject *o);
 
 
 /*
-** if key is not marked, mark its entry as dead (therefore removing it
-** from the table)
+** If key is not marked, mark its entry as dead. This allows key to be
+** collected, but keeps its entry in the table.  A dead node is needed
+** when Lua looks up for a key (it may be part of a chain) and when
+** traversing a weak table (key might be removed from the table during
+** traversal). Other places never manipulate dead keys, because its
+** associated nil value is enough to signal that the entry is logically
+** empty.
 */
 static void removeentry (Node *n) {
   lua_assert(ttisnil(gval(n)));
@@ -226,15 +236,19 @@ static void reallymarkobject (global_State *g, GCObject *o) {
  reentry:
   white2gray(o);
   switch (o->tt) {
-    case LUA_TSHRSTR:
+    case LUA_TSHRSTR: {
+      gray2black(o);
+      g->GCmemtrav += sizelstring(gco2ts(o)->shrlen);
+      break;
+    }
     case LUA_TLNGSTR: {
       gray2black(o);
-      g->GCmemtrav += sizestring(gco2ts(o));
+      g->GCmemtrav += sizelstring(gco2ts(o)->u.lnglen);
       break;
     }
     case LUA_TUSERDATA: {
       TValue uvalue;
-      markobject(g, gco2u(o)->metatable);  /* mark its metatable */
+      markobjectN(g, gco2u(o)->metatable);  /* mark its metatable */
       gray2black(o);
       g->GCmemtrav += sizeudata(gco2u(o));
       getuservalue(g->mainthread, gco2u(o), &uvalue);
@@ -275,7 +289,7 @@ static void reallymarkobject (global_State *g, GCObject *o) {
 static void markmt (global_State *g) {
   int i;
   for (i=0; i < LUA_NUMTAGS; i++)
-    markobject(g, g->mt[i]);
+    markobjectN(g, g->mt[i]);
 }
 
 
@@ -437,7 +451,7 @@ static void traversestrongtable (global_State *g, Table *h) {
 static lu_mem traversetable (global_State *g, Table *h) {
   const char *weakkey, *weakvalue;
   const TValue *mode = gfasttm(g, h->metatable, TM_MODE);
-  markobject(g, h->metatable);
+  markobjectN(g, h->metatable);
   if (mode && ttisstring(mode) &&  /* is there a weak mode? */
       ((weakkey = strchr(svalue(mode), 'k')),
        (weakvalue = strchr(svalue(mode), 'v')),
@@ -457,19 +471,24 @@ static lu_mem traversetable (global_State *g, Table *h) {
 }
 
 
+/*
+** Traverse a prototype. (While a prototype is being build, its
+** arrays can be larger than needed; the extra slots are filled with
+** NULL, so the use of 'markobjectN')
+*/
 static int traverseproto (global_State *g, Proto *f) {
   int i;
   if (f->cache && iswhite(f->cache))
     f->cache = NULL;  /* allow cache to be collected */
-  markobject(g, f->source);
+  markobjectN(g, f->source);
   for (i = 0; i < f->sizek; i++)  /* mark literals */
     markvalue(g, &f->k[i]);
   for (i = 0; i < f->sizeupvalues; i++)  /* mark upvalue names */
-    markobject(g, f->upvalues[i].name);
+    markobjectN(g, f->upvalues[i].name);
   for (i = 0; i < f->sizep; i++)  /* mark nested protos */
-    markobject(g, f->p[i]);
+    markobjectN(g, f->p[i]);
   for (i = 0; i < f->sizelocvars; i++)  /* mark local-variable names */
-    markobject(g, f->locvars[i].varname);
+    markobjectN(g, f->locvars[i].varname);
   return sizeof(Proto) + sizeof(Instruction) * f->sizecode +
                          sizeof(Proto *) * f->sizep +
                          sizeof(TValue) * f->sizek +
@@ -494,7 +513,7 @@ static lu_mem traverseCclosure (global_State *g, CClosure *cl) {
 */
 static lu_mem traverseLclosure (global_State *g, LClosure *cl) {
   int i;
-  markobject(g, cl->p);  /* mark its prototype */
+  markobjectN(g, cl->p);  /* mark its prototype */
   for (i = 0; i < cl->nupvalues; i++) {  /* mark its upvalues */
     UpVal *uv = cl->upvals[i];
     if (uv != NULL) {
@@ -528,7 +547,8 @@ static lu_mem traversethread (global_State *g, lua_State *th) {
   }
   else if (g->gckind != KGC_EMERGENCY)
     luaD_shrinkstack(th); /* do not change stack in emergency cycle */
-  return (sizeof(lua_State) + sizeof(TValue) * th->stacksize);
+  return (sizeof(lua_State) + sizeof(TValue) * th->stacksize +
+          sizeof(CallInfo) * th->nci);
 }
 
 
@@ -689,9 +709,10 @@ static void freeobj (lua_State *L, GCObject *o) {
     case LUA_TUSERDATA: luaM_freemem(L, o, sizeudata(gco2u(o))); break;
     case LUA_TSHRSTR:
       luaS_remove(L, gco2ts(o));  /* remove it from hash table */
-      /* go through */
+      luaM_freemem(L, o, sizelstring(gco2ts(o)->shrlen));
+      break;
     case LUA_TLNGSTR: {
-      luaM_freemem(L, o, sizestring(gco2ts(o)));
+      luaM_freemem(L, o, sizelstring(gco2ts(o)->u.lnglen));
       break;
     }
     default: lua_assert(0);
@@ -754,12 +775,11 @@ static GCObject **sweeptolive (lua_State *L, GCObject **p, int *n) {
 */
 
 /*
-** If possible, free concatenation buffer and shrink string table
+** If possible, shrink string table
 */
 static void checkSizes (lua_State *L, global_State *g) {
   if (g->gckind != KGC_EMERGENCY) {
     l_mem olddebt = g->GCdebt;
-    luaZ_freebuffer(L, &g->buff);  /* free concatenation buffer */
     if (g->strt.nuse < g->strt.size / 4)  /* string table too big? */
       luaS_resize(L, g->strt.size / 2);  /* shrink it a little */
     g->GCestimate += g->GCdebt - olddebt;  /* update estimate */
@@ -782,7 +802,7 @@ static GCObject *udata2finalize (global_State *g) {
 
 static void dothecall (lua_State *L, void *ud) {
   UNUSED(ud);
-  luaD_call(L, L->top - 2, 0, 0);
+  luaD_callnoyield(L, L->top - 2, 0);
 }
 
 
@@ -1002,6 +1022,7 @@ static l_mem atomic (lua_State *L) {
   /* clear values from resurrected weak tables */
   clearvalues(g, g->weak, origweak);
   clearvalues(g, g->allweak, origall);
+  luaS_clearcache(g);
   g->currentwhite = cast_byte(otherwhite(g));  /* flip current white */
   work += g->GCmemtrav;  /* complete counting */
   return work;  /* estimate of memory marked by 'atomic' */
@@ -1098,9 +1119,12 @@ void luaC_runtilstate (lua_State *L, int statesmask) {
 static l_mem getdebt (global_State *g) {
   l_mem debt = g->GCdebt;
   int stepmul = g->gcstepmul;
-  debt = (debt / STEPMULADJ) + 1;
-  debt = (debt < MAX_LMEM / stepmul) ? debt * stepmul : MAX_LMEM;
-  return debt;
+  if (debt <= 0) return 0;  /* minimal debt */
+  else {
+    debt = (debt / STEPMULADJ) + 1;
+    debt = (debt < MAX_LMEM / stepmul) ? debt * stepmul : MAX_LMEM;
+    return debt;
+  }
 }
 
 /*

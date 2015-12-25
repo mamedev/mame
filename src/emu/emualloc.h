@@ -60,9 +60,9 @@ private:
 
 public:
 	resource_pool_item(void *ptr, size_t size)
-		: m_next(NULL),
-			m_ordered_next(NULL),
-			m_ordered_prev(NULL),
+		: m_next(nullptr),
+			m_ordered_next(nullptr),
+			m_ordered_prev(nullptr),
 			m_ptr(ptr),
 			m_size(size),
 			m_id(~(UINT64)0) { }

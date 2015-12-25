@@ -34,7 +34,7 @@ public:
 	required_ioport m_y1;
 	required_ioport m_y2;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( pio_r );
 	DECLARE_WRITE8_MEMBER( pio_w );

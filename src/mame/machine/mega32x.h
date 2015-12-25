@@ -148,12 +148,12 @@ public:
 	emu_timer *m_32x_pwm_timer;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// optional information overrides
 //  virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 
@@ -193,11 +193,11 @@ private:
 
 	UINT16 m_commsram[8];
 
-	UINT16* m_32x_dram0;
-	UINT16* m_32x_dram1;
+	std::unique_ptr<UINT16[]> m_32x_dram0;
+	std::unique_ptr<UINT16[]> m_32x_dram1;
 	UINT16 *m_32x_display_dram, *m_32x_access_dram;
-	UINT16* m_32x_palette;
-	UINT16* m_32x_palette_lookup;
+	std::unique_ptr<UINT16[]> m_32x_palette;
+	std::unique_ptr<UINT16[]> m_32x_palette_lookup;
 
 	UINT16 m_fifo_block_a[4];
 	UINT16 m_fifo_block_b[4];
@@ -224,7 +224,7 @@ class sega_32x_pal_device : public sega_32x_device
 	public:
 		sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	protected:
-		virtual machine_config_constructor device_mconfig_additions() const;
+		virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 

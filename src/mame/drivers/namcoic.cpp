@@ -22,7 +22,7 @@ static struct
 	 * 0x30/2 color
 	 */
 	tilemap_t *tmap[6];
-	UINT16 *videoram;
+	std::unique_ptr<UINT16[]> videoram;
 	int gfxbank;
 	UINT8 *maskBaseAddr;
 	void (*cb)( running_machine &machine, UINT16 code, int *gfx, int *mask);
@@ -59,7 +59,7 @@ void namcos2_shared_state::namco_tilemap_init( int gfxbank, void *maskBaseAddr,
 	mTilemapInfo.gfxbank = gfxbank;
 	mTilemapInfo.maskBaseAddr = (UINT8 *)maskBaseAddr;
 	mTilemapInfo.cb = cb;
-	mTilemapInfo.videoram = auto_alloc_array(machine(), UINT16,  0x10000 );
+	mTilemapInfo.videoram = std::make_unique<UINT16[]>( 0x10000 );
 
 		/* four scrolling tilemaps */
 		mTilemapInfo.tmap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info0),this),TILEMAP_SCAN_ROWS,8,8,64,64);
@@ -561,7 +561,7 @@ READ16_MEMBER( namcos2_shared_state::c355_obj_position_r )
 	return m_c355_obj_position[offset];
 }
 
-INLINE UINT8
+static inline UINT8
 nth_byte16( const UINT16 *pSource, int which )
 {
 	UINT16 data = pSource[which/2];
@@ -579,7 +579,7 @@ nth_byte16( const UINT16 *pSource, int which )
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
  */
 #ifdef UNUSED_FUNCTION
-INLINE UINT16
+static inline UINT16
 nth_word32( const UINT32 *pSource, int which )
 {
 	UINT32 data = pSource[which/2];
@@ -598,7 +598,7 @@ nth_word32( const UINT32 *pSource, int which )
  * read from 32-bit aligned memory as if it were an array of bytes.
  */
 #ifdef UNUSED_FUNCTION
-INLINE UINT8
+static inline UINT8
 nth_byte32( const UINT32 *pSource, int which )
 {
 		UINT32 data = pSource[which/4];
@@ -1165,8 +1165,8 @@ WRITE16_MEMBER( namcos2_shared_state::c169_roz_bank_w )
 	UINT16 old_data = m_c169_roz_bank[offset];
 	COMBINE_DATA(&m_c169_roz_bank[offset]);
 	if (m_c169_roz_bank[offset] != old_data)
-		for (int i = 0; i < ROZ_TILEMAP_COUNT; i++)
-			m_c169_roz_tilemap[i]->mark_all_dirty();
+		for (auto & elem : m_c169_roz_tilemap)
+			elem->mark_all_dirty();
 }
 
 READ16_MEMBER( namcos2_shared_state::c169_roz_videoram_r )
@@ -1177,6 +1177,6 @@ READ16_MEMBER( namcos2_shared_state::c169_roz_videoram_r )
 WRITE16_MEMBER( namcos2_shared_state::c169_roz_videoram_w )
 {
 	COMBINE_DATA(&m_c169_roz_videoram[offset]);
-	for (int i = 0; i < ROZ_TILEMAP_COUNT; i++)
-		m_c169_roz_tilemap[i]->mark_tile_dirty(offset);
+	for (auto & elem : m_c169_roz_tilemap)
+		elem->mark_tile_dirty(offset);
 }

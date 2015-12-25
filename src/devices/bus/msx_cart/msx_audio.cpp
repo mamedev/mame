@@ -86,7 +86,7 @@ static MACHINE_CONFIG_FRAGMENT( msx_audio_hxmu900 )
 	MCFG_Y8950_KEYBOARD_WRITE_HANDLER(DEVWRITE8("kbdc", msx_audio_kbdc_port_device, write))
 	MCFG_Y8950_KEYBOARD_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))
 
-	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, NULL)
+	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
 MACHINE_CONFIG_END
 
 
@@ -148,7 +148,7 @@ static MACHINE_CONFIG_FRAGMENT( msx_audio_nms1205 )
 	MCFG_Y8950_KEYBOARD_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))
 	MCFG_Y8950_IRQ_HANDLER(WRITELINE(msx_cart_msx_audio_nms1205, irq_write))
 
-	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, NULL)
+	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
 
 	// There is a 2 MHz crystal on the PCB, the 6850 TX and RX clocks are derived from it
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
@@ -257,7 +257,7 @@ static MACHINE_CONFIG_FRAGMENT( msx_audio_fsca1 )
 	MCFG_Y8950_IO_READ_HANDLER(READ8(msx_cart_msx_audio_fsca1, y8950_io_r))
 	MCFG_Y8950_IO_WRITE_HANDLER(WRITE8(msx_cart_msx_audio_fsca1, y8950_io_w))
 
-	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, NULL)
+	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
 MACHINE_CONFIG_END
 
 

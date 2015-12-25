@@ -48,8 +48,8 @@ public:
 	int m_blink_on;
 	DECLARE_DRIVER_INIT(apple1);
 	TILE_GET_INFO_MEMBER(terminal_gettileinfo);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_apple1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(apple1_kbd_poll);
 	TIMER_CALLBACK_MEMBER(apple1_kbd_strobe_end);

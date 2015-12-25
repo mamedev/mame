@@ -147,7 +147,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	bitmap_ind16 *m_sprite_bitmap;
+	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
 
 	UINT8 m_reg;
 	UINT8 m_rombank;
@@ -246,7 +246,7 @@ public:
 	DECLARE_MACHINE_RESET(sigmab98);
 	DECLARE_MACHINE_RESET(sammymdl);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sammymdl(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
@@ -263,7 +263,7 @@ public:
 
 void sigmab98_state::video_start()
 {
-	m_sprite_bitmap = auto_bitmap_ind16_alloc(machine(), 512, 512);
+	m_sprite_bitmap = std::make_unique<bitmap_ind16>(512, 512);
 }
 
 /***************************************************************************
@@ -2706,7 +2706,7 @@ ROM_START( sammymdl )
 	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
-	ROM_COPY( "mainbios", 0x0000, 0x0000, 0x40000 )
+	ROM_COPY( "mainbios", 0x000000, 0x0000, 0x40000 )
 
 	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASEFF )
 ROM_END

@@ -211,8 +211,8 @@ void a2bus_mouse_device::device_start()
 	m_rom = device().machine().root_device().memregion(this->subtag(MOUSE_ROM_REGION).c_str())->base();
 
 	// allocate two timers: one for the 68705, one for the quadrature magic
-	m_timer = timer_alloc(TIMER_68705, NULL);
-	m_read_timer = timer_alloc(TIMER_QUADRATURE, NULL);
+	m_timer = timer_alloc(TIMER_68705, nullptr);
+	m_read_timer = timer_alloc(TIMER_QUADRATURE, nullptr);
 	m_timer->adjust(attotime::never, TIMER_68705);
 	m_read_timer->adjust(attotime::never, TIMER_QUADRATURE);
 

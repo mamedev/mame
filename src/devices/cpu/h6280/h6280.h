@@ -77,28 +77,28 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_stop();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual UINT32 execute_input_lines() const;
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override;
+	virtual UINT32 execute_max_cycles() const override;
+	virtual UINT32 execute_input_lines() const override;
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
-	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address);
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
+	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override;
+	virtual UINT32 disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
 
 	// opcode accessors
 	UINT8 program_read8(offs_t addr);

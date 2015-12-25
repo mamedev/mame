@@ -42,7 +42,7 @@ t6721a_device::t6721a_device(const machine_config &mconfig, const char *tag, dev
 		m_write_phi2(*this),
 		m_write_dtrd(*this),
 		m_write_apd(*this),
-		m_stream(NULL)
+		m_stream(nullptr)
 {
 }
 

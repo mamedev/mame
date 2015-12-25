@@ -136,7 +136,7 @@ static const struct CassetteFormat fmsx_cas_format =
 	"tap,cas",
 	fmsx_cas_identify,
 	fmsx_cas_load,
-	NULL
+	nullptr
 };
 
 

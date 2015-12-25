@@ -42,15 +42,15 @@ public:
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_stop();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
 
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	sound_stream  *m_stream;

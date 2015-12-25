@@ -49,7 +49,7 @@ public:
 	DECLARE_DRIVER_INIT(gigasb);
 	DECLARE_DRIVER_INIT(pbillrds);
 	TILE_GET_INFO_MEMBER(get_freek_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(pbillrd);
 	DECLARE_MACHINE_RESET(freekick);
 	DECLARE_MACHINE_START(freekick);

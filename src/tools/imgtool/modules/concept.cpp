@@ -30,7 +30,7 @@ struct UINT16xE
 
     Returns value of word in native format
 */
-INLINE UINT16 get_UINT16xE(int little_endian, UINT16xE word)
+static inline UINT16 get_UINT16xE(int little_endian, UINT16xE word)
 {
 	return little_endian ? (word.bytes[0] | (word.bytes[1] << 8)) : ((word.bytes[0] << 8) | word.bytes[1]);
 }
@@ -46,7 +46,7 @@ INLINE UINT16 get_UINT16xE(int little_endian, UINT16xE word)
     word (O): pointer to word to write
     data (I): value to write in word, in native format
 */
-INLINE void set_UINT16xE(int little_endian, UINT16xE *word, UINT16 data)
+static inline void set_UINT16xE(int little_endian, UINT16xE *word, UINT16 data)
 {
 	if (little_endian)
 	{

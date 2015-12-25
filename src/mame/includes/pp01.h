@@ -46,9 +46,9 @@ public:
 	DECLARE_WRITE8_MEMBER(pp01_video_b_2_w);
 	DECLARE_WRITE8_MEMBER(pp01_mem_block_w);
 	DECLARE_READ8_MEMBER(pp01_mem_block_r);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pp01);
 	UINT32 screen_update_pp01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(pp01_pit_out0);

@@ -323,8 +323,6 @@ static MACHINE_CONFIG_START( ufombs, ufombs_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -465,8 +463,6 @@ static MACHINE_CONFIG_START( ssfball, ssfball_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -592,8 +588,6 @@ static MACHINE_CONFIG_START( bmsoccer, bmsoccer_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -697,8 +691,6 @@ static MACHINE_CONFIG_START( bmsafari, bmsafari_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -849,8 +841,6 @@ static MACHINE_CONFIG_START( splasfgt, splasfgt_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -951,8 +941,6 @@ static MACHINE_CONFIG_START( bcclimbr, bcclimbr_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1071,8 +1059,6 @@ static MACHINE_CONFIG_START( tactix, tactix_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tactix)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1171,8 +1157,6 @@ static MACHINE_CONFIG_START( invspace, invspace_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1283,8 +1267,6 @@ static MACHINE_CONFIG_START( efball, efball_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_efball)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1385,8 +1367,6 @@ static MACHINE_CONFIG_START( galaxy2, galaxy2_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1495,8 +1475,6 @@ static MACHINE_CONFIG_START( astrocmd, astrocmd_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1589,8 +1567,6 @@ static MACHINE_CONFIG_START( edracula, edracula_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1697,8 +1673,6 @@ static MACHINE_CONFIG_START( mvbfree, mvbfree_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_mvbfree)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1794,8 +1768,6 @@ static MACHINE_CONFIG_START( tccombat, tccombat_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1839,7 +1811,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch);
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 // handlers
@@ -1952,8 +1924,6 @@ static MACHINE_CONFIG_START( tmtennis, tmtennis_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -2060,8 +2030,6 @@ static MACHINE_CONFIG_START( tmpacman, tmpacman_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -2162,8 +2130,6 @@ static MACHINE_CONFIG_START( tmscramb, tmscramb_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -2259,8 +2225,6 @@ static MACHINE_CONFIG_START( tcaveman, tcaveman_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2391,8 +2355,6 @@ static MACHINE_CONFIG_START( alnchase, alnchase_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

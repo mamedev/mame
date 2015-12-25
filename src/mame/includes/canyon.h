@@ -42,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(canyon_led_w);
 	DECLARE_WRITE8_MEMBER(canyon_videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(canyon);
 	UINT32 screen_update_canyon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(canyon_motor_w);

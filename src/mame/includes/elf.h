@@ -47,7 +47,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_ioport m_special;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( dispon_r );
 	DECLARE_READ8_MEMBER( data_r );

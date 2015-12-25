@@ -131,7 +131,7 @@ static const char *const sample_names[] =
 	"sexpl",
 	"spslow",
 	"spfast",
-	0
+	nullptr
 };
 
 

@@ -643,10 +643,10 @@ static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_ISA16_SLOT_ADD("isabus","board4", pc_isa16_cards, "lpt", true)
 	// ISA cards
 	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "svga_et4k", false)
-	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD("isabus","isa5", pc_isa16_cards, NULL, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa5", pc_isa16_cards, nullptr, false)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	/* internal ram */
@@ -682,11 +682,11 @@ static MACHINE_CONFIG_START( k286i, at_state )
 	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "cga", false)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "fdc", false)
 	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, "comat", false)
-	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD("isabus","isa5", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD("isabus","isa6", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD("isabus","isa7", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD("isabus","isa8", pc_isa16_cards, NULL, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa5", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa6", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa7", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa8", pc_isa16_cards, nullptr, false)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	/* internal ram */
@@ -728,10 +728,10 @@ static MACHINE_CONFIG_START( at586, at586_state )
 	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371ab", true)
 
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa1", pc_isa16_cards, "svga_et4k", false)
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa2", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa3", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa4", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa5", pc_isa16_cards, NULL, false)
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa2", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa3", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa4", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371ab:isabus","isa5", pc_isa16_cards, nullptr, false)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	MCFG_FRAGMENT_ADD( at_softlists )
@@ -754,10 +754,10 @@ static MACHINE_CONFIG_START( at586x3, at586_state )
 	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371sb", true)
 
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa1", pc_isa16_cards, "svga_et4k", false)
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa2", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa3", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa4", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa5", pc_isa16_cards, NULL, false)
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa2", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa3", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa4", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa5", pc_isa16_cards, nullptr, false)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	MCFG_FRAGMENT_ADD( at_softlists )
@@ -824,7 +824,7 @@ static MACHINE_CONFIG_START( megapc, megapc_state )
 	MCFG_ISA16_SLOT_ADD("isabus","board4", pc_isa16_cards, "lpt", true)
 	MCFG_ISA16_SLOT_ADD("isabus","board5", pc_isa16_cards, "vga", true)
 	// ISA cards
-	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, NULL, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, nullptr, false)
 
 	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL_12MHz)
 	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(DEVWRITELINE("wd7600", wd7600_device, kbrst_w))
@@ -878,10 +878,10 @@ static MACHINE_CONFIG_START( megapcpla, at_state )
 	MCFG_ISA16_SLOT_ADD("isabus","board4", pc_isa16_cards, "lpt", true)
 	// ISA cards
 	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "svga_dm", false)  // closest to the CL-GD5420
-	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD("isabus","isa5", pc_isa16_cards, NULL, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa5", pc_isa16_cards, nullptr, false)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	/* internal ram */
@@ -916,17 +916,17 @@ static MACHINE_CONFIG_START( ficpio2, at_state )
 	MCFG_ISA16_SLOT_ADD("isabus","board2", pc_isa16_cards, "comat", true)
 	MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa16_cards, "lpt", true)
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir6_w))
-	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, "cdrom", NULL, true)
+	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, "cdrom", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir7_w))
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "vt82c505", true)
 	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "svga_et4k", false)
-	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, NULL, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, nullptr, false)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	MCFG_VT82C496_ADD("chipset")
@@ -1341,7 +1341,7 @@ ROM_START( ct386sx )
 	ROM_SYSTEM_BIOS(0, "neatsx", "NEATsx 386sx")
 	ROMX_LOAD("012l-u25.bin", 0xf0000, 0x8000, CRC(4ab1862d) SHA1(d4e8d0ff43731270478ca7671a129080ff350a4f),ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD("012h-u24.bin", 0xf0001, 0x8000, CRC(17472521) SHA1(7588c148fe53d9dc4cb2d0ab6e0fd51a39bb5d1a),ROM_SKIP(1) | ROM_BIOS(1) )
-	ROM_FILL(0xfe2c9, 1, 0) // skip incompatible keyboard controller test
+	ROM_FILL(0xfe2c9, 1, 0x00) // skip incompatible keyboard controller test
 	ROM_FILL(0xfe2cb, 1, 0xbb) // fix checksum
 ROM_END
 

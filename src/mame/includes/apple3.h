@@ -148,7 +148,7 @@ private:
 	offs_t m_zpa;
 	UINT8 m_last_n;
 	UINT8 m_char_mem[0x800];
-	UINT32 *m_hgr_map;
+	std::unique_ptr<UINT32[]> m_hgr_map;
 
 	bool m_sync;
 	bool m_rom_has_been_disabled;

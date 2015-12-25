@@ -203,7 +203,7 @@ static const struct CassetteFormat svi_cas_format =
 	"cas",
 	svi_cas_identify,
 	svi_cas_load,
-	NULL
+	nullptr
 };
 
 

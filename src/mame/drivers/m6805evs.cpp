@@ -40,7 +40,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 

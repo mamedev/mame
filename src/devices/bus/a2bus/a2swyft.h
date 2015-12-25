@@ -27,18 +27,18 @@ public:
 	a2bus_swyft_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	a2bus_swyft_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset);
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
-	virtual UINT8 read_inh_rom(address_space &space, UINT16 offset);
-	virtual UINT16 inh_start() { return 0xd000; }
-	virtual UINT16 inh_end() { return 0xffff; }
-	virtual int inh_type();
+	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
+	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
+	virtual UINT8 read_inh_rom(address_space &space, UINT16 offset) override;
+	virtual UINT16 inh_start() override { return 0xd000; }
+	virtual UINT16 inh_end() override { return 0xffff; }
+	virtual int inh_type() override;
 
 private:
 	UINT8 *m_rom;

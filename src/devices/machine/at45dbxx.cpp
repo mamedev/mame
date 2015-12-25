@@ -121,7 +121,7 @@ void at45db041_device::device_reset()
 	memset(&m_cmd.data[0], 0, sizeof(m_cmd.data));
 	m_cmd.size = 0;
 	// input/output
-	m_io.data = NULL;
+	m_io.data = nullptr;
 	m_io.size = 0;
 	m_io.pos  = 0;
 	// pins
@@ -144,7 +144,7 @@ void at45db041_device::nvram_default()
 {
 	memset(&m_data[0], 0xff, m_data.size());
 
-	if (region() != NULL)
+	if (region() != nullptr)
 	{
 		UINT32 bytes = region()->bytes();
 		if (bytes > m_size)

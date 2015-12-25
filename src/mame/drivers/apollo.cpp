@@ -127,7 +127,7 @@ const char *apollo_cpu_context(device_t *cpu) {
 	static char statebuf[64]; /* string buffer containing state description */
 
 	/* if we have an executing CPU, output data */
-	if (cpu != NULL) {
+	if (cpu != nullptr) {
 		osd_ticks_t t = osd_ticks();
 		int s = t / osd_ticks_per_second();
 		int ms = (t % osd_ticks_per_second()) / 1000;
@@ -145,7 +145,7 @@ const char *apollo_cpu_context(device_t *cpu) {
 
 void apollo_set_cpu_has_fpu(m68000_base_device *device, int onoff)
 {
-	if (device == NULL || (device->type() != M68020PMMU && device->type() != M68030))
+	if (device == nullptr || (device->type() != M68020PMMU && device->type() != M68030))
 	{
 		DLOG1(("set_cpu_has_fpu: unexpected CPU device"));
 	}
@@ -905,13 +905,13 @@ void apollo_state::machine_reset()
 	// set configuration
 	omti8621_device::set_verbose(apollo_config(APOLLO_CONF_DISK_TRACE));
 	threecom3c505_device::set_verbose(apollo_config(APOLLO_CONF_NET_TRACE));
+#endif
 
 	if (apollo_config(APOLLO_CONF_NODE_ID))
 	{
 		// set node ID from UID of logical volume 1 of logical unit 0
 		m_node_id->set_node_id_from_disk();
 	}
-#endif
 
 	m_maincpu->set_instruction_hook(read32_delegate(FUNC(apollo_state::apollo_instruction_hook),this));
 }

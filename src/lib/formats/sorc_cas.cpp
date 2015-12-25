@@ -121,7 +121,7 @@ static int sorcerer_cassette_calculate_size_in_samples(const UINT8 *bytes, int l
 {
 	sorcerer_image_size = length;
 
-	return sorcerer_handle_cassette(NULL, bytes);
+	return sorcerer_handle_cassette(nullptr, bytes);
 }
 
 static const struct CassetteLegacyWaveFiller sorcerer_legacy_fill_wave =
@@ -150,7 +150,7 @@ static const struct CassetteFormat sorcerer_cassette_image_format =
 	"tape",
 	sorcerer_cassette_identify,
 	sorcerer_cassette_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(sorcerer_cassette_formats)

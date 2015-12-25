@@ -36,13 +36,13 @@ void ui_menu_sliders::handle()
 
 	/* process the menu */
 	menu_event = process(UI_MENU_PROCESS_LR_REPEAT | (hidden ? UI_MENU_PROCESS_CUSTOM_ONLY : 0));
-	if (menu_event != NULL)
+	if (menu_event != nullptr)
 	{
 		/* handle keys if there is a valid item selected */
-		if (menu_event->itemref != NULL)
+		if (menu_event->itemref != nullptr)
 		{
 			const slider_state *slider = (const slider_state *)menu_event->itemref;
-			INT32 curvalue = (*slider->update)(machine(), slider->arg, NULL, SLIDER_NOCHANGE);
+			INT32 curvalue = (*slider->update)(machine(), slider->arg, nullptr, SLIDER_NOCHANGE);
 			INT32 increment = 0;
 
 			switch (menu_event->iptkey)
@@ -97,7 +97,7 @@ void ui_menu_sliders::handle()
 					newvalue = slider->maxval;
 
 				/* update the slider and recompute the menu */
-				(*slider->update)(machine(), slider->arg, NULL, newvalue);
+				(*slider->update)(machine(), slider->arg, nullptr, newvalue);
 				reset(UI_MENU_RESET_REMEMBER_REF);
 			}
 		}
@@ -133,7 +133,7 @@ void ui_menu_sliders::populate()
 	std::string tempstring;
 
 	/* add UI sliders */
-	for (const slider_state *curslider = machine().ui().get_slider_list(); curslider != NULL; curslider = curslider->next)
+	for (const slider_state *curslider = machine().ui().get_slider_list(); curslider != nullptr; curslider = curslider->next)
 	{
 		INT32 curval = (*curslider->update)(machine(), curslider->arg, &tempstring, SLIDER_NOCHANGE);
 		UINT32 flags = 0;
@@ -145,7 +145,7 @@ void ui_menu_sliders::populate()
 	}
 
 	/* add OSD sliders */
-	for (const slider_state *curslider = (slider_state*)machine().osd().get_slider_list(); curslider != NULL; curslider = curslider->next)
+	for (const slider_state *curslider = (slider_state*)machine().osd().get_slider_list(); curslider != nullptr; curslider = curslider->next)
 	{
 		INT32 curval = (*curslider->update)(machine(), curslider->arg, &tempstring, SLIDER_NOCHANGE);
 		UINT32 flags = 0;
@@ -167,7 +167,7 @@ void ui_menu_sliders::populate()
 void ui_menu_sliders::custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
 {
 	const slider_state *curslider = (const slider_state *)selectedref;
-	if (curslider != NULL)
+	if (curslider != nullptr)
 	{
 		float bar_left, bar_area_top, bar_width, bar_area_height, bar_top, bar_bottom, default_x, current_x;
 		float line_height = machine().ui().get_line_height();
@@ -198,7 +198,7 @@ void ui_menu_sliders::custom_render(void *selectedref, float top, float bottom, 
 
 		/* determine the text height */
 		machine().ui().draw_text_full(container, tempstring.c_str(), 0, 0, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
-					JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, NULL, &text_height);
+					JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, nullptr, &text_height);
 
 		/* draw the thermometer */
 		bar_left = x1 + UI_BOX_LR_BORDER;
@@ -225,7 +225,7 @@ void ui_menu_sliders::custom_render(void *selectedref, float top, float bottom, 
 
 		/* draw the actual text */
 		machine().ui().draw_text_full(container, tempstring.c_str(), x1 + UI_BOX_LR_BORDER, y1 + line_height, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
-					JUSTIFY_CENTER, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, &text_height);
+					JUSTIFY_CENTER, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, &text_height);
 	}
 }
 

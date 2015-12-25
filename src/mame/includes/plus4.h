@@ -97,8 +97,8 @@ public:
 	required_ioport m_row7;
 	required_ioport m_lock;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void check_interrupts();
 	void bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal);

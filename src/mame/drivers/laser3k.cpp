@@ -97,8 +97,8 @@ public:
 	WRITE8_MEMBER( io_w );
 	READ8_MEMBER( io2_r );
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(laser3k);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
@@ -120,8 +120,8 @@ private:
 	bool m_80col;
 	bool m_mix;
 	int m_gfxmode;
-	UINT16 *m_hires_artifact_map;
-	UINT16 *m_dhires_artifact_map;
+	std::unique_ptr<UINT16[]> m_hires_artifact_map;
+	std::unique_ptr<UINT16[]> m_dhires_artifact_map;
 
 	void plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code, const UINT8 *textgfx_data, UINT32 textgfx_datalen);
 	void do_io(int offset);
@@ -165,10 +165,10 @@ void laser3k_state::machine_start()
 	UINT16 c;
 
 	/* 2^3 dependent pixels * 2 color sets * 2 offsets */
-	m_hires_artifact_map = auto_alloc_array(machine(), UINT16, 8 * 2 * 2);
+	m_hires_artifact_map = std::make_unique<UINT16[]>(8 * 2 * 2);
 
 	/* 2^4 dependent pixels */
-	m_dhires_artifact_map = auto_alloc_array(machine(), UINT16, 16);
+	m_dhires_artifact_map = std::make_unique<UINT16[]>(16);
 
 	/* build hires artifact map */
 	for (i = 0; i < 8; i++)

@@ -24,7 +24,7 @@
 const device_type A1BUS_CFFA = &device_creator<a1bus_cffa_device>;
 
 MACHINE_CONFIG_FRAGMENT( cffa )
-	MCFG_ATA_INTERFACE_ADD(CFFA_ATA_TAG, ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD(CFFA_ATA_TAG, ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END
 
 ROM_START( cffa )

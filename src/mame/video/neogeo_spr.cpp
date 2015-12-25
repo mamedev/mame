@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Bryan McPhail,Fuzz,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// thanks-to:Fuzz
 /* NeoGeo sprites (and fixed text layer) */
 
 #include "emu.h"
@@ -26,11 +27,11 @@ neosprite_base_device::neosprite_base_device(const machine_config &mconfig, cons
 
 void neosprite_base_device::device_start()
 {
-	m_videoram = auto_alloc_array(machine(), UINT16, 0x8000 + 0x800);
-	m_videoram_drawsource = m_videoram;
+	m_videoram = std::make_unique<UINT16[]>(0x8000 + 0x800);
+	m_videoram_drawsource = m_videoram.get();
 
 	/* clear allocated memory */
-	memset(m_videoram, 0x00, (0x8000 + 0x800) * sizeof(UINT16));
+	memset(m_videoram.get(), 0x00, (0x8000 + 0x800) * sizeof(UINT16));
 
 	create_sprite_line_timer();
 	create_auto_animation_timer();
@@ -47,7 +48,7 @@ void neosprite_base_device::device_start()
 	m_auto_animation_frame_counter = 0;
 
 	/* register for state saving */
-	save_pointer(NAME(m_videoram), 0x8000 + 0x800);
+	save_pointer(NAME(m_videoram.get()), 0x8000 + 0x800);
 	save_item(NAME(m_vram_offset));
 	save_item(NAME(m_vram_read_buffer));
 	save_item(NAME(m_vram_modulo));
@@ -705,7 +706,7 @@ const device_type NEOGEO_SPRITE_OPTIMZIED = &device_creator<neosprite_optimized_
 
 neosprite_optimized_device::neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: neosprite_base_device(mconfig, tag, owner, clock, NEOGEO_SPRITE_OPTIMZIED),
-	m_spritegfx8(0)
+	m_spritegfx8(nullptr)
 {
 }
 
@@ -771,16 +772,16 @@ void neosprite_midas_device::device_start()
 {
 	neosprite_base_device::device_start();
 
-	m_videoram_buffer = auto_alloc_array(machine(), UINT16, 0x8000 + 0x800);
-	m_videoram_drawsource = m_videoram_buffer;
+	m_videoram_buffer = std::make_unique<UINT16[]>(0x8000 + 0x800);
+	m_videoram_drawsource = m_videoram_buffer.get();
 
-	memset(m_videoram_buffer, 0x00, (0x8000 + 0x800) * sizeof(UINT16));
+	memset(m_videoram_buffer.get(), 0x00, (0x8000 + 0x800) * sizeof(UINT16));
 
 }
 
 void neosprite_midas_device::buffer_vram()
 {
-	memcpy(m_videoram_buffer, m_videoram, (0x8000 + 0x800) * sizeof(UINT16));
+	memcpy(m_videoram_buffer.get(), m_videoram.get(), (0x8000 + 0x800) * sizeof(UINT16));
 }
 
 inline void neosprite_midas_device::draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, const pen_t* char_pens)

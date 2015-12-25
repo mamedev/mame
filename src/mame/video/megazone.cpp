@@ -103,7 +103,7 @@ WRITE8_MEMBER(megazone_state::megazone_flipscreen_w)
 
 void megazone_state::video_start()
 {
-	m_tmpbitmap = auto_bitmap_ind16_alloc(machine(), 256, 256);
+	m_tmpbitmap = std::make_unique<bitmap_ind16>(256, 256);
 
 	save_item(NAME(*m_tmpbitmap));
 }

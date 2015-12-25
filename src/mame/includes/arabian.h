@@ -23,8 +23,8 @@ public:
 	required_shared_ptr<UINT8> m_custom_cpu_ram;
 	required_shared_ptr<UINT8> m_blitter;
 
-	UINT8 *  m_main_bitmap;
-	UINT8 *  m_converted_gfx;
+	std::unique_ptr<UINT8[]>  m_main_bitmap;
+	std::unique_ptr<UINT8[]>  m_converted_gfx;
 
 	/* video-related */
 	UINT8    m_video_control;
@@ -43,9 +43,9 @@ public:
 	DECLARE_WRITE8_MEMBER(arabian_videoram_w);
 	DECLARE_WRITE8_MEMBER(ay8910_porta_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(arabian);
 	UINT32 screen_update_arabian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void blit_area( UINT8 plane, UINT16 src, UINT8 x, UINT8 y, UINT8 sx, UINT8 sy );

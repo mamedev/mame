@@ -29,6 +29,9 @@ extern const device_type S2650;
 #define MCFG_S2650_FLAG_HANDLER(_devcb) \
 	devcb = &s2650_device::set_flag_handler(*device, DEVCB_##_devcb);
 
+#define MCFG_S2650_INTACK_HANDLER(_devcb) \
+	devcb = &s2650_device::set_intack_handler(*device, DEVCB_##_devcb);
+
 class s2650_device : public cpu_device
 {
 public:
@@ -39,41 +42,43 @@ public:
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_flag_handler(device_t &device, _Object object) { return downcast<s2650_device &>(device).m_flag_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_intack_handler(device_t &device, _Object object) { return downcast<s2650_device &>(device).m_intack_handler.set_callback(object); }
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 5; }
-	virtual UINT32 execute_max_cycles() const { return 13; }
-	virtual UINT32 execute_input_lines() const { return 2; }
-	virtual UINT32 execute_default_irq_vector() const { return 0; }
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override { return 5; }
+	virtual UINT32 execute_max_cycles() const override { return 13; }
+	virtual UINT32 execute_input_lines() const override { return 2; }
+	virtual UINT32 execute_default_irq_vector() const override { return 0; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
 	{
-		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL );
+		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr );
 	}
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	void state_string_export(const device_state_entry &entry, std::string &str) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 3; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 3; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
 	devcb_write_line m_flag_handler;
+	devcb_write_line m_intack_handler;
 
 	UINT16  m_ppc;    /* previous program counter (page + iar) */
 	UINT16  m_page;   /* 8K page select register (A14..A13) */

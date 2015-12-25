@@ -215,8 +215,8 @@ void hd61700_cpu_device::device_reset()
 	memset(m_reg16bit, 0, sizeof(m_reg16bit));
 	memset(m_regmain, 0, sizeof(m_regmain));
 
-	for (int i=0;i<6; i++)
-		m_lines_status[i] = CLEAR_LINE;
+	for (auto & elem : m_lines_status)
+		elem = CLEAR_LINE;
 }
 
 

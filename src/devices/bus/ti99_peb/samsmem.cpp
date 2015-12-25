@@ -122,7 +122,7 @@ void sams_memory_expansion_device::device_reset()
 	// Resetting values
 	m_map_mode = false;
 	m_access_mapper = false;
-	for (int i=0; i < 16; i++) m_mapper[i] = 0;
+	for (auto & elem : m_mapper) elem = 0;
 }
 
 const rom_entry *sams_memory_expansion_device::device_rom_region() const

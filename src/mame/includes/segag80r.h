@@ -127,8 +127,8 @@ public:
 	TILE_GET_INFO_MEMBER(spaceod_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(spaceod_scan_rows);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_segag80r(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(segag80r_vblank_start);
 	INTERRUPT_GEN_MEMBER(sindbadm_vblank_start);
@@ -153,7 +153,7 @@ public:
 	void monsterb_expand_gfx(const char *region);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -171,11 +171,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// internal state

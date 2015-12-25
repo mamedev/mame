@@ -41,9 +41,9 @@ protected:
 	static const UINT8 AT_BLINK       = 0x04;
 	static const UINT8 AT_BLINKED     = 0x80;   // set when character should be blinked off
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	int m_cursx, m_cursy;
 	int m_savedx, m_savedy;
@@ -59,10 +59,10 @@ class esq1x22_t : public esqvfd_t {
 public:
 	esq1x22_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void write_char(int data);
+	virtual void write_char(int data) override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 };
@@ -71,10 +71,10 @@ class esq2x40_t : public esqvfd_t {
 public:
 	esq2x40_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void write_char(int data);
+	virtual void write_char(int data) override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 };
@@ -83,10 +83,10 @@ class esq2x40_sq1_t : public esqvfd_t {
 public:
 	esq2x40_sq1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void write_char(int data);
+	virtual void write_char(int data) override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	bool m_Wait87Shift, m_Wait88Shift;

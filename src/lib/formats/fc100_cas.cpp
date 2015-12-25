@@ -119,7 +119,7 @@ static int fc100_cassette_calculate_size_in_samples(const UINT8 *bytes, int leng
 {
 	fc100_image_size = length;
 
-	return fc100_handle_cassette(NULL, bytes);
+	return fc100_handle_cassette(nullptr, bytes);
 }
 
 static const struct CassetteLegacyWaveFiller fc100_legacy_fill_wave =
@@ -148,7 +148,7 @@ static const struct CassetteFormat fc100_cassette_image_format =
 	"cas",
 	fc100_cassette_identify,
 	fc100_cassette_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(fc100_cassette_formats)

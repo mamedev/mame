@@ -59,7 +59,7 @@ public:
 	int m_shadow_pen_shift;
 	UINT8 m_requested_int;
 	UINT16 m_irq_enable;
-	UINT16 *m_eaglshot_gfxram;
+	std::unique_ptr<UINT16[]> m_eaglshot_gfxram;
 	tilemap_t *m_gdfs_tmap;
 	int m_interrupt_ultrax;
 	int m_gdfs_lightgun_select;
@@ -133,8 +133,8 @@ public:
 	DECLARE_DRIVER_INIT(jsk);
 	DECLARE_DRIVER_INIT(twineag2);
 	DECLARE_DRIVER_INIT(mslider);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(gdfs);
 	DECLARE_VIDEO_START(eaglshot);
 

@@ -803,7 +803,7 @@ static const char *const rallyx_sample_names[] =
 {
 	"*rallyx",
 	"bang",
-	0   /* end of array */
+	nullptr   /* end of array */
 };
 
 /*************************************

@@ -81,7 +81,7 @@ public:
 	DECLARE_READ8_MEMBER(cartridge_r);
 	DECLARE_DRIVER_INIT(aquarius);
 	TILE_GET_INFO_MEMBER(aquarius_gettileinfo);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(aquarius);
 	UINT32 screen_update_aquarius(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(aquarius_reset);

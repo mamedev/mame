@@ -103,7 +103,7 @@ void punchout_state::video_start()
 	m_spr1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::bs1_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 16,32);
 	m_spr2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::bs2_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 16,32);
 
-	m_fg_tilemap = NULL;
+	m_fg_tilemap = nullptr;
 
 	m_spr1_tilemap->set_transparent_pen(0x07);
 	m_spr2_tilemap->set_transparent_pen(0x03);

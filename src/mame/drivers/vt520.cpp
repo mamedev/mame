@@ -21,8 +21,8 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(vt520_some_r);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_vt520(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };

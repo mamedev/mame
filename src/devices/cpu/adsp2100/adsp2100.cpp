@@ -410,7 +410,7 @@ void adsp21xx_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_data = &space(AS_DATA);
-	m_io = has_space(AS_IO) ? &space(AS_IO) : NULL;
+	m_io = has_space(AS_IO) ? &space(AS_IO) : nullptr;
 
 	// "core"
 	save_item(NAME(m_core.ax0.u));
@@ -646,14 +646,14 @@ const address_space_config *adsp2100_device::memory_space_config(address_spacenu
 {
 	return  (spacenum == AS_PROGRAM) ? &m_program_config :
 			(spacenum == AS_DATA) ? &m_data_config :
-			NULL;
+			nullptr;
 }
 
 const address_space_config *adsp2101_device::memory_space_config(address_spacenum spacenum) const
 {
 	return  (spacenum == AS_PROGRAM) ? &m_program_config :
 			(spacenum == AS_DATA) ? &m_data_config :
-			NULL;
+			nullptr;
 }
 
 const address_space_config *adsp2181_device::memory_space_config(address_spacenum spacenum) const
@@ -661,7 +661,7 @@ const address_space_config *adsp2181_device::memory_space_config(address_spacenu
 	return  (spacenum == AS_PROGRAM) ? &m_program_config :
 			(spacenum == AS_DATA) ? &m_data_config :
 			(spacenum == AS_IO) ? &m_io_config :
-			NULL;
+			nullptr;
 }
 
 

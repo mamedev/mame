@@ -72,8 +72,8 @@ public:
 #endif
 
 	// drivers/topspeed.c
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void msm5205_update(int chip);
 

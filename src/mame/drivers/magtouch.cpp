@@ -97,7 +97,7 @@ public:
 	DECLARE_READ8_MEMBER(magtouch_io_r);
 	DECLARE_WRITE8_MEMBER(magtouch_io_w);
 	DECLARE_DRIVER_INIT(magtouch);
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 /*************************************

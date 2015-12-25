@@ -19,16 +19,16 @@ public:
 	neogeo_pcm2_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_rom);
+	virtual DECLARE_READ16_MEMBER(read_rom) override;
 
-	virtual void activate_cart(ACTIVATE_CART_PARAMS) { m_banked_cart->install_banks(machine, maincpu, cpuregion, cpuregion_size); }
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS) {}
-	virtual int get_fixed_bank_type(void) { return 0; }
+	virtual void activate_cart(ACTIVATE_CART_PARAMS) override { m_banked_cart->install_banks(machine, maincpu, cpuregion, cpuregion_size); }
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override {}
+	virtual int get_fixed_bank_type(void) override { return 0; }
 
 	required_device<neogeo_banked_cart_device> m_banked_cart;
 	required_device<cmc_prot_device> m_cmc_prot;
@@ -49,8 +49,8 @@ class neogeo_pcm2_mslug4_cart : public neogeo_pcm2_cart
 {
 public:
 	neogeo_pcm2_mslug4_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 1; }
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 1; }
 };
 extern const device_type NEOGEO_PCM2_MSLUG4_CART;
 
@@ -58,8 +58,8 @@ class neogeo_pcm2_ms4plus_cart : public neogeo_pcm2_cart
 {
 public:
 	neogeo_pcm2_ms4plus_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 0; }
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 0; }
 };
 extern const device_type NEOGEO_PCM2_MS4PLUS_CART;
 
@@ -73,8 +73,8 @@ class neogeo_pcm2_rotd_cart : public neogeo_pcm2_cart
 {
 public:
 	neogeo_pcm2_rotd_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 1; }
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 1; }
 };
 extern const device_type NEOGEO_PCM2_ROTD_CART;
 
@@ -87,8 +87,8 @@ class neogeo_pcm2_pnyaa_cart : public neogeo_pcm2_cart
 {
 public:
 	neogeo_pcm2_pnyaa_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual void decrypt_all(DECRYPT_ALL_PARAMS);
-	virtual int get_fixed_bank_type(void) { return 1; }
+	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
+	virtual int get_fixed_bank_type(void) override { return 1; }
 };
 extern const device_type NEOGEO_PCM2_PNYAA_CART;
 

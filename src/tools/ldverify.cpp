@@ -107,7 +107,7 @@ static void *open_avi(const char *filename, movie_info &info)
 	if (avierr != AVIERR_NONE)
 	{
 		fprintf(stderr, "Error opening AVI file: %s\n", avi_error_string(avierr));
-		return NULL;
+		return nullptr;
 	}
 
 	// extract movie info
@@ -171,7 +171,7 @@ static void close_avi(void *file)
 
 static void *open_chd(const char *filename, movie_info &info)
 {
-	chd_file *chd = new chd_file;
+	auto chd = new chd_file;
 
 	// open the file
 	chd_error chderr = chd->open(filename);
@@ -179,7 +179,7 @@ static void *open_chd(const char *filename, movie_info &info)
 	{
 		fprintf(stderr, "Error opening CHD file: %s\n", chd_file::error_string(chderr));
 		delete chd;
-		return NULL;
+		return nullptr;
 	}
 
 	// get the metadata
@@ -189,7 +189,7 @@ static void *open_chd(const char *filename, movie_info &info)
 	{
 		fprintf(stderr, "Error getting A/V metadata: %s\n", chd_file::error_string(chderr));
 		delete chd;
-		return NULL;
+		return nullptr;
 	}
 
 	// extract the info
@@ -198,7 +198,7 @@ static void *open_chd(const char *filename, movie_info &info)
 	{
 		fprintf(stderr, "Improperly formatted metadata\n");
 		delete chd;
-		return NULL;
+		return nullptr;
 	}
 
 	// extract movie info
@@ -249,7 +249,7 @@ static int read_chd(void *file, int frame, bitmap_yuy16 &bitmap, INT16 *lsound, 
 		chdfile->codec_configure(CHD_CODEC_AVHUFF, AVHUFF_CODEC_DECOMPRESS_CONFIG, &avconfig);
 
 		// read the frame
-		chd_error chderr = chdfile->read_hunk(frame * interlace_factor + fieldnum, NULL);
+		chd_error chderr = chdfile->read_hunk(frame * interlace_factor + fieldnum, nullptr);
 		if (chderr != CHDERR_NONE)
 			return false;
 
@@ -735,7 +735,7 @@ int main(int argc, char *argv[])
 		printf("Processing file: %s\n", srcfile);
 		movie_info info = { 0 };
 		void *file = isavi ? open_avi(srcfile, info) : open_chd(srcfile, info);
-		if (file == NULL)
+		if (file == nullptr)
 		{
 			fprintf(stderr, "Unable to open file '%s'\n", srcfile);
 			return 1;

@@ -72,7 +72,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 
-	UINT8* m_nt_ram;
+	std::unique_ptr<UINT8[]> m_nt_ram;
 	UINT8* m_nt_page[4];
 	UINT32 m_in_0;
 	UINT32 m_in_1;
@@ -86,9 +86,9 @@ public:
 	DECLARE_READ8_MEMBER(cham24_IN1_r);
 	DECLARE_WRITE8_MEMBER(cham24_mapper_w);
 	DECLARE_DRIVER_INIT(cham24);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cham24);
 	UINT32 screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cham24_set_mirroring( int mirroring );
@@ -102,29 +102,29 @@ void cham24_state::cham24_set_mirroring( int mirroring )
 	switch(mirroring)
 	{
 	case PPU_MIRROR_LOW:
-		m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram;
+		m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram.get();
 		break;
 	case PPU_MIRROR_HIGH:
-		m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram + 0x400;
+		m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram.get() + 0x400;
 		break;
 	case PPU_MIRROR_HORZ:
-		m_nt_page[0] = m_nt_ram;
-		m_nt_page[1] = m_nt_ram;
-		m_nt_page[2] = m_nt_ram + 0x400;
-		m_nt_page[3] = m_nt_ram + 0x400;
+		m_nt_page[0] = m_nt_ram.get();
+		m_nt_page[1] = m_nt_ram.get();
+		m_nt_page[2] = m_nt_ram.get() + 0x400;
+		m_nt_page[3] = m_nt_ram.get() + 0x400;
 		break;
 	case PPU_MIRROR_VERT:
-		m_nt_page[0] = m_nt_ram;
-		m_nt_page[1] = m_nt_ram + 0x400;
-		m_nt_page[2] = m_nt_ram;
-		m_nt_page[3] = m_nt_ram + 0x400;
+		m_nt_page[0] = m_nt_ram.get();
+		m_nt_page[1] = m_nt_ram.get() + 0x400;
+		m_nt_page[2] = m_nt_ram.get();
+		m_nt_page[3] = m_nt_ram.get() + 0x400;
 		break;
 	case PPU_MIRROR_NONE:
 	default:
-		m_nt_page[0] = m_nt_ram;
-		m_nt_page[1] = m_nt_ram + 0x400;
-		m_nt_page[2] = m_nt_ram + 0x800;
-		m_nt_page[3] = m_nt_ram + 0xc00;
+		m_nt_page[0] = m_nt_ram.get();
+		m_nt_page[1] = m_nt_ram.get() + 0x400;
+		m_nt_page[2] = m_nt_ram.get() + 0x800;
+		m_nt_page[3] = m_nt_ram.get() + 0xc00;
 		break;
 	}
 }
@@ -289,11 +289,11 @@ void cham24_state::machine_start()
 	membank("bank1")->set_base(memregion("gfx1")->base());
 
 	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
-	m_nt_ram = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_nt_page[0] = m_nt_ram;
-	m_nt_page[1] = m_nt_ram + 0x400;
-	m_nt_page[2] = m_nt_ram + 0x800;
-	m_nt_page[3] = m_nt_ram + 0xc00;
+	m_nt_ram = std::make_unique<UINT8[]>(0x1000);
+	m_nt_page[0] = m_nt_ram.get();
+	m_nt_page[1] = m_nt_ram.get() + 0x400;
+	m_nt_page[2] = m_nt_ram.get() + 0x800;
+	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
 	/* and read/write handlers */
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff,read8_delegate(FUNC(cham24_state::nt_r), this), write8_delegate(FUNC(cham24_state::nt_w), this));

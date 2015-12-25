@@ -40,7 +40,7 @@ public:
 	UINT8 m_kb_matrix;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( kb_matrix_w );
 	DECLARE_READ8_MEMBER( port_a_r );

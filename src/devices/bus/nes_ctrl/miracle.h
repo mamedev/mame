@@ -33,13 +33,13 @@ public:
 	// construction/destruction
 	nes_miracle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// serial overrides
-	virtual void rcv_complete();    // Rx completed receiving byte
-	virtual void tra_complete();    // Tx completed sending byte
-	virtual void tra_callback();    // Tx send bit
+	virtual void rcv_complete() override;    // Rx completed receiving byte
+	virtual void tra_complete() override;    // Tx completed sending byte
+	virtual void tra_callback() override;    // Tx send bit
 
 	void xmit_char(UINT8 data);
 
@@ -47,11 +47,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual UINT8 read_bit0();
-	virtual void write(UINT8 data);
+	virtual UINT8 read_bit0() override;
+	virtual void write(UINT8 data) override;
 
 	static const device_timer_id TIMER_STROBE_ON = 0;
 	emu_timer *strobe_timer;

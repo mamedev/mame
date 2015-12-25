@@ -67,7 +67,7 @@ private:
 	UINT8 m_u14;
 	UINT8 m_digit;
 	UINT8 m_segment[16];
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_ioport m_io_dsw0;
@@ -566,7 +566,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( gp_2_state::zero_timer )
 static const z80_daisy_config daisy_chain[] =
 {
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 static MACHINE_CONFIG_START( gp_2, gp_2_state )

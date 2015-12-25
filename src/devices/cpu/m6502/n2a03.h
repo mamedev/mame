@@ -22,9 +22,9 @@ public:
 
 	static const disasm_entry disasm_entries[0x100];
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	virtual void do_exec_full();
-	virtual void do_exec_partial();
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual void do_exec_full() override;
+	virtual void do_exec_partial() override;
 
 	READ8_MEMBER(psg1_4014_r);
 	READ8_MEMBER(psg1_4015_r);
@@ -35,22 +35,22 @@ protected:
 	class mi_2a03_normal : public memory_interface {
 	public:
 		virtual ~mi_2a03_normal() {}
-		virtual UINT8 read(UINT16 adr);
-		virtual UINT8 read_sync(UINT16 adr);
-		virtual UINT8 read_arg(UINT16 adr);
-		virtual void write(UINT16 adr, UINT8 val);
+		virtual UINT8 read(UINT16 adr) override;
+		virtual UINT8 read_sync(UINT16 adr) override;
+		virtual UINT8 read_arg(UINT16 adr) override;
+		virtual void write(UINT16 adr, UINT8 val) override;
 	};
 
 	class mi_2a03_nd : public memory_interface {
 	public:
 		virtual ~mi_2a03_nd() {}
-		virtual UINT8 read(UINT16 adr);
-		virtual UINT8 read_sync(UINT16 adr);
-		virtual UINT8 read_arg(UINT16 adr);
-		virtual void write(UINT16 adr, UINT8 val);
+		virtual UINT8 read(UINT16 adr) override;
+		virtual UINT8 read_sync(UINT16 adr) override;
+		virtual UINT8 read_arg(UINT16 adr) override;
+		virtual void write(UINT16 adr, UINT8 val) override;
 	};
 
-	virtual void device_start();
+	virtual void device_start() override;
 
 #define O(o) void o ## _full(); void o ## _partial()
 
@@ -63,8 +63,8 @@ protected:
 
 #undef O
 
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 private:
 	address_space_config m_program_config;

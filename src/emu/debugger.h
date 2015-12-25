@@ -41,7 +41,7 @@ void debugger_flush_all_traces_on_abnormal_exit(void);
     this once per instruction from CPU cores
 -------------------------------------------------*/
 
-INLINE void debugger_instruction_hook(device_t *device, offs_t curpc)
+static inline void debugger_instruction_hook(device_t *device, offs_t curpc)
 {
 #ifndef MAME_DEBUG_FAST
 	if ((device->machine().debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
@@ -55,7 +55,7 @@ INLINE void debugger_instruction_hook(device_t *device, offs_t curpc)
     anytime an exception is generated
 -------------------------------------------------*/
 
-INLINE void debugger_exception_hook(device_t *device, int exception)
+static inline void debugger_exception_hook(device_t *device, int exception)
 {
 	if ((device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		device->debug()->exception_hook(exception);
@@ -73,7 +73,7 @@ INLINE void debugger_exception_hook(device_t *device, int exception)
     execution for the given CPU
 -------------------------------------------------*/
 
-INLINE void debugger_start_cpu_hook(device_t *device, const attotime &endtime)
+static inline void debugger_start_cpu_hook(device_t *device, const attotime &endtime)
 {
 	if ((device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		device->debug()->start_hook(endtime);
@@ -86,7 +86,7 @@ INLINE void debugger_start_cpu_hook(device_t *device, const attotime &endtime)
     for the given CPU
 -------------------------------------------------*/
 
-INLINE void debugger_stop_cpu_hook(device_t *device)
+static inline void debugger_stop_cpu_hook(device_t *device)
 {
 	if ((device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		device->debug()->stop_hook();
@@ -99,7 +99,7 @@ INLINE void debugger_stop_cpu_hook(device_t *device)
     acknowledged
 -------------------------------------------------*/
 
-INLINE void debugger_interrupt_hook(device_t *device, int irqline)
+static inline void debugger_interrupt_hook(device_t *device, int irqline)
 {
 	if ((device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		device->debug()->interrupt_hook(irqline);
@@ -116,7 +116,7 @@ INLINE void debugger_interrupt_hook(device_t *device, int irqline)
     next opportunity
 -------------------------------------------------*/
 
-INLINE void debugger_break(running_machine &machine)
+static inline void debugger_break(running_machine &machine)
 {
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		debug_cpu_get_visible_cpu(machine)->debug()->halt_on_next_instruction("Internal breakpoint\n");
@@ -129,7 +129,7 @@ INLINE void debugger_break(running_machine &machine)
     halted within the instruction hook
 -------------------------------------------------*/
 
-INLINE int debugger_within_instruction_hook(running_machine &machine)
+static inline int debugger_within_instruction_hook(running_machine &machine)
 {
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		return debug_cpu_within_instruction_hook(machine);

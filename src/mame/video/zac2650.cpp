@@ -35,7 +35,7 @@ WRITE8_MEMBER(zac2650_state::zac_s2636_w)
 	m_gfxdecode->gfx(2)->mark_dirty(offset/8);
 	if (offset == 0xc7)
 	{
-		m_s2636->soundport_w(0, data);
+		m_s2636->write_data(space, offset, data);
 	}
 }
 

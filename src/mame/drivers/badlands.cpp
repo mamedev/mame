@@ -187,7 +187,7 @@ void badlands_state::update_interrupts()
 
 void badlands_state::scanline_update(screen_device &screen, int scanline)
 {
-	if (m_audiocpu != 0)
+	if (m_audiocpu != nullptr)
 	{
 		address_space &space = m_audiocpu->space(AS_PROGRAM);
 

@@ -1774,6 +1774,7 @@ static MACHINE_CONFIG_START( vsdual, vsnes_state )
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsdual)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsdual)
 
+
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 2*8*4*16)
 	MCFG_PALETTE_INIT_OWNER(vsnes_state,vsdual)
@@ -1809,6 +1810,13 @@ static MACHINE_CONFIG_START( vsdual, vsnes_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( vsdual_pi, vsdual )
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	// need high level of interleave to keep screens in sync in Balloon Fight.
+	// however vsmahjng doesn't like perfect interleave? you end up needing to reset it to boot? maybe something in a bad default state? watchdog?
+	// as the board would always be running in 'perfect interleave' the fact the Mahjong game doens't work like this needs investigating.
 MACHINE_CONFIG_END
 
 
@@ -2821,14 +2829,14 @@ GAME( 1986, vsgshoe,  0,        vsgshoe, vsgshoe, vsnes_state,  vsgshoe,  ROT0, 
 GAME( 1988, vsfdf,    0,        vsnes,   vsfdf, vsnes_state,    vsfdf,    ROT0, "Sunsoft",                "Vs. Freedom Force", 0 )
 
 /* Dual games */
-GAME( 1984, vstennis, 0,        vsdual,  vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set TE A-3)" , 0 )
-GAME( 1984, vstennisa,vstennis, vsdual,  vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 2)" , 0 )
-GAME( 1984, vstennisb,vstennis, vsdual,  vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 3)" , MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, wrecking, 0,        vsdual,  wrecking, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Wrecking Crew", 0 )
-GAME( 1984, balonfgt, 0,        vsdual,  balonfgt, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Balloon Fight (set BF4 A-3)", 0 )
-GAME( 1984, vsmahjng, 0,        vsdual,  vsmahjng, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Mahjong (Japan)" , 0 )
-GAME( 1984, vsbball,  0,        vsdual,  vsbball, vsnes_state,  vsdual,   ROT0, "Nintendo of America",    "Vs. BaseBall (US, set BA E-1)", 0 )
-GAME( 1984, vsbballj, vsbball,  vsdual,  vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-3)", 0 )
-GAME( 1984, vsbballja,vsbball,  vsdual,  vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-2)", 0 )
-GAME( 1984, vsbballjb,vsbball,  vsdual,  vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-1)", 0 )
-GAME( 1984, iceclmrd, 0,        vsdual,  iceclmrj, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Ice Climber Dual (set IC4-4 A-1)" , 0 )
+GAME( 1984, vstennis, 0,        vsdual_pi,  vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set TE A-3)" , 0 )
+GAME( 1984, vstennisa,vstennis, vsdual_pi,  vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 2)" , 0 )
+GAME( 1984, vstennisb,vstennis, vsdual_pi,  vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 3)" , MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, wrecking, 0,        vsdual_pi,  wrecking, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Wrecking Crew", 0 )
+GAME( 1984, balonfgt, 0,        vsdual_pi,  balonfgt, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Balloon Fight (set BF4 A-3)", 0 )
+GAME( 1984, vsmahjng, 0,        vsdual,     vsmahjng, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Mahjong (Japan)" , 0 )
+GAME( 1984, vsbball,  0,        vsdual_pi,  vsbball, vsnes_state,  vsdual,   ROT0, "Nintendo of America",    "Vs. BaseBall (US, set BA E-1)", 0 )
+GAME( 1984, vsbballj, vsbball,  vsdual_pi,  vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-3)", 0 )
+GAME( 1984, vsbballja,vsbball,  vsdual_pi,  vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-2)", 0 )
+GAME( 1984, vsbballjb,vsbball,  vsdual_pi,  vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-1)", 0 )
+GAME( 1984, iceclmrd, 0,        vsdual_pi,  iceclmrj, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Ice Climber Dual (set IC4-4 A-1)" , 0 )

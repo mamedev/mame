@@ -142,8 +142,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 	devcb_write_line m_strobe_handler;
 	devcb_write_line m_data0_handler;

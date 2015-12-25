@@ -77,8 +77,8 @@ public:
 	required_ioport m_io_row3;
 	required_region_ptr<UINT16> m_charset;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER(kb_row_r);
 	DECLARE_WRITE8_MEMBER(kb_col_w);

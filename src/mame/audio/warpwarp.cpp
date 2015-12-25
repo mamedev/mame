@@ -21,17 +21,17 @@ const device_type WARPWARP = &device_creator<warpwarp_sound_device>;
 warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WARPWARP, "Warp Warp Audio Custom", tag, owner, clock, "warpwarp_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_decay(NULL),
-		m_channel(NULL),
+		m_decay(nullptr),
+		m_channel(nullptr),
 		m_sound_latch(0),
 		m_music1_latch(0),
 		m_music2_latch(0),
 		m_sound_signal(0),
 		m_sound_volume(0),
-		m_sound_volume_timer(NULL),
+		m_sound_volume_timer(nullptr),
 		m_music_signal(0),
 		m_music_volume(0),
-		m_music_volume_timer(NULL),
+		m_music_volume_timer(nullptr),
 		m_noise(0),
 		m_vcarry(0),
 		m_vcount(0),
@@ -48,7 +48,7 @@ warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, cons
 
 void warpwarp_sound_device::device_start()
 {
-	m_decay = auto_alloc_array(machine(), INT16, 32768);
+	m_decay = std::make_unique<INT16[]>(32768);
 
 	for (int i = 0; i < 0x8000; i++)
 		m_decay[0x7fff - i] = (INT16) (0x7fff/exp(1.0*i/4096));

@@ -172,7 +172,7 @@ isa8_mda_device::isa8_mda_device(const machine_config &mconfig, device_type type
 
 void isa8_mda_device::device_start()
 {
-	if (m_palette != NULL && !m_palette->started())
+	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
 	set_isa_device();
@@ -591,7 +591,7 @@ isa8_hercules_device::isa8_hercules_device(const machine_config &mconfig, const 
 
 void isa8_hercules_device::device_start()
 {
-	if (m_palette != NULL && !m_palette->started())
+	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
 	m_videoram.resize(0x10000);
@@ -799,15 +799,15 @@ void isa8_ec1840_0002_device::device_start()
 {
 	isa8_mda_device::device_start();
 
-	m_soft_chr_gen = auto_alloc_array(machine(), UINT8, 0x2000);
-	m_isa->install_bank(0xdc000, 0xddfff, 0, 0x2000, "bank_chargen", m_soft_chr_gen);
+	m_soft_chr_gen = std::make_unique<UINT8[]>(0x2000);
+	m_isa->install_bank(0xdc000, 0xddfff, 0, 0x2000, "bank_chargen", m_soft_chr_gen.get());
 }
 
 void isa8_ec1840_0002_device::device_reset()
 {
 	isa8_mda_device::device_reset();
 
-	m_chr_gen = m_soft_chr_gen;
+	m_chr_gen = m_soft_chr_gen.get();
 }
 
 

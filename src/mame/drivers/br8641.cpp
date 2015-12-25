@@ -153,7 +153,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ "pio2" },
 	{ "pio3" },
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 

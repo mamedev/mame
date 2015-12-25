@@ -150,8 +150,8 @@ public:
 	DECLARE_DRIVER_INIT(wardner);
 
 protected:
-	virtual void driver_start();
-	virtual void machine_reset();
+	virtual void driver_start() override;
+	virtual void machine_reset() override;
 };
 
 

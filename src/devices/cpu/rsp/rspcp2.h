@@ -78,9 +78,10 @@ class rsp_cop2
 {
 	friend class rsp_device;
 
-protected:
+public:
 	rsp_cop2(rsp_device &rsp, running_machine &machine);
 
+protected:
 	virtual void init();
 	virtual void start();
 

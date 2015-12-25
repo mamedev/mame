@@ -20,22 +20,22 @@
 static void network_load(running_machine &machine, int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
-	if ((config_type == CONFIG_TYPE_GAME) && (parentnode != NULL))
+	if ((config_type == CONFIG_TYPE_GAME) && (parentnode != nullptr))
 	{
 		for (node = xml_get_sibling(parentnode->child, "device"); node; node = xml_get_sibling(node->next, "device"))
 		{
-			const char *tag = xml_get_attribute_string(node, "tag", NULL);
+			const char *tag = xml_get_attribute_string(node, "tag", nullptr);
 
-			if ((tag != NULL) && (tag[0] != '\0'))
+			if ((tag != nullptr) && (tag[0] != '\0'))
 			{
 				network_interface_iterator iter(machine.root_device());
-				for (device_network_interface *network = iter.first(); network != NULL; network = iter.next())
+				for (device_network_interface *network = iter.first(); network != nullptr; network = iter.next())
 				{
 					if (!strcmp(tag, network->device().tag())) {
 						int interface = xml_get_attribute_int(node, "interface", 0);
 						network->set_interface(interface);
-						const char *mac_addr = xml_get_attribute_string(node, "mac", NULL);
-						if (mac_addr != NULL && strlen(mac_addr)==17) {
+						const char *mac_addr = xml_get_attribute_string(node, "mac", nullptr);
+						if (mac_addr != nullptr && strlen(mac_addr)==17) {
 							char mac[7];
 							unsigned int mac_num[6];
 							sscanf (mac_addr,"%02x:%02x:%02x:%02x:%02x:%02x",&mac_num[0],&mac_num[1],&mac_num[2],&mac_num[3],&mac_num[4],&mac_num[5]);
@@ -58,10 +58,10 @@ static void network_save(running_machine &machine, int config_type, xml_data_nod
 	if (config_type == CONFIG_TYPE_GAME)
 	{
 		network_interface_iterator iter(machine.root_device());
-		for (device_network_interface *network = iter.first(); network != NULL; network = iter.next())
+		for (device_network_interface *network = iter.first(); network != nullptr; network = iter.next())
 		{
-			node = xml_add_child(parentnode, "device", NULL);
-			if (node != NULL)
+			node = xml_add_child(parentnode, "device", nullptr);
+			if (node != nullptr)
 			{
 				xml_set_attribute(node, "tag", network->device().tag());
 				xml_set_attribute_int(node, "interface", network->get_interface());

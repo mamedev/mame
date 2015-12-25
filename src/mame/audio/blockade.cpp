@@ -61,5 +61,5 @@ const char *const blockade_sample_names[] =
 {
 	"*blockade",
 	"boom",
-	0
+	nullptr
 };

@@ -134,7 +134,7 @@ void ym2203_device::device_start()
 
 	/* Initialize FM emurator */
 	m_chip = ym2203_init(this,this,clock(),rate,timer_handler,IRQHandler,&psgintf);
-	assert_always(m_chip != NULL, "Error creating YM2203 chip");
+	assert_always(m_chip != nullptr, "Error creating YM2203 chip");
 }
 
 //-------------------------------------------------

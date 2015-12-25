@@ -33,7 +33,7 @@ struct genesis_z80_vars
 	int z80_is_reset;
 	int z80_has_bus;
 	UINT32 z80_bank_addr;
-	UINT8* z80_prgram;
+	std::unique_ptr<UINT8[]> z80_prgram;
 };
 
 

@@ -64,7 +64,7 @@ private:
 	floppy_image_device *m_floppy;
 	UINT8 convert(offs_t offset, bool state);
 	void setup_banks(UINT8 source);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio0;
 	required_device<z80pio_device> m_pio1;
@@ -201,7 +201,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ "z80ctc" },
 	{ "z80dart" },
 	{ "z80sio" },
-	{ NULL }
+	{ nullptr }
 };
 
 
@@ -298,7 +298,7 @@ WRITE8_MEMBER( altos5_state::port08_w )
 {
 	m_port08 = data & 0x70;
 
-	m_floppy = NULL;
+	m_floppy = nullptr;
 	if (BIT(data, 5))
 		m_floppy = m_floppy1->get_device();
 	else

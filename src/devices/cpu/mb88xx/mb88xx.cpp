@@ -114,7 +114,7 @@ mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, const char *tag,
 	, m_program_config("program", ENDIANNESS_BIG, 8, 11, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 8, 7, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 3, 0)
-	, m_PLA(NULL)
+	, m_PLA(nullptr)
 {
 }
 
@@ -124,7 +124,7 @@ mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, device_type type
 	, m_program_config("program", ENDIANNESS_BIG, 8, program_width, 0, ( (program_width == 9) ? ADDRESS_MAP_NAME(program_9bit) : (program_width == 10) ? ADDRESS_MAP_NAME(program_10bit) : ADDRESS_MAP_NAME(program_11bit) ) )
 	, m_data_config("data", ENDIANNESS_BIG, 8, data_width, 0, ( (data_width == 4) ? ADDRESS_MAP_NAME(data_4bit) : (data_width == 5) ? ADDRESS_MAP_NAME(data_5bit) : (data_width == 6) ? ADDRESS_MAP_NAME(data_6bit) : ADDRESS_MAP_NAME(data_7bit) ) )
 	, m_io_config("io", ENDIANNESS_BIG, 8, 3, 0)
-	, m_PLA(NULL)
+	, m_PLA(nullptr)
 {
 }
 

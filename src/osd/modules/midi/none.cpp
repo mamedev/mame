@@ -23,11 +23,11 @@ public:
 	}
 	virtual ~none_module() { }
 
-	virtual int init(const osd_options &options);
-	virtual void exit();
+	virtual int init(const osd_options &options) override;
+	virtual void exit() override;
 
-	osd_midi_device *create_midi_device();
-	void list_midi_devices(void);
+	virtual osd_midi_device *create_midi_device() override;
+	virtual void list_midi_devices(void) override;
 };
 
 
@@ -35,12 +35,12 @@ class osd_midi_device_none : public osd_midi_device
 {
 public:
 	virtual ~osd_midi_device_none() { }
-	virtual bool open_input(const char *devname);
-	virtual bool open_output(const char *devname);
-	virtual void close();
-	virtual bool poll();
-	virtual int read(UINT8 *pOut);
-	virtual void write(UINT8 data);
+	virtual bool open_input(const char *devname) override;
+	virtual bool open_output(const char *devname) override;
+	virtual void close() override;
+	virtual bool poll() override;
+	virtual int read(UINT8 *pOut) override;
+	virtual void write(UINT8 data) override;
 };
 
 osd_midi_device *none_module::create_midi_device()

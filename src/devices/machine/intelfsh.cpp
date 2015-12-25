@@ -177,10 +177,10 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_erase_sector(0),
 		m_flash_mode(FM_NORMAL),
 		m_flash_master_lock(false),
-		m_timer(NULL),
+		m_timer(nullptr),
 		m_bank(0)
 {
-	address_map_constructor map = NULL;
+	address_map_constructor map = nullptr;
 
 	switch( variant )
 	{
@@ -520,7 +520,7 @@ void intelfsh_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 const address_space_config *intelfsh_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 
@@ -532,7 +532,7 @@ const address_space_config *intelfsh_device::memory_space_config(address_spacenu
 void intelfsh_device::nvram_default()
 {
 	// region always wins
-	if (m_region != NULL)
+	if (m_region != nullptr)
 	{
 		UINT32 bytes = m_region->bytes();
 		if (bytes > m_size)

@@ -68,9 +68,9 @@ public:
 	int m_back_layer_d14;
 	int m_midl_layer_d14;
 	int m_fore_layer_d14;
-	UINT32 *m_tilemap_ram;
-	UINT32 *m_palette_ram;
-	UINT32 *m_sprite_ram;
+	std::unique_ptr<UINT32[]> m_tilemap_ram;
+	std::unique_ptr<UINT32[]> m_palette_ram;
+	std::unique_ptr<UINT32[]> m_sprite_ram;
 	UINT32 m_tilemap_ram_size;
 	UINT32 m_palette_ram_size;
 	UINT32 m_sprite_ram_size;
@@ -128,8 +128,8 @@ public:
 	void set_scroll(tilemap_t *layer, int scroll);
 	void combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tile, int sx, int sy, int opaque, INT16 *rowscroll);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(spi);
 	DECLARE_MACHINE_RESET(sxx2e);
 	DECLARE_VIDEO_START(ejanhs);

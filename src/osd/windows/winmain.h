@@ -240,35 +240,35 @@ public:
 	virtual ~windows_osd_interface();
 
 	// general overridables
-	virtual void init(running_machine &machine);
-	virtual void update(bool skip_redraw);
+	virtual void init(running_machine &machine) override;
+	virtual void update(bool skip_redraw) override;
 
 	// video overridables
-	virtual void *get_slider_list();
+	virtual void *get_slider_list() override;
 
 	// input overridables
-	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
+	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 
-	virtual void video_register();
+	virtual void video_register() override;
 
-	virtual bool video_init();
-	virtual bool window_init();
-	virtual bool input_init();
-	virtual void input_pause();
-	virtual void input_resume();
-	virtual bool output_init();
+	virtual bool video_init() override;
+	virtual bool window_init() override;
+	virtual bool input_init() override;
+	virtual void input_pause() override;
+	virtual void input_resume() override;
+	virtual bool output_init() override;
 
-	virtual void video_exit();
-	virtual void window_exit();
-	virtual void input_exit();
-	virtual void output_exit();
+	virtual void video_exit() override;
+	virtual void window_exit() override;
+	virtual void input_exit() override;
+	virtual void output_exit() override;
 
 	void extract_video_config();
 
 	windows_options &options() { return m_options; }
 
 private:
-	void osd_exit();
+	virtual void osd_exit() override;
 	windows_options &m_options;
 
 	static const int DEFAULT_FONT_HEIGHT = 200;

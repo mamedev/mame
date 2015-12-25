@@ -107,7 +107,7 @@ void nubus_radiustpd_device::device_start()
 	m_nubus->install_device(slotspace+0x80000, slotspace+0xeffff, read32_delegate(FUNC(nubus_radiustpd_device::radiustpd_r), this), write32_delegate(FUNC(nubus_radiustpd_device::radiustpd_w), this));
 	m_nubus->install_device(slotspace+0x980000, slotspace+0x9effff, read32_delegate(FUNC(nubus_radiustpd_device::radiustpd_r), this), write32_delegate(FUNC(nubus_radiustpd_device::radiustpd_w), this));
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
 }
 

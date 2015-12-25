@@ -16,9 +16,9 @@ const device_type MB60553 = &device_creator<mb60553_zooming_tilemap_device>;
 
 mb60553_zooming_tilemap_device::mb60553_zooming_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MB60553, "MB60553 Zooming Tilemap", tag, owner, clock, "mb60553", __FILE__),
-	m_vram(NULL),
+	m_vram(nullptr),
 	m_pal_base(0),
-	m_lineram(NULL),
+	m_lineram(nullptr),
 	m_gfx_region(0),
 	m_gfxdecode(*this)
 {
@@ -35,11 +35,11 @@ void mb60553_zooming_tilemap_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_lineram = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x1000/2);
-	m_vram = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x4000/2);
+	m_lineram = make_unique_clear<UINT16[]>(0x1000/2);
+	m_vram = make_unique_clear<UINT16[]>(0x4000/2);
 
-	save_pointer(NAME(m_lineram), 0x1000/2);
-	save_pointer(NAME(m_vram), 0x4000/2);
+	save_pointer(NAME(m_lineram.get()), 0x1000/2);
+	save_pointer(NAME(m_vram.get()), 0x4000/2);
 	save_item(NAME(m_pal_base));
 	save_item(NAME(m_bank));
 	save_item(NAME(m_regs));

@@ -44,7 +44,7 @@ public:
 	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_WRITE64_MEMBER(eeprom_w);
 	DECLARE_READ64_MEMBER(hwver_r);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<ns16550_device> m_uart0;

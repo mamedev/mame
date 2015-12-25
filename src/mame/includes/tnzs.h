@@ -72,7 +72,7 @@ public:
 	optional_ioport m_an2;
 
 	/* sound-related */
-	INT16    *m_sampledata[MAX_SAMPLES];
+	std::unique_ptr<INT16[]>    m_sampledata[MAX_SAMPLES];
 	int      m_samplesize[MAX_SAMPLES];
 
 	/* misc / mcu */

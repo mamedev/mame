@@ -874,12 +874,12 @@ void fd800_legacy_device::device_start(void)
 	logerror("fd800: start\n");
 	m_int_line.resolve();
 
-	for (int i=0; i<MAX_FLOPPIES; i++)
+	for (auto & elem : m_drv)
 	{
 	//  m_drv[i].img = floppy_get_device(machine(), i);
-		m_drv[i].phys_cylinder = -1;
-		m_drv[i].log_cylinder[0] = m_drv[i].log_cylinder[1] = -1;
-		m_drv[i].seclen = 64;
+		elem.phys_cylinder = -1;
+		elem.log_cylinder[0] = elem.log_cylinder[1] = -1;
+		elem.seclen = 64;
 	}
 }
 

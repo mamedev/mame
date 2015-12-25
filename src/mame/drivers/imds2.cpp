@@ -578,7 +578,7 @@ void imds2_state::driver_start()
 	m_ipc_ram.resize(0x10000);
 
 	memory_region *ipcrom = memregion("ipcrom");
-	if (ipcrom == NULL) {
+	if (ipcrom == nullptr) {
 		fatalerror("Unable to find IPC ROM region\n");
 	} else {
 		m_ipc_rom = ipcrom->base();
@@ -794,11 +794,11 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 				MCFG_I8251_RTS_HANDLER(DEVWRITELINE("serial1" , rs232_port_device , write_rts))
 				MCFG_I8251_DTR_HANDLER(DEVWRITELINE("serial1" , rs232_port_device , write_dtr))
 
-		MCFG_RS232_PORT_ADD("serial0" , default_rs232_devices , NULL)
+		MCFG_RS232_PORT_ADD("serial0" , default_rs232_devices , nullptr)
 				MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ipcusart0" , i8251_device , write_rxd))
 				MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ipcusart0" , i8251_device , write_dsr))
 
-		MCFG_RS232_PORT_ADD("serial1" , default_rs232_devices , NULL)
+		MCFG_RS232_PORT_ADD("serial1" , default_rs232_devices , nullptr)
 				MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ipcusart1" , i8251_device , write_rxd))
 				MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ipcusart1" , i8251_device , write_cts))
 				MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ipcusart1" , i8251_device , write_dsr))

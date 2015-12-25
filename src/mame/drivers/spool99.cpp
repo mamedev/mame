@@ -129,7 +129,7 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_dataline_w);
 
 	DECLARE_DRIVER_INIT(spool99);
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -454,7 +454,7 @@ ROM_END
 DRIVER_INIT_MEMBER(spool99_state,spool99)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
-//  vram = auto_alloc_array(machine(), UINT8, 0x2000);
+//  vram = std::make_unique<UINT8[]>(0x2000);
 	memcpy(m_main, ROM, 0x100);
 }
 

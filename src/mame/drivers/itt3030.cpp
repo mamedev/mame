@@ -259,10 +259,10 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 public:
 
 	DECLARE_READ8_MEMBER(vsync_r);
@@ -447,9 +447,9 @@ WRITE_LINE_MEMBER(itt3030_state::fdchld_w)
 READ8_MEMBER(itt3030_state::fdc_stat_r)
 {
 	UINT8 res = 0;
-	floppy_image_device *floppy1 = m_con1 ? m_con1->get_device() : 0;
-	floppy_image_device *floppy2 = m_con2 ? m_con2->get_device() : 0;
-	floppy_image_device *floppy3 = m_con3 ? m_con3->get_device() : 0;
+	floppy_image_device *floppy1 = m_con1 ? m_con1->get_device() : nullptr;
+	floppy_image_device *floppy2 = m_con2 ? m_con2->get_device() : nullptr;
+	floppy_image_device *floppy3 = m_con3 ? m_con3->get_device() : nullptr;
 
 	res = m_fdc_drq ? 0x80 : 0x00;
 	res |= m_fdc_irq ? 0x40 : 0x00;
@@ -485,22 +485,22 @@ WRITE8_MEMBER(itt3030_state::fdc_w)
 */
 WRITE8_MEMBER(itt3030_state::fdc_cmd_w)
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	logerror("%02x to fdc_cmd_w: motor %d side %d\n", data, (data & 0x10)>>4, (data & 4)>>2);
 
 	// select drive
 	if (data & 0x80)
 	{
-		floppy = m_con1 ? m_con1->get_device() : 0;
+		floppy = m_con1 ? m_con1->get_device() : nullptr;
 	}
 	else if (data & 0x40)
 	{
-		floppy = m_con2 ? m_con2->get_device() : 0;
+		floppy = m_con2 ? m_con2->get_device() : nullptr;
 	}
 	else if (data & 0x20)
 	{
-		floppy = m_con3 ? m_con3->get_device() : 0;
+		floppy = m_con3 ? m_con3->get_device() : nullptr;
 	}
 
 	// selecting a new drive?
@@ -510,7 +510,7 @@ WRITE8_MEMBER(itt3030_state::fdc_cmd_w)
 		m_curfloppy = floppy;
 	}
 
-	if (floppy != NULL)
+	if (floppy != nullptr)
 	{
 		// side select
 		floppy->ss_w((data & 4) ? 1 : 0);
@@ -729,7 +729,7 @@ void itt3030_state::machine_reset()
 	m_kbdrow = m_kbdcol = 0;
 	m_kbdclk = 1;
 	m_fdc_irq = m_fdc_drq = m_fdc_hld = 0;
-	m_curfloppy = NULL;
+	m_curfloppy = nullptr;
 	m_keyskip = false;
 
 	// look up floppies in advance

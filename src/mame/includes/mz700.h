@@ -62,7 +62,7 @@ public:
 	DECLARE_DRIVER_INIT(mz700);
 	DECLARE_MACHINE_RESET(mz700);
 	DECLARE_MACHINE_RESET(mz800);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	UINT32 screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne556_cursor_callback);
@@ -91,7 +91,7 @@ private:
 	int m_mz700_ram_vram;       /* 1 if vram is banked in */
 
 	/* mz800 specific */
-	UINT8 *m_cgram;
+	std::unique_ptr<UINT8[]> m_cgram;
 	UINT8 *m_p_chargen;
 
 	int m_mz700_mode;           /* 1 if in mz700 mode */
@@ -105,7 +105,7 @@ private:
 	int m_centronics_perror;
 
 	UINT8 *m_colorram;
-	UINT8 *m_videoram;
+	std::unique_ptr<UINT8[]> m_videoram;
 	UINT8 m_speaker_level;
 	UINT8 m_prev_state;
 	UINT16 m_mz800_ramaddr;

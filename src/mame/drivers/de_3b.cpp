@@ -44,7 +44,7 @@ public:
 protected:
 
 	// driver_device overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 public:
 	DECLARE_DRIVER_INIT(de_3b);
 

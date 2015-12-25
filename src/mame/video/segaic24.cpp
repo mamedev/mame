@@ -100,12 +100,12 @@ void segas24_tile::device_start()
 		throw device_missing_dependencies();
 
 	for(char_gfx_index = 0; char_gfx_index < MAX_GFX_ELEMENTS; char_gfx_index++)
-		if (m_gfxdecode->gfx(char_gfx_index) == 0)
+		if (m_gfxdecode->gfx(char_gfx_index) == nullptr)
 			break;
 	assert(char_gfx_index != MAX_GFX_ELEMENTS);
 
-	char_ram = auto_alloc_array(machine(), UINT16, 0x80000/2);
-	tile_ram = auto_alloc_array(machine(), UINT16, 0x10000/2);
+	char_ram = std::make_unique<UINT16[]>(0x80000/2);
+	tile_ram = std::make_unique<UINT16[]>(0x10000/2);
 
 	tile_layer[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(segas24_tile::tile_info_0s),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
 	tile_layer[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(segas24_tile::tile_info_0w),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
@@ -117,13 +117,13 @@ void segas24_tile::device_start()
 	tile_layer[2]->set_transparent_pen(0);
 	tile_layer[3]->set_transparent_pen(0);
 
-	memset(char_ram, 0, 0x80000);
-	memset(tile_ram, 0, 0x10000);
+	memset(char_ram.get(), 0, 0x80000);
+	memset(tile_ram.get(), 0, 0x10000);
 
-	m_gfxdecode->set_gfx(char_gfx_index, global_alloc(gfx_element(m_palette, char_layout, (UINT8 *)char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(char_gfx_index, std::make_unique<gfx_element>(m_palette, char_layout, (UINT8 *)char_ram.get(), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0));
 
-	save_pointer(NAME(tile_ram), 0x10000/2);
-	save_pointer(NAME(char_ram), 0x80000/2);
+	save_pointer(NAME(tile_ram.get()), 0x10000/2);
+	save_pointer(NAME(char_ram.get()), 0x80000/2);
 }
 
 void segas24_tile::draw_rect(screen_device &screen, bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_ind16 &dm, const UINT16 *mask,
@@ -378,7 +378,7 @@ void segas24_tile::draw_common(screen_device &screen, _BitmapClass &bitmap, cons
 	UINT16 hscr = tile_ram[0x5000+(layer >> 1)];
 	UINT16 vscr = tile_ram[0x5004+(layer >> 1)];
 	UINT16 ctrl = tile_ram[0x5004+((layer >> 1) & 2)];
-	UINT16 *mask = tile_ram + (layer & 4 ? 0x6800 : 0x6000);
+	UINT16 *mask = tile_ram.get() + (layer & 4 ? 0x6800 : 0x6000);
 	UINT16 tpri = layer & 1;
 
 	lpri = 1 << lpri;
@@ -397,7 +397,7 @@ void segas24_tile::draw_common(screen_device &screen, _BitmapClass &bitmap, cons
 		tile_layer[layer|1]->set_scrolly(0, vscr & 0x1ff);
 
 		if(hscr & 0x8000) {
-			UINT16 *hscrtb = tile_ram + 0x4000 + 0x200*layer;
+			UINT16 *hscrtb = tile_ram.get() + 0x4000 + 0x200*layer;
 
 			switch((ctrl & 0x6000) >> 13) {
 			case 1: {
@@ -500,7 +500,7 @@ void segas24_tile::draw_common(screen_device &screen, _BitmapClass &bitmap, cons
 
 		if(hscr & 0x8000) {
 			int y;
-			UINT16 *hscrtb = tile_ram + 0x4000 + 0x200*layer;
+			UINT16 *hscrtb = tile_ram.get() + 0x4000 + 0x200*layer;
 			vscr &= 0x1ff;
 
 			for(y=0; y<384; y++) {
@@ -566,7 +566,7 @@ READ16_MEMBER(segas24_tile::char_r)
 
 WRITE16_MEMBER(segas24_tile::tile_w)
 {
-	COMBINE_DATA(tile_ram + offset);
+	COMBINE_DATA(tile_ram.get() + offset);
 	if(offset < 0x4000)
 		tile_layer[offset >> 12]->mark_tile_dirty(offset & 0xfff);
 }
@@ -574,7 +574,7 @@ WRITE16_MEMBER(segas24_tile::tile_w)
 WRITE16_MEMBER(segas24_tile::char_w)
 {
 	UINT16 old = char_ram[offset];
-	COMBINE_DATA(char_ram + offset);
+	COMBINE_DATA(char_ram.get() + offset);
 	if(old != char_ram[offset])
 		m_gfxdecode->gfx(char_gfx_index)->mark_dirty(offset / 16);
 }
@@ -609,9 +609,9 @@ segas24_sprite::segas24_sprite(const machine_config &mconfig, const char *tag, d
 
 void segas24_sprite::device_start()
 {
-	sprite_ram = auto_alloc_array(machine(), UINT16, 0x40000/2);
+	sprite_ram = std::make_unique<UINT16[]>(0x40000/2);
 
-	save_pointer(NAME(sprite_ram), 0x40000/2);
+	save_pointer(NAME(sprite_ram.get()), 0x40000/2);
 }
 
 /* System24 sprites
@@ -646,7 +646,7 @@ void segas24_sprite::draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitma
 	UINT8 pmt[4];
 	int i;
 	UINT16 *sprd[0x2000], *clip[0x2000];
-	UINT16 *cclip = 0;
+	UINT16 *cclip = nullptr;
 
 	for(i=0; i<4; i++)
 		pmt[i] = 0xff << (1+spri[3-i]);
@@ -655,7 +655,7 @@ void segas24_sprite::draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitma
 		UINT16 *source;
 		UINT16 type;
 
-		source = sprite_ram + (curspr << 3);
+		source = sprite_ram.get() + (curspr << 3);
 
 		if(curspr == 0 && source[0] == 0)
 			break;
@@ -838,7 +838,7 @@ void segas24_sprite::draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitma
 
 WRITE16_MEMBER(segas24_sprite::write)
 {
-	COMBINE_DATA(sprite_ram + offset);
+	COMBINE_DATA(sprite_ram.get() + offset);
 }
 
 READ16_MEMBER(segas24_sprite::read)

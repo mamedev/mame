@@ -59,7 +59,7 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 	m_write_atn(*this),
 	m_write_sync(*this),
 	m_write_byte(*this),
-	m_floppy(NULL),
+	m_floppy(nullptr),
 	m_mtr(1),
 	m_accl(0),
 	m_stp(0),

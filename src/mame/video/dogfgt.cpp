@@ -70,8 +70,8 @@ void dogfgt_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dogfgt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	m_bitmapram = auto_alloc_array(machine(), UINT8, BITMAPRAM_SIZE);
-	save_pointer(NAME(m_bitmapram), BITMAPRAM_SIZE);
+	m_bitmapram = std::make_unique<UINT8[]>(BITMAPRAM_SIZE);
+	save_pointer(NAME(m_bitmapram.get()), BITMAPRAM_SIZE);
 
 	m_screen->register_screen_bitmap(m_pixbitmap);
 	save_item(NAME(m_pixbitmap));

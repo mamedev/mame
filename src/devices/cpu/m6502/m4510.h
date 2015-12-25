@@ -19,9 +19,9 @@ public:
 
 	static const disasm_entry disasm_entries[0x100];
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	virtual void do_exec_full();
-	virtual void do_exec_partial();
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual void do_exec_full() override;
+	virtual void do_exec_partial() override;
 
 	bool get_nomap() const { return nomap; }
 
@@ -36,23 +36,23 @@ protected:
 
 		mi_4510_normal(m4510_device *base);
 		virtual ~mi_4510_normal() {}
-		virtual UINT8 read(UINT16 adr);
-		virtual UINT8 read_sync(UINT16 adr);
-		virtual UINT8 read_arg(UINT16 adr);
-		virtual void write(UINT16 adr, UINT8 val);
+		virtual UINT8 read(UINT16 adr) override;
+		virtual UINT8 read_sync(UINT16 adr) override;
+		virtual UINT8 read_arg(UINT16 adr) override;
+		virtual void write(UINT16 adr, UINT8 val) override;
 	};
 
 	class mi_4510_nd : public mi_4510_normal {
 	public:
 		mi_4510_nd(m4510_device *base);
 		virtual ~mi_4510_nd() {}
-		virtual UINT8 read_sync(UINT16 adr);
-		virtual UINT8 read_arg(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr) override;
+		virtual UINT8 read_arg(UINT16 adr) override;
 	};
 
-	virtual void device_start();
-	virtual void device_reset();
-	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address) override;
 
 	inline UINT32 map(UINT16 adr) {
 		if(map_enable & (1 << (adr >> 13))) {

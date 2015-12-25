@@ -39,9 +39,9 @@ public:
 	int m_dsp_execute;
 	UINT32 m_dsp_addr_w;
 	UINT32 m_main_ram_seg;
-	UINT16 *m_bgvideoram16;
-	UINT16 *m_fgvideoram16;
-	UINT16 *m_txvideoram16;
+	std::unique_ptr<UINT16[]> m_bgvideoram16;
+	std::unique_ptr<UINT16[]> m_fgvideoram16;
+	std::unique_ptr<UINT16[]> m_txvideoram16;
 	size_t m_bgvideoram_size;
 	size_t m_fgvideoram_size;
 	size_t m_txvideoram_size;

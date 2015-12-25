@@ -1079,15 +1079,15 @@ VIDEO_START_MEMBER(x68k_state,x68000)
 	int gfx_index;
 
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (m_gfxdecode->gfx(gfx_index) == 0)
+		if (m_gfxdecode->gfx(gfx_index) == nullptr)
 			break;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_pcgpalette, x68k_pcg_8, memregion("user1")->base(), 0, 32, 0)));
+	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(m_pcgpalette, x68k_pcg_8, memregion("user1")->base(), 0, 32, 0));
 
 	gfx_index++;
 
-	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_pcgpalette, x68k_pcg_16, memregion("user1")->base(), 0, 32, 0)));
+	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(m_pcgpalette, x68k_pcg_16, memregion("user1")->base(), 0, 32, 0));
 	m_gfxdecode->gfx(gfx_index)->set_colors(32);
 
 	/* Tilemaps */
@@ -1101,10 +1101,10 @@ VIDEO_START_MEMBER(x68k_state,x68000)
 	m_bg0_16->set_transparent_pen(0);
 	m_bg1_16->set_transparent_pen(0);
 
-	m_pcgbitmap = auto_bitmap_ind16_alloc(machine(), 1024, 1024);
+	m_pcgbitmap = std::make_unique<bitmap_ind16>(1024, 1024);
 	m_pcgbitmap->fill(0);
 
-	m_gfxbitmap = auto_bitmap_ind16_alloc(machine(), 1024, 1024);
+	m_gfxbitmap = std::make_unique<bitmap_ind16>(1024, 1024);
 	m_gfxbitmap->fill(0);
 
 //  m_scanline_timer->adjust(attotime::zero, 0, attotime::from_hz(55.45)/568);

@@ -31,14 +31,14 @@ public:
 	optional_shared_ptr<UINT8> m_mcu_ram;
 
 	/* video-related */
-	bitmap_ind16    *m_tmp_bitmap1;
-	bitmap_ind16    *m_tmp_bitmap2;
+	std::unique_ptr<bitmap_ind16>    m_tmp_bitmap1;
+	std::unique_ptr<bitmap_ind16>    m_tmp_bitmap2;
 	tilemap_t     *m_bg_tilemap;
 	UINT8       m_flipscreen;
 	UINT8       m_pix_redraw;
 	UINT8       m_xoffset;
-	UINT8       *m_pixram1;
-	UINT8       *m_pixram2;
+	std::unique_ptr<UINT8[]>       m_pixram1;
+	std::unique_ptr<UINT8[]>       m_pixram2;
 	bitmap_ind16    *m_pixel_bitmap1;
 	bitmap_ind16    *m_pixel_bitmap2;
 	int         m_pixram_sel;
@@ -106,7 +106,7 @@ public:
 	DECLARE_DRIVER_INIT(undoukai);
 	DECLARE_DRIVER_INIT(40love);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(fortyl);
 	DECLARE_MACHINE_START(40love);
 	DECLARE_MACHINE_RESET(40love);
@@ -127,5 +127,5 @@ public:
 	};
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

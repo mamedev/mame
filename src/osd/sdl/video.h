@@ -171,7 +171,7 @@ public:
 	static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
 #endif
 private:
-	void virtual refresh();
+	void virtual refresh() override;
 
 	UINT64              m_handle;                 // handle to the monitor
 };

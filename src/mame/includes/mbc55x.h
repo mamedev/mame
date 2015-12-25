@@ -166,10 +166,10 @@ public:
 	DECLARE_WRITE8_MEMBER(mbc55x_kb_usart_w);
 	DECLARE_DRIVER_INIT(mbc55x);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
-	virtual void video_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void video_reset() override;
 	DECLARE_PALETTE_INIT(mbc55x);
 	void screen_eof_mbc55x(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(keyscan_callback);

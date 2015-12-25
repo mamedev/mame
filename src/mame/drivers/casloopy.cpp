@@ -175,15 +175,15 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	UINT16 *m_paletteram;
-	UINT8 *m_vram;
-	UINT8 *m_bitmap_vram;
+	std::unique_ptr<UINT16[]> m_paletteram;
+	std::unique_ptr<UINT8[]> m_vram;
+	std::unique_ptr<UINT8[]> m_bitmap_vram;
 	UINT16 sh7021_regs[0x100];
 	int m_gfx_index;
 	DECLARE_DRIVER_INIT(casloopy);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ16_MEMBER(vregs_r);
 	DECLARE_WRITE16_MEMBER(vregs_w);
@@ -225,19 +225,19 @@ static const gfx_layout casloopy_8bpp_layout =
 void casloopy_state::video_start()
 {
 	/* TODO: proper sizes */
-	m_paletteram = auto_alloc_array_clear(machine(), UINT16, 0x1000);
-	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
-	m_bitmap_vram = auto_alloc_array_clear(machine(), UINT8, 0x20000);
+	m_paletteram = make_unique_clear<UINT16[]>(0x1000);
+	m_vram = make_unique_clear<UINT8[]>(0x10000);
+	m_bitmap_vram = make_unique_clear<UINT8[]>(0x20000);
 
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
-		if (m_gfxdecode->gfx(m_gfx_index) == 0)
+		if (m_gfxdecode->gfx(m_gfx_index) == nullptr)
 			break;
 
 	for(int i=0;i<0x10000;i++)
 		m_vram[i] = i & 0xff;
 
-	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, casloopy_4bpp_layout, m_vram, 0, 0x10, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index+1, global_alloc(gfx_element(m_palette, casloopy_8bpp_layout, m_vram, 0, 1, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(m_palette, casloopy_4bpp_layout, m_vram.get(), 0, 0x10, 0));
+	m_gfxdecode->set_gfx(m_gfx_index+1, std::make_unique<gfx_element>(m_palette, casloopy_8bpp_layout, m_vram.get(), 0, 1, 0));
 }
 
 UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

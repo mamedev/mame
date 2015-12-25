@@ -36,7 +36,7 @@ const char *hash_collection::HASH_TYPES_ALL = "RS";
 hash_collection::hash_collection()
 	: m_has_crc32(false),
 		m_has_sha1(false),
-		m_creator(NULL)
+		m_creator(nullptr)
 {
 }
 
@@ -44,7 +44,7 @@ hash_collection::hash_collection()
 hash_collection::hash_collection(const char *string)
 	: m_has_crc32(false),
 		m_has_sha1(false),
-		m_creator(NULL)
+		m_creator(nullptr)
 {
 	from_internal_string(string);
 }
@@ -53,7 +53,7 @@ hash_collection::hash_collection(const char *string)
 hash_collection::hash_collection(const hash_collection &src)
 	: m_has_crc32(false),
 		m_has_sha1(false),
-		m_creator(NULL)
+		m_creator(nullptr)
 {
 	copyfrom(src);
 }
@@ -136,7 +136,7 @@ void hash_collection::reset()
 	m_flags.clear();
 	m_has_crc32 = m_has_sha1 = false;
 	delete m_creator;
-	m_creator = NULL;
+	m_creator = nullptr;
 }
 
 
@@ -339,14 +339,14 @@ void hash_collection::begin(const char *types)
 	m_creator = new hash_creator;
 
 	// by default use all types
-	if (types == NULL)
+	if (types == nullptr)
 		m_creator->m_doing_crc32 = m_creator->m_doing_sha1 = true;
 
 	// otherwise, just allocate the ones that are specified
 	else
 	{
-		m_creator->m_doing_crc32 = (strchr(types, HASH_CRC) != NULL);
-		m_creator->m_doing_sha1 = (strchr(types, HASH_SHA1) != NULL);
+		m_creator->m_doing_crc32 = (strchr(types, HASH_CRC) != nullptr);
+		m_creator->m_doing_sha1 = (strchr(types, HASH_SHA1) != nullptr);
 	}
 }
 
@@ -357,7 +357,7 @@ void hash_collection::begin(const char *types)
 
 void hash_collection::buffer(const UINT8 *data, UINT32 length)
 {
-	assert(m_creator != NULL);
+	assert(m_creator != nullptr);
 
 	// append to each active hash
 	if (m_creator->m_doing_crc32)
@@ -373,7 +373,7 @@ void hash_collection::buffer(const UINT8 *data, UINT32 length)
 
 void hash_collection::end()
 {
-	assert(m_creator != NULL);
+	assert(m_creator != nullptr);
 
 	// finish up the CRC32
 	if (m_creator->m_doing_crc32)
@@ -391,7 +391,7 @@ void hash_collection::end()
 
 	// nuke the creator
 	delete m_creator;
-	m_creator = NULL;
+	m_creator = nullptr;
 }
 
 
@@ -412,5 +412,5 @@ void hash_collection::copyfrom(const hash_collection &src)
 	m_sha1 = src.m_sha1;
 
 	// don't copy creators
-	m_creator = NULL;
+	m_creator = nullptr;
 }

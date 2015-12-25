@@ -75,7 +75,7 @@ static MACHINE_CONFIG_FRAGMENT( intellivoice )
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono_voice", 1.00)
 
-	MCFG_INTV_CARTRIDGE_ADD("subslot", intv_cart, NULL)
+	MCFG_INTV_CARTRIDGE_ADD("subslot", intv_cart, nullptr)
 MACHINE_CONFIG_END
 
 

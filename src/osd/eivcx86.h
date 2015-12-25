@@ -28,7 +28,7 @@
 
 #ifndef PTR64
 #define mul_32x32 _mul_32x32
-INLINE INT64 _mul_32x32(INT32 a, INT32 b)
+static inline INT64 _mul_32x32(INT32 a, INT32 b)
 {
 	// in theory this should work, but it is untested
 	__asm
@@ -49,7 +49,7 @@ INLINE INT64 _mul_32x32(INT32 a, INT32 b)
 
 #ifndef PTR64
 #define mulu_32x32 _mulu_32x32
-INLINE UINT64 _mulu_32x32(UINT32 a, UINT32 b)
+static inline UINT64 _mulu_32x32(UINT32 a, UINT32 b)
 {
 	// in theory this should work, but it is untested
 	__asm
@@ -70,7 +70,7 @@ INLINE UINT64 _mulu_32x32(UINT32 a, UINT32 b)
 
 #ifndef PTR64
 #define mul_32x32_hi _mul_32x32_hi
-INLINE INT32 _mul_32x32_hi(INT32 a, INT32 b)
+static inline INT32 _mul_32x32_hi(INT32 a, INT32 b)
 {
 	INT32 result;
 
@@ -94,7 +94,7 @@ INLINE INT32 _mul_32x32_hi(INT32 a, INT32 b)
 
 #ifndef PTR64
 #define mulu_32x32_hi _mulu_32x32_hi
-INLINE UINT32 _mulu_32x32_hi(UINT32 a, UINT32 b)
+static inline UINT32 _mulu_32x32_hi(UINT32 a, UINT32 b)
 {
 	INT32 result;
 
@@ -119,7 +119,7 @@ INLINE UINT32 _mulu_32x32_hi(UINT32 a, UINT32 b)
 
 #ifndef PTR64
 #define mul_32x32_shift _mul_32x32_shift
-INLINE INT32 _mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
+static inline INT32 _mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 {
 	INT32 result;
 
@@ -146,7 +146,7 @@ INLINE INT32 _mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 
 #ifndef PTR64
 #define mulu_32x32_shift _mulu_32x32_shift
-INLINE UINT32 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
+static inline UINT32 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 {
 	INT32 result;
 
@@ -171,7 +171,7 @@ INLINE UINT32 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 
 #ifndef PTR64
 #define div_64x32 _div_64x32
-INLINE INT32 _div_64x32(INT64 a, INT32 b)
+static inline INT32 _div_64x32(INT64 a, INT32 b)
 {
 	INT32 result;
 	INT32 alow = a;
@@ -197,7 +197,7 @@ INLINE INT32 _div_64x32(INT64 a, INT32 b)
 
 #ifndef PTR64
 #define divu_64x32 _divu_64x32
-INLINE UINT32 _divu_64x32(UINT64 a, UINT32 b)
+static inline UINT32 _divu_64x32(UINT64 a, UINT32 b)
 {
 	UINT32 result;
 	UINT32 alow = a;
@@ -224,7 +224,7 @@ INLINE UINT32 _divu_64x32(UINT64 a, UINT32 b)
 
 #ifndef PTR64
 #define div_64x32_rem _div_64x32_rem
-INLINE INT32 _div_64x32_rem(INT64 a, INT32 b, INT32 *remainder)
+static inline INT32 _div_64x32_rem(INT64 a, INT32 b, INT32 *remainder)
 {
 	INT32 result;
 	INT32 alow = a;
@@ -254,7 +254,7 @@ INLINE INT32 _div_64x32_rem(INT64 a, INT32 b, INT32 *remainder)
 
 #ifndef PTR64
 #define divu_64x32_rem _divu_64x32_rem
-INLINE UINT32 _divu_64x32_rem(UINT64 a, UINT32 b, UINT32 *remainder)
+static inline UINT32 _divu_64x32_rem(UINT64 a, UINT32 b, UINT32 *remainder)
 {
 	UINT32 result;
 	UINT32 alow = a;
@@ -284,7 +284,7 @@ INLINE UINT32 _divu_64x32_rem(UINT64 a, UINT32 b, UINT32 *remainder)
 
 #ifndef PTR64
 #define div_32x32_shift _div_32x32_shift
-INLINE INT32 _div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
+static inline INT32 _div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 {
 	INT32 result;
 
@@ -312,7 +312,7 @@ INLINE INT32 _div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 
 #ifndef PTR64
 #define divu_32x32_shift _divu_32x32_shift
-INLINE UINT32 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
+static inline UINT32 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 {
 	UINT32 result;
 
@@ -339,7 +339,7 @@ INLINE UINT32 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 
 #ifndef PTR64
 #define mod_64x32 _mod_64x32
-INLINE INT32 _mod_64x32(INT64 a, INT32 b)
+static inline INT32 _mod_64x32(INT64 a, INT32 b)
 {
 	INT32 result;
 	INT32 alow = a;
@@ -365,7 +365,7 @@ INLINE INT32 _mod_64x32(INT64 a, INT32 b)
 
 #ifndef PTR64
 #define modu_64x32 _modu_64x32
-INLINE UINT32 _modu_64x32(UINT64 a, UINT32 b)
+static inline UINT32 _modu_64x32(UINT64 a, UINT32 b)
 {
 	UINT32 result;
 	UINT32 alow = a;
@@ -391,7 +391,7 @@ INLINE UINT32 _modu_64x32(UINT64 a, UINT32 b)
 
 #ifdef PTR64
 #define recip_approx _recip_approx
-INLINE float _recip_approx(float z)
+static inline float _recip_approx(float z)
 {
 	__m128 mz = _mm_set_ss(z);
 	__m128 mooz = _mm_rcp_ss(mz);
@@ -414,7 +414,7 @@ INLINE float _recip_approx(float z)
 
 #ifndef PTR64
 #define count_leading_zeros _count_leading_zeros
-INLINE UINT8 _count_leading_zeros(UINT32 value)
+static inline UINT8 _count_leading_zeros(UINT32 value)
 {
 	INT32 result;
 
@@ -440,7 +440,7 @@ INLINE UINT8 _count_leading_zeros(UINT32 value)
 
 #ifndef PTR64
 #define count_leading_ones _count_leading_ones
-INLINE UINT8 _count_leading_ones(UINT32 value)
+static inline UINT8 _count_leading_ones(UINT32 value)
 {
 	INT32 result;
 
@@ -477,14 +477,14 @@ INLINE UINT8 _count_leading_ones(UINT32 value)
 
 #ifdef PTR64
 
-INLINE osd_ticks_t _get_profile_ticks(void)
+static inline osd_ticks_t _get_profile_ticks(void)
 {
 	return __rdtsc();
 }
 
 #else
 
-INLINE osd_ticks_t _get_profile_ticks(void)
+static inline osd_ticks_t _get_profile_ticks(void)
 {
 	UINT64 result;
 	UINT64 *presult = &result;

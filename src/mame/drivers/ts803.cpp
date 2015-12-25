@@ -24,7 +24,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 static ADDRESS_MAP_START(ts803_mem, AS_PROGRAM, 8, ts803_state)

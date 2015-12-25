@@ -88,7 +88,7 @@ TILE_GET_INFO_MEMBER(goal92_state::get_fore_tile_info)
 
 void goal92_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-	UINT16 *buffered_spriteram16 = m_buffered_spriteram;
+	UINT16 *buffered_spriteram16 = m_buffered_spriteram.get();
 	int offs, fx, fy, x, y, color, sprite;
 
 	for (offs = 3; offs <= 0x400 - 5; offs += 4)
@@ -136,8 +136,8 @@ void goal92_state::video_start()
 	m_fg_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goal92_state::get_fore_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_tx_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goal92_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	m_buffered_spriteram = auto_alloc_array(machine(), UINT16, 0x400 * 2);
-	save_pointer(NAME(m_buffered_spriteram), 0x400 * 2);
+	m_buffered_spriteram = std::make_unique<UINT16[]>(0x400 * 2);
+	save_pointer(NAME(m_buffered_spriteram.get()), 0x400 * 2);
 
 	m_bg_layer->set_transparent_pen(15);
 	m_fg_layer->set_transparent_pen(15);
@@ -184,6 +184,6 @@ void goal92_state::screen_eof_goal92(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		memcpy(m_buffered_spriteram, m_spriteram, 0x400 * 2);
+		memcpy(m_buffered_spriteram.get(), m_spriteram, 0x400 * 2);
 	}
 }

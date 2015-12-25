@@ -720,9 +720,9 @@ ROM_START( kickgoal )
 	ROM_LOAD( "ic13",        0x00000, 0x40000, BAD_DUMP CRC(c6cb56e9) SHA1(835773b3f0647d3c553180bcf10e57ad44d68353) ) // BAD ADDRESS LINES (mask=010000)
 	ROM_CONTINUE(            0x60000, 0x20000 )
 	ROM_CONTINUE(            0xa0000, 0x20000 )
-	ROM_COPY( "oki", 0x00000, 0x40000, 0x20000)
-	ROM_COPY( "oki", 0x00000, 0x80000, 0x20000)
-	ROM_COPY( "oki", 0x00000, 0xc0000, 0x20000)
+	ROM_COPY( "oki", 0x000000, 0x40000, 0x20000)
+	ROM_COPY( "oki", 0x000000, 0x80000, 0x20000)
+	ROM_COPY( "oki", 0x000000, 0xc0000, 0x20000)
 ROM_END
 
 ROM_START( actionhw )
@@ -750,9 +750,9 @@ ROM_START( actionhw )
 	ROM_LOAD( "3.ic13",      0x00000, 0x40000, CRC(b8f6705d) SHA1(55116e14aba6dac7334e26f704b3e6b0b9f856c2) )
 	ROM_CONTINUE(            0x60000, 0x20000 )
 	ROM_CONTINUE(            0xa0000, 0x20000 )
-	ROM_COPY( "oki", 0x00000, 0x40000, 0x20000)
-	ROM_COPY( "oki", 0x00000, 0x80000, 0x20000)
-	ROM_COPY( "oki", 0x00000, 0xc0000, 0x20000) /* Last bank used in Test Mode */
+	ROM_COPY( "oki", 0x000000, 0x40000, 0x20000)
+	ROM_COPY( "oki", 0x000000, 0x80000, 0x20000)
+	ROM_COPY( "oki", 0x000000, 0xc0000, 0x20000) /* Last bank used in Test Mode */
 ROM_END
 
 /* GAME drivers **************************************************************/

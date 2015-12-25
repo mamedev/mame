@@ -39,7 +39,7 @@ tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, d
 					device_video_interface(mconfig, *this),
 					m_write_vsyn(*this),
 					m_hpixels_per_column(0),
-					m_selfload_region(NULL),
+					m_selfload_region(nullptr),
 					m_reset(0)
 {
 	memset(m_reg, 0x00, sizeof(m_reg));
@@ -50,7 +50,7 @@ tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, 
 					device_video_interface(mconfig, *this),
 					m_write_vsyn(*this),
 					m_hpixels_per_column(0),
-					m_selfload_region(NULL),
+					m_selfload_region(nullptr),
 					m_reset(0)
 {
 	memset(m_reg, 0x00, sizeof(m_reg));
@@ -85,10 +85,10 @@ void tms9927_device::device_start()
 	m_clock = clock();
 
 	/* get the self-load PROM */
-	if (m_selfload_region != NULL)
+	if (m_selfload_region != nullptr)
 	{
 		m_selfload = machine().root_device().memregion(m_selfload_region)->base();
-		assert(m_selfload != NULL);
+		assert(m_selfload != nullptr);
 	}
 
 	// resolve callbacks
@@ -166,7 +166,7 @@ void tms9927_device::generic_access(address_space &space, offs_t offset)
 	{
 		case 0x07:  /* Processor Self Load */
 		case 0x0f:  /* Non-processor self-load */
-			if (m_selfload != NULL)
+			if (m_selfload != nullptr)
 			{
 				for (int cur = 0; cur < 7; cur++)
 					write(space, cur, m_selfload[cur]);

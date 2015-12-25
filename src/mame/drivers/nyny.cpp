@@ -136,8 +136,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
 	DECLARE_WRITE8_MEMBER(nyny_ay8910_37_port_a_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(update_pia_1);
 	DECLARE_WRITE8_MEMBER(ic48_1_74123_output_changed);
 	inline void shift_star_generator(  );

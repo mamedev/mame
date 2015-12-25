@@ -29,10 +29,10 @@ protected:
 
 	/* Constructor */
 	ti_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	virtual void device_start(void);
-	virtual void device_reset(void);
-	virtual DECLARE_READ8Z_MEMBER(readz) { };
-	virtual DECLARE_WRITE8_MEMBER(write) { };
+	virtual void device_start(void) override;
+	virtual void device_reset(void) override;
+	virtual DECLARE_READ8Z_MEMBER(readz) override { };
+	virtual DECLARE_WRITE8_MEMBER(write) override { };
 };
 
 /*
@@ -42,10 +42,10 @@ class ti_std_video_device : public ti_video_device
 {
 public:
 	ti_std_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 
-	void    reset_vdp(int state) { m_tms9928a->reset_line(state); }
+	void    reset_vdp(int state) override { m_tms9928a->reset_line(state); }
 };
 
 /*
@@ -56,14 +56,14 @@ class ti_exp_video_device : public ti_video_device
 public:
 	ti_exp_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	void video_update_mouse(int delta_x, int delta_y, int buttons);
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ16_MEMBER(read16);
 	DECLARE_WRITE16_MEMBER(write16);
-	void    reset_vdp(int state) { m_v9938->reset_line(state); }
+	void    reset_vdp(int state) override { m_v9938->reset_line(state); }
 
 protected:
-	virtual void    device_start(void);
+	virtual void    device_start(void) override;
 	v9938_device    *m_v9938;
 };
 
@@ -89,15 +89,15 @@ public:
 		m_console_ready(*this) { };
 
 	// Cannot read from sound; just ignore silently
-	DECLARE_READ8Z_MEMBER(readz) { };
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override { };
+	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_WRITE_LINE_MEMBER( sound_ready );   // connect to console READY
 
 	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<ti_sound_system_device &>(device).m_console_ready.set_callback(object); }
 
 protected:
-	virtual void device_start(void);
-	virtual machine_config_constructor device_mconfig_additions() const =0;
+	virtual void device_start(void) override;
+	virtual machine_config_constructor device_mconfig_additions() const override  =0;
 
 private:
 	sn76496_base_device*    m_sound_chip;
@@ -113,7 +113,7 @@ public:
 	ti_sound_sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 /*
@@ -125,7 +125,7 @@ public:
 	ti_sound_sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 

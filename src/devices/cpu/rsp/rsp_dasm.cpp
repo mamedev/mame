@@ -57,7 +57,7 @@ static const char *const element2[16] =
 	"00000000", "11111111", "22222222", "33333333", "44444444", "55555555", "66666666", "77777777"
 };
 
-INLINE char *signed_imm16(UINT32 op)
+static inline char *signed_imm16(UINT32 op)
 {
 	static char temp[10];
 	INT16 value = op & 0xffff;

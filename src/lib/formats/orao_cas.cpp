@@ -23,7 +23,7 @@ static INT16    wave_data;
 static int      len;
 
 static void orao_output_wave( INT16 **buffer, int length ) {
-	if ( buffer == NULL ) {
+	if ( buffer == nullptr ) {
 		return;
 	}
 
@@ -36,7 +36,7 @@ static int orao_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 	int i,j,size;
 	UINT8 b;
 
-	if (casdata == NULL) return -1;
+	if (casdata == nullptr) return -1;
 	if (caslen <= ORAO_HEADER_SIZE) {
 		return -1;
 	}
@@ -59,7 +59,7 @@ static int orao_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 	int i,j,size;
 	UINT8 b;
 	size = 0;
-	if (bytes == NULL) return -1;
+	if (bytes == nullptr) return -1;
 	for (i=ORAO_HEADER_SIZE;i<len-ORAO_HEADER_SIZE;i++) {
 		for (j=0;j<8;j++) {
 			b = (bytes[i] >> j) & 1;
@@ -113,7 +113,7 @@ static const struct CassetteFormat orao_cassette_format = {
 	"tap",
 	orao_cassette_identify,
 	orao_cassette_load,
-	NULL
+	nullptr
 };
 
 

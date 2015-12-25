@@ -116,5 +116,5 @@ public:
 	inline void plot_pixel_m10( bitmap_ind16 &bm, int x, int y, int col );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

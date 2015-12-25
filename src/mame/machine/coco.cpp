@@ -487,7 +487,7 @@ READ8_MEMBER( coco_state::pia1_pb_r )
 		|| (ram_size >= 0x8000 && (m_pia_0->b_output() & 0x40));
 
 	// serial in (PB0)
-	bool serial_in = (m_rs232 != NULL) && (m_rs232->rxd_r() ? true : false);
+	bool serial_in = (m_rs232 != nullptr) && (m_rs232->rxd_r() ? true : false);
 
 	// composite the results
 	return (memory_sense ? 0x04 : 0x00)
@@ -728,7 +728,7 @@ void coco_state::update_sound(void)
 coco_state::joystick_type_t coco_state::joystick_type(int index)
 {
 	assert((index == 0) || (index == 1));
-	return (m_joystick_type_control != NULL)
+	return (m_joystick_type_control != nullptr)
 		? (joystick_type_t) ((m_joystick_type_control->read() >> (index * 4)) & 0x0F)
 		: JOYSTICK_NONE;
 }
@@ -741,7 +741,7 @@ coco_state::joystick_type_t coco_state::joystick_type(int index)
 
 coco_state::hires_type_t coco_state::hires_interface_type(void)
 {
-	return (m_joystick_hires_control != NULL)
+	return (m_joystick_hires_control != nullptr)
 		? (hires_type_t) m_joystick_hires_control->read()
 		: HIRES_NONE;
 }
@@ -984,7 +984,7 @@ void coco_state::update_prinout(bool prinout)
 	else
 	{
 		/* output bitbanger if present (only on CoCos) */
-		if (m_rs232 != NULL)
+		if (m_rs232 != nullptr)
 		{
 			m_rs232->write_txd(prinout ? 1 : 0);
 		}
@@ -1122,7 +1122,7 @@ coco_vhd_image_device *coco_state::current_vhd(void)
 	{
 		case 0:     return m_vhd_0;
 		case 1:     return m_vhd_1;
-		default:    return NULL;
+		default:    return nullptr;
 	}
 }
 
@@ -1136,7 +1136,7 @@ READ8_MEMBER( coco_state::ff60_read )
 {
 	UINT8 result;
 
-	if ((current_vhd() != NULL) && (offset >= 32) && (offset <= 37))
+	if ((current_vhd() != nullptr) && (offset >= 32) && (offset <= 37))
 	{
 		result = current_vhd()->read(offset - 32);
 	}
@@ -1156,7 +1156,7 @@ READ8_MEMBER( coco_state::ff60_read )
 
 WRITE8_MEMBER( coco_state::ff60_write )
 {
-	if ((current_vhd() != NULL) && (offset >= 32) && (offset <= 37))
+	if ((current_vhd() != nullptr) && (offset >= 32) && (offset <= 37))
 	{
 		current_vhd()->write(offset - 32, data);
 	}
@@ -1251,12 +1251,12 @@ static const char *const os9syscalls[] =
 	"F$SUser",         /* Set User ID number */
 	"F$UnLoad",        /* Unlink Module by name */
 	"F$Alarm",         /* Color Computer Alarm Call (system wide) */
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 	"F$NMLink",        /* Color Computer NonMapping Link */
 	"F$NMLoad",        /* Color Computer NonMapping Load */
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 	"F$TPS",           /* Return System's Ticks Per Second */
 	"F$TimAlm",        /* COCO individual process alarm call */
 	"F$VIRQ",          /* Install/Delete Virtual IRQ */
@@ -1304,50 +1304,50 @@ static const char *const os9syscalls[] =
 	"F$DelRAM",        /* Deallocate RAM blocks */
 	"F$GCMDir",        /* Pack module directory */
 	"F$AlHRam",        /* Allocate HIGH RAM Blocks */
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	"F$RegDmp",        /* Ron Lammardo's debugging register dump call */
 	"F$NVRAM",         /* Non Volatile RAM (RTC battery backed static) read/write */
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	"I$Attach",        /* Attach I/O Device */
 	"I$Detach",        /* Detach I/O Device */
 	"I$Dup",           /* Duplicate Path */

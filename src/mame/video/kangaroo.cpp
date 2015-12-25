@@ -18,8 +18,8 @@
 void kangaroo_state::video_start()
 {
 	/* video RAM is accessed 32 bits at a time (two planes, 4bpp each, 4 pixels) */
-	m_videoram = auto_alloc_array(machine(), UINT32, 256 * 64);
-	save_pointer(NAME(m_videoram), 256 * 64);
+	m_videoram = std::make_unique<UINT32[]>(256 * 64);
+	save_pointer(NAME(m_videoram.get()), 256 * 64);
 }
 
 

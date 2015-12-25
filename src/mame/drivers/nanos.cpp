@@ -68,9 +68,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
-	virtual void machine_reset();
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	DECLARE_WRITE_LINE_MEMBER(z80daisy_interrupt);
@@ -140,7 +140,7 @@ static const z80_daisy_config nanos_daisy_chain[] =
 	{ "z80ctc_0" },
 	{ "z80sio_1" },
 	{ "z80ctc_1" },
-	{ NULL }
+	{ nullptr }
 };
 
 static ADDRESS_MAP_START( nanos_io , AS_IO, 8, nanos_state)

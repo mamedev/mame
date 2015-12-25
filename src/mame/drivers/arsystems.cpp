@@ -90,7 +90,7 @@ public:
 	inline void generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0);
 
 protected:
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 

@@ -12,11 +12,11 @@
 
 #include "formats/d80_dsk.h"
 
-d80_format::d80_format() : d64_format(file_formats)
+d80_format::d80_format() : d64_format(file_formats), formats(nullptr)
 {
 }
 
-d80_format::d80_format(const format *_formats) : d64_format(_formats)
+d80_format::d80_format(const format *_formats) : d64_format(_formats), formats(nullptr)
 {
 }
 

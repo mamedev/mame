@@ -191,7 +191,7 @@ md_eeprom_stm95_device::md_eeprom_stm95_device(const machine_config &mconfig, co
 void md_eeprom_stm95_device::device_start()
 {
 	nvram_alloc(M95320_SIZE);
-	m_stm95.reset(global_alloc(stm95_eeprom_device(machine(), (UINT8*)get_nvram_base())));
+	m_stm95 = std::make_unique<stm95_eeprom_device>(machine(), (UINT8*)get_nvram_base());
 
 	save_item(NAME(m_rdcnt));
 	save_item(NAME(m_bank));

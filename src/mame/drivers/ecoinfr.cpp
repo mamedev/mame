@@ -111,7 +111,7 @@ public:
 	DECLARE_DRIVER_INIT(ecoinfrbr);
 	DECLARE_DRIVER_INIT(ecoinfr);
 	DECLARE_DRIVER_INIT(ecoinfrmab);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
 
 	UINT8 m_banksel;

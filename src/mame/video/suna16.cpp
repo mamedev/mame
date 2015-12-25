@@ -93,7 +93,7 @@ WRITE16_MEMBER(suna16_state::bestbest_flipscreen_w)
 
 void suna16_state::video_start()
 {
-	m_paletteram = auto_alloc_array(machine(), UINT16, m_palette->entries());
+	m_paletteram = std::make_unique<UINT16[]>(m_palette->entries());
 
 	save_item(NAME(m_color_bank));
 }

@@ -80,7 +80,7 @@ protected:
 	required_device<eeprom_serial_x24c44_device> m_eeprom;
 
 	// driver_device overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 private:
 };

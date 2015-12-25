@@ -15,7 +15,7 @@ const device_type DECOCOMN = &device_creator<decocomn_device>;
 decocomn_device::decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECOCOMN, "DECO Common Video Functions", tag, owner, clock, "decocomn", __FILE__),
 	device_video_interface(mconfig, *this),
-	m_dirty_palette(NULL),
+	m_dirty_palette(nullptr),
 	m_priority(0),
 	m_palette(*this),
 	m_generic_paletteram_16(*this, "^paletteram")
@@ -53,10 +53,10 @@ void decocomn_device::device_start()
 //  width = m_screen->width();
 //  height = m_screen->height();
 
-	m_dirty_palette = auto_alloc_array_clear(machine(), UINT8, 4096);
+	m_dirty_palette = make_unique_clear<UINT8[]>(4096);
 
 	save_item(NAME(m_priority));
-	save_pointer(NAME(m_dirty_palette), 4096);
+	save_pointer(NAME(m_dirty_palette.get()), 4096);
 }
 
 //-------------------------------------------------

@@ -192,9 +192,9 @@ struct {
 	UINT32 curxpos;                     //!< helper: first cursor word in scanline
 	UINT16 cursor0;                     //!< helper: shifted cursor data for left word
 	UINT16 cursor1;                     //!< helper: shifted cursor data for right word
-	UINT16 *raw_bitmap;                 //!< array of words of the raw bitmap that is displayed
+	std::unique_ptr<UINT16[]> raw_bitmap;                 //!< array of words of the raw bitmap that is displayed
 	UINT8 **scanline;                   //!< array of scanlines with 1 byte per pixel
-	bitmap_ind16 *bitmap;               //!< MAME bitmap with 16 bit indices
+	std::unique_ptr<bitmap_ind16> bitmap;               //!< MAME bitmap with 16 bit indices
 	bool odd_frame;                     //!< true, if odd frame is drawn
 }   m_dsp;
 

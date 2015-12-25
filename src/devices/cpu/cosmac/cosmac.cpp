@@ -288,12 +288,12 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 		m_irq(CLEAR_LINE),
 		m_dmain(CLEAR_LINE),
 		m_dmaout(CLEAR_LINE),
-		m_program(NULL),
-		m_io(NULL),
-		m_direct(NULL)
+		m_program(nullptr),
+		m_io(nullptr),
+		m_direct(nullptr)
 {
-	for (int i = 0; i < 4; i++)
-		m_ef[i] = CLEAR_LINE;
+	for (auto & elem : m_ef)
+		elem = CLEAR_LINE;
 }
 
 
@@ -419,7 +419,7 @@ const address_space_config *cosmac_device::memory_space_config(address_spacenum 
 		return &m_io_config;
 
 	default:
-		return NULL;
+		return nullptr;
 	}
 }
 

@@ -27,7 +27,7 @@ const device_type EA2001_CART_SLOT = &device_creator<arcadia_cart_slot_device>;
 
 device_arcadia_cart_interface::device_arcadia_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0)
 {
 }
@@ -47,7 +47,7 @@ device_arcadia_cart_interface::~device_arcadia_cart_interface()
 
 void device_arcadia_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = device().machine().memory().region_alloc(std::string(tag).append(EA2001SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
@@ -120,10 +120,10 @@ static const arcadia_slot slot_list[] =
 
 static int arcadia_get_pcb_id(const char *slot)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(slot_list[i].slot_option, slot))
-			return slot_list[i].pcb_id;
+		if (!core_stricmp(elem.slot_option, slot))
+			return elem.pcb_id;
 	}
 
 	return 0;
@@ -150,16 +150,16 @@ bool arcadia_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 len = (software_entry() == NULL) ? length() : get_software_region_length("rom");
+		UINT32 len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
 
 		m_cart->rom_alloc(len, tag());
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 			fread(m_cart->get_rom_base(), len);
 		else
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), len);
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			// we need to identify Golf!
 			m_type = ARCADIA_STD;

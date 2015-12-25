@@ -1000,7 +1000,7 @@ WRITE16_MEMBER(md_rom_realtec_device::write)
 READ16_MEMBER(md_rom_redcl_device::read)
 {
 	if (offset == 0x400000/2)   return 0x55 << 8;
-	if (offset == 0x400004/2)   return -0x56 << 8;
+	if (offset == 0x400004/2)   return 0xaa << 8;
 
 	// non-protection accesses
 	if (offset < 0x400000/2)

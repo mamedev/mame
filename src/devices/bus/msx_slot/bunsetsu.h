@@ -22,11 +22,11 @@ public:
 	// static configuration helpers
 	static void set_bunsetsu_region_tag(device_t &device, const char *tag) { dynamic_cast<msx_slot_bunsetsu_device &>(device).m_bunsetsu_region_tag = tag; }
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 private:
 	memory_region *m_bunsetsu_region;

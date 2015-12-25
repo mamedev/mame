@@ -103,8 +103,8 @@ public:
 	DECLARE_WRITE8_MEMBER(vectrex_via_w);
 	DECLARE_WRITE8_MEMBER(raaspec_led_w);
 	DECLARE_DRIVER_INIT(vectrex);
-	virtual void video_start();
-	virtual void machine_start();
+	virtual void video_start() override;
+	virtual void machine_start() override;
 	DECLARE_VIDEO_START(raaspec);
 	UINT32 screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(vectrex_imager_change_color);
@@ -125,7 +125,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vectrex_via_irq);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via6522_0;

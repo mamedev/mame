@@ -182,7 +182,7 @@ void segas18_state::machine_reset()
 	m_vdp->device_reset_old();
 
 	// if we are running with a real live 8751, we need to boost the interleave at startup
-	if (m_mcu != NULL && m_mcu->type() == I8751)
+	if (m_mcu != nullptr && m_mcu->type() == I8751)
 		synchronize(TID_INITIAL_BOOST);
 }
 

@@ -16,7 +16,7 @@ public:
 	required_shared_ptr<UINT16> m_vregs;
 	required_shared_ptr<UINT16> m_spriteram;
 	int m_sprite_count[5];
-	int *m_sprite_table[5];
+	std::unique_ptr<int[]> m_sprite_table[5];
 	tilemap_t *m_pant[2];
 	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(thoop2_coin_w);
@@ -24,7 +24,7 @@ public:
 	DECLARE_WRITE16_MEMBER(thoop2_vram_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_thoop2_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_thoop2_screen1);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_thoop2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void thoop2_sort_sprites();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);

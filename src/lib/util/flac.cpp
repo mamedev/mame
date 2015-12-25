@@ -78,7 +78,7 @@ bool flac_encoder::reset()
 	FLAC__stream_encoder_set_blocksize(m_encoder, m_block_size);
 
 	// re-start processing
-	return (FLAC__stream_encoder_init_stream(m_encoder, write_callback_static, NULL, NULL, NULL, this) == FLAC__STREAM_ENCODER_INIT_STATUS_OK);
+	return (FLAC__stream_encoder_init_stream(m_encoder, write_callback_static, nullptr, nullptr, nullptr, this) == FLAC__STREAM_ENCODER_INIT_STATUS_OK);
 }
 
 
@@ -91,7 +91,7 @@ bool flac_encoder::reset(void *buffer, UINT32 buflength)
 	// configure the output
 	m_compressed_start = reinterpret_cast<FLAC__byte *>(buffer);
 	m_compressed_length = buflength;
-	m_file = NULL;
+	m_file = nullptr;
 	return reset();
 }
 
@@ -103,7 +103,7 @@ bool flac_encoder::reset(void *buffer, UINT32 buflength)
 bool flac_encoder::reset(core_file &file)
 {
 	// configure the output
-	m_compressed_start = NULL;
+	m_compressed_start = nullptr;
 	m_compressed_length = 0;
 	m_file = &file;
 	return reset();
@@ -185,7 +185,7 @@ UINT32 flac_encoder::finish()
 {
 	// process the data and return the amount written
 	FLAC__stream_encoder_finish(m_encoder);
-	return (m_file != NULL) ? core_ftell(m_file) : m_compressed_offset;
+	return (m_file != nullptr) ? core_ftell(m_file) : m_compressed_offset;
 }
 
 
@@ -197,13 +197,13 @@ void flac_encoder::init_common()
 {
 	// allocate the encoder
 	m_encoder = FLAC__stream_encoder_new();
-	if (m_encoder == NULL)
+	if (m_encoder == nullptr)
 		throw std::bad_alloc();
 
 	// initialize default state
-	m_file = NULL;
+	m_file = nullptr;
 	m_compressed_offset = 0;
-	m_compressed_start = NULL;
+	m_compressed_start = nullptr;
 	m_compressed_length = 0;
 	m_sample_rate = 44100;
 	m_channels = 2;
@@ -251,7 +251,7 @@ FLAC__StreamEncoderWriteStatus flac_encoder::write_callback(const FLAC__byte buf
 		else
 		{
 			int count = bytes - offset;
-			if (m_file != NULL)
+			if (m_file != nullptr)
 				core_fwrite(m_file, buffer, count);
 			else
 			{
@@ -277,11 +277,11 @@ FLAC__StreamEncoderWriteStatus flac_encoder::write_callback(const FLAC__byte buf
 
 flac_decoder::flac_decoder()
 	: m_decoder(FLAC__stream_decoder_new()),
-		m_file(NULL),
+		m_file(nullptr),
 		m_compressed_offset(0),
-		m_compressed_start(NULL),
+		m_compressed_start(nullptr),
 		m_compressed_length(0),
-		m_compressed2_start(NULL),
+		m_compressed2_start(nullptr),
 		m_compressed2_length(0)
 {
 }
@@ -293,7 +293,7 @@ flac_decoder::flac_decoder()
 
 flac_decoder::flac_decoder(const void *buffer, UINT32 length, const void *buffer2, UINT32 length2)
 	: m_decoder(FLAC__stream_decoder_new()),
-		m_file(NULL),
+		m_file(nullptr),
 		m_compressed_offset(0),
 		m_compressed_start(reinterpret_cast<const FLAC__byte *>(buffer)),
 		m_compressed_length(length),
@@ -312,9 +312,9 @@ flac_decoder::flac_decoder(core_file &file)
 	: m_decoder(FLAC__stream_decoder_new()),
 		m_file(&file),
 		m_compressed_offset(0),
-		m_compressed_start(NULL),
+		m_compressed_start(nullptr),
 		m_compressed_length(0),
-		m_compressed2_start(NULL),
+		m_compressed2_start(nullptr),
 		m_compressed2_length(0)
 {
 	reset();
@@ -341,10 +341,10 @@ bool flac_decoder::reset()
 	m_compressed_offset = 0;
 	if (FLAC__stream_decoder_init_stream(m_decoder,
 				&flac_decoder::read_callback_static,
-				NULL,
+				nullptr,
 				&flac_decoder::tell_callback_static,
-				NULL,
-				NULL,
+				nullptr,
+				nullptr,
 				&flac_decoder::write_callback_static,
 				&flac_decoder::metadata_callback_static,
 				&flac_decoder::error_callback_static, this) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
@@ -359,7 +359,7 @@ bool flac_decoder::reset()
 
 bool flac_decoder::reset(const void *buffer, UINT32 length, const void *buffer2, UINT32 length2)
 {
-	m_file = NULL;
+	m_file = nullptr;
 	m_compressed_start = reinterpret_cast<const FLAC__byte *>(buffer);
 	m_compressed_length = length;
 	m_compressed2_start = reinterpret_cast<const FLAC__byte *>(buffer2);
@@ -401,7 +401,7 @@ bool flac_decoder::reset(UINT32 sample_rate, UINT8 num_channels, UINT32 block_si
 	m_custom_header[0x14] = (sample_rate << 4) | ((num_channels - 1) << 1);
 
 	// configure the header ahead of the provided buffer
-	m_file = NULL;
+	m_file = nullptr;
 	m_compressed_start = reinterpret_cast<const FLAC__byte *>(m_custom_header);
 	m_compressed_length = sizeof(m_custom_header);
 	m_compressed2_start = reinterpret_cast<const FLAC__byte *>(buffer);
@@ -417,9 +417,9 @@ bool flac_decoder::reset(UINT32 sample_rate, UINT8 num_channels, UINT32 block_si
 bool flac_decoder::reset(core_file &file)
 {
 	m_file = &file;
-	m_compressed_start = NULL;
+	m_compressed_start = nullptr;
 	m_compressed_length = 0;
-	m_compressed2_start = NULL;
+	m_compressed2_start = nullptr;
 	m_compressed2_length = 0;
 	return reset();
 }
@@ -510,7 +510,7 @@ FLAC__StreamDecoderReadStatus flac_decoder::read_callback(FLAC__byte buffer[], s
 	UINT32 expected = *bytes;
 
 	// if a file, just read
-	if (m_file != NULL)
+	if (m_file != nullptr)
 		*bytes = core_fread(m_file, buffer, expected);
 
 	// otherwise, copy from memory
@@ -589,7 +589,7 @@ FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame 
 	// interleaved case
 	int shift = m_uncompressed_swap ? 8 : 0;
 	int blocksize = frame->header.blocksize;
-	if (m_uncompressed_start[1] == NULL)
+	if (m_uncompressed_start[1] == nullptr)
 	{
 		INT16 *dest = m_uncompressed_start[0] + m_uncompressed_offset * frame->header.channels;
 		for (int sampnum = 0; sampnum < blocksize && m_uncompressed_offset < m_uncompressed_length; sampnum++, m_uncompressed_offset++)
@@ -602,7 +602,7 @@ FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame 
 	{
 		for (int sampnum = 0; sampnum < blocksize && m_uncompressed_offset < m_uncompressed_length; sampnum++, m_uncompressed_offset++)
 			for (int chan = 0; chan < frame->header.channels; chan++)
-				if (m_uncompressed_start[chan] != NULL)
+				if (m_uncompressed_start[chan] != nullptr)
 					m_uncompressed_start[chan][m_uncompressed_offset] = INT16((UINT16(buffer[chan][sampnum]) << shift) | (UINT16(buffer[chan][sampnum]) >> shift));
 	}
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;

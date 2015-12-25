@@ -25,7 +25,7 @@ void pcw_state::video_start()
 {
 	rectangle rect(0, PCW_PRINTER_WIDTH - 1, 0, PCW_PRINTER_HEIGHT - 1);
 
-	m_prn_output = auto_bitmap_ind16_alloc(machine(),PCW_PRINTER_WIDTH,PCW_PRINTER_HEIGHT);
+	m_prn_output = std::make_unique<bitmap_ind16>(PCW_PRINTER_WIDTH,PCW_PRINTER_HEIGHT);
 	m_prn_output->fill(1, rect);
 }
 
@@ -175,7 +175,7 @@ UINT32 pcw_state::screen_update_pcw_printer(screen_device &screen, bitmap_ind16 
 	INT32 feed;
 	rectangle rect(0, PCW_PRINTER_WIDTH - 1, 0, PCW_PRINTER_HEIGHT - 1);
 	feed = -(m_paper_feed / 2);
-	copyscrollbitmap(bitmap,*m_prn_output,0,NULL,1,&feed,rect);
+	copyscrollbitmap(bitmap,*m_prn_output,0,nullptr,1,&feed,rect);
 	bitmap.pix16(PCW_PRINTER_HEIGHT-1, m_printer_headpos) = 0;
 	bitmap.pix16(PCW_PRINTER_HEIGHT-2, m_printer_headpos) = 0;
 	bitmap.pix16(PCW_PRINTER_HEIGHT-3, m_printer_headpos) = 0;

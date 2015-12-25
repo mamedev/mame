@@ -38,7 +38,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<huc6261_device> m_huc6261;
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -69,7 +69,7 @@ public:
 	TIMER_CALLBACK_MEMBER(pad_func);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -380,13 +380,13 @@ inline void pcfx_state::check_irqs()
 	UINT16 active_irqs = m_irq_pending & ~m_irq_mask;
 	int highest_prio = -1;
 
-	for ( int i = 0; i < 8; i++ )
+	for (auto & elem : m_irq_priority)
 	{
 		if ( active_irqs & 0x80 )
 		{
-			if ( m_irq_priority[i] >= highest_prio )
+			if ( elem >= highest_prio )
 			{
-				highest_prio = m_irq_priority[i];
+				highest_prio = elem;
 			}
 		}
 		active_irqs <<= 1;

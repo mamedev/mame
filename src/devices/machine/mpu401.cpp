@@ -133,7 +133,7 @@ mpu401_device::mpu401_device(const machine_config &mconfig, const char *tag, dev
 void mpu401_device::device_start()
 {
 	write_irq.resolve_safe();
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 }
 
 //-------------------------------------------------

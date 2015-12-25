@@ -92,15 +92,15 @@ static const struct { const char *mnemonic; Adr adr; } table[]={
 	{ "MVWD",   Imp }, { "EXWD",    Imp }, { "MVBD",    Imp }, { "EXBD",    Imp },
 	{ "SRW",    Imp }, { "SLW",     Imp }, { "FILM",    Imp }, { "FILD",    Imp },
 
-	{ "LDP",    Imp }, { "LPQ",     Imp }, { "LPR",     Imp }, { 0,         Ill },
+	{ "LDP",    Imp }, { "LPQ",     Imp }, { "LPR",     Imp }, { nullptr,         Ill },
 	{ "IXL",    Imp }, { "DXL",     Imp }, { "IYS",     Imp }, { "DYS",     Imp },
 	{ "JRNZP",  RelP}, { "JRNZM",   RelM}, { "JRNCP",   RelP}, { "JRNCM",   RelM},
-	{ "JRP",    RelP}, { "JRM",     RelM}, { 0,         Ill }, { "LOOP",    RelM},
+	{ "JRP",    RelP}, { "JRM",     RelM}, { nullptr,         Ill }, { "LOOP",    RelM},
 
-	{ "STP",    Imp }, { "STQ",     Imp }, { "STR",     Imp }, { 0,         Ill },
-	{ "PUSH",   Imp }, { "DATA",    Imp }, { 0,         Ill }, { "RTN",     Imp },
+	{ "STP",    Imp }, { "STQ",     Imp }, { "STR",     Imp }, { nullptr,         Ill },
+	{ "PUSH",   Imp }, { "DATA",    Imp }, { nullptr,         Ill }, { "RTN",     Imp },
 	{ "JRZP",   RelP}, { "JRZM",    RelM}, { "JRCP",    RelP}, { "JRCM",    RelM},
-	{ 0,        Ill }, { 0,         Ill }, { 0,         Ill }, { 0,         Ill },
+	{ nullptr,        Ill }, { nullptr,         Ill }, { nullptr,         Ill }, { nullptr,         Ill },
 
 	{ "INCI",   Imp }, { "DECI",    Imp }, { "INCA",    Imp }, { "DECA",    Imp },
 	{ "ADM",    Imp }, { "SBM",     Imp }, { "ANMA",    Imp }, { "ORMA",    Imp },
@@ -110,46 +110,46 @@ static const struct { const char *mnemonic; Adr adr; } table[]={
 	{ "INCP",   Imp }, { "DECP",    Imp }, { "STD",     Imp }, { "MVDM",    Imp },
 	{ "READM",/*mvmp*/  Imp }, { "MVMD",    Imp }, { "READ"/*ldpc*/,    Imp }, { "LDD",     Imp },
 	{ "SWP",    Imp }, { "LDM",     Imp }, { "SL",      Imp }, { "POP",     Imp },
-	{ 0,        Ill }, { "OUTA",    Imp }, { 0,         Ill }, { "OUTF",    Imp },
+	{ nullptr,        Ill }, { "OUTA",    Imp }, { nullptr,         Ill }, { "OUTF",    Imp },
 
 	{ "ANIM",   Imm }, { "ORIM",    Imm }, { "TSIM",    Imm }, { "CPIM",    Imm },
 	{ "ANIA",   Imm }, { "ORIA",    Imm }, { "TSIA",    Imm }, { "CPIA",    Imm },
-	{ 0,        Ill }, { "ETC",     Etc }, { 0,         Ill }, { "TEST",    Imm },
-	{ 0,        Ill }, { 0,         Ill }, { 0,         Ill }, { "IPXH"/*CDN,lxp*/, Imp },
+	{ nullptr,        Ill }, { "ETC",     Etc }, { nullptr,         Ill }, { "TEST",    Imm },
+	{ nullptr,        Ill }, { nullptr,         Ill }, { nullptr,         Ill }, { "IPXH"/*CDN,lxp*/, Imp },
 
-	{ "ADIM",   Imm }, { "SBIM",    Imm }, { 0,         Ill }, { 0,         Ill },
-	{ "ADIA",   Imm }, { "SBIA",    Imm }, { 0,         Ill }, { 0,         Ill },
-	{ "CALL",   Abs }, { "JP",      Abs }, { "PTC",     Ptc }, { 0,         Ill },
+	{ "ADIM",   Imm }, { "SBIM",    Imm }, { nullptr,         Ill }, { nullptr,         Ill },
+	{ "ADIA",   Imm }, { "SBIA",    Imm }, { nullptr,         Ill }, { nullptr,         Ill },
+	{ "CALL",   Abs }, { "JP",      Abs }, { "PTC",     Ptc }, { nullptr,         Ill },
 	{ "JPNZ",   Abs }, { "JPNC",    Abs }, { "JPZ",     Abs }, { "JPC",     Abs },
 
 
-	{ "LP", Lp  }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ "LP", Lp  }, { nullptr }, { nullptr }, { nullptr },  { nullptr }, { nullptr }, { nullptr }, { nullptr },
+	{ nullptr }, { nullptr }, { nullptr }, { nullptr },  { nullptr }, { nullptr }, { nullptr }, { nullptr },
 
-	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ nullptr }, { nullptr }, { nullptr }, { nullptr },  { nullptr }, { nullptr }, { nullptr }, { nullptr },
+	{ nullptr }, { nullptr }, { nullptr }, { nullptr },  { nullptr }, { nullptr }, { nullptr }, { nullptr },
 
-	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ nullptr }, { nullptr }, { nullptr }, { nullptr },  { nullptr }, { nullptr }, { nullptr }, { nullptr },
+	{ nullptr }, { nullptr }, { nullptr }, { nullptr },  { nullptr }, { nullptr }, { nullptr }, { nullptr },
 
-	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ nullptr }, { nullptr }, { nullptr }, { nullptr },  { nullptr }, { nullptr }, { nullptr }, { nullptr },
+	{ nullptr }, { nullptr }, { nullptr }, { nullptr },  { nullptr }, { nullptr }, { nullptr }, { nullptr },
 
 	{ "INCJ",   Imp }, { "DECJ",    Imp }, { "INCB",    Imp }, { "DECB",    Imp },
-	{ "ACDM",   Imp }, { "SBCM",    Imp }, { 0,         Ill }, { "CPMA",    Imp },
+	{ "ACDM",   Imp }, { "SBCM",    Imp }, { nullptr,         Ill }, { "CPMA",    Imp },
 	{ "INCL",   Imp }, { "DECL",    Imp }, { "INCW",    Imp }, { "DECW",    Imp },
-	{ "INB",    Imp }, { 0,         Ill }, { "NOPT",    Imp }, { 0,         Ill },
+	{ "INB",    Imp }, { nullptr,         Ill }, { "NOPT",    Imp }, { nullptr,         Ill },
 
-	{ "SC",     Imp }, { "RC",      Imp }, { "SR",      Imp }, { 0,         Ill },
-	{ "ANID",   Imm }, { "ORID",    Imm }, { "TSID",    Imm }, { 0,         Ill },
-	{ "LEAVE",  Imp }, { 0,         Ill }, { "EXAB",    Imp }, { "EXAM",    Imp },
-	{ 0,        Ill }, { "OUTB",    Imp }, { 0,         Ill }, { "OUTC",    Imp },
+	{ "SC",     Imp }, { "RC",      Imp }, { "SR",      Imp }, { nullptr,         Ill },
+	{ "ANID",   Imm }, { "ORID",    Imm }, { "TSID",    Imm }, { nullptr,         Ill },
+	{ "LEAVE",  Imp }, { nullptr,         Ill }, { "EXAB",    Imp }, { "EXAM",    Imp },
+	{ nullptr,        Ill }, { "OUTB",    Imp }, { nullptr,         Ill }, { "OUTC",    Imp },
 
-	{ "CAL", Imp }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ "CAL", Imp }, { nullptr }, { nullptr }, { nullptr },  { nullptr }, { nullptr }, { nullptr }, { nullptr },
+	{ nullptr }, { nullptr }, { nullptr }, { nullptr },  { nullptr }, { nullptr }, { nullptr }, { nullptr },
 
-	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
+	{ nullptr }, { nullptr }, { nullptr }, { nullptr },  { nullptr }, { nullptr }, { nullptr }, { nullptr },
+	{ nullptr }, { nullptr }, { nullptr }, { nullptr },  { nullptr }, { nullptr }, { nullptr }, { nullptr },
 };
 
 CPU_DISASSEMBLE( sc61860 )

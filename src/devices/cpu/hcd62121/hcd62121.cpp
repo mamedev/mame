@@ -493,9 +493,9 @@ void hcd62121_cpu_device::device_reset()
 	m_f = 0;
 	m_dsize = 0;
 
-	for( int i = 0; i < 0x80; i++ )
+	for(auto & elem : m_reg)
 	{
-		m_reg[i] = 0;
+		elem = 0;
 	}
 }
 

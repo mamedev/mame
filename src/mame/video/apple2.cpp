@@ -101,7 +101,7 @@ inline void apple2_state::apple2_plot_text_character(bitmap_ind16 &bitmap, int x
 	const UINT8 *chardata;
 	UINT16 color;
 
-	if (m_sysconfig != NULL)
+	if (m_sysconfig != nullptr)
 	{
 		switch (m_sysconfig->read() & 0x03)
 		{
@@ -291,7 +291,7 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 	UINT16 *artifact_map_ptr;
 	int mon_type = 0;
 
-	if (m_sysconfig != NULL)
+	if (m_sysconfig != nullptr)
 	{
 		mon_type = m_sysconfig->read() & 0x03;
 	}
@@ -500,10 +500,10 @@ void apple2_state::apple2_video_start(const UINT8 *vram, const UINT8 *aux_vram, 
 	m_textgfx_datalen = memregion("gfx1")->bytes();
 
 	/* 2^3 dependent pixels * 2 color sets * 2 offsets */
-	m_hires_artifact_map = auto_alloc_array(machine(), UINT16, 8 * 2 * 2);
+	m_hires_artifact_map = std::make_unique<UINT16[]>(8 * 2 * 2);
 
 	/* 2^4 dependent pixels */
-	m_dhires_artifact_map = auto_alloc_array(machine(), UINT16, 16);
+	m_dhires_artifact_map = std::make_unique<UINT16[]>(16);
 
 	/* build hires artifact map */
 	for (i = 0; i < 8; i++)
@@ -704,7 +704,7 @@ void a2_video_device::device_start()
 	UINT16 c;
 
 	/* 2^3 dependent pixels * 2 color sets * 2 offsets */
-	m_hires_artifact_map = auto_alloc_array(machine(), UINT16, 8 * 2 * 2);
+	m_hires_artifact_map = std::make_unique<UINT16[]>(8 * 2 * 2);
 
 	/* build hires artifact map */
 	for (i = 0; i < 8; i++)
@@ -731,7 +731,7 @@ void a2_video_device::device_start()
 	}
 
 	/* 2^4 dependent pixels */
-	m_dhires_artifact_map = auto_alloc_array(machine(), UINT16, 16);
+	m_dhires_artifact_map = std::make_unique<UINT16[]>(16);
 
 	/* build double hires artifact map */
 	for (i = 0; i < 16; i++)
@@ -1283,7 +1283,7 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 			// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
 			if (m_dhires)
 			{
-				artifact_map_ptr = m_hires_artifact_map;
+				artifact_map_ptr = m_hires_artifact_map.get();
 			}
 			else
 			{

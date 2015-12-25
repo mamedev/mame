@@ -90,8 +90,8 @@ void tc0220ioc_device::device_reset()
 {
 	m_port = 0;
 
-	for (int i = 0; i < 8; i++)
-		m_regs[i] = 0;
+	for (auto & elem : m_regs)
+		elem = 0;
 }
 
 /*****************************************************************************
@@ -213,8 +213,8 @@ void tc0510nio_device::device_start()
 
 void tc0510nio_device::device_reset()
 {
-	for (int i = 0; i < 8; i++)
-		m_regs[i] = 0;
+	for (auto & elem : m_regs)
+		elem = 0;
 }
 
 /*****************************************************************************
@@ -340,8 +340,8 @@ void tc0640fio_device::device_start()
 
 void tc0640fio_device::device_reset()
 {
-	for (int i = 0; i < 8; i++)
-		m_regs[i] = 0;
+	for (auto & elem : m_regs)
+		elem = 0;
 }
 
 

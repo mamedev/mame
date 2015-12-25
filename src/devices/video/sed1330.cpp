@@ -143,7 +143,7 @@ sed1330_device::sed1330_device(const machine_config &mconfig, const char *tag, d
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_bf(0),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(sed1330))
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(sed1330))
 {
 }
 
@@ -220,7 +220,7 @@ void sed1330_device::device_reset()
 
 const address_space_config *sed1330_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 

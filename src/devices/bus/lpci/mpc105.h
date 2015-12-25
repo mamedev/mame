@@ -33,13 +33,13 @@ public:
 	static void static_set_cpu(device_t &device, const char *tag) { dynamic_cast<mpc105_device &>(device).m_cpu_tag = tag; }
 	static void static_set_bank_base_default(device_t &device, int bank_base_default) { dynamic_cast<mpc105_device &>(device).m_bank_base_default = bank_base_default; }
 
-	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask);
-	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask);
+	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask) override;
+	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask) override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void update_memory();
 

@@ -51,8 +51,8 @@ public:
 	DECLARE_WRITE16_MEMBER(lemmings_pixel_1_w);
 	DECLARE_WRITE16_MEMBER(lemmings_vram_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_lemmings(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_lemmings(screen_device &screen, bool state);
 	void lemmings_copy_bitmap(bitmap_rgb32& bitmap, bitmap_ind16& srcbitmap, int* xscroll, int* yscroll, const rectangle& cliprect);

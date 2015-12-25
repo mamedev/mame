@@ -23,9 +23,9 @@ public:
 
 	ui_menu_file_manager(running_machine &machine, render_container *container, const char *warnings);
 	virtual ~ui_menu_file_manager();
-	virtual void populate();
-	virtual void handle();
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
+	virtual void populate() override;
+	virtual void handle() override;
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 	void fill_image_line(device_image_interface *img, std::string &instance, std::string &filename);
 

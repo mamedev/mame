@@ -111,7 +111,7 @@ void iq151_disc2_device::read(offs_t offset, UINT8 &data)
 void iq151_disc2_device::io_read(offs_t offset, UINT8 &data)
 {
 	/* This is gross */
-	address_space *space = NULL;
+	address_space *space = nullptr;
 	if (offset == 0xaa)
 		data = m_fdc->msr_r(*space, 0, 0xff);
 	else if (offset == 0xab)
@@ -124,7 +124,7 @@ void iq151_disc2_device::io_read(offs_t offset, UINT8 &data)
 
 void iq151_disc2_device::io_write(offs_t offset, UINT8 data)
 {
-	address_space *space = NULL;
+	address_space *space = nullptr;
 	if (offset == 0xab)
 		m_fdc->fifo_w(*space, 0, data, 0xff);
 	else if (offset == 0xac)

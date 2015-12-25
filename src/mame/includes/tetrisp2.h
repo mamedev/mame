@@ -45,7 +45,7 @@ public:
 	required_shared_ptr<UINT16> m_scroll_fg;
 	required_shared_ptr<UINT16> m_scroll_bg;
 	required_shared_ptr<UINT16> m_rotregs;
-	UINT8 *m_priority;
+	std::unique_ptr<UINT8[]> m_priority;
 	optional_shared_ptr<UINT16> m_rocknms_sub_priority;
 	optional_shared_ptr<UINT16> m_rocknms_sub_vram_rot;
 	optional_shared_ptr<UINT16> m_rocknms_sub_vram_fg;

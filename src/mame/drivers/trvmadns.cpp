@@ -115,8 +115,8 @@ public:
 	DECLARE_WRITE8_MEMBER(w3);
 	DECLARE_WRITE8_MEMBER(trvmadns_tileram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_trvmadns(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -294,7 +294,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( trvmadns )
-	GFXDECODE_ENTRY( NULL, 0x6000, charlayout, 0, 4 ) // doesn't matter where we point this, all the tiles are decoded while the game runs
+	GFXDECODE_ENTRY( nullptr, 0x6000, charlayout, 0, 4 ) // doesn't matter where we point this, all the tiles are decoded while the game runs
 GFXDECODE_END
 
 TILE_GET_INFO_MEMBER(trvmadns_state::get_bg_tile_info)

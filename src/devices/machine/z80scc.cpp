@@ -154,8 +154,8 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 	m_out_txdrqb_cb(*this),
 	m_variant(variant),
 	m_wr0_ptrbits(0){
-	for (int i = 0; i < 6; i++)
-		m_int_state[i] = 0;
+	for (auto & elem : m_int_state)
+		elem = 0;
 }
 
 z80scc_device::z80scc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -184,8 +184,8 @@ z80scc_device::z80scc_device(const machine_config &mconfig, const char *tag, dev
 		m_out_txdrqb_cb(*this),
 		m_variant(TYPE_Z80SCC)
 {
-	for (int i = 0; i < 6; i++)
-		m_int_state[i] = 0;
+	for (auto & elem : m_int_state)
+		elem = 0;
 }
 
 scc8030_device::scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -379,9 +379,9 @@ void z80scc_device::reset_interrupts()
 {
 	LOG(("%s %s \n",FUNCNAME, tag()));
 	// reset internal interrupt sources
-	for (int i = 0; i < 6; i++)
+	for (auto & elem : m_int_state)
 	{
-		m_int_state[i] = 0;
+		elem = 0;
 	}
 
 	// check external interrupt sources
@@ -611,6 +611,53 @@ WRITE8_MEMBER( z80scc_device::ba_cd_w )
 		channel->control_write(data);
 	else
 		channel->data_write(data);
+}
+
+//-------------------------------------------------
+//  ba_cd_r - Universal Bus read
+//-------------------------------------------------
+
+READ8_MEMBER( z80scc_device::ba_cd_inv_r )
+{
+	int ba = BIT(offset, 1);
+	int cd = BIT(offset, 0);
+	z80scc_channel *channel = ba ? m_chanA : m_chanB;
+
+	/* Expell non-Universal Bus variants */
+	if ( !(m_variant & SET_Z85X3X) )
+	{
+		logerror("Z80SCC ba_cd_r not supported by this device variant, you should probably use combinations of c*_r/w and d*_r/w (see z80scc.h)\n");
+		return 0;
+	}
+
+	//    LOG(("z80scc_device::ba_cd_inv_r ba:%02x cd:%02x\n", ba, cd));
+	return cd ? channel->data_read() : channel->control_read();
+}
+
+
+//-------------------------------------------------
+//  ba_cd_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( z80scc_device::ba_cd_inv_w )
+{
+	int ba = BIT(offset, 1);
+	int cd = BIT(offset, 0);
+	z80scc_channel *channel = ba ? m_chanA : m_chanB;
+
+	/* Expell non-Universal Bus variants */
+	if ( !(m_variant & SET_Z85X3X) )
+	{
+		logerror("Z80SCC ba_cd_w not supported by this device variant, you should probably use combinations of c*_r/w and d*_r/w (see z80scc.h)\n");
+		return;
+	}
+
+	LOG(("z80scc_device::ba_cd_inv_w ba:%02x cd:%02x\n", ba, cd));
+
+	if (cd)
+		channel->data_write(data);
+	else
+		channel->control_write(data);
 }
 
 //**************************************************************************

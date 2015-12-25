@@ -112,9 +112,9 @@ UINT32 galaxia_state::screen_update_galaxia(screen_device &screen, bitmap_ind16 
 {
 	int x, y;
 
-	bitmap_ind16 *s2636_0_bitmap = &m_s2636_0->update(cliprect);
-	bitmap_ind16 *s2636_1_bitmap = &m_s2636_1->update(cliprect);
-	bitmap_ind16 *s2636_2_bitmap = &m_s2636_2->update(cliprect);
+	bitmap_ind16 const &s2636_0_bitmap = m_s2636_0->update(cliprect);
+	bitmap_ind16 const &s2636_1_bitmap = m_s2636_1->update(cliprect);
+	bitmap_ind16 const &s2636_2_bitmap = m_s2636_2->update(cliprect);
 
 	bitmap.fill(0, cliprect);
 	cvs_update_stars(bitmap, cliprect, STAR_PEN, 1);
@@ -139,9 +139,9 @@ UINT32 galaxia_state::screen_update_galaxia(screen_device &screen, bitmap_ind16 
 			}
 
 			// copy the S2636 images into the main bitmap and check collision
-			int pixel0 = s2636_0_bitmap->pix16(y, x);
-			int pixel1 = s2636_1_bitmap->pix16(y, x);
-			int pixel2 = s2636_2_bitmap->pix16(y, x);
+			int pixel0 = s2636_0_bitmap.pix16(y, x);
+			int pixel1 = s2636_1_bitmap.pix16(y, x);
+			int pixel2 = s2636_2_bitmap.pix16(y, x);
 
 			int pixel = pixel0 | pixel1 | pixel2;
 
@@ -178,7 +178,7 @@ UINT32 galaxia_state::screen_update_astrowar(screen_device &screen, bitmap_ind16
 	// astrowar has only one S2636
 	int x, y;
 
-	bitmap_ind16 &s2636_0_bitmap = m_s2636_0->update(cliprect);
+	bitmap_ind16 const &s2636_0_bitmap = m_s2636_0->update(cliprect);
 
 	bitmap.fill(0, cliprect);
 	cvs_update_stars(bitmap, cliprect, STAR_PEN, 1);

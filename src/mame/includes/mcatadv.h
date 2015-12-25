@@ -23,9 +23,9 @@ public:
 	required_shared_ptr<UINT16> m_scroll1;
 	required_shared_ptr<UINT16> m_scroll2;
 	required_shared_ptr<UINT16> m_spriteram;
-	UINT16 *     m_spriteram_old;
+	std::unique_ptr<UINT16[]>     m_spriteram_old;
 	required_shared_ptr<UINT16> m_vidregs;
-	UINT16 *     m_vidregs_old;
+	std::unique_ptr<UINT16[]>     m_vidregs_old;
 
 	/* video-related */
 	tilemap_t    *m_tilemap1;
@@ -47,8 +47,8 @@ public:
 	DECLARE_WRITE16_MEMBER(mcatadv_videoram2_w);
 	TILE_GET_INFO_MEMBER(get_mcatadv_tile_info1);
 	TILE_GET_INFO_MEMBER(get_mcatadv_tile_info2);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_mcatadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_mcatadv(screen_device &screen, bool state);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );

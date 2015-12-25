@@ -188,7 +188,7 @@ MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_p_ram = memregion("maincpu")->base();
 
-	m_ram_0000 = NULL;
+	m_ram_0000 = nullptr;
 	space.install_read_bank(0x0000, 0x3fff, "bank1");
 	space.install_write_handler(0x0000, 0x3fff, write8_delegate(FUNC(scorpion_state::scorpion_0000_w),this));
 

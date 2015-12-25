@@ -1486,7 +1486,7 @@ WRITE16_MEMBER( sega_segacd_device::segacd_trace_vector_base_address_w )
 
 		int line;
 		//bitmap_ind16 *srcbitmap = segacd_stampmap[segacd_get_active_stampmap_tilemap(->pixmap()]);
-		bitmap_ind16 *srcbitmap = 0;
+		bitmap_ind16 *srcbitmap = nullptr;
 		UINT32 bufferstart = ((segacd_imagebuffer_start_address&0xfff8)*2)<<3;
 
 		for (line=0;line<segacd_imagebuffer_vdot_size;line++)
@@ -1847,7 +1847,7 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UIN
 		}
 		else if (destination==DMA_PCM)
 		{
-			dest = 0;//fatalerror("PCM RAM DMA unimplemented!\n");
+			dest = nullptr;//fatalerror("PCM RAM DMA unimplemented!\n");
 		}
 		else
 		{

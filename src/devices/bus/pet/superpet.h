@@ -31,9 +31,9 @@ public:
 	superpet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -41,15 +41,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_pet_expansion_card_interface overrides
-	virtual int pet_norom_r(address_space &space, offs_t offset, int sel);
-	virtual UINT8 pet_bd_r(address_space &space, offs_t offset, UINT8 data, int &sel);
-	virtual void pet_bd_w(address_space &space, offs_t offset, UINT8 data, int &sel);
-	virtual int pet_diag_r();
-	virtual void pet_irq_w(int state);
+	virtual int pet_norom_r(address_space &space, offs_t offset, int sel) override;
+	virtual UINT8 pet_bd_r(address_space &space, offs_t offset, UINT8 data, int &sel) override;
+	virtual void pet_bd_w(address_space &space, offs_t offset, UINT8 data, int &sel) override;
+	virtual int pet_diag_r() override;
+	virtual void pet_irq_w(int state) override;
 
 private:
 	required_device<cpu_device> m_maincpu;

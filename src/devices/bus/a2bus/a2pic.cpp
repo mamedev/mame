@@ -131,7 +131,7 @@ void a2bus_pic_device::device_start()
 
 	m_rom = device().machine().root_device().memregion(this->subtag(PIC_ROM_REGION).c_str())->base();
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(attotime::never);
 
 	save_item(NAME(m_ack));

@@ -58,7 +58,7 @@ protected:
 	required_shared_ptr<UINT8> m_p_ram;
 
 	// driver_device overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 private:
 	UINT8 m_t_c;
 	UINT8 m_out_offs;

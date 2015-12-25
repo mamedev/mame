@@ -1331,7 +1331,7 @@ TGP_FUNCTION( model1_state::vmat_save )
 	int i;
 	logerror("TGP vmat_save 0x%x (%x)\n", a, m_pushpc);
 	for(i=0; i<16; i++)
-		memcpy(m_ram_data+a+0x10*i, m_mat_vector[i], sizeof(m_cmat));
+		memcpy(m_ram_data.get()+a+0x10*i, m_mat_vector[i], sizeof(m_cmat));
 	next_fn();
 }
 
@@ -1341,7 +1341,7 @@ TGP_FUNCTION( model1_state::vmat_load )
 	int i;
 	logerror("TGP vmat_load 0x%x (%x)\n", a, m_pushpc);
 	for(i=0; i<16; i++)
-		memcpy(m_mat_vector[i], m_ram_data+a+0x10*i, sizeof(m_cmat));
+		memcpy(m_mat_vector[i], m_ram_data.get()+a+0x10*i, sizeof(m_cmat));
 	next_fn();
 }
 
@@ -1449,7 +1449,7 @@ TGP_FUNCTION( model1_state::vmat_load1 )
 {
 	UINT32 a = fifoin_pop();
 	logerror("TGP vmat_load1 0x%x (%x)\n", a, m_pushpc);
-	memcpy(m_cmat, m_ram_data+a, sizeof(m_cmat));
+	memcpy(m_cmat, m_ram_data.get()+a, sizeof(m_cmat));
 	next_fn();
 }
 
@@ -1586,15 +1586,15 @@ const struct model1_state::function model1_state::ftab_vf[] = {
 	{ &model1_state::fsub,            2 },
 	{ &model1_state::fmul,            2 },
 	{ &model1_state::fdiv,            2 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::matrix_push,     0 },
 	{ &model1_state::matrix_pop,      0 },
 	{ &model1_state::matrix_write,   12 },
 	{ &model1_state::clear_stack,     0 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::anglev,          2 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::track_select,    1 },
 	{ &model1_state::f14,             4 },
 	{ &model1_state::anglep,          4 },
@@ -1606,9 +1606,9 @@ const struct model1_state::function model1_state::ftab_vf[] = {
 	{ &model1_state::matrix_rotx,     1 },
 	{ &model1_state::matrix_roty,     1 },
 	{ &model1_state::matrix_rotz,     1 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::track_read_quad, 1 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::transform_point, 3 },
 	{ &model1_state::fsin_m1,         1 },
 	{ &model1_state::fcos_m1,         1 },
@@ -1616,10 +1616,10 @@ const struct model1_state::function model1_state::ftab_vf[] = {
 	{ &model1_state::fcosm_m1,        2 },
 	{ &model1_state::distance3,       6 },
 
-	{ NULL,                           0 },  /* 0x20 */
-	{ NULL,                           0 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },  /* 0x20 */
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::acc_set,         1 },
 	{ &model1_state::acc_get,         0 },
 	{ &model1_state::acc_add,         1 },
@@ -1631,54 +1631,54 @@ const struct model1_state::function model1_state::ftab_vf[] = {
 	{ &model1_state::f44,             1 },
 	{ &model1_state::f45,             1 },
 	{ &model1_state::vlength,         3 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
 
 	{ &model1_state::track_read_info, 1 },  /* 0x30 */
 	{ &model1_state::colbox_set,     12 },
 	{ &model1_state::colbox_test,     3 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::track_lookup,    4 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
 
 	{ &model1_state::col_setcirc,     3 },  /* 0x40 */
 	{ &model1_state::col_testpt,      2 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::distance,        4 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::car_move,        4 },
 	{ &model1_state::cpa,            12 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::vmat_store,      1 },
 	{ &model1_state::vmat_restore,    1 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::vmat_mul,        2 },
 	{ &model1_state::vmat_read,       1 },
 	{ &model1_state::matrix_unrot,    0 },
 
 	{ &model1_state::f80,             0 },  /* 0x50 */
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::matrix_rtrans,   0 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::vmat_save,       1 },
 	{ &model1_state::vmat_load,       1 },
 	{ &model1_state::ram_setadr,      1 },
 	{ &model1_state::groundbox_test,  3 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::f89,             4 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::f92,             4 },
 	{ &model1_state::f93,             1 },
 	{ &model1_state::f94,             1 },
@@ -1704,7 +1704,7 @@ const struct model1_state::function model1_state::ftab_swa[] = {
 	{ &model1_state::fsub,            2 },
 	{ &model1_state::fmul,            2 },
 	{ &model1_state::fdiv,            2 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::matrix_push,     0 },
 	{ &model1_state::matrix_pop,      0 },
 	{ &model1_state::matrix_write,   12 },
@@ -1724,9 +1724,9 @@ const struct model1_state::function model1_state::ftab_swa[] = {
 	{ &model1_state::matrix_rotx,     1 },
 	{ &model1_state::matrix_roty,     1 },
 	{ &model1_state::matrix_rotz,     1 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::f24_swa,         7 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::transform_point, 3 },
 	{ &model1_state::fsin_m1,         1 },
 	{ &model1_state::fcos_m1,         1 },
@@ -1734,8 +1734,8 @@ const struct model1_state::function model1_state::ftab_swa[] = {
 	{ &model1_state::fcosm_m1,        2 },
 	{ &model1_state::distance3,       6 },
 
-	{ NULL,                           0 }, /* 0x20 */
-	{ NULL,                           0 },
+	{ nullptr,                           0 }, /* 0x20 */
+	{ nullptr,                           0 },
 	{ &model1_state::ftoi,            1 },
 	{ &model1_state::itof,            1 },
 	{ &model1_state::acc_set,         1 },
@@ -1751,26 +1751,26 @@ const struct model1_state::function model1_state::ftab_swa[] = {
 	{ &model1_state::vlength,         3 },
 	{ &model1_state::f47,             3 },
 
-	{ NULL,                           0 }, /* 0x30 */
+	{ nullptr,                           0 }, /* 0x30 */
 	{ &model1_state::f49_swa,         6 },
 	{ &model1_state::f50_swa,         4 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::f52,             0 },
 	{ &model1_state::matrix_rdir,     3 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::f56,             7 },
 	{ &model1_state::f57,             0 },
 	{ &model1_state::matrix_readt,    0 },
 	{ &model1_state::acc_geti,        0 },
 	{ &model1_state::f60,             0 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
+	{ nullptr,                           0 },
 
 	{ &model1_state::push_and_ident,  0 }, /* 0x40 */
-	{ NULL,                           0 },
+	{ nullptr,                           0 },
 	{ &model1_state::catmull_rom,    13 }
 };
 
@@ -1792,7 +1792,7 @@ TGP_FUNCTION( model1_state::function_get_vf )
 			count += FIFO_SIZE;
 		logerror("TGP function called with sizeout = %d\n", count);
 	}
-	if(ARRAY_LENGTH(ftab_vf) > f && NULL != ftab_vf[f].cb) {
+	if(ARRAY_LENGTH(ftab_vf) > f && nullptr != ftab_vf[f].cb) {
 		m_fifoin_cbcount = ftab_vf[f].count;
 		m_fifoin_cb = model1_state::ftab_vf[f].cb;
 		//      logerror("TGP function %d request, %d parameters\n", f, m_fifoin_cbcount);
@@ -1815,7 +1815,7 @@ TGP_FUNCTION( model1_state::function_get_swa )
 			count += FIFO_SIZE;
 		logerror("TGP function called with sizeout = %d\n", count);
 	}
-	if(ARRAY_LENGTH(ftab_swa) > f && NULL != ftab_swa[f].cb) {
+	if(ARRAY_LENGTH(ftab_swa) > f && nullptr != ftab_swa[f].cb) {
 		m_fifoin_cbcount = ftab_swa[f].count;
 		m_fifoin_cb = model1_state::ftab_swa[f].cb;
 		//      logerror("TGP function %d request, %d parameters\n", f, m_fifoin_cbcount);
@@ -1879,9 +1879,9 @@ WRITE16_MEMBER(model1_state::model1_tgp_copro_ram_w)
 
 MACHINE_START_MEMBER(model1_state,model1)
 {
-	m_ram_data = auto_alloc_array(machine(), UINT32, 0x10000);
+	m_ram_data = std::make_unique<UINT32[]>(0x10000);
 
-	save_pointer(NAME(m_ram_data), 0x10000);
+	save_pointer(NAME(m_ram_data.get()), 0x10000);
 	save_item(NAME(m_ram_adr));
 	save_item(NAME(m_ram_scanadr));
 	save_item(NAME(m_ram_latch));
@@ -1902,7 +1902,7 @@ MACHINE_START_MEMBER(model1_state,model1)
 void model1_state::tgp_reset(int swa)
 {
 	m_ram_adr = 0;
-	memset(m_ram_data, 0, 0x10000*4);
+	memset(m_ram_data.get(), 0, 0x10000*4);
 
 	m_fifoout_rpos = 0;
 	m_fifoout_wpos = 0;
@@ -1927,7 +1927,7 @@ void model1_state::tgp_reset(int swa)
 void model1_state::vr_tgp_reset()
 {
 	m_ram_adr = 0;
-	memset(m_ram_data, 0, 0x8000*4);
+	memset(m_ram_data.get(), 0, 0x8000*4);
 
 	m_copro_fifoout_rpos = 0;
 	m_copro_fifoout_wpos = 0;

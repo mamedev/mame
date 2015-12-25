@@ -17,10 +17,10 @@ public:
 	a800_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx);
+	virtual DECLARE_READ8_MEMBER(read_80xx) override;
 };
 
 
@@ -33,11 +33,11 @@ public:
 	a800_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx);
-	virtual DECLARE_WRITE8_MEMBER(write_80xx);
+	virtual DECLARE_READ8_MEMBER(read_80xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_80xx) override;
 
 protected:
 	int m_banks[2];
@@ -53,11 +53,11 @@ public:
 	a800_rom_williams_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx);
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+	virtual DECLARE_READ8_MEMBER(read_80xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
 
 protected:
 	int m_bank;
@@ -73,11 +73,11 @@ public:
 	a800_rom_express_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx);
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+	virtual DECLARE_READ8_MEMBER(read_80xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
 
 protected:
 	int m_bank;
@@ -93,10 +93,10 @@ public:
 	a800_rom_blizzard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx);
+	virtual DECLARE_READ8_MEMBER(read_80xx) override;
 };
 
 
@@ -109,11 +109,11 @@ public:
 	a800_rom_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx);
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+	virtual DECLARE_READ8_MEMBER(read_80xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
 
 protected:
 	int m_bank;
@@ -128,10 +128,10 @@ public:
 	// construction/destruction
 	a800_rom_telelink2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ8_MEMBER(read_80xx);
-	virtual DECLARE_WRITE8_MEMBER(write_80xx);
-	virtual DECLARE_READ8_MEMBER(read_d5xx);
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+	virtual DECLARE_READ8_MEMBER(read_80xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_80xx) override;
+	virtual DECLARE_READ8_MEMBER(read_d5xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
 };
 
 
@@ -144,11 +144,11 @@ public:
 	a800_rom_microcalc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx);
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+	virtual DECLARE_READ8_MEMBER(read_80xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
 
 protected:
 	int m_bank;
@@ -164,11 +164,11 @@ public:
 	xegs_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx);
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+	virtual DECLARE_READ8_MEMBER(read_80xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
 
 protected:
 	int m_bank;
@@ -183,7 +183,7 @@ public:
 	// construction/destruction
 	a5200_rom_2chips_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual DECLARE_READ8_MEMBER(read_80xx);
+	virtual DECLARE_READ8_MEMBER(read_80xx) override;
 };
 
 
@@ -196,11 +196,11 @@ public:
 	a5200_rom_bbsb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx);
-	virtual DECLARE_WRITE8_MEMBER(write_80xx);
+	virtual DECLARE_READ8_MEMBER(read_80xx) override;
+	virtual DECLARE_WRITE8_MEMBER(write_80xx) override;
 
 protected:
 	int m_banks[2];

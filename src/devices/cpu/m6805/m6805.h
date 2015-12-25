@@ -30,28 +30,28 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual UINT32 execute_input_lines() const;
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state) = 0;
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const;
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const;
+	virtual UINT32 execute_min_cycles() const override;
+	virtual UINT32 execute_max_cycles() const override;
+	virtual UINT32 execute_input_lines() const override;
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override = 0;
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const override;
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override;
+	virtual UINT32 disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
 
 private:
 	// opcode/condition tables
@@ -298,7 +298,7 @@ public:
 		: m6805_base_device(mconfig, tag, owner, clock, M6805, "M6805", 12, "m6805", __FILE__) { }
 
 protected:
-	virtual void execute_set_input(int inputnum, int state);
+	virtual void execute_set_input(int inputnum, int state) override;
 };
 
 // ======================> m68hc05eg_device
@@ -312,11 +312,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 
-	virtual void execute_set_input(int inputnum, int state);
+	virtual void execute_set_input(int inputnum, int state) override;
 
-	virtual void interrupt_vector();
+	virtual void interrupt_vector() override;
 };
 
 // ======================> m68705_device
@@ -330,11 +330,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 
-	virtual void execute_set_input(int inputnum, int state);
+	virtual void execute_set_input(int inputnum, int state) override;
 
-	virtual void interrupt();
+	virtual void interrupt() override;
 };
 
 // ======================> hd63705_device
@@ -348,16 +348,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset();
+	virtual void device_reset() override;
 
-	virtual void execute_set_input(int inputnum, int state);
+	virtual void execute_set_input(int inputnum, int state) override;
 
-	virtual void interrupt_vector();
+	virtual void interrupt_vector() override;
 
 	// opcodes
-	virtual void bil();
-	virtual void bih();
-	virtual void swi();
+	virtual void bil() override;
+	virtual void bih() override;
+	virtual void swi() override;
 };
 
 enum { M6805_PC=1, M6805_S, M6805_CC, M6805_A, M6805_X, M6805_IRQ_STATE };

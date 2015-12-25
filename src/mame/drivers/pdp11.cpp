@@ -112,7 +112,7 @@ public:
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 m_teletype_data;
 	UINT16 m_teletype_status;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(pdp11ub2);
 	DECLARE_MACHINE_RESET(pdp11qb);
 	void load9312prom(UINT8 *desc, UINT8 *src, int size);

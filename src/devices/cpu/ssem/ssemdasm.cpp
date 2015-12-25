@@ -19,7 +19,7 @@ static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
 	va_end(vl);
 }
 
-INLINE UINT32 reverse(UINT32 v)
+static inline UINT32 reverse(UINT32 v)
 {
 	// Taken from http://www-graphics.stanford.edu/~seander/bithacks.html#ReverseParallel
 	// swap odd and even bits

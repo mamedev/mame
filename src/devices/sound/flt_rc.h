@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Derrick Renaud, Couriersud
 #pragma once
 
@@ -80,10 +80,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	void recalc();

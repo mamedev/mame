@@ -104,7 +104,7 @@ static file_error osd_or_zlib_write(core_file *file, const void *buffer, UINT64 
     works for most platforms
 -------------------------------------------------*/
 
-INLINE int is_directory_separator(char c)
+static inline int is_directory_separator(char c)
 {
 	return (c == '\\' || c == '/' || c == ':');
 }
@@ -126,7 +126,7 @@ file_error core_fopen(const char *filename, UINT32 openflags, core_file **file)
 
 	/* allocate the file itself */
 	*file = (core_file *)malloc(sizeof(**file));
-	if (*file == NULL)
+	if (*file == nullptr)
 		return FILERR_OUT_OF_MEMORY;
 	memset(*file, 0, sizeof(**file));
 
@@ -138,7 +138,7 @@ file_error core_fopen(const char *filename, UINT32 openflags, core_file **file)
 	if (filerr != FILERR_NONE)
 	{
 		core_fclose(*file);
-		*file = NULL;
+		*file = nullptr;
 	}
 	return filerr;
 }
@@ -160,7 +160,7 @@ static file_error core_fopen_ram_internal(const void *data, size_t length, int c
 
 	/* allocate the file itself */
 	*file = (core_file *)malloc(sizeof(**file) + (copy_buffer ? length : 0));
-	if (*file == NULL)
+	if (*file == nullptr)
 		return FILERR_OUT_OF_MEMORY;
 	memset(*file, 0, sizeof(**file));
 
@@ -210,11 +210,11 @@ file_error core_fopen_ram_copy(const void *data, size_t length, UINT32 openflags
 void core_fclose(core_file *file)
 {
 	/* close files and free memory */
-	if (file->zdata != NULL)
+	if (file->zdata != nullptr)
 		core_fcompress(file, FCOMPRESS_NONE);
-	if (file->file != NULL)
+	if (file->file != nullptr)
 		osd_close(file->file);
-	if (file->data != NULL && file->data_allocated)
+	if (file->data != nullptr && file->data_allocated)
 		free(file->data);
 	free(file);
 }
@@ -235,7 +235,7 @@ file_error core_fcompress(core_file *file, int level)
 		return FILERR_INVALID_ACCESS;
 
 	/* if we have been compressing, flush and free the data */
-	if (file->zdata != NULL && level == FCOMPRESS_NONE)
+	if (file->zdata != nullptr && level == FCOMPRESS_NONE)
 	{
 		int zerr = Z_OK;
 
@@ -273,17 +273,17 @@ file_error core_fcompress(core_file *file, int level)
 
 		/* free memory */
 		free(file->zdata);
-		file->zdata = NULL;
+		file->zdata = nullptr;
 	}
 
 	/* if we are just starting to compress, allocate a new buffer */
-	if (file->zdata == NULL && level > FCOMPRESS_NONE)
+	if (file->zdata == nullptr && level > FCOMPRESS_NONE)
 	{
 		int zerr;
 
 		/* allocate memory */
 		file->zdata = (zlib_data *)malloc(sizeof(*file->zdata));
-		if (file->zdata == NULL)
+		if (file->zdata == nullptr)
 			return FILERR_OUT_OF_MEMORY;
 		memset(file->zdata, 0, sizeof(*file->zdata));
 
@@ -301,7 +301,7 @@ file_error core_fcompress(core_file *file, int level)
 		if (zerr != Z_OK)
 		{
 			free(file->zdata);
-			file->zdata = NULL;
+			file->zdata = nullptr;
 			return FILERR_OUT_OF_MEMORY;
 		}
 
@@ -331,7 +331,7 @@ int core_fseek(core_file *file, INT64 offset, int whence)
 	int err = 0;
 
 	/* error if compressing */
-	if (file->zdata != NULL)
+	if (file->zdata != nullptr)
 		return 1;
 
 	/* flush any buffered char */
@@ -412,7 +412,7 @@ UINT32 core_fread(core_file *file, void *buffer, UINT32 length)
 	file->back_char_tail = 0;
 
 	/* handle real files */
-	if (file->file && file->data == NULL)
+	if (file->file && file->data == nullptr)
 	{
 		/* if we're within the buffer, consume that first */
 		if (file->offset >= file->bufferbase && file->offset < file->bufferbase + file->bufferbytes)
@@ -638,7 +638,7 @@ char *core_fgets(char *s, int n, core_file *file)
 
 	/* if we put nothing in, return NULL */
 	if (cur == s)
-		return NULL;
+		return nullptr;
 
 	/* otherwise, terminate */
 	if (n > 0)
@@ -659,13 +659,13 @@ const void *core_fbuffer(core_file *file)
 	UINT32 read_length;
 
 	/* if we already have data, just return it */
-	if (file->data != NULL || !file->length)
+	if (file->data != nullptr || !file->length)
 		return file->data;
 
 	/* allocate some memory */
 	file->data = (UINT8 *)malloc(file->length);
-	if (file->data == NULL)
-		return NULL;
+	if (file->data == nullptr)
+		return nullptr;
 	file->data_allocated = TRUE;
 
 	/* read the file */
@@ -673,13 +673,13 @@ const void *core_fbuffer(core_file *file)
 	if (filerr != FILERR_NONE || read_length != file->length)
 	{
 		free(file->data);
-		file->data = NULL;
-		return NULL;
+		file->data = nullptr;
+		return nullptr;
 	}
 
 	/* close the file because we don't need it anymore */
 	osd_close(file->file);
-	file->file = NULL;
+	file->file = nullptr;
 	return file->data;
 }
 
@@ -692,7 +692,7 @@ const void *core_fbuffer(core_file *file)
 
 file_error core_fload(const char *filename, void **data, UINT32 *length)
 {
-	core_file *file = NULL;
+	core_file *file = nullptr;
 	file_error err;
 	UINT64 size;
 
@@ -711,7 +711,7 @@ file_error core_fload(const char *filename, void **data, UINT32 *length)
 
 	/* allocate memory */
 	*data = osd_malloc(size);
-	if (length != NULL)
+	if (length != nullptr)
 		*length = (UINT32)size;
 
 	/* read the data */
@@ -729,7 +729,7 @@ file_error core_fload(const char *filename, void **data, UINT32 *length)
 
 file_error core_fload(const char *filename, dynamic_buffer &data)
 {
-	core_file *file = NULL;
+	core_file *file = nullptr;
 	file_error err;
 	UINT64 size;
 
@@ -777,7 +777,7 @@ UINT32 core_fwrite(core_file *file, const void *buffer, UINT32 length)
 	UINT32 bytes_written = 0;
 
 	/* can't write to RAM-based stuff */
-	if (file->data != NULL)
+	if (file->data != nullptr)
 		return 0;
 
 	/* flush any buffered char */
@@ -978,7 +978,7 @@ static UINT32 safe_buffer_copy(const void *source, UINT32 sourceoffs, UINT32 sou
 static file_error osd_or_zlib_read(core_file *file, void *buffer, UINT64 offset, UINT32 length, UINT32 *actual)
 {
 	/* if no compression, just pass through */
-	if (file->zdata == NULL)
+	if (file->zdata == nullptr)
 		return osd_read(file->file, buffer, offset, length, actual);
 
 	/* if the offset doesn't match the next offset, fail */
@@ -1045,7 +1045,7 @@ static file_error osd_or_zlib_read(core_file *file, void *buffer, UINT64 offset,
 static file_error osd_or_zlib_write(core_file *file, const void *buffer, UINT64 offset, UINT32 length, UINT32 *actual)
 {
 	/* if no compression, just pass through */
-	if (file->zdata == NULL)
+	if (file->zdata == nullptr)
 		return osd_write(file->file, buffer, offset, length, actual);
 
 	/* if the offset doesn't match the next offset, fail */

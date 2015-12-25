@@ -24,8 +24,8 @@ public:
 	}
 
 private:
-	void device_start(void);
-	void device_reset(void);
+	void device_start(void) override;
+	void device_reset(void) override;
 	void set_interrupt_line();
 
 	int     read_id(int unit, int head, int *cylinder_id, int *sector_id);

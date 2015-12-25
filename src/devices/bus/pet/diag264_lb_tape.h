@@ -31,13 +31,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_pet_datassette_port_interface overrides
-	virtual int datassette_read();
-	virtual void datassette_write(int state);
-	virtual int datassette_sense();
-	virtual void datassette_motor(int state);
+	virtual int datassette_read() override;
+	virtual void datassette_write(int state) override;
+	virtual int datassette_sense() override;
+	virtual void datassette_motor(int state) override;
 
 private:
 	int m_read;

@@ -25,9 +25,9 @@ const device_type CPS3 = &device_creator<cps3_sound_device>;
 cps3_sound_device::cps3_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CPS3, "CPS3 Audio Custom", tag, owner, clock, "cps3_custom", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_key(0),
-		m_base(NULL)
+		m_base(nullptr)
 {
 }
 

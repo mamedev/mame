@@ -92,9 +92,9 @@ public:
 
 	INTERRUPT_GEN_MEMBER(seabattl_interrupt);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(seabattl);
 	UINT32 screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	bool m_waveenable;
@@ -190,7 +190,7 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	bitmap_ind16 &s2636_0_bitmap = m_s2636->update(cliprect);
+	bitmap_ind16 const &s2636_0_bitmap = m_s2636->update(cliprect);
 
 	// collisions
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -261,7 +261,7 @@ static ADDRESS_MAP_START( seabattl_map, AS_PROGRAM, 8, seabattl_state )
 	AM_RANGE(0x1e06, 0x1e06) AM_MIRROR(0x20f0) AM_READ_PORT("DIPS1") AM_WRITE(sound_w)
 	AM_RANGE(0x1e07, 0x1e07) AM_MIRROR(0x20f0) AM_READ_PORT("DIPS0") AM_WRITE(sound2_w)
 	AM_RANGE(0x1fcc, 0x1fcc) AM_MIRROR(0x2000) AM_READ_PORT("IN1")
-	AM_RANGE(0x1f00, 0x1fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("s2636", s2636_device, work_ram_r, work_ram_w)
+	AM_RANGE(0x1f00, 0x1fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("s2636", s2636_device, read_data, write_data)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( seabattl_io_map, AS_IO, 8, seabattl_state )
@@ -483,8 +483,7 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seabattl_state, seabattl_interrupt)
 
 	MCFG_DEVICE_ADD("s2636", S2636, 0)
-	MCFG_S2636_WORKRAM_SIZE(0x100)
-	MCFG_S2636_OFFSETS(3, -21)
+	MCFG_S2636_OFFSETS(-13, -29)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_DEVICE_ADD("sc_thousand", DM9368, 0)

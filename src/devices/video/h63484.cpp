@@ -45,7 +45,7 @@ h63484_device::h63484_device(const machine_config &mconfig, const char *tag, dev
 	m_cl0(0),
 	m_cl1(0), m_ccmp(0), m_mask(0), m_cpx(0),
 	m_dcr(0),
-	m_space_config("videoram", ENDIANNESS_BIG, 16, 20, -1, NULL, *ADDRESS_MAP_NAME(h63484_vram))
+	m_space_config("videoram", ENDIANNESS_BIG, 16, 20, -1, nullptr, *ADDRESS_MAP_NAME(h63484_vram))
 {
 }
 
@@ -349,7 +349,7 @@ ROM_END
 
 const address_space_config *h63484_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 

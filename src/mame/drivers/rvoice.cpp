@@ -85,7 +85,7 @@ public:
 	DECLARE_READ8_MEMBER(main_hd63701_internal_registers_r);
 	DECLARE_WRITE8_MEMBER(main_hd63701_internal_registers_w);
 	DECLARE_DRIVER_INIT(rvoicepc);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(null_kbd_put);
 	required_device<cpu_device> m_maincpu;
 };

@@ -6,7 +6,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
+static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -108,7 +108,7 @@ void psxcd_device::device_start()
 
 	m_sysclock = sysclk;
 
-	res_queue = NULL;
+	res_queue = nullptr;
 	rdp = 0;
 	status=status_shellopen;
 	mode=0;
@@ -171,7 +171,7 @@ void psxcd_device::device_reset()
 	}
 	open = true;
 	if(m_cdrom_handle)
-		add_system_event(event_change_disk, m_sysclock, NULL);
+		add_system_event(event_change_disk, m_sysclock, nullptr);
 
 	while(res_queue)
 	{
@@ -188,7 +188,7 @@ void psxcd_device::device_reset()
 	m_cursec = 0;
 	m_mute = false;
 	m_dmaload = false;
-	m_int1 = NULL;
+	m_int1 = nullptr;
 	curpos.w = 0;
 }
 
@@ -197,7 +197,7 @@ bool psxcd_device::call_load()
 	bool ret = cdrom_image_device::call_load();
 	open = true;
 	if(ret == IMAGE_INIT_PASS)
-		add_system_event(event_change_disk, m_sysclock, NULL); // 1 sec to spin up the disk
+		add_system_event(event_change_disk, m_sysclock, nullptr); // 1 sec to spin up the disk
 	return ret;
 }
 
@@ -361,7 +361,7 @@ WRITE8_MEMBER( psxcd_device::write )
 				{
 					command_result *res = res_queue;
 					if(res == m_int1)
-						m_int1 = NULL;
+						m_int1 = nullptr;
 
 					res_queue = res->next;
 					global_free(res);
@@ -508,7 +508,7 @@ void psxcd_device::cdcmd_readn()
 		start_read();
 	} else
 	{
-		send_result(intr_diskerror, NULL, 0, 0x80);
+		send_result(intr_diskerror, nullptr, 0, 0x80);
 	}
 }
 
@@ -671,7 +671,7 @@ void psxcd_device::cdcmd_gettn()
 	}
 	else
 	{
-		send_result(intr_diskerror, NULL, 0, 0x80);
+		send_result(intr_diskerror, nullptr, 0, 0x80);
 	}
 }
 
@@ -700,7 +700,7 @@ void psxcd_device::cdcmd_gettd()
 	}
 	else
 	{
-		send_result(intr_diskerror, NULL, 0, 0x80);
+		send_result(intr_diskerror, nullptr, 0, 0x80);
 	}
 }
 
@@ -744,7 +744,7 @@ void psxcd_device::cdcmd_test()
 
 		default:
 			verboselog(*this, 0, "psxcd: unimplemented test cmd %02x\n", cmdbuf[0]);
-			cmd_complete(prepare_result(intr_diskerror, NULL, 0, 0x10));
+			cmd_complete(prepare_result(intr_diskerror, nullptr, 0, 0x10));
 			break;
 	}
 }
@@ -779,7 +779,7 @@ void psxcd_device::cdcmd_id()
 	}
 	else
 	{
-		send_result(intr_diskerror, NULL, 0, 0x80);
+		send_result(intr_diskerror, nullptr, 0, 0x80);
 	}
 }
 
@@ -795,7 +795,7 @@ void psxcd_device::cdcmd_reads()
 		start_read();
 	} else
 	{
-		send_result(intr_diskerror, NULL, 0, 0x80);
+		send_result(intr_diskerror, nullptr, 0, 0x80);
 	}
 }
 
@@ -809,7 +809,7 @@ void psxcd_device::cdcmd_readtoc()
 	verboselog(*this, 1, "psxcd: readtoc\n");
 
 	send_result(intr_complete);
-	send_result(intr_acknowledge, NULL, 0, default_irq_delay*3); // ?
+	send_result(intr_acknowledge, nullptr, 0, default_irq_delay*3); // ?
 }
 
 void psxcd_device::cdcmd_unknown12()
@@ -819,7 +819,7 @@ void psxcd_device::cdcmd_unknown12()
 	if(cmdbuf[0] == 1)
 		send_result(intr_complete);
 	else
-		send_result(intr_diskerror, NULL, 0, 0x40);
+		send_result(intr_diskerror, nullptr, 0, 0x40);
 }
 
 void psxcd_device::cdcmd_illegal17()
@@ -841,7 +841,7 @@ void psxcd_device::illegalcmd(UINT8 cmd)
 {
 	verboselog(*this, 0, "psxcd: unimplemented cd command %02x\n", cmd);
 
-	send_result(intr_diskerror, NULL, 0, 0x40);
+	send_result(intr_diskerror, nullptr, 0, 0x40);
 }
 
 void psxcd_device::cmd_complete(command_result *res)
@@ -863,12 +863,12 @@ void psxcd_device::cmd_complete(command_result *res)
 			m_irq_handler(1);
 		m_regs.sr |= 0x20;
 	}
-	res->next = NULL;
+	res->next = nullptr;
 }
 
 psxcd_device::command_result *psxcd_device::prepare_result(UINT8 res, UINT8 *data, int sz, UINT8 errcode)
 {
-	command_result *cr=global_alloc(command_result);
+	auto cr=global_alloc(command_result);
 
 	cr->res=res;
 	if (sz)
@@ -1008,7 +1008,7 @@ void psxcd_device::read_sector()
 
 			next_sector_t+=cyc;
 
-			next_read_event = add_system_event(event_read_sector, cyc, NULL);
+			next_read_event = add_system_event(event_read_sector, cyc, nullptr);
 		} else
 		{
 			verboselog(*this, 1, "psxcd: autopause xa\n");
@@ -1073,7 +1073,7 @@ void psxcd_device::play_sector()
 
 		if ((mode&mode_report) && !(sector & 15)) // slow the int rate
 		{
-			command_result *res=global_alloc(command_result);
+			auto res=global_alloc(command_result);
 			UINT8 track = cdrom_get_track(m_cdrom_handle, sector) + 1;
 			res->res=intr_dataready;
 
@@ -1105,7 +1105,7 @@ void psxcd_device::play_sector()
 
 		next_sector_t+=cyc>>1;
 
-		next_read_event = add_system_event(event_play_sector, next_sector_t - m_maincpu->total_cycles(), NULL);
+		next_read_event = add_system_event(event_play_sector, next_sector_t - m_maincpu->total_cycles(), nullptr);
 	}
 }
 
@@ -1118,7 +1118,7 @@ void psxcd_device::start_read()
 	if(!(mode & mode_cdda) && (cdrom_get_track_type(m_cdrom_handle, cdrom_get_track(m_cdrom_handle, sector + 150)) == CD_TRACK_AUDIO))
 	{
 		stop_read();
-		cmd_complete(prepare_result(intr_diskerror, NULL, 0, 0x40));
+		cmd_complete(prepare_result(intr_diskerror, nullptr, 0, 0x40));
 		return;
 	}
 	send_result(intr_complete);
@@ -1134,7 +1134,7 @@ void psxcd_device::start_read()
 	systime+=start_read_delay;
 
 	next_sector_t=systime+cyc;
-	next_read_event = add_system_event(event_read_sector, start_read_delay+preread_delay, NULL);
+	next_read_event = add_system_event(event_read_sector, start_read_delay+preread_delay, nullptr);
 }
 
 void psxcd_device::start_play()
@@ -1160,7 +1160,7 @@ void psxcd_device::start_play()
 
 	next_sector_t+=cyc>>1;
 
-	next_read_event = add_system_event(event_play_sector, next_sector_t - m_maincpu->total_cycles(), NULL);
+	next_read_event = add_system_event(event_play_sector, next_sector_t - m_maincpu->total_cycles(), nullptr);
 }
 
 void psxcd_device::stop_read()

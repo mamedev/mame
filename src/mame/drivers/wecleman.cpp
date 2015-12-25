@@ -993,7 +993,7 @@ static const gfx_layout wecleman_road_layout =
 	{0},
 	64*1,
 	wecleman_road_layout_xoffset,
-	NULL
+	nullptr
 };
 
 static GFXDECODE_START( wecleman )
@@ -1027,7 +1027,7 @@ static const gfx_layout hotchase_road_layout =
 	{0},
 	32*4,
 	hotchase_road_layout_xoffset,
-	NULL
+	nullptr
 };
 
 static GFXDECODE_START( hotchase )

@@ -71,7 +71,7 @@ public:
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(ginkun);
 	DECLARE_VIDEO_START(riot);
 

@@ -172,10 +172,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_scanline)
 {
 	int scanline = param;
 
+	// stdragon: irq 1 is raster irq ("press start" behaviour), happens at around scanline 90(-16), 2 vblank, 3 is RTE. 
+	// p47: irq 2 valid, others RTE
+	// kickoff: irq 3 valid, others RTE
+	// tshingen: irq 3 RTE, irq 1 reads inputs, irq 2 sets vregs values (pending further investigation ...)
+	// kazan: irq 3 disables irq in SW then execute a routine, irq 2 just execute this routine, irq 1 RTR
+	// astyanax: irq 3 RTE, irq 1 sets "ffff0210" OR 2, irq 2 vblank
+	// hachoo: irq 2 vblank, irq 3 & 1 sets 0xf004e buffer with the level number
+	// jitsupro: irq 3 RTE, irq 2 sets palette and vregs, irq 1 reads inputs
+	// plusalph: irq 1 & 3 RTE, irq 2 valid
+	// rodland: irq 1 & 3 RTE, irq 2 valid (sets palette, vregs ...)
+	// soldam: irq 1 & 3 RTE, irq 2 valid
+	
 	if(scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
-	if(scanline == 0)
+	if(scanline == 16)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if(scanline == 128)
@@ -196,7 +208,7 @@ static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_SHARE("scrollram.0")
 	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_SHARE("scrollram.1")
 	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_SHARE("scrollram.2")
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(ms1_ram_w) AM_SHARE("ram")
 ADDRESS_MAP_END
 
 
@@ -273,7 +285,7 @@ static ADDRESS_MAP_START( megasys1B_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x050000, 0x053fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_SHARE("scrollram.0")
 	AM_RANGE(0x054000, 0x057fff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_SHARE("scrollram.1")
 	AM_RANGE(0x058000, 0x05bfff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_SHARE("scrollram.2")
-	AM_RANGE(0x060000, 0x07ffff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x060000, 0x07ffff) AM_RAM_WRITE(ms1_ram_w) AM_SHARE("ram")
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READWRITE(ip_select_r,ip_select_w)
 ADDRESS_MAP_END
@@ -287,17 +299,29 @@ ADDRESS_MAP_END
 #define INTERRUPT_NUM_C INTERRUPT_NUM_B
 #define interrupt_C     interrupt_B
 
+WRITE16_MEMBER(megasys1_state::ms1_ram_w )
+{
+	// DON'T use COMBINE_DATA
+	// byte writes end up mirroring in both bytes of the word like nmk16.c
+	// 64th Street and Chimera Beast rely on this for attract inputs
+
+	m_ram[offset] = data;
+//	if (mem_mask != 0xffff) printf("byte write to RAM %04x %04x %04x\n", offset, data, mem_mask);
+
+}
+
 static ADDRESS_MAP_START( megasys1C_map, AS_PROGRAM, 16, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_READWRITE(megasys1_vregs_C_r,megasys1_vregs_C_w) AM_SHARE("vregs")
 	AM_RANGE(0x0d2000, 0x0d3fff) AM_RAM AM_SHARE("objectram")
-	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_SHARE("scrollram.0")
-	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_SHARE("scrollram.1")
-	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_SHARE("scrollram.2")
-	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0d8000, 0x0d8001) AM_READWRITE(ip_select_r,ip_select_w)
-	AM_RANGE(0x1c0000, 0x1cffff) AM_MIRROR(0x30000) AM_RAM AM_SHARE("ram") //0x1f****, Cybattler reads attract mode inputs at 0x1d****
+	// 64th Street actively uses 0xe4*** for breakable objects.
+	AM_RANGE(0x0e0000, 0x0e3fff) AM_MIRROR(0x4000) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_SHARE("scrollram.0")
+	AM_RANGE(0x0e8000, 0x0ebfff) AM_MIRROR(0x4000) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_SHARE("scrollram.1")
+	AM_RANGE(0x0f0000, 0x0f3fff) AM_MIRROR(0x4000) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_SHARE("scrollram.2")
+	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1c0000, 0x1cffff) AM_MIRROR(0x30000) AM_RAM_WRITE(ms1_ram_w) AM_SHARE("ram") //0x1f****, Cybattler reads attract mode inputs at 0x1d****
 ADDRESS_MAP_END
 
 
@@ -322,7 +346,7 @@ static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0f8000, 0x0f8001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 //  AM_RANGE(0x100000, 0x100001) // protection
-	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM /*_WRITE(ms1_ram_w)*/ AM_SHARE("ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megasys1D_oki_map, AS_0, 8, megasys1_state )
@@ -1477,13 +1501,13 @@ static MACHINE_CONFIG_START( system_A, megasys1_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	//MCFG_SCREEN_REFRESH_RATE(56.18) // same as nmk16.cpp based on YT videos.
+	MCFG_SCREEN_RAW_PARAMS(SYS_A_CPU_CLOCK,406,0,256,263,16,240)
+
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update_megasys1)
 	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof_megasys1)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ABC)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -1538,13 +1562,14 @@ static MACHINE_CONFIG_START( system_Bbl, megasys1_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(56.18) // same as nmk16.cpp based on YT videos.
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update_megasys1)
 	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof_megasys1)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ABC)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -1611,7 +1636,7 @@ static MACHINE_CONFIG_START( system_D, megasys1_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(56.18) // same as nmk16.cpp based on YT videos.
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -1665,7 +1690,7 @@ static MACHINE_CONFIG_START( system_Z, megasys1_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(56.18) // same as nmk16.cpp based on YT videos.
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -4305,8 +4330,11 @@ DRIVER_INIT_MEMBER(megasys1_state,monkelf)
  *
  *************************************/
 
+// Type Z
 GAME( 1988, lomakai,  0,        system_Z,          lomakai,  driver_device,  0,        ROT0,   "Jaleco", "Legend of Makai (World)", 0 )
 GAME( 1988, makaiden, lomakai,  system_Z,          lomakai,  driver_device,  0,        ROT0,   "Jaleco", "Makai Densetsu (Japan)", 0 )
+
+// Type A
 GAME( 1988, p47,      0,        system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", 0 )
 GAME( 1988, p47j,     p47,      system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", 0 )
 GAME( 1988, p47je,    p47,      system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", 0 )
@@ -4327,20 +4355,26 @@ GAME( 1990, rodland,  0,        system_A,          rodland,  megasys1_state, rod
 GAME( 1990, rodlandj, rodland,  system_A,          rodland,  megasys1_state, rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", 0 )
 GAME( 1990, rittam,   rodland,  system_A,          rodland,  megasys1_state, rittam,   ROT0,   "Jaleco", "R&T (Rod-Land prototype?)", 0 )
 GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  megasys1_state,  rodlandjb,        ROT0,   "bootleg","Rod-Land (Japan bootleg)", 0 )
-GAME( 1991, avspirit, 0,        system_B,          avspirit, megasys1_state, avspirit, ROT0,   "Jaleco", "Avenging Spirit", 0 )
 GAME( 1990, phantasm, avspirit, system_A,          phantasm, megasys1_state, phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", 0 )
+GAME( 1992, soldam,   0,        system_A,          soldam,   megasys1_state, soldam,   ROT0,   "Jaleco", "Soldam", 0 )
+GAME( 1992, soldamj,  soldam,   system_A,          soldam,   megasys1_state, soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", 0 )
+
+// Type B
+GAME( 1991, avspirit, 0,        system_B,          avspirit, megasys1_state, avspirit, ROT0,   "Jaleco", "Avenging Spirit", 0 )
 GAME( 1990, monkelf,  avspirit, system_B,          avspirit, megasys1_state, monkelf,  ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", 0 )
 GAME( 1991, edf,      0,        system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 1)", 0 )
 GAME( 1991, edfa,     edf,      system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 2)", 0 )
 GAME( 1991, edfu,     edf,      system_B,          edf,      megasys1_state, edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", 0 )
 GAME( 1991, edfbl,    edf,      system_Bbl,        edf,      megasys1_state, edfbl,    ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", MACHINE_NO_SOUND )
+GAME( 1993, hayaosi1, 0,        system_B_hayaosi1, hayaosi1, megasys1_state, hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS )
+
+// Type C
 GAME( 1991, 64street, 0,        system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", 0 )
 GAME( 1991, 64streetj,64street, system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan)", 0 )
-GAME( 1992, soldam,   0,        system_A,          soldam,   megasys1_state, soldam,   ROT0,   "Jaleco", "Soldam", 0 )
-GAME( 1992, soldamj,  soldam,   system_A,          soldam,   megasys1_state, soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", 0 )
 GAME( 1992, bigstrik, 0,        system_C,          bigstrik, megasys1_state, bigstrik, ROT0,   "Jaleco", "Big Striker", 0 )
 GAME( 1993, chimerab, 0,        system_C,          chimerab, megasys1_state, chimerab, ROT0,   "Jaleco", "Chimera Beast (prototype)", 0 )
 GAME( 1993, cybattlr, 0,        system_C,          cybattlr, megasys1_state, cybattlr, ROT90,  "Jaleco", "Cybattler", 0 )
-GAME( 1993, hayaosi1, 0,        system_B_hayaosi1, hayaosi1, megasys1_state, hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS )
+
+// Type D
 GAME( 1993, peekaboo, 0,        system_D,          peekaboo, megasys1_state, peekaboo, ROT0,   "Jaleco", "Peek-a-Boo!", 0 )
 GAME( 1993, peekaboou,peekaboo, system_D,          peekaboo, megasys1_state, peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (North America, ver 1.0)", 0 )

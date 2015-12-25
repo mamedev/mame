@@ -139,7 +139,7 @@ int matsucd_get_next_byte( UINT8 *data )
 
 static void matsucd_cdda_stop( running_machine &machine )
 {
-	if (cd.cdda != NULL)
+	if (cd.cdda != nullptr)
 	{
 		cd.cdda->stop_audio();
 		cd.frame_timer->reset(  );
@@ -148,7 +148,7 @@ static void matsucd_cdda_stop( running_machine &machine )
 
 static void matsucd_cdda_play( running_machine &machine, UINT32 lba, UINT32 num_blocks )
 {
-	if (cd.cdda != NULL)
+	if (cd.cdda != nullptr)
 	{
 		cd.cdda->start_audio(lba, num_blocks);
 		cd.frame_timer->adjust(attotime::from_hz( 75 ));
@@ -157,7 +157,7 @@ static void matsucd_cdda_play( running_machine &machine, UINT32 lba, UINT32 num_
 
 static void matsucd_cdda_pause( running_machine &machine, int pause )
 {
-	if (cd.cdda != NULL)
+	if (cd.cdda != nullptr)
 	{
 		cd.cdda->pause_audio(pause);
 
@@ -176,7 +176,7 @@ static UINT8 matsucd_cdda_getstatus( running_machine &machine, UINT32 *lba )
 {
 	if ( lba ) *lba = 0;
 
-	if (cd.cdda != NULL)
+	if (cd.cdda != nullptr)
 	{
 		if (cd.cdda->audio_active())
 		{
@@ -278,9 +278,9 @@ static TIMER_CALLBACK(matsu_subcode_proc)
 {
 	(void)param;
 
-	if (cd.cdda != NULL)
+	if (cd.cdda != nullptr)
 	{
-		UINT8   s = matsucd_cdda_getstatus(machine, NULL);
+		UINT8   s = matsucd_cdda_getstatus(machine, nullptr);
 		UINT8   newstatus = cd.status;
 
 		if ( s == 0x11 || s == 0x12 )
@@ -694,7 +694,7 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 			track = cd.input[2];
 			msfmode = (cd.input[1] & 0x02) ? 1 : 0;
 
-			if ( cd.cdrom == NULL )
+			if ( cd.cdrom == nullptr )
 			{
 				machine.logerror( "MATSUCD - Warning: Reading TOC without a CD!\n" );
 				matsucd_command_error( machine );

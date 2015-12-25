@@ -30,20 +30,20 @@ public:
 	vcs_keypad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_vcs_control_port_interface overrides
-	virtual UINT8 vcs_joy_r();
-	virtual void vcs_joy_w( UINT8 data );
-	virtual UINT8 vcs_pot_x_r();
-	virtual UINT8 vcs_pot_y_r();
+	virtual UINT8 vcs_joy_r() override;
+	virtual void vcs_joy_w( UINT8 data ) override;
+	virtual UINT8 vcs_pot_x_r() override;
+	virtual UINT8 vcs_pot_y_r() override;
 
-	virtual bool has_pot_x() { return true; }
-	virtual bool has_pot_y() { return true; }
+	virtual bool has_pot_x() override { return true; }
+	virtual bool has_pot_y() override { return true; }
 
 private:
 	required_ioport m_keypad;

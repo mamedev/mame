@@ -61,7 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(astron_FIX_write);
 	DECLARE_WRITE8_MEMBER(astron_io_bankswitch_w);
 	DECLARE_DRIVER_INIT(astron);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	UINT32 screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	void astron_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);

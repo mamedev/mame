@@ -90,7 +90,7 @@ void speaker_device::static_set_position(device_t &device, double x, double y, d
 void speaker_device::mix(INT32 *leftmix, INT32 *rightmix, int &samples_this_update, bool suppress)
 {
 	// skip if no stream
-	if (m_mixer_stream == NULL)
+	if (m_mixer_stream == nullptr)
 		return;
 
 	// update the stream, getting the start/end pointers around the operation

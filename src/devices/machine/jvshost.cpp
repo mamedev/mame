@@ -31,7 +31,7 @@ void jvs_host::device_reset()
 jvs_host::jvs_host(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source), send_size(0), recv_size(0), recv_is_encoded(false)
 {
-	first_device = 0;
+	first_device = nullptr;
 }
 
 void jvs_host::push(UINT8 val)
@@ -104,7 +104,7 @@ void jvs_host::get_encoded_reply(const UINT8 *&buffer, UINT32 &size)
 
 bool jvs_host::get_presence_line()
 {
-	return first_device != 0;
+	return first_device != nullptr;
 }
 
 bool jvs_host::get_address_set_line()

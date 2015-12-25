@@ -43,7 +43,7 @@ static inline int readbit(const UINT8 *src, unsigned int bitnum)
     than the width
 -------------------------------------------------*/
 
-static inline INT32 normalize_xscroll(bitmap_t &bitmap, INT32 xscroll)
+static inline INT32 normalize_xscroll(const bitmap_t &bitmap, INT32 xscroll)
 {
 	return (xscroll >= 0) ? xscroll % bitmap.width() : (bitmap.width() - (-xscroll) % bitmap.width());
 }
@@ -55,7 +55,7 @@ static inline INT32 normalize_xscroll(bitmap_t &bitmap, INT32 xscroll)
     than the height
 -------------------------------------------------*/
 
-static inline INT32 normalize_yscroll(bitmap_t &bitmap, INT32 yscroll)
+static inline INT32 normalize_yscroll(const bitmap_t &bitmap, INT32 yscroll)
 {
 	return (yscroll >= 0) ? yscroll % bitmap.height() : (bitmap.height() - (-yscroll) % bitmap.height());
 }
@@ -87,7 +87,7 @@ gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 gfx_element::gfx_element()
-	: m_palette(NULL),
+	: m_palette(nullptr),
 		m_width(0),
 		m_height(0),
 		m_startx(0),
@@ -101,9 +101,9 @@ gfx_element::gfx_element()
 		m_total_colors(0),
 		m_line_modulo(0),
 		m_char_modulo(0),
-		m_srcdata(NULL),
+		m_srcdata(nullptr),
 		m_dirtyseq(1),
-		m_gfxdata(NULL),
+		m_gfxdata(nullptr),
 		m_layout_is_raw(false),
 		m_layout_planes(0),
 		m_layout_xormask(0),
@@ -151,9 +151,9 @@ gfx_element::gfx_element(palette_device *palette, const gfx_layout &gl, const UI
 		m_total_colors(total_colors),
 		m_line_modulo(0),
 		m_char_modulo(0),
-		m_srcdata(NULL),
+		m_srcdata(nullptr),
 		m_dirtyseq(1),
-		m_gfxdata(NULL),
+		m_gfxdata(nullptr),
 		m_layout_is_raw(false),
 		m_layout_planes(0),
 		m_layout_xormask(xormask),
@@ -198,7 +198,7 @@ void gfx_element::set_layout(const gfx_layout &gl, const UINT8 *srcdata)
 		m_char_modulo = gl.charincrement / 8;
 
 		// RAW graphics must have a pointer up front
-		assert(srcdata != NULL);
+		assert(srcdata != nullptr);
 		m_gfxdata = const_cast<UINT8 *>(srcdata);
 	}
 
@@ -573,7 +573,7 @@ void gfx_element::transtable(bitmap_ind16 &dest, const rectangle &cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		const UINT8 *pentable)
 {
-	assert(pentable != NULL);
+	assert(pentable != nullptr);
 
 	// render
 	color = colorbase() + granularity() * (color % colors());
@@ -587,7 +587,7 @@ void gfx_element::transtable(bitmap_rgb32 &dest, const rectangle &cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		const UINT8 *pentable)
 {
-	assert(pentable != NULL);
+	assert(pentable != nullptr);
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
@@ -859,7 +859,7 @@ void gfx_element::zoom_transtable(bitmap_ind16 &dest, const rectangle &cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, const UINT8 *pentable)
 {
-	assert(pentable != NULL);
+	assert(pentable != nullptr);
 
 	// non-zoom case
 	if (scalex == 0x10000 && scaley == 0x10000)
@@ -877,7 +877,7 @@ void gfx_element::zoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, const UINT8 *pentable)
 {
-	assert(pentable != NULL);
+	assert(pentable != nullptr);
 
 	// non-zoom case
 	if (scalex == 0x10000 && scaley == 0x10000)
@@ -1144,7 +1144,7 @@ void gfx_element::prio_transtable(bitmap_ind16 &dest, const rectangle &cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_ind8 &priority, UINT32 pmask, const UINT8 *pentable)
 {
-	assert(pentable != NULL);
+	assert(pentable != nullptr);
 
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
@@ -1160,7 +1160,7 @@ void gfx_element::prio_transtable(bitmap_rgb32 &dest, const rectangle &cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_ind8 &priority, UINT32 pmask, const UINT8 *pentable)
 {
-	assert(pentable != NULL);
+	assert(pentable != nullptr);
 
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
@@ -1465,7 +1465,7 @@ void gfx_element::prio_zoom_transtable(bitmap_ind16 &dest, const rectangle &clip
 		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,
 		const UINT8 *pentable)
 {
-	assert(pentable != NULL);
+	assert(pentable != nullptr);
 
 	// non-zoom case
 	if (scalex == 0x10000 && scaley == 0x10000)
@@ -1486,7 +1486,7 @@ void gfx_element::prio_zoom_transtable(bitmap_rgb32 &dest, const rectangle &clip
 		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,
 		const UINT8 *pentable)
 {
-	assert(pentable != NULL);
+	assert(pentable != nullptr);
 
 	// non-zoom case
 	if (scalex == 0x10000 && scaley == 0x10000)
@@ -1680,7 +1680,7 @@ void gfx_element::alphastore(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 	assert(dest.bpp() == 32);
 	assert(dest.format() == BITMAP_FORMAT_ARGB32);
-	assert(alphatable != NULL);
+	assert(alphatable != nullptr);
 
 	/* if we have a fixed alpha, call the standard drawgfx_transpen */
 	if (fixedalpha == 0xff)
@@ -1730,7 +1730,7 @@ void gfx_element::alphatable(bitmap_rgb32 &dest, const rectangle &cliprect,
 	}
 
 	assert(dest.bpp() == 32);
-	assert(alphatable != NULL);
+	assert(alphatable != nullptr);
 
 	/* get final code and color, and grab lookup tables */
 	code %= elements();
@@ -1759,7 +1759,7 @@ void draw_scanline8(bitmap_ind16 &bitmap, INT32 destx, INT32 desty, INT32 length
 	DECLARE_NO_PRIORITY;
 
 	// palette lookup case
-	if (paldata != NULL)
+	if (paldata != nullptr)
 		DRAWSCANLINE_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 
 	// raw copy case
@@ -1772,7 +1772,7 @@ void draw_scanline8(bitmap_rgb32 &bitmap, INT32 destx, INT32 desty, INT32 length
 	DECLARE_NO_PRIORITY;
 
 	// palette lookup case
-	if (paldata != NULL)
+	if (paldata != nullptr)
 		DRAWSCANLINE_CORE(UINT32, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 
 	// raw copy case
@@ -1791,7 +1791,7 @@ void draw_scanline16(bitmap_ind16 &bitmap, INT32 destx, INT32 desty, INT32 lengt
 	DECLARE_NO_PRIORITY;
 
 	// palette lookup case
-	if (paldata != NULL)
+	if (paldata != nullptr)
 		DRAWSCANLINE_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 
 	// raw copy case
@@ -1804,7 +1804,7 @@ void draw_scanline16(bitmap_rgb32 &bitmap, INT32 destx, INT32 desty, INT32 lengt
 	DECLARE_NO_PRIORITY;
 
 	// palette lookup case
-	if (paldata != NULL)
+	if (paldata != nullptr)
 		DRAWSCANLINE_CORE(UINT32, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 
 	// raw copy case
@@ -1823,7 +1823,7 @@ void draw_scanline32(bitmap_ind16 &bitmap, INT32 destx, INT32 desty, INT32 lengt
 	DECLARE_NO_PRIORITY;
 
 	// palette lookup case
-	if (paldata != NULL)
+	if (paldata != nullptr)
 		DRAWSCANLINE_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 
 	// raw copy case
@@ -1836,7 +1836,7 @@ void draw_scanline32(bitmap_rgb32 &bitmap, INT32 destx, INT32 desty, INT32 lengt
 	DECLARE_NO_PRIORITY;
 
 	// palette lookup case
-	if (paldata != NULL)
+	if (paldata != nullptr)
 		DRAWSCANLINE_CORE(UINT32, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 
 	// raw copy case
@@ -1855,12 +1855,12 @@ void draw_scanline32(bitmap_rgb32 &bitmap, INT32 destx, INT32 desty, INT32 lengt
     scanline of a bitmap to an 8bpp buffer
 -------------------------------------------------*/
 
-void extract_scanline8(bitmap_ind16 &bitmap, INT32 srcx, INT32 srcy, INT32 length, UINT8 *destptr)
+void extract_scanline8(const bitmap_ind16 &bitmap, INT32 srcx, INT32 srcy, INT32 length, UINT8 *destptr)
 {
 	EXTRACTSCANLINE_CORE(UINT16);
 }
 
-void extract_scanline8(bitmap_rgb32 &bitmap, INT32 srcx, INT32 srcy, INT32 length, UINT8 *destptr)
+void extract_scanline8(const bitmap_rgb32 &bitmap, INT32 srcx, INT32 srcy, INT32 length, UINT8 *destptr)
 {
 	EXTRACTSCANLINE_CORE(UINT32);
 }
@@ -1871,12 +1871,12 @@ void extract_scanline8(bitmap_rgb32 &bitmap, INT32 srcx, INT32 srcy, INT32 lengt
     scanline of a bitmap to a 16bpp buffer
 -------------------------------------------------*/
 
-void extract_scanline16(bitmap_ind16 &bitmap, INT32 srcx, INT32 srcy, INT32 length, UINT16 *destptr)
+void extract_scanline16(const bitmap_ind16 &bitmap, INT32 srcx, INT32 srcy, INT32 length, UINT16 *destptr)
 {
 	EXTRACTSCANLINE_CORE(UINT16);
 }
 
-void extract_scanline16(bitmap_rgb32 &bitmap, INT32 srcx, INT32 srcy, INT32 length, UINT16 *destptr)
+void extract_scanline16(const bitmap_rgb32 &bitmap, INT32 srcx, INT32 srcy, INT32 length, UINT16 *destptr)
 {
 	EXTRACTSCANLINE_CORE(UINT32);
 }
@@ -1887,12 +1887,12 @@ void extract_scanline16(bitmap_rgb32 &bitmap, INT32 srcx, INT32 srcy, INT32 leng
     scanline of a bitmap to a 32bpp buffer
 -------------------------------------------------*/
 
-void extract_scanline32(bitmap_ind16 &bitmap, INT32 srcx, INT32 srcy, INT32 length, UINT32 *destptr)
+void extract_scanline32(const bitmap_ind16 &bitmap, INT32 srcx, INT32 srcy, INT32 length, UINT32 *destptr)
 {
 	EXTRACTSCANLINE_CORE(UINT16);
 }
 
-void extract_scanline32(bitmap_rgb32 &bitmap, INT32 srcx, INT32 srcy, INT32 length, UINT32 *destptr)
+void extract_scanline32(const bitmap_rgb32 &bitmap, INT32 srcx, INT32 srcy, INT32 length, UINT32 *destptr)
 {
 	EXTRACTSCANLINE_CORE(UINT32);
 }
@@ -1908,13 +1908,13 @@ void extract_scanline32(bitmap_rgb32 &bitmap, INT32 srcx, INT32 srcy, INT32 leng
     copying all unclipped pixels
 -------------------------------------------------*/
 
-void copybitmap(bitmap_ind16 &dest, bitmap_ind16 &src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle &cliprect)
+void copybitmap(bitmap_ind16 &dest, const bitmap_ind16 &src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle &cliprect)
 {
 	DECLARE_NO_PRIORITY;
 	COPYBITMAP_CORE(UINT16, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
 }
 
-void copybitmap(bitmap_rgb32 &dest, bitmap_rgb32 &src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle &cliprect)
+void copybitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle &cliprect)
 {
 	DECLARE_NO_PRIORITY;
 	COPYBITMAP_CORE(UINT32, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
@@ -1927,7 +1927,7 @@ void copybitmap(bitmap_rgb32 &dest, bitmap_rgb32 &src, int flipx, int flipy, INT
     those that match transpen
 -------------------------------------------------*/
 
-void copybitmap_trans(bitmap_ind16 &dest, bitmap_ind16 &src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle &cliprect, UINT32 trans_pen)
+void copybitmap_trans(bitmap_ind16 &dest, const bitmap_ind16 &src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle &cliprect, UINT32 trans_pen)
 {
 	DECLARE_NO_PRIORITY;
 	if (trans_pen > 0xffff)
@@ -1936,7 +1936,7 @@ void copybitmap_trans(bitmap_ind16 &dest, bitmap_ind16 &src, int flipx, int flip
 		COPYBITMAP_CORE(UINT16, PIXEL_OP_COPY_TRANSPEN, NO_PRIORITY);
 }
 
-void copybitmap_trans(bitmap_rgb32 &dest, bitmap_rgb32 &src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle &cliprect, UINT32 trans_pen)
+void copybitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle &cliprect, UINT32 trans_pen)
 {
 	DECLARE_NO_PRIORITY;
 	if (trans_pen == 0xffffffff)
@@ -1957,14 +1957,14 @@ void copybitmap_trans(bitmap_rgb32 &dest, bitmap_rgb32 &src, int flipx, int flip
     applying scrolling to one or more rows/columns
 -------------------------------------------------*/
 
-void copyscrollbitmap(bitmap_ind16 &dest, bitmap_ind16 &src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle &cliprect)
+void copyscrollbitmap(bitmap_ind16 &dest, const bitmap_ind16 &src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle &cliprect)
 {
 	// just call through to the transparent case as the underlying copybitmap will
 	// optimize for pen == 0xffffffff
 	copyscrollbitmap_trans(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, 0xffffffff);
 }
 
-void copyscrollbitmap(bitmap_rgb32 &dest, bitmap_rgb32 &src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle &cliprect)
+void copyscrollbitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle &cliprect)
 {
 	// just call through to the transparent case as the underlying copybitmap will
 	// optimize for pen == 0xffffffff
@@ -1980,16 +1980,16 @@ void copyscrollbitmap(bitmap_rgb32 &dest, bitmap_rgb32 &src, UINT32 numrows, con
 -------------------------------------------------*/
 
 template<class _BitmapClass>
-static inline void copyscrollbitmap_trans_common(_BitmapClass &dest, _BitmapClass &src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle &cliprect, UINT32 trans_pen)
+static inline void copyscrollbitmap_trans_common(_BitmapClass &dest, const _BitmapClass &src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle &cliprect, UINT32 trans_pen)
 {
 	// no rowscroll and no colscroll means no scroll
 	if (numrows == 0 && numcols == 0)
 		return copybitmap_trans(dest, src, 0, 0, 0, 0, cliprect, trans_pen);
 
-	assert(numrows != 0 || rowscroll == NULL);
-	assert(numrows == 0 || rowscroll != NULL);
-	assert(numcols != 0 || colscroll == NULL);
-	assert(numcols == 0 || colscroll != NULL);
+	assert(numrows != 0 || rowscroll == nullptr);
+	assert(numrows == 0 || rowscroll != nullptr);
+	assert(numcols != 0 || colscroll == nullptr);
+	assert(numcols == 0 || colscroll != nullptr);
 
 	// fully scrolling X,Y playfield
 	if (numrows <= 1 && numcols <= 1)
@@ -2078,10 +2078,10 @@ static inline void copyscrollbitmap_trans_common(_BitmapClass &dest, _BitmapClas
 	}
 }
 
-void copyscrollbitmap_trans(bitmap_ind16 &dest, bitmap_ind16 &src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle &cliprect, UINT32 trans_pen)
+void copyscrollbitmap_trans(bitmap_ind16 &dest, const bitmap_ind16 &src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle &cliprect, UINT32 trans_pen)
 { copyscrollbitmap_trans_common(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, trans_pen); }
 
-void copyscrollbitmap_trans(bitmap_rgb32 &dest, bitmap_rgb32 &src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle &cliprect, UINT32 trans_pen)
+void copyscrollbitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle &cliprect, UINT32 trans_pen)
 { copyscrollbitmap_trans_common(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, trans_pen); }
 
 
@@ -2096,13 +2096,13 @@ void copyscrollbitmap_trans(bitmap_rgb32 &dest, bitmap_rgb32 &src, UINT32 numrow
     pixels
 -------------------------------------------------*/
 
-void copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, bitmap_ind16 &src, INT32 startx, INT32 starty, INT32 incxx, INT32 incxy, INT32 incyx, INT32 incyy, int wraparound)
+void copyrozbitmap(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, INT32 startx, INT32 starty, INT32 incxx, INT32 incxy, INT32 incyx, INT32 incyy, int wraparound)
 {
 	DECLARE_NO_PRIORITY;
 	COPYROZBITMAP_CORE(UINT16, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
 }
 
-void copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, bitmap_rgb32 &src, INT32 startx, INT32 starty, INT32 incxx, INT32 incxy, INT32 incyx, INT32 incyy, int wraparound)
+void copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, INT32 startx, INT32 starty, INT32 incxx, INT32 incxy, INT32 incyx, INT32 incyy, int wraparound)
 {
 	DECLARE_NO_PRIORITY;
 	COPYROZBITMAP_CORE(UINT32, PIXEL_OP_COPY_OPAQUE, NO_PRIORITY);
@@ -2116,13 +2116,13 @@ void copyrozbitmap(bitmap_rgb32 &dest, const rectangle &cliprect, bitmap_rgb32 &
     transpen
 -------------------------------------------------*/
 
-void copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, bitmap_ind16 &src, INT32 startx, INT32 starty, INT32 incxx, INT32 incxy, INT32 incyx, INT32 incyy, int wraparound, UINT32 trans_pen)
+void copyrozbitmap_trans(bitmap_ind16 &dest, const rectangle &cliprect, const bitmap_ind16 &src, INT32 startx, INT32 starty, INT32 incxx, INT32 incxy, INT32 incyx, INT32 incyy, int wraparound, UINT32 trans_pen)
 {
 	DECLARE_NO_PRIORITY;
 	COPYROZBITMAP_CORE(UINT16, PIXEL_OP_COPY_TRANSPEN, NO_PRIORITY);
 }
 
-void copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, bitmap_rgb32 &src, INT32 startx, INT32 starty, INT32 incxx, INT32 incxy, INT32 incyx, INT32 incyy, int wraparound, UINT32 trans_pen)
+void copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, const bitmap_rgb32 &src, INT32 startx, INT32 starty, INT32 incxx, INT32 incxy, INT32 incyx, INT32 incyy, int wraparound, UINT32 trans_pen)
 {
 	DECLARE_NO_PRIORITY;
 	COPYROZBITMAP_CORE(UINT32, PIXEL_OP_COPY_TRANSPEN, NO_PRIORITY);

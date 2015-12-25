@@ -100,7 +100,7 @@ static void report_failure(object_pool *pool, const char *format, ...) ATTR_PRIN
     object
 -------------------------------------------------*/
 
-INLINE int hash_object(void *object)
+static inline int hash_object(void *object)
 {
 	return ((size_t)object >> 4) % POOL_HASH_SIZE;
 }
@@ -111,15 +111,15 @@ INLINE int hash_object(void *object)
     a given object type
 -------------------------------------------------*/
 
-INLINE objtype_entry *get_object_type(object_pool *pool, object_type type)
+static inline objtype_entry *get_object_type(object_pool *pool, object_type type)
 {
 	objtype_entry *entry;
 
-	for (entry = pool->typelist; entry != NULL; entry = entry->next)
+	for (entry = pool->typelist; entry != nullptr; entry = entry->next)
 		if (entry->type == type)
 			return entry;
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -138,8 +138,8 @@ object_pool *pool_alloc_lib(void (*fail)(const char *message))
 
 	/* allocate memory for the pool itself */
 	pool = (object_pool *)malloc(sizeof(*pool));
-	if (pool == NULL)
-		return NULL;
+	if (pool == nullptr)
+		return nullptr;
 	memset(pool, 0, sizeof(*pool));
 
 	/* set the failure handler */
@@ -162,11 +162,11 @@ void pool_type_register(object_pool *pool, object_type type, const char *friendl
 	objtype_entry *newtype = get_object_type(pool, type);
 
 	/* if the type doesn't already exist... */
-	if (newtype == NULL)
+	if (newtype == nullptr)
 	{
 		/* allocate a new entry */
 		newtype = (objtype_entry *)malloc(sizeof(*newtype));
-		if (newtype == NULL)
+		if (newtype == nullptr)
 		{
 			report_failure(pool, "Error adding new type %s\n", friendly);
 			return;
@@ -195,7 +195,7 @@ void pool_clear(object_pool *pool)
 	object_entry *entry, *next;
 
 	/* iterate over all entries in the global list and free them */
-	for (entry = pool->globallist; entry != NULL; entry = next)
+	for (entry = pool->globallist; entry != nullptr; entry = next)
 	{
 		/* remember the next entry */
 		next = entry->globalnext;
@@ -205,7 +205,7 @@ void pool_clear(object_pool *pool)
 
 		/* add ourself to the free list */
 		entry->next = pool->freelist;
-		entry->globalnext = entry->globalprev = NULL;
+		entry->globalnext = entry->globalprev = nullptr;
 		pool->freelist = entry;
 	}
 
@@ -228,14 +228,14 @@ void pool_free_lib(object_pool *pool)
 	pool_clear(pool);
 
 	/* free all entry blocks */
-	for (block = pool->blocklist; block != NULL; block = nextblock)
+	for (block = pool->blocklist; block != nullptr; block = nextblock)
 	{
 		nextblock = block->next;
 		free(block);
 	}
 
 	/* free all types */
-	for (type = pool->typelist; type != NULL; type = nexttype)
+	for (type = pool->typelist; type != nullptr; type = nexttype)
 	{
 		nexttype = type->next;
 		free(type);
@@ -263,29 +263,29 @@ void *pool_object_add_file_line(object_pool *pool, object_type _type, void *obje
 	object_entry *entry;
 
 	/* if we have an invalid type, fail */
-	if (type == NULL)
+	if (type == nullptr)
 	{
 		report_failure(pool, "pool_object_add (via %s:%d): Attempted to add object of unknown type with size %d", file, line, (int)size);
 		return object;
 	}
 
 	/* if we get a NULL object, fail */
-	if (object == NULL)
+	if (object == nullptr)
 	{
 		report_failure(pool, "pool_object_add (via %s:%d): Attempted to add a NULL object of size %d", file, line, (int)size);
 		return object;
 	}
 
 	/* allocate a new entry */
-	if (pool->freelist == NULL)
+	if (pool->freelist == nullptr)
 	{
 		object_entry_block *block;
 		int entrynum;
 
 		/* if we need a new block, allocate that now */
 		block = (object_entry_block *)malloc(sizeof(*block));
-		if (block == NULL)
-			return NULL;
+		if (block == nullptr)
+			return nullptr;
 		memset(block, 0, sizeof(*block));
 
 		/* hook us into the blocklist */
@@ -312,9 +312,9 @@ void *pool_object_add_file_line(object_pool *pool, object_type _type, void *obje
 	entry->line = line;
 
 	/* hook us into the global list */
-	if (pool->globallist != NULL)
+	if (pool->globallist != nullptr)
 		pool->globallist->globalprev = entry;
-	entry->globalprev = NULL;
+	entry->globalprev = nullptr;
 	entry->globalnext = pool->globallist;
 	pool->globallist = entry;
 
@@ -336,7 +336,7 @@ void *pool_object_remove(object_pool *pool, void *object, int destruct)
 	object_entry **entryptr;
 
 	/* find the object in question and remove it */
-	for (entryptr = &pool->hashtable[hashnum]; *entryptr != NULL; entryptr = &(*entryptr)->next)
+	for (entryptr = &pool->hashtable[hashnum]; *entryptr != nullptr; entryptr = &(*entryptr)->next)
 		if ((*entryptr)->object == object)
 		{
 			object_entry *entry = *entryptr;
@@ -346,9 +346,9 @@ void *pool_object_remove(object_pool *pool, void *object, int destruct)
 				(*entry->type->destructor)(entry->object, entry->size);
 
 			/* remove us from the global list */
-			if (entry->globalprev != NULL)
+			if (entry->globalprev != nullptr)
 				entry->globalprev->globalnext = entry->globalnext;
-			if (entry->globalnext != NULL)
+			if (entry->globalnext != nullptr)
 				entry->globalnext->globalprev = entry->globalprev;
 			if (pool->globallist == entry)
 				pool->globallist = entry->globalnext;
@@ -362,7 +362,7 @@ void *pool_object_remove(object_pool *pool, void *object, int destruct)
 			break;
 		}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -377,7 +377,7 @@ int pool_object_exists(object_pool *pool, object_type type, void *object)
 	object_entry *entry;
 
 	/* find the object in question */
-	for (entry = pool->hashtable[hashnum]; entry != NULL; entry = entry->next)
+	for (entry = pool->hashtable[hashnum]; entry != nullptr; entry = entry->next)
 		if (entry->object == object && (type == OBJTYPE_WILDCARD || entry->type->type == type))
 			return TRUE;
 
@@ -401,14 +401,14 @@ object_pool_iterator *pool_iterate_begin(object_pool *pool, object_type type)
 
 	/* allocate the iterator */
 	iter = (object_pool_iterator *)malloc(sizeof(*iter));
-	if (iter == NULL)
-		return NULL;
+	if (iter == nullptr)
+		return nullptr;
 	memset(iter, 0, sizeof(*iter));
 
 	/* fill it in */
 	iter->pool = pool;
 	iter->type = type;
-	iter->last = NULL;
+	iter->last = nullptr;
 	return iter;
 }
 
@@ -421,19 +421,19 @@ object_pool_iterator *pool_iterate_begin(object_pool *pool, object_type type)
 int pool_iterate_next(object_pool_iterator *iter, void **objectptr, size_t *sizeptr, object_type *typeptr)
 {
 	/* if no previous entry, find the first */
-	if (iter->last == NULL)
+	if (iter->last == nullptr)
 		iter->last = iter->pool->globallist;
 	else
 		iter->last = iter->last->globalnext;
 
 	/* stop when we get one */
-	if (iter->last != NULL)
+	if (iter->last != nullptr)
 	{
-		if (objectptr != NULL)
+		if (objectptr != nullptr)
 			*objectptr = iter->last;
-		if (sizeptr != NULL)
+		if (sizeptr != nullptr)
 			*sizeptr = iter->last->size;
-		if (typeptr != NULL)
+		if (typeptr != nullptr)
 			*typeptr = iter->last->type->type;
 		return TRUE;
 	}
@@ -478,7 +478,7 @@ void *pool_malloc_file_line(object_pool *pool, size_t size, const char *file, in
 
 void *pool_realloc_file_line(object_pool *pool, void *ptr, size_t size, const char *file, int line)
 {
-	if (ptr != NULL)
+	if (ptr != nullptr)
 		pool_object_remove(pool, ptr, FALSE);
 	ptr = realloc(ptr, size);
 	if (size != 0)
@@ -495,7 +495,7 @@ void *pool_realloc_file_line(object_pool *pool, void *ptr, size_t size, const ch
 char *pool_strdup_file_line(object_pool *pool, const char *str, const char *file, int line)
 {
 	char *ptr = (char *)pool_malloc_file_line(pool, strlen(str) + 1, file, line);
-	if (ptr != NULL)
+	if (ptr != nullptr)
 		strcpy(ptr, str);
 	return ptr;
 }
@@ -530,7 +530,7 @@ static void memory_destruct(void *object, size_t size)
 static void report_failure(object_pool *pool, const char *format, ...)
 {
 	/* only do the work if we have a callback */
-	if (pool->fail != NULL)
+	if (pool->fail != nullptr)
 	{
 		char message[1024];
 		va_list argptr;

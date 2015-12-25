@@ -84,9 +84,9 @@ GFXDECODE_END
 k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053244, "K053244 & 053245 Sprite Generator", tag, owner, clock, "k05324x", __FILE__),
 	device_gfx_interface(mconfig, *this, gfxinfo),
-	m_ram(NULL),
-	m_buffer(NULL),
-	m_sprite_rom(NULL),
+	m_ram(nullptr),
+	m_buffer(nullptr),
+	m_sprite_rom(nullptr),
 	m_dx(0),
 	m_dy(0),
 	m_rombank(0),
@@ -131,14 +131,14 @@ void k05324x_device::device_start()
 	m_ramsize = 0x800;
 
 	m_z_rejection = -1;
-	m_ram = auto_alloc_array_clear(machine(), UINT16, m_ramsize / 2);
-	m_buffer = auto_alloc_array_clear(machine(), UINT16, m_ramsize / 2);
+	m_ram = make_unique_clear<UINT16[]>(m_ramsize / 2);
+	m_buffer = make_unique_clear<UINT16[]>(m_ramsize / 2);
 
 	// bind callbacks
 	m_k05324x_cb.bind_relative_to(*owner());
 
-	save_pointer(NAME(m_ram), m_ramsize / 2);
-	save_pointer(NAME(m_buffer), m_ramsize / 2);
+	save_pointer(NAME(m_ram.get()), m_ramsize / 2);
+	save_pointer(NAME(m_buffer.get()), m_ramsize / 2);
 	save_item(NAME(m_rombank));
 	save_item(NAME(m_z_rejection));
 	save_item(NAME(m_regs));
@@ -152,8 +152,8 @@ void k05324x_device::device_reset()
 {
 	m_rombank = 0;
 
-	for (int i = 0; i < 0x10; i++)
-		m_regs[i] = 0;
+	for (auto & elem : m_regs)
+		elem = 0;
 }
 
 /*****************************************************************************
@@ -167,7 +167,7 @@ READ16_MEMBER( k05324x_device::k053245_word_r )
 
 WRITE16_MEMBER( k05324x_device::k053245_word_w )
 {
-	COMBINE_DATA(m_ram + offset);
+	COMBINE_DATA(m_ram.get() + offset);
 }
 
 READ8_MEMBER( k05324x_device::k053245_r )
@@ -197,7 +197,7 @@ void k05324x_device::clear_buffer()
 
 void k05324x_device::update_buffer()
 {
-	memcpy(m_buffer, m_ram, m_ramsize);
+	memcpy(m_buffer.get(), m_ram.get(), m_ramsize);
 }
 
 READ8_MEMBER( k05324x_device::k053244_r )

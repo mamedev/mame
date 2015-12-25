@@ -1022,9 +1022,10 @@ zslc3000 // Sharp Zaurus SL-C3000 "Spitz"
 zslc1000 // Sharp Zaurus SL-C1000 "Akita"
 
 // Silicon Graphics
-sgi_ip2 // IP2: IRIS 2x00, 68020, 16MHz
+sgi_ip2 // IP2: IRIS 3xx0, 68020, 16MHz
 sgi_ip6   // IP6: 4D/PI, R2000, 20MHz
-ip204415  // IP20: Indigo 1, R4400, 150MHz
+indigo3k  // IP12: Indigo 1, R3000, 33MHz
+indigo4k  // IP20: Indigo 1, R4400, 150MHz
 ip225015  // IP22: Indy, R5000, 150MHz
 ip224613    // IP22: Indy, R4600, 133MHz
 ip244415    // IP24: Indigo 2, R4400, 150MHz
@@ -1303,6 +1304,8 @@ gwnf     // Genius Winner Notebook Fun (Germany)
 gl6000sl // Genius Leader 6000SL (Germany)
 gl7007sl // Genius Leader 7007SL (Germany)
 glcolor  // Genius Leader Color (Germany)
+snotec   // Bandai Super Note Club (Japan)
+snotecex // Bandai Super Note Club EX (Japan)
 glmcolor // Genius Leader Magic Color (Germany)
 glscolor // Genius Leader Super Color (Germany)
 gjrstar3 // Genius Junior Redstar 3 (Germany)
@@ -1774,6 +1777,9 @@ tmc600s2
 //osc1000b
 nano
 
+// Escola Politecnica da USP (Brazil)
+patinho // 1972 Patinho Feio
+
 // MIT
 tx0_64kw  // April 1956 MIT TX-0 (64kw RAM)
 tx0_8kw   // 1962 MIT TX-0 (8kw RAM)
@@ -2243,6 +2249,7 @@ elecdet     // Ideal
 starwbc     // Kenner
 starwbcp    // Kenner (patent)
 astro       // Kosmos
+mdndclab    // Mattel
 comp4       // Milton Bradley
 simon       // Milton Bradley
 ssimon      // Milton Bradley
@@ -2256,12 +2263,26 @@ splitsec    // Parker Bros
 mmerlin     // Parker Bros
 tandy12     // Tandy Radio Shack
 tbreakup    // Tomy
+phpball     // Tomy
 
 // hh_tms1k derivatives
 elecbowl    // Marx
 mbdtower    // Milton Bradley
 
-// hh_tms1k tispeak.c
+// hh_tms1k ticalc1x.cpp
+tisr16
+tisr16ii
+ti1270
+ti1000
+ti30
+tiprog
+tibusan1
+wizatron
+lilprof
+lilprof78
+dataman
+
+// hh_tms1k tispeak.cpp
 snspell
 snspellp
 snspella
@@ -2281,18 +2302,9 @@ tntellfr
 tntellp
 vocaid
 
-// hh_tms1k ticalc1x.c
-tisr16
-tisr16ii
-ti1270
-ti1000
-ti30
-tiprog
-tibusan1
-wizatron
-lilprof
-lilprof78
-dataman
+// hh_tms1k tispellb.cpp
+spellb
+mrchalgr
 
 // hh_ucom4
 ufombs      // Bambino
@@ -2330,7 +2342,7 @@ wildfire    // Parker Bros
 
 ssem // Manchester Small-Scale Experimental Machine, "Baby"
 craft // Craft, by [lft]
-
+r9751 // ROLM 9751 phone system
 
 //********** To sort (mostly skeleton drivers) *****************************
 
@@ -2756,6 +2768,7 @@ tecnbras
 minicom
 mcom4_02
 gameking
+gamekin3
 leapster
 leapstertv
 excali64
@@ -2771,3 +2784,14 @@ micral
 rd100
 proteus3
 unichamp
+st1700h
+st1701
+st1702
+st1703
+st1704
+st1705
+st1706
+st1707
+st1708
+st1714
+sanfuze2

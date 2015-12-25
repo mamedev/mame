@@ -162,7 +162,7 @@ static floperr_t dsk_write_indexed_sector(floppy_image_legacy *floppy, int head,
 static floperr_t dsk_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, UINT32 *sector_length)
 {
 	floperr_t err;
-	err = get_offset(floppy, head, track, sector, FALSE, NULL);
+	err = get_offset(floppy, head, track, sector, FALSE, nullptr);
 	if (err)
 		return err;
 
@@ -179,7 +179,7 @@ static floperr_t dsk_get_indexed_sector_info(floppy_image_legacy *floppy, int he
 	UINT8 sector_info[0x100];
 	int pos;
 
-	retVal = get_offset(floppy, head, track, sector_index, FALSE, NULL);
+	retVal = get_offset(floppy, head, track, sector_index, FALSE, nullptr);
 	offset = dsk_get_track_offset(floppy,head,track);
 	pos = 0x18 + (sector_index << 3);
 	floppy_image_read(floppy, sector_info, offset, 0x100);
@@ -419,7 +419,7 @@ bool dsk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 					sdatapos += sects[j].actual_size;
 
 				} else
-					sects[j].data = NULL;
+					sects[j].data = nullptr;
 
 				if(extendformat)
 					pos += sector.data_length;

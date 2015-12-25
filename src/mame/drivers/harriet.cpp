@@ -47,10 +47,10 @@ public:
 	DECLARE_WRITE8_MEMBER( kbd_put );
 protected:
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 };
 
 void harriet_state::video_start()

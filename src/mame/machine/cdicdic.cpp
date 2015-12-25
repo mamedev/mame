@@ -33,7 +33,7 @@ TODO:
 const device_type MACHINE_CDICDIC = &device_creator<cdicdic_device>;
 
 #if ENABLE_VERBOSE_LOG
-INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -99,7 +99,7 @@ const INT32 cdicdic_device::s_cdic_adpcm_filter_coef[5][2] =
 //  INLINES
 //**************************************************************************
 
-INLINE int CDIC_IS_VALID_SAMPLE_BUF(UINT16 *cdram, UINT16 addr)
+static inline int CDIC_IS_VALID_SAMPLE_BUF(UINT16 *cdram, UINT16 addr)
 {
 	UINT8 *cdram8 = ((UINT8*)cdram) + addr + 8;
 	if(cdram8[2] != 0xff)
@@ -109,7 +109,7 @@ INLINE int CDIC_IS_VALID_SAMPLE_BUF(UINT16 *cdram, UINT16 addr)
 	return 0;
 }
 
-INLINE double CDIC_SAMPLE_BUF_FREQ(UINT16 *cdram, UINT16 addr)
+static inline double CDIC_SAMPLE_BUF_FREQ(UINT16 *cdram, UINT16 addr)
 {
 	UINT8 *cdram8 = ((UINT8*)cdram) + addr + 8;
 	switch(cdram8[2] & 0x3f)
@@ -129,7 +129,7 @@ INLINE double CDIC_SAMPLE_BUF_FREQ(UINT16 *cdram, UINT16 addr)
 	}
 }
 
-INLINE int CDIC_SAMPLE_BUF_SIZE(UINT16 *cdram, UINT16 addr)
+static inline int CDIC_SAMPLE_BUF_SIZE(UINT16 *cdram, UINT16 addr)
 {
 	UINT8 *cdram8 = ((UINT8*)cdram) + addr + 8;
 	switch(cdram8[2] & 0x3f)
@@ -151,7 +151,7 @@ INLINE int CDIC_SAMPLE_BUF_SIZE(UINT16 *cdram, UINT16 addr)
 	}
 }
 
-INLINE INT16 clamp(INT16 in)
+static inline INT16 clamp(INT16 in)
 {
 	return in;
 }
@@ -164,12 +164,12 @@ UINT32 cdicdic_device::increment_cdda_frame_bcd(UINT32 bcd)
 {
 	UINT8 nybbles[6] =
 	{
-			bcd & 0x0000000f,
-		(bcd & 0x000000f0) >> 4,
-		(bcd & 0x00000f00) >> 8,
-		(bcd & 0x0000f000) >> 12,
-		(bcd & 0x000f0000) >> 16,
-		(bcd & 0x00f00000) >> 20
+		static_cast<UINT8>(bcd & 0x0000000f),
+		static_cast<UINT8>((bcd & 0x000000f0) >> 4),
+		static_cast<UINT8>((bcd & 0x00000f00) >> 8),
+		static_cast<UINT8>((bcd & 0x0000f000) >> 12),
+		static_cast<UINT8>((bcd & 0x000f0000) >> 16),
+		static_cast<UINT8>((bcd & 0x00f00000) >> 20)
 	};
 	nybbles[0]++;
 	if(nybbles[0] == 5 && nybbles[1] == 7)
@@ -204,12 +204,12 @@ UINT32 cdicdic_device::increment_cdda_sector_bcd(UINT32 bcd)
 {
 	UINT8 nybbles[6] =
 	{
-			bcd & 0x0000000f,
-		(bcd & 0x000000f0) >> 4,
-		(bcd & 0x00000f00) >> 8,
-		(bcd & 0x0000f000) >> 12,
-		(bcd & 0x000f0000) >> 16,
-		(bcd & 0x00f00000) >> 20
+		static_cast<UINT8>(bcd & 0x0000000f),
+		static_cast<UINT8>((bcd & 0x000000f0) >> 4),
+		static_cast<UINT8>((bcd & 0x00000f00) >> 8),
+		static_cast<UINT8>((bcd & 0x0000f000) >> 12),
+		static_cast<UINT8>((bcd & 0x000f0000) >> 16),
+		static_cast<UINT8>((bcd & 0x00f00000) >> 20)
 	};
 	nybbles[2]++;
 	if(nybbles[2] == 10)
@@ -563,12 +563,12 @@ void cdicdic_device::sample_trigger()
 		m_decode_delay = 0;
 	}
 
-	if(CDIC_IS_VALID_SAMPLE_BUF(m_ram, m_decode_addr & 0x3ffe))
+	if(CDIC_IS_VALID_SAMPLE_BUF(m_ram.get(), m_decode_addr & 0x3ffe))
 	{
 		verboselog(machine(), 0, "Hit audio_sample_trigger, with m_decode_addr == %04x, calling decode_audio_sector\n", m_decode_addr );
 
 		// Decode the data at Z+4, the same offset as a normal CD sector.
-		decode_audio_sector(((UINT8*)m_ram) + (m_decode_addr & 0x3ffe) + 4, 1);
+		decode_audio_sector(((UINT8*)m_ram.get()) + (m_decode_addr & 0x3ffe) + 4, 1);
 
 		// Swap buffer positions to indicate our new buffer position at the next read
 		m_decode_addr ^= 0x1a00;
@@ -577,7 +577,7 @@ void cdicdic_device::sample_trigger()
 
 		//// Delay for Frequency * (18*28*2*size in bytes) before requesting more data
 		verboselog(machine(), 0, "%s", "Data is valid, setting up a new callback\n" );
-		m_decode_period = attotime::from_hz(CDIC_SAMPLE_BUF_FREQ(m_ram, m_decode_addr & 0x3ffe)) * (18*28*2*CDIC_SAMPLE_BUF_SIZE(m_ram, m_decode_addr & 0x3ffe));
+		m_decode_period = attotime::from_hz(CDIC_SAMPLE_BUF_FREQ(m_ram.get(), m_decode_addr & 0x3ffe)) * (18*28*2*CDIC_SAMPLE_BUF_SIZE(m_ram.get(), m_decode_addr & 0x3ffe));
 		m_audio_sample_timer->adjust(m_decode_period);
 		//dmadac_enable(&dmadac[0], 2, 0);
 	}
@@ -615,12 +615,12 @@ void cdicdic_device::process_delayed_command()
 			int index = 0;
 			UINT8 nybbles[6] =
 			{
-					msf & 0x0000000f,
-				(msf & 0x000000f0) >> 4,
-				(msf & 0x00000f00) >> 8,
-				(msf & 0x0000f000) >> 12,
-				(msf & 0x000f0000) >> 16,
-				(msf & 0x00f00000) >> 20
+				static_cast<UINT8>(msf & 0x0000000f),
+				static_cast<UINT8>((msf & 0x000000f0) >> 4),
+				static_cast<UINT8>((msf & 0x00000f00) >> 8),
+				static_cast<UINT8>((msf & 0x0000f000) >> 12),
+				static_cast<UINT8>((msf & 0x000f0000) >> 16),
+				static_cast<UINT8>((msf & 0x00f00000) >> 20)
 			};
 			if(msf & 0x000080)
 			{
@@ -706,7 +706,7 @@ void cdicdic_device::process_delayed_command()
 						m_ram[(m_data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
 					}
 
-					decode_audio_sector(((UINT8*)m_ram) + ((m_data_buffer & 5) * 0xa00 + 4), 0);
+					decode_audio_sector(((UINT8*)m_ram.get()) + ((m_data_buffer & 5) * 0xa00 + 4), 0);
 
 					//printf( "Setting CDIC interrupt line\n" );
 					verboselog(machine(), 0, "%s", "Setting CDIC interrupt line for audio sector\n" );
@@ -785,12 +785,12 @@ void cdicdic_device::process_delayed_command()
 //          UINT32 next_lba = 0;
 			UINT8 nybbles[6] =
 			{
-					msf & 0x0000000f,
-				(msf & 0x000000f0) >> 4,
-				(msf & 0x00000f00) >> 8,
-				(msf & 0x0000f000) >> 12,
-				(msf & 0x000f0000) >> 16,
-				(msf & 0x00f00000) >> 20
+				static_cast<UINT8>(msf & 0x0000000f),
+				static_cast<UINT8>((msf & 0x000000f0) >> 4),
+				static_cast<UINT8>((msf & 0x00000f00) >> 8),
+				static_cast<UINT8>((msf & 0x0000f000) >> 12),
+				static_cast<UINT8>((msf & 0x000f0000) >> 16),
+				static_cast<UINT8>((msf & 0x00f00000) >> 20)
 			};
 /*          UINT8 next_nybbles[6] =
             {
@@ -857,12 +857,12 @@ void cdicdic_device::process_delayed_command()
 			UINT32 lba = 0;
 			UINT8 nybbles[6] =
 			{
-					msf & 0x0000000f,
-				(msf & 0x000000f0) >> 4,
-				(msf & 0x00000f00) >> 8,
-				(msf & 0x0000f000) >> 12,
-				(msf & 0x000f0000) >> 16,
-				(msf & 0x00f00000) >> 20
+				static_cast<UINT8>(msf & 0x0000000f),
+				static_cast<UINT8>((msf & 0x000000f0) >> 4),
+				static_cast<UINT8>((msf & 0x00000f00) >> 8),
+				static_cast<UINT8>((msf & 0x0000f000) >> 12),
+				static_cast<UINT8>((msf & 0x000f0000) >> 16),
+				static_cast<UINT8>((msf & 0x00f00000) >> 20)
 			};
 			lba = nybbles[0] + nybbles[1]*10 + ((nybbles[2] + nybbles[3]*10)*75) + ((nybbles[4] + nybbles[5]*10)*75*60);
 
@@ -1193,7 +1193,7 @@ void cdicdic_device::device_start()
 	m_audio_sample_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdicdic_device::audio_sample_trigger), this));
 	m_audio_sample_timer->adjust(attotime::never);
 
-	m_ram = auto_alloc_array(machine(), UINT16, 0x3c00/2);
+	m_ram = std::make_unique<UINT16[]>(0x3c00/2);
 }
 
 //-------------------------------------------------

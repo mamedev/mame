@@ -23,18 +23,18 @@ void fuukivid_device::static_set_gfxdecode_tag(device_t &device, const char *tag
 
 void fuukivid_device::device_start()
 {
-	m_sprram = auto_alloc_array_clear(machine(), UINT16, 0x2000 / 2);
+	m_sprram = make_unique_clear<UINT16[]>(0x2000 / 2);
 
 	// fuukifg3 clearly has buffered ram, it is unclear if fuukifg2 has
 	// it is likely these render to a framebuffer as the tile bank (which is probably external hw) also needs to be banked
 	// suggesting that the sprites are rendered earlier, then displayed from a buffer
 
-	m_sprram_old = auto_alloc_array_clear(machine(), UINT16, 0x2000 / 2);
-	m_sprram_old2 = auto_alloc_array_clear(machine(), UINT16, 0x2000 / 2);
+	m_sprram_old = make_unique_clear<UINT16[]>(0x2000 / 2);
+	m_sprram_old2 = make_unique_clear<UINT16[]>(0x2000 / 2);
 
-	save_pointer(NAME(m_sprram), 0x2000 / 2);
-	save_pointer(NAME(m_sprram_old), 0x2000 / 2);
-	save_pointer(NAME(m_sprram_old2), 0x2000 / 2);
+	save_pointer(NAME(m_sprram.get()), 0x2000 / 2);
+	save_pointer(NAME(m_sprram_old.get()), 0x2000 / 2);
+	save_pointer(NAME(m_sprram_old2.get()), 0x2000 / 2);
 
 }
 
@@ -88,9 +88,9 @@ void fuukivid_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	const rectangle &visarea = screen.visible_area();
 
-	UINT16 *spriteram16 = m_sprram;
+	UINT16 *spriteram16 = m_sprram.get();
 
-	if (tilebank) spriteram16 = m_sprram_old2; // so that FG3 uses the buffered RAM
+	if (tilebank) spriteram16 = m_sprram_old2.get(); // so that FG3 uses the buffered RAM
 
 	int max_x = visarea.max_x + 1;
 	int max_y = visarea.max_y + 1;
@@ -180,6 +180,6 @@ void fuukivid_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,
 
 void fuukivid_device::buffer_sprites(void)
 {
-	memcpy(m_sprram_old2, m_sprram_old, 0x2000);
-	memcpy(m_sprram_old, m_sprram, 0x2000);
+	memcpy(m_sprram_old2.get(), m_sprram_old.get(), 0x2000);
+	memcpy(m_sprram_old.get(), m_sprram.get(), 0x2000);
 }

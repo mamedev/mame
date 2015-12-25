@@ -61,7 +61,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update_toki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_tokib(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -133,7 +133,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ "z80pio" },
 	{ "z80dart" },
 	{ "z80ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 /* Z80-CTC Interface */

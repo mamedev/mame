@@ -47,7 +47,7 @@
 static const prom_load_t pl_enet_a41 =
 {   /* P3601 256x4 BPROM; Ethernet phase encoder 1 "PE1" */
 	"enet.a41",
-	0,
+	nullptr,
 	"d5de8d86",
 	"c134a4c898c73863124361a9b0218f7a7f00082a",
 	/* size */  0400,
@@ -64,7 +64,7 @@ static const prom_load_t pl_enet_a41 =
 static const prom_load_t pl_enet_a42 =
 {   /* P3601 256x4 BPROM; Ethernet phase encoder 2 "PE2" */
 	"enet.a42",
-	0,
+	nullptr,
 	"9d5c81bd",
 	"ac7e63332a3dad0bef7cd0349b24e156a96a4bf0",
 	/* size */  0400,
@@ -106,7 +106,7 @@ static const prom_load_t pl_enet_a42 =
 static const prom_load_t pl_enet_a49 =
 {   /* P3601 256x4 BPROM; Ethernet FIFO control "AFIFO" */
 	"enet.a49",
-	0,
+	nullptr,
 	"4d2dcdb2",
 	"583327a7d70cd02702c941c0e43c1e9408ff7fd0",
 	/* size */  0400,
@@ -245,7 +245,7 @@ static void dump_packet(device_t *device, const char* name, const UINT16 *src, s
  */
 void alto2_cpu_device::eth_wakeup()
 {
-	register int st = m_eth.status;
+	int st = m_eth.status;
 	LOG((this,LOG_ETH,0,"IBUSY=%d OBUSY=%d ", GET_ETH_IBUSY(st), GET_ETH_OBUSY(st)));
 	UINT8 busy = GET_ETH_IBUSY(st) | GET_ETH_OBUSY(st);
 	if (0 == busy) {
@@ -600,7 +600,7 @@ void alto2_cpu_device::bs_early_eidfct()
 		m_eth.rx_packet[m_eth.rx_count] = r;
 	m_eth.rx_count++;
 	if (ALTO2_ETHER_PACKET_SIZE == m_eth.rx_count) {
-		dump_packet(this,"RX", m_eth.rx_packet, 0, m_eth.rx_count);
+		dump_packet(this,"RX", m_eth.rx_packet.get(), 0, m_eth.rx_count);
 		m_eth.rx_count = 0;
 	}
 #endif
@@ -709,7 +709,7 @@ void alto2_cpu_device::f2_late_eodfct()
 		m_eth.tx_packet[m_eth.tx_count] = m_bus;
 	m_eth.tx_count++;
 	if (ALTO2_ETHER_PACKET_SIZE == m_eth.tx_count) {
-		dump_packet(this,"TX", m_eth.tx_packet, 0, m_eth.tx_count);
+		dump_packet(this,"TX", m_eth.tx_packet.get(), 0, m_eth.tx_count);
 		m_eth.tx_count = 0;
 	}
 #endif
@@ -1338,8 +1338,8 @@ void alto2_cpu_device::init_ether(int task)
 
 	m_active_callback[task] = &alto2_cpu_device::activate_eth;
 
-	m_eth.rx_packet = auto_alloc_array(machine(), UINT16, sizeof(UINT16)*ALTO2_ETHER_PACKET_SIZE);
-	m_eth.tx_packet = auto_alloc_array(machine(), UINT16, sizeof(UINT16)*ALTO2_ETHER_PACKET_SIZE);
+	m_eth.rx_packet = std::make_unique<UINT16[]>(sizeof(UINT16)*ALTO2_ETHER_PACKET_SIZE);
+	m_eth.tx_packet = std::make_unique<UINT16[]>(sizeof(UINT16)*ALTO2_ETHER_PACKET_SIZE);
 
 	m_eth.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::tx_packet),this));
 	m_eth.tx_timer->reset();

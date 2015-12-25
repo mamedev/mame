@@ -44,7 +44,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(halt_i86_w);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void machine_reset();
+	void machine_reset() override;
 
 	UINT8 m_sysctl, m_pa, m_kbcin, m_kbcout;
 	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
@@ -260,9 +260,9 @@ static MACHINE_CONFIG_START( olivetti, m24_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "mb3", pc_isa8_cards, "lpt", true)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "mb4", pc_isa8_cards, "com", true)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, nullptr, false)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

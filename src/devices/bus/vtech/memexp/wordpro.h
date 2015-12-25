@@ -28,9 +28,9 @@ public:
 	wordpro_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual const rom_entry *device_rom_region() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual const rom_entry *device_rom_region() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 // device type definition

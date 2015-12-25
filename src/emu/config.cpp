@@ -61,7 +61,7 @@ static int config_save_xml(running_machine &machine, emu_file &file, int type);
 
 void config_init(running_machine &machine)
 {
-	typelist = NULL;
+	typelist = nullptr;
 }
 
 
@@ -80,7 +80,7 @@ void config_register(running_machine &machine, const char *nodename, config_save
 
 	/* allocate a new type */
 	newtype = auto_alloc(machine, config_type);
-	newtype->next = NULL;
+	newtype->next = nullptr;
 	newtype->name = nodename;
 	newtype->load = load;
 	newtype->save = save;
@@ -106,7 +106,7 @@ int config_load_settings(running_machine &machine)
 
 	/* loop over all registrants and call their init function */
 	for (type = typelist; type; type = type->next)
-		type->load(CONFIG_TYPE_INIT, NULL);
+		type->load(CONFIG_TYPE_INIT, nullptr);
 
 	/* now load the controller file */
 	if (controller[0] != 0)
@@ -136,7 +136,7 @@ int config_load_settings(running_machine &machine)
 
 	/* loop over all registrants and call their final function */
 	for (type = typelist; type; type = type->next)
-		type->load(CONFIG_TYPE_FINAL, NULL);
+		type->load(CONFIG_TYPE_FINAL, nullptr);
 
 	/* if we didn't find a saved config, return 0 so the main core knows that it */
 	/* is the first time the game is run and it should diplay the disclaimer. */
@@ -150,7 +150,7 @@ void config_save_settings(running_machine &machine)
 
 	/* loop over all registrants and call their init function */
 	for (type = typelist; type; type = type->next)
-		type->save(CONFIG_TYPE_INIT, NULL);
+		type->save(CONFIG_TYPE_INIT, nullptr);
 
 	/* save the defaults file */
 	emu_file file(machine.options().cfg_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -165,7 +165,7 @@ void config_save_settings(running_machine &machine)
 
 	/* loop over all registrants and call their final function */
 	for (type = typelist; type; type = type->next)
-		type->save(CONFIG_TYPE_FINAL, NULL);
+		type->save(CONFIG_TYPE_FINAL, nullptr);
 }
 
 
@@ -184,7 +184,7 @@ static int config_load_xml(running_machine &machine, emu_file &file, int which_t
 	int version, count;
 
 	/* read the file */
-	root = xml_file_read(file, NULL);
+	root = xml_file_read(file, nullptr);
 	if (!root)
 		goto error;
 
@@ -288,13 +288,13 @@ static int config_save_xml(running_machine &machine, emu_file &file, int which_t
 		return 0;
 
 	/* create a config node */
-	confignode = xml_add_child(root, "mameconfig", NULL);
+	confignode = xml_add_child(root, "mameconfig", nullptr);
 	if (!confignode)
 		goto error;
 	xml_set_attribute_int(confignode, "version", CONFIG_VERSION);
 
 	/* create a system node */
-	systemnode = xml_add_child(confignode, "system", NULL);
+	systemnode = xml_add_child(confignode, "system", nullptr);
 	if (!systemnode)
 		goto error;
 	xml_set_attribute(systemnode, "name", (which_type == CONFIG_TYPE_DEFAULT) ? "default" : machine.system().name);
@@ -303,7 +303,7 @@ static int config_save_xml(running_machine &machine, emu_file &file, int which_t
 	/* loop over all registrants and call their save function */
 	for (type = typelist; type; type = type->next)
 	{
-		xml_data_node *curnode = xml_add_child(systemnode, type->name, NULL);
+		xml_data_node *curnode = xml_add_child(systemnode, type->name, nullptr);
 		if (!curnode)
 			goto error;
 		type->save(which_type, curnode);

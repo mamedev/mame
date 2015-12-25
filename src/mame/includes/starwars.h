@@ -39,9 +39,9 @@ public:
 	UINT16 m_quotient_shift;
 	UINT16 m_divisor;
 	UINT16 m_dividend;
-	UINT8 *m_PROM_STR;
-	UINT8 *m_PROM_MAS;
-	UINT8 *m_PROM_AM;
+	std::unique_ptr<UINT8[]> m_PROM_STR;
+	std::unique_ptr<UINT8[]> m_PROM_MAS;
+	std::unique_ptr<UINT8[]> m_PROM_AM;
 	int m_math_run;
 	emu_timer *m_math_timer;
 	INT16 m_A;
@@ -70,7 +70,7 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(esb_setdirect);
 	DECLARE_DRIVER_INIT(esb);
 	DECLARE_DRIVER_INIT(starwars);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(math_run_clear);
 	TIMER_CALLBACK_MEMBER(main_callback);
 	TIMER_CALLBACK_MEMBER(sound_callback);

@@ -1410,7 +1410,7 @@ static MACHINE_CONFIG_DERIVED( firebeat_spu, firebeat )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_ATA_INTERFACE_ADD("spu_ata", ata_devices, "cdrom", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("spu_ata", ata_devices, "cdrom", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(firebeat_state, spu_ata_interrupt))
 MACHINE_CONFIG_END
 

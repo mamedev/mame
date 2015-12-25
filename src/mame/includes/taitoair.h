@@ -67,7 +67,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	bitmap_ind16 *m_framebuffer[2];
+	std::unique_ptr<bitmap_ind16> m_framebuffer[2];
 
 	/* 3d info */
 	INT16 m_frustumLeft;
@@ -121,9 +121,9 @@ public:
 	DECLARE_WRITE16_MEMBER(dsp_flags_w);
 	DECLARE_WRITE16_MEMBER(dma_regs_w);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	int draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset );

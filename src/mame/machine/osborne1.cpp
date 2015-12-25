@@ -118,7 +118,7 @@ READ8_MEMBER( osborne1_state::opcode_r )
 
 WRITE8_MEMBER( osborne1_state::bankswitch_w )
 {
-	switch (offset & 0x03)
+	switch (offset)
 	{
 	case 0x00:
 		if (set_rom_mode(1))
@@ -223,7 +223,7 @@ WRITE8_MEMBER( osborne1_state::video_pia_port_b_w )
 	}
 	else
 	{
-		m_fdc->set_floppy(NULL);
+		m_fdc->set_floppy(nullptr);
 	}
 }
 

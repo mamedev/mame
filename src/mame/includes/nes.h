@@ -70,7 +70,7 @@ public:
 	ioport_port       *m_io_disksel;
 
 	UINT8      *m_vram;
-	UINT8      *m_ciram; //PPU nametable RAM - external to PPU!
+	std::unique_ptr<UINT8[]>    m_ciram; //PPU nametable RAM - external to PPU!
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
@@ -90,10 +90,10 @@ public:
 	DECLARE_READ8_MEMBER(fc_in1_r);
 	DECLARE_WRITE8_MEMBER(fc_in0_w);
 	DECLARE_WRITE8_MEMBER(nes_vh_sprite_dma_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
-	virtual void video_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void video_reset() override;
 	DECLARE_PALETTE_INIT(nes);
 	UINT32 screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	NESCTRL_BRIGHTPIXEL_CB(bright_pixel);

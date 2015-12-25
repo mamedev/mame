@@ -451,9 +451,9 @@ public:
 	DECLARE_DRIVER_INIT(ama8000_2_i);
 	DECLARE_DRIVER_INIT(ama8000_2_v);
 	DECLARE_DRIVER_INIT(ama8000_1_x);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(amaticmg);
 	DECLARE_PALETTE_INIT(amaticmg2);
 	UINT32 screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

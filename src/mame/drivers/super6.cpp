@@ -222,7 +222,7 @@ WRITE8_MEMBER( super6_state::fdc_w )
 	*/
 
 	// disk drive select
-	floppy_image_device *m_floppy = NULL;
+	floppy_image_device *m_floppy = nullptr;
 
 	if ((data & 3) == 0)
 		m_floppy = m_floppy0->get_device();
@@ -431,7 +431,7 @@ static const z80_daisy_config super6_daisy_chain[] =
 	{ Z80CTC_TAG },
 	{ Z80DART_TAG },
 	{ Z80PIO_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 
@@ -514,7 +514,7 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(super6_state, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", super6_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", super6_floppies, NULL,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", super6_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_24MHz/4, 0, 0, 0, 0 )
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
@@ -529,7 +529,7 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
 
 	MCFG_DEVICE_ADD(BR1945_TAG, COM8116, XTAL_5_0688MHz)

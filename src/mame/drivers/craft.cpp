@@ -43,7 +43,7 @@ public:
 
 	void video_update();
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	UINT32 m_last_cycles;
 	UINT64 m_frame_start_cycle;
@@ -60,7 +60,7 @@ public:
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
 	DECLARE_DRIVER_INIT(craft);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	UINT32 screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	required_device<dac_device> m_dac;

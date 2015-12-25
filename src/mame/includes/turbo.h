@@ -63,7 +63,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 
-	UINT8 *     m_buckrog_bitmap_ram;
+	std::unique_ptr<UINT8[]>     m_buckrog_bitmap_ram;
 
 	/* machine states */
 	UINT8       m_i8279_scanlines;

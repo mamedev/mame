@@ -124,7 +124,7 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", endianness, 32, 32, 0, 32, MIPS3_MIN_PAGE_SHIFT)
 	, m_flavor(flavor)
-	, m_core(NULL)
+	, m_core(nullptr)
 	, m_ppc(0)
 	, m_nextpc(0)
 	, m_pcbase(0)
@@ -134,7 +134,7 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	, m_ll_value(0)
 	, m_lld_value(0)
 	, m_badcop_value(0)
-	, m_tlb_table(NULL)
+	, m_tlb_table(nullptr)
 	, m_lwl(endianness == ENDIANNESS_BIG ? &mips3_device::lwl_be : &mips3_device::lwl_le)
 	, m_lwr(endianness == ENDIANNESS_BIG ? &mips3_device::lwr_be : &mips3_device::lwr_le)
 	, m_swl(endianness == ENDIANNESS_BIG ? &mips3_device::swl_be : &mips3_device::swl_le)
@@ -151,42 +151,42 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	, m_word_xor(m_bigendian ? WORD_XOR_BE(0) : WORD_XOR_LE(0))
 	, c_icache_size(0)
 	, c_dcache_size(0)
-	, m_vtlb(NULL)
+	, m_vtlb(nullptr)
 	, m_fastram_select(0)
 	, m_debugger_temp(0)
 	, m_cache(CACHE_SIZE + sizeof(internal_mips3_state))
-	, m_drcuml(NULL)
-	, m_drcfe(NULL)
+	, m_drcuml(nullptr)
+	, m_drcfe(nullptr)
 	, m_drcoptions(0)
 	, m_cache_dirty(0)
-	, m_entry(NULL)
-	, m_nocode(NULL)
-	, m_out_of_cycles(NULL)
-	, m_tlb_mismatch(NULL)
+	, m_entry(nullptr)
+	, m_nocode(nullptr)
+	, m_out_of_cycles(nullptr)
+	, m_tlb_mismatch(nullptr)
 	, m_hotspot_select(0)
 {
 	memset(m_fpmode, 0, sizeof(m_fpmode));
 
 	for (int i = 0; i < 3; i++)
 	{
-		m_read8[i] = NULL;
-		m_write8[i] = NULL;
-		m_read16[i] = NULL;
-		m_write16[i] = NULL;
-		m_read32[i] = NULL;
-		m_read32mask[i] = NULL;
-		m_write32[i] = NULL;
-		m_write32mask[i] = NULL;
-		m_read64[i] = NULL;
-		m_read64mask[i] = NULL;
-		m_write64[i] = NULL;
-		m_write64mask[i] = NULL;
+		m_read8[i] = nullptr;
+		m_write8[i] = nullptr;
+		m_read16[i] = nullptr;
+		m_write16[i] = nullptr;
+		m_read32[i] = nullptr;
+		m_read32mask[i] = nullptr;
+		m_write32[i] = nullptr;
+		m_write32mask[i] = nullptr;
+		m_read64[i] = nullptr;
+		m_read64mask[i] = nullptr;
+		m_write64[i] = nullptr;
+		m_write64mask[i] = nullptr;
 	}
 
 	for (int i = 0; i < 18; i++)
 	{
-		m_exception[i] = NULL;
-		m_exception_norecover[i] = NULL;
+		m_exception[i] = nullptr;
+		m_exception_norecover[i] = nullptr;
 	}
 	memset(m_fastram, 0, sizeof(m_fastram));
 	memset(m_hotspot, 0, sizeof(m_hotspot));
@@ -195,21 +195,19 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 
 void mips3_device::device_stop()
 {
-	if (m_vtlb != NULL)
+	if (m_vtlb != nullptr)
 	{
 		vtlb_free(m_vtlb);
-		m_vtlb = NULL;
+		m_vtlb = nullptr;
 	}
 
-	if (m_drcfe != NULL)
+	if (m_drcfe != nullptr)
 	{
-		auto_free(machine(), m_drcfe);
-		m_drcfe = NULL;
+		m_drcfe = nullptr;
 	}
-	if (m_drcuml != NULL)
+	if (m_drcuml != nullptr)
 	{
-		auto_free(machine(), m_drcuml);
-		m_drcuml = NULL;
+		m_drcuml = nullptr;
 	}
 }
 
@@ -357,7 +355,7 @@ void mips3_device::device_start()
 
 	UINT32 flags = 0;
 	/* initialize the UML generator */
-	m_drcuml = auto_alloc(machine(), drcuml_state(*this, m_cache, flags, 8, 32, 2));
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 8, 32, 2);
 
 	/* add symbols for our stuff */
 	m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");
@@ -403,7 +401,7 @@ void mips3_device::device_start()
 	m_drcuml->symbol_add(&m_fpmode, sizeof(m_fpmode), "fpmode");
 
 	/* initialize the front-end helper */
-	m_drcfe = auto_alloc(machine(), mips3_frontend(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
+	m_drcfe = std::make_unique<mips3_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 	/* allocate memory for cache-local state and initialize it */
 	memcpy(m_fpmode, fpmode_source, sizeof(fpmode_source));

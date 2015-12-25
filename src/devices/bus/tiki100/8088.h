@@ -31,20 +31,20 @@ public:
 	tiki100_8088_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_tiki100bus_card_interface overrides
-	virtual UINT8 iorq_r(address_space &space, offs_t offset, UINT8 data);
-	virtual void iorq_w(address_space &space, offs_t offset, UINT8 data);
+	virtual UINT8 iorq_r(address_space &space, offs_t offset, UINT8 data) override;
+	virtual void iorq_w(address_space &space, offs_t offset, UINT8 data) override;
 
 private:
 	required_device<i8088_cpu_device> m_maincpu;

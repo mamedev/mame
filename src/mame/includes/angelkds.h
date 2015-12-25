@@ -63,9 +63,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bgtop_tile_info);
 	TILE_GET_INFO_MEMBER(get_bgbot_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_angelkds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int enable_n);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

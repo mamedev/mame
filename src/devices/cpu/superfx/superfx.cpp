@@ -573,9 +573,9 @@ void superfx_device::add_clocks(INT32 clocks)
 
 void superfx_device::device_start()
 {
-	for(int i = 0; i < 16; i++)
+	for(auto & elem : m_r)
 	{
-		m_r[i] = 0;
+		elem = 0;
 	}
 
 	m_sfr = 0;

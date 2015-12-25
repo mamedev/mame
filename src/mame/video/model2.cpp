@@ -105,7 +105,7 @@
  *
  *******************************************/
 
-INLINE void transform_point( poly_vertex *point, float *matrix )
+static inline void transform_point( poly_vertex *point, float *matrix )
 {
 	float tx = (point->x * matrix[0]) + (point->y * matrix[3]) + (point->pz * matrix[6]) + (matrix[9]);
 	float ty = (point->x * matrix[1]) + (point->y * matrix[4]) + (point->pz * matrix[7]) + (matrix[10]);
@@ -116,7 +116,7 @@ INLINE void transform_point( poly_vertex *point, float *matrix )
 	point->pz = tz;
 }
 
-INLINE void transform_vector( poly_vertex *vector, float *matrix )
+static inline void transform_vector( poly_vertex *vector, float *matrix )
 {
 	float tx = (vector->x * matrix[0]) + (vector->y * matrix[3]) + (vector->pz * matrix[6]);
 	float ty = (vector->x * matrix[1]) + (vector->y * matrix[4]) + (vector->pz * matrix[7]);
@@ -127,7 +127,7 @@ INLINE void transform_vector( poly_vertex *vector, float *matrix )
 	vector->pz = tz;
 }
 
-INLINE void normalize_vector( poly_vertex *vector )
+static inline void normalize_vector( poly_vertex *vector )
 {
 	float n = sqrt( (vector->x * vector->x) + (vector->y * vector->y) + (vector->pz * vector->pz) );
 
@@ -140,12 +140,12 @@ INLINE void normalize_vector( poly_vertex *vector )
 	}
 }
 
-INLINE float dot_product( poly_vertex *v1, poly_vertex *v2 )
+static inline float dot_product( poly_vertex *v1, poly_vertex *v2 )
 {
 	return (v1->x * v2->x) + (v1->y * v2->y) + (v1->pz * v2->pz);
 }
 
-INLINE void vector_cross3( poly_vertex *dst, poly_vertex *v0, poly_vertex *v1, poly_vertex *v2 )
+static inline void vector_cross3( poly_vertex *dst, poly_vertex *v0, poly_vertex *v1, poly_vertex *v2 )
 {
 	poly_vertex p1, p2;
 
@@ -451,9 +451,9 @@ static void model2_3d_process_quad( raster_state *raster, UINT32 attr )
 			/* get our list read to add the triangles */
 			ztri = raster->tri_sorted_list[object.z];
 
-			if ( ztri != NULL )
+			if ( ztri != nullptr )
 			{
-				while( ztri->next != NULL )
+				while( ztri->next != nullptr )
 					ztri = (triangle *)ztri->next;
 			}
 
@@ -492,9 +492,9 @@ static void model2_3d_process_quad( raster_state *raster, UINT32 attr )
 				memcpy( &tri->v[2], &verts[i], sizeof( poly_vertex ) );
 
 				/* add to our sorted list */
-				tri->next = NULL;
+				tri->next = nullptr;
 
-				if ( ztri == NULL )
+				if ( ztri == nullptr )
 				{
 					raster->tri_sorted_list[object.z] = tri;
 				}
@@ -688,9 +688,9 @@ static void model2_3d_process_triangle( raster_state *raster, UINT32 attr )
 			/* get our list read to add the triangles */
 			ztri = raster->tri_sorted_list[object.z];
 
-			if ( ztri != NULL )
+			if ( ztri != nullptr )
 			{
-				while( ztri->next != NULL )
+				while( ztri->next != nullptr )
 					ztri = (triangle *)ztri->next;
 			}
 
@@ -729,9 +729,9 @@ static void model2_3d_process_triangle( raster_state *raster, UINT32 attr )
 				memcpy( &tri->v[2], &verts[i], sizeof( poly_vertex ) );
 
 				/* add to our sorted list */
-				tri->next = NULL;
+				tri->next = nullptr;
 
-				if ( ztri == NULL )
+				if ( ztri == nullptr )
 				{
 					raster->tri_sorted_list[object.z] = tri;
 				}
@@ -953,13 +953,13 @@ void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &c
 	for( z = raster->max_z; z >= raster->min_z; z-- )
 	{
 		/* see if we have items at this z level */
-		if ( raster->tri_sorted_list[z] != NULL )
+		if ( raster->tri_sorted_list[z] != nullptr )
 		{
 			/* get a pointer to the first triangle */
 			triangle *tri = raster->tri_sorted_list[z];
 
 			/* and loop clipping and rendering each triangle */
-			while( tri != NULL )
+			while( tri != nullptr )
 			{
 				/* project and render */
 				model2_3d_project( tri );
@@ -2377,7 +2377,7 @@ static UINT32 * geo_end( geo_state *geo, UINT32 opcode, UINT32 *input )
 	model2_3d_push( raster, 0xFF000000 );
 
 	/* signal end by returning NULL */
-	return NULL;
+	return nullptr;
 }
 
 /* Command 10: Dummy */
@@ -2558,7 +2558,7 @@ static void geo_parse( model2_state *state )
 	UINT32 *input = &state->m_bufferram[address];
 	UINT32  opcode;
 
-	while( input != NULL && (input - state->m_bufferram) < 0x20000  )
+	while( input != nullptr && (input - state->m_bufferram) < 0x20000  )
 	{
 		/* read in the opcode */
 		opcode = *input++;
@@ -2601,7 +2601,7 @@ VIDEO_START_MEMBER(model2_state,model2)
 	geo_init( machine(), (UINT32*)memregion("user2")->base() );
 
 	/* init various video-related pointers */
-	m_palram = auto_alloc_array_clear(machine(), UINT16, 0x2000);
+	m_palram = make_unique_clear<UINT16[]>(0x2000);
 }
 
 UINT32 model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

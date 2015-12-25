@@ -169,7 +169,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_3_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_4_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(skylncr_vblank_interrupt);
 	required_device<cpu_device> m_maincpu;

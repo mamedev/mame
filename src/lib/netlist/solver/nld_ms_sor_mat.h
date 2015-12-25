@@ -35,11 +35,11 @@ public:
 
 	virtual ~matrix_solver_SOR_mat_t() {}
 
-	virtual void vsetup(analog_net_t::list_t &nets);
+	virtual void vsetup(analog_net_t::list_t &nets) override;
 
 	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 protected:
-	ATTR_HOT virtual nl_double vsolve();
+	ATTR_HOT virtual nl_double vsolve() override;
 
 private:
 	nl_double m_Vdelta[_storage_N];

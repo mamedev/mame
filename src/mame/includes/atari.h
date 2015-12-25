@@ -34,7 +34,7 @@ public:
 		m_fake(*this, "fake")
 		{ }
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	DECLARE_PALETTE_INIT(atari);
 

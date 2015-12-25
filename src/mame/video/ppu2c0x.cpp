@@ -97,7 +97,7 @@ ADDRESS_MAP_END
 
 const address_space_config *ppu2c0x_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 
@@ -124,7 +124,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 				: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_memory_interface(mconfig, *this),
 					device_video_interface(mconfig, *this),
-					m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(ppu2c0x)),
+					m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(ppu2c0x)),
 					m_cpu(*this),
 					m_scanline(0),  // reset the scanline count
 					m_refresh_data(0),
@@ -144,8 +144,8 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 					m_draw_phase(0),
 					m_use_sprite_write_limitation(true)
 {
-	for (int i = 0; i < PPU_MAX_REG; i++)
-		m_regs[i] = 0;
+	for (auto & elem : m_regs)
+		elem = 0;
 
 	memset(m_palette_ram, 0, ARRAY_LENGTH(m_palette_ram));
 
@@ -222,10 +222,10 @@ void ppu2c0x_device::device_start()
 	m_nmi_timer->adjust(attotime::never);
 
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
-	m_spriteram = auto_alloc_array_clear(machine(), UINT8, SPRITERAM_SIZE);
-	m_colortable = auto_alloc_array(machine(), pen_t, ARRAY_LENGTH(default_colortable));
-	m_colortable_mono = auto_alloc_array(machine(), pen_t, ARRAY_LENGTH(default_colortable_mono));
+	m_bitmap = std::make_unique<bitmap_ind16>(VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
+	m_spriteram = make_unique_clear<UINT8[]>(SPRITERAM_SIZE);
+	m_colortable = std::make_unique<pen_t[]>(ARRAY_LENGTH(default_colortable));
+	m_colortable_mono = std::make_unique<pen_t[]>(ARRAY_LENGTH(default_colortable_mono));
 
 	/* initialize the color tables */
 	for (int i = 0; i < ARRAY_LENGTH(default_colortable_mono); i++)
@@ -256,9 +256,9 @@ void ppu2c0x_device::device_start()
 	save_item(NAME(m_palette_ram));
 	save_item(NAME(m_draw_phase));
 	save_item(NAME(m_tilecount));
-	save_pointer(NAME(m_spriteram), SPRITERAM_SIZE);
-	save_pointer(NAME(m_colortable), ARRAY_LENGTH(default_colortable));
-	save_pointer(NAME(m_colortable_mono), ARRAY_LENGTH(default_colortable_mono));
+	save_pointer(NAME(m_spriteram.get()), SPRITERAM_SIZE);
+	save_pointer(NAME(m_colortable.get()), ARRAY_LENGTH(default_colortable));
+	save_pointer(NAME(m_colortable_mono.get()), ARRAY_LENGTH(default_colortable_mono));
 	save_item(NAME(*m_bitmap));
 }
 
@@ -571,12 +571,12 @@ void ppu2c0x_device::draw_background( UINT8 *line_priority )
 	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
 	{
 		color_mask = 0xf0;
-		color_table = m_colortable_mono;
+		color_table = m_colortable_mono.get();
 	}
 	else
 	{
 		color_mask = 0xff;
-		color_table = m_colortable;
+		color_table = m_colortable.get();
 	}
 
 	/* cache the background pen */

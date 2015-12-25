@@ -10,7 +10,7 @@ READ32_MEMBER( m68340cpu_device::m68340_internal_dma_r )
 {
 	m68340cpu_device *m68k = this;
 	m68340_dma* dma = m68k->m68340DMA;
-	assert(dma != NULL);
+	assert(dma != nullptr);
 
 	if (dma)
 	{
@@ -25,7 +25,7 @@ WRITE32_MEMBER( m68340cpu_device::m68340_internal_dma_w )
 {
 	m68340cpu_device *m68k = this;
 	m68340_dma* dma = m68k->m68340DMA;
-	assert(dma != NULL);
+	assert(dma != nullptr);
 
 	if (dma)
 	{

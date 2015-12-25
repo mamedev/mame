@@ -64,9 +64,9 @@ enum vram_t
 // Layers
 struct layer_t
 {
-	UINT8 *videorams[2];
+	std::unique_ptr<UINT8[]> videorams[2];
 
-	UINT8 *scrollrams[2];
+	std::unique_ptr<UINT8[]> scrollrams[2];
 	int scroll_x;
 	int scroll_y;
 
@@ -88,11 +88,11 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
-	UINT8 *m_hm86171_colorram;
+	std::unique_ptr<UINT8[]> m_hm86171_colorram;
 	layer_t m_layers[2];
 	UINT8 m_ss9601_byte_lo;
 	UINT8 m_ss9601_byte_lo2;
-	UINT8 *m_ss9601_reelrams[2];
+	std::unique_ptr<UINT8[]> m_ss9601_reelrams[2];
 	rectangle m_ss9601_reelrects[3];
 	UINT8 m_ss9601_scrollctrl;
 	UINT8 m_ss9601_tilesize;
@@ -161,6 +161,7 @@ public:
 	DECLARE_DRIVER_INIT(mtrain);
 	DECLARE_DRIVER_INIT(saklove);
 	DECLARE_DRIVER_INIT(xplan);
+	DECLARE_DRIVER_INIT(ptrain);
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_0);
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
 	DECLARE_VIDEO_START(subsino2);
@@ -222,7 +223,7 @@ WRITE8_MEMBER(subsino2_state::ss9601_byte_lo2_w)
 }
 
 
-INLINE void ss9601_videoram_w(layer_t *l, vram_t vram, address_space &space, offs_t offset, UINT8 data)
+static inline void ss9601_videoram_w(layer_t *l, vram_t vram, address_space &space, offs_t offset, UINT8 data)
 {
 	l->videorams[vram][offset] = data;
 
@@ -446,31 +447,50 @@ WRITE8_MEMBER(subsino2_state::ss9601_tilesize_w)
 	m_ss9601_tilesize = data;
 
 	tilesize_t sizes[2];
-	switch (data)
+	switch ((data&0xf0)>>4)
 	{
-		case 0x00:
+		case 0x0:
 			sizes[0] = TILE_8x8;
-			sizes[1] = TILE_8x8;
 			break;
 
-		case 0x40:
+		case 0x4:
 			sizes[0] = TILE_8x32;
-			sizes[1] = TILE_8x8;
 			break;
 
-		case 0x70:
+		case 0x7:
 			sizes[0] = TILE_64x32;
-			sizes[1] = TILE_8x8;
 			break;
 
 		default:
 			sizes[0] = TILE_8x8;
-			sizes[1] = TILE_8x8;
 
-			logerror("%s: warning, unknown tilesize = %02x\n", machine().describe_context(), data);
-			popmessage("UNKNOWN TILESIZE %02X", data);
+			logerror("%s: warning, layer 0 unknown tilesize = %02x\n", machine().describe_context(), data);
+			popmessage("layer 0 UNKNOWN TILESIZE %02X", data);
 			break;
 	}
+
+	switch (data&0x0f)
+	{
+		case 0x0:
+			sizes[1] = TILE_8x8;
+			break;
+
+		case 0x4:
+			sizes[1] = TILE_8x32;
+			break;
+
+		case 0x7:
+			sizes[1] = TILE_64x32;
+			break;
+
+		default:
+			sizes[1] = TILE_8x8;
+
+			logerror("%s: warning, layer 1 unknown tilesize = %02x\n", machine().describe_context(), data);
+			popmessage("layer 1 UNKNOWN TILESIZE %02X", data);
+			break;
+	}
+
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -578,7 +598,7 @@ WRITE8_MEMBER(subsino2_state::ss9601_disable_w)
 
 VIDEO_START_MEMBER(subsino2_state,subsino2)
 {
-	m_hm86171_colorram = auto_alloc_array(machine(), UINT8, 256*3);
+	m_hm86171_colorram = std::make_unique<UINT8[]>(256*3);
 
 	// SS9601 Regs:
 
@@ -602,21 +622,21 @@ VIDEO_START_MEMBER(subsino2_state,subsino2)
 		// line scroll
 		l->tmap->set_scroll_rows(0x200);
 
-		l->videorams[VRAM_HI] = auto_alloc_array(machine(), UINT8, 0x80 * 0x40);
-		l->videorams[VRAM_LO] = auto_alloc_array(machine(), UINT8, 0x80 * 0x40);
+		l->videorams[VRAM_HI] = std::make_unique<UINT8[]>(0x80 * 0x40);
+		l->videorams[VRAM_LO] = std::make_unique<UINT8[]>(0x80 * 0x40);
 
-		l->scrollrams[VRAM_HI] = auto_alloc_array(machine(), UINT8, 0x200);
-		l->scrollrams[VRAM_LO] = auto_alloc_array(machine(), UINT8, 0x200);
-		memset(l->scrollrams[VRAM_HI], 0, 0x200);
-		memset(l->scrollrams[VRAM_LO], 0, 0x200);
+		l->scrollrams[VRAM_HI] = std::make_unique<UINT8[]>(0x200);
+		l->scrollrams[VRAM_LO] = std::make_unique<UINT8[]>(0x200);
+		memset(l->scrollrams[VRAM_HI].get(), 0, 0x200);
+		memset(l->scrollrams[VRAM_LO].get(), 0, 0x200);
 	}
 
 	// SS9601 Reels:
 
-	m_ss9601_reelrams[VRAM_HI] = auto_alloc_array(machine(), UINT8, 0x2000);
-	m_ss9601_reelrams[VRAM_LO] = auto_alloc_array(machine(), UINT8, 0x2000);
-	memset(m_ss9601_reelrams[VRAM_HI], 0, 0x2000);
-	memset(m_ss9601_reelrams[VRAM_LO], 0, 0x2000);
+	m_ss9601_reelrams[VRAM_HI] = std::make_unique<UINT8[]>(0x2000);
+	m_ss9601_reelrams[VRAM_LO] = std::make_unique<UINT8[]>(0x2000);
+	memset(m_ss9601_reelrams[VRAM_HI].get(), 0, 0x2000);
+	memset(m_ss9601_reelrams[VRAM_LO].get(), 0, 0x2000);
 	m_ss9601_reelrects[0].set(0, 0, 0x00*8, 0x09*8-1);
 	m_ss9601_reelrects[1].set(0, 0, 0x09*8, 0x10*8-1);
 	m_ss9601_reelrects[2].set(0, 0, 0x10*8, 256-16-1);
@@ -712,9 +732,9 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 			l->tmap->set_scroll_rows(1);
 			l->tmap->set_scroll_cols(1);
 
-			for (int r = 0; r < 3; r++)
+			for (auto visible : m_ss9601_reelrects)
 			{
-				rectangle visible = m_ss9601_reelrects[r];
+				
 
 				for (int x = 0; x < 0x40; x++)
 				{
@@ -2674,6 +2694,69 @@ DRIVER_INIT_MEMBER(subsino2_state,xtrain)
 
 /***************************************************************************
 
+Panda Train (Novamatic 1.7)
+(c) 1999 Subsino
+
+Note: It's the same hardware as X-Train
+
+PCB:
+  SUBSINO
+
+CPU:
+  AMD Am188 EM-20KC (@U10)
+  Osc. 20.000 MHz (@OSC20)
+  MB84256C-10L (@U13)
+
+Video:
+  Subsino SS9601 9901WK002 (@U16)
+  Subsino SS9802 (@U1)
+  Subsino SS9803 (@U29)
+  HM86171-80 (@U26) - RAMDAC
+  2 x HM62H256DK-12 (@U21-U22)
+
+Sound:
+  U6295 (@U6)
+  Osc. 8.4672 MHz (@X1)
+  Philips TDA1519 (@U9)
+  LM324 (@U8) - Quad Operational Amplifier
+
+Other:
+  Osc. 12.000 MHz (@OSC12)
+  Battery (3V button cell)
+  Reset switch (@SW5)
+  Volume trimmer (@VR1)
+  4 x DSW8 (@SW1-SW4, only SW1 is populated)
+  4 x ULN2003A? (@U3-U5) - High Voltage, High Current Darlington Transistor Arrays
+  10 pin edge connector
+  36 pin edge connector
+  28 pin JAMMA connector
+
+***************************************************************************/
+
+ROM_START( ptrain )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "panda(top)-novam_1-v1.4.u14", 0x00000, 0x40000, CRC(75b12734) SHA1(d05d0cba2de9d7021736bbd7c67d9b3c552374ee) )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "panda-novam_3-v1.4.0.u20", 0x00000, 0x80000, CRC(2d5ab471) SHA1(3df42b7f762d738a4409498984e90c80625fae1f) )
+	ROM_LOAD32_BYTE( "panda-novam_4-v1.4.1.u19", 0x00001, 0x80000, CRC(a4b6985c) SHA1(1d3d23f7c9e775439a2d1a4c68b703bf51b0350f) )
+	ROM_LOAD32_BYTE( "panda-novam_5-v1.4.2.u18", 0x00002, 0x80000, CRC(716f7500) SHA1(971589a2530a0d4152bb68dbc7794985525a837d) )
+	ROM_LOAD32_BYTE( "panda-novam_6-v1.4.3.u17", 0x00003, 0x80000, CRC(10f0c21a) SHA1(400e53bf3dd6fe6f2dd679ed5151fb4400a6ec9f) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "panda-novam_2-v1.4.u7", 0x00000, 0x80000, CRC(d1debec8) SHA1(9086975e5bef2066a688ab3c1df3b384f59e507d) )
+ROM_END
+
+DRIVER_INIT_MEMBER(subsino2_state,ptrain)
+{
+	UINT8 *rom = memregion("maincpu")->base();
+
+	// patch protection test (it always enters test mode on boot otherwise)
+	rom[0xe1b08-0xc0000] = 0xeb;
+}
+
+/***************************************************************************
+
 Water-Nymph (Ver. 1.4)
 (c) 1996 Subsino
 
@@ -2718,10 +2801,11 @@ DRIVER_INIT_MEMBER(subsino2_state,wtrnymph)
 	rom[0xc2d7] = 0x18;
 }
 
-GAME( 1996, mtrain,   0,        mtrain,   mtrain, subsino2_state,   mtrain,   ROT0, "Subsino",        "Magic Train (Ver. 1.31)",              0 )
+GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, mtrain,   ROT0, "Subsino",        "Magic Train (Ver. 1.31)",              0 )
 GAME( 1996, wtrnymph, 0,        mtrain,   wtrnymph, subsino2_state, wtrnymph, ROT0, "Subsino",        "Water-Nymph (Ver. 1.4)",               0 )
-GAME( 1998, expcard,  0,        expcard,  expcard, subsino2_state,  expcard,  ROT0, "American Alpha", "Express Card / Top Card (Ver. 1.5)",   0 )
-GAME( 1998, saklove,  0,        saklove,  saklove, subsino2_state,  saklove,  ROT0, "Subsino",        "Ying Hua Lian 2.0 (China, Ver. 1.02)", 0 )
-GAME( 1999, xtrain,   0,        xtrain,   xtrain, subsino2_state,   xtrain,   ROT0, "Subsino",        "X-Train (Ver. 1.3)",                   0 )
-GAME( 1999, bishjan,  0,        bishjan,  bishjan, subsino2_state,  bishjan,  ROT0, "Subsino",        "Bishou Jan (Japan, Ver. 2.03)",        MACHINE_NO_SOUND )
-GAME( 2006, xplan,    0,        xplan,    xplan, subsino2_state,    xplan,    ROT0, "Subsino",        "X-Plan (Ver. 1.01)",                   0 )
+GAME( 1998, expcard,  0,        expcard,  expcard,  subsino2_state, expcard,  ROT0, "American Alpha", "Express Card / Top Card (Ver. 1.5)",   0 )
+GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, saklove,  ROT0, "Subsino",        "Ying Hua Lian 2.0 (China, Ver. 1.02)", 0 )
+GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, xtrain,   ROT0, "Subsino",        "X-Train (Ver. 1.3)",                   0 )
+GAME( 1999, ptrain,   0,        xtrain,   xtrain,   subsino2_state, ptrain,   ROT0, "Subsino",        "Panda Train (Novamatic 1.7)",          0 )
+GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, bishjan,  ROT0, "Subsino",        "Bishou Jan (Japan, Ver. 2.03)",        MACHINE_NO_SOUND )
+GAME( 2006, xplan,    0,        xplan,    xplan,    subsino2_state, xplan,    ROT0, "Subsino",        "X-Plan (Ver. 1.01)",                   0 )
