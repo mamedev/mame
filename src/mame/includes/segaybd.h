@@ -42,9 +42,6 @@ public:
 		memset(m_misc_io_data, 0, sizeof(m_misc_io_data));
 	}
 
-	// YM2151 chip callbacks
-	DECLARE_WRITE_LINE_MEMBER( sound_cpu_irq );
-
 	// main CPU read/write handlers
 	DECLARE_READ16_MEMBER( analog_r );
 	DECLARE_WRITE16_MEMBER( analog_w );

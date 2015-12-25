@@ -101,7 +101,6 @@ public:
 	DECLARE_WRITE16_MEMBER(darius_ioc_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(adpcm_command_w);
-	DECLARE_WRITE8_MEMBER(display_value);
 	DECLARE_WRITE8_MEMBER(darius_fm0_pan);
 	DECLARE_WRITE8_MEMBER(darius_fm1_pan);
 	DECLARE_WRITE8_MEMBER(darius_psg0_pan);

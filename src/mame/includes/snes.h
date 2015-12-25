@@ -381,8 +381,6 @@ public:
 	required_device<screen_device> m_screen;
 
 
-	DECLARE_DIRECT_UPDATE_MEMBER(snes_spc_direct);
-	DECLARE_DIRECT_UPDATE_MEMBER(snes_direct);
 	DECLARE_DRIVER_INIT(snes);
 	DECLARE_DRIVER_INIT(snes_hirom);
 	DECLARE_DRIVER_INIT(snes_mess);

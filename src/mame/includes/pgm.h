@@ -130,7 +130,6 @@ public:
 	void asic3_compute_hold(int,int);
 	DECLARE_READ16_MEMBER( pgm_asic3_r );
 	DECLARE_WRITE16_MEMBER( pgm_asic3_w );
-	DECLARE_WRITE16_MEMBER( pgm_asic3_reg_w );
 };
 
 

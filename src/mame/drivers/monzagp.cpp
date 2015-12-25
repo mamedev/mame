@@ -61,7 +61,6 @@ public:
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_WRITE8_MEMBER(port3_w);
 	virtual void video_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(time_tick_timer);
 	DECLARE_PALETTE_INIT(monzagp);

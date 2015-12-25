@@ -104,5 +104,4 @@ public:
 	void   sprite_dma_trigger(void);
 	
 	INTERRUPT_GEN_MEMBER(rng_interrupt);
-	INTERRUPT_GEN_MEMBER(audio_interrupt);
 };

@@ -73,5 +73,4 @@ public:
 	INTERRUPT_GEN_MEMBER(kikikai_interrupt);
 	INTERRUPT_GEN_MEMBER(mexico86_m68705_interrupt);
 	void mcu_simulate(  );
-	void kiki_clogic(int address, int latch);
 };

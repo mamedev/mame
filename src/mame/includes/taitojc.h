@@ -106,11 +106,6 @@ public:
 
 	DECLARE_READ16_MEMBER(dsp_rom_r);
 	DECLARE_WRITE16_MEMBER(dsp_rom_w);
-	DECLARE_WRITE16_MEMBER(dsp_texture_w);
-	DECLARE_READ16_MEMBER(dsp_texaddr_r);
-	DECLARE_WRITE16_MEMBER(dsp_texaddr_w);
-	DECLARE_WRITE16_MEMBER(dsp_polygon_fifo_w);
-	DECLARE_WRITE16_MEMBER(dsp_unk2_w);
 
 	DECLARE_WRITE16_MEMBER(dsp_math_viewport_w);
 	DECLARE_WRITE16_MEMBER(dsp_math_projection_w);
@@ -141,5 +136,4 @@ public:
 	INTERRUPT_GEN_MEMBER(taitojc_vblank);
 	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 w1, UINT32 w2, UINT8 bank_type);
 	void draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 bank_type, UINT8 pri);
-	void taitojc_clear_frame();
 };

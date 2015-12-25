@@ -109,10 +109,7 @@ public:
 	DECLARE_WRITE8_MEMBER(t5182shared_w);
 
 	TILE_GET_INFO_MEMBER(get_bgtile_info);
-	TILE_GET_INFO_MEMBER(get_infotile_info);
 	TILE_GET_INFO_MEMBER(get_infotile_info_2);
-	TILE_GET_INFO_MEMBER(get_infotile_info_3);
-	TILE_GET_INFO_MEMBER(get_infotile_info_4);
 	TILE_GET_INFO_MEMBER(get_txttile_info);
 
 	DECLARE_DRIVER_INIT(panicr);

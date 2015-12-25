@@ -609,7 +609,6 @@ public:
 	DECLARE_READ16_MEMBER(tlcs_ide0_r);
 	DECLARE_READ16_MEMBER(tlcs_ide1_r);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
-	void taitotz_exit();
 	void draw_tile(UINT32 pos, UINT32 tile);
 	UINT32 video_mem_r(UINT32 address);
 	void video_mem_w(UINT32 address, UINT32 data);

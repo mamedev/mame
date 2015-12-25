@@ -100,7 +100,6 @@ protected:
 
 private:
 	void make_mixer_table(int voices, int gain);
-	void show_soundregs();
 
 	// internal state
 	emu_timer *m_effect_timer;

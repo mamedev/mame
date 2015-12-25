@@ -67,9 +67,6 @@ public:
 	DECLARE_READ32_MEMBER( interrupt_control_r );
 	DECLARE_WRITE32_MEMBER( eeprom_data_w );
 	DECLARE_WRITE32_MEMBER( eeprom_enable_w );
-	DECLARE_READ32_MEMBER( input_2_r );
-	DECLARE_READ32_MEMBER( sound_data_r );
-	DECLARE_WRITE32_MEMBER( sound_data_w );
 	DECLARE_WRITE32_MEMBER( sound_reset_w );
 	DECLARE_WRITE32_MEMBER( coin_count_w );
 	DECLARE_READ32_MEMBER( speedup_r );

@@ -238,8 +238,6 @@ public:
 	UINT16 m_vram_1_bank_num;
 	DECLARE_WRITE16_MEMBER(expro02_6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(expro02_paletteram_w);
-	DECLARE_WRITE16_MEMBER(expro02_vram_0_bank_w);
-	DECLARE_WRITE16_MEMBER(expro02_vram_1_bank_w);
 	DECLARE_DRIVER_INIT(expro02);
 	virtual void machine_reset() override;
 	virtual void video_start() override;

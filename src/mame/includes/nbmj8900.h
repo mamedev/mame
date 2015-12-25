@@ -50,10 +50,6 @@ public:
 
 	DECLARE_READ8_MEMBER(palette_type1_r);
 	DECLARE_WRITE8_MEMBER(palette_type1_w);
-	DECLARE_READ8_MEMBER(palette_type2_r);
-	DECLARE_WRITE8_MEMBER(palette_type2_w);
-	DECLARE_READ8_MEMBER(palette_type3_r);
-	DECLARE_WRITE8_MEMBER(palette_type3_w);
 	DECLARE_WRITE8_MEMBER(clutsel_w);
 	DECLARE_READ8_MEMBER(clut_r);
 	DECLARE_WRITE8_MEMBER(clut_w);

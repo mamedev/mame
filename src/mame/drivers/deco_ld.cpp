@@ -144,11 +144,9 @@ public:
 
 	UINT8 m_laserdisc_data;
 	int m_nmimask;
-	DECLARE_WRITE8_MEMBER(rblaster_sound_w);
 	DECLARE_READ8_MEMBER(laserdisc_r);
 	DECLARE_WRITE8_MEMBER(laserdisc_w);
 	DECLARE_READ8_MEMBER(sound_status_r);
-	DECLARE_WRITE8_MEMBER(nmimask_w);
 	DECLARE_WRITE8_MEMBER(decold_sound_cmd_w);
 	DECLARE_WRITE8_MEMBER(decold_palette_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);

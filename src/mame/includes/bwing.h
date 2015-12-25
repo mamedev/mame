@@ -61,7 +61,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bwp3_nmiack_w);
 	DECLARE_WRITE8_MEMBER(bwp1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(bwp2_ctrl_w);
-	DECLARE_WRITE8_MEMBER(spriteram_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(fgscrollram_w);
 	DECLARE_WRITE8_MEMBER(bgscrollram_w);

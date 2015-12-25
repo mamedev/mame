@@ -93,8 +93,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(apple3_sync_w);
 	DECLARE_READ8_MEMBER(apple3_c0xx_r);
 	DECLARE_WRITE8_MEMBER(apple3_c0xx_w);
-	DECLARE_READ8_MEMBER(apple3_00xx_r);
-	DECLARE_WRITE8_MEMBER(apple3_00xx_w);
 	DECLARE_DRIVER_INIT(apple3);
 	DECLARE_MACHINE_RESET(apple3);
 	DECLARE_VIDEO_START(apple3);
@@ -111,7 +109,6 @@ public:
 	void apple3_video_text40(bitmap_ind16 &bitmap);
 	void apple3_video_text80(bitmap_ind16 &bitmap);
 	void apple3_video_graphics_hgr(bitmap_ind16 &bitmap);
-	UINT8 swap_bits(UINT8 b);
 	void apple3_video_graphics_chgr(bitmap_ind16 &bitmap);
 	void apple3_video_graphics_shgr(bitmap_ind16 &bitmap);
 	void apple3_video_graphics_chires(bitmap_ind16 &bitmap);

@@ -69,8 +69,6 @@ public:
 	DECLARE_DRIVER_INIT(mjgtaste);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	void ps3_init();
-	void ps5_init();
 	UINT32 screen_update_psikyosh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(psikyosh_interrupt);
 	void draw_scanline32_alpha(bitmap_rgb32 &bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr, int alpha);

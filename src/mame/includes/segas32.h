@@ -94,8 +94,6 @@ public:
 	int m_print_count;
 	DECLARE_WRITE16_MEMBER(ga2_dpram_w);
 	DECLARE_READ16_MEMBER(ga2_dpram_r);
-	DECLARE_READ16_MEMBER(ga2_sprite_protection_r);
-	DECLARE_READ16_MEMBER(ga2_wakeup_protection_r);
 	DECLARE_WRITE16_MEMBER(sonic_level_load_protection);
 	DECLARE_READ16_MEMBER(brival_protection_r);
 	DECLARE_WRITE16_MEMBER(brival_protection_w);

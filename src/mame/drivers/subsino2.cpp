@@ -168,7 +168,6 @@ public:
 	DECLARE_VIDEO_START(mtrain);
 	DECLARE_VIDEO_START(xtrain);
 	UINT32 screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(h8_timer_irq);
 	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;

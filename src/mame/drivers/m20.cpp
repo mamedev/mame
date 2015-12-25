@@ -97,7 +97,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(timer_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(halt_apb_w);
 	DECLARE_WRITE_LINE_MEMBER(int_w);
 	MC6845_UPDATE_ROW(update_row);
 

@@ -82,7 +82,6 @@ public:
 	DECLARE_WRITE8_MEMBER(m14_cram_w);
 	DECLARE_READ8_MEMBER(m14_rng_r);
 	DECLARE_READ8_MEMBER(input_buttons_r);
-	DECLARE_WRITE8_MEMBER(test_w);
 	DECLARE_WRITE8_MEMBER(hopper_w);
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);

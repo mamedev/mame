@@ -123,8 +123,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rs232_dcd_w );
 	DECLARE_WRITE_LINE_MEMBER( rs232_dsr_w );
 	DECLARE_WRITE_LINE_MEMBER( rs232_cts_w );
-	TIMER_CALLBACK_MEMBER( transmit_data );
-	TIMER_CALLBACK_MEMBER( receive_data );
 
 	// centronics
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }

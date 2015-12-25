@@ -56,10 +56,6 @@ public:
 	// non-static internal members
 	void sample_trigger();
 	void process_delayed_command();
-	void ram_write(const UINT32 offset, const UINT16 data, const UINT16 mem_mask);
-	UINT16 ram_read(const UINT32 offset, const UINT16 mem_mask);
-	void register_write(const UINT32 offset, const UINT16 data, const UINT16 mem_mask);
-	UINT16 register_read(const UINT32 offset, const UINT16 mem_mask);
 
 	DECLARE_READ16_MEMBER( regs_r );
 	DECLARE_WRITE16_MEMBER( regs_w );

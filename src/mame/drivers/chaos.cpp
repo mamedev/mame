@@ -50,7 +50,6 @@ public:
 	DECLARE_WRITE8_MEMBER(port1f_w);
 	DECLARE_READ8_MEMBER(port90_r);
 	DECLARE_READ8_MEMBER(port91_r);
-	DECLARE_WRITE8_MEMBER(port92_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
 	virtual void machine_reset() override;

@@ -133,7 +133,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(video_init_vbl);
 	virtual TIMER_CALLBACK_MEMBER(lcd_timer_proc);
 	virtual void videoptr_restore();
-	void save_gb_video();
 	void increment_scanline();
 	void lcd_switch_on();
 };

@@ -151,9 +151,6 @@ public:
 
 	// neoCD
 
-	UINT8 neogeoReadTransfer(UINT32 sekAddress, int is_byte_transfer);
-	void neogeoWriteTransfer(UINT32 sekAddress, UINT8 byteValue, int is_byte_transfer);
-
 	INT32 nActiveTransferArea;
 	INT32 nSpriteTransferBank;
 	INT32 nADPCMTransferBank;

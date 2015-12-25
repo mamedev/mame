@@ -393,7 +393,6 @@ public:
 	DECLARE_READ16_MEMBER( microwire_mask_r );
 	DECLARE_WRITE16_MEMBER( microwire_mask_w );
 
-	DECLARE_READ8_MEMBER( mfp_gpio_r );
 	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
 	void dmasound_set_state(int level);

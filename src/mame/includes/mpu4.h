@@ -237,7 +237,6 @@ protected:
 	void mpu4_install_mod4oki_space(address_space &space);
 	void mpu4_install_mod4bwb_space(address_space &space);
 	void mpu4_config_common();
-	void mpu4_config_common_reels(int reels);
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<roc10937_t> m_vfd;

@@ -92,7 +92,6 @@ public:
 	DECLARE_READ_LINE_MEMBER(speech_rom_read_bit);
 	DECLARE_WRITE_LINE_MEMBER(write_s2650_flag);
 	DECLARE_READ8_MEMBER(cvs_input_r);
-	DECLARE_READ8_MEMBER(cvs_393hz_clock_r);
 	DECLARE_WRITE8_MEMBER(cvs_speech_rom_address_lo_w);
 	DECLARE_WRITE8_MEMBER(cvs_speech_rom_address_hi_w);
 	DECLARE_READ8_MEMBER(cvs_speech_command_r);

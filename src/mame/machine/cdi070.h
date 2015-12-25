@@ -143,7 +143,6 @@ public:
 	cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// external callbacks
-	void init();
 	void uart_rx(UINT8 data);
 	void uart_tx(UINT8 data);
 
@@ -156,8 +155,6 @@ public:
 
 	DECLARE_READ16_MEMBER(periphs_r);
 	DECLARE_WRITE16_MEMBER(periphs_w);
-
-	DECLARE_READ16_MEMBER(uart_loopback_enable);
 
 	TIMER_CALLBACK_MEMBER( timer0_callback );
 	TIMER_CALLBACK_MEMBER( rx_callback );

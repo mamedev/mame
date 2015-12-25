@@ -23,7 +23,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ct_io_w);
 
 	// memory
-	DECLARE_WRITE8_MEMBER(laserbat_input_mux_w);
 	DECLARE_READ8_MEMBER(laserbat_input_r);
 
 	DECLARE_DRIVER_INIT(laserbat);

@@ -202,8 +202,6 @@ public:
 	DECLARE_WRITE8_MEMBER( cia_pa_w );
 	DECLARE_READ8_MEMBER( cia_pb_r );
 
-	DECLARE_WRITE_LINE_MEMBER( tape_read_w );
-
 	DECLARE_READ8_MEMBER( ext_tpi_pb_r );
 	DECLARE_WRITE8_MEMBER( ext_tpi_pb_w );
 	DECLARE_WRITE8_MEMBER( ext_tpi_pc_w );

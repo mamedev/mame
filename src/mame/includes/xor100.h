@@ -96,7 +96,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	DECLARE_WRITE8_MEMBER(xor100_kbd_put);
 
 	int m_centronics_busy;
 	int m_centronics_select;

@@ -117,5 +117,4 @@ public:
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	int nycaptor_spot(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
-	void nycaptor_setmask(  );
 };

@@ -128,7 +128,6 @@ private:
 
 public:
 	DECLARE_DRIVER_INIT(kt);
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
 };

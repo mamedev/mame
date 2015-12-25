@@ -121,7 +121,6 @@ public:
 	DECLARE_READ8_MEMBER(dunhuang_service_r);
 	DECLARE_READ8_MEMBER(dunhuang_input_r);
 	DECLARE_WRITE8_MEMBER(dunhuang_rombank_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_82_w);
 	DECLARE_READ8_MEMBER(dunhuang_dsw_r);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info2);

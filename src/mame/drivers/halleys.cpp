@@ -257,8 +257,6 @@ public:
 	DECLARE_READ8_MEMBER(collision_id_r);
 	DECLARE_READ8_MEMBER(paletteram_r);
 	DECLARE_WRITE8_MEMBER(paletteram_w);
-	DECLARE_READ8_MEMBER(zero_r);
-	DECLARE_READ8_MEMBER(debug_r);
 	DECLARE_READ8_MEMBER(vector_r);
 	DECLARE_WRITE8_MEMBER(firq_ack_w);
 	DECLARE_WRITE8_MEMBER(soundcommand_w);

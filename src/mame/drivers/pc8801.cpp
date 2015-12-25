@@ -407,8 +407,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pc8801_gfx_ctrl_w);
 	DECLARE_READ8_MEMBER(pc8801_vram_select_r);
 	DECLARE_WRITE8_MEMBER(pc8801_vram_select_w);
-	DECLARE_WRITE8_MEMBER(i8214_irq_level_w);
-	DECLARE_WRITE8_MEMBER(i8214_irq_mask_w);
 	DECLARE_WRITE8_MEMBER(pc8801_irq_level_w);
 	DECLARE_WRITE8_MEMBER(pc8801_irq_mask_w);
 	DECLARE_READ8_MEMBER(pc8801_window_bank_r);
@@ -469,7 +467,6 @@ public:
 	void pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,
 							UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int width, UINT8 non_special);
 	void draw_text(bitmap_ind16 &bitmap,int y_size, UINT8 width);
-	void fdc_irq_w(bool state);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(pc8801);
@@ -489,12 +486,9 @@ public:
 	DECLARE_WRITE8_MEMBER(cpu_8255_c_w);
 	DECLARE_READ8_MEMBER(fdc_8255_c_r);
 	DECLARE_WRITE8_MEMBER(fdc_8255_c_w);
-	DECLARE_WRITE_LINE_MEMBER(pic_int_w);
-	DECLARE_WRITE_LINE_MEMBER(pic_enlg_w);
 	DECLARE_READ8_MEMBER(opn_porta_r);
 	DECLARE_READ8_MEMBER(opn_portb_r);
 	IRQ_CALLBACK_MEMBER(pc8801_irq_callback);
-	void pc8801_raise_irq(UINT8 irq,UINT8 state);
 	DECLARE_WRITE_LINE_MEMBER(pc8801_sound_irq);
 };
 

@@ -66,7 +66,6 @@ public:
 	DECLARE_WRITE8_MEMBER(nc100_poweroff_control_w);
 	DECLARE_READ8_MEMBER(nc100_card_battery_status_r);
 	DECLARE_WRITE8_MEMBER(nc100_memory_card_wait_state_w);
-	DECLARE_WRITE8_MEMBER(nc200_display_memory_start_w);
 	DECLARE_READ8_MEMBER(nc200_card_battery_status_r);
 	DECLARE_READ8_MEMBER(nc200_printer_status_r);
 	DECLARE_WRITE8_MEMBER(nc200_uart_control_w);
@@ -78,7 +77,6 @@ public:
 	DECLARE_MACHINE_RESET(nc200);
 	UINT32 screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nc_keyboard_timer_callback);
-	TIMER_CALLBACK_MEMBER(nc_serial_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(dummy_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(nc100_tc8521_alarm_callback);
 	DECLARE_WRITE_LINE_MEMBER(nc100_txrdy_callback);
@@ -109,9 +107,7 @@ private:
 	void nc_refresh_memory_config();
 	void nc_common_init_machine();
 	void nc_sound_update(int channel);
-	void nc150_init_machine();
 	void nc200_refresh_uart_interrupt();
-	void nc200_floppy_drive_index_callback(int drive_id);
 
 public: // HACK FOR MC6845
 	required_device<cpu_device> m_maincpu;

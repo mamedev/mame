@@ -221,7 +221,6 @@ public:
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
 	DECLARE_WRITE8_MEMBER(jubileep_colorram_w);
-	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(unk_w);
 	DECLARE_READ8_MEMBER(mux_port_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

@@ -42,7 +42,6 @@ public:
 	DECLARE_READ8_MEMBER(gamate_video_r);
 	DECLARE_READ8_MEMBER(gamate_nmi_r);
 	DECLARE_WRITE8_MEMBER(gamate_video_w);
-	DECLARE_WRITE8_MEMBER(gamate_bios_w);
 	DECLARE_DRIVER_INIT(gamate);
 	UINT32 screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gamate_interrupt);

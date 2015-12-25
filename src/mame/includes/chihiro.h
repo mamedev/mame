@@ -450,7 +450,6 @@ public:
 	UINT32 dilate0(UINT32 value, int bits);
 	UINT32 dilate1(UINT32 value, int bits);
 	void computedilated(void);
-	void putpixtex(int xp, int yp, int up, int vp);
 	int toggle_register_combiners_usage();
 	int toggle_wait_vblank_support();
 	void debug_grab_texture(int type, const char *filename);

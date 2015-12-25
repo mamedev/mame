@@ -161,7 +161,6 @@ public:
 	void fdc_reset();
 	UINT8 fdc_driveno(UINT8 drivesel);
 	void hdc_reset();
-	void hdc_ctrl_write(UINT8 data);
 	void hdc_post_rw();
 	void hdc_drq(bool state);
 	void pc8031_reset();

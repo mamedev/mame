@@ -56,7 +56,6 @@ public:
 	DECLARE_DRIVER_INIT(pal);
 
 	DECLARE_VIDEO_START(alg);
-	TIMER_CALLBACK_MEMBER(response_timer);
 
 protected:
 	// amiga_state overrides

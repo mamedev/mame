@@ -116,8 +116,6 @@ public:
 	DECLARE_READ16_MEMBER(blitter_status_r);
 	DECLARE_WRITE16_MEMBER(lamps_w);
 	DECLARE_READ16_MEMBER(test_r);
-	DECLARE_WRITE16_MEMBER(irq_callback_w);
-	DECLARE_WRITE16_MEMBER(sound_write_w);
 	DECLARE_READ8_MEMBER(bankrob_mcu1_r);
 	DECLARE_READ8_MEMBER(bankrob_mcu2_r);
 	DECLARE_READ8_MEMBER(bankrob_mcu_status_read_r);

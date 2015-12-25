@@ -30,8 +30,6 @@ public:
 	required_device<ram_device> m_ram;
 	memory_region* m_rom;
 
-	UINT32 screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
-
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(crtc_address_w);
 	DECLARE_WRITE8_MEMBER(crtc_register_w);

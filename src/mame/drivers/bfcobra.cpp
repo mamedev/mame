@@ -289,8 +289,6 @@ public:
 	DECLARE_WRITE8_MEMBER(meter_w);
 	DECLARE_READ8_MEMBER(latch_r);
 	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_WRITE8_MEMBER(fd_op_w);
-	DECLARE_WRITE8_MEMBER(fd_ctrl_w);
 	DECLARE_READ8_MEMBER(upd_r);
 	DECLARE_WRITE8_MEMBER(upd_w);
 	DECLARE_WRITE_LINE_MEMBER(z80_acia_irq);
@@ -311,8 +309,6 @@ public:
 	void command_phase(struct fdc_t &fdc, UINT8 data);
 	inline UINT8* blitter_get_addr(UINT32 addr);
 	inline void z80_bank(int num, int data);
-	UINT8 exec_r_phase(void);
-	UINT8 results_phase(void);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<acia6850_device> m_acia6850_0;

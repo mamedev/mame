@@ -33,12 +33,9 @@ public:
 	required_shared_ptr<UINT32> m_workram;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ32_MEMBER(vram_r);
-	DECLARE_WRITE32_MEMBER(vram_w);
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE32_MEMBER(int_ack_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(flip_status_r);
 
 	UINT32 screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

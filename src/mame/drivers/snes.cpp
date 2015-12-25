@@ -86,7 +86,6 @@ public:
 
 	DECLARE_READ8_MEMBER( spc_ram_100_r );
 	DECLARE_WRITE8_MEMBER( spc_ram_100_w );
-	TIMER_CALLBACK_MEMBER( lightgun_tick );
 
 	// input related
 	SNESCTRL_ONSCREEN_CB(onscreen_cb);

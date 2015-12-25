@@ -76,9 +76,6 @@ public:
 
 	bool m_gradbank;
 
-	DECLARE_READ16_MEMBER(dsp_m_r);
-	DECLARE_WRITE16_MEMBER(dsp_m_w);
-
 	UINT16 m_dsp_test_object_type;
 	INT16 m_dsp_test_or_clip, m_dsp_test_and_clip;
 	INT16 m_dsp_test_x, m_dsp_test_y, m_dsp_test_z;
@@ -133,6 +130,5 @@ public:
 
 	void fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 header, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 );
 	void fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q );
-	int projectEyeCoordToScreen(float* projectionMatrix,const int Res,INT16* eyePoint3d,int type);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

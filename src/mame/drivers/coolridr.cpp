@@ -398,8 +398,6 @@ public:
 
 	DECLARE_READ32_MEMBER(sysh1_sound_dma_r);
 	DECLARE_WRITE32_MEMBER(sysh1_sound_dma_w);
-	DECLARE_READ32_MEMBER(sysh1_ioga_r);
-	DECLARE_WRITE32_MEMBER(sysh1_ioga_w);
 	DECLARE_READ32_MEMBER(sysh1_unk_blit_r);
 	DECLARE_WRITE32_MEMBER(sysh1_unk_blit_w);
 	DECLARE_WRITE32_MEMBER(sysh1_blit_mode_w);
@@ -407,9 +405,7 @@ public:
 	DECLARE_WRITE32_MEMBER(sysh1_fb_mode_w);
 	DECLARE_WRITE32_MEMBER(sysh1_fb_data_w);
 
-	DECLARE_WRITE32_MEMBER(sysh1_pal_w);
 	DECLARE_WRITE32_MEMBER(sysh1_dma_w);
-	DECLARE_WRITE32_MEMBER(sysh1_char_w);
 	DECLARE_READ32_MEMBER(coolridr_hack2_r);
 	DECLARE_READ32_MEMBER(aquastge_hack_r);
 	DECLARE_READ16_MEMBER(h1_soundram_r);
@@ -442,7 +438,6 @@ public:
 	UINT32 screen_update_coolridr1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_coolridr2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void blit_current_sprite(address_space &space);
-	INTERRUPT_GEN_MEMBER(system_h1);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_main);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_sub);
 	DECLARE_WRITE8_MEMBER(scsp_irq);
@@ -480,8 +475,6 @@ public:
 		int screen;
 		int colbase;
 	};
-
-	static int comp_sprite_z(const void *q1, const void *q2);
 
 	struct cool_render_object **m_cool_render_object_list1;
 	struct cool_render_object **m_cool_render_object_list2;

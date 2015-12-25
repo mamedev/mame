@@ -77,7 +77,6 @@ public:
 	DECLARE_READ16_MEMBER(macrossp_soundcmd_r);
 	DECLARE_WRITE16_MEMBER(palette_fade_w);
 	DECLARE_WRITE32_MEMBER(macrossp_speedup_w);
-	DECLARE_WRITE32_MEMBER(quizmoon_speedup_w);
 	DECLARE_WRITE32_MEMBER(macrossp_scra_videoram_w);
 	DECLARE_WRITE32_MEMBER(macrossp_scrb_videoram_w);
 	DECLARE_WRITE32_MEMBER(macrossp_scrc_videoram_w);

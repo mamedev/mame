@@ -56,7 +56,6 @@ public:
 	// 6500/1 internal
 	DECLARE_READ8_MEMBER( port_a_r );
 	DECLARE_WRITE8_MEMBER( port_a_w );
-	DECLARE_READ8_MEMBER( port_b_r );
 	DECLARE_WRITE8_MEMBER( port_b_w );
 	DECLARE_WRITE8_MEMBER( port_c_w );
 	DECLARE_WRITE8_MEMBER( port_d_w );

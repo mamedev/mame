@@ -52,7 +52,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_update );
 
 	UINT8* get_lcd_state() { return m_lcd_state; }
-	void readback_trigger();
 
 	DECLARE_READ16_MEMBER( slave_r );
 	DECLARE_WRITE16_MEMBER( slave_w );

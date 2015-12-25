@@ -73,7 +73,6 @@ public:
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(chasehq_cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(dblaxle_cpua_ctrl_w);
-	DECLARE_READ16_MEMBER(eep_latch_r);
 	DECLARE_WRITE16_MEMBER(spacegun_output_bypass_w);
 	DECLARE_READ8_MEMBER(contcirc_input_bypass_r);
 	DECLARE_READ8_MEMBER(chasehq_input_bypass_r);
@@ -93,8 +92,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(taitoz_sound_w);
 	DECLARE_READ16_MEMBER(taitoz_sound_r);
-	DECLARE_WRITE16_MEMBER(taitoz_msb_sound_w);
-	DECLARE_READ16_MEMBER(taitoz_msb_sound_r);
 	DECLARE_WRITE8_MEMBER(taitoz_pancontrol);
 	DECLARE_READ16_MEMBER(sci_spriteframe_r);
 	DECLARE_WRITE16_MEMBER(sci_spriteframe_w);

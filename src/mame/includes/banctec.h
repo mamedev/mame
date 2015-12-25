@@ -20,8 +20,6 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram") { }
 
-	DECLARE_READ8_MEMBER(banctec_read);
-	DECLARE_WRITE8_MEMBER(banctec_write);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	virtual void machine_reset() override;

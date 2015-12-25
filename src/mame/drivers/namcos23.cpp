@@ -1534,7 +1534,6 @@ public:
 	DECLARE_WRITE16_MEMBER(mcu_p8_w);
 	DECLARE_READ16_MEMBER(mcu_pa_r);
 	DECLARE_WRITE16_MEMBER(mcu_pa_w);
-	DECLARE_READ16_MEMBER(mcu_rtc_r);
 	DECLARE_READ16_MEMBER(mcu_pb_r);
 	DECLARE_WRITE16_MEMBER(mcu_pb_w);
 	DECLARE_READ16_MEMBER(mcu_p6_r);
@@ -1575,7 +1574,6 @@ public:
 	void c435_matrix_set();
 	void c435_vector_set();
 	void c435_matrix_vector_mul();
-	void c435_vector_matrix_mul();
 	void c435_state_set();
 	void c435_scaling_set();
 	void c435_render();
