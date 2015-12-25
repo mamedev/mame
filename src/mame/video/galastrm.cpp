@@ -19,7 +19,7 @@ galastrm_renderer::galastrm_renderer(galastrm_state& state)
 
 void galastrm_state::video_start()
 {
-	m_spritelist = auto_alloc_array(machine(), struct gs_tempsprite, 0x4000);
+	m_spritelist = std::make_unique<gs_tempsprite[]>(0x4000);
 
 	m_poly = std::make_unique<galastrm_renderer>(*this);
 
@@ -87,7 +87,7 @@ void galastrm_state::draw_sprites_pre(int x_offs, int y_offs)
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
-	m_sprite_ptr_pre = m_spritelist;
+	m_sprite_ptr_pre = m_spritelist.get();
 
 	for (offs = (m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
 	{
@@ -184,7 +184,7 @@ void galastrm_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	struct gs_tempsprite *sprite_ptr = m_sprite_ptr_pre;
 
-	while (sprite_ptr != m_spritelist)
+	while (sprite_ptr != m_spritelist.get())
 	{
 		sprite_ptr--;
 

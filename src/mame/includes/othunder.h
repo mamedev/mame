@@ -56,7 +56,7 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 
 	/* video-related */
-	struct othunder_tempsprite *m_spritelist;
+	std::unique_ptr<othunder_tempsprite[]> m_spritelist;
 
 	/* misc */
 	int        m_vblank_irq;
