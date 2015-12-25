@@ -95,9 +95,6 @@ private:
 	UINT8   m_I2;       //!< Most recent parameter I2(8:1)
 	UINT8   m_Ip;       //!< Previous instruction I(8:1)
 
-	//! return the contents of B register (made of BU, BM and BL)
-	inline UINT16 B() const;
-
 	//! return memory at address B(12:1)
 	inline UINT8 M();
 

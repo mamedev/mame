@@ -49,7 +49,6 @@ class tlcs900h_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tlcs900h_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	tlcs900h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
 
 	// static configuration helpers

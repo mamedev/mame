@@ -55,7 +55,7 @@ void i82439tx_device::i82439tx_configure_memory(UINT8 val, offs_t begin, offs_t 
 
 UINT32 i82439tx_device::pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask)
 {
-	UINT32 result = 0;
+	UINT32 result;
 
 	if (function != 0)
 		return 0;

@@ -1233,7 +1233,7 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 		case 0x4840: return m_r4840;
 		case 0x4841:
 		{
-			UINT8 data = 0;
+			UINT8 data;
 			if (m_rtc_state == RTCS_Inactive || m_rtc_state == RTCS_ModeSelect)
 				return 0x00;
 

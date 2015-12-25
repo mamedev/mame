@@ -47,8 +47,6 @@ public:
 	DECLARE_READ8_MEMBER( riot1_pb_r );
 	DECLARE_WRITE8_MEMBER( riot1_pb_w );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
-	DECLARE_READ8_MEMBER( pi_r );
-	DECLARE_WRITE8_MEMBER( pi_w );
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 

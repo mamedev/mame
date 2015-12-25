@@ -256,7 +256,7 @@ UINT8 SDD1_CM::CM_getBit(UINT8 *ROM, UINT32 *mmc)
 {
 	UINT8 currContext;
 	UINT16 *context_bits;
-	UINT8 bit = 0;
+	UINT8 bit;
 
 	switch (m_bitplanesInfo)
 	{
@@ -319,7 +319,7 @@ void SDD1_OL::OL_prepareDecomp(UINT8 *ROM, UINT32 *mmc, UINT32 first_byte, UINT1
 void SDD1_OL::OL_launch(UINT8 *ROM, UINT32 *mmc)
 {
 	UINT8 i;
-	UINT8 register1 = 0, register2 = 0;
+	UINT8 register1, register2 = 0;
 
 	switch (m_bitplanesInfo)
 	{

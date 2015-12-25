@@ -607,7 +607,7 @@ void sega8_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "rom";
+		const char *slot_string;
 		UINT32 len = core_fsize(m_file), offset = 0;
 		dynamic_buffer rom(len);
 		int type;
@@ -725,7 +725,7 @@ void sega8_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len, UIN
 	char reserved[10];
 	UINT8 version, csum_size, region, serial[3];
 	UINT16 checksum, csum = 0;
-	UINT32 csum_end = 0;
+	UINT32 csum_end;
 
 	// LOG FILE DETAILS
 	logerror("FILE DETAILS\n" );

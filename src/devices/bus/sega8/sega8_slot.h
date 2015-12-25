@@ -71,9 +71,6 @@ public:
 	UINT32 get_rom_size() { return m_rom_size; }
 	UINT32 get_ram_size() { return m_ram.size(); }
 
-	void rom_map_setup(UINT32 size);
-	void ram_map_setup(UINT8 banks);
-
 	void save_ram() { device().save_item(NAME(m_ram)); }
 
 //private:

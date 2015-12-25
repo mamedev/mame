@@ -273,7 +273,7 @@ const rom_entry *omti8621_apollo_device::device_rom_region() const
 {
 	// OMTI 8621 boards for Apollo workstations never use a BIOS ROM
 	// They don't even have a socket for the BIOS ROM
-	return NULL;
+	return nullptr;
 }
 
 ioport_constructor omti8621_device::device_input_ports() const
@@ -1239,7 +1239,7 @@ UINT32 omti8621_apollo_device::get_sector(INT32 diskaddr, UINT8 *data_buffer, UI
 {
 	omti_disk_image_device *disk = our_disks[lun];
 
-	if (disk == NULL || disk->m_image == NULL || !disk->m_image->exists())
+	if (disk == nullptr || disk->m_image == nullptr || !disk->m_image->exists())
 	{
 		return 0;
 	}

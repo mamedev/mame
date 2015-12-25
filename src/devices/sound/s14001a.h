@@ -55,8 +55,6 @@ private:
 	INT16 m_filtervals[8];
 	UINT8 m_VSU1000_amp; // amplitude setting on VSU-1000 board
 
-	INT16 audiofilter();
-	void shiftIntoFilter(INT16 inputvalue);
 	void PostPhoneme();
 	void s14001a_clock();
 };

@@ -797,7 +797,7 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 	if (!m_cart->get_addon_bios_size())
 	{
 		std::string region = std::string(m_cart->device().tag()).append(":addon");
-		UINT8 *ROM = nullptr;
+		UINT8 *ROM;
 
 		switch (m_addon)
 		{
@@ -1005,8 +1005,8 @@ void base_sns_cart_slot_device::get_default_card_software(std::string &result)
 
 	if (fullpath)
 	{
-		const char *slot_string = "lorom";
-		UINT32 offset = 0;
+		const char *slot_string;
+		UINT32 offset;
 		UINT32 len = core_fsize(m_file);
 		dynamic_buffer rom(len);
 		int type = 0, addon = 0;

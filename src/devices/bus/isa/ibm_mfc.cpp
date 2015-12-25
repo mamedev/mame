@@ -313,7 +313,7 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_r )
 {
-	UINT8 val = 0xff;
+	UINT8 val;
 
 	switch (offset)
 	{

@@ -51,8 +51,6 @@ protected:
 
 private:
 	required_device<centronics_device> m_centronics;
-
-	void update_output();
 };
 
 

@@ -233,8 +233,6 @@ public:
 	void reinit_sound();
 	void kill_sound();
 
-	void update();
-
 	void start_dma(UINT8 *mainram, bool to_spu, UINT32 size);
 	bool play_xa(const unsigned int sector, const unsigned char *sec);
 	bool play_cdda(const unsigned int sector, const unsigned char *sec);

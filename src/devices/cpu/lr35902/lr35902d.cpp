@@ -195,9 +195,9 @@ CPU_DISASSEMBLE( lr35902 )
 	const lr35902dasm *d;
 	const char /* *symbol,*/ *src;
 	char *dst;
-	INT8 offset = 0;
+	INT8 offset;
 	UINT8 op, op1;
-	UINT16 ea = 0;
+	UINT16 ea;
 	int pos = 0;
 
 	dst = buffer;

@@ -208,7 +208,6 @@ private:
 
 	void    set_slot(int slotnumber);
 	int     get_active_slot(bool changebase, offs_t offset);
-	void    change_slot(bool inserted, int index);
 };
 
 /*
@@ -370,8 +369,6 @@ public:
 	~ti99_paged378_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
-private:
-	int     get_paged378_bank(int rompage);
 };
 
 /********************** Paged 377 ************************************/
@@ -382,8 +379,6 @@ public:
 	~ti99_paged377_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
-private:
-	int     get_paged377_bank(int rompage);
 };
 
 /********************** Paged CRU  ************************************/

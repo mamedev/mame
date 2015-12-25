@@ -225,8 +225,6 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_stop() override;
 
-	void make_ops();
-
 	// device_execute_interface overrides
 	virtual UINT32 execute_min_cycles() const override;
 	virtual UINT32 execute_max_cycles() const override;

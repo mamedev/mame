@@ -32,10 +32,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( speech_ready );
 
-	DECLARE_READ8_MEMBER( spchrom_read );
-	DECLARE_WRITE8_MEMBER( spchrom_load_address );
-	DECLARE_WRITE8_MEMBER( spchrom_read_and_branch );
-
 protected:
 	virtual void            device_start() override;
 	virtual void            device_reset(void) override;

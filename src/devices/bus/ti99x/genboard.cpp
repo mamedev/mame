@@ -1186,7 +1186,7 @@ void geneve_mapper_device::decode(address_space& space, offs_t offset, bool read
 */
 READ8_MEMBER( geneve_mapper_device::read_from_pfm )
 {
-	UINT8 value = 0;
+	UINT8 value;
 	if (!m_pfm_output_enable) return 0;
 
 	int address = (offset & 0x01ffff) | (m_pfm_bank<<17);

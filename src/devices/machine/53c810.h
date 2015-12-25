@@ -25,9 +25,6 @@ public:
 	static void set_dma_callback(device_t &device, lsi53c810_dma_delegate callback) { downcast<lsi53c810_device &>(device).m_dma_cb = callback; }
 	static void set_fetch_callback(device_t &device, lsi53c810_fetch_delegate callback) { downcast<lsi53c810_device &>(device).m_fetch_cb = callback; }
 
-	void lsi53c810_read_data(int bytes, UINT8 *pData);
-	void lsi53c810_write_data(int bytes, UINT8 *pData);
-
 	UINT8 lsi53c810_reg_r( int offset );
 	void lsi53c810_reg_w(int offset, UINT8 data);
 
@@ -65,7 +62,6 @@ private:
 	void dmaop_load();
 	void dma_exec();
 	void add_opcode(UINT8 op, UINT8 mask, opcode_handler_delegate handler);
-	void lsi53c810_init();
 	UINT32 lsi53c810_dasm_fetch(UINT32 pc);
 	unsigned lsi53c810_dasm(char *buf, UINT32 pc);
 

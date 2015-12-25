@@ -33,9 +33,6 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_pdiag) override;
-
-	TIMER_CALLBACK_MEMBER(buffer_empty_timer_work);
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

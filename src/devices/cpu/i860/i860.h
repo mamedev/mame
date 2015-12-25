@@ -208,8 +208,6 @@ private:
 	void writememi_emu (UINT32 addr, int size, UINT32 data);
 	void fp_readmem_emu (UINT32 addr, int size, UINT8 *dest);
 	void fp_writemem_emu (UINT32 addr, int size, UINT8 *data, UINT32 wmask);
-	void dump_pipe (int type);
-	void dump_state ();
 	void unrecog_opcode (UINT32 pc, UINT32 insn);
 	void insn_ld_ctrl (UINT32 insn);
 	void insn_st_ctrl (UINT32 insn);
@@ -278,8 +276,6 @@ private:
 	void insn_faddp (UINT32 insn);
 	void insn_faddz (UINT32 insn);
 	void decode_exec (UINT32 insn, UINT32 non_shadow);
-	void disasm (UINT32 addr, int len);
-	void dbg_db (UINT32 addr, int len);
 	float get_fregval_s (int fr);
 	double get_fregval_d (int fr);
 	void set_fregval_s (int fr, float s);

@@ -178,8 +178,9 @@ CPU_DISASSEMBLE( sm8500 )
 	const sm8500dasm *instr;
 	char *dst;
 	UINT8 op;
-	INT8 offset = 0;
-	UINT16 ea = 0, ea2 = 0;
+	INT8 offset;
+	UINT16 ea;
+	UINT16 ea2;
 	int pos = 0;
 
 	dst = buffer;

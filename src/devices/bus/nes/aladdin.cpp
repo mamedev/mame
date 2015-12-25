@@ -97,7 +97,7 @@ bool nes_aladdin_slot_device::call_load()
 	if (m_cart)
 	{
 		UINT8 *ROM = m_cart->get_cart_base();
-		UINT32 size = 0;
+		UINT32 size;
 
 		if (!ROM)
 			return IMAGE_INIT_FAIL;

@@ -137,7 +137,7 @@ public:
 	UINT8 do_sccreg_rr5();
 	UINT8 do_sccreg_rr6();
 	UINT8 do_sccreg_rr7();
-	UINT8 do_sccreg_rr8();
+//	UINT8 do_sccreg_rr8();
 	UINT8 do_sccreg_rr9();
 	UINT8 do_sccreg_rr10();
 	UINT8 do_sccreg_rr11();

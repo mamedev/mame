@@ -212,8 +212,6 @@ private:
 
 	void log_command();
 	void log_response();
-	void log_tx_data();
-	void log_rx_data();
 
 	void do_receive_command();
 	void set_command_pending(int onoff);

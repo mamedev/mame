@@ -182,7 +182,6 @@ private:
 	void set_bits(UINT8& byte, int mask, bool set);
 
 	// Joined ready line towards the controller
-	void set_ready(int dev, bool ready);
 	int  m_readyflags;
 };
 #endif

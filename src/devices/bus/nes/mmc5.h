@@ -32,7 +32,6 @@ public:
 
 protected:
 	void set_mirror(int page, int src);
-	void update_render_mode();
 	void update_prg();
 
 	inline UINT8 base_chr_r(int bank, UINT32 offset);

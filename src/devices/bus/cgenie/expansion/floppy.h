@@ -50,8 +50,6 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	void update_irq();
-
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;

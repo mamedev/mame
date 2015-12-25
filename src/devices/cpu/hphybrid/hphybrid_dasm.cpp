@@ -356,7 +356,7 @@ static const dis_entry_t dis_table_emc[] = {
         {0xffff , 0x7b61 , "MLY" , param_none , 0 },
         {0xffff , 0x7b8f , "MPY" , param_none , 0 },
         // *** END ***
-        {0 , 0 , NULL , NULL , 0 }
+        {0 , 0 , nullptr , nullptr , 0 }
 };
 
 static offs_t disassemble_table(UINT16 opcode , offs_t pc , const dis_entry_t *table , bool is_3001 , char *buffer)
