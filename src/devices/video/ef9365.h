@@ -58,8 +58,14 @@ protected:
 	// inline helper
 
 private:
+	int get_char_pix( unsigned char c, int x, int y );
 	void draw_character( unsigned char c, int block, int smallblock );
 	void plot(int x_pos,int y_pos);
+	void draw_vector(int x1,int y1,int x2,int y2);
+	unsigned int get_x_reg();
+	unsigned int get_y_reg();
+	void set_x_reg(unsigned int x);
+	void set_y_reg(unsigned int y);
 	void screen_scanning( int force_clear );
 	void set_busy_flag(int period);
 	void set_video_mode(void);
