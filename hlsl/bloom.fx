@@ -240,7 +240,7 @@ uniform float4 Level0123Weight;
 uniform float4 Level4567Weight;
 uniform float3 Level89AWeight;
 
-uniform int BloomType = 1; // blend mode: 0 addition, 1 darken
+uniform int BloomBlendMode = 1; // 0 addition, 1 darken
 uniform float BloomScale;
 uniform float3 BloomOverdrive;
 
@@ -267,7 +267,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float3 blend;
 
 	// addition
-	if (BloomType == 0)
+	if (BloomBlendMode == 0)
 	{
 		texel0 *= Level0123Weight.x;
 		texel1 *= Level0123Weight.y;

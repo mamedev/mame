@@ -195,7 +195,7 @@ struct hlsl_options
 {
 	bool                    params_init;
 	bool                    params_dirty;
-	int                     shadow_mask_type;
+	int                     shadow_mask_tile_mode;
 	float                   shadow_mask_alpha;
 	char                    shadow_mask_texture[1024];
 	int                     shadow_mask_count_x;
@@ -249,7 +249,7 @@ struct hlsl_options
 	float                   vector_length_ratio;
 
 	// Bloom
-	int                     bloom_type;
+	int                     bloom_blend_mode;
 	float                   bloom_scale;
 	float                   bloom_overdrive[3];
 	float                   bloom_level0_weight;

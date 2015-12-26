@@ -688,7 +688,7 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 	if (!options->params_init)
 	{
 		strncpy(options->shadow_mask_texture, winoptions.screen_shadow_mask_texture(), sizeof(options->shadow_mask_texture));
-		options->shadow_mask_type = winoptions.screen_shadow_mask_type();
+		options->shadow_mask_tile_mode = winoptions.screen_shadow_mask_tile_mode();
 		options->shadow_mask_alpha = winoptions.screen_shadow_mask_alpha();
 		options->shadow_mask_count_x = winoptions.screen_shadow_mask_count_x();
 		options->shadow_mask_count_y = winoptions.screen_shadow_mask_count_y();
@@ -735,7 +735,7 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 		options->yiq_phase_count = winoptions.screen_yiq_phase_count();
 		options->vector_length_scale = winoptions.screen_vector_length_scale();
 		options->vector_length_ratio = winoptions.screen_vector_length_ratio();
-		options->bloom_type = winoptions.screen_bloom_type();
+		options->bloom_blend_mode = winoptions.screen_bloom_blend_mode();
 		options->bloom_scale = winoptions.screen_bloom_scale();
 		get_vector(winoptions.screen_bloom_overdrive(), 3, options->bloom_overdrive, TRUE);
 		options->bloom_level0_weight = winoptions.screen_bloom_lvl0_weight();
@@ -1300,12 +1300,12 @@ rgb_t shaders::apply_color_convolution(rgb_t color)
 	float rShifted = r * rRatio[0] + g * rRatio[1] + b * rRatio[2];
 	float gShifted = r * gRatio[0] + g * gRatio[1] + b * gRatio[2];
 	float bShifted = r * bRatio[0] + g * bRatio[1] + b * bRatio[2];
-	
+
 	// RGB Scale & Offset
 	r = rShifted * scale[0] + offset[0];
 	g = gShifted * scale[1] + offset[1];
 	b = bShifted * scale[2] + offset[2];
-	
+
 	// Saturation
 	float grayscale[3] = { 0.299f, 0.587f, 0.114f };
 	float luma = r * grayscale[0] + g * grayscale[1] + b * grayscale[2];
@@ -1440,7 +1440,7 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	rgb_t back_color_rgb = machine->first_screen()->palette() == NULL
 		? rgb_t(0, 0, 0)
 		: machine->first_screen()->palette()->palette()->entry_color(0);
-	back_color_rgb = apply_color_convolution(back_color_rgb);	
+	back_color_rgb = apply_color_convolution(back_color_rgb);
 	float back_color[3] = { 
 		static_cast<float>(back_color_rgb.r()) / 255.0f,
 		static_cast<float>(back_color_rgb.g()) / 255.0f,
@@ -1449,7 +1449,7 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
-	curr_effect->set_int("ShadowType", options->shadow_mask_type);
+	curr_effect->set_int("ShadowTileMode", options->shadow_mask_tile_mode);
 	curr_effect->set_texture("DiffuseTexture", rt->prescale_texture[next_index]);
 	curr_effect->set_vector("BackColor", 3, back_color);
 	curr_effect->set_vector("ScreenScale", 2, screen_scale);
@@ -1552,7 +1552,7 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 	curr_effect->set_vector("Level89Size", 4, bloom_dims[8]);
 	curr_effect->set_vector("LevelASize", 2, bloom_dims[10]);
 
-	curr_effect->set_int("BloomType", options->bloom_type);
+	curr_effect->set_int("BloomBlendMode", options->bloom_blend_mode);
 	curr_effect->set_float("BloomScale", bloom_rescale);
 	curr_effect->set_vector("BloomOverdrive", 3, options->bloom_overdrive);
 
@@ -2276,20 +2276,20 @@ static INT32 slider_set(float *option, float scale, const char *fmt, std::string
 	return floor(*option / scale + 0.5f);
 }
 
-static INT32 slider_shadow_mask_type(running_machine &machine, void *arg, std::string *str, INT32 newval)
+static INT32 slider_shadow_mask_tile_mode(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	hlsl_options *options = (hlsl_options*)arg;
 	if (newval != SLIDER_NOCHANGE)
 	{
-		options->shadow_mask_type = newval;
+		options->shadow_mask_tile_mode = newval;
 	}
 	if (str != NULL)
 	{
-		strprintf(*str, "%s", options->shadow_mask_type == 0 ? "Screen" : "Source");
+		strprintf(*str, "%s", options->shadow_mask_tile_mode == 0 ? "Screen" : "Source");
 	}
 	options->params_dirty = true;
 
-	return options->shadow_mask_type;
+	return options->shadow_mask_tile_mode;
 }
 
 static INT32 slider_shadow_mask_alpha(running_machine &machine, void *arg, std::string *str, INT32 newval)
@@ -2666,20 +2666,20 @@ static INT32 slider_vector_length_max(running_machine &machine, void *arg, std::
 	return slider_set(&(((hlsl_options*)arg)->vector_length_ratio), 1.0f, "%4f", str, newval);
 }
 
-static INT32 slider_bloom_type(running_machine &machine, void *arg, std::string *str, INT32 newval)
+static INT32 slider_bloom_blend_mode(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	hlsl_options *options = (hlsl_options*)arg;
 	if (newval != SLIDER_NOCHANGE)
 	{
-		options->bloom_type = newval;
+		options->bloom_blend_mode = newval;
 	}
 	if (str != NULL)
 	{
-		strprintf(*str, "%s", options->bloom_type == 0 ? "Addition" : "Darken");
+		strprintf(*str, "%s", options->bloom_blend_mode == 0 ? "Addition" : "Darken");
 	}
 	options->params_dirty = true;
 
-	return options->bloom_type;
+	return options->bloom_blend_mode;
 }
 
 static INT32 slider_bloom_scale(running_machine &machine, void *arg, std::string *str, INT32 newval)
@@ -2778,7 +2778,7 @@ shaders::slider_desc shaders::s_sliders[] =
 {
 	{ "Vector Length Attenuation",           0,    50,   100, 1, 2, slider_vector_attenuation },
 	{ "Vector Attenuation Length Limit",     1,   500,  1000, 1, 2, slider_vector_length_max },
-	{ "Shadow Mask Type",                    0,     0,     1, 1, 7, slider_shadow_mask_type },
+	{ "Shadow Mask Tile Mode",               0,     0,     1, 1, 7, slider_shadow_mask_tile_mode },
 	{ "Shadow Mask Darkness",                0,     0,   100, 1, 7, slider_shadow_mask_alpha },
 	{ "Shadow Mask X Count",                 1,     1,  1024, 1, 7, slider_shadow_mask_x_count },
 	{ "Shadow Mask Y Count",                 1,     1,  1024, 1, 7, slider_shadow_mask_y_count },
@@ -2836,7 +2836,7 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Red Phosphor Life",                   0,     0,   100, 1, 7, slider_red_phosphor_life },
 	{ "Green Phosphor Life",                 0,     0,   100, 1, 7, slider_green_phosphor_life },
 	{ "Blue Phosphor Life",                  0,     0,   100, 1, 7, slider_blue_phosphor_life },
-	{ "Bloom Type",                          0,     0,     1, 1, 7, slider_bloom_type },
+	{ "Bloom Blend Mode",                    0,     0,     1, 1, 7, slider_bloom_blend_mode },
 	{ "Bloom Scale",                         0,     0,  2000, 5, 7, slider_bloom_scale },
 	{ "Bloom Red Overdrive",                 0,     0,  2000, 5, 7, slider_bloom_red_overdrive },
 	{ "Bloom Green Overdrive",               0,     0,  2000, 5, 7, slider_bloom_green_overdrive },
@@ -2988,11 +2988,11 @@ void uniform::update()
 		}
 
 		case CU_ORIENTATION_SWAP:
-		{			
+		{
 			bool orientation_swap_xy =
 				(d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
 			m_shader->set_bool("OrientationSwapXY", orientation_swap_xy);
-			
+
 		}
 		case CU_ROTATION_SWAP:
 		{

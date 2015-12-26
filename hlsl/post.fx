@@ -136,7 +136,7 @@ uniform float ScanlineHeight = 1.0f;
 
 uniform float3 BackColor = float3(0.0f, 0.0f, 0.0f);
 
-uniform int ShadowType = 0; // tile mode: 0 based on screen dimension, 1 based on source dimension
+uniform int ShadowTileMode = 0; // 0 based on screen dimension, 1 based on source dimension
 uniform float ShadowAlpha = 0.0f;
 uniform float2 ShadowCount = float2(6.0f, 6.0f);
 uniform float2 ShadowUV = float2(0.25f, 0.25f);
@@ -195,7 +195,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 			// ? shadowUV.yx
 			// : shadowUV.xy;
 
-		float2 screenCoord = ShadowType == 0 ? ScreenCoord : BaseCoord;
+		float2 screenCoord = ShadowTileMode == 0 ? ScreenCoord : BaseCoord;
 		screenCoord = xor(OrientationSwapXY, RotationSwapXY)
 			? screenCoord.yx
 			: screenCoord.xy;
@@ -205,7 +205,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 			? shadowCount.yx
 			: shadowCount.xy;
 
-		float2 shadowTile = ((ShadowType == 0 ? ScreenTexelDims : SourceTexelDims) * shadowCount);
+		float2 shadowTile = ((ShadowTileMode == 0 ? ScreenTexelDims : SourceTexelDims) * shadowCount);
 		shadowTile = xor(OrientationSwapXY, RotationSwapXY)
 			? shadowTile.yx
 			: shadowTile.xy;
