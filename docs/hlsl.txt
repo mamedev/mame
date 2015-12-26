@@ -19,6 +19,7 @@ Surface/Color Processing Parameters
 -----------------------------------
 
 Name                    Values		Description
+shadow_mask_tile_mode   0 or 1          0 for screen based tile mode or 1 for source based tile mode.
 shadow_mask_alpha       0.0 to 1.0      The ovearll darkness of each shadow mask pixel.
 shadow_mask_texture     [filename]      A PNG that defines the shadow mask for each pixel.
 shadow_mask_x_count     1+              The number of pixels one shadow mask tile uses on screen.
@@ -101,6 +102,7 @@ vector_length_ratio     500.0           Vector fade length (4.0 - vectors fade t
 Bloom Post-Processing Options
 -----------------------------
 Name                    Default Values  Description
+bloom_blend_mode        0 or 1          0 for addition blend mode or 1 for darken blend mode.
 bloom_scale             0.500           Bloom intensity factor.  (0.000-2.000)
 bloom_overdrive         0.00,0.00,0.00  Bloom overdrive factor to bright full saturated colors.  (0.000-2.000)
 bloom_lvl0_weight       1.00            Bloom level 0  (full-size target) weight.  (0.00-1.00)
