@@ -305,7 +305,7 @@ The text is coded as phonemes. Books were sold separately.
     Magic Wand "Speaking Reader" (US), 1982
     - MCU: C14007* (TMS1400?)
     - TMS5220
-    - VSM: 4KB? CD2228
+    - VSM: 4KB? CD2228*
 
     Magic Wand "Speak & Learn" (US), 1983
     - notes: same hardware
