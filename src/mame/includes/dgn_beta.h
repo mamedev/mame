@@ -213,7 +213,6 @@ public:
 	void cpu1_recalc_firq(int state);
 	void ScanInKeyboard(void);
 	void dgn_beta_frame_interrupt (int data);
-	void dgn_beta_line_interrupt (int data);
 	required_device<ram_device> m_ram;
 	required_device<wd2797_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;

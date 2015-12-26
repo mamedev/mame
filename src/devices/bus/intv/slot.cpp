@@ -409,8 +409,8 @@ bool intv_cart_slot_device::call_load()
 			if (m_type == INTV_WSMLB)
 				extra_bank = true;
 
-			UINT32 size = 0;
-			UINT16 address = 0;
+			UINT32 size;
+			UINT16 address;
 			UINT8 *ROM, *region;
 
 			m_cart->rom_alloc(extra_bank ? 0x22000 : 0x20000, tag());
@@ -463,7 +463,7 @@ void intv_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "intv_rom";
+		const char *slot_string;
 		UINT32 len = core_fsize(m_file);
 		dynamic_buffer rom(len);
 		int type = INTV_STD;

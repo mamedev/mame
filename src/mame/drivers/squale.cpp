@@ -82,6 +82,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_fdc(*this, "wd1770")
 		, m_floppy0(*this, "wd1770:0")
+		, m_floppy1(*this, "wd1770:1")
 		, m_floppy(NULL)
 		, m_cart(*this, "cartslot")
 	{ }
@@ -133,6 +134,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<wd1770_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	floppy_image_device *m_floppy;
 	required_device<generic_slot_device> m_cart;
 
@@ -160,20 +162,56 @@ WRITE8_MEMBER( squale_state::ctrl_w )
 
 WRITE8_MEMBER( squale_state::fdc_sel0_w )
 {
+	floppy_image_device *floppy = 0;
+
 	#ifdef DBGMODE
-	printf("write fdc_sel0_w reg : 0x%X\n",data);
+	printf("%s: write fdc_sel0_w reg : 0x%X\n",machine().describe_context(),data);
 	#endif
 
 	fdc_sel0 = data;
 
-	// drive select
-	m_floppy = NULL;
+	if( BIT(data, 3) ) // Drive 0
+	{
+		floppy = m_floppy0->get_device();
+		if(!floppy)
+			fdc_sel0 = fdc_sel0 & ~(0x08);
+		else
+		{
+			if(!floppy->dskchg_r())
+			{
+				fdc_sel0 = fdc_sel0 & ~(0x08);
+			}
+		}
+	}
+
+	if( BIT(data, 2) ) // Drive 1
+	{
+		floppy = m_floppy1->get_device();
+		if(!floppy)
+			fdc_sel0 = fdc_sel0 & ~(0x04);
+		else
+		{
+			if(!floppy->dskchg_r())
+			{
+				fdc_sel0 = fdc_sel0 & ~(0x04);
+			}
+		}
+	}
+
+	if(floppy)
+	{
+		floppy->ss_w(BIT(data, 4)); // Side selector bit
+	}
+
+	//m_fdc->mon_w(BIT(data, 3));
+	m_fdc->dden_w(BIT(data, 5));    // Double / Single density selector bit
+	m_fdc->set_floppy(floppy);
 }
 
 WRITE8_MEMBER( squale_state::fdc_sel1_w )
 {
 	#ifdef DBGMODE
-	printf("write fdc_sel1_w reg : 0x%X\n",data);
+	printf("%s: write fdc_sel1_w reg : 0x%X\n",machine().describe_context(),data);
 	#endif
 
 	fdc_sel1 = data;
@@ -181,23 +219,27 @@ WRITE8_MEMBER( squale_state::fdc_sel1_w )
 
 READ8_MEMBER( squale_state::fdc_sel0_r )
 {
-	UINT8 data = 0xFF;
+	UINT8 data;
+
+	data = fdc_sel0;
 
 	#ifdef DBGMODE
-	printf("%s: read fdc_sel0_r\n",machine().describe_context());
+	printf("%s: read fdc_sel0_r 0x%.2X\n",machine().describe_context(),data);
 	#endif
-	data = 0x00;
+
 	return data;
 }
 
 READ8_MEMBER( squale_state::fdc_sel1_r )
 {
-	UINT8 data = 0xFF;
+	UINT8 data;
+
+	data = fdc_sel1;
 
 	#ifdef DBGMODE
-	printf("%s: read fdc_sel1_r\n",machine().describe_context());
+	printf("%s: read fdc_sel1_r 0x%.2X\n",machine().describe_context(),data);
 	#endif
-	data = 0x00;
+
 	return data;
 }
 
@@ -618,13 +660,14 @@ static INPUT_PORTS_START( squale )
 INPUT_PORTS_END
 
 static SLOT_INTERFACE_START( squale_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
 void squale_state::machine_start()
 {
 	int i;
 	std::string region_tag;
+
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
 	fdc_sel0 = 0x00;
@@ -656,7 +699,7 @@ void squale_state::machine_reset()
 
 static MACHINE_CONFIG_START( squale, squale_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809, CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu",M6809E, CPU_CLOCK) // 12/2015 : Should be set to M6809 but it actually have the wrong clock divisor (1 instead of 4) and working 4 times too fast...
 	MCFG_CPU_PROGRAM_MAP(squale_mem)
 	MCFG_CPU_IO_MAP(squale_io)
 
@@ -704,7 +747,8 @@ static MACHINE_CONFIG_START( squale, squale_state )
 
 	/* Floppy */
 	MCFG_WD1770_ADD("wd1770", XTAL_8MHz )
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", squale_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", squale_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", squale_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop525_list", "squale")
 
 	/* Cartridge slot */

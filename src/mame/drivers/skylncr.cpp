@@ -161,7 +161,6 @@ public:
 	DECLARE_WRITE8_MEMBER(reelscroll4_w);
 	DECLARE_WRITE8_MEMBER(skylncr_coin_w);
 	DECLARE_READ8_MEMBER(ret_ff);
-	DECLARE_READ8_MEMBER(ret_00);
 	DECLARE_WRITE8_MEMBER(skylncr_nmi_enable_w);
 	DECLARE_DRIVER_INIT(skylncr);
 	TILE_GET_INFO_MEMBER(get_tile_info);

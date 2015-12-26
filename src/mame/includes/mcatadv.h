@@ -40,7 +40,6 @@ public:
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE16_MEMBER(mcat_soundlatch_w);
-	DECLARE_WRITE16_MEMBER(mcat_coin_w);
 	DECLARE_READ16_MEMBER(mcat_wd_r);
 	DECLARE_WRITE8_MEMBER(mcatadv_sound_bw_w);
 	DECLARE_WRITE16_MEMBER(mcatadv_videoram1_w);

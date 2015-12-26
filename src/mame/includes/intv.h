@@ -102,7 +102,6 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(intv);
-	void ecs_banks_restore();
 	UINT32 screen_update_intv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_intvkbd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(intv_interrupt2);
@@ -131,24 +130,7 @@ protected:
 	ioport_port *m_discy[4];
 	ioport_port *m_intv_keyboard[10];
 
-	int intv_load_rom_file(device_image_interface &image);
 	UINT8 intv_control_r(int hand);
-	void intv_set_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
-	UINT32 intv_get_pixel(bitmap_ind16 &bitmap, int x, int y);
-	void intv_plot_box(bitmap_ind16 &bm, int x, int y, int w, int h, int color);
-	int sprites_collide(int spriteNum1, int spriteNum2);
-	void determine_sprite_collisions();
-	void render_sprites();
-	void render_line(bitmap_ind16 &bitmap, UINT8 nextByte, UINT16 x, UINT16 y, UINT8 fgcolor, UINT8 bgcolor);
-	void render_colored_squares(bitmap_ind16 &bitmap, UINT16 x, UINT16 y, UINT8 color0, UINT8 color1, UINT8 color2, UINT8 color3);
-	void render_color_stack_mode(bitmap_ind16 &bitmap);
-	void render_fg_bg_mode(bitmap_ind16 &bitmap);
-	void copy_sprites_to_background(bitmap_ind16 &bitmap);
-	void render_background(bitmap_ind16 &bitmap);
-	void draw_borders(bitmap_ind16 &bm);
-	void intv_stic_screenrefresh();
-	void draw_background(bitmap_ind16 &bitmap, int transparency);
-	void draw_sprites(bitmap_ind16 &bitmap, int behind_foreground);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 

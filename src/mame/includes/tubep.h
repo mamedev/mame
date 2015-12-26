@@ -97,7 +97,6 @@ public:
 	UINT32 screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(tubep_scanline_callback);
 	TIMER_CALLBACK_MEMBER(rjammer_scanline_callback);
-	TIMER_CALLBACK_MEMBER(sprite_timer_callback);
 	void draw_sprite();
 	void tubep_vblank_end();
 	void tubep_setup_save_state();

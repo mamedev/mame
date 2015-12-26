@@ -295,7 +295,7 @@ void mainboard8_device::PTGE_set(bool state)
 READ8_MEMBER( mainboard8_device::readm )
 {
 	UINT8 value = 0;
-	bool found = false;
+	bool found;
 	if (TRACE_MEM) logerror("%s: read from %04x\n", tag(), offset);
 	found = access_logical_r(space, offset, &value, mem_mask);
 	m_waitcount = 2;
@@ -323,7 +323,7 @@ READ8_MEMBER( mainboard8_device::readm )
 
 WRITE8_MEMBER( mainboard8_device::writem )
 {
-	bool found = false;
+	bool found;
 
 	// Look for components responding to the logical address
 	found = access_logical_w(space, offset, data, mem_mask);
@@ -485,7 +485,7 @@ bool mainboard8_device::access_logical_r(address_space& space, offs_t offset, UI
 {
 	bool found = false;
 	logically_addressed_device *ldev = m_logcomp.first();
-	bus8z_device *bdev = nullptr;
+	bus8z_device *bdev;
 
 	if (TRACE_MEM) logerror("%s: offset=%04x; CRUS=%d, PTGEN=%d\n", tag(), offset, m_CRUS? 1:0, m_PTGE? 0:1);
 	while (ldev != nullptr)
@@ -531,7 +531,7 @@ bool mainboard8_device::access_logical_w(address_space& space, offs_t offset, UI
 {
 	bool found = false;
 	logically_addressed_device *ldev = m_logcomp.first();
-	bus8z_device *bdev = nullptr;
+	bus8z_device *bdev;
 
 	while (ldev != nullptr)
 	{
@@ -573,7 +573,7 @@ bool mainboard8_device::access_logical_w(address_space& space, offs_t offset, UI
 void mainboard8_device::access_physical_r( address_space& space, offs_t pas_address, UINT8 *value, UINT8 mem_mask )
 {
 	physically_addressed_device *pdev = m_physcomp.first();
-	bus8z_device *bdev = nullptr;
+	bus8z_device *bdev;
 
 	while (pdev != nullptr)
 	{
@@ -621,7 +621,7 @@ void mainboard8_device::access_physical_r( address_space& space, offs_t pas_addr
 void mainboard8_device::access_physical_w( address_space& space, offs_t pas_address, UINT8 data, UINT8 mem_mask )
 {
 	physically_addressed_device *pdev = m_physcomp.first();
-	bus8z_device *bdev = nullptr;
+	bus8z_device *bdev;
 
 	while (pdev != nullptr)
 	{

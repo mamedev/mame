@@ -130,10 +130,6 @@ public:
 	DECLARE_WRITE16_MEMBER(mr2_w);
 	DECLARE_READ16_MEMBER(snd_68k_ready_r);
 	DECLARE_WRITE16_MEMBER(snd_latch_to_68k_w);
-	DECLARE_READ16_MEMBER(m1_snd_68k_latch_r);
-	DECLARE_READ16_MEMBER(m1_snd_v60_ready_r);
-	DECLARE_WRITE16_MEMBER(m1_snd_68k_latch1_w);
-	DECLARE_WRITE16_MEMBER(m1_snd_68k_latch2_w);
 	DECLARE_READ16_MEMBER(model1_tgp_copro_r);
 	DECLARE_WRITE16_MEMBER(model1_tgp_copro_w);
 	DECLARE_READ16_MEMBER(model1_tgp_copro_adr_r);
@@ -150,13 +146,10 @@ public:
 	DECLARE_WRITE32_MEMBER(copro_ram_w);
 	DECLARE_READ16_MEMBER(model1_listctl_r);
 	DECLARE_WRITE16_MEMBER(model1_listctl_w);
-	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk1_w);
-	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk2_w);
 	DECLARE_MACHINE_START(model1);
 	DECLARE_MACHINE_RESET(model1);
 	DECLARE_VIDEO_START(model1);
 	DECLARE_MACHINE_RESET(model1_vr);
-	DECLARE_WRITE_LINE_MEMBER(m1_to_main_irq);
 	UINT32 screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_model1(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(model1_interrupt);

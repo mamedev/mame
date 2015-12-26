@@ -286,8 +286,6 @@ private:
 	UINT32 bam1Error1();
 	UINT32 am1Error2();
 	UINT32 bam1Error2();
-	UINT32 am1Error3();
-	UINT32 bam1Error3();
 	UINT32 am1Error4();
 	UINT32 bam1Error4();
 	UINT32 am1Error5();

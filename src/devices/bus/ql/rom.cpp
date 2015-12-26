@@ -79,7 +79,7 @@ bool ql_rom_cartridge_slot_t::call_load()
 {
 	if (m_card)
 	{
-		size_t size = 0;
+		size_t size;
 
 		if (software_entry() == nullptr)
 		{

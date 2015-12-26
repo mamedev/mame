@@ -446,7 +446,6 @@ public:
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 
-	DECLARE_WRITE8_MEMBER(debug_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(avt);

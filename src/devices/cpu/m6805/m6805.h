@@ -119,7 +119,7 @@ protected:
 	void rorx();
 	void asrx();
 	void aslx();
-	void lslx();
+//	void lslx();
 	void rolx();
 	void decx();
 	void incx();

@@ -240,10 +240,6 @@ protected:
 	void s3c240x_lcd_render_04( );
 	void s3c240x_lcd_render_08( );
 	void s3c240x_lcd_render_16( );
-	UINT8 i2cmem_read_byte( int last);
-	void i2cmem_write_byte( UINT8 data);
-	void i2cmem_start( );
-	void i2cmem_stop( );
 };
 
 

@@ -44,7 +44,6 @@ public:
 	required_device<k056832_device> m_k056832;
 	required_device<k05324x_device> m_k053244;
 	required_device<k053251_device> m_k053251;
-	DECLARE_READ16_MEMBER(control2_r);
 	DECLARE_WRITE16_MEMBER(control2_w);
 	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_w);

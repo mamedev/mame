@@ -107,7 +107,6 @@ public:
 	required_device<address_map_bank_device> m_flashbank;
 	required_ioport_array<16> m_inputs;
 
-	DECLARE_READ8_MEMBER( get_slave_ack );
 	DECLARE_WRITE32_MEMBER( flash_w );
 //  DECLARE_WRITE8_MEMBER( bios_ram_w );
 	DECLARE_READ8_MEMBER( test_r );
@@ -131,8 +130,6 @@ public:
 	DECLARE_READ32_MEMBER(biu_ctrl_r);
 	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
 	DECLARE_WRITE8_MEMBER(bios_ram_w);
-	DECLARE_READ32_MEMBER(serial_r);
-	DECLARE_WRITE32_MEMBER(serial_w);
 	DECLARE_READ8_MEMBER(io20_r);
 	DECLARE_WRITE8_MEMBER(io20_w);
 	virtual void machine_start() override;

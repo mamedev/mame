@@ -73,8 +73,6 @@ public:
 	required_device<k054338_device> m_k054338;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	DECLARE_READ16_MEMBER(K053247_scattered_word_r);
-	DECLARE_WRITE16_MEMBER(K053247_scattered_word_w);
 	DECLARE_READ16_MEMBER(spriteram_mirror_r);
 	DECLARE_WRITE16_MEMBER(spriteram_mirror_w);
 	DECLARE_READ16_MEMBER(xexex_waitskip_r);

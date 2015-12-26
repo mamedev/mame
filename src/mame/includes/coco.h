@@ -209,7 +209,6 @@ private:
 
 	soundmux_status_t soundmux_status(void);
 	void update_sound(void);
-	bool joyin(void);
 	void poll_joystick(bool *joyin, UINT8 *buttons);
 	void poll_keyboard(void);
 	void poll_hires_joystick(void);

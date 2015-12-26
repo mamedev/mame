@@ -56,15 +56,6 @@ class pic16c62x_device : public cpu_device
 public:
 	// construction/destruction
 	pic16c62x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int picmodel);
-
-	/****************************************************************************
-	 *  Function to configure the CONFIG register. This is actually hard-wired
-	 *  during ROM programming, so should be called in the driver INIT, with
-	 *  the value if known (available in HEX dumps of the ROM).
-	 */
-
-	void pic16c62x_set_config(device_t *cpu, int data);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;

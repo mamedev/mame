@@ -41,11 +41,9 @@ public:
 	DECLARE_WRITE8_MEMBER(paso1600_6845_data_w);
 	DECLARE_READ8_MEMBER(paso1600_6845_data_r);
 	DECLARE_READ8_MEMBER(paso1600_6845_status_r);
-	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ16_MEMBER(test_hi_r);
-	DECLARE_WRITE_LINE_MEMBER(paso1600_set_int_line);
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 	UINT8 *m_p_chargen;
 	UINT8 *m_p_pcg;
@@ -62,7 +60,6 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	UINT32 screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	IRQ_CALLBACK_MEMBER(paso1600_irq_callback);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])

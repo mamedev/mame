@@ -109,8 +109,6 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_shared_ptr<UINT16> m_decrypted_opcodes;
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	DECLARE_READ16_MEMBER(dblewing_prot_r);
-	DECLARE_WRITE16_MEMBER(dblewing_prot_w);
 	DECLARE_READ8_MEMBER(irq_latch_r);
 	DECLARE_DRIVER_INIT(dblewing);
 	virtual void machine_start() override;

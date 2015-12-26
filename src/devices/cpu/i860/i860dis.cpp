@@ -243,7 +243,7 @@ static void int_ldx(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 1, 1, 2, 4 };
 	const char *const suffix[4] = { "b", "b", "s", "l" };
-	UINT32 idx = 0;
+	UINT32 idx;
 
 	/* Bits 28 and 0 determine the operand size.  */
 	idx = ((insn >> 27) & 2) | (insn & 1);
@@ -270,7 +270,7 @@ static void int_stx(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 1, 1, 2, 4 };
 	const char *const suffix[4] = { "b", "b", "s", "l" };
-	int idx = 0;
+	int idx;
 	int size;
 	INT32 immsrc = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
 
@@ -297,8 +297,8 @@ static void int_fldst(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 8, 4, 16, 4 };
 	const char *const suffix[4] = { "d", "l", "q", "l" };
-	int idx = 0;
-	int size = 0;
+	int idx;
+	int size;
 	int auto_inc = (insn & 1);
 	const char *const auto_suff[2] = { "", "++" };
 	int piped = (insn & 0x40000000) >> 29;

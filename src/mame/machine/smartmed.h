@@ -145,8 +145,6 @@ public:
 	void address_w(UINT8 data);
 	void data_w(UINT8 data);
 
-	void read(int offset, void *data, int size);
-
 	void set_data_ptr(void *ptr);
 protected:
 	// device-level overrides

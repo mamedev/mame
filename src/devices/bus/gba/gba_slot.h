@@ -76,7 +76,6 @@ public:
 	int get_type() { return m_type; }
 	int get_cart_type(UINT8 *ROM, UINT32 len);
 
-	void setup_ram(UINT8 banks);
 	void internal_header_logging(UINT8 *ROM, UINT32 len);
 
 	void save_nvram()   { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }

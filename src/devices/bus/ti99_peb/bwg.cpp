@@ -338,7 +338,7 @@ WRITE8_MEMBER(snug_bwg_device::write)
 */
 READ8Z_MEMBER(snug_bwg_device::crureadz)
 {
-	UINT8 reply = 0;
+	UINT8 reply;
 
 	if ((offset & 0xff00)==m_cru_base)
 	{

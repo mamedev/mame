@@ -97,8 +97,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( irq3_timer_callback );
 	TIMER_DEVICE_CALLBACK_MEMBER( stamp_timer_callback );
 
-	UINT16 handle_segacd_sub_int_callback(int irqline);
-
 	inline void write_pixel(UINT8 pix, int pixeloffset);
 	UINT16 segacd_1meg_mode_word_read(int offset, UINT16 mem_mask);
 	void segacd_1meg_mode_word_write(int offset, UINT16 data, UINT16 mem_mask, int use_pm);

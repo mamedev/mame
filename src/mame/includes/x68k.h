@@ -277,7 +277,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE8_MEMBER(x68k_ct_w);
-	DECLARE_WRITE_LINE_MEMBER(x68k_rtc_alarm_irq);
 	DECLARE_WRITE8_MEMBER(x68030_adpcm_w);
 	DECLARE_WRITE_LINE_MEMBER(mfp_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_irq);
@@ -344,11 +343,6 @@ private:
 	void x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
 
 public:
-	bitmap_rgb32* x68k_get_gfx_page(int pri,int type);
-	attotime prescale(int val);
-	void mfp_trigger_irq(int irq);
-	void mfp_set_timer(int timer, unsigned char data);
-	void mfp_recv_data(int data);
 	DECLARE_PALETTE_DECODER(GGGGGRRRRRBBBBBI);
 
 protected:

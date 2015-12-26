@@ -49,7 +49,6 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<k053936_device> m_k053936;
 	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_READ16_MEMBER(pending_command_r);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(suprslam_sh_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(suprslam_screen_videoram_w);

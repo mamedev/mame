@@ -28,7 +28,6 @@ public:
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_READ16_MEMBER( io_r );
 
-	TIMER_CALLBACK_MEMBER( m68k_asic65_deferred_w );
 	WRITE16_MEMBER( m68k_w );
 	READ16_MEMBER( m68k_r );
 	WRITE16_MEMBER( stat_w );

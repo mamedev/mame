@@ -55,7 +55,6 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE_LINE_MEMBER( adj_w );
 
 protected:
 	// device-level overrides

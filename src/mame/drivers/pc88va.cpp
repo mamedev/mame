@@ -131,7 +131,6 @@ public:
 	DECLARE_WRITE16_MEMBER(video_pri_w);
 	DECLARE_READ8_MEMBER(backupram_dsw_r);
 	DECLARE_WRITE8_MEMBER(sys_port1_w);
-	DECLARE_WRITE8_MEMBER(fdc_irq_vector_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

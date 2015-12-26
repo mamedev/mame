@@ -236,7 +236,6 @@ public:
 	float m_lightStrength;
 	float m_lightVector[3];
 
-	DECLARE_READ32_MEMBER(hng64_random_read);
 	DECLARE_READ32_MEMBER(hng64_com_r);
 	DECLARE_WRITE32_MEMBER(hng64_com_w);
 	DECLARE_WRITE8_MEMBER(hng64_com_share_w);
@@ -274,10 +273,6 @@ public:
 
 	DECLARE_WRITE32_MEMBER(hng64_sprite_clear_even_w);
 	DECLARE_WRITE32_MEMBER(hng64_sprite_clear_odd_w);
-	DECLARE_WRITE32_MEMBER(trap_write);
-	DECLARE_WRITE32_MEMBER(activate_3d_buffer);
-	DECLARE_READ8_MEMBER(hng64_comm_shared_r);
-	DECLARE_WRITE8_MEMBER(hng64_comm_shared_w);
 	DECLARE_WRITE32_MEMBER(hng64_videoram_w);
 	DECLARE_READ8_MEMBER(hng64_comm_space_r);
 	DECLARE_WRITE8_MEMBER(hng64_comm_space_w);
@@ -385,13 +380,6 @@ public:
 	DECLARE_WRITE16_MEMBER(hng64_sound_port_000c_w);
 
 	DECLARE_WRITE16_MEMBER(hng64_sound_port_0080_w);
-
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_0100_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_0102_w);
-	DECLARE_READ16_MEMBER(hng64_sound_port_0104_r);
-	DECLARE_READ16_MEMBER(hng64_sound_port_0106_r);
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_0108_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_010a_w);
 
 	DECLARE_WRITE16_MEMBER(hng64_sound_bank_w);
 	DECLARE_READ16_MEMBER(main_sound_comms_r);

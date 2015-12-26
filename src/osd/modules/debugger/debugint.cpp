@@ -1210,7 +1210,7 @@ static void on_memory_data_format(DView *dv, const ui_menu_event *event)
 {
 	debug_view_memory *memview = downcast<debug_view_memory *>(focus_view->view);
 	int format = memview->get_data_format();
-	int idx;
+	int idx = 0;
 	int order[7] = { 1, 2, 4, 8, 9, 10, 11 };
 
 	for(int x=0; x<7; x++)

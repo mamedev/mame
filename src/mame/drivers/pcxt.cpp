@@ -106,7 +106,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 	DECLARE_READ8_MEMBER(dma_page_select_r);
 	DECLARE_WRITE8_MEMBER(dma_page_select_w);
-	DECLARE_WRITE8_MEMBER(tetriskr_bg_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(ibm5150_pit8253_out2_changed);
 	DECLARE_READ8_MEMBER(port_a_r);
 	DECLARE_READ8_MEMBER(port_b_r);
@@ -123,7 +122,6 @@ public:
 	DECLARE_DRIVER_INIT(tetriskr);
 	DECLARE_DRIVER_INIT(filetto);
 	virtual void machine_reset() override;
-	UINT32 screen_update_tetriskr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT8 pcxt_speaker_get_spk();
 	void pcxt_speaker_set_spkrdata(UINT8 data);
 	required_device<cpu_device> m_maincpu;

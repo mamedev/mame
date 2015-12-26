@@ -194,14 +194,7 @@ public:
 
 	int m_planes_enabled[4];
 #endif
-	DECLARE_WRITE8_MEMBER(cfb_backgnd_color_w);
-	DECLARE_WRITE8_MEMBER(cfb_vbank_w);
 	DECLARE_WRITE8_MEMBER(cfb_rom_bank_sel_w);
-	DECLARE_READ8_MEMBER(cfb_port_02_r);
-	DECLARE_WRITE8_MEMBER(vcu_video_reg_w);
-	DECLARE_READ8_MEMBER(vcu_set_cmd_param_r);
-	DECLARE_READ8_MEMBER(vcu_set_gfx_addr_r);
-	DECLARE_READ8_MEMBER(vcu_set_clr_addr_r);
 	DECLARE_WRITE8_MEMBER(cfb_zpu_int_req_set_w);
 	DECLARE_READ8_MEMBER(cfb_zpu_int_req_clr);
 	DECLARE_READ8_MEMBER(ls670_0_r);

@@ -117,8 +117,6 @@ public:
 	DECLARE_READ16_MEMBER(fdc_stat_r);
 	DECLARE_WRITE16_MEMBER(fdc_data_w);
 	DECLARE_WRITE16_MEMBER(fdc_cmd_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_data_w);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	DECLARE_READ8_MEMBER( internal_data_read );
 	DECLARE_WRITE8_MEMBER( internal_data_write );

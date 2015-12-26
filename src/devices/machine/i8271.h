@@ -244,8 +244,6 @@ private:
 	void set_irq(bool state);
 	bool get_ready(int fid);
 
-	void enable_transfer();
-	void disable_transfer();
 	int calc_sector_size(UINT8 size);
 
 	int check_command();

@@ -1085,7 +1085,7 @@ void sc499_device::eop_w(int state)
 
 UINT8 sc499_device::dack_r(int line)
 {
-	UINT8 data = 0xff;
+	UINT8 data;
 
 //  set_dma_drq(CLEAR_LINE);
 

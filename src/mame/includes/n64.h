@@ -228,7 +228,6 @@ private:
 	UINT32 dd_track_offset;
 
 	// Peripheral Interface (PI) registers and functions
-	void pi_dma();
 	emu_timer *pi_dma_timer;
 	UINT32 pi_dram_addr;
 	UINT32 pi_cart_addr;

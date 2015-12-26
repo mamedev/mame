@@ -194,7 +194,6 @@ public:
 	inline void changecolor(int color,int r,int g,int b);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	int find_sample(int num);
 	void copy_le(UINT16 *dest, const UINT8 *src, UINT8 bytes);
 	void install_protection_handler(const UINT8 *code,const UINT8 *crc);
 };

@@ -145,7 +145,6 @@ public:
 	}m_rs232c;
 
 	DECLARE_PALETTE_INIT(qx10);
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;

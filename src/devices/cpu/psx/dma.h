@@ -63,8 +63,6 @@ private:
 	void dma_timer_adjust( int n_channel );
 	void dma_interrupt_update();
 	void dma_finished( int n_channel );
-	void write( offs_t offset, UINT32 data, UINT32 mem_mask );
-	UINT32 read( offs_t offset, UINT32 mem_mask );
 
 	psx_dma_channel m_channel[7];
 	UINT32 m_dpcp;

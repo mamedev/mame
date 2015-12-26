@@ -66,10 +66,6 @@ public:
 	DECLARE_READ8_MEMBER( romclk_hack_r );
 
 	void set_frequency(int frequency);
-
-	int _speech_rom_read_bit();
-	void _speech_rom_set_addr(int addr);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;

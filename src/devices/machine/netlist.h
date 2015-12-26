@@ -178,9 +178,6 @@ public:
 	// construction/destruction
 	netlist_mame_cpu_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~netlist_mame_cpu_device_t() {}
-
-	static void static_set_constructor(device_t &device, void (*setup_func)(netlist::setup_t &));
-
 protected:
 	// netlist_mame_device_t
 	virtual void nl_register_devices() override;

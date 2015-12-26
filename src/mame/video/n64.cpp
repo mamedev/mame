@@ -3806,8 +3806,6 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 		INT32 sb = b.w >> 14;
 		INT32 sa = a.w >> 14;
 		INT32 sz = (z.w >> 10) & 0x3fffff;
-		color_t c1;
-		color_t c2;
 
 		const bool valid_x = (flip) ? (x >= xend_scissored) : (x <= xend_scissored);
 

@@ -327,9 +327,6 @@ private:
 	void    precalc_cvmask_derivatives(void);
 	void    z_build_com_table(void);
 
-	void    video_update16(n64_periphs* n64, bitmap_rgb32 &bitmap);
-	void    video_update32(n64_periphs* n64, bitmap_rgb32 &bitmap);
-
 	typedef void (n64_rdp::*compute_cvg_t) (extent_t* spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base);
 	compute_cvg_t   m_compute_cvg[2];
 

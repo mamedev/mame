@@ -126,7 +126,6 @@ public:
 	void tumbleb2_set_music_bank( int bank );
 	void tumbleb2_play_sound( okim6295_device *oki, int data );
 	void process_tumbleb2_music_command( okim6295_device *oki, int data );
-	void tumblepb_patch_code(UINT16 offset);
 	void tumblepb_gfx_rearrange(int rgn);
 	void suprtrio_decrypt_code();
 	void suprtrio_decrypt_gfx();

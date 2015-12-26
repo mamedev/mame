@@ -126,8 +126,6 @@ public:
 	DECLARE_READ8_MEMBER(portc4_r);
 	DECLARE_READ8_MEMBER(portd0_r);
 	DECLARE_WRITE8_MEMBER(bigbord2_kbd_put);
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	DECLARE_WRITE_LINE_MEMBER(frame);
 	DECLARE_DRIVER_INIT(bigbord2);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
@@ -147,8 +145,6 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 	address_space *m_mem;
 	address_space *m_io;
 	required_device<cpu_device> m_maincpu;

@@ -123,7 +123,6 @@ protected:
 
 private:
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
-	inline UINT16 psxreadword( UINT32 *p_n_psxram, UINT32 n_address );
 	inline void psxwriteword( UINT32 *p_n_psxram, UINT32 n_address, UINT16 n_data );
 
 	UINT8 m_n_znsecsel;

@@ -174,8 +174,6 @@ public:
 	DECLARE_WRITE8_MEMBER(dodghero_regs2_w);
 	DECLARE_READ8_MEMBER(dodghero_regs2_r);
 
-	DECLARE_WRITE8_MEMBER(dashhero_regs_w);
-	DECLARE_READ8_MEMBER(dashhero_regs_r);
 	DECLARE_WRITE8_MEMBER(dashhero_regs2_w);
 	DECLARE_READ8_MEMBER(dashhero_regs2_r);
 

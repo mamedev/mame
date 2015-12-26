@@ -421,7 +421,6 @@ public:
 	INTERRUPT_GEN_MEMBER(viper_vblank);
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
-	const char* epic_get_register_name(UINT32 reg);
 	void epic_update_interrupts();
 	void mpc8240_interrupt(int irq);
 	void mpc8240_epic_init();

@@ -229,8 +229,6 @@ class towns_state : public driver_device
 	DECLARE_WRITE8_MEMBER(towns_sound_ctrl_w);
 	DECLARE_READ8_MEMBER(towns_padport_r);
 	DECLARE_WRITE8_MEMBER(towns_pad_mask_w);
-	DECLARE_READ8_MEMBER(towns_cmos8_r);
-	DECLARE_WRITE8_MEMBER(towns_cmos8_w);
 	DECLARE_READ8_MEMBER(towns_cmos_low_r);
 	DECLARE_WRITE8_MEMBER(towns_cmos_low_w);
 	DECLARE_READ8_MEMBER(towns_cmos_r);
@@ -282,7 +280,6 @@ class towns_state : public driver_device
 	void kb_sendcode(UINT8 scancode, int release);
 	UINT8 speaker_get_spk();
 	void speaker_set_spkrdata(UINT8 data);
-	void speaker_set_input(UINT8 data);
 	UINT8 towns_cdrom_read_byte_software();
 
 	required_ioport m_ctrltype;

@@ -985,7 +985,7 @@ WRITE8_MEMBER( isa8_aga_pc200_device::pc200_cga_w )
 
 READ8_MEMBER ( isa8_aga_pc200_device::pc200_cga_r )
 {
-	UINT8 result = 0xff;
+	UINT8 result;
 
 	switch(offset) {
 	case 8:

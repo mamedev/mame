@@ -84,7 +84,6 @@ public:
 	DECLARE_WRITE8_MEMBER( io_w );
 
 	DECLARE_READ8_MEMBER( memory_r );
-	DECLARE_WRITE8_MEMBER( memory_w );
 
 protected:
 	// device-level overrides

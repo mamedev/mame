@@ -399,7 +399,7 @@ UINT32 get_dasmflags(UINT8 op)
 CPU_DISASSEMBLE( hd61700 )
 {
 	const hd61700_dasm *inst;
-	UINT32 dasmflags = 0;
+	UINT32 dasmflags;
 	UINT8 op, op1;
 	int pos = 0, type = EXT_ROM;
 

@@ -65,7 +65,6 @@ public:
 	DECLARE_READ16_MEMBER(csplayh5_mux_r);
 	DECLARE_WRITE16_MEMBER(csplayh5_mux_w);
 	DECLARE_WRITE16_MEMBER(csplayh5_sound_w);
-	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_READ8_MEMBER(csplayh5_sound_r);
 	DECLARE_WRITE8_MEMBER(csplayh5_soundclr_w);
 

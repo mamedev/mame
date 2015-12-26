@@ -219,7 +219,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_main_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_pad_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
-	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineR);
 };
 
 

@@ -96,8 +96,6 @@ public:
 	DECLARE_WRITE64_MEMBER(bebox_cpu1_imask_w);
 	DECLARE_WRITE64_MEMBER(bebox_crossproc_interrupts_w);
 	DECLARE_WRITE64_MEMBER(bebox_processor_resets_w);
-	DECLARE_WRITE8_MEMBER(bebox_800001F0_w);
-	DECLARE_WRITE64_MEMBER(bebox_800003F0_w);
 	DECLARE_WRITE8_MEMBER(bebox_page_w);
 	DECLARE_WRITE8_MEMBER(bebox_80000480_w);
 	DECLARE_WRITE8_MEMBER(bebox_flash_w);

@@ -250,7 +250,6 @@ public:
 	required_shared_ptr<UINT8> m_video;
 	int m_mixdata;
 	DECLARE_READ8_MEMBER(mixport_r);
-	DECLARE_WRITE8_MEMBER(muxed_w);
 	DECLARE_WRITE8_MEMBER(outport0_w);
 	DECLARE_WRITE8_MEMBER(outport1_w);
 	DECLARE_WRITE8_MEMBER(outport2_w);
@@ -259,7 +258,6 @@ public:
 	DECLARE_WRITE8_MEMBER(outport5_w);
 	DECLARE_WRITE8_MEMBER(outport6_w);
 	DECLARE_WRITE8_MEMBER(outport7_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mgames);
 	UINT32 screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

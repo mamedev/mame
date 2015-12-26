@@ -63,8 +63,6 @@ public:
 	// construction/destruction
 	sc499_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	int sc499_receive(const UINT8 data[], int length);
-
 	required_ioport m_iobase;
 	required_ioport m_irqdrq;
 

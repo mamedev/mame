@@ -125,8 +125,6 @@ public:
 	void hitice_clear_pixel_bitmap(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
-	void ryujin_patch(void);
-	void sbm_patch(void);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 protected:

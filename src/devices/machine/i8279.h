@@ -106,9 +106,7 @@ private:
 	void clear_display();
 	void new_key(UINT8 data, bool skey, bool ckey);
 	void new_fifo(UINT8 data);
-	UINT8 get_segments();
 	void set_irq(bool state);
-	void set_display_mode(UINT8 data);
 
 	devcb_write_line    m_out_irq_cb;       // IRQ
 	devcb_write8        m_out_sl_cb;        // Scanlines SL0-3

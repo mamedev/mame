@@ -98,7 +98,6 @@ public:
 	void toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 	void swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 	void cclimber_decode(const UINT8 convtable[8][16]);
-	void cannonb_patch();
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 };

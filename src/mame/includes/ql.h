@@ -111,8 +111,6 @@ public:
 	DECLARE_READ8_MEMBER( ipc_port2_r );
 	DECLARE_READ8_MEMBER( ipc_t1_r );
 	DECLARE_READ8_MEMBER( ipc_bus_r );
-	DECLARE_READ8_MEMBER( ql_ram_r );
-	DECLARE_WRITE8_MEMBER( ql_ram_w );
 	DECLARE_WRITE_LINE_MEMBER( ql_baudx4_w );
 	DECLARE_WRITE_LINE_MEMBER( ql_comdata_w );
 	DECLARE_WRITE_LINE_MEMBER( zx8302_mdselck_w );

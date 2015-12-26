@@ -258,7 +258,7 @@ static void format_transfer(UINT64 op)
 
 					int reg = (bank << 3) | d;
 
-					UINT16 offset = 0;
+					UINT16 offset;
 					if (s)
 					{
 						offset = op & 0x7fff;

@@ -77,8 +77,6 @@ public:
 	UINT32 screen_update_boomrang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_prosoccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco16_interrupt);
-	INTERRUPT_GEN_MEMBER(prosport_interrupt);
-	void debug_print(bitmap_ind16 &bitmap);
 	void liberate_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void prosport_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void boomrang_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );

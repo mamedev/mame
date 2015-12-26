@@ -28,7 +28,7 @@ const device_type PET_64K = &device_creator<pet_64k_expansion_device>;
 
 inline UINT8 pet_64k_expansion_device::read_ram(offs_t offset)
 {
-	UINT8 data = 0;
+	UINT8 data;
 
 	if (offset < 0xc000)
 	{

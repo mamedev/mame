@@ -175,7 +175,6 @@ public:
 	virtual void vgrst() override;
 
 	virtual void device_start() override;
-	void avg_start_common();
 };
 
 // device type definition

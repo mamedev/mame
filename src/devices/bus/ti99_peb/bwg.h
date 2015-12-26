@@ -28,9 +28,6 @@ public:
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
-	DECLARE_WRITE_LINE_MEMBER( intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
-
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
 

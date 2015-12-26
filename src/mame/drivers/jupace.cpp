@@ -108,7 +108,6 @@ public:
 	DECLARE_READ8_MEMBER( pio_pa_r );
 	DECLARE_WRITE8_MEMBER( pio_pa_w );
 
-	UINT32 screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(set_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(clear_irq);
 	DECLARE_READ8_MEMBER(pio_ad_r);

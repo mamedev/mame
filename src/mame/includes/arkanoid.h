@@ -72,7 +72,6 @@ public:
 	DECLARE_READ8_MEMBER(arkanoid_bootleg_f000_r);
 	DECLARE_READ8_MEMBER(arkanoid_bootleg_f002_r);
 	DECLARE_WRITE8_MEMBER(arkanoid_bootleg_d018_w);
-	DECLARE_READ8_MEMBER(block2_bootleg_f000_r);
 	DECLARE_READ8_MEMBER(arkanoid_bootleg_d008_r);
 	DECLARE_WRITE8_MEMBER(arkanoid_videoram_w);
 	DECLARE_WRITE8_MEMBER(arkanoid_d008_w);

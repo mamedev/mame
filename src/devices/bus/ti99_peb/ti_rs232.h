@@ -45,7 +45,6 @@ public:
 	DECLARE_WRITE8_MEMBER( xmit1_callback );
 	DECLARE_WRITE8_MEMBER( ctrl0_callback );
 	DECLARE_WRITE8_MEMBER( ctrl1_callback );
-	DECLARE_WRITE_LINE_MEMBER( senila );
 
 protected:
 	virtual void device_start(void) override;

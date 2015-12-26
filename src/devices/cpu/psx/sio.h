@@ -66,7 +66,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_rxd);
 	DECLARE_WRITE_LINE_MEMBER(write_dsr);
-	DECLARE_WRITE_LINE_MEMBER(write_cts);
 
 protected:
 	// device-level overrides

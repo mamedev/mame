@@ -102,10 +102,24 @@
 #include "includes/laserbat.h"
 
 
-WRITE8_MEMBER(laserbat_state::csound1_w)
+READ8_MEMBER(laserbat_state_base::rhsc_r)
 {
-	// all the chips using this are edge-triggered on CSOUND2 lines
+	return m_rhsc;
+}
+
+WRITE8_MEMBER(laserbat_state_base::whsc_w)
+{
+	m_whsc = data;
+}
+
+WRITE8_MEMBER(laserbat_state_base::csound1_w)
+{
 	m_csound1 = data;
+}
+
+WRITE8_MEMBER(laserbat_state_base::csound2_w)
+{
+	m_csound2 = data;
 }
 
 

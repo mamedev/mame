@@ -148,7 +148,6 @@ public:
 	DECLARE_WRITE16_MEMBER(igs011_prot1_w);
 	DECLARE_READ16_MEMBER(igs011_prot1_r);
 	DECLARE_WRITE16_MEMBER(igs011_prot_addr_w);
-	DECLARE_READ16_MEMBER(igs011_prot_fake_r);
 	DECLARE_WRITE16_MEMBER(igs011_prot2_reset_w);
 	DECLARE_READ16_MEMBER(igs011_prot2_reset_r);
 	DECLARE_WRITE16_MEMBER(igs011_prot2_inc_w);
@@ -165,7 +164,6 @@ public:
 	DECLARE_READ16_MEMBER(lhb2_igs011_prot2_r);
 	DECLARE_READ16_MEMBER(vbowl_igs011_prot2_r);
 	DECLARE_WRITE16_MEMBER(igs012_prot_reset_w);
-	DECLARE_READ16_MEMBER(igs012_prot_fake_r);
 	DECLARE_WRITE16_MEMBER(igs012_prot_mode_w);
 	DECLARE_WRITE16_MEMBER(igs012_prot_inc_w);
 	DECLARE_WRITE16_MEMBER(igs012_prot_dec_inc_w);

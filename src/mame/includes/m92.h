@@ -51,8 +51,6 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<pic8259_device> m_upd71059c;
 
-	IRQ_CALLBACK_MEMBER(m92_irq_callback);
-
 	UINT16 m_sound_status;
 	UINT32 m_raster_irq_position;
 	UINT16 m_videocontrol;

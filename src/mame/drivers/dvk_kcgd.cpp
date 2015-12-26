@@ -76,9 +76,6 @@ public:
 	};
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_line_clock);
-
 	DECLARE_READ16_MEMBER(vram_addr_r);
 	DECLARE_READ16_MEMBER(vram_data_r);
 	DECLARE_READ16_MEMBER(vram_mmap_r);

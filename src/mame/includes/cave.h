@@ -161,7 +161,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sailormn_rombank_w);
 	DECLARE_WRITE8_MEMBER(sailormn_okibank_w);
 	DECLARE_WRITE8_MEMBER(sailormn_oki2bank_w);
-	DECLARE_WRITE16_MEMBER(donpachi_videoregs_w);
 	DECLARE_WRITE16_MEMBER(cave_vram_0_w);
 	DECLARE_WRITE16_MEMBER(cave_vram_1_w);
 	DECLARE_WRITE16_MEMBER(cave_vram_2_w);

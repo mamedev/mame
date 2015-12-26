@@ -102,9 +102,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ipr_w);
 	DECLARE_READ8_MEMBER(iprk_r);
 	DECLARE_WRITE8_MEMBER(iprk_w);
-
-	void set_mode_8(bool mode_8);
-
 private:
 	static const int vector_to_slot[];
 	UINT8 ipr[11];

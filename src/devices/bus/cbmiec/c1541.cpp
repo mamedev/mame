@@ -590,7 +590,7 @@ READ8_MEMBER( c1541_base_t::via0_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	UINT8 data;
 
 	// data in
 	data = !m_bus->data_r() && !m_ga->atn_r();

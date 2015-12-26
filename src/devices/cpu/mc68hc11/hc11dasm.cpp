@@ -1286,7 +1286,7 @@ static UINT32 decode_opcode(UINT32 pc, const M68HC11_OPCODE *op_table)
 
 CPU_DISASSEMBLE( hc11 )
 {
-	UINT32 flags = 0;
+	UINT32 flags;
 	UINT8 opcode;
 
 	output = buffer;

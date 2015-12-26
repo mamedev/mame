@@ -101,8 +101,6 @@ private:
 	bool m_dsize;
 	UINT8 m_ds;
 	floppy_image_device *m_floppy;
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	optional_device<mb8877_t> m_fdc;

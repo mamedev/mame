@@ -48,7 +48,6 @@ public:
 	DECLARE_WRITE8_MEMBER(kaypro2x_register_w);
 	DECLARE_WRITE8_MEMBER(kaypro2x_videoram_w);
 	DECLARE_READ8_MEMBER(pio_system_r);
-	DECLARE_WRITE8_MEMBER(common_pio_system_w);
 	DECLARE_WRITE8_MEMBER(kayproii_pio_system_w);
 	DECLARE_WRITE8_MEMBER(kaypro4_pio_system_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);

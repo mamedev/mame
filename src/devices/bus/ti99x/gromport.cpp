@@ -1796,7 +1796,7 @@ WRITE8_MEMBER(ti99_mbx_cartridge::write)
 */
 int ti99_paged379i_cartridge::get_paged379i_bank(int rompage)
 {
-	int mask = 0;
+	int mask;
 	if (m_rom_size > 16384)
 	{
 		if (m_rom_size > 32768)

@@ -135,11 +135,8 @@ public:
 	int m_bios_enabled;
 
 	DECLARE_READ8_MEMBER(bios_or_cart_r);
-	DECLARE_WRITE8_MEMBER(ram0_w);
 	DECLARE_READ8_MEMBER(tia_r);
 	DECLARE_WRITE8_MEMBER(tia_w);
-	DECLARE_READ8_MEMBER(maria_r);
-	DECLARE_WRITE8_MEMBER(maria_w);
 	DECLARE_DRIVER_INIT(a7800_pal);
 	DECLARE_DRIVER_INIT(a7800_ntsc);
 	virtual void machine_start() override;

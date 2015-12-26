@@ -289,7 +289,7 @@ WRITE8_MEMBER(nes_disksys_device::write_ex)
 READ8_MEMBER(nes_disksys_device::read_ex)
 {
 	LOG_MMC(("Famicom Disk System read_ex, offset: %04x\n", offset));
-	UINT8 ret = 0x00;
+	UINT8 ret;
 
 	if (offset >= 0x20 && offset < 0x60)
 	{

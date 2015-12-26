@@ -159,7 +159,6 @@ public:
 	void ccfunc_write32();
 	void ccfunc_get_cop0_reg();
 	void ccfunc_set_cop0_reg();
-	void ccfunc_unimplemented_opcode();
 	void ccfunc_sp_set_status_cb();
 	void ccfunc_unimplemented();
 
@@ -317,11 +316,9 @@ private:
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 linkreg);
 	void generate_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_vector_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_special(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_regimm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_cop2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_cop0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op);
 };

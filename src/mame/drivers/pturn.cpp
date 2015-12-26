@@ -120,8 +120,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bgbank_w);
 	DECLARE_WRITE8_MEMBER(flip_w);
 	DECLARE_READ8_MEMBER(custom_r);
-	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_READ8_MEMBER(protection2_r);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

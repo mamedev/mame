@@ -161,8 +161,6 @@ public:
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 	void int3_raise_local0_irq(UINT8 source_mask);
 	void int3_lower_local0_irq(UINT8 source_mask);
-	void int3_raise_local1_irq(UINT8 source_mask);
-	void int3_lower_local1_irq(UINT8 source_mask);
 	void dump_chain(address_space &space, UINT32 ch_base);
 	void rtc_update();
 

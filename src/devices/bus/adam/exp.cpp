@@ -90,7 +90,7 @@ bool adam_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
-		size_t size = 0;
+		size_t size;
 
 		if (software_entry() == nullptr)
 		{

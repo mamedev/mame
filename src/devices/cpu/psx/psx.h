@@ -240,11 +240,6 @@ protected:
 	// internal stuff
 	UINT32 m_op;
 
-	// memory access
-	inline UINT32 program_read(UINT32 addr);
-	inline void program_write(UINT32 addr, UINT32 data);
-	inline UINT32 opcode_read();
-
 	// address spaces
 	const address_space_config m_program_config;
 	address_space *m_program;

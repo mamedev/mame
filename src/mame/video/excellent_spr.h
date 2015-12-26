@@ -7,8 +7,6 @@ class excellent_spr_device : public device_t,
 public:
 	excellent_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, const rectangle &cliprect);
-
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 

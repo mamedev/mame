@@ -25,7 +25,6 @@ public:
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxcd_device &>(device).m_irq_handler.set_callback(object); }
-	static void static_set_devname(device_t &device, const char *devname);
 	virtual bool call_load() override;
 	virtual void call_unload() override;
 

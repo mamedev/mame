@@ -117,7 +117,6 @@ public:
 	UINT8* m_rom8;
 
 	DECLARE_WRITE16_MEMBER(paloff_w);
-	DECLARE_WRITE16_MEMBER(pcup_prgbank_w);
 	DECLARE_WRITE16_MEMBER(paldat_w);
 
 	DECLARE_WRITE16_MEMBER(port10_w);

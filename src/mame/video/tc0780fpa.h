@@ -49,7 +49,6 @@ public:
 	~tc0780fpa_device() {}
 
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void texture_write(offs_t address, UINT8 data);
 
 	DECLARE_READ16_MEMBER(tex_addr_r);
 	DECLARE_WRITE16_MEMBER(tex_addr_w);
