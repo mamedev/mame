@@ -30,7 +30,7 @@ C1066 - ??
 	<software name="cubeup" supported="no">
 		<description>Cube Up</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1001" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="16384">
@@ -42,7 +42,7 @@ C1066 - ??
 	<software name="wittyape" supported="no">
 		<description>Witty Apee</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1002" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -54,7 +54,7 @@ C1066 - ??
 	<software name="boxforum" supported="no">
 		<description>Box Forum</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1003" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -65,8 +65,8 @@ C1066 - ??
 
 	<software name="mightytk" supported="no">
 		<description>Mighty Tank</description>
-		<year>19??</year>
-		<publisher>Bit Corp.</publisher>
+		<year>199?</year>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1004" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -78,7 +78,7 @@ C1066 - ??
 	<software name="encbrick" supported="no">
 		<description>Enchanted Bricks</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1005" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -90,7 +90,7 @@ C1066 - ??
 	<software name="minigolf" supported="no">
 		<description>Mini Golf</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1006" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -102,7 +102,7 @@ C1066 - ??
 	<software name="galaxinv" supported="no">
 		<description>Galaxy Invaders</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1007" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -114,10 +114,10 @@ C1066 - ??
 	<software name="dknight" supported="no">
 		<description>Legend of Dragon Knight</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1008" />
 		<part name="cart" interface="gamate_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="65536">
 				<rom name="c1-008.bin" size="65536" crc="a67ba296" sha1="d01988984e2950fde8096a0156808995a0e5c515" offset="0" />
 			</dataarea>
 		</part>
@@ -126,7 +126,7 @@ C1066 - ??
 	<software name="tornado" supported="no">
 		<description>Tornado</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1009" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -137,7 +137,7 @@ C1066 - ??
 
 	<software name="moneymaz" supported="no">
 		<description>Money Maze</description>
-		<year>19??</year>
+		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1011" />
 		<part name="cart" interface="gamate_cart">
@@ -150,7 +150,7 @@ C1066 - ??
 	<software name="pharaoh" supported="no">
 		<description>Pharaoh Revenger</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1012" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -161,7 +161,7 @@ C1066 - ??
 
 	<software name="dinobibo" supported="no">
 		<description>Dino Bibo</description>
-		<year>19??</year>
+		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="C1013" />
 		<part name="cart" interface="gamate_cart">
@@ -174,7 +174,7 @@ C1066 - ??
 	<software name="timewarr" supported="no">
 		<description>Time Warrior</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1014" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -186,7 +186,7 @@ C1066 - ??
 	<software name="killshot" supported="no">
 		<description>Kill Shot</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1015" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -198,7 +198,7 @@ C1066 - ??
 	<software name="dvcastle" supported="no">
 		<description>Devil Castle</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1017" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -210,7 +210,7 @@ C1066 - ??
 	<software name="kungfu" supported="no">
 		<description>Kung-Fu Fighter</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1018" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -222,7 +222,7 @@ C1066 - ??
 	<software name="dinoball" supported="no">
 		<description>Dino Ball</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1019" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -234,7 +234,7 @@ C1066 - ??
 	<software name="mythasam" supported="no">
 		<description>Myth of Asamia</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1021" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -246,7 +246,7 @@ C1066 - ??
 	<software name="pipemani" supported="no">
 		<description>Pipemania</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1022" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -258,7 +258,7 @@ C1066 - ??
 	<software name="tennis" supported="no">
 		<description>Tennis</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1023" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -270,7 +270,7 @@ C1066 - ??
 	<software name="marauder" supported="no">
 		<description>Marauder</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1024" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -282,7 +282,7 @@ C1066 - ??
 	<software name="flipuzle" supported="no">
 		<description>Flipuzzle</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1026" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -294,7 +294,7 @@ C1066 - ??
 	<software name="monstpit" supported="no">
 		<description>Monster Pitfall</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1027" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -306,7 +306,7 @@ C1066 - ??
 	<software name="vindicat" supported="no">
 		<description>Vindicators</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1028" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -318,7 +318,7 @@ C1066 - ??
 	<software name="brikblst" supported="no">
 		<description>Brick Blaster</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1029" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -330,7 +330,7 @@ C1066 - ??
 	<software name="bomblast" supported="no">
 		<description>Bomb Blaster</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1031" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -343,7 +343,7 @@ C1066 - ??
 	<software name="bomblasta" cloneof="bomblast" supported="no">
 		<description>Bomb Blaster (Alt)</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1031" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -355,7 +355,7 @@ C1066 - ??
 	<software name="cosmicfg" supported="no">
 		<description>Cosmic Fighter</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1032" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -379,7 +379,7 @@ C1066 - ??
 	<software name="treashnt" supported="no">
 		<description>Treasure Hunter</description>
 		<year>1990</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1035" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -403,7 +403,7 @@ C1066 - ??
 	<software name="santa" supported="no">
 		<description>Nightmare of Santa Claus</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1037" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -439,7 +439,7 @@ C1066 - ??
 	<software name="boom" supported="no">
 		<description>Boom</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1043" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -451,7 +451,7 @@ C1066 - ??
 	<software name="snowman" supported="no">
 		<description>Snowman Legend</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1044" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -511,7 +511,7 @@ C1066 - ??
 	<software name="mjigsaw" supported="no">
 		<description>Magic Jigsaw</description>
 		<year>1991</year>
-		<publisher>Bit Corp.</publisher>
+		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1054" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -556,14 +556,13 @@ C1066 - ??
 		</part>
 	</software>
 
-<!-- This does not display anything, so it might not be this game! -->
 	<software name="dinopark" supported="no">
 		<description>Dinosaur Park</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Phinnex Co., Ltd.</publisher>
 		<info name="serial" value="C1061" />
 		<part name="cart" interface="gamate_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="524288">
 				<rom name="c1-061.bin" size="524288" crc="00356983" sha1="e93c671ee1eb40bb4d7298671dc213a07afef9e0" offset="0" />
 			</dataarea>
 		</part>
@@ -605,14 +604,13 @@ C1066 - ??
 		</part>
 	</software>
 
-<!-- This does not display anything, so it might not be this game! -->
 	<software name="goldpyra" supported="no">
 		<description>The Golden Pyramid</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>199?</year>
+		<publisher>Unknown</publisher>
 		<info name="serial" value="C1068" />
 		<part name="cart" interface="gamate_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="524288">
 				<rom name="c1-068.bin" size="524288" crc="96386b08" sha1="69909b78598184760b3e261da897a9bc90af9dfb" offset="0" />
 			</dataarea>
 		</part>
