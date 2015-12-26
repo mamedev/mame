@@ -878,7 +878,7 @@ void mc68681_channel::update_interrupts()
 
 UINT8 mc68681_channel::read_rx_fifo()
 {
-	UINT8 rv = 0;
+	UINT8 rv;
 
 //  printf("read_rx_fifo: rx_fifo_num %d\n", rx_fifo_num);
 

@@ -1319,7 +1319,7 @@ void sega315_5313_device::render_spriteline_to_spritebuffer(int scanline)
 		int drawypos;
 		int /*drawwidth,*/ drawheight;
 		int spritemask = 0;
-		UINT8 height,width=0,link=0,xflip,yflip,colour,pri;
+		UINT8 height,width,link,xflip,yflip,colour,pri;
 
 		/* Get Sprite Attribs */
 		spritenum = 0;
@@ -1506,7 +1506,7 @@ void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 	int x;
 	int window_hsize=0;
 	int window_vsize=0;
-	int window_is_bugged = 0;
+	int window_is_bugged;
 	int non_window_firstcol;
 	int non_window_lastcol;
 	int screenheight = MEGADRIVE_REG01_240_LINE?240:224;

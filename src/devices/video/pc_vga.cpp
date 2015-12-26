@@ -992,7 +992,7 @@ UINT32 svga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 UINT32 s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 cur_mode = 0;
+	UINT8 cur_mode;
 
 	svga_device::screen_update(screen, bitmap, cliprect);
 
@@ -3387,7 +3387,7 @@ void ibm8514a_device::ibm8514_write_bg(UINT32 offset)
 void ibm8514a_device::ibm8514_write(UINT32 offset, UINT32 src)
 {
 	int data_size = 8;
-	UINT32 xfer = 0;
+	UINT32 xfer;
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch(ibm8514.pixel_control & 0x00c0)

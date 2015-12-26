@@ -125,10 +125,8 @@ private:
 
 	int timer_running();
 	void start_pulse();
-	void output(INT32 param);
 	void set_output();
 	attotime compute_duration();
-	void clear();
 
 	emu_timer *m_timer;
 	int m_connection_type;  /* the hook up type - one of the constants above */

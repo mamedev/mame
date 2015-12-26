@@ -492,8 +492,6 @@ private:
 	void ope8();    void ope9();    void opea();    void opeb();    void opec();    void oped();    void opee();    void opef();
 	void opf0();    void opf1();    void opf2();    void opf3();    void opf4();    void opf5();    void opf6();    void opf7();
 	void opf8();    void opf9();    void opfa();    void opfb();    void opfc();    void opfd();    void opfe();    void opff();
-
-	void set_irq_line(int irqline, int state);
 };
 
 // device type definition

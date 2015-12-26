@@ -854,7 +854,7 @@ void ncr53c7xx_device::step(bool timeout)
 			if (((m_scntl[0] >> SCNTL0_ARB_SHIFT) & SCNTL0_ARB_MASK) == 3)
 			{
 				int win;
-				for (win = 7; win >=0 && !(data & (1 << win)); win--);
+				for (win = 7; win >=0 && !(data & (1 << win)); win--) {};
 
 				if ((1 << win) != m_scid)
 				{

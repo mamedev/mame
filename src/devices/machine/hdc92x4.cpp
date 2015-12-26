@@ -1319,7 +1319,7 @@ void hdc92x4_device::tape_backup()
 */
 void hdc92x4_device::poll_drives()
 {
-	UINT8 drivebit = 0;
+	UINT8 drivebit;
 	if (m_substate == UNDEF)
 	{
 		logerror("%s: POLL DRIVES command %02x\n", tag(), current_command());
@@ -3795,7 +3795,7 @@ bool hdc92x4_device::read_from_mfmhd(const attotime &limit)
 */
 bool hdc92x4_device::write_to_mfmhd(const attotime &limit)
 {
-	UINT16 data = 0;
+	UINT16 data;
 	int count;
 	bool offlimit = false;
 
@@ -3918,7 +3918,7 @@ UINT16 hdc92x4_device::encode_a1_hd()
 */
 READ8_MEMBER( hdc92x4_device::read )
 {
-	UINT8 reply = 0;
+	UINT8 reply;
 	if ((offset & 1) == 0)
 	{
 		// Data register

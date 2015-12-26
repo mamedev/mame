@@ -2104,7 +2104,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 void saturn_state::stv_vdp2_fill_rotation_parameter_table( UINT8 rot_parameter )
 {
-	UINT32 address = 0;
+	UINT32 address;
 
 	address = (((STV_VDP2_RPTAU << 16) | STV_VDP2_RPTAL) << 1);
 	if ( rot_parameter == 1 )
@@ -2390,7 +2390,7 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 
 	if (gfx->has_pen_usage() && transparency == STV_TRANSPARENCY_PEN)
 	{
-		int transmask = 0;
+		int transmask;
 
 		transmask = 1 << (transparent_color & 0xff);
 
@@ -3579,7 +3579,7 @@ map is always enabled?
 void saturn_state::stv_vdp2_get_map_page( int x, int y, int *_map, int *_page )
 {
 	int page = 0;
-	int map = 0;
+	int map;
 
 	if ( stv2_current_tilemap.map_count == 4 )
 	{

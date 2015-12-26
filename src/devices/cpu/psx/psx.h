@@ -153,7 +153,6 @@ class psxcpu_device : public cpu_device,
 {
 public:
 	// construction/destruction
-	psxcpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~psxcpu_device() {};
 
 	// static configuration helpers

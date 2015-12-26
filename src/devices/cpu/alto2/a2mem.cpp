@@ -770,7 +770,7 @@ UINT16 alto2_cpu_device::debug_read_mem(UINT32 addr)
 {
 	space(AS_2).set_debugger_access(true);
 	int base_addr = addr & 0177777;
-	int data = 0177777;
+	int data;
 	if (base_addr >= ALTO2_IO_PAGE_BASE && addr < ALTO2_RAM_SIZE) {
 		data = m_iomem->read_word(m_iomem->address_to_byte(base_addr));
 	} else {

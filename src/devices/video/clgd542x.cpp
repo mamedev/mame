@@ -1094,7 +1094,7 @@ WRITE8_MEMBER(cirrus_gd5428_device::port_03d0_w)
 
 UINT8 cirrus_gd5428_device::cirrus_crtc_reg_read(UINT8 index)
 {
-	UINT8 res = 0xff;
+	UINT8 res;
 
 	switch(index)
 	{

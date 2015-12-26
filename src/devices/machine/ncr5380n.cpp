@@ -165,7 +165,7 @@ void ncr5380n_device::step(bool timeout)
 			break;
 
 		int win;
-		for(win=7; win>=0 && !(data & (1<<win)); win--);
+		for(win=7; win>=0 && !(data & (1<<win)); win--) {};
 //      printf("arb complete: data %02x win %02x scsi_id %02x\n", data, win, scsi_id);
 		if(win != scsi_id) {
 			scsi_bus->data_w(scsi_refid, 0);

@@ -988,7 +988,7 @@ void superfx_device::execute_run()
 			case 0x46: case 0x47: case 0x48: case 0x49: case 0x4a: case 0x4b:   // LDW_IR / LDB_IR
 				if((m_sfr & SUPERFX_SFR_ALT1) == 0)
 				{ // LDW_IR
-					UINT16 data = 0;
+					UINT16 data;
 					m_ramaddr = m_r[op & 0xf];
 					data  = superfx_rambuffer_read(m_ramaddr ^ 0) << 0;
 					data |= superfx_rambuffer_read(m_ramaddr ^ 1) << 8;
@@ -1271,7 +1271,7 @@ void superfx_device::execute_run()
 					case SUPERFX_SFR_ALT1: // LMS
 					case SUPERFX_SFR_ALT3: // LMS
 					{
-						UINT16 data = 0;
+						UINT16 data;
 						m_ramaddr = superfx_pipe() << 1;
 						data  = superfx_rambuffer_read(m_ramaddr ^ 0) << 0;
 						data |= superfx_rambuffer_read(m_ramaddr ^ 1) << 8;

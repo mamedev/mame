@@ -1516,7 +1516,7 @@ void ppc_device::ppccom_execute_tlbl()
 {
 	UINT32 address = m_core->param0;
 	int isitlb = m_core->param1;
-	vtlb_entry flags = 0;
+	vtlb_entry flags;
 	int entrynum;
 
 	/* determine entry number; we use rand() for associativity */

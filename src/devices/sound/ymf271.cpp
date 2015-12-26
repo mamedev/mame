@@ -574,7 +574,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					for (i = 0; i < samples; i++)
 					{
 						INT64 output1 = 0, output2 = 0, output3 = 0, output4 = 0;
-						INT64 phase_mod1 = 0, phase_mod2 = 0, phase_mod3 = 0;
+						INT64 phase_mod1, phase_mod2, phase_mod3;
 						switch (m_slots[slot1].algorithm)
 						{
 							// <--------|
@@ -800,7 +800,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 						for (i = 0; i < samples; i++)
 						{
 							INT64 output1 = 0, output3 = 0;
-							INT64 phase_mod1, phase_mod3 = 0;
+							INT64 phase_mod1, phase_mod3;
 							switch (m_slots[slot1].algorithm & 3)
 							{
 								// <--------|
@@ -863,7 +863,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					for (i = 0; i < samples; i++)
 					{
 						INT64 output1 = 0, output2 = 0, output3 = 0;
-						INT64 phase_mod1 = 0, phase_mod3 = 0;
+						INT64 phase_mod1, phase_mod3;
 						switch (m_slots[slot1].algorithm & 7)
 						{
 							// <--------|

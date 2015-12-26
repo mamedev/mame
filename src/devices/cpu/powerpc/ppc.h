@@ -620,9 +620,6 @@ protected:
 		uml::code_label  labelnum;                   /* index for local labels */
 	};
 
-	int IS_PPC602(void);
-	int IS_PPC603(void);
-	int IS_PPC403(void);
 	UINT32 get_cr();
 	void set_cr(UINT32 value);
 	UINT32 get_xer();

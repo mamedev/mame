@@ -159,8 +159,6 @@ private:
 	inline int movm(UINT32 st1);
 	inline int sfma(UINT32 st1);
 
-	const char *get_memadr(UINT32 opcode, char type);
-
 	void xm_init();
 	void xm_step_read();
 	void xm_step_write();

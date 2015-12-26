@@ -897,7 +897,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			UINT32 shiftmask = SHIFT_MASK[shift ? shift : 32];
 			UINT32 compmask = endmask & shiftmask;
 
-			UINT32 res = 0;
+			UINT32 res;
 			if (r)      // right
 			{
 				res = ROTATE_R(source, rot) & compmask;
@@ -928,7 +928,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			UINT32 shiftmask = SHIFT_MASK[shift ? shift : 32];
 			UINT32 compmask = endmask & shiftmask;
 
-			UINT32 res = 0;
+			UINT32 res;
 			if (r)      // right
 			{
 				res = ROTATE_R(source, rot) & compmask;
@@ -960,7 +960,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			UINT32 shiftmask = SHIFT_MASK[shift ? shift : 32];
 			UINT32 compmask = endmask & ~shiftmask;
 
-			UINT32 res = 0;
+			UINT32 res;
 			if (r)      // right
 			{
 				res = ROTATE_R(source, rot) & compmask;

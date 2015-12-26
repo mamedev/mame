@@ -804,7 +804,7 @@ void aica_device::UpdateRegR(address_space &space, int reg)
 			{
 				int slotnum = MSLC();
 				AICA_SLOT *slot=m_Slots + slotnum;
-				UINT16 LP = 0;
+				UINT16 LP;
 				if (!(AFSEL()))
 				{
 					UINT16 SGC;
@@ -834,7 +834,7 @@ void aica_device::UpdateRegR(address_space &space, int reg)
 				//m_stream->update();
 				int slotnum = MSLC();
 				AICA_SLOT *slot=m_Slots+slotnum;
-				unsigned int CA = 0;
+				unsigned int CA;
 
 				if (PCMS(slot) == 0)    // 16-bit samples
 				{

@@ -1335,7 +1335,7 @@ void upd765_family_device::start_command(int cmd)
 		main_phase = PHASE_RESULT;
 
 		int fid;
-		for(fid=0; fid<4 && !flopi[fid].st0_filled; fid++);
+		for(fid=0; fid<4 && !flopi[fid].st0_filled; fid++) {};
 		if(fid == 4) {
 			result[0] = ST0_UNK;
 			result_pos = 1;

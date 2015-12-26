@@ -623,9 +623,6 @@ private:
 	void record_body_scanline(UINT16 physical_scanline, UINT16 scanline, INT32 start_pos, INT32 end_pos);
 	pixel_t border_value(UINT8 mode, const pixel_t *palette, bool is_mc6847t1);
 
-	template<int xscale>
-	void emit_samples(UINT8 mode, const UINT8 *data, int length, pixel_t *pixels, int x, int y);
-
 	// template function for doing video update collection
 	template<int sample_count, int yres>
 	void record_scanline_res(int scanline, INT32 start_pos, INT32 end_pos);

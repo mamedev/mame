@@ -46,7 +46,7 @@ void segapcm_device::device_start()
 	if (!mask)
 		mask = BANK_MASK7 >> 16;
 
-	for(rom_mask = 1; rom_mask < m_rom.length(); rom_mask *= 2);
+	for(rom_mask = 1; rom_mask < m_rom.length(); rom_mask *= 2) { };
 	rom_mask--;
 
 	m_bankmask = mask & (rom_mask >> m_bankshift);

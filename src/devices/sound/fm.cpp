@@ -1112,7 +1112,7 @@ static inline void advance_lfo(FM_OPN *OPN)
 static void advance_eg_channel(FM_OPN *OPN, FM_SLOT *SLOT)
 {
 	unsigned int out;
-	unsigned int swap_flag = 0;
+	unsigned int swap_flag;
 	unsigned int i;
 
 
