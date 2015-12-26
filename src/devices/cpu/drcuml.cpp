@@ -91,7 +91,7 @@ drcbe_interface::drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_
 	// find the spaces and fetch memory accessors
 	device_memory_interface *memory;
 	if (device.interface(memory))
-		for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_space); spacenum++)
+		for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_space); ++spacenum)
 			if (memory->has_space(spacenum))
 			{
 				m_space[spacenum] = &memory->space(spacenum);

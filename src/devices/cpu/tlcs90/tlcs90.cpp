@@ -1328,7 +1328,7 @@ void tlcs90_device::check_interrupts()
 	if (!(F & IF))
 		return;
 
-	for (irq = INTSWI; irq < INTMAX; irq++)
+	for (irq = INTSWI; irq < INTMAX; ++irq)
 	{
 		mask = (1 << irq);
 		if(irq >= INT0) mask &= m_irq_mask;

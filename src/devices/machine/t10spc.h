@@ -14,6 +14,10 @@ t10spc.h
 class t10spc
 {
 public:
+	t10spc() : commandLength(0), m_transfer_length(0), m_phase(0), m_status_code(), m_sense_key(0), m_sense_asc(0), m_sense_ascq(0), m_sense_information(0), m_sector_bytes(0), m_device(nullptr)
+	{
+	}
+
 	virtual ~t10spc() {};
 	virtual void SetDevice( void *device ) = 0;
 	virtual void GetDevice( void **device ) = 0;
