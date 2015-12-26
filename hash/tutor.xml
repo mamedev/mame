@@ -105,19 +105,6 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="bermudat">
-		<description>Bermuda Triangle (Jpn)</description>
-		<year>198?</year>
-		<publisher>Tomy</publisher>
-		<info name="alt_title" value="バミューダ・ トライアングル"/>
-		<info name="serial" value="020E"/>
-		<part name="cart" interface="tutor_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="bermudatriangle.bin" size="8192" crc="95577ceb" sha1="4b75c4bdd2285eff5ed0df3a951d8527270e6b96" offset="0" />
-			</dataarea>
-		</part>
-	</software>	
 	
 	<software name="bombman">
 		<description>Bombman (Jpn)</description>
@@ -144,19 +131,21 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
+  <!-- Crawlers and Maze Patrol are confirmed as using the exact same ROM data -->
 	<software name="crawlers">
 	<!-- Stock No: 8100, Clone of Maze Patrol (Japanese 017E)-->
-		<description>Cave Crawlers (USA)</description>
+		<description>Cave Crawlers (USA) / Maze Patrol (Jpn)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
-		<info name="serial" value="8100"/>
+    <info name="alt_title" value="メイズ パトロール"/>
+		<info name="serial" value="8100 / 017E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="crawlers.bin" size="8192" crc="f3059779" sha1="fd51c445f0356ed3796bdbbd4a7f6086d7bb5331" offset="0" />
+				<rom name="tomy 36.7.u1" size="8192" crc="f3059779" sha1="fd51c445f0356ed3796bdbbd4a7f6086d7bb5331" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-
+  
 	<software name="deepsix" cloneof="marinadv">
 		<description>Deep Six (USA)</description>
 		<year>1983</year>
@@ -241,19 +230,6 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="tomy 32.2.u1" size="8192" crc="90f6a3d9" sha1="9e7007b97ec2c1cf865b2f55989bb616af14a6e6" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mazeptrl">
-		<description>Maze Patrol (Jpn)</description>
-		<year>1983</year>
-		<publisher>Tomy</publisher>
-		<info name="alt_title" value="メイズ パトロール"/>
-		<info name="serial" value="017E"/>
-		<part name="cart" interface="tutor_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="tomy 36.7.u1" size="8192" crc="f3059779" sha1="fd51c445f0356ed3796bdbbd4a7f6086d7bb5331" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -399,19 +375,21 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
+  <!-- Torpedo and Bermuda Triangle are confirmed as using the exact same ROM data -->
 	<software name="torpedo">
 	<!-- Stock No: 8101, Clone of Bermuda Triangle (Japanese 020E)-->
-		<description>Torpedo Terror</description>
+		<description>Torpedo Terror (USA) / Bermuda Triangle (Jpn)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
-		<info name="serial" value="8101"/>
+    <info name="alt_title" value="バミューダ・ トライアングル"/>
+		<info name="serial" value="8101 / 020E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="torpedo.bin" size="8192" crc="95577ceb" sha1="4b75c4bdd2285eff5ed0df3a951d8527270e6b96" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-
+    
 	<software name="trafjam">
 	<!-- Stock No: 8103, (Japanese 010E)-->
 		<description>Traffic Jam (Jpn)</description>
