@@ -122,25 +122,6 @@ private:
 	scrn_reg_t m_scrn_reg;      /**< Base Video Registers. */	
 };
 
-#define mc6845_h_char_total     (m_crtc_vreg[0])
-#define mc6845_h_display        (m_crtc_vreg[1])
-#define mc6845_h_sync_pos       (m_crtc_vreg[2])
-#define mc6845_sync_width       (m_crtc_vreg[3])
-#define mc6845_v_char_total     (m_crtc_vreg[4])
-#define mc6845_v_total_adj      (m_crtc_vreg[5])
-#define mc6845_v_display        (m_crtc_vreg[6])
-#define mc6845_v_sync_pos       (m_crtc_vreg[7])
-#define mc6845_mode_ctrl        (m_crtc_vreg[8])
-#define mc6845_tile_height      (m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start   (m_crtc_vreg[0x0a])
-#define mc6845_cursor_y_end     (m_crtc_vreg[0x0b])
-#define mc6845_start_addr       (((m_crtc_vreg[0x0c]<<8) & 0xff00) | (m_crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr      (((m_crtc_vreg[0x0e]<<8) & 0xff00) | (m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr   (((m_crtc_vreg[0x10]<<8) & 0xff00) | (m_crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0xff00) | (m_crtc_vreg[0x13] & 0xff))
-
-
-
 WRITE8_MEMBER( spc1500_state::cass_w )
 {
 	attotime time = machine().scheduler().time();
@@ -200,7 +181,7 @@ WRITE8_MEMBER( spc1500_state::psgb_w)
 {
 	m_ipl = data & (1 << 1);
 	printf("PSG B port wrote by %d\n", data);
-//	if (m_romsel)
+	if (m_romsel)
 	{
 		if (m_ipl)
 		{
@@ -317,70 +298,25 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	int j;
 	UINT32  *p = &bitmap.pix32(y); 
 	//printf("ma=%d,y=%d,x_count=%d\n", ma, y, x_count);
-	for (i = 0; i < x_count; i++)
+	int n = y & 0xf;
+	if (n > 3 && n < 12)
 	{
-		UINT8 ascii = m_p_videoram[0x1000 + (y>>3)*x_count + i];
-		if (ascii >= ' ')
+		for (i = 0; i < x_count; i++)
 		{
-			//printf("%c", ascii);
-			fnt = m_font[(ascii - ' ') * 16 + (y & 0xf)];
-			for (j = 0; j < 8; j++)
-				*p++ = (fnt & (0x80 >> j) ? 0xffffff : 0);
+			UINT8 ascii = m_p_videoram[0x1000 + (y>>4)*x_count + i];
+			if (ascii >= ' ')
+			{
+				//printf("%c", ascii);
+				fnt = m_font[ascii * 8 + (n-4)];
+				for (j = 0; j < 8; j++)
+					*p++ = (fnt & (0x80 >> j) ? 0xffffff : 0);
+			}
+			else
+				p += 8;
 		}
-		else
-			p += 8;
 	}
 }
 
-void spc1500_state::draw_pixel(bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height)
-{
-	if(!machine().first_screen()->visible_area().contains(x, y))
-		return;
-
-	if(width && height)
-	{
-		bitmap.pix32(y+0+m_ystart, x+0+m_xstart) = m_palette->pen(pen);
-		bitmap.pix32(y+0+m_ystart, x+1+m_xstart) = m_palette->pen(pen);
-		bitmap.pix32(y+1+m_ystart, x+0+m_xstart) = m_palette->pen(pen);
-		bitmap.pix32(y+1+m_ystart, x+1+m_xstart) = m_palette->pen(pen);
-	}
-	else if(width)
-	{
-		bitmap.pix32(y+m_ystart, x+0+m_xstart) = m_palette->pen(pen);
-		bitmap.pix32(y+m_ystart, x+1+m_xstart) = m_palette->pen(pen);
-	}
-	else if(height)
-	{
-		bitmap.pix32(y+0+m_ystart, x+m_xstart) = m_palette->pen(pen);
-		bitmap.pix32(y+1+m_ystart, x+m_xstart) = m_palette->pen(pen);
-	}
-	else
-		bitmap.pix32(y+m_ystart, x+m_xstart) = m_palette->pen(pen);
-}
-
-/* adjust tile index when we are under double height condition */
-UINT8 spc1500_state::check_prev_height(int x,int y,int x_size)
-{
-	UINT8 prev_tile = m_p_videoram[(x+((y-1)*x_size)+mc6845_start_addr) & 0x7ff];
-	UINT8 cur_tile = m_p_videoram[(x+(y*x_size)+mc6845_start_addr) & 0x7ff];
-	UINT8 prev_attr = m_p_videoram[(x+((y-1)*x_size)+mc6845_start_addr) & 0x7ff];
-	UINT8 cur_attr = m_p_videoram[(x+(y*x_size)+mc6845_start_addr) & 0x7ff];
-
-	if(prev_tile == cur_tile && prev_attr == cur_attr)
-		return 8;
-
-	return 0;
-}
-
-UINT8 spc1500_state::check_line_valid_height(int y,int x_size,int height)
-{
-	UINT8 line_attr = m_p_videoram[(0+(y*x_size)+mc6845_start_addr) & 0x7ff];
-
-	if((line_attr & 0x40) == 0)
-		return 0;
-
-	return height;
-}
 
 #if 0 
 void spc1500_state::draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprect)
@@ -878,7 +814,7 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 
 	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)	
 #if 0
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL_14_31818MHz/8)
+	MCFG_MC6845_ADD("mc6845", H46505, "screen", XTAL_14_31818MHz/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(spc1500_state, crtc_update_row)
