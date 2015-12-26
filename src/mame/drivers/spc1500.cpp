@@ -51,8 +51,7 @@ public:
 		, m_palette(*this, "palette")
 	{}
 
-	DECLARE_WRITE8_MEMBER(bank0_rom);
-	DECLARE_WRITE8_MEMBER(bank0_ram);
+	DECLARE_WRITE8_MEMBER(mem_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
@@ -75,23 +74,27 @@ public:
 	DECLARE_WRITE8_MEMBER(ramsel);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
+	DECLARE_WRITE8_MEMBER(psgb_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_PALETTE_INIT(spc);
 	DECLARE_VIDEO_START(spc);
+	MC6845_UPDATE_ROW(crtc_update_row); 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_pixel(bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height);
 	UINT8 check_prev_height(int x,int y,int x_size);
 	UINT8 check_line_valid_height(int y,int x_size,int height);	
-	void draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprect);
-	void draw_gfxbitmap(bitmap_rgb32 &bitmap,const rectangle &cliprect, int plane,int pri);	
+	//void draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprect);
+	//void draw_gfxbitmap(bitmap_rgb32 &bitmap,const rectangle &cliprect, int plane,int pri);	
 	int priority_mixer_pri(int color);
 private:
+	UINT8 *m_p_ram;
 	UINT8 m_ipl;
 	UINT8 m_GMODE;
 	UINT16 m_page;
-	UINT8 *m_work_ram;
+//	UINT8 *m_work_ram;
 	attotime m_time;
+	bool m_romsel;
 	UINT8 m_crtc_vreg[0x100];
 	bool m_centronics_busy;
 	virtual void machine_start() override;
@@ -106,12 +109,12 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<i8255_device> m_pio;
 	required_device<palette_device> m_palette;	
-	std::unique_ptr<UINT8[]> m_tvram;         /**< Pointer for Text Video RAM */
-	std::unique_ptr<UINT8[]> m_avram;         /**< Pointer for Attribute Video RAM */
-	std::unique_ptr<UINT8[]> m_kvram;         /**< Pointer for Extended Kanji Video RAM (X1 Turbo) */	
-	std::unique_ptr<UINT8[]> m_gfx_bitmap_ram;    /**< Pointer for bitmap layer RAM. */
-	std::unique_ptr<UINT8[]> m_pcg_ram;       /**< Pointer for PCG GFX RAM */		
-	UINT8 *m_cg_rom;        /**< Pointer for GFX ROM */
+	// std::unique_ptr<UINT8[]> m_tvram;         /**< Pointer for Text Video RAM */
+	// std::unique_ptr<UINT8[]> m_avram;         /**< Pointer for Attribute Video RAM */
+	// std::unique_ptr<UINT8[]> m_kvram;         /**< Pointer for Extended Kanji Video RAM (X1 Turbo) */	
+	// std::unique_ptr<UINT8[]> m_gfx_bitmap_ram;    /**< Pointer for bitmap layer RAM. */
+	// std::unique_ptr<UINT8[]> m_pcg_ram;       /**< Pointer for PCG GFX RAM */		
+	UINT8 *m_font;        /**< Pointer for GFX ROM */
 	UINT8 m_is_turbo;       /**< Machine type: (0) X1 Vanilla, (1) X1 Turbo */
 	int m_xstart,           /**< Start X offset for screen drawing. */
 		m_ystart;           /**< Start Y offset for screen drawing. */
@@ -136,11 +139,7 @@ private:
 #define mc6845_light_pen_addr   (((m_crtc_vreg[0x10]<<8) & 0xff00) | (m_crtc_vreg[0x11] & 0xff))
 #define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0xff00) | (m_crtc_vreg[0x13] & 0xff))
 
-static ADDRESS_MAP_START(spc1500_mem, AS_PROGRAM, 8, spc1500_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-	AM_RANGE(0x8000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
-ADDRESS_MAP_END
+
 
 WRITE8_MEMBER( spc1500_state::cass_w )
 {
@@ -167,15 +166,24 @@ READ8_MEMBER( spc1500_state::keyboard_r )
 
 WRITE8_MEMBER( spc1500_state::romsel)
 {
+	m_romsel = 1;
 	if (m_ipl)
-		membank("bank1")->set_entry(1);
+	{
+		printf("bank1 -> IOCS\n");
+		membank("bank1")->set_entry(0);
+	}
 	else
-		membank("bank1")->set_entry(2);		
+	{
+		membank("bank1")->set_entry(1);		
+		printf("bank1 -> basic\n");
+	}
 }
 
 WRITE8_MEMBER( spc1500_state::ramsel)
 {
-	membank("bank1")->set_entry(0);
+	m_romsel = 0;
+	membank("bank1")->set_entry(2);
+	printf("bank1 -> ram\n");
 }
 
 WRITE8_MEMBER( spc1500_state::porta_w)
@@ -185,7 +193,26 @@ WRITE8_MEMBER( spc1500_state::porta_w)
 
 WRITE8_MEMBER( spc1500_state::portb_w)
 {
-	m_ipl = data & 1 << 1;
+//	m_ipl = data & (1 << 1);
+}
+
+WRITE8_MEMBER( spc1500_state::psgb_w)
+{
+	m_ipl = data & (1 << 1);
+	printf("PSG B port wrote by %d\n", data);
+//	if (m_romsel)
+	{
+		if (m_ipl)
+		{
+			printf("bank1 -> IOCS\n");
+			membank("bank1")->set_entry(0);
+		}
+		else
+		{
+			membank("bank1")->set_entry(1);		
+			printf("bank1 -> basic\n");
+		}	
+	}
 }
 
 WRITE8_MEMBER( spc1500_state::portc_w)
@@ -200,7 +227,17 @@ READ8_MEMBER( spc1500_state::portb_r)
 
 WRITE8_MEMBER( spc1500_state::crtc_w)
 {
-	
+	static int m_crtc_index;
+	if(offset == 0)
+	{
+		m_crtc_index = data & 0x1f;
+		m_vdg->address_w(space, offset, data);
+	}
+	else
+	{
+		m_crtc_vreg[m_crtc_index] = data;
+		m_vdg->register_w(space, offset, data);
+	}
 }
 
 READ8_MEMBER( spc1500_state::crtc_r)
@@ -267,10 +304,32 @@ WRITE8_MEMBER( spc1500_state::paletr_w)
 
 VIDEO_START_MEMBER(spc1500_state, spc)
 {
-	m_avram = make_unique_clear<UINT8[]>(0x800);
-	m_tvram = make_unique_clear<UINT8[]>(0x800);
-	m_kvram = make_unique_clear<UINT8[]>(0x800);
-	m_gfx_bitmap_ram = make_unique_clear<UINT8[]>(0xc000*2);
+	// m_avram = make_unique_clear<UINT8[]>(0x800);
+	// m_tvram = make_unique_clear<UINT8[]>(0x800);
+	// m_kvram = make_unique_clear<UINT8[]>(0x800);
+	// m_gfx_bitmap_ram = make_unique_clear<UINT8[]>(0xc000*2);
+}
+
+MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
+{
+	UINT8 fnt;
+	int i;
+	int j;
+	UINT32  *p = &bitmap.pix32(y); 
+	//printf("ma=%d,y=%d,x_count=%d\n", ma, y, x_count);
+	for (i = 0; i < x_count; i++)
+	{
+		UINT8 ascii = m_p_videoram[0x1000 + (y>>3)*x_count + i];
+		if (ascii >= ' ')
+		{
+			//printf("%c", ascii);
+			fnt = m_font[(ascii - ' ') * 16 + (y & 0xf)];
+			for (j = 0; j < 8; j++)
+				*p++ = (fnt & (0x80 >> j) ? 0xffffff : 0);
+		}
+		else
+			p += 8;
+	}
 }
 
 void spc1500_state::draw_pixel(bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height)
@@ -302,10 +361,10 @@ void spc1500_state::draw_pixel(bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8
 /* adjust tile index when we are under double height condition */
 UINT8 spc1500_state::check_prev_height(int x,int y,int x_size)
 {
-	UINT8 prev_tile = m_tvram[(x+((y-1)*x_size)+mc6845_start_addr) & 0x7ff];
-	UINT8 cur_tile = m_tvram[(x+(y*x_size)+mc6845_start_addr) & 0x7ff];
-	UINT8 prev_attr = m_avram[(x+((y-1)*x_size)+mc6845_start_addr) & 0x7ff];
-	UINT8 cur_attr = m_avram[(x+(y*x_size)+mc6845_start_addr) & 0x7ff];
+	UINT8 prev_tile = m_p_videoram[(x+((y-1)*x_size)+mc6845_start_addr) & 0x7ff];
+	UINT8 cur_tile = m_p_videoram[(x+(y*x_size)+mc6845_start_addr) & 0x7ff];
+	UINT8 prev_attr = m_p_videoram[(x+((y-1)*x_size)+mc6845_start_addr) & 0x7ff];
+	UINT8 cur_attr = m_p_videoram[(x+(y*x_size)+mc6845_start_addr) & 0x7ff];
 
 	if(prev_tile == cur_tile && prev_attr == cur_attr)
 		return 8;
@@ -315,7 +374,7 @@ UINT8 spc1500_state::check_prev_height(int x,int y,int x_size)
 
 UINT8 spc1500_state::check_line_valid_height(int y,int x_size,int height)
 {
-	UINT8 line_attr = m_avram[(0+(y*x_size)+mc6845_start_addr) & 0x7ff];
+	UINT8 line_attr = m_p_videoram[(0+(y*x_size)+mc6845_start_addr) & 0x7ff];
 
 	if((line_attr & 0x40) == 0)
 		return 0;
@@ -323,13 +382,14 @@ UINT8 spc1500_state::check_line_valid_height(int y,int x_size,int height)
 	return height;
 }
 
+#if 0 
 void spc1500_state::draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
 	/*
 	    attribute table:
-	    x--- ---- double width
-	    -x-- ---- double height
-	    --x- ---- PCG select
+	    x--- ---- Hangul lower byte
+	    -x-- ---- Semi graphic
+	    --x- ---- PCG select ROM 0, RAM 1
 	    ---x ---- color blinking
 	    ---- x--- reverse color
 	    ---- -xxx color pen
@@ -358,12 +418,12 @@ void spc1500_state::draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprec
 	{
 		for (x=0;x<x_size;x++)
 		{
-			int tile = m_tvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff];
-			int color = m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x1f;
-			int width = BIT(m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 7);
-			int height = BIT(m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 6);
-			int pcg_bank = BIT(m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 5);
-			UINT8 *gfx_data = pcg_bank ? m_pcg_ram.get() : m_cg_rom; //machine.root_device().memregion(pcg_bank ? "pcg" : "cgrom")->base();
+			int tile = m_p_videoram[((x+y*x_size)+mc6845_start_addr) & 0x7ff];
+			int color = m_p_videoram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x1f;
+			int width = BIT(m_p_videoram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 7);
+			int height = BIT(m_p_videoram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 6);
+			int pcg_bank = BIT(m_p_videoram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 5);
+			UINT8 *gfx_data = 0; //= pcg_bank ? m_pcg_ram.get() : m_cg_rom; //machine.root_device().memregion(pcg_bank ? "pcg" : "cgrom")->base();
 			int knj_enable = 0;
 			//int knj_side = 0;
 			//int knj_bank = 0;
@@ -469,6 +529,8 @@ void spc1500_state::draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprec
 	}
 }
 
+#endif
+
 /*
  * Priority Mixer Calculation (pri)
  *
@@ -497,6 +559,7 @@ int spc1500_state::priority_mixer_pri(int color)
 	return pri_mask_calc;
 }
 
+#if 0
 void spc1500_state::draw_gfxbitmap(bitmap_rgb32 &bitmap,const rectangle &cliprect, int plane,int pri)
 {
 	int xi,yi,x,y;
@@ -559,12 +622,12 @@ UINT32 spc1500_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 //  popmessage("%d %d %d %d",mc6845_h_sync_pos,mc6845_v_sync_pos,mc6845_h_char_total,mc6845_v_char_total);
 
 	draw_gfxbitmap(bitmap,cliprect,m_scrn_reg.disp_bank,m_scrn_reg.pri);
-	draw_fgtilemap(bitmap,cliprect);
+	//draw_fgtilemap(bitmap,cliprect);
 	draw_gfxbitmap(bitmap,cliprect,m_scrn_reg.disp_bank,m_scrn_reg.pri^0xff);
 
 	return 0;
 }
-
+#endif
 
 static ADDRESS_MAP_START( spc1500_io , AS_IO, 8, spc1500_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -583,9 +646,11 @@ static ADDRESS_MAP_START( spc1500_io , AS_IO, 8, spc1500_state )
 	AM_RANGE(0x1500, 0x15ff) AM_READWRITE(pcgb_r, pcgb_w)
 	AM_RANGE(0x1600, 0x16ff) AM_READWRITE(pcgr_r, pcgr_w)
 	AM_RANGE(0x1700, 0x17ff) AM_WRITE(pcgg_w)
-	AM_RANGE(0x1800, 0x1801) AM_READWRITE(crtc_r, crtc_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("mc6845", mc6845_device, address_w)
+	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, register_w)
+//	AM_RANGE(0x1800, 0x1801) AM_READWRITE(crtc_r, crtc_w)
 	AM_RANGE(0x1900, 0x1909) AM_READ(keyboard_r)
-// 	AM_RANGE(0x1a00, 0x1a03) AM_DEVREADWRITE("ppi8255", m_pio, data_r, data_w)
+ 	AM_RANGE(0x1a00, 0x1a03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x1b00, 0x1b00) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
 	AM_RANGE(0x1c00, 0x1c00) AM_DEVWRITE("ay8910", ay8910_device, address_w)
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(romsel)
@@ -705,31 +770,41 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED) // Cassette related
 INPUT_PORTS_END
 
+WRITE8_MEMBER( spc1500_state::mem_w )
+{
+	m_p_ram[offset] = data; //RAM
+	printf("0x%04x:%02x\n", offset, data);
+}
+
+static ADDRESS_MAP_START(spc1500_mem, AS_PROGRAM, 8, spc1500_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2") //AM_WRITE(mem_w)
+	AM_RANGE(0x8000, 0xffff) AM_READWRITE_BANK("bank4")
+ADDRESS_MAP_END
 
 void spc1500_state::machine_start()
 {
-	UINT8 *mem_ipl = memregion("ipl")->base();
 	UINT8 *mem_basic = memregion("basic")->base();
-	UINT8 *ram = m_ram->pointer();
-	m_cg_rom = memregion("cgrom")->base();	
-
-	// configure and intialize banks 1 & 3 (read banks)
-	membank("bank1")->configure_entry(0, ram);
-	membank("bank1")->configure_entry(1, mem_ipl);
-	membank("bank1")->configure_entry(2, mem_basic);
-	membank("bank1")->set_entry(1);
+	UINT8 *mem_ipl = memregion("ipl")->base();
+	m_p_ram = m_ram->pointer();
+	m_font = memregion("font1")->base();	
+	// configure and intialize banks 1 (read banks)
+	membank("bank1")->configure_entry(0, mem_ipl);
+	membank("bank1")->configure_entry(1, mem_basic);
+	membank("bank1")->configure_entry(2, m_p_ram);
+	membank("bank1")->set_entry(0);
+	m_romsel = 1;
 
 	// intialize banks 2, 3, 4 (write banks)
-	membank("bank2")->set_base(ram);
-	membank("bank3")->set_base(ram + 0x8000);
-	membank("bank4")->set_base(ram + 0x8000);
+	membank("bank2")->set_base(m_p_ram);
+	membank("bank4")->set_base(m_p_ram + 0x8000);
 	
    	m_time = machine().scheduler().time();	
 }
 
 void spc1500_state::machine_reset()
 {
-	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
+	//m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
 }
 
 READ8_MEMBER(spc1500_state::mc6845_videoram_r)
@@ -758,7 +833,7 @@ PALETTE_INIT_MEMBER(spc1500_state,spc)
 	int i;
 
 	for(i=0;i<(0x10+0x1000);i++)
-		palette.set_pen_color(i,rgb_t(0x00,0x00,0x00));
+		m_palette->set_pen_color(i,rgb_t(0x00,0x00,0x00));
 }
 
 // /* decoded for debugging purpose, this will be nuked in the end... */
@@ -780,21 +855,29 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_CPU_IO_MAP(spc1500_io)
 
 	/* video hardware */
+	
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
-	MCFG_SCREEN_UPDATE_DRIVER( spc1500_state, screen_update )
-
-#if 1	
-	MCFG_MC6845_ADD("mc6845", H46505, "screen", (VDP_CLOCK/48)) //unknown divider
+//	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
+//	MCFG_SCREEN_SIZE(640, 200)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+//	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
+	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update )
+	MCFG_PALETTE_ADD("palette", 8)	
+//	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
+//	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)
+	MCFG_MC6845_ADD("mc6845", MC6845, "screen", (VDP_CLOCK/48)) //unknown divider
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
-	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)
+	MCFG_MC6845_UPDATE_ROW_CB(spc1500_state, crtc_update_row)
 
 	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", spc)
 
 	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)	
-#else	
+#if 0
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL_14_31818MHz/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
@@ -817,7 +900,7 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_4MHz / 2)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(spc1500_state, porta_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(spc1500_state, psgb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -841,7 +924,7 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( spc1500 )
 	ROM_REGION(0x8000, "ipl", ROMREGION_ERASEFF)
-	ROM_LOAD("ipl.rom", 0x0000, 0x8000, CRC(3df21364) SHA1(569512bc674144cd06456652df5f3a8da181f1c0))
+	ROM_LOAD("ipl.rom", 0x0000, 0x8000, CRC(80d0704a) SHA1(01e4cbe8baad72effbbe01addd477c5b0ec85c16))
 	ROM_REGION(0x8000, "basic", ROMREGION_ERASEFF)
 	ROM_LOAD("basic.rom", 0x0000, 0x8000, CRC(757c6fa0) SHA1(5f8304dfe2495fd209d2bfe84802231b1968ba4c))
 	ROM_REGION(0x8000, "font1", 0) 
