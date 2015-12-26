@@ -3,7 +3,7 @@
 
 defines {
 	"OSD_MINI",
-	"USE_QTDEBUG",
+	"USE_QTDEBUG=0",
 	"USE_SDL",
 	"SDLMAME_NOASM=1",
 	"USE_OPENGL=0",

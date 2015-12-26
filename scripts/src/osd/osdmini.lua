@@ -12,6 +12,27 @@
 function maintargetosdoptions(_target,_subtarget)
 end
 
+project ("qtdbg_" .. _OPTIONS["osd"])
+	uuid (os.uuid("qtdbg_" .. _OPTIONS["osd"]))
+	kind (LIBTYPE)
+
+	dofile("osdmini_cfg.lua")
+	includedirs {
+		MAME_DIR .. "src/emu",
+		MAME_DIR .. "src/devices", -- accessing imagedev from debugger
+		MAME_DIR .. "src/osd",
+		MAME_DIR .. "src/lib",
+		MAME_DIR .. "src/lib/util",
+		MAME_DIR .. "src/osd/modules/render",
+		MAME_DIR .. "3rdparty",
+	}
+	removeflags {
+		"SingleOutputDir",
+	}
+
+	files {
+		MAME_DIR .. "src/osd/modules/debugger/debugqt.cpp",
+	}
 
 project ("osd_" .. _OPTIONS["osd"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
