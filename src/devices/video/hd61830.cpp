@@ -420,7 +420,7 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		{
 			int sy = y * m_vp + cl;
 			int sx = x * m_hp + cr;
-			UINT8 data = 0;
+			UINT8 data;
 
 			if (m_mcr & MODE_EXTERNAL_CG)
 			{

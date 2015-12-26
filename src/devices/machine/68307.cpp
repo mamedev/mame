@@ -307,7 +307,7 @@ WRITE16_MEMBER( m68307cpu_device::m68307_internal_base_w )
 
 	int pc = space.device().safe_pc();
 	logerror("%08x m68307_internal_base_w %08x, %04x (%04x)\n", pc, offset*2,data,mem_mask);
-	int base = 0;
+	int base;
 	//int mask = 0;
 
 	switch (offset<<1)

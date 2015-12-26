@@ -268,7 +268,7 @@ void rsp_cop2_drc::lbv()
 {
 	UINT32 op = m_rspcop2_state->op;
 
-	UINT32 ea = 0;
+	UINT32 ea;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -336,7 +336,7 @@ static void cfunc_lsv(void *param)
 void rsp_cop2_drc::llv()
 {
 	UINT32 op = m_rspcop2_state->op;
-	UINT32 ea = 0;
+	UINT32 ea;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xc;

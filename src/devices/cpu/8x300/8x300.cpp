@@ -168,7 +168,7 @@ void n8x300_cpu_device::execute_run()
 	do
 	{
 		UINT16 opcode;
-		UINT8 src = 0;
+		UINT8 src;
 		UINT8 dst;
 		UINT8 rotlen;  // rotate amount or I/O field length
 		UINT8 mask;

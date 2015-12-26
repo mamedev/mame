@@ -661,7 +661,7 @@ void hd61700_cpu_device::execute_run()
 				case 0x1c:  //gpo/gfl
 					{
 						UINT8 arg = read_op();
-						UINT8 src = 0xff;
+						UINT8 src;
 
 						if (arg&0x40)
 						{

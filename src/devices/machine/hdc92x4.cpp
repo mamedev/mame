@@ -568,7 +568,7 @@ bool hdc92x4_device::using_floppy()
 */
 int hdc92x4_device::step_time()
 {
-	int time = 0;
+	int time;
 	int index = m_register_w[MODE] & MO_STEPRATE;
 	// Get seek time.
 	if (m_selected_drive_type == TYPE_FLOPPY8)
@@ -588,7 +588,7 @@ int hdc92x4_device::step_time()
 */
 int hdc92x4_device::pulse_width()
 {
-	int time = 0;
+	int time;
 	// Get seek time.
 	if (m_selected_drive_type == TYPE_FLOPPY8)
 		time = pulse_flop8;

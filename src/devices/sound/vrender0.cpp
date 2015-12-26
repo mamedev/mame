@@ -161,7 +161,7 @@ void vrender0_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 {
 	INT16 *SAMPLES;
 	UINT32 st=STATUS;
-	signed int lsample=0,rsample=0;
+	signed int lsample,rsample=0;
 	UINT32 CLK=(m_SOUNDREGS[0x600/4]>>0)&0xff;
 	UINT32 NCH=(m_SOUNDREGS[0x600/4]>>8)&0xff;
 	UINT32 CT1=(m_SOUNDREGS[0x600/4]>>16)&0xff;

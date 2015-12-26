@@ -322,7 +322,7 @@ WRITE8_MEMBER(ncr5380n_device::icmd_w)
 	if (mask)
 	{
 		// translate data to nscsi
-		UINT8 newdata = 0;
+		UINT8 newdata;
 
 		newdata = (data & IC_RST ? S_RST : 0) |
 			(data & IC_ACK ? S_ACK : 0) |

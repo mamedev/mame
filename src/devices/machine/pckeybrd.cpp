@@ -421,7 +421,7 @@ void pc_keyboard_device::standard_scancode_insert(int our_code, int pressed)
 /* add codes for standard keys */
 void at_keyboard_device::standard_scancode_insert(int our_code, int pressed)
 {
-	int scancode = our_code;
+	int scancode;
 
 	switch (m_scan_code_set)
 	{

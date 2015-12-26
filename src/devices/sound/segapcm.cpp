@@ -106,7 +106,7 @@ void segapcm_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			/* loop over samples on this channel */
 			for (i = 0; i < samples; i++)
 			{
-				INT8 v = 0;
+				INT8 v;
 
 				/* handle looping if we've hit the end */
 				if ((addr >> 16) == end)

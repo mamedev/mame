@@ -224,7 +224,7 @@ void wd2010_device::device_reset()
 
 READ8_MEMBER(wd2010_device::read)
 {
-	UINT8 data = 0;
+	UINT8 data;
 
 	switch (offset)
 	{
@@ -462,8 +462,8 @@ void wd2010_device::seek(UINT8 data)
 
 	auto_scan_id(data); // has drive number changed?
 
-	int direction = 0; // 0 = towards 0
-	int step_pulses = 0;
+	int direction; // 0 = towards 0
+	int step_pulses;
 
 	// Calculate number of steps by comparing the cylinder registers
 	//           HI/LO with the internally stored position.

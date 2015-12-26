@@ -590,7 +590,7 @@ mc68681_channel *mc68681_device::get_channel(int chan)
 
 int mc68681_device::calc_baud(int ch, UINT8 data)
 {
-	int baud_rate = 0;
+	int baud_rate;
 
 	if ( BIT(ACR, 7) == 0 )
 	{

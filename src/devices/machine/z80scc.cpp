@@ -425,10 +425,10 @@ UINT8 z80scc_device::modify_vector(UINT8 vec, int i, UINT8 src)
 void z80scc_device::trigger_interrupt(int index, int state)
 {
 	UINT8 vector = m_chanB->m_wr2;
-	UINT8 source = 0;
+	UINT8 source;
 	int priority;
 
-	int prio_level = 0;
+	int prio_level;
 
 	LOG(("%s %s:%c %d \n",FUNCNAME, tag(), 'A' + index, state));
 

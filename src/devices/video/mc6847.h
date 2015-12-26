@@ -411,7 +411,7 @@ protected:
 	UINT32 emit_mc6847_samples(UINT8 mode, const UINT8 *data, int length, pixel_t *RESTRICT pixels, const pixel_t *RESTRICT palette,
 		mc6847_get_char_rom_delegate get_char_rom, int x, int y)
 	{
-		UINT32 result = 0;
+		UINT32 result;
 		if (mode & MODE_AG)
 		{
 			/* graphics */

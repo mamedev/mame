@@ -418,7 +418,7 @@ void lc8670_cpu_device::execute_run()
 
 		debugger_instruction_hook(this, m_pc);
 
-		int cycles = 0;
+		int cycles;
 		m_ppc = m_pc;
 
 		if (REG_PCON & HALT_MODE)

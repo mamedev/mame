@@ -475,7 +475,7 @@ void i386_device::i386_check_sreg_validity(int reg)
 	UINT8 CPL = m_CPL;
 	UINT8 DPL,RPL;
 	I386_SREG desc;
-	int invalid = 0;
+	int invalid;
 
 	memset(&desc, 0, sizeof(desc));
 	desc.selector = selector;

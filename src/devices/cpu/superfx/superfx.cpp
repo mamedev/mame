@@ -106,7 +106,7 @@ void superfx_device::superfx_pixelcache_flush(INT32 line)
 	UINT8 y = m_pixelcache[line].offset >> 5;
 	UINT32 cn = 0;
 	UINT32 bpp = 2 << ((m_scmr & SUPERFX_SCMR_MD) - ((m_scmr & SUPERFX_SCMR_MD) >> 1)); // = [regs.scmr.md]{ 2, 4, 4, 8 };
-	UINT32 addr = 0;
+	UINT32 addr;
 	UINT32 n = 0;
 
 	if(m_pixelcache[line].bitpend == 0x00)
@@ -218,8 +218,8 @@ void superfx_device::superfx_plot(UINT8 x, UINT8 y)
 UINT8 superfx_device::superfx_rpix(UINT8 x, UINT8 y)
 {
 	UINT32 cn = 0;
-	UINT32 bpp = 0;
-	UINT32 addr = 0;
+	UINT32 bpp;
+	UINT32 addr;
 	UINT8 data = 0x00;
 	UINT32 n = 0;
 

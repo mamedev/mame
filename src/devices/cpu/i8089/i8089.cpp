@@ -286,7 +286,7 @@ UINT8 i8089_device::read_byte(bool space, offs_t address)
 
 UINT16 i8089_device::read_word(bool space, offs_t address)
 {
-	UINT16 data = 0xffff;
+	UINT16 data;
 	address_space *aspace = (space ? m_io : m_mem);
 
 	if (sysbus_width() && !(address & 1))

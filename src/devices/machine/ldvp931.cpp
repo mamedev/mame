@@ -389,7 +389,7 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_output1_w )
 	    $01 = OSM
 	*/
 
-	INT32 speed = 0;
+	INT32 speed;
 
 	if (LOG_PORTS && (m_i8049_out1 ^ data) & 0x08)
 	{

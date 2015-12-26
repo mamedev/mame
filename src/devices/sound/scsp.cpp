@@ -540,10 +540,10 @@ void scsp_device::init()
 		int iTL =(i>>0x0)&0xff;
 		int iPAN=(i>>0x8)&0x1f;
 		int iSDL=(i>>0xD)&0x07;
-		float TL=1.0f;
+		float TL;
 		float SegaDB=0.0f;
-		float fSDL=1.0f;
-		float PAN=1.0f;
+		float fSDL;
+		float PAN;
 		float LPAN,RPAN;
 
 		if(iTL&0x01) SegaDB-=0.4f;

@@ -637,7 +637,7 @@ void arm7_cpu_device::HandleHalfWordDT(UINT32 insn)
 		// Signed?
 		if (insn & 0x40)
 		{
-			UINT32 newval = 0;
+			UINT32 newval;
 
 			// Signed Half Word?
 			if (insn & 0x20) {
