@@ -1342,6 +1342,7 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 
 static void do_info(parameters_t &params)
 {
+	bool verbose = params.find(OPTION_VERBOSE) != params.end();
 	// parse out input files
 	chd_file input_parent_chd;
 	chd_file input_chd;
@@ -1414,15 +1415,17 @@ static void do_info(parameters_t &params)
 			printf("Metadata:     Tag=%08x  Index=%d  Length=%d bytes\n", metatag, metaindex, int(buffer.size()));
 		printf("              ");
 
-		// print up to 60 characters of metadata
-		UINT32 count = MIN(60, buffer.size());
+		UINT32 count = buffer.size();
+		// limit output to 60 characters of metadata if not verbose
+		if (!verbose)
+			count = MIN(60, count);
 		for (int chnum = 0; chnum < count; chnum++)
 			printf("%c", isprint(UINT8(buffer[chnum])) ? buffer[chnum] : '.');
 		printf("\n");
 	}
 
 	// print compression stats if verbose
-	if (params.find(OPTION_VERBOSE) != params.end())
+	if (verbose)
 	{
 		UINT32 compression_types[10] = { 0 };
 		for (UINT32 hunknum = 0; hunknum < input_chd.hunk_count(); hunknum++)
