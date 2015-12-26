@@ -21,9 +21,7 @@ public:
 
 	// control ports
 	DECLARE_WRITE8_MEMBER(ct_io_w);
-
-	// memory
-	DECLARE_READ8_MEMBER(laserbat_input_r);
+	DECLARE_READ8_MEMBER(rrowx_r);
 
 	DECLARE_DRIVER_INIT(laserbat);
 	INTERRUPT_GEN_MEMBER(laserbat_interrupt);
@@ -37,6 +35,12 @@ public:
 	DECLARE_WRITE8_MEMBER(wcov_w);
 	DECLARE_WRITE8_MEMBER(cnt_eff_w);
 	DECLARE_WRITE8_MEMBER(cnt_nav_w);
+
+	// sound control ports
+	virtual DECLARE_READ8_MEMBER(rhsc_r);
+	virtual DECLARE_WRITE8_MEMBER(whsc_w);
+	virtual DECLARE_WRITE8_MEMBER(csound1_w);
+	virtual DECLARE_WRITE8_MEMBER(csound2_w);
 
 	// running the video
 	virtual void video_start() override;
@@ -77,6 +81,10 @@ protected:
 		, m_coleff(0)
 		, m_neg1(false)
 		, m_neg2(false)
+		, m_rhsc(0)
+		, m_whsc(0)
+		, m_csound1(0)
+		, m_csound2(0)
 	{
 	}
 
@@ -133,6 +141,12 @@ protected:
 	unsigned        m_coleff;           // 2-bit colour effect
 	bool            m_neg1;             // 1-bit area selection
 	bool            m_neg2;             // 1-bit area selection
+
+	// sound board I/O signals
+	unsigned        m_rhsc;             // 8-bit input from J7
+	unsigned        m_whsc;             // 8-bit output to J7
+	unsigned        m_csound1;          // bits 1-8 on J3
+	unsigned        m_csound2;          // bits 9-16 on J3
 };
 
 
@@ -144,15 +158,12 @@ public:
 		, m_csg(*this, "csg")
 		, m_synth_low(*this, "synth_low")
 		, m_synth_high(*this, "synth_high")
-		, m_csound1(0)
-		, m_csound2(0)
 		, m_keys(0)
 	{
 	}
 
 	// sound control ports
-	DECLARE_WRITE8_MEMBER(csound1_w);
-	DECLARE_WRITE8_MEMBER(csound2_w);
+	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
 
 protected:
 
@@ -165,8 +176,6 @@ protected:
 	required_device<tms3615_device> m_synth_high;
 
 	// register state
-	unsigned    m_csound1;  // interface bits 1-8
-	unsigned    m_csound2;  // interface bits 9-16
 	unsigned    m_keys;     // low octave keys 1-13 and high octave keys 2-12 (24 bits)
 };
 
