@@ -2,16 +2,16 @@
 // copyright-holders:Couriersud
 /**********************************************************************************************
 
-     TMS6100 simulator
+    Texas Instruments TMS6100
 
-     Written for MAME by Couriersud
+    Written for MAME by Couriersud
 
-     Todo:
-        - implement CS
-        - implement clock pin(CLK) and gating(RCK) properly
-        - implement chip addressing (0-15 mask programmed)
+    Todo:
+    - implement CS
+    - implement clock pin(CLK) and gating(RCK) properly
+    - implement chip addressing (0-15 mask programmed)
 
-     TMS6100:
+    TMS6100:
 
                  +-----------------+
        VDD       |  1           28 |  NC
@@ -30,7 +30,7 @@
        VSS       | 14           15 |  NC
                  +-----------------+
 
-     TMS6125:
+    TMS6125:
 
                  +---------+
        DATA/ADD1 | 1    16 |  NC
@@ -43,34 +43,36 @@
        M0        | 8     9 |  VSS
                  +---------+
 
-    M58819 (from radarscope schematics):
+    Mitsubishi M58819S:
 
                  +-----------------+
        AD0       |  1           40 |  AD1
-       GND       |  2           39 |  AD2
-       -5V       |  3           38 |  AD3
-       A0        |  4           37 |  AD4
-       NC        |  5           36 |  AD5
-       NC        |  6           35 |  AD6
-       A1        |  7           34 |  AD7
-       A2        |  8           33 |  AD8
-       A3        |  9           32 |  AD9
-       CLK       | 10           31 |  AD10
-       NC        | 11           30 |  AD11
-       -5V       | 12           29 |  AD12
-       C0        | 13           28 |  NC
-       C1        | 14           27 |  NC
-       NC        | 15           26 |  I7
+       VDDl      |  2           39 |  AD2
+       VDD       |  3           38 |  AD3
+       A0        |  4           37 |  NC
+       NC        |  5           36 |  AD4
+       NC        |  6           35 |  AD5
+       A1        |  7           34 |  AD6
+       A2        |  8           33 |  AD7
+       A3/Q      |  9           32 |  AD8
+       CLK       | 10           31 |  AD9
+       POW       | 11           30 |  AD10
+       SL        | 12           29 |  AD11
+       C0        | 13           28 |  AD12
+       C1        | 14           27 |  AD13
+       NC        | 15           26 |  D7
        NC        | 16           25 |  NC
-       +5V       | 17           24 |  I6
-       I0        | 18           23 |  I5
-       I1        | 19           22 |  I4
-       I2        | 20           21 |  I3
+       VSS       | 17           24 |  D6
+       D0        | 18           23 |  D5
+       D1        | 19           22 |  D4
+       D2        | 20           21 |  D3
                  +-----------------+
 
-    The M58819 is used as an interface to external speech eproms.
-    NC pins may have a function, although they are not connected in
-    radarscope.
+    The M58819S is used as an interface to external speech eproms.
+    Other than not having its ROM internal, it is a clone of TMS6100.
+    C0/C1 = command pins, equal to M0/M1
+    SL = PROM expansion input
+    POC = power-on clear (think reset)
 
 ***********************************************************************************************/
 
