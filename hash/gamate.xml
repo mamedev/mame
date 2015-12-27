@@ -594,7 +594,7 @@ C1066 - ??
 
 	<software name="robinhoo" supported="no">
 		<description>Robin Hood</description>
-		<year>199?</year>
+		<year>1994</year>
 		<publisher>Phinnex Co., Ltd.</publisher>
 		<info name="serial" value="C1067" />
 		<part name="cart" interface="gamate_cart">
@@ -618,7 +618,7 @@ C1066 - ??
 
 	<software name="rotat" supported="no">
 		<description>Riddle of the Ancient Tomb</description>
-		<year>199?</year>
+		<year>1994</year>
 		<publisher>Unknown</publisher>
 		<info name="serial" value="C1069" />
 		<part name="cart" interface="gamate_cart">
