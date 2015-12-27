@@ -12433,7 +12433,7 @@ ROM_END
 ROM_START( pexmp017b ) /* Superboard : 5-in-1 Wingboard (XMP00017) */
 /*
 
-The CG2426 set supersedes both CG2298 and adds graphics support for the following XnnnnnnP Data game types:
+The CG2426 set supersedes CG2298 and adds graphics support for the following XnnnnnnP Data game types:
   Black Jack Bonus
   Super Double Bonus
   Triple Double Bonus
