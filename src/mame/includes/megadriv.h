@@ -56,6 +56,7 @@ public:
 	required_device<sn76496_base_device> m_snsnd;
 	optional_shared_ptr<UINT16> m_megadrive_ram;
 
+
 	ioport_port *m_io_reset;
 	ioport_port *m_io_pad_3b[4];
 	ioport_port *m_io_pad_6b[4];
