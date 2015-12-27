@@ -127,7 +127,6 @@ private:
 	void fixup_exception(drccodeptr *codeptr, void *param1, void *param2);
 
 	static void debug_log_hashjmp(int mode, offs_t pc);
-	static void debug_log_hashjmp_fail();
 
 	// code generators
 	void op_handle(x86code *&dst, const uml::instruction &inst);
@@ -262,7 +261,6 @@ private:
 	void emit_sbb_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
 	void emit_sbb_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_cmp_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_cmp_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_and_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
 	void emit_and_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_test_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
@@ -272,19 +270,12 @@ private:
 	void emit_xor_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
 	void emit_xor_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_shl_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_shl_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_shr_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_shr_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_sar_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_sar_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_rol_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_rol_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_ror_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_ror_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_rcl_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_rcl_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 	void emit_rcr_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_rcr_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 
 	// floating-point code emission helpers
 	void emit_fld_p(x86code *&dst, int size, const be_parameter &param);

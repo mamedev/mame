@@ -474,7 +474,7 @@ void snes_ppu_device::device_reset()
 
 inline UINT16 snes_ppu_device::get_bgcolor( UINT8 direct_colors, UINT16 palette, UINT8 color )
 {
-	UINT16 c = 0;
+	UINT16 c;
 
 	if (direct_colors)
 	{
@@ -801,8 +801,8 @@ inline void snes_ppu_device::update_line( UINT16 curline, UINT8 layer, UINT8 pri
 		if (offset_per_tile != SNES_OPT_NONE)
 		{
 			int opt_x = ii + (xoff & 7);
-			UINT32 haddr = 0, vaddr = 0;
-			UINT16 hval = 0, vval = 0;
+			UINT32 haddr, vaddr;
+			UINT16 hval, vval;
 
 			if (opt_x >= 8)
 			{
@@ -1275,7 +1275,7 @@ void snes_ppu_device::update_objects_rto( UINT16 curline )
 	UINT8 height, width, vflip, hflip, priority, pal;
 	UINT16 tile;
 	INT16 x, y;
-	UINT32 name_sel = 0;
+	UINT32 name_sel;
 
 	oam_list_build();
 
@@ -2047,7 +2047,7 @@ inline UINT32 snes_ppu_device::get_vram_address()
 
 READ8_MEMBER( snes_ppu_device::vram_read )
 {
-	UINT8 res = 0;
+	UINT8 res;
 	offset &= 0xffff; // only 64KB are present on SNES
 
 	if (m_screen_disabled)
@@ -2208,7 +2208,7 @@ WRITE8_MEMBER( snes_ppu_device::oam_write )
 
 READ8_MEMBER( snes_ppu_device::cgram_read )
 {
-	UINT8 res = 0;
+	UINT8 res;
 	offset &= 0x1ff;
 
 #if 0

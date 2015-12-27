@@ -648,7 +648,7 @@ READ8_MEMBER( mos6530_base_t::timer_on_r )
 
 UINT8 mos6530_base_t::timer_r(bool ie)
 {
-	UINT8 data = 0;
+	UINT8 data;
 
 	live_sync();
 

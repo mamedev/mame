@@ -137,7 +137,7 @@ void ncr5380_device::device_stop()
 UINT8 ncr5380_device::ncr5380_read_reg(UINT32 offset)
 {
 	int reg = offset & 7;
-	UINT8 rv = 0;
+	UINT8 rv;
 
 	switch( reg )
 	{

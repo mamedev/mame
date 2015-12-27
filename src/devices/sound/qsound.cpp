@@ -224,7 +224,7 @@ READ8_MEMBER(qsound_device::qsound_r)
 
 void qsound_device::write_data(UINT8 address, UINT16 data)
 {
-	int ch = 0, reg = 0;
+	int ch = 0, reg;
 
 	// direct sound reg
 	if (address < 0x80)

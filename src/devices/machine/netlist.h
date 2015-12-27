@@ -253,8 +253,6 @@ public:
 	netlist_mame_sound_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~netlist_mame_sound_device_t() {}
 
-	static void static_set_constructor(device_t &device, void (*setup_func)(netlist::setup_t &));
-
 	inline sound_stream *get_stream() { return m_stream; }
 
 

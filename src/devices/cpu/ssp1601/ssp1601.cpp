@@ -451,7 +451,7 @@ void ssp1601_device::ptr1_write(int op, UINT32 d)
 
 UINT32 ssp1601_device::ptr2_read(int op)
 {
-	int mv = 0, t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
+	int mv, t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
 	switch (t)
 	{
 		// mod=0 (00)

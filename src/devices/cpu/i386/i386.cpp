@@ -475,7 +475,7 @@ void i386_device::i386_check_sreg_validity(int reg)
 	UINT8 CPL = m_CPL;
 	UINT8 DPL,RPL;
 	I386_SREG desc;
-	int invalid = 0;
+	int invalid;
 
 	memset(&desc, 0, sizeof(desc));
 	desc.selector = selector;
@@ -697,7 +697,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 	UINT32 offset, oldflags = get_flags();
 	UINT16 segment;
 	int entry = irq * (PROTECTED_MODE ? 8 : 4);
-	int SetRPL = 0;
+	int SetRPL;
 	m_lock = false;
 
 	if( !(PROTECTED_MODE) )
@@ -721,7 +721,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 		int type;
 		UINT16 flags;
 		I386_SREG desc;
-		UINT8 CPL = m_CPL, DPL = 0; //, RPL = 0;
+		UINT8 CPL = m_CPL, DPL; //, RPL = 0;
 
 		/* 32-bit */
 		v1 = READ32PL0(m_idtr.base + entry );
@@ -1347,7 +1347,7 @@ void i386_device::i386_protected_mode_jump(UINT16 seg, UINT32 off, int indirect,
 	I386_SREG desc;
 	I386_CALL_GATE call_gate;
 	UINT8 CPL,DPL,RPL;
-	UINT8 SetRPL = 0;
+	UINT8 SetRPL;
 	UINT16 segment = seg;
 	UINT32 offset = off;
 
@@ -1618,7 +1618,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 {
 	I386_SREG desc;
 	I386_CALL_GATE gate;
-	UINT8 SetRPL = 0;
+	UINT8 SetRPL;
 	UINT8 CPL, DPL, RPL;
 	UINT16 selector = seg;
 	UINT32 offset = off;
@@ -3091,7 +3091,7 @@ UINT64 i386_device::debug_seglimit(symbol_table &table, int params, const UINT64
 
 UINT64 i386_device::debug_segofftovirt(symbol_table &table, int params, const UINT64 *param)
 {
-	UINT32 result = 0;
+	UINT32 result;
 	I386_SREG seg;
 
 	if(param[0] > 65535)

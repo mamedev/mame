@@ -1970,7 +1970,7 @@ UINT16 i80286_cpu_device::far_return(int iret, int bytes)
 
 void i80286_cpu_device::check_permission(UINT8 check_seg, UINT32 offset, UINT16 size, int operation)
 {
-	int trap = 0;
+	int trap;
 	UINT8 rights;
 	if(PM)
 	{

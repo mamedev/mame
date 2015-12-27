@@ -252,12 +252,6 @@ private:
 	//!< write i/o space RAM
 	DECLARE_WRITE16_MEMBER( ioram_w );
 
-	//!< read memory mapped i/o
-	DECLARE_READ16_MEMBER ( mmio_r );
-
-	//!< write memory mapped i/o
-	DECLARE_WRITE16_MEMBER( mmio_w );
-
 	int m_icount;
 
 	typedef void (alto2_cpu_device::*a2func)();

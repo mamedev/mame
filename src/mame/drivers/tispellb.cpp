@@ -50,8 +50,8 @@
 ----------------------------------------------------------------------------
 
   TODO:
-  - spellb numbers don't match with picture book
-  - spellb random lockups
+  - spellb numbers don't match with picture book - roms were doublechecked
+  - spellb random lockups - *
 
 
 ***************************************************************************/

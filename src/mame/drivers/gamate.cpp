@@ -396,14 +396,34 @@ static MACHINE_CONFIG_START( gamate, gamate_state )
 MACHINE_CONFIG_END
 
 
+/* ROM notes:
+gamate_bios_umc.bin is called UMC or NCR ICASC00002
+gamate_bios_bit.bin is called BIT ICASC00001
+So basically the UMC UA6588F and NCR 81489 CPU's contains the ICASC00002 bios
+while the BIT branded CPU contains the ICASC00001 bios.
+They're compatible, but for completeness its nice to have both.
+Note i have 8 gamate consoles (dated 1990 though 1993) which has the gamate_bios_umc.bin in it
+and only 1 dated 1994 which has the gamate_bios_bit.bin in it, so the former seems much more common.
+We dumped the BIOS from all our Gamate consoles, and all except one were
+identical (SHA1:ea449dc607601f9a68d855ad6ab53800d2e99297):
+Gamate_BIOS_9027__9002008__UMC_UA6588F_9027S_606700.bin
+Gamate_BIOS_9027__9142222__UMC_UA6588F_9027S_606700.bin
+Gamate_BIOS_9027__unknown__UMC_UA6588F_9027S_606690.bin
+Gamate_BIOS_9031__9009719__NCR_81489_BIT_WS39323F_ICASC00002_F841400_R9031.bin
+Gamate_BIOS_9038__9145157__NCR_81489_BIT_WS39323F_ICASC00002_F842247_N9038.bin
+One console, with an unknown serial number, has an updated BIOS
+(SHA1:4e9dfbfe916ca485530ef4221593ab68738e2217):
+This console appears to have been manufactured in 1994, based on the date markings on the RAM chips,
+as well as the PCB.
+*/
 ROM_START(gamate)
 	ROM_REGION(0x10000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "default", "DEFAULT")
 	ROMX_LOAD("gamate_bios_umc.bin", 0xf000, 0x1000, CRC(07090415) SHA1(ea449dc607601f9a68d855ad6ab53800d2e99297), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "newer", "NEWER")
-	ROMX_LOAD("gamate_bios_9130__unknown__bit_icasc00001_9130-bs_r32261.bin", 0xf000, 0x1000, CRC(03a5f3a7) SHA1(4e9dfbfe916ca485530ef4221593ab68738e2217), ROM_BIOS(2) )
+	ROMX_LOAD("gamate_bios_bit.bin", 0xf000, 0x1000, CRC(03a5f3a7) SHA1(4e9dfbfe916ca485530ef4221593ab68738e2217), ROM_BIOS(2) )
 ROM_END
 
 
 /*    YEAR  NAME     PARENT  COMPAT    MACHINE  INPUT   CLASS         INIT      COMPANY    FULLNAME */
-CONS( 19??, gamate,  0,      0,        gamate,  gamate, gamate_state, gamate, "Bit Corp", "Gamate", 0)
+CONS( 1990, gamate,  0,      0,        gamate,  gamate, gamate_state, gamate, "Bit Corp", "Gamate", 0)

@@ -19,36 +19,6 @@ class laserbat_state_base : public driver_device
 {
 public:
 
-	// control ports
-	DECLARE_WRITE8_MEMBER(ct_io_w);
-	DECLARE_READ8_MEMBER(rrowx_r);
-
-	DECLARE_DRIVER_INIT(laserbat);
-	INTERRUPT_GEN_MEMBER(laserbat_interrupt);
-
-	// video initialisation
-	DECLARE_PALETTE_INIT(laserbat);
-
-	// video memory and control ports
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(wcoh_w);
-	DECLARE_WRITE8_MEMBER(wcov_w);
-	DECLARE_WRITE8_MEMBER(cnt_eff_w);
-	DECLARE_WRITE8_MEMBER(cnt_nav_w);
-
-	// sound control ports
-	virtual DECLARE_READ8_MEMBER(rhsc_r);
-	virtual DECLARE_WRITE8_MEMBER(whsc_w);
-	virtual DECLARE_WRITE8_MEMBER(csound1_w);
-	virtual DECLARE_WRITE8_MEMBER(csound2_w);
-
-	// running the video
-	virtual void video_start() override;
-	UINT32 screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-protected:
-	enum { TIMER_SCANLINE };
-
 	laserbat_state_base(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_row0(*this, "ROW0")
@@ -87,6 +57,36 @@ protected:
 		, m_csound2(0)
 	{
 	}
+
+	// control ports
+	DECLARE_WRITE8_MEMBER(ct_io_w);
+	DECLARE_READ8_MEMBER(rrowx_r);
+
+	DECLARE_DRIVER_INIT(laserbat);
+	INTERRUPT_GEN_MEMBER(laserbat_interrupt);
+
+	// video initialisation
+	DECLARE_PALETTE_INIT(laserbat);
+
+	// video memory and control ports
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(wcoh_w);
+	DECLARE_WRITE8_MEMBER(wcov_w);
+	DECLARE_WRITE8_MEMBER(cnt_eff_w);
+	DECLARE_WRITE8_MEMBER(cnt_nav_w);
+
+	// sound control ports
+	virtual DECLARE_READ8_MEMBER(rhsc_r);
+	virtual DECLARE_WRITE8_MEMBER(whsc_w);
+	virtual DECLARE_WRITE8_MEMBER(csound1_w);
+	virtual DECLARE_WRITE8_MEMBER(csound2_w);
+
+	// running the video
+	virtual void video_start() override;
+	UINT32 screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	enum { TIMER_SCANLINE };
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

@@ -126,7 +126,7 @@ UINT8 i82730_device::read_byte(offs_t address)
 
 UINT16 i82730_device::read_word(offs_t address)
 {
-	UINT16 data = 0xffff;
+	UINT16 data;
 
 	if (sysbus_16bit() && !(address & 1))
 	{

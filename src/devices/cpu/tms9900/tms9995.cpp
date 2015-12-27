@@ -1128,7 +1128,7 @@ const tms9995_device::tms_instruction tms9995_device::s_command[] =
 void tms9995_device::build_command_lookup_table()
 {
 	int i = 0;
-	int cmdindex = 0;
+	int cmdindex;
 	int bitcount;
 	const tms_instruction *inst;
 	UINT16 opcode;
@@ -1599,7 +1599,7 @@ void tms9995_device::command_completed()
 */
 void tms9995_device::service_interrupt()
 {
-	int vectorpos = 0;
+	int vectorpos;
 
 	if (m_reset)
 	{
@@ -2555,7 +2555,7 @@ void tms9995_device::alu_divide()
 void tms9995_device::alu_divide_signed()
 {
 	int n=1;
-	bool overflow = true;
+	bool overflow;
 	UINT16 w1, w2, dwait;
 	INT16 divisor;
 	INT32 dividend;
@@ -2930,8 +2930,8 @@ void tms9995_device::alu_mov()
 void tms9995_device::alu_multiply()
 {
 	int n = 0;
-	UINT32 result = 0;
-	INT32 results = 0;
+	UINT32 result;
+	INT32 results;
 
 	if (m_instruction->command==MPY)
 	{

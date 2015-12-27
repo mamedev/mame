@@ -395,7 +395,7 @@ void i8085a_cpu_device::check_for_interrupts()
 	/* followed by classic INTR */
 	else if (m_irq_state[I8085_INTR_LINE] && (m_IM & IM_IE))
 	{
-		UINT32 vector = 0;
+		UINT32 vector;
 
 		/* break out of HALT state and call the IRQ ack callback */
 		break_halt_for_interrupt();

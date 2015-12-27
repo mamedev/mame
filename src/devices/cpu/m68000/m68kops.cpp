@@ -5311,8 +5311,8 @@ void m68000_base_device_ops::m68k_op_bfchg_32_ai(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AY_AI_8(mc68kcpu);
 
 
@@ -5365,8 +5365,8 @@ void m68000_base_device_ops::m68k_op_bfchg_32_di(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AY_DI_8(mc68kcpu);
 
 
@@ -5419,8 +5419,8 @@ void m68000_base_device_ops::m68k_op_bfchg_32_ix(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AY_IX_8(mc68kcpu);
 
 
@@ -5473,8 +5473,8 @@ void m68000_base_device_ops::m68k_op_bfchg_32_aw(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AW_8(mc68kcpu);
 
 
@@ -5527,8 +5527,8 @@ void m68000_base_device_ops::m68k_op_bfchg_32_al(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AL_8(mc68kcpu);
 
 
@@ -5618,8 +5618,8 @@ void m68000_base_device_ops::m68k_op_bfclr_32_ai(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AY_AI_8(mc68kcpu);
 
 
@@ -5672,8 +5672,8 @@ void m68000_base_device_ops::m68k_op_bfclr_32_di(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AY_DI_8(mc68kcpu);
 
 
@@ -5726,8 +5726,8 @@ void m68000_base_device_ops::m68k_op_bfclr_32_ix(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AY_IX_8(mc68kcpu);
 
 
@@ -5780,8 +5780,8 @@ void m68000_base_device_ops::m68k_op_bfclr_32_aw(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AW_8(mc68kcpu);
 
 
@@ -5834,8 +5834,8 @@ void m68000_base_device_ops::m68k_op_bfclr_32_al(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AL_8(mc68kcpu);
 
 
@@ -7124,8 +7124,8 @@ void m68000_base_device_ops::m68k_op_bfins_32_ai(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AY_AI_8(mc68kcpu);
 
 
@@ -7200,8 +7200,8 @@ void m68000_base_device_ops::m68k_op_bfins_32_di(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AY_DI_8(mc68kcpu);
 
 
@@ -7276,8 +7276,8 @@ void m68000_base_device_ops::m68k_op_bfins_32_ix(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AY_IX_8(mc68kcpu);
 
 
@@ -7352,8 +7352,8 @@ void m68000_base_device_ops::m68k_op_bfins_32_aw(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AW_8(mc68kcpu);
 
 
@@ -7428,8 +7428,8 @@ void m68000_base_device_ops::m68k_op_bfins_32_al(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AL_8(mc68kcpu);
 
 
@@ -7538,8 +7538,8 @@ void m68000_base_device_ops::m68k_op_bfset_32_ai(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AY_AI_8(mc68kcpu);
 
 		if(BIT_B(word2))
@@ -7591,8 +7591,8 @@ void m68000_base_device_ops::m68k_op_bfset_32_di(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AY_DI_8(mc68kcpu);
 
 		if(BIT_B(word2))
@@ -7644,8 +7644,8 @@ void m68000_base_device_ops::m68k_op_bfset_32_ix(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AY_IX_8(mc68kcpu);
 
 		if(BIT_B(word2))
@@ -7697,8 +7697,8 @@ void m68000_base_device_ops::m68k_op_bfset_32_aw(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AW_8(mc68kcpu);
 
 		if(BIT_B(word2))
@@ -7750,8 +7750,8 @@ void m68000_base_device_ops::m68k_op_bfset_32_al(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AL_8(mc68kcpu);
 
 		if(BIT_B(word2))
@@ -7838,8 +7838,8 @@ void m68000_base_device_ops::m68k_op_bftst_32_ai(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AY_AI_8(mc68kcpu);
 
 		if(BIT_B(word2))
@@ -7889,8 +7889,8 @@ void m68000_base_device_ops::m68k_op_bftst_32_di(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AY_DI_8(mc68kcpu);
 
 		if(BIT_B(word2))
@@ -7940,8 +7940,8 @@ void m68000_base_device_ops::m68k_op_bftst_32_ix(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AY_IX_8(mc68kcpu);
 
 		if(BIT_B(word2))
@@ -7991,8 +7991,8 @@ void m68000_base_device_ops::m68k_op_bftst_32_aw(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AW_8(mc68kcpu);
 
 		if(BIT_B(word2))
@@ -8042,8 +8042,8 @@ void m68000_base_device_ops::m68k_op_bftst_32_al(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_AL_8(mc68kcpu);
 
 		if(BIT_B(word2))
@@ -8093,8 +8093,8 @@ void m68000_base_device_ops::m68k_op_bftst_32_pcdi(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_PCDI_8(mc68kcpu);
 
 		if(BIT_B(word2))
@@ -8144,8 +8144,8 @@ void m68000_base_device_ops::m68k_op_bftst_32_pcix(m68000_base_device* mc68kcpu)
 		UINT32 mask_base;
 		UINT32 data_long;
 		UINT32 mask_long;
-		UINT32 data_byte = 0;
-		UINT32 mask_byte = 0;
+		UINT32 data_byte;
+		UINT32 mask_byte;
 		UINT32 ea = EA_PCIX_8(mc68kcpu);
 
 		if(BIT_B(word2))
@@ -13608,9 +13608,9 @@ void m68000_base_device_ops::m68k_op_divl_32_d(m68000_base_device* mc68kcpu)
 	{
 		UINT32 word2 = OPER_I_16(mc68kcpu);
 		UINT64 divisor   = DY(mc68kcpu);
-		UINT64 dividend  = 0;
-		UINT64 quotient  = 0;
-		UINT64 remainder = 0;
+		UINT64 dividend;
+		UINT64 quotient;
+		UINT64 remainder;
 
 		if(divisor != 0)
 		{
@@ -13678,9 +13678,9 @@ void m68000_base_device_ops::m68k_op_divl_32_ai(m68000_base_device* mc68kcpu)
 	{
 		UINT32 word2 = OPER_I_16(mc68kcpu);
 		UINT64 divisor = OPER_AY_AI_32(mc68kcpu);
-		UINT64 dividend  = 0;
-		UINT64 quotient  = 0;
-		UINT64 remainder = 0;
+		UINT64 dividend;
+		UINT64 quotient;
+		UINT64 remainder;
 
 		if(divisor != 0)
 		{
@@ -13748,9 +13748,9 @@ void m68000_base_device_ops::m68k_op_divl_32_pi(m68000_base_device* mc68kcpu)
 	{
 		UINT32 word2 = OPER_I_16(mc68kcpu);
 		UINT64 divisor = OPER_AY_PI_32(mc68kcpu);
-		UINT64 dividend  = 0;
-		UINT64 quotient  = 0;
-		UINT64 remainder = 0;
+		UINT64 dividend;
+		UINT64 quotient;
+		UINT64 remainder;
 
 		if(divisor != 0)
 		{
@@ -13818,9 +13818,9 @@ void m68000_base_device_ops::m68k_op_divl_32_pd(m68000_base_device* mc68kcpu)
 	{
 		UINT32 word2 = OPER_I_16(mc68kcpu);
 		UINT64 divisor = OPER_AY_PD_32(mc68kcpu);
-		UINT64 dividend  = 0;
-		UINT64 quotient  = 0;
-		UINT64 remainder = 0;
+		UINT64 dividend;
+		UINT64 quotient;
+		UINT64 remainder;
 
 		if(divisor != 0)
 		{
@@ -13888,9 +13888,9 @@ void m68000_base_device_ops::m68k_op_divl_32_di(m68000_base_device* mc68kcpu)
 	{
 		UINT32 word2 = OPER_I_16(mc68kcpu);
 		UINT64 divisor = OPER_AY_DI_32(mc68kcpu);
-		UINT64 dividend  = 0;
-		UINT64 quotient  = 0;
-		UINT64 remainder = 0;
+		UINT64 dividend;
+		UINT64 quotient;
+		UINT64 remainder;
 
 		if(divisor != 0)
 		{
@@ -13958,9 +13958,9 @@ void m68000_base_device_ops::m68k_op_divl_32_ix(m68000_base_device* mc68kcpu)
 	{
 		UINT32 word2 = OPER_I_16(mc68kcpu);
 		UINT64 divisor = OPER_AY_IX_32(mc68kcpu);
-		UINT64 dividend  = 0;
-		UINT64 quotient  = 0;
-		UINT64 remainder = 0;
+		UINT64 dividend;
+		UINT64 quotient;
+		UINT64 remainder;
 
 		if(divisor != 0)
 		{
@@ -14028,9 +14028,9 @@ void m68000_base_device_ops::m68k_op_divl_32_aw(m68000_base_device* mc68kcpu)
 	{
 		UINT32 word2 = OPER_I_16(mc68kcpu);
 		UINT64 divisor = OPER_AW_32(mc68kcpu);
-		UINT64 dividend  = 0;
-		UINT64 quotient  = 0;
-		UINT64 remainder = 0;
+		UINT64 dividend;
+		UINT64 quotient;
+		UINT64 remainder;
 
 		if(divisor != 0)
 		{
@@ -14098,9 +14098,9 @@ void m68000_base_device_ops::m68k_op_divl_32_al(m68000_base_device* mc68kcpu)
 	{
 		UINT32 word2 = OPER_I_16(mc68kcpu);
 		UINT64 divisor = OPER_AL_32(mc68kcpu);
-		UINT64 dividend  = 0;
-		UINT64 quotient  = 0;
-		UINT64 remainder = 0;
+		UINT64 dividend;
+		UINT64 quotient;
+		UINT64 remainder;
 
 		if(divisor != 0)
 		{
@@ -14168,9 +14168,9 @@ void m68000_base_device_ops::m68k_op_divl_32_pcdi(m68000_base_device* mc68kcpu)
 	{
 		UINT32 word2 = OPER_I_16(mc68kcpu);
 		UINT64 divisor = OPER_PCDI_32(mc68kcpu);
-		UINT64 dividend  = 0;
-		UINT64 quotient  = 0;
-		UINT64 remainder = 0;
+		UINT64 dividend;
+		UINT64 quotient;
+		UINT64 remainder;
 
 		if(divisor != 0)
 		{
@@ -14238,9 +14238,9 @@ void m68000_base_device_ops::m68k_op_divl_32_pcix(m68000_base_device* mc68kcpu)
 	{
 		UINT32 word2 = OPER_I_16(mc68kcpu);
 		UINT64 divisor = OPER_PCIX_32(mc68kcpu);
-		UINT64 dividend  = 0;
-		UINT64 quotient  = 0;
-		UINT64 remainder = 0;
+		UINT64 dividend;
+		UINT64 quotient;
+		UINT64 remainder;
 
 		if(divisor != 0)
 		{
@@ -14308,9 +14308,9 @@ void m68000_base_device_ops::m68k_op_divl_32_i(m68000_base_device* mc68kcpu)
 	{
 		UINT32 word2 = OPER_I_16(mc68kcpu);
 		UINT64 divisor = OPER_I_32(mc68kcpu);
-		UINT64 dividend  = 0;
-		UINT64 quotient  = 0;
-		UINT64 remainder = 0;
+		UINT64 dividend;
+		UINT64 quotient;
+		UINT64 remainder;
 
 		if(divisor != 0)
 		{

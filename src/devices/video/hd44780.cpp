@@ -288,7 +288,7 @@ const UINT8 *hd44780_device::render()
 			{
 				UINT16 char_pos = line * 0x40 + ((pos + m_disp_shift) % line_size);
 
-				int char_base = 0;
+				int char_base;
 				if (m_ddram[char_pos] < 0x10)
 				{
 					// draw CGRAM characters

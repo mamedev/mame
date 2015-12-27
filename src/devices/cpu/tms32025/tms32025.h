@@ -276,7 +276,6 @@ private:
 	void mpys();
 	void mpyu();
 	void neg();
-	void nop();
 	void norm();
 	void or_();
 	void ork();

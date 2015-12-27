@@ -557,8 +557,8 @@ void tms3556_device::draw_line_mixed(UINT16 *ln)
 
 void tms3556_device::draw_line(bitmap_ind16 &bmp, int line)
 {
-	int double_lines = 0;
-	UINT16 *ln, *ln2 = nullptr;
+	int double_lines;
+	UINT16 *ln, *ln2;
 
 //  if (m_control_regs[4] & 0x??)
 //  {   // interlaced mode

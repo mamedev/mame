@@ -162,12 +162,15 @@ uniform float ScanlineBrightOffset = 1.0f;
 uniform float ScanlineOffset = 1.0f;
 uniform float ScanlineHeight = 1.0f;
 
+uniform float3 BackColor = float3(0.0f, 0.0f, 0.0f);
+
 uniform float CurvatureAmount = 1.0f;
 uniform float RoundCornerAmount = 0.0f;
 uniform float SmoothBorderAmount = 0.0f;
 uniform float VignettingAmount = 0.0f;
 uniform float ReflectionAmount = 0.0f;
 
+uniform int ShadowTileMode = 0; // 0 based on screen dimension, 1 based on source dimension
 uniform float ShadowAlpha = 0.0f;
 uniform float2 ShadowCount = float2(6.0f, 6.0f);
 uniform float2 ShadowUV = float2(0.25f, 0.25f);
@@ -248,7 +251,7 @@ float GetSpotAddend(float2 coord, float amount)
 	float SpotRadius = amount * 0.75f;
 	float Spot = smoothstep(SpotRadius, SpotRadius - SpotBlur, length(SpotCoord));
 
-	float SigmoidSpot = normalizedSigmoid(Spot, 0.75) * amount;
+	float SigmoidSpot = amount * normalizedSigmoid(Spot, 0.75);
 
 	// increase strength by 100%
 	SigmoidSpot = SigmoidSpot * 2.0f;
@@ -292,8 +295,6 @@ float GetRoundCornerFactor(float2 coord, float radiusAmount, float smoothAmount)
 // www.francois-tarlier.com/blog/cubic-lens-distortion-shader/
 float2 GetDistortedCoords(float2 centerCoord, float amount)
 {
-	amount *= 0.25f; // reduced amount
-
 	// lens distortion coefficient
 	float k = amount;
 
@@ -368,19 +369,20 @@ float2 GetAdjustedCoords(float2 coord, float2 centerOffset, float distortionAmou
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 ScreenTexelDims = 1.0f / ScreenDims;
+	float2 SourceTexelDims = 1.0f / SourceDims;
 
 	float2 HalfSourceRect = PrepareVector
 		? float2(0.5f, 0.5f)
 		: SourceRect * 0.5f;
 
 	float2 ScreenCoord = Input.ScreenCoord / ScreenDims;
-	ScreenCoord = GetCoords(ScreenCoord, float2(0.5f, 0.5f), CurvatureAmount);
+	ScreenCoord = GetCoords(ScreenCoord, float2(0.5f, 0.5f), CurvatureAmount * 0.25f); // reduced amount
 
 	float2 DistortionCoord = Input.TexCoord;
-	DistortionCoord = GetCoords(DistortionCoord, HalfSourceRect, CurvatureAmount);
+	DistortionCoord = GetCoords(DistortionCoord, HalfSourceRect, CurvatureAmount * 0.25f); // reduced amount
 
 	float2 BaseCoord = Input.TexCoord;
-	BaseCoord = GetAdjustedCoords(BaseCoord, HalfSourceRect, CurvatureAmount);
+	BaseCoord = GetAdjustedCoords(BaseCoord, HalfSourceRect, CurvatureAmount * 0.25f); // reduced amount
 
 	float2 DistortionCoordCentered = DistortionCoord;
 	DistortionCoordCentered -= HalfSourceRect;
@@ -409,7 +411,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 			// ? shadowUV.yx
 			// : shadowUV.xy;
 
-		float2 screenCoord = ScreenCoord;
+		float2 screenCoord = ShadowTileMode == 0 ? ScreenCoord : BaseCoord;
 		screenCoord = xor(OrientationSwapXY, RotationSwapXY)
 			? screenCoord.yx
 			: screenCoord.xy;
@@ -419,7 +421,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 			? shadowCount.yx
 			: shadowCount.xy;
 
-		float2 shadowTile = (ScreenTexelDims * shadowCount);
+		float2 shadowTile = ((ShadowTileMode == 0 ? ScreenTexelDims : SourceTexelDims) * shadowCount);
 		shadowTile = xor(OrientationSwapXY, RotationSwapXY)
 			? shadowTile.yx
 			: shadowTile.xy;
@@ -431,10 +433,14 @@ float4 ps_main(PS_INPUT Input) : COLOR
 			// ? ShadowCoord.yx
 			// : ShadowCoord.xy;
 
-		float3 ShadowColor = tex2D(ShadowSampler, ShadowCoord).rgb;
-		ShadowColor = lerp(1.0f, ShadowColor, ShadowAlpha);
+		float4 ShadowColor = tex2D(ShadowSampler, ShadowCoord);
+		float3 ShadowMaskColor = lerp(1.0f, ShadowColor.rgb, ShadowAlpha);
+		float ShadowMaskClear = (1.0f - ShadowColor.a) * ShadowAlpha;
 
-		BaseColor.rgb *= ShadowColor;
+		// apply shadow mask color
+		BaseColor.rgb *= ShadowMaskColor;
+		// clear shadow mask by background color
+		BaseColor.rgb = lerp(BaseColor.rgb, BackColor, ShadowMaskClear);
 	}
 
 	// Color Compression (may not affect bloom)

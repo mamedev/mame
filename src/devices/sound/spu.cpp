@@ -1147,7 +1147,7 @@ void spu_device::kill_sound()
 
 READ16_MEMBER( spu_device::read )
 {
-	unsigned short ret=0, *rp=(unsigned short *)(reg+((offset*2)&0x1ff));
+	unsigned short ret, *rp=(unsigned short *)(reg+((offset*2)&0x1ff));
 
 	m_stream->update();
 

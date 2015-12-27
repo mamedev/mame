@@ -165,7 +165,6 @@ protected:
 											void *fmnoise_ptr,
 											void *outxptr,
 											unsigned int *tleft);
-	void process();
 	void process_until(const unsigned int tsample);
 	void update_voice_loop(const unsigned int v);
 	bool update_voice_state(const unsigned int v);

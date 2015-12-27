@@ -188,7 +188,7 @@ WRITE_LINE_MEMBER( gayle_device::ide_interrupt_w )
 
 READ16_MEMBER( gayle_device::gayle_id_r )
 {
-	UINT16 data = 0xffff;
+	UINT16 data;
 
 	if (ACCESSING_BITS_8_15)
 		data = ((m_gayle_id << m_gayle_id_count++) & 0x80) << 8;

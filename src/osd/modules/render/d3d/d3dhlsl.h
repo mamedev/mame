@@ -37,6 +37,7 @@ public:
 		UT_VEC2,
 		UT_FLOAT,
 		UT_INT,
+		UT_BOOL,
 		UT_MATRIX,
 		UT_SAMPLER
 	} uniform_type;
@@ -48,6 +49,10 @@ public:
 		CU_SOURCE_RECT,
 		CU_TARGET_DIMS,
 		CU_QUAD_DIMS,
+
+		CU_ORIENTATION_SWAP,
+		CU_ROTATION_SWAP,
+		CU_ROTATION_TYPE,
 
 		CU_NTSC_CCFREQ,
 		CU_NTSC_A,
@@ -114,6 +119,7 @@ public:
 	void        set(float x, float y);
 	void        set(float x);
 	void        set(int x);
+	void        set(bool x);
 	void        set(matrix *mat);
 	void        set(texture *tex);
 
@@ -125,6 +131,7 @@ protected:
 
 	float       m_vec[4];
 	int         m_ival;
+	bool        m_bval;
 	matrix      *m_mval;
 	texture     *m_texture;
 	int         m_count;
@@ -188,6 +195,7 @@ struct hlsl_options
 {
 	bool                    params_init;
 	bool                    params_dirty;
+	int                     shadow_mask_tile_mode;
 	float                   shadow_mask_alpha;
 	char                    shadow_mask_texture[1024];
 	int                     shadow_mask_count_x;
@@ -241,6 +249,7 @@ struct hlsl_options
 	float                   vector_length_ratio;
 
 	// Bloom
+	int                     bloom_blend_mode;
 	float                   bloom_scale;
 	float                   bloom_overdrive[3];
 	float                   bloom_level0_weight;
@@ -341,6 +350,8 @@ private:
 	render_target*          find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
 	cache_target *          find_cache_target(UINT32 screen_index, int width, int height);
 	void                    remove_cache_target(cache_target *cache);
+
+	rgb_t                   apply_color_convolution(rgb_t color);
 
 	// Shader passes
 	int                     ntsc_pass(render_target *rt, int source_index, poly_info *poly, int vertnum);

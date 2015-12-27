@@ -162,7 +162,7 @@ static const UINT8 Div31[POLY5_SIZE] =
 void tia_write(void *_chip, offs_t offset, UINT8 data)
 {
 	struct tia *chip = (struct tia *)_chip;
-	UINT16 new_val = 0;
+	UINT16 new_val;
 	UINT8 chan;
 
 	/* determine which address was changed */

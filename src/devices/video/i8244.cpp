@@ -285,7 +285,7 @@ offs_t i8244_device::fix_register_mirrors( offs_t offset )
 
 READ8_MEMBER(i8244_device::read)
 {
-	UINT8 data = 0;
+	UINT8 data;
 
 	offset = fix_register_mirrors( offset );
 

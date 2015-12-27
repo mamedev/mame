@@ -16,6 +16,11 @@ t10mmc.h
 class t10mmc : public virtual t10spc
 {
 public:
+	t10mmc()
+		: t10spc(), m_image(nullptr), m_cdda(nullptr), m_cdrom(nullptr), m_lba(0), m_blocks(0), m_last_lba(0), m_num_subblocks(0), m_cur_subblock(0), m_audio_sense(0), m_device(nullptr)
+	{
+	}
+
 	virtual void SetDevice( void *device ) override;
 	virtual void GetDevice( void **device ) override;
 	virtual void ExecCommand() override;

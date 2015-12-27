@@ -25,14 +25,7 @@ struct VS_OUTPUT
 {
 	float4 Position : POSITION;
 	float4 Color : COLOR0;
-	float2 TexCoord0 : TEXCOORD0;
-	float2 TexCoord1 : TEXCOORD1;
-	float2 TexCoord2 : TEXCOORD2;
-	float2 TexCoord3 : TEXCOORD3;
-	float2 TexCoord4 : TEXCOORD4;
-	float2 TexCoord5 : TEXCOORD5;
-	float2 TexCoord6 : TEXCOORD6;
-	float2 TexCoord7 : TEXCOORD7;
+	float2 TexCoord : TEXCOORD0;
 };
 
 struct VS_INPUT
@@ -45,15 +38,17 @@ struct VS_INPUT
 struct PS_INPUT
 {
 	float4 Color : COLOR0;
-	float2 TexCoord0 : TEXCOORD0;
-	float2 TexCoord1 : TEXCOORD1;
-	float2 TexCoord2 : TEXCOORD2;
-	float2 TexCoord3 : TEXCOORD3;
-	float2 TexCoord4 : TEXCOORD4;
-	float2 TexCoord5 : TEXCOORD5;
-	float2 TexCoord6 : TEXCOORD6;
-	float2 TexCoord7 : TEXCOORD7;
+	float2 TexCoord : TEXCOORD0;
 };
+
+//-----------------------------------------------------------------------------
+// Functions
+//-----------------------------------------------------------------------------
+
+bool xor(bool a, bool b)
+{
+	return (a || b) && !(a && b);
+}
 
 //-----------------------------------------------------------------------------
 // Simple Vertex Shader
@@ -61,22 +56,12 @@ struct PS_INPUT
 
 uniform float2 ScreenDims;
 uniform float2 TargetDims;
-
-uniform float2 Defocus = float2(0.0f, 0.0f);
-
-float2 Coord1Offset = float2(-0.2f, -0.6f);
-float2 Coord2Offset = float2( 0.4f, -0.4f);
-float2 Coord3Offset = float2( 0.6f,  0.2f);
-float2 Coord4Offset = float2( 0.2f,  0.6f);
-float2 Coord5Offset = float2(-0.4f,  0.6f);
-float2 Coord6Offset = float2(-0.6f,  0.2f);
-float2 Coord7Offset = float2(-0.6f, -0.4f);
+uniform float2 SourceRect;
+uniform float2 QuadDims;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
-
-	float2 ScreenTexelDims = 1.0f / ScreenDims;
 
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
@@ -87,15 +72,8 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	float2 TexCoord = Input.TexCoord;
 	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
-	Output.TexCoord0 = TexCoord;
-	Output.TexCoord1 = TexCoord + Coord1Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord2 = TexCoord + Coord2Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord3 = TexCoord + Coord3Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord4 = TexCoord + Coord4Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord5 = TexCoord + Coord5Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord6 = TexCoord + Coord6Offset * ScreenTexelDims * Defocus;
-	Output.TexCoord7 = TexCoord + Coord7Offset * ScreenTexelDims * Defocus;
-
+	Output.TexCoord = TexCoord;
+	
 	Output.Color = Input.Color;
 
 	return Output;
@@ -105,21 +83,44 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Simple Pixel Shader
 //-----------------------------------------------------------------------------
 
+float2 Coord1Offset = float2( 0.75f,  0.50f);
+float2 Coord2Offset = float2( 0.25f,  1.00f);
+float2 Coord3Offset = float2(-0.50f,  0.75f);
+float2 Coord4Offset = float2(-1.00f,  0.25f);
+float2 Coord5Offset = float2(-0.75f, -0.50f);
+float2 Coord6Offset = float2(-0.25f, -1.00f);
+float2 Coord7Offset = float2( 0.50f, -0.75f);
+float2 Coord8Offset = float2( 1.00f, -0.25f);
+
+uniform float2 Defocus = float2(0.0f, 0.0f);
+
+uniform bool OrientationSwapXY = false; // false landscape, true portrait for default screen orientation
+uniform bool RotationSwapXY = false; // swapped default screen orientation due to screen rotation
+
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float4 d0 = tex2D(DiffuseSampler, Input.TexCoord0);
-	float3 d1 = tex2D(DiffuseSampler, Input.TexCoord1).rgb;
-	float3 d2 = tex2D(DiffuseSampler, Input.TexCoord2).rgb;
-	float3 d3 = tex2D(DiffuseSampler, Input.TexCoord3).rgb;
-	float3 d4 = tex2D(DiffuseSampler, Input.TexCoord4).rgb;
-	float3 d5 = tex2D(DiffuseSampler, Input.TexCoord5).rgb;
-	float3 d6 = tex2D(DiffuseSampler, Input.TexCoord6).rgb;
-	float3 d7 = tex2D(DiffuseSampler, Input.TexCoord7).rgb;
+	float2 QuadRatio = 
+		float2(1.0f, xor(OrientationSwapXY, RotationSwapXY) 
+			? QuadDims.y / QuadDims.x 
+			: QuadDims.x / QuadDims.y);
 
-	float3 blurred = (d0.rgb + d1 + d2 + d3 + d4 + d5 + d6 + d7) / 8.0f;
-	blurred = lerp(d0.rgb, blurred, 1.0f);
+	// imaginary texel dimensions independed from quad dimensions, but dependend on quad ratio
+	float2 DefocusTexelDims = (1.0f / 1024.0) * SourceRect * QuadRatio * Defocus;
 
-	return float4(blurred, d0.a);
+	float4 d = tex2D(DiffuseSampler, Input.TexCoord);
+	float3 d1 = tex2D(DiffuseSampler, Input.TexCoord + Coord1Offset * DefocusTexelDims).rgb;
+	float3 d2 = tex2D(DiffuseSampler, Input.TexCoord + Coord2Offset * DefocusTexelDims).rgb;
+	float3 d3 = tex2D(DiffuseSampler, Input.TexCoord + Coord3Offset * DefocusTexelDims).rgb;
+	float3 d4 = tex2D(DiffuseSampler, Input.TexCoord + Coord4Offset * DefocusTexelDims).rgb;
+	float3 d5 = tex2D(DiffuseSampler, Input.TexCoord + Coord5Offset * DefocusTexelDims).rgb;
+	float3 d6 = tex2D(DiffuseSampler, Input.TexCoord + Coord6Offset * DefocusTexelDims).rgb;
+	float3 d7 = tex2D(DiffuseSampler, Input.TexCoord + Coord7Offset * DefocusTexelDims).rgb;
+	float3 d8 = tex2D(DiffuseSampler, Input.TexCoord + Coord8Offset * DefocusTexelDims).rgb;
+
+	float3 blurred = (d.rgb + d1 + d2 + d3 + d4 + d5 + d6 + d7 + d8) / 9.0f;
+	blurred = lerp(d.rgb, blurred, 1.0f);
+
+	return float4(blurred, d.a);
 }
 
 //-----------------------------------------------------------------------------

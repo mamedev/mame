@@ -60,7 +60,7 @@ static void swap_strncpy(UINT16 *dst, const char *src, int field_size_in_words)
 {
 	for (int i = 0; i < field_size_in_words; i++)
 	{
-		UINT16 d = 0;
+		UINT16 d;
 
 		if (*src)
 		{
@@ -404,7 +404,7 @@ void ata_mass_storage_device::fill_buffer()
 
 void ata_mass_storage_device::finished_read()
 {
-	int lba = lba_address(), count = 0;
+	int lba = lba_address(), count;
 
 	set_dasp(CLEAR_LINE);
 
@@ -534,7 +534,7 @@ void ata_mass_storage_device::process_buffer()
 
 void ata_mass_storage_device::finished_write()
 {
-	int lba = lba_address(), count = 0;
+	int lba = lba_address(), count;
 
 	set_dasp(CLEAR_LINE);
 

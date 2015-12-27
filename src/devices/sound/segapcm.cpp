@@ -46,7 +46,7 @@ void segapcm_device::device_start()
 	if (!mask)
 		mask = BANK_MASK7 >> 16;
 
-	for(rom_mask = 1; rom_mask < m_rom.length(); rom_mask *= 2);
+	for(rom_mask = 1; rom_mask < m_rom.length(); rom_mask *= 2) { };
 	rom_mask--;
 
 	m_bankmask = mask & (rom_mask >> m_bankshift);
@@ -106,7 +106,7 @@ void segapcm_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			/* loop over samples on this channel */
 			for (i = 0; i < samples; i++)
 			{
-				INT8 v = 0;
+				INT8 v;
 
 				/* handle looping if we've hit the end */
 				if ((addr >> 16) == end)
