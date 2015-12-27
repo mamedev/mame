@@ -156,7 +156,6 @@ static ADDRESS_MAP_START( laserbat_io_map, AS_IO, 8, laserbat_state_base )
 ADDRESS_MAP_END
 
 
-// the same as in zaccaria.c ?
 static ADDRESS_MAP_START( catnmous_sound_map, AS_PROGRAM, 8, catnmous_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia", pia6821_device, read, write)
@@ -280,6 +279,13 @@ static INPUT_PORTS_START( laserbat )
 	PORT_DIPNAME( 0x80, 0x80, "Collision Detection" )   PORT_DIPLOCATION("SW-1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x80, DEF_STR(On) )
+
+	PORT_MODIFY("SW2")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR(Bonus_Life) )     PORT_DIPLOCATION("SW-2:6,7")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x20, "10,000" )
+	PORT_DIPSETTING(    0x40, "14,000" )
+	PORT_DIPSETTING(    0x60, "18,000" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lazarian )
@@ -315,11 +321,6 @@ static INPUT_PORTS_START( lazarian )
 	PORT_DIPSETTING(    0x08, DEF_STR(Medium) )
 	PORT_DIPSETTING(    0x10, DEF_STR(Difficult) )
 	PORT_DIPSETTING(    0x18, DEF_STR(Very_Difficult) )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR(Bonus_Life) )     PORT_DIPLOCATION("SW-2:6,7")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x20, "10,000" )
-	PORT_DIPSETTING(    0x40, "14,000" )
-	PORT_DIPSETTING(    0x60, "18,000" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( catnmous )
@@ -369,10 +370,10 @@ static const gfx_layout sprites_layout =
 	RGN_FRAC(1,1),
 	2,
 	{ 0, 1 },
-	{  0, 2, 4, 6, 8,10,12,14,16,18,20,22,24,26,28,30,
+	{    0, 2, 4, 6, 8,10,12,14,16,18,20,22,24,26,28,30,
 		32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62
 	},
-	{  0*32, 2*32, 4*32, 6*32, 8*32,10*32,12*32,14*32,
+	{    0*32, 2*32, 4*32, 6*32, 8*32,10*32,12*32,14*32,
 		16*32,18*32,20*32,22*32,24*32,26*32,28*32,30*32,
 		32*32,34*32,36*32,38*32,40*32,42*32,44*32,46*32,
 		48*32,50*32,52*32,54*32,56*32,58*32,60*32,62*32
@@ -520,7 +521,7 @@ void laserbat_state_base::device_timer(emu_timer &timer, device_timer_id id, int
 }
 
 
-static MACHINE_CONFIG_START( laserbat, laserbat_state )
+static MACHINE_CONFIG_START( laserbat_base, laserbat_state_base )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/4)
@@ -552,6 +553,10 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_S2636_DIVIDER(3)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", laserbat)
+
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED_CLASS( laserbat, laserbat_base, laserbat_state )
 
 	// sound board devices
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -579,41 +584,10 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( catnmous, catnmous_state )
-
-	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/4)
-	MCFG_CPU_PROGRAM_MAP(laserbat_map)
-	MCFG_CPU_IO_MAP(laserbat_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbat_state_base, laserbat_interrupt)
-
-	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 227*4, 43*4-1, 227*4-1, 312, 8, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state_base, screen_update_laserbat)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(laserbat_state_base, laserbat)
-
-	MCFG_PLS100_ADD("gfxmix")
-
-	MCFG_DEVICE_ADD("pvi1", S2636, XTAL_14_31818MHz/3)
-	MCFG_S2636_OFFSETS(-8, -24)
-	MCFG_S2636_DIVIDER(3)
-
-	MCFG_DEVICE_ADD("pvi2", S2636, XTAL_14_31818MHz/3)
-	MCFG_S2636_OFFSETS(-8, -24)
-	MCFG_S2636_DIVIDER(3)
-
-	MCFG_DEVICE_ADD("pvi3", S2636, XTAL_14_31818MHz/3)
-	MCFG_S2636_OFFSETS(-8, -24)
-	MCFG_S2636_DIVIDER(3)
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", laserbat)
+static MACHINE_CONFIG_DERIVED_CLASS( catnmous, laserbat_base, catnmous_state )
 
 	// sound board devices
-	MCFG_CPU_ADD("audiocpu", M6802,3580000) /* ? */
+	MCFG_CPU_ADD("audiocpu", M6802, 3580000) // ?
 	MCFG_CPU_PROGRAM_MAP(catnmous_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(catnmous_state, zaccaria_cb1_toggle,  (double)3580000/4096)
 
@@ -635,25 +609,6 @@ static MACHINE_CONFIG_START( catnmous, catnmous_state )
 
 MACHINE_CONFIG_END
 
-
-/*
-
-Main cpu : 2650 signetics
-quartz   : can't read it
-Sub      : 2636 signetics (3 pieces)
-ram      : 2114 (6 pieces in total)
-special  : 82s100
-special  : 2621N
-
-Sound board info :
-
-TMS SN76477N
-TMS 3615NS-28 (x2)
-Xtal : 4.000 Mhz
-
-+ a few usual 74 chips
-
-*/
 
 ROM_START( laserbat )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -687,6 +642,7 @@ ROM_START( laserbat )
 	ROM_LOAD( "lb02.14l",     0x0000, 0x0800, CRC(d29962d1) SHA1(5b6d0856c3ebbd5833b522f7c0240309cf3c9777) )
 
 	ROM_REGION( 0x0100, "gfxmix", 0 )
+	// copied from lazarian to give working graphics, need dump to confirm
 	ROM_LOAD( "82s100_prom",  0x0000, 0x00f5, CRC(c3eb562a) SHA1(65dff81b2e5321d530e5171dab9aa3809ab38b4d) BAD_DUMP )
 ROM_END
 
@@ -778,11 +734,6 @@ ROM_START( catnmous )
 	ROM_CONTINUE(             0x3000, 0x0400 )
 	ROM_CONTINUE(             0x7000, 0x0400 )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "sound01.1d",   0xd000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
-	ROM_LOAD( "sound01.1f",   0xe000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
-	ROM_LOAD( "sound01.1e",   0xf000, 0x1000, CRC(1bd90c93) SHA1(20fd2b765a42e25cf7f716e6631b8c567785a866) )
-
 	ROM_REGION( 0x1800, "gfx1", 0 )
 	ROM_LOAD( "type01.8g",    0x0000, 0x0800, CRC(2b180d4a) SHA1(b6f48ffdbad64b4d9f1fe838000187800c51228c) )
 	ROM_LOAD( "type01.10g",   0x0800, 0x0800, CRC(e5259f9b) SHA1(396753291ab36c3ed72208d619665fc0f33d1e17) )
@@ -793,6 +744,11 @@ ROM_START( catnmous )
 
 	ROM_REGION( 0x0100, "gfxmix", 0 )
 	ROM_LOAD( "82s100.13m",   0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "sound01.1d",   0xd000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
+	ROM_LOAD( "sound01.1f",   0xe000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
+	ROM_LOAD( "sound01.1e",   0xf000, 0x1000, CRC(1bd90c93) SHA1(20fd2b765a42e25cf7f716e6631b8c567785a866) )
 ROM_END
 
 ROM_START( catnmousa )
@@ -819,11 +775,6 @@ ROM_START( catnmousa )
 	ROM_LOAD( "catnmous.2b",  0x3000, 0x0400, BAD_DUMP CRC(880728fa) SHA1(f204d669c190ad0cf2c885af12625026534db655) )
 	ROM_CONTINUE(             0x7000, 0x0400 )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "snd.1d",       0xd000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
-	ROM_LOAD( "snd.1f",       0xe000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
-	ROM_LOAD( "snd.1e",       0xf000, 0x1000, CRC(1bd90c93) SHA1(20fd2b765a42e25cf7f716e6631b8c567785a866) )
-
 	ROM_REGION( 0x1800, "gfx1", 0 )
 	ROM_LOAD( "catnmous.8g",  0x0000, 0x0800, CRC(2b180d4a) SHA1(b6f48ffdbad64b4d9f1fe838000187800c51228c) )
 	ROM_LOAD( "catnmous.10g", 0x0800, 0x0800, CRC(e5259f9b) SHA1(396753291ab36c3ed72208d619665fc0f33d1e17) )
@@ -833,7 +784,13 @@ ROM_START( catnmousa )
 	ROM_LOAD( "catnmous.14l", 0x0000, 0x0800, CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
 
 	ROM_REGION( 0x0100, "gfxmix", 0 )
+	// copied from parent set to give working graphics, need dump to confirm
 	ROM_LOAD( "catnmousa_82s100.13m", 0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) BAD_DUMP )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "snd.1d",       0xd000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
+	ROM_LOAD( "snd.1f",       0xe000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
+	ROM_LOAD( "snd.1e",       0xf000, 0x1000, CRC(1bd90c93) SHA1(20fd2b765a42e25cf7f716e6631b8c567785a866) )
 ROM_END
 
 

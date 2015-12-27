@@ -351,15 +351,15 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 	{
 		// calculate area effects
 		// I have no idea where the magical x offset comes from but it's necessary
-		bool const right_half = bool((x + 6) & 0x80);
-		bool const eff1_cmp = right_half ? (UINT8((x + 6) & 0x7f) < (eff1_val & 0x7f)) : (UINT8((x + 6) & 0x7f) > (~eff1_val & 0x7f));
-		bool const eff2_cmp = right_half ? (UINT8((x + 6) & 0x7f) < (eff2_val & 0x7f)) : (UINT8((x + 6) & 0x7f) > (~eff2_val & 0x7f));
+		bool const right_half = bool((x + 8) & 0x80);
+		bool const eff1_cmp = right_half ? (UINT8((x + 8) & 0x7f) < (eff1_val & 0x7f)) : (UINT8((x + 8) & 0x7f) > (~eff1_val & 0x7f));
+		bool const eff2_cmp = right_half ? (UINT8((x + 8) & 0x7f) < (eff2_val & 0x7f)) : (UINT8((x + 8) & 0x7f) > (~eff2_val & 0x7f));
 		bool const eff1 = m_abeff1 && (m_neg1 ? !eff1_cmp : eff1_cmp);
 		bool const eff2 = m_abeff2 && (m_neg2 ? !eff2_cmp : eff2_cmp) && m_mpx_eff2_sh;
 
 		// calculate shell point effect
 		// using the same magical offset as the area effects
-		bool const shell = m_abeff2 && (UINT8((x + 6) & 0xff) == (eff2_val & 0xff)) && !m_mpx_eff2_sh;
+		bool const shell = m_abeff2 && (UINT8((x + 8) & 0xff) == (eff2_val & 0xff)) && !m_mpx_eff2_sh;
 
 		// set effect bits, and mix in PVI graphics while we're here
 		UINT16 const effect_bits = (shell ? 0x0800 : 0x0000) | (eff1 ? 0x1000 : 0x0000) | (eff2 ? 0x2000 : 0x0000);
