@@ -736,7 +736,7 @@ static MACHINE_CONFIG_START( squale, squale_state )
 
 	/* screen */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("ef9365", ef9365_device, screen_update)
 
 	MCFG_SCREEN_SIZE(256, 256)
