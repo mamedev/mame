@@ -18,6 +18,8 @@
 #include <vector>
 
 #include <QtWidgets/QApplication>
+#include <QtCore/QAbstractEventDispatcher>
+#include <QtCore/QAbstractNativeEventFilter>
 
 #include "emu.h"
 #include "config.h"
@@ -32,7 +34,7 @@
 #include "qt/deviceswindow.h"
 #include "qt/deviceinformationwindow.h"
 
-class debug_qt : public osd_module, public debug_module
+class debug_qt : public osd_module, public debug_module, public QAbstractNativeEventFilter
 {
 public:
 	debug_qt()
@@ -49,7 +51,7 @@ public:
 	virtual void init_debugger(running_machine &machine);
 	virtual void wait_for_debugger(device_t &device, bool firststop);
 	virtual void debugger_update();
-
+	virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *) Q_DECL_OVERRIDE;
 private:
 	running_machine *m_machine;
 };
@@ -231,6 +233,12 @@ static void bring_main_window_to_front()
 
 #if defined(WIN32) && !defined(SDLMAME_WIN32)
 bool winwindow_qt_filter(void *message);
+    
+bool debug_qt::nativeEventFilter(const QByteArray &eventType, void *message, long *)
+{
+	winwindow_qt_filter(message);
+	return false;
+}
 #endif
 
 void debug_qt::init_debugger(running_machine &machine)
@@ -240,7 +248,7 @@ void debug_qt::init_debugger(running_machine &machine)
 		// If you're starting from scratch, create a new qApp
 		new QApplication(qtArgc, qtArgv);
 #if defined(WIN32) && !defined(SDLMAME_WIN32)
-		QAbstractEventDispatcher::instance()->setEventFilter((QAbstractEventDispatcher::EventFilter)&winwindow_qt_filter);
+		QAbstractEventDispatcher::instance()->installNativeEventFilter(this);
 #endif
 	}
 	else
