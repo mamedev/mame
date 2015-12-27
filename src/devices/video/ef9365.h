@@ -4,7 +4,7 @@
 
     ef9365.h
 
-    Thomson EF9365 video controller
+    Thomson EF9365/EF9366 video controller
 
 *********************************************************************/
 
@@ -13,9 +13,17 @@
 #ifndef __EF9365_H__
 #define __EF9365_H__
 
+#define EF936X_BITPLAN_MAX_SIZE 0x8000
+#define EF936X_MAX_BITPLANS  8
 
-#define MCFG_EF9365_PALETTE(_palette_tag) \
+#define MCFG_EF936X_PALETTE(_palette_tag) \
 	ef9365_device::static_set_palette_tag(*device, "^" _palette_tag);
+
+#define MCFG_EF936X_BITPLANS_CNT(_bitplans_number) \
+	ef9365_device::static_set_nb_bitplans(*device,_bitplans_number);
+
+#define MCFG_EF936X_DISPLAYMODE(_display_mode) \
+	ef9365_device::static_set_display_mode(*device,_display_mode);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -33,14 +41,17 @@ public:
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void static_set_nb_bitplans(device_t &device, int nb_bitplans );
+	static void static_set_display_mode(device_t &device, int display_mode );
 
 	// device interface
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
 
 	void update_scanline(UINT16 scanline);
-	void static_set_color_filler( UINT8 color );
-	void static_set_color_entry( int index, UINT8 r, UINT8 g, UINT8 b );
+	void set_color_filler( UINT8 color );
+	void set_color_entry( int index, UINT8 r, UINT8 g, UINT8 b );
+
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -59,9 +70,9 @@ protected:
 
 private:
 	int get_char_pix( unsigned char c, int x, int y );
-	void draw_character( unsigned char c, int block, int smallblock );
 	void plot(int x_pos,int y_pos);
-	void draw_vector(int x1,int y1,int x2,int y2);
+	int draw_character( unsigned char c, int block, int smallblock );
+	int draw_vector(int x1,int y1,int x2,int y2);
 	unsigned int get_x_reg();
 	unsigned int get_y_reg();
 	void set_x_reg(unsigned int x);
@@ -71,6 +82,7 @@ private:
 	void set_video_mode(void);
 	void draw_border(UINT16 line);
 	void ef9365_exec(UINT8 cmd);
+	int  cycles_to_us(int cycles);
 
 	// internal state
 	static const device_timer_id BUSY_TIMER = 0;
@@ -83,8 +95,17 @@ private:
 	UINT8 m_registers[0x10];                //registers
 	UINT8 m_state;                          //status register
 	UINT8 m_border[80];                     //border color
-	rgb_t palette[16];
 
+	rgb_t palette[256];                     // 8 bitplans max -> 256 colors max
+	int   nb_of_bitplans;
+	int   nb_of_colors;
+	int   bitplan_xres;
+	int   bitplan_yres;
+	UINT16 overflow_mask_x;
+	UINT16 overflow_mask_y;
+	int   vsync_scanline_pos;
+
+	UINT32 clock_freq;
 	bitmap_rgb32 m_screen_out;
 
 	// timers
@@ -96,18 +117,23 @@ private:
 // device type definition
 extern const device_type EF9365;
 
-#define EF9365_REG_STATUS 0x00
-#define EF9365_REG_CMD    0x00
-#define EF9365_REG_CTRL1  0x01
-#define EF9365_REG_CTRL2  0x02
-#define EF9365_REG_CSIZE  0x03
-#define EF9365_REG_DELTAX 0x05
-#define EF9365_REG_DELTAY 0x07
-#define EF9365_REG_X_MSB  0x08
-#define EF9365_REG_X_LSB  0x09
-#define EF9365_REG_Y_MSB  0x0A
-#define EF9365_REG_Y_LSB  0x0B
-#define EF9365_REG_XLP    0x0C
-#define EF9365_REG_YLP    0x0D
+#define EF936X_REG_STATUS 0x00
+#define EF936X_REG_CMD    0x00
+#define EF936X_REG_CTRL1  0x01
+#define EF936X_REG_CTRL2  0x02
+#define EF936X_REG_CSIZE  0x03
+#define EF936X_REG_DELTAX 0x05
+#define EF936X_REG_DELTAY 0x07
+#define EF936X_REG_X_MSB  0x08
+#define EF936X_REG_X_LSB  0x09
+#define EF936X_REG_Y_MSB  0x0A
+#define EF936X_REG_Y_LSB  0x0B
+#define EF936X_REG_XLP    0x0C
+#define EF936X_REG_YLP    0x0D
+
+#define EF936X_256x256_DISPLAY_MODE    0x00
+#define EF936X_512x512_DISPLAY_MODE    0x01
+#define EF936X_512x256_DISPLAY_MODE    0x02
+
 
 #endif
