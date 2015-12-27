@@ -34,7 +34,10 @@
 #include "qt/deviceswindow.h"
 #include "qt/deviceinformationwindow.h"
 
-class debug_qt : public osd_module, public debug_module, public QAbstractNativeEventFilter
+class debug_qt : public osd_module, public debug_module
+#if defined(WIN32) && !defined(SDLMAME_WIN32)
+, public QAbstractNativeEventFilter
+#endif
 {
 public:
 	debug_qt()
@@ -51,7 +54,9 @@ public:
 	virtual void init_debugger(running_machine &machine);
 	virtual void wait_for_debugger(device_t &device, bool firststop);
 	virtual void debugger_update();
+#if defined(WIN32) && !defined(SDLMAME_WIN32)
 	virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *) Q_DECL_OVERRIDE;
+#endif
 private:
 	running_machine *m_machine;
 };
@@ -233,7 +238,7 @@ static void bring_main_window_to_front()
 
 #if defined(WIN32) && !defined(SDLMAME_WIN32)
 bool winwindow_qt_filter(void *message);
-    
+
 bool debug_qt::nativeEventFilter(const QByteArray &eventType, void *message, long *)
 {
 	winwindow_qt_filter(message);
