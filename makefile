@@ -118,12 +118,16 @@ GENIEOS := windows
 PLATFORM := x86
 else
 UNAME := $(shell uname -mps)
+UNAME_M := $(shell uname -m)
 GENIEOS := linux
 PLATFORM := unknown
-ifeq ($(firstword $(filter x86,$(UNAME))),x86)
+ifneq ($(filter x86_64,$(UNAME_M)),)
 PLATFORM := x86
 endif 
-ifeq ($(firstword $(filter arm,$(UNAME))),arm)
+ifneq ($(filter %86,$(UNAME_M)),)
+PLATFORM := x86
+endif 
+ifneq ($(filter arm%,$(UNAME_M)),)
 PLATFORM := arm
 endif 
 
