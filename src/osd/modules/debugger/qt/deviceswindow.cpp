@@ -128,8 +128,8 @@ DevicesWindow::DevicesWindow(running_machine* machine, QWidget* parent) :
 	m_devices_view->setModel(&m_devices_model);
 	m_devices_view->expandAll();
 	m_devices_view->resizeColumnToContents(0);
-	connect(m_devices_view->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &,const QModelIndex &)), this, SLOT(currentRowChanged(const QModelIndex &,const QModelIndex &)));
-	connect(m_devices_view, SIGNAL(activated(const QModelIndex &)), this, SLOT(activated(const QModelIndex &)));
+	connect(m_devices_view->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &DevicesWindow::currentRowChanged);
+	connect(m_devices_view, &QTreeView::activated, this, &DevicesWindow::activated);
 	setCentralWidget(m_devices_view);
 }
 

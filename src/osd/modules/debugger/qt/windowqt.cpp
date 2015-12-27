@@ -2,6 +2,9 @@
 // copyright-holders:Andrew Gardner
 #define NO_MEM_TRACKING
 
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMenuBar>
+
 #include "windowqt.h"
 #include "logwindow.h"
 #include "dasmwindow.h"
@@ -27,71 +30,71 @@ WindowQt::WindowQt(running_machine* machine, QWidget* parent) :
 	// The Debug menu bar
 	QAction* debugActOpenMemory = new QAction("New &Memory Window", this);
 	debugActOpenMemory->setShortcut(QKeySequence("Ctrl+M"));
-	connect(debugActOpenMemory, SIGNAL(triggered()), this, SLOT(debugActOpenMemory()));
+	connect(debugActOpenMemory, &QAction::triggered, this, &WindowQt::debugActOpenMemory);
 
 	QAction* debugActOpenDasm = new QAction("New &Dasm Window", this);
 	debugActOpenDasm->setShortcut(QKeySequence("Ctrl+D"));
-	connect(debugActOpenDasm, SIGNAL(triggered()), this, SLOT(debugActOpenDasm()));
+	connect(debugActOpenDasm, &QAction::triggered, this, &WindowQt::debugActOpenDasm);
 
 	QAction* debugActOpenLog = new QAction("New &Log Window", this);
 	debugActOpenLog->setShortcut(QKeySequence("Ctrl+L"));
-	connect(debugActOpenLog, SIGNAL(triggered()), this, SLOT(debugActOpenLog()));
+	connect(debugActOpenLog, &QAction::triggered, this, &WindowQt::debugActOpenLog);
 
 	QAction* debugActOpenPoints = new QAction("New &Break|Watchpoints Window", this);
 	debugActOpenPoints->setShortcut(QKeySequence("Ctrl+B"));
-	connect(debugActOpenPoints, SIGNAL(triggered()), this, SLOT(debugActOpenPoints()));
+	connect(debugActOpenPoints, &QAction::triggered, this, &WindowQt::debugActOpenPoints);
 
 	QAction* debugActOpenDevices = new QAction("New D&evices Window", this);
 	debugActOpenDevices->setShortcut(QKeySequence("Shift+Ctrl+D"));
-	connect(debugActOpenDevices, SIGNAL(triggered()), this, SLOT(debugActOpenDevices()));
+	connect(debugActOpenDevices, &QAction::triggered, this, &WindowQt::debugActOpenDevices);
 
 	QAction* dbgActRun = new QAction("Run", this);
 	dbgActRun->setShortcut(Qt::Key_F5);
-	connect(dbgActRun, SIGNAL(triggered()), this, SLOT(debugActRun()));
+	connect(dbgActRun, &QAction::triggered, this, &WindowQt::debugActRun);
 
 	QAction* dbgActRunAndHide = new QAction("Run And Hide Debugger", this);
 	dbgActRunAndHide->setShortcut(Qt::Key_F12);
-	connect(dbgActRunAndHide, SIGNAL(triggered()), this, SLOT(debugActRunAndHide()));
+	connect(dbgActRunAndHide, &QAction::triggered, this, &WindowQt::debugActRunAndHide);
 
 	QAction* dbgActRunToNextCpu = new QAction("Run to Next CPU", this);
 	dbgActRunToNextCpu->setShortcut(Qt::Key_F6);
-	connect(dbgActRunToNextCpu, SIGNAL(triggered()), this, SLOT(debugActRunToNextCpu()));
+	connect(dbgActRunToNextCpu, &QAction::triggered, this, &WindowQt::debugActRunToNextCpu);
 
 	QAction* dbgActRunNextInt = new QAction("Run to Next Interrupt on This CPU", this);
 	dbgActRunNextInt->setShortcut(Qt::Key_F7);
-	connect(dbgActRunNextInt, SIGNAL(triggered()), this, SLOT(debugActRunNextInt()));
+	connect(dbgActRunNextInt, &QAction::triggered, this, &WindowQt::debugActRunNextInt);
 
 	QAction* dbgActRunNextVBlank = new QAction("Run to Next VBlank", this);
 	dbgActRunNextVBlank->setShortcut(Qt::Key_F8);
-	connect(dbgActRunNextVBlank, SIGNAL(triggered()), this, SLOT(debugActRunNextVBlank()));
+	connect(dbgActRunNextVBlank, &QAction::triggered, this, &WindowQt::debugActRunNextVBlank);
 
 	QAction* dbgActStepInto = new QAction("Step Into", this);
 	dbgActStepInto->setShortcut(Qt::Key_F11);
-	connect(dbgActStepInto, SIGNAL(triggered()), this, SLOT(debugActStepInto()));
+	connect(dbgActStepInto, &QAction::triggered, this, &WindowQt::debugActStepInto);
 
 	QAction* dbgActStepOver = new QAction("Step Over", this);
 	dbgActStepOver->setShortcut(Qt::Key_F10);
-	connect(dbgActStepOver, SIGNAL(triggered()), this, SLOT(debugActStepOver()));
+	connect(dbgActStepOver, &QAction::triggered, this, &WindowQt::debugActStepOver);
 
 	QAction* dbgActStepOut = new QAction("Step Out", this);
 	dbgActStepOut->setShortcut(QKeySequence("Shift+F11"));
-	connect(dbgActStepOut, SIGNAL(triggered()), this, SLOT(debugActStepOut()));
+	connect(dbgActStepOut, &QAction::triggered, this, &WindowQt::debugActStepOut);
 
 	QAction* dbgActSoftReset = new QAction("Soft Reset", this);
 	dbgActSoftReset->setShortcut(Qt::Key_F3);
-	connect(dbgActSoftReset, SIGNAL(triggered()), this, SLOT(debugActSoftReset()));
+	connect(dbgActSoftReset, &QAction::triggered, this, &WindowQt::debugActSoftReset);
 
 	QAction* dbgActHardReset = new QAction("Hard Reset", this);
 	dbgActHardReset->setShortcut(QKeySequence("Shift+F3"));
-	connect(dbgActHardReset, SIGNAL(triggered()), this, SLOT(debugActHardReset()));
+	connect(dbgActHardReset, &QAction::triggered, this, &WindowQt::debugActHardReset);
 
 	QAction* dbgActClose = new QAction("Close &Window", this);
 	dbgActClose->setShortcut(QKeySequence::Close);
-	connect(dbgActClose, SIGNAL(triggered()), this, SLOT(debugActClose()));
+	connect(dbgActClose, &QAction::triggered, this, &WindowQt::debugActClose);
 
 	QAction* dbgActQuit = new QAction("&Quit", this);
 	dbgActQuit->setShortcut(QKeySequence::Quit);
-	connect(dbgActQuit, SIGNAL(triggered()), this, SLOT(debugActQuit()));
+	connect(dbgActQuit, &QAction::triggered, this, &WindowQt::debugActQuit);
 
 	// Construct the menu
 	QMenu* debugMenu = menuBar()->addMenu("&Debug");
