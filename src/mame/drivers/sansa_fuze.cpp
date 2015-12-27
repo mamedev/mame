@@ -56,7 +56,7 @@ ROM_START( sanfuze2 )
 	ROM_REGION(0xf00000, "updates2", 0 )
 	/// 02.03.33  (for Fuze 2?)
 	ROM_LOAD( "020333_fuzpa.bin",   0x00000, 0xf00000, CRC(045ec5be) SHA1(d951d93ff1c0a50343e0cf8e6997930b7c94e5ad) ) // original filename fuzpa.bin
-	ROM_LOAD( "020333_clpp_data.dat",   0x00000, 0x566a0d, CRC(2093569c) SHA1(7882abcf000860a3071f5afe91719530bc54c68a) ) // original filename clpp_data.dat
+	ROM_LOAD( "020333_clpp_data.dat",   0x00000, 0x566a0d, CRC(2093569c) SHA1(7882abcf000860a3071f5afe91719530bc54c68a) ) // original filename clpp_data.dat, actually a 6 minute MP3 advertisement for slotRadio
 
 	ROM_REGION(0xf00000, "updates1", 0 )
     // 01.02.31 (for Fuze 1?)
