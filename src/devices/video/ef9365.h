@@ -25,6 +25,9 @@
 #define MCFG_EF936X_DISPLAYMODE(_display_mode) \
 	ef9365_device::static_set_display_mode(*device,_display_mode);
 
+#define MCFG_EF936X_IRQ_HANDLER(_devcb) \
+	devcb = &ef9365_device::set_irq_handler(*device, DEVCB_##_devcb);
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -43,6 +46,7 @@ public:
 	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void static_set_nb_bitplans(device_t &device, int nb_bitplans );
 	static void static_set_display_mode(device_t &device, int display_mode );
+	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ef9365_device &>(device).m_irq_handler.set_callback(object); }
 
 	// device interface
 	DECLARE_READ8_MEMBER( data_r );
@@ -84,12 +88,18 @@ private:
 	void ef9365_exec(UINT8 cmd);
 	int  cycles_to_us(int cycles);
 
+	void update_interrupts();
+
 	// internal state
 	static const device_timer_id BUSY_TIMER = 0;
 
 	memory_region *m_charset;
 	address_space *m_videoram;
 
+	UINT8 m_irq_state;
+	UINT8 m_irq_vb;
+	UINT8 m_irq_lb;
+	UINT8 m_irq_rdy;
 	UINT8 m_current_color;
 	UINT8 m_bf;                             //busy flag
 	UINT8 m_registers[0x10];                //registers
@@ -112,6 +122,7 @@ private:
 	emu_timer *m_busy_timer;
 
 	required_device<palette_device> m_palette;
+	devcb_write_line m_irq_handler;
 };
 
 // device type definition

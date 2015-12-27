@@ -100,7 +100,8 @@ ef9365_device::ef9365_device(const machine_config &mconfig, const char *tag, dev
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, NULL, *ADDRESS_MAP_NAME(ef9365)),
-	m_palette(*this)
+	m_palette(*this),
+	m_irq_handler(*this)
 {
 	clock_freq = clock;
 }
@@ -203,11 +204,18 @@ void ef9365_device::device_start()
 {
 	int i;
 
+	m_irq_handler.resolve_safe();
+
 	m_busy_timer = timer_alloc(BUSY_TIMER);
 
 	m_videoram = &space(0);
 	m_charset = region();
 	m_current_color = 0x0F;
+
+	m_irq_vb = 0;
+	m_irq_lb = 0;
+	m_irq_rdy = 0;
+	m_irq_state = 0;
 
 	// Default palette : Black and white
 	palette[0] = rgb_t(0, 0, 0);
@@ -223,6 +231,11 @@ void ef9365_device::device_start()
 	save_item(NAME(m_bf));
 	save_item(NAME(m_state));
 
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_irq_vb));
+	save_item(NAME(m_irq_lb));
+	save_item(NAME(m_irq_rdy));
+
 	save_item(NAME(m_screen_out));
 }
 
@@ -232,7 +245,12 @@ void ef9365_device::device_start()
 void ef9365_device::device_reset()
 {
 	m_state = 0;
+
 	m_bf = 0;
+	m_irq_state = 0;
+	m_irq_vb = 0;
+	m_irq_lb = 0;
+	m_irq_rdy = 0;
 
 	memset(m_registers, 0, sizeof(m_registers));
 	memset(m_border, 0, sizeof(m_border));
@@ -240,7 +258,26 @@ void ef9365_device::device_reset()
 	m_screen_out.fill(0);
 
 	set_video_mode();
+
+	m_irq_handler(FALSE);
 }
+
+//-------------------------------------------------
+//  update_interrupts
+//-------------------------------------------------
+void ef9365_device::update_interrupts()
+{
+	int new_state = ( m_irq_vb  && (m_registers[EF936X_REG_CTRL1] & 0x20) )
+				 || ( m_irq_rdy && (m_registers[EF936X_REG_CTRL1] & 0x40) )
+				 || ( m_irq_lb  && (m_registers[EF936X_REG_CTRL1] & 0x10) );
+
+	if (new_state != m_irq_state)
+	{
+		m_irq_state = new_state;
+		m_irq_handler(m_irq_state);
+	}
+}
+
 
 //-------------------------------------------------
 //  device_timer - handler timer events
@@ -251,6 +288,14 @@ void ef9365_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 		case BUSY_TIMER:
 			m_bf = 0;
+
+			if( m_registers[EF936X_REG_CTRL1] & 0x40 )
+			{
+				m_irq_rdy = 1;
+			}
+
+			update_interrupts();
+
 			break;
 	}
 }
@@ -930,7 +975,15 @@ UINT32 ef9365_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 void ef9365_device::update_scanline(UINT16 scanline)
 {
 	if (scanline == vsync_scanline_pos)
+	{
 		m_state |= (0x02); // vsync
+		if( m_registers[EF936X_REG_CTRL1] & 0x20 )
+		{
+			m_irq_vb = 1;
+		}
+
+		update_interrupts();
+	}
 
 	if (scanline == 0)
 	{
@@ -955,6 +1008,31 @@ READ8_MEMBER( ef9365_device::data_r )
 			{
 				m_state |= 0x08;
 			}
+
+			if( m_irq_vb || m_irq_lb || m_irq_rdy )
+			{
+				m_state |= 0x80;
+			}
+
+			if( m_irq_lb )
+			{
+				m_state |= 0x10;
+				m_irq_lb = 0;
+			}
+
+			if( m_irq_vb )
+			{
+				m_state |= 0x20;
+				m_irq_vb = 0;
+			}
+
+			if( m_irq_rdy )
+			{
+				m_state |= 0x40;
+				m_irq_rdy = 0;
+			}
+
+			update_interrupts();
 
 			return_value = m_state;
 		break;
