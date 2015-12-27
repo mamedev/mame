@@ -144,7 +144,6 @@ private:
 
 	emu_timer * m_timer; // timer to delay functions
 	emu_timer * m_timer1; // timer to delay functions
-	int m_timer_type;
 	int m_irq, m_drq;
 
 	bool m_installed;

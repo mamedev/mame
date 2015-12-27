@@ -275,8 +275,6 @@ private:
 	void set_timer_callback(int channel);
 
 	// internal state
-	emu_timer *m_interrupt_timer;
-
 	UINT16 m_seeds[10];
 	UINT8 m_state[8];
 

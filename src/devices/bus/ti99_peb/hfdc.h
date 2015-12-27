@@ -139,9 +139,6 @@ private:
 	// Recent address
 	int m_address;
 
-	// DMA in progress
-	bool m_dma_in_progress;
-
 	// Wait for HD. This was an addition in later cards.
 	bool m_wait_for_hd1;
 
