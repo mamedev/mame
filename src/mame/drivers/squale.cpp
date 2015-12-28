@@ -67,6 +67,7 @@
 
 #define MAIN_CLOCK           XTAL_14MHz
 #define AY_CLOCK             MAIN_CLOCK / 8     /* 1.75 Mhz */
+#define VIDEO_CLOCK          MAIN_CLOCK / 8     /* 1.75 Mhz */
 #define CPU_CLOCK            MAIN_CLOCK / 4     /* 3.50 Mhz */
 
 class squale_state : public driver_device
@@ -153,7 +154,7 @@ WRITE8_MEMBER( squale_state::ctrl_w )
 
 	membank("rom_bank")->set_entry(data >> 7);
 
-	m_ef9365->static_set_color_filler(data & 0xF);
+	m_ef9365->set_color_filler(data & 0xF);
 }
 
 /**********************************
@@ -684,12 +685,12 @@ void squale_state::machine_start()
 	// Generate Squale hardware palette
 	for(i=0;i<8;i++)
 	{
-		m_ef9365->static_set_color_entry(i,(((i&4)>>2)^1) * 255,(((i&2)>>1)^1) * 255, ((i&1)^1) * 255 );
+		m_ef9365->set_color_entry(i,(((i&4)>>2)^1) * 255,(((i&2)>>1)^1) * 255, ((i&1)^1) * 255 );
 	}
 
 	for(i=0;i<8;i++)
 	{
-		m_ef9365->static_set_color_entry(i + 8,(((i&4)>>2)^1) * 127,(((i&2)>>1)^1) * 127, ((i&1)^1) * 127 );
+		m_ef9365->set_color_entry(i + 8,(((i&4)>>2)^1) * 127,(((i&2)>>1)^1) * 127, ((i&1)^1) * 127 );
 	}
 }
 
@@ -734,15 +735,17 @@ static MACHINE_CONFIG_START( squale, squale_state )
 
 	/* screen */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("ef9365", ef9365_device, screen_update)
 
-	MCFG_SCREEN_SIZE(336, 270)
-	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_PALETTE_ADD("palette", 16)
 
-	MCFG_DEVICE_ADD("ef9365", EF9365, 0)
-	MCFG_EF9365_PALETTE("palette")
+	MCFG_DEVICE_ADD("ef9365", EF9365, VIDEO_CLOCK)
+	MCFG_EF936X_PALETTE("palette")
+	MCFG_EF936X_BITPLANS_CNT(4);
+	MCFG_EF936X_DISPLAYMODE(EF936X_256x256_DISPLAY_MODE);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("squale_sl", squale_state, squale_scanline, "screen", 0, 10)
 
 	/* Floppy */
