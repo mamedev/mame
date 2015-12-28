@@ -30,7 +30,7 @@ const char * register_names[]=
 	"0x08 - X MSBs      ",
 	"0x09 - X LSBs      ",
 	"0x0A - Y MSBs      ",
-	"0x0B - X MSBs      ",
+	"0x0B - Y LSBs      ",
 	"0x0C - XLP         ",
 	"0x0D - YLP         ",
 	"0x0E - RESERVED    ",
@@ -344,6 +344,22 @@ void ef9365_device::set_video_mode(void)
 
 	//border color
 	memset(m_border, 0, sizeof(m_border));
+}
+
+// Read back the latched bitplan words
+UINT8 ef9365_device::get_last_readback_word(int bitplan_number, int * pixel_offset)
+{
+	if( pixel_offset )
+		*pixel_offset = m_readback_latch_pix_offset;
+
+	if( bitplan_number < nb_of_bitplans )
+	{
+		return m_readback_latch[bitplan_number];
+	}
+	else
+	{
+		return 0x00;
+	}
 }
 
 void ef9365_device::draw_border(UINT16 line)
@@ -709,6 +725,34 @@ int ef9365_device::cycles_to_us(int cycles)
 	return ( (float)cycles * ( (float)1000000 / (float)clock_freq ) );
 }
 
+// Latch the bitplan words pointed by the x & y regiters (Memory read back function)
+void ef9365_device::dump_bitplanes_word()
+{
+	int p;
+	int pixel_ptr;
+
+	pixel_ptr = ( ( ( ( bitplan_yres - 1 ) - ( get_y_reg() & ( bitplan_yres - 1 ) ) ) * bitplan_xres ) + ( get_x_reg() & ( bitplan_xres - 1 ) ) );
+
+	#ifdef DBGMODE
+	printf("dump : x = %d , y = %d\n", get_x_reg() ,get_y_reg());
+	#endif
+
+	for( p = 0; p < nb_of_bitplans ; p++ )
+	{
+		if( pixel_ptr & 0x4 )
+		{
+			m_readback_latch[p] = ( m_videoram->read_byte( (EF936X_BITPLAN_MAX_SIZE*p) + (pixel_ptr>>3) )  ) & 0xF ;
+		}
+		else
+		{
+			m_readback_latch[p] = ( m_videoram->read_byte( (EF936X_BITPLAN_MAX_SIZE*p) + (pixel_ptr>>3) ) >> 4 ) & 0xF ;
+		}
+		
+	}
+
+	m_readback_latch_pix_offset = pixel_ptr & 0x3;
+}
+
 void ef9365_device::screen_scanning( int force_clear )
 {
 	int x,y,p;
@@ -822,7 +866,8 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 				set_busy_flag( cycles_to_us( 4 ) ); // Timing to check on the real hardware
 			break;
 			case 0xF: // Direct image memory access request for the next free cycle.
-				set_busy_flag( cycles_to_us( 4 ) ); // Timing to check on the real hardware
+				set_busy_flag( cycles_to_us( 64 ) ); // Timing to check on the real hardware
+				dump_bitplanes_word();
 			break;
 			default:
 				logerror("Unemulated EF9365 cmd: %02x\n", cmd);

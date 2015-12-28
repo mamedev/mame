@@ -56,6 +56,8 @@ public:
 	void set_color_filler( UINT8 color );
 	void set_color_entry( int index, UINT8 r, UINT8 g, UINT8 b );
 
+	UINT8 get_last_readback_word(int bitplan_number, int * pixel_offset);
+
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -86,8 +88,8 @@ private:
 	void set_video_mode(void);
 	void draw_border(UINT16 line);
 	void ef9365_exec(UINT8 cmd);
-	int  cycles_to_us(int cycles);
-
+	int  cycles_to_us(int cycles);	
+	void dump_bitplanes_word();
 	void update_interrupts();
 
 	// internal state
@@ -114,6 +116,9 @@ private:
 	UINT16 overflow_mask_x;
 	UINT16 overflow_mask_y;
 	int   vsync_scanline_pos;
+
+	UINT8 m_readback_latch[EF936X_MAX_BITPLANS];   // Last DRAM Readback buffer (Filled after a Direct Memory Access Request command)
+	int m_readback_latch_pix_offset;
 
 	UINT32 clock_freq;
 	bitmap_rgb32 m_screen_out;
