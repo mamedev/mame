@@ -4,7 +4,7 @@
 
  Tatsunoko Vs Capcom : Cross Generation of Heroes
 
- Wii derived? GC derived?
+ Wii derived hardware
 
  -- todo, add more hardware info, seems to have been lost at some point
 
@@ -71,8 +71,14 @@ MACHINE_CONFIG_END
 ROM_START( tvcapcom )
 	// Bios??
 
-	ROM_REGION( 0x21000898, "pic", ROMREGION_ERASE)
-	ROM_LOAD("u14", 0x00, 0x21000898, CRC(51de96ac) SHA1(11a631a695140efa299e6fe9e68c0026dcebc766) ) // type of flash rom? this is a very weird size and seems to cut out in the middle of data??
+	ROM_REGION( 0x21000898, "flash", ROMREGION_ERASE) // it's possible all these dumps are bad
+	
+	ROM_LOAD("tvc_read1.u14", 0x00, 0x21000898, CRC(51de96ac) SHA1(11a631a695140efa299e6fe9e68c0026dcebc766) ) // old dump, lots of data repeats, seems to cut out in the middle of a block?!
+
+	// alt attempts at dumping the same rom, same weird size as above.. the same CRC was read consistently each time, but then differed when read again later without being used inbetween, some blocks seem to get swapped around?!
+	ROM_LOAD("tvc_read2.u14",  0x00, 0x21000898, CRC(efb5911f) SHA1(555e58c2d3744cfe649b7424937c07a3ce675838))
+	ROM_LOAD("tvc_read3.u14",  0x00, 0x21000898, CRC(4a3f143d) SHA1(83bb7abc5f925df9c4e28de0298aed7b3b791e37))
+
 ROM_END
 
 GAME( 2008, tvcapcom,  0, tvcapcom,    tvcapcom, driver_device, 0, ROT0, "Capcom",            "Tatsunoko Vs Capcom : Cross Generation of Heroes", MACHINE_IS_SKELETON )
