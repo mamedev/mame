@@ -50,8 +50,7 @@
 ----------------------------------------------------------------------------
 
   TODO:
-  - spellb numbers don't match with picture book - roms were doublechecked
-  - spellb random lockups - *
+  - spellb fetches wrong word sometimes (on lv1 SPOON and ANT) - roms were doublechecked
 
 
 ***************************************************************************/
@@ -183,8 +182,8 @@ WRITE8_MEMBER(tispellb_state::rev1_ctl_w)
 
 READ8_MEMBER(tispellb_state::sub_read_k)
 {
-	// sub K3210 <- main CTL3201
-	return BITSWAP8(m_rev1_ctl,7,6,5,4,3,2,0,1);
+	// sub K8421 <- main CTL3210
+	return m_rev1_ctl;
 }
 
 WRITE16_MEMBER(tispellb_state::sub_write_o)
@@ -435,6 +434,6 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1978, spellb,    0,        0,  rev1,   spellb,    driver_device, 0, "Texas Instruments", "Spelling B (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1978, spellb,    0,        0,  rev1,   spellb,    driver_device, 0, "Texas Instruments", "Spelling B (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 COMP( 1979, mrchalgr,  0,        0,  rev2,   mrchalgr,  driver_device, 0, "Texas Instruments", "Mr. Challenger", MACHINE_SUPPORTS_SAVE )
