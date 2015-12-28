@@ -99,7 +99,7 @@ ef9365_device::ef9365_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, EF9365, "EF9365", tag, owner, clock, "ef9365", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, NULL, *ADDRESS_MAP_NAME(ef9365)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, nullptr, *ADDRESS_MAP_NAME(ef9365)),
 	m_palette(*this),
 	m_irq_handler(*this)
 {
