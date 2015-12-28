@@ -20,12 +20,17 @@
     Aero Blaster (label shows "Vol. 33") [dumped]
     After Burner
     Ankoku Densetu
+    Armed-F
     Ballistix
+    Be Ball
     Bomberman (label shows "Vol. 34")
     Columns [dumped]
+    Coryoon
+    Cross Wiber
     Cyber Core
     Daisempuu
     Dead Moon
+    Devil Crush
     Die Hard
     Dodge Ball
     Doraemon Meikyuu Daisakusen
@@ -38,44 +43,57 @@
     Final Match Tennis
     Formation Soccer [dumped]
     Gomola Speed [dumped]
+    Gunhed
     Jackie Chan [dumped]
     Jinmu Densho
     Kiki Kaikai
     Legend Of Hero Tomna
     Legendary Axe [dumped]
     Liquid Kids
+    Long Nose Goblin
     Mr. Heli
+    Ninja Ryukenden
+    Operation Wolf
     Out Run
+    Override
     Pac-Land
     PC Denjin Punkic Cyborg
     PC Genjin
     PC Genjin 2 [dumped]
+    Power Drift
     Power Eleven [dumped]
     Power Golf
     Power League IV [dumped]
     Power Sports
     Psycho Chaser
     Puzzle Boy
+    R-Type II
     Rastan Saga II [dumped]
     Saigo no Nindou
     Salamander
     Shinobi
     Side Arms
     Skweek
+    Soldier Blade
     Son Son II
     Special Criminal Investigation [dumped]
+    Super Foolish Man
     Super Star Soldier (label shows "Vol. 30") [dumped]
     Super Volley ball [dumped]
     Tatsujin
     Terra Cresta II
     Thunder Blade [dumped]
+    Tiger Road
     Toy Shop Boys
     Tricky
+    TV Sports
     USA Pro Basketball [dumped]
     Veigues
     Vigilante
     Volfied [dumped]
     W-Ring
+    Winning Shot
+    World Baseball '91
     Xevious
 
  _______________________________________________________________________________________________________________________________________________
