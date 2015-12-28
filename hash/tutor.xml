@@ -80,18 +80,18 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 
 <softwarelist name="tutor" description="Tomy Tutor &amp; Pyuuta cartridges">
 
-  <software name="4ninmj">
-    <description>4-nin Mahjan (Jpn)</description>
-    <year>1984</year>
-    <publisher>Tomy</publisher>
-    <info name="alt_title" value="四人麻雀 "/>
-    <info name="serial" value="021E"/>
-    <part name="cart" interface="tutor_cart">
-      <dataarea name="rom" size="0x4000">
+	<software name="4ninmj">
+		<description>4-nin Mahjan (Jpn)</description>
+		<year>1984</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="四人麻雀 "/>
+		<info name="serial" value="021E"/>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="0x4000">
         <rom name="Yonnin Majan.bin" size="0x4000" crc="1c2eb2f0" sha1="4e9a0ce55f479c4b1a5fee9320561ce93765c4d7" offset="0" /> <!-- needs splitting into 2 files? there are 2 roms, marked 1 and 2 in the cart?? -->
-      </dataarea>
-    </part>
-  </software>  
+			</dataarea>
+		</part>
+	</software>
   
 	<software name="baseball">
 		<description>Baseball (Jpn)</description>
@@ -137,7 +137,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<description>Cave Crawlers (USA) / Maze Patrol (Jpn)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
-    <info name="alt_title" value="メイズ パトロール"/>
+		<info name="alt_title" value="メイズ パトロール"/>
 		<info name="serial" value="8100 / 017E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
@@ -381,7 +381,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<description>Torpedo Terror (USA) / Bermuda Triangle (Jpn)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
-    <info name="alt_title" value="バミューダ・ トライアングル"/>
+		<info name="alt_title" value="バミューダ・ トライアングル"/>
 		<info name="serial" value="8101 / 020E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">

@@ -55,17 +55,17 @@ Undumped:
 	</software>
 
   <software name="fussball" supported ="partial"> <!-- some gfx corruption -->
-    <description>3-on-3 Soccer (Fuss-ball)</description>
-    <year>1990</year>
-    <publisher>Hartung</publisher>
-    <part name="cart" interface="gmaster_cart">
-      <dataarea name="rom" size="0x8000">
-        <rom name="fussball.bin" size="0x8000" crc="76cf4c92" sha1="a4b6e7f98e953e47f5aa427752e8a936e7582bc9" offset="00000" />
-      </dataarea>
-    </part>
-  </software>
+		<description>3-on-3 Soccer (Fuss-ball)</description>
+		<year>1990</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="0x8000">
+				<rom name="fussball.bin" size="0x8000" crc="76cf4c92" sha1="a4b6e7f98e953e47f5aa427752e8a936e7582bc9" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
 
-  <software name="gobang" supported="no">
+	<software name="gobang" supported="no">
 		<description>Go Bang</description>
 		<year>1990</year>
 		<publisher>Hartung</publisher>
