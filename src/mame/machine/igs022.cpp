@@ -13,7 +13,7 @@
 
 
 igs022_device::igs022_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IGS022, "IGS022 Protection", tag, owner, clock, "igs022", __FILE__)
+	: device_t(mconfig, IGS022, "IGS022", tag, owner, clock, "igs022", __FILE__)
 {
 }
 
