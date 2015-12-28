@@ -4318,7 +4318,12 @@ READ32_MEMBER(nv2a_renderer::geforce_r)
 		x = x ^ 0x08080808;
 		ret = x;
 	}
-	if ((offset >= 0x00101000 / 4) && (offset < 0x00102000 / 4)) {
+	if ((offset >= 0x00100000 / 4) && (offset < 0x00101000 / 4)) {
+		//machine().logerror("NV_2A: read 100000[%06X] mask %08X value %08X\n",offset*4-0x00101000,mem_mask,ret);
+		if (offset == 0x100200 / 4)
+			return 3;
+	}
+	else if ((offset >= 0x00101000 / 4) && (offset < 0x00102000 / 4)) {
 		//machine().logerror("NV_2A: read STRAPS[%06X] mask %08X value %08X\n",offset*4-0x00101000,mem_mask,ret);
 	}
 	else if ((offset >= 0x00002000 / 4) && (offset < 0x00004000 / 4)) {

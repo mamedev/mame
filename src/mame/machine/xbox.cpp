@@ -479,7 +479,7 @@ WRITE32_MEMBER(xbox_base_state::geforce_w)
 static UINT32 geforce_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
 #ifdef LOG_PCI
-	//  logerror("  bus:1 device:NV_2A function:%d register:%d mask:%08X\n",function,reg,mem_mask);
+	busdevice->logerror("  bus:1 device:NV_2A function:%d register:%d mask:%08X\n",function,reg,mem_mask);
 #endif
 	return 0;
 }
@@ -487,7 +487,7 @@ static UINT32 geforce_pci_r(device_t *busdevice, device_t *device, int function,
 static void geforce_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 #ifdef LOG_PCI
-	//  logerror("  bus:1 device:NV_2A function:%d register:%d data:%08X mask:%08X\n",function,reg,data,mem_mask);
+	busdevice->logerror("  bus:1 device:NV_2A function:%d register:%d data:%08X mask:%08X\n",function,reg,data,mem_mask);
 #endif
 }
 
@@ -1177,20 +1177,37 @@ TIMER_CALLBACK_MEMBER(xbox_base_state::audio_apu_timer)
 	}
 }
 
-static UINT32 hubintiasbridg_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static UINT32 pcibridghostbridg_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
 #ifdef LOG_PCI
-	//  logerror("  bus:0 function:%d register:%d mask:%08X\n",function,reg,mem_mask);
+	busdevice->logerror("  bus:0 function:%d register:%d mask:%08X\n",function,reg,mem_mask);
+#endif
+	if ((function == 3) && (reg == 0x6c))
+		return 0x08800044;
+	return 0;
+}
+
+static void pcibridghostbridg_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+{
+#ifdef LOG_PCI
+	busdevice->logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n", function, reg, data, mem_mask);
+#endif
+}
+
+static UINT32 hubintisabridg_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+{
+#ifdef LOG_PCI
+	busdevice->logerror("  bus:0 function:%d register:%d mask:%08X\n",function,reg,mem_mask);
 #endif
 	if ((function == 0) && (reg == 8))
 		return 0xb4; // 0:1:0 revision id must be at least 0xb4, otherwise usb will require a hub
 	return 0;
 }
 
-static void hubintiasbridg_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void hubintisabridg_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 #ifdef LOG_PCI
-	if (reg >= 16) busdevice->logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n", function, reg, data, mem_mask);
+	busdevice->logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n", function, reg, data, mem_mask);
 #endif
 }
 
@@ -1201,7 +1218,7 @@ static void hubintiasbridg_pci_w(device_t *busdevice, device_t *device, int func
 static UINT32 dummy_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
 #ifdef LOG_PCI
-	//  logerror("  bus:0 function:%d register:%d mask:%08X\n",function,reg,mem_mask);
+	busdevice->logerror("  bus:0 function:%d register:%d mask:%08X\n",function,reg,mem_mask);
 #endif
 	return 0;
 }
@@ -1209,7 +1226,7 @@ static UINT32 dummy_pci_r(device_t *busdevice, device_t *device, int function, i
 static void dummy_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 #ifdef LOG_PCI
-	if (reg >= 16) busdevice->logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n", function, reg, data, mem_mask);
+	busdevice->logerror("  bus:0 function:%d register:%d data:%08X mask:%08X\n", function, reg, data, mem_mask);
 #endif
 }
 
@@ -1494,8 +1511,8 @@ MACHINE_CONFIG_START(xbox_base, xbox_base_state)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, "PCI Bridge Device - Host Bridge", dummy_pci_r, dummy_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(1, "HUB Interface - ISA Bridge", hubintiasbridg_pci_r, hubintiasbridg_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, "PCI Bridge Device - Host Bridge", pcibridghostbridg_pci_r, pcibridghostbridg_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(1, "HUB Interface - ISA Bridge", hubintisabridg_pci_r, hubintisabridg_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(2, "OHCI USB Controller 1", dummy_pci_r, dummy_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(3, "OHCI USB Controller 2", dummy_pci_r, dummy_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(4, "MCP Networking Adapter", dummy_pci_r, dummy_pci_w)
