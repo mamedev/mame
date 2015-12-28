@@ -101,8 +101,6 @@ private:
 	bool m_dsize;
 	UINT8 m_ds;
 	floppy_image_device *m_floppy;
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	optional_device<mb8877_t> m_fdc;
@@ -252,7 +250,7 @@ WRITE8_MEMBER( ccs_state::port34_w )
 	m_dsize = BIT(data, 4);
 	m_dden = BIT(data, 6);
 
-	m_floppy = NULL;
+	m_floppy = nullptr;
 	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
 	m_fdc->set_floppy(m_floppy);
 	m_fdc->dden_w(!m_dden);

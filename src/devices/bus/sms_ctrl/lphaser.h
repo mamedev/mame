@@ -32,18 +32,18 @@ public:
 	sms_light_phaser_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_CUSTOM_INPUT_MEMBER( th_pin_r );
 	DECLARE_INPUT_CHANGED_MEMBER( position_changed );
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_sms_control_port_interface overrides
-	virtual UINT8 peripheral_r();
+	virtual UINT8 peripheral_r() override;
 
 private:
 	required_ioport m_lphaser_pins;
@@ -54,7 +54,7 @@ private:
 	emu_timer *m_lphaser_timer;
 	static const device_timer_id TIMER_LPHASER = 0;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void sensor_check();
 	int bright_aim_area( emu_timer *timer, int lgun_x, int lgun_y );
 	UINT16 screen_hpos_nonscaled(int scaled_hpos);

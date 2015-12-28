@@ -28,7 +28,7 @@ public:
 	required_memory_bank bank_4000;
 	required_memory_bank nvram_bank;
 
-	UINT8 *nvram_data;
+	std::unique_ptr<UINT8[]> nvram_data;
 	UINT8 control, led_latch_control;
 	UINT32 individual_leds;
 	UINT8 latch_AH_red, latch_AH_green, latch_18_red, latch_18_green;
@@ -47,17 +47,17 @@ public:
 
 	void show_leds();
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void machine_reset();
+	virtual void machine_reset() override;
 };
 
 DRIVER_INIT_MEMBER( stratos_state, stratos )
 {
-	nvram_data = auto_alloc_array(machine(), UINT8, 0x2000);
-	nvram->set_base(nvram_data, 0x2000);
+	nvram_data = std::make_unique<UINT8[]>(0x2000);
+	nvram->set_base(nvram_data.get(), 0x2000);
 
 	bank_8000 ->configure_entries(0, 4, memregion("roms_8000")->base(), 0x8000);
 	bank_4000 ->configure_entries(0, 4, memregion("roms_4000")->base(), 0x4000);
-	nvram_bank->configure_entries(0, 2, nvram_data,                     0x1000);
+	nvram_bank->configure_entries(0, 2, nvram_data.get(),               0x1000);
 }
 
 void stratos_state::machine_reset()
@@ -77,7 +77,7 @@ void stratos_state::machine_reset()
 void stratos_state::show_leds()
 {
 	static const char *led_pos[18] = {
-		0, 0, "gPawn", "gKnight", "gBishop", "gRook", "gQueen", "gKing", 0, 0, "rPawn", "rKnight", "rBishop", "rRook", "rQueen", "rKing", 0, 0
+		nullptr, nullptr, "gPawn", "gKnight", "gBishop", "gRook", "gQueen", "gKing", nullptr, nullptr, "rPawn", "rKnight", "rBishop", "rRook", "rQueen", "rKing", nullptr, nullptr
 	};
 	char str_red[64];
 	char str_green[64];
@@ -320,8 +320,8 @@ WRITE8_MEMBER(stratos_state::lcd_w)
 	idx++;
 	if(idx == 18*2) {
 		logerror("lcd");
-		for(int i=0; i<18; i++)
-			logerror(" %02x", vals[i]);
+		for(auto & val : vals)
+			logerror(" %02x", val);
 		logerror("\n");
 	}
 }

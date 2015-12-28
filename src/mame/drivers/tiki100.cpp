@@ -273,7 +273,7 @@ WRITE8_MEMBER( tiki100_state::system_w )
 	*/
 
 	// drive select
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) floppy = m_floppy1->get_device();
@@ -655,7 +655,7 @@ static const z80_daisy_config tiki100_daisy_chain[] =
 	{ "slot1" },
 	{ "slot2" },
 	{ "slot3" },
-	{ NULL }
+	{ nullptr }
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER( tiki100_state::tape_tick )
@@ -722,7 +722,7 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_TIKI100_BUS_OUT_MREQ_CALLBACK(WRITE8(tiki100_state, mrq_w))
 	MCFG_TIKI100_BUS_SLOT_ADD("slot1", "8088")
 	MCFG_TIKI100_BUS_SLOT_ADD("slot2", "hdc")
-	MCFG_TIKI100_BUS_SLOT_ADD("slot3", NULL)
+	MCFG_TIKI100_BUS_SLOT_ADD("slot3", nullptr)
 
 	/* devices */
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_8MHz/4, 0, 0, 0, 0 )
@@ -753,10 +753,10 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", tiki100_floppies, "525qd", tiki100_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", tiki100_floppies, "525qd", tiki100_state::floppy_formats)
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")

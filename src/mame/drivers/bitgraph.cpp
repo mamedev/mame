@@ -116,8 +116,6 @@ public:
 	DECLARE_WRITE8_MEMBER( pia_pa_w );
 	DECLARE_WRITE8_MEMBER( pia_pb_w );
 	DECLARE_READ_LINE_MEMBER( pia_ca1_r );
-	DECLARE_READ_LINE_MEMBER( pia_cb1_r );
-	DECLARE_WRITE_LINE_MEMBER( pia_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 
 	DECLARE_WRITE16_MEMBER( baud_write );
@@ -140,8 +138,8 @@ public:
 	DECLARE_WRITE8_MEMBER( ppu_i8243_w );
 
 private:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<acia6850_device> m_acia0;
@@ -495,7 +493,7 @@ static MACHINE_CONFIG_FRAGMENT( bg_motherboard )
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE(RS232_D_TAG, rs232_port_device, write_rts))
 	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE(M68K_TAG, m68000_device, write_irq1))
 
-	MCFG_RS232_PORT_ADD(RS232_D_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_D_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA2_TAG, acia6850_device, write_rxd))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(ACIA2_TAG, acia6850_device, write_dcd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA2_TAG, acia6850_device, write_cts))
@@ -558,7 +556,7 @@ static MACHINE_CONFIG_START( bitgrpha, bitgraph_state )
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE(RS232_M_TAG, rs232_port_device, write_rts))
 	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE(M68K_TAG, m68000_device, write_irq1))
 
-	MCFG_RS232_PORT_ADD(RS232_M_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_M_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA3_TAG, acia6850_device, write_rxd))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(ACIA3_TAG, acia6850_device, write_dcd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ACIA3_TAG, acia6850_device, write_cts))

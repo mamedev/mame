@@ -38,7 +38,7 @@ public:
 	required_ioport m_ki2;
 	required_ioport m_ki3;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER( cldig_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );

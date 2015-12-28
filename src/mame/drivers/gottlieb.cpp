@@ -224,7 +224,7 @@ void gottlieb_state::machine_start()
 	save_item(NAME(m_track));
 
 	/* see if we have a laserdisc */
-	if (m_laserdisc != NULL)
+	if (m_laserdisc != nullptr)
 	{
 		/* attach to the I/O ports */
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x05805, 0x05807, 0, 0x07f8, read8_delegate(FUNC(gottlieb_state::laserdisc_status_r),this));
@@ -236,7 +236,7 @@ void gottlieb_state::machine_start()
 		m_laserdisc_philips_timer = timer_alloc(TIMER_LASERDISC_PHILIPS);
 
 		/* create some audio RAM */
-		m_laserdisc_audio_buffer = auto_alloc_array(machine(), UINT8, AUDIORAM_SIZE);
+		m_laserdisc_audio_buffer = std::make_unique<UINT8[]>(AUDIORAM_SIZE);
 		m_laserdisc_status = 0x38;
 
 		/* more save state registration */
@@ -244,7 +244,7 @@ void gottlieb_state::machine_start()
 		save_item(NAME(m_laserdisc_status));
 		save_item(NAME(m_laserdisc_philips_code));
 
-		save_pointer(NAME(m_laserdisc_audio_buffer), AUDIORAM_SIZE);
+		save_pointer(NAME(m_laserdisc_audio_buffer.get()), AUDIORAM_SIZE);
 		save_item(NAME(m_laserdisc_audio_address));
 		save_item(NAME(m_laserdisc_last_samples));
 		save_item(NAME(m_laserdisc_last_time));
@@ -259,7 +259,7 @@ void gottlieb_state::machine_start()
 void gottlieb_state::machine_reset()
 {
 	/* if we have a laserdisc, reset our philips code callback for the next line 17 */
-	if (m_laserdisc != NULL)
+	if (m_laserdisc != nullptr)
 		m_laserdisc_philips_timer->adjust(m_screen->time_until_pos(17), 17);
 }
 
@@ -290,8 +290,8 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_analog_reset_w)
 
 CUSTOM_INPUT_MEMBER(gottlieb_state::stooges_joystick_r)
 {
-	static const char *const joyport[] = { "P2JOY", "P3JOY", "P1JOY", NULL };
-	return (joyport[m_joystick_select & 3] != NULL) ? ioport(joyport[m_joystick_select & 3])->read() : 0xff;
+	static const char *const joyport[] = { "P2JOY", "P3JOY", "P1JOY", nullptr };
+	return (joyport[m_joystick_select & 3] != nullptr) ? ioport(joyport[m_joystick_select & 3])->read() : 0xff;
 }
 
 
@@ -305,7 +305,7 @@ CUSTOM_INPUT_MEMBER(gottlieb_state::stooges_joystick_r)
 WRITE8_MEMBER(gottlieb_state::general_output_w)
 {
 	/* bits 0-3 control video features, and are different for laserdisc games */
-	if (m_laserdisc == NULL)
+	if (m_laserdisc == nullptr)
 		gottlieb_video_control_w(space, offset, data);
 	else
 		gottlieb_laserdisc_video_control_w(space, offset, data);
@@ -589,7 +589,7 @@ void gottlieb_state::laserdisc_audio_process(laserdisc_device &device, int sampl
 		logerror("--------------\n");
 
 	/* if no data, reset it all */
-	if (ch1 == NULL)
+	if (ch1 == nullptr)
 	{
 		m_laserdisc_last_time = curtime + time_per_sample * samples;
 		return;
@@ -665,7 +665,7 @@ static const char *const qbert_knocker_names[] =
 {
 	"*qbert",
 	"knocker",
-	0   /* end of array */
+	nullptr   /* end of array */
 };
 
 MACHINE_CONFIG_FRAGMENT( qbert_knocker )
@@ -719,7 +719,7 @@ INTERRUPT_GEN_MEMBER(gottlieb_state::gottlieb_interrupt)
 	timer_set(m_screen->time_until_pos(0), TIMER_NMI_CLEAR);
 
 	/* if we have a laserdisc, update it */
-	if (m_laserdisc != NULL)
+	if (m_laserdisc != nullptr)
 	{
 		/* set the "disc ready" bit, which basically indicates whether or not we have a proper video frame */
 		if (!m_laserdisc->video_active())
@@ -739,9 +739,9 @@ INTERRUPT_GEN_MEMBER(gottlieb_state::gottlieb_interrupt)
 
 WRITE8_MEMBER(gottlieb_state::gottlieb_sh_w)
 {
-	if (m_r1_sound != NULL)
+	if (m_r1_sound != nullptr)
 		m_r1_sound->write(space, offset, data);
-	if (m_r2_sound != NULL)
+	if (m_r2_sound != nullptr)
 		m_r2_sound->write(space, offset, data);
 }
 
@@ -1747,7 +1747,7 @@ static const gfx_layout fg_layout =
 };
 
 static GFXDECODE_START( gfxdecode )
-	GFXDECODE_ENTRY( NULL,      0x4000, bg_ram_layout, 0, 1 )   /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( nullptr,      0x4000, bg_ram_layout, 0, 1 )   /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "bgtiles", 0x0000, bg_rom_layout, 0, 1 )
 	GFXDECODE_ENTRY( "sprites", 0x0000, fg_layout,     0, 1 )
 GFXDECODE_END

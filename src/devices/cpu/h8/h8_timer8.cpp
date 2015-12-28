@@ -26,7 +26,7 @@ void h8_timer8_channel_device::set_info(const char *intc, int _irq_ca, int _irq_
 	irq_ca = _irq_ca;
 	irq_cb = _irq_cb;
 	irq_v = _irq_v;
-	chain_tag = NULL;
+	chain_tag = nullptr;
 	chain_type = STOPPED;
 	has_adte = false;
 	has_ice = false;
@@ -179,7 +179,7 @@ void h8_timer8_channel_device::device_start()
 	if(chain_tag)
 		chained_timer = siblingdevice<h8_timer8_channel_device>(chain_tag);
 	else
-		chained_timer = NULL;
+		chained_timer = nullptr;
 }
 
 void h8_timer8_channel_device::device_reset()
@@ -278,16 +278,16 @@ void h8_timer8_channel_device::recalc_event(UINT64 cur_time)
 			event_delay = counter_cycle;
 	}
 
-	for(int i=0; i<2; i++) {
+	for(auto & elem : tcor) {
 		UINT32 new_delay = 0xffffffff;
-		if(tcor[i] > tcnt) {
-			if(tcnt >= counter_cycle || tcor[i] <= counter_cycle)
-				new_delay = tcor[i] - tcnt;
-		} else if(tcor[i] <= counter_cycle) {
+		if(elem > tcnt) {
+			if(tcnt >= counter_cycle || elem <= counter_cycle)
+				new_delay = elem - tcnt;
+		} else if(elem <= counter_cycle) {
 			if(tcnt < counter_cycle)
-				new_delay = (counter_cycle - tcnt) + tcor[i];
+				new_delay = (counter_cycle - tcnt) + elem;
 			else
-				new_delay = (0x100 - tcnt) + tcor[i];
+				new_delay = (0x100 - tcnt) + elem;
 		}
 		if(event_delay > new_delay)
 			event_delay = new_delay;

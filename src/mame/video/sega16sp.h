@@ -92,7 +92,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// internal state
 	bool                        m_flip;                 // screen flip?
@@ -113,7 +113,7 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 };
 
 
@@ -127,7 +127,7 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 };
 
 
@@ -142,7 +142,7 @@ protected:
 	sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, bool xboard_variant, const char *shortname, const char *source);
 
 	// subclass overrides
-	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	// configuration
 	bool            m_is_xboard;
@@ -166,7 +166,7 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 };
 
 
@@ -183,7 +183,7 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	// internal state
 	UINT8       m_addrmap[8];
@@ -200,7 +200,7 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 };
 
 
@@ -215,7 +215,7 @@ public:
 
 protected:
 	// subclass overrides
-	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	rotate_info*                        m_segaic16_rotate;
 };

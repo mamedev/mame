@@ -636,19 +636,19 @@ void i80186_cpu_device::device_reset()
 	m_intr.ext_state        = 0x00;
 	m_reloc = 0x20ff;
 
-	for (int i = 0; i < ARRAY_LENGTH(m_dma); i++)
+	for (auto & elem : m_dma)
 	{
-		m_dma[i].drq_state = false;
-		m_dma[i].control = 0;
+		elem.drq_state = false;
+		elem.control = 0;
 	}
 
-	for (int i = 0; i < ARRAY_LENGTH(m_timer); i++)
+	for (auto & elem : m_timer)
 	{
-		m_timer[i].control = 0;
-		m_timer[i].maxA = 0;
-		m_timer[i].maxB = 0;
-		m_timer[i].active_count = false;
-		m_timer[i].count = 0;
+		elem.control = 0;
+		elem.maxA = 0;
+		elem.maxB = 0;
+		elem.active_count = false;
+		elem.count = 0;
 	}
 }
 
@@ -1071,10 +1071,10 @@ void i80186_cpu_device::inc_timer(int which)
 	if (t->control & 2)
 	{
 		if (t->count == (t->active_count ? t->maxB : t->maxA))
-			device_timer(*t->int_timer, which, which, NULL);
+			device_timer(*t->int_timer, which, which, nullptr);
 	}
 	else if (t->count == t->maxA)
-		device_timer(*t->int_timer, which, which, NULL);
+		device_timer(*t->int_timer, which, which, nullptr);
 }
 
 void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_maxA, int new_maxB, int new_control)

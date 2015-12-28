@@ -96,14 +96,13 @@ public:
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE16_MEMBER(amusco_videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_READ8_MEMBER(mc6845_r);
 	DECLARE_WRITE8_MEMBER(mc6845_w);
 	DECLARE_WRITE16_MEMBER(vram_w);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 
 	UINT32 screen_update_amusco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(amusco_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<pic8259_device> m_pic;

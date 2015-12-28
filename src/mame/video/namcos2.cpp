@@ -64,7 +64,7 @@ struct roz_param
 	int wrap;
 };
 
-INLINE void
+static inline void
 draw_roz_helper_block(const struct roz_param *rozInfo, int destx, int desty,
 	int srcx, int srcy, int width, int height,
 	bitmap_ind16 &destbitmap, bitmap_ind8 &flagsbitmap,

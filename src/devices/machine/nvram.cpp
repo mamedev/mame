@@ -26,7 +26,7 @@ nvram_device::nvram_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, NVRAM, "NVRAM", tag, owner, clock, "nvram", __FILE__),
 		device_nvram_interface(mconfig, *this),
 		m_default_value(DEFAULT_ALL_1),
-		m_base(NULL),
+		m_base(nullptr),
 		m_length(0)
 {
 }
@@ -79,7 +79,7 @@ void nvram_device::nvram_default()
 	determine_final_base();
 
 	// region always wins
-	if (m_region != NULL)
+	if (m_region != nullptr)
 	{
 		memcpy(m_base, m_region->base(), m_length);
 		return;
@@ -154,16 +154,16 @@ void nvram_device::nvram_write(emu_file &file)
 void nvram_device::determine_final_base()
 {
 	// find our shared pointer with the target RAM
-	if (m_base == NULL)
+	if (m_base == nullptr)
 	{
 		memory_share *share = owner()->memshare(tag());
-		if (share == NULL)
+		if (share == nullptr)
 			throw emu_fatalerror("NVRAM device '%s' has no corresponding AM_SHARE region", tag());
 		m_base = share->ptr();
 		m_length = share->bytes();
 	}
 
 	// if we are region-backed for the default, find it now and make sure it's the right size
-	if (m_region != NULL && m_region->bytes() != m_length)
+	if (m_region != nullptr && m_region->bytes() != m_length)
 		throw emu_fatalerror("NVRAM device '%s' has a default region, but it should be 0x%" SIZETFMT "X bytes", tag(), m_length);
 }

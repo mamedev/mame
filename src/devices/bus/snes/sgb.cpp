@@ -150,7 +150,7 @@ static MACHINE_CONFIG_FRAGMENT( supergb )
 
 	MCFG_SOUND_ADD("sgb_snd", GAMEBOY, 0)
 
-	MCFG_GB_CARTRIDGE_ADD("gb_slot", supergb_cart, NULL)
+	MCFG_GB_CARTRIDGE_ADD("gb_slot", supergb_cart, nullptr)
 MACHINE_CONFIG_END
 
 

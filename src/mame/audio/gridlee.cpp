@@ -28,8 +28,8 @@ gridlee_sound_device::gridlee_sound_device(const machine_config &mconfig, const 
 		m_tone_step(0),
 		m_tone_fraction(0),
 		m_tone_volume(0),
-		m_stream(NULL),
-		m_samples(NULL),
+		m_stream(nullptr),
+		m_samples(nullptr),
 		m_freq_to_step(0.0)
 {
 	memset(m_sound_data, 0, sizeof(UINT8)*24);

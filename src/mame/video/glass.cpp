@@ -129,7 +129,7 @@ void glass_state::video_start()
 {
 	m_pant[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(glass_state::get_tile_info_glass_screen0),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_pant[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(glass_state::get_tile_info_glass_screen1),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_screen_bitmap = auto_bitmap_ind16_alloc (machine(), 320, 200);
+	m_screen_bitmap = std::make_unique<bitmap_ind16>(320, 200);
 
 	save_item(NAME(*m_screen_bitmap));
 

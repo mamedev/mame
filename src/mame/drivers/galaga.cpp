@@ -1582,7 +1582,7 @@ static const char *const battles_sample_names[] =
 	"*battles",
 	"explo1",   /* ground target explosion */
 	"explo2",   /* Solvalou explosion */
-	0   /* end of array */
+	nullptr   /* end of array */
 };
 
 INTERRUPT_GEN_MEMBER(galaga_state::main_vblank_irq)

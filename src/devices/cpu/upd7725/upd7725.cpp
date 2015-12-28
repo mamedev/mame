@@ -29,9 +29,9 @@ necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, co
 		m_program_config("program", ENDIANNESS_BIG, 32, abits, -2), // data bus width, address bus width, -2 means DWORD-addressable
 		m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1), m_icount(0),   // -1 for WORD-addressable
 		m_irq(0),
-		m_program(NULL),
-		m_data(NULL),
-		m_direct(NULL),
+		m_program(nullptr),
+		m_data(nullptr),
+		m_direct(nullptr),
 		m_in_int_cb(*this),
 		//m_in_si_cb(*this),
 		//m_in_sck_cb(*this),
@@ -139,9 +139,9 @@ void necdsp_device::device_start()
 
 void necdsp_device::device_reset()
 {
-	for (unsigned i = 0; i <  2048; i++)
+	for (auto & elem : dataRAM)
 	{
-		dataRAM[i] = 0x0000;
+		elem = 0x0000;
 	}
 
 	regs.pc = 0x0000;

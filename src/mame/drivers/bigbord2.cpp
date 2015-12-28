@@ -126,8 +126,6 @@ public:
 	DECLARE_READ8_MEMBER(portc4_r);
 	DECLARE_READ8_MEMBER(portd0_r);
 	DECLARE_WRITE8_MEMBER(bigbord2_kbd_put);
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	DECLARE_WRITE_LINE_MEMBER(frame);
 	DECLARE_DRIVER_INIT(bigbord2);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
@@ -144,11 +142,9 @@ private:
 	UINT8 m_term_status;
 	int m_c8[8];
 	floppy_image_device *m_floppy;
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	address_space *m_mem;
 	address_space *m_io;
 	required_device<cpu_device> m_maincpu;
@@ -334,7 +330,7 @@ WRITE8_MEMBER( bigbord2_state::portcc_w )
 	*/
 
 	/* drive select */
-	m_floppy = NULL;
+	m_floppy = nullptr;
 	if BIT(data, 7) m_floppy = m_floppy0->get_device();
 	if BIT(data, 6) m_floppy = m_floppy1->get_device();
 	//if BIT(data, 5) m_floppy = m_floppy2->get_device();
@@ -440,7 +436,7 @@ static const z80_daisy_config bigbord2_daisy_chain[] =
 	{ Z80CTCA_TAG },
 	{ Z80CTCB_TAG },
 	{ Z80SIO_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 /* WD1793 Interface */

@@ -38,15 +38,15 @@ public:
 	// End the array with {}
 	upd765_format(const format *formats);
 
-	virtual int identify(io_generic *io, UINT32 form_factor);
-	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
-	virtual bool save(io_generic *io, floppy_image *image);
-	virtual bool supports_save() const;
+	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) override;
+	virtual bool save(io_generic *io, floppy_image *image) override;
+	virtual bool supports_save() const override;
 
 protected:
 	floppy_image_format_t::desc_e* get_desc_fm(const format &f, int &current_size, int &end_gap_index);
 	floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index);
-	int find_size(io_generic *io, UINT32 form_factor);
+	int find_size(io_generic *io, UINT32 form_factor) const;
 	int compute_track_size(const format &f) const;
 	virtual void build_sector_description(const format &d, UINT8 *sectdata, desc_s *sectors, int track, int head) const;
 	void check_compatibility(floppy_image *image, std::vector<int> &candidates);

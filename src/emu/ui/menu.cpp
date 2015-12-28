@@ -31,7 +31,7 @@
 
 ui_menu *ui_menu::menu_stack;
 ui_menu *ui_menu::menu_free;
-bitmap_rgb32 *ui_menu::hilight_bitmap;
+std::unique_ptr<bitmap_rgb32> ui_menu::hilight_bitmap;
 render_texture *ui_menu::hilight_texture;
 render_texture *ui_menu::arrow_texture;
 
@@ -84,7 +84,7 @@ void ui_menu::init(running_machine &machine)
 	ui_menu::stack_reset(machine);
 
 	// create a texture for hilighting items
-	hilight_bitmap = auto_bitmap_rgb32_alloc(machine, 256, 1);
+	hilight_bitmap = std::make_unique<bitmap_rgb32>(256, 1);
 	for (x = 0; x < 256; x++)
 	{
 		int alpha = 0xff;
@@ -166,14 +166,14 @@ void ui_menu::reset(ui_menu_reset_options options)
 {
 	// based on the reset option, set the reset info
 	resetpos = 0;
-	resetref = NULL;
+	resetref = nullptr;
 	if (options == UI_MENU_RESET_REMEMBER_POSITION)
 		resetpos = selected;
 	else if (options == UI_MENU_RESET_REMEMBER_REF)
 		resetref = item[selected].ref;
 
 	// reset all the pools and the numitems back to 0
-	for (ui_menu_pool *ppool = pool; ppool != NULL; ppool = ppool->next)
+	for (ui_menu_pool *ppool = pool; ppool != nullptr; ppool = ppool->next)
 		ppool->top = (UINT8 *)(ppool + 1);
 	numitems = 0;
 	visitems = 0;
@@ -182,12 +182,12 @@ void ui_menu::reset(ui_menu_reset_options options)
 	strprintf(backtext, "Return to %s", emulator_info::get_capstartgamenoun());
 
 	// add an item to return
-	if (parent == NULL)
-		item_append(backtext.c_str(), NULL, 0, NULL);
+	if (parent == nullptr)
+		item_append(backtext.c_str(), nullptr, 0, nullptr);
 	else if (parent->is_special_main_menu())
-		item_append("Exit", NULL, 0, NULL);
+		item_append("Exit", nullptr, 0, nullptr);
 	else
-		item_append("Return to Previous Menu", NULL, 0, NULL);
+		item_append("Return to Previous Menu", nullptr, 0, nullptr);
 }
 
 
@@ -264,13 +264,13 @@ void ui_menu::item_append(const char *text, const char *subtext, UINT32 flags, v
 
 	// allocate a new item and populate it
 	pitem = &item[index];
-	pitem->text = (text != NULL) ? pool_strdup(text) : NULL;
-	pitem->subtext = (subtext != NULL) ? pool_strdup(subtext) : NULL;
+	pitem->text = (text != nullptr) ? pool_strdup(text) : nullptr;
+	pitem->subtext = (subtext != nullptr) ? pool_strdup(subtext) : nullptr;
 	pitem->flags = flags;
 	pitem->ref = ref;
 
 	// update the selection if we need to
-	if (resetpos == index || (resetref != NULL && resetref == ref))
+	if (resetpos == index || (resetref != nullptr && resetref == ref))
 		selected = index;
 	if (resetpos == numitems - 1)
 		selected = numitems - 1;
@@ -313,7 +313,7 @@ const ui_menu_event *ui_menu::process(UINT32 flags)
 		menu_event.itemref = item[selected].ref;
 		return &menu_event;
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -329,7 +329,7 @@ void *ui_menu::m_pool_alloc(size_t size)
 	assert(size < UI_MENU_POOL_SIZE);
 
 	// find a pool with enough room
-	for (ppool = pool; ppool != NULL; ppool = ppool->next)
+	for (ppool = pool; ppool != nullptr; ppool = ppool->next)
 		if (ppool->end - ppool->top >= size)
 		{
 			void *result = ppool->top;
@@ -367,7 +367,7 @@ const char *ui_menu::pool_strdup(const char *string)
 
 void *ui_menu::get_selection()
 {
-	return (selected >= 0 && selected < numitems) ? item[selected].ref : NULL;
+	return (selected >= 0 && selected < numitems) ? item[selected].ref : nullptr;
 }
 
 
@@ -493,7 +493,7 @@ void ui_menu::draw(bool customonly)
 	if (!customonly)
 	{
 		mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
-		if (mouse_target != NULL)
+		if (mouse_target != nullptr)
 			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
 				mouse_hit = true;
 	}
@@ -577,9 +577,9 @@ void ui_menu::draw(bool customonly)
 				container->add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			// if we don't have a subitem, just draw the string centered
-			else if (pitem.subtext == NULL)
+			else if (pitem.subtext == nullptr)
 				machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-							JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
+							JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, nullptr, nullptr);
 
 			// otherwise, draw the item on the left and the subitem text on the right
 			else
@@ -590,7 +590,7 @@ void ui_menu::draw(bool customonly)
 
 				// draw the left-side text
 				machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
-							JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, &item_width, NULL);
+							JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, &item_width, nullptr);
 
 				// give 2 spaces worth of padding
 				item_width += 2.0f * gutter_width;
@@ -605,7 +605,7 @@ void ui_menu::draw(bool customonly)
 
 				// draw the subitem right-justified
 				machine().ui().draw_text_full(container, subitem_text, effective_left + item_width, line_y, effective_width - item_width,
-							JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor, &subitem_width, NULL);
+							JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor, &subitem_width, nullptr);
 
 				// apply arrows
 				if (itemnum == selected && (pitem.flags & MENU_FLAG_LEFT_ARROW))
@@ -659,11 +659,11 @@ void ui_menu::draw(bool customonly)
 							target_x + target_width + UI_BOX_LR_BORDER,
 							target_y + target_height + UI_BOX_TB_BORDER, subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
 		machine().ui().draw_text_full(container, pitem.subtext, target_x, target_y, target_width,
-					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, NULL, NULL);
+					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
 	}
 
 	// if there is something special to add, do it by calling the virtual method
-	custom_render((selected >= 0 && selected < numitems) ? item[selected].ref : NULL, customtop, custombottom, x1, y1, x2, y2);
+	custom_render((selected >= 0 && selected < numitems) ? item[selected].ref : nullptr, customtop, custombottom, x1, y1, x2, y2);
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
 	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != numitems);
@@ -720,7 +720,7 @@ void ui_menu::draw_text_box()
 						target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
 						target_y + target_height + UI_BOX_TB_BORDER, (item[0].flags & MENU_FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
 	machine().ui().draw_text_full(container, text, target_x, target_y, target_width,
-				JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
+				JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
 
 	// draw the "return to prior menu" text with a hilight behind it
 	highlight(
@@ -731,7 +731,7 @@ void ui_menu::draw_text_box()
 						target_y + target_height,
 						UI_SELECTED_BG_COLOR);
 	machine().ui().draw_text_full(container, backtext, target_x, target_y + target_height - line_height, target_width,
-				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, NULL, NULL);
+				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, nullptr, nullptr);
 
 	// artificially set the hover to the last item so a double-click exits
 	hover = numitems - 1;
@@ -944,7 +944,7 @@ void ui_menu::validate_selection(int scandir)
 
 void ui_menu::clear_free_list(running_machine &machine)
 {
-	while (menu_free != NULL)
+	while (menu_free != nullptr)
 	{
 		ui_menu *menu = menu_free;
 		menu_free = menu->parent;
@@ -964,7 +964,7 @@ void ui_menu::clear_free_list(running_machine &machine)
 
 void ui_menu::stack_reset(running_machine &machine)
 {
-	while (menu_stack != NULL)
+	while (menu_stack != nullptr)
 		ui_menu::stack_pop(machine);
 }
 
@@ -989,7 +989,7 @@ void ui_menu::stack_push(ui_menu *menu)
 
 void ui_menu::stack_pop(running_machine &machine)
 {
-	if (menu_stack != NULL)
+	if (menu_stack != nullptr)
 	{
 		ui_menu *menu = menu_stack;
 		menu_stack = menu->parent;
@@ -1009,7 +1009,7 @@ bool ui_menu::stack_has_special_main_menu()
 {
 	ui_menu *menu;
 
-	for (menu = menu_stack; menu != NULL; menu = menu->parent)
+	for (menu = menu_stack; menu != nullptr; menu = menu->parent)
 		if (menu->is_special_main_menu())
 			return true;
 
@@ -1036,18 +1036,18 @@ void ui_menu::do_handle()
 UINT32 ui_menu::ui_handler(running_machine &machine, render_container *container, UINT32 state)
 {
 	// if we have no menus stacked up, start with the main menu
-	if (menu_stack == NULL)
+	if (menu_stack == nullptr)
 		stack_push(auto_alloc_clear(machine, ui_menu_main(machine, container)));
 
 	// update the menu state
-	if (menu_stack != NULL)
+	if (menu_stack != nullptr)
 		menu_stack->do_handle();
 
 	// clear up anything pending to be released
 	clear_free_list(machine);
 
 	// if the menus are to be hidden, return a cancel here
-	if (machine.ui().is_menu_active() && ((ui_input_pressed(machine, IPT_UI_CONFIGURE) && !stack_has_special_main_menu()) || menu_stack == NULL))
+	if (machine.ui().is_menu_active() && ((ui_input_pressed(machine, IPT_UI_CONFIGURE) && !stack_has_special_main_menu()) || menu_stack == nullptr))
 		return UI_HANDLER_CANCEL;
 
 	return 0;

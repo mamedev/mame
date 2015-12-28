@@ -35,15 +35,15 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT32 update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual ioport_constructor device_input_ports() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 protected:
 	optional_device<palette_device> m_palette;
 	required_ioport m_io_term_conf;
 
 	virtual void term_write(UINT8 data);
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void send_key(UINT8 code) { m_keyboard_cb((offs_t)0, code); }
 	UINT8 m_buffer[TERMINAL_WIDTH*50]; // make big enough for teleprinter
 	UINT8 m_x_pos;

@@ -296,13 +296,13 @@ WRITE32_MEMBER(psikyo4_state::io_select_w)
 	{
 		UINT32 bankdata = data >> 16;
 		UINT32 bankmask = mem_mask >> 16;
-		for (int i = 0; i < 4; i++)
+		for (auto & elem : m_ymf_bank)
 		{
 			if (bankmask & 0x0f)
 			{
 				int banknum = bankdata & 0x0f;
 				if (banknum < m_ymf_max_bank)
-					m_ymf_bank[i]->set_entry(banknum);
+					elem->set_entry(banknum);
 			}
 			bankdata >>= 4;
 			bankmask >>= 4;
@@ -351,7 +351,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_START("P1_P2")
 	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "SYSTEM")
 	PORT_BIT( 0x00ffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state,mahjong_ctrl_r, (void *)0)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo4_state,mahjong_ctrl_r, (void *)nullptr)
 
 	PORT_START("P3_P4")
 	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "SYSTEM")

@@ -97,7 +97,7 @@ private:
 	public:
 		// construction/destruction
 		item(const char *text, UINT64 value, int valformat)
-			: m_next(NULL),
+			: m_next(nullptr),
 				m_text(text),
 				m_value(value, valformat) { }
 
@@ -225,10 +225,10 @@ public:
 	const char *comment() const { return m_comment.c_str(); }
 
 	// script detection
-	bool has_run_script() const { return (m_run_script != NULL); }
-	bool has_on_script() const { return (m_on_script != NULL); }
-	bool has_off_script() const { return (m_off_script != NULL); }
-	bool has_change_script() const { return (m_change_script != NULL); }
+	bool has_run_script() const { return (m_run_script != nullptr); }
+	bool has_on_script() const { return (m_on_script != nullptr); }
+	bool has_off_script() const { return (m_off_script != nullptr); }
+	bool has_change_script() const { return (m_change_script != nullptr); }
 
 	// script execution
 	void execute_off_script() { if (has_off_script()) m_off_script->execute(m_manager, m_argindex); }
@@ -237,12 +237,12 @@ public:
 	void execute_change_script() { if (has_change_script()) m_change_script->execute(m_manager, m_argindex); }
 
 	// cheat classification
-	bool is_text_only() const { return (m_parameter == NULL && !has_run_script() && !has_off_script() && !has_on_script()); }
-	bool is_oneshot() const { return (m_parameter == NULL && !has_run_script() && !has_off_script() && has_on_script()); }
-	bool is_onoff() const { return (m_parameter == NULL && (has_run_script() || (has_off_script() && has_on_script()))); }
-	bool is_value_parameter() const { return (m_parameter != NULL && !m_parameter->has_itemlist()); }
-	bool is_itemlist_parameter() const { return (m_parameter != NULL && m_parameter->has_itemlist()); }
-	bool is_oneshot_parameter() const { return (m_parameter != NULL && !has_run_script() && !has_off_script() && has_change_script()); }
+	bool is_text_only() const { return (m_parameter == nullptr && !has_run_script() && !has_off_script() && !has_on_script()); }
+	bool is_oneshot() const { return (m_parameter == nullptr && !has_run_script() && !has_off_script() && has_on_script()); }
+	bool is_onoff() const { return (m_parameter == nullptr && (has_run_script() || (has_off_script() && has_on_script()))); }
+	bool is_value_parameter() const { return (m_parameter != nullptr && !m_parameter->has_itemlist()); }
+	bool is_itemlist_parameter() const { return (m_parameter != nullptr && m_parameter->has_itemlist()); }
+	bool is_oneshot_parameter() const { return (m_parameter != nullptr && !has_run_script() && !has_off_script() && has_change_script()); }
 
 	// actions
 	bool activate();
@@ -260,18 +260,18 @@ public:
 private:
 	// internal helpers
 	bool set_state(script_state newstate);
-	auto_pointer<cheat_script> &script_for_state(script_state state);
+	std::unique_ptr<cheat_script> &script_for_state(script_state state);
 
 	// internal state
 	cheat_manager &     m_manager;                      // reference to our manager
 	cheat_entry *       m_next;                         // next cheat entry
 	std::string         m_description;                  // string description/menu title
 	std::string         m_comment;                      // comment data
-	auto_pointer<cheat_parameter> m_parameter;          // parameter
-	auto_pointer<cheat_script> m_on_script;             // script to run when turning on
-	auto_pointer<cheat_script> m_off_script;            // script to run when turning off
-	auto_pointer<cheat_script> m_change_script;         // script to run when value changes
-	auto_pointer<cheat_script> m_run_script;            // script to run each frame when on
+	std::unique_ptr<cheat_parameter> m_parameter;          // parameter
+	std::unique_ptr<cheat_script> m_on_script;             // script to run when turning on
+	std::unique_ptr<cheat_script> m_off_script;            // script to run when turning off
+	std::unique_ptr<cheat_script> m_change_script;         // script to run when value changes
+	std::unique_ptr<cheat_script> m_run_script;            // script to run each frame when on
 	symbol_table        m_symbols;                      // symbol table for this cheat
 	script_state        m_state;                        // current cheat state
 	UINT32              m_numtemp;                      // number of temporary variables

@@ -29,7 +29,7 @@ public:
 		segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
+		virtual machine_config_constructor device_mconfig_additions() const override;
 
 		required_device<cpu_device> m_audiocpu;
 		required_device<multipcm_device> m_multipcm_1;
@@ -49,8 +49,8 @@ public:
 
 protected:
 		// device-level overrides
-		virtual void device_start();
-		virtual void device_reset();
+		virtual void device_start() override;
+		virtual void device_reset() override;
 
 private:
 	int m_to_68k[8];

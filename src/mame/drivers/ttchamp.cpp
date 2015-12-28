@@ -106,7 +106,7 @@ public:
 	int m_pic_latched;
 	int m_pic_writelatched;
 
-	UINT8* m_bakram;
+	std::unique_ptr<UINT8[]> m_bakram;
 
 	UINT16 m_mainram[0x10000 / 2];
 
@@ -117,7 +117,6 @@ public:
 	UINT8* m_rom8;
 
 	DECLARE_WRITE16_MEMBER(paloff_w);
-	DECLARE_WRITE16_MEMBER(pcup_prgbank_w);
 	DECLARE_WRITE16_MEMBER(paldat_w);
 
 	DECLARE_WRITE16_MEMBER(port10_w);
@@ -135,8 +134,8 @@ public:
 	DECLARE_READ16_MEMBER(mem_r);
 	DECLARE_WRITE16_MEMBER(mem_w);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -153,8 +152,8 @@ void ttchamp_state::machine_start()
 
 	m_picmodex = PIC_IDLE;
 
-	m_bakram = auto_alloc_array(machine(), UINT8, 0x100);
-	machine().device<nvram_device>("backram")->set_base(m_bakram, 0x100);
+	m_bakram = std::make_unique<UINT8[]>(0x100);
+	machine().device<nvram_device>("backram")->set_base(m_bakram.get(), 0x100);
 
 	save_item(NAME(m_paloff));
 	save_item(NAME(m_port10));

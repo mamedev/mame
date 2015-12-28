@@ -157,7 +157,7 @@ public:
 	void scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 
 protected:
-	virtual void driver_start();
+	virtual void driver_start() override;
 
 private:
 	required_device<am53cf96_device> m_am53cf96;

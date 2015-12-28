@@ -168,13 +168,13 @@ TILE_GET_INFO_MEMBER(phoenix_state::get_bg_tile_info)
 
 VIDEO_START_MEMBER(phoenix_state,phoenix)
 {
-	m_videoram_pg[0] = auto_alloc_array(machine(), UINT8, 0x1000);
-	memset(m_videoram_pg[0], 0x00, 0x1000 * sizeof(UINT8));
-	m_videoram_pg[1] = auto_alloc_array(machine(), UINT8, 0x1000);
-	memset(m_videoram_pg[1], 0x00, 0x1000 * sizeof(UINT8));
+	m_videoram_pg[0] = std::make_unique<UINT8[]>(0x1000);
+	memset(m_videoram_pg[0].get(), 0x00, 0x1000 * sizeof(UINT8));
+	m_videoram_pg[1] = std::make_unique<UINT8[]>(0x1000);
+	memset(m_videoram_pg[1].get(), 0x00, 0x1000 * sizeof(UINT8));
 
-	membank("bank1")->configure_entry(0, m_videoram_pg[0]);
-	membank("bank1")->configure_entry(1, m_videoram_pg[1]);
+	membank("bank1")->configure_entry(0, m_videoram_pg[0].get());
+	membank("bank1")->configure_entry(1, m_videoram_pg[1].get());
 	membank("bank1")->set_entry(0);
 
 	m_videoram_pg_index = 0;
@@ -191,8 +191,8 @@ VIDEO_START_MEMBER(phoenix_state,phoenix)
 	m_fg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
 	m_bg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
 
-	save_pointer(NAME(m_videoram_pg[0]), 0x1000);
-	save_pointer(NAME(m_videoram_pg[1]), 0x1000);
+	save_pointer(NAME(m_videoram_pg[0].get()), 0x1000);
+	save_pointer(NAME(m_videoram_pg[1].get()), 0x1000);
 	save_item(NAME(m_videoram_pg_index));
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_cocktail_mode));

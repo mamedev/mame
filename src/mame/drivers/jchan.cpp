@@ -195,12 +195,12 @@ public:
 	required_shared_ptr<UINT16> m_mainsub_shared_ram;
 	required_shared_ptr<UINT16> m_ctrl;
 
-	bitmap_ind16 *m_sprite_bitmap_1;
-	bitmap_ind16 *m_sprite_bitmap_2;
-	UINT32* m_sprite_ram32_1;
-	UINT32* m_sprite_ram32_2;
-	UINT32* m_sprite_regs32_1;
-	UINT32* m_sprite_regs32_2;
+	std::unique_ptr<bitmap_ind16> m_sprite_bitmap_1;
+	std::unique_ptr<bitmap_ind16> m_sprite_bitmap_2;
+	std::unique_ptr<UINT32[]> m_sprite_ram32_1;
+	std::unique_ptr<UINT32[]> m_sprite_ram32_2;
+	std::unique_ptr<UINT32[]> m_sprite_regs32_1;
+	std::unique_ptr<UINT32[]> m_sprite_regs32_2;
 	int m_irq_sub_enable;
 
 	DECLARE_WRITE16_MEMBER(ctrl_w);
@@ -213,7 +213,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sknsspr_sprite32regs_2_w);
 
 	DECLARE_DRIVER_INIT(jchan);
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -265,23 +265,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(jchan_state::vblank)
 void jchan_state::video_start()
 {
 	/* so we can use sknsspr.c */
-	m_sprite_ram32_1 = auto_alloc_array(machine(), UINT32, 0x4000/4);
-	m_sprite_ram32_2 = auto_alloc_array(machine(), UINT32, 0x4000/4);
+	m_sprite_ram32_1 = std::make_unique<UINT32[]>(0x4000/4);
+	m_sprite_ram32_2 = std::make_unique<UINT32[]>(0x4000/4);
 
-	m_sprite_regs32_1 = auto_alloc_array(machine(), UINT32, 0x40/4);
-	m_sprite_regs32_2 = auto_alloc_array(machine(), UINT32, 0x40/4);
+	m_sprite_regs32_1 = std::make_unique<UINT32[]>(0x40/4);
+	m_sprite_regs32_2 = std::make_unique<UINT32[]>(0x40/4);
 
-	m_sprite_bitmap_1 = auto_bitmap_ind16_alloc(machine(),1024,1024);
-	m_sprite_bitmap_2 = auto_bitmap_ind16_alloc(machine(),1024,1024);
+	m_sprite_bitmap_1 = std::make_unique<bitmap_ind16>(1024,1024);
+	m_sprite_bitmap_2 = std::make_unique<bitmap_ind16>(1024,1024);
 
 	m_spritegen1->skns_sprite_kludge(0,0);
 	m_spritegen2->skns_sprite_kludge(0,0);
 
 	save_item(NAME(m_irq_sub_enable));
-	save_pointer(NAME(m_sprite_ram32_1), 0x4000/4);
-	save_pointer(NAME(m_sprite_ram32_2), 0x4000/4);
-	save_pointer(NAME(m_sprite_regs32_1), 0x40/4);
-	save_pointer(NAME(m_sprite_regs32_2), 0x40/4);
+	save_pointer(NAME(m_sprite_ram32_1.get()), 0x4000/4);
+	save_pointer(NAME(m_sprite_ram32_2.get()), 0x4000/4);
+	save_pointer(NAME(m_sprite_regs32_1.get()), 0x40/4);
+	save_pointer(NAME(m_sprite_regs32_2.get()), 0x40/4);
 }
 
 
@@ -313,8 +313,8 @@ UINT32 jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	m_sprite_bitmap_1->fill(0x0000, cliprect);
 	m_sprite_bitmap_2->fill(0x0000, cliprect);
 
-	m_spritegen1->skns_draw_sprites(*m_sprite_bitmap_1, cliprect, m_sprite_ram32_1, 0x4000, memregion("gfx1")->base(), memregion ("gfx1")->bytes(), m_sprite_regs32_1 );
-	m_spritegen2->skns_draw_sprites(*m_sprite_bitmap_2, cliprect, m_sprite_ram32_2, 0x4000, memregion("gfx2")->base(), memregion ("gfx2")->bytes(), m_sprite_regs32_2 );
+	m_spritegen1->skns_draw_sprites(*m_sprite_bitmap_1, cliprect, m_sprite_ram32_1.get(), 0x4000, memregion("gfx1")->base(), memregion ("gfx1")->bytes(), m_sprite_regs32_1.get() );
+	m_spritegen2->skns_draw_sprites(*m_sprite_bitmap_2, cliprect, m_sprite_ram32_2.get(), 0x4000, memregion("gfx2")->base(), memregion ("gfx2")->bytes(), m_sprite_regs32_2.get() );
 
 	// ignoring priority bits for now - might use alpha too, check 0x8000 of palette writes
 	for (y=0;y<240;y++)

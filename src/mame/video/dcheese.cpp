@@ -97,7 +97,7 @@ void dcheese_state::device_timer(emu_timer &timer, device_timer_id id, int param
 void dcheese_state::video_start()
 {
 	/* the destination bitmap is not directly accessible to the CPU */
-	m_dstbitmap = auto_bitmap_ind16_alloc(machine(), DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT);
+	m_dstbitmap = std::make_unique<bitmap_ind16>(DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT);
 
 	/* create a timer */
 	m_blitter_timer = timer_alloc(TIMER_BLITTER_SCANLINE);

@@ -35,7 +35,7 @@ public:
 	int       m_bg_raster;
 	int       m_bg_palettebank;
 	int       m_tx_palettebank;
-	UINT16*     m_spriteram1_old;
+	std::unique_ptr<UINT16[]>     m_spriteram1_old;
 	UINT32  inufuku_tile_callback( UINT32 code );
 
 	/* misc */
@@ -55,9 +55,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(soundflag_r);
 	TILE_GET_INFO_MEMBER(get_inufuku_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_inufuku_tx_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_inufuku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_inufuku(screen_device &screen, bool state);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

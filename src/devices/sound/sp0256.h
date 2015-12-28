@@ -89,11 +89,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	UINT32 getb(int len);
@@ -108,7 +108,7 @@ private:
 
 	int            m_silent;          /* Flag: SP0256 is silent.                      */
 
-	INT16         *m_scratch;         /* Scratch buffer for audio.                    */
+	std::unique_ptr<INT16[]>    m_scratch;         /* Scratch buffer for audio.                    */
 	UINT32         m_sc_head;         /* Head pointer into scratch circular buf       */
 	UINT32         m_sc_tail;         /* Tail pointer into scratch circular buf       */
 

@@ -22,8 +22,8 @@ void cloud9_state::video_start()
 	static const int resistances[3] = { 22000, 10000, 4700 };
 
 	/* allocate second bank of videoram */
-	m_videoram = auto_alloc_array(machine(), UINT8, 0x8000);
-	membank("bank1")->set_base(m_videoram);
+	m_videoram = std::make_unique<UINT8[]>(0x8000);
+	membank("bank1")->set_base(m_videoram.get());
 
 	/* get pointers to our PROMs */
 	m_syncprom = memregion("proms")->base() + 0x000;
@@ -40,7 +40,7 @@ void cloud9_state::video_start()
 	m_screen->register_screen_bitmap(m_spritebitmap);
 
 	/* register for savestates */
-	save_pointer(NAME(m_videoram), 0x8000);
+	save_pointer(NAME(m_videoram.get()), 0x8000);
 	save_item(NAME(m_video_control));
 	save_item(NAME(m_bitmode_addr));
 }

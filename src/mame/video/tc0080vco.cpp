@@ -79,19 +79,19 @@ const device_type TC0080VCO = &device_creator<tc0080vco_device>;
 
 tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0080VCO, "Taito TC0080VCO", tag, owner, clock, "tc0080vco", __FILE__),
-	m_ram(NULL),
-	m_bg0_ram_0(NULL),
-	m_bg0_ram_1(NULL),
-	m_bg1_ram_0(NULL),
-	m_bg1_ram_1(NULL),
-	m_tx_ram_0(NULL),
-	m_tx_ram_1(NULL),
-	m_char_ram(NULL),
-	m_bgscroll_ram(NULL),
-	m_chain_ram_0(NULL),
-	m_chain_ram_1(NULL),
-	m_spriteram(NULL),
-	m_scroll_ram(NULL),
+	m_ram(nullptr),
+	m_bg0_ram_0(nullptr),
+	m_bg0_ram_1(nullptr),
+	m_bg1_ram_0(nullptr),
+	m_bg1_ram_1(nullptr),
+	m_tx_ram_0(nullptr),
+	m_tx_ram_1(nullptr),
+	m_char_ram(nullptr),
+	m_bgscroll_ram(nullptr),
+	m_chain_ram_0(nullptr),
+	m_chain_ram_1(nullptr),
+	m_spriteram(nullptr),
+	m_scroll_ram(nullptr),
 	m_bg0_scrollx(0),
 	m_bg0_scrolly(0),
 	m_bg1_scrollx(0),
@@ -174,28 +174,28 @@ void tc0080vco_device::device_start()
 
 	m_tilemap[2]->set_transparent_pen(0);
 
-	m_ram = auto_alloc_array_clear(machine(), UINT16, TC0080VCO_RAM_SIZE / 2);
+	m_ram = make_unique_clear<UINT16[]>(TC0080VCO_RAM_SIZE / 2);
 
-	m_char_ram      = m_ram + 0x00000 / 2;    /* continues at +0x10000 */
-	m_tx_ram_0      = m_ram + 0x01000 / 2;
-	m_chain_ram_0   = m_ram + 0x00000 / 2;    /* only used from +0x2000 */
+	m_char_ram      = m_ram.get() + 0x00000 / 2;    /* continues at +0x10000 */
+	m_tx_ram_0      = m_ram.get() + 0x01000 / 2;
+	m_chain_ram_0   = m_ram.get() + 0x00000 / 2;    /* only used from +0x2000 */
 
-	m_bg0_ram_0     = m_ram + 0x0c000 / 2;
-	m_bg1_ram_0     = m_ram + 0x0e000 / 2;
+	m_bg0_ram_0     = m_ram.get() + 0x0c000 / 2;
+	m_bg1_ram_0     = m_ram.get() + 0x0e000 / 2;
 
-	m_tx_ram_1      = m_ram + 0x11000 / 2;
-	m_chain_ram_1   = m_ram + 0x10000 / 2;    /* only used from +0x12000 */
+	m_tx_ram_1      = m_ram.get() + 0x11000 / 2;
+	m_chain_ram_1   = m_ram.get() + 0x10000 / 2;    /* only used from +0x12000 */
 
-	m_bg0_ram_1     = m_ram + 0x1c000 / 2;
-	m_bg1_ram_1     = m_ram + 0x1e000 / 2;
-	m_bgscroll_ram  = m_ram + 0x20000 / 2;
-	m_spriteram     = m_ram + 0x20400 / 2;
-	m_scroll_ram    = m_ram + 0x20800 / 2;
+	m_bg0_ram_1     = m_ram.get() + 0x1c000 / 2;
+	m_bg1_ram_1     = m_ram.get() + 0x1e000 / 2;
+	m_bgscroll_ram  = m_ram.get() + 0x20000 / 2;
+	m_spriteram     = m_ram.get() + 0x20400 / 2;
+	m_scroll_ram    = m_ram.get() + 0x20800 / 2;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, charlayout, (UINT8 *)m_char_ram, 0, 1, 512)));
+	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(m_palette, charlayout, (UINT8 *)m_char_ram, 0, 1, 512));
 
-	save_pointer(NAME(m_ram), TC0080VCO_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram.get()), TC0080VCO_RAM_SIZE / 2);
 	machine().save().register_postload(save_prepost_delegate(FUNC(tc0080vco_device::postload), this));
 }
 

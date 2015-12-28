@@ -45,9 +45,9 @@ public:
 
 	/* video-related */
 	/* framebuffer is a raw bitmap, remapped as a last step */
-	bitmap_ind16      *m_framebuffer[2];
-	bitmap_ind16      *m_pixel_bitmap;
-	bitmap_ind16      *m_realpunc_bitmap;
+	std::unique_ptr<bitmap_ind16> m_framebuffer[2];
+	std::unique_ptr<bitmap_ind16> m_pixel_bitmap;
+	std::unique_ptr<bitmap_ind16> m_realpunc_bitmap;
 
 	UINT16        m_pixel_scroll[2];
 
@@ -99,8 +99,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(realpunc_sensor);
 	DECLARE_DRIVER_INIT(taito_b);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(taitob_color_order0);
 	DECLARE_VIDEO_START(taitob_color_order1);
 	DECLARE_VIDEO_START(taitob_color_order2);
@@ -125,10 +125,8 @@ public:
 	void hitice_clear_pixel_bitmap(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
-	void ryujin_patch(void);
-	void sbm_patch(void);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

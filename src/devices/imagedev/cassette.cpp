@@ -31,7 +31,7 @@ const device_type CASSETTE = &device_creator<cassette_image_device>;
 cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CASSETTE, "Cassette", tag, owner, clock, "cassette_image", __FILE__),
 	device_image_interface(mconfig, *this),
-	m_cassette(NULL),
+	m_cassette(nullptr),
 	m_state(CASSETTE_STOPPED),
 	m_position(0),
 	m_position_time(0),
@@ -40,9 +40,9 @@ cassette_image_device::cassette_image_device(const machine_config &mconfig, cons
 	m_speed(0),
 	m_direction(0),
 	m_formats(cassette_default_formats),
-	m_create_opts(NULL),
+	m_create_opts(nullptr),
 	m_default_state(CASSETTE_PLAY),
-	m_interface(NULL)
+	m_interface(nullptr)
 {
 }
 
@@ -250,7 +250,7 @@ void cassette_image_device::seek(double time, int origin)
 void cassette_image_device::device_start()
 {
 	/* set to default state */
-	m_cassette = NULL;
+	m_cassette = nullptr;
 	m_state = m_default_state;
 	m_value = 0;
 }
@@ -266,7 +266,7 @@ bool cassette_image_device::call_load()
 	int cassette_flags;
 	const char *extension;
 	int is_writable;
-	device_image_interface *image = NULL;
+	device_image_interface *image = nullptr;
 	interface(image);
 
 	if ((has_been_created()) || (length() == 0))
@@ -284,7 +284,7 @@ bool cassette_image_device::call_load()
 			is_writable = !is_readonly();
 			cassette_flags = is_writable ? (CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT) : CASSETTE_FLAG_READONLY;
 			std::string fname;
-			if (software_entry()==NULL) {
+			if (software_entry()==nullptr) {
 				extension = filetype();
 			} else {
 				fname = m_mame_file->filename();
@@ -355,7 +355,7 @@ void cassette_image_device::call_unload()
 
 	/* close out the cassette */
 	cassette_close(m_cassette);
-	m_cassette = NULL;
+	m_cassette = nullptr;
 
 	/* set to default state, but only change the UI state */
 	change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
@@ -392,7 +392,7 @@ void cassette_image_device::call_display()
 	y = 0.5f;
 
 	cassette_device_iterator iter(device().machine().root_device());
-	for (dev = iter.first(); dev != NULL && strcmp( dev->tag(), device().tag() ); dev = iter.next())
+	for (dev = iter.first(); dev != nullptr && strcmp( dev->tag(), device().tag() ); dev = iter.next())
 		y += 1;
 
 	y *= device().machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;

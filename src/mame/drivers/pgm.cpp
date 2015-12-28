@@ -4376,7 +4376,7 @@ void pgm_state::expand_colourdata()
 	while (m_sprite_a_region_size < needed)
 		m_sprite_a_region_size <<= 1;
 
-	m_sprite_a_region = auto_alloc_array(machine(), UINT8, m_sprite_a_region_size);
+	m_sprite_a_region = std::make_unique<UINT8[]>(m_sprite_a_region_size);
 
 	for (cnt = 0 ; cnt < srcsize / 2 ; cnt++)
 	{

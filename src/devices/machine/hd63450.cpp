@@ -22,13 +22,13 @@ hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, d
 		m_dma_write_1(*this),
 		m_dma_write_2(*this),
 		m_dma_write_3(*this),
-		m_cpu_tag(NULL),
-		m_cpu(NULL)
+		m_cpu_tag(nullptr),
+		m_cpu(nullptr)
 {
 	for (int i = 0; i < 4; i++)
 		{
 			memset(&m_reg[i], 0, sizeof(m_reg[i]));
-			m_timer[i] = NULL;
+			m_timer[i] = nullptr;
 			m_in_progress[i] = 0;
 			m_transfer_size[i] = 0;
 			m_halted[i] = 0;
@@ -45,7 +45,7 @@ void hd63450_device::device_start()
 {
 	// get the CPU device
 	m_cpu = machine().device<cpu_device>(m_cpu_tag);
-	assert(m_cpu != NULL);
+	assert(m_cpu != nullptr);
 
 	// resolve callbacks
 	m_dma_end.resolve();

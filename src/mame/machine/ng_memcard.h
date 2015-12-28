@@ -33,23 +33,23 @@ public:
 	// construction/destruction
 	ng_memcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual iodevice_t image_type() const { return IO_MEMCARD; }
+	virtual iodevice_t image_type() const override { return IO_MEMCARD; }
 
-	virtual bool is_readable()  const { return true; }
-	virtual bool is_writeable() const { return true; }
-	virtual bool is_creatable() const { return true; }
-	virtual bool must_be_loaded() const { return false; }
-	virtual bool is_reset_on_load() const { return false; }
-	virtual const char *file_extensions() const { return "neo"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return true; }
+	virtual bool is_writeable() const override { return true; }
+	virtual bool is_creatable() const override { return true; }
+	virtual bool must_be_loaded() const override { return false; }
+	virtual bool is_reset_on_load() const override { return false; }
+	virtual const char *file_extensions() const override { return "neo"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load();
-	virtual void call_unload();
-	virtual bool call_create(int format_type, option_resolution *format_options);
+	virtual bool call_load() override;
+	virtual void call_unload() override;
+	virtual bool call_create(int format_type, option_resolution *format_options) override;
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

@@ -32,7 +32,7 @@ public:
 			m_digital_ports(*this, digital_ports),
 			m_adc_ports(*this, "ADC"),
 			m_pdrift_bank(0),
-			m_scanline_timer(NULL),
+			m_scanline_timer(nullptr),
 			m_irq2_scanline(0),
 			m_timer_irq_state(0),
 			m_vblank_irq_state(0),
@@ -41,9 +41,6 @@ public:
 		memset(m_analog_data, 0, sizeof(m_analog_data));
 		memset(m_misc_io_data, 0, sizeof(m_misc_io_data));
 	}
-
-	// YM2151 chip callbacks
-	DECLARE_WRITE_LINE_MEMBER( sound_cpu_irq );
 
 	// main CPU read/write handlers
 	DECLARE_READ16_MEMBER( analog_r );
@@ -96,9 +93,9 @@ protected:
 	};
 
 	// device overrides
-	virtual void machine_reset();
-	virtual void video_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// internal helpers
 	void update_irqs();

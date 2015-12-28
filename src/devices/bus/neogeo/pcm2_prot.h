@@ -23,14 +23,8 @@ public:
 	void neo_pcm2_swap(UINT8* ymrom, UINT32 ymsize, int value);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-
-
-
-private:
-
-
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 #endif

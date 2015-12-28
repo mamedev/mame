@@ -31,31 +31,31 @@ public:
 	template<class _Object> static devcb_base &set_input_callback(device_t &device, _Object object) { return downcast<midiin_device &>(device).m_input_cb.set_callback(object); }
 
 	// image-level overrides
-	virtual bool call_load();
-	virtual void call_unload();
+	virtual bool call_load() override;
+	virtual void call_unload() override;
 
 	// image device
-	virtual iodevice_t image_type() const { return IO_MIDIIN; }
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 0; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *file_extensions() const { return "mid"; }
-	virtual bool core_opens_image_file() const { return FALSE; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual iodevice_t image_type() const override { return IO_MIDIIN; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 0; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *file_extensions() const override { return "mid"; }
+	virtual bool core_opens_image_file() const override { return FALSE; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_config_complete();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_config_complete() override;
 
 	// serial overrides
-	virtual void tra_complete();    // Tx completed sending byte
-	virtual void tra_callback();    // Tx send bit
+	virtual void tra_complete() override;    // Tx completed sending byte
+	virtual void tra_callback() override;    // Tx send bit
 
 private:
 	static const int XMIT_RING_SIZE = (8192*4*4);

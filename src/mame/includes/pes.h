@@ -39,7 +39,7 @@ public:
 	UINT8 m_infifo_tail_ptr;        // " tail
 	UINT8 m_infifo_head_ptr;        // " head
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(rsws_w);
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_WRITE8_MEMBER(port3_w);

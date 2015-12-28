@@ -54,7 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(banking_callback);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;

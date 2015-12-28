@@ -36,10 +36,10 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
-	virtual void update_interrupts() { }
+	virtual void update_interrupts() override { }
 
 	struct planet;
 

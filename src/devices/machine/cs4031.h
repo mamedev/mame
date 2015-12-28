@@ -85,7 +85,7 @@ public:
 	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// callbacks
 	template<class _ior> void set_ior_callback(_ior ior) { m_read_ior.set_callback(ior); }
@@ -188,9 +188,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_reset_after_children();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_reset_after_children() override;
 
 private:
 	devcb_read16 m_read_ior;

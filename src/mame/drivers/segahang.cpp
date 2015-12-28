@@ -372,7 +372,7 @@ void segahang_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		case TID_INIT_I8751:
 			if (!m_i8751_vblank_hook.isnull())
 				m_mcu->suspend(SUSPEND_REASON_DISABLE, 1);
-			else if (m_mcu != NULL)
+			else if (m_mcu != nullptr)
 				machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
 			break;
 

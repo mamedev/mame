@@ -28,7 +28,7 @@ const device_type GBA_CART_SLOT = &device_creator<gba_cart_slot_device>;
 
 device_gba_cart_interface::device_gba_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0)
 {
 }
@@ -48,7 +48,7 @@ device_gba_cart_interface::~device_gba_cart_interface()
 
 void device_gba_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		// we always alloc 32MB of rom region!
 		m_rom = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
@@ -138,10 +138,10 @@ static const gba_slot slot_list[] =
 
 static int gba_get_pcb_id(const char *slot)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(slot_list[i].slot_option, slot))
-			return slot_list[i].pcb_id;
+		if (!core_stricmp(elem.slot_option, slot))
+			return elem.pcb_id;
 	}
 
 	return 0;
@@ -149,10 +149,10 @@ static int gba_get_pcb_id(const char *slot)
 
 static const char *gba_get_slot(int type)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (slot_list[i].pcb_id == type)
-			return slot_list[i].slot_option;
+		if (elem.pcb_id == type)
+			return elem.slot_option;
 	}
 
 	return "gba_rom";
@@ -168,7 +168,7 @@ bool gba_cart_slot_device::call_load()
 	if (m_cart)
 	{
 		UINT8 *ROM;
-		UINT32 size = (software_entry() != NULL) ? get_software_region_length("rom") : length();
+		UINT32 size = (software_entry() != nullptr) ? get_software_region_length("rom") : length();
 		if (size > 0x2000000)
 		{
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a cart larger than 32MB");
@@ -178,7 +178,7 @@ bool gba_cart_slot_device::call_load()
 		m_cart->rom_alloc(size, tag());
 		ROM = (UINT8 *)m_cart->get_rom_base();
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			fread(ROM, size);
 			m_type = get_cart_type(ROM, size);
@@ -256,7 +256,7 @@ bool gba_cart_slot_device::call_softlist_load(software_list_device &swlist, cons
  fullpath
  -------------------------------------------------*/
 
-INLINE std::string gba_chip_string( UINT32 chip )
+static inline std::string gba_chip_string( UINT32 chip )
 {
 	std::string str;
 	if (chip == 0) str += "NONE ";
@@ -273,7 +273,7 @@ INLINE std::string gba_chip_string( UINT32 chip )
 }
 
 
-INLINE int gba_chip_has_conflict( UINT32 chip )
+static inline int gba_chip_has_conflict( UINT32 chip )
 {
 	int count1 = 0, count2 = 0;
 	if (chip & GBA_CHIP_EEPROM) count1++;
@@ -324,9 +324,9 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		chip &= ~(GBA_CHIP_EEPROM | GBA_CHIP_EEPROM_4K | GBA_CHIP_EEPROM_64K | GBA_CHIP_FLASH | GBA_CHIP_FLASH_1M | GBA_CHIP_FLASH_512 | GBA_CHIP_SRAM);
 
 		// search if it is one of the known titles with NVRAM conflicts
-		for (int i = 0; i < sizeof(gba_chip_fix_conflict_list) / sizeof(gba_chip_fix_conflict_item); i++)
+		for (auto & elem : gba_chip_fix_conflict_list)
 		{
-			const gba_chip_fix_conflict_item *item = &gba_chip_fix_conflict_list[i];
+			const gba_chip_fix_conflict_item *item = &elem;
 			if (!strcmp(game_code, item->game_code))
 			{
 				chip |= item->chip;
@@ -348,9 +348,9 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 
 		osd_printf_info("GBA: Game Code \"%s\"\n", game_code);
 
-		for (int i = 0; i < sizeof(gba_chip_fix_eeprom_list) / sizeof(gba_chip_fix_eeprom_item); i++)
+		for (auto & elem : gba_chip_fix_eeprom_list)
 		{
-			const gba_chip_fix_eeprom_item *item = &gba_chip_fix_eeprom_list[i];
+			const gba_chip_fix_eeprom_item *item = &elem;
 			if (!strcmp(game_code, item->game_code))
 			{
 				chip = (chip & ~GBA_CHIP_EEPROM) | GBA_CHIP_EEPROM_64K;
@@ -404,7 +404,7 @@ void gba_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "gba_rom";
+		const char *slot_string;
 		UINT32 len = core_fsize(m_file);
 		dynamic_buffer rom(len);
 		int type;

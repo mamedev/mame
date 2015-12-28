@@ -63,26 +63,26 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 8; }
-	virtual UINT32 execute_input_lines() const { return 0; }
-	virtual void execute_run();
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 8; }
+	virtual UINT32 execute_input_lines() const override { return 0; }
+	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_state_interface overrides
-	void state_export(const device_state_entry &entry);
-	void state_import(const device_state_entry &entry);
+	void state_export(const device_state_entry &entry) override;
+	void state_import(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 private:
 	address_space_config m_program_config;
@@ -200,7 +200,6 @@ private:
 	 * MAME-specific stuff.
 	 */
 	address_space *m_program;
-	UINT32 m_ppc;
 	int m_icount;
 	// For debugger
 	UINT32 m_freg[32];
@@ -208,8 +207,6 @@ private:
 	void writememi_emu (UINT32 addr, int size, UINT32 data);
 	void fp_readmem_emu (UINT32 addr, int size, UINT8 *dest);
 	void fp_writemem_emu (UINT32 addr, int size, UINT8 *data, UINT32 wmask);
-	void dump_pipe (int type);
-	void dump_state ();
 	void unrecog_opcode (UINT32 pc, UINT32 insn);
 	void insn_ld_ctrl (UINT32 insn);
 	void insn_st_ctrl (UINT32 insn);
@@ -278,8 +275,6 @@ private:
 	void insn_faddp (UINT32 insn);
 	void insn_faddz (UINT32 insn);
 	void decode_exec (UINT32 insn, UINT32 non_shadow);
-	void disasm (UINT32 addr, int len);
-	void dbg_db (UINT32 addr, int len);
 	float get_fregval_s (int fr);
 	double get_fregval_d (int fr);
 	void set_fregval_s (int fr, float s);

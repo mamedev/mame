@@ -463,11 +463,11 @@ DRIVER_INIT_MEMBER(microtan_state,microtan)
 			space.nop_readwrite(0x0400, 0xbbff);
 			break;
 		case 1:  // +7K TANEX
-			space.install_ram(0x0400, 0x1fff,NULL);
+			space.install_ram(0x0400, 0x1fff,nullptr);
 			space.nop_readwrite(0x2000, 0xbbff);
 			break;
 		default: // +7K TANEX + 40K TANRAM
-			space.install_ram(0x0400, 0xbbff, NULL);
+			space.install_ram(0x0400, 0xbbff, nullptr);
 			break;
 	}
 

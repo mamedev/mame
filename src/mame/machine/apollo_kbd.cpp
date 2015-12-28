@@ -146,7 +146,7 @@ const char *apollo_kbd_device::cpu_context()
 	int ms = (t % osd_ticks_per_second()) / 1000;
 
 	/* if we have an executing CPU, output data */
-	if (cpu != NULL)
+	if (cpu != nullptr)
 	{
 		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag(),
 				cpu->safe_pcbase(), tag());
@@ -163,9 +163,9 @@ const char *apollo_kbd_device::cpu_context()
 //**************************************************************************
 
 apollo_kbd_device::beeper::beeper() :
-	m_device(NULL),
-	m_beeper(NULL),
-	m_timer(NULL)
+	m_device(nullptr),
+	m_beeper(nullptr),
+	m_timer(nullptr)
 {
 }
 
@@ -218,7 +218,7 @@ TIMER_CALLBACK( apollo_kbd_device::beeper::static_beeper_callback )
 //**************************************************************************
 
 apollo_kbd_device::mouse::mouse() :
-	m_device(NULL)
+	m_device(nullptr)
 {
 }
 
@@ -977,10 +977,14 @@ INPUT_PORTS_START( apollo_kbd )
 	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON3)
 	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Center mouse button") PORT_CODE(MOUSECODE_BUTTON2)
 
+// FIXME:
+// PORT_SENSITIVITY(50) would be perfect for SDL2
+// PORT_SENSITIVITY(200) would be perfect for SDL1.2
+
 	PORT_START("mouse2")  // X-axis
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(200) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START("mouse3")  // Y-axis
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(200) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 INPUT_PORTS_END

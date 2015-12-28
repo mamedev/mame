@@ -47,14 +47,14 @@ public:
 	required_shared_ptr<UINT8> m_backup_ram;
 	required_shared_ptr<UINT8> m_ram_attr;
 	required_shared_ptr<UINT8> m_ram_video;
-	UINT8 *m_ram_palette;
+	std::unique_ptr<UINT8[]> m_ram_palette;
 	DECLARE_READ8_MEMBER(palette_r);
 	DECLARE_WRITE8_MEMBER(palette_w);
 	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 };
@@ -529,8 +529,8 @@ GFXDECODE_END
 
 void slotcarn_state::machine_start()
 {
-	m_ram_palette = auto_alloc_array(machine(), UINT8, RAM_PALETTE_SIZE);
-	save_pointer(NAME(m_ram_palette), RAM_PALETTE_SIZE);
+	m_ram_palette = std::make_unique<UINT8[]>(RAM_PALETTE_SIZE);
+	save_pointer(NAME(m_ram_palette.get()), RAM_PALETTE_SIZE);
 }
 
 /***********************************

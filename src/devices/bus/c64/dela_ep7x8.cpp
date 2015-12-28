@@ -22,19 +22,19 @@ const device_type C64_DELA_EP7X8 = &device_creator<c64_dela_ep7x8_cartridge_devi
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_dela_ep7x8 )
-	MCFG_GENERIC_SOCKET_ADD("rom1", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom1", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom2", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom2", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom3", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom3", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom4", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom4", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom5", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom5", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom6", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom6", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_SOCKET_ADD("rom7", generic_linear_slot, NULL)
+	MCFG_GENERIC_SOCKET_ADD("rom7", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 MACHINE_CONFIG_END
 

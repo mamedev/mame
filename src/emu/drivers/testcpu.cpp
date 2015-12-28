@@ -33,12 +33,12 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_cpu(*this, "maincpu"),
 			m_ram(*this, "ram"),
-			m_space(NULL)
+			m_space(nullptr)
 	{
 	}
 
 	// timer callback; used to wrest control of the system
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override
 	{
 		static const UINT32 sample_instructions[] =
 		{
@@ -52,11 +52,11 @@ public:
 		};
 
 		// iterate over instructions
-		for (int instnum = 0; instnum < ARRAY_LENGTH(sample_instructions); instnum++)
+		for (auto & sample_instruction : sample_instructions)
 		{
 			// write the instruction to execute, followed by a BLR which will terminate the
 			// basic block in the DRC
-			m_space->write_dword(RAM_BASE, sample_instructions[instnum]);
+			m_space->write_dword(RAM_BASE, sample_instruction);
 			m_space->write_dword(RAM_BASE + 4, 0x4e800020);
 
 			// initialize the register state
@@ -92,7 +92,7 @@ public:
 	}
 
 	// startup code; do basic configuration and set a timer to go off immediately
-	virtual void machine_start()
+	virtual void machine_start() override
 	{
 		// find the CPU's address space
 		m_space = &m_cpu->space(AS_PROGRAM);

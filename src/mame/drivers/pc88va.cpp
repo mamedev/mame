@@ -131,10 +131,9 @@ public:
 	DECLARE_WRITE16_MEMBER(video_pri_w);
 	DECLARE_READ8_MEMBER(backupram_dsw_r);
 	DECLARE_WRITE8_MEMBER(sys_port1_w);
-	DECLARE_WRITE8_MEMBER(fdc_irq_vector_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_pc88va(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pc88va_vrtc_irq);
 	DECLARE_READ8_MEMBER(cpu_8255_c_r);
@@ -184,7 +183,7 @@ DECLARE_WRITE8_MEMBER(dma_memw_cb);
 	void execute_sprsw_cmd();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
@@ -1157,7 +1156,7 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 
 			m_fdc_ctrl_2 = data;
 
-			pc88va_fdc_update_ready(NULL, 0);
+			pc88va_fdc_update_ready(nullptr, 0);
 
 			break; // FDC control port 2
 	}

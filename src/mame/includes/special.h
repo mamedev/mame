@@ -86,7 +86,7 @@ public:
 	DECLARE_WRITE8_MEMBER(specialist_8255_portc_w);
 	void specimx_set_bank(offs_t i, UINT8 data);
 	void erik_set_bank();
-	UINT8 *m_specimx_colorram;
+	std::unique_ptr<UINT8[]> m_specimx_colorram;
 	UINT8 m_erik_color_1;
 	UINT8 m_erik_color_2;
 	UINT8 m_erik_background;
@@ -147,7 +147,7 @@ protected:
 	required_ioport m_io_line12;
 
 	required_device<palette_device> m_palette;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif /* SPECIAL_H_ */

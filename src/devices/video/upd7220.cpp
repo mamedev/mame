@@ -165,7 +165,7 @@ ROM_END
 
 const address_space_config *upd7220_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 
@@ -643,7 +643,7 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	m_disp(0),
 	m_gchr(0),
 	m_bitmap_mod(0),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, 0, NULL, *ADDRESS_MAP_NAME(upd7220_vram))
+	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, 0, nullptr, *ADDRESS_MAP_NAME(upd7220_vram))
 {
 	for (int i = 0; i < 16; i++)
 	{
@@ -653,9 +653,9 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 		m_ra[i] = 0;
 	}
 
-	for (int i = 0; i < 17; i++)
+	for (auto & elem : m_pr)
 	{
-		m_pr[i] = 0;
+		elem = 0;
 	}
 
 	memset(&m_figs, 0x00, sizeof(m_figs));
@@ -987,7 +987,7 @@ void upd7220_device::draw_rectangle(int x, int y)
 void upd7220_device::draw_char(int x, int y)
 {
 	int isize,psize;
-	UINT16 tile_data = 0;
+	UINT16 tile_data;
 
 	LOG(("uPD7220 char check: %d %d %02x %08x %d %d %02x\n",x,y,m_figs.m_dir,m_ead,m_figs.m_d,m_figs.m_dc,m_figs.m_figure_type));
 

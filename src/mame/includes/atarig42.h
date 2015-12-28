@@ -50,8 +50,8 @@ public:
 	UINT16 *        m_sloop_base;
 
 	UINT32          m_last_accesses[8];
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_WRITE16_MEMBER(a2d_select_w);
 	DECLARE_READ16_MEMBER(a2d_data_r);
@@ -73,5 +73,4 @@ public:
 	DECLARE_MACHINE_RESET(atarig42);
 	DECLARE_VIDEO_START(atarig42);
 	UINT32 screen_update_atarig42(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_atarig42(screen_device &screen, bool state);
 };

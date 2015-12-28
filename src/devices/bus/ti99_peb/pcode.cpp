@@ -107,7 +107,7 @@ READ8Z_MEMBER( ti_pcode_card_device::readz )
 		// GROM access
 		if ((offset & GROMMASK)==GROMREAD)
 		{
-			for (int i=0; i < 8; i++) m_grom[i]->readz(space, offset, value, mem_mask);
+			for (auto & elem : m_grom) elem->readz(space, offset, value, mem_mask);
 			if (VERBOSE>5) LOG("ti99_pcode: read from grom %04x: %02x\n", offset&0xffff, *value);
 		}
 		else
@@ -148,7 +148,7 @@ WRITE8_MEMBER( ti_pcode_card_device::write )
 			// 0101 1111 1111 11x0
 			if ((offset & GROMMASK) == GROMWRITE)
 			{
-				for (int i=0; i < 8; i++) m_grom[i]->write(space, offset, data, mem_mask);
+				for (auto & elem : m_grom) elem->write(space, offset, data, mem_mask);
 			}
 		}
 	}
@@ -300,7 +300,7 @@ MACHINE_CONFIG_END
 
 INPUT_PORTS_START( ti99_pcode )
 	PORT_START( ACTIVE_TAG )
-	PORT_DIPNAME( 0x01, 0x00, "P-Code activation switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti_pcode_card_device, switch_changed, 0)
+	PORT_DIPNAME( 0x01, 0x00, "P-Code activation switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti_pcode_card_device, switch_changed, nullptr)
 		PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING( 0x01, DEF_STR( On ) )
 INPUT_PORTS_END

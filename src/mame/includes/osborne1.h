@@ -54,10 +54,10 @@ public:
 		m_bank_0xxx(*this, "bank_0xxx"),
 		m_bank_1xxx(*this, "bank_1xxx"),
 		m_bank_fxxx(*this, "bank_fxxx"),
-		m_video_timer(NULL),
-		m_p_chargen(NULL),
-		m_tilemap(NULL),
-		m_acia_rxc_txc_timer(NULL)
+		m_video_timer(nullptr),
+		m_p_chargen(nullptr),
+		m_tilemap(nullptr),
+		m_acia_rxc_txc_timer(nullptr)
 	{ }
 
 
@@ -82,8 +82,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(serial_acia_irq_func);
 
 	DECLARE_DRIVER_INIT(osborne1);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device>             m_maincpu;
@@ -99,7 +99,7 @@ public:
 	required_device<floppy_image_device>    m_floppy1;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	TIMER_CALLBACK_MEMBER(video_callback);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);

@@ -64,8 +64,8 @@ public:
 	required_device<floppy_connector> m_floppy3;
 	required_memory_region m_rom;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( mmu_w );
 	DECLARE_WRITE8_MEMBER( prom_toggle_w );
@@ -96,7 +96,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	DECLARE_WRITE8_MEMBER(xor100_kbd_put);
 
 	int m_centronics_busy;
 	int m_centronics_select;

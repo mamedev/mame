@@ -16,11 +16,11 @@ const device_type K001006 = &device_creator<k001006_device>;
 
 k001006_device::k001006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K001006, "K001006 Texel Unit", tag, owner, clock, "k001006", __FILE__),
-	m_pal_ram(NULL),
-	m_unknown_ram(NULL),
+	m_pal_ram(nullptr),
+	m_unknown_ram(nullptr),
 	m_addr(0),
 	m_device_sel(0),
-	m_palette(NULL),
+	m_palette(nullptr), m_gfx_region(nullptr), m_gfxrom(nullptr),
 	m_tex_layout(0)
 {
 }
@@ -41,18 +41,18 @@ void k001006_device::device_config_complete()
 
 void k001006_device::device_start()
 {
-	m_pal_ram = auto_alloc_array_clear(machine(), UINT16, 0x800);
-	m_unknown_ram = auto_alloc_array_clear(machine(), UINT16, 0x1000);
-	m_palette = auto_alloc_array_clear(machine(), UINT32, 0x800);
+	m_pal_ram = make_unique_clear<UINT16[]>(0x800);
+	m_unknown_ram = make_unique_clear<UINT16[]>(0x1000);
+	m_palette = make_unique_clear<UINT32[]>(0x800);
 
 	m_gfxrom = machine().root_device().memregion(m_gfx_region)->base();
-	m_texrom = auto_alloc_array(machine(), UINT8, 0x800000);
+	m_texrom = std::make_unique<UINT8[]>(0x800000);
 
-	preprocess_texture_data(m_texrom, m_gfxrom, 0x800000, m_tex_layout);
+	preprocess_texture_data(m_texrom.get(), m_gfxrom, 0x800000, m_tex_layout);
 
-	save_pointer(NAME(m_pal_ram), 0x800*sizeof(UINT16));
-	save_pointer(NAME(m_unknown_ram), 0x1000*sizeof(UINT16));
-	save_pointer(NAME(m_palette), 0x800*sizeof(UINT32));
+	save_pointer(NAME(m_pal_ram.get()), 0x800*sizeof(UINT16));
+	save_pointer(NAME(m_unknown_ram.get()), 0x1000*sizeof(UINT16));
+	save_pointer(NAME(m_palette.get()), 0x800*sizeof(UINT32));
 	save_item(NAME(m_device_sel));
 	save_item(NAME(m_addr));
 }
@@ -65,7 +65,7 @@ void k001006_device::device_reset()
 {
 	m_addr = 0;
 	m_device_sel = 0;
-	memset(m_palette, 0, 0x800*sizeof(UINT32));
+	memset(m_palette.get(), 0, 0x800*sizeof(UINT32));
 }
 
 /*****************************************************************************
@@ -155,7 +155,7 @@ WRITE32_MEMBER( k001006_device::write )
 
 UINT32 k001006_device::fetch_texel(int page, int pal_index, int u, int v)
 {
-	UINT8 *tex = m_texrom + page;
+	UINT8 *tex = m_texrom.get() + page;
 	int texel = tex[((v & 0x1ff) * 512) + (u & 0x1ff)];
 	return m_palette[pal_index + texel];
 }

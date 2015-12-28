@@ -218,7 +218,7 @@ DISCRETE_RESET(dss_counter)
 #define DSS_LFSR_NOISE__FEED    DISCRETE_INPUT(4)
 #define DSS_LFSR_NOISE__BIAS    DISCRETE_INPUT(5)
 
-INLINE int dss_lfsr_function(discrete_device *dev, int myfunc, int in0, int in1, int bitmask)
+static inline int dss_lfsr_function(discrete_device *dev, int myfunc, int in0, int in1, int bitmask)
 {
 	int retval;
 
@@ -914,7 +914,7 @@ DISCRETE_RESET(dss_op_amp_osc)
 	for (loop = 0; loop < 8; loop ++)
 	{
 		m_r[loop] = m_device->node_output_ptr(*r_info_ptr);
-		if (m_r[loop] == NULL)
+		if (m_r[loop] == nullptr)
 			m_r[loop] = r_info_ptr;
 		r_info_ptr++;
 	}

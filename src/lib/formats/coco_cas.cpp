@@ -277,7 +277,7 @@ const struct CassetteFormat coco_cas_format =
 	"cas",
 	coco_cas_identify,
 	coco_cas_load,
-	NULL
+	nullptr
 };
 
 const struct CassetteFormat alice32_cas_format =
@@ -285,7 +285,7 @@ const struct CassetteFormat alice32_cas_format =
 	"cas,c10,k7",
 	coco_cas_identify,
 	alice32_cas_load,
-	NULL
+	nullptr
 };
 
 

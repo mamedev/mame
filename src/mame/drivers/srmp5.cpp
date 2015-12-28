@@ -86,8 +86,8 @@ public:
 	required_ioport_array<4> m_keys;
 
 	UINT32 m_chrbank;
-	UINT16 *m_tileram;
-	UINT16 *m_sprram;
+	std::unique_ptr<UINT16[]> m_tileram;
+	std::unique_ptr<UINT16[]> m_sprram;
 
 	UINT8 m_input_select;
 
@@ -116,7 +116,7 @@ public:
 	DECLARE_READ8_MEMBER(cmd1_r);
 	DECLARE_READ8_MEMBER(cmd2_r);
 	DECLARE_READ8_MEMBER(cmd_stat8_r);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_DRIVER_INIT(srmp5);
 	UINT32 screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -128,9 +128,9 @@ public:
 UINT32 srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,address,xs,xs2,ys,ys2,height,width,xw,yw,xb,yb,sizex,sizey;
-	UINT16 *sprite_list=m_sprram;
+	UINT16 *sprite_list=m_sprram.get();
 	UINT16 *sprite_list_end=&m_sprram[0x4000]; //guess
-	UINT8 *pixels=(UINT8 *)m_tileram;
+	UINT8 *pixels=(UINT8 *)m_tileram.get();
 	const pen_t * const pens = m_palette->pens();
 
 //Table surface seems to be tiles, but display corrupts when switching the scene if always ON.
@@ -249,8 +249,8 @@ void srmp5_state::machine_start()
 	save_item(NAME(m_cmd2));
 	save_item(NAME(m_cmd_stat));
 	save_item(NAME(m_chrbank));
-	save_pointer(NAME(m_tileram), 0x100000/2);
-	save_pointer(NAME(m_sprram), 0x80000/2);
+	save_pointer(NAME(m_tileram.get()), 0x100000/2);
+	save_pointer(NAME(m_sprram.get()), 0x80000/2);
 	save_item(NAME(m_vidregs));
 }
 
@@ -612,8 +612,8 @@ DRIVER_INIT_MEMBER(srmp5_state,srmp5)
 {
 	m_maincpu->st0016_game = 9;
 
-	m_tileram = auto_alloc_array(machine(), UINT16, 0x100000/2);
-	m_sprram  = auto_alloc_array(machine(), UINT16, 0x080000/2);
+	m_tileram = std::make_unique<UINT16[]>(0x100000/2);
+	m_sprram  = std::make_unique<UINT16[]>(0x080000/2);
 #ifdef DEBUG_CHAR
 	memset(m_tileduty, 1, 0x2000);
 #endif

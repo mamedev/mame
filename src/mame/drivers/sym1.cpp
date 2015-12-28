@@ -58,7 +58,7 @@ public:
 	UINT8 m_riot_port_b;
 	emu_timer *m_led_update;
 	DECLARE_DRIVER_INIT(sym1);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_0_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_1_w);

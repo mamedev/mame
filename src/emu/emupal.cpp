@@ -30,10 +30,10 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 		m_endianness(),
 		m_endianness_supplied(false),
 		m_raw_to_rgb(raw_to_rgb_converter()),
-		m_palette(NULL),
-		m_pens(NULL),
+		m_palette(nullptr),
+		m_pens(nullptr),
 		m_format(),
-		m_shadow_table(NULL),
+		m_shadow_table(nullptr),
 		m_shadow_group(0),
 		m_hilight_group(0),
 		m_white_pen(0),
@@ -234,7 +234,7 @@ void palette_device::set_shadow_dRGB32(int mode, int dr, int dg, int db, bool no
 
 	// only applies to RGB direct modes
 	assert(m_format != BITMAP_FORMAT_IND16);
-	assert(stable.base != NULL);
+	assert(stable.base != nullptr);
 
 	// clamp the deltas (why?)
 	if (dr < -0xff) dr = -0xff; else if (dr > 0xff) dr = 0xff;
@@ -302,7 +302,7 @@ inline void palette_device::update_for_write(offs_t byte_offset, int bytes_modif
 	for (int index = 0; index < count; index++)
 	{
 		UINT32 data = m_paletteram.read(base + index);
-		if (m_paletteram_ext.base() != NULL)
+		if (m_paletteram_ext.base() != nullptr)
 			data |= m_paletteram_ext.read(base + index) << (8 * bpe);
 
 		if (indirect)
@@ -410,7 +410,7 @@ void palette_device::device_start()
 
 	// find the memory, if present
 	const memory_share *share = memshare(tag());
-	if (share != NULL)
+	if (share != nullptr)
 	{
 		// find the extended (split) memory, if present
 		std::string tag_ext = std::string(tag()).append("_ext");
@@ -421,7 +421,7 @@ void palette_device::device_start()
 
 		// determine bytes per entry and configure
 		int bytes_per_entry = m_raw_to_rgb.bytes_per_entry();
-		if (share_ext == NULL)
+		if (share_ext == nullptr)
 			m_paletteram.set(*share, bytes_per_entry);
 		else
 		{
@@ -435,7 +435,7 @@ void palette_device::device_start()
 			// forcing width only makes sense when narrower than the native bus width
 			assert_always(m_membits < share->bitwidth(), "Improper use of MCFG_PALETTE_MEMBITS");
 			m_paletteram.set_membits(m_membits);
-			if (share_ext != NULL)
+			if (share_ext != nullptr)
 				m_paletteram_ext.set_membits(m_membits);
 		}
 
@@ -443,14 +443,14 @@ void palette_device::device_start()
 		if (m_endianness_supplied)
 		{
 			// forcing endianness only makes sense when the RAM is narrower than the palette format and not split
-			assert_always((share_ext == NULL && m_paletteram.membits() / 8 < bytes_per_entry), "Improper use of MCFG_PALETTE_ENDIANNESS");
+			assert_always((share_ext == nullptr && m_paletteram.membits() / 8 < bytes_per_entry), "Improper use of MCFG_PALETTE_ENDIANNESS");
 			m_paletteram.set_endianness(m_endianness);
 		}
 	}
 
 	// reset all our data
 	screen_device *device = machine().first_screen();
-	m_format = (device != NULL) ? device->format() : BITMAP_FORMAT_INVALID;
+	m_format = (device != nullptr) ? device->format() : BITMAP_FORMAT_INVALID;
 
 	// allocate the palette
 	if (m_entries > 0)
@@ -540,7 +540,7 @@ void palette_device::device_post_load()
 void palette_device::device_stop()
 {
 	// dereference the palette
-	if (m_palette != NULL)
+	if (m_palette != nullptr)
 		m_palette->deref();
 }
 
@@ -638,7 +638,7 @@ void palette_device::allocate_color_tables()
 			break;
 
 		default:
-			m_pens = NULL;
+			m_pens = nullptr;
 			break;
 	}
 }
@@ -713,7 +713,7 @@ void palette_device::configure_rgb_shadows(int mode, float factor)
 	// verify the shadow table
 	assert(mode >= 0 && mode < ARRAY_LENGTH(m_shadow_tables));
 	shadow_table_data &stable = m_shadow_tables[mode];
-	assert(stable.base != NULL);
+	assert(stable.base != nullptr);
 
 	// regenerate the table
 	int ifactor = int(factor * 256.0f);

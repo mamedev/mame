@@ -75,8 +75,8 @@ public:
 	required_device<cassette_image_device> m_cassette;
 
 	// defined in machine/kc.c
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	// modules read/write
 	DECLARE_READ8_MEMBER ( expansion_read );
@@ -110,7 +110,6 @@ public:
 	// CTC callback
 	DECLARE_WRITE_LINE_MEMBER( ctc_zc0_callback );
 	DECLARE_WRITE_LINE_MEMBER( ctc_zc1_callback );
-	DECLARE_WRITE_LINE_MEMBER( ctc_zc2_callback );
 
 	// keyboard
 	DECLARE_WRITE_LINE_MEMBER( keyboard_cb );
@@ -123,7 +122,7 @@ public:
 	void speaker_update();
 
 	// defined in video/kc.c
-	virtual void video_start();
+	virtual void video_start() override;
 	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER( video_toggle_blink_state );
 	void video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, UINT8 colour_byte, UINT8 gfx_byte);
@@ -164,11 +163,11 @@ public:
 		{ }
 
 	// defined in machine/kc.c
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
-	virtual void update_0x04000();
-	virtual void update_0x08000();
-	virtual void update_0x0c000();
+	virtual void update_0x04000() override;
+	virtual void update_0x08000() override;
+	virtual void update_0x0c000() override;
 
 	DECLARE_READ8_MEMBER( kc85_4_86_r );
 	DECLARE_READ8_MEMBER( kc85_4_84_r );
@@ -176,8 +175,8 @@ public:
 	DECLARE_WRITE8_MEMBER( kc85_4_84_w );
 
 	// defined in video/kc.c
-	virtual void video_start();
-	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void video_start() override;
+	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	void video_control_w(int data);
 
 	// driver state

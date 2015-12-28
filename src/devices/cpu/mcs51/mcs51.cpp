@@ -263,9 +263,9 @@ ADDRESS_MAP_END
 mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, UINT8 features)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0
-		, ( ( program_width == 12 ) ? ADDRESS_MAP_NAME(program_12bit) : ( ( program_width == 13 ) ? ADDRESS_MAP_NAME(program_13bit) : NULL ) ))
+		, ( ( program_width == 12 ) ? ADDRESS_MAP_NAME(program_12bit) : ( ( program_width == 13 ) ? ADDRESS_MAP_NAME(program_13bit) : nullptr ) ))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0
-		, ( ( data_width == 7 ) ? ADDRESS_MAP_NAME(data_7bit) : ( ( data_width == 8 ) ? ADDRESS_MAP_NAME(data_8bit) : NULL ) ))
+		, ( ( data_width == 7 ) ? ADDRESS_MAP_NAME(data_7bit) : ( ( data_width == 8 ) ? ADDRESS_MAP_NAME(data_8bit) : nullptr ) ))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 18, 0)
 	, m_pc(0)
 	, m_features(features)
@@ -279,8 +279,8 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 
 	/* default to standard cmos interfacing */
 
-	for (int i=0; i < ARRAY_LENGTH(m_forced_inputs); i++)
-		m_forced_inputs[i] = 0;
+	for (auto & elem : m_forced_inputs)
+		elem = 0;
 }
 
 
@@ -1004,7 +1004,7 @@ void mcs51_cpu_device::transmit_receive(int source)
 void mcs51_cpu_device::update_timer_t0(int cycles)
 {
 	int mode = (GET_M0_1<<1) | GET_M0_0;
-	UINT32 count = 0;
+	UINT32 count;
 
 	if (GET_TR0)
 	{
@@ -1091,7 +1091,7 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 {
 	UINT8 mode = (GET_M1_1<<1) | GET_M1_0;
 	UINT8 mode_0 = (GET_M0_1<<1) | GET_M0_0;
-	UINT32 count = 0;
+	UINT32 count;
 
 	if (mode_0 != 3)
 	{
@@ -1713,7 +1713,7 @@ void mcs51_cpu_device::check_irqs()
 	UINT8 ints = (GET_IE0 | (GET_TF0<<1) | (GET_IE1<<2) | (GET_TF1<<3)
 			| ((GET_RI|GET_TI)<<4));
 	UINT8 int_vec = 0;
-	UINT8 int_mask = 0;
+	UINT8 int_mask;
 	int priority_request = -1;
 	int i;
 

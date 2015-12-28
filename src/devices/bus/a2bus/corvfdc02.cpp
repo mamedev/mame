@@ -178,7 +178,7 @@ UINT8 a2bus_corvfdc02_device::read_c0nx(address_space &space, UINT8 offset)
 
 void a2bus_corvfdc02_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	switch (offset)
 	{
@@ -208,16 +208,16 @@ void a2bus_corvfdc02_device::write_c0nx(address_space &space, UINT8 offset, UINT
 				switch (data & 3)
 				{
 					case 0:
-						floppy = m_con1 ? m_con1->get_device() : 0;
+						floppy = m_con1 ? m_con1->get_device() : nullptr;
 						break;
 					case 1:
-						floppy = m_con2 ? m_con2->get_device() : 0;
+						floppy = m_con2 ? m_con2->get_device() : nullptr;
 						break;
 					case 2:
-						floppy = m_con3 ? m_con3->get_device() : 0;
+						floppy = m_con3 ? m_con3->get_device() : nullptr;
 						break;
 					case 3:
-						floppy = m_con4 ? m_con4->get_device() : 0;
+						floppy = m_con4 ? m_con4->get_device() : nullptr;
 						break;
 				}
 
@@ -230,7 +230,7 @@ void a2bus_corvfdc02_device::write_c0nx(address_space &space, UINT8 offset, UINT
 				}
 			}
 
-			if (m_curfloppy != NULL)
+			if (m_curfloppy != nullptr)
 			{
 				// motor control (active low)
 				m_curfloppy->mon_w((data & 8) ? 1 : 0);

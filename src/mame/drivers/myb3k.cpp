@@ -43,9 +43,9 @@ public:
 	required_device<palette_device> m_palette;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 	UINT8 m_vmode;
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -128,7 +128,7 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 WRITE8_MEMBER( myb3k_state::myb3k_fdc_output_w )
 {
 	/* TODO: complete guesswork! (it just does a 0x24 -> 0x20 in there) */
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (data & 1) floppy = m_floppy0;
 	if (data & 2) floppy = m_floppy1;

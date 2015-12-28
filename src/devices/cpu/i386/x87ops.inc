@@ -117,7 +117,7 @@ extern flag floatx80_is_nan( floatx80 a );
 
 extern flag floatx80_is_signaling_nan(floatx80 a);
 
-INLINE flag floatx80_is_quiet_nan(floatx80 a)
+static inline flag floatx80_is_quiet_nan(floatx80 a)
 {
 	bits64 aLow;
 
@@ -128,36 +128,36 @@ INLINE flag floatx80_is_quiet_nan(floatx80 a)
 		&& (a.low != aLow);
 }
 
-INLINE int floatx80_is_zero(floatx80 fx)
+static inline int floatx80_is_zero(floatx80 fx)
 {
 	return (((fx.high & 0x7fff) == 0) && ((fx.low << 1) == 0));
 }
 
-INLINE int floatx80_is_inf(floatx80 fx)
+static inline int floatx80_is_inf(floatx80 fx)
 {
 	return (((fx.high & 0x7fff) == 0x7fff) && ((fx.low << 1) == 0));
 }
 
-INLINE int floatx80_is_denormal(floatx80 fx)
+static inline int floatx80_is_denormal(floatx80 fx)
 {
 	return (((fx.high & 0x7fff) == 0) &&
 			((fx.low & U64(0x8000000000000000)) == 0) &&
 			((fx.low << 1) != 0));
 }
 
-INLINE floatx80 floatx80_abs(floatx80 fx)
+static inline floatx80 floatx80_abs(floatx80 fx)
 {
 	fx.high &= 0x7fff;
 	return fx;
 }
 
-INLINE double fx80_to_double(floatx80 fx)
+static inline double fx80_to_double(floatx80 fx)
 {
 	UINT64 d = floatx80_to_float64(fx);
 	return *(double*)&d;
 }
 
-INLINE floatx80 double_to_fx80(double in)
+static inline floatx80 double_to_fx80(double in)
 {
 	return float64_to_floatx80(*(UINT64*)&in);
 }

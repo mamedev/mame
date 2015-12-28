@@ -76,8 +76,8 @@ class feature_list_item
 
 public:
 	// construction/destruction
-	feature_list_item(const char *name = NULL, const char *value = NULL)
-		: m_next(NULL),
+	feature_list_item(const char *name = nullptr, const char *value = nullptr)
+		: m_next(nullptr),
 			m_name(name),
 			m_value(value) { }
 
@@ -104,7 +104,7 @@ class software_part
 
 public:
 	// construction/destruction
-	software_part(software_info &info, const char *name = NULL, const char *interface = NULL);
+	software_part(software_info &info, const char *name = nullptr, const char *interface = nullptr);
 
 	// getters
 	software_part *next() const { return m_next; }
@@ -112,7 +112,7 @@ public:
 	const char *name() const { return m_name; }
 	const char *interface() const { return m_interface; }
 	feature_list_item *featurelist() const { return m_featurelist.first(); }
-	rom_entry *romdata(unsigned int index = 0) { return (index < m_romdata.size()) ? &m_romdata[index] : NULL; }
+	rom_entry *romdata(unsigned int index = 0) { return (index < m_romdata.size()) ? &m_romdata[index] : nullptr; }
 
 	// helpers
 	bool is_compatible(const software_list_device &swlist) const;
@@ -158,7 +158,7 @@ public:
 	software_part *last_part() const { return m_partdata.last(); }
 
 	// additional operations
-	software_part *find_part(const char *partname, const char *interface = NULL);
+	software_part *find_part(const char *partname, const char *interface = nullptr);
 	bool has_multiple_parts(const char *interface) const;
 
 private:
@@ -205,7 +205,7 @@ public:
 	const char *errors_string() { if (!m_parsed) parse(); return m_errors.c_str(); }
 
 	// operations
-	software_info *find(const char *look_for, software_info *prev = NULL);
+	software_info *find(const char *look_for, software_info *prev = nullptr);
 	software_info *first_software_info() { if (!m_parsed) parse(); return m_infolist.first(); }
 	void find_approx_matches(const char *name, int matches, software_info **list, const char *interface);
 	void release();
@@ -224,8 +224,8 @@ protected:
 	void internal_validity_check(validity_checker &valid) ATTR_COLD;
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_validity_check(validity_checker &valid) const ATTR_COLD;
+	virtual void device_start() override;
+	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
 
 	// configuration state
 	std::string                 m_list_name;

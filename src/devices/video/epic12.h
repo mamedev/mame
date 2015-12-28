@@ -76,7 +76,7 @@ public:
 	UINT32 m_gfx_scroll_1_x, m_gfx_scroll_1_y;
 
 	int m_gfx_size;
-	bitmap_rgb32 *m_bitmaps;
+	std::unique_ptr<bitmap_rgb32> m_bitmaps;
 	rectangle m_clip;
 
 	UINT16* m_use_ram;
@@ -95,7 +95,7 @@ public:
 	UINT32 m_gfx_addr_shadowcopy;
 	UINT32 m_gfx_scroll_0_x_shadowcopy, m_gfx_scroll_0_y_shadowcopy;
 	UINT32 m_gfx_scroll_1_x_shadowcopy, m_gfx_scroll_1_y_shadowcopy;
-	UINT16* m_ram16_copy;
+	std::unique_ptr<UINT16[]> m_ram16_copy;
 	inline void gfx_upload_shadow_copy(address_space &space, offs_t *addr);
 	inline void gfx_create_shadow_copy(address_space &space);
 	inline UINT16 COPY_NEXT_WORD(address_space &space, offs_t *addr);
@@ -822,8 +822,8 @@ public:
 
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	osd_work_queue *m_work_queue;
 	osd_work_item *m_blitter_request;

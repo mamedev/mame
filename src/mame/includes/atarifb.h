@@ -87,9 +87,9 @@ public:
 	TILE_GET_INFO_MEMBER(alpha1_get_tile_info);
 	TILE_GET_INFO_MEMBER(alpha2_get_tile_info);
 	TILE_GET_INFO_MEMBER(field_get_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(atarifb);
 	UINT32 screen_update_atarifb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_abaseb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

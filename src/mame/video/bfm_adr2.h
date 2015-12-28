@@ -9,8 +9,6 @@ public:
 	// construction/destruction
 	bfm_adder2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void static_set_palette_tag(device_t &device, const char *tag);
-
 	TILE_GET_INFO_MEMBER( get_tile0_info );
 	TILE_GET_INFO_MEMBER( get_tile1_info );
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -39,9 +37,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 private:
 
 	int m_adder2_screen_page_reg;        // access/display select

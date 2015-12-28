@@ -627,10 +627,10 @@ void tms340x0_device::device_reset()
 {
 	m_ppc = 0;
 	m_st = 0;
-	m_pixel_write = NULL;
-	m_pixel_read = NULL;
-	m_raster_op = NULL;
-	m_pixel_op = NULL;
+	m_pixel_write = nullptr;
+	m_pixel_read = nullptr;
+	m_raster_op = nullptr;
+	m_pixel_op = nullptr;
 	m_pixel_op_timing = 0;
 	m_convsp = 0;
 	m_convdp = 0;
@@ -812,14 +812,14 @@ void tms340x0_device::set_pixel_function()
 
 const tms340x0_device::raster_op_func tms340x0_device::s_raster_ops[32] =
 {
-				NULL, &tms340x0_device::raster_op_1 , &tms340x0_device::raster_op_2 , &tms340x0_device::raster_op_3,
+				nullptr, &tms340x0_device::raster_op_1 , &tms340x0_device::raster_op_2 , &tms340x0_device::raster_op_3,
 	&tms340x0_device::raster_op_4 , &tms340x0_device::raster_op_5 , &tms340x0_device::raster_op_6 , &tms340x0_device::raster_op_7,
 	&tms340x0_device::raster_op_8 , &tms340x0_device::raster_op_9 , &tms340x0_device::raster_op_10, &tms340x0_device::raster_op_11,
 	&tms340x0_device::raster_op_12, &tms340x0_device::raster_op_13, &tms340x0_device::raster_op_14, &tms340x0_device::raster_op_15,
 	&tms340x0_device::raster_op_16, &tms340x0_device::raster_op_17, &tms340x0_device::raster_op_18, &tms340x0_device::raster_op_19,
-	&tms340x0_device::raster_op_20, &tms340x0_device::raster_op_21,            NULL,            NULL,
-				NULL,            NULL,            NULL,            NULL,
-				NULL,            NULL,            NULL,            NULL,
+	&tms340x0_device::raster_op_20, &tms340x0_device::raster_op_21,            nullptr,            nullptr,
+				nullptr,            nullptr,            nullptr,            nullptr,
+				nullptr,            nullptr,            nullptr,            nullptr,
 };
 
 
@@ -861,7 +861,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 	if (enabled && vcount == SMART_IOREG(DPYINT))
 	{
 		/* generate the display interrupt signal */
-		internal_interrupt_callback(NULL, TMS34010_DI);
+		internal_interrupt_callback(nullptr, TMS34010_DI);
 	}
 
 	/* at the start of VBLANK, load the starting display address */

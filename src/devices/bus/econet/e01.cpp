@@ -482,7 +482,7 @@ void e01_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 READ8_MEMBER( e01_device::read )
 {
-	UINT8 data = 0;
+	UINT8 data;
 
 	if (m_ram_en)
 	{
@@ -541,7 +541,7 @@ WRITE8_MEMBER( e01_device::floppy_w )
 	*/
 
 	// floppy select
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (!BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (!BIT(data, 1)) floppy = m_floppy1->get_device();

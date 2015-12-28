@@ -15,17 +15,17 @@ class linear_flash_pccard_device : public device_t,
 	public device_slot_card_interface
 {
 public:
-	virtual DECLARE_READ16_MEMBER(read_memory);
-	virtual DECLARE_WRITE16_MEMBER(write_memory);
+	virtual DECLARE_READ16_MEMBER(read_memory) override;
+	virtual DECLARE_WRITE16_MEMBER(write_memory) override;
 
 protected:
 	linear_flash_pccard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config( address_spacenum spacenum = AS_0 ) const;
+	virtual const address_space_config *memory_space_config( address_spacenum spacenum = AS_0 ) const override;
 
 	address_space_config m_space_config;
 	address_space *m_space;
@@ -41,7 +41,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 
@@ -54,7 +54,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 extern const device_type LINEAR_FLASH_PCCARD_64MB;
@@ -66,7 +66,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 #endif

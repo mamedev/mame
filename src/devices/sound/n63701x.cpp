@@ -35,7 +35,7 @@ namco_63701x_device::namco_63701x_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, NAMCO_63701X, "Namco 63701X", tag, owner, clock, "namco_63701x", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_rom(*this, DEVICE_SELF),
-		m_stream(NULL)
+		m_stream(nullptr)
 {
 }
 

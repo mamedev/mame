@@ -114,24 +114,24 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 1; }
-	virtual UINT32 execute_input_lines() const { return 5; }
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 1; }
+	virtual UINT32 execute_input_lines() const override { return 5; }
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	void state_string_export(const device_state_entry &entry, std::string &str) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 6; }
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 6; }
 
 	address_space_config m_program_config;
 
@@ -163,6 +163,10 @@ protected:
 	static const op_func dsp_op_table[64];
 	static const UINT32 convert_zero[32];
 	bool m_tables_referenced;
+
+	UINT32       table_refcount;
+	std::unique_ptr<UINT16[]>  mirror_table;
+	std::unique_ptr<UINT8[]>   condition_table;
 
 	const op_func *m_table;
 
@@ -249,12 +253,12 @@ public:
 	// construction/destruction
 	jaguargpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_WRITE32_MEMBER(ctrl_w);
-	DECLARE_READ32_MEMBER(ctrl_r);
+	DECLARE_WRITE32_MEMBER(ctrl_w) override;
+	DECLARE_READ32_MEMBER(ctrl_r) override;
 
 protected:
-	virtual void execute_run();
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual void execute_run() override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 };
 
 
@@ -264,14 +268,14 @@ public:
 	// construction/destruction
 	jaguardsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_WRITE32_MEMBER(ctrl_w);
-	DECLARE_READ32_MEMBER(ctrl_r);
+	DECLARE_WRITE32_MEMBER(ctrl_w) override;
+	DECLARE_READ32_MEMBER(ctrl_r) override;
 
 protected:
-	virtual UINT32 execute_input_lines() const { return 6; }
-	virtual void execute_run();
+	virtual UINT32 execute_input_lines() const override { return 6; }
+	virtual void execute_run() override;
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 };
 
 

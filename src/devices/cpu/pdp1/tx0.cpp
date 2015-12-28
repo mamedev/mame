@@ -116,9 +116,9 @@ void tx0_device::device_start()
 	m_pf = 0;
 	m_tbr = 0;
 	m_tac = 0;
-	for ( int i = 0; i < 16; i++ )
+	for (auto & elem : m_tss)
 	{
-		m_tss[i] = 0;
+		elem = 0;
 	}
 	m_cm_sel = 0;
 	m_lr_sel = 0;

@@ -46,7 +46,7 @@ public:
 		m_floppy5(*this, MB8877_TAG":5"),
 		m_floppy6(*this, MB8877_TAG":6"),
 		m_floppy7(*this, MB8877_TAG":7"),
-		m_floppy(NULL),
+		m_floppy(nullptr),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_rom(*this, Z80_TAG),
 		m_sw1(*this, "SW1"),
@@ -75,8 +75,8 @@ public:
 	required_memory_region m_rom;
 	required_ioport m_sw1;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( mreq_r );
 	DECLARE_WRITE8_MEMBER( mreq_w );
@@ -89,7 +89,6 @@ public:
 	DECLARE_WRITE8_MEMBER( exdma_w );
 	DECLARE_WRITE8_MEMBER( hdcon_w );
 	DECLARE_WRITE8_MEMBER( segst_w );
-	DECLARE_WRITE8_MEMBER( dart_w );
 	DECLARE_READ8_MEMBER( dma_mreq_r );
 	DECLARE_WRITE8_MEMBER( dma_mreq_w );
 	DECLARE_READ8_MEMBER( pio_pb_r );
@@ -101,9 +100,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
-	void bankswitch();
 	void update_dma_rdy();
-
 	// memory state
 	int m_segst;
 	int m_brom;
@@ -152,8 +149,8 @@ public:
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_ctrl_in;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( mreq_r );
 	DECLARE_WRITE8_MEMBER( mreq_w );
@@ -169,8 +166,6 @@ public:
 	DECLARE_WRITE8_MEMBER( pio_pa_w );
 	DECLARE_WRITE_LINE_MEMBER( cstrb_w );
 	DECLARE_WRITE_LINE_MEMBER( req_w );
-
-	void fdc_intrq_w(bool state);
 
 	void update_dma_rdy();
 

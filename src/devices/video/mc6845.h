@@ -30,9 +30,6 @@
 #define MCFG_MC6845_SHOW_BORDER_AREA(_show) \
 	mc6845_device::set_show_border_area(*device, _show);
 
-#define MCFG_MC6845_INTERLACE_ADJUST(_value) \
-	mc6845_device::set_interlace_adjust(*device, _value);
-
 #define MCFG_MC6845_VISAREA_ADJUST(_minx, _maxx, _miny, _maxy) \
 	mc6845_device::set_visarea_adjust(*device, _minx, _maxx, _miny, _maxy);
 
@@ -98,6 +95,7 @@ class mc6845_device :   public device_t,
 	friend class sy6845e_device;
 	friend class hd6345_device;
 	friend class ams40041_device;
+	friend class ams40489_device;
 
 public:
 	// construction/destruction
@@ -105,7 +103,6 @@ public:
 	mc6845_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	static void set_show_border_area(device_t &device, bool show) { downcast<mc6845_device &>(device).m_show_border_area = show; }
-	static void set_interlace_adjust(device_t &device, int value) { downcast<mc6845_device &>(device).m_interlace_adjust = value; }
 	static void set_visarea_adjust(device_t &device, int min_x, int max_x, int min_y, int max_y)
 	{
 		mc6845_device &dev = downcast<mc6845_device &>(device);
@@ -173,10 +170,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	bool m_supports_disp_start_addr_r;
 	bool m_supports_vert_sync_width;
@@ -335,8 +332,8 @@ public:
 	mc6845_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class r6545_1_device : public mc6845_device
@@ -345,8 +342,8 @@ public:
 	r6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class c6545_1_device : public mc6845_device
@@ -355,8 +352,8 @@ public:
 	c6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class h46505_device : public mc6845_device
@@ -365,8 +362,8 @@ public:
 	h46505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class hd6845_device : public mc6845_device
@@ -375,8 +372,8 @@ public:
 	hd6845_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class sy6545_1_device : public mc6845_device
@@ -385,8 +382,8 @@ public:
 	sy6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class sy6845e_device : public mc6845_device
@@ -395,8 +392,8 @@ public:
 	sy6845e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class hd6345_device : public mc6845_device
@@ -405,8 +402,8 @@ public:
 	hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class ams40041_device : public mc6845_device
@@ -415,8 +412,18 @@ public:
 	ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+};
+
+class ams40489_device : public mc6845_device
+{
+public:
+	ams40489_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class mos8563_device : public mc6845_device,
@@ -426,7 +433,7 @@ public:
 	mos8563_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	DECLARE_PALETTE_INIT(mos8563);
 
@@ -442,10 +449,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	const address_space_config      m_videoram_space_config;
 	required_device<palette_device> m_palette;
@@ -475,8 +482,8 @@ protected:
 
 	int m_revision;
 
-	virtual void update_cursor_state();
-	virtual UINT8 draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void update_cursor_state() override;
+	virtual UINT8 draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 	static const device_timer_id TIMER_BLOCK_COPY = 9;
 
@@ -490,8 +497,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 
@@ -505,6 +512,7 @@ extern const device_type SY6545_1;
 extern const device_type SY6845E;
 extern const device_type HD6345;
 extern const device_type AMS40041;
+extern const device_type AMS40489;
 extern const device_type MOS8563;
 extern const device_type MOS8568;
 

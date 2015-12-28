@@ -385,7 +385,7 @@ static const char *const sharkatt_sample_names[] =
 	"*sharkatt",
 	"talk",
 	"crash",
-	0   /* end of array */
+	nullptr   /* end of array */
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -395,7 +395,7 @@ static const char *const thief_sample_names[] =
 	"*thief",
 	"talk",
 	"crash",
-	0   /* end of array */
+	nullptr   /* end of array */
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -405,7 +405,7 @@ static const char *const natodef_sample_names[] =
 	"*natodef",
 	"talk",
 	"crash",
-	0   /* end of array */
+	nullptr   /* end of array */
 };
 
 

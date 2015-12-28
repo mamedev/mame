@@ -25,7 +25,7 @@ public:
 	eolith16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: eolith_state(mconfig, type, tag) { }
 
-	UINT16 *m_vram;
+	std::unique_ptr<UINT16[]> m_vram;
 	int m_vbuffer;
 
 	DECLARE_WRITE16_MEMBER(eeprom_w);
@@ -116,8 +116,8 @@ INPUT_PORTS_END
 
 VIDEO_START_MEMBER(eolith16_state,eolith16)
 {
-	m_vram = auto_alloc_array(machine(), UINT16, 0x10000);
-	save_pointer(NAME(m_vram), 0x10000);
+	m_vram = std::make_unique<UINT16[]>(0x10000);
+	save_pointer(NAME(m_vram.get()), 0x10000);
 	save_item(NAME(m_vbuffer));
 }
 

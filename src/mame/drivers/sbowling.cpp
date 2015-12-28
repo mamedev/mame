@@ -62,7 +62,7 @@ public:
 	int m_bgmap;
 	int m_system;
 	tilemap_t *m_tilemap;
-	bitmap_ind16 *m_tmpbitmap;
+	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
 	UINT32 m_color_prom_address;
 	UINT8 m_pix_sh;
 	UINT8 m_pix[2];
@@ -78,7 +78,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sbowling);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -121,7 +121,7 @@ WRITE8_MEMBER(sbowling_state::videoram_w)
 
 	for (int i = 0; i < 8; i++)
 	{
-		plot_pixel_sbw(m_tmpbitmap, x++, y, m_color_prom_address | ( ((v1&1)*0x20) | ((v2&1)*0x40) ), flip);
+		plot_pixel_sbw(m_tmpbitmap.get(), x++, y, m_color_prom_address | ( ((v1&1)*0x20) | ((v2&1)*0x40) ), flip);
 		v1 >>= 1;
 		v2 >>= 1;
 	}
@@ -137,7 +137,7 @@ UINT32 sbowling_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 void sbowling_state::video_start()
 {
-	m_tmpbitmap = auto_bitmap_ind16_alloc(machine(),32*8,32*8);
+	m_tmpbitmap = std::make_unique<bitmap_ind16>(32*8,32*8);
 	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sbowling_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	save_item(NAME(m_bgmap));

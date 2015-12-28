@@ -86,8 +86,8 @@ void upd1990a_device::device_start()
 	// initialize
 	set_current_time(machine());
 
-	for (int i = 0; i < 7; i++)
-		m_shift_reg[i] = 0;
+	for (auto & elem : m_shift_reg)
+		elem = 0;
 
 	m_oe = 0;
 	m_cs = 0;

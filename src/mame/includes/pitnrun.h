@@ -36,7 +36,7 @@ public:
 	int m_scroll;
 	int m_char_bank;
 	int m_color_select;
-	bitmap_ind16 *m_tmp_bitmap[4];
+	std::unique_ptr<bitmap_ind16> m_tmp_bitmap[4];
 	tilemap_t *m_bg;
 	tilemap_t *m_fg;
 
@@ -69,9 +69,9 @@ public:
 	TIMER_CALLBACK_MEMBER(mcu_data_real_r);
 	TIMER_CALLBACK_MEMBER(mcu_status_real_w);
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pitnrun);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

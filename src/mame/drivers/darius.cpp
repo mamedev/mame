@@ -1,5 +1,6 @@
 // license:???
 // copyright-holders:David Graves, Jarek Burczynski
+// thanks-to:Richard Bush
 /***************************************************************************
 
 Darius    (c) Taito 1986
@@ -295,9 +296,9 @@ void darius_state::update_fm0(  )
 	int left  = (        m_pan[0]  * m_vol[6]) >> 8;
 	int right = ((0xff - m_pan[0]) * m_vol[6]) >> 8;
 
-	if (m_filter0_3l != NULL)
+	if (m_filter0_3l != nullptr)
 		m_filter0_3l->flt_volume_set_volume(left / 100.0);
-	if (m_filter0_3r != NULL)
+	if (m_filter0_3r != nullptr)
 		m_filter0_3r->flt_volume_set_volume(right / 100.0); /* FM #0 */
 }
 
@@ -306,15 +307,15 @@ void darius_state::update_fm1(  )
 	int left  = (        m_pan[1]  * m_vol[7]) >> 8;
 	int right = ((0xff - m_pan[1]) * m_vol[7]) >> 8;
 
-	if (m_filter1_3l != NULL)
+	if (m_filter1_3l != nullptr)
 		m_filter1_3l->flt_volume_set_volume(left / 100.0);
-	if (m_filter1_3r != NULL)
+	if (m_filter1_3r != nullptr)
 		m_filter1_3r->flt_volume_set_volume(right / 100.0); /* FM #1 */
 }
 
 void darius_state::update_psg0( int port )
 {
-	filter_volume_device *lvol = NULL, *rvol = NULL;
+	filter_volume_device *lvol = nullptr, *rvol = nullptr;
 	int left, right;
 
 	switch (port)
@@ -328,15 +329,15 @@ void darius_state::update_psg0( int port )
 	left  = (        m_pan[2]  * m_vol[port]) >> 8;
 	right = ((0xff - m_pan[2]) * m_vol[port]) >> 8;
 
-	if (lvol != NULL)
+	if (lvol != nullptr)
 		lvol->flt_volume_set_volume(left / 100.0);
-	if (rvol != NULL)
+	if (rvol != nullptr)
 		rvol->flt_volume_set_volume(right / 100.0);
 }
 
 void darius_state::update_psg1( int port )
 {
-	filter_volume_device *lvol = NULL, *rvol = NULL;
+	filter_volume_device *lvol = nullptr, *rvol = nullptr;
 	int left, right;
 
 	switch (port)
@@ -350,9 +351,9 @@ void darius_state::update_psg1( int port )
 	left  = (        m_pan[3]  * m_vol[port + 3]) >> 8;
 	right = ((0xff - m_pan[3]) * m_vol[port + 3]) >> 8;
 
-	if (lvol != NULL)
+	if (lvol != nullptr)
 		lvol->flt_volume_set_volume(left / 100.0);
-	if (rvol != NULL)
+	if (rvol != nullptr)
 		rvol->flt_volume_set_volume(right / 100.0);
 }
 
@@ -361,9 +362,9 @@ void darius_state::update_da(  )
 	int left  = m_def_vol[(m_pan[4] >> 4) & 0x0f];
 	int right = m_def_vol[(m_pan[4] >> 0) & 0x0f];
 
-	if (m_msm5205_l != NULL)
+	if (m_msm5205_l != nullptr)
 		m_msm5205_l->flt_volume_set_volume(left / 100.0);
-	if (m_msm5205_r != NULL)
+	if (m_msm5205_r != nullptr)
 		m_msm5205_r->flt_volume_set_volume(right / 100.0);
 }
 
@@ -729,11 +730,11 @@ void darius_state::machine_reset()
 
 	machine().sound().system_enable(true);  /* mixer enabled */
 
-	for (int i = 0; i < DARIUS_VOL_MAX; i++)
-		m_vol[i] = 0x00;    /* min volume */
+	for (auto & elem : m_vol)
+		elem = 0x00;    /* min volume */
 
-	for (int i = 0; i < DARIUS_PAN_MAX; i++)
-		m_pan[i] = 0x80;    /* center */
+	for (auto & elem : m_pan)
+		elem = 0x80;    /* center */
 
 	for (int i = 0; i < 0x10; i++)
 	{

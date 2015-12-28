@@ -120,22 +120,22 @@ static const lr35902dasm mnemonic_cb[256] = {
 };
 
 static const lr35902dasm mnemonic_main[256]= {
-	{zNOP,0},       {zLD,"bc,N"},   {zLD,"(bc),a"}, {zINC,"bc"},
-	{zINC,"b"},     {zDEC,"b"},     {zLD,"b,B"},    {zRLCA,0},
+	{zNOP,nullptr},       {zLD,"bc,N"},   {zLD,"(bc),a"}, {zINC,"bc"},
+	{zINC,"b"},     {zDEC,"b"},     {zLD,"b,B"},    {zRLCA,nullptr},
 	{zLD,"(W),sp"}, {zADD,"hl,bc"}, {zLD,"a,(bc)"}, {zDEC,"bc"},
-	{zINC,"c"},     {zDEC,"c"},     {zLD,"c,B"},    {zRRCA,0},
-	{zSTOP,0},      {zLD,"de,N"},   {zLD,"(de),a"}, {zINC,"de"},
-	{zINC,"d"},     {zDEC,"d"},     {zLD,"d,B"},    {zRLA,0},
+	{zINC,"c"},     {zDEC,"c"},     {zLD,"c,B"},    {zRRCA,nullptr},
+	{zSTOP,nullptr},      {zLD,"de,N"},   {zLD,"(de),a"}, {zINC,"de"},
+	{zINC,"d"},     {zDEC,"d"},     {zLD,"d,B"},    {zRLA,nullptr},
 	{zJR,"O"},      {zADD,"hl,de"}, {zLD,"a,(de)"}, {zDEC,"de"},
-	{zINC,"e"},     {zDEC,"e"},     {zLD,"e,B"},    {zRRA,0},
+	{zINC,"e"},     {zDEC,"e"},     {zLD,"e,B"},    {zRRA,nullptr},
 	{zJR,"nz,O"},   {zLD,"hl,N"},   {zLD,"(hl+),a"},{zINC,"hl"},
-	{zINC,"h"},     {zDEC,"h"},     {zLD,"h,B"},    {zDAA,0},
+	{zINC,"h"},     {zDEC,"h"},     {zLD,"h,B"},    {zDAA,nullptr},
 	{zJR,"z,O"},    {zADD,"hl,hl"}, {zLD,"a,(hl+)"},{zDEC,"hl"},
-	{zINC,"l"},     {zDEC,"l"},     {zLD,"l,B"},    {zCPL,0},
+	{zINC,"l"},     {zDEC,"l"},     {zLD,"l,B"},    {zCPL,nullptr},
 	{zJR,"nc,O"},   {zLD,"sp,N"},   {zLD,"(hl-),a"},{zINC,"sp"},
-	{zINC,"(hl)"},  {zDEC,"(hl)"},  {zLD,"(hl),B"}, {zSCF,0},
+	{zINC,"(hl)"},  {zDEC,"(hl)"},  {zLD,"(hl),B"}, {zSCF,nullptr},
 	{zJR,"c,O"},    {zADD,"hl,sp"}, {zLD,"a,(hl-)"},{zDEC,"sp"},
-	{zINC,"a"},     {zDEC,"a"},     {zLD,"a,B"},    {zCCF,0},
+	{zINC,"a"},     {zDEC,"a"},     {zLD,"a,B"},    {zCCF,nullptr},
 	{zLD,"b,b"},    {zLD,"b,c"},    {zLD,"b,d"},    {zLD,"b,e"},
 	{zLD,"b,h"},    {zLD,"b,l"},    {zLD,"b,(hl)"}, {zLD,"b,a"},
 	{zLD,"c,b"},    {zLD,"c,c"},    {zLD,"c,d"},    {zLD,"c,e"},
@@ -149,7 +149,7 @@ static const lr35902dasm mnemonic_main[256]= {
 	{zLD,"l,b"},    {zLD,"l,c"},    {zLD,"l,d"},    {zLD,"l,e"},
 	{zLD,"l,h"},    {zLD,"l,l"},    {zLD,"l,(hl)"}, {zLD,"l,a"},
 	{zLD,"(hl),b"}, {zLD,"(hl),c"}, {zLD,"(hl),d"}, {zLD,"(hl),e"},
-	{zLD,"(hl),h"}, {zLD,"(hl),l"}, {zHLT,0},       {zLD,"(hl),a"},
+	{zLD,"(hl),h"}, {zLD,"(hl),l"}, {zHLT,nullptr},       {zLD,"(hl),a"},
 	{zLD,"a,b"},    {zLD,"a,c"},    {zLD,"a,d"},    {zLD,"a,e"},
 	{zLD,"a,h"},    {zLD,"a,l"},    {zLD,"a,(hl)"}, {zLD,"a,a"},
 	{zADD,"a,b"},   {zADD,"a,c"},   {zADD,"a,d"},   {zADD,"a,e"},
@@ -170,19 +170,19 @@ static const lr35902dasm mnemonic_main[256]= {
 	{zCP,"h"},      {zCP,"l"},      {zCP,"(hl)"},   {zCP,"a"},
 	{zRET,"nz"},    {zPOP,"bc"},    {zJP,"nz,A"},   {zJP,"A"},
 	{zCALL,"nz,A"}, {zPUSH,"bc"},   {zADD,"a,B"},   {zRST,"V"},
-	{zRET,"z"},     {zRET,0},       {zJP,"z,A"},    {zDB,"cb"},
+	{zRET,"z"},     {zRET,nullptr},       {zJP,"z,A"},    {zDB,"cb"},
 	{zCALL,"z,A"},  {zCALL,"A"},    {zADC,"a,B"},   {zRST,"V"},
 	{zRET,"nc"},    {zPOP,"de"},    {zJP,"nc,A"},   {zDB,"d3"},
 	{zCALL,"nc,A"}, {zPUSH,"de"},   {zSUB,"B"},     {zRST,"V"},
-	{zRET,"c"},     {zRETI,0},      {zJP,"c,A"},    {zDB,"db"},
+	{zRET,"c"},     {zRETI,nullptr},      {zJP,"c,A"},    {zDB,"db"},
 	{zCALL,"c,A"},  {zDB,"dd"},     {zSBC,"a,B"},   {zRST,"V"},
 	{zLD,"(F),a"},  {zPOP,"hl"},    {zLD,"(C),a"},  {zDB,"e3"},
 	{zDB,"e4"},     {zPUSH,"hl"},   {zAND,"B"},     {zRST,"V"},
 	{zADD,"SP,B"},  {zJP,"(hl)"},   {zLD,"(W),a"},  {zDB,"eb"},
 	{zDB,"ec"},     {zDB,"ed"},     {zXOR,"B"},     {zRST,"V"},
-	{zLD,"a,(F)"},  {zPOP,"af"},    {zLD,"a,(C)"},  {zDI,0},
+	{zLD,"a,(F)"},  {zPOP,"af"},    {zLD,"a,(C)"},  {zDI,nullptr},
 	{zDB,"f4"},     {zPUSH,"af"},   {zOR,"B"},      {zRST,"V"},
-	{zLD,"hl,sp+B"},{zLD,"sp,hl"},  {zLD,"a,(W)"},  {zEI,0},
+	{zLD,"hl,sp+B"},{zLD,"sp,hl"},  {zLD,"a,(W)"},  {zEI,nullptr},
 	{zDB,"fc"},     {zDB,"fd"},     {zCP,"B"},      {zRST,"V"}
 };
 
@@ -195,9 +195,9 @@ CPU_DISASSEMBLE( lr35902 )
 	const lr35902dasm *d;
 	const char /* *symbol,*/ *src;
 	char *dst;
-	INT8 offset = 0;
+	INT8 offset;
 	UINT8 op, op1;
-	UINT16 ea = 0;
+	UINT16 ea;
 	int pos = 0;
 
 	dst = buffer;

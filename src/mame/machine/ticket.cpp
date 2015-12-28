@@ -49,7 +49,7 @@ ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, 
 		m_ticketnotdispensed(0),
 		m_status(0),
 		m_power(0),
-		m_timer(NULL)
+		m_timer(nullptr)
 {
 }
 

@@ -634,9 +634,9 @@ void lsi53c810_device::device_start()
 	m_dma_cb.bind_relative_to(*owner());
 	m_fetch_cb.bind_relative_to(*owner());
 
-	for (int i = 0; i < 256; i++)
+	for (auto & elem : dma_opcode)
 	{
-		dma_opcode[i] = opcode_handler_delegate(FUNC(lsi53c810_device::dmaop_invalid), this);
+		elem = opcode_handler_delegate(FUNC(lsi53c810_device::dmaop_invalid), this);
 	}
 
 	add_opcode(0x00, 0xc0, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_block_move ), this));
@@ -671,7 +671,7 @@ UINT32 lsi53c810_device::lsi53c810_dasm_fetch(UINT32 pc)
 unsigned lsi53c810_device::lsi53c810_dasm(char *buf, UINT32 pc)
 {
 	unsigned result = 0;
-	const char *op_mnemonic = NULL;
+	const char *op_mnemonic = nullptr;
 	UINT32 op = lsi53c810_dasm_fetch(pc);
 	UINT32 dest;
 	int i;
@@ -708,7 +708,7 @@ unsigned lsi53c810_device::lsi53c810_dasm(char *buf, UINT32 pc)
 			{ 0x00000200, "TARGET" },
 			{ 0x00000400, "CARRY" }
 		};
-		int need_cojunction = FALSE;
+		int need_cojunction;
 
 		/* SET/CLEAR */
 		switch(op & 0xF8000000)

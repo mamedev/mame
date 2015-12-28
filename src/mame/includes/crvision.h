@@ -67,7 +67,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 class crvision_pal_state : public crvision_state
@@ -108,7 +108,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 #endif // __CRVISION__

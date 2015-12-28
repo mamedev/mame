@@ -52,16 +52,16 @@ const rom_entry *cst_q_plus4_t::device_rom_region() const
 static MACHINE_CONFIG_FRAGMENT( cst_q_plus4 )
 	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
 
-	MCFG_QL_EXPANSION_SLOT_ADD("exp1", ql_expansion_cards, NULL)
+	MCFG_QL_EXPANSION_SLOT_ADD("exp1", ql_expansion_cards, nullptr)
 	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(cst_q_plus4_t, exp1_extintl_w))
 
-	MCFG_QL_EXPANSION_SLOT_ADD("exp2", ql_expansion_cards, NULL)
+	MCFG_QL_EXPANSION_SLOT_ADD("exp2", ql_expansion_cards, nullptr)
 	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(cst_q_plus4_t, exp2_extintl_w))
 
-	MCFG_QL_EXPANSION_SLOT_ADD("exp3", ql_expansion_cards, NULL)
+	MCFG_QL_EXPANSION_SLOT_ADD("exp3", ql_expansion_cards, nullptr)
 	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(cst_q_plus4_t, exp3_extintl_w))
 
-	MCFG_QL_EXPANSION_SLOT_ADD("exp4", ql_expansion_cards, NULL)
+	MCFG_QL_EXPANSION_SLOT_ADD("exp4", ql_expansion_cards, nullptr)
 	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(cst_q_plus4_t, exp4_extintl_w))
 MACHINE_CONFIG_END
 

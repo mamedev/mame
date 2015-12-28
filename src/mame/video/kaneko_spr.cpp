@@ -70,13 +70,13 @@ void kaneko16_sprite_device::static_set_gfxdecode_tag(device_t &device, const ch
 
 void kaneko16_sprite_device::device_start()
 {
-	m_first_sprite = auto_alloc_array(machine(), struct kan_tempsprite, 0x400);
-	m_sprites_regs = auto_alloc_array_clear(machine(), UINT16, 0x20/2);
+	m_first_sprite = std::make_unique<struct kan_tempsprite[]>(0x400);
+	m_sprites_regs = make_unique_clear<UINT16[]>(0x20/2);
 	m_screen->register_screen_bitmap(m_sprites_bitmap);
 
 	save_item(NAME(m_sprite_flipx));
 	save_item(NAME(m_sprite_flipy));
-	save_pointer(NAME(m_sprites_regs), 0x20/2);
+	save_pointer(NAME(m_sprites_regs.get()), 0x20/2);
 	save_item(NAME(m_keep_sprites));
 	save_item(NAME(m_sprites_bitmap));
 }
@@ -358,7 +358,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(_BitmapClass &bitmap, const r
 	int max =   (m_screen->width() > 0x100) ? (0x200<<6) : (0x100<<6);
 
 	int i = 0;
-	struct kan_tempsprite *s = m_first_sprite;
+	struct kan_tempsprite *s = m_first_sprite.get();
 
 	/* These values are latched from the last sprite. */
 	int x           =   0;
@@ -451,7 +451,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(_BitmapClass &bitmap, const r
 	/* Let's finally draw the sprites we buffered, in reverse order
 	   (for pdrawgfx) */
 
-	for (s--; s >= m_first_sprite; s--)
+	for (s--; s >= m_first_sprite.get(); s--)
 	{
 		int curr_pri = s->priority;
 

@@ -223,15 +223,15 @@ public:
 	UINT8 m_sound_fifo[MAX_SOUNDS];
 	UINT8 *m_gfx_plane02;
 	UINT8 *m_gfx_plane13;
-	UINT8 *m_collision_list;
+	std::unique_ptr<UINT8[]> m_collision_list;
 	UINT8 *m_scrolly0;
 	UINT8 *m_scrollx0;
 	UINT8 *m_scrolly1;
 	UINT8 *m_scrollx1;
-	UINT32 *m_internal_palette;
-	UINT32 *m_alpha_table;
+	std::unique_ptr<UINT32[]> m_internal_palette;
+	std::unique_ptr<UINT32[]> m_alpha_table;
 	UINT8 *m_cpu1_base;
-	UINT8 *m_gfx1_base;
+	std::unique_ptr<UINT8[]> m_gfx1_base;
 	required_shared_ptr<UINT8> m_blitter_ram;
 	required_shared_ptr<UINT8> m_io_ram;
 	int m_game_id;
@@ -257,8 +257,6 @@ public:
 	DECLARE_READ8_MEMBER(collision_id_r);
 	DECLARE_READ8_MEMBER(paletteram_r);
 	DECLARE_WRITE8_MEMBER(paletteram_w);
-	DECLARE_READ8_MEMBER(zero_r);
-	DECLARE_READ8_MEMBER(debug_r);
 	DECLARE_READ8_MEMBER(vector_r);
 	DECLARE_WRITE8_MEMBER(firq_ack_w);
 	DECLARE_WRITE8_MEMBER(soundcommand_w);
@@ -269,8 +267,8 @@ public:
 	DECLARE_DRIVER_INIT(halley87);
 	DECLARE_DRIVER_INIT(benberob);
 	DECLARE_DRIVER_INIT(halleys);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(halleys);
 	UINT32 screen_update_halleys(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_benberob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -432,7 +430,7 @@ if (0) {
 	src1 &= 0x3fff;
 	src2 &= 0x3fff;
 	bank = ((code & BANKBIT0) | (color & BANKBIT1)) << 8;
-	pal_ptr = m_internal_palette;
+	pal_ptr = m_internal_palette.get();
 
 
 	// the crossroad of fate
@@ -749,7 +747,7 @@ COMMAND_MODE:
 	if (flags & S1_IDLE) src_dx = 0; else src_dx = 1;
 	if (flags & S1_REV ) src_dx = -src_dx;
 
-	src_base = m_gfx1_base + bank;
+	src_base = m_gfx1_base.get() + bank;
 
 	if (command == STARPASS1 || command == STARPASS2) layer = (layer & 1) + 4;
 	dst_base = m_render_layer[layer];
@@ -1133,8 +1131,8 @@ PALETTE_INIT_MEMBER(halleys_state, halleys)
 {
 	UINT32 d, r, g, b, i, j, count;
 	// allocate memory for internal palette
-	m_internal_palette = auto_alloc_array(machine(), UINT32, PALETTE_SIZE);
-	UINT32 *pal_ptr = m_internal_palette;
+	m_internal_palette = std::make_unique<UINT32[]>(PALETTE_SIZE);
+	UINT32 *pal_ptr = m_internal_palette.get();
 
 	for (count=0; count<1024; count++)
 	{
@@ -1232,7 +1230,7 @@ READ8_MEMBER(halleys_state::paletteram_r)
 WRITE8_MEMBER(halleys_state::paletteram_w)
 {
 	UINT32 d, r, g, b, i, j;
-	UINT32 *pal_ptr = m_internal_palette;
+	UINT32 *pal_ptr = m_internal_palette.get();
 
 	m_paletteram[offset] = data;
 	d = (UINT32)data;
@@ -1476,7 +1474,7 @@ void halleys_state::filter_bitmap(bitmap_ind16 &bitmap, int mask)
 	UINT32 *pal_ptr, *edi;
 	int esi, eax, ebx, ecx, edx;
 
-	pal_ptr = m_internal_palette;
+	pal_ptr = m_internal_palette.get();
 	esi = mask | 0xffffff00;
 	edi = (UINT32*)&bitmap.pix16(VIS_MINY, VIS_MINX + CLIP_W);
 	dst_pitch = bitmap.rowpixels() >> 1;
@@ -2184,20 +2182,20 @@ void halleys_state::init_common()
 
 
 	// allocate memory for pre-processed ROMs
-	m_gfx1_base = auto_alloc_array(machine(), UINT8, 0x20000);
+	m_gfx1_base = std::make_unique<UINT8[]>(0x20000);
 
 
 	// allocate memory for alpha table
-	m_alpha_table = auto_alloc_array(machine(), UINT32, 0x10000);
+	m_alpha_table = std::make_unique<UINT32[]>(0x10000);
 
 
 	// allocate memory for hardware collision list
-	m_collision_list = auto_alloc_array(machine(), UINT8, MAX_SPRITES);
+	m_collision_list = std::make_unique<UINT8[]>(MAX_SPRITES);
 
 
 	// decrypt main program ROM
 	rom = m_cpu1_base = memregion("maincpu")->base();
-	buf = m_gfx1_base;
+	buf = m_gfx1_base.get();
 
 	for (i=0; i<0x10000; i++)
 	{

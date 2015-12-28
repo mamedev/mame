@@ -189,7 +189,7 @@ const address_space_config *h8_device::memory_space_config(address_spacenum spac
 {
 	return
 		spacenum == AS_PROGRAM ? &program_config :
-		spacenum == AS_IO ? &io_config : NULL;
+		spacenum == AS_IO ? &io_config : nullptr;
 }
 
 

@@ -16,7 +16,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<pleiads_sound_device> m_pleiads_custom;
 	required_device<gfxdecode_device> m_gfxdecode;
-	UINT8 *m_videoram_pg[2];
+	std::unique_ptr<UINT8[]> m_videoram_pg[2];
 	UINT8 m_videoram_pg_index;
 	UINT8 m_palette_bank;
 	UINT8 m_cocktail_mode;
@@ -91,11 +91,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 private:
 	// internal state
 	struct c_state      m_c24_state;
@@ -103,7 +103,7 @@ private:
 	struct n_state      m_noise_state;
 	UINT8               m_sound_latch_a;
 	sound_stream *      m_channel;
-	UINT32 *                m_poly18;
+	std::unique_ptr<UINT32[]>                m_poly18;
 	discrete_device *m_discrete;
 	tms36xx_device *m_tms;
 

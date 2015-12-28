@@ -765,7 +765,7 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 
 	// cartridge
-	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, NULL)
+	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -847,7 +847,7 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 
 	// cartridge
-	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, NULL)
+	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

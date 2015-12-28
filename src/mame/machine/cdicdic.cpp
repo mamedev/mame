@@ -33,7 +33,7 @@ TODO:
 const device_type MACHINE_CDICDIC = &device_creator<cdicdic_device>;
 
 #if ENABLE_VERBOSE_LOG
-INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -42,7 +42,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, c
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", machine.device("maincpu")->safe_pc(), buf );
+		device.logerror("%s: %s", device.machine().describe_context(), buf );
 	}
 }
 #else
@@ -99,7 +99,7 @@ const INT32 cdicdic_device::s_cdic_adpcm_filter_coef[5][2] =
 //  INLINES
 //**************************************************************************
 
-INLINE int CDIC_IS_VALID_SAMPLE_BUF(UINT16 *cdram, UINT16 addr)
+static inline int CDIC_IS_VALID_SAMPLE_BUF(UINT16 *cdram, UINT16 addr)
 {
 	UINT8 *cdram8 = ((UINT8*)cdram) + addr + 8;
 	if(cdram8[2] != 0xff)
@@ -109,7 +109,7 @@ INLINE int CDIC_IS_VALID_SAMPLE_BUF(UINT16 *cdram, UINT16 addr)
 	return 0;
 }
 
-INLINE double CDIC_SAMPLE_BUF_FREQ(UINT16 *cdram, UINT16 addr)
+static inline double CDIC_SAMPLE_BUF_FREQ(UINT16 *cdram, UINT16 addr)
 {
 	UINT8 *cdram8 = ((UINT8*)cdram) + addr + 8;
 	switch(cdram8[2] & 0x3f)
@@ -129,7 +129,7 @@ INLINE double CDIC_SAMPLE_BUF_FREQ(UINT16 *cdram, UINT16 addr)
 	}
 }
 
-INLINE int CDIC_SAMPLE_BUF_SIZE(UINT16 *cdram, UINT16 addr)
+static inline int CDIC_SAMPLE_BUF_SIZE(UINT16 *cdram, UINT16 addr)
 {
 	UINT8 *cdram8 = ((UINT8*)cdram) + addr + 8;
 	switch(cdram8[2] & 0x3f)
@@ -151,7 +151,7 @@ INLINE int CDIC_SAMPLE_BUF_SIZE(UINT16 *cdram, UINT16 addr)
 	}
 }
 
-INLINE INT16 clamp(INT16 in)
+static inline INT16 clamp(INT16 in)
 {
 	return in;
 }
@@ -164,12 +164,12 @@ UINT32 cdicdic_device::increment_cdda_frame_bcd(UINT32 bcd)
 {
 	UINT8 nybbles[6] =
 	{
-			bcd & 0x0000000f,
-		(bcd & 0x000000f0) >> 4,
-		(bcd & 0x00000f00) >> 8,
-		(bcd & 0x0000f000) >> 12,
-		(bcd & 0x000f0000) >> 16,
-		(bcd & 0x00f00000) >> 20
+		static_cast<UINT8>(bcd & 0x0000000f),
+		static_cast<UINT8>((bcd & 0x000000f0) >> 4),
+		static_cast<UINT8>((bcd & 0x00000f00) >> 8),
+		static_cast<UINT8>((bcd & 0x0000f000) >> 12),
+		static_cast<UINT8>((bcd & 0x000f0000) >> 16),
+		static_cast<UINT8>((bcd & 0x00f00000) >> 20)
 	};
 	nybbles[0]++;
 	if(nybbles[0] == 5 && nybbles[1] == 7)
@@ -204,12 +204,12 @@ UINT32 cdicdic_device::increment_cdda_sector_bcd(UINT32 bcd)
 {
 	UINT8 nybbles[6] =
 	{
-			bcd & 0x0000000f,
-		(bcd & 0x000000f0) >> 4,
-		(bcd & 0x00000f00) >> 8,
-		(bcd & 0x0000f000) >> 12,
-		(bcd & 0x000f0000) >> 16,
-		(bcd & 0x00f00000) >> 20
+		static_cast<UINT8>(bcd & 0x0000000f),
+		static_cast<UINT8>((bcd & 0x000000f0) >> 4),
+		static_cast<UINT8>((bcd & 0x00000f00) >> 8),
+		static_cast<UINT8>((bcd & 0x0000f000) >> 12),
+		static_cast<UINT8>((bcd & 0x000f0000) >> 16),
+		static_cast<UINT8>((bcd & 0x00f00000) >> 20)
 	};
 	nybbles[2]++;
 	if(nybbles[2] == 10)
@@ -429,7 +429,7 @@ void cdicdic_device::decode_audio_sector(const UINT8 *xa, INT32 triggered)
 		return;
 	}
 
-	verboselog(machine(), 0, "decode_audio_sector, got header type %02x\n", hdr[2] );
+	verboselog(*this, 0, "decode_audio_sector, got header type %02x\n", hdr[2] );
 
 	switch(hdr[2] & 0x3f)   // ignore emphasis and reserved bits
 	{
@@ -542,7 +542,7 @@ void cdicdic_device::sample_trigger()
 
 	if(m_decode_addr == 0xffff)
 	{
-		verboselog(machine(), 0, "%s", "Decode stop requested, stopping playback\n" );
+		verboselog(*this, 0, "%s", "Decode stop requested, stopping playback\n" );
 		m_audio_sample_timer->adjust(attotime::never);
 		return;
 	}
@@ -550,11 +550,11 @@ void cdicdic_device::sample_trigger()
 	if(!m_decode_delay)
 	{
 		// Indicate that data has been decoded
-		verboselog(machine(), 0, "%s", "Flagging that audio data has been decoded\n" );
+		verboselog(*this, 0, "%s", "Flagging that audio data has been decoded\n" );
 		m_audio_buffer |= 0x8000;
 
 		// Set the CDIC interrupt line
-		verboselog(machine(), 0, "%s", "Setting CDIC interrupt line for soundmap decode\n" );
+		verboselog(*this, 0, "%s", "Setting CDIC interrupt line for soundmap decode\n" );
 		state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
 		state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 	}
@@ -563,21 +563,21 @@ void cdicdic_device::sample_trigger()
 		m_decode_delay = 0;
 	}
 
-	if(CDIC_IS_VALID_SAMPLE_BUF(m_ram, m_decode_addr & 0x3ffe))
+	if(CDIC_IS_VALID_SAMPLE_BUF(m_ram.get(), m_decode_addr & 0x3ffe))
 	{
-		verboselog(machine(), 0, "Hit audio_sample_trigger, with m_decode_addr == %04x, calling decode_audio_sector\n", m_decode_addr );
+		verboselog(*this, 0, "Hit audio_sample_trigger, with m_decode_addr == %04x, calling decode_audio_sector\n", m_decode_addr );
 
 		// Decode the data at Z+4, the same offset as a normal CD sector.
-		decode_audio_sector(((UINT8*)m_ram) + (m_decode_addr & 0x3ffe) + 4, 1);
+		decode_audio_sector(((UINT8*)m_ram.get()) + (m_decode_addr & 0x3ffe) + 4, 1);
 
 		// Swap buffer positions to indicate our new buffer position at the next read
 		m_decode_addr ^= 0x1a00;
 
-		verboselog(machine(), 0, "Updated m_decode_addr, new value is %04x\n", m_decode_addr );
+		verboselog(*this, 0, "Updated m_decode_addr, new value is %04x\n", m_decode_addr );
 
 		//// Delay for Frequency * (18*28*2*size in bytes) before requesting more data
-		verboselog(machine(), 0, "%s", "Data is valid, setting up a new callback\n" );
-		m_decode_period = attotime::from_hz(CDIC_SAMPLE_BUF_FREQ(m_ram, m_decode_addr & 0x3ffe)) * (18*28*2*CDIC_SAMPLE_BUF_SIZE(m_ram, m_decode_addr & 0x3ffe));
+		verboselog(*this, 0, "%s", "Data is valid, setting up a new callback\n" );
+		m_decode_period = attotime::from_hz(CDIC_SAMPLE_BUF_FREQ(m_ram.get(), m_decode_addr & 0x3ffe)) * (18*28*2*CDIC_SAMPLE_BUF_SIZE(m_ram.get(), m_decode_addr & 0x3ffe));
 		m_audio_sample_timer->adjust(m_decode_period);
 		//dmadac_enable(&dmadac[0], 2, 0);
 	}
@@ -586,7 +586,7 @@ void cdicdic_device::sample_trigger()
 		// Swap buffer positions to indicate our new buffer position at the next read
 		m_decode_addr ^= 0x1a00;
 
-		verboselog(machine(), 0, "%s", "Data is not valid, indicating to shut down on the next audio sample\n" );
+		verboselog(*this, 0, "%s", "Data is not valid, indicating to shut down on the next audio sample\n" );
 		m_decode_addr = 0xffff;
 		m_audio_sample_timer->adjust(m_decode_period);
 	}
@@ -615,12 +615,12 @@ void cdicdic_device::process_delayed_command()
 			int index = 0;
 			UINT8 nybbles[6] =
 			{
-					msf & 0x0000000f,
-				(msf & 0x000000f0) >> 4,
-				(msf & 0x00000f00) >> 8,
-				(msf & 0x0000f000) >> 12,
-				(msf & 0x000f0000) >> 16,
-				(msf & 0x00f00000) >> 20
+				static_cast<UINT8>(msf & 0x0000000f),
+				static_cast<UINT8>((msf & 0x000000f0) >> 4),
+				static_cast<UINT8>((msf & 0x00000f00) >> 8),
+				static_cast<UINT8>((msf & 0x0000f000) >> 12),
+				static_cast<UINT8>((msf & 0x000f0000) >> 16),
+				static_cast<UINT8>((msf & 0x00f00000) >> 20)
 			};
 			if(msf & 0x000080)
 			{
@@ -656,7 +656,7 @@ void cdicdic_device::process_delayed_command()
 			lba = nybbles[0] + nybbles[1]*10 + ((nybbles[2] + nybbles[3]*10)*75) + ((nybbles[4] + nybbles[5]*10)*75*60);
 
 			//printf( "Reading Mode %d sector from MSF location %06x\n", m_command - 0x28, m_time | 2 );
-			verboselog(machine(), 0, "Reading Mode %d sector from MSF location %06x\n", m_command - 0x28, m_time | 2 );
+			verboselog(*this, 0, "Reading Mode %d sector from MSF location %06x\n", m_command - 0x28, m_time | 2 );
 
 			cdrom_read_data(m_cd, lba, buffer, CD_TRACK_RAW_DONTCARE);
 
@@ -695,7 +695,7 @@ void cdicdic_device::process_delayed_command()
 				if(((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_FORM | CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == (CDIC_SUBMODE_FORM | CDIC_SUBMODE_AUDIO)) &&
 					(m_channel & m_audio_channel & (1 << buffer[CDIC_SECTOR_CHAN2])))
 				{
-					verboselog(machine(), 0, "%s", "Audio sector\n" );
+					verboselog(*this, 0, "%s", "Audio sector\n" );
 
 					m_x_buffer |= 0x8000;
 					//m_data_buffer |= 0x4000;
@@ -706,10 +706,10 @@ void cdicdic_device::process_delayed_command()
 						m_ram[(m_data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
 					}
 
-					decode_audio_sector(((UINT8*)m_ram) + ((m_data_buffer & 5) * 0xa00 + 4), 0);
+					decode_audio_sector(((UINT8*)m_ram.get()) + ((m_data_buffer & 5) * 0xa00 + 4), 0);
 
 					//printf( "Setting CDIC interrupt line\n" );
-					verboselog(machine(), 0, "%s", "Setting CDIC interrupt line for audio sector\n" );
+					verboselog(*this, 0, "%s", "Setting CDIC interrupt line for audio sector\n" );
 					state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
 					state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 				}
@@ -728,13 +728,13 @@ void cdicdic_device::process_delayed_command()
 						(buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_EOF) == CDIC_SUBMODE_EOF)
 					{
 						//printf( "Setting CDIC interrupt line\n" );
-						verboselog(machine(), 0, "%s", "Setting CDIC interrupt line for message sector\n" );
+						verboselog(*this, 0, "%s", "Setting CDIC interrupt line for message sector\n" );
 						state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
 						state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 					}
 					else
 					{
-						verboselog(machine(), 0, "%s", "Message sector, ignored\n" );
+						verboselog(*this, 0, "%s", "Message sector, ignored\n" );
 					}
 				}
 				else
@@ -748,7 +748,7 @@ void cdicdic_device::process_delayed_command()
 					}
 
 					//printf( "Setting CDIC interrupt line\n" );
-					verboselog(machine(), 0, "%s", "Setting CDIC interrupt line for data sector\n" );
+					verboselog(*this, 0, "%s", "Setting CDIC interrupt line for data sector\n" );
 					state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
 					state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 				}
@@ -785,12 +785,12 @@ void cdicdic_device::process_delayed_command()
 //          UINT32 next_lba = 0;
 			UINT8 nybbles[6] =
 			{
-					msf & 0x0000000f,
-				(msf & 0x000000f0) >> 4,
-				(msf & 0x00000f00) >> 8,
-				(msf & 0x0000f000) >> 12,
-				(msf & 0x000f0000) >> 16,
-				(msf & 0x00f00000) >> 20
+				static_cast<UINT8>(msf & 0x0000000f),
+				static_cast<UINT8>((msf & 0x000000f0) >> 4),
+				static_cast<UINT8>((msf & 0x00000f00) >> 8),
+				static_cast<UINT8>((msf & 0x0000f000) >> 12),
+				static_cast<UINT8>((msf & 0x000f0000) >> 16),
+				static_cast<UINT8>((msf & 0x00f00000) >> 20)
 			};
 /*          UINT8 next_nybbles[6] =
             {
@@ -812,7 +812,7 @@ void cdicdic_device::process_delayed_command()
 			if(!(msf & 0x0000ff))
 			{
 //              next_lba = next_nybbles[0] + next_nybbles[1]*10 + ((next_nybbles[2] + next_nybbles[3]*10)*75) + ((next_nybbles[4] + next_nybbles[5]*10)*75*60);
-				verboselog(machine(), 0, "Playing CDDA sector from MSF location %06x\n", m_time | 2 );
+				verboselog(*this, 0, "Playing CDDA sector from MSF location %06x\n", m_time | 2 );
 
 				state->m_cdda->start_audio(lba, rounded_next_msf);
 			}
@@ -843,7 +843,7 @@ void cdicdic_device::process_delayed_command()
 				m_ram[(m_data_buffer & 5) * (0xa00/2) + (index - 6)] = (buffer[index*2] << 8) | buffer[index*2 + 1];
 			}
 
-			verboselog(machine(), 0, "%s", "Setting CDIC interrupt line for CDDA sector\n" );
+			verboselog(*this, 0, "%s", "Setting CDIC interrupt line for CDDA sector\n" );
 			state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
 			state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 			break;
@@ -857,12 +857,12 @@ void cdicdic_device::process_delayed_command()
 			UINT32 lba = 0;
 			UINT8 nybbles[6] =
 			{
-					msf & 0x0000000f,
-				(msf & 0x000000f0) >> 4,
-				(msf & 0x00000f00) >> 8,
-				(msf & 0x0000f000) >> 12,
-				(msf & 0x000f0000) >> 16,
-				(msf & 0x00f00000) >> 20
+				static_cast<UINT8>(msf & 0x0000000f),
+				static_cast<UINT8>((msf & 0x000000f0) >> 4),
+				static_cast<UINT8>((msf & 0x00000f00) >> 8),
+				static_cast<UINT8>((msf & 0x0000f000) >> 12),
+				static_cast<UINT8>((msf & 0x000f0000) >> 16),
+				static_cast<UINT8>((msf & 0x00f00000) >> 20)
 			};
 			lba = nybbles[0] + nybbles[1]*10 + ((nybbles[2] + nybbles[3]*10)*75) + ((nybbles[4] + nybbles[5]*10)*75*60);
 
@@ -894,7 +894,7 @@ void cdicdic_device::process_delayed_command()
 
 			m_time = next_msf << 8;
 
-			verboselog(machine(), 0, "%s", "Setting CDIC interrupt line for Seek sector\n" );
+			verboselog(*this, 0, "%s", "Setting CDIC interrupt line for Seek sector\n" );
 			state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
 			state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 			break;
@@ -910,31 +910,31 @@ READ16_MEMBER( cdicdic_device::regs_r )
 	switch(addr)
 	{
 		case 0x3c00/2: // Command register
-			verboselog(machine(), 0, "cdic_r: Command Register = %04x & %04x\n", m_command, mem_mask);
+			verboselog(*this, 0, "cdic_r: Command Register = %04x & %04x\n", m_command, mem_mask);
 			return m_command;
 
 		case 0x3c02/2: // Time register (MSW)
-			verboselog(machine(), 0, "cdic_r: Time Register (MSW) = %04x & %04x\n", m_time >> 16, mem_mask);
+			verboselog(*this, 0, "cdic_r: Time Register (MSW) = %04x & %04x\n", m_time >> 16, mem_mask);
 			return m_time >> 16;
 
 		case 0x3c04/2: // Time register (LSW)
-			verboselog(machine(), 0, "cdic_r: Time Register (LSW) = %04x & %04x\n", (UINT16)(m_time & 0x0000ffff), mem_mask);
+			verboselog(*this, 0, "cdic_r: Time Register (LSW) = %04x & %04x\n", (UINT16)(m_time & 0x0000ffff), mem_mask);
 			return m_time & 0x0000ffff;
 
 		case 0x3c06/2: // File register
-			verboselog(machine(), 0, "cdic_r: File Register = %04x & %04x\n", m_file, mem_mask);
+			verboselog(*this, 0, "cdic_r: File Register = %04x & %04x\n", m_file, mem_mask);
 			return m_file;
 
 		case 0x3c08/2: // Channel register (MSW)
-			verboselog(machine(), 0, "cdic_r: Channel Register (MSW) = %04x & %04x\n", m_channel >> 16, mem_mask);
+			verboselog(*this, 0, "cdic_r: Channel Register (MSW) = %04x & %04x\n", m_channel >> 16, mem_mask);
 			return m_channel >> 16;
 
 		case 0x3c0a/2: // Channel register (LSW)
-			verboselog(machine(), 0, "cdic_r: Channel Register (LSW) = %04x & %04x\n", m_channel & 0x0000ffff, mem_mask);
+			verboselog(*this, 0, "cdic_r: Channel Register (LSW) = %04x & %04x\n", m_channel & 0x0000ffff, mem_mask);
 			return m_channel & 0x0000ffff;
 
 		case 0x3c0c/2: // Audio Channel register
-			verboselog(machine(), 0, "cdic_r: Audio Channel Register = %04x & %04x\n", m_audio_channel, mem_mask);
+			verboselog(*this, 0, "cdic_r: Audio Channel Register = %04x & %04x\n", m_audio_channel, mem_mask);
 			return m_audio_channel;
 
 		case 0x3ff4/2: // ABUF
@@ -944,10 +944,10 @@ READ16_MEMBER( cdicdic_device::regs_r )
 			if(!((m_audio_buffer | m_x_buffer) & 0x8000))
 			{
 				state->m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
-				verboselog(machine(), 0, "%s", "Clearing CDIC interrupt line\n" );
+				verboselog(*this, 0, "%s", "Clearing CDIC interrupt line\n" );
 				////printf("Clearing CDIC interrupt line\n" );
 			}
-			verboselog(machine(), 0, "cdic_r: Audio Buffer Register = %04x & %04x\n", temp, mem_mask);
+			verboselog(*this, 0, "cdic_r: Audio Buffer Register = %04x & %04x\n", temp, mem_mask);
 			return temp;
 		}
 
@@ -958,10 +958,10 @@ READ16_MEMBER( cdicdic_device::regs_r )
 			if(!((m_audio_buffer | m_x_buffer) & 0x8000))
 			{
 				state->m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
-				verboselog(machine(), 0, "%s", "Clearing CDIC interrupt line\n" );
+				verboselog(*this, 0, "%s", "Clearing CDIC interrupt line\n" );
 				////printf("Clearing CDIC interrupt line\n" );
 			}
-			verboselog(machine(), 0, "cdic_r: X-Buffer Register = %04x & %04x\n", temp, mem_mask);
+			verboselog(*this, 0, "cdic_r: X-Buffer Register = %04x & %04x\n", temp, mem_mask);
 			return temp;
 		}
 
@@ -971,17 +971,17 @@ READ16_MEMBER( cdicdic_device::regs_r )
 			{
 				m_z_buffer ^= 0x0001;
 			}
-			verboselog(machine(), 0, "cdic_r: Z-Buffer Register = %04x & %04x\n", m_z_buffer, mem_mask);
+			verboselog(*this, 0, "cdic_r: Z-Buffer Register = %04x & %04x\n", m_z_buffer, mem_mask);
 			return m_z_buffer;
 		}
 
 		case 0x3ffe/2:
 		{
-			verboselog(machine(), 0, "cdic_r: Data buffer Register = %04x & %04x\n", m_data_buffer, mem_mask);
+			verboselog(*this, 0, "cdic_r: Data buffer Register = %04x & %04x\n", m_data_buffer, mem_mask);
 			return m_data_buffer;
 		}
 		default:
-			verboselog(machine(), 0, "cdic_r: UNIMPLEMENTED: Unknown address: %04x & %04x\n", addr*2, mem_mask);
+			verboselog(*this, 0, "cdic_r: UNIMPLEMENTED: Unknown address: %04x & %04x\n", addr*2, mem_mask);
 			return 0;
 	}
 }
@@ -995,51 +995,51 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 	switch(addr)
 	{
 		case 0x3c00/2: // Command register
-			verboselog(machine(), 0, "cdic_w: Command Register = %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 0, "cdic_w: Command Register = %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&m_command);
 			break;
 
 		case 0x3c02/2: // Time register (MSW)
 			m_time &= ~(mem_mask << 16);
 			m_time |= (data & mem_mask) << 16;
-			verboselog(machine(), 0, "cdic_w: Time Register (MSW) = %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 0, "cdic_w: Time Register (MSW) = %04x & %04x\n", data, mem_mask);
 			break;
 
 		case 0x3c04/2: // Time register (LSW)
 			m_time &= ~mem_mask;
 			m_time |= data & mem_mask;
-			verboselog(machine(), 0, "cdic_w: Time Register (LSW) = %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 0, "cdic_w: Time Register (LSW) = %04x & %04x\n", data, mem_mask);
 			break;
 
 		case 0x3c06/2: // File register
-			verboselog(machine(), 0, "cdic_w: File Register = %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 0, "cdic_w: File Register = %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&m_file);
 			break;
 
 		case 0x3c08/2: // Channel register (MSW)
 			m_channel &= ~(mem_mask << 16);
 			m_channel |= (data & mem_mask) << 16;
-			verboselog(machine(), 0, "cdic_w: Channel Register (MSW) = %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 0, "cdic_w: Channel Register (MSW) = %04x & %04x\n", data, mem_mask);
 			break;
 
 		case 0x3c0a/2: // Channel register (LSW)
 			m_channel &= ~mem_mask;
 			m_channel |= data & mem_mask;
-			verboselog(machine(), 0, "cdic_w: Channel Register (LSW) = %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 0, "cdic_w: Channel Register (LSW) = %04x & %04x\n", data, mem_mask);
 			break;
 
 		case 0x3c0c/2: // Audio Channel register
-			verboselog(machine(), 0, "cdic_w: Audio Channel Register = %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 0, "cdic_w: Audio Channel Register = %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&m_audio_channel);
 			break;
 
 		case 0x3ff4/2:
-			verboselog(machine(), 0, "cdic_w: Audio Buffer Register = %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 0, "cdic_w: Audio Buffer Register = %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&m_audio_buffer);
 			break;
 
 		case 0x3ff6/2:
-			verboselog(machine(), 0, "cdic_w: X Buffer Register = %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 0, "cdic_w: X Buffer Register = %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&m_x_buffer);
 			break;
 
@@ -1050,9 +1050,9 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 			UINT32 index = 0;
 			UINT32 device_index = (data & 0x3fff) >> 1;
 			UINT16 *memory = state->m_planea;
-			verboselog(machine(), 0, "memory address counter: %08x\n", scc68070->dma.channel[0].memory_address_counter);
-			verboselog(machine(), 0, "cdic_w: DMA Control Register = %04x & %04x\n", data, mem_mask);
-			verboselog(machine(), 0, "Doing copy, transferring %04x bytes\n", count * 2 );
+			verboselog(*this, 0, "memory address counter: %08x\n", state->m_scc->dma().channel[0].memory_address_counter);
+			verboselog(*this, 0, "cdic_w: DMA Control Register = %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 0, "Doing copy, transferring %04x bytes\n", count * 2 );
 			////printf("Doing copy, transferring %04x bytes\n", count * 2 );
 			if((start & 0x00f00000) == 0x00200000)
 			{
@@ -1076,7 +1076,7 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 
 		case 0x3ffa/2:
 		{
-			verboselog(machine(), 0, "cdic_w: Z-Buffer Register = %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 0, "cdic_w: Z-Buffer Register = %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&m_z_buffer);
 			if(m_z_buffer & 0x2000)
 			{
@@ -1096,12 +1096,12 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 			break;
 		}
 		case 0x3ffc/2:
-			verboselog(machine(), 0, "cdic_w: Interrupt Vector Register = %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 0, "cdic_w: Interrupt Vector Register = %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&m_interrupt_vector);
 			break;
 		case 0x3ffe/2:
 		{
-			verboselog(machine(), 0, "cdic_w: Data Buffer Register = %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 0, "cdic_w: Data Buffer Register = %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&m_data_buffer);
 			if(m_data_buffer & 0x8000)
 			{
@@ -1140,7 +1140,7 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 						break;
 					}
 					default:
-						verboselog(machine(), 0, "Unknown CDIC command: %02x\n", m_command );
+						verboselog(*this, 0, "Unknown CDIC command: %02x\n", m_command );
 						break;
 				}
 			}
@@ -1148,7 +1148,7 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 			break;
 		}
 		default:
-			verboselog(machine(), 0, "cdic_w: UNIMPLEMENTED: Unknown address: %04x = %04x & %04x\n", addr*2, data, mem_mask);
+			verboselog(*this, 0, "cdic_w: UNIMPLEMENTED: Unknown address: %04x = %04x & %04x\n", addr*2, data, mem_mask);
 			break;
 	}
 }
@@ -1193,7 +1193,7 @@ void cdicdic_device::device_start()
 	m_audio_sample_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdicdic_device::audio_sample_trigger), this));
 	m_audio_sample_timer->adjust(attotime::never);
 
-	m_ram = auto_alloc_array(machine(), UINT16, 0x3c00/2);
+	m_ram = std::make_unique<UINT16[]>(0x3c00/2);
 }
 
 //-------------------------------------------------

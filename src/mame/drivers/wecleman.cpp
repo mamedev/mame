@@ -672,19 +672,21 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_control_w)
 
 	switch (offset)
 	{
+		/* change volume
+		    offset 00000xxx----- channel select (0:channel 0, 1:channel 1)
+		    ++------ chip select ( 0:chip 1, 1:chip2, 2:chip3)
+		    data&0x0f left volume  (data>>4)&0x0f right volume
+			*/
 		case 0x0:
 		case 0x1:
+			m_k007232_1->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
+			break;
 		case 0x2:
 		case 0x3:
+			m_k007232_2->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
+			break;
 		case 0x4:
 		case 0x5:
-			/* change volume
-			    offset 00000xxx----- channel select (0:channel 0, 1:channel 1)
-			    ++------ chip select ( 0:chip 1, 1:chip2, 2:chip3)
-			    data&0x0f left volume  (data>>4)&0x0f right volume
-			*/
-			m_k007232_1->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
-			m_k007232_2->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
 			m_k007232_3->set_volume( offset&1,  (data&0x0f) * 0x08, (data>>4) * 0x08 );
 			break;
 
@@ -991,7 +993,7 @@ static const gfx_layout wecleman_road_layout =
 	{0},
 	64*1,
 	wecleman_road_layout_xoffset,
-	NULL
+	nullptr
 };
 
 static GFXDECODE_START( wecleman )
@@ -1025,7 +1027,7 @@ static const gfx_layout hotchase_road_layout =
 	{0},
 	32*4,
 	hotchase_road_layout_xoffset,
-	NULL
+	nullptr
 };
 
 static GFXDECODE_START( hotchase )

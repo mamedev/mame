@@ -1246,7 +1246,7 @@ READ8_MEMBER( apollo_graphics_15i::apollo_ccr_r )
 UINT8 apollo_graphics_15i::get_pixel(UINT32 offset, UINT16 mask)
 {
 	UINT8 data = 0;
-	UINT16 *source_ptr = m_image_memory + offset;
+	UINT16 *source_ptr = m_image_memory.get() + offset;
 
 	if (m_n_planes == 4)
 	{
@@ -1555,7 +1555,7 @@ UINT32 apollo_graphics_15i::screen_update(screen_device &screen, bitmap_rgb32 &b
 
 void apollo_graphics_15i::screen_update1(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *source_ptr = m_image_memory;
+	UINT16 *source_ptr = m_image_memory.get();
 	int x, y;
 	UINT16 data, mask;
 	UINT16 inverse = (m_cr1 & CR1_INV) ? 0xffff : 0;
@@ -1721,15 +1721,15 @@ const device_type APOLLO_GRAPHICS = &device_creator<apollo_graphics_15i> ;
 
 apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, APOLLO_GRAPHICS, "Apollo Screen", tag, owner, clock,"apollo_graphics_15i", __FILE__),
-	m_lut_fifo(NULL),
-	m_bt458(NULL)
+	m_lut_fifo(nullptr),
+	m_bt458(nullptr)
 {
 }
 
 apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, UINT32 clock, device_type type,const char *name, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_lut_fifo(NULL),
-	m_bt458(NULL)
+	m_lut_fifo(nullptr),
+	m_bt458(nullptr)
 {
 }
 
@@ -1795,14 +1795,14 @@ void apollo_graphics_15i::device_start()
 	m_p_clock = 0;
 	m_data_clock = 0;
 
-	m_image_memory = 0;
+	m_image_memory = nullptr;
 	m_image_plane_size = 0;
 	m_image_memory_size = 0;
 
 	memset(m_color_lookup_table, 0, sizeof(m_color_lookup_table));
 
-	m_lut_fifo = NULL;
-	m_bt458 = NULL;
+	m_lut_fifo = nullptr;
+	m_bt458 = nullptr;
 }
 
 //-------------------------------------------------
@@ -1866,20 +1866,20 @@ void apollo_graphics_15i::device_reset()
 		}
 	}
 
-	if (m_image_memory == NULL)
+	if (m_image_memory == nullptr)
 	{
 		/* allocate the memory image */
 		m_image_plane_size = m_buffer_height * m_buffer_width / 16;
 		m_image_memory_size = m_image_plane_size * m_n_planes;
 		m_image_memory
-				= auto_alloc_array(machine(), UINT16, m_image_memory_size);
-		assert(m_image_memory != NULL);
+				= std::make_unique<UINT16[]>(m_image_memory_size);
+		assert(m_image_memory != nullptr);
 
-		MLOG1(("device reset apollo graphics: buffer=%p size=%0x", (void *) m_image_memory, m_image_memory_size));
+		MLOG1(("device reset apollo graphics: buffer=%p size=%0x", (void *) m_image_memory.get(), m_image_memory_size));
 	}
 
 	memset(m_color_lookup_table, 0, sizeof(m_color_lookup_table));
-	memset(m_image_memory, 0, m_image_memory_size * 2);
+	memset(m_image_memory.get(), 0, m_image_memory_size * 2);
 
 	//  register_vblank_callback(this);
 

@@ -333,7 +333,6 @@ enum X86_CYCLES
 };
 
 
-#define X86_NUM_CPUS        4
 #define CPU_CYCLES_I386         0
 #define CPU_CYCLES_I486         1
 #define CPU_CYCLES_PENTIUM      2

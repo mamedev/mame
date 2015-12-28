@@ -557,13 +557,13 @@ void am9517a_device::device_start()
 	m_out_dack_2_cb.resolve_safe();
 	m_out_dack_3_cb.resolve_safe();
 
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_channel)
 	{
-		m_channel[i].m_address = 0;
-		m_channel[i].m_count = 0;
-		m_channel[i].m_base_address = 0;
-		m_channel[i].m_base_count = 0;
-		m_channel[i].m_mode = 0;
+		elem.m_address = 0;
+		elem.m_count = 0;
+		elem.m_base_address = 0;
+		elem.m_base_count = 0;
+		elem.m_mode = 0;
 	}
 
 	// state saving

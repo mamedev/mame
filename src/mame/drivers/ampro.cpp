@@ -67,7 +67,7 @@ WRITE8_MEMBER( ampro_state::port00_w )
 {
 	membank("bankr0")->set_entry(BIT(data, 6));
 	m_fdc->dden_w(BIT(data, 5));
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	m_fdc->set_floppy(floppy);
 	if (floppy)
@@ -114,7 +114,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 {
 	{ "z80ctc" },
 	{ "z80dart" },
-	{ NULL }
+	{ nullptr }
 };
 
 // Baud rate generator. All inputs are 2MHz.

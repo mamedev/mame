@@ -124,7 +124,7 @@ static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(vectrex_state, vectrex_via_irq))
 
 	/* cartridge */
-	MCFG_VECTREX_CARTRIDGE_ADD("cartslot", vectrex_cart, NULL)
+	MCFG_VECTREX_CARTRIDGE_ADD("cartslot", vectrex_cart, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vectrex")

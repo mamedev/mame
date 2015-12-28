@@ -67,7 +67,7 @@ public:
 	bool m_has_text; // has text sprites (older games)
 
 	// samples
-	INT16 *m_samplebuf;
+	std::unique_ptr<INT16[]> m_samplebuf;
 	int m_sample, m_play;
 	int m_numsamples;
 
@@ -141,6 +141,7 @@ public:
 	DECLARE_DRIVER_INIT(brickznv4);
 	DECLARE_DRIVER_INIT(starfigh);
 	DECLARE_DRIVER_INIT(hardhea2);
+	DECLARE_DRIVER_INIT(hardhea2b);
 	DECLARE_DRIVER_INIT(hardhedb);
 	DECLARE_DRIVER_INIT(sparkman);
 	DECLARE_DRIVER_INIT(brickzn);
@@ -157,7 +158,6 @@ public:
 	DECLARE_MACHINE_RESET(brickzn);
 	DECLARE_MACHINE_RESET(hardhea2);
 	UINT32 screen_update_suna8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(brickzn_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(hardhea2_interrupt);
 
 	// samples

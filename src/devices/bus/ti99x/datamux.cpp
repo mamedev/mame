@@ -94,7 +94,7 @@ void ti99_datamux_device::read_all(address_space& space, UINT16 addr, UINT8 *tar
 	attached_device *dev = m_devices.first();
 
 	// Reading the odd address first (addr+1)
-	while (dev != NULL)
+	while (dev != nullptr)
 	{
 		if (dev->m_config->write_select != 0xffff) // write-only
 		{
@@ -114,7 +114,7 @@ void ti99_datamux_device::read_all(address_space& space, UINT16 addr, UINT8 *tar
 void ti99_datamux_device::write_all(address_space& space, UINT16 addr, UINT8 value)
 {
 	attached_device *dev = m_devices.first();
-	while (dev != NULL)
+	while (dev != nullptr)
 	{
 		if ((addr & dev->m_config->address_mask)==(dev->m_config->select | dev->m_config->write_select))
 		{
@@ -128,7 +128,7 @@ void ti99_datamux_device::write_all(address_space& space, UINT16 addr, UINT8 val
 void ti99_datamux_device::setaddress_all(address_space& space, UINT16 addr)
 {
 	attached_device *dev = m_devices.first();
-	while (dev != NULL)
+	while (dev != nullptr)
 	{
 		if ((addr & dev->m_config->address_mask)==(dev->m_config->select | dev->m_config->write_select))
 		{
@@ -386,14 +386,14 @@ WRITE_LINE_MEMBER( ti99_datamux_device::ready_line )
 
 void ti99_datamux_device::device_start(void)
 {
-	m_ram16b = NULL;
+	m_ram16b = nullptr;
 	m_muxready = ASSERT_LINE;
 	m_ready.resolve();
 }
 
 void ti99_datamux_device::device_stop(void)
 {
-	if (m_ram16b) global_free_array(m_ram16b);
+	m_ram16b = nullptr;
 }
 
 void ti99_datamux_device::device_reset(void)
@@ -409,29 +409,29 @@ void ti99_datamux_device::device_reset(void)
 	m_use32k = (ioport("RAM")->read()==1);
 
 	// better use a region?
-	if (m_ram16b==NULL)
+	if (m_ram16b==nullptr)
 	{
-		m_ram16b = global_alloc_array_clear(UINT16, 32768/2);
+		m_ram16b = make_unique_clear<UINT16[]>(32768/2);
 	}
 
 	// Now building the list of active devices at this databus multiplex.
 	// We allow for turning off devices according to configuration switch settings.
 	// In particular, the HSGPL card cannot function unless the console GROMs are
 	// removed.
-	if ( list != NULL )
+	if ( list != nullptr )
 	{
 		bool done = false;
 		for (int i=0; !done; i++)
 		{
-			if (list[i].name == NULL)
+			if (list[i].name == nullptr)
 			{
 				done = true;
 			}
 			else
 			{
-				UINT32 set = 0;
+				UINT32 set;
 				bool active_device = true;
-				if (list[i].setting!=NULL)
+				if (list[i].setting!=nullptr)
 				{
 					set = ioport(list[i].setting)->read();
 					active_device = ((set & list[i].set)==list[i].set) && ((set & list[i].unset)==0);
@@ -439,9 +439,9 @@ void ti99_datamux_device::device_reset(void)
 				if (active_device)
 				{
 					device_t *dev = machine().device(list[i].name);
-					if (dev != NULL)
+					if (dev != nullptr)
 					{
-						attached_device *ad = new attached_device(dev, list[i]);
+						auto ad = new attached_device(dev, list[i]);
 						m_devices.append(*ad);
 						if (TRACE_SETUP) logerror("datamux: Device %s mounted at index %d.\n", list[i].name, i);
 					}

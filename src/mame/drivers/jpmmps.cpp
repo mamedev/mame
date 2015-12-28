@@ -47,7 +47,7 @@ public:
 	{ }
 	UINT8 m_sound_buffer;
 	UINT8 m_psg_latch;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 protected:
 

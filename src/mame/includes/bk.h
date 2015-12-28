@@ -37,9 +37,9 @@ public:
 	DECLARE_WRITE16_MEMBER(bk_floppy_cmd_w);
 	DECLARE_READ16_MEMBER(bk_floppy_data_r);
 	DECLARE_WRITE16_MEMBER(bk_floppy_data_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_bk0010(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(keyboard_callback);
 	IRQ_CALLBACK_MEMBER(bk0010_irq_callback);

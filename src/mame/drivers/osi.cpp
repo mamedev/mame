@@ -828,7 +828,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( c1pmf, c1p, c1pmf_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia_1", acia6850_device, write_txc))
 
 	MCFG_FLOPPY_DRIVE_ADD("floppy0", osi_floppies, "ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("floppy1", osi_floppies, NULL,   floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("floppy1", osi_floppies, nullptr,   floppy_image_device::default_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

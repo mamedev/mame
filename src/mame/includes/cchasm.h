@@ -60,11 +60,11 @@ public:
 
 	INPUT_CHANGED_MEMBER(set_coin_flag);
 
-	virtual void video_start();
-	virtual void sound_start();
+	virtual void video_start() override;
+	virtual void sound_start() override;
 
 	void refresh();
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -7,8 +7,8 @@
 
 void slapshot_state::video_start()
 {
-	m_spriteram_delayed = auto_alloc_array(machine(), UINT16, m_spriteram.bytes() / 2);
-	m_spriteram_buffered = auto_alloc_array(machine(), UINT16, m_spriteram.bytes() / 2);
+	m_spriteram_delayed = std::make_unique<UINT16[]>(m_spriteram.bytes() / 2);
+	m_spriteram_buffered = std::make_unique<UINT16[]>(m_spriteram.bytes() / 2);
 	m_spritelist = auto_alloc_array(machine(), struct slapshot_tempsprite, 0x400);
 
 	m_sprites_disabled = 1;
@@ -20,8 +20,8 @@ void slapshot_state::video_start()
 	save_item(NAME(m_sprites_master_scrolly));
 	save_item(NAME(m_sprites_flipscreen));
 	save_item(NAME(m_prepare_sprites));
-	save_pointer(NAME(m_spriteram_delayed), m_spriteram.bytes() / 2);
-	save_pointer(NAME(m_spriteram_buffered), m_spriteram.bytes() / 2);
+	save_pointer(NAME(m_spriteram_delayed.get()), m_spriteram.bytes() / 2);
+	save_pointer(NAME(m_spriteram_buffered.get()), m_spriteram.bytes() / 2);
 }
 
 /************************************************************
@@ -374,7 +374,7 @@ void slapshot_state::taito_handle_sprite_buffering(  )
 {
 	if (m_prepare_sprites)   /* no buffering */
 	{
-		memcpy(m_spriteram_buffered, m_spriteram, m_spriteram.bytes());
+		memcpy(m_spriteram_buffered.get(), m_spriteram, m_spriteram.bytes());
 		m_prepare_sprites = 0;
 	}
 }

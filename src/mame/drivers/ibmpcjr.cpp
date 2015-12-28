@@ -60,7 +60,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pic8259_set_int_line);
 
 	DECLARE_WRITE8_MEMBER(pcjr_ppi_portb_w);
-	DECLARE_READ8_MEMBER(pcjr_ppi_porta_r);
 	DECLARE_READ8_MEMBER(pcjr_ppi_portc_r);
 	DECLARE_WRITE8_MEMBER(pcjr_fdc_dor_w);
 	DECLARE_READ8_MEMBER(pcjx_port_1ff_r);
@@ -89,7 +88,7 @@ public:
 	int m_signal_count;
 	UINT8 m_nmi_enabled;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	emu_timer *m_pc_int_delay_timer;
 	emu_timer *m_pcjr_watchdog;
 	emu_timer *m_keyb_signal_timer;
@@ -101,7 +100,7 @@ public:
 		TIMER_KB_SIGNAL
 	};
 
-	void machine_reset();
+	void machine_reset() override;
 	DECLARE_DRIVER_INIT(pcjr);
 };
 
@@ -372,7 +371,7 @@ WRITE8_MEMBER(pcjr_state::pcjr_fdc_dor_w)
 	logerror("fdc: dor = %02x\n", data);
 	UINT8 pdor = m_pcjr_dor;
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
-	floppy_image_device *floppy1 = NULL;
+	floppy_image_device *floppy1 = nullptr;
 
 	if(m_fdc->subdevice("1"))
 		floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
@@ -388,7 +387,7 @@ WRITE8_MEMBER(pcjr_state::pcjr_fdc_dor_w)
 	else if(m_pcjr_dor & 2)
 		m_fdc->set_floppy(floppy1);
 	else
-		m_fdc->set_floppy(NULL);
+		m_fdc->set_floppy(nullptr);
 
 	if((pdor^m_pcjr_dor) & 0x80)
 		m_fdc->reset();
@@ -442,7 +441,7 @@ int pcjr_state::load_cart(device_image_interface &image, generic_slot_device *sl
 	UINT32 size = slot->common_get_size("rom");
 	bool imagic_hack = false;
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		int header_size = 0;
 
@@ -603,7 +602,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
 
-	MCFG_RS232_PORT_ADD( "serport", pcjr_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport", pcjr_com, nullptr )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ins8250", ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ins8250", ins8250_uart_device, dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ins8250", ins8250_uart_device, dsr_w))

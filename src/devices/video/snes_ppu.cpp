@@ -216,9 +216,9 @@ void snes_ppu_device::device_start()
 {
 	m_openbus_cb.resolve_safe(0);
 
-	m_vram = auto_alloc_array(machine(), UINT8, SNES_VRAM_SIZE);
-	m_cgram = auto_alloc_array(machine(), UINT16, SNES_CGRAM_SIZE/2);
-	m_oam_ram = auto_alloc_array(machine(), UINT16, SNES_OAM_SIZE/2);
+	m_vram = std::make_unique<UINT8[]>(SNES_VRAM_SIZE);
+	m_cgram = std::make_unique<UINT16[]>(SNES_CGRAM_SIZE/2);
+	m_oam_ram = std::make_unique<UINT16[]>(SNES_OAM_SIZE/2);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -355,9 +355,9 @@ void snes_ppu_device::device_start()
 
 	save_item(NAME(m_regs));
 
-	save_pointer(NAME(m_vram), SNES_VRAM_SIZE);
-	save_pointer(NAME(m_cgram), SNES_CGRAM_SIZE/2);
-	save_pointer(NAME(m_oam_ram), SNES_OAM_SIZE/2);
+	save_pointer(NAME(m_vram.get()), SNES_VRAM_SIZE);
+	save_pointer(NAME(m_cgram.get()), SNES_CGRAM_SIZE/2);
+	save_pointer(NAME(m_oam_ram.get()), SNES_OAM_SIZE/2);
 }
 
 void snes_ppu_device::device_reset()
@@ -393,13 +393,13 @@ void snes_ppu_device::device_reset()
 	}
 
 	/* Init VRAM */
-	memset(m_vram, 0, SNES_VRAM_SIZE);
+	memset(m_vram.get(), 0, SNES_VRAM_SIZE);
 
 	/* Init Palette RAM */
-	memset((UINT8 *)m_cgram, 0, SNES_CGRAM_SIZE);
+	memset((UINT8 *)m_cgram.get(), 0, SNES_CGRAM_SIZE);
 
 	/* Init oam RAM */
-	memset((UINT8 *)m_oam_ram, 0xff, SNES_OAM_SIZE);
+	memset((UINT8 *)m_oam_ram.get(), 0xff, SNES_OAM_SIZE);
 
 	m_stat78 = 0;
 
@@ -409,14 +409,14 @@ void snes_ppu_device::device_reset()
 	memset(&m_oam, 0, sizeof(m_oam));
 	memset(&m_mode7, 0, sizeof(m_mode7));
 
-	for (int i = 0; i < 2; i++)
+	for (auto & elem : m_scanlines)
 	{
-		m_scanlines[i].enable = 0;
-		m_scanlines[i].clip = 0;
-		memset(m_scanlines[i].buffer, 0, SNES_SCR_WIDTH);
-		memset(m_scanlines[i].priority, 0, SNES_SCR_WIDTH);
-		memset(m_scanlines[i].layer, 0, SNES_SCR_WIDTH);
-		memset(m_scanlines[i].blend_exception, 0, SNES_SCR_WIDTH);
+		elem.enable = 0;
+		elem.clip = 0;
+		memset(elem.buffer, 0, SNES_SCR_WIDTH);
+		memset(elem.priority, 0, SNES_SCR_WIDTH);
+		memset(elem.layer, 0, SNES_SCR_WIDTH);
+		memset(elem.blend_exception, 0, SNES_SCR_WIDTH);
 	}
 
 	for (int i = 0; i < 6; i++)
@@ -442,27 +442,27 @@ void snes_ppu_device::device_reset()
 		memset(m_clipmasks[i], 0, SNES_SCR_WIDTH);
 	}
 
-	for (int i = 0; i < ARRAY_LENGTH(m_oam_spritelist); i++)
+	for (auto & elem : m_oam_spritelist)
 	{
-		m_oam_spritelist[i].tile = 0;
-		m_oam_spritelist[i].x = 0;
-		m_oam_spritelist[i].y = 0;
-		m_oam_spritelist[i].size = 0;
-		m_oam_spritelist[i].vflip = 0;
-		m_oam_spritelist[i].hflip = 0;
-		m_oam_spritelist[i].priority_bits = 0;
-		m_oam_spritelist[i].pal = 0;
-		m_oam_spritelist[i].height = 0;
-		m_oam_spritelist[i].width = 0;
+		elem.tile = 0;
+		elem.x = 0;
+		elem.y = 0;
+		elem.size = 0;
+		elem.vflip = 0;
+		elem.hflip = 0;
+		elem.priority_bits = 0;
+		elem.pal = 0;
+		elem.height = 0;
+		elem.width = 0;
 	}
 
-	for (int i = 0; i < ARRAY_LENGTH(m_oam_tilelist); i++)
+	for (auto & elem : m_oam_tilelist)
 	{
-		m_oam_tilelist[i].x = 0;
-		m_oam_tilelist[i].priority = 0;
-		m_oam_tilelist[i].pal = 0;
-		m_oam_tilelist[i].tileaddr = 0;
-		m_oam_tilelist[i].hflip = 0;
+		elem.x = 0;
+		elem.priority = 0;
+		elem.pal = 0;
+		elem.tileaddr = 0;
+		elem.hflip = 0;
 	}
 }
 
@@ -474,7 +474,7 @@ void snes_ppu_device::device_reset()
 
 inline UINT16 snes_ppu_device::get_bgcolor( UINT8 direct_colors, UINT16 palette, UINT8 color )
 {
-	UINT16 c = 0;
+	UINT16 c;
 
 	if (direct_colors)
 	{
@@ -801,8 +801,8 @@ inline void snes_ppu_device::update_line( UINT16 curline, UINT8 layer, UINT8 pri
 		if (offset_per_tile != SNES_OPT_NONE)
 		{
 			int opt_x = ii + (xoff & 7);
-			UINT32 haddr = 0, vaddr = 0;
-			UINT16 hval = 0, vval = 0;
+			UINT32 haddr, vaddr;
+			UINT16 hval, vval;
 
 			if (opt_x >= 8)
 			{
@@ -1156,7 +1156,7 @@ void snes_ppu_device::update_obsel( void )
 
 void snes_ppu_device::oam_list_build( void )
 {
-	UINT8 *oamram = (UINT8 *)m_oam_ram;
+	UINT8 *oamram = (UINT8 *)m_oam_ram.get();
 	INT16 oam = 0x1ff;
 	UINT16 oam_extra = oam + 0x20;
 	UINT16 extra = 0;
@@ -1275,7 +1275,7 @@ void snes_ppu_device::update_objects_rto( UINT16 curline )
 	UINT8 height, width, vflip, hflip, priority, pal;
 	UINT16 tile;
 	INT16 x, y;
-	UINT32 name_sel = 0;
+	UINT32 name_sel;
 
 	oam_list_build();
 
@@ -2047,7 +2047,7 @@ inline UINT32 snes_ppu_device::get_vram_address()
 
 READ8_MEMBER( snes_ppu_device::vram_read )
 {
-	UINT8 res = 0;
+	UINT8 res;
 	offset &= 0xffff; // only 64KB are present on SNES
 
 	if (m_screen_disabled)
@@ -2208,7 +2208,7 @@ WRITE8_MEMBER( snes_ppu_device::oam_write )
 
 READ8_MEMBER( snes_ppu_device::cgram_read )
 {
-	UINT8 res = 0;
+	UINT8 res;
 	offset &= 0x1ff;
 
 #if 0
@@ -2222,7 +2222,7 @@ READ8_MEMBER( snes_ppu_device::cgram_read )
 	}
 #endif
 
-	res = ((UINT8 *)m_cgram)[offset];
+	res = ((UINT8 *)m_cgram.get())[offset];
 
 	// CGRAM palette data format is 15-bits (0,bbbbb,ggggg,rrrrr).
 	// Highest bit is simply ignored.
@@ -2255,7 +2255,7 @@ WRITE8_MEMBER( snes_ppu_device::cgram_write )
 	if (offset & 0x01)
 		data &= 0x7f;
 
-	((UINT8 *)m_cgram)[offset] = data;
+	((UINT8 *)m_cgram.get())[offset] = data;
 }
 
 UINT8 snes_ppu_device::read(address_space &space, UINT32 offset, UINT8 wrio_bit7)

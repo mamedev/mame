@@ -31,7 +31,7 @@ public:
 	DECLARE_WRITE8_MEMBER(audio_dac_w);
 	DECLARE_DRIVER_INIT(trucocl);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(trucocl);
 	UINT32 screen_update_trucocl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(trucocl_interrupt);
@@ -40,5 +40,5 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

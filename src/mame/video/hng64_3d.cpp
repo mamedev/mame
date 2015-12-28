@@ -15,7 +15,7 @@ hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
 	, m_colorBuffer3d(state.m_screen->visible_area().width(), state.m_screen->visible_area().height())
 {
 	const INT32 bufferSize = state.m_screen->visible_area().width() * state.m_screen->visible_area().height();
-	m_depthBuffer3d = auto_alloc_array(state.machine(), float, bufferSize);
+	m_depthBuffer3d = std::make_unique<float[]>(bufferSize);
 }
 
 

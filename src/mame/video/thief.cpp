@@ -72,14 +72,14 @@ WRITE8_MEMBER(thief_state::thief_color_plane_w){
 }
 
 READ8_MEMBER(thief_state::thief_videoram_r){
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	UINT8 *source = &videoram[offset];
 	if( m_video_control&0x02 ) source+=0x2000*4; /* foreground/background */
 	return source[m_read_mask*0x2000];
 }
 
 WRITE8_MEMBER(thief_state::thief_videoram_w){
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	UINT8 *dest = &videoram[offset];
 	if( m_video_control&0x02 )
 		dest+=0x2000*4; /* foreground/background */
@@ -94,14 +94,14 @@ WRITE8_MEMBER(thief_state::thief_videoram_w){
 void thief_state::video_start(){
 	memset( &m_coprocessor, 0x00, sizeof(m_coprocessor) );
 
-	m_videoram = auto_alloc_array_clear(machine(), UINT8, 0x2000*4*2 );
+	m_videoram = make_unique_clear<UINT8[]>(0x2000*4*2 );
 
-	m_coprocessor.image_ram = auto_alloc_array(machine(), UINT8, 0x2000 );
-	m_coprocessor.context_ram = auto_alloc_array(machine(), UINT8, 0x400 );
+	m_coprocessor.image_ram = std::make_unique<UINT8[]>(0x2000 );
+	m_coprocessor.context_ram = std::make_unique<UINT8[]>(0x400 );
 }
 
 UINT32 thief_state::screen_update_thief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.get();
 	UINT32 offs;
 	int flipscreen = m_video_control&1;
 	const UINT8 *source = videoram;

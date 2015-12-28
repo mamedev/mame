@@ -47,7 +47,6 @@ public:
 	/* misc */
 	UINT32         m_pixel_clock;
 	int            m_ic_state;   // for 9980
-	DECLARE_READ8_MEMBER( interrupt_level );
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

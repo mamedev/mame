@@ -223,7 +223,7 @@ class render_screen_list
 	public:
 		// construction/destruction
 		item(screen_device &screen)
-			: m_next(NULL),
+			: m_next(nullptr),
 				m_screen(screen) { }
 
 		// state
@@ -243,7 +243,7 @@ public:
 	int contains(screen_device &screen) const
 	{
 		int count = 0;
-		for (item *curitem = m_list.first(); curitem != NULL; curitem = curitem->m_next)
+		for (item *curitem = m_list.first(); curitem != nullptr; curitem = curitem->m_next)
 			if (&curitem->m_screen == &screen) count++;
 		return count;
 	}
@@ -308,8 +308,8 @@ public:
 		type(),
 		flags(0),
 		width(0),
-		container(NULL),
-		m_next(NULL)
+		container(nullptr),
+		m_next(nullptr)
 	{}
 
 	// render primitive types
@@ -408,7 +408,7 @@ class render_texture
 	~render_texture();
 
 	// reset before re-use
-	void reset(render_manager &manager, texture_scaler_func scaler = NULL, void *param = NULL);
+	void reset(render_manager &manager, texture_scaler_func scaler = nullptr, void *param = nullptr);
 
 	// release resources when freed
 	void release();
@@ -468,7 +468,7 @@ class render_container
 	friend class render_target;
 
 	// construction/destruction
-	render_container(render_manager &manager, screen_device *screen = NULL);
+	render_container(render_manager &manager, screen_device *screen = nullptr);
 	~render_container();
 
 public:
@@ -514,13 +514,13 @@ public:
 	void add_quad(float x0, float y0, float x1, float y1, rgb_t argb, render_texture *texture, UINT32 flags);
 	void add_char(float x0, float y0, float height, float aspect, rgb_t argb, render_font &font, UINT16 ch);
 	void add_point(float x0, float y0, float diameter, rgb_t argb, UINT32 flags) { add_line(x0, y0, x0, y0, diameter, argb, flags); }
-	void add_rect(float x0, float y0, float x1, float y1, rgb_t argb, UINT32 flags) { add_quad(x0, y0, x1, y1, argb, NULL, flags); }
+	void add_rect(float x0, float y0, float x1, float y1, rgb_t argb, UINT32 flags) { add_quad(x0, y0, x1, y1, argb, nullptr, flags); }
 
 	// brightness/contrast/gamma helpers
 	bool has_brightness_contrast_gamma_changes() const { return (m_user.m_brightness != 1.0f || m_user.m_contrast != 1.0f || m_user.m_gamma != 1.0f); }
 	UINT8 apply_brightness_contrast_gamma(UINT8 value);
 	float apply_brightness_contrast_gamma_fp(float value);
-	const rgb_t *bcg_lookup_table(int texformat, palette_t *palette = NULL);
+	const rgb_t *bcg_lookup_table(int texformat, palette_t *palette = nullptr);
 
 private:
 	// an item describes a high level primitive that is added to a container
@@ -530,7 +530,7 @@ private:
 		friend class simple_list<item>;
 
 	public:
-		item() : m_next(NULL), m_type(0), m_flags(0), m_internal(0), m_width(0), m_texture(NULL) { }
+		item() : m_next(nullptr), m_type(0), m_flags(0), m_internal(0), m_width(0), m_texture(nullptr) { }
 
 		// getters
 		item *next() const { return m_next; }
@@ -572,7 +572,7 @@ private:
 	user_settings           m_user;                 // user settings
 	bitmap_argb32 *         m_overlaybitmap;        // overlay bitmap
 	render_texture *        m_overlaytexture;       // overlay texture
-	auto_pointer<palette_client> m_palclient;       // client to the screen palette
+	std::unique_ptr<palette_client> m_palclient;       // client to the screen palette
 	std::vector<rgb_t>           m_bcglookup;            // copy of screen palette with bcg adjustment
 	rgb_t                   m_bcglookup256[0x400];  // lookup table for brightness/contrast/gamma
 };
@@ -704,7 +704,7 @@ private:
 		int                 m_textalign;                // text alignment to box
 		bitmap_argb32       m_bitmap[MAX_BITMAPS];      // source bitmap for images
 		std::string         m_dirname;                  // directory name of image file (for lazy loading)
-		auto_pointer<emu_file> m_file[MAX_BITMAPS];        // file object for reading image/alpha files
+		std::unique_ptr<emu_file> m_file[MAX_BITMAPS];        // file object for reading image/alpha files
 		std::string         m_imagefile[MAX_BITMAPS];   // name of the image file (for lazy loading)
 		std::string         m_alphafile[MAX_BITMAPS];   // name of the alpha file (for lazy loading)
 		bool                m_hasalpha[MAX_BITMAPS];    // is there any alpha component present?
@@ -873,7 +873,7 @@ class render_target
 	friend class render_manager;
 
 	// construction/destruction
-	render_target(render_manager &manager, const char *layoutfile = NULL, UINT32 flags = 0);
+	render_target(render_manager &manager, const char *layoutfile = nullptr, UINT32 flags = 0);
 	~render_target();
 
 public:
@@ -942,7 +942,7 @@ public:
 	// debug containers
 	render_container *debug_alloc();
 	void debug_free(render_container &container);
-	void debug_top(render_container &container);
+	void debug_append(render_container &container);
 
 	// resolve tag lookups
 	void resolve_tags();
@@ -1024,25 +1024,25 @@ public:
 	float max_update_rate() const;
 
 	// targets
-	render_target *target_alloc(const char *layoutfile = NULL, UINT32 flags = 0);
+	render_target *target_alloc(const char *layoutfile = nullptr, UINT32 flags = 0);
 	void target_free(render_target *target);
 	render_target *first_target() const { return m_targetlist.first(); }
 	render_target *target_by_index(int index) const;
 
 	// UI targets
-	render_target &ui_target() const { assert(m_ui_target != NULL); return *m_ui_target; }
+	render_target &ui_target() const { assert(m_ui_target != nullptr); return *m_ui_target; }
 	void set_ui_target(render_target &target) { m_ui_target = &target; }
-	float ui_aspect(render_container *rc = NULL);
+	float ui_aspect(render_container *rc = nullptr);
 
 	// UI containers
-	render_container &ui_container() const { assert(m_ui_container != NULL); return *m_ui_container; }
+	render_container &ui_container() const { assert(m_ui_container != nullptr); return *m_ui_container; }
 
 	// textures
-	render_texture *texture_alloc(texture_scaler_func scaler = NULL, void *param = NULL);
+	render_texture *texture_alloc(texture_scaler_func scaler = nullptr, void *param = nullptr);
 	void texture_free(render_texture *texture);
 
 	// fonts
-	render_font *font_alloc(const char *filename = NULL);
+	render_font *font_alloc(const char *filename = nullptr);
 	void font_free(render_font *font);
 
 	// reference tracking
@@ -1053,7 +1053,7 @@ public:
 
 private:
 	// containers
-	render_container *container_alloc(screen_device *screen = NULL);
+	render_container *container_alloc(screen_device *screen = nullptr);
 	void container_free(render_container *container);
 
 	// config callbacks

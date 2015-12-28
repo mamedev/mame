@@ -39,7 +39,7 @@ public:
 	optional_shared_ptr<UINT8> m_audio_rambase;
 
 	/* video-related */
-	bitmap_ind16 *m_background_bitmap;
+	std::unique_ptr<bitmap_ind16> m_background_bitmap;
 	UINT8    m_btime_palette;
 	UINT8    m_bnj_scroll1;
 	UINT8    m_bnj_scroll2;
@@ -64,12 +64,6 @@ public:
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(audio_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(lnc_w);
-	DECLARE_WRITE8_MEMBER(mmonkey_w);
-	DECLARE_WRITE8_MEMBER(btime_w);
-	DECLARE_WRITE8_MEMBER(tisland_w);
-	DECLARE_WRITE8_MEMBER(zoar_w);
-	DECLARE_WRITE8_MEMBER(disco_w);
 	DECLARE_WRITE8_MEMBER(audio_command_w);
 	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_READ8_MEMBER(zoar_dsw1_read);

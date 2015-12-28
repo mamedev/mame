@@ -90,8 +90,8 @@ void ds1302_device::device_start()
 	m_clock_timer = timer_alloc();
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
 
-	for (int i = 0; i < 9; i++)
-		m_reg[i] = 0;
+	for (auto & elem : m_reg)
+		elem = 0;
 
 	// state saving
 	save_item(NAME(m_ce));

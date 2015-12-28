@@ -27,22 +27,22 @@ public:
 	a2bus_memexp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
 	bool m_isramfactor;
 	UINT8 m_bankhior;
 	int m_addrmask;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// overrides of standard a2bus slot functions
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset);
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
-	virtual UINT8 read_cnxx(address_space &space, UINT8 offset);
-	virtual UINT8 read_c800(address_space &space, UINT16 offset);
+	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
+	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
+	virtual UINT8 read_cnxx(address_space &space, UINT8 offset) override;
+	virtual UINT8 read_c800(address_space &space, UINT16 offset) override;
 
 private:
 	UINT8 *m_rom;
@@ -62,7 +62,7 @@ class a2bus_ramfactor_device : public a2bus_memexp_device
 public:
 	a2bus_ramfactor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 // device type definition

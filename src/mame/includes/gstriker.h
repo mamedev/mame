@@ -51,7 +51,6 @@ public:
 	// common
 	DECLARE_READ16_MEMBER(dmmy_8f);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_READ16_MEMBER(pending_command_r);
 	DECLARE_WRITE8_MEMBER(sh_pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(sh_bankswitch_w);
 
@@ -65,8 +64,8 @@ public:
 	DECLARE_READ16_MEMBER(vbl_toggle_r);
 	DECLARE_WRITE16_MEMBER(vbl_toggle_w);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_DRIVER_INIT(twrldc94a);
 	DECLARE_DRIVER_INIT(vgoalsoc);
 	DECLARE_DRIVER_INIT(twrldc94);

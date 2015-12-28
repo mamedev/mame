@@ -629,7 +629,7 @@ public:
 	{ }
 
 	UINT32* m_adder4cpuregion;
-	UINT32* m_adder4ram;
+	std::unique_ptr<UINT32[]> m_adder4ram;
 
 	DECLARE_READ32_MEMBER(adder4_mem_r);
 	DECLARE_WRITE32_MEMBER(adder4_mem_w);

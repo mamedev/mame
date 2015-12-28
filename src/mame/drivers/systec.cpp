@@ -55,7 +55,7 @@ public:
 	DECLARE_READ8_MEMBER(systec_c6_r);
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 m_term_data;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 READ8_MEMBER( systec_state::systec_c4_r )

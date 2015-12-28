@@ -44,8 +44,8 @@ public:
 	DECLARE_WRITE8_MEMBER(rockrage_vreg_w);
 	DECLARE_READ8_MEMBER(rockrage_VLM5030_busy_r);
 	DECLARE_WRITE8_MEMBER(rockrage_speech_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(rockrage);
 	UINT32 screen_update_rockrage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rockrage_interrupt);

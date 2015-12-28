@@ -843,7 +843,7 @@ void balsente_state::set_counter_0_ff(timer_device &timer, int newstate)
 		{
 			m_counter[0].count--;
 			if (m_counter[0].count == 0)
-				balsente_counter_callback(timer, NULL, 0);
+				balsente_counter_callback(timer, nullptr, 0);
 		}
 	}
 
@@ -925,8 +925,8 @@ WRITE8_MEMBER(balsente_state::balsente_counter_control_w)
 	/* bit D0 enables/disables audio */
 	if (diff_counter_control & 0x01)
 	{
-		for (int ch = 0; ch < 6; ch++)
-			m_cem_device[ch]->set_output_gain(0, (data & 0x01) ? 1.0 : 0);
+		for (auto & elem : m_cem_device)
+			elem->set_output_gain(0, (data & 0x01) ? 1.0 : 0);
 	}
 
 	/* bit D1 is hooked to counter 0's gate */

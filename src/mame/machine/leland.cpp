@@ -369,7 +369,7 @@ MACHINE_START_MEMBER(leland_state,ataxx)
 {
 	/* set the odd data banks */
 	m_battery_ram = reinterpret_cast<UINT8 *>(memshare("battery")->ptr());
-	m_extra_tram = auto_alloc_array(machine(), UINT8, ATAXX_EXTRA_TRAM_SIZE);
+	m_extra_tram = std::make_unique<UINT8[]>(ATAXX_EXTRA_TRAM_SIZE);
 
 	/* start scanline interrupts going */
 	m_master_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::ataxx_interrupt_callback),this));
@@ -378,7 +378,7 @@ MACHINE_START_MEMBER(leland_state,ataxx)
 
 MACHINE_RESET_MEMBER(leland_state,ataxx)
 {
-	memset(m_extra_tram, 0, ATAXX_EXTRA_TRAM_SIZE);
+	memset(m_extra_tram.get(), 0, ATAXX_EXTRA_TRAM_SIZE);
 	m_master_int_timer->adjust(m_screen->time_until_pos(8), 8);
 
 	/* initialize the XROM */

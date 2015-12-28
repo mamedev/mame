@@ -49,7 +49,7 @@ public:
 		m_port_scope_binocular(*this, "SSCOPE_BINOCULAR"),
 		m_port_persist(*this, "PERSISTENCE"),
 		m_region_maincpu(*this, "maincpu"),
-		m_mainram(NULL),
+		m_mainram(nullptr),
 		m_is_gamegear(0),
 		m_is_gg_region_japan(0),
 		m_is_smsj(0),
@@ -83,7 +83,7 @@ public:
 
 	required_memory_region m_region_maincpu;
 	address_space *m_space;
-	UINT8 *m_mainram;
+	std::unique_ptr<UINT8[]> m_mainram;
 	UINT8 *m_BIOS;
 
 	// for 3D glass binocular hack
@@ -100,7 +100,7 @@ public:
 	bitmap_rgb32 m_gg_sms_mode_bitmap;
 	// line_buffer will be used to hold 4 lines of line data as a kind of cache for
 	// vertical scaling in the gamegear sms compatibility mode.
-	int *m_line_buffer;
+	std::unique_ptr<int[]> m_line_buffer;
 
 	// model identifiers
 	UINT8 m_is_gamegear;

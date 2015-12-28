@@ -104,7 +104,7 @@ void a2eauxslot_device::device_start()
 	m_out_nmi_cb.resolve_safe();
 
 	// clear slot
-	m_device = NULL;
+	m_device = nullptr;
 }
 
 //-------------------------------------------------

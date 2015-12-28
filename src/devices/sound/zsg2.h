@@ -40,11 +40,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// 16 registers per channel, 48 channels
@@ -70,9 +70,9 @@ private:
 
 	required_region_ptr<UINT32> m_mem_base;
 	UINT32 m_read_address;
-	UINT32 *m_mem_copy;
+	std::unique_ptr<UINT32[]> m_mem_copy;
 	UINT32 m_mem_blocks;
-	INT16 *m_full_samples;
+	std::unique_ptr<INT16[]> m_full_samples;
 
 	sound_stream *m_stream;
 

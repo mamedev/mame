@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Derrick Renaud
 /*************************************************************************
 
@@ -15,7 +15,7 @@ const char *const triplhnt_sample_names[] =
 	"*triplhnt",
 	"bear_rac",
 	"witch",
-	0
+	nullptr
 };
 
 /************************************************************************/

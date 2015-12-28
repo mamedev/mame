@@ -50,7 +50,7 @@ sns_rom_spc7110rtc_device::sns_rom_spc7110rtc_device(const machine_config &mconf
 
 void sns_rom_spc7110_device::spc7110_start()
 {
-	m_decomp = auto_alloc(machine(), SPC7110_Decomp(machine()));
+	m_decomp = std::make_unique<SPC7110_Decomp>(machine());
 
 	// The SPC7110 works in conjunction with 0x2000 of RAM, which is battery backed up (and hence emulated by our m_nvram)
 
@@ -300,7 +300,7 @@ static const UINT8 spc7110_mode2_context_table[32][2] =
 SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
 				:  m_machine(machine)
 {
-	m_decomp_buffer = (UINT8*)auto_alloc_array(machine, UINT8, SPC7110_DECOMP_BUFFER_SIZE);
+	m_decomp_buffer = std::make_unique<UINT8[]>(SPC7110_DECOMP_BUFFER_SIZE);
 	reset();
 
 	for (int i = 0; i < 256; i++)
@@ -325,7 +325,7 @@ SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
 
 	m_machine.save().save_item(m_decomp_mode, "SNES_SPC7110/m_decomp_mode");
 	m_machine.save().save_item(m_decomp_offset, "SNES_SPC7110/m_decomp_offset");
-	m_machine.save().save_pointer(m_decomp_buffer, "SNES_SPC7110/m_decomp_buffer", SPC7110_DECOMP_BUFFER_SIZE);
+	m_machine.save().save_pointer(m_decomp_buffer.get(), "SNES_SPC7110/m_decomp_buffer", SPC7110_DECOMP_BUFFER_SIZE);
 	m_machine.save().save_item(m_decomp_buffer_rdoffset, "SNES_SPC7110/m_decomp_buffer_rdoffset");
 	m_machine.save().save_item(m_decomp_buffer_wroffset, "SNES_SPC7110/m_decomp_buffer_wroffset");
 	m_machine.save().save_item(m_decomp_buffer_length, "SNES_SPC7110/m_decomp_buffer_length");
@@ -389,10 +389,10 @@ void SPC7110_Decomp::init(running_machine &machine, UINT8 *ROM, UINT32 len, UINT
 	m_decomp_buffer_length   = 0;
 
 	//reset context states
-	for (int i = 0; i < 32; i++)
+	for (auto & elem : m_context)
 	{
-		m_context[i].index  = 0;
-		m_context[i].invert = 0;
+		elem.index  = 0;
+		elem.invert = 0;
 	}
 
 	switch (m_decomp_mode)
@@ -873,9 +873,9 @@ void SPC7110_Decomp::mode2(UINT8 init, UINT8 *ROM, UINT32 len)
 
 		if (m_m2_buffer_index == 16)
 		{
-			for (int i = 0; i < 16; i++)
+			for (auto & elem : m_m2_bitplanebuffer)
 			{
-				write(m_m2_bitplanebuffer[i]);
+				write(elem);
 			}
 			m_m2_buffer_index = 0;
 		}
@@ -1233,7 +1233,7 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 		case 0x4840: return m_r4840;
 		case 0x4841:
 		{
-			UINT8 data = 0;
+			UINT8 data;
 			if (m_rtc_state == RTCS_Inactive || m_rtc_state == RTCS_ModeSelect)
 				return 0x00;
 

@@ -431,7 +431,7 @@ static const ay8910_device::mosfet_param ay8910_mosfet_param =
  *
  *************************************/
 
-INLINE void build_3D_table(double rl, const ay8910_device::ay_ym_param *par, const ay8910_device::ay_ym_param *par_env, int normalize, double factor, int zero_is_off, INT32 *tab)
+static inline void build_3D_table(double rl, const ay8910_device::ay_ym_param *par, const ay8910_device::ay_ym_param *par_env, int normalize, double factor, int zero_is_off, INT32 *tab)
 {
 	double min = 10.0,  max = 0.0;
 
@@ -490,7 +490,7 @@ INLINE void build_3D_table(double rl, const ay8910_device::ay_ym_param *par, con
 	/* for (e=0;e<16;e++) printf("%d %d\n",e<<10, tab[e<<10]); */
 }
 
-INLINE void build_single_table(double rl, const ay8910_device::ay_ym_param *par, int normalize, INT32 *tab, int zero_is_off)
+static inline void build_single_table(double rl, const ay8910_device::ay_ym_param *par, int normalize, INT32 *tab, int zero_is_off)
 {
 	int j;
 	double rt;
@@ -529,7 +529,7 @@ INLINE void build_single_table(double rl, const ay8910_device::ay_ym_param *par,
 
 }
 
-INLINE void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, const double rd, INT32 *tab)
+static inline void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, const double rd, INT32 *tab)
 {
 	int j;
 
@@ -687,8 +687,8 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	int chan;
 
 	buf[0] = outputs[0];
-	buf[1] = NULL;
-	buf[2] = NULL;
+	buf[1] = nullptr;
+	buf[2] = nullptr;
 	if (m_streams == AY8910_NUM_CHANNELS)
 	{
 		buf[1] = outputs[1];
@@ -699,7 +699,7 @@ void ay8910_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	if (!m_ready)
 	{
 		for (chan = 0; chan < AY8910_NUM_CHANNELS; chan++)
-			if (buf[chan] != NULL)
+			if (buf[chan] != nullptr)
 				memset(buf[chan], 0, samples * sizeof(*buf[chan]));
 	}
 
@@ -1131,7 +1131,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, dev
 		m_streams(3),
 		m_ioports(2),
 		m_ready(0),
-		m_channel(NULL),
+		m_channel(nullptr),
 		m_register_latch(0),
 		m_last_enable(0),
 		m_prescale_noise(0),
@@ -1173,7 +1173,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 		m_streams(streams),
 		m_ioports(ioports),
 		m_ready(0),
-		m_channel(NULL),
+		m_channel(nullptr),
 		m_register_latch(0),
 		m_last_enable(0),
 		m_prescale_noise(0),

@@ -12,7 +12,7 @@ msx_cart_super_swangi::msx_cart_super_swangi(const machine_config &mconfig, cons
 	, msx_cart_interface(mconfig, *this)
 	, m_selected_bank(0)
 {
-	m_bank_base[0] = m_bank_base[1] = NULL;
+	m_bank_base[0] = m_bank_base[1] = nullptr;
 }
 
 

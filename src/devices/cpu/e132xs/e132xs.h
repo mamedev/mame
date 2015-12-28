@@ -221,29 +221,27 @@ protected:
 	void init(int scale_mask);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_stop();
-
-	void make_ops();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual UINT32 execute_input_lines() const;
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override;
+	virtual UINT32 execute_max_cycles() const override;
+	virtual UINT32 execute_input_lines() const override;
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override;
+	virtual UINT32 disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
 
 	// address spaces
 	const address_space_config m_program_config;
@@ -494,8 +492,6 @@ private:
 	void ope8();    void ope9();    void opea();    void opeb();    void opec();    void oped();    void opee();    void opef();
 	void opf0();    void opf1();    void opf2();    void opf3();    void opf4();    void opf5();    void opf6();    void opf7();
 	void opf8();    void opf9();    void opfa();    void opfb();    void opfc();    void opfd();    void opfe();    void opff();
-
-	void set_irq_line(int irqline, int state);
 };
 
 // device type definition
@@ -524,7 +520,7 @@ public:
 	e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -537,7 +533,7 @@ public:
 	e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -550,7 +546,7 @@ public:
 	e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -563,7 +559,7 @@ public:
 	e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -576,7 +572,7 @@ public:
 	e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -589,7 +585,7 @@ public:
 	e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -602,7 +598,7 @@ public:
 	e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -615,7 +611,7 @@ public:
 	e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -628,7 +624,7 @@ public:
 	e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -641,7 +637,7 @@ public:
 	e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -654,7 +650,7 @@ public:
 	gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -667,7 +663,7 @@ public:
 	gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -680,7 +676,7 @@ public:
 	gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -693,7 +689,7 @@ public:
 	gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 #endif /* __E132XS_H__ */

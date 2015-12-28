@@ -6,7 +6,6 @@
 
     TODO:
     - System is too fast, there should be one wait cycle every five cycles?
-    - What's the exact MC6845 type? It can't be H46505
     - Adjust visible area so that the borders aren't that large (needs
       MC6845 changes)
     - Verify BASIC and character set versions
@@ -44,7 +43,7 @@ public:
 		m_color_ram(*this, "colorram"),
 		m_font_ram(*this, "fontram"),
 		m_keyboard(*this, "KEY"),
-		m_palette(NULL),
+		m_palette(nullptr),
 		m_control(0xff),
 		m_rs232_rx(1),
 		m_rs232_dcd(1)
@@ -71,13 +70,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rs232_dcd_w);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
-	required_device<mc6845_1_device> m_crtc;
+	required_device<hd6845_device> m_crtc;
 	required_device<rs232_port_device> m_rs232;
 	required_device<expansion_slot_device> m_exp;
 	required_memory_region m_char_rom;
@@ -118,8 +117,8 @@ static ADDRESS_MAP_START( cgenie_io, AS_IO, 8, cgenie_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_DEVWRITE("ay8910", ay8910_device, address_w)
 	AM_RANGE(0xf9, 0xf9) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
-	AM_RANGE(0xfa, 0xfa) AM_DEVWRITE("crtc", mc6845_1_device, address_w)
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("crtc", mc6845_1_device, register_r, register_w)
+	AM_RANGE(0xfa, 0xfa) AM_DEVWRITE("crtc", hd6845_device, address_w)
+	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("crtc", hd6845_device, register_r, register_w)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(control_r, control_w)
 ADDRESS_MAP_END
 
@@ -440,9 +439,9 @@ static MACHINE_CONFIG_START( cgenie, cgenie_state )
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_17_73447MHz / 2, 568, 32, 416, 312, 28, 284)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", MC6845_1, "screen", XTAL_17_73447MHz / 16)
+	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_17_73447MHz / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_BEGIN_UPDATE_CB(cgenie_state, crtc_begin_update)
@@ -465,7 +464,7 @@ static MACHINE_CONFIG_START( cgenie, cgenie_state )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "cgenie_cass")
 
 	// serial port
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(cgenie_state, rs232_rx_w))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(cgenie_state, rs232_dcd_w))
 

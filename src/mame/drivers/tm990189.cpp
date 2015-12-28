@@ -92,8 +92,6 @@ public:
 	required_device<cassette_image_device> m_cass;
 	optional_device<tms9918_device> m_tms9918;
 
-	DECLARE_READ8_MEMBER( interrupt_level );
-
 	DECLARE_READ8_MEMBER(video_vdp_r);
 	DECLARE_WRITE8_MEMBER(video_vdp_w);
 	DECLARE_READ8_MEMBER(video_joy_r);
@@ -434,25 +432,25 @@ public:
 	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_SERIAL; }
+	virtual iodevice_t image_type() const override { return IO_SERIAL; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
-	virtual const char *file_extensions() const { return ""; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 1; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return nullptr; }
+	virtual const char *file_extensions() const override { return ""; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual bool call_load();
-	virtual void call_unload();
+	virtual bool call_load() override;
+	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 };
 
 const device_type TM990_189_RS232 = &device_creator<tm990_189_rs232_image_device>;

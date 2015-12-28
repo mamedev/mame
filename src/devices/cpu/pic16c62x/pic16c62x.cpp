@@ -105,11 +105,11 @@ static ADDRESS_MAP_START( pic16c62xa_ram, AS_DATA, 8, pic16c62x_device )
 	AM_RANGE(0x00, 0x06) AM_RAM
 	AM_RANGE(0x0a, 0x0c) AM_RAM
 	AM_RANGE(0x1f, 0x6f) AM_RAM
-	AM_RANGE(0x70, 0x7f) AM_RAM AM_SHARE(0)
+	AM_RANGE(0x70, 0x7f) AM_RAM AM_SHARE(nullptr)
 	AM_RANGE(0x80, 0x86) AM_RAM
 	AM_RANGE(0x8a, 0x8e) AM_RAM
 	AM_RANGE(0x9f, 0xbf) AM_RAM
-	AM_RANGE(0xf0, 0xff) AM_RAM AM_SHARE(0)
+	AM_RANGE(0xf0, 0xff) AM_RAM AM_SHARE(nullptr)
 ADDRESS_MAP_END
 
 
@@ -808,7 +808,7 @@ const pic16c62x_device::pic16c62x_instruction pic16c62x_device::s_instructiontab
 	{(char *)"00000001100100", &pic16c62x_device::clrwdt, 1},
 	{(char *)"00000001100010", &pic16c62x_device::option, 1},      // deprecated
 	{(char *)"00000001100fff", &pic16c62x_device::tris, 1},        // deprecated
-	{NULL, NULL, 0}
+	{nullptr, nullptr, 0}
 };
 
 /***********************************************************************

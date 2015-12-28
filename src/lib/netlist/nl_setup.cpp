@@ -886,7 +886,7 @@ class logic_family_std_proxy_t : public logic_family_desc_t
 {
 public:
 	logic_family_std_proxy_t() { }
-	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const
+	virtual devices::nld_base_d_to_a_proxy *create_d_a_proxy(logic_output_t *proxied) const override
 	{
 		return palloc(devices::nld_d_to_a_proxy(proxied));
 	}

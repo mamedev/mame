@@ -119,7 +119,7 @@ static casserr_t to7_k7_load( cassette_image *cass )
 	if ( to7_k7_bits )
 	{
 		free( to7_k7_bits );
-		to7_k7_bits = NULL;
+		to7_k7_bits = nullptr;
 	}
 
 	to7_k7_bitsize = 0;
@@ -366,7 +366,7 @@ static casserr_t to7_k7_load( cassette_image *cass )
 
 
 static const struct CassetteFormat to7_k7 =
-{ "k7", to7_k7_identify, to7_k7_load, NULL /* no save */ };
+{ "k7", to7_k7_identify, to7_k7_load, nullptr /* no save */ };
 
 
 
@@ -392,7 +392,7 @@ static casserr_t to7_wav_load ( cassette_image *cass )
 	if ( to7_k7_bits )
 	{
 		free( to7_k7_bits );
-		to7_k7_bits = NULL;
+		to7_k7_bits = nullptr;
 	}
 
 	if ( e != CASSETTE_ERROR_SUCCESS )
@@ -730,7 +730,7 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 
 
 static const struct CassetteFormat mo5_k5 =
-{ "k5,k7", mo5_k5_identify, mo5_k5_load, NULL /* no save */ };
+{ "k5,k7", mo5_k5_identify, mo5_k5_load, nullptr /* no save */ };
 
 
 /********************* MO5 WAV format ************************/
@@ -781,8 +781,8 @@ static const struct CassetteFormat mo5_wav =
 
 
 const struct CassetteFormat *const to7_cassette_formats[] =
-{ &to7_wav, &to7_k7, NULL };
+{ &to7_wav, &to7_k7, nullptr };
 
 
 const struct CassetteFormat *const mo5_cassette_formats[] =
-{ &mo5_wav, &mo5_k5, NULL };
+{ &mo5_wav, &mo5_k5, nullptr };

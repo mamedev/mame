@@ -45,7 +45,7 @@ private:
 	UINT8 m_keyrow;
 	UINT16 m_digit;
 	UINT8 m_vector;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<8> m_switch;
 };

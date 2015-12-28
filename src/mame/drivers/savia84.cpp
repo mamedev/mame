@@ -53,7 +53,7 @@ public:
 	UINT8 m_segment;
 	UINT8 m_digit;
 	UINT8 m_digit_last;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 };
 
 static ADDRESS_MAP_START( savia84_mem, AS_PROGRAM, 8, savia84_state )

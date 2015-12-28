@@ -146,7 +146,7 @@ static void sdlwindow_sync(void);
 //============================================================
 
 
-INLINE void execute_async(osd_work_callback callback, const worker_param &wp)
+static inline void execute_async(osd_work_callback callback, const worker_param &wp)
 {
 	worker_param *wp_temp = (worker_param *) osd_malloc(sizeof(worker_param));
 	*wp_temp = wp;
@@ -158,7 +158,7 @@ INLINE void execute_async(osd_work_callback callback, const worker_param &wp)
 		callback((void *) wp_temp, 0);
 }
 
-INLINE void execute_sync(osd_work_callback callback, const worker_param &wp)
+static inline void execute_sync(osd_work_callback callback, const worker_param &wp)
 {
 	worker_param *wp_temp = (worker_param *) osd_malloc(sizeof(worker_param));
 	*wp_temp = wp;
@@ -171,7 +171,7 @@ INLINE void execute_sync(osd_work_callback callback, const worker_param &wp)
 //  execute_async_wait
 //============================================================
 
-INLINE void execute_async_wait(osd_work_callback callback, const worker_param &wp)
+static inline void execute_async_wait(osd_work_callback callback, const worker_param &wp)
 {
 	execute_async(callback, wp);
 	sdlwindow_sync();
@@ -380,7 +380,7 @@ void sdl_osd_interface::window_exit()
 //  sdlwindow_blit_surface_size
 //============================================================
 
-INLINE int better_mode(int width0, int height0, int width1, int height1, float desired_aspect)
+static inline int better_mode(int width0, int height0, int width1, int height1, float desired_aspect)
 {
 	float aspect0 = (float)width0 / (float)height0;
 	float aspect1 = (float)width1 / (float)height1;

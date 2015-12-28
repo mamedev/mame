@@ -27,6 +27,10 @@
 // define this to zap memory to a fixed non-0 value before freeing
 //#define OVERWRITE_FREED_MEMORY
 
+// compatibility with non-clang compilers
+#ifndef __has_feature
+	#define __has_feature(x) 0
+#endif
 
 
 //**************************************************************************
@@ -90,11 +94,11 @@ const zeromem_t zeromem = { };
 
 // globals for memory_entry
 UINT64 memory_entry::s_curid = 1;
-osd_lock *memory_entry::s_lock = NULL;
+osd_lock *memory_entry::s_lock = nullptr;
 bool memory_entry::s_lock_alloc = false;
 bool memory_entry::s_tracking = false;
-memory_entry *memory_entry::s_hash[memory_entry::k_hash_prime] = { NULL };
-memory_entry *memory_entry::s_freehead = NULL;
+memory_entry *memory_entry::s_hash[memory_entry::k_hash_prime] = { nullptr };
+memory_entry *memory_entry::s_freehead = nullptr;
 
 //**************************************************************************
 //  OPERATOR REPLACEMENTS
@@ -103,15 +107,15 @@ memory_entry *memory_entry::s_freehead = NULL;
 #ifndef NO_MEM_TRACKING
 
 // standard new/delete operators (try to avoid using)
-void *operator new(std::size_t size) throw (std::bad_alloc) { return malloc_file_line(size, NULL, 0, false, true, false); }
-void *operator new[](std::size_t size) throw (std::bad_alloc) { return malloc_file_line(size, NULL, 0, true, true, false); }
-void operator delete(void *ptr) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, false); }
-void operator delete[](void *ptr) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, true); }
+void *operator new(std::size_t size) throw (std::bad_alloc) { return malloc_file_line(size, nullptr, 0, false, true, false); }
+void *operator new[](std::size_t size) throw (std::bad_alloc) { return malloc_file_line(size, nullptr, 0, true, true, false); }
+void operator delete(void *ptr) throw() { if (ptr != nullptr) free_file_line(ptr, nullptr, 0, false); }
+void operator delete[](void *ptr) throw() { if (ptr != nullptr) free_file_line(ptr, nullptr, 0, true); }
 
-void* operator new(std::size_t size,const std::nothrow_t&) throw() { return malloc_file_line(size, NULL, 0, false, false, false); }
-void* operator new[](std::size_t size, const std::nothrow_t&) throw() { return malloc_file_line(size, NULL, 0, true, false, false); }
-void operator delete(void* ptr, const std::nothrow_t&) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, false); }
-void operator delete[](void* ptr, const std::nothrow_t&) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, true); }
+void* operator new(std::size_t size,const std::nothrow_t&) throw() { return malloc_file_line(size, nullptr, 0, false, false, false); }
+void* operator new[](std::size_t size, const std::nothrow_t&) throw() { return malloc_file_line(size, nullptr, 0, true, false, false); }
+void operator delete(void* ptr, const std::nothrow_t&) throw() { if (ptr != nullptr) free_file_line(ptr, nullptr, 0, false); }
+void operator delete[](void* ptr, const std::nothrow_t&) throw() { if (ptr != nullptr) free_file_line(ptr, nullptr, 0, true); }
 
 #endif
 
@@ -122,14 +126,14 @@ void operator delete[](void* ptr, const std::nothrow_t&) throw() { if (ptr != NU
 // file/line new/delete operators
 void *operator new(std::size_t size, const char *file, int line) throw (std::bad_alloc) { return malloc_file_line(size, file, line, false, true, false); }
 void *operator new[](std::size_t size, const char *file, int line) throw (std::bad_alloc) { return malloc_file_line(size, file, line, true, true, false); }
-void operator delete(void *ptr, const char *file, int line) { if (ptr != NULL) free_file_line(ptr, file, line, false); }
-void operator delete[](void *ptr, const char *file, int line) { if (ptr != NULL) free_file_line(ptr, file, line, true); }
+void operator delete(void *ptr, const char *file, int line) { if (ptr != nullptr) free_file_line(ptr, file, line, false); }
+void operator delete[](void *ptr, const char *file, int line) { if (ptr != nullptr) free_file_line(ptr, file, line, true); }
 
 // file/line new/delete operators with zeroing
 void *operator new(std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc) { return malloc_file_line(size, file, line, false, true, true); }
 void *operator new[](std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc) { return malloc_file_line(size, file, line, true, true, true); }
-void operator delete(void *ptr, const char *file, int line, const zeromem_t &) { if (ptr != NULL) free_file_line(ptr, file, line, false); }
-void operator delete[](void *ptr, const char *file, int line, const zeromem_t &) { if (ptr != NULL) free_file_line(ptr, file, line, true); }
+void operator delete(void *ptr, const char *file, int line, const zeromem_t &) { if (ptr != nullptr) free_file_line(ptr, file, line, false); }
+void operator delete[](void *ptr, const char *file, int line, const zeromem_t &) { if (ptr != nullptr) free_file_line(ptr, file, line, true); }
 
 
 
@@ -146,13 +150,13 @@ void *malloc_file_line(size_t size, const char *file, int line, bool array, bool
 {
 	// allocate the memory and fail if we can't
 	void *result = array ? osd_malloc_array(size) : osd_malloc(size);
-	if (result == NULL)
+	if (result == nullptr)
 	{
 		fprintf(stderr, "Failed to allocate %d bytes (%s:%d)\n", UINT32(size), file, line);
 		osd_break_into_debugger("Failed to allocate RAM");
 		if (throw_on_fail)
 			throw std::bad_alloc();
-		return NULL;
+		return nullptr;
 	}
 
 	// zap the memory if requested
@@ -183,7 +187,7 @@ void free_file_line(void *memory, const char *file, int line, bool array)
 	memory_entry *entry = memory_entry::find(memory);
 
 	// warn about untracked frees
-	if (entry == NULL)
+	if (entry == nullptr)
 	{
 		fprintf(stderr, "Error: attempt to free untracked memory %p in %s(%d)!\n", memory, file, line);
 		osd_break_into_debugger("Error: attempt to free untracked memory");
@@ -267,7 +271,7 @@ void memory_entry::acquire_lock()
 {
 	// allocate a lock on first usage
 	// note that osd_lock_alloc() may re-enter this path, so protect against recursion!
-	if (s_lock == NULL)
+	if (s_lock == nullptr)
 	{
 		if (s_lock_alloc)
 			return;
@@ -298,14 +302,14 @@ memory_entry *memory_entry::allocate(size_t size, void *base, const char *file, 
 	acquire_lock();
 
 	// if we're out of free entries, allocate a new chunk
-	if (s_freehead == NULL)
+	if (s_freehead == nullptr)
 	{
 		// create a new chunk, and fail if we can't
 		memory_entry *entry = reinterpret_cast<memory_entry *>(osd_malloc_array(memory_block_alloc_chunk * sizeof(memory_entry)));
-		if (entry == NULL)
+		if (entry == nullptr)
 		{
 			release_lock();
-			return NULL;
+			return nullptr;
 		}
 
 		// add all the entries to the list
@@ -323,7 +327,7 @@ memory_entry *memory_entry::allocate(size_t size, void *base, const char *file, 
 	// populate it
 	entry->m_size = size;
 	entry->m_base = base;
-	entry->m_file = s_tracking ? file : NULL;
+	entry->m_file = s_tracking ? file : nullptr;
 	entry->m_line = s_tracking ? line : 0;
 	entry->m_id = s_curid++;
 	entry->m_array = array;
@@ -333,9 +337,9 @@ memory_entry *memory_entry::allocate(size_t size, void *base, const char *file, 
 	// add it to the alloc list
 	int hashval = reinterpret_cast<FPTR>(base) % k_hash_prime;
 	entry->m_next = s_hash[hashval];
-	if (entry->m_next != NULL)
+	if (entry->m_next != nullptr)
 		entry->m_next->m_prev = entry;
-	entry->m_prev = NULL;
+	entry->m_prev = nullptr;
 	s_hash[hashval] = entry;
 
 	release_lock();
@@ -350,15 +354,15 @@ memory_entry *memory_entry::allocate(size_t size, void *base, const char *file, 
 memory_entry *memory_entry::find(void *ptr)
 {
 	// NULL maps to nothing
-	if (ptr == NULL)
-		return NULL;
+	if (ptr == nullptr)
+		return nullptr;
 
 	// scan the list under the lock
 	acquire_lock();
 
 	int hashval = reinterpret_cast<FPTR>(ptr) % k_hash_prime;
 	memory_entry *entry;
-	for (entry = s_hash[hashval]; entry != NULL; entry = entry->m_next)
+	for (entry = s_hash[hashval]; entry != nullptr; entry = entry->m_next)
 		if (entry->m_base == ptr)
 			break;
 
@@ -380,11 +384,11 @@ void memory_entry::release(memory_entry *entry, const char *file, int line)
 
 	// remove ourselves from the alloc list
 	int hashval = reinterpret_cast<FPTR>(entry->m_base) % k_hash_prime;
-	if (entry->m_prev != NULL)
+	if (entry->m_prev != nullptr)
 		entry->m_prev->m_next = entry->m_next;
 	else
 		s_hash[hashval] = entry->m_next;
-	if (entry->m_next != NULL)
+	if (entry->m_next != nullptr)
 		entry->m_next->m_prev = entry->m_prev;
 
 	// add ourself to the free list
@@ -411,9 +415,9 @@ void memory_entry::report_unfreed(UINT64 start)
 	// check for leaked memory
 	UINT32 total = 0;
 
-	for (int hashnum = 0; hashnum < k_hash_prime; hashnum++)
-		for (memory_entry *entry = s_hash[hashnum]; entry != NULL; entry = entry->m_next)
-			if (entry->m_file != NULL && entry->m_id >= start)
+	for (auto entry : s_hash)
+		for (; entry != nullptr; entry = entry->m_next)
+			if (entry->m_file != nullptr && entry->m_id >= start)
 			{
 				if (total == 0)
 					fprintf(stderr, "--- memory leak warning ---\n");

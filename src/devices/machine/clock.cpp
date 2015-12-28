@@ -7,7 +7,7 @@ const device_type CLOCK = &device_creator<clock_device>;
 clock_device::clock_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CLOCK, "Clock", tag, owner, clock, "clock", __FILE__),
 	m_signal(0),
-	m_timer(NULL),
+	m_timer(nullptr),
 	m_signal_handler(*this)
 {
 }
@@ -44,7 +44,7 @@ void clock_device::update_timer()
 {
 	if (!m_signal_handler.isnull() && m_clock > 0)
 	{
-		if (m_timer == NULL)
+		if (m_timer == nullptr)
 		{
 			m_timer = timer_alloc(0);
 			m_timer->adjust(period());
@@ -61,7 +61,7 @@ void clock_device::update_timer()
 			m_timer->adjust(next);
 		}
 	}
-	else if (m_timer != NULL)
+	else if (m_timer != nullptr)
 	{
 		m_timer->adjust(attotime::never);
 	}

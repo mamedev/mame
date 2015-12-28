@@ -102,7 +102,7 @@ static const struct CassetteLegacyWaveFiller vtech1_legacy_fill_wave =
 	vtech1_cassette_fill_wave,  /* fill_wave */
 	1,                          /* chunk_size */
 	V1_BYTESAMPLES,             /* chunk_samples */
-	NULL,                       /* chunk_sample_calc */
+	nullptr,                       /* chunk_sample_calc */
 	600*V1_BITSAMPLES,          /* sample_frequency */
 	600*V1_BITSAMPLES,          /* header_samples */
 	600*V1_BITSAMPLES           /* trailer_samples */
@@ -123,7 +123,7 @@ static const struct CassetteFormat vtech1_cas_format =
 	"cas",
 	vtech1_cas_identify,
 	vtech1_cas_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(vtech1_cassette_formats)
@@ -197,7 +197,7 @@ static const struct CassetteLegacyWaveFiller vtech2_legacy_fill_wave =
 	vtech2_cassette_fill_wave,  /* fill_wave */
 	1,                          /* chunk_size */
 	VT2_BYTESAMPLES,            /* chunk_samples */
-	NULL,                       /* chunk_sample_calc */
+	nullptr,                       /* chunk_sample_calc */
 	600*VT2_BITSAMPLES,         /* sample_frequency */
 	600*VT2_BITSAMPLES,         /* header_samples */
 	600*VT2_BITSAMPLES          /* trailer_samples */
@@ -218,7 +218,7 @@ static const struct CassetteFormat vtech2_cas_format =
 	"cas",
 	vtech2_cas_identify,
 	vtech2_cas_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(vtech2_cassette_formats)

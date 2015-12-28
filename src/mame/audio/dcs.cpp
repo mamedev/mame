@@ -712,7 +712,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_reset )
 	m_internal_timer->reset();
 
 	/* start the SPORT0 timer */
-	if (m_sport_timer != NULL)
+	if (m_sport_timer != nullptr)
 		m_sport_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
 
 	/* reset the HLE transfer states */
@@ -773,7 +773,7 @@ void dcs_audio_device::dcs_register_state()
 	save_item(NAME(m_transfer.sum));
 	save_item(NAME(m_transfer.fifo_entries));
 
-	if (m_sram != NULL)
+	if (m_sram != nullptr)
 		save_pointer(NAME(m_sram), 0x8000*4 / sizeof(m_sram[0]));
 
 	if (m_rev == 2)
@@ -787,23 +787,23 @@ void dcs_audio_device::dcs_register_state()
 
 dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int rev) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_cpu(NULL),
-	m_program(NULL),
-	m_data(NULL),
+	m_cpu(nullptr),
+	m_program(nullptr),
+	m_data(nullptr),
 	m_rev(rev),
 	m_polling_offset(0),
 	m_polling_count(0),
 	m_channels(0),
 	m_size(0),
 	m_incs(0),
-	m_reg_timer(NULL),
-	m_sport_timer(NULL),
-	m_internal_timer(NULL),
+	m_reg_timer(nullptr),
+	m_sport_timer(nullptr),
+	m_internal_timer(nullptr),
 	m_ireg(0),
 	m_ireg_base(0),
-	m_bootrom(NULL),
+	m_bootrom(nullptr),
 	m_bootrom_words(0),
-	m_sounddata(NULL),
+	m_sounddata(nullptr),
 	m_sounddata_words(0),
 	m_sounddata_banks(0),
 	m_sounddata_bank(0),
@@ -823,13 +823,13 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_timer_scale(0),
 	m_timer_period(0),
 	m_timers_fired(0),
-	m_sram(NULL),
-	m_polling_base(NULL),
-	m_internal_program_ram(NULL),
-	m_external_program_ram(NULL),
+	m_sram(nullptr),
+	m_polling_base(nullptr),
+	m_internal_program_ram(nullptr),
+	m_external_program_ram(nullptr),
 	m_dram_in_mb(0)
 {
-	m_dmadac[0] = m_dmadac[1] = m_dmadac[2] = m_dmadac[3] = m_dmadac[4] = m_dmadac[5] = NULL;
+	m_dmadac[0] = m_dmadac[1] = m_dmadac[2] = m_dmadac[3] = m_dmadac[4] = m_dmadac[5] = nullptr;
 	memset(m_control_regs, 0, sizeof(m_control_regs));
 	memset(&m_sdrc, 0, sizeof(m_sdrc));
 	memset(&m_dsio, 0, sizeof(m_dsio));
@@ -838,19 +838,19 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 
 void dcs_audio_device::device_reset()
 {
-	dcs_reset(NULL, 0);
+	dcs_reset(nullptr, 0);
 }
 
 void dcs_audio_device::device_start()
 {
-	m_sram = NULL;
+	m_sram = nullptr;
 
 	m_internal_program_ram = (UINT32 *)memshare("dcsint")->ptr();
 	m_external_program_ram = (UINT32 *)memshare("dcsext")->ptr();
 
 	/* find the DCS CPU and the sound ROMs */
 	m_cpu = subdevice<adsp21xx_device>("dcs");
-	if (m_cpu != NULL && !m_cpu->started())
+	if (m_cpu != nullptr && !m_cpu->started())
 		throw device_missing_dependencies();
 
 	m_program = &m_cpu->space(AS_PROGRAM);
@@ -883,7 +883,7 @@ void dcs_audio_device::device_start()
 	/* register for save states */
 	dcs_register_state();
 	/* reset the system */
-	dcs_reset(NULL, 0);
+	dcs_reset(nullptr, 0);
 }
 
 
@@ -898,19 +898,19 @@ void dcs2_audio_device::device_start()
 	m_cpu = subdevice<adsp21xx_device>("dcs2");
 	m_rev = 2;
 	soundbank_words = 0x1000;
-	if (m_cpu == NULL)
+	if (m_cpu == nullptr)
 	{
 		m_cpu = subdevice<adsp21xx_device>("dsio");
 		m_rev = 3;
 		soundbank_words = 0x400;
 	}
-	if (m_cpu == NULL)
+	if (m_cpu == nullptr)
 	{
 		m_cpu = subdevice<adsp21xx_device>("denver");
 		m_rev = 4;
 		soundbank_words = 0x800;
 	}
-	if (m_cpu != NULL && !m_cpu->started())
+	if (m_cpu != nullptr && !m_cpu->started())
 		throw device_missing_dependencies();
 
 	m_program = &m_cpu->space(AS_PROGRAM);
@@ -963,7 +963,7 @@ void dcs2_audio_device::device_start()
 	dcs_register_state();
 
 	/* reset the system */
-	dcs_reset(NULL, 0);
+	dcs_reset(nullptr, 0);
 }
 
 
@@ -1528,7 +1528,7 @@ void dcs_audio_device::data_w(UINT16 data)
 		return;
 
 	/* if we are DCS1, set a timer to latch the data */
-	if (m_sport_timer == NULL)
+	if (m_sport_timer == nullptr)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::dcs_delayed_data_w_callback),this), data);
 	else
 		dcs_delayed_data_w(data);
@@ -2074,7 +2074,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::transfer_watchdog_callback )
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
 			preprocess_write(m_fifo_data_r(machine().driver_data()->generic_space(),0, 0xffff));
 	}
-	if (transfer.watchdog != NULL)
+	if (transfer.watchdog != nullptr)
 		transfer.watchdog->adjust(attotime::from_msec(1), transfer.writes_left);
 }
 
@@ -2352,7 +2352,7 @@ int dcs_audio_device::preprocess_write(UINT16 data)
 	int result;
 
 	/* if we're not DCS2, skip */
-	if (m_sport_timer == NULL)
+	if (m_sport_timer == nullptr)
 		return 0;
 
 	/* state 0 - initialization phase */

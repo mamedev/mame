@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Michael Strutts, Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni,Lee Taylor, Valerio Verrando, Marco Cassili, Zsolt Vasvari
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni,Lee Taylor, Valerio Verrando, Zsolt Vasvari
+// thanks-to:Michael Strutts, Marco Cassili
 /***************************************************************************
 
     Midway 8080-based black and white hardware
@@ -195,11 +196,7 @@ public:
 	void mw8080bw_create_interrupt_timer(  );
 	void mw8080bw_start_interrupt_timer(  );
 	UINT8 tornbase_get_cabinet_type();
-	UINT8 spcenctr_get_trench_width();
-	UINT8 spcenctr_get_trench_center();
-	UINT8 spcenctr_get_trench_slope(UINT8 addr );
 	int invaders_is_cabinet_cocktail();
-	UINT32 invad2ct_coin_input_r(void *param);
 };
 
 

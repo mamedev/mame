@@ -978,7 +978,7 @@ WRITE8_MEMBER(nes_smb2j_device::write_ex)
 
 	if (offset == 2)
 	{
-		int temp = 0;
+		int temp;
 
 		// According to hardware tests
 		if (data & 1)

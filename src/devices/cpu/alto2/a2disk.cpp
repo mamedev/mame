@@ -1026,7 +1026,7 @@ void alto2_cpu_device::f1_late_strobe()
 		LOG((this,LOG_DISK,1,"   STROBE (SENDADR:1)\n"));
 		/* Set the STROBON flag and start the STROBON monoflop */
 		m_dsk.strobe = 1;
-		disk_strobon(0,
+		disk_strobon(nullptr,
 			4 * GET_KADDR_CYLINDER(m_dsk.kaddr) +
 			2 * GET_KADDR_RESTORE(m_dsk.kaddr) +
 			m_dsk.drive);
@@ -1600,7 +1600,7 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 	(void)ptr;
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
 	int clk = arg & 1;
-	int bit = 0;
+	int bit;
 
 	/**
 	 * The source for BITCLK and DATAIN depends on disk controller part #65

@@ -10,7 +10,7 @@ msx_cart_superloderunner::msx_cart_superloderunner(const machine_config &mconfig
 	: device_t(mconfig, MSX_CART_SUPERLODERUNNER, "MSX Cartridge - Super Lode Runner", tag, owner, clock, "msx_cart_superloderunner", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_selected_bank(0)
-	, m_bank_base(NULL)
+	, m_bank_base(nullptr)
 {
 }
 

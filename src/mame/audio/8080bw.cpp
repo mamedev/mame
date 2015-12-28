@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Michael Strutts,Nicola Salmoria,Tormod Tjaberg,Mirko Buffoni,Lee Taylor,Valerio Verrando,Marco Cassili,Zsolt Vasvari,Aaron Giles,Jonathan Gevaryahu,hap,Robbbert
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni,Lee Taylor, Valerio Verrando, Zsolt Vasvari,Aaron Giles,Jonathan Gevaryahu,hap,Robbbert
+// thanks-to:Michael Strutts, Marco Cassili
 /* 8080bw.c *******************************************/
 
 #include "emu.h"
@@ -133,7 +134,7 @@ const char *const lrescue_sample_names[] =
 	"shootingstar",
 	"stepl",
 	"steph",
-	0
+	nullptr
 };
 
 WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_1_w)
@@ -1054,7 +1055,7 @@ const char *const lupin3_sample_names[] =
 	"warp",     /* translocate, deposit money */
 	"extend",       /* bonus man */
 	"kick",     /* lands on top of building, wife kicks man */
-	0
+	nullptr
 };
 
 WRITE8_MEMBER( _8080bw_state::lupin3_00_w )

@@ -76,7 +76,7 @@ void asc_device::device_start()
 
 	memset(m_regs, 0, sizeof(m_regs));
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 
 	save_item(NAME(m_fifo_a_rdptr));
 	save_item(NAME(m_fifo_b_rdptr));

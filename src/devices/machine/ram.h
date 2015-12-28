@@ -71,8 +71,8 @@ public:
 	static void static_set_default_value(device_t &device, UINT8 default_value)         { downcast<ram_device &>(device).m_default_value = default_value; }
 
 protected:
-	virtual void device_start(void);
-	virtual void device_validity_check(validity_checker &valid) const;
+	virtual void device_start(void) override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
 	// device state

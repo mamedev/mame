@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Bryan McPhail,Fuzz,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// thanks-to:Fuzz
 /***************************************************************************
 
     Neo-Geo AES hardware
@@ -150,9 +151,6 @@ public:
 
 	// neoCD
 
-	UINT8 neogeoReadTransfer(UINT32 sekAddress, int is_byte_transfer);
-	void neogeoWriteTransfer(UINT32 sekAddress, UINT8 byteValue, int is_byte_transfer);
-
 	INT32 nActiveTransferArea;
 	INT32 nSpriteTransferBank;
 	INT32 nADPCMTransferBank;
@@ -194,7 +192,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER(neocd_int_callback);
 
-	UINT8 *m_meminternal_data;
+	std::unique_ptr<UINT8[]> m_meminternal_data;
 protected:
 	required_ioport m_io_in2;
 	required_ioport m_io_in0;
@@ -740,7 +738,7 @@ void ng_aes_state::NeoCDDoDMA(address_space& curr_space)
 			//  - DMA controller program[14] -> 0xFFFE (PC: 0xC0A1A0)
 
 			char* data = m_tempcdc->LC8915InitTransfer(NeoCDDMACount);
-			if (data == NULL) {
+			if (data == nullptr) {
 				break;
 			}
 
@@ -838,7 +836,7 @@ if (NeoCDDMAAddress2 == 0x0800)  {
 			//  - DMA controller program[14] -> 0xDA92 (PC: 0xC0A1A0)
 
 			char* data = m_tempcdc->LC8915InitTransfer(NeoCDDMACount);
-			if (data == NULL) {
+			if (data == nullptr) {
 				break;
 			}
 
@@ -1054,9 +1052,9 @@ MACHINE_START_MEMBER(ng_aes_state,neocd)
 
 	/* initialize the memcard data structure */
 	/* NeoCD doesn't have memcard slots, rather, it has a larger internal memory which works the same */
-	m_meminternal_data = auto_alloc_array_clear(machine(), UINT8, 0x2000);
-	machine().device<nvram_device>("saveram")->set_base(m_meminternal_data, 0x2000);
-	save_pointer(NAME(m_meminternal_data), 0x2000);
+	m_meminternal_data = make_unique_clear<UINT8[]>(0x2000);
+	machine().device<nvram_device>("saveram")->set_base(m_meminternal_data.get(), 0x2000);
+	save_pointer(NAME(m_meminternal_data.get()), 0x2000);
 
 	//m_bank_vectors->set_entry(0); // default to the BIOS vectors
 	m_use_cart_vectors = 0;
@@ -1399,7 +1397,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( aes, neogeo_base, ng_aes_state )
 	MCFG_MACHINE_START_OVERRIDE(ng_aes_state, neogeo)
 	MCFG_MACHINE_RESET_OVERRIDE(ng_aes_state, neogeo)
 
-	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot1", neogeo_cart, NULL)
+	MCFG_NEOGEO_CARTRIDGE_ADD("cartslot1", neogeo_cart, nullptr)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","neogeo")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list","AES")

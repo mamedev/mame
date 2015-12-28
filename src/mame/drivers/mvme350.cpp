@@ -155,12 +155,12 @@ mvme350_state(const machine_config &mconfig, device_type type, const char *tag) 
 {
 }
 
-DECLARE_READ16_MEMBER (vme_a24_r);
-DECLARE_WRITE16_MEMBER (vme_a24_w);
-DECLARE_READ16_MEMBER (vme_a16_r);
-DECLARE_WRITE16_MEMBER (vme_a16_w);
-virtual void machine_start ();
-virtual void machine_reset ();
+//DECLARE_READ16_MEMBER (vme_a24_r);
+//DECLARE_WRITE16_MEMBER (vme_a24_w);
+//DECLARE_READ16_MEMBER (vme_a16_r);
+//DECLARE_WRITE16_MEMBER (vme_a16_w);
+virtual void machine_start () override;
+virtual void machine_reset () override;
 protected:
 
 private:

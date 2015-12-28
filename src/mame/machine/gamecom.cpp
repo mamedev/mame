@@ -22,7 +22,7 @@ void gamecom_state::machine_reset()
 	m_bank3->set_base(rom);
 	m_bank4->set_base(rom);
 
-	m_cart_ptr = NULL;
+	m_cart_ptr = nullptr;
 	m_lch_reg = 0x07;
 	m_lcv_reg = 0x27;
 	m_lcdc_reg = 0xb0;
@@ -179,7 +179,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
 				{
 				case 0x40: m_cart_ptr = m_cart1_rom->base(); break;
 				case 0x80: m_cart_ptr = m_cart2_rom->base(); break;
-				default:   m_cart_ptr = NULL;       break;
+				default:   m_cart_ptr = nullptr;       break;
 				}
 				return;
 	}

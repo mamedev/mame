@@ -115,7 +115,7 @@ void floppy_controller_device::device_reset()
 	m_slot->m_io->install_device(0x10, 0x1f, *this, &floppy_controller_device::map);
 
 	m_latch = 0x00;
-	m_floppy = NULL;
+	m_floppy = nullptr;
 	m_current_cyl = 0;
 	m_shifter = 0x00;
 	m_latching_inverter = false;
@@ -141,7 +141,7 @@ WRITE8_MEMBER(floppy_controller_device::latch_w)
 	UINT8 diff = m_latch ^ data;
 	m_latch = data;
 
-	floppy_image_device *newflop = NULL;
+	floppy_image_device *newflop = nullptr;
 	if(m_latch & 0x10)
 		newflop = m_floppy0->get_device();
 	else if(m_latch & 0x80)

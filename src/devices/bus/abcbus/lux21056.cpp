@@ -166,7 +166,7 @@ ADDRESS_MAP_END
 static const z80_daisy_config daisy_chain[] =
 {
 	{ Z80DMA_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 

@@ -55,7 +55,7 @@ const struct io_procs stdio_ioprocs =
 
 const struct io_procs stdio_ioprocs_noclose =
 {
-	NULL,
+	nullptr,
 	stdio_seekproc,
 	stdio_readproc,
 	stdio_writeproc,
@@ -109,7 +109,7 @@ const struct io_procs corefile_ioprocs =
 
 const struct io_procs corefile_ioprocs_noclose =
 {
-	NULL,
+	nullptr,
 	corefile_seekproc,
 	corefile_readproc,
 	corefile_writeproc,

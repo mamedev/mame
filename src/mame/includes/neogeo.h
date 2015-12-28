@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Bryan McPhail,Fuzz,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// thanks-to:Fuzz
 /*************************************************************************
 
     Neo-Geo hardware
@@ -63,7 +64,6 @@ public:
 	DECLARE_WRITE16_MEMBER(memcard_w);
 	DECLARE_WRITE8_MEMBER(audio_command_w);
 	DECLARE_READ8_MEMBER(audio_command_r);
-	DECLARE_WRITE16_MEMBER(main_cpu_bank_select_w);
 	DECLARE_READ8_MEMBER(audio_cpu_bank_select_r);
 	DECLARE_WRITE8_MEMBER(audio_cpu_enable_nmi_w);
 	DECLARE_WRITE8_MEMBER(system_control_w);
@@ -134,8 +134,8 @@ protected:
 
 
 	// device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -178,8 +178,8 @@ protected:
 
 	// video hardware, including maincpu interrupts
 	// TODO: make into a device
-	virtual void video_start();
-	virtual void video_reset();
+	virtual void video_start() override;
+	virtual void video_reset() override;
 
 	emu_timer  *m_display_position_interrupt_timer;
 	emu_timer  *m_display_position_vblank_timer;

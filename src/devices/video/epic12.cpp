@@ -16,8 +16,8 @@ epic12_device::epic12_device(const machine_config &mconfig, const char *tag, dev
 {
 	m_is_unsafe = 0;
 	m_delay_scale = 0;
-	m_blitter_request = 0;
-	m_blitter_delay_timer = 0;
+	m_blitter_request = nullptr;
+	m_blitter_delay_timer = nullptr;
 	m_blitter_busy = 0;
 	m_gfx_addr = 0;
 	m_gfx_scroll_0_x = 0;
@@ -41,11 +41,11 @@ TIMER_CALLBACK_MEMBER( epic12_device::blitter_delay_callback )
 void epic12_device::device_start()
 {
 	m_gfx_size = 0x2000 * 0x1000;
-	m_bitmaps = auto_bitmap_rgb32_alloc(machine(), 0x2000, 0x1000);
+	m_bitmaps = std::make_unique<bitmap_rgb32>( 0x2000, 0x1000);
 	m_clip = m_bitmaps->cliprect();
 	m_clip.set(0, 0x2000-1, 0, 0x1000-1);
 
-	m_ram16_copy = auto_alloc_array(machine(), UINT16, m_main_ramsize/2);
+	m_ram16_copy = std::make_unique<UINT16[]>(m_main_ramsize/2);
 
 	m_blitter_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(epic12_device::blitter_delay_callback),this));
 	m_blitter_delay_timer->adjust(attotime::never);
@@ -60,7 +60,7 @@ void epic12_device::device_reset()
 	}
 	else
 	{
-		m_use_ram = m_ram16_copy; // slow mode
+		m_use_ram = m_ram16_copy.get(); // slow mode
 		m_work_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
 	}
 
@@ -186,7 +186,7 @@ inline void epic12_device::gfx_upload(offs_t *addr)
 	}
 }
 
-#define draw_params m_bitmaps, &m_clip, &m_bitmaps->pix(0,0),src_x,src_y, x,y, dimx,dimy, flipy, s_alpha, d_alpha, &tint_clr
+#define draw_params m_bitmaps.get(), &m_clip, &m_bitmaps->pix(0,0),src_x,src_y, x,y, dimx,dimy, flipy, s_alpha, d_alpha, &tint_clr
 
 
 
@@ -658,7 +658,7 @@ void *epic12_device::blit_request_callback(void *param, int threadid)
 	epic12_device *object = reinterpret_cast<epic12_device *>(param);
 
 	object->gfx_exec();
-	return NULL;
+	return nullptr;
 }
 
 
@@ -669,7 +669,7 @@ void *epic12_device::blit_request_callback_unsafe(void *param, int threadid)
 
 	epic12_device_blit_delay = 0;
 	object->gfx_exec_unsafe();
-	return NULL;
+	return nullptr;
 }
 
 

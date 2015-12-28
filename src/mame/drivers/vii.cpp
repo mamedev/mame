@@ -113,8 +113,6 @@ public:
 	DECLARE_WRITE16_MEMBER(audio_w);
 	DECLARE_READ16_MEMBER(io_r);
 	DECLARE_WRITE16_MEMBER(io_w);
-	DECLARE_WRITE16_MEMBER(rowscroll_w);
-	DECLARE_WRITE16_MEMBER(spriteram_w);
 	DECLARE_READ16_MEMBER(rom_r);
 	required_shared_ptr<UINT16> m_p_ram;
 	required_shared_ptr<UINT16> m_p_rowscroll;
@@ -151,9 +149,9 @@ public:
 	DECLARE_DRIVER_INIT(walle);
 	DECLARE_DRIVER_INIT(vii);
 	DECLARE_DRIVER_INIT(batman);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vii_vblank);
 	TIMER_CALLBACK_MEMBER(tmb1_tick);

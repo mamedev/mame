@@ -12,7 +12,7 @@
 
 
 igs028_device::igs028_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IGS028, "IGS028", tag, owner, clock, "igs028", __FILE__)
+	: device_t(mconfig, IGS028, "IGS028 Protection", tag, owner, clock, "igs028", __FILE__)
 {
 }
 
@@ -26,7 +26,7 @@ void igs028_device::device_validity_check(validity_checker &valid) const
 
 void igs028_device::device_start()
 {
-	m_sharedprotram = 0;
+	m_sharedprotram = nullptr;
 
 
 }

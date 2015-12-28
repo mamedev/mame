@@ -224,7 +224,7 @@ public:
 
 	const address_space_config m_io_space_config;
 
-	const address_space_config *memory_space_config(address_spacenum spacenum) const
+	const address_space_config *memory_space_config(address_spacenum spacenum) const override
 	{
 		switch (spacenum)
 		{
@@ -242,10 +242,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	required_device<pit8253_device> m_v53tcu;
 	required_device<upd71071_v53_device> m_v53dmau;

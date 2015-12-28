@@ -66,7 +66,7 @@ static const UINT8 TZX_HEADER[8] = { 'Z','X','T','a','p','e','!',0x1a };
 
 static INT16    wave_data = 0;
 static int  block_count = 0;
-static UINT8**  blocks = NULL;
+static UINT8**  blocks = nullptr;
 static float t_scale = 1;  /* for scaling T-states to the 4MHz CPC */
 
 static void toggle_wave_data(void)
@@ -207,19 +207,19 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen )
 	}
 }
 
-INLINE int millisec_to_samplecount( int millisec )
+static inline int millisec_to_samplecount( int millisec )
 {
 	return (int) (millisec * ((double)TZX_WAV_FREQUENCY / 1000.0));
 }
 
-INLINE int tcycles_to_samplecount( int tcycles )
+static inline int tcycles_to_samplecount( int tcycles )
 {
 	return (int) ((0.5 + (((double)TZX_WAV_FREQUENCY / 3500000) * (double)tcycles)) * (double) t_scale);
 }
 
 static void tzx_output_wave( INT16 **buffer, int length )
 {
-	if (buffer == NULL)
+	if (buffer == nullptr)
 	{
 		return;
 	}
@@ -335,7 +335,7 @@ static int tzx_handle_direct(INT16 **buffer, const UINT8 *bytes, int pause, int 
 }
 
 
-INLINE int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol, int maxp)
+static inline int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol, int maxp)
 {
 	int size = 0;
 	const UINT8 *cursymb = symtable + (2 * maxp + 1)*symbol;
@@ -395,7 +395,7 @@ INLINE int tzx_handle_symbol(INT16 **buffer, const UINT8 *symtable, UINT8 symbol
 	return size;
 }
 
-INLINE int stream_get_bit(const UINT8 *bytes, UINT8 &stream_bit, UINT32 &stream_byte)
+static inline int stream_get_bit(const UINT8 *bytes, UINT8 &stream_bit, UINT32 &stream_byte)
 {
 	// get bit here
 	UINT8 retbit = 0;
@@ -805,7 +805,7 @@ static int tzx_cas_to_wav_size( const UINT8 *casdata, int caslen )
 		goto cleanup;
 	}
 
-	size = tzx_cas_do_work(NULL);
+	size = tzx_cas_do_work(nullptr);
 
 	return size;
 
@@ -843,7 +843,7 @@ static int tap_cas_to_wav_size( const UINT8 *casdata, int caslen )
 //      int pilot_length = (p[2] == 0x00) ? 8063 : 3223;    /* worldofspectrum */
 		LOG_FORMATS("tap_cas_to_wav_size: Handling TAP block containing 0x%X bytes", data_size);
 		p += 2;
-		size += tzx_cas_handle_block(NULL, p, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
+		size += tzx_cas_handle_block(nullptr, p, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
 		LOG_FORMATS(", total size is now: %d\n", size);
 		p += data_size;
 	}
@@ -936,7 +936,7 @@ static const struct CassetteFormat tzx_cassette_format =
 	"tzx",
 	tzx_cassette_identify,
 	tzx_cassette_load,
-	NULL
+	nullptr
 };
 
 static const struct CassetteFormat tap_cassette_format =
@@ -944,7 +944,7 @@ static const struct CassetteFormat tap_cassette_format =
 	"tap,blk",
 	tap_cassette_identify,
 	tap_cassette_load,
-	NULL
+	nullptr
 };
 
 static const struct CassetteFormat cdt_cassette_format =
@@ -952,7 +952,7 @@ static const struct CassetteFormat cdt_cassette_format =
 	"cdt",
 	cdt_cassette_identify,
 	cdt_cassette_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(tzx_cassette_formats)

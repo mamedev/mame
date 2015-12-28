@@ -38,11 +38,11 @@ tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag,
 	m_xmask(0),
 	m_yshift(0),
 	m_vrammask(0),
-	m_vram(NULL),
-	m_latchram(NULL),
+	m_vram(nullptr),
+	m_latchram(nullptr),
 	m_latchdata(0),
-	m_shiftreg(NULL),
-	m_timer(NULL)
+	m_shiftreg(nullptr),
+	m_timer(nullptr)
 {
 	memset(m_regs, 0, sizeof(m_regs));
 	memset(&m_display, 0, sizeof(m_display));

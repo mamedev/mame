@@ -43,8 +43,8 @@ public:
 		UINT8 x;
 		UINT8 y;
 		UINT8 status;
-		UINT8 *vram;
-		UINT8 *attr;
+		std::unique_ptr<UINT8[]> vram;
+		std::unique_ptr<UINT8[]> attr;
 	}m_lcd;
 	UINT8 read_lcd_attr(UINT16 X, UINT16 Y);
 	UINT8 read_lcd_vram(UINT16 X, UINT16 Y);
@@ -68,16 +68,16 @@ public:
 	DECLARE_PALETTE_INIT(fp200);
 protected:
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 };
 
 void fp200_state::video_start()
 {
-	m_lcd.vram = auto_alloc_array_clear(machine(), UINT8, 20*64);
-	m_lcd.attr = auto_alloc_array_clear(machine(), UINT8, 20*64);
+	m_lcd.vram = make_unique_clear<UINT8[]>(20*64);
+	m_lcd.attr = make_unique_clear<UINT8[]>(20*64);
 }
 
 /* TODO: Very preliminary, I actually believe that the LCDC writes in a blitter fashion ... */

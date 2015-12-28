@@ -101,7 +101,6 @@ public:
 	DECLARE_WRITE16_MEMBER(darius_ioc_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(adpcm_command_w);
-	DECLARE_WRITE8_MEMBER(display_value);
 	DECLARE_WRITE8_MEMBER(darius_fm0_pan);
 	DECLARE_WRITE8_MEMBER(darius_fm1_pan);
 	DECLARE_WRITE8_MEMBER(darius_psg0_pan);
@@ -119,9 +118,9 @@ public:
 	DECLARE_WRITE8_MEMBER(darius_write_portB1);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_darius_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_darius_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_darius_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

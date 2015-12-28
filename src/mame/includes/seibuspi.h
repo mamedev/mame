@@ -68,9 +68,9 @@ public:
 	int m_back_layer_d14;
 	int m_midl_layer_d14;
 	int m_fore_layer_d14;
-	UINT32 *m_tilemap_ram;
-	UINT32 *m_palette_ram;
-	UINT32 *m_sprite_ram;
+	std::unique_ptr<UINT32[]> m_tilemap_ram;
+	std::unique_ptr<UINT32[]> m_palette_ram;
+	std::unique_ptr<UINT32[]> m_sprite_ram;
 	UINT32 m_tilemap_ram_size;
 	UINT32 m_palette_ram_size;
 	UINT32 m_sprite_ram_size;
@@ -80,7 +80,6 @@ public:
 
 	DECLARE_READ32_MEMBER(spi_layer_bank_r);
 	DECLARE_WRITE32_MEMBER(spi_layer_bank_w);
-	DECLARE_READ32_MEMBER(spi_layer_enable_r);
 	DECLARE_WRITE32_MEMBER(spi_layer_enable_w);
 	DECLARE_WRITE8_MEMBER(rf2_layer_bank_w);
 	DECLARE_WRITE32_MEMBER(tilemap_dma_start_w);
@@ -105,7 +104,6 @@ public:
 	DECLARE_READ8_MEMBER(flashrom_read);
 	DECLARE_WRITE8_MEMBER(flashrom_write);
 
-	DECLARE_READ32_MEMBER(ejanhs_speedup_r);
 	DECLARE_READ32_MEMBER(senkyu_speedup_r);
 	DECLARE_READ32_MEMBER(senkyua_speedup_r);
 	DECLARE_READ32_MEMBER(batlball_speedup_r);
@@ -124,12 +122,10 @@ public:
 	void set_layer_offsets();
 	void drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, bitmap_ind8 &primap, int primask);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap, int priority);
-	void set_rowscroll(tilemap_t *layer, int scroll, INT16* rows);
-	void set_scroll(tilemap_t *layer, int scroll);
 	void combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tile, int sx, int sy, int opaque, INT16 *rowscroll);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(spi);
 	DECLARE_MACHINE_RESET(sxx2e);
 	DECLARE_VIDEO_START(ejanhs);

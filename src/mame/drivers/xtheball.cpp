@@ -43,7 +43,7 @@ public:
 	DECLARE_READ16_MEMBER(analogx_r);
 	DECLARE_READ16_MEMBER(analogy_watchdog_r);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);

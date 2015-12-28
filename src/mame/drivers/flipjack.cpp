@@ -127,7 +127,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(flipjack_coin);
 	DECLARE_READ8_MEMBER(flipjack_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(flipjack_portc_w);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(flipjack);
 	UINT32 screen_update_flipjack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };

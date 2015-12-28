@@ -33,7 +33,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	bitmap_ind16 m_fg_bitmap;
-	UINT32 *m_transmask[3];
+	std::unique_ptr<UINT32[]> m_transmask[3];
 	UINT16 m_scroll0;
 	UINT16 m_scroll1;
 	UINT8 m_main_irq_mask;
@@ -56,8 +56,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pacland);
 
 	INTERRUPT_GEN_MEMBER(main_vblank_irq);

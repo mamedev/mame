@@ -161,10 +161,10 @@ void arabian_state::video_start()
 	/* allocate a common bitmap to use for both planes */
 	/* plane A (top plane with motion objects) is in the upper 4 bits */
 	/* plane B (bottom plane with playfield) is in the lower 4 bits */
-	m_main_bitmap = auto_alloc_array(machine(), UINT8, BITMAP_WIDTH * BITMAP_HEIGHT);
+	m_main_bitmap = std::make_unique<UINT8[]>(BITMAP_WIDTH * BITMAP_HEIGHT);
 
 	/* allocate memory for the converted graphics data */
-	m_converted_gfx = auto_alloc_array(machine(), UINT8, 0x8000 * 2);
+	m_converted_gfx = std::make_unique<UINT8[]>(0x8000 * 2);
 
 	/*--------------------------------------------------
 	    transform graphics data into more usable format
@@ -207,8 +207,8 @@ void arabian_state::video_start()
 		m_converted_gfx[offs * 4 + 0] = p4;
 	}
 
-	save_pointer(NAME(m_main_bitmap), BITMAP_WIDTH * BITMAP_HEIGHT);
-	save_pointer(NAME(m_converted_gfx), 0x8000 * 2);
+	save_pointer(NAME(m_main_bitmap.get()), BITMAP_WIDTH * BITMAP_HEIGHT);
+	save_pointer(NAME(m_converted_gfx.get()), 0x8000 * 2);
 	save_item(NAME(m_video_control));
 	save_item(NAME(m_flip_screen));
 }

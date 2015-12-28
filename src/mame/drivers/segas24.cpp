@@ -2374,7 +2374,7 @@ DRIVER_INIT_MEMBER(segas24_state,hotrod)
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
-	mlatch_table = 0;
+	mlatch_table = nullptr;
 
 	// Sector  Size
 	// 1       8192
@@ -2409,7 +2409,7 @@ DRIVER_INIT_MEMBER(segas24_state,sspirits)
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
-	mlatch_table = 0;
+	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
@@ -2417,7 +2417,7 @@ DRIVER_INIT_MEMBER(segas24_state,sspiritj)
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
-	mlatch_table = 0;
+	mlatch_table = nullptr;
 	track_size = 0x2f00;
 }
 
@@ -2434,7 +2434,7 @@ DRIVER_INIT_MEMBER(segas24_state,sgmast)
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
-	mlatch_table = 0;
+	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
@@ -2442,7 +2442,7 @@ DRIVER_INIT_MEMBER(segas24_state,qsww)
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
-	mlatch_table = 0;
+	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
@@ -2450,7 +2450,7 @@ DRIVER_INIT_MEMBER(segas24_state,gground)
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
-	mlatch_table = 0;
+	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
@@ -2458,7 +2458,7 @@ DRIVER_INIT_MEMBER(segas24_state,crkdown)
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
-	mlatch_table = 0;
+	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
@@ -2466,7 +2466,7 @@ DRIVER_INIT_MEMBER(segas24_state,roughrac)
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
-	mlatch_table = 0;
+	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 

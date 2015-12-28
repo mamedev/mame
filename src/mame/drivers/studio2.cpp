@@ -224,8 +224,8 @@ public:
 	required_ioport m_b;
 	required_device<screen_device> m_screen;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( cart_400 );
 	DECLARE_READ8_MEMBER( cart_a00 );
@@ -273,8 +273,8 @@ public:
 
 	required_device<cdp1864_device> m_cti;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( cart_c00 );
 	DECLARE_WRITE8_MEMBER( dma_w );
@@ -534,7 +534,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 	// always alloc 3K, even if range $400-$600 is not read by the system (RAM is present there)
 	m_cart->rom_alloc(0xc00, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		if (!strcmp(image.filetype(), "st2"))
 		{

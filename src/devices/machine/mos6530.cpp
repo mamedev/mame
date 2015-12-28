@@ -259,7 +259,7 @@ WRITE8_MEMBER( mos6530_device::write )
 
 READ8_MEMBER( mos6530_device::read )
 {
-	UINT8 val = 0;
+	UINT8 val;
 
 	/* if A2 == 1 and A0 == 1, we are reading interrupt flags */
 	if ((offset & 0x05) == 0x05)

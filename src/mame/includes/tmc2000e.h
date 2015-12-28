@@ -53,8 +53,8 @@ public:
 	required_ioport m_y7;
 	required_ioport m_run;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( vismac_r );
 	DECLARE_WRITE8_MEMBER( vismac_w );

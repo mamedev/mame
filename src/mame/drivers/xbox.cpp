@@ -38,12 +38,12 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
-	virtual void hack_eeprom();
-	virtual void hack_usb();
+	virtual void hack_eeprom() override;
+	virtual void hack_usb() override;
 
 	struct chihiro_devices {
 		bus_master_ide_controller_device    *ide;

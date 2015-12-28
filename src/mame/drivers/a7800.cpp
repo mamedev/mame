@@ -135,15 +135,12 @@ public:
 	int m_bios_enabled;
 
 	DECLARE_READ8_MEMBER(bios_or_cart_r);
-	DECLARE_WRITE8_MEMBER(ram0_w);
 	DECLARE_READ8_MEMBER(tia_r);
 	DECLARE_WRITE8_MEMBER(tia_w);
-	DECLARE_READ8_MEMBER(maria_r);
-	DECLARE_WRITE8_MEMBER(maria_w);
 	DECLARE_DRIVER_INIT(a7800_pal);
 	DECLARE_DRIVER_INIT(a7800_ntsc);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(a7800);
 	DECLARE_PALETTE_INIT(a7800p);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
@@ -1381,7 +1378,7 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	MCFG_MOS6530n_IN_PB_CB(READ8(a7800_state, riot_console_button_r))
 	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a7800_state, riot_button_pullup_w))
 
-	MCFG_A78_CARTRIDGE_ADD("cartslot", a7800_cart, NULL)
+	MCFG_A78_CARTRIDGE_ADD("cartslot", a7800_cart, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","a7800")

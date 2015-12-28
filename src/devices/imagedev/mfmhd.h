@@ -88,8 +88,8 @@ public:
 	// Head select
 	void            headsel_w(int head) { m_current_head = head & 0x0f; }
 
-	bool            call_load();
-	void            call_unload();
+	bool            call_load() override;
+	void            call_unload() override;
 
 	// Tells us the time when the track ends (next index pulse). Needed by the controller.
 	attotime        track_end_time();
@@ -102,10 +102,10 @@ public:
 	int             get_actual_heads();
 
 protected:
-	void                device_start();
-	void                device_stop();
-	void                device_reset();
-	void                device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void                device_start() override;
+	void                device_stop() override;
+	void                device_reset() override;
+	void                device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	std::string         tts(const attotime &t);
 
@@ -217,8 +217,8 @@ public:
 	void configure(mfmhd_enc_t encoding, int spinupms, int cache, mfmhd_format_type format);
 
 protected:
-	void device_start() { };
-	void device_config_complete();
+	void device_start() override { };
+	void device_config_complete() override;
 
 private:
 	mfmhd_enc_t m_encoding;

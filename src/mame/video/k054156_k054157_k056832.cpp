@@ -187,15 +187,15 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	//*m_pixmap[K056832_PAGE_COUNT],
 	//m_regs[0x20],
 	//m_regsb[4],
-	m_rombase(NULL),
+	m_rombase(nullptr),
 	m_num_gfx_banks(0),
 	m_cur_gfx_banks(0),
-	m_gfx_memory_region(NULL),
+	m_gfx_memory_region(nullptr),
 	m_gfx_num(0),
 	m_bpp(-1),
 	m_big(0),
 	m_djmain_hack(0),
-	m_k055555_tag(NULL),
+	m_k055555_tag(nullptr),
 	//m_layer_assoc_with_page[K056832_PAGE_COUNT],
 	//m_layer_offs[8][2],
 	//m_lsram_page[8][2],
@@ -219,7 +219,7 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	m_use_ext_linescroll(0),
 	m_uses_tile_banks(0),
 	m_cur_tile_bank(0),
-	m_k055555(NULL),
+	m_k055555(nullptr),
 	m_gfxdecode(*this),
 	m_palette(*this)
 {
@@ -1063,10 +1063,12 @@ WRITE16_MEMBER( k056832_device::word_w )
 	{
 		switch(offset)
 		{
-			/* -x-- ---- dotclock select: 0=8Mhz, 1=6Mhz (not used by GX)
-			 * --x- ---- screen flip y
-			 * ---x ---- screen flip x
-			 * ---- --x- external linescroll RAM page enable
+			/* -x-- ---- ---- hardcodes 8bpp when enabled (ignores next field)
+			 * --xx ---- ---- gfx bpp select: n + 4 (1 << n), i.e. from 7bpp to 4bpp
+			 * ---- -x-- ---- dotclock select: 0=8Mhz, 1=6Mhz (not used by GX)
+			 * ---- --x- ---- screen flip y
+			 * ---- ---x ---- screen flip x
+			 * ---- ---- --x- external linescroll RAM page enable
 			 */
 			case 0x00/2:
 				if ((new_data & 0x30) != (old_data & 0x30))
@@ -1452,7 +1454,7 @@ printf("\nend\n");
 }
 */
 	last_active = m_active_layer;
-	new_colorbase = (m_k055555 != NULL) ? m_k055555->K055555_get_palette_index(layer) : 0;
+	new_colorbase = (m_k055555 != nullptr) ? m_k055555->K055555_get_palette_index(layer) : 0;
 
 	for (r = 0; r < rowspan; r++)
 	{
@@ -1557,7 +1559,7 @@ printf("\nend\n");
 				m_active_layer = layer;
 			}
 
-			if (m_k055555 != NULL)       // are we using k055555 palette?
+			if (m_k055555 != nullptr)       // are we using k055555 palette?
 			{
 				if (m_last_colorbase[pageIndex] != new_colorbase)
 				{
@@ -1757,7 +1759,7 @@ void k056832_device::tilemap_draw_dj( screen_device &screen, bitmap_rgb32 &bitma
 		sdat_adv = -sdat_adv;
 
 	last_active = m_active_layer;
-	new_colorbase = (m_k055555 != NULL) ? m_k055555->K055555_get_palette_index(layer) : 0;
+	new_colorbase = (m_k055555 != nullptr) ? m_k055555->K055555_get_palette_index(layer) : 0;
 
 	for (r = 0; r <= rowspan; r++)
 	{
@@ -1838,7 +1840,7 @@ void k056832_device::tilemap_draw_dj( screen_device &screen, bitmap_rgb32 &bitma
 				m_active_layer = layer;
 			}
 
-			if (m_k055555 != NULL)       // are we using k055555 palette?
+			if (m_k055555 != nullptr)       // are we using k055555 palette?
 			{
 				if (m_last_colorbase[pageIndex] != new_colorbase)
 				{
@@ -2025,16 +2027,7 @@ void k056832_device::create_gfx(const char *gfx_memory_region, int bpp, int big)
 	int gfx_index;
 	int i;
 	UINT32 total;
-	static const gfx_layout charlayout8_tasman =
-	{
-		8,8,
-		RGN_FRAC(1,1),
-		8,
-		{ 0,8,16,24,32,40,48,56 },
-		{ 0,1,2,3,4,5,6,7 },
-		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64},
-		8*64
-	};
+
 	static const gfx_layout charlayout8 =
 	{
 		8, 8,
@@ -2102,7 +2095,7 @@ void k056832_device::create_gfx(const char *gfx_memory_region, int bpp, int big)
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 	{
-		if (m_gfxdecode->gfx(gfx_index) == 0) break;
+		if (m_gfxdecode->gfx(gfx_index) == nullptr) break;
 	}
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -2139,7 +2132,7 @@ void k056832_device::create_gfx(const char *gfx_memory_region, int bpp, int big)
 
 		case K056832_BPP_8TASMAN:
 			total = machine().root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout8_tasman, 8);
+			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, machine().root_device().memregion(gfx_memory_region)->base(), total, &charlayout8, 8);
 			break;
 
 		case K056832_BPP_4dj:
@@ -2371,7 +2364,7 @@ void k056832_device::m_tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap,
 	if (flipy) sdat_adv = -sdat_adv;
 
 	last_active = m_active_layer;
-	new_colorbase = (m_k055555 != NULL) ? m_k055555->K055555_get_palette_index(layer) : 0;
+	new_colorbase = (m_k055555 != nullptr) ? m_k055555->K055555_get_palette_index(layer) : 0;
 
 	for (r=0; r<rowspan; r++)
 	{
@@ -2469,7 +2462,7 @@ void k056832_device::m_tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap,
 			m_active_layer = layer;
 		}
 
-		if (m_k055555 != NULL)
+		if (m_k055555 != nullptr)
 		{
 			if (m_last_colorbase[pageIndex] != new_colorbase)
 			{

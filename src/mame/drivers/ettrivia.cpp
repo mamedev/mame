@@ -62,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(b800_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ettrivia);
 	UINT32 screen_update_ettrivia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ettrivia_interrupt);
@@ -234,7 +234,7 @@ PALETTE_INIT_MEMBER(ettrivia_state, ettrivia)
 	compute_resistor_weights(0, 255, -1.0,
 			2, resistances, weights, 0, 0,
 			2, resistances, weights, 0, 0,
-			0, 0, 0, 0, 0);
+			0, nullptr, nullptr, 0, 0);
 
 	for (i = 0;i < palette.entries(); i++)
 	{

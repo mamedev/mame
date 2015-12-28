@@ -176,7 +176,7 @@ int ti_rs232_attached_device::get_index_from_tagname()
 */
 bool ti_rs232_attached_device::call_load()
 {
-	tms9902_device* tms9902 = NULL;
+	tms9902_device* tms9902;
 //  ti_rs232_pio_device* card = static_cast<ti_rs232_pio_device*>(owner());
 
 	int devnumber = get_index_from_tagname();
@@ -206,7 +206,7 @@ bool ti_rs232_attached_device::call_load()
 
 void ti_rs232_attached_device::call_unload()
 {
-	tms9902_device* tms9902 = NULL;
+	tms9902_device* tms9902;
 
 	int devnumber = get_index_from_tagname();
 	if (devnumber==0)
@@ -705,7 +705,7 @@ void ti_rs232_pio_device::receive_data_or_line_state(int uartind)
 		if (m_bufpos[uartind] == m_buflen[uartind])
 		{
 			// Get all out of sdlsocket
-			m_buflen[uartind] = serial->fread(m_recvbuf[uartind], 512);
+			m_buflen[uartind] = serial->fread(m_recvbuf[uartind].get(), 512);
 			m_bufpos[uartind] = 0;
 			if (m_buflen[uartind]==0) return;
 		}
@@ -1023,8 +1023,8 @@ void ti_rs232_pio_device::device_start()
 	m_serdev[1] = subdevice<ti_rs232_attached_device>("serdev1");
 	m_piodev = subdevice<ti_pio_attached_device>("piodev");
 	// Prepare the receive buffers
-	m_recvbuf[0] = global_alloc_array(UINT8, 512);
-	m_recvbuf[1] = global_alloc_array(UINT8, 512);
+	m_recvbuf[0] = std::make_unique<UINT8[]>(512);
+	m_recvbuf[1] = std::make_unique<UINT8[]>(512);
 	m_pio_write = true; // required for call_load of pio_attached_device
 	m_pio_writable = false;
 	m_pio_handshakein = false;
@@ -1032,8 +1032,8 @@ void ti_rs232_pio_device::device_start()
 
 void ti_rs232_pio_device::device_stop()
 {
-	if (m_recvbuf[0] != NULL) global_free_array(m_recvbuf[0]);
-	if (m_recvbuf[1] != NULL) global_free_array(m_recvbuf[1]);
+	m_recvbuf[0] = nullptr;
+	m_recvbuf[1] = nullptr;
 }
 
 void ti_rs232_pio_device::device_reset()

@@ -50,7 +50,7 @@ static int pc6001_cas_to_wav_size (const UINT8 *casdata, int caslen)
 {
 	cas_size = caslen*8;
 
-	return pc6001_handle_cas(NULL,casdata);
+	return pc6001_handle_cas(nullptr,casdata);
 }
 
 /*******************************************************************
@@ -89,7 +89,7 @@ static const struct CassetteFormat pc6001_cassette_format = {
 	"cas",
 	pc6001_cas_identify,
 	pc6001_cas_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(pc6001_cassette_formats)

@@ -108,7 +108,7 @@ at29c040a_device::at29c040a_device(const machine_config &mconfig, const char *ta
 
 void at29x_device::nvram_default()
 {
-	memset(m_eememory, 0, m_memory_size+2);
+	memset(m_eememory.get(), 0, m_memory_size+2);
 }
 
 //-------------------------------------------------
@@ -118,7 +118,7 @@ void at29x_device::nvram_default()
 
 void at29x_device::nvram_read(emu_file &file)
 {
-	file.read(m_eememory, m_memory_size+2);
+	file.read(m_eememory.get(), m_memory_size+2);
 }
 
 //-------------------------------------------------
@@ -131,7 +131,7 @@ void at29x_device::nvram_write(emu_file &file)
 	// If we don't write (because there were no changes), the file will be wiped
 	if (TRACE_PRG) logerror("%s: Write to NVRAM file\n", tag());
 	m_eememory[0] = m_version;
-	file.write(m_eememory, m_memory_size+2);
+	file.write(m_eememory.get(), m_memory_size+2);
 }
 
 /*
@@ -157,7 +157,7 @@ void at29x_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 	case PGM_3:
 		// Programming cycle end; now burn the buffer into the flash EEPROM
-		memcpy(m_eememory + 2 + get_sector_number(m_programming_last_offset) * m_sector_size, m_programming_buffer, m_sector_size);
+		memcpy(m_eememory.get() + 2 + get_sector_number(m_programming_last_offset) * m_sector_size, m_programming_buffer.get(), m_sector_size);
 
 		if (TRACE_PRG) logerror("%s: Sector write completed at location %04x\n", tag(), m_programming_last_offset);
 
@@ -366,7 +366,7 @@ WRITE8_MEMBER( at29x_device::write )
 					else
 					{
 						if (TRACE_STATE) logerror("%s: Erase chip\n", tag());
-						memset(m_eememory+2, 0xff, m_memory_size);
+						memset(m_eememory.get()+2, 0xff, m_memory_size);
 					}
 				}
 				break;
@@ -460,7 +460,7 @@ WRITE8_MEMBER( at29x_device::write )
 		{   // enter programming mode
 			if (TRACE_STATE) logerror("%s: Enter programming mode (m_pgm=%d, m_sdp=%d)\n", tag(), m_pgm, m_sdp);
 			// Clear the programming buffer
-			memset(m_programming_buffer, 0xff, m_sector_size);
+			memset(m_programming_buffer.get(), 0xff, m_sector_size);
 			m_pgm = PGM_2;
 		}
 	}
@@ -479,8 +479,8 @@ WRITE8_MEMBER( at29x_device::write )
 
 void at29x_device::device_start(void)
 {
-	m_programming_buffer = global_alloc_array(UINT8, m_sector_size);
-	m_eememory = global_alloc_array(UINT8, m_memory_size+2);
+	m_programming_buffer = std::make_unique<UINT8[]>(m_sector_size);
+	m_eememory = std::make_unique<UINT8[]>(m_memory_size+2);
 	m_programming_timer = timer_alloc(PRGTIMER);
 
 	// TODO: Complete 16-bit handling
@@ -490,8 +490,8 @@ void at29x_device::device_start(void)
 
 void at29x_device::device_stop(void)
 {
-	global_free_array(m_programming_buffer);
-	global_free_array(m_eememory);
+	m_programming_buffer = nullptr;
+	m_eememory = nullptr;
 }
 
 void at29x_device::device_reset(void)

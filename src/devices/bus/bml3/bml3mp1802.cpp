@@ -82,7 +82,7 @@ READ8_MEMBER( bml3bus_mp1802_device::bml3_mp1802_r)
 
 WRITE8_MEMBER( bml3bus_mp1802_device::bml3_mp1802_w)
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	switch (data & 0x03)
 	{

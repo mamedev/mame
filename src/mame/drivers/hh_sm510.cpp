@@ -46,8 +46,8 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(lcd_segment_w);
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 
@@ -209,8 +209,6 @@ static MACHINE_CONFIG_START( ktopgun, ktopgun_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -286,8 +284,6 @@ static MACHINE_CONFIG_START( ktmnt, ktmnt_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
 
-	/* no video! */
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -354,8 +350,6 @@ static MACHINE_CONFIG_START( gnwmndon, gnwmndon_state )
 	MCFG_SM510_WRITE_R_CB(WRITE8(gnwmndon_state, speaker_w))
 
 	MCFG_DEFAULT_LAYOUT(layout_hh_sm510_test)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

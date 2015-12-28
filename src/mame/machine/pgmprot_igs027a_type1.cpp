@@ -881,9 +881,9 @@ void pgm_arm_type1_state::command_handler_puzzli2(int pc)
 			m_valueresponse = 0x36<<16;
 
 			//  clear the return structure
-			for (int columns=0;columns<8;columns++)
+			for (auto & elem : level_structure)
 				for (int rows=0;rows<10;rows++)
-					level_structure[columns][rows] = 0x0000;
+					elem[rows] = 0x0000;
 
 		break;
 

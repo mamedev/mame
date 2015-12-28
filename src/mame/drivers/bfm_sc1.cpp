@@ -175,7 +175,6 @@ public:
 	DECLARE_WRITE8_MEMBER(triac_w);
 	DECLARE_READ8_MEMBER(triac_r);
 	DECLARE_READ8_MEMBER(nec_r);
-	DECLARE_WRITE8_MEMBER(nec_reset_w);
 	DECLARE_WRITE8_MEMBER(nec_latch_w);
 
 	void save_state();
@@ -187,11 +186,10 @@ public:
 	DECLARE_DRIVER_INIT(clatt);
 	DECLARE_DRIVER_INIT(rou029);
 	DECLARE_DRIVER_INIT(nocrypt);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void sc1_common_init(int reels, int decrypt, int defaultbank);
 	void Scorpion1_SetSwitchState(int strobe, int data, int state);
-	int Scorpion1_GetSwitchState(int strobe, int data);
 	int sc1_find_project_string( );
 	required_device<cpu_device> m_maincpu;
 	required_device<stepper_device> m_reel0;
@@ -1147,9 +1145,9 @@ int bfm_sc1_state::sc1_find_project_string( )
 	UINT8 *src = memregion( "maincpu" )->base();
 	int size = memregion( "maincpu" )->bytes();
 
-	for (int search=0;search<7;search++)
+	for (auto & elem : title_string)
 	{
-		int strlength = strlen(title_string[search]);
+		int strlength = strlen(elem);
 
 		for (int i=0;i<size-strlength;i++)
 		{
@@ -1158,7 +1156,7 @@ int bfm_sc1_state::sc1_find_project_string( )
 			for (j=0;j<strlength;j+=1)
 			{
 				UINT8 rom = src[(i+j)];
-				UINT8 chr = title_string[search][j];
+				UINT8 chr = elem[j];
 
 				if (rom != chr)
 				{

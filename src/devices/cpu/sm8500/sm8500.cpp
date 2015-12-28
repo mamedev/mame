@@ -198,9 +198,9 @@ void sm8500_cpu_device::state_string_export(const device_state_entry &entry, std
 
 void sm8500_cpu_device::device_reset()
 {
-	for ( int i = 0; i < 0x108; i++ )
+	for (auto & elem : m_register_ram)
 	{
-		m_register_ram[i] = 0;
+		elem = 0;
 	}
 
 	m_PC = 0x1020;

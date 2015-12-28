@@ -23,7 +23,7 @@ public:
 	void set_reverse_bit_order(bool reverse) { m_reverse = reverse; }
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	UINT8 *m_speechrom_data;           /* pointer to speech ROM data */

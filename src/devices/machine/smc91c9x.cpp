@@ -377,7 +377,7 @@ void smc91c9x_device::process_command(UINT16 data)
 
 READ16_MEMBER( smc91c9x_device::read )
 {
-	UINT32 result = ~0;
+	UINT32 result;
 
 	/* determine the effective register */
 	offset %= 8;

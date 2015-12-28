@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Jarek Burczynski
+// copyright-holders:Jarek Burczynski, Angelo Salese
 /****************************************************************************
 
 Mazer Blazer by Stern Electronics (c) 1983
@@ -194,14 +194,7 @@ public:
 
 	int m_planes_enabled[4];
 #endif
-	DECLARE_WRITE8_MEMBER(cfb_backgnd_color_w);
-	DECLARE_WRITE8_MEMBER(cfb_vbank_w);
 	DECLARE_WRITE8_MEMBER(cfb_rom_bank_sel_w);
-	DECLARE_READ8_MEMBER(cfb_port_02_r);
-	DECLARE_WRITE8_MEMBER(vcu_video_reg_w);
-	DECLARE_READ8_MEMBER(vcu_set_cmd_param_r);
-	DECLARE_READ8_MEMBER(vcu_set_gfx_addr_r);
-	DECLARE_READ8_MEMBER(vcu_set_clr_addr_r);
 	DECLARE_WRITE8_MEMBER(cfb_zpu_int_req_set_w);
 	DECLARE_READ8_MEMBER(cfb_zpu_int_req_clr);
 	DECLARE_READ8_MEMBER(ls670_0_r);
@@ -222,9 +215,9 @@ public:
 	DECLARE_READ8_MEMBER(soundcommand_r);
 	DECLARE_DRIVER_INIT(mazerbla);
 	DECLARE_DRIVER_INIT(greatgun);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mazerbla);
 	UINT32 screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);

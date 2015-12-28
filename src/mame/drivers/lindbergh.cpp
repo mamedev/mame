@@ -345,8 +345,8 @@ class lindbergh_state : public driver_device
 public:
 	lindbergh_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 lindbergh_state::lindbergh_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag)

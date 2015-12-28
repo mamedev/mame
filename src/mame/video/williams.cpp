@@ -114,7 +114,7 @@ void williams_state::state_save_register()
 
 VIDEO_START_MEMBER(williams_state,williams)
 {
-	blitter_init(m_blitter_config, NULL);
+	blitter_init(m_blitter_config, nullptr);
 	create_palette_lookup();
 	state_save_register();
 }
@@ -132,7 +132,7 @@ VIDEO_START_MEMBER(blaster_state,blaster)
 
 VIDEO_START_MEMBER(williams2_state,williams2)
 {
-	blitter_init(m_blitter_config, NULL);
+	blitter_init(m_blitter_config, nullptr);
 
 	/* create the tilemap */
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(williams2_state::get_tile_info),this), TILEMAP_SCAN_COLS,  24,16, 128,16);
@@ -276,7 +276,7 @@ void williams_state::create_palette_lookup()
 			2, resistances_b,  weights_b, 0, 0);
 
 	/* build a palette lookup */
-	m_palette_lookup = auto_alloc_array(machine(), rgb_t, 256);
+	m_palette_lookup = std::make_unique<rgb_t[]>(256);
 	for (i = 0; i < 256; i++)
 	{
 		int r = combine_3_weights(weights_r, BIT(i,0), BIT(i,1), BIT(i,2));
@@ -432,7 +432,7 @@ WRITE8_MEMBER(williams2_state::williams2_xscroll_high_w)
 WRITE8_MEMBER(blaster_state::blaster_remap_select_w)
 {
 	m_blitter_remap_index = data;
-	m_blitter_remap = m_blitter_remap_lookup + data * 256;
+	m_blitter_remap = m_blitter_remap_lookup.get() + data * 256;
 }
 
 
@@ -461,9 +461,9 @@ void williams_state::blitter_init(int blitter_config, const UINT8 *remap_prom)
 	m_blitter_xor = (blitter_config == WILLIAMS_BLITTER_SC01) ? 4 : 0;
 
 	/* create the remap table; if no PROM, make an identity remap table */
-	m_blitter_remap_lookup = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_blitter_remap_lookup = std::make_unique<UINT8[]>(256 * 256);
 	m_blitter_remap_index = 0;
-	m_blitter_remap = m_blitter_remap_lookup;
+	m_blitter_remap = m_blitter_remap_lookup.get();
 	for (i = 0; i < 256; i++)
 	{
 		const UINT8 *table = remap_prom ? (remap_prom + (i & 0x7f) * 16) : dummy_table;

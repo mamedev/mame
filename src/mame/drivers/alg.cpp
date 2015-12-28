@@ -56,11 +56,10 @@ public:
 	DECLARE_DRIVER_INIT(pal);
 
 	DECLARE_VIDEO_START(alg);
-	TIMER_CALLBACK_MEMBER(response_timer);
 
 protected:
 	// amiga_state overrides
-	virtual void potgo_w(UINT16 data);
+	virtual void potgo_w(UINT16 data) override;
 	int get_lightgun_pos(int player, int *x, int *y);
 
 private:
@@ -756,7 +755,7 @@ DRIVER_INIT_MEMBER(alg_state,aplatoon)
 
 	/* NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!! */
 	UINT8 *rom = memregion("user2")->base();
-	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x40000);
+	std::unique_ptr<UINT8[]> decrypted = std::make_unique<UINT8[]>(0x40000);
 	int i;
 
 	static const int shuffle[] =
@@ -766,8 +765,8 @@ DRIVER_INIT_MEMBER(alg_state,aplatoon)
 	};
 
 	for (i = 0; i < 64; i++)
-		memcpy(decrypted + i * 0x1000, rom + shuffle[i] * 0x1000, 0x1000);
-	memcpy(rom, decrypted, 0x40000);
+		memcpy(decrypted.get() + i * 0x1000, rom + shuffle[i] * 0x1000, 0x1000);
+	memcpy(rom, decrypted.get(), 0x40000);
 	logerror("decrypt done\n ");
 }
 

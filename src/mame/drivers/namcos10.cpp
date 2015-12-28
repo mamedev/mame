@@ -572,7 +572,7 @@ ADDRESS_MAP_END
 WRITE16_MEMBER(namcos10_state::crypto_switch_w)
 {
 	printf("crypto_switch_w: %04x\n", data);
-	if (decrypter == 0)
+	if (decrypter == nullptr)
 		return;
 
 	if (BIT(data, 15) != 0)
@@ -633,7 +633,7 @@ READ16_MEMBER( namcos10_state::nand_data_r )
 /*  printf( "data<-%08x (%08x)\n", data, nand_address ); */
 	nand_address++;
 
-	if (decrypter == 0)
+	if (decrypter == nullptr)
 		return data;
 
 	if (decrypter->is_active())

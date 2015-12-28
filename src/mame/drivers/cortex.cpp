@@ -36,7 +36,7 @@ public:
 		, m_p_ram(*this, "ram")
 		{ }
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<tms9995_device> m_maincpu;
 	required_shared_ptr<UINT8> m_p_ram;
 };

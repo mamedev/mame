@@ -1,6 +1,6 @@
-// license:???
-// copyright-holders:Bryan McPhail,Fuzz,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
-
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// thanks-to:Fuzz
 #define VERBOSE     (0)
 
 // todo, move these back, currently the sprite code needs some of the values tho
@@ -51,7 +51,7 @@ public:
 	void set_screen(screen_device* screen);
 	void set_pens(const pen_t* pens);
 
-	UINT16     *m_videoram;
+	std::unique_ptr<UINT16[]>     m_videoram;
 	UINT16     *m_videoram_drawsource;
 
 	UINT16     m_vram_offset;
@@ -80,8 +80,8 @@ public:
 	int m_bppshift; // 4 for 4bpp gfx (NeoGeo) 8 for 8bpp gfx (Midas)
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	UINT32 get_region_mask(UINT8* rgn, UINT32 rgn_size);
 	UINT8* m_region_sprites; UINT32 m_region_sprites_size;
 	UINT8* m_region_fixed; UINT32 m_region_fixed_size;
@@ -100,8 +100,8 @@ class neosprite_regular_device : public neosprite_base_device
 {
 public:
 	neosprite_regular_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens);
-	virtual void set_sprite_region(UINT8* region_sprites, UINT32 region_sprites_size);
+	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens) override;
+	virtual void set_sprite_region(UINT8* region_sprites, UINT32 region_sprites_size) override;
 
 };
 
@@ -112,9 +112,9 @@ class neosprite_optimized_device : public neosprite_base_device
 {
 public:
 	neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual void optimize_sprite_data();
-	virtual void set_optimized_sprite_data(UINT8* sprdata, UINT32 mask);
-	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens);
+	virtual void optimize_sprite_data() override;
+	virtual void set_optimized_sprite_data(UINT8* sprdata, UINT32 mask) override;
+	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens) override;
 	std::vector<UINT8> m_sprite_gfx;
 	UINT8* m_spritegfx8;
 
@@ -131,15 +131,15 @@ class neosprite_midas_device : public neosprite_base_device
 public:
 	neosprite_midas_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens);
+	virtual void draw_pixel(int romaddr, UINT32* dst, const pen_t *line_pens) override;
 
-	UINT16* m_videoram_buffer;
+	std::unique_ptr<UINT16[]> m_videoram_buffer;
 	void buffer_vram();
-	virtual void draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, const pen_t* char_pens);
-	virtual void set_sprite_region(UINT8* region_sprites, UINT32 region_sprites_size);
+	virtual void draw_fixed_layer_2pixels(UINT32*&pixel_addr, int offset, UINT8* gfx_base, const pen_t* char_pens) override;
+	virtual void set_sprite_region(UINT8* region_sprites, UINT32 region_sprites_size) override;
 
 	protected:
-	virtual void device_start();
+	virtual void device_start() override;
 
 };
 

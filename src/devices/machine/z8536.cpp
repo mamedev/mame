@@ -214,7 +214,7 @@ void z8536_device::get_interrupt_vector()
 
 void z8536_device::check_interrupt()
 {
-	int state = ASSERT_LINE;
+	int state;
 
 	if (m_register[MASTER_INTERRUPT_CONTROL] & MICR_MIE)
 	{
@@ -251,7 +251,7 @@ void z8536_device::check_interrupt()
 
 UINT8 z8536_device::read_register(offs_t offset)
 {
-	UINT8 data = 0;
+	UINT8 data;
 
 	switch (offset)
 	{
@@ -905,9 +905,9 @@ void z8536_device::device_reset()
 {
 	m_state = STATE_RESET;
 
-	for (int i = 0; i < 48; i++)
+	for (auto & elem : m_register)
 	{
-		m_register[i] = 0;
+		elem = 0;
 	}
 
 	m_register[MASTER_INTERRUPT_CONTROL] = MICR_RESET;

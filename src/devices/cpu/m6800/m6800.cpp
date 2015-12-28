@@ -632,9 +632,9 @@ const address_space_config *m6800_cpu_device::memory_space_config(address_spacen
 	switch(spacenum)
 	{
 	case AS_PROGRAM:           return &m_program_config;
-	case AS_IO:                return m_has_io ? &m_io_config : NULL;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_opcodes_config : NULL;
-	default:                   return NULL;
+	case AS_IO:                return m_has_io ? &m_io_config : nullptr;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_opcodes_config : nullptr;
+	default:                   return nullptr;
 	}
 }
 

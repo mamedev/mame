@@ -220,7 +220,7 @@ static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tm
 	}
 }
 
-INLINE UINT32 alpha_additive_r32(UINT32 d, UINT32 s, UINT8 level)
+static inline UINT32 alpha_additive_r32(UINT32 d, UINT32 s, UINT8 level)
 {
 	UINT32 add;
 	add = (s & 0x00ff0000) + (d & 0x00ff0000);
@@ -575,7 +575,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	//}
 
 	// Select the proper tilemap size
-	tilemap_t* tilemap = NULL;
+	tilemap_t* tilemap = nullptr;
 	if (global_dimensions==0)
 	{
 		if (bigTilemapBit) tilemap = m_tilemap[tm].m_tilemap_16x16;
@@ -1274,21 +1274,21 @@ void hng64_state::video_start()
 	m_tilemap[3].m_tilemap_16x16     = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile3_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
 	m_tilemap[3].m_tilemap_16x16_alt = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile3_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_tilemap)
 	{
-		m_tilemap[i].m_tilemap_8x8->set_transparent_pen(0);
-		m_tilemap[i].m_tilemap_16x16->set_transparent_pen(0);
-		m_tilemap[i].m_tilemap_16x16_alt->set_transparent_pen(0);
+		elem.m_tilemap_8x8->set_transparent_pen(0);
+		elem.m_tilemap_16x16->set_transparent_pen(0);
+		elem.m_tilemap_16x16_alt->set_transparent_pen(0);
 	}
 
 	// Debug switch, turn on / off additive blending on a per-tilemap basis
 	m_additive_tilemap_debug = 0;
 
 	// Rasterizer creation
-	m_poly_renderer = auto_alloc(machine(), hng64_poly_renderer(*this));
+	m_poly_renderer = std::make_unique<hng64_poly_renderer>(*this);
 
 	// 3d information
-	m_dl = auto_alloc_array(machine(), UINT16, 0x100);
+	m_dl = std::make_unique<UINT16[]>(0x100);
 	m_polys.resize(HNG64_MAX_POLYGONS);
 
 	m_texturerom = memregion("textures")->base();

@@ -94,7 +94,7 @@ private:
 	UINT8 m_out_offs;
 	UINT8 m_t_c;
 	UINT8 *m_p_prom;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_p_ram;
 	required_device<dac_device> m_dac;

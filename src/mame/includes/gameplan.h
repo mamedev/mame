@@ -50,7 +50,7 @@ public:
 	optional_shared_ptr<UINT8> m_trvquest_question;
 
 	/* video state */
-	UINT8   *m_videoram;
+	std::unique_ptr<UINT8[]>   m_videoram;
 	size_t   m_videoram_size;
 	UINT8    m_video_x;
 	UINT8    m_video_y;
@@ -102,7 +102,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(trvquest_misc_w);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /*----------- defined in video/gameplan.c -----------*/

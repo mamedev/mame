@@ -73,14 +73,12 @@ public:
 	DECLARE_WRITE32_MEMBER(pxa255_gpio_w);
 	DECLARE_READ32_MEMBER(pxa255_lcd_r);
 	DECLARE_WRITE32_MEMBER(pxa255_lcd_w);
-	DECLARE_READ32_MEMBER(return_zero);
-	DECLARE_READ32_MEMBER(unknown_r);
 	DECLARE_READ32_MEMBER(cpld_r);
 	DECLARE_WRITE32_MEMBER(cpld_w);
 	DECLARE_READ32_MEMBER(prot_cheater_r);
 	DECLARE_DRIVER_INIT(39in1);
 	DECLARE_MACHINE_START(60in1);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	UINT32 screen_update_39in1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pxa255_vblank_start);
 	TIMER_CALLBACK_MEMBER(pxa255_dma_dma_end);
@@ -103,7 +101,7 @@ public:
 
 #define VERBOSE_LEVEL ( 3 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char* s_fmt, ... )
+static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char* s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{

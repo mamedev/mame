@@ -82,12 +82,12 @@ public:
 	optional_ioport m_eepromin;
 
 
-	UINT16 *m_videoram;
-	UINT16 *m_spriteram;
-	UINT16 *m_f3_vram;
-	UINT16 *m_f3_line_ram;
-	UINT16 *m_f3_pf_data;
-	UINT16 *m_f3_pivot_ram;
+	std::unique_ptr<UINT16[]> m_videoram;
+	std::unique_ptr<UINT16[]> m_spriteram;
+	std::unique_ptr<UINT16[]> m_f3_vram;
+	std::unique_ptr<UINT16[]> m_f3_line_ram;
+	std::unique_ptr<UINT16[]> m_f3_pf_data;
+	std::unique_ptr<UINT16[]> m_f3_pivot_ram;
 
 	UINT32 m_coin_word[2];
 	int m_f3_game;
@@ -101,7 +101,7 @@ public:
 	tilemap_t *m_pf8_tilemap;
 	tilemap_t *m_pixel_layer;
 	tilemap_t *m_vram_layer;
-	UINT16 *m_spriteram16_buffered;
+	std::unique_ptr<UINT16[]> m_spriteram16_buffered;
 	UINT16 m_f3_control_0[8];
 	UINT16 m_f3_control_1[8];
 	int m_flipscreen;
@@ -131,8 +131,8 @@ public:
 	int m_width_mask;
 	int m_twidth_mask;
 	int m_twidth_mask_bit;
-	UINT8 *m_tile_opaque_sp;
-	UINT8 *m_tile_opaque_pf[8];
+	std::unique_ptr<UINT8[]> m_tile_opaque_sp;
+	std::unique_ptr<UINT8[]> m_tile_opaque_pf[8];
 	UINT8 m_add_sat[256][256];
 	int m_alpha_s_1_1;
 	int m_alpha_s_1_2;
@@ -311,7 +311,7 @@ public:
 	INTERRUPT_GEN_MEMBER(f3_interrupt2);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	inline void get_tile_info(tile_data &tileinfo, int tile_index, UINT16 *gfx_base);

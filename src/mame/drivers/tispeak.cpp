@@ -2,7 +2,7 @@
 // copyright-holders:hap, Jonathan Gevaryahu, Sean Riddle
 /***************************************************************************
 
-  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.c) **
+  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
 
   Texas Instruments 1st-gen. handheld speech devices.
 
@@ -297,6 +297,20 @@ Touch & Tell/Vocaid overlay reference:
     - 16: 7h - Do You Remember? II
 
 
+Magic Wand "Speaking Reader" or "Speak & Learn":
+
+Limited release barcode reader text-to-speech device, meant for children.
+The text is coded as phonemes. Books were sold separately.
+
+    Magic Wand "Speaking Reader" (US), 1982
+    - MCU: C14007* (TMS1400?)
+    - TMS5220
+    - VSM: 4KB? CD2228*
+
+    Magic Wand "Speak & Learn" (US), 1983
+    - notes: same hardware
+
+
 Language Tutor/Translator:
 
 A later device, called Language Teacher, was released without speech hardware.
@@ -381,8 +395,8 @@ public:
 	required_device<tms6100_device> m_tms6100;
 	optional_device<generic_slot_device> m_cart;
 
-	DECLARE_INPUT_CHANGED_MEMBER(snspell_power_button);
-	void snspell_power_off();
+	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
+	void power_off();
 	void prepare_display();
 
 	DECLARE_READ8_MEMBER(snspell_read_k);
@@ -408,7 +422,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(tntell_get_overlay);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 
@@ -432,7 +446,7 @@ void tispeak_state::init_cartridge()
 {
 	m_overlay = 0;
 
-	if (m_cart != NULL && m_cart->exists())
+	if (m_cart != nullptr && m_cart->exists())
 	{
 		std::string region_tag;
 		memory_region *src = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
@@ -496,7 +510,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_r)
 {
 	// R13: power-off request, on falling edge
 	if ((m_r >> 13 & 1) && !(data >> 13 & 1))
-		snspell_power_off();
+		power_off();
 
 	// R0-R7: input mux and select digit (+R8 if the device has 9 digits)
 	// R15: filament on
@@ -517,16 +531,15 @@ WRITE16_MEMBER(tispeak_state::snspell_write_o)
 
 READ8_MEMBER(tispeak_state::snspell_read_k)
 {
-	// note: the Vss row is always on
+	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inp_matrix[8]->read() | read_inputs(8);
 }
 
 
-void tispeak_state::snspell_power_off()
+void tispeak_state::power_off()
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_tms5100->reset();
-	m_tms6100->reset();
 
 	m_power_on = false;
 }
@@ -563,7 +576,7 @@ WRITE16_MEMBER(tispeak_state::tntell_write_r)
 
 	// R9: power-off request, on falling edge
 	if ((m_r >> 9 & 1) && !(data >> 9 & 1))
-		snspell_power_off();
+		power_off();
 
 	// R0-R8: input mux
 	m_r = m_inp_mux = data;
@@ -617,7 +630,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 
 ***************************************************************************/
 
-INPUT_CHANGED_MEMBER(tispeak_state::snspell_power_button)
+INPUT_CHANGED_MEMBER(tispeak_state::power_button)
 {
 	int on = (int)(FPTR)param;
 
@@ -627,7 +640,7 @@ INPUT_CHANGED_MEMBER(tispeak_state::snspell_power_button)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else if (!on && m_power_on)
-		snspell_power_off();
+		power_off();
 }
 
 static INPUT_PORTS_START( snspell )
@@ -678,7 +691,7 @@ static INPUT_PORTS_START( snspell )
 
 	PORT_START("IN.7") // R7
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") // -> auto_power_off
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_NAME("Go")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_HOME) PORT_NAME("Go")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Replay")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Repeat")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Clue")
@@ -688,7 +701,7 @@ static INPUT_PORTS_START( snspell )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Secret Code")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Say It")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, snspell_power_button, (void *)true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
 INPUT_PORTS_END
 
 
@@ -717,7 +730,7 @@ static INPUT_PORTS_START( snmath )
 	PORT_START("IN.3") // R3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Go")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_CODE(KEYCODE_HOME) PORT_NAME("Go")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") // -> auto_power_off
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -740,7 +753,7 @@ static INPUT_PORTS_START( snmath )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Write It")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Greater/Less")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Word Problems")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Solve It/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, snspell_power_button, (void *)true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Solve It/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
 
 	PORT_START("IN.7")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -762,7 +775,7 @@ static INPUT_PORTS_START( snread )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Picture Read")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter Stumper")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Hear It")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Word Zap/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, snspell_power_button, (void *)true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Word Zap/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
 INPUT_PORTS_END
 
 
@@ -853,7 +866,7 @@ static INPUT_PORTS_START( tntell )
 
 	PORT_START("IN.9") // Vss!
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Grid 6-6 (On)") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, snspell_power_button, (void *)true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Grid 6-6 (On)") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
 
 	PORT_START("IN.10")
 	PORT_CONFNAME( 0x1f, 0x04, "Overlay Code" ) // only if not provided by external artwork
@@ -902,11 +915,11 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_FRAGMENT( tms5110_route )
 
 	/* sound hardware */
-	MCFG_TMS5110_M0_CB(DEVWRITELINE("tms6100", tms6100_device, tms6100_m0_w))
-	MCFG_TMS5110_M1_CB(DEVWRITELINE("tms6100", tms6100_device, tms6100_m1_w))
-	MCFG_TMS5110_ADDR_CB(DEVWRITE8("tms6100", tms6100_device, tms6100_addr_w))
-	MCFG_TMS5110_DATA_CB(DEVREADLINE("tms6100", tms6100_device, tms6100_data_r))
-	MCFG_TMS5110_ROMCLK_CB(DEVWRITELINE("tms6100", tms6100_device, tms6100_romclock_w))
+	MCFG_TMS5110_M0_CB(DEVWRITELINE("tms6100", tms6100_device, m0_w))
+	MCFG_TMS5110_M1_CB(DEVWRITELINE("tms6100", tms6100_device, m1_w))
+	MCFG_TMS5110_ADDR_CB(DEVWRITE8("tms6100", tms6100_device, addr_w))
+	MCFG_TMS5110_DATA_CB(DEVREADLINE("tms6100", tms6100_device, data_line_r))
+	MCFG_TMS5110_ROMCLK_CB(DEVWRITELINE("tms6100", tms6100_device, romclock_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -924,8 +937,6 @@ static MACHINE_CONFIG_START( snmath, tispeak_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_snmath)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
@@ -1020,8 +1031,6 @@ static MACHINE_CONFIG_START( vocaid, tispeak_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ol_timer", tispeak_state, tntell_get_overlay, attotime::from_msec(50))
 	MCFG_DEFAULT_LAYOUT(layout_tntell)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)

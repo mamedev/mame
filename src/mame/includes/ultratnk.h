@@ -49,8 +49,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ultratnk_attract_w);
 	DECLARE_WRITE8_MEMBER(ultratnk_explosion_w);
 	TILE_GET_INFO_MEMBER(ultratnk_tile_info);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ultratnk);
 	UINT32 screen_update_ultratnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_ultratnk(screen_device &screen, bool state);
@@ -62,5 +62,5 @@ public:
 	required_device<palette_device> m_palette;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

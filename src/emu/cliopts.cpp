@@ -16,18 +16,18 @@
 const options_entry cli_options::s_option_entries[] =
 {
 	/* core commands */
-	{ NULL,                            NULL,       OPTION_HEADER,     "CORE COMMANDS" },
+	{ nullptr,                            nullptr,       OPTION_HEADER,     "CORE COMMANDS" },
 	{ CLICOMMAND_HELP ";h;?",           "0",       OPTION_COMMAND,    "show help message" },
 	{ CLICOMMAND_VALIDATE ";valid",     "0",       OPTION_COMMAND,    "perform driver validation on all game drivers" },
 
 	/* configuration commands */
-	{ NULL,                            NULL,       OPTION_HEADER,     "CONFIGURATION COMMANDS" },
+	{ nullptr,                            nullptr,       OPTION_HEADER,     "CONFIGURATION COMMANDS" },
 	{ CLICOMMAND_CREATECONFIG ";cc",    "0",       OPTION_COMMAND,    "create the default configuration file" },
 	{ CLICOMMAND_SHOWCONFIG ";sc",      "0",       OPTION_COMMAND,    "display running parameters" },
 	{ CLICOMMAND_SHOWUSAGE ";su",       "0",       OPTION_COMMAND,    "show this help" },
 
 	/* frontend commands */
-	{ NULL,                            NULL,       OPTION_HEADER,     "FRONTEND COMMANDS" },
+	{ nullptr,                            nullptr,       OPTION_HEADER,     "FRONTEND COMMANDS" },
 	{ CLICOMMAND_LISTXML ";lx",         "0",       OPTION_COMMAND,    "all available info on driver in XML format" },
 	{ CLICOMMAND_LISTFULL ";ll",        "0",       OPTION_COMMAND,    "short name, full name" },
 	{ CLICOMMAND_LISTSOURCE ";ls",      "0",       OPTION_COMMAND,    "driver sourcefile" },
@@ -46,7 +46,7 @@ const options_entry cli_options::s_option_entries[] =
 	{ CLICOMMAND_VERIFYSOFTWARE ";vsoft", "0",     OPTION_COMMAND,    "verify known software for the system" },
 	{ CLICOMMAND_GETSOFTLIST ";glist",  "0",       OPTION_COMMAND,    "retrieve software list by name" },
 	{ CLICOMMAND_VERIFYSOFTLIST ";vlist", "0",     OPTION_COMMAND,    "verify software list by name" },
-	{ NULL }
+	{ nullptr }
 };
 
 //**************************************************************************

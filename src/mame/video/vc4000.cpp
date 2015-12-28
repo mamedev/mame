@@ -1,6 +1,6 @@
-// license:???
+// license:GPL-2.0+
 // copyright-holders:Peter Trauner, Manfred Schneider, Robbbert
-
+// thanks-to:Manfred Schneider
 #include "includes/vc4000.h"
 
 
@@ -58,7 +58,7 @@ void vc4000_state::video_start()
 	m_video.sprites[3].data = &m_video.reg.d.sprite4;
 	m_video.sprites[3].mask = 1 << 3;
 
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), m_screen->width(), m_screen->height());
+	m_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
 }
 
 inline UINT8 vc4000_state::vc4000_joystick_return_to_centre(UINT8 joy)

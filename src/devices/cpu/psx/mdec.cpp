@@ -15,7 +15,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
+static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -83,13 +83,13 @@ void psxmdec_device::device_start()
 }
 
 #ifdef UNUSED_FUNCTION
-INLINE void psxwriteword( UINT32 *p_n_psxram, UINT32 n_address, UINT16 n_data )
+static inline void psxwriteword( UINT32 *p_n_psxram, UINT32 n_address, UINT16 n_data )
 {
 	*( (UINT16 *)( (UINT8 *)p_n_psxram + WORD_XOR_LE( n_address ) ) ) = n_data;
 }
 #endif
 
-INLINE UINT16 psxreadword( UINT32 *p_n_psxram, UINT32 n_address )
+static inline UINT16 psxreadword( UINT32 *p_n_psxram, UINT32 n_address )
 {
 	return *( (UINT16 *)( (UINT8 *)p_n_psxram + WORD_XOR_LE( n_address ) ) );
 }
@@ -161,12 +161,12 @@ void psxmdec_device::mdec_idct( INT32 *p_n_src, INT32 *p_n_dst )
 	}
 }
 
-INLINE UINT16 mdec_unpack_run( UINT16 n_packed )
+static inline UINT16 mdec_unpack_run( UINT16 n_packed )
 {
 	return n_packed >> 10;
 }
 
-INLINE INT32 mdec_unpack_val( UINT16 n_packed )
+static inline INT32 mdec_unpack_val( UINT16 n_packed )
 {
 	return ( ( (INT32)n_packed ) << 22 ) >> 22;
 }
@@ -224,22 +224,22 @@ UINT32 psxmdec_device::mdec_unpack( UINT32 *p_n_psxram, UINT32 n_address )
 	return n_address;
 }
 
-INLINE INT32 mdec_cr_to_r( INT32 n_cr )
+static inline INT32 mdec_cr_to_r( INT32 n_cr )
 {
 	return ( 1435 * n_cr ) >> 10;
 }
 
-INLINE INT32 mdec_cr_to_g( INT32 n_cr )
+static inline INT32 mdec_cr_to_g( INT32 n_cr )
 {
 	return ( -731 * n_cr ) >> 10;
 }
 
-INLINE INT32 mdec_cb_to_g( INT32 n_cb )
+static inline INT32 mdec_cb_to_g( INT32 n_cb )
 {
 	return ( -351 * n_cb ) >> 10;
 }
 
-INLINE INT32 mdec_cb_to_b( INT32 n_cb )
+static inline INT32 mdec_cb_to_b( INT32 n_cb )
 {
 	return ( 1814 * n_cb ) >> 10;
 }

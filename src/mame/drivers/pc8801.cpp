@@ -324,10 +324,10 @@ public:
 	required_device<ym2203_device> m_opn;
 	required_device<palette_device> m_palette;
 
-	UINT8 *m_work_ram;
-	UINT8 *m_hi_work_ram;
-	UINT8 *m_ext_work_ram;
-	UINT8 *m_gvram;
+	std::unique_ptr<UINT8[]> m_work_ram;
+	std::unique_ptr<UINT8[]> m_hi_work_ram;
+	std::unique_ptr<UINT8[]> m_ext_work_ram;
+	std::unique_ptr<UINT8[]> m_gvram;
 	UINT8 *m_n80rom;
 	UINT8 *m_n88rom;
 	UINT8 *m_kanji_rom;
@@ -407,8 +407,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pc8801_gfx_ctrl_w);
 	DECLARE_READ8_MEMBER(pc8801_vram_select_r);
 	DECLARE_WRITE8_MEMBER(pc8801_vram_select_w);
-	DECLARE_WRITE8_MEMBER(i8214_irq_level_w);
-	DECLARE_WRITE8_MEMBER(i8214_irq_mask_w);
 	DECLARE_WRITE8_MEMBER(pc8801_irq_level_w);
 	DECLARE_WRITE8_MEMBER(pc8801_irq_mask_w);
 	DECLARE_READ8_MEMBER(pc8801_window_bank_r);
@@ -469,15 +467,14 @@ public:
 	void pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,
 							UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int width, UINT8 non_special);
 	void draw_text(bitmap_ind16 &bitmap,int y_size, UINT8 width);
-	void fdc_irq_w(bool state);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(pc8801);
 protected:
 
-	virtual void video_start();
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void video_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 public:
 	DECLARE_MACHINE_RESET(pc8801_clock_speed);
 	DECLARE_MACHINE_RESET(pc8801_dic);
@@ -489,12 +486,9 @@ public:
 	DECLARE_WRITE8_MEMBER(cpu_8255_c_w);
 	DECLARE_READ8_MEMBER(fdc_8255_c_r);
 	DECLARE_WRITE8_MEMBER(fdc_8255_c_w);
-	DECLARE_WRITE_LINE_MEMBER(pic_int_w);
-	DECLARE_WRITE_LINE_MEMBER(pic_enlg_w);
 	DECLARE_READ8_MEMBER(opn_porta_r);
 	DECLARE_READ8_MEMBER(opn_portb_r);
 	IRQ_CALLBACK_MEMBER(pc8801_irq_callback);
-	void pc8801_raise_irq(UINT8 irq,UINT8 state);
 	DECLARE_WRITE_LINE_MEMBER(pc8801_sound_irq);
 };
 
@@ -689,7 +683,7 @@ UINT8 pc8801_state::calc_cursor_pos(int x,int y,int yi)
 
 UINT8 pc8801_state::extract_text_attribute(UINT32 address,int x, UINT8 width, UINT8 &non_special)
 {
-	UINT8 *vram = m_work_ram;
+	UINT8 *vram = m_work_ram.get();
 	int i;
 	int fifo_size;
 	int offset;
@@ -728,7 +722,7 @@ UINT8 pc8801_state::extract_text_attribute(UINT32 address,int x, UINT8 width, UI
 void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int width, UINT8 non_special)
 {
 	int xi,yi;
-	UINT8 *vram = m_work_ram;
+	UINT8 *vram = m_work_ram.get();
 	UINT8 is_cursor;
 	UINT8 y_height, y_double;
 	UINT8 y_step;
@@ -2400,19 +2394,19 @@ void pc8801_state::machine_start()
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
 
-	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
-	m_hi_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x1000);
-	m_ext_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x8000*0x100);
-	m_gvram = auto_alloc_array_clear(machine(), UINT8, 0xc000);
+	m_work_ram = make_unique_clear<UINT8[]>(0x10000);
+	m_hi_work_ram = make_unique_clear<UINT8[]>(0x1000);
+	m_ext_work_ram = make_unique_clear<UINT8[]>(0x8000*0x100);
+	m_gvram = make_unique_clear<UINT8[]>(0xc000);
 	m_n80rom = memregion("n80rom")->base();
 	m_n88rom = memregion("n88rom")->base();
 	m_kanji_rom = memregion("kanji")->base();
 	m_cg_rom = memregion("cgrom")->base();
 
-	save_pointer(NAME(m_work_ram), 0x10000);
-	save_pointer(NAME(m_hi_work_ram), 0x1000);
-	save_pointer(NAME(m_ext_work_ram), 0x8000*0x100);
-	save_pointer(NAME(m_gvram), 0xc000);
+	save_pointer(NAME(m_work_ram.get()), 0x10000);
+	save_pointer(NAME(m_hi_work_ram.get()), 0x1000);
+	save_pointer(NAME(m_ext_work_ram.get()), 0x8000*0x100);
+	save_pointer(NAME(m_gvram.get()), 0xc000);
 }
 
 void pc8801_state::machine_reset()

@@ -59,14 +59,11 @@ public:
 	DECLARE_WRITE8_MEMBER(lamp1_w) { };
 	//DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	//DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_WRITE8_MEMBER(sol2_w) { }; // solenoids 8-15
 	DECLARE_WRITE8_MEMBER(sol3_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(dac_w) { };
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_READ8_MEMBER(dmd_status_r);
 
 //  DECLARE_READ8_MEMBER(sound_latch_r);
@@ -83,7 +80,7 @@ public:
 protected:
 
 	// driver_device overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 private:
 //  UINT32 m_segment1;
 //  UINT32 m_segment2;
@@ -91,7 +88,6 @@ private:
 	UINT8 m_kbdrow;
 	UINT8 m_diag;
 	bool m_ca1;
-	bool m_irq_active;
 	UINT8 m_sound_data;
 
 public:

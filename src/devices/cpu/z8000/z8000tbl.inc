@@ -527,7 +527,7 @@ static const Z8000_init table[] = {
 {0xfd80,0xfdff, 1,1, 11,&z8002_device::ZF_dddd_1dsp7,                           "djnz    %rw1,%d0",                DASMFLAG_STEP_OVER},
 {0xfe80,0xfeff, 1,1, 11,&z8002_device::ZF_dddd_1dsp7,                           "djnz    %rw1,%d0",                DASMFLAG_STEP_OVER},
 {0xff80,0xffff, 1,1, 11,&z8002_device::ZF_dddd_1dsp7,                           "djnz    %rw1,%d0",                DASMFLAG_STEP_OVER},
-{0,     0,      0,0,  0,NULL,                                   NULL,                               0}
+{0,     0,      0,0,  0,nullptr,                                   nullptr,                               0}
 };
 
 
@@ -575,5 +575,5 @@ void z8000_init_tables(void)
 void z8000_deinit_tables(void)
 {
 	global_free_array( z8000_exec );
-	z8000_exec = NULL;
+	z8000_exec = nullptr;
 }

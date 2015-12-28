@@ -131,7 +131,7 @@ static const struct CassetteFormat x1_cassette_format = {
 	"tap",
 	x1_cas_identify,
 	x1_cas_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(x1_cassette_formats)

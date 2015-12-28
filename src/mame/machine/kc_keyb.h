@@ -31,13 +31,13 @@ public:
 	template<class _Object> static devcb_base &set_out_wr_callback(device_t &device, _Object object) { return downcast<kc_keyboard_device &>(device).m_write_out.set_callback(object); }
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void add_pulse_to_transmit_buffer(int pulse_state, int pulse_number = 1);
 	void add_bit(int bit);

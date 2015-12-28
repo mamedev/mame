@@ -223,8 +223,8 @@ void mcms_device::device_start()
 {
 	m_write_irq.resolve();
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, 31250);
-	m_timer = timer_alloc(0, NULL);
-	m_clrtimer = timer_alloc(1, NULL);
+	m_timer = timer_alloc(0, nullptr);
+	m_clrtimer = timer_alloc(1, nullptr);
 	m_enabled = false;
 	memset(m_vols, 0, sizeof(m_vols));
 	memset(m_table, 0, sizeof(m_table));
@@ -232,9 +232,9 @@ void mcms_device::device_start()
 	memset(m_acc, 0, sizeof(m_acc));
 
 	// the card detect programs volumes and wavetable page but not freq and expects the accumulator to increment
-	for (int i = 0; i < 16; i++)
+	for (auto & elem : m_freq)
 	{
-		m_freq[i] = 0x0040;
+		elem = 0x0040;
 	}
 
 	save_item(NAME(m_enabled));

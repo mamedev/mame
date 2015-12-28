@@ -33,8 +33,8 @@ public:
 		device_t *owner, UINT32 clock, const char *name, const char *shortname);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry *device_rom_region() const override;
 
 	DECLARE_READ8_MEMBER( dmac_scsi_r );
 	DECLARE_WRITE8_MEMBER( dmac_scsi_w );
@@ -44,8 +44,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// to slot
 	virtual void cfgout_w(int state) = 0;
@@ -75,19 +75,19 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// output to slot
-	virtual void cfgout_w(int state) { m_slot->cfgout_w(state); }
-	virtual void int2_w(int state) { m_slot->int2_w(state); }
-	virtual void int6_w(int state) { m_slot->int6_w(state); }
+	virtual void cfgout_w(int state) override { m_slot->cfgout_w(state); }
+	virtual void int2_w(int state) override { m_slot->int2_w(state); }
+	virtual void int6_w(int state) override { m_slot->int6_w(state); }
 
 	// input from slot
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
 
 private:
 	required_ioport m_dips;
@@ -105,19 +105,19 @@ public:
 	a2091_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// output to slot
-	virtual void cfgout_w(int state) { m_slot->cfgout_w(state); }
-	virtual void int2_w(int state) { m_slot->int2_w(state); }
-	virtual void int6_w(int state) { m_slot->int6_w(state); }
+	virtual void cfgout_w(int state) override { m_slot->cfgout_w(state); }
+	virtual void int2_w(int state) override { m_slot->int2_w(state); }
+	virtual void int6_w(int state) override { m_slot->int6_w(state); }
 
 	// input from slot
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
 
 private:
 	required_ioport m_jp1;

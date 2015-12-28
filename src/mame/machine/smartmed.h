@@ -145,13 +145,11 @@ public:
 	void address_w(UINT8 data);
 	void data_w(UINT8 data);
 
-	void read(int offset, void *data, int size);
-
 	void set_data_ptr(void *ptr);
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	int m_page_data_size;   // 256 for a 2MB card, 512 otherwise
 	int m_page_total_size;// 264 for a 2MB card, 528 otherwise
@@ -160,8 +158,8 @@ protected:
 						// 0 means no card loaded
 	int m_log2_pages_per_block; // log2 of number of pages per erase block (usually 4 or 5)
 
-	UINT8 *m_data_ptr;  // FEEPROM data area
-	UINT8 *m_data_uid_ptr;
+	UINT8* m_data_ptr;  // FEEPROM data area
+	std::unique_ptr<UINT8[]> m_data_uid_ptr;
 
 	sm_mode_t m_mode;               // current operation mode
 	pointer_sm_mode_t m_pointer_mode;       // pointer mode
@@ -173,7 +171,7 @@ protected:
 	int m_status;           // current status
 	int m_accumulated_status;   // accumulated status
 
-	UINT8 *m_pagereg;   // page register used by program command
+	std::unique_ptr<UINT8[]> m_pagereg;   // page register used by program command
 	UINT8 m_id[5];      // chip ID
 	UINT8 m_mp_opcode;  // multi-plane operation code
 
@@ -206,24 +204,24 @@ public:
 	smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_MEMCARD; }
+	virtual iodevice_t image_type() const override { return IO_MEMCARD; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return "sm_memc"; }
-	virtual const char *file_extensions() const { return "smc"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 0; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return "sm_memc"; }
+	virtual const char *file_extensions() const override { return "smc"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load();
-	virtual void call_unload();
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
+	virtual bool call_load() override;
+	virtual void call_unload() override;
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override { return load_software(swlist, swname, start_entry); }
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
+	virtual void device_config_complete() override;
 
 	bool smartmedia_format_1();
 	bool smartmedia_format_2();

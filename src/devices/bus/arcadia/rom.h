@@ -17,12 +17,12 @@ public:
 	arcadia_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start() {}
-	virtual void device_reset() {}
+	virtual void device_start() override {}
+	virtual void device_reset() override {}
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_READ8_MEMBER(extra_rom);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_READ8_MEMBER(extra_rom) override;
 };
 
 // ======================> arcadia_golf_device

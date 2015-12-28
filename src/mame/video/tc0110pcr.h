@@ -22,11 +22,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
-	UINT16 *     m_ram;
+	std::unique_ptr<UINT16[]>     m_ram;
 	int          m_type;
 	int          m_addr;
 	required_device<palette_device> m_palette;

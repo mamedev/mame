@@ -41,7 +41,7 @@ void awacs_device::device_start()
 
 	memset(m_regs, 0, sizeof(m_regs));
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 
 	save_item(NAME(m_play_ptr));
 	save_item(NAME(m_buffer_size));
@@ -62,7 +62,7 @@ void awacs_device::device_reset()
 	m_play_ptr = 0;
 	m_buffer_size = 0;
 	m_playback_enable = false;
-	m_dma_space = NULL;
+	m_dma_space = nullptr;
 	m_dma_offset_0 = m_dma_offset_1 = 0;
 	m_buffer_num = 0;
 }

@@ -58,14 +58,14 @@ public:
 	float get_beam_intensity_weight();
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	static float m_flicker;
 	static float m_beam_width_min;
 	static float m_beam_width_max;
 	static float m_beam_intensity_weight;
-	point *m_vector_list;
+	std::unique_ptr<point[]> m_vector_list;
 	static int m_vector_index;
 	int m_min_intensity;
 	int m_max_intensity;

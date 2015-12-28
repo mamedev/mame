@@ -34,7 +34,7 @@ const device_type VS920A = &device_creator<vs920a_text_tilemap_device>;
 
 vs920a_text_tilemap_device::vs920a_text_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VS920A, "VS920A Text Tilemap", tag, owner, clock, "vs920a", __FILE__),
-	m_vram(NULL),
+	m_vram(nullptr),
 	m_pal_base(0),
 	m_gfx_region(0),
 	m_gfxdecode(*this)
@@ -48,8 +48,8 @@ void vs920a_text_tilemap_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_vram = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x1000/2);
-	save_pointer(NAME(m_vram), 0x1000/2);
+	m_vram = make_unique_clear<UINT16[]>(0x1000/2);
+	save_pointer(NAME(m_vram.get()), 0x1000/2);
 	save_item(NAME(m_pal_base));
 
 

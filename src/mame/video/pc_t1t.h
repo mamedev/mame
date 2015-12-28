@@ -96,8 +96,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( t1000_vsync_changed );
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 
 private:
 	UINT8 *m_t1_displayram;
@@ -123,13 +123,13 @@ public:
 
 	UINT8   *m_jxkanji;
 
-	virtual MC6845_UPDATE_ROW( crtc_update_row );
+	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( pcjx_text_update_row );
 	MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row );
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 
 private:
 	void pc_pcjr_mode_switch();

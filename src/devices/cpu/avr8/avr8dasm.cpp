@@ -31,7 +31,7 @@ CPU_DISASSEMBLE( avr8 )
 	int pos = 0;
 	UINT32 op = oprom[pos++];
 	op |= oprom[pos++] << 8;
-	UINT32 addr = 0;
+	UINT32 addr;
 	const char* register_names[0x40] = {"PINA", "DDRA", "PORTA", "PINB", "DDRB", "PORTB", "PINC", "DDRC", "PORTC", "PIND", "DDRD", "PORTD", "PINE", "DDRE", "PORTE", "PINF", "DDRF", "PORTF", "PING", "DDRG", "PORTG", "TIFR0", "TIFR1", "TIFR2","TIFR3", "TIFR4", "TIFR5", "PCIFR", "EIFR", "EIMSK", "GPIOR0", "EECR", "EEDR", "EEARL", "EEARH", "GTCCR", "TCCR0A", "TCCR0B", "TCNT0", "OCR0A", "OCR0B", "0x29", "GPIOR1", "GPIOR2", "SPCR", "SPSR", "SPDR", "0x2F", "ACSR", "OCDR", "0x32", "SMCR", "MCUSR", "MCUCR", "0x36", "SPMCSR", "0x38", "0x39", "0x3A", "RAMPZ", "EIND", "SPL", "SPH", "SREG"};
 
 	const char* register_bit_names[0x40][8] = {

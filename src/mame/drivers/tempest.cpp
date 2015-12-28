@@ -333,7 +333,7 @@ public:
 
 	DECLARE_READ8_MEMBER(rom_ae1f_r);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 

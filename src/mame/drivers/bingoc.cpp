@@ -47,10 +47,9 @@ public:
 
 	UINT8 m_x;
 	DECLARE_READ16_MEMBER(unknown_r);
-	DECLARE_READ8_MEMBER(sound_test_r);
 	DECLARE_WRITE16_MEMBER(main_sound_latch_w);
 	DECLARE_WRITE8_MEMBER(sound_play_w);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_bingoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;

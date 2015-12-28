@@ -219,7 +219,7 @@ WRITE_LINE_MEMBER(gameplan_state::video_command_trigger_w)
 				m_via_0->write_ca1(1);
 			}
 
-			memset(m_videoram, m_video_data & 0x0f, m_videoram_size);
+			memset(m_videoram.get(), m_video_data & 0x0f, m_videoram_size);
 
 			/* set a timer for an arbitrarily short period.
 			   The real time it takes to clear to screen is not
@@ -268,12 +268,12 @@ TIMER_CALLBACK_MEMBER(gameplan_state::via_0_ca1_timer_callback)
 VIDEO_START_MEMBER(gameplan_state,common)
 {
 	m_videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
-	m_videoram = auto_alloc_array(machine(), UINT8, m_videoram_size);
+	m_videoram = std::make_unique<UINT8[]>(m_videoram_size);
 
 	m_via_0_ca1_timer = timer_alloc(TIMER_VIA_0_CAL);
 
 	/* register for save states */
-	save_pointer(NAME(m_videoram), m_videoram_size);
+	save_pointer(NAME(m_videoram.get()), m_videoram_size);
 }
 
 

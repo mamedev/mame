@@ -830,7 +830,7 @@ WRITE8_MEMBER(pk8020_state::pk8020_portc_w)
 
 WRITE8_MEMBER(pk8020_state::pk8020_portb_w)
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	// Turn all motors off
 	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(1);

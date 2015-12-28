@@ -233,8 +233,8 @@ static const gfx_layout s2636_character =
 
 static GFXDECODE_START( tinvader )
 	GFXDECODE_SCALE( "gfx1", 0, tinvader_character,   0, 2, 3, 3 )
-	GFXDECODE_SCALE( NULL,   0x1F00, s2636_character, 0, 2, 4, 3 )  /* dynamic */
-	GFXDECODE_SCALE( NULL,   0x1F00, s2636_character, 0, 2, 8, 6 )  /* dynamic */
+	GFXDECODE_SCALE( nullptr,   0x1F00, s2636_character, 0, 2, 4, 3 )  /* dynamic */
+	GFXDECODE_SCALE( nullptr,   0x1F00, s2636_character, 0, 2, 8, 6 )  /* dynamic */
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( tinvader, zac2650_state )
@@ -261,7 +261,6 @@ static MACHINE_CONFIG_START( tinvader, zac2650_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_DEVICE_ADD("s2636", S2636, 0)
-	MCFG_S2636_WORKRAM_SIZE(0x100)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

@@ -24,10 +24,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// internal state
@@ -55,8 +55,6 @@ private:
 	INT16 m_filtervals[8];
 	UINT8 m_VSU1000_amp; // amplitude setting on VSU-1000 board
 
-	INT16 audiofilter();
-	void shiftIntoFilter(INT16 inputvalue);
 	void PostPhoneme();
 	void s14001a_clock();
 };

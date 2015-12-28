@@ -60,7 +60,7 @@ ROM_END
 
 at_keyboard_controller_device::at_keyboard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AT_KEYBOARD_CONTROLLER, "AT Keyboard Controller", tag, owner, clock, "at_keybc", __FILE__),
-		m_cpu(NULL),
+		m_cpu(nullptr),
 		m_system_reset_cb(*this),
 		m_gate_a20_cb(*this),
 		m_input_buffer_full_cb(*this),

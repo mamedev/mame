@@ -114,7 +114,7 @@ public:
 	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrolly_w);
 
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
@@ -214,9 +214,9 @@ UINT32 galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb3
 		int drawy, drawx;
 		for (drawy=0;drawy<512;drawy++)
 		{
-			UINT16* srcline1 = m_grap2_0->m_framebuffer + ((drawy+m_grap2_0->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
-			UINT16* srcline2 = m_grap2_1->m_framebuffer + ((drawy+m_grap2_1->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
-			UINT16* srcline3 = m_grap2_2->m_framebuffer + ((drawy+m_grap2_2->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
+			UINT16* srcline1 = m_grap2_0->m_framebuffer.get() + ((drawy+m_grap2_0->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
+			UINT16* srcline2 = m_grap2_1->m_framebuffer.get() + ((drawy+m_grap2_1->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
+			UINT16* srcline3 = m_grap2_2->m_framebuffer.get() + ((drawy+m_grap2_2->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
 
 			UINT16*  priline  = m_priority_buffer + ((drawy+m_priority_buffer_scrolly+11)&0x1ff) * 0x200;
 

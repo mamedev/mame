@@ -57,7 +57,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 	UINT32* m_cpuregion;
-	UINT32* m_mainram;
+	std::unique_ptr<UINT32[]> m_mainram;
 	SEC sec;
 
 	UINT8 m_led_strobe_temp;
@@ -86,7 +86,7 @@ protected:
 
 	// devices
 	required_device<m68340cpu_device> m_maincpu;
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 READ8_MEMBER(mpu5_state::asic_r8)
@@ -386,7 +386,7 @@ INPUT_PORTS_END
 void mpu5_state::machine_start()
 {
 	m_cpuregion = (UINT32*)memregion( "maincpu" )->base();
-	m_mainram = (UINT32*)auto_alloc_array_clear(machine(), UINT32, 0x10000);
+	m_mainram = make_unique_clear<UINT32[]>(0x10000);
 	m_pic_output_bit =0;
 }
 

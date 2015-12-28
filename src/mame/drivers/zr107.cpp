@@ -227,7 +227,7 @@ public:
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
 	required_device<konppc_device> m_konppc;
 
-	UINT32 *m_sharc_dataram;
+	std::unique_ptr<UINT32[]> m_sharc_dataram;
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
 	int m_ccu_vcth;
@@ -258,8 +258,8 @@ public:
 	K056832_CB_MEMBER(tile_callback);
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 
@@ -909,7 +909,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(zr107_state,common)
 {
-	m_sharc_dataram = auto_alloc_array(machine(), UINT32, 0x100000/4);
+	m_sharc_dataram = std::make_unique<UINT32[]>(0x100000/4);
 	m_led_reg0 = m_led_reg1 = 0x7f;
 	m_ccu_vcth = m_ccu_vctl = 0;
 }

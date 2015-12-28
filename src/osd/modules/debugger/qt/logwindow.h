@@ -3,8 +3,6 @@
 #ifndef __DEBUG_QT_LOG_WINDOW_H__
 #define __DEBUG_QT_LOG_WINDOW_H__
 
-#include <QtGui/QtGui>
-
 #include "debuggerview.h"
 #include "windowqt.h"
 

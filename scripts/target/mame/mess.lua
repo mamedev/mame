@@ -91,6 +91,7 @@ CPUS["APEXC"] = true
 CPUS["CP1610"] = true
 CPUS["F8"] = true
 CPUS["LH5801"] = true
+CPUS["PATINHOFEIO"] = true
 CPUS["PDP1"] = true
 CPUS["SATURN"] = true
 CPUS["SC61860"] = true
@@ -485,6 +486,7 @@ MACHINES["PC_LPT"] = true
 MACHINES["PCCARD"] = true
 MACHINES["PCF8593"] = true
 MACHINES["PCKEYBRD"] = true
+MACHINES["PDC"] = true
 MACHINES["PIC8259"] = true
 MACHINES["PIT68230"] = true
 MACHINES["PIT8253"] = true
@@ -807,10 +809,12 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"robotron",
 		"rockwell",
 		"roland",
+		"rolm",
 		"sage",
 		"samcoupe",
 		"samsung",
 		"sanyo",
+		"saturn",
 		"sega",
 		"sgi",
 		"sharp",
@@ -852,6 +856,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"ultratec",
 		"unisonic",
 		"unisys",
+		"usp",
 		"veb",
 		"vidbrain",
 		"videoton",
@@ -880,6 +885,7 @@ function createMESSProjects(_target, _subtarget, _name)
 	targetsubdir(_target .."_" .. _subtarget)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-" .. _target .."_" .. _subtarget .. "_" .._name))
+	addprojectflags()
 
 	includedirs {
 		MAME_DIR .. "src/osd",
@@ -2143,6 +2149,7 @@ files {
 	MAME_DIR .. "src/mame/machine/mm1kb.cpp",
 	MAME_DIR .. "src/mame/machine/mm1kb.h",
 	MAME_DIR .. "src/mame/video/mikromik.cpp",
+	MAME_DIR .. "src/mame/drivers/nokia_3310.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "northstar")
@@ -2356,12 +2363,22 @@ files {
 	MAME_DIR .. "src/mame/drivers/tb303.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "rolm")
+files {
+	MAME_DIR .. "src/mame/drivers/r9751.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "rockwell")
 files {
 	MAME_DIR .. "src/mame/drivers/aim65.cpp",
 	MAME_DIR .. "src/mame/includes/aim65.h",
 	MAME_DIR .. "src/mame/machine/aim65.cpp",
 	MAME_DIR .. "src/mame/drivers/aim65_40.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "saturn")
+files {
+	MAME_DIR .. "src/mame/drivers/st17xx.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "sage")
@@ -2424,10 +2441,10 @@ createMESSProjects(_target, _subtarget, "sgi")
 files {
 	MAME_DIR .. "src/mame/machine/sgi.cpp",
 	MAME_DIR .. "src/mame/machine/sgi.h",
-	MAME_DIR .. "src/mame/drivers/sgi_ip2.cpp",
-	MAME_DIR .. "src/mame/drivers/sgi_ip6.cpp",
-	MAME_DIR .. "src/mame/drivers/ip20.cpp",
-	MAME_DIR .. "src/mame/drivers/ip22.cpp",
+	MAME_DIR .. "src/mame/drivers/iris3130.cpp",
+	MAME_DIR .. "src/mame/drivers/4dpi.cpp",
+	MAME_DIR .. "src/mame/drivers/indigo.cpp",
+	MAME_DIR .. "src/mame/drivers/indy_indigo2.cpp",
 	MAME_DIR .. "src/mame/video/newport.cpp",
 	MAME_DIR .. "src/mame/video/newport.h",
 }
@@ -2633,6 +2650,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/tek405x.cpp",
 	MAME_DIR .. "src/mame/includes/tek405x.h",
 	MAME_DIR .. "src/mame/drivers/tek410x.cpp",
+	MAME_DIR .. "src/mame/drivers/tekxp33x.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "telenova")
@@ -2708,6 +2726,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/geneve.cpp",
 	MAME_DIR .. "src/mame/drivers/ticalc1x.cpp",
 	MAME_DIR .. "src/mame/drivers/tispeak.cpp",
+	MAME_DIR .. "src/mame/drivers/tispellb.cpp",
 	MAME_DIR .. "src/mame/drivers/ti74.cpp",
 	MAME_DIR .. "src/mame/drivers/ti85.cpp",
 	MAME_DIR .. "src/mame/includes/ti85.h",
@@ -2841,6 +2860,11 @@ files {
 createMESSProjects(_target, _subtarget, "unisys")
 files {
 	MAME_DIR .. "src/mame/drivers/univac.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "usp")
+files {
+    MAME_DIR .. "src/mame/drivers/patinho_feio.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "veb")
@@ -3116,6 +3140,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/sbrain.cpp",
 	MAME_DIR .. "src/mame/drivers/seattlecmp.cpp",
 	MAME_DIR .. "src/mame/drivers/sh4robot.cpp",
+	MAME_DIR .. "src/mame/drivers/sansa_fuze.cpp",
 	MAME_DIR .. "src/mame/drivers/softbox.cpp",
 	MAME_DIR .. "src/mame/includes/softbox.h",
 	MAME_DIR .. "src/mame/drivers/squale.cpp",

@@ -446,9 +446,8 @@ public:
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 
-	DECLARE_WRITE8_MEMBER(debug_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(avt);
 	UINT32 screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(avt_vblank_irq);
@@ -551,7 +550,7 @@ PALETTE_INIT_MEMBER(avt_state, avt)
 	int j;
 
 	/* 0000BGRI */
-	if (color_prom == 0) return;
+	if (color_prom == nullptr) return;
 
 	for (j = 0; j < palette.entries(); j++)
 	{

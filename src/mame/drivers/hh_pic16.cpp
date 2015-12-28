@@ -69,8 +69,8 @@ public:
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 
@@ -271,8 +271,6 @@ static MACHINE_CONFIG_START( maniac, maniac_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_maniac)
-
-	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -168,7 +168,7 @@ public:
 	optional_shared_ptr<UINT16> m_protection2;
 
 
-	UINT8 *  m_ddenlovr_pixmap[8];
+	std::unique_ptr<UINT8[]>  m_ddenlovr_pixmap[8];
 
 	/* blitter (TODO: merge with the dynax.h, where possible) */
 	int m_extra_layers;
@@ -461,7 +461,7 @@ VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
 
 	for (i = 0; i < 8; i++)
 	{
-		m_ddenlovr_pixmap[i] = auto_alloc_array(machine(), UINT8, 512 * 512);
+		m_ddenlovr_pixmap[i] = std::make_unique<UINT8[]>(512 * 512);
 		m_ddenlovr_scroll[i * 2 + 0] = m_ddenlovr_scroll[i * 2 + 1] = 0;
 	}
 
@@ -542,14 +542,14 @@ VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
 	save_item(NAME(m_ddenlovr_blit_pen_mask));
 	save_item(NAME(m_ddenlovr_blit_regs));
 
-	save_pointer(NAME(m_ddenlovr_pixmap[0]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[1]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[2]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[3]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[4]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[5]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[6]), 512 * 512);
-	save_pointer(NAME(m_ddenlovr_pixmap[7]), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[0].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[1].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[2].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[3].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[4].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[5].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[6].get()), 512 * 512);
+	save_pointer(NAME(m_ddenlovr_pixmap[7].get()), 512 * 512);
 }
 
 VIDEO_START_MEMBER(ddenlovr_state,mmpanic)
@@ -686,7 +686,7 @@ void ddenlovr_state::do_plot( int x, int y, int pen )
 }
 
 
-INLINE int fetch_bit( UINT8 *src_data, int src_len, int *bit_addr )
+static inline int fetch_bit( UINT8 *src_data, int src_len, int *bit_addr )
 {
 	const int baddrmask = 0x7ffffff;
 
@@ -705,7 +705,7 @@ INLINE int fetch_bit( UINT8 *src_data, int src_len, int *bit_addr )
 	return (src_data[baddr / 8] >> (7 - (baddr & 7))) & 1;
 }
 
-INLINE int fetch_word( UINT8 *src_data, int src_len, int *bit_addr, int word_len )
+static inline int fetch_word( UINT8 *src_data, int src_len, int *bit_addr, int word_len )
 {
 	int res = 0;
 
@@ -872,17 +872,17 @@ void ddenlovr_state::blit_rect_yh()
 		if (start + length > 512 * 512)
 			length = 512 * 512 - start;
 
-		if (m_ddenlovr_dest_layer & 0x0001) memset(m_ddenlovr_pixmap[0] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0002) memset(m_ddenlovr_pixmap[1] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0004) memset(m_ddenlovr_pixmap[2] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0008) memset(m_ddenlovr_pixmap[3] + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0001) memset(m_ddenlovr_pixmap[0].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0002) memset(m_ddenlovr_pixmap[1].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0004) memset(m_ddenlovr_pixmap[2].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0008) memset(m_ddenlovr_pixmap[3].get() + start, m_ddenlovr_blit_pen, length);
 
 		if (!m_extra_layers) return;
 
-		if (m_ddenlovr_dest_layer & 0x0100) memset(m_ddenlovr_pixmap[4] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0200) memset(m_ddenlovr_pixmap[5] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0400) memset(m_ddenlovr_pixmap[6] + start, m_ddenlovr_blit_pen, length);
-		if (m_ddenlovr_dest_layer & 0x0800) memset(m_ddenlovr_pixmap[7] + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0100) memset(m_ddenlovr_pixmap[4].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0200) memset(m_ddenlovr_pixmap[5].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0400) memset(m_ddenlovr_pixmap[6].get() + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0800) memset(m_ddenlovr_pixmap[7].get() + start, m_ddenlovr_blit_pen, length);
 	}
 }
 
@@ -905,17 +905,17 @@ void ddenlovr_state::blit_fill_xy( int x, int y )
 //      popmessage("FILL command X %03x Y %03x", x, y);
 #endif
 
-	if (m_ddenlovr_dest_layer & 0x0001) memset(m_ddenlovr_pixmap[0] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0002) memset(m_ddenlovr_pixmap[1] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0004) memset(m_ddenlovr_pixmap[2] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0008) memset(m_ddenlovr_pixmap[3] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0001) memset(m_ddenlovr_pixmap[0].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0002) memset(m_ddenlovr_pixmap[1].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0004) memset(m_ddenlovr_pixmap[2].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0008) memset(m_ddenlovr_pixmap[3].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
 
 	if (!m_extra_layers) return;
 
-	if (m_ddenlovr_dest_layer & 0x0100) memset(m_ddenlovr_pixmap[4] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0200) memset(m_ddenlovr_pixmap[5] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0400) memset(m_ddenlovr_pixmap[6] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (m_ddenlovr_dest_layer & 0x0800) memset(m_ddenlovr_pixmap[7] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0100) memset(m_ddenlovr_pixmap[4].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0200) memset(m_ddenlovr_pixmap[5].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0400) memset(m_ddenlovr_pixmap[6].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0800) memset(m_ddenlovr_pixmap[7].get() + start, m_ddenlovr_blit_pen, 512 * 512 - start);
 }
 
 
@@ -11614,13 +11614,13 @@ ROM_START( kotbinsp )
 	ROM_LOAD16_BYTE( "909033.6c", 0x200001, 0x080000, CRC(9388b85d) SHA1(a35fe0b585cba256bb5575f7b539b33dd0ca3aa0) )
 	ROM_FILL(                     0x300000, 0x100000, 0xff )
 	// mirror the whole address space (25 bits)
-	ROM_COPY( "blitter", 0, 0x0400000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x0800000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x0c00000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x1000000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x1400000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x1800000, 0x400000 )
-	ROM_COPY( "blitter", 0, 0x1c00000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x0400000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x0800000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x0c00000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x1000000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x1400000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x1800000, 0x400000 )
+	ROM_COPY( "blitter", 0x000000, 0x1c00000, 0x400000 )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "909031.1c", 0x00000, 0x80000, CRC(9f20a531) SHA1(1b43edd70c4c958cbbcd6c051ea6ba5e6fb41e77) )

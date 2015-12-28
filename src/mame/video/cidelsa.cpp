@@ -118,13 +118,13 @@ ADDRESS_MAP_END
 void cidelsa_state::video_start()
 {
 	// allocate memory
-	m_pcbram = auto_alloc_array_clear(machine(), UINT8, CIDELSA_CHARRAM_SIZE);
-	m_charram = auto_alloc_array_clear(machine(), UINT8, CIDELSA_CHARRAM_SIZE);
+	m_pcbram = make_unique_clear<UINT8[]>(CIDELSA_CHARRAM_SIZE);
+	m_charram = make_unique_clear<UINT8[]>(CIDELSA_CHARRAM_SIZE);
 
 	// register for state saving
 	save_item(NAME(m_cdp1869_pcb));
-	save_pointer(NAME(m_pcbram), CIDELSA_CHARRAM_SIZE);
-	save_pointer(NAME(m_charram), CIDELSA_CHARRAM_SIZE);
+	save_pointer(NAME(m_pcbram.get()), CIDELSA_CHARRAM_SIZE);
+	save_pointer(NAME(m_charram.get()), CIDELSA_CHARRAM_SIZE);
 }
 
 /* AY-3-8910 */

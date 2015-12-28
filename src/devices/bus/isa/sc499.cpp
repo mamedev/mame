@@ -321,7 +321,7 @@ sc499_device::sc499_device(const machine_config &mconfig, const char *tag, devic
 	m_iobase(*this, "IO_BASE"),
 	m_irqdrq(*this, "IRQ_DRQ"), m_data(0), m_command(0), m_status(0), m_control(0), m_has_cartridge(0), m_is_writable(0), m_current_command(0), m_first_block_hack(0), m_nasty_readahead(0), m_read_block_pending(0),
 	m_data_index(0), m_tape_status(0), m_data_error_counter(0), m_underrun_counter(0), m_tape_pos(0), m_ctape_block_count(0), m_ctape_block_index(0), m_image_length(0),
-	m_image(*this, SC499_CTAPE_TAG), irq_state(), dma_drq_state(), m_timer(nullptr), m_timer1(nullptr), m_timer_type(0), m_irq(0), m_drq(0), m_installed(false)
+	m_image(*this, SC499_CTAPE_TAG), irq_state(), dma_drq_state(), m_timer(nullptr), m_timer1(nullptr), m_irq(0), m_drq(0), m_installed(false)
 {
 }
 
@@ -340,12 +340,12 @@ void sc499_device::device_start()
 
 	LOG1(("start sc499"));
 
-	m_timer = timer_alloc(0, NULL);
-	m_timer1 = timer_alloc(1, NULL);
+	m_timer = timer_alloc(0, nullptr);
+	m_timer1 = timer_alloc(1, nullptr);
 
 	m_installed = false;
 
-	if (m_image->image_core_file() == NULL)
+	if (m_image->image_core_file() == nullptr)
 	{
 		LOG2(("start sc499: no cartridge tape"));
 	}
@@ -1085,7 +1085,7 @@ void sc499_device::eop_w(int state)
 
 UINT8 sc499_device::dack_r(int line)
 {
-	UINT8 data = 0xff;
+	UINT8 data;
 
 //  set_dma_drq(CLEAR_LINE);
 
@@ -1177,7 +1177,7 @@ void sc499_device::read_block()
 
 	tape = m_image->read_block(m_tape_pos);
 
-	if (tape == NULL)
+	if (tape == nullptr)
 	{
 		// either there is no tape or m_tape_pos goes beyond end-of-tape
 		m_status &= ~SC499_STAT_EXC;
@@ -1296,7 +1296,7 @@ UINT8 *sc499_ctape_image_device::read_block(int block_num)
 {
 	// access beyond end of tape cart
 	if (m_ctape_data.size() <= (block_num + 1) * SC499_CTAPE_BLOCK_SIZE)
-		return NULL;
+		return nullptr;
 	else
 		return &m_ctape_data[block_num * SC499_CTAPE_BLOCK_SIZE];
 }

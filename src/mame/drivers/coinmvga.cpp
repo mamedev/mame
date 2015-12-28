@@ -241,11 +241,9 @@ public:
 		m_palette2(*this, "palette2") { }
 
 	required_shared_ptr<UINT16> m_vram;
-	DECLARE_WRITE8_MEMBER(debug_w);
-	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_DRIVER_INIT(colorama);
 	DECLARE_DRIVER_INIT(cmrltv75);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_coinmvga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	required_device<cpu_device> m_maincpu;

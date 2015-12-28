@@ -149,8 +149,8 @@ public:
 	{
 	}
 
-	UINT32 *m_bios_ram;
-	UINT32 *m_bios_ext_ram;
+	std::unique_ptr<UINT32[]> m_bios_ram;
+	std::unique_ptr<UINT32[]> m_bios_ext_ram;
 	UINT8 m_mtxc_config_reg[256];
 	UINT8 m_piix4_config_reg[4][256];
 
@@ -168,8 +168,8 @@ public:
 	DECLARE_WRITE16_MEMBER(calchase_dac_r_w);
 	DECLARE_DRIVER_INIT(calchase);
 	DECLARE_DRIVER_INIT(hostinv);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void intel82439tx_init();
 	required_device<dac_device> m_dac_l;
 	required_device<dac_device> m_dac_r;
@@ -204,11 +204,11 @@ static void mtxc_config_w(device_t *busdevice, device_t *device, int function, i
 	if (reg == 0x63)
 	{
 		if (data & 0x20)        // enable RAM access to region 0xf0000 - 0xfffff
-			state->membank("bios_bank")->set_base(state->m_bios_ram);
+			state->membank("bios_bank")->set_base(state->m_bios_ram.get());
 		else                    // disable RAM access (reads go to BIOS ROM)
 			state->membank("bios_bank")->set_base(state->memregion("bios")->base() + 0x10000);
 		if (data & 0x80)        // enable RAM access to region 0xe0000 - 0xeffff
-			state->membank("bios_ext")->set_base(state->m_bios_ext_ram);
+			state->membank("bios_ext")->set_base(state->m_bios_ext_ram.get());
 		else
 			state->membank("bios_ext")->set_base(state->memregion("bios")->base() + 0);
 	}
@@ -339,7 +339,7 @@ WRITE32_MEMBER(calchase_state::bios_ram_w)
 {
 	if (m_mtxc_config_reg[0x63] & 0x10)       // write to RAM if this region is write-enabled
 	{
-		COMBINE_DATA(m_bios_ram + offset);
+		COMBINE_DATA(m_bios_ram.get() + offset);
 	}
 }
 
@@ -347,7 +347,7 @@ WRITE32_MEMBER(calchase_state::bios_ext_ram_w)
 {
 	if (m_mtxc_config_reg[0x63] & 0x40)       // write to RAM if this region is write-enabled
 	{
-		COMBINE_DATA(m_bios_ext_ram + offset);
+		COMBINE_DATA(m_bios_ext_ram.get() + offset);
 	}
 }
 
@@ -641,8 +641,8 @@ INPUT_PORTS_END
 
 void calchase_state::machine_start()
 {
-	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
-	m_bios_ext_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
+	m_bios_ram = std::make_unique<UINT32[]>(0x10000/4);
+	m_bios_ext_ram = std::make_unique<UINT32[]>(0x10000/4);
 }
 
 void calchase_state::machine_reset()
@@ -660,12 +660,12 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
@@ -691,12 +691,12 @@ static MACHINE_CONFIG_START( hostinv, calchase_state )
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "cdrom", NULL, true)
+	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "cdrom", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
@@ -725,7 +725,7 @@ WRITE32_MEMBER(calchase_state::calchase_idle_skip_w)
 
 DRIVER_INIT_MEMBER(calchase_state,calchase)
 {
-	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x20000/4);
+	m_bios_ram = std::make_unique<UINT32[]>(0x20000/4);
 
 	intel82439tx_init();
 
@@ -734,7 +734,7 @@ DRIVER_INIT_MEMBER(calchase_state,calchase)
 
 DRIVER_INIT_MEMBER(calchase_state, hostinv)
 {
-	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x20000/4);
+	m_bios_ram = std::make_unique<UINT32[]>(0x20000/4);
 
 	intel82439tx_init();
 }

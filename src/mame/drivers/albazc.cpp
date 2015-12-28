@@ -37,7 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hanaroku_out_1_w);
 	DECLARE_WRITE8_MEMBER(hanaroku_out_2_w);
 	DECLARE_WRITE8_MEMBER(albazc_vregs_w);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(albazc);
 	UINT32 screen_update_hanaroku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

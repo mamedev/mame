@@ -140,8 +140,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( cts_r ) { return m_cts; }
 
 protected:
-	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 	int m_rxd;
 	int m_dcd;

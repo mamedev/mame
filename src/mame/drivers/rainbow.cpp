@@ -377,7 +377,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 private:
 	enum
@@ -461,7 +461,7 @@ private:
 	UINT8 m_z80_mailbox, m_8088_mailbox;
 
 	void update_kbd_irq();
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	int m_unit;
 	floppy_image_device *m_floppy;
@@ -893,7 +893,7 @@ void rainbow_state::machine_reset()
 	//  *********** FLOPPY DISK CONTROLLER
 	m_unit = INVALID_DRIVE;
 	m_fdc->reset();
-	m_fdc->set_floppy(NULL);
+	m_fdc->set_floppy(nullptr);
 	m_fdc->dden_w(0);
 
 	m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -1150,19 +1150,19 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 	m_hdc_drive_ready = false;
 
 	if (m_inp5->read() != 0x01) // ...PRESENT?
-		return NULL;
+		return nullptr;
 
 	if (drv != 0)
-		return NULL;
+		return nullptr;
 
-	harddisk_image_device *img = NULL;
+	harddisk_image_device *img = nullptr;
 	img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("harddisk1").c_str()));
 
 	if (!img)
-		return NULL;
+		return nullptr;
 
 	if (!img->exists())
-		return NULL;
+		return nullptr;
 
 	hard_disk_file *file = img->get_hard_disk_file();
 	hard_disk_info *info = hard_disk_get_info(file);
@@ -1184,14 +1184,14 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 			info->heads, info->cylinders, info->sectors, info->sectorbytes);
 
 		printf("\n <<< === REJECTED = (SANITY CHECK FAILED) === >>> \n");
-		return NULL;
+		return nullptr;
 	}
 }
 
 // LBA sector from CHS
 static UINT32 get_and_print_lbasector(device_t *device,hard_disk_info *info, UINT16 cylinder, UINT8 head, UINT8 sector_number)
 {
-	if (info == NULL)
+	if (info == nullptr)
 		return 0;
 
 	// LBA_ADDRESS = (C * HEADS + H) * NUMBER_SECTORS + (S - 1)
@@ -1296,7 +1296,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_write_sector)
 		output_set_value("led1", 0);  // (1 = OFF ) =HARD DISK ACTIVITY =
 		MOTOR_DISABLE_counter = 20;
 
-		if (rainbow_hdc_file(0) != NULL)
+		if (rainbow_hdc_file(0) != nullptr)
 		{
 			success = do_write_sector();
 			if (success < 88)
@@ -1428,7 +1428,7 @@ READ8_MEMBER(rainbow_state::hd_status_68_r)
 {
 	// (*) Bits 5-7 : HARD WIRED IDENTIFICATION BITS, bits 5+7 = 1 and bit 6 = 0  (= 101 f?r RD51 module)
 	int data = 0xe0; // 111 gives DRIVE NOT READY (when W is pressed on boot screen)
-	if ((m_inp5->read() == 0x01) && (rainbow_hdc_file(0) != NULL))
+	if ((m_inp5->read() == 0x01) && (rainbow_hdc_file(0) != nullptr))
 		data = 0xa0; // A0 : OK, DRIVE IS READY (!)
 
 	int my_offset = 0x07;
@@ -1955,7 +1955,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	else
 		drive = data & 3;
 
-	floppy_connector *con = NULL;
+	floppy_connector *con = nullptr;
 	if (drive < MAX_FLOPPIES)
 		con = machine().device<floppy_connector>(names[drive]);
 
@@ -1971,15 +1971,15 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	{
 		printf("(m_unit = %i)   ** SELECTED DRIVE ** INVALID. (selected drive = %i)\n", m_unit, selected_drive);
 		m_unit = INVALID_DRIVE;
-		m_floppy = NULL;
+		m_floppy = nullptr;
 	}
 
-	if (m_floppy != NULL)
+	if (m_floppy != nullptr)
 	{
 		m_fdc->set_floppy(m_floppy);  // Sets new  _image device_
 		if (!m_floppy->exists())
 		{
-			m_floppy = NULL;
+			m_floppy = nullptr;
 			printf("(m_unit = %i) SELECTED IMAGE *** DOES NOT EXIST *** (selected drive = %i)\n", m_unit, selected_drive);
 			selected_drive = INVALID_DRIVE;
 			//m_unit = INVALID_DRIVE;

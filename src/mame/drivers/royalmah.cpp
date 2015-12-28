@@ -119,7 +119,7 @@ public:
 	UINT8 m_dsw_select;
 	UINT8 m_rombank;
 	int m_palette_base;
-	UINT8 *m_janptr96_nvram;
+	std::unique_ptr<UINT8[]> m_janptr96_nvram;
 	UINT8 m_suzume_bank;
 	UINT8 m_gfx_adr_l;
 	UINT8 m_gfx_adr_m;
@@ -883,7 +883,7 @@ WRITE8_MEMBER(royalmah_state::janptr96_rombank_w)
 
 WRITE8_MEMBER(royalmah_state::janptr96_rambank_w)
 {
-	membank("bank2")->set_base(m_janptr96_nvram + 0x1000 + 0x1000 * data);
+	membank("bank2")->set_base(m_janptr96_nvram.get() + 0x1000 + 0x1000 * data);
 }
 
 READ8_MEMBER(royalmah_state::janptr96_unknown_r)
@@ -4901,9 +4901,9 @@ DRIVER_INIT_MEMBER(royalmah_state,ippatsu)
 
 DRIVER_INIT_MEMBER(royalmah_state,janptr96)
 {
-	m_janptr96_nvram = auto_alloc_array(machine(), UINT8, 0x1000 * 9);
-	membank("bank3")->set_base(m_janptr96_nvram);
-	machine().device<nvram_device>("nvram")->set_base(m_janptr96_nvram, 0x1000 * 9);
+	m_janptr96_nvram = std::make_unique<UINT8[]>(0x1000 * 9);
+	membank("bank3")->set_base(m_janptr96_nvram.get());
+	machine().device<nvram_device>("nvram")->set_base(m_janptr96_nvram.get(), 0x1000 * 9);
 }
 
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, driver_device,  0,        ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )

@@ -23,8 +23,8 @@ class gromport_device : public bus8z_device, public device_slot_interface
 {
 public:
 	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(crureadz);
 	DECLARE_WRITE8_MEMBER(cruwrite);
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
@@ -38,10 +38,10 @@ public:
 	UINT16  get_grom_mask() { return m_grommask; }
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_config_complete();
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_config_complete() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	ti99_cartridge_connector_device*    m_connector;
@@ -74,41 +74,41 @@ class ti99_cartridge_device : public bus8z_device, public device_image_interface
 public:
 	ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(crureadz);
 	DECLARE_WRITE8_MEMBER(cruwrite);
 
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
-	bool    is_available() { return m_pcb != NULL; }
+	bool    is_available() { return m_pcb != nullptr; }
 	bool    has_grom();
 	void    set_slot(int i);
 	UINT16  grom_base();
 	UINT16  grom_mask();
 
 protected:
-	virtual void device_start() { };
-	virtual void device_config_complete();
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry* device_rom_region() const;
+	virtual void device_start() override { };
+	virtual void device_config_complete() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry* device_rom_region() const override;
 
 	// Image handling: implementation of methods which are abstract in the parent
-	bool call_load();
-	void call_unload();
-	bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
+	bool call_load() override;
+	void call_unload() override;
+	bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
 
 	void prepare_cartridge();
 
 	// device_image_interface
-	iodevice_t image_type() const { return IO_CARTSLOT; }
-	bool is_readable()  const           { return true; }
-	bool is_writeable() const           { return false; }
-	bool is_creatable() const           { return false; }
-	bool must_be_loaded() const         { return false; }
-	bool is_reset_on_load() const       { return false; }
-	const char *image_interface() const { return "ti99_cart"; }
-	const char *file_extensions() const { return "rpk"; }
-	const option_guide *create_option_guide() const { return NULL; }
+	iodevice_t image_type() const override { return IO_CARTSLOT; }
+	bool is_readable()  const override           { return true; }
+	bool is_writeable() const override           { return false; }
+	bool is_creatable() const override           { return false; }
+	bool must_be_loaded() const override         { return false; }
+	bool is_reset_on_load() const override       { return false; }
+	const char *image_interface() const override { return "ti99_cart"; }
+	const char *file_extensions() const override { return "rpk"; }
+	const option_guide *create_option_guide() const override { return nullptr; }
 
 private:
 	bool    m_softlist;
@@ -131,8 +131,8 @@ extern const device_type TI99CART;
 class ti99_cartridge_connector_device : public bus8z_device
 {
 public:
-	virtual DECLARE_READ8Z_MEMBER(readz) =0;
-	virtual DECLARE_WRITE8_MEMBER(write) =0;
+	virtual DECLARE_READ8Z_MEMBER(readz) override =0;
+	virtual DECLARE_WRITE8_MEMBER(write) override =0;
 	virtual DECLARE_READ8Z_MEMBER(crureadz) = 0;
 	virtual DECLARE_WRITE8_MEMBER(cruwrite) = 0;
 
@@ -145,7 +145,7 @@ public:
 
 protected:
 	ti99_cartridge_connector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	virtual void device_config_complete();
+	virtual void device_config_complete() override;
 
 	gromport_device*    m_gromport;
 };
@@ -158,15 +158,15 @@ class single_conn_device : public ti99_cartridge_connector_device
 public:
 	single_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	ti99_cartridge_device *m_cartridge;
@@ -186,19 +186,19 @@ class multi_conn_device : public ti99_cartridge_connector_device
 public:
 	multi_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
-	void insert(int index, ti99_cartridge_device* cart);
-	void remove(int index);
+	void insert(int index, ti99_cartridge_device* cart) override;
+	void remove(int index) override;
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	int     m_active_slot;
@@ -208,7 +208,6 @@ private:
 
 	void    set_slot(int slotnumber);
 	int     get_active_slot(bool changebase, offs_t offset);
-	void    change_slot(bool inserted, int index);
 };
 
 /*
@@ -219,27 +218,27 @@ class gkracker_device : public ti99_cartridge_connector_device, public device_nv
 public:
 	gkracker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 
-	void insert(int index, ti99_cartridge_device* cart);
-	void remove(int index);
+	void insert(int index, ti99_cartridge_device* cart) override;
+	void remove(int index) override;
 	DECLARE_INPUT_CHANGED_MEMBER( gk_changed );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry* device_rom_region() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const rom_entry* device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device_nvram_interface
-	void nvram_default();
-	void nvram_read(emu_file &file);
-	void nvram_write(emu_file &file);
+	void nvram_default() override;
+	void nvram_read(emu_file &file) override;
+	void nvram_write(emu_file &file) override;
 
 private:
 	int     m_gk_switch[6];         // Used to cache the switch settings.
@@ -298,7 +297,6 @@ protected:
 	int                 m_grom_address; // for gromemu
 	int                 m_ram_page;     // for super
 	const char*         m_tag;
-private:
 };
 
 /******************** Standard cartridge ******************************/
@@ -315,8 +313,8 @@ class ti99_paged_cartridge : public ti99_cartridge_pcb
 {
 public:
 	~ti99_paged_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 };
 
 /********************** Mini Memory ***********************************/
@@ -325,8 +323,8 @@ class ti99_minimem_cartridge : public ti99_cartridge_pcb
 {
 public:
 	~ti99_minimem_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 };
 
 /********************* Super Space II *********************************/
@@ -335,10 +333,10 @@ class ti99_super_cartridge : public ti99_cartridge_pcb
 {
 public:
 	~ti99_super_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 };
 
 /************************* MBX  ***************************************/
@@ -347,8 +345,8 @@ class ti99_mbx_cartridge : public ti99_cartridge_pcb
 {
 public:
 	~ti99_mbx_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 };
 
 /********************** Paged 379i ************************************/
@@ -357,8 +355,8 @@ class ti99_paged379i_cartridge : public ti99_cartridge_pcb
 {
 public:
 	~ti99_paged379i_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 private:
 	int     get_paged379i_bank(int rompage);
 };
@@ -369,10 +367,8 @@ class ti99_paged378_cartridge : public ti99_cartridge_pcb
 {
 public:
 	~ti99_paged378_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-private:
-	int     get_paged378_bank(int rompage);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 };
 
 /********************** Paged 377 ************************************/
@@ -381,10 +377,8 @@ class ti99_paged377_cartridge : public ti99_cartridge_pcb
 {
 public:
 	~ti99_paged377_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-private:
-	int     get_paged377_bank(int rompage);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 };
 
 /********************** Paged CRU  ************************************/
@@ -393,10 +387,10 @@ class ti99_pagedcru_cartridge : public ti99_cartridge_pcb
 {
 public:
 	~ti99_pagedcru_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
+	DECLARE_READ8Z_MEMBER(crureadz) override;
+	DECLARE_WRITE8_MEMBER(cruwrite) override;
 };
 
 /********************** GROM emulation cartridge  ************************************/
@@ -407,8 +401,8 @@ public:
 	ti99_gromemu_cartridge(): m_waddr_LSB(false)
 	{  m_grom_address = 0; }
 	~ti99_gromemu_cartridge() { };
-	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(readz) override;
+	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(gromemureadz);
 	DECLARE_WRITE8_MEMBER(gromemuwrite);
 private:
@@ -439,9 +433,9 @@ public:
 	const char*     id() { return m_id; }
 	int             get_content_length() { return m_length; }
 	UINT8*          get_contents() { return m_contents; }
-	bool            persistent_ram() { return m_pathname != NULL; }
+	bool            persistent_ram() { return m_pathname != nullptr; }
 	const char*     get_pathname() { return m_pathname; }
-	void            cleanup() { if (m_contents != NULL) global_free_array(m_contents); }
+	void            cleanup() { if (m_contents != nullptr) global_free_array(m_contents); }
 
 private:
 	const char*     m_id;
@@ -530,12 +524,12 @@ static const char error_text[16][30] =
 class rpk_exception
 {
 public:
-	rpk_exception(rpk_open_error value): m_err(value), m_detail(NULL) { };
+	rpk_exception(rpk_open_error value): m_err(value), m_detail(nullptr) { };
 	rpk_exception(rpk_open_error value, const char* detail): m_err(value), m_detail(detail) { };
 
 	const char* to_string()
 	{
-		if (m_detail==NULL) return error_text[(int)m_err];
+		if (m_detail==nullptr) return error_text[(int)m_err];
 		std::string errormsg = std::string(error_text[(int)m_err]).append(": ").append(m_detail);
 		return core_strdup(errormsg.c_str());
 	}

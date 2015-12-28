@@ -63,8 +63,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irst_w);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// status

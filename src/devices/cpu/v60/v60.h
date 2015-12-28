@@ -91,27 +91,27 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 1; }
-	virtual UINT32 execute_input_lines() const { return 1; }
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state);
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 1; }
+	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 22; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 22; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 private:
 	typedef UINT32 (v60_device::*am_func)();
@@ -151,7 +151,6 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	offs_t              m_fetch_xor;
 	offs_t              m_start_pc;
 	UINT32              m_reg[68];
 	struct {
@@ -286,8 +285,6 @@ private:
 	UINT32 bam1Error1();
 	UINT32 am1Error2();
 	UINT32 bam1Error2();
-	UINT32 am1Error3();
-	UINT32 bam1Error3();
 	UINT32 am1Error4();
 	UINT32 bam1Error4();
 	UINT32 am1Error5();
@@ -380,12 +377,10 @@ private:
 	UINT32 am2ImmediateQuick();
 	UINT32 am2Error1();
 	UINT32 am2Error2();
-	UINT32 am2Error3();
 	UINT32 am2Error4();
 	UINT32 am2Error5();
 	UINT32 bam2Error1();
 	UINT32 bam2Error2();
-	UINT32 bam2Error3();
 	UINT32 bam2Error4();
 	UINT32 bam2Error5();
 	UINT32 bam2Error6();
@@ -438,7 +433,6 @@ private:
 	UINT32 am3ImmediateQuick();
 	UINT32 am3Error1();
 	UINT32 am3Error2();
-	UINT32 am3Error3();
 	UINT32 am3Error4();
 	UINT32 am3Error5();
 	UINT32 am3Group7a();
@@ -783,7 +777,7 @@ public:
 	v70_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 };
 
 

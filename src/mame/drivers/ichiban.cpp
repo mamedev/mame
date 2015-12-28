@@ -56,13 +56,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	DECLARE_WRITE8_MEMBER( bank_w );
 };
 
 void ichibanjyan_state::video_start()

@@ -105,7 +105,7 @@ void real_profiler_state::reset(bool enabled)
 	else
 	{
 		// magic value to indicate disabled
-		m_filoptr = NULL;
+		m_filoptr = nullptr;
 	}
 }
 
@@ -212,10 +212,10 @@ void real_profiler_state::update_text(running_machine &machine)
 			if (curtype >= PROFILER_DEVICE_FIRST && curtype <= PROFILER_DEVICE_MAX)
 				strcatprintf(m_text, "'%s'", iter.byindex(curtype - PROFILER_DEVICE_FIRST)->tag());
 			else
-				for (int nameindex = 0; nameindex < ARRAY_LENGTH(names); nameindex++)
-					if (names[nameindex].type == curtype)
+				for (auto & name : names)
+					if (name.type == curtype)
 					{
-						m_text.append(names[nameindex].string);
+						m_text.append(name.string);
 						break;
 					}
 

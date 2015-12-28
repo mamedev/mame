@@ -85,7 +85,7 @@ public:
 	int          m_spriteram_bank[4];
 	int          m_spriteram_bank_delay[4];
 
-	UINT16       *m_palette_map[4];
+	std::unique_ptr<UINT16[]>      m_palette_map[4];
 
 	int          m_layers_offs_x;
 	int          m_layers_offs_y;
@@ -161,7 +161,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sailormn_rombank_w);
 	DECLARE_WRITE8_MEMBER(sailormn_okibank_w);
 	DECLARE_WRITE8_MEMBER(sailormn_oki2bank_w);
-	DECLARE_WRITE16_MEMBER(donpachi_videoregs_w);
 	DECLARE_WRITE16_MEMBER(cave_vram_0_w);
 	DECLARE_WRITE16_MEMBER(cave_vram_1_w);
 	DECLARE_WRITE16_MEMBER(cave_vram_2_w);

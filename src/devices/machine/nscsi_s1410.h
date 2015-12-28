@@ -62,11 +62,11 @@ protected:
 		SC_WRITE_LONG           = 0xe6
 	};
 
-	virtual void device_reset();
+	virtual void device_reset() override;
 
-	virtual void scsi_command();
-	virtual UINT8 scsi_get_data(int id, int pos);
-	virtual void scsi_put_data(int buf, int offset, UINT8 data);
+	virtual void scsi_command() override;
+	virtual UINT8 scsi_get_data(int id, int pos) override;
+	virtual void scsi_put_data(int buf, int offset, UINT8 data) override;
 
 	UINT8 params[8];
 };

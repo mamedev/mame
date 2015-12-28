@@ -135,7 +135,7 @@ template<typename _src_type, typename _dest_type, typename _op, int _len_div>
 struct blit_texcopy : public blit_base
 {
 	blit_texcopy() : blit_base(sizeof(_dest_type) / _len_div, false, false) { }
-	void texop(const texture_info *texture, const render_texinfo *texsource) const
+	void texop(const texture_info *texture, const render_texinfo *texsource) const override
 	{
 		ATTR_UNUSED const rgb_t *palbase = texsource->palette;
 		int x, y;
@@ -162,7 +162,7 @@ template<typename _src_type, typename _dest_type, typename _op>
 struct blit_texrot : public blit_base
 {
 	blit_texrot() : blit_base(sizeof(_dest_type), true, false) { }
-	void texop(const texture_info *texture, const render_texinfo *texsource) const
+	void texop(const texture_info *texture, const render_texinfo *texsource) const override
 	{
 		ATTR_UNUSED const rgb_t *palbase = texsource->palette;
 		int x, y;
@@ -195,7 +195,7 @@ template<typename _src_type, typename _dest_type>
 struct blit_texpass : public blit_base
 {
 	blit_texpass() : blit_base(sizeof(_dest_type), false, true) { }
-	void texop(const texture_info *texture, const render_texinfo *texsource) const
+	void texop(const texture_info *texture, const render_texinfo *texsource) const override
 	{
 	}
 };

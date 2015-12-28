@@ -40,8 +40,8 @@ public:
 			m_roller_y(*this, "ROLLER_Y")
 	{ }
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( cart_r );
 	DECLARE_READ8_MEMBER( paddle_1_r );

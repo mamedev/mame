@@ -62,13 +62,13 @@ void esripsys_state::video_start()
 	int i;
 
 	/* Allocate memory for the two 512-pixel line buffers */
-	line_buffer[0].colour_buf = auto_alloc_array(machine(), UINT8, 512);
-	line_buffer[0].intensity_buf = auto_alloc_array(machine(), UINT8, 512);
-	line_buffer[0].priority_buf = auto_alloc_array(machine(), UINT8, 512);
+	line_buffer[0].colour_buf = std::make_unique<UINT8[]>(512);
+	line_buffer[0].intensity_buf = std::make_unique<UINT8[]>(512);
+	line_buffer[0].priority_buf = std::make_unique<UINT8[]>(512);
 
-	line_buffer[1].colour_buf = auto_alloc_array(machine(), UINT8, 512);
-	line_buffer[1].intensity_buf = auto_alloc_array(machine(), UINT8, 512);
-	line_buffer[1].priority_buf = auto_alloc_array(machine(), UINT8, 512);
+	line_buffer[1].colour_buf = std::make_unique<UINT8[]>(512);
+	line_buffer[1].intensity_buf = std::make_unique<UINT8[]>(512);
+	line_buffer[1].priority_buf = std::make_unique<UINT8[]>(512);
 
 	/* Create and initialise the HBLANK timers */
 	m_hblank_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(esripsys_state::hblank_start_callback),this));
@@ -76,7 +76,7 @@ void esripsys_state::video_start()
 	m_hblank_start_timer->adjust(m_screen->time_until_pos(0, ESRIPSYS_HBLANK_START));
 
 	/* Create the sprite scaling table */
-	m_scale_table = auto_alloc_array(machine(), UINT8, 64 * 64);
+	m_scale_table = std::make_unique<UINT8[]>(64 * 64);
 
 	for (i = 0; i < 64; ++i)
 	{
@@ -109,7 +109,7 @@ void esripsys_state::video_start()
 	}
 
 	/* Now create a lookup table for scaling the sprite 'fig' value */
-	m_fig_scale_table = auto_alloc_array(machine(), UINT8, 1024 * 64);
+	m_fig_scale_table = std::make_unique<UINT8[]>(1024 * 64);
 
 	for (i = 0; i < 1024; ++i)
 	{
@@ -133,13 +133,13 @@ void esripsys_state::video_start()
 	}
 
 	/* Register stuff for state saving */
-	save_pointer(NAME(line_buffer[0].colour_buf), 512);
-	save_pointer(NAME(line_buffer[0].intensity_buf), 512);
-	save_pointer(NAME(line_buffer[0].priority_buf), 512);
+	save_pointer(NAME(line_buffer[0].colour_buf.get()), 512);
+	save_pointer(NAME(line_buffer[0].intensity_buf.get()), 512);
+	save_pointer(NAME(line_buffer[0].priority_buf.get()), 512);
 
-	save_pointer(NAME(line_buffer[1].colour_buf), 512);
-	save_pointer(NAME(line_buffer[1].intensity_buf), 512);
-	save_pointer(NAME(line_buffer[1].priority_buf), 512);
+	save_pointer(NAME(line_buffer[1].colour_buf.get()), 512);
+	save_pointer(NAME(line_buffer[1].intensity_buf.get()), 512);
+	save_pointer(NAME(line_buffer[1].priority_buf.get()), 512);
 
 	save_item(NAME(m_video_firq));
 	save_item(NAME(m_bg_intensity));
@@ -154,9 +154,9 @@ UINT32 esripsys_state::screen_update_esripsys(screen_device &screen, bitmap_rgb3
 	struct line_buffer_t *line_buffer = m_line_buffer;
 	int x, y;
 
-	UINT8 *colour_buf = line_buffer[m_12sel ? 0 : 1].colour_buf;
-	UINT8 *intensity_buf = line_buffer[m_12sel ? 0 : 1].intensity_buf;
-	UINT8 *priority_buf = line_buffer[m_12sel ? 0 : 1].priority_buf;
+	UINT8 *colour_buf = line_buffer[m_12sel ? 0 : 1].colour_buf.get();
+	UINT8 *intensity_buf = line_buffer[m_12sel ? 0 : 1].intensity_buf.get();
+	UINT8 *priority_buf = line_buffer[m_12sel ? 0 : 1].priority_buf.get();
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
@@ -191,9 +191,9 @@ WRITE8_MEMBER(esripsys_state::esripsys_bg_intensity_w)
 ESRIP_DRAW(esripsys_state::esripsys_draw )
 {
 	struct line_buffer_t *line_buffer = m_line_buffer;
-	UINT8 *colour_buf = line_buffer[m_12sel ? 1 : 0].colour_buf;
-	UINT8 *intensity_buf = line_buffer[m_12sel ? 1 : 0].intensity_buf;
-	UINT8 *priority_buf = line_buffer[m_12sel ? 1 : 0].priority_buf;
+	UINT8 *colour_buf = line_buffer[m_12sel ? 1 : 0].colour_buf.get();
+	UINT8 *intensity_buf = line_buffer[m_12sel ? 1 : 0].intensity_buf.get();
+	UINT8 *priority_buf = line_buffer[m_12sel ? 1 : 0].priority_buf.get();
 
 	UINT8 pri = attr & 0xff;
 	UINT8 iny = (attr >> 8) & 0xf;

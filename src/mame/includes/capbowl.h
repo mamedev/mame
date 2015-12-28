@@ -58,8 +58,8 @@ public:
 	DECLARE_READ8_MEMBER(bowlrama_blitter_r);
 
 	DECLARE_DRIVER_INIT(capbowl);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(update);
@@ -68,5 +68,5 @@ public:
 	inline rgb_t pen_for_pixel( UINT8 *src, UINT8 pix );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

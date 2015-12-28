@@ -66,12 +66,12 @@ public:
 	}
 	virtual ~sound_direct_sound() { }
 
-	virtual int init(osd_options const &options);
-	virtual void exit();
+	virtual int init(osd_options const &options) override;
+	virtual void exit() override;
 
 	// sound_module
-	virtual void update_audio_stream(bool is_throttled, INT16 const *buffer, int samples_this_frame);
-	virtual void set_mastervolume(int attenuation);
+	virtual void update_audio_stream(bool is_throttled, INT16 const *buffer, int samples_this_frame) override;
+	virtual void set_mastervolume(int attenuation) override;
 
 private:
 	class buffer

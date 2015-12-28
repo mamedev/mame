@@ -113,9 +113,9 @@ public:
 	DECLARE_WRITE64_MEMBER(area4_w);
 	DECLARE_READ64_MEMBER(ioport_r);
 	DECLARE_WRITE64_MEMBER(ioport_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline UINT32 decode64_32(offs_t offset64, UINT64 data, UINT64 mem_mask, offs_t &offset32);
 	void logbinary(UINT32 data,int high,int low);
@@ -137,8 +137,8 @@ public:
 	smashdrv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atvtrack_state(mconfig, type, tag) { }
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 void atvtrack_state::logbinary(UINT32 data,int high=31,int low=0)

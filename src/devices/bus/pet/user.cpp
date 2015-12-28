@@ -34,7 +34,7 @@ pet_user_port_device::pet_user_port_device(const machine_config &mconfig, const 
 	m_k_handler(*this),
 	m_l_handler(*this),
 	m_m_handler(*this),
-	m_card(NULL)
+	m_card(nullptr)
 {
 }
 
@@ -85,25 +85,25 @@ void pet_user_port_device::device_start()
 	m_m_handler(1);
 }
 
-WRITE_LINE_MEMBER( pet_user_port_device::write_2 ) { if (m_card != NULL) m_card->input_2(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_3 ) { if (m_card != NULL) m_card->input_3(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_4 ) { if (m_card != NULL) m_card->input_4(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_5 ) { if (m_card != NULL) m_card->input_5(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_6 ) { if (m_card != NULL) m_card->input_6(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_7 ) { if (m_card != NULL) m_card->input_7(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_8 ) { if (m_card != NULL) m_card->input_8(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_9 ) { if (m_card != NULL) m_card->input_9(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_10 ) { if (m_card != NULL) m_card->input_10(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_b ) { if (m_card != NULL) m_card->input_b(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_c ) { if (m_card != NULL) m_card->input_c(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_d ) { if (m_card != NULL) m_card->input_d(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_e ) { if (m_card != NULL) m_card->input_e(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_f ) { if (m_card != NULL) m_card->input_f(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_h ) { if (m_card != NULL) m_card->input_h(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_j ) { if (m_card != NULL) m_card->input_j(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_k ) { if (m_card != NULL) m_card->input_k(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_l ) { if (m_card != NULL) m_card->input_l(state); }
-WRITE_LINE_MEMBER( pet_user_port_device::write_m ) { if (m_card != NULL) m_card->input_m(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_2 ) { if (m_card != nullptr) m_card->input_2(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_3 ) { if (m_card != nullptr) m_card->input_3(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_4 ) { if (m_card != nullptr) m_card->input_4(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_5 ) { if (m_card != nullptr) m_card->input_5(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_6 ) { if (m_card != nullptr) m_card->input_6(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_7 ) { if (m_card != nullptr) m_card->input_7(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_8 ) { if (m_card != nullptr) m_card->input_8(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_9 ) { if (m_card != nullptr) m_card->input_9(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_10 ) { if (m_card != nullptr) m_card->input_10(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_b ) { if (m_card != nullptr) m_card->input_b(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_c ) { if (m_card != nullptr) m_card->input_c(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_d ) { if (m_card != nullptr) m_card->input_d(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_e ) { if (m_card != nullptr) m_card->input_e(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_f ) { if (m_card != nullptr) m_card->input_f(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_h ) { if (m_card != nullptr) m_card->input_h(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_j ) { if (m_card != nullptr) m_card->input_j(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_k ) { if (m_card != nullptr) m_card->input_k(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_l ) { if (m_card != nullptr) m_card->input_l(state); }
+WRITE_LINE_MEMBER( pet_user_port_device::write_m ) { if (m_card != nullptr) m_card->input_m(state); }
 
 
 // class device_pet_user_port_interface

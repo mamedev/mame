@@ -408,7 +408,7 @@ void arm7_cpu_device::HandleMemSingle(UINT32 insn)
 	if (insn & INSN_I)
 	{
 		/* Register Shift */
-		off = decodeShift(insn, NULL);
+		off = decodeShift(insn, nullptr);
 	}
 	else
 	{
@@ -637,7 +637,7 @@ void arm7_cpu_device::HandleHalfWordDT(UINT32 insn)
 		// Signed?
 		if (insn & 0x40)
 		{
-			UINT32 newval = 0;
+			UINT32 newval;
 
 			// Signed Half Word?
 			if (insn & 0x20) {
@@ -822,7 +822,7 @@ void arm7_cpu_device::HandleSwap(UINT32 insn)
 void arm7_cpu_device::HandlePSRTransfer(UINT32 insn)
 {
 	int reg = (insn & 0x400000) ? SPSR : eCPSR; // Either CPSR or SPSR
-	UINT32 newval, val = 0;
+	UINT32 newval, val;
 	int oldmode = GET_CPSR & MODE_FLAG;
 
 	// get old value of CPSR/SPSR
@@ -956,7 +956,7 @@ void arm7_cpu_device::HandleALU(UINT32 insn)
 	/* Op2 = Register Value */
 	else
 	{
-		op2 = decodeShift(insn, (insn & INSN_S) ? &sc : NULL);
+		op2 = decodeShift(insn, (insn & INSN_S) ? &sc : nullptr);
 
 		// LD TODO sc will always be 0 if this applies
 		if (!(insn & INSN_S))
@@ -1195,7 +1195,7 @@ void arm7_cpu_device::HandleSMulLong(UINT32 insn)
 {
 	INT32 rm, rs;
 	UINT32 rhi, rlo;
-	INT64 res = 0;
+	INT64 res;
 
 	// MULL takes 1S + (m+1)I and MLAL 1S + (m+2)I cycles to execute, where m is the
 	// number of 8 bit multiplier array cycles required to complete the multiply, which is
@@ -1247,7 +1247,7 @@ void arm7_cpu_device::HandleUMulLong(UINT32 insn)
 {
 	UINT32 rm, rs;
 	UINT32 rhi, rlo;
-	UINT64 res = 0;
+	UINT64 res;
 
 	// MULL takes 1S + (m+1)I and MLAL 1S + (m+2)I cycles to execute, where m is the
 	// number of 8 bit multiplier array cycles required to complete the multiply, which is

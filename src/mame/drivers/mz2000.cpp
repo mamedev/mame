@@ -41,7 +41,7 @@ public:
 	mz2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cass(*this, "cassette"),
-		m_floppy(NULL),
+		m_floppy(nullptr),
 		m_maincpu(*this, "maincpu"),
 		m_mb8877a(*this, "mb8877a"),
 		m_floppy0(*this, "mb8877a:0"),
@@ -112,8 +112,8 @@ public:
 	DECLARE_WRITE8_MEMBER(timer_w);
 	DECLARE_WRITE8_MEMBER(mz2000_tvram_attr_w);
 	DECLARE_WRITE8_MEMBER(mz2000_gvram_mask_w);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_mz2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(fdc_w);
@@ -635,7 +635,7 @@ READ8_MEMBER(mz2000_state::mz2000_portb_r)
 	*/
 	UINT8 res = 0x80;
 
-	if(m_cass->get_image() != NULL)
+	if(m_cass->get_image() != nullptr)
 	{
 		res |= (m_cass->input() > 0.0038) ? 0x40 : 0x00;
 		res |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x00 : 0x20;

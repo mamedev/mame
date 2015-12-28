@@ -167,7 +167,7 @@ ADDRESS_MAP_END
 tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0091LVC, "Taito TC0091LVC", tag, owner, clock, "tc0091lvc", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, NULL, *ADDRESS_MAP_NAME(tc0091lvc_map8)),
+		m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, nullptr, *ADDRESS_MAP_NAME(tc0091lvc_map8)),
 		m_gfxdecode(*this),
 		m_palette(*this)
 {
@@ -292,12 +292,12 @@ void tc0091lvc_device::device_start()
 	bg1_tilemap->set_scrolldx(38, -21);
 
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
-		if (m_gfxdecode->gfx(m_gfx_index) == 0)
+		if (m_gfxdecode->gfx(m_gfx_index) == nullptr)
 			break;
 
 	//printf("m_gfx_index %d\n", m_gfx_index);
 
-	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, char_layout, (UINT8 *)m_pcg_ram, 0, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(m_palette, char_layout, (UINT8 *)m_pcg_ram, 0, m_palette->entries() / 16, 0));
 }
 
 void tc0091lvc_device::device_reset()
@@ -306,7 +306,7 @@ void tc0091lvc_device::device_reset()
 
 const address_space_config *tc0091lvc_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 

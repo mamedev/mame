@@ -61,9 +61,9 @@ m68307cpu_device::m68307cpu_device(const machine_config &mconfig, const char *ta
 	write_outport(*this),
 	m_duart(*this, "internal68681")
 {
-	m68307SIM = 0;
-	m68307MBUS = 0;
-	m68307TIMER = 0;
+	m68307SIM = nullptr;
+	m68307MBUS = nullptr;
+	m68307TIMER = nullptr;
 	m68307_base = 0;
 	m68307_scrhigh = 0;
 	m68307_scrlow = 0;
@@ -307,7 +307,7 @@ WRITE16_MEMBER( m68307cpu_device::m68307_internal_base_w )
 
 	int pc = space.device().safe_pc();
 	logerror("%08x m68307_internal_base_w %08x, %04x (%04x)\n", pc, offset*2,data,mem_mask);
-	int base = 0;
+	int base;
 	//int mask = 0;
 
 	switch (offset<<1)

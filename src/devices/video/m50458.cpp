@@ -138,7 +138,7 @@ const rom_entry *m50458_device::device_rom_region() const
 
 const address_space_config *m50458_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 //**************************************************************************
@@ -176,7 +176,7 @@ m50458_device::m50458_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, M50458, "M50458 OSD", tag, owner, clock, "m50458", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, NULL, *ADDRESS_MAP_NAME(m50458_vram))
+		m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, nullptr, *ADDRESS_MAP_NAME(m50458_vram))
 {
 }
 
@@ -205,7 +205,7 @@ void m50458_device::device_start()
 
 	/* Create an array for shadow gfx */
 	/* this will spread the source ROM into four directions (up-left, up-right, down-left, down-right) thus creating a working shadow copy */
-	m_shadow_gfx = auto_alloc_array_clear(machine(), UINT8, 0x1200);
+	m_shadow_gfx = make_unique_clear<UINT8[]>(0x1200);
 
 	for(tile=0;tile<0x80;tile++)
 	{

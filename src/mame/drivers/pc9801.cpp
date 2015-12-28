@@ -495,9 +495,9 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	enum
 	{
@@ -516,7 +516,7 @@ public:
 	UINT8 m_txt_scroll_reg[8];
 	UINT8 m_pal_clut[4];
 
-	UINT16 *m_tvram;
+	std::unique_ptr<UINT16[]> m_tvram;
 
 	UINT16 m_font_addr;
 	UINT8 m_font_line;
@@ -723,7 +723,7 @@ public:
 
 	DECLARE_DRIVER_INIT(pc9801_kanji);
 	inline void set_dma_channel(int channel, int state);
-	virtual void device_reset_after_children();
+	virtual void device_reset_after_children() override;
 };
 
 
@@ -749,7 +749,7 @@ void pc9801_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 void pc9801_state::video_start()
 {
-	m_tvram = auto_alloc_array(machine(), UINT16, 0x2000);
+	m_tvram = std::make_unique<UINT16[]>(0x2000);
 
 	// find memory regions
 	m_char_rom = memregion("chargen")->base();
@@ -3068,7 +3068,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9821ap2)
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 {
-	memset(m_tvram, 0, sizeof(UINT16) * 0x2000);
+	memset(m_tvram.get(), 0, sizeof(UINT16) * 0x2000);
 	/* this looks like to be some kind of backup ram, system will boot with green colors otherwise */
 	{
 		int i;
@@ -3126,10 +3126,13 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 //  m_has_opna = ioport("SOUND_CONFIG")->read() & 1;
 	m_maincpu->set_input_line(INPUT_LINE_A20, m_gate_a20);
 
-	if(!(ioport("ROM_LOAD")->read() & 4))
-		m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base());
-	else
-		m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base() + 0x2000);
+	if(memregion("ide"))
+	{
+		if(!(ioport("ROM_LOAD")->read() & 4))
+			m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base());
+		else
+			m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base() + 0x2000);
+	}
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9821)
@@ -3199,7 +3202,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_cbus )
 	MCFG_PC9801CBUS_SLOT_ADD("cbus0", pc9801_cbus, "pc9801_26")
-	MCFG_PC9801CBUS_SLOT_ADD("cbus1", pc9801_cbus, NULL)
+	MCFG_PC9801CBUS_SLOT_ADD("cbus1", pc9801_cbus, nullptr)
 //  TODO: six max slots
 MACHINE_CONFIG_END
 
@@ -3226,7 +3229,7 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_ide )
-	MCFG_ATA_INTERFACE_ADD("ide", ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ide", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir1_w))
 MACHINE_CONFIG_END
 

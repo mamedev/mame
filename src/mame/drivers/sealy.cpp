@@ -122,7 +122,7 @@ MACHINE_CONFIG_END
 ROM_START( crzyddz )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "crzyddz_m30624.mcu", 0x00000, 0x40000, NO_DUMP )
-	ROM_FILL(                       0x00000, 0x40000, 0 )
+	ROM_FILL(                       0x00000, 0x40000, 0x00 )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "1", 0x000000, 0x200000, CRC(d202a278) SHA1(3ae75d6942527e58a56a703e40de22e70535b332) )

@@ -74,22 +74,22 @@ public:
 
 	void laserdisc_data_w(UINT8 data)
 	{
-		if (m_ldv1000 != NULL) m_ldv1000->data_w(data);
-		if (m_pr7820 != NULL) m_pr7820->data_w(data);
-		if (m_22vp932 != NULL) m_22vp932->data_w(data);
+		if (m_ldv1000 != nullptr) m_ldv1000->data_w(data);
+		if (m_pr7820 != nullptr) m_pr7820->data_w(data);
+		if (m_22vp932 != nullptr) m_22vp932->data_w(data);
 	}
 
 	void laserdisc_enter_w(UINT8 data)
 	{
-		if (m_pr7820 != NULL) m_pr7820->enter_w(data);
-		if (m_22vp932 != NULL) m_22vp932->enter_w(data);
+		if (m_pr7820 != nullptr) m_pr7820->enter_w(data);
+		if (m_22vp932 != nullptr) m_22vp932->enter_w(data);
 	}
 
 	UINT8 laserdisc_data_r()
 	{
-		if (m_ldv1000 != NULL) return m_ldv1000->status_r();
-		if (m_pr7820 != NULL) return m_pr7820->data_r();
-		if (m_22vp932 != NULL) return m_22vp932->data_r();
+		if (m_ldv1000 != nullptr) return m_ldv1000->status_r();
+		if (m_pr7820 != nullptr) return m_pr7820->data_r();
+		if (m_22vp932 != nullptr) return m_22vp932->data_r();
 		return 0;
 	}
 
@@ -100,14 +100,14 @@ public:
 
 	UINT8 laserdisc_status_r()
 	{
-		if (m_ldv1000 != NULL) return m_ldv1000->status_strobe_r();
+		if (m_ldv1000 != nullptr) return m_ldv1000->status_strobe_r();
 		return CLEAR_LINE;
 	}
 
 	UINT8 laserdisc_ready_r()
 	{
-		if (m_ldv1000 != NULL) return m_ldv1000->command_strobe_r();
-		if (m_pr7820 != NULL) return m_pr7820->ready_r();
+		if (m_ldv1000 != nullptr) return m_ldv1000->command_strobe_r();
+		if (m_pr7820 != nullptr) return m_pr7820->ready_r();
 		return CLEAR_LINE;
 	}
 
@@ -173,7 +173,7 @@ static const z80_daisy_config dleuro_daisy_chain[] =
 {
 	{ "sio" },
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 

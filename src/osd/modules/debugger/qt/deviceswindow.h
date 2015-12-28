@@ -3,7 +3,7 @@
 #ifndef __DEBUG_QT_DEVICES_WINDOW_H__
 #define __DEBUG_QT_DEVICES_WINDOW_H__
 
-#include <QtGui/QtGui>
+#include <QtWidgets/QTreeView>
 
 #include "windowqt.h"
 

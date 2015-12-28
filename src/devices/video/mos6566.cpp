@@ -248,7 +248,7 @@ const address_space_config *mos6566_device::memory_space_config(address_spacenum
 	{
 		case AS_0: return &m_videoram_space_config;
 		case AS_1: return &m_colorram_space_config;
-		default: return NULL;
+		default: return nullptr;
 	}
 }
 
@@ -585,8 +585,8 @@ mos6566_device::mos6566_device(const machine_config &mconfig, const char *tag, d
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_variant(TYPE_6566),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6566_videoram_map)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6566_colorram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(mos6566_videoram_map)),
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(mos6566_colorram_map)),
 		m_write_irq(*this),
 		m_write_ba(*this),
 		m_write_aec(*this),
@@ -602,8 +602,8 @@ mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, 
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_variant(variant),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6566_videoram_map)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6566_colorram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(mos6566_videoram_map)),
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(mos6566_colorram_map)),
 		m_write_irq(*this),
 		m_write_ba(*this),
 		m_write_aec(*this),
@@ -773,8 +773,8 @@ void mos6566_device::device_reset()
 {
 	memset(m_reg, 0, sizeof(m_reg));
 
-	for (int i = 0; i < ARRAY_LENGTH(m_mc); i++)
-		m_mc[i] = 63;
+	for (auto & elem : m_mc)
+		elem = 63;
 
 	// from 0 to 311 (0 first, PAL) or from 0 to 261 (? first, NTSC 6567R56A) or from 0 to 262 (? first, NTSC 6567R8)
 	m_rasterline = 0; // VIC2_LINES - 1;
@@ -2138,7 +2138,7 @@ void mos6566_device::draw_sprites()
 	UINT8 snum, sbit;
 	UINT8 spr_coll = 0, gfx_coll = 0;
 	UINT32 plane0_l, plane0_r, plane1_l, plane1_r;
-	UINT32 sdata_l = 0, sdata_r = 0;
+	UINT32 sdata_l, sdata_r;
 
 	for (i = 0; i < 0x400; i++)
 		m_spr_coll_buf[i] = 0;

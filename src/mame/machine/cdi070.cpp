@@ -30,7 +30,7 @@ TODO:
 const device_type MACHINE_CDI68070 = &device_creator<cdi68070_device>;
 
 #if ENABLE_VERBOSE_LOG
-INLINE void ATTR_PRINTF(1,2) verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -39,7 +39,7 @@ INLINE void ATTR_PRINTF(1,2) verboselog(running_machine &machine, int n_level, c
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", machine.device("maincpu")->safe_pc(), buf );
+		device.logerror("%s: %s", device.machine().describe_context(), buf );
 	}
 }
 #else
@@ -336,7 +336,7 @@ TIMER_CALLBACK_MEMBER( cdi68070_device::rx_callback )
 
 		if(m_uart.receive_pointer > -1)
 		{
-			verboselog(machine(), 2, "scc68070_rx_callback: Receiving %02x\n", m_uart.receive_holding_register);
+			verboselog(*this, 2, "scc68070_rx_callback: Receiving %02x\n", m_uart.receive_holding_register);
 
 			UINT8 interrupt = (m_picr2 >> 4) & 7;
 			if(interrupt)
@@ -426,9 +426,9 @@ void cdi68070_device::mcu_frame()
 	{
 		quizard_calculate_state();
 		uart_rx(0x5a);
-		for(int index = 0; index < 8; index++)
+		for(auto & elem : m_state)
 		{
-			uart_rx(m_state[index]);
+			uart_rx(elem);
 		}
 	}
 }
@@ -547,7 +547,7 @@ TIMER_CALLBACK_MEMBER( cdi68070_device::tx_callback )
 			m_uart.transmit_holding_register = m_uart.transmit_buffer[0];
 			quizard_handle_byte_tx();
 
-			verboselog(machine(), 2, "cdi68070_tx_callback: Transmitting %02x\n", m_uart.transmit_holding_register);
+			verboselog(*this, 2, "cdi68070_tx_callback: Transmitting %02x\n", m_uart.transmit_holding_register);
 			for(int index = 0; index < m_uart.transmit_pointer; index++)
 			{
 				m_uart.transmit_buffer[index] = m_uart.transmit_buffer[index+1];
@@ -584,31 +584,31 @@ READ16_MEMBER( cdi68070_device::periphs_r )
 		case 0x2000/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: I2C Data Register: %04x & %04x\n", m_i2c.data_register, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: I2C Data Register: %04x & %04x\n", m_i2c.data_register, mem_mask);
 			}
 			return m_i2c.data_register;
 		case 0x2002/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: I2C Address Register: %04x & %04x\n", m_i2c.address_register, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: I2C Address Register: %04x & %04x\n", m_i2c.address_register, mem_mask);
 			}
 			return m_i2c.address_register;
 		case 0x2004/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: I2C Status Register: %04x & %04x\n", m_i2c.status_register, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: I2C Status Register: %04x & %04x\n", m_i2c.status_register, mem_mask);
 			}
 			return m_i2c.status_register;
 		case 0x2006/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: I2C Control Register: %04x & %04x\n", m_i2c.control_register, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: I2C Control Register: %04x & %04x\n", m_i2c.control_register, mem_mask);
 			}
 			return m_i2c.control_register;
 		case 0x2008/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: I2C Clock Control Register: %04x & %04x\n", m_i2c.clock_control_register, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: I2C Clock Control Register: %04x & %04x\n", m_i2c.clock_control_register, mem_mask);
 			}
 			return m_i2c.clock_control_register;
 
@@ -616,22 +616,22 @@ READ16_MEMBER( cdi68070_device::periphs_r )
 		case 0x2010/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: UART Mode Register: %04x & %04x\n", m_uart.mode_register, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: UART Mode Register: %04x & %04x\n", m_uart.mode_register, mem_mask);
 			}
 			else
 			{
-				verboselog(machine(), 0, "cdi68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
+				verboselog(*this, 0, "cdi68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
 			}
 			return m_uart.mode_register | 0x20;
 		case 0x2012/2:
 			m_uart.status_register |= (1 << 1);
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: UART Status Register: %04x & %04x\n", m_uart.status_register, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: UART Status Register: %04x & %04x\n", m_uart.status_register, mem_mask);
 			}
 			else
 			{
-				verboselog(space.machine(), 0, "cdi68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
+				verboselog(*this, 0, "cdi68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
 			}
 
 			if((m_picr2 >> 4) & 7)
@@ -649,41 +649,41 @@ READ16_MEMBER( cdi68070_device::periphs_r )
 		case 0x2014/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: UART Clock Select: %04x & %04x\n", m_uart.clock_select, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: UART Clock Select: %04x & %04x\n", m_uart.clock_select, mem_mask);
 			}
 			else
 			{
-				verboselog(machine(), 0, "cdi68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
+				verboselog(*this, 0, "cdi68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
 			}
 			return m_uart.clock_select | 0x08;
 		case 0x2016/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: UART Command Register: %02x & %04x\n", m_uart.command_register, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: UART Command Register: %02x & %04x\n", m_uart.command_register, mem_mask);
 			}
 			else
 			{
-				verboselog(machine(), 0, "cdi68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
+				verboselog(*this, 0, "cdi68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
 			}
 			return m_uart.command_register | 0x80;
 		case 0x2018/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: UART Transmit Holding Register: %02x & %04x\n", m_uart.transmit_holding_register, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: UART Transmit Holding Register: %02x & %04x\n", m_uart.transmit_holding_register, mem_mask);
 			}
 			else
 			{
-				verboselog(machine(), 0, "cdi68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
+				verboselog(*this, 0, "cdi68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
 			}
 			return m_uart.transmit_holding_register;
 		case 0x201a/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: UART Receive Holding Register: %02x & %04x\n", m_uart.receive_holding_register, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: UART Receive Holding Register: %02x & %04x\n", m_uart.receive_holding_register, mem_mask);
 			}
 			else
 			{
-				verboselog(machine(), 0, "cdi68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
+				verboselog(*this, 0, "cdi68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
 			}
 			if((m_picr2 >> 4) & 7)
 			{
@@ -706,31 +706,31 @@ READ16_MEMBER( cdi68070_device::periphs_r )
 		case 0x2020/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: Timer Control Register: %02x & %04x\n", m_timers.timer_control_register, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: Timer Control Register: %02x & %04x\n", m_timers.timer_control_register, mem_mask);
 			}
 			if(ACCESSING_BITS_8_15)
 			{
-				verboselog(machine(), 12, "cdi68070_periphs_r: Timer Status Register: %02x & %04x\n", m_timers.timer_status_register, mem_mask);
+				verboselog(*this, 12, "cdi68070_periphs_r: Timer Status Register: %02x & %04x\n", m_timers.timer_status_register, mem_mask);
 			}
 			return (m_timers.timer_status_register << 8) | m_timers.timer_control_register;
 		case 0x2022/2:
-			verboselog(machine(), 2, "cdi68070_periphs_r: Timer Reload Register: %04x & %04x\n", m_timers.reload_register, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_r: Timer Reload Register: %04x & %04x\n", m_timers.reload_register, mem_mask);
 			return m_timers.reload_register;
 		case 0x2024/2:
-			verboselog(machine(), 2, "cdi68070_periphs_r: Timer 0: %04x & %04x\n", m_timers.timer0, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_r: Timer 0: %04x & %04x\n", m_timers.timer0, mem_mask);
 			return m_timers.timer0;
 		case 0x2026/2:
-			verboselog(machine(), 2, "cdi68070_periphs_r: Timer 1: %04x & %04x\n", m_timers.timer1, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_r: Timer 1: %04x & %04x\n", m_timers.timer1, mem_mask);
 			return m_timers.timer1;
 		case 0x2028/2:
-			verboselog(machine(), 2, "cdi68070_periphs_r: Timer 2: %04x & %04x\n", m_timers.timer2, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_r: Timer 2: %04x & %04x\n", m_timers.timer2, mem_mask);
 			return m_timers.timer2;
 
 		// PICR1: 80002045
 		case 0x2044/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: Peripheral Interrupt Control Register 1: %02x & %04x\n", m_picr1, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: Peripheral Interrupt Control Register 1: %02x & %04x\n", m_picr1, mem_mask);
 			}
 			return m_picr1;
 
@@ -738,7 +738,7 @@ READ16_MEMBER( cdi68070_device::periphs_r )
 		case 0x2046/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: Peripheral Interrupt Control Register 2: %02x & %04x\n", m_picr2, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: Peripheral Interrupt Control Register 2: %02x & %04x\n", m_picr2, mem_mask);
 			}
 			return m_picr2 & 0x77;
 
@@ -747,65 +747,65 @@ READ16_MEMBER( cdi68070_device::periphs_r )
 		case 0x4040/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: DMA(%d) Error Register: %04x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].channel_error, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: DMA(%d) Error Register: %04x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].channel_error, mem_mask);
 			}
 			if(ACCESSING_BITS_8_15)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: DMA(%d) Status Register: %04x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].channel_status, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: DMA(%d) Status Register: %04x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].channel_status, mem_mask);
 			}
 			return (m_dma.channel[(offset - 0x2000) / 32].channel_status << 8) | m_dma.channel[(offset - 0x2000) / 32].channel_error;
 		case 0x4004/2:
 		case 0x4044/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: DMA(%d) Operation Control Register: %02x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].operation_control, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: DMA(%d) Operation Control Register: %02x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].operation_control, mem_mask);
 			}
 			if(ACCESSING_BITS_8_15)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: DMA(%d) Device Control Register: %02x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].device_control, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: DMA(%d) Device Control Register: %02x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].device_control, mem_mask);
 			}
 			return (m_dma.channel[(offset - 0x2000) / 32].device_control << 8) | m_dma.channel[(offset - 0x2000) / 32].operation_control;
 		case 0x4006/2:
 		case 0x4046/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: DMA(%d) Channel Control Register: %02x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].channel_control, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: DMA(%d) Channel Control Register: %02x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].channel_control, mem_mask);
 			}
 			if(ACCESSING_BITS_8_15)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: DMA(%d) Sequence Control Register: %02x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].sequence_control, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: DMA(%d) Sequence Control Register: %02x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].sequence_control, mem_mask);
 			}
 			return (m_dma.channel[(offset - 0x2000) / 32].sequence_control << 8) | m_dma.channel[(offset - 0x2000) / 32].channel_control;
 		case 0x400a/2:
-			verboselog(machine(), 2, "cdi68070_periphs_r: DMA(%d) Memory Transfer Counter: %04x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].transfer_counter, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_r: DMA(%d) Memory Transfer Counter: %04x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].transfer_counter, mem_mask);
 			return m_dma.channel[(offset - 0x2000) / 32].transfer_counter;
 		case 0x400c/2:
 		case 0x404c/2:
-			verboselog(machine(), 2, "cdi68070_periphs_r: DMA(%d) Memory Address Counter (High Word): %04x & %04x\n", (offset - 0x2000) / 32, (m_dma.channel[(offset - 0x2000) / 32].memory_address_counter >> 16), mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_r: DMA(%d) Memory Address Counter (High Word): %04x & %04x\n", (offset - 0x2000) / 32, (m_dma.channel[(offset - 0x2000) / 32].memory_address_counter >> 16), mem_mask);
 			return (m_dma.channel[(offset - 0x2000) / 32].memory_address_counter >> 16);
 		case 0x400e/2:
 		case 0x404e/2:
-			verboselog(machine(), 2, "cdi68070_periphs_r: DMA(%d) Memory Address Counter (Low Word): %04x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].memory_address_counter, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_r: DMA(%d) Memory Address Counter (Low Word): %04x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].memory_address_counter, mem_mask);
 			return m_dma.channel[(offset - 0x2000) / 32].memory_address_counter;
 		case 0x4014/2:
 		case 0x4054/2:
-			verboselog(machine(), 2, "cdi68070_periphs_r: DMA(%d) Device Address Counter (High Word): %04x & %04x\n", (offset - 0x2000) / 32, (m_dma.channel[(offset - 0x2000) / 32].device_address_counter >> 16), mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_r: DMA(%d) Device Address Counter (High Word): %04x & %04x\n", (offset - 0x2000) / 32, (m_dma.channel[(offset - 0x2000) / 32].device_address_counter >> 16), mem_mask);
 			return (m_dma.channel[(offset - 0x2000) / 32].device_address_counter >> 16);
 		case 0x4016/2:
 		case 0x4056/2:
-			verboselog(machine(), 2, "cdi68070_periphs_r: DMA(%d) Device Address Counter (Low Word): %04x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].device_address_counter, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_r: DMA(%d) Device Address Counter (Low Word): %04x & %04x\n", (offset - 0x2000) / 32, m_dma.channel[(offset - 0x2000) / 32].device_address_counter, mem_mask);
 			return m_dma.channel[(offset - 0x2000) / 32].device_address_counter;
 
 		// MMU: 80008000 to 8000807f
 		case 0x8000/2:  // Status / Control register
 			if(ACCESSING_BITS_0_7)
 			{   // Control
-				verboselog(machine(), 2, "cdi68070_periphs_r: MMU Control: %02x & %04x\n", m_mmu.control, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: MMU Control: %02x & %04x\n", m_mmu.control, mem_mask);
 				return m_mmu.control;
 			}   // Status
 			else
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: MMU Status: %02x & %04x\n", m_mmu.status, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: MMU Status: %02x & %04x\n", m_mmu.status, mem_mask);
 				return m_mmu.status;
 			}
 		case 0x8040/2:
@@ -816,7 +816,7 @@ READ16_MEMBER( cdi68070_device::periphs_r )
 		case 0x8068/2:
 		case 0x8070/2:
 		case 0x8078/2:  // Attributes (SD0-7)
-			verboselog(machine(), 2, "cdi68070_periphs_r: MMU descriptor %d attributes: %04x & %04x\n", (offset - 0x4020) / 4, m_mmu.desc[(offset - 0x4020) / 4].attr, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_r: MMU descriptor %d attributes: %04x & %04x\n", (offset - 0x4020) / 4, m_mmu.desc[(offset - 0x4020) / 4].attr, mem_mask);
 			return m_mmu.desc[(offset - 0x4020) / 4].attr;
 		case 0x8042/2:
 		case 0x804a/2:
@@ -826,7 +826,7 @@ READ16_MEMBER( cdi68070_device::periphs_r )
 		case 0x806a/2:
 		case 0x8072/2:
 		case 0x807a/2:  // Segment Length (SD0-7)
-			verboselog(machine(), 2, "cdi68070_periphs_r: MMU descriptor %d length: %04x & %04x\n", (offset - 0x4020) / 4, m_mmu.desc[(offset - 0x4020) / 4].length, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_r: MMU descriptor %d length: %04x & %04x\n", (offset - 0x4020) / 4, m_mmu.desc[(offset - 0x4020) / 4].length, mem_mask);
 			return m_mmu.desc[(offset - 0x4020) / 4].length;
 		case 0x8044/2:
 		case 0x804c/2:
@@ -838,7 +838,7 @@ READ16_MEMBER( cdi68070_device::periphs_r )
 		case 0x807c/2:  // Segment Number (SD0-7, A0=1 only)
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_r: MMU descriptor %d segment: %02x & %04x\n", (offset - 0x4020) / 4, m_mmu.desc[(offset - 0x4020) / 4].segment, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_r: MMU descriptor %d segment: %02x & %04x\n", (offset - 0x4020) / 4, m_mmu.desc[(offset - 0x4020) / 4].segment, mem_mask);
 				return m_mmu.desc[(offset - 0x4020) / 4].segment;
 			}
 			break;
@@ -850,10 +850,10 @@ READ16_MEMBER( cdi68070_device::periphs_r )
 		case 0x806e/2:
 		case 0x8076/2:
 		case 0x807e/2:  // Base Address (SD0-7)
-			verboselog(machine(), 2, "cdi68070_periphs_r: MMU descriptor %d base: %04x & %04x\n", (offset - 0x4020) / 4, m_mmu.desc[(offset - 0x4020) / 4].base, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_r: MMU descriptor %d base: %04x & %04x\n", (offset - 0x4020) / 4, m_mmu.desc[(offset - 0x4020) / 4].base, mem_mask);
 			return m_mmu.desc[(offset - 0x4020) / 4].base;
 		default:
-			verboselog(space.machine(), 0, "cdi68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
+			verboselog(*this, 0, "cdi68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
 			break;
 	}
 
@@ -868,7 +868,7 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 	{
 		// Interrupts: 80001001
 		case 0x1000/2: // LIR priority level
-			verboselog(machine(), 2, "cdi68070_periphs_w: LIR: %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_w: LIR: %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&m_lir);
 			break;
 
@@ -876,35 +876,35 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 		case 0x2000/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: I2C Data Register: %04x & %04x\n", data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: I2C Data Register: %04x & %04x\n", data, mem_mask);
 				m_i2c.data_register = data & 0x00ff;
 			}
 			break;
 		case 0x2002/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: I2C Address Register: %04x & %04x\n", data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: I2C Address Register: %04x & %04x\n", data, mem_mask);
 				m_i2c.address_register = data & 0x00ff;
 			}
 			break;
 		case 0x2004/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: I2C Status Register: %04x & %04x\n", data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: I2C Status Register: %04x & %04x\n", data, mem_mask);
 				m_i2c.status_register = data & 0x00ff;
 			}
 			break;
 		case 0x2006/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: I2C Control Register: %04x & %04x\n", data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: I2C Control Register: %04x & %04x\n", data, mem_mask);
 				m_i2c.control_register = data & 0x00ff;
 			}
 			break;
 		case 0x2008/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: I2C Clock Control Register: %04x & %04x\n", data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: I2C Clock Control Register: %04x & %04x\n", data, mem_mask);
 				m_i2c.clock_control_register = data & 0x00ff;
 			}
 			break;
@@ -913,70 +913,70 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 		case 0x2010/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: UART Mode Register: %04x & %04x\n", data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: UART Mode Register: %04x & %04x\n", data, mem_mask);
 				m_uart.mode_register = data & 0x00ff;
 			}
 			else
 			{
-				verboselog(machine(), 0, "cdi68070_periphs_w: Unknown address: %04x = %04x & %04x\n", offset * 2, data, mem_mask);
+				verboselog(*this, 0, "cdi68070_periphs_w: Unknown address: %04x = %04x & %04x\n", offset * 2, data, mem_mask);
 			}
 			break;
 		case 0x2012/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: UART Status Register: %04x & %04x\n", data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: UART Status Register: %04x & %04x\n", data, mem_mask);
 				m_uart.status_register = data & 0x00ff;
 			}
 			else
 			{
-				verboselog(machine(), 0, "cdi68070_periphs_w: Unknown address: %04x = %04x & %04x\n", offset * 2, data, mem_mask);
+				verboselog(*this, 0, "cdi68070_periphs_w: Unknown address: %04x = %04x & %04x\n", offset * 2, data, mem_mask);
 			}
 			break;
 		case 0x2014/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: UART Clock Select: %04x & %04x\n", data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: UART Clock Select: %04x & %04x\n", data, mem_mask);
 				m_uart.clock_select = data & 0x00ff;
 			}
 			else
 			{
-				verboselog(machine(), 0, "cdi68070_periphs_w: Unknown address: %04x = %04x & %04x\n", offset * 2, data, mem_mask);
+				verboselog(*this, 0, "cdi68070_periphs_w: Unknown address: %04x = %04x & %04x\n", offset * 2, data, mem_mask);
 			}
 			break;
 		case 0x2016/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: UART Command Register: %04x & %04x\n", data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: UART Command Register: %04x & %04x\n", data, mem_mask);
 				m_uart.command_register = data & 0x00ff;
 				uart_rx_check();
 				uart_tx_check();
 			}
 			else
 			{
-				verboselog(machine(), 0, "cdi68070_periphs_w: Unknown address: %04x = %04x & %04x\n", offset * 2, data, mem_mask);
+				verboselog(*this, 0, "cdi68070_periphs_w: Unknown address: %04x = %04x & %04x\n", offset * 2, data, mem_mask);
 			}
 			break;
 		case 0x2018/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: UART Transmit Holding Register: %04x & %04x: %c\n", data, mem_mask, (data >= 0x20 && data < 0x7f) ? (data & 0x00ff) : ' ');
+				verboselog(*this, 2, "cdi68070_periphs_w: UART Transmit Holding Register: %04x & %04x: %c\n", data, mem_mask, (data >= 0x20 && data < 0x7f) ? (data & 0x00ff) : ' ');
 				uart_tx(data & 0x00ff);
 				m_uart.transmit_holding_register = data & 0x00ff;
 			}
 			else
 			{
-				verboselog(machine(), 0, "cdi68070_periphs_w: Unknown address: %04x = %04x & %04x\n", offset * 2, data, mem_mask);
+				verboselog(*this, 0, "cdi68070_periphs_w: Unknown address: %04x = %04x & %04x\n", offset * 2, data, mem_mask);
 			}
 			break;
 		case 0x201a/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: UART Receive Holding Register: %04x & %04x\n", data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: UART Receive Holding Register: %04x & %04x\n", data, mem_mask);
 				m_uart.receive_holding_register = data & 0x00ff;
 			}
 			else
 			{
-				verboselog(machine(), 0, "cdi68070_periphs_w: Unknown address: %04x = %04x & %04x\n", offset * 2, data, mem_mask);
+				verboselog(*this, 0, "cdi68070_periphs_w: Unknown address: %04x = %04x & %04x\n", offset * 2, data, mem_mask);
 			}
 			break;
 
@@ -984,12 +984,12 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 		case 0x2020/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: Timer Control Register: %04x & %04x\n", data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: Timer Control Register: %04x & %04x\n", data, mem_mask);
 				m_timers.timer_control_register = data & 0x00ff;
 			}
 			if(ACCESSING_BITS_8_15)
 			{
-				verboselog(machine(), 12, "cdi68070_periphs_w: Timer Status Register: %04x & %04x\n", data, mem_mask);
+				verboselog(*this, 12, "cdi68070_periphs_w: Timer Status Register: %04x & %04x\n", data, mem_mask);
 				m_timers.timer_status_register &= ~(data >> 8);
 				if(!m_timers.timer_status_register)
 				{
@@ -999,20 +999,20 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 			}
 			break;
 		case 0x2022/2:
-			verboselog(machine(), 2, "cdi68070_periphs_w: Timer Reload Register: %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_w: Timer Reload Register: %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&m_timers.reload_register);
 			break;
 		case 0x2024/2:
-			verboselog(machine(), 2, "cdi68070_periphs_w: Timer 0: %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_w: Timer 0: %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&m_timers.timer0);
 			set_timer_callback(0);
 			break;
 		case 0x2026/2:
-			verboselog(machine(), 2, "cdi68070_periphs_w: Timer 1: %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_w: Timer 1: %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&m_timers.timer1);
 			break;
 		case 0x2028/2:
-			verboselog(machine(), 2, "cdi68070_periphs_w: Timer 2: %04x & %04x\n", data, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_w: Timer 2: %04x & %04x\n", data, mem_mask);
 			COMBINE_DATA(&m_timers.timer2);
 			break;
 
@@ -1020,7 +1020,7 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 		case 0x2044/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: Peripheral Interrupt Control Register 1: %04x & %04x\n", data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: Peripheral Interrupt Control Register 1: %04x & %04x\n", data, mem_mask);
 				m_picr1 = data & 0x00ff;
 			}
 			break;
@@ -1029,7 +1029,7 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 		case 0x2046/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: Peripheral Interrupt Control Register 2: %04x & %04x\n", data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: Peripheral Interrupt Control Register 2: %04x & %04x\n", data, mem_mask);
 				m_picr2 = data & 0x00ff;
 			}
 			break;
@@ -1039,11 +1039,11 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 		case 0x4040/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: DMA(%d) Error (invalid): %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: DMA(%d) Error (invalid): %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
 			}
 			if(ACCESSING_BITS_8_15)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: DMA(%d) Status: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: DMA(%d) Status: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
 				m_dma.channel[(offset - 0x2000) / 32].channel_status &= ~(data & 0xb0);
 			}
 			break;
@@ -1051,12 +1051,12 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 		case 0x4044/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: DMA(%d) Operation Control Register: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: DMA(%d) Operation Control Register: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
 				m_dma.channel[(offset - 0x2000) / 32].operation_control = data & 0x00ff;
 			}
 			if(ACCESSING_BITS_8_15)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: DMA(%d) Device Control Register: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: DMA(%d) Device Control Register: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
 				m_dma.channel[(offset - 0x2000) / 32].device_control = data >> 8;
 			}
 			break;
@@ -1064,7 +1064,7 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 		case 0x4046/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: DMA(%d) Channel Control Register: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: DMA(%d) Channel Control Register: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
 				m_dma.channel[(offset - 0x2000) / 32].channel_control = data & 0x007f;
 				if(data & CCR_SO)
 				{
@@ -1073,35 +1073,35 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 			}
 			if(ACCESSING_BITS_8_15)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: DMA(%d) Sequence Control Register: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: DMA(%d) Sequence Control Register: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
 				m_dma.channel[(offset - 0x2000) / 32].sequence_control = data >> 8;
 			}
 			break;
 		case 0x400a/2:
-			verboselog(machine(), 2, "cdi68070_periphs_w: DMA(%d) Memory Transfer Counter: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_w: DMA(%d) Memory Transfer Counter: %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
 			COMBINE_DATA(&m_dma.channel[(offset - 0x2000) / 32].transfer_counter);
 			break;
 		case 0x400c/2:
 		case 0x404c/2:
-			verboselog(machine(), 2, "cdi68070_periphs_w: DMA(%d) Memory Address Counter (High Word): %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_w: DMA(%d) Memory Address Counter (High Word): %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
 			m_dma.channel[(offset - 0x2000) / 32].memory_address_counter &= ~(mem_mask << 16);
 			m_dma.channel[(offset - 0x2000) / 32].memory_address_counter |= data << 16;
 			break;
 		case 0x400e/2:
 		case 0x404e/2:
-			verboselog(machine(), 2, "cdi68070_periphs_w: DMA(%d) Memory Address Counter (Low Word): %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_w: DMA(%d) Memory Address Counter (Low Word): %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
 			m_dma.channel[(offset - 0x2000) / 32].memory_address_counter &= ~mem_mask;
 			m_dma.channel[(offset - 0x2000) / 32].memory_address_counter |= data;
 			break;
 		case 0x4014/2:
 		case 0x4054/2:
-			verboselog(machine(), 2, "cdi68070_periphs_w: DMA(%d) Device Address Counter (High Word): %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_w: DMA(%d) Device Address Counter (High Word): %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
 			m_dma.channel[(offset - 0x2000) / 32].device_address_counter &= ~(mem_mask << 16);
 			m_dma.channel[(offset - 0x2000) / 32].device_address_counter |= data << 16;
 			break;
 		case 0x4016/2:
 		case 0x4056/2:
-			verboselog(machine(), 2, "cdi68070_periphs_w: DMA(%d) Device Address Counter (Low Word): %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_w: DMA(%d) Device Address Counter (Low Word): %04x & %04x\n", (offset - 0x2000) / 32, data, mem_mask);
 			m_dma.channel[(offset - 0x2000) / 32].device_address_counter &= ~mem_mask;
 			m_dma.channel[(offset - 0x2000) / 32].device_address_counter |= data;
 			break;
@@ -1110,12 +1110,12 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 		case 0x8000/2:  // Status / Control register
 			if(ACCESSING_BITS_0_7)
 			{   // Control
-				verboselog(machine(), 2, "cdi68070_periphs_w: MMU Control: %04x & %04x\n", data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: MMU Control: %04x & %04x\n", data, mem_mask);
 				m_mmu.control = data & 0x00ff;
 			}   // Status
 			else
 			{
-				verboselog(machine(), 0, "cdi68070_periphs_w: MMU Status (invalid): %04x & %04x\n", data, mem_mask);
+				verboselog(*this, 0, "cdi68070_periphs_w: MMU Status (invalid): %04x & %04x\n", data, mem_mask);
 			}
 			break;
 		case 0x8040/2:
@@ -1126,7 +1126,7 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 		case 0x8068/2:
 		case 0x8070/2:
 		case 0x8078/2:  // Attributes (SD0-7)
-			verboselog(machine(), 2, "cdi68070_periphs_w: MMU descriptor %d attributes: %04x & %04x\n", (offset - 0x4020) / 4, data, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_w: MMU descriptor %d attributes: %04x & %04x\n", (offset - 0x4020) / 4, data, mem_mask);
 			COMBINE_DATA(&m_mmu.desc[(offset - 0x4020) / 4].attr);
 			break;
 		case 0x8042/2:
@@ -1137,7 +1137,7 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 		case 0x806a/2:
 		case 0x8072/2:
 		case 0x807a/2:  // Segment Length (SD0-7)
-			verboselog(machine(), 2, "cdi68070_periphs_w: MMU descriptor %d length: %04x & %04x\n", (offset - 0x4020) / 4, data, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_w: MMU descriptor %d length: %04x & %04x\n", (offset - 0x4020) / 4, data, mem_mask);
 			COMBINE_DATA(&m_mmu.desc[(offset - 0x4020) / 4].length);
 			break;
 		case 0x8044/2:
@@ -1150,7 +1150,7 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 		case 0x807c/2:  // Segment Number (SD0-7, A0=1 only)
 			if(ACCESSING_BITS_0_7)
 			{
-				verboselog(machine(), 2, "cdi68070_periphs_w: MMU descriptor %d segment: %04x & %04x\n", (offset - 0x4020) / 4, data, mem_mask);
+				verboselog(*this, 2, "cdi68070_periphs_w: MMU descriptor %d segment: %04x & %04x\n", (offset - 0x4020) / 4, data, mem_mask);
 				m_mmu.desc[(offset - 0x4020) / 4].segment = data & 0x00ff;
 			}
 			break;
@@ -1162,11 +1162,11 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 		case 0x806e/2:
 		case 0x8076/2:
 		case 0x807e/2:  // Base Address (SD0-7)
-			verboselog(machine(), 2, "cdi68070_periphs_w: MMU descriptor %d base: %04x & %04x\n", (offset - 0x4020) / 4, data, mem_mask);
+			verboselog(*this, 2, "cdi68070_periphs_w: MMU descriptor %d base: %04x & %04x\n", (offset - 0x4020) / 4, data, mem_mask);
 			COMBINE_DATA(&m_mmu.desc[(offset - 0x4020) / 4].base);
 			break;
 		default:
-			verboselog(machine(), 0, "cdi68070_periphs_w: Unknown address: %04x = %04x & %04x\n", offset * 2, data, mem_mask);
+			verboselog(*this, 0, "cdi68070_periphs_w: Unknown address: %04x = %04x & %04x\n", offset * 2, data, mem_mask);
 			break;
 	}
 }

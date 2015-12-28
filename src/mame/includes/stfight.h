@@ -84,8 +84,8 @@ public:
 
 	DECLARE_VIDEO_START(stfight);
 	DECLARE_VIDEO_START(cshooter);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(stfight);
 	UINT32 screen_update_stfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -114,5 +114,5 @@ public:
 	UINT8 m_ddrA, m_ddrB, m_ddrC;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

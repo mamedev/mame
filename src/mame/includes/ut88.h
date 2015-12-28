@@ -70,8 +70,6 @@ public:
 	DECLARE_MACHINE_START(ut88mini);
 	DECLARE_MACHINE_RESET(ut88mini);
 	UINT32 screen_update_ut88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(ut88_reset);
-	TIMER_CALLBACK_MEMBER(update_display);
 
 protected:
 	required_memory_region m_region_maincpu;
@@ -89,7 +87,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<palette_device> m_palette;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /*----------- defined in video/ut88.c -----------*/

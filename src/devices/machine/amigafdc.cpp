@@ -34,10 +34,10 @@ void amiga_fdc::device_start()
 		if(con)
 			floppy_devices[i] = con->get_device();
 		else
-			floppy_devices[i] = 0;
+			floppy_devices[i] = nullptr;
 	}
 
-	floppy = 0;
+	floppy = nullptr;
 
 	t_gen = timer_alloc(0);
 }
@@ -45,7 +45,7 @@ void amiga_fdc::device_start()
 
 void amiga_fdc::device_reset()
 {
-	floppy = 0;
+	floppy = nullptr;
 	dsklen = 0x4000;
 	dsksync = 0x4489;
 	adkcon = 0;
@@ -457,7 +457,7 @@ WRITE8_MEMBER( amiga_fdc::ciaaprb_w )
 	else if(!(data & 0x40))
 		floppy = floppy_devices[3];
 	else
-		floppy = 0;
+		floppy = nullptr;
 
 	if(old_floppy != floppy) {
 		if(old_floppy)

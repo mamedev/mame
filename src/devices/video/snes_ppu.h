@@ -256,7 +256,6 @@ public:
 	void set_latch_hv(INT16 x, INT16 y);
 	void dynamic_res_change();
 	inline UINT32 get_vram_address();
-	UINT8 dbg_video(UINT16 curline);
 
 	UINT8 read(address_space &space, UINT32 offset, UINT8 wrio_bit7);
 	void write(address_space &space, UINT32 offset, UINT8 data);
@@ -267,14 +266,14 @@ public:
 	DECLARE_WRITE8_MEMBER( cgram_write );
 	DECLARE_READ8_MEMBER( vram_read );
 	DECLARE_WRITE8_MEMBER( vram_write );
-	UINT16 *m_oam_ram;     /* Object Attribute Memory */
-	UINT16 *m_cgram;   /* Palette RAM */
-	UINT8  *m_vram;    /* Video RAM (TODO: Should be 16-bit, but it's easier this way) */
+	std::unique_ptr<UINT16[]> m_oam_ram;     /* Object Attribute Memory */
+	std::unique_ptr<UINT16[]> m_cgram;   /* Palette RAM */
+	std::unique_ptr<UINT8[]> m_vram;    /* Video RAM (TODO: Should be 16-bit, but it's easier this way) */
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	devcb_read16  m_openbus_cb;

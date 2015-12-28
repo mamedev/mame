@@ -262,8 +262,8 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 		m_irq_pending(false),
 		m_is_idling(false),
 		m_icount(0),
-		m_program(0),
-		m_direct(0),
+		m_program(nullptr),
+		m_direct(nullptr),
 		m_mcbl_mode(false),
 		m_xf0_cb(*this),
 		m_xf1_cb(*this),
@@ -468,7 +468,7 @@ void tms3203x_device::device_reset()
 
 const address_space_config *tms3203x_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_PROGRAM) ? &m_program_config : NULL;
+	return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr;
 }
 
 

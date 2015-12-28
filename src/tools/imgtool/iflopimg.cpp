@@ -81,7 +81,7 @@ static const struct io_procs imgtool_ioprocs =
 
 static const struct io_procs imgtool_noclose_ioprocs =
 {
-	NULL,
+	nullptr,
 	imgtool_floppy_seekproc,
 	imgtool_floppy_readproc,
 	imgtool_floppy_writeproc,
@@ -118,7 +118,7 @@ static imgtoolerr_t imgtool_floppy_open_internal(imgtool_image *image, imgtool_s
 
 	/* open up the floppy */
 	ferr = floppy_open(f, noclose ? &imgtool_noclose_ioprocs : &imgtool_ioprocs,
-		NULL, format, FLOPPY_FLAGS_READWRITE, &fimg->floppy);
+		nullptr, format, FLOPPY_FLAGS_READWRITE, &fimg->floppy);
 	if (ferr)
 	{
 		err = imgtool_floppy_error(ferr);
@@ -127,7 +127,7 @@ static imgtoolerr_t imgtool_floppy_open_internal(imgtool_image *image, imgtool_s
 
 	if (open)
 	{
-		err = open(image, NULL);
+		err = open(image, nullptr);
 		if (err)
 			return err;
 	}
@@ -171,7 +171,7 @@ static imgtoolerr_t imgtool_floppy_create(imgtool_image *image, imgtool_stream *
 	/* do we have to do extra stuff when creating the image? */
 	if (create)
 	{
-		err = create(image, NULL, opts);
+		err = create(image, nullptr, opts);
 		if (err)
 			goto done;
 	}
@@ -179,7 +179,7 @@ static imgtoolerr_t imgtool_floppy_create(imgtool_image *image, imgtool_stream *
 	/* do we have to do extra stuff when opening the image? */
 	if (open)
 	{
-		err = open(image, NULL);
+		err = open(image, nullptr);
 		if (err)
 			goto done;
 	}
@@ -269,7 +269,7 @@ static void imgtool_floppy_get_info(const imgtool_class *imgclass, UINT32 state,
 		case IMGTOOLINFO_PTR_OPEN:                  info->open = imgtool_floppy_open; break;
 		case IMGTOOLINFO_PTR_CREATE:                info->create = imgtool_floppy_create; break;
 		case IMGTOOLINFO_PTR_CLOSE:                 info->close = imgtool_floppy_close; break;
-		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:  info->createimage_optguide = format->param_guidelines ? floppy_option_guide : NULL; break;
+		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:  info->createimage_optguide = format->param_guidelines ? floppy_option_guide : nullptr; break;
 		case IMGTOOLINFO_PTR_GET_SECTOR_SIZE:       info->get_sector_size = imgtool_floppy_get_sector_size; break;
 		case IMGTOOLINFO_PTR_READ_SECTOR:           info->read_sector = imgtool_floppy_read_sector; break;
 		case IMGTOOLINFO_PTR_WRITE_SECTOR:          info->write_sector = imgtool_floppy_write_sector; break;

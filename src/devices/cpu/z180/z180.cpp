@@ -755,8 +755,8 @@ static UINT8 SZP[256];      /* zero, sign and parity flags */
 static UINT8 SZHV_inc[256]; /* zero, sign, half carry and overflow flags INC r8 */
 static UINT8 SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r8 */
 
-static UINT8 *SZHVC_add;
-static UINT8 *SZHVC_sub;
+static std::unique_ptr<UINT8[]> SZHVC_add;
+static std::unique_ptr<UINT8[]> SZHVC_sub;
 
 #include "z180ops.h"
 #include "z180tbl.h"
@@ -775,8 +775,8 @@ const address_space_config *z180_device::memory_space_config(address_spacenum sp
 	{
 	case AS_PROGRAM:           return &m_program_config;
 	case AS_IO:                return &m_io_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_opcodes_config : NULL;
-	default:                   return NULL;
+	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_decrypted_opcodes_config : nullptr;
+	default:                   return nullptr;
 	}
 }
 
@@ -1888,14 +1888,14 @@ void z180_device::device_start()
 	int oldval, newval, val;
 	UINT8 *padd, *padc, *psub, *psbc;
 
-	if (static_config() != NULL)
+	if (static_config() != nullptr)
 	{
 		m_daisy.init(this, (const z80_daisy_config *)static_config());
 	}
 
 	/* allocate big flag arrays once */
-	SZHVC_add = auto_alloc_array(machine(), UINT8, 2*256*256);
-	SZHVC_sub = auto_alloc_array(machine(), UINT8, 2*256*256);
+	SZHVC_add = std::make_unique<UINT8[]>(2*256*256);
+	SZHVC_sub = std::make_unique<UINT8[]>(2*256*256);
 
 	padd = &SZHVC_add[  0*256];
 	padc = &SZHVC_add[256*256];

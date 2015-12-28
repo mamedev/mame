@@ -65,8 +65,8 @@ void tc0360pri_device::device_start()
 
 void tc0360pri_device::device_reset()
 {
-	for (int i = 0; i < 16; i++)
-		m_regs[i] = 0;
+	for (auto & elem : m_regs)
+		elem = 0;
 }
 
 

@@ -1,5 +1,5 @@
 /*
-** $Id: loadlib.c,v 1.124 2015/01/05 13:51:39 roberto Exp $
+** $Id: loadlib.c,v 1.127 2015/11/23 11:30:45 roberto Exp $
 ** Dynamic library loader for Lua
 ** See Copyright Notice in lua.h
 **
@@ -14,6 +14,7 @@
 #include "lprefix.h"
 
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -136,8 +137,8 @@ static lua_CFunction lsys_sym (lua_State *L, void *lib, const char *sym);
 #include <dlfcn.h>
 
 /*
-** Macro to covert pointer to void* to pointer to function. This cast
-** is undefined according to ISO C, but POSIX assumes that it must work.
+** Macro to convert pointer-to-void* to pointer-to-function. This cast
+** is undefined according to ISO C, but POSIX assumes that it works.
 ** (The '__extension__' in gnu compilers is only to avoid warnings.)
 */
 #if defined(__GNUC__)
@@ -731,7 +732,7 @@ static void createsearcherstable (lua_State *L) {
   int i;
   /* create 'searchers' table */
   lua_createtable(L, sizeof(searchers)/sizeof(searchers[0]) - 1, 0);
-  /* fill it with pre-defined searchers */
+  /* fill it with predefined searchers */
   for (i=0; searchers[i] != NULL; i++) {
     lua_pushvalue(L, -2);  /* set 'package' as upvalue for all searchers */
     lua_pushcclosure(L, searchers[i], 1);

@@ -254,7 +254,7 @@ void tms32082_mp_device::execute_short_imm()
 
 			UINT32 compmask = endmask;          // shiftmask == 0xffffffff
 
-			UINT32 res = 0;
+			UINT32 res;
 			if (r)      // right
 			{
 				res = ROTATE_R(source, rot) & compmask;
@@ -283,7 +283,7 @@ void tms32082_mp_device::execute_short_imm()
 
 			UINT32 compmask = endmask;          // shiftmask == 0xffffffff
 
-			UINT32 res = 0;
+			UINT32 res;
 			if (r)      // right
 			{
 				res = ROTATE_R(source, rot) & compmask;
@@ -316,7 +316,7 @@ void tms32082_mp_device::execute_short_imm()
 			UINT32 shiftmask = SHIFT_MASK[shift ? shift : 32];
 			UINT32 compmask = endmask & shiftmask;
 
-			UINT32 res = 0;
+			UINT32 res;
 			if (r)      // right
 			{
 				res = ROTATE_R(source, rot) & compmask;
@@ -346,7 +346,7 @@ void tms32082_mp_device::execute_short_imm()
 			UINT32 shiftmask = SHIFT_MASK[r ? 32-rot : rot];
 			UINT32 compmask = endmask & shiftmask;
 
-			UINT32 res = 0;
+			UINT32 res;
 			if (r)      // right
 			{
 				res = (ROTATE_R(source, rot) & compmask) | (m_reg[rd] & ~compmask);
@@ -377,7 +377,7 @@ void tms32082_mp_device::execute_short_imm()
 			UINT32 shiftmask = SHIFT_MASK[shift ? shift : 32];
 			UINT32 compmask = endmask & shiftmask;
 
-			UINT32 res = 0;
+			UINT32 res;
 			if (r)      // right
 			{
 				res = ROTATE_R(source, rot) & compmask;
@@ -409,7 +409,7 @@ void tms32082_mp_device::execute_short_imm()
 			UINT32 shiftmask = SHIFT_MASK[r ? 32-rot : rot];
 			UINT32 compmask = endmask & ~shiftmask;
 
-			UINT32 res = 0;
+			UINT32 res;
 			if (r)      // right
 			{
 				res = ROTATE_R(source, rot) & compmask;
@@ -439,7 +439,7 @@ void tms32082_mp_device::execute_short_imm()
 			UINT32 shiftmask = SHIFT_MASK[r ? 32-rot : rot];
 			UINT32 compmask = endmask & ~shiftmask;
 
-			UINT32 res = 0;
+			UINT32 res;
 			if (r)      // right
 			{
 				res = (ROTATE_R(source, rot) & compmask) | (m_reg[rd] & ~compmask);
@@ -897,7 +897,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			UINT32 shiftmask = SHIFT_MASK[shift ? shift : 32];
 			UINT32 compmask = endmask & shiftmask;
 
-			UINT32 res = 0;
+			UINT32 res;
 			if (r)      // right
 			{
 				res = ROTATE_R(source, rot) & compmask;
@@ -928,7 +928,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			UINT32 shiftmask = SHIFT_MASK[shift ? shift : 32];
 			UINT32 compmask = endmask & shiftmask;
 
-			UINT32 res = 0;
+			UINT32 res;
 			if (r)      // right
 			{
 				res = ROTATE_R(source, rot) & compmask;
@@ -960,7 +960,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			UINT32 shiftmask = SHIFT_MASK[shift ? shift : 32];
 			UINT32 compmask = endmask & ~shiftmask;
 
-			UINT32 res = 0;
+			UINT32 res;
 			if (r)      // right
 			{
 				res = ROTATE_R(source, rot) & compmask;
@@ -1393,7 +1393,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			float src1 = u2f(m_reg[OP_SRC1()]);
 			float src2 = u2f(m_reg[OP_RS()]);
 
-			float res = (src1 * src2) + (z ? 0.0f : m_acc[acc]);
+			float res = (src1 * src2) + (z ? 0.0f : m_facc[acc]);
 
 			// parallel load/store op
 			if (!(ls_bit1 == 0 && ls_bit2 == 0))
@@ -1436,7 +1436,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			float src1 = u2f(m_reg[OP_SRC1()]);
 			float src2 = u2f(m_reg[OP_RS()]);
 
-			float res = (z ? 0.0f : m_acc[acc]) - (src1 * src2);
+			float res = (z ? 0.0f : m_facc[acc]) - (src1 * src2);
 
 			// parallel load/store op
 			if (!(ls_bit1 == 0 && ls_bit2 == 0))
@@ -1663,7 +1663,11 @@ void tms32082_mp_device::execute_reg_long_imm()
 				double src1 = has_imm ? (double)u2f(imm32) : (p1 ? u2d(m_fpair[rs1 >> 1]) : (double)u2f(m_reg[rs1]));
 				double src2 = p2 ? u2d(m_fpair[rs2 >> 1]) : (double)u2f(m_reg[rs2]);
 
-				double res = src1 / src2;
+				double res;
+				if (src2 != 0.0)
+					res = src1 / src2;
+				else
+					res = 0.0f;
 
 				if (pd)
 					m_fpair[rd >> 1] = d2u(res);
@@ -1710,7 +1714,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 						m_reg[rd] = f2u((float)(s));
 						break;
 					case 1:
-						m_fpair[rd] = d2u(s);
+						m_fpair[rd >> 1] = d2u(s);
 						break;
 					case 2:
 						m_reg[rd] = (INT32)(s);
@@ -1767,7 +1771,11 @@ void tms32082_mp_device::execute_reg_long_imm()
 
 			if (rd)
 			{
-				double res = sqrt(source);
+				double res;
+				if (source >= 0.0f)
+					res = sqrt(source);
+				else
+					res = 0.0;
 
 				if (pd)
 					m_fpair[rd >> 1] = d2u(res);

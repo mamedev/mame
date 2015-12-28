@@ -45,8 +45,8 @@ public:
 	required_device<via6522_device> m_via_0;
 	required_device<via6522_device> m_via_1;
 	required_shared_ptr<UINT8> m_p_videoram;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 };

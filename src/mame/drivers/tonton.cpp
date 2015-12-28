@@ -44,8 +44,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tonton_outport_w);
 	DECLARE_WRITE8_MEMBER(ay_aout_w);
 	DECLARE_WRITE8_MEMBER(ay_bout_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(tonton_vdp0_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;

@@ -134,7 +134,7 @@ static FILE *sample[1];
 #endif
 
 #define LOG_CYM_FILE 0
-static FILE * cymfile = NULL;
+static FILE * cymfile = nullptr;
 
 
 
@@ -297,7 +297,7 @@ static const int slot_array[32]=
 /* table is 3dB/octave , DV converts this into 6dB/octave */
 /* 0.1875 is bit 0 weight of the envelope counter (volume) expressed in the 'decibel' scale */
 #define DV (0.1875/2.0)
-static const UINT32 ksl_tab[8*16]=
+static const double ksl_tab[8*16]=
 {
 	/* OCT 0 */
 		0.000/DV, 0.000/DV, 0.000/DV, 0.000/DV,
@@ -609,7 +609,7 @@ static int num_lock = 0;
 
 
 
-INLINE int limit( int val, int max, int min ) {
+static inline int limit( int val, int max, int min ) {
 	if ( val > max )
 		val = max;
 	else if ( val < min )
@@ -620,7 +620,7 @@ INLINE int limit( int val, int max, int min ) {
 
 
 /* status set and IRQ handling */
-INLINE void OPL3_STATUS_SET(OPL3 *chip,int flag)
+static inline void OPL3_STATUS_SET(OPL3 *chip,int flag)
 {
 	/* set status flag masking out disabled IRQs */
 	chip->status |= (flag & chip->statusmask);
@@ -636,7 +636,7 @@ INLINE void OPL3_STATUS_SET(OPL3 *chip,int flag)
 }
 
 /* status reset and IRQ handling */
-INLINE void OPL3_STATUS_RESET(OPL3 *chip,int flag)
+static inline void OPL3_STATUS_RESET(OPL3 *chip,int flag)
 {
 	/* reset status flag */
 	chip->status &= ~flag;
@@ -652,7 +652,7 @@ INLINE void OPL3_STATUS_RESET(OPL3 *chip,int flag)
 }
 
 /* IRQ mask set */
-INLINE void OPL3_STATUSMASK_SET(OPL3 *chip,int flag)
+static inline void OPL3_STATUSMASK_SET(OPL3 *chip,int flag)
 {
 	chip->statusmask = flag;
 	/* IRQ handling check */
@@ -662,7 +662,7 @@ INLINE void OPL3_STATUSMASK_SET(OPL3 *chip,int flag)
 
 
 /* advance LFO to next sample */
-INLINE void advance_lfo(OPL3 *chip)
+static inline void advance_lfo(OPL3 *chip)
 {
 	UINT8 tmp;
 
@@ -683,7 +683,7 @@ INLINE void advance_lfo(OPL3 *chip)
 }
 
 /* advance to next sample */
-INLINE void advance(OPL3 *chip)
+static inline void advance(OPL3 *chip)
 {
 	OPL3_CH *CH;
 	OPL3_SLOT *op;
@@ -851,7 +851,7 @@ INLINE void advance(OPL3 *chip)
 }
 
 
-INLINE signed int op_calc(UINT32 phase, unsigned int env, signed int pm, unsigned int wave_tab)
+static inline signed int op_calc(UINT32 phase, unsigned int env, signed int pm, unsigned int wave_tab)
 {
 	UINT32 p;
 
@@ -862,7 +862,7 @@ INLINE signed int op_calc(UINT32 phase, unsigned int env, signed int pm, unsigne
 	return tl_tab[p];
 }
 
-INLINE signed int op_calc1(UINT32 phase, unsigned int env, signed int pm, unsigned int wave_tab)
+static inline signed int op_calc1(UINT32 phase, unsigned int env, signed int pm, unsigned int wave_tab)
 {
 	UINT32 p;
 
@@ -878,7 +878,7 @@ INLINE signed int op_calc1(UINT32 phase, unsigned int env, signed int pm, unsign
 
 /* calculate output of a standard 2 operator channel
  (or 1st part of a 4-op channel) */
-INLINE void chan_calc( OPL3 *chip, OPL3_CH *CH )
+static inline void chan_calc( OPL3 *chip, OPL3_CH *CH )
 {
 	OPL3_SLOT *SLOT;
 	unsigned int env;
@@ -913,7 +913,7 @@ INLINE void chan_calc( OPL3 *chip, OPL3_CH *CH )
 }
 
 /* calculate output of a 2nd part of 4-op channel */
-INLINE void chan_calc_ext( OPL3 *chip, OPL3_CH *CH )
+static inline void chan_calc_ext( OPL3 *chip, OPL3_CH *CH )
 {
 	OPL3_SLOT *SLOT;
 	unsigned int env;
@@ -971,7 +971,7 @@ number   number    BLK/FNUM2 FNUM    Drum  Hat   Drum  Tom  Cymbal
 
 /* calculate rhythm */
 
-INLINE void chan_calc_rhythm( OPL3 *chip, OPL3_CH *CH, unsigned int noise )
+static inline void chan_calc_rhythm( OPL3 *chip, OPL3_CH *CH, unsigned int noise )
 {
 	OPL3_SLOT *SLOT;
 	signed int *chanout = chip->chanout;
@@ -1345,7 +1345,7 @@ static void OPL3_initalize(OPL3 *chip)
 		logerror("YMF262.C: ksl_tab[oct=%2i] =",i);
 		for (j=0; j<16; j++)
 		{
-			logerror("%08x ", ksl_tab[i*16+j] );
+			logerror("%08x ", static_cast<UINT32>(ksl_tab[i*16+j]) );
 		}
 		logerror("\n");
 	}
@@ -1370,7 +1370,7 @@ static void OPL3_initalize(OPL3 *chip)
 
 }
 
-INLINE void FM_KEYON(OPL3_SLOT *SLOT, UINT32 key_set)
+static inline void FM_KEYON(OPL3_SLOT *SLOT, UINT32 key_set)
 {
 	if( !SLOT->key )
 	{
@@ -1382,7 +1382,7 @@ INLINE void FM_KEYON(OPL3_SLOT *SLOT, UINT32 key_set)
 	SLOT->key |= key_set;
 }
 
-INLINE void FM_KEYOFF(OPL3_SLOT *SLOT, UINT32 key_clr)
+static inline void FM_KEYOFF(OPL3_SLOT *SLOT, UINT32 key_clr)
 {
 	if( SLOT->key )
 	{
@@ -1398,7 +1398,7 @@ INLINE void FM_KEYOFF(OPL3_SLOT *SLOT, UINT32 key_clr)
 }
 
 /* update phase increment counter of operator (also update the EG rates if necessary) */
-INLINE void CALC_FCSLOT(OPL3_CH *CH,OPL3_SLOT *SLOT)
+static inline void CALC_FCSLOT(OPL3_CH *CH,OPL3_SLOT *SLOT)
 {
 	int ksr;
 
@@ -1433,7 +1433,7 @@ INLINE void CALC_FCSLOT(OPL3_CH *CH,OPL3_SLOT *SLOT)
 }
 
 /* set multi,am,vib,EG-TYP,KSR,mul */
-INLINE void set_mul(OPL3 *chip,int slot,int v)
+static inline void set_mul(OPL3 *chip,int slot,int v)
 {
 	OPL3_CH   *CH   = &chip->P_CH[slot/2];
 	OPL3_SLOT *SLOT = &CH->SLOT[slot&1];
@@ -1499,7 +1499,7 @@ INLINE void set_mul(OPL3 *chip,int slot,int v)
 }
 
 /* set ksl & tl */
-INLINE void set_ksl_tl(OPL3 *chip,int slot,int v)
+static inline void set_ksl_tl(OPL3 *chip,int slot,int v)
 {
 	OPL3_CH   *CH   = &chip->P_CH[slot/2];
 	OPL3_SLOT *SLOT = &CH->SLOT[slot&1];
@@ -1563,7 +1563,7 @@ INLINE void set_ksl_tl(OPL3 *chip,int slot,int v)
 }
 
 /* set attack rate & decay rate  */
-INLINE void set_ar_dr(OPL3 *chip,int slot,int v)
+static inline void set_ar_dr(OPL3 *chip,int slot,int v)
 {
 	OPL3_CH   *CH   = &chip->P_CH[slot/2];
 	OPL3_SLOT *SLOT = &CH->SLOT[slot&1];
@@ -1590,7 +1590,7 @@ INLINE void set_ar_dr(OPL3 *chip,int slot,int v)
 }
 
 /* set sustain level & release rate */
-INLINE void set_sl_rr(OPL3 *chip,int slot,int v)
+static inline void set_sl_rr(OPL3 *chip,int slot,int v)
 {
 	OPL3_CH   *CH   = &chip->P_CH[slot/2];
 	OPL3_SLOT *SLOT = &CH->SLOT[slot&1];
@@ -1959,7 +1959,7 @@ static void OPL3WriteReg(OPL3 *chip, int r, int v)
 
 			CH->block_fnum = block_fnum;
 
-			CH->ksl_base = ksl_tab[block_fnum>>6];
+			CH->ksl_base = static_cast<UINT32>(ksl_tab[block_fnum>>6]);
 			CH->fc       = chip->fn_tab[block_fnum&0x03ff] >> (7-block);
 
 			/* BLK 2,1,0 bits -> bits 3,2,1 of kcode */
@@ -2287,7 +2287,7 @@ static void OPL3_UnLockTable(void)
 
 	if (LOG_CYM_FILE)
 		fclose (cymfile);
-	cymfile = NULL;
+	cymfile = nullptr;
 }
 
 static void OPL3ResetChip(OPL3 *chip)
@@ -2339,7 +2339,7 @@ static OPL3 *OPL3Create(device_t *device, int clock, int rate, int type)
 {
 	OPL3 *chip;
 
-	if (OPL3_LockTable(device) == -1) return NULL;
+	if (OPL3_LockTable(device) == -1) return nullptr;
 
 	/* allocate memory block */
 	chip = auto_alloc_clear(device->machine(), OPL3);

@@ -149,8 +149,8 @@ public:
 	int m_ColourRAM[4];
 	int m_Field;
 	int m_DrawInterlace;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(dgn);
 	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b0_w);
 	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b1_w);
@@ -213,7 +213,6 @@ public:
 	void cpu1_recalc_firq(int state);
 	void ScanInKeyboard(void);
 	void dgn_beta_frame_interrupt (int data);
-	void dgn_beta_line_interrupt (int data);
 	required_device<ram_device> m_ram;
 	required_device<wd2797_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;

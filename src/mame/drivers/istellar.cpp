@@ -57,7 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_2_latch1_write);
 	DECLARE_WRITE8_MEMBER(z80_2_ldp_write);
 	DECLARE_DRIVER_INIT(istellar);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(istellar);
 	UINT32 screen_update_istellar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_istellar);

@@ -302,6 +302,30 @@ ROM_START( pirates )
 	ROM_LOAD( "s89_49d4.bin", 0x000000, 0x080000, CRC(63a739ec) SHA1(c57f657225e62b3c9c5f0c7185ad7a87794d55f4) )
 ROM_END
 
+ROM_START( piratesb )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code (encrypted) */
+	ROM_LOAD16_BYTE( "U15",  0x00000, 0x80000, CRC(0cfd6415) SHA1(ff5d3631702f64351afa3b7435a6977ae856dff7) )
+	ROM_LOAD16_BYTE( "U16",  0x00001, 0x80000, CRC(98cece02) SHA1(79858623a2b6ae24067e0ba1af009444bafba490) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* GFX (encrypted) */
+	ROM_LOAD( "U34", 0x000000, 0x080000, CRC(89fda216) SHA1(ea31e750460e67a24972b04171230633eb2b6d9d) )
+	ROM_LOAD( "U35", 0x080000, 0x080000, CRC(40e069b4) SHA1(515d12cbb29bdbf3f3016e5bbe14941209978095) )
+	ROM_LOAD( "U48", 0x100000, 0x080000, CRC(26d78518) SHA1(c293f1194f8ef38241d149cf1db1a511a7fb4936) )
+	ROM_LOAD( "U49", 0x180000, 0x080000, CRC(f31696ea) SHA1(f5ab59e441317b02b615a1cdc6d075c5bdcdea73) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* GFX (encrypted) */
+	ROM_LOAD( "U69", 0x000000, 0x080000, CRC(c78a276f) SHA1(d5127593e68f9e8f2878803c652a35a1c6d82b2c) )
+	ROM_LOAD( "U70", 0x080000, 0x080000, CRC(9f0bad96) SHA1(b8f910aa259192e261815392f5d7c9c7dabe0b4d) )
+	ROM_LOAD( "U71", 0x100000, 0x080000, CRC(0bb7c816) SHA1(bc786b6d04ae964f0ea5d6dd314fd7b18f8872e8) ) // 1 bit different, is one of them bad?
+	ROM_LOAD( "U72", 0x180000, 0x080000, CRC(1c41bd2c) SHA1(fba264a3c195f303337223a74cbad5eec5c457ec) )
+
+	ROM_REGION( 0x080000, "oki", 0) /* OKI samples (encrypted) */
+	ROM_LOAD( "U31", 0x000000, 0x080000, CRC(63a739ec) SHA1(c57f657225e62b3c9c5f0c7185ad7a87794d55f4) )
+ROM_END
+
+ 
+
+
 ROM_START( genix )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code (encrypted) */
 	ROM_LOAD16_BYTE( "1.15",  0x00000, 0x80000, CRC(d26abfb0) SHA1(4a89ba7504f86cb612796c376f359ab61ec3d902) )
@@ -443,8 +467,9 @@ DRIVER_INIT_MEMBER(pirates_state,genix)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x109e98, 0x109e9b, read16_delegate(FUNC(pirates_state::genix_prot_r),this));
 }
 
-
 /* GAME */
 
-GAME( 1994, pirates, 0, pirates, pirates, pirates_state, pirates, 0, "NIX", "Pirates", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, genix,   0, pirates, pirates, pirates_state, genix,   0, "NIX", "Genix Family", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pirates, 0,        pirates, pirates, pirates_state, pirates,  0, "NIX", "Pirates (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, piratesb, pirates, pirates, pirates, pirates_state, pirates,  0, "NIX", "Pirates (set 2)", MACHINE_SUPPORTS_SAVE ) // shows 'Copyright 1995' instead of (c)1994 Nix, but isn't unprotected, various changes to the names in the credis + a few other minor alterations
+
+GAME( 1994, genix,   0,        pirates, pirates, pirates_state, genix,    0, "NIX", "Genix Family", MACHINE_SUPPORTS_SAVE )

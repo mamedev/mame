@@ -364,11 +364,11 @@ void i8257_device::device_reset()
 	m_hreq = -1;
 	m_tc = 0;
 
-	for (int i = 0; i < 4; i++)
+	for (auto & elem : m_channel)
 	{
-		m_channel[i].m_address = 0;
-		m_channel[i].m_count = 0;
-		m_channel[i].m_mode = 0;
+		elem.m_address = 0;
+		elem.m_count = 0;
+		elem.m_mode = 0;
 	}
 	set_hreq(0);
 	set_dack();
@@ -390,11 +390,11 @@ bool i8257_device::next_channel()
 		}
 	}
 
-	for (int channel = 0; channel < 4; channel++)
+	for (auto & elem : priority)
 	{
-		if (is_request_active(priority[channel]))
+		if (is_request_active(elem))
 		{
-			m_current_channel = m_last_channel = priority[channel];
+			m_current_channel = m_last_channel = elem;
 			return true;
 		}
 	}

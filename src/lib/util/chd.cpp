@@ -186,7 +186,7 @@ inline void chd_file::be_write_sha1(UINT8 *base, sha1_t value)
 inline void chd_file::file_read(UINT64 offset, void *dest, UINT32 length)
 {
 	// no file = failure
-	if (m_file == NULL)
+	if (m_file == nullptr)
 		throw CHDERR_NOT_OPEN;
 
 	// seek and read
@@ -205,7 +205,7 @@ inline void chd_file::file_read(UINT64 offset, void *dest, UINT32 length)
 inline void chd_file::file_write(UINT64 offset, const void *source, UINT32 length)
 {
 	// no file = failure
-	if (m_file == NULL)
+	if (m_file == nullptr)
 		throw CHDERR_NOT_OPEN;
 
 	// seek and write
@@ -225,7 +225,7 @@ inline void chd_file::file_write(UINT64 offset, const void *source, UINT32 lengt
 inline UINT64 chd_file::file_append(const void *source, UINT32 length, UINT32 alignment)
 {
 	// no file = failure
-	if (m_file == NULL)
+	if (m_file == nullptr)
 		throw CHDERR_NOT_OPEN;
 
 	// seek to the end and align if necessary
@@ -288,7 +288,7 @@ inline UINT8 chd_file::bits_for_value(UINT64 value)
  */
 
 chd_file::chd_file()
-	: m_file(NULL),
+	: m_file(nullptr),
 		m_owns_file(false)
 {
 	// reset state
@@ -554,7 +554,7 @@ void chd_file::set_raw_sha1(sha1_t rawdata)
 void chd_file::set_parent_sha1(sha1_t parent)
 {
 	// if no file, fail
-	if (m_file == NULL)
+	if (m_file == nullptr)
 		throw CHDERR_INVALID_FILE;
 
 	// create a big-endian version
@@ -585,7 +585,7 @@ void chd_file::set_parent_sha1(sha1_t parent)
 chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 unitbytes, chd_codec_type compression[4])
 {
 	// make sure we don't already have a file open
-	if (m_file != NULL)
+	if (m_file != nullptr)
 		return CHDERR_ALREADY_OPEN;
 
 	// set the header parameters
@@ -593,7 +593,7 @@ chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbyte
 	m_hunkbytes = hunkbytes;
 	m_unitbytes = unitbytes;
 	memcpy(m_compression, compression, sizeof(m_compression));
-	m_parent = NULL;
+	m_parent = nullptr;
 
 	// take ownership of the file
 	m_file = &file;
@@ -620,7 +620,7 @@ chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbyte
 chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbytes, chd_codec_type compression[4], chd_file &parent)
 {
 	// make sure we don't already have a file open
-	if (m_file != NULL)
+	if (m_file != nullptr)
 		return CHDERR_ALREADY_OPEN;
 
 	// set the header parameters
@@ -655,11 +655,11 @@ chd_error chd_file::create(core_file &file, UINT64 logicalbytes, UINT32 hunkbyte
 chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 unitbytes, chd_codec_type compression[4])
 {
 	// make sure we don't already have a file open
-	if (m_file != NULL)
+	if (m_file != nullptr)
 		return CHDERR_ALREADY_OPEN;
 
 	// create the new file
-	core_file *file = NULL;
+	core_file *file = nullptr;
 	file_error filerr = core_fopen(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
 	if (filerr != FILERR_NONE)
 		return CHDERR_FILE_NOT_FOUND;
@@ -696,11 +696,11 @@ chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hun
 chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes, chd_codec_type compression[4], chd_file &parent)
 {
 	// make sure we don't already have a file open
-	if (m_file != NULL)
+	if (m_file != nullptr)
 		return CHDERR_ALREADY_OPEN;
 
 	// create the new file
-	core_file *file = NULL;
+	core_file *file = nullptr;
 	file_error filerr = core_fopen(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
 	if (filerr != FILERR_NONE)
 		return CHDERR_FILE_NOT_FOUND;
@@ -735,12 +735,12 @@ chd_error chd_file::create(const char *filename, UINT64 logicalbytes, UINT32 hun
 chd_error chd_file::open(const char *filename, bool writeable, chd_file *parent)
 {
 	// make sure we don't already have a file open
-	if (m_file != NULL)
+	if (m_file != nullptr)
 		return CHDERR_ALREADY_OPEN;
 
 	// open the file
 	UINT32 openflags = writeable ? (OPEN_FLAG_READ | OPEN_FLAG_WRITE) : OPEN_FLAG_READ;
-	core_file *file = NULL;
+	core_file *file = nullptr;
 	file_error filerr = core_fopen(filename, openflags, &file);
 	if (filerr != FILERR_NONE)
 		return CHDERR_FILE_NOT_FOUND;
@@ -775,7 +775,7 @@ chd_error chd_file::open(const char *filename, bool writeable, chd_file *parent)
 chd_error chd_file::open(core_file &file, bool writeable, chd_file *parent)
 {
 	// make sure we don't already have a file open
-	if (m_file != NULL)
+	if (m_file != nullptr)
 		return CHDERR_ALREADY_OPEN;
 
 	// open the file
@@ -796,9 +796,9 @@ chd_error chd_file::open(core_file &file, bool writeable, chd_file *parent)
 void chd_file::close()
 {
 	// reset file characteristics
-	if (m_owns_file && m_file != NULL)
+	if (m_owns_file && m_file != nullptr)
 		core_fclose(m_file);
-	m_file = NULL;
+	m_file = nullptr;
 	m_owns_file = false;
 	m_allow_reads = false;
 	m_allow_writes = false;
@@ -813,7 +813,7 @@ void chd_file::close()
 	m_unitbytes = 0;
 	m_unitcount = 0;
 	memset(m_compression, 0, sizeof(m_compression));
-	m_parent = NULL;
+	m_parent = nullptr;
 	m_parent_missing = false;
 
 	// reset key offsets within the header
@@ -828,10 +828,10 @@ void chd_file::close()
 	m_rawmap.clear();
 
 	// reset compression management
-	for (int decompnum = 0; decompnum < ARRAY_LENGTH(m_decompressor); decompnum++)
+	for (auto & elem : m_decompressor)
 	{
-		delete m_decompressor[decompnum];
-		m_decompressor[decompnum] = NULL;
+		delete elem;
+		elem = nullptr;
 	}
 	m_compressed.clear();
 
@@ -869,7 +869,7 @@ chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 	try
 	{
 		// punt if no file
-		if (m_file == NULL)
+		if (m_file == nullptr)
 			throw CHDERR_NOT_OPEN;
 
 		// return an error if out of range
@@ -896,7 +896,7 @@ chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 						blocklen = be_read(&rawmap[12], 2) + (rawmap[14] << 16);
 						file_read(blockoffs, &m_compressed[0], blocklen);
 						m_decompressor[0]->decompress(&m_compressed[0], blocklen, dest, m_hunkbytes);
-						if (!(rawmap[15] & V34_MAP_ENTRY_FLAG_NO_CRC) && dest != NULL && crc32_creator::simple(dest, m_hunkbytes) != blockcrc)
+						if (!(rawmap[15] & V34_MAP_ENTRY_FLAG_NO_CRC) && dest != nullptr && crc32_creator::simple(dest, m_hunkbytes) != blockcrc)
 							throw CHDERR_DECOMPRESSION_ERROR;
 						return CHDERR_NONE;
 
@@ -936,7 +936,7 @@ chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 						file_read(blockoffs, dest, m_hunkbytes);
 					else if (m_parent_missing)
 						throw CHDERR_REQUIRES_PARENT;
-					else if (m_parent != NULL)
+					else if (m_parent != nullptr)
 						m_parent->read_hunk(hunknum, dest);
 					else
 						memset(dest, 0, m_hunkbytes);
@@ -955,7 +955,7 @@ chd_error chd_file::read_hunk(UINT32 hunknum, void *buffer)
 					case COMPRESSION_TYPE_3:
 						file_read(blockoffs, &m_compressed[0], blocklen);
 						m_decompressor[rawmap[0]]->decompress(&m_compressed[0], blocklen, dest, m_hunkbytes);
-						if (!m_decompressor[rawmap[0]]->lossy() && dest != NULL && crc16_creator::simple(dest, m_hunkbytes) != blockcrc)
+						if (!m_decompressor[rawmap[0]]->lossy() && dest != nullptr && crc16_creator::simple(dest, m_hunkbytes) != blockcrc)
 							throw CHDERR_DECOMPRESSION_ERROR;
 						if (m_decompressor[rawmap[0]]->lossy() && crc16_creator::simple(&m_compressed[0], blocklen) != blockcrc)
 							throw CHDERR_DECOMPRESSION_ERROR;
@@ -1014,7 +1014,7 @@ chd_error chd_file::write_hunk(UINT32 hunknum, const void *buffer)
 	try
 	{
 		// punt if no file
-		if (m_file == NULL)
+		if (m_file == nullptr)
 			throw CHDERR_NOT_OPEN;
 
 		// return an error if out of range
@@ -1249,7 +1249,7 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex
 
 		// read the metadata
 		// TODO: how to properly allocate a dynamic char buffer?
-		char* metabuf = new char[metaentry.length+1];
+		auto   metabuf = new char[metaentry.length+1];
 		memset(metabuf, 0x00, metaentry.length+1);
 		file_read(metaentry.offset + METADATA_HEADER_SIZE, metabuf, metaentry.length);
 		output.assign(metabuf);
@@ -2268,25 +2268,25 @@ chd_error chd_file::create_common()
 		m_metaoffset = 0;
 
 		// if we have a parent, it must be V3 or later
-		if (m_parent != NULL && m_parent->version() < 3)
+		if (m_parent != nullptr && m_parent->version() < 3)
 			throw CHDERR_UNSUPPORTED_VERSION;
 
 		// must be an even number of units per hunk
 		if (m_hunkbytes % m_unitbytes != 0)
 			throw CHDERR_INVALID_PARAMETER;
-		if (m_parent != NULL && m_unitbytes != m_parent->unit_bytes())
+		if (m_parent != nullptr && m_unitbytes != m_parent->unit_bytes())
 			throw CHDERR_INVALID_PARAMETER;
 
 		// verify the compression types
 		bool found_zero = false;
-		for (int codecnum = 0; codecnum < ARRAY_LENGTH(m_compression); codecnum++)
+		for (auto & elem : m_compression)
 		{
 			// once we hit an empty slot, all later slots must be empty as well
-			if (m_compression[codecnum] == CHD_CODEC_NONE)
+			if (elem == CHD_CODEC_NONE)
 				found_zero = true;
 			else if (found_zero)
 				throw CHDERR_INVALID_PARAMETER;
-			else if (!chd_codec_list::codec_exists(m_compression[codecnum]))
+			else if (!chd_codec_list::codec_exists(elem))
 				throw CHDERR_UNKNOWN_COMPRESSION;
 		}
 
@@ -2306,7 +2306,7 @@ chd_error chd_file::create_common()
 		be_write(&rawheader[60], m_unitbytes, 4);
 		be_write_sha1(&rawheader[64], sha1_t::null);
 		be_write_sha1(&rawheader[84], sha1_t::null);
-		be_write_sha1(&rawheader[104], (m_parent != NULL) ? m_parent->sha1() : sha1_t::null);
+		be_write_sha1(&rawheader[104], (m_parent != nullptr) ? m_parent->sha1() : sha1_t::null);
 
 		// write the resulting header
 		file_write(0, rawheader, sizeof(rawheader));
@@ -2412,12 +2412,12 @@ chd_error chd_file::open_common(bool writeable)
 		// make sure we have a parent if we need one (and don't if we don't)
 		if (parentsha1 != sha1_t::null)
 		{
-			if (m_parent == NULL)
+			if (m_parent == nullptr)
 				m_parent_missing = true;
 			else if (m_parent->sha1() != parentsha1)
 				throw CHDERR_INVALID_PARENT;
 		}
-		else if (m_parent != NULL)
+		else if (m_parent != nullptr)
 			throw CHDERR_INVALID_PARAMETER;
 
 		// finish opening the file
@@ -2450,7 +2450,7 @@ void chd_file::create_open_common()
 	for (int decompnum = 0; decompnum < ARRAY_LENGTH(m_compression); decompnum++)
 	{
 		m_decompressor[decompnum] = chd_codec_list::new_decompressor(m_compression[decompnum], *this);
-		if (m_decompressor[decompnum] == NULL && m_compression[decompnum] != 0)
+		if (m_decompressor[decompnum] == nullptr && m_compression[decompnum] != 0)
 			throw CHDERR_UNKNOWN_COMPRESSION;
 	}
 
@@ -2488,7 +2488,7 @@ void chd_file::create_open_common()
 void chd_file::verify_proper_compression_append(UINT32 hunknum)
 {
 	// punt if no file
-	if (m_file == NULL)
+	if (m_file == nullptr)
 		throw CHDERR_NOT_OPEN;
 
 	// return an error if out of range
@@ -2751,11 +2751,11 @@ chd_file_compressor::chd_file_compressor()
 	: m_walking_parent(false),
 		m_total_in(0),
 		m_total_out(0),
-		m_read_queue(NULL),
+		m_read_queue(nullptr),
 		m_read_queue_offset(0),
 		m_read_done_offset(0),
 		m_read_error(false),
-		m_work_queue(NULL),
+		m_work_queue(nullptr),
 		m_write_hunk(0)
 {
 	// zap arrays
@@ -2781,8 +2781,8 @@ chd_file_compressor::~chd_file_compressor()
 	osd_work_queue_free(m_work_queue);
 
 	// delete allocated arrays
-	for (int codecnum = 0; codecnum < ARRAY_LENGTH(m_codecs); codecnum++)
-		delete m_codecs[codecnum];
+	for (auto & elem : m_codecs)
+		delete elem;
 }
 
 /**
@@ -2796,7 +2796,7 @@ chd_file_compressor::~chd_file_compressor()
 void chd_file_compressor::compress_begin()
 {
 	// reset state
-	m_walking_parent = (m_parent != NULL);
+	m_walking_parent = (m_parent != nullptr);
 	m_total_in = 0;
 	m_total_out = 0;
 	m_compsha1.reset();
@@ -2824,10 +2824,10 @@ void chd_file_compressor::compress_begin()
 	}
 
 	// initialize codec instances
-	for (int instance = 0; instance < ARRAY_LENGTH(m_codecs); instance++)
+	for (auto & elem : m_codecs)
 	{
-		delete m_codecs[instance];
-		m_codecs[instance] = new chd_compressor_group(*this, m_compression);
+		delete elem;
+		elem = new chd_compressor_group(*this, m_compression);
 	}
 
 	// reset write state
@@ -2886,9 +2886,9 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 		work_item &item = m_work_item[m_write_hunk % WORK_BUFFER_HUNKS];
 
 		// free any OSD work item
-		if (item.m_osd != NULL)
+		if (item.m_osd != nullptr)
 			osd_work_item_release(item.m_osd);
-		item.m_osd = NULL;
+		item.m_osd = nullptr;
 
 		// for parent walking, just add to the hashmap
 		if (m_walking_parent)
@@ -2929,7 +2929,7 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 			}
 
 			// if not, see if it's in the parent map
-			if (m_parent != NULL)
+			if (m_parent != nullptr)
 			{
 				UINT64 parentunit = m_parent_map.find(item.m_hash[0].m_crc16, item.m_hash[0].m_sha1);
 				if (parentunit != hashmap::NOT_FOUND)
@@ -2958,8 +2958,8 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 				m_walking_parent = false;
 				m_read_queue_offset = m_read_done_offset = 0;
 				m_write_hunk = 0;
-				for (int itemnum = 0; itemnum < WORK_BUFFER_HUNKS; itemnum++)
-					atomic_exchange32(&m_work_item[itemnum].m_status, WS_READY);
+				for (auto & elem : m_work_item)
+					atomic_exchange32(&elem.m_status, WS_READY);
 			}
 
 			// wait for all reads to finish and if we're compressed, write the final SHA1 and map
@@ -2982,7 +2982,7 @@ chd_error chd_file_compressor::compress_continue(double &progress, double &ratio
 	ratio = (m_total_in == 0) ? 1.0 : double(m_total_out) / double(m_total_in);
 
 	// if we're waiting for work, wait
-	while (m_work_item[m_write_hunk % WORK_BUFFER_HUNKS].m_status != WS_COMPLETE && m_work_item[m_write_hunk % WORK_BUFFER_HUNKS].m_osd != NULL)
+	while (m_work_item[m_write_hunk % WORK_BUFFER_HUNKS].m_status != WS_COMPLETE && m_work_item[m_write_hunk % WORK_BUFFER_HUNKS].m_osd != nullptr)
 		osd_work_item_wait(m_work_item[m_write_hunk % WORK_BUFFER_HUNKS].m_osd, osd_ticks_per_second());
 
 	return m_walking_parent ? CHDERR_WALKING_PARENT : CHDERR_COMPRESSING;
@@ -3005,7 +3005,7 @@ void *chd_file_compressor::async_walk_parent_static(void *param, int threadid)
 {
 	work_item *item = reinterpret_cast<work_item *>(param);
 	item->m_compressor->async_walk_parent(*item);
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -3047,7 +3047,7 @@ void *chd_file_compressor::async_compress_hunk_static(void *param, int threadid)
 {
 	work_item *item = reinterpret_cast<work_item *>(param);
 	item->m_compressor->async_compress_hunk(*item, threadid);
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -3096,7 +3096,7 @@ void chd_file_compressor::async_compress_hunk(work_item &item, int threadid)
 void *chd_file_compressor::async_read_static(void *param, int threadid)
 {
 	reinterpret_cast<chd_file_compressor *>(param)->async_read();
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -3189,7 +3189,7 @@ void chd_file_compressor::async_read()
  */
 
 chd_file_compressor::hashmap::hashmap()
-	: m_block_list(new entry_block(NULL))
+	: m_block_list(new entry_block(nullptr))
 {
 	// initialize the map to empty
 	memset(m_map, 0, sizeof(m_map));
@@ -3220,7 +3220,7 @@ chd_file_compressor::hashmap::~hashmap()
 void chd_file_compressor::hashmap::reset()
 {
 	// delete all the blocks
-	while (m_block_list->m_next != NULL)
+	while (m_block_list->m_next != nullptr)
 	{
 		entry_block *block = m_block_list;
 		m_block_list = block->m_next;
@@ -3248,7 +3248,7 @@ void chd_file_compressor::hashmap::reset()
 UINT64 chd_file_compressor::hashmap::find(crc16_t crc16, sha1_t sha1)
 {
 	// look up the entry in the map
-	for (entry_t *entry = m_map[crc16]; entry != NULL; entry = entry->m_next)
+	for (entry_t *entry = m_map[crc16]; entry != nullptr; entry = entry->m_next)
 		if (entry->m_sha1 == sha1)
 			return entry->m_itemnum;
 	return NOT_FOUND;

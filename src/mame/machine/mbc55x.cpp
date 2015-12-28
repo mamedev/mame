@@ -72,7 +72,7 @@ WRITE8_MEMBER( mbc55x_state::mbc55x_ppi_portb_w )
 
 WRITE8_MEMBER( mbc55x_state::mbc55x_ppi_portc_w )
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	switch (data & 0x03)
 	{
@@ -374,7 +374,7 @@ static int instruction_hook(device_t &device, offs_t curpc)
 
 	addr_ptr = (UINT8*)space.get_read_ptr(curpc);
 
-	if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD))
+	if ((addr_ptr !=nullptr) && (addr_ptr[0]==0xCD))
 	{
 //      logerror("int %02X called\n",addr_ptr[1]);
 

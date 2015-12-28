@@ -34,8 +34,8 @@ READ32_MEMBER(eolith_state::eolith_vram_r)
 
 VIDEO_START_MEMBER(eolith_state,eolith)
 {
-	m_vram = auto_alloc_array(machine(), UINT32, 0x40000*2/4);
-	save_pointer(NAME(m_vram), 0x40000*2/4);
+	m_vram = std::make_unique<UINT32[]>(0x40000*2/4);
+	save_pointer(NAME(m_vram.get()), 0x40000*2/4);
 	save_item(NAME(m_buffer));
 }
 

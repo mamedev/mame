@@ -43,16 +43,16 @@ public:
 	{
 	}
 
-	UINT32 *m_bios_ram;
-	UINT32 *m_bios_ext_ram;
+	std::unique_ptr<UINT32[]> m_bios_ram;
+	std::unique_ptr<UINT32[]> m_bios_ext_ram;
 	UINT8 m_mtxc_config_reg[256];
 	UINT8 m_piix4_config_reg[4][256];
 
 	DECLARE_WRITE32_MEMBER( bios_ext_ram_w );
 
 	DECLARE_WRITE32_MEMBER( bios_ram_w );
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	void intel82439tx_init();
 };
 
@@ -85,11 +85,11 @@ static void mtxc_config_w(device_t *busdevice, device_t *device, int function, i
 	if (reg == 0x63)
 	{
 		if (data & 0x20)        // enable RAM access to region 0xf0000 - 0xfffff
-			state->membank("bios_bank")->set_base(state->m_bios_ram);
+			state->membank("bios_bank")->set_base(state->m_bios_ram.get());
 		else                    // disable RAM access (reads go to BIOS ROM)
 			state->membank("bios_bank")->set_base(state->memregion("bios")->base() + 0x30000);
 		if (data & 0x80)        // enable RAM access to region 0xe0000 - 0xeffff
-			state->membank("bios_ext")->set_base(state->m_bios_ext_ram);
+			state->membank("bios_ext")->set_base(state->m_bios_ext_ram.get());
 		else
 			state->membank("bios_ext")->set_base(state->memregion("bios")->base() + 0x20000);
 	}
@@ -217,7 +217,7 @@ WRITE32_MEMBER(queen_state::bios_ext_ram_w)
 {
 	if (m_mtxc_config_reg[0x63] & 0x40)     // write to RAM if this region is write-enabled
 	{
-		COMBINE_DATA(m_bios_ext_ram + offset);
+		COMBINE_DATA(m_bios_ext_ram.get() + offset);
 	}
 }
 
@@ -226,7 +226,7 @@ WRITE32_MEMBER(queen_state::bios_ram_w)
 {
 	if (m_mtxc_config_reg[0x63] & 0x10)     // write to RAM if this region is write-enabled
 	{
-		COMBINE_DATA(m_bios_ram + offset);
+		COMBINE_DATA(m_bios_ram.get() + offset);
 	}
 }
 
@@ -256,8 +256,8 @@ ADDRESS_MAP_END
 
 void queen_state::machine_start()
 {
-	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
-	m_bios_ext_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
+	m_bios_ram = std::make_unique<UINT32[]>(0x10000/4);
+	m_bios_ext_ram = std::make_unique<UINT32[]>(0x10000/4);
 
 	intel82439tx_init();
 }
@@ -279,13 +279,13 @@ static MACHINE_CONFIG_START( queen, queen_state )
 	MCFG_FRAGMENT_ADD( pcat_common )
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, intel82439tx_pci_r, intel82439tx_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(7, nullptr, intel82371ab_pci_r, intel82371ab_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, NULL, NULL, true)
+	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, nullptr, nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir7_w))
 
 	/* video hardware */

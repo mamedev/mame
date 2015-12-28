@@ -42,7 +42,7 @@ const device_type A78_CART_SLOT = &device_creator<a78_cart_slot_device>;
 
 device_a78_cart_interface::device_a78_cart_interface (const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0),
 		m_base_rom(0x8000),
 		m_bank_mask(0)
@@ -64,7 +64,7 @@ device_a78_cart_interface::~device_a78_cart_interface ()
 
 void device_a78_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = device().machine().memory().region_alloc(std::string(tag).append(A78SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
@@ -115,7 +115,7 @@ void device_a78_cart_interface::nvram_alloc(UINT32 size)
 a78_cart_slot_device::a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						device_t(mconfig, A78_CART_SLOT, "Atari 7800 Cartridge Slot", tag, owner, clock, "a78_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this), m_cart(nullptr), m_type(0), m_stick_type(0)
+						device_slot_interface(mconfig, *this), m_cart(nullptr), m_type(0)
 {
 }
 
@@ -322,10 +322,10 @@ static const a78_slot slot_list[] =
 
 static int a78_get_pcb_id(const char *slot)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(slot_list[i].slot_option, slot))
-			return slot_list[i].pcb_id;
+		if (!core_stricmp(elem.slot_option, slot))
+			return elem.pcb_id;
 	}
 
 	return 0;
@@ -333,10 +333,10 @@ static int a78_get_pcb_id(const char *slot)
 
 static const char *a78_get_slot(int type)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (slot_list[i].pcb_id == type)
-			return slot_list[i].slot_option;
+		if (elem.pcb_id == type)
+			return elem.slot_option;
 	}
 
 	return "a78_rom";
@@ -348,7 +348,7 @@ bool a78_cart_slot_device::call_load()
 	{
 		UINT32 len;
 
-		if (software_entry() != NULL)
+		if (software_entry() != nullptr)
 		{
 			const char *pcb_name;
 			bool has_ram = get_software_region("ram") ? TRUE : FALSE;
@@ -358,7 +358,7 @@ bool a78_cart_slot_device::call_load()
 			m_cart->rom_alloc(len, tag());
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), len);
 
-			if ((pcb_name = get_feature("slot")) != NULL)
+			if ((pcb_name = get_feature("slot")) != nullptr)
 				m_type = a78_get_pcb_id(pcb_name);
 			else
 				m_type = A78_TYPE0;
@@ -532,7 +532,7 @@ void a78_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "a78_rom";
+		const char *slot_string;
 		dynamic_buffer head(128);
 		int type = A78_TYPE0, mapper;
 

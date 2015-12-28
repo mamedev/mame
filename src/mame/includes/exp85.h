@@ -31,13 +31,12 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_memory_region m_rom;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER( i8355_a_r );
 	DECLARE_WRITE8_MEMBER( i8355_a_w );
 	DECLARE_READ_LINE_MEMBER( sid_r );
 	DECLARE_WRITE_LINE_MEMBER( sod_w );
-	DECLARE_WRITE_LINE_MEMBER( terminal_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_rst75 );
 

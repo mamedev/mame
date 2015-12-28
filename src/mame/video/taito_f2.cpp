@@ -34,9 +34,9 @@ void taitof2_state::taitof2_core_vh_start (int sprite_type, int hide, int flip_h
 	m_hide_pixels = hide;
 	m_flip_hide_pixels = flip_hide;
 
-	m_spriteram_delayed = auto_alloc_array_clear(machine(), UINT16, m_spriteram.bytes() / 2);
-	m_spriteram_buffered = auto_alloc_array_clear(machine(), UINT16, m_spriteram.bytes() / 2);
-	m_spritelist = auto_alloc_array_clear(machine(), struct f2_tempsprite, 0x400);
+	m_spriteram_delayed = make_unique_clear<UINT16[]>(m_spriteram.bytes() / 2);
+	m_spriteram_buffered = make_unique_clear<UINT16[]>(m_spriteram.bytes() / 2);
+	m_spritelist = make_unique_clear<struct f2_tempsprite[]>(0x400);
 
 	for (i = 0; i < 8; i ++)
 	{
@@ -67,8 +67,8 @@ void taitof2_state::taitof2_core_vh_start (int sprite_type, int hide, int flip_h
 	save_item(NAME(m_spritepri));
 	save_item(NAME(m_spriteblendmode));
 	save_item(NAME(m_prepare_sprites));
-	save_pointer(NAME(m_spriteram_delayed), m_spriteram.bytes() / 2);
-	save_pointer(NAME(m_spriteram_buffered), m_spriteram.bytes() / 2);
+	save_pointer(NAME(m_spriteram_delayed.get()), m_spriteram.bytes() / 2);
+	save_pointer(NAME(m_spriteram_buffered.get()), m_spriteram.bytes() / 2);
 }
 
 /**************************************************************************************/
@@ -487,7 +487,7 @@ void taitof2_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
-	struct f2_tempsprite *sprite_ptr = m_spritelist;
+	struct f2_tempsprite *sprite_ptr = m_spritelist.get();
 
 	/* must remember enable status from last frame because driftout fails to
 	   reactivate them from a certain point onwards. */
@@ -775,7 +775,7 @@ void taitof2_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 
 
 	/* this happens only if primsks != NULL */
-	while (sprite_ptr != m_spritelist)
+	while (sprite_ptr != m_spritelist.get())
 	{
 		sprite_ptr--;
 
@@ -820,7 +820,7 @@ void taitof2_state::taitof2_handle_sprite_buffering(  )
 {
 	if (m_prepare_sprites)   /* no buffering */
 	{
-		memcpy(m_spriteram_buffered, m_spriteram, m_spriteram.bytes());
+		memcpy(m_spriteram_buffered.get(), m_spriteram, m_spriteram.bytes());
 		m_prepare_sprites = 0;
 	}
 }
@@ -892,10 +892,10 @@ void taitof2_state::screen_eof_taitof2_full_buffer_delayed(screen_device &screen
 		taitof2_update_sprites_active_area();
 
 		m_prepare_sprites = 0;
-		memcpy(m_spriteram_buffered, m_spriteram_delayed, m_spriteram.bytes());
+		memcpy(m_spriteram_buffered.get(), m_spriteram_delayed.get(), m_spriteram.bytes());
 		for (i = 0; i < m_spriteram.bytes() / 2; i++)
 			m_spriteram_buffered[i] = spriteram[i];
-		memcpy(m_spriteram_delayed, spriteram, m_spriteram.bytes());
+		memcpy(m_spriteram_delayed.get(), spriteram, m_spriteram.bytes());
 	}
 }
 
@@ -910,10 +910,10 @@ void taitof2_state::screen_eof_taitof2_partial_buffer_delayed(screen_device &scr
 		taitof2_update_sprites_active_area();
 
 		m_prepare_sprites = 0;
-		memcpy(m_spriteram_buffered, m_spriteram_delayed, m_spriteram.bytes());
+		memcpy(m_spriteram_buffered.get(), m_spriteram_delayed.get(), m_spriteram.bytes());
 		for (i = 0;i < m_spriteram.bytes() / 2; i += 4)
 			m_spriteram_buffered[i] = spriteram[i];
-		memcpy(m_spriteram_delayed, spriteram, m_spriteram.bytes());
+		memcpy(m_spriteram_delayed.get(), spriteram, m_spriteram.bytes());
 	}
 }
 
@@ -928,14 +928,14 @@ void taitof2_state::screen_eof_taitof2_partial_buffer_delayed_thundfox(screen_de
 		taitof2_update_sprites_active_area();
 
 		m_prepare_sprites = 0;
-		memcpy(m_spriteram_buffered, m_spriteram_delayed, m_spriteram.bytes());
+		memcpy(m_spriteram_buffered.get(), m_spriteram_delayed.get(), m_spriteram.bytes());
 		for (i = 0; i < m_spriteram.bytes() / 2; i += 8)
 		{
 			m_spriteram_buffered[i]     = spriteram[i];
 			m_spriteram_buffered[i + 1] = spriteram[i + 1];
 			m_spriteram_buffered[i + 4] = spriteram[i + 4];
 		}
-		memcpy(m_spriteram_delayed, spriteram, m_spriteram.bytes());
+		memcpy(m_spriteram_delayed.get(), spriteram, m_spriteram.bytes());
 	}
 }
 
@@ -953,7 +953,7 @@ void taitof2_state::screen_eof_taitof2_partial_buffer_delayed_qzchikyu(screen_de
 		taitof2_update_sprites_active_area();
 
 		m_prepare_sprites = 0;
-		memcpy(m_spriteram_buffered, m_spriteram_delayed, m_spriteram.bytes());
+		memcpy(m_spriteram_buffered.get(), m_spriteram_delayed.get(), m_spriteram.bytes());
 		for (i = 0; i < m_spriteram.bytes() / 2; i += 8)
 		{
 			m_spriteram_buffered[i]     = spriteram[i];
@@ -963,7 +963,7 @@ void taitof2_state::screen_eof_taitof2_partial_buffer_delayed_qzchikyu(screen_de
 			m_spriteram_buffered[i + 6] = spriteram[i + 6]; // not needed?
 			m_spriteram_buffered[i + 7] = spriteram[i + 7]; // not needed?
 		}
-		memcpy(m_spriteram_delayed, spriteram, m_spriteram.bytes());
+		memcpy(m_spriteram_delayed.get(), spriteram, m_spriteram.bytes());
 	}
 }
 
@@ -977,7 +977,7 @@ UINT32 taitof2_state::screen_update_taitof2_ssi(screen_device &screen, bitmap_in
 	   (they are in Majestic 12, but the tilemaps are not used anyway) */
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
-	draw_sprites(screen, bitmap, cliprect, NULL, 0);
+	draw_sprites(screen, bitmap, cliprect, nullptr, 0);
 	return 0;
 }
 
@@ -990,7 +990,7 @@ UINT32 taitof2_state::screen_update_taitof2_yesnoj(screen_device &screen, bitmap
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);   /* wrong color? */
-	draw_sprites(screen, bitmap, cliprect, NULL, 0);
+	draw_sprites(screen, bitmap, cliprect, nullptr, 0);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, m_tc0100scn->bottomlayer(), 0, 0);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, m_tc0100scn->bottomlayer() ^ 1, 0, 0);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
@@ -1008,7 +1008,7 @@ UINT32 taitof2_state::screen_update_taitof2(screen_device &screen, bitmap_ind16 
 	bitmap.fill(0, cliprect);   /* wrong color? */
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, m_tc0100scn->bottomlayer(), 0, 0);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, m_tc0100scn->bottomlayer() ^ 1, 0, 0);
-	draw_sprites(screen, bitmap, cliprect, NULL, 0);
+	draw_sprites(screen, bitmap, cliprect, nullptr, 0);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
 	return 0;
 }
@@ -1044,7 +1044,7 @@ UINT32 taitof2_state::screen_update_taitof2_pri(screen_device &screen, bitmap_in
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
-	draw_sprites(screen, bitmap, cliprect, NULL, 1);
+	draw_sprites(screen, bitmap, cliprect, nullptr, 1);
 	return 0;
 }
 
@@ -1052,10 +1052,10 @@ UINT32 taitof2_state::screen_update_taitof2_pri(screen_device &screen, bitmap_in
 
 void taitof2_state::draw_roz_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 priority)
 {
-	if (m_tc0280grd != NULL)
+	if (m_tc0280grd != nullptr)
 		m_tc0280grd->tc0280grd_zoom_draw(screen, bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority);
 
-	if (m_tc0430grw != NULL)
+	if (m_tc0430grw != nullptr)
 		m_tc0430grw->tc0430grw_zoom_draw(screen, bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority);
 }
 
@@ -1071,10 +1071,10 @@ UINT32 taitof2_state::screen_update_taitof2_pri_roz(screen_device &screen, bitma
 
 	taitof2_handle_sprite_buffering();
 
-	if (m_tc0280grd != NULL)
+	if (m_tc0280grd != nullptr)
 		m_tc0280grd->tc0280grd_tilemap_update(roz_base_color);
 
-	if (m_tc0430grw != NULL)
+	if (m_tc0430grw != nullptr)
 		m_tc0430grw->tc0430grw_tilemap_update(roz_base_color);
 
 	m_tc0100scn->tilemap_update();
@@ -1121,7 +1121,7 @@ UINT32 taitof2_state::screen_update_taitof2_pri_roz(screen_device &screen, bitma
 		}
 	}
 
-	draw_sprites(screen, bitmap, cliprect, NULL, 1);
+	draw_sprites(screen, bitmap, cliprect, nullptr, 1);
 	return 0;
 }
 
@@ -1310,7 +1310,7 @@ UINT32 taitof2_state::screen_update_taitof2_metalb(screen_device &screen, bitmap
 	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 8);
 	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 16);
 
-	draw_sprites(screen, bitmap, cliprect, NULL, 1);
+	draw_sprites(screen, bitmap, cliprect, nullptr, 1);
 	return 0;
 }
 

@@ -15,7 +15,7 @@
 
 #define VERBOSE_LEVEL   (0)
 
-INLINE void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{
@@ -1794,7 +1794,7 @@ WRITE16_MEMBER( mc68328_device::write )
 
 READ16_MEMBER( mc68328_device::read )
 {
-	UINT16 temp16 = 0;
+	UINT16 temp16;
 	UINT32 address = offset << 1;
 
 	switch (address)

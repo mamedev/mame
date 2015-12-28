@@ -19,8 +19,8 @@ const device_type I82439TX = &device_creator<i82439tx_device>;
 i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: northbridge_device(mconfig, I82439TX, "Intel 82439TX", tag, owner, clock, "i82439tx", __FILE__),
 	pci_device_interface( mconfig, *this ),
-	m_cpu_tag( NULL ),
-	m_region_tag( NULL ),
+	m_cpu_tag( nullptr ),
+	m_region_tag( nullptr ),
 	m_space(nullptr),
 	m_rom(nullptr)
 {
@@ -55,7 +55,7 @@ void i82439tx_device::i82439tx_configure_memory(UINT8 val, offs_t begin, offs_t 
 
 UINT32 i82439tx_device::pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask)
 {
-	UINT32 result = 0;
+	UINT32 result;
 
 	if (function != 0)
 		return 0;
@@ -266,7 +266,7 @@ void i82439tx_device::device_start()
 	northbridge_device::device_start();
 	/* get address space we are working on */
 	device_t *cpu = machine().device(m_cpu_tag);
-	assert(cpu != NULL);
+	assert(cpu != nullptr);
 
 	m_space = &cpu->memory().space(AS_PROGRAM);
 

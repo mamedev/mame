@@ -391,7 +391,7 @@ static const z80_daisy_config x1_daisy[] =
 {
 	{ "x1kb" },
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 static SLOT_INTERFACE_START( x1_floppies )

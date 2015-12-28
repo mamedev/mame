@@ -77,7 +77,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;

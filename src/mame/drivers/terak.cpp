@@ -25,8 +25,8 @@ public:
 	UINT8 m_unit;
 	UINT8 m_cmd;
 	UINT16 m_data;
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };

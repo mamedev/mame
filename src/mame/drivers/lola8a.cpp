@@ -42,7 +42,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	virtual void machine_reset() { m_maincpu->set_pc(0x8000); }
+	virtual void machine_reset() override { m_maincpu->set_pc(0x8000); }
 
 	DECLARE_READ8_MEMBER(lola8a_port_a_r);
 	DECLARE_WRITE8_MEMBER(lola8a_port_b_w);
@@ -231,8 +231,8 @@ READ8_MEMBER(lola8a_state::keyboard_r)
 	{
 		"line_0", "line_1", "line_2", "line_3",
 		"line_4", "line_5", "line_6", "line_7",
-		"line_8", "line_9", NULL, NULL,
-		NULL,NULL,NULL,NULL
+		"line_8", "line_9", nullptr, nullptr,
+		nullptr,nullptr,nullptr,nullptr
 	};
 
 	if( keynames[m_portb & 0x0f])

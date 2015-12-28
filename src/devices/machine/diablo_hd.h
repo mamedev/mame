@@ -68,10 +68,10 @@ public:
 	int rd_clock(int index);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 #if DIABLO_DEBUG
@@ -108,7 +108,7 @@ private:
 	int m_head;                             //!< current head (track) number on cylinder
 	int m_sector;                           //!< current sector number in track
 	int m_page;                             //!< current page (derived from cylinder, head and sector)
-	UINT8** m_cache;                        //!< pages raw bytes
+	std::unique_ptr<UINT8[]> m_cache[2 * DIABLO_PAGES];                        //!< pages raw bytes
 	UINT32** m_bits;                        //!< pages expanded to bits
 	int m_rdfirst;                          //!< set to first bit of a sector that is read from
 	int m_rdlast;                           //!< set to last bit of a sector that was read from

@@ -77,11 +77,8 @@ public:
 	DECLARE_WRITE32_MEMBER(memory_ctrl_w);
 	DECLARE_READ32_MEMBER(biu_ctrl_r);
 	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
-	DECLARE_WRITE32_MEMBER(bios_ram_w);
 	DECLARE_READ32_MEMBER(parallel_port_r);
 	DECLARE_WRITE32_MEMBER(parallel_port_w);
-	DECLARE_READ32_MEMBER(ad1847_r);
-	DECLARE_WRITE32_MEMBER(ad1847_w);
 	DECLARE_READ8_MEMBER(io20_r);
 	DECLARE_WRITE8_MEMBER(io20_w);
 	DECLARE_READ32_MEMBER(port400_r);
@@ -89,9 +86,9 @@ public:
 	DECLARE_READ32_MEMBER(port800_r);
 	DECLARE_WRITE32_MEMBER(port800_w);
 	DECLARE_DRIVER_INIT(pinball2k);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_mediagx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -602,9 +599,9 @@ static MACHINE_CONFIG_START( mediagx, pinball2k_state )
 	MCFG_FRAGMENT_ADD( pcat_common )
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(18, NULL, cx5510_pci_r, cx5510_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(18, nullptr, cx5510_pci_r, cx5510_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")

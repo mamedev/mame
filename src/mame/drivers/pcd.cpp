@@ -42,7 +42,7 @@ public:
 	m_scsi_data_out(*this, "scsi_data_out"),
 	m_scsi_data_in(*this, "scsi_data_in"),
 	m_ram(*this, "ram"),
-	m_req_hack(NULL)
+	m_req_hack(nullptr)
 	{ }
 
 	DECLARE_READ8_MEMBER( irq_callback );
@@ -76,9 +76,9 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	required_device<i80186_cpu_device> m_maincpu;
@@ -524,9 +524,9 @@ static MACHINE_CONFIG_START( pcd, pcd_state )
 	MCFG_MC2661_TXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir4_w))
 	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232_2", rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD("rs232_1", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232_1", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("usart1", mc2661_device, rx_w))
-	MCFG_RS232_PORT_ADD("rs232_2", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232_2", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("usart3", mc2661_device, rx_w))
 
 	// sound hardware

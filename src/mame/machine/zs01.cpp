@@ -47,7 +47,7 @@ zs01_device::zs01_device( const machine_config &mconfig, const char *tag, device
 void zs01_device::device_start()
 {
 	m_ds2401 = siblingdevice<ds2401_device>(m_ds2401_tag);
-	if( m_ds2401 == NULL )
+	if( m_ds2401 == nullptr )
 	{
 		logerror( "ds2401 '%s' not found\n", m_ds2401_tag );
 	}

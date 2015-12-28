@@ -220,7 +220,7 @@ static const gfx_layout sprite_layout =
 static GFXDECODE_START( lemmings )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,  0, 16 ) /* Sprites 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout,  0, 16 ) /* Sprites 16x16 */
-	GFXDECODE_ENTRY( NULL,           0, charlayout,         0, 16 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( nullptr,           0, charlayout,         0, 16 ) /* Dynamically modified */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -304,13 +304,13 @@ ROM_START( lemmings )
 	ROM_LOAD( "lemmings.9",  0x000000, 0x10000, CRC(e06442f5) SHA1(d9c8b681cce1d0257a0446bc820c7d679e2a1168) )
 	ROM_LOAD( "lemmings.10", 0x010000, 0x10000, CRC(36398848) SHA1(6c6956607f889c35367e6df4a32359042fad695e) )
 	ROM_LOAD( "lemmings.11", 0x020000, 0x10000, CRC(b46a54e5) SHA1(53b053346f80357aecff4ab888a8562f99cb318f) )
-	ROM_FILL(                0x030000, 0x10000, 0 ) /* 3bpp data but sprite chip expects 4 */
+	ROM_FILL(                0x030000, 0x10000, 0x00 ) /* 3bpp data but sprite chip expects 4 */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "lemmings.12", 0x000000, 0x10000, CRC(dc9047ff) SHA1(1bbe573fa51127a9e8b970a353f3cceab00f486a) )
 	ROM_LOAD( "lemmings.13", 0x010000, 0x10000, CRC(7cc15491) SHA1(73c1c11b2738f6679c70cae8ac4c55cdc9b8fc27) )
 	ROM_LOAD( "lemmings.14", 0x020000, 0x10000, CRC(c162788f) SHA1(e1f669efa59699cd1b7da71b112701ee79240c18) )
-	ROM_FILL(                0x030000, 0x10000, 0 ) /* 3bpp data but sprite chip expects 4 */
+	ROM_FILL(                0x030000, 0x10000, 0x00 ) /* 3bpp data but sprite chip expects 4 */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "lemmings.16",    0x00000, 0x20000, CRC(f747847c) SHA1(00880fa6dff979e5d15daea61938bd18c768c92f) )

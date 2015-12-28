@@ -531,8 +531,8 @@ static MACHINE_CONFIG_START( z80netf, z80ne_state )
 	MCFG_FD1771_ADD("wd1771", XTAL_2MHz / 2)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", z80ne_floppies, "sssd", z80ne_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1771:2", z80ne_floppies, NULL,   z80ne_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1771:3", z80ne_floppies, NULL,   z80ne_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1771:2", z80ne_floppies, nullptr,   z80ne_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1771:3", z80ne_floppies, nullptr,   z80ne_state::floppy_formats)
 
 	MCFG_DEFAULT_LAYOUT(layout_z80netf)
 

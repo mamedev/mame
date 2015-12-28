@@ -135,7 +135,7 @@ static const char *const astrof_sample_names[] =
 	"death",
 	"bosshit",
 	"bosskill",
-	0
+	nullptr
 };
 
 MACHINE_CONFIG_FRAGMENT( astrof_audio )

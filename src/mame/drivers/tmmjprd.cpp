@@ -58,7 +58,7 @@ public:
 	required_shared_ptr<UINT32> m_spriteregs;
 	required_shared_ptr<UINT32> m_spriteram;
 
-	UINT32 *m_tilemap_ram[4];
+	std::unique_ptr<UINT32[]> m_tilemap_ram[4];
 	UINT8 m_mux_data;
 	UINT8 m_system_in;
 	double m_old_brt1;
@@ -73,25 +73,22 @@ public:
 	DECLARE_READ32_MEMBER(tilemap2_r);
 	DECLARE_READ32_MEMBER(tilemap3_r);
 	DECLARE_READ32_MEMBER(randomtmmjprds);
-	DECLARE_WRITE32_MEMBER(blitter_w);
 	DECLARE_READ32_MEMBER(mux_r);
 	DECLARE_WRITE32_MEMBER(brt_1_w);
 	DECLARE_WRITE32_MEMBER(brt_2_w);
 	DECLARE_WRITE32_MEMBER(eeprom_write);
 
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	UINT32 screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_CALLBACK_MEMBER(blit_done);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int screen);
 	void draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, UINT32 tiledata, UINT8* rom);
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32*tileram, UINT32*tileregs, UINT8*rom );
-	void do_blit();
 };
 
 
@@ -319,9 +316,9 @@ UINT32 tmmjprd_state::screen_update_left(screen_device &screen, bitmap_ind16 &bi
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	draw_tilemap(bitmap, cliprect, m_tilemap_ram[3], m_tilemap_regs[3], gfxroms );
+	draw_tilemap(bitmap, cliprect, m_tilemap_ram[3].get(), m_tilemap_regs[3], gfxroms );
 	draw_sprites(bitmap,cliprect, 1);
-	draw_tilemap(bitmap, cliprect, m_tilemap_ram[2], m_tilemap_regs[2], gfxroms );
+	draw_tilemap(bitmap, cliprect, m_tilemap_ram[2].get(), m_tilemap_regs[2], gfxroms );
 
 	/*
 	popmessage("%08x %08x %08x %08x %08x %08x",
@@ -353,9 +350,9 @@ UINT32 tmmjprd_state::screen_update_right(screen_device &screen, bitmap_ind16 &b
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	draw_tilemap(bitmap, cliprect, m_tilemap_ram[1], m_tilemap_regs[1], gfxroms );
+	draw_tilemap(bitmap, cliprect, m_tilemap_ram[1].get(), m_tilemap_regs[1], gfxroms );
 	draw_sprites(bitmap,cliprect, 0);
-	draw_tilemap(bitmap, cliprect, m_tilemap_ram[0], m_tilemap_regs[0], gfxroms );
+	draw_tilemap(bitmap, cliprect, m_tilemap_ram[0].get(), m_tilemap_regs[0], gfxroms );
 
 	return 0;
 }
@@ -364,16 +361,16 @@ void tmmjprd_state::video_start()
 {
 	/* the tilemaps are bigger than the regions the cpu can see, need to allocate the ram here */
 	/* or maybe not for this game/hw .... */
-	m_tilemap_ram[0] = auto_alloc_array_clear(machine(), UINT32, 0x8000);
-	m_tilemap_ram[1] = auto_alloc_array_clear(machine(), UINT32, 0x8000);
-	m_tilemap_ram[2] = auto_alloc_array_clear(machine(), UINT32, 0x8000);
-	m_tilemap_ram[3] = auto_alloc_array_clear(machine(), UINT32, 0x8000);
+	m_tilemap_ram[0] = make_unique_clear<UINT32[]>(0x8000);
+	m_tilemap_ram[1] = make_unique_clear<UINT32[]>(0x8000);
+	m_tilemap_ram[2] = make_unique_clear<UINT32[]>(0x8000);
+	m_tilemap_ram[3] = make_unique_clear<UINT32[]>(0x8000);
 
 
-	save_pointer(NAME(m_tilemap_ram[0]), 0x8000);
-	save_pointer(NAME(m_tilemap_ram[1]), 0x8000);
-	save_pointer(NAME(m_tilemap_ram[2]), 0x8000);
-	save_pointer(NAME(m_tilemap_ram[3]), 0x8000);
+	save_pointer(NAME(m_tilemap_ram[0].get()), 0x8000);
+	save_pointer(NAME(m_tilemap_ram[1].get()), 0x8000);
+	save_pointer(NAME(m_tilemap_ram[2].get()), 0x8000);
+	save_pointer(NAME(m_tilemap_ram[3].get()), 0x8000);
 
 	save_item(NAME(m_old_brt1));
 	save_item(NAME(m_old_brt2));

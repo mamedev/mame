@@ -240,7 +240,9 @@ uniform float4 Level0123Weight;
 uniform float4 Level4567Weight;
 uniform float3 Level89AWeight;
 
-uniform float3 OverdriveWeight;
+uniform int BloomBlendMode = 1; // 0 addition, 1 darken
+uniform float BloomScale;
+uniform float3 BloomOverdrive;
 
 float3 GetNoiseFactor(float3 n, float random)
 {
@@ -262,43 +264,78 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float3 texel9 = tex2D(DiffuseSampler9, Input.TexCoord89.zw).rgb;
 	float3 texelA = tex2D(DiffuseSamplerA, Input.TexCoordA).rgb;
 
-	texel0 = texel0 * Level0123Weight.x;
-	texel1 = texel1 * Level0123Weight.y;
-	texel2 = texel2 * Level0123Weight.z;
-	texel3 = texel3 * Level0123Weight.w;
-	texel4 = texel4 * Level4567Weight.x;
-	texel5 = texel5 * Level4567Weight.y;
-	texel6 = texel6 * Level4567Weight.z;
-	texel7 = texel7 * Level4567Weight.w;
-	texel8 = texel8 * Level89AWeight.x;
-	texel9 = texel9 * Level89AWeight.y;
-	texelA = texelA * Level89AWeight.z;
+	float3 blend;
 
-	float3 bloom = float3(
-		texel1 +
-		texel2 +
-		texel3 +
-		texel4 +
-		texel5 +
-		texel6 +
-		texel7 +
-		texel8 +
-		texel9 +
-		texelA);
+	// addition
+	if (BloomBlendMode == 0)
+	{
+		texel0 *= Level0123Weight.x;
+		texel1 *= Level0123Weight.y;
+		texel2 *= Level0123Weight.z;
+		texel3 *= Level0123Weight.w;
+		texel4 *= Level4567Weight.x;
+		texel5 *= Level4567Weight.y;
+		texel6 *= Level4567Weight.z;
+		texel7 *= Level4567Weight.w;
+		texel8 *= Level89AWeight.x;
+		texel9 *= Level89AWeight.y;
+		texelA *= Level89AWeight.z;
 
-	float3 bloomOverdrive = max(0.0f, texel0 + bloom - 1.0f) * OverdriveWeight;
+		float3 bloom = float3(
+			texel1 +
+			texel2 +
+			texel3 +
+			texel4 +
+			texel5 +
+			texel6 +
+			texel7 +
+			texel8 +
+			texel9 +
+			texelA) * BloomScale;
 
-	bloom.r += bloomOverdrive.g * 0.5f;
-	bloom.r += bloomOverdrive.b * 0.5f;
-	bloom.g += bloomOverdrive.r * 0.5f;
-	bloom.g += bloomOverdrive.b * 0.5f;
-	bloom.b += bloomOverdrive.r * 0.5f;
-	bloom.b += bloomOverdrive.g * 0.5f;
+		float3 bloomOverdrive = max(0.0f, texel0 + bloom - 1.0f) * BloomOverdrive;
 
-	float2 NoiseCoord = Input.TexCoord01.xy;
-	float3 NoiseFactor = GetNoiseFactor(bloom, random(NoiseCoord));
-	
-	return float4(texel0 + bloom * NoiseFactor, 1.0f);
+		bloom.r += bloomOverdrive.g * 0.5f;
+		bloom.r += bloomOverdrive.b * 0.5f;
+		bloom.g += bloomOverdrive.r * 0.5f;
+		bloom.g += bloomOverdrive.b * 0.5f;
+		bloom.b += bloomOverdrive.r * 0.5f;
+		bloom.b += bloomOverdrive.g * 0.5f;
+
+		float2 NoiseCoord = Input.TexCoord01.xy;
+		float3 NoiseFactor = GetNoiseFactor(bloom, random(NoiseCoord));
+		
+		blend = texel0 + bloom * NoiseFactor;
+	}
+
+	// darken
+	else
+	{	
+		texel1 = min(texel0, texel1);
+		texel2 = min(texel0, texel2);
+		texel3 = min(texel0, texel3);
+		texel4 = min(texel0, texel4);
+		texel5 = min(texel0, texel5);
+		texel6 = min(texel0, texel6);
+		texel7 = min(texel0, texel7);
+		texel8 = min(texel0, texel8);
+		texel9 = min(texel0, texel9);
+		texelA = min(texel0, texelA);
+
+		blend = texel0 * Level0123Weight.x;
+		blend = lerp(blend, texel1, Level0123Weight.y * BloomScale);
+		blend = lerp(blend, texel2, Level0123Weight.z * BloomScale);
+		blend = lerp(blend, texel3, Level0123Weight.w * BloomScale);
+		blend = lerp(blend, texel4, Level4567Weight.x * BloomScale);
+		blend = lerp(blend, texel5, Level4567Weight.y * BloomScale);
+		blend = lerp(blend, texel6, Level4567Weight.z * BloomScale);
+		blend = lerp(blend, texel7, Level4567Weight.w * BloomScale);
+		blend = lerp(blend, texel8, Level89AWeight.x * BloomScale);
+		blend = lerp(blend, texel9, Level89AWeight.y * BloomScale);
+		blend = lerp(blend, texelA, Level89AWeight.z * BloomScale);
+	}
+
+	return float4(blend, 1.0f);
 }
 
 //-----------------------------------------------------------------------------

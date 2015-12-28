@@ -52,7 +52,7 @@ m_ram(nullptr), m_dsrrom(nullptr), m_bank(0), m_size(0)
 
 int myarc_memory_expansion_device::get_base(int offset)
 {
-	int base = 0;
+	int base;
 	if (m_size == SIZE_128)
 	{
 		base = ((m_bank & 0x03) << 15);

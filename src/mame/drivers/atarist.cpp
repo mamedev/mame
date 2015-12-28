@@ -760,9 +760,9 @@ void ste_state::dmasound_tick()
 	{
 		UINT8 *RAM = m_ram->pointer();
 
-		for (int i = 0; i < 8; i++)
+		for (auto & elem : m_dmasnd_fifo)
 		{
-			m_dmasnd_fifo[i] = RAM[m_dmasnd_cntr];
+			elem = RAM[m_dmasnd_cntr];
 			m_dmasnd_cntr++;
 			m_dmasnd_samples++;
 
@@ -1743,7 +1743,7 @@ WRITE8_MEMBER( st_state::psg_pa_w )
 	*/
 
 	// drive select
-	floppy_image_device *floppy = 0;
+	floppy_image_device *floppy = nullptr;
 	if (!BIT(data, 1))
 		floppy = floppy_devices[0];
 	else if(!BIT(data, 2))
@@ -1787,7 +1787,7 @@ WRITE8_MEMBER( stbook_state::psg_pa_w )
 	*/
 
 	// drive select
-	floppy_image_device *floppy = 0;
+	floppy_image_device *floppy = nullptr;
 	if (!BIT(data, 1))
 		floppy = floppy_devices[0];
 	else if(!BIT(data, 2))
@@ -1955,7 +1955,7 @@ void st_state::machine_start()
 		if(con)
 			floppy_devices[i] = con->get_device();
 		else
-			floppy_devices[i] = 0;
+			floppy_devices[i] = nullptr;
 	}
 
 	/// TODO: get callbacks to trigger these.
@@ -2104,7 +2104,7 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
@@ -2119,7 +2119,7 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_MC68901_OUT_TDO_CB(WRITELINE(st_state, mfp_tdo_w))
 	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))
@@ -2195,7 +2195,7 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
@@ -2210,7 +2210,7 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_MC68901_OUT_TDO_CB(WRITELINE(st_state, mfp_tdo_w))
 	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))
@@ -2293,7 +2293,7 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
@@ -2308,7 +2308,7 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_MC68901_OUT_TDO_CB(WRITELINE(st_state, mfp_tdo_w))
 	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))

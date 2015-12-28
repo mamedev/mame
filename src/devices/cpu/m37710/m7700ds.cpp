@@ -321,25 +321,25 @@ static const m7700_opcode_struct g_opcodes_prefix89[256] =
 	{JSR, I, AXI }, {SBC, M, AX  }, {INC, M, AX  }, {SBC, M, ALX }
 };
 
-INLINE unsigned int read_8(const UINT8 *oprom, unsigned int offset)
+static inline unsigned int read_8(const UINT8 *oprom, unsigned int offset)
 {
 	return oprom[offset];
 }
 
-INLINE unsigned int read_16(const UINT8 *oprom, unsigned int offset)
+static inline unsigned int read_16(const UINT8 *oprom, unsigned int offset)
 {
 	unsigned int val = read_8(oprom, offset);
 	return val | (read_8(oprom, offset+1)<<8);
 }
 
-INLINE unsigned int read_24(const UINT8 *oprom, unsigned int offset)
+static inline unsigned int read_24(const UINT8 *oprom, unsigned int offset)
 {
 	unsigned int val = read_8(oprom, offset);
 	val |= (read_8(oprom, offset+1)<<8);
 	return val | (read_8(oprom, offset+2)<<16);
 }
 
-INLINE char* int_8_str(unsigned int val)
+static inline char* int_8_str(unsigned int val)
 {
 	static char str[20];
 
@@ -353,7 +353,7 @@ INLINE char* int_8_str(unsigned int val)
 	return str;
 }
 
-INLINE char* int_16_str(unsigned int val)
+static inline char* int_16_str(unsigned int val)
 {
 	static char str[20];
 

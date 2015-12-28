@@ -116,7 +116,7 @@ static optreserr_t resolve_single_param(const char *specification, int *param_va
 				range++;
 				flags &= ~FLAG_HALF_RANGE;
 				if (--range_count == 0)
-					range = NULL;
+					range = nullptr;
 			}
 		}
 		else if (*s == ';')
@@ -179,14 +179,14 @@ static const char *lookup_in_specification(const char *specification, const opti
 {
 	const char *s;
 	s = strchr(specification, option->parameter);
-	return s ? s + 1 : NULL;
+	return s ? s + 1 : nullptr;
 }
 
 
 
 option_resolution *option_resolution_create(const option_guide *guide, const char *specification)
 {
-	option_resolution *resolution = NULL;
+	option_resolution *resolution = nullptr;
 	const option_guide *guide_entry;
 	int option_count;
 	int opt = -1;
@@ -198,7 +198,7 @@ option_resolution *option_resolution_create(const option_guide *guide, const cha
 	option_count = option_resolution_countoptions(guide, specification);
 
 	/* create a memory pool for this structure */
-	pool = pool_alloc_lib(NULL);
+	pool = pool_alloc_lib(nullptr);
 	if (!pool)
 		goto outofmemory;
 
@@ -244,7 +244,7 @@ unexpected:
 outofmemory:
 	if (resolution)
 		option_resolution_close(resolution);
-	return NULL;
+	return nullptr;
 }
 
 
@@ -255,7 +255,7 @@ optreserr_t option_resolution_add_param(option_resolution *resolution, const cha
 	int must_resolve;
 	optreserr_t err;
 	const char *option_specification;
-	struct option_resolution_entry *entry = NULL;
+	struct option_resolution_entry *entry = nullptr;
 
 	for (i = 0; i < resolution->option_count; i++)
 	{
@@ -317,7 +317,7 @@ optreserr_t option_resolution_add_param(option_resolution *resolution, const cha
 	if (must_resolve)
 	{
 		option_specification = lookup_in_specification(resolution->specification, entry->guide_entry);
-		err = resolve_single_param(option_specification, &entry->u.int_value, NULL, 0);
+		err = resolve_single_param(option_specification, &entry->u.int_value, nullptr, 0);
 		if (err)
 			goto done;
 
@@ -363,7 +363,7 @@ optreserr_t option_resolution_finish(option_resolution *resolution)
 				option_specification = lookup_in_specification(resolution->specification, entry->guide_entry);
 				assert(option_specification);
 				entry->u.int_value = -1;
-				err = resolve_single_param(option_specification, &entry->u.int_value, NULL, 0);
+				err = resolve_single_param(option_specification, &entry->u.int_value, nullptr, 0);
 				if (err)
 					return err;
 				break;
@@ -403,10 +403,10 @@ static const struct option_resolution_entry *option_resolution_lookup_entry(opti
 
 		default:
 			assert(FALSE);
-			return NULL;
+			return nullptr;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -424,7 +424,7 @@ const char *option_resolution_lookup_string(option_resolution *resolution, int o
 {
 	const struct option_resolution_entry *entry;
 	entry = option_resolution_lookup_entry(resolution, option_char);
-	return entry ? entry->u.str_value : NULL;
+	return entry ? entry->u.str_value : nullptr;
 }
 
 
@@ -440,7 +440,7 @@ const option_guide *option_resolution_find_option(option_resolution *resolution,
 {
 	const struct option_resolution_entry *entry;
 	entry = option_resolution_lookup_entry(resolution, option_char);
-	return entry ? entry->guide_entry : NULL;
+	return entry ? entry->guide_entry : nullptr;
 }
 
 
@@ -448,7 +448,7 @@ const option_guide *option_resolution_find_option(option_resolution *resolution,
 const option_guide *option_resolution_index_option(option_resolution *resolution, int indx)
 {
 	if ((indx < 0) || (indx >= resolution->option_count))
-		return NULL;
+		return nullptr;
 	return resolution->entries[indx].guide_entry;
 }
 
@@ -495,7 +495,7 @@ optreserr_t option_resolution_listranges(const char *specification, int option_c
 		return OPTIONRESOLUTION_ERROR_SYNTAX;
 	}
 
-	return resolve_single_param(specification + 1, NULL, range, range_count);
+	return resolve_single_param(specification + 1, nullptr, range, range_count);
 }
 
 
@@ -513,7 +513,7 @@ optreserr_t option_resolution_getdefault(const char *specification, int option_c
 		return OPTIONRESOLUTION_ERROR_SYNTAX;
 	}
 
-	return resolve_single_param(specification + 1, val, NULL, 0);
+	return resolve_single_param(specification + 1, val, nullptr, 0);
 }
 
 
@@ -549,7 +549,7 @@ optreserr_t option_resolution_isvalidvalue(const char *specification, int option
 
 int option_resolution_contains(const char *specification, int option_char)
 {
-	return strchr(specification, option_char) != NULL;
+	return strchr(specification, option_char) != nullptr;
 }
 
 /**
@@ -578,6 +578,6 @@ const char *option_resolution_error_string(optreserr_t err)
 	};
 
 	if ((err < 0) || (err >= ARRAY_LENGTH(errors)))
-		return NULL;
+		return nullptr;
 	return errors[err];
 }

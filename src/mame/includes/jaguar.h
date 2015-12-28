@@ -49,14 +49,14 @@ public:
 			m_using_cart(false),
 			m_misc_control_data(0),
 			m_eeprom_enable(true),
-			m_gpu_jump_address(NULL),
+			m_gpu_jump_address(nullptr),
 			m_gpu_command_pending(false),
 			m_gpu_spin_pc(0),
-			m_main_speedup(NULL),
+			m_main_speedup(nullptr),
 			m_main_speedup_hits(0),
 			m_main_speedup_last_cycles(0),
 			m_main_speedup_max_cycles(0),
-			m_main_gpu_wait(NULL),
+			m_main_gpu_wait(nullptr),
 			m_joystick_data(0),
 			m_eeprom_bit_count(0),
 			m_protection_check(0) ,
@@ -239,7 +239,6 @@ public:
 
 	int quickload(device_image_interface &image, const char *file_type, int quickload_size);
 	void cart_start();
-	int cart_load(device_image_interface &image);
 	IRQ_CALLBACK_MEMBER(jaguar_irq_callback);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( jaguar_cart );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( jaguar );
@@ -255,11 +254,11 @@ protected:
 	};
 
 	// device overrides
-	virtual void machine_reset();
-	virtual void sound_start();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void sound_start() override;
+	virtual void video_start() override;
 	virtual void device_postload();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void gpu_suspend() { m_gpu->suspend(SUSPEND_REASON_SPIN, 1); }
 	void gpu_resume() { m_gpu->resume(SUSPEND_REASON_SPIN); }
@@ -338,9 +337,6 @@ protected:
 	void blitter_01800001_xxxxxx_xxxxxx(UINT32 command, UINT32 a1flags, UINT32 a2flags);
 	void blitter_x1800x01_xxxxxx_xxxxxx(UINT32 command, UINT32 a1flags, UINT32 a2flags);
 
-	emu_file *jaguar_nvram_fopen( UINT32 openflags);
-	void jaguar_nvram_load();
-	void jaguar_nvram_save();
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<vt83c461_device> m_ide;
 	required_device<screen_device> m_screen;

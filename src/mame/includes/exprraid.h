@@ -42,9 +42,9 @@ public:
 	tilemap_t       *m_fg_tilemap;
 	int             m_bg_index[4];
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	DECLARE_WRITE8_MEMBER(exprraid_int_clear_w);
 	DECLARE_READ8_MEMBER(exprraid_prot_status_r);
@@ -72,7 +72,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	UINT32 screen_update_exprraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(exprraid_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void exprraid_gfx_expand();
 };

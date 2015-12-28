@@ -349,8 +349,8 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, device_gfx_interface &decod
 	m_manager = &manager;
 	m_device = dynamic_cast<tilemap_device *>(this);
 	m_palette = decoder.palette();
-	m_next = NULL;
-	m_user_data = NULL;
+	m_next = nullptr;
+	m_user_data = nullptr;
 
 	// populate tilemap metrics
 	m_rows = rows;
@@ -409,17 +409,17 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, device_gfx_interface &decod
 
 	// save relevant state
 	int instance = manager.alloc_instance();
-	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_enable));
-	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_attributes));
-	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_palette_offset));
-	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_scrollrows));
-	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_scrollcols));
-	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_rowscroll));
-	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_colscroll));
-	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_dx));
-	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_dx_flipped));
-	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_dy));
-	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_dy_flipped));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_enable));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_attributes));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_palette_offset));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_scrollrows));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_scrollcols));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_rowscroll));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_colscroll));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dx));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dx_flipped));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dy));
+	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dy_flipped));
 
 	// reset everything after a load
 	machine().save().register_postload(save_prepost_delegate(FUNC(tilemap_t::postload), this));
@@ -760,7 +760,7 @@ g_profiler.start(PROFILER_TILEMAP_UPDATE);
 		m_tileinfo.palette_base, m_tileinfo.category, m_tileinfo.group, flags, m_tileinfo.pen_mask);
 
 	// if mask data is specified, apply it
-	if ((flags & (TILE_FORCE_LAYER0 | TILE_FORCE_LAYER1 | TILE_FORCE_LAYER2)) == 0 && m_tileinfo.mask_data != NULL)
+	if ((flags & (TILE_FORCE_LAYER0 | TILE_FORCE_LAYER1 | TILE_FORCE_LAYER2)) == 0 && m_tileinfo.mask_data != nullptr)
 		m_tileflags[logindex] = tile_apply_bitmask(m_tileinfo.mask_data, x0, y0, m_tileinfo.category, flags);
 
 	// track which gfx have been used for this tilemap
@@ -1124,7 +1124,7 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 	// look up priority and destination base addresses for y1
 	bitmap_ind8 &priority_bitmap = *blit.priority;
 	UINT8 *priority_baseaddr = &priority_bitmap.pix8(y1, xpos);
-	typename _BitmapClass::pixel_t *dest_baseaddr = NULL;
+	typename _BitmapClass::pixel_t *dest_baseaddr = nullptr;
 	int dest_rowpixels = 0;
 	if (dest.valid())
 	{
@@ -1208,7 +1208,7 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 				{
 					for (int cury = y; cury < nexty; cury++)
 					{
-						if (dest_baseaddr == NULL)
+						if (dest_baseaddr == nullptr)
 							scanline_draw_opaque_null(x_end - x_start, pmap0, blit.tilemap_priority_code);
 						else if (sizeof(*dest0) == 2)
 							scanline_draw_opaque_ind16(reinterpret_cast<UINT16 *>(dest0), source0, x_end - x_start, pmap0, blit.tilemap_priority_code);
@@ -1229,7 +1229,7 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 					const UINT8 *mask0 = mask_baseaddr + x_start;
 					for (int cury = y; cury < nexty; cury++)
 					{
-						if (dest_baseaddr == NULL)
+						if (dest_baseaddr == nullptr)
 							scanline_draw_masked_null(mask0, blit.mask, blit.value, x_end - x_start, pmap0, blit.tilemap_priority_code);
 						else if (sizeof(*dest0) == 2)
 							scanline_draw_masked_ind16(reinterpret_cast<UINT16 *>(dest0), source0, mask0, blit.mask, blit.value, x_end - x_start, pmap0, blit.tilemap_priority_code);
@@ -1503,8 +1503,8 @@ tilemap_manager::~tilemap_manager()
 	while (found)
 	{
 		found = false;
-		for (tilemap_t *tmap = m_tilemap_list.first(); tmap != NULL; tmap = tmap->next())
-			if (tmap->device() != NULL)
+		for (tilemap_t *tmap = m_tilemap_list.first(); tmap != nullptr; tmap = tmap->next())
+			if (tmap->device() != nullptr)
 			{
 				found = true;
 				m_tilemap_list.detach(*tmap);
@@ -1537,14 +1537,14 @@ static const struct
 
 tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated)
 {
-	if (allocated == NULL)
+	if (allocated == nullptr)
 		allocated = global_alloc(tilemap_t);
 	return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, mapper, tilewidth, tileheight, cols, rows));
 }
 
 tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated)
 {
-	if (allocated == NULL)
+	if (allocated == nullptr)
 		allocated = global_alloc(tilemap_t);
 	return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(s_standard_mappers[mapper].func, s_standard_mappers[mapper].name, machine().driver_data()), tilewidth, tileheight, cols, rows));
 }
@@ -1557,7 +1557,7 @@ tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_in
 
 void tilemap_manager::set_flip_all(UINT32 attributes)
 {
-	for (tilemap_t *tmap = m_tilemap_list.first(); tmap != NULL; tmap = tmap->next())
+	for (tilemap_t *tmap = m_tilemap_list.first(); tmap != nullptr; tmap = tmap->next())
 		tmap->set_flip(attributes);
 }
 
@@ -1569,7 +1569,7 @@ void tilemap_manager::set_flip_all(UINT32 attributes)
 
 void tilemap_manager::mark_all_dirty()
 {
-	for (tilemap_t *tmap = m_tilemap_list.first(); tmap != NULL; tmap = tmap->next())
+	for (tilemap_t *tmap = m_tilemap_list.first(); tmap != nullptr; tmap = tmap->next())
 		tmap->mark_all_dirty();
 }
 
@@ -1783,14 +1783,14 @@ void tilemap_device::device_start()
 
 	// find the memory, if present
 	const memory_share *share = memshare(tag());
-	if (share != NULL)
+	if (share != nullptr)
 	{
 		m_basemem.set(*share, m_bytes_per_entry);
 
 		// look for an extension entry
 		std::string tag_ext = std::string(tag()).append("_ext");
 		share = memshare(tag_ext.c_str());
-		if (share != NULL)
+		if (share != nullptr)
 			m_extmem.set(*share, m_bytes_per_entry);
 	}
 

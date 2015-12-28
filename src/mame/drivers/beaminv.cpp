@@ -82,8 +82,8 @@ public:
 	DECLARE_READ8_MEMBER(v128_r);
 	DECLARE_WRITE8_MEMBER(controller_select_w);
 	DECLARE_READ8_MEMBER(controller_r);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_beaminv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 	void create_interrupt_timer();

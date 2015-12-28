@@ -80,7 +80,7 @@ void debugwin_info::prev_view(debugview_info *curview)
 	{
 		for (curindex = numviews - 1; curindex > 0; curindex--)
 		{
-			if (m_views[curindex] == curview)
+			if (m_views[curindex].get() == curview)
 				break;
 		}
 		if (curindex < 0)
@@ -126,7 +126,7 @@ void debugwin_info::next_view(debugview_info *curview)
 	{
 		for (curindex = numviews - 1; curindex > 0; curindex--)
 		{
-			if (m_views[curindex] == curview)
+			if (m_views[curindex].get() == curview)
 				break;
 		}
 	}

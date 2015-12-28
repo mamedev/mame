@@ -107,7 +107,6 @@ nick_device::nick_device(const machine_config &mconfig, const char *tag, device_
 		device_video_interface(mconfig, *this),
 		m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(nick_map)),
 		m_write_virq(*this),
-		horizontal_clock(0),
 		m_scanline_count(0),
 		m_FIXBIAS(0),
 		m_BORDER(0),
@@ -206,7 +205,7 @@ void nick_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 const address_space_config *nick_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 
@@ -300,7 +299,7 @@ void nick_device::initialize_palette()
 	compute_resistor_weights(0, 0xff, -1.0,
 								3, resistances_rg, color_weights_rg, 0, 0,
 								2, resistances_b,  color_weights_b,  0, 0,
-								0, 0, 0, 0, 0);
+								0, nullptr, nullptr, 0, 0);
 
 	for (int i = 0; i < 256; i++)
 	{

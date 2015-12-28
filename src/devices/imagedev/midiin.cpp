@@ -26,8 +26,8 @@ midiin_device::midiin_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, MIDIIN, "MIDI In image device", tag, owner, clock, "midiin", __FILE__),
 		device_image_interface(mconfig, *this),
 		device_serial_interface(mconfig, *this),
-		m_midi(NULL),
-		m_timer(NULL),
+		m_midi(nullptr),
+		m_timer(nullptr),
 		m_input_cb(*this),
 		m_xmit_read(0),
 		m_xmit_write(0),
@@ -43,7 +43,7 @@ void midiin_device::device_start()
 {
 	m_input_cb.resolve_safe();
 	m_timer = timer_alloc(0);
-	m_midi = NULL;
+	m_midi = nullptr;
 	m_timer->enable(false);
 }
 
@@ -81,7 +81,7 @@ void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	UINT8 buf[8192*4];
 	int bytesRead;
 
-	if (m_midi == NULL) {
+	if (m_midi == nullptr) {
 		return;
 	}
 
@@ -110,7 +110,7 @@ bool midiin_device::call_load(void)
 	if (!m_midi->open_input(filename()))
 	{
 		global_free(m_midi);
-		m_midi = NULL;
+		m_midi = nullptr;
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -131,7 +131,7 @@ void midiin_device::call_unload(void)
 		global_free(m_midi);
 	}
 		m_timer->enable(false);
-		m_midi = NULL;
+		m_midi = nullptr;
 }
 
 void midiin_device::tra_complete()

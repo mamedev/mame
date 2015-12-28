@@ -26,16 +26,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
 
 	void vram_write16(UINT16 data);
 
-	UINT32 *m_data;
+	std::unique_ptr<UINT32[]> m_data;
 	int m_screen_x;
 	int m_screen_y;
 	int m_screen_x_max;

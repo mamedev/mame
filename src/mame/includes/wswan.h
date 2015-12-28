@@ -57,15 +57,15 @@ public:
 	UINT8 m_internal_eeprom[INTERNAL_EEPROM_SIZE];
 	UINT8 m_system_type;
 	SoundDMA m_sound_dma;
-	UINT8 *m_ws_bios_bank;
+	std::unique_ptr<UINT8[]> m_ws_bios_bank;
 	UINT8 m_bios_disabled;
 	UINT8 m_rotate;
 
 	void set_irq_line(int irq);
 	void dma_sound_cb();
 	void common_start();
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(wswan);
 	DECLARE_MACHINE_START(wscolor);
 	DECLARE_PALETTE_INIT(wscolor);

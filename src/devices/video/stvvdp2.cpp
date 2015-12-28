@@ -2104,7 +2104,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 void saturn_state::stv_vdp2_fill_rotation_parameter_table( UINT8 rot_parameter )
 {
-	UINT32 address = 0;
+	UINT32 address;
 
 	address = (((STV_VDP2_RPTAU << 16) | STV_VDP2_RPTAL) << 1);
 	if ( rot_parameter == 1 )
@@ -2318,7 +2318,7 @@ UINT8 saturn_state::stv_vdp2_check_vram_cycle_pattern_registers( UINT8 access_co
 	return access_command_ok == 3 ? 1 : 0;
 }
 
-INLINE UINT32 stv_add_blend(UINT32 a, UINT32 b)
+static inline UINT32 stv_add_blend(UINT32 a, UINT32 b)
 {
 	rgb_t rb = (a & 0xff00ff) + (b & 0xff00ff);
 	rgb_t g = (a & 0x00ff00) + (b & 0x00ff00);
@@ -2390,7 +2390,7 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 
 	if (gfx->has_pen_usage() && transparency == STV_TRANSPARENCY_PEN)
 	{
-		int transmask = 0;
+		int transmask;
 
 		transmask = 1 << (transparent_color & 0xff);
 
@@ -2580,7 +2580,7 @@ void saturn_state::stv_vdp2_drawgfxzoom_rgb555(
 	rectangle myclip;
 	UINT8* gfxdata;
 
-	gfxdata = m_vdp2.gfx_decode + code * 0x20;
+	gfxdata = m_vdp2.gfx_decode.get() + code * 0x20;
 
 	if(stv2_current_tilemap.window_control.enabled[0] ||
 		stv2_current_tilemap.window_control.enabled[1])
@@ -2806,7 +2806,7 @@ void saturn_state::stv_vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectan
 	UINT8* gfxdata;
 	int sprite_screen_width, sprite_screen_height;
 
-	gfxdata = m_vdp2.gfx_decode + code * 0x20;
+	gfxdata = m_vdp2.gfx_decode.get() + code * 0x20;
 	sprite_screen_width = sprite_screen_height = 8;
 
 	if(stv2_current_tilemap.window_control.enabled[0] ||
@@ -2920,7 +2920,7 @@ void saturn_state::stv_vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectan
 	UINT8* gfxdata;
 	int sprite_screen_width, sprite_screen_height;
 
-	gfxdata = m_vdp2.gfx_decode + code * 0x20;
+	gfxdata = m_vdp2.gfx_decode.get() + code * 0x20;
 	sprite_screen_width = sprite_screen_height = 8;
 
 	if(stv2_current_tilemap.window_control.enabled[0] ||
@@ -3185,7 +3185,7 @@ void saturn_state::draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 	int xsize, ysize, xsize_mask, ysize_mask;
 	int xsrc,ysrc,xdst,ydst;
 	int src_offs;
-	UINT8* vram = m_vdp2.gfx_decode;
+	UINT8* vram = m_vdp2.gfx_decode.get();
 	UINT32 map_offset = stv2_current_tilemap.bitmap_map * 0x20000;
 	int scrollx = stv2_current_tilemap.scrollx;
 	int scrolly = stv2_current_tilemap.scrolly;
@@ -3241,7 +3241,7 @@ void saturn_state::draw_8bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 	int xsize, ysize, xsize_mask, ysize_mask;
 	int xsrc,ysrc,xdst,ydst;
 	int src_offs;
-	UINT8* vram = m_vdp2.gfx_decode;
+	UINT8* vram = m_vdp2.gfx_decode.get();
 	UINT32 map_offset = stv2_current_tilemap.bitmap_map * 0x20000;
 	int scrollx = stv2_current_tilemap.scrollx;
 	int scrolly = stv2_current_tilemap.scrolly;
@@ -3300,7 +3300,7 @@ void saturn_state::draw_11bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 	int xsize, ysize, xsize_mask, ysize_mask;
 	int xsrc,ysrc,xdst,ydst;
 	int src_offs;
-	UINT8* vram = m_vdp2.gfx_decode;
+	UINT8* vram = m_vdp2.gfx_decode.get();
 	UINT32 map_offset = stv2_current_tilemap.bitmap_map * 0x20000;
 	int scrollx = stv2_current_tilemap.scrollx;
 	int scrolly = stv2_current_tilemap.scrolly;
@@ -3358,7 +3358,7 @@ void saturn_state::draw_rgb15_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 	int xsize, ysize, xsize_mask, ysize_mask;
 	int xsrc,ysrc,xdst,ydst;
 	int src_offs;
-	UINT8* vram = m_vdp2.gfx_decode;
+	UINT8* vram = m_vdp2.gfx_decode.get();
 	UINT32 map_offset = stv2_current_tilemap.bitmap_map * 0x20000;
 	int scrollx = stv2_current_tilemap.scrollx;
 	int scrolly = stv2_current_tilemap.scrolly;
@@ -3416,7 +3416,7 @@ void saturn_state::draw_rgb32_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 	int xsize, ysize, xsize_mask, ysize_mask;
 	int xsrc,ysrc,xdst,ydst;
 	int src_offs;
-	UINT8* vram = m_vdp2.gfx_decode;
+	UINT8* vram = m_vdp2.gfx_decode.get();
 	UINT32 map_offset = stv2_current_tilemap.bitmap_map * 0x20000;
 	int scrollx = stv2_current_tilemap.scrollx;
 	int scrolly = stv2_current_tilemap.scrolly;
@@ -3579,7 +3579,7 @@ map is always enabled?
 void saturn_state::stv_vdp2_get_map_page( int x, int y, int *_map, int *_page )
 {
 	int page = 0;
-	int map = 0;
+	int map;
 
 	if ( stv2_current_tilemap.map_count == 4 )
 	{
@@ -4327,7 +4327,7 @@ void saturn_state::stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, 
 void saturn_state::stv_vdp2_draw_line(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
-	UINT8* gfxdata = m_vdp2.gfx_decode;
+	UINT8* gfxdata = m_vdp2.gfx_decode.get();
 	UINT32 base_offs,base_mask;
 	UINT32 pix;
 	UINT8 interlace;
@@ -4542,7 +4542,7 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 	use_coeff_table = coeff_table_mode = coeff_table_size = coeff_table_shift = 0;
 	coeff_table_offset = 0;
 	coeff_table_val = 0;
-	coeff_table_base = NULL;
+	coeff_table_base = nullptr;
 
 	if ( LOG_ROZ == 1 ) logerror( "Rendering RBG with parameter %s\n", iRP == 1 ? "A" : "B" );
 	if ( LOG_ROZ == 1 ) logerror( "RPMD (parameter mode) = %x\n", STV_VDP2_RPMD );
@@ -4576,11 +4576,11 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 	{
 		if ( STV_VDP2_CRKTE == 0 )
 		{
-			coeff_table_base = m_vdp2_vram;
+			coeff_table_base = m_vdp2_vram.get();
 		}
 		else
 		{
-			coeff_table_base = m_vdp2_cram;
+			coeff_table_base = m_vdp2_cram.get();
 		}
 		if ( coeff_table_size == 0 )
 		{
@@ -5581,7 +5581,7 @@ void saturn_state::stv_vdp2_draw_RBG0(bitmap_rgb32 &bitmap, const rectangle &cli
 void saturn_state::stv_vdp2_draw_back(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
-	UINT8* gfxdata = m_vdp2.gfx_decode;
+	UINT8* gfxdata = m_vdp2.gfx_decode.get();
 	UINT32 base_offs,base_mask;
 	UINT8 interlace;
 
@@ -5627,7 +5627,7 @@ READ32_MEMBER ( saturn_state::saturn_vdp2_vram_r )
 
 WRITE32_MEMBER ( saturn_state::saturn_vdp2_vram_w )
 {
-	UINT8* gfxdata = m_vdp2.gfx_decode;
+	UINT8* gfxdata = m_vdp2.gfx_decode.get();
 
 	COMBINE_DATA(&m_vdp2_vram[offset]);
 
@@ -6057,7 +6057,7 @@ int saturn_state::get_vcounter( void )
 
 void saturn_state::stv_vdp2_state_save_postload( void )
 {
-	UINT8 *gfxdata = m_vdp2.gfx_decode;
+	UINT8 *gfxdata = m_vdp2.gfx_decode.get();
 	int offset;
 	UINT32 data;
 
@@ -6101,10 +6101,10 @@ int saturn_state::stv_vdp2_start ( void )
 {
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(saturn_state::stv_vdp2_exit), this));
 
-	m_vdp2_regs = auto_alloc_array_clear(machine(), UINT16, 0x040000/2 );
-	m_vdp2_vram = auto_alloc_array_clear(machine(), UINT32, 0x100000/4 );
-	m_vdp2_cram = auto_alloc_array_clear(machine(), UINT32, 0x080000/4 );
-	m_vdp2.gfx_decode = auto_alloc_array(machine(), UINT8, 0x100000 );
+	m_vdp2_regs = make_unique_clear<UINT16[]>(0x040000/2 );
+	m_vdp2_vram = make_unique_clear<UINT32[]>(0x100000/4 );
+	m_vdp2_cram = make_unique_clear<UINT32[]>(0x080000/4 );
+	m_vdp2.gfx_decode = std::make_unique<UINT8[]>(0x100000 );
 
 //  m_gfxdecode->gfx(0)->granularity()=4;
 //  m_gfxdecode->gfx(1)->granularity()=4;
@@ -6113,9 +6113,9 @@ int saturn_state::stv_vdp2_start ( void )
 	stv_rbg_cache_data.is_cache_dirty = 3;
 	memset( &stv_vdp2_layer_data_placement, 0, sizeof(stv_vdp2_layer_data_placement));
 
-	save_pointer(NAME(m_vdp2_regs), 0x040000/2);
-	save_pointer(NAME(m_vdp2_vram), 0x100000/4);
-	save_pointer(NAME(m_vdp2_cram), 0x080000/4);
+	save_pointer(NAME(m_vdp2_regs.get()), 0x040000/2);
+	save_pointer(NAME(m_vdp2_vram.get()), 0x100000/4);
+	save_pointer(NAME(m_vdp2_cram.get()), 0x080000/4);
 	machine().save().register_postload(save_prepost_delegate(FUNC(saturn_state::stv_vdp2_state_save_postload), this));
 
 	return 0;
@@ -6129,10 +6129,10 @@ VIDEO_START_MEMBER(saturn_state,stv_vdp2)
 	stv_vdp2_start();
 	stv_vdp1_start();
 	m_vdpdebug_roz = 0;
-	m_gfxdecode->gfx(0)->set_source(m_vdp2.gfx_decode);
-	m_gfxdecode->gfx(1)->set_source(m_vdp2.gfx_decode);
-	m_gfxdecode->gfx(2)->set_source(m_vdp2.gfx_decode);
-	m_gfxdecode->gfx(3)->set_source(m_vdp2.gfx_decode);
+	m_gfxdecode->gfx(0)->set_source(m_vdp2.gfx_decode.get());
+	m_gfxdecode->gfx(1)->set_source(m_vdp2.gfx_decode.get());
+	m_gfxdecode->gfx(2)->set_source(m_vdp2.gfx_decode.get());
+	m_gfxdecode->gfx(3)->set_source(m_vdp2.gfx_decode.get());
 
 	/* calc V counter offsets */
 	/* 224 mode */
@@ -6411,7 +6411,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	int i;
 	UINT16 pix;
 	UINT16 *framebuffer_line;
-	UINT32 *bitmap_line, *bitmap_line2 = NULL;
+	UINT32 *bitmap_line, *bitmap_line2 = nullptr;
 	UINT8  interlace_framebuffer;
 	UINT8  double_x;
 	static const UINT16 sprite_colormask_table[] = {

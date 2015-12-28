@@ -42,7 +42,7 @@ enum
 
 void wangpc_state::select_drive()
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	if (m_ds1) floppy = m_floppy0;
 	if (m_ds2) floppy = m_floppy1;
@@ -1137,7 +1137,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCN2661_TAG, mc2661_device, rx_w))
 
 	MCFG_DEVICE_ADD(WANGPC_KEYBOARD_TAG, WANGPC_KEYBOARD, 0)
@@ -1155,11 +1155,11 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_WANGPC_BUS_DRQ2_CALLBACK(DEVWRITELINE(AM9517A_TAG, am9517a_device, dreq2_w))
 	MCFG_WANGPC_BUS_DRQ3_CALLBACK(DEVWRITELINE(AM9517A_TAG, am9517a_device, dreq3_w))
 	MCFG_WANGPC_BUS_IOERROR_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_NMI))
-	MCFG_WANGPC_BUS_SLOT_ADD("slot1", 1, wangpc_cards, NULL)
+	MCFG_WANGPC_BUS_SLOT_ADD("slot1", 1, wangpc_cards, nullptr)
 	MCFG_WANGPC_BUS_SLOT_ADD("slot2", 2, wangpc_cards, "mvc")
-	MCFG_WANGPC_BUS_SLOT_ADD("slot3", 3, wangpc_cards, NULL)
-	MCFG_WANGPC_BUS_SLOT_ADD("slot4", 4, wangpc_cards, NULL)
-	MCFG_WANGPC_BUS_SLOT_ADD("slot5", 5, wangpc_cards, NULL)
+	MCFG_WANGPC_BUS_SLOT_ADD("slot3", 3, wangpc_cards, nullptr)
+	MCFG_WANGPC_BUS_SLOT_ADD("slot4", 4, wangpc_cards, nullptr)
+	MCFG_WANGPC_BUS_SLOT_ADD("slot5", 5, wangpc_cards, nullptr)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

@@ -125,7 +125,7 @@ VIDEO_START_MEMBER(apple3_state,apple3)
 
 	memset(m_char_mem, 0, 0x800);
 
-	m_hgr_map = auto_alloc_array(machine(), UINT32, 192);
+	m_hgr_map = std::make_unique<UINT32[]>(192);
 	for (i = 0; i < 24; i++)
 	{
 		v = text_map[i] - 0x0400;

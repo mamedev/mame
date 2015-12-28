@@ -31,7 +31,7 @@ const device_type WSWAN_SND = &device_creator<wswan_sound_device>;
 wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WSWAN_SND, "WonderSwan Audio Custom", tag, owner, clock, "wswan_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_channel(NULL),
+		m_channel(nullptr),
 		m_sweep_step(0),
 		m_sweep_time(0),
 		m_sweep_count(0),

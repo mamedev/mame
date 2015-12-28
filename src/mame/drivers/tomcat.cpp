@@ -83,7 +83,7 @@ public:
 	DECLARE_READ8_MEMBER(tomcat_nvram_r);
 	DECLARE_WRITE8_MEMBER(tomcat_nvram_w);
 	DECLARE_WRITE8_MEMBER(soundlatches_w);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
 };

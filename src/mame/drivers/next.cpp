@@ -272,10 +272,10 @@ void next_state::irq_check()
 }
 
 const char *next_state::dma_targets[0x20] = {
-	0, "scsi", 0, 0, "soundout", "disk", 0, 0,
-	"soundin", "printer", 0, 0, "scc", "dsp", 0, 0,
-	"s-enetx", "enetx", 0, 0, "s-enetr", "enetr", 0, 0,
-	"video", 0, 0, 0, "r2m", "m2r", 0, 0
+	nullptr, "scsi", nullptr, nullptr, "soundout", "disk", nullptr, nullptr,
+	"soundin", "printer", nullptr, nullptr, "scc", "dsp", nullptr, nullptr,
+	"s-enetx", "enetx", nullptr, nullptr, "s-enetr", "enetr", nullptr, nullptr,
+	"video", nullptr, nullptr, nullptr, "r2m", "m2r", nullptr, nullptr
 };
 
 const int next_state::dma_irqs[0x20] = {
@@ -1035,11 +1035,11 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	MCFG_NEXTKBD_INT_NMI_CALLBACK(WRITELINE(next_state, nmi_irq))
 	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "harddisk", false)
 	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "cdrom", false)
-	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, 0, false)
-	MCFG_NSCSI_ADD("scsibus:3", next_scsi_devices, 0, false)
-	MCFG_NSCSI_ADD("scsibus:4", next_scsi_devices, 0, false)
-	MCFG_NSCSI_ADD("scsibus:5", next_scsi_devices, 0, false)
-	MCFG_NSCSI_ADD("scsibus:6", next_scsi_devices, 0, false)
+	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:3", next_scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:4", next_scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:5", next_scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:6", next_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:7", next_scsi_devices, "ncr5390", true)
 	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5390", ncr5390)
 

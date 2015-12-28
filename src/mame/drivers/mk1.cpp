@@ -58,7 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mk1_f8_w);
 	UINT8 m_f8[2];
 	UINT8 m_led[4];
-	virtual void machine_start();
+	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(mk1_update_leds);
 	F3853_INTERRUPT_REQ_CB(mk1_interrupt);
 	required_device<cpu_device> m_maincpu;

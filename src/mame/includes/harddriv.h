@@ -430,8 +430,8 @@ public:
 	optional_device<atari_slapstic_device> m_slapstic_device;
 protected:
 	//virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 class harddriv_sound_board_device :  public device_t
@@ -472,9 +472,9 @@ public:
 	DECLARE_READ16_MEMBER(hdsnddsp_compare_r);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
 	required_device<cpu_device> m_soundcpu;
@@ -509,8 +509,8 @@ public:
 	harddriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
@@ -522,8 +522,8 @@ public:
 	harddrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
@@ -535,8 +535,8 @@ public:
 	racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
@@ -548,7 +548,7 @@ public:
 		{};
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 /* Race Drivin' Compact */
@@ -559,8 +559,8 @@ public:
 	racedrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
@@ -571,7 +571,7 @@ public:
 		racedrivc_board_device_state(mconfig, tag, owner, clock)
 		{};
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class racedrivc_panorama_side_board_device_state :  public racedrivc_board_device_state
@@ -581,8 +581,8 @@ public:
 		racedrivc_board_device_state(mconfig, tag, owner, clock)
 		{};
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 };
 
 
@@ -594,8 +594,8 @@ public:
 	stunrun_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
@@ -607,8 +607,8 @@ public:
 	steeltal_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
@@ -620,7 +620,7 @@ public:
 		{};
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 class steeltalp_board_device_state :  public steeltal_board_device_state
@@ -631,7 +631,7 @@ public:
 		{};
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 
@@ -644,8 +644,8 @@ public:
 	strtdriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
@@ -657,8 +657,8 @@ public:
 	hdrivair_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_start() override;
 //  virtual void device_reset();
 };
 
@@ -670,5 +670,5 @@ public:
 		{};
 
 protected:
-	virtual void device_start();
+	virtual void device_start() override;
 };

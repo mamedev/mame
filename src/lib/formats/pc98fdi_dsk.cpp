@@ -63,7 +63,7 @@ bool pc98fdi_format::load(io_generic *io, UINT32 form_factor, floppy_image *imag
 	int cell_count = form_factor == floppy_image::FF_35 ? 200000 : 166666;
 
 	int ssize;
-	for(ssize=0; (128 << ssize) < sector_size; ssize++);
+	for(ssize=0; (128 << ssize) < sector_size; ssize++) {};
 
 	desc_pc_sector sects[256];
 	UINT8 sect_data[65536];

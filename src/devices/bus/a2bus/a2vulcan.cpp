@@ -69,7 +69,7 @@ const device_type A2BUS_VULCANGOLD = &device_creator<a2bus_vulcangold_device>;
 #define VULCAN_ATA_TAG     "vulcan_ata"
 
 static MACHINE_CONFIG_FRAGMENT( vulcan )
-	MCFG_ATA_INTERFACE_ADD(VULCAN_ATA_TAG, ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD(VULCAN_ATA_TAG, ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END
 
 ROM_START( vulcan )

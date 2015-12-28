@@ -15,7 +15,8 @@ public:
 	: md_base_state(mconfig, type, tag),
 	m_32x(*this,"sega32x"),
 	m_segacd(*this,"segacd"),
-	m_cart(*this, "mdslot")
+	m_cart(*this, "mdslot"),
+	m_tmss(*this, "tmss")
 	{ }
 
 	ioport_port *m_io_ctrlr;
@@ -25,6 +26,7 @@ public:
 	optional_device<sega_32x_device> m_32x;
 	optional_device<sega_segacd_device> m_segacd;
 	optional_device<md_cart_slot_device> m_cart;
+	optional_region_ptr<UINT16> m_tmss;
 
 	DECLARE_DRIVER_INIT(mess_md_common);
 	DECLARE_DRIVER_INIT(genesis);
@@ -46,4 +48,9 @@ public:
 	void _32x_scanline_callback(int x, UINT32 priority, UINT16 &lineptr);
 	void _32x_interrupt_callback(int scanline, int irq6);
 	void _32x_scanline_helper_callback(int scanline);
+
+	void install_cartslot();
+	void install_tmss();
+	DECLARE_READ16_MEMBER(tmss_r);
+	DECLARE_WRITE16_MEMBER(tmss_swap_w);
 };

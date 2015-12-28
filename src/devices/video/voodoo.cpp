@@ -269,7 +269,7 @@ static void raster_generic_2tmu(void *dest, INT32 scanline, const poly_extent *e
 static const raster_info predef_raster_table[] =
 {
 #include "voodoo.cpp"
-	{ 0 }
+	{ nullptr }
 };
 
 #undef RASTERIZER_ENTRY
@@ -285,9 +285,9 @@ static const raster_info predef_raster_table[] =
     in device is, in fact, a voodoo device
 -------------------------------------------------*/
 
-INLINE voodoo_state *get_safe_token(device_t *device)
+static inline voodoo_state *get_safe_token(device_t *device)
 {
-	assert(device != NULL);
+	assert(device != nullptr);
 	assert((device->type() == VOODOO_1) || (device->type() == VOODOO_2) || (device->type() == VOODOO_BANSHEE) ||  (device->type() == VOODOO_3));
 
 	return (voodoo_state *)downcast<voodoo_device *>(device)->token();
@@ -503,7 +503,7 @@ static void init_fbi(voodoo_state *v, fbi_state *f, void *memory, int fbmem)
 	f->vblank = FALSE;
 
 	/* initialize the memory FIFO */
-	f->fifo.base = NULL;
+	f->fifo.base = nullptr;
 	f->fifo.size = f->fifo.in = f->fifo.out = 0;
 
 	/* set the fog delta mask */
@@ -577,8 +577,8 @@ static void init_tmu(voodoo_state *v, tmu_state *t, voodoo_reg *reg, void *memor
 	t->texel[3] = v->tmushare.int8;
 	t->texel[4] = v->tmushare.ai44;
 	t->texel[5] = t->palette;
-	t->texel[6] = (v->type >= TYPE_VOODOO_2) ? t->palettea : NULL;
-	t->texel[7] = NULL;
+	t->texel[6] = (v->type >= TYPE_VOODOO_2) ? t->palettea : nullptr;
+	t->texel[7] = nullptr;
 	t->texel[8] = v->tmushare.rgb332;
 	t->texel[9] = t->ncc[0].texel;
 	t->texel[10] = v->tmushare.rgb565;
@@ -586,7 +586,7 @@ static void init_tmu(voodoo_state *v, tmu_state *t, voodoo_reg *reg, void *memor
 	t->texel[12] = v->tmushare.argb4444;
 	t->texel[13] = v->tmushare.int8;
 	t->texel[14] = t->palette;
-	t->texel[15] = NULL;
+	t->texel[15] = nullptr;
 	t->lookup = t->texel[0];
 
 	/* attach the palette to NCC table 0 */
@@ -747,7 +747,7 @@ static void init_save_state(device_t *device)
 	for (index = 0; index < ARRAY_LENGTH(v->tmu); index++)
 	{
 		tmu_state *tmu = &v->tmu[index];
-		if (tmu->ram == NULL)
+		if (tmu->ram == nullptr)
 			continue;
 		if (tmu->ram != v->fbi.ram)
 			device->save_pointer(NAME(tmu->ram), tmu->mask + 1, index);
@@ -1165,7 +1165,7 @@ static void recompute_video_memory(voodoo_state *v)
 	/* if not, disable the FIFO */
 	else
 	{
-		v->fbi.fifo.base = NULL;
+		v->fbi.fifo.base = nullptr;
 		v->fbi.fifo.size = 0;
 	}
 
@@ -1426,7 +1426,7 @@ static void recompute_texture_params(tmu_state *t)
 }
 
 
-INLINE INT32 prepare_tmu(tmu_state *t)
+static inline INT32 prepare_tmu(tmu_state *t)
 {
 	INT64 texdx, texdy;
 	INT32 lodbase;
@@ -3414,7 +3414,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
 				/* pixel pipeline part 2 handles color combine, fog, alpha, and final output */
 				PIXEL_PIPELINE_END(v, stats, dither, dither4, dither_lookup, x, dest, depth,
 					v->reg[fbzMode].u, v->reg[fbzColorPath].u, v->reg[alphaMode].u, v->reg[fogMode].u,
-					iterz, iterw, iterargb);
+					iterz, iterw, iterargb) {};
 nextpixel:
 			/* advance our pointers */
 			x++;
@@ -5021,8 +5021,8 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 	int val;
 
 	/* validate configuration */
-	assert(m_screen != NULL);
-	assert(m_cputag != NULL);
+	assert(m_screen != nullptr);
+	assert(m_cputag != nullptr);
 	assert(m_fbmem > 0);
 
 	/* store a pointer back to the device */
@@ -5108,7 +5108,7 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 	/* set the type, and initialize the chip mask */
 	device_iterator iter(machine().root_device());
 	v->index = 0;
-	for (device_t *scan = iter.first(); scan != NULL; scan = iter.next())
+	for (device_t *scan = iter.first(); scan != nullptr; scan = iter.next())
 		if (scan->type() == this->type())
 		{
 			if (scan == this)
@@ -5116,9 +5116,9 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 			v->index++;
 		}
 	v->screen = downcast<screen_device *>(machine().device(m_screen));
-	assert_always(v->screen != NULL, "Unable to find screen attached to voodoo");
+	assert_always(v->screen != nullptr, "Unable to find screen attached to voodoo");
 	v->cpu = machine().device(m_cputag);
-	assert_always(v->cpu != NULL, "Unable to find CPU attached to voodoo");
+	assert_always(v->cpu != nullptr, "Unable to find CPU attached to voodoo");
 
 	if (m_tmumem1 != 0)
 		v->tmu_config |= 0xc0;  // two TMUs
@@ -5146,7 +5146,7 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 		/* separate FB/TMU memory */
 		fbmem = auto_alloc_array(machine(), UINT8, m_fbmem << 20);
 		tmumem[0] = auto_alloc_array(machine(), UINT8, m_tmumem0 << 20);
-		tmumem[1] = (m_tmumem1 != 0) ? auto_alloc_array(machine(), UINT8, m_tmumem1 << 20) : NULL;
+		tmumem[1] = (m_tmumem1 != 0) ? auto_alloc_array(machine(), UINT8, m_tmumem1 << 20) : nullptr;
 	}
 	else
 	{
@@ -5218,7 +5218,7 @@ static INT32 fastfill(voodoo_state *v)
 	int ey = (v->reg[clipLowYHighY].u >> 0) & 0x3ff;
 	poly_extent extents[64];
 	UINT16 dithermatrix[16];
-	UINT16 *drawbuf = NULL;
+	UINT16 *drawbuf = nullptr;
 	UINT32 pixels = 0;
 	int extnum, x, y;
 
@@ -5317,7 +5317,7 @@ static INT32 swapbuffer(voodoo_state *v, UINT32 data)
 
 static INT32 triangle(voodoo_state *v)
 {
-	int texcount = 0;
+	int texcount;
 	UINT16 *drawbuf;
 	int destbuf;
 	int pixels;
@@ -5735,7 +5735,7 @@ static raster_info *add_rasterizer(voodoo_state *v, const raster_info *cinfo)
 
 static raster_info *find_rasterizer(voodoo_state *v, int texcount)
 {
-	raster_info *info, *prev = NULL;
+	raster_info *info, *prev = nullptr;
 	raster_info curinfo;
 	int hash;
 
@@ -5777,7 +5777,7 @@ static raster_info *find_rasterizer(voodoo_state *v, int texcount)
 	curinfo.display = 0;
 	curinfo.polys = 0;
 	curinfo.hits = 0;
-	curinfo.next = 0;
+	curinfo.next = nullptr;
 	curinfo.hash = hash;
 
 	return add_rasterizer(v, &curinfo);
@@ -5801,16 +5801,16 @@ static void dump_rasterizer_stats(voodoo_state *v)
 	/* loop until we've displayed everything */
 	while (1)
 	{
-		best = NULL;
+		best = nullptr;
 
 		/* find the highest entry */
 		for (hash = 0; hash < RASTER_HASH_SIZE; hash++)
 			for (cur = v->raster_hash[hash]; cur; cur = cur->next)
-				if (cur->display != display_index && (best == NULL || cur->hits > best->hits))
+				if (cur->display != display_index && (best == nullptr || cur->hits > best->hits))
 					best = cur;
 
 		/* if we're done, we're done */
-		if (best == NULL || best->hits == 0)
+		if (best == nullptr || best->hits == 0)
 			break;
 
 		/* print it */
@@ -5836,8 +5836,8 @@ voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, co
 		m_fbmem(0),
 		m_tmumem0(0),
 		m_tmumem1(0),
-		m_screen(NULL),
-		m_cputag(NULL),
+		m_screen(nullptr),
+		m_cputag(nullptr),
 		m_vblank(*this),
 		m_stall(*this)
 {
@@ -5878,7 +5878,7 @@ void voodoo_device::device_stop()
 	voodoo_state *v = get_safe_token(this);
 
 	/* release the work queue, ensuring all work is finished */
-	if (v->poly != NULL)
+	if (v->poly != nullptr)
 		poly_free(v->poly);
 }
 

@@ -91,12 +91,12 @@ const device_type PCI_BUS_LEGACY = &device_creator<pci_bus_legacy_device>;
 //-------------------------------------------------
 pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PCI_BUS_LEGACY, "PCI Bus Legacy", tag, owner, clock, "pci_bus_legacy", __FILE__),
-		m_father(NULL)
+		m_father(nullptr)
 {
 	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++) {
-		m_devtag[i]= NULL;
-		m_read_callback[i] = NULL;
-		m_write_callback[i] = NULL;
+		m_devtag[i]= nullptr;
+		m_read_callback[i] = nullptr;
+		m_write_callback[i] = nullptr;
 	}
 	m_siblings_count = 0;
 }
@@ -122,7 +122,7 @@ READ32_MEMBER( pci_bus_legacy_device::read )
 			if (m_devicenum != -1)
 			{
 				pci_read_func read = m_busnumaddr->m_read_callback[m_devicenum];
-				if (read != NULL)
+				if (read != nullptr)
 				{
 					function = (m_address >> 8) & 0x07;
 					reg = (m_address >> 0) & 0xfc;
@@ -152,10 +152,10 @@ pci_bus_legacy_device *pci_bus_legacy_device::pci_search_bustree(int busnum, int
 	for (a = 0; a < pcibus->m_siblings_count; a++)
 	{
 		ret = pci_search_bustree(busnum, devicenum, pcibus->m_siblings[a]);
-		if (ret != NULL)
+		if (ret != nullptr)
 			return ret;
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -178,7 +178,7 @@ WRITE32_MEMBER( pci_bus_legacy_device::write )
 				int busnum = (m_address >> 16) & 0xff;
 				int devicenum = (m_address >> 11) & 0x1f;
 				m_busnumaddr = pci_search_bustree(busnum, devicenum, this);
-				if (m_busnumaddr != NULL)
+				if (m_busnumaddr != nullptr)
 				{
 					m_busnumber = busnum;
 					m_devicenum = devicenum;
@@ -194,7 +194,7 @@ WRITE32_MEMBER( pci_bus_legacy_device::write )
 			if (m_devicenum != -1)
 			{
 				pci_write_func write = m_busnumaddr->m_write_callback[m_devicenum];
-				if (write != NULL)
+				if (write != nullptr)
 				{
 					int function = (m_address >> 8) & 0x07;
 					int reg = (m_address >> 0) & 0xfc;
@@ -263,10 +263,10 @@ void pci_bus_legacy_device::device_start()
 
 	/* find all our devices */
 	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++)
-		if (m_devtag[i] != NULL)
+		if (m_devtag[i] != nullptr)
 			m_device[i] = machine().device(m_devtag[i]);
 
-	if (m_father != NULL) {
+	if (m_father != nullptr) {
 		pci_bus_legacy_device *father = machine().device<pci_bus_legacy_device>(m_father);
 		if (father)
 			father->add_sibling(this, m_busnum);

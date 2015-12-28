@@ -193,7 +193,7 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 void mc146818_device::nvram_default()
 {
 	// populate from a memory region if present
-	if (m_region != NULL)
+	if (m_region != nullptr)
 	{
 		UINT32 bytes = m_region->bytes();
 

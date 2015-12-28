@@ -258,7 +258,7 @@ WRITE8_MEMBER(ti_fdc_device::cruwrite)
 			// Select side of disk (bit 7)
 			m_SIDSEL = (data==1)? ASSERT_LINE : CLEAR_LINE;
 			if (TRACE_CRU) logerror("tifdc: set side (bit 7) = %d\n", data);
-			if (m_current_floppy != NULL) m_current_floppy->ss_w(data);
+			if (m_current_floppy != nullptr) m_current_floppy->ss_w(data);
 			break;
 
 		default:
@@ -273,7 +273,7 @@ void ti_fdc_device::set_drive()
 	switch (m_DSEL)
 	{
 	case 0:
-		m_current_floppy = NULL;
+		m_current_floppy = nullptr;
 		if (TRACE_CRU) logerror("tifdc: all drives deselected\n");
 		break;
 	case 1:
@@ -333,8 +333,8 @@ void ti_fdc_device::set_floppy_motors_running(bool run)
 	m_fd1771->set_force_ready(run);
 
 	// Set all motors
-	for (int i=0; i < 3; i++)
-		if (m_floppy[i] != NULL) m_floppy[i]->mon_w((run)? 0 : 1);
+	for (auto & elem : m_floppy)
+		if (elem != nullptr) elem->mon_w((run)? 0 : 1);
 
 	// The motor-on line also connects to the wait state logic
 	operate_ready_line();
@@ -378,7 +378,7 @@ void ti_fdc_device::device_reset()
 
 	for (int i=0; i < 3; i++)
 	{
-		if (m_floppy[i] != NULL)
+		if (m_floppy[i] != nullptr)
 			logerror("tifdc: Connector %d with %s\n", i, m_floppy[i]->name());
 		else
 			logerror("tifdc: No floppy attached to connector %d\n", i);
@@ -390,9 +390,9 @@ void ti_fdc_device::device_reset()
 void ti_fdc_device::device_config_complete()
 {
 	// Seems to be null when doing a "-listslots"
-	if (subdevice("0")!=NULL) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->first_subdevice());
-	if (subdevice("1")!=NULL) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->first_subdevice());
-	if (subdevice("2")!=NULL) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->first_subdevice());
+	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->first_subdevice());
+	if (subdevice("1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->first_subdevice());
+	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->first_subdevice());
 }
 
 FLOPPY_FORMATS_MEMBER(ti_fdc_device::floppy_formats)
@@ -412,7 +412,7 @@ MACHINE_CONFIG_FRAGMENT( ti_fdc )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("1", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("2", tifdc_floppies, NULL, ti_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("2", tifdc_floppies, nullptr, ti_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 

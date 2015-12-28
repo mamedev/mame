@@ -162,8 +162,8 @@ public:
 	DECLARE_DRIVER_INIT(lhzb2a);
 	DECLARE_DRIVER_INIT(mgdha);
 
-	virtual void video_start();
-	virtual void machine_reset();
+	virtual void video_start() override;
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(iqblocka);
 	DECLARE_MACHINE_RESET(mgcs);
 	DECLARE_MACHINE_RESET(lhzb2a);
@@ -247,7 +247,7 @@ void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4,
 {
 	int length = memregion("maincpu")->bytes();
 	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
+	std::unique_ptr<UINT8[]> tmp = std::make_unique<UINT8[]>(length);
 	int i;
 
 	// decrypt the program ROM
@@ -283,7 +283,7 @@ void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4,
 		}
 	}
 
-	memcpy(tmp,rom,length);
+	memcpy(tmp.get(),rom,length);
 
 	// address lines swap
 	for (i = 0;i < length;i++)
@@ -347,11 +347,11 @@ void igs017_state::tjsb_decrypt_sprites()
 {
 	int length = memregion("sprites")->bytes();
 	UINT8 *rom = memregion("sprites")->base();
-	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
+	std::unique_ptr<UINT8[]> tmp = std::make_unique<UINT8[]>(length);
 	int i, addr;
 
 	// address lines swap
-	memcpy(tmp, rom, length);
+	memcpy(tmp.get(), rom, length);
 	for (i = 0; i < length; i++)
 	{
 		addr = (i & ~0xff) | BITSWAP8(i,7,6,5,2,1,4,3,0);
@@ -739,11 +739,11 @@ void igs017_state::lhzb2_decrypt_sprites()
 {
 	int length = memregion("sprites")->bytes();
 	UINT8 *rom = memregion("sprites")->base();
-	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
+	std::unique_ptr<UINT8[]> tmp = std::make_unique<UINT8[]>(length);
 	int i, addr;
 
 	// address lines swap
-	memcpy(tmp, rom, length);
+	memcpy(tmp.get(), rom, length);
 	for (i = 0; i < length; i++)
 	{
 		addr = (i & ~0xffff) | BITSWAP16(i,15,14,13,6,7,10,9,8,11,12,5,4,3,2,1,0);
@@ -1053,11 +1053,11 @@ void igs017_state::spkrform_decrypt_sprites()
 {
 	int length = memregion("sprites")->bytes();
 	UINT8 *rom = memregion("sprites")->base();
-	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
+	std::unique_ptr<UINT8[]> tmp = std::make_unique<UINT8[]>(length);
 	int i, addr;
 
 	// address lines swap
-	memcpy(tmp, rom, length);
+	memcpy(tmp.get(), rom, length);
 	for (i = 0; i < length; i++)
 	{
 		if (i & 0x80000)

@@ -38,7 +38,7 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
     round-to-nearest
 -------------------------------------------------*/
 
-INLINE float render_round_nearest(float f)
+static inline float render_round_nearest(float f)
 {
 	return floor(f + 0.5f);
 }
@@ -49,7 +49,7 @@ INLINE float render_round_nearest(float f)
     bounds
 -------------------------------------------------*/
 
-INLINE void set_render_bounds_xy(render_bounds *bounds, float x0, float y0, float x1, float y1)
+static inline void set_render_bounds_xy(render_bounds *bounds, float x0, float y0, float x1, float y1)
 {
 	bounds->x0 = x0;
 	bounds->y0 = y0;
@@ -63,7 +63,7 @@ INLINE void set_render_bounds_xy(render_bounds *bounds, float x0, float y0, floa
     bounds
 -------------------------------------------------*/
 
-INLINE void set_render_bounds_wh(render_bounds *bounds, float x0, float y0, float width, float height)
+static inline void set_render_bounds_wh(render_bounds *bounds, float x0, float y0, float width, float height)
 {
 	bounds->x0 = x0;
 	bounds->y0 = y0;
@@ -77,7 +77,7 @@ INLINE void set_render_bounds_wh(render_bounds *bounds, float x0, float y0, floa
     of two render_bounds
 -------------------------------------------------*/
 
-INLINE void sect_render_bounds(render_bounds *dest, const render_bounds *src)
+static inline void sect_render_bounds(render_bounds *dest, const render_bounds *src)
 {
 	dest->x0 = (dest->x0 > src->x0) ? dest->x0 : src->x0;
 	dest->x1 = (dest->x1 < src->x1) ? dest->x1 : src->x1;
@@ -91,7 +91,7 @@ INLINE void sect_render_bounds(render_bounds *dest, const render_bounds *src)
     render_bounds
 -------------------------------------------------*/
 
-INLINE void union_render_bounds(render_bounds *dest, const render_bounds *src)
+static inline void union_render_bounds(render_bounds *dest, const render_bounds *src)
 {
 	dest->x0 = (dest->x0 < src->x0) ? dest->x0 : src->x0;
 	dest->x1 = (dest->x1 > src->x1) ? dest->x1 : src->x1;
@@ -104,7 +104,7 @@ INLINE void union_render_bounds(render_bounds *dest, const render_bounds *src)
     set_render_color - cleaner way to set a color
 -------------------------------------------------*/
 
-INLINE void set_render_color(render_color *color, float a, float r, float g, float b)
+static inline void set_render_color(render_color *color, float a, float r, float g, float b)
 {
 	color->a = a;
 	color->r = r;
@@ -118,7 +118,7 @@ INLINE void set_render_color(render_color *color, float a, float r, float g, flo
     flip flags
 -------------------------------------------------*/
 
-INLINE int orientation_swap_flips(int orientation)
+static inline int orientation_swap_flips(int orientation)
 {
 	return (orientation & ORIENTATION_SWAP_XY) |
 			((orientation & ORIENTATION_FLIP_X) ? ORIENTATION_FLIP_Y : 0) |
@@ -131,7 +131,7 @@ INLINE int orientation_swap_flips(int orientation)
     that will undo another orientation
 -------------------------------------------------*/
 
-INLINE int orientation_reverse(int orientation)
+static inline int orientation_reverse(int orientation)
 {
 	/* if not swapping X/Y, then just apply the same transform to reverse */
 	if (!(orientation & ORIENTATION_SWAP_XY))
@@ -148,7 +148,7 @@ INLINE int orientation_reverse(int orientation)
     after applying two subsequent orientations
 -------------------------------------------------*/
 
-INLINE int orientation_add(int orientation1, int orientation2)
+static inline int orientation_add(int orientation1, int orientation2)
 {
 	/* if the 2nd transform doesn't swap, just XOR together */
 	if (!(orientation2 & ORIENTATION_SWAP_XY))
@@ -166,7 +166,7 @@ INLINE int orientation_add(int orientation1, int orientation2)
     a single RGB component
 -------------------------------------------------*/
 
-INLINE float apply_brightness_contrast_gamma_fp(float srcval, float brightness, float contrast, float gamma)
+static inline float apply_brightness_contrast_gamma_fp(float srcval, float brightness, float contrast, float gamma)
 {
 	/* first apply gamma */
 	srcval = pow(srcval, 1.0f / gamma);
@@ -189,7 +189,7 @@ INLINE float apply_brightness_contrast_gamma_fp(float srcval, float brightness, 
     a single RGB component
 -------------------------------------------------*/
 
-INLINE UINT8 apply_brightness_contrast_gamma(UINT8 src, float brightness, float contrast, float gamma)
+static inline UINT8 apply_brightness_contrast_gamma(UINT8 src, float brightness, float contrast, float gamma)
 {
 	float srcval = (float)src * (1.0f / 255.0f);
 	float result = apply_brightness_contrast_gamma_fp(srcval, brightness, contrast, gamma);

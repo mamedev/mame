@@ -92,9 +92,9 @@ public:
 	DECLARE_READ8_MEMBER(input_system_r);
 	DECLARE_DRIVER_INIT(jngolady);
 	DECLARE_DRIVER_INIT(luckygrl);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jangou);
 	DECLARE_MACHINE_START(jngolady);
 	DECLARE_MACHINE_RESET(jngolady);
@@ -127,7 +127,7 @@ PALETTE_INIT_MEMBER(jangou_state, jangou)
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 0,
 			2, resistances_b,  weights_b,  0, 0,
-			0, 0, 0, 0, 0);
+			0, nullptr, nullptr, 0, 0);
 
 	for (i = 0;i < palette.entries(); i++)
 	{

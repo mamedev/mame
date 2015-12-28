@@ -402,12 +402,12 @@ void galaxold_state::state_save_register()
 
 void galaxold_state::video_start_common()
 {
-	m_modify_charcode = 0;
-	m_modify_spritecode = 0;
-	m_modify_color = 0;
-	m_modify_ypos = 0;
+	m_modify_charcode = nullptr;
+	m_modify_spritecode = nullptr;
+	m_modify_color = nullptr;
+	m_modify_ypos = nullptr;
 
-	m_draw_bullets = 0;
+	m_draw_bullets = nullptr;
 
 	m_draw_background = &galaxold_state::galaxold_draw_background;
 	m_background_enable = 0;
@@ -803,10 +803,10 @@ VIDEO_START_MEMBER(galaxold_state,dambustr)
 	m_draw_bullets = &galaxold_state::dambustr_draw_bullets;
 
 	/* allocate the temporary bitmap for the background priority */
-	m_dambustr_tmpbitmap = auto_bitmap_ind16_alloc(machine(), m_screen->width(), m_screen->height());
+	m_dambustr_tmpbitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
 
 	/* make a copy of the tilemap to emulate background priority */
-	m_dambustr_videoram2 = auto_alloc_array(machine(), UINT8, 0x0400);
+	m_dambustr_videoram2 = std::make_unique<UINT8[]>(0x0400);
 	m_dambustr_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxold_state::dambustr_get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_dambustr_tilemap2->set_transparent_pen(0);
@@ -1776,7 +1776,7 @@ UINT32 galaxold_state::screen_update_dambustr(screen_device &screen, bitmap_ind1
 		dambustr_draw_upper_background(bitmap, cliprect);
 
 		/* only rows with color code > 3 are stronger than the background */
-		memset(m_dambustr_videoram2, 0x20, 0x0400);
+		memset(m_dambustr_videoram2.get(), 0x20, 0x0400);
 		for (i=0; i<32; i++) {
 			color = m_attributesram[(i << 1) | 1] & m_color_mask;
 			if (color > 3) {

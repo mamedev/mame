@@ -72,8 +72,8 @@ void ui_menu_barcode_reader::populate()
 		item_append("New Barcode:", new_barcode, 0, ITEMREF_NEW_BARCODE);
 
 		// finish up the menu
-		item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-		item_append("Enter Code", NULL, 0, ITEMREF_ENTER_BARCODE);
+		item_append(MENU_SEPARATOR_ITEM, nullptr, 0, nullptr);
+		item_append("Enter Code", nullptr, 0, ITEMREF_ENTER_BARCODE);
 
 		customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	}
@@ -94,7 +94,7 @@ void ui_menu_barcode_reader::handle()
 	const ui_menu_event *event = process(UI_MENU_PROCESS_LR_REPEAT);
 
 	// process the event
-	if (event != NULL)
+	if (event != nullptr)
 	{
 		// handle selections
 		switch (event->iptkey)

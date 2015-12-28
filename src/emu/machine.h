@@ -73,13 +73,6 @@ const int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is e
 #define auto_alloc_array_clear(m, t, c) pool_alloc_array_clear(static_cast<running_machine &>(m).respool(), t, c)
 #define auto_free(m, v)                 pool_free(static_cast<running_machine &>(m).respool(), v)
 
-#define auto_bitmap_ind8_alloc(m, w, h) auto_alloc(m, bitmap_ind8(w, h))
-#define auto_bitmap_ind16_alloc(m, w, h)    auto_alloc(m, bitmap_ind16(w, h))
-#define auto_bitmap_ind32_alloc(m, w, h)    auto_alloc(m, bitmap_ind32(w, h))
-#define auto_bitmap_rgb32_alloc(m, w, h)    auto_alloc(m, bitmap_rgb32(w, h))
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -165,14 +158,14 @@ public:
 	memory_manager &memory() { return m_memory; }
 	ioport_manager &ioport() { return m_ioport; }
 	parameters_manager &parameters() { return m_parameters; }
-	cheat_manager &cheat() const { assert(m_cheat != NULL); return *m_cheat; }
-	render_manager &render() const { assert(m_render != NULL); return *m_render; }
-	input_manager &input() const { assert(m_input != NULL); return *m_input; }
-	sound_manager &sound() const { assert(m_sound != NULL); return *m_sound; }
-	video_manager &video() const { assert(m_video != NULL); return *m_video; }
-	ui_manager &ui() const { assert(m_ui != NULL); return *m_ui; }
-	tilemap_manager &tilemap() const { assert(m_tilemap != NULL); return *m_tilemap; }
-	debug_view_manager &debug_view() const { assert(m_debug_view != NULL); return *m_debug_view; }
+	cheat_manager &cheat() const { assert(m_cheat != nullptr); return *m_cheat; }
+	render_manager &render() const { assert(m_render != nullptr); return *m_render; }
+	input_manager &input() const { assert(m_input != nullptr); return *m_input; }
+	sound_manager &sound() const { assert(m_sound != nullptr); return *m_sound; }
+	video_manager &video() const { assert(m_video != nullptr); return *m_video; }
+	ui_manager &ui() const { assert(m_ui != nullptr); return *m_ui; }
+	tilemap_manager &tilemap() const { assert(m_tilemap != nullptr); return *m_tilemap; }
+	debug_view_manager &debug_view() const { assert(m_debug_view != nullptr); return *m_debug_view; }
 	driver_device *driver_data() const { return &downcast<driver_device &>(root_device()); }
 	template<class _DriverClass> _DriverClass *driver_data() const { return &downcast<_DriverClass &>(root_device()); }
 	machine_phase phase() const { return m_current_phase; }
@@ -253,8 +246,8 @@ private:
 	void set_saveload_filename(const char *filename);
 	std::string get_statename(const char *statename_opt);
 	void handle_saveload();
-	void soft_reset(void *ptr = NULL, INT32 param = 0);
-	void watchdog_fired(void *ptr = NULL, INT32 param = 0);
+	void soft_reset(void *ptr = nullptr, INT32 param = 0);
+	void watchdog_fired(void *ptr = nullptr, INT32 param = 0);
 	void watchdog_vblank(screen_device &screen, bool vblank_state);
 	const char *image_parent_basename(device_t *device);
 	std::string &nvram_filename(std::string &result, device_t &device);
@@ -278,14 +271,14 @@ private:
 	const game_driver &     m_system;               // reference to the definition of the game machine
 	machine_manager &       m_manager;              // reference to machine manager system
 	// managers
-	auto_pointer<cheat_manager> m_cheat;            // internal data from cheat.c
-	auto_pointer<render_manager> m_render;          // internal data from render.c
-	auto_pointer<input_manager> m_input;            // internal data from input.c
-	auto_pointer<sound_manager> m_sound;            // internal data from sound.c
-	auto_pointer<video_manager> m_video;            // internal data from video.c
-	auto_pointer<ui_manager> m_ui;                  // internal data from ui.c
-	auto_pointer<tilemap_manager> m_tilemap;        // internal data from tilemap.c
-	auto_pointer<debug_view_manager> m_debug_view;  // internal data from debugvw.c
+	std::unique_ptr<cheat_manager> m_cheat;            // internal data from cheat.c
+	std::unique_ptr<render_manager> m_render;          // internal data from render.c
+	std::unique_ptr<input_manager> m_input;            // internal data from input.c
+	std::unique_ptr<sound_manager> m_sound;            // internal data from sound.c
+	std::unique_ptr<video_manager> m_video;            // internal data from video.c
+	std::unique_ptr<ui_manager> m_ui;                  // internal data from ui.c
+	std::unique_ptr<tilemap_manager> m_tilemap;        // internal data from tilemap.c
+	std::unique_ptr<debug_view_manager> m_debug_view;  // internal data from debugvw.c
 
 	// system state
 	machine_phase           m_current_phase;        // current execution phase
@@ -306,7 +299,7 @@ private:
 	std::string             m_basename;             // basename used for game-related paths
 	std::string             m_context;              // context string buffer
 	int                     m_sample_rate;          // the digital audio sample rate
-	auto_pointer<emu_file>  m_logfile;              // pointer to the active log file
+	std::unique_ptr<emu_file>  m_logfile;              // pointer to the active log file
 
 	// load/save management
 	enum saveload_schedule
@@ -326,14 +319,10 @@ private:
 		// construction/destruction
 		notifier_callback_item(machine_notify_delegate func);
 
-		// getters
-		notifier_callback_item *next() const { return m_next; }
-
 		// state
-		notifier_callback_item *    m_next;
 		machine_notify_delegate     m_func;
 	};
-	simple_list<notifier_callback_item> m_notifier_list[MACHINE_NOTIFY_COUNT];
+	std::list<std::unique_ptr<notifier_callback_item>> m_notifier_list[MACHINE_NOTIFY_COUNT];
 
 	// logerror callbacks
 	class logerror_callback_item
@@ -342,14 +331,10 @@ private:
 		// construction/destruction
 		logerror_callback_item(logerror_callback func);
 
-		// getters
-		logerror_callback_item *next() const { return m_next; }
-
 		// state
-		logerror_callback_item *    m_next;
 		logerror_callback           m_func;
 	};
-	simple_list<logerror_callback_item> m_logerror_list;
+	std::list<std::unique_ptr<logerror_callback_item>> m_logerror_list;
 
 	// embedded managers and objects
 	save_manager            m_save;                 // save manager

@@ -854,9 +854,9 @@ void towns_state::draw_sprites(const rectangle* rect)
 
 	// clears VRAM for each frame?
 	if(m_video.towns_sprite_page == 0)
-		memset(m_towns_gfxvram+0x40000,0x80,0x20000);
+		memset(m_towns_gfxvram.get()+0x40000,0x80,0x20000);
 	else
-		memset(m_towns_gfxvram+0x60000,0x80,0x20000);
+		memset(m_towns_gfxvram.get()+0x60000,0x80,0x20000);
 
 	for(n=sprite_limit;n<1024;n++)
 	{

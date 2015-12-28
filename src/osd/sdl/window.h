@@ -79,7 +79,7 @@ public:
 
 	void notify_changed();
 
-	osd_dim get_size()
+	osd_dim get_size() override
 	{
 #if (SDLMAME_SDL2)
 		int w=0; int h=0;
@@ -92,18 +92,18 @@ public:
 
 	int xy_to_render_target(int x, int y, int *xt, int *yt);
 
-	running_machine &machine() const { return m_machine; }
-	osd_monitor_info *monitor() const { return m_monitor; }
-	int fullscreen() const { return m_fullscreen; }
+	running_machine &machine() const override { return m_machine; }
+	osd_monitor_info *monitor() const override { return m_monitor; }
+	int fullscreen() const override { return m_fullscreen; }
 
-	render_target *target() { return m_target; }
+	render_target *target() override { return m_target; }
 #if (SDLMAME_SDL2)
-	SDL_Window *sdl_window() { return m_sdl_window; }
+	SDL_Window *sdl_window() override { return m_sdl_window; }
 #else
 	SDL_Surface *sdl_surface() { return m_sdlsurf; }
 #endif
 
-	osd_dim blit_surface_size();
+	osd_dim blit_surface_size() override;
 	int prescale() const { return m_prescale; }
 
 	// Pointer to next window

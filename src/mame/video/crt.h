@@ -69,11 +69,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	crt_point *m_list; /* array of (crt_window_width*crt_window_height) point */
-	int *m_list_head;  /* head of the list of lit pixels (index in the array) */
+	std::unique_ptr<int[]> m_list_head;  /* head of the list of lit pixels (index in the array) */
 						/* keep a separate list for each display line (makes the video code slightly faster) */
 
 	int m_decay_counter;  /* incremented each frame (tells for how many frames the CRT has decayed between two screen refresh) */

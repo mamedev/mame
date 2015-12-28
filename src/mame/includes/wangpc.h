@@ -90,8 +90,8 @@ public:
 	required_device<wangpcbus_device> m_bus;
 	required_ioport m_sw;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void select_drive();
 	void check_level1_interrupts();
@@ -153,7 +153,6 @@ public:
 	DECLARE_READ8_MEMBER( ppi_pb_r );
 	DECLARE_READ8_MEMBER( ppi_pc_r );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-	DECLARE_WRITE_LINE_MEMBER( pit0_w );
 	DECLARE_WRITE_LINE_MEMBER( pit2_w );
 	DECLARE_WRITE_LINE_MEMBER( uart_dr_w );
 	DECLARE_WRITE_LINE_MEMBER( uart_tbre_w );

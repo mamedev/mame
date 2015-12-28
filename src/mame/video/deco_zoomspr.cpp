@@ -399,7 +399,7 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 						colour,
 						fx,fy,
 						xpos>>16,ypos>>16,
-						15,zoomx,zoomy,NULL,0,
+						15,zoomx,zoomy,nullptr,0,
 						((xpos+(zoomx<<4))>>16) - (xpos>>16), ((ypos+(zoomy<<4))>>16) - (ypos>>16), alpha,
 						pri_bitmap, temp_bitmap,
 						priority

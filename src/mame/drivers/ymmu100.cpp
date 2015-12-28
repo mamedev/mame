@@ -193,7 +193,7 @@ public:
 
 	float lightlevel(const UINT8 *src, const UINT8 *render);
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 class mu100r_state : public mu100_state {
@@ -202,7 +202,7 @@ public:
 		: mu100_state(mconfig, type, tag)
 	{ }
 
-	virtual DECLARE_READ16_MEMBER(adc7_r);
+	virtual DECLARE_READ16_MEMBER(adc7_r) override;
 };
 
 #include "../drivers/ymmu100.inc"

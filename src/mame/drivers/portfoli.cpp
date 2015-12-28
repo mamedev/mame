@@ -215,12 +215,12 @@ void portfolio_state::scan_keyboard()
 {
 	UINT8 keycode = 0xff;
 
-	UINT8 keydata[8] = { m_y0->read(), m_y1->read(), m_y2->read(), m_y3->read(),
+	UINT32 keydata[8] = { m_y0->read(), m_y1->read(), m_y2->read(), m_y3->read(),
 							m_y4->read(), m_y5->read(), m_y6->read(), m_y7->read() };
 
 	for (int row = 0; row < 8; row++)
 	{
-		UINT8 data = keydata[row];
+		UINT8 data = static_cast<int>(keydata[row]);
 
 		if (data != 0xff)
 		{
@@ -862,7 +862,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("counter", portfolio_state, counter_tick, attotime::from_hz(XTAL_32_768kHz/16384))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_TICK_TAG, portfolio_state, system_tick, attotime::from_hz(XTAL_32_768kHz/32768))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, dsr_w))

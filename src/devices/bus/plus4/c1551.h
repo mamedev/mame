@@ -34,9 +34,9 @@ public:
 	c1551_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_READ8_MEMBER( port_r );
 	DECLARE_WRITE8_MEMBER( port_w );
@@ -45,13 +45,9 @@ public:
 	DECLARE_WRITE8_MEMBER( tcbm_data_w );
 	DECLARE_READ8_MEMBER( tpi0_r );
 	DECLARE_WRITE8_MEMBER( tpi0_w );
-	DECLARE_READ8_MEMBER( yb_r );
-	DECLARE_WRITE8_MEMBER( yb_w );
 	DECLARE_READ8_MEMBER( tpi0_pc_r );
 	DECLARE_WRITE8_MEMBER( tpi0_pc_w );
 
-	DECLARE_READ8_MEMBER( tpi1_pa_r );
-	DECLARE_WRITE8_MEMBER( tpi1_pa_w );
 	DECLARE_READ8_MEMBER( tpi1_pb_r );
 	DECLARE_READ8_MEMBER( tpi1_pc_r );
 	DECLARE_WRITE8_MEMBER( tpi1_pc_w );
@@ -60,13 +56,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_plus4_expansion_card_interface overrides
-	virtual UINT8 plus4_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
-	virtual void plus4_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
+	virtual UINT8 plus4_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
+	virtual void plus4_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
 
 private:
 	enum

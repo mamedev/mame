@@ -199,7 +199,7 @@ private:
 class winui_output_error : public osd_output
 {
 public:
-	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args)
+	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args) override
 	{
 		if (channel == OSD_OUTPUT_CHANNEL_ERROR)
 		{
@@ -288,6 +288,7 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_HLSL_WRITE,                                     NULL,                OPTION_STRING,     "enables HLSL AVI writing (huge disk bandwidth suggested)" },
 	{ WINOPTION_HLSL_SNAP_WIDTH,                                "2048",              OPTION_STRING,     "HLSL upscaled-snapshot width" },
 	{ WINOPTION_HLSL_SNAP_HEIGHT,                               "1536",              OPTION_STRING,     "HLSL upscaled-snapshot height" },
+	{ WINOPTION_SHADOW_MASK_TILE_MODE,                          "0",                 OPTION_INTEGER,    "shadow mask tile mode (0 for screen based, 1 for source based)" },
 	{ WINOPTION_SHADOW_MASK_ALPHA";fs_shadwa(0.0-1.0)",         "0.0",               OPTION_FLOAT,      "shadow mask alpha-blend value (1.0 is fully blended, 0.0 is no mask)" },
 	{ WINOPTION_SHADOW_MASK_TEXTURE";fs_shadwt(0.0-1.0)",       "shadow-mask.png",   OPTION_STRING,     "shadow mask texture name" },
 	{ WINOPTION_SHADOW_MASK_COUNT_X";fs_shadww",                "6",                 OPTION_INTEGER,    "shadow mask tile width, in screen dimensions" },
@@ -345,6 +346,7 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_VECTOR_LENGTH_RATIO";vecsize",                  "500.0",             OPTION_FLOAT,      "Vector fade length (4.0 - vectors fade the most at and above 4 pixels, etc.)" },
 	/* Bloom below this line */
 	{ NULL,                                                     NULL,                OPTION_HEADER,     "BLOOM POST-PROCESSING OPTIONS" },
+	{ WINOPTION_BLOOM_BLEND_MODE,                               "0",                 OPTION_INTEGER,    "bloom blend mode (0 for addition, 1 for darken)" },
 	{ WINOPTION_BLOOM_SCALE,                                    "0.25",              OPTION_FLOAT,      "Intensity factor for bloom" },
 	{ WINOPTION_BLOOM_OVERDRIVE,                                "1.0,1.0,1.0",       OPTION_STRING,     "Overdrive factor for bloom" },
 	{ WINOPTION_BLOOM_LEVEL0_WEIGHT,                            "1.0",               OPTION_FLOAT,      "Bloom level 0  (full-size target) weight" },

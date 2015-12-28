@@ -13,7 +13,7 @@ class namco_c69_device : public m37702m2_device
 public:
 	namco_c69_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -22,7 +22,7 @@ class namco_c70_device : public m37702m2_device
 public:
 	namco_c70_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -31,7 +31,7 @@ class namco_c74_device : public m37702m2_device
 public:
 	namco_c74_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -40,7 +40,7 @@ class namco_c75_device : public m37702m2_device
 public:
 	namco_c75_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 
@@ -49,7 +49,7 @@ class namco_c76_device : public m37702m2_device
 public:
 	namco_c76_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 };
 
 

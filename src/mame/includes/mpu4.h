@@ -223,7 +223,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reel6_optic_cb) { if (state) m_optic_pattern |= 0x40; else m_optic_pattern &= ~0x40; }
 	DECLARE_WRITE_LINE_MEMBER(reel7_optic_cb) { if (state) m_optic_pattern |= 0x80; else m_optic_pattern &= ~0x80; }
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void lamp_extend_small(int data);
 	void lamp_extend_large(int data,int column,int active);
@@ -237,7 +237,6 @@ protected:
 	void mpu4_install_mod4oki_space(address_space &space);
 	void mpu4_install_mod4bwb_space(address_space &space);
 	void mpu4_config_common();
-	void mpu4_config_common_reels(int reels);
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<roc10937_t> m_vfd;

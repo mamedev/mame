@@ -303,7 +303,7 @@ READ8_MEMBER( c1571_t::via0_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	UINT8 data;
 
 	// data in
 	data = !m_bus->data_r();
@@ -476,7 +476,7 @@ WRITE_LINE_MEMBER( c1571_t::cia_irq_w )
 
 WRITE_LINE_MEMBER( c1571_t::cia_pc_w )
 {
-	if (m_other != NULL)
+	if (m_other != nullptr)
 	{
 		m_other->parallel_strobe_w(state);
 	}
@@ -503,7 +503,7 @@ READ8_MEMBER( c1571_t::cia_pb_r )
 
 WRITE8_MEMBER( c1571_t::cia_pb_w )
 {
-	if (m_other != NULL)
+	if (m_other != nullptr)
 	{
 		m_other->parallel_data_w(data);
 	}

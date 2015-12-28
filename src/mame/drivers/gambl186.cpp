@@ -73,11 +73,10 @@ public:
 	int m_comms_blocks;
 	bool m_comms_ack;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_READ16_MEMBER(comms_r);
 	DECLARE_WRITE16_MEMBER(comms_w);
 	DECLARE_WRITE16_MEMBER(data_bank_w);
-	DECLARE_READ16_MEMBER(upd_r);
 	DECLARE_WRITE16_MEMBER(upd_w);
 };
 
@@ -510,6 +509,20 @@ ROM_START( gambl186a )
 ROM_END
 
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT  ROT     COMPANY    FULLNAME             FLAGS... */
-GAME( 1997, gambl186,  0,        gambl186, gambl186, driver_device, 0,    ROT0,  "EGD",     "Multi Game (V398)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, gambl186a, gambl186, gambl186, gambl186, driver_device, 0,    ROT0,  "EGD",     "Multi Game (V399)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+ROM_START( gambl186b )
+	ROM_REGION( 0x100000, "data", 0 )
+	ROM_LOAD16_BYTE( "IE3.7.8.bin", 0x00000, 0x80000, CRC(cc27886c) SHA1(cb27af74dffe86c564ba8a0ad711f4232330cf1b) )
+	ROM_LOAD16_BYTE( "IO3.7.8.bin", 0x00001, 0x80000, CRC(c69bf3ad) SHA1(eb612e903a9b184c2dd363e081ee8f650a4f2f90) )
+
+	ROM_REGION( 0x40000, "ipl", 0 )
+	ROM_LOAD16_BYTE( "SE3.8.6T.bin", 0x00000, 0x20000,CRC(158bd3a3) SHA1(846f382f145f8c4c36bd75fef12717b41e91c70b))
+	ROM_LOAD16_BYTE( "SO3.8.6T.bin", 0x00001, 0x20000, CRC(4bd275d3) SHA1(6b84f54e723408b06b71e89f7de6a8014fd9ecfd) )
+
+	ROM_REGION( 0x20000, "upd", 0 ) // upd7759 sound samples
+	ROM_LOAD( "SOUND3.9.8.bin", 0x00000, 0x20000, CRC(1d6d1743) SHA1(df0e8d311ccaf77fb5dfc341124a11051154e79c) )
+ROM_END
+
+// version numbering isn't clear, rom labels don't agree with test mode display.
+GAME( 1997, gambl186,  0,        gambl186, gambl186, driver_device, 0,    ROT0,  "EGD",     "Multi Game (Versione 4.0.3 - 1.5.7, 05-FEV-99(397)) (V398?)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Versione 4.0.3 (1.5.7), csmb15A, CSMB_0015A (IT), - 05-FEV-99(397)
+GAME( 1997, gambl186a, gambl186, gambl186, gambl186, driver_device, 0,    ROT0,  "EGD",     "Multi Game (Versione 4.0.3 - 1.5.7, 05-FEV-99(397)) (V399?)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // same?
+GAME( 1997, gambl186b, gambl186, gambl186, gambl186, driver_device, 0,    ROT0,  "EGD",     "Multi Game (Versione 3.8.6T - 1.5.6, 25-AUG-97) (V378?)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Versione 3.8.6T (1.5.6), mult5_it, CSMB-0000F (IT), 25-AUG-97

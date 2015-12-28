@@ -113,7 +113,7 @@ public:
 	required_device<esqpanel2x40_sq1_device> m_sq1panel;
 	required_device<midi_port_device> m_mdout;
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
@@ -123,12 +123,8 @@ public:
 	UINT8 m_duart_io;
 	bool  m_bCalibSecondByte;
 
-private:
-	UINT32  *m_rom, *m_ram;
-
 public:
 	DECLARE_DRIVER_INIT(kt);
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
 };

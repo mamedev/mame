@@ -20,12 +20,12 @@ public:
 	s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual void ExecCommand();
-	virtual void WriteData( UINT8 *data, int dataLength );
-	virtual void ReadData( UINT8 *data, int dataLength );
+	virtual void ExecCommand() override;
+	virtual void WriteData( UINT8 *data, int dataLength ) override;
+	virtual void ReadData( UINT8 *data, int dataLength ) override;
 };
 
 

@@ -45,27 +45,27 @@ void vp575_device::update_interrupts()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( vp575 )
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp1", XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp1", XTAL_3_52128MHz/2, vip_expansion_cards, nullptr)
 	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp1_int_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp1_dma_out_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vp575_device, exp1_dma_in_w))
 
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp2", XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp2", XTAL_3_52128MHz/2, vip_expansion_cards, nullptr)
 	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp2_int_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp2_dma_out_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vp575_device, exp2_dma_in_w))
 
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp3", XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp3", XTAL_3_52128MHz/2, vip_expansion_cards, nullptr)
 	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp3_int_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp3_dma_out_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vp575_device, exp3_dma_in_w))
 
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp4", XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp4", XTAL_3_52128MHz/2, vip_expansion_cards, nullptr)
 	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp4_int_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp4_dma_out_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vp575_device, exp4_dma_in_w))
 
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp5", XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp5", XTAL_3_52128MHz/2, vip_expansion_cards, nullptr)
 	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp5_int_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp5_dma_out_w))
 	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vp575_device, exp5_dma_in_w))
@@ -128,9 +128,9 @@ UINT8 vp575_device::vip_program_r(address_space &space, offs_t offset, int cs, i
 {
 	UINT8 data = 0xff;
 
-	for (int i = 0; i < MAX_SLOTS; i++)
+	for (auto & elem : m_expansion_slot)
 	{
-		data &= m_expansion_slot[i]->program_r(space, offset, cs, cdef, minh);
+		data &= elem->program_r(space, offset, cs, cdef, minh);
 	}
 
 	return data;
@@ -143,9 +143,9 @@ UINT8 vp575_device::vip_program_r(address_space &space, offs_t offset, int cs, i
 
 void vp575_device::vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh)
 {
-	for (int i = 0; i < MAX_SLOTS; i++)
+	for (auto & elem : m_expansion_slot)
 	{
-		m_expansion_slot[i]->program_w(space, offset, data, cdef, minh);
+		elem->program_w(space, offset, data, cdef, minh);
 	}
 }
 
@@ -158,9 +158,9 @@ UINT8 vp575_device::vip_io_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0xff;
 
-	for (int i = 0; i < MAX_SLOTS; i++)
+	for (auto & elem : m_expansion_slot)
 	{
-		data &= m_expansion_slot[i]->io_r(space, offset);
+		data &= elem->io_r(space, offset);
 	}
 
 	return data;
@@ -173,9 +173,9 @@ UINT8 vp575_device::vip_io_r(address_space &space, offs_t offset)
 
 void vp575_device::vip_io_w(address_space &space, offs_t offset, UINT8 data)
 {
-	for (int i = 0; i < MAX_SLOTS; i++)
+	for (auto & elem : m_expansion_slot)
 	{
-		m_expansion_slot[i]->io_w(space, offset, data);
+		elem->io_w(space, offset, data);
 	}
 }
 
@@ -188,9 +188,9 @@ UINT8 vp575_device::vip_dma_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0xff;
 
-	for (int i = 0; i < MAX_SLOTS; i++)
+	for (auto & elem : m_expansion_slot)
 	{
-		data &= m_expansion_slot[i]->dma_r(space, offset);
+		data &= elem->dma_r(space, offset);
 	}
 
 	return data;
@@ -203,9 +203,9 @@ UINT8 vp575_device::vip_dma_r(address_space &space, offs_t offset)
 
 void vp575_device::vip_dma_w(address_space &space, offs_t offset, UINT8 data)
 {
-	for (int i = 0; i < MAX_SLOTS; i++)
+	for (auto & elem : m_expansion_slot)
 	{
-		m_expansion_slot[i]->dma_w(space, offset, data);
+		elem->dma_w(space, offset, data);
 	}
 }
 
@@ -218,9 +218,9 @@ UINT32 vp575_device::vip_screen_update(screen_device &screen, bitmap_rgb32 &bitm
 {
 	UINT32 data = 0;
 
-	for (int i = 0; i < MAX_SLOTS; i++)
+	for (auto & elem : m_expansion_slot)
 	{
-		data |= m_expansion_slot[i]->screen_update(screen, bitmap, cliprect);
+		data |= elem->screen_update(screen, bitmap, cliprect);
 	}
 
 	return data;
@@ -235,9 +235,9 @@ int vp575_device::vip_ef1_r()
 {
 	int state = CLEAR_LINE;
 
-	for (int i = 0; i < MAX_SLOTS; i++)
+	for (auto & elem : m_expansion_slot)
 	{
-		state |= m_expansion_slot[i]->ef1_r();
+		state |= elem->ef1_r();
 	}
 
 	return state;
@@ -252,9 +252,9 @@ int vp575_device::vip_ef3_r()
 {
 	int state = CLEAR_LINE;
 
-	for (int i = 0; i < MAX_SLOTS; i++)
+	for (auto & elem : m_expansion_slot)
 	{
-		state |= m_expansion_slot[i]->ef3_r();
+		state |= elem->ef3_r();
 	}
 
 	return state;
@@ -269,9 +269,9 @@ int vp575_device::vip_ef4_r()
 {
 	int state = CLEAR_LINE;
 
-	for (int i = 0; i < MAX_SLOTS; i++)
+	for (auto & elem : m_expansion_slot)
 	{
-		state |= m_expansion_slot[i]->ef4_r();
+		state |= elem->ef4_r();
 	}
 
 	return state;
@@ -284,9 +284,9 @@ int vp575_device::vip_ef4_r()
 
 void vp575_device::vip_sc_w(int data)
 {
-	for (int i = 0; i < MAX_SLOTS; i++)
+	for (auto & elem : m_expansion_slot)
 	{
-		m_expansion_slot[i]->sc_w(data);
+		elem->sc_w(data);
 	}
 }
 
@@ -297,9 +297,9 @@ void vp575_device::vip_sc_w(int data)
 
 void vp575_device::vip_q_w(int state)
 {
-	for (int i = 0; i < MAX_SLOTS; i++)
+	for (auto & elem : m_expansion_slot)
 	{
-		m_expansion_slot[i]->q_w(state);
+		elem->q_w(state);
 	}
 }
 
@@ -310,8 +310,8 @@ void vp575_device::vip_q_w(int state)
 
 void vp575_device::vip_run_w(int state)
 {
-	for (int i = 0; i < MAX_SLOTS; i++)
+	for (auto & elem : m_expansion_slot)
 	{
-		m_expansion_slot[i]->run_w(state);
+		elem->run_w(state);
 	}
 }

@@ -268,7 +268,7 @@ void rsp_cop2_drc::lbv()
 {
 	UINT32 op = m_rspcop2_state->op;
 
-	UINT32 ea = 0;
+	UINT32 ea;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
@@ -336,7 +336,7 @@ static void cfunc_lsv(void *param)
 void rsp_cop2_drc::llv()
 {
 	UINT32 op = m_rspcop2_state->op;
-	UINT32 ea = 0;
+	UINT32 ea;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xc;
@@ -375,7 +375,7 @@ static void cfunc_llv(void *param)
 void rsp_cop2_drc::ldv()
 {
 	UINT32 op = m_rspcop2_state->op;
-	UINT32 ea = 0;
+	UINT32 ea;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0x8;
@@ -687,7 +687,7 @@ void rsp_cop2_drc::ltv()
 		ve = 32;
 	}
 
-	int element = 7 - (index >> 1);
+	int element;
 
 	UINT32 ea = (base) ? m_rsp.m_rsp_state->r[base] + (offset * 16) : (offset * 16);
 
@@ -2438,7 +2438,7 @@ void rsp_cop2_drc::vch()
 	CLEAR_ZERO_FLAGS();
 	CLEAR_CLIP2_FLAGS();
 
-	UINT32 vce = 0;
+	UINT32 vce;
 	for (int i = 0; i < 8; i++)
 	{
 		INT16 s1, s2;

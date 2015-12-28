@@ -128,9 +128,9 @@ public:
 	DECLARE_WRITE8_MEMBER(stuntair_sound_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
 	INTERRUPT_GEN_MEMBER(stuntair_irq);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(stuntair);

@@ -108,7 +108,7 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 	tracks = TRACK_COUNT * heads;
 
 	// write header
-	UINT8 header[] = { 'G', 'C', 'R', '-', '1', '5', '4', '1', 0x00, tracks, TRACK_LENGTH & 0xff, TRACK_LENGTH >> 8 };
+	UINT8 header[] = { 'G', 'C', 'R', '-', '1', '5', '4', '1', 0x00, static_cast<UINT8>(tracks), TRACK_LENGTH & 0xff, TRACK_LENGTH >> 8 };
 	io_generic_write(io, header, POS_SIGNATURE, sizeof(header));
 
 	// write tracks

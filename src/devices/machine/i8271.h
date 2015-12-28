@@ -53,9 +53,9 @@ public:
 	void soft_reset();
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	enum {
@@ -244,8 +244,6 @@ private:
 	void set_irq(bool state);
 	bool get_ready(int fid);
 
-	void enable_transfer();
-	void disable_transfer();
 	int calc_sector_size(UINT8 size);
 
 	int check_command();

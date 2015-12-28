@@ -891,7 +891,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void video_start();
+	virtual void video_start() override;
 };
 
 
@@ -1369,8 +1369,11 @@ ROM_START( rrvac )
 	ROM_LOAD( "rrv3vera.ic002", 0x000000, 0x800000, CRC(dd20c4a2) SHA1(07bddaac958ac62d9fc29671fc83bd1e3b27f4b8) )
 	ROM_LOAD( "rrv3vera_spr.ic002", 0x800000, 0x040000, CRC(712e0e9a) SHA1(d396aaf918036ff7f909a84daefe8f651fdf9b05) )
 
-	ROM_REGION(0x4010, "jvsio", 0)  // Namco "FCA" JVS I/O board PIC16F84 code (see namcos23.c for FCA details)
+	ROM_REGION(0xc000, "jvsio", 0)  // Namco "FCA" JVS I/O board PIC16F84 code (see namcos23.c for FCA details)
 	ROM_LOAD( "fcap11.ic2",   0x000000, 0x004010, CRC(1b2592ce) SHA1(a1a487361053af564f6ec67e545413e370a3b38c) )
+	// Fujitsu MB90F574 code, partial dumps, only last 48KB of 256KB flash was extracted
+	ROM_LOAD( "fcaf11.ic4",     0x000000, 0x00c000, BAD_DUMP CRC(9794f16b) SHA1(94e1c036a6d23d39b2ad69dd1ad2cfa6163287e0) )	// almost good dump, all JVS related code and data is in place
+	ROM_LOAD( "fcb1_io-0b.ic4", 0x000000, 0x00c000, BAD_DUMP CRC(5e25b73f) SHA1(fa805a422ff8793989b0ce901cc868ec1a87c7ac) ) // most JVS handling code is in undumped area
 
 	ROM_REGION(0x80000, "steering", 0)  // Steering I/O board MB90242A code (see namcos23.c for steering board details)
 	ROM_LOAD( "rrv3_str-0a.ic16", 0x000000, 0x080000, CRC(df8b6cac) SHA1(d45e150678218084925673e1d77edefc04135035) )
@@ -1387,8 +1390,11 @@ ROM_START( rrvac2 )
 	ROM_LOAD( "rrv2vera.ic002", 0x000000, 0x800000, CRC(4666f6b5) SHA1(974ed4f6c5869ecf879c0d3540db6ea576225c04) )
 	ROM_LOAD( "rrv2vera_spr.ic002", 0x800000, 0x040000, CRC(8d98ef04) SHA1(3f33046a8283b918226301fcf5538729be84bfbe) )
 
-	ROM_REGION(0x4010, "jvsio", 0)  // Namco "FCA" JVS I/O board PIC16F84 code (see namcos23.c for FCA details)
+	ROM_REGION(0xc000, "jvsio", 0)  // Namco "FCA" JVS I/O board PIC16F84 code (see namcos23.c for FCA details)
 	ROM_LOAD( "fcap11.ic2",   0x000000, 0x004010, CRC(1b2592ce) SHA1(a1a487361053af564f6ec67e545413e370a3b38c) )
+	// Fujitsu MB90F574 code, partial dumps, only last 48KB of 256KB flash was extracted
+	ROM_LOAD( "fcaf11.ic4",     0x000000, 0x00c000, BAD_DUMP CRC(9794f16b) SHA1(94e1c036a6d23d39b2ad69dd1ad2cfa6163287e0) )	// almost good dump, all JVS related code and data is in place
+	ROM_LOAD( "fcb1_io-0b.ic4", 0x000000, 0x00c000, BAD_DUMP CRC(5e25b73f) SHA1(fa805a422ff8793989b0ce901cc868ec1a87c7ac) ) // most JVS handling code is in undumped area
 
 	ROM_REGION(0x80000, "steering", 0)  // Steering I/O board MB90242A code (see namcos23.c for steering board details)
 	ROM_LOAD( "rrv3_str-0a.ic16", 0x000000, 0x080000, CRC(df8b6cac) SHA1(d45e150678218084925673e1d77edefc04135035) )
@@ -1406,8 +1412,11 @@ ROM_START( rrvac1 )
 	ROM_LOAD( "rrv1vera.ic002", 0x000000, 0x800000, CRC(e28bb0be) SHA1(9683ddc228e9aedd338cf2eb4d4373faeaea5b75) )
 	ROM_LOAD( "rrv1vera_spr.ic002", 0x800000, 0x040000, CRC(81c370b7) SHA1(7693c03b544c79fa3b6e536abb32ad34cf14dfbf) )
 
-	ROM_REGION(0x4010, "jvsio", 0)  // Namco "FCA" JVS I/O board PIC16F84 code (see namcos23.c for FCA details)
+	ROM_REGION(0xc000, "jvsio", 0)  // Namco "FCA" JVS I/O board PIC16F84 code (see namcos23.c for FCA details)
 	ROM_LOAD( "fcap11.ic2",   0x000000, 0x004010, CRC(1b2592ce) SHA1(a1a487361053af564f6ec67e545413e370a3b38c) )
+	// Fujitsu MB90F574 code, partial dumps, only last 48KB of 256KB flash was extracted
+	ROM_LOAD( "fcaf11.ic4",     0x000000, 0x00c000, BAD_DUMP CRC(9794f16b) SHA1(94e1c036a6d23d39b2ad69dd1ad2cfa6163287e0) )	// almost good dump, all JVS related code and data is in place
+	ROM_LOAD( "fcb1_io-0b.ic4", 0x000000, 0x00c000, BAD_DUMP CRC(5e25b73f) SHA1(fa805a422ff8793989b0ce901cc868ec1a87c7ac) ) // most JVS handling code is in undumped area
 
 	ROM_REGION(0x80000, "steering", 0)  // Steering I/O board MB90242A code (see namcos23.c for steering board details)
 	ROM_LOAD( "rrv3_str-0a.ic16", 0x000000, 0x080000, CRC(df8b6cac) SHA1(d45e150678218084925673e1d77edefc04135035) )

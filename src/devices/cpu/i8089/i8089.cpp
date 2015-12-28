@@ -139,7 +139,7 @@ const address_space_config *i8089_device::memory_space_config(address_spacenum s
 	{
 	case AS_PROGRAM: return &m_program_config;
 	case AS_IO:      return &m_io_config;
-	default:         return NULL;
+	default:         return nullptr;
 	}
 }
 
@@ -286,7 +286,7 @@ UINT8 i8089_device::read_byte(bool space, offs_t address)
 
 UINT16 i8089_device::read_word(bool space, offs_t address)
 {
-	UINT16 data = 0xffff;
+	UINT16 data;
 	address_space *aspace = (space ? m_io : m_mem);
 
 	if (sysbus_width() && !(address & 1))

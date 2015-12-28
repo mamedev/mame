@@ -57,8 +57,8 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);
 	DECLARE_WRITE8_MEMBER(go2000_pcm_1_bankswitch_w);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

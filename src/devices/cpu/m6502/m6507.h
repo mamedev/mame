@@ -21,20 +21,20 @@ protected:
 	class mi_6507_normal : public memory_interface {
 	public:
 		virtual ~mi_6507_normal() {}
-		virtual UINT8 read(UINT16 adr);
-		virtual UINT8 read_sync(UINT16 adr);
-		virtual UINT8 read_arg(UINT16 adr);
-		virtual void write(UINT16 adr, UINT8 val);
+		virtual UINT8 read(UINT16 adr) override;
+		virtual UINT8 read_sync(UINT16 adr) override;
+		virtual UINT8 read_arg(UINT16 adr) override;
+		virtual void write(UINT16 adr, UINT8 val) override;
 	};
 
 	class mi_6507_nd : public mi_6507_normal {
 	public:
 		virtual ~mi_6507_nd() {}
-		virtual UINT8 read_sync(UINT16 adr);
-		virtual UINT8 read_arg(UINT16 adr);
+		virtual UINT8 read_sync(UINT16 adr) override;
+		virtual UINT8 read_arg(UINT16 adr) override;
 	};
 
-	virtual void device_start();
+	virtual void device_start() override;
 };
 
 

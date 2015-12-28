@@ -126,7 +126,7 @@ static const char *const spacewar_sample_names[] =
 	"pop",
 	"explode2",
 	"fire2",
-	0
+	nullptr
 };
 
 void cinemat_state::spacewar_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -198,7 +198,7 @@ static const char *const barrier_sample_names[] =
 	"playrdie",
 	"playmove",
 	"enemmove",
-	0
+	nullptr
 };
 
 void cinemat_state::barrier_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -244,7 +244,7 @@ static const char *const speedfrk_sample_names[] =
 {
 	"*speedfrk",
 	"offroad",
-	NULL
+	nullptr
 };
 
 void cinemat_state::speedfrk_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -302,7 +302,7 @@ static const char *const starhawk_sample_names[] =
 	"k",
 	"master",
 	"kexit",
-	NULL
+	nullptr
 };
 
 void cinemat_state::starhawk_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -371,7 +371,7 @@ static const char *const sundance_sample_names[] =
 	"ping1",
 	"ping2",
 	"hatch",
-	0
+	nullptr
 };
 
 void cinemat_state::sundance_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -434,7 +434,7 @@ static const char *const tailg_sample_names[] =
 	"shield",
 	"bounce",
 	"hypersp",
-	NULL
+	nullptr
 };
 
 void cinemat_state::tailg_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -515,7 +515,7 @@ static const char *const warrior_sample_names[] =
 	"killed",
 	"fall",
 	"appear",
-	NULL
+	nullptr
 };
 
 void cinemat_state::warrior_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -579,7 +579,7 @@ static const char *const armora_sample_names[] =
 	"tankeng",
 	"beep",
 	"chopper",
-	NULL
+	nullptr
 };
 
 void cinemat_state::armora_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -673,7 +673,7 @@ static const char *const ripoff_sample_names[] =
 	"bg6",
 	"bg7",
 	"bg8",
-	NULL
+	nullptr
 };
 
 void cinemat_state::ripoff_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -753,7 +753,7 @@ static const char *const starcas_sample_names[] =
 	"lexplode",
 	"sexplode",
 	"pfire",
-	0
+	nullptr
 };
 
 void cinemat_state::starcas_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -860,7 +860,7 @@ static const char *const solarq_sample_names[] =
 	"nuke2",
 	"nuke1",
 	"music",
-	NULL
+	nullptr
 };
 
 void cinemat_state::solarq_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -992,7 +992,7 @@ static const char *const boxingb_sample_names[] =
 	"cannon",
 	"bounce",
 	"bell",
-	NULL
+	nullptr
 };
 
 void cinemat_state::boxingb_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -1116,7 +1116,7 @@ static const char *const wotw_sample_names[] =
 	"lexplode",
 	"sexplode",
 	"pfire",
-	0
+	nullptr
 };
 
 void cinemat_state::wotw_sound_w(UINT8 sound_val, UINT8 bits_changed)
@@ -1303,7 +1303,7 @@ ADDRESS_MAP_END
 static const z80_daisy_config daisy_chain[] =
 {
 	{ "ctc" },
-	{ NULL }
+	{ nullptr }
 };
 
 

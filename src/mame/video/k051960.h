@@ -82,12 +82,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
-	UINT8    *m_ram;
+	std::unique_ptr<UINT8[]>   m_ram;
 
 	UINT8 *m_sprite_rom;
 	UINT32 m_sprite_size;

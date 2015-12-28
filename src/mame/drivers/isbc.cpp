@@ -250,12 +250,12 @@ static MACHINE_CONFIG_START( rpc86, isbc_state )
 	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
 
 	/* video hardware */
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 
-	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, NULL)
+	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, nullptr)
 	//MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir3_w))
 	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir4_w))
-	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, NULL)
+	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, nullptr)
 	//MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
 	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
 MACHINE_CONFIG_END
@@ -301,7 +301,7 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(WRITELINE(isbc_state, isbc_uart8274_irq))
 
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", z80dart_device, ctsa_w))
@@ -312,10 +312,10 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", z80dart_device, ctsb_w))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
 
-	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, NULL)
+	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, nullptr)
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir3_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir4_w))
-	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, NULL)
+	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, nullptr)
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir5_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir6_w))
 

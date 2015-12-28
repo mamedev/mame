@@ -54,7 +54,7 @@ namespace netlist
 				const pstring &def_param)
 		: base_factory_t(name, classname, def_param) { }
 
-		ATTR_COLD device_t *Create()
+		ATTR_COLD device_t *Create() override
 		{
 			device_t *r = palloc(C);
 			//r->init(setup, name);

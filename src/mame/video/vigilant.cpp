@@ -21,7 +21,7 @@ static const rectangle bottomvisiblearea(16*8, 48*8-1, 6*8, 32*8-1);
 
 void vigilant_state::video_start()
 {
-	m_bg_bitmap = auto_bitmap_ind16_alloc(machine(),512*4,256);
+	m_bg_bitmap = std::make_unique<bitmap_ind16>(512*4,256);
 
 	save_item(NAME(m_horiz_scroll_low));
 	save_item(NAME(m_horiz_scroll_high));
@@ -229,7 +229,7 @@ void vigilant_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clip
 		m_rear_refresh=0;
 	}
 
-	copyscrollbitmap(bitmap,*m_bg_bitmap,1,&scrollx,0,0,bottomvisiblearea);
+	copyscrollbitmap(bitmap,*m_bg_bitmap,1,&scrollx,0,nullptr,bottomvisiblearea);
 }
 
 

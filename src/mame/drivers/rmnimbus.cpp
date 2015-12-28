@@ -166,7 +166,7 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_RS232_PORT_ADD("rs232a", keyboard, "rmnkbd")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxa_w))
 
-	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxb_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, dcdb_w))
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rib_w))

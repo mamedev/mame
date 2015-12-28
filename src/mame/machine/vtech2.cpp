@@ -319,7 +319,7 @@ void vtech2_state::laser_get_track()
 	sprintf(m_laser_frame_message, "#%d get track %02d", m_laser_drive, m_laser_track_x2[m_laser_drive]/2);
 	m_laser_frame_time = 30;
 	/* drive selected or and image file ok? */
-	if( m_laser_drive >= 0 && laser_file() != NULL )
+	if( m_laser_drive >= 0 && laser_file() != nullptr )
 	{
 		int size, offs;
 		device_image_interface *image = dynamic_cast<device_image_interface *>(laser_file());
@@ -337,7 +337,7 @@ void vtech2_state::laser_put_track()
 {
 	device_image_interface *image = dynamic_cast<device_image_interface *>(laser_file());
 	/* drive selected and image file ok? */
-	if( m_laser_drive >= 0 && laser_file() != NULL )
+	if( m_laser_drive >= 0 && laser_file() != nullptr )
 	{
 		int size, offs;
 		offs = TRKSIZE_VZ * m_laser_track_x2[m_laser_drive]/2;

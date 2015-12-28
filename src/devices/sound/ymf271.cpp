@@ -399,7 +399,7 @@ void ymf271_device::update_lfo(YMF271Slot *slot)
 	slot->lfo_phase += slot->lfo_step;
 
 	slot->lfo_amplitude = m_lut_alfo[slot->lfowave][(slot->lfo_phase >> LFO_SHIFT) & (LFO_LENGTH-1)];
-	slot->lfo_phasemod = m_lut_plfo[slot->lfowave][slot->pms][(slot->lfo_phase >> LFO_SHIFT) & (LFO_LENGTH-1)];
+	slot->lfo_phasemod = m_lut_plfo[slot->lfowave][slot->pms].get()[(slot->lfo_phase >> LFO_SHIFT) & (LFO_LENGTH-1)];
 
 	calculate_step(slot);
 }
@@ -544,12 +544,12 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	int op;
 	INT32 *mixp;
 
-	memset(m_mix_buffer, 0, sizeof(m_mix_buffer[0])*samples*2);
+	memset(m_mix_buffer.get(), 0, sizeof(m_mix_buffer[0])*samples*2);
 
 	for (j = 0; j < 12; j++)
 	{
 		YMF271Group *slot_group = &m_groups[j];
-		mixp = m_mix_buffer;
+		mixp = m_mix_buffer.get();
 
 		if (slot_group->pfm && slot_group->sync != 3)
 		{
@@ -567,14 +567,14 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				int slot2 = j + (1*12);
 				int slot3 = j + (2*12);
 				int slot4 = j + (3*12);
-				mixp = m_mix_buffer;
+				mixp = m_mix_buffer.get();
 
 				if (m_slots[slot1].active)
 				{
 					for (i = 0; i < samples; i++)
 					{
 						INT64 output1 = 0, output2 = 0, output3 = 0, output4 = 0;
-						INT64 phase_mod1 = 0, phase_mod2 = 0, phase_mod3 = 0;
+						INT64 phase_mod1, phase_mod2, phase_mod3;
 						switch (m_slots[slot1].algorithm)
 						{
 							// <--------|
@@ -794,13 +794,13 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					int slot1 = j + ((op + 0) * 12);
 					int slot3 = j + ((op + 2) * 12);
 
-					mixp = m_mix_buffer;
+					mixp = m_mix_buffer.get();
 					if (m_slots[slot1].active)
 					{
 						for (i = 0; i < samples; i++)
 						{
 							INT64 output1 = 0, output3 = 0;
-							INT64 phase_mod1, phase_mod3 = 0;
+							INT64 phase_mod1, phase_mod3;
 							switch (m_slots[slot1].algorithm & 3)
 							{
 								// <--------|
@@ -856,14 +856,14 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				int slot1 = j + (0*12);
 				int slot2 = j + (1*12);
 				int slot3 = j + (2*12);
-				mixp = m_mix_buffer;
+				mixp = m_mix_buffer.get();
 
 				if (m_slots[slot1].active)
 				{
 					for (i = 0; i < samples; i++)
 					{
 						INT64 output1 = 0, output2 = 0, output3 = 0;
-						INT64 phase_mod1 = 0, phase_mod3 = 0;
+						INT64 phase_mod1, phase_mod3;
 						switch (m_slots[slot1].algorithm & 7)
 						{
 							// <--------|
@@ -959,7 +959,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					}
 				}
 
-				mixp = m_mix_buffer;
+				mixp = m_mix_buffer.get();
 				update_pcm(j + (3*12), mixp, samples);
 				break;
 			}
@@ -976,7 +976,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		}
 	}
 
-	mixp = m_mix_buffer;
+	mixp = m_mix_buffer.get();
 	for (i = 0; i < samples; i++)
 	{
 		outputs[0][i] = (*mixp++)>>2;
@@ -1505,13 +1505,13 @@ void ymf271_device::init_tables()
 	int i, j;
 
 	for (i = 0; i < 8; i++)
-		m_lut_waves[i] = auto_alloc_array(machine(), INT16, SIN_LEN);
+		m_lut_waves[i] = std::make_unique<INT16[]>(SIN_LEN);
 
 	for (i = 0; i < 4*8; i++)
-		m_lut_plfo[i>>3][i&7] = auto_alloc_array(machine(), double, LFO_LENGTH);
+		m_lut_plfo[i>>3][i&7] = std::make_unique<double[]>(LFO_LENGTH);
 
 	for (i = 0; i < 4; i++)
-		m_lut_alfo[i] = auto_alloc_array(machine(), int, LFO_LENGTH);
+		m_lut_alfo[i] = std::make_unique<int[]>(LFO_LENGTH);
 
 	for (i = 0; i < SIN_LEN; i++)
 	{
@@ -1568,14 +1568,14 @@ void ymf271_device::init_tables()
 
 		for (j = 0; j < 4; j++)
 		{
-			m_lut_plfo[j][0][i] = pow(2.0, 0.0);
-			m_lut_plfo[j][1][i] = pow(2.0, (3.378 * plfo[j]) / 1200.0);
-			m_lut_plfo[j][2][i] = pow(2.0, (5.0646 * plfo[j]) / 1200.0);
-			m_lut_plfo[j][3][i] = pow(2.0, (6.7495 * plfo[j]) / 1200.0);
-			m_lut_plfo[j][4][i] = pow(2.0, (10.1143 * plfo[j]) / 1200.0);
-			m_lut_plfo[j][5][i] = pow(2.0, (20.1699 * plfo[j]) / 1200.0);
-			m_lut_plfo[j][6][i] = pow(2.0, (40.1076 * plfo[j]) / 1200.0);
-			m_lut_plfo[j][7][i] = pow(2.0, (79.307 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][0].get()[i] = pow(2.0, 0.0);
+			m_lut_plfo[j][1].get()[i] = pow(2.0, (3.378 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][2].get()[i] = pow(2.0, (5.0646 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][3].get()[i] = pow(2.0, (6.7495 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][4].get()[i] = pow(2.0, (10.1143 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][5].get()[i] = pow(2.0, (20.1699 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][6].get()[i] = pow(2.0, (40.1076 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][7].get()[i] = pow(2.0, (79.307 * plfo[j]) / 1200.0);
 		}
 
 		// LFO amplitude modulation
@@ -1717,7 +1717,7 @@ void ymf271_device::device_start()
 	init_state();
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock()/384);
-	m_mix_buffer = auto_alloc_array(machine(), INT32, 44100*2);
+	m_mix_buffer = std::make_unique<INT32[]>(44100*2);
 }
 
 //-------------------------------------------------
@@ -1726,10 +1726,10 @@ void ymf271_device::device_start()
 
 void ymf271_device::device_reset()
 {
-	for (int i = 0; i < 48; i++)
+	for (auto & elem : m_slots)
 	{
-		m_slots[i].active = 0;
-		m_slots[i].volume = 0;
+		elem.active = 0;
+		elem.volume = 0;
 	}
 
 	// reset timers and IRQ

@@ -25,15 +25,15 @@ public:
 		macpds_sedisplay_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual const rom_entry *device_rom_region() const;
+		virtual machine_config_constructor device_mconfig_additions() const override;
+		virtual const rom_entry *device_rom_region() const override;
 
 		UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:
 		// device-level overrides
-		virtual void device_start();
-		virtual void device_reset();
-		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+		virtual void device_start() override;
+		virtual void device_reset() override;
+		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 		DECLARE_READ16_MEMBER(sedisplay_r);
 		DECLARE_WRITE16_MEMBER(sedisplay_w);
@@ -41,7 +41,7 @@ protected:
 		DECLARE_WRITE16_MEMBER(ramdac_w);
 
 public:
-		UINT8 *m_vram;
+		std::unique_ptr<UINT8[]> m_vram;
 		UINT32 m_vbl_disable;
 		UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
 		emu_timer *m_timer;

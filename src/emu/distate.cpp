@@ -51,7 +51,7 @@ const UINT64 device_state_entry::k_decimal_divisor[] =
 
 device_state_entry::device_state_entry(int index, const char *symbol, void *dataptr, UINT8 size, device_state_interface *dev)
 	: m_device_state(dev),
-		m_next(NULL),
+		m_next(nullptr),
 		m_index(index),
 		m_dataptr(dataptr),
 		m_datamask(0),
@@ -89,9 +89,9 @@ device_state_entry::device_state_entry(int index, const char *symbol, void *data
 
 device_state_entry::device_state_entry(int index, device_state_interface *dev)
 	: m_device_state(dev),
-		m_next(NULL),
+		m_next(nullptr),
 		m_index(index),
-		m_dataptr(NULL),
+		m_dataptr(nullptr),
 		m_datamask(0),
 		m_datasize(0),
 		m_flags(DSF_DIVIDER),
@@ -114,7 +114,7 @@ device_state_entry &device_state_entry::formatstr(const char *_format)
 	// set the DSF_CUSTOM_STRING flag by formatting with a NULL string
 	m_flags &= ~DSF_CUSTOM_STRING;
 	std::string dummy;
-	format(dummy, NULL);
+	format(dummy, nullptr);
 
 	return *this;
 }
@@ -321,7 +321,7 @@ std::string &device_state_entry::format(std::string &dest, const char *string, b
 			case 's':
 				if (width == 0)
 					throw emu_fatalerror("Width required for %%s formats\n");
-				if (string == NULL)
+				if (string == nullptr)
 				{
 					const_cast<device_state_entry *>(this)->m_flags |= DSF_CUSTOM_STRING;
 					return dest;
@@ -419,7 +419,7 @@ UINT64 device_state_interface::state_int(int index)
 {
 	// NULL or out-of-range entry returns 0
 	const device_state_entry *entry = state_find_entry(index);
-	if (entry == NULL)
+	if (entry == nullptr)
 		return 0;
 
 	// call the exporter before we do anything
@@ -440,7 +440,7 @@ std::string &device_state_interface::state_string(int index, std::string &dest)
 {
 	// NULL or out-of-range entry returns bogus string
 	const device_state_entry *entry = state_find_entry(index);
-	if (entry == NULL)
+	if (entry == nullptr)
 		return dest.assign("???");
 
 	// get the custom string if needed
@@ -462,7 +462,7 @@ int device_state_interface::state_string_max_length(int index)
 {
 	// NULL or out-of-range entry returns bogus string
 	const device_state_entry *entry = state_find_entry(index);
-	if (entry == NULL)
+	if (entry == nullptr)
 		return 3;
 
 	// ask the entry to format itself maximally
@@ -480,7 +480,7 @@ void device_state_interface::set_state_int(int index, UINT64 value)
 {
 	// NULL or out-of-range entry is a no-op
 	const device_state_entry *entry = state_find_entry(index);
-	if (entry == NULL)
+	if (entry == nullptr)
 		return;
 
 	// set the value
@@ -501,7 +501,7 @@ void device_state_interface::set_state_string(int index, const char *string)
 {
 	// NULL or out-of-range entry is a no-op
 	const device_state_entry *entry = state_find_entry(index);
-	if (entry == NULL)
+	if (entry == nullptr)
 		return;
 
 	// set the value
@@ -522,10 +522,10 @@ device_state_entry &device_state_interface::state_add(int index, const char *sym
 {
 	// assert validity of incoming parameters
 	assert(size == 1 || size == 2 || size == 4 || size == 8);
-	assert(symbol != NULL);
+	assert(symbol != nullptr);
 
 	// allocate new entry
-	device_state_entry *entry = global_alloc(device_state_entry(index, symbol, data, size, this));
+	auto entry = global_alloc(device_state_entry(index, symbol, data, size, this));
 
 	// append to the end of the list
 	m_state_list.append(*entry);
@@ -545,7 +545,7 @@ device_state_entry &device_state_interface::state_add(int index, const char *sym
 device_state_entry &device_state_interface::state_add_divider(int index)
 {
 	// allocate new entry
-	device_state_entry *entry = global_alloc(device_state_entry(index, this));
+	auto entry = global_alloc(device_state_entry(index, this));
 
 	// append to the end of the list
 	m_state_list.append(*entry);
@@ -622,10 +622,10 @@ const device_state_entry *device_state_interface::state_find_entry(int index)
 		return m_fast_state[index - FAST_STATE_MIN];
 
 	// otherwise, scan the first
-	for (const device_state_entry *entry = m_state_list.first(); entry != NULL; entry = entry->m_next)
+	for (const device_state_entry *entry = m_state_list.first(); entry != nullptr; entry = entry->m_next)
 		if (entry->m_index == index)
 			return entry;
 
 	// handle failure by returning NULL
-	return NULL;
+	return nullptr;
 }

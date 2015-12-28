@@ -39,7 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER( port_f2_w );
 
 	UINT8 m_port_f2;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
 };
 

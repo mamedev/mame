@@ -186,13 +186,13 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 	scroll[6] = 0;
 	scroll[7] = 0;
 
-	copyscrollbitmap(bitmap, m_background_bitmap, 0, 0, 8, scroll, cliprect);
-	copyscrollbitmap(m_scrolled_collision_background, m_collision_background, 0, 0, 8, scroll, cliprect);
+	copyscrollbitmap(bitmap, m_background_bitmap, 0, nullptr, 8, scroll, cliprect);
+	copyscrollbitmap(m_scrolled_collision_background, m_collision_background, 0, nullptr, 8, scroll, cliprect);
 
 	/* update the S2636 chips */
-	bitmap_ind16 *s2636_0_bitmap = &m_s2636_0->update(cliprect);
-	bitmap_ind16 *s2636_1_bitmap = &m_s2636_1->update(cliprect);
-	bitmap_ind16 *s2636_2_bitmap = &m_s2636_2->update(cliprect);
+	bitmap_ind16 const &s2636_0_bitmap = m_s2636_0->update(cliprect);
+	bitmap_ind16 const &s2636_1_bitmap = m_s2636_1->update(cliprect);
+	bitmap_ind16 const &s2636_2_bitmap = m_s2636_2->update(cliprect);
 
 	/* Bullet Hardware */
 	for (offs = 8; offs < 256; offs++ )
@@ -205,9 +205,9 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 				int bx = 255 - 7 - m_bullet_ram[offs] - ct;
 
 				/* Bullet/Object Collision */
-				if ((s2636_0_bitmap->pix16(offs, bx) != 0) ||
-					(s2636_1_bitmap->pix16(offs, bx) != 0) ||
-					(s2636_2_bitmap->pix16(offs, bx) != 0))
+				if ((s2636_0_bitmap.pix16(offs, bx) != 0) ||
+					(s2636_1_bitmap.pix16(offs, bx) != 0) ||
+					(s2636_2_bitmap.pix16(offs, bx) != 0))
 					m_collision_register |= 0x08;
 
 				/* Bullet/Background Collision */
@@ -230,9 +230,9 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
-				int pixel0 = s2636_0_bitmap->pix16(y, x);
-				int pixel1 = s2636_1_bitmap->pix16(y, x);
-				int pixel2 = s2636_2_bitmap->pix16(y, x);
+				int pixel0 = s2636_0_bitmap.pix16(y, x);
+				int pixel1 = s2636_1_bitmap.pix16(y, x);
+				int pixel2 = s2636_2_bitmap.pix16(y, x);
 
 				int pixel = pixel0 | pixel1 | pixel2;
 

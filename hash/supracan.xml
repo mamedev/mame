@@ -1,8 +1,21 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="supracan" description="Funtech Super A'Can cartridges">
-	<!-- F001 - 福爾摩沙大對決 (Formosa Da Dui Jue) - aka Formosa Duel -->
-
+	
+  
+  <!-- appears to work, but gameplay logic is broken, attack pieces don't drop down, game can get stuck, can sometimes rotate pieces through other pieces too! -->
+  <software name="formduel" supported="no"> <!-- F001 - 福爾摩沙大對決 (Formosa Da Dui Jue) - aka Formosa Duel -->
+		<description>Formosa Duel</description>
+		<year>1995</year>
+		<publisher>AV Artisan Corp.</publisher>
+		<info name="serial" value="F001" />
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_word_swap" name="Formosa Duel (Taiwan).bin" size="0x100000" crc="b2bf31dc" sha1="8d0680e1322af21b20d5cee2c100b05cf4217815" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+    
 	<software name="sangofgt">
 		<description>Sango Fighter ~ Wu Jiang Zheng Ba - San Guo Zhi</description>
 		<year>1995</year>

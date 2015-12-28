@@ -199,9 +199,9 @@ static const UINT32 banks[4] = { 0, 0x40000/2, 0x20000/2, 0x60000/2 };
 struct i82716_t
 {
 	UINT16  r[16];
-	UINT16  *dram;
+	std::unique_ptr<UINT16[]>  dram;
 
-	UINT8   *line_buf;  // there's actually two
+	std::unique_ptr<UINT8[]>   line_buf;  // there's actually two
 };
 
 
@@ -242,9 +242,9 @@ public:
 	DECLARE_WRITE8_MEMBER(lamp_data_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 	DECLARE_DRIVER_INIT(screenpl);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_maygayv1(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(vsync_interrupt);
@@ -336,7 +336,7 @@ UINT32 maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_ind1
 
 		/* Clear the frame buffer on each line to BG colour (palette entry 2) */
 		/* 4bpp only ! */
-		memset(i82716.line_buf, 0x22, 512);
+		memset(i82716.line_buf.get(), 0x22, 512);
 
 		/* Parse the list of 16 objects */
 		for (obj = 0; obj < 16; ++obj)
@@ -838,10 +838,10 @@ WRITE8_MEMBER(maygayv1_state::b_writ)
 void maygayv1_state::machine_start()
 {
 	i82716_t &i82716 = m_i82716;
-	i82716.dram = auto_alloc_array(machine(), UINT16, 0x80000/2);   // ???
-	i82716.line_buf = auto_alloc_array(machine(), UINT8, 512);
+	i82716.dram = std::make_unique<UINT16[]>(0x80000/2);   // ???
+	i82716.line_buf = std::make_unique<UINT8[]>(512);
 
-	save_pointer(NAME(i82716.dram), 0x40000);
+	save_pointer(NAME(i82716.dram.get()), 0x40000);
 
 	m_soundcpu->i8051_set_serial_tx_callback(write8_delegate(FUNC(maygayv1_state::data_from_i8031),this));
 	m_soundcpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(maygayv1_state::data_to_i8031),this));
@@ -851,7 +851,7 @@ void maygayv1_state::machine_reset()
 {
 	i82716_t &i82716 = m_i82716;
 	// ?
-	memset(i82716.dram, 0, 0x40000);
+	memset(i82716.dram.get(), 0, 0x40000);
 	i82716.r[RWBA] = 0x0200;
 }
 

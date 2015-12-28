@@ -38,7 +38,7 @@ public:
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ16_MEMBER( cs4031_ior );
 	DECLARE_WRITE16_MEMBER( cs4031_iow );
@@ -159,10 +159,10 @@ static MACHINE_CONFIG_START( ct486, ct486_state )
 	MCFG_ISA16_SLOT_ADD("isabus", "board3", pc_isa16_cards, "ide", true)
 	MCFG_ISA16_SLOT_ADD("isabus", "board4", pc_isa16_cards, "lpt", true)
 	MCFG_ISA16_SLOT_ADD("isabus", "isa1", pc_isa16_cards, "svga_et4k", false)
-	MCFG_ISA16_SLOT_ADD("isabus", "isa2", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD("isabus", "isa3", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD("isabus", "isa4", pc_isa16_cards, NULL, false)
-	MCFG_ISA16_SLOT_ADD("isabus", "isa5", pc_isa16_cards, NULL, false)
+	MCFG_ISA16_SLOT_ADD("isabus", "isa2", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("isabus", "isa3", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("isabus", "isa4", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("isabus", "isa5", pc_isa16_cards, nullptr, false)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -160,7 +160,7 @@ WRITE8_MEMBER(cococart_slot_device::write)
 
 static const char *line_value_string(cococart_line_value value)
 {
-	const char *s = NULL;
+	const char *s;
 	switch(value)
 	{
 		case COCOCART_LINE_VALUE_CLEAR:
@@ -299,9 +299,9 @@ void cococart_slot_device::cart_set_line(cococart_line line, cococart_line_value
 
 UINT8* cococart_slot_device::get_cart_base()
 {
-	if (m_cart != NULL)
+	if (m_cart != nullptr)
 		return m_cart->get_cart_base();
-	return NULL;
+	return nullptr;
 }
 
 
@@ -312,7 +312,7 @@ UINT8* cococart_slot_device::get_cart_base()
 
 void cococart_slot_device::set_cart_base_update(cococart_base_update_delegate update)
 {
-	if (m_cart != NULL)
+	if (m_cart != nullptr)
 		m_cart->set_cart_base_update(update);
 }
 
@@ -326,8 +326,8 @@ bool cococart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		offs_t read_length = 0;
-		if (software_entry() == NULL)
+		offs_t read_length;
+		if (software_entry() == nullptr)
 		{
 			read_length = fread(m_cart->get_cart_base(), 0x8000);
 		}
@@ -424,7 +424,7 @@ WRITE8_MEMBER(device_cococart_interface::write)
 
 UINT8* device_cococart_interface::get_cart_base()
 {
-	return NULL;
+	return nullptr;
 }
 
 

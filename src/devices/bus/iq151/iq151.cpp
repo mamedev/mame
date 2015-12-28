@@ -167,12 +167,12 @@ bool iq151cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		offs_t read_length = 0;
+		offs_t read_length;
 		UINT8 *cart_base = m_cart->get_cart_base();
 
-		if (cart_base != NULL)
+		if (cart_base != nullptr)
 		{
-			if (software_entry() == NULL)
+			if (software_entry() == nullptr)
 			{
 				read_length = length();
 				fread(m_cart->get_cart_base(), read_length);

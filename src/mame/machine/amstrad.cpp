@@ -689,7 +689,7 @@ void amstrad_state::amstrad_update_video()
 			m_gate_array.line_ticks++;
 			if ( m_gate_array.line_ticks > m_gate_array.bitmap->width() )
 			{
-				m_gate_array.draw_p = NULL;
+				m_gate_array.draw_p = nullptr;
 				cycles_passed = 0;
 			}
 		}
@@ -791,7 +791,7 @@ void amstrad_state::amstrad_plus_update_video()
 				m_asic.hsync_first_tick = false;
 			if ( m_gate_array.line_ticks >= m_gate_array.bitmap->width() )
 			{
-				m_gate_array.draw_p = NULL;
+				m_gate_array.draw_p = nullptr;
 				cycles_passed = 0;
 			}
 		}
@@ -803,12 +803,19 @@ void amstrad_state::amstrad_plus_update_video()
 
 void amstrad_state::amstrad_plus_update_video_sprites()
 {
-	UINT16  *p = &m_gate_array.bitmap->pix16(m_gate_array.y, m_asic.h_start );
+	UINT16  *p;
 	int i;
+	UINT16 horiz;
 
 	if ( m_gate_array.y < 0 )
 		return;
 
+	if(m_asic.h_end < m_asic.h_start)
+		horiz = 0;
+	else
+		horiz = m_asic.h_start;
+
+	p = &m_gate_array.bitmap->pix16(m_gate_array.y, horiz );
 	for ( i = 15 * 8; i >= 0; i -= 8 )
 	{
 		UINT8   xmag = ( m_asic.ram[ 0x2000 + i + 4 ] >> 2 ) & 0x03;
@@ -824,21 +831,19 @@ void amstrad_state::amstrad_plus_update_video_sprites()
 			ymag -= 1;
 
 			/* Check if sprite would appear on this scanline */
-			if ( spr_y <= m_asic.vpos && m_asic.vpos < spr_y + ( 16 << ymag ) && spr_x < ( m_asic.h_end - m_asic.h_start ) && spr_x + ( 16 << xmag ) > 0 )
+//if(i == 0) printf("%i <= %i, %i < %i, %i < %i, %i > 0\n", spr_y,m_asic.vpos,m_asic.vpos,spr_y+(16<<ymag),spr_x,(m_asic.h_end - horiz),spr_x+(16<<xmag));
+			if ( spr_y <= m_asic.vpos && m_asic.vpos < spr_y + ( 16 << ymag ) && spr_x < (m_asic.h_end - horiz) && spr_x + ( 16 << xmag ) > 0 )
 			{
 				UINT16  spr_addr = i * 32 + ( ( ( m_asic.vpos - spr_y ) >> ymag ) * 16 );
 				int     j, k;
-
 				for ( j = 0; j < 16; j++ )
 				{
 					for ( k = 0; k < ( 1 << xmag ); k++ )
 					{
 						INT16 x = spr_x + ( j << xmag ) + k;
-
-						if ( x >= 0 && x < ( m_asic.h_end - m_asic.h_start ) )
+						if ( x >= 0 && x < (m_asic.h_end - horiz))
 						{
 							UINT8   spr_col = ( m_asic.ram[ spr_addr + j ] & 0x0f ) * 2;
-
 							if ( spr_col )
 								p[x] = m_asic.ram[ 0x2420 + spr_col ] + ( m_asic.ram[ 0x2421 + spr_col ] << 8 );
 						}
@@ -867,7 +872,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_hsync_changed)
 		}
 		else
 		{
-			m_gate_array.draw_p = NULL;
+			m_gate_array.draw_p = nullptr;
 		}
 
 		if ( m_gate_array.hsync_after_vsync_counter != 0 )  // counters still operate regardless of PRI state
@@ -910,7 +915,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_hsync_changed)
 		}
 		else
 		{
-			m_gate_array.draw_p = NULL;
+			m_gate_array.draw_p = nullptr;
 		}
 
 		if ( m_gate_array.hsync_after_vsync_counter != 0 )  // counters still operate regardless of PRI state
@@ -1083,7 +1088,7 @@ VIDEO_START_MEMBER(amstrad_state,amstrad)
 {
 	amstrad_init_lookups();
 
-	m_gate_array.bitmap = auto_bitmap_ind16_alloc( machine(), m_screen->width(), m_screen->height() );
+	m_gate_array.bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height() );
 	m_gate_array.hsync_after_vsync_counter = 3;
 }
 
@@ -1101,24 +1106,24 @@ static device_t* get_expansion_device(running_machine &machine, const char* tag)
 	amstrad_state *state = machine.driver_data<amstrad_state>();
 	cpc_expansion_slot_device* exp_port = state->m_exp;
 
-	while(exp_port != NULL)
+	while(exp_port != nullptr)
 	{
 		device_t* temp;
 
 		// first, check if this expansion port has the device we want attached
 		temp = exp_port->subdevice(tag);
-		if(temp != NULL)
+		if(temp != nullptr)
 			return temp;
 
 		// if it's not what we're looking for, then check the expansion port on this expansion device. if it exists.
 		temp = dynamic_cast<device_t*>(exp_port->get_card_device());
-		if(temp == NULL)
-			return NULL; // no device attached
+		if(temp == nullptr)
+			return nullptr; // no device attached
 		exp_port = temp->subdevice<cpc_expansion_slot_device>("exp");
-		if(exp_port == NULL)
-			return NULL;  // we're at the end of the chain
+		if(exp_port == nullptr)
+			return nullptr;  // we're at the end of the chain
 	}
-	return NULL;
+	return nullptr;
 }
 
 WRITE_LINE_MEMBER(amstrad_state::cpc_romdis)
@@ -1179,7 +1184,7 @@ void amstrad_state::amstrad_setLowerRom()
             space.install_write_bank(0x6000, 0x7fff, "bank12");
         }
 */
-		if(m_AmstradCPC_RamBanks[0] != NULL)
+		if(m_AmstradCPC_RamBanks[0] != nullptr)
 		{
 			m_bank1->set_base(m_AmstradCPC_RamBanks[0]);
 			m_bank2->set_base(m_AmstradCPC_RamBanks[0]+0x2000);
@@ -1236,7 +1241,7 @@ void amstrad_state::amstrad_setLowerRom()
   -----------------*/
 void amstrad_state::amstrad_setUpperRom()
 {
-	UINT8 *bank_base = NULL;
+	UINT8 *bank_base = nullptr;
 
 	/* b3 : "1" Upper rom area disable or "0" Upper rom area enable */
 	if ( ! ( m_gate_array.mrer & 0x08 ) && m_gate_array.romdis == 0)
@@ -1863,6 +1868,9 @@ READ8_MEMBER(amstrad_state::amstrad_cpc_io_r)
 		}
 	}
 
+	if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )  // Plus systems return 0x78 (464+) or 0x79 (6128+) when attempting to read the gate array (and any other unreadable space too?)
+		data = 0x79;
+
 	/* if b14 = 0 : CRTC Read selected */
 	if ((offset & (1<<14)) == 0)
 	{
@@ -1910,6 +1918,9 @@ b9 b8 | PPI Function Read/Write status
 	{
 		if (r1r0 < 0x03 )
 			data = m_ppi->read(space, r1r0);
+		if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )  // Plus systems return the data written to port C (I/O status is ignored)
+			if(r1r0 == 0x02)
+				data = m_last_write;
 	}
 
 /* if b10 = 0 : Expansion Peripherals Read selected
@@ -1989,14 +2000,14 @@ WRITE8_MEMBER(amstrad_state::rom_select)
 	// expansion devices know the selected ROM by monitoring I/O writes to DFxx
 	// there are no signals related to which ROM is selected
 	cpc_expansion_slot_device* exp_port = m_exp;
-	while(exp_port != NULL)
+	while(exp_port != nullptr)
 	{
 		device_cpc_expansion_card_interface* temp;
 		device_t* temp_dev;
 
 		temp = dynamic_cast<device_cpc_expansion_card_interface*>(exp_port->get_card_device());
 		temp_dev = dynamic_cast<device_t*>(exp_port->get_card_device());
-		if(temp != NULL)
+		if(temp != nullptr)
 		{
 			temp->set_rom_bank(data);
 		}
@@ -2101,9 +2112,11 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 	*/
 	if ((offset & (1<<11)) == 0)
 	{
-		unsigned int Index = ((offset & 0x0300) >> 8);
+		unsigned int idx = ((offset & 0x0300) >> 8);
 
-		m_ppi->write(space, Index, data);
+		m_ppi->write(space, idx, data);
+		if(idx == 0x02)
+			m_last_write = data;
 	}
 
 	/* if b10 = 0 : Expansion Peripherals Write selected */
@@ -2179,7 +2192,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 	}
 
 	mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(machine(),"multiface2"));
-	if(mface2 != NULL)
+	if(mface2 != nullptr)
 	{
 		if(mface2->multiface_io_write(offset, data) != 0)
 		{
@@ -2332,6 +2345,8 @@ Once all tables and jumpblocks have been set up,
 control is passed to the default entry in rom 0*/
 void amstrad_state::amstrad_reset_machine()
 {
+	m_last_write = 0xff;
+	
 	/* enable lower rom (OS rom) */
 	amstrad_GateArray_write(0x089);
 
@@ -2414,7 +2429,7 @@ void amstrad_state::amstrad_rethinkMemory()
 
 	/* multiface hardware enabled? */
 	mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(machine(),"multiface2"));
-	if(mface2 != NULL)
+	if(mface2 != nullptr)
 	{
 		if (mface2->multiface_hardware_enabled())
 		{
@@ -2448,7 +2463,7 @@ void amstrad_state::screen_eof_amstrad(screen_device &screen, bool state)
 	{
 		cpc_multiface2_device* mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(machine(),"multiface2"));
 
-		if(mface2 != NULL)
+		if(mface2 != nullptr)
 		{
 			mface2->check_button_state();
 		}
@@ -2933,14 +2948,14 @@ void amstrad_state::enumerate_roms()
 	/* find any expansion devices that have a 'exp_rom' region */
 	cpc_expansion_slot_device* exp_port = m_exp;
 
-	while(exp_port != NULL)
+	while(exp_port != nullptr)
 	{
 		device_t* temp;
 
 		temp = dynamic_cast<device_t*>(exp_port->get_card_device());
-		if(temp != NULL)
+		if(temp != nullptr)
 		{
-			if(temp->memregion("exp_rom")->base() != NULL)
+			if(temp->memregion("exp_rom")->base() != nullptr)
 			{
 				int num = temp->memregion("exp_rom")->bytes() / 0x4000;
 				for(i=0;i<num;i++)
@@ -2962,7 +2977,7 @@ void amstrad_state::enumerate_roms()
 		{
 			sprintf(str,"rom%i",i+1);
 			romimage = romexp->subdevice<rom_image_device>(str);
-			if(romimage->base() != NULL)
+			if(romimage->base() != nullptr)
 			{
 				m_Amstrad_ROM_Table[m_rom_count] = romimage->base();
 				NEXT_ROM_SLOT
@@ -3074,7 +3089,7 @@ MACHINE_RESET_MEMBER(amstrad_state,amstrad)
 //  amstrad_init_palette(machine());
 
 	m_gate_array.de = 0;
-	m_gate_array.draw_p = NULL;
+	m_gate_array.draw_p = nullptr;
 	m_gate_array.hsync = 0;
 	m_gate_array.vsync = 0;
 
@@ -3175,7 +3190,7 @@ MACHINE_START_MEMBER(amstrad_state,kccomp)
 	m_centronics->write_data7(0);
 
 	m_gate_array.de = 0;
-	m_gate_array.draw_p = NULL;
+	m_gate_array.draw_p = nullptr;
 	m_gate_array.hsync = 0;
 	m_gate_array.vsync = 0;
 
@@ -3245,7 +3260,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 	logerror("IMG: loading CPC+ cartridge file\n");
 
 	// check for .CPR header
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		image.fread(header, 12);
 		if (strncmp((char *)header, "RIFF", 4) != 0)
@@ -3264,7 +3279,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 
 	// actually load the cart into ROM
-	if (image.software_entry() != NULL)
+	if (image.software_entry() != nullptr)
 	{
 		logerror("IMG: raw CPC+ cartridge from softlist\n");
 		memcpy(m_cart->get_rom_base(), image.get_software_region("rom"), size);

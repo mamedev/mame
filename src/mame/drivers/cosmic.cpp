@@ -899,7 +899,7 @@ static const char *const cosmica_sample_names[] =
 	"loudexp",
 	"smallexp",
 	"coin",
-	0       /* end of array */
+	nullptr       /* end of array */
 };
 
 
@@ -917,7 +917,7 @@ static const char *const panic_sample_names[] =
 	"extral",
 	"oxygen",
 	"coin",
-	0
+	nullptr
 };
 
 
@@ -939,7 +939,7 @@ static const char *const cosmicg_sample_names[] =
 	"cg_gun",   /* Gun Shot */
 	"cg_gotm",  /* Got Monster */
 	"cg_ext",   /* Coin Extend */
-	0
+	nullptr
 };
 
 

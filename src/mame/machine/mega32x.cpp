@@ -1038,13 +1038,13 @@ void sega_32x_device::_32x_check_framebuffer_swap(bool enabled)
 
 		if (m_32x_fb_swap & 1)
 		{
-			m_32x_access_dram = m_32x_dram0;
-			m_32x_display_dram = m_32x_dram1;
+			m_32x_access_dram = m_32x_dram0.get();
+			m_32x_display_dram = m_32x_dram1.get();
 		}
 		else
 		{
-			m_32x_display_dram = m_32x_dram0;
-			m_32x_access_dram = m_32x_dram1;
+			m_32x_display_dram = m_32x_dram0.get();
+			m_32x_access_dram = m_32x_dram1.get();
 		}
 	}
 }
@@ -1835,20 +1835,20 @@ void sega_32x_device::device_start()
 	m_32x_pwm_timer = machine().scheduler().timer_alloc(FUNC(_32x_pwm_callback), (void*)this);
 	m_32x_pwm_timer->adjust(attotime::never);
 
-	m_32x_dram0 = auto_alloc_array(machine(), UINT16, 0x40000/2);
-	m_32x_dram1 = auto_alloc_array(machine(), UINT16, 0x40000/2);
+	m_32x_dram0 = std::make_unique<UINT16[]>(0x40000/2);
+	m_32x_dram1 = std::make_unique<UINT16[]>(0x40000/2);
 
-	memset(m_32x_dram0, 0x00, 0x40000);
-	memset(m_32x_dram1, 0x00, 0x40000);
+	memset(m_32x_dram0.get(), 0x00, 0x40000);
+	memset(m_32x_dram1.get(), 0x00, 0x40000);
 
-	m_32x_palette_lookup = auto_alloc_array(machine(), UINT16, 0x200/2);
-	m_32x_palette = auto_alloc_array(machine(), UINT16, 0x200/2);
+	m_32x_palette_lookup = std::make_unique<UINT16[]>(0x200/2);
+	m_32x_palette = std::make_unique<UINT16[]>(0x200/2);
 
-	memset(m_32x_palette_lookup, 0x00, 0x200);
-	memset(m_32x_palette, 0x00, 0x200);
+	memset(m_32x_palette_lookup.get(), 0x00, 0x200);
+	memset(m_32x_palette.get(), 0x00, 0x200);
 
-	m_32x_display_dram = m_32x_dram0;
-	m_32x_access_dram = m_32x_dram1;
+	m_32x_display_dram = m_32x_dram0.get();
+	m_32x_access_dram = m_32x_dram1.get();
 }
 
 void sega_32x_device::device_reset()

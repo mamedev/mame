@@ -187,13 +187,13 @@ VIDEO_START_MEMBER(astrocde_state,profpac)
 	m_intoff_timer = timer_alloc(TIMER_INTERRUPT_OFF);
 
 	/* allocate videoram */
-	m_profpac_videoram = auto_alloc_array(machine(), UINT16, 0x4000 * 4);
+	m_profpac_videoram = std::make_unique<UINT16[]>(0x4000 * 4);
 
 	/* register for save states */
 	init_savestate();
 
 	/* register our specific save state data */
-	save_pointer(NAME(m_profpac_videoram), 0x4000 * 4);
+	save_pointer(NAME(m_profpac_videoram.get()), 0x4000 * 4);
 	save_item(NAME(m_profpac_palette));
 	save_item(NAME(m_profpac_colormap));
 	save_item(NAME(m_profpac_intercept));
@@ -924,7 +924,7 @@ void astrocde_state::init_sparklestar()
 	m_sparkle[0] = m_sparkle[1] = m_sparkle[2] = m_sparkle[3] = 0;
 
 	/* allocate memory for the sparkle/star array */
-	m_sparklestar = auto_alloc_array(machine(), UINT8, RNG_PERIOD);
+	m_sparklestar = std::make_unique<UINT8[]>(RNG_PERIOD);
 
 	/* generate the data for the sparkle/star array */
 	for (shiftreg = i = 0; i < RNG_PERIOD; i++)

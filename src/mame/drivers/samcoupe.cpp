@@ -76,7 +76,7 @@ READ8_MEMBER(samcoupe_state::samcoupe_disk_r)
 {
 	/* drive and side is encoded into bit 5 and 3 */
 	floppy_connector *con = (BIT(offset, 4) ? m_wd1772_1 : m_wd1772_0);
-	floppy_image_device *floppy = con ? con->get_device() : 0;
+	floppy_image_device *floppy = con ? con->get_device() : nullptr;
 
 	if(floppy)
 		floppy->ss_w(BIT(offset, 2));
@@ -98,7 +98,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
 {
 	/* drive and side is encoded into bit 5 and 3 */
 	floppy_connector *con = (BIT(offset, 4) ? m_wd1772_1 : m_wd1772_0);
-	floppy_image_device *floppy = con ? con->get_device() : 0;
+	floppy_image_device *floppy = con ? con->get_device() : nullptr;
 
 	if(floppy)
 		floppy->ss_w(BIT(offset, 2));

@@ -48,7 +48,6 @@ public:
 	DECLARE_WRITE8_MEMBER(kaypro2x_register_w);
 	DECLARE_WRITE8_MEMBER(kaypro2x_videoram_w);
 	DECLARE_READ8_MEMBER(pio_system_r);
-	DECLARE_WRITE8_MEMBER(common_pio_system_w);
 	DECLARE_WRITE8_MEMBER(kayproii_pio_system_w);
 	DECLARE_WRITE8_MEMBER(kaypro4_pio_system_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
@@ -89,7 +88,7 @@ private:
 	floppy_image_device *m_floppy;
 	void mc6845_cursor_configure();
 	void mc6845_screen_configure();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<cpu_device> m_maincpu;
 	optional_device<z80pio_device> m_pio_g;
 	optional_device<z80pio_device> m_pio_s;

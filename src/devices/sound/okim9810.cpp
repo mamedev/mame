@@ -81,8 +81,8 @@ okim9810_device::okim9810_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, OKIM9810, "OKI9810", tag, owner, clock, "okim9810", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
-		m_space_config("samples", ENDIANNESS_BIG, 8, 24, 0, NULL, *ADDRESS_MAP_NAME(okim9810)),
-		m_stream(NULL),
+		m_space_config("samples", ENDIANNESS_BIG, 8, 24, 0, nullptr, *ADDRESS_MAP_NAME(okim9810)),
+		m_stream(nullptr),
 		m_TMP_register(0x00),
 		m_global_volume(0x00),
 		m_filter_type(OKIM9810_SECONDARY_FILTER),
@@ -144,8 +144,8 @@ void okim9810_device::device_start()
 void okim9810_device::device_reset()
 {
 	m_stream->update();
-	for (int voicenum = 0; voicenum < OKIM9810_VOICES; voicenum++)
-		m_voice[voicenum].m_playing = false;
+	for (auto & elem : m_voice)
+		elem.m_playing = false;
 }
 
 
@@ -175,7 +175,7 @@ void okim9810_device::device_clock_changed()
 
 const address_space_config *okim9810_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 
@@ -191,8 +191,8 @@ void okim9810_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
 	// iterate over voices and accumulate sample data
-	for (int voicenum = 0; voicenum < OKIM9810_VOICES; voicenum++)
-		m_voice[voicenum].generate_audio(*m_direct, outputs, samples, m_global_volume, clock(), m_filter_type);
+	for (auto & elem : m_voice)
+		elem.generate_audio(*m_direct, outputs, samples, m_global_volume, clock(), m_filter_type);
 }
 
 

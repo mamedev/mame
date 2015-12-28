@@ -11,15 +11,15 @@ extern const device_type CMC_PROT = &device_creator<cmc_prot_device>;
 
 cmc_prot_device::cmc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CMC_PROT, "NeoGeo Protection (CMC)", tag, owner, clock, "cmc_prot", __FILE__),
-	type0_t03(NULL),
-	type0_t12(NULL),
-	type1_t03(NULL),
-	type1_t12(NULL),
-	address_8_15_xor1(NULL),
-	address_8_15_xor2(NULL),
-	address_16_23_xor1(NULL),
-	address_16_23_xor2(NULL),
-	address_0_7_xor(NULL)
+	type0_t03(nullptr),
+	type0_t12(nullptr),
+	type1_t03(nullptr),
+	type1_t12(nullptr),
+	address_8_15_xor1(nullptr),
+	address_8_15_xor2(nullptr),
+	address_16_23_xor1(nullptr),
+	address_16_23_xor2(nullptr),
+	address_0_7_xor(nullptr)
 {
 }
 

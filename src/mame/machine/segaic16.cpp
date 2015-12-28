@@ -110,16 +110,16 @@ void sega_16bit_common_base::palette_init()
 	double weights_normal[6];
 	compute_resistor_weights(0, 255, -1.0,
 		6, resistances_normal, weights_normal, 0, 0,
-		0, NULL, NULL, 0, 0,
-		0, NULL, NULL, 0, 0);
+		0, nullptr, nullptr, 0, 0,
+		0, nullptr, nullptr, 0, 0);
 
 	// compute weight table for shadow/hilight palette entries
 	static const int resistances_sh[6]     = { 3900, 2000, 1000, 1000/2, 1000/4, 470 };
 	double weights_sh[6];
 	compute_resistor_weights(0, 255, -1.0,
 		6, resistances_sh, weights_sh, 0, 0,
-		0, NULL, NULL, 0, 0,
-		0, NULL, NULL, 0, 0);
+		0, nullptr, nullptr, 0, 0,
+		0, nullptr, nullptr, 0, 0);
 
 	// compute R, G, B for each weight
 	for (int value = 0; value < 32; value++)
@@ -176,10 +176,10 @@ WRITE16_MEMBER( sega_16bit_common_base::paletteram_w )
 
 sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, "Sega 315-5195 Memory Mapper", tag, owner, clock, "sega_315_5195", __FILE__),
-		m_cputag(NULL),
-		m_cpu(NULL),
-		m_space(NULL),
-		m_decrypted_space(NULL),
+		m_cputag(nullptr),
+		m_cpu(nullptr),
+		m_space(nullptr),
+		m_decrypted_space(nullptr),
 		m_curregion(0)
 {
 }
@@ -487,8 +487,8 @@ void sega_315_5195_mapper_device::configure_explicit(const UINT8 *map_data)
 void sega_315_5195_mapper_device::fd1094_state_change(UINT8 state)
 {
 	// iterate over regions and set the decrypted address of any ROM banks
-	for (int index = 0; index < ARRAY_LENGTH(m_banks); index++)
-		m_banks[index].update();
+	for (auto & elem : m_banks)
+		elem.update();
 }
 
 
@@ -505,30 +505,30 @@ void sega_315_5195_mapper_device::device_start()
 
 	// find our CPU
 	m_cpu = siblingdevice<m68000_device>(m_cputag);
-	if (m_cpu == NULL)
+	if (m_cpu == nullptr)
 		throw emu_fatalerror("Unable to find sibling device '%s'", m_cputag);
 
 	// if we are mapping an FD1089, tell all the banks
 	fd1089_base_device *fd1089 = dynamic_cast<fd1089_base_device *>(m_cpu);
-	if (fd1089 != NULL)
-		for (int banknum = 0; banknum < ARRAY_LENGTH(m_banks); banknum++)
-			m_banks[banknum].set_decrypt(fd1089);
+	if (fd1089 != nullptr)
+		for (auto & elem : m_banks)
+			elem.set_decrypt(fd1089);
 
 	// if we are mapping an FD1094, register for state change notifications and tell all the banks
 	fd1094_device *fd1094 = dynamic_cast<fd1094_device *>(m_cpu);
-	if (fd1094 != NULL)
+	if (fd1094 != nullptr)
 	{
 		fd1094->notify_state_change(fd1094_device::state_change_delegate(FUNC(sega_315_5195_mapper_device::fd1094_state_change), this));
-		for (int banknum = 0; banknum < ARRAY_LENGTH(m_banks); banknum++)
-			m_banks[banknum].set_decrypt(fd1094);
+		for (auto & elem : m_banks)
+			elem.set_decrypt(fd1094);
 	}
 
 	// find the address space that is to be mapped
 	m_space = &m_cpu->space(AS_PROGRAM);
-	if (m_space == NULL)
+	if (m_space == nullptr)
 		throw emu_fatalerror("Unable to find program address space on device '%s'", m_cputag);
 
-	m_decrypted_space = m_cpu->has_space(AS_DECRYPTED_OPCODES) ? &m_cpu->space(AS_DECRYPTED_OPCODES) : NULL;
+	m_decrypted_space = m_cpu->has_space(AS_DECRYPTED_OPCODES) ? &m_cpu->space(AS_DECRYPTED_OPCODES) : nullptr;
 
 	// register for saves
 	save_item(NAME(m_regs));
@@ -602,13 +602,13 @@ void sega_315_5195_mapper_device::update_mapping()
 //-------------------------------------------------
 
 sega_315_5195_mapper_device::decrypt_bank::decrypt_bank()
-	: m_bank(NULL),
-		m_decrypted_bank(NULL),
+	: m_bank(nullptr),
+		m_decrypted_bank(nullptr),
 		m_start(0),
 		m_end(0),
 		m_rgnoffs(~0),
-		m_srcptr(NULL),
-		m_fd1089(NULL)
+		m_srcptr(nullptr),
+		m_fd1089(nullptr)
 {
 	// invalidate all states
 	reset();
@@ -641,10 +641,10 @@ void sega_315_5195_mapper_device::decrypt_bank::set_decrypt(fd1089_base_device *
 void sega_315_5195_mapper_device::decrypt_bank::set_decrypt(fd1094_device *fd1094)
 {
 	// set the fd1094 pointer and allocate a decryption cache
-	m_fd1094_cache.reset(global_alloc(fd1094_decryption_cache(*fd1094)));
+	m_fd1094_cache = std::make_unique<fd1094_decryption_cache>(*fd1094);
 
 	// clear out all fd1089 stuff
-	m_fd1089 = NULL;
+	m_fd1089 = nullptr;
 	m_fd1089_decrypted.clear();
 }
 
@@ -657,7 +657,7 @@ void sega_315_5195_mapper_device::decrypt_bank::set_decrypt(fd1094_device *fd109
 void sega_315_5195_mapper_device::decrypt_bank::set(memory_bank *bank, memory_bank *decrypted_bank, offs_t start, offs_t end, offs_t rgnoffs, UINT8 *src)
 {
 	// ignore if not encrypted
-	if (m_fd1089 == NULL && m_fd1094_cache == NULL)
+	if (m_fd1089 == nullptr && m_fd1094_cache == nullptr)
 		return;
 
 	// ignore if nothing is changing
@@ -676,7 +676,7 @@ void sega_315_5195_mapper_device::decrypt_bank::set(memory_bank *bank, memory_ba
 	m_srcptr = src;
 
 	// configure the fd1094 cache
-	if (m_fd1094_cache != NULL)
+	if (m_fd1094_cache != nullptr)
 		m_fd1094_cache->configure(m_start, m_end + 1 - m_start, m_rgnoffs);
 
 	// force an update of what we have
@@ -692,11 +692,11 @@ void sega_315_5195_mapper_device::decrypt_bank::set(memory_bank *bank, memory_ba
 void sega_315_5195_mapper_device::decrypt_bank::update()
 {
 	// if this isn't a valid state, don't try to do anything
-	if (m_bank == NULL || m_srcptr == NULL)
+	if (m_bank == nullptr || m_srcptr == nullptr)
 		return;
 
 	// fd1089 case
-	if (m_fd1089 != NULL)
+	if (m_fd1089 != nullptr)
 	{
 		m_fd1089_decrypted.resize((m_end + 1 - m_start) / 2);
 		m_fd1089->decrypt(m_start, m_end + 1 - m_start, m_rgnoffs, &m_fd1089_decrypted[0], reinterpret_cast<UINT16 *>(m_srcptr));
@@ -704,7 +704,7 @@ void sega_315_5195_mapper_device::decrypt_bank::update()
 	}
 
 	// fd1094 case
-	if (m_fd1094_cache != NULL)
+	if (m_fd1094_cache != nullptr)
 		m_decrypted_bank->set_base(m_fd1094_cache->decrypted_opcodes(m_fd1094_cache->fd1094().state()));
 }
 

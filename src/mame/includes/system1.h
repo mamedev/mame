@@ -34,7 +34,7 @@ public:
 	optional_shared_ptr<UINT8> m_nob_mcu_status;
 	required_shared_ptr<UINT8> m_paletteram;
 
-	UINT8 *m_videoram;
+	std::unique_ptr<UINT8[]> m_videoram;
 	void (system1_state::*m_videomode_custom)(UINT8 data, UINT8 prevdata);
 	UINT8 m_mute_xor;
 	UINT8 m_dakkochn_mux_data;
@@ -42,9 +42,9 @@ public:
 	UINT8 m_mcu_control;
 	UINT8 m_nob_maincpu_latch;
 	int m_nobb_inport23_step;
-	UINT8 *m_mix_collide;
+	std::unique_ptr<UINT8[]> m_mix_collide;
 	UINT8 m_mix_collide_summary;
-	UINT8 *m_sprite_collide;
+	std::unique_ptr<UINT8[]> m_sprite_collide;
 	UINT8 m_sprite_collide_summary;
 	bitmap_ind16 m_sprite_bitmap;
 	UINT8 m_video_mode;
@@ -119,9 +119,9 @@ public:
 	DECLARE_DRIVER_INIT(spatter);
 	DECLARE_DRIVER_INIT(spattera);
 	TILE_GET_INFO_MEMBER(tile_get_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(system2);
 	DECLARE_VIDEO_START(system2);
 	UINT32 screen_update_system1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -151,5 +151,5 @@ public:
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;
 
-	UINT8 *m_banked_decrypted_opcodes;
+	std::unique_ptr<UINT8[]> m_banked_decrypted_opcodes;
 };

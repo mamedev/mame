@@ -2,11 +2,13 @@
 // copyright-holders:hap, Sean Riddle
 /***************************************************************************
 
-  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.c) **
+  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
 
-  Texas Instruments TMS1xxx family handheld calculators (mostly single-chip)
+  Texas Instruments TMS1xxx family handheld calculators (mostly single-chip).
+  For a comprehensive list of MCU serials, see Joerg Woerner's datamath.org:
+  http://www.datamath.org/IC_List.htm
 
-  Refer to their official manuals on how to use them.
+  Refer to the calculators/toys official manuals on how to use them.
 
 
   TODO:
@@ -32,7 +34,7 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 
@@ -53,8 +55,8 @@ void ticalc1x_state::machine_start()
 /***************************************************************************
 
   TI SR-16, SR-16 II
-  * SR-16: TMS1000 MCU labeled TMS1001NL. die labeled 1000, 1001A
-  * SR-16 II: TMS1000 MCU labeled TMS1016NL. die labeled 1000B, 1016A
+  * SR-16: TMS1000 MCU labeled TMS1001NL (die labeled 1000, 1001A)
+  * SR-16 II: TMS1000 MCU labeled TMS1016NL (die labeled 1000B, 1016A)
   * 12-digit 7seg LED display
 
   SR-16 II is a cost-reduced 'sequel', [10^x] was removed, and [pi] was added.
@@ -263,8 +265,6 @@ static MACHINE_CONFIG_START( tisr16, tisr16_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tisr16)
 
-	/* no video! */
-
 	/* no sound! */
 MACHINE_CONFIG_END
 
@@ -275,7 +275,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI-1270
-  * TMS0970 MCU labeled TMC0974NL ZA0355, DP0974A. die labeled 0970D-74A
+  * TMS0970 MCU labeled TMC0974NL ZA0355, DP0974A (die labeled 0970D-74A)
   * 8-digit 7seg LED display
 
 ***************************************************************************/
@@ -366,8 +366,6 @@ static MACHINE_CONFIG_START( ti1270, ti1270_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ti1270)
 
-	/* no video! */
-
 	/* no sound! */
 MACHINE_CONFIG_END
 
@@ -378,7 +376,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI-1000
-  * TMS1990 MCU labeled TMC1991NL, die labeled 1991-91A
+  * TMS1990 MCU labeled TMC1991NL (die labeled 1991-91A)
   * 8-digit 7seg LED display
 
 ***************************************************************************/
@@ -465,8 +463,6 @@ static MACHINE_CONFIG_START( ti1000, ti1000_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ti1270)
 
-	/* no video! */
-
 	/* no sound! */
 MACHINE_CONFIG_END
 
@@ -477,7 +473,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI WIZ-A-TRON
-  * TMS0970 MCU labeled TMC0907NL ZA0379, DP0907BS. die labeled 0970F-07B
+  * TMS0970 MCU labeled TMC0907NL ZA0379, DP0907BS (die labeled 0970F-07B)
   * 9-digit 7seg LED display(one custom digit)
 
 ***************************************************************************/
@@ -566,8 +562,6 @@ static MACHINE_CONFIG_START( wizatron, wizatron_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_wizatron)
 
-	/* no video! */
-
 	/* no sound! */
 MACHINE_CONFIG_END
 
@@ -578,7 +572,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI Little Professor (1976 version)
-  * TMS0970 MCU labeled TMS0975NL ZA0356, GP0975CS. die labeled 0970D-75C
+  * TMS0970 MCU labeled TMS0975NL ZA0356, GP0975CS (die labeled 0970D-75C)
   * 9-digit 7seg LED display(one custom digit)
 
   The hardware is nearly identical to Wiz-A-Tron (or vice versa, since this
@@ -593,8 +587,8 @@ public:
 		: wizatron_state(mconfig, type, tag)
 	{ }
 
-	virtual DECLARE_WRITE16_MEMBER(write_o);
-	virtual DECLARE_READ8_MEMBER(read_k);
+	virtual DECLARE_WRITE16_MEMBER(write_o) override;
+	virtual DECLARE_READ8_MEMBER(read_k) override;
 };
 
 // handlers
@@ -642,8 +636,6 @@ static MACHINE_CONFIG_START( lilprof, lilprof_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_wizatron)
 
-	/* no video! */
-
 	/* no sound! */
 MACHINE_CONFIG_END
 
@@ -654,7 +646,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI Little Professor (1978 version)
-  * TMS1990 MCU labeled TMC1993NL. die labeled 1990C-c3C
+  * TMS1990 MCU labeled TMC1993NL (die labeled 1990C-c3C)
   * 9-digit 7seg LED display(one custom digit)
 
   1978 re-release, with on/off and level select on buttons instead of
@@ -757,8 +749,6 @@ static MACHINE_CONFIG_START( lilprof78, lilprof78_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_wizatron)
 
-	/* no video! */
-
 	/* no sound! */
 MACHINE_CONFIG_END
 
@@ -769,7 +759,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI DataMan
-  * TMS1980 MCU labeled TMC1982NL. die labeled 1980A 82B
+  * TMS1980 MCU labeled TMC1982NL (die labeled 1980A 82B)
   * 10-digit cyan VFD display(3 digits are custom)
 
 ***************************************************************************/
@@ -871,8 +861,6 @@ static MACHINE_CONFIG_START( dataman, dataman_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_dataman)
 
-	/* no video! */
-
 	/* no sound! */
 MACHINE_CONFIG_END
 
@@ -883,9 +871,9 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Majestic-line calculators:
-  * TI-30(aka SR-40): TMS0980 MCU labeled TMC0981NL. die labeled 0980B-81F
-  * TI Programmer: TMS0980 MCU labeled ZA0675NL, JP0983AT. die labeled 0980B-83
-  * TI Business Analyst-I: TMS0980 MCU labeled TMC0982NL. die labeled 0980B-82F
+  * TI-30(aka SR-40): TMS0980 MCU labeled TMC0981NL (die labeled 0980B-81F)
+  * TI Programmer: TMS0980 MCU labeled ZA0675NL, JP0983AT (die labeled 0980B-83)
+  * TI Business Analyst-I: TMS0980 MCU labeled TMC0982NL (die labeled 0980B-82F)
   * 9-digit 7seg LED display
 
   Of note is a peripheral by Schoenherr, called the Braillotron. It acts as
@@ -1129,8 +1117,6 @@ static MACHINE_CONFIG_START( majestic, majestic_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ti30)
 
-	/* no video! */
-
 	/* no sound! */
 MACHINE_CONFIG_END
 
@@ -1246,8 +1232,8 @@ ROM_START( dataman )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
-	ROM_REGION( 2056, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1980_dataman_micro.pla", 0, 2056, CRC(b733b621) SHA1(7897d7db72c0c24555e58738a09ebe0f7f7689b0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 525, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1980_dataman_output.pla", 0, 525, CRC(5fc6f451) SHA1(11475c785c34eab5b13c5dc67f413c709cd4bd4d) )
 ROM_END

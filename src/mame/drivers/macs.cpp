@@ -73,7 +73,7 @@ public:
 
 	UINT8 m_mux_data;
 	UINT8 m_rev;
-	UINT8 *m_ram1;
+	std::unique_ptr<UINT8[]> m_ram1;
 	required_shared_ptr<UINT8> m_ram2;
 	DECLARE_WRITE8_MEMBER(rambank_w);
 	DECLARE_READ8_MEMBER(macs_input_r);
@@ -520,7 +520,7 @@ ROM_START( macsbios )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   0x00000, 0x000000, 0x400000 ) // Bios
+	ROM_COPY( "user1",   0x000000, 0x000000, 0x400000 ) // Bios
 ROM_END
 
 ROM_START( mac2bios )
@@ -529,7 +529,7 @@ ROM_START( mac2bios )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   0x00000, 0x000000, 0x400000 ) // Bios
+	ROM_COPY( "user1",   0x000000, 0x000000, 0x400000 ) // Bios
 ROM_END
 
 ROM_START( kisekaem )
@@ -545,8 +545,8 @@ ROM_START( kisekaem )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   0x00000, 0x000000, 0x400000 ) // Bios
-	ROM_COPY( "user2",   0x00000, 0x400000, 0x400000 ) // Slot A
+	ROM_COPY( "user1",   0x000000, 0x000000, 0x400000 ) // Bios
+	ROM_COPY( "user2",   0x000000, 0x400000, 0x400000 ) // Slot A
 ROM_END
 
 ROM_START( kisekaeh )
@@ -562,8 +562,8 @@ ROM_START( kisekaeh )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   0x00000, 0x000000, 0x400000 ) // Bios
-	ROM_COPY( "user2",   0x00000, 0x400000, 0x400000 ) // Slot A
+	ROM_COPY( "user1",   0x000000, 0x000000, 0x400000 ) // Bios
+	ROM_COPY( "user2",   0x000000, 0x400000, 0x400000 ) // Slot A
 ROM_END
 
 ROM_START( cultname ) // uses printer - two different games ? (slot a - checks for printer, slot b - not)
@@ -584,9 +584,9 @@ ROM_START( cultname ) // uses printer - two different games ? (slot a - checks f
 
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",   0x00000, 0x000000, 0x400000 ) // Bios
-	ROM_COPY( "user2",   0x00000, 0x400000, 0x400000 ) // Slot A
-	ROM_COPY( "user3",   0x00000, 0x800000, 0x400000 ) // Slot B
+	ROM_COPY( "user1",   0x000000, 0x000000, 0x400000 ) // Bios
+	ROM_COPY( "user2",   0x000000, 0x400000, 0x400000 ) // Slot A
+	ROM_COPY( "user3",   0x000000, 0x800000, 0x400000 ) // Slot B
 ROM_END
 
 /* these are listed as MACS2 sub-boards, is it the same?  - it's not ;) */
@@ -603,7 +603,7 @@ ROM_START( yuka )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASE00 ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user2",   0x00000, 0x000000, 0x400000 ) // Slot A
+	ROM_COPY( "user2",   0x000000, 0x000000, 0x400000 ) // Slot A
 ROM_END
 
 ROM_START( yujan )
@@ -618,7 +618,7 @@ ROM_START( yujan )
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user2",   0x00000, 0x000000, 0x400000 ) // Slot A
+	ROM_COPY( "user2",   0x000000, 0x000000, 0x400000 ) // Slot A
 ROM_END
 
 #if 0
@@ -639,7 +639,7 @@ static const UINT8 ramdata[160]=
 
 MACHINE_RESET_MEMBER(macs_state,macs)
 {
-	UINT8 *macs_ram1 = m_ram1;
+	UINT8 *macs_ram1 = m_ram1.get();
 	#if 0
 	UINT8 *macs_ram2 = m_ram2;
 /*
@@ -718,28 +718,28 @@ MACHINE_RESET_MEMBER(macs_state,macs)
 
 DRIVER_INIT_MEMBER(macs_state,macs)
 {
-	m_ram1=auto_alloc_array(machine(), UINT8, 0x20000);
+	m_ram1=std::make_unique<UINT8[]>(0x20000);
 	m_maincpu->st0016_game=10|0x80;
 	m_rev = 1;
 }
 
 DRIVER_INIT_MEMBER(macs_state,macs2)
 {
-	m_ram1=auto_alloc_array(machine(), UINT8, 0x20000);
+	m_ram1=std::make_unique<UINT8[]>(0x20000);
 	m_maincpu->st0016_game=10|0x80;
 	m_rev = 2;
 }
 
 DRIVER_INIT_MEMBER(macs_state,kisekaeh)
 {
-	m_ram1=auto_alloc_array(machine(), UINT8, 0x20000);
+	m_ram1=std::make_unique<UINT8[]>(0x20000);
 	m_maincpu->st0016_game=11|0x180;
 	m_rev = 1;
 }
 
 DRIVER_INIT_MEMBER(macs_state,kisekaem)
 {
-	m_ram1=auto_alloc_array(machine(), UINT8, 0x20000);
+	m_ram1=std::make_unique<UINT8[]>(0x20000);
 	m_maincpu->st0016_game=10|0x180;
 	m_rev = 1;
 }

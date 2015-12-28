@@ -1281,7 +1281,7 @@ void sega_yboard_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 	set_origin(m_xoffs, m_yoffs);
 
 	// clear out any scanlines we might be using
-	const UINT16 *rotatebase = m_segaic16_rotate[0].buffer ? m_segaic16_rotate[0].buffer : m_segaic16_rotate[0].rotateram;
+	const UINT16 *rotatebase = m_segaic16_rotate[0].buffer ? m_segaic16_rotate[0].buffer.get() : m_segaic16_rotate[0].rotateram;
 	rotatebase -= yorigin();
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		if (!(rotatebase[y & ~1] & 0xc000))

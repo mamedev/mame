@@ -44,7 +44,7 @@ public:
 	DECLARE_READ8_MEMBER(sm1800_8255_porta_r);
 	DECLARE_READ8_MEMBER(sm1800_8255_portc_r);
 	UINT8 m_irq_state;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(sm1800);
 	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
 	IRQ_CALLBACK_MEMBER(sm1800_irq_callback);

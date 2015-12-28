@@ -73,7 +73,7 @@ qsound_device::qsound_device(const machine_config &mconfig, const char *tag, dev
 		m_cpu(*this, "qsound"),
 		m_sample_rom(*this, DEVICE_SELF),
 		m_data(0),
-		m_stream(NULL)
+		m_stream(nullptr)
 {
 }
 
@@ -147,9 +147,9 @@ void qsound_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
 	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
-	for (int ch = 0; ch < 16; ch++)
+	for (auto & elem : m_channel)
 	{
-		if (m_channel[ch].enabled)
+		if (elem.enabled)
 		{
 			stream_sample_t *lmix=outputs[0];
 			stream_sample_t *rmix=outputs[1];
@@ -157,34 +157,34 @@ void qsound_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			// Go through the buffer and add voice contributions
 			for (int i = 0; i < samples; i++)
 			{
-				m_channel[ch].address += (m_channel[ch].step_ptr >> 12);
-				m_channel[ch].step_ptr &= 0xfff;
-				m_channel[ch].step_ptr += m_channel[ch].freq;
+				elem.address += (elem.step_ptr >> 12);
+				elem.step_ptr &= 0xfff;
+				elem.step_ptr += elem.freq;
 
-				if (m_channel[ch].address >= m_channel[ch].end)
+				if (elem.address >= elem.end)
 				{
-					if (m_channel[ch].loop)
+					if (elem.loop)
 					{
 						// Reached the end, restart the loop
-						m_channel[ch].address -= m_channel[ch].loop;
+						elem.address -= elem.loop;
 
 						// Make sure we don't overflow (what does the real chip do in this case?)
-						if (m_channel[ch].address >= m_channel[ch].end)
-							m_channel[ch].address = m_channel[ch].end - m_channel[ch].loop;
+						if (elem.address >= elem.end)
+							elem.address = elem.end - elem.loop;
 
-						m_channel[ch].address &= 0xffff;
+						elem.address &= 0xffff;
 					}
 					else
 					{
 						// Reached the end of a non-looped sample
-						m_channel[ch].enabled = false;
+						elem.enabled = false;
 						break;
 					}
 				}
 
-				INT8 sample = read_sample(m_channel[ch].bank | m_channel[ch].address);
-				*lmix++ += ((sample * m_channel[ch].lvol * m_channel[ch].vol) >> 14);
-				*rmix++ += ((sample * m_channel[ch].rvol * m_channel[ch].vol) >> 14);
+				INT8 sample = read_sample(elem.bank | elem.address);
+				*lmix++ += ((sample * elem.lvol * elem.vol) >> 14);
+				*rmix++ += ((sample * elem.rvol * elem.vol) >> 14);
 			}
 		}
 	}
@@ -224,7 +224,7 @@ READ8_MEMBER(qsound_device::qsound_r)
 
 void qsound_device::write_data(UINT8 address, UINT16 data)
 {
-	int ch = 0, reg = 0;
+	int ch = 0, reg;
 
 	// direct sound reg
 	if (address < 0x80)

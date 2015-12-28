@@ -7,7 +7,7 @@
 
 void groundfx_state::video_start()
 {
-	m_spritelist = auto_alloc_array(machine(), struct gfx_tempsprite, 0x4000);
+	m_spritelist = std::make_unique<gfx_tempsprite[]>(0x4000);
 
 	/* Hack */
 	m_hack_cliprect.set(69, 250, 24 + 5, 24 + 44);
@@ -74,7 +74,7 @@ void groundfx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
-	struct gfx_tempsprite *sprite_ptr = m_spritelist;
+	struct gfx_tempsprite *sprite_ptr = m_spritelist.get();
 
 	for (offs = (m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
 	{
@@ -170,7 +170,7 @@ void groundfx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 	}
 
 	/* this happens only if primsks != NULL */
-	while (sprite_ptr != m_spritelist)
+	while (sprite_ptr != m_spritelist.get())
 	{
 		const rectangle *clipper;
 

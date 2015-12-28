@@ -622,7 +622,7 @@ spu_device::reverb_preset spu_device::reverb_presets[]=
 		}
 	},
 
-	{ NULL }
+	{ nullptr }
 };
 
 //
@@ -699,5 +699,5 @@ spu_device::reverb_preset *spu_device::find_reverb_preset(const unsigned short *
 		if (j==32) return &reverb_presets[i];
 	}
 
-	return NULL;
+	return nullptr;
 }

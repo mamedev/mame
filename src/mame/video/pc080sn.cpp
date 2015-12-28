@@ -52,7 +52,7 @@ const device_type PC080SN = &device_creator<pc080sn_device>;
 
 pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC080SN, "Taito PC080SN", tag, owner, clock, "pc080sn", __FILE__),
-	m_ram(NULL),
+	m_ram(nullptr),
 	m_gfxnum(0),
 	m_x_offset(0),
 	m_y_offset(0),
@@ -61,13 +61,13 @@ pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, d
 	m_gfxdecode(*this),
 	m_palette(*this)
 {
-	for (int i = 0; i < 8; i++)
-		m_ctrl[i] = 0;
+	for (auto & elem : m_ctrl)
+		elem = 0;
 
 	for (int i = 0; i < 2; i++)
 	{
-		m_bg_ram[i] = NULL;
-		m_bgscroll_ram[i] = NULL;
+		m_bg_ram[i] = nullptr;
+		m_bgscroll_ram[i] = nullptr;
 		m_bgscrollx[i] = 0;
 		m_bgscrolly[i] = 0;
 	}
@@ -128,14 +128,14 @@ void pc080sn_device::device_start()
 		m_tilemap[1]->set_scroll_rows(512);
 	}
 
-	m_ram = auto_alloc_array_clear(machine(), UINT16, PC080SN_RAM_SIZE / 2);
+	m_ram = make_unique_clear<UINT16[]>(PC080SN_RAM_SIZE / 2);
 
-	m_bg_ram[0]       = m_ram + 0x0000 /2;
-	m_bg_ram[1]       = m_ram + 0x8000 /2;
-	m_bgscroll_ram[0] = m_ram + 0x4000 /2;
-	m_bgscroll_ram[1] = m_ram + 0xc000 /2;
+	m_bg_ram[0]       = m_ram.get() + 0x0000 /2;
+	m_bg_ram[1]       = m_ram.get() + 0x8000 /2;
+	m_bgscroll_ram[0] = m_ram.get() + 0x4000 /2;
+	m_bgscroll_ram[1] = m_ram.get() + 0xc000 /2;
 
-	save_pointer(NAME(m_ram), PC080SN_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram.get()), PC080SN_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
 	machine().save().register_postload(save_prepost_delegate(FUNC(pc080sn_device::restore_scroll), this));
 

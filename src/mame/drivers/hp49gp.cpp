@@ -35,8 +35,8 @@ public:
 	required_shared_ptr<UINT32> m_steppingstone;
 	lcd_spi_t m_lcd_spi;
 	DECLARE_DRIVER_INIT(hp49gp);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c2410_gpio_port_w);

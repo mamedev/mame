@@ -183,8 +183,8 @@ tms9995_device::tms9995_device(const machine_config &mconfig, const char *tag, d
 		PC_debug(0),
 		m_program_config("program", ENDIANNESS_BIG, 8, 16),
 		m_io_config("cru", ENDIANNESS_BIG, 8, 16),
-		m_prgspace(NULL),
-		m_cru(NULL),
+		m_prgspace(nullptr),
+		m_cru(nullptr),
 		m_external_operation(*this),
 		m_iaq_line(*this),
 		m_clock_out_line(*this),
@@ -205,8 +205,8 @@ tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, 
 		PC_debug(0),
 		m_program_config("program", ENDIANNESS_BIG, 8, 16),
 		m_io_config("cru", ENDIANNESS_BIG, 8, 16),
-		m_prgspace(NULL),
-		m_cru(NULL),
+		m_prgspace(nullptr),
+		m_cru(nullptr),
 		m_external_operation(*this),
 		m_iaq_line(*this),
 		m_clock_out_line(*this),
@@ -276,7 +276,7 @@ void tms9995_device::device_stop()
 {
 	int k = 0;
 	if (TRACE_CONFIG) logerror("%s: Deleting lookup tables\n", tag());
-	while (m_lotables[k]!=NULL) delete[] m_lotables[k++];
+	while (m_lotables[k]!=nullptr) delete[] m_lotables[k++];
 }
 
 /*
@@ -446,7 +446,7 @@ const address_space_config *tms9995_device::memory_space_config(address_spacenum
 		return &m_io_config;
 
 	default:
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -1128,7 +1128,7 @@ const tms9995_device::tms_instruction tms9995_device::s_command[] =
 void tms9995_device::build_command_lookup_table()
 {
 	int i = 0;
-	int cmdindex = 0;
+	int cmdindex;
 	int bitcount;
 	const tms_instruction *inst;
 	UINT16 opcode;
@@ -1142,8 +1142,8 @@ void tms9995_device::build_command_lookup_table()
 	lookup_entry* table = m_command_lookup_table;
 	for (int j=0; j < 16; j++)
 	{
-		table[j].entry = NULL;
-		table[j].next_digit = NULL;
+		table[j].entry = nullptr;
+		table[j].next_digit = nullptr;
 	}
 
 	do
@@ -1158,15 +1158,15 @@ void tms9995_device::build_command_lookup_table()
 		while (bitcount < format_mask_len[inst->format])
 		{
 			// Descend
-			if (table[cmdindex].next_digit == NULL)
+			if (table[cmdindex].next_digit == nullptr)
 			{
 				if (TRACE_EMU) logerror("tms9995: create new table at bitcount=%d for index=%d\n", bitcount, cmdindex);
 				table[cmdindex].next_digit = new lookup_entry[16];
 				m_lotables[k++] = table[cmdindex].next_digit;
 				for (int j=0; j < 16; j++)
 				{
-					table[cmdindex].next_digit[j].next_digit = NULL;
-					table[cmdindex].next_digit[j].entry = NULL;
+					table[cmdindex].next_digit[j].next_digit = nullptr;
+					table[cmdindex].next_digit[j].entry = nullptr;
 				}
 			}
 			else
@@ -1196,7 +1196,7 @@ void tms9995_device::build_command_lookup_table()
 		i++;
 	} while (inst->opcode != 0xf000);
 
-	m_lotables[k++] = NULL;
+	m_lotables[k++] = nullptr;
 	if (TRACE_EMU) logerror("tms9995: Allocated %d tables\n", k);
 }
 
@@ -1401,7 +1401,7 @@ void tms9995_device::decode(UINT16 inst)
 	{
 		index = (opcode >> 12) & 0x000f;
 		if (TRACE_EMU) logerror("tms9995: Check next hex digit of instruction %x\n", index);
-		if (table[index].next_digit != NULL)
+		if (table[index].next_digit != nullptr)
 		{
 			table = table[index].next_digit;
 			opcode = opcode << 4;
@@ -1409,7 +1409,7 @@ void tms9995_device::decode(UINT16 inst)
 		else complete = true;
 	}
 	decoded = table[index].entry;
-	if (decoded == NULL)
+	if (decoded == nullptr)
 	{
 		// not found
 		logerror("tms9995: Undefined opcode %04x at logical address %04x, will trigger MID\n", inst, PC);
@@ -1599,7 +1599,7 @@ void tms9995_device::command_completed()
 */
 void tms9995_device::service_interrupt()
 {
-	int vectorpos = 0;
+	int vectorpos;
 
 	if (m_reset)
 	{
@@ -2555,7 +2555,7 @@ void tms9995_device::alu_divide()
 void tms9995_device::alu_divide_signed()
 {
 	int n=1;
-	bool overflow = true;
+	bool overflow;
 	UINT16 w1, w2, dwait;
 	INT16 divisor;
 	INT32 dividend;
@@ -2930,8 +2930,8 @@ void tms9995_device::alu_mov()
 void tms9995_device::alu_multiply()
 {
 	int n = 0;
-	UINT32 result = 0;
-	INT32 results = 0;
+	UINT32 result;
+	INT32 results;
 
 	if (m_instruction->command==MPY)
 	{

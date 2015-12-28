@@ -42,7 +42,7 @@ mos6581_device::mos6581_device(const machine_config &mconfig, device_type type, 
 		device_sound_interface(mconfig, *this),
 		m_read_potx(*this),
 		m_read_poty(*this),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_variant(variant)
 {
 	m_token = global_alloc_clear(SID6581_t);
@@ -53,7 +53,7 @@ mos6581_device::mos6581_device(const machine_config &mconfig, const char *tag, d
 		device_sound_interface(mconfig, *this),
 		m_read_potx(*this),
 		m_read_poty(*this),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_variant(TYPE_6581)
 {
 	m_token = global_alloc_clear(SID6581_t);
@@ -126,7 +126,7 @@ void mos6581_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 READ8_MEMBER( mos6581_device::read )
 {
-	UINT8 data = 0;
+	UINT8 data;
 
 	switch (offset & 0x1f)
 	{

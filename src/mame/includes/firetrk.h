@@ -111,8 +111,8 @@ public:
 	TILE_GET_INFO_MEMBER(firetrk_get_tile_info2);
 	TILE_GET_INFO_MEMBER(superbug_get_tile_info2);
 	TILE_GET_INFO_MEMBER(montecar_get_tile_info2);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(firetrk);
 	DECLARE_VIDEO_START(superbug);
 	DECLARE_VIDEO_START(montecar);

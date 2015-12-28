@@ -130,8 +130,8 @@ void scmp_device::DEC_ADD(UINT8 val)
 
 UINT16 scmp_device::GET_ADDR(UINT8 code)
 {
-	UINT16 addr = 0;
-	INT8 offset = 0;
+	UINT16 addr;
+	INT8 offset;
 	UINT16 retVal = 0;
 	UINT16 ptr = GET_PTR_REG(code & 0x03)->w.l;
 

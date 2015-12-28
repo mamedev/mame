@@ -143,7 +143,7 @@ VIDEO_START_MEMBER(madalien_state,madalien)
 		m_tilemap_edge2[i] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_2),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
 	}
 
-	m_headlight_bitmap = auto_bitmap_ind16_alloc(machine(), 128, 128);
+	m_headlight_bitmap = std::make_unique<bitmap_ind16>(128, 128);
 
 	m_gfxdecode->gfx(0)->set_source(m_charram);
 
@@ -361,7 +361,7 @@ static const gfx_layout tilelayout =
 
 
 static GFXDECODE_START( madalien )
-	GFXDECODE_ENTRY( NULL,   0, charlayout,     0x20, 2 ) /* foreground characters, stored in RAM */
+	GFXDECODE_ENTRY( nullptr,   0, charlayout,     0x20, 2 ) /* foreground characters, stored in RAM */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, headlightlayout,   0, 1 )
 GFXDECODE_END

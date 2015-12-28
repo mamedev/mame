@@ -82,6 +82,6 @@ public:
 	void champbas_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void exctsccr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };

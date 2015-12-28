@@ -716,8 +716,8 @@ TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_timer_exp )
 void S3C24_CLASS_NAME::s3c24xx_video_start()
 {
 	screen_device *screen = machine().first_screen();
-	m_lcd.bitmap[0] = auto_bitmap_rgb32_alloc(machine(), screen->width(), screen->height());
-	m_lcd.bitmap[1] = auto_bitmap_rgb32_alloc(machine(), screen->width(), screen->height());
+	m_lcd.bitmap[0] = std::make_unique<bitmap_rgb32>( screen->width(), screen->height());
+	m_lcd.bitmap[1] = std::make_unique<bitmap_rgb32>( screen->width(), screen->height());
 }
 
 void S3C24_CLASS_NAME::bitmap_blend( bitmap_rgb32 &bitmap_dst, bitmap_rgb32 &bitmap_src_1, bitmap_rgb32 &bitmap_src_2)
@@ -1481,9 +1481,9 @@ TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_pwm_timer_exp )
 
 void S3C24_CLASS_NAME::s3c24xx_dma_reset()
 {
-	for (int i = 0; i < S3C24XX_DMA_COUNT; i++)
+	for (auto & elem : m_dma)
 	{
-		s3c24xx_dma_t *dma = &m_dma[i];
+		s3c24xx_dma_t *dma = &elem;
 		memset( &dma->regs, 0, sizeof( dma->regs));
 		dma->timer->adjust( attotime::never);
 	}
@@ -2012,9 +2012,9 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_usb_host_w )
 
 void S3C24_CLASS_NAME::s3c24xx_uart_reset()
 {
-	for (int i = 0; i < S3C24XX_UART_COUNT; i++)
+	for (auto & elem : m_uart)
 	{
-		s3c24xx_uart_t *uart = &m_uart[i];
+		s3c24xx_uart_t *uart = &elem;
 		memset( &uart->regs, 0, sizeof( uart->regs));
 		uart->regs.utrstat = 6;
 	}
@@ -2860,9 +2860,9 @@ void S3C24_CLASS_NAME::s3c24xx_touch_screen(int state)
 
 void S3C24_CLASS_NAME::s3c24xx_spi_reset()
 {
-	for (int i = 0; i < S3C24XX_SPI_COUNT; i++)
+	for (auto & elem : m_spi)
 	{
-		s3c24xx_spi_t *spi = &m_spi[i];
+		s3c24xx_spi_t *spi = &elem;
 		memset( &spi->regs, 0, sizeof( spi->regs));
 		spi->regs.spsta = 1;
 		#if defined(DEVICE_S3C2400) || defined(DEVICE_S3C2410)
@@ -3496,9 +3496,9 @@ void S3C24_CLASS_NAME::s3c24xx_device_start()
 	{
 		m_pwm.timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate( FUNC(S3C24_CLASS_NAME::s3c24xx_pwm_timer_exp), this));
 	}
-	for (int i = 0; i < S3C24XX_DMA_COUNT; i++)
+	for (auto & elem : m_dma)
 	{
-		m_dma[i].timer = machine().scheduler().timer_alloc(timer_expired_delegate( FUNC(S3C24_CLASS_NAME::s3c24xx_dma_timer_exp), this));
+		elem.timer = machine().scheduler().timer_alloc(timer_expired_delegate( FUNC(S3C24_CLASS_NAME::s3c24xx_dma_timer_exp), this));
 	}
 	m_iic.timer = machine().scheduler().timer_alloc(timer_expired_delegate( FUNC(S3C24_CLASS_NAME::s3c24xx_iic_timer_exp), this));
 	m_iis.timer = machine().scheduler().timer_alloc(timer_expired_delegate( FUNC(S3C24_CLASS_NAME::s3c24xx_iis_timer_exp), this));

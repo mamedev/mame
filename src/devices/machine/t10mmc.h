@@ -16,15 +16,20 @@ t10mmc.h
 class t10mmc : public virtual t10spc
 {
 public:
-	virtual void SetDevice( void *device );
-	virtual void GetDevice( void **device );
-	virtual void ExecCommand();
-	virtual void WriteData( UINT8 *data, int dataLength );
-	virtual void ReadData( UINT8 *data, int dataLength );
+	t10mmc()
+		: t10spc(), m_image(nullptr), m_cdda(nullptr), m_cdrom(nullptr), m_lba(0), m_blocks(0), m_last_lba(0), m_num_subblocks(0), m_cur_subblock(0), m_audio_sense(0), m_device(nullptr)
+	{
+	}
+
+	virtual void SetDevice( void *device ) override;
+	virtual void GetDevice( void **device ) override;
+	virtual void ExecCommand() override;
+	virtual void WriteData( UINT8 *data, int dataLength ) override;
+	virtual void ReadData( UINT8 *data, int dataLength ) override;
 
 protected:
-	virtual void t10_start(device_t &device);
-	virtual void t10_reset();
+	virtual void t10_start(device_t &device) override;
+	virtual void t10_reset() override;
 
 	enum
 	{

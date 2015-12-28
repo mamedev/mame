@@ -63,7 +63,7 @@ void redalert_state::get_pens(pen_t *pens)
 				compute_resistor_weights(0, 0xff, scaler,
 										1, resistances_back_r,     back_r_weight,      470, 0,
 										1, resistances_back_gb,    back_gb_weight,     470, 0,
-										0, 0, 0, 0, 0);
+										0, nullptr, nullptr, 0, 0);
 
 	/* the character layer colors come from the PROM */
 	for (offs = 0; offs < NUM_CHARMAP_PENS; offs++)
@@ -128,7 +128,7 @@ void redalert_state::get_panther_pens(pen_t *pens)
 				compute_resistor_weights(0, 0xff, scaler,
 										1, resistances_back_r,     back_r_weight,      470, 0,
 										1, resistances_back_gb,    back_gb_weight,     470, 0,
-										0, 0, 0, 0, 0);
+										0, nullptr, nullptr, 0, 0);
 
 	/* the character layer colors come from the PROM */
 	for (offs = 0; offs < NUM_CHARMAP_PENS; offs++)
@@ -164,9 +164,9 @@ void redalert_state::get_panther_pens(pen_t *pens)
 
 VIDEO_START_MEMBER(redalert_state,redalert)
 {
-	m_bitmap_colorram = auto_alloc_array(machine(), UINT8, 0x0400);
+	m_bitmap_colorram = std::make_unique<UINT8[]>(0x0400);
 
-	save_pointer(NAME(m_bitmap_colorram), 0x0400);
+	save_pointer(NAME(m_bitmap_colorram.get()), 0x0400);
 
 	m_control_xor = 0x00;
 }

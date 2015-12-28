@@ -38,11 +38,11 @@ public:
 	x1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 private:
-	virtual void device_start();
+	virtual void device_start() override;
 	// z80daisy_interface overrides
-	virtual int z80daisy_irq_state();
-	virtual int z80daisy_irq_ack();
-	virtual void z80daisy_irq_reti();
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
 };
 
 struct scrn_reg_t
@@ -104,13 +104,13 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<z80ctc_device> m_ctc;
 
-	UINT8 *m_tvram;         /**< Pointer for Text Video RAM */
-	UINT8 *m_avram;         /**< Pointer for Attribute Video RAM */
-	UINT8 *m_kvram;         /**< Pointer for Extended Kanji Video RAM (X1 Turbo) */
+	std::unique_ptr<UINT8[]> m_tvram;         /**< Pointer for Text Video RAM */
+	std::unique_ptr<UINT8[]> m_avram;         /**< Pointer for Attribute Video RAM */
+	std::unique_ptr<UINT8[]> m_kvram;         /**< Pointer for Extended Kanji Video RAM (X1 Turbo) */
 	UINT8 *m_ipl_rom;       /**< Pointer for IPL ROM */
-	UINT8 *m_work_ram;      /**< Pointer for base work RAM */
-	UINT8 *m_emm_ram;       /**< Pointer for EMM RAM */
-	UINT8 *m_pcg_ram;       /**< Pointer for PCG GFX RAM */
+	std::unique_ptr<UINT8[]> m_work_ram;      /**< Pointer for base work RAM */
+	std::unique_ptr<UINT8[]> m_emm_ram;       /**< Pointer for EMM RAM */
+	std::unique_ptr<UINT8[]> m_pcg_ram;       /**< Pointer for PCG GFX RAM */
 	UINT8 *m_cg_rom;        /**< Pointer for GFX ROM */
 	UINT8 *m_kanji_rom;     /**< Pointer for Kanji ROMs */
 	int m_xstart,           /**< Start X offset for screen drawing. */
@@ -121,7 +121,7 @@ public:
 	UINT8 m_vsync;          /**< Screen V-Sync bit, active low */
 	UINT8 m_vdisp;          /**< Screen V-Disp bit, active high */
 	UINT8 m_io_bank_mode;       /**< Helper for special bitmap RMW phase. */
-	UINT8 *m_gfx_bitmap_ram;    /**< Pointer for bitmap layer RAM. */
+	std::unique_ptr<UINT8[]> m_gfx_bitmap_ram;    /**< Pointer for bitmap layer RAM. */
 	UINT8 m_pcg_reset;      /**< @todo Unused variable. */
 	UINT8 m_sub_obf;        /**< MCU side: OBF flag active low, indicates that there are parameters in comm buffer. */
 	UINT8 m_ctc_irq_flag;       /**< @todo Unused variable. */
@@ -156,7 +156,7 @@ public:
 	UINT8 m_key_irq_flag;       /**< Keyboard IRQ pending. */
 	UINT8 m_key_irq_vector;     /**< Keyboard IRQ vector. */
 	UINT32 m_emm_addr;      /**< EMM RAM current address */
-	UINT8 *m_pal_4096;      /**< X1 Turbo Z: pointer for 4096 palette entries */
+	std::unique_ptr<UINT8[]> m_pal_4096;      /**< X1 Turbo Z: pointer for 4096 palette entries */
 	UINT8 m_crtc_vreg[0x100],   /**< CRTC register buffer. */
 			m_crtc_index;       /**< CRTC register index. */
 	UINT8 m_is_turbo;       /**< Machine type: (0) X1 Vanilla, (1) X1 Turbo */

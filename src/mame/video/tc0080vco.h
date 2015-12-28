@@ -39,11 +39,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 private:
 	// internal state
-	UINT16 *       m_ram;
+	std::unique_ptr<UINT16[]>       m_ram;
 	UINT16 *       m_bg0_ram_0;
 	UINT16 *       m_bg0_ram_1;
 	UINT16 *       m_bg1_ram_0;

@@ -6108,7 +6108,7 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 	int size = memregion("maincpu")->bytes();
 	int start = 0x8000;
 
-	UINT8 *buffer;
+	//UINT8 *buffer;
 	int i;// a;
 
 	/*****************************
@@ -6122,8 +6122,8 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 		rom[i] = BITSWAP8(rom[i], 5, 6, 7, 3, 4, 0, 1, 2);
 	}
 
-	buffer = auto_alloc_array(machine(), UINT8, size);
-	memcpy(buffer, rom, size);
+	//buffer = std::make_unique<UINT8[]>(size);
+	//memcpy(buffer, rom, size);
 
 
 	/*****************************

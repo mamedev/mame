@@ -29,7 +29,7 @@ void cdda_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 void cdda_device::device_start()
 {
 	/* allocate an audio cache */
-	m_audio_cache = auto_alloc_array( machine(), UINT8, CD_MAX_SECTOR_DATA * MAX_SECTORS );
+	m_audio_cache = std::make_unique<UINT8[]>(CD_MAX_SECTOR_DATA * MAX_SECTORS );
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100);
 
@@ -40,14 +40,14 @@ void cdda_device::device_start()
 	m_audio_length = 0;
 	m_audio_samples = 0;
 	m_audio_bptr = 0;
-	m_disc = NULL;
+	m_disc = nullptr;
 
 	save_item( NAME(m_audio_playing) );
 	save_item( NAME(m_audio_pause) );
 	save_item( NAME(m_audio_ended_normally) );
 	save_item( NAME(m_audio_lba) );
 	save_item( NAME(m_audio_length) );
-	save_pointer( NAME(m_audio_cache), CD_MAX_SECTOR_DATA * MAX_SECTORS );
+	save_pointer( NAME(m_audio_cache.get()), CD_MAX_SECTOR_DATA * MAX_SECTORS );
 	save_item( NAME(m_audio_samples) );
 	save_item( NAME(m_audio_bptr) );
 }
@@ -161,7 +161,7 @@ int cdda_device::audio_ended()
 void cdda_device::get_audio_data(stream_sample_t *bufL, stream_sample_t *bufR, UINT32 samples_wanted)
 {
 	int i;
-	INT16 *audio_cache = (INT16 *) m_audio_cache;
+	INT16 *audio_cache = (INT16 *) m_audio_cache.get();
 
 	while (samples_wanted > 0)
 	{

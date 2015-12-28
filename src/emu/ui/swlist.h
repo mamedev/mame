@@ -18,8 +18,8 @@ public:
 	enum { T_EMPTY, T_FMGR, T_SWLIST, T_ENTRY };
 	ui_menu_software_parts(running_machine &machine, render_container *container, const software_info *info, const char *interface, const software_part **part, bool other_opt, int *result);
 	virtual ~ui_menu_software_parts();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	struct software_part_menu_entry {
@@ -42,8 +42,8 @@ class ui_menu_software_list : public ui_menu {
 public:
 	ui_menu_software_list(running_machine &machine, render_container *container, software_list_device *swlist, const char *interface, std::string &result);
 	virtual ~ui_menu_software_list();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	struct entry_info {
@@ -73,8 +73,8 @@ class ui_menu_software : public ui_menu {
 public:
 	ui_menu_software(running_machine &machine, render_container *container, const char *interface, software_list_device **result);
 	virtual ~ui_menu_software();
-	virtual void populate();
-	virtual void handle();
+	virtual void populate() override;
+	virtual void handle() override;
 
 private:
 	const char *                    m_interface;

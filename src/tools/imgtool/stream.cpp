@@ -41,9 +41,9 @@ struct imgtool_stream
 
 static imgtool_stream *stream_open_zip(const char *zipname, const char *subname, int read_or_write)
 {
-	imgtool_stream *imgfile = NULL;
+	imgtool_stream *imgfile = nullptr;
 //  zip_error ziperr;
-	zip_file *z = NULL;
+	zip_file *z = nullptr;
 	const zip_file_header *zipent;
 	FILE *f;
 
@@ -96,7 +96,7 @@ error:
 			free(imgfile->u.buffer);
 		free(imgfile);
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -105,7 +105,7 @@ imgtool_stream *stream_open(const char *fname, int read_or_write)
 {
 	file_error filerr;
 	const char *ext;
-	imgtool_stream *imgfile = NULL;
+	imgtool_stream *imgfile = nullptr;
 	static const UINT32 write_modes[] =
 	{
 		OPEN_FLAG_READ,
@@ -113,16 +113,16 @@ imgtool_stream *stream_open(const char *fname, int read_or_write)
 		OPEN_FLAG_READ | OPEN_FLAG_WRITE,
 		OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE
 	};
-	core_file *f = NULL;
-	char *buf = NULL;
+	core_file *f = nullptr;
+	char *buf = nullptr;
 	int len, i;
-	imgtool_stream *s = NULL;
+	imgtool_stream *s = nullptr;
 	char c;
 
 	/* maybe we are just a ZIP? */
 	ext = strrchr(fname, '.');
 	if (ext && !core_stricmp(ext, ".zip"))
-		return stream_open_zip(fname, NULL, read_or_write);
+		return stream_open_zip(fname, nullptr, read_or_write);
 
 	filerr = core_fopen(fname, write_modes[read_or_write], &f);
 	if (filerr != FILERR_NONE)
@@ -148,7 +148,7 @@ imgtool_stream *stream_open(const char *fname, int read_or_write)
 				}
 			}
 			free(buf);
-			buf = NULL;
+			buf = nullptr;
 
 			if (s)
 				return s;
@@ -173,13 +173,13 @@ imgtool_stream *stream_open(const char *fname, int read_or_write)
 	return imgfile;
 
 error:
-	if (imgfile != NULL)
+	if (imgfile != nullptr)
 		free((void *) imgfile);
-	if (f != NULL)
+	if (f != nullptr)
 		core_fclose(f);
 	if (buf)
 		free(buf);
-	return (imgtool_stream *) NULL;
+	return (imgtool_stream *) nullptr;
 }
 
 
@@ -190,7 +190,7 @@ imgtool_stream *stream_open_write_stream(int size)
 
 	imgfile = (imgtool_stream *)malloc(sizeof(imgtool_stream));
 	if (!imgfile)
-		return NULL;
+		return nullptr;
 
 	imgfile->imgtype = IMG_MEM;
 	imgfile->write_protect = 0;
@@ -201,7 +201,7 @@ imgtool_stream *stream_open_write_stream(int size)
 	if (!imgfile->u.buffer)
 	{
 		free(imgfile);
-		return NULL;
+		return nullptr;
 	}
 
 	return imgfile;
@@ -215,7 +215,7 @@ imgtool_stream *stream_open_mem(void *buf, size_t sz)
 
 	imgfile = (imgtool_stream *)malloc(sizeof(imgtool_stream));
 	if (!imgfile)
-		return NULL;
+		return nullptr;
 
 	memset(imgfile, 0, sizeof(*imgfile));
 	imgfile->imgtype = IMG_MEM;
@@ -231,23 +231,23 @@ imgtool_stream *stream_open_mem(void *buf, size_t sz)
 
 void stream_close(imgtool_stream *s)
 {
-	assert(s != NULL);
+	assert(s != nullptr);
 
 	switch(s->imgtype)
 	{
 		case IMG_FILE:
-			if (s->u.file != NULL)
+			if (s->u.file != nullptr)
 			{
 				core_fclose(s->u.file);
-				s->u.file = NULL;
+				s->u.file = nullptr;
 			}
 			break;
 
 		case IMG_MEM:
-			if (s->u.buffer != NULL)
+			if (s->u.buffer != nullptr)
 			{
 				free(s->u.buffer);
-				s->u.buffer = NULL;
+				s->u.buffer = nullptr;
 			}
 			break;
 
@@ -262,7 +262,7 @@ void stream_close(imgtool_stream *s)
 
 core_file *stream_core_file(imgtool_stream *stream)
 {
-	return (stream->imgtype == IMG_FILE) ? stream->u.file : NULL;
+	return (stream->imgtype == IMG_FILE) ? stream->u.file : nullptr;
 }
 
 
@@ -369,7 +369,7 @@ void *stream_getptr(imgtool_stream *f)
 			break;
 
 		default:
-			ptr = NULL;
+			ptr = nullptr;
 			break;
 	}
 	return ptr;

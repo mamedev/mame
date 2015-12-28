@@ -247,7 +247,7 @@ const char *apple2gs_state::apple2gs_irq_name(UINT16 irq_mask)
 		case IRQ_DOC:               return "IRQ_DOC";
 		case IRQ_SLOT:              return "IRQ_SLOT";
 	}
-	return NULL;
+	return nullptr;
 }
 
 void apple2gs_state::apple2gs_add_irq(UINT16 irq_mask)
@@ -1638,7 +1638,7 @@ UINT8 apple2gs_state::apple2gs_xxCxxx_r(address_space &space, offs_t address)
 			else
 			{
 				// accessing a slot mapped to "Your Card", C800 should belong to that card
-				if (slotdevice != NULL)
+				if (slotdevice != nullptr)
 				{
 					if (slotdevice->take_c800())
 					{
@@ -1655,7 +1655,7 @@ UINT8 apple2gs_state::apple2gs_xxCxxx_r(address_space &space, offs_t address)
 		}
 		else    // C800-CFFF, not cards
 		{
-			slotdevice = NULL;
+			slotdevice = nullptr;
 
 			// if CFFF accessed, reset C800 area to internal ROM
 			if(!space.debugger_access())
@@ -1730,7 +1730,7 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, UIN
 			else
 			{
 				// accessing a slot mapped to "Your Card", C800 should belong to that card if it can take it
-				if (slotdevice != NULL)
+				if (slotdevice != nullptr)
 				{
 					if (slotdevice->take_c800())
 					{
@@ -1744,7 +1744,7 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, UIN
 		}
 		else    // C800-CFFF, not cards
 		{
-			slotdevice = NULL;
+			slotdevice = nullptr;
 
 			// if CFFF accessed, reset C800 area to internal ROM
 			if ((address & 0xfff) == 0xfff)
@@ -1821,8 +1821,8 @@ void apple2gs_state::apple2gs_setup_memory()
 	apple2_memmap_config cfg;
 
 	/* allocate memory for E00000-E1FFFF */
-	m_slowmem = auto_alloc_array_clear(machine(), UINT8, 128*1024);
-	save_pointer(m_slowmem, "APPLE2GS_SLOWMEM", 128*1024);
+	m_slowmem = make_unique_clear<UINT8[]>(128*1024);
+	save_pointer(m_slowmem.get(), "APPLE2GS_SLOWMEM", 128*1024);
 
 	// install expanded memory
 	// fair warning: other code assumes banks 0 and 1 are the first 128k of the RAM device, so you must install bank 1 at 0x10000
@@ -1857,7 +1857,7 @@ void apple2gs_state::apple2gs_setup_memory()
 	space.install_write_handler(0xe02000, 0xe03fff, write8_delegate(FUNC(apple2gs_state::apple2gs_E02xxx_w),this));
 	space.install_write_handler(0xe10400, 0xe107ff, write8_delegate(FUNC(apple2gs_state::apple2gs_E104xx_w),this));
 	space.install_write_handler(0xe12000, 0xe13fff, write8_delegate(FUNC(apple2gs_state::apple2gs_E12xxx_w),this));
-	membank("bank2")->set_base(m_slowmem);
+	membank("bank2")->set_base(m_slowmem.get());
 
 	/* install alternate ROM bank */
 	begin = 0x1000000 - memregion("maincpu")->bytes();
@@ -1885,7 +1885,7 @@ void apple2gs_state::apple2gs_setup_memory()
 	memset(&cfg, 0, sizeof(cfg));
 	cfg.first_bank = 4;
 	cfg.memmap = apple2gs_memmap_entries;
-	cfg.auxmem = m_slowmem;
+	cfg.auxmem = m_slowmem.get();
 	cfg.auxmem_length = 0x20000;
 	apple2_setup_memory(&cfg);
 }
@@ -1908,7 +1908,7 @@ MACHINE_RESET_MEMBER(apple2gs_state,apple2gs)
 	// call "base class" machine reset to set up m_rambase and the language card
 	machine_reset();
 
-	m_cur_slot6_image = NULL;
+	m_cur_slot6_image = nullptr;
 	m_newvideo = 0x00;
 	m_vgcint = 0x00;
 	m_langsel = 0x00;
@@ -1961,7 +1961,7 @@ MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 	apple2gs_refresh_delegates();
 
 	m_machinetype = APPLE_IIGS;
-	apple2eplus_init_common(NULL);
+	apple2eplus_init_common(nullptr);
 
 	/* set up Apple IIgs vectoring */
 	m_maincpu->set_read_vector_callback(read8_delegate(FUNC(apple2gs_state::apple2gs_read_vector),this));

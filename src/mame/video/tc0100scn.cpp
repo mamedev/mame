@@ -150,14 +150,14 @@ const device_type TC0100SCN = &device_creator<tc0100scn_device>;
 
 tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0100SCN, "Taito TC0100SCN", tag, owner, clock, "tc0100scn", __FILE__),
-	m_ram(NULL),
-	m_bg_ram(NULL),
-	m_fg_ram(NULL),
-	m_tx_ram(NULL),
-	m_char_ram(NULL),
-	m_bgscroll_ram(NULL),
-	m_fgscroll_ram(NULL),
-	m_colscroll_ram(NULL),
+	m_ram(nullptr),
+	m_bg_ram(nullptr),
+	m_fg_ram(nullptr),
+	m_tx_ram(nullptr),
+	m_char_ram(nullptr),
+	m_bgscroll_ram(nullptr),
+	m_fgscroll_ram(nullptr),
+	m_colscroll_ram(nullptr),
 	m_bgscrollx(0),
 	m_bgscrolly(0),
 	m_fgscrollx(0),
@@ -284,12 +284,12 @@ void tc0100scn_device::device_start()
 
 	m_bg_tilemask = 0xffff;    /* Mjnquest has 0x7fff tilemask */
 
-	m_ram = auto_alloc_array_clear(machine(), UINT16, TC0100SCN_RAM_SIZE / 2);
+	m_ram = make_unique_clear<UINT16[]>(TC0100SCN_RAM_SIZE / 2);
 
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, tc0100scn_charlayout, (UINT8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 256, 0)));
+	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(m_palette, tc0100scn_charlayout, (UINT8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 256, 0));
 
 	gfx_element *gfx = m_gfxdecode->gfx(m_gfxnum);
 	gfx_element *txt = m_gfxdecode->gfx(m_txnum);
@@ -302,7 +302,7 @@ void tc0100scn_device::device_start()
 	set_colbanks(0, 0, 0);  /* standard values, only Wgp & multiscreen games change them */
 									/* we call this here, so that they can be modified at video_start*/
 
-	save_pointer(NAME(m_ram), TC0100SCN_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram.get()), TC0100SCN_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
 	save_item(NAME(m_dblwidth));
 	save_item(NAME(m_gfxbank));
@@ -318,8 +318,8 @@ void tc0100scn_device::device_reset()
 	m_dblwidth = 0;
 	m_gfxbank = 0; /* Mjnquest uniquely banks tiles */
 
-	for (int i = 0; i < 8; i++)
-		m_ctrl[i] = 0;
+	for (auto & elem : m_ctrl)
+		elem = 0;
 }
 
 
@@ -390,23 +390,23 @@ void tc0100scn_device::set_layer_ptrs()
 {
 	if (!m_dblwidth)
 	{
-		m_bg_ram        = m_ram + 0x0;
-		m_tx_ram        = m_ram + 0x4000 /2;
-		m_char_ram      = m_ram + 0x6000 /2;
-		m_fg_ram        = m_ram + 0x8000 /2;
-		m_bgscroll_ram  = m_ram + 0xc000 /2;
-		m_fgscroll_ram  = m_ram + 0xc400 /2;
-		m_colscroll_ram = m_ram + 0xe000 /2;
+		m_bg_ram        = m_ram.get() + 0x0;
+		m_tx_ram        = m_ram.get() + 0x4000 /2;
+		m_char_ram      = m_ram.get() + 0x6000 /2;
+		m_fg_ram        = m_ram.get() + 0x8000 /2;
+		m_bgscroll_ram  = m_ram.get() + 0xc000 /2;
+		m_fgscroll_ram  = m_ram.get() + 0xc400 /2;
+		m_colscroll_ram = m_ram.get() + 0xe000 /2;
 	}
 	else
 	{
-		m_bg_ram        = m_ram + 0x0;
-		m_fg_ram        = m_ram + 0x08000 /2;
-		m_bgscroll_ram  = m_ram + 0x10000 /2;
-		m_fgscroll_ram  = m_ram + 0x10400 /2;
-		m_colscroll_ram = m_ram + 0x10800 /2;
-		m_char_ram      = m_ram + 0x11000 /2;
-		m_tx_ram        = m_ram + 0x12000 /2;
+		m_bg_ram        = m_ram.get() + 0x0;
+		m_fg_ram        = m_ram.get() + 0x08000 /2;
+		m_bgscroll_ram  = m_ram.get() + 0x10000 /2;
+		m_fgscroll_ram  = m_ram.get() + 0x10400 /2;
+		m_colscroll_ram = m_ram.get() + 0x10800 /2;
+		m_char_ram      = m_ram.get() + 0x11000 /2;
+		m_tx_ram        = m_ram.get() + 0x12000 /2;
 	}
 }
 

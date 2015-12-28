@@ -49,7 +49,7 @@ c352_device::c352_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, C352, "C352", tag, owner, clock, "c352", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
-		m_space_config("samples", ENDIANNESS_LITTLE, 8, 24, 0, NULL, *ADDRESS_MAP_NAME(c352))
+		m_space_config("samples", ENDIANNESS_LITTLE, 8, 24, 0, nullptr, *ADDRESS_MAP_NAME(c352))
 {
 }
 
@@ -71,7 +71,7 @@ void c352_device::static_set_divider(device_t &device, int setting)
 
 const address_space_config *c352_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 // noise generator

@@ -32,7 +32,7 @@ static const char *const invinco_sample_names[] =
 	"shiphit",
 	"move3",    /* currently not used */
 	"move4",    /* currently not used */
-	0
+	nullptr
 };
 
 

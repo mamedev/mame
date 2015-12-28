@@ -97,9 +97,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -112,11 +112,11 @@ private:
 	required_device<palette_device> m_palette;
 
 	UINT8 *m_ipl_rom;
-	UINT8 *m_work_ram;
-	UINT8 *m_vram;
-	UINT8 *m_attr;
-	UINT8 *m_gvram;
-	UINT8 *m_pcg;
+	std::unique_ptr<UINT8[]> m_work_ram;
+	std::unique_ptr<UINT8[]> m_vram;
+	std::unique_ptr<UINT8[]> m_attr;
+	std::unique_ptr<UINT8[]> m_gvram;
+	std::unique_ptr<UINT8[]> m_pcg;
 
 	UINT8 m_keyb_press;
 	UINT8 m_keyb_press_flag;
@@ -406,7 +406,7 @@ READ8_MEMBER( smc777_state::fdc_request_r )
 
 WRITE8_MEMBER( smc777_state::floppy_select_w )
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	// ---- xxxx select floppy drive (yes, 15 of them, A to P)
 	switch (data & 0x01)
@@ -903,19 +903,19 @@ static const gfx_layout smc777_charlayout =
 void smc777_state::machine_start()
 {
 	m_ipl_rom = memregion("ipl")->base();
-	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
-	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x800);
-	m_attr = auto_alloc_array_clear(machine(), UINT8, 0x800);
-	m_gvram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
-	m_pcg = auto_alloc_array_clear(machine(), UINT8, 0x800);
+	m_work_ram = make_unique_clear<UINT8[]>(0x10000);
+	m_vram = make_unique_clear<UINT8[]>(0x800);
+	m_attr = make_unique_clear<UINT8[]>(0x800);
+	m_gvram = make_unique_clear<UINT8[]>(0x8000);
+	m_pcg = make_unique_clear<UINT8[]>(0x800);
 
-	save_pointer(NAME(m_work_ram), 0x10000);
-	save_pointer(NAME(m_vram), 0x800);
-	save_pointer(NAME(m_attr), 0x800);
-	save_pointer(NAME(m_gvram), 0x8000);
-	save_pointer(NAME(m_pcg), 0x800);
+	save_pointer(NAME(m_work_ram.get()), 0x10000);
+	save_pointer(NAME(m_vram.get()), 0x800);
+	save_pointer(NAME(m_attr.get()), 0x800);
+	save_pointer(NAME(m_gvram.get()), 0x8000);
+	save_pointer(NAME(m_pcg.get()), 0x800);
 
-	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, smc777_charlayout, (UINT8 *)m_pcg, 0, 8, 0)));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, smc777_charlayout, m_pcg.get(), 0, 8, 0));
 }
 
 void smc777_state::machine_reset()

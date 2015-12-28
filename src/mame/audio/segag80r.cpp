@@ -33,8 +33,8 @@ const device_type SEGA005 = &device_creator<sega005_sound_device>;
 sega005_sound_device::sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA005, "Sega 005 Audio Custom", tag, owner, clock, "sega005_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_sega005_sound_timer(NULL),
-		m_sega005_stream(NULL)
+		m_sega005_sound_timer(nullptr),
+		m_sega005_stream(nullptr)
 {
 }
 
@@ -235,7 +235,7 @@ static const char *const astrob_sample_names[] =
 	"pexplode",     /* 13 */
 	"deedle",       /* 14 */
 	"sonar",        /* 15 */
-	0
+	nullptr
 };
 
 
@@ -422,7 +422,7 @@ static const char *const sega005_sample_names[] =
 	"missile",      /* 4 */
 	"helicopt",     /* 5 */
 	"whistle",      /* 6 */
-	0
+	nullptr
 };
 
 
@@ -584,7 +584,7 @@ static const char *const spaceod_sample_names[] =
 	"accel",        /* 8 */
 	"damaged",      /* 9 */
 	"erocket",      /* 10 */
-	0
+	nullptr
 };
 
 
@@ -676,7 +676,7 @@ static const char *const monsterb_sample_names[] =
 	"*monsterb",
 	"zap",
 	"jumpdown",
-	0
+	nullptr
 };
 
 

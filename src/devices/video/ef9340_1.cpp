@@ -234,7 +234,7 @@ void ef9340_1_device::ef9341_write( UINT8 command, UINT8 b, UINT8 data )
 
 UINT8 ef9340_1_device::ef9341_read( UINT8 command, UINT8 b )
 {
-	UINT8   data = 0xFF;
+	UINT8   data;
 
 	logerror("ef9341 %s read, t%s\n", command ? "command" : "data", b ? "B" : "A" );
 	if ( command )

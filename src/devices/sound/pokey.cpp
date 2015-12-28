@@ -184,7 +184,7 @@ pokey_device::pokey_device(const machine_config &mconfig, const char *tag, devic
 		device_state_interface(mconfig, *this),
 		m_output_type(LEGACY_LINEAR),
 		m_icount(0),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_pot0_r_cb(*this),
 		m_pot1_r_cb(*this),
 		m_pot2_r_cb(*this),
@@ -802,7 +802,7 @@ READ8_MEMBER( pokey_device::read )
 
 UINT8 pokey_device::read(offs_t offset)
 {
-	int data = 0, pot;
+	int data, pot;
 
 	synchronize(SYNC_NOOP); /* force resync */
 

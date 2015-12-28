@@ -81,7 +81,7 @@ struct rotate_info
 	UINT16          colorbase;                      /* base color index */
 	INT32           ramsize;                        /* size of rotate RAM */
 	UINT16 *        rotateram;                      /* pointer to rotateram pointer */
-	UINT16 *        buffer;                         /* buffered data */
+	std::unique_ptr<UINT16[]>        buffer;                         /* buffered data */
 };
 
 
@@ -145,8 +145,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state

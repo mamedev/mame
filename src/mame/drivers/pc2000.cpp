@@ -52,8 +52,8 @@ public:
 	UINT8 m_mux_data;
 	UINT8 m_beep_state;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( key_matrix_r );
 	DECLARE_WRITE8_MEMBER( key_matrix_w );
@@ -88,7 +88,7 @@ public:
 		: pc2000_state(mconfig, type, tag)
 		{ }
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 class pc1000_state : public pc2000_state
@@ -99,8 +99,8 @@ public:
 		{ }
 
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( kb_r );
 	DECLARE_READ8_MEMBER( lcdc_data_r );

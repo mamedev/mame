@@ -33,8 +33,8 @@ ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t 
 	: device_t(mconfig, RAM, "RAM", tag, owner, clock, "ram", __FILE__)
 {
 	m_size = 0;
-	m_default_size = NULL;
-	m_extra_options = NULL;
+	m_default_size = nullptr;
+	m_extra_options = nullptr;
 	m_default_value = 0xCD;
 }
 
@@ -51,7 +51,7 @@ void ram_device::device_start()
 	if (strcmp(tag(), ":" RAM_TAG) == 0)
 	{
 		const char *ramsize_string = machine().options().ram_size();
-		if ((ramsize_string != NULL) && (ramsize_string[0] != '\0'))
+		if ((ramsize_string != nullptr) && (ramsize_string[0] != '\0'))
 			m_size = parse_string(ramsize_string);
 	}
 
@@ -76,7 +76,7 @@ void ram_device::device_start()
 
 void ram_device::device_validity_check(validity_checker &valid) const
 {
-	const char *ramsize_string = NULL;
+	const char *ramsize_string = nullptr;
 	int is_valid = FALSE;
 	UINT32 specified_ram;
 	const char *gamename_option;
@@ -86,27 +86,27 @@ void ram_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("Invalid default RAM option: %s\n", m_default_size);
 
 	/* command line options are only parsed for the device named RAM_TAG */
-	if (tag() != NULL && strcmp(tag(), ":" RAM_TAG) == 0)
+	if (tag() != nullptr && strcmp(tag(), ":" RAM_TAG) == 0)
 	{
 		/* verify command line ram option */
 		ramsize_string = mconfig().options().ram_size();
 		gamename_option = mconfig().options().system_name();
 
-		if ((ramsize_string != NULL) && (ramsize_string[0] != '\0'))
+		if ((ramsize_string != nullptr) && (ramsize_string[0] != '\0'))
 		{
 			specified_ram = parse_string(ramsize_string);
 
 			if (specified_ram == 0)
 				osd_printf_error("Cannot recognize the RAM option %s\n", ramsize_string);
 
-			if (gamename_option != NULL && *gamename_option != 0 && strcmp(gamename_option, mconfig().gamedrv().name) == 0)
+			if (gamename_option != nullptr && *gamename_option != 0 && strcmp(gamename_option, mconfig().gamedrv().name) == 0)
 			{
 				/* compare command line option to default value */
 				if (default_size() == specified_ram)
 					is_valid = TRUE;
 
 				/* verify extra ram options */
-				if (m_extra_options != NULL)
+				if (m_extra_options != nullptr)
 				{
 					int j;
 					int size = strlen(m_extra_options);
@@ -157,7 +157,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 		strcatprintf(output, "Cannot recognize the RAM option %s", ramsize_string);
 		strcatprintf(output, " (valid options are %s", m_default_size);
 
-		if (m_extra_options != NULL)
+		if (m_extra_options != nullptr)
 			strcatprintf(output, ",%s).\n", m_extra_options);
 		else
 			strcatprintf(output, ").\n");

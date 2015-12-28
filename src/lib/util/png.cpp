@@ -53,51 +53,51 @@ static const int samples[] = { 1, 0, 3, 1, 2, 0, 4 };
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE UINT8 fetch_8bit(UINT8 *v)
+static inline UINT8 fetch_8bit(UINT8 *v)
 {
 	return *v;
 }
 
 
 #ifdef UNUSED_FUNCTION
-INLINE UINT16 fetch_16bit(UINT8 *v)
+static inline UINT16 fetch_16bit(UINT8 *v)
 {
 	return BIG_ENDIANIZE_INT16(*(UINT16 *)v);
 }
 #endif
 
-INLINE UINT32 fetch_32bit(UINT8 *v)
+static inline UINT32 fetch_32bit(UINT8 *v)
 {
 	return BIG_ENDIANIZE_INT32(*(UINT32 *)v);
 }
 
 
-INLINE void put_8bit(UINT8 *v, UINT8 data)
+static inline void put_8bit(UINT8 *v, UINT8 data)
 {
 	*v = data;
 }
 
 
 #ifdef UNUSED_FUNCTION
-INLINE void put_16bit(UINT8 *v, UINT16 data)
+static inline void put_16bit(UINT8 *v, UINT16 data)
 {
 	*(UINT16 *)v = BIG_ENDIANIZE_INT16(data);
 }
 #endif
 
-INLINE void put_32bit(UINT8 *v, UINT32 data)
+static inline void put_32bit(UINT8 *v, UINT32 data)
 {
 	*(UINT32 *)v = BIG_ENDIANIZE_INT32(data);
 }
 
 
-INLINE int compute_bpp(const png_info *pnginfo)
+static inline int compute_bpp(const png_info *pnginfo)
 {
 	return samples[pnginfo->color_type] * pnginfo->bit_depth / 8;
 }
 
 
-INLINE int compute_rowbytes(const png_info *pnginfo)
+static inline int compute_rowbytes(const png_info *pnginfo)
 {
 	return (pnginfo->width * samples[pnginfo->color_type] * pnginfo->bit_depth + 7) / 8;
 }
@@ -115,26 +115,26 @@ INLINE int compute_rowbytes(const png_info *pnginfo)
 
 void png_free(png_info *pnginfo)
 {
-	while (pnginfo->textlist != NULL)
+	while (pnginfo->textlist != nullptr)
 	{
 		png_text *temp = pnginfo->textlist;
 		pnginfo->textlist = temp->next;
-		if (temp->keyword != NULL)
+		if (temp->keyword != nullptr)
 			free((void *)temp->keyword);
 		free(temp);
 	}
 
-	if (pnginfo->palette != NULL)
+	if (pnginfo->palette != nullptr)
 		free(pnginfo->palette);
-	pnginfo->palette = NULL;
+	pnginfo->palette = nullptr;
 
-	if (pnginfo->trans != NULL)
+	if (pnginfo->trans != nullptr)
 		free(pnginfo->trans);
-	pnginfo->trans = NULL;
+	pnginfo->trans = nullptr;
 
-	if (pnginfo->image != NULL)
+	if (pnginfo->image != nullptr)
 		free(pnginfo->image);
-	pnginfo->image = NULL;
+	pnginfo->image = nullptr;
 }
 
 
@@ -191,19 +191,19 @@ static png_error read_chunk(core_file *fp, UINT8 **data, UINT32 *type, UINT32 *l
 	crc = crc32(0, tempbuff, 4);
 
 	/* read the chunk itself into an allocated memory buffer */
-	*data = NULL;
+	*data = nullptr;
 	if (*length != 0)
 	{
 		/* allocate memory for this chunk */
 		*data = (UINT8 *)malloc(*length);
-		if (*data == NULL)
+		if (*data == nullptr)
 			return PNGERR_OUT_OF_MEMORY;
 
 		/* read the data from the file */
 		if (core_fread(fp, *data, *length) != *length)
 		{
 			free(*data);
-			*data = NULL;
+			*data = nullptr;
 			return PNGERR_FILE_TRUNCATED;
 		}
 
@@ -215,7 +215,7 @@ static png_error read_chunk(core_file *fp, UINT8 **data, UINT32 *type, UINT32 *l
 	if (core_fread(fp, tempbuff, 4) != 4)
 	{
 		free(*data);
-		*data = NULL;
+		*data = nullptr;
 		return PNGERR_FILE_TRUNCATED;
 	}
 	chunk_crc = fetch_32bit(tempbuff);
@@ -224,7 +224,7 @@ static png_error read_chunk(core_file *fp, UINT8 **data, UINT32 *type, UINT32 *l
 	if (crc != chunk_crc)
 	{
 		free(*data);
-		*data = NULL;
+		*data = nullptr;
 		return PNGERR_FILE_CORRUPT;
 	}
 	return PNGERR_NONE;
@@ -273,11 +273,11 @@ static png_error process_chunk(png_private *png, UINT8 *data, UINT32 type, UINT3
 
 			/* allocate a new image data descriptor */
 			*png->idata_next = (image_data_chunk *)malloc(sizeof(**png->idata_next));
-			if (*png->idata_next == NULL)
+			if (*png->idata_next == nullptr)
 				return PNGERR_OUT_OF_MEMORY;
 
 			/* add it to the tail of the list */
-			(*png->idata_next)->next = NULL;
+			(*png->idata_next)->next = nullptr;
 			(*png->idata_next)->length = length;
 			(*png->idata_next)->data = data;
 			png->idata_next = &(*png->idata_next)->next;
@@ -303,17 +303,17 @@ static png_error process_chunk(png_private *png, UINT8 *data, UINT32 type, UINT3
 
 			/* allocate a new text item */
 			text = (png_text *)malloc(sizeof(*text));
-			if (text == NULL)
+			if (text == nullptr)
 				return PNGERR_OUT_OF_MEMORY;
 
 			/* set the elements */
 			text->keyword = (char *)data;
 			text->text = text->keyword + strlen(text->keyword) + 1;
-			text->next = NULL;
+			text->next = nullptr;
 
 			/* add to the end of the list */
-			for (pt = NULL, ct = png->pnginfo->textlist; ct != NULL; pt = ct, ct = ct->next) ;
-			if (pt == NULL)
+			for (pt = nullptr, ct = png->pnginfo->textlist; ct != nullptr; pt = ct, ct = ct->next) ;
+			if (pt == nullptr)
 				png->pnginfo->textlist = text;
 			else
 				pt->next = text;
@@ -359,7 +359,7 @@ static png_error unfilter_row(int type, UINT8 *src, UINT8 *dst, UINT8 *dstprev, 
 
 		/* UP = pixel above */
 		case PNG_PF_Up:
-			if (dstprev == NULL)
+			if (dstprev == nullptr)
 				return unfilter_row(PNG_PF_None, src, dst, dstprev, bpp, rowbytes);
 			for (x = 0; x < rowbytes; x++, dst++)
 				*dst = *src++ + *dstprev++;
@@ -367,7 +367,7 @@ static png_error unfilter_row(int type, UINT8 *src, UINT8 *dst, UINT8 *dstprev, 
 
 		/* AVERAGE = average of pixel above and previous pixel */
 		case PNG_PF_Average:
-			if (dstprev == NULL)
+			if (dstprev == nullptr)
 			{
 				for (x = 0; x < bpp; x++)
 					*dst++ = *src++;
@@ -388,8 +388,8 @@ static png_error unfilter_row(int type, UINT8 *src, UINT8 *dst, UINT8 *dstprev, 
 			for (x = 0; x < rowbytes; x++)
 			{
 				INT32 pa = (x < bpp) ? 0 : dst[-bpp];
-				INT32 pc = (x < bpp || dstprev == NULL) ? 0 : dstprev[-bpp];
-				INT32 pb = (dstprev == NULL) ? 0 : *dstprev++;
+				INT32 pc = (x < bpp || dstprev == nullptr) ? 0 : dstprev[-bpp];
+				INT32 pb = (dstprev == nullptr) ? 0 : *dstprev++;
 				INT32 prediction = pa + pb - pc;
 				INT32 da = abs(prediction - pa);
 				INT32 db = abs(prediction - pb);
@@ -432,7 +432,7 @@ static png_error process_image(png_private *png)
 
 	/* allocate memory for the filtered image */
 	png->pnginfo->image = (UINT8 *)malloc(imagesize);
-	if (png->pnginfo->image == NULL)
+	if (png->pnginfo->image == nullptr)
 		return PNGERR_OUT_OF_MEMORY;
 
 	/* initialize the stream */
@@ -447,7 +447,7 @@ static png_error process_image(png_private *png)
 	}
 
 	/* loop over IDAT and decompress each as part of a larger stream */
-	for (idat = png->idata; idat != NULL; idat = idat->next)
+	for (idat = png->idata; idat != nullptr; idat = idat->next)
 	{
 		/* decompress this chunk */
 		stream.next_in = idat->data;
@@ -482,7 +482,7 @@ static png_error process_image(png_private *png)
 	{
 		/* first byte of each row is the filter type */
 		int filter = *src++;
-		error = unfilter_row(filter, src, dst, (y == 0) ? NULL : &dst[-rowbytes], bpp, rowbytes);
+		error = unfilter_row(filter, src, dst, (y == 0) ? nullptr : &dst[-rowbytes], bpp, rowbytes);
 		src += rowbytes;
 		dst += rowbytes;
 	}
@@ -492,7 +492,7 @@ handle_error:
 	if (error != PNGERR_NONE)
 	{
 		free(png->pnginfo->image);
-		png->pnginfo->image = NULL;
+		png->pnginfo->image = nullptr;
 	}
 	return error;
 }
@@ -504,7 +504,7 @@ handle_error:
 
 png_error png_read_file(core_file *fp, png_info *pnginfo)
 {
-	UINT8 *chunk_data = NULL;
+	UINT8 *chunk_data = nullptr;
 	png_private png;
 	png_error error;
 
@@ -542,7 +542,7 @@ png_error png_read_file(core_file *fp, png_info *pnginfo)
 		/* free memory if we didn't want to keep it */
 		if (!keepmem)
 			free(chunk_data);
-		chunk_data = NULL;
+		chunk_data = nullptr;
 	}
 
 	/* finish processing the image */
@@ -553,15 +553,15 @@ png_error png_read_file(core_file *fp, png_info *pnginfo)
 handle_error:
 
 	/* free all intermediate data */
-	while (png.idata != NULL)
+	while (png.idata != nullptr)
 	{
 		image_data_chunk *next = png.idata->next;
-		if (png.idata->data != NULL)
+		if (png.idata->data != nullptr)
 			free(png.idata->data);
 		free(png.idata);
 		png.idata = next;
 	}
-	if (chunk_data != NULL)
+	if (chunk_data != nullptr)
 		free(chunk_data);
 
 	/* if we have an error, free all the other data as well */
@@ -665,7 +665,7 @@ png_error png_expand_buffer_8bit(png_info *pnginfo)
 
 	/* allocate a new buffer at 8-bit */
 	outbuf = (UINT8 *)malloc(pnginfo->width * pnginfo->height);
-	if (outbuf == NULL)
+	if (outbuf == nullptr)
 		return PNGERR_OUT_OF_MEMORY;
 
 	inp = pnginfo->image;
@@ -710,13 +710,13 @@ png_error png_add_text(png_info *pnginfo, const char *keyword, const char *text)
 
 	/* allocate a new text element */
 	newtext = (png_text *)malloc(sizeof(*newtext));
-	if (newtext == NULL)
+	if (newtext == nullptr)
 		return PNGERR_OUT_OF_MEMORY;
 
 	/* allocate a string long enough to hold both */
 	keylen = (int)strlen(keyword);
 	textdata = (char *)malloc(keylen + 1 + strlen(text) + 1);
-	if (textdata == NULL)
+	if (textdata == nullptr)
 	{
 		free(newtext);
 		return PNGERR_OUT_OF_MEMORY;
@@ -729,11 +729,11 @@ png_error png_add_text(png_info *pnginfo, const char *keyword, const char *text)
 	/* text follows a trailing NULL */
 	newtext->keyword = textdata;
 	newtext->text = textdata + keylen + 1;
-	newtext->next = NULL;
+	newtext->next = nullptr;
 
 	/* add us to the end of the linked list */
-	for (pt = NULL, ct = pnginfo->textlist; ct != NULL; pt = ct, ct = ct->next) ;
-	if (pt == NULL)
+	for (pt = nullptr, ct = pnginfo->textlist; ct != nullptr; pt = ct, ct = ct->next) ;
+	if (pt == nullptr)
 		pnginfo->textlist = newtext;
 	else
 		pt->next = newtext;
@@ -884,7 +884,7 @@ static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap
 
 	/* allocate memory for the palette */
 	pnginfo->palette = (UINT8 *)malloc(3 * 256);
-	if (pnginfo->palette == NULL)
+	if (pnginfo->palette == nullptr)
 		return PNGERR_OUT_OF_MEMORY;
 
 	/* build the palette */
@@ -899,7 +899,7 @@ static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap
 
 	/* allocate memory for the image */
 	pnginfo->image = (UINT8 *)malloc(pnginfo->height * (rowbytes + 1));
-	if (pnginfo->image == NULL)
+	if (pnginfo->image == nullptr)
 	{
 		free(pnginfo->palette);
 		return PNGERR_OUT_OF_MEMORY;
@@ -941,7 +941,7 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t &
 
 	/* allocate memory for the image */
 	pnginfo->image = (UINT8 *)malloc(pnginfo->height * (rowbytes + 1));
-	if (pnginfo->image == NULL)
+	if (pnginfo->image == nullptr)
 		return PNGERR_OUT_OF_MEMORY;
 
 	/* copy in the pixels, specifying a NULL filter */
@@ -1046,7 +1046,7 @@ static png_error write_png_stream(core_file *fp, png_info *pnginfo, const bitmap
 		goto handle_error;
 
 	/* write TEXT chunks */
-	for (text = pnginfo->textlist; text != NULL; text = text->next)
+	for (text = pnginfo->textlist; text != nullptr; text = text->next)
 	{
 		error = write_chunk(fp, (UINT8 *)text->keyword, PNG_CN_tEXt, (UINT32)strlen(text->keyword) + 1 + (UINT32)strlen(text->text));
 		if (error != PNGERR_NONE)
@@ -1054,7 +1054,7 @@ static png_error write_png_stream(core_file *fp, png_info *pnginfo, const bitmap
 	}
 
 	/* write an IEND chunk */
-	error = write_chunk(fp, NULL, PNG_CN_IEND, 0);
+	error = write_chunk(fp, nullptr, PNG_CN_IEND, 0);
 
 handle_error:
 	return error;
@@ -1067,7 +1067,7 @@ png_error png_write_bitmap(core_file *fp, png_info *info, bitmap_t &bitmap, int 
 	png_error error;
 
 	/* use a dummy pnginfo if none passed to us */
-	if (info == NULL)
+	if (info == nullptr)
 	{
 		info = &pnginfo;
 		memset(&pnginfo, 0, sizeof(pnginfo));
@@ -1161,5 +1161,5 @@ png_error mng_capture_frame(core_file *fp, png_info *info, bitmap_t &bitmap, int
 
 png_error mng_capture_stop(core_file *fp)
 {
-	return write_chunk(fp, NULL, MNG_CN_MEND, 0);
+	return write_chunk(fp, nullptr, MNG_CN_MEND, 0);
 }

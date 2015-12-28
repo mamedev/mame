@@ -86,9 +86,9 @@ const device_type VRENDER0 = &device_creator<vrender0_device>;
 vrender0_device::vrender0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VRENDER0, "VRender0", tag, owner, clock, "vrender0", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_TexBase(NULL),
-		m_FBBase(NULL),
-		m_stream(NULL),
+		m_TexBase(nullptr),
+		m_FBBase(nullptr),
+		m_stream(nullptr),
 		m_reg_base(0)
 {
 }
@@ -161,7 +161,7 @@ void vrender0_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_s
 {
 	INT16 *SAMPLES;
 	UINT32 st=STATUS;
-	signed int lsample=0,rsample=0;
+	signed int lsample,rsample=0;
 	UINT32 CLK=(m_SOUNDREGS[0x600/4]>>0)&0xff;
 	UINT32 NCH=(m_SOUNDREGS[0x600/4]>>8)&0xff;
 	UINT32 CT1=(m_SOUNDREGS[0x600/4]>>16)&0xff;

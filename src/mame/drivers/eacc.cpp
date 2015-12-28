@@ -77,7 +77,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_shared_ptr<UINT8> m_p_nvram;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_nmi);
 private:

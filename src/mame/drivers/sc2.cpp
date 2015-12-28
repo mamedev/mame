@@ -38,8 +38,8 @@ public:
 	UINT8 m_digit_data;
 	UINT8 m_beep_state;
 	void sc2_update_display();
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
 

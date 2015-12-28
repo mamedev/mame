@@ -84,11 +84,11 @@ gic_device::gic_device(const machine_config &mconfig, const char *tag, device_t 
 	: device_t(mconfig, GIC, "GIC", tag, owner, clock, "gic", __FILE__)
 	, device_sound_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_cgrom(0)
+	, m_cgrom(nullptr)
 	, m_audiocnt(0)
 	, m_audioval(0)
 	, m_audioreset(0)
-	, m_ram(0)
+	, m_ram(nullptr)
 {
 }
 
@@ -97,11 +97,11 @@ gic_device::gic_device(const machine_config &mconfig, device_type type, const ch
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_sound_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_cgrom(0)
+	, m_cgrom(nullptr)
 	, m_audiocnt(0)
 	, m_audioval(0)
 	, m_audioreset(0)
-	, m_ram(0)
+	, m_ram(nullptr)
 {
 }
 

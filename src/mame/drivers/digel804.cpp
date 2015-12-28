@@ -88,7 +88,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_memory_bank m_rambank;
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_DRIVER_INIT(digel804);
 	DECLARE_WRITE8_MEMBER( op00 );
 	DECLARE_READ8_MEMBER( ip40 );

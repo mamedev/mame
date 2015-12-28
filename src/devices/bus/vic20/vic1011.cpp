@@ -30,7 +30,7 @@ const device_type VIC1011 = &device_creator<vic1011_device>;
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( vic1011 )
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, output_rxd))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, output_h)) MCFG_DEVCB_XOR(1)
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, output_k)) MCFG_DEVCB_XOR(1)

@@ -50,7 +50,7 @@ private:
 	UINT32 m_decomp_mode;
 	UINT32 m_decomp_offset;
 
-	UINT8 *m_decomp_buffer;
+	std::unique_ptr<UINT8[]> m_decomp_buffer;
 	UINT32 m_decomp_buffer_rdoffset;
 	UINT32 m_decomp_buffer_wroffset;
 	UINT32 m_decomp_buffer_length;
@@ -93,16 +93,16 @@ public:
 	sns_rom_spc7110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
 
-	virtual DECLARE_READ8_MEMBER(chip_read);
-	virtual DECLARE_WRITE8_MEMBER(chip_write);
+	virtual DECLARE_READ8_MEMBER(chip_read) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
 
 	void spc7110_start();
 	UINT32 spc7110_datarom_addr(UINT32 addr, UINT32 len);
@@ -130,7 +130,7 @@ public:
 	UINT8 m_r480b;        // decompression control register
 	UINT8 m_r480c;        // decompression status
 
-	SPC7110_Decomp* m_decomp;
+	std::unique_ptr<SPC7110_Decomp> m_decomp;
 
 	UINT8 m_r4811;        // data pointer low
 	UINT8 m_r4812;        // data pointer high
@@ -207,7 +207,7 @@ public:
 	sns_rom_spc7110rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// reading and writing
 

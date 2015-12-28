@@ -258,7 +258,7 @@ static MACHINE_CONFIG_FRAGMENT( cga )
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(isa8_cga_device, hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_cga_device, vsync_changed))
 	MCFG_MC6845_RECONFIGURE_CB(isa8_cga_device, reconfigure)
-	MCFG_VIDEO_SET_SCREEN(NULL)
+	MCFG_VIDEO_SET_SCREEN(nullptr)
 MACHINE_CONFIG_END
 
 
@@ -343,7 +343,7 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type
 
 void isa8_cga_device::device_start()
 {
-	if (m_palette != NULL && !m_palette->started())
+	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
 	set_isa_device();
@@ -1191,7 +1191,7 @@ WRITE8_MEMBER( isa8_cga_device::io_write )
 //          proc = cga_pgfx_4bpp;
 //
 
-//INLINE void pgfx_plot_unit_4bpp(bitmap_ind16 &bitmap,
+//static inline void pgfx_plot_unit_4bpp(bitmap_ind16 &bitmap,
 //                           int x, int y, int offs)
 //{
 //  int color, values[2];
@@ -1259,7 +1259,7 @@ WRITE8_MEMBER( isa8_cga_device::io_write )
 //
 //
 //
-//INLINE void pgfx_plot_unit_2bpp(bitmap_ind16 &bitmap,
+//static inline void pgfx_plot_unit_2bpp(bitmap_ind16 &bitmap,
 //                   int x, int y, const UINT16 *palette, int offs)
 //{
 //  int i;
@@ -1561,7 +1561,7 @@ isa8_cga_pc1512_device::isa8_cga_pc1512_device(const machine_config &mconfig, co
 
 const rom_entry *isa8_cga_pc1512_device::device_rom_region() const
 {
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1593,9 +1593,9 @@ void isa8_cga_pc1512_device::device_reset()
 	m_write = 0x0f;
 	m_read = 0;
 	m_mc6845_address = 0;
-	for ( int i = 0; i < 31; i++ )
+	for (auto & elem : m_mc6845_locked_register)
 	{
-		m_mc6845_locked_register[i] = 0;
+		elem = 0;
 	}
 
 	membank("bank1")->set_base(&m_vram[isa8_cga_pc1512_device::vram_offset[0]]);

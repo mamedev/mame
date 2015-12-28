@@ -49,14 +49,14 @@ public:
 	optional_ioport m_fake_comms;
 
 	memory_region *m_cart_reg[4];
-	UINT8     *m_backupram;
-	UINT32    *m_scu_regs;
-	UINT16    *m_scsp_regs;
-	UINT16    *m_vdp2_regs;
-	UINT32    *m_vdp2_vram;
-	UINT32    *m_vdp2_cram;
-	UINT32    *m_vdp1_vram;
-	UINT16    *m_vdp1_regs;
+	std::unique_ptr<UINT8[]>     m_backupram;
+	std::unique_ptr<UINT32[]>    m_scu_regs;
+	std::unique_ptr<UINT16[]>    m_scsp_regs;
+	std::unique_ptr<UINT16[]>    m_vdp2_regs;
+	std::unique_ptr<UINT32[]>    m_vdp2_vram;
+	std::unique_ptr<UINT32[]>    m_vdp2_cram;
+	std::unique_ptr<UINT32[]>    m_vdp1_vram;
+	std::unique_ptr<UINT16[]>    m_vdp1_regs;
 
 	UINT8     m_NMI_reset;
 	UINT8     m_en_68k;
@@ -96,9 +96,9 @@ public:
 		int       framebuffer_clear_on_next_frame;
 		rectangle system_cliprect;
 		rectangle user_cliprect;
-		UINT16    *framebuffer[2];
+		std::unique_ptr<UINT16[]>   framebuffer[2];
 		UINT16    **framebuffer_draw_lines;
-		UINT8     *gfx_decode;
+		std::unique_ptr<UINT8[]>     gfx_decode;
 		UINT16    lopr;
 		UINT16    copr;
 		UINT16    ewdr;
@@ -108,7 +108,7 @@ public:
 	}m_vdp1;
 
 	struct {
-		UINT8     *gfx_decode;
+		std::unique_ptr<UINT8[]>      gfx_decode;
 		bitmap_rgb32 roz_bitmap[2];
 		UINT8     dotsel;
 		UINT8     pal;
@@ -178,7 +178,6 @@ public:
 
 	bitmap_rgb32 m_tmpbitmap;
 	DECLARE_VIDEO_START(stv_vdp2);
-	UINT32 screen_update_saturn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_slave_scanline);
@@ -293,7 +292,7 @@ public:
 		struct  stv_vdp1_poly_scanline scanline[512];
 	};
 
-	struct stv_vdp1_poly_scanline_data* stv_vdp1_shading_data;
+	std::unique_ptr<struct stv_vdp1_poly_scanline_data> stv_vdp1_shading_data;
 
 	struct stv_vdp2_sprite_list
 	{

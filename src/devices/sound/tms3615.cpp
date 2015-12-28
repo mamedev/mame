@@ -24,7 +24,7 @@ const device_type TMS3615 = &device_creator<tms3615_device>;
 tms3615_device::tms3615_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS3615, "TMS3615", tag, owner, clock, "tms3615", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_channel(0),
+		m_channel(nullptr),
 		m_samplerate(0),
 		m_basefreq(0),
 		m_output8(0),

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Yochizo
+// thanks-to:Richard Bush
 /***************************************************************************
 
 Taito H system

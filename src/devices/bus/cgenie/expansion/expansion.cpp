@@ -29,9 +29,9 @@ const device_type EXPANSION_SLOT = &device_creator<expansion_slot_device>;
 expansion_slot_device::expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, EXPANSION_SLOT, "Expansion Slot", tag, owner, clock, "expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
-	m_program(NULL),
-	m_io(NULL),
-	m_cart(NULL),
+	m_program(nullptr),
+	m_io(nullptr),
+	m_cart(nullptr),
 	m_int_handler(*this),
 	m_nmi_handler(*this),
 	m_reset_handler(*this)

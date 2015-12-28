@@ -97,8 +97,8 @@ void fixedfreq_device::device_start()
 	m_sig_composite = 0;
 	m_sig_field = 0;
 
-	m_bitmap[0] = NULL;
-	m_bitmap[1] = NULL;
+	m_bitmap[0] = nullptr;
+	m_bitmap[1] = nullptr;
 	//m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
 	recompute_parameters(false);
 
@@ -148,10 +148,10 @@ void fixedfreq_device::recompute_parameters(bool postload)
 {
 	bool needs_realloc = (m_htotal != m_hbackporch) && (m_vtotal != m_vbackporch);
 
-	if (m_bitmap[0] != NULL || needs_realloc)
-		auto_free(machine(), m_bitmap[0]);
-	if (m_bitmap[1] != NULL || needs_realloc)
-		auto_free(machine(), m_bitmap[0]);
+	if (m_bitmap[0] != nullptr || needs_realloc)
+		m_bitmap[0] = nullptr;
+	if (m_bitmap[1] != nullptr || needs_realloc)
+		m_bitmap[1] = nullptr;
 
 	m_htotal = m_hbackporch;
 	m_vtotal = m_vbackporch;
@@ -162,8 +162,8 @@ void fixedfreq_device::recompute_parameters(bool postload)
 	m_mult = (double) (m_monitor_clock) / (double) m_htotal * 1.0; // / (3.0 + 3.0);
 	VERBOSE_OUT(("trigger %f with len %f\n", m_int_trig, 1e6 / m_mult));
 
-	m_bitmap[0] = auto_bitmap_rgb32_alloc(machine(),m_htotal, m_vtotal);
-	m_bitmap[1] = auto_bitmap_rgb32_alloc(machine(),m_htotal, m_vtotal);
+	m_bitmap[0] = std::make_unique<bitmap_rgb32>(m_htotal, m_vtotal);
+	m_bitmap[1] = std::make_unique<bitmap_rgb32>(m_htotal, m_vtotal);
 
 	rectangle visarea(
 			m_hbackporch - m_hfrontporch,
@@ -235,7 +235,7 @@ UINT32 fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_vid)
 {
-	bitmap_rgb32 *bm = m_bitmap[m_cur_bm];
+	bitmap_rgb32 *bm = m_bitmap[m_cur_bm].get();
 	const int has_fields = (m_fieldcount > 1) ? 1: 0;
 
 	int pixels = round((time - m_line_time).as_double() / m_clock_period.as_double());

@@ -193,7 +193,7 @@ kcexp_slot_device::~kcexp_slot_device()
 void kcexp_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_kcexp_interface *>(get_card_device());
-	m_next_slot = m_next_slot_tag ? owner()->subdevice<kcexp_slot_device>(m_next_slot_tag) : NULL;
+	m_next_slot = m_next_slot_tag ? owner()->subdevice<kcexp_slot_device>(m_next_slot_tag) : nullptr;
 
 	// resolve callbacks
 	m_out_irq_cb.resolve_safe();
@@ -333,12 +333,12 @@ bool kccart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		offs_t read_length = 0;
+		offs_t read_length;
 		UINT8 *cart_base = m_cart->get_cart_base();
 
-		if (cart_base != NULL)
+		if (cart_base != nullptr)
 		{
-			if (software_entry() == NULL)
+			if (software_entry() == nullptr)
 			{
 				read_length = length();
 				fread(m_cart->get_cart_base(), read_length);

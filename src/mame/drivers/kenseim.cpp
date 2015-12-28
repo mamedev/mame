@@ -468,7 +468,7 @@ ADDRESS_MAP_END
 static const z80_daisy_config daisy_chain_gamecpu[] =
 {
 	TMPZ84C011_DAISY_INTERNAL,
-	{ NULL }
+	{ nullptr }
 };
 
 static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )

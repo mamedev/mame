@@ -26,7 +26,7 @@ protected:
 	bool m_promisc;
 	char m_mac[6];
 	float m_bandwidth;
-	auto_pointer<class osd_netdev> m_dev;
+	std::unique_ptr<osd_netdev> m_dev;
 	int m_intf;
 };
 

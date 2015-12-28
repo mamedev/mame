@@ -675,7 +675,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 
 
 /* inline helper to queue a single work item using the same interface */
-INLINE osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback callback, void *param, UINT32 flags)
+static inline osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback callback, void *param, UINT32 flags)
 {
 	return osd_work_item_queue_multiple(queue, callback, 1, param, 0, flags);
 }
@@ -962,7 +962,7 @@ enum osd_output_channel
 class osd_output
 {
 public:
-	osd_output() : m_chain(NULL) { }
+	osd_output() : m_chain(nullptr) { }
 	virtual ~osd_output() { }
 
 	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args) = 0;
@@ -973,7 +973,7 @@ protected:
 
 	void chain_output(osd_output_channel channel, const char *msg, va_list args)
 	{
-		if (m_chain != NULL)
+		if (m_chain != nullptr)
 			m_chain->output_callback(channel, msg, args);
 	}
 private:

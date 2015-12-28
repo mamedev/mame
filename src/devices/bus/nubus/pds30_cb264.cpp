@@ -101,7 +101,7 @@ void nubus_cb264se30_device::device_start()
 	m_nubus->install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_cb264se30_device::vram_r), this), write32_delegate(FUNC(nubus_cb264se30_device::vram_w), this));
 	m_nubus->install_device(slotspace+0xf00000, slotspace+0xfeffff, read32_delegate(FUNC(nubus_cb264se30_device::cb264se30_r), this), write32_delegate(FUNC(nubus_cb264se30_device::cb264se30_w), this));
 
-	m_timer = timer_alloc(0, NULL);
+	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
 }
 

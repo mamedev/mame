@@ -111,7 +111,7 @@ public:
 
 	required_device<palette_device> m_palette;
 
-	UINT16  *m_dma_ram;
+	std::unique_ptr<UINT16[]> m_dma_ram;
 	UINT8   m_dma_cpu_bank;
 	UINT8   m_dma_busy;
 	UINT16  m_dsp_hold_signal;
@@ -122,8 +122,8 @@ public:
 	UINT8   m_msm2_vck;
 	UINT8   m_msm2_vck2;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE16_MEMBER(dma_start_w);
 	DECLARE_WRITE16_MEMBER(dma_stop_w);
@@ -158,7 +158,7 @@ public:
 	void msm5205_update(int chip);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -172,11 +172,11 @@ protected:
 void mlanding_state::machine_start()
 {
 	// Allocate two DMA RAM banks
-	m_dma_ram = auto_alloc_array(machine(), UINT16, c_dma_bank_words * 2);
-	m_dma_bank->configure_entries(0, 2, m_dma_ram, c_dma_bank_words * 2);
+	m_dma_ram = std::make_unique<UINT16[]>(c_dma_bank_words * 2);
+	m_dma_bank->configure_entries(0, 2, m_dma_ram.get(), c_dma_bank_words * 2);
 
 	// Register state for saving
-	save_pointer(NAME(m_dma_ram), c_dma_bank_words * 2);
+	save_pointer(NAME(m_dma_ram.get()), c_dma_bank_words * 2);
 	save_item(NAME(m_dma_cpu_bank));
 	save_item(NAME(m_dma_busy));
 	save_item(NAME(m_dsp_hold_signal));

@@ -47,7 +47,7 @@ public:
 	required_ioport m_io_line4;
 	required_ioport m_io_config;
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_READ8_MEMBER(getbus);

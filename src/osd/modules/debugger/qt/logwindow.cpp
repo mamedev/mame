@@ -2,6 +2,8 @@
 // copyright-holders:Andrew Gardner
 #define NO_MEM_TRACKING
 
+#include <QtWidgets/QVBoxLayout>
+
 #include "logwindow.h"
 
 #include "debug/debugcon.h"

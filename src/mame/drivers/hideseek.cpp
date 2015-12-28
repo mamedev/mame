@@ -42,7 +42,7 @@ public:
 
 
 	DECLARE_DRIVER_INIT(hideseek);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(hideseek);
 	UINT32 screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

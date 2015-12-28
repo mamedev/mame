@@ -115,8 +115,8 @@ private:
 	UINT8 m_bios_6403;
 	UINT8 m_bios_6404;
 
-	UINT16 *m_ic36_ram;
-	UINT8* m_ic37_ram;
+	std::unique_ptr<UINT16[]> m_ic36_ram;
+	std::unique_ptr<UINT8[]> m_ic37_ram;
 
 	required_shared_ptr<UINT8>           m_ic3_ram;
 	optional_device<sega315_5124_device> m_vdp1;
@@ -896,8 +896,8 @@ DRIVER_INIT_MEMBER(mplay_state,megaplay)
 	}
 
 	// to support the old code
-	m_ic36_ram = auto_alloc_array(machine(), UINT16, 0x10000 / 2);
-	m_ic37_ram = auto_alloc_array(machine(), UINT8, 0x10000);
+	m_ic36_ram = std::make_unique<UINT16[]>(0x10000 / 2);
+	m_ic37_ram = std::make_unique<UINT8[]>(0x10000);
 
 	DRIVER_INIT_CALL(megadrij);
 	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);

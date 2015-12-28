@@ -92,7 +92,7 @@ void pet_expansion_slot_device::device_start()
 
 void pet_expansion_slot_device::device_reset()
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		get_card_device()->reset();
 	}
@@ -115,7 +115,7 @@ int pet_expansion_slot_device::norom_r(address_space &space, offs_t offset, int 
 
 UINT8 pet_expansion_slot_device::read(address_space &space, offs_t offset, UINT8 data, int &sel)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		data = m_card->pet_bd_r(space, offset, data, sel);
 	}
@@ -130,7 +130,7 @@ UINT8 pet_expansion_slot_device::read(address_space &space, offs_t offset, UINT8
 
 void pet_expansion_slot_device::write(address_space &space, offs_t offset, UINT8 data, int &sel)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		m_card->pet_bd_w(space, offset, data, sel);
 	}

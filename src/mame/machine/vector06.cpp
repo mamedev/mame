@@ -138,7 +138,7 @@ TIMER_CALLBACK_MEMBER(vector06_state::reset_check_callback)
 
 WRITE8_MEMBER( vector06_state::vector06_disc_w )
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	switch (data & 0x01)
 	{

@@ -21,8 +21,10 @@
 
 /* These input port macros expand to a great deal of code and break compilers */
 #if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 4 || (__GNUC_MINOR__ == 4 && __GNUC_PATCHLEVEL__ >= 4))))
+#if not(defined(__arm__) || defined(__ARMEL__))
 #pragma GCC push_options
 #pragma GCC optimize ("O1")
+#endif
 #elif defined(_MSC_VER)
 #pragma optimize("", off)
 #endif
@@ -755,33 +757,33 @@ void construct_core_types_UI(simple_list<input_type_entry> &typelist)
 
 void construct_core_types_OSD(simple_list<input_type_entry> &typelist)
 {
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_1,               NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_2,               NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_3,               NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_4,               NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_5,               NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_6,               NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_7,               NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_8,               NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_9,               NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_10,              NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_11,              NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_12,              NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_13,              NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_14,              NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_15,              NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_16,              NULL,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_1,               nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_2,               nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_3,               nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_4,               nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_5,               nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_6,               nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_7,               nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_8,               nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_9,               nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_10,              nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_11,              nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_12,              nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_13,              nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_14,              nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_15,              nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_16,              nullptr,                     input_seq() )
 }
 
 void construct_core_types_invalid(simple_list<input_type_entry> &typelist)
 {
-	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, UNKNOWN,             NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, UNUSED,              NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, SPECIAL,             NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, OTHER,               NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, ADJUSTER,            NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, DIPSWITCH,           NULL,                     input_seq() )
-	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, CONFIG,              NULL,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, UNKNOWN,             nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, UNUSED,              nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, SPECIAL,             nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, OTHER,               nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, ADJUSTER,            nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, DIPSWITCH,           nullptr,                     input_seq() )
+	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, CONFIG,              nullptr,                     input_seq() )
 }
 
 void construct_core_types(simple_list<input_type_entry> &typelist)
@@ -830,7 +832,9 @@ void construct_core_types(simple_list<input_type_entry> &typelist)
 	construct_core_types_invalid(typelist);
 }
 #if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 4 || (__GNUC_MINOR__ == 4 && __GNUC_PATCHLEVEL__ >= 4))))
+#if not(defined(__arm__) || defined(__ARMEL__))
 #pragma GCC pop_options
+#endif
 #elif defined(_MSC_VER)
 #pragma optimize("", on)
 #endif

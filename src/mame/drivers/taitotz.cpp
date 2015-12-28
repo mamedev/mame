@@ -565,9 +565,9 @@ public:
 	DECLARE_READ64_MEMBER(video_fifo_r);
 	DECLARE_WRITE64_MEMBER(video_fifo_w);
 
-	UINT32 *m_screen_ram;
-	UINT32 *m_frame_ram;
-	UINT32 *m_texture_ram;
+	std::unique_ptr<UINT32[]> m_screen_ram;
+	std::unique_ptr<UINT32[]> m_frame_ram;
+	std::unique_ptr<UINT32[]> m_texture_ram;
 	UINT32 m_video_unk_reg[0x10];
 
 	UINT32 m_video_fifo_ptr;
@@ -593,7 +593,7 @@ public:
 	UINT32 m_displist_addr;
 	int m_count;
 
-	taitotz_renderer *m_renderer;
+	std::unique_ptr<taitotz_renderer> m_renderer;
 	DECLARE_DRIVER_INIT(batlgr2a);
 	DECLARE_DRIVER_INIT(batlgr2);
 	DECLARE_DRIVER_INIT(pwrshovl);
@@ -601,15 +601,14 @@ public:
 	DECLARE_DRIVER_INIT(landhigh);
 	DECLARE_DRIVER_INIT(raizpin);
 	DECLARE_DRIVER_INIT(styphp);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_taitotz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(taitotz_vbi);
 	DECLARE_READ16_MEMBER(tlcs_ide0_r);
 	DECLARE_READ16_MEMBER(tlcs_ide1_r);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
-	void taitotz_exit();
 	void draw_tile(UINT32 pos, UINT32 tile);
 	UINT32 video_mem_r(UINT32 address);
 	void video_mem_w(UINT32 address, UINT32 data);
@@ -626,7 +625,7 @@ public:
 		: poly_manager<float, taitotz_polydata, 6, 50000>(state.machine()),
 			m_state(state)
 	{
-		m_zbuffer = auto_bitmap_ind32_alloc(state.machine(), width, height);
+		m_zbuffer = std::make_unique<bitmap_ind32>(width, height);
 		m_texture = texram;
 
 		m_diffuse_intensity = 224;
@@ -659,7 +658,7 @@ private:
 
 	taitotz_state &m_state;
 	bitmap_rgb32 *m_fb;
-	bitmap_ind32 *m_zbuffer;
+	std::unique_ptr<bitmap_ind32> m_zbuffer;
 	UINT32 *m_texture;
 
 	PLANE m_clip_plane[6];
@@ -742,12 +741,12 @@ void taitotz_state::video_start()
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_screen_ram = auto_alloc_array(machine(), UINT32, 0x200000);
-	m_frame_ram = auto_alloc_array(machine(), UINT32, 0x80000);
-	m_texture_ram = auto_alloc_array(machine(), UINT32, 0x800000);
+	m_screen_ram = std::make_unique<UINT32[]>(0x200000);
+	m_frame_ram = std::make_unique<UINT32[]>(0x80000);
+	m_texture_ram = std::make_unique<UINT32[]>(0x800000);
 
 	/* create renderer */
-	m_renderer = auto_alloc(machine(), taitotz_renderer(*this, width, height, m_texture_ram));
+	m_renderer = std::make_unique<taitotz_renderer>(*this, width, height, m_texture_ram.get());
 
 	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitotz_exit), &machine()));
 }
@@ -760,14 +759,14 @@ static const float dot3_tex_table[32] =
 		0.266666f,  0.300000f,  0.333333f,  0.366666f,  0.400000f,  0.433333f,  0.466666f,  0.500000f,
 };
 
-INLINE float dot_product_vec3(VECTOR3 a, VECTOR3 b)
+static inline float dot_product_vec3(VECTOR3 a, VECTOR3 b)
 {
 	return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]);
 }
 
 // Fast inverse square-root
 // Adapted from http://en.wikipedia.org/wiki/Fast_inverse_square_root
-INLINE float finvsqrt(float number)
+static inline float finvsqrt(float number)
 {
 	UINT32 i;
 	float x2, y;
@@ -783,7 +782,7 @@ INLINE float finvsqrt(float number)
 }
 
 #if 0
-INLINE void normalize_vec3(VECTOR3 *v)
+static inline void normalize_vec3(VECTOR3 *v)
 {
 	float l = finvsqrt(*v[0] * *v[0] + *v[1] * *v[1] + *v[2] * *v[2]);
 	*v[0] *= l;
@@ -792,7 +791,7 @@ INLINE void normalize_vec3(VECTOR3 *v)
 }
 #endif
 
-INLINE float clamp_pos(float v)
+static inline float clamp_pos(float v)
 {
 	if (v < 0.0f)
 		return 0.0f;
@@ -800,7 +799,7 @@ INLINE float clamp_pos(float v)
 		return v;
 }
 
-INLINE UINT32 generate_texel_address(int iu, int iv)
+static inline UINT32 generate_texel_address(int iu, int iv)
 {
 	// generate texel address from U and V
 	UINT32 addr = 0;
@@ -1074,7 +1073,7 @@ void taitotz_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 	}
 }
 
-INLINE int is_point_inside(float x, float y, float z, PLANE cp)
+static inline int is_point_inside(float x, float y, float z, PLANE cp)
 {
 	float s = (x * cp.x) + (y * cp.y) + (z * cp.z) + cp.d;
 	if (s >= 0.0f)
@@ -2628,7 +2627,7 @@ INPUT_PORTS_END
 
 void taitotz_state::machine_reset()
 {
-	if (m_hdd_serial_number != NULL)
+	if (m_hdd_serial_number != nullptr)
 	{
 		ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
 		UINT16 *identify_device = hdd->identify_device_buffer();
@@ -2668,10 +2667,10 @@ static MACHINE_CONFIG_START( taitotz, taitotz_state )
 
 	/* TMP95C063F I/O CPU */
 	MCFG_CPU_ADD("iocpu", TMP95C063, 25000000)
-	MCFG_TMP95C063_PORT9_WRITE(IOPORT("INPUTS1"))
-	MCFG_TMP95C063_PORTB_WRITE(IOPORT("INPUTS2"))
-	MCFG_TMP95C063_PORTD_WRITE(IOPORT("INPUTS3"))
-	MCFG_TMP95C063_PORTE_WRITE(IOPORT("INPUTS4"))
+	MCFG_TMP95C063_PORT9_READ(IOPORT("INPUTS1"))
+	MCFG_TMP95C063_PORTB_READ(IOPORT("INPUTS2"))
+	MCFG_TMP95C063_PORTD_READ(IOPORT("INPUTS3"))
+	MCFG_TMP95C063_PORTE_READ(IOPORT("INPUTS4"))
 
 	MCFG_CPU_PROGRAM_MAP(tlcs900h_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitotz_state,  taitotz_vbi)
@@ -2680,7 +2679,7 @@ static MACHINE_CONFIG_START( taitotz, taitotz_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120))
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(taitotz_state, ide_interrupt))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -2746,7 +2745,7 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgear)
 	init_taitotz_111a();
 
 	// unknown, not used by BIOS 1.11a
-	m_hdd_serial_number = NULL;
+	m_hdd_serial_number = nullptr;
 
 	m_scr_base = 0x1c0000;
 
@@ -2780,7 +2779,7 @@ DRIVER_INIT_MEMBER(taitotz_state,pwrshovl)
 	init_taitotz_111a();
 
 	// unknown, not used by BIOS 1.11a
-	m_hdd_serial_number = NULL;
+	m_hdd_serial_number = nullptr;
 
 	m_scr_base = 0x1c0000;
 

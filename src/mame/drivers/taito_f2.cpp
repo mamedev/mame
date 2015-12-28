@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves, Bryan McPhail, Brad Oliver, Andrew Prime, Brian Troha, Nicola Salmoria
+// thanks-to:Richard Bush
 /***************************************************************************
 
 Taito F2 System

@@ -326,19 +326,19 @@ void adsp21062_device::device_start()
 
 	m_delayed_iop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(adsp21062_device::sharc_iop_delayed_write_callback), this));
 
-	for (int i=0; i < 12; i++)
+	for (auto & elem : m_dma_op)
 	{
-		m_dma_op[i].src = 0;
-		m_dma_op[i].dst = 0;
-		m_dma_op[i].chain_ptr = 0;
-		m_dma_op[i].src_modifier = 0;
-		m_dma_op[i].dst_modifier = 0;
-		m_dma_op[i].src_count = 0;
-		m_dma_op[i].dst_count = 0;
-		m_dma_op[i].pmode = 0;
-		m_dma_op[i].chained_direction = 0;
-		m_dma_op[i].active = false;
-		m_dma_op[i].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(adsp21062_device::sharc_dma_callback), this));
+		elem.src = 0;
+		elem.dst = 0;
+		elem.chain_ptr = 0;
+		elem.src_modifier = 0;
+		elem.dst_modifier = 0;
+		elem.src_count = 0;
+		elem.dst_count = 0;
+		elem.pmode = 0;
+		elem.chained_direction = 0;
+		elem.active = false;
+		elem.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(adsp21062_device::sharc_dma_callback), this));
 	}
 
 	for (int i=0; i < 16; i++)
@@ -348,9 +348,9 @@ void adsp21062_device::device_start()
 	}
 	m_mrf = 0;
 	m_mrb = 0;
-	for (int i=0; i < 32; i++)
+	for (auto & elem : m_pcstack)
 	{
-		m_pcstack[i] = 0;
+		elem = 0;
 	}
 	for (int i=0; i < 6; i++)
 	{
@@ -368,17 +368,17 @@ void adsp21062_device::device_start()
 		m_dag1_alt.i[i] = m_dag1_alt.m[i] = m_dag1_alt.b[i] = m_dag1_alt.l[i] = 0;
 		m_dag2_alt.i[i] = m_dag2_alt.m[i] = m_dag2_alt.b[i] = m_dag2_alt.l[i] = 0;
 	}
-	for (int i=0; i < 12; i++)
+	for (auto & elem : m_dma)
 	{
-		m_dma[i].control = 0;
-		m_dma[i].int_index = 0;
-		m_dma[i].int_modifier = 0;
-		m_dma[i].int_count = 0;
-		m_dma[i].chain_ptr = 0;
-		m_dma[i].gen_purpose = 0;
-		m_dma[i].ext_index = 0;
-		m_dma[i].ext_modifier = 0;
-		m_dma[i].ext_count = 0;
+		elem.control = 0;
+		elem.int_index = 0;
+		elem.int_modifier = 0;
+		elem.int_count = 0;
+		elem.chain_ptr = 0;
+		elem.gen_purpose = 0;
+		elem.ext_index = 0;
+		elem.ext_modifier = 0;
+		elem.ext_count = 0;
 	}
 	m_mode1 = 0;
 	m_mode2 = 0;
@@ -391,10 +391,10 @@ void adsp21062_device::device_start()
 	m_flag[0] = m_flag[1] = m_flag[2] = m_flag[3] = 0;
 	m_syscon = 0;
 	m_sysstat = 0;
-	for (int i=0; i < 5; i++)
+	for (auto & elem : m_status_stack)
 	{
-		m_status_stack[i].mode1 = 0;
-		m_status_stack[i].astat = 0;
+		elem.mode1 = 0;
+		elem.astat = 0;
 	}
 	m_status_stkp = 0;
 	m_px = 0;

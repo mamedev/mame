@@ -28,17 +28,17 @@ public:
 
 	virtual ~matrix_solver_direct_t();
 
-	virtual void vsetup(analog_net_t::list_t &nets);
-	virtual void reset() { matrix_solver_t::reset(); }
+	virtual void vsetup(analog_net_t::list_t &nets) override;
+	virtual void reset() override { matrix_solver_t::reset(); }
 
 	ATTR_HOT inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
 	ATTR_HOT inline int vsolve_non_dynamic(const bool newton_raphson);
 
 protected:
-	virtual void add_term(int net_idx, terminal_t *term);
+	virtual void add_term(int net_idx, terminal_t *term) override;
 
-	ATTR_HOT virtual nl_double vsolve();
+	ATTR_HOT virtual nl_double vsolve() override;
 
 	ATTR_HOT int solve_non_dynamic(const bool newton_raphson);
 	ATTR_HOT void build_LE_A();

@@ -25,7 +25,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
 	m_slave->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 5 resets mcu */
-	if (m_mcu != NULL) // only if we have a MCU
+	if (m_mcu != nullptr) // only if we have a MCU
 		m_mcu->set_input_line(INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 6 enables display */

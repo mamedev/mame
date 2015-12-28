@@ -31,7 +31,7 @@ public:
 	c64_cpm_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// not really public
 	DECLARE_READ8_MEMBER( dma_r );
@@ -39,12 +39,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_c64_expansion_card_interface overrides
-	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
-	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw);
+	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
+	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw) override;
 
 private:
 	inline void update_signals();

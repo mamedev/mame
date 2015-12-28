@@ -61,7 +61,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bwp3_nmiack_w);
 	DECLARE_WRITE8_MEMBER(bwp1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(bwp2_ctrl_w);
-	DECLARE_WRITE8_MEMBER(spriteram_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(fgscrollram_w);
 	DECLARE_WRITE8_MEMBER(bgscrollram_w);
@@ -78,9 +77,9 @@ public:
 	TILEMAP_MAPPER_MEMBER(scan_cols);
 
 	DECLARE_DRIVER_INIT(bwing);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	void bwing_postload();
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

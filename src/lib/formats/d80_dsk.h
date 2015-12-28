@@ -18,19 +18,19 @@ public:
 	d80_format();
 	d80_format(const format *formats);
 
-	virtual const char *name() const;
-	virtual const char *description() const;
-	virtual const char *extensions() const;
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
 
 protected:
 	const format *formats;
 
-	virtual int get_physical_track(const format &f, int head, int track);
-	virtual UINT32 get_cell_size(const format &f, int track);
-	virtual int get_sectors_per_track(const format &f, int track);
-	virtual int get_disk_id_offset(const format &f);
-	virtual floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count, UINT8 id1, UINT8 id2, int gap_2);
-	virtual void fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_size);
+	virtual int get_physical_track(const format &f, int head, int track) override;
+	virtual UINT32 get_cell_size(const format &f, int track) override;
+	virtual int get_sectors_per_track(const format &f, int track) override;
+	virtual int get_disk_id_offset(const format &f) override;
+	virtual floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count, UINT8 id1, UINT8 id2, int gap_2) override;
+	virtual void fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_size) override;
 
 	static const format file_formats[];
 

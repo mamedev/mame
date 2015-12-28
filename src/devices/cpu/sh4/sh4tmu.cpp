@@ -16,7 +16,7 @@ static const int tcnt_div[8] = { 4, 16, 64, 256, 1024, 1, 1, 1 };
     a (constant+1) where 0 <= constant < 2^32
 -------------------------------------------------*/
 
-INLINE attotime sh4_scale_up_mame_time(const attotime &_time1, UINT32 factor1)
+static inline attotime sh4_scale_up_mame_time(const attotime &_time1, UINT32 factor1)
 {
 	return _time1 * factor1 + _time1;
 }

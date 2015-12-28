@@ -64,9 +64,9 @@ static void compute_hash_as_string(std::string &buffer, void *data, UINT32 lengt
 static int split_file(const char *filename, const char *basename, UINT32 splitsize)
 {
 	std::string outfilename, basefilename, splitfilename;
-	core_file *outfile = NULL, *infile = NULL, *splitfile = NULL;
+	core_file *outfile = nullptr, *infile = nullptr, *splitfile = nullptr;
 	std::string computedhash;
-	void *splitbuffer = NULL;
+	void *splitbuffer = nullptr;
 	int index, partnum;
 	UINT64 totallength;
 	file_error filerr;
@@ -103,7 +103,7 @@ static int split_file(const char *filename, const char *basename, UINT32 splitsi
 
 	// allocate a buffer for reading
 	splitbuffer = malloc(splitsize);
-	if (splitbuffer == NULL)
+	if (splitbuffer == nullptr)
 	{
 		fprintf(stderr, "Fatal error: unable to allocate memory for the split\n");
 		goto cleanup;
@@ -174,7 +174,7 @@ static int split_file(const char *filename, const char *basename, UINT32 splitsi
 			goto cleanup;
 		}
 		core_fclose(outfile);
-		outfile = NULL;
+		outfile = nullptr;
 
 		printf(" done\n");
 
@@ -188,21 +188,21 @@ static int split_file(const char *filename, const char *basename, UINT32 splitsi
 	error = 0;
 
 cleanup:
-	if (splitfile != NULL)
+	if (splitfile != nullptr)
 	{
 		core_fclose(splitfile);
 		if (error != 0)
 			remove(splitfilename.c_str());
 	}
-	if (infile != NULL)
+	if (infile != nullptr)
 		core_fclose(infile);
-	if (outfile != NULL)
+	if (outfile != nullptr)
 	{
 		core_fclose(outfile);
 		if (error != 0)
 			remove(outfilename.c_str());
 	}
-	if (splitbuffer != NULL)
+	if (splitbuffer != nullptr)
 		free(splitbuffer);
 	return error;
 }
@@ -218,8 +218,8 @@ static int join_file(const char *filename, const char *outname, int write_output
 	std::string expectedhash, computedhash;
 	std::string outfilename, infilename;
 	std::string basepath;
-	core_file *outfile = NULL, *infile = NULL, *splitfile = NULL;
-	void *splitbuffer = NULL;
+	core_file *outfile = nullptr, *infile = nullptr, *splitfile = nullptr;
+	void *splitbuffer = nullptr;
 	file_error filerr;
 	UINT32 splitsize;
 	char buffer[256];
@@ -252,7 +252,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 		basepath.clear();
 
 	// override the output filename if specified, otherwise prepend the path
-	if (outname != NULL)
+	if (outname != nullptr)
 		outfilename.assign(outname);
 	else
 		outfilename.insert(0, basepath);
@@ -272,7 +272,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 		if (filerr == FILERR_NONE)
 		{
 			core_fclose(outfile);
-			outfile = NULL;
+			outfile = nullptr;
 			fprintf(stderr, "Fatal error: output file '%s' already exists\n", outfilename.c_str());
 			goto cleanup;
 		}
@@ -346,7 +346,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 
 		// release allocated memory
 		osd_free(splitbuffer);
-		splitbuffer = NULL;
+		splitbuffer = nullptr;
 	}
 	if (write_output)
 		printf("File re-created successfully\n");
@@ -357,17 +357,17 @@ static int join_file(const char *filename, const char *outname, int write_output
 	error = 0;
 
 cleanup:
-	if (splitfile != NULL)
+	if (splitfile != nullptr)
 		core_fclose(splitfile);
-	if (infile != NULL)
+	if (infile != nullptr)
 		core_fclose(infile);
-	if (outfile != NULL)
+	if (outfile != nullptr)
 	{
 		core_fclose(outfile);
 		if (error != 0)
 			remove(outfilename.c_str());
 	}
-	if (splitbuffer != NULL)
+	if (splitbuffer != nullptr)
 		osd_free(splitbuffer);
 	return error;
 }
@@ -398,7 +398,7 @@ int main(int argc, char *argv[])
 	{
 		if (argc != 3 && argc != 4)
 			goto usage;
-		result = join_file(argv[2], (argc >= 4) ? argv[3] : NULL, TRUE);
+		result = join_file(argv[2], (argc >= 4) ? argv[3] : nullptr, TRUE);
 	}
 
 	/* verify command */
@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
 	{
 		if (argc != 3)
 			goto usage;
-		result = join_file(argv[2], NULL, FALSE);
+		result = join_file(argv[2], nullptr, FALSE);
 	}
 	else
 		goto usage;

@@ -52,7 +52,7 @@ public:
 		m_floppy1(*this, FD1791_TAG":1"),
 		m_floppy2(*this, FD1791_TAG":2"),
 		m_floppy3(*this, FD1791_TAG":3"),
-		m_floppy(NULL),
+		m_floppy(nullptr),
 		m_ram(*this, RAM_TAG),
 		m_kb(*this, TRS80M2_KEYBOARD_TAG),
 		m_rom(*this, Z80_TAG),
@@ -80,10 +80,10 @@ public:
 	required_memory_region m_char_rom;
 	optional_shared_ptr<UINT8> m_video_ram;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( read );
@@ -94,10 +94,6 @@ public:
 	DECLARE_READ8_MEMBER( rtc_r );
 	DECLARE_READ8_MEMBER( nmi_r );
 	DECLARE_WRITE8_MEMBER( nmi_w );
-	DECLARE_READ8_MEMBER( keyboard_busy_r );
-	DECLARE_READ8_MEMBER( keyboard_data_r );
-	DECLARE_WRITE8_MEMBER( keyboard_ctrl_w );
-	DECLARE_WRITE8_MEMBER( keyboard_latch_w );
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_WRITE_LINE_MEMBER( de_w );
@@ -155,7 +151,7 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<pic8259_device> m_pic;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER( ual_w );
 	DECLARE_WRITE8_MEMBER( tcl_w );

@@ -159,8 +159,8 @@ class palette_device;
 
 struct gfx_layout
 {
-	UINT32 xoffs(int x) const { return (extxoffs != NULL) ? extxoffs[x] : xoffset[x]; }
-	UINT32 yoffs(int y) const { return (extyoffs != NULL) ? extyoffs[y] : yoffset[y]; }
+	UINT32 xoffs(int x) const { return (extxoffs != nullptr) ? extxoffs[x] : xoffset[x]; }
+	UINT32 yoffs(int y) const { return (extyoffs != nullptr) ? extyoffs[y] : yoffset[y]; }
 
 	UINT16          width;              // pixel width of each element
 	UINT16          height;             // pixel height of each element
@@ -191,7 +191,7 @@ class device_gfx_interface : public device_interface
 public:
 	// construction/destruction
 	device_gfx_interface(const machine_config &mconfig, device_t &device,
-						const gfx_decode_entry *gfxinfo = NULL, const char *palette_tag = NULL);
+						const gfx_decode_entry *gfxinfo = nullptr, const char *palette_tag = nullptr);
 	virtual ~device_gfx_interface();
 
 	// static configuration
@@ -200,22 +200,22 @@ public:
 
 	// getters
 	palette_device *palette() const { return m_palette; }
-	gfx_element *gfx(int index) const { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index]; }
+	gfx_element *gfx(int index) const { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index].get(); }
 
 	// decoding
 	void decode_gfx(const gfx_decode_entry *gfxdecodeinfo);
 	void decode_gfx() { decode_gfx(m_gfxdecodeinfo); }
 
-	void set_gfx(int index, gfx_element *element) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index].reset(element); }
+	void set_gfx(int index, std::unique_ptr<gfx_element> &&element) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index] = std::move(element); }
 
 protected:
 	// interface-level overrides
-	virtual void interface_validity_check(validity_checker &valid) const;
-	virtual void interface_pre_start();
-	virtual void interface_post_start();
+	virtual void interface_validity_check(validity_checker &valid) const override;
+	virtual void interface_pre_start() override;
+	virtual void interface_post_start() override;
 
 	palette_device *            m_palette;                  // pointer to the palette device
-	auto_pointer<gfx_element>   m_gfx[MAX_GFX_ELEMENTS];    // array of pointers to graphic sets
+	std::unique_ptr<gfx_element>  m_gfx[MAX_GFX_ELEMENTS];    // array of pointers to graphic sets
 
 private:
 	// configuration

@@ -145,7 +145,7 @@ atari_motion_objects_device::atari_motion_objects_device(const machine_config &m
 		m_xscroll(0),
 		m_yscroll(0),
 		m_slipram(*this, "slip"),
-		m_activelast(NULL),
+		m_activelast(nullptr),
 		m_last_xpos(0),
 		m_next_xpos(0),
 		m_gfxdecode(*this)
@@ -282,7 +282,7 @@ void atari_motion_objects_device::device_start()
 
 	// verify configuration
 	gfx_element *gfx = m_gfxdecode->gfx(m_gfxindex);
-	if (gfx == NULL)
+	if (gfx == nullptr)
 		throw emu_fatalerror("No gfxelement #%d!", m_gfxindex);
 
 	// determine the masks

@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Alex Pasadyn, Zsolt Vasvari, Kurt Mahan, Ernesto Corvi, Aaron Giles
+// license:BSD-3-Clause
+// copyright-holders:Alex Pasadyn, Zsolt Vasvari, Ernesto Corvi, Aaron Giles
+// thanks-to:Kurt Mahan
 /*************************************************************************
 
     Williams/Midway Y/Z-unit system
@@ -68,7 +69,7 @@ public:
 
 	DECLARE_IOPORT_ARRAY(ports);
 
-	UINT16 *m_cmos_ram;
+	std::unique_ptr<UINT16[]> m_cmos_ram;
 	UINT32 m_cmos_page;
 	UINT16 m_prot_result;
 	UINT16 m_prot_sequence[3];
@@ -81,8 +82,8 @@ public:
 	UINT8 *m_cvsd_protection_base;
 	UINT8 m_autoerase_enable;
 	UINT32 m_palette_mask;
-	pen_t * m_pen_map;
-	UINT16 *    m_local_videoram;
+	std::unique_ptr<pen_t[]> m_pen_map;
+	std::unique_ptr<UINT16[]>   m_local_videoram;
 	UINT8 m_videobank_select;
 	UINT8 m_yawdim_dma;
 	UINT16 m_dma_register[16];
@@ -139,7 +140,7 @@ public:
 	TIMER_CALLBACK_MEMBER(autoerase_line);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void dma_draw(UINT16 command);
 	void init_generic(int bpp, int sound, int prot_start, int prot_end);
 	void term2_init_common(write16_delegate hack_w);

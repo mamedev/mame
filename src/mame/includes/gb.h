@@ -130,15 +130,13 @@ protected:
 	void gb_timer_check_irq();
 	void gb_init();
 	void gb_init_regs();
-	void gb_video_reset(int mode);
-	void gb_video_start(int mode);
 
 	void save_gb_base();
 	void save_gbc_only();
 	void save_sgb_only();
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 

@@ -23,6 +23,8 @@ function devicesProject(_target, _subtarget)
 		"ArchiveSplit",
 	}
 
+	addprojectflags()
+
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
@@ -59,6 +61,7 @@ if (_OPTIONS["SOURCES"] == nil) then
 	uuid ("5d782c89-cf7e-4cfe-8f9f-0d4bfc16c91d")
 	kind (LIBTYPE)
 	targetsubdir(_target .."_" .. _subtarget)
+	addprojectflags()
 	options {
 		"ArchiveSplit",
 	}
@@ -96,6 +99,7 @@ if #disasm_files > 0 then
 	uuid ("f2d28b0a-6da5-4f78-b629-d834aa00429d")
 	kind (LIBTYPE)
 	targetsubdir(_target .."_" .. _subtarget)
+	addprojectflags()
 
 	includedirs {
 		MAME_DIR .. "src/osd",

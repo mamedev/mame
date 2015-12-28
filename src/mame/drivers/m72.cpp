@@ -373,7 +373,7 @@ WRITE16_MEMBER(m72_state::main_mcu_w)
 		//machine().scheduler().timer_set(m_mcu->cycles_to_attotime(0), FUNC(mcu_irq0_raise));
 	}
 	else
-		machine().scheduler().synchronize( timer_expired_delegate(FUNC(m72_state::delayed_ram16_w),this), (offset<<16) | val, m_protection_ram);
+		machine().scheduler().synchronize( timer_expired_delegate(FUNC(m72_state::delayed_ram16_w),this), (offset<<16) | val, m_protection_ram.get());
 }
 
 WRITE8_MEMBER(m72_state::mcu_data_w)
@@ -382,7 +382,7 @@ WRITE8_MEMBER(m72_state::mcu_data_w)
 	if (offset&1) val = (m_protection_ram[offset/2] & 0x00ff) | (data << 8);
 	else val = (m_protection_ram[offset/2] & 0xff00) | (data&0xff);
 
-	machine().scheduler().synchronize( timer_expired_delegate(FUNC(m72_state::delayed_ram16_w),this), ((offset >>1 ) << 16) | val, m_protection_ram);
+	machine().scheduler().synchronize( timer_expired_delegate(FUNC(m72_state::delayed_ram16_w),this), ((offset >>1 ) << 16) | val, m_protection_ram.get());
 }
 
 READ8_MEMBER(m72_state::mcu_data_r)
@@ -466,12 +466,12 @@ DRIVER_INIT_MEMBER(m72_state,m72_8751)
 	address_space &io = m_maincpu->space(AS_IO);
 	address_space &sndio = m_soundcpu->space(AS_IO);
 
-	m_protection_ram = auto_alloc_array(machine(), UINT16, 0x10000/2);
+	m_protection_ram = std::make_unique<UINT16[]>(0x10000/2);
 	program.install_read_bank(0xb0000, 0xbffff, "bank1");
 	program.install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::main_mcu_w),this));
-	membank("bank1")->configure_entry(0, m_protection_ram);
+	membank("bank1")->configure_entry(0, m_protection_ram.get());
 
-	save_pointer(NAME(m_protection_ram), 0x10000/2);
+	save_pointer(NAME(m_protection_ram.get()), 0x10000/2);
 	save_item(NAME(m_mcu_sample_latch));
 	save_item(NAME(m_mcu_sample_addr));
 	save_item(NAME(m_mcu_snd_cmd_latch));
@@ -795,7 +795,7 @@ void m72_state::copy_le(UINT16 *dest, const UINT8 *src, UINT8 bytes)
 READ16_MEMBER(m72_state::protection_r)
 {
 	if (ACCESSING_BITS_8_15)
-		copy_le(m_protection_ram,m_protection_code,CODE_LEN);
+		copy_le(m_protection_ram.get(),m_protection_code,CODE_LEN);
 	return m_protection_ram[0xffa/2+offset];
 }
 
@@ -811,15 +811,15 @@ WRITE16_MEMBER(m72_state::protection_w)
 
 void m72_state::install_protection_handler(const UINT8 *code,const UINT8 *crc)
 {
-	m_protection_ram = auto_alloc_array(machine(), UINT16, 0x1000/2);
+	m_protection_ram = std::make_unique<UINT16[]>(0x1000/2);
 	m_protection_code = code;
 	m_protection_crc =  crc;
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xb0000, 0xb0fff, "bank1");
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0ffa, 0xb0ffb, read16_delegate(FUNC(m72_state::protection_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::protection_w),this));
-	membank("bank1")->configure_entry(0, m_protection_ram);
+	membank("bank1")->configure_entry(0, m_protection_ram.get());
 
-	save_pointer(NAME(m_protection_ram), 0x1000/2);
+	save_pointer(NAME(m_protection_ram.get()), 0x1000/2);
 }
 
 DRIVER_INIT_MEMBER(m72_state,bchopper)

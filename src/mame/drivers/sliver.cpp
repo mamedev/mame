@@ -117,7 +117,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(oki_setbank);
 	TIMER_DEVICE_CALLBACK_MEMBER(obj_irq_cb);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_sliver(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void plot_pixel_rgb(int x, int y, UINT32 r, UINT32 g, UINT32 b);
 	void plot_pixel_pal(int x, int y, int addr);

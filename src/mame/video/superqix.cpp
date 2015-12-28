@@ -56,8 +56,8 @@ VIDEO_START_MEMBER(superqix_state,pbillian)
 
 VIDEO_START_MEMBER(superqix_state,superqix)
 {
-	m_fg_bitmap[0] = auto_bitmap_ind16_alloc(machine(), 256, 256);
-	m_fg_bitmap[1] = auto_bitmap_ind16_alloc(machine(), 256, 256);
+	m_fg_bitmap[0] = std::make_unique<bitmap_ind16>(256, 256);
+	m_fg_bitmap[1] = std::make_unique<bitmap_ind16>(256, 256);
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(superqix_state::sqix_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
 	m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */

@@ -33,7 +33,7 @@ public:
 
 	required_device<s14001a_device> m_speech;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	UINT16 input_read(int index);
 	DECLARE_WRITE8_MEMBER( pia0_pa_w );

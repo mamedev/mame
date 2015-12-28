@@ -29,9 +29,9 @@ const device_type BUDDHA = &device_creator<buddha_device>;
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( buddha )
-	MCFG_ATA_INTERFACE_ADD("ata_0", ata_devices, NULL, NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata_0", ata_devices, nullptr, nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(buddha_device, ide_0_interrupt_w))
-	MCFG_ATA_INTERFACE_ADD("ata_1", ata_devices, NULL, NULL, false)
+	MCFG_ATA_INTERFACE_ADD("ata_1", ata_devices, nullptr, nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(buddha_device, ide_1_interrupt_w))
 MACHINE_CONFIG_END
 
@@ -220,7 +220,7 @@ WRITE_LINE_MEMBER( buddha_device::ide_1_interrupt_w)
 
 READ16_MEMBER( buddha_device::ide_0_interrupt_r )
 {
-	UINT16 data = 0xffff;
+	UINT16 data;
 
 	data = m_ide_0_interrupt << 15;
 
@@ -234,7 +234,7 @@ READ16_MEMBER( buddha_device::ide_0_interrupt_r )
 
 READ16_MEMBER( buddha_device::ide_1_interrupt_r )
 {
-	UINT16 data = 0xffff;
+	UINT16 data;
 
 	data = m_ide_1_interrupt << 15;
 
@@ -255,7 +255,7 @@ WRITE16_MEMBER( buddha_device::ide_interrupt_enable_w )
 
 READ16_MEMBER( buddha_device::ide_0_cs0_r )
 {
-	UINT16 data = 0xffff;
+	UINT16 data;
 
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = m_ata_0->read_cs0(space, (offset >> 1) & 0x07, mem_mask);
@@ -279,7 +279,7 @@ WRITE16_MEMBER( buddha_device::ide_0_cs0_w )
 
 READ16_MEMBER( buddha_device::ide_0_cs1_r )
 {
-	UINT16 data = 0xffff;
+	UINT16 data;
 
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = m_ata_0->read_cs1(space, (offset >> 1) & 0x07, mem_mask);
@@ -303,7 +303,7 @@ WRITE16_MEMBER( buddha_device::ide_0_cs1_w )
 
 READ16_MEMBER( buddha_device::ide_1_cs0_r )
 {
-	UINT16 data = 0xffff;
+	UINT16 data;
 
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = m_ata_1->read_cs0(space, (offset >> 1) & 0x07, mem_mask);
@@ -327,7 +327,7 @@ WRITE16_MEMBER( buddha_device::ide_1_cs0_w )
 
 READ16_MEMBER( buddha_device::ide_1_cs1_r )
 {
-	UINT16 data = 0xffff;
+	UINT16 data;
 
 	mem_mask = (mem_mask << 8) | (mem_mask >> 8);
 	data = m_ata_1->read_cs1(space, (offset >> 1) & 0x07, mem_mask);

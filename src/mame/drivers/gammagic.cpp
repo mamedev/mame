@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Grull Osgo
 /************************************************************************************
 
@@ -45,7 +45,7 @@ public:
 	gammagic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag) { }
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 // Memory is mostly handled by the chipset

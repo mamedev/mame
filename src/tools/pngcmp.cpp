@@ -72,7 +72,7 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 	bitmap_argb32 bitmap2;
 	bitmap_argb32 finalbitmap;
 	int width, height, maxwidth;
-	core_file *file = NULL;
+	core_file *file = nullptr;
 	file_error filerr;
 	png_error pngerr;
 	int error = 100;
@@ -150,8 +150,8 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 		/* iterate over rows in these bitmaps */
 		for (y = 0; y < curheight; y++)
 		{
-			UINT32 *src1 = (y < bitmap1.height()) ? &bitmap1.pix32(y) : NULL;
-			UINT32 *src2 = (y < bitmap2.height()) ? &bitmap2.pix32(y) : NULL;
+			UINT32 *src1 = (y < bitmap1.height()) ? &bitmap1.pix32(y) : nullptr;
+			UINT32 *src2 = (y < bitmap2.height()) ? &bitmap2.pix32(y) : nullptr;
 			UINT32 *dst1 = &finalbitmap.pix32(y);
 			UINT32 *dst2 = &finalbitmap.pix32(y, bitmap1.width() + BITMAP_SPACE);
 			UINT32 *dstdiff = &finalbitmap.pix32(y, bitmap1.width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE);
@@ -161,9 +161,9 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 			{
 				int pix1 = -1, pix2 = -2;
 
-				if (src1 != NULL && x < bitmap1.width())
+				if (src1 != nullptr && x < bitmap1.width())
 					pix1 = dst1[x] = src1[x];
-				if (src2 != NULL && x < bitmap2.width())
+				if (src2 != nullptr && x < bitmap2.width())
 					pix2 = dst2[x] = src2[x];
 				dstdiff[x] = (pix1 != pix2) ? 0xffffffff : 0xff000000;
 			}
@@ -176,7 +176,7 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 			printf("Could not open %s (%d)\n", outfilename.c_str(), filerr);
 			goto error;
 		}
-		pngerr = png_write_bitmap(file, NULL, finalbitmap, 0, NULL);
+		pngerr = png_write_bitmap(file, nullptr, finalbitmap, 0, nullptr);
 		core_fclose(file);
 		if (pngerr != PNGERR_NONE)
 		{

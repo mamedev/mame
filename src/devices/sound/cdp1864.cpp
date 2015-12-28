@@ -427,9 +427,9 @@ UINT32 cdp1864_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 void cdp1864_device::initialize_palette()
 {
-	const int resistances_r[] = { m_chr_r };
-	const int resistances_g[] = { m_chr_g };
-	const int resistances_b[] = { m_chr_b };
+	const int resistances_r[] = { static_cast<int>(m_chr_r) };
+	const int resistances_g[] = { static_cast<int>(m_chr_g) };
+	const int resistances_b[] = { static_cast<int>(m_chr_b) };
 
 	double color_weights_r[1], color_weights_g[1], color_weights_b[1];
 	double color_weights_bkg_r[1], color_weights_bkg_g[1], color_weights_bkg_b[1];

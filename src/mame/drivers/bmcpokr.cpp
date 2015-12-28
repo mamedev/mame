@@ -81,17 +81,16 @@ public:
 	tilemap_t *m_tilemap_2;
 	TILE_GET_INFO_MEMBER(get_t1_tile_info);
 	TILE_GET_INFO_MEMBER(get_t2_tile_info);
-	TILE_GET_INFO_MEMBER(get_t3_tile_info);
 	DECLARE_WRITE16_MEMBER(videoram_1_w);
 	DECLARE_WRITE16_MEMBER(videoram_2_w);
 
-	bitmap_ind16 *m_pixbitmap;
+	std::unique_ptr<bitmap_ind16> m_pixbitmap;
 	void pixbitmap_redraw();
 	UINT16 m_pixpal;
 	DECLARE_WRITE16_MEMBER(pixram_w);
 	DECLARE_WRITE16_MEMBER(pixpal_w);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 	UINT32 screen_update_bmcpokr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -149,7 +148,7 @@ void bmcpokr_state::video_start()
 	m_tilemap_1->set_scroll_cols(1);
 	m_tilemap_2->set_scroll_cols(1);
 
-	m_pixbitmap  = auto_bitmap_ind16_alloc(machine(), 0x400, 0x200);
+	m_pixbitmap  = std::make_unique<bitmap_ind16>(0x400, 0x200);
 
 	save_state();
 }
@@ -215,7 +214,7 @@ void bmcpokr_state::draw_layer(screen_device &screen, bitmap_ind16 &bitmap, cons
 	{
 		case 1:     tmap = m_tilemap_1; scroll = m_scrollram_1; ctrl = (m_layerctrl[0] >> 8) & 0xff; break;
 		case 2:     tmap = m_tilemap_2; scroll = m_scrollram_2; ctrl = (m_layerctrl[0] >> 0) & 0xff; break;
-		default:    tmap = 0;           scroll = m_scrollram_3; ctrl = (m_layerctrl[1] >> 8) & 0xff; break;
+		default:    tmap = nullptr;           scroll = m_scrollram_3; ctrl = (m_layerctrl[1] >> 8) & 0xff; break;
 	}
 
 	if (ctrl == 0x00)

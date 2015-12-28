@@ -38,8 +38,8 @@ namco_c117_device::namco_c117_device(const machine_config &mconfig, const char *
 	device_memory_interface(mconfig, *this),
 	m_subres_cb(*this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 23),
-	m_maincpu_tag(NULL),
-	m_subcpu_tag(NULL)
+	m_maincpu_tag(nullptr),
+	m_subcpu_tag(nullptr)
 {
 }
 

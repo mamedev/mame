@@ -71,8 +71,8 @@ public:
 	required_shared_ptr<UINT8> m_bg_scroll;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	UINT8 *m_ram_1;
-	UINT8 *m_ram_2;
+	std::unique_ptr<UINT8[]> m_ram_1;
+	std::unique_ptr<UINT8[]> m_ram_2;
 	UINT8 m_ram_bank;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
@@ -85,8 +85,8 @@ public:
 	DECLARE_WRITE8_MEMBER(safarir_audio_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(safarir);
 	UINT32 screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -294,7 +294,7 @@ static const char *const safarir_sample_names[] =
 	"sound6",
 	"sound7",
 	"sound8",
-	0
+	nullptr
 };
 
 
@@ -316,14 +316,14 @@ MACHINE_CONFIG_END
 
 void safarir_state::machine_start()
 {
-	m_ram_1 = auto_alloc_array(machine(), UINT8, m_ram.bytes());
-	m_ram_2 = auto_alloc_array(machine(), UINT8, m_ram.bytes());
+	m_ram_1 = std::make_unique<UINT8[]>(m_ram.bytes());
+	m_ram_2 = std::make_unique<UINT8[]>(m_ram.bytes());
 	m_port_last = 0;
 	m_port_last2 = 0;
 
 	/* setup for save states */
-	save_pointer(NAME(m_ram_1), m_ram.bytes());
-	save_pointer(NAME(m_ram_2), m_ram.bytes());
+	save_pointer(NAME(m_ram_1.get()), m_ram.bytes());
+	save_pointer(NAME(m_ram_2.get()), m_ram.bytes());
 	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_port_last));
 	save_item(NAME(m_port_last2));

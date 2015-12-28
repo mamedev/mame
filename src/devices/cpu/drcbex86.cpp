@@ -507,25 +507,25 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, U
 		m_hash(cache, modes, addrbits, ignorebits),
 		m_map(cache, 0),
 		m_labels(cache),
-		m_log(NULL),
+		m_log(nullptr),
 		m_logged_common(false),
 		m_sse3(false),
-		m_entry(NULL),
-		m_exit(NULL),
-		m_nocode(NULL),
-		m_save(NULL),
-		m_restore(NULL),
+		m_entry(nullptr),
+		m_exit(nullptr),
+		m_nocode(nullptr),
+		m_save(nullptr),
+		m_restore(nullptr),
 		m_last_lower_reg(REG_NONE),
-		m_last_lower_pc(NULL),
-		m_last_lower_addr(NULL),
+		m_last_lower_pc(nullptr),
+		m_last_lower_addr(nullptr),
 		m_last_upper_reg(REG_NONE),
-		m_last_upper_pc(NULL),
-		m_last_upper_addr(NULL),
+		m_last_upper_pc(nullptr),
+		m_last_upper_addr(nullptr),
 		m_fptemp(0),
 		m_fpumode(0),
 		m_fmodesave(0),
-		m_stacksave(0),
-		m_hashstacksave(0),
+		m_stacksave(nullptr),
+		m_hashstacksave(nullptr),
 		m_reslo(0),
 		m_reshi(0),
 		m_fixup_label(FUNC(drcbe_x86::fixup_label), this),
@@ -562,8 +562,8 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, U
 	}
 
 	// build the opcode table (static but it doesn't hurt to regenerate it)
-	for (int opnum = 0; opnum < ARRAY_LENGTH(s_opcode_table_source); opnum++)
-		s_opcode_table[s_opcode_table_source[opnum].opcode] = s_opcode_table_source[opnum].func;
+	for (auto & elem : s_opcode_table_source)
+		s_opcode_table[elem.opcode] = elem.func;
 
 	// create the log
 	if (device.machine().options().drc_log_native())
@@ -581,7 +581,7 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, U
 drcbe_x86::~drcbe_x86()
 {
 	// free the log context
-	if (m_log != NULL)
+	if (m_log != nullptr)
 		x86log_free_context(m_log);
 }
 
@@ -593,12 +593,12 @@ drcbe_x86::~drcbe_x86()
 void drcbe_x86::reset()
 {
 	// output a note to the log
-	if (m_log != NULL)
-		x86log_printf(m_log, "\n\n===========\nCACHE RESET\n===========\n\n");
+	if (m_log != nullptr)
+		x86log_printf(m_log, "%s", "\n\n===========\nCACHE RESET\n===========\n\n");
 
 	// generate a little bit of glue code to set up the environment
 	drccodeptr *cachetop = m_cache.begin_codegen(500);
-	if (cachetop == NULL)
+	if (cachetop == nullptr)
 		fatalerror("Out of cache space after a reset!\n");
 
 	x86code *dst = (x86code *)*cachetop;
@@ -628,7 +628,7 @@ void drcbe_x86::reset()
 	emit_mov_m32_r32(dst, MABS(&m_stacksave), REG_ESP);                         // mov   [stacksave],esp
 	emit_fstcw_m16(dst, MABS(&m_fpumode));                                          // fstcw [fpumode]
 	emit_jmp_r32(dst, REG_EAX);                                                         // jmp   eax
-	if (m_log != NULL && !m_logged_common)
+	if (m_log != nullptr && !m_logged_common)
 		x86log_disasm_code_range(m_log, "entry_point", (x86code *)m_entry, dst);
 
 	// generate an exit point
@@ -641,13 +641,13 @@ void drcbe_x86::reset()
 	emit_pop_r32(dst, REG_ESI);                                                         // pop   esi
 	emit_pop_r32(dst, REG_EBX);                                                         // pop   ebx
 	emit_ret(dst);                                                                      // ret
-	if (m_log != NULL && !m_logged_common)
+	if (m_log != nullptr && !m_logged_common)
 		x86log_disasm_code_range(m_log, "exit_point", m_exit, dst);
 
 	// generate a no code point
 	m_nocode = dst;
 	emit_ret(dst);                                                                      // ret
-	if (m_log != NULL && !m_logged_common)
+	if (m_log != nullptr && !m_logged_common)
 		x86log_disasm_code_range(m_log, "nocode", m_nocode, dst);
 
 	// generate a save subroutine
@@ -663,8 +663,8 @@ void drcbe_x86::reset()
 	emit_mov_m32_r32(dst, MBD(REG_ECX, offsetof(drcuml_machine_state, exp)), REG_EAX);  // mov    state->exp,eax
 	for (int regnum = 0; regnum < ARRAY_LENGTH(m_state.r); regnum++)
 	{
-		FPTR regoffsl = (FPTR)&((drcuml_machine_state *)NULL)->r[regnum].w.l;
-		FPTR regoffsh = (FPTR)&((drcuml_machine_state *)NULL)->r[regnum].w.h;
+		FPTR regoffsl = (FPTR)&((drcuml_machine_state *)nullptr)->r[regnum].w.l;
+		FPTR regoffsh = (FPTR)&((drcuml_machine_state *)nullptr)->r[regnum].w.h;
 		if (int_register_map[regnum] != 0)
 			emit_mov_m32_r32(dst, MBD(REG_ECX, regoffsl), int_register_map[regnum]);
 		else
@@ -677,23 +677,23 @@ void drcbe_x86::reset()
 	}
 	for (int regnum = 0; regnum < ARRAY_LENGTH(m_state.f); regnum++)
 	{
-		FPTR regoffsl = (FPTR)&((drcuml_machine_state *)NULL)->f[regnum].s.l;
-		FPTR regoffsh = (FPTR)&((drcuml_machine_state *)NULL)->f[regnum].s.h;
+		FPTR regoffsl = (FPTR)&((drcuml_machine_state *)nullptr)->f[regnum].s.l;
+		FPTR regoffsh = (FPTR)&((drcuml_machine_state *)nullptr)->f[regnum].s.h;
 		emit_mov_r32_m32(dst, REG_EAX, MABS(&m_state.f[regnum].s.l));
 		emit_mov_m32_r32(dst, MBD(REG_ECX, regoffsl), REG_EAX);
 		emit_mov_r32_m32(dst, REG_EAX, MABS(&m_state.f[regnum].s.h));
 		emit_mov_m32_r32(dst, MBD(REG_ECX, regoffsh), REG_EAX);
 	}
 	emit_ret(dst);                                                                      // ret
-	if (m_log != NULL && !m_logged_common)
+	if (m_log != nullptr && !m_logged_common)
 		x86log_disasm_code_range(m_log, "save", m_save, dst);
 
 	// generate a restore subroutine
 	m_restore = dst;
 	for (int regnum = 0; regnum < ARRAY_LENGTH(m_state.r); regnum++)
 	{
-		FPTR regoffsl = (FPTR)&((drcuml_machine_state *)NULL)->r[regnum].w.l;
-		FPTR regoffsh = (FPTR)&((drcuml_machine_state *)NULL)->r[regnum].w.h;
+		FPTR regoffsl = (FPTR)&((drcuml_machine_state *)nullptr)->r[regnum].w.l;
+		FPTR regoffsh = (FPTR)&((drcuml_machine_state *)nullptr)->r[regnum].w.h;
 		if (int_register_map[regnum] != 0)
 			emit_mov_r32_m32(dst, int_register_map[regnum], MBD(REG_ECX, regoffsl));
 		else
@@ -706,8 +706,8 @@ void drcbe_x86::reset()
 	}
 	for (int regnum = 0; regnum < ARRAY_LENGTH(m_state.f); regnum++)
 	{
-		FPTR regoffsl = (FPTR)&((drcuml_machine_state *)NULL)->f[regnum].s.l;
-		FPTR regoffsh = (FPTR)&((drcuml_machine_state *)NULL)->f[regnum].s.h;
+		FPTR regoffsl = (FPTR)&((drcuml_machine_state *)nullptr)->f[regnum].s.l;
+		FPTR regoffsh = (FPTR)&((drcuml_machine_state *)nullptr)->f[regnum].s.h;
 		emit_mov_r32_m32(dst, REG_EAX, MBD(REG_ECX, regoffsl));
 		emit_mov_m32_r32(dst, MABS(&m_state.f[regnum].s.l), REG_EAX);
 		emit_mov_r32_m32(dst, REG_EAX, MBD(REG_ECX, regoffsh));
@@ -723,7 +723,7 @@ void drcbe_x86::reset()
 	emit_push_m32(dst, MABSI(flags_unmap, REG_EAX, 4));                                 // push   flags_unmap[eax*4]
 	emit_popf(dst);                                                                     // popf
 	emit_ret(dst);                                                                      // ret
-	if (m_log != NULL && !m_logged_common)
+	if (m_log != nullptr && !m_logged_common)
 		x86log_disasm_code_range(m_log, "restore", m_restore, dst);
 
 	// finish up codegen
@@ -762,7 +762,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, UINT3
 
 	// begin codegen; fail if we can't
 	drccodeptr *cachetop = m_cache.begin_codegen(numinst * 8 * 4);
-	if (cachetop == NULL)
+	if (cachetop == nullptr)
 		block.abort();
 
 	// compute the base by aligning the cache top to a cache line (assumed to be 64 bytes)
@@ -771,14 +771,14 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, UINT3
 
 	// generate code
 	std::string tempstring;
-	const char *blockname = NULL;
+	const char *blockname = nullptr;
 	for (int inum = 0; inum < numinst; inum++)
 	{
 		const instruction &inst = instlist[inum];
 		assert(inst.opcode() < ARRAY_LENGTH(s_opcode_table));
 
 		// add a comment
-		if (m_log != NULL)
+		if (m_log != nullptr)
 		{
 			std::string dasm;
 			inst.disasm(dasm, &m_drcuml);
@@ -786,7 +786,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, UINT3
 		}
 
 		// extract a blockname
-		if (blockname == NULL)
+		if (blockname == nullptr)
 		{
 			if (inst.opcode() == OP_HANDLE)
 				blockname = inst.param(0).handle().string();
@@ -803,8 +803,8 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, UINT3
 	m_cache.end_codegen();
 
 	// log it
-	if (m_log != NULL)
-		x86log_disasm_code_range(m_log, (blockname == NULL) ? "Unknown block" : blockname, base, m_cache.top());
+	if (m_log != nullptr)
+		x86log_disasm_code_range(m_log, (blockname == nullptr) ? "Unknown block" : blockname, base, m_cache.top());
 
 	// tell all of our utility objects that the block is finished
 	m_hash.block_end(block);
@@ -2839,7 +2839,7 @@ void drcbe_x86::fixup_exception(drccodeptr *codeptr, void *param1, void *param2)
 
 	// push the original return address on the stack
 	emit_push_imm(dst, (FPTR)src);                                                      // push  <return>
-	if (*targetptr != NULL)
+	if (*targetptr != nullptr)
 		emit_jmp(dst, *targetptr);                                                      // jmp   *targetptr
 	else
 		emit_jmp_m32(dst, MABS(targetptr));                                         // jmp   [targetptr]
@@ -2995,7 +2995,7 @@ void drcbe_x86::op_debug(x86code *&dst, const instruction &inst)
 
 		// test and branch
 		emit_test_m32_imm(dst, MABS(&m_device.machine().debug_flags), DEBUG_FLAG_CALL_HOOK);        // test  [debug_flags],DEBUG_FLAG_CALL_HOOK
-		emit_link skip = { 0 };
+		emit_link skip = { nullptr };
 		emit_jcc_short_link(dst, x86emit::COND_Z, skip);                                        // jz    skip
 
 		// push the parameter
@@ -3163,7 +3163,7 @@ void drcbe_x86::op_exh(x86code *&dst, const instruction &inst)
 	if (inst.condition() == uml::COND_ALWAYS)
 	{
 		emit_mov_m32_p32(dst, MABS(&m_state.exp), exp);                 // mov   [exp],exp
-		if (*targetptr != NULL)
+		if (*targetptr != nullptr)
 			emit_call(dst, *targetptr);                                             // call  *targetptr
 		else
 			emit_call_m32(dst, MABS(targetptr));                                        // call  [targetptr]
@@ -3172,7 +3172,7 @@ void drcbe_x86::op_exh(x86code *&dst, const instruction &inst)
 	// otherwise, jump to an out-of-band handler
 	else
 	{
-		emit_jcc(dst, X86_CONDITION(inst.condition()), 0);                              // jcc   exception
+		emit_jcc(dst, X86_CONDITION(inst.condition()), nullptr);                              // jcc   exception
 		m_cache.request_oob_codegen(m_fixup_exception, dst, &const_cast<instruction &>(inst));
 	}
 }
@@ -3197,12 +3197,12 @@ void drcbe_x86::op_callh(x86code *&dst, const instruction &inst)
 	drccodeptr *targetptr = handp.handle().codeptr_addr();
 
 	// skip if conditional
-	emit_link skip = { 0 };
+	emit_link skip = { nullptr };
 	if (inst.condition() != uml::COND_ALWAYS)
 		emit_jcc_short_link(dst, X86_NOT_CONDITION(inst.condition()), skip);            // jcc   skip
 
 	// jump through the handle; directly if a normal jump
-	if (*targetptr != NULL)
+	if (*targetptr != nullptr)
 		emit_call(dst, *targetptr);                                                 // call  *targetptr
 	else
 		emit_call_m32(dst, MABS(targetptr));                                            // call  [targetptr]
@@ -3226,7 +3226,7 @@ void drcbe_x86::op_ret(x86code *&dst, const instruction &inst)
 	assert(inst.numparams() == 0);
 
 	// skip if conditional
-	emit_link skip = { 0 };
+	emit_link skip = { nullptr };
 	if (inst.condition() != uml::COND_ALWAYS)
 		emit_jcc_short_link(dst, X86_NOT_CONDITION(inst.condition()), skip);            // jcc   skip
 
@@ -3257,7 +3257,7 @@ void drcbe_x86::op_callc(x86code *&dst, const instruction &inst)
 	be_parameter paramp(*this, inst.param(1), PTYPE_M);
 
 	// skip if conditional
-	emit_link skip = { 0 };
+	emit_link skip = { nullptr };
 	if (inst.condition() != uml::COND_ALWAYS)
 		emit_jcc_short_link(dst, X86_NOT_CONDITION(inst.condition()), skip);            // jcc   skip
 
@@ -4200,7 +4200,7 @@ void drcbe_x86::op_mov(x86code *&dst, const instruction &inst)
 	int dstreg = dstp.select_register(REG_EAX);
 
 	// always start with a jmp
-	emit_link skip = { 0 };
+	emit_link skip = { nullptr };
 	if (inst.condition() != uml::COND_ALWAYS)
 		emit_jcc_short_link(dst, X86_NOT_CONDITION(inst.condition()), skip);            // jcc   skip
 
@@ -4219,7 +4219,7 @@ void drcbe_x86::op_mov(x86code *&dst, const instruction &inst)
 		else if (inst.condition() != uml::COND_ALWAYS && dstp.is_int_register() && srcp.is_memory())
 		{
 			dst = savedst;
-			skip.target = NULL;
+			skip.target = nullptr;
 			emit_cmovcc_r32_m32(dst, X86_CONDITION(inst.condition()), dstp.ireg(), MABS(srcp.memory()));
 																						// cmovcc dstp,[srcp]
 		}
@@ -4228,7 +4228,7 @@ void drcbe_x86::op_mov(x86code *&dst, const instruction &inst)
 		else if (inst.condition() != uml::COND_ALWAYS && dstp.is_int_register() && srcp.is_int_register())
 		{
 			dst = savedst;
-			skip.target = NULL;
+			skip.target = nullptr;
 			emit_cmovcc_r32_r32(dst, X86_CONDITION(inst.condition()), dstp.ireg(), srcp.ireg());
 																						// cmovcc dstp,srcp
 		}
@@ -4268,7 +4268,7 @@ void drcbe_x86::op_mov(x86code *&dst, const instruction &inst)
 	}
 
 	// resolve the jump
-	if (skip.target != NULL)
+	if (skip.target != nullptr)
 		track_resolve_link(dst, skip);
 }
 
@@ -6016,7 +6016,7 @@ void drcbe_x86::op_fmov(x86code *&dst, const instruction &inst)
 	be_parameter srcp(*this, inst.param(1), PTYPE_MF);
 
 	// always start with a jmp
-	emit_link skip = { 0 };
+	emit_link skip = { nullptr };
 	if (inst.condition() != uml::COND_ALWAYS)
 		emit_jcc_short_link(dst, X86_NOT_CONDITION(inst.condition()), skip);            // jcc   skip
 
@@ -6029,7 +6029,7 @@ void drcbe_x86::op_fmov(x86code *&dst, const instruction &inst)
 		emit_mov_m32_r32(dst, MABS(dstp.memory(4)), REG_EDX);                           // mov   [dstp + 4],edx
 
 	// resolve the jump
-	if (skip.target != NULL)
+	if (skip.target != nullptr)
 		track_resolve_link(dst, skip);                                              // skip:
 }
 

@@ -167,7 +167,7 @@ void nbmj8900_state::vramflip(int vram)
 
 	if (m_flipscreen == m_flipscreen_old) return;
 
-	vidram = vram ? m_videoram1 : m_videoram0;
+	vidram = vram ? m_videoram1.get() : m_videoram0.get();
 
 	for (y = 0; y < (height / 2); y++)
 	{
@@ -373,12 +373,12 @@ void nbmj8900_state::video_start()
 
 	m_screen->register_screen_bitmap(m_tmpbitmap0);
 	m_screen->register_screen_bitmap(m_tmpbitmap1);
-	m_videoram0 = auto_alloc_array(machine(), UINT8, m_screen_width * m_screen_height);
-	m_videoram1 = auto_alloc_array(machine(), UINT8, m_screen_width * m_screen_height);
-	m_palette_ptr = auto_alloc_array(machine(), UINT8, 0x200);
-	m_clut = auto_alloc_array(machine(), UINT8, 0x800);
-	memset(m_videoram0, 0xff, (m_screen_width * m_screen_height * sizeof(UINT8)));
-	memset(m_videoram1, 0xff, (m_screen_width * m_screen_height * sizeof(UINT8)));
+	m_videoram0 = std::make_unique<UINT8[]>(m_screen_width * m_screen_height);
+	m_videoram1 = std::make_unique<UINT8[]>(m_screen_width * m_screen_height);
+	m_palette_ptr = std::make_unique<UINT8[]>(0x200);
+	m_clut = std::make_unique<UINT8[]>(0x800);
+	memset(m_videoram0.get(), 0xff, (m_screen_width * m_screen_height * sizeof(UINT8)));
+	memset(m_videoram1.get(), 0xff, (m_screen_width * m_screen_height * sizeof(UINT8)));
 //  m_palette->pen(0x07f) = 0xff;    /* palette_transparent_pen */
 	m_gfxdraw_mode = 1;
 	m_screen_refresh = 1;
@@ -397,10 +397,10 @@ void nbmj8900_state::video_start()
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_clutsel));
 	//save_item(NAME(m_gfxdraw_mode)); //always 1?
-	save_pointer(NAME(m_videoram0), m_screen_width * m_screen_height);
-	save_pointer(NAME(m_videoram1), m_screen_width * m_screen_height);
-	save_pointer(NAME(m_palette_ptr), 0x200);
-	save_pointer(NAME(m_clut), 0x800);
+	save_pointer(NAME(m_videoram0.get()), m_screen_width * m_screen_height);
+	save_pointer(NAME(m_videoram1.get()), m_screen_width * m_screen_height);
+	save_pointer(NAME(m_palette_ptr.get()), 0x200);
+	save_pointer(NAME(m_clut.get()), 0x800);
 	save_item(NAME(m_flipscreen_old));
 }
 
@@ -447,12 +447,12 @@ UINT32 nbmj8900_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 		if (m_gfxdraw_mode)
 		{
-			copyscrollbitmap(bitmap, m_tmpbitmap0, 0, 0, 0, 0, cliprect);
-			copyscrollbitmap_trans(bitmap, m_tmpbitmap1, 0, 0, 1, &scrolly, cliprect, 0xff);
+			copyscrollbitmap(bitmap, m_tmpbitmap0, 0, nullptr, 0, nullptr, cliprect);
+			copyscrollbitmap_trans(bitmap, m_tmpbitmap1, 0, nullptr, 1, &scrolly, cliprect, 0xff);
 		}
 		else
 		{
-			copyscrollbitmap(bitmap, m_tmpbitmap0, 0, 0, 1, &scrolly, cliprect);
+			copyscrollbitmap(bitmap, m_tmpbitmap0, 0, nullptr, 1, &scrolly, cliprect);
 		}
 	}
 	else

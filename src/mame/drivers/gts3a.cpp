@@ -56,7 +56,7 @@ private:
 	UINT8 m_segment[4];
 	UINT8 m_u4b;
 	UINT8 m_dmd;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	required_device<m65c02_device> m_maincpu;
 	required_device<m65c02_device> m_dmdcpu;
 	required_device<via6522_device> m_u4;

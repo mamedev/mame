@@ -22,9 +22,9 @@ public:
 	/* video-related */
 	n64_rdp *m_rdp;
 
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	void n64_machine_stop();
 
 	UINT32 screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -139,8 +139,8 @@ public:
 	UINT32 dp_clock;
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	address_space *mem_map;
@@ -228,7 +228,6 @@ private:
 	UINT32 dd_track_offset;
 
 	// Peripheral Interface (PI) registers and functions
-	void pi_dma();
 	emu_timer *pi_dma_timer;
 	UINT32 pi_dram_addr;
 	UINT32 pi_cart_addr;

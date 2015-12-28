@@ -295,7 +295,7 @@ alpha_8201_device::alpha_8201_device(const machine_config &mconfig, const char *
 
 void alpha_8201_device::device_start()
 {
-	m_shared_ram = auto_alloc_array_clear(machine(), UINT8, 0x400);
+	m_shared_ram = make_unique_clear<UINT8[]>(0x400);
 
 	// zerofill
 	m_bus = 0;
@@ -304,7 +304,7 @@ void alpha_8201_device::device_start()
 	memset(m_mcu_r, 0, sizeof(m_mcu_r));
 
 	// register for savestates
-	save_pointer(NAME(m_shared_ram), 0x400);
+	save_pointer(NAME(m_shared_ram.get()), 0x400);
 	save_item(NAME(m_bus));
 	save_item(NAME(m_mcu_address));
 	save_item(NAME(m_mcu_d));

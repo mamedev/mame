@@ -60,18 +60,18 @@ imgtoolerr_t imgtool_create_cannonical_library(int omit_untested, imgtool_librar
 	/* if we are omitting untested, go through and block out the functionality in question */
 	if (omit_untested)
 	{
-		module = NULL;
-		while((module = imgtool_library_iterate(lib, module)) != NULL)
+		module = nullptr;
+		while((module = imgtool_library_iterate(lib, module)) != nullptr)
 		{
 			if (module->writing_untested)
 			{
-				module->write_sector = NULL;
+				module->write_sector = nullptr;
 			}
 			if (module->creation_untested)
 			{
-				module->create = NULL;
-				module->createimage_optguide = NULL;
-				module->createimage_optspec = NULL;
+				module->create = nullptr;
+				module->createimage_optguide = nullptr;
+				module->createimage_optspec = nullptr;
 			}
 		}
 	}

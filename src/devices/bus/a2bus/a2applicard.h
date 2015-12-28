@@ -28,7 +28,7 @@ public:
 	a2bus_applicard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_READ8_MEMBER( dma_r );
 	DECLARE_WRITE8_MEMBER( dma_w );
@@ -36,14 +36,14 @@ public:
 	DECLARE_WRITE8_MEMBER( z80_io_w );
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-	virtual const rom_entry *device_rom_region() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual const rom_entry *device_rom_region() const override;
 
 	// overrides of standard a2bus slot functions
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset);
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
-	virtual bool take_c800();
+	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
+	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
+	virtual bool take_c800() override;
 
 	required_device<cpu_device> m_z80;
 

@@ -32,7 +32,7 @@ public:
 	UINT32  m_scroll_bank;
 	UINT8   m_scroll_x[2];
 	UINT8   m_scroll_y[2];
-	UINT8   *m_scroll_ram;
+	std::unique_ptr<UINT8[]>   m_scroll_ram;
 	UINT8   m_screen_layout;
 	UINT8   m_chon;
 	UINT8   m_objon;
@@ -64,9 +64,9 @@ public:
 	TILEMAP_MAPPER_MEMBER(bg4x8_scan);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_blktiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

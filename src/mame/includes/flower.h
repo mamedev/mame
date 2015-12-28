@@ -43,7 +43,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_flower(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
@@ -89,18 +89,17 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	void make_mixer_table(int voices, int gain);
-	void show_soundregs();
 
 	// internal state
 	emu_timer *m_effect_timer;
@@ -115,9 +114,9 @@ private:
 	sound_stream * m_stream;
 
 	/* mixer tables and internal buffers */
-	INT16 *m_mixer_table;
+	std::unique_ptr<INT16[]> m_mixer_table;
 	INT16 *m_mixer_lookup;
-	short *m_mixer_buffer;
+	std::unique_ptr<short[]> m_mixer_buffer;
 
 	UINT8 m_soundregs1[0x40];
 	UINT8 m_soundregs2[0x40];

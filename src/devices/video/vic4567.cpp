@@ -172,7 +172,7 @@ void vic3_device::device_start()
 	width = m_screen->width();
 	height = m_screen->height();
 
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
+	m_bitmap = std::make_unique<bitmap_ind16>(width, height);
 
 	m_dma_read_cb.resolve_safe(0);
 	m_dma_read_color_cb.resolve_safe(0);
@@ -494,7 +494,7 @@ void vic3_device::draw_bitmap_multi( int ybegin, int yend, int ch, int yoff, int
 
 void vic3_device::draw_sprite_code( int y, int xbegin, int code, int color, int start_x, int end_x )
 {
-	register int mask, x;
+	int mask, x;
 
 	if ((y < YPOS) || (y >= (VIC2_STARTVISIBLELINES + VIC2_VISIBLELINES)) || (xbegin <= 1) || (xbegin >= (VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS)))
 		return;
@@ -511,7 +511,7 @@ void vic3_device::draw_sprite_code( int y, int xbegin, int code, int color, int 
 
 void vic3_device::draw_sprite_code_multi( int y, int xbegin, int code, int prior, int start_x, int end_x )
 {
-	register int x, mask, shift;
+	int x, mask, shift;
 
 	if ((y < YPOS) || (y >= (VIC2_STARTVISIBLELINES + VIC2_VISIBLELINES)) || (xbegin <= 1) || (xbegin >= (VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS)))
 		return;
@@ -782,7 +782,7 @@ void vic3_device::draw_sprite_multi( int nr, int yoff, int ybegin, int yend, int
 #ifndef memset16
 static void *memset16(void *dest, int value, size_t size)
 {
-	register int i;
+	int i;
 
 	for (i = 0; i < size; i++)
 		((short *) dest)[i] = value;

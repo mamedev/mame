@@ -101,9 +101,9 @@ void namcos2_shared_state::reset_all_subcpus(int state)
 
 MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 {
-	namcos2_kickstart = NULL;
-	m_eeprom = auto_alloc_array(machine(), UINT8, m_eeprom_size);
-	machine().device<nvram_device>("nvram")->set_base(m_eeprom, m_eeprom_size);
+	namcos2_kickstart = nullptr;
+	m_eeprom = std::make_unique<UINT8[]>(m_eeprom_size);
+	machine().device<nvram_device>("nvram")->set_base(m_eeprom.get(), m_eeprom_size);
 	m_posirq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos2_shared_state::namcos2_posirq_tick),this));
 }
 
@@ -448,9 +448,9 @@ void namcos2_shared_state::init_c148()
 UINT16 namcos2_shared_state::readwrite_c148( address_space &space, offs_t offset, UINT16 data, int bWrite )
 {
 	offs_t addr = ((offset * 2) + 0x1c0000) & 0x1fe000;
-	device_t *altcpu = NULL;
-	UINT16 *pC148Reg = NULL;
-	UINT16 *pC148RegAlt = NULL;
+	device_t *altcpu = nullptr;
+	UINT16 *pC148Reg = nullptr;
+	UINT16 *pC148RegAlt = nullptr;
 	UINT16 result = 0;
 
 	if (&space.device() == m_maincpu)
@@ -563,7 +563,7 @@ UINT16 namcos2_shared_state::readwrite_c148( address_space &space, offs_t offset
 				/* Suspend execution */
 				m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			}
-			if (namcos2_kickstart != NULL)
+			if (namcos2_kickstart != nullptr)
 			{
 				//printf( "dspkick=0x%x\n", data );
 				if (data & 0x04)

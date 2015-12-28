@@ -597,7 +597,7 @@ READ16_MEMBER(md_rom_chinf3_device::read)
 	 and the writes made at the start of the game.. */
 	if (offset >= 0x400000/2 && offset < 0x500000/2)
 	{
-		UINT32 retdat = 0;
+		UINT32 retdat;
 		/*
 		 04dc10 chifi3, prot_r? 2800
 		 04cefa chifi3, prot_r? 65262
@@ -1000,7 +1000,7 @@ WRITE16_MEMBER(md_rom_realtec_device::write)
 READ16_MEMBER(md_rom_redcl_device::read)
 {
 	if (offset == 0x400000/2)   return 0x55 << 8;
-	if (offset == 0x400004/2)   return -0x56 << 8;
+	if (offset == 0x400004/2)   return 0xaa << 8;
 
 	// non-protection accesses
 	if (offset < 0x400000/2)

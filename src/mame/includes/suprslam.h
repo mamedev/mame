@@ -49,7 +49,6 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<k053936_device> m_k053936;
 	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_READ16_MEMBER(pending_command_r);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(suprslam_sh_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(suprslam_screen_videoram_w);
@@ -57,9 +56,9 @@ public:
 	DECLARE_WRITE16_MEMBER(suprslam_bank_w);
 	TILE_GET_INFO_MEMBER(get_suprslam_tile_info);
 	TILE_GET_INFO_MEMBER(get_suprslam_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_suprslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;

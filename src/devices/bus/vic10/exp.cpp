@@ -113,9 +113,9 @@ bool vic10_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
-		size_t size = 0;
+		size_t size;
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			size = length();
 
@@ -141,8 +141,8 @@ bool vic10_expansion_slot_device::call_load()
 
 				if (cbm_crt_read_header(m_file, &roml_size, &romh_size, &exrom, &game))
 				{
-					UINT8 *roml = NULL;
-					UINT8 *romh = NULL;
+					UINT8 *roml = nullptr;
+					UINT8 *romh = nullptr;
 
 					m_card->m_lorom.allocate(roml_size);
 					m_card->m_uprom.allocate(romh_size);
@@ -205,7 +205,7 @@ void vic10_expansion_slot_device::get_default_card_software(std::string &result)
 
 UINT8 vic10_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		data = m_card->vic10_cd_r(space, offset, data, lorom, uprom, exram);
 	}
@@ -220,14 +220,14 @@ UINT8 vic10_expansion_slot_device::cd_r(address_space &space, offs_t offset, UIN
 
 void vic10_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram)
 {
-	if (m_card != NULL)
+	if (m_card != nullptr)
 	{
 		m_card->vic10_cd_w(space, offset, data, lorom, uprom, exram);
 	}
 }
 
-READ_LINE_MEMBER( vic10_expansion_slot_device::p0_r ) { int state = 0; if (m_card != NULL) state = m_card->vic10_p0_r(); return state; }
-WRITE_LINE_MEMBER( vic10_expansion_slot_device::p0_w ) { if (m_card != NULL) m_card->vic10_p0_w(state); }
+READ_LINE_MEMBER( vic10_expansion_slot_device::p0_r ) { int state = 0; if (m_card != nullptr) state = m_card->vic10_p0_r(); return state; }
+WRITE_LINE_MEMBER( vic10_expansion_slot_device::p0_w ) { if (m_card != nullptr) m_card->vic10_p0_w(state); }
 
 
 //-------------------------------------------------

@@ -70,7 +70,7 @@ sns_rom_bsmempak_device::sns_rom_bsmempak_device(const machine_config &mconfig, 
 
 void sns_rom_bsx_device::device_start()
 {
-	m_base_unit = auto_alloc(machine(), BSX_base(machine()));
+	m_base_unit = std::make_unique<BSX_base>(machine());
 	m_base_unit->init();
 
 	memset(m_cart_regs, 0x00, sizeof(m_cart_regs));
@@ -249,7 +249,7 @@ static SLOT_INTERFACE_START(bsx_cart)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( bs_slot )
-	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, NULL)
+	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, nullptr)
 MACHINE_CONFIG_END
 
 

@@ -65,8 +65,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_2151_w);
 	DECLARE_WRITE8_MEMBER(asuka_msm5205_start_w);
 	DECLARE_WRITE8_MEMBER(asuka_msm5205_stop_w);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_bonzeadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_asuka(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_asuka(screen_device &screen, bool state);
@@ -85,5 +85,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(asuka_msm5205_vck);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

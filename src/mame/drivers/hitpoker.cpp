@@ -64,9 +64,9 @@ public:
 	required_shared_ptr<UINT8> m_sys_regs;
 
 	UINT8 m_pic_data;
-	UINT8 *m_videoram;
-	UINT8 *m_paletteram;
-	UINT8 *m_colorram;
+	std::unique_ptr<UINT8[]> m_videoram;
+	std::unique_ptr<UINT8[]> m_paletteram;
+	std::unique_ptr<UINT8[]> m_colorram;
 	UINT8 m_eeprom_data[0x1000];
 	UINT16 m_eeprom_index;
 
@@ -82,9 +82,8 @@ public:
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_READ8_MEMBER(hitpoker_pic_r);
 	DECLARE_WRITE8_MEMBER(hitpoker_pic_w);
-	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_DRIVER_INIT(hitpoker);
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(hitpoker_irq);
 	required_device<cpu_device> m_maincpu;
@@ -97,9 +96,9 @@ public:
 
 void hitpoker_state::video_start()
 {
-	m_videoram = auto_alloc_array(machine(), UINT8, 0x35ff);
-	m_paletteram = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_colorram = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_videoram = std::make_unique<UINT8[]>(0x35ff);
+	m_paletteram = std::make_unique<UINT8[]>(0x1000);
+	m_colorram = std::make_unique<UINT8[]>(0x2000);
 }
 
 UINT32 hitpoker_state::screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

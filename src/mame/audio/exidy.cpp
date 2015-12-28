@@ -55,7 +55,7 @@ WRITE_LINE_MEMBER( exidy_sound_device::update_irq_state )
  *
  *************************************/
 
-INLINE void sh6840_apply_clock(struct sh6840_timer_channel *t, int clocks)
+static inline void sh6840_apply_clock(struct sh6840_timer_channel *t, int clocks)
 {
 	/* dual 8-bit case */
 	if (t->cr & 0x04)
@@ -215,7 +215,7 @@ exidy_sound_device::exidy_sound_device(const machine_config &mconfig, device_typ
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_riot_irq_state(0),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_freq_to_step(0),
 		m_sh6840_MSB_latch(0),
 		m_sh6840_LSB_latch(0),
@@ -248,8 +248,8 @@ void exidy_sound_device::device_start()
 {
 	/* indicate no additional hardware */
 	m_has_sh8253  = FALSE;
-	m_tms = NULL;
-	m_cvsd = NULL;
+	m_tms = nullptr;
+	m_cvsd = nullptr;
 
 	common_sh_start();
 }
@@ -413,10 +413,10 @@ void exidy_sound_device::r6532_irq(int state)
 
 WRITE8_MEMBER( exidy_sound_device::r6532_porta_w )
 {
-	if (m_cvsd != NULL)
+	if (m_cvsd != nullptr)
 		space.machine().device("cvsdcpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
-	if (m_tms != NULL)
+	if (m_tms != nullptr)
 	{
 		logerror("(%f)%s:TMS5220 data write = %02X\n", space.machine().time().as_double(), space.machine().describe_context(), m_riot->porta_out_get());
 		m_tms->data_w(space, 0, data);
@@ -425,7 +425,7 @@ WRITE8_MEMBER( exidy_sound_device::r6532_porta_w )
 
 READ8_MEMBER( exidy_sound_device::r6532_porta_r )
 {
-	if (m_tms != NULL)
+	if (m_tms != nullptr)
 	{
 		logerror("(%f)%s:TMS5220 status read = %02X\n", space.machine().time().as_double(), space.machine().describe_context(), m_tms->status_r(space, 0));
 		return m_tms->status_r(space, 0);
@@ -436,7 +436,7 @@ READ8_MEMBER( exidy_sound_device::r6532_porta_r )
 
 WRITE8_MEMBER( exidy_sound_device::r6532_portb_w )
 {
-	if (m_tms != NULL)
+	if (m_tms != nullptr)
 	{
 		m_tms->rsq_w(data & 0x01);
 		m_tms->wsq_w((data >> 1) & 0x01);
@@ -447,7 +447,7 @@ WRITE8_MEMBER( exidy_sound_device::r6532_portb_w )
 READ8_MEMBER( exidy_sound_device::r6532_portb_r )
 {
 	UINT8 newdata = m_riot->portb_in_get();
-	if (m_tms != NULL)
+	if (m_tms != nullptr)
 	{
 		newdata &= ~0x0c;
 		if (m_tms->readyq_r()) newdata |= 0x04;
@@ -695,7 +695,7 @@ void venture_sound_device::device_start()
 	m_riot = machine().device<riot6532_device>("riot");
 
 	m_has_sh8253  = TRUE;
-	m_tms = NULL;
+	m_tms = nullptr;
 	m_pia0 = machine().device<pia6821_device>("pia0");
 	m_pia1 = machine().device<pia6821_device>("pia1");
 
@@ -955,7 +955,7 @@ void victory_sound_device::device_start()
 	m_riot = machine().device<riot6532_device>("riot");
 
 	m_has_sh8253  = TRUE;
-	m_tms = NULL;
+	m_tms = nullptr;
 	m_pia0 = machine().device<pia6821_device>("pia0");
 	m_pia1 = machine().device<pia6821_device>("pia1");
 

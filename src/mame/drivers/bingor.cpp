@@ -455,7 +455,7 @@ public:
 		m_palette(*this, "palette")  { }
 
 	required_shared_ptr<UINT16> m_blit_ram;
-	virtual void video_start();
+	virtual void video_start() override;
 	UINT32 screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(unk_irq);

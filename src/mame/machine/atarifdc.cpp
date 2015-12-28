@@ -114,7 +114,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image)
 	int size, i;
 	const char *ext;
 
-	m_drv[id].image = auto_alloc_array(image.device().machine(),UINT8,MAXSIZE);
+	m_drv[id].image = std::make_unique<UINT8[]>(MAXSIZE);
 	if (!m_drv[id].image)
 		return;
 
@@ -132,11 +132,11 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image)
 		image.fseek(0, SEEK_SET);
 	}
 
-	size = image.fread(m_drv[id].image, MAXSIZE);
+	size = image.fread(m_drv[id].image.get(), MAXSIZE);
 
 	if( size <= 0 )
 	{
-		m_drv[id].image = NULL;
+		m_drv[id].image = nullptr;
 		return;
 	}
 
@@ -147,7 +147,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image)
 	ext = image.filetype();
 
 	// hack alert, this means we can only load ATR via the softlist at the moment, image.filetype reutrns NULL :/
-	if (image.software_entry() != NULL) ext="ATR";
+	if (image.software_entry() != nullptr) ext="ATR";
 
 	/* no extension: assume XFD format (no header) */
 	if (!ext)
@@ -276,7 +276,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image)
 	/* DSK format: it's all in the header */
 	case FORMAT_DSK:
 		{
-			atari_dsk_format *dsk = (atari_dsk_format *) m_drv[id].image;
+			atari_dsk_format *dsk = (atari_dsk_format *) m_drv[id].image.get();
 
 			m_drv[id].tracks = dsk->tracks;
 			m_drv[id].spt = dsk->spt;
@@ -749,7 +749,7 @@ legacy_floppy_image_device *atari_fdc_device::atari_floppy_get_device_child(int 
 		case 2 : return subdevice<legacy_floppy_image_device>(FLOPPY_2);
 		case 3 : return subdevice<legacy_floppy_image_device>(FLOPPY_3);
 	}
-	return NULL;
+	return nullptr;
 }
 
 const device_type ATARI_FDC = &device_creator<atari_fdc_device>;

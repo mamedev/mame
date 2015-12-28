@@ -246,9 +246,9 @@ public:
 	DECLARE_WRITE8_MEMBER(pc6001sr_vram_bank_w);
 	DECLARE_WRITE8_MEMBER(pc6001sr_system_latch_w);
 	DECLARE_WRITE8_MEMBER(necsr_ppi8255_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pc6001);
 	DECLARE_MACHINE_RESET(pc6001m2);
 	DECLARE_PALETTE_INIT(pc6001m2);
@@ -303,9 +303,6 @@ protected:
 	UINT8 check_joy_press();
 	UINT8 check_keyboard_press();
 	void vram_bank_change(UINT8 vram_bank);
-	ATTR_CONST UINT8 pc6001_get_attributes(UINT8 c,int scanline, int pos);
-	const UINT8 *pc6001_get_video_ram(int scanline);
-	UINT8 pc6001_get_char_rom(UINT8 ch, int line);
 };
 
 

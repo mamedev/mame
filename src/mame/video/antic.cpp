@@ -28,7 +28,7 @@ const device_type ATARI_ANTIC = &device_creator<antic_device>;
 antic_device::antic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 				device_t(mconfig, ATARI_ANTIC, "Atari ANTIC", tag, owner, clock, "antic", __FILE__),
 				device_video_interface(mconfig, *this),
-				m_gtia_tag(NULL),
+				m_gtia_tag(nullptr),
 				m_maincpu(*this, ":maincpu"),
 				m_djoy_b(*this, ":djoy_b"),
 				m_artifacts(*this, ":artifacts"),
@@ -65,9 +65,9 @@ void antic_device::device_start()
 	m_gtia = machine().device<gtia_device>(m_gtia_tag);
 	assert(m_gtia);
 
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), m_screen->width(), m_screen->height());
+	m_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
 
-	m_cclk_expand = auto_alloc_array_clear(machine(), UINT32, 21 * 256);
+	m_cclk_expand = make_unique_clear<UINT32[]>(21 * 256);
 
 	m_pf_21       = &m_cclk_expand[ 0 * 256];
 	m_pf_x10b     = &m_cclk_expand[ 1 * 256];
@@ -79,9 +79,9 @@ void antic_device::device_start()
 	m_pf_gtia2    = &m_cclk_expand[19 * 256];
 	m_pf_gtia3    = &m_cclk_expand[20 * 256];
 
-	m_used_colors = auto_alloc_array(machine(), UINT8, 21 * 256);
+	m_used_colors = std::make_unique<UINT8[]>(21 * 256);
 
-	memset(m_used_colors, 0, 21 * 256 * sizeof(UINT8));
+	memset(m_used_colors.get(), 0, 21 * 256 * sizeof(UINT8));
 
 	m_uc_21       = &m_used_colors[ 0 * 256];
 	m_uc_x10b     = &m_used_colors[ 1 * 256];
@@ -96,8 +96,8 @@ void antic_device::device_start()
 	LOG(("atari cclk_init\n"));
 	cclk_init();
 
-	for (int i = 0; i < 64; i++)
-		m_prio_table[i] = auto_alloc_array_clear(machine(), UINT8, 8*256);
+	for (auto & elem : m_prio_table)
+		elem = make_unique_clear<UINT8[]>(8*256);
 
 	LOG(("atari prio_init\n"));
 	prio_init();
@@ -133,8 +133,8 @@ void antic_device::device_start()
 	save_item(NAME(m_cclock));
 	save_item(NAME(m_pmbits));
 
-	save_pointer(NAME(m_cclk_expand), 21 * 256);
-	save_pointer(NAME(m_used_colors), 21 * 256);
+	save_pointer(NAME(m_cclk_expand.get()), 21 * 256);
+	save_pointer(NAME(m_used_colors.get()), 21 * 256);
 }
 
 
@@ -1655,7 +1655,7 @@ void antic_device::linerefresh()
 	dst[2] = color_lookup[PBK] | color_lookup[PBK] << 16;
 	dst[3] = color_lookup[PBK] | color_lookup[PBK] << 16;
 
-	draw_scanline8(*m_bitmap, 12, y, MIN(m_bitmap->width() - 12, sizeof(scanline)), (const UINT8 *) scanline, NULL);
+	draw_scanline8(*m_bitmap, 12, y, MIN(m_bitmap->width() - 12, sizeof(scanline)), (const UINT8 *) scanline, nullptr);
 }
 
 
@@ -1804,7 +1804,7 @@ TIMER_CALLBACK_MEMBER( antic_device::scanline_render )
 	}
 
 	if (m_scanline >= VBL_END && m_scanline < 256)
-		m_gtia->render((UINT8 *)m_pmbits + PMOFFSET, (UINT8 *)m_cclock + PMOFFSET - m_hscrol_old, (UINT8 *)m_prio_table[m_gtia->get_w_prior() & 0x3f], (UINT8 *)&m_pmbits);
+		m_gtia->render((UINT8 *)m_pmbits + PMOFFSET, (UINT8 *)m_cclock + PMOFFSET - m_hscrol_old, m_prio_table[m_gtia->get_w_prior() & 0x3f].get(), (UINT8 *)&m_pmbits);
 
 	m_steal_cycles += CYCLES_REFRESH;
 	LOG(("           run CPU for %d cycles\n", CYCLES_HSYNC - CYCLES_HSTART - m_steal_cycles));

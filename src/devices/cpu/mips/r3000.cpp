@@ -128,8 +128,8 @@ r3000_device::r3000_device(const machine_config &mconfig, device_type type, cons
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config_be("program", ENDIANNESS_BIG, 32, 29),
 		m_program_config_le("program", ENDIANNESS_LITTLE, 32, 29),
-		m_program(NULL),
-		m_direct(NULL),
+		m_program(nullptr),
+		m_direct(nullptr),
 		m_chip_type(chiptype),
 		m_hasfpu(false),
 		m_endianness(ENDIANNESS_BIG),
@@ -399,7 +399,7 @@ const address_space_config *r3000_device::memory_space_config(address_spacenum s
 	if (spacenum == AS_PROGRAM)
 		return (m_endianness == ENDIANNESS_BIG) ? &m_program_config_be : &m_program_config_le;
 	else
-		return NULL;
+		return nullptr;
 }
 
 

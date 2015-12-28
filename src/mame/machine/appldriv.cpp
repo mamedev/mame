@@ -19,9 +19,9 @@
 #define PARENT_FLOPPY_2 "^floppy2"
 #define PARENT_FLOPPY_3 "^floppy3"
 
-INLINE apple525_floppy_image_device *get_device(device_t *device)
+static inline apple525_floppy_image_device *get_device(device_t *device)
 {
-	assert(device != NULL);
+	assert(device != nullptr);
 	assert(device->type() == FLOPPY_APPLE);
 
 	return (apple525_floppy_image_device *) downcast<apple525_floppy_image_device *>(device);
@@ -37,7 +37,7 @@ legacy_floppy_image_device *apple525_get_subdevice(device_t *device, int drive)
 		case 2 : return device->subdevice<legacy_floppy_image_device>(PARENT_FLOPPY_2);
 		case 3 : return device->subdevice<legacy_floppy_image_device>(PARENT_FLOPPY_3);
 	}
-	return NULL;
+	return nullptr;
 }
 
 device_t *apple525_get_device_by_type(device_t *device, int ftype, int drive)
@@ -53,7 +53,7 @@ device_t *apple525_get_device_by_type(device_t *device, int ftype, int drive)
 			cnt++;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 void apple525_set_enable_lines(device_t *device,int enable_mask)
@@ -166,10 +166,10 @@ static void apple525_disk_set_lines(device_t *device,device_t *image, UINT8 new_
 int apple525_get_count(device_t *device)
 {
 	int cnt = 0;
-	if ((device->subdevice("^" FLOPPY_0)!=NULL) && (device->subdevice<legacy_floppy_image_device>("^" FLOPPY_0)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_0))!=NULL)) cnt++;
-	if ((device->subdevice("^" FLOPPY_1)!=NULL) && (device->subdevice<legacy_floppy_image_device>("^" FLOPPY_1)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_1))!=NULL)) cnt++;
-	if ((device->subdevice("^" FLOPPY_2)!=NULL) && (device->subdevice<legacy_floppy_image_device>("^" FLOPPY_2)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_2))!=NULL)) cnt++;
-	if ((device->subdevice("^" FLOPPY_3)!=NULL) && (device->subdevice<legacy_floppy_image_device>("^" FLOPPY_3)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_3))!=NULL)) cnt++;
+	if ((device->subdevice("^" FLOPPY_0)!=nullptr) && (device->subdevice<legacy_floppy_image_device>("^" FLOPPY_0)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_0))!=nullptr)) cnt++;
+	if ((device->subdevice("^" FLOPPY_1)!=nullptr) && (device->subdevice<legacy_floppy_image_device>("^" FLOPPY_1)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_1))!=nullptr)) cnt++;
+	if ((device->subdevice("^" FLOPPY_2)!=nullptr) && (device->subdevice<legacy_floppy_image_device>("^" FLOPPY_2)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_2))!=nullptr)) cnt++;
+	if ((device->subdevice("^" FLOPPY_3)!=nullptr) && (device->subdevice<legacy_floppy_image_device>("^" FLOPPY_3)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_3))!=nullptr)) cnt++;
 
 	return cnt;
 }
@@ -253,7 +253,7 @@ static device_t *apple525_selected_image(device_t *device)
 		if (apple525_enable_mask & (1 << i))
 			return apple525_get_device_by_type(device, FLOPPY_TYPE_APPLE, i);
 	}
-	return NULL;
+	return nullptr;
 }
 
 UINT8 apple525_read_data(device_t *device)

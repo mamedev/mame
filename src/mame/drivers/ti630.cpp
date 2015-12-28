@@ -53,8 +53,8 @@ public:
 	DECLARE_DRIVER_INIT(ti630);
 	DECLARE_PALETTE_INIT(ti630);
 private:
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 };

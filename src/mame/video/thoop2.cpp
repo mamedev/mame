@@ -90,7 +90,7 @@ void thoop2_state::video_start()
 	m_pant[1]->set_transmask(0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
 
 	for (i = 0; i < 5; i++){
-		m_sprite_table[i] = auto_alloc_array(machine(), int, 512);
+		m_sprite_table[i] = std::make_unique<int[]>(512);
 	}
 }
 

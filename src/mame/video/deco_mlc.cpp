@@ -24,15 +24,15 @@ VIDEO_START_MEMBER(deco_mlc_state,mlc)
 	else
 		m_colour_mask=0x1f;
 
-//  temp_bitmap = auto_bitmap_rgb32_alloc( machine(), 512, 512 );
-	m_mlc_buffered_spriteram = auto_alloc_array(machine(), UINT16, 0x3000/2);
-	m_mlc_spriteram_spare = auto_alloc_array(machine(), UINT16, 0x3000/2);
-	m_mlc_spriteram = auto_alloc_array(machine(), UINT16, 0x3000/2);
+//  temp_bitmap = std::make_unique<bitmap_rgb32>(512, 512 );
+	m_mlc_buffered_spriteram = std::make_unique<UINT16[]>(0x3000/2);
+	m_mlc_spriteram_spare = std::make_unique<UINT16[]>(0x3000/2);
+	m_mlc_spriteram = std::make_unique<UINT16[]>(0x3000/2);
 
 
-	save_pointer(NAME(m_mlc_spriteram), 0x3000/2);
-	save_pointer(NAME(m_mlc_spriteram_spare), 0x3000/2);
-	save_pointer(NAME(m_mlc_buffered_spriteram), 0x3000/2);
+	save_pointer(NAME(m_mlc_spriteram.get()), 0x3000/2);
+	save_pointer(NAME(m_mlc_spriteram_spare.get()), 0x3000/2);
+	save_pointer(NAME(m_mlc_buffered_spriteram.get()), 0x3000/2);
 
 }
 
@@ -137,7 +137,7 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 
 void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT32* dest)
 {
-	UINT32 *index_ptr=0;
+	UINT32 *index_ptr=nullptr;
 	int offs,fx=0,fy=0,x,y,color,colorOffset,sprite,indx,h,w,bx,by,fx1,fy1;
 	int xoffs,yoffs;
 	UINT8 *rom = memregion("gfx2")->base() + 0x20000, *index_ptr8;
@@ -153,7 +153,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 
 	int clipper=0;
 	rectangle user_clip;
-	UINT16* mlc_spriteram=m_mlc_buffered_spriteram; // spriteram32
+	UINT16* mlc_spriteram=m_mlc_buffered_spriteram.get(); // spriteram32
 
 	//printf("%d - (%08x %08x %08x) (%08x %08x %08x) (%08x %08x %08x)\n", scanline, m_irq_ram[6], m_irq_ram[7], m_irq_ram[8], m_irq_ram[9], m_irq_ram[10], m_irq_ram[11] , m_irq_ram[12] , m_irq_ram[13] , m_irq_ram[14]);
 
@@ -547,7 +547,7 @@ void deco_mlc_state::screen_eof_mlc(screen_device &screen, bool state)
 		lookup table.  Without buffering incorrect one frame glitches are seen
 		in several places, especially in Hoops.
 		*/
-		memcpy(m_mlc_buffered_spriteram, m_mlc_spriteram, 0x3000/2);
+		memcpy(m_mlc_buffered_spriteram.get(), m_mlc_spriteram.get(), 0x3000/2);
 	}
 }
 

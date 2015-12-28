@@ -313,7 +313,7 @@ static const char *const TMS32025Formats[] = {
 	FMT("111111011mmmnnnnbbbbbbbbbbbbbbbb", "blkd %B,%M%N"),
 	FMT("111111101mmmnnnnbbbbbbbbbbbbbbbb", "call %B %M%N"),    /* FExx */
 	FMT("111111111mmmnnnnbbbbbbbbbbbbbbbb", "b    %B %M%N"),    /* FFxx */
-	NULL
+	nullptr
 };
 
 #define MAX_OPS ((ARRAY_LENGTH(TMS32025Formats) - 1) / PTRS_PER_FORMAT)

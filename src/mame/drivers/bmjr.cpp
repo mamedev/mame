@@ -50,9 +50,9 @@ public:
 	UINT8 m_xor_display;
 	UINT8 m_key_mux;
 	DECLARE_DRIVER_INIT(bmjr);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

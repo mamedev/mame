@@ -37,7 +37,7 @@ sams_memory_expansion_device::sams_memory_expansion_device(const machine_config 
 */
 READ8Z_MEMBER(sams_memory_expansion_device::readz)
 {
-	int base = 0;
+	int base;
 
 	if (m_access_mapper && ((offset & 0xe000)==0x4000))
 	{
@@ -61,7 +61,7 @@ READ8Z_MEMBER(sams_memory_expansion_device::readz)
 
 WRITE8_MEMBER(sams_memory_expansion_device::write)
 {
-	int base = 0;
+	int base;
 
 	if (m_access_mapper && ((offset & 0xe000)==0x4000))
 	{
@@ -122,7 +122,7 @@ void sams_memory_expansion_device::device_reset()
 	// Resetting values
 	m_map_mode = false;
 	m_access_mapper = false;
-	for (int i=0; i < 16; i++) m_mapper[i] = 0;
+	for (auto & elem : m_mapper) elem = 0;
 }
 
 const rom_entry *sams_memory_expansion_device::device_rom_region() const

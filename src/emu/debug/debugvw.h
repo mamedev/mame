@@ -117,7 +117,7 @@ class debug_view_source
 
 public:
 	// construction/destruction
-	debug_view_source(const char *name, device_t *device = NULL);
+	debug_view_source(const char *name, device_t *device = nullptr);
 	virtual ~debug_view_source();
 
 	// getters

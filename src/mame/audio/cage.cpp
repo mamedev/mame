@@ -56,45 +56,45 @@
 
 static const char *const register_names[] =
 {
-	"TMS32031-DMA global control", NULL, NULL, NULL,
-	"TMS32031-DMA source address", NULL, "TMS32031-DMA destination address", NULL,
-	"TMS32031-DMA transfer counter", NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL,
+	"TMS32031-DMA global control", nullptr, nullptr, nullptr,
+	"TMS32031-DMA source address", nullptr, "TMS32031-DMA destination address", nullptr,
+	"TMS32031-DMA transfer counter", nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr,
 
-	NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL,
+	nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr,
 
-	"TMS32031-Timer 0 global control", NULL, NULL, NULL,
-	"TMS32031-Timer 0 counter", NULL, NULL, NULL,
-	"TMS32031-Timer 0 period", NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL,
+	"TMS32031-Timer 0 global control", nullptr, nullptr, nullptr,
+	"TMS32031-Timer 0 counter", nullptr, nullptr, nullptr,
+	"TMS32031-Timer 0 period", nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr,
 
-	"TMS32031-Timer 1 global control", NULL, NULL, NULL,
-	"TMS32031-Timer 1 counter", NULL, NULL, NULL,
-	"TMS32031-Timer 1 period", NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL,
+	"TMS32031-Timer 1 global control", nullptr, nullptr, nullptr,
+	"TMS32031-Timer 1 counter", nullptr, nullptr, nullptr,
+	"TMS32031-Timer 1 period", nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr,
 
-	"TMS32031-Serial port global control", NULL, "TMS32031-Serial port TX control", "TMS32031-Serial port RX control",
-	"TMS32031-Serial port timer control", "TMS32031-Serial port timer counter", "TMS32031-Serial port timer period", NULL,
-	"TMS32031-Serial port data TX", NULL, NULL, NULL,
-	"TMS32031-Serial port data RX", NULL, NULL, NULL,
+	"TMS32031-Serial port global control", nullptr, "TMS32031-Serial port TX control", "TMS32031-Serial port RX control",
+	"TMS32031-Serial port timer control", "TMS32031-Serial port timer counter", "TMS32031-Serial port timer period", nullptr,
+	"TMS32031-Serial port data TX", nullptr, nullptr, nullptr,
+	"TMS32031-Serial port data RX", nullptr, nullptr, nullptr,
 
-	NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL,
+	nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr,
 
-	NULL, NULL, NULL, NULL,
-	"TMS32031-Primary bus control", NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL,
+	nullptr, nullptr, nullptr, nullptr,
+	"TMS32031-Primary bus control", nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr,
 
-	NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL,
-	NULL, NULL, NULL, NULL
+	nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr
 };
 
 

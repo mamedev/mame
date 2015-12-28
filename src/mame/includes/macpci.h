@@ -95,8 +95,8 @@ public:
 	optional_device<ncr539x_device> m_539x_1;
 	optional_device<ncr539x_device> m_539x_2;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	model_t m_model;
 
@@ -117,11 +117,6 @@ public:
 
 	// this is shared among all video setups with vram
 	UINT32 *m_vram;
-
-	// defined in machine/mac.c
-	void set_via_interrupt(int value);
-	void vblank_irq();
-	void mac_adb_newaction(int state);
 
 	DECLARE_READ16_MEMBER ( mac_via_r );
 	DECLARE_WRITE16_MEMBER ( mac_via_w );

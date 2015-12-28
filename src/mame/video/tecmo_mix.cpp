@@ -234,7 +234,9 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 					else
 					{
 						dd[x] = paldata[sprpixel + m_spregular_comp];
-						//dd[x] = rand();
+                        //dd[x] = rand();
+						// the bad tiles on the wildfang map (shown between levels) are drawn here.. why? looks like they should be transparent? 
+						// most wildfang sprites use this and are fine, so what's going wrong?
 					}
 				}
 

@@ -249,7 +249,7 @@ READ8_MEMBER( excali64_state::porte8_r )
 
 WRITE8_MEMBER( excali64_state::porte4_w )
 {
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 	if (BIT(data, 0))
 		floppy = m_floppy0->get_device();
 

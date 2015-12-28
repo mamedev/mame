@@ -833,7 +833,7 @@ DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3_swap)
 		0x06, 0x02, 0x07, 0x03, 0x0e, 0x0a, 0x0f, 0x0b,     0x31, 0x21, 0x39, 0x29, 0x33, 0x23, 0x3b, 0x2b,
 	};
 
-	UINT8*  buffer = auto_alloc_array(machine(), UINT8, 0x10000);
+	auto buffer = std::make_unique<UINT8[]>(0x10000);
 	UINT8 *rom = memregion( "maincpu" )->base();
 
 
@@ -842,7 +842,7 @@ DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3_swap)
 		buffer[i] = rom[(i&0xff80)|table[i&0x7f]];
 	}
 
-	memcpy(rom,buffer,0x10000);
+	memcpy(rom,buffer.get(),0x10000);
 
 }
 

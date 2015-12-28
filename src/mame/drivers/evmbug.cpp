@@ -30,7 +30,7 @@ public:
 	DECLARE_READ8_MEMBER(rs232_r);
 	DECLARE_WRITE8_MEMBER(rs232_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	UINT8 m_term_data;
 	UINT8 m_term_out;
 	required_device<cpu_device> m_maincpu;

@@ -113,9 +113,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia_u75_cb2_w);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( squale_cart );
-
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	UINT8 keyboard_line;
 	UINT8 fdc_sel0;

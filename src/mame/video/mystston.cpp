@@ -81,7 +81,7 @@ void mystston_state::set_palette()
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 4700,
 			2, resistances_b,  weights_b,  0, 4700,
-			0, 0, 0, 0, 0);
+			0, nullptr, nullptr, 0, 0);
 
 	for (i = 0; i < 0x40; i++)
 	{

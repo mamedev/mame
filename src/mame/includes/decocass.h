@@ -35,7 +35,7 @@ public:
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette")
 	{
-		m_type1_map = 0;
+		m_type1_map = nullptr;
 	}
 
 	/* devices */
@@ -136,9 +136,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_l_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_r_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(decocass);
 	DECLARE_MACHINE_RESET(ctsttape);
 	DECLARE_MACHINE_RESET(cprogolfj);

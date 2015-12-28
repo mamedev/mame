@@ -562,8 +562,8 @@ void ygv608_device::device_start()
 	m_tilemap_B_cache_16[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 64,32);
 	m_tilemap_B_cache_16[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,64);
 
-	m_tilemap_A = NULL;
-	m_tilemap_B = NULL;
+	m_tilemap_A = nullptr;
+	m_tilemap_B = nullptr;
 
 	register_state_save();
 }

@@ -63,7 +63,7 @@ WRITE8_MEMBER( simpsons_state::banking_callback )
 
 void simpsons_state::machine_start()
 {
-	m_spriteram = auto_alloc_array_clear(machine(), UINT16, 0x1000 / 2);
+	m_spriteram = make_unique_clear<UINT16[]>(0x1000 / 2);
 
 	membank("bank1")->configure_entries(0, 64, memregion("maincpu")->base(), 0x2000);
 
@@ -74,7 +74,7 @@ void simpsons_state::machine_start()
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
-	save_pointer(NAME(m_spriteram), 0x1000 / 2);
+	save_pointer(NAME(m_spriteram.get()), 0x1000 / 2);
 }
 
 void simpsons_state::machine_reset()

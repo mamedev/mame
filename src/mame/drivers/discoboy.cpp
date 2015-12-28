@@ -90,12 +90,11 @@ public:
 	DECLARE_WRITE8_MEMBER(yunsung8_adpcm_w);
 	DECLARE_WRITE8_MEMBER(yunsung8_sound_bankswitch_w);
 	DECLARE_DRIVER_INIT(discoboy);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_discoboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void discoboy_setrombank( UINT8 data );
 	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;

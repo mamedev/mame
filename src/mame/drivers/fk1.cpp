@@ -55,7 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fk1_reset_int_w);
 	UINT8 m_video_rol;
 	UINT8 m_int_vector;
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_callback);

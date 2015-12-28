@@ -42,8 +42,6 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ8_MEMBER(pasopia_romram_r);
-	DECLARE_WRITE8_MEMBER(pasopia_ram_w);
 	DECLARE_WRITE8_MEMBER(pasopia_ctrl_w);
 	DECLARE_WRITE8_MEMBER(vram_addr_lo_w);
 	DECLARE_WRITE8_MEMBER(vram_latch_w);
@@ -52,11 +50,6 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_addr_hi_w);
 	DECLARE_WRITE8_MEMBER(screen_mode_w);
 	DECLARE_READ8_MEMBER(rombank_r);
-	DECLARE_READ8_MEMBER(testa_r);
-	DECLARE_READ8_MEMBER(testb_r);
-	DECLARE_WRITE_LINE_MEMBER(testa_w);
-	DECLARE_WRITE_LINE_MEMBER(testb_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_READ8_MEMBER(keyb_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
@@ -73,9 +66,9 @@ public:
 	UINT8 *m_p_vram;
 	DECLARE_DRIVER_INIT(pasopia);
 	TIMER_CALLBACK_MEMBER(pio_timer);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 };
 
 // needed to scan the keyboard, as the pio emulation doesn't do it.
@@ -275,7 +268,7 @@ static const z80_daisy_config pasopia_daisy[] =
 	{ "z80ctc" },
 	{ "z80pio" },
 //  { "upd765" }, /* TODO */
-	{ NULL }
+	{ nullptr }
 };
 
 

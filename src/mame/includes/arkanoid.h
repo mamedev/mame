@@ -72,7 +72,6 @@ public:
 	DECLARE_READ8_MEMBER(arkanoid_bootleg_f000_r);
 	DECLARE_READ8_MEMBER(arkanoid_bootleg_f002_r);
 	DECLARE_WRITE8_MEMBER(arkanoid_bootleg_d018_w);
-	DECLARE_READ8_MEMBER(block2_bootleg_f000_r);
 	DECLARE_READ8_MEMBER(arkanoid_bootleg_d008_r);
 	DECLARE_WRITE8_MEMBER(arkanoid_videoram_w);
 	DECLARE_WRITE8_MEMBER(arkanoid_d008_w);
@@ -97,9 +96,9 @@ public:
 	DECLARE_DRIVER_INIT(arkangc);
 	DECLARE_DRIVER_INIT(brixian);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_arkanoid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hexa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(test);

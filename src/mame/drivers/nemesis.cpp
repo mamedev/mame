@@ -246,7 +246,7 @@ READ8_MEMBER(nemesis_state::nemesis_portA_r)
 
 	res |= 0xd0;
 
-	if (m_vlm != NULL && m_vlm->bsy())
+	if (m_vlm != nullptr && m_vlm->bsy())
 		res |= 0x20;
 
 	return res;
@@ -1450,7 +1450,7 @@ void nemesis_state::machine_start()
 	save_item(NAME(m_irq_port_last));
 
 	/* gx400 voice data is not in a ROM but in sound RAM at $8000 */
-	if (m_vlm != NULL && memregion("vlm")->bytes() == 0x800)
+	if (m_vlm != nullptr && memregion("vlm")->bytes() == 0x800)
 		m_vlm->set_rom(m_voiceram);
 }
 

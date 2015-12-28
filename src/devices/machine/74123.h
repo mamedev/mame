@@ -113,10 +113,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load() { }
-	virtual void device_clock_changed() { }
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override { }
+	virtual void device_clock_changed() override { }
 
 	TIMER_CALLBACK_MEMBER( output_callback );
 	TIMER_CALLBACK_MEMBER( clear_callback );
@@ -125,10 +125,8 @@ private:
 
 	int timer_running();
 	void start_pulse();
-	void output(INT32 param);
 	void set_output();
 	attotime compute_duration();
-	void clear();
 
 	emu_timer *m_timer;
 	int m_connection_type;  /* the hook up type - one of the constants above */

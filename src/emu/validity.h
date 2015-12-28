@@ -29,8 +29,8 @@ class machine_config;
 class validity_checker : public osd_output
 {
 	// internal map types
-	typedef tagmap_t<const game_driver *> game_driver_map;
-	typedef tagmap_t<FPTR> int_map;
+	typedef std::unordered_map<std::string,const game_driver *> game_driver_map;
+	typedef std::unordered_map<std::string,FPTR> int_map;
 
 public:
 	validity_checker(emu_options &options);
@@ -47,15 +47,15 @@ public:
 
 	// helpers for devices
 	void validate_tag(const char *tag);
-	int region_length(const char *tag) { return m_region_map.find(tag); }
+	int region_length(const char *tag) { return m_region_map.find(tag)->second; }
 
 	// generic registry of already-checked stuff
-	bool already_checked(const char *string) { return (m_already_checked.add(string, 1, false) == TMERR_DUPLICATE); }
+	bool already_checked(const char *string) { return m_already_checked.insert(string).second; }
 
 	// osd_output interface
 
 protected:
-	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args);
+	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args) override;
 
 private:
 	// internal helpers
@@ -74,13 +74,14 @@ private:
 	void validate_roms();
 	void validate_analog_input_field(ioport_field &field);
 	void validate_dip_settings(ioport_field &field);
-	void validate_condition(ioport_condition &condition, device_t &device, int_map &port_map);
+	void validate_condition(ioport_condition &condition, device_t &device, std::unordered_set<std::string> &port_map);
 	void validate_inputs();
 	void validate_devices();
 
 	// output helpers
 	void build_output_prefix(std::string &str);
 	void output_via_delegate(osd_output_channel channel, const char *format, ...) ATTR_PRINTF(3,4);
+	void output_indented_errors(std::string &text, const char *header);
 
 	// internal driver list
 	driver_enumerator       m_drivlist;
@@ -88,6 +89,7 @@ private:
 	// error tracking
 	int                     m_errors;
 	int                     m_warnings;
+	bool                    m_verbose;
 	std::string             m_error_text;
 	std::string             m_warning_text;
 
@@ -103,7 +105,7 @@ private:
 	const device_t *        m_current_device;
 	const char *            m_current_ioport;
 	int_map                 m_region_map;
-	tagmap_t<UINT8>         m_already_checked;
+	std::unordered_set<std::string>   m_already_checked;
 
 };
 

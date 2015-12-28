@@ -56,8 +56,8 @@ UINT32 vaportra_state::screen_update_vaportra(screen_device &screen, bitmap_ind1
 	int pri = m_priority[0] & 0x03;
 
 	flip_screen_set(!BIT(flip, 7));
-	m_deco_tilegen1->pf_update(0, 0);
-	m_deco_tilegen2->pf_update(0, 0);
+	m_deco_tilegen1->pf_update(nullptr, nullptr);
+	m_deco_tilegen2->pf_update(nullptr, nullptr);
 
 	m_spritegen->set_pri_type(1); // force priorities to be handled in a different way for this driver for now
 

@@ -30,7 +30,7 @@ scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, d
 	m_IR11_display_pointer_address_upper(0), m_IR11_reset_scanline_counter_on_scrollup(0), m_IR11_reset_scanline_counter_on_scrolldown(0), m_IR12_scroll_start(0), m_IR12_split_register_1(0),
 	m_IR13_scroll_end(0), m_IR13_split_register_2(0), m_IR14_scroll_lines(0), m_IR14_double_1(0), m_IR14_double_2(0), m_spl1(0), m_spl2(0), m_dbl1(0), m_buffer(0), m_linecounter(0), m_address(0),
 	m_start1change(0), m_irq_state(0), m_scanline_timer(nullptr),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(scn2674_vram))
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(scn2674_vram))
 {
 }
 

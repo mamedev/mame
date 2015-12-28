@@ -358,15 +358,15 @@ public:
 	cobra_renderer(screen_device &screen)
 		: poly_manager<float, cobra_polydata, 8, 10000>(screen)
 	{
-		m_texture_ram = auto_alloc_array(machine(), UINT32, 0x100000);
+		m_texture_ram = std::make_unique<UINT32[]>(0x100000);
 
-		m_framebuffer = auto_bitmap_rgb32_alloc(machine(), 1024, 1024);
-		m_backbuffer = auto_bitmap_rgb32_alloc(machine(), 1024, 1024);
-		m_overlay = auto_bitmap_rgb32_alloc(machine(), 1024, 1024);
-		m_zbuffer = auto_bitmap_ind32_alloc(machine(), 1024, 1024);
-		m_stencil = auto_bitmap_ind32_alloc(machine(), 1024, 1024);
+		m_framebuffer = std::make_unique<bitmap_rgb32>( 1024, 1024);
+		m_backbuffer = std::make_unique<bitmap_rgb32>( 1024, 1024);
+		m_overlay = std::make_unique<bitmap_rgb32>( 1024, 1024);
+		m_zbuffer = std::make_unique<bitmap_ind32>(1024, 1024);
+		m_stencil = std::make_unique<bitmap_ind32>(1024, 1024);
 
-		m_gfx_regmask = auto_alloc_array(machine(), UINT32, 0x100);
+		m_gfx_regmask = std::make_unique<UINT32[]>(0x100);
 		for (int i=0; i < 0x100; i++)
 		{
 			UINT32 mask = 0;
@@ -400,19 +400,19 @@ public:
 	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
 	inline rgb_t texture_fetch(UINT32 *texture, int u, int v, int width, int format);
 private:
-	bitmap_rgb32 *m_framebuffer;
-	bitmap_rgb32 *m_backbuffer;
-	bitmap_rgb32 *m_overlay;
-	bitmap_ind32 *m_zbuffer;
-	bitmap_ind32 *m_stencil;
+	std::unique_ptr<bitmap_rgb32> m_framebuffer;
+	std::unique_ptr<bitmap_rgb32> m_backbuffer;
+	std::unique_ptr<bitmap_rgb32> m_overlay;
+	std::unique_ptr<bitmap_ind32> m_zbuffer;
+	std::unique_ptr<bitmap_ind32> m_stencil;
 
-	UINT32 *m_texture_ram;
+	std::unique_ptr<UINT32[]> m_texture_ram;
 
-	UINT32 *m_gfx_gram;
-	UINT32 *m_gfx_regmask;
+	std::unique_ptr<UINT32[]> m_gfx_gram;
+	std::unique_ptr<UINT32[]> m_gfx_regmask;
 
 	UINT32 m_gfx_register_select;
-	UINT64 *m_gfx_register;
+	std::unique_ptr<UINT64[]> m_gfx_register;
 
 	UINT32 m_texram_ptr;
 
@@ -451,7 +451,7 @@ public:
 
 	cobra_fifo(running_machine &machine, int capacity, const char *name, bool verbose, event_delegate event_callback)
 	{
-		m_data = auto_alloc_array(machine, UINT64, capacity);
+		m_data = std::make_unique<UINT64[]>(capacity);
 
 		m_name = name;
 		m_size = capacity;
@@ -481,7 +481,7 @@ private:
 	int m_num;
 	bool m_verbose;
 	const char *m_name;
-	UINT64 *m_data;
+	std::unique_ptr<UINT64[]> m_data;
 	event_delegate m_event_callback;
 };
 
@@ -494,8 +494,8 @@ public:
 	cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual bool switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch);
-	virtual bool coin_counters(UINT8 *&buf, UINT8 count);
+	virtual bool switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch) override;
+	virtual bool coin_counters(UINT8 *&buf, UINT8 count) override;
 };
 
 const device_type COBRA_JVS = &device_creator<cobra_jvs>;
@@ -595,7 +595,7 @@ void cobra_jvs_host::write(UINT8 data, const UINT8 *&rec_data, UINT32 &rec_size)
 		m_send_ptr = 0;
 	}
 
-	rec_data = NULL;
+	rec_data = nullptr;
 	rec_size = 0;
 }
 
@@ -647,8 +647,6 @@ public:
 
 	DECLARE_READ32_MEMBER(sub_comram_r);
 	DECLARE_WRITE32_MEMBER(sub_comram_w);
-	DECLARE_READ32_MEMBER(sub_sound_r);
-	DECLARE_WRITE32_MEMBER(sub_sound_w);
 	DECLARE_READ32_MEMBER(sub_unk7e_r);
 	DECLARE_WRITE32_MEMBER(sub_debug_w);
 	DECLARE_READ32_MEMBER(sub_unk1_r);
@@ -680,7 +678,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 
-	cobra_renderer *m_renderer;
+	std::unique_ptr<cobra_renderer> m_renderer;
 
 	cobra_fifo *m_gfxfifo_in;
 	cobra_fifo *m_gfxfifo_out;
@@ -708,7 +706,7 @@ public:
 	UINT8 m_main_int_active;
 
 
-	UINT32 *m_comram[2];
+	std::unique_ptr<UINT32[]> m_comram[2];
 	int m_comram_page;
 
 	int m_main_debug_state;
@@ -737,8 +735,8 @@ public:
 
 	bool m_has_psac;
 
-	INT16 *m_sound_dma_buffer_l;
-	INT16 *m_sound_dma_buffer_r;
+	std::unique_ptr<INT16[]> m_sound_dma_buffer_l;
+	std::unique_ptr<INT16[]> m_sound_dma_buffer_r;
 	UINT32 m_sound_dma_ptr;
 
 	dmadac_sound_device *m_dmadac[2];
@@ -746,8 +744,8 @@ public:
 	DECLARE_DRIVER_INIT(racjamdx);
 	DECLARE_DRIVER_INIT(bujutsu);
 	DECLARE_DRIVER_INIT(cobra);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_cobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cobra_vblank);
 	void cobra_video_exit();
@@ -1020,7 +1018,7 @@ void cobra_state::video_start()
 {
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cobra_state::cobra_video_exit), this));
 
-	m_renderer = auto_alloc(machine(), cobra_renderer(*m_screen));
+	m_renderer = std::make_unique<cobra_renderer>(*m_screen);
 	m_renderer->gfx_init();
 }
 
@@ -1071,7 +1069,7 @@ void cobra_fifo::push(const device_t *cpu, UINT64 data)
 	if (m_verbose)
 	{
 		char accessor_location[50];
-		if (cpu != NULL)
+		if (cpu != nullptr)
 		{
 			// cpu has a name and a PC
 			sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
@@ -1091,7 +1089,7 @@ void cobra_fifo::push(const device_t *cpu, UINT64 data)
 		{
 			int i, j;
 			char accessor_location[50];
-			if (cpu != NULL)
+			if (cpu != nullptr)
 			{
 				// cpu has a name and a PC
 				sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
@@ -1148,7 +1146,7 @@ bool cobra_fifo::pop(const device_t *cpu, UINT64 *result)
 		if (m_verbose)
 		{
 			char accessor_location[50];
-			if (cpu != NULL)
+			if (cpu != nullptr)
 			{
 				// cpu has a name and a PC
 				sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
@@ -1169,7 +1167,7 @@ bool cobra_fifo::pop(const device_t *cpu, UINT64 *result)
 	if (m_verbose)
 	{
 		char accessor_location[50];
-		if (cpu != NULL)
+		if (cpu != nullptr)
 		{
 			// cpu has a name and a PC
 			sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
@@ -1895,7 +1893,7 @@ WRITE32_MEMBER(cobra_state::sub_comram_w)
 {
 	int page = m_comram_page ^ 1;
 
-	COMBINE_DATA(m_comram[page] + offset);
+	COMBINE_DATA(m_comram[page].get() + offset);
 }
 
 WRITE32_MEMBER(cobra_state::sub_psac_palette_w)
@@ -1946,8 +1944,8 @@ WRITE32_MEMBER(cobra_state::sub_sound_dma_w)
 	{
 		m_sound_dma_ptr = 0;
 
-		dmadac_transfer(&m_dmadac[0], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_l);
-		dmadac_transfer(&m_dmadac[1], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_r);
+		dmadac_transfer(&m_dmadac[0], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_l.get());
+		dmadac_transfer(&m_dmadac[1], 1, 0, 1, DMA_SOUND_BUFFER_SIZE, m_sound_dma_buffer_r.get());
 	}
 }
 
@@ -2052,9 +2050,9 @@ void cobra_renderer::gfx_init()
 {
 	const rectangle& visarea = screen().visible_area();
 
-	m_gfx_gram = auto_alloc_array(machine(), UINT32, 0x40000);
+	m_gfx_gram = std::make_unique<UINT32[]>(0x40000);
 
-	m_gfx_register = auto_alloc_array(machine(), UINT64, 0x3000);
+	m_gfx_register = std::make_unique<UINT64[]>(0x3000);
 	m_gfx_register_select = 0;
 
 	float zvalue = 10000000.0f;
@@ -2199,8 +2197,8 @@ void cobra_renderer::gfx_fifo_exec()
 
 		if (cobra->m_gfx_re_status == RE_STATUS_IDLE)
 		{
-			fifo_in->pop(NULL, &in1);
-			fifo_in->pop(NULL, &in2);
+			fifo_in->pop(nullptr, &in1);
+			fifo_in->pop(nullptr, &in2);
 			w1 = (UINT32)(in1);
 			w2 = (UINT32)(in2);
 
@@ -2233,12 +2231,12 @@ void cobra_renderer::gfx_fifo_exec()
 					return;
 				}
 
-				fifo_in->pop(NULL, &param[0]);
-				fifo_in->pop(NULL, &param[1]);
-				fifo_in->pop(NULL, &param[2]);
-				fifo_in->pop(NULL, &param[3]);
-				fifo_in->pop(NULL, &param[4]);
-				fifo_in->pop(NULL, &param[5]);
+				fifo_in->pop(nullptr, &param[0]);
+				fifo_in->pop(nullptr, &param[1]);
+				fifo_in->pop(nullptr, &param[2]);
+				fifo_in->pop(nullptr, &param[3]);
+				fifo_in->pop(nullptr, &param[4]);
+				fifo_in->pop(nullptr, &param[5]);
 
 				w[0] = (UINT32)param[0];    w[1] = (UINT32)param[1];    w[2] = (UINT32)param[2];
 				w[3] = (UINT32)param[3];    w[4] = (UINT32)param[4];    w[5] = (UINT32)param[5];
@@ -2294,19 +2292,19 @@ void cobra_renderer::gfx_fifo_exec()
 
 				//printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
 
-				fifo_in->pop(NULL, &in3);
-				fifo_in->pop(NULL, &in4);
-				fifo_in->pop(NULL, &ignore);
-				fifo_in->pop(NULL, &ignore);
-				fifo_in->pop(NULL, &ignore);
-				fifo_in->pop(NULL, &ignore);
+				fifo_in->pop(nullptr, &in3);
+				fifo_in->pop(nullptr, &in4);
+				fifo_in->pop(nullptr, &ignore);
+				fifo_in->pop(nullptr, &ignore);
+				fifo_in->pop(nullptr, &ignore);
+				fifo_in->pop(nullptr, &ignore);
 
 				if (w1 == 0x0f600000 && w2 == 0x10520c00)
 				{
-					fifo_out->push(NULL, w1);
-					fifo_out->push(NULL, w2);
-					fifo_out->push(NULL, in3);
-					fifo_out->push(NULL, in4);
+					fifo_out->push(nullptr, w1);
+					fifo_out->push(nullptr, w2);
+					fifo_out->push(nullptr, in3);
+					fifo_out->push(nullptr, in4);
 				}
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
@@ -2391,34 +2389,34 @@ void cobra_renderer::gfx_fifo_exec()
 					UINT64 in[4];
 					if (w2 & 0x40000000)        // line flags
 					{
-						fifo_in->pop(NULL, &in[0]);
+						fifo_in->pop(nullptr, &in[0]);
 					}
 
 					if (w2 & 0x20000000)        // unknown float (0.0f ... 1.0f)
 					{
-						fifo_in->pop(NULL, &in[1]);
+						fifo_in->pop(nullptr, &in[1]);
 					}
 
-					fifo_in->pop(NULL, &x);                     // X coord
-					fifo_in->pop(NULL, &y);                     // Y coord
-					fifo_in->pop(NULL, &in[2]);                 // coord?
-					fifo_in->pop(NULL, &z);                     // Z coord
+					fifo_in->pop(nullptr, &x);                     // X coord
+					fifo_in->pop(nullptr, &y);                     // Y coord
+					fifo_in->pop(nullptr, &in[2]);                 // coord?
+					fifo_in->pop(nullptr, &z);                     // Z coord
 
 					if (w2 & 0x00200000)        // texture coords
 					{
-						fifo_in->pop(NULL, &w);                 // W coord (1 / Z)
-						fifo_in->pop(NULL, &vert[i].p[POLY_U]); // U/Z coord
-						fifo_in->pop(NULL, &vert[i].p[POLY_V]); // V/Z coord
+						fifo_in->pop(nullptr, &w);                 // W coord (1 / Z)
+						fifo_in->pop(nullptr, &vert[i].p[POLY_U]); // U/Z coord
+						fifo_in->pop(nullptr, &vert[i].p[POLY_V]); // V/Z coord
 					}
 
-					fifo_in->pop(NULL, &a);                     // Gouraud Color Alpha
-					fifo_in->pop(NULL, &r);                     // Gouraud Color R
-					fifo_in->pop(NULL, &g);                     // Gouraud Color G
-					fifo_in->pop(NULL, &b);                     // Gouraud Color B
+					fifo_in->pop(nullptr, &a);                     // Gouraud Color Alpha
+					fifo_in->pop(nullptr, &r);                     // Gouraud Color R
+					fifo_in->pop(nullptr, &g);                     // Gouraud Color G
+					fifo_in->pop(nullptr, &b);                     // Gouraud Color B
 
 					if (w2 & 0x00000001)        // unknown float (0.0f ... 1.0f)
 					{
-						fifo_in->pop(NULL, &in[3]);
+						fifo_in->pop(nullptr, &in[3]);
 					}
 
 					vert[i].x = ((x / z) * vp_width) + vp_center_x;
@@ -2579,10 +2577,10 @@ void cobra_renderer::gfx_fifo_exec()
 
 					UINT64 param[4];
 					param[0] = param[1] = param[2] = param[3] = 0;
-					fifo_in->pop(NULL, &param[0]);
-					fifo_in->pop(NULL, &param[1]);
-					fifo_in->pop(NULL, &param[2]);
-					fifo_in->pop(NULL, &param[3]);
+					fifo_in->pop(nullptr, &param[0]);
+					fifo_in->pop(nullptr, &param[1]);
+					fifo_in->pop(nullptr, &param[2]);
+					fifo_in->pop(nullptr, &param[3]);
 
 					buffer[x+0] = (UINT32)(param[0]);
 					buffer[x+1] = (UINT32)(param[1]);
@@ -2625,10 +2623,10 @@ void cobra_renderer::gfx_fifo_exec()
 				// flush fifo_out so we have fresh data at top
 				fifo_out->flush();
 
-				fifo_out->push(NULL, buffer[x+0]);
-				fifo_out->push(NULL, buffer[x+1]);
-				fifo_out->push(NULL, buffer[x+2]);
-				fifo_out->push(NULL, buffer[x+3]);
+				fifo_out->push(nullptr, buffer[x+0]);
+				fifo_out->push(nullptr, buffer[x+1]);
+				fifo_out->push(nullptr, buffer[x+2]);
+				fifo_out->push(nullptr, buffer[x+3]);
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
 				break;
@@ -2728,7 +2726,7 @@ void cobra_renderer::gfx_fifo_exec()
 				for (i = 0; i < num; i++)
 				{
 					UINT64 value = 0;
-					fifo_in->pop(NULL, &value);
+					fifo_in->pop(nullptr, &value);
 
 					gfx_write_gram(reg + (i*4), 0xffffffff, value);
 				}
@@ -2749,7 +2747,7 @@ void cobra_renderer::gfx_fifo_exec()
 				int reg = (w1 >> 8) & 0xfffff;
 
 				UINT32 ret = gfx_read_gram(reg);
-				fifo_out->push(NULL, ret);
+				fifo_out->push(nullptr, ret);
 
 		//      printf("GFX: reg read %08X\n", reg);
 
@@ -2776,7 +2774,7 @@ void cobra_renderer::gfx_fifo_exec()
 				{
 					UINT32 value = gfx_read_gram(reg + (i*4));
 
-					fifo_out->push(NULL, value);
+					fifo_out->push(nullptr, value);
 				}
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
@@ -2804,7 +2802,7 @@ void cobra_renderer::gfx_fifo_exec()
 				for (int i=0; i < num_left; i++)
 				{
 					UINT64 param = 0;
-					fifo_in->pop(NULL, &param);
+					fifo_in->pop(nullptr, &param);
 					cobra->m_gfx_re_word_count++;
 
 					m_texture_ram[m_texram_ptr] = (UINT32)(param);
@@ -2832,7 +2830,7 @@ void cobra_renderer::gfx_fifo_exec()
 				while (fifo_in->current_num() > 0)
 				{
 					UINT64 param;
-					fifo_in->pop(NULL, &param);
+					fifo_in->pop(nullptr, &param);
 
 					if (c == 0)
 						printf("              ");
@@ -3208,9 +3206,9 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, mpc106_pci_r, mpc106_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, mpc106_pci_r, mpc106_pci_w)
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(cobra_state, ide_interrupt))
 
 	/* video hardware */
@@ -3298,13 +3296,13 @@ DRIVER_INIT_MEMBER(cobra_state, cobra)
 	m_subcpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(cobra_state::sub_jvs_w), this));
 
 
-	m_comram[0] = auto_alloc_array(machine(), UINT32, 0x40000/4);
-	m_comram[1] = auto_alloc_array(machine(), UINT32, 0x40000/4);
+	m_comram[0] = std::make_unique<UINT32[]>(0x40000/4);
+	m_comram[1] = std::make_unique<UINT32[]>(0x40000/4);
 
 	m_comram_page = 0;
 
-	m_sound_dma_buffer_l = auto_alloc_array(machine(), INT16, DMA_SOUND_BUFFER_SIZE);
-	m_sound_dma_buffer_r = auto_alloc_array(machine(), INT16, DMA_SOUND_BUFFER_SIZE);
+	m_sound_dma_buffer_l = std::make_unique<INT16[]>(DMA_SOUND_BUFFER_SIZE);
+	m_sound_dma_buffer_r = std::make_unique<INT16[]>(DMA_SOUND_BUFFER_SIZE);
 
 	// setup fake pagetable until we figure out what really maps there...
 	//m_gfx_pagetable[0x80 / 8] = U64(0x800001001e0001a8);

@@ -61,7 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(geebee_out7_w);
 	DECLARE_WRITE8_MEMBER(geebee_videoram_w);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_DRIVER_INIT(navarone);
 	DECLARE_DRIVER_INIT(geebee);
 	DECLARE_DRIVER_INIT(kaitein);

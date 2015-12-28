@@ -70,8 +70,8 @@ public:
 	UINT8 m_port15;
 	UINT8 m_port18;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( lcd_status_r );
 	DECLARE_WRITE8_MEMBER( lcd_control_w );
@@ -111,8 +111,8 @@ public:
 	UINT8 m_lcd_contrast;
 	UINT8 m_lcd_read_mode;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( g850v_bank_r );
 	DECLARE_WRITE8_MEMBER( g850v_bank_w );

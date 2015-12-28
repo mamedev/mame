@@ -51,8 +51,8 @@ protected:
 	required_memory_bank m_dmdbank6;
 
 	// driver_device overrides
-	virtual void machine_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
 public:
@@ -66,7 +66,6 @@ public:
 	DECLARE_WRITE8_MEMBER(wpc_sound_ctrl_w);
 	DECLARE_READ8_MEMBER(wpc_sound_data_r);
 	DECLARE_WRITE8_MEMBER(wpc_sound_data_w);
-	DECLARE_WRITE8_MEMBER(wpc_sound_s11_w);
 	DECLARE_WRITE8_MEMBER(wpc_rombank_w);
 	DECLARE_WRITE8_MEMBER(wpc_dmdbank_w);
 

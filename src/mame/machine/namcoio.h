@@ -29,8 +29,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	int m_device_type;
 
@@ -71,7 +71,7 @@ class namco56xx_device : public namcoio_device
 public:
 	namco56xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void customio_run();
+	virtual void customio_run() override;
 };
 
 class namco58xx_device : public namcoio_device
@@ -79,7 +79,7 @@ class namco58xx_device : public namcoio_device
 public:
 	namco58xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void customio_run();
+	virtual void customio_run() override;
 };
 
 class namco59xx_device : public namcoio_device
@@ -87,7 +87,7 @@ class namco59xx_device : public namcoio_device
 public:
 	namco59xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void customio_run();
+	virtual void customio_run() override;
 };
 
 extern const device_type NAMCO56XX;

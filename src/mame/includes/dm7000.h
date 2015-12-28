@@ -51,8 +51,8 @@ public:
 	UINT16          m_enet_regs[32];
 
 	UINT32          dcr[1024];
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_dm7000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 

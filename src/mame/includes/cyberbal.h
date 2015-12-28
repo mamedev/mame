@@ -62,8 +62,8 @@ public:
 	UINT8           m_sound_data_from_6502;
 	UINT8           m_sound_data_from_68k_ready;
 	UINT8           m_sound_data_from_6502_ready;
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ16_MEMBER(sound_state_r);
 	DECLARE_WRITE16_MEMBER(p2_reset_w);
 	DECLARE_READ8_MEMBER(special_port3_r);
@@ -79,9 +79,7 @@ public:
 	DECLARE_DRIVER_INIT(cyberbal2p);
 	DECLARE_DRIVER_INIT(cyberbal);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
-	TILE_GET_INFO_MEMBER(get_alpha2_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
 	DECLARE_MACHINE_START(cyberbal);
 	DECLARE_MACHINE_RESET(cyberbal);
 	DECLARE_VIDEO_START(cyberbal);
@@ -99,5 +97,4 @@ private:
 	void cyberbal_sound_reset();
 	UINT32 update_one_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index);
 	void update_sound_68k_interrupts();
-	inline void set_palette_entry(int entry, UINT16 value);
 };

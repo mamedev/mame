@@ -77,9 +77,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ym_port_w2);
 	DECLARE_WRITE8_MEMBER(chin_adpcm_w);
 	DECLARE_DRIVER_INIT(chinsan);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(chinsan);
 	UINT32 screen_update_chinsan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(chin_adpcm_int);
@@ -87,7 +87,7 @@ public:
 	required_device<msm5205_device> m_adpcm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	UINT8 *m_decrypted_opcodes;
+	std::unique_ptr<UINT8[]> m_decrypted_opcodes;
 };
 
 
@@ -572,8 +572,8 @@ WRITE_LINE_MEMBER(chinsan_state::chin_adpcm_int)
 void chinsan_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x4000);
-	membank("bank0d")->set_base(m_decrypted_opcodes);
-	membank("bank1d")->configure_entries(0, 4, m_decrypted_opcodes + 0x8000, 0x4000);
+	membank("bank0d")->set_base(m_decrypted_opcodes.get());
+	membank("bank1d")->configure_entries(0, 4, m_decrypted_opcodes.get() + 0x8000, 0x4000);
 
 	save_item(NAME(m_adpcm_idle));
 	save_item(NAME(m_port_select));
@@ -677,8 +677,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(chinsan_state,chinsan)
 {
-	m_decrypted_opcodes = auto_alloc_array(machine(), UINT8, 0x18000);
-	mc8123_decode(memregion("maincpu")->base(), m_decrypted_opcodes, memregion("user1")->base(), 0x18000);
+	m_decrypted_opcodes = std::make_unique<UINT8[]>(0x18000);
+	mc8123_decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), memregion("user1")->base(), 0x18000);
 }
 
 

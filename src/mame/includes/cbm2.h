@@ -158,7 +158,7 @@ public:
 	required_ioport m_pb7;
 	required_ioport m_lock;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	DECLARE_MACHINE_START( cbm2 );
 	DECLARE_MACHINE_START( cbm2_ntsc );
@@ -201,8 +201,6 @@ public:
 	DECLARE_READ8_MEMBER( cia_pa_r );
 	DECLARE_WRITE8_MEMBER( cia_pa_w );
 	DECLARE_READ8_MEMBER( cia_pb_r );
-
-	DECLARE_WRITE_LINE_MEMBER( tape_read_w );
 
 	DECLARE_READ8_MEMBER( ext_tpi_pb_r );
 	DECLARE_WRITE8_MEMBER( ext_tpi_pb_w );
@@ -254,7 +252,7 @@ public:
 	{ }
 
 	virtual void read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
-		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4);
+		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4) override;
 
 	DECLARE_READ8_MEMBER( tpi2_pc_r );
 };

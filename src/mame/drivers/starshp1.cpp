@@ -282,7 +282,7 @@ static const gfx_layout shiplayout =
 	{ STEP16(0x000, 0x080) },
 	0x800,  /* step */
 	shiplayout_xoffset,
-	NULL
+	nullptr
 };
 
 

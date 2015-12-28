@@ -97,9 +97,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(audio_gate);
 	DECLARE_WRITE_LINE_MEMBER(cassette_output);
 	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(handset_ack);
 	DECLARE_WRITE_LINE_MEMBER(alphaW);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(ti99_4p);
 
 	DECLARE_WRITE_LINE_MEMBER(set_tms9901_INT2_from_v9938);
@@ -272,7 +271,7 @@ INPUT_PORTS_END
 READ16_MEMBER( ti99_4p_state::memread )
 {
 	int addroff = offset << 1;
-	if (m_rom0 == NULL) return 0;   // premature access
+	if (m_rom0 == nullptr) return 0;   // premature access
 
 	UINT16 zone = addroff & 0xe000;
 	UINT16 value = 0;

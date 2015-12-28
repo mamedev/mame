@@ -38,7 +38,7 @@ public:
 
 	UINT8 m_paramReg;           // status leds and resets and etc
 
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(i8251_rxd);
 	DECLARE_READ8_MEMBER(dsw_r);
 	DECLARE_WRITE8_MEMBER(peripheral_w);

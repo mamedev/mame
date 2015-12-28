@@ -17,6 +17,12 @@
 #include "corealloc.h"
 
 #include <vector>
+#include <memory>
+
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
+#include <yvals.h>
+#define noexcept _NOEXCEPT
+#endif
 
 // TEMPORARY helper to catch is_pod assertions in the debugger
 #if 0
@@ -25,42 +31,35 @@
 #endif
 
 
-// ======================> auto_pointer
-
-// an object that transparently wraps a pointer and auto-frees it upon destruction
-template<class _ElementType>
-class auto_pointer
-{
-private:
-	// we don't support deep copying
-	auto_pointer(const auto_pointer &);
-	auto_pointer &operator=(const auto_pointer &);
-
-public:
-	// construction/destruction
-	auto_pointer(_ElementType *value = NULL)
-		: m_ptr(value) { }
-	virtual ~auto_pointer() { reset(); }
-
-	// operators
-	operator _ElementType *() const { return m_ptr; }
-	_ElementType &operator*() const { assert(m_ptr != NULL); return *m_ptr; }
-	_ElementType *operator->() const { return m_ptr; }
-
-	// simple getters
-	_ElementType *get() const { return m_ptr; }
-
-	// core operations
-	void reset(_ElementType *ptr = NULL) { if (m_ptr != ptr) { global_free(m_ptr); m_ptr = ptr; } }
-
-private:
-	// internal state
-	_ElementType *  m_ptr;          // pointer we are tracking
-};
-
-
-
 typedef std::vector<UINT8> dynamic_buffer;
+
+template<typename T>
+inline std::unique_ptr<T> make_unique_clear(std::size_t size)
+{
+	auto ptr = std::make_unique<T>(size);
+	static_assert(std::is_array<T>::value, "Type must be array");
+	memset(ptr.get(), 0, sizeof(std::remove_extent<T>) * size);
+	return ptr;
+}
+
+template<typename T,unsigned char F>
+inline std::unique_ptr<T> make_unique_clear(std::size_t size)
+{
+	auto ptr = std::make_unique<T>(size);
+	static_assert(std::is_array<T>::value, "Type must be array");
+	memset(ptr.get(), F, sizeof(std::remove_extent<T>) * size);
+	return ptr;
+}
+
+
+template<typename T>
+inline std::unique_ptr<T> make_unique_clear()
+{
+	auto ptr = std::make_unique<T>();
+	static_assert(std::is_pod<T>::value, "Type must be plain old data type");
+	memset(ptr.get(), 0, sizeof(T));
+	return ptr;
+}
 
 
 // ======================> simple_list
@@ -68,30 +67,30 @@ typedef std::vector<UINT8> dynamic_buffer;
 // a simple_list is a singly-linked list whose 'next' pointer is owned
 // by the object
 template<class _ElementType>
-class simple_list
+class simple_list final
 {
-	// we don't support deep copying
-	simple_list(const simple_list &);
-	simple_list &operator=(const simple_list &);
-
 public:
+	// we don't support deep copying
+	simple_list(const simple_list &) = delete;
+	simple_list &operator=(const simple_list &) = delete;
+
 	// construction/destruction
-	simple_list()
-		: m_head(NULL),
-			m_tail(NULL),
+	simple_list() noexcept
+		: m_head(nullptr),
+			m_tail(nullptr),
 			m_count(0) { }
 
-	virtual ~simple_list() { reset(); }
+	~simple_list() noexcept { reset(); }
 
 	// simple getters
-	_ElementType *first() const { return m_head; }
-	_ElementType *last() const { return m_tail; }
-	int count() const { return m_count; }
+	_ElementType *first() const noexcept { return m_head; }
+	_ElementType *last() const noexcept { return m_tail; }
+	int count() const noexcept { return m_count; }
 
 	// remove (free) all objects in the list, leaving an empty list
 	void reset()
 	{
-		while (m_head != NULL)
+		while (m_head != nullptr)
 			remove(*m_head);
 	}
 
@@ -100,14 +99,14 @@ public:
 	{
 		object.m_next = m_head;
 		m_head = &object;
-		if (m_tail == NULL)
+		if (m_tail == nullptr)
 			m_tail = m_head;
 		m_count++;
 		return object;
 	}
 
 	// add the given list to the head of the list
-	void prepend_list(simple_list<_ElementType> &list)
+	void prepend_list(simple_list<_ElementType> &list) noexcept
 	{
 		int count = list.count();
 		if (count == 0)
@@ -116,16 +115,16 @@ public:
 		_ElementType *head = list.detach_all();
 		tail->m_next = m_head;
 		m_head = head;
-		if (m_tail == NULL)
+		if (m_tail == nullptr)
 			m_tail = tail;
 		m_count += count;
 	}
 
 	// add the given object to the tail of the list
-	_ElementType &append(_ElementType &object)
+	_ElementType &append(_ElementType &object) noexcept
 	{
-		object.m_next = NULL;
-		if (m_tail != NULL)
+		object.m_next = nullptr;
+		if (m_tail != nullptr)
 			m_tail = m_tail->m_next = &object;
 		else
 			m_tail = m_head = &object;
@@ -134,14 +133,14 @@ public:
 	}
 
 	// add the given list to the tail of the list
-	void append_list(simple_list<_ElementType> &list)
+	void append_list(simple_list<_ElementType> &list) noexcept
 	{
 		int count = list.count();
 		if (count == 0)
 			return;
 		_ElementType *tail = list.last();
 		_ElementType *head = list.detach_all();
-		if (m_tail != NULL)
+		if (m_tail != nullptr)
 			m_tail->m_next = head;
 		else
 			m_head = head;
@@ -150,9 +149,9 @@ public:
 	}
 
 	// insert the given object after a particular object (NULL means prepend)
-	_ElementType &insert_after(_ElementType &object, _ElementType *insert_after)
+	_ElementType &insert_after(_ElementType &object, _ElementType *insert_after) noexcept
 	{
-		if (insert_after == NULL)
+		if (insert_after == nullptr)
 			return prepend(object);
 		object.m_next = insert_after->m_next;
 		insert_after->m_next = &object;
@@ -163,11 +162,11 @@ public:
 	}
 
 	// insert the given object before a particular object (NULL means append)
-	_ElementType &insert_before(_ElementType &object, _ElementType *insert_before)
+	_ElementType &insert_before(_ElementType &object, _ElementType *insert_before) noexcept
 	{
-		if (insert_before == NULL)
+		if (insert_before == nullptr)
 			return append(object);
-		for (_ElementType **curptr = &m_head; *curptr != NULL; curptr = &(*curptr)->m_next)
+		for (_ElementType **curptr = &m_head; *curptr != nullptr; curptr = &(*curptr)->m_next)
 			if (*curptr == insert_before)
 			{
 				object.m_next = insert_before;
@@ -181,13 +180,13 @@ public:
 	}
 
 	// replace an item in the list at the same location, and remove it
-	_ElementType &replace_and_remove(_ElementType &object, _ElementType &toreplace)
+	_ElementType &replace_and_remove(_ElementType &object, _ElementType &toreplace) noexcept
 	{
-		_ElementType *prev = NULL;
-		for (_ElementType *cur = m_head; cur != NULL; prev = cur, cur = cur->m_next)
+		_ElementType *prev = nullptr;
+		for (_ElementType *cur = m_head; cur != nullptr; prev = cur, cur = cur->m_next)
 			if (cur == &toreplace)
 			{
-				if (prev != NULL)
+				if (prev != nullptr)
 					prev->m_next = &object;
 				else
 					m_head = &object;
@@ -201,27 +200,27 @@ public:
 	}
 
 	// detach the head item from the list, but don't free its memory
-	_ElementType *detach_head()
+	_ElementType *detach_head() noexcept
 	{
 		_ElementType *result = m_head;
-		if (result != NULL)
+		if (result != nullptr)
 		{
 			m_head = result->m_next;
 			m_count--;
-			if (m_head == NULL)
-				m_tail = NULL;
+			if (m_head == nullptr)
+				m_tail = nullptr;
 		}
 		return result;
 	}
 
 	// detach the given item from the list, but don't free its memory
-	_ElementType &detach(_ElementType &object)
+	_ElementType &detach(_ElementType &object) noexcept
 	{
-		_ElementType *prev = NULL;
-		for (_ElementType *cur = m_head; cur != NULL; prev = cur, cur = cur->m_next)
+		_ElementType *prev = nullptr;
+		for (_ElementType *cur = m_head; cur != nullptr; prev = cur, cur = cur->m_next)
 			if (cur == &object)
 			{
-				if (prev != NULL)
+				if (prev != nullptr)
 					prev->m_next = object.m_next;
 				else
 					m_head = object.m_next;
@@ -234,34 +233,34 @@ public:
 	}
 
 	// deatch the entire list, returning the head, but don't free memory
-	_ElementType *detach_all()
+	_ElementType *detach_all() noexcept
 	{
 		_ElementType *result = m_head;
-		m_head = m_tail = NULL;
+		m_head = m_tail = nullptr;
 		m_count = 0;
 		return result;
 	}
 
 	// remove the given object and free its memory
-	void remove(_ElementType &object)
+	void remove(_ElementType &object) noexcept
 	{
 		global_free(&detach(object));
 	}
 
 	// find an object by index in the list
-	_ElementType *find(int index) const
+	_ElementType *find(int index) const noexcept
 	{
-		for (_ElementType *cur = m_head; cur != NULL; cur = cur->m_next)
+		for (_ElementType *cur = m_head; cur != nullptr; cur = cur->m_next)
 			if (index-- == 0)
 				return cur;
-		return NULL;
+		return nullptr;
 	}
 
 	// return the index of the given object in the list
-	int indexof(const _ElementType &object) const
+	int indexof(const _ElementType &object) const noexcept
 	{
 		int index = 0;
-		for (_ElementType *cur = m_head; cur != NULL; cur = cur->m_next)
+		for (_ElementType *cur = m_head; cur != nullptr; cur = cur->m_next)
 		{
 			if (cur == &object)
 				return index;
@@ -291,7 +290,7 @@ public:
 
 	// construction/destruction
 	simple_list_wrapper(_ObjectType *object)
-		: m_next(NULL),
+		: m_next(nullptr),
 			m_object(object) { }
 
 	// operators
@@ -329,13 +328,13 @@ public:
 	_ItemType *alloc()
 	{
 		_ItemType *result = m_freelist.detach_head();
-		if (result == NULL)
+		if (result == nullptr)
 			result = global_alloc(_ItemType);
 		return result;
 	}
 
 	// reclaim an item by adding it to the free list
-	void reclaim(_ItemType *item) { if (item != NULL) m_freelist.append(*item); }
+	void reclaim(_ItemType *item) { if (item != nullptr) m_freelist.append(*item); }
 	void reclaim(_ItemType &item) { m_freelist.append(item); }
 
 	// reclaim all items from a list

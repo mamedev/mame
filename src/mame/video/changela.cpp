@@ -21,8 +21,8 @@ Todo: Priority between tree0 and tree1.
 
 void changela_state::video_start()
 {
-	m_memory_devices = auto_alloc_array(machine(), UINT8, 4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
-	m_tree_ram = auto_alloc_array(machine(), UINT8, 2 * 0x20);
+	m_memory_devices = std::make_unique<UINT8[]>(4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
+	m_tree_ram = std::make_unique<UINT8[]>(2 * 0x20);
 
 	m_screen->register_screen_bitmap(m_obj0_bitmap);
 	m_screen->register_screen_bitmap(m_river_bitmap);
@@ -32,8 +32,8 @@ void changela_state::video_start()
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(changela_state::changela_scanline_callback),this));
 	m_scanline_timer->adjust(m_screen->time_until_pos(30), 30);
 
-	save_pointer(NAME(m_memory_devices), 4 * 0x800);
-	save_pointer(NAME(m_tree_ram), 2 * 0x20);
+	save_pointer(NAME(m_memory_devices.get()), 4 * 0x800);
+	save_pointer(NAME(m_tree_ram.get()), 2 * 0x20);
 }
 
 /**************************************************************************
@@ -173,9 +173,9 @@ void changela_state::draw_river( bitmap_ind16 &bitmap, int sy )
 	int sx, i, j;
 
 	UINT8* ROM = memregion("user2")->base();
-	UINT8* RAM = m_memory_devices + 0x800;
+	UINT8* RAM = m_memory_devices.get() + 0x800;
 	UINT8* TILE_ROM = memregion("gfx1")->base();
-	UINT8* TILE_RAM = m_memory_devices + 0x1000;
+	UINT8* TILE_RAM = m_memory_devices.get() + 0x1000;
 	UINT8* PROM = memregion("proms")->base();
 
 	int preload = ((sy < 32) ? 1 : 0);
@@ -352,13 +352,13 @@ void changela_state::draw_tree( bitmap_ind16 &bitmap, int sy, int tree_num )
 
 	/* State machine */
 	UINT8* ROM = memregion("user2")->base();
-	UINT8* RAM = m_memory_devices + 0x840 + 0x40 * tree_num;
+	UINT8* RAM = m_memory_devices.get() + 0x840 + 0x40 * tree_num;
 	UINT8* PROM = memregion("proms")->base();
 
 	/* Tree Data */
-	UINT8* RAM2 = m_tree_ram + 0x20 * tree_num;
+	UINT8* RAM2 = m_tree_ram.get() + 0x20 * tree_num;
 	UINT8* TILE_ROM = (tree_num ? (memregion("user3")->base() + 0x1000) : (memregion("gfx1")->base() + 0x2000));
-	UINT8* TILE_RAM = (tree_num ? (memregion("user3")->base()) : (m_memory_devices + 0x1800));
+	UINT8* TILE_RAM = (tree_num ? (memregion("user3")->base()) : (m_memory_devices.get() + 0x1800));
 
 	int preload = ((sy < 32) ? 1 : 0);
 

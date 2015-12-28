@@ -144,7 +144,7 @@ public:
 	{
 	}
 
-	void convert(const pstring &contents);
+	void convert(const pstring &contents) override;
 
 protected:
 
@@ -197,7 +197,7 @@ public:
 
 	protected:
 
-		void verror(const pstring &msg, int line_num, const pstring &line)
+		void verror(const pstring &msg, int line_num, const pstring &line) override
 		{
 			m_convert.out("{} (line {}): {}\n", msg.cstr(), line_num, line.cstr());
 		}
@@ -207,7 +207,7 @@ public:
 		nl_convert_eagle_t &m_convert;
 	};
 
-	void convert(const pstring &contents);
+	void convert(const pstring &contents) override;
 
 protected:
 

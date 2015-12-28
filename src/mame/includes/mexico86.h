@@ -66,12 +66,11 @@ public:
 	DECLARE_WRITE8_MEMBER(mexico86_68705_ddr_b_w);
 	DECLARE_WRITE8_MEMBER(mexico86_bankswitch_w);
 	DECLARE_READ8_MEMBER(kiki_ym2203_r);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	UINT32 screen_update_mexico86(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_kikikai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(kikikai_interrupt);
 	INTERRUPT_GEN_MEMBER(mexico86_m68705_interrupt);
 	void mcu_simulate(  );
-	void kiki_clogic(int address, int latch);
 };

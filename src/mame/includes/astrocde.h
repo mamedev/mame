@@ -94,7 +94,7 @@ public:
 	UINT8 m_port_2_last;
 	UINT8 m_ram_write_enable;
 	UINT8 m_input_select;
-	UINT8 *m_sparklestar;
+	std::unique_ptr<UINT8[]> m_sparklestar;
 	UINT8 m_interrupt_enabl;
 	UINT8 m_interrupt_vector;
 	UINT8 m_interrupt_scanline;
@@ -120,7 +120,7 @@ public:
 	UINT8 m_pattern_skip;
 	UINT8 m_pattern_width;
 	UINT8 m_pattern_height;
-	UINT16 *m_profpac_videoram;
+	std::unique_ptr<UINT16[]> m_profpac_videoram;
 	UINT16 m_profpac_palette[16];
 	UINT8 m_profpac_colormap[4];
 	UINT8 m_profpac_intercept;
@@ -176,7 +176,7 @@ public:
 	DECLARE_DRIVER_INIT(ebases);
 	DECLARE_DRIVER_INIT(gorf);
 	DECLARE_DRIVER_INIT(astrocde);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(astrocde);
 	DECLARE_VIDEO_START(profpac);
 	DECLARE_PALETTE_INIT(profpac);
@@ -190,7 +190,7 @@ public:
 	inline void increment_dest(UINT8 curwidth);
 	void execute_blit(address_space &space);
 	void init_sparklestar();
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	/*----------- defined in audio/wow.c -----------*/
 	DECLARE_READ8_MEMBER( wow_speech_r );
@@ -201,7 +201,7 @@ public:
 	CUSTOM_INPUT_MEMBER( gorf_speech_status_r );
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 /*----------- defined in audio/wow.c -----------*/

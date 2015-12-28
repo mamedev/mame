@@ -137,7 +137,7 @@ static int x07_cassette_calculate_size_in_samples(const UINT8 *bytes, int length
 {
 	x07_image_size = length;
 
-	return x07_handle_cassette(NULL, bytes);
+	return x07_handle_cassette(nullptr, bytes);
 }
 
 static const struct CassetteLegacyWaveFiller x07_legacy_fill_wave =
@@ -166,7 +166,7 @@ static const struct CassetteFormat x07_cassette_image_format =
 	"k7,lst,cas",
 	x07_cassette_identify,
 	x07_cassette_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(x07_cassette_formats)

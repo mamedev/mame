@@ -32,16 +32,16 @@ public:
 	tiki100_hdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_tiki100bus_card_interface overrides
-	virtual UINT8 iorq_r(address_space &space, offs_t offset, UINT8 data);
-	virtual void iorq_w(address_space &space, offs_t offset, UINT8 data);
+	virtual UINT8 iorq_r(address_space &space, offs_t offset, UINT8 data) override;
+	virtual void iorq_w(address_space &space, offs_t offset, UINT8 data) override;
 
 private:
 	required_device<wd2010_device> m_hdc;

@@ -39,9 +39,9 @@ public:
 	osd_font_windows(): m_font(NULL) { }
 	virtual ~osd_font_windows() { }
 
-	virtual bool open(const char *font_path, const char *name, int &height);
-	virtual void close();
-	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
+	virtual bool open(const char *font_path, const char *name, int &height) override;
+	virtual void close() override;
+	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs) override;
 private:
 	HGDIOBJ m_font;
 };
@@ -273,9 +273,9 @@ public:
 	{
 	}
 
-	virtual int init(const osd_options &options) { return 0; }
+	virtual int init(const osd_options &options) override { return 0; }
 
-	osd_font *font_alloc()
+	virtual osd_font *font_alloc() override
 	{
 		return global_alloc(osd_font_windows);
 	}

@@ -27,7 +27,7 @@ public:
 	x68k_neptune_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	void x68k_neptune_irq_w(int state);
 	DECLARE_READ8_MEMBER(x68k_neptune_mem_read);
@@ -37,8 +37,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	x68k_expansion_slot_device *m_slot;

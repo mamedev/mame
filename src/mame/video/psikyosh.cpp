@@ -260,7 +260,7 @@ void psikyosh_state::draw_bglayerscroll( int layer, bitmap_rgb32 &bitmap, const 
 
 	/* cache rendered bitmap */
 	int last_bank[32]; // corresponds to bank of bitmap in m_bg_bitmap. bg_bitmap is split into 16/32-rows of one-tile high each
-	for(int ii = 0; ii < 32; ii++) last_bank[ii] = -1;
+	for(auto & elem : last_bank) elem = -1;
 
 	int scr_width = cliprect.width();
 	int scr_height = cliprect.height();
@@ -1093,7 +1093,7 @@ void psikyosh_state::video_start()
 	m_screen->register_screen_bitmap(m_z_bitmap); /* z-buffer */
 	m_zoom_bitmap.allocate(16*16, 16*16); /* temp buffer for assembling sprites */
 	m_bg_bitmap.allocate(32*16, 32*16); /* temp buffer for assembling tilemaps */
-	m_bg_zoom = auto_alloc_array(machine(), UINT16, 256);
+	m_bg_zoom = std::make_unique<UINT16[]>(256);
 
 	m_gfxdecode->gfx(1)->set_granularity(16); /* 256 colour sprites with palette selectable on 16 colour boundaries */
 
@@ -1117,7 +1117,7 @@ void psikyosh_state::video_start()
 	save_item(NAME(m_z_bitmap));
 	save_item(NAME(m_zoom_bitmap));
 	save_item(NAME(m_bg_bitmap));
-	save_pointer(NAME(m_bg_zoom), 256);
+	save_pointer(NAME(m_bg_zoom.get()), 256);
 }
 
 

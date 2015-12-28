@@ -67,8 +67,8 @@ public:
 	required_memory_region m_boot_rom;
 	required_memory_region m_os7_rom;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( mreq_r );
 	DECLARE_WRITE8_MEMBER( mreq_w );

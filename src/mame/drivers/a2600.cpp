@@ -84,7 +84,6 @@ protected:
 	required_device<vcs_cart_slot_device> m_cart;
 	required_device<tia_video_device> m_tia;
 
-	unsigned long detect_2600controllers();
 	required_device<m6507_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_ioport m_swb;
@@ -563,7 +562,7 @@ static SLOT_INTERFACE_START(a2600_cart)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT(a2600_cartslot)
-	MCFG_VCS_CARTRIDGE_ADD("cartslot", a2600_cart, NULL)
+	MCFG_VCS_CARTRIDGE_ADD("cartslot", a2600_cart, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","a2600")
@@ -612,7 +611,7 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 #endif
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
 
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
@@ -662,7 +661,7 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 #endif
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
 
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")

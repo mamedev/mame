@@ -69,9 +69,9 @@ const device_type DECO_BAC06 = &device_creator<deco_bac06_device>;
 
 deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_BAC06, "DECO BAC06 Tilemap", tag, owner, clock, "deco_bac06", __FILE__),
-		m_pf_data(NULL),
-		m_pf_rowscroll(NULL),
-		m_pf_colscroll(NULL),
+		m_pf_data(nullptr),
+		m_pf_rowscroll(nullptr),
+		m_pf_colscroll(nullptr),
 		m_tile_region_8(0),
 		m_tile_region_16(0),
 		m_supports_8x8(true),
@@ -108,9 +108,9 @@ void deco_bac06_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_pf_data = auto_alloc_array_clear(machine(), UINT16, 0x4000 / 2); // 0x2000 is the maximum needed, some games / chip setups map less and mirror - stadium hero banks this to 0x4000?!
-	m_pf_rowscroll = auto_alloc_array_clear(machine(), UINT16, 0x2000 / 2);
-	m_pf_colscroll = auto_alloc_array_clear(machine(), UINT16, 0x2000 / 2);
+	m_pf_data = make_unique_clear<UINT16[]>(0x4000 / 2); // 0x2000 is the maximum needed, some games / chip setups map less and mirror - stadium hero banks this to 0x4000?!
+	m_pf_rowscroll = make_unique_clear<UINT16[]>(0x2000 / 2);
+	m_pf_colscroll = make_unique_clear<UINT16[]>(0x2000 / 2);
 
 	create_tilemaps(m_gfxregion8x8, m_gfxregion16x16);
 	m_gfxcolmask = 0x0f;
@@ -119,9 +119,9 @@ void deco_bac06_device::device_start()
 	m_bppmask = 0x0f;
 	m_rambank = 0;
 
-	save_pointer(NAME(m_pf_data), 0x4000/2);
-	save_pointer(NAME(m_pf_rowscroll), 0x2000/2);
-	save_pointer(NAME(m_pf_colscroll), 0x2000/2);
+	save_pointer(NAME(m_pf_data.get()), 0x4000/2);
+	save_pointer(NAME(m_pf_rowscroll.get()), 0x2000/2);
+	save_pointer(NAME(m_pf_colscroll.get()), 0x2000/2);
 	save_item(NAME(m_pf_control_0));
 	save_item(NAME(m_pf_control_1));
 	save_item(NAME(m_gfxcolmask));
@@ -315,7 +315,7 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 
 void deco_bac06_device::deco_bac06_pf_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition)
 {
-	tilemap_t* tm = 0;
+	tilemap_t* tm = nullptr;
 
 	int tm_dimensions = m_pf_control_0[3] & 0x3;
 	if (tm_dimensions == 3) tm_dimensions = 1; // 3 is invalid / the same as 1?
@@ -344,18 +344,18 @@ void deco_bac06_device::deco_bac06_pf_draw(bitmap_ind16 &bitmap,const rectangle 
 	}
 
 	if (tm)
-		custom_tilemap_draw(bitmap,cliprect,tm,m_pf_rowscroll,m_pf_colscroll,m_pf_control_0,m_pf_control_1,flags, penmask, pencondition, colprimask, colpricondition);
+		custom_tilemap_draw(bitmap,cliprect,tm,m_pf_rowscroll.get(),m_pf_colscroll.get(),m_pf_control_0,m_pf_control_1,flags, penmask, pencondition, colprimask, colpricondition);
 
 }
 
 // used for pocket gal bootleg, which doesn't set registers properly and simply expects a fixed size tilemap.
 void deco_bac06_device::deco_bac06_pf_draw_bootleg(bitmap_ind16 &bitmap,const rectangle &cliprect,int flags, int mode, int type)
 {
-	tilemap_t* tm = 0;
+	tilemap_t* tm = nullptr;
 	if (!mode) tm = m_pf8x8_tilemap[type];
 	else tm = m_pf16x16_tilemap[type];
 
-	custom_tilemap_draw(bitmap,cliprect,tm,m_pf_rowscroll,m_pf_colscroll,0,0,flags, 0, 0, 0, 0);
+	custom_tilemap_draw(bitmap,cliprect,tm,m_pf_rowscroll.get(),m_pf_colscroll.get(),nullptr,nullptr,flags, 0, 0, 0, 0);
 }
 
 

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Dirk Verwiebe, Robbbert, Ralf Schaefer, Cowering
+// license:LGPL-2.1+
+// copyright-holders:Dirk Verwiebe, Robbbert, Cowering
 /***************************************************************************
 Mephisto Glasgow 3 S chess computer
 Dirk V.
@@ -84,10 +84,8 @@ public:
 	UINT8 m_led7;
 	UINT8 m_irq_flag;
 	UINT16 m_beeper;
-	DECLARE_READ16_MEMBER(read_test);
-	DECLARE_READ16_MEMBER(read_board_amsterd);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(dallas32);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi32);

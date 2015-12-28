@@ -38,11 +38,11 @@ public:
 	UINT8   *m_displaydata;
 	void set_display_data(UINT8 *data) { m_displaydata = data; }
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual DECLARE_WRITE8_MEMBER(write);
@@ -71,21 +71,18 @@ public:
 	a26_rom_dpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_reset() override;
 
 	required_device<dpc_device> m_dpc;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
-	virtual DECLARE_DIRECT_UPDATE_MEMBER(cart_opbase);
+	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual DECLARE_DIRECT_UPDATE_MEMBER(cart_opbase) override;
 
-	virtual void setup_addon_ptr(UINT8 *ptr);
-
-protected:
-//  int m_reset_bank;
+	virtual void setup_addon_ptr(UINT8 *ptr) override;
 };
 
 

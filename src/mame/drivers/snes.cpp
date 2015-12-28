@@ -86,19 +86,18 @@ public:
 
 	DECLARE_READ8_MEMBER( spc_ram_100_r );
 	DECLARE_WRITE8_MEMBER( spc_ram_100_w );
-	TIMER_CALLBACK_MEMBER( lightgun_tick );
 
 	// input related
 	SNESCTRL_ONSCREEN_CB(onscreen_cb);
 	SNESCTRL_GUNLATCH_CB(gun_latch_cb);
-	virtual DECLARE_WRITE8_MEMBER(io_read);
-	virtual UINT8 oldjoy1_read(int latched);
-	virtual UINT8 oldjoy2_read(int latched);
-	virtual void write_joy_latch(UINT8 data);
-	virtual void wrio_write(UINT8 data);
+	virtual DECLARE_WRITE8_MEMBER(io_read) override;
+	virtual UINT8 oldjoy1_read(int latched) override;
+	virtual UINT8 oldjoy2_read(int latched) override;
+	virtual void write_joy_latch(UINT8 data) override;
+	virtual void wrio_write(UINT8 data) override;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	int m_type;
 	required_device<snes_control_port_device> m_ctrl1;
 	required_device<snes_control_port_device> m_ctrl2;
@@ -1355,7 +1354,7 @@ static MACHINE_CONFIG_START( snes, snes_console_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_SNS_CARTRIDGE_ADD("snsslot", snes_cart, NULL)
+	MCFG_SNS_CARTRIDGE_ADD("snsslot", snes_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","snes")
 	MCFG_SOFTWARE_LIST_ADD("bsx_list","snes_bspack")
 	MCFG_SOFTWARE_LIST_ADD("st_list","snes_strom")

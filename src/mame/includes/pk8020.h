@@ -66,9 +66,9 @@ public:
 	DECLARE_WRITE8_MEMBER(gzu_w);
 	DECLARE_READ8_MEMBER(devices_r);
 	DECLARE_WRITE8_MEMBER(devices_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pk8020);
 	UINT32 screen_update_pk8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pk8020_interrupt);
@@ -79,8 +79,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pk8020_2_portc_w);
 	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out1);
-	DECLARE_WRITE_LINE_MEMBER(pk8020_pic_set_int_line);
-	IRQ_CALLBACK_MEMBER(pk8020_irq_callback);
 
 protected:
 	required_device<cpu_device> m_maincpu;

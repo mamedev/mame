@@ -44,8 +44,8 @@ public:
 	UINT16          m_last_write;
 	UINT16          m_last_write_offset;
 
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ32_MEMBER(special_port2_r);
 	DECLARE_READ32_MEMBER(special_port3_r);
 	DECLARE_READ32_MEMBER(a2d_data_r);

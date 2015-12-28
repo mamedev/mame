@@ -195,7 +195,7 @@ void trident_vga_device::device_reset()
 
 UINT32 trident_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 cur_mode = 0;
+	UINT8 cur_mode;
 
 	svga_device::screen_update(screen,bitmap,cliprect);
 	cur_mode = pc_vga_choosevideomode();

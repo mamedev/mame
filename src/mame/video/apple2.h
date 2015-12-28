@@ -28,8 +28,8 @@ public:
 	bool m_dhires;
 	bool m_80col;
 	bool m_altcharset;
-	UINT16 *m_hires_artifact_map;
-	UINT16 *m_dhires_artifact_map;
+	std::unique_ptr<UINT16[]> m_hires_artifact_map;
+	std::unique_ptr<UINT16[]> m_dhires_artifact_map;
 
 	UINT8 *m_ram_ptr, *m_aux_ptr, *m_char_ptr;
 	int m_char_size;
@@ -46,8 +46,8 @@ public:
 	void dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
 protected:
-	virtual void device_reset();
-	virtual void device_start();
+	virtual void device_reset() override;
+	virtual void device_start() override;
 
 private:
 	void plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code, const UINT8 *textgfx_data, UINT32 textgfx_datalen, int fg, int bg);

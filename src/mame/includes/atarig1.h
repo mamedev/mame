@@ -34,7 +34,7 @@ public:
 	required_shared_ptr<UINT16> m_mo_command;
 
 	UINT16 *        m_bslapstic_base;
-	void *          m_bslapstic_bank0;
+	std::unique_ptr<UINT8[]>          m_bslapstic_bank0;
 	UINT8           m_bslapstic_bank;
 	bool            m_bslapstic_primed;
 
@@ -44,10 +44,9 @@ public:
 	UINT16          m_playfield_xscroll;
 	UINT16          m_playfield_yscroll;
 
-	virtual void device_post_load();
-	virtual void update_interrupts();
-	virtual void scanline_update(screen_device &screen, int scanline);
-	DECLARE_WRITE16_MEMBER(mo_control_w);
+	virtual void device_post_load() override;
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(mo_command_w);
 	DECLARE_READ16_MEMBER(special_port0_r);
 	DECLARE_WRITE16_MEMBER(a2d_select_w);

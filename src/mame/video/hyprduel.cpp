@@ -125,7 +125,7 @@ inline void hyprduel_state::get_tile_info( tile_data &tileinfo, int tile_index, 
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
 		int _code = code & 0x000f;
-		tileinfo.pen_data = m_empty_tiles + _code * 16 * 16;
+		tileinfo.pen_data = m_empty_tiles.get() + _code * 16 * 16;
 		tileinfo.palette_base = ((code & 0x0ff0)) + 0x1000;
 		tileinfo.flags = 0;
 		tileinfo.group = 0;
@@ -162,7 +162,7 @@ inline void hyprduel_state::get_tile_info_8bit( tile_data &tileinfo, int tile_in
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
 		int _code = code & 0x000f;
-		tileinfo.pen_data = m_empty_tiles + _code * 16 * 16;
+		tileinfo.pen_data = m_empty_tiles.get() + _code * 16 * 16;
 		tileinfo.palette_base = ((code & 0x0ff0)) + 0x1000;
 		tileinfo.flags = 0;
 		tileinfo.group = 0;
@@ -207,7 +207,7 @@ inline void hyprduel_state::get_tile_info_16x16_8bit( tile_data &tileinfo, int t
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
 		int _code = code & 0x000f;
-		tileinfo.pen_data = m_empty_tiles + _code * 16 * 16;
+		tileinfo.pen_data = m_empty_tiles.get() + _code * 16 * 16;
 		tileinfo.palette_base = ((code & 0x0ff0)) + 0x1000;
 		tileinfo.flags = 0;
 		tileinfo.group = 0;
@@ -304,8 +304,8 @@ void hyprduel_state::alloc_empty_tiles(  )
 {
 	int code,i;
 
-	m_empty_tiles = auto_alloc_array(machine(), UINT8, 16*16*16);
-	save_pointer(NAME(m_empty_tiles), 16*16*16);
+	m_empty_tiles = std::make_unique<UINT8[]>(16*16*16);
+	save_pointer(NAME(m_empty_tiles.get()), 16*16*16);
 
 	for (code = 0; code < 0x10; code++)
 		for (i = 0; i < 16 * 16; i++)
@@ -334,7 +334,7 @@ void hyprduel_state::expand_gfx1(hyprduel_state &state)
 {
 	UINT8 *base_gfx = state.memregion("gfx1")->base();
 	UINT32 length = 2 * state.memregion("gfx1")->bytes();
-	state.m_expanded_gfx1 = auto_alloc_array(state.machine(), UINT8, length);
+	state.m_expanded_gfx1 = std::make_unique<UINT8[]>(length);
 	for (int i = 0; i < length; i += 2)
 	{
 		UINT8 src = base_gfx[i / 2];
@@ -347,11 +347,11 @@ VIDEO_START_MEMBER(hyprduel_state,common_14220)
 {
 	expand_gfx1(*this);
 	alloc_empty_tiles();
-	m_tiletable_old = auto_alloc_array(machine(), UINT16, m_tiletable.bytes() / 2);
-	m_dirtyindex = auto_alloc_array(machine(), UINT8, m_tiletable.bytes() / 4);
+	m_tiletable_old = std::make_unique<UINT16[]>(m_tiletable.bytes() / 2);
+	m_dirtyindex = std::make_unique<UINT8[]>(m_tiletable.bytes() / 4);
 
-	save_pointer(NAME(m_tiletable_old), m_tiletable.bytes() / 2);
-	save_pointer(NAME(m_dirtyindex), m_tiletable.bytes() / 4);
+	save_pointer(NAME(m_tiletable_old.get()), m_tiletable.bytes() / 2);
+	save_pointer(NAME(m_dirtyindex.get()), m_tiletable.bytes() / 4);
 
 	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_0_8bit),this), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
 	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_1_8bit),this), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
@@ -449,7 +449,7 @@ VIDEO_START_MEMBER(hyprduel_state,magerror_14220)
 
 void hyprduel_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *base_gfx4 = m_expanded_gfx1;
+	UINT8 *base_gfx4 = m_expanded_gfx1.get();
 	UINT8 *base_gfx8 = memregion("gfx1")->base();
 	UINT32 gfx_size = memregion("gfx1")->bytes();
 
@@ -660,7 +660,7 @@ UINT32 hyprduel_state::screen_update_hyprduel(screen_device &screen, bitmap_ind1
 	{
 		int dirty = 0;
 
-		memset(m_dirtyindex, 0, m_tiletable.bytes() / 4);
+		memset(m_dirtyindex.get(), 0, m_tiletable.bytes() / 4);
 		for (i = 0; i < m_tiletable.bytes() / 4; i++)
 		{
 			UINT32 tile_new = (m_tiletable[2 * i + 0] << 16 ) + m_tiletable[2 * i + 1];
@@ -672,7 +672,7 @@ UINT32 hyprduel_state::screen_update_hyprduel(screen_device &screen, bitmap_ind1
 				dirty = 1;
 			}
 		}
-		memcpy(m_tiletable_old, m_tiletable, m_tiletable.bytes());
+		memcpy(m_tiletable_old.get(), m_tiletable, m_tiletable.bytes());
 
 		if (dirty)
 		{

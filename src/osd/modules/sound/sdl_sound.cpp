@@ -57,13 +57,13 @@ public:
 	}
 	virtual ~sound_sdl() { }
 
-	virtual int init(const osd_options &options);
-	virtual void exit();
+	virtual int init(const osd_options &options) override;
+	virtual void exit() override;
 
 	// sound_module
 
-	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame);
-	virtual void set_mastervolume(int attenuation);
+	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame) override;
+	virtual void set_mastervolume(int attenuation) override;
 
 private:
 	int lock_buffer(bool is_throttled, long offset, long size, void **buffer1, long *length1, void **buffer2, long *length2);

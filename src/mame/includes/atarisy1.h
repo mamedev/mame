@@ -57,11 +57,10 @@ public:
 	UINT8           m_bank_color_shift[MAX_GFX_ELEMENTS];
 
 	UINT8           m_cur[2][2];
-	virtual void update_interrupts();
+	virtual void update_interrupts() override;
 	DECLARE_READ16_MEMBER(joystick_r);
 	DECLARE_WRITE16_MEMBER(joystick_w);
 	DECLARE_READ16_MEMBER(trakball_r);
-	DECLARE_READ16_MEMBER(port4_r);
 	DECLARE_READ8_MEMBER(switch_6502_r);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(via_pa_w);

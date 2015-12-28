@@ -115,7 +115,7 @@ v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, cons
 	m_my_delta(0),
 	m_button_state(0),
 	m_vdp_ops_count(0),
-	m_vdp_engine(NULL),
+	m_vdp_engine(nullptr),
 	m_palette(*this, "palette"),
 	m_pal_ntsc(0)
 {
@@ -621,7 +621,7 @@ void v99x8_device::device_start()
 {
 	m_int_callback.resolve_safe();
 	m_vdp_ops_count = 1;
-	m_vdp_engine = NULL;
+	m_vdp_engine = nullptr;
 
 	m_screen->register_screen_bitmap(m_bitmap);
 
@@ -1774,8 +1774,8 @@ const v99x8_device::v99x8_mode v99x8_device::s_modes[] = {
 	{ 0x02,
 		&v99x8_device::mode_text1,
 		&v99x8_device::default_border,
-		NULL,
-		NULL
+		nullptr,
+		nullptr
 	},
 	{ 0x01,
 		&v99x8_device::mode_multi,
@@ -1828,14 +1828,14 @@ const v99x8_device::v99x8_mode v99x8_device::s_modes[] = {
 	{ 0x0a,
 		&v99x8_device::mode_text2,
 		&v99x8_device::default_border,
-		NULL,
-		NULL
+		nullptr,
+		nullptr
 	},
 	{ 0xff,
 		&v99x8_device::mode_unknown,
 		&v99x8_device::default_border,
-		NULL,
-		NULL
+		nullptr,
+		nullptr
 	}
 };
 
@@ -1856,7 +1856,7 @@ void v99x8_device::refresh_16(int line)
 	const pen_t *pens = m_palette->pens();
 	bool double_lines = false;
 	UINT8 col[256];
-	UINT16 *ln, *ln2 = NULL;
+	UINT16 *ln, *ln2 = nullptr;
 
 	if (m_cont_reg[9] & 0x08)
 	{
@@ -2371,7 +2371,7 @@ void v99x8_device::srch_engine()
 	if ((m_vdp_ops_count=cnt)>0) {
 		// Command execution done
 		m_stat_reg[2] &= 0xFE;
-		m_vdp_engine = 0;
+		m_vdp_engine = nullptr;
 		// Update SX in VDP registers
 		m_stat_reg[8] = SX & 0xFF;
 		m_stat_reg[9] = (SX>>8) | 0xFE;
@@ -2455,7 +2455,7 @@ void v99x8_device::line_engine()
 	if ((m_vdp_ops_count=cnt)>0) {
 		// Command execution done
 		m_stat_reg[2]&=0xFE;
-		m_vdp_engine=0;
+		m_vdp_engine=nullptr;
 		m_cont_reg[38]=DY & 0xFF;
 		m_cont_reg[39]=(DY>>8) & 0x03;
 	}
@@ -2504,7 +2504,7 @@ void v99x8_device::lmmv_engine()
 	if ((m_vdp_ops_count=cnt)>0) {
 		// Command execution done
 		m_stat_reg[2]&=0xFE;
-		m_vdp_engine=0;
+		m_vdp_engine=nullptr;
 		if (!NY)
 			DY+=TY;
 		m_cont_reg[38]=DY & 0xFF;
@@ -2560,7 +2560,7 @@ void v99x8_device::lmmm_engine()
 	if ((m_vdp_ops_count=cnt)>0) {
 		// Command execution done
 		m_stat_reg[2]&=0xFE;
-		m_vdp_engine=0;
+		m_vdp_engine=nullptr;
 		if (!NY) {
 			SY+=TY;
 			DY+=TY;
@@ -2598,7 +2598,7 @@ void v99x8_device::lmcm_engine()
 		if (!--m_mmc.ANX || ((m_mmc.ASX+=m_mmc.TX)&m_mmc.MX)) {
 			if (!(--m_mmc.NY & 1023) || (m_mmc.SY+=m_mmc.TY)==-1) {
 				m_stat_reg[2]&=0xFE;
-				m_vdp_engine=0;
+				m_vdp_engine=nullptr;
 				if (!m_mmc.NY)
 					m_mmc.DY+=m_mmc.TY;
 				m_cont_reg[42]=m_mmc.NY & 0xFF;
@@ -2630,7 +2630,7 @@ void v99x8_device::lmmc_engine()
 		if (!--m_mmc.ANX || ((m_mmc.ADX+=m_mmc.TX)&m_mmc.MX)) {
 			if (!(--m_mmc.NY&1023) || (m_mmc.DY+=m_mmc.TY)==-1) {
 				m_stat_reg[2]&=0xFE;
-				m_vdp_engine=0;
+				m_vdp_engine=nullptr;
 				if (!m_mmc.NY)
 					m_mmc.DY+=m_mmc.TY;
 				m_cont_reg[42]=m_mmc.NY & 0xFF;
@@ -2682,7 +2682,7 @@ void v99x8_device::hmmv_engine()
 	if ((m_vdp_ops_count=cnt)>0) {
 		// Command execution done
 		m_stat_reg[2]&=0xFE;
-		m_vdp_engine=0;
+		m_vdp_engine=nullptr;
 		if (!NY)
 			DY+=TY;
 		m_cont_reg[42]=NY & 0xFF;
@@ -2737,7 +2737,7 @@ void v99x8_device::hmmm_engine()
 	if ((m_vdp_ops_count=cnt)>0) {
 		// Command execution done
 		m_stat_reg[2]&=0xFE;
-		m_vdp_engine=0;
+		m_vdp_engine=nullptr;
 		if (!NY) {
 			SY+=TY;
 			DY+=TY;
@@ -2797,7 +2797,7 @@ void v99x8_device::ymmm_engine()
 	if ((m_vdp_ops_count=cnt)>0) {
 		// Command execution done
 		m_stat_reg[2]&=0xFE;
-		m_vdp_engine=0;
+		m_vdp_engine=nullptr;
 		if (!NY) {
 			SY+=TY;
 			DY+=TY;
@@ -2833,7 +2833,7 @@ void v99x8_device::hmmc_engine()
 		if (!--m_mmc.ANX || ((m_mmc.ADX+=m_mmc.TX)&m_mmc.MX)) {
 			if (!(--m_mmc.NY&1023) || (m_mmc.DY+=m_mmc.TY)==-1) {
 				m_stat_reg[2]&=0xFE;
-				m_vdp_engine=0;
+				m_vdp_engine=nullptr;
 				if (!m_mmc.NY)
 					m_mmc.DY+=m_mmc.TY;
 				m_cont_reg[42]=m_mmc.NY & 0xFF;
@@ -2931,11 +2931,11 @@ UINT8 v99x8_device::command_unit_w(UINT8 Op)
 	switch(Op>>4) {
 	case CM_ABRT:
 		m_stat_reg[2]&=0xFE;
-		m_vdp_engine=0;
+		m_vdp_engine=nullptr;
 		return 1;
 	case CM_POINT:
 		m_stat_reg[2]&=0xFE;
-		m_vdp_engine=0;
+		m_vdp_engine=nullptr;
 		m_stat_reg[7]=m_cont_reg[44]=
 		VDP_POINT(SM, (m_cont_reg[45] & 0x10) != 0,
 			m_cont_reg[32]+((int)m_cont_reg[33]<<8),
@@ -2943,7 +2943,7 @@ UINT8 v99x8_device::command_unit_w(UINT8 Op)
 		return 1;
 	case CM_PSET:
 		m_stat_reg[2]&=0xFE;
-		m_vdp_engine=0;
+		m_vdp_engine=nullptr;
 		VDP_PSET(SM, (m_cont_reg[45] & 0x20) != 0,
 			m_cont_reg[36]+((int)m_cont_reg[37]<<8),
 			m_cont_reg[38]+((int)m_cont_reg[39]<<8),

@@ -89,7 +89,7 @@ ROM_END
 phillips_22vp931_device::phillips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: laserdisc_device(mconfig, PHILLIPS_22VP931, "Phillips 22VP931", tag, owner, clock, "22vp931", __FILE__),
 		m_i8049_cpu(*this, "vp931"),
-		m_tracktimer(NULL),
+		m_tracktimer(nullptr),
 		m_i8049_out0(0),
 		m_i8049_out1(0),
 		m_i8049_port1(0),
@@ -389,7 +389,7 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_output1_w )
 	    $01 = OSM
 	*/
 
-	INT32 speed = 0;
+	INT32 speed;
 
 	if (LOG_PORTS && (m_i8049_out1 ^ data) & 0x08)
 	{
@@ -575,7 +575,7 @@ WRITE8_MEMBER( phillips_22vp931_device::i8049_port1_w )
 	}
 
 	// if we have a timer, adjust it
-	if (m_tracktimer != NULL)
+	if (m_tracktimer != nullptr)
 	{
 		// turn it off if we're not tracking
 		if (m_trackdir == 0)

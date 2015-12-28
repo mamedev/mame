@@ -55,7 +55,7 @@ public:
 	macpds_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// inline configuration
 	static void static_set_macpds_slot(device_t &device, const char *tag, const char *slottag);
@@ -88,8 +88,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// internal state
 	cpu_device   *m_maincpu;
@@ -118,7 +118,6 @@ public:
 	void set_macpds_device();
 
 	// helper functions for card devices
-	void install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb = false, bool reverse_rom = false);
 	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
 	void install_rom(device_t *dev, const char *romregion, UINT32 addr);
 

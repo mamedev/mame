@@ -41,14 +41,14 @@ public:
 
 	UINT8 m_last_analog_input[2];
 	UINT8 m_last_analog_output[2];
-	UINT8 *m_poly17;
+	std::unique_ptr<UINT8[]> m_poly17;
 	UINT8 *m_rand17;
 	emu_timer *m_irq_off;
 	emu_timer *m_irq_timer;
 	emu_timer *m_firq_off;
 	emu_timer *m_firq_timer;
 	UINT8 m_cocktail_flip;
-	UINT8 *m_local_videoram;
+	std::unique_ptr<UINT8[]> m_local_videoram;
 	UINT8 m_palettebank_vis;
 
 	DECLARE_READ8_MEMBER(analog_port_r);
@@ -59,9 +59,9 @@ public:
 	DECLARE_WRITE8_MEMBER(gridlee_cocktail_flip_w);
 	DECLARE_WRITE8_MEMBER(gridlee_videoram_w);
 	DECLARE_WRITE8_MEMBER(gridlee_palette_select_w);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(gridlee);
 	UINT32 screen_update_gridlee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(irq_off_tick);
@@ -84,10 +84,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
 	DECLARE_WRITE8_MEMBER( gridlee_sound_w );

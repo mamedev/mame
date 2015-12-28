@@ -49,7 +49,7 @@ samples_device::samples_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, SAMPLES, "Samples", tag, owner, clock, "samples", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_channels(0),
-		m_names(NULL)
+		m_names(nullptr)
 {
 }
 
@@ -57,7 +57,7 @@ samples_device::samples_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_channels(0),
-		m_names(NULL)
+		m_names(nullptr)
 {
 }
 
@@ -85,7 +85,7 @@ void samples_device::start(UINT8 channel, UINT32 samplenum, bool loop)
 
 	// update the parameters
 	sample_t &sample = m_sample[samplenum];
-	chan.source = (sample.data.size() > 0) ? &sample.data[0] : NULL;
+	chan.source = (sample.data.size() > 0) ? &sample.data[0] : nullptr;
 	chan.source_length = sample.data.size();
 	chan.source_num = (chan.source_length > 0) ? samplenum : -1;
 	chan.pos = 0;
@@ -176,7 +176,7 @@ void samples_device::stop(UINT8 channel)
 
 	// force an update before we start
 	channel_t &chan = m_channel[channel];
-	chan.source = NULL;
+	chan.source = nullptr;
 	chan.source_num = -1;
 }
 
@@ -221,7 +221,7 @@ bool samples_device::playing(UINT8 channel) const
 	// force an update before we start
 	const channel_t &chan = m_channel[channel];
 	chan.stream->update();
-	return (chan.source != NULL);
+	return (chan.source != nullptr);
 }
 
 
@@ -246,7 +246,7 @@ void samples_device::device_start()
 		// initialize channel
 		channel_t &chan = m_channel[channel];
 		chan.stream = stream_alloc(0, 1, machine().sample_rate());
-		chan.source = NULL;
+		chan.source = nullptr;
 		chan.source_num = -1;
 		chan.step = 0;
 		chan.loop = 0;
@@ -302,13 +302,13 @@ void samples_device::device_post_load()
 		}
 
 		// validate the position against the length in case the sample is smaller
-		if (chan.source != NULL && chan.pos >= chan.source_length)
+		if (chan.source != nullptr && chan.pos >= chan.source_length)
 		{
 			if (chan.loop)
 				chan.pos %= chan.source_length;
 			else
 			{
-				chan.source = NULL;
+				chan.source = nullptr;
 				chan.source_num = -1;
 			}
 		}
@@ -330,7 +330,7 @@ void samples_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			stream_sample_t *buffer = outputs[0];
 
 			// process if we still have a source and we're not paused
-			if (chan.source != NULL && !chan.paused)
+			if (chan.source != nullptr && !chan.paused)
 			{
 				// load some info locally
 				UINT32 pos = chan.pos;
@@ -359,7 +359,7 @@ void samples_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 							pos %= sample_length;
 						else
 						{
-							chan.source = NULL;
+							chan.source = nullptr;
 							chan.source_num = -1;
 							if (samples > 0)
 								memset(buffer, 0, samples * sizeof(*buffer));
@@ -571,7 +571,7 @@ bool samples_device::read_flac_sample(emu_file &file, sample_t &sample)
 	file.seek(0, SEEK_SET);
 
 	// create the FLAC decoder and fill in the sample data
-	flac_decoder decoder(file);
+	flac_decoder decoder((core_file&) file);
 	sample.frequency = decoder.sample_rate();
 
 	// error if more than 1 channel or not 16bpp
@@ -614,18 +614,18 @@ bool samples_device::load_samples()
 
 	// load the samples
 	int index = 0;
-	for (const char *samplename = iter.first(); samplename != NULL; index++, samplename = iter.next())
+	for (const char *samplename = iter.first(); samplename != nullptr; index++, samplename = iter.next())
 	{
 		// attempt to open as FLAC first
 		emu_file file(machine().options().sample_path(), OPEN_FLAG_READ);
 		file_error filerr = file.open(basename, PATH_SEPARATOR, samplename, ".flac");
-		if (filerr != FILERR_NONE && altbasename != NULL)
+		if (filerr != FILERR_NONE && altbasename != nullptr)
 			filerr = file.open(altbasename, PATH_SEPARATOR, samplename, ".flac");
 
 		// if not, try as WAV
 		if (filerr != FILERR_NONE)
 			filerr = file.open(basename, PATH_SEPARATOR, samplename, ".wav");
-		if (filerr != FILERR_NONE && altbasename != NULL)
+		if (filerr != FILERR_NONE && altbasename != nullptr)
 			filerr = file.open(altbasename, PATH_SEPARATOR, samplename, ".wav");
 
 		// if opened, read it

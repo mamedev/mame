@@ -1,8 +1,8 @@
-// license:???
-// copyright-holders:ElSemi, kingshriek, Deunan Knute, R. Belmont
+// license:BSD-3-Clause
+// copyright-holders:ElSemi, Deunan Knute, R. Belmont
+// thanks-to: kingshriek
 /*
     Sega/Yamaha AICA emulation
-    By ElSemi, kingshriek, Deunan Knute, and R. Belmont
 
     This is effectively a 64-voice SCSP, with the following differences:
     - No FM mode
@@ -443,10 +443,10 @@ void aica_device::Init()
 		int iTL =(i>>0x0)&0xff;
 		int iPAN=(i>>0x8)&0x1f;
 		int iSDL=(i>>0xD)&0x0F;
-		float TL=1.0;
+		float TL;
 		float SegaDB=0;
-		float fSDL=1.0;
-		float PAN=1.0;
+		float fSDL;
+		float PAN;
 		float LPAN,RPAN;
 
 		if(iTL&0x01) SegaDB-=0.4f;
@@ -515,14 +515,14 @@ void aica_device::Init()
 	{
 		m_Slots[i].slot=i;
 		m_Slots[i].active=0;
-		m_Slots[i].base=NULL;
+		m_Slots[i].base=nullptr;
 		m_Slots[i].EG.state=AICA_RELEASE;
 		m_Slots[i].lpend=1;
 	}
 
 	AICALFO_Init();
-	m_buffertmpl=auto_alloc_array_clear(machine(), signed int, 44100);
-	m_buffertmpr=auto_alloc_array_clear(machine(), signed int, 44100);
+	m_buffertmpl=make_unique_clear<INT32[]>(44100);
+	m_buffertmpr=make_unique_clear<INT32[]>(44100);
 
 	// no "pend"
 	m_udata.data[0xa0/2] = 0;
@@ -804,7 +804,7 @@ void aica_device::UpdateRegR(address_space &space, int reg)
 			{
 				int slotnum = MSLC();
 				AICA_SLOT *slot=m_Slots + slotnum;
-				UINT16 LP = 0;
+				UINT16 LP;
 				if (!(AFSEL()))
 				{
 					UINT16 SGC;
@@ -834,7 +834,7 @@ void aica_device::UpdateRegR(address_space &space, int reg)
 				//m_stream->update();
 				int slotnum = MSLC();
 				AICA_SLOT *slot=m_Slots+slotnum;
-				unsigned int CA = 0;
+				unsigned int CA;
 
 				if (PCMS(slot) == 0)    // 16-bit samples
 				{
@@ -1476,12 +1476,12 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 		m_IRQL(0),
 		m_IRQR(0),
 		m_BUFPTR(0),
-		m_AICARAM(NULL),
+		m_AICARAM(nullptr),
 		m_AICARAM_LENGTH(0),
 		m_RAM_MASK(0),
 		m_RAM_MASK16(0),
-		m_buffertmpl(NULL),
-		m_buffertmpr(NULL),
+		m_buffertmpl(nullptr),
+		m_buffertmpr(nullptr),
 		m_IrqTimA(0),
 		m_IrqTimBC(0),
 		m_IrqMidi(0),
@@ -1491,10 +1491,10 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 		m_MidiR(0),
 		m_mcieb(0),
 		m_mcipd(0),
-		m_bufferl(NULL),
-		m_bufferr(NULL),
+		m_bufferl(nullptr),
+		m_bufferr(nullptr),
 		m_length(0),
-		m_RBUFDST(NULL)
+		m_RBUFDST(nullptr)
 
 {
 	memset(&m_udata.data, 0, sizeof(m_udata.data));

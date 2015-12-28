@@ -1582,7 +1582,7 @@ void i960_cpu_device::execute_op(UINT32 opcode)
 			switch((opcode >> 7) & 0xf) {
 			case 0x1: // movre
 				{
-					UINT32 *src=0, *dst=0;
+					UINT32 *src=nullptr, *dst=nullptr;
 
 					m_icount -= 8;
 

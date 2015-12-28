@@ -18,7 +18,7 @@ void legacy_scsi_host_adapter::reset_bus()
 	for (int i = 0; i <= 7; i++)
 	{
 		scsihle_device *scsidev = get_device(i);
-		if (scsidev != NULL)
+		if (scsidev != nullptr)
 		{
 			scsidev->reset();
 		}
@@ -30,7 +30,7 @@ bool legacy_scsi_host_adapter::select(int id)
 	m_selected = id;
 
 	scsihle_device *scsidev = get_device(m_selected);
-	if (scsidev != NULL)
+	if (scsidev != nullptr)
 	{
 		return true;
 	}
@@ -41,7 +41,7 @@ bool legacy_scsi_host_adapter::select(int id)
 void legacy_scsi_host_adapter::send_command(UINT8 *data, int bytes)
 {
 	scsihle_device *scsidev = get_device(m_selected);
-	if (scsidev != NULL)
+	if (scsidev != nullptr)
 	{
 		scsidev->SetCommand(data, bytes);
 		scsidev->ExecCommand();
@@ -55,7 +55,7 @@ void legacy_scsi_host_adapter::send_command(UINT8 *data, int bytes)
 int legacy_scsi_host_adapter::get_length(void)
 {
 	scsihle_device *scsidev = get_device(m_selected);
-	if (scsidev != NULL)
+	if (scsidev != nullptr)
 	{
 		int length;
 		scsidev->GetLength(&length);
@@ -71,7 +71,7 @@ int legacy_scsi_host_adapter::get_length(void)
 int legacy_scsi_host_adapter::get_phase(void)
 {
 	scsihle_device *scsidev = get_device(m_selected);
-	if (scsidev != NULL)
+	if (scsidev != nullptr)
 	{
 		int phase;
 		scsidev->GetPhase(&phase);
@@ -87,7 +87,7 @@ int legacy_scsi_host_adapter::get_phase(void)
 void legacy_scsi_host_adapter::read_data(UINT8 *data, int bytes)
 {
 	scsihle_device *scsidev = get_device(m_selected);
-	if (scsidev != NULL)
+	if (scsidev != nullptr)
 	{
 		scsidev->ReadData(data, bytes);
 	}
@@ -100,7 +100,7 @@ void legacy_scsi_host_adapter::read_data(UINT8 *data, int bytes)
 void legacy_scsi_host_adapter::write_data(UINT8 *data, int bytes)
 {
 	scsihle_device *scsidev = get_device(m_selected);
-	if (scsidev != NULL)
+	if (scsidev != nullptr)
 	{
 		scsidev->WriteData(data, bytes);
 	}
@@ -113,12 +113,12 @@ void legacy_scsi_host_adapter::write_data(UINT8 *data, int bytes)
 UINT8 legacy_scsi_host_adapter::get_status()
 {
 	scsihle_device *scsidev = get_device(m_selected);
-	if (scsidev != NULL)
+	if (scsidev != nullptr)
 	{
 		void *image;
 
 		scsidev->GetDevice(&image);
-		if (image != NULL)
+		if (image != nullptr)
 			return 0x00;
 
 		return 0x02;
@@ -133,13 +133,13 @@ UINT8 legacy_scsi_host_adapter::get_status()
 scsihle_device *legacy_scsi_host_adapter::get_device(int id)
 {
 	// steal scsi devices from bus
-	for (device_t *device = m_scsi_port->first_subdevice(); device != NULL; device = device->next())
+	for (device_t *device = m_scsi_port->first_subdevice(); device != nullptr; device = device->next())
 	{
 		SCSI_PORT_SLOT_device *slot = dynamic_cast<SCSI_PORT_SLOT_device *>(device);
-		if (slot != NULL)
+		if (slot != nullptr)
 		{
 			scsihle_device *scsidev = dynamic_cast<scsihle_device *>(slot->dev());
-			if (scsidev != NULL)
+			if (scsidev != nullptr)
 			{
 				if (scsidev->GetDeviceID() == id)
 				{
@@ -149,5 +149,5 @@ scsihle_device *legacy_scsi_host_adapter::get_device(int id)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }

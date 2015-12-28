@@ -326,29 +326,29 @@ static const int hamming_lut[64] = {
  */
 UINT32 alto2_cpu_device::hamming_code(int write, UINT32 dw_addr, UINT32 dw_data)
 {
-	register UINT8 hpb = write ? 0 : m_mem.hpb[dw_addr];
-	register UINT8 hc_0_a;
-	register UINT8 hc_0b1;
-	register UINT8 hc_1_a;
-	register UINT8 hc_2_a;
-	register UINT8 hc_2_b;
-	register UINT8 hc_0;
-	register UINT8 hc_1;
-	register UINT8 hc_2;
-	register UINT8 h_0_2;
-	register UINT8 hc_3_a;
-	register UINT8 hc_3_4;
-	register UINT8 hcpa;
-	register UINT8 hc_4_a;
-	register UINT8 hc_3;
-	register UINT8 hc_4;
-	register UINT8 hc_5;
-	register UINT8 hcpb;
-	register UINT8 perr;
-	register UINT8 pca;
-	register UINT8 pcb;
-	register UINT8 pc;
-	register int syndrome;
+	UINT8 hpb = write ? 0 : m_mem.hpb[dw_addr];
+	UINT8 hc_0_a;
+	UINT8 hc_0b1;
+	UINT8 hc_1_a;
+	UINT8 hc_2_a;
+	UINT8 hc_2_b;
+	UINT8 hc_0;
+	UINT8 hc_1;
+	UINT8 hc_2;
+	UINT8 h_0_2;
+	UINT8 hc_3_a;
+	UINT8 hc_3_4;
+	UINT8 hcpa;
+	UINT8 hc_4_a;
+	UINT8 hc_3;
+	UINT8 hc_4;
+	UINT8 hc_5;
+	UINT8 hcpb;
+	UINT8 perr;
+	UINT8 pca;
+	UINT8 pcb;
+	UINT8 pc;
+	int syndrome;
 
 	/* a75: WD01   WD04   WD08   WD11   WD15   WD19   WD23   WD26   WD30 ---     HC(0)A */
 	hc_0_a = parity_odd (dw_data & A75);
@@ -770,7 +770,7 @@ UINT16 alto2_cpu_device::debug_read_mem(UINT32 addr)
 {
 	space(AS_2).set_debugger_access(true);
 	int base_addr = addr & 0177777;
-	int data = 0177777;
+	int data;
 	if (base_addr >= ALTO2_IO_PAGE_BASE && addr < ALTO2_RAM_SIZE) {
 		data = m_iomem->read_word(m_iomem->address_to_byte(base_addr));
 	} else {
@@ -838,12 +838,10 @@ void alto2_cpu_device::exit_memory()
 void alto2_cpu_device::reset_memory()
 {
 	if (m_mem.ram) {
-		auto_free(machine(), m_mem.ram);
-		m_mem.ram = 0;
+		m_mem.ram = nullptr;
 	}
 	if (m_mem.hpb) {
-		auto_free(machine(), m_mem.hpb);
-		m_mem.hpb = 0;
+		m_mem.hpb = nullptr;
 	}
 	// allocate 64K or 128K words of main memory
 	ioport_port* config = ioport(":CONFIG");
@@ -854,8 +852,8 @@ void alto2_cpu_device::reset_memory()
 		m_mem.size = ALTO2_RAM_SIZE;
 	logerror("Main memory %u KiB\n", static_cast<UINT32>(sizeof(UINT16) * m_mem.size / 1024));
 
-	m_mem.ram = auto_alloc_array_clear(machine(), UINT32, sizeof(UINT16) * m_mem.size);
-	m_mem.hpb = auto_alloc_array_clear(machine(), UINT8,  sizeof(UINT16) * m_mem.size);
+	m_mem.ram = make_unique_clear<UINT32[]>(sizeof(UINT16) * m_mem.size);
+	m_mem.hpb = make_unique_clear<UINT8[]>( sizeof(UINT16) * m_mem.size);
 
 #if USE_HAMMING_CHECK
 	// Initialize the hamming codes and parity bit

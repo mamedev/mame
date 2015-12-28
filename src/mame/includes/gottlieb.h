@@ -76,7 +76,7 @@ public:
 	UINT8 m_laserdisc_select;
 	UINT8 m_laserdisc_status;
 	UINT16 m_laserdisc_philips_code;
-	UINT8 *m_laserdisc_audio_buffer;
+	std::unique_ptr<UINT8[]> m_laserdisc_audio_buffer;
 	UINT16 m_laserdisc_audio_address;
 	INT16 m_laserdisc_last_samples[2];
 	attotime m_laserdisc_last_time;
@@ -120,9 +120,9 @@ public:
 	DECLARE_DRIVER_INIT(qbertqub);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_screwloo_bg_tile_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(screwloo);
 	UINT32 screen_update_gottlieb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gottlieb_interrupt);
@@ -137,5 +137,5 @@ public:
 	void laserdisc_audio_process(laserdisc_device &device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

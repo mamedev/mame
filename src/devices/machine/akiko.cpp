@@ -75,11 +75,11 @@ akiko_device::akiko_device(const machine_config &mconfig, const char *tag, devic
 	m_cdrom_cmd_start(0),
 	m_cdrom_cmd_end(0),
 	m_cdrom_cmd_resp(0),
-	m_cdda(NULL),
-	m_cdrom(NULL),
-	m_cdrom_toc(NULL),
-	m_dma_timer(NULL),
-	m_frame_timer(NULL),
+	m_cdda(nullptr),
+	m_cdrom(nullptr),
+	m_cdrom_toc(nullptr),
+	m_dma_timer(nullptr),
+	m_frame_timer(nullptr),
 	m_cdrom_is_device(0),
 	m_scl_w(*this),
 	m_sda_r(*this),
@@ -147,7 +147,7 @@ void akiko_device::device_start()
 	device_t *cpu = machine().device(m_cputag);
 	m_space = &cpu->memory().space(AS_PROGRAM);
 
-	m_cdrom_toc = NULL;
+	m_cdrom_toc = nullptr;
 	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(akiko_device::dma_proc), this));
 	m_frame_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(akiko_device::frame_proc), this));
 	m_cdda = machine().device<cdda_device>("cdda");
@@ -161,7 +161,7 @@ void akiko_device::device_reset()
 {
 	cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
 
-	if (cddevice != NULL)
+	if (cddevice != nullptr)
 	{
 		// MESS case
 		m_cdrom = cddevice->get_cdrom_file();
@@ -175,7 +175,7 @@ void akiko_device::device_reset()
 	}
 
 	/* create the TOC table */
-	if ( m_cdrom != NULL && cdrom_get_last_track(m_cdrom) )
+	if ( m_cdrom != nullptr && cdrom_get_last_track(m_cdrom) )
 	{
 		UINT8 *p;
 		int     i, addrctrl = cdrom_get_adr_control( m_cdrom, 0 );
@@ -187,10 +187,10 @@ void akiko_device::device_reset()
 
 		m_cdrom_numtracks = cdrom_get_last_track(m_cdrom)+3;
 
-		m_cdrom_toc = auto_alloc_array(machine(), UINT8, 13*m_cdrom_numtracks);
-		memset( m_cdrom_toc, 0, 13*m_cdrom_numtracks);
+		m_cdrom_toc = std::make_unique<UINT8[]>(13*m_cdrom_numtracks);
+		memset( m_cdrom_toc.get(), 0, 13*m_cdrom_numtracks);
 
-		p = m_cdrom_toc;
+		p = m_cdrom_toc.get();
 		p[1] = ((addrctrl & 0x0f) << 4) | ((addrctrl & 0xf0) >> 4);
 		p[3] = 0xa0; /* first track */
 		p[8] = 1;
@@ -236,7 +236,7 @@ void akiko_device::device_stop()
 		if( m_cdrom )
 		{
 			cdrom_close(m_cdrom);
-			m_cdrom = (cdrom_file *)NULL;
+			m_cdrom = (cdrom_file *)nullptr;
 		}
 	}
 }
@@ -347,7 +347,7 @@ static const char* get_akiko_reg_name(int reg)
 
 void akiko_device::cdda_stop()
 {
-	if (m_cdda != NULL)
+	if (m_cdda != nullptr)
 	{
 		m_cdda->stop_audio();
 		m_frame_timer->reset(  );
@@ -356,7 +356,7 @@ void akiko_device::cdda_stop()
 
 void akiko_device::cdda_play(UINT32 lba, UINT32 num_blocks)
 {
-	if (m_cdda != NULL)
+	if (m_cdda != nullptr)
 	{
 		m_cdda->start_audio(lba, num_blocks);
 		m_frame_timer->adjust( attotime::from_hz( 75 ) );
@@ -365,7 +365,7 @@ void akiko_device::cdda_play(UINT32 lba, UINT32 num_blocks)
 
 void akiko_device::cdda_pause(int pause)
 {
-	if (m_cdda != NULL)
+	if (m_cdda != nullptr)
 	{
 		if (m_cdda->audio_active() && m_cdda->audio_paused() != pause )
 		{
@@ -387,7 +387,7 @@ UINT8 akiko_device::cdda_getstatus(UINT32 *lba)
 {
 	if ( lba ) *lba = 0;
 
-	if (m_cdda != NULL)
+	if (m_cdda != nullptr)
 	{
 		if (m_cdda->audio_active())
 		{
@@ -430,9 +430,9 @@ TIMER_CALLBACK_MEMBER(akiko_device::frame_proc)
 {
 	(void)param;
 
-	if (m_cdda != NULL)
+	if (m_cdda != nullptr)
 	{
-		UINT8   s = cdda_getstatus(NULL);
+		UINT8   s = cdda_getstatus(nullptr);
 
 		if ( s == 0x11 )
 		{
@@ -471,7 +471,7 @@ TIMER_CALLBACK_MEMBER(akiko_device::dma_proc)
 	{
 		amiga_state *amiga = machine().driver_data<amiga_state>();
 		UINT32  track = cdrom_get_track( m_cdrom, m_cdrom_lba_cur );
-		UINT32  datasize = cdrom_get_toc( m_cdrom )->tracks[track].datasize;
+		UINT32  datasize;// = cdrom_get_toc(m_cdrom)->tracks[track].datasize;
 		UINT32  subsize = cdrom_get_toc( m_cdrom )->tracks[track].subsize;
 		int     i;
 
@@ -577,7 +577,7 @@ TIMER_CALLBACK_MEMBER( akiko_device::cd_delayed_cmd )
 	if ( m_cdrom_status[0] & 0x10000000 )
 		return;
 
-	cddastatus = cdda_getstatus(NULL);
+	cddastatus = cdda_getstatus(nullptr);
 
 	if ( cddastatus == 0x11 || cddastatus == 0x12 )
 		return;
@@ -593,7 +593,7 @@ TIMER_CALLBACK_MEMBER( akiko_device::cd_delayed_cmd )
 
 		resp[0] = 0x06;
 
-		if ( m_cdrom == NULL || m_cdrom_numtracks == 0 )
+		if ( m_cdrom == nullptr || m_cdrom_numtracks == 0 )
 		{
 			resp[1] = 0x80;
 			setup_response( 15, resp );
@@ -633,7 +633,7 @@ void akiko_device::update_cdrom()
 		{
 			resp[1] = 0x00;
 
-			if ( cdda_getstatus(NULL) == 0x11 )
+			if ( cdda_getstatus(nullptr) == 0x11 )
 				resp[1] = 0x08;
 
 			cdda_pause(1);
@@ -646,7 +646,7 @@ void akiko_device::update_cdrom()
 		{
 			resp[1] = 0x00;
 
-			if ( cdda_getstatus(NULL) == 0x11 )
+			if ( cdda_getstatus(nullptr) == 0x11 )
 				resp[1] = 0x08;
 
 			cdda_pause(0);
@@ -669,7 +669,7 @@ void akiko_device::update_cdrom()
 
 			m_cdrom_cmd_start = (m_cdrom_cmd_start+13) & 0xff;
 
-			if ( m_cdrom == NULL || m_cdrom_numtracks == 0 )
+			if ( m_cdrom == nullptr || m_cdrom_numtracks == 0 )
 			{
 				resp[1] = 0x80;
 				setup_response( 2, resp );
@@ -776,7 +776,7 @@ void akiko_device::update_cdrom()
 
 			m_cdrom_cmd_start = (m_cdrom_cmd_start+2) & 0xff;
 
-			if ( m_cdrom == NULL || m_cdrom_numtracks == 0 )
+			if ( m_cdrom == nullptr || m_cdrom_numtracks == 0 )
 				resp[1] = 0x80;
 
 			setup_response( 20, resp );
@@ -801,7 +801,7 @@ READ32_MEMBER( akiko_device::read )
 	switch( offset )
 	{
 		case 0x00/4:    /* ID */
-			if ( m_cdrom != NULL ) m_cdda->set_cdrom(m_cdrom);
+			if ( m_cdrom != nullptr ) m_cdda->set_cdrom(m_cdrom);
 			return 0x0000cafe;
 
 		case 0x04/4:    /* CDROM STATUS 1 */

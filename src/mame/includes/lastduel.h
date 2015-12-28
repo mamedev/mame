@@ -60,7 +60,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_info);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(lastduel);
 	DECLARE_VIDEO_START(lastduel);
 	DECLARE_MACHINE_START(madgear);

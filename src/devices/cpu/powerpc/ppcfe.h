@@ -53,7 +53,7 @@ public:
 
 protected:
 	// required overrides
-	virtual bool describe(opcode_desc &desc, const opcode_desc *prev);
+	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
 
 private:
 	// inlines

@@ -126,13 +126,19 @@ public:
 
 	running_machine &machine() const { return m_machine; }
 
-	SDD1_IM* m_IM;
-	SDD1_GCD* m_GCD;
-	SDD1_BG* m_BG0;   SDD1_BG* m_BG1;   SDD1_BG* m_BG2;   SDD1_BG* m_BG3;
-	SDD1_BG* m_BG4;   SDD1_BG* m_BG5;   SDD1_BG* m_BG6;   SDD1_BG* m_BG7;
-	SDD1_PEM* m_PEM;
-	SDD1_CM* m_CM;
-	SDD1_OL* m_OL;
+	std::unique_ptr<SDD1_IM> m_IM;
+	std::unique_ptr<SDD1_GCD> m_GCD;
+	std::unique_ptr<SDD1_BG> m_BG0;
+	std::unique_ptr<SDD1_BG> m_BG1;
+	std::unique_ptr<SDD1_BG> m_BG2;
+	std::unique_ptr<SDD1_BG> m_BG3;
+	std::unique_ptr<SDD1_BG> m_BG4;
+	std::unique_ptr<SDD1_BG> m_BG5;
+	std::unique_ptr<SDD1_BG> m_BG6;
+	std::unique_ptr<SDD1_BG> m_BG7;
+	std::unique_ptr<SDD1_PEM> m_PEM;
+	std::unique_ptr<SDD1_CM> m_CM;
+	std::unique_ptr<SDD1_OL> m_OL;
 
 	void SDD1emu_decompress(UINT8 *ROM, UINT32 *mmc, UINT32 in_buf, UINT16 out_len, UINT8 *out_buf);
 
@@ -153,16 +159,16 @@ public:
 	sns_rom_sdd1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	virtual DECLARE_READ8_MEMBER(chip_read);
-	virtual DECLARE_WRITE8_MEMBER(chip_write);
+	virtual DECLARE_READ8_MEMBER(read_l) override;
+	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual DECLARE_READ8_MEMBER(chip_read) override;
+	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
 
 	UINT8 read_helper(UINT32 offset);
 
@@ -176,11 +182,11 @@ public:
 		UINT16 size;    // $43x5-$43x6 -- DMA transfer size
 	} m_dma[8];
 
-	SDD1_emu* m_sdd1emu;
+	std::unique_ptr<SDD1_emu> m_sdd1emu;
 
 	struct
 	{
-		UINT8 *data;    // pointer to decompressed S-DD1 data (65536 bytes)
+		std::unique_ptr<UINT8[]> data;    // pointer to decompressed S-DD1 data (65536 bytes)
 		UINT16 offset;  // read index into S-DD1 decompression buffer
 		UINT32 size;    // length of data buffer; reads decrement counter, set ready to false at 0
 		UINT8 ready;    // 1 when data[] is valid; 0 to invoke sdd1emu.decompress()

@@ -56,10 +56,6 @@ public:
 	// non-static internal members
 	void sample_trigger();
 	void process_delayed_command();
-	void ram_write(const UINT32 offset, const UINT16 data, const UINT16 mem_mask);
-	UINT16 ram_read(const UINT32 offset, const UINT16 mem_mask);
-	void register_write(const UINT32 offset, const UINT16 data, const UINT16 mem_mask);
-	UINT16 register_read(const UINT32 offset, const UINT16 mem_mask);
 
 	DECLARE_READ16_MEMBER( regs_r );
 	DECLARE_WRITE16_MEMBER( regs_w );
@@ -69,8 +65,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// internal callbacks
 	TIMER_CALLBACK_MEMBER( audio_sample_trigger );
@@ -103,7 +99,7 @@ private:
 	attotime m_decode_period;
 
 	int m_xa_last[4];
-	UINT16 *m_ram;
+	std::unique_ptr<UINT16[]> m_ram;
 
 	// static internal members
 	static void decode_xa_mono(INT32 *cdic_xa_last, const UINT8 *xa, INT16 *dp);

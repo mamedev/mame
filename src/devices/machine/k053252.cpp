@@ -54,6 +54,7 @@ TODO:
 - dual screen support (for Konami GX types 3/4)
 - viostorm and dbz reads the VCT port, but their usage is a side effect to send an irq ack thru the same port:
   i.e. first one uses move.b $26001d.l, $26001d.l, second one clr.b
+- le2 sets int-time but never ever enables hblank irq?
 
 ***************************************************************************************************************************/
 
@@ -73,7 +74,10 @@ k053252_device::k053252_device(const machine_config &mconfig, const char *tag, d
 		m_int2_ack_cb(*this),
 		//m_int_time_cb(*this),
 		m_offsx(0),
-		m_offsy(0)
+		m_offsy(0),
+		// ugly, needed to work with the rungun etc. video demux board
+		m_slave_screen_tag(nullptr),
+		m_slave_screen(nullptr)
 {
 }
 
@@ -99,6 +103,12 @@ void k053252_device::device_start()
 	save_item(NAME(m_vbp));
 	save_item(NAME(m_vsw));
 	save_item(NAME(m_hsw));
+
+	if (m_slave_screen_tag != nullptr)
+	{
+		// find the screen device if explicitly configured
+		m_slave_screen = device().siblingdevice<screen_device>(m_slave_screen_tag);
+	}
 }
 
 //-------------------------------------------------
@@ -113,7 +123,12 @@ void k053252_device::device_reset()
 		m_regs[i] = 0;
 
 	m_regs[0x08] = 1; // Xexex apparently does a wrong assignment for VC (sets up the INT enable register instead)
+	
+	reset_internal_state();
+}
 
+void k053252_device::reset_internal_state()
+{
 	m_hc=0;
 	m_hfp=0;
 	m_hbp=0;
@@ -124,7 +139,6 @@ void k053252_device::device_reset()
 	m_hsw=0;
 }
 
-
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
@@ -134,11 +148,12 @@ READ8_MEMBER( k053252_device::read )
 	//TODO: debugger_access()
 	switch(offset)
 	{
-		/* VCT read-back (TODO: values not extensively tested) */
+		/* VCT read-back */
+		// TODO: correct?
 		case 0x0e:
-			return (m_screen->vpos() >> 8) & 1;
+			return ((m_screen->vpos()-m_vc) >> 8) & 1;
 		case 0x0f:
-			return m_screen->vpos() & 0xff;
+			return (m_screen->vpos()-m_vc) & 0xff;
 		default:
 			//popmessage("Warning: k053252 read %02x, contact MAMEdev",offset);
 			break;
@@ -158,16 +173,26 @@ void k053252_device::res_change()
 		//(HC+1) - HFP - HBP - 8*(HSW+1)
 		//VC - VFP - VBP - (VSW+1)
 		attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock()) * (m_hc) * m_vc;
-
-		//printf("H %d %d %d %d\n",m_hc,m_hfp,m_hbp,m_hsw);
-		//printf("V %d %d %d %d\n",m_vc,m_vfp,m_vbp,m_vsw);
-
+		
 		visarea.min_x = m_offsx;
 		visarea.min_y = m_offsy;
 		visarea.max_x = m_offsx + m_hc - m_hfp - m_hbp - 8*(m_hsw) - 1;
 		visarea.max_y = m_offsy + m_vc - m_vfp - m_vbp - (m_vsw) - 1;
-
+		
 		m_screen->configure(m_hc, m_vc, visarea, refresh);
+		
+		if (m_slave_screen)
+			m_slave_screen->configure(m_hc, m_vc, visarea, refresh);
+
+#if 0
+		attoseconds_t hsync = HZ_TO_ATTOSECONDS(clock()) * (m_hc);
+		printf("H %d HFP %d HSW %d HBP %d\n",m_hc,m_hfp,m_hsw*8,m_hbp);
+		printf("V %d VFP %d VSW %d VBP %d\n",m_vc,m_vfp,m_vsw,m_vbp);
+		// L stands for Legacy ...
+		printf("L %d %d\n",m_offsx,m_offsy); 
+		printf("Screen params: Clock: %u V-Sync %.2f H-Sync %.f\n",clock(),ATTOSECONDS_TO_HZ(refresh),ATTOSECONDS_TO_HZ(hsync));
+		printf("visible screen area: %d x %d\n\n",(visarea.max_x - visarea.min_x) + 1,(visarea.max_y - visarea.min_y) + 1);
+#endif
 	}
 }
 
@@ -226,8 +251,16 @@ WRITE8_MEMBER( k053252_device::write )
 			logerror("%02x VSW / %02x HSW set\n",m_vsw,m_hsw);
 			res_change();
 			break;
+		
 		//case 0x0d: m_int_time(data); break;
 		case 0x0e: m_int1_ack_cb(1); break;
 		case 0x0f: m_int2_ack_cb(1); break;
 	}
+}
+
+
+void k053252_device::static_set_slave_screen(device_t &device, const char *tag)
+{
+	k053252_device &dev = downcast<k053252_device &>(device);
+	dev.m_slave_screen_tag = tag;
 }

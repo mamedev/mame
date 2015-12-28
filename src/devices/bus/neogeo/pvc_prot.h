@@ -37,14 +37,8 @@ public:
 	void kof2003h_decrypt_68k(UINT8* rom, UINT32 size);
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
-
-
-
-private:
-
-
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 #endif

@@ -382,6 +382,7 @@ static MACHINE_CONFIG_START( softbox, softbox_state )
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_cts))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD(I8255_0_TAG, I8255A, 0)
@@ -411,7 +412,7 @@ static MACHINE_CONFIG_START( softbox, softbox_state )
 	MCFG_HARDDISK_ADD("harddisk4")
 	MCFG_HARDDISK_INTERFACE("corvus_hdd")
 
-	MCFG_IMI7000_BUS_ADD("imi5000h", NULL, NULL, NULL)
+	MCFG_IMI7000_BUS_ADD("imi5000h", nullptr, nullptr, nullptr)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "softbox")

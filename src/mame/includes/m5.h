@@ -46,8 +46,8 @@ public:
 	required_device<floppy_image_device> m_floppy0;
 	required_ioport m_reset;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( sts_r );
 	DECLARE_WRITE8_MEMBER( com_w );

@@ -307,6 +307,27 @@ elseif BASE_TARGETOS=="os2" then
 	}
 end
 
+project ("qtdbg_" .. _OPTIONS["osd"])
+	uuid (os.uuid("qtdbg_" .. _OPTIONS["osd"]))
+	kind (LIBTYPE)
+
+	dofile("sdl_cfg.lua")
+	includedirs {
+		MAME_DIR .. "src/emu",
+		MAME_DIR .. "src/devices", -- accessing imagedev from debugger
+		MAME_DIR .. "src/osd",
+		MAME_DIR .. "src/lib",
+		MAME_DIR .. "src/lib/util",
+		MAME_DIR .. "src/osd/modules/render",
+		MAME_DIR .. "3rdparty",
+	}
+	configuration { "linux-*" }
+		buildoptions {
+			"-fPIC",
+		}
+	configuration { }
+	
+	qtdebuggerbuild()
 
 project ("osd_" .. _OPTIONS["osd"])
 	targetsubdir(_OPTIONS["target"] .."_" .._OPTIONS["subtarget"])
@@ -369,7 +390,7 @@ project ("osd_" .. _OPTIONS["osd"])
 			MAME_DIR .. "src/osd/modules/debugger/osx/registersview.mm",
 			MAME_DIR .. "src/osd/modules/debugger/osx/registersview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/watchpointsview.mm",
-			MAME_DIR .. "src/osd/modules/debugger/osx/watchpointsview.h",		
+			MAME_DIR .. "src/osd/modules/debugger/osx/watchpointsview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/debugosx.h",
 		}
 		if _OPTIONS["SDL_LIBVER"]=="sdl" then
@@ -438,7 +459,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/sdl/sdlsocket.cpp",
 		MAME_DIR .. "src/osd/sdl/sdlos_" .. SDLOS_TARGETOS .. ".cpp",
 		MAME_DIR .. "src/osd/modules/osdmodule.cpp",
-		MAME_DIR .. "src/osd/modules/osdmodule.h",		
+		MAME_DIR .. "src/osd/modules/osdmodule.h",
 		MAME_DIR .. "src/osd/modules/lib/osdlib_" .. SDLOS_TARGETOS .. ".cpp",
 		MAME_DIR .. "src/osd/modules/lib/osdlib.h",
 		MAME_DIR .. "src/osd/modules/sync/sync_" .. SYNC_IMPLEMENTATION .. ".cpp",
@@ -473,7 +494,7 @@ if _OPTIONS["with-tools"] then
 		kind "ConsoleApp"
 
 		flags {
-			"Symbols", -- always include minimum symbols for executables 	
+			"Symbols", -- always include minimum symbols for executables
 		}
 
 		dofile("sdl_cfg.lua")
@@ -483,7 +504,7 @@ if _OPTIONS["with-tools"] then
 			MAME_DIR .. "src/lib/util",
 		}
 
-		if _OPTIONS["SEPARATE_BIN"]~="1" then 
+		if _OPTIONS["SEPARATE_BIN"]~="1" then
 			targetdir(MAME_DIR)
 		end
 
@@ -534,12 +555,12 @@ if _OPTIONS["targetos"] == "macosx" and _OPTIONS["with-tools"] then
 		kind "ConsoleApp"
 
 		flags {
-			"Symbols", -- always include minimum symbols for executables 	
+			"Symbols", -- always include minimum symbols for executables
 		}
 
 		dofile("sdl_cfg.lua")
 
-		if _OPTIONS["SEPARATE_BIN"]~="1" then 
+		if _OPTIONS["SEPARATE_BIN"]~="1" then
 			targetdir(MAME_DIR)
 		end
 

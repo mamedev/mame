@@ -60,7 +60,7 @@ static void swap_strncpy(UINT16 *dst, const char *src, int field_size_in_words)
 {
 	for (int i = 0; i < field_size_in_words; i++)
 	{
-		UINT16 d = 0;
+		UINT16 d;
 
 		if (*src)
 		{
@@ -199,8 +199,8 @@ void ata_mass_storage_device::soft_reset()
 	m_cur_lba = 0;
 	m_status |= IDE_STATUS_DSC;
 
-	m_master_password_enable = (m_master_password != NULL);
-	m_user_password_enable = (m_user_password != NULL);
+	m_master_password_enable = (m_master_password != nullptr);
+	m_user_password_enable = (m_user_password != nullptr);
 }
 
 void ata_mass_storage_device::perform_diagnostic()
@@ -404,7 +404,7 @@ void ata_mass_storage_device::fill_buffer()
 
 void ata_mass_storage_device::finished_read()
 {
-	int lba = lba_address(), count = 0;
+	int lba = lba_address(), count;
 
 	set_dasp(CLEAR_LINE);
 
@@ -534,7 +534,7 @@ void ata_mass_storage_device::process_buffer()
 
 void ata_mass_storage_device::finished_write()
 {
-	int lba = lba_address(), count = 0;
+	int lba = lba_address(), count;
 
 	set_dasp(CLEAR_LINE);
 
@@ -777,7 +777,7 @@ void ide_hdd_device::device_reset()
 	m_handle = m_image->get_chd_file();
 	m_disk = m_image->get_hard_disk_file();
 
-	if (m_disk != NULL && !m_can_identify_device)
+	if (m_disk != nullptr && !m_can_identify_device)
 	{
 		const hard_disk_info *hdinfo = hard_disk_get_info(m_disk);
 		if (hdinfo->sectorbytes == IDE_DISK_SECTOR_SIZE)

@@ -810,7 +810,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(bbc_state, bbc_rts_w))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_acia6850_irq_w))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(bbc_state, write_rxd_serial))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(bbc_state, write_dcd_serial))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
@@ -885,6 +885,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_b_orig", "bbcb_orig_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_z80", "bbc_z80_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_32016", "bbc_32016_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_68000", "bbc_68000_flop")
 MACHINE_CONFIG_END
 
 
@@ -980,6 +981,7 @@ static MACHINE_CONFIG_DERIVED( abc110, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
 MACHINE_CONFIG_END
 
 
@@ -1001,6 +1003,7 @@ static MACHINE_CONFIG_DERIVED( acw443, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
 MACHINE_CONFIG_END
 
 
@@ -1020,6 +1023,7 @@ static MACHINE_CONFIG_DERIVED( abc310, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
 MACHINE_CONFIG_END
 
 
@@ -1054,6 +1058,7 @@ static MACHINE_CONFIG_DERIVED( reutapm, bbcbp )
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
 MACHINE_CONFIG_END
 
 
@@ -1137,6 +1142,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_ls_m", "bbcm_cart")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_z80", "bbc_z80_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_32016", "bbc_32016_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_68000", "bbc_68000_flop")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_a", "bbca_cass")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_ls_b", "bbcb_cass")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_b", "bbcb_flop")
@@ -1148,7 +1154,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(bbc_state, bbc_rts_w))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_acia6850_irq_w))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(bbc_state, write_rxd_serial))
 	MCFG_RS232_DCD_HANDLER(WRITELINE(bbc_state, write_dcd_serial))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
@@ -1193,7 +1199,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_ECONET_ADD()
 	MCFG_ECONET_CLK_CALLBACK(WRITELINE(bbc_state, econet_clk_w))
 	MCFG_ECONET_DATA_CALLBACK(DEVWRITELINE("mc6854", mc6854_device, set_rx))
-	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, NULL)
+	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
 MACHINE_CONFIG_END
 
 
@@ -1233,6 +1239,7 @@ static MACHINE_CONFIG_DERIVED( bbcmet, bbcm )
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
 
 	/* acia */
 	MCFG_DEVICE_REMOVE("acia6850")
@@ -1286,7 +1293,7 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", bbc_floppies_35, "qd", bbc_state::floppy_formats_bbcmc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", bbc_floppies_35, NULL, bbc_state::floppy_formats_bbcmc)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", bbc_floppies_35, nullptr, bbc_state::floppy_formats_bbcmc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* eeprom pcd8572 */
@@ -1304,6 +1311,7 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_b_orig")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
 	MCFG_SOFTWARE_LIST_REMOVE("cart_ls_m")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_mc", "bbcmc_flop")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_ls_pro128s", "pro128s_flop")

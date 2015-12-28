@@ -453,7 +453,7 @@ crt9007_t::crt9007_t(const machine_config &mconfig, const char *tag, device_t *o
 	device_t(mconfig, CRT9007, "SMC CRT9007", tag, owner, clock, "crt9007", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(crt9007)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(crt9007)),
 	m_write_int(*this),
 	m_write_dmar(*this),
 	m_write_hs(*this),
@@ -466,8 +466,8 @@ crt9007_t::crt9007_t(const machine_config &mconfig, const char *tag, device_t *o
 	m_write_slg(*this),
 	m_write_sld(*this)
 {
-	for (int i = 0; i < 0x3d; i++)
-		m_reg[i] = 0;
+	for (auto & elem : m_reg)
+		elem = 0;
 }
 
 
@@ -658,7 +658,7 @@ void crt9007_t::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 
 const address_space_config *crt9007_t::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 

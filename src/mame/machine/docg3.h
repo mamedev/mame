@@ -27,13 +27,13 @@ public:
 	void set_size(int _size) { m_size = _size; }
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
 public:
 	DECLARE_READ16_MEMBER( sec_1_r );
 	DECLARE_WRITE16_MEMBER( sec_1_w );
@@ -82,7 +82,7 @@ private:
 	UINT32 m_pages;
 	UINT32 m_user_data_size;
 	UINT32 m_extra_area_size;
-	UINT8 *m_data[3];
+	std::unique_ptr<UINT8[]> m_data[3];
 	UINT32 m_data_size[3];
 	UINT8  m_sec_2[0x800];
 	UINT32 m_data_1036;

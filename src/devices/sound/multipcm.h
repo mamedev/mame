@@ -20,14 +20,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	const address_space_config  m_space_config;
 
@@ -126,7 +126,6 @@ private:
 
 	// Internal LFO functions
 	void lfo_init();
-	INT32 lfo_float_to_fixed(const float value);
 	void lfo_compute_step(lfo_t *lfo, UINT32 lfo_frequency, UINT32 LFOS, INT32 amplitude_lfo);
 	INT32 pitch_lfo_step(lfo_t *lfo);
 	INT32 amplitude_lfo_step(lfo_t *lfo);

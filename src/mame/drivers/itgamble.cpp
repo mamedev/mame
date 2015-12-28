@@ -79,8 +79,8 @@ protected:
 	required_device<palette_device> m_palette;
 
 	// driver_device overrides
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 };
 
 

@@ -32,7 +32,7 @@ const device_type MACHINE_CDISLAVE = &device_creator<cdislave_device>;
 
 
 #if ENABLE_VERBOSE_LOG
-INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -41,7 +41,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, c
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", machine.device("maincpu")->safe_pc(), buf );
+		device.logerror("%s: %s", device.machine().describe_context(), buf );
 	}
 }
 #else
@@ -56,7 +56,7 @@ TIMER_CALLBACK_MEMBER( cdislave_device::trigger_readback_int )
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 
-	verboselog(machine(), 0, "%s", "Asserting IRQ2\n" );
+	verboselog(*this, 0, "%s", "Asserting IRQ2\n" );
 	state->m_maincpu->set_input_line_vector(M68K_IRQ_2, 26);
 	state->m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 	m_interrupt_timer->adjust(attotime::never);
@@ -129,7 +129,7 @@ READ16_MEMBER( cdislave_device::slave_r )
 	if(m_channel[offset].m_out_count)
 	{
 		UINT8 ret = m_channel[offset].m_out_buf[m_channel[offset].m_out_index];
-		verboselog(machine(), 0, "slave_r: Channel %d: %d, %02x\n", offset, m_channel[offset].m_out_index, ret );
+		verboselog(*this, 0, "slave_r: Channel %d: %d, %02x\n", offset, m_channel[offset].m_out_index, ret );
 		if(m_channel[offset].m_out_index == 0)
 		{
 			switch(m_channel[offset].m_out_cmd)
@@ -140,7 +140,7 @@ READ16_MEMBER( cdislave_device::slave_r )
 				case 0xf3:
 				case 0xf4:
 				case 0xf7:
-					verboselog(machine(), 0, "%s", "slave_r: De-asserting IRQ2\n" );
+					verboselog(*this, 0, "%s", "slave_r: De-asserting IRQ2\n" );
 					state->m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 					break;
 			}
@@ -155,7 +155,7 @@ READ16_MEMBER( cdislave_device::slave_r )
 		}
 		return ret;
 	}
-	verboselog(machine(), 0, "slave_r: Channel %d: %d\n", offset, m_channel[offset].m_out_index );
+	verboselog(*this, 0, "slave_r: Channel %d: %d\n", offset, m_channel[offset].m_out_index );
 	return 0xff;
 }
 
@@ -186,7 +186,7 @@ WRITE16_MEMBER( cdislave_device::slave_w )
 		case 0:
 			if(m_in_index)
 			{
-				verboselog(machine(), 0, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff );
+				verboselog(*this, 0, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff );
 				m_in_buf[m_in_index] = data & 0x00ff;
 				m_in_index++;
 				if(m_in_index == m_in_count)
@@ -223,11 +223,11 @@ WRITE16_MEMBER( cdislave_device::slave_w )
 					case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
 					case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
 					case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff:
-						verboselog(machine(), 0, "slave_w: Channel %d: Update Mouse Position (0x%02x)\n", offset, data & 0x00ff );
+						verboselog(*this, 0, "slave_w: Channel %d: Update Mouse Position (0x%02x)\n", offset, data & 0x00ff );
 						m_in_count = 3;
 						break;
 					default:
-						verboselog(machine(), 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
+						verboselog(*this, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
 						m_in_index = 0;
 						break;
 				}
@@ -236,7 +236,7 @@ WRITE16_MEMBER( cdislave_device::slave_w )
 		case 1:
 			if(m_in_index)
 			{
-				verboselog(machine(), 0, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff );
+				verboselog(*this, 0, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff );
 				m_in_buf[m_in_index] = data & 0x00ff;
 				m_in_index++;
 				if(m_in_index == m_in_count)
@@ -262,7 +262,7 @@ WRITE16_MEMBER( cdislave_device::slave_w )
 				switch(data & 0x00ff)
 				{
 					default:
-						verboselog(machine(), 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
+						verboselog(*this, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
 						memset(m_in_buf, 0, 17);
 						m_in_index = 0;
 						m_in_count = 0;
@@ -273,7 +273,7 @@ WRITE16_MEMBER( cdislave_device::slave_w )
 		case 2:
 			if(m_in_index)
 			{
-				verboselog(machine(), 0, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff );
+				verboselog(*this, 0, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff );
 				m_in_buf[m_in_index] = data & 0x00ff;
 				m_in_index++;
 				if(m_in_index == m_in_count)
@@ -299,24 +299,24 @@ WRITE16_MEMBER( cdislave_device::slave_w )
 				switch(data & 0x00ff)
 				{
 					case 0x82: // Mute Audio
-						verboselog(machine(), 0, "slave_w: Channel %d: Mute Audio (0x82)\n", offset );
+						verboselog(*this, 0, "slave_w: Channel %d: Mute Audio (0x82)\n", offset );
 						dmadac_enable(&state->m_dmadac[0], 2, 0);
 						m_in_index = 0;
 						m_in_count = 0;
 						//cdic->audio_sample_timer->adjust(attotime::never);
 						break;
 					case 0x83: // Unmute Audio
-						verboselog(machine(), 0, "slave_w: Channel %d: Unmute Audio (0x83)\n", offset );
+						verboselog(*this, 0, "slave_w: Channel %d: Unmute Audio (0x83)\n", offset );
 						dmadac_enable(&state->m_dmadac[0], 2, 1);
 						m_in_index = 0;
 						m_in_count = 0;
 						break;
 					case 0xf0: // Set Front Panel LCD
-						verboselog(machine(), 0, "slave_w: Channel %d: Set Front Panel LCD (0xf0)\n", offset );
+						verboselog(*this, 0, "slave_w: Channel %d: Set Front Panel LCD (0xf0)\n", offset );
 						m_in_count = 17;
 						break;
 					default:
-						verboselog(machine(), 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
+						verboselog(*this, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
 						memset(m_in_buf, 0, 17);
 						m_in_index = 0;
 						m_in_count = 0;
@@ -327,7 +327,7 @@ WRITE16_MEMBER( cdislave_device::slave_w )
 		case 3:
 			if(m_in_index)
 			{
-				verboselog(machine(), 0, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff );
+				verboselog(*this, 0, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff );
 				m_in_buf[m_in_index] = data & 0x00ff;
 				m_in_index++;
 				if(m_in_index == m_in_count)
@@ -361,45 +361,45 @@ WRITE16_MEMBER( cdislave_device::slave_w )
 				switch(data & 0x00ff)
 				{
 					case 0xb0: // Request Disc Status
-						verboselog(machine(), 0, "slave_w: Channel %d: Request Disc Status (0xb0)\n", offset );
+						verboselog(*this, 0, "slave_w: Channel %d: Request Disc Status (0xb0)\n", offset );
 						m_in_count = 4;
 						break;
 					case 0xb1: // Request Disc Base
-						verboselog(machine(), 0, "slave_w: Channel %d: Request Disc Base (0xb1)\n", offset );
+						verboselog(*this, 0, "slave_w: Channel %d: Request Disc Base (0xb1)\n", offset );
 						m_in_count = 4;
 						break;
 					case 0xf0: // Request SLAVE Revision
-						verboselog(machine(), 0, "slave_w: Channel %d: Request SLAVE Revision (0xf0)\n", offset );
+						verboselog(*this, 0, "slave_w: Channel %d: Request SLAVE Revision (0xf0)\n", offset );
 						prepare_readback(attotime::from_hz(10000), 2, 2, 0xf0, 0x32, 0x31, 0, 0xf0);
 						m_in_index = 0;
 						break;
 					case 0xf3: // Request Pointer Type
-						verboselog(machine(), 0, "slave_w: Channel %d: Request Pointer Type (0xf3)\n", offset );
+						verboselog(*this, 0, "slave_w: Channel %d: Request Pointer Type (0xf3)\n", offset );
 						m_in_index = 0;
 						prepare_readback(attotime::from_hz(10000), 2, 2, 0xf3, 1, 0, 0, 0xf3);
 						break;
 					case 0xf4: // Request Test Plug Status
-						verboselog(machine(), 0, "slave_w: Channel %d: Request Test Plug Status (0xf4)\n", offset );
+						verboselog(*this, 0, "slave_w: Channel %d: Request Test Plug Status (0xf4)\n", offset );
 						m_in_index = 0;
 						prepare_readback(attotime::from_hz(10000), 2, 2, 0xf4, 0, 0, 0, 0xf4);
 						break;
 					case 0xf6: // Request NTSC/PAL Status
-						verboselog(machine(), 0, "slave_w: Channel %d: Request NTSC/PAL Status (0xf6)\n", offset );
+						verboselog(*this, 0, "slave_w: Channel %d: Request NTSC/PAL Status (0xf6)\n", offset );
 						prepare_readback(attotime::never, 2, 2, 0xf6, 2, 0, 0, 0xf6);
 						m_in_index = 0;
 						break;
 					case 0xf7: // Enable Input Polling
-						verboselog(machine(), 0, "slave_w: Channel %d: Activate Input Polling (0xf7)\n", offset );
+						verboselog(*this, 0, "slave_w: Channel %d: Activate Input Polling (0xf7)\n", offset );
 						m_polling_active = 1;
 						m_in_index = 0;
 						break;
 					case 0xfa: // Enable X-Bus Interrupts
-						verboselog(machine(), 0, "slave_w: Channel %d: X-Bus Interrupt Enable (0xfa)\n", offset );
+						verboselog(*this, 0, "slave_w: Channel %d: X-Bus Interrupt Enable (0xfa)\n", offset );
 						m_xbus_interrupt_enable = 1;
 						m_in_index = 0;
 						break;
 					default:
-						verboselog(machine(), 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
+						verboselog(*this, 0, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff );
 						memset(m_in_buf, 0, 17);
 						m_in_index = 0;
 						m_in_count = 0;
@@ -484,15 +484,15 @@ void cdislave_device::device_start()
 
 void cdislave_device::device_reset()
 {
-	for(INT32 index = 0; index < 4; index++)
+	for(auto & elem : m_channel)
 	{
-		m_channel[index].m_out_buf[0] = 0;
-		m_channel[index].m_out_buf[1] = 0;
-		m_channel[index].m_out_buf[2] = 0;
-		m_channel[index].m_out_buf[3] = 0;
-		m_channel[index].m_out_index = 0;
-		m_channel[index].m_out_count = 0;
-		m_channel[index].m_out_cmd = 0;
+		elem.m_out_buf[0] = 0;
+		elem.m_out_buf[1] = 0;
+		elem.m_out_buf[2] = 0;
+		elem.m_out_buf[3] = 0;
+		elem.m_out_index = 0;
+		elem.m_out_count = 0;
+		elem.m_out_cmd = 0;
 	}
 
 	memset(m_in_buf, 0, 17);

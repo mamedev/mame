@@ -32,13 +32,13 @@
 void victory_state::video_start()
 {
 	/* allocate bitmapram */
-	m_rram = auto_alloc_array(machine(), UINT8, 0x4000);
-	m_gram = auto_alloc_array(machine(), UINT8, 0x4000);
-	m_bram = auto_alloc_array(machine(), UINT8, 0x4000);
+	m_rram = std::make_unique<UINT8[]>(0x4000);
+	m_gram = std::make_unique<UINT8[]>(0x4000);
+	m_bram = std::make_unique<UINT8[]>(0x4000);
 
 	/* allocate bitmaps */
-	m_bgbitmap = auto_alloc_array(machine(), UINT8, 256 * 256);
-	m_fgbitmap = auto_alloc_array(machine(), UINT8, 256 * 256);
+	m_bgbitmap = std::make_unique<UINT8[]>(256 * 256);
+	m_fgbitmap = std::make_unique<UINT8[]>(256 * 256);
 
 	/* reset globals */
 	m_vblank_irq = 0;
@@ -51,9 +51,9 @@ void victory_state::video_start()
 
 	/* register for state saving */
 	save_item(NAME(m_paletteram));
-	save_pointer(NAME(m_rram), 0x4000);
-	save_pointer(NAME(m_gram), 0x4000);
-	save_pointer(NAME(m_bram), 0x4000);
+	save_pointer(NAME(m_rram.get()), 0x4000);
+	save_pointer(NAME(m_gram.get()), 0x4000);
+	save_pointer(NAME(m_bram.get()), 0x4000);
 	save_item(NAME(m_vblank_irq));
 	save_item(NAME(m_fgcoll));
 	save_item(NAME(m_fgcollx));
@@ -510,7 +510,7 @@ Registers:
  *
  *************************************/
 
-INLINE void count_states(struct micro_t &micro, int states)
+static inline void count_states(struct micro_t &micro, int states)
 {
 	attotime state_time = MICRO_STATE_CLOCK_PERIOD * states;
 

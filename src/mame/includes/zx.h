@@ -52,14 +52,12 @@ public:
 	DECLARE_WRITE8_MEMBER(zx80_io_w);
 	DECLARE_WRITE8_MEMBER(zx81_io_w);
 	DECLARE_DRIVER_INIT(zx);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(zx);
 	DECLARE_PALETTE_INIT(ts1000);
 	void zx_tape_input();
 	void zx_ula_hsync();
-
-	UINT32 get_ram_size();
 
 protected:
 	enum
@@ -95,12 +93,13 @@ protected:
 	UINT8 m_prev_refresh;
 	UINT8 m_speaker_state;
 
-	bitmap_ind16 *m_bitmap_render, *m_bitmap_buffer;
+	std::unique_ptr<bitmap_ind16> m_bitmap_render;
+	std::unique_ptr<bitmap_ind16> m_bitmap_buffer;
 
 	UINT16 m_ula_char_buffer;
 	double m_cassette_cur_level;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	void drop_sync();
 	void recalc_hsync();

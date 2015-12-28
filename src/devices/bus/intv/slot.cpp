@@ -98,7 +98,7 @@ const device_type INTV_CART_SLOT = &device_creator<intv_cart_slot_device>;
 
 device_intv_cart_interface::device_intv_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0)
 {
 }
@@ -118,7 +118,7 @@ device_intv_cart_interface::~device_intv_cart_interface()
 
 void device_intv_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = device().machine().memory().region_alloc(std::string(tag).append(INTVSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		memset(m_rom, 0xff, size);
@@ -207,10 +207,10 @@ static const intv_slot slot_list[] =
 
 static int intv_get_pcb_id(const char *slot)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(slot_list[i].slot_option, slot))
-			return slot_list[i].pcb_id;
+		if (!core_stricmp(elem.slot_option, slot))
+			return elem.pcb_id;
 	}
 
 	return 0;
@@ -219,10 +219,10 @@ static int intv_get_pcb_id(const char *slot)
 #if 1
 static const char *intv_get_slot(int type)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (slot_list[i].pcb_id == type)
-			return slot_list[i].slot_option;
+		if (elem.pcb_id == type)
+			return elem.slot_option;
 	}
 
 	return "intv_rom";
@@ -392,7 +392,7 @@ bool intv_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 			return load_fullpath();
 		else
 		{
@@ -409,8 +409,8 @@ bool intv_cart_slot_device::call_load()
 			if (m_type == INTV_WSMLB)
 				extra_bank = true;
 
-			UINT32 size = 0;
-			UINT16 address = 0;
+			UINT32 size;
+			UINT16 address;
 			UINT8 *ROM, *region;
 
 			m_cart->rom_alloc(extra_bank ? 0x22000 : 0x20000, tag());
@@ -463,7 +463,7 @@ void intv_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "intv_rom";
+		const char *slot_string;
 		UINT32 len = core_fsize(m_file);
 		dynamic_buffer rom(len);
 		int type = INTV_STD;

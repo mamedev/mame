@@ -39,8 +39,8 @@ public:
 	required_device<ieee488_device> m_ieee;
 	required_device<corvus_hdc_t> m_hdc;
 
-	virtual void machine_start();
-	virtual void device_reset_after_children();
+	virtual void machine_start() override;
+	virtual void device_reset_after_children() override;
 
 	// device_ieee488_interface overrides
 	virtual void ieee488_ifc(int state);

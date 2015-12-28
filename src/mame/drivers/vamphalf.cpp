@@ -110,7 +110,7 @@ public:
 	int m_semicom_prot_idx;
 	int m_semicom_prot_which;
 	UINT16 m_finalgdr_backupram_bank;
-	UINT8 *m_finalgdr_backupram;
+	std::unique_ptr<UINT8[]> m_finalgdr_backupram;
 	UINT8 m_qs1000_data;
 
 	DECLARE_WRITE16_MEMBER(flipscreen_w);
@@ -167,7 +167,7 @@ public:
 	DECLARE_READ8_MEMBER(qs1000_p1_r);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_DRIVER_INIT(vamphalf);
 	DECLARE_DRIVER_INIT(vamphafk);
 	DECLARE_DRIVER_INIT(coolmini);
@@ -644,7 +644,7 @@ void vamphalf_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 			offs = (block + cnt) / 2;
 
 			// 16bit version
-			if(m_tiles != NULL)
+			if(m_tiles != nullptr)
 			{
 				if(m_tiles[offs] & 0x0100) continue;
 
@@ -2891,9 +2891,9 @@ DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
 DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
 {
 	m_finalgdr_backupram_bank = 1;
-	m_finalgdr_backupram = auto_alloc_array(machine(), UINT8, 0x80*0x100);
+	m_finalgdr_backupram = std::make_unique<UINT8[]>(0x80*0x100);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x005e874, 0x005e877, read32_delegate(FUNC(vamphalf_state::finalgdr_speedup_r), this));
-	machine().device<nvram_device>("nvram")->set_base(m_finalgdr_backupram, 0x80*0x100);
+	machine().device<nvram_device>("nvram")->set_base(m_finalgdr_backupram.get(), 0x80*0x100);
 
 	m_palshift = 0;
 	m_flip_bit = 1; //?
@@ -2903,7 +2903,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
 	m_semicom_prot_data[1] = 3;
 
 	save_item(NAME(m_finalgdr_backupram_bank));
-	save_pointer(NAME(m_finalgdr_backupram), 0x80*0x100);
+	save_pointer(NAME(m_finalgdr_backupram.get()), 0x80*0x100);
 	save_item(NAME(m_semicom_prot_idx));
 	save_item(NAME(m_semicom_prot_which));
 }
@@ -2912,9 +2912,9 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrkickera)
 {
 	// backup ram isn't used
 	m_finalgdr_backupram_bank = 1;
-	m_finalgdr_backupram = auto_alloc_array(machine(), UINT8, 0x80*0x100);
+	m_finalgdr_backupram = std::make_unique<UINT8[]>(0x80*0x100);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00701a4, 0x00701a7, read32_delegate(FUNC(vamphalf_state::mrkickera_speedup_r), this));
-	machine().device<nvram_device>("nvram")->set_base(m_finalgdr_backupram, 0x80*0x100);
+	machine().device<nvram_device>("nvram")->set_base(m_finalgdr_backupram.get(), 0x80*0x100);
 
 	m_palshift = 0;
 	m_flip_bit = 1; //?

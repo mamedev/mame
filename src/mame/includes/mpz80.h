@@ -44,8 +44,8 @@ public:
 	optional_shared_ptr<UINT8> m_map_ram;
 	required_ioport m_16c;
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	inline offs_t get_address(offs_t offset);
 	inline offs_t get_io_address(offs_t offset);
@@ -65,7 +65,6 @@ public:
 	DECLARE_WRITE8_MEMBER( disp_col_w );
 	DECLARE_WRITE8_MEMBER( task_w );
 	DECLARE_WRITE8_MEMBER( mask_w );
-	DECLARE_WRITE8_MEMBER( terminal_w );
 	DECLARE_WRITE_LINE_MEMBER( s100_pint_w );
 	DECLARE_WRITE_LINE_MEMBER( s100_nmi_w );
 	DECLARE_DIRECT_UPDATE_MEMBER(mpz80_direct_update_handler);

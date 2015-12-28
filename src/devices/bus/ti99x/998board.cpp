@@ -295,7 +295,7 @@ void mainboard8_device::PTGE_set(bool state)
 READ8_MEMBER( mainboard8_device::readm )
 {
 	UINT8 value = 0;
-	bool found = false;
+	bool found;
 	if (TRACE_MEM) logerror("%s: read from %04x\n", tag(), offset);
 	found = access_logical_r(space, offset, &value, mem_mask);
 	m_waitcount = 2;
@@ -323,7 +323,7 @@ READ8_MEMBER( mainboard8_device::readm )
 
 WRITE8_MEMBER( mainboard8_device::writem )
 {
-	bool found = false;
+	bool found;
 
 	// Look for components responding to the logical address
 	found = access_logical_w(space, offset, data, mem_mask);
@@ -485,10 +485,10 @@ bool mainboard8_device::access_logical_r(address_space& space, offs_t offset, UI
 {
 	bool found = false;
 	logically_addressed_device *ldev = m_logcomp.first();
-	bus8z_device *bdev = NULL;
+	bus8z_device *bdev;
 
 	if (TRACE_MEM) logerror("%s: offset=%04x; CRUS=%d, PTGEN=%d\n", tag(), offset, m_CRUS? 1:0, m_PTGE? 0:1);
-	while (ldev != NULL)
+	while (ldev != nullptr)
 	{
 		if (TRACE_MEM) logerror("%s: checking node=%s\n", tag(), ldev->m_config->name);
 		// Check the mode
@@ -531,9 +531,9 @@ bool mainboard8_device::access_logical_w(address_space& space, offs_t offset, UI
 {
 	bool found = false;
 	logically_addressed_device *ldev = m_logcomp.first();
-	bus8z_device *bdev = NULL;
+	bus8z_device *bdev;
 
-	while (ldev != NULL)
+	while (ldev != nullptr)
 	{
 		// Check the mode
 		if (((ldev->m_config->mode == NATIVE) && (m_CRUS==false))
@@ -573,9 +573,9 @@ bool mainboard8_device::access_logical_w(address_space& space, offs_t offset, UI
 void mainboard8_device::access_physical_r( address_space& space, offs_t pas_address, UINT8 *value, UINT8 mem_mask )
 {
 	physically_addressed_device *pdev = m_physcomp.first();
-	bus8z_device *bdev = NULL;
+	bus8z_device *bdev;
 
-	while (pdev != NULL)
+	while (pdev != nullptr)
 	{
 		if ((pas_address & pdev->m_config->address_mask)==pdev->m_config->select_pattern)
 		{
@@ -621,9 +621,9 @@ void mainboard8_device::access_physical_r( address_space& space, offs_t pas_addr
 void mainboard8_device::access_physical_w( address_space& space, offs_t pas_address, UINT8 data, UINT8 mem_mask )
 {
 	physically_addressed_device *pdev = m_physcomp.first();
-	bus8z_device *bdev = NULL;
+	bus8z_device *bdev;
 
-	while (pdev != NULL)
+	while (pdev != nullptr)
 	{
 		if ((pas_address & pdev->m_config->address_mask)==(pdev->m_config->select_pattern | pdev->m_config->write_select))
 		{
@@ -706,18 +706,18 @@ void mainboard8_device::device_start()
 
 	// Now building the list of active devices at this mapper.
 	// Coyping partly from datamux.c.
-	if ( entry != NULL )
+	if ( entry != nullptr )
 	{
 		bool done = false;
 		for (int i=0; !done; i++)
 		{
-			if (entry[i].name == NULL)
+			if (entry[i].name == nullptr)
 			{
 				done = true;
 			}
 			else
 			{
-				device_t *dev = NULL;
+				device_t *dev = nullptr;
 				mapper8_device_kind kind = MAP8_UNDEF;
 
 				for (int j=1; (j < 8) && (kind == MAP8_UNDEF); j++)
@@ -731,17 +731,17 @@ void mainboard8_device::device_start()
 					kind = MAP8_DEV;
 					dev = machine().device(entry[i].name);
 				}
-				if (kind != MAP8_DEV || dev != NULL)
+				if (kind != MAP8_DEV || dev != nullptr)
 				{
 					if (entry[i].mode != PHYSIC)
 					{
-						logically_addressed_device *ad = new logically_addressed_device(kind, (device_t*)dev, entry[i]);
+						auto ad = new logically_addressed_device(kind, (device_t*)dev, entry[i]);
 						m_logcomp.append(*ad);
 						if (TRACE_CONFIG) logerror("%s: Device %s mounted into logical address space.\n", tag(), entry[i].name);
 					}
 					else
 					{
-						physically_addressed_device *ad = new physically_addressed_device(kind, (device_t*)dev, entry[i]);
+						auto ad = new physically_addressed_device(kind, (device_t*)dev, entry[i]);
 						m_physcomp.append(*ad);
 						if (TRACE_CONFIG) logerror("%s: Device %s mounted into physical address space.\n", tag(), entry[i].name);
 					}
@@ -761,7 +761,7 @@ void mainboard8_device::device_start()
 	m_PTGE = false;
 
 	// Clean mapper
-	for (int i=0; i < 16; i++) m_pas_offset[i] = 0;
+	for (auto & elem : m_pas_offset) elem = 0;
 }
 
 void mainboard8_device::device_reset()
@@ -773,7 +773,7 @@ void mainboard8_device::device_reset()
 	m_hexbus_selected = false;
 
 	// Clean mapper
-	for (int i=0; i < 16; i++) m_pas_offset[i] = 0;
+	for (auto & elem : m_pas_offset) elem = 0;
 
 	m_ready(ASSERT_LINE);
 }

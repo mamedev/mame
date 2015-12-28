@@ -44,13 +44,13 @@ const int TRIGGER_SUSPENDTIME   = -4000;
 device_execute_interface::device_execute_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "execute"),
 		m_disabled(false),
-		m_vblank_interrupt_screen(NULL),
+		m_vblank_interrupt_screen(nullptr),
 		m_timed_interrupt_period(attotime::zero),
 		m_is_octal(false),
-		m_nextexec(NULL),
-		m_timedint_timer(NULL),
+		m_nextexec(nullptr),
+		m_timedint_timer(nullptr),
 		m_profiler(PROFILER_IDLE),
-		m_icountptr(NULL),
+		m_icountptr(nullptr),
 		m_cycles_running(0),
 		m_cycles_stolen(0),
 		m_suspend(0),
@@ -208,7 +208,7 @@ void device_execute_interface::abort_timeslice()
 		return;
 
 	// swallow the remaining cycles
-	if (m_icountptr != NULL)
+	if (m_icountptr != nullptr)
 	{
 		int delta = *m_icountptr;
 		m_cycles_stolen += delta;
@@ -449,9 +449,9 @@ void device_execute_interface::interface_validity_check(validity_checker &valid)
 	if (!m_vblank_interrupt.isnull())
 	{
 		screen_device_iterator iter(device().mconfig().root_device());
-		if (iter.first() == NULL)
+		if (iter.first() == nullptr)
 			osd_printf_error("VBLANK interrupt specified, but the driver is screenless\n");
-		else if (m_vblank_interrupt_screen != NULL && device().siblingdevice(m_vblank_interrupt_screen) == NULL)
+		else if (m_vblank_interrupt_screen != nullptr && device().siblingdevice(m_vblank_interrupt_screen) == nullptr)
 			osd_printf_error("VBLANK interrupt references a non-existant screen tag '%s'\n", m_vblank_interrupt_screen);
 	}
 
@@ -497,7 +497,7 @@ void device_execute_interface::interface_pre_start()
 void device_execute_interface::interface_post_start()
 {
 	// make sure somebody set us up the icount
-	assert_always(m_icountptr != NULL, "m_icountptr never initialized!");
+	assert_always(m_icountptr != nullptr, "m_icountptr never initialized!");
 
 	// register for save states
 	device().save_item(NAME(m_suspend));
@@ -540,16 +540,16 @@ void device_execute_interface::interface_pre_reset()
 void device_execute_interface::interface_post_reset()
 {
 	// reset the interrupt vectors and queues
-	for (int line = 0; line < ARRAY_LENGTH(m_input); line++)
-		m_input[line].reset();
+	for (auto & elem : m_input)
+		elem.reset();
 
 	// reconfingure VBLANK interrupts
-	if (m_vblank_interrupt_screen != NULL)
+	if (m_vblank_interrupt_screen != nullptr)
 	{
 		// get the screen that will trigger the VBLANK
 		screen_device *screen = downcast<screen_device *>(device().machine().device(device().siblingtag(m_vblank_interrupt_screen).c_str()));
 
-		assert(screen != NULL);
+		assert(screen != nullptr);
 		screen->register_vblank_callback(vblank_state_delegate(FUNC(device_execute_interface::on_vblank), this));
 	}
 
@@ -557,7 +557,7 @@ void device_execute_interface::interface_post_reset()
 	if (m_timed_interrupt_period != attotime::zero)
 	{
 		attotime timedint_period = m_timed_interrupt_period;
-		assert(m_timedint_timer != NULL);
+		assert(m_timedint_timer != nullptr);
 		m_timedint_timer->adjust(timedint_period, 0, timedint_period);
 	}
 }
@@ -712,7 +712,7 @@ void device_execute_interface::trigger_periodic_interrupt()
 //-------------------------------------------------
 
 device_execute_interface::device_input::device_input()
-	: m_execute(NULL),
+	: m_execute(nullptr),
 		m_linenum(0),
 		m_stored_vector(0),
 		m_curvector(0),

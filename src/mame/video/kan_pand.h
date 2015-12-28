@@ -44,15 +44,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void draw( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 private:
 	// internal state
-	UINT8 *         m_spriteram;
-	bitmap_ind16    *m_sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
+	std::unique_ptr<UINT8[]>        m_spriteram;
+	std::unique_ptr<bitmap_ind16> m_sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
 	int             m_clear_bitmap;
 	int             m_bg_pen; // might work some other way..
 	UINT8           m_gfx_region;

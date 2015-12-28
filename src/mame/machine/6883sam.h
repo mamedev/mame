@@ -31,7 +31,7 @@
 class sam6883_friend_device
 {
 public:
-	sam6883_friend_device() { m_cpu = NULL; m_sam_state = 0x0000; }
+	sam6883_friend_device() { m_cpu = nullptr; m_sam_state = 0x0000; }
 
 protected:
 	// SAM state constants
@@ -133,9 +133,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_post_load();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 private:
 	// represents an external memory bank - memory or IO that the SAM

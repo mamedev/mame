@@ -992,7 +992,7 @@ UINT32 svga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 UINT32 s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 cur_mode = 0;
+	UINT8 cur_mode;
 
 	svga_device::screen_update(screen, bitmap, cliprect);
 
@@ -3387,7 +3387,7 @@ void ibm8514a_device::ibm8514_write_bg(UINT32 offset)
 void ibm8514a_device::ibm8514_write(UINT32 offset, UINT32 src)
 {
 	int data_size = 8;
-	UINT32 xfer = 0;
+	UINT32 xfer;
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch(ibm8514.pixel_control & 0x00c0)
@@ -5235,7 +5235,7 @@ WRITE8_MEMBER(ati_vga_device::ati_port_ext_w)
 			if(data & 0x04)
 			{
 				eeprom_serial_93cxx_device* eep = subdevice<eeprom_serial_93cxx_device>("ati_eeprom");
-				if(eep != NULL)
+				if(eep != nullptr)
 				{
 					eep->di_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 					eep->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);

@@ -85,10 +85,7 @@ public:
 	required_ioport m_y10;
 	required_ioport m_rpt;
 
-	virtual void machine_start();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void bankswitch();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER( ppi_pa_w );
 	DECLARE_READ8_MEMBER( ppi_pb_r );
@@ -130,7 +127,7 @@ public:
 	{
 	}
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(eprom_r);
 	DECLARE_WRITE8_MEMBER(eprom_w);

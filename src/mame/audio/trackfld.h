@@ -16,17 +16,15 @@ public:
 	DECLARE_WRITE8_MEMBER(trackfld_sound_w );
 	DECLARE_READ8_MEMBER(hyperspt_sh_timer_r );
 	DECLARE_WRITE8_MEMBER(hyperspt_sound_w );
-	DECLARE_WRITE8_MEMBER(konami_SN76496_latch_w );
-	DECLARE_WRITE8_MEMBER(konami_SN76496_w );
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
 	// internal state

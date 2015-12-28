@@ -228,7 +228,7 @@ gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *ta
 
 const address_space_config *gp9001vdp_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
 TILE_GET_INFO_MEMBER(gp9001vdp_device::get_top0_tile_info)
@@ -308,11 +308,11 @@ void gp9001vdp_device::create_tilemaps()
 
 void gp9001vdp_device::device_start()
 {
-	sp.vram16_buffer = auto_alloc_array_clear(machine(), UINT16, GP9001_SPRITERAM_SIZE/2);
+	sp.vram16_buffer = make_unique_clear<UINT16[]>(GP9001_SPRITERAM_SIZE/2);
 
 	create_tilemaps();
 
-	save_pointer(NAME(sp.vram16_buffer), GP9001_SPRITERAM_SIZE/2);
+	save_pointer(NAME(sp.vram16_buffer.get()), GP9001_SPRITERAM_SIZE/2);
 
 	save_item(NAME(gp9001_scroll_reg));
 	save_item(NAME(gp9001_voffs));
@@ -680,7 +680,7 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 
 	UINT16 *source;
 
-	if (sp.use_sprite_buffer) source = sp.vram16_buffer;
+	if (sp.use_sprite_buffer) source = sp.vram16_buffer.get();
 	else source = m_spriteram;
 	int total_elements = m_gfx[1]->elements();
 	int total_colors = m_gfx[1]->colors();
@@ -936,5 +936,5 @@ void gp9001vdp_device::gp9001_render_vdp(bitmap_ind16 &bitmap, const rectangle &
 void gp9001vdp_device::gp9001_screen_eof(void)
 {
 	/** Shift sprite RAM buffers  ***  Used to fix sprite lag **/
-	if (sp.use_sprite_buffer) memcpy(sp.vram16_buffer,m_spriteram,GP9001_SPRITERAM_SIZE);
+	if (sp.use_sprite_buffer) memcpy(sp.vram16_buffer.get(),m_spriteram,GP9001_SPRITERAM_SIZE);
 }

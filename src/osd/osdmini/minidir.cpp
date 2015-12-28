@@ -17,7 +17,7 @@ osd_directory *osd_opendir(const char *dirname)
 {
 	// since there are no standard C library routines for walking directories,
 	// we always return an error here
-	return NULL;
+	return nullptr;
 }
 
 
@@ -29,7 +29,7 @@ const osd_directory_entry *osd_readdir(osd_directory *dir)
 {
 	// since there are no standard C library routines for walking directories,
 	// we always return an error here
-	return NULL;
+	return nullptr;
 }
 
 

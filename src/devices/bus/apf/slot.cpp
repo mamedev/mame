@@ -27,7 +27,7 @@ const device_type APF_CART_SLOT = &device_creator<apf_cart_slot_device>;
 
 device_apf_cart_interface::device_apf_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0)
 {
 }
@@ -47,7 +47,7 @@ device_apf_cart_interface::~device_apf_cart_interface()
 
 void device_apf_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = device().machine().memory().region_alloc(std::string(tag).append(APFSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
@@ -131,10 +131,10 @@ static const apf_slot slot_list[] =
 
 static int apf_get_pcb_id(const char *slot)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(slot_list[i].slot_option, slot))
-			return slot_list[i].pcb_id;
+		if (!core_stricmp(elem.slot_option, slot))
+			return elem.pcb_id;
 	}
 
 	return 0;
@@ -142,10 +142,10 @@ static int apf_get_pcb_id(const char *slot)
 
 static const char *apf_get_slot(int type)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (slot_list[i].pcb_id == type)
-			return slot_list[i].slot_option;
+		if (elem.pcb_id == type)
+			return elem.slot_option;
 	}
 
 	return "std";
@@ -160,7 +160,7 @@ bool apf_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 size = (software_entry() == NULL) ? length() : get_software_region_length("rom");
+		UINT32 size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
 
 		if (size > 0x3800)
 		{
@@ -170,12 +170,12 @@ bool apf_cart_slot_device::call_load()
 
 		m_cart->rom_alloc(size, tag());
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 			fread(m_cart->get_rom_base(), size);
 		else
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			m_type = APF_STD;
 			// attempt to identify Space Destroyer, which needs 1K of additional RAM
@@ -225,7 +225,7 @@ void apf_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "std";
+		const char *slot_string;
 		UINT32 size = core_fsize(m_file);
 		int type = APF_STD;
 

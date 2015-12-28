@@ -68,7 +68,7 @@ offs_t z8002_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
 
 
 /* opcode execution table */
-Z8000_exec *z8000_exec = NULL;
+Z8000_exec *z8000_exec = nullptr;
 
 /* zero, sign and parity flags for logical byte operations */
 static UINT8 z8000_zsp[256];
@@ -658,7 +658,7 @@ void z8001_device::device_start()
 	m_io = &space(AS_IO);
 
 	/* already initialized? */
-	if(z8000_exec == NULL)
+	if(z8000_exec == nullptr)
 		z8000_init_tables();
 
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
@@ -688,7 +688,7 @@ void z8002_device::device_start()
 	m_io = &space(AS_IO);
 
 	/* already initialized? */
-	if(z8000_exec == NULL)
+	if(z8000_exec == nullptr)
 		z8000_init_tables();
 
 	z8k_segm = false;

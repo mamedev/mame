@@ -162,7 +162,6 @@ public:
 	DECLARE_WRITE8_MEMBER(shdancbl_msm5205_data_w);
 	DECLARE_READ8_MEMBER(shdancbl_soundbank_r);
 	DECLARE_WRITE8_MEMBER(shdancbl_bankctrl_w);
-	DECLARE_WRITE16_MEMBER(sys16_paletteram_w);
 	DECLARE_WRITE16_MEMBER(sys16_tileram_w);
 	DECLARE_WRITE16_MEMBER(sys16_textram_w);
 	DECLARE_WRITE16_MEMBER(s16a_bootleg_bgscrolly_w);

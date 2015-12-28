@@ -40,7 +40,7 @@ public:
 	int m_xoffset;
 	int m_yoffset;
 	int m_keyboard_row;
-	UINT16 *m_buffered_spriteram;
+	std::unique_ptr<UINT16[]> m_buffered_spriteram;
 
 	UINT64 m_funcube_coin_start_cycles;
 	UINT8 m_funcube_hopper_motor;
@@ -82,7 +82,7 @@ public:
 	DECLARE_DRIVER_INIT(funcube3);
 	DECLARE_DRIVER_INIT(funcube);
 	DECLARE_DRIVER_INIT(funcube2);
-	virtual void video_start();
+	virtual void video_start() override;
 	DECLARE_MACHINE_START(mj4simai);
 	DECLARE_MACHINE_START(funcube);
 	DECLARE_MACHINE_RESET(funcube);

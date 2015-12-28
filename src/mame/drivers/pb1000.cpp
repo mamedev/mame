@@ -56,8 +56,7 @@ public:
 	memory_region *m_card1_reg;
 	memory_region *m_card2_reg;
 
-	virtual void machine_start();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void machine_start() override;
 	DECLARE_WRITE16_MEMBER( gatearray_w );
 	DECLARE_WRITE8_MEMBER( lcd_control );
 	DECLARE_READ8_MEMBER( lcd_data_r );

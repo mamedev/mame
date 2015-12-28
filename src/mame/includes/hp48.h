@@ -69,7 +69,7 @@ public:
 	*/
 	UINT32 m_port_size[2];
 	UINT8 m_port_write[2];
-	UINT8* m_port_data[2];
+	std::unique_ptr<UINT8[]> m_port_data[2];
 
 	UINT32 m_bank_switch;
 	UINT32 m_io_addr;
@@ -81,7 +81,7 @@ public:
 	UINT8* m_rom;
 
 	DECLARE_DRIVER_INIT(hp48);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(hp48);
 	DECLARE_MACHINE_START(hp49g);
 	DECLARE_MACHINE_START(hp48gx);
@@ -97,7 +97,6 @@ public:
 	DECLARE_WRITE8_MEMBER(hp49_bank_w);
 	TIMER_CALLBACK_MEMBER(hp48_rs232_byte_recv_cb);
 	TIMER_CALLBACK_MEMBER(hp48_rs232_byte_sent_cb);
-	TIMER_CALLBACK_MEMBER(hp48_chardev_byte_recv_cb);
 	TIMER_CALLBACK_MEMBER(hp48_kbd_cb);
 	TIMER_CALLBACK_MEMBER(hp48_timer1_cb);
 	TIMER_CALLBACK_MEMBER(hp48_timer2_cb);
@@ -184,24 +183,24 @@ public:
 	}
 
 	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_MEMCARD; }
+	virtual iodevice_t image_type() const override { return IO_MEMCARD; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
-	virtual const char *file_extensions() const { return "crd"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 1; }
+	virtual bool is_creatable() const override { return 1; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
+	virtual const char *image_interface() const override { return nullptr; }
+	virtual const char *file_extensions() const override { return "crd"; }
+	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load();
-	virtual void call_unload();
-	virtual bool call_create(int format_type, option_resolution *format_options);
+	virtual bool call_load() override;
+	virtual void call_unload() override;
+	virtual bool call_create(int format_type, option_resolution *format_options) override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
 private:
 	void hp48_fill_port();
 	void hp48_unfill_port();

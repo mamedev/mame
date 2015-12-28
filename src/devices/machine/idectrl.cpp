@@ -187,10 +187,10 @@ void bus_master_ide_controller_device::device_start()
 	ide_controller_32_device::device_start();
 
 	/* find the bus master space */
-	if (m_bmcpu != NULL)
+	if (m_bmcpu != nullptr)
 	{
 		device_t *bmtarget = machine().device(m_bmcpu);
-		if (bmtarget == NULL)
+		if (bmtarget == nullptr)
 			throw emu_fatalerror("IDE controller '%s' bus master target '%s' doesn't exist!", tag(), m_bmcpu);
 		device_memory_interface *memory;
 		if (!bmtarget->interface(memory))

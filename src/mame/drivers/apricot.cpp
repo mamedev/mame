@@ -80,7 +80,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 
-	DECLARE_WRITE_LINE_MEMBER(apricot_mc6845_de) { m_display_enabled = state; };
+	DECLARE_WRITE_LINE_MEMBER(apricot_hd6845_de) { m_display_enabled = state; };
 
 	DECLARE_WRITE_LINE_MEMBER(data_selector_dtr_w) { m_data_selector_dtr = state; };
 	DECLARE_WRITE_LINE_MEMBER(data_selector_rts_w) { m_data_selector_rts = state; };
@@ -89,13 +89,13 @@ public:
 	UINT32 screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 private:
 	required_device<i8086_cpu_device> m_cpu;
 	required_device<i8089_device> m_iop;
 	required_device<ram_device> m_ram;
-	required_device<mc6845_device> m_crtc;
+	required_device<hd6845_device> m_crtc;
 	required_device<i8255_device> m_ppi;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8253_device> m_pit;
@@ -173,7 +173,7 @@ WRITE8_MEMBER( apricot_state::i8255_portb_w )
 	m_display_on = BIT(data, 3);
 	m_video_mode = BIT(data, 4);
 
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 
 	// bit 5, enable disk select
 	// bit 6, disk select
@@ -359,8 +359,8 @@ static ADDRESS_MAP_START( apricot_io, AS_IO, 16, apricot_state )
 	AM_RANGE(0x62, 0x63) AM_READ8(sio_ca_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio0_device, ca_w, 0x00ff)
 	AM_RANGE(0x64, 0x65) AM_READ8(sio_db_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio0_device, db_w, 0x00ff)
 	AM_RANGE(0x66, 0x67) AM_READ8(sio_cb_r, 0x00ff) AM_DEVWRITE8("ic15", z80sio0_device, cb_w, 0x00ff)
-	AM_RANGE(0x68, 0x69) AM_MIRROR(0x04) AM_DEVWRITE8("ic30", mc6845_device, address_w, 0x00ff)
-	AM_RANGE(0x6a, 0x6b) AM_MIRROR(0x04) AM_DEVREADWRITE8("ic30", mc6845_device, register_r, register_w, 0x00ff)
+	AM_RANGE(0x68, 0x69) AM_MIRROR(0x04) AM_DEVWRITE8("ic30", hd6845_device, address_w, 0x00ff)
+	AM_RANGE(0x6a, 0x6b) AM_MIRROR(0x04) AM_DEVREADWRITE8("ic30", hd6845_device, register_r, register_w, 0x00ff)
 	AM_RANGE(0x70, 0x71) AM_MIRROR(0x04) AM_WRITE8(i8089_ca1_w, 0x00ff)
 	AM_RANGE(0x72, 0x73) AM_MIRROR(0x04) AM_WRITE8(i8089_ca2_w, 0x00ff)
 	AM_RANGE(0x78, 0x7f) AM_NOP // unavailable
@@ -400,12 +400,11 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
-	MCFG_MC6845_ADD("ic30", MC6845, "screen", XTAL_15MHz / 10)
-	MCFG_MC6845_INTERLACE_ADJUST(2)
+	MCFG_MC6845_ADD("ic30", HD6845, "screen", XTAL_15MHz / 10)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(10)
 	MCFG_MC6845_UPDATE_ROW_CB(apricot_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(apricot_state, apricot_mc6845_de))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(apricot_state, apricot_hd6845_de))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -441,7 +440,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("ic31", pic8259_device, ir5_w))
 
 	// rs232 port
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 // note: missing a receive clock callback to support external clock mode
 // (m_data_selector_rts == 1 and m_data_selector_dtr == 0)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ic15", z80sio0_device, rxa_w))
@@ -475,8 +474,8 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	// expansion bus
 	MCFG_EXPANSION_ADD("exp", "ic91")
 	MCFG_EXPANSION_IOP_ADD("ic71")
-	MCFG_EXPANSION_SLOT_ADD("exp:1", apricot_expansion_cards, NULL)
-	MCFG_EXPANSION_SLOT_ADD("exp:2", apricot_expansion_cards, NULL)
+	MCFG_EXPANSION_SLOT_ADD("exp:1", apricot_expansion_cards, nullptr)
+	MCFG_EXPANSION_SLOT_ADD("exp:2", apricot_expansion_cards, nullptr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apricotxi, apricot )

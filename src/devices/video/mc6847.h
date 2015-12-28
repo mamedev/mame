@@ -210,7 +210,7 @@ protected:
 
 		// artifacting config
 		void setup_config(device_t *device);
-		void poll_config(void) { m_artifacting = (m_config!=NULL) ? m_config->read() : 0; }
+		void poll_config(void) { m_artifacting = (m_config!=nullptr) ? m_config->read() : 0; }
 
 		// artifacting application
 		template<int xscale>
@@ -281,10 +281,10 @@ protected:
 	artifacter m_artifacter;
 
 	// device-level overrides
-	virtual void device_start(void);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_reset(void);
-	virtual void device_post_load(void);
+	virtual void device_start(void) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_reset(void) override;
+	virtual void device_post_load(void) override;
 
 	// other overridables
 	virtual void new_frame(void);
@@ -411,7 +411,7 @@ protected:
 	UINT32 emit_mc6847_samples(UINT8 mode, const UINT8 *data, int length, pixel_t *RESTRICT pixels, const pixel_t *RESTRICT palette,
 		mc6847_get_char_rom_delegate get_char_rom, int x, int y)
 	{
-		UINT32 result = 0;
+		UINT32 result;
 		if (mode & MODE_AG)
 		{
 			/* graphics */
@@ -540,14 +540,14 @@ protected:
 	mc6847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, double tpfs, const char *shortname, const char *source);
 
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// other overrides
-	virtual void field_sync_changed(bool line);
-	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 scanline);
-	virtual void record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock);
+	virtual void field_sync_changed(bool line) override;
+	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 scanline) override;
+	virtual void record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock) override;
 
 	void set_custom_palette(const pixel_t *custom_palette)
 	{
@@ -622,9 +622,6 @@ private:
 	// runtime functions
 	void record_body_scanline(UINT16 physical_scanline, UINT16 scanline, INT32 start_pos, INT32 end_pos);
 	pixel_t border_value(UINT8 mode, const pixel_t *palette, bool is_mc6847t1);
-
-	template<int xscale>
-	void emit_samples(UINT8 mode, const UINT8 *data, int length, pixel_t *pixels, int x, int y);
 
 	// template function for doing video update collection
 	template<int sample_count, int yres>

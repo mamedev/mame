@@ -218,7 +218,7 @@ UINT32 eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &bit
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap.pix16(y);
@@ -324,7 +324,7 @@ UINT32 eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &bit
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap.pix16(y);
@@ -365,7 +365,7 @@ UINT32 eprom_state::screen_update_guts(screen_device &screen, bitmap_ind16 &bitm
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap.pix16(y);
@@ -390,7 +390,7 @@ UINT32 eprom_state::screen_update_guts(screen_device &screen, bitmap_ind16 &bitm
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			UINT16 *mo = &mobitmap.pix16(y);

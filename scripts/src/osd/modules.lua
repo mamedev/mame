@@ -54,7 +54,6 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/debugger/none.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/debugint.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/debugwin.cpp",
-		MAME_DIR .. "src/osd/modules/debugger/debugqt.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_sdl.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_windows.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_osx.cpp",
@@ -121,6 +120,29 @@ function osdmodulesbuild()
 	end
 
 	if _OPTIONS["USE_QTDEBUG"]=="1" then
+		defines {
+			"USE_QTDEBUG=1",
+		}		
+	else
+		defines {
+			"USE_QTDEBUG=0",
+		}
+	end
+
+end
+
+
+function qtdebuggerbuild()
+
+	removeflags {
+		"SingleOutputDir",
+	}
+
+	files {
+		MAME_DIR .. "src/osd/modules/debugger/debugqt.cpp",
+	}
+
+	if _OPTIONS["USE_QTDEBUG"]=="1" then
 		files {
 			MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.cpp",
 			MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.h",
@@ -166,7 +188,7 @@ function osdmodulesbuild()
 				end	
 				MOC = _OPTIONS["QT_HOME"] .. "/bin/moc"
 			else 
-				MOCTST = backtick("which moc-qt4 2>/dev/null")			
+				MOCTST = backtick("which moc-qt5 2>/dev/null")
 				if (MOCTST=='') then
 					MOCTST = backtick("which moc 2>/dev/null")
 				end
@@ -209,7 +231,7 @@ function osdmodulesbuild()
 				}
 			else
 				buildoptions {
-					backtick("pkg-config --cflags QtGui"),
+					backtick("pkg-config --cflags Qt5Widgets"),
 				}
 			end
 		end
@@ -261,16 +283,18 @@ function osdmodulestargetconf()
 			}
 			links {
 				"qtmain",
-				"QtGui4",
-				"QtCore4",
+				"Qt5Core",
+				"Qt5Gui",
+				"Qt5Widgets",
 			}
 		elseif _OPTIONS["targetos"]=="macosx" then
 			linkoptions {
 				"-F" .. backtick("qmake -query QT_INSTALL_LIBS"),
 			}
 			links {
-				"QtCore.framework",
-				"QtGui.framework",
+				"Qt5Core.framework",
+				"Qt5Gui.framework",
+				"Qt5Widgets.framework",
 			}
 		else
 			if _OPTIONS["QT_HOME"]~=nil then
@@ -278,11 +302,12 @@ function osdmodulestargetconf()
 					"-L" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_LIBS"),
 				}
 				links {
-					"QtGui",
-					"QtCore",
+					"Qt5Core",
+					"Qt5Gui",
+					"Qt5Widgets",
 				}
 			else
-				local str = backtick("pkg-config --libs QtGui")
+				local str = backtick("pkg-config --libs Qt5Widgets")
 				addlibfromstring(str)
 				addoptionsfromstring(str)
 			end

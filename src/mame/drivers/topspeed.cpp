@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves
+// thanks-to:Richard Bush
 /***************+************************************************************
 
 Top Speed / Full Throttle    (c) Taito 1987
@@ -313,7 +314,7 @@ WRITE8_MEMBER(topspeed_state::msm5205_command_w)
 WRITE8_MEMBER(topspeed_state::volume_w)
 {
 	// The volume is controlled by two Taito TC0060DCA hybrid volume modules
-	filter_volume_device *filter = NULL;
+	filter_volume_device *filter = nullptr;
 
 	switch (offset)
 	{

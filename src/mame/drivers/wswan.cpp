@@ -139,7 +139,7 @@ static MACHINE_CONFIG_START( wswan, wswan_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* cartridge */
-	MCFG_WSWAN_CARTRIDGE_ADD("cartslot", wswan_cart, NULL)
+	MCFG_WSWAN_CARTRIDGE_ADD("cartslot", wswan_cart, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","wswan")

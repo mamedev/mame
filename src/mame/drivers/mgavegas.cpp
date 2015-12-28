@@ -150,7 +150,7 @@ protected:
 	required_device<filter_rc_device> m_filter2;
 
 	// driver_device overrides
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	void update_custom();
 	void update_lamp();
 

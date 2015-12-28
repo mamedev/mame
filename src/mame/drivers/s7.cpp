@@ -97,7 +97,6 @@ public:
 	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ8_MEMBER(nvram_r);
 	DECLARE_WRITE8_MEMBER(nvram_w);
-	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w) { };
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
@@ -122,9 +121,9 @@ private:
 	bool m_data_ok;
 	bool m_memprotect;
 	emu_timer* m_irq_timer;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
-	virtual void machine_start();
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dac_device> m_dac;

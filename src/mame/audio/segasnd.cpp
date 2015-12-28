@@ -37,21 +37,21 @@
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE void configure_filter(g80_filter_state *state, double r, double c)
+static inline void configure_filter(g80_filter_state *state, double r, double c)
 {
 	state->capval = 0;
 	state->exponent = 1.0 - exp(-1.0 / (r * c * SAMPLE_RATE));
 }
 
 
-INLINE double step_rc_filter(g80_filter_state *state, double input)
+static inline double step_rc_filter(g80_filter_state *state, double input)
 {
 	state->capval += (input - state->capval) * state->exponent;
 	return state->capval;
 }
 
 
-INLINE double step_cr_filter(g80_filter_state *state, double input)
+static inline double step_cr_filter(g80_filter_state *state, double input)
 {
 	double result = (input - state->capval);
 	state->capval += (input - state->capval) * state->exponent;
@@ -73,7 +73,7 @@ speech_sound_device::speech_sound_device(const machine_config &mconfig, const ch
 		m_latch(0),
 		m_t0(0),
 		m_p2(0),
-		m_speech(NULL)
+		m_speech(nullptr)
 {
 }
 
@@ -243,7 +243,7 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type ty
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_ourcpu(*this, "ourcpu"),
-		m_stream(NULL),
+		m_stream(nullptr),
 		m_in_latch(0),
 		m_out_latch(0),
 		m_last_p2_value(0),
@@ -278,7 +278,7 @@ void usb_sound_device::device_start()
 
 	/* find the CPU we are associated with */
 	m_maincpu = machine().device("maincpu");
-	assert(m_maincpu != NULL);
+	assert(m_maincpu != nullptr);
 
 	/* create a sound stream */
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE);
@@ -503,7 +503,7 @@ READ8_MEMBER( usb_sound_device::t1_r )
  *
  *************************************/
 
-INLINE void clock_channel(timer8253_channel *ch)
+static inline void clock_channel(timer8253_channel *ch)
 {
 	UINT8 lastgate = ch->lastgate;
 

@@ -168,7 +168,7 @@ PALETTE_INIT_MEMBER(tubep_state,tubep)
 	compute_resistor_weights(0, 255,    -1.0,
 			3,  resistors_txt_rg,   weights_txt_rg, 470,    0,
 			2,  resistors_txt_b,    weights_txt_b,  470,    0,
-			0,  0,  0,  0,  0   );
+			0,  nullptr,  nullptr,  0,  0   );
 
 	/* create text palette */
 
@@ -340,7 +340,7 @@ PALETTE_INIT_MEMBER(tubep_state,tubep)
 
 VIDEO_START_MEMBER(tubep_state,tubep)
 {
-	m_spritemap = auto_alloc_array(machine(), UINT8, 256*256*2);
+	m_spritemap = std::make_unique<UINT8[]>(256*256*2);
 
 	/* Set up save state */
 	save_item(NAME(m_romD_addr));
@@ -369,7 +369,7 @@ VIDEO_START_MEMBER(tubep_state,tubep)
 
 VIDEO_RESET_MEMBER(tubep_state,tubep)
 {
-	memset(m_spritemap,0,256*256*2);
+	memset(m_spritemap.get(),0,256*256*2);
 
 	m_romD_addr = 0;
 	m_romEF_addr = 0;
@@ -567,7 +567,7 @@ void tubep_state::tubep_vblank_end()
 	m_DISP = m_DISP ^ 1;
 	/* logerror("EOF: DISP after this is=%i, and clearing it now.\n", m_DISP); */
 	/* clear the new frame (the one that was (just) displayed)*/
-	memset(m_spritemap+m_DISP*256*256, 0x0f, 256*256);
+	memset(m_spritemap.get()+m_DISP*256*256, 0x0f, 256*256);
 }
 
 
@@ -687,7 +687,7 @@ PALETTE_INIT_MEMBER(tubep_state,rjammer)
 	compute_resistor_weights(0, 255,    -1.0,
 			3,  resistors_rg,   weights_rg, 470,    0,
 			2,  resistors_b,    weights_b,  470,    0,
-			0,  0,  0,  0,  0   );
+			0,  nullptr,  nullptr,  0,  0   );
 
 	for (i = 0;i < palette.entries();i++)
 	{

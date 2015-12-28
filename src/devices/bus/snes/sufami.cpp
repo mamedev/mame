@@ -54,8 +54,8 @@ static SLOT_INTERFACE_START(sufamiturbo_cart)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( st_slot )
-	MCFG_SNS_SUFAMI_CARTRIDGE_ADD("st_slot1", sufamiturbo_cart, NULL)
-	MCFG_SNS_SUFAMI_CARTRIDGE_ADD("st_slot2", sufamiturbo_cart, NULL)
+	MCFG_SNS_SUFAMI_CARTRIDGE_ADD("st_slot1", sufamiturbo_cart, nullptr)
+	MCFG_SNS_SUFAMI_CARTRIDGE_ADD("st_slot2", sufamiturbo_cart, nullptr)
 MACHINE_CONFIG_END
 
 

@@ -146,7 +146,7 @@ public:
 	DECLARE_MACHINE_RESET(nsub);
 	DECLARE_MACHINE_START(frogs_audio);
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	UINT32 screen_update_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_bw_or_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

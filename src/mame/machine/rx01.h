@@ -36,11 +36,11 @@ public:
 	DECLARE_WRITE16_MEMBER( write );
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	void command_write(UINT16 data);
 	UINT16 status_read();

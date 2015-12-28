@@ -64,7 +64,7 @@ void starshp1_state::video_start()
 
 	m_bg_tilemap->set_scrollx(0, -8);
 
-	m_LSFR = auto_alloc_array(machine(), UINT16, 0x10000);
+	m_LSFR = std::make_unique<UINT16[]>(0x10000);
 
 	for (i = 0; i < 0x10000; i++)
 	{
@@ -153,7 +153,7 @@ void starshp1_state::draw_starfield(bitmap_ind16 &bitmap)
 
 	for (y = 0; y < bitmap.height(); y++)
 	{
-		const UINT16* p = m_LSFR + (UINT16) (512 * y);
+		const UINT16* p = m_LSFR.get() + (UINT16) (512 * y);
 
 		UINT16* pLine = &bitmap.pix16(y);
 
@@ -250,7 +250,7 @@ void starshp1_state::draw_circle_line(bitmap_ind16 &bitmap, int x, int y, int l)
 {
 	if (y >= 0 && y <= bitmap.height() - 1)
 	{
-		const UINT16* p = m_LSFR + (UINT16) (512 * y);
+		const UINT16* p = m_LSFR.get() + (UINT16) (512 * y);
 
 		UINT16* pLine = &bitmap.pix16(y);
 

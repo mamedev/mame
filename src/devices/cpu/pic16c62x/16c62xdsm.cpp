@@ -93,7 +93,7 @@ static const char *const PIC16C62xFormats[] = {
 	FMT("111010kkkkkkkk", "xorlw  %K"),
 	FMT("11110xkkkkkkkk", "sublw  %K"),
 	FMT("11111xkkkkkkkk", "addlw  %K"),
-	NULL
+	nullptr
 };
 
 #define MAX_OPS ((ARRAY_LENGTH(PIC16C62xFormats) - 1) / PTRS_PER_FORMAT)

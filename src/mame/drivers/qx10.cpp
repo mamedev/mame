@@ -91,14 +91,14 @@ public:
 	required_device<rs232_port_device> m_kbd;
 	UINT8 m_vram_bank;
 	//required_shared_ptr<UINT8> m_video_ram;
-	UINT16 *m_video_ram;
+	std::unique_ptr<UINT16[]> m_video_ram;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	void update_memory_mapping();
 
@@ -145,7 +145,6 @@ public:
 	}m_rs232c;
 
 	DECLARE_PALETTE_INIT(qx10);
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -350,7 +349,7 @@ READ8_MEMBER( qx10_state::qx10_30_r )
 
 	return m_fdcint |
 			/*m_fdcmotor*/ 0 << 1 |
-			((floppy1 != NULL) || (floppy2 != NULL) ? 1 : 0) << 3 |
+			((floppy1 != nullptr) || (floppy2 != nullptr) ? 1 : 0) << 3 |
 			m_membank << 4;
 }
 
@@ -620,7 +619,7 @@ GFXDECODE_END
 void qx10_state::video_start()
 {
 	// allocate memory
-	m_video_ram = auto_alloc_array_clear(machine(), UINT16, 0x30000);
+	m_video_ram = make_unique_clear<UINT16[]>(0x30000);
 
 	// find memory regions
 	m_char_rom = memregion("chargen")->base();
@@ -749,7 +748,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_device, rxb_w))
 
 	MCFG_RS232_PORT_ADD("kbd", keyboard, "qx10")

@@ -24,13 +24,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// dmvcart_interface overrides
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, UINT8 data);
-	virtual bool read(offs_t offset, UINT8 &data);
-	virtual bool write(offs_t offset, UINT8 data);
+	virtual void io_write(address_space &space, int ifsel, offs_t offset, UINT8 data) override;
+	virtual bool read(offs_t offset, UINT8 &data) override;
+	virtual bool write(offs_t offset, UINT8 data) override;
 
 private:
 	bool        m_enabled;

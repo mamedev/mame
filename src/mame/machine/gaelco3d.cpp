@@ -158,13 +158,13 @@ static void *osd_sharedmem_ptr(osd_shared_mem *os_shmem)
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE void shmem_lock(shmem_t *shmem)
+static inline void shmem_lock(shmem_t *shmem)
 {
 	while (atomic_exchange32(&shmem->lock,1) == 0)
 		;
 }
 
-INLINE void shmem_unlock(shmem_t *shmem)
+static inline void shmem_unlock(shmem_t *shmem)
 {
 	atomic_exchange32(&shmem->lock,0);
 }
@@ -192,11 +192,11 @@ gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const 
 	m_status(0),
 	m_last_in_msg_cnt(0),
 	m_slack_cnt(0),
-	m_sync_timer(NULL),
-	m_in_ptr(NULL),
-	m_out_ptr(NULL),
-	m_os_shmem(NULL),
-	m_shmem(NULL)
+	m_sync_timer(nullptr),
+	m_in_ptr(nullptr),
+	m_out_ptr(nullptr),
+	m_os_shmem(nullptr),
+	m_shmem(nullptr)
 {
 }
 
@@ -221,7 +221,7 @@ void gaelco_serial_device::device_start()
 #endif
 
 	m_os_shmem = osd_sharedmem_alloc(PATH_NAME, 0, sizeof(shmem_t));
-	if (m_os_shmem == NULL)
+	if (m_os_shmem == nullptr)
 	{
 		m_os_shmem = osd_sharedmem_alloc(PATH_NAME, 1, sizeof(shmem_t));
 		m_shmem = (shmem_t *) osd_sharedmem_ptr(m_os_shmem);

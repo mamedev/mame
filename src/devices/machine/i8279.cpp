@@ -206,11 +206,11 @@ void i8279_device::set_irq(bool state)
 void i8279_device::new_key(UINT8 data, bool skey, bool ckey)
 {
 	UINT8 i, rl, sl;
-	for (i = 0; BIT(data, i); i++);
+	for (i = 0; BIT(data, i); i++) {};
 	rl = i;
 	if (BIT(m_cmd[0], 0))
 	{
-		for (i = 0; !BIT(data, i); i++);
+		for (i = 0; !BIT(data, i); i++) {};
 		sl = i;
 	}
 	else
@@ -315,7 +315,7 @@ void i8279_device::timer_mainloop()
 						UINT8 addr = m_scanner &7;
 
 						if (decoded)
-							for (addr=0; !BIT(m_scanner, addr); addr++);
+							for (addr=0; !BIT(m_scanner, addr); addr++) {};
 
 						rl ^= 0xff;     // inverted
 						assert(addr < ARRAY_LENGTH(m_s_ram));

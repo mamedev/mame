@@ -227,7 +227,7 @@ void isa8_pgc_device::device_start()
 	int width = PGC_DISP_HORZ;
 	int height = PGC_DISP_VERT;
 
-	if (m_palette != NULL && !m_palette->started())
+	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
 	set_isa_device();
@@ -237,14 +237,14 @@ void isa8_pgc_device::device_start()
 		m_palette->set_pen_color( i, 0, 0, 0 );
 	}
 
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
+	m_bitmap = std::make_unique<bitmap_ind16>(width, height);
 	m_bitmap->fill(0);
 
-	m_vram = auto_alloc_array(machine(), UINT8, 0x78000);
+	m_vram = std::make_unique<UINT8[]>(0x78000);
 	space.install_readwrite_bank(0x80000, 0xf7fff, "vram");
-	membank("vram")->set_base(m_vram);
+	membank("vram")->set_base(m_vram.get());
 
-	m_eram = auto_alloc_array(machine(), UINT8, 0x8000);
+	m_eram = std::make_unique<UINT8[]>(0x8000);
 
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(isa8_pgc_device::reset_common), this));
 }
@@ -325,7 +325,7 @@ READ8_MEMBER( isa8_pgc_device::init_r ) {
 
 	DBG_LOG(1,"INIT",("mapping emulator RAM\n"));
 	space.install_readwrite_bank(0xf8000, 0xfffff, "eram");
-	membank("eram")->set_base(m_eram);
+	membank("eram")->set_base(m_eram.get());
 
 	DBG_LOG(1,"INIT",("mapping LUT\n"));
 	space.install_write_handler(0xf8400, 0xf85ff,

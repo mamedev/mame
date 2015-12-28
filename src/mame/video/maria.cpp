@@ -93,12 +93,12 @@ void atari_maria_device::device_start()
 
 void atari_maria_device::device_reset()
 {
-	for (int i = 0; i < 32; i++)
-		m_maria_palette[i] = 0;
+	for (auto & elem : m_maria_palette)
+		elem = 0;
 
-	for (int i = 0; i < 2; i++)
+	for (auto & elem : m_line_ram)
 		for (int j = 0; j < 160; j++)
-			m_line_ram[i][j] = 0;
+			elem[j] = 0;
 
 	m_active_buffer = 0;
 

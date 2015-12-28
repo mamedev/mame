@@ -78,7 +78,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 
-	UINT8* m_nt_ram;
+	std::unique_ptr<UINT8[]> m_nt_ram;
 	UINT8* m_nt_page[4];
 
 	UINT32 m_in_0;
@@ -108,14 +108,13 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(famibox_coin_r);
 	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(famibox);
 	UINT32 screen_update_famibox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(famicombox_attract_timer_callback);
 	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
-	void set_mirroring(int mirroring);
 	void famicombox_bankswitch(UINT8 bank);
 	void famicombox_reset();
 	void ppu_irq(int *ppu_regs);
@@ -254,14 +253,14 @@ void famibox_state::famicombox_bankswitch(UINT8 bank)
 	};
 
 
-	for (int i = 0; i < ARRAY_LENGTH(famicombox_banks); i++ )
+	for (auto & famicombox_bank : famicombox_banks)
 	{
-		if ( bank == famicombox_banks[i].bank ||
-				famicombox_banks[i].bank == 0 )
+		if ( bank == famicombox_bank.bank ||
+				famicombox_bank.bank == 0 )
 		{
-			membank("cpubank1")->set_base(memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank1_offset);
-			membank("cpubank2")->set_base(memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank2_offset);
-			membank("ppubank1")->set_base(memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].ppubank_offset);
+			membank("cpubank1")->set_base(memregion(famicombox_bank.memory_region)->base() + famicombox_bank.bank1_offset);
+			membank("cpubank2")->set_base(memregion(famicombox_bank.memory_region)->base() + famicombox_bank.bank2_offset);
+			membank("ppubank1")->set_base(memregion(famicombox_bank.memory_region)->base() + famicombox_bank.ppubank_offset);
 			break;
 		}
 	}
@@ -523,11 +522,11 @@ void famibox_state::machine_reset()
 
 void famibox_state::machine_start()
 {
-	m_nt_ram = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_nt_page[0] = m_nt_ram;
-	m_nt_page[1] = m_nt_ram + 0x400;
-	m_nt_page[2] = m_nt_ram + 0x800;
-	m_nt_page[3] = m_nt_ram + 0xc00;
+	m_nt_ram = std::make_unique<UINT8[]>(0x1000);
+	m_nt_page[0] = m_nt_ram.get();
+	m_nt_page[1] = m_nt_ram.get() + 0x400;
+	m_nt_page[2] = m_nt_ram.get() + 0x800;
+	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(famibox_state::famibox_nt_r), this), write8_delegate(FUNC(famibox_state::famibox_nt_w), this));
 	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "ppubank1");

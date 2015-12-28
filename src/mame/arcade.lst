@@ -1435,6 +1435,7 @@ pss64           // 199? Nintendo / Hudson Soft
 
 // SNES-based hacks
 kinstb          // bootleg
+mk3snes			// bootleg
 ffight2b        // bootleg
 sblast2b        // bootleg
 iron            // bootleg
@@ -1533,6 +1534,7 @@ schasera        // RT  Taito
 schaserb        // RT  Taito
 schaserc        // RT  Taito
 schasercv       // RT  Taito
+schaserm		// Model Racing
 lupin3          // LP  (c) 1980 Taito
 lupin3a         // LP  (c) 1980 Taito
 intruder        // (c) 1980 GamePlan (Taito)
@@ -2115,6 +2117,7 @@ knightb         // bootleg
 kicknrun        // A87 (c) 1986 Taito Corporation
 kicknrunu       // A87 (c) 1986 Taito Corporation
 mexico86        // bootleg (Micro Research)
+mexico86a		// bootleg
 darius          // A96 (c) 1986 Taito Corporation Japan (World)
 dariusu         // A96 (c) 1986 Taito America Corporation (US)
 dariusj         // A96 (c) 1986 Taito Corporation (Japan)
@@ -2496,7 +2499,7 @@ gseeker         // 1992.?? D40 (c) 1992 Taito Corporation Japan (World)
 gseekerj        // 1992.12 D40 (c) 1992 Taito Corporation (Japan)
 gseekeru        // 1992.?? D40 (c) 1992 Taito America Corporation (US)
 hthero93        // 1993.03 D49 (c) 1992 Taito Corporation (Japan)
-				// 1993.04 D49 (US)
+hthero93u		// 1993.04 D49 (c) 1992 Taito America Corporation (US)
 cupfinal        // 1993.?? D49 (c) 1993 Taito Corporation Japan (World)
 trstar          // 1993.?? D53 (c) 1993 Taito Corporation Japan (World)
 trstarj         // 1993.07 D53 (c) 1993 Taito Corporation (Japan)
@@ -3250,6 +3253,7 @@ sf2v004         // hack
 sf2acc          // hack
 sf2acca         // hack
 sf2ceblp        // hack
+sf2cebltw		// hack
 sf2accp2        // hack
 sf2amf          // bootleg
 sf2amf2         // bootleg
@@ -3263,6 +3267,7 @@ sf2m6           // hack
 sf2m7           // hack
 sf2m8           // bootleg
 sf2m9           // bootleg
+sf2m10          // bootleg
 sf2yyc          // hack
 sf2koryu        // hack
 sf2dongb        // hack
@@ -3361,6 +3366,7 @@ ddtodh          // 12/04/1994 (c) 1993 (Hispanic)
 ddtodhr1        // 25/01/1994 (c) 1993 (Hispanic)
 ddtodhr2        // 13/01/1994 (c) 1993 (Hispanic)
 ssf2t           // 23/02/1994 (c) 1994 (World)
+ssf2th			// 23/02/1994 (c) 1994 (Hispanic)
 ssf2tu          // 23/03/1994 (c) 1994 (USA)
 ssf2tur1        // 23/02/1994 (c) 1994 (USA)
 ssf2ta          // 23/02/1994 (c) 1994 (Asia)
@@ -3382,6 +3388,7 @@ vampja          // 05/07/1994 (c) 1994 (Japan)
 vampjr1         // 30/06/1994 (c) 1994 (Japan)
 ringdest        // 02/09/1994 (c) 1994 (Euro)
 ringdesta       // 31/08/1994 (c) 1994 (Asia)
+ringdesth		// 02/09/1994 (c) 1994 (Hispanic)
 smbomb          // 31/08/1994 (c) 1994 (Japan)
 smbombr1        // 08/08/1994 (c) 1994 (Japan)
 armwar          // 24/10/1994 (c) 1994 (Euro)
@@ -3717,6 +3724,9 @@ shiryu2         // Strider Hiryu 2 (JAPAN 991213)
 // Capcom medal games
 alien           // (c) 2005
 
+// Capcom Nintendo HW?
+tvcapcom
+
 // Tecmo ZN1
 tps
 glpracr2        // Gallop Racer 2 (USA)
@@ -3726,7 +3736,8 @@ doapp           // Dead Or Alive ++ (JAPAN)
 cbaj            // Cool Boaders Arcade Jam
 shngmtkb        // Shanghai Matekibuyuu
 tondemo         // Tondemo Crisis (JAPAN)
-glpracr3        // Gallop Racer 3 (JAPAN)
+glpracr3		// Gallop Racer 3 (Export)
+glpracr3j       // Gallop Racer 3 (JAPAN)
 flamegun        // Flame Gunner (USA)
 flamegunj       // Flame Gunner (JAPAN)
 lpadv           // Logic Pro Adventure (JAPAN)
@@ -4122,6 +4133,7 @@ tsurugij        // 2001
 wcombat         // 2002
 wcombatk        // 2002
 wcombatj        // 2002
+wcombatu		// 2002
 xtrial          // 2002
 mfightc         // 2002
 mfightcc        // 2002
@@ -5487,7 +5499,8 @@ hotd2p          // 1998.11 The House of the Dead 2 (prototype)
 dybbnao         // 1998.12 Dynamite Baseball NAOMI
 crzytaxi        // 1999.02 Crazy Taxi
 pstone          // 1999.02 Power Stone
-zombrvn         // 1999.02 Zombie Revenge
+zombrvno        // 1999.02 Zombie Revenge
+zombrvn         // 1999.03 Zombie Revenge (Rev A)
 airlbios        // 1999.03 Airline Pilots (BIOS)
 alpilota        // 1999.03 Airline Pilots (Rev A)
 ggram2          // 1999.04 Giant Gram: All Japan Pro Wrestling 2
@@ -5520,7 +5533,7 @@ alpiltdx        // 1999.?? Airline Pilots Deluxe (Rev B)
 sambap          // 1999.?? Samba de Amigo (prototype)
 spawn           // 1999.?? Spawn In the Demon's Hand
 				// 1999.?? Tokio Bus Guide
-				// 1999.?? Tokio Bus Guide (Rev A)
+tokyobus        // 1999.?? Tokio Bus Guide (Rev A)
 vtennisg        // 1999.?? Virtua Tennis / Power Smash (GD-ROM)
 totdo           // 1999.?? The Typing of the Dead
 18wheelr        // 2000.01 18 Wheeler Deluxe (Rev A)
@@ -5753,24 +5766,17 @@ initdv3e        // 2004.05.18 Initial D Arcade Stage Ver. 3 (Export)
 vf4tuneda       // 2004.09 Virtua Fighter 4 Final Tuned (Rev A)
 vf4tunedd       // 2004.10 Virtua Fighter 4 Final Tuned (Rev D)
 vf4tuned        // 2004.12 Virtua Fighter 4 Final Tuned (Rev F)
-				// 2004.12 World Club Champion Football Serie A 2002-2003 Ver.2.12
-				// 2004.12 World Club Champion Football Serie A 2002-2003 Ver.2.34
-				// 2005.04 Menkyo no Tetsujin
-				// 2005.06 World Club Champion Football European Clubs 2004-2005
-				// 2005.06 World Club Champion Football European Clubs 2004-2005 Ver.1.1
+wccf212e        // 2004.12 World Club Champion Football Serie A 2002-2003 Ver.2.12
+wccf234j        // 2004.12 World Club Champion Football Serie A 2002-2003 Ver.2.34
+				// 2005.04 Menkyo no Tetsujin / Sega Driving Simulator
+wccf310j        // 2005.06 World Club Champion Football European Clubs 2004-2005
+wccf331e        // 2005.06 World Club Champion Football European Clubs 2004-2005 Ver.1.1
 				// 2005.06 World Club Champion Football European Clubs 2004-2005 Ver.1.2
-				// 2005.11 World Club Champion Football European Clubs 2004-2005 Ver.3.22
-				// 2005.12 Mobile Suit Gundam 0079 Card Builder
-				// 2006.03 Mobile Suit Gundam 0079 Card Builder Ver.1.007
-				// 2006.07 Mobile Suit Gundam 0079 Card Builder Ver.2.00
-				// 2006.08 World Club Champion Football European Clubs 2005-2006
-				// 2006.09 Mobile Suit Gundam 0079 Card Builder Ver.2.01
+wccf322e        // 2005.11 World Club Champion Football European Clubs 2004-2005 Ver.3.22
+wccf420e        // 2006.08 World Club Champion Football European Clubs 2005-2006
 				// 2006.10 World Club Champion Football European Clubs 2005-2006 bugfix
-				// 2006.11 Mobile Suit Gundam 0079 Card Builder Ver.2.02
 inidv3ca        // 2006.?? Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev A)
 inidv3cy        // 2006.?? Initial D Arcade Stage Ver. 3 Cycraft Edition (Rev B)
-				// 2007.03 Mobile Suit Gundam 0083 Card Builder
-				// 2007.10 Mobile Suit Gundam 0083 Card Builder Ryouyuu Gekitotsu
 
 
 // Atomiswave (Dreamcast-based) games
@@ -5900,6 +5906,7 @@ wangmid2        // 2005.04 Wangan Midnight Maximum Tune 2 (Japan)
 				// 2005.10 Sangokushi Taisen Ver.1.100
 wangmd2b        // 2005.10 Wangan Midnight Maximum Tune 2 (Export) (Rev A)
 				// 2005.11 Sangokushi Taisen Ver.1.110
+				// 2005.12 Mobile Suit Gundam 0079 Card Builder
 				// 2005.12 Quest of D Gofu no Keisyousya Ver.2.00
 				// 2005.12 Quest of D Gofu no Keisyousya Ver.2.01
 				// 2005.12 Sega Network Taisen Mahjong MJ 3
@@ -5913,15 +5920,21 @@ mj3             // 2005.12 Sega Network Taisen Mahjong MJ 3 (Rev F)
 scg06nt         // 2005.12 Sega Golf Club 2006: Next Tours (Rev A)
 				// 2006.02 Sangokushi Taisen Ver.1.12
 				// 2006.03 Quest of D Gofu no Keisyousya Ver.2.02b
+				// 2006.03 Mobile Suit Gundam 0079 Card Builder Ver.1.007
 				// 2006.04 Sega Network Taisen Mahjong MJ 3 Evolution
 				// 2006.05 Sangokushi Taisen 2
 				// 2006.05 Sangokushi Taisen 2 Firmware Update
+				// 2006.07 Mobile Suit Gundam 0079 Card Builder Ver.2.00
+				// 2006.09 Mobile Suit Gundam 0079 Card Builder Ver.2.01
 				// 2006.09 Sangokushi Taisen 2 Ver.2.007
 				// 2006.09 Sangokushi Taisen 2 Ver.2.01
 				// 2006.09 Sega Network Taisen Mahjong MJ 3 Evolution (Rev A)
 				// 2006.10 Quest of D Oukoku no Syugosya Ver.3.00
 				// 2006.11 Quest of D Oukoku no Syugosya Ver.3.01
+				// 2006.11 Mobile Suit Gundam 0079 Card Builder Ver.2.02
+				// 2007.03 Mobile Suit Gundam 0083 Card Builder
 mj3evo      // 2007.06 Sega Network Taisen Mahjong MJ 3 Evolution (Rev B)
+				// 2007.10 Mobile Suit Gundam 0083 Card Builder Ryouyuu Gekitotsu
 				// 2007.11 Quest of D The Battle Kingdom Ver.4.00
 				// 2008.01 Quest of D The Battle Kingdom Ver.4.00b
 				// 2008.02 Quest of D The Battle Kingdom Ver.4.00c
@@ -6659,6 +6672,7 @@ lethalenua      // GX191 (c) 1992
 lethalenux      // GX191 (c) 1992
 lethaleneae     // GX191 (c) 1992
 lethaleneab     // GX191 (c) 1992
+lethaleneaa     // GX191 (c) 1992
 lethalenj       // GX191 (c) 1992
 tgtpanic        // GX601 (c) 1996
 
@@ -6761,6 +6775,7 @@ xmen2pj         // GX065 (c) 1992 (Japan)
 xmen6p          // GX065 (c) 1992 (World)
 xmen6pu         // GX065 (c) 1992 (US)
 xexex           // GX067 (c) 1991 (World)
+orius			// GX067 (c) 1991 (USA)
 xexexa          // GX067 (c) 1991 (Asia)
 xexexj          // GX067 (c) 1991 (Japan)
 asterix         // GX068 (c) 1992 (World)
@@ -6815,9 +6830,17 @@ mtlchampa       // GX234 (c) 1993 (Japan)
 rungun          // GX247 (c) 1993 (World)
 runguna         // GX247 (c) 1993 (World)
 rungunb         // GX247 (c) 1993 (World)
-rungunu         // GX247 (c) 1993 (US)
 rungunua        // GX247 (c) 1993 (US)
 slmdunkj        // GX247 (c) 1993 (Japan)
+
+rungund         // GX247 (c) 1993 (World)
+rungunad        // GX247 (c) 1993 (World)
+rungunbd        // GX247 (c) 1993 (World)
+rungunuad       // GX247 (c) 1993 (US)
+slmdunkjd       // GX247 (c) 1993 (Japan)
+
+rungunud        // GX247 (c) 1993 (US)
+
 dbz             // (c) 1993 Banpresto
 dbza            // (c) 1993 Banpresto
 dbz2            // (c) 1994 Banpresto
@@ -7511,6 +7534,7 @@ badlandsb       // bootleg
 badlandsb2      // bootleg set 2
 klax            // 136075           (c) 1989
 klax2           // 136075           (c) 1989
+klax2bl			// bootleg
 klax3           // 136075           (c) 1989
 klaxj           // 136075           (c) 1989 (Japan)
 klaxd           // 136075           (c) 1989 (Germany)
@@ -8117,6 +8141,7 @@ vball2pjb       // bootleg (of Japan set)
 ddragon2        // TA-0026 (c) 1988 (World)
 ddragon2u       // TA-0026 (c) 1988 (US)
 ddragon2j       // TA-0026 (c) 1988 (Japan)
+ddragon2b		// bootleg
 toffy           // (c) 1993 Midas
 stoffy          // (c) 1994 Midas
 stoffyu         // (c) 1994 Midas + Unico
@@ -8211,6 +8236,7 @@ xxmissio        // UPL-86001 [1986]
 ninjakd2        // UPL-????? (c) 1987
 ninjakd2a       // UPL-????? (c) 1987
 ninjakd2b       // UPL-????? (c) 1987
+ninjakd2c		// UPL-????? (c) 1987
 rdaction        // UPL-87003?(c) 1987 + World Games license
 jt104           // hack?
 mnight          // UPL-????? (c) 1987 distributed by Kawakus
@@ -9118,7 +9144,8 @@ wrallya         // (c) 1993 - Ref 930705
 wrallyb         // (c) 1993 - Ref 930217
 glass           // (c) 1993 - Ref 931021
 glass10         // (c) 1993 - Ref 931021
-glassbrk        // (c) 1993 - Ref 931021 shows "Break Edition" on a real PCB
+glass10a        // (c) 1993 - Ref 931021 shows "Break Edition" on a real PCB
+glasskr			// (c) 1994 - Ref 931021 shows 1994 version, Anime girls, unprotected
 targeth         // (c) 1994 - Ref 940531
 targetha        // (c) 1994 - Ref 940531
 thoop2          // (c) 1994 - Ref ???
@@ -9517,6 +9544,7 @@ sparkman        // (c) 1989 SunA
 sparkmana       // (c) 1989 SunA
 starfigh        // (c) 1990 SunA
 hardhea2        // (c) 1991 SunA
+hardhea2b		// bootleg
 brickzn         // (c) 1992 SunA
 brickznv5       // (c) 1992 SunA
 brickznv4       // (c) 1992 SunA
@@ -9590,6 +9618,7 @@ zipzap          // (c) 1995 Barko Corp
 missw96         // (c) 1996 Comad
 missw96a        // (c) 1996 Comad
 missw96b        // (c) 1996 Comad
+missw96c        // (c) 1996 Comad
 missmw96        // (c) 1996 Comad
 smissw          //
 fantsia2        // (c) 1997 Comad
@@ -9602,7 +9631,8 @@ galhustl        // (c) 1997 ACE International
 
 // Playmark games
 sslam           // (c) 1993 - hack of Namco's Super World Court
-sslama          // (c) 1993 - hack of Namco's Super World Court
+sslama          // ^
+sslamb			// ^
 powerbal        // (c) 1994
 powerbals       // (c) 1994
 magicstk        // (c) 1995
@@ -10052,6 +10082,7 @@ drgnwrldv21j    // (c) 1995
 drgnwrldv20j    // (c) 1995
 drgnwrldv10c    // (c) 1995
 drgnwrldv11h    // (c) 1995
+drgnwrldv40k
 nkishusp        // (c) 1998
 
 // IGS017 / IGS031 Games
@@ -10569,6 +10600,7 @@ gcpinbal        // (c) 1994 Excellent System
 vmetal          // (c) 1995 Excellent System?
 vmetaln         // (c) 1995 Excellent System?
 aquarium        // (c) 1996 Excellent System
+aquariumj       // (c) 1996 Excellent System
 policetr        // (c) 1996 P&P Marketing
 policetr11      // (c) 1996 P&P Marketing
 policetr10      // (c) 1996 P&P Marketing
@@ -10639,6 +10671,7 @@ driblingbr      // bootleg
 ace             // [1976 Allied Leisure]
 clayshoo        // [1979 Allied Leisure]
 pirates         // (c) 1994 NIX
+piratesb		// bootleg?
 genix           // (c) 199? NIX
 fitfight        // bootleg of Art of Fighting
 histryma        // bootleg of Fighter's History
@@ -11199,6 +11232,7 @@ wtrnymph        // (c) 1996 Subsino
 expcard         // (c) 1998 American Alpha
 saklove         // (c) 1998 Subsino
 bishjan         // (c) 1999 Subsino
+ptrain          // (c) 1999 Subsino
 xtrain          // (c) 1999 Subsino
 lastfght        // (c) 2000 Subsino
 xplan           // (c) 2006 Subsino
@@ -11350,6 +11384,8 @@ bchanceq        // 198?, Unknown
 pokermon        // 1987, Unknown
 pokersis        // 198?, Sisteme France.
 super98         // 199?, Unknown
+animpkr         // 198?, Unknown
+animpkra        // 198?, Unknown
 
 
 // Cal Omega
@@ -11396,7 +11432,35 @@ peset001        // (c) 1987 IGT - International Game Technology
 peset004        // (c) 1987 IGT - International Game Technology
 peset038        // (c) 1987 IGT - International Game Technology
 peivc006        // (c) 1987 IGT - International Game Technology
+pepk0719        // (c) 1987 IGT - International Game Technology
+pepk0719a       // (c) 1987 IGT - International Game Technology
+pepk0719b       // (c) 1987 IGT - International Game Technology
+pepk0756        // (c) 1987 IGT - International Game Technology
+pepk0756a       // (c) 1987 IGT - International Game Technology
+pepk0756b       // (c) 1987 IGT - International Game Technology
+pepk0757        // (c) 1987 IGT - International Game Technology
+pepk0758        // (c) 1987 IGT - International Game Technology
+pepk0769        // (c) 1987 IGT - International Game Technology
+pepk0773        // (c) 1987 IGT - International Game Technology
+pepk0810        // (c) 1987 IGT - International Game Technology
+pepk0810a       // (c) 1987 IGT - International Game Technology
+pepk0811        // (c) 1987 IGT - International Game Technology
+pepk0823        // (c) 1987 IGT - International Game Technology
+pepk0832        // (c) 1987 IGT - International Game Technology
+pepk0849        // (c) 1987 IGT - International Game Technology
+pepk0856        // (c) 1987 IGT - International Game Technology
+pepk0856a       // (c) 1987 IGT - International Game Technology
+pepk0858        // (c) 1987 IGT - International Game Technology
+pepk0873        // (c) 1987 IGT - International Game Technology
+pepk0873a       // (c) 1987 IGT - International Game Technology
+pepk0930        // (c) 1987 IGT - International Game Technology
+pepk0930a       // (c) 1987 IGT - International Game Technology
+pepk1004        // (c) 1987 IGT - International Game Technology
+pepk1013        // (c) 1987 IGT - International Game Technology
+pepk1020        // (c) 1987 IGT - International Game Technology
 pepk1024        // (c) 1987 IGT - International Game Technology
+pepk1030        // (c) 1987 IGT - International Game Technology
+pepk1069        // (c) 1987 IGT - International Game Technology
 pepp0002        // (c) 1987 IGT - International Game Technology
 pepp0002a       // (c) 1987 IGT - International Game Technology
 pepp0008        // (c) 1987 IGT - International Game Technology
@@ -11438,12 +11502,14 @@ pepp0059a       // (c) 1987 IGT - International Game Technology
 pepp0060        // (c) 1987 IGT - International Game Technology
 pepp0060a       // (c) 1987 IGT - International Game Technology
 pepp0060b       // (c) 1987 IGT - International Game Technology
+pepp0060c       // (c) 1987 IGT - International Game Technology
 pepp0063        // (c) 1987 IGT - International Game Technology
 pepp0064        // (c) 1987 IGT - International Game Technology
 pepp0065        // (c) 1987 IGT - International Game Technology
 pepp0083        // (c) 1987 IGT - International Game Technology
 pepp0085        // (c) 1987 IGT - International Game Technology
 pepp0089        // (c) 1987 IGT - International Game Technology
+pepp0094        // (c) 1987 IGT - International Game Technology
 pepp0103        // (c) 1987 IGT - International Game Technology
 pepp0104        // (c) 1987 IGT - International Game Technology
 pepp0116        // (c) 1987 IGT - International Game Technology
@@ -11454,6 +11520,7 @@ pepp0125        // (c) 1987 IGT - International Game Technology
 pepp0126        // (c) 1987 IGT - International Game Technology
 pepp0127        // (c) 1987 IGT - International Game Technology
 pepp0127a       // (c) 1987 IGT - International Game Technology
+pepp0129        // (c) 1987 IGT - International Game Technology
 pepp0130        // (c) 1987 IGT - International Game Technology
 pepp0132        // (c) 1987 IGT - International Game Technology
 pepp0150        // (c) 1987 IGT - International Game Technology
@@ -11469,9 +11536,11 @@ pepp0178        // (c) 1987 IGT - International Game Technology
 pepp0181        // (c) 1987 IGT - International Game Technology
 pepp0188        // (c) 1987 IGT - International Game Technology
 pepp0188a       // (c) 1987 IGT - International Game Technology
+pepp0189        // (c) 1987 IGT - International Game Technology
 pepp0190        // (c) 1987 IGT - International Game Technology
 pepp0190a       // (c) 1987 IGT - International Game Technology
 pepp0190b       // (c) 1987 IGT - International Game Technology
+pepp0190c       // (c) 1987 IGT - International Game Technology
 pepp0197        // (c) 1987 IGT - International Game Technology
 pepp0197a       // (c) 1987 IGT - International Game Technology
 pepp0197b       // (c) 1987 IGT - International Game Technology
@@ -11499,9 +11568,11 @@ pepp0250a       // (c) 1987 IGT - International Game Technology
 pepp0265        // (c) 1987 IGT - International Game Technology
 pepp0265a       // (c) 1987 IGT - International Game Technology
 pepp0265b       // (c) 1987 IGT - International Game Technology
+pepp0265c       // (c) 1987 IGT - International Game Technology
 pepp0274        // (c) 1987 IGT - International Game Technology
 pepp0288        // (c) 1987 IGT - International Game Technology
 pepp0290        // (c) 1987 IGT - International Game Technology
+pepp0290a       // (c) 1987 IGT - International Game Technology
 pepp0291        // (c) 1987 IGT - International Game Technology
 pepp0291a       // (c) 1987 IGT - International Game Technology
 pepp0401        // (c) 1987 IGT - International Game Technology
@@ -11510,6 +11581,7 @@ pepp0410        // (c) 1987 IGT - International Game Technology
 pepp0410a       // (c) 1987 IGT - International Game Technology
 pepp0417        // (c) 1987 IGT - International Game Technology
 pepp0417a       // (c) 1987 IGT - International Game Technology
+pepp0418        // (c) 1987 IGT - International Game Technology
 pepp0419        // (c) 1987 IGT - International Game Technology
 pepp0420        // (c) 1987 IGT - International Game Technology
 pepp0423        // (c) 1987 IGT - International Game Technology
@@ -11548,6 +11620,7 @@ pepp0515c       // (c) 1987 IGT - International Game Technology
 pepp0516        // (c) 1987 IGT - International Game Technology
 pepp0516a       // (c) 1987 IGT - International Game Technology
 pepp0516b       // (c) 1987 IGT - International Game Technology
+pepp0526        // (c) 1987 IGT - International Game Technology
 pepp0531        // (c) 1987 IGT - International Game Technology
 pepp0536        // (c) 1987 IGT - International Game Technology
 pepp0538        // (c) 1987 IGT - International Game Technology
@@ -11557,19 +11630,27 @@ pepp0542a       // (c) 1987 IGT - International Game Technology
 pepp0550        // (c) 1987 IGT - International Game Technology
 pepp0550a       // (c) 1987 IGT - International Game Technology
 pepp0555        // (c) 1987 IGT - International Game Technology
+pepp0559        // (c) 1987 IGT - International Game Technology
+pepp0562        // (c) 1987 IGT - International Game Technology
 pepp0568        // (c) 1987 IGT - International Game Technology
 pepp0585        // (c) 1987 IGT - International Game Technology
+pepp0587        // (c) 1987 IGT - International Game Technology
+pepp0596        // (c) 1987 IGT - International Game Technology
+pepp0598        // (c) 1987 IGT - International Game Technology
+pepp0711        // (c) 1987 IGT - International Game Technology
 pepp0713        // (c) 1987 IGT - International Game Technology
 pepp0725        // (c) 1987 IGT - International Game Technology
 pepp0725a       // (c) 1987 IGT - International Game Technology
 pepp0726        // (c) 1987 IGT - International Game Technology
 pepp0728        // (c) 1987 IGT - International Game Technology
+pepp0733        // (c) 1987 IGT - International Game Technology
 pepp0750        // (c) 1987 IGT - International Game Technology
 pepp0757        // (c) 1987 IGT - International Game Technology
 pepp0760        // (c) 1987 IGT - International Game Technology
 pepp0763        // (c) 1987 IGT - International Game Technology
 pepp0764        // (c) 1987 IGT - International Game Technology
 pepp0775        // (c) 1987 IGT - International Game Technology
+pepp0797        // (c) 1987 IGT - International Game Technology
 pepp0812        // (c) 1987 IGT - International Game Technology
 pepp0816        // (c) 1987 IGT - International Game Technology
 peip0028        // (c) 1987 IGT - International Game Technology
@@ -11598,9 +11679,11 @@ pebe0014        // (c) 1994 IGT - International Game Technology
 pebe0014a       // (c) 1994 IGT - International Game Technology
 peke0004        // (c) 1994 IGT - International Game Technology
 peke0017        // (c) 1994 IGT - International Game Technology
+peke1001        // (c) 1994 IGT - International Game Technology
 peke1006        // (c) 1994 IGT - International Game Technology
 peke1012        // (c) 1994 IGT - International Game Technology
 peke1012a       // (c) 1994 IGT - International Game Technology
+peke1012b       // (c) 1994 IGT - International Game Technology
 peke1013        // (c) 1994 IGT - International Game Technology
 peke1013a       // (c) 1994 IGT - International Game Technology
 peps0014        // (c) 1996 IGT - International Game Technology
@@ -11617,15 +11700,21 @@ peps0207        // (c) 1996 IGT - International Game Technology
 peps0296        // (c) 1996 IGT - International Game Technology
 peps0298        // (c) 1996 IGT - International Game Technology
 peps0308        // (c) 1996 IGT - International Game Technology
+peps0358        // (c) 1996 IGT - International Game Technology
 peps0364        // (c) 1996 IGT - International Game Technology
 peps0366        // (c) 1996 IGT - International Game Technology
 peps0372        // (c) 1996 IGT - International Game Technology
 peps0373        // (c) 1996 IGT - International Game Technology
+peps0425        // (c) 1996 IGT - International Game Technology
 peps0426        // (c) 1996 IGT - International Game Technology
+peps0470        // (c) 1996 IGT - International Game Technology
 peps0581        // (c) 1996 IGT - International Game Technology
 peps0615        // (c) 1996 IGT - International Game Technology
+peps0628        // (c) 1996 IGT - International Game Technology
 peps0631        // (c) 1996 IGT - International Game Technology
+peps0708        // (c) 1996 IGT - International Game Technology
 peps0716        // (c) 1996 IGT - International Game Technology
+peps0722        // (c) 1996 IGT - International Game Technology
 pex0002p        // (c) 1995 IGT - International Game Technology
 pex0002pa       // (c) 1995 IGT - International Game Technology
 pex0006p        // (c) 1995 IGT - International Game Technology
@@ -11712,6 +11801,8 @@ pex2027p        // (c) 1995 IGT - International Game Technology
 pex2028p        // (c) 1995 IGT - International Game Technology
 pex2029p        // (c) 1995 IGT - International Game Technology
 pex2031p        // (c) 1995 IGT - International Game Technology
+pex2033p        // (c) 1995 IGT - International Game Technology
+pex2034p        // (c) 1995 IGT - International Game Technology
 pex2035p        // (c) 1995 IGT - International Game Technology
 pex2036p        // (c) 1995 IGT - International Game Technology
 pex2037p        // (c) 1995 IGT - International Game Technology
@@ -11730,13 +11821,18 @@ pex2070p        // (c) 1995 IGT - International Game Technology
 pex2111p        // (c) 1995 IGT - International Game Technology
 pex2121p        // (c) 1995 IGT - International Game Technology
 pex2121pa       // (c) 1995 IGT - International Game Technology
+pex2127p        // (c) 1995 IGT - International Game Technology
+pex2134p        // (c) 1995 IGT - International Game Technology
 pex2150p        // (c) 1995 IGT - International Game Technology
+pex2152p        // (c) 1995 IGT - International Game Technology
 pex2172p        // (c) 1995 IGT - International Game Technology
 pex2172pa       // (c) 1995 IGT - International Game Technology
 pex2173p        // (c) 1995 IGT - International Game Technology
 pex2178p        // (c) 1995 IGT - International Game Technology
 pex2179p        // (c) 1995 IGT - International Game Technology
 pex2180p        // (c) 1995 IGT - International Game Technology
+pex2211p        // (c) 1995 IGT - International Game Technology
+pex2236p        // (c) 1995 IGT - International Game Technology
 pex2241p        // (c) 1995 IGT - International Game Technology
 pex2244p        // (c) 1995 IGT - International Game Technology
 pex2245p        // (c) 1995 IGT - International Game Technology
@@ -11744,9 +11840,11 @@ pex2245pa       // (c) 1995 IGT - International Game Technology
 pex2247p        // (c) 1995 IGT - International Game Technology
 pex2250p        // (c) 1995 IGT - International Game Technology
 pex2251p        // (c) 1995 IGT - International Game Technology
+pex2270p        // (c) 1995 IGT - International Game Technology
 pex2272p        // (c) 1995 IGT - International Game Technology
 pex2275p        // (c) 1995 IGT - International Game Technology
 pex2276p        // (c) 1995 IGT - International Game Technology
+pex2279p        // (c) 1995 IGT - International Game Technology
 pex2283p        // (c) 1995 IGT - International Game Technology
 pex2284p        // (c) 1995 IGT - International Game Technology
 pex2287p        // (c) 1995 IGT - International Game Technology
@@ -11759,7 +11857,9 @@ pex2308p        // (c) 1995 IGT - International Game Technology
 pex2310p        // (c) 1995 IGT - International Game Technology
 pex2312p        // (c) 1995 IGT - International Game Technology
 pex2314p        // (c) 1995 IGT - International Game Technology
+pex2315p        // (c) 1995 IGT - International Game Technology
 pex2374p        // (c) 1995 IGT - International Game Technology
+pex2376p        // (c) 1995 IGT - International Game Technology
 pex2377p        // (c) 1995 IGT - International Game Technology
 pex2386p        // (c) 1995 IGT - International Game Technology
 pex2412p        // (c) 1995 IGT - International Game Technology
@@ -11783,12 +11883,15 @@ pekoc806        // (c) 1997 IGT - International Game Technology
 pekoc818        // (c) 1997 IGT - International Game Technology
 pekoc819        // (c) 1997 IGT - International Game Technology
 pekoc825        // (c) 1997 IGT - International Game Technology
+pex0006k        // (c) 1997 IGT - International Game Technology
+pex0013k        // (c) 1997 IGT - International Game Technology
 pex0838s        // (c) 1997 IGT - International Game Technology
 pex0841s        // (c) 1997 IGT - International Game Technology
 pex0998s        // (c) 1997 IGT - International Game Technology
 pex1087s        // (c) 1997 IGT - International Game Technology
 pexm001p        // (c) 1997 IGT - International Game Technology
 pexm002p        // (c) 1997 IGT - International Game Technology
+pexm002pa       // (c) 1997 IGT - International Game Technology
 pexm003p        // (c) 1997 IGT - International Game Technology
 pexm004p        // (c) 1997 IGT - International Game Technology
 pexm005p        // (c) 1997 IGT - International Game Technology
@@ -11802,6 +11905,7 @@ pexmp013        // (c) 1997 IGT - International Game Technology
 pexmp017        // (c) 1997 IGT - International Game Technology
 pexmp017a       // (c) 1997 IGT - International Game Technology
 pexmp017b       // (c) 1997 IGT - International Game Technology
+pexmp022        // (c) 1997 IGT - International Game Technology
 pexmp026        // (c) 1997 IGT - International Game Technology
 pexmp030        // (c) 1997 IGT - International Game Technology
 pexmp030a       // (c) 1997 IGT - International Game Technology
@@ -11927,7 +12031,7 @@ ichiban         // (c) 199? Excel
 3x3puzzla       // (c) 199? Ace
 gambl186        // unknown
 gambl186a       // unknown
-
+gambl186b		// unknown
 
 // InterFlip / Recreativos Franco
 videopkr        // (c) 1984 InterFlip
@@ -12143,7 +12247,6 @@ partygrs        // (c) 2001
 
 // Aristocrat Mk6 hardware
 aristmk6
-mk6nsw11
 antcleo         // (c) 2004
 50lions         // (c) 2002
 50lionsa        // (c) 2003
@@ -13288,6 +13391,7 @@ pongd           // (c) 1973 Atari
 breakout        // (c) 1976 Atari
 //cktpong       // (c) 1974 Atari / National Entertainment Co.
 //coupedav      // (c) 1973 Atari France
+//coupdmnd      // (c) 1974 Atari France
 //coupfran      // (c) 1974 Atari Europe
 //drpong        // (c) 1974 Atari
 //pupppong      // (c) 1974 Atari
@@ -32452,3 +32556,19 @@ dumpump
 3lilpigs
 
 wackygtr   // Wacky Gator
+
+amerihok
+
+ice_tbd // ICE - Turbo Drive
+ice_bozo // ICE - Bozo Pail Toss
+
+scm_500
+
+awetoss // Lazer-tron Awesome Toss'em
+aftrshok // Lazer-tron After Shock
+aftrshoka
+ribrac // Lazer-tron Ribbit Racing
+
+age_cand // AGE Candy Crane
+
+clowndwn // Elwood Clown Roll Down

@@ -76,7 +76,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sorcerer_ff_w);
 	DECLARE_MACHINE_START(sorcererd);
 	DECLARE_DRIVER_INIT(sorcerer);
-	TIMER_CALLBACK_MEMBER(sorcerer_serial_tc);
 	TIMER_CALLBACK_MEMBER(sorcerer_cassette_tc);
 	TIMER_CALLBACK_MEMBER(sorcerer_reset);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( sorcerer );
@@ -89,10 +88,10 @@ private:
 	emu_timer *m_serial_timer;
 	emu_timer *m_cassette_timer;
 	cass_data_t m_cass_data;
-	virtual void video_start();
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void video_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;

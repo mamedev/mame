@@ -99,7 +99,7 @@ public:
 	pen_t m_pens[NUM_PENS];
 	required_shared_ptr<UINT8> m_ram_attr;
 	required_shared_ptr<UINT8> m_ram_video;
-	UINT8 *m_ram_palette;
+	std::unique_ptr<UINT8[]> m_ram_palette;
 	UINT8 m_lscnblk;
 	int m_extra_video_bank_bit;
 	int m_question_address;
@@ -126,7 +126,7 @@ public:
 	DECLARE_DRIVER_INIT(key_0);
 	DECLARE_DRIVER_INIT(key_2);
 	DECLARE_DRIVER_INIT(dtrvwz5);
-	virtual void machine_start();
+	virtual void machine_start() override;
 	DECLARE_MACHINE_START(casino5);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -138,9 +138,9 @@ public:
 void merit_state::machine_start()
 {
 	m_question_address = 0;
-	m_ram_palette = auto_alloc_array(machine(), UINT8, RAM_PALETTE_SIZE);
+	m_ram_palette = std::make_unique<UINT8[]>(RAM_PALETTE_SIZE);
 
-	save_pointer(NAME(m_ram_palette), RAM_PALETTE_SIZE);
+	save_pointer(NAME(m_ram_palette.get()), RAM_PALETTE_SIZE);
 	save_item(NAME(m_lscnblk));
 	save_item(NAME(m_extra_video_bank_bit));
 	save_item(NAME(m_question_address));

@@ -62,8 +62,8 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 	DECLARE_PALETTE_INIT(kcgd);
@@ -74,10 +74,7 @@ public:
 		TIMER_ID_VSYNC_OFF,
 		TIMER_ID_500HZ
 	};
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-
-	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_line_clock);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	DECLARE_READ16_MEMBER(vram_addr_r);
 	DECLARE_READ16_MEMBER(vram_data_r);
@@ -107,7 +104,7 @@ private:
 		int palette_index, vram_addr;
 		UINT8 palette[16];
 	} m_video;
-	UINT32 *m_videoram;
+	std::unique_ptr<UINT32[]> m_videoram;
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -158,7 +155,7 @@ void kcgd_state::video_start()
 //  screen_device *screen = machine().device<screen_device>("screen");
 
 	// 64 kwords, word size is 17 bits
-	m_videoram = auto_alloc_array(machine(), UINT32, 65536);
+	m_videoram = std::make_unique<UINT32[]>(65536);
 
 	m_tmpclip = rectangle(0, KCGD_DISP_HORZ-1, 0, KCGD_DISP_VERT-1);
 	m_tmpbmp.allocate(KCGD_DISP_HORZ, KCGD_DISP_VERT);

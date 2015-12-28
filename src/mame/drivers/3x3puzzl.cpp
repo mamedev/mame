@@ -95,9 +95,9 @@ public:
 	DECLARE_WRITE16_MEMBER(tilemap1_scrolly_w);
 
 protected:
-	virtual void video_start();
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void video_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 

@@ -81,7 +81,7 @@ public:
 	UINT8 m_mux_data;
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(big10_vdp_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_in1;

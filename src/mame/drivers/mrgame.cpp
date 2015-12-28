@@ -76,7 +76,7 @@ public:
 	DECLARE_READ8_MEMBER(rsw_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	UINT32 screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	bitmap_ind16 *m_tile_bitmap;
+	std::unique_ptr<bitmap_ind16> m_tile_bitmap;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_shared_ptr<UINT8> m_p_objectram;
@@ -93,8 +93,8 @@ private:
 	UINT8 m_video_data;
 	UINT8 m_video_status;
 	UINT8 m_video_ctrl[8];
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<m68000_device> m_maincpu;
 	required_device<z80_device> m_audiocpu1;
 	required_device<z80_device> m_audiocpu2;
@@ -299,7 +299,7 @@ READ8_MEMBER( mrgame_state::portc_r )
 
 void mrgame_state::machine_start()
 {
-	m_tile_bitmap=auto_bitmap_ind16_alloc(machine(),256,256);
+	m_tile_bitmap=std::make_unique<bitmap_ind16>(256,256);
 }
 
 void mrgame_state::machine_reset()
@@ -432,7 +432,7 @@ UINT32 mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 &b
 	}
 
 	// scroll each column as needed
-	copyscrollbitmap(bitmap,*m_tile_bitmap,0,0,32,scrolly,cliprect);
+	copyscrollbitmap(bitmap,*m_tile_bitmap,0,nullptr,32,scrolly,cliprect);
 
 
 	// sprites

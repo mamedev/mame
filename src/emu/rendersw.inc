@@ -610,7 +610,7 @@ private:
 		INT32 endx = setup.endx;
 
 		// ensure all parameters are valid
-		assert(prim.texture.palette != NULL);
+		assert(prim.texture.palette != nullptr);
 
 		// fast case: no coloring, no alpha
 		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
@@ -718,7 +718,7 @@ private:
 		INT32 endx = setup.endx;
 
 		// ensure all parameters are valid
-		assert(prim.texture.palette != NULL);
+		assert(prim.texture.palette != nullptr);
 
 		// fast case: no coloring, no alpha
 		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
@@ -811,7 +811,7 @@ private:
 		INT32 endx = setup.endx;
 
 		// ensure all parameters are valid
-		assert(prim.texture.palette != NULL);
+		assert(prim.texture.palette != nullptr);
 
 		// fast case: no coloring, no alpha
 		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
@@ -918,7 +918,7 @@ private:
 				INT32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// no lookup case
-				if (palbase == NULL)
+				if (palbase == nullptr)
 				{
 					// loop over cols
 					for (INT32 x = setup.startx; x < endx; x++)
@@ -965,7 +965,7 @@ private:
 				INT32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// no lookup case
-				if (palbase == NULL)
+				if (palbase == nullptr)
 				{
 					// loop over cols
 					for (INT32 x = setup.startx; x < endx; x++)
@@ -1022,7 +1022,7 @@ private:
 				INT32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// no lookup case
-				if (palbase == NULL)
+				if (palbase == nullptr)
 				{
 					// loop over cols
 					for (INT32 x = setup.startx; x < endx; x++)
@@ -1088,7 +1088,7 @@ private:
 				INT32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// no lookup case
-				if (palbase == NULL)
+				if (palbase == nullptr)
 				{
 					// loop over cols
 					for (INT32 x = setup.startx; x < endx; x++)
@@ -1139,7 +1139,7 @@ private:
 				INT32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// no lookup case
-				if (palbase == NULL)
+				if (palbase == nullptr)
 				{
 					// loop over cols
 					for (INT32 x = setup.startx; x < endx; x++)
@@ -1196,7 +1196,7 @@ private:
 				INT32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// no lookup case
-				if (palbase == NULL)
+				if (palbase == nullptr)
 				{
 					// loop over cols
 					for (INT32 x = setup.startx; x < endx; x++)
@@ -1262,7 +1262,7 @@ private:
 				INT32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// no lookup case
-				if (palbase == NULL)
+				if (palbase == nullptr)
 				{
 					// loop over cols
 					for (INT32 x = setup.startx; x < endx; x++)
@@ -1325,7 +1325,7 @@ private:
 				INT32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// no lookup case
-				if (palbase == NULL)
+				if (palbase == nullptr)
 				{
 					// loop over cols
 					for (INT32 x = setup.startx; x < endx; x++)
@@ -1396,7 +1396,7 @@ private:
 				INT32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// no lookup case
-				if (palbase == NULL)
+				if (palbase == nullptr)
 				{
 					// loop over cols
 					for (INT32 x = setup.startx; x < endx; x++)
@@ -1467,7 +1467,7 @@ private:
 				INT32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// no lookup case
-				if (palbase == NULL)
+				if (palbase == nullptr)
 				{
 					// loop over cols
 					for (INT32 x = setup.startx; x < endx; x++)
@@ -1546,7 +1546,7 @@ private:
 				INT32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// no lookup case
-				if (palbase == NULL)
+				if (palbase == nullptr)
 				{
 					// loop over cols
 					for (INT32 x = setup.startx; x < endx; x++)
@@ -1601,7 +1601,7 @@ private:
 				INT32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// no lookup case
-				if (palbase == NULL)
+				if (palbase == nullptr)
 				{
 					// loop over cols
 					for (INT32 x = setup.startx; x < endx; x++)
@@ -1665,7 +1665,7 @@ private:
 				INT32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// no lookup case
-				if (palbase == NULL)
+				if (palbase == nullptr)
 				{
 					// loop over cols
 					for (INT32 x = setup.startx; x < endx; x++)
@@ -1738,7 +1738,7 @@ private:
 				INT32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
 
 				// no lookup case
-				if (palbase == NULL)
+				if (palbase == nullptr)
 				{
 					// loop over cols
 					for (INT32 x = setup.startx; x < endx; x++)
@@ -1910,7 +1910,7 @@ public:
 	static void draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch)
 	{
 		// loop over the list and render each element
-		for (const render_primitive *prim = primlist.first(); prim != NULL; prim = prim->next())
+		for (const render_primitive *prim = primlist.first(); prim != nullptr; prim = prim->next())
 			switch (prim->type)
 			{
 				case render_primitive::LINE:

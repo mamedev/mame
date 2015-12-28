@@ -392,7 +392,7 @@ void pdp1_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const pdp1_reset_param_t *intf = reinterpret_cast<const pdp1_reset_param_t *>(static_config());
-	if (intf != NULL)
+	if (intf != nullptr)
 		*static_cast<pdp1_reset_param_t *>(this) = *intf;
 
 	// or initialize to defaults if none provided
@@ -404,9 +404,9 @@ void pdp1_device::device_config_complete()
 		hw_mul_div = 0;
 		type_20_sbs = 0;
 
-		for (int i = 0; i < 64; i++)
+		for (auto & elem : extern_iot)
 		{
-			memset(&extern_iot[i], 0, sizeof(extern_iot[i]));
+			memset(&elem, 0, sizeof(elem));
 		}
 	}
 }

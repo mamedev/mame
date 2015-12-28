@@ -1160,7 +1160,7 @@ void fm7_state::fm7_mmr_refresh(address_space& space)
 	if(m_basic_rom_en)
 	{
 		UINT8* ROM = memregion("fbasic")->base();
-		if(ROM != NULL)
+		if(ROM != nullptr)
 			membank("fbasic_bank_r")->set_base(ROM);
 	}
 	else
@@ -1892,8 +1892,8 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(fm7_state,fm7)
 {
-//  m_shared_ram = auto_alloc_array(machine(),UINT8,0x80);
-	m_video_ram = auto_alloc_array(machine(),UINT8,0x18000);  // 2 pages on some systems
+//  m_shared_ram = std::make_unique<UINT8[]>(0x80);
+	m_video_ram = std::make_unique<UINT8[]>(0x18000);  // 2 pages on some systems
 	m_timer = timer_alloc(TIMER_FM7_IRQ);
 	m_subtimer = timer_alloc(TIMER_FM7_SUBTIMER_IRQ);
 	m_keyboard_timer = timer_alloc(TIMER_FM7_KEYBOARD_POLL);
@@ -2038,7 +2038,7 @@ void fm7_state::machine_reset()
 		m_x86->set_input_line(INPUT_LINE_HALT,ASSERT_LINE);
 	}
 
-	memset(m_video_ram, 0, sizeof(UINT8) * 0x18000);
+	memset(m_video_ram.get(), 0, sizeof(UINT8) * 0x18000);
 }
 
 

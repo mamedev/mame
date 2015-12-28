@@ -80,8 +80,8 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 
 	// allocate memory to hold the result
 	item = (osd_work_item *)malloc(sizeof(*item));
-	if (item == NULL)
-		return NULL;
+	if (item == nullptr)
+		return nullptr;
 
 	// loop over all requested items
 	for (itemnum = 0; itemnum < numitems; itemnum++)
@@ -97,7 +97,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 	if (flags & WORK_ITEM_FLAG_AUTO_RELEASE)
 	{
 		free(item);
-		item = NULL;
+		item = nullptr;
 	}
 	return item;
 }

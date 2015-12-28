@@ -38970,7 +38970,16 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-
+	<software name="raymanp" supported="no"> <!-- the header lists 19950424, but elsewhere there are date stamps of 19950720 -->
+		<description>Rayman (Prototype 19950720)</description>
+		<year>1995</year>
+		<publisher>Ubi Soft</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rayman (prototype 19950720)" sha1="6072f577a950aded8d0a634cb0dc962ed639a520" />
+			</diskarea>
+		</part>
+	</software>
 
 
 </softwarelist>

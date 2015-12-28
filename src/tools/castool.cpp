@@ -121,7 +121,7 @@ const struct SupportedCassetteFormats formats[] = {
 
 
 
-	{NULL,NULL,NULL}
+	{nullptr,nullptr,nullptr}
 };
 
 
@@ -129,9 +129,9 @@ static const char *get_extension(const char *name)
 {
 	const char *s;
 	s = name;
-	if (s != NULL)
+	if (s != nullptr)
 		s = strrchr(s, '.');
-	return s ? s+1 : NULL;
+	return s ? s+1 : nullptr;
 }
 
 static void display_usage(void)
@@ -156,7 +156,7 @@ int CLIB_DECL main(int argc, char *argv[])
 {
 	int i;
 	int found =0;
-	const struct CassetteFormat * const *selected_formats = NULL;
+	const struct CassetteFormat * const *selected_formats = nullptr;
 	cassette_image *cassette;
 	FILE *f;
 

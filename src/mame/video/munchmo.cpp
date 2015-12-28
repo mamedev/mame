@@ -45,7 +45,7 @@ WRITE8_MEMBER(munchmo_state::mnchmobl_flipscreen_w)
 
 void munchmo_state::video_start()
 {
-	m_tmpbitmap = auto_bitmap_ind16_alloc(machine(), 512, 512);
+	m_tmpbitmap = std::make_unique<bitmap_ind16>(512, 512);
 }
 
 void munchmo_state::draw_status( bitmap_ind16 &bitmap, const rectangle &cliprect )

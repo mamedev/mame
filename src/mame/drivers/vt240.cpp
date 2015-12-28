@@ -64,8 +64,6 @@ public:
 
 	required_device<upd7220_device> m_hgdc;
 	DECLARE_READ8_MEMBER( test_r );
-	DECLARE_READ8_MEMBER( pcg_r );
-	DECLARE_WRITE8_MEMBER( pcg_w );
 
 	//UINT16 m_pcg_addr;
 	//UINT8 m_pcg_internal_addr;
@@ -74,7 +72,7 @@ public:
 	required_shared_ptr<UINT16> m_video_ram;
 
 	DECLARE_DRIVER_INIT(vt240);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(vt240_irq);
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 };

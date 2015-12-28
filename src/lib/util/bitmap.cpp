@@ -77,11 +77,11 @@ inline void bitmap_t::compute_base(int xslop, int yslop)
  */
 
 bitmap_t::bitmap_t(bitmap_format format, int bpp, int width, int height, int xslop, int yslop)
-	: m_alloc(NULL),
+	: m_alloc(nullptr),
 		m_allocbytes(0),
 		m_format(format),
 		m_bpp(bpp),
-		m_palette(NULL)
+		m_palette(nullptr)
 {
 	// allocate intializes all other fields
 	allocate(width, height, xslop, yslop);
@@ -101,7 +101,7 @@ bitmap_t::bitmap_t(bitmap_format format, int bpp, int width, int height, int xsl
  */
 
 bitmap_t::bitmap_t(bitmap_format format, int bpp, void *base, int width, int height, int rowpixels)
-	: m_alloc(NULL),
+	: m_alloc(nullptr),
 		m_allocbytes(0),
 		m_base(base),
 		m_rowpixels(rowpixels),
@@ -109,7 +109,7 @@ bitmap_t::bitmap_t(bitmap_format format, int bpp, void *base, int width, int hei
 		m_height(height),
 		m_format(format),
 		m_bpp(bpp),
-		m_palette(NULL),
+		m_palette(nullptr),
 		m_cliprect(0, width - 1, 0, height - 1)
 {
 }
@@ -126,7 +126,7 @@ bitmap_t::bitmap_t(bitmap_format format, int bpp, void *base, int width, int hei
  */
 
 bitmap_t::bitmap_t(bitmap_format format, int bpp, bitmap_t &source, const rectangle &subrect)
-	: m_alloc(NULL),
+	: m_alloc(nullptr),
 		m_allocbytes(0),
 		m_base(source.raw_pixptr(subrect.min_y, subrect.min_x)),
 		m_rowpixels(source.m_rowpixels),
@@ -134,7 +134,7 @@ bitmap_t::bitmap_t(bitmap_format format, int bpp, bitmap_t &source, const rectan
 		m_height(subrect.height()),
 		m_format(format),
 		m_bpp(bpp),
-		m_palette(NULL),
+		m_palette(nullptr),
 		m_cliprect(0, subrect.width() - 1, 0, subrect.height() - 1)
 {
 	assert(format == source.m_format);
@@ -258,10 +258,10 @@ void bitmap_t::resize(int width, int height, int xslop, int yslop)
 void bitmap_t::reset()
 {
 	// delete any existing stuff
-	set_palette(NULL);
+	set_palette(nullptr);
 	delete[] m_alloc;
-	m_alloc = NULL;
-	m_base = NULL;
+	m_alloc = nullptr;
+	m_base = nullptr;
 
 	// reset all fields
 	m_rowpixels = 0;
@@ -339,14 +339,14 @@ void bitmap_t::wrap(const bitmap_t &source, const rectangle &subrect)
 void bitmap_t::set_palette(palette_t *palette)
 {
 	// first dereference any existing palette
-	if (m_palette != NULL)
+	if (m_palette != nullptr)
 	{
 		m_palette->deref();
-		m_palette = NULL;
+		m_palette = nullptr;
 	}
 
 	// then reference any new palette
-	if (palette != NULL)
+	if (palette != nullptr)
 	{
 		palette->ref();
 		m_palette = palette;

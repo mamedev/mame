@@ -81,29 +81,21 @@ public:
 	DECLARE_READ8_MEMBER(blitter_status_r);
 	DECLARE_WRITE8_MEMBER(nsc_true_blitter_w);
 	DECLARE_WRITE8_MEMBER(sexygal_nsc_true_blitter_w);
-	DECLARE_WRITE8_MEMBER(nsc_latch_w);
-	DECLARE_READ8_MEMBER(nsc_latch_r);
-	DECLARE_WRITE8_MEMBER(z80_latch_w);
-	DECLARE_READ8_MEMBER(z80_latch_r);
-	DECLARE_WRITE8_MEMBER(blitter_w);
-	DECLARE_READ8_MEMBER(nsc_blit_r);
 	DECLARE_WRITE8_MEMBER(royalqn_blitter_0_w);
 	DECLARE_WRITE8_MEMBER(royalqn_blitter_1_w);
 	DECLARE_WRITE8_MEMBER(royalqn_blitter_2_w);
 	DECLARE_READ8_MEMBER(royalqn_nsc_blit_r);
 	DECLARE_READ8_MEMBER(royalqn_comm_r);
 	DECLARE_WRITE8_MEMBER(royalqn_comm_w);
-	DECLARE_WRITE8_MEMBER(blit_vregs_w);
-	DECLARE_READ8_MEMBER(blit_vregs_r);
 	DECLARE_WRITE8_MEMBER(blit_true_vregs_w);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(input_1p_r);
 	DECLARE_READ8_MEMBER(input_2p_r);
 	DECLARE_DRIVER_INIT(ngalsumr);
 	DECLARE_DRIVER_INIT(royalqn);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(nightgal);
 	UINT32 screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -314,7 +306,7 @@ PALETTE_INIT_MEMBER(nightgal_state, nightgal)
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 0,
 			2, resistances_b,  weights_b,  0, 0,
-			0, 0, 0, 0, 0);
+			0, nullptr, nullptr, 0, 0);
 
 	for (i = 0; i < palette.entries(); i++)
 	{

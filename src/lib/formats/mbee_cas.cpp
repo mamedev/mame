@@ -224,7 +224,7 @@ static int mbee_tap_calculate_size_in_samples(const UINT8 *bytes, int length)
 {
 	mbee_image_size = length;
 
-	return mbee_handle_tap(NULL, bytes);
+	return mbee_handle_tap(nullptr, bytes);
 }
 
 static const struct CassetteLegacyWaveFiller mbee_tap_config =
@@ -253,7 +253,7 @@ static const struct CassetteFormat mbee_tap_image_format =
 	"tap",
 	mbee_tap_identify,
 	mbee_tap_load,
-	NULL
+	nullptr
 };
 
 CASSETTE_FORMATLIST_START(mbee_cassette_formats)

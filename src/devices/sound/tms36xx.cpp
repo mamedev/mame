@@ -264,7 +264,7 @@ static const int tune4[13*6] = {
 	B(1),   B(2),   Dx(3),  B(3),   Dx(4),  B(4)
 };
 
-static const int *const tunes[] = {NULL,tune1,tune2,tune3,tune4};
+static const int *const tunes[] = {nullptr,tune1,tune2,tune3,tune4};
 
 #define DECAY(voice)                                            \
 	if( m_vol[voice] > TMS36XX_VMIN )                                   \
@@ -323,8 +323,8 @@ const device_type TMS36XX = &device_creator<tms36xx_device>;
 tms36xx_device::tms36xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS36XX, "TMS36XX", tag, owner, clock, "tms36xx", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_subtype(NULL),
-		m_channel(NULL),
+		m_subtype(nullptr),
+		m_channel(nullptr),
 		m_samplerate(0),
 		m_basefreq(0),
 		m_octave(0),

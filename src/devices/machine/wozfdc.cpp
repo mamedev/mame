@@ -88,7 +88,7 @@ void wozfdc_device::device_start()
 
 void wozfdc_device::device_reset()
 {
-	floppy = NULL;
+	floppy = nullptr;
 	active = MODE_IDLE;
 	phases = 0x00;
 	mode_write = false;
@@ -109,7 +109,7 @@ void wozfdc_device::device_reset()
 
 void wozfdc_device::a3_update_drive_sel()
 {
-	floppy_image_device *newflop = NULL;
+	floppy_image_device *newflop = nullptr;
 
 	if (!external_io_select)
 	{
@@ -154,7 +154,7 @@ void diskii_fdc::device_reset()
 	wozfdc_device::device_reset();
 	external_drive_select = false;
 
-	if (floppy0 != NULL)
+	if (floppy0 != nullptr)
 	{
 		floppy = floppy0->get_device();
 	}

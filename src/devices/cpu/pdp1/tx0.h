@@ -57,19 +57,19 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 3; }
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 3; }
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
 
 protected:
 	address_space_config m_program_config;
@@ -150,8 +150,8 @@ public:
 	tx0_8kw_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
 protected:
-	virtual void execute_run();
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual void execute_run() override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 private:
 	void execute_instruction_8kw();
@@ -165,8 +165,8 @@ public:
 	tx0_64kw_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
 protected:
-	virtual void execute_run();
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual void execute_run() override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 private:
 	void execute_instruction_64kw();

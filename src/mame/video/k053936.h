@@ -41,13 +41,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// internal state
-	UINT16    *m_ctrl;
-	UINT16    *m_linectrl;
+	std::unique_ptr<UINT16[]>    m_ctrl;
+	std::unique_ptr<UINT16[]>    m_linectrl;
 	int       m_wrap, m_xoff, m_yoff;
 };
 

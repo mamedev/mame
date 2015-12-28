@@ -117,13 +117,12 @@ public:
 	DECLARE_WRITE8_MEMBER(mux_enable_w);
 	DECLARE_WRITE8_MEMBER(triac_w);
 	DECLARE_READ8_MEMBER(triac_r);
-	DECLARE_READ_LINE_MEMBER(sys85_data_r);
 	DECLARE_WRITE_LINE_MEMBER(sys85_data_w);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_DRIVER_INIT(decode);
 	DECLARE_DRIVER_INIT(nodecode);
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	int b85_find_project_string( );
 	required_device<cpu_device> m_maincpu;
@@ -671,9 +670,9 @@ int bfmsys85_state::b85_find_project_string( )
 	UINT8 *src = memregion( "maincpu" )->base();
 	int size = memregion( "maincpu" )->bytes();
 
-	for (int search=0;search<7;search++)
+	for (auto & elem : title_string)
 	{
-		int strlength = strlen(title_string[search]);
+		int strlength = strlen(elem);
 
 		for (int i=0;i<size-strlength;i++)
 		{
@@ -682,7 +681,7 @@ int bfmsys85_state::b85_find_project_string( )
 			for (j=0;j<strlength;j+=1)
 			{
 				UINT8 rom = src[(i+j)];
-				UINT8 chr = title_string[search][j];
+				UINT8 chr = elem[j];
 
 				if (rom != chr)
 				{

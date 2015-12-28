@@ -58,6 +58,16 @@ project "zlib"
 	uuid "3d78bd2a-2bd0-4449-8087-42ddfaef7ec9"
 	kind "StaticLib"
 
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
+		configuration { "gmake" }
+		if (version >= 30700) then
+			buildoptions {
+				"-Wno-shift-negative-value",
+			}
+		end	
+	end
+
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4131", -- warning C4131: 'xxx' : uses old-style declarator
@@ -119,11 +129,19 @@ project "softfloat"
 	includedirs {
 		MAME_DIR .. "src/osd",
 	}
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+			"/wd4146", -- warning C4146: unary minus operator applied to unsigned type, result still unsigned
+			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
+		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
 		}
 end	
+	configuration { }
+
 	files {
 		MAME_DIR .. "3rdparty/softfloat/softfloat.c",
 		MAME_DIR .. "3rdparty/softfloat/fsincos.c",
@@ -356,6 +374,10 @@ project "lua"
 	--	"ForceCPP",
 	--}
 
+	configuration { "gmake" }
+		buildoptions_c {
+			"-Wno-bad-function-cast"
+		}
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
@@ -674,11 +696,6 @@ end
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
 		}
-if _OPTIONS["CPP11"]~="1" then		
-		defines {
-			"nullptr=NULL" -- not used but needed for C++11 code
-		}
-end
 
 	configuration { "osx*" }
 		includedirs {
@@ -745,7 +762,7 @@ end
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/text_buffer_manager.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/text_metrics.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/font/utf8.cpp",
-		--MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp",
 	}

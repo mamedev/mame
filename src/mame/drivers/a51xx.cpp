@@ -22,8 +22,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(a5130);
 	DECLARE_VIDEO_START(a5130);
 	UINT32 screen_update_a5120(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

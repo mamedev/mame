@@ -29,9 +29,9 @@ const device_type MEMEXP_SLOT = &device_creator<memexp_slot_device>;
 memexp_slot_device::memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MEMEXP_SLOT, "Memory Expansion Slot", tag, owner, clock, "memexp_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
-	m_program(NULL),
-	m_io(NULL),
-	m_cart(NULL),
+	m_program(nullptr),
+	m_io(nullptr),
+	m_cart(nullptr),
 	m_int_handler(*this),
 	m_nmi_handler(*this),
 	m_reset_handler(*this)

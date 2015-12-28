@@ -41,7 +41,7 @@ public:
 
 	int m_coin_counter_bit;
 	int m_buffer;
-	UINT32 *m_vram;
+	std::unique_ptr<UINT32[]> m_vram;
 
 	UINT8 m_sound_data;
 

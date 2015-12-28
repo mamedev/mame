@@ -216,8 +216,8 @@ public:
 	DECLARE_READ8_MEMBER(tutor_highmem_r);
 	int m_tape_interrupt_enable;
 	emu_timer *m_tape_interrupt_timer;
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(tape_interrupt_handler);
 
 	int m_centronics_busy;

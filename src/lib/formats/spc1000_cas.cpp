@@ -108,14 +108,14 @@ static int spc1000_tap_calculate_size_in_samples(const UINT8 *bytes, int length)
 {
 	spc1000_image_size = length;
 
-	return spc1000_handle_tap(NULL, bytes);
+	return spc1000_handle_tap(nullptr, bytes);
 }
 
 static int spc1000_cas_calculate_size_in_samples(const UINT8 *bytes, int length)
 {
 	spc1000_image_size = length;
 
-	return spc1000_handle_cas(NULL, bytes);
+	return spc1000_handle_cas(nullptr, bytes);
 }
 
 
@@ -151,7 +151,7 @@ static const struct CassetteFormat spc1000_tap_cassette_image_format =
 	"tap",
 	spc1000_tap_cassette_identify,
 	spc1000_tap_cassette_load,
-	NULL
+	nullptr
 };
 
 
@@ -182,7 +182,7 @@ static const struct CassetteFormat spc1000_cas_cassette_image_format =
 	"cas",
 	spc1000_cas_cassette_identify,
 	spc1000_cas_cassette_load,
-	NULL
+	nullptr
 };
 
 

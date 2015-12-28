@@ -1517,6 +1517,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2v004",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2acc",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2ceblp",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2cebltw",   CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2acca",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2accp2",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2amf",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 }, // probably wrong but this set is not completely dumped anyway
@@ -1531,6 +1532,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2m7",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m8",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2m9",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2m10",      HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2dongb",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2yyc",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2koryu",    CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
@@ -1603,7 +1605,7 @@ static const struct CPS1config cps1_config_table[]=
 
 	{"kenseim",     CPS_B_21_DEF, mapper_KNM10B },  // wrong, need to convert equations from PAL
 
-	{0}     /* End of table */
+	{nullptr}     /* End of table */
 };
 
 
@@ -2221,10 +2223,10 @@ VIDEO_START_MEMBER(cps_state,cps)
 	for (i = 0; i < cps1_palette_entries * 16; i++)
 		m_palette->set_pen_color(i, rgb_t(0,0,0));
 
-	m_buffered_obj = auto_alloc_array_clear(machine(), UINT16, m_obj_size / 2);
+	m_buffered_obj = make_unique_clear<UINT16[]>(m_obj_size / 2);
 
 	if (m_cps_version == 2)
-		m_cps2_buffered_obj = auto_alloc_array_clear(machine(), UINT16, m_cps2_obj_size / 2);
+		m_cps2_buffered_obj = make_unique_clear<UINT16[]>(m_cps2_obj_size / 2);
 
 	/* clear RAM regions */
 	memset(m_gfxram, 0, m_gfxram.bytes());   /* Clear GFX RAM */
@@ -2249,11 +2251,11 @@ VIDEO_START_MEMBER(cps_state,cps)
 
 
 	/* Set up old base */
-	m_scroll1 = NULL;
-	m_scroll2 = NULL;
-	m_scroll3 = NULL;
-	m_obj = NULL;
-	m_other = NULL;
+	m_scroll1 = nullptr;
+	m_scroll2 = nullptr;
+	m_scroll3 = nullptr;
+	m_obj = nullptr;
+	m_other = nullptr;
 	cps1_get_video_base();   /* Calculate base pointers */
 	cps1_get_video_base();   /* Calculate old base pointers */
 
@@ -2279,11 +2281,11 @@ VIDEO_START_MEMBER(cps_state,cps)
 	save_item(NAME(m_pri_ctrl));
 	save_item(NAME(m_objram_bank));
 
-	save_pointer(NAME(m_buffered_obj), m_obj_size / 2);
+	save_pointer(NAME(m_buffered_obj.get()), m_obj_size / 2);
 	if (m_cps_version == 2)
 	{
 		save_item(NAME(m_cps2_last_sprite_offset));
-		save_pointer(NAME(m_cps2_buffered_obj), m_cps2_obj_size / 2);
+		save_pointer(NAME(m_cps2_buffered_obj.get()), m_cps2_obj_size / 2);
 	}
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(cps_state::cps1_get_video_base), this));
@@ -2442,7 +2444,7 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 
 
 	int i, baseadd;
-	UINT16 *base = m_buffered_obj;
+	UINT16 *base = m_buffered_obj.get();
 
 	/* some sf2 hacks draw the sprites in reverse order */
 	if ((m_game_config->bootleg_kludge == 1) || (m_game_config->bootleg_kludge == 2) || (m_game_config->bootleg_kludge == 3))
@@ -2635,7 +2637,7 @@ UINT16 *cps_state::cps2_objbase()
 void cps_state::cps2_find_last_sprite()    /* Find the offset of last sprite */
 {
 	int offset = 0;
-	UINT16 *base = m_cps2_buffered_obj;
+	UINT16 *base = m_cps2_buffered_obj.get();
 
 	/* Locate the end of table marker */
 	while (offset < m_cps2_obj_size / 2)
@@ -2674,7 +2676,7 @@ void cps_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 }
 
 	int i;
-	UINT16 *base = m_cps2_buffered_obj;
+	UINT16 *base = m_cps2_buffered_obj.get();
 	int xoffs = 64 - m_output[CPS2_OBJ_XOFFS /2];
 	int yoffs = 16 - m_output[CPS2_OBJ_YOFFS /2];
 
@@ -3064,7 +3066,7 @@ void cps_state::screen_eof_cps1(screen_device &screen, bool state)
 		if (m_cps_version == 1)
 		{
 			/* CPS1 sprites have to be delayed one frame */
-			memcpy(m_buffered_obj, m_obj, m_obj_size);
+			memcpy(m_buffered_obj.get(), m_obj, m_obj_size);
 		}
 	}
 }
@@ -3077,5 +3079,5 @@ void cps_state::cps2_set_sprite_priorities()
 void cps_state::cps2_objram_latch()
 {
 	cps2_set_sprite_priorities();
-	memcpy(m_cps2_buffered_obj, cps2_objbase(), m_cps2_obj_size);
+	memcpy(m_cps2_buffered_obj.get(), cps2_objbase(), m_cps2_obj_size);
 }

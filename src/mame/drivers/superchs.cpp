@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
+// thanks-to:Richard Bush
 /****************************************************************************
 
     Super Chase                         (c) 1992 Taito

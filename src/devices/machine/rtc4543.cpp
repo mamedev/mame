@@ -88,7 +88,7 @@ void rtc4543_device::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-INLINE UINT8 make_bcd(UINT8 data)
+static inline UINT8 make_bcd(UINT8 data)
 {
 	return ((data / 10) << 4) | (data % 10);
 }

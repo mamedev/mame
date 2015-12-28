@@ -60,7 +60,7 @@ SLOT_INTERFACE_END
 static const z80_daisy_config kc_d004_daisy_chain[] =
 {
 	{ Z80CTC_TAG },
-	{ NULL }
+	{ nullptr }
 };
 
 static MACHINE_CONFIG_FRAGMENT(kc_d004)
@@ -89,7 +89,7 @@ static MACHINE_CONFIG_FRAGMENT(kc_d004_gide)
 	MCFG_CPU_MODIFY(Z80_TAG)
 	MCFG_CPU_IO_MAP(kc_d004_gide_io)
 
-	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", NULL, false)
+	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END
 
 
@@ -353,7 +353,7 @@ WRITE8_MEMBER(kc_d004_device::fdd_select_w)
 	else if (data & 0x08)
 		m_floppy = m_floppy3->get_device();
 	else
-		m_floppy = NULL;
+		m_floppy = nullptr;
 
 	if (m_floppy)
 		m_floppy->mon_w(0);

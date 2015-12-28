@@ -46,7 +46,7 @@ public:
 	void periodic_check();
 	bool frame_hook();
 
-	void resume(lua_State *L, int nparam = 0, lua_State *root = NULL);
+	void resume(lua_State *L, int nparam = 0, lua_State *root = nullptr);
 	void set_machine(running_machine *machine) { m_machine = machine; update_machine(); }
 private:
 	struct hook {
@@ -57,7 +57,7 @@ private:
 		void set(lua_State *L, int idx);
 		lua_State *precall();
 		void call(lua_engine *engine, lua_State *T, int nparam);
-		bool active() const { return L != NULL; }
+		bool active() const { return L != nullptr; }
 	};
 
 	static const char *const tname_ioport;

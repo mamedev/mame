@@ -207,12 +207,12 @@ VIDEO_START_MEMBER(ssv_state,eaglshot)
 {
 	ssv_state::video_start();
 
-	m_eaglshot_gfxram       =   auto_alloc_array(machine(), UINT16, 16 * 0x40000 / 2);
+	m_eaglshot_gfxram       =   std::make_unique<UINT16[]>(16 * 0x40000 / 2);
 
-	m_gfxdecode->gfx(0)->set_source((UINT8 *)m_eaglshot_gfxram);
-	m_gfxdecode->gfx(1)->set_source((UINT8 *)m_eaglshot_gfxram);
+	m_gfxdecode->gfx(0)->set_source((UINT8 *)m_eaglshot_gfxram.get());
+	m_gfxdecode->gfx(1)->set_source((UINT8 *)m_eaglshot_gfxram.get());
 
-	save_pointer(NAME(m_eaglshot_gfxram), 16 * 0x40000 / 2);
+	save_pointer(NAME(m_eaglshot_gfxram.get()), 16 * 0x40000 / 2);
 }
 
 TILE_GET_INFO_MEMBER(ssv_state::get_tile_info_0)

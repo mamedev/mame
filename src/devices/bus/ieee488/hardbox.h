@@ -34,9 +34,9 @@ public:
 	hardbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_READ8_MEMBER( ppi0_pa_r );
 	DECLARE_WRITE8_MEMBER( ppi0_pb_w );
@@ -49,11 +49,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset_after_children();
+	virtual void device_start() override;
+	virtual void device_reset_after_children() override;
 
 	// device_ieee488_interface overrides
-	virtual void ieee488_ifc(int state);
+	virtual void ieee488_ifc(int state) override;
 
 private:
 	enum

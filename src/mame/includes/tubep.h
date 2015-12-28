@@ -34,7 +34,7 @@ public:
 	optional_shared_ptr<UINT8> m_backgroundram;
 	required_shared_ptr<UINT8> m_sprite_colorsharedram;
 	optional_shared_ptr<UINT8> m_rjammer_backgroundram;
-	UINT8 *m_spritemap;
+	std::unique_ptr<UINT8[]> m_spritemap;
 	UINT8 m_prom2[32];
 	UINT32 m_romD_addr;
 	UINT32 m_romEF_addr;
@@ -97,7 +97,6 @@ public:
 	UINT32 screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(tubep_scanline_callback);
 	TIMER_CALLBACK_MEMBER(rjammer_scanline_callback);
-	TIMER_CALLBACK_MEMBER(sprite_timer_callback);
 	void draw_sprite();
 	void tubep_vblank_end();
 	void tubep_setup_save_state();
@@ -111,5 +110,5 @@ public:
 
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

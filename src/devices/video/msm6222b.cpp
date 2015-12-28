@@ -48,7 +48,7 @@ void msm6222b_device::device_start()
 	else if(m_region)
 		cgrom = m_region->base();
 	else
-		cgrom = NULL;
+		cgrom = nullptr;
 
 	memset(cgram, 0, sizeof(cgram));
 	memset(ddram, 0x20, sizeof(ddram));
@@ -67,7 +67,7 @@ void msm6222b_device::device_start()
 void msm6222b_device::control_w(UINT8 data)
 {
 	int cmd;
-	for(cmd = 7; cmd >= 0 && !(data & (1<<cmd)); cmd--);
+	for(cmd = 7; cmd >= 0 && !(data & (1<<cmd)); cmd--) {};
 	switch(cmd) {
 	case 0:
 		memset(ddram, 0x20, sizeof(ddram));

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders:Nicola Salmoria,Derrick Renaud
 /***************************************************************************
 
     Taito Crazy Balloon hardware

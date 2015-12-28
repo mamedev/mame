@@ -1,5 +1,6 @@
-// license:???
-// copyright-holders:Bryan McPhail,Fuzz,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail,Ernesto Corvi,Andrew Prime,Zsolt Vasvari
+// thanks-to:Fuzz
 
 // MAME NeoGeo code for single fixed slot 'shortname' configs
 // none of this is required by MESS or the slot-based implementation
@@ -222,7 +223,7 @@ static INPUT_PORTS_START( kizuna4p )
 	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Players ) ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING(      0x0002, "2" )
 	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, kizuna4p_controller_r, (void *)0)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, kizuna4p_controller_r, (void *)nullptr)
 
 	PORT_MODIFY("P2")
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, kizuna4p_controller_r, (void *)1)
@@ -282,7 +283,7 @@ static INPUT_PORTS_START( irrmaze )
 	PORT_INCLUDE( neogeo )
 
 	PORT_MODIFY("P1/DSW")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)0)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)nullptr)
 
 	PORT_MODIFY("P2")
 	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -307,7 +308,7 @@ static INPUT_PORTS_START( popbounc )
 	PORT_INCLUDE( neogeo )
 
 	PORT_MODIFY("P1/DSW")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)0)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)nullptr)
 
 	PORT_MODIFY("P2")
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)1)
@@ -2935,7 +2936,7 @@ ROM_START( zupapa ) /* Original Version - Encrypted GFX */ /* MVS ONLY RELEASE *
 
 	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -5792,7 +5793,7 @@ ROM_START( kof99 ) /* Original Version - Encrypted Code & GFX */ /* MVS VERSION 
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -5828,7 +5829,7 @@ ROM_START( kof99h ) /* Original Version - Encrypted Code & GFX */ /* AES VERSION
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -5867,7 +5868,7 @@ ROM_START( kof99e ) /* Original Version - Encrypted Code & GFX */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -5902,7 +5903,7 @@ ROM_START( kof99k ) /* Original Version - Encrypted GFX */ /* KOREAN VERSION */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -5974,7 +5975,7 @@ ROM_START( ganryu ) /* Original Version - Encrypted GFX */ /* MVS ONLY RELEASE *
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6011,7 +6012,7 @@ ROM_START( garou ) /* Original Version - Encrypted GFX */ /* MVS VERSION - later
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 )   /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6047,7 +6048,7 @@ ROM_START( garouh ) /* Original Version - Encrypted GFX */ /* MVS AND AES VERSIO
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 )   /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6116,7 +6117,7 @@ ROM_START( s1945p ) /* Original Version, Encrypted GFX Roms */ /* MVS ONLY RELEA
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6156,7 +6157,7 @@ ROM_START( preisle2 ) /* Original Version, Encrypted GFX */ /* MVS ONLY RELEASE 
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6200,7 +6201,7 @@ ROM_START( mslug3 ) /* Original Version - Encrypted Code & GFX */ /* revision 20
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6237,7 +6238,7 @@ ROM_START( mslug3h ) /* Original Version - Encrypted GFX */ /* revision 2000.3.1
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6284,7 +6285,7 @@ ROM_START( kof2000 ) /* Original Version, Encrypted Code + Sound + GFX Roms */ /
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 )   /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6319,7 +6320,7 @@ ROM_START( kof2000n ) /* Original Version, Encrypted Sound + GFX Roms */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 )   /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6365,7 +6366,7 @@ ROM_START( bangbead ) /* Original Version - Encrypted GFX */ /* MVS ONLY RELEASE
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6397,7 +6398,7 @@ ROM_START( nitd ) /* Original Version - Encrypted GFX */ /* MVS ONLY RELEASE */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6431,7 +6432,7 @@ ROM_START( sengoku3 ) /* Original Version - Encrypted GFX */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6471,7 +6472,7 @@ ROM_START( kof2001 ) /* MVS VERSION */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6507,7 +6508,7 @@ ROM_START( kof2001h ) /* AES VERSION */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6554,7 +6555,7 @@ ROM_START( mslug4 ) /* Original Version - Encrypted GFX */ /* MVS VERSION */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 )   /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6587,7 +6588,7 @@ ROM_START( mslug4h ) /* Original Version - Encrypted GFX */ /* AES VERSION */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 )   /* larger char set */
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6628,7 +6629,7 @@ ROM_START( rotd ) /* Encrypted Set */ /* MVS VERSION */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6671,7 +6672,7 @@ ROM_START( kof2002 ) /* Encrypted Set */ /* MVS AND AES VERSION */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6714,7 +6715,7 @@ ROM_START( matrim ) /* Encrypted Set */ /* MVS AND AES VERSION */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6755,7 +6756,7 @@ ROM_START( pnyaa ) /* Encrypted Set */ /* MVS ONLY RELEASE */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6791,7 +6792,7 @@ ROM_START( mslug5 ) /* Encrypted Set */ /* MVS VERSION */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6827,7 +6828,7 @@ ROM_START( mslug5h ) /* Encrypted Set */ /* AES release of the game but is also 
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6870,7 +6871,7 @@ ROM_START( svc ) /* Encrypted Set */ /* MVS AND AES VERSION */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6911,7 +6912,7 @@ ROM_START( samsho5 ) /* Encrypted Set */ /* MVS VERSION */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6946,7 +6947,7 @@ ROM_START( samsho5h ) /* Encrypted Set, Alternate Set */ /* AES VERSION */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -6990,7 +6991,7 @@ ROM_START( kof2003 ) /* Encrypted Code + Sound + GFX Roms */ /* MVS VERSION */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -7027,7 +7028,7 @@ ROM_START( kof2003h ) /* Encrypted Code + Sound + GFX Roms */ /* AES VERSION */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -7070,7 +7071,7 @@ ROM_START( samsh5sp ) /* Encrypted Set */ /* MVS VERSION */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -7118,7 +7119,7 @@ ROM_START( samsh5sph ) /* Encrypted Set */ /* AES VERSION, 2nd bugfix release */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -7154,7 +7155,7 @@ ROM_START( samsh5spho ) /* Encrypted Set */ /* AES VERSION, 1st release */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -7204,7 +7205,7 @@ ROM_START( jockeygp ) /* MVS ONLY RELEASE */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -7232,7 +7233,7 @@ ROM_START( jockeygpa ) /* MVS ONLY RELEASE */
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -7354,7 +7355,7 @@ ROM_START( ms5pcb ) /* Encrypted Set */
 	ROM_LOAD32_WORD_SWAP( "268-p2r.p2", 0x000002, 0x400000, CRC(fbf6b61e) SHA1(9ec743d5988b5e3183f37f8edf45c72a8c0c893e) )
 
 	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_FILL( 0x000000, 0x20000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -7396,7 +7397,7 @@ ROM_START( svcpcb ) /* Encrypted Set, JAMMA PCB */
 	ROM_LOAD16_WORD_SWAP( "269-p1.p1", 0x000000, 0x2000000, CRC(432cfdfc) SHA1(19b40d32188a8bace6d2d570c6cf3d2f1e31e379) )
 
 	ROM_REGION( 0x80000, "fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -7435,7 +7436,7 @@ ROM_START( svcpcba ) /* Encrypted Set, JAMMA PCB */
 	ROM_LOAD32_WORD_SWAP( "269-p2a.p1", 0x000002, 0x400000, CRC(6d13797c) SHA1(3cb71a95cea6b006b44cac0f547df88aec0007b7)  )
 
 	ROM_REGION( 0x80000, "fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -7475,7 +7476,7 @@ ROM_START( kf2k3pcb ) /* Encrypted Set, JAMMA PCB */
 	ROM_LOAD16_WORD_SWAP( "271-p3.p3", 0x800000, 0x100000, CRC(5cefd0d2) SHA1(cddc3164629fed4b6f715e12b109ad35d1009355) )
 
 	ROM_REGION( 0x100000, "fixed", 0 ) /* larger char set */
-	ROM_FILL( 0x000000, 0x100000, 0 )
+	ROM_FILL( 0x000000, 0x100000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8017,7 +8018,7 @@ ROM_START( kof10th )
 	ROM_Y_ZOOM
 
 	ROM_REGION( 0x40000, "fixed", 0 ) // modified
-	ROM_FILL( 0x000000, 0x40000, 0 ) // modified
+	ROM_FILL( 0x000000, 0x40000, 0x000000 ) // modified
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8153,7 +8154,7 @@ ROM_START( matrimbl )
 	ROM_Y_ZOOM
 
 	ROM_REGION( 0x80000, "fixed", 0 )
-	ROM_FILL( 0x000000, 0x80000, 0 )
+	ROM_FILL( 0x000000, 0x80000, 0x000000 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
 
@@ -8257,7 +8258,7 @@ ROM_START( svcboot )
 	ROM_REGION( 0x50000, "audiocpu", 0 )
 	ROM_LOAD( "svc-m1.bin", 0x20000, 0x10000, CRC(804328c3) SHA1(f931636c563b0789d4812033a77b47bf663db43f) )
 	ROM_CONTINUE( 0x00000, 0x10000 )
-	ROM_COPY( "audiocpu", 0x00000, 0x10000, 0x10000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x10000, 0x10000 )
 
 	ROM_Y_ZOOM
 
@@ -8296,7 +8297,7 @@ ROM_START( svcplus )
 	ROM_REGION( 0x50000, "audiocpu", 0 )
 	ROM_LOAD( "svc-m1.bin", 0x20000, 0x10000, CRC(804328c3) SHA1(f931636c563b0789d4812033a77b47bf663db43f) )
 	ROM_CONTINUE( 0x00000, 0x10000 )
-	ROM_COPY( "audiocpu", 0x00000, 0x10000, 0x10000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x10000, 0x10000 )
 
 	ROM_REGION( 0x1000000, "ymsnd", 0 )
 	ROM_LOAD16_WORD_SWAP( "svc-v2.bin", 0x000000, 0x400000, CRC(b5097287) SHA1(3ba3a9b5624879616382ed40337a3d9c50a0f314) )
@@ -8336,7 +8337,7 @@ ROM_START( svcplusa )
 	ROM_REGION( 0x50000, "audiocpu", 0 )
 	ROM_LOAD( "svc-m1.bin", 0x20000, 0x10000, CRC(804328c3) SHA1(f931636c563b0789d4812033a77b47bf663db43f) )
 	ROM_CONTINUE( 0x00000, 0x10000 )
-	ROM_COPY( "audiocpu", 0x00000, 0x10000, 0x10000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x10000, 0x10000 )
 
 	ROM_Y_ZOOM
 
@@ -8374,7 +8375,7 @@ ROM_START( svcsplus )
 	ROM_REGION( 0x50000, "audiocpu", 0 )
 	ROM_LOAD( "svc-m1.bin", 0x20000, 0x10000, CRC(804328c3) SHA1(f931636c563b0789d4812033a77b47bf663db43f) )
 	ROM_CONTINUE( 0x00000, 0x10000 )
-	ROM_COPY( "audiocpu", 0x00000, 0x10000, 0x10000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x10000, 0x10000 )
 
 	ROM_REGION( 0x1000000, "ymsnd", 0 )
 	ROM_LOAD16_WORD_SWAP( "svc-v2.bin", 0x000000, 0x400000, CRC(b5097287) SHA1(3ba3a9b5624879616382ed40337a3d9c50a0f314) )

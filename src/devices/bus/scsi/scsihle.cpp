@@ -14,9 +14,9 @@ scsihle_device::scsihle_device(const machine_config &mconfig, device_type type, 
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	scsi_port_interface(mconfig, *this),
 	m_scsi_id(*this, "SCSI_ID"),
-	req_timer(NULL),
-	sel_timer(NULL),
-	dataout_timer(NULL),
+	req_timer(nullptr),
+	sel_timer(nullptr),
+	dataout_timer(nullptr),
 	cmd_idx(0),
 	is_linked(0),
 	data_idx(0),
@@ -417,11 +417,11 @@ WRITE_LINE_MEMBER( scsihle_device::input_sel )
 		// only one line active.
 		if (scsibus_driveno(m_input_data) == scsiID)
 		{
-			void *hdfile = NULL;
+			void *hdfile = nullptr;
 			// Check to see if device had image file mounted, if not, do not set busy,
 			// and stay busfree.
 			GetDevice(&hdfile);
-			if (hdfile != NULL)
+			if (hdfile != nullptr)
 			{
 				if (!state)
 				{

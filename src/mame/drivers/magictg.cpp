@@ -212,7 +212,6 @@ public:
 	DECLARE_READ32_MEMBER( unk_r );
 	DECLARE_READ32_MEMBER( unk2_r );
 
-	DECLARE_READ32_MEMBER( serial_r );
 	DECLARE_WRITE32_MEMBER( serial_w );
 
 	DECLARE_READ32_MEMBER( adsp_idma_data_r );
@@ -226,9 +225,9 @@ public:
 	void zr36120_reset();
 
 protected:
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 public:
 	UINT32 screen_update_magictg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
@@ -930,7 +929,7 @@ static MACHINE_CONFIG_START( magictg, magictg_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, pci_dev0_r, pci_dev0_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(0, nullptr, pci_dev0_r, pci_dev0_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, "voodoo_0", voodoo_0_pci_r, voodoo_0_pci_w)
 
 #if defined(USE_TWO_3DFX)

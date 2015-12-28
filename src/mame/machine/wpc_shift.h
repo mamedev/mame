@@ -30,8 +30,8 @@ protected:
 	UINT16 adr;
 	UINT8 val1, val2;
 
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 };
 
 extern const device_type WPC_SHIFT;

@@ -69,14 +69,13 @@ public:
 
 	DECLARE_DRIVER_INIT(gsword);
 	DECLARE_DRIVER_INIT(gsword2);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(gsword);
 	DECLARE_PALETTE_INIT(josvolly);
 
 	UINT32 screen_update_gsword(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gsword_snd_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	int coins_in(void); //if 0'd
 };

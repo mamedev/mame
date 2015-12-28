@@ -11,9 +11,9 @@ msx_cart_rtype::msx_cart_rtype(const machine_config &mconfig, const char *tag, d
 	, msx_cart_interface(mconfig, *this)
 	, m_selected_bank(0)
 {
-	for (int i = 0; i < 2; i++)
+	for (auto & elem : m_bank_base)
 	{
-		m_bank_base[i] = NULL;
+		elem = nullptr;
 	}
 }
 

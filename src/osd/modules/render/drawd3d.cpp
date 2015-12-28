@@ -92,7 +92,7 @@ static const line_aa_step line_aa_4step[] =
 //  INLINES
 //============================================================
 
-INLINE BOOL GetClientRectExceptMenu(HWND hWnd, PRECT pRect, BOOL fullscreen)
+static inline BOOL GetClientRectExceptMenu(HWND hWnd, PRECT pRect, BOOL fullscreen)
 {
 	static HMENU last_menu;
 	static RECT last_rect;
@@ -119,7 +119,7 @@ INLINE BOOL GetClientRectExceptMenu(HWND hWnd, PRECT pRect, BOOL fullscreen)
 }
 
 
-INLINE UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
+static inline UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
 {
 	/* original equations:
 
@@ -2199,7 +2199,7 @@ void texture_info::compute_size(int texwidth, int texheight)
 //  copyline_palette16
 //============================================================
 
-INLINE void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
+static inline void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
 {
 	int x;
 
@@ -2217,7 +2217,7 @@ INLINE void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const 
 //  copyline_palettea16
 //============================================================
 
-INLINE void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
+static inline void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
 {
 	int x;
 
@@ -2235,7 +2235,7 @@ INLINE void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const
 //  copyline_rgb32
 //============================================================
 
-INLINE void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int xborderpix)
+static inline void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int xborderpix)
 {
 	int x;
 
@@ -2278,7 +2278,7 @@ INLINE void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_
 //  copyline_argb32
 //============================================================
 
-INLINE void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int xborderpix)
+static inline void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int xborderpix)
 {
 	int x;
 
@@ -2321,7 +2321,7 @@ INLINE void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb
 //  copyline_yuy16_to_yuy2
 //============================================================
 
-INLINE void copyline_yuy16_to_yuy2(UINT16 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
+static inline void copyline_yuy16_to_yuy2(UINT16 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
 {
 	int x;
 
@@ -2386,7 +2386,7 @@ INLINE void copyline_yuy16_to_yuy2(UINT16 *dst, const UINT16 *src, int width, co
 //  copyline_yuy16_to_uyvy
 //============================================================
 
-INLINE void copyline_yuy16_to_uyvy(UINT16 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
+static inline void copyline_yuy16_to_uyvy(UINT16 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
 {
 	int x;
 
@@ -2449,7 +2449,7 @@ INLINE void copyline_yuy16_to_uyvy(UINT16 *dst, const UINT16 *src, int width, co
 //  copyline_yuy16_to_argb
 //============================================================
 
-INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
+static inline void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
 {
 	int x;
 

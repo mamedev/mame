@@ -402,7 +402,7 @@ WRITE8_MEMBER(pmd85_state::pmd85_ppi_2_portc_w)
 
 READ8_MEMBER(pmd85_state::pmd85_ppi_3_porta_r)
 {
-	if (memregion("user1")->base() != NULL)
+	if (memregion("user1")->base() != nullptr)
 		return memregion("user1")->base()[m_ppi_port_outputs[3][1] | (m_ppi_port_outputs[3][2] << 8)];
 	else
 		return 0;
@@ -797,7 +797,7 @@ DRIVER_INIT_MEMBER(pmd85_state,mato)
 	}
 	for ( int i = 9; i < 16; i++ )
 	{
-		m_io_port[i] = NULL;
+		m_io_port[i] = nullptr;
 	}
 }
 

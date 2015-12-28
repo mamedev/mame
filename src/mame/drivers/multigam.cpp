@@ -123,8 +123,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 
-	UINT8* m_nt_ram;
-	UINT8* m_vram;
+	std::unique_ptr<UINT8[]> m_nt_ram;
+	std::unique_ptr<UINT8[]> m_vram;
 	UINT8* m_nt_page[4];
 	UINT32 m_in_0;
 	UINT32 m_in_1;
@@ -138,7 +138,7 @@ public:
 	int m_multigam3_mmc3_banks[2];
 	int m_multigam3_mmc3_4screen;
 	int m_multigam3_mmc3_last_bank;
-	UINT8* m_multigmc_mmc3_6000_ram;
+	std::unique_ptr<UINT8[]> m_multigmc_mmc3_6000_ram;
 	UINT8* m_multigam3_mmc3_prg_base;
 	int m_multigam3_mmc3_prg_size;
 	int m_multigam3_mmc3_chr_bank_base;
@@ -179,9 +179,9 @@ public:
 	DECLARE_DRIVER_INIT(multigmt);
 	DECLARE_DRIVER_INIT(multigam);
 	DECLARE_DRIVER_INIT(multigm3);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(multigam);
 	DECLARE_MACHINE_START(multigm3);
 	DECLARE_MACHINE_RESET(multigm3);
@@ -212,29 +212,29 @@ void multigam_state::set_mirroring(int mirroring)
 	switch(mirroring)
 	{
 	case PPU_MIRROR_LOW:
-		m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram;
+		m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram.get();
 		break;
 	case PPU_MIRROR_HIGH:
-		m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram + 0x400;
+		m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram.get() + 0x400;
 		break;
 	case PPU_MIRROR_HORZ:
-		m_nt_page[0] = m_nt_ram;
-		m_nt_page[1] = m_nt_ram;
-		m_nt_page[2] = m_nt_ram + 0x400;
-		m_nt_page[3] = m_nt_ram + 0x400;
+		m_nt_page[0] = m_nt_ram.get();
+		m_nt_page[1] = m_nt_ram.get();
+		m_nt_page[2] = m_nt_ram.get() + 0x400;
+		m_nt_page[3] = m_nt_ram.get() + 0x400;
 		break;
 	case PPU_MIRROR_VERT:
-		m_nt_page[0] = m_nt_ram;
-		m_nt_page[1] = m_nt_ram + 0x400;
-		m_nt_page[2] = m_nt_ram;
-		m_nt_page[3] = m_nt_ram + 0x400;
+		m_nt_page[0] = m_nt_ram.get();
+		m_nt_page[1] = m_nt_ram.get() + 0x400;
+		m_nt_page[2] = m_nt_ram.get();
+		m_nt_page[3] = m_nt_ram.get() + 0x400;
 		break;
 	case PPU_MIRROR_NONE:
 	default:
-		m_nt_page[0] = m_nt_ram;
-		m_nt_page[1] = m_nt_ram + 0x400;
-		m_nt_page[2] = m_nt_ram + 0x800;
-		m_nt_page[3] = m_nt_ram + 0xc00;
+		m_nt_page[0] = m_nt_ram.get();
+		m_nt_page[1] = m_nt_ram.get() + 0x400;
+		m_nt_page[2] = m_nt_ram.get() + 0x800;
+		m_nt_page[3] = m_nt_ram.get() + 0xc00;
 		break;
 	}
 }
@@ -274,7 +274,7 @@ void multigam_state::set_videoram_bank( int start, int count, int bank, int bank
 	/* count determines the size of the area mapped in KB */
 	for (i = 0; i < count; i++, offset += 0x400)
 	{
-		membank(banknames[i + start])->set_base(m_vram + offset);
+		membank(banknames[i + start])->set_base(m_vram.get() + offset);
 	}
 }
 
@@ -554,7 +554,7 @@ WRITE8_MEMBER(multigam_state::multigam3_mmc3_rom_switch_w)
 		case 0x2001: /* enable ram at $6000 */
 			if (data & 0x80)
 			{
-				membank("bank10")->set_base(m_multigmc_mmc3_6000_ram);
+				membank("bank10")->set_base(m_multigmc_mmc3_6000_ram.get());
 			}
 			else
 			{
@@ -591,7 +591,7 @@ void multigam_state::multigam_init_mmc3(UINT8 *prg_base, int prg_size, int chr_b
 
 	// Tom & Jerry in Super Game III enables 6000 ram, but does not read/write it
 	// however, it expects ROM from 6000 there (code jumps to $6xxx)
-	memcpy(m_multigmc_mmc3_6000_ram, dst + 0x6000, 0x2000);
+	memcpy(m_multigmc_mmc3_6000_ram.get(), dst + 0x6000, 0x2000);
 
 	memcpy(&dst[0x8000], prg_base + (prg_size - 0x4000), 0x4000);
 	memcpy(&dst[0xc000], prg_base + (prg_size - 0x4000), 0x4000);
@@ -899,7 +899,7 @@ void multigam_state::supergm3_set_bank()
 		// VRAM
 		m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank1");
 		m_ppu->space(AS_PROGRAM).install_write_bank(0x0000, 0x1fff, "bank1");
-		membank("bank1")->set_base(m_vram);
+		membank("bank1")->set_base(m_vram.get());
 
 		if (m_supergm3_chr_bank == 0x40)
 			set_mirroring(PPU_MIRROR_VERT);
@@ -1158,11 +1158,11 @@ MACHINE_RESET_MEMBER(multigam_state,multigm3)
 
 void multigam_state::machine_start()
 {
-	m_nt_ram = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_nt_page[0] = m_nt_ram;
-	m_nt_page[1] = m_nt_ram + 0x400;
-	m_nt_page[2] = m_nt_ram + 0x800;
-	m_nt_page[3] = m_nt_ram + 0xc00;
+	m_nt_ram = std::make_unique<UINT8[]>(0x1000);
+	m_nt_page[0] = m_nt_ram.get();
+	m_nt_page[1] = m_nt_ram.get() + 0x400;
+	m_nt_page[2] = m_nt_ram.get() + 0x800;
+	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(multigam_state::multigam_nt_r),this), write8_delegate(FUNC(multigam_state::multigam_nt_w),this));
 	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank1");
@@ -1171,11 +1171,11 @@ void multigam_state::machine_start()
 
 MACHINE_START_MEMBER(multigam_state,multigm3)
 {
-	m_nt_ram = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_nt_page[0] = m_nt_ram;
-	m_nt_page[1] = m_nt_ram + 0x400;
-	m_nt_page[2] = m_nt_ram + 0x800;
-	m_nt_page[3] = m_nt_ram + 0xc00;
+	m_nt_ram = std::make_unique<UINT8[]>(0x1000);
+	m_nt_page[0] = m_nt_ram.get();
+	m_nt_page[1] = m_nt_ram.get() + 0x400;
+	m_nt_page[2] = m_nt_ram.get() + 0x800;
+	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(multigam_state::multigam_nt_r),this), write8_delegate(FUNC(multigam_state::multigam_nt_w),this));
 
@@ -1193,16 +1193,16 @@ MACHINE_START_MEMBER(multigam_state,multigm3)
 
 MACHINE_START_MEMBER(multigam_state,supergm3)
 {
-	m_nt_ram = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_nt_page[0] = m_nt_ram;
-	m_nt_page[1] = m_nt_ram + 0x400;
-	m_nt_page[2] = m_nt_ram + 0x800;
-	m_nt_page[3] = m_nt_ram + 0xc00;
+	m_nt_ram = std::make_unique<UINT8[]>(0x1000);
+	m_nt_page[0] = m_nt_ram.get();
+	m_nt_page[1] = m_nt_ram.get() + 0x400;
+	m_nt_page[2] = m_nt_ram.get() + 0x800;
+	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(multigam_state::multigam_nt_r),this), write8_delegate(FUNC(multigam_state::multigam_nt_w),this));
 
-	m_vram = auto_alloc_array(machine(), UINT8, 0x2000);
-	m_multigmc_mmc3_6000_ram = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_vram = std::make_unique<UINT8[]>(0x2000);
+	m_multigmc_mmc3_6000_ram = std::make_unique<UINT8[]>(0x2000);
 }
 
 static MACHINE_CONFIG_START( multigam, multigam_state )
@@ -1267,7 +1267,7 @@ ROM_START( multigam )
 	ROM_LOAD( "8.bin", 0x00000, 0x20000, CRC(509c0e94) SHA1(9e87c74e76afe6c3a7ba194439434f54e2c879eb) )
 	ROM_LOAD( "9.bin", 0x20000, 0x20000, CRC(48416f20) SHA1(f461fcbff6d2fa4774d64c26475089d1aeea7fb5) )
 	ROM_LOAD( "10.bin", 0x40000, 0x20000, CRC(869d1661) SHA1(ac155bd24ebfea8e064859e1a05317001286f9ae) )
-	ROM_FILL( 0x60000, 0x20000, 0x00 )
+	ROM_FILL( 0x60000, 0x20000, 0x0000 )
 ROM_END
 
 ROM_START( multigmb )
@@ -1286,7 +1286,7 @@ ROM_START( multigmb )
 	ROM_LOAD( "8.bin", 0x00000, 0x20000, CRC(509c0e94) SHA1(9e87c74e76afe6c3a7ba194439434f54e2c879eb) )
 	ROM_LOAD( "9.bin", 0x20000, 0x20000, CRC(48416f20) SHA1(f461fcbff6d2fa4774d64c26475089d1aeea7fb5) )
 	ROM_LOAD( "10.bin", 0x40000, 0x20000, CRC(869d1661) SHA1(ac155bd24ebfea8e064859e1a05317001286f9ae) )
-	ROM_FILL( 0x60000, 0x20000, 0x00 )
+	ROM_FILL( 0x60000, 0x20000, 0x0000 )
 ROM_END
 
 ROM_START( multigm2 )
@@ -1325,7 +1325,7 @@ ROM_START( multigm3 )
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "mg3-7.bin", 0x00000, 0x20000, CRC(d8308cdb) SHA1(7bfb864611c32cf3740cfd650bfe275513d511d7) )
 	ROM_LOAD( "mg3-8.bin", 0x20000, 0x20000, CRC(b4a53b9d) SHA1(63d8901149d0d9b69f28bfc096f7932448542032) )
-	ROM_FILL( 0x40000, 0x20000, 0x00 )
+	ROM_FILL( 0x40000, 0x20000, 0x0000 )
 	ROM_LOAD( "mg3-9.bin", 0x60000, 0x20000, CRC(a0ae2b4b) SHA1(5e026ad8a6b2a8120e386471d5178625bda04525) )
 ROM_END
 
@@ -1406,7 +1406,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigm3)
 	multigm3_decrypt(memregion("maincpu")->base(), memregion("maincpu")->bytes(), decode );
 	multigm3_decrypt(memregion("user1")->base(), memregion("user1")->bytes(), decode );
 
-	m_multigmc_mmc3_6000_ram = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_multigmc_mmc3_6000_ram = std::make_unique<UINT8[]>(0x2000);
 
 	multigam_switch_prg_rom(space, 0x0, 0x01);
 }

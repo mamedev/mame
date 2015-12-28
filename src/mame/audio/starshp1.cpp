@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Derrick Renaud
 /************************************************************************
  * starshp1 Sound System Analog emulation

@@ -68,8 +68,8 @@ ADDRESS_MAP_END
 naomi_board::naomi_board(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: naomi_g1_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
-	eeprom_tag = 0;
-	rombdid_tag = 0;
+	eeprom_tag = nullptr;
+	rombdid_tag = nullptr;
 }
 
 void naomi_board::static_set_eeprom_tag(device_t &device, const char *_eeprom_tag, const char *_actel_tag)
@@ -94,7 +94,7 @@ void naomi_board::device_start()
 	if(eeprom_tag)
 		eeprom = machine().device<x76f100_device>(eeprom_tag);
 	else
-		eeprom = 0;
+		eeprom = nullptr;
 }
 
 void naomi_board::device_reset()
@@ -110,7 +110,7 @@ void naomi_board::device_reset()
 void naomi_board::dma_get_position(UINT8 *&base, UINT32 &limit, bool to_mainram)
 {
 	if(!to_mainram) {
-		base = 0;
+		base = nullptr;
 		limit = 0;
 		return;
 	}

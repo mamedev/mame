@@ -94,10 +94,6 @@ public:
 	DECLARE_READ16_MEMBER(r2dx_cos_r);
 
 	DECLARE_WRITE16_MEMBER(tile_bank_w);
-	DECLARE_WRITE16_MEMBER(rdx_bg_vram_w);
-	DECLARE_WRITE16_MEMBER(rdx_md_vram_w);
-	DECLARE_WRITE16_MEMBER(rdx_fg_vram_w);
-	DECLARE_WRITE16_MEMBER(rdx_tx_vram_w);
 	DECLARE_READ16_MEMBER(rdx_v33_unknown_r);
 	DECLARE_WRITE16_MEMBER(mcu_xval_w);
 	DECLARE_WRITE16_MEMBER(mcu_yval_w);
@@ -129,12 +125,10 @@ public:
 	UINT16 r2dx_i_dx, r2dx_i_dy, r2dx_i_angle;
 	UINT32 r2dx_i_sdist;
 
-	UINT32 screen_update_rdx_v33(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 };
 
 void r2dx_v33_state::machine_start()
@@ -1020,7 +1014,7 @@ ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "sound",       0x000000, 0x08000, CRC(7ec1fbc3) SHA1(48299d6530f641b18764cc49e283c347d0918a47) ) /* Same as some of other Zero Team sets */
 	ROM_CONTINUE(            0x010000, 0x08000 )    /* banked stuff */
-	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x0000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD16_BYTE( "fix1", 0x000000, 0x010000, CRC(0c4895b0) SHA1(f595dbe5a19edb8a06ea60105ee26b95db4a2619) )
@@ -1050,7 +1044,7 @@ ROM_START( zerotm2k ) /* V33 SYSTEM TYPE_C VER2 hardware, uses SEI333 (AKA COPX-
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "syz-02.u019",  0x000000, 0x08000, CRC(55371073) SHA1(f6e182fa64630595dc8c25ac820e12983cfbed12) ) /* PCB silkscreened SOUND */
 	ROM_CONTINUE(             0x010000, 0x08000 )   /* banked stuff */
-	ROM_COPY( "audiocpu", 0,  0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x0000,  0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD16_BYTE( "syz-04.u0616", 0x000000, 0x010000, CRC(3515a45f) SHA1(a25a7e23a5d9cf5a95a0d0e828848a8d223bdf51) ) /* PCB silkscreened FIX E */

@@ -169,7 +169,7 @@ static void append_driver_list_table(const char *header, std::string &dirname, c
     from a string
 -------------------------------------------------*/
 
-INLINE char *trim_string(char *string)
+static inline char *trim_string(char *string)
 {
 	int length;
 
@@ -191,7 +191,7 @@ INLINE char *trim_string(char *string)
     index for a given entry
 -------------------------------------------------*/
 
-INLINE int get_unique_index(const summary_file *curfile, int index)
+static inline int get_unique_index(const summary_file *curfile, int index)
 {
 	int listnum, curindex = 0;
 
@@ -287,14 +287,14 @@ static summary_file *get_file(const char *filename)
 	summary_file *file;
 
 	/* use the first two characters as a lookup */
-	for (file = filehash[filename[0] & 0x7f][filename[1] & 0x7f]; file != NULL; file = file->next)
+	for (file = filehash[filename[0] & 0x7f][filename[1] & 0x7f]; file != nullptr; file = file->next)
 		if (strcmp(filename, file->name) == 0)
 			return file;
 
 	/* didn't find one -- allocate */
 	file = (summary_file *)malloc(sizeof(*file));
-	if (file == NULL)
-		return NULL;
+	if (file == nullptr)
+		return nullptr;
 	memset(file, 0, sizeof(*file));
 
 	/* set the name so we find it in the future */
@@ -314,7 +314,7 @@ static summary_file *get_file(const char *filename)
 
 static int read_summary_log(const char *filename, int index)
 {
-	summary_file *curfile = NULL;
+	summary_file *curfile = nullptr;
 	char linebuffer[1024];
 	char *linestart;
 	int drivers = 0;
@@ -322,14 +322,14 @@ static int read_summary_log(const char *filename, int index)
 
 	/* open the logfile */
 	file = fopen(filename, "r");
-	if (file == NULL)
+	if (file == nullptr)
 	{
 		fprintf(stderr, "Error: file '%s' not found\n", filename);
 		return 1;
 	}
 
 	/* parse it */
-	while (fgets(linebuffer, sizeof(linebuffer), file) != NULL)
+	while (fgets(linebuffer, sizeof(linebuffer), file) != nullptr)
 	{
 		/* trim the leading/trailing spaces */
 		linestart = trim_string(linebuffer);
@@ -344,7 +344,7 @@ static int read_summary_log(const char *filename, int index)
 			if (strncmp(linestart, "driver=", 7) == 0)
 			{
 				curfile = parse_driver_tag(linestart + 7, index);
-				if (curfile == NULL)
+				if (curfile == nullptr)
 					goto error;
 				drivers++;
 			}
@@ -353,7 +353,7 @@ static int read_summary_log(const char *filename, int index)
 			else if (strncmp(linestart, "source=", 7) == 0)
 			{
 				/* error if no driver yet */
-				if (curfile == NULL)
+				if (curfile == nullptr)
 				{
 					fprintf(stderr, "Unexpected @@@@@source= tag\n");
 					goto error;
@@ -370,7 +370,7 @@ static int read_summary_log(const char *filename, int index)
 
 				/* allocate a copy of the string */
 				lists[index].dir = (char *)malloc(strlen(dirname) + 1);
-				if (lists[index].dir == NULL)
+				if (lists[index].dir == nullptr)
 					goto error;
 				strcpy(lists[index].dir, dirname);
 				fprintf(stderr, "Directory %s\n", lists[index].dir);
@@ -378,7 +378,7 @@ static int read_summary_log(const char *filename, int index)
 		}
 
 		/* if not, consider other options */
-		else if (curfile != NULL)
+		else if (curfile != nullptr)
 		{
 			int foundchars = 0;
 			char *curptr;
@@ -443,19 +443,19 @@ static summary_file *parse_driver_tag(char *linestart, int index)
 
 	/* find the colon separating name from status */
 	colon = strchr(linestart, ':');
-	if (colon == NULL)
+	if (colon == nullptr)
 	{
 		fprintf(stderr, "Unexpected text after @@@@@driver=\n");
-		return NULL;
+		return nullptr;
 	}
 
 	/* NULL terminate at the colon and look up the file */
 	*colon = 0;
 	curfile = get_file(trim_string(linestart));
-	if (curfile == NULL)
+	if (curfile == nullptr)
 	{
 		fprintf(stderr, "Unable to allocate memory for driver\n");
-		return NULL;
+		return nullptr;
 	}
 
 	/* clear out any old status for this file */
@@ -514,36 +514,36 @@ static summary_file *sort_file_list(void)
 	numfiles = 0;
 	for (c0 = 0; c0 < 128; c0++)
 		for (c1 = 0; c1 < 128; c1++)
-			for (curfile = filehash[c0][c1]; curfile != NULL; curfile = curfile->next)
+			for (curfile = filehash[c0][c1]; curfile != nullptr; curfile = curfile->next)
 				numfiles++;
 
 	/* allocate an array of files */
 	filearray = (summary_file **)malloc(numfiles * sizeof(*filearray));
-	if (filearray == NULL)
+	if (filearray == nullptr)
 	{
 		fprintf(stderr, "Out of memory!\n");
-		return NULL;
+		return nullptr;
 	}
 
 	/* populate the array */
 	numfiles = 0;
 	for (c0 = 0; c0 < 128; c0++)
 		for (c1 = 0; c1 < 128; c1++)
-			for (curfile = filehash[c0][c1]; curfile != NULL; curfile = curfile->next)
+			for (curfile = filehash[c0][c1]; curfile != nullptr; curfile = curfile->next)
 				filearray[numfiles++] = curfile;
 
 	/* sort the array */
 	qsort(filearray, numfiles, sizeof(filearray[0]), compare_file);
 
 	/* now regenerate a single list */
-	listhead = NULL;
+	listhead = nullptr;
 	tailptr = &listhead;
 	for (filenum = 0; filenum < numfiles; filenum++)
 	{
 		*tailptr = filearray[filenum];
 		tailptr = &(*tailptr)->next;
 	}
-	*tailptr = NULL;
+	*tailptr = nullptr;
 	free(filearray);
 
 	return listhead;
@@ -566,7 +566,7 @@ static core_file *create_file_and_output_header(std::string &filename, std::stri
 
 	/* create the indexfile */
 	if (core_fopen(filename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, &file) != FILERR_NONE)
-		return NULL;
+		return nullptr;
 
 	/* print a header */
 	std::string modified(templatefile);
@@ -615,17 +615,17 @@ static void output_report(std::string &dirname, std::string &tempheader, std::st
 	/* initialize the lists */
 	for (bucknum = 0; bucknum < BUCKET_COUNT; bucknum++)
 	{
-		buckethead[bucknum] = NULL;
+		buckethead[bucknum] = nullptr;
 		buckettailptr[bucknum] = &buckethead[bucknum];
 	}
 
 	/* compute the total number of files */
 	total = 0;
-	for (curfile = filelist; curfile != NULL; curfile = curfile->next)
+	for (curfile = filelist; curfile != nullptr; curfile = curfile->next)
 		total++;
 
 	/* first bucketize the games */
-	for (curfile = filelist; curfile != NULL; curfile = curfile->next)
+	for (curfile = filelist; curfile != nullptr; curfile = curfile->next)
 	{
 		int statcount[STATUS_COUNT] = { 0 };
 		int bucket = BUCKET_UNKNOWN;
@@ -683,12 +683,12 @@ static void output_report(std::string &dirname, std::string &tempheader, std::st
 
 	/* terminate all the lists */
 	for (bucknum = 0; bucknum < BUCKET_COUNT; bucknum++)
-		*buckettailptr[bucknum] = NULL;
+		*buckettailptr[bucknum] = nullptr;
 
 	/* output header */
 	strprintf(tempname,"%s" PATH_SEPARATOR "%s", dirname.c_str(), "index.html");
 	indexfile = create_file_and_output_header(tempname, tempheader, title);
-	if (indexfile == NULL)
+	if (indexfile == nullptr)
 	{
 		fprintf(stderr, "Error creating file '%s'\n", tempname.c_str());
 		return;
@@ -699,7 +699,7 @@ static void output_report(std::string &dirname, std::string &tempheader, std::st
 	{
 		int curbucket = bucket_output_order[bucknum];
 
-		if (buckethead[curbucket] != NULL)
+		if (buckethead[curbucket] != nullptr)
 		{
 			fprintf(stderr, "Outputting bucket: %s\n", bucket_name[curbucket]);
 			append_driver_list_table(bucket_name[curbucket], dirname, indexfile, buckethead[curbucket], tempheader, tempfooter);
@@ -836,7 +836,7 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 	int width, height, maxwidth;
 	int bitmapcount = 0;
 	int listnum, bmnum;
-	core_file *file = NULL;
+	core_file *file = nullptr;
 	file_error filerr;
 	png_error pngerr;
 	int error = -1;
@@ -901,8 +901,8 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 		/* iterate over rows in these bitmaps */
 		for (y = 0; y < curheight; y++)
 		{
-			UINT32 *src1 = (y < bitmap1.height()) ? &bitmap1.pix32(y) : NULL;
-			UINT32 *src2 = (y < bitmap2.height()) ? &bitmap2.pix32(y) : NULL;
+			UINT32 *src1 = (y < bitmap1.height()) ? &bitmap1.pix32(y) : nullptr;
+			UINT32 *src2 = (y < bitmap2.height()) ? &bitmap2.pix32(y) : nullptr;
 			UINT32 *dst1 = &finalbitmap.pix32(starty + y, 0);
 			UINT32 *dst2 = &finalbitmap.pix32(starty + y, bitmap1.width() + BITMAP_SPACE);
 			UINT32 *dstdiff = &finalbitmap.pix32(starty + y, bitmap1.width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE);
@@ -912,9 +912,9 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 			{
 				int pix1 = -1, pix2 = -2;
 
-				if (src1 != NULL && x < bitmap1.width())
+				if (src1 != nullptr && x < bitmap1.width())
 					pix1 = dst1[x] = src1[x];
-				if (src2 != NULL && x < bitmap2.width())
+				if (src2 != nullptr && x < bitmap2.width())
 					pix2 = dst2[x] = src2[x];
 				dstdiff[x] = (pix1 != pix2) ? 0xffffffff : 0xff000000;
 			}
@@ -928,7 +928,7 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 	filerr = core_fopen(dstfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
 	if (filerr != FILERR_NONE)
 		goto error;
-	pngerr = png_write_bitmap(file, NULL, finalbitmap, 0, NULL);
+	pngerr = png_write_bitmap(file, nullptr, finalbitmap, 0, nullptr);
 	core_fclose(file);
 	if (pngerr != PNGERR_NONE)
 		goto error;
@@ -963,7 +963,7 @@ static void create_linked_file(std::string &dirname, const summary_file *curfile
 	strprintf(title, "%s Regressions (%s)", curfile->name, curfile->source);
 	strprintf(linkname,"%s" PATH_SEPARATOR "%s", dirname.c_str(), filename.c_str());
 	linkfile = create_file_and_output_header(linkname, tempheader, title);
-	if (linkfile == NULL)
+	if (linkfile == nullptr)
 	{
 		fprintf(stderr, "Error creating file '%s'\n", filename.c_str());
 		return;
@@ -973,12 +973,12 @@ static void create_linked_file(std::string &dirname, const summary_file *curfile
 	core_fprintf(linkfile, "\t<p>\n");
 	core_fprintf(linkfile, "\t<table width=\"100%%\">\n");
 	core_fprintf(linkfile, "\t\t<td align=\"left\" width=\"40%%\" style=\"border:none\">");
-	if (prevfile != NULL)
+	if (prevfile != nullptr)
 		core_fprintf(linkfile, "<a href=\"%s.html\"><< %s (%s)</a>", prevfile->name, prevfile->name, prevfile->source);
 	core_fprintf(linkfile, "</td>\n");
 	core_fprintf(linkfile, "\t\t<td align=\"center\" width=\"20%%\" style=\"border:none\"><a href=\"index.html\">Home</a></td>\n");
 	core_fprintf(linkfile, "\t\t<td align=\"right\" width=\"40%%\" style=\"border:none\">");
-	if (nextfile != NULL)
+	if (nextfile != nullptr)
 		core_fprintf(linkfile, "<a href=\"%s.html\">%s (%s) >></a>", nextfile->name, nextfile->name, nextfile->source);
 	core_fprintf(linkfile, "</td>\n");
 	core_fprintf(linkfile, "\t</table>\n");
@@ -993,7 +993,7 @@ static void create_linked_file(std::string &dirname, const summary_file *curfile
 		core_fprintf(linkfile, "\n\t<h2>%s</h2>\n", lists[listnum].version);
 		core_fprintf(linkfile, "\t<p>\n");
 		core_fprintf(linkfile, "\t<b>Status:</b> %s\n", status_text[curfile->status[listnum]]);
-		if (pngfile != NULL)
+		if (pngfile != nullptr)
 			imageindex = get_unique_index(curfile, listnum);
 		if (imageindex != -1)
 			core_fprintf(linkfile, " [%d]", imageindex);
@@ -1008,7 +1008,7 @@ static void create_linked_file(std::string &dirname, const summary_file *curfile
 	}
 
 	/* output link to the image */
-	if (pngfile != NULL)
+	if (pngfile != nullptr)
 	{
 		core_fprintf(linkfile, "\n\t<h2>Screenshot Comparisons</h2>\n");
 		core_fprintf(linkfile, "\t<p>\n");
@@ -1043,7 +1043,7 @@ static void append_driver_list_table(const char *header, std::string &dirname, c
 	core_fprintf(indexfile, "\n\t\t</tr>\n");
 
 	/* if nothing, print a default message */
-	if (listhead == NULL)
+	if (listhead == nullptr)
 	{
 		core_fprintf(indexfile, "\t\t<tr>\n\t\t\t");
 		core_fprintf(indexfile, "<td colspan=\"%d\" align=\"center\">(No regressions detected)</td>", list_count + 2);
@@ -1051,16 +1051,16 @@ static void append_driver_list_table(const char *header, std::string &dirname, c
 	}
 
 	/* iterate over files */
-	for (prevfile = NULL, curfile = listhead; curfile != NULL; prevfile = curfile, curfile = curfile->next)
+	for (prevfile = nullptr, curfile = listhead; curfile != nullptr; prevfile = curfile, curfile = curfile->next)
 	{
 		int rowspan = 0, uniqueshots = 0;
 		char pngdiffname[40];
 
 		/* if this is the first entry in this source file, count how many rows we need to span */
-		if (prevfile == NULL || strcmp(prevfile->source, curfile->source) != 0)
+		if (prevfile == nullptr || strcmp(prevfile->source, curfile->source) != 0)
 		{
 			const summary_file *cur;
-			for (cur = curfile; cur != NULL; cur = cur->next)
+			for (cur = curfile; cur != nullptr; cur = cur->next)
 				if (strcmp(cur->source, curfile->source) == 0)
 					rowspan++;
 				else
@@ -1080,7 +1080,7 @@ static void append_driver_list_table(const char *header, std::string &dirname, c
 		}
 
 		/* create a linked file */
-		create_linked_file(dirname, curfile, prevfile, curfile->next, (pngdiffname[0] == 0) ? NULL : pngdiffname, tempheader, tempfooter);
+		create_linked_file(dirname, curfile, prevfile, curfile->next, (pngdiffname[0] == 0) ? nullptr : pngdiffname, tempheader, tempfooter);
 
 		/* create a row */
 		core_fprintf(indexfile, "\t\t<tr>\n\t\t\t");

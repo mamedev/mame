@@ -70,12 +70,12 @@ WRITE8_MEMBER(homerun_state::homerun_control_w)
 
 	// d4: d7756 start pin
 	// d5: d7756 reset pin(?)
-	if (m_d7756 != NULL)
+	if (m_d7756 != nullptr)
 	{
 		m_d7756->reset_w(~data & 0x20);
 		m_d7756->start_w(~data & 0x10);
 	}
-	if (m_samples != NULL)
+	if (m_samples != nullptr)
 	{
 		// play MAME sample if a dump of the internal rom does not exist
 		if (data & 0x20 & ~m_control)
@@ -97,7 +97,7 @@ WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
 {
 	m_sample = data;
 
-	if (m_d7756 != NULL)
+	if (m_d7756 != nullptr)
 		m_d7756->port_w(space, 0, data);
 }
 
@@ -285,7 +285,7 @@ static const char *const homerun_sample_names[] =
 	"13", // aho (be called a fool by supervisor)
 	"14", // bat hits ball
 	"15", // crowd cheers
-	0
+	nullptr
 };
 
 /**************************************************************************/

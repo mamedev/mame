@@ -49,7 +49,6 @@ class tlcs900h_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tlcs900h_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	tlcs900h_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
 
 	// static configuration helpers
@@ -57,27 +56,27 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 1; } /* FIXME */
-	virtual UINT32 execute_max_cycles() const { return 1; } /* FIXME */
-	virtual UINT32 execute_input_lines() const { return 6; }
-	virtual void execute_run();
+	virtual UINT32 execute_min_cycles() const override { return 1; } /* FIXME */
+	virtual UINT32 execute_max_cycles() const override { return 1; } /* FIXME */
+	virtual UINT32 execute_input_lines() const override { return 6; }
+	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
 	{
-		return (spacenum == AS_PROGRAM) ? &m_program_config : NULL;
+		return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr;
 	}
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	void state_string_export(const device_state_entry &entry, std::string &str) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 7; } /* FIXME */
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 7; } /* FIXME */
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 protected:
 	int m_am8_16;
@@ -660,15 +659,15 @@ public:
 	DECLARE_WRITE8_MEMBER( internal_w );
 
 protected:
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void execute_set_input(int inputnum, int state);
-	virtual void tlcs900_check_hdma();
-	virtual void tlcs900_check_irqs();
-	virtual void tlcs900_handle_ad();
-	virtual void tlcs900_handle_timers();
+	virtual void execute_set_input(int inputnum, int state) override;
+	virtual void tlcs900_check_hdma() override;
+	virtual void tlcs900_check_irqs() override;
+	virtual void tlcs900_handle_ad() override;
+	virtual void tlcs900_handle_timers() override;
 
 	void tlcs900_change_tff( int which, int change );
 	int tlcs900_process_hdma( int channel );
@@ -779,15 +778,15 @@ public:
 	template<class _Object> static devcb_base &set_porte_write(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_porte_write.set_callback(object); }
 
 protected:
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_config_complete() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void execute_set_input(int inputnum, int state);
-	virtual void tlcs900_check_hdma();
-	virtual void tlcs900_check_irqs();
-	virtual void tlcs900_handle_ad();
-	virtual void tlcs900_handle_timers();
+	virtual void execute_set_input(int inputnum, int state) override;
+	virtual void tlcs900_check_hdma() override;
+	virtual void tlcs900_check_irqs() override;
+	virtual void tlcs900_handle_ad() override;
+	virtual void tlcs900_handle_timers() override;
 
 private:
 	// Port 1: 8 bit I/O. Shared with d8-d15

@@ -4,6 +4,7 @@
 #include "sound/k054539.h"
 #include "cpu/tms57002/tms57002.h"
 #include "machine/adc083x.h"
+#include "machine/k053252.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k055555.h"
@@ -18,6 +19,7 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_dasp(*this, "dasp"),
+		m_k053252(*this, "k053252"),
 		m_k055673(*this, "k055673"),
 		m_k055555(*this, "k055555"),
 		m_k056832(*this, "k056832"),
@@ -50,6 +52,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<tms57002_device> m_dasp;
+	required_device<k053252_device> m_k053252; // not hooked up in tasman.cpp yet (does it even have it?)
 	required_device<k055673_device> m_k055673;
 	required_device<k055555_device> m_k055555;
 	required_device<k056832_device> m_k056832;
@@ -76,11 +79,6 @@ public:
 	DECLARE_WRITE32_MEMBER(esc_w);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE32_MEMBER(control_w);
-	DECLARE_READ32_MEMBER(waitskip_r);
-	DECLARE_READ32_MEMBER(ccu_r);
-	DECLARE_WRITE32_MEMBER(ccu_w);
-	DECLARE_READ32_MEMBER(sound020_r);
-	DECLARE_WRITE32_MEMBER(sound020_w);
 	DECLARE_READ32_MEMBER(le2_gun_H_r);
 	DECLARE_READ32_MEMBER(le2_gun_V_r);
 	DECLARE_READ32_MEMBER(type1_roz_r1);
@@ -97,11 +95,11 @@ public:
 	DECLARE_WRITE16_MEMBER(K053990_martchmp_word_w);
 	DECLARE_WRITE32_MEMBER(fantjour_dma_w);
 	DECLARE_WRITE32_MEMBER(konamigx_type3_psac2_bank_w);
-	DECLARE_WRITE32_MEMBER(konamigx_555_palette_w);
-	DECLARE_WRITE32_MEMBER(konamigx_555_palette2_w);
 	DECLARE_WRITE32_MEMBER(konamigx_tilebank_w);
 	DECLARE_WRITE32_MEMBER(konamigx_t1_psacmap_w);
 	DECLARE_WRITE32_MEMBER(konamigx_t4_psacmap_w);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(hblank_irq_ack_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(gx_rdport1_3_r);
 	DECLARE_DRIVER_INIT(konamigx);
 	TILE_GET_INFO_MEMBER(get_gx_psac_tile_info);
@@ -124,12 +122,12 @@ public:
 	UINT32 screen_update_konamigx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_konamigx_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_konamigx_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(konamigx_vbinterrupt);
-	INTERRUPT_GEN_MEMBER(tms_sync);
+	INTERRUPT_GEN_MEMBER(konamigx_type2_vblank_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_type2_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_type4_scanline);
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_CALLBACK_MEMBER(boothack_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_hbinterrupt);
 	ADC083X_INPUT_CB(adc0834_callback);
 	K056832_CB_MEMBER(type2_tile_callback);
 	K056832_CB_MEMBER(alpha_tile_callback);
@@ -164,6 +162,7 @@ public:
 
 	void konamigx_mixer_init(screen_device &screen, int objdma);
 	void konamigx_objdma(void);
+	void generate_sprites(address_space &space, UINT32 src, UINT32 spr, int count);
 
 	void fantjour_dma_install();
 
@@ -194,6 +193,7 @@ public:
 	int m_gx_cfgport;
 	int m_suspension_active, m_resume_trigger;
 	int m_last_prot_op, m_last_prot_clk;
+	UINT8 m_prev_pixel_clock;
 
 	UINT8 m_esc_program[4096];
 	esc_cb m_esc_cb;
@@ -216,20 +216,21 @@ public:
 	UINT16 m_gx_wrport2;
 
 	// 2nd-Tier GX/MW Graphics Variables
-	UINT8 *m_gx_objzbuf, *m_gx_shdzbuf;
+	UINT8 *m_gx_objzbuf;
+	std::unique_ptr<UINT8[]> m_gx_shdzbuf;
 	int m_layer_colorbase[4];
 	INT32 m_gx_tilebanks[8], m_gx_oldbanks[8];
 	int m_gx_tilemode, m_gx_rozenable, m_psac_colorbase, m_last_psac_colorbase;
 	int m_gx_specialrozenable; // type 1 roz, with voxel height-map, rendered from 2 source tilemaps (which include height data) to temp bitmap for further processing
 	int m_gx_rushingheroes_hack;
-	int m_gx_le2_textcolour_hack;
+
 	tilemap_t *m_gx_psac_tilemap, *m_gx_psac_tilemap2;
-	bitmap_ind16 *m_type3_roz_temp_bitmap;
+	std::unique_ptr<bitmap_ind16> m_type3_roz_temp_bitmap;
 	tilemap_t *m_gx_psac_tilemap_alt;
 	int m_konamigx_has_dual_screen;
 	int m_konamigx_palformat;
-	bitmap_rgb32 *m_dualscreen_left_tempbitmap;
-	bitmap_rgb32 *m_dualscreen_right_tempbitmap;
+	std::unique_ptr<bitmap_rgb32> m_dualscreen_left_tempbitmap;
+	std::unique_ptr<bitmap_rgb32> m_dualscreen_right_tempbitmap;
 
 	/* On Type-1 the K053936 output is rendered to these temporary bitmaps as raw data
 	the 'voxel' effect to give the pixels height is a post-process operation on the
@@ -247,8 +248,8 @@ public:
 
 
 	*/
-	bitmap_ind16 *m_gxtype1_roz_dstbitmap;
-	bitmap_ind16 *m_gxtype1_roz_dstbitmap2;
+	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap;
+	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap2;
 	rectangle m_gxtype1_roz_dstbitmapclip;
 
 	int m_konamigx_type3_psac2_actual_bank;

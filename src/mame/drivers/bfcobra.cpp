@@ -250,8 +250,8 @@ public:
 	}
 
 	UINT8 m_bank_data[4];
-	UINT8 *m_work_ram;
-	UINT8 *m_video_ram;
+	std::unique_ptr<UINT8[]> m_work_ram;
+	std::unique_ptr<UINT8[]> m_video_ram;
 	UINT8 m_h_scroll;
 	UINT8 m_v_scroll;
 	UINT8 m_flip_8;
@@ -289,8 +289,6 @@ public:
 	DECLARE_WRITE8_MEMBER(meter_w);
 	DECLARE_READ8_MEMBER(latch_r);
 	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_WRITE8_MEMBER(fd_op_w);
-	DECLARE_WRITE8_MEMBER(fd_ctrl_w);
 	DECLARE_READ8_MEMBER(upd_r);
 	DECLARE_WRITE8_MEMBER(upd_w);
 	DECLARE_WRITE_LINE_MEMBER(z80_acia_irq);
@@ -298,8 +296,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_DRIVER_INIT(bfcobra);
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	INTERRUPT_GEN_MEMBER(vblank_gen);
@@ -311,8 +309,6 @@ public:
 	void command_phase(struct fdc_t &fdc, UINT8 data);
 	inline UINT8* blitter_get_addr(UINT32 addr);
 	inline void z80_bank(int num, int data);
-	UINT8 exec_r_phase(void);
-	UINT8 results_phase(void);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<acia6850_device> m_acia6850_0;
@@ -1615,10 +1611,10 @@ INPUT_PORTS_END
 void bfcobra_state::init_ram()
 {
 	/* 768kB work RAM */
-	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0xC0000);
+	m_work_ram = make_unique_clear<UINT8[]>(0xC0000);
 
 	/* 128kB video RAM */
-	m_video_ram = auto_alloc_array_clear(machine(), UINT8, 0x20000);
+	m_video_ram = make_unique_clear<UINT8[]>(0x20000);
 }
 
 
@@ -1708,8 +1704,8 @@ DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 	save_item(NAME(m_z80_int));
 	save_item(NAME(m_z80_inten));
 	save_item(NAME(m_bank_data));
-	save_pointer(NAME(m_work_ram), 0xc0000);
-	save_pointer(NAME(m_video_ram), 0x20000);
+	save_pointer(NAME(m_work_ram.get()), 0xc0000);
+	save_pointer(NAME(m_video_ram.get()), 0x20000);
 }
 
 /* TODO */

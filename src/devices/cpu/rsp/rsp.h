@@ -159,7 +159,6 @@ public:
 	void ccfunc_write32();
 	void ccfunc_get_cop0_reg();
 	void ccfunc_set_cop0_reg();
-	void ccfunc_unimplemented_opcode();
 	void ccfunc_sp_set_status_cb();
 	void ccfunc_unimplemented();
 
@@ -167,30 +166,30 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_stop();
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_stop() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 1; }
-	virtual UINT32 execute_input_lines() const { return 1; }
-	virtual UINT32 execute_default_irq_vector() const { return 0; }
-	virtual void execute_run();
-	virtual void execute_set_input(int inputnum, int state) { }
+	virtual UINT32 execute_min_cycles() const override { return 1; }
+	virtual UINT32 execute_max_cycles() const override { return 1; }
+	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual UINT32 execute_default_irq_vector() const override { return 0; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override { }
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry);
-	virtual void state_export(const device_state_entry &entry);
-	void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	void state_string_export(const device_state_entry &entry, std::string &str) override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
+	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	void unimplemented_opcode(UINT32 op);
 
@@ -217,8 +216,8 @@ private:
 
 	/* core state */
 	drc_cache           m_cache;                      /* pointer to the DRC code cache */
-	drcuml_state *      m_drcuml;                     /* DRC UML generator state */
-	rsp_frontend *      m_drcfe;                      /* pointer to the DRC front-end state */
+	std::unique_ptr<drcuml_state>      m_drcuml;                     /* DRC UML generator state */
+	std::unique_ptr<rsp_frontend>      m_drcfe;                      /* pointer to the DRC front-end state */
 	UINT32              m_drcoptions;                 /* configurable DRC options */
 
 	/* internal stuff */
@@ -269,7 +268,7 @@ protected:
 	direct_read_data *m_direct;
 
 private:
-	rsp_cop2    *m_cop2;
+	std::unique_ptr<rsp_cop2>    m_cop2;
 
 	UINT32 *m_dmem32;
 	UINT16 *m_dmem16;
@@ -317,11 +316,9 @@ private:
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 linkreg);
 	void generate_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_vector_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_special(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_regimm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_cop2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_cop0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op);
 };

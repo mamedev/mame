@@ -82,8 +82,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	UINT8 m_h;      // 4-bit data latch
 	UINT8 m_s;      // 3-bit port select

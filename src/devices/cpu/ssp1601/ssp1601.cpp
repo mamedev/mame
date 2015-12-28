@@ -347,7 +347,7 @@ UINT32 ssp1601_device::ptr1_read_(int ri, int isj2, int modi3)
 {
 	//int t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
 	UINT32 mask, add = 0, t = ri | isj2 | modi3;
-	unsigned char *rp = NULL;
+	unsigned char *rp = nullptr;
 	switch (t)
 	{
 		// mod=0 (00)
@@ -451,7 +451,7 @@ void ssp1601_device::ptr1_write(int op, UINT32 d)
 
 UINT32 ssp1601_device::ptr2_read(int op)
 {
-	int mv = 0, t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
+	int mv, t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
 	switch (t)
 	{
 		// mod=0 (00)
@@ -504,9 +504,9 @@ void ssp1601_device::device_start()
 		m_r[i] = 0;
 	}
 	memset( m_RAM, 0, sizeof(m_RAM));
-	for ( int i = 0; i < 6; i++ )
+	for (auto & elem : m_stack)
 	{
-		m_stack[i] = 0;
+		elem = 0;
 	}
 	m_ppc.d = 0;
 	m_g_cycles = 0;

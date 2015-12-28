@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+// thanks-to:Richard Bush
 /***************************************************************************
 
   Data East 16 bit games - Bryan McPhail, mish@tendril.co.uk

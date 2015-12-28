@@ -80,18 +80,18 @@ void spacefb_state::video_start()
 	compute_resistor_weights(0, 0xff, -1.0,
 								3, resistances_rg, m_color_weights_rg, 470, 0,
 								2, resistances_b,  m_color_weights_b,  470, 0,
-								0, 0, 0, 0, 0);
+								0, nullptr, nullptr, 0, 0);
 
 	width = m_screen->width();
 	height = m_screen->height();
-	m_object_present_map = auto_alloc_array(machine(), UINT8, width * height);
+	m_object_present_map = std::make_unique<UINT8[]>(width * height);
 
 	/* this start value positions the stars to match the flyer screen shot,
 	   but most likely, the actual star position is random as the hardware
 	   uses whatever value is on the shift register on power-up */
 	m_star_shift_reg = 0x18f89;
 
-	save_pointer(NAME(m_object_present_map), width * height);
+	save_pointer(NAME(m_object_present_map.get()), width * height);
 	save_item(NAME(m_port_0));
 	save_item(NAME(m_port_2));
 	save_item(NAME(m_star_shift_reg));
@@ -373,7 +373,7 @@ void spacefb_state::draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 	get_sprite_pens(sprite_pens);
 
-	memset(m_object_present_map, 0, bitmap.width() * bitmap.height());
+	memset(m_object_present_map.get(), 0, bitmap.width() * bitmap.height());
 
 	while (1)
 	{

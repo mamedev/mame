@@ -136,7 +136,7 @@ public:
 		const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// inline configuration
 	static void set_nasbus_slot(device_t &device, device_t *owner, const char *nasbus_tag);
@@ -174,8 +174,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	simple_list<device_nasbus_card_interface> m_dev;

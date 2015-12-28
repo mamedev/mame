@@ -28,7 +28,7 @@ const device_type HC55516 = &device_creator<hc55516_device>;
 hc55516_device::hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HC55516, "HC-55516", tag, owner, clock, "hc55516", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_channel(NULL),
+		m_channel(nullptr),
 		m_active_clock_hi(0),
 		m_shiftreg_mask(0),
 		m_last_clock_state(0),
@@ -48,7 +48,7 @@ hc55516_device::hc55516_device(const machine_config &mconfig, const char *tag, d
 hc55516_device::hc55516_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
-		m_channel(NULL),
+		m_channel(nullptr),
 		m_active_clock_hi(0),
 		m_shiftreg_mask(0),
 		m_last_clock_state(0),

@@ -36,7 +36,7 @@
 
 ntb_cart_interface::ntb_cart_interface(const machine_config &mconfig, device_t &device)
 					: device_slot_card_interface(mconfig, device),
-						m_rom(NULL)
+						m_rom(nullptr)
 {
 }
 
@@ -85,7 +85,7 @@ bool nes_ntb_slot_device::call_load()
 		if (!ROM)
 			return IMAGE_INIT_FAIL;
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			if (length() != 0x4000)
 				return IMAGE_INIT_FAIL;

@@ -29,7 +29,7 @@ static void tlb_entry_log_half(mips3_tlb_entry *entry, int tlbindex, int which);
     TLB entry matches the provided ASID
 -------------------------------------------------*/
 
-INLINE int tlb_entry_matches_asid(const mips3_tlb_entry *entry, UINT8 asid)
+static inline int tlb_entry_matches_asid(const mips3_tlb_entry *entry, UINT8 asid)
 {
 	return (entry->entry_hi & 0xff) == asid;
 }
@@ -40,7 +40,7 @@ INLINE int tlb_entry_matches_asid(const mips3_tlb_entry *entry, UINT8 asid)
     TLB entry is global
 -------------------------------------------------*/
 
-INLINE int tlb_entry_is_global(const mips3_tlb_entry *entry)
+static inline int tlb_entry_is_global(const mips3_tlb_entry *entry)
 {
 	return (entry->entry_lo[0] & entry->entry_lo[1] & TLB_GLOBAL);
 }

@@ -104,7 +104,7 @@ public:
 	optional_shared_ptr<UINT16> m_vbowl_trackball;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 
-	UINT8 *m_layer[8];
+	std::unique_ptr<UINT8[]> m_layer[8];
 	UINT16 m_priority;
 	UINT8 m_lhb2_pen_hi;
 	UINT16 m_igs_dips_sel;
@@ -148,7 +148,6 @@ public:
 	DECLARE_WRITE16_MEMBER(igs011_prot1_w);
 	DECLARE_READ16_MEMBER(igs011_prot1_r);
 	DECLARE_WRITE16_MEMBER(igs011_prot_addr_w);
-	DECLARE_READ16_MEMBER(igs011_prot_fake_r);
 	DECLARE_WRITE16_MEMBER(igs011_prot2_reset_w);
 	DECLARE_READ16_MEMBER(igs011_prot2_reset_r);
 	DECLARE_WRITE16_MEMBER(igs011_prot2_inc_w);
@@ -165,7 +164,6 @@ public:
 	DECLARE_READ16_MEMBER(lhb2_igs011_prot2_r);
 	DECLARE_READ16_MEMBER(vbowl_igs011_prot2_r);
 	DECLARE_WRITE16_MEMBER(igs012_prot_reset_w);
-	DECLARE_READ16_MEMBER(igs012_prot_fake_r);
 	DECLARE_WRITE16_MEMBER(igs012_prot_mode_w);
 	DECLARE_WRITE16_MEMBER(igs012_prot_inc_w);
 	DECLARE_WRITE16_MEMBER(igs012_prot_dec_inc_w);
@@ -212,14 +210,15 @@ public:
 	DECLARE_DRIVER_INIT(xymg);
 	DECLARE_DRIVER_INIT(drgnwrldv10c);
 	DECLARE_DRIVER_INIT(drgnwrldv20j);
+	DECLARE_DRIVER_INIT(drgnwrldv40k);
 	DECLARE_DRIVER_INIT(vbowl);
 	DECLARE_DRIVER_INIT(vbowlj);
 	DECLARE_DRIVER_INIT(ryukobou);
 	TIMER_DEVICE_CALLBACK_MEMBER(lev5_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lhb_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lev3_timer_irq_cb);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void video_start() override;
 	UINT32 screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_vbowl(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(lhb_vblank_irq);
@@ -275,8 +274,8 @@ void igs011_state::video_start()
 {
 	for (int i = 0; i < 8; i++)
 	{
-		m_layer[i] = auto_alloc_array(machine(), UINT8, 512 * 256);
-		save_pointer(NAME(m_layer[i]), 512 * 256, i);
+		m_layer[i] = std::make_unique<UINT8[]>(512 * 256);
+		save_pointer(NAME(m_layer[i].get()), 512 * 256, i);
 	}
 
 	m_lhb2_pen_hi = 0;
@@ -374,8 +373,8 @@ READ16_MEMBER(igs011_state::igs011_layers_r)
 {
 	int layer0 = ((offset & (0x80000/2)) ? 4 : 0) + ((offset & 1) ? 0 : 2);
 
-	UINT8 *l0 = m_layer[layer0];
-	UINT8 *l1 = m_layer[layer0+1];
+	UINT8 *l0 = m_layer[layer0].get();
+	UINT8 *l1 = m_layer[layer0+1].get();
 
 	offset >>= 1;
 	offset &= 0x1ffff;
@@ -389,8 +388,8 @@ WRITE16_MEMBER(igs011_state::igs011_layers_w)
 
 	int layer0 = ((offset & (0x80000/2)) ? 4 : 0) + ((offset & 1) ? 0 : 2);
 
-	UINT8 *l0 = m_layer[layer0];
-	UINT8 *l1 = m_layer[layer0+1];
+	UINT8 *l0 = m_layer[layer0].get();
+	UINT8 *l1 = m_layer[layer0+1].get();
 
 	offset >>= 1;
 	offset &= 0x1ffff;
@@ -499,7 +498,7 @@ WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 					blitter.x,blitter.y,blitter.w,blitter.h,blitter.gfx_hi,blitter.gfx_lo,blitter.depth,blitter.pen,blitter.flags);
 #endif
 
-	dest    =   m_layer[   blitter.flags & 0x0007   ];
+	dest    =   m_layer[   blitter.flags & 0x0007   ].get();
 	opaque  =            !(blitter.flags & 0x0008);
 	clear   =              blitter.flags & 0x0010;
 	flipx   =              blitter.flags & 0x0020;
@@ -2092,6 +2091,14 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv20j)
 */
 }
 
+DRIVER_INIT_MEMBER(igs011_state,drgnwrldv40k)
+{
+	//drgnwrld_type3_decrypt(); // wrong
+	drgnwrld_gfx_decrypt();
+
+	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16_delegate(FUNC(igs011_state::drgnwrldv21_igs011_prot2_r), this)); // wrong
+}
+
 DRIVER_INIT_MEMBER(igs011_state,drgnwrldv11h)
 {
 	drgnwrld_type1_decrypt();
@@ -3126,7 +3133,7 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   // data clear
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0) // hopper switch
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)nullptr) // hopper switch
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // stats
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coin
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -3256,7 +3263,7 @@ static INPUT_PORTS_START( nkishusp )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   // data clear
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0) // hopper switch
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)nullptr) // hopper switch
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // stats
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coin
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -3385,7 +3392,7 @@ static INPUT_PORTS_START( wlcc )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE2  ) // shown in test mode
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)   // clear coin
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL   ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0)   // hopper switch
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL   ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)nullptr)   // hopper switch
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -3514,7 +3521,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)nullptr) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )   // system reset
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // stats
@@ -3841,7 +3848,7 @@ static INPUT_PORTS_START( xymg )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)0) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, (void *)nullptr) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // stats
@@ -4372,6 +4379,25 @@ ROM_START( drgnwrldv10c )
 	ROM_LOAD( "ccdu45.u45", 0x000, 0x2e5, CRC(a15fce69) SHA1(3e38d75c7263bfb36aebdbbd55ebbdd7ca601633) )
 ROM_END
 
+
+ROM_START( drgnwrldv40k )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "v-040k.u3", 0x00000, 0x80000, CRC(397404ef) SHA1(5228558760be7c103d4b9e2e2a31ca5619ca8055) )
+
+	ROM_REGION( 0x400000, "blitter", 0 )
+	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
+	// u44 unpopulated
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
+
+	ROM_REGION( 0x40000, "plds", 0 )
+	ROM_LOAD( "ccdu15.u15", 0x000, 0x2e5, CRC(a15fce69) SHA1(3e38d75c7263bfb36aebdbbd55ebbdd7ca601633) )
+	//ROM_LOAD( "ccdu17.u17.bad.dump", 0x000, 0x104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	//ROM_LOAD( "ccdu18.u18.bad.dump", 0x000, 0x104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "ccdu45.u45", 0x000, 0x2e5, CRC(a15fce69) SHA1(3e38d75c7263bfb36aebdbbd55ebbdd7ca601633) )
+ROM_END
+
 /***************************************************************************
 
     Wan Li Chang Cheng (The Great Wall)
@@ -4739,9 +4765,9 @@ ROM_START( vbowl )
 	ROM_REGION( 0x400000, "ics", 0 )
 	ROM_LOAD( "vrbowlng.u67", 0x00000, 0x80000, CRC(53000936) SHA1(e50c6216f559a9248c095bdfae05c3be4be79ff3) )  // 8 bit signed mono & u-law
 	ROM_LOAD( "vrbowlng.u66", 0x80000, 0x80000, CRC(f62cf8ed) SHA1(c53e47e2c619ed974ad40ee4aaa4a35147ea8311) )  // 8 bit signed mono
-	ROM_COPY( "ics", 0, 0x100000,0x100000)
-	ROM_COPY( "ics", 0, 0x200000,0x100000)
-	ROM_COPY( "ics", 0, 0x300000,0x100000)
+	ROM_COPY( "ics", 0x000000, 0x100000,0x100000)
+	ROM_COPY( "ics", 0x000000, 0x200000,0x100000)
+	ROM_COPY( "ics", 0x000000, 0x300000,0x100000)
 ROM_END
 
 ROM_START( vbowlj )
@@ -4758,9 +4784,9 @@ ROM_START( vbowlj )
 	ROM_REGION( 0x400000, "ics", 0 )
 	ROM_LOAD( "vrbowlng.u67", 0x00000, 0x80000, CRC(53000936) SHA1(e50c6216f559a9248c095bdfae05c3be4be79ff3) )  // 8 bit signed mono & u-law
 	ROM_LOAD( "vrbowlng.u66", 0x80000, 0x80000, CRC(f62cf8ed) SHA1(c53e47e2c619ed974ad40ee4aaa4a35147ea8311) )  // 8 bit signed mono
-	ROM_COPY( "ics", 0, 0x100000,0x100000)
-	ROM_COPY( "ics", 0, 0x200000,0x100000)
-	ROM_COPY( "ics", 0, 0x300000,0x100000)
+	ROM_COPY( "ics", 0x000000, 0x100000,0x100000)
+	ROM_COPY( "ics", 0x000000, 0x200000,0x100000)
+	ROM_COPY( "ics", 0x000000, 0x300000,0x100000)
 ROM_END
 
 /***************************************************************************
@@ -4803,6 +4829,7 @@ GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, dr
 GAME( 1995, drgnwrldv20j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, drgnwrldv20j, ROT0, "IGS / Alta", "Zhong Guo Long (Japan, V020J)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv10c, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv10c, ROT0, "IGS",        "Zhong Guo Long (China, V010C)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1995, drgnwrldv11h, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv11h, ROT0, "IGS",        "Dong Fang Zhi Zhu (Hong Kong, V011H)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv40k, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, drgnwrldv40k, ROT0, "IGS",        "Dragon World (Korea, V040K)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, lhb,          0,        lhb,             lhb, igs011_state,       lhb,          ROT0, "IGS",        "Long Hu Bang (China, V035C)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, lhbv33c,      lhb,      lhb,             lhb, igs011_state,       lhbv33c,      ROT0, "IGS",        "Long Hu Bang (China, V033C)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1995, dbc,          lhb,      lhb,             lhb, igs011_state,       dbc,          ROT0, "IGS",        "Da Ban Cheng (Hong Kong, V027H)",      MACHINE_SUPPORTS_SAVE )

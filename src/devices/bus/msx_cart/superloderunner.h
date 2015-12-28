@@ -16,11 +16,11 @@ public:
 	msx_cart_superloderunner(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
-	virtual void initialize_cartridge();
+	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart);
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
 
 	DECLARE_WRITE8_MEMBER(banking);
 

@@ -318,13 +318,13 @@ void arm_cpu_device::SetModeRegister( int mode, int rIndex, UINT32 value )
 
 void arm_cpu_device::device_reset()
 {
-	for ( int i = 0; i < 27; i++ )
+	for (auto & elem : m_sArmRegister)
 	{
-		m_sArmRegister[i] = 0;
+		elem = 0;
 	}
-	for ( int i = 0; i < 16; i++ )
+	for (auto & elem : m_coproRegister)
 	{
-		m_coproRegister[i] = 0;
+		elem = 0;
 	}
 	m_pendingIrq = 0;
 	m_pendingFiq = 0;
@@ -604,7 +604,7 @@ void arm_cpu_device::HandleMemSingle( UINT32 insn )
 	/* Fetch the offset */
 	if (insn & INSN_I)
 	{
-		off = decodeShift(insn, NULL);
+		off = decodeShift(insn, nullptr);
 	}
 	else
 	{
@@ -821,7 +821,7 @@ void arm_cpu_device::HandleALU( UINT32 insn )
 	}
 	else
 	{
-		op2 = decodeShift(insn, (insn & INSN_S) ? &sc : NULL);
+		op2 = decodeShift(insn, (insn & INSN_S) ? &sc : nullptr);
 
 			if (!(insn & INSN_S))
 			sc=0;

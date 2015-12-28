@@ -66,7 +66,7 @@ ADDRESS_MAP_END
 
 const address_space_config *zx8301_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	return (spacenum == AS_0) ? &m_space_config : nullptr;
 }
 
 
@@ -108,7 +108,7 @@ zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, ZX8301, "Sinclair ZX8301", tag, owner, clock, "zx8301", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(zx8301)),
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(zx8301)),
 		m_cpu(*this),
 		m_write_vsync(*this),
 		m_dispoff(1),

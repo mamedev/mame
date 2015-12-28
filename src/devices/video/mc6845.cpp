@@ -55,6 +55,7 @@ const device_type SY6545_1 = &device_creator<sy6545_1_device>;
 const device_type SY6845E = &device_creator<sy6845e_device>;
 const device_type HD6345 = &device_creator<hd6345_device>;
 const device_type AMS40041 = &device_creator<ams40041_device>;
+const device_type AMS40489 = &device_creator<ams40489_device>;
 const device_type MOS8563 = &device_creator<mos8563_device>;
 const device_type MOS8568 = &device_creator<mos8568_device>;
 
@@ -533,7 +534,7 @@ void mc6845_device::recompute_parameters(bool postload)
 			if (LOG) logerror("M6845 config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
 								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
-			if ( m_screen != NULL )
+			if ( m_screen != nullptr )
 				m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 			if(!m_reconfigure_cb.isnull())
@@ -703,7 +704,7 @@ void mc6845_device::handle_line_timer()
 			/* also update the cursor state now */
 			update_cursor_state();
 
-			if (m_screen != NULL)
+			if (m_screen != nullptr)
 				m_screen->reset_origin();
 		}
 		else
@@ -1244,6 +1245,18 @@ void ams40041_device::device_start()
 	m_supports_transparent = false;
 }
 
+void ams40489_device::device_start()
+{
+	mc6845_device::device_start();
+
+	m_supports_disp_start_addr_r = true;
+	m_supports_vert_sync_width = false;
+	m_supports_status_reg_d5 = false;
+	m_supports_status_reg_d6 = false;
+	m_supports_status_reg_d7 = false;
+	m_supports_transparent = false;
+}
+
 
 void mos8563_device::device_start()
 {
@@ -1350,6 +1363,7 @@ void sy6545_1_device::device_reset() { mc6845_device::device_reset(); }
 void sy6845e_device::device_reset() { mc6845_device::device_reset(); }
 void hd6345_device::device_reset() { mc6845_device::device_reset(); }
 void ams40041_device::device_reset() { mc6845_device::device_reset(); }
+void ams40489_device::device_reset() { mc6845_device::device_reset(); }
 
 void mos8563_device::device_reset()
 {
@@ -1371,7 +1385,7 @@ const address_space_config *mos8563_device::memory_space_config(address_spacenum
 	switch (spacenum)
 	{
 		case AS_0: return &m_videoram_space_config;
-		default: return NULL;
+		default: return nullptr;
 	}
 }
 
@@ -1434,11 +1448,16 @@ ams40041_device::ams40041_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+ams40489_device::ams40489_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: mc6845_device(mconfig, AMS40489, "AMS40489 ASIC (CRTC)", tag, owner, clock, "ams40489", __FILE__)
+{
+}
+
 
 mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: mc6845_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
 		m_palette(*this, "palette")
 {
 	set_clock_scale(1.0/8);
@@ -1448,7 +1467,7 @@ mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, 
 mos8563_device::mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, MOS8563, "MOS8563", tag, owner, clock, "mos8563", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
 		m_palette(*this, "palette")
 {
 	set_clock_scale(1.0/8);

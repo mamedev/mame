@@ -65,9 +65,9 @@ public:
 	DECLARE_PALETTE_INIT(osi630);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void machine_start();
-	virtual void video_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	enum
 	{
@@ -116,7 +116,7 @@ public:
 
 	required_device<beep_device> m_beep;
 
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER( osi630_ctrl_w );
 	DECLARE_WRITE8_MEMBER( osi630_sound_w );
@@ -138,7 +138,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( osi470_pia_cb2_w );
 
 protected:
-	virtual void machine_start();
+	virtual void machine_start() override;
 
 private:
 	required_device<floppy_connector> m_floppy0;

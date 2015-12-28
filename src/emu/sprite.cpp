@@ -114,7 +114,7 @@ sparse_dirty_rect *sparse_dirty_bitmap::first_dirty_rect(const rectangle &clipre
 	for (int y = sy; y <= ey; y++)
 	{
 		UINT8 *dirtybase = &m_bitmap.pix(y);
-		sparse_dirty_rect *currect = NULL;
+		sparse_dirty_rect *currect = nullptr;
 
 		// loop over all grid columns that intersect our cliprect
 		for (int x = sx; x <= ex; x++)
@@ -122,14 +122,14 @@ sparse_dirty_rect *sparse_dirty_bitmap::first_dirty_rect(const rectangle &clipre
 			// if this tile is not dirty, end our current run and continue
 			if (!dirtybase[x])
 			{
-				if (currect != NULL)
+				if (currect != nullptr)
 					*currect &= cliprect;
-				currect = NULL;
+				currect = nullptr;
 				continue;
 			}
 
 			// if we can't add to an existing rect, create a new one
-			if (currect == NULL)
+			if (currect == nullptr)
 			{
 				// allocate a new rect and add it to the list
 				currect = &m_rect_list.append(*m_rect_allocator.alloc());
@@ -147,7 +147,7 @@ sparse_dirty_rect *sparse_dirty_bitmap::first_dirty_rect(const rectangle &clipre
 		}
 
 		// clip the last rect to the cliprect
-		if (currect != NULL)
+		if (currect != nullptr)
 			*currect &= cliprect;
 	}
 

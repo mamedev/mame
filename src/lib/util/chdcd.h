@@ -27,7 +27,7 @@ struct chdcd_track_input_entry
 
 struct chdcd_track_input_info
 {
-	void reset() { for (int i = 0; i < CD_MAX_TRACKS; i++) track[i].reset(); }
+	void reset() { for (auto & elem : track) elem.reset(); }
 
 	chdcd_track_input_entry track[CD_MAX_TRACKS];
 };

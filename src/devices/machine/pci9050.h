@@ -48,9 +48,9 @@ public:
 	void set_map(int id, address_map_constructor map, const char *name, device_t *device);
 
 protected:
-	virtual void device_start();
-	virtual void device_config_complete();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
+	virtual void device_reset() override;
 
 private:
 	DECLARE_ADDRESS_MAP(map, 32);

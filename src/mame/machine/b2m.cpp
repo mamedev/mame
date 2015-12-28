@@ -183,7 +183,7 @@ WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 	UINT8 side  = (data  & 1) ^ 1;
 
 	static const char *names[] = { "fd0", "fd1"};
-	floppy_image_device *floppy = NULL;
+	floppy_image_device *floppy = nullptr;
 	floppy_connector *con = machine().device<floppy_connector>(names[drive]);
 	if(con)
 		floppy = con->get_device();

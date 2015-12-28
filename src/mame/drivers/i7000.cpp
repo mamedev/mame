@@ -62,8 +62,8 @@ public:
 			m_videoram(*this, "videoram")
 	{ }
 
-	void video_start();
-	void machine_start();
+	void video_start() override;
+	void machine_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_card;

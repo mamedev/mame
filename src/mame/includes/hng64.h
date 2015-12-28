@@ -118,14 +118,14 @@ public:
 
 	hng64_state& state() { return m_state; }
 	bitmap_rgb32& colorBuffer3d() { return m_colorBuffer3d; }
-	float* depthBuffer3d() { return m_depthBuffer3d; }
+	float* depthBuffer3d() { return m_depthBuffer3d.get(); }
 
 private:
 	hng64_state& m_state;
 
 	// (Temporarily class members - someday they will live in the memory map)
 	bitmap_rgb32 m_colorBuffer3d;
-	float* m_depthBuffer3d;
+	std::unique_ptr<float[]> m_depthBuffer3d;
 };
 
 
@@ -174,7 +174,7 @@ public:
 	required_shared_ptr<UINT32> m_videoregs;
 	required_shared_ptr<UINT32> m_tcram;
 
-	UINT16* m_dl;
+	std::unique_ptr<UINT16[]> m_dl;
 	required_shared_ptr<UINT32> m_3dregs;
 	required_shared_ptr<UINT32> m_3d_1;
 	required_shared_ptr<UINT32> m_3d_2;
@@ -188,12 +188,12 @@ public:
 
 	int m_mcu_type;
 
-	UINT16 *m_soundram;
-	UINT16 *m_soundram2;
+	std::unique_ptr<UINT16[]> m_soundram;
+	std::unique_ptr<UINT16[]> m_soundram2;
 
 	/* Communications stuff */
-	UINT8 *m_com_op_base;
-	UINT8 *m_com_virtual_mem;
+	std::unique_ptr<UINT8[]> m_com_op_base;
+	std::unique_ptr<UINT8[]> m_com_virtual_mem;
 	UINT8 m_com_shared[8];
 
 	INT32 m_dma_start;
@@ -236,7 +236,6 @@ public:
 	float m_lightStrength;
 	float m_lightVector[3];
 
-	DECLARE_READ32_MEMBER(hng64_random_read);
 	DECLARE_READ32_MEMBER(hng64_com_r);
 	DECLARE_WRITE32_MEMBER(hng64_com_w);
 	DECLARE_WRITE8_MEMBER(hng64_com_share_w);
@@ -274,10 +273,6 @@ public:
 
 	DECLARE_WRITE32_MEMBER(hng64_sprite_clear_even_w);
 	DECLARE_WRITE32_MEMBER(hng64_sprite_clear_odd_w);
-	DECLARE_WRITE32_MEMBER(trap_write);
-	DECLARE_WRITE32_MEMBER(activate_3d_buffer);
-	DECLARE_READ8_MEMBER(hng64_comm_shared_r);
-	DECLARE_WRITE8_MEMBER(hng64_comm_shared_w);
 	DECLARE_WRITE32_MEMBER(hng64_videoram_w);
 	DECLARE_READ8_MEMBER(hng64_comm_space_r);
 	DECLARE_WRITE8_MEMBER(hng64_comm_space_w);
@@ -295,7 +290,7 @@ public:
 	void set_irq(UINT32 irq_vector);
 	UINT32 m_irq_pending;
 	UINT8 *m_comm_rom;
-	UINT8 *m_comm_ram;
+	std::unique_ptr<UINT8[]> m_comm_ram;
 	UINT8 m_mmu_regs[8];
 	UINT32 m_mmua[6];
 	UINT16 m_mmub[6];
@@ -310,9 +305,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_hng64_tile2_16x16_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile3_8x8_info);
 	TILE_GET_INFO_MEMBER(get_hng64_tile3_16x16_info);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	UINT32 screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_hng64(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(hng64_irq);
@@ -340,7 +335,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(acc_down_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(brake_down_r);
 
-	hng64_poly_renderer* m_poly_renderer;
+	std::unique_ptr<hng64_poly_renderer> m_poly_renderer;
 
 	TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
 
@@ -385,13 +380,6 @@ public:
 	DECLARE_WRITE16_MEMBER(hng64_sound_port_000c_w);
 
 	DECLARE_WRITE16_MEMBER(hng64_sound_port_0080_w);
-
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_0100_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_0102_w);
-	DECLARE_READ16_MEMBER(hng64_sound_port_0104_r);
-	DECLARE_READ16_MEMBER(hng64_sound_port_0106_r);
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_0108_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_010a_w);
 
 	DECLARE_WRITE16_MEMBER(hng64_sound_bank_w);
 	DECLARE_READ16_MEMBER(main_sound_comms_r);

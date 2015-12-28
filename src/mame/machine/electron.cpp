@@ -379,7 +379,7 @@ void electron_state::machine_start()
 
 DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
 {
-	if (image.software_entry() == NULL)
+	if (image.software_entry() == nullptr)
 	{
 		UINT32 filesize = image.length();
 

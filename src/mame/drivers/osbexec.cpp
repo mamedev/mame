@@ -46,7 +46,7 @@ public:
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 
-	virtual void video_start();
+	virtual void video_start() override;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -112,7 +112,7 @@ public:
 	DECLARE_READ8_MEMBER(osbexec_kbd_r);
 	DECLARE_READ8_MEMBER(osbexec_rtc_r);
 	DECLARE_DRIVER_INIT(osbexec);
-	virtual void machine_reset();
+	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(osbexec_video_callback);
 	DECLARE_READ8_MEMBER(osbexec_pia0_a_r);
 	DECLARE_WRITE8_MEMBER(osbexec_pia0_a_w);
@@ -388,7 +388,7 @@ WRITE8_MEMBER(osbexec_state::osbexec_pia0_b_w)
 		m_floppy0->mon_w(0);
 		break;
 	default:
-		m_mb8877->set_floppy(NULL);
+		m_mb8877->set_floppy(nullptr);
 		break;
 	}
 
@@ -520,7 +520,7 @@ void osbexec_state::machine_reset()
 static const z80_daisy_config osbexec_daisy_config[] =
 {
 	{ "sio" },
-	{ NULL }
+	{ nullptr }
 };
 
 

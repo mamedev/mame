@@ -44,7 +44,7 @@ debug_view_state::debug_view_state(running_machine &machine, debug_view_osd_upda
 	: debug_view(machine, DVT_STATE, osdupdate, osdprivate),
 		m_divider(0),
 		m_last_update(0),
-		m_state_list(NULL)
+		m_state_list(nullptr)
 {
 	// fail if no available sources
 	enumerate_sources();
@@ -76,7 +76,7 @@ void debug_view_state::enumerate_sources()
 	// iterate over devices that have state interfaces
 	state_interface_iterator iter(machine().root_device());
 	std::string name;
-	for (device_state_interface *state = iter.first(); state != NULL; state = iter.next())
+	for (device_state_interface *state = iter.first(); state != nullptr; state = iter.next())
 	{
 		strprintf(name,"%s '%s'", state->device().name(), state->device().tag());
 		m_source_list.append(*global_alloc(debug_view_state_source(name.c_str(), state->device())));
@@ -94,7 +94,7 @@ void debug_view_state::enumerate_sources()
 void debug_view_state::reset()
 {
 	// free all items in the state list
-	while (m_state_list != NULL)
+	while (m_state_list != nullptr)
 	{
 		state_item *oldhead = m_state_list;
 		m_state_list = oldhead->m_next;
@@ -141,7 +141,7 @@ void debug_view_state::recompute()
 	tailptr = &(*tailptr)->m_next;
 
 	// add all registers into it
-	for (const device_state_entry *entry = source.m_stateintf->state_first(); entry != NULL; entry = entry->next())
+	for (const device_state_entry *entry = source.m_stateintf->state_first(); entry != nullptr; entry = entry->next())
 		if (entry->divider())
 		{
 			*tailptr = auto_alloc(machine(), state_item(REG_DIVIDER, "", 0));
@@ -157,7 +157,7 @@ void debug_view_state::recompute()
 	int count = 0;
 	int maxtaglen = 0;
 	int maxvallen = 0;
-	for (state_item *item = m_state_list; item != NULL; item = item->m_next)
+	for (state_item *item = m_state_list; item != nullptr; item = item->m_next)
 	{
 		count++;
 		maxtaglen = MAX(maxtaglen, item->m_symbol.length());
@@ -202,12 +202,12 @@ void debug_view_state::view_update()
 	// get cycle count if we have an execute interface
 	const debug_view_state_source &source = downcast<const debug_view_state_source &>(*m_source);
 	UINT64 total_cycles = 0;
-	if (source.m_execintf != NULL)
+	if (source.m_execintf != nullptr)
 		total_cycles = source.m_execintf->total_cycles();
 
 	// find the first entry
 	state_item *curitem = m_state_list;
-	for (int index = 0; curitem != NULL && index < m_topleft.y; index++)
+	for (int index = 0; curitem != nullptr && index < m_topleft.y; index++)
 		curitem = curitem->m_next;
 
 	// loop over visible rows
@@ -218,7 +218,7 @@ void debug_view_state::view_update()
 		UINT32 col = 0;
 
 		// if this visible row is valid, add it to the buffer
-		if (curitem != NULL)
+		if (curitem != nullptr)
 		{
 			UINT32 effcol = m_topleft.x;
 			UINT8 attrib = DCA_NORMAL;
@@ -239,7 +239,7 @@ void debug_view_state::view_update()
 						break;
 
 					case REG_CYCLES:
-						if (source.m_execintf != NULL)
+						if (source.m_execintf != nullptr)
 						{
 							curitem->m_currval = source.m_execintf->cycles_remaining();
 							strprintf(valstr, "%-8d", (UINT32)curitem->m_currval);
@@ -247,7 +247,7 @@ void debug_view_state::view_update()
 						break;
 
 					case REG_BEAMX:
-						if (screen != NULL)
+						if (screen != nullptr)
 						{
 							curitem->m_currval = screen->hpos();
 							strprintf(valstr, "%4d", (UINT32)curitem->m_currval);
@@ -255,7 +255,7 @@ void debug_view_state::view_update()
 						break;
 
 					case REG_BEAMY:
-						if (screen != NULL)
+						if (screen != nullptr)
 						{
 							curitem->m_currval = screen->vpos();
 							strprintf(valstr, "%4d", (UINT32)curitem->m_currval);
@@ -263,7 +263,7 @@ void debug_view_state::view_update()
 						break;
 
 					case REG_FRAME:
-						if (screen != NULL)
+						if (screen != nullptr)
 						{
 							curitem->m_currval = screen->frame_number();
 							strprintf(valstr, "%6d", (UINT32)curitem->m_currval);
@@ -336,7 +336,7 @@ void debug_view_state::view_update()
 //-------------------------------------------------
 
 debug_view_state::state_item::state_item(int index, const char *name, UINT8 valuechars)
-	: m_next(NULL),
+	: m_next(nullptr),
 		m_lastval(0),
 		m_currval(0),
 		m_index(index),

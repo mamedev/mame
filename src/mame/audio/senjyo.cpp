@@ -8,7 +8,7 @@ const z80_daisy_config senjyo_daisy_chain[] =
 {
 	{ "z80ctc" },
 	{ "z80pio" },
-	{ NULL }
+	{ nullptr }
 };
 
 

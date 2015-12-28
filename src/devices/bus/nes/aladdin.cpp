@@ -40,7 +40,7 @@
 
 aladdin_cart_interface::aladdin_cart_interface(const machine_config &mconfig, device_t &device)
 						: device_slot_card_interface(mconfig, device),
-							m_rom(NULL),
+							m_rom(nullptr),
 							m_rom_size(0),
 	m_lobank(0),
 	m_hibank(0),
@@ -97,12 +97,12 @@ bool nes_aladdin_slot_device::call_load()
 	if (m_cart)
 	{
 		UINT8 *ROM = m_cart->get_cart_base();
-		UINT32 size = 0;
+		UINT32 size;
 
 		if (!ROM)
 			return IMAGE_INIT_FAIL;
 
-		if (software_entry() == NULL)
+		if (software_entry() == nullptr)
 		{
 			if (length() != 0x20010 && length() != 0x40010)
 				return IMAGE_INIT_FAIL;

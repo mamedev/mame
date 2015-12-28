@@ -28,11 +28,11 @@ public:
 	DECLARE_WRITE16_MEMBER(pio_w);                  // 5f7080
 
 protected:
-	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	virtual void dma_get_position(UINT8 *&base, UINT32 &limit, bool to_mainram);
-	virtual void dma_advance(UINT32 size);
+	virtual void dma_get_position(UINT8 *&base, UINT32 &limit, bool to_mainram) override;
+	virtual void dma_advance(UINT32 size) override;
 
 private:
 	enum { EPR, MPR_RECORD, MPR_FILE };

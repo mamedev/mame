@@ -43,10 +43,10 @@ protected:
 	UINT8 port_314;
 	bool intrq_state, drq_state, hld_state;
 
-	virtual void device_start();
-	virtual void device_reset();
-	const rom_entry *device_rom_region() const;
-	machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	const rom_entry *device_rom_region() const override;
+	machine_config_constructor device_mconfig_additions() const override;
 
 	void remap();
 };

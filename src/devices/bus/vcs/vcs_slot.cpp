@@ -31,7 +31,7 @@ const device_type VCS_CART_SLOT = &device_creator<vcs_cart_slot_device>;
 
 device_vcs_cart_interface::device_vcs_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
+		m_rom(nullptr),
 		m_rom_size(0)
 {
 }
@@ -51,7 +51,7 @@ device_vcs_cart_interface::~device_vcs_cart_interface()
 
 void device_vcs_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
-	if (m_rom == NULL)
+	if (m_rom == nullptr)
 	{
 		m_rom = device().machine().memory().region_alloc(std::string(tag).append(A26SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
@@ -162,10 +162,10 @@ static const vcs_slot slot_list[] =
 
 static int vcs_get_pcb_id(const char *slot)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(slot_list[i].slot_option, slot))
-			return slot_list[i].pcb_id;
+		if (!core_stricmp(elem.slot_option, slot))
+			return elem.pcb_id;
 	}
 
 	return 0;
@@ -173,10 +173,10 @@ static int vcs_get_pcb_id(const char *slot)
 
 static const char *vcs_get_slot(int type)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (auto & elem : slot_list)
 	{
-		if (slot_list[i].pcb_id == type)
-			return slot_list[i].slot_option;
+		if (elem.pcb_id == type)
+			return elem.slot_option;
 	}
 
 	return "a26_4k";
@@ -189,7 +189,7 @@ bool vcs_cart_slot_device::call_load()
 		UINT8 *ROM;
 		UINT32 len;
 
-		if (software_entry() != NULL)
+		if (software_entry() != nullptr)
 			len = get_software_region_length("rom");
 		else
 			len = length();
@@ -219,13 +219,13 @@ bool vcs_cart_slot_device::call_load()
 		m_cart->rom_alloc(len, tag());
 		ROM = m_cart->get_rom_base();
 
-		if (software_entry() != NULL)
+		if (software_entry() != nullptr)
 		{
 			const char *pcb_name;
 			bool has_ram = get_software_region("ram") ? TRUE : FALSE;
 			memcpy(ROM, get_software_region("rom"), len);
 
-			if ((pcb_name = get_feature("slot")) != NULL)
+			if ((pcb_name = get_feature("slot")) != nullptr)
 				m_type = vcs_get_pcb_id(pcb_name);
 			else
 			{
@@ -671,9 +671,9 @@ int vcs_cart_slot_device::detect_super_chip(UINT8 *cart, UINT32 len)
 	{
 		for (int i = 0; i < len - sizeof signatures[0]; i++)
 		{
-			for (int j = 0; j < (sizeof signatures/sizeof signatures[0]); j++)
+			for (auto & signature : signatures)
 			{
-				if (!memcmp(&cart[i], &signatures[j], sizeof signatures[0]))
+				if (!memcmp(&cart[i], &signature, sizeof signatures[0]))
 				{
 					return 1;
 				}
@@ -785,7 +785,7 @@ void vcs_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "a26_4k";
+		const char *slot_string;
 		UINT32 len = core_fsize(m_file);
 		dynamic_buffer rom(len);
 		int type;

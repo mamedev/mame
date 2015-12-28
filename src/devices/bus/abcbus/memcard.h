@@ -30,15 +30,15 @@ public:
 	abc_memory_card_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() override;
 
 	// device_abcbus_interface overrides
-	virtual void abcbus_cs(UINT8 data) { };
-	virtual UINT8 abcbus_xmemfl(offs_t offset);
+	virtual void abcbus_cs(UINT8 data) override { };
+	virtual UINT8 abcbus_xmemfl(offs_t offset) override;
 
 private:
 	required_memory_region m_dos_rom;
