@@ -41,6 +41,7 @@
 #include "machine/wd33c93.h"
 
 #include "machine/pdc.h"
+#include "softlist.h"
 
 #define TERMINAL_TAG "terminal"
 
@@ -424,6 +425,9 @@ static MACHINE_CONFIG_START( r9751, r9751_state )
 	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	//MCFG_WD33C93_IRQ_CB(WRITELINE(r9751_state,scsi_irq))
+
+	/* software list */
+	MCFG_SOFTWARE_LIST_ADD("flop_list","r9751")
 MACHINE_CONFIG_END
 
 
