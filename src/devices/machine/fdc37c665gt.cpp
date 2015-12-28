@@ -3,7 +3,7 @@
 #include "fdc37c665gt.h"
 
 fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, FDC37C665GT, "SMC FDC37C665GT FDC", tag, owner, clock, "fdc37c665gt", __FILE__),
+	device_t(mconfig, FDC37C665GT, "FDC37C665GT", tag, owner, clock, "fdc37c665gt", __FILE__),
 	m_uart1(*this, "uart1"),
 	m_uart2(*this, "uart2")
 {

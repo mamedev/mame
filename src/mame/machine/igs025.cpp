@@ -17,7 +17,7 @@
 
 
 igs025_device::igs025_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IGS025, "IGS025 Protection", tag, owner, clock, "igs_025_022", __FILE__)
+	: device_t(mconfig, IGS025, "IGS025", tag, owner, clock, "igs_025_022", __FILE__)
 {
 	m_execute_external =  igs025_execute_external(FUNC(igs025_device::no_callback_setup), this);
 }
