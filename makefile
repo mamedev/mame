@@ -181,10 +181,10 @@ endif
 endif
 
 #-------------------------------------------------
-# specify core target: mame, mess, etc.
-# specify subtarget: mame, mess, tiny, etc.
-# build rules will be included from
-# src/$(TARGET)/$(SUBTARGET).mak
+# specify core target: mame, ldplayer
+# specify subtarget: mame, arcade, mess, tiny, etc.
+# build scripts will be run from
+# scripts/target/$(TARGET)/$(SUBTARGET).lua
 #-------------------------------------------------
 
 ifndef TARGET
@@ -312,8 +312,8 @@ LD := $(SILENT)g++
 
 #-------------------------------------------------
 # specify OSD layer: windows, sdl, etc.
-# build rules will be included from
-# src/osd/$(OSD)/$(OSD).mak
+# build scripts will be run from
+# scripts/src/osd/$(OSD).lua
 #-------------------------------------------------
 
 ifndef OSD
