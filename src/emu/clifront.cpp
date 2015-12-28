@@ -30,8 +30,6 @@
 #include <new>
 #include <ctype.h>
 
-extern bool g_print_verbose;
-
 
 
 // media_identifier class identifies media by hash via a search in
@@ -1613,10 +1611,6 @@ void cli_frontend::execute_commands(const char *exename)
 	// validate?
 	if (strcmp(m_options.command(), CLICOMMAND_VALIDATE) == 0)
 	{
-		// hack: enable verbose output if requested
-		if (m_options.verbose())
-			g_print_verbose = true;
-
 		validity_checker valid(m_options);
 		bool result = valid.check_all();
 		if (!result)
