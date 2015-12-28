@@ -299,21 +299,18 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	UINT32  *p = &bitmap.pix32(y); 
 	//printf("ma=%d,y=%d,x_count=%d\n", ma, y, x_count);
 	int n = y & 0xf;
-	if (n > 3 && n < 12)
+	for (i = 0; i < x_count; i++)
 	{
-		for (i = 0; i < x_count; i++)
+		UINT8 ascii = m_p_videoram[0x1000 + (y>>4)*x_count + i];
+		if (ascii >= ' ')
 		{
-			UINT8 ascii = m_p_videoram[0x1000 + (y>>4)*x_count + i];
-			if (ascii >= ' ')
-			{
-				//printf("%c", ascii);
-				fnt = m_font[ascii * 8 + (n-4)];
-				for (j = 0; j < 8; j++)
-					*p++ = (fnt & (0x80 >> j) ? 0xffffff : 0);
-			}
-			else
-				p += 8;
+			//printf("%c", ascii);
+			fnt = m_font[ascii * 16 + n];
+			for (j = 0; j < 8; j++)
+				*p++ = (fnt & (0x80 >> j) ? 0 : 0xffffff);
 		}
+		else
+			p += 8;
 	}
 }
 
