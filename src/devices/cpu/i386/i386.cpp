@@ -71,7 +71,7 @@ i486_device::i486_device(const machine_config &mconfig, const char *tag, device_
 }
 
 pentium_device::pentium_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: i386_device(mconfig, PENTIUM, "PENTIUM", tag, owner, clock, "pentium", __FILE__)
+	: i386_device(mconfig, PENTIUM, "Pentium", tag, owner, clock, "pentium", __FILE__)
 {
 }
 
