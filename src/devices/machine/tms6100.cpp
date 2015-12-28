@@ -2,7 +2,7 @@
 // copyright-holders:Couriersud
 /**********************************************************************************************
 
-    Texas Instruments TMS6100
+    Texas Instruments TMS6100 Voice Synthesis Memory (VSM)
 
     Written for MAME by Couriersud
 
@@ -36,14 +36,14 @@
        DATA/ADD1 | 1    16 |  NC
        DATA/ADD2 | 2    15 |  NC
        DATA/ADD4 | 3    14 |  NC
-       DATA/ADD8 | 4    13 |  NC
+       RCK       | 4    13 |  NC
        CLK       | 5    12 |  VDD
-       NC        | 6    11 |  /CS
+       DATA/ADD8 | 6    11 |  CS
        NC        | 7    10 |  M1
        M0        | 8     9 |  VSS
                  +---------+
 
-    Mitsubishi M58819S:
+    Mitsubishi M58819S EPROM Interface:
 
                  +-----------------+
        AD0       |  1           40 |  AD1
@@ -110,7 +110,7 @@ tms6100_device::tms6100_device(const machine_config &mconfig, const char *tag, d
 const device_type M58819 = &device_creator<m58819_device>;
 
 m58819_device::m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms6100_device(mconfig, M58819, "M58819 Memory Controller", tag, owner, clock, "m58819", __FILE__)
+	: tms6100_device(mconfig, M58819, "M58819S", tag, owner, clock, "m58819s", __FILE__)
 {
 }
 
@@ -174,6 +174,7 @@ READ8_MEMBER(tms6100_device::data_r)
 
 READ_LINE_MEMBER(tms6100_device::data_line_r)
 {
+	// DATA/ADD8
 	return m_data;
 }
 

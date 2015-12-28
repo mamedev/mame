@@ -51,6 +51,7 @@
 
   TODO:
   - spellb fetches wrong word sometimes (on lv1 SPOON and ANT) - roms were doublechecked
+  - mrchalgr wrong sound, need more accurate tms6100 emulation
 
 
 ***************************************************************************/
