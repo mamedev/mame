@@ -1795,6 +1795,26 @@ static ADDRESS_MAP_START( anteaterg_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x01fc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( anteatergg_map, AS_PROGRAM, 8, galaxian_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x4fff) AM_RAM
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
+//	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
+//	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x07f8) AM_WRITE(start_lamp_w)
+//	AM_RANGE(0x6002, 0x6002) AM_MIRROR(0x07f8) AM_WRITE(coin_lock_w)
+//	AM_RANGE(0x6003, 0x6003) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
+	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
+	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
+	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
+	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
+	AM_RANGE(0x7800, 0x7800) AM_READ(watchdog_reset_r)
+	AM_IMPORT_FROM(galaxian_map_discrete)
+ADDRESS_MAP_END
 
 /* map derived from schematics */
 static ADDRESS_MAP_START( frogger_map, AS_PROGRAM, 8, galaxian_state )
@@ -5834,6 +5854,13 @@ static MACHINE_CONFIG_DERIVED( scobra, konami_base )
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(scobra_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( anteatergg, galaxian )
+
+	/* alternate memory map */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(anteatergg_map)
 MACHINE_CONFIG_END
 
 /*
@@ -10996,6 +11023,26 @@ ROM_START( anteaterg )
 ROM_END
 
 
+ROM_START( anteatergg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "for1.bin",       0x0000, 0x0800, CRC(e28cd0be) SHA1(c7f648455a527077c6b8124628a2689e60222668) )
+	ROM_LOAD( "for2.bin",       0x0800, 0x0800, CRC(be8de95c) SHA1(1bee4eadf190e9967fd5c1eea0a3b9b1e7658088) )
+	ROM_LOAD( "for3.bin",       0x1000, 0x0800, CRC(5d79f4d0) SHA1(81a286469d08a5d9281f9f3c21ae479f5f62073e) )
+	ROM_LOAD( "for4.bin",       0x1800, 0x0800, CRC(b8d981a5) SHA1(16972d26df8cb1a0a0616d9d80d3d383be5e8b71) )
+	ROM_LOAD( "for5.bin",       0x2000, 0x0800, CRC(cdc89fda) SHA1(a3ceda7afccd4455fe627e1877797d5975ec92de) )
+	ROM_LOAD( "for6.bin",       0x2800, 0x0800, CRC(8a80f838) SHA1(9ab7848ffd279ba99fbcb43ef3719db37731a5dd) )
+	ROM_LOAD( "for7.bin",       0x3000, 0x0800, CRC(41966df4) SHA1(b9655fc257fe8d67861a737337fc0a185e68f602) )
+	ROM_LOAD( "for8.bin",       0x3800, 0x0800, CRC(dc58265c) SHA1(763460aec5627fde9d75b77ee4ec7cbcdb9cc337) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "forb.bin",    0x0000, 0x0800, CRC(1e2824b1) SHA1(9527937db618505181f4d5a22bc532977a767232) )
+	ROM_LOAD( "fora.bin",    0x0800, 0x0800, CRC(784319b3) SHA1(0c3612a428d0906b07b35782cc0f84fda13aab73) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "colr6f.cpu",   0x0000, 0x0020, CRC(fce333c7) SHA1(f63a214dc47c5e7c80db000b0b6a261ca8da6629) )
+ROM_END
+
+
 ROM_START( calipso )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "calipso.2c",   0x0000, 0x1000, CRC(0fcb703c) SHA1(2bb096f114911973afdf3088c860c9566df06f60) )
@@ -11398,6 +11445,7 @@ GAME( 1982, tazmania,    0,        scobra,     tazmania,   galaxian_state, scobr
 GAME( 1982, anteater,    0,        anteater,   anteater,   galaxian_state, anteater,   ROT90,  "Tago Electronics", "Anteater", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, anteateruk,  anteater, anteateruk, anteateruk, galaxian_state, anteateruk, ROT90,  "Tago Electronics (Free Enterprise Games license", "The Anteater (UK)", MACHINE_SUPPORTS_SAVE ) // distributed in 1983
 GAME( 1982, anteaterg,   anteater, anteaterg,  anteateruk, galaxian_state, anteateruk, ROT90,  "Tago Electronics (TV-Tuning license from Free Enterprise Games)", "Ameisenbaer (German)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, anteatergg,  anteater, anteatergg, galaxian,   galaxian_state, galaxian,   ROT90,  "bootleg", "Ameisenbaer (German, Galaxian hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, calipso,     0,        scobra,     calipso,    galaxian_state, calipso,    ROT90,  "Tago Electronics", "Calipso",  MACHINE_SUPPORTS_SAVE )
 
