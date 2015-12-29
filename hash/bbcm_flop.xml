@@ -37,5 +37,17 @@
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="fsdd">
+		<description>FileStore Dealer Test Disc</description>
+		<year>1986</year>
+		<publisher>Acorn</publisher>
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="fsdd.adl" size="655360" crc="77560540" sha1="c60e1df1aff74cb491234140577137c65c55be0a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
