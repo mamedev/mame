@@ -56,6 +56,7 @@
 		<description>Elite</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG38" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
 				<rom name="elitebbc.ssd" size="204800" crc="1f15458d" sha1="ac47c0d6d0006ceef2102dda521df3364aff32aa" offset="0" />
@@ -67,6 +68,7 @@
 		<description>Elite (Executive Edition)</description>
 		<year>1986</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNG47" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
 				<rom name="elite_executive.ssd" size="204800" crc="f10aea60" sha1="cbd40dd9cad231f2f093e64665a69b64ddab5608" offset="0" />
@@ -180,7 +182,7 @@
 		</part>
 	</software>
 
-	<software name="mapocaly">
+	<software name="megapoca">
 		<description>Mega-Apocalypse</description>
 		<year>1988</year>
 		<publisher>Martech</publisher>

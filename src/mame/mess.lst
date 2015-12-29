@@ -344,12 +344,16 @@ sc55    // 1991 Sound Canvas SC-55
 
 // Acorn
 acrnsys1  // 1979 Acorn System 1 (Microcomputer Kit)
+a6809
 atom      // 1979 Acorn Atom
 atomeb    // 1979 Acorn Atom
 atombb    // 1979 Acorn Atom
 //prophet2
 bbca      // 1981 BBC Micro Model A
 bbcb      // 1981 BBC Micro Model B w/8271 FDC
+torchf    // 1982 Torch CF240
+torchh10  // 1982 Torch CH240/10
+torchh21  // 1982 Torch CH240/21
 bbcb_de   // 1982 BBC Micro Model B (German)
 bbcb_us   // 1983 BBC Micro Model B (US)
 electron  // 1983 Acorn Electron
@@ -375,7 +379,6 @@ a3010     // 1988 Acorn Archimedes 3010
 a3020     // 1988 Acorn Archimedes 3020
 a7000     // 1995 Acorn Archimedes 7000
 a7000p    // 1997 Acorn Archimedes 7000+
-a6809
 rpc600
 rpc700
 sarpc

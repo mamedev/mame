@@ -1771,6 +1771,29 @@ MACHINE_RESET_MEMBER(bbc_state, bbcb)
 }
 
 
+MACHINE_START_MEMBER(bbc_state, torch)
+{
+	m_machinetype = MODELB;
+	m_mc6850_clock = 0;
+	bbc_setup_banks(m_bank4, 16, 0, 0x4000);
+}
+
+MACHINE_RESET_MEMBER(bbc_state, torch)
+{
+	UINT8 *RAM = m_region_maincpu->base();
+	m_Speech    = 1;
+	m_SWRAMtype = 0;
+	m_bank1->set_base(RAM);
+	m_bank3->set_base(RAM + 0x4000);
+	m_memorySize=32;
+
+	m_bank4->set_entry(0);
+	m_bank7->set_base(m_region_os->base());  /* bank 7 points at the OS rom  from c000 to ffff */
+
+	bbcb_IC32_initialise(this);
+}
+
+
 MACHINE_START_MEMBER(bbc_state, bbcbp)
 {
 	m_machinetype = BPLUS;

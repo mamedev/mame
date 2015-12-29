@@ -31,7 +31,7 @@
 		<description>Arcade Action</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G06" />
+		<info name="release" value="SBG06" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="13352">
 				<rom name="arcadeaction-v2.5(1982)(acornsoft)(g06).uef" size="13352" crc="6c2db1cd" sha1="b86be839f41ce68dc229f4ca84bac63c24326f9a" offset="0"/>
@@ -39,9 +39,21 @@
 		</part>
 	</software>
 
+	<software name="asterbel">
+		<description>Asteroid Belt</description>
+		<year>1982</year>
+		<publisher>Computer Concepts</publisher>
+		<info name="usage" value="Load with *RUN" />
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="4713">
+				<rom name="asteroidbelt_run(computerconcepts).uef" size="4713" crc="61b7b9e7" sha1="bd51ec809ac60842bacd6916d6d4c5ce7d431586" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="beebtrek">
 		<description>Beebtrek</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Software For All</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7235">
@@ -61,6 +73,17 @@
 		</part>
 	</software>
 
+	<software name="catmouse">
+		<description>Cat and Mouse</description>
+		<year>1982</year>
+		<publisher>Micro Power</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="2370">
+				<rom name="catandmouse(micropower).uef" size="2370" crc="2abaadbb" sha1="20969ad3fe5002b9cdbbf10c5d51fca6a6477371" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="corncrop">
 		<description>Corn Cropper</description>
 		<year>1983</year>
@@ -72,11 +95,22 @@
 		</part>
 	</software>
 
+	<software name="disassem">
+		<description>Disassembler</description>
+		<year>1982</year>
+		<publisher>Micro Power</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="2624">
+				<rom name="disassembler(micropower).uef" size="2624" crc="e9bc953b" sha1="c70e48ec699f60de7b8cb07769c2ba80b245b9d3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dreversi">
 		<description>Draughts And Reversi</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G20" />
+		<info name="release" value="SBG20" />
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Draughts"/>
 			<dataarea name="cass" size="6165">
@@ -135,11 +169,22 @@
 
 	<software name="fruitmc">
 		<description>Fruit Machine</description>
-			<year>198?</year>
+			<year>1982</year>
 		<publisher>Computer Concepts</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4421">
 				<rom name="fruitmachine(computerconcepts).uef" size="4421" crc="75c47190" sha1="daf5d18bc78e189d3d5ca4191ff7c1fa5f64e4e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gomoku">
+		<description>Gomoku</description>
+		<year>1982</year>
+		<publisher>Micro Power</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="3482">
+				<rom name="gomoku(micropower).uef" size="3482" crc="fcfcb9f5" sha1="2cfed84fab03f6aab487dffc722ca4a855ed8a19" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -162,6 +207,17 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="1650">
 				<rom name="munchyman(1981)(micropower).uef" size="1650" crc="1eb418a1" sha1="2da3a559253ac210dc75824e6dbdd34957680e84" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mutantbr">
+		<description>Mutant Invaders/Breakout</description>
+		<year>1982</year>
+		<publisher>I.J.K.</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="5346">
+				<rom name="mutantbreakout(ijk).uef" size="5346" crc="69d134b0" sha1="cdbd3c5a970961fa4fe9f72c9dc848708f920708" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -210,6 +266,17 @@
 		</part>
 	</software>
 
+	<software name="reversim">
+		<description>Reversi (Micro Power)</description>
+		<year>1982</year>
+		<publisher>Micro Power</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="2150">
+				<rom name="reversi(198x)(micropower).uef" size="2150" crc="45f2023a" sha1="b01cd4fbf1c0d0e2a8515c01e224871c6f3a3af4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="seek">
 		<description>Seek</description>
 		<year>1982</year>
@@ -229,17 +296,6 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4513">
 				<rom name="spaceinvaders16k_run(1982)(davidmckeran).uef" size="4513" crc="a95a6a41" sha1="dff22b2d7a5c1d5355b8f72edf60acaa67f06c90" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spacmaze">
-		<description>Space Maze</description>
-		<year>1981</year>
-		<publisher>Micro Power</publisher>
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="8096">
-				<rom name="spacemaze(1981)(micropower).uef" size="8096" crc="7ed8de96" sha1="6dd52f9832f8ff8d3b8e7fd94586fc7ddeb8b182" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -266,25 +322,60 @@
 		</part>
 	</software>
 
-	<!-- Educational -->
-
-	<software name="peekog" cloneof="peeko">
-		<description>Peeko Computer (Ger)</description>
-		<year>198?</year>
-		<publisher>Acornsoft</publisher>
-		<info name="release" value="E02" />
+	<software name="startrkm">
+		<description>Star Trek (Micro Power)</description>
+		<year>1983</year>
+		<publisher>Micro Power</publisher>
 		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="4821">
-				<rom name="peekocomputer-german(198x)(acornsoft)(e02).uef" size="4821" crc="c6503a6b" sha1="813a6399a45a75a4aab3d2edd1722488edf41a52" offset="0" />
+			<dataarea name="cass" size="6092">
+				<rom name="startrek(1983)(micropower).uef" size="6092" crc="9daba7da" sha1="2562b7e8da65a5c80f909f477e36e9241f43c376" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="peeko">
-		<description>Peeko Computer</description>
-		<year>198?</year>
+	<software name="towealos">
+		<description>Tower of Alos</description>
+		<year>1982</year>
+		<publisher>A&amp;F Software</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="6425">
+				<rom name="towerofalos(anf).uef" size="6425" crc="fd11ea22" sha1="c5af41e482249edfc7f568f93a27de19d2a9ba04" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="zombies">
+		<description>Zombies</description>
+		<year>1982</year>
+		<publisher>Micro Power</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="1561">
+				<rom name="zombies.uef" size="1561" crc="2457e0a7" sha1="d94bab3abed8122debeb4fc579b43e699033a828" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Business -->
+	
+	<software name="dskdiary">
+		<description>Desk Diary</description>
+		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="E02" />
+		<info name="release" value="SBB01" />
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="8831">
+				<rom name="deskdiary(198x)(acornsoft)(b01).uef" size="8831" crc="fa88d857" sha1="e12a6e25e371a141c7152a8e88474be2967cb4c2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Educational -->
+
+	<software name="peekoc">
+		<description>Peeko-Computer</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBE02" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="3993">
 				<rom name="peekocomputer(198x)(acornsoft)(e02).uef" size="3993" crc="9a78f3b9" sha1="ff974eb52d6d984637e21e15a883a7572991e38b" offset="0" />
@@ -292,76 +383,56 @@
 		</part>
 	</software>
 
-	<software name="busgames">
-		<description>Business Games (Ger)</description>
-		<year>198?</year>
-		<publisher>Acornsoft</publisher>
-		<info name="release" value="E03" />
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="11858">
-				<rom name="businessgames-german(198x)(acornsoft)(e03).uef" size="11858" crc="ae23e0dd" sha1="2a4ca1e06870e41d9fa4c4e86ab196251869b160" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wordhunt">
-		<description>Word Hunt (Ger)</description>
-		<year>198?</year>
-		<publisher>Acornsoft</publisher>
-		<info name="release" value="E05" />
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="10849">
-				<rom name="wordhunt-german(198x)(acornsoft)(e05).uef" size="10849" crc="e412d5af" sha1="3163432f2388b0795ec03b61ab77e90e37a3f18d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wordseqg" cloneof="wordseq">
-		<description>Word Sequencing (Ger)</description>
-		<year>198?</year>
-		<publisher>Acornsoft</publisher>
-		<info name="release" value="E06" />
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="10883">
-				<rom name="wordsequencing-german(198x)(acornsoft)(e06).uef" size="10883" crc="605ebb74" sha1="5d2b67151889a0fa90c490dd4db40d579a8fb386" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wordseq">
 		<description>Word Sequencing</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="E06" />
+		<info name="release" value="SBE06" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7955">
-				<rom name="wordsequencing(198x)(acornsoft)(e06).uef" size="7955" crc="b6a37e42" sha1="b0b2088cd4bbbed7accd33e943eb8f343e36c7a2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="missignsg" cloneof="missigns">
-		<description>Missing Signs (Ger)</description>
-		<year>198?</year>
-		<publisher>Acornsoft</publisher>
-		<info name="release" value="E09" />
-		<part name="cass" interface="bbc_cass">
-			<dataarea name="cass" size="11055">
-				<rom name="missingsigns-german(198x)(acornsoft)(e09).uef" size="11055" crc="3a6c4f59" sha1="e02115cbf2cdcc0996b12fe8db25c02ca234248b" offset="0" />
+				<rom name="wordsequencing(1983)(acornsoft)(e06).uef" size="7955" crc="b6a37e42" sha1="b0b2088cd4bbbed7accd33e943eb8f343e36c7a2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="missigns">
 		<description>Missing Signs</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="E09" />
+		<info name="release" value="SBE09" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7977">
-				<rom name="missingsigns(198x)(acornsoft)(e09).uef" size="7977" crc="7da85f67" sha1="ebc8116fa980c0d268918a3aa333f772de0a7cb9" offset="0" />
+				<rom name="missingsigns(1983)(acornsoft)(e09).uef" size="7977" crc="7da85f67" sha1="ebc8116fa980c0d268918a3aa333f772de0a7cb9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- Languages -->
+	
+	<software name="lisp">
+		<description>LISP</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBL02" />
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="12734">
+				<rom name="lisp(1982)(acornsoft)(l02).uef" size="12734" crc="f93222c5" sha1="fd2b12ce8a273d0b2340c86627c82dec85a7366e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Graphics and other -->
+	
+	<software name="crgraph">
+		<description>Creative Graphics</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBX01" />
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="9543">
+				<rom name="creativegraphics(198x)(acornsoft)(x01).uef" size="9543" crc="b1879555" sha1="5f603d2a1c0693c4d91d8695e473e65e5c6ba3c5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 </softwarelist>

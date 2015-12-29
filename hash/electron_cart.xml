@@ -18,6 +18,7 @@
 		<description>Countdown to Doom</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SCG19" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
 				<rom name="countdowntodoom_1.rom" size="16384" crc="f8720e7e" sha1="eb414b81760d38c0a0d58a34dc70c2462c12e23c" offset="0" />
@@ -32,6 +33,7 @@
 		<description>Hopper</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SCG23" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
 				<rom name="hopper.rom" size="16384" crc="18db837e" sha1="fa3c6b17fd1ce2efd0115e370f6f6e0b528a05e2" offset="0" />
@@ -43,6 +45,7 @@
 		<description>Snapper</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SCG04" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
 				<rom name="snapper.rom" size="16384" crc="08befbda" sha1="7db762c705f64e91ab7fe8797e14d1213bc90de1" offset="0" />
@@ -54,6 +57,7 @@
 		<description>Starship Command</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SCG22" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
 				<rom name="starshipcommand_1.rom" size="16384" crc="e39ada2d" sha1="9dfa6d622e37d5115cbeaae9c9a4e978f85f2683" offset="0" />
@@ -75,10 +79,13 @@
 		</part>
 	</software>
 
+	<!-- Educational -->
+
 	<software name="treeknow">
 		<description>Tree of Knowledge</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SCE04" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
 				<rom name="treeofknowledge_1.rom" size="16384" crc="c09522e0" sha1="5b107be7a57a01b2719e9953e163f16825a026ab" offset="0" />
@@ -95,6 +102,7 @@
 		<description>LISP</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SCL02" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
 				<rom name="lisp_1.rom" size="16384" crc="fda4c546" sha1="24c7062fc3666cd6814d72e417146e32eb995b04" offset="0" />
@@ -109,6 +117,7 @@
 		<description>Logo</description>
 		<year>1985</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SCL06" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
 				<rom name="logo-v1.0e_1.rom" size="16384" crc="a0defcf9" sha1="57fdd30894679400cb7c10b331cefd1a2362aeae" offset="0" />
@@ -123,6 +132,7 @@
 		<description>ISO-Pascal</description>
 		<year>1985</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SCL18" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
 				<rom name="pascal_1.rom" size="16384" crc="c4adeb8c" sha1="ed5226520136ffa1212317ad5ab9d09c2a04b88d" offset="0" />
@@ -139,6 +149,7 @@
 		<description>View</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SCB03" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
 				<rom name="view-v1.0e.rom" size="16384" crc="5bdea2dd" sha1="64a12be5a1bbcf5bd003f38feb98e0eeafd601ee" offset="0" />
@@ -150,6 +161,7 @@
 		<description>ViewSheet</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SCB07" />
 		<part name="cart" interface="electron_cart">
 			<dataarea name="uprom" size="16384">
 				<rom name="viewsheet-v1.0e.rom" size="16384" crc="356fe589" sha1="146b3fb6cc9843a64c4e29a69f80db8980fab043" offset="0" />

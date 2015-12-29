@@ -20,6 +20,7 @@
 		<description>Hopper (Ger)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBG23" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8112">
 				<rom name="hopper-german(1983)(acornsoft)(g23).uef" size="8112" crc="3972b897" sha1="b5f7897dcad92b758d0473ac840f2b41e8049ef4" offset="0" />
@@ -31,6 +32,7 @@
 		<description>Meteors (Ger)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBG13" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6610">
 				<rom name="meteors-german(1982)(acornsoft)(g13).uef" size="6610" crc="0bb65e55" sha1="238ba733b0094942dd477ca49754249284741c40" offset="0" />
@@ -42,6 +44,7 @@
 		<description>Monsters (Ger)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBG03" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7890">
 				<rom name="monsters-german(1982)(acornsoft)(g03).uef" size="7890" crc="37838358" sha1="c3c698a8174d0b67d6ee563bcecb9a42354ae3fc" offset="0" />
@@ -53,6 +56,7 @@
 		<description>Planetoid (Ger)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBG15" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8515">
 				<rom name="planetoid-german(1982)(acornsoft)(g15).uef" size="8515" crc="bfaa94f8" sha1="fc8cb246c19cd717f7684074979ea5cb6d98e4fb" offset="0" />
@@ -64,6 +68,7 @@
 		<description>Rocket Raid (Ger)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBG05" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7747">
 				<rom name="rocketraid-german(1982)(acornsoft)(g05).uef" size="7747" crc="3a6ccbd0" sha1="afd7318589bb419606b25b575c7488369acf2c9b" offset="0" />
@@ -75,6 +80,7 @@
 		<description>Snapper (Ger)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBG04" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7174">
 				<rom name="snapper-german(1982)(acornsoft)(g04).uef" size="7174" crc="6ffbe578" sha1="0cc295dba1b771475ae8e71340b6ce4f885040e9" offset="0" />
@@ -86,6 +92,7 @@
 		<description>Super Invaders (Ger)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBG16" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7812">
 				<rom name="superinvaders-german(1982)(acornsoft)(g16).uef" size="7812" crc="382b3412" sha1="4361fba1203b07fb05f62273ac02db403a3f38ce" offset="0" />
@@ -108,8 +115,9 @@
 
 	<software name="dskdiarg">
 		<description>Desk Diary (Ger)</description>
-		<year>198?</year>
+		<year>1982</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBB01" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="9739">
 				<rom name="deskdiary-german(198x)(acornsoft)(b01).uef" size="9739" crc="7ef32892" sha1="ec3910be9c7b5c1729586ba88a88173d08dcf34b" offset="0" />
@@ -119,8 +127,44 @@
 
 	<!-- Educational -->
 
+	<software name="peekocg">
+		<description>Peeko-Computer (Ger)</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBE02" />
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="4821">
+				<rom name="peekocomputer-german(198x)(acornsoft)(e02).uef" size="4821" crc="c6503a6b" sha1="813a6399a45a75a4aab3d2edd1722488edf41a52" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="busgames">
+		<description>Managementspiele (Ger)</description>
+		<year>1982</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBE03" />
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="11858">
+				<rom name="businessgames-german(198x)(acornsoft)(e03).uef" size="11858" crc="ae23e0dd" sha1="2a4ca1e06870e41d9fa4c4e86ab196251869b160" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="missigns">
+		<description>Fehlende Zeichen (Ger)</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBE09" />
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="11055">
+				<rom name="missingsigns-german(1983)(acornsoft)(e09).uef" size="11055" crc="3a6c4f59" sha1="e02115cbf2cdcc0996b12fe8db25c02ca234248b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="numberbg">
-		<description>Number Balance (Ger)</description>
+		<description>Zahlenwaage (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft/ESM</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -131,9 +175,10 @@
 	</software>
 
 	<software name="sentseqg">
-		<description>Sentence Sequencing (Ger)</description>
+		<description>Satzsalat (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBE07" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="10769">
 				<rom name="sentencesequencing-german(198x)(acornsoft)(e07).uef" size="10769" crc="28955bf7" sha1="f6422764589cbe5d1acefca2d90f288b95e84280" offset="0" />
@@ -142,20 +187,22 @@
 	</software>
 
 	<software name="treeknog">
-		<description>Tree Of Knowledge (Ger)</description>
-		<year>198?</year>
+		<description>Baum der Weisheit (Ger)</description>
+		<year>1983</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBE04" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11319">
-				<rom name="treeofknowledge-german(198x)(acornsoft)(e04).uef" size="11319" crc="c1b66b33" sha1="53bd97ccc48c5b00a1e57728800e786b6a9d30d9" offset="0" />
+				<rom name="treeofknowledge-german(1983)(acornsoft)(e04).uef" size="11319" crc="c1b66b33" sha1="53bd97ccc48c5b00a1e57728800e786b6a9d30d9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="jars">
-		<description>Jars (Ger)</description>
+		<description>Kruege (Ger)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBE15" />
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="8325">
 				<rom name="jars-german(198x)(acornsoft)(e15).uef" size="8325" crc="943ba245" sha1="5a911796040eb708926d5c9e1aecb3d0e7ea546b" offset="0" />
@@ -163,4 +210,28 @@
 		</part>
 	</software>
 
+	<software name="wordhunt">
+		<description>Wort-Schatzsuche (Ger)</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBE05" />
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="10849">
+				<rom name="wordhunt-german(1983)(acornsoft)(e05).uef" size="10849" crc="e412d5af" sha1="3163432f2388b0795ec03b61ab77e90e37a3f18d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="wordseqg">
+		<description>Wortsalat (Ger)</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SBE06" />
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="10883">
+				<rom name="wordsequencing-german(1983)(acornsoft)(e06).uef" size="10883" crc="605ebb74" sha1="5d2b67151889a0fa90c490dd4db40d579a8fb386" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 </softwarelist>

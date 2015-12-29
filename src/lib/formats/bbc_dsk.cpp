@@ -352,7 +352,55 @@ const bbc_cpm_format::format bbc_cpm_format::formats[] =
 	{}
 };
 
+
+bbc_cpn_format::bbc_cpn_format() : wd177x_format(formats)
+{
+}
+
+const char *bbc_cpn_format::name() const
+{
+	return "cpn";
+}
+
+const char *bbc_cpn_format::description() const
+{
+	return "Torch CPN disk image";
+}
+
+const char *bbc_cpn_format::extensions() const
+{
+	return "dsd";
+}
+
+int bbc_cpn_format::identify(io_generic *io, UINT32 form_factor)
+{
+	int type = find_size(io, form_factor);
+
+	if(type != -1)
+		return 50;
+	return 0;
+}
+
+int bbc_cpn_format::get_image_offset(const format &f, int head, int track)
+{
+	if (f.sector_base_id == -1)
+		return (track * f.head_count + head) * compute_track_size(f);
+	else
+		return (f.track_count * head + track) * compute_track_size(f);
+}
+
+const bbc_cpn_format::format bbc_cpn_format::formats[] =
+{
+	{ // 400k 80 track double sided single density (interleaved) - gaps unverified
+		floppy_image::FF_525, floppy_image::DSQD, floppy_image::FM,
+		4000, 10, 80, 2, 256, {}, -1, { 0,1,2,3,4,5,6,7,8,9 }, 40, 10, 10
+	},
+	{}
+};
+
+
 const floppy_format_type FLOPPY_BBC_DFS_FORMAT = &floppy_image_format_creator<bbc_dfs_format>;
 const floppy_format_type FLOPPY_BBC_ADFS_FORMAT = &floppy_image_format_creator<bbc_adfs_format>;
 const floppy_format_type FLOPPY_BBC_DOS_FORMAT = &floppy_image_format_creator<bbc_dos_format>;
 const floppy_format_type FLOPPY_BBC_CPM_FORMAT = &floppy_image_format_creator<bbc_cpm_format>;
+const floppy_format_type FLOPPY_BBC_CPN_FORMAT = &floppy_image_format_creator<bbc_cpn_format>;
