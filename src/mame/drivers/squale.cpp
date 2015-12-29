@@ -818,7 +818,7 @@ static MACHINE_CONFIG_START( squale, squale_state )
 
 	MCFG_DEVICE_ADD("ef9365", EF9365, VIDEO_CLOCK)
 	MCFG_EF936X_PALETTE("palette")
-	MCFG_EF936X_BITPLANS_CNT(4);
+	MCFG_EF936X_BITPLANES_CNT(4);
 	MCFG_EF936X_DISPLAYMODE(EF936X_256x256_DISPLAY_MODE);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("squale_sl", squale_state, squale_scanline, "screen", 0, 10)
 
@@ -852,4 +852,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR   NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1984, squale, 0,      0,       squale,    squale,driver_device,   0,     "Apollo 7", "Squale",    MACHINE_TYPE_COMPUTER | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1984, squale, 0,      0,       squale,    squale,driver_device,   0,     "Apollo 7", "Squale",    MACHINE_TYPE_COMPUTER )
