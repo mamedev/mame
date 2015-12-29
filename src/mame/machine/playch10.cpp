@@ -739,7 +739,6 @@ WRITE8_MEMBER(playch10_state::eboard_rom_switch_w)
 
 DRIVER_INIT_MEMBER(playch10_state,pceboard)
 {
-	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
 	UINT8 *prg = memregion("cart")->base();
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
@@ -753,7 +752,7 @@ DRIVER_INIT_MEMBER(playch10_state,pceboard)
 	machine().device("cart")->memory().space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::eboard_rom_switch_w),this));
 
 	/* ppu_latch callback */
-	ppu->set_latch(ppu2c0x_latch_delegate(FUNC(playch10_state::mapper9_latch),this));
+	m_ppu->set_latch(ppu2c0x_latch_delegate(FUNC(playch10_state::mapper9_latch),this));
 
 	/* nvram at $6000-$6fff */
 	machine().device("cart")->memory().space(AS_PROGRAM).install_ram(0x6000, 0x6fff);
@@ -955,7 +954,6 @@ WRITE8_MEMBER(playch10_state::gboard_rom_switch_w)
 
 DRIVER_INIT_MEMBER(playch10_state,pcgboard)
 {
-	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
 	UINT8 *prg = memregion("cart")->base();
 	m_vram = nullptr;
 
@@ -981,7 +979,7 @@ DRIVER_INIT_MEMBER(playch10_state,pcgboard)
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
 
-	ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(playch10_state::gboard_scanline_cb),this));
+	m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(playch10_state::gboard_scanline_cb),this));
 }
 
 DRIVER_INIT_MEMBER(playch10_state,pcgboard_type2)
@@ -1100,6 +1098,8 @@ DRIVER_INIT_MEMBER(playch10_state,pchboard)
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
+	
+	m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(playch10_state::gboard_scanline_cb),this));
 }
 
 /**********************************************************************************/
