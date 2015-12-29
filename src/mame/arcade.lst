@@ -1484,7 +1484,7 @@ searthie        // bootleg
 invadrmr        // (c) 1978 Model Racing
 claybust        // (c) 1978 Model Racing
 gunchamp        // (c) 1980 Model Racing
-gunchamps       // (c) 1980 Model Racing (sshot.c)
+gunchamps       // (c) 1980 Model Racing (sshot.cpp)
 spaceatt        // (c) 1978 Video Games GmbH
 spaceattbp      // (c) 1978 Video Games GmbH
 spaceatt2k      // (c) 1978 Video Games GmbH
@@ -4373,7 +4373,7 @@ sspaceatc       // 139-146 (c)
 sspacaho        // ? epr00001.bin - epr00008.bin
 headon          // 163-167/192-193 (c) Gremlin
 headon1         // 163-167/192-193 (c) Gremlin
-headonb         // bootleg, headonb.c
+headonb         // bootleg, headonb.cpp
 headons         // Sidam bootleg
 headonsa        // Sidam bootleg
 headonmz        // bootleg
@@ -8290,17 +8290,17 @@ nouryokup       // (c) 1995 Tecmo
 arcadian        // (c) 1994 NMK
 raphero         // (c) 1994 Media Trading Corp
 
-// nmk16.c bootlegs using the Seibu Sound System
+// nmk16.cpp bootlegs using the Seibu Sound System
 mustangb        // bootleg
 mustangb2       // TAB Austria bootleg
 tdragonb        // bootleg
 
-// Comad games on unofficial hardware based on nmk16.c
+// Comad games on unofficial hardware based on nmk16.cpp
 ssmissin        // (c) 1992 Comad
 airattck        // (c) 1996 Comad
 airattcka       // (c) 1996 Comad
 
-// Bee-Oh games on unofficial hardware based on nmk16.c
+// Bee-Oh games on unofficial hardware based on nmk16.cpp
 manybloc        // (c) 1991 Bee-Oh
 
 // Jaleco Mahjong Games, Similar Hardware to the NMK ones above?
@@ -9185,7 +9185,6 @@ smashdrv        // (c) 2000
 /*
   Remaining Gaelco Games:
   =======================
-  1999: Rolling Extreme
   2000: Football Power
 */
 
@@ -9301,7 +9300,7 @@ mjyuugia        // (c) 1990 Visco
 ponchin         // (c) 1991 Visco
 ponchina        // (c) 1991 Visco
 
-// Seta 1st Generation HW (seta.c)
+// Seta 1st Generation HW (seta.cpp)
 tndrcade        // UA-0 (c) 1987 Taito
 tndrcadej       // UA-0 (c) 1987 Taito
 twineagl        // UA-2 (c) 1988 + Taito license
@@ -9370,7 +9369,7 @@ crazyfgt        // (c) 1998 Subsino
 inttoote        // (c) 1998 Coinmaster
 inttootea       // (c) 1998 Coinmaster
 
-// Seta 2nd Generation HW (seta2.c)
+// Seta 2nd Generation HW (seta2.cpp)
 gundamex        // (c) 1994 Banpresto
 grdians         // (c) 1995 Banpresto
 mj4simai        // (c) 1996 Maboroshi Ware
@@ -30681,7 +30680,7 @@ spss4240
 
 /* [BEGIN] pinball drivers */
 
-// allied.c
+// allied.cpp
 allied
 suprpick
 royclark
@@ -30695,7 +30694,7 @@ erosone
 circa33
 starshot
 
-// alvg.c
+// alvg.cpp
 
 agsoccer
 
@@ -30727,7 +30726,7 @@ fourx4
 */
 roadrunr
 
-// bingo.c
+// bingo.cpp
 cntinntl
 goldgame
 goldgkitb
@@ -30881,7 +30880,7 @@ babypac
 babypac2
 granny
 
-// by68701.c
+// by68701.cpp
 flashgdnp1
 flashgdnp2
 eballdlxp1
@@ -30889,7 +30888,7 @@ eballdlxp2
 eballdlxp3
 eballdlxp4
 
-// capcom.c
+// capcom.cpp
 abv106
 abv106r
 bbb109
@@ -30906,12 +30905,12 @@ pmv112r
 ghv101
 
 
-// de_1.c
+// de_1.cpp
 lwar_a83
 lwar_e90
 
 
-// de_2.c
+// de_2.cpp
 mnfb_c27
 poto_a32
 play_a24
@@ -30923,7 +30922,7 @@ tmac_a18
 torp_e21
 
 
-// de_3.c
+// de_3.cpp
 rab_320
 rab_130
 rab_103
@@ -30978,7 +30977,7 @@ wwfr_106
 wwfr_103
 
 
-// de_3b.c
+// de_3b.cpp
 batmanf
 batmanf3
 bmf_uk
@@ -31007,16 +31006,16 @@ detest
 ctcheese
 
 
-// flicker.c
+// flicker.cpp
 flicker
 
 
-// g627.c
+// g627.cpp
 rotation
 rota_115
 rota_101
 
-// gp_1.c
+// gp_1.cpp
 gp_110
 blvelvet
 camlight
@@ -31028,7 +31027,7 @@ rio
 startrip
 
 
-// gp_2.c
+// gp_2.cpp
 agent777
 andromep
 andromepa
@@ -31047,7 +31046,7 @@ suprnova
 vegasgp
 
 
-// gts1.c
+// gts1.cpp
 gts1
 gts1s
 astannie
@@ -31071,7 +31070,7 @@ hexagone
 sys1test
 
 
-// gts3.c
+// gts3.cpp
 barbwire
 bellring
 brooks
@@ -31125,7 +31124,7 @@ snspares
 snspares1
 
 
-// gts80.c
+// gts80.cpp
 blckhole
 blckhole2
 blckhols
@@ -31149,7 +31148,7 @@ vlcno_1a
 s80tst
 
 
-// gts80a.c
+// gts80a.cpp
 alienstr
 amazonh
 caveman
@@ -31174,7 +31173,7 @@ thegames
 touchdn
 
 
-// gts80b.c
+// gts80b.cpp
 arena
 badgirls
 bighouse
@@ -31202,7 +31201,7 @@ txsector
 victoryp
 
 
-// hankin.c
+// hankin.cpp
 fjholden
 howzat
 orbit1
@@ -31210,11 +31209,11 @@ shark
 empsback
 
 
-// icecold.c
+// icecold.cpp
 icecold
 zekepeak
 
-// inder.c
+// inder.cpp
 ind250cc
 atleta
 brvteam
@@ -31226,11 +31225,11 @@ pinmoonl
 lapbylap
 metalman
 
-// jeutel.c
+// jeutel.cpp
 leking
 olympic
 
-// jp.c
+// jp.cpp
 america
 aqualand
 faeton
@@ -31243,12 +31242,12 @@ halleya
 olympus
 
 
-// jvh.c
+// jvh.cpp
 escape
 movmastr
 
 
-// ltd.c
+// ltd.cpp
 alcapone
 atla_ltd
 bhol_ltd
@@ -31257,15 +31256,15 @@ cowboy
 pecmen
 zephy
 
-// micropin.c
+// micropin.cpp
 pentacup
 pentacup2
 
-// mephisto.c
+// mephisto.cpp
 mephistp
 mephistp1
 
-// mrgame.c
+// mrgame.cpp
 dakar
 motrshow
 motrshowa
@@ -31273,11 +31272,11 @@ macattck
 wcup90
 
 
-// nsm.c
+// nsm.cpp
 firebird
 
 
-// peyper.c
+// peyper.cpp
 odisea
 wolfman
 odin
@@ -31289,7 +31288,7 @@ gamatros
 nemesisp
 sonstwr2
 
-// play_1.c
+// play_1.cpp
 bigtown
 chance
 lastlap
@@ -31297,7 +31296,7 @@ spcgambl
 party
 
 
-// play_2.c
+// play_2.cpp
 antar
 antar2
 evlfight
@@ -31308,12 +31307,12 @@ madrace
 zira
 
 
-// play_3.c
+// play_3.cpp
 megaaton
 megaatona
 
 
-// play_5.c
+// play_5.cpp
 spain82
 nautilus
 theraid
@@ -31326,11 +31325,11 @@ trailer
 fldragon
 sklflite
 
-// rowamet.c
+// rowamet.cpp
 heavymtl
 
 
-// s11.c
+// s11.cpp
 gmine_l2
 grand_l4
 hs_l4
@@ -31345,7 +31344,7 @@ tts_l2
 tts_l1
 
 
-// s11a.c
+// s11a.cpp
 f14_l1
 f14_p3
 f14_p4
@@ -31358,7 +31357,7 @@ pb_l3
 pb_p4
 
 
-// s11b.c
+// s11b.cpp
 bcats_l5
 bcats_l2
 bnzai_l3
@@ -31408,7 +31407,7 @@ whirl_l2
 whirl_lg3
 
 
-// s11c.c
+// s11c.cpp
 bbnny_l2
 bbnny_lu
 diner_l4
@@ -31436,7 +31435,7 @@ gs_l4
 strax_p7
 
 
-// s3.c
+// s3.cpp
 httip_l1
 lucky_l1
 wldcp_l1
@@ -31444,7 +31443,7 @@ cntct_l1
 disco_l1
 
 
-// s4.c
+// s4.cpp
 flash_l1
 flash_l2
 flash_t1
@@ -31461,7 +31460,7 @@ bstrk_l1
 tstrk_l1
 
 
-// s6.c
+// s6.cpp
 blkou_l1
 blkou_t1
 blkou_f1
@@ -31480,14 +31479,14 @@ trizn_l1
 trizn_t1
 
 
-// s6a.c
+// s6a.cpp
 algar_l1
 alpok_l6
 alpok_l2
 alpok_f6
 
 
-// s7.c
+// s7.cpp
 vrkon_l1
 barra_l1
 bk_l4
@@ -31514,13 +31513,13 @@ thund_p3
 ratrc_l1
 
 
-// s8.c
+// s8.cpp
 pfevr_l2
 pfevr_p3
 scrzy_l1
 
 
-// s9.c
+// s9.cpp
 comet_l4
 comet_l5
 sorcr_l1
@@ -31530,7 +31529,7 @@ alcat_l7
 szone_l5
 szone_l2
 
-// sam.c
+// sam.cpp
 
 24_130
 24_140
@@ -31731,15 +31730,15 @@ wpt_1400gf
 wpt_1400i
 wpt_1400l
 
-// sleic.c
+// sleic.cpp
 sleicpin
 
 
-// spectra.c
+// spectra.cpp
 spectra
 
 
-// spinb.c
+// spinb.cpp
 bushido
 bushidoa
 jolypark
@@ -31747,7 +31746,7 @@ mach2
 vrnwrld
 
 
-// st_mp100.c
+// st_mp100.cpp
 princess
 dracula
 hothand
@@ -31762,7 +31761,7 @@ trident
 wildfyre
 
 
-// st_mp200.c
+// st_mp200.cpp
 ali
 biggame
 catacomp
@@ -31788,7 +31787,7 @@ blkshpsq
 st_game
 
 
-// taito.c
+// taito.cpp
 taitest
 cavnegro
 cavnegro1
@@ -31828,17 +31827,17 @@ zarza1
 mrblkz80
 
 
-// techno.c
+// techno.cpp
 xforce
 
 
-// vd.c
+// vd.cpp
 //ator - missing most of rom
 break86
 papillon
 
 
-// whitestar.c
+// whitestar.cpp
 apollo13
 apollo13_10
 aust301
@@ -32021,7 +32020,7 @@ monopred
 wackadoo
 
 
-// white_mod.c
+// white_mod.cpp
 elvisp
 elvisp4
 elvisp303
@@ -32176,11 +32175,11 @@ sopranoi_300
 sopranoi_107
 
 
-// wico.c
+// wico.cpp
 aftor
 
 
-// wpc_95.c
+// wpc_95.cpp
 tf95_12
 afm_113
 afm_113b
@@ -32245,7 +32244,7 @@ cp_15
 ttt_10
 
 
-// wpc_an.c
+// wpc_an.cpp
 tfa_13
 dd_p7
 dd_p06
@@ -32265,7 +32264,7 @@ bop_l3
 bop_l2
 
 
-// wpc_dcs.c
+// wpc_dcs.cpp
 dm_lx4
 dm_pa2
 dm_px5
@@ -32300,7 +32299,7 @@ sttng_l3
 afv_l4
 
 
-// wpc_dot.c
+// wpc_dot.cpp
 tfdmd_l3
 gi_l9
 gi_l3
@@ -32321,7 +32320,7 @@ t2_l3
 t2_l2
 
 
-// wpc_flip1.c
+// wpc_flip1.cpp
 taf_l5
 taf_p2
 taf_l1
@@ -32333,7 +32332,7 @@ taf_l6
 taf_h4
 
 
-// wpc_flip2.c
+// wpc_flip2.cpp
 br_l4
 br_p17
 br_l1
@@ -32385,7 +32384,7 @@ strik_l4
 lc_11
 
 
-// wpc_s.c
+// wpc_s.cpp
 corv_21
 corv_px4
 corv_lx1
@@ -32445,7 +32444,7 @@ wcs_p3
 tfs_12
 
 
-// zac_1.c
+// zac_1.cpp
 ewf
 firemntn
 futurwld
@@ -32459,7 +32458,7 @@ stargoda
 wsports
 
 
-// zac_2.c
+// zac_2.cpp
 bbeltzac
 clown
 dvlrider
@@ -32500,7 +32499,7 @@ tmachzacf
 zankor
 
 
-// zac_proto.c
+// zac_proto.cpp
 skijump
 spacecty
 strike
