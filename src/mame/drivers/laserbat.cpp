@@ -669,7 +669,11 @@ ROM_START( catnmous )
 	ROM_LOAD( "type01.11g",   0x1000, 0x0800, CRC(2999f378) SHA1(929082383b2b0006de171587adb932ce57316963) )
 
 	ROM_REGION( 0x0800, "gfx2", 0 )
-	ROM_LOAD( "type01.14l",   0x0000, 0x0800, CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
+	// This needs double checking, might be a case of the wrong ROM type being marked on the PCB like with the final program rom.
+	// Flyers indicate there should be an 'old lady' character, and even show a graphic for one approaching from the right.
+	// This graphic is not present in our ROM and instead we get incorrect looking sprites, so the rom could be half size with
+	// an additional sprite bank bit coming from somewhere?
+	ROM_LOAD( "type01.14l",   0x0000, 0x0800, BAD_DUMP CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
 
 	ROM_REGION( 0x0100, "gfxmix", 0 )
 	ROM_LOAD( "82s100.13m",   0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) )
@@ -710,7 +714,8 @@ ROM_START( catnmousa )
 	ROM_LOAD( "catnmous.11g", 0x1000, 0x0800, CRC(2999f378) SHA1(929082383b2b0006de171587adb932ce57316963) )
 
 	ROM_REGION( 0x0800, "gfx2", 0 )
-	ROM_LOAD( "catnmous.14l", 0x0000, 0x0800, CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
+	// see comment in parent set
+	ROM_LOAD( "catnmous.14l", 0x0000, 0x0800, BAD_DUMP CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
 
 	ROM_REGION( 0x0100, "gfxmix", 0 )
 	// copied from parent set to give working graphics, need dump to confirm
