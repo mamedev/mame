@@ -8294,14 +8294,13 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x10000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x040000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2425.u77",  0x00000, 0x10000, BAD_DUMP CRC(3decf667) SHA1(1a30cbe616b2a833d2cec6f24fc0f9abb1dda051) ) /* One of these 2 are wrong! */
-	ROM_LOAD( "mgo-cg2425.u78",  0x10000, 0x10000, BAD_DUMP CRC(3decf667) SHA1(1a30cbe616b2a833d2cec6f24fc0f9abb1dda051) ) /* One of these 2 are wrong! */
+	ROM_LOAD( "mro-cg2425.u77",  0x00000, 0x10000, CRC(3decf667) SHA1(1a30cbe616b2a833d2cec6f24fc0f9abb1dda051) )
+	ROM_LOAD( "mgo-cg2425.u78",  0x10000, 0x10000, CRC(ace9cb0c) SHA1(dbb7a3b95bc303df3c7932422d1803502671d92c) )
 	ROM_LOAD( "mbo-cg2425.u79",  0x20000, 0x10000, CRC(6ec83d3a) SHA1(07acb0ed3bb0108b72ff27bbbfb5bcbb006a510e) )
 	ROM_LOAD( "mxo-cg2425.u80",  0x30000, 0x10000, CRC(4dbee1a7) SHA1(8281ce452c1d418f671ed8c5aa833f8d8ca3f247) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "capx2367.u43", 0x0000, 0x0200, NO_DUMP )
-	ROM_LOAD( "capx2307.u43", 0x0000, 0x0200, CRC(58d81338) SHA1(f0044ebbd0128d6fb74d850528ef02730c180f00) )
+	ROM_LOAD( "capx2367.u43", 0x0000, 0x0200, CRC(9631bfc9) SHA1(bdb4e5c069ed2a447c1709727cc74842a1b83a7c) )
 ROM_END
 
 ROM_START( pex0057p ) /* Superboard : Deuces Wild Poker (X000057P+XP000038) - PSR Verified */
@@ -11625,6 +11624,11 @@ ROM_END
 
 ROM_START( pex2412p ) /* Superboard : Standard Draw with 5 decks - Two Pair or Better (X002412P+XP000096) - PSR Verified */
 /*
+                Same          Same            Same Same            Same
+                Suit          Suit            Suit Suit            Suit
+PayTable   2PR  2PR  3K   STR  3K  FL  FH  4K  FH   4K  SF  5K  RF  5K  (Bonus)
+-------------------------------------------------------------------------------
+  ????      1    2    2    3    4   4   6  10  12   20  50  60 250 1000   800
   % Range: 93.7-95.7%  Optimum: 97.7%  Hit Frequency: 44.6%
      Programs Available: X002412P
 
@@ -12134,6 +12138,32 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "pp0819_data_a5w-a6f.u66",   0x00000, 0x10000, CRC(636ceb06) SHA1(ca0f7e67f6c86d6aed2bbed2a70372b5d5799bb8) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2245.u77",  0x00000, 0x8000, CRC(60461758) SHA1(856aa5a2ec2d3dece8a94cd6c58ff0e2941d61b3) )
+	ROM_LOAD( "mgo-cg2245.u78",  0x08000, 0x8000, CRC(d4939806) SHA1(2852ec153da620868330d0d51b73c779ee6cfc49) )
+	ROM_LOAD( "mbo-cg2245.u79",  0x10000, 0x8000, CRC(86b2977b) SHA1(a086c05afeb6b2658975f06c33aa768efef92688) )
+	ROM_LOAD( "mxo-cg2245.u80",  0x18000, 0x8000, CRC(fd95acea) SHA1(be8feb17e22915951ff9b68150674e369ea95758) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx733.u43", 0x0000, 0x0200, CRC(867efa71) SHA1(f9e303dfaa43d5e44dbd1671b3269c1a658dea89) )
+ROM_END
+
+ROM_START( pekoc822 ) /* Superboard :  Standard Draw Poker - Key On Credit */
+/*
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+  ????      1    2    3    4    6   9  25  50 250   1000
+  % Range: 96.1-98.1%  Optimum: 100.1%  Hit Frequency: 45.2%
+     Programs Available: PP0822 A5W-A6F
+
+Same as US paytable CB
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0822_a5w-a6f.u67",   0x00000, 0x10000, CRC(b8034351) SHA1(78a2c5c67526ff734c7794301c0204a16d9b1fd8) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "pp0822_data_a5w-a6f.u66",   0x00000, 0x10000, CRC(636ceb06) SHA1(ca0f7e67f6c86d6aed2bbed2a70372b5d5799bb8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2245.u77",  0x00000, 0x8000, CRC(60461758) SHA1(856aa5a2ec2d3dece8a94cd6c58ff0e2941d61b3) )
@@ -13254,7 +13284,7 @@ GAMEL(1995, pex0055pp, pex0055p,  peplus,  peplus_poker, peplus_state, peplussb,
 GAMEL(1995, pex0055pq, pex0055p,  peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000109) Deuces Wild Poker",   0, layout_pe_poker )
 GAMEL(1995, pex0055pr, pex0055p,  peplus,  peplus_poker, peplus_state, pepluss64,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000126) Deuces Wild Poker",   0, layout_pe_poker )
 GAMEL(1995, pex0055ps, pex0055p,  peplus,  peplus_poker, peplus_state, pepluss64,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000132) Deuces Wild Poker",   0, layout_pe_poker )
-GAMEL(1995, pex0055pt, pex0055p,  peplus,  peplus_poker, peplus_state, pepluss64,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000137) Deuces Wild Poker",   MACHINE_WRONG_COLORS, layout_pe_poker ) /* CAPX2367 not dumped */
+GAMEL(1995, pex0055pt, pex0055p,  peplus,  peplus_poker, peplus_state, pepluss64,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000137) Deuces Wild Poker",   0, layout_pe_poker )
 GAMEL(1995, pex0057p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker",   0, layout_pe_poker )
 GAMEL(1995, pex0057pa, pex0057p,  peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (The Orleans)", 0, layout_pe_poker )
 GAMEL(1995, pex0057pb, pex0057p,  peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000057P+XP000038) Deuces Wild Poker (The Fun Ships)", MACHINE_WRONG_COLORS, layout_pe_poker ) /* CAPX2399 not dumped */
@@ -13402,6 +13432,7 @@ GAMEL(1995, pekoc804,  0,         peplus,  peplus_poker, peplus_state, peplussb,
 GAMEL(1995, pekoc806,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0806 A5W-A6F) Standard Draw Poker",  0, layout_pe_poker )
 GAMEL(1995, pekoc818,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0818 A5W-A6F) Joker Poker (Aces or Better)", 0, layout_pe_poker )
 GAMEL(1995, pekoc819,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0819 A5W-A6F) Bonus Poker Deluxe",   0, layout_pe_poker )
+GAMEL(1995, pekoc822,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0822 A5W-A6F) Standard Draw Poker",  0, layout_pe_poker )
 GAMEL(1995, pekoc825,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0825 A59-A7C) White Hot Aces",       0, layout_pe_poker )
 
 /* Superboard : Multi-Poker */
