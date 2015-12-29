@@ -9,9 +9,13 @@
     The two games have identical game/video boards hardware, but
     completely different sound boards.  Laser Battle/Lazarian have a
     dumb sound board with TMS organ and CSG chips driven directly by the
-    game program.  Cat'N'Mouse
-    very different and they don't use the collision detection provided
-    by the s2636 chips.
+    game program.  Cat and Mouse uses an intelligent sound board with
+    its own CPU that plays melodies on a pair of AY-3-8910 PSGs.
+
+    The video hardware uses a PLA to mix TTL-generated background,
+    effect and sprite layers with the S2636 PVI outputs.  The collision
+    detection and interrupt generation capabilities of the S2636 PVIs
+    are not used.
 
     Game board supports two different sound board interfaces: 16-bit
     unidirectional bus on J3 and 8-bit bidirectional bus on J7.
