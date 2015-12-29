@@ -83,11 +83,11 @@ class bbc_cpn_format : public wd177x_format
 public:
 	bbc_cpn_format();
 
-	virtual int identify(io_generic *io, UINT32 form_factor);
-	virtual int get_image_offset(const format &f, int head, int track);
-	virtual const char *name() const;
-	virtual const char *description() const;
-	virtual const char *extensions() const;
+	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual int get_image_offset(const format &f, int head, int track) override;
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
 
 private:
 	static const format formats[];
