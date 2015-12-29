@@ -3,20 +3,77 @@
 
 /*********************************************************************
 
-    ef9365.c
+	ef9365.c
 
-    Thomson EF9365/EF9366 video controller emulator code
+	Thomson EF9365/EF9366 video controller emulator code
 
+	The EF9365/EF9366 is a video controller driving a frame buffer
+	and having built-in vectors and characters drawing engines.
+	This is natively a "black and white" chip (1 bitplane),
+	but it is possible to add more bitplanes to have colors with a
+	hardware trick. The system don't have direct access to the video
+	memory, but indirect access is possible through the 0x0F command
+	and some hardware glue logics.
+	The current implementation emulate the main functions :
+
+	Video modes supported (Hardware implementation dependent):
+		- 256 x 256 (EF9365 with 4 bits shifters per bitplane and FMAT to VSS)
+		- 512 x 512 interlaced (EF9365 with 8 bits shifters per bitplane and FMAT to VCC)
+		- 512 x 256 non interlaced (EF9366 with 8 bits shifters per bitplane)
+		- 128 x 128 (EF9365 with 2 bits shifters per bitplane and FMAT to VSS)
+		- 64 x 64 (EF9365 with FMAT to VSS)
+
+		- 1 bitplane up to 8 bitplanes hardware configuration.
+		- 2 up to 256 colors fixed palette.
+
+	Character & block drawing :
+		- Normal / Titled mode
+		- Horizontal / Vertical orientation
+		- P & Q Zoom factors (1 up to 16)
+
+	Vector drawing :
+		- Normal / Dotted / Dashed / Dotted-Dashed mode
+		- All directions and size supported.
+
+	General :
+		- Clear Screen
+		- Fill Screen
+		- Clear X & Y registers
+		- Video RAM readback supported (Command 0x0F)
+
+	What is NOT yet currently implemented:
+		- Light pen support
+		(To be done when i will find a software using the lightpen)
+
+	What is implemented but not really tested:
+		- Interrupts output.
+		My target system (Squale Apollo 7) doesn't use the interruption
+		for this chip. So i add the interrupt line support, but
+		bug(s) is possible.
+
+	The needed charset file charset_ef9365.rom (CRC 8d3053be) is available
+	there : http://hxc2001.free.fr/Squale/rom/charset_ef9365.zip
+	This ROM charset is into the EF9365/EF9366.
+
+	To see how to use this driver, have a look to the Squale machine
+	driver (squale.cpp).
+	If you have any question, don't hesitate to contact me at the email
+	present on this website : http://hxc2001.free.fr/
+
+	12/29/2015
+	Jean-François DEL NERO
 *********************************************************************/
 
 #include "emu.h"
 #include "ef9365.h"
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
 #ifdef DBGMODE
+//-------------------------------------------------
+// Some debug mode const strings
+// to trace the commands and registers accesses.
+//-------------------------------------------------
+
+// Registers list
 const char * register_names[]=
 {
 	"0x00 - CMD / STATUS",
@@ -30,13 +87,14 @@ const char * register_names[]=
 	"0x08 - X MSBs      ",
 	"0x09 - X LSBs      ",
 	"0x0A - Y MSBs      ",
-	"0x0B - X MSBs      ",
+	"0x0B - Y LSBs      ",
 	"0x0C - XLP         ",
 	"0x0D - YLP         ",
 	"0x0E - RESERVED    ",
 	"0x0F - RESERVED    "
 };
 
+// Commands list
 const char * commands_names[]=
 {
 	"0x00 - Set bit 1 of CTRL1   : Pen selection",
@@ -66,10 +124,12 @@ const char * commands_names[]=
 // devices
 const device_type EF9365 = &device_creator<ef9365_device>;
 
+//-------------------------------------------------
 // default address map
-// Up to 512*512 per bitplan
+// Up to 512*512 per bitplane, 8 bitplanes max.
+//-------------------------------------------------
 static ADDRESS_MAP_START( ef9365, AS_0, 8, ef9365_device )
-	AM_RANGE(0x00000, ( ( EF936X_BITPLAN_MAX_SIZE * EF936X_MAX_BITPLANS ) - 1 ) ) AM_RAM
+	AM_RANGE(0x00000, ( ( EF936X_BITPLANE_MAX_SIZE * EF936X_MAX_BITPLANES ) - 1 ) ) AM_RAM
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -117,15 +177,15 @@ void ef9365_device::static_set_palette_tag(device_t &device, const char *tag)
 }
 
 //-------------------------------------------------
-//  static_set_nb_of_bitplans: Set the number of bitplans
+//  static_set_nb_of_bitplanes: Set the number of bitplanes
 //-------------------------------------------------
 
-void ef9365_device::static_set_nb_bitplans(device_t &device, int nb_bitplans )
+void ef9365_device::static_set_nb_bitplanes(device_t &device, int nb_bitplanes )
 {
-	if( nb_bitplans > 0 && nb_bitplans <= 8 )
+	if( nb_bitplanes > 0 && nb_bitplanes <= 8 )
 	{
-		downcast<ef9365_device &>(device).nb_of_bitplans = nb_bitplans;
-		downcast<ef9365_device &>(device).nb_of_colors = pow(2,nb_bitplans);
+		downcast<ef9365_device &>(device).nb_of_bitplanes = nb_bitplanes;
+		downcast<ef9365_device &>(device).nb_of_colors = pow(2,nb_bitplanes);
 	}
 }
 
@@ -138,30 +198,44 @@ void ef9365_device::static_set_display_mode(device_t &device, int display_mode )
 	switch(display_mode)
 	{
 		case EF936X_256x256_DISPLAY_MODE:
-			downcast<ef9365_device &>(device).bitplan_xres = 256;
-			downcast<ef9365_device &>(device).bitplan_yres = 256;
+			downcast<ef9365_device &>(device).bitplane_xres = 256;
+			downcast<ef9365_device &>(device).bitplane_yres = 256;
 			downcast<ef9365_device &>(device).vsync_scanline_pos = 250;
 			downcast<ef9365_device &>(device).overflow_mask_x = 0xFF00;
 			downcast<ef9365_device &>(device).overflow_mask_y = 0xFF00;
 		break;
 		case EF936X_512x512_DISPLAY_MODE:
-			downcast<ef9365_device &>(device).bitplan_xres = 512;
-			downcast<ef9365_device &>(device).bitplan_yres = 512;
+			downcast<ef9365_device &>(device).bitplane_xres = 512;
+			downcast<ef9365_device &>(device).bitplane_yres = 512;
 			downcast<ef9365_device &>(device).vsync_scanline_pos = 506;
 			downcast<ef9365_device &>(device).overflow_mask_x = 0xFE00;
 			downcast<ef9365_device &>(device).overflow_mask_y = 0xFE00;
 		break;
 		case EF936X_512x256_DISPLAY_MODE:
-			downcast<ef9365_device &>(device).bitplan_xres = 512;
-			downcast<ef9365_device &>(device).bitplan_yres = 256;
+			downcast<ef9365_device &>(device).bitplane_xres = 512;
+			downcast<ef9365_device &>(device).bitplane_yres = 256;
 			downcast<ef9365_device &>(device).vsync_scanline_pos = 250;
 			downcast<ef9365_device &>(device).overflow_mask_x = 0xFE00;
 			downcast<ef9365_device &>(device).overflow_mask_y = 0xFF00;
 		break;
+		case EF936X_128x128_DISPLAY_MODE:
+			downcast<ef9365_device &>(device).bitplane_xres = 128;
+			downcast<ef9365_device &>(device).bitplane_yres = 128;
+			downcast<ef9365_device &>(device).vsync_scanline_pos = 124;
+			downcast<ef9365_device &>(device).overflow_mask_x = 0xFF80;
+			downcast<ef9365_device &>(device).overflow_mask_y = 0xFF80;
+		break;
+		case EF936X_64x64_DISPLAY_MODE:
+			downcast<ef9365_device &>(device).bitplane_xres = 64;
+			downcast<ef9365_device &>(device).bitplane_yres = 64;
+			downcast<ef9365_device &>(device).vsync_scanline_pos = 62;
+			downcast<ef9365_device &>(device).overflow_mask_x = 0xFFC0;
+			downcast<ef9365_device &>(device).overflow_mask_y = 0xFFC0;
+		break;
 		default:
 			downcast<ef9365_device &>(device).logerror("Invalid EF9365 Display mode: %02x\n", display_mode);
-			downcast<ef9365_device &>(device).bitplan_xres = 256;
-			downcast<ef9365_device &>(device).bitplan_yres = 256;
+			downcast<ef9365_device &>(device).bitplane_xres = 256;
+			downcast<ef9365_device &>(device).bitplane_yres = 256;
 			downcast<ef9365_device &>(device).vsync_scanline_pos = 250;
 			downcast<ef9365_device &>(device).overflow_mask_x = 0xFF00;
 			downcast<ef9365_device &>(device).overflow_mask_y = 0xFF00;
@@ -224,7 +298,7 @@ void ef9365_device::device_start()
 		palette[i] = rgb_t(255, 255, 255);
 	}
 
-	m_screen_out.allocate( bitplan_xres, m_screen->height() );
+	m_screen_out.allocate( bitplane_xres, m_screen->height() );
 
 	save_item(NAME(m_border));
 	save_item(NAME(m_registers));
@@ -242,6 +316,7 @@ void ef9365_device::device_start()
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
+
 void ef9365_device::device_reset()
 {
 	m_state = 0;
@@ -278,10 +353,10 @@ void ef9365_device::update_interrupts()
 	}
 }
 
-
 //-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
+
 void ef9365_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
@@ -300,22 +375,38 @@ void ef9365_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-// set busy flag and timer to clear it
+//-------------------------------------------------
+//  set_busy_flag: set busy flag and
+//  timer to clear it
+//-------------------------------------------------
+
 void ef9365_device::set_busy_flag(int period)
 {
 	m_bf = 1;
 	m_busy_timer->adjust(attotime::from_usec(period));
 }
 
+//-------------------------------------------------
+//  get_x_reg: Get the X register value
+//-------------------------------------------------
+
 unsigned int ef9365_device::get_x_reg()
 {
 	return (m_registers[EF936X_REG_X_MSB]<<8) | m_registers[EF936X_REG_X_LSB];
 }
 
+//-------------------------------------------------
+//  get_y_reg: Get the Y register value
+//-------------------------------------------------
+
 unsigned int ef9365_device::get_y_reg()
 {
 	return (m_registers[EF936X_REG_Y_MSB]<<8) | m_registers[EF936X_REG_Y_LSB];
 }
+
+//-------------------------------------------------
+//  set_x_reg: Set the X register value
+//-------------------------------------------------
 
 void ef9365_device::set_x_reg(unsigned int x)
 {
@@ -323,16 +414,23 @@ void ef9365_device::set_x_reg(unsigned int x)
 	m_registers[EF936X_REG_X_LSB] = x & 0xFF;
 }
 
+//-------------------------------------------------
+//  set_y_reg: Set the Y register value
+//-------------------------------------------------
+
 void ef9365_device::set_y_reg(unsigned int y)
 {
 	m_registers[EF936X_REG_Y_MSB] = y >> 8;
 	m_registers[EF936X_REG_Y_LSB] = y & 0xFF;
 }
 
-// set then ef9365 mode
+//-------------------------------------------------
+//  set_video_mode: Set output screen format
+//-------------------------------------------------
+
 void ef9365_device::set_video_mode(void)
 {
-	UINT16 new_width = bitplan_xres;
+	UINT16 new_width = bitplane_xres;
 
 	if (m_screen->width() != new_width)
 	{
@@ -346,51 +444,89 @@ void ef9365_device::set_video_mode(void)
 	memset(m_border, 0, sizeof(m_border));
 }
 
+//-------------------------------------------------
+//  get_last_readback_word: Read back the latched
+//  bitplane words
+//-------------------------------------------------
+
+UINT8 ef9365_device::get_last_readback_word(int bitplane_number, int * pixel_offset)
+{
+	if( pixel_offset )
+		*pixel_offset = m_readback_latch_pix_offset;
+
+	if( bitplane_number < nb_of_bitplanes )
+	{
+		return m_readback_latch[bitplane_number];
+	}
+	else
+	{
+		return 0x00;
+	}
+}
+
+//-------------------------------------------------
+//  draw_border: Draw the left and right borders
+//  ( No border for the moment ;) )
+//-------------------------------------------------
+
 void ef9365_device::draw_border(UINT16 line)
 {
 
 }
 
+//-------------------------------------------------
+//  plot: Plot a pixel to the bitplanes
+//  at the x & y position with the m_current_color color
+//-------------------------------------------------
+
 void ef9365_device::plot(int x_pos,int y_pos)
 {
 	int p;
 
-	if( ( x_pos >= 0 && y_pos >= 0 ) && ( x_pos < bitplan_xres && y_pos < bitplan_yres ) )
+	if( ( x_pos >= 0 && y_pos >= 0 ) && ( x_pos < bitplane_xres && y_pos < bitplane_yres ) )
 	{
 		if ( m_registers[EF936X_REG_CTRL1] & 0x01 )
 		{
-			y_pos = ( (bitplan_yres - 1) - y_pos );
+			y_pos = ( (bitplane_yres - 1) - y_pos );
 
 			if( (m_registers[EF936X_REG_CTRL1] & 0x02) )
 			{
 				// Pen
-				for( p = 0 ; p < nb_of_bitplans ; p++ )
+				for( p = 0 ; p < nb_of_bitplanes ; p++ )
 				{
 					if( m_current_color & (0x01 << p) )
-						m_videoram->write_byte ( (EF936X_BITPLAN_MAX_SIZE*p) + (((y_pos*bitplan_xres) + x_pos)>>3), m_videoram->read_byte( (EF936X_BITPLAN_MAX_SIZE*p) + (((y_pos*bitplan_xres) + x_pos)>>3)) |  (0x80 >> (((y_pos*bitplan_xres) + x_pos)&7) ) );
+						m_videoram->write_byte ( (EF936X_BITPLANE_MAX_SIZE*p) + (((y_pos*bitplane_xres) + x_pos)>>3), m_videoram->read_byte( (EF936X_BITPLANE_MAX_SIZE*p) + (((y_pos*bitplane_xres) + x_pos)>>3)) |  (0x80 >> (((y_pos*bitplane_xres) + x_pos)&7) ) );
 					else
-						m_videoram->write_byte ( (EF936X_BITPLAN_MAX_SIZE*p) + (((y_pos*bitplan_xres) + x_pos)>>3), m_videoram->read_byte( (EF936X_BITPLAN_MAX_SIZE*p) + (((y_pos*bitplan_xres) + x_pos)>>3)) & ~(0x80 >> (((y_pos*bitplan_xres) + x_pos)&7) ) );
+						m_videoram->write_byte ( (EF936X_BITPLANE_MAX_SIZE*p) + (((y_pos*bitplane_xres) + x_pos)>>3), m_videoram->read_byte( (EF936X_BITPLANE_MAX_SIZE*p) + (((y_pos*bitplane_xres) + x_pos)>>3)) & ~(0x80 >> (((y_pos*bitplane_xres) + x_pos)&7) ) );
 				}
 			}
 			else
 			{
 				// Eraser
-				for( p = 0 ; p < nb_of_bitplans ; p++ )
+				for( p = 0 ; p < nb_of_bitplanes ; p++ )
 				{
-					m_videoram->write_byte ( (EF936X_BITPLAN_MAX_SIZE*p) + (((y_pos*bitplan_xres) + x_pos)>>3), m_videoram->read_byte( (EF936X_BITPLAN_MAX_SIZE*p) + (((y_pos*bitplan_xres) + x_pos)>>3)) | (0x80 >> (((y_pos*bitplan_xres) + x_pos)&7) ) );
+					m_videoram->write_byte ( (EF936X_BITPLANE_MAX_SIZE*p) + (((y_pos*bitplane_xres) + x_pos)>>3), m_videoram->read_byte( (EF936X_BITPLANE_MAX_SIZE*p) + (((y_pos*bitplane_xres) + x_pos)>>3)) | (0x80 >> (((y_pos*bitplane_xres) + x_pos)&7) ) );
 				}
 			}
 		}
 	}
 }
 
+
 const static unsigned int vectortype_code[][8] =
 {
 	{0xFF,0x00,0x00,0x00,0x00,0x00,0x00,0x00}, // Continous drawing
-	{0x82,0x02,0x00,0x00,0x00,0x00,0x00,0x00}, // dotted - 2 dots on, 2 dots off
-	{0x84,0x04,0x00,0x00,0x00,0x00,0x00,0x00}, // dashed - 4 dots on, 4 dots off
-	{0x8A,0x02,0x82,0x02,0x00,0x00,0x00,0x00}  // dotted-dashed - 10 dots on, 2 dots off, 2 dots on, 2 dots off
+	{0x82,0x02,0x00,0x00,0x00,0x00,0x00,0x00}, // Dotted - 2 dots on, 2 dots off
+	{0x84,0x04,0x00,0x00,0x00,0x00,0x00,0x00}, // Dashed - 4 dots on, 4 dots off
+	{0x8A,0x02,0x82,0x02,0x00,0x00,0x00,0x00}  // Dotted-Dashed - 10 dots on, 2 dots off, 2 dots on, 2 dots off
 };
+
+//-------------------------------------------------
+//  draw_vector: Vector drawing function
+//  from the x1 & y1 position to the x2 & y2 position
+//  with the m_current_color color
+//  (Bresenham's line algorithm)
+//-------------------------------------------------
 
 int ef9365_device::draw_vector(int x1,int y1,int x2,int y2)
 {
@@ -578,6 +714,11 @@ int ef9365_device::draw_vector(int x1,int y1,int x2,int y2)
 	return compute_cycles;
 }
 
+//-------------------------------------------------
+//  get_char_pix: Get a character pixel state
+//  from the charset.
+//-------------------------------------------------
+
 int ef9365_device::get_char_pix( unsigned char c, int x, int y )
 {
 	int char_base,char_pix;
@@ -598,6 +739,12 @@ int ef9365_device::get_char_pix( unsigned char c, int x, int y )
 
 	return 0;
 }
+
+//-------------------------------------------------
+//  draw_character: Character and block drawing function
+//  Set smallblock to draw a 4x4 block
+//  Set block to draw a 5x8 block
+//-------------------------------------------------
 
 int ef9365_device::draw_character( unsigned char c, int block, int smallblock )
 {
@@ -704,10 +851,51 @@ int ef9365_device::draw_character( unsigned char c, int block, int smallblock )
 	return compute_cycles;
 }
 
+//-------------------------------------------------
+//  cycles_to_us: Convert a number of clock cycles to us
+//-------------------------------------------------
+
 int ef9365_device::cycles_to_us(int cycles)
 {
 	return ( (float)cycles * ( (float)1000000 / (float)clock_freq ) );
 }
+
+//-------------------------------------------------
+// dump_bitplanes_word: Latch the bitplane words
+// pointed by the x & y regiters
+// (Memory read back function)
+//-------------------------------------------------
+
+void ef9365_device::dump_bitplanes_word()
+{
+	int p;
+	int pixel_ptr;
+
+	pixel_ptr = ( ( ( ( bitplane_yres - 1 ) - ( get_y_reg() & ( bitplane_yres - 1 ) ) ) * bitplane_xres ) + ( get_x_reg() & ( bitplane_xres - 1 ) ) );
+
+	#ifdef DBGMODE
+	printf("dump : x = %d , y = %d\n", get_x_reg() ,get_y_reg());
+	#endif
+
+	for( p = 0; p < nb_of_bitplanes ; p++ )
+	{
+		if( pixel_ptr & 0x4 )
+		{
+			m_readback_latch[p] = ( m_videoram->read_byte( (EF936X_BITPLANE_MAX_SIZE*p) + (pixel_ptr>>3) )  ) & 0xF ;
+		}
+		else
+		{
+			m_readback_latch[p] = ( m_videoram->read_byte( (EF936X_BITPLANE_MAX_SIZE*p) + (pixel_ptr>>3) ) >> 4 ) & 0xF ;
+		}
+
+	}
+
+	m_readback_latch_pix_offset = pixel_ptr & 0x3;
+}
+
+//-------------------------------------------------
+// screen_scanning: Fill / Clear framebuffer memory
+//-------------------------------------------------
 
 void ef9365_device::screen_scanning( int force_clear )
 {
@@ -715,36 +903,39 @@ void ef9365_device::screen_scanning( int force_clear )
 
 	if( (m_registers[EF936X_REG_CTRL1] & 0x02) && !force_clear )
 	{
-		for( y = 0; y < bitplan_yres; y++ )
+		for( y = 0; y < bitplane_yres; y++ )
 		{
-			for( x = 0; x < bitplan_xres; x++ )
+			for( x = 0; x < bitplane_xres; x++ )
 			{
-				for( p = 0 ; p < nb_of_bitplans ; p++ )
+				for( p = 0 ; p < nb_of_bitplanes ; p++ )
 				{
 					if( m_current_color & (0x01 << p) )
-						m_videoram->write_byte ( (EF936X_BITPLAN_MAX_SIZE*p) + (((y*bitplan_xres) + x)>>3), m_videoram->read_byte( (EF936X_BITPLAN_MAX_SIZE*p) + (((y*bitplan_xres) + x)>>3)) |  (0x80 >> (((y*bitplan_xres) + x)&7) ) );
+						m_videoram->write_byte ( (EF936X_BITPLANE_MAX_SIZE*p) + (((y*bitplane_xres) + x)>>3), m_videoram->read_byte( (EF936X_BITPLANE_MAX_SIZE*p) + (((y*bitplane_xres) + x)>>3)) |  (0x80 >> (((y*bitplane_xres) + x)&7) ) );
 					else
-						m_videoram->write_byte ( (EF936X_BITPLAN_MAX_SIZE*p) + (((y*bitplan_xres) + x)>>3), m_videoram->read_byte( (EF936X_BITPLAN_MAX_SIZE*p) + (((y*bitplan_xres) + x)>>3)) & ~(0x80 >> (((y*bitplan_xres) + x)&7) ) );
+						m_videoram->write_byte ( (EF936X_BITPLANE_MAX_SIZE*p) + (((y*bitplane_xres) + x)>>3), m_videoram->read_byte( (EF936X_BITPLANE_MAX_SIZE*p) + (((y*bitplane_xres) + x)>>3)) & ~(0x80 >> (((y*bitplane_xres) + x)&7) ) );
 				}
 			}
 		}
 	}
 	else
 	{
-		for( y = 0; y < bitplan_yres; y++)
+		for( y = 0; y < bitplane_yres; y++)
 		{
-			for( x = 0; x < bitplan_xres; x++)
+			for( x = 0; x < bitplane_xres; x++)
 			{
-				for( p = 0 ; p < nb_of_bitplans ; p++ )
+				for( p = 0 ; p < nb_of_bitplanes ; p++ )
 				{
-					m_videoram->write_byte ( (EF936X_BITPLAN_MAX_SIZE*p) + (((y*bitplan_xres) + x)>>3), m_videoram->read_byte( (EF936X_BITPLAN_MAX_SIZE*p) + (((y*bitplan_xres) + x)>>3)) | (0x80 >> (((y*bitplan_xres) + x)&7) ) );
+					m_videoram->write_byte ( (EF936X_BITPLANE_MAX_SIZE*p) + (((y*bitplane_xres) + x)>>3), m_videoram->read_byte( (EF936X_BITPLANE_MAX_SIZE*p) + (((y*bitplane_xres) + x)>>3)) | (0x80 >> (((y*bitplane_xres) + x)&7) ) );
 				}
 			}
 		}
 	}
 }
 
-// Execute EF9365 command
+//-------------------------------------------------
+// ef9365_exec: EF936X Command decoder and execution
+//-------------------------------------------------
+
 void ef9365_device::ef9365_exec(UINT8 cmd)
 {
 	int tmp_delta_x,tmp_delta_y;
@@ -777,7 +968,7 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 			break;
 			case 0x4: // Clear screen
 				screen_scanning(1);
-				set_busy_flag( cycles_to_us( bitplan_xres*bitplan_yres ) ); // Timing to check on the real hardware
+				set_busy_flag( cycles_to_us( bitplane_xres*bitplane_yres ) ); // Timing to check on the real hardware
 			break;
 			case 0x5: // X and Y registers reset to 0
 				set_x_reg(0);
@@ -788,12 +979,12 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 				set_x_reg(0);
 				set_y_reg(0);
 				screen_scanning(1);
-				set_busy_flag( cycles_to_us( bitplan_xres*bitplan_yres ) ); // Timing to check on the real hardware
+				set_busy_flag( cycles_to_us( bitplane_xres*bitplane_yres ) ); // Timing to check on the real hardware
 			break;
 			case 0x7: // Clear screen, set CSIZE to code "minsize". All other registers reset to 0
 				m_registers[EF936X_REG_CSIZE] = 0x11;
 				screen_scanning(1);
-				set_busy_flag( cycles_to_us( bitplan_xres*bitplan_yres ) ); // Timing to check on the real hardware
+				set_busy_flag( cycles_to_us( bitplane_xres*bitplane_yres ) ); // Timing to check on the real hardware
 			break;
 			case 0x8: // Light-pen initialization (/White forced low)
 				set_busy_flag( cycles_to_us( 4 ) ); // Timing to check on the real hardware
@@ -811,7 +1002,7 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 			break;
 			case 0xC: // Screen scanning : pen or Eraser as defined by CTRL1
 				screen_scanning(0);
-				set_busy_flag( cycles_to_us( bitplan_xres*bitplan_yres ) ); // Timing to check on the real hardware
+				set_busy_flag( cycles_to_us( bitplane_xres*bitplane_yres ) ); // Timing to check on the real hardware
 			break;
 			case 0xD: // X  reset to 0
 				set_x_reg(0);
@@ -822,7 +1013,8 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 				set_busy_flag( cycles_to_us( 4 ) ); // Timing to check on the real hardware
 			break;
 			case 0xF: // Direct image memory access request for the next free cycle.
-				set_busy_flag( cycles_to_us( 4 ) ); // Timing to check on the real hardware
+				set_busy_flag( cycles_to_us( 64 ) ); // Timing to check on the real hardware
+				dump_bitplanes_word();
 			break;
 			default:
 				logerror("Unemulated EF9365 cmd: %02x\n", cmd);
@@ -939,26 +1131,26 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 	}
 }
 
-/**************************************************************
-            EF9365 interface
-**************************************************************/
+//-------------------------------------------------
+// screen_update: Framebuffer video ouput
+//-------------------------------------------------
 
 UINT32 ef9365_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i,j,ptr,p;
 	unsigned char color_index;
 
-	for(j=0;j<bitplan_yres;j++)
+	for(j=0;j<bitplane_yres;j++)
 	{
-		for(i=0;i<bitplan_xres;i++)
+		for(i=0;i<bitplane_xres;i++)
 		{
 			color_index = 0x00;
 
-			ptr = ( bitplan_xres * j ) + i;
+			ptr = ( bitplane_xres * j ) + i;
 
-			for( p = 0; p < nb_of_bitplans; p++)
+			for( p = 0; p < nb_of_bitplanes; p++)
 			{
-				if( m_videoram->read_byte( (EF936X_BITPLAN_MAX_SIZE*p) + (ptr>>3)) & (0x80>>(ptr&7)))
+				if( m_videoram->read_byte( (EF936X_BITPLANE_MAX_SIZE*p) + (ptr>>3)) & (0x80>>(ptr&7)))
 				{
 					color_index |= (0x01<<p);
 				}
@@ -971,6 +1163,10 @@ UINT32 ef9365_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	copybitmap(bitmap, m_screen_out, 0, 0, 0, 0, cliprect);
 	return 0;
 }
+
+//-------------------------------------------------
+// update_scanline: Scanline callback
+//-------------------------------------------------
 
 void ef9365_device::update_scanline(UINT16 scanline)
 {
@@ -991,6 +1187,10 @@ void ef9365_device::update_scanline(UINT16 scanline)
 		draw_border(0);
 	}
 }
+
+//-------------------------------------------------
+// data_r: Registers read access callback
+//-------------------------------------------------
 
 READ8_MEMBER( ef9365_device::data_r )
 {
@@ -1080,6 +1280,10 @@ READ8_MEMBER( ef9365_device::data_r )
 
 	return return_value;
 }
+
+//-------------------------------------------------
+// data_w: Registers write access callback
+//-------------------------------------------------
 
 WRITE8_MEMBER( ef9365_device::data_w )
 {

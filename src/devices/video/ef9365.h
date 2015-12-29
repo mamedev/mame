@@ -13,14 +13,14 @@
 #ifndef __EF9365_H__
 #define __EF9365_H__
 
-#define EF936X_BITPLAN_MAX_SIZE 0x8000
-#define EF936X_MAX_BITPLANS  8
+#define EF936X_BITPLANE_MAX_SIZE 0x8000
+#define EF936X_MAX_BITPLANES  8
 
 #define MCFG_EF936X_PALETTE(_palette_tag) \
 	ef9365_device::static_set_palette_tag(*device, "^" _palette_tag);
 
-#define MCFG_EF936X_BITPLANS_CNT(_bitplans_number) \
-	ef9365_device::static_set_nb_bitplans(*device,_bitplans_number);
+#define MCFG_EF936X_BITPLANES_CNT(_bitplanes_number) \
+	ef9365_device::static_set_nb_bitplanes(*device,_bitplanes_number);
 
 #define MCFG_EF936X_DISPLAYMODE(_display_mode) \
 	ef9365_device::static_set_display_mode(*device,_display_mode);
@@ -44,7 +44,7 @@ public:
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
-	static void static_set_nb_bitplans(device_t &device, int nb_bitplans );
+	static void static_set_nb_bitplanes(device_t &device, int nb_bitplanes );
 	static void static_set_display_mode(device_t &device, int display_mode );
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ef9365_device &>(device).m_irq_handler.set_callback(object); }
 
@@ -55,6 +55,8 @@ public:
 	void update_scanline(UINT16 scanline);
 	void set_color_filler( UINT8 color );
 	void set_color_entry( int index, UINT8 r, UINT8 g, UINT8 b );
+
+	UINT8 get_last_readback_word(int bitplane_number, int * pixel_offset);
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -86,8 +88,8 @@ private:
 	void set_video_mode(void);
 	void draw_border(UINT16 line);
 	void ef9365_exec(UINT8 cmd);
-	int  cycles_to_us(int cycles);
-
+	int  cycles_to_us(int cycles);	
+	void dump_bitplanes_word();
 	void update_interrupts();
 
 	// internal state
@@ -106,14 +108,17 @@ private:
 	UINT8 m_state;                          //status register
 	UINT8 m_border[80];                     //border color
 
-	rgb_t palette[256];                     // 8 bitplans max -> 256 colors max
-	int   nb_of_bitplans;
+	rgb_t palette[256];                     // 8 bitplanes max -> 256 colors max
+	int   nb_of_bitplanes;
 	int   nb_of_colors;
-	int   bitplan_xres;
-	int   bitplan_yres;
+	int   bitplane_xres;
+	int   bitplane_yres;
 	UINT16 overflow_mask_x;
 	UINT16 overflow_mask_y;
 	int   vsync_scanline_pos;
+
+	UINT8 m_readback_latch[EF936X_MAX_BITPLANES];   // Last DRAM Readback buffer (Filled after a Direct Memory Access Request command)
+	int m_readback_latch_pix_offset;
 
 	UINT32 clock_freq;
 	bitmap_rgb32 m_screen_out;
@@ -145,6 +150,8 @@ extern const device_type EF9365;
 #define EF936X_256x256_DISPLAY_MODE    0x00
 #define EF936X_512x512_DISPLAY_MODE    0x01
 #define EF936X_512x256_DISPLAY_MODE    0x02
+#define EF936X_128x128_DISPLAY_MODE    0x03
+#define EF936X_64x64_DISPLAY_MODE    0x04
 
 
 #endif
