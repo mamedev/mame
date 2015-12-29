@@ -53,7 +53,8 @@
     up indicating when player 2 is playing.  In a cocktail cabinet this
     goes to an "image commutation board".  It's not connected to
     anything in an upright cabinet.  The "image commutation board" must
-    flip the image somehow, presumably by dark magic.
+    flip the image somehow, presumably by reversing the deflection coil
+    connections.
 
     There are still issues with horizontal alignment between layers.  I
     have the schematic, yet I really can't understand where these issues

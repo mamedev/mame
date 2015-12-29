@@ -1,12 +1,15 @@
 // license:BSD-3-Clause
-// copyright-holders:Pierpaolo Prazzoli, Vas Crabb
+// copyright-holders:Vas Crabb
 /*
     Laser Battle / Lazarian (c) 1981 Zaccaria
     Cat and Mouse           (c) 1982 Zaccaria
 
     original driver by Pierpaolo Prazzoli
 
-    The two games have a similar video hardware, but sound hardware is
+    The two games have identical game/video boards hardware, but
+    completely different sound boards.  Laser Battle/Lazarian have a
+    dumb sound board with TMS organ and CSG chips driven directly by the
+    game program.  Cat'N'Mouse
     very different and they don't use the collision detection provided
     by the s2636 chips.
 
@@ -18,10 +21,14 @@
     written at I/O address 3.  The sound board controls data direction
     on J7 and when input from sound board to game board is latched.
 
+    Both Laser Battle/Lazarian and Cat and Mouse use the unidirectional
+    interface on J3.  It seems there are no games that actually use the
+    bidirectional interface on J7.
+
     Laser Battle/Lazarian notes:
     * Cocktail cabinet has an additional "image commutation board"
       consuming the screen flip output, presumably flipping the image by
-      means of dark magic
+      reversing the deflection coil connections
     * Player 2 inputs are only used in cocktail mode
     * Tilt input resets Laser Battle, but just causes loss of one credit
       in Lazarian
@@ -35,7 +42,7 @@
 
     TODO:
     - work out where all the magic layer offsets come from
-    - second bank of DIP switches in laserbat
+    - second bank of DIP switches in laserbat and catnmous
     - sound in laserbat (with schematics) and in catnmous
 */
 
@@ -99,8 +106,6 @@ READ8_MEMBER(laserbat_state_base::rrowx_r)
 
 /*
 
-    Color handling with 2716.14L and 82S100.10M
-
     2716.14L address lines are connected as follows:
 
     A0  4H
@@ -134,7 +139,7 @@ static ADDRESS_MAP_START( laserbat_map, AS_PROGRAM, 8, laserbat_state_base )
 	AM_RANGE(0x6000, 0x73ff) AM_ROM
 	AM_RANGE(0x7800, 0x7bff) AM_ROM
 
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_WRITENOP // always 0 (bullet ram in Quasar)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_WRITENOP
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("pvi1", s2636_device, read_data, write_data)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("pvi2", s2636_device, read_data, write_data)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("pvi3", s2636_device, read_data, write_data)
@@ -159,7 +164,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( catnmous_sound_map, AS_PROGRAM, 8, catnmous_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -348,7 +354,7 @@ static INPUT_PORTS_START( catnmous )
 //  PORT_DIPSETTING(    0x50, DEF_STR(Infinite) )
 //  PORT_DIPSETTING(    0x60, DEF_STR(Infinite) )
 //  PORT_DIPSETTING(    0x70, DEF_STR(Infinite) )
-	PORT_DIPNAME( 0x80, 0x80, "Game Over Melody" )  PORT_DIPLOCATION("SW-1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Demo_Sounds) )    PORT_DIPLOCATION("SW-1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x80, DEF_STR(On) )
 INPUT_PORTS_END
@@ -387,68 +393,9 @@ static GFXDECODE_START( laserbat )
 GFXDECODE_END
 
 
-/* Cat'N Mouse sound ***********************************/
-
-WRITE_LINE_MEMBER(catnmous_state::zaccaria_irq0a)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(catnmous_state::zaccaria_irq0b)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-READ8_MEMBER(catnmous_state::zaccaria_port0a_r)
-{
-	ay8910_device *ay8910 = (m_active_8910 == 0) ? m_ay1 : m_ay2;
-	return ay8910->data_r(space, 0);
-}
-
-WRITE8_MEMBER(catnmous_state::zaccaria_port0a_w)
-{
-	m_port0a = data;
-}
-
-WRITE8_MEMBER(catnmous_state::zaccaria_port0b_w)
-{
-	/* bit 1 goes to 8910 #0 BDIR pin  */
-	if ((m_last_port0b & 0x02) == 0x02 && (data & 0x02) == 0x00)
-	{
-		/* bit 0 goes to the 8910 #0 BC1 pin */
-		m_ay1->data_address_w(space, m_last_port0b >> 0, m_port0a);
-	}
-	else if ((m_last_port0b & 0x02) == 0x00 && (data & 0x02) == 0x02)
-	{
-		/* bit 0 goes to the 8910 #0 BC1 pin */
-		if (m_last_port0b & 0x01)
-			m_active_8910 = 0;
-	}
-	/* bit 3 goes to 8910 #1 BDIR pin  */
-	if ((m_last_port0b & 0x08) == 0x08 && (data & 0x08) == 0x00)
-	{
-		/* bit 2 goes to the 8910 #1 BC1 pin */
-		m_ay2->data_address_w(space, m_last_port0b >> 2, m_port0a);
-	}
-	else if ((m_last_port0b & 0x08) == 0x00 && (data & 0x08) == 0x08)
-	{
-		/* bit 2 goes to the 8910 #1 BC1 pin */
-		if (m_last_port0b & 0x04)
-			m_active_8910 = 1;
-	}
-
-	m_last_port0b = data;
-}
-
 INTERRUPT_GEN_MEMBER(laserbat_state_base::laserbat_interrupt)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x0a);
-}
-
-INTERRUPT_GEN_MEMBER(catnmous_state::zaccaria_cb1_toggle)
-{
-	m_pia->cb1_w(m_cb1_toggle & 1);
-	m_cb1_toggle ^= 1;
 }
 
 DRIVER_INIT_MEMBER(laserbat_state_base, laserbat)
@@ -492,20 +439,7 @@ void catnmous_state::machine_start()
 {
 	laserbat_state_base::machine_start();
 
-	save_item(NAME(m_active_8910));
-	save_item(NAME(m_port0a));
-	save_item(NAME(m_last_port0b));
-	save_item(NAME(m_cb1_toggle));
-}
-
-void catnmous_state::machine_reset()
-{
-	laserbat_state_base::machine_reset();
-
-	m_active_8910 = 0;
-	m_port0a = 0;
-	m_last_port0b = 0;
-	m_cb1_toggle = 0;
+	save_item(NAME(m_cb1));
 }
 
 void laserbat_state_base::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -589,22 +523,22 @@ static MACHINE_CONFIG_DERIVED_CLASS( catnmous, laserbat_base, catnmous_state )
 	// sound board devices
 	MCFG_CPU_ADD("audiocpu", M6802, 3580000) // ?
 	MCFG_CPU_PROGRAM_MAP(catnmous_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(catnmous_state, zaccaria_cb1_toggle,  (double)3580000/4096)
+	MCFG_CPU_PERIODIC_INT_DRIVER(catnmous_state, cb1_toggle,  (double)3580000/4096)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(catnmous_state, zaccaria_port0a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(catnmous_state, zaccaria_port0a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(catnmous_state, zaccaria_port0b_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(catnmous_state, zaccaria_irq0a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(catnmous_state, zaccaria_irq0b))
+	MCFG_PIA_READPA_HANDLER(READ8(catnmous_state, pia_porta_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(catnmous_state, pia_porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(catnmous_state, pia_portb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(catnmous_state, pia_irqa))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(catnmous_state, pia_irqb))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 3580000/2) // ?
-	MCFG_AY8910_PORT_B_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_SOUND_ADD("psg1", AY8910, 3580000/2) // ?
+	MCFG_AY8910_PORT_B_READ_CB(READ8(catnmous_state, psg1_portb_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 3580000/2) // ?
+	MCFG_SOUND_ADD("psg2", AY8910, 3580000/2) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -706,7 +640,7 @@ Sound Board 1b11107
 
 6802
 6821
-8910
+2*8910
 */
 
 ROM_START( catnmous )
@@ -746,8 +680,8 @@ ROM_START( catnmous )
 	ROM_LOAD( "82s100.13m",   0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "sound01.1d",   0xd000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
-	ROM_LOAD( "sound01.1f",   0xe000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
+	ROM_LOAD( "sound01.1f",   0xc000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
+	ROM_LOAD( "sound01.1d",   0xe000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
 	ROM_LOAD( "sound01.1e",   0xf000, 0x1000, CRC(1bd90c93) SHA1(20fd2b765a42e25cf7f716e6631b8c567785a866) )
 ROM_END
 
@@ -788,13 +722,13 @@ ROM_START( catnmousa )
 	ROM_LOAD( "catnmousa_82s100.13m", 0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) BAD_DUMP )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "snd.1d",       0xd000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
-	ROM_LOAD( "snd.1f",       0xe000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
+	ROM_LOAD( "snd.1f",       0xc000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
+	ROM_LOAD( "snd.1d",       0xe000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
 	ROM_LOAD( "snd.1e",       0xf000, 0x1000, CRC(1bd90c93) SHA1(20fd2b765a42e25cf7f716e6631b8c567785a866) )
 ROM_END
 
 
-GAME( 1981, laserbat, 0,        laserbat, laserbat, laserbat_state_base, laserbat, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, lazarian, laserbat, laserbat, lazarian, laserbat_state_base, laserbat, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmous, 0,        catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1982, catnmousa,catnmous, catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, laserbat,  0,        laserbat, laserbat, laserbat_state_base, laserbat, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, lazarian,  laserbat, laserbat, lazarian, laserbat_state_base, laserbat, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmous,  0,        catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmousa, catnmous, catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

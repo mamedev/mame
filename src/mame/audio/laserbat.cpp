@@ -2,9 +2,36 @@
 // copyright-holders:Vas Crabb
 /*
     Laser Battle / Lazarian (c) 1981 Zaccaria
+    Cat and Mouse           (c) 1982 Zaccaria
 
     audio emulation by Vas Crabb
+*/
 
+#include "includes/laserbat.h"
+
+
+READ8_MEMBER(laserbat_state_base::rhsc_r)
+{
+	return m_rhsc;
+}
+
+WRITE8_MEMBER(laserbat_state_base::whsc_w)
+{
+	m_whsc = data;
+}
+
+WRITE8_MEMBER(laserbat_state_base::csound1_w)
+{
+	m_csound1 = data;
+}
+
+WRITE8_MEMBER(laserbat_state_base::csound2_w)
+{
+	m_csound2 = data;
+}
+
+
+/*
     The Laser Battle/Lazarian sound board has a SN76477 CSG, two TMS3615
     tone synthesisers, and a TDA1010 power amplifier.  It receives
     commands from the game board over a 16-bit unidirectional data bus.
@@ -98,30 +125,6 @@
     +-----+---------------------------------------------------------+
 
 */
-
-#include "includes/laserbat.h"
-
-
-READ8_MEMBER(laserbat_state_base::rhsc_r)
-{
-	return m_rhsc;
-}
-
-WRITE8_MEMBER(laserbat_state_base::whsc_w)
-{
-	m_whsc = data;
-}
-
-WRITE8_MEMBER(laserbat_state_base::csound1_w)
-{
-	m_csound1 = data;
-}
-
-WRITE8_MEMBER(laserbat_state_base::csound2_w)
-{
-	m_csound2 = data;
-}
-
 
 WRITE8_MEMBER(laserbat_state::csound2_w)
 {
@@ -220,4 +223,154 @@ WRITE8_MEMBER(laserbat_state::csound2_w)
 
 	// keep for detecting changes next time
 	m_csound2 = data;
+}
+
+
+/*
+    The Cat and Mouse sound board has a 6802 processor with three ROMs,
+    a 6821 PIA, two AY-3-8910 PSGs, and some other logic and analog
+    circuitry.  Unfortunately we lack a schematic, so all knowledge of
+    this board is based on tracing the sound program.
+
+    The 6821 PIA is mapped at addresses $005C..$005F.  The known PIA
+    signal assignments are as follows:
+
+    +------+-----------------------+
+    | PA0  | PSG1/PSG2 DA0         |
+    | PA1  | PSG1/PSG2 DA1         |
+    | PA2  | PSG1/PSG2 DA2         |
+    | PA3  | PSG1/PSG2 DA3         |
+    | PA4  | PSG1/PSG2 DA4         |
+    | PA5  | PSG1/PSG2 DA5         |
+    | PA6  | PSG1/PSG2 DA6         |
+    | PA7  | PSG1/PSG2 DA7         |
+    | PB0  | PSG1 BC1              |
+    | PB1  | PSG1 BDIR             |
+    | PB2  | PSG2 BC1              |
+    | PB3  | PSG2 BDIR             |
+    | CA1  | Host interface bit 6  |
+    | CB1  | periodic IRQ source   |
+    | IRQA | 6802 NMI              |
+    | IRQB | 6802 IRQ              |
+    +------+-----------------------+
+
+    The program makes use of I/O port A on the first PSG as outputs.  At
+    a guess, it could have the same function as it does on other
+    Zaccaria sound boards.
+
+    The first PSG receives commands from the game board in the low five
+    bits of port B.  Commands are processed on receiving an NMI.  The
+    sound program always masks out the high three bits of the value so
+    they could be connected to anything on the board.
+
+    The I/O ports on the second PSG don't appear to be used at all.
+
+    The game board sends commands to the sound board over a 16-bit
+    unidirectional data bus.  The CPU cannot write all sixteen lines
+    atomically, it write to lines 1-8 as one group and 9-16 as another
+    group.  Not all bit functions are known:
+
+    +-----+----------------------------------------------------------+
+    | Bit | Function                                                 |
+    +-----+----------------------------------------------------------+
+    |   1 | PSG1 IOB0                                                |
+    |   2 | PSG1 IOB1                                                |
+    |   3 | PSG1 IOB2                                                |
+    |   4 | PSG1 IOB3                                                |
+    |   5 | PSG1 IOB4                                                |
+    |   6 | PIA CA1                                                  |
+    |   7 |                                                          |
+    |   8 |                                                          |
+    |   9 | Used but unknown purpose                                 |
+    |  10 |                                                          |
+    |  11 |                                                          |
+    |  12 |                                                          |
+    |  13 |                                                          |
+    |  14 |                                                          |
+    |  15 |                                                          |
+    |  16 | Used but unknown purpose                                 |
+    +-----+----------------------------------------------------------+
+
+    The game board makes the the audio output from the first S2636 PVI
+    (5E) available on a pin at the sound board interface connector, but
+    it may or may not be routed anywhere.
+*/
+
+WRITE8_MEMBER(catnmous_state::csound1_w)
+{
+	m_pia->ca1_w((data & 0x20) ? 1 : 0);
+	m_csound1 = data;
+}
+
+READ8_MEMBER(catnmous_state::pia_porta_r)
+{
+	UINT8 const control = m_pia->b_output();
+	UINT8 data = 0xff;
+
+	if (0x01 == (control & 0x03))
+		data &= m_psg1->data_r(space, 0);
+
+	if (0x04 == (control & 0x0c))
+		data &= m_psg2->data_r(space, 0);
+
+	return data;
+}
+
+WRITE8_MEMBER(catnmous_state::pia_porta_w)
+{
+	UINT8 const control = m_pia->b_output();
+
+	if (control & 0x02)
+		m_psg1->data_address_w(space, (control >> 0) & 0x01, data);
+
+	if (control & 0x08)
+		m_psg2->data_address_w(space, (control >> 2) & 0x01, data);
+}
+
+WRITE8_MEMBER(catnmous_state::pia_portb_w)
+{
+	if (data & 0x02)
+		m_psg1->data_address_w(space, (data >> 0) & 0x01, m_pia->a_output());
+
+	if (data & 0x08)
+		m_psg2->data_address_w(space, (data >> 2) & 0x01, m_pia->a_output());
+}
+
+WRITE_LINE_MEMBER(catnmous_state::pia_irqa)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(catnmous_state::pia_irqb)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE8_MEMBER(catnmous_state::psg1_porta_w)
+{
+	// similar to zaccaria.c since we have no clue how this board really works
+	// this code could be completely wrong/inappropriate for this game for all we know
+	static double const table[8] = {
+			RES_K(8.2),
+			RES_R(820),
+			RES_K(3.3),
+			RES_R(150),
+			RES_K(5.6),
+			RES_R(390),
+			RES_K(1.5),
+			RES_R(47) };
+	RES_VOLTAGE_DIVIDER(RES_K(4.7), table[data & 0x07]);
+	m_psg2->set_volume(1, 150 * RES_VOLTAGE_DIVIDER(RES_K(4.7), table[data & 0x07]));
+}
+
+READ8_MEMBER(catnmous_state::psg1_portb_r)
+{
+	// the program masks out the three high bits - no clue what they're connected to
+	return m_csound1 & 0x1f;
+}
+
+INTERRUPT_GEN_MEMBER(catnmous_state::cb1_toggle)
+{
+	m_cb1 = !m_cb1;
+	m_pia->cb1_w(m_cb1 ? 1 : 0);
 }
