@@ -168,7 +168,7 @@ NOTE:  Sets marked PSR Verified use official IGT CG+CAP combo as documented in a
        Stardard PE+ sets marked as PSR Verified means the build version is correctly matched to the CG+CAP combo
        Sets marked as PSR Verified on superboards means the XP000xxx poker program is correctly matched to the
 	   CG+CAP combo. Except for specialty games the CG set is determined by XP000xxx Poker Program. However,
-	   were specialty games are involved the X00xxxxP DATA rom determines the CG set due to specific needs.
+	   where specialty games are involved the X00xxxxP DATA rom determines the CG set due to specific needs.
 	   PSR Verified does not gaurantee or imply that other XP000xxx programs are incompatible with said DATA rom.
 
 NOTE:  International PP0xxx sets support a Tournament mode.  You can toggle back and forth between standard and
@@ -10911,7 +10911,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K* SF  RF  (Bonus)
 Also compatible with:
  XP000111 + CG2427 + CAPX2309
  XP000117 + CG2309 + CAPX2309
- XP000111 + CG2309 + CAPX2309
+ XP000122 + CG2309 + CAPX2309
 
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -10944,7 +10944,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K* SF  RF  (Bonus)
 Also compatible with:
  XP000111 + CG2427 + CAPX2309
  XP000117 + CG2309 + CAPX2309
- XP000111 + CG2309 + CAPX2309
+ XP000122 + CG2309 + CAPX2309
 
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
