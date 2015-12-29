@@ -148,13 +148,13 @@ WRITE8_MEMBER( spc1500_state::romsel)
 	m_romsel = 1;
 	if (m_ipl)
 	{
-		printf("bank1 -> IOCS\n");
+//		printf("bank1 -> IOCS\n");
 		membank("bank1")->set_entry(0);
 	}
 	else
 	{
 		membank("bank1")->set_entry(1);		
-		printf("bank1 -> basic\n");
+//		printf("bank1 -> basic\n");
 	}
 }
 
@@ -162,7 +162,7 @@ WRITE8_MEMBER( spc1500_state::ramsel)
 {
 	m_romsel = 0;
 	membank("bank1")->set_entry(2);
-	printf("bank1 -> ram\n");
+//	printf("bank1 -> ram\n");
 }
 
 WRITE8_MEMBER( spc1500_state::porta_w)
@@ -177,21 +177,21 @@ WRITE8_MEMBER( spc1500_state::portb_w)
 
 WRITE8_MEMBER( spc1500_state::psgb_w)
 {
-	m_ipl = data & (1 << 1);
-	printf("PSG B port wrote by %d\n", data);
-	if (m_romsel)
+	if (m_ipl != ((data>>1)&1))
 	{
+		m_ipl = ((data>>1)&1);
 		if (m_ipl)
 		{
-			printf("bank1 -> IOCS\n");
+//			printf("bank1 -> IOCS\n");
 			membank("bank1")->set_entry(0);
 		}
 		else
 		{
 			membank("bank1")->set_entry(1);		
-			printf("bank1 -> basic\n");
+//			printf("bank1 -> basic\n");
 		}	
 	}
+//	printf("PSG B port wrote by %d\n", m_ipl);
 }
 
 WRITE8_MEMBER( spc1500_state::portc_w)
@@ -207,20 +207,24 @@ READ8_MEMBER( spc1500_state::portb_r)
 WRITE8_MEMBER( spc1500_state::crtc_w)
 {
 	static int m_crtc_index;
-	if(offset == 0)
+	if((offset & 1) == 0)
 	{
 		m_crtc_index = data & 0x1f;
-		m_vdg->address_w(space, offset, data);
+		m_vdg->address_w(space, 0, data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		m_vdg->register_w(space, offset, data);
+		m_vdg->register_w(space, 0, data);
 	}
 }
 
 READ8_MEMBER( spc1500_state::crtc_r)
 {
+	if (offset & 1)
+	{
+		return m_vdg->register_r(space, 0);
+	}
 	return 0;
 }
 
@@ -291,19 +295,44 @@ VIDEO_START_MEMBER(spc1500_state, spc)
 
 MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 {
-	UINT8 fnt;
+	UINT8 han2;
+	UINT8 *pf;
+	UINT16 hfnt;
 	int i;
 	int j;
+	int h1, h2, h3;
 	UINT32  *p = &bitmap.pix32(y); 
+	
+	unsigned char cho[] ={0,0,0,1,1,1,1,1,0,0,1,1,1,3,5,5,0,0,5,3,3,5,5,5,0,0,3,3,5,5};
+	unsigned char cho2[]={0,0,0,2,2,2,2,2,0,0,2,2,2,4,6,6,0,0,6,4,4,6,6,6,0,0,4,4,6,6};
+	unsigned char jong[]={0,0,0,1,1,1,1,1,0,0,1,1,1,2,2,2,0,0,2,2,2,2,2,2,0,0,2,2,1,1};
 	//printf("ma=%d,y=%d,x_count=%d\n", ma, y, x_count);
 	int n = y & 0xf;
 	for (i = 0; i < x_count; i++)
 	{
-		UINT8 ascii = m_p_videoram[0x1000 + (y>>4)*x_count + i];
-		if (ascii >= ' ')
+		UINT8 *pv = &m_p_videoram[0x1000 + (y>>4)*x_count + i];
+		UINT8 ascii = *pv;
+		if (ascii & 0x80)
+		{
+			han2 = *(pv+1);
+			h1 = (ascii>>2)&0x1f;
+			h2 = ((ascii<<3)|(han2>>5))&0x1f;
+			h3 = (han2)&0x1f;
+			pf = &m_font[0x2000+(h1 * 32) + ((h3 == 0 ? cho[h2] : cho2[h2])-1) * 16 * 2 * 32 + n];
+			hfnt = (*pf << 8) | (*(pf+16));
+			pf = &m_font[0x4000+(h2 * 32) + (h3 == 0 ? 0 : 1) * 16 * 2 * 32 + n];
+			hfnt = hfnt ^ ((*pf << 8) | (*(pf+16)));
+			pf = &m_font[0x6000+(h3 * 32) + (jong[h2]-1) * 16 * 2 * 32 + n];
+			hfnt = hfnt ^ ((*pf << 8) | (*(pf+16)));
+			//printf("0x%04x\n" , hfnt);
+			for (j = 0; j < 16; j++)
+				*p++ = (hfnt & (0x8000 >> j) ? 0 : 0xffffff);
+			i++;
+		}
+		else if (ascii >= ' ')
 		{
 			//printf("%c", ascii);
-			fnt = m_font[ascii * 16 + n];
+			UINT8 fnt = m_font[0x1000+ascii * 16 + n];
 			for (j = 0; j < 8; j++)
 				*p++ = (fnt & (0x80 >> j) ? 0 : 0xffffff);
 		}
@@ -358,8 +387,9 @@ static ADDRESS_MAP_START( spc1500_io , AS_IO, 8, spc1500_state )
 	AM_RANGE(0x1500, 0x15ff) AM_READWRITE(pcgb_r, pcgb_w)
 	AM_RANGE(0x1600, 0x16ff) AM_READWRITE(pcgr_r, pcgr_w)
 	AM_RANGE(0x1700, 0x17ff) AM_WRITE(pcgg_w)
-	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("mc6845", mc6845_device, address_w)
-	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, register_w)
+	AM_RANGE(0x1800, 0x18ff) AM_READWRITE(crtc_r, crtc_w)
+//	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("mc6845", mc6845_device, address_w)
+//	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, register_w)
 //	AM_RANGE(0x1800, 0x1801) AM_READWRITE(crtc_r, crtc_w)
 	AM_RANGE(0x1900, 0x1909) AM_READ(keyboard_r)
  	AM_RANGE(0x1a00, 0x1a03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
@@ -465,7 +495,7 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_START("LINE.9")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)   
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("= +") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('=') PORT_CHAR('+')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("= +") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 )") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("; :") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR(0x0c)
@@ -582,7 +612,7 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 //	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
 //	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", (VDP_CLOCK/48)) //unknown divider
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(spc1500_state, crtc_update_row)
 
