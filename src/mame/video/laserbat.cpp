@@ -69,8 +69,6 @@
 
 #include "includes/laserbat.h"
 
-#define PLA_DEBUG 0
-
 
 PALETTE_INIT_MEMBER(laserbat_state_base, laserbat)
 {
@@ -200,35 +198,6 @@ WRITE8_MEMBER(laserbat_state_base::cnt_nav_w)
 
 void laserbat_state_base::video_start()
 {
-	// extract product and sum terms from video mixing PAL
-	if (PLA_DEBUG)
-	{
-		UINT8 const *bitstream = memregion("gfxmix")->base() + 4;
-		UINT32 products[48];
-		UINT8 sums[48];
-		for (unsigned term = 0; 48 > term; term++)
-		{
-			products[term] = 0;
-			for (unsigned byte = 0; 4 > byte; byte++)
-			{
-				UINT8 bits = *bitstream++;
-				for (unsigned bit = 0; 4 > bit; bit++, bits >>= 2)
-				{
-					products[term] >>= 1;
-					if (bits & 0x01) products[term] |= 0x80000000;
-					if (bits & 0x02) products[term] |= 0x00008000;
-				}
-			}
-			sums[term] = ~*bitstream++;
-			UINT32 const sensitive = ((products[term] >> 16) ^ products[term]) & 0x0000ffff;
-			UINT32 const required = ~products[term] & sensitive & 0x0000ffff;
-			UINT32 const inactive = ~((products[term] >> 16) | products[term]) & 0x0000ffff;
-			printf("if (!0x%04x && ((x & 0x%04x) == 0x%04x)) y |= %02x; /* %u */\n", inactive, sensitive, required, sums[term], term);
-		}
-		UINT8 const mask = *bitstream;
-		printf("y ^= %02x;\n", mask);
-	}
-
 	// we render straight from ROM
 	m_gfx1 = memregion("gfx1")->base();
 	m_gfx2 = memregion("gfx2")->base();

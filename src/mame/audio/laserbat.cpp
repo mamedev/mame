@@ -268,38 +268,49 @@ WRITE8_MEMBER(laserbat_state::csound2_w)
     The game board sends commands to the sound board over a 16-bit
     unidirectional data bus.  The CPU cannot write all sixteen lines
     atomically, it write to lines 1-8 as one group and 9-16 as another
-    group.  Not all bit functions are known:
+    group.  However only seven lines are actually connected to the sound
+    board:
 
-    +-----+----------------------------------------------------------+
-    | Bit | Function                                                 |
-    +-----+----------------------------------------------------------+
-    |   1 | PSG1 IOB0                                                |
-    |   2 | PSG1 IOB1                                                |
-    |   3 | PSG1 IOB2                                                |
-    |   4 | PSG1 IOB3                                                |
-    |   5 | PSG1 IOB4                                                |
-    |   6 | PIA CA1                                                  |
-    |   7 |                                                          |
-    |   8 |                                                          |
-    |   9 | Used but unknown purpose                                 |
-    |  10 |                                                          |
-    |  11 |                                                          |
-    |  12 |                                                          |
-    |  13 |                                                          |
-    |  14 |                                                          |
-    |  15 |                                                          |
-    |  16 | Used but unknown purpose                                 |
-    +-----+----------------------------------------------------------+
+    +-----+----------+-------------+
+    | Bit | Name     | Connection  |
+    +-----+----------+-------------+
+    |   1 | SOUND 0  | PSG1 IOB0   |
+    |   2 | SOUND 1  | PSG1 IOB1   |
+    |   3 | SOUND 2  | PSG1 IOB2   |
+    |   4 | SOUND 3  | PSG1 IOB3   |
+    |   5 | SOUND 4  | PSG1 IOB4   |
+    |   6 | SOUND 5  | PIA CA1     |
+    |   7 |          |             |
+    |   8 |          |             |
+    |   9 |          |             |
+    |  10 |          |             |
+    |  11 |          |             |
+    |  12 |          |             |
+    |  13 |          |             |
+    |  14 |          |             |
+    |  15 |          |             |
+    |  16 | RESET    | Unknown     |
+    +-----+----------+-------------+
+
+    There could well be other connections on the sound board - these are
+    just what can be deduced by tracing the sound program.
 
     The game board makes the the audio output from the first S2636 PVI
     (5E) available on a pin at the sound board interface connector, but
-    it may or may not be routed anywhere.
+    it isn't routed anywhere.
 */
 
 WRITE8_MEMBER(catnmous_state::csound1_w)
 {
 	m_pia->ca1_w((data & 0x20) ? 1 : 0);
 	m_csound1 = data;
+}
+
+WRITE8_MEMBER(catnmous_state::csound2_w)
+{
+	// the top bit is called RESET on the wiring diagram - assume it resets the sound CPU
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	m_csound2 = data;
 }
 
 READ8_MEMBER(catnmous_state::pia_porta_r)
@@ -365,8 +376,9 @@ WRITE8_MEMBER(catnmous_state::psg1_porta_w)
 
 READ8_MEMBER(catnmous_state::psg1_portb_r)
 {
-	// the program masks out the three high bits - no clue what they're connected to
-	return m_csound1 & 0x1f;
+	// the sound program masks out the three most significant bits
+	// assume they're not connected and read high from the internal pull-ups
+	return m_csound1 | 0xe0;
 }
 
 INTERRUPT_GEN_MEMBER(catnmous_state::cb1_toggle)

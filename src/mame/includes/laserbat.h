@@ -195,6 +195,7 @@ public:
 
 	// sound control ports
 	virtual DECLARE_WRITE8_MEMBER(csound1_w) override;
+	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
 
 	// PIA handlers
 	DECLARE_READ8_MEMBER(pia_porta_r);
