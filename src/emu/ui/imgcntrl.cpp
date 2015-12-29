@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    ui/imgcntrl.c
+    ui/imgcntrl.cpp
 
     MESS's clunky built-in file manager
 
@@ -146,7 +146,7 @@ void ui_menu_control_device_image::load_software_part()
 		hook_load(temp_name, true);
 	else
 	{
-		machine().popmessage("The selected game is missing one or more required ROM or CHD images. Please select a different game.");
+		machine().popmessage("The software selected is missing one or more required ROM or CHD images. Please select a different one.");
 		state = SELECT_SOFTLIST;
 	}
 }
