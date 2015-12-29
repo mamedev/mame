@@ -178,6 +178,7 @@ Cisco Heat.
 
 #include "cischeat.lh"
 #include "f1gpstar.lh"
+#include "captflag.lh"
 
 /**************************************************************************
 
@@ -509,6 +510,160 @@ static ADDRESS_MAP_START( armchmp2_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x100010, 0x100011) AM_READWRITE(armchmp2_motor_status_r, armchmp2_motor_command_w)        // Motor Limit Switches?
 	AM_RANGE(0x100014, 0x100015) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff  )           // Sound
 	AM_RANGE(0x100018, 0x100019) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff  )           //
+ADDRESS_MAP_END
+
+
+/**************************************************************************
+                                Captain Flag
+**************************************************************************/
+
+#define RIGHT 0
+#define LEFT  1
+
+WRITE16_MEMBER(cischeat_state::captflag_leds_w)
+{
+	COMBINE_DATA( &m_captflag_leds );
+	if (ACCESSING_BITS_8_15)
+	{
+		coin_counter_w(machine(), 1, data & 0x0100);	// coin 2
+		set_led_status(machine(), 0, data & 0x0200);	// decide
+		coin_counter_w(machine(), 0, data & 0x0400);	// coin 1
+		set_led_status(machine(), 1, data & 0x2000);	// select
+
+		int power = (data & 0x1000);
+		m_captflag_hopper->write(space, 0, power ? 0x80 : 0x00);	// prize motor
+		if (!power)
+			m_captflag_hopper->reset();
+	}
+}
+
+WRITE16_MEMBER(cischeat_state::captflag_oki_bank_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_oki1_bank->set_entry(((data >> 0) + 1) & 0x7);
+		m_oki2_bank->set_entry(((data >> 4) + 1) & 0x7);
+	}
+}
+
+// Motors
+
+WRITE16_MEMBER(cischeat_state::captflag_motor_command_right_w)
+{
+	// Output check:
+	// e09a up
+	// 80b9 - (when not busy)
+	// 0088 - (when busy)
+	// e0ba down 
+	data = COMBINE_DATA( &m_captflag_motor_command[RIGHT] );
+	captflag_motor_move(RIGHT, data);
+}
+WRITE16_MEMBER(cischeat_state::captflag_motor_command_left_w)
+{
+	// Output check:
+	// e0ba up
+	// 8099 - (when not busy)
+	// 0088 - (when busy)
+	// e09a down 
+	data = COMBINE_DATA( &m_captflag_motor_command[LEFT] );
+	captflag_motor_move(LEFT, data);
+}
+
+void cischeat_state::captflag_motor_move(int side, UINT16 data)
+{
+	UINT16 & pos  = m_captflag_motor_pos[side];
+
+	timer_device & dev = ((side == RIGHT) ? m_captflag_motor_right : m_captflag_motor_left);
+
+//	bool busy = !(dev.time_left() == attotime::never);
+	bool busy = false;
+
+	if (data & 0x0010)
+	{
+		if (!busy)
+		{
+			bool down = (data & 0x0020);
+
+			int inc;
+			switch (data >> 8)
+			{
+				case 0xf5:	inc = +2;	break;	// -5 -6
+				case 0xf8:	inc = +1;	break;	// -5 -3
+				case 0xfe:	inc = -1;	break;	// -5 +3
+				case 0x01:	inc = -2;	break;	// -5 +6
+				default:
+					if ((data >> 8) + 5 >= 0x100)
+						inc = -1;
+					else
+						inc = +1;
+			}
+
+			if (data & 0x0001)
+				inc = 1;
+
+			if (down)
+				inc *= -1;
+
+			int new_pos = pos + inc;
+			if (new_pos > 3)
+				new_pos = 3;
+			else if (new_pos < 0)
+				new_pos = 0;
+			busy = (new_pos != pos);
+			pos = new_pos;
+
+			if (busy)
+				dev.adjust(attotime::from_msec(100));
+		}
+	}
+	else
+	{
+		dev.reset();
+	}
+
+	output_set_value((side == RIGHT) ? "right" : "left", pos);
+}
+
+CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_pos_r)
+{
+	const UINT8 pos[4] = {1,0,2,3}; // -> 2,3,1,0 offsets -> 0123
+	return ~pos[m_captflag_motor_pos[(FPTR)param]];
+}
+
+CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_busy_r)
+{
+//	timer_device & dev = ((side == RIGHT) ? m_captflag_motor_right : m_captflag_motor_left);
+//	return (dev.time_left() == attotime::never) ? 0 : 1;
+	return 0;
+}
+
+static ADDRESS_MAP_START( captflag_map, AS_PROGRAM, 16, cischeat_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
+	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(scudhamm_vregs_w) AM_SHARE("vregs")                       // Video Registers + RAM
+	AM_RANGE(0x090008, 0x090009) AM_WRITENOP                                                            // 0?
+	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE(cischeat_scrollram_0_w) AM_SHARE("scrollram.0")           // Scroll RAM 0
+	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(cischeat_scrollram_2_w) AM_SHARE("scrollram.2")           // Scroll RAM 2
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")  // Palette
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("ram")                                                 // Work RAM + Spriteram
+	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SW1_2") AM_WRITE(captflag_oki_bank_w)                    // 2 x DSW + Sound
+	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("Buttons") AM_WRITE(captflag_leds_w)                      // Buttons + Leds
+	AM_RANGE(0x100014, 0x100015) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)         // Sound
+	AM_RANGE(0x100018, 0x100019) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)         //
+	AM_RANGE(0x10001c, 0x10001d) AM_WRITE(scudhamm_enable_w)                                            // ?
+	AM_RANGE(0x100040, 0x100041) AM_READ_PORT("SW01")                                                   // DSW + Motor
+	AM_RANGE(0x100044, 0x100045) AM_WRITE(captflag_motor_command_left_w)                                // Motor Command (Left)
+	AM_RANGE(0x100048, 0x100049) AM_WRITE(captflag_motor_command_right_w)                               // Motor Command (Right)
+	AM_RANGE(0x100060, 0x10007d) AM_RAM                                                                 // 7-seg? NVRAM?
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( captflag_oki1_map, AS_0, 8, cischeat_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("oki1_bank")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( captflag_oki2_map, AS_0, 8, cischeat_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("oki2_bank")
 ADDRESS_MAP_END
 
 
@@ -1323,6 +1478,97 @@ INPUT_PORTS_END
 
 
 /**************************************************************************
+                                Captain Flag
+**************************************************************************/
+
+static INPUT_PORTS_START( captflag )
+	PORT_START("Buttons")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_PLAYER(2) // up left
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) // down left
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_PLAYER(1) // up right
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) // down right
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2    )	PORT_IMPULSE(1) // coin 2
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1  )	// decide
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1    )	PORT_IMPULSE(1) // coin 1
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 )	// service
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE  )	// test
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2  ) // select
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH,IPT_OUTPUT   ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // prize sensor
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // potery on schems?
+
+	PORT_START("SW1_2")
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPSETTING(      0x0008, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0028, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x00c0, 0x00c0, "Qualify" ) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(      0x0000, "30/40" )
+	PORT_DIPSETTING(      0x00c0, "30/50" )
+	PORT_DIPSETTING(      0x0080, "40/50" )
+	PORT_DIPSETTING(      0x0040, "50/50" )
+
+	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW2:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW2:8" )
+
+	PORT_START("SW01")
+	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_pos_r,  (void *)LEFT)
+	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_pos_r,  (void *)RIGHT)
+
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_busy_r, (void *)LEFT)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_busy_r, (void *)RIGHT)
+
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW01:1,2")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW01:3")
+	PORT_DIPSETTING(      0x0400, "3/4" )
+	PORT_DIPSETTING(      0x0000, "4/5" )
+	PORT_DIPNAME( 0x0800, 0x0800, "BGM Volume" ) PORT_DIPLOCATION("SW01:4")
+	PORT_DIPSETTING(      0x0000, "Low" )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW01:5")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
+	PORT_DIPNAME( 0xe000, 0xe000, "Capsule Payout" ) PORT_DIPLOCATION("SW01:6,7,8")
+	PORT_DIPSETTING(      0x0000, "Nothing" )
+	PORT_DIPSETTING(      0xc000, "05%" )
+	PORT_DIPSETTING(      0xe000, "10%" )
+	PORT_DIPSETTING(      0xa000, "15%" )
+	PORT_DIPSETTING(      0x8000, "20%" )
+	PORT_DIPSETTING(      0x6000, "30%" )
+	PORT_DIPSETTING(      0x4000, "50%" )
+	PORT_DIPSETTING(      0x2000, "All" )
+INPUT_PORTS_END
+
+
+/**************************************************************************
 
 
                                 Gfx Layouts
@@ -1687,6 +1933,76 @@ static MACHINE_CONFIG_DERIVED( armchmp2, scudhamm )
 	MCFG_CPU_PROGRAM_MAP(armchmp2_map)
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(cischeat_state, armchamp2_scanline)
+MACHINE_CONFIG_END
+
+
+/**************************************************************************
+                                Captain Flag
+**************************************************************************/
+
+/*
+    1]          no-op
+    2]          copy text buffer to tilemap, sound (~50 scanlines at 30Hz)
+    3]          I/O, sound (~5 scanlines at 30Hz). Sets a flag to update text buffer and sprites
+    4-7]        rte
+*/
+
+TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
+{
+	int scanline = param;
+
+	if(scanline == 240)	// vblank: draw screen
+		m_maincpu->set_input_line(2, HOLD_LINE);
+
+	if(scanline == 50)
+		m_maincpu->set_input_line(3, HOLD_LINE);
+}
+
+static MACHINE_CONFIG_START( captflag, cischeat_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",M68000, XTAL_24MHz / 2)	// TMP68000P-12
+	MCFG_CPU_PROGRAM_MAP(captflag_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, captflag_scanline, "screen", 0, 1)
+
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+//	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(30) //TODO: wrong!
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0 +16, 256-1 -16)
+	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scudhamm)
+	MCFG_PALETTE_ADD("palette", 0x8000/2)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+
+	MCFG_VIDEO_START_OVERRIDE(cischeat_state,f1gpstar)
+
+	// Motors
+	MCFG_TIMER_ADD_NONE("motor_left")
+	MCFG_TIMER_ADD_NONE("motor_right")
+
+	// Layout
+	MCFG_DEFAULT_LAYOUT(layout_captflag)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_OKIM6295_ADD("oki1", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, captflag_oki1_map)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+
+	MCFG_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, captflag_oki2_map)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -2922,6 +3238,68 @@ ROM_END
 
 /***************************************************************************
 
+                                Captain Flag
+
+**************************************************************************/
+
+ROM_START( captflag )
+	ROM_REGION( 0x80000, "maincpu", 0 )        /* Main CPU Code */
+	ROM_LOAD16_BYTE( "cf-92128a_3_ver1.4.ic40", 0x000000, 0x020000, CRC(e62af6ae) SHA1(38eb581def468860e4705f25088550799303a9aa) )
+	ROM_LOAD16_BYTE( "cf-92128_4_ver1.4.ic46",  0x000001, 0x020000, CRC(e773f87f) SHA1(cf9d72b0df256b69b96f1cd6b5f86282801873e3) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) /* Scroll 0 */
+	ROM_LOAD( "mr92027-11_w89.ic54", 0x000000, 0x080000, CRC(d34cae3c) SHA1(622ad4645df12d34e55bbfb7194508957bb2198b) )	// 5 on the PCB
+
+//  ROM_REGION( 0x080000, "gfx2", 0 ) /* Scroll 1 */
+//  UNUSED
+
+	ROM_REGION( 0x20000, "gfx3", 0 ) /* Scroll 2 */
+	ROM_LOAD( "cf-92128_6.ic55", 0x000000, 0x020000, CRC(12debfc2) SHA1(f28d3f63a3c8965fcd838eedad4ef3682a28da0d) )	// 6 on the PCB
+
+	ROM_REGION( 0x400000, "gfx4", 0 ) /* Sprites */
+	ROM_LOAD16_BYTE( "gp-9189_1.ic1",       0x000000, 0x080000, CRC(03d69f0f) SHA1(97a0552d94ca1e9c76896903c02c3f005752e5db) )
+	ROM_LOAD16_BYTE( "gp-9189_2.ic2",       0x000001, 0x080000, CRC(fbfba282) SHA1(65735d8f6abdb5816b8b26ce2969959a0f2e2c7d) )
+	ROM_LOAD16_BYTE( "mr92027-08_w85.ic5",  0x100000, 0x080000, CRC(1e02abff) SHA1(497aeab40c778ef6d8a76b005530fea5f4f68ab8) )
+	ROM_LOAD16_BYTE( "mr92027-04_w86.ic6",  0x100001, 0x080000, CRC(89dfe3e8) SHA1(f069cf55d08e5901699e7ee7c6b2b5cdba031cf2) )
+	ROM_LOAD16_BYTE( "gp-9189_5.ic11",      0x200000, 0x080000, CRC(edc33285) SHA1(a23f9a1877108eaaef6d467ae21433fe5f24261f) )
+	ROM_LOAD16_BYTE( "gp-9189_6.ic12",      0x200001, 0x080000, CRC(99b8f6d8) SHA1(e01c85861d5a131bb31908460cb3bc9eb0ea045c) )
+	ROM_LOAD16_BYTE( "mr92027-07_w87.ic15", 0x300000, 0x080000, CRC(07e49754) SHA1(c9fcd394badba104508e4c5ec5cf5513ecb2d69e) )
+	ROM_LOAD16_BYTE( "mr92027-08_w88.ic16", 0x300001, 0x080000, CRC(fb080dd6) SHA1(49eceba8cdce76dec3f6a85327135125bb0910f0) )
+
+	ROM_REGION( 0x80000, "user2", 0 )       /* ? Unused ROMs ? */
+	ROM_LOAD( "pr91042.ic86",        0x000000, 0x000100, CRC(e71de4aa) SHA1(d06e5a35ad2127df2d6328cce153073380ee7819) )	// FIXED BITS (00000xxx0000xxxx)
+	ROM_LOAD( "pr88004q.ic88",       0x000000, 0x000200, CRC(9327dc37) SHA1(cfe7b144cdcd76170d47f1c4e0f72b6d4fca0c8d) )	// FIXED BITS (1xxxxxxx1111x1xx)
+	ROM_LOAD( "pr92027a.ic16",       0x000000, 0x000020, CRC(bee7adc6) SHA1(cd11a3dae0317d06a69b5707a653b8997c1eb97f) )	// FIXED BITS (0000000000000xxx), 1xxx0 = 0x00
+	ROM_LOAD( "pr92027a.ic17",       0x000000, 0x000020, CRC(bee7adc6) SHA1(cd11a3dae0317d06a69b5707a653b8997c1eb97f) )	// ""
+	ROM_LOAD( "pr92027b.ic32.bin",   0x000000, 0x000113, CRC(483f4fb5) SHA1(84bb0300a106261634c921a37858482d3233c05a) )
+	ROM_LOAD( "pr92027b.ic32.jedec", 0x000000, 0x000bd0, CRC(f0ed1845) SHA1(203438fdee05810b2265624e1a1fdd55d360f833) )
+	ROM_LOAD( "pr92027b.ic36.bin",   0x000000, 0x000113, CRC(483f4fb5) SHA1(84bb0300a106261634c921a37858482d3233c05a) )
+	ROM_LOAD( "pr92027b.ic36.jedec", 0x000000, 0x000bd0, CRC(f0ed1845) SHA1(203438fdee05810b2265624e1a1fdd55d360f833) )
+
+	ROM_LOAD( "ch9072_4.ic39",       0x000000, 0x002000, CRC(b45b4dc0) SHA1(b9fae0c9ac2d40f0a202c538d866d5f2941ba8dd) )	// FIXED BITS (0000000x), 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "ch9072_5.ic33",       0x000000, 0x001000, CRC(a8025dc1) SHA1(c9bb7ea59bba3041c687b449ff1560d7d1ce2ec9) )	// FIXED BITS (xxxx0xxx)          
+	ROM_LOAD( "ch9072_6.ic35",       0x000000, 0x001000, CRC(5cc9c561) SHA1(10866fd0707498fe4d4415bf755c07b55af4ae18) )
+	ROM_LOAD( "ch9072_8.ic59",       0x000000, 0x001000, CRC(6c99523b) SHA1(cc00b326b69a97b5bd2e2d741ab41692a14eae35) )	// FIXED BITS (0xxx0xxx)
+
+	ROM_LOAD( "mr90015-35_w33.ic54", 0x000000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) ) // not dumped yet (taken from the other games)
+	ROM_LOAD( "mr90015-35_w33.ic67", 0x000000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) ) // ""
+
+	ROM_REGION( 0x100000, "oki1", 0 )       /* Samples (8x20000) */
+	ROM_LOAD( "mr92027-10_w27.ic19", 0x000000, 0x100000, CRC(04bd729e) SHA1(92bcedf16554f33cc3d0dbdd8807b0e2fafe5d7c) )	// 2 on the PCB
+
+	ROM_REGION( 0x100000, "oki2", 0 )       /* Samples (8x20000) */
+	ROM_LOAD( "mr92027-09_w26.ic18", 0x000000, 0x100000, CRC(3aaa332a) SHA1(6c19364069e0b077a07ac4f9c4b0cf0c0985a42a) )	// 1 on the PCB
+ROM_END
+
+DRIVER_INIT_MEMBER(cischeat_state, captflag)
+{
+	m_oki1_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki1")->base(), 0x20000);
+	m_oki2_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki2")->base(), 0x20000);
+}
+
+
+/***************************************************************************
+
 
                                 Game Drivers
 
@@ -2931,8 +3309,9 @@ ROM_END
 GAMEL( 1989, bigrun,   0,        bigrun,   bigrun, cischeat_state,   bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES?)
 GAMEL( 1990, cischeat, 0,        cischeat, cischeat, cischeat_state, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS, layout_cischeat )
 GAMEL( 1991, f1gpstar, 0,        f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star",               MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
-GAME ( 1992, armchmp2, 0,        armchmp2, armchmp2, driver_device, 0,        ROT270, "Jaleco", "Arm Champs II v2.6",            MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, driver_device, 0,        ROT270, "Jaleco", "Arm Champs II v1.7",            MACHINE_IMPERFECT_GRAPHICS )
+GAME ( 1992, armchmp2, 0,        armchmp2, armchmp2, driver_device, 0,         ROT270, "Jaleco", "Arm Champs II v2.6",            MACHINE_IMPERFECT_GRAPHICS )
+GAME ( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, driver_device, 0,         ROT270, "Jaleco", "Arm Champs II v1.7",            MACHINE_IMPERFECT_GRAPHICS )
 GAME ( 1992, wildplt,  0,        f1gpstr2, wildplt, cischeat_state,  wildplt,  ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS )
 GAMEL( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS, layout_f1gpstar )
-GAME ( 1994, scudhamm, 0,        scudhamm, scudhamm, driver_device, 0,        ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )
+GAME ( 1993, captflag, 0,        captflag, captflag, cischeat_state, captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )
+GAME ( 1994, scudhamm, 0,        scudhamm, scudhamm, driver_device, 0,         ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )

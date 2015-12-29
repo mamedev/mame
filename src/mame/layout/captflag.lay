@@ -1,0 +1,107 @@
+<?xml version="1.0" ?>
+<mamelayout version="2">
+
+  <!-- Left Flag (Red) -->
+  <element name="left_flag" defstate="0">
+    <!-- Top position -->
+    <!-- Falgpole -->
+    <rect state="0">
+      <bounds x="0.95" y="0.6" width="0.05" height="0.4"/>
+      <color red="0.8" green="0.8" blue="0.8"/>
+    </rect>
+    <!-- Flag -->
+    <rect state="0">
+      <bounds x="0" y="0" width="1" height="0.6"/>
+      <color red="1.0" green="0.0" blue="0.0"/>
+    </rect>
+
+    <rect state="1">
+      <bounds x="0.95" y="1.6" width="0.05" height="0.4"/>
+      <color red="0.8" green="0.8" blue="0.8"/>
+    </rect>
+    <rect state="1">
+      <bounds x="0" y="1" width="1" height="0.6"/>
+      <color red="1.0" green="0.0" blue="0.0"/>
+    </rect>
+
+    <rect state="2">
+      <bounds x="0.95" y="2.6" width="0.05" height="0.4"/>
+      <color red="0.8" green="0.8" blue="0.8"/>
+    </rect>
+    <rect state="2">
+      <bounds x="0" y="2" width="1" height="0.6"/>
+      <color red="1.0" green="0.0" blue="0.0"/>
+    </rect>
+
+    <rect state="3">
+      <bounds x="0.95" y="3.6" width="0.05" height="0.4"/>
+      <color red="0.8" green="0.8" blue="0.8"/>
+    </rect>
+    <rect state="3">
+      <bounds x="0" y="3" width="1" height="0.6"/>
+      <color red="1.0" green="0.0" blue="0.0"/>
+    </rect>
+  </element>
+
+  <!-- Right Flag (White) -->
+  <element name="right_flag" defstate="0">
+    <!-- Top position -->
+    <!-- Falgpole -->
+    <rect state="3">
+      <bounds x="0" y="0.6" width="0.05" height="0.4"/>
+      <color red="0.8" green="0.8" blue="0.8"/>
+    </rect>
+    <!-- Flag -->
+    <rect state="3">
+      <bounds x="0" y="0" width="1" height="0.6"/>
+      <color red="1.0" green="1.0" blue="1.0"/>
+    </rect>
+
+    <rect state="2">
+      <bounds x="0" y="1.6" width="0.05" height="0.4"/>
+      <color red="0.8" green="0.8" blue="0.8"/>
+    </rect>
+    <rect state="2">
+      <bounds x="0" y="1" width="1" height="0.6"/>
+      <color red="1.0" green="1.0" blue="1.0"/>
+    </rect>
+
+    <rect state="1">
+      <bounds x="0" y="2.6" width="0.05" height="0.4"/>
+      <color red="0.8" green="0.8" blue="0.8"/>
+    </rect>
+    <rect state="1">
+      <bounds x="0" y="2" width="1" height="0.6"/>
+      <color red="1.0" green="1.0" blue="1.0"/>
+    </rect>
+
+    <rect state="0">
+      <bounds x="0" y="3.6" width="0.05" height="0.4"/>
+      <color red="0.8" green="0.8" blue="0.8"/>
+    </rect>
+    <rect state="0">
+      <bounds x="0" y="3" width="1" height="0.6"/>
+      <color red="1.0" green="1.0" blue="1.0"/>
+    </rect>
+  </element>
+
+  <view name="Mechanical Torso (No Artwork)">
+
+    <!-- Screen (Face) -->
+    <screen index="0">
+      <bounds left="0" top="0" right="3" bottom="4" />
+    </screen>
+
+    <!-- Left Arm -->
+    <bezel name="left" element="left_flag">
+      <bounds x="-1.1" y="0" width="1" height="4"/>
+    </bezel>
+
+    <!-- Right Arm -->
+    <bezel name="right" element="right_flag">
+      <bounds x="3.1" y="0" width="1" height="4"/>
+    </bezel>
+
+  </view>
+
+</mamelayout>

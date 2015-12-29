@@ -1415,6 +1415,15 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
 							scudhamm_motor_pos_r(space,0,0xffff),
 							scudhamm_motor_status_r(space,0,0xffff),
 							scudhamm_analog_r(space,0,0xffff) );
+
+#if 0
+	// captflag
+	{
+		popmessage(	"[%04x] [%04x]\nLEDS %04x", m_captflag_motor_command[LEFT], m_captflag_motor_command[RIGHT], m_captflag_leds );
+		m_captflag_motor_command[LEFT] = m_captflag_motor_command[RIGHT] = 0;
+	}
+#endif
+
 	}
 #endif
 
