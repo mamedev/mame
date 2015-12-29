@@ -8294,8 +8294,8 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x10000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x040000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2425.u77",  0x00000, 0x10000, CRC(3decf667) SHA1(1a30cbe616b2a833d2cec6f24fc0f9abb1dda051) )
-	ROM_LOAD( "mgo-cg2425.u78",  0x10000, 0x10000, CRC(3decf667) SHA1(1a30cbe616b2a833d2cec6f24fc0f9abb1dda051) )
+	ROM_LOAD( "mro-cg2425.u77",  0x00000, 0x10000, BAD_DUMP CRC(3decf667) SHA1(1a30cbe616b2a833d2cec6f24fc0f9abb1dda051) ) /* One of these 2 are wrong! */
+	ROM_LOAD( "mgo-cg2425.u78",  0x10000, 0x10000, BAD_DUMP CRC(3decf667) SHA1(1a30cbe616b2a833d2cec6f24fc0f9abb1dda051) ) /* One of these 2 are wrong! */
 	ROM_LOAD( "mbo-cg2425.u79",  0x20000, 0x10000, CRC(6ec83d3a) SHA1(07acb0ed3bb0108b72ff27bbbfb5bcbb006a510e) )
 	ROM_LOAD( "mxo-cg2425.u80",  0x30000, 0x10000, CRC(4dbee1a7) SHA1(8281ce452c1d418f671ed8c5aa833f8d8ca3f247) )
 
