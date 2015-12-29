@@ -93,7 +93,7 @@ public:
 	UINT8 m_ss9601_byte_lo;
 	UINT8 m_ss9601_byte_lo2;
 	std::unique_ptr<UINT8[]> m_ss9601_reelrams[2];
-	rectangle m_ss9601_reelrects[3];
+	std::unique_ptr<bitmap_ind16> m_reelbitmap;
 	UINT8 m_ss9601_scrollctrl;
 	UINT8 m_ss9601_tilesize;
 	UINT8 m_ss9601_disable;
@@ -165,8 +165,6 @@ public:
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_0);
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
 	DECLARE_VIDEO_START(subsino2);
-	DECLARE_VIDEO_START(mtrain);
-	DECLARE_VIDEO_START(xtrain);
 	UINT32 screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
 	required_device<cpu_device> m_maincpu;
@@ -636,10 +634,7 @@ VIDEO_START_MEMBER(subsino2_state,subsino2)
 	m_ss9601_reelrams[VRAM_LO] = std::make_unique<UINT8[]>(0x2000);
 	memset(m_ss9601_reelrams[VRAM_HI].get(), 0, 0x2000);
 	memset(m_ss9601_reelrams[VRAM_LO].get(), 0, 0x2000);
-	m_ss9601_reelrects[0].set(0, 0, 0x00*8, 0x09*8-1);
-	m_ss9601_reelrects[1].set(0, 0, 0x09*8, 0x10*8-1);
-	m_ss9601_reelrects[2].set(0, 0, 0x10*8, 256-16-1);
-
+	m_reelbitmap = std::make_unique<bitmap_ind16>(0x80*8, 0x40*8);
 /*
     save_pointer(NAME(m_ss9601_reelrams[VRAM_HI]), 0x2000);
     save_pointer(NAME(m_ss9601_reelrams[VRAM_LO]), 0x2000);
@@ -650,19 +645,6 @@ VIDEO_START_MEMBER(subsino2_state,subsino2)
     save_pointer(NAME(m_layers[1].scrollrams[VRAM_HI]), 0x200);
     save_pointer(NAME(m_layers[1].scrollrams[VRAM_LO]), 0x200);
 */
-}
-
-VIDEO_START_MEMBER(subsino2_state,mtrain)
-{
-	VIDEO_START_CALL_MEMBER( subsino2 );
-}
-
-VIDEO_START_MEMBER(subsino2_state,xtrain)
-{
-	VIDEO_START_CALL_MEMBER( subsino2 );
-	m_ss9601_reelrects[0].set(0, 0, 0x00*8, 0x08*8-1);
-	m_ss9601_reelrects[1].set(0, 0, 0x08*8, 0x18*8-1);
-	m_ss9601_reelrects[2].set(0, 0, 0x18*8, 256-16-1);
 }
 
 UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -694,6 +676,8 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 		case 0x07:
 			mask_y[0] = ~(8-1);
 			break;
+//		case 0x7f:	// ptrain
+//			break;
 		case 0xfd:
 			l0_reel = true;
 			break;
@@ -731,22 +715,23 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 			l->tmap->set_scroll_rows(1);
 			l->tmap->set_scroll_cols(1);
 
-			for (auto visible : m_ss9601_reelrects)
+			for (int y = 0; y < 0x20/4; y++)
 			{
-				
-
-				for (int x = 0; x < 0x40; x++)
+				for (int x = 0; x < 0x80; x++)
 				{
+					rectangle visible;
 					visible.min_x = 8 * x;
 					visible.max_x = 8 * (x+1) - 1;
+					visible.min_y = 4 * 0x10 * y;
+					visible.max_y = 4 * 0x10 * (y+1) - 1;
 
-					int reeladdr = (visible.min_y / 0x10) * 0x80 + x;
+					int reeladdr = y * 0x80 * 4 + x;
 					UINT16 reelscroll = (m_ss9601_reelrams[VRAM_HI][reeladdr] << 8) + m_ss9601_reelrams[VRAM_LO][reeladdr];
 
-					l->tmap->set_scrollx(0, (reelscroll >> 9) * 8 + l->scroll_x - visible.min_x);
+					l->tmap->set_scrollx(0, (reelscroll >> 9) * 8 - visible.min_x);
 
 					// wrap around at half tilemap (0x100)
-					int reelscroll_y = (reelscroll & 0x100) + ((reelscroll + l->scroll_y - visible.min_y/0x10*0x10 + 1) & 0xff);
+					int reelscroll_y = (reelscroll & 0x100) + ((reelscroll - visible.min_y) & 0xff);
 					int reelwrap_y = 0x100 - (reelscroll_y & 0xff);
 
 					rectangle tmp = visible;
@@ -757,7 +742,7 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 						if ( reelwrap_y-1 <= visible.max_y )
 							tmp.max_y = reelwrap_y-1;
 						l->tmap->set_scrolly(0, reelscroll_y);
-						l->tmap->draw(screen, bitmap, tmp, 0, 0);
+						l->tmap->draw(screen, *m_reelbitmap, tmp, TILEMAP_DRAW_OPAQUE);
 						tmp.max_y = visible.max_y;
 					}
 
@@ -767,11 +752,15 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 						if ( reelwrap_y >= visible.min_y )
 							tmp.min_y = reelwrap_y;
 						l->tmap->set_scrolly(0, -((reelwrap_y &0xff) | (reelscroll_y & 0x100)));
-						l->tmap->draw(screen, bitmap, tmp, 0, 0);
+						l->tmap->draw(screen, *m_reelbitmap, tmp, TILEMAP_DRAW_OPAQUE);
 						tmp.min_y = visible.min_y;
 					}
 				}
 			}
+
+			INT32 sx = -l->scroll_x;
+			INT32 sy = -(l->scroll_y + 1);
+			copyscrollbitmap(bitmap, *m_reelbitmap, 1, &sx, 1, &sy, cliprect);
 		}
 		else
 		{
@@ -2193,7 +2182,7 @@ static MACHINE_CONFIG_START( mtrain, subsino2_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
 	MCFG_PALETTE_ADD( "palette", 256 )
 
-	MCFG_VIDEO_START_OVERRIDE(subsino2_state, mtrain )
+	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2273,8 +2262,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( xtrain, xplan )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(xtrain_io)
-
-	MCFG_VIDEO_START_OVERRIDE(subsino2_state, xtrain )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( expcard, xplan )
@@ -2805,6 +2792,6 @@ GAME( 1996, wtrnymph, 0,        mtrain,   wtrnymph, subsino2_state, wtrnymph, RO
 GAME( 1998, expcard,  0,        expcard,  expcard,  subsino2_state, expcard,  ROT0, "American Alpha", "Express Card / Top Card (Ver. 1.5)",   0 )
 GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, saklove,  ROT0, "Subsino",        "Ying Hua Lian 2.0 (China, Ver. 1.02)", 0 )
 GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, xtrain,   ROT0, "Subsino",        "X-Train (Ver. 1.3)",                   0 )
-GAME( 1999, ptrain,   0,        xtrain,   xtrain,   subsino2_state, ptrain,   ROT0, "Subsino",        "Panda Train (Novamatic 1.7)",          0 )
+GAME( 1999, ptrain,   0,        xtrain,   xtrain,   subsino2_state, ptrain,   ROT0, "Subsino",        "Panda Train (Novamatic 1.7)",          MACHINE_IMPERFECT_GRAPHICS ) // missing scroll in race screens
 GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, bishjan,  ROT0, "Subsino",        "Bishou Jan (Japan, Ver. 2.03)",        MACHINE_NO_SOUND )
 GAME( 2006, xplan,    0,        xplan,    xplan,    subsino2_state, xplan,    ROT0, "Subsino",        "X-Plan (Ver. 1.01)",                   0 )
