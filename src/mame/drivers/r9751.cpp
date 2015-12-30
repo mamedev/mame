@@ -3,7 +3,7 @@
 /******************************************************************************
 *
 * Rolm CBX 9751 Driver
-* 
+*
 * This driver attempts to emulate the following models:
 * * Model 10
 * * Model 20
@@ -21,10 +21,10 @@
 *
 * Special Thanks to:
 * * Stephen Stair (sgstair)   - for help with reverse engineering,
-*				programming, and emulation
+*               programming, and emulation
 * * Felipe Sanches (FSanches) - for help with MESS and emulation
 * * Michael Zapf (mizapf)     - for building the HDC9234/HDC9224
-*				driver that makes this driver possible
+*               driver that makes this driver possible
 *
 * Memory map:
 * * 0x00000000 - 0x00ffffff : RAM 12MB to 16MB known, up to 128MB?
@@ -67,8 +67,8 @@ public:
 
 	DECLARE_READ32_MEMBER(r9751_mmio_5ff_r);
 	DECLARE_WRITE32_MEMBER(r9751_mmio_5ff_w);
-        DECLARE_READ32_MEMBER(r9751_mmio_ff05_r);
-        DECLARE_WRITE32_MEMBER(r9751_mmio_ff05_w);
+		DECLARE_READ32_MEMBER(r9751_mmio_ff05_r);
+		DECLARE_WRITE32_MEMBER(r9751_mmio_ff05_w);
 	DECLARE_READ32_MEMBER(r9751_mmio_fff8_r);
 	DECLARE_WRITE32_MEMBER(r9751_mmio_fff8_w);
 
@@ -94,7 +94,7 @@ private:
 	UINT32 smioc_out_addr;
 	// End registers
 
-//	UINT32 fdd_scsi_command;
+//  UINT32 fdd_scsi_command;
 	address_space *m_mem;
 
 	// functions
@@ -106,8 +106,8 @@ private:
 
 UINT32 r9751_state::swap_uint32( UINT32 val )
 {
-    val = ((val << 8) & 0xFF00FF00 ) | ((val >> 8) & 0xFF00FF ); 
-    return (val << 16) | (val >> 16);
+	val = ((val << 8) & 0xFF00FF00 ) | ((val >> 8) & 0xFF00FF );
+	return (val << 16) | (val >> 16);
 }
 
 READ8_MEMBER(r9751_state::pdc_dma_r)
@@ -127,7 +127,7 @@ DRIVER_INIT_MEMBER(r9751_state,r9751)
 	reg_ff050320 = 1;
 	reg_fff80040 = 0;
 	fdd_dest_address = 0;
-//	fdd_scsi_command = 0;
+//  fdd_scsi_command = 0;
 	fdd_cmd_complete = 0;
 	smioc_out_addr = 0;
 	m_mem = &m_maincpu->space(AS_PROGRAM);
@@ -300,7 +300,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 READ32_MEMBER( r9751_state::r9751_mmio_ff05_r )
 {
 	UINT32 data;
-        UINT32 address = offset * 4 + 0xFF050000;
+		UINT32 address = offset * 4 + 0xFF050000;
 
 	switch(address)
 	{
@@ -352,8 +352,8 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_ff05_w )
 
 READ32_MEMBER( r9751_state::r9751_mmio_fff8_r )
 {
-        UINT32 data;
-        UINT32 address = offset * 4 + 0xFFF80000;
+		UINT32 data;
+		UINT32 address = offset * 4 + 0xFFF80000;
 
 	switch(address)
 	{
@@ -369,7 +369,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_fff8_r )
 
 WRITE32_MEMBER( r9751_state::r9751_mmio_fff8_w )
 {
-        UINT32 address = offset * 4 + 0xFFF80000;
+		UINT32 address = offset * 4 + 0xFFF80000;
 
 	switch(address)
 	{
@@ -391,8 +391,8 @@ static ADDRESS_MAP_START(r9751_mem, AS_PROGRAM, 32, r9751_state)
 	AM_RANGE(0x00000000,0x00ffffff) AM_RAM AM_SHARE("main_ram") // 16MB
 	//AM_RANGE(0x01000000,0x07ffffff) AM_NOP
 	AM_RANGE(0x08000000,0x0800ffff) AM_ROM AM_REGION("prom", 0)
-        AM_RANGE(0x5FF00000,0x5FFFFFFF) AM_READWRITE(r9751_mmio_5ff_r, r9751_mmio_5ff_w)
-        AM_RANGE(0xFF050000,0xFF06FFFF) AM_READWRITE(r9751_mmio_ff05_r, r9751_mmio_ff05_w)
+		AM_RANGE(0x5FF00000,0x5FFFFFFF) AM_READWRITE(r9751_mmio_5ff_r, r9751_mmio_5ff_w)
+		AM_RANGE(0xFF050000,0xFF06FFFF) AM_READWRITE(r9751_mmio_ff05_r, r9751_mmio_ff05_w)
 	AM_RANGE(0xFFF80000,0xFFF8FFFF) AM_READWRITE(r9751_mmio_fff8_r, r9751_mmio_fff8_w)
 	//AM_RANGE(0xffffff00,0xffffffff) AM_RAM // Unknown area
 ADDRESS_MAP_END

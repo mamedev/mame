@@ -34,11 +34,11 @@
 class pdc_device :  public device_t
 {
 public:
-        /* Constructor and Destructor */
+		/* Constructor and Destructor */
 	pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-        /* Optional information overrides */
-        virtual machine_config_constructor device_mconfig_additions() const override;
+		/* Optional information overrides */
+		virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const rom_entry *device_rom_region() const override;
 
@@ -69,7 +69,7 @@ public:
 	DECLARE_WRITE8_MEMBER(m68k_dma_w);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-        DECLARE_FLOPPY_FORMATS( floppy_formats );
+		DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	/* Main CPU accessible registers */
 	UINT8 reg_p0;
@@ -84,16 +84,16 @@ public:
 	UINT8 reg_p38;
 	UINT32 fdd_68k_dma_address; /* FDD <-> m68k DMA read/write address */
 protected:
-        /* Device-level overrides */
-        virtual void device_start() override;
-        virtual void device_reset() override;
+		/* Device-level overrides */
+		virtual void device_start() override;
+		virtual void device_reset() override;
 
 	/* Protected variables */
 	//UINT32 fdd_68k_dma_address;
 	bool b_fdc_irq;
 
 	/* Attached devices */
-        required_device<cpu_device> m_pdccpu;
+		required_device<cpu_device> m_pdccpu;
 	required_device<am9517a_device> m_dma8237;
 	required_device<upd765a_device> m_fdc;
 	//required_device<floppy_connector> m_floppy;
@@ -103,8 +103,8 @@ protected:
 	required_shared_ptr<UINT8> m_pdc_ram;
 
 	/* Callbacks */
-	devcb_read8	m_m68k_r_cb;
-	devcb_write8	m_m68k_w_cb;
+	devcb_read8 m_m68k_r_cb;
+	devcb_write8    m_m68k_w_cb;
 };
 
 /* Device type */

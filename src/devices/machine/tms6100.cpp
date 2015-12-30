@@ -206,7 +206,7 @@ WRITE_LINE_MEMBER(tms6100_device::romclock_w)
 					UINT8 word = m_rom[m_address >> 3];
 					if (m_reverse_bits)
 						word = BITSWAP8(word,0,1,2,3,4,5,6,7);
-					
+
 					if (m_4bit_read)
 					{
 						m_data = word >> (m_address & 4) & 0xf;

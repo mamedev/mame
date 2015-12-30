@@ -314,7 +314,7 @@ amidars         // GX337 (c) 1982 Konami
 triplep         // (c) 1982 KKI / made by Sanritsu?
 triplepa        // (c) 1982 KKI / made by Sanritsu?
 knockout        // (c) 1982 KKK
-knockoutb		// bootleg
+knockoutb       // bootleg
 mariner         // (c) 1981 Amenip
 800fath         // (c) 1981 Amenip + U.S. Billiards license
 mars            // (c) 1981 Artic
@@ -360,7 +360,7 @@ calipso         // (c) 1982 Tago
 anteater        // (c) 1982 Tago
 anteaterg       // (c) 1983 TV-Tuning (F.E.G. license)
 anteateruk      // (c) 1983 Free Enterprise Games
-anteatergg		// bootleg
+anteatergg      // bootleg
 rescue          // (c) 1982 Stern
 rescueb         // (c) Videl Games (Rescue bootleg)
 aponow          // bootleg
@@ -1437,7 +1437,7 @@ pss64           // 199? Nintendo / Hudson Soft
 
 // SNES-based hacks
 kinstb          // bootleg
-mk3snes			// bootleg
+mk3snes         // bootleg
 ffight2b        // bootleg
 sblast2b        // bootleg
 iron            // bootleg
@@ -1536,7 +1536,7 @@ schasera        // RT  Taito
 schaserb        // RT  Taito
 schaserc        // RT  Taito
 schasercv       // RT  Taito
-schaserm		// Model Racing
+schaserm        // Model Racing
 lupin3          // LP  (c) 1980 Taito
 lupin3a         // LP  (c) 1980 Taito
 intruder        // (c) 1980 GamePlan (Taito)
@@ -2119,7 +2119,7 @@ knightb         // bootleg
 kicknrun        // A87 (c) 1986 Taito Corporation
 kicknrunu       // A87 (c) 1986 Taito Corporation
 mexico86        // bootleg (Micro Research)
-mexico86a		// bootleg
+mexico86a       // bootleg
 darius          // A96 (c) 1986 Taito Corporation Japan (World)
 dariusu         // A96 (c) 1986 Taito America Corporation (US)
 dariusj         // A96 (c) 1986 Taito Corporation (Japan)
@@ -2501,7 +2501,7 @@ gseeker         // 1992.?? D40 (c) 1992 Taito Corporation Japan (World)
 gseekerj        // 1992.12 D40 (c) 1992 Taito Corporation (Japan)
 gseekeru        // 1992.?? D40 (c) 1992 Taito America Corporation (US)
 hthero93        // 1993.03 D49 (c) 1992 Taito Corporation (Japan)
-hthero93u		// 1993.04 D49 (c) 1992 Taito America Corporation (US)
+hthero93u       // 1993.04 D49 (c) 1992 Taito America Corporation (US)
 cupfinal        // 1993.?? D49 (c) 1993 Taito Corporation Japan (World)
 trstar          // 1993.?? D53 (c) 1993 Taito Corporation Japan (World)
 trstarj         // 1993.07 D53 (c) 1993 Taito Corporation (Japan)
@@ -3255,7 +3255,7 @@ sf2v004         // hack
 sf2acc          // hack
 sf2acca         // hack
 sf2ceblp        // hack
-sf2cebltw		// hack
+sf2cebltw       // hack
 sf2accp2        // hack
 sf2amf          // bootleg
 sf2amf2         // bootleg
@@ -3368,7 +3368,7 @@ ddtodh          // 12/04/1994 (c) 1993 (Hispanic)
 ddtodhr1        // 25/01/1994 (c) 1993 (Hispanic)
 ddtodhr2        // 13/01/1994 (c) 1993 (Hispanic)
 ssf2t           // 23/02/1994 (c) 1994 (World)
-ssf2th			// 23/02/1994 (c) 1994 (Hispanic)
+ssf2th          // 23/02/1994 (c) 1994 (Hispanic)
 ssf2tu          // 23/03/1994 (c) 1994 (USA)
 ssf2tur1        // 23/02/1994 (c) 1994 (USA)
 ssf2ta          // 23/02/1994 (c) 1994 (Asia)
@@ -3390,7 +3390,7 @@ vampja          // 05/07/1994 (c) 1994 (Japan)
 vampjr1         // 30/06/1994 (c) 1994 (Japan)
 ringdest        // 02/09/1994 (c) 1994 (Euro)
 ringdesta       // 31/08/1994 (c) 1994 (Asia)
-ringdesth		// 02/09/1994 (c) 1994 (Hispanic)
+ringdesth       // 02/09/1994 (c) 1994 (Hispanic)
 smbomb          // 31/08/1994 (c) 1994 (Japan)
 smbombr1        // 08/08/1994 (c) 1994 (Japan)
 armwar          // 24/10/1994 (c) 1994 (Euro)
@@ -3740,7 +3740,7 @@ doapp           // Dead Or Alive ++ (JAPAN)
 cbaj            // Cool Boaders Arcade Jam
 shngmtkb        // Shanghai Matekibuyuu
 tondemo         // Tondemo Crisis (JAPAN)
-glpracr3		// Gallop Racer 3 (Export)
+glpracr3        // Gallop Racer 3 (Export)
 glpracr3j       // Gallop Racer 3 (JAPAN)
 flamegun        // Flame Gunner (USA)
 flamegunj       // Flame Gunner (JAPAN)
@@ -4137,7 +4137,7 @@ tsurugij        // 2001
 wcombat         // 2002
 wcombatk        // 2002
 wcombatj        // 2002
-wcombatu		// 2002
+wcombatu        // 2002
 xtrial          // 2002
 mfightc         // 2002
 mfightcc        // 2002
@@ -6176,7 +6176,7 @@ hbarrelw        // (c) 1987 Data East Corporation (World)
 baddudes        // EI (c) 1988 Data East USA (US)
 drgninja        // EG (c) 1988 Data East Corporation (Japan)
 drgninjab       // bootleg
-drgninjab2		// bootleg
+drgninjab2      // bootleg
 birdtry         // (c) 1988 Data East Corporation (Japan)
 robocop         // EP? (c) 1988 Data East Corporation (World)
 robocopw        // EP? (c) 1988 Data East Corporation (World)
@@ -6780,7 +6780,7 @@ xmen2pj         // GX065 (c) 1992 (Japan)
 xmen6p          // GX065 (c) 1992 (World)
 xmen6pu         // GX065 (c) 1992 (US)
 xexex           // GX067 (c) 1991 (World)
-orius			// GX067 (c) 1991 (USA)
+orius           // GX067 (c) 1991 (USA)
 xexexa          // GX067 (c) 1991 (Asia)
 xexexj          // GX067 (c) 1991 (Japan)
 asterix         // GX068 (c) 1992 (World)
@@ -7539,7 +7539,7 @@ badlandsb       // bootleg
 badlandsb2      // bootleg set 2
 klax            // 136075           (c) 1989
 klax2           // 136075           (c) 1989
-klax2bl			// bootleg
+klax2bl         // bootleg
 klax3           // 136075           (c) 1989
 klaxj           // 136075           (c) 1989 (Japan)
 klaxd           // 136075           (c) 1989 (Germany)
@@ -8112,7 +8112,7 @@ kuniokunb       // bootleg
 xsleena         // TA-0019 (c) 1986 + Taito license
 xsleenaj        // TA-0019 (c) 1986
 xsleenab        // bootleg
-xsleenaba		// bootleg
+xsleenaba       // bootleg
 solrwarr        // TA-0019 (c) 1986 + Taito / Memetron license
 battlane        // -0215, -0216 (Data East part number) (c) 1986 + Taito license
 battlane2       // -0215, -0216 (Data East part number) (c) 1986 + Taito license
@@ -8147,7 +8147,7 @@ vball2pjb       // bootleg (of Japan set)
 ddragon2        // TA-0026 (c) 1988 (World)
 ddragon2u       // TA-0026 (c) 1988 (US)
 ddragon2j       // TA-0026 (c) 1988 (Japan)
-ddragon2b		// bootleg
+ddragon2b       // bootleg
 toffy           // (c) 1993 Midas
 stoffy          // (c) 1994 Midas
 stoffyu         // (c) 1994 Midas + Unico
@@ -8242,7 +8242,7 @@ xxmissio        // UPL-86001 [1986]
 ninjakd2        // UPL-????? (c) 1987
 ninjakd2a       // UPL-????? (c) 1987
 ninjakd2b       // UPL-????? (c) 1987
-ninjakd2c		// UPL-????? (c) 1987
+ninjakd2c       // UPL-????? (c) 1987
 rdaction        // UPL-87003?(c) 1987 + World Games license
 jt104           // hack?
 mnight          // UPL-????? (c) 1987 distributed by Kawakus
@@ -9152,7 +9152,7 @@ wrallyb         // (c) 1993 - Ref 930217
 glass           // (c) 1993 - Ref 931021
 glass10         // (c) 1993 - Ref 931021
 glass10a        // (c) 1993 - Ref 931021 shows "Break Edition" on a real PCB
-glasskr			// (c) 1994 - Ref 931021 shows 1994 version, Anime girls, unprotected
+glasskr         // (c) 1994 - Ref 931021 shows 1994 version, Anime girls, unprotected
 targeth         // (c) 1994 - Ref 940531
 targetha        // (c) 1994 - Ref 940531
 thoop2          // (c) 1994 - Ref ???
@@ -9550,7 +9550,7 @@ sparkman        // (c) 1989 SunA
 sparkmana       // (c) 1989 SunA
 starfigh        // (c) 1990 SunA
 hardhea2        // (c) 1991 SunA
-hardhea2b		// bootleg
+hardhea2b       // bootleg
 brickzn         // (c) 1992 SunA
 brickznv5       // (c) 1992 SunA
 brickznv4       // (c) 1992 SunA
@@ -9638,7 +9638,7 @@ galhustl        // (c) 1997 ACE International
 // Playmark games
 sslam           // (c) 1993 - hack of Namco's Super World Court
 sslama          // ^
-sslamb			// ^
+sslamb          // ^
 powerbal        // (c) 1994
 powerbals       // (c) 1994
 magicstk        // (c) 1995
@@ -10677,7 +10677,7 @@ driblingbr      // bootleg
 ace             // [1976 Allied Leisure]
 clayshoo        // [1979 Allied Leisure]
 pirates         // (c) 1994 NIX
-piratesb		// bootleg?
+piratesb        // bootleg?
 genix           // (c) 199? NIX
 fitfight        // bootleg of Art of Fighting
 histryma        // bootleg of Fighter's History
@@ -12050,7 +12050,7 @@ ichiban         // (c) 199? Excel
 3x3puzzla       // (c) 199? Ace
 gambl186        // unknown
 gambl186a       // unknown
-gambl186b		// unknown
+gambl186b       // unknown
 
 // InterFlip / Recreativos Franco
 videopkr        // (c) 1984 InterFlip

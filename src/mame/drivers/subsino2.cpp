@@ -676,8 +676,8 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 		case 0x07:
 			mask_y[0] = ~(8-1);
 			break;
-//		case 0x7f:	// ptrain
-//			break;
+//      case 0x7f:  // ptrain
+//          break;
 		case 0xfd:
 			l0_reel = true;
 			break;

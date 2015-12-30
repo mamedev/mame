@@ -90,8 +90,8 @@ static MACHINE_CONFIG_START( fastinvaders, fastinvaders_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, 10000000 ) // guess
 	MCFG_CPU_PROGRAM_MAP(fastinvaders_map)
-//	MCFG_CPU_IO_MAP(fastinvaders_io_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", fastinvaders_state, irq0_line_hold) // where is irqack?
+//  MCFG_CPU_IO_MAP(fastinvaders_io_map)
+//  MCFG_CPU_VBLANK_INT_DRIVER("screen", fastinvaders_state, irq0_line_hold) // where is irqack?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -172,4 +172,3 @@ ROM_END
 
 GAME( 1979, fi6845, 0,      fastinvaders, fastinvaders, driver_device, 0, ROT0, "Fiberglass", "Fast Invaders (6845 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1979, fi8275, fi6845, fastinvaders, fastinvaders, driver_device, 0, ROT0, "Fiberglass", "Fast Invaders (8275 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-

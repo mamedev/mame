@@ -270,7 +270,7 @@ private:
 	UINT32 get_data_mc6847(UINT32 video_position, UINT8 *data, UINT8 *mode);
 	UINT32 get_data_without_attributes(UINT32 video_position, UINT8 *data, UINT8 *mode);
 	UINT32 get_data_with_attributes(UINT32 video_position, UINT8 *data, UINT8 *mode);
-	
+
 	// template function for doing video update collection
 	template<UINT8 xres, get_data_func get_data, bool record_mode>
 	UINT32 record_scanline_res(int scanline);

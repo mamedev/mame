@@ -28,7 +28,7 @@
 #define MCFG_SEIBU_CRTC_REG_1A_CB(_devcb) \
 	devcb = &seibu_crtc_device::set_reg_1a_callback(*device, DEVCB_##_devcb);
 
-	
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -70,8 +70,8 @@ protected:
 private:
 	devcb_write16       m_layer_en_cb;
 	devcb_write16       m_layer_scroll_cb;
-	devcb_write16		m_reg_1a_cb;
-	devcb_write16		m_layer_scroll_base_cb;
+	devcb_write16       m_reg_1a_cb;
+	devcb_write16       m_layer_scroll_base_cb;
 	const address_space_config      m_space_config;
 	inline UINT16 read_word(offs_t address);
 	inline void write_word(offs_t address, UINT16 data);

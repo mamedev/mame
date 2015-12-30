@@ -77,7 +77,7 @@
         0xf010:
         0xf020:
 
-	TLCS -> PPC Commands:
+    TLCS -> PPC Commands:
         0x7000:                                                     DSP ready
         0xd000:                                                     Vblank
 
@@ -93,7 +93,7 @@
 
 #define LOG_TLCS_TO_PPC_COMMANDS        1
 #define LOG_PPC_TO_TLCS_COMMANDS        1
-#define LOG_DISPLAY_LIST					0
+#define LOG_DISPLAY_LIST                    0
 
 class taitopjc_state : public driver_device
 {
@@ -208,7 +208,7 @@ UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_ind1
 
 			int palette = (tile >> 12) & 0xf;
 
-			tile &= 0xfff;			
+			tile &= 0xfff;
 
 			for (y=0; y < 16; y++)
 			{
@@ -249,7 +249,7 @@ void taitopjc_state::videochip_w(offs_t address, UINT32 data)
 		m_pal_ram[address - 0x20000000] = data;
 
 		int b = (data >> 16) & 0xff;
-		int g = (data >>  8) & 0xff;		
+		int g = (data >>  8) & 0xff;
 		int r = (data >>  0) & 0xff;
 		m_palette->set_pen_color(address - 0x20000000, rgb_t(r, g, b));
 	}
@@ -382,7 +382,7 @@ void taitopjc_state::print_display_list()
 				int count = (w & 0x7fff) + 1;
 				UINT16 d = m_dsp_ram[ptr++];
 				for (int i=0; i < count; i++)
-				{					
+				{
 					UINT16 s = m_dsp_ram[ptr++];
 					printf("   %04X -> [%04X]\n", s, d);
 					d++;
@@ -639,7 +639,7 @@ static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, taitopjc_state )
 	AM_RANGE(0x4c00, 0xefff) AM_ROM AM_REGION("user2", 0x9800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitopjc_state )	
+static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitopjc_state )
 	AM_RANGE(0x4000, 0x6fff) AM_ROM AM_REGION("user2", 0x8000)
 	AM_RANGE(0x7000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE(tms_dspshare_r, tms_dspshare_w)
@@ -660,27 +660,27 @@ static INPUT_PORTS_START( taitopjc )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN1 )			// Coin A
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN1 )            // Coin A
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("INPUTS2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)		// Service switch
-	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW)		// Test Button
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)        // Service switch
+	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW)      // Test Button
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START1 )		// Select 1
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_START2 )		// Select 2
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START1 )       // Select 1
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_START2 )       // Select 2
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("INPUTS3")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)		// P1 trigger
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)		// P1 bomb
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)		// P2 trigger
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)		// P2 bomb
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)       // P1 trigger
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)       // P1 bomb
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)       // P2 trigger
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)       // P2 bomb
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -796,7 +796,7 @@ ROM_START( optiger )
 	ROM_REGION16_BE( 0xc00000, "poly", 0 )
 	ROM_LOAD16_WORD_SWAP( "e63-09_poly0.3", 0x000000, 0x400000, CRC(c3e2b1e0) SHA1(ee71f3f59b46e26dbe2ff724da2c509267c8bf2f) )
 	ROM_LOAD16_WORD_SWAP( "e63-10_poly1.4", 0x400000, 0x400000, CRC(f4a56390) SHA1(fc3c51a7f4639479e66ad50dcc94255d94803c97) )
-	ROM_LOAD16_WORD_SWAP( "e63-11_poly2.5", 0x800000, 0x400000, CRC(2293d9f8) SHA1(16adaa0523168ee63a7a34b29622c623558fdd82) )	
+	ROM_LOAD16_WORD_SWAP( "e63-11_poly2.5", 0x800000, 0x400000, CRC(2293d9f8) SHA1(16adaa0523168ee63a7a34b29622c623558fdd82) )
 // Poly 3 is not populated
 
 	ROM_REGION( 0x800000, "sound_data", 0 )

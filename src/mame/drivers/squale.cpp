@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic, Jean-François DEL NERO
+// copyright-holders:Miodrag Milanovic, Jean-Francois DEL NERO
 /***************************************************************************
 
     Apollo 7 Squale

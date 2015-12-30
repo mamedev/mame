@@ -2346,7 +2346,7 @@ control is passed to the default entry in rom 0*/
 void amstrad_state::amstrad_reset_machine()
 {
 	m_last_write = 0xff;
-	
+
 	/* enable lower rom (OS rom) */
 	amstrad_GateArray_write(0x089);
 

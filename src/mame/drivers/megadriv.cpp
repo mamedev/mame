@@ -280,7 +280,7 @@ void md_cons_state::install_cartslot()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_cart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_cart));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_cart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_cart));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_cart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_cart));
-//	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_cart));
+//  m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_cart));
 }
 
 READ16_MEMBER( md_cons_state::tmss_r )
@@ -330,7 +330,7 @@ MACHINE_START_MEMBER(md_cons_state, ms_megadriv)
 	{
 		install_cartslot();
 	}
-	
+
 
 }
 

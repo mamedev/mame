@@ -126,7 +126,7 @@ class namcos22_renderer : public poly_manager<float, namcos22_object_data, 4, 80
 {
 public:
 	namcos22_renderer(namcos22_state &state);
-	
+
 	void render_scene(screen_device &screen, bitmap_rgb32 &bitmap);
 	struct namcos22_scenenode *new_scenenode(running_machine &machine, UINT32 zsort, namcos22_scenenode_type type);
 

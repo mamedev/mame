@@ -28,7 +28,7 @@ class cbm2_graphic_cartridge_device : public device_t,
 public:
 	// construction/destruction
 	cbm2_graphic_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	
+
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
 

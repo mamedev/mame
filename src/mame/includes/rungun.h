@@ -52,24 +52,24 @@ public:
 	tilemap_t   *m_936_tilemap[2];
 	std::unique_ptr<UINT16[]> m_psac2_vram;
 	std::unique_ptr<UINT16[]>    m_ttl_vram;
-	std::unique_ptr<UINT16[]>	m_pal_ram;
-	UINT8		m_current_display_bank;
+	std::unique_ptr<UINT16[]>   m_pal_ram;
+	UINT8       m_current_display_bank;
 	int         m_ttl_gfx_index;
 	int         m_sprite_colorbase;
 
-	UINT8 		*m_roz_rom;
-	UINT8		m_roz_rombase;
-	
+	UINT8       *m_roz_rom;
+	UINT8       m_roz_rombase;
+
 	/* sound */
 	UINT8       m_sound_ctrl;
 	UINT8       m_sound_status;
 	UINT8       m_sound_nmi_clk;
-	
-	bool		m_video_priority_mode;
+
+	bool        m_video_priority_mode;
 	std::unique_ptr<UINT16[]> m_banked_ram;
-	bool		m_single_screen_mode;
-	UINT8		m_video_mux_bank;
-	
+	bool        m_single_screen_mode;
+	UINT8       m_video_mux_bank;
+
 	DECLARE_READ16_MEMBER(rng_sysregs_r);
 	DECLARE_WRITE16_MEMBER(rng_sysregs_w);
 	DECLARE_WRITE16_MEMBER(sound_cmd1_w);
@@ -89,7 +89,7 @@ public:
 	DECLARE_READ16_MEMBER(palette_read);
 	DECLARE_WRITE16_MEMBER(palette_write);
 
-	
+
 	K055673_CB_MEMBER(sprite_callback);
 
 	virtual void machine_start() override;
@@ -102,6 +102,6 @@ public:
 	bitmap_ind16 m_rng_dual_demultiplex_left_temp;
 	bitmap_ind16 m_rng_dual_demultiplex_right_temp;
 	void   sprite_dma_trigger(void);
-	
+
 	INTERRUPT_GEN_MEMBER(rng_interrupt);
 };

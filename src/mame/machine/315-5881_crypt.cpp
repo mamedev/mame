@@ -859,7 +859,7 @@ void sega_315_5881_crypt_device::line_fill()
 	assert(line_buffer_pos == line_buffer_size);
 	UINT8 *lp = line_buffer.get();
 	UINT8 *lc = line_buffer_prev.get();
-	
+
 	line_buffer.swap(line_buffer_prev);
 
 	line_buffer_pos = 0;

@@ -1441,7 +1441,7 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 		? rgb_t(0, 0, 0)
 		: machine->first_screen()->palette()->palette()->entry_color(0);
 	back_color_rgb = apply_color_convolution(back_color_rgb);
-	float back_color[3] = { 
+	float back_color[3] = {
 		static_cast<float>(back_color_rgb.r()) / 255.0f,
 		static_cast<float>(back_color_rgb.g()) / 255.0f,
 		static_cast<float>(back_color_rgb.b()) / 255.0f };

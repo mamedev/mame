@@ -1750,10 +1750,10 @@ static ADDRESS_MAP_START( spactrai_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x1600, 0x4fff) AM_ROM
 
 // cleared on startup
-//	AM_RANGE(0x6000, 0x60ff) AM_RAM
-//	AM_RANGE(0x6800, 0x68ff) AM_RAM
-//	AM_RANGE(0x7000, 0x70ff) AM_RAM
-	
+//  AM_RANGE(0x6000, 0x60ff) AM_RAM
+//  AM_RANGE(0x6800, 0x68ff) AM_RAM
+//  AM_RANGE(0x7000, 0x70ff) AM_RAM
+
 // standard galaxian mapping?
 	AM_RANGE(0x6004, 0x6007) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
 	AM_RANGE(0x6800, 0x6807) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, sound_w)
@@ -1801,11 +1801,11 @@ static ADDRESS_MAP_START( anteatergg_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-//	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
+//  AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
-//	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x07f8) AM_WRITE(start_lamp_w)
-//	AM_RANGE(0x6002, 0x6002) AM_MIRROR(0x07f8) AM_WRITE(coin_lock_w)
-//	AM_RANGE(0x6003, 0x6003) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
+//  AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x07f8) AM_WRITE(start_lamp_w)
+//  AM_RANGE(0x6002, 0x6002) AM_MIRROR(0x07f8) AM_WRITE(coin_lock_w)
+//  AM_RANGE(0x6003, 0x6003) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
 	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
 	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
 	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
@@ -7728,7 +7728,7 @@ ROM_START( spactrai )
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "6cen.bin",  0x0000, 0x0800, CRC(a59a9f3f) SHA1(9564f1d013d566dc0b19762aec66119e2ece0b49) ) // MK2716J
 	ROM_LOAD( "7cen.bin",  0x0800, 0x0800, CRC(9b75b40a) SHA1(4ad94db3f1d6b45a3de1ed9b51d361f20c6706e4) ) // marked MM2758Q (which is meant to be a 1Kx8 EPROM, but in reality is a 2Kx8 EPROM ?!)
-	 
+
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "stk.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END

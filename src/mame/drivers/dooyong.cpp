@@ -564,7 +564,7 @@ static INPUT_PORTS_START( flytiger )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 
 	PORT_MODIFY("SYSTEM")
-//	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // allows title screen + ending screen colours to cycle (but I'm not sure they're meant to, reference shots suggest not, maybe a debug port?)
+//  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // allows title screen + ending screen colours to cycle (but I'm not sure they're meant to, reference shots suggest not, maybe a debug port?)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sadari )

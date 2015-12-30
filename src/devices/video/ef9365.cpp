@@ -1,67 +1,67 @@
 // license:BSD-3-Clause
-// copyright-holders:Jean-François DEL NERO
+// copyright-holders:Jean-Francois DEL NERO
 
 /*********************************************************************
 
-	ef9365.c
+    ef9365.c
 
-	Thomson EF9365/EF9366 video controller emulator code
+    Thomson EF9365/EF9366 video controller emulator code
 
-	The EF9365/EF9366 is a video controller driving a frame buffer
-	and having built-in vectors and characters drawing engines.
-	This is natively a "black and white" chip (1 bitplane),
-	but it is possible to add more bitplanes to have colors with a
-	hardware trick. The system don't have direct access to the video
-	memory, but indirect access is possible through the 0x0F command
-	and some hardware glue logics.
-	The current implementation emulate the main functions :
+    The EF9365/EF9366 is a video controller driving a frame buffer
+    and having built-in vectors and characters drawing engines.
+    This is natively a "black and white" chip (1 bitplane),
+    but it is possible to add more bitplanes to have colors with a
+    hardware trick. The system don't have direct access to the video
+    memory, but indirect access is possible through the 0x0F command
+    and some hardware glue logics.
+    The current implementation emulate the main functions :
 
-	Video modes supported (Hardware implementation dependent):
-		- 256 x 256 (EF9365 with 4 bits shifters per bitplane and FMAT to VSS)
-		- 512 x 512 interlaced (EF9365 with 8 bits shifters per bitplane and FMAT to VCC)
-		- 512 x 256 non interlaced (EF9366 with 8 bits shifters per bitplane)
-		- 128 x 128 (EF9365 with 2 bits shifters per bitplane and FMAT to VSS)
-		- 64 x 64 (EF9365 with FMAT to VSS)
+    Video modes supported (Hardware implementation dependent):
+        - 256 x 256 (EF9365 with 4 bits shifters per bitplane and FMAT to VSS)
+        - 512 x 512 interlaced (EF9365 with 8 bits shifters per bitplane and FMAT to VCC)
+        - 512 x 256 non interlaced (EF9366 with 8 bits shifters per bitplane)
+        - 128 x 128 (EF9365 with 2 bits shifters per bitplane and FMAT to VSS)
+        - 64 x 64 (EF9365 with FMAT to VSS)
 
-		- 1 bitplane up to 8 bitplanes hardware configuration.
-		- 2 up to 256 colors fixed palette.
+        - 1 bitplane up to 8 bitplanes hardware configuration.
+        - 2 up to 256 colors fixed palette.
 
-	Character & block drawing :
-		- Normal / Titled mode
-		- Horizontal / Vertical orientation
-		- P & Q Zoom factors (1 up to 16)
+    Character & block drawing :
+        - Normal / Titled mode
+        - Horizontal / Vertical orientation
+        - P & Q Zoom factors (1 up to 16)
 
-	Vector drawing :
-		- Normal / Dotted / Dashed / Dotted-Dashed mode
-		- All directions and size supported.
+    Vector drawing :
+        - Normal / Dotted / Dashed / Dotted-Dashed mode
+        - All directions and size supported.
 
-	General :
-		- Clear Screen
-		- Fill Screen
-		- Clear X & Y registers
-		- Video RAM readback supported (Command 0x0F)
+    General :
+        - Clear Screen
+        - Fill Screen
+        - Clear X & Y registers
+        - Video RAM readback supported (Command 0x0F)
 
-	What is NOT yet currently implemented:
-		- Light pen support
-		(To be done when i will find a software using the lightpen)
+    What is NOT yet currently implemented:
+        - Light pen support
+        (To be done when i will find a software using the lightpen)
 
-	What is implemented but not really tested:
-		- Interrupts output.
-		My target system (Squale Apollo 7) doesn't use the interruption
-		for this chip. So i add the interrupt line support, but
-		bug(s) is possible.
+    What is implemented but not really tested:
+        - Interrupts output.
+        My target system (Squale Apollo 7) doesn't use the interruption
+        for this chip. So i add the interrupt line support, but
+        bug(s) is possible.
 
-	The needed charset file charset_ef9365.rom (CRC 8d3053be) is available
-	there : http://hxc2001.free.fr/Squale/rom/charset_ef9365.zip
-	This ROM charset is into the EF9365/EF9366.
+    The needed charset file charset_ef9365.rom (CRC 8d3053be) is available
+    there : http://hxc2001.free.fr/Squale/rom/charset_ef9365.zip
+    This ROM charset is into the EF9365/EF9366.
 
-	To see how to use this driver, have a look to the Squale machine
-	driver (squale.cpp).
-	If you have any question, don't hesitate to contact me at the email
-	present on this website : http://hxc2001.free.fr/
+    To see how to use this driver, have a look to the Squale machine
+    driver (squale.cpp).
+    If you have any question, don't hesitate to contact me at the email
+    present on this website : http://hxc2001.free.fr/
 
-	12/29/2015
-	Jean-François DEL NERO
+    12/29/2015
+    Jean-Francois DEL NERO
 *********************************************************************/
 
 #include "emu.h"
@@ -343,8 +343,8 @@ void ef9365_device::device_reset()
 void ef9365_device::update_interrupts()
 {
 	int new_state = ( m_irq_vb  && (m_registers[EF936X_REG_CTRL1] & 0x20) )
-				 || ( m_irq_rdy && (m_registers[EF936X_REG_CTRL1] & 0x40) )
-				 || ( m_irq_lb  && (m_registers[EF936X_REG_CTRL1] & 0x10) );
+					|| ( m_irq_rdy && (m_registers[EF936X_REG_CTRL1] & 0x40) )
+					|| ( m_irq_lb  && (m_registers[EF936X_REG_CTRL1] & 0x10) );
 
 	if (new_state != m_irq_state)
 	{
@@ -471,7 +471,6 @@ UINT8 ef9365_device::get_last_readback_word(int bitplane_number, int * pixel_off
 
 void ef9365_device::draw_border(UINT16 line)
 {
-
 }
 
 //-------------------------------------------------
@@ -792,7 +791,7 @@ int ef9365_device::draw_character( unsigned char c, int block, int smallblock )
 							for(p = 0; p < p_factor; p++)
 							{
 								if( !(m_registers[EF936X_REG_CTRL2] & 0x08) )
-								{	// Titled - Horizontal orientation
+								{   // Titled - Horizontal orientation
 									plot(
 											x + ( (y_char*q_factor) + q ) + ( (x_char*p_factor) + p ),
 											y + ( (y_char*q_factor) + q )
@@ -816,14 +815,14 @@ int ef9365_device::draw_character( unsigned char c, int block, int smallblock )
 							for(p = 0; p < p_factor; p++)
 							{
 								if( !(m_registers[EF936X_REG_CTRL2] & 0x08) )
-								{	// Normal - Horizontal orientation
+								{   // Normal - Horizontal orientation
 									plot(
 											x + ( (x_char*p_factor) + p ),
 											y + ( (y_char*q_factor) + q )
 										);
 								}
 								else
-								{	// Normal - Vertical orientation
+								{   // Normal - Vertical orientation
 									plot(
 											x - ( (y_char*q_factor) + q ),
 											y + ( (x_char*p_factor) + p )
@@ -1046,29 +1045,29 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 			switch ( cmd & 0x7 ) // Direction code
 			{
 				case 0x1:
-					busy_cycles = draw_vector	( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() + tmp_delta_y);
+					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() + tmp_delta_y);
 				break;
 				case 0x3:
-					busy_cycles = draw_vector	( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() + tmp_delta_y);
+					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() + tmp_delta_y);
 				break;
 				case 0x5:
-					busy_cycles = draw_vector	( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() - tmp_delta_y);
+					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() - tmp_delta_y);
 				break;
 				case 0x7:
-					busy_cycles = draw_vector	( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() - tmp_delta_y);
+					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() - tmp_delta_y);
 				break;
 
 				case 0x0:
-					busy_cycles = draw_vector	( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() );
+					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() );
 				break;
 				case 0x2:
-					busy_cycles = draw_vector	( get_x_reg(), get_y_reg(), get_x_reg(), get_y_reg() + tmp_delta_y);
+					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg(), get_y_reg() + tmp_delta_y);
 				break;
 				case 0x4:
-					busy_cycles = draw_vector	( get_x_reg(), get_y_reg(), get_x_reg(), get_y_reg() - tmp_delta_y);
+					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg(), get_y_reg() - tmp_delta_y);
 				break;
 				case 0x6:
-					busy_cycles = draw_vector	( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() );
+					busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() );
 				break;
 			}
 			set_busy_flag( cycles_to_us( busy_cycles ) );
@@ -1088,29 +1087,29 @@ void ef9365_device::ef9365_exec(UINT8 cmd)
 				switch ( cmd & 0x7 ) // Direction code
 				{
 					case 0x1:
-						busy_cycles = draw_vector	( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() + tmp_delta_y);
+						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() + tmp_delta_y);
 					break;
 					case 0x3:
-						busy_cycles = draw_vector	( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() + tmp_delta_y);
+						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() + tmp_delta_y);
 					break;
 					case 0x5:
-						busy_cycles = draw_vector	( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() - tmp_delta_y);
+						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() - tmp_delta_y);
 					break;
 					case 0x7:
-						busy_cycles = draw_vector	( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() - tmp_delta_y);
+						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() - tmp_delta_y);
 					break;
 
 					case 0x0:
-						busy_cycles = draw_vector	( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() );
+						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() + tmp_delta_x, get_y_reg() );
 					break;
 					case 0x2:
-						busy_cycles = draw_vector	( get_x_reg(), get_y_reg(), get_x_reg(), get_y_reg() + tmp_delta_y);
+						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg(), get_y_reg() + tmp_delta_y);
 					break;
 					case 0x4:
-						busy_cycles = draw_vector	( get_x_reg(), get_y_reg(), get_x_reg(), get_y_reg() - tmp_delta_y);
+						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg(), get_y_reg() - tmp_delta_y);
 					break;
 					case 0x6:
-						busy_cycles = draw_vector	( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() );
+						busy_cycles = draw_vector   ( get_x_reg(), get_y_reg(), get_x_reg() - tmp_delta_x, get_y_reg() );
 					break;
 				}
 

@@ -11,9 +11,9 @@ devices are 27c512
 --------------------------
 
 file Aftrshk.upd is the updated eprom for an update version.
-The update version uses a small (appx 2" x 4" ) pcb to turn on 
+The update version uses a small (appx 2" x 4" ) pcb to turn on
 the playfield motor.  If you don't have this small pcb, then don't use
-this .upd version software.  The small pcb is numbered 
+this .upd version software.  The small pcb is numbered
 
 "pcb100067"
 "Lazer Tron driver pcb V.02"
@@ -38,13 +38,13 @@ class aftrshok_state : public driver_device
 public:
 	aftrshok_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-	//	,m_maincpu(*this, "maincpu")
+	//  ,m_maincpu(*this, "maincpu")
 	{ }
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-//	required_device<mcs51_cpu_device> m_maincpu;
+//  required_device<mcs51_cpu_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( aftrshok )
@@ -64,9 +64,9 @@ void aftrshok_state::machine_reset()
 static MACHINE_CONFIG_START( aftrshok, aftrshok_state )
 
 	/* basic machine hardware */
-//	MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
-//	MCFG_CPU_PROGRAM_MAP(aftrshok_map)
-//	MCFG_CPU_IO_MAP(aftrshok_io)
+//  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
+//  MCFG_CPU_PROGRAM_MAP(aftrshok_map)
+//  MCFG_CPU_IO_MAP(aftrshok_io)
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", aftrshok_state,  irq0_line_hold)
 
 	/* sound hardware */
@@ -101,4 +101,3 @@ ROM_END
 
 GAME( 19??, aftrshok,  0,           aftrshok, aftrshok, driver_device,  0, ROT0, "Lazer-tron", "After Shock (Lazer-tron, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 19??, aftrshoka, aftrshok,    aftrshok, aftrshok, driver_device,  0, ROT0, "Lazer-tron", "After Shock (Lazer-tron, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-

@@ -144,7 +144,7 @@ Super PE+
    XnnnnnnP Poker Data. Contains poker game + paytable percentages
              Data roms will not work with every Program rom. Incompatible combos report: Incompatible Data EPROM
              X000055P is a good example, it works with most XP000xxx Program roms. Others may be as few as two due
-			 to specific requirements of the game. Examples are Jackpot Poker and games with mid game bonus payouts.
+             to specific requirements of the game. Examples are Jackpot Poker and games with mid game bonus payouts.
   XMPnnnnn  Multi-Poker Programs. Different options for each set, but all use the same XMnnnnnP data
              XMP00002 through XMP00006, XMP00020 & XMP00024 Use the XM000xxP Multi-Poker Data
              XMP00014, XMP00017 & XMP00030 Use the WING Board add-on and use the XnnnnnnP Poker Data (Not all are compatible!)
@@ -167,9 +167,9 @@ NOTE:  Do NOT use the CG+CAP combos listed below as THE definitive absolute refe
 NOTE:  Sets marked PSR Verified use official IGT CG+CAP combo as documented in a IGT PSR (Program Summary Report)
        Stardard PE+ sets marked as PSR Verified means the build version is correctly matched to the CG+CAP combo
        Sets marked as PSR Verified on superboards means the XP000xxx poker program is correctly matched to the
-	   CG+CAP combo. Except for specialty games the CG set is determined by XP000xxx Poker Program. However,
-	   where specialty games are involved the X00xxxxP DATA rom determines the CG set due to specific needs.
-	   PSR Verified does not gaurantee or imply that other XP000xxx programs are incompatible with said DATA rom.
+       CG+CAP combo. Except for specialty games the CG set is determined by XP000xxx Poker Program. However,
+       where specialty games are involved the X00xxxxP DATA rom determines the CG set due to specific needs.
+       PSR Verified does not gaurantee or imply that other XP000xxx programs are incompatible with said DATA rom.
 
 NOTE:  International PP0xxx sets support a Tournament mode.  You can toggle back and forth between standard and
        Tournament mode by pressing and holding Jackpot Reset (L key) and pressing Change Request (Y key)
@@ -6020,7 +6020,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF     (Bonus)
   % Range: 92.3-94.3%  Optimum: 96.3%  Hit Frequency: 45.1%
      Programs Available: PP0596
 
-* Payout for a Royal Flush is shown as "MINIMANIA" and for the named suited Sequential Royal it shows "POKERMANIA" 
+* Payout for a Royal Flush is shown as "MINIMANIA" and for the named suited Sequential Royal it shows "POKERMANIA"
 
 Currently errors out with CCOM LINK DOWN as CCOM linking is not supported
 */
@@ -6046,7 +6046,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF     (Bonus)
   % Range: 92.3-94.3%  Optimum: 96.3%  Hit Frequency: 45.1%
      Programs Available: PP0598
 
-* Payout for a Royal Flush is shown as "MINIMANIA" and for the named suited Sequential Royal it shows "POKERMANIA" 
+* Payout for a Royal Flush is shown as "MINIMANIA" and for the named suited Sequential Royal it shows "POKERMANIA"
 
 Currently errors out with CCOM LINK DOWN as CCOM linking is not supported
 */
@@ -6058,7 +6058,7 @@ Currently errors out with CCOM LINK DOWN as CCOM linking is not supported
 	ROM_LOAD( "mgo-cg2093.u73",   0x08000, 0x8000, BAD_DUMP CRC(8bf73e80) SHA1(25ee0a6fe61d1f92a47fd9408c36111b1ed73a56) )
 	ROM_LOAD( "mbo-cg2093.u74",   0x10000, 0x8000, BAD_DUMP CRC(907400f2) SHA1(56ceb960a08b2d3f87e4acb720675cbbfb39d012) )
 	ROM_LOAD( "mxo-cg2093.u75",   0x18000, 0x8000, BAD_DUMP CRC(b6c3e987) SHA1(97f71792cb584a659615d1fe78228ac11fe32571) )
-	
+
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap779.u50", 0x0000, 0x0100, CRC(b04a98fd) SHA1(4788c7cb88aa692a55855ca65e092df43506e55a) )
 ROM_END
@@ -6350,7 +6350,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "mxo-cg2312.u80",  0x18000, 0x8000, CRC(1e0d3df8) SHA1(716d6bd2b41ef41a7da393e805651c378a16e00e) ) /* These graphics don't seem to work with anything else */
 
 	ROM_REGION( 0x200, "proms", 0 )
-//	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /*  verified - For use with CG2195 when added */
+//  ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /*  verified - For use with CG2195 when added */
 	ROM_LOAD( "capx2312.u43", 0x0000, 0x0200, CRC(66971da6) SHA1(6984a68bc2f01009ad6a7a0705c00e715c29bb65) )
 ROM_END
 
@@ -9348,7 +9348,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
    WA       1    2    3    4    5   7  20  50 300    800
   % Range: 91.0-93.0%  Optimum: 95.0%  Hit Frequency: 45.5%
      Programs Available: X000557P
-	 
+
 NOTE: Same as X000040P, except MAX Coin (set to 5) CANNOT be changed - NJ jurisdiction
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -9969,7 +9969,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "mgo-cg2242.u78",  0x08000, 0x8000, CRC(53eed56f) SHA1(e79f31c5c817b8b96b4970c1a702d1892961d441) )
 	ROM_LOAD( "mbo-cg2242.u79",  0x10000, 0x8000, CRC(af092f50) SHA1(53a3536593bb14c4072e8a5ee9e05af332feceb1) )
 	ROM_LOAD( "mxo-cg2242.u80",  0x18000, 0x8000, CRC(ecacb6b2) SHA1(32660adcc266fbbb3702a0cd30e25d11b953d23d) )
-	
+
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
 ROM_END

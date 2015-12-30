@@ -29,10 +29,10 @@
 
    Known Issues:
      - CRTC and video registers needs syncronization with current video draw state, it's very noticeable if for example scroll values are in very different states between screens.
-	 - Current draw state could be improved optimization-wise (for example by supporting it in the core in some way).
-	 - sprite palettes are not entirely right
-	 
-	 
+     - Current draw state could be improved optimization-wise (for example by supporting it in the core in some way).
+     - sprite palettes are not entirely right
+
+
 *************************************************************************/
 
 #include "emu.h"
@@ -68,7 +68,7 @@ READ16_MEMBER(rungun_state::rng_sysregs_r)
 			    bit9 : screen output select
 			*/
 			{
-				UINT8 field_bit = machine().first_screen()->frame_number() & 1; 
+				UINT8 field_bit = machine().first_screen()->frame_number() & 1;
 				if(m_single_screen_mode == true)
 					field_bit = 1;
 				return (ioport("SYSTEM")->read() & 0xfdff) | (field_bit << 9);
@@ -95,12 +95,12 @@ WRITE16_MEMBER(rungun_state::rng_sysregs_w)
 			    bit0  : eeprom_di_write
 			    bit1  : eeprom_cs_write
 			    bit2  : eeprom_clk_write
-				bit3  : coin counter #1
-				bit4  : coin counter #2 (when coin slot "common" is selected)
+			    bit3  : coin counter #1
+			    bit4  : coin counter #2 (when coin slot "common" is selected)
 			    bit7  : set before massive memory writes (video chip select?)
 			    bit10 : IRQ5 ACK
-				bit12 : if set, forces screen output to 1 monitor.
-				bit14 : (0) sprite on top of PSAC2 layer (1) other way around (title screen) 
+			    bit12 : if set, forces screen output to 1 monitor.
+			    bit14 : (0) sprite on top of PSAC2 layer (1) other way around (title screen)
 			*/
 			if (ACCESSING_BITS_0_7)
 			{
@@ -123,7 +123,7 @@ WRITE16_MEMBER(rungun_state::rng_sysregs_w)
 			    bit 1  : disable PSAC2 input?
 			    bit 2  : OBJCHA
 			    bit 3  : enable IRQ 5
-				bit 7-4: base address for 53936 ROM readback.
+			    bit 7-4: base address for 53936 ROM readback.
 			*/
 			m_k055673->k053246_set_objcha_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 			m_roz_rombase = (data & 0xf0) >> 4;
@@ -162,7 +162,7 @@ INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
 	// send to sprite device current state (i.e. bread & butter sprite DMA)
 	// TODO: firing this in screen update causes sprites to desync badly ...
 	sprite_dma_trigger();
-	
+
 	if (m_sysreg[0x0c / 2] & 0x09)
 		device.execute().set_input_line(M68K_IRQ_5, ASSERT_LINE);
 }
@@ -185,21 +185,21 @@ WRITE16_MEMBER(rungun_state::palette_write)
 	palette_device *cur_paldevice = m_video_mux_bank == 0 ? m_palette : static_cast<palette_device *>(m_palette2);
 	UINT32 addr = offset + m_video_mux_bank*0x800/2;
 	COMBINE_DATA(&m_pal_ram[addr]);
-	
+
 	UINT8 r,g,b;
-	
+
 	r = m_pal_ram[addr] & 0x1f;
 	g = (m_pal_ram[addr] & 0x3e0) >> 5;
 	b = (m_pal_ram[addr] & 0x7e00) >> 10;
-	
+
 	cur_paldevice->set_pen_color(offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM                                         // main program + data
-	AM_RANGE(0x300000, 0x3007ff) AM_READWRITE(palette_read,palette_write) 
+	AM_RANGE(0x300000, 0x3007ff) AM_READWRITE(palette_read,palette_write)
 	AM_RANGE(0x380000, 0x39ffff) AM_RAM                                         // work RAM
-	AM_RANGE(0x400000, 0x43ffff) AM_READ8(rng_53936_rom_r,0x00ff)			    // '936 ROM readback window
+	AM_RANGE(0x400000, 0x43ffff) AM_READ8(rng_53936_rom_r,0x00ff)               // '936 ROM readback window
 	AM_RANGE(0x480000, 0x48001f) AM_READWRITE(rng_sysregs_r, rng_sysregs_w) AM_SHARE("sysreg")
 	AM_RANGE(0x4c0000, 0x4c001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                        // CCU (for scanline and vblank polling)
 	AM_RANGE(0x540000, 0x540001) AM_WRITE(sound_irq_w)
@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
 	AM_RANGE(0x580000, 0x58001f) AM_RAM                                         // sound regs read/write fall-through
 	AM_RANGE(0x5c0000, 0x5c000f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)                       // 246A ROM readback window
 	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVWRITE("k055673", k055673_device, k055673_reg_word_w)
-	AM_RANGE(0x600000, 0x601fff) AM_RAMBANK("spriteram_bank")                                        	     // OBJ RAM 
+	AM_RANGE(0x600000, 0x601fff) AM_RAMBANK("spriteram_bank")                                                // OBJ RAM
 	AM_RANGE(0x640000, 0x640007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)                      // '246A registers
 	AM_RANGE(0x680000, 0x68001f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)          // '936 registers
 	AM_RANGE(0x6c0000, 0x6cffff) AM_READWRITE(rng_psac2_videoram_r,rng_psac2_videoram_w) // PSAC2 ('936) RAM (34v + 35v)
@@ -391,8 +391,8 @@ void rungun_state::machine_start()
 	m_banked_ram = make_unique_clear<UINT16[]>(0x2000);
 	m_pal_ram = make_unique_clear<UINT16[]>(0x800*2);
 	membank("spriteram_bank")->configure_entries(0,2,&m_banked_ram[0],0x2000);
-	
-	
+
+
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_status));
 	save_item(NAME(m_sound_nmi_clk));
@@ -460,7 +460,7 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -989,4 +989,4 @@ GAMEL( 1993, rungunuad,rungun, rng_dual, rng_dual, driver_device, 0, ROT0, "Kona
 GAMEL( 1993, slmdunkjd,rungun, rng_dual, rng_dual, driver_device, 0, ROT0, "Konami", "Slam Dunk (ver JAA 1993 10.8) (dual screen with demux adapter)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )
 
 // this set has no dipswitches to select single screen mode (they're not even displayed in test menu) it's twin cabinet ONLY
-GAMEL( 1993, rungunud, rungun, rng_dual, rng_nodip, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UAB 1993 10.12, dedicated twin cabinet)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual ) 
+GAMEL( 1993, rungunud, rungun, rng_dual, rng_nodip, driver_device, 0, ROT0, "Konami", "Run and Gun (ver UAB 1993 10.12, dedicated twin cabinet)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND, layout_rungun_dual )

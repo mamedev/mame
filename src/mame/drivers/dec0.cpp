@@ -1892,43 +1892,43 @@ ROM_END
 /*
 
  CPUs
-QTY 	Type 	clock 	position 	function
-1x 	SCN68000CAN64 		main PCB 9h 	16/32-bit Microprocessor - main
-1x 	UM6502 		main PCB 7d 	8-bit Microprocessor - sound
-1x 	MC3403 		main PCB 14e 	Quad Operational Amplifier - sound
-1x 	GL358 		main PCB 13b 	Dual Operational Amplifier - sound
-1x 	YM2203C 		main PCB 12a 	FM Operator Type-M (OPM) - sound
-2x 	YM3014B 		main PCB 13d, 13e 	D/A Converter (DAC) - sound
-1x 	YM3812 		main PCB 9b 	FM Operator Type-L II (OPL II) - sound
-1x 	MC68705R3P 		ROMs PCB 1l 	8-bit EPROM Microcomputer Unit - main (not dumped)
-1x 	M5205 		ROMs PCB 12c 	ADPCM Speech Syntesis IC - sound
-1x 	oscillator 	24.000MHz 	main PCB 2a 	
-1x 	oscillator 	16.0000 	main PCB 12n 	
-1x 	blu resonator 	CSB-400P 	ROMs PCB 12b 	
+QTY     Type    clock   position    function
+1x  SCN68000CAN64       main PCB 9h     16/32-bit Microprocessor - main
+1x  UM6502      main PCB 7d     8-bit Microprocessor - sound
+1x  MC3403      main PCB 14e    Quad Operational Amplifier - sound
+1x  GL358       main PCB 13b    Dual Operational Amplifier - sound
+1x  YM2203C         main PCB 12a    FM Operator Type-M (OPM) - sound
+2x  YM3014B         main PCB 13d, 13e   D/A Converter (DAC) - sound
+1x  YM3812      main PCB 9b     FM Operator Type-L II (OPL II) - sound
+1x  MC68705R3P      ROMs PCB 1l     8-bit EPROM Microcomputer Unit - main (not dumped)
+1x  M5205       ROMs PCB 12c    ADPCM Speech Syntesis IC - sound
+1x  oscillator  24.000MHz   main PCB 2a
+1x  oscillator  16.0000     main PCB 12n
+1x  blu resonator   CSB-400P    ROMs PCB 12b
 ROMs
-QTY 	Type 	position 	status
-4x 	27256 	main PCB 1-4 	dumped
-4x 	27512 	main PCB 5-8 	dumped
-7x 	27256 	ROMs PCB 15,20-23,28,29 	dumped
-9x 	27512 	ROMs PCB 9-14,27-30 	dumped
-2x 	N82S129AN 	main PCB 2q,3p 	not dumped yet
-1x 	N82S131N 	main PCB 5q 	not dumped yet
-1x 	N82S137N 	main PCB 8u 	not dumped yet
-1x 	N82S129AN 	ROMs PCB 12c 	not dumped yet
+QTY     Type    position    status
+4x  27256   main PCB 1-4    dumped
+4x  27512   main PCB 5-8    dumped
+7x  27256   ROMs PCB 15,20-23,28,29     dumped
+9x  27512   ROMs PCB 9-14,27-30     dumped
+2x  N82S129AN   main PCB 2q,3p  not dumped yet
+1x  N82S131N    main PCB 5q     not dumped yet
+1x  N82S137N    main PCB 8u     not dumped yet
+1x  N82S129AN   ROMs PCB 12c    not dumped yet
 RAMs
-QTY 	Type 	position
-2x 	HY6264 	main PCB 12c,12d
-14x 	TMM2018 	main PCB 1e,2e,5k,5l,5m,5n,5o,5p,7m,7n,8b,11s,11t,11u
-2x 	TMM2064 	ROMs PCB 8n,8o
-4x 	TMM2018 	ROMs PCB 8f,8g,8j,8k
+QTY     Type    position
+2x  HY6264  main PCB 12c,12d
+14x     TMM2018     main PCB 1e,2e,5k,5l,5m,5n,5o,5p,7m,7n,8b,11s,11t,11u
+2x  TMM2064     ROMs PCB 8n,8o
+4x  TMM2018     ROMs PCB 8f,8g,8j,8k
 PLDs
-QTY 	Type 	position 	status
+QTY     Type    position    status
 Others
 
 1x 28x2 edge connector
 3x 50 pins flat cable connector from main board to roms board
 1x trimmer (volume)
-1x 8x2 switches DIP 
+1x 8x2 switches DIP
 
 */
 
@@ -1937,7 +1937,7 @@ ROM_START( drgninjab2 )
 	ROM_LOAD16_BYTE( "a14.3e",  0x00000, 0x10000, CRC(c4b9f4e7) SHA1(4a8176cce8c7909aace8ece4f97b1a199617938e) ) // 99.978638%
 	ROM_LOAD16_BYTE( "a11.3b",  0x00001, 0x10000, CRC(e4cc7c60) SHA1(63aeab4e20420f28a947438f2d7079c92a43d2df) ) // 99.978638%
 	ROM_LOAD16_BYTE( "a12.2e",  0x40000, 0x10000, CRC(2b81faf7) SHA1(6d10c29f5ee06856843d83e77ba24c2b6e00a9cb) )
-	ROM_LOAD16_BYTE( "a9.2b",   0x40001, 0x10000, CRC(c52c2e9d) SHA1(399f2b7df9d558c8f33bf1a7c8048c62e0f54cec) ) 
+	ROM_LOAD16_BYTE( "a9.2b",   0x40001, 0x10000, CRC(c52c2e9d) SHA1(399f2b7df9d558c8f33bf1a7c8048c62e0f54cec) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "a15.7b",   0x8000, 0x8000, CRC(82007af2) SHA1(f0db1b1dab199df402a7590e56d4d5ab4baca803) ) // 99.612427%
@@ -1982,7 +1982,7 @@ ROM_START( drgninjab2 )
 	ROM_LOAD( "n82s137n.8u",   0x0000, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) )
 ROM_END
 
-  
+
 
 ROM_START( birdtry )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */

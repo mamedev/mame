@@ -228,7 +228,7 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
 	{
 		float x;
 		float y;
-//		float z;
+//      float z;
 	} tmpz[4];
 
 	vertex_t vert[4];
@@ -372,19 +372,19 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
 	}
 
 	{
-//		polyVert tmpz[4];
+//      polyVert tmpz[4];
 		tmpz[0].x = ((float)(-zx)  * zcs) - ((float)(-zy)  * zsn);
 		tmpz[0].y = ((float)(-zx)  * zsn) + ((float)(-zy)  * zcs);
-//		tmpz[0].z = 0.0;
+//      tmpz[0].z = 0.0;
 		tmpz[1].x = ((float)(-zx)  * zcs) - ((float)(zy-1) * zsn);
 		tmpz[1].y = ((float)(-zx)  * zsn) + ((float)(zy-1) * zcs);
-//		tmpz[1].z = 0.0;
+//      tmpz[1].z = 0.0;
 		tmpz[2].x = ((float)(zx-1) * zcs) - ((float)(zy-1) * zsn);
 		tmpz[2].y = ((float)(zx-1) * zsn) + ((float)(zy-1) * zcs);
-//		tmpz[2].z = 0.0;
+//      tmpz[2].z = 0.0;
 		tmpz[3].x = ((float)(zx-1) * zcs) - ((float)(-zy)  * zsn);
 		tmpz[3].y = ((float)(zx-1) * zsn) + ((float)(-zy)  * zcs);
-//		tmpz[3].z = 0.0;
+//      tmpz[3].z = 0.0;
 
 		vert[0].x = tmpz[0].x + (float)(lx / 2);
 		vert[0].y = tmpz[0].y + (float)(ly / 2);

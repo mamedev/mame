@@ -7,7 +7,7 @@
 #include "tc0780fpa.h"
 
 
-#define POLY_FIFO_SIZE	32
+#define POLY_FIFO_SIZE  32
 
 
 tc0780fpa_renderer::tc0780fpa_renderer(device_t &parent, screen_device &screen, const UINT8 *texture_ram)
@@ -19,7 +19,7 @@ tc0780fpa_renderer::tc0780fpa_renderer(device_t &parent, screen_device &screen, 
 	m_fb[0] = std::make_unique<bitmap_ind16>(width, height);
 	m_fb[1] = std::make_unique<bitmap_ind16>(width, height);
 	m_zb = std::make_unique<bitmap_ind16>(width, height);
-	
+
 	m_texture = texture_ram;
 
 	m_cliprect = screen.cliprect();
@@ -153,7 +153,7 @@ void tc0780fpa_renderer::render_texture_scan(INT32 scanline, const extent_t &ext
 
 
 void tc0780fpa_renderer::render(UINT16 *polygon_fifo, int length)
-{	
+{
 	vertex_t vert[4];
 	int i;
 
@@ -418,7 +418,7 @@ void tc0780fpa_device::device_start()
 
 	m_renderer = std::make_unique<tc0780fpa_renderer>(*this, *m_screen, m_texture.get());
 
-	save_pointer(NAME(m_texture.get()), 0x400000);	
+	save_pointer(NAME(m_texture.get()), 0x400000);
 	save_pointer(NAME(m_poly_fifo.get()), POLY_FIFO_SIZE);
 	save_item(NAME(m_poly_fifo_ptr));
 	save_item(NAME(m_tex_address));
@@ -479,16 +479,16 @@ WRITE16_MEMBER(tc0780fpa_device::poly_fifo_w)
 {
 	assert (m_poly_fifo_ptr < POLY_FIFO_SIZE); // never happens
 	m_poly_fifo[m_poly_fifo_ptr++] = data;
-	
+
 	static const int cmd_length[8] = { 7, 13, -1, 20, 17, -1, 26, -1 };
 	UINT16 cmd = m_poly_fifo[0] & 0x7;
 
 	if (m_poly_fifo_ptr >= cmd_length[cmd])
 	{
-		m_renderer->render(m_poly_fifo.get(), m_poly_fifo_ptr);	
+		m_renderer->render(m_poly_fifo.get(), m_poly_fifo_ptr);
 		m_poly_fifo_ptr = 0;
 	}
-	
+
 }
 
 WRITE16_MEMBER(tc0780fpa_device::render_w)

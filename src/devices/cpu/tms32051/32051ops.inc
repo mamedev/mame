@@ -388,7 +388,7 @@ void tms32051_device::op_and_mem()
 {
 	UINT16 ea = GET_ADDRESS();
 	UINT16 data = DM_READ16(ea);
-	
+
 	m_acc &= (UINT32)(data);
 
 	CYCLES(1);
@@ -1359,7 +1359,7 @@ void tms32051_device::op_out()
 {
 	UINT16 port = ROPCODE();
 	UINT16 ea = GET_ADDRESS();
-	
+
 	UINT16 data = DM_READ16(ea);
 	m_io->write_word(port << 1, data);
 

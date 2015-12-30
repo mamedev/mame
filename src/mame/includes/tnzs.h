@@ -135,7 +135,7 @@ public:
 	void screen_eof_tnzs(screen_device &screen, bool state);
 
 	INTERRUPT_GEN_MEMBER(arknoid2_interrupt);
-	
+
 	void mcu_reset();
 	void mcu_handle_coins(int coin);
 };

@@ -3,14 +3,14 @@
 /* TimeTop - GameKing */
 /*
   PeT mess@utanet.at 2015
-  
+
   Thanks to Deathadder, Judge, Porchy, Klaus Sommer, James Brolly & Brian Provinciano
 
   hopefully my work (reverse engineerung, cartridge+bios backup, emulation) will be honored in future
   and my name will not be removed entirely, especially by simple code rewrites of working emulation
-  
+
   flashcard, handheld, programmer, assembler ready to do some test on real hardware
-  
+
   todo:
   !back up gameking3 bios so emulation of gameking3 gets possible; my gameking bios backup solution should work
   search for rockwell r65c02 variant (cb:wai instruction) and several more exceptions, and implement it
@@ -18,7 +18,7 @@
   work out bankswitching and exceptions
   (improove emulation)
   (add audio)
-  
+
   use gameking3 cartridge to get illegal cartridge scroller
 
   This system appears to be based on the GeneralPlus GPL133 system-on-chip or a close relative.
@@ -59,13 +59,13 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gameking_cart);
 
 	struct Gkio {
-	  UINT8 input, input2;
-	  UINT8 timer;
-	  UINT8 res3[0x2f];
-	  UINT8 bank4000_address; // 32
-	  UINT8 bank4000_cart; //33 bit 0 only?
-	  UINT8 bank8000_cart; //34 bit 7; bits 0,1,.. a15,a16,..
-	  UINT8 res2[0x4c];
+		UINT8 input, input2;
+		UINT8 timer;
+		UINT8 res3[0x2f];
+		UINT8 bank4000_address; // 32
+		UINT8 bank4000_cart; //33 bit 0 only?
+		UINT8 bank8000_cart; //34 bit 7; bits 0,1,.. a15,a16,..
+		UINT8 res2[0x4c];
 	};
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -125,7 +125,7 @@ READ8_MEMBER(gameking_state::io_r)
 
 	if (offset != offsetof(Gkio, bank8000_cart))
 		logerror("%.6f io r %x %x\n", machine().time().as_double(), offset, data);
-	
+
 	return data;
 }
 
@@ -149,9 +149,9 @@ static ADDRESS_MAP_START( gameking_mem , AS_PROGRAM, 8, gameking_state )
 
 	AM_RANGE(0x0600, 0x077f) AM_READWRITE(lcd_r, lcd_w)
 	AM_RANGE(0x0d00, 0x0fff) AM_RAM // d00, e00, f00 prooved on handheld
-//	AM_RANGE(0x1000, 0x1fff) AM_RAM    // sthero writes to $19xx
+//  AM_RANGE(0x1000, 0x1fff) AM_RAM    // sthero writes to $19xx
 
-//	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("bank3000")
+//  AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("bank3000")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank4000")
 	AM_RANGE(0x8000, 0xffaf) AM_ROMBANK("bank8000")
 	AM_RANGE(0xffb0, 0xffff) AM_ROMBANK("bankboot") // cpu seems to read from 8000 bank, and for exceptions ignore bank
@@ -191,7 +191,7 @@ UINT32 gameking_state::screen_update_gameking(screen_device &screen, bitmap_ind1
 	{
 		for (int x=0, j=0;j<48/4;x+=4, j++)
 		{
-		  	memory_region *maincpu_rom = memregion("maincpu");
+			memory_region *maincpu_rom = memregion("maincpu");
 			UINT8 data=maincpu_rom->base()[0x600+j+i*12];
 			bitmap.pix16(y, x+3)=data&3;
 			bitmap.pix16(y, x+2)=(data>>2)&3;
@@ -245,8 +245,8 @@ DEVICE_IMAGE_LOAD_MEMBER( gameking_state, gameking_cart )
 
 void gameking_state::machine_start()
 {
-    std::string region_tag;
-    m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	std::string region_tag;
+	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
 	m_bank4000 = membank("bank4000");
 	m_bank8000 = membank("bank8000");
@@ -298,18 +298,18 @@ static MACHINE_CONFIG_START( gameking, gameking_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gameking1, gameking )
-    MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gameking3, gameking )
-    MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_3", "gameking3")
 MACHINE_CONFIG_END
 
 
 ROM_START(gameking)
 	ROM_REGION(0x10000+0x80000, "maincpu", ROMREGION_ERASE00)
-//	ROM_LOAD("gm218.bin", 0x10000, 0x80000, CRC(8f52a928) SHA1(2e791fc7b642440d36820d2c53e1bb732375eb6e) ) // a14 inversed
+//  ROM_LOAD("gm218.bin", 0x10000, 0x80000, CRC(8f52a928) SHA1(2e791fc7b642440d36820d2c53e1bb732375eb6e) ) // a14 inversed
 	ROM_LOAD("gm218.bin", 0x10000, 0x80000, CRC(5a1ade3d) SHA1(e0d056f8ebfdf52ef6796d0375eba7fcc4a6a9d3) )
 ROM_END
 

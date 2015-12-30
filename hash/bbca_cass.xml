@@ -343,7 +343,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="zombies">
 		<description>Zombies</description>
 		<year>1982</year>
@@ -356,7 +356,7 @@
 	</software>
 
 	<!-- Business -->
-	
+
 	<software name="dskdiary">
 		<description>Desk Diary</description>
 		<year>1982</year>
@@ -408,7 +408,7 @@
 	</software>
 
 	<!-- Languages -->
-	
+
 	<software name="lisp">
 		<description>LISP</description>
 		<year>1982</year>
@@ -422,7 +422,7 @@
 	</software>
 
 	<!-- Graphics and other -->
-	
+
 	<software name="crgraph">
 		<description>Creative Graphics</description>
 		<year>1982</year>
@@ -434,5 +434,5 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>

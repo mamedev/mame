@@ -3,24 +3,24 @@
 /***************************************************************************
 
   ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
-  
+
   Texas Instruments Spelling B hardware
-  
+
   The Spelling B was introduced together with the Speak & Spell. It is a
   handheld educational toy with booklet. Two revisions of the hardware exist.
   (* indicates not dumped)
-  
+
   1st revision:
-  
+
   Spelling B (US), 1978
   - TMS0270 MCU TMC0272 (die labeled 0272A T0270B)
   - TMS1980 MCU TMC1984 (die labeled 1980A 84A)
   - 8-digit cyan VFD display (seen with and without apostrophe)
-  
+
   Spelling ABC (UK), 1979: exact same hardware as US version
 
   2nd revision:
-  
+
   Spelling B (US), 1979
   - TMS0270 MCU TMC0274*
   - TMC0355 4KB VSM ROM CD2602*
@@ -31,7 +31,7 @@
 
   Spelling ABC (Germany), 1979: different VSM
   - TMC0355 4KB VSM ROM CD2607*
-  
+
   Mr. Challenger (US), 1979
   - TMS0270 MCU TMC0273
   - TMC0355 4KB VSM ROM CD2601
@@ -212,7 +212,7 @@ WRITE16_MEMBER(tispellb_state::rev2_write_o)
 {
 	// SEG DP: speaker out
 	m_speaker->level_w(data >> 15 & 1);
-	
+
 	// SEG DP and SEG AP are not connected to VFD, rest is same as rev1
 	main_write_o(space, offset, data & 0x6fff);
 }
@@ -229,7 +229,7 @@ WRITE16_MEMBER(tispellb_state::rev2_write_r)
 		m_tms6100->romclock_w(1);
 		m_tms6100->romclock_w(0);
 	}
-	
+
 	// rest is same as rev1
 	main_write_r(space, offset, data);
 }
@@ -250,7 +250,7 @@ INPUT_CHANGED_MEMBER(tispellb_state::power_button)
 	{
 		m_power_on = true;
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		
+
 		if (m_subcpu)
 			m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
@@ -319,7 +319,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mrchalgr )
 	PORT_INCLUDE( spellb ) // same key layout as spellb
-	
+
 	PORT_MODIFY("IN.5")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("2nd Player")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Score")

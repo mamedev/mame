@@ -1,20 +1,20 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-	ROLM 9751 CBX Software
+    ROLM 9751 CBX Software
 
-	Releases known: 9004, 9005
+    Releases known: 9004, 9005
 
-	9005.6.84 - Last software release (1998)
-		Install disks (7)
-		Disktool
-		Mini Patch Volume MPV4-84
-			Additional fixes up to year 2000
-		RPDN Loadware
+    9005.6.84 - Last software release (1998)
+        Install disks (7)
+        Disktool
+        Mini Patch Volume MPV4-84
+            Additional fixes up to year 2000
+        RPDN Loadware
 
-	9005.6.82 (1995)
+    9005.6.82 (1995)
 
-	
+
 -->
 <softwarelist name="r9751" description="ROLM CBX 9751 floppy disk images">
 	<software name="cbxr5684">
@@ -37,7 +37,7 @@
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1474560">
 				<rom name="Siemens.9751.CBX.Release.9005.6.84.Disk3.img" size="1474560" crc="2c0226e2" sha1="08fca05de78e6325881deb3f062235a7bcc4ea10" offset="0" />
-			 </dataarea>
+				</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />

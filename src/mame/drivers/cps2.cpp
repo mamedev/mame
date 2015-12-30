@@ -910,7 +910,7 @@ READ16_MEMBER(cps_state::joy_or_paddle_ecofghtr_r)
 		else if ((dial1 & 0x800) < (m_ecofghtr_dial_last1 & 0x800)) // value gone from 0xfff to 0x000
 		{
 			m_ecofghtr_dial_direction1 = 1;
-		}		
+		}
 
 		m_ecofghtr_dial_last0 = dial0;
 		m_ecofghtr_dial_last1 = dial1;

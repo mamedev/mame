@@ -1813,18 +1813,18 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		</part>
 	</software>
 
-  <software name="heiseiky">
+	<software name="heiseiky">
 		<description>Heisei Kyouiku Iinkai Jr. Mezase Yuutousei (Jpn)</description>
 		<year>1995</year>
 		<publisher>Imagineer</publisher>
 		<part name="cart" interface="pico_cart">
-      <feature name="pcb" value="171-6882A" />
+		<feature name="pcb" value="171-6882A" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18565-t.ic1" size="524288" crc="8ba23bbe" sha1="85e6ed98f5e7bfa04c1b099bba79ddd34ccdd40e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
-	</software>  
-    
+	</software>
+
 	<software name="hellokcs">
 		<description>Hello Kitty no Castelo (Bra)</description>
 		<year>19??</year>
@@ -4628,7 +4628,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
- 	<software name="tomicarp">
+	<software name="tomicarp">
 		<description>Tomica Pico Rescue Parking ~Shokai-Tomica Fuzoku~ (Jpn)</description>
 		<year>2002</year>
 		<publisher>Sega Toys</publisher>
@@ -4637,8 +4637,8 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 				<rom name="9v1-0014ar2" size="2097152" crc="3e53c515" sha1="fff0d70882c10adab3065bebe4ce07aee690f674" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
 	<software name="hamtnaka">
 		<description>Tottoko Hamtaro - Haru-Natsu-Aki-Fuyu - Tottoko Nakayoshi! Ham Chance! (Jpn)</description>
 		<year>2001</year>
@@ -5102,7 +5102,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			</dataarea>
 		</part>
 	</software>
-   
+
 	<software name="hucklowlp" cloneof="hucklowl">
 		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19941004)</description>
 		<year>1994</year>

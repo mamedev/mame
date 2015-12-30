@@ -48,7 +48,7 @@ ROM_START( sanfuze2 )
 	// this rom was dumped using the RockBox (custom firmware) debugging features, it's presumably the internal ROM
 	// I don't know if it's specific to the Fuze 2, or shared.
 	ROM_LOAD( "sanza.rom",   0x00000, 0x20000, CRC(a93674b0) SHA1(3a17dfc9ad31f07fdd66e3dac94c9494c59f3203) )
-	
+
 	// these are firmware update files, we probably need to extract the data from them in order to use them with the ROM
 	// above and get things booting.
 	// http://forums.sandisk.com/t5/Sansa-Fuze/Sansa-Fuze-Firmware-Update-01-02-31-amp-02-03-33/td-p/139175
@@ -59,7 +59,7 @@ ROM_START( sanfuze2 )
 	ROM_LOAD( "020333_clpp_data.dat",   0x00000, 0x566a0d, CRC(2093569c) SHA1(7882abcf000860a3071f5afe91719530bc54c68a) ) // original filename clpp_data.dat, actually a 6 minute MP3 advertisement for slotRadio
 
 	ROM_REGION(0xf00000, "updates1", 0 )
-    // 01.02.31 (for Fuze 1?)
+	// 01.02.31 (for Fuze 1?)
 	ROM_LOAD( "010231_fuzea.bin",   0x00000, 0xf00000, CRC(48b264cb) SHA1(387d5270fdd2fb7ba3901be59651a55167700768) ) // original filename fuzea.bin
 
 ROM_END

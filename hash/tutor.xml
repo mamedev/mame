@@ -88,11 +88,11 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<info name="serial" value="021E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="0x4000">
-        <rom name="Yonnin Majan.bin" size="0x4000" crc="1c2eb2f0" sha1="4e9a0ce55f479c4b1a5fee9320561ce93765c4d7" offset="0" /> <!-- needs splitting into 2 files? there are 2 roms, marked 1 and 2 in the cart?? -->
+		<rom name="Yonnin Majan.bin" size="0x4000" crc="1c2eb2f0" sha1="4e9a0ce55f479c4b1a5fee9320561ce93765c4d7" offset="0" /> <!-- needs splitting into 2 files? there are 2 roms, marked 1 and 2 in the cart?? -->
 			</dataarea>
 		</part>
 	</software>
-  
+
 	<software name="baseball">
 		<description>Baseball (Jpn)</description>
 		<year>1984</year>
@@ -105,7 +105,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bombman">
 		<description>Bombman (Jpn)</description>
 		<year>1982</year>
@@ -131,7 +131,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
-  <!-- Crawlers and Maze Patrol are confirmed as using the exact same ROM data -->
+	<!-- Crawlers and Maze Patrol are confirmed as using the exact same ROM data -->
 	<software name="crawlers">
 	<!-- Stock No: 8100, Clone of Maze Patrol (Japanese 017E)-->
 		<description>Cave Crawlers (USA) / Maze Patrol (Jpn)</description>
@@ -145,7 +145,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 			</dataarea>
 		</part>
 	</software>
-  
+
 	<software name="deepsix" cloneof="marinadv">
 		<description>Deep Six (USA)</description>
 		<year>1983</year>
@@ -375,7 +375,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
-  <!-- Torpedo and Bermuda Triangle are confirmed as using the exact same ROM data -->
+	<!-- Torpedo and Bermuda Triangle are confirmed as using the exact same ROM data -->
 	<software name="torpedo">
 	<!-- Stock No: 8101, Clone of Bermuda Triangle (Japanese 020E)-->
 		<description>Torpedo Terror (USA) / Bermuda Triangle (Jpn)</description>
@@ -389,7 +389,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 			</dataarea>
 		</part>
 	</software>
-    
+
 	<software name="trafjam">
 	<!-- Stock No: 8103, (Japanese 010E)-->
 		<description>Traffic Jam (Jpn)</description>

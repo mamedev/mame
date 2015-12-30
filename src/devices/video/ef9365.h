@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Jean-François DEL NERO
+// copyright-holders:Jean-Francois DEL NERO
 /*********************************************************************
 
     ef9365.h
@@ -88,7 +88,7 @@ private:
 	void set_video_mode(void);
 	void draw_border(UINT16 line);
 	void ef9365_exec(UINT8 cmd);
-	int  cycles_to_us(int cycles);	
+	int  cycles_to_us(int cycles);
 	void dump_bitplanes_word();
 	void update_interrupts();
 

@@ -404,7 +404,6 @@ void sound_stream::update_with_accounting(bool second_tick)
 			if (output_bufindex > 0)
 				for (auto & output : m_output)
 				{
-					
 					memmove(&output.m_buffer[0], &output.m_buffer[samples_to_lose], sizeof(output.m_buffer[0]) * (output_bufindex - samples_to_lose));
 				}
 
@@ -459,7 +458,6 @@ void sound_stream::recompute_sample_rate_data()
 		// When synchronous, pick the sample rate for the inputs, if any
 		for (auto & input : m_input)
 		{
-			
 			if (input.m_source != nullptr)
 			{
 				if (!m_sample_rate)
@@ -486,7 +484,7 @@ void sound_stream::recompute_sample_rate_data()
 	for (auto & input : m_input)
 	{
 		// if we have a source, see if its sample rate changed
-		
+
 		if (input.m_source != nullptr)
 		{
 			// okay, we have a new sample rate; recompute the latency to be the maximum

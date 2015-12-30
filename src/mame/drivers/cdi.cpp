@@ -107,15 +107,15 @@ static ADDRESS_MAP_START( cdi910_mem, AS_PROGRAM, 16, cdi_state )
 #if ENABLE_UART_PRINTING
 	AM_RANGE(0x00301400, 0x00301403) AM_DEVREAD("scc68070", cdi68070_device, uart_loopback_enable)
 #endif
-//	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
-//	AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdicdic_device, regs_r, regs_w)
-//	AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE("slave_hle", cdislave_device, slave_r, slave_w)
-//	AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
+//  AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
+//  AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdicdic_device, regs_r, regs_w)
+//  AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE("slave_hle", cdislave_device, slave_r, slave_w)
+//  AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
 	AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00)    /* nvram (only low bytes used) */
 	AM_RANGE(0x004fffe0, 0x004fffff) AM_DEVREADWRITE("mcd212", mcd212_device, regs_r, regs_w)
-//	AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
+//  AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
 	AM_RANGE(0x00500000, 0x00ffffff) AM_NOP
-//	AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
+//  AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
 	AM_RANGE(0x80000000, 0x8000807f) AM_DEVREADWRITE("scc68070", cdi68070_device, periphs_r, periphs_w)
 ADDRESS_MAP_END
 

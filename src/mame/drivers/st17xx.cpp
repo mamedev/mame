@@ -2,36 +2,36 @@
 // copyright-holders:Justin Kerk
 /***************************************************************************
 
-	Saturn ST-17xx series DVD players
+    Saturn ST-17xx series DVD players
 
-	Skeleton driver.
+    Skeleton driver.
 
 ****************************************************************************/
 
 /*
 
-	TODO:
+    TODO:
 
-	- everything
+    - everything
 
-	Technical info:
-	DVD-player-on-a-chip designs from Mediatek:
-	http://www.mediatek.com/en/products/home-entertainment/consumer-dvd-blu-ray/
+    Technical info:
+    DVD-player-on-a-chip designs from Mediatek:
+    http://www.mediatek.com/en/products/home-entertainment/consumer-dvd-blu-ray/
 
-	MT1379:
-	http://pdf.datasheetcatalog.com/datasheets/134/477326_DS.pdf
+    MT1379:
+    http://pdf.datasheetcatalog.com/datasheets/134/477326_DS.pdf
 
-	MT1389:
-	http://newage.mpeg4-players.info/mt1389/mt1389.html
-	http://groups.yahoo.com/group/MEDIATEK1389/
-	http://www.sigmatek-xm600.borec.cz/chip.html
-	http://www.sigmatek-xm600.borec.cz/Info%20-%20MT1389%20v0.3b%20English.doc (rename to .rtf)
-	Includes an 8032, ARM7TDMI, and unknown DSP
+    MT1389:
+    http://newage.mpeg4-players.info/mt1389/mt1389.html
+    http://groups.yahoo.com/group/MEDIATEK1389/
+    http://www.sigmatek-xm600.borec.cz/chip.html
+    http://www.sigmatek-xm600.borec.cz/Info%20-%20MT1389%20v0.3b%20English.doc (rename to .rtf)
+    Includes an 8032, ARM7TDMI, and unknown DSP
 
-	SUNPLUS SPHE8200A:
-	http://pdf.datasheetcatalog.com/datasheets/2300/499420_DS.pdf
-	https://004code.googlecode.com/svn/trunk/h/regmapo_8200.h
-	"32-bit RISC" architecture, but which one?
+    SUNPLUS SPHE8200A:
+    http://pdf.datasheetcatalog.com/datasheets/2300/499420_DS.pdf
+    https://004code.googlecode.com/svn/trunk/h/regmapo_8200.h
+    "32-bit RISC" architecture, but which one?
 
 */
 

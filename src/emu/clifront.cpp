@@ -597,8 +597,6 @@ void cli_frontend::listdevices(const char *gamename)
 		// dump the results
 		for (auto device : device_list)
 		{
-			
-
 			// extract the tag, stripping the leading colon
 			const char *tag = device->tag();
 			if (*tag == ':')

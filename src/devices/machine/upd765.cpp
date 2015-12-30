@@ -2247,7 +2247,6 @@ void upd765_family_device::run_drive_ready_polling()
 void upd765_family_device::index_callback(floppy_image_device *floppy, int state)
 {
 	for(auto & fi : flopi) {
-		
 		if(fi.dev != floppy)
 			continue;
 

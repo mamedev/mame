@@ -48,18 +48,18 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	void res_change();
-	
-	
+
+
 	static void static_set_slave_screen(device_t &device, const char *tag);
 
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override; 
+	virtual void device_reset() override;
 	virtual void device_clock_changed() override { reset_internal_state(); }
 	void reset_internal_state();
-	
+
 	private:
 	// internal state
 	UINT8   m_regs[16];
@@ -75,7 +75,7 @@ protected:
 	int                m_offsx;
 	int                m_offsy;
 
-	const char *    m_slave_screen_tag; 
+	const char *    m_slave_screen_tag;
 	screen_device * m_slave_screen;
 
 };

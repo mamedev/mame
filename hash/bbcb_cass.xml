@@ -1295,7 +1295,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bcbill">
 		<description>BC Bill</description>
 		<year>1984</year>
@@ -2334,7 +2334,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="chessmp">
 		<description>Chess (Micro Power)</description>
 		<year>198?</year>

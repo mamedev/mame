@@ -61,7 +61,7 @@
         [0x00000320] 2000000-TCOUNT in XINT3 handler
         [0x01010668] copied from (word)0xb0000004 in XINT3 handler
 
-		ROM [0xc0050000] 0x10000 floats copied to [0x40180000]
+        ROM [0xc0050000] 0x10000 floats copied to [0x40180000]
 
 
     Texture ROM decode:
@@ -170,7 +170,7 @@ void rollext_renderer::process_display_list(UINT32* disp_ram)
 		// Word 0:   xxxxxxxx -------- -------- --------   Command? 0xFC for quads
 		//           -------- -------- xxxxxxxx --------   Palette?
 		//           -------- -------- -------- xxxxxxxx   Number of verts? (4 for quads)
-		
+
 		// Word 1:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 1 X
 
 		// Word 2:   xxxxxxxx xxxxx--- -------- --------   Texture Origin Bottom
@@ -227,10 +227,10 @@ void rollext_renderer::process_display_list(UINT32* disp_ram)
 			vert[j].y = (int)((u2f(iy) / 2.0f) + 192.0f);
 		}
 
-		vert[0].p[0] = 0.0f;		vert[0].p[1] = 1.0f;
-		vert[1].p[0] = 0.0f;		vert[1].p[1] = 0.0f;
-		vert[2].p[0] = 1.0f;		vert[2].p[1] = 0.0f;
-		vert[3].p[0] = 1.0f;		vert[3].p[1] = 1.0f;
+		vert[0].p[0] = 0.0f;        vert[0].p[1] = 1.0f;
+		vert[1].p[0] = 0.0f;        vert[1].p[1] = 0.0f;
+		vert[2].p[0] = 1.0f;        vert[2].p[1] = 0.0f;
+		vert[3].p[0] = 1.0f;        vert[3].p[1] = 1.0f;
 
 		rollext_polydata &extra = object_data_alloc();
 
@@ -238,18 +238,18 @@ void rollext_renderer::process_display_list(UINT32* disp_ram)
 		extra.tex_left = (disp_ram[(ii + 8) / 4] >> 8) & 0x7ff;
 		extra.pal = (disp_ram[(ii + 0) / 4] >> 8) & 0x1f;
 
-#if 0		
+#if 0
 		printf("P%d\n", i);
 		for (int j=0; j < 6; j++)
 		{
 			printf("   %08X %08X %08X %08X", disp_ram[(ii + (j*0x10) + 0) / 4], disp_ram[(ii + (j*0x10) + 4) / 4], disp_ram[(ii + (j*0x10) + 8) / 4], disp_ram[(ii + (j*0x10) + 12) / 4]);
 			printf("   %f %f %f %f\n", u2f(disp_ram[(ii + (j*0x10) + 0) / 4]), u2f(disp_ram[(ii + (j*0x10) + 4) / 4]), u2f(disp_ram[(ii + (j*0x10) + 8) / 4]), u2f(disp_ram[(ii + (j*0x10) + 12) / 4]));
 		}
-#endif	
+#endif
 
 		render_triangle(visarea, rd, 4, vert[0], vert[1], vert[2]);
 		render_triangle(visarea, rd, 4, vert[0], vert[2], vert[3]);
-		
+
 	}
 
 	wait();
@@ -371,7 +371,7 @@ UINT32 rollext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		ii += 1536;
 	}
 #endif
-	
+
 	m_renderer->display(&bitmap, cliprect);
 
 	//m_renderer->clear_fb();
@@ -443,7 +443,7 @@ WRITE32_MEMBER(rollext_state::cmd_callback)
 			printf("PP num %d\n", num);
 			printf("0x00000084 = %08X\n", space.read_dword(0x84));
 
-			
+
 			UINT32 ra = 0x1000280;
 
 			/*

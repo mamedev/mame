@@ -18,13 +18,13 @@ class awetoss_state : public driver_device
 public:
 	awetoss_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-	//	,m_maincpu(*this, "maincpu")
+	//  ,m_maincpu(*this, "maincpu")
 	{ }
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-//	required_device<mcs51_cpu_device> m_maincpu;
+//  required_device<mcs51_cpu_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( awetoss )
@@ -44,9 +44,9 @@ void awetoss_state::machine_reset()
 static MACHINE_CONFIG_START( awetoss, awetoss_state )
 
 	/* basic machine hardware */
-//	MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
-//	MCFG_CPU_PROGRAM_MAP(awetoss_map)
-//	MCFG_CPU_IO_MAP(awetoss_io)
+//  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
+//  MCFG_CPU_PROGRAM_MAP(awetoss_map)
+//  MCFG_CPU_IO_MAP(awetoss_io)
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", awetoss_state,  irq0_line_hold)
 
 	/* sound hardware */
@@ -77,8 +77,7 @@ ROM_START( awetoss )
 	ROM_LOAD( "AWSMTOSS.U14", 0x00000, 0x10000, CRC(6217daaf) SHA1(3036e7f941f787374ef130d3ae6d57813d9e9aac) )
 	ROM_LOAD( "AWSMTOSS.U13", 0x10000, 0x10000, CRC(4ed3c827) SHA1(761d2796d4f40deeb2caa61c4a9c56ced156084b) )
 	ROM_LOAD( "AWSMTOSS.U12", 0x20000, 0x10000, CRC(9ddf6dd9) SHA1(c115828ab261ae6d83cb500057313c3a5570b4b0) )
-	ROM_LOAD( "AWSMTOSS.U11", 0x30000, 0x10000, CRC(8ae9d4f0) SHA1(58d1d8972c8e4c9a7c63e9d63e267ea81515d22a) )	
+	ROM_LOAD( "AWSMTOSS.U11", 0x30000, 0x10000, CRC(8ae9d4f0) SHA1(58d1d8972c8e4c9a7c63e9d63e267ea81515d22a) )
 ROM_END
 
 GAME( 19??, awetoss,  0,    awetoss, awetoss, driver_device,  0, ROT0, "Lazer-tron", "Awesome Toss'em (Lazer-tron)", MACHINE_IS_SKELETON_MECHANICAL )
-

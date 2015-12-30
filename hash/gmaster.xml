@@ -54,7 +54,7 @@ Undumped:
 		</part>
 	</software>
 
-  <software name="fussball" supported ="partial"> <!-- some gfx corruption -->
+	<software name="fussball" supported ="partial"> <!-- some gfx corruption -->
 		<description>3-on-3 Soccer (Fuss-ball)</description>
 		<year>1990</year>
 		<publisher>Hartung</publisher>

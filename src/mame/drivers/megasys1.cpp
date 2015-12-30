@@ -172,7 +172,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_scanline)
 {
 	int scanline = param;
 
-	// stdragon: irq 1 is raster irq ("press start" behaviour), happens at around scanline 90(-16), 2 vblank, 3 is RTE. 
+	// stdragon: irq 1 is raster irq ("press start" behaviour), happens at around scanline 90(-16), 2 vblank, 3 is RTE.
 	// p47: irq 2 valid, others RTE
 	// kickoff: irq 3 valid, others RTE
 	// tshingen: irq 3 RTE, irq 1 reads inputs, irq 2 sets vregs values (pending further investigation ...)
@@ -183,7 +183,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_scanline)
 	// plusalph: irq 1 & 3 RTE, irq 2 valid
 	// rodland: irq 1 & 3 RTE, irq 2 valid (sets palette, vregs ...)
 	// soldam: irq 1 & 3 RTE, irq 2 valid
-	
+
 	if(scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
@@ -306,7 +306,7 @@ WRITE16_MEMBER(megasys1_state::ms1_ram_w )
 	// 64th Street and Chimera Beast rely on this for attract inputs
 
 	m_ram[offset] = data;
-//	if (mem_mask != 0xffff) printf("byte write to RAM %04x %04x %04x\n", offset, data, mem_mask);
+//  if (mem_mask != 0xffff) printf("byte write to RAM %04x %04x %04x\n", offset, data, mem_mask);
 
 }
 

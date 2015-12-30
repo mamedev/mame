@@ -126,7 +126,7 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int
 			std::unique_ptr<drcbe_interface>{ std::make_unique<drcbe_native>(*this, device, cache, flags, modes, addrbits, ignorebits) }),
 		m_beintf(*m_drcbe_interface.get()),
 		m_umllog(nullptr)
-{	
+{
 	// if we're to log, create the logfile
 	if (device.machine().options().drc_log_uml())
 	{

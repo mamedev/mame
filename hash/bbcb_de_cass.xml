@@ -138,7 +138,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="busgames">
 		<description>Managementspiele (Ger)</description>
 		<year>1982</year>
@@ -150,7 +150,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="missigns">
 		<description>Fehlende Zeichen (Ger)</description>
 		<year>1983</year>
@@ -162,7 +162,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="numberbg">
 		<description>Zahlenwaage (Ger)</description>
 		<year>198?</year>
@@ -221,7 +221,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="wordseqg">
 		<description>Wortsalat (Ger)</description>
 		<year>1983</year>
@@ -233,5 +233,5 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>

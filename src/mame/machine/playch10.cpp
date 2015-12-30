@@ -1098,7 +1098,7 @@ DRIVER_INIT_MEMBER(playch10_state,pchboard)
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
-	
+
 	m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(playch10_state::gboard_scanline_cb),this));
 }
 

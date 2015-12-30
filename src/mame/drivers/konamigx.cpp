@@ -108,7 +108,7 @@
 
 // TODO: check on PCB
 #define MASTER_CLOCK XTAL_24MHz
-#define SUB_CLOCK XTAL_16MHz	
+#define SUB_CLOCK XTAL_16MHz
 
 /**********************************************************************************/
 /*
@@ -221,7 +221,7 @@ void konamigx_state::generate_sprites(address_space &space, UINT32 src, UINT32 s
 			UINT16 color_set    = 0x0000;
 			UINT16 color_rotate = 0x0000;
 			UINT16 v;
-			
+
 			v = space.read_word(adr+24);
 			if(v & 0x8000) {
 				color_mask = 0xf3ff;
@@ -250,7 +250,7 @@ void konamigx_state::generate_sprites(address_space &space, UINT32 src, UINT32 s
 				zoom_x = 0x40;
 			if(!zoom_y)
 				zoom_y = 0x40;
-			
+
 			if(set >= 0x200000 && set < 0xd00000)
 			{
 				UINT16 count2 = space.read_word(set);
@@ -262,7 +262,7 @@ void konamigx_state::generate_sprites(address_space &space, UINT32 src, UINT32 s
 					UINT16 col  = space.read_word(set+4);
 					short y = space.read_word(set+6);
 					short x = space.read_word(set+8);
-								
+
 					if(idx == 0xffff) {
 						set = (flip<<16) | col;
 						if(set >= 0x200000 && set < 0xd00000)
@@ -504,11 +504,11 @@ WRITE32_MEMBER(konamigx_state::eeprom_w)
 }
 
 WRITE32_MEMBER(konamigx_state::control_w)
-{ 
+{
 	// TODO: derive from reported PCB XTALs
 	const UINT32 pixclock[4] = { XTAL_6MHz, XTAL_8MHz, XTAL_12MHz, XTAL_16MHz};
 	//logerror("write %x to control register (mask=%x)\n", data, mem_mask);
-	
+
 	// known controls:
 	// bit 23 = reset graphics chips
 	// bit 22 = 0 to halt 68000, 1 to let it run (SOUNDRESET)
@@ -545,7 +545,7 @@ WRITE32_MEMBER(konamigx_state::control_w)
 		m_k055673->k053246_set_objcha_line((data&0x100000) ? ASSERT_LINE : CLEAR_LINE);
 
 		m_gx_wrport2 = (data>>16)&0xff;
-		
+
 		if(m_prev_pixel_clock != (m_gx_wrport2 & 3))
 		{
 			m_k053252->set_unscaled_clock(pixclock[m_gx_wrport2 & 3]);
@@ -598,7 +598,7 @@ TIMER_CALLBACK_MEMBER(konamigx_state::dmaend_callback)
 void konamigx_state::dmastart_callback(int data)
 {
 	int sprite_timing;
-	
+
 	// raise the DMA busy flag
 	// TODO: is it supposed to raise even if DMA is disabled?
 	m_gx_rdport1_3 |= 2;
@@ -648,7 +648,7 @@ INTERRUPT_GEN_MEMBER(konamigx_state::konamigx_type2_vblank_irq)
 TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type2_scanline)
 {
 	int scanline = param;
-	
+
 	if(scanline == 48)
 	{
 		if (m_gx_syncen & 0x40)
@@ -1725,7 +1725,7 @@ static MACHINE_CONFIG_DERIVED( dragoonj, konamigx )
 
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(24+16, 16)
-	
+
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_5, 1, 0, "none")
 
@@ -1791,7 +1791,7 @@ static MACHINE_CONFIG_DERIVED( racinfrc, konamigx )
 
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(24-8+16, 0)
-	
+
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_6, 0, 0, "none")
 
@@ -1814,7 +1814,7 @@ static MACHINE_CONFIG_DERIVED( gxtype3, konamigx )
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type3)
-	
+
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(0, 16)
 	MCFG_K053252_SET_SLAVE_SCREEN("screen2")
@@ -1879,7 +1879,7 @@ static MACHINE_CONFIG_DERIVED( gxtype4, konamigx )
 	MCFG_K053252_OFFSETS(0, 16)
 	MCFG_K053252_SET_SLAVE_SCREEN("screen2")
 
-	
+
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_8, 0, 0, "none")
 
@@ -1896,8 +1896,8 @@ static MACHINE_CONFIG_DERIVED( gxtype4_vsn, gxtype4 )
 
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(0, 16)
-	
-	
+
+
 	MCFG_SCREEN_MODIFY("screen2")
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
@@ -1924,7 +1924,7 @@ static MACHINE_CONFIG_DERIVED( winspike, konamigx )
 
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(24+15, 16)
-	
+
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CB(konamigx_state, alpha_tile_callback)
 	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_8, 0, 2, "none")
@@ -3724,7 +3724,7 @@ MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 	m_gx_syncen    = 0;
 	m_suspension_active = 0;
 	m_prev_pixel_clock = 0xff;
-	
+
 	// Hold sound CPUs in reset
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -3928,7 +3928,7 @@ DRIVER_INIT_MEMBER(konamigx_state,posthack)
 /*     year  ROM       parent    machine   inp       init */
 
 /* dummy parent for the BIOS */
-GAME( 1994, konamigx, 0, 		konamigx_bios, konamigx, konamigx_state, konamigx, ROT0, "Konami", "System GX", MACHINE_IS_BIOS_ROOT )
+GAME( 1994, konamigx, 0,        konamigx_bios, konamigx, konamigx_state, konamigx, ROT0, "Konami", "System GX", MACHINE_IS_BIOS_ROOT )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 1: standard with an add-on 53936 on the ROM board, analog inputs, */
