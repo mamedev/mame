@@ -14,7 +14,7 @@
 #define APPNAME_LOWER           "mame"
 #define CONFIGNAME              "mame"
 #define APPLONGNAME             "M.A.M.E."
-#define FULLLONGNAME            "Multiple Arcade Machine Emulator"
+#define FULLLONGNAME            "Multiple Arcane Machine Emulator"
 #define CAPGAMENOUN             "MACHINE"
 #define CAPSTARTGAMENOUN        "Machine"
 #define GAMENOUN                "machine"
