@@ -328,6 +328,7 @@ neocdzj //
 // Philips
 cdimono1  // Philips CD-i model 200 (Mono-I board, PAL)
 cdimono2  // Philips CD-i model 220 (Mono-II board, NTSC)
+cdi910 //
 
 // Yamaha
 mu100   // 1997 MU-100

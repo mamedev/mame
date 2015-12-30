@@ -99,6 +99,27 @@ static ADDRESS_MAP_START( cdimono2_mem, AS_PROGRAM, 16, cdi_state )
 	AM_RANGE(0x80000000, 0x8000807f) AM_DEVREADWRITE("scc68070", cdi68070_device, periphs_r, periphs_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( cdi910_mem, AS_PROGRAM, 16, cdi_state )
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("planea")
+	AM_RANGE(0x00180000, 0x001fffff) AM_ROM AM_REGION("maincpu", 0) // boot vectors point here
+
+	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_SHARE("planeb")
+#if ENABLE_UART_PRINTING
+	AM_RANGE(0x00301400, 0x00301403) AM_DEVREAD("scc68070", cdi68070_device, uart_loopback_enable)
+#endif
+//	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
+//	AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdicdic_device, regs_r, regs_w)
+//	AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE("slave_hle", cdislave_device, slave_r, slave_w)
+//	AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
+	AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00)    /* nvram (only low bytes used) */
+	AM_RANGE(0x004fffe0, 0x004fffff) AM_DEVREADWRITE("mcd212", mcd212_device, regs_r, regs_w)
+//	AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
+	AM_RANGE(0x00500000, 0x00ffffff) AM_NOP
+//	AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
+	AM_RANGE(0x80000000, 0x8000807f) AM_DEVREADWRITE("scc68070", cdi68070_device, periphs_r, periphs_w)
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( cdimono2_servo_mem, AS_PROGRAM, 8, cdi_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(servo_io_r, servo_io_w)
 	AM_RANGE(0x0050, 0x00ff) AM_RAM
@@ -896,6 +917,60 @@ static MACHINE_CONFIG_START( cdimono2, cdi_state )
 	MCFG_MK48T08_ADD( "mk48t08" )
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( cdi910, cdi_state )
+	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
+	MCFG_CPU_PROGRAM_MAP(cdi910_mem)
+
+	MCFG_MCD212_ADD("mcd212")
+	MCFG_MCD212_SET_SCREEN("screen")
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(384, 302)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 22, 302-1) // TODO: dynamic resolution
+	MCFG_SCREEN_UPDATE_DRIVER(cdi_state, screen_update_cdimono1)
+
+	MCFG_SCREEN_ADD("lcd", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(192, 22)
+	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 22-1)
+	MCFG_SCREEN_UPDATE_DRIVER(cdi_state, screen_update_cdimono1_lcd)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+
+	MCFG_DEFAULT_LAYOUT(layout_cdi)
+
+	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
+
+	MCFG_CDI68070_ADD("scc68070")
+	MCFG_CPU_ADD("servo", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
+	MCFG_CPU_PROGRAM_MAP(cdimono2_servo_mem)
+	MCFG_CPU_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
+	MCFG_CPU_PROGRAM_MAP(cdimono2_slave_mem)
+
+	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_INTERFACE("cdi_cdrom")
+	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
+	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD( "dac1", DMADAC, 0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
+
+	MCFG_SOUND_ADD( "dac2", DMADAC, 0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
+
+	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
+
+	MCFG_MK48T08_ADD( "mk48t08" )
+MACHINE_CONFIG_END
+
 // CD-i Mono-I, with CD-ROM image device (MESS) and Software List (MESS)
 static MACHINE_CONFIG_DERIVED( cdimono1, cdimono1_base )
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, cdimono1)
@@ -968,15 +1043,34 @@ ROM_START( cdimono1 )
 	// This one is a Mono-IV board, needs to be a separate driver
 	//ROM_SYSTEM_BIOS( 2, "pcdi490", "Philips CD-i 490" )
 	//ROMX_LOAD( "cdi490.rom", 0x000000, 0x80000, CRC(e115f45b) SHA1(f71be031a5dfa837de225081b2ddc8dcb74a0552), ROM_BIOS(3) )
-	// This one is a Mini-MMC board, needs to be a separate driver
-	//ROM_SYSTEM_BIOS( 3, "pcdi910m", "Philips CD-i 910" )
-	//ROMX_LOAD( "cdi910.rom", 0x000000, 0x80000,  CRC(8ee44ed6) SHA1(3fcdfa96f862b0cb7603fb6c2af84cac59527b05), ROM_BIOS(4) )
 
 	ROM_REGION(0x2000, "cdic", 0)
 	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
 	ROM_REGION(0x2000, "slave", 0)
 	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+ROM_END
+
+
+
+ROM_START( cdi910 )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_SYSTEM_BIOS( 0, "cdi910", "CD-I 910-17P Mini-MMC" )
+	ROMX_LOAD( "philips__cd-i_2.1__mb834200b-15__26b_aa__9224_z01.tc574200.7211", 0x000000, 0x80000, CRC(4ae3bee3) SHA1(9729b4ee3ce0c17172d062339c47b1ab822b222b), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE )
+
+	// cdic
+
+	ROM_REGION(0x2000, "servo", 0)
+	ROM_LOAD( "zx405037p__cdi_servo_2.1__b43t__llek9215.mc68hc705c8a_withtestrom.7201", 0x0000, 0x2000, CRC(7a3af407) SHA1(fdf8d78d6a0df4a56b5b963d72eabd39fcec163f) )
+
+	ROM_REGION(0x2000, "slave", 0)
+	ROM_LOAD( "zx405042p__cdi_slave_2.0__b43t__zzmk9213.mc68hc705c8a_withtestrom.7206", 0x0000, 0x2000, CRC(688cda63) SHA1(56d0acd7caad51c7de703247cd6d842b36173079) )
+
+	ROM_REGION(0x2000, "pals", 0)
+	ROM_LOAD( "ti_portugal_206xf__tibpal20l8-15cnt__m7205n._1.7205.bin",   0x0000, 0x144, CRC(dd167e0d) SHA1(2ba82a4619d7a0f19e62e02a2841afd4d45d56ba) )
+	ROM_LOAD( "ti_portugal_206xf__tibpal20l8-15cnt__m7205n._2.7205.bin",   0x0000, 0x144, CRC(0d893d31) SHA1(f10296f8bbbfed926c13a48c770cc606971d1703) )
+	ROM_LOAD( "ti_portugal_206xf__tibpal20l8-15cnt__m7205n.7205.bin",      0x0000, 0x144, CRC(dd167e0d) SHA1(2ba82a4619d7a0f19e62e02a2841afd4d45d56ba) )
+	ROM_LOAD( "ti_portugal_774_206xf__tibpal16l8-10cn_m7204n.7204.bin",    0x0000, 0x104, CRC(04e6bd37) SHA1(153d1a977291bedb7420484a9f889325dbd3628e) )
 ROM_END
 
 ROM_START( cdimono2 )
@@ -999,9 +1093,6 @@ ROM_START( cdibios )
 	// This one is a Mono-IV board, needs to be a separate driver
 	//ROM_SYSTEM_BIOS( 2, "pcdi490", "Philips CD-i 490" )
 	//ROMX_LOAD( "cdi490.rom", 0x000000, 0x80000, CRC(e115f45b) SHA1(f71be031a5dfa837de225081b2ddc8dcb74a0552), ROM_BIOS(3) )
-	// This one is a Mini-MMC board, needs to be a separate driver
-	//ROM_SYSTEM_BIOS( 3, "pcdi910m", "Philips CD-i 910" )
-	//ROMX_LOAD( "cdi910.rom", 0x000000, 0x80000,  CRC(8ee44ed6) SHA1(3fcdfa96f862b0cb7603fb6c2af84cac59527b05), ROM_BIOS(4) )
 
 	ROM_REGION(0x2000, "cdic", 0)
 	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
@@ -1185,6 +1276,7 @@ ROM_END
 // BIOS / System
 CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      driver_device, 0,        "Philips",  "CD-i (Mono-I) (PAL)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  )
 CONS( 1991, cdimono2, 0,        0,        cdimono2, cdimono2, driver_device, 0,        "Philips",  "CD-i (Mono-II) (NTSC)",   MACHINE_NOT_WORKING )
+CONS( 1991, cdi910,   0,        0,        cdi910,   cdimono2, driver_device, 0,        "Philips",  "CD-I 910-17P Mini-MMC (PAL)",   MACHINE_NOT_WORKING  )
 
 // The Quizard games are RETAIL CD-i units, with additional JAMMA adapters & dongles for protection, hence being 'clones' of the system.
 
