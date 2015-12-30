@@ -6,7 +6,7 @@
 
     original driver by Pierpaolo Prazzoli
 
-    The two games have identical game/video boards hardware, but
+    The two games have near identical game/video boards hardware, but
     completely different sound boards.  Laser Battle/Lazarian have a
     dumb sound board with TMS organ and CSG chips driven directly by the
     game program.  Cat and Mouse uses an intelligent sound board with
@@ -29,6 +29,12 @@
     interface on J3.  It seems there are no games that actually use the
     bidirectional interface on J7.
 
+    The game board appears to have had some last-minute design changes
+    that aren't reflected in the Midway schematics, for example the last
+    program ROM being double the size of the others.  There are also
+    some errors in the schematic like missing connections and incorrect
+    logic gate symbols.
+
     Laser Battle/Lazarian notes:
     * Manuals clearly indicate the controls to fire in four directions
       are four buttons arranged in a diamond, not a four-way joystick
@@ -46,16 +52,37 @@
     * Laser Battle is far less forgiving, sending you back to the start
       of an area on dying and not giving continues
 
+    Cat and Mouse notes:
+    * Tilt input causes loss of one credit
+    * Service coin 1 input grants two credits the first time it's
+      pushed, but remembers this and won't grant credits again unless
+      unless you trigger the tilt input
+    * Flyer suggests there should be an "old lady" sprite, which is not
+      present in our ROM dump
+    * Sprite ROM is likely double size, banking could be controlled by
+      one of the many unused CSOUND bits, the NEG2 bit, or even H128
+    * Judging by the PLA program, the colour weight resistors are likely
+      different to what Laser Battle/Lazarian uses - we need a detailed
+      colour photo of the game board or a schematic to confirm values
+    * Sound board emulation is based on tracing the program and guessing
+      what's connected where - we really need someone to trace out the
+      1b11107 sound board if we want to get this right
+
     TODO:
     - work out where all the magic layer offsets come from
+    - catnmous sprite ROM appears to be underdumped
+    - need to confirm colour weight resistors on catnmous (detailed photo required):
+      R58, R59, R60, R61, R62, R65, R66, R67, R68, R69, R72, R73, R74, R75
+      (network connected between 11M, 12M, Q5, Q7, Q8)
     - sound in laserbat (with schematics) and in catnmous
 */
 
 #include "emu.h"
+
+#include "includes/laserbat.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/s2650/s2650.h"
-#include "machine/6821pia.h"
-#include "includes/laserbat.h"
 
 
 WRITE8_MEMBER(laserbat_state_base::ct_io_w)
@@ -69,29 +96,32 @@ WRITE8_MEMBER(laserbat_state_base::ct_io_w)
 
 	    Bit 3 is an open collector output with a 2k2 pull-up resistor.
 	    It is used to drive the "image commutation board" used to flip
-	    the screen for player 2 in cocktail configuration.
+	    the screen for player 2 in cocktail configuration.  Note that
+	    this output is asserted when player 2 is active even in upright
+	    configuration, it's only supposed to be connected in a cocktail
+	    cabinet.
 
 	    Bits 4-5 feed the input row select decoder that switches between
 	    ROW0, ROW1, SW1 and SW2 (ROW2 is selected using a bit in the
 	    video effects register, just to be confusing).
 
-	    +-----+-----------------------------+-------------------+------------------------------+
-	    | bit | output                      | Laser Battle      | Lazarian                     |
-	    +-----+-----------------------------+-------------------+------------------------------+
-	    |  0  | J2-3 solenoid driver        | 1*Credits         | 1*Coin C                     |
-	    |     |                             |                   |                              |
-	    |  1  | J2-8 solenoid driver        |  5*Coin A         | 1*Coin A                     |
-	    |     |                             | 10*Coin B         |                              |
-	    |     |                             |  1*Coin C         |                              |
-	    |     |                             |                   |                              |
-	    |  2  | J2-6 solenoid driver        |                   | 1*Coin B                     |
-	    |     |                             |                   |                              |
-	    |  3  | J3-4 open collector output  | Connected to cocktail "image commutation board"  |
-	    |     |                             |                   |                              |
-	    |  4  | input row select A          |                   |                              |
-	    |     |                             |                   |                              |
-	    |  5  | input row select B          |                   |                              |
-	    +-----+-----------------------------+-------------------+------------------------------+
+	    +-----+-----------------------------+--------------------+--------------+
+	    | bit | output                      | laserbat/catnmous  | lazarian     |
+	    +-----+-----------------------------+--------------------+--------------+
+	    |  0  | J2-3 solenoid driver        | 1*Credits          | 1*Coin C     |
+	    |     |                             |                    |              |
+	    |  1  | J2-8 solenoid driver        |  5*Coin A          | 1*Coin A     |
+	    |     |                             | 10*Coin B          |              |
+	    |     |                             |  1*Coin C          |              |
+	    |     |                             |                    |              |
+	    |  2  | J2-6 solenoid driver        |                    | 1*Coin B     |
+	    |     |                             |                    |              |
+	    |  3  | J3-4 open collector output  | Screen flip        | Screen flip  |
+	    |     |                             |                    |              |
+	    |  4  | input row select A          |                    |              |
+	    |     |                             |                    |              |
+	    |  5  | input row select B          |                    |              |
+	    +-----+-----------------------------+--------------------+--------------+
 	*/
 
 	coin_counter_w(machine(), 0, data & 0x01);
@@ -730,5 +760,5 @@ ROM_END
 
 GAME( 1981, laserbat,  0,        laserbat, laserbat, laserbat_state_base, laserbat, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, lazarian,  laserbat, laserbat, lazarian, laserbat_state_base, laserbat, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmous,  0,        catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmousa, catnmous, catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmous,  0,        catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmousa, catnmous, catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

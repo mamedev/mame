@@ -40,13 +40,25 @@
     However video is actually generated in a 16-bit internal colour
     space and mapped onto the 8-bit output colour space using a PLA.
 
-    The equations in the PAL give the following graphics priorities,
-    from highest to lowest:
+    The equations in the PLA for Laser Battle/Lazarian give the
+    following graphics priorities, from highest to lowest:
     * TTL-generated sprite
     * PVIs (colours ORed, object/score output ignored)
     * Shell/area effect 2
     * Background tilemap
     * Area effect 1
+
+    The Cat and Mouse PLA program gives completely different priorities,
+    once again from highest to lowest:
+    * Background tilemap
+    * PVIs (colours ORed, object/score output ignored)
+    * TTL-generated sprite
+    * Shell
+
+    Cat and Mouse uses some signals completely differently.  LUM affects
+    the background palette rather than the sprite palette, area effect 1
+    affects the background palette, and area effect 2 is completely
+    unused.
 
     The game board has no logic for flipping the screen in cocktail
     mode.  It just provides an active-low open collector out with pull-
@@ -231,26 +243,26 @@ UINT32 laserbat_state_base::screen_update_laserbat(screen_device &screen, bitmap
 TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 {
 	/*
-	    +-----+---------+-----------------------------------+
-	    | bit |  name   | description                       |
-	    +-----+---------+-----------------------------------+
-	    |  0  | NAV0    | sprite bit 0                      |
-	    |  1  | NAV1    | sprite bit 1                      |
-	    |  2  | CLR0    | sprite colour bit 0               |
-	    |  3  | CLR1    | sprite colour bit 1               |
-	    |  4  | LUM     | sprite luminance                  |
-	    |  5  | C1*     | combined PVI red (active low)     |
-	    |  6  | C2*     | combined PVI green (active low)   |
-	    |  7  | C3*     | combined PVI blue (active low)    |
-	    |  8  | BKR     | background tilemap red            |
-	    |  9  | BKG     | background tilemap green          |
-	    | 10  | BKB     | background tilemap blue           |
-	    | 11  | SHELL   | shell point                       |
-	    | 12  | EFF1    | effect 1 area                     |
-	    | 13  | EFF2    | effect 2 area                     |
-	    | 14  | COLEFF0 | area effect colour bit 0          |
-	    | 15  | COLEFF1 | area effect colour bit 1          |
-	    +-----+---------+-----------------------------------+
+	    +-----+---------+----------------------------------+-------------------------------------+
+	    | bit |  name   | laserbat/lazarian                | catnmous                            |
+	    +-----+---------+----------------------------------+-------------------------------------+
+	    |  0  | NAV0    | sprite bit 0                     | sprite bit 0                        |
+	    |  1  | NAV1    | sprite bit 1                     | sprite bit 1                        |
+	    |  2  | CLR0    | sprite palette bit 0             | sprite palette bit 0                |
+	    |  3  | CLR1    | sprite palette bit 1             | sprite palette bit 1                |
+	    |  4  | LUM     | sprite luminance                 | background tilemap palette control  |
+	    |  5  | C1*     | combined PVI red (active low)    | combined PVI red (active low)       |
+	    |  6  | C2*     | combined PVI green (active low)  | combined PVI green (active low)     |
+	    |  7  | C3*     | combined PVI blue (active low)   | combined PVI blue (active low)      |
+	    |  8  | BKR     | background tilemap red           | background tilemap bit 0            |
+	    |  9  | BKG     | background tilemap green         | background tilemap bit 1            |
+	    | 10  | BKB     | background tilemap blue          | background tilemap bit 2            |
+	    | 11  | SHELL   | shell point                      | shell point                         |
+	    | 12  | EFF1    | effect 1 area                    | background tilemap palette control  |
+	    | 13  | EFF2    | effect 2 area                    | unused                              |
+	    | 14  | COLEFF0 | area effect colour bit 0         | background tilemap palette control  |
+	    | 15  | COLEFF1 | area effect colour bit 1         | background tilemap palette control  |
+	    +-----+---------+----------------------------------+-------------------------------------+
 	*/
 
 	assert(m_bitmap.width() > m_screen->visible_area().max_x);
