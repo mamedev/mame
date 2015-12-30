@@ -1067,8 +1067,6 @@ ROM_START( cdi910 )
 	ROM_LOAD( "zx405042p__cdi_slave_2.0__b43t__zzmk9213.mc68hc705c8a_withtestrom.7206", 0x0000, 0x2000, CRC(688cda63) SHA1(56d0acd7caad51c7de703247cd6d842b36173079) )
 
 	ROM_REGION(0x2000, "pals", 0)
-	ROM_LOAD( "ti_portugal_206xf__tibpal20l8-15cnt__m7205n._1.7205.bin",   0x0000, 0x144, CRC(dd167e0d) SHA1(2ba82a4619d7a0f19e62e02a2841afd4d45d56ba) )
-	ROM_LOAD( "ti_portugal_206xf__tibpal20l8-15cnt__m7205n._2.7205.bin",   0x0000, 0x144, CRC(0d893d31) SHA1(f10296f8bbbfed926c13a48c770cc606971d1703) )
 	ROM_LOAD( "ti_portugal_206xf__tibpal20l8-15cnt__m7205n.7205.bin",      0x0000, 0x144, CRC(dd167e0d) SHA1(2ba82a4619d7a0f19e62e02a2841afd4d45d56ba) )
 	ROM_LOAD( "ti_portugal_774_206xf__tibpal16l8-10cn_m7204n.7204.bin",    0x0000, 0x104, CRC(04e6bd37) SHA1(153d1a977291bedb7420484a9f889325dbd3628e) )
 ROM_END
