@@ -2,6 +2,12 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
+schematics can be found at
+http://www.citylan.it/wiki/index.php/Fast_Invaders_%286845_version%29
+and
+http://www.citylan.it/wiki/index.php/Fast_Invaders_%288275_version%29
+
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -14,11 +20,13 @@ public:
 	fastinvaders_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_videoram(*this, "videoram")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_shared_ptr<UINT8> m_videoram;
 
 	virtual void video_start() override;
 
@@ -38,6 +46,34 @@ void fastinvaders_state::video_start()
 
 UINT32 fastinvaders_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	gfx_element *gfx = m_gfxdecode->gfx(0);
+
+	bitmap.fill(0, cliprect);
+
+	int count = 0;
+
+	for (int y = 0;y < 19;y++)
+	{
+		for (int x = 0;x < 40;x++)
+		{
+			UINT8 tile = m_videoram[count];
+
+
+			gfx->transpen(
+				bitmap,
+				cliprect,
+				tile,
+				0,
+				0, 0,
+				x*16, y*14, 0
+				);
+
+			count++;
+		
+		}
+
+	}
+
 	return 0;
 }
 
@@ -49,7 +85,11 @@ UINT32 fastinvaders_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 ***************************************************************************/
 
 static ADDRESS_MAP_START( fastinvaders_map, AS_PROGRAM, 8, fastinvaders_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x3000, 0x3fff) AM_RAM
+
 ADDRESS_MAP_END
 
 
@@ -72,12 +112,12 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	16,16,
+	16,14,
 	RGN_FRAC(1,2),
 	1,
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7, RGN_FRAC(1,2) + 0, RGN_FRAC(1,2) +1, RGN_FRAC(1,2) +2, RGN_FRAC(1,2) +3, RGN_FRAC(1,2) +4, RGN_FRAC(1,2) +5, RGN_FRAC(1,2) +6, RGN_FRAC(1,2) +7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8 /*, 14*8, 15*8*/ },
 	16*8
 };
 
@@ -90,15 +130,15 @@ static MACHINE_CONFIG_START( fastinvaders, fastinvaders_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, 10000000 ) // guess
 	MCFG_CPU_PROGRAM_MAP(fastinvaders_map)
-//  MCFG_CPU_IO_MAP(fastinvaders_io_map)
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", fastinvaders_state, irq0_line_hold) // where is irqack?
+//	MCFG_CPU_IO_MAP(fastinvaders_io_map)
+//	MCFG_CPU_VBLANK_INT_DRIVER("screen", fastinvaders_state, irq0_line_hold) // where is irqack?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_SIZE(64*16, 32*16)
+	MCFG_SCREEN_VISIBLE_AREA(0*16, 40*16-1, 0*14, 19*14-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fastinvaders_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -170,5 +210,6 @@ ROM_START( fi8275 )
 ROM_END
 
 
-GAME( 1979, fi6845, 0,      fastinvaders, fastinvaders, driver_device, 0, ROT0, "Fiberglass", "Fast Invaders (6845 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1979, fi8275, fi6845, fastinvaders, fastinvaders, driver_device, 0, ROT0, "Fiberglass", "Fast Invaders (8275 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979, fi6845, 0,      fastinvaders, fastinvaders, driver_device, 0, ROT270, "Fiberglass", "Fast Invaders (6845 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979, fi8275, fi6845, fastinvaders, fastinvaders, driver_device, 0, ROT270, "Fiberglass", "Fast Invaders (8275 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
