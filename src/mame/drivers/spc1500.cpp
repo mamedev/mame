@@ -50,7 +50,6 @@ public:
 		, m_pio(*this, "ppi8255")
 		, m_palette(*this, "palette")
 	{}
-
 	DECLARE_WRITE8_MEMBER(mem_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	DECLARE_READ8_MEMBER(porta_r);
@@ -95,6 +94,7 @@ private:
 //	UINT8 *m_work_ram;
 	attotime m_time;
 	bool m_romsel;
+	UINT8 m_palette_b, m_palette_g, m_palette_r;
 	UINT8 m_crtc_vreg[0x100];
 	bool m_centronics_busy;
 	virtual void machine_start() override;
@@ -119,7 +119,8 @@ private:
 	int m_xstart,           /**< Start X offset for screen drawing. */
 		m_ystart;           /**< Start Y offset for screen drawing. */
 	UINT8 *m_Hangul_rom;     /**< Pointer for Kanji ROMs */		
-	scrn_reg_t m_scrn_reg;      /**< Base Video Registers. */	
+	scrn_reg_t m_scrn_reg;      /**< Base Video Registers. */
+	UINT8 m_priority;
 };
 
 WRITE8_MEMBER( spc1500_state::cass_w )
@@ -260,24 +261,38 @@ READ8_MEMBER( spc1500_state::pcgb_r)
 
 WRITE8_MEMBER( spc1500_state::priority_w)
 {
-	
+	m_priority = data;
 }
 
 WRITE8_MEMBER( spc1500_state::paletg_w)
 {
-	
+//	printf("m_palette_g:0x%02x\n", data);
+	m_palette_g = data;
 }
 
 WRITE8_MEMBER( spc1500_state::paletb_w)
 {
-	
+//	printf("m_palette_b:0x%02x\n", data);
+	m_palette_b = data;
 }
 
 WRITE8_MEMBER( spc1500_state::paletr_w)
 {
-	
+//	printf("m_palette_r:0x%02x\n", data);
+	m_palette_r = data;
 }
 
+PALETTE_INIT_MEMBER(spc1500_state,spc)
+{
+	palette.set_pen_color(0,rgb_t(0x00,0x00,0x00));
+	palette.set_pen_color(1,rgb_t(0x00,0x00,0xff));
+	palette.set_pen_color(2,rgb_t(0xff,0x00,0x00));
+	palette.set_pen_color(3,rgb_t(0xff,0x00,0xff));
+	palette.set_pen_color(4,rgb_t(0x00,0xff,0x00));
+	palette.set_pen_color(5,rgb_t(0x00,0xff,0xff));
+	palette.set_pen_color(6,rgb_t(0xff,0xff,0x00));
+	palette.set_pen_color(7,rgb_t(0xff,0xff,0xff));
+}
 
 /*************************************
  *
@@ -303,53 +318,64 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	int h1, h2, h3;
 	UINT32  *p = &bitmap.pix32(y); 
 	
-	unsigned char cho[] ={0,0,0,1,1,1,1,1,0,0,1,1,1,3,5,5,0,0,5,3,3,5,5,5,0,0,3,3,5,5};
-	unsigned char cho2[]={0,0,0,2,2,2,2,2,0,0,2,2,2,4,6,6,0,0,6,4,4,6,6,6,0,0,4,4,6,6};
+	unsigned char cho[] ={0,0,0,1,1,1,1,1,0,0,1,1,1,3,5,5,0,0,5,3,3,5,5,5,0,0,3,3,5,1};
+	//unsigned char cho2[]={0,0,0,2,2,2,2,2,0,0,2,2,2,4,6,6,0,0,6,4,4,6,6,6,0,0,4,4,6,2};
 	unsigned char jong[]={0,0,0,1,1,1,1,1,0,0,1,1,1,2,2,2,0,0,2,2,2,2,2,2,0,0,2,2,1,1};
 	//printf("ma=%d,y=%d,x_count=%d\n", ma, y, x_count);
 	int n = y & 0xf;
 	bool inv = false;
 	for (i = 0; i < x_count; i++)
 	{
-		UINT8 *pv = &m_p_videoram[0x1000 + (y>>4)*x_count + i];
-		UINT8 ascii = *pv;
-		inv = (i == cursor_x);
-		if (ascii & 0x80)
+		UINT8 *pp = &m_p_videoram[0x2000+y*x_count+i];
+		UINT8 *pv = &m_p_videoram[(y>>4)*x_count + i];
+		UINT8 ascii = *(pv+0x1000);
+		UINT8 attr = *pv;
+		inv = (attr & 0x8) != 0;
+		UINT8 rgb = (attr & 0x7);
+		UINT8 pal = 1<<rgb;
+		UINT8 pixelb = *(pp+0);
+		UINT8 pixelr = *(pp+0x4000);
+		UINT8 pixelg = *(pp+0x8000);
+		UINT8 pen = (((m_palette_g&pal)>0)<<2)|(((m_palette_r&pal)>0)<<1)|(((m_palette_b&pal)>0));
+		UINT32 color = m_palette->pen(pen);
+//		if (color != 0)
+//			printf("pal:%d, pen:%d, 0x%04x\n", pal, (((m_palette_g&pal)>0)<<2)|(((m_palette_r&pal)>0)<<1)|(((m_palette_b&pal)>0)), color);
+		UINT8 pixelpen = 0;
+		if (ascii & 0x80 && ((*(pv+1) & 0x80)))
 		{
-			han2 = *(pv+1);
+			UINT16 wpixelb = (pixelb << 8) | (*(pp+1));
+			UINT16 wpixelr = (pixelr << 8) | (*(pp+0x4001));
+			UINT16 wpixelg = (pixelg << 8) | (*(pp+0x8001));
+			han2 = *(pv+0x1001);
 			h1 = (ascii>>2)&0x1f;
 			h2 = ((ascii<<3)|(han2>>5))&0x1f;
 			h3 = (han2)&0x1f;
-			pf = &m_font[0x2000+(h1 * 32) + ((h3 == 0 ? cho[h2] : cho2[h2])-1) * 16 * 2 * 32 + n];
+			pf = &m_font[0x2000+(h1 * 32) + (cho[h2] + (h3 != 0) -1) * 16 * 2 * 32 + n];
 			hfnt = (*pf << 8) | (*(pf+16));
 			pf = &m_font[0x4000+(h2 * 32) + (h3 == 0 ? 0 : 1) * 16 * 2 * 32 + n];
-			hfnt = hfnt ^ ((*pf << 8) | (*(pf+16)));
+			hfnt = hfnt & ((*pf << 8) | (*(pf+16)));
 			pf = &m_font[0x6000+(h3 * 32) + (jong[h2]-1) * 16 * 2 * 32 + n];
-			hfnt = hfnt ^ ((*pf << 8) | (*(pf+16)));
+			hfnt = hfnt & ((*pf << 8) | (*(pf+16)));
+			hfnt = (inv ? 0xffff - hfnt : hfnt);
 			//printf("0x%04x\n" , hfnt);
 			for (j = 0; j < 16; j++)
 			{
-				if (inv)
-					*p++ = (hfnt & (0x8000 >> j) ? 0xffffff : 0);
-				else
-					*p++ = (hfnt & (0x8000 >> j) ? 0 : 0xffffff);
+				pixelpen = ((((wpixelg&(0x8000 >> j))>0)<<2)|(((wpixelr&(0x8000 >> j))>0)<<1)|(((wpixelb&(0x8000 >> j)))>0));
+				*p++ = (((hfnt & (0x8000 >> j)) || (m_priority & (1<<pixelpen))) ? m_palette->pen(pixelpen) : color);
 			}
 			i++;
 		}
-		else if (ascii >= ' ')
+		else
 		{
 			//printf("%c", ascii);
 			UINT8 fnt = m_font[0x1000+ascii * 16 + n];
+			fnt = (inv ? 0xff - fnt : fnt);
 			for (j = 0; j < 8; j++)
 			{
-				if (inv)
-					*p++ = (fnt & (0x80 >> j) ? 0xffffff : 0);
-				else
-					*p++ = (fnt & (0x80 >> j) ? 0 : 0xffffff);
+				pixelpen = (((pixelg&(0x80 >> i))>0)<<2)|(((pixelr&(0x80 >> i))>0)<<1)|(((pixelb&(0x80 >> i))));
+				*p++ = (((fnt & (0x80 >> j)) || (m_priority & (1<<pixelpen))) ? m_palette->pen(pixelpen) : color);
 			}
 		}
-		else
-			p += 8;
 	}
 }
 
@@ -582,13 +608,6 @@ WRITE_LINE_MEMBER( spc1500_state::irq_w )
 	m_maincpu->set_input_line(0, state ? CLEAR_LINE : HOLD_LINE);
 }
 
-PALETTE_INIT_MEMBER(spc1500_state,spc)
-{
-	int i;
-
-	for(i=0;i<(0x10+0x1000);i++)
-		m_palette->set_pen_color(i,rgb_t(0x00,0x00,0x00));
-}
 
 // /* decoded for debugging purpose, this will be nuked in the end... */
 // static GFXDECODE_START( x1 )
@@ -622,8 +641,7 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update )
 	MCFG_PALETTE_ADD("palette", 8)	
-//	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
-//	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)
+	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", (VDP_CLOCK/48)) //unknown divider
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
@@ -679,14 +697,14 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( spc1500 )
 	ROM_REGION(0x8000, "ipl", ROMREGION_ERASEFF)
-	ROM_LOAD("ipl.rom", 0x0000, 0x8000, CRC(80d0704a) SHA1(01e4cbe8baad72effbbe01addd477c5b0ec85c16))
+	ROM_LOAD("ipl.rom", 0x0000, 0x8000, CRC(d0e8e579) SHA1(d044dc67128a4a8143bc716965c40c34ac8ead2c))
 	ROM_REGION(0x8000, "basic", ROMREGION_ERASEFF)
-	ROM_LOAD("basic.rom", 0x0000, 0x8000, CRC(757c6fa0) SHA1(5f8304dfe2495fd209d2bfe84802231b1968ba4c))
+	ROM_LOAD("basic.rom", 0x0000, 0x8000, CRC(f48328e1) SHA1(fb874ea7d20078726682f2d0e03ea0d1f8bdbb07))
 	ROM_REGION(0x8000, "font1", 0) 
-	ROM_LOAD( "ss150fnt.bin", 0x0000, 0x2000, CRC(c0a5e661) SHA1(b263465a37029b4fc16374ad4b47cd2a03f779fa) )
-	ROM_LOAD( "ss151fnt.bin", 0x2000, 0x2000, CRC(87999759) SHA1(38345fcfaf93c9d0c89e5e541cb209937a94d376) )
-	ROM_LOAD( "ss152fnt.bin", 0x4000, 0x2000, CRC(a6e5dd4a) SHA1(8a0b6e43e20d150ea9f840f248cb212d88c3786f) )
-	ROM_LOAD( "ss153fnt.bin", 0x6000, 0x2000, CRC(0658639e) SHA1(aeb6370e6de46f5a12157e68fcdf8b68744226de) )
+	ROM_LOAD( "ss150fnt.bin", 0x0000, 0x2000, CRC(affdc5c0) SHA1(2a93582fcccf9e40b99ae238ce585d189afe9a5a) )
+	ROM_LOAD( "ss151fnt.bin", 0x2000, 0x2000, CRC(83c2eb8d) SHA1(2adf7816206dc74b9f0d32cb3b56cbab31fa6044) )
+	ROM_LOAD( "ss152fnt.bin", 0x4000, 0x2000, CRC(f4a5a590) SHA1(c9a02756107083bf602ae7c90cfe29b8b964e0df) )
+	ROM_LOAD( "ss153fnt.bin", 0x6000, 0x2000, CRC(8677d5fa) SHA1(34bfacc855c3846744cd586c150c72e5cbe948b0) )
 	
 ROM_END
 
