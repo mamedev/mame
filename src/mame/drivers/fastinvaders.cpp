@@ -13,6 +13,8 @@ http://www.citylan.it/wiki/index.php/Fast_Invaders_%288275_version%29
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 
+#include "video/i8275.h"
+#include "video/mc6845.h"
 
 class fastinvaders_state : public driver_device
 {
@@ -21,12 +23,19 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_videoram(*this, "videoram")
+		m_videoram(*this, "videoram"),
+		m_crtc8275(*this, "8275"),
+		m_crtc6845(*this, "6845")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<UINT8> m_videoram;
+	
+	optional_device<i8275_device> m_crtc8275;
+	optional_device<mc6845_device> m_crtc6845;
+
+	
 
 	virtual void video_start() override;
 
@@ -88,8 +97,23 @@ static ADDRESS_MAP_START( fastinvaders_map, AS_PROGRAM, 8, fastinvaders_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x3fff) AM_RAM
+	AM_RANGE(0x3000, 0x33ff) AM_RAM
 
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( fastinvaders_io_base, AS_IO, 8, fastinvaders_state )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( fastinvaders_6845_io, AS_IO, 8, fastinvaders_state )
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("6845", mc6845_device, address_w)
+	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("6845", mc6845_device, register_r, register_w)
+	AM_IMPORT_FROM(fastinvaders_io_base)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( fastinvaders_8275_io, AS_IO, 8, fastinvaders_state )
+	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE("8275", i8275_device, read, write) 
+	AM_IMPORT_FROM(fastinvaders_io_base)
 ADDRESS_MAP_END
 
 
@@ -128,10 +152,10 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( fastinvaders, fastinvaders_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, 10000000 ) // guess
+	MCFG_CPU_ADD("maincpu", I8085A, 2000000 ) // guess
 	MCFG_CPU_PROGRAM_MAP(fastinvaders_map)
 //	MCFG_CPU_IO_MAP(fastinvaders_io_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", fastinvaders_state, irq0_line_hold) // where is irqack?
+//	MCFG_CPU_VBLANK_INT_DRIVER("screen", fastinvaders_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -147,6 +171,25 @@ static MACHINE_CONFIG_START( fastinvaders, fastinvaders_state )
 
 	/* sound hardware */
 	// TODO
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( fastinvaders_8275, fastinvaders )
+	MCFG_CPU_MODIFY("maincpu" ) // guess
+	MCFG_CPU_IO_MAP(fastinvaders_8275_io)
+	
+	MCFG_DEVICE_ADD("8275", I8275, 10000000 ) /* guess */ // does not configure a very useful resolution(!)
+	MCFG_I8275_CHARACTER_WIDTH(16)
+//	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(apogee_state, display_pixels)
+//	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257_device, dreq2_w))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( fastinvaders_6845, fastinvaders )
+	MCFG_CPU_MODIFY("maincpu" ) // guess
+	MCFG_CPU_IO_MAP(fastinvaders_6845_io)
+
+	MCFG_MC6845_ADD("6845", MC6845, "screen", 1000000) /* guess */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(16)
 MACHINE_CONFIG_END
 
 
@@ -175,12 +218,12 @@ ROM_START( fi6845 )
 	ROM_LOAD( "R2.7A",     0x1800, 0x0200, CRC(c9207fbd) SHA1(bf388e26ee1e2073b8a641ba6fb551c24d471a70) )
 
 	ROM_REGION( 0x0c00, "gfx1", 0 )
-	ROM_LOAD( "_C2.1F",     0x0000, 0x0200, CRC(9feca88a) SHA1(14a8c46eb51eed01b7b537a9931cd092cec2019f) )
-	ROM_LOAD( "_C2.1G",     0x0200, 0x0200, CRC(79fc3963) SHA1(25651d1031895a01a2a4751b355ff1200a899ac5) )
-	ROM_LOAD( "_C2.1H",     0x0400, 0x0200, CRC(936171e4) SHA1(d0756b49bfd5d58a79f735d4a98a99cce7604b0e) )
-	ROM_LOAD( "_C2.2F",     0x0600, 0x0200, CRC(3bb16f55) SHA1(b1cc1e2346acd0e5c84861b414b4677871079844) )
-	ROM_LOAD( "_C2.2G",     0x0800, 0x0200, CRC(19828c47) SHA1(f215ce55be32b3564e1b7cc19500d38a93117051) )
-	ROM_LOAD( "_C2.2H",     0x0a00, 0x0200, CRC(284ae4eb) SHA1(6e28fcd9d481d37f47728f22f6048b29266f4346) )
+	ROM_LOAD( "C2.1F",     0x0000, 0x0200, CRC(9feca88a) SHA1(14a8c46eb51eed01b7b537a9931cd092cec2019f) )
+	ROM_LOAD( "C2.1G",     0x0200, 0x0200, CRC(79fc3963) SHA1(25651d1031895a01a2a4751b355ff1200a899ac5) )
+	ROM_LOAD( "C2.1H",     0x0400, 0x0200, CRC(936171e4) SHA1(d0756b49bfd5d58a79f735d4a98a99cce7604b0e) )
+	ROM_LOAD( "C2.2F",     0x0600, 0x0200, CRC(3bb16f55) SHA1(b1cc1e2346acd0e5c84861b414b4677871079844) )
+	ROM_LOAD( "C2.2G",     0x0800, 0x0200, CRC(19828c47) SHA1(f215ce55be32b3564e1b7cc19500d38a93117051) )
+	ROM_LOAD( "C2.2H",     0x0a00, 0x0200, CRC(284ae4eb) SHA1(6e28fcd9d481d37f47728f22f6048b29266f4346) )
 ROM_END
 
 ROM_START( fi8275 )
@@ -201,15 +244,15 @@ ROM_START( fi8275 )
 	ROM_LOAD( "R1.7B",     0x1a00, 0x0200, CRC(7270d194) SHA1(7cef9c420c3c3cbc5846bd22137213a78506a8d3) )
 
 	ROM_REGION( 0x0c00, "gfx1", 0 )
-	ROM_LOAD( "_C1.1B",     0x0000, 0x0200, CRC(9feca88a) SHA1(14a8c46eb51eed01b7b537a9931cd092cec2019f) )
-	ROM_LOAD( "_C1.2B",     0x0200, 0x0200, CRC(79fc3963) SHA1(25651d1031895a01a2a4751b355ff1200a899ac5) )
-	ROM_LOAD( "_C1.3B",     0x0400, 0x0200, CRC(936171e4) SHA1(d0756b49bfd5d58a79f735d4a98a99cce7604b0e) )
-	ROM_LOAD( "_C1.1A",     0x0600, 0x0200, CRC(3bb16f55) SHA1(b1cc1e2346acd0e5c84861b414b4677871079844) )
-	ROM_LOAD( "_C1.2A",     0x0800, 0x0200, CRC(19828c47) SHA1(f215ce55be32b3564e1b7cc19500d38a93117051) )
-	ROM_LOAD( "_C1.3A",     0x0a00, 0x0200, CRC(284ae4eb) SHA1(6e28fcd9d481d37f47728f22f6048b29266f4346) )
+	ROM_LOAD( "C1.1B",     0x0000, 0x0200, CRC(9feca88a) SHA1(14a8c46eb51eed01b7b537a9931cd092cec2019f) )
+	ROM_LOAD( "C1.2B",     0x0200, 0x0200, CRC(79fc3963) SHA1(25651d1031895a01a2a4751b355ff1200a899ac5) )
+	ROM_LOAD( "C1.3B",     0x0400, 0x0200, CRC(936171e4) SHA1(d0756b49bfd5d58a79f735d4a98a99cce7604b0e) )
+	ROM_LOAD( "C1.1A",     0x0600, 0x0200, CRC(3bb16f55) SHA1(b1cc1e2346acd0e5c84861b414b4677871079844) )
+	ROM_LOAD( "C1.2A",     0x0800, 0x0200, CRC(19828c47) SHA1(f215ce55be32b3564e1b7cc19500d38a93117051) )
+	ROM_LOAD( "C1.3A",     0x0a00, 0x0200, CRC(284ae4eb) SHA1(6e28fcd9d481d37f47728f22f6048b29266f4346) )
 ROM_END
 
 
-GAME( 1979, fi6845, 0,      fastinvaders, fastinvaders, driver_device, 0, ROT270, "Fiberglass", "Fast Invaders (6845 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1979, fi8275, fi6845, fastinvaders, fastinvaders, driver_device, 0, ROT270, "Fiberglass", "Fast Invaders (8275 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979, fi6845, 0,      fastinvaders_6845, fastinvaders, driver_device, 0, ROT270, "Fiberglass", "Fast Invaders (6845 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979, fi8275, fi6845, fastinvaders_8275, fastinvaders, driver_device, 0, ROT270, "Fiberglass", "Fast Invaders (8275 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
