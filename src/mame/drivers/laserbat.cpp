@@ -53,6 +53,11 @@
       of an area on dying and not giving continues
 
     Cat and Mouse notes:
+    * This game is designed to work with two-way joysticks - up/down
+      directions are ignored and not shown on wiring diagram
+    * The input lines used for the fire buttons are chosen so that if
+      you plug it in to a Laser Battle control panel, the Fire Up button
+      will be used
     * Tilt input causes loss of one credit
     * Service coin 1 input grants two credits the first time it's
       pushed, but remembers this and won't grant credits again unless
