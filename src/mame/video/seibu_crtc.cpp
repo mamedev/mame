@@ -152,6 +152,8 @@ List of default vregs (title screen):
 100620:  0000 0000 0000 0000 0000 0000 01D8 01FF
 100630:  01DA 01FF 01D9 01FF 01D8 01FF 0034 003F
 100640:  0000 A8A8 0004 1830 0009 0000 0000 FFFF
+*Godzilla, 320 x 224 (455 x 258 hvtotal)
+100600:  000f 0013 00a0 00d7 00fa 000f 00fa 00ff
 
 *Seibu SPI is a newer CRTC?
 00000400: 013F007F - hblank start(-1), hblank length(-1)
