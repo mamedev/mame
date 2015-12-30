@@ -1225,6 +1225,7 @@ static MACHINE_CONFIG_START( legionna, legionna_state )
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", legionna)
@@ -1261,6 +1262,7 @@ static MACHINE_CONFIG_START( heatbrl, legionna_state )
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
 
 
@@ -1300,7 +1302,8 @@ static MACHINE_CONFIG_START( godzilla, legionna_state )
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
-
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_BASE_CB(WRITE16(legionna_state, tile_scroll_base_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", heatbrl)
 
@@ -1339,6 +1342,7 @@ static MACHINE_CONFIG_START( denjinmk, legionna_state )
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
@@ -1374,6 +1378,7 @@ static MACHINE_CONFIG_START( grainbow, legionna_state )
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", grainbow)
@@ -1412,6 +1417,7 @@ static MACHINE_CONFIG_START( cupsoc, legionna_state )
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cupsoc)
@@ -1460,7 +1466,7 @@ static MACHINE_CONFIG_START( cupsocbl, legionna_state )
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(legionna_state, tilemap_enable_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(legionna_state, tile_scroll_w))
-
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(legionna_state, tile_vreg_1a_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", heatbrl_csb)
 

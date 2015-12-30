@@ -45,6 +45,21 @@ WRITE16_MEMBER(legionna_state::tile_scroll_w)
 		tm->set_scrollx(0, data);
 }
 
+WRITE16_MEMBER(legionna_state::tile_vreg_1a_w)
+{
+	flip_screen_set(data & 1);
+	// TODO: other bits ...
+}
+
+WRITE16_MEMBER(legionna_state::tile_scroll_base_w)
+{
+	// TODO: specific for Godzilla, needs visible area changes.
+	if(offset == 7)
+		m_text_layer->set_scrolldy(0x1ef - data,0x1ef - data);
+	
+	printf("%02x %04x\n",offset,data);
+}
+
 WRITE16_MEMBER(legionna_state::heatbrl_setgfxbank)
 {
 	m_back_gfx_bank = (data &0x4000) >> 2;
@@ -501,7 +516,7 @@ UINT32 legionna_state::screen_update_godzilla(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(0x0200, cliprect);
 	screen.priority().fill(0, cliprect);
-
+	
 	if (!(m_layer_disable&0x0001)) m_background_layer->draw(screen, bitmap, cliprect, 0,0);
 	if (!(m_layer_disable&0x0002)) m_midground_layer->draw(screen, bitmap, cliprect, 0,0);
 	if (!(m_layer_disable&0x0004)) m_foreground_layer->draw(screen, bitmap, cliprect, 0,1);
