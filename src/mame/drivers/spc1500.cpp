@@ -46,13 +46,14 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_io_kb(*this, "LINE")
 		, m_io_joy(*this, "JOY")
+		, m_dipsw(*this, "DIP_SWITCH")
 		, m_centronics(*this, "centronics")
 		, m_pio(*this, "ppi8255")
 		, m_palette(*this, "palette")
 	{}
 	DECLARE_WRITE8_MEMBER(mem_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_READ8_MEMBER(porta_r);
+	DECLARE_READ8_MEMBER(psga_r);
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
 	DECLARE_READ8_MEMBER(mc6845_videoram_r);
 	DECLARE_WRITE8_MEMBER(cass_w);
@@ -106,20 +107,11 @@ private:
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_ioport_array<10> m_io_kb;
 	required_ioport m_io_joy;
+	required_ioport m_dipsw;
 	required_device<centronics_device> m_centronics;
 	required_device<i8255_device> m_pio;
 	required_device<palette_device> m_palette;	
-	// std::unique_ptr<UINT8[]> m_tvram;         /**< Pointer for Text Video RAM */
-	// std::unique_ptr<UINT8[]> m_avram;         /**< Pointer for Attribute Video RAM */
-	// std::unique_ptr<UINT8[]> m_kvram;         /**< Pointer for Extended Kanji Video RAM (X1 Turbo) */	
-	// std::unique_ptr<UINT8[]> m_gfx_bitmap_ram;    /**< Pointer for bitmap layer RAM. */
-	// std::unique_ptr<UINT8[]> m_pcg_ram;       /**< Pointer for PCG GFX RAM */		
-	UINT8 *m_font;        /**< Pointer for GFX ROM */
-	UINT8 m_is_turbo;       /**< Machine type: (0) X1 Vanilla, (1) X1 Turbo */
-	int m_xstart,           /**< Start X offset for screen drawing. */
-		m_ystart;           /**< Start Y offset for screen drawing. */
-	UINT8 *m_Hangul_rom;     /**< Pointer for Kanji ROMs */		
-	scrn_reg_t m_scrn_reg;      /**< Base Video Registers. */
+	UINT8 *m_font;        
 	UINT8 m_priority;
 };
 
@@ -173,7 +165,7 @@ WRITE8_MEMBER( spc1500_state::porta_w)
 
 WRITE8_MEMBER( spc1500_state::portb_w)
 {
-//	m_ipl = data & (1 << 1);
+	
 }
 
 WRITE8_MEMBER( spc1500_state::psgb_w)
@@ -192,17 +184,32 @@ WRITE8_MEMBER( spc1500_state::psgb_w)
 //			printf("bank1 -> basic\n");
 		}	
 	}
+	if ((data>>6)&1)
+	{
+		m_cass->set_state(CASSETTE_SPEAKER_ENABLED);
+	}
+	else
+	{
+		m_cass->set_state(CASSETTE_SPEAKER_MUTED);
+	}
 //	printf("PSG B port wrote by %d\n", m_ipl);
 }
 
 WRITE8_MEMBER( spc1500_state::portc_w)
 {
-	
+	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
+	m_centronics->write_strobe(BIT(data, 7) ? true : false);	
 }
 
 READ8_MEMBER( spc1500_state::portb_r)
 {
-	return 0;
+	UINT8 data = 0;
+	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) && ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED)  ? 0x00 : 0x1;
+	data |= (m_dipsw->read() & 1) << 4;
+	data |= (m_cass->input() > 0.0038)<<1;
+	data |= m_vdg->vsync_r()<<7;
+	data &= ~((m_centronics_busy==0)<<3);
+	return data;
 }
 
 WRITE8_MEMBER( spc1500_state::crtc_w)
@@ -261,6 +268,7 @@ READ8_MEMBER( spc1500_state::pcgb_r)
 
 WRITE8_MEMBER( spc1500_state::priority_w)
 {
+//	printf("m_priority:0x%02x\n", data);
 	m_priority = data;
 }
 
@@ -312,7 +320,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 {
 	UINT8 han2;
 	UINT8 *pf;
-	UINT16 hfnt;
+	UINT16 hfnt = 0;
 	int i;
 	int j;
 	int h1, h2, h3;
@@ -326,7 +334,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	bool inv = false;
 	for (i = 0; i < x_count; i++)
 	{
-		UINT8 *pp = &m_p_videoram[0x2000+y*x_count+i];
+		UINT8 *pp = &m_p_videoram[0x2000+(y>>3)*x_count+(y%8)*0x800+i];
 		UINT8 *pv = &m_p_videoram[(y>>4)*x_count + i];
 		UINT8 ascii = *(pv+0x1000);
 		UINT8 attr = *pv;
@@ -338,24 +346,32 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 		UINT8 pixelg = *(pp+0x8000);
 		UINT8 pen = (((m_palette_g&pal)>0)<<2)|(((m_palette_r&pal)>0)<<1)|(((m_palette_b&pal)>0));
 		UINT32 color = m_palette->pen(pen);
-//		if (color != 0)
+//		if (color != 0 && y == 0)
 //			printf("pal:%d, pen:%d, 0x%04x\n", pal, (((m_palette_g&pal)>0)<<2)|(((m_palette_r&pal)>0)<<1)|(((m_palette_b&pal)>0)), color);
 		UINT8 pixelpen = 0;
-		if (ascii & 0x80 && ((*(pv+1) & 0x80)))
+		if (ascii & 0x80)
 		{
-			UINT16 wpixelb = (pixelb << 8) | (*(pp+1));
-			UINT16 wpixelr = (pixelr << 8) | (*(pp+0x4001));
-			UINT16 wpixelg = (pixelg << 8) | (*(pp+0x8001));
-			han2 = *(pv+0x1001);
-			h1 = (ascii>>2)&0x1f;
-			h2 = ((ascii<<3)|(han2>>5))&0x1f;
-			h3 = (han2)&0x1f;
-			pf = &m_font[0x2000+(h1 * 32) + (cho[h2] + (h3 != 0) -1) * 16 * 2 * 32 + n];
-			hfnt = (*pf << 8) | (*(pf+16));
-			pf = &m_font[0x4000+(h2 * 32) + (h3 == 0 ? 0 : 1) * 16 * 2 * 32 + n];
-			hfnt = hfnt & ((*pf << 8) | (*(pf+16)));
-			pf = &m_font[0x6000+(h3 * 32) + (jong[h2]-1) * 16 * 2 * 32 + n];
-			hfnt = hfnt & ((*pf << 8) | (*(pf+16)));
+			UINT16 wpixelb = (pixelb << 8) | (*(pp+8));
+			UINT16 wpixelr = (pixelr << 8) | (*(pp+0x4008));
+			UINT16 wpixelg = (pixelg << 8) | (*(pp+0x8008));
+			if ((*(pv+1) & 0x80))
+			{
+				han2 = *(pv+0x1001);
+				h1 = (ascii>>2)&0x1f;
+				h2 = ((ascii<<3)|(han2>>5))&0x1f;
+				h3 = (han2)&0x1f;
+				pf = &m_font[0x2000+(h1 * 32) + (cho[h2] + (h3 != 0) -1) * 16 * 2 * 32 + n];
+				hfnt = (*pf << 8) | (*(pf+16));
+				pf = &m_font[0x4000+(h2 * 32) + (h3 == 0 ? 0 : 1) * 16 * 2 * 32 + n];
+				hfnt = hfnt & ((*pf << 8) | (*(pf+16)));
+				pf = &m_font[0x6000+(h3 * 32) + (jong[h2]-1) * 16 * 2 * 32 + n];
+				hfnt = hfnt & ((*pf << 8) | (*(pf+16)));
+			}
+			else if (ascii == 0xfd)
+			{
+				pf = &m_font[0x7000+*(pv+1)*16];
+				hfnt = (*pf << 8) | (*(pf+16));
+			}
 			hfnt = (inv ? 0xffff - hfnt : hfnt);
 			//printf("0x%04x\n" , hfnt);
 			for (j = 0; j < 16; j++)
@@ -439,7 +455,21 @@ static ADDRESS_MAP_START( spc1500_io , AS_IO, 8, spc1500_state )
 ADDRESS_MAP_END
 
 /* Input ports */
+
+	
 static INPUT_PORTS_START( spc1500 )
+
+	PORT_START("DIP_SWITCH") //TODO: implement front-panel DIP-SW here
+	PORT_DIPNAME( 0x01, 0x01, "40/80" )
+	PORT_DIPSETTING(    0x00, "40COL" )
+	PORT_DIPSETTING(    0x01, "80COL" )
+	PORT_DIPNAME( 0x02, 0x02, "Language" )
+	PORT_DIPSETTING(    0x02, "Korean" )
+	PORT_DIPSETTING(    0x00, "English" )
+	PORT_DIPNAME( 0x04, 0x04, "V-Res" )
+	PORT_DIPSETTING(    0x04, "400" )
+	PORT_DIPSETTING(    0x00, "200" )
+
 	PORT_START("LINE.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) 
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_RSHIFT) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
@@ -592,13 +622,10 @@ READ8_MEMBER(spc1500_state::mc6845_videoram_r)
 	return m_p_videoram[offset];
 }
 
-READ8_MEMBER( spc1500_state::porta_r )
+READ8_MEMBER( spc1500_state::psga_r )
 {
-	UINT8 data = 0x3f;
-	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;
-	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) && ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED)  ? 0x00 : 0x40;
-	data &= ~(m_io_joy->read() & 0x3f);
-	data &= ~((m_centronics_busy == 0)<< 5);
+	UINT8 data = 0;
+	data |= (BIT(m_dipsw->read(),1)<<4) | (BIT(m_dipsw->read(),2)<<7);
 	return data;
 }
 
@@ -672,7 +699,7 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_4MHz / 2)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(spc1500_state, porta_r))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(spc1500_state, psga_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(spc1500_state, psgb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
@@ -712,4 +739,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 1984, spc1500,  0,      0,       spc1500,   spc1500, driver_device,  0,   "Samsung", "SPC-1500", MACHINE_NOT_WORKING )
+COMP( 1987, spc1500,  0,      0,       spc1500,   spc1500, driver_device,  0,   "Samsung", "SPC-1500", MACHINE_NOT_WORKING )
