@@ -1035,14 +1035,13 @@ MACHINE_CONFIG_END
 *************************/
 
 ROM_START( cdimono1 )
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0x80000, "maincpu", 0) // these roms need byteswapping
 	ROM_SYSTEM_BIOS( 0, "mcdi200", "Magnavox CD-i 200" )
 	ROMX_LOAD( "cdi200.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "pcdi220", "Philips CD-i 220 F2" )
 	ROMX_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e), ROM_BIOS(2) )
-	// This one is a Mono-IV board, needs to be a separate driver
-	//ROM_SYSTEM_BIOS( 2, "pcdi490", "Philips CD-i 490" )
-	//ROMX_LOAD( "cdi490.rom", 0x000000, 0x80000, CRC(e115f45b) SHA1(f71be031a5dfa837de225081b2ddc8dcb74a0552), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 2, "pcdi220_alt", "Philips CD-i 220?" ) // doesn't boot
+	ROMX_LOAD( "cdi220.rom", 0x000000, 0x80000, CRC(584c0af8) SHA1(5d757ab46b8c8fc36361555d978d7af768342d47), ROM_BIOS(3) )
 
 	ROM_REGION(0x2000, "cdic", 0)
 	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
@@ -1057,6 +1056,8 @@ ROM_START( cdi910 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "cdi910", "CD-I 910-17P Mini-MMC" )
 	ROMX_LOAD( "philips__cd-i_2.1__mb834200b-15__26b_aa__9224_z01.tc574200.7211", 0x000000, 0x80000, CRC(4ae3bee3) SHA1(9729b4ee3ce0c17172d062339c47b1ab822b222b), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE )
+	ROM_SYSTEM_BIOS( 1, "cdi910_alt", "alt" )
+	ROMX_LOAD( "cdi910.rom", 0x000000, 0x80000, CRC(2f3048d2) SHA1(11c4c3e602060518b52e77156345fa01f619e793), ROM_BIOS(2) | ROM_GROUPWORD | ROM_REVERSE )
 
 	// cdic
 
@@ -1082,15 +1083,26 @@ ROM_START( cdimono2 )
 	ROM_LOAD( "zc405352p__slave_cdi_4.1__0d67p__lltr9403.mc68hc705c8a.7206", 0x0000, 0x2000, CRC(5b19da07) SHA1(cf02d84977050c71e87a38f1249e83c43a93949b) )
 ROM_END
 
-ROM_START( cdibios )
+
+ROM_START( cdi490a )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_SYSTEM_BIOS( 0, "cdi490", "CD-i 490" )
+	ROMX_LOAD( "cdi490a.rom", 0x000000, 0x80000, CRC(e2f200f6) SHA1(c9bf3c4c7e4fe5cbec3fe3fc993c77a4522ca547), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE  )
+
+	ROM_REGION(0x40000, "mpegs", 0) // keep these somewhere
+	ROM_LOAD( "impega.rom", 0x0000, 0x40000, CRC(84d6f6aa) SHA1(02526482a0851ea2a7b582d8afaa8ef14a8bd914) )
+	ROM_LOAD( "vmpega.rom", 0x0000, 0x40000, CRC(db264e8b) SHA1(be407fbc102f1731a0862554855e963e5a47c17b) )
+ROM_END
+
+
+
+
+ROM_START( cdibios ) // for the quizard sets
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "mcdi200", "Magnavox CD-i 200" )
 	ROMX_LOAD( "cdi200.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "pcdi220", "Philips CD-i 220 F2" )
 	ROMX_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e), ROM_BIOS(2) )
-	// This one is a Mono-IV board, needs to be a separate driver
-	//ROM_SYSTEM_BIOS( 2, "pcdi490", "Philips CD-i 490" )
-	//ROMX_LOAD( "cdi490.rom", 0x000000, 0x80000, CRC(e115f45b) SHA1(f71be031a5dfa837de225081b2ddc8dcb74a0552), ROM_BIOS(3) )
 
 	ROM_REGION(0x2000, "cdic", 0)
 	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
@@ -1274,7 +1286,8 @@ ROM_END
 // BIOS / System
 CONS( 1991, cdimono1, 0,        0,        cdimono1, cdi,      driver_device, 0,        "Philips",  "CD-i (Mono-I) (PAL)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE  )
 CONS( 1991, cdimono2, 0,        0,        cdimono2, cdimono2, driver_device, 0,        "Philips",  "CD-i (Mono-II) (NTSC)",   MACHINE_NOT_WORKING )
-CONS( 1991, cdi910,   0,        0,        cdi910,   cdimono2, driver_device, 0,        "Philips",  "CD-I 910-17P Mini-MMC (PAL)",   MACHINE_NOT_WORKING  )
+CONS( 1991, cdi910,   0,        0,        cdi910,   cdimono2, driver_device, 0,        "Philips",  "CD-i 910-17P Mini-MMC (PAL)",   MACHINE_NOT_WORKING  )
+CONS( 1991, cdi490a,  0,        0,        cdimono1, cdi,      driver_device, 0,        "Philips",  "CD-i 490",   MACHINE_NOT_WORKING  )
 
 // The Quizard games are RETAIL CD-i units, with additional JAMMA adapters & dongles for protection, hence being 'clones' of the system.
 
