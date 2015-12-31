@@ -90,82 +90,83 @@ public:
 		template<class _Object> static devcb_base &set_pa_changed_func(device_t &device, _Object object) { return downcast<hp_hybrid_cpu_device &>(device).m_pa_changed_func.set_callback(object); }
 
 protected:
-		hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname , UINT8 addrwidth);
+        hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname , UINT8 addrwidth);
 
-				// device-level overrides
-				virtual void device_start() override;
-				virtual void device_reset() override;
+                // device-level overrides
+                virtual void device_start() override;
+                virtual void device_reset() override;
 
-				// device_execute_interface overrides
-				virtual UINT32 execute_min_cycles() const override { return 6; }
-				virtual UINT32 execute_input_lines() const override { return 2; }
-				virtual UINT32 execute_default_irq_vector() const  override { return 0xffff; }
-				virtual void execute_run() override;
-				virtual void execute_set_input(int inputnum, int state) override;
+                // device_execute_interface overrides
+                virtual UINT32 execute_min_cycles() const override { return 6; }
+                virtual UINT32 execute_input_lines() const override { return 2; }
+                virtual UINT32 execute_default_irq_vector() const  override { return 0xffff; }
+                virtual void execute_run() override;
+                virtual void execute_set_input(int inputnum, int state) override;
 
-				UINT16 execute_one(UINT16 opcode);
-				UINT16 execute_one_sub(UINT16 opcode);
-		// Execute an instruction that doesn't belong to either BPC or IOC
-		virtual UINT16 execute_no_bpc_ioc(UINT16 opcode) = 0;
+                UINT16 execute_one(UINT16 opcode);
+                UINT16 execute_one_sub(UINT16 opcode);
+        // Execute an instruction that doesn't belong to either BPC or IOC
+        virtual UINT16 execute_no_bpc_ioc(UINT16 opcode) = 0;
 
-				// device_memory_interface overrides
-				virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
+                // device_memory_interface overrides
+                virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
 
-				// device_state_interface overrides
-				void state_string_export(const device_state_entry &entry, std::string &str) override;
+                // device_state_interface overrides
+                void state_string_export(const device_state_entry &entry, std::string &str) override;
 
-				// device_disasm_interface overrides
-				virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
-				virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
-				virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+                // device_disasm_interface overrides
+                virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
+                virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
+                virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
-		// Different cases of memory access
-		// See patent @ pg 361
-		typedef enum {
-				AEC_CASE_A,     // Instr. fetches, non-base page fetches of link pointers, BPC direct non-base page accesses
-				AEC_CASE_B,     // Base page fetches of link pointers, BPC direct base page accesses
-				AEC_CASE_C,     // IOC, EMC & BPC indirect final destination accesses
-				AEC_CASE_D      // DMA accesses
-		} aec_cases_t;
+        // Different cases of memory access
+        // See patent @ pg 361
+        typedef enum {
+                AEC_CASE_A,     // Instr. fetches, non-base page fetches of link pointers, BPC direct non-base page accesses
+                AEC_CASE_B,     // Base page fetches of link pointers, BPC direct base page accesses
+                AEC_CASE_C,     // IOC, EMC & BPC indirect final destination accesses
+                AEC_CASE_D,     // DMA accesses
+                AEC_CASE_I      // Interrupt vector fetches
+        } aec_cases_t;
 
-		// do memory address extension
-		virtual UINT32 add_mae(aec_cases_t aec_case , UINT16 addr) = 0;
+        // do memory address extension
+        virtual UINT32 add_mae(aec_cases_t aec_case , UINT16 addr) = 0;
 
-		UINT16 remove_mae(UINT32 addr);
+        UINT16 remove_mae(UINT32 addr);
 
-		UINT16 RM(aec_cases_t aec_case , UINT16 addr);
-		UINT16 RM(UINT32 addr);
-		virtual UINT16 read_non_common_reg(UINT16 addr) = 0;
+        UINT16 RM(aec_cases_t aec_case , UINT16 addr);
+        UINT16 RM(UINT32 addr);
+        virtual UINT16 read_non_common_reg(UINT16 addr) = 0;
 
-		void   WM(aec_cases_t aec_case , UINT16 addr , UINT16 v);
-		void   WM(UINT32 addr , UINT16 v);
-		virtual void write_non_common_reg(UINT16 addr , UINT16 v) = 0;
+        void   WM(aec_cases_t aec_case , UINT16 addr , UINT16 v);
+        void   WM(UINT32 addr , UINT16 v);
+        virtual void write_non_common_reg(UINT16 addr , UINT16 v) = 0;
 
-		UINT16 fetch(void);
+        UINT16 fetch(void);
 
-		UINT16 get_skip_addr(UINT16 opcode , bool condition) const;
+        UINT16 get_skip_addr(UINT16 opcode , bool condition) const;
 
-		devcb_write8 m_pa_changed_func;
+        devcb_write8 m_pa_changed_func;
 
-				int m_icount;
-		bool m_forced_bsc_25;
+                int m_icount;
+        bool m_forced_bsc_25;
 
-				// State of processor
-				UINT16 m_reg_A;     // Register A
-				UINT16 m_reg_B;     // Register B
-				UINT16 m_reg_P;     // Register P
-				UINT16 m_reg_R;     // Register R
-				UINT16 m_reg_C;     // Register C
-				UINT16 m_reg_D;     // Register D
-				UINT16 m_reg_IV;    // Register IV
-		UINT16 m_reg_W; // Register W
-				UINT8  m_reg_PA[ HPHYBRID_INT_LVLS + 1 ];   // Stack of register PA (4 bit-long)
-				UINT16 m_flags;     // Flags
-				UINT8  m_dmapa;     // DMA peripheral address (4 bits)
-				UINT16 m_dmama;     // DMA address
-				UINT16 m_dmac;      // DMA counter
-				UINT16 m_reg_I;     // Instruction register
-		UINT32 m_genpc; // Full PC
+                // State of processor
+                UINT16 m_reg_A;     // Register A
+                UINT16 m_reg_B;     // Register B
+                UINT16 m_reg_P;     // Register P
+                UINT16 m_reg_R;     // Register R
+                UINT16 m_reg_C;     // Register C
+                UINT16 m_reg_D;     // Register D
+                UINT16 m_reg_IV;    // Register IV
+        UINT16 m_reg_W; // Register W
+                UINT8  m_reg_PA[ HPHYBRID_INT_LVLS + 1 ];   // Stack of register PA (4 bit-long)
+                UINT16 m_flags;     // Flags
+                UINT8  m_dmapa;     // DMA peripheral address (4 bits)
+                UINT16 m_dmama;     // DMA address
+                UINT16 m_dmac;      // DMA counter
+                UINT16 m_reg_I;     // Instruction register
+        UINT32 m_genpc; // Full PC
 
 private:
 				address_space_config m_program_config;

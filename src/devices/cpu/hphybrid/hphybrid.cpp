@@ -1016,12 +1016,12 @@ void hp_hybrid_cpu_device::check_for_interrupts(void)
 								m_pa_changed_func((UINT8)CURRENT_PA);
 
 				// Is this correct? Patent @ pg 210 suggests that the whole interrupt recognition sequence
-				// lasts for 32 cycles (6 are already accounted for in get_ea for one indirection)
-				m_icount -= 26;
+				// lasts for 32 cycles
+				m_icount -= 32;
 
 				// Do a double-indirect JSM IV,I instruction
 				WM(AEC_CASE_C , ++m_reg_R , m_reg_P);
-				m_reg_P = RM(get_ea(0xc008));
+				m_reg_P = RM(AEC_CASE_I , RM(HP_REG_IV_ADDR));
 				m_reg_I = fetch();
 }
 
@@ -1485,12 +1485,20 @@ UINT32 hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , UINT16 addr)
 				bsc_reg = HP_REG_R37_ADDR;
 				break;
 
-		default:
-				logerror("hphybrid: aec_case=%d\n" , aec_case);
-				return 0;
-		}
+                case AEC_CASE_I:
+                                // Behaviour of AEC during interrupt vector fetch is undocumented but it can be guessed from 9845B firmware.
+                                // Basically in this case the integrated AEC seems to do what the discrete implementation in 9845A does:
+                                // top half of memory is mapped to block 0 (fixed) and bottom half is mapped according to content of R35
+                                // (see pg 334 of patent).
+                                bsc_reg = top_half ? 0 : HP_REG_R35_ADDR;
+                                break;
 
-		UINT16 aec_reg = m_reg_aec[ bsc_reg - HP_REG_R32_ADDR ] & BSC_REG_MASK;
+                default:
+                                logerror("hphybrid: aec_case=%d\n" , aec_case);
+                                return 0;
+                }
+
+                UINT16 aec_reg = (bsc_reg != 0) ? (m_reg_aec[ bsc_reg - HP_REG_R32_ADDR ] & BSC_REG_MASK) : 0;
 
 		if (m_forced_bsc_25) {
 				aec_reg = (aec_reg & 0xf) | 0x20;
