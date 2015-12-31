@@ -32,7 +32,7 @@
   * Cyber Core
     Daisempuu
     Dead Moon
-    Devil Crush
+    Devil Crash
   * Die Hard
     Dodge Ball
   * Doraemon Meikyuu Daisakusen
@@ -573,10 +573,10 @@ ROM_START(tvdmoon)
 	TOURVISION_BIOS
 ROM_END
 
-/* Devil Crush */ 
+/* Devil Crash */ 
 ROM_START(tvdevilc)
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "tourv_devil_crush.bin", 0x00000, 0x100000, CRC(c163e5c1) SHA1(2134b3943df87af556694dbe6c77b30723f9175a) )
+	ROM_LOAD( "tourv_devil_crash.bin", 0x00000, 0x100000, CRC(c163e5c1) SHA1(2134b3943df87af556694dbe6c77b30723f9175a) )
 
 	TOURVISION_BIOS
 ROM_END
