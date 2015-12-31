@@ -407,8 +407,8 @@ static int read_summary_log(const char *filename, int index)
 			}
 		}
 
-		/* look for the M.A.M.E. header */
-		else if (strncmp(linestart, "M.A.M.E. v", 10) == 0)
+		/* look for the MAME header */
+		else if (strncmp(linestart, "MAME v", 10) == 0)
 		{
 			char *start = linestart + 10;
 			char *end;
