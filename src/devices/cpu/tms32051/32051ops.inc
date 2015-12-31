@@ -15,19 +15,19 @@ UINT16 tms32051_device::POP_STACK()
 	return pc;
 }
 
-INT32 tms32051_device::SUB(UINT32 a, UINT32 b, int shift)
+INT32 tms32051_device::SUB(UINT32 a, UINT32 b, bool shift16)
 {
 	UINT32 res = a - b;
 
-	if (shift > 0)
+	if (shift16)
 	{
 		// C is cleared if borrow was generated, otherwise unaffected
-		if (b > a) m_st1.c = 0;
+		if (a < res) m_st1.c = 0;
 	}
 	else
 	{
 		// C is cleared if borrow was generated
-		m_st1.c = (b > a) ? 0 : 1;
+		m_st1.c = (a < res) ? 0 : 1;
 	}
 
 	// check overflow
@@ -45,11 +45,11 @@ INT32 tms32051_device::SUB(UINT32 a, UINT32 b, int shift)
 	return (INT32)(res);
 }
 
-INT32 tms32051_device::ADD(UINT32 a, UINT32 b, int shift)
+INT32 tms32051_device::ADD(UINT32 a, UINT32 b, bool shift16)
 {
 	UINT32 res = a + b;
 
-	if (shift > 0)
+	if (shift16)
 	{
 		// C is set if carry was generated, otherwise unaffected
 		if (a > res) m_st1.c = 1;
@@ -196,67 +196,58 @@ UINT16 tms32051_device::GET_ADDRESS()
 	}
 }
 
-int tms32051_device::GET_ZLVC_CONDITION(int zlvc, int zlvc_mask)
+bool tms32051_device::GET_ZLVC_CONDITION(int zlvc, int zlvc_mask)
 {
-	if (zlvc_mask & 0x2)        // OV-bit
+	if (zlvc_mask & 0x2)			// OV-bit
 	{
-		if ((zlvc & 0x2) && m_st0.ov)                           // OV
-		{
-			// clear OV
-			m_st0.ov = 0;
+		if ((zlvc & 0x2) && m_st0.ov == 0)			// OV
+			return false;
+		if (((zlvc & 0x2) == 0) && m_st0.ov != 0)	// NOV
+			return false;
+	}
+	if (zlvc_mask & 0x1)			// C-bit
+	{
+		if ((zlvc & 0x1) && m_st1.c == 0)			// C
+			return false;
+		if (((zlvc & 0x1) == 0) && m_st1.c != 0)		// NC
+			return false;
+	}
+	if (zlvc_mask & 0x8)			// Z-bit
+	{
+		if ((zlvc & 0x8) && (INT32)(m_acc) != 0)			// EQ
+			return false;
+		if (((zlvc & 0x8) == 0) && (INT32)(m_acc) == 0)	// NEQ
+			return false;
+	}
+	if (zlvc_mask & 0x4)			// L-bit
+	{
+		if ((zlvc & 0x4) && (INT32)(m_acc) >= 0)			// LT
+			return false;
+		if (((zlvc & 0x4) == 0) && (INT32)(m_acc) <= 0)	// GT
+			return false;
+	}
 
-			return 1;
-		}
-		else if ((zlvc & 0x2) == 0 && m_st0.ov == 0)            // NOV
-			return 1;
-	}
-	if (zlvc_mask & 0x1)        // C-bit
-	{
-		if ((zlvc & 0x1) && m_st1.c)                            // C
-			return 1;
-		else if ((zlvc & 0x1) == 0 && m_st1.c == 0)         // NC
-			return 1;
-	}
-	if (zlvc_mask & 0x8)        // Z-bit
-	{
-		if ((zlvc & 0x8) && (INT32)(m_acc) == 0)                // EQ
-			return 1;
-		else if ((zlvc & 0x8) == 0 && (INT32)(m_acc) != 0)  // NEQ
-			return 1;
-	}
-	if (zlvc_mask & 0x4)        // L-bit
-	{
-		if ((zlvc & 0x4) && (INT32)(m_acc) < 0)             // LT
-			return 1;
-		else if ((zlvc & 0x4) == 0 && (INT32)(m_acc) > 0)       // GT
-			return 1;
-	}
-	return 0;
+	return true;
 }
 
-int tms32051_device::GET_TP_CONDITION(int tp)
+bool tms32051_device::GET_TP_CONDITION(int tp)
 {
 	switch (tp)
 	{
-		case 0:     // BIO pin low
-		{
+		case 0:		// BIO pin low
 			// TODO
-			return 0;
-		}
-		case 1:     // TC = 1
-		{
-			return m_st1.tc;
-		}
-		case 2:     // TC = 0
-		{
-			return m_st1.tc ^ 1;
-		}
-		case 3:     // always false
-		{
-			return 0;
-		}
+			return false;
+		
+		case 1:		// TC == 1
+			return m_st1.tc != 0;
+
+		case 2:		// TC == 0
+			return m_st1.tc == 0;
+
+		case 3:
+			return true;
 	}
-	return 0;
+	return true;
 }
 
 INT32 tms32051_device::PREG_PSCALER(INT32 preg)
@@ -318,7 +309,7 @@ void tms32051_device::op_add_mem()
 		d = (UINT32)(UINT16)(data) << shift;
 	}
 
-	m_acc = ADD(m_acc, d, shift);
+	m_acc = ADD(m_acc, d, false);
 
 	CYCLES(1);
 }
@@ -327,7 +318,7 @@ void tms32051_device::op_add_simm()
 {
 	UINT16 imm = m_op & 0xff;
 
-	m_acc = ADD(m_acc, imm, 0);
+	m_acc = ADD(m_acc, imm, false);
 
 	CYCLES(1);
 }
@@ -347,7 +338,7 @@ void tms32051_device::op_add_limm()
 		d = (UINT32)(UINT16)(imm) << shift;
 	}
 
-	m_acc = ADD(m_acc, d, shift);
+	m_acc = ADD(m_acc, d, false);
 
 	CYCLES(2);
 }
@@ -357,14 +348,14 @@ void tms32051_device::op_add_s16_mem()
 	UINT16 ea = GET_ADDRESS();
 	UINT32 data = DM_READ16(ea) << 16;
 
-	m_acc = ADD(m_acc, data, 0);
+	m_acc = ADD(m_acc, data, true);
 
 	CYCLES(1);
 }
 
 void tms32051_device::op_addb()
 {
-	m_acc = ADD(m_acc, m_accb, 0);
+	m_acc = ADD(m_acc, m_accb, false);
 
 	CYCLES(1);
 }
@@ -694,7 +685,12 @@ void tms32051_device::op_satl()
 
 void tms32051_device::op_sbb()
 {
-	m_acc = SUB(m_acc, m_accb, 0);
+	UINT32 res = m_acc - m_accb;
+
+	// C is cleared if borrow was generated
+	m_st1.c = ((UINT32)(m_acc) < res) ? 0 : 1;
+
+	m_acc = res;
 
 	CYCLES(1);
 }
@@ -761,7 +757,7 @@ void tms32051_device::op_sub_mem()
 		d = (UINT32)(UINT16)(data) << shift;
 	}
 
-	m_acc = SUB(m_acc, d, shift);
+	m_acc = SUB(m_acc, d, false);
 
 	CYCLES(1);
 }
@@ -775,7 +771,7 @@ void tms32051_device::op_sub_simm()
 {
 	UINT16 imm = m_op & 0xff;
 
-	m_acc = SUB(m_acc, imm, 0);
+	m_acc = SUB(m_acc, imm, false);
 
 	CYCLES(1);
 }
@@ -795,7 +791,7 @@ void tms32051_device::op_sub_limm()
 		d = (UINT32)(UINT16)(imm) << shift;
 	}
 
-	m_acc = SUB(m_acc, d, shift);
+	m_acc = SUB(m_acc, d, false);
 
 	CYCLES(2);
 }
@@ -1037,10 +1033,14 @@ void tms32051_device::op_bcnd()
 {
 	UINT16 pma = ROPCODE();
 
-	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
 		CHANGE_PC(pma);
 		CYCLES(4);
+
+		// clear overflow
+		if (m_op & 0x2)
+			m_st0.ov = 0;
 	}
 	else
 	{
@@ -1052,8 +1052,12 @@ void tms32051_device::op_bcndd()
 {
 	UINT16 pma = ROPCODE();
 
-	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
+		// clear overflow
+		if (m_op & 0x2)
+			m_st0.ov = 0;
+
 		delay_slot(m_pc);
 		CHANGE_PC(pma);
 		CYCLES(4);
@@ -1121,12 +1125,16 @@ void tms32051_device::op_cc()
 {
 	UINT16 pma = ROPCODE();
 
-	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
 		PUSH_STACK(m_pc);
 
 		CHANGE_PC(pma);
 		CYCLES(4);
+
+		// clear overflow
+		if (m_op & 0x2)
+			m_st0.ov = 0;
 	}
 	else
 	{
@@ -1138,9 +1146,13 @@ void tms32051_device::op_ccd()
 {
 	UINT16 pma = ROPCODE();
 
-	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
 		PUSH_STACK(m_pc+2);
+
+		// clear overflow
+		if (m_op & 0x2)
+			m_st0.ov = 0;
 
 		delay_slot(m_pc);
 		CHANGE_PC(pma);
@@ -1161,7 +1173,7 @@ void tms32051_device::op_nmi()
 
 void tms32051_device::op_retc()
 {
-	if ((m_op & 0x3ff) == 0x300 || GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
 		UINT16 pc = POP_STACK();
 		CHANGE_PC(pc);
@@ -1175,7 +1187,7 @@ void tms32051_device::op_retc()
 
 void tms32051_device::op_retcd()
 {
-	if ((m_op & 0x3ff) == 0x300 || GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
 		UINT16 pc = POP_STACK();
 		delay_slot(m_pc);
@@ -1212,7 +1224,7 @@ void tms32051_device::op_trap()
 
 void tms32051_device::op_xc()
 {
-	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
 		CYCLES(1);
 	}
@@ -1359,7 +1371,7 @@ void tms32051_device::op_out()
 {
 	UINT16 port = ROPCODE();
 	UINT16 ea = GET_ADDRESS();
-
+	
 	UINT16 data = DM_READ16(ea);
 	m_io->write_word(port << 1, data);
 
@@ -1421,7 +1433,11 @@ void tms32051_device::op_apl_dbmr()
 {
 	UINT16 ea = GET_ADDRESS();
 	UINT16 data = DM_READ16(ea);
+	
 	data &= m_dbmr;
+
+	m_st1.tc = (data == 0) ? 1 : 0;
+
 	DM_WRITE16(ea, data);
 	CYCLES(1);
 }
@@ -1431,7 +1447,11 @@ void tms32051_device::op_apl_imm()
 	UINT16 ea = GET_ADDRESS();
 	UINT16 imm = ROPCODE();
 	UINT16 data = DM_READ16(ea);
+	
 	data &= imm;
+
+	m_st1.tc = (data == 0) ? 1 : 0;
+
 	DM_WRITE16(ea, data);
 	CYCLES(1);
 }
@@ -1457,6 +1477,9 @@ void tms32051_device::op_opl_dbmr()
 	UINT16 ea = GET_ADDRESS();
 	UINT16 data = DM_READ16(ea);
 	data |= m_dbmr;
+
+	m_st1.tc = (data == 0) ? 1 : 0;
+
 	DM_WRITE16(ea, data);
 	CYCLES(1);
 }
@@ -1467,6 +1490,9 @@ void tms32051_device::op_opl_imm()
 	UINT16 imm = ROPCODE();
 	UINT16 data = DM_READ16(ea);
 	data |= imm;
+
+	m_st1.tc = (data == 0) ? 1 : 0;
+
 	DM_WRITE16(ea, data);
 	CYCLES(1);
 }
@@ -1494,7 +1520,7 @@ void tms32051_device::op_xpl_imm()
 void tms32051_device::op_apac()
 {
 	INT32 spreg = PREG_PSCALER(m_preg);
-	m_acc = ADD(m_acc, spreg, 0);
+	m_acc = ADD(m_acc, spreg, false);
 
 	CYCLES(1);
 }
@@ -1527,7 +1553,7 @@ void tms32051_device::op_lta()
 
 	m_treg0 = data;
 	spreg = PREG_PSCALER(m_preg);
-	m_acc = ADD(m_acc, spreg, 0);
+	m_acc = ADD(m_acc, spreg, false);
 	if (m_pmst.trm == 0)
 	{
 		m_treg1 = data;

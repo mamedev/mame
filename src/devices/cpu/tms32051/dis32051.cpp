@@ -231,8 +231,8 @@ static void dasm_group_be(UINT16 opcode)
 		case 0x82:  print("or      #%04X", FETCH() << 16); break;
 		case 0x83:  print("xor     #%04X", FETCH() << 16); break;
 		case 0xc4:  print("rpt     #%04X", FETCH()); break;
-		case 0xc5:  print("rpt     #%04X", FETCH()); break;
-		case 0xc6:  print("rpt     #%04X", FETCH()); break;
+		case 0xc5:  print("rptz    #%04X", FETCH()); break;
+		case 0xc6:  print("rptb    #%04X", FETCH()); break;
 
 		default:    print("???     (group be)"); break;
 	}

@@ -38,10 +38,9 @@ enum
 	TMS32051_AR7,
 	TMS32051_IFR,
 	TMS32051_IMR,
-	TMS32051_ST0_ARP,
 	TMS32051_ST0_INTM,
-	TMS32051_ST0_DP,
 	TMS32051_ST1_ARB,
+	TMS32051_ST1_TC,
 	TMS32051_TIM,
 	TMS32051_PSC
 };
@@ -238,10 +237,9 @@ void tms32051_device::device_start()
 
 	state_add( TMS32051_IFR,      "IFR", m_ifr).formatstr("%04X");
 	state_add( TMS32051_IMR,      "IMR", m_imr).formatstr("%04X");
-	state_add( TMS32051_ST0_ARP,  "ST0 ARP", m_st0.arp).formatstr("%1d");
-	state_add( TMS32051_ST0_INTM, "ST0 INTM", m_st0.intm).formatstr("%1d");
-	state_add( TMS32051_ST0_DP,   "ST0 DP", m_st0.dp).formatstr("%04X");
-	state_add( TMS32051_ST1_ARB,  "ST1 ARB", m_st1.arb).formatstr("%04X");
+	state_add( TMS32051_ST0_INTM, "ST0_INTM", m_st0.intm).formatstr("%1d");
+	state_add( TMS32051_ST1_ARB,  "ST1_ARB", m_st1.arb).formatstr("%04X");
+	state_add( TMS32051_ST1_TC,   "ST1_TC", m_st1.tc).formatstr("%1d");
 	state_add( TMS32051_TIM,      "TIM", m_timer.tim).formatstr("%04X");
 	state_add( TMS32051_PSC,      "PSC", m_timer.psc).formatstr("%04X");
 
