@@ -408,9 +408,9 @@ static int read_summary_log(const char *filename, int index)
 		}
 
 		/* look for the MAME header */
-		else if (strncmp(linestart, "MAME v", 10) == 0)
+		else if (strncmp(linestart, "MAME v", 6) == 0)
 		{
-			char *start = linestart + 10;
+			char *start = linestart + 6;
 			char *end;
 
 			/* find the end */
