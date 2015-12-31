@@ -812,7 +812,7 @@ osd_lock *lock;
 void lua_engine::serve_lua()
 {
 	osd_sleep(osd_ticks_per_second() / 1000 * 50);
-	printf("%s v%s - %s\n%s\n%s\n\n", emulator_info::get_applongname(),build_version,emulator_info::get_fulllongname(),emulator_info::get_copyright_info(),LUA_COPYRIGHT);
+	printf("%s v%s\n%s\n%s\n\n", emulator_info::get_appname(),build_version,emulator_info::get_copyright_info(),LUA_COPYRIGHT);
 	fflush(stdout);
 	char buff[LUA_MAXINPUT];
 	std::string oldbuff;

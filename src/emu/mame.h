@@ -55,8 +55,6 @@ public:
 	static const char * get_appname();
 	static const char * get_appname_lower();
 	static const char * get_configname();
-	static const char * get_applongname();
-	static const char * get_fulllongname();
 	static const char * get_capgamenoun();
 	static const char * get_capstartgamenoun();
 	static const char * get_gamenoun();
