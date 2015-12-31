@@ -49,6 +49,7 @@ struct PS_INPUT
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
+uniform float2 TargetDims;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -56,11 +57,12 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
-	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= 0.5f;
-	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
+	Output.Position.y = 1.0f - Output.Position.y; // flip y
+	Output.Position.xy -= 0.5f; // center
+	Output.Position.xy *= 2.0f; // zoom
 	
-	Output.TexCoord = Input.TexCoord + 0.5f / ScreenDims;
+	Output.TexCoord = Input.TexCoord;
+	Output.TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
 	return Output;
 }

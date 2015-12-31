@@ -53,9 +53,6 @@ public:
 
 	cache_target *next;
 	cache_target *prev;
-
-	surface *bloom_target[11];
-	texture *bloom_texture[11];
 };
 
 /* render_target is the information about a Direct3D render target chain */

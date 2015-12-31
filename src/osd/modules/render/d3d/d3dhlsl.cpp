@@ -940,9 +940,33 @@ int shaders::create_resources(bool reset)
 		return 1;
 	}
 
-	yiq_encode_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-	yiq_encode_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
-	yiq_encode_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
+	effect *effects[14] = {
+		default_effect,
+		post_effect,
+		distortion_effect,
+		prescale_effect,
+		phosphor_effect,
+		focus_effect,
+		deconverge_effect,
+		color_effect,
+		yiq_encode_effect,
+		yiq_decode_effect,
+		color_effect,
+		bloom_effect,
+		downsample_effect,
+		vector_effect
+	};
+
+	for (int i = 0; i < 14; i++)
+	{
+		effects[i]->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
+		effects[i]->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
+		effects[i]->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
+		effects[i]->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+		effects[i]->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS);
+		effects[i]->add_uniform("SwapXY", uniform::UT_BOOL, uniform::CU_SWAP_XY);
+	}
+
 	yiq_encode_effect->add_uniform("CCValue", uniform::UT_FLOAT, uniform::CU_NTSC_CCFREQ);
 	yiq_encode_effect->add_uniform("AValue", uniform::UT_FLOAT, uniform::CU_NTSC_A);
 	yiq_encode_effect->add_uniform("BValue", uniform::UT_FLOAT, uniform::CU_NTSC_B);
@@ -952,10 +976,7 @@ int shaders::create_resources(bool reset)
 	yiq_encode_effect->add_uniform("IFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_IFREQ);
 	yiq_encode_effect->add_uniform("QFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_QFREQ);
 	yiq_encode_effect->add_uniform("ScanTime", uniform::UT_FLOAT, uniform::CU_NTSC_HTIME);
-
-	yiq_decode_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-	yiq_decode_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
-	yiq_decode_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
+	
 	yiq_decode_effect->add_uniform("CCValue", uniform::UT_FLOAT, uniform::CU_NTSC_CCFREQ);
 	yiq_decode_effect->add_uniform("AValue", uniform::UT_FLOAT, uniform::CU_NTSC_A);
 	yiq_decode_effect->add_uniform("BValue", uniform::UT_FLOAT, uniform::CU_NTSC_B);
@@ -967,9 +988,6 @@ int shaders::create_resources(bool reset)
 	yiq_decode_effect->add_uniform("QFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_QFREQ);
 	yiq_decode_effect->add_uniform("ScanTime", uniform::UT_FLOAT, uniform::CU_NTSC_HTIME);
 
-	color_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-	color_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
-
 	color_effect->add_uniform("RedRatios", uniform::UT_VEC3, uniform::CU_COLOR_RED_RATIOS);
 	color_effect->add_uniform("GrnRatios", uniform::UT_VEC3, uniform::CU_COLOR_GRN_RATIOS);
 	color_effect->add_uniform("BluRatios", uniform::UT_VEC3, uniform::CU_COLOR_BLU_RATIOS);
@@ -977,38 +995,14 @@ int shaders::create_resources(bool reset)
 	color_effect->add_uniform("Scale", uniform::UT_VEC3, uniform::CU_COLOR_SCALE);
 	color_effect->add_uniform("Saturation", uniform::UT_FLOAT, uniform::CU_COLOR_SATURATION);
 
-	prescale_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-
-	deconverge_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-	deconverge_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
-	deconverge_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
 	deconverge_effect->add_uniform("ConvergeX", uniform::UT_VEC3, uniform::CU_CONVERGE_LINEAR_X);
 	deconverge_effect->add_uniform("ConvergeY", uniform::UT_VEC3, uniform::CU_CONVERGE_LINEAR_Y);
 	deconverge_effect->add_uniform("RadialConvergeX", uniform::UT_VEC3, uniform::CU_CONVERGE_RADIAL_X);
 	deconverge_effect->add_uniform("RadialConvergeY", uniform::UT_VEC3, uniform::CU_CONVERGE_RADIAL_Y);
 
-	focus_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-	focus_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
-	focus_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
-	focus_effect->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS);
 	focus_effect->add_uniform("Defocus", uniform::UT_VEC2, uniform::CU_FOCUS_SIZE);
-	focus_effect->add_uniform("OrientationSwapXY", uniform::UT_BOOL, uniform::CU_ORIENTATION_SWAP);
-	focus_effect->add_uniform("RotationSwapXY", uniform::UT_BOOL, uniform::CU_ROTATION_SWAP);
-
-	phosphor_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-	phosphor_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
+	
 	phosphor_effect->add_uniform("Phosphor", uniform::UT_VEC3, uniform::CU_PHOSPHOR_LIFE);
-
-	downsample_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-
-	bloom_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-	bloom_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
-
-	post_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
-	post_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
-	post_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-	post_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
-	post_effect->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS); // backward compatibility
 
 	post_effect->add_uniform("VignettingAmount", uniform::UT_FLOAT, uniform::CU_POST_VIGNETTING); // backward compatibility
 	post_effect->add_uniform("CurvatureAmount", uniform::UT_FLOAT, uniform::CU_POST_CURVATURE); // backward compatibility
@@ -1030,13 +1024,7 @@ int shaders::create_resources(bool reset)
 	post_effect->add_uniform("Power", uniform::UT_VEC3, uniform::CU_POST_POWER);
 	post_effect->add_uniform("Floor", uniform::UT_VEC3, uniform::CU_POST_FLOOR);
 
-	post_effect->add_uniform("OrientationSwapXY", uniform::UT_BOOL, uniform::CU_ORIENTATION_SWAP);
-	post_effect->add_uniform("RotationSwapXY", uniform::UT_BOOL, uniform::CU_ROTATION_SWAP);
 	post_effect->add_uniform("RotationType", uniform::UT_INT, uniform::CU_ROTATION_TYPE);
-
-	distortion_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-	distortion_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
-	distortion_effect->add_uniform("QuadDims", uniform::UT_VEC2, uniform::CU_QUAD_DIMS);
 
 	distortion_effect->add_uniform("VignettingAmount", uniform::UT_FLOAT, uniform::CU_POST_VIGNETTING);
 	distortion_effect->add_uniform("CurvatureAmount", uniform::UT_FLOAT, uniform::CU_POST_CURVATURE);
@@ -1044,14 +1032,7 @@ int shaders::create_resources(bool reset)
 	distortion_effect->add_uniform("SmoothBorderAmount", uniform::UT_FLOAT, uniform::CU_POST_SMOOTH_BORDER);
 	distortion_effect->add_uniform("ReflectionAmount", uniform::UT_FLOAT, uniform::CU_POST_REFLECTION);
 
-	distortion_effect->add_uniform("OrientationSwapXY", uniform::UT_BOOL, uniform::CU_ORIENTATION_SWAP);
-	distortion_effect->add_uniform("RotationSwapXY", uniform::UT_BOOL, uniform::CU_ROTATION_SWAP);
 	distortion_effect->add_uniform("RotationType", uniform::UT_INT, uniform::CU_ROTATION_TYPE);
-
-	vector_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-
-	default_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
-	default_effect->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
 
 	initialized = true;
 
@@ -1359,6 +1340,15 @@ int shaders::deconverge_pass(render_target *rt, int source_index, poly_info *pol
 {
 	int next_index = source_index;
 
+	// skip deconverge if no influencing settings
+	if (options->converge_x[0] == 0.0f && options->converge_x[1] == 0.0f && options->converge_x[2] == 0.0f &&
+		options->converge_y[0] == 0.0f && options->converge_y[1] == 0.0f && options->converge_y[2] == 0.0f &&
+		options->radial_converge_x[0] == 0.0f && options->radial_converge_x[1] == 0.0f && options->radial_converge_x[2] == 0.0f &&
+		options->radial_converge_y[0] == 0.0f && options->radial_converge_y[1] == 0.0f && options->radial_converge_y[2] == 0.0f)
+	{
+		return next_index;
+	}
+
 	curr_effect = deconverge_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->prescale_texture[next_index]);
@@ -1373,11 +1363,8 @@ int shaders::defocus_pass(render_target *rt, int source_index, poly_info *poly, 
 {
 	int next_index = source_index;
 
-	float defocus_x = options->defocus[0];
-	float defocus_y = options->defocus[1];
-
 	// skip defocus if no influencing settings
-	if (defocus_x == 0.0f && defocus_y == 0.0f)
+	if (options->defocus[0] == 0.0f && options->defocus[1] == 0.0f)
 	{
 		return next_index;
 	}
@@ -1395,6 +1382,12 @@ int shaders::defocus_pass(render_target *rt, int source_index, poly_info *poly, 
 int shaders::phosphor_pass(render_target *rt, cache_target *ct, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
+
+	// skip phosphor if no influencing settings
+	if (options->phosphor[0] == 0.0f && options->defocus[1] == 0.0f && options->defocus[2] == 0.0f)
+	{
+		return next_index;
+	}
 
 	curr_effect = phosphor_effect;
 	curr_effect->update_uniforms();
@@ -1420,8 +1413,6 @@ int shaders::phosphor_pass(render_target *rt, cache_target *ct, int source_index
 int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int vertnum, bool prepare_bloom)
 {
 	int next_index = source_index;
-
-	texture_info *texture = poly->get_texture();
 
 	bool prepare_vector =
 		machine->first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
@@ -1459,7 +1450,7 @@ int shaders::post_pass(render_target *rt, int source_index, poly_info *poly, int
 	curr_effect->set_vector("BackColor", 3, back_color);
 	curr_effect->set_vector("ScreenScale", 2, screen_scale);
 	curr_effect->set_vector("ScreenOffset", 2, screen_offset);
-	curr_effect->set_float("ScanlineOffset", texture->get_cur_frame() == 0 ? 0.0f : options->scanline_offset);
+	curr_effect->set_float("ScanlineOffset", curr_texture->get_cur_frame() == 0 ? 0.0f : options->scanline_offset);
 	curr_effect->set_bool("PrepareBloom", prepare_bloom);
 	curr_effect->set_bool("PrepareVector", prepare_vector);
 
@@ -1473,15 +1464,14 @@ int shaders::downsample_pass(render_target *rt, int source_index, poly_info *pol
 {
 	int next_index = source_index;
 
-	bool prepare_vector =
-		machine->first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
-	float bloom_rescale = options->bloom_scale;
-
 	// skip downsample if no influencing settings
-	if (bloom_rescale == 0.0f)
+	if (options->bloom_scale == 0.0f)
 	{
 		return next_index;
 	}
+
+	bool prepare_vector =
+		machine->first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
 
 	curr_effect = downsample_effect;
 	curr_effect->update_uniforms();
@@ -1519,10 +1509,8 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 {
 	int next_index = source_index;
 
-	float bloom_rescale = options->bloom_scale;
-
 	// skip bloom if no influencing settings
-	if (bloom_rescale == 0.0f)
+	if (options->bloom_scale == 0.0f)
 	{
 		return next_index;
 	}
@@ -1558,7 +1546,7 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 	curr_effect->set_vector("LevelASize", 2, bloom_dims[10]);
 
 	curr_effect->set_int("BloomBlendMode", options->bloom_blend_mode);
-	curr_effect->set_float("BloomScale", bloom_rescale);
+	curr_effect->set_float("BloomScale", options->bloom_scale);
 	curr_effect->set_vector("BloomOverdrive", 3, options->bloom_overdrive);
 
 	curr_effect->set_texture("DiffuseA", rt->prescale_texture[next_index]);
@@ -1755,7 +1743,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		// render on screen
 		d3d->set_wrap(D3DTADDRESS_MIRROR);
 		next_index = screen_pass(rt, next_index, poly, vertnum);
-		d3d->set_wrap(PRIMFLAG_GET_TEXWRAP(poly->get_texture()->get_flags()) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
+		d3d->set_wrap(PRIMFLAG_GET_TEXWRAP(curr_texture->get_flags()) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
 
 		curr_texture->increment_frame_count();
 		curr_texture->mask_frame_count(options->yiq_phase_count);
@@ -2961,37 +2949,67 @@ void uniform::update()
 		}
 		case CU_SOURCE_DIMS:
 		{
-			vec2f sourcedims = shadersys->curr_texture->get_rawdims();
-			m_shader->set_vector("SourceDims", 2, &sourcedims.c.x);
+			if (shadersys->curr_texture != NULL)
+			{
+				vec2f sourcedims = shadersys->curr_texture->get_rawdims();
+				m_shader->set_vector("SourceDims", 2, &sourcedims.c.x);
+			}
+
 			break;
 		}
 		case CU_SOURCE_RECT:
-		{
-			vec2f delta = shadersys->curr_texture->get_uvstop() - shadersys->curr_texture->get_uvstart();
-			m_shader->set_vector("SourceRect", 2, &delta.c.x);
+		{			
+			bool prepare_vector =
+				d3d->window().machine().first_screen()->screen_type() == SCREEN_TYPE_VECTOR;
+
+			if (prepare_vector)
+			{
+				float delta[2] = { 1.0f, 1.0f };
+				m_shader->set_vector("SourceRect", 2, delta);
+				break;
+			}
+			
+			if (shadersys->curr_texture != NULL)
+			{
+				vec2f delta = shadersys->curr_texture->get_uvstop() - shadersys->curr_texture->get_uvstart();
+				m_shader->set_vector("SourceRect", 2, &delta.c.x);
+				break;
+			}
+
 			break;
 		}
 		case CU_TARGET_DIMS:
 		{
-			if (shadersys->curr_render_target == NULL)
+			if (shadersys->curr_render_target != NULL)
 			{
-				float targetdims[2] = { 0.0f, 0.0f };
-				m_shader->set_vector("TargetDims", 2, targetdims);
-			}
-			else
-			{
-				float targetdims[2] = { static_cast<float>(shadersys->curr_render_target->target_width), static_cast<float>(shadersys->curr_render_target->target_height) };
+				float targetdims[2] = {
+					static_cast<float>(shadersys->curr_render_target->target_width), 
+					static_cast<float>(shadersys->curr_render_target->target_height) };
 				m_shader->set_vector("TargetDims", 2, targetdims);
 			}
 			break;
 		}
 		case CU_QUAD_DIMS:
 		{
-			float quaddims[2] = { shadersys->curr_poly->get_prim_width(), shadersys->curr_poly->get_prim_height() };
-			m_shader->set_vector("QuadDims", 2, quaddims);
+			if (shadersys->curr_poly != NULL)
+			{
+				float quaddims[2] = {
+					shadersys->curr_poly->get_prim_width(),
+					shadersys->curr_poly->get_prim_height() };
+				m_shader->set_vector("QuadDims", 2, quaddims);
+			}
 			break;
 		}
 
+		case CU_SWAP_XY:
+		{
+			bool orientation_swap_xy =
+				(d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+			bool rotation_swap_xy =
+				(d3d->window().target()->orientation() & ROT90) == ROT90 ||
+				(d3d->window().target()->orientation() & ROT270) == ROT270;
+			m_shader->set_bool("SwapXY", orientation_swap_xy ^ rotation_swap_xy);
+		}
 		case CU_ORIENTATION_SWAP:
 		{
 			bool orientation_swap_xy =

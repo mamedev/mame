@@ -67,15 +67,6 @@ struct PS_INPUT
 static const float PI = 3.1415927f;
 
 //-----------------------------------------------------------------------------
-// Functions
-//-----------------------------------------------------------------------------
-
-bool xor(bool a, bool b)
-{
-	return (a || b) && !(a && b);
-}
-
-//-----------------------------------------------------------------------------
 // Scanline & Shadowmask Vertex Shader
 //-----------------------------------------------------------------------------
 
@@ -87,8 +78,7 @@ uniform float2 TargetDims; // size of the target surface
 uniform float2 ShadowDims = float2(32.0f, 32.0f); // size of the shadow texture (extended to power-of-two size)
 uniform float2 ShadowUVOffset = float2(0.0f, 0.0f);
 
-uniform bool OrientationSwapXY = false; // false landscape, true portrait for default screen orientation
-uniform bool RotationSwapXY = false; // swapped default screen orientation due to screen rotation
+uniform bool SwapXY = false;
 
 uniform bool PrepareBloom = false; // disables some effects for rendering bloom textures
 uniform bool PrepareVector = false;
@@ -98,7 +88,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
 	float2 shadowUVOffset = ShadowUVOffset;
-	shadowUVOffset = xor(OrientationSwapXY, RotationSwapXY)
+	shadowUVOffset = SwapXY
 		? shadowUVOffset.yx
 		: shadowUVOffset.xy;
 
@@ -170,9 +160,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 ScreenTexelDims = 1.0f / ScreenDims;
 	float2 SourceTexelDims = 1.0f / SourceDims;
 
-	float2 HalfSourceRect = PrepareVector
-		? float2(0.5f, 0.5f)
-		: SourceRect * 0.5f;
+	float2 HalfSourceRect = SourceRect * 0.5f;
 
 	float2 ScreenCoord = Input.ScreenCoord / ScreenDims;
 	float2 BaseCoord = GetAdjustedCoords(Input.TexCoord, HalfSourceRect);
@@ -190,34 +178,34 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	if (!PrepareBloom)
 	{
 		float2 shadowDims = ShadowDims;
-		shadowDims = xor(OrientationSwapXY, RotationSwapXY)
+		shadowDims = SwapXY
 			? shadowDims.yx
 			: shadowDims.xy;
 
 		float2 shadowUV = ShadowUV;
-		// shadowUV = xor(OrientationSwapXY, RotationSwapXY)
+		// shadowUV = SwapXY
 			// ? shadowUV.yx
 			// : shadowUV.xy;
 
 		float2 screenCoord = ShadowTileMode == 0 ? ScreenCoord : BaseCoord;
-		screenCoord = xor(OrientationSwapXY, RotationSwapXY)
+		screenCoord = SwapXY
 			? screenCoord.yx
 			: screenCoord.xy;
 
 		float2 shadowCount = ShadowCount;
-		shadowCount = xor(OrientationSwapXY, RotationSwapXY)
+		shadowCount = SwapXY
 			? shadowCount.yx
 			: shadowCount.xy;
 
 		float2 shadowTile = ((ShadowTileMode == 0 ? ScreenTexelDims : SourceTexelDims) * shadowCount);
-		shadowTile = xor(OrientationSwapXY, RotationSwapXY)
+		shadowTile = SwapXY
 			? shadowTile.yx
 			: shadowTile.xy;
 
 		float2 ShadowFrac = frac(screenCoord / shadowTile);
 		float2 ShadowCoord = (ShadowFrac * shadowUV);
 		ShadowCoord += 0.5f / shadowDims; // half texel offset
-		// ShadowCoord = xor(OrientationSwapXY, RotationSwapXY)
+		// ShadowCoord = SwapXY
 			// ? ShadowCoord.yx
 			// : ShadowCoord.xy;
 

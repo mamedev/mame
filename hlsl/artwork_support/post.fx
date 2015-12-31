@@ -74,11 +74,6 @@ static const float GelfondSchneider = 2.6651442f; // 2^sqrt(2) (Gelfond-Schneide
 // Functions
 //-----------------------------------------------------------------------------
 
-bool xor(bool a, bool b)
-{
-	return (a || b) && !(a && b);
-}
-
 // www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
 float random(float2 seed)
 {
@@ -114,8 +109,8 @@ uniform float2 QuadDims; // size of the screen quad
 uniform float2 ShadowDims = float2(32.0f, 32.0f); // size of the shadow texture (extended to power-of-two size)
 uniform float2 ShadowUVOffset = float2(0.0f, 0.0f);
 
-uniform bool OrientationSwapXY = false; // false landscape, true portrait for default screen orientation
-uniform bool RotationSwapXY = false; // swapped default screen orientation due to screen rotation
+uniform bool SwapXY = false;
+
 uniform int RotationType = 0; // 0 = 0°, 1 = 90°, 2 = 180°, 3 = 270°
 
 uniform bool PrepareBloom = false; // disables some effects for rendering bloom textures 
@@ -126,7 +121,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
 	float2 shadowUVOffset = ShadowUVOffset;
-	shadowUVOffset = xor(OrientationSwapXY, RotationSwapXY)
+	shadowUVOffset = SwapXY
 		? shadowUVOffset.yx
 		: shadowUVOffset.xy;
 
@@ -227,7 +222,7 @@ float GetSpotAddend(float2 coord, float amount)
 	// normalized screen canvas ratio
 	float2 CanvasRatio = PrepareVector
 		? float2(1.0f, QuadDims.y / QuadDims.x)
-		: float2(1.0f, xor(OrientationSwapXY, RotationSwapXY) 
+		: float2(1.0f, SwapXY
 			? QuadDims.x / QuadDims.y 
 			: QuadDims.y / QuadDims.x);
 
@@ -240,7 +235,7 @@ float GetSpotAddend(float2 coord, float amount)
 				: RotationType == 3 // 270°
 					? float2(0.25f, 0.25f)
 					: float2(-0.25f, 0.25f)
-		: OrientationSwapXY
+		: SwapXY
 			? float2(0.25f, 0.25f)
 			: float2(-0.25f, 0.25f);
 
@@ -272,7 +267,7 @@ float GetRoundCornerFactor(float2 coord, float radiusAmount, float smoothAmount)
 
 	float2 CanvasDims = PrepareVector
 		? ScreenDims
-		: xor(OrientationSwapXY, RotationSwapXY) 
+		: SwapXY 
 			? QuadDims.yx / SourceRect 
 			: QuadDims.xy / SourceRect;
 
@@ -375,9 +370,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 ScreenTexelDims = 1.0f / ScreenDims;
 	float2 SourceTexelDims = 1.0f / SourceDims;
 
-	float2 HalfSourceRect = PrepareVector
-		? float2(0.5f, 0.5f)
-		: SourceRect * 0.5f;
+	float2 HalfSourceRect = SourceRect * 0.5f;
 
 	float2 ScreenCoord = Input.ScreenCoord / ScreenDims;
 	ScreenCoord = GetCoords(ScreenCoord, float2(0.5f, 0.5f), CurvatureAmount * 0.25f); // reduced amount
@@ -406,34 +399,34 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	if (!PrepareBloom)
 	{
 		float2 shadowDims = ShadowDims;
-		shadowDims = xor(OrientationSwapXY, RotationSwapXY)
+		shadowDims = SwapXY
 			? shadowDims.yx
 			: shadowDims.xy;
 
 		float2 shadowUV = ShadowUV;
-		// shadowUV = xor(OrientationSwapXY, RotationSwapXY)
+		// shadowUV = SwapXY
 			// ? shadowUV.yx
 			// : shadowUV.xy;
 
 		float2 screenCoord = ShadowTileMode == 0 ? ScreenCoord : BaseCoord;
-		screenCoord = xor(OrientationSwapXY, RotationSwapXY)
+		screenCoord = SwapXY
 			? screenCoord.yx
 			: screenCoord.xy;
 
 		float2 shadowCount = ShadowCount;
-		shadowCount = xor(OrientationSwapXY, RotationSwapXY)
+		shadowCount = SwapXY
 			? shadowCount.yx
 			: shadowCount.xy;
 
 		float2 shadowTile = ((ShadowTileMode == 0 ? ScreenTexelDims : SourceTexelDims) * shadowCount);
-		shadowTile = xor(OrientationSwapXY, RotationSwapXY)
+		shadowTile = SwapXY
 			? shadowTile.yx
 			: shadowTile.xy;
 
 		float2 ShadowFrac = frac(screenCoord / shadowTile);
 		float2 ShadowCoord = (ShadowFrac * shadowUV);
 		ShadowCoord += 0.5f / shadowDims; // half texel offset
-		// ShadowCoord = xor(OrientationSwapXY, RotationSwapXY)
+		// ShadowCoord = SwapXY
 			// ? ShadowCoord.yx
 			// : ShadowCoord.xy;
 
