@@ -18,8 +18,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MAX_COMMAND_LENGTH                  512
-#define MAX_COMMAND_PARAMS                  16
+#define MAX_COMMAND_LENGTH                  4096
+#define MAX_COMMAND_PARAMS                  128
 
 /* flags for command parsing */
 #define CMDFLAG_NONE                        (0x0000)
