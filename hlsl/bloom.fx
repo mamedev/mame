@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz,ImJezze
 //-----------------------------------------------------------------------------
-// Effect File Variables
+// Bloom Effect
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Sampler Definitions
 //-----------------------------------------------------------------------------
 
 texture DiffuseA;
@@ -304,13 +308,13 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 		float2 NoiseCoord = Input.TexCoord01.xy;
 		float3 NoiseFactor = GetNoiseFactor(bloom, random(NoiseCoord));
-		
+
 		blend = texel0 + bloom * NoiseFactor;
 	}
 
 	// darken
 	else
-	{	
+	{
 		texel1 = min(texel0, texel1);
 		texel2 = min(texel0, texel2);
 		texel3 = min(texel0, texel3);
@@ -339,26 +343,14 @@ float4 ps_main(PS_INPUT Input) : COLOR
 }
 
 //-----------------------------------------------------------------------------
-// Bloom Effect
+// Bloom Technique
 //-----------------------------------------------------------------------------
 
-technique TestTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{
 		Lighting = FALSE;
-
-		Sampler[0] = <DiffuseSampler0>; // 2048x2048
-		Sampler[1] = <DiffuseSampler1>; // 1024x1024
-		Sampler[2] = <DiffuseSampler2>; // 512x512
-		Sampler[3] = <DiffuseSampler3>; // 256x256
-		Sampler[4] = <DiffuseSampler4>; // 128x128
-		Sampler[5] = <DiffuseSampler5>; // 64x64
-		Sampler[6] = <DiffuseSampler6>; // 32x32
-		Sampler[7] = <DiffuseSampler7>; // 16x16
-		Sampler[8] = <DiffuseSampler8>; // 8x8
-		Sampler[9] = <DiffuseSampler9>; // 4x4
-		Sampler[10] = <DiffuseSamplerA>; // 2x2
 
 		VertexShader = compile vs_3_0 vs_main();
 		PixelShader = compile ps_3_0 ps_main();

@@ -1072,15 +1072,20 @@ void shaders::begin_draw()
 
 	curr_effect = default_effect;
 
-	default_effect->set_technique("TestTechnique");
-	post_effect->set_technique("ScanMaskTechnique");
-	distortion_effect->set_technique("DistortionTechnique");
-	phosphor_effect->set_technique("TestTechnique");
-	focus_effect->set_technique("TestTechnique");
-	deconverge_effect->set_technique("DeconvergeTechnique");
-	color_effect->set_technique("ColorTechnique");
-	yiq_encode_effect->set_technique("EncodeTechnique");
-	yiq_decode_effect->set_technique("DecodeTechnique");
+	default_effect->set_technique("DefaultTechnique");
+	post_effect->set_technique("DefaultTechnique");
+	distortion_effect->set_technique("DefaultTechnique");
+	prescale_effect->set_technique("DefaultTechnique");
+	phosphor_effect->set_technique("DefaultTechnique");
+	focus_effect->set_technique("DefaultTechnique");
+	deconverge_effect->set_technique("DefaultTechnique");
+	color_effect->set_technique("DefaultTechnique");
+	yiq_encode_effect->set_technique("DefaultTechnique");
+	yiq_decode_effect->set_technique("DefaultTechnique");
+	color_effect->set_technique("DefaultTechnique");
+	bloom_effect->set_technique("DefaultTechnique");
+	downsample_effect->set_technique("DefaultTechnique");
+	vector_effect->set_technique("DefaultTechnique");
 
 	HRESULT result = (*d3dintf->device.get_render_target)(d3d->get_device(), 0, &backbuffer);
 	if (result != D3D_OK)

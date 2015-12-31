@@ -4,6 +4,10 @@
 // Deconvergence Effect
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+// Sampler Definitions
+//-----------------------------------------------------------------------------
+
 texture Diffuse;
 
 sampler DiffuseSampler = sampler_state
@@ -112,10 +116,10 @@ float4 ps_main(PS_INPUT Input) : COLOR
 }
 
 //-----------------------------------------------------------------------------
-// Deconvergence Effect
+// Deconvergence Technique
 //-----------------------------------------------------------------------------
 
-technique DeconvergeTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{

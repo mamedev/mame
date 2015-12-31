@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz,ImJezze
 //-----------------------------------------------------------------------------
-// Scanline & Shadowmask Effect
+// Scanline, Shadowmask & Distortion Effect
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Sampler Definitions
 //-----------------------------------------------------------------------------
 
 texture DiffuseTexture;
@@ -98,7 +102,7 @@ float roundBox(float2 p, float2 b, float r)
 }
 
 //-----------------------------------------------------------------------------
-// Scanline & Shadowmask Vertex Shader
+// Scanline, Shadowmask & Distortion Vertex Shader
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims; // size of the window or fullscreen
@@ -149,7 +153,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 }
 
 //-----------------------------------------------------------------------------
-// Post-Processing Pixel Shader
+// Scanline, Shadowmask & Distortion Pixel Shader
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenScale = float2(1.0f, 1.0f);
@@ -511,13 +515,11 @@ float4 ps_main(PS_INPUT Input) : COLOR
 // Scanline & Shadowmask Effect
 //-----------------------------------------------------------------------------
 
-technique ScanMaskTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{
 		Lighting = FALSE;
-
-		//Sampler[0] = <DiffuseSampler>;
 
 		VertexShader = compile vs_3_0 vs_main();
 		PixelShader = compile ps_3_0 ps_main();

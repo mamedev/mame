@@ -4,6 +4,10 @@
 // Scanline & Shadowmask Effect
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+// Sampler Definitions
+//-----------------------------------------------------------------------------
+
 texture DiffuseTexture;
 
 sampler DiffuseSampler = sampler_state
@@ -121,7 +125,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 }
 
 //-----------------------------------------------------------------------------
-// Post-Processing Pixel Shader
+// Scanline & Shadowmask Pixel Shader
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenScale = float2(1.0f, 1.0f);
@@ -264,16 +268,14 @@ float4 ps_main(PS_INPUT Input) : COLOR
 }
 
 //-----------------------------------------------------------------------------
-// Scanline & Shadowmask Effect
+// Scanline & Shadowmask Technique
 //-----------------------------------------------------------------------------
 
-technique ScanMaskTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{
 		Lighting = FALSE;
-
-		Sampler[0] = <DiffuseSampler>;
 
 		VertexShader = compile vs_3_0 vs_main();
 		PixelShader = compile ps_3_0 ps_main();

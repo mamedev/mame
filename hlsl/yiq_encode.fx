@@ -4,6 +4,10 @@
 // YIQ Encode Effect
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+// Sampler Definitions
+//-----------------------------------------------------------------------------
+
 texture Diffuse;
 
 sampler DiffuseSampler = sampler_state
@@ -51,7 +55,7 @@ uniform float2 ScreenDims;
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
-	
+
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
 	Output.Position.y = 1.0f - Output.Position.y;
@@ -59,7 +63,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
 	Output.TexCoord = Input.TexCoord;
-	
+
 	return Output;
 }
 
@@ -99,7 +103,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 Texel1 = tex2D(DiffuseSampler, float2(CoordX.y, CoordY.y) + TexelOffset);
 	float4 Texel2 = tex2D(DiffuseSampler, float2(CoordX.z, CoordY.z) + TexelOffset);
 	float4 Texel3 = tex2D(DiffuseSampler, float2(CoordX.w, CoordY.w) + TexelOffset);
-	
+
 	float4 Y = float4(dot(Texel0, YDot), dot(Texel1, YDot), dot(Texel2, YDot), dot(Texel3, YDot));
 	float4 I = float4(dot(Texel0, IDot), dot(Texel1, IDot), dot(Texel2, IDot), dot(Texel3, IDot));
 	float4 Q = float4(dot(Texel0, QDot), dot(Texel1, QDot), dot(Texel2, QDot), dot(Texel3, QDot));
@@ -107,10 +111,10 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 W = PI2 * CCValue * ScanTime;
 	float4 VPosition = (CoordY * SourceRect.y) * (SourceDims.x / SourceRect.x);
 	float4 T = CoordX / SourceRect.x + VPosition + BValue;
-	
+
 	float4 C = Y + I * cos(T * W) + Q * sin(T * W);
 	C = (C - MinC) / CRange;
-	
+
 	return C;
 }
 
@@ -118,7 +122,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 // YIQ Encode Technique
 //-----------------------------------------------------------------------------
 
-technique EncodeTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{

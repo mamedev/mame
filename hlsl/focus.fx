@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz,ImJezze
 //-----------------------------------------------------------------------------
-// Effect File Variables
+// Defocus Effect
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Sampler Definitions
 //-----------------------------------------------------------------------------
 
 texture Diffuse;
@@ -51,7 +55,7 @@ bool xor(bool a, bool b)
 }
 
 //-----------------------------------------------------------------------------
-// Simple Vertex Shader
+// Defocus Vertex Shader
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
@@ -80,7 +84,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 }
 
 //-----------------------------------------------------------------------------
-// Simple Pixel Shader
+// Defocus Pixel Shader
 //-----------------------------------------------------------------------------
 
 float2 Coord1Offset = float2( 0.75f,  0.50f);
@@ -124,16 +128,14 @@ float4 ps_main(PS_INPUT Input) : COLOR
 }
 
 //-----------------------------------------------------------------------------
-// Simple Effect
+// Defocus Technique
 //-----------------------------------------------------------------------------
 
-technique TestTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{
 		Lighting = FALSE;
-
-		Sampler[0] = <DiffuseSampler>;
 
 		VertexShader = compile vs_2_0 vs_main();
 		PixelShader = compile ps_2_0 ps_main();

@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 //-----------------------------------------------------------------------------
-// Passthrough Effect
+// Prescale Effect
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Sampler Definitions
 //-----------------------------------------------------------------------------
 
 texture Diffuse;
@@ -41,7 +45,7 @@ struct PS_INPUT
 };
 
 //-----------------------------------------------------------------------------
-// Passthrough Vertex Shader
+// Prescale Vertex Shader
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
@@ -62,7 +66,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 }
 
 //-----------------------------------------------------------------------------
-// Passthrough Pixel Shader
+// Prescale Pixel Shader
 //-----------------------------------------------------------------------------
 
 float4 ps_main(PS_INPUT Input) : COLOR
@@ -71,10 +75,10 @@ float4 ps_main(PS_INPUT Input) : COLOR
 }
 
 //-----------------------------------------------------------------------------
-// Passthrough Effect
+// Prescale Technique
 //-----------------------------------------------------------------------------
 
-technique DeconvergeTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{

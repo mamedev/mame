@@ -4,6 +4,10 @@
 // Distortion Effect
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+// Sampler Definitions
+//-----------------------------------------------------------------------------
+
 texture DiffuseTexture;
 
 sampler DiffuseSampler = sampler_state
@@ -109,7 +113,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 }
 
 //-----------------------------------------------------------------------------
-// Post-Processing Pixel Shader
+// Distortion Pixel Shader
 //-----------------------------------------------------------------------------
 
 uniform float CurvatureAmount = 0.0f;
@@ -299,10 +303,10 @@ float4 ps_main(PS_INPUT Input) : COLOR
 }
 
 //-----------------------------------------------------------------------------
-// Distortion Effect
+// Distortion Technique
 //-----------------------------------------------------------------------------
 
-technique DistortionTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{

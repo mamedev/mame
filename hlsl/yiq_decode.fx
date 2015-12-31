@@ -4,6 +4,10 @@
 // YIQ Decode Effect
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+// Sampler Definitions
+//-----------------------------------------------------------------------------
+
 texture Composite;
 
 sampler CompositeSampler = sampler_state
@@ -64,7 +68,7 @@ uniform float2 SourceRect;
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
-	
+
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
 	Output.Position.y = 1.0f - Output.Position.y;
@@ -151,23 +155,23 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		float4 IdealI = Fc_i_2 * ((SincIIn != 0.0f) ? (sin(SincIIn) / SincIIn) : 1.0f);
 		float4 IdealQ = Fc_q_2 * ((SincQIn != 0.0f) ? (sin(SincQIn) / SincQIn) : 1.0f);
 
-		float4 FilterY = SincKernel * IdealY;		
+		float4 FilterY = SincKernel * IdealY;
 		float4 FilterI = SincKernel * IdealI;
 		float4 FilterQ = SincKernel * IdealQ;
-		
+
 		YAccum = YAccum + C * FilterY;
 		IAccum = IAccum + C * cos(WT) * FilterI;
 		QAccum = QAccum + C * sin(WT) * FilterQ;
 	}
-	
+
 	float Y = YAccum.r + YAccum.g + YAccum.b + YAccum.a;
 	float I = (IAccum.r + IAccum.g + IAccum.b + IAccum.a) * 2.0f;
 	float Q = (QAccum.r + QAccum.g + QAccum.b + QAccum.a) * 2.0f;
-	
+
 	float3 YIQ = float3(Y, I, Q);
 
 	float3 OutRGB = float3(dot(YIQ, float3(1.0f, 0.956f, 0.621f)), dot(YIQ, float3(1.0f, -0.272f, -0.647f)), dot(YIQ, float3(1.0f, -1.106f, 1.703f)));	
-	
+
 	return float4(OutRGB, BaseTexel.a);
 }
 
@@ -175,7 +179,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 // YIQ Decode Technique
 //-----------------------------------------------------------------------------
 
-technique DecodeTechnique
+technique DefaultTechnique
 {
 	pass Pass0
 	{
