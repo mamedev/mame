@@ -1,0 +1,14 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
+//============================================================
+//
+//	mess.rc - Minimal resource file for Win32 MAME
+//
+//============================================================
+
+#include <windows.h>
+#include "messvers.rc"
+
+1                       24      MOVEABLE PURE   "mess.man"
+
+2                       ICON    DISCARDABLE     "mess.ico"

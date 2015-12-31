@@ -182,7 +182,7 @@ endif
 
 #-------------------------------------------------
 # specify core target: mame, ldplayer
-# specify subtarget: mame, nl, dummy, tiny, etc.
+# specify subtarget: mame, arcade, mess, tiny, etc.
 # build scripts will be run from
 # scripts/target/$(TARGET)/$(SUBTARGET).lua
 #-------------------------------------------------
@@ -698,6 +698,11 @@ SCRIPTS = scripts/genie.lua \
 	$(wildcard src/osd/$(OSD)/$(OSD).mak) \
 	$(wildcard src/$(TARGET)/$(SUBTARGET).mak)
 
+ifeq ($(SUBTARGET),mame)
+SCRIPTS += scripts/target/$(TARGET)/arcade.lua
+SCRIPTS += scripts/target/$(TARGET)/mess.lua
+endif
+
 ifndef SOURCES
 SCRIPTS += scripts/target/$(TARGET)/$(SUBTARGET).lua
 endif
@@ -764,6 +769,8 @@ else
 MSBUILD_PARAMS += /p:Platform=win32
 endif
 ifeq ($(SUBTARGET),mame)
+MSBUILD_SOLUTION := $(SUBTARGET).sln
+else ifeq ($(SUBTARGET),mess)
 MSBUILD_SOLUTION := $(SUBTARGET).sln
 else
 MSBUILD_SOLUTION := $(TARGET)$(SUBTARGET).sln

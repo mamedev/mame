@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    mame.c
+    mess.c
 
     Specific (per target) constants
 
@@ -10,11 +10,11 @@
 
 #include "emu.h"
 
-#define APPNAME                 "MAME"
-#define APPNAME_LOWER           "mame"
-#define CONFIGNAME              "mame"
-#define APPLONGNAME             "M.A.M.E."
-#define FULLLONGNAME            "Multiple Arcane Machine Emulator"
+#define APPNAME                 "MESS"
+#define APPNAME_LOWER           "mess"
+#define CONFIGNAME              "mess"
+#define APPLONGNAME             "M.E.S.S."
+#define FULLLONGNAME            "Multi Emulator Super System"
 #define CAPGAMENOUN             "MACHINE"
 #define CAPSTARTGAMENOUN        "Machine"
 #define GAMENOUN                "machine"
