@@ -247,8 +247,7 @@ end
 	
 if (_OPTIONS["SOURCES"] == nil) then 	
 	dependency {
-		{ "../../../../generated/mame/mame/drivlist.cpp",  MAME_DIR .. "src/mame/mess.lst", true },
-		{ "../../../../generated/mame/mame/drivlist.cpp" , MAME_DIR .. "src/mame/arcade.lst", true},
+		{ "../../../../generated/mame/mame/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst", true },
 	}
 	custombuildtask {
 		{ MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makelist.py" }, {"@echo Building driver list...",    PYTHON .. " $(1) $(<) > $(@)" }},

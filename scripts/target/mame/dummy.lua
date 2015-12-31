@@ -9,8 +9,7 @@
 --
 ---------------------------------------------------------------------------
 
-dofile("arcade.lua")
-dofile("mess.lua")
+dofile("mame.lua")
 
 function createProjects_mame_dummy(_target, _subtarget)
 	project ("mame_dummy")

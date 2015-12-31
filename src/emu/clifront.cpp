@@ -1695,7 +1695,7 @@ void cli_frontend::execute_commands(const char *exename)
 
 void cli_frontend::display_help()
 {
-	osd_printf_info("%s v%s - %s\n%s\n\n", emulator_info::get_applongname(),build_version,emulator_info::get_fulllongname(),emulator_info::get_copyright_info());
+	osd_printf_info("%s v%s\n%s\n\n", emulator_info::get_appname(),build_version,emulator_info::get_copyright_info());
 	osd_printf_info("%s\n", emulator_info::get_disclaimer());
 	emulator_info::printf_usage(emulator_info::get_appname(),emulator_info::get_gamenoun());
 	osd_printf_info("\n\n"
