@@ -855,9 +855,6 @@ windows_x86: generate $(PROJECTDIR)/gmake-mingw32-gcc/Makefile
 #-------------------------------------------------
 
 $(PROJECTDIR)/gmake-mingw-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef CLANG
-	$(error CLANG is not set)
-endif
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw-clang --gcc_version=$(CLANG_VERSION) gmake
 
 .PHONY: windows_x64_clang
