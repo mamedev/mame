@@ -22,18 +22,6 @@ ToDo:
 #define VDP_CLOCK  XTAL_42_9545MHz
 #include "softlist.h"
 
-struct scrn_reg_t
-{
-	UINT8 gfx_bank;
-	UINT8 disp_bank;
-	UINT8 pcg_mode;
-	UINT8 v400_mode;
-	UINT8 ank_sel;
-
-	UINT8 pri;
-	UINT8 blackclip; // x1 turbo specific
-};
-
 class spc1500_state : public driver_device
 {
 public:
@@ -46,12 +34,15 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_io_kb(*this, "LINE")
 		, m_io_joy(*this, "JOY")
+		, m_dipsw(*this, "DIP_SWITCH")		
 		, m_centronics(*this, "centronics")
 		, m_pio(*this, "ppi8255")
+		, m_sound(*this, "ay8910")
 		, m_palette(*this, "palette")
 	{}
 	DECLARE_WRITE8_MEMBER(mem_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	DECLARE_READ8_MEMBER(psga_r);	
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
 	DECLARE_READ8_MEMBER(mc6845_videoram_r);
@@ -61,9 +52,11 @@ public:
 	DECLARE_WRITE8_MEMBER(paletr_w);
 	DECLARE_WRITE8_MEMBER(paletg_w);
 	DECLARE_WRITE8_MEMBER(priority_w);
+	DECLARE_WRITE8_MEMBER(pcg_w);
 	DECLARE_WRITE8_MEMBER(pcgg_w);
 	DECLARE_WRITE8_MEMBER(pcgb_w);
 	DECLARE_WRITE8_MEMBER(pcgr_w);
+	DECLARE_READ8_MEMBER(pcg_r);
 	DECLARE_READ8_MEMBER(pcgg_r);
 	DECLARE_READ8_MEMBER(pcgb_r);
 	DECLARE_READ8_MEMBER(pcgr_r);
@@ -81,12 +74,6 @@ public:
 	DECLARE_PALETTE_INIT(spc);
 	DECLARE_VIDEO_START(spc);
 	MC6845_UPDATE_ROW(crtc_update_row); 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_pixel(bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height);
-	UINT8 check_prev_height(int x,int y,int x_size);
-	UINT8 check_line_valid_height(int y,int x_size,int height);	
-	//void draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprect);
-	//void draw_gfxbitmap(bitmap_rgb32 &bitmap,const rectangle &cliprect, int plane,int pri);	
 	int priority_mixer_pri(int color);
 private:
 	UINT8 *m_p_ram;
@@ -96,6 +83,8 @@ private:
 //	UINT8 *m_work_ram;
 	attotime m_time;
 	bool m_romsel;
+	bool m_double_mode;
+	bool m_p5bit;
 	UINT8 m_palette_b, m_palette_g, m_palette_r;
 	UINT8 m_crtc_vreg[0x100];
 	bool m_centronics_busy;
@@ -108,20 +97,12 @@ private:
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_ioport_array<10> m_io_kb;
 	required_ioport m_io_joy;
+	required_ioport m_dipsw;
 	required_device<centronics_device> m_centronics;
 	required_device<i8255_device> m_pio;
+	required_device<ay8910_device> m_sound;
 	required_device<palette_device> m_palette;	
-	// std::unique_ptr<UINT8[]> m_tvram;         /**< Pointer for Text Video RAM */
-	// std::unique_ptr<UINT8[]> m_avram;         /**< Pointer for Attribute Video RAM */
-	// std::unique_ptr<UINT8[]> m_kvram;         /**< Pointer for Extended Kanji Video RAM (X1 Turbo) */	
-	// std::unique_ptr<UINT8[]> m_gfx_bitmap_ram;    /**< Pointer for bitmap layer RAM. */
-	// std::unique_ptr<UINT8[]> m_pcg_ram;       /**< Pointer for PCG GFX RAM */		
-	UINT8 *m_font;        /**< Pointer for GFX ROM */
-	UINT8 m_is_turbo;       /**< Machine type: (0) X1 Vanilla, (1) X1 Turbo */
-	int m_xstart,           /**< Start X offset for screen drawing. */
-		m_ystart;           /**< Start Y offset for screen drawing. */
-	UINT8 *m_Hangul_rom;     /**< Pointer for Kanji ROMs */		
-	scrn_reg_t m_scrn_reg;      /**< Base Video Registers. */
+	UINT8 *m_font;        
 	UINT8 m_priority;
 };
 
@@ -183,28 +164,44 @@ WRITE8_MEMBER( spc1500_state::psgb_w)
 	if (m_ipl != ((data>>1)&1))
 	{
 		m_ipl = ((data>>1)&1);
+		membank("bank1")->set_entry(m_ipl ? 0 : 1);
+#if 0		
 		if (m_ipl)
 		{
-//			printf("bank1 -> IOCS\n");
+			printf("bank1 -> IOCS\n");
 			membank("bank1")->set_entry(0);
 		}
 		else
 		{
 			membank("bank1")->set_entry(1);		
-//			printf("bank1 -> basic\n");
+			printf("bank1 -> basic\n");
 		}	
+#endif		
 	}
-//	printf("PSG B port wrote by %d\n", m_ipl);
+	m_cass->set_state(BIT(data, 6) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED);
+	
+	//	printf("PSG B port wrote by %d\n", m_ipl);
 }
 
 WRITE8_MEMBER( spc1500_state::portc_w)
 {
+	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
+	m_centronics->write_strobe(BIT(data, 7));
+	m_double_mode = (!m_p5bit && BIT(data, 5));
+	if (m_double_mode) printf("double access I/O mode\n");
+	m_p5bit = BIT(data, 5);
 	
 }
 
 READ8_MEMBER( spc1500_state::portb_r)
 {
-	return 0;
+	UINT8 data = 0;
+ 	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) && ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED)  ? 0x00 : 0x1;
+ 	data |= (m_dipsw->read() & 1) << 4;
+ 	data |= (m_cass->input() > 0.0038)<<1;
+ 	data |= m_vdg->vsync_r()<<7;
+ 	data &= ~((m_centronics_busy==0)<<3);
+ 	return data;
 }
 
 WRITE8_MEMBER( spc1500_state::crtc_w)
@@ -261,6 +258,15 @@ READ8_MEMBER( spc1500_state::pcgb_r)
 	return 0;
 }
 
+READ8_MEMBER( spc1500_state::pcg_r)
+{
+	return 0;
+}
+WRITE8_MEMBER( spc1500_state::pcg_w)
+{
+	m_priority = data;
+}
+
 WRITE8_MEMBER( spc1500_state::priority_w)
 {
 	m_priority = data;
@@ -284,16 +290,7 @@ WRITE8_MEMBER( spc1500_state::paletr_w)
 	m_palette_r = data;
 }
 
-WRITE8_MEMBER( spc1500_state::double_w)
-{
-	printf("double_w:0x%04x:0x%02x\n", offset, data);
-}
 
-READ8_MEMBER( spc1500_state::double_r)
-{
-//	printf("double_r:0x%04x:0x%02x\n", offset, data);
-	return 0;
-}
 
 
 PALETTE_INIT_MEMBER(spc1500_state,spc)
@@ -340,7 +337,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	bool inv = false;
 	for (i = 0; i < x_count; i++)
 	{
-		UINT8 *pp = &m_p_videoram[0x2000+y*x_count+i];
+		UINT8 *pp = &m_p_videoram[0x2000+(y>>3)*x_count+(y%8)*0x800+i];
 		UINT8 *pv = &m_p_videoram[(y>>4)*x_count + i];
 		UINT8 ascii = *(pv+0x1000);
 		UINT8 attr = *pv;
@@ -357,9 +354,9 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 		UINT8 pixelpen = 0;
 		if (ascii & 0x80)
 		{
-			UINT16 wpixelb = (pixelb << 8) | (*(pp+1));
-			UINT16 wpixelr = (pixelr << 8) | (*(pp+0x4001));
-			UINT16 wpixelg = (pixelg << 8) | (*(pp+0x8001));
+			UINT16 wpixelb = (pixelb << 8) + (*(pp+1));
+			UINT16 wpixelr = (pixelr << 8) + (*(pp+0x4001));
+			UINT16 wpixelg = (pixelg << 8) + (*(pp+0x8001));
 			han2 = *(pv+0x1001);
 			h1 = (ascii>>2)&0x1f;
 			h2 = ((ascii<<3)|(han2>>5))&0x1f;
@@ -422,12 +419,60 @@ int spc1500_state::priority_mixer_pri(int color)
 	return pri_mask_calc;
 }
 
+WRITE8_MEMBER( spc1500_state::double_w)
+{
+	//printf("double_w:0x%04x:0x%02x\n", offset, data);
+	if (m_double_mode)
+	{
+		if (offset < 0x4000) { m_p_videoram[offset] = m_p_videoram[offset + 0x4000] = m_p_videoram[offset + 0x8000] = data; } else
+		if (offset < 0x8000) { m_p_videoram[offset] = m_p_videoram[offset + 0x4000] = data; } else
+		if (offset < 0xc000) { m_p_videoram[offset] = m_p_videoram[offset - 0x8000] = data; } else
+		if (offset < 0x10000){ m_p_videoram[offset - 0xc000] = m_p_videoram[offset + 0x8000] = data; }
+	}
+	else
+	{
+		if (offset < 0x1000) {} else
+		if (offset < 0x1100) { paletb_w(space, offset, data); } else
+		if (offset < 0x1200) { paletr_w(space, offset, data); } else
+		if (offset < 0x1300) { paletg_w(space, offset, data); } else
+		if (offset < 0x1400) { priority_w(space, offset, data); } else
+		if (offset < 0x1800) { pcg_w(space, offset, data); } else
+		if (offset < 0x1900) { crtc_w(space, offset, data); } else
+		if (offset < 0x1a00) {} else
+		if (offset < 0x1b00) { m_pio->write(space, offset, data);} else
+		if (offset < 0x1c00) { m_sound->data_w(space, offset, data);} else
+		if (offset < 0x1d00) { m_sound->address_w(space, offset, data);} else
+		if (offset < 0x1e00) { romsel(space, offset, data);} else
+		if (offset < 0x1f00) { ramsel(space, offset, data);} else
+		if (offset < 0x2000) {} else
+		if (offset < 0x10000) { m_p_videoram[offset-0x2000] = data; };
+	}
+}
+
+READ8_MEMBER( spc1500_state::double_r)
+{
+	//printf("double_r:0x%04x:0x%02x\n", offset, data);
+	if (m_double_mode) printf("double access I/O mode disabled \n");
+	m_double_mode = false;
+	if (offset < 0x1000) {} else 
+	if (offset < 0x1400) {} else
+	if (offset < 0x1800) { return pcg_r(space, offset>>8); } else
+	if (offset < 0x1900) { return crtc_r(space, offset); } else
+	if (offset < 0x1a00) { return keyboard_r(space, offset); } else
+	if (offset < 0x1b00) { return m_pio->read(space, offset); } else
+	if (offset < 0x1c00) { return m_sound->data_r(space, offset); } else
+	if (offset < 0x2000) {} else
+	if (offset < 0x10000){ return m_p_videoram[offset - 0x2000]; }
+	return 0xff;
+}
+
 static ADDRESS_MAP_START( spc1500_double_io , AS_IO, 8, spc1500_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(double_r, double_w)
 	AM_RANGE(0x2000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
+#if 0
 static ADDRESS_MAP_START( spc1500_io , AS_IO, 8, spc1500_state )
 	ADDRESS_MAP_UNMAP_HIGH
 //	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("userio", user_device, userio_r, userio_w)
@@ -457,18 +502,34 @@ static ADDRESS_MAP_START( spc1500_io , AS_IO, 8, spc1500_state )
 	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(ramsel)
 	AM_RANGE(0x2000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
+#endif 
 
 /* Input ports */
 static INPUT_PORTS_START( spc1500 )
+
+ 	PORT_START("DIP_SWITCH") //TODO: implement front-panel DIP-SW here
+ 	PORT_DIPNAME( 0x01, 0x01, "40/80" )
+ 	PORT_DIPSETTING(    0x00, "40COL" )
+ 	PORT_DIPSETTING(    0x01, "80COL" )
+ 	PORT_DIPNAME( 0x02, 0x02, "Language" )
+ 	PORT_DIPSETTING(    0x02, "Korean" )
+ 	PORT_DIPSETTING(    0x00, "English" )
+	PORT_DIPNAME( 0x04, 0x04, "V-Res" )
+ 	PORT_DIPSETTING(    0x04, "400" )
+	PORT_DIPSETTING(    0x00, "200" )
+	PORT_DIPNAME( 0x08, 0x08, "X1" )
+ 	PORT_DIPSETTING(    0x08, "Compatible Mode" )
+	PORT_DIPSETTING(    0x00, "Non Compatible" )
+ 
 	PORT_START("LINE.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) 
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_RSHIFT) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_RCONTROL) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED) 
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_PAUSE)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\\ |") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|') PORT_CHAR(0x1c)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Graph") PORT_CODE(KEYCODE_LALT)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("LINE.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("= +") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+') 
@@ -507,21 +568,21 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Home") PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(0x0e)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F') PORT_CHAR(0x06)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHAR('r')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4 $") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 
 	PORT_START("LINE.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) 
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M') PORT_CHAR(0x0d)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G') PORT_CHAR(0x07)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T') PORT_CHAR(0x14)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5 %") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 
 	PORT_START("LINE.6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) 
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[ {") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{') PORT_CHAR(0x1b)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(0x18)
@@ -531,9 +592,9 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6 ^") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')
 
 	PORT_START("LINE.7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) 
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED) 
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR(0x10)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J') PORT_CHAR(0x0a)
@@ -541,9 +602,9 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7 &") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 
 	PORT_START("LINE.8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED) 
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CODE(KEYCODE_F6)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED) 
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\' \"") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('\"')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K') PORT_CHAR(0x0b)
@@ -554,7 +615,7 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hangul") PORT_CODE(KEYCODE_RALT)    
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("- _") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 )") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 )") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("; :") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR(0x0c)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O') PORT_CHAR(0x0e)
@@ -601,6 +662,8 @@ void spc1500_state::machine_start()
 	membank("bank4")->set_base(m_p_ram + 0x8000);
 	
    	m_time = machine().scheduler().time();	
+	
+	m_double_mode = false;
 }
 
 void spc1500_state::machine_reset()
@@ -611,6 +674,13 @@ void spc1500_state::machine_reset()
 READ8_MEMBER(spc1500_state::mc6845_videoram_r)
 {
 	return m_p_videoram[offset];
+}
+
+READ8_MEMBER( spc1500_state::psga_r )
+{
+	UINT8 data = 0;
+	data |= (BIT(m_dipsw->read(),1)<<4) | (BIT(m_dipsw->read(),2)<<7);
+	return data;
 }
 
 READ8_MEMBER( spc1500_state::porta_r )
@@ -646,8 +716,8 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(spc1500_mem)
+	//MCFG_CPU_IO_MAP(spc1500_io)
 	MCFG_CPU_IO_MAP(spc1500_double_io)
-	MCFG_CPU_IO_MAP(spc1500_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(spc1500_state, irq0_line_hold,  60)
 
 	/* video hardware */
@@ -659,8 +729,8 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 //	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
+	MCFG_SCREEN_SIZE(640, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 400 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update )
 	MCFG_PALETTE_ADD("palette", 8)	
 	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)
@@ -694,7 +764,7 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_4MHz / 2)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(spc1500_state, porta_r))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(spc1500_state, psga_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(spc1500_state, psgb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
