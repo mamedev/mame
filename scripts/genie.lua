@@ -1101,6 +1101,7 @@ configuration { "mingw*" }
 		linkoptions {
 			"-static-libgcc",
 			"-static-libstdc++",
+			"-static",
 		}
 		links {
 			"user32",
