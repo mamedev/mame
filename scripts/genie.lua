@@ -53,6 +53,10 @@ function layoutbuildtask(_folder, _name)
 		{  MAME_DIR .. "scripts/build/file2str.py" }, {"@echo Converting src/".._folder.."/".._name..".lay...",    PYTHON .. " $(1) $(<) $(@) layout_".._name }};
 end
 
+function precompiledheaders()
+	pchheader("emu.h")
+end
+
 function addprojectflags()
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "gcc") and (version >= 50100) then
@@ -456,11 +460,11 @@ language "C++"
 
 flags {
 	"StaticRuntime",
-	"NoPCH",
 }
 
 configuration { "vs*" }
 	flags {
+		"NoPCH",
 		"ExtraWarnings",
 		"NoEditAndContinue",
 		"EnableMinimalRebuild",
@@ -523,6 +527,8 @@ msgresource ("Compiling resources $(subst ../,,$<)...")
 msglinking ("Linking $(notdir $@)...")
 
 msgarchiving ("Archiving $(notdir $@)...")
+
+msgprecompile ("Precompiling $(subst ../,,$<)...")
 
 messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
 
