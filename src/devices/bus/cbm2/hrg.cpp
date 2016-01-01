@@ -26,7 +26,7 @@
 //**************************************************************************
 
 #define EF9365_TAG  "ef9365"
-#define EF9366_TAG  "ef9366"
+#define EF9366_TAG  EF9365_TAG
 #define SCREEN_TAG  "screen"
 
 
@@ -64,14 +64,17 @@ const rom_entry *cbm2_graphic_cartridge_device::device_rom_region() const
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( cbm2_hrg_a )
-/*  MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MCFG_SCREEN_UPDATE_DEVICE(EF9365_TAG, ef9365_device, screen_update)
-    MCFG_SCREEN_SIZE(512, 512)
-    MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-    MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(EF9365_TAG, ef9365_device, screen_update)
+	MCFG_SCREEN_SIZE(512, 512)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
+	MCFG_SCREEN_REFRESH_RATE(25)
 
-    MCFG_EF9365_ADD(EF9365_TAG, gdp_intf)*/
+	MCFG_DEVICE_ADD(EF9365_TAG, EF9365, 1750000)
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	MCFG_EF936X_PALETTE("palette")
+	MCFG_EF936X_BITPLANES_CNT(1);
+	MCFG_EF936X_DISPLAYMODE(EF936X_512x512_DISPLAY_MODE);
 MACHINE_CONFIG_END
 
 
@@ -80,14 +83,17 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( cbm2_hrg_b )
-/*  MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MCFG_SCREEN_UPDATE_DEVICE(EF9366_TAG, ef9366_device, screen_update)
-    MCFG_SCREEN_SIZE(512, 256)
-    MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-    MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(EF9366_TAG, ef9365_device, screen_update)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_REFRESH_RATE(50)
 
-    MCFG_EF9366_ADD(EF9366_TAG, gdp_intf)*/
+	MCFG_DEVICE_ADD(EF9366_TAG, EF9365, 1750000)
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	MCFG_EF936X_PALETTE("palette")
+	MCFG_EF936X_BITPLANES_CNT(1);
+	MCFG_EF936X_DISPLAYMODE(EF936X_512x256_DISPLAY_MODE);
 MACHINE_CONFIG_END
 
 
@@ -119,19 +125,18 @@ machine_config_constructor cbm2_graphic_cartridge_b_device::device_mconfig_addit
 cbm2_graphic_cartridge_device::cbm2_graphic_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_cbm2_expansion_card_interface(mconfig, *this),
+	m_gdc(*this, EF9366_TAG),
 	m_bank3(*this, "bank3")
 {
 }
 
 cbm2_graphic_cartridge_a_device::cbm2_graphic_cartridge_a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	cbm2_graphic_cartridge_device(mconfig, CBM2_HRG_A, "CBM 500/600/700 High Resolution Graphics (A)", tag, owner, clock, "cbm2_hrga", __FILE__)
-	//m_gdc(*this, EF9365_TAG)
 {
 }
 
 cbm2_graphic_cartridge_b_device::cbm2_graphic_cartridge_b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	cbm2_graphic_cartridge_device(mconfig, CBM2_HRG_B, "CBM 500/600/700 High Resolution Graphics (B)", tag, owner, clock, "cbm2_hrgb", __FILE__)
-	//m_gdc(*this, EF9366_TAG)
 {
 }
 
@@ -142,6 +147,8 @@ cbm2_graphic_cartridge_b_device::cbm2_graphic_cartridge_b_device(const machine_c
 
 void cbm2_graphic_cartridge_device::device_start()
 {
+	m_gdc->set_color_entry(0, 0, 0, 0);
+	m_gdc->set_color_entry(1, 0, 0xff, 00);
 }
 
 
@@ -151,7 +158,7 @@ void cbm2_graphic_cartridge_device::device_start()
 
 void cbm2_graphic_cartridge_device::device_reset()
 {
-	//m_gdc->reset();
+	m_gdc->reset();
 }
 
 
@@ -190,7 +197,7 @@ UINT8 cbm2_graphic_cartridge_device::cbm2_bd_r(address_space &space, offs_t offs
 		}
 		else if (offset >= 0x7ff0)
 		{
-			//data = m_gdc->data_r(space, offset & 0x07);
+			data = m_gdc->data_r(space, offset & 0x07);
 		}
 	}
 
@@ -225,7 +232,7 @@ void cbm2_graphic_cartridge_device::cbm2_bd_w(address_space &space, offs_t offse
 		}
 		else if (offset >= 0x7ff0)
 		{
-			//m_gdc->data_w(space, offset & 0x07, data);
+			m_gdc->data_w(space, offset & 0x07, data);
 		}
 	}
 }

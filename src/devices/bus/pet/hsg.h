@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "exp.h"
+#include "video/ef9365.h"
 
 
 
@@ -23,7 +24,7 @@
 // ======================> cbm8000_hsg_t
 
 class cbm8000_hsg_t : public device_t,
-						public device_pet_expansion_card_interface
+					  public device_pet_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -45,7 +46,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	//required_device<ef9365_device> m_gdc;
+	required_device<ef9365_device> m_gdc;
 	required_memory_region m_9000;
 	required_memory_region m_a000;
 };
