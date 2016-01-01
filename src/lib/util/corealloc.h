@@ -91,7 +91,7 @@ extern const zeromem_t zeromem;
 #undef free
 
 #define malloc(x)       malloc_file_line(x, __FILE__, __LINE__, true, false, false)
-//#define realloc(x,y)    __error_realloc_is_dangerous__
+#define realloc(x,y)    __error_realloc_is_dangerous__
 #define free(x)         free_file_line(x, __FILE__, __LINE__, true)
 
 #if !defined(_MSC_VER) || _MSC_VER < 1900 // < VS2015
