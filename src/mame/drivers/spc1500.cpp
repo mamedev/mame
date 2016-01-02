@@ -4,10 +4,217 @@
 
 Samsung SPC-1500 driver by Miso Kim
 
-    2015-12-16 Preliminary driver.
-ToDo:
-
+    2015-12-16 preliminary driver initialized
+	2015-12-18 cassette tape supported
+	2015-12-26 80/40 column mode supported
+	2015-12-28 double access mode supported for I/O 
+	2016-01-02 Korean charater input method and display enabled
+	
+TODO:
+	- Recover color palette after list and width command in basic mode
+	- Support user defined char setting
+	- Support floppy disk drive with SD-1500A controller card
+	
 ****************************************************************************/
+
+/*
+ * SAMSUNG SPC-1500 Series
+ *
+ * Brief history
+ * ---------------------------------------------------------
+ * First release on 02-26-1987
+ * Press release on 03-14-1987
+ * Market price 365,000 won ($430) on 04-01-1987
+
+ Hardware Specification
+ 
+ 1) SPC-1500
+ RAM 122KB
+  - Main Memory: 64KB
+  - Video RAM: 10KB (text 2KB, character attributes 2KB, custom letter: 6KB)
+  - Graphics RAM: 48KB (16KB on three sides by assigning each of RGB)
+ ROM 96KB
+  - BIOS: 32KB (including IPL and a part of BASIC)
+  - BASIC ROM: 32KB (Hangul Samsung BASIC - Korean character display)
+  - English font: 8KB (sizes 8x8 and 8x16 size of each character in ROM)
+  - Hangul fonts: 24KB (head 8KB, middle 8KB, last 8KB)
+
+ Periperials
+  - Built-in cassette deck
+  - 1 composite video output to connect a monitor
+  - 1 TTL output for RGB monitor connection
+  - 1 RF output for TV connection
+  - 1 printer port
+  - 1 joystick port
+
+ Expansion Slots
+  - Built-in 50-pin 3 slot
+  - One is using the memory expansion card by default
+
+ Two external power connector for FDD connection
+  - DIP switch settings for the screen
+  - Volume control
+ 
+ 2) SPC-1500A
+  July 1987 Release
+  RF modulator only remove the product from an existing model
+ 
+ 3) SPC-1500V
+  This product can not confirm the release date because of PCB level modification.
+  It equiped SPC-1500V VLSI chip embedded products and removed a lot of TTLs and the memory expansion card.
+  - IOCS ROM Version: 1.6
+  - Two internal 50-pin expension slots
+ 
+ Firmware
+ 
+  IOCS ROM
+    The various versions with 32KB of capacity existed to date has confirmed the final version number 1.8
+  - Version 1.3:
+  - Version 1.4:
+  - Version 1.5:
+  - Version 1.6:
+  - Version 1.8: supports a variety of peripherals such as external hard disk, FM-Sound, RS-232C from Static soft (C)
+                 various memu appears on the initial screen.
+ 
+  BASIC ROM
+   Capacity and the final version number of the currently identified 32KB 1.3
+ 
+  English ROM
+   The final version of the verification of the capacity 8KB SS150-1222
+   The character set of a 8x8 size, and are stored with the size 8x16 8x16 is a part of the size of the font data are written differently and 8x8.
+ 
+  Hangul ROM
+   8KB each is divided by a consonant and consonant and neutral.
+   - Inital (Choseong)  SS151-1223: 8 types of intial character (actual 6 types)
+   - Middle (Jungseong) SS152-1224: 2 types of middle character
+   - Final  (Jongseong) SS153-1225: 2 types of final character
+  
+  Periperials - Monitor
+   - , high-resolution monitor SM, color monitor model was to distinguish it from CD.
+  
+  1) MD-1255H (Low resolution monitors MD)
+   - 12 inches Composite 15.734KHz / 60Hz
+   - N displayed after the model name in the model is non - CRT scanning products
+   - Stand adopted: if you put the rest on the bottom that can be placed slightly tilted back.
+ 
+  2) MD-9052H (Low resolution monitors MD)
+   - 9 inches Composite 15.734KHz / 60Hz
+   - N from model name means 'anti-glare' 
+   - All parts except for the appearance and size is the same as the CRT 1255H.
+ 
+  3) MD-2563 (color monitor SM)
+  4) SM-1439A (high-resolution monitor SM)
+  5) SM-1422 (high-resolution monitor SM)
+   - RGB monitors
+  6) SM-1231 (high-resolution monitor SM)
+   - High-resolution monochrome monitor
+  7) SM-1231A (high-resolution monitor SM)
+   - The other part is other than the appearance of the stand is attached to the same as the model SM-1231
+ 
+  8) CD-1451D (color monitor SM) 
+   - Composite color monitors
+  9) CD-1462X (color monitor SM)
+  10)CD-1464W (color monitor SM)
+  11)CW-4644 
+ 
+  FDD (floppy disk drive)
+ 
+  1) SD-1500A
+   - 5.25 "floppy drive for 2D composed of external disk drives diskettes
+  2) SD-1500B
+   - Dual external disk drives
+   - The two models are idential except the number of FDD. They need the expension controller card named by SFC-1500.
+   - IBM PC XT compatible FDD can be quipped. SFD-5x0 model is a genuine FDD from Samsung Electronics.
+
+  HDD (Hard Disk Drive)
+ 
+  1) STH-20
+   - External hard disk drive set having a capacity of 20MB SCSI controller and the way
+   - The controller had not solved alone but the controller can be used to mount another hard disk products.
+   - Release price: 450,000 won ($530).
+ 
+  Joysticks
+   - Joystick was limited to 1 as possible (The PCB was designed by supporting two joysticks. 
+ 
+  1) SJ-1500
+   - Release price: 8,000 won ($9.4)
+   - SPC-1000A, MSX-compatible
+ 
+  Printer
+ 
+  1) SP-510S
+   - Bitmap image output method Hangul support
+   - Recommanded 80 columns dot-matrix printer
+  2) SP-570H
+   - Recommanded 132 columns dot-matrix printer
+  3) SP-510L
+  4) SP-510T
+  5) SP-570B
+
+  Expansion Cards
+ 
+  1) SFC-1500
+   - External FDD capacity of the floppy disk controller 5.25 inches / 320KB can connect up to two.
+ 
+  2) Multi-controller
+   - Floppy disk controllers and hard disk controllers on the same PCB.
+ 
+  3) ST-PAC
+   - FM sound card can play with up to 9 simultaneous sound or 5 simultaneous sound and 5 drum tones at the same time (FM-PAC compatible MSX)
+   - Line output and speaker output volume, tone adjustment built-in volume
+   - it can be used as a synthesizer by connecting the ST-KEY2 product 
+   - Release price: 60,000won ($71)
+ 
+  SPC-1500 VDP card
+   - MSX game support 
+   - Release price: 35,000won ($41) with composite output only
+   - Release price: 60,000won ($71) with composite and RGB outputs simultaneously
+ 
+  VDP UNIT I
+   - Composite video output with built-in card expansion card using the same video chip and MSX (static soft)
+   - Release price: 40,000won ($47).
+ 
+  VDP UNIT II
+   - Expansion using the same video chip and video card with built-in card MSX with an RGB output (static soft)
+   - Release price: 55,000won ($59).
+ 
+  LAN card (SAMNET-K)
+   - It uses serial communication instead of an Ethernet network card has a way with two serial ports.
+   - There are two kinds of host card without a DIP switch and the DIP switch is in the client card.
+   - It was mainly supplied to the teacher / student in an educational institution.
+ 
+  Super Pack Card
+   - Expansion cards that enable the external expansion slot, etc.
+ 
+  RS-232C card
+   - At least 300bps, an external modem connected to the serial communication card that supports up to 19,200bps 
+     additionally available communications services using the PSTN network (general switched telephone network) 
+	 and may also be connected to a 9-pin serial mouse.
+   - Support for common serial communications functions, 
+     and if IOCS ROM version 1.8 or higher to connect an external modem to the PC communication card is available.
+   - When used in this communication program is super soft static net programs (XMODEM protocol, FS 220-6 compatible 
+     and supporting Samsung/Sambo combination korean character code, and an 8-bit code completion support Hangul) is used.
+   - Release price: 60,000won ($71).
+ 
+  SS-1 ROM pack unit
+   - The VDP unit containing 1 cartridge slot card and ROM pack
+   - ROM pack was not compatible with original MSX ROM pack
+   - Release price: 49,900won ($58)
+ 
+  Super Pack
+   - External ROM cartrige from Static Soft (C)
+   - 1 cartridge slot and 3 expansion slots (up to five expansion slots available)
+   - It is available to use the MSX ROM packs without any modification with the static soft VDP card
+   - Release price: 60,000won ($71)
+ 
+  ST-KEY2
+   - For synthesizer external keyboard
+ 
+  * Compatiblity with X1 series of Sharp Electronics
+   - Almost the key components is the same as X1 models of Sharp Electronics and except for the keyboard input.
+   - To port the X1 software to SPC-1500, Text attribute, keyboard input and DMA related code should be modified
+   
+*/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -46,7 +253,6 @@ public:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
 	DECLARE_READ8_MEMBER(mc6845_videoram_r);
-	DECLARE_WRITE8_MEMBER(cass_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(paletb_w);
 	DECLARE_WRITE8_MEMBER(paletr_w);
@@ -70,12 +276,11 @@ public:
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(double_w);
-	DECLARE_READ8_MEMBER(double_r);
+	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_PALETTE_INIT(spc);
 	DECLARE_VIDEO_START(spc);
 	MC6845_UPDATE_ROW(crtc_update_row); 
 	MC6845_RECONFIGURE(crtc_reconfig);
-	int priority_mixer_pri(int color);
 private:
 	UINT8 *m_p_ram;
 	UINT8 m_ipl;
@@ -86,6 +291,7 @@ private:
 	bool m_romsel;
 	bool m_double_mode;
 	bool m_p5bit;
+	bool m_motor;
 	UINT8 m_palette_b, m_palette_g, m_palette_r;
 	UINT8 m_crtc_vreg[0x100];
 	bool m_centronics_busy;
@@ -106,17 +312,6 @@ private:
 	UINT8 *m_font;        
 	UINT8 m_priority;
 };
-
-WRITE8_MEMBER( spc1500_state::cass_w )
-{
-	attotime time = machine().scheduler().time();
-	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
-	if (BIT(data, 1) && ATTOSECONDS_IN_MSEC((time - m_time).as_attoseconds()) > 500) {
-		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		m_time = time;
-	}
-	m_centronics->write_strobe(BIT(data, 2) ? true : false);
-}
 
 READ8_MEMBER( spc1500_state::keyboard_r )
 {
@@ -162,34 +357,26 @@ WRITE8_MEMBER( spc1500_state::portb_w)
 
 WRITE8_MEMBER( spc1500_state::psgb_w)
 {
+	attotime time = machine().scheduler().time();
 	if (m_ipl != ((data>>1)&1))
 	{
 		m_ipl = ((data>>1)&1);
 		membank("bank1")->set_entry(m_ipl ? 0 : 1);
-#if 0		
-		if (m_ipl)
-		{
-			printf("bank1 -> IOCS\n");
-			membank("bank1")->set_entry(0);
-		}
-		else
-		{
-			membank("bank1")->set_entry(1);		
-			printf("bank1 -> basic\n");
-		}	
-#endif		
 	}
 	m_cass->set_state(BIT(data, 6) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED);
-	
-	//	printf("PSG B port wrote by %d\n", m_ipl);
+	if (!m_motor && BIT(data, 7) &&  ATTOSECONDS_IN_MSEC((time - m_time).as_attoseconds()) > 500)
+	{
+		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		m_time = time;
+	}
+	m_motor = BIT(data, 7);
 }
 
 WRITE8_MEMBER( spc1500_state::portc_w)
 {
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
 	m_centronics->write_strobe(BIT(data, 7));
-	m_double_mode = (!m_p5bit && BIT(data, 5));
-	if (m_double_mode) printf("double access I/O mode\n");
+	m_double_mode = (!m_p5bit && BIT(data, 5)); // double access I/O mode
 	m_p5bit = BIT(data, 5);
 	
 }
@@ -197,7 +384,7 @@ WRITE8_MEMBER( spc1500_state::portc_w)
 READ8_MEMBER( spc1500_state::portb_r)
 {
 	UINT8 data = 0;
- 	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) && ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED)  ? 0x00 : 0x1;
+ 	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) && ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED)  ? 0x0 : 0x1;
  	data |= (m_dipsw->read() & 1) << 4;
  	data |= (m_cass->input() > 0.0038)<<1;
  	data |= m_vdg->vsync_r()<<7;
@@ -275,24 +462,18 @@ WRITE8_MEMBER( spc1500_state::priority_w)
 
 WRITE8_MEMBER( spc1500_state::paletg_w)
 {
-//	printf("m_palette_g:0x%02x\n", data);
 	m_palette_g = data;
 }
 
 WRITE8_MEMBER( spc1500_state::paletb_w)
 {
-//	printf("m_palette_b:0x%02x\n", data);
 	m_palette_b = data;
 }
 
 WRITE8_MEMBER( spc1500_state::paletr_w)
 {
-//	printf("m_palette_r:0x%02x\n", data);
 	m_palette_r = data;
 }
-
-
-
 
 PALETTE_INIT_MEMBER(spc1500_state,spc)
 {
@@ -306,25 +487,15 @@ PALETTE_INIT_MEMBER(spc1500_state,spc)
 	palette.set_pen_color(7,rgb_t(0xff,0xff,0xff));
 }
 
-/*************************************
- *
- *  Video Functions
- *
- *************************************/
-
 VIDEO_START_MEMBER(spc1500_state, spc)
 {
-	// m_avram = make_unique_clear<UINT8[]>(0x800);
-	// m_tvram = make_unique_clear<UINT8[]>(0x800);
-	// m_kvram = make_unique_clear<UINT8[]>(0x800);
-	// m_gfx_bitmap_ram = make_unique_clear<UINT8[]>(0xc000*2);
+	
 }
 
 MC6845_RECONFIGURE(spc1500_state::crtc_reconfig)
 {
-	printf("reconfig. w:%d, h:%d, %f (%d,%d,%d,%d)\n", width, height, (float)frame_period, visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
-	printf("register. m_vert_disp:%d, m_horiz_disp:%d\n", m_crtc_vreg[6], m_crtc_vreg[1]);
-	//m_vdg->
+//	printf("reconfig. w:%d, h:%d, %f (%d,%d,%d,%d)\n", width, height, (float)frame_period, visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
+//	printf("register. m_vert_disp:%d, m_horiz_disp:%d, m_max_ras_addr:%d, m_vert_char_total:%d\n", m_crtc_vreg[6], m_crtc_vreg[1],  m_crtc_vreg[9], m_crtc_vreg[0x4]);
 }
 
 MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
@@ -339,16 +510,16 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	
 	unsigned char cho[] ={1,1,1,1,1,1,1,1,0,0,1,1,1,3,5,5,0,0,5,3,3,5,5,5,0,0,3,3,5,1};
 	unsigned char jong[]={0,0,0,1,1,1,1,1,0,0,1,1,1,2,2,2,0,0,2,2,2,2,2,2,0,0,2,2,1,1};
-	//printf("ma=%d,y=%d,x_count=%d\n", ma, y, x_count);
-	int n = y & 0xf;
 	bool inv = false;
+	char hs = (m_crtc_vreg[0x4] == 0x1f ? 4 : 3);
+	int n = y & (hs == 4 ? 0x7 : 0xf);
 	for (i = 0; i < x_count; i++)
 	{
 		UINT8 *pp = &m_p_videoram[0x2000+(y>>3)*x_count+((y&7)<<11)+i];
-		UINT8 *pv = &m_p_videoram[(y>>4)*x_count + i];
+		UINT8 *pv = &m_p_videoram[(y>>(hs==3?4:3))*x_count + i];
 		UINT8 ascii = *(pv+0x1000);
 		UINT8 attr = *pv;
-		inv = (attr & 0x8) != 0;
+		inv = (attr & 0x8 ? true : false);
 		UINT8 rgb = (attr & 0x7);
 		UINT8 pal = 1<<rgb;
 		UINT8 pixelb = *(pp+0);
@@ -356,10 +527,8 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 		UINT8 pixelg = *(pp+0x8000);
 		UINT8 pen = (((m_palette_g&pal)>0)<<2)|(((m_palette_r&pal)>0)<<1)|(((m_palette_b&pal)>0));
 		UINT32 color = m_palette->pen(pen);
-//		if (color != 0)
-//			printf("pal:%d, pen:%d, 0x%04x\n", pal, (((m_palette_g&pal)>0)<<2)|(((m_palette_r&pal)>0)<<1)|(((m_palette_b&pal)>0)), color);
 		UINT8 pixelpen = 0;
-		if (ascii & 0x80)
+		if (hs == 3 && ascii & 0x80)
 		{
 			UINT16 wpixelb = (pixelb << 8) + (*(pp+1));
 			UINT16 wpixelr = (pixelr << 8) + (*(pp+0x4001));
@@ -386,7 +555,12 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 		else
 		{
 			//printf("%c", ascii);
-			UINT8 fnt = m_font[0x1000+ascii * 16 + n];
+			UINT8 fnt = m_font[(hs == 3 ? 0x1000 : (attr & (1<<6) ? 0x80<<4 : 0)) + (ascii<<4) + n];
+			if (ascii == 0 && (attr & 0x08) && inv)
+			{
+				fnt = 0xff;
+				color = m_palette->pen(7);
+			}
 			fnt = (inv ? 0xff - fnt : fnt);
 			for (j = 0; j < 8; j++)
 			{
@@ -398,38 +572,8 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	}
 }
 
-
-/*
- * Priority Mixer Calculation (pri)
- *
- * If pri is 0xff then the bitmap entirely covers the tilemap, if it's 0x00 then
- * the tilemap priority is entirely above the bitmap. Any other value mixes the
- * bitmap and the tilemap priorities based on the pen value, bit 0 = entry 0 <-> bit 7 = entry 7
- * of the bitmap.
- *
- */
-int spc1500_state::priority_mixer_pri(int color)
-{
-	int pri_i,pri_mask_calc;
-
-	pri_i = 0;
-	pri_mask_calc = 1;
-
-	while(pri_i < 7)
-	{
-		if((color & 7) == pri_i)
-			break;
-
-		pri_i++;
-		pri_mask_calc<<=1;
-	}
-
-	return pri_mask_calc;
-}
-
 WRITE8_MEMBER( spc1500_state::double_w)
 {
-	//printf("double_w:0x%04x:0x%02x\n", offset, data);
 	if (m_double_mode)
 	{
 		if (offset < 0x4000) { m_p_videoram[offset] = m_p_videoram[offset + 0x4000] = m_p_videoram[offset + 0x8000] = data; } else
@@ -453,14 +597,21 @@ WRITE8_MEMBER( spc1500_state::double_w)
 		if (offset < 0x1e00) { romsel(space, offset, data);} else
 		if (offset < 0x1f00) { ramsel(space, offset, data);} else
 		if (offset < 0x2000) {} else
-		if (offset < 0x10000) { m_p_videoram[offset-0x2000] = data; };
+		if (offset < 0x10000) 
+		{ 
+			if (offset < 0x4000) 
+			{
+				offset &= 0xf7ff;
+				m_p_videoram[offset-0x1800] = m_p_videoram[offset-0x2000] = data;
+			}
+			else
+				m_p_videoram[offset-0x2000] = data; 
+		};
 	}
 }
 
-READ8_MEMBER( spc1500_state::double_r)
+READ8_MEMBER( spc1500_state::io_r)
 {
-	//printf("double_r:0x%04x:0x%02x\n", offset, data);
-	if (m_double_mode) printf("double access I/O mode disabled \n");
 	m_double_mode = false;
 	if (offset < 0x1000) {} else 
 	if (offset < 0x1400) {} else
@@ -470,13 +621,16 @@ READ8_MEMBER( spc1500_state::double_r)
 	if (offset < 0x1b00) { return m_pio->read(space, offset); } else
 	if (offset < 0x1c00) { return m_sound->data_r(space, offset); } else
 	if (offset < 0x2000) {} else
-	if (offset < 0x10000){ return m_p_videoram[offset - 0x2000]; }
+	if (offset < 0x10000){ 
+		if (offset < 0x4000)
+			offset &= 0xf7ff;
+		return m_p_videoram[offset - 0x2000]; }
 	return 0xff;
 }
 
 static ADDRESS_MAP_START( spc1500_double_io , AS_IO, 8, spc1500_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(double_r, double_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_r, double_w)
 	AM_RANGE(0x2000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
@@ -516,7 +670,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( spc1500 )
 
  	PORT_START("DIP_SWITCH") //TODO: implement front-panel DIP-SW here
- 	PORT_DIPNAME( 0x01, 0x01, "40/80" )
+ 	PORT_DIPNAME( 0x01, 0x00, "40/80" )
  	PORT_DIPSETTING(    0x00, "40COL" )
  	PORT_DIPSETTING(    0x01, "80COL" )
  	PORT_DIPNAME( 0x02, 0x02, "Language" )
@@ -630,13 +784,12 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9 (") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
 
 	PORT_START("JOY")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED) // Button 2?
-	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED) // Cassette related
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT(0x50, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 WRITE8_MEMBER( spc1500_state::mem_w )
@@ -669,14 +822,13 @@ void spc1500_state::machine_start()
 	membank("bank2")->set_base(m_p_ram);
 	membank("bank4")->set_base(m_p_ram + 0x8000);
 	
-   	m_time = machine().scheduler().time();	
-	
-	m_double_mode = false;
 }
 
 void spc1500_state::machine_reset()
 {
-	//m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
+	m_motor = false;
+   	m_time = machine().scheduler().time();	
+	m_double_mode = false;
 }
 
 READ8_MEMBER(spc1500_state::mc6845_videoram_r)
@@ -696,29 +848,15 @@ READ8_MEMBER( spc1500_state::porta_r )
 	UINT8 data = 0x3f;
 	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;
 	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) && ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED)  ? 0x00 : 0x40;
-	data &= ~(m_io_joy->read() & 0x3f);
+	data |= (m_io_joy->read() & 0x6f);
 	data &= ~((m_centronics_busy == 0)<< 5);
 	return data;
 }
 
-// irq is inverted in emulation, so we need this trampoline
 WRITE_LINE_MEMBER( spc1500_state::irq_w )
 {
 	m_maincpu->set_input_line(0, state ? CLEAR_LINE : HOLD_LINE);
 }
-
-
-// /* decoded for debugging purpose, this will be nuked in the end... */
-// static GFXDECODE_START( x1 )
-	// GFXDECODE_ENTRY( "cgrom",   0x00000, x1_chars_8x8,    0, 1 )
-	// GFXDECODE_ENTRY( "font",    0x00000, x1_chars_8x16,   0, 1 )
-	// GFXDECODE_ENTRY( "kanji",   0x00000, x1_chars_16x16,  0, 1 )
-// GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0, 1 )
-// GFXDECODE_END
-
-//-------------------------------------------------
-//  address maps
-//-------------------------------------------------
 
 static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	/* basic machine hardware */
@@ -731,10 +869,6 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	/* video hardware */
 	
 	MCFG_SCREEN_ADD("screen", RASTER)
-//	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
-//	MCFG_SCREEN_SIZE(640, 200)
-//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-//	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 400)
@@ -748,20 +882,7 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(spc1500_state, crtc_update_row)
 	MCFG_MC6845_RECONFIGURE_CB(spc1500_state, crtc_reconfig)
-
-	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", spc)
-
 	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)	
-#if 0
-	MCFG_MC6845_ADD("mc6845", H46505, "screen", XTAL_14_31818MHz/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(spc1500_state, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(spc1500_state, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(spc1500_state, vsync_changed))
-	MCFG_MC6845_RECONFIGURE_CB(spc1500_state, reconfigure)
-	MCFG_VIDEO_SET_SCREEN(nullptr)
-#endif
 	
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(spc1500_state, porta_w))
@@ -769,8 +890,6 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(spc1500_state, portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(spc1500_state, portc_w))
 	
-	// other lines not connected
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_4MHz / 2)
@@ -799,7 +918,7 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( spc1500 )
 	ROM_REGION(0x8000, "ipl", ROMREGION_ERASEFF)
-	ROM_LOAD("ipl.rom", 0x0000, 0x8000, CRC(d0e8e579) SHA1(d044dc67128a4a8143bc716965c40c34ac8ead2c))
+	ROM_LOAD("ipl.rom", 0x0000, 0x8000, CRC(80d0704a) SHA1(01e4cbe8baad72effbbe01addd477c5b0ec85c16))
 	ROM_REGION(0x8000, "basic", ROMREGION_ERASEFF)
 	ROM_LOAD("basic.rom", 0x0000, 0x8000, CRC(f48328e1) SHA1(fb874ea7d20078726682f2d0e03ea0d1f8bdbb07))
 	ROM_REGION(0x8000, "font1", 0) 
