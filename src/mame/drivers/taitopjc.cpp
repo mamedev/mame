@@ -106,7 +106,8 @@ public:
 		m_dsp(*this, "dsp"),
 		m_tc0780fpa(*this, "tc0780fpa"),
 		m_palette(*this, "palette"),
-		m_polyrom(*this, "poly")
+		m_polyrom(*this, "poly"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -116,6 +117,7 @@ public:
 	required_device<tc0780fpa_device> m_tc0780fpa;
 	required_device<palette_device> m_palette;
 	required_memory_region m_polyrom;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_READ64_MEMBER(video_r);
 	DECLARE_WRITE64_MEMBER(video_w);
@@ -141,6 +143,9 @@ public:
 	void videochip_w(offs_t address, UINT32 data);
 	void video_exit();
 	void print_display_list();
+	TILE_GET_INFO_MEMBER(tile_get_info);
+	TILEMAP_MAPPER_MEMBER(tile_scan_layer0);
+	TILEMAP_MAPPER_MEMBER(tile_scan_layer1);
 
 	DECLARE_DRIVER_INIT(optiger);
 
@@ -149,6 +154,8 @@ public:
 
 	std::unique_ptr<UINT32[]> m_screen_ram;
 	std::unique_ptr<UINT32[]> m_pal_ram;
+
+	tilemap_t *m_tilemap[2];
 
 	UINT32 m_video_address;
 
@@ -183,49 +190,65 @@ void taitopjc_state::video_exit()
 #endif
 }
 
+TILE_GET_INFO_MEMBER(taitopjc_state::tile_get_info)
+{
+	UINT32 val = m_screen_ram[0x3f000 + (tile_index/2)];
+
+	if (!(tile_index & 1))
+		val >>= 16;
+
+	int color = (val >> 12) & 0xf;
+	int tile = (val & 0xfff);
+	int flags = 0;
+
+	SET_TILE_INFO_MEMBER(0, tile, color, flags);
+}
+
+TILEMAP_MAPPER_MEMBER(taitopjc_state::tile_scan_layer0)
+{
+	/* logical (col,row) -> memory offset */
+	return (row * 64) + col;
+}
+
+TILEMAP_MAPPER_MEMBER(taitopjc_state::tile_scan_layer1)
+{
+	/* logical (col,row) -> memory offset */
+	return (row * 64) + col + 32;
+}
+
 void taitopjc_state::video_start()
 {
+	static const gfx_layout char_layout =
+	{
+		16, 16,
+		4032,
+		8,
+		{ 0,1,2,3,4,5,6,7 },
+		{ 3*8, 2*8, 1*8, 0*8, 7*8, 6*8, 5*8, 4*8, 11*8, 10*8, 9*8, 8*8, 15*8, 14*8, 13*8, 12*8 },
+		{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
+		8*256
+	};
+
 	m_screen_ram = std::make_unique<UINT32[]>(0x40000);
 	m_pal_ram = std::make_unique<UINT32[]>(0x8000);
+
+	m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taitopjc_state::tile_get_info),this), tilemap_mapper_delegate(FUNC(taitopjc_state::tile_scan_layer0),this), 16, 16, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taitopjc_state::tile_get_info),this), tilemap_mapper_delegate(FUNC(taitopjc_state::tile_scan_layer1),this), 16, 16, 32, 32);
+	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[1]->set_transparent_pen(1);
+	
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, char_layout, (UINT8*)m_screen_ram.get(), 0, m_palette->entries() / 256, 0));
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitopjc_state::video_exit), this));
 }
 
 UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *s = (UINT8*)m_screen_ram.get();
-	int x,y,t,u;
-
 	bitmap.fill(0x000000, cliprect);
 
-	UINT16 *s16 = (UINT16*)m_screen_ram.get();
-
-	for (u=0; u < 24; u++)
-	{
-		for (t=0; t < 32; t++)
-		{
-			UINT16 tile = s16[(0x7e000 + (u*64) + t) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
-
-			int palette = (tile >> 12) & 0xf;
-
-			tile &= 0xfff;
-
-			for (y=0; y < 16; y++)
-			{
-				UINT16 *fb = &bitmap.pix16(y+(u*16));
-				for (x=0; x < 16; x++)
-				{
-					UINT8 p = s[((tile*256) + ((y*16)+x)) ^ NATIVE_ENDIAN_VALUE_LE_BE(3,0)];
-					if (p != 0)
-					{
-						fb[x+(t*16)] = (palette << 8) + p;
-					}
-				}
-			}
-		}
-	}
-
 	m_tc0780fpa->draw(bitmap, cliprect);
+
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0);
 
 	return 0;
 }
@@ -255,7 +278,19 @@ void taitopjc_state::videochip_w(offs_t address, UINT32 data)
 	}
 	else if (address >= 0x10000000 && address < 0x10040000)
 	{
-		m_screen_ram[address - 0x10000000] = data;
+		UINT32 addr = address - 0x10000000;
+		m_screen_ram[addr] = data;
+		
+		if (address >= 0x1003f000)
+		{
+			UINT32 a = address - 0x1003f000;
+			m_tilemap[0]->mark_tile_dirty((a*2));
+			m_tilemap[0]->mark_tile_dirty((a*2)+1);
+		}
+		else
+		{
+			m_gfxdecode->gfx(0)->mark_dirty(addr / 64);
+		}
 	}
 	else
 	{
@@ -753,6 +788,8 @@ static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 
 	MCFG_PALETTE_ADD("palette", 32768)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+
 	MCFG_DEVICE_ADD("tc0780fpa", TC0780FPA, 0)
 
 MACHINE_CONFIG_END
@@ -765,6 +802,12 @@ DRIVER_INIT_MEMBER(taitopjc_state, optiger)
 	// skip sound check
 	rom[0x217] = 0x00;
 	rom[0x218] = 0x00;
+
+#if 0
+	UINT32 *mr = (UINT32*)memregion("user1")->base();
+	//mr[(0x23a5c^4)/4] = 0x60000000;
+	mr[((0x513b0-0x40000)^4)/4] = 0x38600001;
+#endif
 }
 
 
