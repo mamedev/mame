@@ -212,21 +212,26 @@ bool tms32051_device::GET_ZLVC_CONDITION(int zlvc, int zlvc_mask)
 		if (((zlvc & 0x1) == 0) && m_st1.c != 0)		// NC
 			return false;
 	}
-	if (zlvc_mask & 0x8)			// Z-bit
-	{
-		if ((zlvc & 0x8) && (INT32)(m_acc) != 0)			// EQ
-			return false;
-		if (((zlvc & 0x8) == 0) && (INT32)(m_acc) == 0)	// NEQ
-			return false;
-	}
-	if (zlvc_mask & 0x4)			// L-bit
-	{
-		if ((zlvc & 0x4) && (INT32)(m_acc) >= 0)			// LT
-			return false;
-		if (((zlvc & 0x4) == 0) && (INT32)(m_acc) <= 0)	// GT
-			return false;
-	}
 
+	switch ((zlvc_mask & 0xc) | ((zlvc >> 2) & 0x3))
+	{
+		case 0x00: break;											// MZ=0, ML=0, Z=0, L=0
+		case 0x01: break;											// MZ=0, ML=0, Z=0, L=1
+		case 0x02: break;											// MZ=0, ML=0, Z=1, L=0
+		case 0x03: break;											// MZ=0, ML=0, Z=1, L=1
+		case 0x04: if ((INT32)(m_acc) <= 0) return false; break;		// MZ=0, ML=1, Z=0, L=0  (GT)
+		case 0x05: if ((INT32)(m_acc) >= 0) return false; break;		// MZ=0, ML=1, Z=0, L=1  (LT)
+		case 0x06: if ((INT32)(m_acc) <= 0) return false; break;		// MZ=0, ML=1, Z=1, L=0  (GT)
+		case 0x07: if ((INT32)(m_acc) >= 0) return false; break;		// MZ=0, ML=1, Z=1, L=1  (LT)
+		case 0x08: if ((INT32)(m_acc) == 0) return false; break;		// MZ=1, ML=0, Z=0, L=0  (NEQ)
+		case 0x09: if ((INT32)(m_acc) == 0) return false; break;		// MZ=1, ML=0, Z=0, L=1  (NEQ)
+		case 0x0a: if ((INT32)(m_acc) != 0) return false; break;		// MZ=1, ML=0, Z=1, L=0  (EQ)
+		case 0x0b: if ((INT32)(m_acc) != 0) return false; break;		// MZ=1, ML=0, Z=1, L=1  (EQ)
+		case 0x0c: if ((INT32)(m_acc) <= 0) return false; break;		// MZ=1, ML=1, Z=0, L=0  (GT)
+		case 0x0d: if ((INT32)(m_acc) >= 0) return false; break;		// MZ=1, ML=1, Z=0, L=1  (LT)
+		case 0x0e: if ((INT32)(m_acc) < 0) return false;	 break;		// MZ=1, ML=1, Z=1, L=0  (GEQ)
+		case 0x0f: if ((INT32)(m_acc) > 0) return false;	 break;		// MZ=1, ML=1, Z=1, L=1  (LEQ)
+	}
 	return true;
 }
 
