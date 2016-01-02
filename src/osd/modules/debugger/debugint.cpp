@@ -452,10 +452,10 @@ static void dview_draw_hsb(DView *dv)
 
 static void dview_draw_vsb(DView *dv)
 {
-	int vt;
-	int ts;
+	INT64 vt;
+	INT64 ts;
 	//int sz = SLIDER_SIZE;
-	int sz;
+	INT64 sz;
 	rectangle r;
 	adjustment *sb = &dv->vsb;
 
@@ -788,6 +788,7 @@ static void dview_size_allocate(DView *dv)
 	debug_view_xy size, pos, col, vsize;
 	render_container::user_settings rcus;
 	rectangle r;
+	std::string title;
 
 	dv->container->get_user_settings(rcus);
 	rcus.m_xoffset = (float) dv->ofs_x / (float) dv->rt_width;
@@ -805,7 +806,7 @@ static void dview_size_allocate(DView *dv)
 	dview_get_rect(dv, RECT_DVIEW_CLIENT, r);
 
 	dv->hsb.visible = (size.x * debug_font_width > r.width() ? 1 : 0);
-	dv->vsb.visible = (size.y * debug_font_height > r.height() ? 1 : 0);
+	dv->vsb.visible = ((INT64)size.y * (INT64)debug_font_height > r.height() ? 1 : 0);
 	dview_get_rect(dv, RECT_DVIEW_CLIENT, r);
 
 //  dv->hsb.visible = (size.x * debug_font_width > r.width() ? 1 : 0);
