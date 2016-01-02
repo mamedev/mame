@@ -84,6 +84,7 @@ private:
 	// output helpers
 	void build_output_prefix(std::string &str);
 	void output_via_delegate(osd_output_channel channel, const char *format, ...) ATTR_PRINTF(3,4);
+	void output_indented_errors(std::string &text, const char *header);
 
 	// internal driver list
 	driver_enumerator       m_drivlist;
