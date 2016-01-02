@@ -829,6 +829,9 @@ endif
 
 .PHONY: windows_x64
 windows_x64: generate $(PROJECTDIR)/gmake-mingw64-gcc/Makefile
+ifndef MINGW64
+	$(error MINGW64 is not set)
+endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES) 
 
@@ -847,6 +850,9 @@ endif
 
 .PHONY: windows_x86
 windows_x86: generate $(PROJECTDIR)/gmake-mingw32-gcc/Makefile
+ifndef MINGW32
+	$(error MINGW32 is not set)
+endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw32-gcc config=$(CONFIG)32 WINDRES=$(WINDRES) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw32-gcc config=$(CONFIG)32 WINDRES=$(WINDRES)
 
