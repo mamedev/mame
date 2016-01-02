@@ -40,6 +40,9 @@ public:
 	int errors() const { return m_errors; }
 	int warnings() const { return m_warnings; }
 
+	// setter
+	void set_verbose(bool verbose) { m_print_verbose = verbose; }
+
 	// operations
 	void check_driver(const game_driver &driver);
 	void check_shared_source(const game_driver &driver);
@@ -88,8 +91,10 @@ private:
 	// error tracking
 	int                     m_errors;
 	int                     m_warnings;
+	bool                    m_print_verbose;
 	std::string             m_error_text;
 	std::string             m_warning_text;
+	std::string             m_verbose_text;
 
 	// maps for finding duplicates
 	game_driver_map         m_names_map;

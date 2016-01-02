@@ -125,6 +125,7 @@ validity_checker::validity_checker(emu_options &options)
 	: m_drivlist(options),
 		m_errors(0),
 		m_warnings(0),
+		m_print_verbose(options.verbose()),
 		m_current_driver(nullptr),
 		m_current_config(nullptr),
 		m_current_device(nullptr),
@@ -194,19 +195,15 @@ bool validity_checker::check_all()
 	validate_inlines();
 
 	// if we had warnings or errors, output
-	if (m_errors > 0 || m_warnings > 0)
+	if (m_errors > 0 || m_warnings > 0 || !m_verbose_text.empty())
 	{
 		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Core: %d errors, %d warnings\n", m_errors, m_warnings);
 		if (m_errors > 0)
-		{
-			strreplace(m_error_text, "\n", "\n   ");
-			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Errors:\n   %s", m_error_text.c_str());
-		}
+			output_indented_errors(m_error_text, "Errors");
 		if (m_warnings > 0)
-		{
-			strreplace(m_warning_text, "\n", "\n   ");
-			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Warnings:\n   %s", m_warning_text.c_str());
-		}
+			output_indented_errors(m_warning_text, "Warnings");
+		if (!m_verbose_text.empty())
+			output_indented_errors(m_verbose_text, "Messages");
 		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "\n");
 	}
 
@@ -277,6 +274,7 @@ void validity_checker::validate_one(const game_driver &driver)
 	int start_warnings = m_warnings;
 	m_error_text.clear();
 	m_warning_text.clear();
+	m_verbose_text.clear();
 
 	// wrap in try/except to catch fatalerrors
 	try
@@ -295,20 +293,16 @@ void validity_checker::validate_one(const game_driver &driver)
 	}
 
 	// if we had warnings or errors, output
-	if (m_errors > start_errors || m_warnings > start_warnings)
+	if (m_errors > start_errors || m_warnings > start_warnings || !m_verbose_text.empty())
 	{
 		std::string tempstr;
 		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): %d errors, %d warnings\n", driver.name, core_filename_extract_base(tempstr, driver.source_file).c_str(), m_errors - start_errors, m_warnings - start_warnings);
 		if (m_errors > start_errors)
-		{
-			strreplace(m_error_text, "\n", "\n   ");
-			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Errors:\n   %s", m_error_text.c_str());
-		}
+			output_indented_errors(m_error_text, "Errors");
 		if (m_warnings > start_warnings)
-		{
-			strreplace(m_warning_text, "\n", "\n   ");
-			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Warnings:\n   %s", m_warning_text.c_str());
-		}
+			output_indented_errors(m_warning_text, "Warnings");
+		if (!m_verbose_text.empty())
+			output_indented_errors(m_verbose_text, "Messages");
 		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "\n");
 	}
 
@@ -1088,6 +1082,17 @@ void validity_checker::output_callback(osd_output_channel channel, const char *m
 			// generate the string and output to the original target
 			strcatvprintf(output, msg, args);
 			m_warning_text.append(output);
+			break;
+		case OSD_OUTPUT_CHANNEL_VERBOSE:
+			// if we're not verbose, skip it
+			if (!m_print_verbose) break;
+
+			// output the source(driver) device 'tag'
+			build_output_prefix(output);
+
+			// generate the string and output to the original target
+			strcatvprintf(output, msg, args);
+			m_verbose_text.append(output);
 			break;
 		default:
 			chain_output(channel, msg, args);
