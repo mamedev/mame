@@ -221,13 +221,11 @@ WRITE16_MEMBER(tispellb_state::rev2_write_r)
 	// R12: TMC0355 CS
 	// R4: TMC0355 M1
 	// R6: TMC0355 M0
-	if (data & 0x1000)
-	{
-		m_tms6100->m1_w(data >> 4 & 1);
-		m_tms6100->m0_w(data >> 6 & 1);
-		m_tms6100->romclock_w(1);
-		m_tms6100->romclock_w(0);
-	}
+	m_tms6100->cs_w(data >> 12 & 1);
+	m_tms6100->m1_w(data >> 4 & 1);
+	m_tms6100->m0_w(data >> 6 & 1);
+	m_tms6100->clk_w(1);
+	m_tms6100->clk_w(0);
 
 	// rest is same as rev1
 	main_write_r(space, offset, data);
@@ -371,7 +369,7 @@ static MACHINE_CONFIG_START( rev2, tispellb_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispellb_state, rev2_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispellb_state, rev2_write_r))
 	MCFG_TMS0270_READ_CTL_CB(DEVREAD8("tms6100", tms6100_device, data_r))
-	MCFG_TMS0270_WRITE_CTL_CB(DEVWRITE8("tms6100", tms6100_device, addr_w))
+	MCFG_TMS0270_WRITE_CTL_CB(DEVWRITE8("tms6100", tms6100_device, add_w))
 
 	MCFG_DEVICE_ADD("tms6100", TMS6100, 350000)
 	MCFG_TMS6100_4BIT_MODE()

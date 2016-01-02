@@ -120,7 +120,7 @@ WRITE_LINE_MEMBER(tms6100_device::rck_w)
 	m_rck = (state) ? 1 : 0;
 }
 
-WRITE8_MEMBER(tms6100_device::addr_w)
+WRITE8_MEMBER(tms6100_device::add_w)
 {
 	m_add = data & 0xf;
 }
@@ -136,7 +136,7 @@ READ_LINE_MEMBER(tms6100_device::data_line_r)
 	return (m_data & 8) ? 1 : 0;
 }
 
-WRITE_LINE_MEMBER(tms6100_device::romclock_w)
+WRITE_LINE_MEMBER(tms6100_device::clk_w)
 {
 	// process on falling edge
 	if (m_clk && !m_rck && !state)

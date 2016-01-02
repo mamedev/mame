@@ -917,9 +917,9 @@ static MACHINE_CONFIG_FRAGMENT( tms5110_route )
 	/* sound hardware */
 	MCFG_TMS5110_M0_CB(DEVWRITELINE("tms6100", tms6100_device, m0_w))
 	MCFG_TMS5110_M1_CB(DEVWRITELINE("tms6100", tms6100_device, m1_w))
-	MCFG_TMS5110_ADDR_CB(DEVWRITE8("tms6100", tms6100_device, addr_w))
+	MCFG_TMS5110_ADDR_CB(DEVWRITE8("tms6100", tms6100_device, add_w))
 	MCFG_TMS5110_DATA_CB(DEVREADLINE("tms6100", tms6100_device, data_line_r))
-	MCFG_TMS5110_ROMCLK_CB(DEVWRITELINE("tms6100", tms6100_device, romclock_w))
+	MCFG_TMS5110_ROMCLK_CB(DEVWRITELINE("tms6100", tms6100_device, clk_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
