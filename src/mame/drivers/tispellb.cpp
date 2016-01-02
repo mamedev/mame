@@ -51,7 +51,6 @@
 
   TODO:
   - spellb fetches wrong word sometimes (on lv1 SPOON and ANT) - roms were doublechecked
-  - mrchalgr wrong sound, need more accurate tms6100 emulation
 
 
 ***************************************************************************/
@@ -428,7 +427,7 @@ ROM_START( mrchalgr )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_mrchalgr_output.pla", 0, 1246, CRC(4785289c) SHA1(60567af0ea120872a4ccf3128e1365fe84722aa8) )
 
-	ROM_REGION( 0x4000, "tms6100", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "tms6100", 0 )
 	ROM_LOAD( "cd2601.vsm", 0x0000, 0x1000, CRC(a9fbe7e9) SHA1(9d480cb30313b8cbce2d048140c1e5e6c5b92452) )
 ROM_END
 
