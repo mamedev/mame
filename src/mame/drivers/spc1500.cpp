@@ -8,7 +8,7 @@ Samsung SPC-1500 driver by Miso Kim
 	2015-12-18 cassette tape supported
 	2015-12-26 80/40 column mode supported
 	2015-12-28 double access mode supported for I/O 
-	2016-01-02 Korean charater input method and display enabled
+	2016-01-02 Korean character input method and display enabled
 	
 TODO:
 	- Recover color palette after list and width command in basic mode
@@ -933,4 +933,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 1984, spc1500,  0,      0,       spc1500,   spc1500, driver_device,  0,   "Samsung", "SPC-1500", MACHINE_NOT_WORKING )
+COMP( 1987, spc1500,  0,      0,       spc1500,   spc1500, driver_device,  0,   "Samsung", "SPC-1500", MACHINE_NOT_WORKING )
