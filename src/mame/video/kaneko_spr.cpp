@@ -322,12 +322,15 @@ void kaneko16_sprite_device::kaneko16_draw_sprites_custom(_BitmapClass &dest_bmp
 					int c = source[x_index >> 16];
 					if (c != 0)
 					{
-						if (pri[x] < priority)
+						// If we haven't drawn a sprite here yet, do so.
+						if (!(pri[x] & 0x10))
 						{
-							if (!rgb) dest[x] = pen_base + c;
-							else dest[x] = pal[pen_base + c];
-
-							pri[x] = 0xff; // mark it "already drawn"
+							if (pri[x] < priority) {
+								if (!rgb) dest[x] = pen_base + c;
+								else dest[x] = pal[pen_base + c];
+							}
+							// Mark that we (tried to) draw a sprite.
+							pri[x] |= 0x10;
 						}
 					}
 					x_index += dx;

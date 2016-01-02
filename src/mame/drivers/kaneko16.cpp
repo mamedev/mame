@@ -371,7 +371,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( blazeon, AS_PROGRAM, 16, kaneko16_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM     // ROM
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM     // ROM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM     // Work RAM
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
@@ -772,6 +772,29 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
+                                    Wing Force
+***************************************************************************/
+
+static ADDRESS_MAP_START( wingforc_soundmem, AS_PROGRAM, 8, kaneko16_state )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM     // ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM     // RAM
+ADDRESS_MAP_END
+
+WRITE8_MEMBER(kaneko16_state::wingforc_oki_bank_sw)
+{
+	m_oki->set_bank_base(0x40000 * (data & 0x7));
+}
+
+static ADDRESS_MAP_START( wingforc_soundport, AS_IO, 8, kaneko16_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x0a, 0x0a) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(wingforc_oki_bank_sw)
+ADDRESS_MAP_END
+
+
+/***************************************************************************
 
 
                                 Input Ports
@@ -975,6 +998,100 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( blazeon )
+	PORT_START("DSW2_P1")       /* c00000.w */
+	PORT_DIPNAME( 0x0003,  0x0003, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(       0x0002, DEF_STR( Easy ) )
+	PORT_DIPSETTING(       0x0003, DEF_STR( Normal ) )
+	PORT_DIPSETTING(       0x0001, DEF_STR( Hard ) )
+	PORT_DIPSETTING(       0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x000c,  0x000c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(       0x0000, "2" )
+	PORT_DIPSETTING(       0x000c, "3" )
+	PORT_DIPSETTING(       0x0008, "4" )
+	PORT_DIPSETTING(       0x0004, "5" )
+	PORT_DIPNAME( 0x0010,  0x0010, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(       0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(       0x0010, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW2:6" ) /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:7" ) /* Listed as "Unused" */
+	PORT_SERVICE_DIPLOC(   0x0080, IP_ACTIVE_LOW, "SW2:8" )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+
+	PORT_START("DSW1_P2")       /* c00002.w */
+	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(      0x0007, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0005, "6 Coins/3 Credits" )
+	PORT_DIPSETTING(      0x0009, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(      0x000f, DEF_STR( 1C_1C ) )
+//  PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0003, "5 Coins/6 Credits" )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 4C_5C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_3C ) )
+//  PORT_DIPSETTING(      0x0001, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x000e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x000d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x000b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x000a, DEF_STR( 1C_6C ) )
+
+	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(      0x0070, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0050, "6 Coins/3 Credits" )
+	PORT_DIPSETTING(      0x0090, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(      0x00f0, DEF_STR( 1C_1C ) )
+//  PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0030, "5 Coins/6 Credits" )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 4C_5C ) )
+	PORT_DIPSETTING(      0x0060, DEF_STR( 2C_3C ) )
+//  PORT_DIPSETTING(      0x0010, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x00e0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x00d0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x00b0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_6C ) )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
+
+	PORT_START("UNK")           /* ? - c00004.w */
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
+
+	PORT_START("SYSTEM")        /* c00006.w */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_LOW )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 )
+INPUT_PORTS_END
+
+/***************************************************************************
+                                    Wing Force
+***************************************************************************/
+
+// Board only has one DIP bank, but which one of these is it?
+// The program does try to read from both.
+static INPUT_PORTS_START( wingforc )
 	PORT_START("DSW2_P1")       /* c00000.w */
 	PORT_DIPNAME( 0x0003,  0x0003, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(       0x0002, DEF_STR( Easy ) )
@@ -1735,6 +1852,7 @@ GFXDECODE_END
 
 
 
+
 /***************************************************************************
 
 
@@ -1948,6 +2066,72 @@ static MACHINE_CONFIG_START( blazeon, kaneko16_state )
 	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
+
+
+/***************************************************************************
+                                    Wing Force
+***************************************************************************/
+
+/*
+    Wing Force:
+        1]      busy loop
+        2]      rte
+        3]      rte
+        4]      drives the game
+        5]      rte
+        6]      busy loop
+        7]      busy loop
+*/
+
+static MACHINE_CONFIG_START( wingforc, kaneko16_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000,XTAL_16MHz)    /* TMP68HC000-16, may actually be 13.333 */
+	MCFG_CPU_PROGRAM_MAP(blazeon)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
+
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)   /* D780C-2, not verified */
+	MCFG_CPU_PROGRAM_MAP(wingforc_soundmem)
+	MCFG_CPU_IO_MAP(wingforc_soundport)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1-16)
+	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+
+	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
+	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
+	kaneko_view2_tilemap_device::set_offset(*device, 0x33, 0x9, 320, 240);
+	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+
+	MCFG_DEVICE_ADD_VU002_SPRITES
+	kaneko16_sprite_device::set_priorities(*device, 2,3,5,7);
+	kaneko16_sprite_device::set_offsets(*device, 0x10000 - 0x680, 0x000);
+	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
+
+	// there is actually a 2nd sprite chip! looks like our device emulation handles both at once
+
+	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -2377,6 +2561,7 @@ DRIVER_INIT_MEMBER( kaneko16_state, samplebank )
 
 
 
+
 /***************************************************************************
 
                                 Bakuretsu Breaker
@@ -2745,9 +2930,10 @@ CUSTOM:       KANEKO VU-002 x2
 ***************************************************************************/
 
 ROM_START( blazeon )
-	ROM_REGION( 0x080000, "maincpu", 0 )            /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )            /* 68000 Code */
 	ROM_LOAD16_BYTE( "bz_prg1.u80", 0x000000, 0x040000, CRC(8409e31d) SHA1(a9dfc299f4b457df190314401aef309adfaf9bae) )
 	ROM_LOAD16_BYTE( "bz_prg2.u81", 0x000001, 0x040000, CRC(b8a0a08b) SHA1(5f275b98d3e49a834850b45179d26e8c2f9fd604) )
+	ROM_COPY( "maincpu", 0x000000, 0x080000, 0x080000)
 
 	ROM_REGION( 0x020000, "audiocpu", 0 )           /* Z80 Code */
 	ROM_LOAD( "3.u45", 0x000000, 0x020000, CRC(52fe4c94) SHA1(896230e4627503292575bbd84edc3cf9cb18b27e) )   // 1xxxxxxxxxxxxxxxx = 0xFF
@@ -2760,6 +2946,76 @@ ROM_START( blazeon )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles (Scrambled) */
 	ROM_LOAD( "bz_bg.u2", 0x000000, 0x100000, CRC(fc67f19f) SHA1(f5d9e037a736b0932efbfb48587de08bec93df5d) )
+ROM_END
+
+/***************************************************************************
+
+                       Wing Force (Japan, Unreleased)
+
+CPU:          TMP68HC000-16/D780C-2(Z80)
+SOUND:        YM2151 + OKI MSM6295
+OSC:          13.3330/16.000MHz
+CUSTOM:       KANEKO VU-002 x2
+              KANEKO 23160-509 VIEW2-CHIP
+              KANEKO MUX2-CHIP
+              KANEKO HELP1-CHIP
+
+---------------------------------------------------
+ filenames          devices       kind
+---------------------------------------------------
+ E_2.24.U80         27C040        68000 program (even)
+ O_2.24.U81         27C040        68000 program (odd)
+ S-DRV_2.22.U45     27512         Z80 program
+ PCM.U5             27C040        OKI MSM6295 samples (on ATLAS SUB)
+ SP0M.U1            27C040        Sprite data (on 32-pin riser with SP1M.U1)
+ SP1M.U1            27C040        Sprite data (on 32-pin riser with SP0M.U1)
+ SP2M.U20           27C040        Sprite data (on 32-pin riser with SP3M.U20)
+ SP3M.U20           27C040        Sprite data (on 32-pin riser with SP2M.U20)
+ SP0M.U69           27C040        Sprite data (on 32-pin riser with SP1M.U69) (copy of SP0M.U1)
+ SP1M.U69           27C040        Sprite data (on 32-pin riser with SP0M.U69) (copy of SP1M.U1)
+ SP2M.U68           27C040        Sprite data (on 32-pin riser with SP3M.U68) (copy of SP2M.U20)
+ SP3M.U68           27C040        Sprite data (on 32-pin riser with SP2M.U68) (copy of SP3M.U20)
+ BG0AM.U2           27C040        Tilemap data (on 42-pin riser with BG0BM.U2)
+ BG0BM.U2           27C040        Tilemap data (on 42-pin riser with BG0AM.U2)
+ BG1AM.U3           27C040        Tilemap data (on 42-pin riser with BG1BM.U3)
+ BG1BM.U3           27C040        Tilemap data (on 42-pin riser with BG1AM.U3)
+
+***************************************************************************/
+
+ROM_START( wingforc )
+	ROM_REGION( 0x100000, "maincpu", 0 )            /* 68000 Code */
+	ROM_LOAD16_BYTE( "E_2.24.U80", 0x000000, 0x080000, CRC(837e0726) SHA1(349013edc5ccdfd05ae022563e6a831ce98e4a1a) )
+	ROM_LOAD16_BYTE( "O_2.24.U81", 0x000001, 0x080000, CRC(b6983437) SHA1(0a124e64ad37f9381f8a10a7b462a29563c2ccd9) )
+
+	ROM_REGION( 0x010000, "audiocpu", 0 )           /* Z80 Code */
+	ROM_LOAD( "S-DRV_2.22.U45", 0x000000, 0x010000, CRC(ccdc2758) SHA1(5c0448a70306bd7574f35056ad45ffcbd4a866a8) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD( "SP0M.U1", 0x000000, 0x080000, CRC(8be26a05) SHA1(5b54cd74235c0e32a234ddbe9cf26817700451f1) )
+	ROM_LOAD( "SP0M.U69", 0x000000, 0x080000, CRC(8be26a05) SHA1(5b54cd74235c0e32a234ddbe9cf26817700451f1) )
+	ROM_LOAD( "SP1M.U1", 0x080000, 0x080000, CRC(ad8c5b68) SHA1(438b58df301a06266284aad63e19d607d7e9f726) )
+	ROM_LOAD( "SP1M.U69", 0x080000, 0x080000, CRC(ad8c5b68) SHA1(438b58df301a06266284aad63e19d607d7e9f726) )
+	ROM_LOAD( "SP2M.U20", 0x100000, 0x080000, CRC(b5994bda) SHA1(66bd9664e31ac0c831a1c538d895386cabb03ac8) )
+	ROM_LOAD( "SP2M.U68", 0x100000, 0x080000, CRC(b5994bda) SHA1(66bd9664e31ac0c831a1c538d895386cabb03ac8) )
+	ROM_LOAD( "SP3M.U20", 0x180000, 0x080000, CRC(889ddf72) SHA1(1eaeb4580133d38185ff52fbdc445744c207a202) )
+	ROM_LOAD( "SP3M.U68", 0x180000, 0x080000, CRC(889ddf72) SHA1(1eaeb4580133d38185ff52fbdc445744c207a202) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* Tiles (Scrambled) */
+	ROM_LOAD16_BYTE( "BG0AM.U2", 0x000000, 0x080000, CRC(f4276860) SHA1(8c0848d43ec07f88734993a996a62919979c75ea) )
+	ROM_LOAD16_BYTE( "BG0BM.U2", 0x000001, 0x080000, CRC(9df92283) SHA1(53bcac1d63b7bb84b664507906ee768a83be28c9) )
+	ROM_LOAD16_BYTE( "BG1AM.U3", 0x100000, 0x080000, CRC(a44fdebb) SHA1(676ade63d22818c7a7adf39d42aad41fa93319d2) )
+	ROM_LOAD16_BYTE( "BG1BM.U3", 0x100001, 0x080000, CRC(a9b9fc5d) SHA1(33db691007a8cf25aea6b87a0f009c50df2676f2) )
+
+	ROM_REGION( 0x80000, "user1", 0 )   /* Samples */
+	ROM_LOAD( "PCM.U5",  0x000000, 0x080000, CRC(233569fd) SHA1(eb835008bcb961528c0ef4ca72e44ee08c517b81) )
+
+	ROM_REGION( 0xC0000, "oki", 0 )   /* Samples area */
+	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "user1", 0x020000, 0x020000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
+	ROM_COPY( "user1", 0x040000, 0x060000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
+	ROM_COPY( "user1", 0x060000, 0x0a0000, 0x020000)
 ROM_END
 
 /***************************************************************************
@@ -4112,3 +4368,5 @@ GAME( 1992, brapboysu,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, bra
 GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, shogwarru,shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Fujiyama Buster (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1993, wingforc, 0,        wingforc, wingforc, kaneko16_state,          kaneko16, ROT270,"Atlus",  "Wing Force", 0 )

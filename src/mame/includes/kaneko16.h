@@ -75,12 +75,14 @@ public:
 	DECLARE_READ16_MEMBER(kaneko16_ay2_YM2149_r);
 	DECLARE_WRITE16_MEMBER(kaneko16_ay2_YM2149_w);
 	DECLARE_WRITE16_MEMBER(bakubrkr_oki_bank_sw);
+	DECLARE_WRITE8_MEMBER(wingforc_oki_bank_sw);
 
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 
 	DECLARE_DRIVER_INIT(kaneko16);
 	DECLARE_DRIVER_INIT(samplebank);
+	DECLARE_DRIVER_INIT(wingforc);
 
 
 	DECLARE_MACHINE_RESET(gtmr);
