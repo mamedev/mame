@@ -1,0 +1,14 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
+/******************************************************************************
+
+    tiny.lst
+
+    List of all enabled drivers in the system. This file is parsed by
+    makelist.exe, sorted, and output as C code describing the drivers.
+
+******************************************************************************/
+
+spc1000         // (c) 1982 Samsung Electronics SPC-1000
+spc1500			// (c) 1987 Samsung Electronics SPC-1500
+

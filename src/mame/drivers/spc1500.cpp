@@ -74,6 +74,7 @@ public:
 	DECLARE_PALETTE_INIT(spc);
 	DECLARE_VIDEO_START(spc);
 	MC6845_UPDATE_ROW(crtc_update_row); 
+	MC6845_RECONFIGURE(crtc_reconfig);
 	int priority_mixer_pri(int color);
 private:
 	UINT8 *m_p_ram;
@@ -319,6 +320,13 @@ VIDEO_START_MEMBER(spc1500_state, spc)
 	// m_gfx_bitmap_ram = make_unique_clear<UINT8[]>(0xc000*2);
 }
 
+MC6845_RECONFIGURE(spc1500_state::crtc_reconfig)
+{
+	printf("reconfig. w:%d, h:%d, %f (%d,%d,%d,%d)\n", width, height, (float)frame_period, visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
+	printf("register. m_vert_disp:%d, m_horiz_disp:%d\n", m_crtc_vreg[6], m_crtc_vreg[1]);
+	//m_vdg->
+}
+
 MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 {
 	UINT8 han2;
@@ -330,14 +338,13 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	UINT32  *p = &bitmap.pix32(y); 
 	
 	unsigned char cho[] ={1,1,1,1,1,1,1,1,0,0,1,1,1,3,5,5,0,0,5,3,3,5,5,5,0,0,3,3,5,1};
-	//unsigned char cho2[]={0,0,0,2,2,2,2,2,0,0,2,2,2,4,6,6,0,0,6,4,4,6,6,6,0,0,4,4,6,2};
 	unsigned char jong[]={0,0,0,1,1,1,1,1,0,0,1,1,1,2,2,2,0,0,2,2,2,2,2,2,0,0,2,2,1,1};
 	//printf("ma=%d,y=%d,x_count=%d\n", ma, y, x_count);
 	int n = y & 0xf;
 	bool inv = false;
 	for (i = 0; i < x_count; i++)
 	{
-		UINT8 *pp = &m_p_videoram[0x2000+(y>>3)*x_count+(y%8)*0x800+i];
+		UINT8 *pp = &m_p_videoram[0x2000+(y>>3)*x_count+((y&7)<<11)+i];
 		UINT8 *pv = &m_p_videoram[(y>>4)*x_count + i];
 		UINT8 ascii = *(pv+0x1000);
 		UINT8 attr = *pv;
@@ -371,7 +378,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 			//printf("0x%04x\n" , hfnt);
 			for (j = 0; j < 16; j++)
 			{
-				pixelpen = ((((wpixelg&(0x8000 >> j))>0)<<2)|(((wpixelr&(0x8000 >> j))>0)<<1)|(((wpixelb&(0x8000 >> j)))>0));
+				pixelpen = (((wpixelg&(0x8000 >> j))>0 ? 4:0 )|((wpixelr&(0x8000 >> j))>0 ? 2:0)|((wpixelb&(0x8000 >> j))>0 ? 1:0));
 				*p++ = (((hfnt & (0x8000 >> j)) || (m_priority & (1<<pixelpen))) ? m_palette->pen(pixelpen) : color);
 			}
 			i++;
@@ -383,7 +390,8 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 			fnt = (inv ? 0xff - fnt : fnt);
 			for (j = 0; j < 8; j++)
 			{
-				pixelpen = (((pixelg&(0x80 >> i))>0)<<2)|(((pixelr&(0x80 >> i))>0)<<1)|(((pixelb&(0x80 >> i))));
+				pixelpen = (((pixelg&(0x80 >> j))>0 ? 4 : 0)|((pixelr&(0x80 >> j))>0 ? 2:0)|((pixelb&(0x80 >> j ? 1:0 ))));
+				//if (pixelpen > 7) printf("pixelpen:%d (%d,%d)\n", pixelpen, i, y);
 				*p++ = (((fnt & (0x80 >> j)) || (m_priority & (1<<pixelpen))) ? m_palette->pen(pixelpen) : color);
 			}
 		}
@@ -730,7 +738,8 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 400 - 1)
+	MCFG_SCREEN_VISIBLE_AREA(0,640-1,0,400-1)
+	//MCFG_MC6845_VISAREA_ADJUST(50,50,640-50,400-50)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update )
 	MCFG_PALETTE_ADD("palette", 8)	
 	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)
@@ -738,6 +747,7 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(spc1500_state, crtc_update_row)
+	MCFG_MC6845_RECONFIGURE_CB(spc1500_state, crtc_reconfig)
 
 	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", spc)
 
