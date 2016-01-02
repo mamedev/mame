@@ -87,15 +87,12 @@ extern const zeromem_t zeromem;
 #ifndef NO_MEM_TRACKING
 // re-route classic malloc-style allocations
 #undef malloc
+#undef realloc
 #undef free
 
 #define malloc(x)       malloc_file_line(x, __FILE__, __LINE__, true, false, false)
-#define free(x)         free_file_line(x, __FILE__, __LINE__, true)
-
-#if !defined(__APPLE__) // avoid conflicts with some 3rd-party #includes
-#undef realloc
 #define realloc(x,y)    __error_realloc_is_dangerous__
-#endif
+#define free(x)         free_file_line(x, __FILE__, __LINE__, true)
 
 #if !defined(_MSC_VER) || _MSC_VER < 1900 // < VS2015
 #undef calloc
