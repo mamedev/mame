@@ -73,7 +73,6 @@ public:
 	DECLARE_READ32_MEMBER(tilemap2_r);
 	DECLARE_READ32_MEMBER(tilemap3_r);
 	DECLARE_READ32_MEMBER(randomtmmjprds);
-	DECLARE_WRITE32_MEMBER(blitter_w);
 	DECLARE_READ32_MEMBER(mux_r);
 	DECLARE_WRITE32_MEMBER(brt_1_w);
 	DECLARE_WRITE32_MEMBER(brt_2_w);
@@ -85,13 +84,11 @@ public:
 	UINT32 screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_CALLBACK_MEMBER(blit_done);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int screen);
 	void draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, UINT32 tiledata, UINT8* rom);
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32*tileram, UINT32*tileregs, UINT8*rom );
-	void do_blit();
 };
 
 

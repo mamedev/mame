@@ -94,10 +94,6 @@ public:
 	DECLARE_READ16_MEMBER(r2dx_cos_r);
 
 	DECLARE_WRITE16_MEMBER(tile_bank_w);
-	DECLARE_WRITE16_MEMBER(rdx_bg_vram_w);
-	DECLARE_WRITE16_MEMBER(rdx_md_vram_w);
-	DECLARE_WRITE16_MEMBER(rdx_fg_vram_w);
-	DECLARE_WRITE16_MEMBER(rdx_tx_vram_w);
 	DECLARE_READ16_MEMBER(rdx_v33_unknown_r);
 	DECLARE_WRITE16_MEMBER(mcu_xval_w);
 	DECLARE_WRITE16_MEMBER(mcu_yval_w);
@@ -129,9 +125,7 @@ public:
 	UINT16 r2dx_i_dx, r2dx_i_dy, r2dx_i_angle;
 	UINT32 r2dx_i_sdist;
 
-	UINT32 screen_update_rdx_v33(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 
 protected:
 	virtual void machine_start() override;

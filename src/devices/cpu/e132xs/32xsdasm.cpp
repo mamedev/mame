@@ -394,7 +394,7 @@ static UINT32 RRdis_format(char *source, char *dest, UINT16 op, UINT16 next_op, 
 
 unsigned dasm_hyperstone(char *buffer, unsigned pc, const UINT8 *oprom, unsigned h_flag, int private_fp)
 {
-	UINT16 op = 0;
+	UINT16 op;
 	UINT8 op_num;
 
 	UINT8 source_code, dest_code, source_bit, dest_bit;

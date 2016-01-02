@@ -819,8 +819,8 @@ void sns_sa1_device::write_iram(UINT32 offset, UINT8 data)
 
 UINT8 sns_sa1_device::read_bwram(UINT32 offset)
 {
-	int shift = 0;
-	UINT8 mask = 0xff;
+	int shift;
+	UINT8 mask;
 
 	if (m_nvram.empty())
 		return 0xff;    // this should probably never happen, or are there SA-1 games with no BWRAM?
@@ -852,7 +852,7 @@ UINT8 sns_sa1_device::read_bwram(UINT32 offset)
 
 void sns_sa1_device::write_bwram(UINT32 offset, UINT8 data)
 {
-	UINT8 mask = 0xff;
+	UINT8 mask;
 
 	if (m_nvram.empty())
 		return; // this should probably never happen, or are there SA-1 games with no BWRAM?
@@ -894,7 +894,7 @@ void sns_sa1_device::write_bwram(UINT32 offset, UINT8 data)
 
 READ8_MEMBER(sns_sa1_device::read_l)
 {
-	int bank = 0;
+	int bank;
 
 	if (offset == 0xffea && BIT(m_scpu_ctrl, 4)) return (m_nmi_vector >> 0) & 0xff;
 	if (offset == 0xffeb && BIT(m_scpu_ctrl, 4)) return (m_nmi_vector >> 8) & 0xff;
@@ -929,7 +929,7 @@ READ8_MEMBER(sns_sa1_device::read_l)
 
 READ8_MEMBER(sns_sa1_device::read_h)
 {
-	int bank = 0;
+	int bank;
 
 	// ROM is mapped to [80-bf][8000-ffff] & [c0-ff][0000-ffff]
 	if (offset < 0x200000)

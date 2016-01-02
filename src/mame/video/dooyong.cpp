@@ -101,7 +101,7 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::lastday_ctrl_w)
 
 WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 {
-//	printf("pollux_ctrl_w %02x\n", data);
+//  printf("pollux_ctrl_w %02x\n", data);
 
 	/* bit 0 is flip screen */
 	flip_screen_set(data & 0x01);
@@ -125,7 +125,7 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 
 	/* bit 4 is used but unknown - display disable? */
 }
-	
+
 
 
 WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
@@ -147,7 +147,7 @@ WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
 READ8_MEMBER(dooyong_z80_state::paletteram_flytiger_r)
 {
 	if (m_palette_bank) offset+= 0x800;
-	
+
 	return m_paletteram_flytiger[offset];
 }
 
@@ -155,11 +155,11 @@ READ8_MEMBER(dooyong_z80_state::paletteram_flytiger_r)
 WRITE8_MEMBER(dooyong_z80_state::paletteram_flytiger_w)
 {
 	if (m_palette_bank) offset+= 0x800;
-	
+
 	m_paletteram_flytiger[offset] = data;
 	UINT16 const value = m_paletteram_flytiger[offset & ~1] | (m_paletteram_flytiger[offset | 1] << 8);
 	m_palette->set_pen_color(offset/2, pal5bit(value >> 10), pal5bit(value >> 5), pal5bit(value >> 0));
-	
+
 }
 
 WRITE8_MEMBER(dooyong_z80_state::flytiger_ctrl_w)

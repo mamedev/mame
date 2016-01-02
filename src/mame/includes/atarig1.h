@@ -47,7 +47,6 @@ public:
 	virtual void device_post_load() override;
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
-	DECLARE_WRITE16_MEMBER(mo_control_w);
 	DECLARE_WRITE16_MEMBER(mo_command_w);
 	DECLARE_READ16_MEMBER(special_port0_r);
 	DECLARE_WRITE16_MEMBER(a2d_select_w);

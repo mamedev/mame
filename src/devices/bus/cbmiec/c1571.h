@@ -73,8 +73,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( byte_w );
 
-	DECLARE_WRITE_LINE_MEMBER( wpt_w );
-
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	void wpt_callback(floppy_image_device *floppy, int state);

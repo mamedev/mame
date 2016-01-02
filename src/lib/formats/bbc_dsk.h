@@ -78,10 +78,26 @@ private:
 	static const format formats[];
 };
 
+class bbc_cpn_format : public wd177x_format
+{
+public:
+	bbc_cpn_format();
+
+	virtual int identify(io_generic *io, UINT32 form_factor) override;
+	virtual int get_image_offset(const format &f, int head, int track) override;
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+	virtual const char *extensions() const override;
+
+private:
+	static const format formats[];
+};
+
 
 extern const floppy_format_type FLOPPY_BBC_DFS_FORMAT;
 extern const floppy_format_type FLOPPY_BBC_ADFS_FORMAT;
 extern const floppy_format_type FLOPPY_BBC_DOS_FORMAT;
 extern const floppy_format_type FLOPPY_BBC_CPM_FORMAT;
+extern const floppy_format_type FLOPPY_BBC_CPN_FORMAT;
 
 #endif // __BBC_DSK_H__

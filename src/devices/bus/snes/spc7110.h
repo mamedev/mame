@@ -130,7 +130,7 @@ public:
 	UINT8 m_r480b;        // decompression control register
 	UINT8 m_r480c;        // decompression status
 
-	SPC7110_Decomp* m_decomp;
+	std::unique_ptr<SPC7110_Decomp> m_decomp;
 
 	UINT8 m_r4811;        // data pointer low
 	UINT8 m_r4812;        // data pointer high

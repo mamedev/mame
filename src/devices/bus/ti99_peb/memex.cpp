@@ -48,7 +48,7 @@ bool geneve_memex_device::access_enabled(offs_t offset)
 	// Some traditional cards will not decode the AMx lines, so
 	// we may have to lock out those areas
 	int page = (offset >> 13)&0xff;
-	int index = 0;
+	int index;
 
 	// SW2: "off" locks
 	//      10xxx010

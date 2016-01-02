@@ -23,8 +23,6 @@ public:
 	int m_dma_activ;
 	int m_state;
 	int m_count;
-	DECLARE_READ8_MEMBER(comquest_read);
-	DECLARE_WRITE8_MEMBER(comquest_write);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	UINT32 screen_update_comquest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

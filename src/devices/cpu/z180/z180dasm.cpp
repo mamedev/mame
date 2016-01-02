@@ -399,7 +399,7 @@ CPU_DISASSEMBLE( z180 )
 	unsigned PC = pc;
 	INT8 offset = 0;
 	UINT8 op, op1 = 0;
-	UINT16 ea = 0;
+	UINT16 ea;
 	int pos = 0;
 	UINT32 flags = 0;
 

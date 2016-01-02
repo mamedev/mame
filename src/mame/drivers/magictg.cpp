@@ -212,7 +212,6 @@ public:
 	DECLARE_READ32_MEMBER( unk_r );
 	DECLARE_READ32_MEMBER( unk2_r );
 
-	DECLARE_READ32_MEMBER( serial_r );
 	DECLARE_WRITE32_MEMBER( serial_w );
 
 	DECLARE_READ32_MEMBER( adsp_idma_data_r );

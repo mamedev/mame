@@ -356,7 +356,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		line = 0;
 
 		// first line is version string
-		strprintf(tempbuf[line++], "%s %s", emulator_info::get_applongname(), build_version);
+		strprintf(tempbuf[line++], "%s %s", emulator_info::get_appname(), build_version);
 
 		// output message
 		while (line < ARRAY_LENGTH(tempbuf))

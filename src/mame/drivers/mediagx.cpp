@@ -152,7 +152,6 @@ public:
 	DECLARE_WRITE32_MEMBER(memory_ctrl_w);
 	DECLARE_READ32_MEMBER(biu_ctrl_r);
 	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
-	DECLARE_WRITE32_MEMBER(bios_ram_w);
 	DECLARE_READ32_MEMBER(parallel_port_r);
 	DECLARE_WRITE32_MEMBER(parallel_port_w);
 	DECLARE_READ32_MEMBER(ad1847_r);

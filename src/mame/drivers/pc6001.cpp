@@ -303,9 +303,6 @@ protected:
 	UINT8 check_joy_press();
 	UINT8 check_keyboard_press();
 	void vram_bank_change(UINT8 vram_bank);
-	ATTR_CONST UINT8 pc6001_get_attributes(UINT8 c,int scanline, int pos);
-	const UINT8 *pc6001_get_video_ram(int scanline);
-	UINT8 pc6001_get_char_rom(UINT8 ch, int line);
 };
 
 

@@ -117,10 +117,6 @@ public:
 	DECLARE_READ32_MEMBER(drivedge_tms1_speedup_r);
 	DECLARE_READ32_MEMBER(drivedge_tms2_speedup_r);
 	DECLARE_WRITE32_MEMBER(int1_ack32_w);
-	DECLARE_READ32_MEMBER(test1_r);
-	DECLARE_WRITE32_MEMBER(test1_w);
-	DECLARE_READ32_MEMBER(test2_r);
-	DECLARE_WRITE32_MEMBER(test2_w);
 	DECLARE_WRITE16_MEMBER(timekill_colora_w);
 	DECLARE_WRITE16_MEMBER(timekill_colorbc_w);
 	DECLARE_WRITE16_MEMBER(timekill_intensity_w);

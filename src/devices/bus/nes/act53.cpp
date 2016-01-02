@@ -105,7 +105,7 @@ void nes_action53_device::pcb_reset()
 
 void nes_action53_device::update_prg()
 {
-	UINT8 prg_lo = 0, prg_hi = 0, helper = 0;
+	UINT8 prg_lo, prg_hi, helper;
 	UINT8 out = (m_reg[3] & 0x3f) << 1;     // Outer PRG reg
 	UINT8 size = (m_reg[2] & 0x30) >> 4;    // Game size
 	UINT8 mask = (1 << (size + 1)) - 1;     // Bits to be taken from PRG reg

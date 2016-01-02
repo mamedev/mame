@@ -386,7 +386,7 @@ static void dview_draw_box(DView *dv, int rtype, int x, int y, int w, int h, rgb
 static void dview_draw_line(DView *dv, int rtype, int x1, int y1, int x2, int y2, rgb_t col)
 {
 	rectangle r;
-	
+
 	dview_get_rect(dv, rtype, r);
 	dv->container->add_line(NX(dv, x1 + r.min_x), NY(dv, y1 + r.min_y),
 			NX(dv, x2 + r.min_x), NY(dv, y2 + r.min_y), UI_LINE_WIDTH, col,
@@ -452,10 +452,10 @@ static void dview_draw_hsb(DView *dv)
 
 static void dview_draw_vsb(DView *dv)
 {
-	int vt;
-	int ts;
+	INT64 vt;
+	INT64 ts;
 	//int sz = SLIDER_SIZE;
-	int sz;
+	INT64 sz;
 	rectangle r;
 	adjustment *sb = &dv->vsb;
 
@@ -788,6 +788,7 @@ static void dview_size_allocate(DView *dv)
 	debug_view_xy size, pos, col, vsize;
 	render_container::user_settings rcus;
 	rectangle r;
+	std::string title;
 
 	dv->container->get_user_settings(rcus);
 	rcus.m_xoffset = (float) dv->ofs_x / (float) dv->rt_width;
@@ -805,12 +806,12 @@ static void dview_size_allocate(DView *dv)
 	dview_get_rect(dv, RECT_DVIEW_CLIENT, r);
 
 	dv->hsb.visible = (size.x * debug_font_width > r.width() ? 1 : 0);
-	dv->vsb.visible = (size.y * debug_font_height > r.height() ? 1 : 0);
+	dv->vsb.visible = ((INT64)size.y * (INT64)debug_font_height > r.height() ? 1 : 0);
 	dview_get_rect(dv, RECT_DVIEW_CLIENT, r);
 
-//	dv->hsb.visible = (size.x * debug_font_width > r.width() ? 1 : 0);
-//	dv->vsb.visible = (size.y * debug_font_height > r.height() ? 1 : 0);
-//	dview_get_rect(dv, RECT_DVIEW_CLIENT, r);
+//  dv->hsb.visible = (size.x * debug_font_width > r.width() ? 1 : 0);
+//  dv->vsb.visible = (size.y * debug_font_height > r.height() ? 1 : 0);
+//  dview_get_rect(dv, RECT_DVIEW_CLIENT, r);
 
 	col.y = (r.height() - 2 * BORDER_YTHICKNESS /*+ debug_font_height  - 1*/) / debug_font_height;
 	col.x = (r.width() - 2 * BORDER_XTHICKNESS /*+ debug_font_width - 1*/) / debug_font_width;
@@ -918,7 +919,7 @@ void debug_internal::init_debugger(running_machine &machine)
 		debug_font = m_machine->render().font_alloc("Courier New");
 	else
 		debug_font = m_machine->render().font_alloc(font_name);
-		
+
 	debug_font_width = 0;
 	if(font_size < 8)
 		debug_font_height = 16;  // default
@@ -1210,7 +1211,7 @@ static void on_memory_data_format(DView *dv, const ui_menu_event *event)
 {
 	debug_view_memory *memview = downcast<debug_view_memory *>(focus_view->view);
 	int format = memview->get_data_format();
-	int idx;
+	int idx = 0;
 	int order[7] = { 1, 2, 4, 8, 9, 10, 11 };
 
 	for(int x=0; x<7; x++)
@@ -1218,11 +1219,11 @@ static void on_memory_data_format(DView *dv, const ui_menu_event *event)
 		if(order[x] == format)
 			idx = x;
 	}
-	
+
 	if (event->iptkey == IPT_UI_RIGHT)
 	{
 		idx++;
-		if(idx >= 7) 
+		if(idx >= 7)
 			idx = 0;
 		memview->set_data_format(order[idx]);
 		dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
@@ -1230,7 +1231,7 @@ static void on_memory_data_format(DView *dv, const ui_menu_event *event)
 	if (event->iptkey == IPT_UI_LEFT)
 	{
 		idx--;
-		if(idx < 0) 
+		if(idx < 0)
 			idx = 6;
 		memview->set_data_format(order[idx]);
 		dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
@@ -1274,22 +1275,22 @@ static void render_editor(DView_edit *editor)
 	const char* str = editor->str.c_str();
 	int str_x = 2 * BORDER_XTHICKNESS;
 	int start;
-//	int editor_width;
-	
+//  int editor_width;
+
 	dview_get_rect(dv,RECT_DVIEW_HSB,r);
 
-//	editor_width = debug_font->string_width(debug_font_height, debug_font_aspect, editor->str.c_str());
+//  editor_width = debug_font->string_width(debug_font_height, debug_font_aspect, editor->str.c_str());
 	// figure out which character to start drawing, so that you can always see the end of the string you're typing
 	start = strlen(str) - (r.width() / (debug_font_width + 2*BORDER_XTHICKNESS));
 	if(start < 0)
 		start = 0;
-	
+
 	dview_draw_box(dv,RECT_DVIEW_HSB,0,0,r.width(),r.height(),rgb_t(0xff,0xff,0xff,0xff));
 	dview_draw_line(dv,RECT_DVIEW_HSB,0,0,r.width(),0,rgb_t(0xff,0xc0,0xc0,0xc0));
 	dview_draw_line(dv,RECT_DVIEW_HSB,r.width(),0,r.width(),r.height(),rgb_t(0xff,0x60,0x60,0x60));
 	dview_draw_line(dv,RECT_DVIEW_HSB,r.width(),r.height(),0,r.height(),rgb_t(0xff,0x60,0x60,0x60));
 	dview_draw_line(dv,RECT_DVIEW_HSB,0,r.height(),0,0,rgb_t(0xff,0xc0,0xc0,0xc0));
-	
+
 	for(int x=start;x<strlen(str);x++)
 	{
 		if(str_x < r.width() - debug_font_width)
@@ -1641,7 +1642,7 @@ void debug_internal::wait_for_debugger(device_t &device, bool firststop)
 		statewin->ofs_x = 350;
 		statewin->bounds.set(0,150,0,600);
 		win_count++;
-		
+
 		DView *console = dview_alloc(target, device.machine(), DVT_CONSOLE, VIEW_STATE_FOLLOW_CPU);
 		dview_set_title(console, "Console");
 		console->editor.active = TRUE;

@@ -151,7 +151,6 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	offs_t              m_fetch_xor;
 	offs_t              m_start_pc;
 	UINT32              m_reg[68];
 	struct {
@@ -286,8 +285,6 @@ private:
 	UINT32 bam1Error1();
 	UINT32 am1Error2();
 	UINT32 bam1Error2();
-	UINT32 am1Error3();
-	UINT32 bam1Error3();
 	UINT32 am1Error4();
 	UINT32 bam1Error4();
 	UINT32 am1Error5();
@@ -380,12 +377,10 @@ private:
 	UINT32 am2ImmediateQuick();
 	UINT32 am2Error1();
 	UINT32 am2Error2();
-	UINT32 am2Error3();
 	UINT32 am2Error4();
 	UINT32 am2Error5();
 	UINT32 bam2Error1();
 	UINT32 bam2Error2();
-	UINT32 bam2Error3();
 	UINT32 bam2Error4();
 	UINT32 bam2Error5();
 	UINT32 bam2Error6();
@@ -438,7 +433,6 @@ private:
 	UINT32 am3ImmediateQuick();
 	UINT32 am3Error1();
 	UINT32 am3Error2();
-	UINT32 am3Error3();
 	UINT32 am3Error4();
 	UINT32 am3Error5();
 	UINT32 am3Group7a();

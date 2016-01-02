@@ -32,21 +32,11 @@ public:
 	UINT8 m_dmd_status;
 	UINT8 m_dmd_busy;
 
-	DECLARE_WRITE8_MEMBER(dmd_latch_w);
-	DECLARE_READ8_MEMBER(dmd_latch_r);
-	DECLARE_WRITE8_MEMBER(dmd_ctrl_w);
-	DECLARE_READ8_MEMBER(dmd_ctrl_r);
-	DECLARE_READ8_MEMBER(dmd_status_r);
-	DECLARE_WRITE8_MEMBER(dmd_status_w);
-
 	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(dmd_bank_w);
 	DECLARE_WRITE8_MEMBER(dmddata_w);
 
-	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ8_MEMBER(dedicated_switch_r);
 	DECLARE_DRIVER_INIT(whitestar);
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(whitestar_firq_interrupt);

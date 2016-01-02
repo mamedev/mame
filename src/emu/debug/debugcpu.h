@@ -360,7 +360,7 @@ private:
 														//    (0 = not tracing over,
 														//    ~0 = not currently tracing over)
 	};
-	tracer *                m_trace;                    // tracer state
+	std::unique_ptr<tracer>                m_trace;                    // tracer state
 
 	// hotspots
 	struct hotspot_entry

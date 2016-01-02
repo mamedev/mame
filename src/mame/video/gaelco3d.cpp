@@ -68,14 +68,14 @@ gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
 
 void gaelco3d_state::video_start()
 {
-	m_poly = auto_alloc(machine(), gaelco3d_renderer(*this));
+	m_poly = std::make_unique<gaelco3d_renderer>(*this);
 
-	m_palette = auto_alloc_array(machine(), rgb_t, 32768);
+	m_palette = std::make_unique<rgb_t[]>(32768);
 	m_polydata_buffer = std::make_unique<UINT32[]>(MAX_POLYDATA);
 
 	/* save states */
 
-	save_pointer(NAME(m_palette), 32768);
+	save_pointer(NAME(m_palette.get()), 32768);
 	save_pointer(NAME(m_polydata_buffer.get()), MAX_POLYDATA);
 	save_item(NAME(m_polydata_count));
 	save_item(NAME(m_lastscan));
@@ -208,7 +208,7 @@ void gaelco3d_renderer::render_noz_noperspective(INT32 scanline, const extent_t 
 	float voz_step = object.voz_dx * zbase;
 	int zbufval = (int)(-object.z0 * zbase);
 	offs_t endmask = m_texture_size - 1;
-	const rgb_t *palsource = m_state.m_palette + object.color;
+	const rgb_t *palsource = m_state.m_palette.get() + object.color;
 	UINT32 tex = object.tex;
 	UINT16 *dest = &m_screenbits.pix16(scanline);
 	UINT16 *zbuf = &m_zbuffer.pix16(scanline);
@@ -246,7 +246,7 @@ void gaelco3d_renderer::render_normal(INT32 scanline, const extent_t &extent, co
 	float uoz_dx = object.uoz_dx;
 	float voz_dx = object.voz_dx;
 	offs_t endmask = m_texture_size - 1;
-	const rgb_t *palsource = m_state.m_palette + object.color;
+	const rgb_t *palsource = m_state.m_palette.get() + object.color;
 	UINT32 tex = object.tex;
 	float z0 = object.z0;
 	UINT16 *dest = &m_screenbits.pix16(scanline);
@@ -296,7 +296,7 @@ void gaelco3d_renderer::render_alphablend(INT32 scanline, const extent_t &extent
 	float uoz_dx = object.uoz_dx;
 	float voz_dx = object.voz_dx;
 	offs_t endmask = m_texture_size - 1;
-	const rgb_t *palsource = m_state.m_palette + object.color;
+	const rgb_t *palsource = m_state.m_palette.get() + object.color;
 	UINT32 tex = object.tex;
 	float z0 = object.z0;
 	UINT16 *dest = &m_screenbits.pix16(scanline);

@@ -109,5 +109,4 @@ protected:
 	UINT8                   m_adc_select;
 	bool                    m_shadow;
 	optional_shared_ptr<UINT16> m_decrypted_opcodes;
-	TIMER_DEVICE_CALLBACK_MEMBER(hangon_irq);
 };

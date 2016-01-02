@@ -63,13 +63,11 @@ public:
 	m_caps1(*this, "capsule1"), m_caps2(*this, "capsule2"),
 	m_caps1_rom(nullptr), m_caps2_rom(nullptr),
 	m_ctrl1(0), m_icrb(0), m_bankr(0),
-	m_isr(0), m_ier(0), m_str(0), m_sior(0xbf),
+	m_isr(0), m_ier(0), m_sior(0xbf),
 	m_frc_value(0), m_frc_latch(0),
 	m_vadr(0), m_yoff(0),
-	m_receive_timer(nullptr), m_transmit_timer(nullptr),
 	m_artdir(0xff), m_artdor(0xff), m_artsr(0), m_artcr(0),
-	m_swr(0),
-	m_one_sec_int_enabled(true), m_alarm_int_enabled(true), m_key_int_enabled(true),
+	m_one_sec_int_enabled(true),
 	m_key_status(0), m_interrupt_status(0),
 	m_time(), m_clock_state(0),
 	m_ear_last_state(0),
@@ -123,8 +121,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rs232_dcd_w );
 	DECLARE_WRITE_LINE_MEMBER( rs232_dsr_w );
 	DECLARE_WRITE_LINE_MEMBER( rs232_cts_w );
-	TIMER_CALLBACK_MEMBER( transmit_data );
-	TIMER_CALLBACK_MEMBER( receive_data );
 
 	// centronics
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
@@ -204,7 +200,6 @@ private:
 	UINT8 m_bankr;
 	UINT8 m_isr;
 	UINT8 m_ier;
-	UINT8 m_str;
 	UINT8 m_sior;
 
 	// gapnit internal
@@ -216,8 +211,6 @@ private:
 	UINT8 m_yoff;
 
 	// gapnio
-	emu_timer *m_receive_timer;
-	emu_timer *m_transmit_timer;
 	UINT8 m_artdir;
 	UINT8 m_artdor;
 	UINT8 m_artsr;
@@ -226,7 +219,6 @@ private:
 
 	// 7508 internal
 	bool m_one_sec_int_enabled;
-	bool m_alarm_int_enabled;
 	bool m_key_int_enabled;
 
 	UINT8 m_key_status;

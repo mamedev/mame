@@ -337,10 +337,7 @@ public:
 	void set_via_interrupt(int value);
 	void set_via2_interrupt(int value);
 	void field_interrupts();
-	void rtc_write_rTCEnb(int data);
-	void rtc_shift_data(int data);
 	void vblank_irq();
-	void rtc_incticks();
 	void adb_talk();
 	void mouse_callback();
 	void rbv_recalc_irqs();
@@ -546,7 +543,6 @@ public:
 	DECLARE_READ8_MEMBER(mac_via2_in_b_pmu);
 	DECLARE_WRITE8_MEMBER(mac_via2_out_a_pmu);
 	DECLARE_WRITE8_MEMBER(mac_via2_out_b_pmu);
-	DECLARE_WRITE_LINE_MEMBER(mac_kbd_clk_in);
 	void mac_state_load();
 	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
 	DECLARE_WRITE_LINE_MEMBER(mac_via2_irq);
@@ -557,7 +553,6 @@ public:
 	void kbd_shift_out(int data);
 	void keyboard_receive(int val);
 	void mac_driver_init(model_t model);
-	void mac_tracetrap(const char *cpu_name_local, int addr, int trap);
 	void mac_install_memory(offs_t memory_begin, offs_t memory_end,
 		offs_t memory_size, void *memory_data, int is_rom, const char *bank);
 };

@@ -151,7 +151,6 @@ public:
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq2);
 	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq4);
 	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
-	TIMER_CALLBACK_MEMBER(toaplan2_raise_irq);
 	void truxton2_postload();
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 	void toaplan2_vblank_irq(int irq_line);

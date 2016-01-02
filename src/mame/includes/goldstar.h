@@ -32,7 +32,6 @@ public:
 	DECLARE_WRITE8_MEMBER(p2_lamps_w);
 	DECLARE_WRITE8_MEMBER(ncb3_port81_w);
 	DECLARE_WRITE8_MEMBER(cm_coincount_w);
-	DECLARE_WRITE8_MEMBER(ladylinr_outport_w);
 	DECLARE_WRITE8_MEMBER(goldstar_fg_vidram_w);
 	DECLARE_WRITE8_MEMBER(goldstar_fg_atrram_w);
 	DECLARE_WRITE8_MEMBER(goldstar_reel1_ram_w);

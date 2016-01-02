@@ -160,7 +160,7 @@ WRITE8_MEMBER(cococart_slot_device::write)
 
 static const char *line_value_string(cococart_line_value value)
 {
-	const char *s = nullptr;
+	const char *s;
 	switch(value)
 	{
 		case COCOCART_LINE_VALUE_CLEAR:
@@ -326,7 +326,7 @@ bool cococart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		offs_t read_length = 0;
+		offs_t read_length;
 		if (software_entry() == nullptr)
 		{
 			read_length = fread(m_cart->get_cart_base(), 0x8000);

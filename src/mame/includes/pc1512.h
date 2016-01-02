@@ -117,7 +117,6 @@ public:
 	void update_fdc_drq();
 	void update_fdc_tc();
 	void update_ack();
-	void set_fdc_dsr(UINT8 data);
 	int get_display_mode(UINT8 mode);
 	offs_t get_char_rom_offset();
 	int get_color(UINT8 data);
@@ -135,15 +134,12 @@ public:
 	DECLARE_WRITE8_MEMBER( nmi_mask_w );
 	DECLARE_READ8_MEMBER( printer_r );
 	DECLARE_WRITE8_MEMBER( printer_w );
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_READ8_MEMBER( vdu_r );
 	DECLARE_WRITE8_MEMBER( vdu_w );
 	DECLARE_WRITE_LINE_MEMBER( kbdata_w );
 	DECLARE_WRITE_LINE_MEMBER( kbclk_w );
 	DECLARE_WRITE_LINE_MEMBER( pit1_w );
 	DECLARE_WRITE_LINE_MEMBER( pit2_w );
-	DECLARE_WRITE_LINE_MEMBER( ack_w );
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_WRITE_LINE_MEMBER( eop_w );
 	DECLARE_READ8_MEMBER( memr_r );

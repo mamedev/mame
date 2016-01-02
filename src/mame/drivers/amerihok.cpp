@@ -24,13 +24,13 @@ class amerihok_state : public driver_device
 public:
 	amerihok_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-	//	,m_maincpu(*this, "maincpu")
+	//  ,m_maincpu(*this, "maincpu")
 	{ }
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-//	required_device<mcs51_cpu_device> m_maincpu;
+//  required_device<mcs51_cpu_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( amerihok )
@@ -50,9 +50,9 @@ void amerihok_state::machine_reset()
 static MACHINE_CONFIG_START( amerihok, amerihok_state )
 
 	/* basic machine hardware */
-//	MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
-//	MCFG_CPU_PROGRAM_MAP(amerihok_map)
-//	MCFG_CPU_IO_MAP(amerihok_io)
+//  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
+//  MCFG_CPU_PROGRAM_MAP(amerihok_map)
+//  MCFG_CPU_IO_MAP(amerihok_io)
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", amerihok_state,  irq0_line_hold)
 
 	/* sound hardware */
@@ -75,4 +75,3 @@ ROM_START( amerihok )
 ROM_END
 
 GAME( 19??, amerihok,  0,    amerihok, amerihok, driver_device,  0, ROT0, "<unknown>", "Ameri-Hockey", MACHINE_IS_SKELETON_MECHANICAL )
-

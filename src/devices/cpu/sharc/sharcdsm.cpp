@@ -1208,8 +1208,8 @@ static UINT32 sharc_dasm_one(char *buffer, offs_t pc, UINT64 opcode)
 
 CPU_DISASSEMBLE( sharc )
 {
-	UINT64 op = 0;
-	UINT32 flags = 0;
+	UINT64 op;
+	UINT32 flags;
 
 	op = ((UINT64)oprom[0] << 0)  | ((UINT64)oprom[1] << 8) |
 			((UINT64)oprom[2] << 16) | ((UINT64)oprom[3] << 24) |

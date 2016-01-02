@@ -83,8 +83,6 @@ public:
 	virtual ~ui_menu_bios_selection();
 	virtual void populate() override;
 	virtual void handle() override;
-
-private:
 };
 
 #endif  /* __UI_MISCMENU_H__ */

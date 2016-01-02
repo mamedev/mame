@@ -118,11 +118,6 @@ public:
 	// this is shared among all video setups with vram
 	UINT32 *m_vram;
 
-	// defined in machine/mac.c
-	void set_via_interrupt(int value);
-	void vblank_irq();
-	void mac_adb_newaction(int state);
-
 	DECLARE_READ16_MEMBER ( mac_via_r );
 	DECLARE_WRITE16_MEMBER ( mac_via_w );
 	DECLARE_READ16_MEMBER ( mac_scc_r );

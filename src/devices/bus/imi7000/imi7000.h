@@ -76,8 +76,6 @@ public:
 	// construction/destruction
 	imi7000_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void add_device(imi7000_slot_device *slot, device_t *target);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;

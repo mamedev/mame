@@ -504,7 +504,7 @@ int arcompact_handle04_p01_helper_dasm(DASM_OPS_32, const char* optext, int igno
 int arcompact_handle04_p10_helper_dasm(DASM_OPS_32, const char* optext, int b_reserved)
 {
 	int size = 4;
-	UINT32 limm = 0;
+	UINT32 limm;
 	//int got_limm = 0;
 
 	COMMON32_GET_breg;
@@ -599,7 +599,7 @@ int arcompact_handle04_p11_m0_helper_dasm(DASM_OPS_32, const char* optext, int b
 int arcompact_handle04_p11_m1_helper_dasm(DASM_OPS_32, const char* optext, int b_reserved)
 {
 	int size = 4;
-	UINT32 limm = 0;
+	UINT32 limm;
 	//int got_limm = 0;
 
 	COMMON32_GET_breg;

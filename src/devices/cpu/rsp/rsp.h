@@ -159,7 +159,6 @@ public:
 	void ccfunc_write32();
 	void ccfunc_get_cop0_reg();
 	void ccfunc_set_cop0_reg();
-	void ccfunc_unimplemented_opcode();
 	void ccfunc_sp_set_status_cb();
 	void ccfunc_unimplemented();
 
@@ -217,8 +216,8 @@ private:
 
 	/* core state */
 	drc_cache           m_cache;                      /* pointer to the DRC code cache */
-	drcuml_state *      m_drcuml;                     /* DRC UML generator state */
-	rsp_frontend *      m_drcfe;                      /* pointer to the DRC front-end state */
+	std::unique_ptr<drcuml_state>      m_drcuml;                     /* DRC UML generator state */
+	std::unique_ptr<rsp_frontend>      m_drcfe;                      /* pointer to the DRC front-end state */
 	UINT32              m_drcoptions;                 /* configurable DRC options */
 
 	/* internal stuff */
@@ -269,7 +268,7 @@ protected:
 	direct_read_data *m_direct;
 
 private:
-	rsp_cop2    *m_cop2;
+	std::unique_ptr<rsp_cop2>    m_cop2;
 
 	UINT32 *m_dmem32;
 	UINT16 *m_dmem16;
@@ -317,11 +316,9 @@ private:
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 linkreg);
 	void generate_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_vector_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_special(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_regimm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_cop2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_cop0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op);
 };

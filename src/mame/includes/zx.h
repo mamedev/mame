@@ -59,8 +59,6 @@ public:
 	void zx_tape_input();
 	void zx_ula_hsync();
 
-	UINT32 get_ram_size();
-
 protected:
 	enum
 	{

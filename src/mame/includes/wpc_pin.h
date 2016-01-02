@@ -66,7 +66,6 @@ public:
 	DECLARE_WRITE8_MEMBER(wpc_sound_ctrl_w);
 	DECLARE_READ8_MEMBER(wpc_sound_data_r);
 	DECLARE_WRITE8_MEMBER(wpc_sound_data_w);
-	DECLARE_WRITE8_MEMBER(wpc_sound_s11_w);
 	DECLARE_WRITE8_MEMBER(wpc_rombank_w);
 	DECLARE_WRITE8_MEMBER(wpc_dmdbank_w);
 

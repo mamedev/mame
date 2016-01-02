@@ -572,7 +572,6 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 	memset(m_masked_opcodes_lookup, 0, sizeof(m_masked_opcodes_lookup));
 	for (auto opcode : s_masked_opcodes)
 	{
-		
 		m_masked_opcodes_lookup[0][opcode >> 4] |= 1 << ((opcode >> 1) & 7);
 		m_masked_opcodes_lookup[1][opcode >> 4] |= 1 << ((opcode >> 1) & 7);
 	}

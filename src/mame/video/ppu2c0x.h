@@ -190,8 +190,8 @@ public:
 
 	std::unique_ptr<bitmap_ind16>                m_bitmap;          /* target bitmap */
 	std::unique_ptr<UINT8[]>    m_spriteram;           /* sprite ram */
-	pen_t                       *m_colortable;          /* color table modified at run time */
-	pen_t                       *m_colortable_mono;     /* monochromatic color table modified at run time */
+	std::unique_ptr<pen_t[]>    m_colortable;          /* color table modified at run time */
+	std::unique_ptr<pen_t[]>    m_colortable_mono;     /* monochromatic color table modified at run time */
 	int                         m_scanline;         /* scanline count */
 	ppu2c0x_scanline_delegate   m_scanline_callback_proc;   /* optional scanline callback */
 	ppu2c0x_hblank_delegate     m_hblank_callback_proc; /* optional hblank callback */

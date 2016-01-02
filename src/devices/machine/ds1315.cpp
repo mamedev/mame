@@ -231,7 +231,7 @@ READ8_MEMBER(ds1315_device::write_data)
 
 void ds1315_device::input_raw_data()
 {
-	int raw[8], i, j=0;
+	int raw[8], i, j;
 	raw[0] = raw[1] = raw[2] = raw[3] = raw[4] = raw[5] = raw[6] = raw[7] = 0;
 	UINT8 flag = 1;
 

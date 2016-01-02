@@ -226,7 +226,7 @@ bool pce_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 offset = 0;
+		UINT32 offset;
 		UINT32 len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
 		UINT8 *ROM;
 
@@ -343,7 +343,7 @@ void pce_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "rom";
+		const char *slot_string;
 		UINT32 len = core_fsize(m_file);
 		dynamic_buffer rom(len);
 		int type;

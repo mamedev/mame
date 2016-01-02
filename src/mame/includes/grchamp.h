@@ -97,9 +97,6 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_objects(int y, UINT8 *objdata);
-	int collision_check(bitmap_ind16 &bitmap, int which );
-	void draw_fog(bitmap_ind16 &bitmap, const rectangle &cliprect, int fog);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /* Discrete Sound Input Nodes */

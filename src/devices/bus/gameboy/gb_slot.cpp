@@ -262,7 +262,7 @@ bool base_gb_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 offset = 0;
+		UINT32 offset;
 		UINT32 len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
 		UINT8 *ROM;
 		int rambanks = 0;
@@ -604,7 +604,7 @@ void base_gb_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "rom";
+		const char *slot_string;
 		UINT32 len = core_fsize(m_file), offset = 0;
 		dynamic_buffer rom(len);
 		int type;
@@ -793,7 +793,7 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 	static const int ramsize[8] = { 0, 2, 8, 32, 128, 64, 0, 0 };
 
 	char soft[17];
-	UINT32 tmp = 0;
+	UINT32 tmp;
 	int csum = 0, i = 0;
 	int rom_banks;
 

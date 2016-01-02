@@ -647,8 +647,6 @@ public:
 
 	DECLARE_READ32_MEMBER(sub_comram_r);
 	DECLARE_WRITE32_MEMBER(sub_comram_w);
-	DECLARE_READ32_MEMBER(sub_sound_r);
-	DECLARE_WRITE32_MEMBER(sub_sound_w);
 	DECLARE_READ32_MEMBER(sub_unk7e_r);
 	DECLARE_WRITE32_MEMBER(sub_debug_w);
 	DECLARE_READ32_MEMBER(sub_unk1_r);

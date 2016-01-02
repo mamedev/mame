@@ -148,8 +148,6 @@ UINT32 pla_device::read(UINT32 input)
 
 	for (auto cache2_entry : m_cache2)
 	{
-		
-
 		if ((UINT32)cache2_entry == input)
 		{
 			// cache2 hit

@@ -2125,7 +2125,7 @@ int saturn_state::stv_vdp1_start ( void )
 	m_vdp1_vram = make_unique_clear<UINT32[]>(0x100000/4 );
 	m_vdp1.gfx_decode = std::make_unique<UINT8[]>(0x100000 );
 
-	stv_vdp1_shading_data = auto_alloc(machine(), struct stv_vdp1_poly_scanline_data);
+	stv_vdp1_shading_data = std::make_unique<struct stv_vdp1_poly_scanline_data>();
 
 	m_vdp1.framebuffer[0] = std::make_unique<UINT16[]>(1024 * 256 * 2 ); /* *2 is for double interlace */
 	m_vdp1.framebuffer[1] = std::make_unique<UINT16[]>(1024 * 256 * 2 );

@@ -199,7 +199,6 @@ protected:
 	bool condition(int which);
 
 	// floating point helpers
-	void double_to_dsp_with_flags(double val, tmsreg &result);
 	void int2float(tmsreg &srcdst);
 	void float2int(tmsreg &srcdst, bool setflags);
 	void negf(tmsreg &dst, tmsreg &src);

@@ -2138,7 +2138,7 @@ void mos6566_device::draw_sprites()
 	UINT8 snum, sbit;
 	UINT8 spr_coll = 0, gfx_coll = 0;
 	UINT32 plane0_l, plane0_r, plane1_l, plane1_r;
-	UINT32 sdata_l = 0, sdata_r = 0;
+	UINT32 sdata_l, sdata_r;
 
 	for (i = 0; i < 0x400; i++)
 		m_spr_coll_buf[i] = 0;

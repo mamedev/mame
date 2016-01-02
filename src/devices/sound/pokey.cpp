@@ -802,7 +802,7 @@ READ8_MEMBER( pokey_device::read )
 
 UINT8 pokey_device::read(offs_t offset)
 {
-	int data = 0, pot;
+	int data, pot;
 
 	synchronize(SYNC_NOOP); /* force resync */
 

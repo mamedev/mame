@@ -99,7 +99,6 @@ public:
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
 
 	int get_cart_type() { return m_type; };
-	int identify_cart_type(UINT8 *ROM, UINT32 len);
 	bool has_cart() { return m_cart != nullptr; }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
@@ -129,7 +128,6 @@ public:
 private:
 	device_a78_cart_interface*       m_cart;
 	int m_type;
-	int m_stick_type;
 
 	int verify_header(char *header);
 	int validate_header(int head, bool log);

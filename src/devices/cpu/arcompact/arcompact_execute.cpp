@@ -1293,7 +1293,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_00_01dasm(OPS_32)
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_01_01_00_helper(OPS_32, const char* optext)
 {
-	int size = 4;
+	int size;
 
 	// Branch on Compare / Bit Test - Register-Register
 
@@ -1564,7 +1564,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_01_0f(OPS_32)  { retur
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle02(OPS_32)
 {
 	int size = 4;
-	UINT32 limm = 0;
+	UINT32 limm;
 
 	int S = (op & 0x00008000) >> 15;// op &= ~0x00008000;
 	int s = (op & 0x00ff0000) >> 16;// op &= ~0x00ff0000;
@@ -1761,7 +1761,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle03(OPS_32)
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_helper(OPS_32, const char* optext, int ignore_dst, int b_reserved)
 {
-	int size = 4;
+	int size;
 	//UINT32 limm = 0;
 	int got_limm = 0;
 
@@ -1925,7 +1925,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_1d(OPS_32)
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p00(OPS_32)
 {
-	int size = 4;
+	int size;
 	UINT32 limm = 0;
 	int got_limm = 0;
 
@@ -2011,7 +2011,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p11_m0(OPS_32) // Jcc 
 	COMMON32_GET_CONDITION;
 	COMMON32_GET_F
 
-	UINT32 c = 0;
+	UINT32 c;
 
 	if (creg == LIMM_REG)
 	{
@@ -2127,7 +2127,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_21_p10(OPS_32)
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_21_p11_m0(OPS_32) // Jcc.D   (no link, delay)
 {
 	int size = 4;
-	UINT32 limm = 0;
+	UINT32 limm;
 	int got_limm = 0;
 
 	COMMON32_GET_creg
@@ -2270,7 +2270,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_29(OPS_32)
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_helper(OPS_32, const char* optext)
 {
-	int size = 4;
+	int size;
 
 	COMMON32_GET_p;
 	//COMMON32_GET_breg;
@@ -2330,7 +2330,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_3f_05(OPS_32)  { arcom
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_3x_helper(OPS_32, int dsize, int extend)
 {
-	int size = 4;
+	int size;
 	//UINT32 limm=0;
 	int got_limm = 0;
 
@@ -2406,7 +2406,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle05_29(OPS_32)  { return arco
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle05_2f_0x_helper(OPS_32, const char* optext)
 {
-	int size = 4;
+	int size;
 
 	COMMON32_GET_p;
 	//COMMON32_GET_breg;
@@ -2548,7 +2548,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0d_03(OPS_16)
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0e_0x_helper(OPS_16, const char* optext, int revop)
 {
 	int h;// , breg;
-	int size = 2;
+	int size;
 
 	GROUP_0e_GET_h;
 

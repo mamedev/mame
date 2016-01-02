@@ -103,7 +103,6 @@ public:
 	void check_interrupts();
 	void bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal);
 	UINT8 read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal);
-	UINT8 read_keyboard(UINT8 databus);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -113,8 +112,6 @@ public:
 	DECLARE_WRITE8_MEMBER( cpu_w );
 
 	DECLARE_WRITE_LINE_MEMBER( ted_irq_w );
-	DECLARE_READ8_MEMBER( ted_ram_r );
-	DECLARE_READ8_MEMBER( ted_rom_r );
 	DECLARE_READ8_MEMBER( ted_k_r );
 
 	DECLARE_WRITE_LINE_MEMBER( write_kb0 ) { if (state) m_kb |= 1; else m_kb &= ~1; }

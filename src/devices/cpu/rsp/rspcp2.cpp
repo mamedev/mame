@@ -1167,7 +1167,7 @@ void rsp_cop2::handle_lwc2(UINT32 op)
 			if (ve > 32)
 				ve = 32;
 
-			INT32 element = 7 - (index >> 1);
+			INT32 element;
 
 			if (index & 1)  fatalerror("RSP: LTV: index = %d\n", index);
 
@@ -2966,7 +2966,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			CLEAR_CLIP1_FLAGS();
 			CLEAR_ZERO_FLAGS();
 			CLEAR_CLIP2_FLAGS();
-			UINT32 vce = 0;
+			UINT32 vce;
 
 			for (i=0; i < 8; i++)
 			{

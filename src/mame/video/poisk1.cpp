@@ -95,7 +95,6 @@ WRITE8_MEMBER(p1_state::p1_vram_w)
 WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 {
 	address_space &space_prg = m_maincpu->space(AS_PROGRAM);
-	rectangle visarea;
 
 	DBG_LOG(1,"color_select_68",("W $%02x\n", data));
 

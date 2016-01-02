@@ -233,7 +233,7 @@ void crvision_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "crv_rom4k";
+		const char *slot_string;
 		UINT32 size = core_fsize(m_file);
 		int type = CRV_4K;
 

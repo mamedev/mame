@@ -44,7 +44,6 @@ public:
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(port43_w);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	const UINT8 *m_p_chargen;

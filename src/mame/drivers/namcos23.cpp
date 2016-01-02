@@ -1384,7 +1384,7 @@ struct c404_t
 
 struct render_t
 {
-	namcos23_renderer *polymgr;
+	std::unique_ptr<namcos23_renderer> polymgr;
 	int cur;
 	int poly_count;
 	int count[2];
@@ -1534,7 +1534,6 @@ public:
 	DECLARE_WRITE16_MEMBER(mcu_p8_w);
 	DECLARE_READ16_MEMBER(mcu_pa_r);
 	DECLARE_WRITE16_MEMBER(mcu_pa_w);
-	DECLARE_READ16_MEMBER(mcu_rtc_r);
 	DECLARE_READ16_MEMBER(mcu_pb_r);
 	DECLARE_WRITE16_MEMBER(mcu_pb_w);
 	DECLARE_READ16_MEMBER(mcu_p6_r);
@@ -1575,7 +1574,6 @@ public:
 	void c435_matrix_set();
 	void c435_vector_set();
 	void c435_matrix_vector_mul();
-	void c435_vector_matrix_mul();
 	void c435_state_set();
 	void c435_scaling_set();
 	void c435_render();
@@ -2380,7 +2378,7 @@ VIDEO_START_MEMBER(namcos23_state,s23)
 	m_bgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_bgtilemap->set_transparent_pen(0xf);
 	m_bgtilemap->set_scrolldx(860, 860);
-	m_render.polymgr = auto_alloc(machine(), namcos23_renderer(*this));
+	m_render.polymgr = std::make_unique<namcos23_renderer>(*this);
 }
 
 

@@ -114,7 +114,7 @@ static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, screen_dev
 			maxy = ctrl[0x0b] + K053936_offset[chip][1]-2 - 1;
 			if (maxy > cliprect.max_y)
 				maxy = cliprect.max_y;
-			
+
 		}
 		else
 		{

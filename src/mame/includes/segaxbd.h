@@ -28,9 +28,6 @@ public:
 	void timer_ack_callback();
 	void sound_data_w(UINT8 data);
 
-	// YM2151 chip callbacks
-	DECLARE_WRITE_LINE_MEMBER( sound_cpu_irq );
-
 	// main CPU read/write handlers
 	DECLARE_READ16_MEMBER( adc_r );
 	DECLARE_WRITE16_MEMBER( adc_w );

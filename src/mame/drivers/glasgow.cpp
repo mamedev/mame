@@ -84,8 +84,6 @@ public:
 	UINT8 m_led7;
 	UINT8 m_irq_flag;
 	UINT16 m_beeper;
-	DECLARE_READ16_MEMBER(read_test);
-	DECLARE_READ16_MEMBER(read_board_amsterd);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(dallas32);

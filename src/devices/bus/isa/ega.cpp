@@ -854,7 +854,7 @@ CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_text )
 		UINT16  offset = ma + i;
 		UINT8   chr = m_plane[0][ offset ];
 		UINT8   attr = m_plane[1][ offset ];
-		UINT8   data = 0;
+		UINT8   data;
 		UINT16  fg = m_attribute.data[ attr & 0x07 ];
 		UINT16  bg = m_attribute.data[ ( attr >> 4 ) & 0x07 ];
 
@@ -1329,7 +1329,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3c0_w )
 			0x0F, 0x0F, 0x0F, 0x1F, 0x07, 0x3F, 0x0F, 0x0F,
 			0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		};
-	int index = 0;
+	int index;
 
 	if ( VERBOSE_EGA )
 	{

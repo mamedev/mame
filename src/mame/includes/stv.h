@@ -178,7 +178,6 @@ public:
 
 	bitmap_rgb32 m_tmpbitmap;
 	DECLARE_VIDEO_START(stv_vdp2);
-	UINT32 screen_update_saturn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_slave_scanline);
@@ -293,7 +292,7 @@ public:
 		struct  stv_vdp1_poly_scanline scanline[512];
 	};
 
-	struct stv_vdp1_poly_scanline_data* stv_vdp1_shading_data;
+	std::unique_ptr<struct stv_vdp1_poly_scanline_data> stv_vdp1_shading_data;
 
 	struct stv_vdp2_sprite_list
 	{

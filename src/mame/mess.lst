@@ -77,6 +77,7 @@ smssdisp  // Sega Master System Store Display Unit
 megadrij  // 1988 Sega Mega Drive (Japan)
 genesis   // 1989 Sega Genesis (USA)
 megadriv  // 1990 Sega Mega Drive (Europe)
+genesis_tmss //
 pico      // 1994 Sega Pico (Europe)
 picou    // 1994 Sega Pico (USA)
 picoj    // 1993 Sega Pico (Japan)
@@ -259,7 +260,7 @@ telngtcs
 krvnjvtv
 oc2000
 mpt05
-h21		// TRQ Video Computer H-21
+h21     // TRQ Video Computer H-21
 
 
 // Game Park
@@ -325,7 +326,10 @@ neocdz  // NeoGeo CDZ
 neocdzj //
 
 // Philips
-cdimono1  // Philips CD-i (Mono-I board)
+cdimono1  // Philips CD-i model 200 (Mono-I board, PAL)
+cdimono2  // Philips CD-i model 220 (Mono-II board, NTSC)
+cdi910 //
+cdi490a //
 
 // Yamaha
 mu100   // 1997 MU-100
@@ -342,12 +346,16 @@ sc55    // 1991 Sound Canvas SC-55
 
 // Acorn
 acrnsys1  // 1979 Acorn System 1 (Microcomputer Kit)
+a6809
 atom      // 1979 Acorn Atom
 atomeb    // 1979 Acorn Atom
 atombb    // 1979 Acorn Atom
 //prophet2
 bbca      // 1981 BBC Micro Model A
 bbcb      // 1981 BBC Micro Model B w/8271 FDC
+torchf    // 1982 Torch CF240
+torchh10  // 1982 Torch CH240/10
+torchh21  // 1982 Torch CH240/21
 bbcb_de   // 1982 BBC Micro Model B (German)
 bbcb_us   // 1983 BBC Micro Model B (US)
 electron  // 1983 Acorn Electron
@@ -373,7 +381,6 @@ a3010     // 1988 Acorn Archimedes 3010
 a3020     // 1988 Acorn Archimedes 3020
 a7000     // 1995 Acorn Archimedes 7000
 a7000p    // 1997 Acorn Archimedes 7000+
-a6809
 rpc600
 rpc700
 sarpc
@@ -1022,9 +1029,10 @@ zslc3000 // Sharp Zaurus SL-C3000 "Spitz"
 zslc1000 // Sharp Zaurus SL-C1000 "Akita"
 
 // Silicon Graphics
-sgi_ip2 // IP2: IRIS 2x00, 68020, 16MHz
+sgi_ip2 // IP2: IRIS 3xx0, 68020, 16MHz
 sgi_ip6   // IP6: 4D/PI, R2000, 20MHz
-ip204415  // IP20: Indigo 1, R4400, 150MHz
+indigo3k  // IP12: Indigo 1, R3000, 33MHz
+indigo4k  // IP20: Indigo 1, R4400, 150MHz
 ip225015  // IP22: Indy, R5000, 150MHz
 ip224613    // IP22: Indy, R4600, 133MHz
 ip244415    // IP24: Indigo 2, R4400, 150MHz
@@ -2269,7 +2277,20 @@ phpball     // Tomy
 elecbowl    // Marx
 mbdtower    // Milton Bradley
 
-// hh_tms1k tispeak.c
+// hh_tms1k ticalc1x.cpp
+tisr16
+tisr16ii
+ti1270
+ti1000
+ti30
+tiprog
+tibusan1
+wizatron
+lilprof
+lilprof78
+dataman
+
+// hh_tms1k tispeak.cpp
 snspell
 snspellp
 snspella
@@ -2289,18 +2310,9 @@ tntellfr
 tntellp
 vocaid
 
-// hh_tms1k ticalc1x.c
-tisr16
-tisr16ii
-ti1270
-ti1000
-ti30
-tiprog
-tibusan1
-wizatron
-lilprof
-lilprof78
-dataman
+// hh_tms1k tispellb.cpp
+spellb
+mrchalgr
 
 // hh_ucom4
 ufombs      // Bambino
@@ -2338,7 +2350,7 @@ wildfire    // Parker Bros
 
 ssem // Manchester Small-Scale Experimental Machine, "Baby"
 craft // Craft, by [lft]
-
+r9751 // ROLM 9751 phone system
 
 //********** To sort (mostly skeleton drivers) *****************************
 
@@ -2780,3 +2792,14 @@ micral
 rd100
 proteus3
 unichamp
+st1700h
+st1701
+st1702
+st1703
+st1704
+st1705
+st1706
+st1707
+st1708
+st1714
+sanfuze2

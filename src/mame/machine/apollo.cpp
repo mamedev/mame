@@ -97,11 +97,11 @@ INPUT_PORTS_START( apollo_config )
 		PORT_CONFNAME(APOLLO_CONF_25_YEARS_AGO, APOLLO_CONF_25_YEARS_AGO, "25 Years Ago ...")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_25_YEARS_AGO, DEF_STR ( On ) )
-#ifdef APOLLO_XXL
+
 		PORT_CONFNAME(APOLLO_CONF_NODE_ID, APOLLO_CONF_NODE_ID, "Node ID from Disk")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_NODE_ID, DEF_STR ( On ) )
-#endif
+
 //      PORT_CONFNAME(APOLLO_CONF_IDLE_SLEEP, 0x00, "Idle Sleep")
 //      PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 //      PORT_CONFSETTING(APOLLO_CONF_IDLE_SLEEP, DEF_STR ( On ) )
@@ -1047,25 +1047,25 @@ void apollo_ni::call_unload()
 
 void apollo_ni::set_node_id_from_disk()
 {
-#ifdef APOLLO_XXL
-	// set node ID from UID of logical volume 1 of logical unit 0
+	omti8621_apollo_device *omti8621 = machine().device<omti8621_apollo_device>("isa1:wdc");
 	UINT8 db[0x50];
 
 	// check label of physical volume and get sector data of logical volume 1
 	// Note: sector data starts with 32 byte block header
-	if (omti8621_device::get_sector(0, db, sizeof(db), 0) == sizeof(db)
+	// set node ID from UID of logical volume 1 of logical unit 0
+	if (omti8621
+			&& omti8621->get_sector(0, db, sizeof(db), 0) == sizeof(db)
 			&& memcmp(db + 0x22, "APOLLO", 6) == 0)
 	{
 		UINT16 sector1 = apollo_is_dn5500() ? 4 : 1;
 
-		if (omti8621_device::get_sector(sector1, db, sizeof(db), 0) == sizeof(db))
+		if (omti8621->get_sector(sector1, db, sizeof(db), 0) == sizeof(db))
 		{
 			// set node_id from UID of logical volume 1 of logical unit 0
 			m_node_id = (((db[0x49] << 8) | db[0x4a]) << 8) | db[0x4b];
 			CLOG1(("apollo_ni::set_node_id_from_disk: node ID is %x", m_node_id));
 		}
 	}
-#endif
 }
 
 //##########################################################################
@@ -1076,7 +1076,7 @@ void apollo_ni::set_node_id_from_disk()
 #define VERBOSE 0
 
 static SLOT_INTERFACE_START(apollo_isa_cards)
-	SLOT_INTERFACE("wdc", ISA16_OMTI8621)   // Combo ESDI/AT floppy controller
+	SLOT_INTERFACE("wdc", ISA16_OMTI8621_APOLLO)   // Combo ESDI/AT floppy controller
 	SLOT_INTERFACE("ctape", ISA8_SC499)     // Archive SC499 cartridge tape
 	SLOT_INTERFACE("3c505", ISA16_3C505)   // 3Com 3C505 Ethernet card
 SLOT_INTERFACE_END

@@ -418,7 +418,7 @@ void lc8670_cpu_device::execute_run()
 
 		debugger_instruction_hook(this, m_pc);
 
-		int cycles = 0;
+		int cycles;
 		m_ppc = m_pc;
 
 		if (REG_PCON & HALT_MODE)
@@ -1135,7 +1135,7 @@ inline UINT8 lc8670_cpu_device::pop()
 inline UINT16 lc8670_cpu_device::get_addr()
 {
 	int mode = m_op & 0x0f;
-	UINT16 addr = 0;
+	UINT16 addr;
 
 	if (mode > 0x01 && mode <= 0x03)
 		addr = GET_D9;
@@ -1150,7 +1150,7 @@ inline UINT16 lc8670_cpu_device::get_addr()
 inline UINT8 lc8670_cpu_device::get_data()
 {
 	int mode = m_op & 0x0f;
-	UINT8 data = 0;
+	UINT8 data;
 
 	if (mode == 0x01)
 		data = GET_I8;
@@ -1217,7 +1217,7 @@ inline void lc8670_cpu_device::set_irq_flag(int source)
 
 int lc8670_cpu_device::decode_op(UINT8 op)
 {
-	int idx = 0;
+	int idx;
 	switch (op & 0x0f)
 	{
 		case 0: case 1:

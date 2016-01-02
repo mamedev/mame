@@ -465,9 +465,13 @@
 	function cpp.pchrules(prj)
 		_p('ifneq (,$(PCH))')
 		_p('$(GCH): $(PCH)')
-		_p('\t@echo $(notdir $<)')
+		if prj.msgprecompile then
+			_p('\t@echo ' .. prj.msgprecompile)
+		else
+			_p('\t@echo $(notdir $<)')
+		end		
 
-		local cmd = iif(prj.language == "C", "$(CC) -x c-header $(ALL_CFLAGS)", "$(CXX) -x c++-header $(ALL_CXXFLAGS)")
+		local cmd = iif(prj.language == "C", "$(CC) $(ALL_CFLAGS) -x c-header", "$(CXX) $(ALL_CXXFLAGS) -x c++-header")
 		_p('\t$(SILENT) %s -MMD -MP $(DEFINES) $(INCLUDES) -o "$@" -MF "$(@:%%.gch=%%.d)" -c "$<"', cmd)
 
 		_p('endif')

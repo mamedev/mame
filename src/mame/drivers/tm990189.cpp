@@ -92,8 +92,6 @@ public:
 	required_device<cassette_image_device> m_cass;
 	optional_device<tms9918_device> m_tms9918;
 
-	DECLARE_READ8_MEMBER( interrupt_level );
-
 	DECLARE_READ8_MEMBER(video_vdp_r);
 	DECLARE_WRITE8_MEMBER(video_vdp_w);
 	DECLARE_READ8_MEMBER(video_joy_r);

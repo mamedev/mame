@@ -1316,7 +1316,7 @@ void avr8_device::timer1_tick()
 	//UINT8 compare_mode[2] = { (m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1A_MASK) >> AVR8_TCCR1A_COM1A_SHIFT,
 								//(m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1B_MASK) >> AVR8_TCCR1A_COM1B_SHIFT };
 	UINT16 ocr1[2] = { static_cast<UINT16>((m_r[AVR8_REGIDX_OCR1AH] << 8) | m_r[AVR8_REGIDX_OCR1AL]),
-					   static_cast<UINT16>((m_r[AVR8_REGIDX_OCR1BH] << 8) | m_r[AVR8_REGIDX_OCR1BL]) };
+						static_cast<UINT16>((m_r[AVR8_REGIDX_OCR1BH] << 8) | m_r[AVR8_REGIDX_OCR1BL]) };
 	UINT8 ocf1[2] = { (1 << AVR8_TIFR1_OCF1A_SHIFT), (1 << AVR8_TIFR1_OCF1B_SHIFT) };
 	UINT8 int1[2] = { AVR8_INTIDX_OCF1A, AVR8_INTIDX_OCF1B };
 	INT32 increment = m_timer_increment[1];
@@ -1712,7 +1712,7 @@ void avr8_device::timer4_tick()
 	//UINT8 compare_mode[2] = { (m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1A_MASK) >> AVR8_TCCR1A_COM1A_SHIFT,
 								//(m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1B_MASK) >> AVR8_TCCR1A_COM1B_SHIFT };
 	UINT16 ocr4[2] = { static_cast<UINT16>((m_r[AVR8_REGIDX_OCR4AH] << 8) | m_r[AVR8_REGIDX_OCR4AL]),
-					   static_cast<UINT16>((m_r[AVR8_REGIDX_OCR4BH] << 8) | m_r[AVR8_REGIDX_OCR4BL]) };
+						static_cast<UINT16>((m_r[AVR8_REGIDX_OCR4BH] << 8) | m_r[AVR8_REGIDX_OCR4BL]) };
 //TODO  UINT8 ocf4[2] = { (1 << AVR8_TIFR4_OCF4A_SHIFT), (1 << AVR8_TIFR4_OCF4B_SHIFT) };
 //TODO  UINT8 int4[2] = { AVR8_INTIDX_OCF4A, AVR8_INTIDX_OCF4B };
 	INT32 increment = m_timer_increment[4];
@@ -2973,15 +2973,15 @@ void avr8_device::execute_set_input(int inputnum, int state)
 
 void avr8_device::execute_run()
 {
-	UINT32 op = 0;
-	INT32 offs = 0;
-	UINT8 rd = 0;
-	UINT8 rr = 0;
-	UINT8 res = 0;
-	UINT16 pd = 0;
-	UINT32 pd32 = 0;
-	INT16 sd = 0;
-	INT32 opcycles = 1;
+	UINT32 op;
+	INT32 offs;
+	UINT8 rd;
+	UINT8 rr;
+	UINT8 res;
+	UINT16 pd;
+	UINT32 pd32;
+	INT16 sd;
+	INT32 opcycles;
 
 	while (m_icount > 0)
 	{

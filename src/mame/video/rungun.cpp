@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(rungun_state::ttl_get_tile_info)
 	UINT32 base_addr = (FPTR)tilemap.user_data();
 	UINT8 *lvram = (UINT8 *)m_ttl_vram.get() + base_addr;
 	int attr, code;
-	
+
 	attr = (lvram[BYTE_XOR_LE(tile_index<<2)] & 0xf0) >> 4;
 	code = ((lvram[BYTE_XOR_LE(tile_index<<2)] & 0x0f) << 8) | (lvram[BYTE_XOR_LE((tile_index<<2)+2)]);
 
@@ -60,7 +60,7 @@ TILE_GET_INFO_MEMBER(rungun_state::get_rng_936_tile_info)
 {
 	UINT32 base_addr = (FPTR)tilemap.user_data();
 	int tileno, colour, flipx;
-	
+
 	tileno = m_psac2_vram[tile_index * 2 + 1 + base_addr] & 0x3fff;
 	flipx = (m_psac2_vram[tile_index * 2 + 1 + base_addr] & 0xc000) >> 14;
 	colour = 0x10 + (m_psac2_vram[tile_index * 2 + base_addr] & 0x000f);
@@ -108,7 +108,7 @@ void rungun_state::video_start()
 		m_936_tilemap[screen_num] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(rungun_state::get_rng_936_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
 		m_936_tilemap[screen_num]->set_user_data((void *)(FPTR)(screen_num * 0x80000));
 		m_936_tilemap[screen_num]->set_transparent_pen(0);
-		
+
 	}
 	m_sprite_colorbase = 0x20;
 
@@ -123,7 +123,7 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 	m_current_display_bank = machine().first_screen()->frame_number() & 1;
 	if(m_single_screen_mode == true)
 		m_current_display_bank = 0;
-		
+
 	if(m_video_priority_mode == false)
 	{
 		m_k053936->zoom_draw(screen, bitmap, cliprect, m_936_tilemap[m_current_display_bank], 0, 0, 1);
@@ -134,7 +134,7 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 		m_k055673->k053247_sprites_draw(bitmap, cliprect);
 		m_k053936->zoom_draw(screen, bitmap, cliprect, m_936_tilemap[m_current_display_bank], 0, 0, 1);
 	}
-	
+
 	m_ttl_tilemap[m_current_display_bank]->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -174,5 +174,5 @@ void rungun_state::sprite_dma_trigger(void)
 
 	// TODO: size could be programmable somehow.
 	for(int i=0;i<0x1000;i+=2)
-		m_k055673->k053247_word_w(space,i/2,m_banked_ram[(i + src_address) /2],0xffff);	
+		m_k055673->k053247_word_w(space,i/2,m_banked_ram[(i + src_address) /2],0xffff);
 }

@@ -19,12 +19,12 @@ void mystwarr_state::decode_tiles()
 	UINT8 *s = memregion("gfx1")->base();
 	int len = memregion("gfx1")->bytes();
 	UINT8 *pFinish = s+len-3;
-	UINT8 *d, *decoded;
+	UINT8 *d;
 
 	int gfxnum = m_k056832->get_gfx_num();
 
-	decoded = auto_alloc_array(machine(), UINT8, len);
-	d = decoded;
+	m_decoded = std::make_unique<UINT8[]>(len);
+	d = m_decoded.get();
 
 	// now convert the data into a drawable format so we can decode it
 	while (s < pFinish)
@@ -52,7 +52,7 @@ void mystwarr_state::decode_tiles()
 		d += 5;
 	}
 
-	m_gfxdecode->gfx(gfxnum)->set_source(decoded);
+	m_gfxdecode->gfx(gfxnum)->set_source(m_decoded.get());
 }
 
 

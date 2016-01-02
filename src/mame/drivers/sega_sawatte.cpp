@@ -51,4 +51,4 @@ ROM_START( sawatte )
 ROM_END
 
 
-GAME( 1996?, sawatte,    0,       sawatte,  sawatte, driver_device,  0,  ROT0,  "Sega",    "Sawatte",          MACHINE_IS_SKELETON )
+CONS( 1996?, sawatte, 0, 0, sawatte,  sawatte, driver_device,  0, "Sega", "Sawatte", MACHINE_IS_SKELETON )

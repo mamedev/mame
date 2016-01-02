@@ -24,7 +24,7 @@ k001604_device::k001604_device(const machine_config &mconfig, const char *tag, d
 	m_layer_size(0),
 	m_roz_size(0),
 	m_txt_mem_offset(0),
-	m_roz_mem_offset(0), 
+	m_roz_mem_offset(0),
 	m_layer_roz(nullptr),
 	m_tile_ram(nullptr),
 	m_char_ram(nullptr),

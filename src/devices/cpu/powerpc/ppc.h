@@ -537,8 +537,8 @@ protected:
 
 	/* core state */
 	drc_cache           m_cache;                      /* pointer to the DRC code cache */
-	drcuml_state *      m_drcuml;                     /* DRC UML generator state */
-	ppc_frontend *      m_drcfe;                      /* pointer to the DRC front-end state */
+	std::unique_ptr<drcuml_state>      m_drcuml;                     /* DRC UML generator state */
+	std::unique_ptr<ppc_frontend>      m_drcfe;                      /* pointer to the DRC front-end state */
 	UINT32              m_drcoptions;                 /* configurable DRC options */
 
 	/* parameters for subroutines */
@@ -620,9 +620,6 @@ protected:
 		uml::code_label  labelnum;                   /* index for local labels */
 	};
 
-	int IS_PPC602(void);
-	int IS_PPC603(void);
-	int IS_PPC403(void);
 	UINT32 get_cr();
 	void set_cr(UINT32 value);
 	UINT32 get_xer();

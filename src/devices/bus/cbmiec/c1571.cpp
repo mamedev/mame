@@ -303,7 +303,7 @@ READ8_MEMBER( c1571_t::via0_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	UINT8 data;
 
 	// data in
 	data = !m_bus->data_r();

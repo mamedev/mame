@@ -921,7 +921,7 @@ READ8_MEMBER( mos6526_device::read )
 
 READ8_MEMBER( mos8520_device::read )
 {
-	UINT8 data = 0;
+	UINT8 data;
 
 	switch (offset & 0x0f)
 	{

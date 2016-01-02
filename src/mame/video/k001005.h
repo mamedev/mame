@@ -110,8 +110,6 @@ public:
 
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void swap_buffers();
-	void preprocess_texture_data(UINT8 *rom, int length, int gticlub);
-	void render_polygons();
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );

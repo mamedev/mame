@@ -2139,7 +2139,7 @@ inline UINT16 es5505_device::reg_read_test(es550x_voice *voice, offs_t offset)
 READ16_MEMBER( es5505_device::read )
 {
 	es550x_voice *voice = &m_voice[m_current_page & 0x1f];
-	UINT16 result = 0;
+	UINT16 result;
 
 	if (LOG_COMMANDS && m_eslog)
 		fprintf(m_eslog, "read from %02x/%02x -> ", m_current_page, offset);

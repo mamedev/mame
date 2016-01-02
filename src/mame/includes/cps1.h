@@ -146,14 +146,14 @@ public:
 	optional_shared_ptr<UINT16> m_objram1;
 	optional_shared_ptr<UINT16> m_objram2;
 	optional_shared_ptr<UINT16> m_output;
-	
+
 	optional_ioport m_io_in0;
 	optional_ioport m_io_in1;
 	std::unique_ptr<UINT16[]>     m_cps2_buffered_obj;
 	// game-specific
 	std::unique_ptr<UINT16[]>    m_gigaman2_dummyqsound_ram;
 	UINT16  sf2ceblp_prot;
-	
+
 	/* video-related */
 	tilemap_t      *m_bg_tilemap[3];
 	int          m_scanline1;
@@ -184,11 +184,11 @@ public:
 	int          m_cps2digitalvolumelevel;
 	int          m_cps2disabledigitalvolume;
 	emu_timer    *m_digital_volume_timer;
-	int			 m_cps2_dial_type;
-	int			 m_ecofghtr_dial_direction0;
-	int			 m_ecofghtr_dial_direction1;
-	int			 m_ecofghtr_dial_last0;
-	int			 m_ecofghtr_dial_last1;
+	int          m_cps2_dial_type;
+	int          m_ecofghtr_dial_direction0;
+	int          m_ecofghtr_dial_direction1;
+	int          m_ecofghtr_dial_last0;
+	int          m_ecofghtr_dial_last1;
 
 
 	/* fcrash sound hw */

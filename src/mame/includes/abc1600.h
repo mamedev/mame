@@ -127,13 +127,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
-	UINT8 read_io(offs_t offset);
-	void write_io(offs_t offset, UINT8 data);
-	UINT8 read_internal_io(offs_t offset);
-	void write_internal_io(offs_t offset, UINT8 data);
-	UINT8 read_external_io(offs_t offset);
-	void write_external_io(offs_t offset, UINT8 data);
-
 	void update_drdy0();
 	void update_drdy1();
 	void update_drdy2();

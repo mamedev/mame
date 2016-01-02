@@ -64,12 +64,6 @@ public:
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(audio_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(lnc_w);
-	DECLARE_WRITE8_MEMBER(mmonkey_w);
-	DECLARE_WRITE8_MEMBER(btime_w);
-	DECLARE_WRITE8_MEMBER(tisland_w);
-	DECLARE_WRITE8_MEMBER(zoar_w);
-	DECLARE_WRITE8_MEMBER(disco_w);
 	DECLARE_WRITE8_MEMBER(audio_command_w);
 	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_READ8_MEMBER(zoar_dsw1_read);

@@ -987,7 +987,7 @@ void upd7220_device::draw_rectangle(int x, int y)
 void upd7220_device::draw_char(int x, int y)
 {
 	int isize,psize;
-	UINT16 tile_data = 0;
+	UINT16 tile_data;
 
 	LOG(("uPD7220 char check: %d %d %02x %08x %d %d %02x\n",x,y,m_figs.m_dir,m_ead,m_figs.m_d,m_figs.m_dc,m_figs.m_figure_type));
 

@@ -117,8 +117,6 @@ public:
 	DECLARE_READ16_MEMBER(fdc_stat_r);
 	DECLARE_WRITE16_MEMBER(fdc_data_w);
 	DECLARE_WRITE16_MEMBER(fdc_cmd_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_data_w);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	DECLARE_READ8_MEMBER( internal_data_read );
 	DECLARE_WRITE8_MEMBER( internal_data_write );
@@ -157,7 +155,6 @@ private:
 	UINT8   m_p3;
 	UINT16  m_last_write_addr;
 	UINT8 m_cass_data[4];
-	int m_centronics_busy;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<via6522_device> m_via;

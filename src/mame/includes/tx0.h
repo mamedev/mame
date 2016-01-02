@@ -179,7 +179,6 @@ public:
 	void tx0_draw_char(bitmap_ind16 &bitmap, char character, int x, int y, int color);
 	void tx0_draw_string(bitmap_ind16 &bitmap, const char *buf, int x, int y, int color);
 	void tx0_draw_vline(bitmap_ind16 &bitmap, int x, int y, int height, int color);
-	void tx0_draw_hline(bitmap_ind16 &bitmap, int x, int y, int width, int color);
 	void tx0_draw_panel_backdrop(bitmap_ind16 &bitmap);
 	void tx0_draw_panel(bitmap_ind16 &bitmap);
 	void tx0_typewriter_linefeed();

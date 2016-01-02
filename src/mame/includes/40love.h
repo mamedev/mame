@@ -79,11 +79,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(fortyl_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(bank_select_w);
 	DECLARE_WRITE8_MEMBER(pix1_w);
 	DECLARE_WRITE8_MEMBER(pix2_w);
-	DECLARE_READ8_MEMBER(pix1_r);
 	DECLARE_READ8_MEMBER(pix2_r);
 	DECLARE_WRITE8_MEMBER(undoukai_mcu_w);
 	DECLARE_READ8_MEMBER(undoukai_mcu_r);

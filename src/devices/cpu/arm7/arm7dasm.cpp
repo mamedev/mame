@@ -494,7 +494,7 @@ static UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 	}
 	else if( (opcode&0x0c000000)==0x04000000 )      //bits 27-26 == 01
 	{
-		UINT32 rn = 0;
+		UINT32 rn;
 		UINT32 rnv = 0;
 
 		/* Data Transfer */

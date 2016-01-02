@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- BBC Micro - Torch Z80 Co-Processor Discs -->
+
+<!-- Loading CPN:
+
+      Reset with Z80 co-processor enabled and Acorn CP/M System Disc 1 in drive 0.
+-->
+
+<softwarelist name="bbc_torch_flop" description="Torch Z80 Co-Processor Discs">
+
+	<software name="advent" supported="no">
+		<description>Adventure B01 - 550 points</description>
+		<year>1984</year>
+		<publisher>Crowther and Woods</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Torch Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="adventureb01.dsd" size="409600" crc="38be4448" sha1="acadee5c6648f01d84188ea05cba9b2f55fef8e5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbcbasic" supported="no">
+		<description>BBC Basic (Z80) v2.30</description>
+		<year>1984</year>
+		<publisher>Torch</publisher>
+		<info name="release" value="SC02" />
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Torch Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="bbcbasic.dsd" size="409600" crc="d72e8582" sha1="6a6080863988810117774d79a5ff94da79a1ef48" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="comanex" supported="no">
+		<description>Comanex</description>
+		<year>1982</year>
+		<publisher>Sapphire Systems</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Torch Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="comanex.dsd" size="409600" crc="5e457aea" sha1="d5544c6e56c9f6d484890951b7c1a9134df8dcf1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbaseii" supported="no">
+		<description>dBASE-II</description>
+		<year>1982</year>
+		<publisher>Torch</publisher>
+		<info name="release" value="SC05" />
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Torch Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="dbase_ii.dsd" size="409600" crc="f9dc5794" sha1="5e26e1a4b05f689b95c34e9121019cccafd7a57c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdutils" supported="no">
+		<description>Hard Disc Utilities v4.0</description>
+		<year>1985</year>
+		<publisher>Torch</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Torch Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="hard_disc_utils.dsd" size="409600" crc="c84cdc5d" sha1="a8134ccb787e831e234731297c719ad94e3ffe2a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kermit" supported="no">
+		<description>Kermit-80 v4.05</description>
+		<year>1984</year>
+		<publisher>Columbia University</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Torch Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="kermit.dsd" size="409600" crc="f48b3ca6" sha1="de7d576f5c0a0e24a5425fb41de8f73f7651d075" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="perfect" supported="no">
+		<description>Perfect Software Suite</description>
+		<year>1983</year>
+		<publisher>Torch</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Torch Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Perfect Calc"/>
+			<dataarea name="flop" size="409600">
+				<rom name="perfect_calc.dsd" size="409600" crc="9430ff7a" sha1="5666a290779a8c0151ffe4b84b6b4b80d4c841f9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Perfect Filer"/>
+			<dataarea name="flop" size="409600">
+				<rom name="perfect_filer.dsd" size="409600" crc="749784f6" sha1="020b0eeeb6a9f59ffcbec6dcdd8e14c3a181c25f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Perfect Writer"/>
+			<dataarea name="flop" size="409600">
+				<rom name="perfect_writer.dsd" size="409600" crc="32c1884a" sha1="61b7a8d35ea71529bb494b3123701601cedfc9eb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stdutil2" supported="no">
+		<description>Standard Utilities v2.0</description>
+		<year>1984</year>
+		<publisher>Torch</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Torch Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="standard_utilities_2.dsd" size="409600" crc="6e6feeec" sha1="52033a8e4772a81d5879d3d14c04cc65b5df47cf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tpascal3" supported="no">
+		<description>Turbo Pascal v3.0A</description>
+		<year>1985</year>
+		<publisher>Borland</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Torch Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="turbopascal30a.dsd" size="409600" crc="8c3dde20" sha1="15b544b9b7a3cf0369fd7c952fa3c95f741b2fc2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unicomm" supported="no">
+		<description>UniComm</description>
+		<year>1984</year>
+		<publisher>Torch</publisher>
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Torch Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="unicomms.dsd" size="409600" crc="35dd22b8" sha1="1878284d8aa1610eec80fb91a0a074acc709ec69" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordstar" supported="no">
+		<description>WordStar</description>
+		<year>1983</year>
+		<publisher>Torch</publisher>
+		<info name="release" value="SC02" />
+		<info name="format" value="CP/M" />
+		<info name="compatibility" value="Torch Z80 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="wordstar.dsd" size="409600" crc="cf3b9c77" sha1="2053ec8a1aead7c392c0e7243e8420699fd43491" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

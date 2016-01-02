@@ -120,10 +120,6 @@ public:
 	void clock_cassette(int state);
 
 	DECLARE_READ8_MEMBER( pling_r );
-	DECLARE_READ8_MEMBER( keyboard_col_r );
-	DECLARE_WRITE8_MEMBER( keyboard_row_w );
-	DECLARE_WRITE8_MEMBER( keyboard_ctrl_w );
-	DECLARE_READ8_MEMBER( keyboard_t1_r );
 	DECLARE_WRITE8_MEMBER( hrs_w );
 	DECLARE_WRITE8_MEMBER( hrc_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );

@@ -76,14 +76,11 @@ private:
 	int keyboard_is_german();
 
 	void set_mode(UINT16 mode);
-	void putchar(const UINT8 data);
 	void putdata(const UINT8 *data, int data_length);
 	void putstring(const char *data);
 
 	int push_scancode( UINT8 code, UINT8 repeat);
 	void scan_keyboard();
-	void poll_callback();
-	static TIMER_CALLBACK( static_poll_callback );
 
 	// the keyboard beeper
 	class beeper

@@ -1423,8 +1423,6 @@ void render_target::invalidate_all(void *refptr)
 	// iterate through all our primitive lists
 	for (auto & list : m_primlist)
 	{
-		
-
 		// if we have a reference to this object, release our list
 		list.acquire_lock();
 		if (list.has_reference(refptr))

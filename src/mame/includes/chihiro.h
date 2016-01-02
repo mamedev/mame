@@ -394,6 +394,7 @@ public:
 		colorformat_rendertarget = NV2A_COLOR_FORMAT::A8R8G8B8;
 		bytespixel_rendertarget = 4;
 		clear_rendertarget.set(0, 0, 639, 479);
+		primitive_type = NV2A_BEGIN_END::STOP;
 		antialias_control = 0;
 		rendertarget = nullptr;
 		depthbuffer = nullptr;
@@ -450,7 +451,6 @@ public:
 	UINT32 dilate0(UINT32 value, int bits);
 	UINT32 dilate1(UINT32 value, int bits);
 	void computedilated(void);
-	void putpixtex(int xp, int yp, int up, int vp);
 	int toggle_register_combiners_usage();
 	int toggle_wait_vblank_support();
 	void debug_grab_texture(int type, const char *filename);
@@ -515,10 +515,16 @@ public:
 		int rectangle_pitch;
 		void *buffer;
 	} texture[4];
+	NV2A_BEGIN_END primitive_type;
 	int primitives_count;
 	int indexesleft_count;
 	int indexesleft_first;
-	UINT32 indexesleft[8];
+	UINT32 indexesleft[1024]; // vertex indices sent by the software to the 3d accelerator
+	int vertex_count;
+	unsigned int vertex_first;
+	vertex_nv vertex_software[1024+2]; // vertex attributes sent by the software to the 3d accelerator
+	vertex_t vertex_xy[1024+2]; // vertex attributes computed by the 3d accelerator
+
 	struct {
 		float variable_A[4]; // 0=R 1=G 2=B 3=A
 		float variable_B[4];

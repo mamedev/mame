@@ -158,7 +158,7 @@ K055673_CB_MEMBER(konamigx_state::le2_sprite_callback)
 int konamigx_state::K055555GX_decode_vmixcolor(int layer, int *color) // (see p.62 7.2.6 and p.27 3.3)
 {
 	int vcb, shift, pal, vmx, von, pl45, emx;
-			
+
 	vcb    =  m_vcblk[layer]<<6;
 	shift  =  layer<<1;
 	pal    =  *color;
@@ -173,10 +173,10 @@ int konamigx_state::K055555GX_decode_vmixcolor(int layer, int *color) // (see p.
 	pal   |=  pl45;
 	emx   |=  vmx;
 	pal   |=  vcb;
-	
+
 	//if (m_gx_le2_textcolour_hack)
-	//	if (layer==0)
-	//		pal |= 0x1c0;
+	//  if (layer==0)
+	//      pal |= 0x1c0;
 
 	if (von == 3) emx = -1; // invalidate external mix code if all bits are from internal
 	*color =  pal;
@@ -1052,7 +1052,7 @@ K056832_CB_MEMBER(konamigx_state::alpha_tile_callback)
 		// Daisu-Kiss stage presentation
 		// Sexy Parodius level 3b
 		*code =  (m_gx_tilebanks[(d & 0xe000)>>13]<<13) + (d & 0x1fff);
-		
+
 		if (VERBOSE)
 			popmessage("skipped alpha tile(layer=%d mix=%d)", layer, mixcode);
 	}
@@ -1437,7 +1437,7 @@ UINT32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb3
 	if (m_gx_specialrozenable == 1)
 	{
 		const pen_t *paldata = m_palette->pens();
-		
+
 		// hack, draw the roz tilemap if W is held
 		if ( machine().input().code_pressed(KEYCODE_W) )
 		{

@@ -298,8 +298,6 @@ public:
 	DECLARE_WRITE8_MEMBER(vfd2_data_w);
 	DECLARE_WRITE8_MEMBER(e2ram_w);
 	DECLARE_READ8_MEMBER(direct_input_r);
-	DECLARE_READ8_MEMBER(sc3_expansion_r);
-	DECLARE_WRITE8_MEMBER(sc3_expansion_w);
 	int recdata(int changed, int data);
 	DECLARE_WRITE8_MEMBER(nec_reset_w);
 	DECLARE_WRITE8_MEMBER(nec_latch_w);

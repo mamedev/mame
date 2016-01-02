@@ -1825,7 +1825,7 @@ void upd7810_device::execute_run()
 {
 	do
 	{
-		int cc = 0;
+		int cc;
 
 		debugger_instruction_hook(this, PC);
 

@@ -102,6 +102,9 @@ end
 	links {
 		"osd_" .. _OPTIONS["osd"],
 	}
+	links {
+		"qtdbg_" .. _OPTIONS["osd"],
+	}
 	if (_OPTIONS["SOURCES"] == nil) then 
 		links {
 			"bus",

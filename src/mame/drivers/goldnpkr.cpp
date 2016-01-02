@@ -4547,7 +4547,7 @@ ROM_START( potnpkrh )
 	ROM_LOAD( "unk_2716.8a",   0x1000, 0x0800, CRC(a138afa6) SHA1(80c6d11086f78e36dfc01c15b23e70667fcf17fc) )    /* char ROM */
 
 	/* Backplane at 5a has two bits different against the common cards gfx
-       Offsets 0x380 and 0x400, bit0 is set to 0 */
+	   Offsets 0x380 and 0x400, bit0 is set to 0 */
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "unk_2716.4a",  0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
 	ROM_LOAD( "unk_2716.5a",  0x0800, 0x0800, CRC(daf38d03) SHA1(6b518494688756ad7b753fdec46b6392c4a9ebbe) )    /* cards deck gfx, bitplane2 */
@@ -10149,7 +10149,7 @@ ROM_END
 ---------------------------------------------------------------------------
 
   * First game program:
-  
+
   NMI vector is OK ($29FD).
   RES & IRQ/BRK vectors are pointing to 0x2EE3 and $3065 (JMP $2EE3)
   $2EE3 --> JMP $FBBB (where is in middle of a routine. Not the real start)
@@ -10159,22 +10159,22 @@ ROM_END
   * Second game program:
 
   Expects the string '#2D' placed in offset FAh-FCh (NVRAM)
-   
+
   fill FAh = 0x23
        FBh = 0x32
        FCh = 0x44
 
-	   #2D
+       #2D
 
   ...to pass the checks at $638c: JSR $6760
-  
+
   Another odd thing:
 
   bp 6394
-  
+
   639f: lda #$20
   63a1: sta $a0
-  63a3: lda $a0   \ 
+  63a3: lda $a0   \
   63a5: bne $63a3 / ---> loop waiting for register $a0 cleared!
 
 -------------------------------------------------------------------------*/
@@ -10215,7 +10215,7 @@ ROM_START( animpkra )
 ROM_END
 
 
-  
+
 /*********************************************
 *                Driver Init                 *
 *********************************************/

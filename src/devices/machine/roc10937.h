@@ -55,10 +55,8 @@ public:
 	static void static_set_value(device_t &device, int val);
 	virtual void update_display();
 	UINT8   m_port_val;
-	void blank(int data);
 	void shift_clock(int data);
 	void write_char(int data);
-	void setdata(int segdata, int data);
 	UINT32 set_display(UINT32 segin);
 	DECLARE_WRITE_LINE_MEMBER( sclk );
 	DECLARE_WRITE_LINE_MEMBER( data );

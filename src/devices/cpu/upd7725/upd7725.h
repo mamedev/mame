@@ -188,9 +188,6 @@ private:
 	void exec_jp(UINT32 opcode);
 	void exec_ld(UINT32 opcode);
 
-	void stack_push();
-	void stack_pull();
-
 	int m_icount;
 	int m_irq; // old irq line state, for detecting rising edges.
 

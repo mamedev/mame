@@ -488,8 +488,6 @@ void qs1000_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	// Iterate over voices and accumulate sample data
 	for (auto & chan : m_channels)
 	{
-		
-
 		UINT8 lvol = chan.m_regs[6];
 		UINT8 rvol = chan.m_regs[7];
 		UINT8 vol  = chan.m_regs[8];

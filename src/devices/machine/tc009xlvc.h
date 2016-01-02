@@ -43,9 +43,6 @@ public:
 	DECLARE_READ8_MEMBER( tc0091lvc_tvram_r );
 	DECLARE_WRITE8_MEMBER( tc0091lvc_tvram_w );
 
-	DECLARE_WRITE8_MEMBER( tc0091lvc_bg0_scroll_w );
-	DECLARE_WRITE8_MEMBER( tc0091lvc_bg1_scroll_w );
-
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

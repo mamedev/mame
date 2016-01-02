@@ -103,7 +103,7 @@ void cbm2_expansion_slot_device::device_reset()
 
 bool cbm2_expansion_slot_device::call_load()
 {
-	size_t size = 0;
+	size_t size;
 
 	if (m_card)
 	{

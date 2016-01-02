@@ -185,8 +185,6 @@ int z80ctc_device::z80daisy_irq_state()
 	int state = 0;
 	for (auto & channel : m_channel)
 	{
-		
-
 		// if we're servicing a request, don't indicate more interrupts
 		if (channel.m_int_state & Z80_DAISY_IEO)
 		{

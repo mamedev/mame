@@ -97,7 +97,6 @@ public:
 	DECLARE_WRITE8_MEMBER(hp49_bank_w);
 	TIMER_CALLBACK_MEMBER(hp48_rs232_byte_recv_cb);
 	TIMER_CALLBACK_MEMBER(hp48_rs232_byte_sent_cb);
-	TIMER_CALLBACK_MEMBER(hp48_chardev_byte_recv_cb);
 	TIMER_CALLBACK_MEMBER(hp48_kbd_cb);
 	TIMER_CALLBACK_MEMBER(hp48_timer1_cb);
 	TIMER_CALLBACK_MEMBER(hp48_timer2_cb);

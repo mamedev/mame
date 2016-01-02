@@ -478,7 +478,7 @@ UINT32 mb86233_cpu_device::GETEXTERNAL( UINT32 EB, UINT32 offset )
 		{
 			unsigned int value=GETEXTPORT()[0x27];
 			int exp=(value>>23)&0xff;
-			unsigned int res=0;
+			unsigned int res;
 			unsigned int sign=0;
 			MB86233_REG a,b;
 			int index;

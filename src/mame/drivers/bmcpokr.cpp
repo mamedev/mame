@@ -81,7 +81,6 @@ public:
 	tilemap_t *m_tilemap_2;
 	TILE_GET_INFO_MEMBER(get_t1_tile_info);
 	TILE_GET_INFO_MEMBER(get_t2_tile_info);
-	TILE_GET_INFO_MEMBER(get_t3_tile_info);
 	DECLARE_WRITE16_MEMBER(videoram_1_w);
 	DECLARE_WRITE16_MEMBER(videoram_2_w);
 

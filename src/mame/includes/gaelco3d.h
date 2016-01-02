@@ -96,12 +96,12 @@ public:
 	offs_t m_adsp_incs;
 	offs_t m_adsp_size;
 	dmadac_sound_device *m_dmadac[SOUND_CHANNELS];
-	rgb_t *m_palette;
+	std::unique_ptr<rgb_t[]> m_palette;
 	std::unique_ptr<UINT32[]> m_polydata_buffer;
 	UINT32 m_polydata_count;
 	int m_lastscan;
 	int m_video_changed;
-	gaelco3d_renderer *m_poly;
+	std::unique_ptr<gaelco3d_renderer> m_poly;
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
 	DECLARE_WRITE32_MEMBER(irq_ack32_w);
 	DECLARE_WRITE16_MEMBER(sound_data_w);

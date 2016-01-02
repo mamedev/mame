@@ -256,7 +256,6 @@ public:
 	void set_latch_hv(INT16 x, INT16 y);
 	void dynamic_res_change();
 	inline UINT32 get_vram_address();
-	UINT8 dbg_video(UINT16 curline);
 
 	UINT8 read(address_space &space, UINT32 offset, UINT8 wrio_bit7);
 	void write(address_space &space, UINT32 offset, UINT8 data);

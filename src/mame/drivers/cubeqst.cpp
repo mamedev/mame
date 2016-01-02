@@ -49,7 +49,7 @@ public:
 	required_device<cquestsnd_cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
-	rgb_t *m_colormap;
+	std::unique_ptr<rgb_t[]> m_colormap;
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_READ16_MEMBER(line_r);
 	DECLARE_WRITE16_MEMBER(laserdisc_w);
@@ -444,7 +444,7 @@ void cubeqst_state::machine_start()
 	/* TODO: Use resistor values */
 	int i;
 
-	m_colormap = auto_alloc_array(machine(), rgb_t, 65536);
+	m_colormap = std::make_unique<rgb_t[]>(65536);
 	for (i = 0; i < 65536; ++i)
 	{
 		UINT8 a, r, g, b, y;

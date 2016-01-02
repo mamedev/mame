@@ -759,7 +759,7 @@ void sp0256_device::bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int l
 /* ======================================================================== */
 UINT32 sp0256_device::getb( int len )
 {
-	UINT32 data = 0;
+	UINT32 data;
 	UINT32 d0, d1;
 
 	/* -------------------------------------------------------------------- */
@@ -822,8 +822,8 @@ void sp0256_device::micro()
 	UINT8  immed4;
 	UINT8  opcode;
 	UINT16 cr;
-	int ctrl_xfer = 0;
-	int repeat    = 0;
+	int ctrl_xfer;
+	int repeat;
 	int i, idx0, idx1;
 
 	/* -------------------------------------------------------------------- */

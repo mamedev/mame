@@ -77,7 +77,7 @@
         0xf010:
         0xf020:
 
-	TLCS -> PPC Commands:
+    TLCS -> PPC Commands:
         0x7000:                                                     DSP ready
         0xd000:                                                     Vblank
 
@@ -93,6 +93,7 @@
 
 #define LOG_TLCS_TO_PPC_COMMANDS        1
 #define LOG_PPC_TO_TLCS_COMMANDS        1
+#define LOG_DISPLAY_LIST                    0
 
 class taitopjc_state : public driver_device
 {
@@ -139,14 +140,15 @@ public:
 	UINT32 videochip_r(offs_t address);
 	void videochip_w(offs_t address, UINT32 data);
 	void video_exit();
+	void print_display_list();
 
 	DECLARE_DRIVER_INIT(optiger);
 
 	UINT16 m_dsp_ram[0x1000];
 	UINT16 m_io_share_ram[0x2000];
 
-	UINT32 *m_screen_ram;
-	UINT32 *m_pal_ram;
+	std::unique_ptr<UINT32[]> m_screen_ram;
+	std::unique_ptr<UINT32[]> m_pal_ram;
 
 	UINT32 m_video_address;
 
@@ -183,40 +185,37 @@ void taitopjc_state::video_exit()
 
 void taitopjc_state::video_start()
 {
-	m_screen_ram = auto_alloc_array(machine(), UINT32, 0x40000);
-	m_pal_ram = auto_alloc_array(machine(), UINT32, 0x8000);
+	m_screen_ram = std::make_unique<UINT32[]>(0x40000);
+	m_pal_ram = std::make_unique<UINT32[]>(0x8000);
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitopjc_state::video_exit), this));
 }
 
 UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *s = (UINT8*)m_screen_ram;
+	UINT8 *s = (UINT8*)m_screen_ram.get();
 	int x,y,t,u;
 
 	bitmap.fill(0x000000, cliprect);
+
+	UINT16 *s16 = (UINT16*)m_screen_ram.get();
 
 	for (u=0; u < 24; u++)
 	{
 		for (t=0; t < 32; t++)
 		{
-			UINT32 tile = m_screen_ram[0x3f000 + (((u*32)+(t/2)) ^ 0)];
-
-			if (t & 1)
-				tile &= 0xffff;
-			else
-				tile >>= 16;
+			UINT16 tile = s16[(0x7e000 + (u*64) + t) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
 
 			int palette = (tile >> 12) & 0xf;
 
-			tile &= 0xfff;			
+			tile &= 0xfff;
 
 			for (y=0; y < 16; y++)
 			{
 				UINT16 *fb = &bitmap.pix16(y+(u*16));
 				for (x=0; x < 16; x++)
 				{
-					UINT8 p = s[((tile*256) + ((y*16)+x)) ^3];
+					UINT8 p = s[((tile*256) + ((y*16)+x)) ^ NATIVE_ENDIAN_VALUE_LE_BE(3,0)];
 					if (p != 0)
 					{
 						fb[x+(t*16)] = (palette << 8) + p;
@@ -250,7 +249,7 @@ void taitopjc_state::videochip_w(offs_t address, UINT32 data)
 		m_pal_ram[address - 0x20000000] = data;
 
 		int b = (data >> 16) & 0xff;
-		int g = (data >>  8) & 0xff;		
+		int g = (data >>  8) & 0xff;
 		int r = (data >>  0) & 0xff;
 		m_palette->set_pen_color(address - 0x20000000, rgb_t(r, g, b));
 	}
@@ -366,6 +365,79 @@ READ64_MEMBER(taitopjc_state::dsp_r)
 	return r;
 }
 
+void taitopjc_state::print_display_list()
+{
+	int ptr = 0;
+
+	UINT16 cmd = m_dsp_ram[0xffe];
+	if (cmd == 0x5245)
+	{
+		printf("DSP command RE\n");
+		bool end = false;
+		do
+		{
+			UINT16 w = m_dsp_ram[ptr++];
+			if (w & 0x8000)
+			{
+				int count = (w & 0x7fff) + 1;
+				UINT16 d = m_dsp_ram[ptr++];
+				for (int i=0; i < count; i++)
+				{
+					UINT16 s = m_dsp_ram[ptr++];
+					printf("   %04X -> [%04X]\n", s, d);
+					d++;
+				}
+			}
+			else if (w == 0)
+			{
+				end = true;
+			}
+			else
+			{
+				switch (w)
+				{
+					case 0x406d:
+						printf("   Call %04X [%04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1]);
+						ptr += 2;
+						break;
+					case 0x40cd:
+						printf("   Call %04X [%04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1]);
+						ptr += 2;
+						break;
+					case 0x40ac:
+						printf("   Call %04X [%04X %04X %04X %04X %04X %04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2], m_dsp_ram[ptr+3], m_dsp_ram[ptr+4], m_dsp_ram[ptr+5], m_dsp_ram[ptr+6], m_dsp_ram[ptr+7]);
+						ptr += 8;
+						break;
+					case 0x4774:
+						printf("   Call %04X [%04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2]);
+						ptr += 3;
+						break;
+					case 0x47d9:
+						printf("   Call %04X [%04X %04X %04X %04X %04X %04X %04X %04X]\n", w, m_dsp_ram[ptr], m_dsp_ram[ptr+1], m_dsp_ram[ptr+2], m_dsp_ram[ptr+3], m_dsp_ram[ptr+4], m_dsp_ram[ptr+5], m_dsp_ram[ptr+6], m_dsp_ram[ptr+7]);
+						ptr += 8;
+						break;
+					default:
+					{
+						printf("Unknown call %04X\n", w);
+						for (int i=0; i < 10; i++)
+						{
+							printf("%04X\n", m_dsp_ram[ptr++]);
+						}
+						fatalerror("Unknown call %04X\n", w);
+						break;
+					}
+				}
+			}
+		} while(!end);
+	}
+	else
+	{
+		if (cmd != 0)
+			printf("DSP command %04X\n", cmd);
+		return;
+	}
+}
+
 WRITE64_MEMBER(taitopjc_state::dsp_w)
 {
 	//logerror("dsp_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask), space.device().safe_pc());
@@ -385,7 +457,9 @@ WRITE64_MEMBER(taitopjc_state::dsp_w)
 		}
 		#endif
 
-		printf("DSP command %04X\n", (UINT16)(data >> 48) & 0xffff);
+#if LOG_DISPLAY_LIST
+		print_display_list();
+#endif
 	}
 
 	if (ACCESSING_BITS_48_63)
@@ -565,7 +639,7 @@ static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, taitopjc_state )
 	AM_RANGE(0x4c00, 0xefff) AM_ROM AM_REGION("user2", 0x9800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitopjc_state )	
+static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitopjc_state )
 	AM_RANGE(0x4000, 0x6fff) AM_ROM AM_REGION("user2", 0x8000)
 	AM_RANGE(0x7000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE(tms_dspshare_r, tms_dspshare_w)
@@ -586,27 +660,27 @@ static INPUT_PORTS_START( taitopjc )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN1 )			// Coin A
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN1 )            // Coin A
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("INPUTS2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)		// Service switch
-	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW)		// Test Button
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)        // Service switch
+	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW)      // Test Button
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START1 )		// Select 1
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_START2 )		// Select 2
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START1 )       // Select 1
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_START2 )       // Select 2
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("INPUTS3")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)		// P1 trigger
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)		// P1 bomb
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)		// P2 trigger
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)		// P2 bomb
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)       // P1 trigger
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)       // P1 bomb
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)       // P2 trigger
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)       // P2 bomb
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -722,7 +796,7 @@ ROM_START( optiger )
 	ROM_REGION16_BE( 0xc00000, "poly", 0 )
 	ROM_LOAD16_WORD_SWAP( "e63-09_poly0.3", 0x000000, 0x400000, CRC(c3e2b1e0) SHA1(ee71f3f59b46e26dbe2ff724da2c509267c8bf2f) )
 	ROM_LOAD16_WORD_SWAP( "e63-10_poly1.4", 0x400000, 0x400000, CRC(f4a56390) SHA1(fc3c51a7f4639479e66ad50dcc94255d94803c97) )
-	ROM_LOAD16_WORD_SWAP( "e63-11_poly2.5", 0x800000, 0x400000, CRC(2293d9f8) SHA1(16adaa0523168ee63a7a34b29622c623558fdd82) )	
+	ROM_LOAD16_WORD_SWAP( "e63-11_poly2.5", 0x800000, 0x400000, CRC(2293d9f8) SHA1(16adaa0523168ee63a7a34b29622c623558fdd82) )
 // Poly 3 is not populated
 
 	ROM_REGION( 0x800000, "sound_data", 0 )

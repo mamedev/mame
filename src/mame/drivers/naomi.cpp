@@ -8698,6 +8698,90 @@ ROM_START( inidv3ca )
 ROM_END
 
 /**********************************************
+*
+* Naomi 2 network DVD-ROM defines
+*
+*********************************************/
+
+ROM_START( wccf212e )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10002", 0, SHA1(66b383d764eff39687de123e3e0833171c35e3b0) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0369-EXP)
+	//(sticker 253-5508-0369E)
+	ROM_LOAD("317-0369-exp.pic", 0x00, 0x4000, CRC(adf2d113) SHA1(a5703f0926d6fd4ed95daa730184067865f4b5d8) )
+ROM_END
+
+ROM_START( wccf234j )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10008", 0, SHA1(80f73b07fca1979e0161f670147d5f8a37dbeda8) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0369-JPN)
+	//(sticker 253-5508-0369J)
+	ROM_LOAD("317-0369-jpn.pic", 0x00, 0x4000, CRC(fb3672ba) SHA1(4b3c096e1e83da13fc967ca8c95d558c1cdf5817) )
+ROM_END
+
+ROM_START( wccf310j )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10013", 0, SHA1(4d58b44e39659d816d25d295ad2a1d4ec0ee0ab1) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0419-JPN)
+	//(sticker 253-5508-0419J)
+	ROM_LOAD("317-0419-jpn.pic", 0x00, 0x4000, CRC(04fae86b) SHA1(95663183c24a8a492afab8ebba084bb31fa5a312) )
+ROM_END
+
+ROM_START( wccf331e )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10015", 0, SHA1(46228791b59441d02d1170bc319b4643fad862c3) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0419-EXP)
+	//(sticker 253-5508-0419E)
+	ROM_LOAD("317-0419-exp.pic", 0x00, 0x4000, CRC(3f5e1445) SHA1(184731633c0264e2104baa006ac80d3927c3e6e5) )
+ROM_END
+
+ROM_START( wccf322e )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10015p", 0, SHA1(5187b442b42fc10cd6565176563e4b709d28b749) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0419-EXP)
+	//(sticker 253-5508-0419E)
+	ROM_LOAD("317-0419-exp.pic", 0x00, 0x4000, CRC(3f5e1445) SHA1(184731633c0264e2104baa006ac80d3927c3e6e5) )
+ROM_END
+
+ROM_START( wccf420e )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10027", 0, SHA1(c7d94f2134798efea5feb2a1b494f308fc0b81be) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0456-EXP)
+	//(sticker 253-5508-0456E)
+	ROM_LOAD("317-0456-exp.pic", 0x00, 0x4000, CRC(fb7dd592) SHA1(25e4927c83afc7ae26092ec192c40588a74a39b0) )
+ROM_END
+
+/**********************************************
  *
  * Atomiswave cart defines
  *
@@ -9509,12 +9593,12 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 /* 0042  */ GAME( 2006, takoron, naomigd, naomigd, naomi, naomi_state,  naomigd,  ROT0,   "Compile",      "Noukone Puzzle Takoron (GDL-0042)", GAME_FLAGS )
 
 /* CDV-xxxxx (CD-ROM and DVD-ROM for Naomi 2 Satellite Terminal) */
-// 10002  CD  - World Club Champion Football Serie A 2002-2003 Ver.2.12 (Sega, 2004)
-// 10008  DVD - World Club Champion Football Serie A 2002-2003 Ver.2.34 (Sega, 2004)
-// 10013  CD  - World Club Champion Football European Clubs 2004-2005 (Sega, 2005)
-// 10015  CD  - World Club Champion Football European Clubs 2004-2005 Ver.1.1 (Sega, 2005)
-// 10015P CD  - World Club Champion Football European Clubs 2004-2005 Ver.3.22 (Sega, 2005)
-// 10027  CD  - World Club Champion Football European Clubs 2005-2006 (Sega, 2006)
+/* 10002 */ GAME( 2004, wccf212e,naomigd, naomigd, naomi, naomi_state,  naomigd,  ROT0,   "Sega",         "World Club Champion Football Serie A 2002-2003 Ver. 2.12 (CDV-10002)", GAME_FLAGS )
+/* 10008 */ GAME( 2004, wccf234j,naomigd, naomigd, naomi, naomi_state,  naomigd,  ROT0,   "Sega",         "World Club Champion Football Serie A 2002-2003 Ver. 2.34 (CDV-10008)", GAME_FLAGS )
+/* 10013 */ GAME( 2005, wccf310j,naomigd, naomigd, naomi, naomi_state,  naomigd,  ROT0,   "Sega",         "World Club Champion Football European Clubs 2004-2005 (CDV-10013)", GAME_FLAGS )
+/* 10015 */ GAME( 2005, wccf331e,wccf322e,naomigd, naomi, naomi_state,  naomigd,  ROT0,   "Sega",         "World Club Champion Football European Clubs 2004-2005 Ver. 1.1 (CDV-10015)", GAME_FLAGS )
+/* 10015P*/ GAME( 2005, wccf322e,naomigd, naomigd, naomi, naomi_state,  naomigd,  ROT0,   "Sega",         "World Club Champion Football European Clubs 2004-2005 Ver. 3.22 (CDV-10015P)", GAME_FLAGS )
+/* 10027 */ GAME( 2006, wccf420e,naomigd, naomigd, naomi, naomi_state,  naomigd,  ROT0,   "Sega",         "World Club Champion Football European Clubs 2005-2006 (CDV-10027)", GAME_FLAGS )
 // ?????  ??? - World Club Champion Football Serie A 2001-2002 (Sega, 2002)
 // ?????  ??? - World Club Champion Football Serie A 2001-2002 Ver.1.2 (Sega, 2002)
 // ?????  ??? - World Club Champion Football Serie A 2001-2002 Ver.2 (Sega, 2003)

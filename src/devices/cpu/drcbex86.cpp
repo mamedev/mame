@@ -594,7 +594,7 @@ void drcbe_x86::reset()
 {
 	// output a note to the log
 	if (m_log != nullptr)
-		x86log_printf(m_log, "\n\n===========\nCACHE RESET\n===========\n\n");
+		x86log_printf(m_log, "%s", "\n\n===========\nCACHE RESET\n===========\n\n");
 
 	// generate a little bit of glue code to set up the environment
 	drccodeptr *cachetop = m_cache.begin_codegen(500);

@@ -301,7 +301,7 @@ private:
 	void    alu_abs(void);
 	void    alu_x(void);
 	void    alu_b(void);
-	void    alu_bl(void);
+	//void    alu_bl(void);
 	void    alu_blwp(void);
 	void    alu_ldcr(void);
 	void    alu_stcr(void);

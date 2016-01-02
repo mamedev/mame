@@ -95,7 +95,7 @@ PALETTE_INIT_MEMBER(tiamc1_state, tiamc1)
 	int r, g, b, ir, ig, ib;
 	float tcol;
 
-	m_palette_ptr = auto_alloc_array(machine(), rgb_t, 256);
+	m_palette_ptr = std::make_unique<rgb_t[]>(256);
 
 	for (col = 0; col < 256; col++) {
 		ir = (col >> 3) & 7;

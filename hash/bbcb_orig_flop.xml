@@ -20,7 +20,7 @@
 		<description>Magic Mushrooms</description>
 		<year>1985</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G46" />
+		<info name="release" value="SNG46" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55146">
 				<rom name="004 magic mushrooms.fsd" size="55146" crc="cac03f12" sha1="6efe0e75045805057ec45c44338ba5d2e9ec2c4e" offset="0" />
@@ -32,7 +32,7 @@
 		<description>Arcadians</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G14" />
+		<info name="release" value="SNG14" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="35063">
 				<rom name="005 arcadians.fsd" size="35063" crc="9e2f412b" sha1="6c833c589a619a4dac186d7e7a1db02b94ee8aba" offset="0" />
@@ -44,7 +44,7 @@
 		<description>Arcadians (40/80t)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G14" />
+		<info name="release" value="SNG14" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55277">
 				<rom name="006 arcadians 40-80.fsd" size="55277" crc="94e7e5cf" sha1="66c84208dd461605ed48233b02e3ee6570e95de3" offset="0" />
@@ -56,7 +56,7 @@
 		<description>Boxer (40/80t)</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G31" />
+		<info name="release" value="SNG31" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55273">
 				<rom name="007 boxer 40-80.fsd" size="55273" crc="365164a9" sha1="7f25cfa4f4cfccfbcececd0619884d02f1023628" offset="0" />
@@ -68,7 +68,7 @@
 		<description>Hopper (40/80t)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G23" />
+		<info name="release" value="SNG23" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="101175">
 				<rom name="008 hopper 40-80.fsd" size="101175" crc="597ee0d9" sha1="3e0e2ad75147ab28cc514f125221c4e765f5f308" offset="0" />
@@ -80,7 +80,7 @@
 		<description>Volcano</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G33" />
+		<info name="release" value="SNG33" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55275">
 				<rom name="009 volcano.fsd" size="55275" crc="4e16b301" sha1="8775b14d2bb46b3e4254f3e7227463ff77cfd619" offset="0" />
@@ -92,7 +92,7 @@
 		<description>Meteors</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G13" />
+		<info name="release" value="SNG13" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="24709">
 				<rom name="010 meteors.fsd" size="24709" crc="9f4226a2" sha1="6f529751be461cb695bad9778d2f4998784fda34" offset="0" />
@@ -104,7 +104,7 @@
 		<description>Labyrinth</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G41" />
+		<info name="release" value="SNG41" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55277">
 				<rom name="011 labyrinth.fsd" size="55277" crc="919768d4" sha1="12e9b368afa58198c823e789ad4827ff6aaabbb3" offset="0" />
@@ -114,9 +114,9 @@
 
 	<software name="bboxgamb">
 		<description>Black Box and Gambit</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G34" />
+		<info name="release" value="SNG34" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102329">
 				<rom name="015 black box and gambit.fsd" size="102329" crc="876b301b" sha1="c5114ea239fd42e4ae6d64c98b25a7f1ed714581" offset="0" />
@@ -128,7 +128,7 @@
 		<description>Meteor Mission</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G29" />
+		<info name="release" value="SNG29" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55282">
 				<rom name="016 meteor mission.fsd" size="55282" crc="8c538999" sha1="abab70a653d18ed50ab0d838cb9fe89efedb9aa9" offset="0" />
@@ -140,7 +140,7 @@
 		<description>Tetrapod</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G32" />
+		<info name="release" value="SNG32" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55276">
 				<rom name="017 tetrapod.fsd" size="55276" crc="bc5f3936" sha1="0752cabb3c168cb4695df1d668c9a968c7b44979" offset="0" />
@@ -152,7 +152,7 @@
 		<description>Firebug</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G39" />
+		<info name="release" value="SNG39" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55275">
 				<rom name="018 firebug.fsd" size="55275" crc="826d3399" sha1="0120f272bc4de8f6ffa480bfc235e0a579c85444" offset="0" />
@@ -164,7 +164,7 @@
 		<description>Snapper</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G04" />
+		<info name="release" value="SNG04" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55138">
 				<rom name="019 snapper.fsd" size="55138" crc="526d12a5" sha1="a40b51aa75e02bd096e08c13fd8372e0f2c71069" offset="0" />
@@ -176,7 +176,7 @@
 		<description>Drogna</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G27" />
+		<info name="release" value="SNG27" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55274">
 				<rom name="020 drogna.fsd" size="55274" crc="4ff2895f" sha1="019545da835024bf31959d78bab351988c60ba47" offset="0" />
@@ -188,7 +188,7 @@
 		<description>Go</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G42" />
+		<info name="release" value="SNG42" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55270">
 				<rom name="026 go.fsd" size="55270" crc="bb260970" sha1="cdbca519a0825c2d54a08e685cc5dc2cb9ce2842" offset="0" />
@@ -200,7 +200,7 @@
 		<description>Maze</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G11" />
+		<info name="release" value="SNG11" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55272">
 				<rom name="027 maze.fsd" size="55272" crc="38c998e4" sha1="00eee0558e2f12ba864b9612a09e911e5ba61e2e" offset="0" />
@@ -212,7 +212,7 @@
 		<description>Quondam</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G40" />
+		<info name="release" value="SNG40" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55275">
 				<rom name="028 quondam.fsd" size="55275" crc="10efe562" sha1="09c5069b68ff7dbfcfabfb0a04934e153d664945" offset="0" />
@@ -224,7 +224,7 @@
 		<description>Bouncer</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G35" />
+		<info name="release" value="SNG35" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55275">
 				<rom name="029 bouncer.fsd" size="55275" crc="8166acf9" sha1="bc3f9fe318d6f22266698f3d70f9ba3509510813" offset="0" />
@@ -236,7 +236,7 @@
 		<description>Revs</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G43" />
+		<info name="release" value="SNG43" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104934">
 				<rom name="030 revs.fsd" size="104934" crc="48f95827" sha1="2a8d2e82f1d4b0fdd56d39e2400f445a59855f98" offset="0" />
@@ -248,7 +248,7 @@
 		<description>Revs 4 Tracks</description>
 		<year>1985</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G44" />
+		<info name="release" value="SNG44" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102322">
 				<rom name="031 revs 4 tracks.fsd" size="102322" crc="d1cbdf33" sha1="b4281b2b55c292b7ed96798a52139d9a1a50b661" offset="0" />
@@ -260,7 +260,7 @@
 		<description>Acheton</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G37" />
+		<info name="release" value="SNG37" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program"/>
 			<dataarea name="flop" size="102461">
@@ -279,7 +279,7 @@
 		<description>Monsters</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G03" />
+		<info name="release" value="SNG03" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55276">
 				<rom name="034 monsters.fsd" size="55276" crc="ba2223e5" sha1="66359136ad78a049733eca596a77115037fdbe82" offset="0" />
@@ -291,7 +291,7 @@
 		<description>Monsters (40t)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G03" />
+		<info name="release" value="SNG03" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="24710">
 				<rom name="054 monsters 40track.fsd" size="24710" crc="3e371d1d" sha1="f35c4b15f8f3358c4ff9c6fc63c850d228f2e6b3" offset="0" />
@@ -303,7 +303,7 @@
 		<description>Snooker</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G21" />
+		<info name="release" value="SNG21" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55275">
 				<rom name="035 snooker.fsd" size="55275" crc="08eaa805" sha1="42254fc9b39029f30abac5e4c2da6eeec16dec4a" offset="0" />
@@ -315,7 +315,7 @@
 		<description>Carousel</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G24" />
+		<info name="release" value="SNG24" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="101177">
 				<rom name="036 carousel.fsd" size="101177" crc="dac1680a" sha1="b70cd85993adc22155ef750ef0ec3905e429d195" offset="0" />
@@ -327,7 +327,7 @@
 		<description>Free Fall</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G28" />
+		<info name="release" value="SNG28" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55277">
 				<rom name="037 free fall.fsd" size="55277" crc="eca72121" sha1="279300664a66bc95908fe48a37075adc24fb5aa1" offset="0" />
@@ -339,7 +339,7 @@
 		<description>Crazy Tracer</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G26" />
+		<info name="release" value="SNG26" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="101318">
 				<rom name="038 crazy tracer.fsd" size="101318" crc="40d4e30b" sha1="1a35ba220245b1d75319628c1c0cd5fcd53b82e9" offset="0" />
@@ -351,7 +351,7 @@
 		<description>Kingdom of Hamil</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G25" />
+		<info name="release" value="SNG25" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="73134">
 				<rom name="039 kingdom of hamil.fsd" size="73134" crc="3fe60d1e" sha1="a441d9c67a1677069f855e3b29f638b47b18aaea" offset="0" />
@@ -363,7 +363,7 @@
 		<description>Starship Command</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G22" />
+		<info name="release" value="SNG22" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="101185">
 				<rom name="040 starship command.fsd" size="101185" crc="f0bc6523" sha1="446ca8e624a0edfe29540e94b6ad76fcd80b9bfc" offset="0" />
@@ -375,7 +375,7 @@
 		<description>Countdown to Doom</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G19" />
+		<info name="release" value="SNG19" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="73495">
 				<rom name="041 countdown to doom.fsd" size="73495" crc="ba37517e" sha1="2cb63f7f044e99bd38abab273229c303f5801259" offset="0" />
@@ -387,7 +387,7 @@
 		<description>Missile Base</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G18" />
+		<info name="release" value="SNG18" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="101181">
 				<rom name="042 missile base.fsd" size="101181" crc="91a46fa1" sha1="6afc77cb445e4aa1e8069ae9134449d51786b704" offset="0" />
@@ -399,7 +399,7 @@
 		<description>Philosopher's Quest</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G01" />
+		<info name="release" value="SNG01" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55287">
 				<rom name="043 philosopher's quest.fsd" size="55287" crc="d69898f3" sha1="ea76abc3dd58565d9219c76e2c15db3168ec96be" offset="0" />
@@ -411,7 +411,7 @@
 		<description>Aviator</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G02" />
+		<info name="release" value="SNG02" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55275">
 				<rom name="044 aviator.fsd" size="55275" crc="8249a0f0" sha1="a6f2a56059851b211c0dc753b14643571b3f4002" offset="0" />
@@ -423,7 +423,7 @@
 		<description>Sphinx Adventure</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G07" />
+		<info name="release" value="SNG07" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55284">
 				<rom name="045 sphinx adventure.fsd" size="55284" crc="65f04493" sha1="45faab5009902c6df0e14fb780e74d487dcf7376" offset="0" />
@@ -435,7 +435,7 @@
 		<description>Planetoid</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G15" />
+		<info name="release" value="SNG15" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55277">
 				<rom name="046 planetoid.fsd" size="55277" crc="c9b6bd5c" sha1="48fc462499de9fd37a3e5164e723f9022ab0f870" offset="0" />
@@ -447,7 +447,7 @@
 		<description>Planetoid (40t)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G15" />
+		<info name="release" value="SNG15" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="24711">
 				<rom name="055 planetoid 40track.fsd" size="24711" crc="f8f6c291" sha1="d7a8d0b55052d62f748301b6a0ece3d6d063e606" offset="0" />
@@ -459,7 +459,7 @@
 		<description>Super Invaders</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G16" />
+		<info name="release" value="SNG16" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55282">
 				<rom name="047 super invaders.fsd" size="55282" crc="e639e138" sha1="61fa94d5beb55b178b1ec732c69649d4a6bdb6ea" offset="0" />
@@ -471,7 +471,7 @@
 		<description>Super Invaders (40t)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G16" />
+		<info name="release" value="SNG16" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="24716">
 				<rom name="053 super invaders 40track.fsd" size="24716" crc="0a8e861d" sha1="7d81dbf2a01a83266b4531c913d956a68bc63a12" offset="0" />
@@ -483,7 +483,7 @@
 		<description>Rocket Raid</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G05" />
+		<info name="release" value="SNG05" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55279">
 				<rom name="048 rocket raid.fsd" size="55279" crc="06311675" sha1="e7524e853b83906c12ec3a17497339d25596eee8" offset="0" />
@@ -495,7 +495,7 @@
 		<description>Shirley Conran's Magic Garden</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="X04" />
+		<info name="release" value="SNX04" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104959">
 				<rom name="067 shirley conran's magic garden.fsd" size="104959" crc="dd05b72c" sha1="5914bd14014f89cfae12b8e55a9b4b8349835286" offset="0" />
@@ -507,7 +507,7 @@
 		<description>Spooky Manor</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="E18" />
+		<info name="release" value="SNE18" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102321">
 				<rom name="068 spooky manor.fsd" size="102321" crc="077375a1" sha1="2b2d7cccd4bfa6fe2e8c352098e11acc685633f4" offset="0" />
@@ -517,9 +517,9 @@
 
 	<software name="peekoc">
 		<description>Peeko-Computer</description>
-		<year>198?</year>
+		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="E02" />
+		<info name="release" value="SNE02" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55478">
 				<rom name="069 peeko-computer.fsd" size="55478" crc="149db5f7" sha1="62967f65582d2e3d78c28be407dbd68da5609824" offset="0" />
@@ -529,9 +529,9 @@
 
 	<software name="busgames">
 		<description>Business Games</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="E03" />
+		<info name="release" value="SNE03" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102323">
 				<rom name="070 business games.fsd" size="102323" crc="47b34ec1" sha1="96fe3ca59520a28113387606d5d6826a236e9027" offset="0" />
@@ -543,7 +543,7 @@
 		<description>Microtext</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="L04" />
+		<info name="release" value="SNL04" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104939">
 				<rom name="075 microtext.fsd" size="104939" crc="b614ea31" sha1="224e87db1a3fa677e53f3506fa1401ee598bd2b2" offset="0" />
@@ -564,9 +564,9 @@
 
 	<software name="prtdrvgn">
 		<description>Printer Driver Generator</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="B0?" />
+		<info name="release" value="SNB16" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="105091">
 				<rom name="227 printer driver generator.fsd" size="105091" crc="c047f362" sha1="024b53fe31bdbec2083de9a9ffc8c9d2737f398d" offset="0" />
@@ -578,7 +578,7 @@
 		<description>FORTH</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="L01" />
+		<info name="release" value="SNL01" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="81355">
 				<rom name="235 forth.fsd" size="81355" crc="5d6ba897" sha1="f58964a536b59012e85298ffc55c2165b05bd154" offset="0" />
@@ -590,7 +590,7 @@
 		<description>Jars</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="E15" />
+		<info name="release" value="SNE15" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="29478">
 				<rom name="262 jars.fsd" size="29478" crc="6613abb4" sha1="19024209a8fe98df7726acbefa78744459637dcf" offset="0" />
@@ -600,9 +600,9 @@
 
 	<software name="chemanal">
 		<description>Chemical Analysis</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="E12" />
+		<info name="release" value="SNE12" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104947">
 				<rom name="263 chemical analysis.fsd" size="104947" crc="1c0ecd19" sha1="04f9c198dda70bb498844594d206918344aa13d3" offset="0" />
@@ -614,7 +614,7 @@
 		<description>JCB Digger</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="G09" />
+		<info name="release" value="SNG09" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="101190">
 				<rom name="286 jcb digger.fsd" size="101190" crc="16102871" sha1="e0226e03b831d260c8ccbab5e1a6885a0b362b10" offset="0" />
@@ -1031,8 +1031,8 @@
 
 	<software name="battbrit">
 		<description>Battle of Britain</description>
-		<year>1987</year>
-		<publisher>Design People</publisher>
+		<year>1984</year>
+		<publisher>Betasoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104947">
 				<rom name="092 battle of britain.fsd" size="104947" crc="6ba3eb9e" sha1="d0798a2bd0717cf3fc872cfdaee77e35fee9913e" offset="0" />
@@ -1997,15 +1997,15 @@
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 2"/>
-			<dataarea name="flop" size="105084">
-				<rom name="304 the hobbit side 2.fsd" size="105084" crc="2629eaff" sha1="ab033a5c6d74d7c86b0e4d03be4a2fd76814cfe2" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Picture Disk 1"/>
 			<dataarea name="flop" size="104955">
 				<rom name="304 the hobbit picture disk 1.fsd" size="104955" crc="c6b638f4" sha1="a0e0683312eaa726b1bfec3e859a7c87bcaff175" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="105084">
+				<rom name="304 the hobbit side 2.fsd" size="105084" crc="2629eaff" sha1="ab033a5c6d74d7c86b0e4d03be4a2fd76814cfe2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
@@ -2624,7 +2624,7 @@
 
 	<software name="cybermis">
 		<description>Cybertron Mission</description>
-		<year>1984</year>
+		<year>1983</year>
 		<publisher>Micro Power</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="87383">
@@ -3261,15 +3261,15 @@
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 01"/>
-			<dataarea name="flop" size="104948">
-				<rom name="156 beverly hills  cop (side 01).fsd" size="104948" crc="4ce85ea9" sha1="1e2951fb058fe10c212a5b59842733ba3dc09504" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Side 02"/>
 			<dataarea name="flop" size="104947">
 				<rom name="156 beverly hills  cop (side 02).fsd" size="104947" crc="05d06984" sha1="308cf3ff46e6b88478ab471bd412fc2d86d53e75" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 01"/>
+			<dataarea name="flop" size="104948">
+				<rom name="156 beverly hills  cop (side 01).fsd" size="104948" crc="4ce85ea9" sha1="1e2951fb058fe10c212a5b59842733ba3dc09504" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
@@ -3355,7 +3355,7 @@
 		<description>Mailing System</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="B09" />
+		<info name="release" value="SNB09" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104944">
 				<rom name="228 mailing system.fsd" size="104944" crc="e3f570ed" sha1="cd5ec03cb9c28636496b5af912d615226d78677a" offset="0" />
@@ -3367,7 +3367,7 @@
 		<description>Database</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="B06" />
+		<info name="release" value="SNB06" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102318">
 				<rom name="229 database.fsd" size="102318" crc="abebfbc3" sha1="49219fd09580b758bd2d5ab8d285555027407c05" offset="0" />
@@ -3379,7 +3379,7 @@
 		<description>Accounts Receivable</description>
 		<year>1984</year>
 		<publisher>Acornsoft/MI</publisher>
-		<info name="release" value="B10" />
+		<info name="release" value="SNB10" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104949">
 				<rom name="230 accounts receivable.fsd" size="104949" crc="ac819ec1" sha1="a9fe53efcaa39051ee4bb9bbb2b71f1009ddc8ca" offset="0" />
@@ -3391,7 +3391,7 @@
 		<description>Accounts Payable</description>
 		<year>1984</year>
 		<publisher>Acornsoft/MI</publisher>
-		<info name="release" value="B13" />
+		<info name="release" value="SNB13" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104946">
 				<rom name="231 accounts payable.fsd" size="104946" crc="cb182be6" sha1="d47a2e8b18f8efb533bc300e334b88bd06125e48" offset="0" />
@@ -3403,7 +3403,7 @@
 		<description>Purchasing</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="B14" />
+		<info name="release" value="SNB14" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104940">
 				<rom name="232 purchasing.fsd" size="104940" crc="29d5cbdf" sha1="6c0751612fd710e6d09f347cbe0cb1fba3472bd7" offset="0" />
@@ -3415,7 +3415,7 @@
 		<description>Invoicing</description>
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
-		<info name="release" value="B08" />
+		<info name="release" value="SNB08" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="104939">
 				<rom name="234 invoicing.fsd" size="104939" crc="3fdd7673" sha1="a33910702375886d4ec4e48337861634e6783d14" offset="0" />
@@ -3508,7 +3508,7 @@
 
 	<software name="dragonwb">
 		<description>Dragon World (BBC Only)</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>4mation</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102584">
@@ -3519,7 +3519,7 @@
 
 	<software name="dragonw">
 		<description>Dragon World</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>4mation</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102721">
@@ -3550,24 +3550,20 @@
 		</part>
 	</software>
 
-	<software name="boxtresc">
-		<description>Box of Treasures Create</description>
-		<year>198?</year>
-		<publisher>4mation</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="102725">
-				<rom name="250 box of treasures create.fsd" size="102725" crc="94a92558" sha1="3116adba9d0c5c454f966ccb02e5ec571c616a12" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="boxtres">
 		<description>Box of Treasures</description>
-		<year>1983</year>
+		<year>1985</year>
 		<publisher>4mation</publisher>
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Game"/>
 			<dataarea name="flop" size="102503">
 				<rom name="250 box of treasures.fsd" size="102503" crc="7e2a3d56" sha1="2a92a30c363b4830b3e9261b037fdee242103686" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Create"/>
+			<dataarea name="flop" size="102725">
+				<rom name="250 box of treasures create.fsd" size="102725" crc="94a92558" sha1="3116adba9d0c5c454f966ccb02e5ec571c616a12" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3588,6 +3584,7 @@
 		<description>Children from Space</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE16" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="79288">
 				<rom name="218 children from space.fsd" size="79288" crc="2a1f96c7" sha1="dda2f5479a755d065d830c9938370a6d743b5e28" offset="0" />
@@ -3599,6 +3596,7 @@
 		<description>Hide &amp; Seek</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE11" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="79280">
 				<rom name="219 hide and seek.fsd" size="79280" crc="6a537a1b" sha1="e1d3b464985e13da5476a1da4e40117c9cef0306" offset="0" />
@@ -3610,6 +3608,7 @@
 		<description>Facemaker</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE10" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="76468">
 				<rom name="220 facemaker.fsd" size="76468" crc="02565c9f" sha1="c3044473cad293f2c0cb2f57d2ff30ffda3ac40b" offset="0" />
@@ -3621,6 +3620,7 @@
 		<description>Squeeze</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE28" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55138">
 				<rom name="221 squeeze.fsd" size="55138" crc="9b9689e7" sha1="6d2af4e6c8454fb9e6ad588611fb22b369b2a845" offset="0" />
@@ -3632,6 +3632,7 @@
 		<description>Number Gulper</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE13" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="79282">
 				<rom name="222 number gulper.fsd" size="79282" crc="2827a37e" sha1="1c03bfb9f0af780ef9d271f715e856758795a215" offset="0" />
@@ -3643,6 +3644,7 @@
 		<description>Cranky</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE17" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="79275">
 				<rom name="223 cranky.fsd" size="79275" crc="2cef012f" sha1="b693814f465653020504f87c57a7909e6a3225a8" offset="0" />
@@ -3654,6 +3656,7 @@
 		<description>Table Adventures</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE18" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="79285">
 				<rom name="224 table adventures.fsd" size="79285" crc="098d33cf" sha1="5d21be7e707cdfd2248a6f0beb1612a4cda4a08c" offset="0" />
@@ -3665,6 +3668,7 @@
 		<description>Juggle Puzzle</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE27" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55144">
 				<rom name="225 juggle puzzle.fsd" size="55144" crc="244d1ac3" sha1="b71d331ee864e91c863065b468617e2ec13179d9" offset="0" />
@@ -3687,6 +3691,7 @@
 		<description>Let's Count</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE12" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="79280">
 				<rom name="347 let's count.fsd" size="79280" crc="8d69c2ba" sha1="7dc53270ea1a36964cd2040f3044ae83f936b27a" offset="0" />
@@ -3698,6 +3703,7 @@
 		<description>Words Words Words</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE19" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="72642">
 				<rom name="348 words words words.fsd" size="72642" crc="ecda7e69" sha1="c2706c4bd45d6eee0af3ce176a8a34d8111bcbd9" offset="0" />
@@ -3709,6 +3715,7 @@
 		<description>Podd</description>
 		<year>1984</year>
 		<publisher>Acornsoft/ASK</publisher>
+		<info name="release" value="XNE26" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102386">
 				<rom name="349 podd.fsd" size="102386" crc="6d764be9" sha1="8d6334c45f7e9d28e4300b7fe3f8a2f608e833a6" offset="0" />

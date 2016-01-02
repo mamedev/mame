@@ -55,7 +55,7 @@ public:
 	optional_shared_ptr<UINT16> m_cchip2_ram;           // for megablst only
 
 	/* video-related */
-	struct f2_tempsprite *m_spritelist;
+	std::unique_ptr<struct f2_tempsprite[]> m_spritelist;
 	int             m_sprite_type;
 
 	UINT16          m_spritebank[8];

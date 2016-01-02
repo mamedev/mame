@@ -251,7 +251,6 @@ protected:
 	inline void reset();
 	inline void initialize();
 	inline void fetch_instruction();
-	inline void fetch_instruction_debug();
 	inline void execute_instruction();
 	inline void dma_input();
 	inline void dma_output();

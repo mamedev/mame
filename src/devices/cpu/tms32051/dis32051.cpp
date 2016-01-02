@@ -27,22 +27,22 @@ static const char *const zl_condition_codes[] =
 
 static const char *const cv_condition_codes[16] =
 {
-	"",             // C=0, V=0, CM=0, VM=0
-	"nov",          // C=0, V=0, CM=0, VM=1
-	"nc",           // C=0, V=0, CM=1, VM=0
-	"nc nov",       // C=0, V=0, CM=1, VM=1
-	"",             // C=0, V=1, CM=0, VM=0
-	"ov",           // C=0, V=1, CM=0, VM=1
-	"nc",           // C=0, V=1, CM=1, VM=0
-	"nc ov",        // C=0, V=1, CM=1, VM=1
-	"",             // C=1, V=0, CM=0, VM=0
-	"nov",          // C=1, V=0, CM=0, VM=1
-	"c",            // C=1, V=0, CM=1, VM=0
-	"c nov",        // C=1, V=0, CM=1, VM=1
-	"",             // C=1, V=1, CM=0, VM=0
-	"ov",           // C=1, V=1, CM=0, VM=1
-	"c",            // C=1, V=1, CM=1, VM=0
-	"c ov",         // C=1, V=1, CM=1, VM=1
+	"",             // V=0, C=0, VM=0, CM=0
+	"nc",           // V=0, C=0, VM=0, CM=1
+	"nov",          // V=0, C=0, VM=1, CM=0
+	"nc nov",       // V=0, C=0, VM=1, CM=1
+	"",             // V=0, C=1, VM=0, CM=0
+	"c",            // V=0, C=1, VM=0, CM=1
+	"nov",          // V=0, C=1, VM=1, CM=0
+	"c nov",        // V=0, C=1, VM=1, CM=1
+	"",             // V=1, C=0, VM=0, CM=0
+	"nc",           // V=1, C=0, VM=0, CM=1
+	"ov",           // V=1, C=0, VM=1, CM=0
+	"nc ov",        // V=1, C=0, VM=1, CM=1
+	"",             // V=1, C=1, VM=0, CM=0
+	"c",            // V=1, C=1, VM=0, CM=1
+	"ov",           // V=1, C=1, VM=1, CM=0
+	"c ov",         // V=1, C=1, VM=1, CM=1
 };
 
 static const char *const tp_condition_codes[4] =
@@ -231,8 +231,8 @@ static void dasm_group_be(UINT16 opcode)
 		case 0x82:  print("or      #%04X", FETCH() << 16); break;
 		case 0x83:  print("xor     #%04X", FETCH() << 16); break;
 		case 0xc4:  print("rpt     #%04X", FETCH()); break;
-		case 0xc5:  print("rpt     #%04X", FETCH()); break;
-		case 0xc6:  print("rpt     #%04X", FETCH()); break;
+		case 0xc5:  print("rptz    #%04X", FETCH()); break;
+		case 0xc6:  print("rptb    #%04X", FETCH()); break;
 
 		default:    print("???     (group be)"); break;
 	}
@@ -566,7 +566,7 @@ CPU_DISASSEMBLE( tms32051 )
 			break;
 		}
 
-		case 0xfc: case 0xfd: case 0xfe:
+		case 0xfc: case 0xfd: case 0xfe: case 0xff:
 		{
 			int zlcvmask = opcode & 0xf;
 			int zlcv = (opcode >> 4) & 0xf;
@@ -574,13 +574,18 @@ CPU_DISASSEMBLE( tms32051 )
 			int cv = ((zlcv << 2) & 0xc) | (zlcvmask & 0x3);
 			int tp = (opcode >> 8) & 0x3;
 
-			print("retcd   ");
-			print_condition_codes(false, zl, cv, tp);
+			if (opcode == 0xff00)
+			{
+				print("retd");
+			}
+			else
+			{
+				print("retcd   ");
+				print_condition_codes(false, zl, cv, tp);
+			}
 			flags = DASMFLAG_STEP_OUT;
 			break;
 		}
-
-		case 0xff:  print("retd"); flags = DASMFLAG_STEP_OUT; break;
 
 		default:    print("???     ($%04X)", opcode); break;
 	}

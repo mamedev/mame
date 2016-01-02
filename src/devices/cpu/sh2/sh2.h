@@ -219,8 +219,8 @@ private:
 	sh2_ftcsr_read_delegate              m_ftcsr_read_cb;
 
 	drc_cache           m_cache;                  /* pointer to the DRC code cache */
-	drcuml_state *      m_drcuml;                 /* DRC UML generator state */
-	sh2_frontend *      m_drcfe;                  /* pointer to the DRC front-end state */
+	std::unique_ptr<drcuml_state>      m_drcuml;                 /* DRC UML generator state */
+	std::unique_ptr<sh2_frontend>      m_drcfe;                  /* pointer to the DRC front-end state */
 	UINT32              m_drcoptions;         /* configurable DRC options */
 
 	internal_sh2_state *m_sh2_state;

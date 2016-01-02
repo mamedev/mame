@@ -172,7 +172,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_scanline)
 {
 	int scanline = param;
 
-	// stdragon: irq 1 is raster irq ("press start" behaviour), happens at around scanline 90(-16), 2 vblank, 3 is RTE. 
+	// stdragon: irq 1 is raster irq ("press start" behaviour), happens at around scanline 90(-16), 2 vblank, 3 is RTE.
 	// p47: irq 2 valid, others RTE
 	// kickoff: irq 3 valid, others RTE
 	// tshingen: irq 3 RTE, irq 1 reads inputs, irq 2 sets vregs values (pending further investigation ...)
@@ -183,7 +183,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_scanline)
 	// plusalph: irq 1 & 3 RTE, irq 2 valid
 	// rodland: irq 1 & 3 RTE, irq 2 valid (sets palette, vregs ...)
 	// soldam: irq 1 & 3 RTE, irq 2 valid
-	
+
 	if(scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
@@ -306,7 +306,7 @@ WRITE16_MEMBER(megasys1_state::ms1_ram_w )
 	// 64th Street and Chimera Beast rely on this for attract inputs
 
 	m_ram[offset] = data;
-//	if (mem_mask != 0xffff) printf("byte write to RAM %04x %04x %04x\n", offset, data, mem_mask);
+//  if (mem_mask != 0xffff) printf("byte write to RAM %04x %04x %04x\n", offset, data, mem_mask);
 
 }
 
@@ -1501,10 +1501,9 @@ static MACHINE_CONFIG_START( system_A, megasys1_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(56.18) // same as nmk16.cpp based on YT videos.
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	//MCFG_SCREEN_REFRESH_RATE(56.18) // same as nmk16.cpp based on YT videos.
+	MCFG_SCREEN_RAW_PARAMS(SYS_A_CPU_CLOCK,406,0,256,263,16,240)
+
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update_megasys1)
 	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof_megasys1)
 	MCFG_SCREEN_PALETTE("palette")

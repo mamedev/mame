@@ -335,7 +335,7 @@ void sn76496_base_device::sound_stream_update(sound_stream &stream, stream_sampl
 	stream_sample_t *lbuffer = outputs[0];
 	stream_sample_t *rbuffer = (m_stereo)? outputs[1] : nullptr;
 
-	INT16 out = 0;
+	INT16 out;
 	INT16 out2 = 0;
 
 	while (samples > 0)

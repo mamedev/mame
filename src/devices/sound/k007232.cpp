@@ -310,7 +310,7 @@ WRITE8_MEMBER( k007232_device::write )
 READ8_MEMBER( k007232_device::read )
 {
 	int r = offset;
-	int  ch = 0;
+	int  ch;
 
 	if( r == 0x0005 || r == 0x000b ){
 	ch = r/0x0006;

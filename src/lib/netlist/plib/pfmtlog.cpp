@@ -5,13 +5,11 @@
  *
  */
 
-#if 0
 #include <cstring>
 //FIXME:: pstring should be locale free
 #include <cctype>
 #include <cstdlib>
 #include <cstdio>
-#endif
 
 #include <algorithm>
 

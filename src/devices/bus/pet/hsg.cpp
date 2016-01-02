@@ -26,7 +26,7 @@
 //**************************************************************************
 
 #define EF9365_TAG  "ef9365"
-#define EF9366_TAG  "ef9366"
+#define EF9366_TAG  EF9365_TAG
 #define SCREEN_TAG  "screen"
 
 
@@ -63,28 +63,21 @@ const rom_entry *cbm8000_hsg_t::device_rom_region() const
 
 
 //-------------------------------------------------
-//  screen_update -
-//-------------------------------------------------
-
-UINT32 cbm8000_hsg_t::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( cbm8000_hsg_a )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( cbm8000_hsg_a )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, cbm8000_hsg_t, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE(EF9365_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
 	MCFG_SCREEN_REFRESH_RATE(25)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	//MCFG_DEVICE_ADD(EF9365_TAG, EF9365, 0)
+	MCFG_DEVICE_ADD(EF9365_TAG, EF9365, 1750000)
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	MCFG_EF936X_PALETTE("palette")
+	MCFG_EF936X_BITPLANES_CNT(1);
+	MCFG_EF936X_DISPLAYMODE(EF936X_512x512_DISPLAY_MODE);
 MACHINE_CONFIG_END
 
 
@@ -94,13 +87,16 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( cbm8000_hsg_b )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, cbm8000_hsg_t, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE(EF9366_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	//MCFG_DEVICE_ADD(EF9366_TAG, EF9366, 0)
+	MCFG_DEVICE_ADD(EF9366_TAG, EF9365, 1750000)
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	MCFG_EF936X_PALETTE("palette")
+	MCFG_EF936X_BITPLANES_CNT(1);
+	MCFG_EF936X_DISPLAYMODE(EF936X_512x256_DISPLAY_MODE);
 MACHINE_CONFIG_END
 
 
@@ -132,6 +128,7 @@ machine_config_constructor cbm8000_hsg_b_t::device_mconfig_additions() const
 cbm8000_hsg_t::cbm8000_hsg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_pet_expansion_card_interface(mconfig, *this),
+	m_gdc(*this, EF9365_TAG),
 	m_9000(*this, "9000"),
 	m_a000(*this, "a000")
 {
@@ -139,13 +136,11 @@ cbm8000_hsg_t::cbm8000_hsg_t(const machine_config &mconfig, device_type type, co
 
 cbm8000_hsg_a_t::cbm8000_hsg_a_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	cbm8000_hsg_t(mconfig, CBM8000_HSG_A, "CBM 8000 High Speed Graphics (A)", tag, owner, clock, "cbm8000_hsg_a", __FILE__)
-	//m_gdc(*this, EF9365_TAG)
 {
 }
 
 cbm8000_hsg_b_t::cbm8000_hsg_b_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	cbm8000_hsg_t(mconfig, CBM8000_HSG_B, "CBM 8000 High Speed Graphics (B)", tag, owner, clock, "cbm8000_hsg_b", __FILE__)
-	//m_gdc(*this, EF9366_TAG)
 {
 }
 
@@ -156,6 +151,8 @@ cbm8000_hsg_b_t::cbm8000_hsg_b_t(const machine_config &mconfig, const char *tag,
 
 void cbm8000_hsg_t::device_start()
 {
+	m_gdc->set_color_entry(0, 0, 0, 0);
+	m_gdc->set_color_entry(1, 0, 0xff, 00);
 }
 
 
@@ -165,7 +162,7 @@ void cbm8000_hsg_t::device_start()
 
 void cbm8000_hsg_t::device_reset()
 {
-	//m_gdc->reset();
+	m_gdc->reset();
 }
 
 
@@ -219,7 +216,7 @@ UINT8 cbm8000_hsg_t::pet_bd_r(address_space &space, offs_t offset, UINT8 data, i
 		}
 		else if (offset >= 0xaf70 && offset < 0xaf80)
 		{
-			//data = m_gdc->data_r(space, offset & 0x0f);
+			data = m_gdc->data_r(space, offset & 0x0f);
 		}
 		break;
 	}
@@ -253,6 +250,6 @@ void cbm8000_hsg_t::pet_bd_w(address_space &space, offs_t offset, UINT8 data, in
 	}
 	else if (offset >= 0xaf70 && offset < 0xaf80)
 	{
-		//m_gdc->data_w(space, offset & 0x0f, data);
+		m_gdc->data_w(space, offset & 0x0f, data);
 	}
 }

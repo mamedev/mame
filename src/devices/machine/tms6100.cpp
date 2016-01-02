@@ -2,16 +2,16 @@
 // copyright-holders:Couriersud
 /**********************************************************************************************
 
-     TMS6100 simulator
+    Texas Instruments TMS6100 Voice Synthesis Memory (VSM)
 
-     Written for MAME by Couriersud
+    Written for MAME by Couriersud
 
-     Todo:
-        - implement CS
-        - implement 4 bit mode (mask programmed)
-        - implement chip addressing (0-15 mask programmed)
+    Todo:
+    - implement CS
+    - implement clock pin(CLK) and gating(RCK) properly
+    - implement chip addressing (0-15 mask programmed)
 
-     TMS6100:
+    TMS6100:
 
                  +-----------------+
        VDD       |  1           28 |  NC
@@ -30,51 +30,52 @@
        VSS       | 14           15 |  NC
                  +-----------------+
 
-     TMS6125:
+    TMS6125:
 
                  +---------+
        DATA/ADD1 | 1    16 |  NC
        DATA/ADD2 | 2    15 |  NC
        DATA/ADD4 | 3    14 |  NC
-       DATA/ADD8 | 4    13 |  NC
+       RCK       | 4    13 |  NC
        CLK       | 5    12 |  VDD
-       NC        | 6    11 |  /CS
+       DATA/ADD8 | 6    11 |  CS
        NC        | 7    10 |  M1
        M0        | 8     9 |  VSS
                  +---------+
 
-    M58819 (from radarscope schematics):
+    Mitsubishi M58819S EPROM Interface:
 
                  +-----------------+
        AD0       |  1           40 |  AD1
-       GND       |  2           39 |  AD2
-       -5V       |  3           38 |  AD3
-       A0        |  4           37 |  AD4
-       NC        |  5           36 |  AD5
-       NC        |  6           35 |  AD6
-       A1        |  7           34 |  AD7
-       A2        |  8           33 |  AD8
-       A3        |  9           32 |  AD9
-       CLK       | 10           31 |  AD10
-       NC        | 11           30 |  AD11
-       -5V       | 12           29 |  AD12
-       C0        | 13           28 |  NC
-       C1        | 14           27 |  NC
-       NC        | 15           26 |  I7
+       VDDl      |  2           39 |  AD2
+       VDD       |  3           38 |  AD3
+       A0        |  4           37 |  NC
+       NC        |  5           36 |  AD4
+       NC        |  6           35 |  AD5
+       A1        |  7           34 |  AD6
+       A2        |  8           33 |  AD7
+       A3/Q      |  9           32 |  AD8
+       CLK       | 10           31 |  AD9
+       POW       | 11           30 |  AD10
+       SL        | 12           29 |  AD11
+       C0        | 13           28 |  AD12
+       C1        | 14           27 |  AD13
+       NC        | 15           26 |  D7
        NC        | 16           25 |  NC
-       +5V       | 17           24 |  I6
-       I0        | 18           23 |  I5
-       I1        | 19           22 |  I4
-       I2        | 20           21 |  I3
+       VSS       | 17           24 |  D6
+       D0        | 18           23 |  D5
+       D1        | 19           22 |  D4
+       D2        | 20           21 |  D3
                  +-----------------+
 
-    The M58819 is used as an interface to external speech eproms.
-    NC pins may have a function, although they are not connected in
-    radarscope.
+    The M58819S is used as an interface to external speech eproms.
+    Other than not having its ROM internal, it is a clone of TMS6100.
+    C0/C1 = command pins, equal to M0/M1
+    SL = PROM expansion input
+    POC = power-on clear (think reset)
 
 ***********************************************************************************************/
 
-#include "emu.h"
 #include "tms6100.h"
 
 #define VERBOSE     (0)
@@ -88,40 +89,28 @@
 #define TMS6100_READ_PENDING        0x01
 #define TMS6100_NEXT_READ_IS_DUMMY  0x02
 
-/* Variants */
-
-#define TMS6110_IS_TMS6100    (1)
-#define TMS6110_IS_M58819     (2)
-
-
 const device_type TMS6100 = &device_creator<tms6100_device>;
 
 tms6100_device::tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_rom(*this, DEVICE_SELF)
+	m_rom(*this, DEVICE_SELF),
+	m_reverse_bits(false),
+	m_4bit_read(false)
 {
 }
 
 tms6100_device::tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS6100, "TMS6100", tag, owner, clock, "tms6100", __FILE__),
-	m_rom(*this, DEVICE_SELF)
+	m_rom(*this, DEVICE_SELF),
+	m_reverse_bits(false),
+	m_4bit_read(false)
 {
 }
 
 const device_type M58819 = &device_creator<m58819_device>;
 
 m58819_device::m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms6100_device(mconfig, M58819, "M58819 Memory Controller", tag, owner, clock, "m58819", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tms6100_device::device_config_complete()
+	: tms6100_device(mconfig, M58819, "M58819S", tag, owner, clock, "m58819s", __FILE__)
 {
 }
 
@@ -131,34 +120,7 @@ void tms6100_device::device_config_complete()
 
 void tms6100_device::device_start()
 {
-	// save device variables
-	save_item(NAME(m_addr_bits));
-	save_item(NAME(m_address));
-	save_item(NAME(m_address_latch));
-	save_item(NAME(m_tms_clock));
-	save_item(NAME(m_data));
-	save_item(NAME(m_loadptr));
-	save_item(NAME(m_m0));
-	save_item(NAME(m_m1));
-	save_item(NAME(m_state));
-	save_item(NAME(m_variant));
-	set_variant(TMS6110_IS_TMS6100);
-
-}
-
-void m58819_device::device_start()
-{
-	tms6100_device::device_start();
-	set_variant(TMS6110_IS_M58819);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void tms6100_device::device_reset()
-{
-	/* initialize the chip */
+	// zerofill
 	m_addr_bits = 0;
 	m_address = 0;
 	m_address_latch = 0;
@@ -166,80 +128,120 @@ void tms6100_device::device_reset()
 	m_m0 = 0;
 	m_m1 = 0;
 	m_state = 0;
-	m_tms_clock = 0;
 	m_data = 0;
+	m_tms_clock = 0;
+
+	// save device variables
+	save_item(NAME(m_addr_bits));
+	save_item(NAME(m_address));
+	save_item(NAME(m_address_latch));
+	save_item(NAME(m_loadptr));
+	save_item(NAME(m_m0));
+	save_item(NAME(m_m1));
+	save_item(NAME(m_state));
+	save_item(NAME(m_data));
+	save_item(NAME(m_tms_clock));
 }
 
-void tms6100_device::set_variant(int variant)
+void m58819_device::device_start()
 {
-	m_variant = variant;
+	tms6100_device::device_start();
+	m_reverse_bits = true; // m58819 'vsm-emulator' chip expects ROM bit order backwards
 }
 
-WRITE_LINE_MEMBER(tms6100_device::tms6100_m0_w)
+
+// external i/o
+
+WRITE_LINE_MEMBER(tms6100_device::m0_w)
 {
-	if (state != m_m0)
-		m_m0 = state;
+	m_m0 = (state) ? 1 : 0;
 }
 
-WRITE_LINE_MEMBER(tms6100_device::tms6100_m1_w)
+WRITE_LINE_MEMBER(tms6100_device::m1_w)
 {
-	if (state != m_m1)
-		m_m1 = state;
+	m_m1 = (state) ? 1 : 0;
 }
 
-WRITE_LINE_MEMBER(tms6100_device::tms6100_romclock_w)
+WRITE8_MEMBER(tms6100_device::addr_w)
 {
-	/* process on falling edge */
+	m_addr_bits = data & 0xf;
+}
+
+READ8_MEMBER(tms6100_device::data_r)
+{
+	return m_data;
+}
+
+READ_LINE_MEMBER(tms6100_device::data_line_r)
+{
+	// DATA/ADD8
+	return m_data;
+}
+
+
+// CLK/RCK pin
+
+WRITE_LINE_MEMBER(tms6100_device::romclock_w)
+{
+	// process on falling edge
 	if (m_tms_clock && !state)
 	{
-		switch ((m_m1<<1) | m_m0)
+		switch (m_m1 << 1 | m_m0)
 		{
 		case 0x00:
-			/* NOP in datasheet, not really ... */
+			// NOP in datasheet, not really ...
 			if (m_state & TMS6100_READ_PENDING)
 			{
 				if (m_state & TMS6100_NEXT_READ_IS_DUMMY)
 				{
+					LOG(("loaded address %08x\n", m_address_latch));
 					m_address = (m_address_latch << 3);
 					m_address_latch = 0;
 					m_loadptr = 0;
 					m_state &= ~TMS6100_NEXT_READ_IS_DUMMY;
-					LOG(("loaded address %08x\n", m_address));
 				}
 				else
 				{
-					/* read bit at address */
-					if (m_variant == TMS6110_IS_M58819)
+					// read bit(s) at address
+					UINT8 word = m_rom[m_address >> 3];
+					if (m_reverse_bits)
+						word = BITSWAP8(word,0,1,2,3,4,5,6,7);
+
+					if (m_4bit_read)
 					{
-						m_data = (m_rom[m_address >> 3] >> (7-(m_address & 0x07))) & 1;
+						m_data = word >> (m_address & 4) & 0xf;
+						m_address += 4;
 					}
-					else // m_variant == (TMS6110_IS_TMS6100 || TMS6110_IS_TMS6125)
+					else
 					{
-						m_data = (m_rom[m_address >> 3] >> (m_address & 0x07)) & 1;
+						m_data = word >> (m_address & 7) & 1;
+						m_address++;
 					}
-					m_address++;
 				}
 				m_state &= ~TMS6100_READ_PENDING;
 			}
 			break;
+
 		case 0x01:
-			/* READ */
+			// READ
 			m_state |= TMS6100_READ_PENDING;
 			break;
+
 		case 0x02:
-			/* LOAD ADDRESS */
+			// LOAD ADDRESS
 			m_state |= TMS6100_NEXT_READ_IS_DUMMY;
 			m_address_latch |= (m_addr_bits << m_loadptr);
 			LOG(("loaded address latch %08x\n", m_address_latch));
 			m_loadptr += 4;
 			break;
+
 		case 0x03:
-			/* READ AND BRANCH */
+			// READ AND BRANCH
 			if (m_state & TMS6100_NEXT_READ_IS_DUMMY)
 			{
-				m_state &= ~TMS6100_NEXT_READ_IS_DUMMY;  // clear - no dummy read according to datasheet
-				LOG(("loaded address latch %08x\n", m_address_latch));
-				m_address = m_rom[m_address_latch] | (m_rom[m_address_latch+1]<<8);
+				m_state |= TMS6100_READ_PENDING;
+				m_state &= ~TMS6100_NEXT_READ_IS_DUMMY; // clear - no dummy read according to datasheet
+				m_address = m_rom[m_address_latch] | (m_rom[m_address_latch+1] << 8);
 				m_address &= 0x3fff; // 14 bits
 				LOG(("loaded indirect address %04x\n", m_address));
 				m_address = (m_address << 3);
@@ -250,15 +252,4 @@ WRITE_LINE_MEMBER(tms6100_device::tms6100_romclock_w)
 		}
 	}
 	m_tms_clock = state;
-}
-
-WRITE8_MEMBER(tms6100_device::tms6100_addr_w)
-{
-	if (data != m_addr_bits)
-		m_addr_bits = data;
-}
-
-READ_LINE_MEMBER(tms6100_device::tms6100_data_r)
-{
-	return m_data;
 }

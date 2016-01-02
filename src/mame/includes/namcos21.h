@@ -78,7 +78,7 @@ public:
 	std::unique_ptr<UINT8[]> m_pointram;
 	int m_pointram_idx;
 	UINT16 m_pointram_control;
-	dsp_state *m_mpDspState;
+	std::unique_ptr<dsp_state> m_mpDspState;
 	int m_mbNeedsKickstart;
 	UINT32 m_pointrom_idx;
 	UINT8 m_mPointRomMSB;

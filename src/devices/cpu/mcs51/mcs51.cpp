@@ -1004,7 +1004,7 @@ void mcs51_cpu_device::transmit_receive(int source)
 void mcs51_cpu_device::update_timer_t0(int cycles)
 {
 	int mode = (GET_M0_1<<1) | GET_M0_0;
-	UINT32 count = 0;
+	UINT32 count;
 
 	if (GET_TR0)
 	{
@@ -1091,7 +1091,7 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 {
 	UINT8 mode = (GET_M1_1<<1) | GET_M1_0;
 	UINT8 mode_0 = (GET_M0_1<<1) | GET_M0_0;
-	UINT32 count = 0;
+	UINT32 count;
 
 	if (mode_0 != 3)
 	{
@@ -1713,7 +1713,7 @@ void mcs51_cpu_device::check_irqs()
 	UINT8 ints = (GET_IE0 | (GET_TF0<<1) | (GET_IE1<<2) | (GET_TF1<<3)
 			| ((GET_RI|GET_TI)<<4));
 	UINT8 int_vec = 0;
-	UINT8 int_mask = 0;
+	UINT8 int_mask;
 	int priority_request = -1;
 	int i;
 

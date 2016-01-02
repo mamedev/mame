@@ -121,7 +121,7 @@ bool z88cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		offs_t read_length = 0;
+		offs_t read_length;
 		UINT8 *cart_base = m_cart->get_cart_base();
 
 		if (cart_base != nullptr)

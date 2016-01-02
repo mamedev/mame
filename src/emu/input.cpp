@@ -676,7 +676,7 @@ bool input_seq::is_valid() const
 	for (auto code : m_code)
 	{
 		// invalid codes are never permitted
-		
+
 		if (code == INPUT_CODE_INVALID)
 			return false;
 

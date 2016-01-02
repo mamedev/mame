@@ -1918,7 +1918,7 @@ READ16_MEMBER( h63484_device::status_r )
 
 READ16_MEMBER( h63484_device::data_r )
 {
-	UINT16 res = 0xffff;
+	UINT16 res;
 
 	if(m_ar == 0) // FIFO read
 	{

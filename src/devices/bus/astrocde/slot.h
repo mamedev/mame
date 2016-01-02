@@ -30,7 +30,6 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_rom) { return 0xff; }
 
 	void rom_alloc(UINT32 size, const char *tag);
-	void ram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
 	UINT32 get_rom_size() { return m_rom_size; }
 

@@ -368,7 +368,7 @@ void adsp2181_device::idma_data_w(UINT16 data)
 
 UINT16 adsp2181_device::idma_data_r()
 {
-	UINT16 result = 0xffff;
+	UINT16 result;
 
 	// program memory?
 	if (!(m_idma_addr & 0x4000))

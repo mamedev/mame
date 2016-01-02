@@ -271,7 +271,7 @@ READ32_MEMBER( nubus_image_device::image_super_r )
 
 WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 {
-	const osd_directory_entry *dp = nullptr;
+	const osd_directory_entry *dp;
 	char fullpath[1024];
 	UINT64 filesize;
 

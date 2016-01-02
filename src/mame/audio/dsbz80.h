@@ -54,7 +54,6 @@ private:
 	UINT32 mp_start, mp_end, mp_vol, mp_pan, mp_state, lp_start, lp_end, start, end;
 	int mp_pos, audio_pos, audio_avail;
 	int status;
-	int getbit();
 };
 
 

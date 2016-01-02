@@ -283,29 +283,28 @@ void tceptor_state::decode_sprite16(const char * region)
 
 	UINT8 *src = memregion(region)->base();
 	int len = memregion(region)->bytes();
-	UINT8 *dst;
 	int i, y;
 
-	dst = auto_alloc_array(machine(), UINT8, len);
+	m_decoded_16 = std::make_unique<UINT8[]>(len);
 
 	for (i = 0; i < len / (4*4*16); i++)
 		for (y = 0; y < 16; y++)
 		{
-			memcpy(&dst[(i*4 + 0) * (2*16*16/8) + y * (2*16/8)],
+			memcpy(&m_decoded_16[(i*4 + 0) * (2*16*16/8) + y * (2*16/8)],
 					&src[i * (2*32*32/8) + y * (2*32/8)],
 					4);
-			memcpy(&dst[(i*4 + 1) * (2*16*16/8) + y * (2*16/8)],
+			memcpy(&m_decoded_16[(i*4 + 1) * (2*16*16/8) + y * (2*16/8)],
 					&src[i * (2*32*32/8) + y * (2*32/8) + (4*8/8)],
 					4);
-			memcpy(&dst[(i*4 + 2) * (2*16*16/8) + y * (2*16/8)],
+			memcpy(&m_decoded_16[(i*4 + 2) * (2*16*16/8) + y * (2*16/8)],
 					&src[i * (2*32*32/8) + y * (2*32/8) + (16*2*32/8)],
 					4);
-			memcpy(&dst[(i*4 + 3) * (2*16*16/8) + y * (2*16/8)],
+			memcpy(&m_decoded_16[(i*4 + 3) * (2*16*16/8) + y * (2*16/8)],
 					&src[i * (2*32*32/8) + y * (2*32/8) + (4*8/8) + (16*2*32/8)],
 					4);
 		}
 
-	decode_sprite(m_sprite16, &spr16_layout, dst);
+	decode_sprite(m_sprite16, &spr16_layout, m_decoded_16.get());
 }
 
 // fix sprite order
@@ -336,12 +335,9 @@ void tceptor_state::decode_sprite32(const char * region)
 	int len = memregion(region)->bytes();
 	int total = spr32_layout.total;
 	int size = spr32_layout.charincrement / 8;
-	UINT8 *dst;
 	int i;
 
-	dst = auto_alloc_array(machine(), UINT8, len);
-
-	memset(dst, 0, len);
+	m_decoded_32 = make_unique_clear<UINT8[]>(len);
 
 	for (i = 0; i < total; i++)
 	{
@@ -350,11 +346,11 @@ void tceptor_state::decode_sprite32(const char * region)
 		code = (i & 0x07f) | ((i & 0x180) << 1) | 0x80;
 		code &= ~((i & 0x200) >> 2);
 
-		memcpy(&dst[size * (i + 0)],     &src[size * (code + 0)],     size);
-		memcpy(&dst[size * (i + total)], &src[size * (code + total)], size);
+		memcpy(&m_decoded_32[size * (i + 0)],     &src[size * (code + 0)],     size);
+		memcpy(&m_decoded_32[size * (i + total)], &src[size * (code + total)], size);
 	}
 
-	decode_sprite(m_sprite32, &spr32_layout, dst);
+	decode_sprite(m_sprite32, &spr32_layout, m_decoded_32.get());
 }
 
 void tceptor_state::video_start()

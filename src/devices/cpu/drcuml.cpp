@@ -91,7 +91,7 @@ drcbe_interface::drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_
 	// find the spaces and fetch memory accessors
 	device_memory_interface *memory;
 	if (device.interface(memory))
-		for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_space); spacenum++)
+		for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_space); ++spacenum)
 			if (memory->has_space(spacenum))
 			{
 				m_space[spacenum] = &memory->space(spacenum);
@@ -121,9 +121,10 @@ drcbe_interface::~drcbe_interface()
 drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int modes, int addrbits, int ignorebits)
 	: m_device(device),
 		m_cache(cache),
-		m_beintf(device.machine().options().drc_use_c() ?
-			*static_cast<drcbe_interface *>(auto_alloc(device.machine(), drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits))) :
-			*static_cast<drcbe_interface *>(auto_alloc(device.machine(), drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits)))),
+		m_drcbe_interface(device.machine().options().drc_use_c() ?
+			std::unique_ptr<drcbe_interface>{ std::make_unique<drcbe_c>(*this, device, cache, flags, modes, addrbits, ignorebits) } :
+			std::unique_ptr<drcbe_interface>{ std::make_unique<drcbe_native>(*this, device, cache, flags, modes, addrbits, ignorebits) }),
+		m_beintf(*m_drcbe_interface.get()),
 		m_umllog(nullptr)
 {
 	// if we're to log, create the logfile
@@ -141,9 +142,6 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int
 
 drcuml_state::~drcuml_state()
 {
-	// free the back-end
-	auto_free(m_device.machine(), &m_beintf);
-
 	// close any files
 	if (m_umllog != nullptr)
 		fclose(m_umllog);

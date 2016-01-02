@@ -192,7 +192,7 @@ READ8_MEMBER( c1581_t::cia_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	UINT8 data;
 
 	// data in
 	data = !m_bus->data_r();

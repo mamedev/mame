@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Brad Oliver, Bernd Wiebelt, Allard van der Bas
+// copyright-holders:K.Wilkins
 /*****************************************************************************
  *
  * Asteroids Analog Sound system interface

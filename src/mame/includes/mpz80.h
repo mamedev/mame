@@ -65,7 +65,6 @@ public:
 	DECLARE_WRITE8_MEMBER( disp_col_w );
 	DECLARE_WRITE8_MEMBER( task_w );
 	DECLARE_WRITE8_MEMBER( mask_w );
-	DECLARE_WRITE8_MEMBER( terminal_w );
 	DECLARE_WRITE_LINE_MEMBER( s100_pint_w );
 	DECLARE_WRITE_LINE_MEMBER( s100_nmi_w );
 	DECLARE_DIRECT_UPDATE_MEMBER(mpz80_direct_update_handler);

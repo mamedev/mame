@@ -3414,7 +3414,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
 				/* pixel pipeline part 2 handles color combine, fog, alpha, and final output */
 				PIXEL_PIPELINE_END(v, stats, dither, dither4, dither_lookup, x, dest, depth,
 					v->reg[fbzMode].u, v->reg[fbzColorPath].u, v->reg[alphaMode].u, v->reg[fogMode].u,
-					iterz, iterw, iterargb);
+					iterz, iterw, iterargb) {};
 nextpixel:
 			/* advance our pointers */
 			x++;
@@ -5317,7 +5317,7 @@ static INT32 swapbuffer(voodoo_state *v, UINT32 data)
 
 static INT32 triangle(voodoo_state *v)
 {
-	int texcount = 0;
+	int texcount;
 	UINT16 *drawbuf;
 	int destbuf;
 	int pixels;

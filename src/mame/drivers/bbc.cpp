@@ -32,7 +32,7 @@
 
     Acorn Business Computer
 
-    ABC110        - 64K, 10MB HDD, Z80, CP/M 2.2
+    ABC110        - 64K,   10MB HDD, Z80, CP/M 2.2
     ABC210/ACW443 - 4096K, 20MB HDD, 32016, PanOS
     ABC310        - 1024K, 10MB HDD, 80286, DOS 3.1/GEM
 
@@ -386,13 +386,13 @@ static INPUT_PORTS_START(bbc_keyboard)
 
 	PORT_START("COL9")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LEFT")               PORT_CODE(KEYCODE_LEFT)         PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DOWN")               PORT_CODE(KEYCODE_DOWN)         PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("UP")                 PORT_CODE(KEYCODE_UP)           PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)            PORT_CODE(KEYCODE_LEFT)         PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)            PORT_CODE(KEYCODE_DOWN)         PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP)              PORT_CODE(KEYCODE_UP)           PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RETURN")             PORT_CODE(KEYCODE_ENTER)        PORT_CHAR(13)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DELETE")             PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("COPY")               PORT_CODE(KEYCODE_END)          PORT_CHAR(UCHAR_MAMEKEY(END))
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RIGHT")              PORT_CODE(KEYCODE_RIGHT)        PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)           PORT_CODE(KEYCODE_RIGHT)        PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 	PORT_START("BRK")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK")              PORT_CODE(KEYCODE_F12)          PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, trigger_reset, 0)
@@ -409,6 +409,49 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START(bbc_keypad)
+	PORT_MODIFY("COL10")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 6")           PORT_CODE(KEYCODE_6_PAD)        PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 8")           PORT_CODE(KEYCODE_8_PAD)        PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad +")           PORT_CODE(KEYCODE_PLUS_PAD)     PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad /")           PORT_CODE(KEYCODE_SLASH_PAD)    PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad #")           PORT_CODE(KEYCODE_NUMLOCK)      PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 0")           PORT_CODE(KEYCODE_0_PAD)        PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 4")           PORT_CODE(KEYCODE_4_PAD)        PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
+
+	PORT_MODIFY("COL11")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 7")           PORT_CODE(KEYCODE_7_PAD)        PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 9")           PORT_CODE(KEYCODE_9_PAD)        PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad -")           PORT_CODE(KEYCODE_MINUS_PAD)    PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad DELETE")      PORT_CODE(KEYCODE_DEL_PAD)      PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad *")           PORT_CODE(KEYCODE_ASTERISK)     PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 1")           PORT_CODE(KEYCODE_1_PAD)        PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 5")           PORT_CODE(KEYCODE_5_PAD)        PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
+
+	PORT_MODIFY("COL12")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad RETURN")      PORT_CODE(KEYCODE_ENTER_PAD)    PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad .")           PORT_CODE(KEYCODE_STOP)         PORT_CHAR(UCHAR_MAMEKEY(STOP))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad ,")           PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(UCHAR_MAMEKEY(COMMA))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 3")           PORT_CODE(KEYCODE_3_PAD)        PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 2")           PORT_CODE(KEYCODE_2_PAD)        PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START(torch_keyboard)
+	PORT_MODIFY("COL9")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MOVE LEFT")          PORT_CODE(KEYCODE_LEFT)         PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LOWERCASE")          PORT_CODE(KEYCODE_DOWN)         PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("UPPERCASE")          PORT_CODE(KEYCODE_UP)           PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RETURN")             PORT_CODE(KEYCODE_ENTER)        PORT_CHAR(13)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DELETE THIS")        PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MOVE PAST")          PORT_CODE(KEYCODE_END)          PORT_CHAR(UCHAR_MAMEKEY(END))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MOVE RIGHT")         PORT_CODE(KEYCODE_RIGHT)        PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+
 	PORT_MODIFY("COL10")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 6")           PORT_CODE(KEYCODE_6_PAD)        PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
@@ -651,6 +694,13 @@ static INPUT_PORTS_START(bbcbp)
 	PORT_INCLUDE(bbc_joy)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(torch)
+	PORT_INCLUDE(bbc_keyboard)
+	PORT_INCLUDE(torch_keyboard)
+	PORT_INCLUDE(bbcb_links)
+	PORT_INCLUDE(bbc_joy)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START(abc)
 	PORT_INCLUDE(bbc_keyboard)
 	PORT_INCLUDE(bbc_keypad)
@@ -684,6 +734,7 @@ WRITE_LINE_MEMBER(bbc_state::bbcb_acia6850_irq_w)
 FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbc )
 	FLOPPY_BBC_DFS_FORMAT,
 	FLOPPY_BBC_CPM_FORMAT,
+	FLOPPY_BBC_CPN_FORMAT,
 	FLOPPY_FSD_FORMAT
 FLOPPY_FORMATS_END
 
@@ -691,6 +742,7 @@ FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbcm )
 	FLOPPY_BBC_DFS_FORMAT,
 	FLOPPY_BBC_ADFS_FORMAT,
 	FLOPPY_BBC_CPM_FORMAT,
+	FLOPPY_BBC_CPN_FORMAT,
 	FLOPPY_BBC_DOS_FORMAT,
 	FLOPPY_FSD_FORMAT
 FLOPPY_FORMATS_END
@@ -879,6 +931,14 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "qd", bbc_state::floppy_formats_bbc)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
+	/* econet */
+	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
+	MCFG_MC6854_OUT_TXD_CB(DEVWRITELINE(ECONET_TAG, econet_device, data_w))
+	MCFG_ECONET_ADD()
+	MCFG_ECONET_CLK_CALLBACK(WRITELINE(bbc_state, econet_clk_w))
+	MCFG_ECONET_DATA_CALLBACK(DEVWRITELINE("mc6854", mc6854_device, set_rx))
+	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, NULL)
+
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_ls_b", "bbcb_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_ls_b", "bbcb_flop")
@@ -955,6 +1015,46 @@ static MACHINE_CONFIG_DERIVED( bbcbp128, bbcb1770 )
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
+MACHINE_CONFIG_END
+
+
+/***************************************************************************
+
+    Torch Computers
+
+****************************************************************************/
+
+
+static MACHINE_CONFIG_DERIVED( torchf, bbcb )
+	/* basic machine hardware */
+	MCFG_MACHINE_START_OVERRIDE(bbc_state, torch)
+	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, torch)
+
+	/* Add Torch Z80 Communicator co-processor */
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_torch", "bbc_torch_flop")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_z80")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_32016")
+	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_68000")
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( torchh10, torchf )
+	/* fdc */
+	MCFG_DEVICE_REMOVE("i8271:1")
+
+	/* Add 10MB HDD */
+
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( torchh21, torchf )
+	/* fdc */
+	MCFG_DEVICE_REMOVE("i8271:1")
+
+	/* Add 21MB HDD */
+
 MACHINE_CONFIG_END
 
 
@@ -1523,10 +1623,10 @@ ROM_START(bbcb_us)
 	ROM_DEFAULT_BIOS("os10b3")
 	ROM_SYSTEM_BIOS( 0, "os10b3", "OS A1.0 / BASIC3" )
 	ROMX_LOAD("usmos10.rom",  0x40000, 0x4000, CRC(c8e946a9) SHA1(83d91d089dca092d2c8b7c3650ff8143c9069b89), ROM_BIOS(1))
-	ROMX_LOAD("usbasic3.rom", 0x3c000, 0x4000, CRC(161b9539) SHA1(b39014610a968789afd7695aa04d1277d874405c), ROM_BIOS(1)) /* rom page 15 3c000 */
+	ROMX_LOAD("usbasic3.rom", 0x38000, 0x4000, CRC(161b9539) SHA1(b39014610a968789afd7695aa04d1277d874405c), ROM_BIOS(1)) /* rom page 15 3c000 */
 
 	ROM_LOAD("viewa210.rom", 0x30000, 0x4000, CRC(4345359f) SHA1(88c93df1854f5fbe6cd6e5f0e29a8bf4ea3b5614))
-	ROM_LOAD("usdnfs10.rom", 0x38000, 0x4000, CRC(7e367e8c) SHA1(161f585dc45665ea77433c84afd2f95049f7f5a0))
+	ROM_LOAD("usdnfs10.rom", 0x34000, 0x4000, CRC(7e367e8c) SHA1(161f585dc45665ea77433c84afd2f95049f7f5a0))
 
 	ROM_REGION(0x4000, "os", 0)
 	ROM_COPY("option", 0x40000, 0, 0x4000)
@@ -1534,6 +1634,42 @@ ROM_START(bbcb_us)
 	ROM_REGION(0x8000, "vsm", 0) /* system speech PHROM */
 	ROM_LOAD("phrom_us.bin", 0x0000, 0x4000, CRC(bf4b3b64) SHA1(66876702d1d95eecc034d20f25047f893a27cde5))
 ROM_END
+
+
+ROM_START(torchf)
+	ROM_REGION(0x08000,"maincpu",ROMREGION_ERASEFF) /* RAM */
+
+	ROM_REGION(0x44000,"option",0) /* ROM */
+	/* rom page 12 30000 IC52  BASIC */
+	/* rom page 13 34000 IC88  DNFS */
+	/* rom page 14 38000 IC100 CPN */
+	/* rom page 15 3c000 IC101 SPARE SOCKET */
+	ROM_LOAD("os12.rom", 0x40000, 0x4000, CRC(3c14fc70) SHA1(0d9bcaf6a393c9ce2359ed700ddb53c232c2c45d)) /* os */
+
+	ROM_LOAD("basic2.rom", 0x0c000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281))
+	ROM_LOAD("dnfs120-201666.rom", 0x34000, 0x4000, CRC(8ccd2157) SHA1(7e3c536baeae84d6498a14e8405319e01ee78232))
+
+	ROM_DEFAULT_BIOS("mcp120cbl")
+	ROM_SYSTEM_BIOS( 0, "mcp120cbl", "MCP120CBL" )
+	ROMX_LOAD("mcp120cbl.rom", 0x38000, 0x4000, CRC(851d0879) SHA1(2e54ef15692ba7dd9fcfd1ef0d660464a772b156), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "mcp041cbl", "MCP041CBL" )
+	ROMX_LOAD("mcp041cbl.rom", 0x38000, 0x4000, CRC(b36f07f4) SHA1(bd53f09bf73357845a6f97df1ee9e5aea5cdca90), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 2, "cpn071", "CPN71+" )
+	ROMX_LOAD("cpn071.rom",    0x38000, 0x2000, CRC(fcb1bdc8) SHA1(756e22f6d76eb26206765f92c78c7152944102b6), ROM_BIOS(3))
+	ROM_RELOAD(                0x3a000, 0x2000 )
+
+	ROM_REGION(0x4000, "os", 0)
+	ROM_COPY("option", 0x40000, 0, 0x4000)
+
+	ROM_REGION(0x8000, "vsm", 0) /* system speech PHROM */
+	ROM_LOAD("phrom_us.bin", 0x0000, 0x4000, CRC(bf4b3b64) SHA1(66876702d1d95eecc034d20f25047f893a27cde5))
+ROM_END
+
+
+#define rom_torchh10 rom_torchf
+
+
+#define rom_torchh21 rom_torchf
 
 
 ROM_START(bbcbp)
@@ -1558,7 +1694,7 @@ ROM_START(bbcbp)
 	/* rom page 11 2c000 IC68 SPARE SOCKET */
 	/* rom page 12 30000 SWRAM (B+ 128K only) */
 	/* rom page 13 34000 SWRAM (B+ 128K only) */
-	/* rom page 14 38000  32K IN PAGE 15 */
+	/* rom page 14 38000 IC71 32K IN PAGE 15 */
 	/* rom page 15 3C000 IC71 BASIC */
 	ROM_LOAD("adfs130.rom", 0x14000, 0x4000, CRC(d3855588) SHA1(301fd05c475a629c4bec70510d4507256a5b00d8))
 	ROM_LOAD("ddfs223.rom", 0x1c000, 0x4000, CRC(7891f9b7) SHA1(0d7ed0b0b3852cb61970ada1993244f2896896aa))
@@ -1693,11 +1829,11 @@ ROM_START(bbcm)
 	ROM_REGION(0x10000,"maincpu",ROMREGION_ERASEFF) /* ROM MEMORY */
 
 	ROM_REGION(0x44000,"option",0) /* ROM */
-	ROM_DEFAULT_BIOS("mos350")
-	ROM_SYSTEM_BIOS( 0, "mos350", "Enhanced MOS 3.50" )
-	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "mos320", "Original MOS 3.20" )
-	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(2))
+	ROM_DEFAULT_BIOS("mos320")
+	ROM_SYSTEM_BIOS( 0, "mos320", "Original MOS 3.20" )
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "mos350", "Enhanced MOS 3.50" )
+	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(2))
 	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
 	ROM_FILL(0x20000, 0x4000, 0xFFFF)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
@@ -1951,15 +2087,18 @@ ROM_END
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  CLASS        INIT     COMPANY     FULLNAME                         FLAGS */
 COMP ( 1981, bbcb,     0,        bbca,  bbcb,     bbcb,  bbc_state,   bbc,     "Acorn",    "BBC Micro Model B w/8271 FDC",  MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1981, bbca,     bbcb,     0,     bbca,     bbca,  bbc_state,   bbc,     "Acorn",    "BBC Micro Model A",             MACHINE_IMPERFECT_GRAPHICS)
+COMP ( 1982, torchf,   bbcb,     0,     torchf,   torch, bbc_state,   bbc,     "Torch",    "Torch CF240",                   MACHINE_IMPERFECT_KEYBOARD | MACHINE_NOT_WORKING)
+COMP ( 1982, torchh10, bbcb,     0,     torchh10, torch, bbc_state,   bbc,     "Torch",    "Torch CH240/10",                MACHINE_IMPERFECT_KEYBOARD | MACHINE_NOT_WORKING)
+COMP ( 1982, torchh21, bbcb,     0,     torchh21, torch, bbc_state,   bbc,     "Torch",    "Torch CH240/21",                MACHINE_IMPERFECT_KEYBOARD | MACHINE_NOT_WORKING)
 COMP ( 1982, bbcb_de,  bbcb,     0,     bbcb_de,  bbcb,  bbc_state,   bbc,     "Acorn",    "BBC Micro Model B (German)",    MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1983, bbcb_us,  bbcb,     0,     bbcb_us,  bbcb,  bbc_state,   bbc,     "Acorn",    "BBC Micro Model B (US)",        MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1984, bbcb1770, bbcb,     0,     bbcb1770, bbcb,  bbc_state,   bbc,     "Acorn",    "BBC Micro Model B w/1770 FDC",  MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1985, bbcbp,    0,        bbcb,  bbcbp,    bbcbp, bbc_state,   bbc,     "Acorn",    "BBC Micro Model B+ 64K",        MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1985, bbcbp128, bbcbp,    0,     bbcbp128, bbcbp, bbc_state,   bbc,     "Acorn",    "BBC Micro Model B+ 128K",       MACHINE_IMPERFECT_GRAPHICS)
-COMP ( 1985, acw443,   0,        0,     acw443,   abc,   bbc_state,   bbc,     "Acorn",    "ABC 210/Cambridge Workstation", MACHINE_NOT_WORKING)
-COMP ( 1985, abc110,   acw443,   0,     abc110,   abc,   bbc_state,   bbc,     "Acorn",    "ABC 110",                       MACHINE_NOT_WORKING)
-COMP ( 1985, abc310,   acw443,   0,     abc310,   abc,   bbc_state,   bbc,     "Acorn",    "ABC 310",                       MACHINE_NOT_WORKING)
-COMP ( 1985, reutapm,  0,        0,     reutapm,  bbcb,  bbc_state,   bbc,     "Acorn",    "Reuters APM",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP ( 1985, acw443,   bbcbp,    0,     acw443,   abc,   bbc_state,   bbc,     "Acorn",    "ABC 210/Cambridge Workstation", MACHINE_NOT_WORKING)
+COMP ( 1985, abc110,   bbcbp,    0,     abc110,   abc,   bbc_state,   bbc,     "Acorn",    "ABC 110",                       MACHINE_NOT_WORKING)
+COMP ( 1985, abc310,   bbcbp,    0,     abc310,   abc,   bbc_state,   bbc,     "Acorn",    "ABC 310",                       MACHINE_NOT_WORKING)
+COMP ( 1985, reutapm,  bbcbp,    0,     reutapm,  bbcb,  bbc_state,   bbc,     "Acorn",    "Reuters APM",                   MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
 COMP ( 1986, bbcm,     0,        bbcb,  bbcm,     bbcm,  bbc_state,   bbc,     "Acorn",    "BBC Master 128",                MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcmt,    bbcm,     0,     bbcmt,    bbcm,  bbc_state,   bbc,     "Acorn",    "BBC Master Turbo",              MACHINE_NOT_WORKING)
 COMP ( 1986, bbcmaiv,  bbcm,     0,     bbcmaiv,  bbcm,  bbc_state,   bbc,     "Acorn",    "BBC Master AIV",                MACHINE_NOT_WORKING)

@@ -79,9 +79,6 @@ class avr8_device;
 class avr8_device : public cpu_device
 {
 public:
-	// construction/destruction
-	avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 address_mask);
-
 	// inline configuration helpers
 	static void set_eeprom_tag(device_t &device, const char *tag) { downcast<avr8_device &>(device).m_eeprom_tag = tag; }
 
@@ -188,13 +185,6 @@ protected:
 	UINT64 m_elapsed_cycles;
 
 	// memory access
-	inline UINT8 program_read8(UINT32 addr);
-	inline UINT16 program_read16(UINT32 addr);
-	inline void program_write8(UINT32 addr, UINT8 data);
-	inline void program_write16(UINT32 addr, UINT16 data);
-	inline UINT8 io_read8(UINT16 addr);
-	inline void io_write8(UINT16 addr, UINT8 data);
-	inline UINT16 opcode_read();
 	inline void push(UINT8 val);
 	inline UINT8 pop();
 	inline bool is_long_opcode(UINT16 op);
@@ -204,7 +194,6 @@ protected:
 
 	// interrupts
 	void set_irq_line(UINT16 vector, int state);
-	void update_interrupt_internal(int source);
 
 	// timers
 	void timer_tick(int cycles);

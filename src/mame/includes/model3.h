@@ -287,9 +287,7 @@ public:
 	TILE_GET_INFO_MEMBER(tile_info_layer3_8bit);
 	void reset_triangle_buffers();
 	m3_triangle* push_triangle(bool alpha);
-	void draw_layers(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int sx, int sy, int prio);
-	void draw_3d_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void invalidate_texture(int page, int texx, int texy, int texwidth, int texheight);
 	cached_texture *get_texture(int page, int texx, int texy, int texwidth, int texheight, int format);
 	inline void write_texture16(int xpos, int ypos, int width, int height, int page, UINT16 *data);

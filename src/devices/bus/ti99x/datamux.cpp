@@ -429,7 +429,7 @@ void ti99_datamux_device::device_reset(void)
 			}
 			else
 			{
-				UINT32 set = 0;
+				UINT32 set;
 				bool active_device = true;
 				if (list[i].setting!=nullptr)
 				{

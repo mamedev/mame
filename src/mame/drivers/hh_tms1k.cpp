@@ -7,7 +7,7 @@
   part of a series is (or will be) in its own driver.
 
   Let's use this driver for a list of known devices and their serials,
-  excluding TI's own products (see ticalc1x.c, tispeak.c)
+  excluding TI's own products (see ticalc1x.cpp, tispeak.cpp, tispellb.cpp)
 
   serial   device    etc.
 --------------------------------------------------------------------
@@ -2691,7 +2691,7 @@ READ8_MEMBER(mdndclab_state::read_k)
     8 buttons on the left, top-to-bottom: (lower 6 are just for sound-preview)
     [Switch Key]  [Next Turn / Level 1/2]  [Dragon Flying / Defeat Tune]  [Dragon Attacks / Dragon Wakes]
     [Wall / Door]  [Illegal Move / Warrior Moves]  [Warrior 1 / Winner]  [Warrior 2 / Treasure]
-    
+
     8*8 buttons to the right of that, making the gameboard
 
 */

@@ -192,8 +192,6 @@ public:
 	INTERRUPT_GEN_MEMBER(metro_periodic_interrupt);
 	INTERRUPT_GEN_MEMBER(karatour_interrupt);
 	INTERRUPT_GEN_MEMBER(puzzlet_interrupt);
-	TIMER_CALLBACK_MEMBER(karatour_irq_callback);
-	TIMER_CALLBACK_MEMBER(mouja_irq_callback);
 	TIMER_CALLBACK_MEMBER(metro_blit_done);
 	void update_irq_state();
 	IRQ_CALLBACK_MEMBER(metro_irq_callback);

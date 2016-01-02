@@ -294,7 +294,7 @@ private:
 	int m_vdp_pal;
 	int m_use_cram; // c2 uses it's own palette ram, so it sets this to 0
 	int m_dma_delay;    // SVP and SegaCD have some 'lag' in DMA transfers
-	
+
 	std::unique_ptr<UINT16[]> m_regs;
 	std::unique_ptr<UINT16[]> m_vram;
 	std::unique_ptr<UINT16[]> m_cram;

@@ -21,9 +21,9 @@
 class rsp_cop2_drc : public rsp_cop2
 {
 	friend class rsp_device;
-
+public:
 	rsp_cop2_drc(rsp_device &rsp, running_machine &machine) : rsp_cop2(rsp, machine) { }
-
+private:
 	virtual int generate_cop2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) override;
 	virtual int generate_lwc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) override;
 	virtual int generate_swc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) override;

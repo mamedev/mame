@@ -220,7 +220,7 @@ void ymf278b_device::compute_envelope(YMF278BSlot *slot)
 void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	int i, j;
-	YMF278BSlot *slot = nullptr;
+	YMF278BSlot *slot;
 	INT16 sample = 0;
 	INT32 *mixp;
 	INT32 vl, vr;
@@ -463,7 +463,7 @@ void ymf278b_device::C_w(UINT8 reg, UINT8 data)
 	// Handle slot registers specifically
 	if (reg >= 0x08 && reg <= 0xf7)
 	{
-		YMF278BSlot *slot = nullptr;
+		YMF278BSlot *slot;
 		int snum;
 		snum = (reg-8) % 24;
 		slot = &m_slots[snum];

@@ -72,8 +72,6 @@ public:
 	DECLARE_READ8_MEMBER( ppi1_pb_r );
 	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
-
 	DECLARE_DIRECT_UPDATE_MEMBER(sage2_direct_update_handler);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq );

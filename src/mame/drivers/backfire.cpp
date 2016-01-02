@@ -72,7 +72,6 @@ public:
 	UINT16    m_pf3_rowscroll[0x0800/2];
 	UINT16    m_pf4_rowscroll[0x0800/2];
 	DECLARE_READ32_MEMBER(backfire_control2_r);
-	DECLARE_READ32_MEMBER(backfire_control3_r);
 	DECLARE_WRITE32_MEMBER(backfire_nonbuffered_palette_w);
 	DECLARE_READ32_MEMBER(backfire_pf1_rowscroll_r);
 	DECLARE_READ32_MEMBER(backfire_pf2_rowscroll_r);
@@ -87,9 +86,6 @@ public:
 	DECLARE_READ32_MEMBER(backfire_spriteram2_r);
 	DECLARE_WRITE32_MEMBER(backfire_spriteram2_w);
 	DECLARE_READ32_MEMBER(backfire_speedup_r);
-	DECLARE_READ32_MEMBER(backfire_unknown_wheel_r);
-	DECLARE_READ32_MEMBER(backfire_wheel1_r);
-	DECLARE_READ32_MEMBER(backfire_wheel2_r);
 	DECLARE_READ32_MEMBER(backfire_eeprom_r);
 	DECLARE_WRITE32_MEMBER(backfire_eeprom_w);
 	DECLARE_DRIVER_INIT(backfire);

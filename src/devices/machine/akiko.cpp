@@ -471,7 +471,7 @@ TIMER_CALLBACK_MEMBER(akiko_device::dma_proc)
 	{
 		amiga_state *amiga = machine().driver_data<amiga_state>();
 		UINT32  track = cdrom_get_track( m_cdrom, m_cdrom_lba_cur );
-		UINT32  datasize = cdrom_get_toc( m_cdrom )->tracks[track].datasize;
+		UINT32  datasize;// = cdrom_get_toc(m_cdrom)->tracks[track].datasize;
 		UINT32  subsize = cdrom_get_toc( m_cdrom )->tracks[track].subsize;
 		int     i;
 

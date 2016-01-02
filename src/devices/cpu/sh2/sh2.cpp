@@ -199,11 +199,6 @@ sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t 
 
 void sh2_device::device_stop()
 {
-	/* clean up the DRC */
-	if ( m_drcuml )
-	{
-		auto_free(machine(), m_drcuml);
-	}
 }
 
 
@@ -2536,7 +2531,7 @@ void sh2_device::device_start()
 
 	/* initialize the UML generator */
 	UINT32 flags = 0;
-	m_drcuml = auto_alloc(machine(), drcuml_state(*this, m_cache, flags, 1, 32, 1));
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 1, 32, 1);
 
 	/* add symbols for our stuff */
 	m_drcuml->symbol_add(&m_sh2_state->pc, sizeof(m_sh2_state->pc), "pc");
@@ -2555,7 +2550,7 @@ void sh2_device::device_start()
 	m_drcuml->symbol_add(&m_sh2_state->mach, sizeof(m_sh2_state->macl), "mach");
 
 	/* initialize the front-end helper */
-	m_drcfe = auto_alloc(machine(), sh2_frontend(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE));
+	m_drcfe = std::make_unique<sh2_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 	/* compute the register parameters */
 	for (int regnum = 0; regnum < 16; regnum++)

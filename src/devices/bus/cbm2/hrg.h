@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "exp.h"
+#include "video/ef9365.h"
 
 
 
@@ -28,7 +29,6 @@ class cbm2_graphic_cartridge_device : public device_t,
 public:
 	// construction/destruction
 	cbm2_graphic_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	cbm2_graphic_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
@@ -43,7 +43,7 @@ protected:
 	virtual void cbm2_bd_w(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3) override;
 
 private:
-	//required_device<ef9365_device> m_gdc;
+	required_device<ef9365_device> m_gdc;
 	required_memory_region m_bank3;
 };
 

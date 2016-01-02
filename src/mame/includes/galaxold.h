@@ -133,8 +133,6 @@ public:
 	DECLARE_WRITE8_MEMBER(galaxold_attributesram_w);
 	DECLARE_WRITE8_MEMBER(galaxold_flip_screen_x_w);
 	DECLARE_WRITE8_MEMBER(galaxold_flip_screen_y_w);
-	DECLARE_WRITE8_MEMBER(gteikob2_flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(gteikob2_flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(hotshock_flip_screen_w);
 	DECLARE_WRITE8_MEMBER(scrambold_background_enable_w);
 	DECLARE_WRITE8_MEMBER(scrambold_background_red_w);
@@ -223,7 +221,6 @@ public:
 	void state_save_register();
 	void video_start_common();
 	void pisces_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-	void theend_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	void mooncrst_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void batman2_modify_charcode(UINT16 *code, UINT8 x);
 	void rockclim_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

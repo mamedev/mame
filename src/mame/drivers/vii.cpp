@@ -113,8 +113,6 @@ public:
 	DECLARE_WRITE16_MEMBER(audio_w);
 	DECLARE_READ16_MEMBER(io_r);
 	DECLARE_WRITE16_MEMBER(io_w);
-	DECLARE_WRITE16_MEMBER(rowscroll_w);
-	DECLARE_WRITE16_MEMBER(spriteram_w);
 	DECLARE_READ16_MEMBER(rom_r);
 	required_shared_ptr<UINT16> m_p_ram;
 	required_shared_ptr<UINT16> m_p_rowscroll;

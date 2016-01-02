@@ -65,14 +65,14 @@ void SCSPDSP_Step(SCSPDSP *DSP)
 {
 	INT32 ACC=0;    //26 bit
 	INT32 SHIFTED=0;    //24 bit
-	INT32 X=0;  //24 bit
+	INT32 X;  //24 bit
 	INT32 Y=0;  //13 bit
-	INT32 B=0;  //26 bit
-	INT32 INPUTS=0; //24 bit
+	INT32 B;  //26 bit
+	INT32 INPUTS; //24 bit
 	INT32 MEMVAL=0;
 	INT32 FRC_REG=0;    //13 bit
 	INT32 Y_REG=0;      //24 bit
-	UINT32 ADDR=0;
+	UINT32 ADDR;
 	UINT32 ADRS_REG=0;  //13 bit
 	int step;
 

@@ -31,7 +31,6 @@ public:
 
 	UINT32 screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 
-	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ8_MEMBER(latch_r);
 	DECLARE_WRITE8_MEMBER(data_w);
 	DECLARE_READ8_MEMBER(busy_r);

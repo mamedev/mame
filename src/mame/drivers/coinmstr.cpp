@@ -162,8 +162,6 @@ public:
 	DECLARE_WRITE8_MEMBER(quizmstr_attr1_w);
 	DECLARE_WRITE8_MEMBER(quizmstr_attr2_w);
 	DECLARE_WRITE8_MEMBER(quizmstr_attr3_w);
-	DECLARE_WRITE8_MEMBER(jpcoin2_attr1_w);
-	DECLARE_WRITE8_MEMBER(jpcoin2_attr2_w);
 	DECLARE_READ8_MEMBER(question_r);
 	DECLARE_WRITE8_MEMBER(question_w);
 	DECLARE_READ8_MEMBER(ff_r);

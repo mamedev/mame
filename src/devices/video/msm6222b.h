@@ -27,7 +27,6 @@ public:
 	void control_w(UINT8 data);
 	UINT8 control_r();
 	void data_w(UINT8 data);
-	UINT8 data_r();
 
 	// Character n bits are at bytes n*16..n*16+7 when 8-high, +10 when 11-high.  Only the low 5 bits are used.
 	// In one line mode n = 0..79.  In two line mode first line is 0..39 and second is 40..79.

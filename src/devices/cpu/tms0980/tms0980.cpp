@@ -174,7 +174,6 @@ const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 
 // - one of the microinstructions redirects to a RSTR instruction, like on TMS0270
 // - 32-term output PLA above the RAM, 7 bits! (rotate opla 270 degrees)
 const device_type TMS1980 = &device_creator<tms1980_cpu_device>; // 28-pin DIP, 7 O pins, 10 R pins, high voltage
-// TMS0260 is same?
 
 // TMS0970 is a stripped-down version of the TMS0980, itself acting more like a TMS1000
 // - RAM and ROM is exactly the same as TMS1000
@@ -191,6 +190,7 @@ const device_type TMS1990 = &device_creator<tms1990_cpu_device>; // 28-pin DIP, 
 // - 48-term output PLA above the RAM (rotate opla 90 degrees)
 const device_type TMS0270 = &device_creator<tms0270_cpu_device>; // 40-pin DIP, 16 O pins, 8+ R pins (some R pins are internally hooked up to support more I/O)
 // newer TMS0270 chips (eg. Speak & Math) have 42 pins
+// TMS0260 is same or similar?
 
 
 // internal memory maps
@@ -402,7 +402,7 @@ static MACHINE_CONFIG_FRAGMENT(tms1980)
 	// main opcodes PLA, microinstructions PLA, output PLA
 	MCFG_PLA_ADD("ipla", 9, 22, 24)
 	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
-	MCFG_PLA_ADD("mpla", 6, 21, 64)
+	MCFG_PLA_ADD("mpla", 6, 22, 64)
 	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
 	MCFG_PLA_ADD("opla", 5, 7, 32)
 	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
@@ -908,7 +908,7 @@ void tms0270_cpu_device::dynamic_output()
 
 	if (m_chipsel)
 	{
-		// ACC via SEG B,C,D,G: TMS5100 CTL pins
+		// ACC via SEG G,B,C,D: TMS5100 CTL pins
 		if (m_ctl_dir && m_a != m_ctl_out)
 		{
 			m_ctl_out = m_a;
@@ -956,7 +956,7 @@ UINT8 tms0980_cpu_device::read_k_input()
 
 UINT8 tms0270_cpu_device::read_k_input()
 {
-	// external: TMS5100 CTL port via SEG B,C,D,G
+	// external: TMS5100 CTL port via SEG G,B,C,D
 	if (m_chipsel)
 		return (m_ctl_dir) ? m_ctl_out : m_read_ctl(0, 0xff) & 0xf;
 

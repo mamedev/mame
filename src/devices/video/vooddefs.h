@@ -2366,7 +2366,7 @@ static inline bool ATTR_FORCE_INLINE chromaKeyTest(voodoo_state *v, stats_block 
 		else
 		{
 			INT32 low, high, test;
-			int results = 0;
+			int results;
 
 			/* check blue */
 			low = v->reg[chromaKey].rgb.b;

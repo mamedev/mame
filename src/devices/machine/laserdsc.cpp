@@ -805,7 +805,7 @@ void laserdisc_device::init_video()
 	for (auto & frame : m_frame)
 	{
 		// first allocate a YUY16 bitmap at 2x the height
-		
+
 		frame.m_bitmap.allocate(m_width, m_height * 2);
 		frame.m_bitmap.set_palette(m_videopalette);
 		fillbitmap_yuy16(frame.m_bitmap, 40, 109, 240);

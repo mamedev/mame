@@ -113,7 +113,7 @@ void pci9050_device::remap_local(int id)
 		return;
 	}
 	int lsize;
-	for(lsize=1; lsize<28 && !(csbase & (1<<lsize)); lsize++);
+	for(lsize=1; lsize<28 && !(csbase & (1<<lsize)); lsize++) {};
 	if(lsize == 28) {
 		set_map_flags(id+2, M_MEM | M_DISABLED);
 		return;

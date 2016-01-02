@@ -590,7 +590,7 @@ mc68681_channel *mc68681_device::get_channel(int chan)
 
 int mc68681_device::calc_baud(int ch, UINT8 data)
 {
-	int baud_rate = 0;
+	int baud_rate;
 
 	if ( BIT(ACR, 7) == 0 )
 	{
@@ -878,7 +878,7 @@ void mc68681_channel::update_interrupts()
 
 UINT8 mc68681_channel::read_rx_fifo()
 {
-	UINT8 rv = 0;
+	UINT8 rv;
 
 //  printf("read_rx_fifo: rx_fifo_num %d\n", rx_fifo_num);
 

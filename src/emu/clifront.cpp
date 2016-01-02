@@ -597,8 +597,6 @@ void cli_frontend::listdevices(const char *gamename)
 		// dump the results
 		for (auto device : device_list)
 		{
-			
-
 			// extract the tag, stripping the leading colon
 			const char *tag = device->tag();
 			if (*tag == ':')
@@ -935,6 +933,67 @@ void cli_frontend::verifyroms(const char *gamename)
 
 										default:
 											break;
+									}
+								}
+							}
+						}
+					} else {
+						// check for subdevices with ROMs (a few devices are missed otherwise, e.g. MPU401)
+						device_iterator subiter(*dev);
+						for (device_t *device = subiter.first(); device != nullptr; device = subiter.next())
+						{
+							device_iterator subsubiter(*device);
+							for (device_t *subdev = subsubiter.first(); subdev != nullptr; subdev = subsubiter.next())
+							{
+								if (subdev->owner() == device && subdev->rom_region() != nullptr && subdev->shortname() != nullptr && subdev->shortname()[0] != '\0')
+								{
+									if (device_map.insert(subdev->shortname()).second)
+									{
+										if (core_strwildcmp(gamename, subdev->shortname()) == 0)
+										{
+											matched++;
+
+											// audit the ROMs in this set
+											media_auditor::summary summary = auditor.audit_device(subdev, AUDIT_VALIDATE_FAST);
+
+											// if not found, count that and leave it at that
+											if (summary == media_auditor::NOTFOUND)
+												notfound++;
+
+											// else display information about what we discovered
+											else if (summary != media_auditor::NONE_NEEDED)
+											{
+												// output the summary of the audit
+												std::string summary_string;
+												auditor.summarize(subdev->shortname(),&summary_string);
+												osd_printf_info("%s", summary_string.c_str());
+
+												// display information about what we discovered
+												osd_printf_info("romset %s ", subdev->shortname());
+
+												// switch off of the result
+												switch (summary)
+												{
+													case media_auditor::INCORRECT:
+														osd_printf_info("is bad\n");
+														incorrect++;
+														break;
+
+													case media_auditor::CORRECT:
+														osd_printf_info("is good\n");
+														correct++;
+														break;
+
+													case media_auditor::BEST_AVAILABLE:
+														osd_printf_info("is best available\n");
+														correct++;
+														break;
+
+													default:
+														break;
+												}
+											}
+										}
 									}
 								}
 							}
@@ -1636,7 +1695,7 @@ void cli_frontend::execute_commands(const char *exename)
 
 void cli_frontend::display_help()
 {
-	osd_printf_info("%s v%s - %s\n%s\n\n", emulator_info::get_applongname(),build_version,emulator_info::get_fulllongname(),emulator_info::get_copyright_info());
+	osd_printf_info("%s v%s\n%s\n\n", emulator_info::get_appname(),build_version,emulator_info::get_copyright_info());
 	osd_printf_info("%s\n", emulator_info::get_disclaimer());
 	emulator_info::printf_usage(emulator_info::get_appname(),emulator_info::get_gamenoun());
 	osd_printf_info("\n\n"

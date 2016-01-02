@@ -280,7 +280,7 @@ void nscsi_full_device::step(bool timeout)
 	switch(scsi_state & SUB_MASK ? scsi_state & SUB_MASK : scsi_state & STATE_MASK) {
 	case IDLE:
 		if(((ctrl & (S_SEL|S_BSY)) == S_SEL) && (scsi_id != -1) && ((data & (1 << scsi_id)) != 0)) {
-			for(scsi_initiator_id = 0; scsi_initiator_id != 16 && (scsi_initiator_id == scsi_id || (data & (1 << scsi_initiator_id))); scsi_initiator_id++);
+			for(scsi_initiator_id = 0; scsi_initiator_id != 16 && (scsi_initiator_id == scsi_id || (data & (1 << scsi_initiator_id))); scsi_initiator_id++) {};
 			if(scsi_initiator_id == 16)
 				scsi_initiator_id = -1;
 			scsi_state = TARGET_SELECT_WAIT_BUS_SETTLE;

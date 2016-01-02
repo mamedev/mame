@@ -105,7 +105,7 @@ UINT32 aquarium_state::screen_update_aquarium(screen_device &screen, bitmap_ind1
 	m_bak_tilemap->set_scrolly(0, m_scroll[3]);
 	m_txt_tilemap->set_scrollx(0, m_scroll[4]);
 	m_txt_tilemap->set_scrolly(0, m_scroll[5]);
-	
+
 	bitmap.fill(0, cliprect); // WDUD logo suggests this
 
 	m_temp_sprite_bitmap.fill(0, cliprect);

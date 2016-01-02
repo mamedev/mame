@@ -2187,7 +2187,7 @@ bool tms32025_device::memory_readop(offs_t offset, int size, UINT64 &value)
  ****************************************************************************/
 bool tms32025_device::memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value)
 {
-	void *ptr = nullptr;
+	void *ptr;
 	UINT64 temp = 0;
 
 	switch (spacenum)
@@ -2239,7 +2239,7 @@ bool tms32025_device::memory_read(address_spacenum spacenum, offs_t offset, int 
  ****************************************************************************/
 bool tms32025_device::memory_write(address_spacenum spacenum, offs_t offset, int size, UINT64 value)
 {
-	void *ptr = nullptr;
+	void *ptr;
 
 	switch (spacenum)
 	{

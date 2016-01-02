@@ -24,6 +24,7 @@
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/mc146818.h"
+#include "machine/apollo_dbg.h"
 #include "machine/apollo_kbd.h"
 #include "machine/clock.h"
 #include "bus/isa/isa.h"
@@ -55,10 +56,6 @@
 // Enabling this is >NOT< supported by MESSdev
 // Do *not* report any issues on Mametesters if this is enabled!
 // #define APOLLO_XXL
-
-/*----------- machine/apollo_dbg.c -----------*/
-
-int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc);
 
 /*----------- drivers/apollo.c -----------*/
 
@@ -167,8 +164,6 @@ public:
 	DECLARE_READ8_MEMBER(cache_status_register_r);
 	DECLARE_WRITE8_MEMBER(task_alias_register_w);
 	DECLARE_READ8_MEMBER(task_alias_register_r);
-	DECLARE_WRITE16_MEMBER(apollo_node_id_w);
-	DECLARE_READ16_MEMBER(apollo_node_id_r);
 	DECLARE_WRITE16_MEMBER(latch_page_on_parity_error_register_w);
 	DECLARE_READ16_MEMBER(latch_page_on_parity_error_register_r);
 	DECLARE_WRITE8_MEMBER(master_req_register_w);
@@ -194,8 +189,6 @@ public:
 	DECLARE_READ8_MEMBER(dn5500_11500_r);
 	DECLARE_WRITE8_MEMBER(dn5500_io_protection_map_w);
 	DECLARE_READ8_MEMBER(dn5500_io_protection_map_r);
-	DECLARE_READ32_MEMBER(apollo_f8_r);
-	DECLARE_WRITE32_MEMBER(apollo_f8_w);
 	DECLARE_DRIVER_INIT(dsp3000);
 	DECLARE_DRIVER_INIT(dsp5500);
 	DECLARE_DRIVER_INIT(dn3500);
@@ -212,7 +205,6 @@ public:
 	IRQ_CALLBACK_MEMBER(apollo_irq_acknowledge);
 	IRQ_CALLBACK_MEMBER(apollo_pic_acknowledge);
 	void apollo_bus_error();
-	DECLARE_WRITE8_MEMBER( apollo_kbd_putchar );
 	DECLARE_READ_LINE_MEMBER( apollo_kbd_is_german );
 	DECLARE_WRITE_LINE_MEMBER( apollo_dma8237_out_eop );
 	DECLARE_WRITE_LINE_MEMBER( apollo_dma_1_hrq_changed );

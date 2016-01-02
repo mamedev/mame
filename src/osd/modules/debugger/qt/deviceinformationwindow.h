@@ -3,8 +3,6 @@
 #ifndef __DEBUG_QT_DEVICE_INFORMATION_WINDOW_H__
 #define __DEBUG_QT_DEVICE_INFORMATION_WINDOW_H__
 
-#include <QtGui/QtGui>
-
 #include "windowqt.h"
 
 //============================================================

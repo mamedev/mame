@@ -2346,7 +2346,7 @@ void saturn_state::cd_readTOC(void)
 saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype, UINT8 *p_ok)
 {
 	int match, keepgoing;
-	partitionT *filterprt = (partitionT *)nullptr;
+	partitionT *filterprt;
 
 	CDROM_LOG(("cd_filterdata, trktype %d\n", trktype))
 	match = 1;

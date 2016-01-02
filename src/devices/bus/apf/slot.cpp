@@ -225,7 +225,7 @@ void apf_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
-		const char *slot_string = "std";
+		const char *slot_string;
 		UINT32 size = core_fsize(m_file);
 		int type = APF_STD;
 

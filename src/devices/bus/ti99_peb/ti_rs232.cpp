@@ -176,7 +176,7 @@ int ti_rs232_attached_device::get_index_from_tagname()
 */
 bool ti_rs232_attached_device::call_load()
 {
-	tms9902_device* tms9902 = nullptr;
+	tms9902_device* tms9902;
 //  ti_rs232_pio_device* card = static_cast<ti_rs232_pio_device*>(owner());
 
 	int devnumber = get_index_from_tagname();
@@ -206,7 +206,7 @@ bool ti_rs232_attached_device::call_load()
 
 void ti_rs232_attached_device::call_unload()
 {
-	tms9902_device* tms9902 = nullptr;
+	tms9902_device* tms9902;
 
 	int devnumber = get_index_from_tagname();
 	if (devnumber==0)

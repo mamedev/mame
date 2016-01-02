@@ -138,6 +138,9 @@ public:
 	DECLARE_MACHINE_RESET(bbcb);
 	DECLARE_VIDEO_START(bbcb);
 
+	DECLARE_MACHINE_START(torch);
+	DECLARE_MACHINE_RESET(torch);
+
 	DECLARE_MACHINE_START(bbcbp);
 	DECLARE_MACHINE_RESET(bbcbp);
 	DECLARE_VIDEO_START(bbcbp);
@@ -150,10 +153,8 @@ public:
 	DECLARE_MACHINE_RESET(bbcmc);
 
 	DECLARE_PALETTE_INIT(bbc);
-	UINT32 screen_update_bbc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(bbcb_vsync);
 	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
-	INTERRUPT_GEN_MEMBER(bbcm_keyscan);
 	TIMER_CALLBACK_MEMBER(bbc_tape_timer_cb);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_WRITE_LINE_MEMBER(bbcb_acia6850_irq_w);
@@ -417,11 +418,6 @@ public: // HACK FOR MC6845
 	void bbc_setvideoshadow(int vdusel);
 	void common_init(int memorySize);
 	void set_pixel_lookup();
-	void set_cursor(bbc_state *state);
-	void BBC_Clock_CR(bbc_state *state);
-	void BBC_Set_HSync(int offset, int data);
-	void BBC_Set_VSync(int offset, int data);
-	void BBC_Set_CRE(int offset, int data);
 	int vdudriverset();
 	int bbcm_vdudriverset();
 	int bbc_keyboard(address_space &space, int data);

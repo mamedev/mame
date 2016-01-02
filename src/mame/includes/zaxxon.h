@@ -100,7 +100,6 @@ public:
 	inline int find_minimum_y(UINT8 value, int flip);
 	inline int find_minimum_x(UINT8 value, int flip);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 flipxmask, UINT16 flipymask);
-	void zaxxonj_decode(const char *cputag);
 };
 
 

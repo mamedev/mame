@@ -20,13 +20,13 @@ class age_candy_state : public driver_device
 public:
 	age_candy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-	//	,m_maincpu(*this, "maincpu")
+	//  ,m_maincpu(*this, "maincpu")
 	{ }
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-//	required_device<mcs51_cpu_device> m_maincpu;
+//  required_device<mcs51_cpu_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( age_candy )
@@ -46,9 +46,9 @@ void age_candy_state::machine_reset()
 static MACHINE_CONFIG_START( age_candy, age_candy_state )
 
 	/* basic machine hardware */
-//	MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown (vectors at end? 6xxx ?)
-//	MCFG_CPU_PROGRAM_MAP(age_candy_map)
-//	MCFG_CPU_IO_MAP(age_candy_io)
+//  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown (vectors at end? 6xxx ?)
+//  MCFG_CPU_PROGRAM_MAP(age_candy_map)
+//  MCFG_CPU_IO_MAP(age_candy_io)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -62,4 +62,3 @@ ROM_START( age_cand )
 ROM_END
 
 GAME( 19??, age_cand,  0,    age_candy, age_candy, driver_device,  0, ROT0, "Advanced Game Engineering", "Candy Crane (AGE)", MACHINE_IS_SKELETON_MECHANICAL )
-

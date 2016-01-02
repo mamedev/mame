@@ -126,7 +126,7 @@ void mos6581_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 READ8_MEMBER( mos6581_device::read )
 {
-	UINT8 data = 0;
+	UINT8 data;
 
 	switch (offset & 0x1f)
 	{

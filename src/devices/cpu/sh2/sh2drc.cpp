@@ -586,7 +586,7 @@ void sh2_device::func_SUBV() {}
 
 void sh2_device::code_flush_cache()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 
 	/* empty the transient cache contents */
 	drcuml->reset();
@@ -617,7 +617,7 @@ void sh2_device::code_flush_cache()
 /* Execute cycles - returns number of cycles actually run */
 void sh2_device::execute_run_drc()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	int execute_result;
 
 	// run any active DMAs now
@@ -665,7 +665,7 @@ void sh2_device::execute_run_drc()
 
 void sh2_device::code_compile_block(UINT8 mode, offs_t pc)
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	compiler_state compiler = { 0 };
 	const opcode_desc *seqhead, *seqlast;
 	const opcode_desc *desclist;
@@ -781,7 +781,7 @@ void sh2_device::code_compile_block(UINT8 mode, offs_t pc)
 
 void sh2_device::static_generate_entry_point()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	code_label skip = 1;
 	drcuml_block *block;
 
@@ -861,7 +861,7 @@ void sh2_device::static_generate_entry_point()
 
 void sh2_device::static_generate_nocode_handler()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	drcuml_block *block;
 
 	/* begin generating */
@@ -886,7 +886,7 @@ void sh2_device::static_generate_nocode_handler()
 
 void sh2_device::static_generate_out_of_cycles()
 {
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	drcuml_block *block;
 
 	/* begin generating */
@@ -912,7 +912,7 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 	/* on entry, address is in I0; data for writes is in I1 */
 	/* on exit, read result is in I0 */
 	/* routine trashes I0 */
-	drcuml_state *drcuml = m_drcuml;
+	drcuml_state *drcuml = m_drcuml.get();
 	drcuml_block *block;
 	int label = 1;
 

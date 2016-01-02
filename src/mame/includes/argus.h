@@ -85,7 +85,6 @@ public:
 	DECLARE_WRITE8_MEMBER(butasan_bg0_status_w);
 	DECLARE_WRITE8_MEMBER(butasan_bg1_status_w);
 	DECLARE_WRITE8_MEMBER(butasan_paletteram_w);
-	DECLARE_READ8_MEMBER(butasan_bg1ram_r);
 	DECLARE_WRITE8_MEMBER(butasan_bg1ram_w);
 	DECLARE_WRITE8_MEMBER(butasan_pageselect_w);
 	DECLARE_READ8_MEMBER(butasan_pagedram_r);

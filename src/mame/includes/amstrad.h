@@ -245,7 +245,6 @@ public:
 	DECLARE_WRITE8_MEMBER(amstrad_ppi_portc_w);
 
 	DECLARE_WRITE_LINE_MEMBER( cpc_romdis );
-	DECLARE_WRITE_LINE_MEMBER( cpc_romen );
 	DECLARE_WRITE8_MEMBER(rom_select);
 
 	DECLARE_FLOPPY_FORMATS( aleste_floppy_formats );

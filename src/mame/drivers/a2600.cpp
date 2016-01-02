@@ -84,7 +84,6 @@ protected:
 	required_device<vcs_cart_slot_device> m_cart;
 	required_device<tia_video_device> m_tia;
 
-	unsigned long detect_2600controllers();
 	required_device<m6507_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_ioport m_swb;

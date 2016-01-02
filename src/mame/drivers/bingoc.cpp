@@ -47,7 +47,6 @@ public:
 
 	UINT8 m_x;
 	DECLARE_READ16_MEMBER(unknown_r);
-	DECLARE_READ8_MEMBER(sound_test_r);
 	DECLARE_WRITE16_MEMBER(main_sound_latch_w);
 	DECLARE_WRITE8_MEMBER(sound_play_w);
 	virtual void video_start() override;

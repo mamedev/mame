@@ -62,8 +62,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(msisaac_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(ms_unknown_w);
 	DECLARE_READ8_MEMBER(msisaac_mcu_r);
 	DECLARE_READ8_MEMBER(msisaac_mcu_status_r);
@@ -75,7 +73,6 @@ public:
 	DECLARE_WRITE8_MEMBER(msisaac_bg2_scrollx_w);
 	DECLARE_WRITE8_MEMBER(msisaac_bg_scrolly_w);
 	DECLARE_WRITE8_MEMBER(msisaac_bg_scrollx_w);
-	DECLARE_WRITE8_MEMBER(msisaac_textbank1_w);
 	DECLARE_WRITE8_MEMBER(msisaac_bg2_textbank_w);
 	DECLARE_WRITE8_MEMBER(msisaac_bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(msisaac_bg2_videoram_w);

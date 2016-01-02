@@ -103,11 +103,11 @@ private:
 	debug_view_expression m_expression;         // expression describing the start address
 	UINT32              m_chunks_per_row;       // number of chunks displayed per line
 	UINT8               m_bytes_per_chunk;      // bytes per chunk
-	int					m_data_format;			// 1-8 current values 9 32bit floating point
+	int                 m_data_format;          // 1-8 current values 9 32bit floating point
 	bool                m_reverse_view;         // reverse-endian view?
 	bool                m_ascii_view;           // display ASCII characters?
 	bool                m_no_translation;       // don't run addresses through the cpu translation hook
-	bool				m_edit_enabled;			// can modify contents ?
+	bool                m_edit_enabled;         // can modify contents ?
 	offs_t              m_maxaddr;              // (derived) maximum address to display
 	UINT32              m_bytes_per_row;        // (derived) number of bytes displayed per line
 	UINT32              m_byte_offset;          // (derived) offset of starting visible byte

@@ -47,7 +47,6 @@ public:
 	DECLARE_WRITE8_MEMBER( network_irq_enable_w );
 	DECLARE_READ8_MEMBER( hdc_data_r );
 	DECLARE_WRITE8_MEMBER( hdc_data_w );
-	DECLARE_READ8_MEMBER( hdc_status_r );
 	DECLARE_WRITE8_MEMBER( hdc_select_w );
 	DECLARE_WRITE8_MEMBER( hdc_irq_enable_w );
 	DECLARE_READ8_MEMBER( rtc_address_r );

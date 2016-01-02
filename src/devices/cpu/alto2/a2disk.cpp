@@ -1600,7 +1600,7 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 	(void)ptr;
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
 	int clk = arg & 1;
-	int bit = 0;
+	int bit;
 
 	/**
 	 * The source for BITCLK and DATAIN depends on disk controller part #65
