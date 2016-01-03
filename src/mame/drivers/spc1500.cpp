@@ -239,6 +239,7 @@ public:
 		, m_cass(*this, "cassette")
 		, m_ram(*this, RAM_TAG)
 		, m_p_videoram(*this, "videoram")
+		, m_pcgram(*this, "pcgram")
 		, m_io_kb(*this, "LINE")
 		, m_io_joy(*this, "JOY")
 		, m_dipsw(*this, "DIP_SWITCH")		
@@ -286,7 +287,7 @@ private:
 	UINT8 m_ipl;
 	UINT8 m_GMODE;
 	UINT16 m_page;
-//	UINT8 *m_work_ram;
+	UINT16 m_pcg_addr;
 	attotime m_time;
 	bool m_romsel;
 	bool m_double_mode;
@@ -302,6 +303,7 @@ private:
 	required_device<cassette_image_device> m_cass;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_pcgram;
 	required_ioport_array<10> m_io_kb;
 	required_ioport m_io_joy;
 	required_ioport m_dipsw;
@@ -311,6 +313,7 @@ private:
 	required_device<palette_device> m_palette;	
 	UINT8 *m_font;        
 	UINT8 m_priority;
+	void get_pcg_addr();
 };
 
 READ8_MEMBER( spc1500_state::keyboard_r )
@@ -450,9 +453,29 @@ READ8_MEMBER( spc1500_state::pcg_r)
 {
 	return 0;
 }
+void spc1500_state::get_pcg_addr()
+{
+	UINT16 vaddr = 0;
+	if(m_p_videoram[0x7ff] & 0x20) {
+		vaddr = 0x7ff;
+	} else if(m_p_videoram[0x3ff] & 0x20) {
+		vaddr = 0x3ff;
+	} else if(m_p_videoram[0x5ff] & 0x20) {
+		vaddr = 0x5ff;
+	} else if(m_p_videoram[0x1ff] & 0x20) {
+		vaddr = 0x1ff;
+	} else {
+		vaddr = 0x3ff;
+	}
+	m_pcg_addr = m_p_videoram[0x1000 + vaddr] * (m_crtc_vreg[0x9]+1);
+}
 WRITE8_MEMBER( spc1500_state::pcg_w)
 {
-	m_priority = data;
+	get_pcg_addr();
+	offset = (offset & 0x1f00) - 0x1500;
+	m_pcg_addr=m_pcg_addr+m_vdg->get_ra()+(offset<<3);
+	m_pcgram[m_pcg_addr] = data;
+//	printf("pcgram:0x%04x 0x%02x\n",m_pcg_addr, data);
 }
 
 WRITE8_MEMBER( spc1500_state::priority_w)
@@ -506,13 +529,14 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	int i;
 	int j;
 	int h1, h2, h3;
-	UINT32  *p = &bitmap.pix32(y); 
+	UINT32  *p = &bitmap.pix32(y);
 	
 	unsigned char cho[] ={1,1,1,1,1,1,1,1,0,0,1,1,1,3,5,5,0,0,5,3,3,5,5,5,0,0,3,3,5,1};
 	unsigned char jong[]={0,0,0,1,1,1,1,1,0,0,1,1,1,2,2,2,0,0,2,2,2,2,2,2,0,0,2,2,1,1};
 	bool inv = false;
 	char hs = (m_crtc_vreg[0x4] == 0x1f ? 4 : 3);
-	int n = y & (hs == 4 ? 0x7 : 0xf);
+	int n = y & (m_crtc_vreg[0x9]);
+	if (y > 200) printf("y=%d,", y);
 	for (i = 0; i < x_count; i++)
 	{
 		UINT8 *pp = &m_p_videoram[0x2000+(y>>3)*x_count+((y&7)<<11)+i];
@@ -632,6 +656,7 @@ static ADDRESS_MAP_START( spc1500_double_io , AS_IO, 8, spc1500_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_r, double_w)
 	AM_RANGE(0x2000, 0xffff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x0000, 0x17ff) AM_RAM AM_SHARE("pcgram")
 ADDRESS_MAP_END
 
 #if 0
@@ -820,8 +845,7 @@ void spc1500_state::machine_start()
 	set_address_space(AS_IO, m_maincpu->space(AS_IO));
 	// intialize banks 2, 3, 4 (write banks)
 	membank("bank2")->set_base(m_p_ram);
-	membank("bank4")->set_base(m_p_ram + 0x8000);
-	
+	membank("bank4")->set_base(m_p_ram + 0x8000);	
 }
 
 void spc1500_state::machine_reset()
@@ -871,8 +895,8 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0,640-1,0,400-1)
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0,640-1,0,200-1)
 	//MCFG_MC6845_VISAREA_ADJUST(50,50,640-50,400-50)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update )
 	MCFG_PALETTE_ADD("palette", 8)	
