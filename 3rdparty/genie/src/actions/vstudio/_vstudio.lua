@@ -255,6 +255,7 @@
 			productVersion  = "9.0.21022",
 			solutionVersion = "10",
 			toolsVersion    = "3.5",
+			supports64bitEditContinue = false,
 		}
 	}
 
@@ -303,5 +304,6 @@
 			solutionVersion = "11",
 			targetFramework = "4.0",
 			toolsVersion    = "4.0",
+			supports64bitEditContinue = false,
 		}
 	}
