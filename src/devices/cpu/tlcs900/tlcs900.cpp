@@ -110,7 +110,15 @@ tmp95c063_device::tmp95c063_device(const machine_config &mconfig, const char *ta
 	m_portd_read(*this),
 	m_portd_write(*this),
 	m_porte_read(*this),
-	m_porte_write(*this)
+	m_porte_write(*this),
+	m_an0_read(*this),
+	m_an1_read(*this),
+	m_an2_read(*this),
+	m_an3_read(*this),
+	m_an4_read(*this),
+	m_an5_read(*this),
+	m_an6_read(*this),
+	m_an7_read(*this)
 {
 }
 
@@ -1732,7 +1740,151 @@ void tmp95c063_device::tlcs900_check_irqs()
 
 void tmp95c063_device::tlcs900_handle_ad()
 {
-	// TODO
+	if ( m_ad_cycles_left > 0 )
+	{
+		m_ad_cycles_left -= m_cycles;
+		if ( m_ad_cycles_left <= 0 )
+		{
+			int ad_value;
+
+			/* Store A/D converted value */
+			if ((m_reg[TMP95C063_ADMOD1] & 0x10) == 0)		// conversion channel fixed
+			{
+				switch( m_reg[TMP95C063_ADMOD2] & 0x07 )
+				{
+				case 0x00:	// AN0
+					ad_value = m_an0_read(0) & 0x3ff;
+					m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
+					m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
+					break;
+				case 0x01:	// AN1
+					ad_value = m_an1_read(0) & 0x3ff;
+					m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
+					m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
+					break;
+				case 0x02:	// AN2
+					ad_value = m_an2_read(0) & 0x3ff;
+					m_reg[TMP95C063_ADREG26L] = (ad_value & 0x3) << 6;
+					m_reg[TMP95C063_ADREG26H] = (ad_value >> 2) & 0xff;
+					break;
+				case 0x03:	// AN3
+					ad_value = m_an3_read(0) & 0x3ff;
+					m_reg[TMP95C063_ADREG37L] = (ad_value & 0x3) << 6;
+					m_reg[TMP95C063_ADREG37H] = (ad_value >> 2) & 0xff;
+					break;
+				case 0x04:	// AN4				
+					ad_value = m_an4_read(0) & 0x3ff;
+					m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
+					m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
+					break;
+				case 0x05:	// AN5
+					ad_value = m_an5_read(0) & 0x3ff;
+					m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
+					m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
+					break;
+				case 0x06:	// AN6
+					ad_value = m_an6_read(0) & 0x3ff;
+					m_reg[TMP95C063_ADREG26L] = (ad_value & 0x3) << 6;
+					m_reg[TMP95C063_ADREG26H] = (ad_value >> 2) & 0xff;
+					break;
+				case 0x07:	// AN7
+					ad_value = m_an7_read(0) & 0x3ff;
+					m_reg[TMP95C063_ADREG37L] = (ad_value & 0x3) << 6;
+					m_reg[TMP95C063_ADREG37H] = (ad_value >> 2) & 0xff;
+					break;
+				}
+			}
+			else			// conversion channel sweep
+			{
+				switch( m_reg[TMP95C063_ADMOD2] & 0x07 )
+				{
+					case 0x00:		// AN0
+						ad_value = m_an0_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
+						break;
+					case 0x01:		// AN0 -> AN1
+						ad_value = m_an0_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
+						ad_value = m_an1_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
+						break;
+					case 0x02:		// AN0 -> AN1 -> AN2
+						ad_value = m_an0_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
+						ad_value = m_an1_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
+						ad_value = m_an2_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG26L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG26H] = (ad_value >> 2) & 0xff;
+						break;
+					case 0x03:		// AN0 -> AN1 -> AN2 -> AN3
+						ad_value = m_an0_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
+						ad_value = m_an1_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
+						ad_value = m_an2_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG26L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG26H] = (ad_value >> 2) & 0xff;
+						ad_value = m_an3_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG37L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG37H] = (ad_value >> 2) & 0xff;
+						break;
+					case 0x04:		// AN4
+						ad_value = m_an4_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
+						break;
+					case 0x05:		// AN4 -> AN5
+						ad_value = m_an4_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
+						ad_value = m_an5_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
+						break;
+					case 0x06:		// AN4 -> AN5 -> AN6
+						ad_value = m_an4_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
+						ad_value = m_an5_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
+						ad_value = m_an6_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG26L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG26H] = (ad_value >> 2) & 0xff;
+						break;
+					case 0x07:		// AN4 -> AN5 -> AN6 -> AN7
+						ad_value = m_an4_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
+						ad_value = m_an5_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
+						ad_value = m_an6_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG26L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG26H] = (ad_value >> 2) & 0xff;
+						ad_value = m_an7_read(0) & 0x3ff;
+						m_reg[TMP95C063_ADREG37L] = (ad_value & 0x3) << 6;
+						m_reg[TMP95C063_ADREG37H] = (ad_value >> 2) & 0xff;
+						break;
+				}
+			}
+
+			/* Clear BUSY flag, set END flag */
+			m_reg[TMP95C063_ADMOD1] &= ~ 0x40;
+			m_reg[TMP95C063_ADMOD1] |= 0x80;
+
+			m_reg[TMP95C063_INTE0AD] |= 0x80;
+			m_check_irqs = 1;
+		}
+	}
 }
 
 
@@ -1762,6 +1914,14 @@ void tmp95c063_device::device_start()
 	m_portd_write.resolve_safe();
 	m_porte_read.resolve_safe(0);
 	m_porte_write.resolve_safe();
+	m_an0_read.resolve_safe(0);
+	m_an1_read.resolve_safe(0);
+	m_an2_read.resolve_safe(0);
+	m_an3_read.resolve_safe(0);
+	m_an4_read.resolve_safe(0);
+	m_an5_read.resolve_safe(0);
+	m_an6_read.resolve_safe(0);
+	m_an7_read.resolve_safe(0);
 }
 
 void tmp95c063_device::device_reset()
@@ -2048,6 +2208,26 @@ WRITE8_MEMBER( tmp95c063_device::internal_w )
 		break;
 
 	case TMP95C063_IIMC:
+		break;
+
+	case TMP95C063_ADMOD1:
+		// conversion start
+		if (data & 0x04)
+		{
+			data &= ~0x04;
+			data |= 0x40;
+
+			switch ((m_reg[TMP95C063_ADMOD2] >> 4) & 3)
+			{
+				case 0: m_ad_cycles_left = 160; break;
+				case 1: m_ad_cycles_left = 320; break;
+				case 2: m_ad_cycles_left = 640; break;
+				case 3: m_ad_cycles_left = 1280; break;
+			}
+		}
+		break;
+
+	case TMP95C063_ADMOD2:
 		break;
 
 	default:
