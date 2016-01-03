@@ -314,6 +314,8 @@ public:
 	DECLARE_READ8_MEMBER(c400_int_bank_r);
 	DECLARE_WRITE8_MEMBER(c400_w);
 	DECLARE_READ8_MEMBER(c800_r);
+	DECLARE_READ8_MEMBER(c800_int_r);
+	DECLARE_READ8_MEMBER(c800_b2_int_r);
 	DECLARE_WRITE8_MEMBER(c800_w);
 	DECLARE_READ8_MEMBER(inh_r);
 	DECLARE_WRITE8_MEMBER(inh_w);
@@ -1963,6 +1965,40 @@ READ8_MEMBER(apple2e_state::c800_r)
 	return read_floatingbus();
 }
 
+READ8_MEMBER(apple2e_state::c800_int_r)
+{
+	if ((m_isiicplus) && (offset >= 0x600))
+	{
+		return m_iicplus_ce00[offset-0x600];
+	}
+
+	if (offset == 0x7ff)
+	{
+		m_cnxx_slot = CNXX_UNCLAIMED;
+		update_slotrom_banks();
+		return 0xff;
+	}
+
+	return m_rom_ptr[0x800 + offset];
+}
+
+READ8_MEMBER(apple2e_state::c800_b2_int_r)
+{
+	if ((m_isiicplus) && (offset >= 0x600))
+	{
+		return m_iicplus_ce00[offset-0x600];
+	}
+
+	if (offset == 0x7ff)
+	{
+		m_cnxx_slot = CNXX_UNCLAIMED;
+		update_slotrom_banks();
+		return 0xff;
+	}
+
+	return m_rom_ptr[0x4800 + offset];
+}
+
 WRITE8_MEMBER(apple2e_state::c800_w)
 {
 	if ((m_isiicplus) && (offset >= 0x600))
@@ -2385,8 +2421,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c800bank_map, AS_PROGRAM, 8, apple2e_state )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(c800_r, c800_w)
-	AM_RANGE(0x0800, 0x0fff) AM_ROM AM_REGION("maincpu", 0x800)
-	AM_RANGE(0x1000, 0x17ff) AM_ROM AM_REGION("maincpu", 0x4800)
+	AM_RANGE(0x0800, 0x0fff) AM_READWRITE(c800_int_r, c800_w)
+	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(c800_b2_int_r, c800_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( inhbank_map, AS_PROGRAM, 8, apple2e_state )
