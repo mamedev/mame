@@ -488,7 +488,7 @@ public:
 	optional_device<ata_interface_device> m_ide;
 	required_shared_ptr<UINT16> m_video_ram_1;
 	required_shared_ptr<UINT16> m_video_ram_2;
-	optional_shared_ptr<UINT16> m_ext_gvram;
+	optional_shared_ptr<UINT32> m_ext_gvram;
 	required_device<beep_device> m_beeper;
 	optional_device<ram_device> m_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -781,19 +781,15 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
+		UINT8 *ext_gvram = (UINT8 *)m_ext_gvram.target();
 		for(xi=0;xi<16;xi++)
 		{
 			res_x = x + xi;
 			res_y = y;
 
-			if(!m_screen->visible_area().contains(res_x, res_y*2+0))
-				return;
+			pen = ext_gvram[((address*16+xi)+(m_vram_disp*0x40000)) >> 1];
 
-			pen = m_ext_gvram[((address*16+xi)+(m_vram_disp*0x40000)) >> 1];
-
-			bitmap.pix32(res_y*2+0, res_x) = palette[pen + 0x20];
-			if(m_screen->visible_area().contains(res_x, res_y*2+1))
-				bitmap.pix32(res_y*2+1, res_x) = palette[pen + 0x20];
+			bitmap.pix32(res_y, res_x) = palette[pen + 0x20];
 		}
 	}
 	else
