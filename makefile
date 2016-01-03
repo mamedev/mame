@@ -115,6 +115,10 @@ ifeq ($(OS),Windows_NT)
 OS := windows
 GENIEOS := windows
 PLATFORM := x86
+ifeq ($(MSYSTEM),)
+SHELL := cmd
+MAKEPARAMS += SHELL=cmd
+endif
 else
 UNAME := $(shell uname -mps)
 UNAME_M := $(shell uname -m)
