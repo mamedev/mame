@@ -1515,35 +1515,43 @@ int shaders::bloom_pass(render_target *rt, int source_index, poly_info *poly, in
 		return next_index;
 	}
 
-	curr_effect = bloom_effect;
-	curr_effect->update_uniforms();
-
-	float weight0123[4] = {
-		options->bloom_level0_weight,
+	float weight12[2] = {
 		options->bloom_level1_weight,
-		options->bloom_level2_weight,
-		options->bloom_level3_weight
+		options->bloom_level2_weight
 	};
-	float weight4567[4] = {
-		options->bloom_level4_weight,
+	float weight34[2] = {
+		options->bloom_level3_weight,
+		options->bloom_level4_weight
+	};
+	float weight56[2] = {
 		options->bloom_level5_weight,
 		options->bloom_level6_weight,
-		options->bloom_level7_weight
 	};
-	float weight89A[3]  = {
-		options->bloom_level8_weight,
+	float weight78[2] = {
+		options->bloom_level7_weight,
+		options->bloom_level8_weight
+	};
+	float weight9A[2]  = {
 		options->bloom_level9_weight,
 		options->bloom_level10_weight
 	};
-	curr_effect->set_vector("Level0123Weight", 4, weight0123);
-	curr_effect->set_vector("Level4567Weight", 4, weight4567);
-	curr_effect->set_vector("Level89AWeight", 3, weight89A);
-	curr_effect->set_vector("Level01Size", 4, bloom_dims[0]);
-	curr_effect->set_vector("Level23Size", 4, bloom_dims[2]);
-	curr_effect->set_vector("Level45Size", 4, bloom_dims[4]);
-	curr_effect->set_vector("Level67Size", 4, bloom_dims[6]);
-	curr_effect->set_vector("Level89Size", 4, bloom_dims[8]);
-	curr_effect->set_vector("LevelASize", 2, bloom_dims[10]);
+
+	curr_effect = bloom_effect;
+	curr_effect->update_uniforms();
+
+	curr_effect->set_float ("Level0Weight", options->bloom_level0_weight);
+	curr_effect->set_vector("Level12Weight", 2, weight12);
+	curr_effect->set_vector("Level34Weight", 2, weight34);
+	curr_effect->set_vector("Level56Weight", 2, weight56);
+	curr_effect->set_vector("Level78Weight", 2, weight78);
+	curr_effect->set_vector("Level9AWeight", 2, weight9A);
+
+	curr_effect->set_vector("Level0Size", 2, bloom_dims[0]);
+	curr_effect->set_vector("Level12Size", 4, bloom_dims[1]);
+	curr_effect->set_vector("Level34Size", 4, bloom_dims[3]);
+	curr_effect->set_vector("Level56Size", 4, bloom_dims[5]);
+	curr_effect->set_vector("Level78Size", 4, bloom_dims[7]);
+	curr_effect->set_vector("Level9ASize", 4, bloom_dims[9]);
 
 	curr_effect->set_int("BloomBlendMode", options->bloom_blend_mode);
 	curr_effect->set_float("BloomScale", options->bloom_scale);
@@ -3185,28 +3193,6 @@ void uniform::update()
 		case CU_POST_FLOOR:
 			m_shader->set_vector("Floor", 3, options->floor);
 			break;
-
-		case CU_BLOOM_RESCALE:
-			m_shader->set_float("BloomRescale", options->bloom_scale);
-			break;
-		case CU_BLOOM_LVL0123_WEIGHTS:
-		{
-			float weight0123[4] = { options->bloom_level0_weight, options->bloom_level1_weight, options->bloom_level2_weight, options->bloom_level3_weight };
-			m_shader->set_vector("Level0123Weight", 4, weight0123);
-			break;
-		}
-		case CU_BLOOM_LVL4567_WEIGHTS:
-		{
-			float weight4567[4] = { options->bloom_level4_weight, options->bloom_level5_weight, options->bloom_level6_weight, options->bloom_level7_weight };
-			m_shader->set_vector("Level4567Weight", 4, weight4567);
-			break;
-		}
-		case CU_BLOOM_LVL89A_WEIGHTS:
-		{
-			float weight89A[3]  = { options->bloom_level8_weight, options->bloom_level9_weight, options->bloom_level10_weight };
-			m_shader->set_vector("Level89AWeight", 3, weight89A);
-			break;
-		}
 	}
 }
 
