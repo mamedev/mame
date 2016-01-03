@@ -27,7 +27,7 @@ def file_exists(root, srcfile, folder, inc_dir):
     includes.extend(inc_dir)
     for line in includes:
         try:
-            fp = open(root + line + srcfile, 'rb')
+            fp = open(root + line + srcfile, 'r')
             fp.close()
             return line + srcfile
         except IOError:
@@ -36,7 +36,7 @@ def file_exists(root, srcfile, folder, inc_dir):
 
 def add_c_if_exists(root, fullname):
     try:
-        fp = open(root + fullname, 'rb')
+        fp = open(root + fullname, 'r')
         fp.close()
         deps_files_included.append(fullname)
     except IOError:
@@ -61,7 +61,7 @@ def add_rest_if_exists(root, srcfile,folder):
 
 def parse_file_for_deps(root, srcfile, folder):
     try:
-        fp = open(root + srcfile, 'rb')
+        fp = open(root + srcfile, 'r')
     except IOError:
         return 1
     in_comment = 0
@@ -73,11 +73,11 @@ def parse_file_for_deps(root, srcfile, folder):
         while srcptr < len(line):
             c = line[srcptr]
             srcptr+=1
-            if c==13 or c==10:
-                if c==13 and line[srcptr]==10:
+            if ord(c)==13 or ord(c)==10:
+                if ord(c)==13 and ord(line[srcptr])==10:
                     srcptr+=1
                 continue
-            if c==' ' or c==9:
+            if c==' ' or ord(c)==9:
                 continue
             if in_comment==1 and c=='*' and line[srcptr]=='/' :
                 srcptr+=1
@@ -112,7 +112,7 @@ def parse_file_for_deps(root, srcfile, folder):
 
 def parse_file(root, srcfile, folder):
     try:
-        fp = open(root + srcfile, 'rb')
+        fp = open(root + srcfile, 'r')
     except IOError:
         return 1
     in_comment = 0
@@ -124,11 +124,11 @@ def parse_file(root, srcfile, folder):
         while srcptr < len(line):
             c = line[srcptr]
             srcptr+=1
-            if c==13 or c==10:
-                if c==13 and line[srcptr]==10:
+            if ord(c)==13 or ord(c)==10:
+                if ord(c)==13 and ord(line[srcptr])==10:
                     srcptr+=1
                 continue
-            if c==' ' or c==9:
+            if c==' ' or ord(c)==9:
                 continue
             if in_comment==1 and c=='*' and line[srcptr]=='/' :
                 srcptr+=1
@@ -168,7 +168,7 @@ def parse_file(root, srcfile, folder):
 
 def parse_file_for_drivers(root, srcfile):
     try:
-        fp = open(root + srcfile, 'rb')
+        fp = open(root + srcfile, 'r')
     except IOError:
         sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
         return 1
@@ -181,11 +181,11 @@ def parse_file_for_drivers(root, srcfile):
         while srcptr < len(line):
             c = line[srcptr]
             srcptr+=1
-            if c==13 or c==10:
-                if c==13 and line[srcptr]==10:
+            if ord(c)==13 or ord(c)==10:
+                if ord(c)==13 and ord(line[srcptr])==10:
                     srcptr+=1
                 continue
-            if c==' ' or c==9:
+            if c==' ' or ord(c)==9:
                 continue
             if in_comment==1 and c=='*' and line[srcptr]=='/' :
                 srcptr+=1
@@ -209,7 +209,7 @@ def parse_file_for_drivers(root, srcfile):
 
 def parse_lua_file(srcfile):
     try:
-        fp = open(srcfile, 'rb')
+        fp = open(srcfile, 'r')
     except IOError:
         sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
         return 1
