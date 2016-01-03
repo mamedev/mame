@@ -115,9 +115,28 @@ MAKEPARAMS := -R
 ifeq ($(OS),Windows_NT)
 OS := windows
 GENIEOS := windows
+PLATFORM := x86
 else
 UNAME := $(shell uname -mps)
+UNAME_M := $(shell uname -m)
+UNAME_P := $(shell uname -p)
 GENIEOS := linux
+PLATFORM := unknown
+ifneq ($(filter x86_64,$(UNAME_P)),)
+PLATFORM := x86
+endif 
+ifneq ($(filter %86,$(UNAME_P)),)
+PLATFORM := x86
+endif 
+ifneq ($(filter arm%,$(UNAME_M)),)
+PLATFORM := arm
+endif 
+ifneq ($(filter arm%,$(UNAME_P)),)
+PLATFORM := arm
+endif 
+ifneq ($(filter powerpc,$(UNAME_P)),)
+PLATFORM := powerpc
+endif 
 ifeq ($(firstword $(filter Linux,$(UNAME))),Linux)
 OS := linux
 endif
@@ -648,6 +667,10 @@ endif
 
 ifdef FORCE_VERSION_COMPILE
 PARAMS += --FORCE_VERSION_COMPILE='$(FORCE_VERSION_COMPILE)'
+endif
+
+ifdef PLATFORM
+PARAMS += --PLATFORM='$(PLATFORM)'
 endif
 
 #-------------------------------------------------

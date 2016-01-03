@@ -446,6 +446,14 @@ int sdl_info::create()
 
 	if (!m_sdl_renderer)
 	{
+		if (video_config.waitvsync)
+			m_sdl_renderer = SDL_CreateRenderer(window().sdl_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_SOFTWARE);
+		else
+			m_sdl_renderer = SDL_CreateRenderer(window().sdl_window(), -1, SDL_RENDERER_SOFTWARE);
+	}
+
+	if (!m_sdl_renderer)
+	{
 		fatalerror("Error on creating renderer: %s\n", SDL_GetError());
 	}
 

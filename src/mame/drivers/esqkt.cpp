@@ -123,9 +123,6 @@ public:
 	UINT8 m_duart_io;
 	bool  m_bCalibSecondByte;
 
-private:
-	UINT32  *m_rom, *m_ram;
-
 public:
 	DECLARE_DRIVER_INIT(kt);
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);

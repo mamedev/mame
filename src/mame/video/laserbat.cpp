@@ -326,7 +326,7 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 	// render the TTL-generated background tilemap
 	unsigned const bg_row = (y - y_offset) & 0x07;
 	UINT8 const *const bg_src = &m_bg_ram[((y - y_offset) << 2) & 0x3e0];
-	for (unsigned byte = 0, px = x_offset; max_x >= px; byte++)
+	for (unsigned byte = 0, px = x_offset + (9 * 3); max_x >= px; byte++)
 	{
 		UINT16 const tile = (UINT16(bg_src[byte & 0x1f]) << 3) & 0x7f8;
 		UINT8 red   = m_gfx1[0x0000 | tile | bg_row];
@@ -351,15 +351,15 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 	{
 		// calculate area effects
 		// I have no idea where the magical x offset comes from but it's necessary
-		bool const right_half = bool((x + 8) & 0x80);
-		bool const eff1_cmp = right_half ? (UINT8((x + 8) & 0x7f) < (eff1_val & 0x7f)) : (UINT8((x + 8) & 0x7f) > (~eff1_val & 0x7f));
-		bool const eff2_cmp = right_half ? (UINT8((x + 8) & 0x7f) < (eff2_val & 0x7f)) : (UINT8((x + 8) & 0x7f) > (~eff2_val & 0x7f));
+		bool const right_half = bool((x + 0) & 0x80);
+		bool const eff1_cmp = right_half ? (UINT8((x + 0) & 0x7f) < (eff1_val & 0x7f)) : (UINT8((x + 0) & 0x7f) > (~eff1_val & 0x7f));
+		bool const eff2_cmp = right_half ? (UINT8((x + 0) & 0x7f) < (eff2_val & 0x7f)) : (UINT8((x + 0) & 0x7f) > (~eff2_val & 0x7f));
 		bool const eff1 = m_abeff1 && (m_neg1 ? !eff1_cmp : eff1_cmp);
 		bool const eff2 = m_abeff2 && (m_neg2 ? !eff2_cmp : eff2_cmp) && m_mpx_eff2_sh;
 
 		// calculate shell point effect
 		// using the same magical offset as the area effects
-		bool const shell = m_abeff2 && (UINT8((x + 8) & 0xff) == (eff2_val & 0xff)) && !m_mpx_eff2_sh;
+		bool const shell = m_abeff2 && (UINT8((x + 0) & 0xff) == (eff2_val & 0xff)) && !m_mpx_eff2_sh;
 
 		// set effect bits, and mix in PVI graphics while we're here
 		UINT16 const effect_bits = (shell ? 0x0800 : 0x0000) | (eff1 ? 0x1000 : 0x0000) | (eff2 ? 0x2000 : 0x0000);
@@ -380,7 +380,7 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 		int const sprite_row = y + y_offset - ((256 - m_wcov) & 0x0ff);
 		if ((0 <= sprite_row) && (32 > sprite_row))
 		{
-			for (unsigned byte = 0, x = x_offset + (3 * ((256 - m_wcoh - 4) & 0x0ff)); 8 > byte; byte++)
+			for (unsigned byte = 0, x = x_offset + (3 * ((256 - m_wcoh + 5) & 0x0ff)); 8 > byte; byte++)
 			{
 				UINT8 bits = m_gfx2[((m_shp << 8) & 0x700) | ((sprite_row << 3) & 0x0f8) | (byte & 0x07)];
 				for (unsigned pixel = 0; 4 > pixel; pixel++, bits <<= 2)

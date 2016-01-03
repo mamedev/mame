@@ -107,7 +107,6 @@ nick_device::nick_device(const machine_config &mconfig, const char *tag, device_
 		device_video_interface(mconfig, *this),
 		m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(nick_map)),
 		m_write_virq(*this),
-		horizontal_clock(0),
 		m_scanline_count(0),
 		m_FIXBIAS(0),
 		m_BORDER(0),

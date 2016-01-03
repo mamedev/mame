@@ -155,7 +155,6 @@ private:
 	UINT8   m_p3;
 	UINT16  m_last_write_addr;
 	UINT8 m_cass_data[4];
-	int m_centronics_busy;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<via6522_device> m_via;

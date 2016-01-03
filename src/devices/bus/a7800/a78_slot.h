@@ -128,7 +128,6 @@ public:
 private:
 	device_a78_cart_interface*       m_cart;
 	int m_type;
-	int m_stick_type;
 
 	int verify_header(char *header);
 	int validate_header(int head, bool log);

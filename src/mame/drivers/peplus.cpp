@@ -6282,7 +6282,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "mgo-cg2195.u73",  0x08000, 0x8000, NO_DUMP )
 	ROM_LOAD( "mbo-cg2195.u74",  0x10000, 0x8000, NO_DUMP )
 	ROM_LOAD( "mxo-cg2195.u75",  0x18000, 0x8000, NO_DUMP )
-	ROM_LOAD( "mro-cg2312.u77",  0x00000, 0x8000, CRC(29a9d408) SHA1(af8c18833ea268b80fabf3b539f35c6782a0309d) ) /* WRONG?!?! Use until the correct set is verified! */
+	ROM_LOAD( "mro-cg2312.u77",  0x00000, 0x8000, CRC(29a9d408) SHA1(af8c18833ea268b80fabf3b539f35c6782a0309d) ) /* WRONG?!?! Use until the correct set is dumped */
 	ROM_LOAD( "mgo-cg2312.u78",  0x08000, 0x8000, CRC(b5ea2602) SHA1(82ee6d45dbc53ccf2d2a956daa83f41bb4a27384) ) /* Gives full paytable, but the hands listed are wrong */
 	ROM_LOAD( "mbo-cg2312.u79",  0x10000, 0x8000, CRC(e349202c) SHA1(ef6a904112361425aef5824ae983c15d3456dc49) )
 	ROM_LOAD( "mxo-cg2312.u80",  0x18000, 0x8000, CRC(1e0d3df8) SHA1(716d6bd2b41ef41a7da393e805651c378a16e00e) ) /* These graphics don't seem to work with anything else */
@@ -8895,22 +8895,31 @@ PayTable   Ks+  2P   3K   STR  FL  FH  4K  SF  5K  RF  4D   RF  (Bonus)
   ????      1    1    2    3    4   5   6  12  15 100 400 1000   2000
   % Range: 91.3-93.3%  Optimum: 95.3%  Hit Frequency: 45.3%
      Programs Available: PP0489, X000489P
+
+NOTE: According to PSRs for XP000074 and XP000088, graphics set CG2342+CAPX1321 is required & SET014 to set the denomination
+
+XP000038 + CG2185 is currently used just to show something when the game boots up.
+
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000074.u67",   0x00000, 0x10000, NO_DUMP ) /* required program XP000074 not dumped */
+	ROM_LOAD( "xp000074.u67",   0x00000, 0x10000, NO_DUMP ) /* required program XP000074 or XP000088 not dumped */
 	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* Errors with INCOMPATIBLE EPROM error */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000489p.u66",   0x00000, 0x10000, CRC(73d21c66) SHA1(0f863037a34549f4255dedda70b4401d288eee01) ) /* Double Down Stud Deuces Wild Poker - 04/21/97   @ IGT  MO */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2342.u77",  0x00000, 0x8000, NO_DUMP ) /* This set requires CG2342 which is not dumped */
+	ROM_LOAD( "mgo-cg2342.u78",  0x08000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mbo-cg2342.u79",  0x10000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mxo-cg2342.u80",  0x18000, 0x8000, NO_DUMP )
 	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
 	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
+	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) ) /* Correct CAPX chip for CG2342 */
 ROM_END
 
 ROM_START( pex0508p ) /* Superboard : Loose Deuce Deuces Wild Poker (X000508P+XP000038) */
@@ -12027,8 +12036,7 @@ Double Bonus Poker   P323A     99.10%
 	ROM_LOAD( "mxo-cg2440.u80",  0x18000, 0x8000, CRC(9849096b) SHA1(65604ac2a2a27d4e458f6878aacf86f63f5f7c58) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "capx2440.u43", 0x0000, 0x0200, NO_DUMP ) /* Should be white cards with black logo */
-	ROM_LOAD( "capx2294.u43", 0x0000, 0x0200, CRC(641b72c0) SHA1(22f940defceee579fce8547c3469765be730ec56) )
+	ROM_LOAD( "capx2440.u43", 0x0000, 0x0200, BAD_DUMP CRC(37e8619f) SHA1(303ab25ef0483f2c5023d1765bb0cf9984c45f63) )
 ROM_END
 
 ROM_START( pexm003p ) /* Superboard : Multi-Poker (XM00003P) - Bonus Poker, Bonus Poker Dlx, Deuces Wild Poker, Jacks or Better & Dbl Bonus Poker */
@@ -12296,17 +12304,9 @@ ROM_END
 ROM_START( pexmp013 ) /* Superboard : 5-in-1 Wingboard (XMP00013) Program in Spanish, Requires Spanish Wingboard CG rom set */
 /*
 
-Known Wingboard compatible program roms:
-   XMP00013 - Spanish
-   XMP00014 - International
-   XMP00017
-   XMP00022 - Spanish
-   XMP00026 - Spanish
-   XMP00030
-
 The CG2346 set seems to support all games supported in CG2298 as well as graphics support for the following XnnnnnnP Data game types:
   Triple Double Bonus
-  Black Jack Bonus (comes up as Back Jack Poker)
+  Black Jack Bonus (comes up as Black Jack Poker)
 
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -12341,6 +12341,9 @@ ROM_START( pexmp017 ) /* Superboard : 5-in-1 Wingboard (XMP00017) */
 /*
 
 Known Wingboard compatible program roms:
+   XMP00007 (CG2298+CAPX2298 - not dumped)
+   XMP00009 (CG2230+CAPX2230 - not dumped - MGM exclusive)
+   XMP00011 (CG2298+CAPX2298 - not dumped)
    XMP00013 - Spanish
    XMP00014 - International (not dumped)
    XMP00017
@@ -12430,7 +12433,7 @@ ROM_END
 ROM_START( pexmp017b ) /* Superboard : 5-in-1 Wingboard (XMP00017) */
 /*
 
-The CG2426 set supersedes both CG2298 & CG2352 and adds graphics support for the following XnnnnnnP Data game types:
+The CG2426 set supersedes CG2298 and adds graphics support for the following XnnnnnnP Data game types:
   Black Jack Bonus
   Super Double Bonus
   Triple Double Bonus
@@ -13071,7 +13074,7 @@ GAMEL(1995, pekoc825,  0,         peplus,  peplus_poker, peplus_state, peplussb,
 /* Superboard : Multi-Poker */
 GAMEL(1995, pexm001p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00001P+XMP00003) Multi-Poker",        0, layout_pe_poker )
 GAMEL(1995, pexm002p,  pexm001p, peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00002P+XMP00006) Multi-Poker",        0, layout_pe_poker )
-GAMEL(1995, pexm002pa, pexm001p, peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00002P+XMP00006) Multi-Poker (MGM Grand Detroit Casino)", MACHINE_WRONG_COLORS, layout_pe_poker ) /* CAPX2440 not dumped */
+GAMEL(1995, pexm002pa, pexm001p, peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00002P+XMP00006) Multi-Poker (MGM Grand Detroit Casino)", 0, layout_pe_poker ) /* CAPX2440 needs a redumped */
 GAMEL(1995, pexm003p,  pexm001p, peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00003P+XMP00024) Multi-Poker",        0, layout_pe_poker )
 GAMEL(1995, pexm004p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00004P+XMP00002) Multi-Poker",        0, layout_pe_poker )
 GAMEL(1995, pexm005p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00005P+XMP00004) Multi-Poker",        0, layout_pe_poker )

@@ -91,8 +91,6 @@ private:
 	double audio_buffer[2][32*32];
 	int audio_buffer_pos[2];
 
-	int master_pos;
-
 	int current_pos, current_limit;
 
 	void read_header_amm(bool layer25);

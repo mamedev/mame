@@ -129,8 +129,6 @@ private:
 	void reload_lpt();
 	void do_line();
 
-	/* horizontal position */
-	UINT8 horizontal_clock;
 	/* current scanline within LPT */
 	UINT8 m_scanline_count;
 

@@ -77,6 +77,7 @@ smssdisp  // Sega Master System Store Display Unit
 megadrij  // 1988 Sega Mega Drive (Japan)
 genesis   // 1989 Sega Genesis (USA)
 megadriv  // 1990 Sega Mega Drive (Europe)
+genesis_tmss //
 pico      // 1994 Sega Pico (Europe)
 picou    // 1994 Sega Pico (USA)
 picoj    // 1993 Sega Pico (Japan)
@@ -325,7 +326,8 @@ neocdz  // NeoGeo CDZ
 neocdzj //
 
 // Philips
-cdimono1  // Philips CD-i (Mono-I board)
+cdimono1  // Philips CD-i model 200 (Mono-I board, PAL)
+cdimono2  // Philips CD-i model 220 (Mono-II board, NTSC)
 
 // Yamaha
 mu100   // 1997 MU-100

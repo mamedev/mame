@@ -2,6 +2,11 @@
 // copyright-holders:Andrew Gardner
 #define NO_MEM_TRACKING
 
+#include <QtWidgets/QScrollBar>
+#include <QtWidgets/QApplication>
+#include <QtGui/QPainter>
+#include <QtGui/QKeyEvent>
+
 #include "debuggerview.h"
 
 #include "modules/lib/osdobj_common.h"
@@ -28,10 +33,10 @@ DebuggerView::DebuggerView(const debug_view_type& type,
 												DebuggerView::debuggerViewUpdate,
 												this);
 
-	connect(verticalScrollBar(), SIGNAL(valueChanged(int)),
-			this, SLOT(verticalScrollSlot(int)));
-	connect(horizontalScrollBar(), SIGNAL(valueChanged(int)),
-			this, SLOT(horizontalScrollSlot(int)));
+	connect(verticalScrollBar(), &QScrollBar::valueChanged,
+			this, &DebuggerView::verticalScrollSlot);
+	connect(horizontalScrollBar(), &QScrollBar::valueChanged,
+			this, &DebuggerView::horizontalScrollSlot);
 }
 
 
@@ -41,127 +46,12 @@ DebuggerView::~DebuggerView()
 		m_machine->debug_view().free_view(*m_view);
 }
 
-// TODO: remove this version no later than January 1, 2015
-#if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
-void DebuggerView::paintEvent(QPaintEvent* event)
-{
-	// Tell the MAME debug view how much real estate is available
-	QFontMetrics actualFont = fontMetrics();
-	const int fontWidth = MAX(1, actualFont.width('_'));
-	const int fontHeight = MAX(1, actualFont.height());
-	m_view->set_visible_size(debug_view_xy(width()/fontWidth, height()/fontHeight));
-
-
-	// Handle the scroll bars
-	const int horizontalScrollCharDiff = m_view->total_size().x - m_view->visible_size().x;
-	const int horizontalScrollSize = horizontalScrollCharDiff < 0 ? 0 : horizontalScrollCharDiff;
-	horizontalScrollBar()->setRange(0, horizontalScrollSize);
-
-	// If the horizontal scroll bar appears, make sure to adjust the vertical scrollbar accordingly
-	const int verticalScrollAdjust = horizontalScrollSize > 0 ? 1 : 0;
-
-	const int verticalScrollCharDiff = m_view->total_size().y - m_view->visible_size().y;
-	const int verticalScrollSize = verticalScrollCharDiff < 0 ? 0 : verticalScrollCharDiff+verticalScrollAdjust;
-	bool atEnd = false;
-	if (verticalScrollBar()->value() == verticalScrollBar()->maximum())
-	{
-		atEnd = true;
-	}
-	verticalScrollBar()->setRange(0, verticalScrollSize);
-	if (m_preferBottom && atEnd)
-	{
-		verticalScrollBar()->setValue(verticalScrollSize);
-	}
-
-
-	// Draw the viewport widget
-	QPainter painter(viewport());
-	painter.fillRect(0, 0, width(), height(), QBrush(Qt::white));
-	painter.setBackgroundMode(Qt::OpaqueMode);
-	painter.setBackground(QColor(255,255,255));
-
-	// Background control
-	QBrush bgBrush;
-	bgBrush.setStyle(Qt::SolidPattern);
-	painter.setPen(QPen(QColor(0,0,0)));
-
-	size_t viewDataOffset = 0;
-	const debug_view_xy& visibleCharDims = m_view->visible_size();
-	for (int y = 0; y < visibleCharDims.y; y++)
-	{
-		for (int x = 0; x < visibleCharDims.x; x++)
-		{
-			const unsigned char textAttr = m_view->viewdata()[viewDataOffset].attrib;
-
-			if (x == 0 || textAttr != m_view->viewdata()[viewDataOffset-1].attrib)
-			{
-				// Text color handling
-				QColor fgColor(0,0,0);
-				QColor bgColor(255,255,255);
-
-				if(textAttr & DCA_VISITED)
-				{
-					bgColor.setRgb(0xc6, 0xe2, 0xff);
-				}
-				if(textAttr & DCA_ANCILLARY)
-				{
-					bgColor.setRgb(0xe0, 0xe0, 0xe0);
-				}
-				if(textAttr & DCA_SELECTED)
-				{
-					bgColor.setRgb(0xff, 0x80, 0x80);
-				}
-				if(textAttr & DCA_CURRENT)
-				{
-					bgColor.setRgb(0xff, 0xff, 0x00);
-				}
-				if ((textAttr & DCA_SELECTED) && (textAttr & DCA_CURRENT))
-				{
-					bgColor.setRgb(0xff,0xc0,0x80);
-				}
-				if(textAttr & DCA_CHANGED)
-				{
-					fgColor.setRgb(0xff, 0x00, 0x00);
-				}
-				if(textAttr & DCA_INVALID)
-				{
-					fgColor.setRgb(0x00, 0x00, 0xff);
-				}
-				if(textAttr & DCA_DISABLED)
-				{
-					fgColor.setRgb((fgColor.red()   + bgColor.red())   >> 1,
-									(fgColor.green() + bgColor.green()) >> 1,
-									(fgColor.blue()  + bgColor.blue())  >> 1);
-				}
-				if(textAttr & DCA_COMMENT)
-				{
-					fgColor.setRgb(0x00, 0x80, 0x00);
-				}
-
-				bgBrush.setColor(bgColor);
-				painter.setBackground(bgBrush);
-				painter.setPen(QPen(fgColor));
-			}
-
-			// Your character is not guaranteed to take up the entire fontWidth x fontHeight, so fill before.
-			painter.fillRect(x*fontWidth, y*fontHeight, fontWidth, fontHeight, bgBrush);
-
-			// There is a touchy interplay between font height, drawing difference, visible position, etc
-			// Fonts don't get drawn "down and to the left" like boxes, so some wiggling is needed.
-			painter.drawText(x*fontWidth,
-								(y*fontHeight + (fontHeight*0.80)),
-								QString(m_view->viewdata()[viewDataOffset].byte));
-			viewDataOffset++;
-		}
-	}
-}
-#else
 void DebuggerView::paintEvent(QPaintEvent* event)
 {
 	// Tell the MAME debug view how much real estate is available
 	QFontMetrics actualFont = fontMetrics();
 	const double fontWidth = actualFont.width(QString(100, '_')) / 100.;
-	const int fontHeight = MAX(1, actualFont.height());
+	const int fontHeight = MAX(1, actualFont.lineSpacing());
 	m_view->set_visible_size(debug_view_xy(width()/fontWidth, height()/fontHeight));
 
 
@@ -272,7 +162,6 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 		}
 	}
 }
-#endif
 
 void DebuggerView::keyPressEvent(QKeyEvent* event)
 {

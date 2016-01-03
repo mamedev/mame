@@ -200,7 +200,6 @@ private:
 	 * MAME-specific stuff.
 	 */
 	address_space *m_program;
-	UINT32 m_ppc;
 	int m_icount;
 	// For debugger
 	UINT32 m_freg[32];

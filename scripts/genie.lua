@@ -388,6 +388,11 @@ newoption {
 	}
 }
 
+newoption {
+	trigger = "PLATFORM",
+	description = "Target machine platform (x86,arm,...)",
+}
+
 if _OPTIONS["SHLIB"]=="1" then
 	LIBTYPE = "SharedLib"
 else
@@ -1012,9 +1017,12 @@ end
 				}
 		end
 	end
---ifeq ($(findstring arm,$(UNAME)),arm)
---	CCOMFLAGS += -Wno-cast-align
---endif
+	
+if (_OPTIONS["PLATFORM"]=="arm") then
+	buildoptions {
+		"-Wno-cast-align",
+	}
+end
 
 local subdir
 if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then

@@ -65,8 +65,6 @@ private:
 	UINT32 lsi53c810_dasm_fetch(UINT32 pc);
 	unsigned lsi53c810_dasm(char *buf, UINT32 pc);
 
-	UINT8 last_id;
-
 	UINT8 scntl0;
 	UINT8 scntl1;
 	UINT8 scntl2;

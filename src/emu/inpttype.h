@@ -21,8 +21,10 @@
 
 /* These input port macros expand to a great deal of code and break compilers */
 #if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 4 || (__GNUC_MINOR__ == 4 && __GNUC_PATCHLEVEL__ >= 4))))
+#if not(defined(__arm__) || defined(__ARMEL__))
 #pragma GCC push_options
 #pragma GCC optimize ("O1")
+#endif
 #elif defined(_MSC_VER)
 #pragma optimize("", off)
 #endif
@@ -830,7 +832,9 @@ void construct_core_types(simple_list<input_type_entry> &typelist)
 	construct_core_types_invalid(typelist);
 }
 #if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 4 || (__GNUC_MINOR__ == 4 && __GNUC_PATCHLEVEL__ >= 4))))
+#if not(defined(__arm__) || defined(__ARMEL__))
 #pragma GCC pop_options
+#endif
 #elif defined(_MSC_VER)
 #pragma optimize("", on)
 #endif

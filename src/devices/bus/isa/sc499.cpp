@@ -321,7 +321,7 @@ sc499_device::sc499_device(const machine_config &mconfig, const char *tag, devic
 	m_iobase(*this, "IO_BASE"),
 	m_irqdrq(*this, "IRQ_DRQ"), m_data(0), m_command(0), m_status(0), m_control(0), m_has_cartridge(0), m_is_writable(0), m_current_command(0), m_first_block_hack(0), m_nasty_readahead(0), m_read_block_pending(0),
 	m_data_index(0), m_tape_status(0), m_data_error_counter(0), m_underrun_counter(0), m_tape_pos(0), m_ctape_block_count(0), m_ctape_block_index(0), m_image_length(0),
-	m_image(*this, SC499_CTAPE_TAG), irq_state(), dma_drq_state(), m_timer(nullptr), m_timer1(nullptr), m_timer_type(0), m_irq(0), m_drq(0), m_installed(false)
+	m_image(*this, SC499_CTAPE_TAG), irq_state(), dma_drq_state(), m_timer(nullptr), m_timer1(nullptr), m_irq(0), m_drq(0), m_installed(false)
 {
 }
 

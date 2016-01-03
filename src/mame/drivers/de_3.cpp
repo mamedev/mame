@@ -88,7 +88,6 @@ private:
 	UINT8 m_kbdrow;
 	UINT8 m_diag;
 	bool m_ca1;
-	bool m_irq_active;
 	UINT8 m_sound_data;
 
 public:
