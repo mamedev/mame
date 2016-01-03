@@ -43,6 +43,10 @@ void *malloc_file_line(size_t size, const char *file, int line, bool array, bool
 void free_file_line(void *memory, const char *file, int line, bool array);
 inline void free_file_line(const void *memory, const char *file, int line, bool array) { free_file_line(const_cast<void *>(memory), file, line, array); }
 
+// realloc with file and line number info for internal use
+void *realloc_internal(void *memory, size_t size, const char *file, int line, bool array);
+
+
 // called from the exit path of any code that wants to check for unfreed memory
 void track_memory(bool track);
 UINT64 next_memory_id();
@@ -91,7 +95,7 @@ extern const zeromem_t zeromem;
 #undef free
 
 #define malloc(x)       malloc_file_line(x, __FILE__, __LINE__, true, false, false)
-#define realloc(x,y)    __error_realloc_is_dangerous__
+#define realloc(x,y)    realloc_internal(x, y, __FILE__, __LINE__, true, false)
 #define free(x)         free_file_line(x, __FILE__, __LINE__, true)
 
 #if !defined(_MSC_VER) || _MSC_VER < 1900 // < VS2015
