@@ -194,6 +194,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_scanline)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_iganinju_scanline)
+{
+	int scanline = param;
+
+	// TODO: there's more than one hint that MCU controls IRQ signals via work RAM buffers.
+	//       Right now makes it to speed-up too much, which I assume it's just plain wrong.
+	if(m_ram[0] == 0)
+		return;
+
+	if(scanline == 240) // vblank-out irq
+		m_maincpu->set_input_line(2, HOLD_LINE);
+
+	if(scanline == 16)
+		m_maincpu->set_input_line(1, HOLD_LINE);
+
+	if(scanline == 128)
+		m_maincpu->set_input_line(3, HOLD_LINE);
+	
+}
+
 static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
@@ -1534,6 +1554,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system_A_hachoo, system_A )
 	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1_hachoo)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( system_A_iganinju, system_A )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_REMOVE("scantimer")
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_iganinju_scanline, "screen", 0, 1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system_B, system_A )
@@ -4341,8 +4367,8 @@ GAME( 1988, p47je,    p47,      system_A,          p47,      driver_device,  0, 
 GAME( 1988, kickoff,  0,        system_A,          kickoff,  driver_device,  0,        ROT0,   "Jaleco", "Kick Off (Japan)", 0 )
 GAME( 1988, tshingen, 0,        system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1988, tshingena,tshingen, system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, kazan,    0,        system_A,          kazan,    megasys1_state, iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", 0 )
-GAME( 1988, iganinju, kazan,    system_A,          kazan,    megasys1_state, iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", 0 )
+GAME( 1988, kazan,    0,        system_A_iganinju, kazan,    megasys1_state, iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", 0 )
+GAME( 1988, iganinju, kazan,    system_A_iganinju, kazan,    megasys1_state, iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", 0 )
 GAME( 1989, astyanax, 0,        system_A,          astyanax, megasys1_state, astyanax, ROT0,   "Jaleco", "The Astyanax", 0 )
 GAME( 1989, lordofk,  astyanax, system_A,          astyanax, megasys1_state, astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", 0 )
 GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo,   megasys1_state, astyanax, ROT0,   "Jaleco", "Hachoo!", 0 )
