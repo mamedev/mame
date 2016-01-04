@@ -496,6 +496,7 @@ WRITE8_MEMBER( spc1500_state::paletb_w)
 WRITE8_MEMBER( spc1500_state::paletr_w)
 {
 	m_palette_r = data;
+	printf("palet:0x%02x, 0x%02x, 0x%02x\n", m_palette_g, m_palette_b, m_palette_r);
 }
 
 PALETTE_INIT_MEMBER(spc1500_state,spc)
@@ -518,7 +519,7 @@ VIDEO_START_MEMBER(spc1500_state, spc)
 MC6845_RECONFIGURE(spc1500_state::crtc_reconfig)
 {
 //	printf("reconfig. w:%d, h:%d, %f (%d,%d,%d,%d)\n", width, height, (float)frame_period, visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
-//	printf("register. m_vert_disp:%d, m_horiz_disp:%d, m_max_ras_addr:%d, m_vert_char_total:%d\n", m_crtc_vreg[6], m_crtc_vreg[1],  m_crtc_vreg[9], m_crtc_vreg[0x4]);
+	printf("register. m_vert_disp:%d, m_horiz_disp:%d, m_max_ras_addr:%d, m_vert_char_total:%d\n", m_crtc_vreg[6], m_crtc_vreg[1],  m_crtc_vreg[9], m_crtc_vreg[0x4]);
 }
 
 MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
@@ -534,13 +535,13 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	unsigned char cho[] ={1,1,1,1,1,1,1,1,0,0,1,1,1,3,5,5,0,0,5,3,3,5,5,5,0,0,3,3,5,1};
 	unsigned char jong[]={0,0,0,1,1,1,1,1,0,0,1,1,1,2,2,2,0,0,2,2,2,2,2,2,0,0,2,2,1,1};
 	bool inv = false;
-	char hs = (m_crtc_vreg[0x4] == 0x1f ? 4 : 3);
+	char hs = (m_crtc_vreg[0x9] < 15 ? 3 : 4);
 	int n = y & (m_crtc_vreg[0x9]);
-	if (y > 200) printf("y=%d,", y);
+	bool ln400 = (hs == 4 && m_crtc_vreg[0x4] > 20);
 	for (i = 0; i < x_count; i++)
 	{
 		UINT8 *pp = &m_p_videoram[0x2000+(y>>3)*x_count+((y&7)<<11)+i];
-		UINT8 *pv = &m_p_videoram[(y>>(hs==3?4:3))*x_count + i];
+		UINT8 *pv = &m_p_videoram[(y>>hs)*x_count + i];
 		UINT8 ascii = *(pv+0x1000);
 		UINT8 attr = *pv;
 		inv = (attr & 0x8 ? true : false);
@@ -550,9 +551,9 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 		UINT8 pixelr = *(pp+0x4000);
 		UINT8 pixelg = *(pp+0x8000);
 		UINT8 pen = (((m_palette_g&pal)>0)<<2)|(((m_palette_r&pal)>0)<<1)|(((m_palette_b&pal)>0));
-		UINT32 color = m_palette->pen(pen);
+		UINT32 color = m_palette->pen(ln400 ? rgb : pen);
 		UINT8 pixelpen = 0;
-		if (hs == 3 && ascii & 0x80)
+		if (hs == 4 && ascii & 0x80)
 		{
 			UINT16 wpixelb = (pixelb << 8) + (*(pp+1));
 			UINT16 wpixelr = (pixelr << 8) + (*(pp+0x4001));
@@ -579,7 +580,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 		else
 		{
 			//printf("%c", ascii);
-			UINT8 fnt = m_font[(hs == 3 ? 0x1000 : (attr & (1<<6) ? 0x80<<4 : 0)) + (ascii<<4) + n];
+			UINT8 fnt = m_font[(hs == 4 ? 0x1000 : (attr & (1<<6) ? 0x80<<4 : 0)) + (ascii<<4) + n];
 			if (ascii == 0 && (attr & 0x08) && inv)
 			{
 				fnt = 0xff;
@@ -694,14 +695,14 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( spc1500 )
 
- 	PORT_START("DIP_SWITCH") //TODO: implement front-panel DIP-SW here
+ 	PORT_START("DIP_SWITCH") 
  	PORT_DIPNAME( 0x01, 0x00, "40/80" )
  	PORT_DIPSETTING(    0x00, "40COL" )
  	PORT_DIPSETTING(    0x01, "80COL" )
  	PORT_DIPNAME( 0x02, 0x02, "Language" )
  	PORT_DIPSETTING(    0x02, "Korean" )
  	PORT_DIPSETTING(    0x00, "English" )
-	PORT_DIPNAME( 0x04, 0x04, "V-Res" )
+	PORT_DIPNAME( 0x04, 0x00, "V-Res" )
  	PORT_DIPSETTING(    0x04, "400" )
 	PORT_DIPSETTING(    0x00, "200" )
 	PORT_DIPNAME( 0x08, 0x08, "X1" )
@@ -895,8 +896,8 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0,640-1,0,200-1)
+	MCFG_SCREEN_SIZE(640, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0,640-1,0,400-1)
 	//MCFG_MC6845_VISAREA_ADJUST(50,50,640-50,400-50)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update )
 	MCFG_PALETTE_ADD("palette", 8)	
