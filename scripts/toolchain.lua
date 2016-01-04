@@ -485,8 +485,6 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "mingw-clang" }
 		linkoptions {
-			"-Qunused-arguments",
-			"-Wno-error=unused-command-line-argument-hard-error-in-future",
 			"-Wl,--allow-multiple-definition",
 		}
 

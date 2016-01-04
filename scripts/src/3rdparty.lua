@@ -385,11 +385,6 @@ project "lua"
 			"-Wno-bad-function-cast"
 		}
 		
-	configuration { "mingw-clang" }
-		defines {
-			"LUA_USE_C89",
-		}
-
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data

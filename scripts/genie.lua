@@ -675,16 +675,11 @@ end
 
 	if _ACTION == "gmake" then
 
-	--we compile C-only to C89 standard with GNU extensions
-if (_OPTIONS["targetos"]=="solaris") then
+	--we compile C-only to C99 standard with GNU extensions
+
 	buildoptions_c {
 		"-std=gnu99",
 	}
-else
-	buildoptions_c {
-		"-std=gnu89",
-	}
-end
 
 local version = str_to_version(_OPTIONS["gcc_version"])
 if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["targetos"]=="macosx" and (version <= 60000))) then
@@ -1058,9 +1053,13 @@ configuration { "osx*" }
 			"pthread",
 		}
 
-configuration { "mingw-clang" }
+configuration { "mingw*" }
+		linkoptions {
+			"-static-libgcc",
+			"-static-libstdc++",
+			"-static",
+		}
 		links {
-			"gcc",
 			"stdc++",
 			"user32",
 			"winmm",
@@ -1068,20 +1067,6 @@ configuration { "mingw-clang" }
 			"shlwapi",
 			"wsock32",
 			"pthread",
-		}
-
-configuration { "mingw*-gcc" }
-		linkoptions {
-			"-static-libgcc",
-			"-static-libstdc++",
-			"-static",
-		}
-		links {
-			"user32",
-			"winmm",
-			"advapi32",
-			"shlwapi",
-			"wsock32",
 		}
 
 configuration { "vs*" }
