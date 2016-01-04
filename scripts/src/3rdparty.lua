@@ -252,9 +252,8 @@ if _OPTIONS["vs"]=="intel-15" then
 end	
 
 	configuration { "mingw-clang" }
-		defines {
-			"SIZE_MAX=UINT_MAX",
-			"SIZE_T_MAX=UINT_MAX",
+		buildoptions {
+			"-include stdint.h"
 		}
 
 	configuration { "vs2015" }
