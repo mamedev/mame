@@ -244,6 +244,11 @@ if BASE_TARGETOS=="unix" then
 		links {
 			"Cocoa.framework",
 		}
+		linkoptions {
+			"-framework QuartzCore",
+			"-framework OpenGL",
+			"-weak_framework Metal",
+		}
 		if _OPTIONS["MACOSX_USE_LIBSDL"]~="1" then
 			linkoptions {
 				"-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
@@ -326,7 +331,7 @@ project ("qtdbg_" .. _OPTIONS["osd"])
 			"-fPIC",
 		}
 	configuration { }
-	
+
 	qtdebuggerbuild()
 
 project ("osd_" .. _OPTIONS["osd"])
