@@ -271,7 +271,6 @@ public:
 	DECLARE_READ8_MEMBER(crtc_r);
 	DECLARE_WRITE8_MEMBER(romsel);
 	DECLARE_WRITE8_MEMBER(ramsel);
-	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
 	DECLARE_WRITE8_MEMBER(psgb_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
@@ -346,11 +345,6 @@ WRITE8_MEMBER( spc1500_state::ramsel)
 	m_romsel = 0;
 	membank("bank1")->set_entry(2);
 //	printf("bank1 -> ram\n");
-}
-
-WRITE8_MEMBER( spc1500_state::porta_w)
-{
-	
 }
 
 WRITE8_MEMBER( spc1500_state::portb_w)
@@ -472,8 +466,7 @@ void spc1500_state::get_pcg_addr()
 WRITE8_MEMBER( spc1500_state::pcg_w)
 {
 	get_pcg_addr();
-	offset = (offset & 0x1f00) - 0x1500;
-	m_pcg_addr=m_pcg_addr+m_vdg->get_ra()+(offset<<3);
+	m_pcg_addr=m_pcg_addr+(offset&0xf)+(((offset & 0x1f00) - 0x1500)<<3);
 	m_pcgram[m_pcg_addr] = data;
 //	printf("pcgram:0x%04x 0x%02x\n",m_pcg_addr, data);
 }
@@ -540,7 +533,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	bool ln400 = (hs == 4 && m_crtc_vreg[0x4] > 20);
 	for (i = 0; i < x_count; i++)
 	{
-		UINT8 *pp = &m_p_videoram[0x2000+(y>>3)*x_count+((y&7)<<11)+i];
+		UINT8 *pp = &m_p_videoram[0x2000+((y>>(ln400 ? 4 : 3)))*x_count+(((ln400?y/2:y)&7)<<11)+i];
 		UINT8 *pv = &m_p_videoram[(y>>hs)*x_count + i];
 		UINT8 ascii = *(pv+0x1000);
 		UINT8 attr = *pv;
@@ -577,6 +570,19 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 			}
 			i++;
 		}
+		else if (attr & 0x20)
+		{
+			UINT8 *pa = &m_pcgram[(ascii<<hs)+n];
+			UINT8 b = *pa;
+			UINT8 r = *(pa+0x800);
+			UINT8 g = *(pa+0x1000);
+			for (j = 0; j < 8; j++)
+			{
+				pen = ((g & (0x80 >> j))>0?4:0)|((r & (0x80>>j))>0?2:0)|((b & (0x80>>j))>0?1:0);
+				pixelpen = (((pixelg&(0x80 >> j))>0 ? 4 : 0)|((pixelr&(0x80 >> j))>0 ? 2:0)|(((pixelb&(0x80 >> j) ? 1:0 ))));
+				*p++ = ((pen == 0 || (m_priority & (1<<pixelpen))) ? m_palette->pen(pixelpen) : m_palette->pen(pen));
+			}
+		}
 		else
 		{
 			//printf("%c", ascii);
@@ -589,9 +595,11 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 			fnt = (inv ? 0xff - fnt : fnt);
 			for (j = 0; j < 8; j++)
 			{
-				pixelpen = (((pixelg&(0x80 >> j))>0 ? 4 : 0)|((pixelr&(0x80 >> j))>0 ? 2:0)|((pixelb&(0x80 >> j ? 1:0 ))));
-				//if (pixelpen > 7) printf("pixelpen:%d (%d,%d)\n", pixelpen, i, y);
-				*p++ = (((fnt & (0x80 >> j)) || (m_priority & (1<<pixelpen))) ? m_palette->pen(pixelpen) : color);
+				pixelpen = (((pixelg&(0x80 >> j))>0 ? 4 : 0)|((pixelr&(0x80 >> j))>0 ? 2:0)|(((pixelb&(0x80 >> j) ? 1:0 ))));
+				if (ascii == 0 && attr == 0 && !inv)
+					*p++ = m_palette->pen(pixelpen);
+				else
+					*p++ = (((fnt & (0x80 >> j)) || (m_priority & (1<<pixelpen))) ? m_palette->pen(pixelpen) : color);
 			}
 		}
 	}
@@ -601,10 +609,10 @@ WRITE8_MEMBER( spc1500_state::double_w)
 {
 	if (m_double_mode)
 	{
-		if (offset < 0x4000) { m_p_videoram[offset] = m_p_videoram[offset + 0x4000] = m_p_videoram[offset + 0x8000] = data; } else
-		if (offset < 0x8000) { m_p_videoram[offset] = m_p_videoram[offset + 0x4000] = data; } else
-		if (offset < 0xc000) { m_p_videoram[offset] = m_p_videoram[offset - 0x8000] = data; } else
-		if (offset < 0x10000){ m_p_videoram[offset - 0xc000] = m_p_videoram[offset + 0x8000] = data; }
+		if (offset < 0x4000) { offset += 0x2000; m_p_videoram[offset] = m_p_videoram[offset + 0x4000] = m_p_videoram[offset + 0x8000] = data; } else
+		if (offset < 0x8000) { offset += 0x2000; m_p_videoram[offset + 0x8000] = m_p_videoram[offset + 0x4000] = data; } else
+		if (offset < 0xc000) { offset += 0x2000; m_p_videoram[offset] = m_p_videoram[offset + 0x8000] = data; } else
+		if (offset < 0x10000){ offset += 0x2000; m_p_videoram[offset] = m_p_videoram[offset + 0x4000] = data; }
 	}
 	else
 	{
@@ -910,7 +918,7 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)	
 	
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(spc1500_state, porta_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_I8255_IN_PORTB_CB(READ8(spc1500_state, portb_r))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(spc1500_state, portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(spc1500_state, portc_w))
