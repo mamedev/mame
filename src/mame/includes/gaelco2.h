@@ -27,6 +27,9 @@ public:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 
+	UINT32 snowboard_latch;
+
+
 	UINT16 *m_videoram;
 	tilemap_t *m_pant[2];
 	int m_dual_monitor;
