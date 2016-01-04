@@ -4372,7 +4372,7 @@ GAME( 1993, hayaosi1, 0,        system_B_hayaosi1, hayaosi1, megasys1_state, hay
 GAME( 1991, 64street, 0,        system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", 0 )
 GAME( 1991, 64streetj,64street, system_C,          64street, megasys1_state, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan)", 0 )
 GAME( 1992, bigstrik, 0,        system_C,          bigstrik, megasys1_state, bigstrik, ROT0,   "Jaleco", "Big Striker", 0 )
-GAME( 1993, chimerab, 0,        system_C,          chimerab, megasys1_state, chimerab, ROT0,   "Jaleco", "Chimera Beast (prototype)", 0 )
+GAME( 1993, chimerab, 0,        system_C,          chimerab, megasys1_state, chimerab, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype)", 0 )
 GAME( 1993, cybattlr, 0,        system_C,          cybattlr, megasys1_state, cybattlr, ROT90,  "Jaleco", "Cybattler", 0 )
 
 // Type D
