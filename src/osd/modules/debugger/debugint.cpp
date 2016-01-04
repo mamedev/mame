@@ -1657,7 +1657,7 @@ static void handle_keys(running_machine &machine)
 
 static void handle_editor(running_machine &machine)
 {
-	if (focus_view->editor.active)
+	if (focus_view->editor.active && dview_is_state(focus_view, VIEW_STATE_VISIBLE))
 	{
 		ui_event event;
 
@@ -1835,6 +1835,7 @@ void debug_internal::wait_for_debugger(device_t &device, bool firststop)
 	}
 
 	followers_set_cpu(&device);
+	ui_input_reset(device.machine());
 	debug_show_all();
 	//ui_update_and_render(device.machine(), device.machine().render().ui_container()());
 	update_views();
