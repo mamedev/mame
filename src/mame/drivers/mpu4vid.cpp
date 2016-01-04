@@ -1216,9 +1216,6 @@ MACHINE_START_MEMBER(mpu4vid_state,mpu4_vid)
 	/* setup communications */
 	m_link7a_connected = 1;
 
-	/* setup 8 mechanical meters */
-	MechMtr_config(machine(),8);
-
 	/* Hook the reset line */
 	m_videocpu->set_reset_callback(write_line_delegate(FUNC(mpu4vid_state::mpu_video_reset),this));
 }

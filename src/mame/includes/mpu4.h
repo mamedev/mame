@@ -123,7 +123,8 @@ public:
 			m_reel5(*this, "reel5"),
 			m_reel6(*this, "reel6"),
 			m_reel7(*this, "reel7"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_meters(*this, "meters")
 	{}
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -265,6 +266,8 @@ protected:
 	optional_device<stepper_device> m_reel5;
 	optional_device<stepper_device> m_reel6;
 	optional_device<stepper_device> m_reel7;
+	optional_device<palette_device> m_palette;
+	required_device<meters_device> m_meters;
 
 	enum
 	{
@@ -329,7 +332,6 @@ protected:
 	UINT8 m_numbanks;
 	mpu4_chr_table* m_current_chr_table;
 	const bwb_chr_table* m_bwb_chr_table1;
-	optional_device<palette_device> m_palette;
 };
 
 MACHINE_CONFIG_EXTERN( mpu4_common );

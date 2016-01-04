@@ -283,9 +283,6 @@ INPUT_PORTS_END
 
 void maygay1b_state::machine_start()
 {
-// setup 8 mechanical meters ////////////////////////////////////////////
-	MechMtr_config(machine(),8);
-
 }
 WRITE8_MEMBER(maygay1b_state::reel12_w)
 {
@@ -326,7 +323,7 @@ WRITE8_MEMBER(maygay1b_state::m1_meter_w)
 	{
 		if ( data & (1 << i) )
 		{
-			MechMtr_update(i, data & (1 << i) );
+			m_meters->update(i, data & (1 << i) );
 			m_meter = data;
 		}
 	}
@@ -636,6 +633,9 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel4_optic_cb))
 	MCFG_STARPOINT_48STEP_ADD("reel5")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel5_optic_cb))
+
+	MCFG_DEVICE_ADD("meters", METERS, 0)
+	MCFG_METERS_NUMBER(8)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

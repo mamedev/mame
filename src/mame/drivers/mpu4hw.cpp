@@ -420,16 +420,16 @@ void mpu4_state::update_meters()
 		break;
 	}
 
-	MechMtr_update(7, (data & 0x80));
+	m_meters->update(7, (data & 0x80));
 	for (meter = 0; meter < 4; meter ++)
 	{
-		MechMtr_update(meter, (data & (1 << meter)));
+		m_meters->update(meter, (data & (1 << meter)));
 	}
 	if (m_reel_mux == STANDARD_REEL)
 	{
 		for (meter = 4; meter < 7; meter ++)
 		{
-			MechMtr_update(meter, (data & (1 << meter)));
+			m_meters->update(meter, (data & (1 << meter)));
 		}
 	}
 }
@@ -1222,10 +1222,10 @@ all eight meters are driven from this port, giving the 8 line driver chip
 
 	//This may be overkill, but the meter sensing is VERY picky
 
-	int combined_meter = MechMtr_GetActivity(0) | MechMtr_GetActivity(1) |
-							MechMtr_GetActivity(2) | MechMtr_GetActivity(3) |
-							MechMtr_GetActivity(4) | MechMtr_GetActivity(5) |
-							MechMtr_GetActivity(6) | MechMtr_GetActivity(7);
+	int combined_meter = m_meters->GetActivity(0) | m_meters->GetActivity(1) |
+							m_meters->GetActivity(2) | m_meters->GetActivity(3) |
+							m_meters->GetActivity(4) | m_meters->GetActivity(5) |
+							m_meters->GetActivity(6) | m_meters->GetActivity(7);
 
 	if(combined_meter)
 	{
@@ -2129,10 +2129,6 @@ void mpu4_state::mpu4_config_common()
 {
 	m_ic24_timer = timer_alloc(TIMER_IC24);
 	m_lamp_strobe_ext_persistence = 0;
-
-	/* setup 8 mechanical meters */
-	MechMtr_config(machine(),8);
-
 }
 
 MACHINE_START_MEMBER(mpu4_state,mod2)
@@ -2638,6 +2634,9 @@ MACHINE_CONFIG_FRAGMENT( mpu4_common )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(mpu4_state, pia_ic8_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(mpu4_state, cpu0_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(mpu4_state, cpu0_irq))
+	
+	MCFG_DEVICE_ADD("meters", METERS, 0)
+	MCFG_METERS_NUMBER(8)
 
 MACHINE_CONFIG_END
 
