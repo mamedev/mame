@@ -28,6 +28,7 @@
 		"base/inspect.lua",
 		"tools/dotnet.lua",
 		"tools/gcc.lua",
+		"tools/ghs.lua",
 		"tools/msc.lua",
 		"tools/ow.lua",
 		"tools/snc.lua",
@@ -45,7 +46,7 @@
 		"actions/codelite/codelite_workspace.lua",
 		"actions/codelite/codelite_project.lua",
 
-		-- CodeLite action
+		-- CMake action
 		"actions/cmake/_cmake.lua",
 		"actions/cmake/cmake_workspace.lua",
 		"actions/cmake/cmake_project.lua",

@@ -4,12 +4,14 @@
 What is it?
 -----------
 
-**GENie** is project generator tool. It automagically generates project from Lua
-script, making applying the same settings for multiple projects easy.
+**GENie** (pronounced as Jenny) is project generator tool. It automagically
+generates project from Lua script, making applying the same settings for
+multiple projects easy.
 
 Supported project generators:
  * Visual Studio 2008, 2010, 2012, 2013, 2015
  * GNU Makefile
+ * XCode
 
 Who is using it?
 ----------------
@@ -35,7 +37,7 @@ Download (stable)
 
 [![Build Status](https://travis-ci.org/bkaradzic/genie.svg?branch=master)](https://travis-ci.org/bkaradzic/genie)
 
-	version 331 (commit 3653d092d054d5725cab272b6a5fd55edfd9a4ba)
+	version 366 (commit b887178737cd74cf60899899c4c65b9bf02efb26)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -100,6 +102,10 @@ intention to keep it compatible with it.
    `excludes` will exclude files from build but files will be added to project
    file. `removefiles` removes files completely from project.
  - Added support for generating PS4/Orbis projects.
+ - Fixed PCH race when using concurrent Makefile build.
+ - Added Green Hills Software compiler support.
+ - Added edit & continue support for 64-bit builds in VS2013 upwards.
+ - Added `windowstargetplatformversion` to specify VS Windows target version.
 
 ## Why fork?
 
@@ -138,9 +144,9 @@ state of Premake, it's just acknowledging the problem, and dealing with it.
 -----------------------------------------------------------------
 
 	GENie
-	Copyright (c) 2014-2015 Branimir Karadžić, Neil Richardson, Mike Popoloski,
-	Drew Solomon, Ted de Munnik, Miodrag Milanović, Brett Vickers,
-	Terry Hendrix II.
+	Copyright (c) 2014-2016 Branimir Karadžić, Neil Richardson, Mike Popoloski,
+	Drew Solomon, Ted de Munnik, Miodrag Milanović, Brett Vickers, Bill Freist,
+	Terry Hendrix II, Ryan Juckett, Andrew Johnson
 	All rights reserved.
 
 	https://github.com/bkaradzic/genie

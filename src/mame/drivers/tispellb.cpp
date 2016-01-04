@@ -51,7 +51,6 @@
 
   TODO:
   - spellb fetches wrong word sometimes (on lv1 SPOON and ANT) - roms were doublechecked
-  - mrchalgr wrong sound, need more accurate tms6100 emulation
 
 
 ***************************************************************************/
@@ -222,13 +221,11 @@ WRITE16_MEMBER(tispellb_state::rev2_write_r)
 	// R12: TMC0355 CS
 	// R4: TMC0355 M1
 	// R6: TMC0355 M0
-	if (data & 0x1000)
-	{
-		m_tms6100->m1_w(data >> 4 & 1);
-		m_tms6100->m0_w(data >> 6 & 1);
-		m_tms6100->romclock_w(1);
-		m_tms6100->romclock_w(0);
-	}
+	m_tms6100->cs_w(data >> 12 & 1);
+	m_tms6100->m1_w(data >> 4 & 1);
+	m_tms6100->m0_w(data >> 6 & 1);
+	m_tms6100->clk_w(1);
+	m_tms6100->clk_w(0);
 
 	// rest is same as rev1
 	main_write_r(space, offset, data);
@@ -372,7 +369,7 @@ static MACHINE_CONFIG_START( rev2, tispellb_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispellb_state, rev2_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispellb_state, rev2_write_r))
 	MCFG_TMS0270_READ_CTL_CB(DEVREAD8("tms6100", tms6100_device, data_r))
-	MCFG_TMS0270_WRITE_CTL_CB(DEVWRITE8("tms6100", tms6100_device, addr_w))
+	MCFG_TMS0270_WRITE_CTL_CB(DEVWRITE8("tms6100", tms6100_device, add_w))
 
 	MCFG_DEVICE_ADD("tms6100", TMS6100, 350000)
 	MCFG_TMS6100_4BIT_MODE()
@@ -428,7 +425,7 @@ ROM_START( mrchalgr )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_mrchalgr_output.pla", 0, 1246, CRC(4785289c) SHA1(60567af0ea120872a4ccf3128e1365fe84722aa8) )
 
-	ROM_REGION( 0x4000, "tms6100", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "tms6100", 0 )
 	ROM_LOAD( "cd2601.vsm", 0x0000, 0x1000, CRC(a9fbe7e9) SHA1(9d480cb30313b8cbce2d048140c1e5e6c5b92452) )
 ROM_END
 

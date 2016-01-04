@@ -21,14 +21,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> cbm2_graphic_cartridge_device
+// ======================> cbm2_hrg_t
 
-class cbm2_graphic_cartridge_device : public device_t,
-										public device_cbm2_expansion_card_interface
+class cbm2_hrg_t : public device_t,
+				   public device_cbm2_expansion_card_interface
 {
 public:
 	// construction/destruction
-	cbm2_graphic_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	cbm2_hrg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;
@@ -48,26 +48,26 @@ private:
 };
 
 
-// ======================> cbm2_graphic_cartridge_a_device
+// ======================> cbm2_hrg_a_t
 
-class cbm2_graphic_cartridge_a_device :  public cbm2_graphic_cartridge_device
+class cbm2_hrg_a_t :  public cbm2_hrg_t
 {
 public:
 	// construction/destruction
-	cbm2_graphic_cartridge_a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cbm2_hrg_a_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 
-// ======================> cbm2_graphic_cartridge_b_device
+// ======================> cbm2_hrg_b_t
 
-class cbm2_graphic_cartridge_b_device :  public cbm2_graphic_cartridge_device
+class cbm2_hrg_b_t :  public cbm2_hrg_t
 {
 public:
 	// construction/destruction
-	cbm2_graphic_cartridge_b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cbm2_hrg_b_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

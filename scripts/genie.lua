@@ -328,15 +328,6 @@ newoption {
 }
 
 newoption {
-	trigger = "FILTER_DEPS",
-	description = "Filter dependency files.",
-	allowed = {
-		{ "0",   "Disabled" 	},
-		{ "1",   "Enabled"      },
-	}
-}
-
-newoption {
 	trigger = "SEPARATE_BIN",
 	description = "Use separate bin folders.",
 	allowed = {
@@ -487,36 +478,6 @@ configuration { "Release", "vs*" }
 	}
 
 configuration {}
-
-local AWK = ""
-if (os.is("windows")) then
-	AWK_TEST = backtick("awk --version 2> NUL")
-	if (AWK_TEST~='') then
-		AWK = "awk"
-	else
-		AWK_TEST = backtick("gawk --version 2> NUL")
-		if (AWK_TEST~='') then
-			AWK = "gawk"
-		end
-	end
-else
-	AWK_TEST = backtick("awk --version 2> /dev/null")
-	if (AWK_TEST~='') then
-		AWK = "awk"
-	else
-		AWK_TEST = backtick("gawk --version 2> /dev/null")
-		if (AWK_TEST~='') then
-			AWK = "gawk"
-		end
-	end
-end
-
-if (_OPTIONS["FILTER_DEPS"]=="1") and (AWK~='') then
-	postcompiletasks {
-		AWK .. " -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)",
-		"mv $(@:%.o=%.dep) $(@:%.o=%.d)",
-	}
-end
 
 msgcompile ("Compiling $(subst ../,,$<)...")
 
