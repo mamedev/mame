@@ -251,6 +251,12 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end	
 
+	configuration { "mingw-clang" }
+		defines {
+			"SIZE_MAX=UINT_MAX",
+			"SIZE_T_MAX=UINT_MAX",
+		}
+
 	configuration { "vs2015" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
@@ -378,6 +384,12 @@ project "lua"
 		buildoptions_c {
 			"-Wno-bad-function-cast"
 		}
+		
+	configuration { "mingw-clang" }
+		defines {
+			"LUA_USE_C89",
+		}
+
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
@@ -726,6 +738,7 @@ end
 			buildoptions {
 				"-Wno-unknown-attributes",
 				"-Wno-missing-braces",
+				"-Wno-int-to-pointer-cast",
 			}
 		end
 	end
@@ -940,6 +953,11 @@ project "gtest"
 		buildoptions {
 			"-Wno-undef",
 			"-Wno-unused-variable",
+		}
+
+	configuration { "mingw-clang" }
+		buildoptions {
+			"-O0", -- crash of compiler when doing optimization
 		}
 
 	configuration { "vs*" }

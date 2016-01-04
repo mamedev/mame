@@ -1058,7 +1058,19 @@ configuration { "osx*" }
 			"pthread",
 		}
 
-configuration { "mingw*" }
+configuration { "mingw-clang" }
+		links {
+			"gcc",
+			"stdc++",
+			"user32",
+			"winmm",
+			"advapi32",
+			"shlwapi",
+			"wsock32",
+			"pthread",
+		}
+
+configuration { "mingw*-gcc" }
 		linkoptions {
 			"-static-libgcc",
 			"-static-libstdc++",
