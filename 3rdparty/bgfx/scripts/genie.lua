@@ -1,6 +1,6 @@
 --
--- Copyright 2010-2015 Branimir Karadzic. All rights reserved.
--- License: http://www.opensource.org/licenses/BSD-2-Clause
+-- Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+-- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 --
 
 newoption {
@@ -21,6 +21,11 @@ newoption {
 newoption {
 	trigger = "with-glfw",
 	description = "Enable GLFW entry.",
+}
+
+newoption {
+	trigger = "with-profiler",
+	description = "Enable build with intrusive profiler.",
 }
 
 newoption {
@@ -65,6 +70,12 @@ local BGFX_BUILD_DIR = path.join(BGFX_DIR, ".build")
 local BGFX_THIRD_PARTY_DIR = path.join(BGFX_DIR, "3rdparty")
 BX_DIR = path.getabsolute(path.join(BGFX_DIR, "../bx"))
 
+if not os.isdir(BX_DIR) then
+	print("bx not found at " .. BX_DIR)
+	print("For more info see: https://bkaradzic.github.io/bgfx/build.html")
+	os.exit()
+end
+
 defines {
 	"BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS=1"
 }
@@ -83,6 +94,14 @@ if _OPTIONS["with-sdl"] then
 			print("Set SDL2_DIR enviroment variable.")
 		end
 	end
+end
+
+if _OPTIONS["with-profiler"] then
+	defines {
+		"ENTRY_CONFIG_PROFILER=1",
+		"BGFX_CONFIG_PROFILER_REMOTERY=1",
+        "_WINSOCKAPI_"
+	}
 end
 
 function exampleProject(_name)
@@ -307,9 +326,9 @@ function exampleProject(_name)
 	configuration { "osx" }
 		linkoptions {
 			"-framework Cocoa",
-			"-framework Metal",
 			"-framework QuartzCore",
 			"-framework OpenGL",
+			"-weak_framework Metal",
 		}
 
 	configuration { "ios* or tvos*" }
@@ -317,10 +336,10 @@ function exampleProject(_name)
 		linkoptions {
 			"-framework CoreFoundation",
 			"-framework Foundation",
-			"-framework Metal",
 			"-framework OpenGLES",
 			"-framework UIKit",
 			"-framework QuartzCore",
+			"-weak_framework Metal",
 		}
 
 	configuration { "xcode4", "ios" }
@@ -381,6 +400,8 @@ exampleProject("21-deferred")
 exampleProject("22-windows")
 exampleProject("23-vectordisplay")
 exampleProject("24-nbody")
+exampleProject("26-occlusion")
+exampleProject("27-terrain")
 
 -- C99 source doesn't compile under WinRT settings
 if not premake.vstudio.iswinrt() then

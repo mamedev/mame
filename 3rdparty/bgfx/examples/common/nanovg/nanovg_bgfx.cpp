@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 //
@@ -134,7 +134,6 @@ namespace
 
 		struct GLNVGtexture* textures;
 		float view[2];
-		float surface[2];
 		int ntextures;
 		int ctextures;
 		int textureId;
@@ -327,7 +326,7 @@ namespace
 						, mem
 						);
 
-		return tex->id.idx;
+		return bgfx::isValid(tex->id) ? tex->id.idx : 0;
 	}
 
 	static int nvgRenderDeleteTexture(void* _userPtr, int image)
@@ -349,7 +348,7 @@ namespace
 		uint32_t pitch = tex->width * bytesPerPixel;
 
 		bgfx::updateTexture2D(tex->id, 0, x, y, w, h
-				, bgfx::makeRef(data + y*pitch + x*bytesPerPixel, h*pitch)
+				, bgfx::copy(data + y*pitch + x*bytesPerPixel, h*pitch)
 				, pitch
 				);
 
@@ -523,13 +522,11 @@ namespace
 		gl->th = handle;
 	}
 
-	static void nvgRenderViewport(void* _userPtr, int width, int height, int surfaceWidth, int surfaceHeight)
+	static void nvgRenderViewport(void* _userPtr, int width, int height)
 	{
 		struct GLNVGcontext* gl = (struct GLNVGcontext*)_userPtr;
 		gl->view[0] = (float)width;
 		gl->view[1] = (float)height;
-		gl->surface[0] = (float)surfaceWidth;
-		gl->surface[1] = (float)surfaceHeight;
 		bgfx::setViewRect(gl->viewid, 0, 0, width, height);
 	}
 
@@ -721,7 +718,7 @@ namespace
 								);
 			}
 
-			bgfx::setUniform(gl->u_viewSize, gl->surface);
+			bgfx::setUniform(gl->u_viewSize, gl->view);
 
 			for (uint32_t ii = 0, num = gl->ncalls; ii < num; ++ii)
 			{

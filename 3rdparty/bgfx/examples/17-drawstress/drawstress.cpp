@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "common.h"
@@ -241,6 +241,11 @@ class DrawStress : public entry::AppI
 			imguiSlider("Dim", m_dim, 5, m_maxDim);
 			imguiLabel("Draw calls: %d", m_dim*m_dim*m_dim);
 			imguiLabel("Avg Delta Time (1 second) [ms]: %0.4f", m_deltaTimeAvgNs/1000.0f);
+
+			imguiSeparatorLine();
+			const bgfx::Stats* stats = bgfx::getStats();
+			imguiLabel("GPU %0.6f [ms]", double(stats->gpuTimeEnd - stats->gpuTimeBegin)*1000.0/stats->gpuTimerFreq);
+			imguiLabel("CPU %0.6f [ms]", double(stats->cpuTimeEnd - stats->cpuTimeBegin)*1000.0/stats->cpuTimerFreq);
 
 			imguiEndScrollArea();
 			imguiEndFrame();

@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_PLATFORM_H_HEADER_GUARD
@@ -14,8 +14,7 @@
 
 #define BX_PLATFORM_ANDROID    0
 #define BX_PLATFORM_EMSCRIPTEN 0
-#define BX_PLATFORM_FREEBSD    0
-#define BX_PLATFORM_NETBSD     0
+#define BX_PLATFORM_BSD        0
 #define BX_PLATFORM_IOS        0
 #define BX_PLATFORM_LINUX      0
 #define BX_PLATFORM_NACL       0
@@ -175,7 +174,11 @@
 #	define BX_PLATFORM_IOS 1
 #elif defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
 #	undef  BX_PLATFORM_OSX
-#	define BX_PLATFORM_OSX 1
+#	if defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
+#		define BX_PLATFORM_OSX __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
+#	else
+#		define BX_PLATFORM_OSX 1
+#	endif // defined(MAC_OS_X_VERSION_MAX_ALLOWED)
 #elif defined(__EMSCRIPTEN__)
 #	undef  BX_PLATFORM_EMSCRIPTEN
 #	define BX_PLATFORM_EMSCRIPTEN 1
@@ -185,12 +188,9 @@
 #elif defined(__QNX__)
 #	undef  BX_PLATFORM_QNX
 #	define BX_PLATFORM_QNX 1
-#elif defined(__FreeBSD__)
-#	undef  BX_PLATFORM_FREEBSD
-#	define BX_PLATFORM_FREEBSD 1
-#elif defined(__NetBSD__)
-#	undef  BX_PLATFORM_NETBSD
-#	define BX_PLATFORM_NETBSD 1
+#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+#	undef  BX_PLATFORM_BSD
+#	define BX_PLATFORM_BSD 1
 #else
 #	error "BX_PLATFORM_* is not defined!"
 #endif //
@@ -198,8 +198,7 @@
 #define BX_PLATFORM_POSIX (0 \
 						|| BX_PLATFORM_ANDROID \
 						|| BX_PLATFORM_EMSCRIPTEN \
-						|| BX_PLATFORM_FREEBSD \
-						|| BX_PLATFORM_NETBSD \
+						|| BX_PLATFORM_BSD \
 						|| BX_PLATFORM_IOS \
 						|| BX_PLATFORM_LINUX \
 						|| BX_PLATFORM_NACL \
@@ -247,10 +246,8 @@
 				BX_STRINGIZE(__EMSCRIPTEN_major__) "." \
 				BX_STRINGIZE(__EMSCRIPTEN_minor__) "." \
 				BX_STRINGIZE(__EMSCRIPTEN_tiny__)
-#elif BX_PLATFORM_FREEBSD
-#	define BX_PLATFORM_NAME "FreeBSD"
-#elif BX_PLATFORM_NETBSD
-#	define BX_PLATFORM_NAME "NetBSD"
+#elif BX_PLATFORM_BSD
+#	define BX_PLATFORM_NAME "BSD"
 #elif BX_PLATFORM_IOS
 #	define BX_PLATFORM_NAME "iOS"
 #elif BX_PLATFORM_LINUX
