@@ -1060,14 +1060,17 @@ configuration { "mingw*" }
 			"-static",
 		}
 		links {
-			"stdc++",
 			"user32",
 			"winmm",
 			"advapi32",
 			"shlwapi",
 			"wsock32",
-			"pthread",
 		}
+configuration { "mingw-clang" }
+		linkoptions {
+			"-pthread",
+		}
+		
 
 configuration { "vs*" }
 		defines {
