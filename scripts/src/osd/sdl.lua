@@ -241,14 +241,20 @@ end
 
 if BASE_TARGETOS=="unix" then
 	if _OPTIONS["targetos"]=="macosx" then
+		local os_version = str_to_version(backtick("sw_vers -productVersion"))
+
 		links {
 			"Cocoa.framework",
 		}
 		linkoptions {
 			"-framework QuartzCore",
 			"-framework OpenGL",
-			"-weak_framework Metal",
 		}
+		if os_version>=101100 then
+			linkoptions {
+				"-weak_framework Metal",
+			}
+		end
 		if _OPTIONS["MACOSX_USE_LIBSDL"]~="1" then
 			linkoptions {
 				"-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
