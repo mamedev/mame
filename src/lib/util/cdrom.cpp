@@ -371,8 +371,8 @@ cdrom_file *cdrom_open(chd_file *chd)
 		chdofs  += file->cdtoc.tracks[i].frames;
 		chdofs  += file->cdtoc.tracks[i].extraframes;
 		logofs  += file->cdtoc.tracks[i].frames;
-
-/*      printf("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d\n", i+1,
+/*
+      printf("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d\n", i+1,
             file->cdtoc.tracks[i].trktype,
             file->cdtoc.tracks[i].subtype,
             file->cdtoc.tracks[i].datasize,
@@ -447,17 +447,20 @@ void cdrom_close(cdrom_file *file)
  * @return  The partial sector.
  */
 
-chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UINT32 chdsector, UINT32 tracknum, UINT32 startoffs, UINT32 length)
+chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UINT32 chdsector, UINT32 tracknum, UINT32 startoffs, UINT32 length, bool phys=false)
 {
 	chd_error result = CHDERR_NONE;
 	bool needswap = false;
 
 	// if this is pregap info that isn't actually in the file, just return blank data
-	if ((file->cdtoc.tracks[tracknum].pgdatasize == 0) && (lbasector < (file->cdtoc.tracks[tracknum].logframeofs + file->cdtoc.tracks[tracknum].pregap)))
+	if (!phys)
 	{
-//      printf("PG missing sector: LBA %d, trklog %d\n", lbasector, file->cdtoc.tracks[tracknum].logframeofs);
-		memset(dest, 0, length);
-		return result;
+		if ((file->cdtoc.tracks[tracknum].pgdatasize == 0) && (lbasector < (file->cdtoc.tracks[tracknum].logframeofs + file->cdtoc.tracks[tracknum].pregap)))
+		{
+			//printf("PG missing sector: LBA %d, trklog %d\n", lbasector, file->cdtoc.tracks[tracknum].logframeofs);
+			memset(dest, 0, length);
+			return result;
+		}
 	}
 
 	// if a CHD, just read
@@ -542,14 +545,14 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
 
 	if ((datatype == tracktype) || (datatype == CD_TRACK_RAW_DONTCARE))
 	{
-		return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 0, file->cdtoc.tracks[tracknum].datasize) == CHDERR_NONE);
+		return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 0, file->cdtoc.tracks[tracknum].datasize, phys) == CHDERR_NONE);
 	}
 	else
 	{
 		/* return 2048 bytes of mode 1 data from a 2352 byte mode 1 raw sector */
 		if ((datatype == CD_TRACK_MODE1) && (tracktype == CD_TRACK_MODE1_RAW))
 		{
-			return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 16, 2048) == CHDERR_NONE);
+			return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 16, 2048, phys) == CHDERR_NONE);
 		}
 
 		/* return 2352 byte mode 1 raw sector from 2048 bytes of mode 1 data */
@@ -565,19 +568,19 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
 			bufptr[14] = msf&0xff;
 			bufptr[15] = 1; // mode 1
 			LOG(("CDROM: promotion of mode1/form1 sector to mode1 raw is not complete!\n"));
-			return (read_partial_sector(file, bufptr+16, lbasector, chdsector, tracknum, 0, 2048) == CHDERR_NONE);
+			return (read_partial_sector(file, bufptr+16, lbasector, chdsector, tracknum, 0, 2048, phys) == CHDERR_NONE);
 		}
 
 		/* return 2048 bytes of mode 1 data from a mode2 form1 or raw sector */
 		if ((datatype == CD_TRACK_MODE1) && ((tracktype == CD_TRACK_MODE2_FORM1)||(tracktype == CD_TRACK_MODE2_RAW)))
 		{
-			return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 24, 2048) == CHDERR_NONE);
+			return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 24, 2048, phys) == CHDERR_NONE);
 		}
 
 		/* return mode 2 2336 byte data from a 2352 byte mode 1 or 2 raw sector (skip the header) */
 		if ((datatype == CD_TRACK_MODE2) && ((tracktype == CD_TRACK_MODE1_RAW) || (tracktype == CD_TRACK_MODE2_RAW)))
 		{
-			return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 16, 2336) == CHDERR_NONE);
+			return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 16, 2336, phys) == CHDERR_NONE);
 		}
 
 		LOG(("CDROM: Conversion from type %d to type %d not supported!\n", tracktype, datatype));

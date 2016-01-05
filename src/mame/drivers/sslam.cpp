@@ -845,7 +845,7 @@ ROM_END
 // other labels seem to be that of the powerbals set below, but with sslam content, maybe it was
 // factory converted to powerbals at one time, then back again?
 // there are quite a lot of changes from the above sets.
-ROM_START( sslamb ) 
+ROM_START( sslamb )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "21.u67", 0x00000, 0x80000, CRC(a7c57d58) SHA1(28964c30a12bf7b236fd10bd3b1da341b54f4b7c) )
 	ROM_RELOAD_SSLAM(0x100000)

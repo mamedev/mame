@@ -194,6 +194,7 @@ int machine_manager::execute()
 		if (system != nullptr)
 		{
 			validity_checker valid(m_options);
+			valid.set_verbose(false);
 			valid.check_shared_source(*system);
 		}
 

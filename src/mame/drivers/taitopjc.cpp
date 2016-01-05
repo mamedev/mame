@@ -77,7 +77,7 @@
         0xf010:
         0xf020:
 
-	TLCS -> PPC Commands:
+    TLCS -> PPC Commands:
         0x7000:                                                     DSP ready
         0xd000:                                                     Vblank
 
@@ -93,7 +93,7 @@
 
 #define LOG_TLCS_TO_PPC_COMMANDS        1
 #define LOG_PPC_TO_TLCS_COMMANDS        1
-#define LOG_DISPLAY_LIST					0
+#define LOG_DISPLAY_LIST                    0
 
 class taitopjc_state : public driver_device
 {
@@ -106,7 +106,8 @@ public:
 		m_dsp(*this, "dsp"),
 		m_tc0780fpa(*this, "tc0780fpa"),
 		m_palette(*this, "palette"),
-		m_polyrom(*this, "poly")
+		m_polyrom(*this, "poly"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -116,6 +117,7 @@ public:
 	required_device<tc0780fpa_device> m_tc0780fpa;
 	required_device<palette_device> m_palette;
 	required_memory_region m_polyrom;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_READ64_MEMBER(video_r);
 	DECLARE_WRITE64_MEMBER(video_w);
@@ -141,6 +143,9 @@ public:
 	void videochip_w(offs_t address, UINT32 data);
 	void video_exit();
 	void print_display_list();
+	TILE_GET_INFO_MEMBER(tile_get_info);
+	TILEMAP_MAPPER_MEMBER(tile_scan_layer0);
+	TILEMAP_MAPPER_MEMBER(tile_scan_layer1);
 
 	DECLARE_DRIVER_INIT(optiger);
 
@@ -149,6 +154,8 @@ public:
 
 	std::unique_ptr<UINT32[]> m_screen_ram;
 	std::unique_ptr<UINT32[]> m_pal_ram;
+
+	tilemap_t *m_tilemap[2];
 
 	UINT32 m_video_address;
 
@@ -183,49 +190,65 @@ void taitopjc_state::video_exit()
 #endif
 }
 
+TILE_GET_INFO_MEMBER(taitopjc_state::tile_get_info)
+{
+	UINT32 val = m_screen_ram[0x3f000 + (tile_index/2)];
+
+	if (!(tile_index & 1))
+		val >>= 16;
+
+	int color = (val >> 12) & 0xf;
+	int tile = (val & 0xfff);
+	int flags = 0;
+
+	SET_TILE_INFO_MEMBER(0, tile, color, flags);
+}
+
+TILEMAP_MAPPER_MEMBER(taitopjc_state::tile_scan_layer0)
+{
+	/* logical (col,row) -> memory offset */
+	return (row * 64) + col;
+}
+
+TILEMAP_MAPPER_MEMBER(taitopjc_state::tile_scan_layer1)
+{
+	/* logical (col,row) -> memory offset */
+	return (row * 64) + col + 32;
+}
+
 void taitopjc_state::video_start()
 {
+	static const gfx_layout char_layout =
+	{
+		16, 16,
+		4032,
+		8,
+		{ 0,1,2,3,4,5,6,7 },
+		{ 3*8, 2*8, 1*8, 0*8, 7*8, 6*8, 5*8, 4*8, 11*8, 10*8, 9*8, 8*8, 15*8, 14*8, 13*8, 12*8 },
+		{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
+		8*256
+	};
+
 	m_screen_ram = std::make_unique<UINT32[]>(0x40000);
 	m_pal_ram = std::make_unique<UINT32[]>(0x8000);
+
+	m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taitopjc_state::tile_get_info),this), tilemap_mapper_delegate(FUNC(taitopjc_state::tile_scan_layer0),this), 16, 16, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taitopjc_state::tile_get_info),this), tilemap_mapper_delegate(FUNC(taitopjc_state::tile_scan_layer1),this), 16, 16, 32, 32);
+	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[1]->set_transparent_pen(1);
+	
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, char_layout, (UINT8*)m_screen_ram.get(), 0, m_palette->entries() / 256, 0));
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitopjc_state::video_exit), this));
 }
 
 UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *s = (UINT8*)m_screen_ram.get();
-	int x,y,t,u;
-
 	bitmap.fill(0x000000, cliprect);
 
-	UINT16 *s16 = (UINT16*)m_screen_ram.get();
-
-	for (u=0; u < 24; u++)
-	{
-		for (t=0; t < 32; t++)
-		{
-			UINT16 tile = s16[(0x7e000 + (u*64) + t) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
-
-			int palette = (tile >> 12) & 0xf;
-
-			tile &= 0xfff;			
-
-			for (y=0; y < 16; y++)
-			{
-				UINT16 *fb = &bitmap.pix16(y+(u*16));
-				for (x=0; x < 16; x++)
-				{
-					UINT8 p = s[((tile*256) + ((y*16)+x)) ^ NATIVE_ENDIAN_VALUE_LE_BE(3,0)];
-					if (p != 0)
-					{
-						fb[x+(t*16)] = (palette << 8) + p;
-					}
-				}
-			}
-		}
-	}
-
 	m_tc0780fpa->draw(bitmap, cliprect);
+
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0);
 
 	return 0;
 }
@@ -249,13 +272,25 @@ void taitopjc_state::videochip_w(offs_t address, UINT32 data)
 		m_pal_ram[address - 0x20000000] = data;
 
 		int b = (data >> 16) & 0xff;
-		int g = (data >>  8) & 0xff;		
+		int g = (data >>  8) & 0xff;
 		int r = (data >>  0) & 0xff;
 		m_palette->set_pen_color(address - 0x20000000, rgb_t(r, g, b));
 	}
 	else if (address >= 0x10000000 && address < 0x10040000)
 	{
-		m_screen_ram[address - 0x10000000] = data;
+		UINT32 addr = address - 0x10000000;
+		m_screen_ram[addr] = data;
+		
+		if (address >= 0x1003f000)
+		{
+			UINT32 a = address - 0x1003f000;
+			m_tilemap[0]->mark_tile_dirty((a*2));
+			m_tilemap[0]->mark_tile_dirty((a*2)+1);
+		}
+		else
+		{
+			m_gfxdecode->gfx(0)->mark_dirty(addr / 64);
+		}
 	}
 	else
 	{
@@ -382,7 +417,7 @@ void taitopjc_state::print_display_list()
 				int count = (w & 0x7fff) + 1;
 				UINT16 d = m_dsp_ram[ptr++];
 				for (int i=0; i < count; i++)
-				{					
+				{
 					UINT16 s = m_dsp_ram[ptr++];
 					printf("   %04X -> [%04X]\n", s, d);
 					d++;
@@ -639,7 +674,7 @@ static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, taitopjc_state )
 	AM_RANGE(0x4c00, 0xefff) AM_ROM AM_REGION("user2", 0x9800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitopjc_state )	
+static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitopjc_state )
 	AM_RANGE(0x4000, 0x6fff) AM_ROM AM_REGION("user2", 0x8000)
 	AM_RANGE(0x7000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE(tms_dspshare_r, tms_dspshare_w)
@@ -660,43 +695,43 @@ static INPUT_PORTS_START( taitopjc )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN1 )			// Coin A
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_COIN1 )            // Coin A
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("INPUTS2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)		// Service switch
-	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW)		// Test Button
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)        // Service switch
+	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW)      // Test Button
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START1 )		// Select 1
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_START2 )		// Select 2
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START1 )       // Select 1
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_START2 )       // Select 2
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("INPUTS3")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)		// P1 trigger
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)		// P1 bomb
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)		// P2 trigger
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)		// P2 bomb
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)       // P1 trigger
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)       // P1 bomb
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)       // P2 trigger
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)       // P2 bomb
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ANALOG1")       // Player 1 X
-	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(30)
 
 	PORT_START("ANALOG2")       // Player 1 Y
-	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(30)
 
 	PORT_START("ANALOG3")       // Player 2 X
-	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(30)
 
 	PORT_START("ANALOG4")       // Player 2 Y
-	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(30)
 INPUT_PORTS_END
 
 
@@ -727,6 +762,10 @@ static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 	MCFG_TMP95C063_PORT5_READ(IOPORT("INPUTS1"))
 	MCFG_TMP95C063_PORTD_READ(IOPORT("INPUTS2"))
 	MCFG_TMP95C063_PORTE_READ(IOPORT("INPUTS3"))
+	MCFG_TMP95C063_AN0_READ(IOPORT("ANALOG1"))
+	MCFG_TMP95C063_AN1_READ(IOPORT("ANALOG2"))
+	MCFG_TMP95C063_AN2_READ(IOPORT("ANALOG3"))
+	MCFG_TMP95C063_AN3_READ(IOPORT("ANALOG4"))
 	MCFG_CPU_PROGRAM_MAP(tlcs900h_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitopjc_state,  taitopjc_vbi)
 
@@ -753,6 +792,8 @@ static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 
 	MCFG_PALETTE_ADD("palette", 32768)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+
 	MCFG_DEVICE_ADD("tc0780fpa", TC0780FPA, 0)
 
 MACHINE_CONFIG_END
@@ -765,6 +806,12 @@ DRIVER_INIT_MEMBER(taitopjc_state, optiger)
 	// skip sound check
 	rom[0x217] = 0x00;
 	rom[0x218] = 0x00;
+
+#if 0
+	UINT32 *mr = (UINT32*)memregion("user1")->base();
+	//mr[(0x23a5c^4)/4] = 0x60000000;
+	mr[((0x513b0-0x40000)^4)/4] = 0x38600001;
+#endif
 }
 
 
@@ -796,7 +843,7 @@ ROM_START( optiger )
 	ROM_REGION16_BE( 0xc00000, "poly", 0 )
 	ROM_LOAD16_WORD_SWAP( "e63-09_poly0.3", 0x000000, 0x400000, CRC(c3e2b1e0) SHA1(ee71f3f59b46e26dbe2ff724da2c509267c8bf2f) )
 	ROM_LOAD16_WORD_SWAP( "e63-10_poly1.4", 0x400000, 0x400000, CRC(f4a56390) SHA1(fc3c51a7f4639479e66ad50dcc94255d94803c97) )
-	ROM_LOAD16_WORD_SWAP( "e63-11_poly2.5", 0x800000, 0x400000, CRC(2293d9f8) SHA1(16adaa0523168ee63a7a34b29622c623558fdd82) )	
+	ROM_LOAD16_WORD_SWAP( "e63-11_poly2.5", 0x800000, 0x400000, CRC(2293d9f8) SHA1(16adaa0523168ee63a7a34b29622c623558fdd82) )
 // Poly 3 is not populated
 
 	ROM_REGION( 0x800000, "sound_data", 0 )

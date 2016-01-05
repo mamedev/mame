@@ -702,7 +702,7 @@ static void decrypt_bios( running_machine &machine, const char *regionName, int 
 
 DRIVER_INIT_MEMBER(namcos10_state,mrdrilr2)
 {
-	int regSize = machine().root_device().memregion("user2")->bytes();
+	int regSize = machine().root_device().memregion("maincpu:rom")->bytes();
 	decrypt_bios(machine(), "maincpu:rom", 0, regSize, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3);
 }
 

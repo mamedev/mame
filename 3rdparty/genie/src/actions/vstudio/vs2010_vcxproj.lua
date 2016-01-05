@@ -264,7 +264,7 @@
 	--
 		local debug_info = ''
 		if cfg.flags.Symbols then
-			if cfg.platform == "x64"
+			if (action.vstudio.supports64bitEditContinue == false and cfg.platform == "x64")
 				or cfg.flags.Managed
 				or premake.config.isoptimizedbuild(cfg.flags)
 				or cfg.flags.NoEditAndContinue

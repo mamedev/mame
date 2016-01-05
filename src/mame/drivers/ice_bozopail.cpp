@@ -24,13 +24,13 @@ class ice_bozopail : public driver_device
 public:
 	ice_bozopail(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-	//	,m_maincpu(*this, "maincpu")
+	//  ,m_maincpu(*this, "maincpu")
 	{ }
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-//	required_device<mcs51_cpu_device> m_maincpu;
+//  required_device<mcs51_cpu_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( ice_bozoice_bozo )
@@ -50,9 +50,9 @@ void ice_bozopail::machine_reset()
 static MACHINE_CONFIG_START( ice_bozoice_bozo, ice_bozopail )
 
 	/* basic machine hardware */
-//	MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
-//	MCFG_CPU_PROGRAM_MAP(ice_bozoice_bozo_map)
-//	MCFG_CPU_IO_MAP(ice_bozoice_bozo_io)
+//  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
+//  MCFG_CPU_PROGRAM_MAP(ice_bozoice_bozo_map)
+//  MCFG_CPU_IO_MAP(ice_bozoice_bozo_io)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -67,4 +67,3 @@ ROM_START( ice_bozo )
 ROM_END
 
 GAME( 1997?, ice_bozo,  0,    ice_bozoice_bozo, ice_bozoice_bozo, driver_device,  0, ROT0, "Innovative Creations in Entertainment", "Bozo's Pail Toss (v2.07)", MACHINE_IS_SKELETON_MECHANICAL )
-

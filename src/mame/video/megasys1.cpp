@@ -266,7 +266,7 @@ VIDEO_START_MEMBER(megasys1_state,megasys1)
 	m_8x8_scroll_factor[2] = 1; m_16x16_scroll_factor[2] = 4;
 
 	if (strcmp(machine().system().name, "soldam") == 0 ||
-	    strcmp(machine().system().name, "soldamj") == 0)
+		strcmp(machine().system().name, "soldamj") == 0)
 	{
 		m_8x8_scroll_factor[1] = 4; m_16x16_scroll_factor[1] = 4;
 	}
@@ -417,7 +417,7 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_A_w)
 
 	if(((offset*2) & 0x300) == 0)
 		m_screen->update_partial(m_screen->vpos());
-	
+
 	switch (offset)
 	{
 		case 0x000/2   :    m_active_layers = new_data; break;
@@ -596,7 +596,7 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_D_w)
     00-07                       ?
     08      fed- ---- ---- ---- ?
             ---c ---- ---- ---- mosaic sol.
-            ---- ba98 ---- ---- mosaic      
+            ---- ba98 ---- ---- mosaic
             ---- ---- 7--- ---- y flip
             ---- ---- -6-- ---- x flip
             ---- ---- --45 ---- ?
@@ -658,8 +658,7 @@ void megasys1_state::partial_clear_sprite_bitmap(screen_device &screen, bitmap_i
 
 inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, INT32 code, INT32 color, INT32 sx, INT32 sy, INT32 flipx, INT32 flipy, UINT8 mosaic, UINT8 mosaicsol, INT32 priority)
 {
-
-//	if (sy >= nScreenHeight || sy < -15 || sx >= nScreenWidth || sx < -15) return;
+//  if (sy >= nScreenHeight || sy < -15 || sx >= nScreenWidth || sx < -15) return;
 	gfx_element *decodegfx = m_gfxdecode->gfx(3);
 	sy = sy + 16;
 
@@ -673,13 +672,13 @@ inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bi
 
 	for (INT32 y = 0; y < 16; y++, sy++, sx-=16)
 	{
-	//	UINT16 *dest = &bitmap.pix16(sy)+ sx;
-	//	UINT8 *prio = &screen.priority().pix8(sy) + sx;
+	//  UINT16 *dest = &bitmap.pix16(sy)+ sx;
+	//  UINT8 *prio = &screen.priority().pix8(sy) + sx;
 		UINT16* dest = &m_sprite_buffer_bitmap.pix16(sy)+ sx;
 
 		for (INT32 x = 0; x < 16; x++, sx++)
 		{
-			if (sx < cliprect.min_x || sy < cliprect.min_y || sx > cliprect.max_x || sy > cliprect.max_y) continue;	
+			if (sx < cliprect.min_x || sy < cliprect.min_y || sx > cliprect.max_x || sy > cliprect.max_y) continue;
 
 			INT32 pxl;
 
@@ -690,7 +689,6 @@ inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bi
 			}
 
 			if (pxl != 0x0f) {
-				
 				if (!(dest[x] & 0x8000)) {
 					dest[x] = (pxl+color) | (priority << 14);
 
@@ -706,7 +704,7 @@ void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 {
 	int color,code,sx,sy,flipx,flipy,attr,sprite;
 
-	
+
 
 /* objram: 0x100*4 entries      spritedata: 0x80 entries */
 

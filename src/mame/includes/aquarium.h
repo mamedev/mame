@@ -26,7 +26,7 @@ public:
 	required_shared_ptr<UINT16> m_bak_videoram;
 	required_shared_ptr<UINT16> m_txt_videoram;
 	required_shared_ptr<UINT16> m_scroll;
-	
+
 	/* video-related */
 	tilemap_t  *m_txt_tilemap;
 	tilemap_t  *m_mid_tilemap;

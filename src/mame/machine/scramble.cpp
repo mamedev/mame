@@ -645,7 +645,7 @@ DRIVER_INIT_MEMBER(scramble_state,harem)
 {
 	UINT8 *ROM      =   memregion("maincpu")->base() + 0x8000;
 	size_t size     =   0x2000;
-	
+
 	m_harem_decrypted_data      = std::make_unique<UINT8[]>(size * 3);
 	UINT8 *data = m_harem_decrypted_data.get();
 	m_harem_decrypted_opcodes   = std::make_unique<UINT8[]>(size * 3);

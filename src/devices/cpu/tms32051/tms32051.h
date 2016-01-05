@@ -175,13 +175,13 @@ protected:
 	inline void DM_WRITE16(UINT16 address, UINT16 data);
 	inline void PUSH_STACK(UINT16 pc);
 	inline UINT16 POP_STACK();
-	inline INT32 SUB(UINT32 a, UINT32 b, int shift);
-	inline INT32 ADD(UINT32 a, UINT32 b, int shift);
+	inline INT32 SUB(UINT32 a, UINT32 b, bool shift16);
+	inline INT32 ADD(UINT32 a, UINT32 b, bool shift16);
 	inline void UPDATE_AR(int ar, int step);
 	inline void UPDATE_ARP(int nar);
 	UINT16 GET_ADDRESS();
-	inline int GET_ZLVC_CONDITION(int zlvc, int zlvc_mask);
-	inline int GET_TP_CONDITION(int tp);
+	inline bool GET_ZLVC_CONDITION(int zlvc, int zlvc_mask);
+	inline bool GET_TP_CONDITION(int tp);
 	inline INT32 PREG_PSCALER(INT32 preg);
 	void op_invalid();
 	void op_abs();

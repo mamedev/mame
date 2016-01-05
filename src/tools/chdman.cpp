@@ -775,7 +775,6 @@ static int print_help(const char *argv0, const char *error = nullptr)
 	printf("Usage:\n");
 	for (auto & desc : s_commands)
 	{
-		
 		printf("   %s %s%s\n", argv0, desc.name, desc.description);
 	}
 	printf("\nFor help with any command, run:\n");

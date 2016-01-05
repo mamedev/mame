@@ -1,14 +1,21 @@
 // license:BSD-3-Clause
-// copyright-holders:Pierpaolo Prazzoli, Vas Crabb
+// copyright-holders:Vas Crabb
 /*
     Laser Battle / Lazarian (c) 1981 Zaccaria
     Cat and Mouse           (c) 1982 Zaccaria
 
     original driver by Pierpaolo Prazzoli
 
-    The two games have a similar video hardware, but sound hardware is
-    very different and they don't use the collision detection provided
-    by the s2636 chips.
+    The two games have near identical game/video boards hardware, but
+    completely different sound boards.  Laser Battle/Lazarian have a
+    dumb sound board with TMS organ and CSG chips driven directly by the
+    game program.  Cat and Mouse uses an intelligent sound board with
+    its own CPU that plays melodies on a pair of AY-3-8910 PSGs.
+
+    The video hardware uses a PLA to mix TTL-generated background,
+    effect and sprite layers with the S2636 PVI outputs.  The collision
+    detection and interrupt generation capabilities of the S2636 PVIs
+    are not used.
 
     Game board supports two different sound board interfaces: 16-bit
     unidirectional bus on J3 and 8-bit bidirectional bus on J7.
@@ -18,10 +25,22 @@
     written at I/O address 3.  The sound board controls data direction
     on J7 and when input from sound board to game board is latched.
 
+    Both Laser Battle/Lazarian and Cat and Mouse use the unidirectional
+    interface on J3.  It seems there are no games that actually use the
+    bidirectional interface on J7.
+
+    The game board appears to have had some last-minute design changes
+    that aren't reflected in the Midway schematics, for example the last
+    program ROM being double the size of the others.  There are also
+    some errors in the schematic like missing connections and incorrect
+    logic gate symbols.
+
     Laser Battle/Lazarian notes:
+    * Manuals clearly indicate the controls to fire in four directions
+      are four buttons arranged in a diamond, not a four-way joystick
     * Cocktail cabinet has an additional "image commutation board"
       consuming the screen flip output, presumably flipping the image by
-      means of dark magic
+      reversing the deflection coil connections
     * Player 2 inputs are only used in cocktail mode
     * Tilt input resets Laser Battle, but just causes loss of one credit
       in Lazarian
@@ -33,17 +52,42 @@
     * Laser Battle is far less forgiving, sending you back to the start
       of an area on dying and not giving continues
 
+    Cat and Mouse notes:
+    * This game is designed to work with two-way joysticks - up/down
+      directions are ignored and not shown on wiring diagram
+    * The input lines used for the fire buttons are chosen so that if
+      you plug it in to a Laser Battle control panel, the Fire Up button
+      will be used
+    * Tilt input causes loss of one credit
+    * Service coin 1 input grants two credits the first time it's
+      pushed, but remembers this and won't grant credits again unless
+      unless you trigger the tilt input
+    * Flyer suggests there should be an "old lady" sprite, which is not
+      present in our ROM dump
+    * Sprite ROM is likely double size, banking could be controlled by
+      one of the many unused CSOUND bits, the NEG2 bit, or even H128
+    * Judging by the PLA program, the colour weight resistors are likely
+      different to what Laser Battle/Lazarian uses - we need a detailed
+      colour photo of the game board or a schematic to confirm values
+    * Sound board emulation is based on tracing the program and guessing
+      what's connected where - we really need someone to trace out the
+      1b11107 sound board if we want to get this right
+
     TODO:
     - work out where all the magic layer offsets come from
-    - second bank of DIP switches in laserbat
+    - catnmous sprite ROM appears to be underdumped
+    - need to confirm colour weight resistors on catnmous (detailed photo required):
+      R58, R59, R60, R61, R62, R65, R66, R67, R68, R69, R72, R73, R74, R75
+      (network connected between 11M, 12M, Q5, Q7, Q8)
     - sound in laserbat (with schematics) and in catnmous
 */
 
 #include "emu.h"
+
+#include "includes/laserbat.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/s2650/s2650.h"
-#include "machine/6821pia.h"
-#include "includes/laserbat.h"
 
 
 WRITE8_MEMBER(laserbat_state_base::ct_io_w)
@@ -57,29 +101,32 @@ WRITE8_MEMBER(laserbat_state_base::ct_io_w)
 
 	    Bit 3 is an open collector output with a 2k2 pull-up resistor.
 	    It is used to drive the "image commutation board" used to flip
-	    the screen for player 2 in cocktail configuration.
+	    the screen for player 2 in cocktail configuration.  Note that
+	    this output is asserted when player 2 is active even in upright
+	    configuration, it's only supposed to be connected in a cocktail
+	    cabinet.
 
 	    Bits 4-5 feed the input row select decoder that switches between
 	    ROW0, ROW1, SW1 and SW2 (ROW2 is selected using a bit in the
 	    video effects register, just to be confusing).
 
-	    +-----+-----------------------------+-------------------+------------------------------+
-	    | bit | output                      | Laser Battle      | Lazarian                     |
-	    +-----+-----------------------------+-------------------+------------------------------+
-	    |  0  | J2-3 solenoid driver        | 1*Credits         | 1*Coin C                     |
-	    |     |                             |                   |                              |
-	    |  1  | J2-8 solenoid driver        |  5*Coin A         | 1*Coin A                     |
-	    |     |                             | 10*Coin B         |                              |
-	    |     |                             |  1*Coin C         |                              |
-	    |     |                             |                   |                              |
-	    |  2  | J2-6 solenoid driver        |                   | 1*Coin B                     |
-	    |     |                             |                   |                              |
-	    |  3  | J3-4 open collector output  | Connected to cocktail "image commutation board"  |
-	    |     |                             |                   |                              |
-	    |  4  | input row select A          |                   |                              |
-	    |     |                             |                   |                              |
-	    |  5  | input row select B          |                   |                              |
-	    +-----+-----------------------------+-------------------+------------------------------+
+	    +-----+-----------------------------+--------------------+--------------+
+	    | bit | output                      | laserbat/catnmous  | lazarian     |
+	    +-----+-----------------------------+--------------------+--------------+
+	    |  0  | J2-3 solenoid driver        | 1*Credits          | 1*Coin C     |
+	    |     |                             |                    |              |
+	    |  1  | J2-8 solenoid driver        |  5*Coin A          | 1*Coin A     |
+	    |     |                             | 10*Coin B          |              |
+	    |     |                             |  1*Coin C          |              |
+	    |     |                             |                    |              |
+	    |  2  | J2-6 solenoid driver        |                    | 1*Coin B     |
+	    |     |                             |                    |              |
+	    |  3  | J3-4 open collector output  | Screen flip        | Screen flip  |
+	    |     |                             |                    |              |
+	    |  4  | input row select A          |                    |              |
+	    |     |                             |                    |              |
+	    |  5  | input row select B          |                    |              |
+	    +-----+-----------------------------+--------------------+--------------+
 	*/
 
 	coin_counter_w(machine(), 0, data & 0x01);
@@ -98,8 +145,6 @@ READ8_MEMBER(laserbat_state_base::rrowx_r)
 }
 
 /*
-
-    Color handling with 2716.14L and 82S100.10M
 
     2716.14L address lines are connected as follows:
 
@@ -134,7 +179,7 @@ static ADDRESS_MAP_START( laserbat_map, AS_PROGRAM, 8, laserbat_state_base )
 	AM_RANGE(0x6000, 0x73ff) AM_ROM
 	AM_RANGE(0x7800, 0x7bff) AM_ROM
 
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_WRITENOP // always 0 (bullet ram in Quasar)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_WRITENOP
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("pvi1", s2636_device, read_data, write_data)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("pvi2", s2636_device, read_data, write_data)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("pvi3", s2636_device, read_data, write_data)
@@ -159,7 +204,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( catnmous_sound_map, AS_PROGRAM, 8, catnmous_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -213,9 +259,9 @@ static INPUT_PORTS_START( laserbat_base )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW-1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW-1:7")
-	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x40, 0x00, "Infinite Lives" )        PORT_DIPLOCATION("SW-1:7")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x40, DEF_STR(On) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW-1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
@@ -230,12 +276,11 @@ static INPUT_PORTS_START( laserbat_base )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW-2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW-2:4")
-	PORT_DIPSETTING(    0x08, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW-2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR(Difficulty) )     PORT_DIPLOCATION("SW-2:4,5")
+	PORT_DIPSETTING(    0x00, DEF_STR(Easy) )
+	PORT_DIPSETTING(    0x08, DEF_STR(Medium) )
+	PORT_DIPSETTING(    0x10, DEF_STR(Difficult) )
+	PORT_DIPSETTING(    0x18, DEF_STR(Very_Difficult) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW-2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
@@ -254,28 +299,12 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( laserbat )
 	PORT_INCLUDE(laserbat_base)
 
-	PORT_MODIFY("ROW0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Fire Left")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Fire Right")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Fire Up")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Fire Down")
-
-	PORT_MODIFY("ROW1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fire Left")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Fire Right")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Fire Up")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Fire Down")
-
 	PORT_MODIFY("SW1")
-	PORT_DIPNAME( 0x70, 0x10, DEF_STR(Lives) )          PORT_DIPLOCATION("SW-1:5,6,7")
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR(Lives) )          PORT_DIPLOCATION("SW-1:5,6")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x30, "6" )
-	PORT_DIPSETTING(    0x40, DEF_STR(Infinite) )
-//  PORT_DIPSETTING(    0x50, DEF_STR(Infinite) )
-//  PORT_DIPSETTING(    0x60, DEF_STR(Infinite) )
-//  PORT_DIPSETTING(    0x70, DEF_STR(Infinite) )
 	PORT_DIPNAME( 0x80, 0x80, "Collision Detection" )   PORT_DIPLOCATION("SW-1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x80, DEF_STR(On) )
@@ -316,11 +345,6 @@ static INPUT_PORTS_START( lazarian )
 	PORT_DIPNAME( 0x04, 0x00, "Freeze" )                PORT_DIPLOCATION("SW-2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x04, DEF_STR(On) )
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR(Difficulty) )     PORT_DIPLOCATION("SW-2:4,5")
-	PORT_DIPSETTING(    0x00, DEF_STR(Easy) )
-	PORT_DIPSETTING(    0x08, DEF_STR(Medium) )
-	PORT_DIPSETTING(    0x10, DEF_STR(Difficult) )
-	PORT_DIPSETTING(    0x18, DEF_STR(Very_Difficult) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( catnmous )
@@ -339,18 +363,30 @@ static INPUT_PORTS_START( catnmous )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SW1")
-	PORT_DIPNAME( 0x70, 0x10, DEF_STR(Lives) )          PORT_DIPLOCATION("SW-1:5,6,7")
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR(Lives) )          PORT_DIPLOCATION("SW-1:5,6")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x30, "5" )
-	PORT_DIPSETTING(    0x40, DEF_STR(Infinite) )
-//  PORT_DIPSETTING(    0x50, DEF_STR(Infinite) )
-//  PORT_DIPSETTING(    0x60, DEF_STR(Infinite) )
-//  PORT_DIPSETTING(    0x70, DEF_STR(Infinite) )
-	PORT_DIPNAME( 0x80, 0x80, "Game Over Melody" )  PORT_DIPLOCATION("SW-1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Demo_Sounds) )    PORT_DIPLOCATION("SW-1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x80, DEF_STR(On) )
+
+	PORT_MODIFY("SW2")
+	PORT_DIPNAME( 0x01, 0x01, "Free Play" )             PORT_DIPLOCATION("SW-2:1") // taken from manual, assuming poor translation
+	PORT_DIPSETTING(    0x01, "Win Play" )
+	PORT_DIPSETTING(    0x00, "No Win Play" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Unused) )         PORT_DIPLOCATION("SW-2:2") // manual says not used
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Unused) )         PORT_DIPLOCATION("SW-2:3") // manual says not used
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR(Bonus_Life) )     PORT_DIPLOCATION("SW-2:6,7")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x20, "20,000" )
+	PORT_DIPSETTING(    0x40, "24,000" )
+	PORT_DIPSETTING(    0x60, "28,000" )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -387,68 +423,9 @@ static GFXDECODE_START( laserbat )
 GFXDECODE_END
 
 
-/* Cat'N Mouse sound ***********************************/
-
-WRITE_LINE_MEMBER(catnmous_state::zaccaria_irq0a)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(catnmous_state::zaccaria_irq0b)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-READ8_MEMBER(catnmous_state::zaccaria_port0a_r)
-{
-	ay8910_device *ay8910 = (m_active_8910 == 0) ? m_ay1 : m_ay2;
-	return ay8910->data_r(space, 0);
-}
-
-WRITE8_MEMBER(catnmous_state::zaccaria_port0a_w)
-{
-	m_port0a = data;
-}
-
-WRITE8_MEMBER(catnmous_state::zaccaria_port0b_w)
-{
-	/* bit 1 goes to 8910 #0 BDIR pin  */
-	if ((m_last_port0b & 0x02) == 0x02 && (data & 0x02) == 0x00)
-	{
-		/* bit 0 goes to the 8910 #0 BC1 pin */
-		m_ay1->data_address_w(space, m_last_port0b >> 0, m_port0a);
-	}
-	else if ((m_last_port0b & 0x02) == 0x00 && (data & 0x02) == 0x02)
-	{
-		/* bit 0 goes to the 8910 #0 BC1 pin */
-		if (m_last_port0b & 0x01)
-			m_active_8910 = 0;
-	}
-	/* bit 3 goes to 8910 #1 BDIR pin  */
-	if ((m_last_port0b & 0x08) == 0x08 && (data & 0x08) == 0x00)
-	{
-		/* bit 2 goes to the 8910 #1 BC1 pin */
-		m_ay2->data_address_w(space, m_last_port0b >> 2, m_port0a);
-	}
-	else if ((m_last_port0b & 0x08) == 0x00 && (data & 0x08) == 0x08)
-	{
-		/* bit 2 goes to the 8910 #1 BC1 pin */
-		if (m_last_port0b & 0x04)
-			m_active_8910 = 1;
-	}
-
-	m_last_port0b = data;
-}
-
 INTERRUPT_GEN_MEMBER(laserbat_state_base::laserbat_interrupt)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x0a);
-}
-
-INTERRUPT_GEN_MEMBER(catnmous_state::zaccaria_cb1_toggle)
-{
-	m_pia->cb1_w(m_cb1_toggle & 1);
-	m_cb1_toggle ^= 1;
 }
 
 DRIVER_INIT_MEMBER(laserbat_state_base, laserbat)
@@ -492,20 +469,7 @@ void catnmous_state::machine_start()
 {
 	laserbat_state_base::machine_start();
 
-	save_item(NAME(m_active_8910));
-	save_item(NAME(m_port0a));
-	save_item(NAME(m_last_port0b));
-	save_item(NAME(m_cb1_toggle));
-}
-
-void catnmous_state::machine_reset()
-{
-	laserbat_state_base::machine_reset();
-
-	m_active_8910 = 0;
-	m_port0a = 0;
-	m_last_port0b = 0;
-	m_cb1_toggle = 0;
+	save_item(NAME(m_cb1));
 }
 
 void laserbat_state_base::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -589,22 +553,22 @@ static MACHINE_CONFIG_DERIVED_CLASS( catnmous, laserbat_base, catnmous_state )
 	// sound board devices
 	MCFG_CPU_ADD("audiocpu", M6802, 3580000) // ?
 	MCFG_CPU_PROGRAM_MAP(catnmous_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(catnmous_state, zaccaria_cb1_toggle,  (double)3580000/4096)
+	MCFG_CPU_PERIODIC_INT_DRIVER(catnmous_state, cb1_toggle,  (double)3580000/4096)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(catnmous_state, zaccaria_port0a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(catnmous_state, zaccaria_port0a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(catnmous_state, zaccaria_port0b_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(catnmous_state, zaccaria_irq0a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(catnmous_state, zaccaria_irq0b))
+	MCFG_PIA_READPA_HANDLER(READ8(catnmous_state, pia_porta_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(catnmous_state, pia_porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(catnmous_state, pia_portb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(catnmous_state, pia_irqa))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(catnmous_state, pia_irqb))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 3580000/2) // ?
-	MCFG_AY8910_PORT_B_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_SOUND_ADD("psg1", AY8910, 3580000/2) // ?
+	MCFG_AY8910_PORT_B_READ_CB(READ8(catnmous_state, psg1_portb_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 3580000/2) // ?
+	MCFG_SOUND_ADD("psg2", AY8910, 3580000/2) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -706,7 +670,7 @@ Sound Board 1b11107
 
 6802
 6821
-8910
+2*8910
 */
 
 ROM_START( catnmous )
@@ -740,14 +704,18 @@ ROM_START( catnmous )
 	ROM_LOAD( "type01.11g",   0x1000, 0x0800, CRC(2999f378) SHA1(929082383b2b0006de171587adb932ce57316963) )
 
 	ROM_REGION( 0x0800, "gfx2", 0 )
-	ROM_LOAD( "type01.14l",   0x0000, 0x0800, CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
+	// This needs double checking, might be a case of the wrong ROM type being marked on the PCB like with the final program rom.
+	// Flyers indicate there should be an 'old lady' character, and even show a graphic for one approaching from the right.
+	// This graphic is not present in our ROM and instead we get incorrect looking sprites, so the rom could be half size with
+	// an additional sprite bank bit coming from somewhere?
+	ROM_LOAD( "type01.14l",   0x0000, 0x0800, BAD_DUMP CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
 
 	ROM_REGION( 0x0100, "gfxmix", 0 )
 	ROM_LOAD( "82s100.13m",   0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "sound01.1d",   0xd000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
-	ROM_LOAD( "sound01.1f",   0xe000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
+	ROM_LOAD( "sound01.1f",   0xc000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
+	ROM_LOAD( "sound01.1d",   0xe000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
 	ROM_LOAD( "sound01.1e",   0xf000, 0x1000, CRC(1bd90c93) SHA1(20fd2b765a42e25cf7f716e6631b8c567785a866) )
 ROM_END
 
@@ -781,20 +749,21 @@ ROM_START( catnmousa )
 	ROM_LOAD( "catnmous.11g", 0x1000, 0x0800, CRC(2999f378) SHA1(929082383b2b0006de171587adb932ce57316963) )
 
 	ROM_REGION( 0x0800, "gfx2", 0 )
-	ROM_LOAD( "catnmous.14l", 0x0000, 0x0800, CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
+	// see comment in parent set
+	ROM_LOAD( "catnmous.14l", 0x0000, 0x0800, BAD_DUMP CRC(af79179a) SHA1(de61af7d02c93be326a33ee51572e3da7a25dab0) )
 
 	ROM_REGION( 0x0100, "gfxmix", 0 )
 	// copied from parent set to give working graphics, need dump to confirm
 	ROM_LOAD( "catnmousa_82s100.13m", 0x0000, 0x00f5, CRC(6b724cdb) SHA1(8a0ca3b171b103661a3b2fffbca3d7162089e243) BAD_DUMP )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "snd.1d",       0xd000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
-	ROM_LOAD( "snd.1f",       0xe000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
+	ROM_LOAD( "snd.1f",       0xc000, 0x1000, CRC(473c44de) SHA1(ff08b02d45a2c23cabb5db716aa203225a931424) )
+	ROM_LOAD( "snd.1d",       0xe000, 0x1000, CRC(f65cb9d0) SHA1(a2fe7563c6da055bf6aa20797b2d9fa184f0133c) )
 	ROM_LOAD( "snd.1e",       0xf000, 0x1000, CRC(1bd90c93) SHA1(20fd2b765a42e25cf7f716e6631b8c567785a866) )
 ROM_END
 
 
-GAME( 1981, laserbat, 0,        laserbat, laserbat, laserbat_state_base, laserbat, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, lazarian, laserbat, laserbat, lazarian, laserbat_state_base, laserbat, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmous, 0,        catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1982, catnmousa,catnmous, catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, laserbat,  0,        laserbat, laserbat, laserbat_state_base, laserbat, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, lazarian,  laserbat, laserbat, lazarian, laserbat_state_base, laserbat, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmous,  0,        catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmousa, catnmous, catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

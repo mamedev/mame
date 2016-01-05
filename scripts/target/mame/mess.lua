@@ -886,6 +886,7 @@ function createMESSProjects(_target, _subtarget, _name)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-" .. _target .."_" .. _subtarget .. "_" .._name))
 	addprojectflags()
+	precompiledheaders()
 
 	includedirs {
 		MAME_DIR .. "src/osd",

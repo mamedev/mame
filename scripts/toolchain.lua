@@ -225,9 +225,9 @@ function toolchain(_buildDir, _subDir)
 
 
 		if "mingw-clang" == _OPTIONS["gcc"] then
-			premake.gcc.cc   = "$(CLANG)/bin/clang"
-			premake.gcc.cxx  = "$(CLANG)/bin/clang++"
-			premake.gcc.ar   = "$(CLANG)/bin/llvm-ar"
+			premake.gcc.cc   = "clang"
+			premake.gcc.cxx  = "clang++"
+			premake.gcc.ar   = "llvm-ar"
 			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-mingw-clang")
 		end

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic, Jean-François DEL NERO
+// copyright-holders:Miodrag Milanovic, Jean-Francois DEL NERO
 /***************************************************************************
 
     Apollo 7 Squale
@@ -67,6 +67,7 @@
 
 #define MAIN_CLOCK           XTAL_14MHz
 #define AY_CLOCK             MAIN_CLOCK / 8     /* 1.75 Mhz */
+#define VIDEO_CLOCK          MAIN_CLOCK / 8     /* 1.75 Mhz */
 #define CPU_CLOCK            MAIN_CLOCK / 4     /* 3.50 Mhz */
 
 class squale_state : public driver_device
@@ -88,6 +89,8 @@ public:
 	{ }
 
 	DECLARE_WRITE8_MEMBER(ctrl_w);
+	DECLARE_READ8_MEMBER(video_ram_read_reg1);
+	DECLARE_READ8_MEMBER(video_ram_read_reg2);
 	DECLARE_WRITE8_MEMBER(fdc_sel0_w);
 	DECLARE_READ8_MEMBER(fdc_sel0_r);
 	DECLARE_WRITE8_MEMBER(fdc_sel1_w);
@@ -153,7 +156,77 @@ WRITE8_MEMBER( squale_state::ctrl_w )
 
 	membank("rom_bank")->set_entry(data >> 7);
 
-	m_ef9365->static_set_color_filler(data & 0xF);
+	m_ef9365->set_color_filler(data & 0xF);
+}
+
+READ8_MEMBER( squale_state::video_ram_read_reg1 )
+{
+	UINT8 data;
+	int p;
+
+	//D7             D0
+	//I2R2G2B2 I3R3G3B3
+
+	data = 0x00;
+
+	for(p = 0; p < 4 ; p++)
+	{
+		if( m_ef9365->get_last_readback_word(p, 0) & 8 )
+		{
+			data |= (0x01 << p);
+		}
+	}
+
+	data = data << 4;
+
+	for(p = 0; p < 4 ; p++)
+	{
+		if( m_ef9365->get_last_readback_word(p, 0) & 4 )
+		{
+			data |= (0x01 << p);
+		}
+	}
+
+	#ifdef DBGMODE
+	printf("read video_ram_read_reg1 reg : 0x%X\n",data);
+	#endif
+
+	return data;
+}
+
+READ8_MEMBER( squale_state::video_ram_read_reg2 )
+{
+	UINT8 data;
+	int p;
+
+	//D7             D0
+	//I0R0G0B0 I1R1G1B1
+
+	data = 0x00;
+
+	for(p = 0; p < 4 ; p++)
+	{
+		if( m_ef9365->get_last_readback_word(p, 0) & 2 )
+		{
+			data |= (0x01 << p);
+		}
+	}
+
+	data = data << 4;
+
+	for(p = 0; p < 4 ; p++)
+	{
+		if( m_ef9365->get_last_readback_word(p, 0) & 1 )
+		{
+			data |= (0x01 << p);
+		}
+	}
+
+	#ifdef DBGMODE
+	printf("read video_ram_read_reg2 reg : 0x%X\n",data);
+	#endif
+
+	return data;
 }
 
 /**********************************
@@ -541,6 +614,8 @@ static ADDRESS_MAP_START(squale_mem, AS_PROGRAM, 8, squale_state)
 	AM_RANGE(0x0000,0xefff) AM_RAM
 	AM_RANGE(0xf000,0xf00f) AM_DEVREADWRITE("ef9365", ef9365_device, data_r, data_w)
 	AM_RANGE(0xf010,0xf01f) AM_WRITE( ctrl_w )
+	AM_RANGE(0xf020,0xf02f) AM_READ( video_ram_read_reg1 )
+	AM_RANGE(0xf030,0xf03f) AM_READ( video_ram_read_reg2 )
 	AM_RANGE(0xf044,0xf047) AM_DEVREADWRITE("pia_u75", pia6821_device, read, write)
 	AM_RANGE(0xf048,0xf04b) AM_DEVREADWRITE("pia_u72", pia6821_device, read, write)
 	AM_RANGE(0xf050,0xf05f) AM_DEVREADWRITE("ef6850", acia6850_device, data_r, data_w)
@@ -684,12 +759,12 @@ void squale_state::machine_start()
 	// Generate Squale hardware palette
 	for(i=0;i<8;i++)
 	{
-		m_ef9365->static_set_color_entry(i,(((i&4)>>2)^1) * 255,(((i&2)>>1)^1) * 255, ((i&1)^1) * 255 );
+		m_ef9365->set_color_entry(i,(((i&4)>>2)^1) * 255,(((i&2)>>1)^1) * 255, ((i&1)^1) * 255 );
 	}
 
 	for(i=0;i<8;i++)
 	{
-		m_ef9365->static_set_color_entry(i + 8,(((i&4)>>2)^1) * 127,(((i&2)>>1)^1) * 127, ((i&1)^1) * 127 );
+		m_ef9365->set_color_entry(i + 8,(((i&4)>>2)^1) * 127,(((i&2)>>1)^1) * 127, ((i&1)^1) * 127 );
 	}
 }
 
@@ -734,15 +809,17 @@ static MACHINE_CONFIG_START( squale, squale_state )
 
 	/* screen */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("ef9365", ef9365_device, screen_update)
 
-	MCFG_SCREEN_SIZE(336, 270)
-	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_PALETTE_ADD("palette", 16)
 
-	MCFG_DEVICE_ADD("ef9365", EF9365, 0)
-	MCFG_EF9365_PALETTE("palette")
+	MCFG_DEVICE_ADD("ef9365", EF9365, VIDEO_CLOCK)
+	MCFG_EF936X_PALETTE("palette")
+	MCFG_EF936X_BITPLANES_CNT(4);
+	MCFG_EF936X_DISPLAYMODE(EF936X_256x256_DISPLAY_MODE);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("squale_sl", squale_state, squale_scanline, "screen", 0, 10)
 
 	/* Floppy */
@@ -775,4 +852,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR   NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1984, squale, 0,      0,       squale,    squale,driver_device,   0,     "Apollo 7", "Squale",    MACHINE_TYPE_COMPUTER | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1984, squale, 0,      0,       squale,    squale,driver_device,   0,     "Apollo 7", "Squale",    MACHINE_TYPE_COMPUTER )

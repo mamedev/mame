@@ -470,7 +470,7 @@ void naomi_gdrom_board::device_start()
 			UINT32 i = 0;
 			while (i < 2048 && buffer[i] != 0)
 			{
-				if (buffer[i] == 3 && buffer[i + 8] == 'R' && buffer[i + 9] == 'O' && buffer[i + 10] == 'M')	// find ROM dir
+				if (buffer[i] == 3 && buffer[i + 8] == 'R' && buffer[i + 9] == 'O' && buffer[i + 10] == 'M')    // find ROM dir
 				{
 					UINT32 dir = ((buffer[i + 2] << 0) |
 						(buffer[i + 3] << 8) |

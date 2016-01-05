@@ -17,13 +17,13 @@ class clowndwn_state : public driver_device
 public:
 	clowndwn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-	//	,m_maincpu(*this, "maincpu")
+	//  ,m_maincpu(*this, "maincpu")
 	{ }
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-//	required_device<mcs51_cpu_device> m_maincpu;
+//  required_device<mcs51_cpu_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( clowndwn )
@@ -43,9 +43,9 @@ void clowndwn_state::machine_reset()
 static MACHINE_CONFIG_START( clowndwn, clowndwn_state )
 
 	/* basic machine hardware */
-//	MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown (vectors at end? 6xxx ?)
-//	MCFG_CPU_PROGRAM_MAP(clowndwn_map)
-//	MCFG_CPU_IO_MAP(clowndwn_io)
+//  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown (vectors at end? 6xxx ?)
+//  MCFG_CPU_PROGRAM_MAP(clowndwn_map)
+//  MCFG_CPU_IO_MAP(clowndwn_io)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -63,4 +63,3 @@ ROM_START( clowndwn )
 ROM_END
 
 GAME( 1987, clowndwn,  0,    clowndwn, clowndwn, driver_device,  0, ROT0, "Elwood Electronics", "Clown Roll Down (Elwood)", MACHINE_IS_SKELETON_MECHANICAL )
-

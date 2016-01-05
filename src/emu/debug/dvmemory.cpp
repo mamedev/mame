@@ -315,7 +315,7 @@ void debug_view_memory::view_update()
 					UINT64 chunkdata = 0;
 					floatx80 chunkdata80 = { 0, 0 };
 					bool ismapped;
-					
+
 					if (m_data_format != 11)
 						ismapped = read(m_bytes_per_chunk, addrbyte + chunknum * m_bytes_per_chunk, chunkdata);
 					else

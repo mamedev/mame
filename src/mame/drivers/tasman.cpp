@@ -14,7 +14,7 @@
   Thanks to palindrome for PCB scans.
 
     0x38606
-	
+
   TODO:
   - dual port sound RAM;
   - interrupt sources / irq masking;
@@ -45,7 +45,7 @@ public:
 	DECLARE_DRIVER_INIT(kingtut);
 	DECLARE_VIDEO_START(kongambl);
 	UINT8 m_irq_mask;
-	
+
 	virtual void machine_reset() override { m_irq_mask = 0; };
 	UINT32 screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kongambl_vblank);
@@ -141,7 +141,7 @@ READ32_MEMBER(kongambl_state::eeprom_r)
 WRITE8_MEMBER(kongambl_state::eeprom_w)
 {
 	// offset == 3 seems mux writes (active low)
-	
+
 	if (offset == 2)
 	{
 		ioport("EEPROMOUT")->write(data&0x7, 0xff);
@@ -150,7 +150,7 @@ WRITE8_MEMBER(kongambl_state::eeprom_w)
 	}
 	else
 		printf("%02x %02x\n",offset,data);
-	
+
 	if(offset == 0)
 		m_irq_mask = data;
 }
@@ -566,7 +566,7 @@ static const gfx_layout charlayout8_tasman =
 	8,
 	// 0,8,16,24,32,40,48,56
 	{ 56,24,40,8,48,16,32,0 },
-	{ 0,1,2,3,4,5,6,7 },  
+	{ 0,1,2,3,4,5,6,7 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64},
 	8*64
 };
@@ -585,11 +585,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(kongambl_state::kongambl_vblank)
 		m_maincpu->set_input_line(1, HOLD_LINE); // vblank?
 
 	//if(scanline == 256 && m_irq_mask & 2)
-	//	m_maincpu->set_input_line(2, HOLD_LINE); // unknown (jumps to work RAM via a branch or returns lv 2 exception error, extension board?)
-	
+	//  m_maincpu->set_input_line(2, HOLD_LINE); // unknown (jumps to work RAM via a branch or returns lv 2 exception error, extension board?)
+
 	if(scanline == 0 && m_irq_mask & 4)
 		m_maincpu->set_input_line(3, HOLD_LINE); // sprite irq?
-	
+
 	if(scanline == 128 && m_irq_mask & 8)
 		m_maincpu->set_input_line(4, HOLD_LINE); // sound irq
 
@@ -603,13 +603,13 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_CPU_ADD("sndcpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(kongamaud_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(kongambl_state, irq2_line_hold,  480)
-	
+
 	MCFG_DEVICE_ADD("k053252", K053252, 25000000)
 	MCFG_K053252_OFFSETS(0, 16) // TBD
 	MCFG_K053252_INT1_ACK_CB(WRITELINE(konamigx_state, vblank_irq_ack_w))
 	MCFG_K053252_INT2_ACK_CB(WRITELINE(konamigx_state, hblank_irq_ack_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
-	
+
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -772,9 +772,9 @@ DRIVER_INIT_MEMBER(kongambl_state,kingtut)
 {
 	//UINT32 *rom = (UINT32*)memregion("maincpu")->base();
 
-  //rom[0x3986c/4] = (rom[0x3986c/4] & 0xffff0000) | 0x600e; // patch ROM check
-  //rom[0x2bfc8/4] = (rom[0x2bfc8/4] & 0xffff0000) | 0x6612; // patch VRAM ROM checks
-  //rom[0x2acd0/4] = (rom[0x2acd0/4] & 0xffff) | 0x6612<<16; // patch OBJ ROM checks
+	//rom[0x3986c/4] = (rom[0x3986c/4] & 0xffff0000) | 0x600e; // patch ROM check
+	//rom[0x2bfc8/4] = (rom[0x2bfc8/4] & 0xffff0000) | 0x6612; // patch VRAM ROM checks
+	//rom[0x2acd0/4] = (rom[0x2acd0/4] & 0xffff) | 0x6612<<16; // patch OBJ ROM checks
 	//rom[0x55e40/4] = (rom[0x55e40/4] & 0xffff0000) | 0x4e71; // goes away from the POST
 }
 

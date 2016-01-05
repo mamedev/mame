@@ -64,6 +64,13 @@ public:
 		ACOUNT_LO = 0x1b
 	};
 
+	enum servo_portc_bit_t
+	{
+		INV_JUC_OUT = (1 << 2),
+		INV_DIV4_IN = (1 << 5),
+		INV_CADDYSWITCH_IN = (1 << 7)
+	};
+
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_planea;
 	required_shared_ptr<UINT16> m_planeb;

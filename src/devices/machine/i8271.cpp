@@ -1541,7 +1541,6 @@ void i8271_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 void i8271_device::index_callback(floppy_image_device *floppy, int state)
 {
 	for(auto & fi : flopi) {
-		
 		if(fi.dev != floppy)
 			continue;
 

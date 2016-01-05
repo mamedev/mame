@@ -3,7 +3,7 @@
 /******************************************************************************
 *
 * Rolm CBX 9751 Driver
-* 
+*
 * This driver attempts to emulate the following models:
 * * Model 10
 * * Model 20
@@ -21,10 +21,10 @@
 *
 * Special Thanks to:
 * * Stephen Stair (sgstair)   - for help with reverse engineering,
-*				programming, and emulation
+*               programming, and emulation
 * * Felipe Sanches (FSanches) - for help with MESS and emulation
 * * Michael Zapf (mizapf)     - for building the HDC9234/HDC9224
-*				driver that makes this driver possible
+*               driver that makes this driver possible
 *
 * Memory map:
 * * 0x00000000 - 0x00ffffff : RAM 12MB to 16MB known, up to 128MB?
@@ -41,6 +41,7 @@
 #include "machine/wd33c93.h"
 
 #include "machine/pdc.h"
+#include "softlist.h"
 
 #define TERMINAL_TAG "terminal"
 
@@ -66,8 +67,8 @@ public:
 
 	DECLARE_READ32_MEMBER(r9751_mmio_5ff_r);
 	DECLARE_WRITE32_MEMBER(r9751_mmio_5ff_w);
-        DECLARE_READ32_MEMBER(r9751_mmio_ff05_r);
-        DECLARE_WRITE32_MEMBER(r9751_mmio_ff05_w);
+	DECLARE_READ32_MEMBER(r9751_mmio_ff05_r);
+	DECLARE_WRITE32_MEMBER(r9751_mmio_ff05_w);
 	DECLARE_READ32_MEMBER(r9751_mmio_fff8_r);
 	DECLARE_WRITE32_MEMBER(r9751_mmio_fff8_w);
 
@@ -76,7 +77,6 @@ public:
 
 	DECLARE_DRIVER_INIT(r9751);
 
-	//DECLARE_FLOPPY_FORMATS( floppy_formats );
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pdc_device> m_pdc;
@@ -86,14 +86,13 @@ private:
 
 	// Begin registers
 	UINT32 reg_ff050004;
-	UINT32 reg_ff050320; // Counter?
 	UINT32 reg_fff80040;
 	UINT32 fdd_dest_address; // 5FF080B0
 	UINT32 fdd_cmd_complete;
 	UINT32 smioc_out_addr;
+	attotime timer_32khz_last;
 	// End registers
 
-//	UINT32 fdd_scsi_command;
 	address_space *m_mem;
 
 	// functions
@@ -105,8 +104,8 @@ private:
 
 UINT32 r9751_state::swap_uint32( UINT32 val )
 {
-    val = ((val << 8) & 0xFF00FF00 ) | ((val >> 8) & 0xFF00FF ); 
-    return (val << 16) | (val >> 16);
+	val = ((val << 8) & 0xFF00FF00 ) | ((val >> 8) & 0xFF00FF );
+	return (val << 16) | (val >> 16);
 }
 
 READ8_MEMBER(r9751_state::pdc_dma_r)
@@ -116,17 +115,15 @@ READ8_MEMBER(r9751_state::pdc_dma_r)
 
 WRITE8_MEMBER(r9751_state::pdc_dma_w)
 {
-	/* NOTE: This needs to be changed to a function that accepts an address and data */
 	m_maincpu->space(AS_PROGRAM).write_byte(m_pdc->fdd_68k_dma_address,data);
 }
 
 DRIVER_INIT_MEMBER(r9751_state,r9751)
 {
 	reg_ff050004 = 0;
-	reg_ff050320 = 1;
 	reg_fff80040 = 0;
 	fdd_dest_address = 0;
-//	fdd_scsi_command = 0;
+//  fdd_scsi_command = 0;
 	fdd_cmd_complete = 0;
 	smioc_out_addr = 0;
 	m_mem = &m_maincpu->space(AS_PROGRAM);
@@ -157,20 +154,16 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 		/* PDC HDD region (0x24, device 9) */
 		case 0x5FF00824: /* HDD Command result code */
 			return 0x10;
-			break;
 		case 0x5FF03024: /* HDD SCSI command completed successfully */
 			data = 0x1;
 			if(TRACE_HDC) logerror("SCSI HDD command completion status - Read: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
 			return data;
-			break;
 		/* SMIOC region (0x98, device 26) */
 		case 0x5FF00898: /* Serial status or DMA status */
 			return 0x40;
-			break;
 		/* PDC FDD region (0xB0, device 44 */
 		case 0x5FF008B0: /* FDD Command result code */
 			return 0x10;
-			break;
 		case 0x5FF010B0: /* Clear 5FF030B0 ?? */
 			if(TRACE_FDC) logerror("--- FDD 0x5FF010B0 READ (0)\n");
 			return 0;
@@ -178,7 +171,6 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 			data = (m_pdc->reg_p5 << 8) + m_pdc->reg_p4;
 			if(TRACE_FDC) logerror("--- SCSI FDD command completion status - Read: %08X, From: %08X, Register: %08X\n", data, space.machine().firstcpu->pc(), address);
 			return data;
-			break;
 		default:
 			if(TRACE_FDC || TRACE_HDC || TRACE_SMIOC) logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, 0, mem_mask);
 			return 0;
@@ -299,29 +291,22 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 READ32_MEMBER( r9751_state::r9751_mmio_ff05_r )
 {
 	UINT32 data;
-        UINT32 address = offset * 4 + 0xFF050000;
+		UINT32 address = offset * 4 + 0xFF050000;
 
 	switch(address)
 	{
 		case 0xFF050004:
 			return reg_ff050004;
-			break;
 		case 0xFF050300:
 			return 0x1B | (1<<0x14);
-			break;
 		case 0xFF050320: /* Some type of counter */
-			reg_ff050320++;
-			return reg_ff050320;
-			break;
+			return (machine().time() - timer_32khz_last).as_ticks(32768) & 0xFFFF;
 		case 0xFF050584:
 			return 0;
-			break;
 		case 0xFF050610:
 			return 0xabacabac;
-			break;
 		case 0xFF060014:
 			return 0x80;
-			break;
 		default:
 			data = 0;
 			if(TRACE_CPU_REG) logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
@@ -338,11 +323,11 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_ff05_w )
 		case 0xFF050004:
 			reg_ff050004 = data;
 			return;
-			break;
 		case 0xFF05000C: /* CPU LED hex display indicator */
 			if(TRACE_LED) logerror("\n*** LED: %02x, Instruction: %08x ***\n\n", data, space.machine().firstcpu->pc());
 			return;
-			break;
+		case 0xFF050320:
+			timer_32khz_last = machine().time();
 		default:
 			if(TRACE_CPU_REG) logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
 			return;
@@ -351,14 +336,13 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_ff05_w )
 
 READ32_MEMBER( r9751_state::r9751_mmio_fff8_r )
 {
-        UINT32 data;
-        UINT32 address = offset * 4 + 0xFFF80000;
+		UINT32 data;
+		UINT32 address = offset * 4 + 0xFFF80000;
 
 	switch(address)
 	{
 		case 0xFFF80040:
 			return reg_fff80040;
-			break;
 		default:
 			data = 0;
 			if(TRACE_CPU_REG) logerror("Instruction: %08x READ MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
@@ -368,14 +352,13 @@ READ32_MEMBER( r9751_state::r9751_mmio_fff8_r )
 
 WRITE32_MEMBER( r9751_state::r9751_mmio_fff8_w )
 {
-        UINT32 address = offset * 4 + 0xFFF80000;
+		UINT32 address = offset * 4 + 0xFFF80000;
 
 	switch(address)
 	{
 		case 0xFFF80040:
 			reg_fff80040 = data;
 			return;
-			break;
 		default:
 			if(TRACE_CPU_REG) logerror("Instruction: %08x WRITE MMIO(%08x): %08x & %08x\n", space.machine().firstcpu->pc(), address, data, mem_mask);
 	}
@@ -388,10 +371,9 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_fff8_w )
 static ADDRESS_MAP_START(r9751_mem, AS_PROGRAM, 32, r9751_state)
 	//ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000,0x00ffffff) AM_RAM AM_SHARE("main_ram") // 16MB
-	//AM_RANGE(0x01000000,0x07ffffff) AM_NOP
 	AM_RANGE(0x08000000,0x0800ffff) AM_ROM AM_REGION("prom", 0)
-        AM_RANGE(0x5FF00000,0x5FFFFFFF) AM_READWRITE(r9751_mmio_5ff_r, r9751_mmio_5ff_w)
-        AM_RANGE(0xFF050000,0xFF06FFFF) AM_READWRITE(r9751_mmio_ff05_r, r9751_mmio_ff05_w)
+	AM_RANGE(0x5FF00000,0x5FFFFFFF) AM_READWRITE(r9751_mmio_5ff_r, r9751_mmio_5ff_w)
+	AM_RANGE(0xFF050000,0xFF06FFFF) AM_READWRITE(r9751_mmio_ff05_r, r9751_mmio_ff05_w)
 	AM_RANGE(0xFFF80000,0xFFF8FFFF) AM_READWRITE(r9751_mmio_fff8_r, r9751_mmio_fff8_w)
 	//AM_RANGE(0xffffff00,0xffffffff) AM_RAM // Unknown area
 ADDRESS_MAP_END
@@ -424,6 +406,9 @@ static MACHINE_CONFIG_START( r9751, r9751_state )
 	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	//MCFG_WD33C93_IRQ_CB(WRITELINE(r9751_state,scsi_irq))
+
+	/* software list */
+	MCFG_SOFTWARE_LIST_ADD("flop_list","r9751")
 MACHINE_CONFIG_END
 
 

@@ -2691,7 +2691,7 @@ READ8_MEMBER(mdndclab_state::read_k)
     8 buttons on the left, top-to-bottom: (lower 6 are just for sound-preview)
     [Switch Key]  [Next Turn / Level 1/2]  [Dragon Flying / Defeat Tune]  [Dragon Attacks / Dragon Wakes]
     [Wall / Door]  [Illegal Move / Warrior Moves]  [Warrior 1 / Winner]  [Warrior 2 / Treasure]
-    
+
     8*8 buttons to the right of that, making the gameboard
 
 */

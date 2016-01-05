@@ -100,7 +100,7 @@ WRITE32_MEMBER( k055555_device::K055555_long_w )
 		regdat = data>>24;
 		K055555_write_reg(regnum, regdat);
 	}
-		
+
 	if (ACCESSING_BITS_8_15)
 	{
 		regnum = (offset<<1)+1;

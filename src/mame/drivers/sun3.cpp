@@ -298,8 +298,8 @@
 #define SCC2_TAG        "scc2"
 #define ESP_TAG         "esp"
 #define FDC_TAG         "fdc"
-#define RS232A_TAG		"rs232a"
-#define RS232B_TAG		"rs232b"
+#define RS232A_TAG      "rs232a"
+#define RS232B_TAG      "rs232b"
 
 class sun3_state : public driver_device
 {

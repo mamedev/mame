@@ -116,7 +116,6 @@ dcjp      // 1998 Sega Dreamcast (Japan)
 dc  // 1999 Sega Dreamcast (USA)
 dceu      // 1999 Sega Dreamcast (Europe)
 dcdev    // 1998 Sega HKT-0120 Sega Dreamcast Development Box
-dcprt    // 1998 Sega Katana Set 5 Prototype
 
 svmu     // 1998 Sega Visual Memory Unit
 
@@ -260,7 +259,7 @@ telngtcs
 krvnjvtv
 oc2000
 mpt05
-h21		// TRQ Video Computer H-21
+h21     // TRQ Video Computer H-21
 
 
 // Game Park
@@ -328,6 +327,8 @@ neocdzj //
 // Philips
 cdimono1  // Philips CD-i model 200 (Mono-I board, PAL)
 cdimono2  // Philips CD-i model 220 (Mono-II board, NTSC)
+cdi910 //
+cdi490a //
 
 // Yamaha
 mu100   // 1997 MU-100
@@ -344,12 +345,16 @@ sc55    // 1991 Sound Canvas SC-55
 
 // Acorn
 acrnsys1  // 1979 Acorn System 1 (Microcomputer Kit)
+a6809
 atom      // 1979 Acorn Atom
 atomeb    // 1979 Acorn Atom
 atombb    // 1979 Acorn Atom
 //prophet2
 bbca      // 1981 BBC Micro Model A
 bbcb      // 1981 BBC Micro Model B w/8271 FDC
+torchf    // 1982 Torch CF240
+torchh10  // 1982 Torch CH240/10
+torchh21  // 1982 Torch CH240/21
 bbcb_de   // 1982 BBC Micro Model B (German)
 bbcb_us   // 1983 BBC Micro Model B (US)
 electron  // 1983 Acorn Electron
@@ -375,7 +380,6 @@ a3010     // 1988 Acorn Archimedes 3010
 a3020     // 1988 Acorn Archimedes 3020
 a7000     // 1995 Acorn Archimedes 7000
 a7000p    // 1997 Acorn Archimedes 7000+
-a6809
 rpc600
 rpc700
 sarpc

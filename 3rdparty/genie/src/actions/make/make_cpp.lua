@@ -34,13 +34,13 @@
 				objdirs[_MAKE.esc(path.getdirectory(path.trimdots(file)))] = 1
 			end
 		end
-		
+
 		for _, custombuildtask in ipairs(prj.custombuildtask or {}) do
 			for _, buildtask in ipairs(custombuildtask or {}) do
 				additionalobjdirs[_MAKE.esc(path.getdirectory(path.getrelative(prj.location,buildtask[2])))] = 1
 			end
 		end
-		
+
 		_p('OBJDIRS := \\')
 		_p('\t$(OBJDIR) \\')
 		for dir, _ in pairs(objdirs) do
@@ -64,9 +64,9 @@
 		_p('')
 
 		if os.is("MacOSX") and prj.kind == "WindowedApp" then
-			_p('all: $(TARGETDIR) $(OBJDIRS) prebuild prelink $(TARGET) $(dir $(TARGETDIR))PkgInfo $(dir $(TARGETDIR))Info.plist')
+			_p('all: $(OBJDIRS) prebuild prelink $(TARGET) $(dir $(TARGETDIR))PkgInfo $(dir $(TARGETDIR))Info.plist | $(TARGETDIR)')
 		else
-			_p('all: $(TARGETDIR) $(OBJDIRS) prebuild prelink $(TARGET)')
+			_p('all: $(OBJDIRS) prebuild prelink $(TARGET) | $(TARGETDIR)')
 		end
 		_p('\t@:')
 		_p('')
@@ -86,7 +86,7 @@
 		end
 
 		-- target build rule
-		_p('$(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)')
+		_p('$(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES) | $(TARGETDIR) $(OBJDIRS)')
 
 		if prj.kind == "StaticLib" then
 			if prj.msgarchiving then
@@ -162,7 +162,7 @@
 
 		-- per-file build rules
 		cpp.fileRules(prj)
-		
+
 		-- per-dependency build rules
 		cpp.dependencyRules(prj)
 
@@ -172,7 +172,7 @@
 				for _, depdata in ipairs(buildtask[3] or {}) do
 					deps = deps .. string.format("%s ",path.getrelative(prj.location,depdata))
 				end
-				_p('%s: %s'
+				_p('%s: %s | $(TARGETDIR) $(OBJDIRS)'
 					,path.getrelative(prj.location,buildtask[2])
 					, deps
 					)
@@ -185,14 +185,14 @@
 					end
 					cmd = string.gsub(cmd, "%$%(<%)", "$<")
 					cmd = string.gsub(cmd, "%$%(@%)", "$@")
-					 
+
 					_p('\t$(SILENT) %s',cmd)
-					
+
 				end
 				_p('')
 			end
 		end
-		
+
 		-- include the dependencies, built by GCC (with the -MMD flag)
 		_p('-include $(OBJECTS:%%.o=%%.d)')
 		_p('ifneq (,$(PCH))')
@@ -387,24 +387,11 @@
 		_p('  LIBS      += $(LDDEPS)%s', make.list(cc.getlinkflags(cfg)))
 
 		if cfg.kind == "StaticLib" then
-			if cfg.platform:startswith("Universal") then
-				_p('  LINKCMD    = libtool -o $(TARGET)')
+			if (not prj.options.ArchiveSplit) then
+				_p('  LINKCMD    = $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, false)))
 			else
-				if (not prj.options.ArchiveSplit) then
-					if cc.llvm then
-						_p('  LINKCMD    = $(AR) rcs $(TARGET)')
-					else
-						_p('  LINKCMD    = $(AR) -rcs $(TARGET)')
-					end
-				else
-					if cc.llvm then
-						_p('  LINKCMD    = $(AR) qc $(TARGET)')
-						_p('  LINKCMD_NDX= $(AR) cs $(TARGET)')
-					else
-						_p('  LINKCMD    = $(AR) -qc $(TARGET)')
-						_p('  LINKCMD_NDX= $(AR) -cs $(TARGET)')
-					end
-				end
+				_p('  LINKCMD    = $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, false)))
+				_p('  LINKCMD_NDX= $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, true)))
 			end
 		else
 
@@ -464,11 +451,15 @@
 
 	function cpp.pchrules(prj)
 		_p('ifneq (,$(PCH))')
-		_p('$(GCH): $(PCH)')
-		_p('\t@echo $(notdir $<)')
+		_p('$(GCH): $(PCH) | $(OBJDIR)')
+		if prj.msgprecompile then
+			_p('\t@echo ' .. prj.msgprecompile)
+		else
+			_p('\t@echo $(notdir $<)')
+		end	
 
-		local cmd = iif(prj.language == "C", "$(CC) -x c-header $(ALL_CFLAGS)", "$(CXX) -x c++-header $(ALL_CXXFLAGS)")
-		_p('\t$(SILENT) %s -MMD -MP $(DEFINES) $(INCLUDES) -o "$@" -MF "$(@:%%.gch=%%.d)" -c "$<"', cmd)
+		local cmd = iif(prj.language == "C", "$(CC) $(ALL_CFLAGS) -x c-header", "$(CXX) $(ALL_CXXFLAGS) -x c++-header")
+		_p('\t$(SILENT) %s $(DEFINES) $(INCLUDES) -o "$@" -c "$<"', cmd)
 
 		_p('endif')
 		_p('')
@@ -482,7 +473,7 @@
 	function cpp.fileRules(prj)
 		for _, file in ipairs(prj.files or {}) do
 			if path.iscppfile(file) then
-				_p('$(OBJDIR)/%s.o: %s'
+				_p('$(OBJDIR)/%s.o: %s $(GCH)'
 					, _MAKE.esc(path.trimdots(path.removeext(file)))
 					, _MAKE.esc(file)
 					)
@@ -494,7 +485,7 @@
 					_p('\t@echo $(notdir $<)')
 				end
 				if (path.isobjcfile(file)) then
-					_p('\t$(SILENT) $(CXX) $(ALL_OBJCFLAGS) $(FORCE_INCLUDE) -o "$@" -MF $(@:%%.o=%%.d) -c "$<"')
+					_p('\t$(SILENT) $(CXX) $(ALL_OBJCFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"')
 				else
 					cpp.buildcommand(path.iscfile(file) and not prj.options.ForceCPP, "o")
 				end
@@ -502,7 +493,7 @@
 					_p('\t$(SILENT) %s', task)
 					_p('')
 				end
-				
+
 				_p('')
 			elseif (path.getextension(file) == ".rc") then
 				_p('$(OBJDIR)/%s.res: %s', _MAKE.esc(path.getbasename(file)), _MAKE.esc(file))
@@ -516,7 +507,7 @@
 			end
 		end
 	end
-	
+
 	function cpp.dependencyRules(prj)
 		for _, dependency in ipairs(prj.dependency or {}) do
 			for _, dep in ipairs(dependency or {}) do
@@ -535,9 +526,9 @@
 			end
 		end
 	end
-	
+
 
 	function cpp.buildcommand(iscfile, objext)
 		local flags = iif(iscfile, '$(CC) $(ALL_CFLAGS)', '$(CXX) $(ALL_CXXFLAGS)')
-		_p('\t$(SILENT) %s $(FORCE_INCLUDE) -o "$@" -MF $(@:%%.%s=%%.d) -c "$<"', flags, objext)
+		_p('\t$(SILENT) %s $(FORCE_INCLUDE) -o "$@" -c "$<"', flags, objext)
 	end

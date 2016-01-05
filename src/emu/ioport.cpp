@@ -1344,7 +1344,7 @@ std::string natural_keyboard::dump()
 	for (auto & code : m_keycode_map)
 	{
 		// describe the character code
-		
+
 		strcatprintf(buffer,"%08X (%s) ", code.ch, unicode_to_string(tempstr, code.ch));
 
 		// pad with spaces

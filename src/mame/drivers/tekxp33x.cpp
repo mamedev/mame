@@ -2,35 +2,35 @@
 // copyright-holders:Justin Kerk
 /***************************************************************************
 
-	Tektronix TekXpress XP33x series X terminals
+    Tektronix TekXpress XP33x series X terminals
 
-	Skeleton driver.
+    Skeleton driver.
 
 ****************************************************************************/
 
 /*
 
-	TODO:
+    TODO:
 
-	- everything
+    - everything
 
-	Technical info:
-	https://www.linux-mips.org/wiki/Tektronix_TekXPress_XP338
-	https://web.archive.org/web/20061013084616/http://tekxp-linux.hopto.org/pmwiki/pmwiki.php/Hardware/XP33x
-	http://bio.gsi.de/DOCS/NCD/xp.html
+    Technical info:
+    https://www.linux-mips.org/wiki/Tektronix_TekXPress_XP338
+    https://web.archive.org/web/20061013084616/http://tekxp-linux.hopto.org/pmwiki/pmwiki.php/Hardware/XP33x
+    http://bio.gsi.de/DOCS/NCD/xp.html
 
-	CPU: IDT 79R3052E (MIPS I R3000 embedded core. Big Endian. With MMU, without FPU.)
-	Graphic Chipset: Texas Instruments (34020AGBL-40) TI 34010 (TIGA)
-	Graphic RAMDAC: Brooktree BT458LPJ135 (Supported in XFree86)
-	RAM: 4MB onboard, upgradeable to 52MB, 3 slots for 5V FPM NoParity SIMMs
-	ROM: 256Kb, 2 x 27c1024 (64Kx16), with BootMonitor
-	Peripherals:
-		1x Ethernet Port (AUI and UTP) -- AMD AM79C98 Chipset
-		2x Serial Ports -- Philips SCC2692 Dual UART chipset
-		Keyboard and Mouse controller is a generic PC-Style i8742 with Phoenix BIOS.
-		1x "ERGO" Port (Combined Monitor, Keyboard, Mouse)
-	16K (2K*8) EEPROM is SEEQ NQ2816A-250, AT28C16 compatible. Contains Boot Monitor settings. The content is compressed.
-	Micron MT56C0816 - ??? Flash
+    CPU: IDT 79R3052E (MIPS I R3000 embedded core. Big Endian. With MMU, without FPU.)
+    Graphic Chipset: Texas Instruments (34020AGBL-40) TI 34010 (TIGA)
+    Graphic RAMDAC: Brooktree BT458LPJ135 (Supported in XFree86)
+    RAM: 4MB onboard, upgradeable to 52MB, 3 slots for 5V FPM NoParity SIMMs
+    ROM: 256Kb, 2 x 27c1024 (64Kx16), with BootMonitor
+    Peripherals:
+        1x Ethernet Port (AUI and UTP) -- AMD AM79C98 Chipset
+        2x Serial Ports -- Philips SCC2692 Dual UART chipset
+        Keyboard and Mouse controller is a generic PC-Style i8742 with Phoenix BIOS.
+        1x "ERGO" Port (Combined Monitor, Keyboard, Mouse)
+    16K (2K*8) EEPROM is SEEQ NQ2816A-250, AT28C16 compatible. Contains Boot Monitor settings. The content is compressed.
+    Micron MT56C0816 - ??? Flash
 
 */
 

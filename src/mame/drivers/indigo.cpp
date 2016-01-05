@@ -639,5 +639,5 @@ ROM_START( indigo4k )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS         INIT    COMPANY   FULLNAME */
-COMP( 1991, indigo3k, 0,        0,        indigo3k, indigo,   driver_device, 0,		"Silicon Graphics Inc", "IRIS Indigo (R3000, 33MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1993, indigo4k, 0,        0,        indigo4k, indigo,   driver_device, 0, 		"Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz, Ver. 4.0.5D Rev A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1991, indigo3k, 0,        0,        indigo3k, indigo,   driver_device, 0,     "Silicon Graphics Inc", "IRIS Indigo (R3000, 33MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1993, indigo4k, 0,        0,        indigo4k, indigo,   driver_device, 0,         "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz, Ver. 4.0.5D Rev A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

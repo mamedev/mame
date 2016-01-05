@@ -7,12 +7,12 @@
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
-    This board is based on the Hudson HuC6280 and Huc6270 IC's used in 
+    This board is based on the Hudson HuC6280 and Huc6270 IC's used in
     the NEC PC-Engine.
-    
+
     Differences from PC-Engine console:
     Input ports are different (2 dips, 2 joysticks, 1 coin port)
-    _Interface_ to palette is different (Huc6260 isn't present), 
+    _Interface_ to palette is different (Huc6260 isn't present),
     palette data is the same.
     Extra sound chips (YM2203 & Oki M5205), and extra HuC6280 processor to drive them.
     Twice as much VRAM (128kb).
@@ -20,7 +20,7 @@
     Todo:
     - There seems to be a bug with a stuck note from the YM2203 FM channel
       at the start of scene 3 and near the ending when your characters are
-      flying over a forest in a helicopter. 
+      flying over a forest in a helicopter.
       This is verified to NOT happen on real hardware - Guru
 
 **********************************************************************
@@ -64,7 +64,7 @@ Notes:
       DEC-01 - Hudson HuC6280 6502-based CPU with in-built Programmable Sound Generator
                used as the main CPU. Clock input is 21.4772MHz and is divided internally
                by 3 for the CPU (7.15906MHz) and by 6 for the PSG (3.579533MHz), although
-               in this case the PSG isn't used. The Hudson markings have been scratch off 
+               in this case the PSG isn't used. The Hudson markings have been scratch off
                and the IC is labelled 'DEC-01'
           45 - Hudson HuC6280 6502-based CPU with in-built PSG used as the sound CPU
                Clock input is 21.4772MHz and is divided internally by 3 for the CPU

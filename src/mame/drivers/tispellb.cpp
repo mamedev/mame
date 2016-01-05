@@ -3,24 +3,24 @@
 /***************************************************************************
 
   ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
-  
+
   Texas Instruments Spelling B hardware
-  
+
   The Spelling B was introduced together with the Speak & Spell. It is a
   handheld educational toy with booklet. Two revisions of the hardware exist.
   (* indicates not dumped)
-  
+
   1st revision:
-  
+
   Spelling B (US), 1978
   - TMS0270 MCU TMC0272 (die labeled 0272A T0270B)
   - TMS1980 MCU TMC1984 (die labeled 1980A 84A)
   - 8-digit cyan VFD display (seen with and without apostrophe)
-  
+
   Spelling ABC (UK), 1979: exact same hardware as US version
 
   2nd revision:
-  
+
   Spelling B (US), 1979
   - TMS0270 MCU TMC0274*
   - TMC0355 4KB VSM ROM CD2602*
@@ -31,7 +31,7 @@
 
   Spelling ABC (Germany), 1979: different VSM
   - TMC0355 4KB VSM ROM CD2607*
-  
+
   Mr. Challenger (US), 1979
   - TMS0270 MCU TMC0273
   - TMC0355 4KB VSM ROM CD2601
@@ -50,8 +50,7 @@
 ----------------------------------------------------------------------------
 
   TODO:
-  - spellb numbers don't match with picture book - roms were doublechecked
-  - spellb random lockups - *
+  - spellb fetches wrong word sometimes (on lv1 SPOON and ANT) - roms were doublechecked
 
 
 ***************************************************************************/
@@ -183,8 +182,8 @@ WRITE8_MEMBER(tispellb_state::rev1_ctl_w)
 
 READ8_MEMBER(tispellb_state::sub_read_k)
 {
-	// sub K3210 <- main CTL3201
-	return BITSWAP8(m_rev1_ctl,7,6,5,4,3,2,0,1);
+	// sub K8421 <- main CTL3210
+	return m_rev1_ctl;
 }
 
 WRITE16_MEMBER(tispellb_state::sub_write_o)
@@ -212,7 +211,7 @@ WRITE16_MEMBER(tispellb_state::rev2_write_o)
 {
 	// SEG DP: speaker out
 	m_speaker->level_w(data >> 15 & 1);
-	
+
 	// SEG DP and SEG AP are not connected to VFD, rest is same as rev1
 	main_write_o(space, offset, data & 0x6fff);
 }
@@ -222,14 +221,12 @@ WRITE16_MEMBER(tispellb_state::rev2_write_r)
 	// R12: TMC0355 CS
 	// R4: TMC0355 M1
 	// R6: TMC0355 M0
-	if (data & 0x1000)
-	{
-		m_tms6100->m1_w(data >> 4 & 1);
-		m_tms6100->m0_w(data >> 6 & 1);
-		m_tms6100->romclock_w(1);
-		m_tms6100->romclock_w(0);
-	}
-	
+	m_tms6100->cs_w(data >> 12 & 1);
+	m_tms6100->m1_w(data >> 4 & 1);
+	m_tms6100->m0_w(data >> 6 & 1);
+	m_tms6100->clk_w(1);
+	m_tms6100->clk_w(0);
+
 	// rest is same as rev1
 	main_write_r(space, offset, data);
 }
@@ -250,7 +247,7 @@ INPUT_CHANGED_MEMBER(tispellb_state::power_button)
 	{
 		m_power_on = true;
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		
+
 		if (m_subcpu)
 			m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
@@ -319,7 +316,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mrchalgr )
 	PORT_INCLUDE( spellb ) // same key layout as spellb
-	
+
 	PORT_MODIFY("IN.5")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("2nd Player")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Score")
@@ -372,7 +369,7 @@ static MACHINE_CONFIG_START( rev2, tispellb_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispellb_state, rev2_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispellb_state, rev2_write_r))
 	MCFG_TMS0270_READ_CTL_CB(DEVREAD8("tms6100", tms6100_device, data_r))
-	MCFG_TMS0270_WRITE_CTL_CB(DEVWRITE8("tms6100", tms6100_device, addr_w))
+	MCFG_TMS0270_WRITE_CTL_CB(DEVWRITE8("tms6100", tms6100_device, add_w))
 
 	MCFG_DEVICE_ADD("tms6100", TMS6100, 350000)
 	MCFG_TMS6100_4BIT_MODE()
@@ -428,13 +425,13 @@ ROM_START( mrchalgr )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_mrchalgr_output.pla", 0, 1246, CRC(4785289c) SHA1(60567af0ea120872a4ccf3128e1365fe84722aa8) )
 
-	ROM_REGION( 0x4000, "tms6100", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "tms6100", 0 )
 	ROM_LOAD( "cd2601.vsm", 0x0000, 0x1000, CRC(a9fbe7e9) SHA1(9d480cb30313b8cbce2d048140c1e5e6c5b92452) )
 ROM_END
 
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1978, spellb,    0,        0,  rev1,   spellb,    driver_device, 0, "Texas Instruments", "Spelling B (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1978, spellb,    0,        0,  rev1,   spellb,    driver_device, 0, "Texas Instruments", "Spelling B (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 COMP( 1979, mrchalgr,  0,        0,  rev2,   mrchalgr,  driver_device, 0, "Texas Instruments", "Mr. Challenger", MACHINE_SUPPORTS_SAVE )

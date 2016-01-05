@@ -28,13 +28,13 @@
         * Porky
         * MTV Rock-N-Roll Trivia (Part 2)
         * Woodpecker
-		* Pacman Club / Club Lambada
+        * Pacman Club / Club Lambada
 
 
     Known issues:
         * Mystery items in Ali Baba don't work correctly because of protection.
-		* Pacman Club controls need to be demultiplexed for 2-players simultaneous mode.
-		  Also need 4-players extra inputs.
+        * Pacman Club controls need to be demultiplexed for 2-players simultaneous mode.
+          Also need 4-players extra inputs.
 
     Known to exist but dumps needed
         * Eeeek!
@@ -4135,7 +4135,7 @@ ROM_START( clubpacm )
 	ROM_LOAD( "13.5f",   0x1000, 0x0800, CRC(22b0188a) SHA1(a9ed9ca8b36a60081fd364abc9bc23963932cc0b) )
 	ROM_LOAD( "15.5j",   0x1800, 0x0800, CRC(50c7477d) SHA1(c04ec282a8cb528df5e38ad750d12ee71612695d) )
 
-	// Color PROMs have been dumped. They match the pacman/mspacman ones 
+	// Color PROMs have been dumped. They match the pacman/mspacman ones
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "n82s123n.7f",  0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
 	ROM_LOAD( "m7611.4a",     0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )

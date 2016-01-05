@@ -3646,10 +3646,18 @@ ROM_START( cps3boot ) // for cart with standard SH2
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
-	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_hd6417095_sh2", 0, SHA1(6057cc3ec7991c0c00a7ab9da6ac2f92c9fb1aed) )
+	DISK_IMAGE_READONLY( "UniCD-CPS3_for_standard_SH2_V4", 0, SHA1(099c52bd38753f0f4876243e7aa87ca482a2dcb7) )
 ROM_END
 
 ROM_START( cps3booto ) // for cart with standard SH2
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
+
+	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_hd6417095_sh2", 0, SHA1(6057cc3ec7991c0c00a7ab9da6ac2f92c9fb1aed) )
+ROM_END
+
+ROM_START( cps3booto2 ) // for cart with standard SH2
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
 	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
 
@@ -3678,11 +3686,19 @@ ROM_START( cps3boota ) // for cart with dead custom SH2 (or 2nd Impact CPU which
 	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
+	DISK_IMAGE_READONLY( "UniCD-CPS3_for_custom_SH2_V5", 0, SHA1(50a5b2845d3dd3de3bce15c4f1b58500db80cabe) )
+ROM_END
+
+ROM_START( cps3bootao ) // for cart with dead custom SH2 (or 2nd Impact CPU which is the same as a dead one)
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
+
+	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
 	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_dead_security_cart", 0, SHA1(1ede2f1ba197ee787208358a13eae7185a5ae3b2) )
 ROM_END
 
 
-ROM_START( cps3bootoa ) // for cart with dead custom SH2 (or 2nd Impact CPU which is the same as a dead one)
+ROM_START( cps3bootao2 ) // for cart with dead custom SH2 (or 2nd Impact CPU which is the same as a dead one)
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
 	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
 
@@ -3909,12 +3925,17 @@ GAME( 1999, jojobanr1, jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0
 GAME( 1999, jojobaner1,jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", MACHINE_IMPERFECT_GRAPHICS )
 
 // bootlegs, hold START1 during bootup to change games
-GAME( 1999, cps3boot,  0,        sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, cps3boota, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart", MACHINE_IMPERFECT_GRAPHICS )
+
+// newest revision, fixes some issues with Warzard decryption.
+GAME( 1999, cps3boot,   0,        sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (V4)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3boota,  cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (V5)", MACHINE_IMPERFECT_GRAPHICS )
+
+GAME( 1999, cps3booto,  cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (older)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3bootao, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (older)", MACHINE_IMPERFECT_GRAPHICS )
 // this doesn't play 2nd Impact despite it being listed.  2nd Impact uses separate data/code encryption and can't be decrypted cleanly for a standard SH2.  Selecting it just flashes in a copy of 3rd Strike with the 2nd Impact loading screen
-GAME( 1999, cps3booto,  cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (older) (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure and Red Earth only)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3booto2, cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (oldest) (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure and Red Earth only)", MACHINE_IMPERFECT_GRAPHICS )
 // this does not play Red Earth or the 2 Jojo games.  New Generation and 3rd Strike have been heavily modified to work with the separate code/data encryption a dead cart / 2nd Impact cart has.  Selecting the other games will give an 'invalid CD' message.
-GAME( 1999, cps3bootoa, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (older) (New Generation, 2nd Impact and 3rd Strike only)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3bootao2, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (oldest) (New Generation, 2nd Impact and 3rd Strike only)", MACHINE_IMPERFECT_GRAPHICS )
 // these are test bootleg CDs for running 2nd Impact on a standard SH2
 GAME( 1999, cps3bs32,  cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, V3)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, cps3bs32a, cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, older)", MACHINE_IMPERFECT_GRAPHICS ) // older / buggier hack

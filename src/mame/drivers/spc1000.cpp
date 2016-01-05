@@ -403,8 +403,8 @@ void spc1000_state::machine_start()
 	// intialize banks 2 & 4 (write banks)
 	membank("bank2")->set_base(ram);
 	membank("bank4")->set_base(ram + 0x8000);
-	
-    	m_time = machine().scheduler().time();	
+
+		m_time = machine().scheduler().time();
 }
 
 void spc1000_state::machine_reset()

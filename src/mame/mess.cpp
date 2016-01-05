@@ -13,8 +13,6 @@
 #define APPNAME                 "MESS"
 #define APPNAME_LOWER           "mess"
 #define CONFIGNAME              "mess"
-#define APPLONGNAME             "M.E.S.S."
-#define FULLLONGNAME            "Multi Emulator Super System"
 #define CAPGAMENOUN             "MACHINE"
 #define CAPSTARTGAMENOUN        "Machine"
 #define GAMENOUN                "machine"
@@ -32,8 +30,6 @@
 const char * emulator_info::get_appname() { return APPNAME;}
 const char * emulator_info::get_appname_lower() { return APPNAME_LOWER;}
 const char * emulator_info::get_configname() { return CONFIGNAME;}
-const char * emulator_info::get_applongname() { return APPLONGNAME;}
-const char * emulator_info::get_fulllongname() { return FULLLONGNAME;}
 const char * emulator_info::get_capgamenoun() { return CAPGAMENOUN;}
 const char * emulator_info::get_capstartgamenoun() { return CAPSTARTGAMENOUN;}
 const char * emulator_info::get_gamenoun() { return GAMENOUN;}

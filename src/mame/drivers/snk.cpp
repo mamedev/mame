@@ -4942,6 +4942,52 @@ ROM_START( ikarijpb )
 	ROM_LOAD( "16.rom", 0x28000, 0x8000, CRC(e9b03e07) SHA1(124e5328a965ea2af28c4d74934a82394a2ffd72) )
 ROM_END
 
+
+ROM_START( ikariram )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",      0x00000, 0x4000, CRC(ce97e30f) SHA1(24fb1499e888ae7d2857a8bb169d9b44fb3f5187) )
+	ROM_LOAD( "up03_k4.rom",  0x04000, 0x8000, CRC(26948850) SHA1(bfeba5f7019f6eaacf2a5464756d9cb283c5f5a2) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "ik3",    0x0000, 0x4000, CRC(9bb385f8) SHA1(70cc30bece54c28205017e755dc32a1c088f9f80) )
+	ROM_LOAD( "ik4",    0x4000, 0x8000, CRC(3a144bca) SHA1(c1b09bffb8d89e607332304b1d8845794f25273f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ik5",    0x0000, 0x4000, CRC(863448fa) SHA1(19cad05dc9c4495f36e0d8627927ea6d0a971824) )
+	ROM_LOAD( "ik6",    0x4000, 0x8000, CRC(9b16aa57) SHA1(69866ce41c587721702c92ac2e9ba3f6645004cf) )
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "7122er.prm", 0x000, 0x400, CRC(b9bf2c2c) SHA1(8eb62152dcb04f463baf6ec2a66148eb947403ef) )
+	ROM_LOAD( "7122eg.prm", 0x400, 0x400, CRC(0703a770) SHA1(62861ef4987003d4965ef5018ccdf7157981d939) )
+	ROM_LOAD( "7122eb.prm", 0x800, 0x400, CRC(0a11cdde) SHA1(faae17398341317e7afbd06b903b8e9e65967bf1) )
+
+	ROM_REGION( 0x4000, "tx_tiles", 0 )
+	ROM_LOAD( "ik7", 0x0000, 0x4000, CRC(9e88f536) SHA1(80e9aadeb626e60318a2139fd1b3875f6256c492) )
+
+	ROM_REGION( 0x20000, "bg_tiles", 0 )
+	ROM_LOAD( "17.rom", 0x00000, 0x8000, CRC(e0dba976) SHA1(5a8f14f7a199b5fb1862debda0bceee42cddac59) )
+	ROM_LOAD( "18.rom", 0x08000, 0x8000, CRC(24947d5f) SHA1(ffd18074ced8171c9da56c839e8289afc29af2c9) )
+	ROM_LOAD( "ik19",   0x10000, 0x8000, CRC(566242ec) SHA1(ca25587460491597d462d2526d59afbc9b92fb75) )
+	ROM_LOAD( "20.rom", 0x18000, 0x8000, CRC(5da7ec1a) SHA1(4b212c1dfe4c18eced90ee3a783e7edf8d23c906) )
+
+	ROM_REGION( 0x18000, "sp16_tiles", 0 )
+	ROM_LOAD( "ik8",    0x00000, 0x8000, CRC(75d796d0) SHA1(395c1d22b935c92c50a326edc8b6cd9aab235f7c) )
+	ROM_LOAD( "ik9",    0x08000, 0x8000, CRC(2c34903b) SHA1(1949fc0cef4b30665ad288fa8e506a05741face0) )
+	ROM_LOAD( "ik10",   0x10000, 0x8000, CRC(da9ccc94) SHA1(be3c9d44a887ac823039153b832dfae18fe69965) )
+
+	ROM_REGION( 0x30000, "sp32_tiles", 0 )
+	ROM_LOAD( "11.rom", 0x00000, 0x8000, CRC(5c75ea8f) SHA1(4e8ee56a2dbeb9ac2dd74bc584dba29433d91ae0) )
+	ROM_LOAD( "14.rom", 0x08000, 0x8000, CRC(3293fde4) SHA1(3e2f0fa00c22f1c0c1427d8d3de57dd9ec7682a9) )
+	ROM_LOAD( "12.rom", 0x10000, 0x8000, CRC(95138498) SHA1(8ac3d2cd793312434b9ffb8c47c30473f713e0e8) )
+	ROM_LOAD( "15.rom", 0x18000, 0x8000, CRC(65a61c99) SHA1(767694c919180de208b6211b593db68fc5a66ff1) )
+	ROM_LOAD( "13.rom", 0x20000, 0x8000, CRC(315383d7) SHA1(1c1c5931e3447c4dcbd54fc8ae383b03cb5fbf5b) )
+	ROM_LOAD( "16.rom", 0x28000, 0x8000, CRC(e9b03e07) SHA1(124e5328a965ea2af28c4d74934a82394a2ffd72) )
+	
+	ROM_REGION( 0x30000, "bootleg_proms", 0 )
+	ROM_LOAD( "82s191.bin", 0x00000, 0x800, CRC(072f8622) SHA1(43b0d48656263e88067cddea1d01188755a2023d) )	//prom from a bootleg pcb
+ROM_END
+
+
 /***********************************************************************/
 
 ROM_START( victroad )
@@ -6278,6 +6324,7 @@ GAME( 1986, ikaria,   ikari,    ikari,    ikaria, driver_device,   0,        ROT
 GAME( 1986, ikarinc,  ikari,    ikari,    ikarinc, driver_device,  0,        ROT270, "SNK", "Ikari Warriors (US No Continues)", 0 ) // distributed by Tradewest(?)
 GAME( 1986, ikarijp,  ikari,    ikari,    ikarinc, driver_device,  0,        ROT270, "SNK", "Ikari (Japan No Continues)", 0 )
 GAME( 1986, ikarijpb, ikari,    ikari,    ikarijpb, driver_device, 0,        ROT270, "bootleg", "Ikari (Joystick hack bootleg)", 0 )
+GAME( 1986, ikariram, ikari,    ikari,    ikarijpb, driver_device, 0,        ROT270, "bootleg", "Rambo 3 (bootleg of Ikari, Joystick hack)", 0 )
 GAME( 1986, victroad, 0,        victroad, victroad, driver_device, 0,        ROT270, "SNK", "Victory Road", 0 )
 GAME( 1986, dogosoke, victroad, victroad, victroad, driver_device, 0,        ROT270, "SNK", "Dogou Souken", 0 )
 GAME( 1986, dogosokb, victroad, victroad, dogosokb, driver_device, 0,        ROT270, "bootleg", "Dogou Souken (Joystick hack bootleg)", 0 )

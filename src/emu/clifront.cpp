@@ -597,8 +597,6 @@ void cli_frontend::listdevices(const char *gamename)
 		// dump the results
 		for (auto device : device_list)
 		{
-			
-
 			// extract the tag, stripping the leading colon
 			const char *tag = device->tag();
 			if (*tag == ':')
@@ -1614,7 +1612,7 @@ void cli_frontend::execute_commands(const char *exename)
 		validity_checker valid(m_options);
 		bool result = valid.check_all();
 		if (!result)
-			throw emu_fatalerror(MAMERR_FAILED_VALIDITY, "Validity check failed!\n");
+			throw emu_fatalerror(MAMERR_FAILED_VALIDITY, "Validity check failed (%d errors, %d warnings in total)\n", valid.errors(), valid.warnings());
 		return;
 	}
 
@@ -1697,7 +1695,7 @@ void cli_frontend::execute_commands(const char *exename)
 
 void cli_frontend::display_help()
 {
-	osd_printf_info("%s v%s - %s\n%s\n\n", emulator_info::get_applongname(),build_version,emulator_info::get_fulllongname(),emulator_info::get_copyright_info());
+	osd_printf_info("%s v%s\n%s\n\n", emulator_info::get_appname(),build_version,emulator_info::get_copyright_info());
 	osd_printf_info("%s\n", emulator_info::get_disclaimer());
 	emulator_info::printf_usage(emulator_info::get_appname(),emulator_info::get_gamenoun());
 	osd_printf_info("\n\n"

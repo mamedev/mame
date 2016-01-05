@@ -44,7 +44,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_rom) override;
 	virtual DECLARE_READ8_MEMBER(read_ram) override;
 	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
-	
+
 	UINT16 m_tama5_data, m_tama5_addr, m_tama5_cmd;
 	UINT8 m_regs[32];
 	UINT8 m_rtc_reg;

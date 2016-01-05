@@ -274,7 +274,6 @@ void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 			for (auto & voice : m_voice)
 			{
-				
 				if (voice.playing())
 					voice.play(buffer);
 			}

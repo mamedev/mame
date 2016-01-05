@@ -48,6 +48,8 @@ public:
 	UINT16 scrollvals[6];
 	DECLARE_WRITE16_MEMBER(tilemap_enable_w);
 	DECLARE_WRITE16_MEMBER(tile_scroll_w);
+	DECLARE_WRITE16_MEMBER(tile_scroll_base_w);
+	DECLARE_WRITE16_MEMBER(tile_vreg_1a_w);
 	DECLARE_WRITE16_MEMBER(videowrite_cb_w);
 	DECLARE_WRITE16_MEMBER(wordswapram_w);
 	DECLARE_WRITE16_MEMBER(legionna_background_w);

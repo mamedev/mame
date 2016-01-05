@@ -26,7 +26,7 @@ Notes:
 - A bug in the program code causes the OKI to be reset on the very
   first coin inserted.
 
-// Sound banking + video references 
+// Sound banking + video references
 // https://www.youtube.com/watch?v=nyAQPrkt_a4
 // https://www.youtube.com/watch?v=0gn2Kj2M46Q
 
@@ -74,7 +74,7 @@ WRITE8_MEMBER(aquarium_state::aquarium_z80_bank_w)
 	// aquarium bank 0006 00ff - correct (select)  110
 	// aquarium bank 0005 00ff - level 1 (correct)
 	// (all music seems correct w/regards the reference video)
-	
+
 
 	membank("bank1")->set_entry(data & 0x7);
 }
@@ -349,7 +349,7 @@ ROM_START( aquarium )
 	ROM_LOAD16_WORD_SWAP( "aquar3.bin",  0x000000, 0x080000, CRC(f197991e) SHA1(0a217d735e2643605dbfd6ee20f98f46b37d4838) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 (sound) code */
-	ROM_LOAD( "aquar5",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) ) 
+	ROM_LOAD( "aquar5",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* BG Tiles */
 	ROM_LOAD( "aquar1",      0x000000, 0x080000, CRC(575df6ac) SHA1(071394273e512666fe124facdd8591a767ad0819) ) // 4bpp
@@ -378,7 +378,7 @@ ROM_START( aquariumj )
 	ROM_LOAD16_WORD_SWAP( "aquar3",  0x000000, 0x080000, CRC(344509a1) SHA1(9deb610732dee5066b3225cd7b1929b767579235) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 (sound) code */
-	ROM_LOAD( "aquar5",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) ) 
+	ROM_LOAD( "aquar5",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* BG Tiles */
 	ROM_LOAD( "aquar1",      0x000000, 0x080000, CRC(575df6ac) SHA1(071394273e512666fe124facdd8591a767ad0819) ) // 4bpp

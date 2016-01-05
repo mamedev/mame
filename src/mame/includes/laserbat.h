@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Pierpaolo Prazzoli, Vas Crabb
+// copyright-holders:Vas Crabb
 /*************************************************************************
 
     Laser Battle / Lazarian - Cat and Mouse
@@ -185,43 +185,43 @@ class catnmous_state : public laserbat_state_base
 public:
 	catnmous_state(const machine_config &mconfig, device_type type, const char *tag)
 		: laserbat_state_base(mconfig, type, tag)
-		, m_pia(*this, "pia")
 		, m_audiocpu(*this, "audiocpu")
-		, m_ay1(*this, "ay1")
-		, m_ay2(*this, "ay2")
-		, m_active_8910(0)
-		, m_port0a(0)
-		, m_last_port0b(0)
-		, m_cb1_toggle(0)
+		, m_pia(*this, "pia")
+		, m_psg1(*this, "psg1")
+		, m_psg2(*this, "psg2")
+		, m_cb1(false)
 	{
 	}
 
-	// control ports
-	DECLARE_WRITE_LINE_MEMBER(zaccaria_irq0a);
-	DECLARE_WRITE_LINE_MEMBER(zaccaria_irq0b);
-	DECLARE_READ8_MEMBER(zaccaria_port0a_r);
-	DECLARE_WRITE8_MEMBER(zaccaria_port0a_w);
-	DECLARE_WRITE8_MEMBER(zaccaria_port0b_w);
+	// sound control ports
+	virtual DECLARE_WRITE8_MEMBER(csound1_w) override;
+	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
+
+	// PIA handlers
+	DECLARE_READ8_MEMBER(pia_porta_r);
+	DECLARE_WRITE8_MEMBER(pia_porta_w);
+	DECLARE_WRITE8_MEMBER(pia_portb_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_irqa);
+	DECLARE_WRITE_LINE_MEMBER(pia_irqb);
+
+	// PSG handlers
+	DECLARE_WRITE8_MEMBER(psg1_porta_w);
+	DECLARE_READ8_MEMBER(psg1_portb_r);
 
 	// periodic signal generators
-	INTERRUPT_GEN_MEMBER(zaccaria_cb1_toggle);
+	INTERRUPT_GEN_MEMBER(cb1_toggle);
 
 protected:
 
 	// initialisation/startup
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	// sound board devices
-	required_device<pia6821_device> m_pia;
 	required_device<cpu_device>     m_audiocpu;
-	required_device<ay8910_device>  m_ay1;
-	required_device<ay8910_device>  m_ay2;
-
+	required_device<pia6821_device> m_pia;
+	required_device<ay8910_device>  m_psg1;
+	required_device<ay8910_device>  m_psg2;
 
 	// control line states
-	int m_active_8910;
-	int m_port0a;
-	int m_last_port0b;
-	int m_cb1_toggle;
+	bool    m_cb1;
 };

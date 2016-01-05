@@ -331,6 +331,7 @@ static ADDRESS_MAP_START( triplep_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x5040, 0x505f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5060, 0x507f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x5080, 0x50ff) AM_RAM
+	AM_RANGE(0x5800, 0x67ff) AM_ROM
 	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0x6802, 0x6802) AM_WRITE(galaxold_coin_counter_w)
 	AM_RANGE(0x6804, 0x6804) AM_WRITE(galaxold_stars_enable_w)
@@ -600,6 +601,16 @@ static INPUT_PORTS_START( triplep )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( knockoutb )
+	PORT_INCLUDE(triplep)
+
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x03, "256 (Cheat)")
+INPUT_PORTS_END
 
 /* ckongs coinage DIPs are spread across two input ports */
 CUSTOM_INPUT_MEMBER(scramble_state::ckongs_coinage_r)
@@ -1754,7 +1765,7 @@ Empty 40 pin socket at 0A
 ***************************************************************************/
 
 ROM_START( triplepa )
-	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "td4.2h", 0x0000, 0x1000, CRC(15a6d46a) SHA1(a76d97876268d303bc18bf6f18f05227a6689b9d) )
 	ROM_LOAD( "tc3.2k", 0x1000, 0x1000, CRC(bc26d2c0) SHA1(b9934ddb2918f6c4123dafd07cc39ae31d7e28e9) )
 	ROM_LOAD( "te2.2l", 0x2000, 0x1000, CRC(02025c10) SHA1(16ffc7681d949172034b8c85dc72c1a528309abf) )
@@ -1767,6 +1778,24 @@ ROM_START( triplepa )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "ta.6e", 0x0000, 0x0020, CRC(624f75df) SHA1(0e9a7c48dd976af1dca1d5351236d4d5bf7a9dc8) )
 ROM_END
+
+ROM_START( knockoutb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "k1-2h.bin", 0x0000, 0x1000, CRC(f16bdd40) SHA1(e14aad2f2820f643f32e1ee4dbb78cd469367498) )
+	ROM_LOAD( "k2-2k.bin", 0x1000, 0x1000, CRC(fa6214ef) SHA1(5e569b2a4eaf5e4f033cf2375d607c54fb96b1f8) )
+	ROM_LOAD( "k3-2l.bin", 0x2000, 0x1000, CRC(9f734d29) SHA1(430c53b9c3fa888fe45f9feeb4ad8f92011adc05) )
+	ROM_LOAD( "k4-2m.bin", 0x3000, 0x1000, CRC(1809ec77) SHA1(97d575f47f861a572a483559790e271c21775ac5) )
+	ROM_LOAD( "k5-2p.bin", 0x6000, 0x0800, CRC(60c1aa52) SHA1(f0598be70cfca8651edb7bb3c58f01368d6965ce) )
+	ROM_CONTINUE(             0x5800, 0x0800             )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "ta6.5f", 0x0000, 0x0800, CRC(d51cbd6f) SHA1(c3766a69a4599e54b8d7fb893e45802ec8bf6713) )
+	ROM_LOAD( "ta7.5h", 0x0800, 0x0800, CRC(f21c0059) SHA1(b1ba87f13908e3e662de8bf444f59bd5c2009720) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "ta.6e", 0x0000, 0x0020, CRC(624f75df) SHA1(0e9a7c48dd976af1dca1d5351236d4d5bf7a9dc8) )
+ROM_END
+
 
 ROM_START( mariner )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2284,7 +2313,8 @@ ROM_END
 
 GAME( 1982, triplep,  0,        triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 1)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1982, triplepa, triplep,  triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 2)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, knockout, triplep,  triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "bootleg? (KKK)",      "Knock Out!! (bootleg?)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, knockout, triplep,  triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "bootleg? (KKK)",      "Knock Out!! (bootleg, set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, knockoutb,triplep,  triplep,  knockoutb,scramble_state, scramble_ppi, ROT90, "bootleg",             "Knock Out!! (bootleg, set 2)",         MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, mariner,  0,        mariner,  scramble, scramble_state, mariner,      ROT90, "Amenip",              "Mariner",                        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1981, 800fath,  mariner,  mariner,  800fath,  scramble_state, mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
