@@ -2445,6 +2445,41 @@ ROM_START( lghostud )
 ROM_END
 
 
+
+ROM_START( lghostj )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-13410.a4",  0x00000, 0x40000, CRC(9c1d672b) SHA1(d617b1fbdad1b42af6f1341e4556c3481c4a7031) )
+	ROM_LOAD16_BYTE( "epr-13412.a6",  0x00001, 0x40000, CRC(3a3155fa) SHA1(534231450d4da0668e8742ada8c9c86f2e5768a6))
+	ROM_LOAD16_BYTE( "epr-13411.a5",  0x80000, 0x40000, CRC(5160167b) SHA1(3d176a18c7527b1e485f10b144bb4db1b945e709) )
+	ROM_LOAD16_BYTE( "epr-13413.a7",  0x80001, 0x40000, CRC(656b3bd8) SHA1(db81d4ae3138308dce1e3db7a859f1d63c4ff815) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
+	ROM_LOAD( "317-0164.key", 0x0000, 0x2000,  CRC(6bf5cf2d) SHA1(9f43b057ac162a62a5f3b5511b0825f34a2a31a3))
+
+	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-13414.c1", 0x00000, 0x40000, CRC(dada2419) SHA1(f6ffd02d75232a09ea83fd199e5e30b2773b0cf5) )
+	ROM_LOAD( "epr-13415.c2", 0x40000, 0x40000, CRC(bbb62c48) SHA1(7a4c5bd11b73a92deece72b55627f48ac167acd6) )
+	ROM_LOAD( "epr-13416.c3", 0x80000, 0x40000, CRC(1d11dbae) SHA1(331aa49c6b38d32ec33184dbd0851888463ddbc7) )
+
+	ROM_REGION16_BE( 0x800000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-13603.a10", 0x000000, 0x80000, CRC(5350a94e) SHA1(47e99803cab4b508feb51069c940d6c824d6961d) )
+	ROM_LOAD16_BYTE( "epr-13604.c10", 0x000001, 0x80000, CRC(4009c8e5) SHA1(97f513d312f4c90f8bffdf797afa3749779989a5) )
+	ROM_LOAD16_BYTE( "mpr-13421.a11", 0x200000, 0x80000, CRC(2fc75890) SHA1(9f97f07dba3b978df8eb357894168ad74f151d30) )
+	ROM_LOAD16_BYTE( "mpr-13424.c11", 0x200001, 0x80000, CRC(fb98d920) SHA1(cebdebe88902e96c631df6053ac2589f794da155) )
+	ROM_LOAD16_BYTE( "mpr-13422.a12", 0x400000, 0x80000, CRC(48a0754d) SHA1(9fead9f8319593adb4bddaaa4d053b21ca726009) )
+	ROM_LOAD16_BYTE( "mpr-13425.c12", 0x400001, 0x80000, CRC(f8252589) SHA1(5a1ed24296d0609393e53df3ee585a366da4ee46) )
+	ROM_LOAD16_BYTE( "mpr-13423.a13", 0x600000, 0x80000, CRC(335bbc9d) SHA1(78793335b2f8a1bb05809259521db193c17c9b98) )
+	ROM_LOAD16_BYTE( "mpr-13426.c13", 0x600001, 0x80000, CRC(5cfb1e25) SHA1(1dd57475604f339e58bf946e17ae0dc5cf4a3dba) )
+
+	ROM_REGION( 0x210000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
+	ROM_LOAD( "epr-13417.c7",   0x010000, 0x20000, CRC(cd7beb49) SHA1(2435ce000f1eefdd06b27ea93e22fd82c0e999d2) )
+	// these seem best 3 from the different sized dumps
+	ROM_LOAD( "mpr-13420.c6",   0x090000, 0x40000, CRC(3de0dee4) SHA1(31833684df5a34d5e9ef04f2ab42355b8e9cbb45) )
+	ROM_LOAD( "mpr-13419.c5",   0x110000, 0x40000, CRC(e7021b0a) SHA1(82e390fac63965d4f80ae01758c19ae951c39475) )
+	ROM_LOAD( "mpr-13418.c4",   0x190000, 0x40000, CRC(0732594d) SHA1(9fbeae29f1a31d136ddc9a49c786b2a08a523e0d) )
+ROM_END
+
+
 /**************************************************************************************************************************
  **************************************************************************************************************************
  **************************************************************************************************************************
@@ -2986,6 +3021,7 @@ GAME( 1991, hamaway,   0,        system18,             hamaway,  segas18_state, 
 
 GAME( 1990, lghost,    0,        lghost_fd1094,        lghost,   segas18_state, lghost,       ROT0,   "Sega",          "Laser Ghost (World) (FD1094 317-0166)", 0 )
 GAME( 1990, lghostu,   lghost,   lghost_fd1094,        lghost,   segas18_state, lghost,       ROT0,   "Sega",          "Laser Ghost (US) (FD1094 317-0165)", 0 )
+GAME( 1990, lghostj,   lghost,   lghost_fd1094,        lghost,   segas18_state, lghost,       ROT0,   "Sega",          "Laser Ghost (Japan) (FD1094 317-0164)", 0 )
 
 GAME( 1990, mwalk,     0,        system18_fd1094_i8751,mwalk,    segas18_state, generic_5874, ROT0,   "Sega",          "Michael Jackson's Moonwalker (World) (FD1094/8751 317-0159)", 0 )
 GAME( 1990, mwalku,    mwalk,    system18_fd1094_i8751,mwalka,   segas18_state, generic_5874, ROT0,   "Sega",          "Michael Jackson's Moonwalker (US) (FD1094/8751 317-0158)", 0 )
