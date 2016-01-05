@@ -115,6 +115,7 @@ public:
 
 	bitmap_ind16 m_pcgbitmap;
 	bitmap_ind16 m_gfxbitmap;
+	bitmap_ind16 m_special;
 
 	void floppy_load_unload(bool load, floppy_image_device *dev);
 	int floppy_load(floppy_image_device *dev);

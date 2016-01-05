@@ -26,10 +26,10 @@
          1 sprite layer - up to 128 16x16 sprites, 16 colours per sprite, maximum 16 sprites per scanline (not yet implemented).
 
          Questions: What do the other bits in m_video.reg[2] do?
-                    What is "special priority mode"?
                     How is the intensity applied during blending if at all?
                     Black appears to be opaque only at priority 2 but not 3, is that right?
                     Are the gfx layers blended from the bottom up or all at once?
+                    Special priority in 16bit color mode?
 
 */
 
@@ -783,7 +783,12 @@ bool x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 						break;
 					}
 					if(colour || (priority == 3))
-						bitmap.pix16(scanline, pixel) = colour;
+					{
+						if(((m_video.reg[2] & 0x1800) == 0x1000) && (colour & 1))
+							m_special.pix16(scanline, pixel) = colour & ~1;
+						else
+							bitmap.pix16(scanline, pixel) = colour;
+					}
 					loc++;
 					loc &= 0x3ff;
 				}
@@ -824,6 +829,8 @@ bool x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 								else
 									bitmap.pix16(scanline, pixel) = (pal[colour] & 0xfffe) + blend;
 							}
+							else if(((m_video.reg[2] & 0x1800) == 0x1000) && (colour & 1))
+								m_special.pix16(scanline, pixel) = colour;
 							else
 								bitmap.pix16(scanline, pixel) = colour;
 						}
@@ -860,6 +867,8 @@ bool x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 									else
 										bitmap.pix16(scanline, pixel) = (pal[colour] & 0xfffe) + blend;
 								}
+								if(((m_video.reg[2] & 0x1800) == 0x1000) && (colour & 1))
+									m_special.pix16(scanline, pixel) = colour;
 								else
 									bitmap.pix16(scanline, pixel) = colour;
 							}
@@ -901,6 +910,8 @@ void x68k_state::x68k_draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect)
 		return;
 
 	m_gfxbitmap.fill(0, cliprect);
+	if((m_video.reg[2] & 0x1800) == 0x1000)
+		m_special.fill(0, cliprect);
 
 	for(priority=3;priority>=0;priority--)
 	{
@@ -1102,10 +1113,8 @@ VIDEO_START_MEMBER(x68k_state,x68000)
 	m_bg1_16->set_transparent_pen(0);
 
 	m_screen->register_screen_bitmap(m_pcgbitmap);
-	m_pcgbitmap.fill(0);
-
 	m_screen->register_screen_bitmap(m_gfxbitmap);
-	m_gfxbitmap.fill(0);
+	m_screen->register_screen_bitmap(m_special);
 
 //  m_scanline_timer->adjust(attotime::zero, 0, attotime::from_hz(55.45)/568);
 }
@@ -1118,7 +1127,7 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_rgb32 &bit
 	int x;
 	tilemap_t* x68k_bg0;
 	tilemap_t* x68k_bg1;
-	int pixel, scanline;
+	int pixel = 0, scanline = 0;
 	//UINT8 *rom;
 
 	if((m_spritereg[0x408] & 0x03) == 0x00)  // Sprite/BG H-Res 0=8x8, 1=16x16, 2 or 3 = undefined.
@@ -1229,6 +1238,20 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_rgb32 &bit
 			yscr = (m_crtc.reg[11] & 0x3ff);
 			if(!(m_crtc.reg[20] & 0x1000))  // if text layer is set to buffer, then it's not visible
 				x68k_draw_text(bitmap,xscr,yscr,rect);
+		}
+	}
+
+	if((m_video.reg[2] & 0x1800) == 0x1000) // special priority
+	{
+		UINT16 colour;
+		for(scanline=rect.min_y;scanline<=rect.max_y;scanline++)
+		{
+			for(pixel=m_crtc.hbegin;pixel<=m_crtc.hend;pixel++)
+			{
+				colour = m_special.pix16(scanline, pixel) & 0xff;
+				if(colour)
+					bitmap.pix32(scanline, pixel) = m_gfxpalette->pen(colour & ~1);
+			}
 		}
 	}
 
