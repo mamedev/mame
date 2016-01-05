@@ -785,7 +785,7 @@ bool x68k_state::x68k_draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprec
 					if(colour || (priority == 3))
 					{
 						if(((m_video.reg[2] & 0x1800) == 0x1000) && (colour & 1))
-							m_special.pix16(scanline, pixel) = colour & ~1;
+							m_special.pix16(scanline, pixel) = colour;
 						else
 							bitmap.pix16(scanline, pixel) = colour;
 					}
