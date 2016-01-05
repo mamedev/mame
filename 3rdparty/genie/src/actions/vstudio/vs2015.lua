@@ -54,7 +54,7 @@
 		oncleantarget   = premake.vstudio.cleantarget,
 
 		vstudio = {
-			solutionVersion = "14",
+			solutionVersion = "12",
 			targetFramework = "4.5",
 			toolsVersion    = "14.0",
 			windowsTargetPlatformVersion = "8.1",
