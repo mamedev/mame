@@ -927,7 +927,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 					}
 
 					if(reverse) { tile_data^=0xff; }
-					if(u_line && yi == 7) { tile_data = 0xff; }
+					if(u_line && yi == lr-1) { tile_data = 0xff; }
 					if(v_line)  { tile_data|=8; }
 
 					/* TODO: proper blink rate for these two */
