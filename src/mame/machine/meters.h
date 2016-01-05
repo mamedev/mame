@@ -17,21 +17,51 @@
 #include "emu.h"
 
 
+#define MCFG_METERS_NUMBER(_number) \
+	meters_device::static_set_number_meters(*device, _number); \
+
 #define MAXMECHMETERS 8
 
 #define METERREACTTIME 0.025 // number of seconds meter has to be active to tick
 
-void MechMtr_config(running_machine &machine, int number);
+class meters_device : public device_t
+{
+public:
+	meters_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~meters_device() {}
 
-int  MechMtr_GetNumberMeters(void);
+	static void static_set_number_meters(device_t &device, int number) { downcast<meters_device &>(device).m_number_mtr = number; }
 
-void MechMtr_Setcount( int id, long count);
+	int update(int id, int state);
+	int GetActivity(int id);
 
-long MechMtr_Getcount( int id);
+	int GetNumberMeters(void);  // currently unused
+	void Setcount(int id, INT32 count); // currently unused
+	INT32 Getcount(int id); // currently unused
+	void ReactTime(int id, INT32 cycles); // currently unused
 
-void MechMtr_ReactTime(int id, long cycles);
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-int  MechMtr_update(   int id, int state);
+private:
+	// internal state
+	struct meter_info
+	{
+		bool on;    // Activity of reel
+		INT32 reacttime;
+		INT32 count;      // mechmeter value
+		bool state;     // state 0/1
+		emu_timer *meter_timer;
+	};
+	
+	meter_info m_meter_info[MAXMECHMETERS];
 
-int MechMtr_GetActivity(int id);
+	int m_number_mtr;
+};
+
+extern const device_type METERS;
+
 #endif

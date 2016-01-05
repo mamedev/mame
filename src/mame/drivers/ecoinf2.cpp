@@ -28,6 +28,7 @@ public:
 		m_reel1(*this, "reel1"),
 		m_reel2(*this, "reel2"),
 		m_reel3(*this, "reel3"),
+		m_meters(*this, "meters"),
 		m_coins(*this, "COINS"),
 		m_key(*this, "PERKEY"),
 		m_panel(*this, "PANEL")
@@ -41,6 +42,7 @@ public:
 	required_device<stepper_device> m_reel1;
 	required_device<stepper_device> m_reel2;
 	required_device<stepper_device> m_reel3;
+	required_device<meters_device> m_meters;
 	required_ioport m_coins;
 	required_ioport m_key;
 	required_ioport m_panel;
@@ -149,10 +151,10 @@ public:
 	}
 	DECLARE_READ8_MEMBER(ppi8255_ic22_read_c_misc)
 	{
-		int combined_meter = MechMtr_GetActivity(0) | MechMtr_GetActivity(1) |
-							MechMtr_GetActivity(2) | MechMtr_GetActivity(3) |
-							MechMtr_GetActivity(4) | MechMtr_GetActivity(5) |
-							MechMtr_GetActivity(6) | MechMtr_GetActivity(7);
+		int combined_meter = m_meters->GetActivity(0) | m_meters->GetActivity(1) |
+							m_meters->GetActivity(2) | m_meters->GetActivity(3) |
+							m_meters->GetActivity(4) | m_meters->GetActivity(5) |
+							m_meters->GetActivity(6) | m_meters->GetActivity(7);
 
 		if(combined_meter)
 		{
@@ -170,12 +172,10 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_a_meters)
 	{
-		int meter;
-		for (meter = 0; meter < 8; meter ++)
+		for (int meter = 0; meter < 8; meter ++)
 		{
-			MechMtr_update(meter, (data & (1 << meter)));
+			m_meters->update(meter, (data & (1 << meter)));
 		}
-
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_b_payouts)
@@ -499,11 +499,6 @@ static INPUT_PORTS_START( ecoinf2 )
 
 INPUT_PORTS_END
 
-MACHINE_START_MEMBER(ecoinf2_state,ecoinf2)
-{
-	MechMtr_config(machine(),8);
-}
-
 
 static MACHINE_CONFIG_START( ecoinf2_oxo, ecoinf2_state )
 	/* basic machine hardware */
@@ -512,8 +507,6 @@ static MACHINE_CONFIG_START( ecoinf2_oxo, ecoinf2_state )
 	MCFG_CPU_IO_MAP(oxo_portmap)
 
 	MCFG_DEFAULT_LAYOUT(layout_ecoinf2)
-
-	MCFG_MACHINE_START_OVERRIDE(ecoinf2_state, ecoinf2 )
 
 	MCFG_DEVICE_ADD("ic10_lamp", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf2_state, ppi8255_ic10_write_a_strobedat0))
@@ -549,6 +542,9 @@ static MACHINE_CONFIG_START( ecoinf2_oxo, ecoinf2_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel2_optic_cb))
 	MCFG_ECOIN_200STEP_ADD("reel3")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel3_optic_cb))
+
+	MCFG_DEVICE_ADD("meters", METERS, 0)
+	MCFG_METERS_NUMBER(8)
 
 //  MCFG_DEVICE_ADD("ic25_dips", I8255, 0)
 MACHINE_CONFIG_END

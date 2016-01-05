@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "bgfx_p.h"
@@ -207,11 +207,21 @@ namespace bgfx { namespace gl
 						_func = (_proto)bx::dlsym(s_opengl, #_import); \
 						BX_TRACE("%p " #_func " (" #_import ")", _func); \
 					} \
-					BGFX_FATAL(_optional || NULL != _func, Fatal::UnableToInitialize, "Failed to create OpenGL context. NSGLGetProcAddress(\"%s\")", #_import); \
+					BGFX_FATAL(_optional || NULL != _func, Fatal::UnableToInitialize, "Failed to create OpenGL context. GetProcAddress(\"%s\")", #_import); \
 				}
 #	include "glimports.h"
 	}
 
 } /* namespace gl */ } // namespace bgfx
+
+void* nsglGetProcAddress(const GLubyte* _name)
+{
+	using namespace bgfx::gl;
+	if (NULL == s_opengl)
+	{
+		s_opengl = bx::dlopen("/System/Library/Frameworks/OpenGL.framework/Versions/Current/OpenGL");
+	}
+	return bx::dlsym(s_opengl, (const char*)_name);
+}
 
 #endif // BX_PLATFORM_OSX && (BGFX_CONFIG_RENDERER_OPENGLES2|BGFX_CONFIG_RENDERER_OPENGLES3|BGFX_CONFIG_RENDERER_OPENGL)

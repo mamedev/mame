@@ -106,12 +106,9 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 #include "cpu/m68000/m68000.h"
 
 #include "includes/jpmimpct.h"
-#include "machine/meters.h"
 #include "machine/nvram.h"
 #include "jpmimpct.lh"
 #include "video/awpvid.h"
-#include "machine/steppers.h"
-#include "machine/roc10937.h"
 #include "machine/i8255.h"
 
 /*************************************
@@ -552,7 +549,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmio_w)
 			}
 			else
 //          slide = 0;
-			MechMtr_update(0, data >> 10);
+			m_meters->update(0, data >> 10);
 			m_duart_1.IP &= ~0x10;
 			break;
 		}
@@ -865,6 +862,9 @@ static MACHINE_CONFIG_START( jpmimpct, jpmimpct_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_VIDEO_START_OVERRIDE(jpmimpct_state,jpmimpct)
+	
+	MCFG_DEVICE_ADD("meters", METERS, 0)
+	MCFG_METERS_NUMBER(5)
 MACHINE_CONFIG_END
 
 
@@ -1122,20 +1122,20 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 					{
 						for (i=0; i<5; i++)
 						{
-							MechMtr_update(i, 0);
+							m_meters->update(i, 0);
 						}
 						break;
 					}
 					default:
 					{
-						MechMtr_update(((metno <<2) - 1), 1);
+						m_meters->update(((metno <<2) - 1), 1);
 					}
 					break;
 				}
 			}
-			int combined_meter = MechMtr_GetActivity(0) | MechMtr_GetActivity(1) |
-			MechMtr_GetActivity(2) | MechMtr_GetActivity(3) |
-			MechMtr_GetActivity(4);
+			int combined_meter = m_meters->GetActivity(0) | m_meters->GetActivity(1) |
+			m_meters->GetActivity(2) | m_meters->GetActivity(3) |
+			m_meters->GetActivity(4);
 
 			if(combined_meter)
 			{
@@ -1339,6 +1339,9 @@ MACHINE_CONFIG_START( impctawp, jpmimpct_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel4_optic_cb))
 	MCFG_STARPOINT_48STEP_ADD("reel5")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel5_optic_cb))
+	
+	MCFG_DEVICE_ADD("meters", METERS, 0)
+	MCFG_METERS_NUMBER(5)
 
 MACHINE_CONFIG_END
 

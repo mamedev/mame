@@ -27,7 +27,8 @@ public:
 		m_tms34061(*this, "tms34061"),
 		m_vfd(*this, "vfd"),
 		m_direct_port(*this, "DIRECT"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_meters(*this, "meters") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia6850_0;
@@ -38,6 +39,7 @@ public:
 	optional_device<s16lf01_t> m_vfd;
 	required_ioport m_direct_port;
 	optional_device<palette_device> m_palette;
+	optional_device<meters_device> m_meters; //jpmsys5v doesn't use this
 
 	UINT8 m_palette_val[16][3];
 	int m_pal_addr;

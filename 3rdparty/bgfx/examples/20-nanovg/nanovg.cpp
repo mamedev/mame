@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 //
@@ -946,7 +946,7 @@ int loadDemoData(struct NVGcontext* vg, struct DemoData* data)
 		char file[128];
 		bx::snprintf(file, 128, "images/image%d.jpg", ii+1);
 		data->images[ii] = nvgCreateImage(vg, file, 0);
-		if (data->images[ii] == bgfx::invalidHandle)
+		if (data->images[ii] == 0)
 		{
 			printf("Could not load %s.\n", file);
 			return -1;

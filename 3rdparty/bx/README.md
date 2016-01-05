@@ -14,7 +14,7 @@ https://github.com/bkaradzic/bx
 [License (BSD 2-clause)](https://github.com/bkaradzic/bx/blob/master/LICENSE)
 -----------------------------------------------------------------------------
 
-	Copyright 2010-2015 Branimir Karadzic. All rights reserved.
+	Copyright 2010-2016 Branimir Karadzic. All rights reserved.
 	
 	https://github.com/bkaradzic/bx
 	

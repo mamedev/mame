@@ -245,7 +245,8 @@ public:
 		m_acia6850_1(*this, "acia6850_1"),
 		m_acia6850_2(*this, "acia6850_2"),
 		m_upd7759(*this, "upd"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_meters(*this, "meters")
 	{
 	}
 
@@ -316,6 +317,7 @@ public:
 	required_device<acia6850_device> m_acia6850_2;
 	required_device<upd7759_device> m_upd7759;
 	required_device<palette_device> m_palette;
+	required_device<meters_device> m_meters;
 };
 
 
@@ -1420,7 +1422,7 @@ WRITE8_MEMBER(bfcobra_state::meter_w)
 	{
 		if (changed & (1 << i))
 		{
-			MechMtr_update(i, data & (1 << i) );
+			m_meters->update(i, data & (1 << i) );
 			space.device().execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 		}
 	}
@@ -1766,6 +1768,9 @@ static MACHINE_CONFIG_START( bfcobra, bfcobra_state )
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) // What are the correct ACIA clocks ?
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bfcobra_state, write_acia_clock))
+
+	MCFG_DEVICE_ADD("meters", METERS, 0)
+	MCFG_METERS_NUMBER(8)
 MACHINE_CONFIG_END
 
 /***************************************************************************

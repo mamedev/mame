@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -19,7 +19,7 @@
 
 #define BGFX_INVALID_HANDLE { bgfx::invalidHandle }
 
-namespace bx { struct ReallocatorI; }
+namespace bx { struct AllocatorI; }
 
 /// BGFX
 namespace bgfx
@@ -275,6 +275,18 @@ namespace bgfx
 		};
 	};
 
+	struct OcclusionQueryResult
+	{
+		enum Enum
+		{
+			Invisible,
+			Visible,
+			NoResult,
+
+			Count
+		};
+	};
+
 	static const uint16_t invalidHandle = UINT16_MAX;
 
 	BGFX_HANDLE(DynamicIndexBufferHandle);
@@ -282,6 +294,7 @@ namespace bgfx
 	BGFX_HANDLE(FrameBufferHandle);
 	BGFX_HANDLE(IndexBufferHandle);
 	BGFX_HANDLE(IndirectBufferHandle);
+	BGFX_HANDLE(OcclusionQueryHandle);
 	BGFX_HANDLE(ProgramHandle);
 	BGFX_HANDLE(ShaderHandle);
 	BGFX_HANDLE(TextureHandle);
@@ -431,21 +444,7 @@ namespace bgfx
 
 		/// Supported functionality.
 		///
-		/// - `BGFX_CAPS_TEXTURE_COMPARE_LEQUAL` - Less equal texture
-		///      compare mode.
-		/// - `BGFX_CAPS_TEXTURE_COMPARE_ALL` - All texture compare modes.
-		/// - `BGFX_CAPS_TEXTURE_3D` - 3D textures.
-		/// - `BGFX_CAPS_VERTEX_ATTRIB_HALF` - AttribType::Half.
-		/// - `BGFX_CAPS_INSTANCING` - Vertex instancing.
-		/// - `BGFX_CAPS_RENDERER_MULTITHREADED` - Renderer on separate
-		///      thread.
-		/// - `BGFX_CAPS_FRAGMENT_DEPTH` - Fragment shader can modify depth
-		///      buffer value (gl_FragDepth).
-		/// - `BGFX_CAPS_BLEND_INDEPENDENT` - Multiple render targets can
-		///      have different blend mode set individually.
-		/// - `BGFX_CAPS_COMPUTE` - Renderer has compute shaders.
-		/// - `BGFX_CAPS_FRAGMENT_ORDERING` - Intel's pixel sync.
-		/// - `BGFX_CAPS_SWAP_CHAIN` - Multiple windows.
+		/// @attention See BGFX_CAPS_* flags at https://bkaradzic.github.io/bgfx/bgfx.html#available-caps
 		///
 		uint64_t supported;
 
@@ -576,10 +575,12 @@ namespace bgfx
 	///
 	struct Stats
 	{
-		uint64_t cpuTime;      //!< CPU frame time.
+		uint64_t cpuTimeBegin; //!< CPU frame begin time.
+		uint64_t cpuTimeEnd;   //!< CPU frame end time.
 		uint64_t cpuTimerFreq; //!< CPU timer frequency.
 
-		uint64_t gpuTime;      //!< GPU frame time.
+		uint64_t gpuTimeBegin; //!< GPU frame begin time.
+		uint64_t gpuTimeEnd;   //!< GPU frame end time.
 		uint64_t gpuTimerFreq; //!< GPU timer frequency.
 	};
 
@@ -737,7 +738,7 @@ namespace bgfx
 	///
 	/// @param[in] _vendorId Vendor PCI id. If set to `BGFX_PCI_ID_NONE` it will select the first
 	///   device.
-	///   - `BGFX_PCI_ID_NONE` - autoselect.
+	///   - `BGFX_PCI_ID_NONE` - auto-select.
 	///   - `BGFX_PCI_ID_AMD` - AMD.
 	///   - `BGFX_PCI_ID_INTEL` - Intel.
 	///   - `BGFX_PCI_ID_NVIDIA` - nVidia.
@@ -750,13 +751,13 @@ namespace bgfx
 	///
 	/// @param[in] _reallocator Custom allocator. When custom allocator is not
 	///   specified, library uses default CRT allocator. The library assumes
-	///   icustom allocator is thread safe.
+	///   custom allocator is thread safe.
 	///
-	/// @returns `true` if initialization is sucessful.
+	/// @returns `true` if initialization is successful.
 	///
 	/// @attention C99 equivalent is `bgfx_init`.
 	///
-	bool init(RendererType::Enum _type = RendererType::Count, uint16_t _vendorId = BGFX_PCI_ID_NONE, uint16_t _deviceId = 0, CallbackI* _callback = NULL, bx::ReallocatorI* _reallocator = NULL);
+	bool init(RendererType::Enum _type = RendererType::Count, uint16_t _vendorId = BGFX_PCI_ID_NONE, uint16_t _deviceId = 0, CallbackI* _callback = NULL, bx::AllocatorI* _reallocator = NULL);
 
 	/// Shutdown bgfx library.
 	///
@@ -1413,7 +1414,7 @@ namespace bgfx
 	///
 	/// @attention Texture must be created with `BGFX_TEXTURE_READ_BACK` flag.
 	/// @attention Availability depends on: `BGFX_CAPS_TEXTURE_READ_BACK`.
-	/// @attention C99 equivalent is `bgfx_read_texture`.
+	/// @attention C99 equivalent is `bgfx_read_frame_buffer`.
 	///
 	void readTexture(FrameBufferHandle _handle, uint8_t _attachment, void* _data);
 
@@ -1479,7 +1480,7 @@ namespace bgfx
 	/// @returns Handle to frame buffer object.
 	///
 	/// @remarks
-	///   Frame buffer cannnot be used for sampling.
+	///   Frame buffer cannot be used for sampling.
 	///
 	/// @attention C99 equivalent is `bgfx_create_frame_buffer_from_nwh`.
 	///
@@ -1529,6 +1530,31 @@ namespace bgfx
 	///
 	void destroyUniform(UniformHandle _handle);
 
+	/// Create occlusion query.
+	///
+	/// @returns Handle to occlusion query object.
+	///
+	/// @attention C99 equivalent is `bgfx_create_occlusion_query`.
+	///
+	OcclusionQueryHandle createOcclusionQuery();
+
+	/// Retrieve occlusion query result from previous frame.
+	///
+	/// @param[in] _handle Handle to occlusion query object.
+	/// @returns Occlusion query result.
+	///
+	/// @attention C99 equivalent is `bgfx_get_result`.
+	///
+	OcclusionQueryResult::Enum getResult(OcclusionQueryHandle _handle);
+
+	/// Destroy occlusion query.
+	///
+	/// @param[in] _handle Handle to occlusion query object.
+	///
+	/// @attention C99 equivalent is `bgfx_destroy_occlusion_query`.
+	///
+	void destroyOcclusionQuery(OcclusionQueryHandle _handle);
+
 	/// Set palette color value.
 	///
 	/// @param[in] _index Index into palette.
@@ -1566,11 +1592,11 @@ namespace bgfx
 	///
 	///   In graphics debugger view name will appear as:
 	///
-	///     "nnnce <view name>"
-	///      ^  ^^ ^
-	///      |  |+-- eye (L/R)
-	///      |  +-- compute (C)
-	///      +-- view id
+	///       "nnnce <view name>"
+	///        ^  ^^ ^
+	///        |  |+-- eye (L/R)
+	///        |  +--- compute (C)
+	///        +------ view id
 	///
 	/// @attention C99 equivalent is `bgfx_set_view_name`.
 	///
@@ -1588,6 +1614,7 @@ namespace bgfx
 	///
 	void setViewRect(uint8_t _id, uint16_t _x, uint16_t _y, uint16_t _width, uint16_t _height);
 
+    /// @attention C99 equivalent is `bgfx_set_view_rect_auto`.
 	///
 	void setViewRect(uint8_t _id, uint16_t _x, uint16_t _y, BackbufferRatio::Enum _ratio);
 
@@ -1728,6 +1755,15 @@ namespace bgfx
 	/// @attention C99 equivalent is `bgfx_set_state`.
 	///
 	void setState(uint64_t _state, uint32_t _rgba = 0);
+
+	/// Set condition for rendering.
+	///
+	/// @param[in] _handle Occlusion query handle.
+	/// @param[in] _visible Render if occlusion query is visible.
+	///
+	/// @attention C99 equivalent is `bgfx_set_condition`.
+	///
+	void setCondition(OcclusionQueryHandle _handle, bool _visible);
 
 	/// Set stencil test state.
 	///
@@ -1946,19 +1982,31 @@ namespace bgfx
 	/// Submit primitive for rendering.
 	///
 	/// @param[in] _id View id.
-	/// @param[in] _handle Program.
+	/// @param[in] _program Program.
 	/// @param[in] _depth Depth for sorting.
 	/// @returns Number of draw calls.
 	///
 	/// @attention C99 equivalent is `bgfx_submit`.
 	///
-	uint32_t submit(uint8_t _id, ProgramHandle _handle, int32_t _depth = 0);
+	uint32_t submit(uint8_t _id, ProgramHandle _program, int32_t _depth = 0);
+
+	/// Submit primitive with occlusion query for rendering.
+	///
+	/// @param[in] _id View id.
+	/// @param[in] _program Program.
+	/// @param[in] _occlusionQuery Occlusion query.
+	/// @param[in] _depth Depth for sorting.
+	/// @returns Number of draw calls.
+	///
+	/// @attention C99 equivalent is `bgfx_submit_occlusion_query.
+	///
+	uint32_t submit(uint8_t _id, ProgramHandle _program, OcclusionQueryHandle _occlusionQuery, int32_t _depth = 0);
 
 	/// Submit primitive for rendering with index and instance data info from
 	/// indirect buffer.
 	///
 	/// @param[in] _id View id.
-	/// @param[in] _handle Program.
+	/// @param[in] _program Program.
 	/// @param[in] _indirectHandle Indirect buffer.
 	/// @param[in] _start First element in indirect buffer.
 	/// @param[in] _num Number of dispatches.
@@ -1966,7 +2014,7 @@ namespace bgfx
 	///
 	/// @attention C99 equivalent is `bgfx_submit_indirect`.
 	///
-	uint32_t submit(uint8_t _id, ProgramHandle _handle, IndirectBufferHandle _indirectHandle, uint16_t _start = 0, uint16_t _num = 1, int32_t _depth = 0);
+	uint32_t submit(uint8_t _id, ProgramHandle _program, IndirectBufferHandle _indirectHandle, uint16_t _start = 0, uint16_t _num = 1, int32_t _depth = 0);
 
 	/// Set compute index buffer.
 	///
