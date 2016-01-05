@@ -11130,6 +11130,10 @@ photoply
 supercrd        // (c) 1992 Fun World
 fruitstr        // (c) 1992 Fun World
 
+// with 2nd set of hardware on PCB for stealth purposes
+royalcrd_nes
+royalcrd_msx
+
 // Sandii'
 snookr10        // (c) 1998 Sandii'
 apple10         // (c) 1998 Sandii'
