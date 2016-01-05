@@ -255,9 +255,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
 	DECLARE_READ8_MEMBER(mc6845_videoram_r);
 	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(paletb_w);
-	DECLARE_WRITE8_MEMBER(paletr_w);
-	DECLARE_WRITE8_MEMBER(paletg_w);
+	DECLARE_WRITE8_MEMBER(palet_w);
 	DECLARE_WRITE8_MEMBER(priority_w);
 	DECLARE_WRITE8_MEMBER(pcg_w);
 	DECLARE_WRITE8_MEMBER(pcgg_w);
@@ -284,7 +282,7 @@ public:
 private:
 	UINT8 *m_p_ram;
 	UINT8 m_ipl;
-	UINT8 m_GMODE;
+	UINT8 m_palet[3];
 	UINT16 m_page;
 	UINT16 m_pcg_addr;
 	attotime m_time;
@@ -292,7 +290,6 @@ private:
 	bool m_double_mode;
 	bool m_p5bit;
 	bool m_motor;
-	UINT8 m_palette_b, m_palette_g, m_palette_r;
 	UINT8 m_crtc_vreg[0x100];
 	bool m_centronics_busy;
 	virtual void machine_start() override;
@@ -476,20 +473,10 @@ WRITE8_MEMBER( spc1500_state::priority_w)
 	m_priority = data;
 }
 
-WRITE8_MEMBER( spc1500_state::paletg_w)
+WRITE8_MEMBER( spc1500_state::palet_w)
 {
-	m_palette_g = data;
-}
-
-WRITE8_MEMBER( spc1500_state::paletb_w)
-{
-	m_palette_b = data;
-}
-
-WRITE8_MEMBER( spc1500_state::paletr_w)
-{
-	m_palette_r = data;
-	printf("palet:0x%02x, 0x%02x, 0x%02x\n", m_palette_g, m_palette_b, m_palette_r);
+	m_palet[(offset>>8)&0x0f] = data;
+	printf("palet:0x%02x, 0x%02x, 0x%02x\n", m_palet[0], m_palet[1], m_palet[2]);
 }
 
 PALETTE_INIT_MEMBER(spc1500_state,spc)
@@ -533,7 +520,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	bool ln400 = (hs == 4 && m_crtc_vreg[0x4] > 20);
 	for (i = 0; i < x_count; i++)
 	{
-		UINT8 *pp = &m_p_videoram[0x2000+((y>>(ln400 ? 4 : 3)))*x_count+(((ln400?y/2:y)&7)<<11)+i];
+		UINT8 *pp = &m_p_videoram[0x2000+((y>>hs)*x_count+(((y>>(hs-3))&7)<<11))+i];
 		UINT8 *pv = &m_p_videoram[(y>>hs)*x_count + i];
 		UINT8 ascii = *(pv+0x1000);
 		UINT8 attr = *pv;
@@ -543,8 +530,10 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 		UINT8 pixelb = *(pp+0);
 		UINT8 pixelr = *(pp+0x4000);
 		UINT8 pixelg = *(pp+0x8000);
-		UINT8 pen = (((m_palette_g&pal)>0)<<2)|(((m_palette_r&pal)>0)<<1)|(((m_palette_b&pal)>0));
-		UINT32 color = m_palette->pen(ln400 ? rgb : pen);
+		UINT8 pen = (((m_palet[0]&pal)>0)<<2)|(((m_palet[1]&pal)>0)<<1)|(((m_palet[2]&pal)>0));
+		if ((m_palet[0] | m_palet[1] | m_palet[2])==0 || ln400)
+			pen = rgb;
+		UINT32 color = m_palette->pen(pen);
 		UINT8 pixelpen = 0;
 		if (hs == 4 && ascii & 0x80)
 		{
@@ -612,14 +601,12 @@ WRITE8_MEMBER( spc1500_state::double_w)
 		if (offset < 0x4000) { offset += 0x2000; m_p_videoram[offset] = m_p_videoram[offset + 0x4000] = m_p_videoram[offset + 0x8000] = data; } else
 		if (offset < 0x8000) { offset += 0x2000; m_p_videoram[offset + 0x8000] = m_p_videoram[offset + 0x4000] = data; } else
 		if (offset < 0xc000) { offset += 0x2000; m_p_videoram[offset] = m_p_videoram[offset + 0x8000] = data; } else
-		if (offset < 0x10000){ offset += 0x2000; m_p_videoram[offset] = m_p_videoram[offset + 0x4000] = data; }
+		if (offset < 0x10000){ offset += 0x2000; m_p_videoram[offset] = m_p_videoram[offset - 0x4000] = data; }
 	}
 	else
 	{
 		if (offset < 0x1000) {} else
-		if (offset < 0x1100) { paletb_w(space, offset, data); } else
-		if (offset < 0x1200) { paletr_w(space, offset, data); } else
-		if (offset < 0x1300) { paletg_w(space, offset, data); } else
+		if (offset < 0x1300) { palet_w(space, offset, data); } else
 		if (offset < 0x1400) { priority_w(space, offset, data); } else
 		if (offset < 0x1800) { pcg_w(space, offset, data); } else
 		if (offset < 0x1900) { crtc_w(space, offset, data); } else
