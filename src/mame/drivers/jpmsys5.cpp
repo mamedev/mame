@@ -472,29 +472,39 @@ WRITE_LINE_MEMBER(jpmsys5_state::pia_irq)
 
 READ8_MEMBER(jpmsys5_state::u29_porta_r)
 {
-	int combined_meter = m_meters->GetActivity(0) | m_meters->GetActivity(1) |
+	int meter_bit =0;
+	
+	if (m_meters != nullptr)
+	{
+		int combined_meter = m_meters->GetActivity(0) | m_meters->GetActivity(1) |
 							m_meters->GetActivity(2) | m_meters->GetActivity(3) |
 							m_meters->GetActivity(4) | m_meters->GetActivity(5) |
 							m_meters->GetActivity(6) | m_meters->GetActivity(7);
 
-	int meter_bit =0;
-	if(combined_meter)
-	{
-		meter_bit =  0x80;
-	}
-	else
-	{
-		meter_bit =  0x00;
-	}
+		if(combined_meter)
+		{
+			meter_bit =  0x80;
+		}
+		else
+		{
+			meter_bit =  0x00;
+		}
 
-	return m_direct_port->read() | meter_bit;
+		return m_direct_port->read() | meter_bit;
+	}
+	
+	else
+		return m_direct_port->read() | meter_bit;
 }
 
 WRITE8_MEMBER(jpmsys5_state::u29_portb_w)
 {
-	for (int meter = 0; meter < 8; meter ++)
+	if (m_meters != nullptr)
 	{
-		m_meters->update(meter, (data & (1 << meter)));
+		for (int meter = 0; meter < 8; meter ++)
+		{
+			m_meters->update(meter, (data & (1 << meter)));
+		}
 	}
 }
 
