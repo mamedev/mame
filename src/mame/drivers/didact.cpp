@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Joakim Larsson Edstrom
 /*
  * The Didact Esselte 100 CPU board
  *__________________________________________________________________________________________________________
@@ -11,7 +13,7 @@
  *
  * The Didact Mp68A CPU board, by Anders Andersson 1979
  *__________________________________________________________________________________________________________
- *                                                                                                          |
+ *                                       74138                                                              |
  *                 +------+ +-------+     +--+                                                              |
  *                 | 7402 | | 74490 |     |  |      +-------+               +--+                            |
  *      +-------+  +------+ +-------+     |  |      |       |               |  |                            |
@@ -147,7 +149,6 @@ class e100_state : public driver_device
 	required_device<m6802_cpu_device> m_maincpu;
 
 	virtual void machine_reset();
-	DECLARE_DRIVER_INIT(e100);
 protected:
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
@@ -166,7 +167,6 @@ class md6802_state : public driver_device
 	required_device<m6802_cpu_device> m_maincpu;
 
 	virtual void machine_reset();
-	DECLARE_DRIVER_INIT(md6802);
 protected:
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
@@ -206,7 +206,6 @@ class mp68a_state : public driver_device
 
 	required_device<m6800_cpu_device> m_maincpu;
 
-  //bool m_key_pressed;
 	required_ioport m_io_line0;
 	required_ioport m_io_line1;
 	required_ioport m_io_line2;
@@ -226,7 +225,6 @@ class mp68a_state : public driver_device
 	required_device<dm9368_device> m_digit4;
 	required_device<dm9368_device> m_digit5;
 
-  //	emu_timer *m_kbd_timer;
 	DECLARE_READ8_MEMBER( pia2_kbA_r );
 	DECLARE_WRITE8_MEMBER( pia2_kbA_w );
 	DECLARE_READ8_MEMBER( pia2_kbB_r );
@@ -235,7 +233,6 @@ class mp68a_state : public driver_device
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	DECLARE_DRIVER_INIT(mp68a);
 	TIMER_DEVICE_CALLBACK_MEMBER(scan_artwork);
 protected:
 	required_device<pia6820_device> m_pia1;
@@ -516,18 +513,6 @@ static MACHINE_CONFIG_START( mp68a, mp68a_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", mp68a_state, scan_artwork, attotime::from_hz(10))
 
 MACHINE_CONFIG_END
-
-DRIVER_INIT_MEMBER(e100_state, e100)
-{
-}
-
-DRIVER_INIT_MEMBER(md6802_state, md6802)
-{
-}
-
-DRIVER_INIT_MEMBER(mp68a_state, mp68a)
-{
-}
 
 // TODO: Get a ROM set
 ROM_START( e100 )
