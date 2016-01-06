@@ -148,7 +148,6 @@ class e100_state : public driver_device
 	   { }
 	required_device<m6802_cpu_device> m_maincpu;
 
-	virtual void machine_reset();
 protected:
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
@@ -166,7 +165,6 @@ class md6802_state : public driver_device
 	   { }
 	required_device<m6802_cpu_device> m_maincpu;
 
-	virtual void machine_reset();
 protected:
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
@@ -231,7 +229,6 @@ class mp68a_state : public driver_device
 	DECLARE_WRITE8_MEMBER( pia2_kbB_w );
 	DECLARE_READ_LINE_MEMBER( pia2_cb1_r );
 
-	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(scan_artwork);
 protected:
@@ -301,6 +298,7 @@ READ8_MEMBER( mp68a_state::pia2_kbB_r )
 	{
 		pb |= 0x80;	  // Set shift bit (PB7)
 		m_shift = 0;  // Reset flip flop
+		set_led_status(machine(), 0, m_shift);
 		LOG( ("SHIFT is released\n") );
 	}
 
@@ -327,19 +325,6 @@ READ_LINE_MEMBER( mp68a_state::pia2_cb1_r )
 #endif
 
 	return (m_line0 | m_line1 | m_line2 | m_line3) != 0 ? 0 : 1;
-}
-
-void e100_state::machine_reset()
-{
-}
-
-void md6802_state::machine_reset()
-{
-}
-
-void mp68a_state::machine_reset()
-{
-	m_shift = 0;
 }
 
 void mp68a_state::machine_start()
@@ -426,7 +411,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(mp68a_state::scan_artwork)
 	if ( (m_io_line4->read() & 0x04) )
 	{
 		LOG( ("RESET is pressed, resetting the CPU\n") );
+		m_shift = 0;
+		set_led_status(machine(), 0, m_shift);
 		m_maincpu->reset();
+		
 	}
 
 	 // Poll the artwork SHIFT/* key
@@ -434,6 +422,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mp68a_state::scan_artwork)
 	{
 		LOG( ("SHIFT is set\n") );
 		m_shift = 1;
+		set_led_status(machine(), 0, m_shift);
 	}
 }
 
@@ -542,6 +531,6 @@ ROM_START( mp68a ) // ROM image from http://elektronikforumet.com/forum/viewtopi
 ROM_END
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   CLASS            INIT        COMPANY             FULLNAME           FLAGS
-COMP( 1979, mp68a,	    0,          0,      mp68a,      mp68a,  driver_device,   0,          "Didact AB",        "mp68a",           MACHINE_IS_SKELETON )
+COMP( 1979, mp68a,	    0,          0,      mp68a,      mp68a,  driver_device,   0,          "Didact AB",        "mp68a",           0 )
 COMP( 1982, e100,	    0,          0,      e100,       e100,   driver_device,   0,          "Didact AB",        "Esselte 100",     MACHINE_IS_SKELETON )
 COMP( 1983, md6802,	    0,          0,      md6802,     md6802, driver_device,   0,          "Didact AB",        "Mikrodator 6802", MACHINE_IS_SKELETON )
