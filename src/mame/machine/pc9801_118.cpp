@@ -17,7 +17,7 @@
 #include "machine/pic8259.h"
 #include "sound/2608intf.h"
 
-#define MAIN_CLOCK_X1 XTAL_1_9968MHz
+#define MAIN_CLOCK_X2 XTAL_2_4576MHz
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -45,7 +45,7 @@ WRITE_LINE_MEMBER(pc9801_118_device::pc9801_sound_irq)
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_118_config )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("opn3", YM2608, MAIN_CLOCK_X1*4) // actually YMF288, unknown clock / divider
+	MCFG_SOUND_ADD("opn3", YM2608, MAIN_CLOCK_X2*4) // actually YMF288, unknown clock / divider, might be X1 x 5 actually
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(pc9801_118_device, pc9801_sound_irq))
 	MCFG_AY8910_PORT_A_READ_CB(READ8(pc9801_118_device, opn_porta_r))
 	//MCFG_AY8910_PORT_B_READ_CB(READ8(pc9801_state, opn_portb_r))
