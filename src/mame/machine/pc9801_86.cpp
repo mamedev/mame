@@ -306,7 +306,7 @@ int pc9801_86_device::queue_count()
 UINT8 pc9801_86_device::queue_pop()
 {
 	if(!queue_count())
-		return 128;
+		return 0;
 	UINT8 ret = m_queue[m_tail++];
 	m_tail %= QUEUE_SIZE;
 	m_count--;
@@ -323,14 +323,14 @@ void pc9801_86_device::device_timer(emu_timer& timer, device_timer_id id, int pa
 	switch(m_pcm_mode & 0x70)
 	{
 		case 0x70: // 8bit stereo
-			m_dacl->write_signed8(queue_pop() + 128);
-			m_dacr->write_signed8(queue_pop() + 128);
+			m_dacl->write(queue_pop() << 8);
+			m_dacr->write(queue_pop() << 8);
 			break;
 		case 0x60: // 8bit left only
-			m_dacl->write_signed8(queue_pop() + 128);
+			m_dacl->write(queue_pop() << 8);
 			break;
 		case 0x50: // 8bit right only
-			m_dacr->write_signed8(queue_pop() + 128);
+			m_dacr->write(queue_pop() << 8);
 			break;
 		case 0x30: // 16bit stereo
 			lsample = queue_pop();
