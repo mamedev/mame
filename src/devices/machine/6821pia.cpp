@@ -14,7 +14,7 @@
 //  MACROS
 //**************************************************************************
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
