@@ -1835,8 +1835,9 @@ void debug_internal::wait_for_debugger(device_t &device, bool firststop)
 	}
 
 	followers_set_cpu(&device);
-	ui_input_reset(device.machine());
 	debug_show_all();
+	if(firststop)
+		ui_input_reset(device.machine());
 	//ui_update_and_render(device.machine(), device.machine().render().ui_container()());
 	update_views();
 	device.machine().osd().update(false);
