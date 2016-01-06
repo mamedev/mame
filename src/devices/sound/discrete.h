@@ -3742,93 +3742,6 @@ enum
 
 /*************************************
  *
- *  Classes and structs to handle
- *  linked lists.
- *
- *************************************/
-
-/*
- * add and delete may be slow - the focus is on access!
- */
-
-	// TODO: replace with vector from utils
-template<class _ElementType> struct vector_t
-{
-public:
-	vector_t(int initial) {
-		m_count = 0;
-		m_allocated = initial;
-		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
-	}
-	vector_t()  {
-		m_count = 0;
-		m_allocated = 16;
-		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
-	}
-	~vector_t() {
-		global_free_array(m_arr);
-	}
-	_ElementType& operator [] (unsigned int index) const // get array item
-	{
-		return m_arr[index];
-	}
-
-	vector_t(const vector_t &a)  // copy constructor
-	{
-		m_allocated = a.count();
-		if (m_allocated < 16)
-			m_allocated = 16;
-		m_count = a.count();
-		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
-		for (int i=0; i < m_count; i++)
-			m_arr[i] = a[i];
-	}
-	vector_t& operator = (const vector_t &a) // assignment operator
-	{
-		if (this == &a) return *this;
-		m_allocated = a.count();
-		if (m_allocated < 16)
-			m_allocated = 16;
-		m_count = a.count();
-		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
-		for (int i=0; i < m_count; i++)
-			m_arr[i] = a[i];
-		return *this;
-	}
-
-	inline _ElementType* add(_ElementType object)
-	{
-		if (m_count >= m_allocated)
-		{
-			m_allocated *= 2;
-			auto  newarr = global_alloc_array_clear(_ElementType, m_allocated);
-			for (int i=0; i < m_count; i++)
-				newarr[i] = m_arr[i];
-			global_free_array(m_arr);
-			m_arr = newarr;
-		}
-		m_arr[m_count] = object;
-		m_count++;
-		return &m_arr[m_count-1];
-	}
-	inline void remove(int index)
-	{
-		for (int i=index+1; i < m_count; i++)
-			m_arr[i-1] = m_arr[i];
-		m_count--;
-	}
-	inline void clear(void) { m_count = 0;  }
-	inline int count(void) const { return m_count; }
-	inline _ElementType *begin_ptr(void) const { return m_arr; }
-	inline _ElementType *end_ptr(void) const { return m_arr + (m_count - 1); }
-private:
-	_ElementType    *m_arr;
-	int m_count;
-	int m_allocated;
-};
-
-/*************************************
- *
  *  Node-specific struct types
  *
  *************************************/
@@ -4185,9 +4098,9 @@ class discrete_task;
 class discrete_base_node;
 class discrete_dss_input_stream_node;
 class discrete_device;
-typedef vector_t<discrete_base_node *> node_list_t;
-typedef vector_t<discrete_dss_input_stream_node *> istream_node_list_t;
-typedef vector_t<discrete_task *> task_list_t;
+using node_list_t = std::vector<discrete_base_node *>;
+using istream_node_list_t = std::vector<discrete_dss_input_stream_node *>;
+using task_list_t = std::vector<discrete_task *>;
 
 
 /*************************************
@@ -4216,7 +4129,7 @@ struct discrete_block
 	const char *    name;                           /* Node Name */
 	const char *    mod_name;                       /* Module / class name */
 };
-typedef vector_t<const discrete_block *> sound_block_list_t;
+typedef std::vector<const discrete_block *> sound_block_list_t;
 
 /*************************************
  *
@@ -4233,7 +4146,7 @@ public:
 	osd_ticks_t         run_time;
 	discrete_base_node *    self;
 };
-typedef vector_t<discrete_step_interface *> node_step_list_t;
+typedef std::vector<discrete_step_interface *> node_step_list_t;
 
 class discrete_input_interface
 {
@@ -4271,7 +4184,7 @@ public:
 //**************************************************************************
 
 class discrete_sound_output_interface;
-typedef vector_t<discrete_sound_output_interface *> node_output_list_t;
+typedef std::vector<discrete_sound_output_interface *> node_output_list_t;
 
 
 // ======================> discrete_device
