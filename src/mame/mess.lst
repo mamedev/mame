@@ -2005,8 +2005,9 @@ pcm   // PC/M Mugler
 pecom32
 pecom64
 
-// Samsung SPC-1000
+// Samsung Electronics
 spc1000
+spc1500
 
 // PolyMorphic Systems
 poly88
