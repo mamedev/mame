@@ -5,6 +5,7 @@
   TMS0980/TMS1000-family MCU cores
 
   TODO:
+  - fix TMS0950 (opcode related?)
   - emulate TMS1600 L-pins
   - fix debugger disasm view
 
@@ -166,26 +167,30 @@ const device_type TMS1670 = &device_creator<tms1670_cpu_device>; // high voltage
 // - 2048x9bit ROM array at the bottom-left
 // - main instructions PLA at the top half, to the right of the midline
 // - 64-term microinstructions PLA between the RAM and ROM, supporting 20 microinstructions
-// - 16-term output PLA and segment PLA above the RAM (rotate opla 90 degrees)
+// - 16-term inverted output PLA and segment PLA above the RAM (rotate opla 90 degrees)
 const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 9 R pins
 
 // TMS1980 is a TMS0980 with a TMS1x00 style opla
-// - RAM, ROM, and main instructions PLA is exactly the same as TMS0980
+// - RAM, ROM, and main instructions PLA is the same as TMS0980
 // - one of the microinstructions redirects to a RSTR instruction, like on TMS0270
-// - 32-term output PLA above the RAM, 7 bits! (rotate opla 270 degrees)
+// - 32-term inverted output PLA above the RAM, 7 bits! (rotate opla 270 degrees)
 const device_type TMS1980 = &device_creator<tms1980_cpu_device>; // 28-pin DIP, 7 O pins, 10 R pins, high voltage
 
+// TMS0950 is a TMS1000 with a TMS0980 style opla, it was quickly succeeded by the TMS0970
+// - RAM, ROM, microinstructions is the same as TMS1000
+// - 10-term inverted output PLA and segment PLA on the top-left
+const device_type TMS0950 = &device_creator<tms0950_cpu_device>; // 28-pin DIP, 8 O pins, 11? R pins
+
 // TMS0970 is a stripped-down version of the TMS0980, itself acting more like a TMS1000
-// - RAM and ROM is exactly the same as TMS1000
+// - RAM and ROM is the same as TMS1000
 // - main instructions PLA at the top half, to the right of the midline
 // - 32-term microinstructions PLA between the RAM and ROM, supporting 15 microinstructions
-// - 16-term output PLA and segment PLA above the RAM (rotate opla 90 degrees)
+// - 16-term inverted output PLA and segment PLA above the RAM (rotate opla 90 degrees)
 const device_type TMS0970 = &device_creator<tms0970_cpu_device>; // 28-pin DIP, 11 R pins (note: pinout may slightly differ from chip to chip)
 const device_type TMS1990 = &device_creator<tms1990_cpu_device>; // 28-pin DIP, ? R pins..
-// TMS0950 is same?
 
 // TMS0270 on the other hand, is a TMS0980 with earrings and a new hat. The new changes look like a quick afterthought, almost hacky
-// - RAM, ROM, and main instructions PLA is exactly the same as TMS0980
+// - RAM, ROM, and main instructions PLA is the same as TMS0980
 // - 64-term microinstructions PLA between the RAM and ROM, supporting 20 microinstructions plus optional separate lines for custom opcode handling
 // - 48-term output PLA above the RAM (rotate opla 90 degrees)
 const device_type TMS0270 = &device_creator<tms0270_cpu_device>; // 40-pin DIP, 16 O pins, 8+ R pins (some R pins are internally hooked up to support more I/O)
@@ -302,6 +307,10 @@ tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, device_typ
 	: tms1000_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
 { }
 
+tms0950_cpu_device::tms0950_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms0970_cpu_device(mconfig, TMS0950, "TMS0950", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms0950", __FILE__)
+{ }
+
 tms1990_cpu_device::tms1990_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms0970_cpu_device(mconfig, TMS1990, "TMS1990", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1990", __FILE__)
 { }
@@ -356,6 +365,23 @@ MACHINE_CONFIG_END
 machine_config_constructor tms1400_cpu_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME(tms1400);
+}
+
+
+static MACHINE_CONFIG_FRAGMENT(tms0950)
+
+	// microinstructions PLA, output PLA, segment PLA
+	MCFG_PLA_ADD("mpla", 8, 16, 30)
+	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
+	MCFG_PLA_ADD("opla", 4, 8, 10)
+	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
+	MCFG_PLA_ADD("spla", 3, 8, 8)
+	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
+MACHINE_CONFIG_END
+
+machine_config_constructor tms0950_cpu_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME(tms0950);
 }
 
 
@@ -1243,7 +1269,7 @@ void tms0970_cpu_device::op_setr()
 {
 	// SETR: set output register
 	// DDIG line is a coincidence between the selected output pla row(s) and segment pla row(s)
-	int ddig = (m_opla->read(m_a) & m_o) ? 0 : 1;
+	int ddig = (m_opla->read(m_a) & m_o) ? 1 : 0;
 	m_r = (m_r & ~(1 << m_y)) | (ddig << m_y);
 }
 

@@ -12,6 +12,7 @@
 
 
   TODO:
+  - TI-1250 doesn't work right
   - MCU clocks are unknown where noted
 
 ***************************************************************************/
@@ -20,6 +21,7 @@
 
 // internal artwork
 #include "dataman.lh"
+#include "ti1250.lh"
 #include "ti1270.lh"
 #include "ti30.lh"
 #include "tisr16.lh"
@@ -54,12 +56,13 @@ void ticalc1x_state::machine_start()
 
 /***************************************************************************
 
-  TI SR-16, SR-16 II
-  * SR-16: TMS1000 MCU labeled TMS1001NL (die labeled 1000, 1001A)
-  * SR-16 II: TMS1000 MCU labeled TMS1016NL (die labeled 1000B, 1016A)
+  TI SR-16 (1974, first consumer product with TMS1000 series MCU)
+  * TMS1000 MCU labeled TMS1001NL (die labeled 1000, 1001A)
   * 12-digit 7seg LED display
-
-  SR-16 II is a cost-reduced 'sequel', [10^x] was removed, and [pi] was added.
+  
+  TI SR-16 II (1975 version)
+  * TMS1000 MCU labeled TMS1016NL (die labeled 1000B, 1016A)
+  * notes: cost-reduced 'sequel', [10^x] was removed, and [pi] was added.
 
 ***************************************************************************/
 
@@ -184,7 +187,6 @@ static INPUT_PORTS_START( tisr16 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( tisr16ii )
 	PORT_START("IN.0") // R0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -253,7 +255,6 @@ static INPUT_PORTS_START( tisr16ii )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 INPUT_PORTS_END
 
-
 static MACHINE_CONFIG_START( tisr16, tisr16_state )
 
 	/* basic machine hardware */
@@ -274,16 +275,33 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  TI-1250/TI-1200 (1975 version), Spirit of '76
+  * TMS0950 MCU labeled TMC0952NL, K0952 (die labeled 0950A 0952)
+  * 9-digit 7seg LED display
+
+  TI-1250/TI-1200 (1976 version), TI-1400, TI-1450, TI-1205, TI-1255, LADY 1200, ABLE
+  * TMS0970 MCU labeled TMS0972NL ZA0348, JP0972A (die labeled 0970D-72A)
+  * 8-digit 7seg LED display, or 9 digits with leftmost unused
+  
+  As seen listed above, the basic 4-function TMS0972 calculator MCU was used
+  in many calculators. It was licensed to other manufacturers too, one funny
+  example being a Mattel Barbie handheld calculator.
+  
+  Some cheaper models lacked the memory buttons (the function itself still works).
+  The ABLE series was for educational purposes, with each having a small subset of
+  available buttons.
+
   TI-1270
   * TMS0970 MCU labeled TMC0974NL ZA0355, DP0974A (die labeled 0970D-74A)
   * 8-digit 7seg LED display
+  * notes: almost same hardware as TMS0972 TI-1250, minor scientific functions
 
 ***************************************************************************/
 
-class ti1270_state : public ticalc1x_state
+class ti1250_state : public ticalc1x_state
 {
 public:
-	ti1270_state(const machine_config &mconfig, device_type type, const char *tag)
+	ti1250_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
@@ -294,13 +312,16 @@ public:
 
 // handlers
 
-WRITE16_MEMBER(ti1270_state::write_r)
+WRITE16_MEMBER(ti1250_state::write_r)
 {
-	// R0-R7: select digit (right-to-left)
-	display_matrix_seg(8, 8, m_o, data, 0xff);
+	// R8 only has segment G connected
+	m_display_segmask[8] = 0x40;
+
+	// R0-R7(,R8): select digit (right-to-left)
+	display_matrix_seg(9, 8, m_o, data, 0xff);
 }
 
-WRITE16_MEMBER(ti1270_state::write_o)
+WRITE16_MEMBER(ti1250_state::write_o)
 {
 	// O1-O5,O7: input mux
 	// O0-O7: digit segments
@@ -308,7 +329,7 @@ WRITE16_MEMBER(ti1270_state::write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(ti1270_state::read_k)
+READ8_MEMBER(ti1250_state::read_k)
 {
 	// K: multiplexed inputs
 	return read_inputs(6);
@@ -317,9 +338,9 @@ READ8_MEMBER(ti1270_state::read_k)
 
 // config
 
-static INPUT_PORTS_START( ti1270 )
+static INPUT_PORTS_START( ti1250 )
 	PORT_START("IN.0") // O1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("CE/C")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
@@ -343,30 +364,59 @@ static INPUT_PORTS_START( ti1270 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
 
 	PORT_START("IN.4") // O5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("STO")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_NAME("RCL")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_NAME(UTF8_SMALL_PI)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("C")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("CS") // named either CS(Change Sign) or +/-
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 
 	PORT_START("IN.5") // O7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_NAME("MC")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_NAME("MR")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_INSERT) PORT_NAME("M-")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("M+")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ti1270 )
+	PORT_INCLUDE( ti1250 )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("CE/C")
+
+	PORT_MODIFY("IN.4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("STO")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_NAME("RCL")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_NAME(UTF8_SMALL_PI)
+
+	PORT_MODIFY("IN.5")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ti1270, ti1270_state )
+static MACHINE_CONFIG_START( ti1250, ti1250_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // guessed
-	MCFG_TMS1XXX_READ_K_CB(READ8(ti1270_state, read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ti1270_state, write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ti1270_state, write_r))
+	MCFG_CPU_ADD("maincpu", TMS0950, 200000) // RC osc. R=68K, C=68pf -> ~200kHz
+	MCFG_TMS1XXX_READ_K_CB(READ8(ti1250_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ti1250_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ti1250_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ti1270)
+	MCFG_DEFAULT_LAYOUT(layout_ti1250)
 
 	/* no sound! */
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( ti1270, ti1250 )
+
+	/* basic machine hardware */
+	MCFG_CPU_REPLACE("maincpu", TMS0970, 250000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(ti1250_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ti1250_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ti1250_state, write_r))
+
+	MCFG_DEFAULT_LAYOUT(layout_ti1270)
 MACHINE_CONFIG_END
 
 
@@ -375,9 +425,12 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  TI-1000
+  TI-1000 (1977 version)
   * TMS1990 MCU labeled TMC1991NL (die labeled 1991-91A)
   * 8-digit 7seg LED display
+
+  TI-1000 (1978 version)
+  * TMS1990 MCU labeled TMC1992-4NL **not dumped yet
 
 ***************************************************************************/
 
@@ -455,7 +508,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( ti1000, ti1000_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // guessed
+	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // approximation
 	MCFG_TMS1XXX_READ_K_CB(READ8(ti1000_state, read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ti1000_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ti1000_state, write_r))
@@ -554,7 +607,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( wizatron, wizatron_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // guessed
+	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // approximation
 	MCFG_TMS1XXX_READ_K_CB(READ8(wizatron_state, read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(wizatron_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(wizatron_state, write_r))
@@ -628,7 +681,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( lilprof, lilprof_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // guessed
+	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // approximation
 	MCFG_TMS1XXX_READ_K_CB(READ8(lilprof_state, read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(lilprof_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(wizatron_state, write_r))
@@ -741,7 +794,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( lilprof78, lilprof78_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // guessed
+	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // approximation
 	MCFG_TMS1XXX_READ_K_CB(READ8(lilprof78_state, read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(lilprof78_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(lilprof78_state, write_r))
@@ -870,10 +923,10 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Majestic-line calculators:
-  * TI-30(aka SR-40): TMS0980 MCU labeled TMC0981NL (die labeled 0980B-81F)
-  * TI Programmer: TMS0980 MCU labeled ZA0675NL, JP0983AT (die labeled 0980B-83)
-  * TI Business Analyst-I: TMS0980 MCU labeled TMC0982NL (die labeled 0980B-82F)
+  TMC098x series Majestic-line calculators
+
+  TI-30, SR-40, TI-15(less buttons) and several by Koh-I-Noor
+  * TMS0980 MCU labeled TMC0981NL (die labeled 0980B-81F)
   * 9-digit 7seg LED display
 
   Of note is a peripheral by Schoenherr, called the Braillotron. It acts as
@@ -881,12 +934,18 @@ MACHINE_CONFIG_END
   refreshable Braille cells. The TI-30 itself is slightly modified to wire
   the original LED display to a 25-pin D-Sub connector.
 
+  TI Business Analyst, TI Business Analyst-I, TI Money Manager, TI-31, TI-41
+  * TMS0980 MCU labeled TMC0982NL (die labeled 0980B-82F)
+
+  TI Programmer
+  * TMS0980 MCU labeled ZA0675NL, JP0983AT (die labeled 0980B-83)
+
 ***************************************************************************/
 
-class majestic_state : public ticalc1x_state
+class ti30_state : public ticalc1x_state
 {
 public:
-	majestic_state(const machine_config &mconfig, device_type type, const char *tag)
+	ti30_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
@@ -897,9 +956,9 @@ public:
 
 // handlers
 
-WRITE16_MEMBER(majestic_state::write_r)
+WRITE16_MEMBER(ti30_state::write_r)
 {
-	// note: 1st digit only has segments B,F,G,DP
+	// 1st digit only has segments B,F,G,DP
 	m_display_segmask[0] = 0xe2;
 
 	// R0-R8: select digit
@@ -907,7 +966,7 @@ WRITE16_MEMBER(majestic_state::write_r)
 	display_matrix_seg(8, 9, o, data, 0xff);
 }
 
-WRITE16_MEMBER(majestic_state::write_o)
+WRITE16_MEMBER(ti30_state::write_o)
 {
 	// O0-O2,O4-O7: input mux
 	// O0-O7: digit segments
@@ -915,7 +974,7 @@ WRITE16_MEMBER(majestic_state::write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(majestic_state::read_k)
+READ8_MEMBER(ti30_state::read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inp_matrix[7]->read() | read_inputs(7);
@@ -983,7 +1042,6 @@ static INPUT_PORTS_START( ti30 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( tiprog )
 	PORT_START("IN.0") // O0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_NAME("K")
@@ -1043,8 +1101,7 @@ static INPUT_PORTS_START( tiprog )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
-
-static INPUT_PORTS_START( tibusan1 )
+static INPUT_PORTS_START( tibusan )
 	// PORT_NAME lists functions under [2nd] as secondaries.
 	PORT_START("IN.0") // O0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME("y" UTF8_POW_X"  " UTF8_POW_X"" UTF8_SQUAREROOT"y") // 2nd one implies xth root of y
@@ -1104,14 +1161,13 @@ static INPUT_PORTS_START( tibusan1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( majestic, majestic_state )
+static MACHINE_CONFIG_START( ti30, ti30_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0980, 400000) // guessed
-	MCFG_TMS1XXX_READ_K_CB(READ8(majestic_state, read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(majestic_state, write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(majestic_state, write_r))
+	MCFG_TMS1XXX_READ_K_CB(READ8(ti30_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ti30_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ti30_state, write_r))
 	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
@@ -1152,18 +1208,45 @@ ROM_START( tisr16ii )
 ROM_END
 
 
-ROM_START( ti1270 )
+ROM_START( ti1250 )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "za0355", 0x0000, 0x0400, CRC(48e09b4b) SHA1(17f27167164df223f9f06082ece4c3fc3900eda3) )
+	ROM_LOAD( "tmc0952nl", 0x0000, 0x0400, CRC(fc0cee65) SHA1(1480e4553181f081281d3b78457721b9ecb20173) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ti1250_micro.pla", 0, 867, CRC(60106ee3) SHA1(70f914056238a93a6718f26f8591dbd18c25d7f5) )
+	ROM_REGION( 195, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0950_ti1250_output.pla", 0, 195, CRC(31570eb8) SHA1(c1cb17c31367b65aa777925459515c3d5c565508) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+ROM_START( ti125076 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms0972nl_za0348", 0x0000, 0x0400, CRC(6e3f8add) SHA1(a249209e2a92f5016e33b7ad2c6c2660df1df959) )
 
 	ROM_REGION( 782, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
 	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_ti1270_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
+	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0970_ti1270_output.pla", 0, 352, CRC(f39bf0a4) SHA1(160341490043eb369720d5f487cf0f59f458a93e) )
+	ROM_LOAD( "tms0980_ti1270_output.pla", 0, 352, CRC(472f95a0) SHA1(32adb17285f2f3f93a4b027a3dd2156ec48000ec) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0970_common2_segment.pla", 0, 157, CRC(56c37a4f) SHA1(18ecc20d2666e89673739056483aed5a261ae927) )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
+ROM_END
+
+
+ROM_START( ti1270 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc0974nl_za0355", 0x0000, 0x0400, CRC(48e09b4b) SHA1(17f27167164df223f9f06082ece4c3fc3900eda3) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_ti1270_output.pla", 0, 352, CRC(472f95a0) SHA1(32adb17285f2f3f93a4b027a3dd2156ec48000ec) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
 ROM_END
 
 
@@ -1174,41 +1257,41 @@ ROM_START( ti1000 )
 	ROM_REGION( 782, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
 	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
+	ROM_LOAD( "tms0970_common2_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0970_ti1000_output.pla", 0, 352, CRC(1d82061a) SHA1(90e4a4b0fb3b4ae5965da90479b7fed737ad8831) )
+	ROM_LOAD( "tms0980_ti1000_output.pla", 0, 352, CRC(a936631e) SHA1(1f900b12a41419d6e1ffbddd5cf72be3adaa4435) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0970_ti1000_segment.pla", 0, 157, CRC(234ca3a8) SHA1(76844dd87cb380a07c8fcbef143038087e98f138) )
+	ROM_LOAD( "tms0980_common3_segment.pla", 0, 157, CRC(b5b3153f) SHA1(e0145c729695a4f962970aee0571d42cee6f5a9e) )
 ROM_END
 
 
 ROM_START( wizatron )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "za0379", 0x0000, 0x0400, CRC(5a6af094) SHA1(b1f27e1f13f4db3b052dd50fb08dbf9c4d8db26e) )
+	ROM_LOAD( "tmc0907nl_za0379", 0x0000, 0x0400, CRC(5a6af094) SHA1(b1f27e1f13f4db3b052dd50fb08dbf9c4d8db26e) )
 
 	ROM_REGION( 782, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
 	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
+	ROM_LOAD( "tms0970_common2_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0970_wizatron_output.pla", 0, 352, CRC(745a3900) SHA1(031b55a0cf783c8a88eec4289d4373eb8538f374) )
+	ROM_LOAD( "tms0980_wizatron_output.pla", 0, 352, CRC(c0ee5c04) SHA1(e9fadcef688309adbe6c1c0545aac6883ce4a1ac) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0970_common2_segment.pla", 0, 157, CRC(56c37a4f) SHA1(18ecc20d2666e89673739056483aed5a261ae927) )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
 ROM_END
 
 
 ROM_START( lilprof )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "za0356", 0x0000, 0x0400, CRC(fef9dd39) SHA1(5c9614c9c5092d55dabeee2d6e0387d50d6ad4d5) )
+	ROM_LOAD( "tms0975nl_za0356", 0x0000, 0x0400, CRC(fef9dd39) SHA1(5c9614c9c5092d55dabeee2d6e0387d50d6ad4d5) )
 
 	ROM_REGION( 782, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
 	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_lilprof_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
+	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(6ff5d51d) SHA1(59d3e5de290ba57694068ddba78d21a0c1edf427) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0970_lilprof_output.pla", 0, 352, CRC(c74daf97) SHA1(c4948000196171b34d4fe9cdd2962a945da9883d) )
+	ROM_LOAD( "tms0980_lilprof_output.pla", 0, 352, CRC(73f9ca93) SHA1(9d6c559e2c1886c62bcd57e3c3aa897e8829b4d2) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0970_common2_segment.pla", 0, 157, CRC(56c37a4f) SHA1(18ecc20d2666e89673739056483aed5a261ae927) )
+	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
 ROM_END
 
 ROM_START( lilprof78 )
@@ -1218,17 +1301,17 @@ ROM_START( lilprof78 )
 	ROM_REGION( 782, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0970_common1_instr.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
 	ROM_REGION( 860, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0970_common1_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
+	ROM_LOAD( "tms0970_common2_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0970_lilprof78_output.pla", 0, 352, CRC(03f509c4) SHA1(691554a55db0c5950df848077095f23a991b1909) )
+	ROM_LOAD( "tms0980_lilprof78_output.pla", 0, 352, CRC(b7416cc0) SHA1(57891ffeaf34aafe8a915086c6d2feb78f5113af) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
-	ROM_LOAD( "tms0970_lilprof78_segment.pla", 0, 157, CRC(234ca3a8) SHA1(76844dd87cb380a07c8fcbef143038087e98f138) )
+	ROM_LOAD( "tms0980_common3_segment.pla", 0, 157, CRC(b5b3153f) SHA1(e0145c729695a4f962970aee0571d42cee6f5a9e) )
 ROM_END
 
 
 ROM_START( dataman )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD16_WORD( "tmc1982nl", 0x0000, 0x1000, CRC(3521f53f) SHA1(c46fe7fe20715fdf5aed65833fb867cfd3938062) ) // it matches with source code in patent US4340374
+	ROM_LOAD16_WORD( "tmc1982nl", 0x0000, 0x1000, CRC(3521f53f) SHA1(c46fe7fe20715fdf5aed65833fb867cfd3938062) ) // matches patent US4340374
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
@@ -1248,13 +1331,13 @@ ROM_START( ti30 )
 	ROM_REGION( 1982, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0980_common1_micro.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_ti30_output.pla", 0, 352, CRC(38788410) SHA1(cb3d1a61190b887cd2e6d9c60b4fdb9b901f7eed) )
+	ROM_LOAD( "tms0980_ti30_output.pla", 0, 352, CRC(00475f99) SHA1(70e04c1472639bd35d4adaab0b9f1ae4a0e394be) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
 ROM_END
 
 
-ROM_START( tibusan1 )
+ROM_START( tibusan )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "tmc0982nl", 0x0000, 0x1000, CRC(6954560a) SHA1(6c153a0c9239a811e3514a43d809964c06f8f88e) )
 
@@ -1263,7 +1346,7 @@ ROM_START( tibusan1 )
 	ROM_REGION( 1982, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0980_common1_micro.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_tibusan1_output.pla", 0, 352, CRC(38788410) SHA1(cb3d1a61190b887cd2e6d9c60b4fdb9b901f7eed) )
+	ROM_LOAD( "tms0980_ti30_output.pla", 0, 352, CRC(00475f99) SHA1(70e04c1472639bd35d4adaab0b9f1ae4a0e394be) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
 ROM_END
@@ -1271,14 +1354,14 @@ ROM_END
 
 ROM_START( tiprog )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD16_WORD( "za0675nl", 0x0000, 0x1000, CRC(82355854) SHA1(03fab373bce04df8ea3fe25352525e8539213626) )
+	ROM_LOAD16_WORD( "za0675nl", 0x0000, 0x1000, CRC(82355854) SHA1(03fab373bce04df8ea3fe25352525e8539213626) ) // tmc0983
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 1982, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0980_tiprog_micro.pla", 0, 1982, CRC(57043284) SHA1(0fa06d5865830ecdb3d870271cb92ac917bed3ca) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_tiprog_output.pla", 0, 352, BAD_DUMP CRC(2a63956f) SHA1(26a62ca2b5973d8564e580e12230292f6d2888d9) ) // corrected by hand
+	ROM_LOAD( "tms0980_tiprog_output.pla", 0, 352, BAD_DUMP CRC(125c4ee6) SHA1(b8d865c42fd37c3d9b92c5edbecfc831be558597) ) // corrected by hand
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0980_common1_segment.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
 ROM_END
@@ -1289,14 +1372,17 @@ ROM_END
 COMP( 1974, tisr16,    0,        0, tisr16,    tisr16,    driver_device, 0, "Texas Instruments", "SR-16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1975, tisr16ii,  0,        0, tisr16,    tisr16ii,  driver_device, 0, "Texas Instruments", "SR-16 II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
+COMP( 1975, ti1250,    0,        0, ti1250,    ti1250,    driver_device, 0, "Texas Instruments", "TI-1250 (1975 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1976, ti125076,  ti1250,   0, ti1270,    ti1250,    driver_device, 0, "Texas Instruments", "TI-1250 (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti1270,    0,        0, ti1270,    ti1270,    driver_device, 0, "Texas Instruments", "TI-1270", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, ti1000,    0,        0, ti1000,    ti1000,    driver_device, 0, "Texas Instruments", "TI-1000", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, ti1000,    0,        0, ti1000,    ti1000,    driver_device, 0, "Texas Instruments", "TI-1000 (1977 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+
 COMP( 1977, wizatron,  0,        0, wizatron,  wizatron,  driver_device, 0, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, lilprof,   0,        0, lilprof,   lilprof,   driver_device, 0, "Texas Instruments", "Little Professor (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1978, lilprof78, lilprof,  0, lilprof78, lilprof78, driver_device, 0, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 COMP( 1977, dataman,   0,        0, dataman,   dataman,   driver_device, 0, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-COMP( 1976, ti30,      0,        0, majestic,  ti30,      driver_device, 0, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, tiprog,    0,        0, majestic,  tiprog,    driver_device, 0, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, tibusan1,  0,        0, majestic,  tibusan1,  driver_device, 0, "Texas Instruments", "TI Business Analyst-I", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, ti30,      0,        0, ti30,     ti30,      driver_device, 0, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, tibusan,   0,        0, ti30,     tibusan,   driver_device, 0, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, tiprog,    0,        0, ti30,     tiprog,    driver_device, 0, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
