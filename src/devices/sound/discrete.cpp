@@ -176,7 +176,7 @@ private:
 
 inline void discrete_task::step_nodes(void)
 {
-	for(input_buffer sn : source_list)
+	for(input_buffer &sn : source_list)
 	{
 		sn.buffer = *sn.ptr++;
 	}
@@ -234,7 +234,7 @@ bool discrete_task::process(void)
 	int samples = MIN(m_samples, MAX_SAMPLES_PER_TASK_SLICE);
 
 	/* check dependencies */
-	for(input_buffer sn : source_list)
+	for(input_buffer& sn : source_list)
 	{
 		int avail;
 
@@ -268,7 +268,7 @@ void discrete_task::prepare_for_queue(int samples)
 		ob.ptr = ob.node_buf;
 
 	/* initialize sources */
-	for(input_buffer sn : source_list)
+	for(input_buffer& sn : source_list)
 	{
 		sn.ptr = sn.linked_outbuf->node_buf;
 	}
