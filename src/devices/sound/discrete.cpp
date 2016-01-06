@@ -205,7 +205,7 @@ inline void discrete_task::step_nodes(void)
 	}
 
 	/* buffer the outputs */
-	for(output_buffer outbuf : m_buffers)
+	for(output_buffer& outbuf : m_buffers)
 		*(outbuf.ptr++) = *outbuf.source;
 }
 
@@ -264,7 +264,7 @@ void discrete_task::prepare_for_queue(int samples)
 {
 	m_samples = samples;
 	/* set up task buffers */
-	for(output_buffer ob : m_buffers)
+	for(output_buffer& ob : m_buffers)
 		ob.ptr = ob.node_buf;
 
 	/* initialize sources */
