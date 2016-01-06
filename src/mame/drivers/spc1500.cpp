@@ -9,10 +9,12 @@ Samsung SPC-1500 driver by Miso Kim
 	2015-12-26 80/40 column mode supported
 	2015-12-28 double access mode supported for I/O 
 	2016-01-02 Korean character input method and display enabled
+    2016-01-03 user defined char (PCG, Programmable Character Generator) support	
+	2016-01-05 detection of color palette initialization 
+	2016-01-06 80x16 mode graphic mode support
 	
 TODO:
-	- Recover color palette after list and width command in basic mode
-	- Support user defined char setting
+    - Verify PCG ram read
 	- Support floppy disk drive with SD-1500A controller card
 	
 ****************************************************************************/
@@ -248,7 +250,6 @@ public:
 		, m_sound(*this, "ay8910")
 		, m_palette(*this, "palette")
 	{}
-	DECLARE_WRITE8_MEMBER(mem_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	DECLARE_READ8_MEMBER(psga_r);	
 	DECLARE_READ8_MEMBER(porta_r);
@@ -285,6 +286,7 @@ private:
 	UINT8 m_palet[3];
 	UINT16 m_page;
 	UINT16 m_pcg_addr;
+	UINT8 m_pcg_char, m_pcg_attr;
 	attotime m_time;
 	bool m_romsel;
 	bool m_double_mode;
@@ -326,22 +328,15 @@ WRITE8_MEMBER( spc1500_state::romsel)
 {
 	m_romsel = 1;
 	if (m_ipl)
-	{
-//		printf("bank1 -> IOCS\n");
 		membank("bank1")->set_entry(0);
-	}
 	else
-	{
 		membank("bank1")->set_entry(1);		
-//		printf("bank1 -> basic\n");
-	}
 }
 
 WRITE8_MEMBER( spc1500_state::ramsel)
 {
 	m_romsel = 0;
 	membank("bank1")->set_entry(2);
-//	printf("bank1 -> ram\n");
 }
 
 WRITE8_MEMBER( spc1500_state::portb_w)
@@ -358,7 +353,7 @@ WRITE8_MEMBER( spc1500_state::psgb_w)
 		membank("bank1")->set_entry(m_ipl ? 0 : 1);
 	}
 	m_cass->set_state(BIT(data, 6) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED);
-	if (!m_motor && BIT(data, 7) &&  ATTOSECONDS_IN_MSEC((time - m_time).as_attoseconds()) > 500)
+	if (!m_motor && BIT(data, 7) &&  ATTOSECONDS_IN_MSEC((time - m_time).as_attoseconds()) > 1000)
 	{
 		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		m_time = time;
@@ -372,7 +367,6 @@ WRITE8_MEMBER( spc1500_state::portc_w)
 	m_centronics->write_strobe(BIT(data, 7));
 	m_double_mode = (!m_p5bit && BIT(data, 5)); // double access I/O mode
 	m_p5bit = BIT(data, 5);
-	
 }
 
 READ8_MEMBER( spc1500_state::portb_r)
@@ -410,38 +404,19 @@ READ8_MEMBER( spc1500_state::crtc_r)
 	return 0;
 }
 
-WRITE8_MEMBER( spc1500_state::pcgg_w)
-{
-	
-}
-
-READ8_MEMBER( spc1500_state::pcgg_r)
-{
-	return 0;
-}
-
-WRITE8_MEMBER( spc1500_state::pcgr_w)
-{
-	
-}
-
-READ8_MEMBER( spc1500_state::pcgr_r)
-{
-	return 0;
-}
-
-WRITE8_MEMBER( spc1500_state::pcgb_w)
-{
-	
-}
-
-READ8_MEMBER( spc1500_state::pcgb_r)
-{
-	return 0;
-}
-
 READ8_MEMBER( spc1500_state::pcg_r)
 {
+	get_pcg_addr();
+	if (BIT(m_pcg_attr,5)) // PCG font
+	{
+		if ((offset&0x1f00) == 0x1400) 
+			offset += 0x300;
+		return m_pcgram[m_pcg_addr+(offset&0xf)+(((offset & 0x1f00) - 0x1500)<<3)];
+	}
+	else // ROM font
+	{
+		return m_font[(m_crtc_vreg[0x9]==15?0x1000:0)+m_pcg_addr+(offset&0xf)];
+	}
 	return 0;
 }
 void spc1500_state::get_pcg_addr()
@@ -458,7 +433,9 @@ void spc1500_state::get_pcg_addr()
 	} else {
 		vaddr = 0x3ff;
 	}
-	m_pcg_addr = m_p_videoram[0x1000 + vaddr] * (m_crtc_vreg[0x9]+1);
+	m_pcg_char = m_p_videoram[0x1000 + vaddr];
+	m_pcg_attr = m_p_videoram[vaddr];
+	m_pcg_addr = m_pcg_char * (m_crtc_vreg[0x9]+1);
 }
 WRITE8_MEMBER( spc1500_state::pcg_w)
 {
@@ -476,7 +453,7 @@ WRITE8_MEMBER( spc1500_state::priority_w)
 WRITE8_MEMBER( spc1500_state::palet_w)
 {
 	m_palet[(offset>>8)&0x0f] = data;
-	printf("palet:0x%02x, 0x%02x, 0x%02x\n", m_palet[0], m_palet[1], m_palet[2]);
+//	printf("palet:0x%02x, 0x%02x, 0x%02x\n", m_palet[0], m_palet[1], m_palet[2]);
 }
 
 PALETTE_INIT_MEMBER(spc1500_state,spc)
@@ -499,7 +476,7 @@ VIDEO_START_MEMBER(spc1500_state, spc)
 MC6845_RECONFIGURE(spc1500_state::crtc_reconfig)
 {
 //	printf("reconfig. w:%d, h:%d, %f (%d,%d,%d,%d)\n", width, height, (float)frame_period, visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
-	printf("register. m_vert_disp:%d, m_horiz_disp:%d, m_max_ras_addr:%d, m_vert_char_total:%d\n", m_crtc_vreg[6], m_crtc_vreg[1],  m_crtc_vreg[9], m_crtc_vreg[0x4]);
+//	printf("register. m_vert_disp:%d, m_horiz_disp:%d, m_max_ras_addr:%d, m_vert_char_total:%d\n", m_crtc_vreg[6], m_crtc_vreg[1],  m_crtc_vreg[9], m_crtc_vreg[0x4]);
 }
 
 MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
@@ -520,7 +497,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	bool ln400 = (hs == 4 && m_crtc_vreg[0x4] > 20);
 	for (i = 0; i < x_count; i++)
 	{
-		UINT8 *pp = &m_p_videoram[0x2000+((y>>hs)*x_count+(((y>>(hs-3))&7)<<11))+i];
+		UINT8 *pp = &m_p_videoram[0x2000+((y>>hs)*x_count+(((y)&7)<<11))+i+(((hs==4)&&(y&8))?0x400:0)];
 		UINT8 *pv = &m_p_videoram[(y>>hs)*x_count + i];
 		UINT8 ascii = *(pv+0x1000);
 		UINT8 attr = *pv;
@@ -635,7 +612,7 @@ READ8_MEMBER( spc1500_state::io_r)
 	m_double_mode = false;
 	if (offset < 0x1000) {} else 
 	if (offset < 0x1400) {} else
-	if (offset < 0x1800) { return pcg_r(space, offset>>8); } else
+	if (offset < 0x1800) { return pcg_r(space, offset); } else
 	if (offset < 0x1900) { return crtc_r(space, offset); } else
 	if (offset < 0x1a00) { return keyboard_r(space, offset); } else
 	if (offset < 0x1b00) { return m_pio->read(space, offset); } else
@@ -735,7 +712,7 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
 
 	PORT_START("LINE.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Del Ins") PORT_CODE(KEYCODE_DEL_PAD) PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD)) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)  PORT_CODE(KEYCODE_UP)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(0x1b)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("` ~") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('`') PORT_CHAR('~')
@@ -745,7 +722,7 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
 
 	PORT_START("LINE.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Del Ins") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD)) PORT_CHAR(8)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)   
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Home") PORT_CODE(KEYCODE_HOME)
@@ -813,15 +790,9 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x50, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
-WRITE8_MEMBER( spc1500_state::mem_w )
-{
-	m_p_ram[offset] = data; //RAM
-	printf("0x%04x:%02x\n", offset, data);
-}
-
 static ADDRESS_MAP_START(spc1500_mem, AS_PROGRAM, 8, spc1500_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2") //AM_WRITE(mem_w)
+	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2") 
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE_BANK("bank4")
 ADDRESS_MAP_END
 
@@ -953,4 +924,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 1987, spc1500,  0,      0,       spc1500,   spc1500, driver_device,  0,   "Samsung", "SPC-1500", MACHINE_NOT_WORKING )
+COMP( 1987, spc1500,  0,      0,       spc1500,   spc1500, driver_device,  0,   "Samsung", "SPC-1500", 0 )
