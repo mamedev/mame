@@ -2337,7 +2337,6 @@ ROM_START( lghost )
 
 	ROM_REGION( 0x210000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
 	ROM_LOAD( "epr-13417.c7",   0x010000, 0x20000, CRC(cd7beb49) SHA1(2435ce000f1eefdd06b27ea93e22fd82c0e999d2) )
-	// these seem best 3 from the different sized dumps
 	ROM_LOAD( "mpr-13420.c6",   0x090000, 0x40000, CRC(3de0dee4) SHA1(31833684df5a34d5e9ef04f2ab42355b8e9cbb45) )
 	ROM_LOAD( "mpr-13419.c5",   0x110000, 0x40000, CRC(e7021b0a) SHA1(82e390fac63965d4f80ae01758c19ae951c39475) )
 	ROM_LOAD( "mpr-13418.c4",   0x190000, 0x40000, CRC(0732594d) SHA1(9fbeae29f1a31d136ddc9a49c786b2a08a523e0d) )
@@ -2367,7 +2366,6 @@ ROM_START( lghostd )
 
 	ROM_REGION( 0x210000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
 	ROM_LOAD( "epr-13417.c7",   0x010000, 0x20000, CRC(cd7beb49) SHA1(2435ce000f1eefdd06b27ea93e22fd82c0e999d2) )
-	// these seem best 3 from the different sized dumps
 	ROM_LOAD( "mpr-13420.c6",   0x090000, 0x40000, CRC(3de0dee4) SHA1(31833684df5a34d5e9ef04f2ab42355b8e9cbb45) )
 	ROM_LOAD( "mpr-13419.c5",   0x110000, 0x40000, CRC(e7021b0a) SHA1(82e390fac63965d4f80ae01758c19ae951c39475) )
 	ROM_LOAD( "mpr-13418.c4",   0x190000, 0x40000, CRC(0732594d) SHA1(9fbeae29f1a31d136ddc9a49c786b2a08a523e0d) )
@@ -2379,6 +2377,37 @@ ROM_END
       Game BD: 833-7627-04 LASER GHOST
     ROM Board: 834-7597-04 (type 171-5873B)
     A/D BD NO. 837-7536
+
+A PCB was found with a Game BD: 833-7627-01-T GHOST HUNTER
+While the DATA matched the set below (lghostu), all roms were hand labeled and dated as follows:
+
+ROM0 E * A3AB @ A4
+ROM0 O * B21C @ A6
+ROM1 E 5B93 @ A5
+ROM1 O 6B23 @ A7
+
+FD1094 labeled as LASER GHOST USA
+
+Fix0 11/19-14 @ C1
+Fix1 11/19-14 @ C2
+Fix2 11/19-14 @ C3
+
+bank0 O 11/20-14 @ C10
+bank0 E 11/20-14 @ A10
+bank1 O 10/31 @ C11
+bank1 E 10/31 @ A11
+bank2 O 10/31 @ C12
+bank2 E 10/31 @ A12
+bank3 O 10/31 @ C13
+bank3 E 10/31 @ A13
+
+Sound 0 FINAL @ C7
+Sound 1 10/22 @ C6
+Sound 2 10/22 @ C5
+Sound 3 10/22 @ C4
+
+suggesting the original name for the game was Ghost Hunter and the roms dated 11/20-14 & 11/19-14
+contain the data for name change to Laser Ghost
 */
 ROM_START( lghostu )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
@@ -2407,7 +2436,6 @@ ROM_START( lghostu )
 
 	ROM_REGION( 0x210000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
 	ROM_LOAD( "epr-13417.c7",   0x010000, 0x20000, CRC(cd7beb49) SHA1(2435ce000f1eefdd06b27ea93e22fd82c0e999d2) )
-	// these seem best 3 from the different sized dumps
 	ROM_LOAD( "mpr-13420.c6",   0x090000, 0x40000, CRC(3de0dee4) SHA1(31833684df5a34d5e9ef04f2ab42355b8e9cbb45) )
 	ROM_LOAD( "mpr-13419.c5",   0x110000, 0x40000, CRC(e7021b0a) SHA1(82e390fac63965d4f80ae01758c19ae951c39475) )
 	ROM_LOAD( "mpr-13418.c4",   0x190000, 0x40000, CRC(0732594d) SHA1(9fbeae29f1a31d136ddc9a49c786b2a08a523e0d) )
@@ -2438,7 +2466,6 @@ ROM_START( lghostud )
 
 	ROM_REGION( 0x210000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
 	ROM_LOAD( "epr-13417.c7",   0x010000, 0x20000, CRC(cd7beb49) SHA1(2435ce000f1eefdd06b27ea93e22fd82c0e999d2) )
-	// these seem best 3 from the different sized dumps
 	ROM_LOAD( "mpr-13420.c6",   0x090000, 0x40000, CRC(3de0dee4) SHA1(31833684df5a34d5e9ef04f2ab42355b8e9cbb45) )
 	ROM_LOAD( "mpr-13419.c5",   0x110000, 0x40000, CRC(e7021b0a) SHA1(82e390fac63965d4f80ae01758c19ae951c39475) )
 	ROM_LOAD( "mpr-13418.c4",   0x190000, 0x40000, CRC(0732594d) SHA1(9fbeae29f1a31d136ddc9a49c786b2a08a523e0d) )
@@ -2473,7 +2500,6 @@ ROM_START( lghostj )
 
 	ROM_REGION( 0x210000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
 	ROM_LOAD( "epr-13417.c7",   0x010000, 0x20000, CRC(cd7beb49) SHA1(2435ce000f1eefdd06b27ea93e22fd82c0e999d2) )
-	// these seem best 3 from the different sized dumps
 	ROM_LOAD( "mpr-13420.c6",   0x090000, 0x40000, CRC(3de0dee4) SHA1(31833684df5a34d5e9ef04f2ab42355b8e9cbb45) )
 	ROM_LOAD( "mpr-13419.c5",   0x110000, 0x40000, CRC(e7021b0a) SHA1(82e390fac63965d4f80ae01758c19ae951c39475) )
 	ROM_LOAD( "mpr-13418.c4",   0x190000, 0x40000, CRC(0732594d) SHA1(9fbeae29f1a31d136ddc9a49c786b2a08a523e0d) )
