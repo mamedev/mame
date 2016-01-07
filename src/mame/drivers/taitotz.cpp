@@ -600,6 +600,7 @@ public:
 	DECLARE_DRIVER_INIT(batlgear);
 	DECLARE_DRIVER_INIT(landhigh);
 	DECLARE_DRIVER_INIT(raizpin);
+	DECLARE_DRIVER_INIT(raizpinj);
 	DECLARE_DRIVER_INIT(styphp);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -2726,6 +2727,9 @@ static const char BATLGR2A_HDD_SERIAL[] =           // "            05411645"
 static const char RAIZPIN_HDD_SERIAL[] =            // "691934013492        "
 	{ 0x36, 0x39, 0x31, 0x39, 0x33, 0x34, 0x30, 0x31, 0x33, 0x34, 0x39, 0x32, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
 
+static const char RAIZPINJ_HDD_SERIAL[] =           // "824915745143        "
+	{ 0x38, 0x32, 0x34, 0x39, 0x31, 0x35, 0x37, 0x34, 0x35, 0x31, 0x34, 0x33, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
+
 static const char STYPHP_HDD_SERIAL[] =             // "            05872160"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x38, 0x37, 0x32, 0x31, 0x36, 0x30 };
 
@@ -2791,6 +2795,17 @@ DRIVER_INIT_MEMBER(taitotz_state,raizpin)
 	init_taitotz_152();
 
 	m_hdd_serial_number = RAIZPIN_HDD_SERIAL;
+
+	m_scr_base = 0x1c0000;
+
+	m_displist_addr = 0x33480c;
+}
+
+DRIVER_INIT_MEMBER(taitotz_state,raizpinj)
+{
+	init_taitotz_152();
+
+	m_hdd_serial_number = RAIZPINJ_HDD_SERIAL;
 
 	m_scr_base = 0x1c0000;
 
@@ -3015,4 +3030,4 @@ GAME( 2000, batlgr2,  taitotz, taitotz,  batlgr2, taitotz_state,  batlgr2,  ROT0
 GAME( 2000, batlgr2a, batlgr2, taitotz,  batlgr2, taitotz_state,  batlgr2a, ROT0, "Taito", "Battle Gear 2 (v2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2000, styphp,   taitotz, taitotz,  styphp,  taitotz_state,  styphp,   ROT0, "Taito", "Stunt Typhoon Plus", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, raizpin,  taitotz, taitotz,  taitotz, taitotz_state,  raizpin,  ROT0, "Taito", "Raizin Ping Pong (V2.01O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, raizpinj, raizpin, taitotz,  taitotz, taitotz_state,  raizpin,  ROT0, "Taito", "Raizin Ping Pong (V2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // needs proper serial code
+GAME( 2002, raizpinj, raizpin, taitotz,  taitotz, taitotz_state,  raizpinj, ROT0, "Taito", "Raizin Ping Pong (V2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
