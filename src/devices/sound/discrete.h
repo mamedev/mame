@@ -3758,15 +3758,15 @@ public:
 	vector_t(int initial) {
 		m_count = 0;
 		m_allocated = initial;
-		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
+		m_arr = make_unique_clear<_ElementType[]>(m_allocated);
 	}
 	vector_t()  {
 		m_count = 0;
 		m_allocated = 16;
-		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
+		m_arr = make_unique_clear<_ElementType[]>(m_allocated);
 	}
 	~vector_t() {
-		global_free_array(m_arr);
+		m_arr = nullptr;
 	}
 	_ElementType& operator [] (unsigned int index) const // get array item
 	{
@@ -3779,7 +3779,7 @@ public:
 		if (m_allocated < 16)
 			m_allocated = 16;
 		m_count = a.count();
-		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
+		m_arr = make_unique_clear<_ElementType[]>(m_allocated);
 		for (int i=0; i < m_count; i++)
 			m_arr[i] = a[i];
 	}
@@ -3790,7 +3790,7 @@ public:
 		if (m_allocated < 16)
 			m_allocated = 16;
 		m_count = a.count();
-		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
+		m_arr = make_unique_clear<_ElementType[]>(m_allocated);
 		for (int i=0; i < m_count; i++)
 			m_arr[i] = a[i];
 		return *this;
@@ -3800,12 +3800,14 @@ public:
 	{
 		if (m_count >= m_allocated)
 		{
+			auto oldarr = make_unique_clear<_ElementType[]>(m_allocated);
+			for (int i = 0; i < m_count; i++)
+				oldarr[i] = m_arr[i];
+
 			m_allocated *= 2;
-			auto  newarr = global_alloc_array_clear(_ElementType, m_allocated);
-			for (int i=0; i < m_count; i++)
-				newarr[i] = m_arr[i];
-			global_free_array(m_arr);
-			m_arr = newarr;
+			m_arr = make_unique_clear<_ElementType[]>(m_allocated);
+			for (int i = 0; i < m_count; i++)
+				m_arr[i] = oldarr[i];
 		}
 		m_arr[m_count] = object;
 		m_count++;
@@ -3819,10 +3821,10 @@ public:
 	}
 	inline void clear(void) { m_count = 0;  }
 	inline int count(void) const { return m_count; }
-	inline _ElementType *begin_ptr(void) const { return m_arr; }
-	inline _ElementType *end_ptr(void) const { return m_arr + (m_count - 1); }
+	inline _ElementType *begin_ptr(void) const { return m_arr.get(); }
+	inline _ElementType *end_ptr(void) const { return m_arr.get() + (m_count - 1); }
 private:
-	_ElementType    *m_arr;
+	std::unique_ptr<_ElementType[]> m_arr;
 	int m_count;
 	int m_allocated;
 };
