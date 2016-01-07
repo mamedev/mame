@@ -2294,13 +2294,16 @@ dataman
 // hh_tms1k tispeak.cpp
 snspell
 snspellp
-snspella
-snspellb
+snspellua
+snspellub
 snspelluk
 snspelluka
 snspelljp
 snspellfr
 snspellit
+snspellc
+snspellca
+snspellcuk
 snmath
 snmathp
 snread
