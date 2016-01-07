@@ -2830,6 +2830,24 @@ ROM_START( taitotz )
 	DISK_REGION( "ata:0:hdd:image" )
 ROM_END
 
+/*
+
+The official drive for (at least) Raizin Ping Pong and Power Shovel is
+
+Quantum Fireball 4.3AT
+
+Formatted Capacity 4,310.43 MB
+Logical Heads 9
+Logical Cylinders 14,848
+Logical Sectors/Track 63
+Physical Heads 6
+Physical Disks 3
+Sectors Per Drive 8,418,816	
+Average Seek Time  10.0 ms (read)	
+Buffer Size 	128K
+
+*/
+
 ROM_START( landhigh )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
@@ -2919,6 +2937,30 @@ ROM_START( pwrshovl )
 	DISK_IMAGE( "pwrshovl", 0, SHA1(360f63b39f645851c513b4644fb40601b9ba1412) )
 ROM_END
 
+ROM_START( pwrshovla )
+	ROM_REGION64_BE( 0x100000, "user1", 0 )
+	TAITOTZ_BIOS_V111A
+
+	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_LOAD16_BYTE( "e74-04++.ic14", 0x000000, 0x020000, CRC(ef21a261) SHA1(7398826dbf48014b9c7e9454f978f3e419ebc64b) ) // actually labeled E74-04**
+	ROM_LOAD16_BYTE( "e74-05++.ic15", 0x000001, 0x020000, CRC(2466217d) SHA1(dc814da3a1679cff001f179d3c1641af985a6490) ) // actually labeled E74-05**
+
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
+	ROM_LOAD( "e74-06.ic2", 0x000000, 0x020000, CRC(cd4a99d3) SHA1(ea280e05a68308c1c5f1fc0ee8a25b33923df635) ) // located on the I/O PCB
+
+	ROM_REGION( 0x20000, "oki1", 0 )
+	ROM_LOAD( "e74-07.ic6", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) ) // located on the I/O PCB
+
+	ROM_REGION( 0x20000, "oki2", 0 )
+	ROM_LOAD( "e74-08.ic8", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) ) // located on the I/O PCB
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "POWER SHOVEL VER.2.07J", 0, SHA1(05410d4b4972262ef93400b02f21dd17d10b1c5e) )
+ROM_END
+
 ROM_START( raizpin )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
@@ -2932,6 +2974,21 @@ ROM_START( raizpin )
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "raizpin", 0, SHA1(883ebcda03026df31da1cdb95af521e100c171ed) )
+ROM_END
+
+ROM_START( raizpinj )
+	ROM_REGION64_BE( 0x100000, "user1", 0 )
+	TAITOTZ_BIOS_V152
+
+	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_LOAD16_BYTE( "f14-01.ic14",  0x000000, 0x020000, CRC(f86a184d) SHA1(46abd11430c08d4f384fb79a5a3a39e54f83b8d8) )
+	ROM_LOAD16_BYTE( "f14-02.ic15",  0x000001, 0x020000, CRC(bd2d0dee) SHA1(652f810702598184551de9fd69436862d48c1608) )
+
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "RAIZIN PING PONG VER 2.01J", 0, SHA1(eddc803c2507d19f0a3e3cc217bb22a565c04f3e) )
 ROM_END
 
 ROM_START( styphp )
@@ -2952,8 +3009,10 @@ ROM_END
 GAME( 1999, taitotz,  0, taitotz, taitotz, driver_device, 0, ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT)
 GAME( 1999, landhigh, taitotz, landhigh, landhigh, taitotz_state, landhigh, ROT0, "Taito", "Landing High Japan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1999, batlgear, taitotz, taitotz,  batlgr2, taitotz_state,  batlgear, ROT0, "Taito", "Battle Gear", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1999, pwrshovl, taitotz, taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, pwrshovl, taitotz, taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 1999/8/5 19:13:35
+GAME( 1999, pwrshovla,pwrshovl,taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // seem to be some differences in drive content, but identifies as the same revision, is it just user data changes??
 GAME( 2000, batlgr2,  taitotz, taitotz,  batlgr2, taitotz_state,  batlgr2,  ROT0, "Taito", "Battle Gear 2 (v2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2000, batlgr2a, batlgr2, taitotz,  batlgr2, taitotz_state,  batlgr2a, ROT0, "Taito", "Battle Gear 2 (v2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2000, styphp,   taitotz, taitotz,  styphp,  taitotz_state,  styphp,   ROT0, "Taito", "Stunt Typhoon Plus", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, raizpin,  taitotz, taitotz,  taitotz, taitotz_state,  raizpin,  ROT0, "Taito", "Raizin Ping Pong", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, raizpin,  taitotz, taitotz,  taitotz, taitotz_state,  raizpin,  ROT0, "Taito", "Raizin Ping Pong (V2.01O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, raizpinj, raizpin, taitotz,  taitotz, taitotz_state,  raizpin,  ROT0, "Taito", "Raizin Ping Pong (V2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // needs proper serial code
