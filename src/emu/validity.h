@@ -40,6 +40,9 @@ public:
 	int errors() const { return m_errors; }
 	int warnings() const { return m_warnings; }
 
+	// setter
+	void set_verbose(bool verbose) { m_print_verbose = verbose; }
+
 	// operations
 	void check_driver(const game_driver &driver);
 	void check_shared_source(const game_driver &driver);
@@ -81,6 +84,7 @@ private:
 	// output helpers
 	void build_output_prefix(std::string &str);
 	void output_via_delegate(osd_output_channel channel, const char *format, ...) ATTR_PRINTF(3,4);
+	void output_indented_errors(std::string &text, const char *header);
 
 	// internal driver list
 	driver_enumerator       m_drivlist;
@@ -88,8 +92,10 @@ private:
 	// error tracking
 	int                     m_errors;
 	int                     m_warnings;
+	bool                    m_print_verbose;
 	std::string             m_error_text;
 	std::string             m_warning_text;
+	std::string             m_verbose_text;
 
 	// maps for finding duplicates
 	game_driver_map         m_names_map;

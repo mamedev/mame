@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_SEM_H_HEADER_GUARD
@@ -83,13 +83,34 @@ namespace bx
 			int result = pthread_mutex_lock(&m_mutex);
 			BX_CHECK(0 == result, "pthread_mutex_lock %d", result);
 
-#		if BX_PLATFORM_NACL || BX_PLATFORM_OSX || BX_PLATFORM_IOS
+#		if BX_PLATFORM_NACL || BX_PLATFORM_OSX
 			BX_UNUSED(_msecs);
-			BX_CHECK(-1 == _msecs, "NaCl, iOS and OSX don't support pthread_cond_timedwait at this moment.");
+			BX_CHECK(-1 == _msecs, "NaCl and OSX don't support pthread_cond_timedwait at this moment.");
 			while (0 == result
-			&&     0 >= m_count)
+			&&	 0 >= m_count)
 			{
 				result = pthread_cond_wait(&m_cond, &m_mutex);
+			}
+#		elif BX_PLATFORM_IOS
+			if (-1 == _msecs)
+			{
+				while (0 == result
+				&&     0 >= m_count)
+				{
+					result = pthread_cond_wait(&m_cond, &m_mutex);
+				}
+			}
+			else
+			{
+				timespec ts;
+				ts.tv_sec = _msecs/1000;
+				ts.tv_nsec = (_msecs%1000)*1000;
+
+				while (0 == result
+				&&     0 >= m_count)
+				{
+					result = pthread_cond_timedwait_relative_np(&m_cond, &m_mutex, &ts);
+				}
 			}
 #		else
 			timespec ts;

@@ -6,16 +6,21 @@
     Releases known: 9004, 9005
 
     9005.6.84 - Last software release (1998)
-        Install disks (7)
-        Disktool
-        Mini Patch Volume MPV4-84
+        Install disks (7) - MN 19584
+        Disktool - MN 19584
+        Mini Patch Volume MPV4-84 - MN 19274, 19584-36, 19684-35
             Additional fixes up to year 2000
-        RPDN Loadware
+        RPDN Loadware Version 6 - MN 19293-35
 
     9005.6.82 (1995)
-
-
+        Install disks (7) - MN 19582
+        Disktool (missing)
+        Mini Patch Volume 2 - MN 19270
+            Additional fixes up to year 1996
+        RPDN Loadware Version 3.0 - MN 19293-35 PN 51D0553
 -->
+
+<!-- System Software -->
 <softwarelist name="r9751" description="ROLM CBX 9751 floppy disk images">
 	<software name="cbxr5684">
 		<description>Siemens ROLM 9751 CBX 9005.6.84</description>
@@ -79,6 +84,66 @@
 			<feature name="part_id" value="RPDN Loadware" />
 			<dataarea name="flop" size="1474560">
 				<rom name="Siemens.9751.CBX.Release.9005.6.84.RPDN.Loadware.img" size="1474560" crc="5f5a0990" sha1="95cd0a38c447eeb6096edb5f4377df2920ba9a89" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbxr5682">
+		<description>Siemens ROLM 9751 CBX 9005.6.82</description>
+		<year>1995</year>
+		<publisher>Siemens Rolm Communications Inc</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.Disk1.img" size="1474560" crc="e9600226" sha1="89d18c6b16e66a6dcb74850bca972e54dc89f043" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.Disk2.img" size="1474560" crc="7a8053b5" sha1="fa439bf102143114bd27501619b63d02268e9788" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.Disk3.img" size="1474560" crc="03b4d15a" sha1="1cbdea2407ae1ff1eaa8c08ecadd92cca39a5f00" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.Disk4.img" size="1474560" crc="28377232" sha1="81a1bd74dff32381aefe12faffdf08d4e6532f67" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.Disk5.img" size="1474560" crc="8a8eb36e" sha1="e31ac428d4775d22fbf911f3abb8cf7a416159c1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.Disk6.img" size="1474560" crc="b2bd782f" sha1="dcd982467132c32ed04a53fe1327272cf1ba8320" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.Disk7.img" size="1474560" crc="1695649f" sha1="dd5a9e5af910237f9a4b7e12d5fade15d1e1ceeb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Mini Patch Volume 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.Mini.Patch.Volume.2.img" size="1474560" crc="65d5021d" sha1="57a11686805f3873a4dde231a260943f2e2ab1b3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="RPDN Loadware Version 3.0" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Siemens.9751.CBX.Release.9005.6.82.RPDN.Loadware.img" size="1474560" crc="f082df1f" sha1="ccfce632a2433b6c5ad6cd75130e999ce98daaea" offset="0" />
 			</dataarea>
 		</part>
 	</software>

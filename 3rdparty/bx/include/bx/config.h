@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_CONFIG_H_HEADER_GUARD
@@ -23,7 +23,7 @@
 #ifndef BX_CONFIG_CRT_FILE_READER_WRITER
 #	define BX_CONFIG_CRT_FILE_READER_WRITER (0 \
 				|| BX_PLATFORM_ANDROID \
-				|| BX_PLATFORM_FREEBSD \
+				|| BX_PLATFORM_BSD \
 				|| BX_PLATFORM_EMSCRIPTEN \
 				|| BX_PLATFORM_IOS \
 				|| BX_PLATFORM_LINUX \

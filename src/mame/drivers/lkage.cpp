@@ -964,4 +964,4 @@ GAME( 1984, lkageoo,  lkage,    lkage,    lkage, lkage_state,    lkage,    ROT0,
 GAME( 1984, lkageb,   lkage,    lkageb,   lkageb, lkage_state,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, lkageb2,  lkage,    lkageb,   lkageb, lkage_state,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, lkageb3,  lkage,    lkageb,   lkageb, lkage_state,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, bygone,   0,        lkage,    bygone, lkage_state,   bygone,   ROT0, "Taito Corporation", "Bygone", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bygone,   0,        lkage,    bygone, lkage_state,   bygone,   ROT0, "Taito Corporation", "Bygone (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

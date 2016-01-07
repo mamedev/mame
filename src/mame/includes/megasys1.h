@@ -153,6 +153,7 @@ public:
 	void screen_eof_megasys1(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(megasys1D_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1B_scanline);
 	DECLARE_WRITE16_MEMBER(ms1_ram_w);
 

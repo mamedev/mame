@@ -485,19 +485,12 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "mingw-clang" }
 		linkoptions {
-			"-Qunused-arguments",
-			"-Wno-error=unused-command-line-argument-hard-error-in-future",
 			"-Wl,--allow-multiple-definition",
 		}
 
 	configuration { "x32", "mingw-clang" }
 		objdir ( _buildDir .. "mingw-clang/obj")
 		buildoptions { "-m32" }
-		buildoptions {
-			"-isystem$(MINGW32)/i686-w64-mingw32/include/c++",
-			"-isystem$(MINGW32)/i686-w64-mingw32/include/c++/i686-w64-mingw32",
-			"-isystem$(MINGW32)/i686-w64-mingw32/include",
-		}
 
 	configuration { "x32", "mingw-clang", "Release" }
 		targetdir (_buildDir .. "mingw-clang/bin/x32/Release")
@@ -508,11 +501,6 @@ function toolchain(_buildDir, _subDir)
 	configuration { "x64", "mingw-clang" }
 		objdir (_buildDir .. "mingw-clang/obj")
 		buildoptions { "-m64" }
-		buildoptions {
-			"-isystem$(MINGW64)/x86_64-w64-mingw32/include/c++",
-			"-isystem$(MINGW64)/x86_64-w64-mingw32/include/c++/x86_64-w64-mingw32",
-			"-isystem$(MINGW64)/x86_64-w64-mingw32/include",
-		}
 
 	configuration { "x64", "mingw-clang", "Release" }
 		targetdir (_buildDir .. "mingw-clang/bin/x64/Release")

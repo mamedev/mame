@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include <limits>
+#include <thread>
 #include "lua.hpp"
 #include "luabridge/Source/LuaBridge/LuaBridge.h"
 #include <signal.h>
@@ -860,14 +861,12 @@ void lua_engine::serve_lua()
 	} while (1);
 }
 
-/*
 static void *serve_lua(void *param)
 {
     lua_engine *engine = (lua_engine *)param;
     engine->serve_lua();
     return NULL;
 }
-*/
 
 //-------------------------------------------------
 //  lua_engine - constructor
@@ -1024,6 +1023,8 @@ void lua_engine::initialize()
 
 void lua_engine::start_console()
 {
+	std::thread th(::serve_lua, this);
+	th.detach();
 }
 
 //-------------------------------------------------

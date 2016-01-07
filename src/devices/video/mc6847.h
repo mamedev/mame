@@ -447,12 +447,12 @@ protected:
 					break;
 			}
 		}
-		else if (!get_char_rom.isnull() && ((mode & (MODE_AG|MODE_AS|MODE_INTEXT)) == MODE_INTEXT))
+		else if (!m_charrom_cb.isnull() && ((mode & (MODE_AG|MODE_AS|MODE_INTEXT)) == MODE_INTEXT))
 		{
 			/* external ROM */
 			for (int i = 0; i < length; i++)
 			{
-				UINT8 byte = get_char_rom(data[i], y % 12) ^ (mode & MODE_INV ? 0xFF : 0x00);
+				UINT8 byte = m_charrom_cb(data[i], y % 12) ^ (mode & MODE_INV ? 0xFF : 0x00);
 				emit_extbytes<1, xscale>(&byte, 1, &pixels[i * 8], (mode & MODE_CSS) ? 14 : 12, palette);
 			}
 			result = length * 8 * xscale;

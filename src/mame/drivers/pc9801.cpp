@@ -488,7 +488,7 @@ public:
 	optional_device<ata_interface_device> m_ide;
 	required_shared_ptr<UINT16> m_video_ram_1;
 	required_shared_ptr<UINT16> m_video_ram_2;
-	optional_shared_ptr<UINT16> m_ext_gvram;
+	optional_shared_ptr<UINT32> m_ext_gvram;
 	required_device<beep_device> m_beeper;
 	optional_device<ram_device> m_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -772,32 +772,24 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 	int xi;
 	int res_x,res_y;
 	UINT8 pen;
-	UINT8 interlace_on;
 	UINT8 colors16_mode;
 
 	if(m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
-//  popmessage("%02x %d",m_video_ff[INTERLACE_REG],machine().first_screen()->visible_area().max_y + 1);
-//  interlace_on = ((machine().first_screen()->visible_area().max_y + 1) >= 400) ? 1 : 0;
-	interlace_on = m_video_ff[INTERLACE_REG];
 	colors16_mode = (m_ex_video_ff[ANALOG_16_MODE]) ? 16 : 8;
 
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
+		UINT8 *ext_gvram = (UINT8 *)m_ext_gvram.target();
 		for(xi=0;xi<16;xi++)
 		{
 			res_x = x + xi;
 			res_y = y;
 
-			if(!m_screen->visible_area().contains(res_x, res_y*2+0))
-				return;
+			pen = ext_gvram[(address >> 1)*16+xi+(m_vram_disp*0x20000)];
 
-			pen = m_ext_gvram[((address*16+xi)+(m_vram_disp*0x40000)) >> 1];
-
-			bitmap.pix32(res_y*2+0, res_x) = palette[pen + 0x20];
-			if(m_screen->visible_area().contains(res_x, res_y*2+1))
-				bitmap.pix32(res_y*2+1, res_x) = palette[pen + 0x20];
+			bitmap.pix32(res_y, res_x) = palette[pen + 0x20];
 		}
 	}
 	else
@@ -812,17 +804,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 			pen|= ((m_video_ram_2[((address & 0x7fff) + (0x18000) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 4 : 0;
 			if(m_ex_video_ff[ANALOG_16_MODE])
 				pen|= ((m_video_ram_2[((address & 0x7fff) + (0) + (m_vram_disp*0x20000)) >> 1] >> xi) & 1) ? 8 : 0;
-
-			if(interlace_on)
-			{
-				if(m_screen->visible_area().contains(res_x, res_y*2+0))
-					bitmap.pix32(res_y*2+0, res_x) = palette[pen + colors16_mode];
-				/* TODO: it looks like that PC-98xx can only display even lines ... */
-				if(m_screen->visible_area().contains(res_x, res_y*2+1))
-					bitmap.pix32(res_y*2+1, res_x) = palette[pen + colors16_mode];
-			}
-			else
-				bitmap.pix32(res_y, res_x) = palette[pen + colors16_mode];
+			bitmap.pix32(res_y, res_x) = palette[pen + colors16_mode];
 		}
 	}
 }
@@ -945,7 +927,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 					}
 
 					if(reverse) { tile_data^=0xff; }
-					if(u_line && yi == 7) { tile_data = 0xff; }
+					if(u_line && yi == lr-1) { tile_data = 0xff; }
 					if(v_line)  { tile_data|=8; }
 
 					/* TODO: proper blink rate for these two */
@@ -2226,9 +2208,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 16, pc9801_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0050, 0x0053) AM_WRITE8(pc9801rs_nmi_w, 0xffff)
-	AM_RANGE(0x0430, 0x0433) AM_READ8(ide_hack_r, 0x00ff)
+	AM_RANGE(0x0430, 0x0433) AM_READ8(ide_hack_r, 0x00ff) AM_WRITENOP
 	AM_RANGE(0x0640, 0x064f) AM_DEVREADWRITE("ide", ata_interface_device, read_cs0, write_cs0)
 	AM_RANGE(0x0740, 0x074f) AM_DEVREADWRITE("ide", ata_interface_device, read_cs1, write_cs1)
+	AM_RANGE(0x1e80, 0x1e8f) AM_NOP // temp
 	AM_RANGE(0xbfd8, 0xbfdf) AM_WRITE8(pc9801rs_mouse_freq_w, 0xffff)
 	AM_RANGE(0xe0d0, 0xe0d3) AM_READ8(pc9801rs_midi_r, 0xffff)
 	AM_IMPORT_FROM(pc9801ux_io)

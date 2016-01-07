@@ -185,6 +185,7 @@ void tc0780fpa_renderer::render(UINT16 *polygon_fifo, int length)
 				printf("MAX Z %04x\n",polygon_fifo[ptr+5]);
 			}
 
+			swap_buffers();
 			break;
 		}
 
@@ -493,10 +494,6 @@ WRITE16_MEMBER(tc0780fpa_device::poly_fifo_w)
 
 WRITE16_MEMBER(tc0780fpa_device::render_w)
 {
-	if (offset == 0)
-	{
-		m_renderer->swap_buffers();
-	}
 }
 
 void tc0780fpa_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect)

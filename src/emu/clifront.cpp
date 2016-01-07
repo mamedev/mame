@@ -1612,7 +1612,7 @@ void cli_frontend::execute_commands(const char *exename)
 		validity_checker valid(m_options);
 		bool result = valid.check_all();
 		if (!result)
-			throw emu_fatalerror(MAMERR_FAILED_VALIDITY, "Validity check failed!\n");
+			throw emu_fatalerror(MAMERR_FAILED_VALIDITY, "Validity check failed (%d errors, %d warnings in total)\n", valid.errors(), valid.warnings());
 		return;
 	}
 

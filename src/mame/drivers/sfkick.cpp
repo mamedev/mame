@@ -44,12 +44,111 @@ Board # CBK1029
 
 CN1: 40 PIN Connector (Epoxy Block )
 CN2: 8  PIN Connector (Epoxy Block)
-1UP: 4 PIN Connector (Analog Controls ?)
-2UP: 4 PIN Connector (Analog Controls ?)
+1UP: 4 PIN Connector (Analog Controls)
+2UP: 4 PIN Connector (Analog Controls)
 
 Z8400A (x2)
 UM82C55A-PC
 YM2203C
+
+Documentation as per manual:
+
+            Main Jamma Connector
+    Solder Side    |        Parts Side
+------------------------------------------------------------------
+           GND | A | 1 | GND
+           GND | B | 2 | GND
+            +5 | C | 3 | +5
+            +5 | D | 4 | +5
+               | E | 5 |
+           +12 | F | 6 | +12
+----- KEY -----| H | 7 |----- KEY -----
+               | J | 8 |
+               | K | 9 |
+   Speaker (-) | L | 10| Speaker (+)
+               | M | 11|
+   Video Green | N | 12| Video Red
+    Video Sync | P | 13| Video Blue
+ Player 1 Left | R | 14| Player 2 Right
+Player 1 Right | S | 15| Player 2 Left
+ Coin Switch 2 | T | 16| Coin Switch 1
+Player 2 Start | U | 17| Player 1 Start
+               | V | 18|
+               | W | 19|
+               | X | 20|
+               | Y | 21|
+Player 2 Shoot | Z | 22| Player 1 Shoot
+               | a | 23|
+               | b | 24|
+               | c | 25|
+               | d | 26|
+           GND | e | 27| GND
+           GND | f | 28| GND
+
+         ____ 
+        /    \
+       | Dial |
+        \____/
+       /|   |\ 
+     /  |   | \
+ Blue Red Black Yellow
+  /     |   |    \
+Left  +5v  GND   Right
+
+
+DIPSW-1
+------------------------------------------------------------------
+    DipSwitch Title   | Function | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+------------------------------------------------------------------
+    Cabinet Style     | Upright  |off|                           |
+                      | Cocktail |on |                           |
+------------------------------------------------------------------
+    Stage Select      |   Off    |   |off|                       |
+                      |   On     |   |on |                       |
+------------------------------------------------------------------
+    Freeze Screen     |   Off    |       |off|                   |
+                      |   On     |       |on |                   |
+------------------------------------------------------------------
+   Test / Game Mode   |   Game   |           |off|               |
+                      |   Test   |           |on |               |
+------------------------------------------------------------------
+    Allow Continue    |   Off    |               |off|           |
+                      |   On     |               |on |           |
+------------------------------------------------------------------
+                      | 1cn/1cr  |                   |off|off|off|
+                      | 1cn/2cr  |                   |on |off|off|
+                      | 1cn/3cr  |                   |off|on |off|
+        Coinage       | 1cn/5cr  |                   |on |on |off|
+                      | 2cn/1cr  |                   |off|off|on |
+                      | 2cn/3cr  |                   |on |off|on |
+                      | 3cn/1cr  |                   |off|on |on |
+                      | 3cn/2cr  |                   |on |on |on |
+------------------------------------------------------------------
+
+DIPSW-2
+------------------------------------------------------------------
+    DipSwitch Title   | Function | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+------------------------------------------------------------------
+      No Comment      |   N/A    |off|                           |
+------------------------------------------------------------------
+     Demo Sounds      |   Yes    |   |off|                       |
+                      |   No     |   |on |                       |
+------------------------------------------------------------------
+                      |    1     |       |off|off|               |
+    Players Count     |    2     |       |on |off|               |
+                      |    3     |       |off|on |               |
+                      |    5     |       |on |on |               |
+-----------------------------------------------------------------
+                      |   None   |               |off|off|       |
+         Bonus        |Every 20K |               |on |off|       |
+                      |20K & 50K |               |off|on |       |
+                      |Every 50K |               |on |on |       |
+------------------------------------------------------------------
+                      |   Easy   |                       |off|off|
+      Difficulty      |  Normal  |                       |on |off|
+                      |   Hard   |                       |off|on |
+                      |  V.Hard  |                       |on |on |
+------------------------------------------------------------------
 
 */
 
@@ -137,8 +236,8 @@ READ8_MEMBER(sfkick_state::ppi_port_b_r)
 		case 0: return m_in0->read();
 		case 1: return m_in1->read();
 		case 2: return BITSWAP8(m_dial->read(),4,5,6,7,3,2,1,0);
-		case 3: return m_dsw2->read();
-		case 4: return m_dsw1->read();
+		case 3: return m_dsw1->read();
+		case 4: return m_dsw2->read();
 	}
 	return 0xff;
 }
@@ -411,41 +510,22 @@ static INPUT_PORTS_START( sfkick )
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(-20)
 
 	PORT_START("DSW1") /* bitswapped at read! 76543210 -> 45673210 */
-	PORT_DIPNAME(   0x82, 0x02, DEF_STR( Unknown ) )  /* unknown, code @ $98a8 */
-	PORT_DIPSETTING(      0x00, "3" )
-	PORT_DIPSETTING(      0x02, "2" )
-	PORT_DIPSETTING(      0x80, "1" )
-	PORT_DIPSETTING(      0x82, "0" )
-	PORT_DIPNAME(   0x0c, 0x08, DEF_STR( Difficulty ) ) /* not sure, code @ $9877 */
-	PORT_DIPSETTING(      0x0c, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x08, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x04, DEF_STR( Medium ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( Hard ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) /* unused ? */
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x41, 0x01, DEF_STR( Lives ) )
-	PORT_DIPSETTING(      0x00, "5" )
-	PORT_DIPSETTING(      0x01, "3" )
-	PORT_DIPSETTING(      0x40, "2" )
-	PORT_DIPSETTING(      0x41, "1" )
-
-	PORT_START("DSW2") /* bitswapped at read! 76543210 -> 45673210 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) /* unused ? */
-	PORT_DIPNAME(   0x02, 0x02,  "Test Mode" )
-	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME(   0x20, 0x20,  "Freeze" )
-	PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x01, 0x01,  "Stage Select" )	PORT_DIPLOCATION("SW1:2") /* How does this work?? */
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20,  "Freeze" )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02,  "Test Mode" )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME(   0x8c, 0x8c, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x8c, 0x8c, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:6,8,7")
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x84, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_2C ) )
@@ -454,6 +534,27 @@ static INPUT_PORTS_START( sfkick )
 	PORT_DIPSETTING(    0x88, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
+
+	PORT_START("DSW2") /* bitswapped at read! 76543210 -> 45673210 */
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:1" ) /* Manual states "No Comment" */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x41, 0x01, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x41, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x82, 0x02, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x80, "Every 20,000" )
+	PORT_DIPSETTING(    0x02, "20,000 & 50,000" )
+	PORT_DIPSETTING(    0x00, "Every 50,000" )
+	PORT_DIPSETTING(    0x82, DEF_STR( None ) )
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0x0c, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(sfkick_state::sfkick_vdp_interrupt)

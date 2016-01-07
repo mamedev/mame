@@ -326,9 +326,8 @@ void kaneko16_sprite_device::kaneko16_draw_sprites_custom(_BitmapClass &dest_bmp
 						{
 							if (!rgb) dest[x] = pen_base + c;
 							else dest[x] = pal[pen_base + c];
-
-							pri[x] = 0xff; // mark it "already drawn"
 						}
+						pri[x] = 0xff; // mark it "already drawn"
 					}
 					x_index += dx;
 				}

@@ -743,6 +743,14 @@ private:
 #define MCFG_TMP95C063_PORTD_WRITE( _port_write ) tmp95c063_device::set_portd_write( *device, DEVCB_##_port_write );
 #define MCFG_TMP95C063_PORTE_READ( _port_read ) tmp95c063_device::set_porte_read( *device, DEVCB_##_port_read );
 #define MCFG_TMP95C063_PORTE_WRITE( _port_write ) tmp95c063_device::set_porte_write( *device, DEVCB_##_port_write );
+#define MCFG_TMP95C063_AN0_READ( _port_read ) tmp95c063_device::set_an0_read( *device, DEVCB_##_port_read );
+#define MCFG_TMP95C063_AN1_READ( _port_read ) tmp95c063_device::set_an1_read( *device, DEVCB_##_port_read );
+#define MCFG_TMP95C063_AN2_READ( _port_read ) tmp95c063_device::set_an2_read( *device, DEVCB_##_port_read );
+#define MCFG_TMP95C063_AN3_READ( _port_read ) tmp95c063_device::set_an3_read( *device, DEVCB_##_port_read );
+#define MCFG_TMP95C063_AN4_READ( _port_read ) tmp95c063_device::set_an4_read( *device, DEVCB_##_port_read );
+#define MCFG_TMP95C063_AN5_READ( _port_read ) tmp95c063_device::set_an5_read( *device, DEVCB_##_port_read );
+#define MCFG_TMP95C063_AN6_READ( _port_read ) tmp95c063_device::set_an6_read( *device, DEVCB_##_port_read );
+#define MCFG_TMP95C063_AN7_READ( _port_read ) tmp95c063_device::set_an7_read( *device, DEVCB_##_port_read );
 
 class tmp95c063_device : public tlcs900h_device
 {
@@ -776,6 +784,14 @@ public:
 	template<class _Object> static devcb_base &set_portd_write(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_portd_write.set_callback(object); }
 	template<class _Object> static devcb_base &set_porte_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_porte_read.set_callback(object); }
 	template<class _Object> static devcb_base &set_porte_write(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_porte_write.set_callback(object); }
+	template<class _Object> static devcb_base &set_an0_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_an0_read.set_callback(object); }
+	template<class _Object> static devcb_base &set_an1_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_an1_read.set_callback(object); }
+	template<class _Object> static devcb_base &set_an2_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_an2_read.set_callback(object); }
+	template<class _Object> static devcb_base &set_an3_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_an3_read.set_callback(object); }
+	template<class _Object> static devcb_base &set_an4_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_an4_read.set_callback(object); }
+	template<class _Object> static devcb_base &set_an5_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_an5_read.set_callback(object); }
+	template<class _Object> static devcb_base &set_an6_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_an6_read.set_callback(object); }
+	template<class _Object> static devcb_base &set_an7_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_an7_read.set_callback(object); }
 
 protected:
 	virtual void device_config_complete() override;
@@ -834,6 +850,16 @@ private:
 	// Port E: 8 bit I/O.
 	devcb_read8    m_porte_read;
 	devcb_write8   m_porte_write;
+
+	// analogue inputs, sampled at 10 bits
+	devcb_read16	   m_an0_read;
+	devcb_read16	   m_an1_read;
+	devcb_read16	   m_an2_read;
+	devcb_read16	   m_an3_read;
+	devcb_read16	   m_an4_read;
+	devcb_read16	   m_an5_read;
+	devcb_read16	   m_an6_read;
+	devcb_read16	   m_an7_read;
 };
 
 #endif

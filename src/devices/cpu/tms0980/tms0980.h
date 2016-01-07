@@ -373,6 +373,20 @@ protected:
 	virtual void op_tdo() override;
 };
 
+class tms0950_cpu_device : public tms0970_cpu_device
+{
+public:
+	tms0950_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// overrides
+	virtual void device_reset() override { tms1000_cpu_device::device_reset(); }
+	virtual machine_config_constructor device_mconfig_additions() const override;
+
+	virtual void op_rstr() override { ; } // assume it has no RSTR or CLO
+	virtual void op_clo() override { ; } // "
+};
+
 class tms1990_cpu_device : public tms0970_cpu_device
 {
 public:
@@ -478,6 +492,7 @@ extern const device_type TMS1400;
 extern const device_type TMS1470;
 extern const device_type TMS1600;
 extern const device_type TMS1670;
+extern const device_type TMS0950;
 extern const device_type TMS0970;
 extern const device_type TMS1990;
 extern const device_type TMS0980;

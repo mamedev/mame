@@ -2949,6 +2949,7 @@ void * ym2608_init(void *param, device_t *device, int clock, int rate,
 		return nullptr;
 	}
 
+	F2608->device = device;
 	F2608->OPN.ST.param = param;
 	F2608->OPN.type = TYPE_YM2608;
 	F2608->OPN.P_CH = F2608->CH;
@@ -3072,7 +3073,7 @@ void ym2608_reset_chip(void *chip)
 	DELTAT->output_pointer = OPN->out_delta;
 	DELTAT->portshift = 5;      /* always 5bits shift */ /* ASG */
 	DELTAT->output_range = 1<<23;
-	YM_DELTAT_ADPCM_Reset(DELTAT,OUTD_CENTER,YM_DELTAT_EMULATION_MODE_NORMAL,DELTAT->device);
+	YM_DELTAT_ADPCM_Reset(DELTAT,OUTD_CENTER,YM_DELTAT_EMULATION_MODE_NORMAL,F2608->device);
 }
 
 /* YM2608 write */

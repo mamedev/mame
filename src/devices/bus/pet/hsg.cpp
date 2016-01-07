@@ -63,6 +63,26 @@ const rom_entry *cbm8000_hsg_t::device_rom_region() const
 
 
 //-------------------------------------------------
+//  ADDRESS_MAP( hsg_a_map )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( hsg_a_map, AS_0, 8, cbm8000_hsg_a_t )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( hsg_b_map )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( hsg_b_map, AS_0, 8, cbm8000_hsg_b_t )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( cbm8000_hsg_a )
 //-------------------------------------------------
 
@@ -72,9 +92,11 @@ static MACHINE_CONFIG_FRAGMENT( cbm8000_hsg_a )
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
 	MCFG_SCREEN_REFRESH_RATE(25)
+    MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	MCFG_DEVICE_ADD(EF9365_TAG, EF9365, 1750000)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, hsg_a_map)
 	MCFG_EF936X_PALETTE("palette")
 	MCFG_EF936X_BITPLANES_CNT(1);
 	MCFG_EF936X_DISPLAYMODE(EF936X_512x512_DISPLAY_MODE);
@@ -91,9 +113,11 @@ static MACHINE_CONFIG_FRAGMENT( cbm8000_hsg_b )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	MCFG_DEVICE_ADD(EF9366_TAG, EF9365, 1750000)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, hsg_b_map)
 	MCFG_EF936X_PALETTE("palette")
 	MCFG_EF936X_BITPLANES_CNT(1);
 	MCFG_EF936X_DISPLAYMODE(EF936X_512x256_DISPLAY_MODE);
@@ -151,8 +175,6 @@ cbm8000_hsg_b_t::cbm8000_hsg_b_t(const machine_config &mconfig, const char *tag,
 
 void cbm8000_hsg_t::device_start()
 {
-	m_gdc->set_color_entry(0, 0, 0, 0);
-	m_gdc->set_color_entry(1, 0, 0xff, 00);
 }
 
 

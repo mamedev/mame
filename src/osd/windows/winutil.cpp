@@ -9,9 +9,11 @@
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <direct.h>
 
 // MAMEOS headers
 #include "winutil.h"
+#include "strconv.h"
 
 //============================================================
 //  win_error_to_file_error
@@ -120,6 +122,18 @@ BOOL win_is_gui_application(void)
 		}
 	}
 	return is_gui_frontend;
+}
+
+//============================================================
+//  osd_subst_env
+//============================================================
+void osd_subst_env(char **dst, const char *src)
+{
+	TCHAR buffer[MAX_PATH];
+
+	TCHAR *t_src = tstring_from_utf8(src);
+	ExpandEnvironmentStrings(t_src, buffer, ARRAY_LENGTH(buffer));
+	*dst = utf8_from_tstring(buffer);
 }
 
 //-------------------------------------------------
