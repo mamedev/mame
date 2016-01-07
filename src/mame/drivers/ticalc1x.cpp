@@ -12,7 +12,6 @@
 
 
   TODO:
-  - TI-1250 doesn't work right
   - MCU clocks are unknown where noted
 
 ***************************************************************************/
@@ -318,7 +317,7 @@ WRITE16_MEMBER(ti1250_state::write_r)
 	m_display_segmask[8] = 0x40;
 
 	// R0-R7(,R8): select digit (right-to-left)
-	display_matrix_seg(9, 8, m_o, data, 0xff);
+	display_matrix_seg(8, 9, m_o, data, 0xff);
 }
 
 WRITE16_MEMBER(ti1250_state::write_o)
@@ -1213,7 +1212,7 @@ ROM_START( ti1250 )
 	ROM_LOAD( "tmc0952nl", 0x0000, 0x0400, CRC(fc0cee65) SHA1(1480e4553181f081281d3b78457721b9ecb20173) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_ti1250_micro.pla", 0, 867, CRC(60106ee3) SHA1(70f914056238a93a6718f26f8591dbd18c25d7f5) )
+	ROM_LOAD( "tms1000_ti1250_micro.pla", 0, 867, CRC(cb3fd2d6) SHA1(82cf36a65dfc3ccb9dd08e48f45ac4d90f693238) )
 	ROM_REGION( 195, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0950_ti1250_output.pla", 0, 195, CRC(31570eb8) SHA1(c1cb17c31367b65aa777925459515c3d5c565508) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
@@ -1372,7 +1371,7 @@ ROM_END
 COMP( 1974, tisr16,    0,        0, tisr16,    tisr16,    driver_device, 0, "Texas Instruments", "SR-16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1975, tisr16ii,  0,        0, tisr16,    tisr16ii,  driver_device, 0, "Texas Instruments", "SR-16 II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-COMP( 1975, ti1250,    0,        0, ti1250,    ti1250,    driver_device, 0, "Texas Instruments", "TI-1250 (1975 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1975, ti1250,    0,        0, ti1250,    ti1250,    driver_device, 0, "Texas Instruments", "TI-1250 (1975 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti125076,  ti1250,   0, ti1270,    ti1250,    driver_device, 0, "Texas Instruments", "TI-1250 (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti1270,    0,        0, ti1270,    ti1270,    driver_device, 0, "Texas Instruments", "TI-1270", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, ti1000,    0,        0, ti1000,    ti1000,    driver_device, 0, "Texas Instruments", "TI-1000 (1977 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

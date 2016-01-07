@@ -5,7 +5,6 @@
   TMS0980/TMS1000-family MCU cores
 
   TODO:
-  - fix TMS0950 (opcode related?)
   - emulate TMS1600 L-pins
   - fix debugger disasm view
 
