@@ -457,8 +457,8 @@ WRITE8_MEMBER( spc1500_state::palet_w)
 {
 	m_palet[(offset>>8)&0x0f] = data;
 	for(int i=1, j=0; i < 0x100; i<<=1, j++)
-		m_paltbl[j] = (m_palet[0]&i?4:0)|(m_palet[1]&i?2:0)|(m_palet[2]&i?1:0);
-//	printf("palet:0x%02x, 0x%02x, 0x%02x\n", m_palet[0], m_palet[1], m_palet[2]);
+		m_paltbl[j] = (m_palet[0]&i?1:0)|(m_palet[1]&i?2:0)|(m_palet[2]&i?4:0);
+	printf("palet:0x%02x, 0x%02x, 0x%02x\n", m_palet[0], m_palet[1], m_palet[2]);
 }
 
 PALETTE_INIT_MEMBER(spc1500_state,spc)
@@ -549,7 +549,6 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 			for (j = 0x80; j > 0; j>>=1)
 			{
 				pen = ((g & j)?4:0)|((r & j)?2:0)|((b & j)?1:0);
-				pen = (nopalet ? pen : m_paltbl[pen]);
 				pixel = (pixelg&j ? 4 : 0)|(pixelr&j ? 2:0)|(pixelb&j ? 1:0 );
 				pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
 				*p++ = m_palette->pen((pen == 0 || (m_priority & (1<<pixel))) ? pixelpen : pen);
