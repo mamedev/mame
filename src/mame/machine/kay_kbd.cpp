@@ -284,7 +284,7 @@ static const UINT8 keyboard[8][10][8] = {
 
 MACHINE_RESET_MEMBER(kaypro_state,kay_kbd)
 {
-	kay_kbd_t *kbd = m_kbd = auto_alloc_clear(machine(), kay_kbd_t);
+	kay_kbd_t *kbd = m_kbd = auto_alloc_clear(machine(), <kay_kbd_t>());
 
 	/* disable CapsLock LED initially */
 	set_led_status(machine(), 1, 1);

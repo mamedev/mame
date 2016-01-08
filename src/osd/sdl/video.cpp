@@ -336,7 +336,7 @@ void sdl_monitor_info::add_primary_monitor(void *data)
 	osd_monitor_info **tailptr = &sdl_monitor_info::list;
 
 	// allocate a new monitor info
-	osd_monitor_info *monitor = global_alloc_clear(sdl_monitor_info(0, "", 1.0f));
+	osd_monitor_info *monitor = global_alloc_clear<sdl_monitor_info>(0, "", 1.0f);
 
 	//monitor->refresh();
 	// guess the aspect ratio assuming square pixels
@@ -413,7 +413,7 @@ void sdl_monitor_info::init()
 
 			// allocate a new monitor info
 
-			monitor = global_alloc_clear(sdl_monitor_info(i, temp, 1.0f));
+			monitor = global_alloc_clear<sdl_monitor_info>(i, temp, 1.0f);
 
 			osd_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->devicename(),
 					monitor->position_size().width(), monitor->position_size().height());

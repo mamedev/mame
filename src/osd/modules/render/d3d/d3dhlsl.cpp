@@ -1864,7 +1864,7 @@ bool shaders::register_prescaled_texture(texture_info *texture)
 //============================================================
 bool shaders::add_cache_target(renderer* d3d, texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index)
 {
-	cache_target* target = (cache_target*)global_alloc_clear(cache_target);
+	cache_target* target = (cache_target*)global_alloc_clear<cache_target>();
 
 	if (!target->init(d3d, d3dintf, width, height, xprescale, yprescale))
 	{
@@ -1945,7 +1945,7 @@ bool shaders::add_render_target(renderer* d3d, texture_info* info, int width, in
 		}
 	}
 
-	render_target* target = (render_target*)global_alloc_clear(render_target);
+	render_target* target = (render_target*)global_alloc_clear<render_target>();
 
 	if (!target->init(d3d, d3dintf, width, height, xprescale, yprescale))
 	{

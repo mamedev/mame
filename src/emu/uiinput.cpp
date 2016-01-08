@@ -72,7 +72,7 @@ struct ui_input_private
 void ui_input_init(running_machine &machine)
 {
 	/* create the private data */
-	machine.ui_input_data = auto_alloc_clear(machine, ui_input_private);
+	machine.ui_input_data = auto_alloc_clear(machine, <ui_input_private>());
 	machine.ui_input_data->current_mouse_x = -1;
 	machine.ui_input_data->current_mouse_y = -1;
 

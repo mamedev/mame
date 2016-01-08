@@ -604,13 +604,13 @@ bool hashfile_extrainfo(device_image_interface &image, std::string &result)
 
 static void *expat_malloc(size_t size)
 {
-	return global_alloc_array_clear(UINT8,size);
+	return global_alloc_array_clear<UINT8>(size);
 }
 
 static void *expat_realloc(void *ptr, size_t size)
 {
 	if (ptr) global_free_array((UINT8 *)ptr);
-	return global_alloc_array_clear(UINT8,size);
+	return global_alloc_array_clear<UINT8>(size);
 }
 
 static void expat_free(void *ptr)

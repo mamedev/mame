@@ -242,7 +242,7 @@ UINT32 ui_menu_sliders::ui_handler(running_machine &machine, render_container *c
 
 	/* if this is the first call, push the sliders menu */
 	if (state)
-		ui_menu::stack_push(auto_alloc_clear(machine, ui_menu_sliders(machine, container, true)));
+		ui_menu::stack_push(auto_alloc_clear(machine, <ui_menu_sliders>(machine, container, true)));
 
 	/* handle standard menus */
 	result = ui_menu::ui_handler(machine, container, state);

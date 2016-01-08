@@ -2219,7 +2219,7 @@ static device_info *generic_device_alloc(device_info **devlist_head_ptr, const c
 	device_info *devinfo;
 
 	// allocate memory for the device object
-	devinfo = global_alloc_clear(device_info);
+	devinfo = global_alloc_clear<device_info>();
 	devinfo->head = devlist_head_ptr;
 
 	// allocate a UTF8 copy of the name

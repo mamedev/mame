@@ -8,8 +8,6 @@
 //
 //============================================================
 
-#define NO_MEM_TRACKING
-
 #include "debug_module.h"
 #include "modules/osdmodule.h"
 

@@ -56,7 +56,7 @@ vtlb_state *vtlb_alloc(device_t *cpu, address_spacenum space, int fixed_entries,
 	vtlb_state *vtlb;
 
 	/* allocate memory for the core structure */
-	vtlb = auto_alloc_clear(cpu->machine(), vtlb_state);
+	vtlb = auto_alloc_clear(cpu->machine(), <vtlb_state>());
 
 	/* fill in CPU information */
 	vtlb->cpudevice = downcast<cpu_device *>(cpu);

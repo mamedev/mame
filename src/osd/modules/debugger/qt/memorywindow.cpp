@@ -1,7 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#define NO_MEM_TRACKING
-
 #include <QtGui/QClipboard>
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QActionGroup>

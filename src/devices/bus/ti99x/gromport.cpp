@@ -2260,7 +2260,7 @@ rpk_socket* rpk_reader::load_rom_resource(zip_file* zip, xml_data_node* rom_reso
 	length = header->uncompressed_length;
 
 	// Allocate storage
-	contents = global_alloc_array_clear(UINT8, length);
+	contents = global_alloc_array_clear<UINT8>(length);
 	if (contents==nullptr) throw rpk_exception(RPK_OUT_OF_MEMORY);
 
 	// and unzip file from the zip file
@@ -2326,7 +2326,7 @@ rpk_socket* rpk_reader::load_ram_resource(emu_options &options, xml_data_node* r
 	}
 
 	// Allocate memory for this resource
-	contents = global_alloc_array_clear(UINT8, length);
+	contents = global_alloc_array_clear<UINT8>(length);
 	if (contents==nullptr) throw rpk_exception(RPK_OUT_OF_MEMORY);
 
 	//if (TRACE_RPK) logerror("gromport/RPK: Allocating RAM buffer (%d bytes) for socket '%s'\n", length, socketname);
