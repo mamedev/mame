@@ -45,7 +45,7 @@ mos6581_device::mos6581_device(const machine_config &mconfig, device_type type, 
 		m_stream(nullptr),
 		m_variant(variant)
 {
-	m_token = global_alloc_clear(SID6581_t);
+	m_token = global_alloc_clear<SID6581_t>();
 }
 
 mos6581_device::mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -56,7 +56,7 @@ mos6581_device::mos6581_device(const machine_config &mconfig, const char *tag, d
 		m_stream(nullptr),
 		m_variant(TYPE_6581)
 {
-	m_token = global_alloc_clear(SID6581_t);
+	m_token = global_alloc_clear<SID6581_t>();
 }
 
 mos6581_device::~mos6581_device()

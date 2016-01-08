@@ -141,7 +141,7 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 
 	// special case for configure inputs
 	if ((FPTR)driver == 1)
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_input_groups(machine(), container)));
+		ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_input_groups>(machine(), container)));
 
 	// anything else is a driver
 	else
@@ -180,7 +180,7 @@ void ui_menu_select_game::inkey_cancel(const ui_menu_event *menu_event)
 	if (m_search[0] != 0)
 	{
 		// since we have already been popped, we must recreate ourself from scratch
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_game(machine(), container, nullptr)));
+		ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_select_game>(machine(), container, nullptr)));
 	}
 }
 
@@ -429,10 +429,10 @@ void ui_menu_select_game::force_game_select(running_machine &machine, render_con
 	ui_menu::stack_reset(machine);
 
 	// add the quit entry followed by the game select entry
-	ui_menu *quit = auto_alloc_clear(machine, ui_menu_quit_game(machine, container));
+	ui_menu *quit = auto_alloc_clear(machine, <ui_menu_quit_game>(machine, container));
 	quit->set_special_main_menu(true);
 	ui_menu::stack_push(quit);
-	ui_menu::stack_push(auto_alloc_clear(machine, ui_menu_select_game(machine, container, gamename)));
+	ui_menu::stack_push(auto_alloc_clear(machine, <ui_menu_select_game>(machine, container, gamename)));
 
 	// force the menus on
 	machine.ui().show_menu();

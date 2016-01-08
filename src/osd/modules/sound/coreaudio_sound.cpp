@@ -146,7 +146,7 @@ private:
 		CFIndex const len = CFStringGetMaximumSizeForEncoding(
 				CFStringGetLength(str),
 				kCFStringEncodingUTF8);
-		char *const result = global_alloc_array_clear(char, len + 1);
+		char *const result = global_alloc_array_clear<char>(len + 1);
 		if (!CFStringGetCString(str, result, len + 1, kCFStringEncodingUTF8))
 		{
 			global_free_array(result);
@@ -229,7 +229,7 @@ int sound_coreaudio::init(const osd_options &options)
 	// Allocate buffer
 	m_headroom = m_sample_bytes * (clamped_latency() * sample_rate() / 40);
 	m_buffer_size = m_sample_bytes * MAX(sample_rate() * (clamped_latency() + 3) / 40, 256);
-	m_buffer = global_alloc_array_clear(INT8, m_buffer_size);
+	m_buffer = global_alloc_array_clear<INT8>(m_buffer_size);
 	if (!m_buffer)
 	{
 		osd_printf_error("Could not allocate stream buffer\n");
@@ -648,7 +648,7 @@ bool sound_coreaudio::get_output_device_id(
 		return false;
 	}
 	property_size /= sizeof(AudioDeviceID);
-	AudioDeviceID *const devices = global_alloc_array_clear(AudioDeviceID, property_size);
+	AudioDeviceID *const devices = global_alloc_array_clear<AudioDeviceID>(property_size);
 	property_size *= sizeof(AudioDeviceID);
 	err = AudioObjectGetPropertyData(
 			kAudioObjectSystemObject,

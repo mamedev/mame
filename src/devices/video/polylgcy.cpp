@@ -315,7 +315,7 @@ legacy_poly_manager *poly_alloc(running_machine &machine, int max_polys, size_t 
 	legacy_poly_manager *poly;
 
 	/* allocate the manager itself */
-	poly = auto_alloc_clear(machine, legacy_poly_manager);
+	poly = auto_alloc_clear(machine, <legacy_poly_manager>());
 	poly->flags = flags;
 
 	/* allocate polygons */

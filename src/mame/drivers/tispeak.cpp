@@ -15,7 +15,7 @@
 
 ----------------------------------------------------------------------------
 
-Known devices on this hardware: (* denotes not dumped, ** denotes pending dump)
+Known devices on this hardware: (* denotes not dumped)
 
 
 ROM (and/or source) code obtained from patents:
@@ -80,7 +80,7 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: this one has a dedicated voice actor
 
     Speak & Spell (France) "La Dictee Magique", 1980
-    - MCU: CD2702**
+    - MCU: CD2702*
     - TMS51xx: CD2801
     - VSM: 16KB CD2352
 
@@ -96,7 +96,7 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: it appears that TI ran out of original snspell VFDs in the early 80s?
 
     Speak & Spell Compact (US), 1981
-    - MCU: CD8011**
+    - MCU: CD8011, labeled CD8011A-NL (die labeled 1100B)
     - TMS51xx: TMC0281D
     - VSM: 16KB CD2354, CD2354(rev.A)
     - notes: no display, MCU is TMS1100 instead of TMS0270, overall similar to Touch & Tell
@@ -104,7 +104,8 @@ above expectations. TI continued to manufacture many products for this line.
     Speak & Spell Compact (UK) "Speak & Write", 1981
     - MCU & TMS51xx: same as US 1981 version
     - VSM: 16KB CD62174(rev.A)
-    - notes: anecdotes from the developer, the same person working on the original UK version:
+    - notes: BTANB: gibberish when the module button is pressed (with module present),
+      anecdotes from the developer, the same person working on the original UK version:
           "We included a pencil and writing pad - it was now about 'writing'.",
       and one about the welcome message:
           "I had to manually create a sentence of digital speech from thin air.
@@ -190,7 +191,7 @@ Speak & Read modules:
 Touch & Tell:
 
     Touch & Tell (US), 1981
-    - MCU: CD8012
+    - MCU: CD8012, labeled CD8012NL (die labeled 1100G CD8012)
     - TMS51xx: CD2802
     - VSM: 4KB CD2610
     - notes: MCU is TMS1100 instead of TMS0270. CD8010 is seen in some devices
@@ -405,9 +406,10 @@ public:
 	DECLARE_WRITE16_MEMBER(snspell_write_r);
 	DECLARE_WRITE16_MEMBER(lantutor_write_r);
 
+	DECLARE_READ8_MEMBER(snspellc_read_k);
+	DECLARE_WRITE16_MEMBER(snspellc_write_o);
+	DECLARE_WRITE16_MEMBER(snspellc_write_r);
 	DECLARE_READ8_MEMBER(tntell_read_k);
-	DECLARE_WRITE16_MEMBER(tntell_write_o);
-	DECLARE_WRITE16_MEMBER(tntell_write_r);
 
 	// cartridge
 	UINT32 m_cart_max_size;
@@ -567,11 +569,11 @@ WRITE16_MEMBER(tispeak_state::lantutor_write_r)
 }
 
 
-// tntell specific
+// snspellc specific
 
-WRITE16_MEMBER(tispeak_state::tntell_write_r)
+WRITE16_MEMBER(tispeak_state::snspellc_write_r)
 {
-	// R10: CD2802 PDC pin
+	// R10: TMS5100 PDC pin
 	m_tms5100->pdc_w(data >> 10);
 
 	// R9: power-off request, on falling edge
@@ -582,27 +584,32 @@ WRITE16_MEMBER(tispeak_state::tntell_write_r)
 	m_r = m_inp_mux = data;
 }
 
-WRITE16_MEMBER(tispeak_state::tntell_write_o)
+WRITE16_MEMBER(tispeak_state::snspellc_write_o)
 {
-	// O3210: CD2802 CTL8124
+	// O3210: TMS5100 CTL8124
 	m_o = BITSWAP8(data,7,6,5,4,3,0,1,2);
 	m_tms5100->ctl_w(space, 0, m_o & 0xf);
 }
 
+READ8_MEMBER(tispeak_state::snspellc_read_k)
+{
+	// K4: TMS5100 CTL1
+	UINT8 k4 = m_tms5100->ctl_r(space, 0) << 2 & 4;
+
+	// K: multiplexed inputs (note: the Vss row is always on)
+	return k4 | m_inp_matrix[9]->read() | read_inputs(9);
+}
+
+
+// tntell specific
+
 READ8_MEMBER(tispeak_state::tntell_read_k)
 {
-	// multiplexed inputs (and K2 from on-button)
-	UINT8 k = m_inp_matrix[9]->read() | read_inputs(9);
-
-	// K4: CD2802 CTL1
-	if (m_tms5100->ctl_r(space, 0) & 1)
-		k |= 4;
-
 	// K8: overlay code from R5,O4-O7
-	if (((m_r >> 1 & 0x10) | (m_o >> 4 & 0xf)) & m_overlay)
-		k |= 8;
+	UINT8 k8 = (((m_r >> 1 & 0x10) | (m_o >> 4 & 0xf)) & m_overlay) ? 8 : 0;
 
-	return k;
+	// rest is same as snpellc
+	return k8 | snspellc_read_k(space, offset);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
@@ -682,7 +689,7 @@ static INPUT_PORTS_START( snspell )
 	PORT_START("IN.5") // R5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_NAME("Module")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_NAME("Module Select")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Erase")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Enter")
 
@@ -702,6 +709,52 @@ static INPUT_PORTS_START( snspell )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Say It")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( snspellfr ) // French button names
+	PORT_INCLUDE( snspell )
+
+	PORT_MODIFY("IN.5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_NAME("Module 2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Efface")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Essaie")
+
+	PORT_MODIFY("IN.7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Arr" e_ACUTE "t")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_HOME) PORT_NAME("D" e_ACUTE "part")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Rejoue")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Repete")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Aide")
+
+	PORT_MODIFY("IN.8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("Mot Mystere")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Code Secret")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Lettre")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Dis-le")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Epelle/Marche") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( snspellit ) // Italian button names
+	PORT_INCLUDE( snspell )
+
+	PORT_MODIFY("IN.5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_NAME("Moduli")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Cancella")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Controllo")
+
+	PORT_MODIFY("IN.7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Stop")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_HOME) PORT_NAME("Via")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Ritorno")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Replica")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Aiuto")
+
+	PORT_MODIFY("IN.8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("Indovina")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Codice")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Alfabeto")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Ripeti")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Scrivi") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
 INPUT_PORTS_END
 
 
@@ -809,6 +862,76 @@ static INPUT_PORTS_START( lantutor )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( snspellc )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Letter Stumper")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Review")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Repeat")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Erase")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_NAME("Module")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_HOME) PORT_NAME("Go")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
+
+	PORT_START("IN.7") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Enter")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
+
+	PORT_START("IN.8") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'')
+
+	PORT_START("IN.9") // Vss!
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) // speech chip data
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") // -> auto_power_off
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( snspellcuk )
+	PORT_INCLUDE( snspellc )
+
+	PORT_MODIFY("IN.9")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Write/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true) // just the label changed from Spell to Write
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( tntell )
 	PORT_START("IN.0") // R0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Grid 1-1")
@@ -865,8 +988,10 @@ static INPUT_PORTS_START( tntell )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Grid 6-3")
 
 	PORT_START("IN.9") // Vss!
-	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Grid 6-6 (On)") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) // speech chip data
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.10")
 	PORT_CONFNAME( 0x1f, 0x04, "Overlay Code" ) // only if not provided by external artwork
@@ -1020,13 +1145,37 @@ static MACHINE_CONFIG_DERIVED( lantutor, snmath )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_START( snspellc, tispeak_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, MASTER_CLOCK/2)
+	MCFG_TMS1XXX_READ_K_CB(READ8(tispeak_state, snspellc_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspellc_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, snspellc_write_r))
+
+	/* sound hardware */
+	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("tms5100", TMC0281D, MASTER_CLOCK)
+	MCFG_FRAGMENT_ADD(tms5110_route)
+
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "snspell")
+	MCFG_GENERIC_EXTENSIONS("vsm")
+	MCFG_GENERIC_LOAD(tispeak_state, tispeak_cartridge)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "snspell")
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_START( vocaid, tispeak_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1100, MASTER_CLOCK/2)
 	MCFG_TMS1XXX_READ_K_CB(READ8(tispeak_state, tntell_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, tntell_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, tntell_write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspellc_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, snspellc_write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ol_timer", tispeak_state, tntell_get_overlay, attotime::from_msec(50))
@@ -1076,7 +1225,7 @@ ROM_START( snspell )
 	ROM_LOAD( "tmc0352nl.vsm", 0x4000, 0x4000, CRC(d51f0587) SHA1(ddaa484be1bba5fef46b481cafae517e4acaa8ed) )
 ROM_END
 
-ROM_START( snspella )
+ROM_START( snspellua )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "us4189779_tmc0271", 0x0000, 0x1000, BAD_DUMP CRC(d3f5a37d) SHA1(f75ab617a6067d4d3a954a9f86126d2089554df8) ) // placeholder, use the one we have
 
@@ -1092,7 +1241,7 @@ ROM_START( snspella )
 	ROM_LOAD( "tmc0352n2l.vsm", 0x4000, 0x4000, CRC(a6d56883) SHA1(eebf9c07f2f9001679dec06c2367d4a50596d04b) )
 ROM_END
 
-ROM_START( snspellb )
+ROM_START( snspellub )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "us4189779_tmc0271", 0x0000, 0x1000, BAD_DUMP CRC(d3f5a37d) SHA1(f75ab617a6067d4d3a954a9f86126d2089554df8) ) // placeholder, use the one we have
 
@@ -1185,6 +1334,46 @@ ROM_START( snspellit )
 ROM_END
 
 
+ROM_START( snspellc )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "cd8011a-nl", 0x0000, 0x0800, CRC(8a82a467) SHA1(fa4f8a232392603721bd8136c141a340fd5936a0) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_cd8011_micro.pla", 0, 867, CRC(bbb64ddc) SHA1(602cd5eef897c9115c12db7367c5654ab2297fa1) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_cd8011_output.pla", 0, 365, CRC(b400dd75) SHA1(5a4b5d4532a8932cf4b469ddb71ad6b3b9911672) )
+
+	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
+	ROM_LOAD( "cd2354.vsm", 0x0000, 0x4000, CRC(3af3232e) SHA1(f89d90dca209ee612634d664d5d4562f1d1786cf) )
+ROM_END
+
+ROM_START( snspellca )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "cd8011a-nl", 0x0000, 0x0800, CRC(8a82a467) SHA1(fa4f8a232392603721bd8136c141a340fd5936a0) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_cd8011_micro.pla", 0, 867, CRC(bbb64ddc) SHA1(602cd5eef897c9115c12db7367c5654ab2297fa1) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_cd8011_output.pla", 0, 365, CRC(b400dd75) SHA1(5a4b5d4532a8932cf4b469ddb71ad6b3b9911672) )
+
+	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
+	ROM_LOAD( "cd2354a.vsm", 0x0000, 0x4000, CRC(548a940c) SHA1(c37e620c4c70a05cbaaff9a166c6da2e2420196f) )
+ROM_END
+
+ROM_START( snspellcuk )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "cd8011a-nl", 0x0000, 0x0800, CRC(8a82a467) SHA1(fa4f8a232392603721bd8136c141a340fd5936a0) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_cd8011_micro.pla", 0, 867, CRC(bbb64ddc) SHA1(602cd5eef897c9115c12db7367c5654ab2297fa1) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_cd8011_output.pla", 0, 365, CRC(b400dd75) SHA1(5a4b5d4532a8932cf4b469ddb71ad6b3b9911672) )
+
+	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
+	ROM_LOAD( "cd62174a.vsm", 0x0000, 0x4000, CRC(b7bbaaf3) SHA1(9eb949fcf522982f9c3c4649f207703b746b90ef) )
+ROM_END
+
+
 ROM_START( snmath )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "cd2708n2l", 0x0000, 0x1000, CRC(35937360) SHA1(69c362c75bb459056c09c7fab37c91040485474b) )
@@ -1257,7 +1446,7 @@ ROM_END
 
 ROM_START( tntell )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "cd8012", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
+	ROM_LOAD( "cd8012nl", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) )
@@ -1270,7 +1459,7 @@ ROM_END
 
 ROM_START( tntelluk )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "cd8012", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
+	ROM_LOAD( "cd8012nl", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) )
@@ -1283,7 +1472,7 @@ ROM_END
 
 ROM_START( tntellfr )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "cd8012", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
+	ROM_LOAD( "cd8012nl", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) )
@@ -1310,7 +1499,7 @@ ROM_END
 
 ROM_START( vocaid )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "cd8012", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
+	ROM_LOAD( "cd8012nl", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) )
@@ -1323,27 +1512,31 @@ ROM_END
 
 
 
-/*    YEAR  NAME        PARENT COMPAT MACHINE     INPUT     INIT                     COMPANY, FULLNAME, FLAGS */
-COMP( 1978, snspell,    0,        0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // incomplete dump, uses patent MCU ROM
-COMP( 1978, snspellp,   snspell,  0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1979, snspella,   snspell,  0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
-COMP( 1980, snspellb,   snspell,  0, sns_tmc0281d,snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
-COMP( 1978, snspelluk,  snspell,  0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
-COMP( 1981, snspelluka, snspell,  0, sns_cd2801_m,snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
-COMP( 1979, snspelljp,  snspell,  0, sns_tmc0281, snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
-COMP( 1980, snspellfr,  snspell,  0, sns_cd2801,  snspell,  tispeak_state, snspell,  "Texas Instruments", "La Dictee Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // doesn't work due to missing CD2702 MCU dump, German/Italian version has CD2702 too
-COMP( 1982, snspellit,  snspell,  0, sns_cd2801_m,snspell,  tispeak_state, snspell,  "Texas Instruments", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
+/*    YEAR  NAME        PARENT COMPAT MACHINE      INPUT       INIT                     COMPANY, FULLNAME, FLAGS */
+COMP( 1978, snspell,    0,        0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // incomplete dump, uses patent MCU ROM
+COMP( 1978, snspellp,   snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1979, snspellua,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
+COMP( 1980, snspellub,  snspell,  0, sns_tmc0281d, snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
+COMP( 1978, snspelluk,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
+COMP( 1981, snspelluka, snspell,  0, sns_cd2801_m, snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
+COMP( 1979, snspelljp,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
+COMP( 1980, snspellfr,  snspell,  0, sns_cd2801,   snspellfr,  tispeak_state, snspell,  "Texas Instruments", "La Dictee Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // doesn't work due to missing CD2702 MCU dump, German/Italian version has CD2702 too
+COMP( 1982, snspellit,  snspell,  0, sns_cd2801_m, snspellit,  tispeak_state, snspell,  "Texas Instruments", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
 
-COMP( 1986, snmath,     0,        0, snmath,      snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1980, snmathp,    snmath,   0, snmath,      snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1980 version/patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+COMP( 1981, snspellc,   0,        0, snspellc,     snspellc,   tispeak_state, snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1982, snspellca,  snspellc, 0, snspellc,     snspellc,   tispeak_state, snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1982, snspellcuk, snspellc, 0, snspellc,     snspellcuk, tispeak_state, snspell,  "Texas Instruments", "Speak & Write (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-COMP( 1980, snread,     0,        0, snread,      snread,   tispeak_state, snspell,  "Texas Instruments", "Speak & Read (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1986, snmath,     0,        0, snmath,       snmath,     driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1980, snmathp,    snmath,   0, snmath,       snmath,     driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1980 version/patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-COMP( 1979, lantutor,   0,        0, lantutor,    lantutor, tispeak_state, lantutor, "Texas Instruments", "Language Tutor (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+COMP( 1980, snread,     0,        0, snread,       snread,     tispeak_state, snspell,  "Texas Instruments", "Speak & Read (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-COMP( 1981, tntell,     0,        0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK ) // assume there is an older version too, with CD8010 MCU
-COMP( 1980, tntellp,    tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
-COMP( 1981, tntelluk,   tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
-COMP( 1981, tntellfr,   tntell,   0, tntell,      tntell,   tispeak_state, tntell,   "Texas Instruments", "Le Livre Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+COMP( 1979, lantutor,   0,        0, lantutor,     lantutor,   tispeak_state, lantutor, "Texas Instruments", "Language Tutor (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-COMP( 1982, vocaid,     0,        0, vocaid,      tntell,   driver_device, 0,        "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+COMP( 1981, tntell,     0,        0, tntell,       tntell,     tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK ) // assume there is an older version too, with CD8010 MCU
+COMP( 1980, tntellp,    tntell,   0, tntell,       tntell,     tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+COMP( 1981, tntelluk,   tntell,   0, tntell,       tntell,     tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+COMP( 1981, tntellfr,   tntell,   0, tntell,       tntell,     tispeak_state, tntell,   "Texas Instruments", "Le Livre Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+
+COMP( 1982, vocaid,     0,        0, vocaid,       tntell,     driver_device, 0,        "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )

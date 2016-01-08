@@ -1319,7 +1319,7 @@ static void CreateMainMenu(running_machine &machine)
 
 	if (menu)
 		global_free( menu);
-	menu = global_alloc_clear(ui_menu_debug(machine, &machine.render().ui_container()));
+	menu = global_alloc_clear<ui_menu_debug>(machine, &machine.render().ui_container());
 
 	switch (focus_view->type)
 	{

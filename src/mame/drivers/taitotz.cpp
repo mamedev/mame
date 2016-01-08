@@ -600,6 +600,7 @@ public:
 	DECLARE_DRIVER_INIT(batlgear);
 	DECLARE_DRIVER_INIT(landhigh);
 	DECLARE_DRIVER_INIT(raizpin);
+	DECLARE_DRIVER_INIT(raizpinj);
 	DECLARE_DRIVER_INIT(styphp);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -2406,6 +2407,15 @@ static INPUT_PORTS_START( taitotz )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON4 )                                  // View 2
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON1 )                                  // Select 1
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON2 )                                  // Select 2
+
+	PORT_START("ANALOG1")
+	PORT_START("ANALOG2")
+	PORT_START("ANALOG3")
+	PORT_START("ANALOG4")
+	PORT_START("ANALOG5")
+	PORT_START("ANALOG6")
+	PORT_START("ANALOG7")
+	PORT_START("ANALOG8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( landhigh )
@@ -2461,6 +2471,10 @@ static INPUT_PORTS_START( landhigh )
 
 	PORT_START("ANALOG5")
 	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL3 ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
+	PORT_START("ANALOG6")
+	PORT_START("ANALOG7")
+	PORT_START("ANALOG8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( batlgr2 )
@@ -2510,6 +2524,12 @@ static INPUT_PORTS_START( batlgr2 )
 
 	PORT_START("ANALOG3")       // Brake Pedal
 	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
+	PORT_START("ANALOG4")
+	PORT_START("ANALOG5")
+	PORT_START("ANALOG6")
+	PORT_START("ANALOG7")
+	PORT_START("ANALOG8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pwrshovl )
@@ -2623,6 +2643,12 @@ static INPUT_PORTS_START( styphp )
 
 	PORT_START("ANALOG3")       // Brake Pedal
 	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
+	PORT_START("ANALOG4")
+	PORT_START("ANALOG5")
+	PORT_START("ANALOG6")
+	PORT_START("ANALOG7")
+	PORT_START("ANALOG8")
 INPUT_PORTS_END
 
 void taitotz_state::machine_reset()
@@ -2671,6 +2697,14 @@ static MACHINE_CONFIG_START( taitotz, taitotz_state )
 	MCFG_TMP95C063_PORTB_READ(IOPORT("INPUTS2"))
 	MCFG_TMP95C063_PORTD_READ(IOPORT("INPUTS3"))
 	MCFG_TMP95C063_PORTE_READ(IOPORT("INPUTS4"))
+	MCFG_TMP95C063_AN0_READ(IOPORT("ANALOG1"))
+	MCFG_TMP95C063_AN1_READ(IOPORT("ANALOG2"))
+	MCFG_TMP95C063_AN2_READ(IOPORT("ANALOG3"))
+	MCFG_TMP95C063_AN3_READ(IOPORT("ANALOG4"))
+	MCFG_TMP95C063_AN4_READ(IOPORT("ANALOG5"))
+	MCFG_TMP95C063_AN5_READ(IOPORT("ANALOG6"))
+	MCFG_TMP95C063_AN6_READ(IOPORT("ANALOG7"))
+	MCFG_TMP95C063_AN7_READ(IOPORT("ANALOG8"))
 
 	MCFG_CPU_PROGRAM_MAP(tlcs900h_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitotz_state,  taitotz_vbi)
@@ -2725,6 +2759,9 @@ static const char BATLGR2A_HDD_SERIAL[] =           // "            05411645"
 
 static const char RAIZPIN_HDD_SERIAL[] =            // "691934013492        "
 	{ 0x36, 0x39, 0x31, 0x39, 0x33, 0x34, 0x30, 0x31, 0x33, 0x34, 0x39, 0x32, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
+
+static const char RAIZPINJ_HDD_SERIAL[] =           // "824915745143        "
+	{ 0x38, 0x32, 0x34, 0x39, 0x31, 0x35, 0x37, 0x34, 0x35, 0x31, 0x34, 0x33, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
 
 static const char STYPHP_HDD_SERIAL[] =             // "            05872160"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x38, 0x37, 0x32, 0x31, 0x36, 0x30 };
@@ -2791,6 +2828,17 @@ DRIVER_INIT_MEMBER(taitotz_state,raizpin)
 	init_taitotz_152();
 
 	m_hdd_serial_number = RAIZPIN_HDD_SERIAL;
+
+	m_scr_base = 0x1c0000;
+
+	m_displist_addr = 0x33480c;
+}
+
+DRIVER_INIT_MEMBER(taitotz_state,raizpinj)
+{
+	init_taitotz_152();
+
+	m_hdd_serial_number = RAIZPINJ_HDD_SERIAL;
 
 	m_scr_base = 0x1c0000;
 
@@ -3015,4 +3063,4 @@ GAME( 2000, batlgr2,  taitotz, taitotz,  batlgr2, taitotz_state,  batlgr2,  ROT0
 GAME( 2000, batlgr2a, batlgr2, taitotz,  batlgr2, taitotz_state,  batlgr2a, ROT0, "Taito", "Battle Gear 2 (v2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2000, styphp,   taitotz, taitotz,  styphp,  taitotz_state,  styphp,   ROT0, "Taito", "Stunt Typhoon Plus", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, raizpin,  taitotz, taitotz,  taitotz, taitotz_state,  raizpin,  ROT0, "Taito", "Raizin Ping Pong (V2.01O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, raizpinj, raizpin, taitotz,  taitotz, taitotz_state,  raizpin,  ROT0, "Taito", "Raizin Ping Pong (V2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // needs proper serial code
+GAME( 2002, raizpinj, raizpin, taitotz,  taitotz, taitotz_state,  raizpinj, ROT0, "Taito", "Raizin Ping Pong (V2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

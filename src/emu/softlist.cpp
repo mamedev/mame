@@ -703,13 +703,13 @@ softlist_parser::softlist_parser(software_list_device &list, std::string &errors
 
 void *softlist_parser::expat_malloc(size_t size)
 {
-	return global_alloc_array_clear(UINT8, size);
+	return global_alloc_array_clear<UINT8>(size);
 }
 
 void *softlist_parser::expat_realloc(void *ptr, size_t size)
 {
 	if (ptr != nullptr) global_free_array((UINT8 *)ptr);
-	return global_alloc_array_clear(UINT8, size);
+	return global_alloc_array_clear<UINT8>(size);
 }
 
 void softlist_parser::expat_free(void *ptr)

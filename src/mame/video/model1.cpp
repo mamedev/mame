@@ -1442,7 +1442,7 @@ void model1_state::tgp_scan()
 
 VIDEO_START_MEMBER(model1_state,model1)
 {
-	m_view = auto_alloc_clear(machine(), struct view);
+	m_view = auto_alloc_clear(machine(), <struct view>());
 
 	m_poly_rom = (UINT32 *)memregion("user1")->base();
 	m_poly_ram = make_unique_clear<UINT32[]>(0x400000);

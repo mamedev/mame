@@ -2263,7 +2263,7 @@ void * ym2203_init(void *param, device_t *device, int clock, int rate,
 	YM2203 *F2203;
 
 	/* allocate ym2203 state space */
-	F2203 = auto_alloc_clear(device->machine(), YM2203);
+	F2203 = auto_alloc_clear(device->machine(), <YM2203>());
 
 	if( !init_tables() )
 	{
@@ -2941,7 +2941,7 @@ void * ym2608_init(void *param, device_t *device, int clock, int rate,
 	YM2608 *F2608;
 
 	/* allocate extend state space */
-	F2608 = auto_alloc_clear(device->machine(), YM2608);
+	F2608 = auto_alloc_clear(device->machine(), <YM2608>());
 	/* allocate total level table (128kb space) */
 	if( !init_tables() )
 	{
@@ -3623,7 +3623,7 @@ void *ym2610_init(void *param, device_t *device, int clock, int rate,
 	YM2610 *F2610;
 
 	/* allocate extend state space */
-	F2610 = auto_alloc_clear(device->machine(), YM2610);
+	F2610 = auto_alloc_clear(device->machine(), <YM2610>());
 	/* allocate total level table (128kb space) */
 	if( !init_tables() )
 	{

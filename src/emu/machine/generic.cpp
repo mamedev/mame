@@ -52,7 +52,7 @@ void generic_machine_init(running_machine &machine)
 	int counternum;
 
 	/* allocate our state */
-	machine.generic_machine_data = auto_alloc_clear(machine, generic_machine_private);
+	machine.generic_machine_data = auto_alloc_clear(machine, <generic_machine_private>());
 	state = machine.generic_machine_data;
 
 	/* reset coin counters */

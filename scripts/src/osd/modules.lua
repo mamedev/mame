@@ -15,8 +15,8 @@ end
 
 function addlibfromstring(str)
 	if (str==nil) then return  end
-	for w in str:gmatch("%S+") do 
-		if string.starts(w,"-l")==true then 
+	for w in str:gmatch("%S+") do
+		if string.starts(w,"-l")==true then
 			links {
 				string.sub(w,3)
 			}
@@ -26,8 +26,8 @@ end
 
 function addoptionsfromstring(str)
 	if (str==nil) then return  end
-	for w in str:gmatch("%S+") do 
-		if string.starts(w,"-l")==false then 
+	for w in str:gmatch("%S+") do
+		if string.starts(w,"-l")==false then
 			linkoptions {
 				w
 			}
@@ -122,7 +122,7 @@ function osdmodulesbuild()
 	if _OPTIONS["USE_QTDEBUG"]=="1" then
 		defines {
 			"USE_QTDEBUG=1",
-		}		
+		}
 	else
 		defines {
 			"USE_QTDEBUG=0",
@@ -137,6 +137,15 @@ function qtdebuggerbuild()
 	removeflags {
 		"SingleOutputDir",
 	}
+  local version = str_to_version(_OPTIONS["gcc_version"])
+	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
+		configuration { "gmake" }
+		if (version >= 30600) then
+			buildoptions {
+				"-Wno-inconsistent-missing-override",
+			}
+		end
+	end
 
 	files {
 		MAME_DIR .. "src/osd/modules/debugger/debugqt.cpp",
@@ -175,7 +184,7 @@ function qtdebuggerbuild()
 		defines {
 			"USE_QTDEBUG=1",
 		}
-		
+
 		local MOC = ""
 		if (os.is("windows")) then
 			MOC = "moc"
@@ -185,9 +194,9 @@ function qtdebuggerbuild()
 				if (QMAKETST=='') then
 					print("Qt's Meta Object Compiler (moc) wasn't found!")
 					os.exit(1)
-				end	
+				end
 				MOC = _OPTIONS["QT_HOME"] .. "/bin/moc"
-			else 
+			else
 				MOCTST = backtick("which moc-qt5 2>/dev/null")
 				if (MOCTST=='') then
 					MOCTST = backtick("which moc 2>/dev/null")
@@ -195,12 +204,12 @@ function qtdebuggerbuild()
 				if (MOCTST=='') then
 					print("Qt's Meta Object Compiler (moc) wasn't found!")
 					os.exit(1)
-				end	
+				end
 				MOC = MOCTST
 			end
 		end
-		
-		
+
+
 		custombuildtask {
 			{ MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.h", 			GEN_DIR .. "osd/modules/debugger/qt/debuggerview.moc.cpp", { },			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
 			{ MAME_DIR .. "src/osd/modules/debugger/qt/windowqt.h", 				GEN_DIR .. "osd/modules/debugger/qt/windowqt.moc.cpp", { }, 				{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
@@ -211,9 +220,9 @@ function qtdebuggerbuild()
 			{ MAME_DIR .. "src/osd/modules/debugger/qt/breakpointswindow.h",		GEN_DIR .. "osd/modules/debugger/qt/breakpointswindow.moc.cpp", { }, 		{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
 			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceswindow.h", 			GEN_DIR .. "osd/modules/debugger/qt/deviceswindow.moc.cpp", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
 			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceinformationwindow.h",  GEN_DIR .. "osd/modules/debugger/qt/deviceinformationwindow.moc.cpp", { },{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			
+
 		}
-		
+
 		if _OPTIONS["targetos"]=="windows" then
 			configuration { "mingw*" }
 				buildoptions {
@@ -283,9 +292,9 @@ function osdmodulestargetconf()
 			}
 			links {
 				"qtmain",
-				"Qt5Core",
-				"Qt5Gui",
-				"Qt5Widgets",
+				"Qt5Core.dll",
+				"Qt5Gui.dll",
+				"Qt5Widgets.dll",
 			}
 		elseif _OPTIONS["targetos"]=="macosx" then
 			linkoptions {

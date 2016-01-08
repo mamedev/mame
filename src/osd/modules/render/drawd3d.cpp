@@ -915,11 +915,11 @@ try_again:
 	// create shader options only once
 	if (m_shaders_options == NULL)
 	{
-		m_shaders_options = (hlsl_options*)global_alloc_clear(hlsl_options);
+		m_shaders_options = (hlsl_options*)global_alloc_clear<hlsl_options>();
 		m_shaders_options->params_init = false;
 	}
 
-	m_shaders = (shaders*)global_alloc_clear(shaders);
+	m_shaders = (shaders*)global_alloc_clear<shaders>();
 	m_shaders->init(d3dintf, &window().machine(), this);
 
 	int failed = m_shaders->create_resources(false);
