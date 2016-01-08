@@ -116,7 +116,7 @@ void debug_cpu_init(running_machine &machine)
 	int regnum;
 
 	/* allocate and reset globals */
-	machine.debugcpu_data = global = auto_alloc_clear(machine, debugcpu_private);
+	machine.debugcpu_data = global = auto_alloc_clear(machine, <debugcpu_private>());
 	global->execution_state = EXECUTION_STATE_STOPPED;
 	global->bpindex = 1;
 	global->wpindex = 1;

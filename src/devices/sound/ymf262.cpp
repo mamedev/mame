@@ -2342,7 +2342,7 @@ static OPL3 *OPL3Create(device_t *device, int clock, int rate, int type)
 	if (OPL3_LockTable(device) == -1) return nullptr;
 
 	/* allocate memory block */
-	chip = auto_alloc_clear(device->machine(), OPL3);
+	chip = auto_alloc_clear(device->machine(), <OPL3>());
 
 	chip->device = device;
 	chip->type  = type;

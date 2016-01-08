@@ -4500,7 +4500,7 @@ public:
 template <class C>
 discrete_base_node * discrete_node_factory<C>::Create(discrete_device * pdev, const discrete_block *block)
 {
-	discrete_base_node *r = auto_alloc_clear(pdev->machine(), C);
+	discrete_base_node *r = auto_alloc_clear(pdev->machine(), <C>());
 
 	r->init(pdev, block);
 	return r;

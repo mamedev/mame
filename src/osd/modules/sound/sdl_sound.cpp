@@ -518,7 +518,7 @@ int sound_sdl::sdl_create_buffers(void)
 {
 	osd_printf_verbose("sdl_create_buffers: creating stream buffer of %u bytes\n", stream_buffer_size);
 
-	stream_buffer = global_alloc_array_clear(INT8, stream_buffer_size);
+	stream_buffer = global_alloc_array_clear<INT8>(stream_buffer_size);
 	stream_playpos = 0;
 	buf_locked = 0;
 	return 0;

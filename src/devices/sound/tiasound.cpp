@@ -564,7 +564,7 @@ void *tia_sound_init(device_t *device, int clock, int sample_rate, int gain)
 	struct tia *chip;
 	int chan;
 
-	chip = global_alloc_clear(struct tia);
+	chip = global_alloc_clear<struct tia>();
 
 	/* set the gain factor (normally use TIA_DEFAULT_GAIN) */
 	chip->tia_gain = gain;

@@ -2372,7 +2372,7 @@ void * ym2612_init(void *param, device_t *device, int clock, int rate,
 	YM2612 *F2612;
 
 	/* allocate extend state space */
-	F2612 = auto_alloc_clear(device->machine(), YM2612);
+	F2612 = auto_alloc_clear(device->machine(), <YM2612>());
 	/* allocate total level table (128kb space) */
 	init_tables();
 

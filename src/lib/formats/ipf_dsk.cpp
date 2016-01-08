@@ -84,7 +84,7 @@ bool ipf_format::parse(dynamic_buffer &data, floppy_image *image)
 {
 	image->set_variant(floppy_image::DSDD); // Not handling anything else yet
 	tcount = 84*2+1; // Usual max
-	tinfos = global_alloc_array_clear(track_info, tcount);
+	tinfos = global_alloc_array_clear<track_info>(tcount);
 	bool res = scan_all_tags(data);
 	if(res)
 		res = generate_tracks(image);
@@ -121,7 +121,7 @@ ipf_format::track_info *ipf_format::get_index(UINT32 idx)
 	if(idx > 1000)
 		return nullptr;
 	if(idx >= tcount) {
-		auto ti1 = global_alloc_array_clear(track_info, idx+1);
+		auto ti1 = global_alloc_array_clear<track_info>(idx+1);
 		memcpy(ti1, tinfos, tcount*sizeof(tinfos));
 		global_free_array(tinfos);
 		tcount = idx+1;

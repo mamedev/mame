@@ -1037,7 +1037,7 @@ UINT32 ui_menu::ui_handler(running_machine &machine, render_container *container
 {
 	// if we have no menus stacked up, start with the main menu
 	if (menu_stack == nullptr)
-		stack_push(auto_alloc_clear(machine, ui_menu_main(machine, container)));
+		stack_push(auto_alloc_clear(machine, <ui_menu_main>(machine, container)));
 
 	// update the menu state
 	if (menu_stack != nullptr)

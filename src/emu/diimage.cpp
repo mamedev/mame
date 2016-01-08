@@ -1349,5 +1349,5 @@ void device_image_interface::software_get_default_slot(std::string &result, cons
 
 ui_menu *device_image_interface::get_selection_menu(running_machine &machine, render_container *container)
 {
-	return auto_alloc_clear(machine, ui_menu_control_device_image(machine, container, this));
+	return auto_alloc_clear(machine, <ui_menu_control_device_image>(machine, container, this));
 }

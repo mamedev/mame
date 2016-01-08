@@ -103,7 +103,7 @@ void antic_device::device_start()
 	prio_init();
 
 	for (int i = 0; i < m_screen->height(); i++)
-		m_video[i] = auto_alloc_clear(machine(), VIDEO);
+		m_video[i] = auto_alloc_clear(machine(), <VIDEO>());
 
 	/* save states */
 	save_pointer(NAME((UINT8 *) &m_r), sizeof(m_r));

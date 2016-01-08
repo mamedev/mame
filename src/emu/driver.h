@@ -284,7 +284,7 @@ device_t *driver_device_creator(const machine_config &mconfig, const char *tag, 
 {
 	assert(owner == nullptr);
 	assert(clock == 0);
-	return global_alloc_clear(_DriverClass(mconfig, &driver_device_creator<_DriverClass>, tag));
+	return global_alloc_clear<_DriverClass>(mconfig, &driver_device_creator<_DriverClass>, tag);
 }
 
 

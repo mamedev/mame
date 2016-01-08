@@ -125,7 +125,6 @@ public:
 	int                     task_group;
 
 
-protected:
 	discrete_task(discrete_device &pdev)
 	: task_group(0), m_device(pdev), m_threadid(-1), m_samples(0)
 {
@@ -134,6 +133,7 @@ protected:
 		m_buffers.clear();
 	}
 
+protected:
 	static void *task_callback(void *param, int threadid);
 	inline bool process(void);
 
@@ -698,7 +698,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 		/* make sure we have one simple task
 		 * No need to create a node since there are no dependencies.
 		 */
-		task = auto_alloc_clear(machine(), discrete_task(*this));
+		task = auto_alloc_clear(machine(), <discrete_task>(*this));
 		task_list.add(task);
 	}
 
@@ -733,7 +733,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 					{
 						if (task != nullptr)
 							fatalerror("init_nodes() - Nested DISCRETE_START_TASK.\n");
-						task = auto_alloc_clear(machine(), discrete_task(*this));
+						task = auto_alloc_clear(machine(), <discrete_task>(*this));
 						task->task_group = block->initial[0];
 						if (task->task_group < 0 || task->task_group >= DISCRETE_MAX_TASK_GROUPS)
 							fatalerror("discrete_dso_task: illegal task_group %d\n", task->task_group);

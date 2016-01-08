@@ -73,7 +73,7 @@ void ui_menu_input_groups::handle()
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->iptkey == IPT_UI_SELECT)
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_input_general(machine(), container, int((long long)(menu_event->itemref)-1))));
+		ui_menu::stack_push(auto_alloc_clear(machine(), <ui_menu_input_general>(machine(), container, int((long long)(menu_event->itemref)-1))));
 }
 
 

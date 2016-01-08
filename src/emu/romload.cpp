@@ -1526,7 +1526,7 @@ void rom_init(running_machine &machine)
 	romload_private *romdata;
 
 	/* allocate private data */
-	machine.romload_data = romdata = auto_alloc_clear(machine, romload_private);
+	machine.romload_data = romdata = auto_alloc_clear(machine, <romload_private>());
 
 	/* make sure we get called back on the way out */
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(rom_exit), &machine));
