@@ -477,11 +477,6 @@ configuration { "Release", "vs*" }
 		"Optimize",
 	}
 
-configuration { "asmjs" }
-	flags {
-		"NoPCH",
-	}
-
 configuration {}
 
 msgcompile ("Compiling $(subst ../,,$<)...")
