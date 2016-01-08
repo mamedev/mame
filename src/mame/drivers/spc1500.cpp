@@ -456,9 +456,13 @@ WRITE8_MEMBER( spc1500_state::priority_w)
 WRITE8_MEMBER( spc1500_state::palet_w)
 {
 	m_palet[(offset>>8)&0x0f] = data;
+//	printf("palet:");
 	for(int i=1, j=0; i < 0x100; i<<=1, j++)
+	{
 		m_paltbl[j] = (m_palet[0]&i?1:0)|(m_palet[1]&i?2:0)|(m_palet[2]&i?4:0);
-	printf("palet:0x%02x, 0x%02x, 0x%02x\n", m_palet[0], m_palet[1], m_palet[2]);
+//		printf("%d,", m_paltbl[j]);
+	}
+//	printf("\n");
 }
 
 PALETTE_INIT_MEMBER(spc1500_state,spc)
@@ -500,10 +504,11 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	char hs = (m_crtc_vreg[0x9] < 15 ? 3 : 4);
 	int n = y & (m_crtc_vreg[0x9]);
 	bool ln400 = (hs == 4 && m_crtc_vreg[0x4] > 20);
+	UINT8 *vram = &m_p_videoram[0] + (m_crtc_vreg[12] << 8) + m_crtc_vreg[13];
 	for (i = 0; i < x_count; i++)
 	{
-		UINT8 *pp = &m_p_videoram[0x2000+((y>>hs)*x_count+(((y)&7)<<11))+i+(((hs==4)&&(y&8))?0x400:0)];
-		UINT8 *pv = &m_p_videoram[(y>>hs)*x_count + i];
+		UINT8 *pp = &vram[0x2000+((y>>hs)*x_count+(((y)&7)<<11))+i+(((hs==4)&&(y&8))?0x400:0)];
+		UINT8 *pv = &vram[(y>>hs)*x_count + i];
 		UINT8 ascii = *(pv+0x1000);
 		UINT8 attr = *pv;
 		inv = (attr & 0x8 ? true : false);
@@ -548,10 +553,11 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 			UINT8 g = *(pa+0x1000);
 			for (j = 0x80; j > 0; j>>=1)
 			{
-				pen = ((g & j)?4:0)|((r & j)?2:0)|((b & j)?1:0);
+				pixel = ((g & j)?4:0)|((r & j)?2:0)|((b & j)?1:0);
+				pen = (pixel == 7 ? color : pixel);
 				pixel = (pixelg&j ? 4 : 0)|(pixelr&j ? 2:0)|(pixelb&j ? 1:0 );
 				pixelpen = (nopalet ? pixel : m_paltbl[pixel]);
-				*p++ = m_palette->pen((pen == 0 || (m_priority & (1<<pixel))) ? pixelpen : pen);
+				*p++ = m_palette->pen((m_priority & (1<<pixel)) ? pixelpen : pen);
 			}
 		}
 		else
@@ -561,7 +567,6 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 			if (ascii == 0 && (attr & 0x08) && inv)
 			{
 				fnt = 0xff;
-				color = m_palette->pen((nopalet ? 7 : m_paltbl[7]));
 			}
 			fnt = (inv ? 0xff - fnt : fnt);
 			for (j = 0x80; j > 0; j>>=1)
