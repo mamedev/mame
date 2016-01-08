@@ -204,7 +204,7 @@ READ8_MEMBER(pc9801_86_device::opn_r)
 		return m_opna->read(space, offset >> 1);
 	else // odd
 	{
-		printf("PC9801-86: Read to undefined port [%02x]\n",offset+0x188);
+		logerror("PC9801-86: Read to undefined port [%02x]\n",offset+0x188);
 		return 0xff;
 	}
 }
@@ -214,7 +214,7 @@ WRITE8_MEMBER(pc9801_86_device::opn_w)
 	if((offset & 1) == 0)
 		m_opna->write(space, offset >> 1,data);
 	else // odd
-		printf("PC9801-86: Write to undefined port [%02x] %02x\n",offset+0x188,data);
+		logerror("PC9801-86: Write to undefined port [%02x] %02x\n",offset+0x188,data);
 }
 
 READ8_MEMBER(pc9801_86_device::id_r)
@@ -247,7 +247,7 @@ READ8_MEMBER(pc9801_86_device::pcm_r)
 		}
 	}
 	else // odd
-		printf("PC9801-86: Read to undefined port [%02x]\n",offset+0xa466);
+		logerror("PC9801-86: Read to undefined port [%02x]\n",offset+0xa464);
 	return 0xff;
 }
 
@@ -295,7 +295,7 @@ WRITE8_MEMBER(pc9801_86_device::pcm_w)
 		}
 	}
 	else // odd
-		printf("PC9801-86: Write to undefined port [%02x] %02x\n",offset+0xa466,data);
+		logerror("PC9801-86: Write to undefined port [%02x] %02x\n",offset+0xa464,data);
 }
 
 int pc9801_86_device::queue_count()
