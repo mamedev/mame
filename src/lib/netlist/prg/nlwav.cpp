@@ -237,10 +237,6 @@ void usage(nlwav_options_t &opts)
 
 int main(int argc, char *argv[])
 {
-#if (!PSTANDALONE)
-	track_memory(true);
-	{
-#endif
 	nlwav_options_t opts;
 	int ret;
 
@@ -258,10 +254,6 @@ int main(int argc, char *argv[])
 	}
 
 	convert(opts);
-#if (!PSTANDALONE)
-	}
-	dump_unfreed_mem();
-#endif
 
 	return 0;
 }

@@ -395,10 +395,6 @@ static const char *pmf_verbose[] =
 
 int main(int argc, char *argv[])
 {
-#if (!PSTANDALONE)
-	track_memory(true);
-	{
-#endif
 	tool_options_t opts;
 	int ret;
 
@@ -462,9 +458,5 @@ int main(int argc, char *argv[])
 	}
 
 	pstring::resetmem();
-#if (!PSTANDALONE)
-	}
-	dump_unfreed_mem();
-#endif
 	return 0;
 }
