@@ -7,6 +7,7 @@ def main(argv):
 	y = 0
 	wimg = 0
 	h = 8
+	w = 256
 	if len(sys.argv) == 1:
 		print "fnt2gif file height width "
 		exit(0)
@@ -18,9 +19,9 @@ def main(argv):
 	if len(sys.argv) > 3:
 		w = int(sys.argv[3]) 
 
-	wimg = length/32
+	wimg = length/w*8
 	print wimg, length
-	img = Image.new('RGB', (256, wimg), 'black')
+	img = Image.new('RGB', (w, wimg), 'black')
 	pixels = img.load()
 	arr = array.array('B')
 	arr.read(f, length)
@@ -37,7 +38,7 @@ def main(argv):
 		if y1 >= h:
 			y1 = 0
 			x = x + 8
-		if x >=  256:
+		if x >=  w:
 			x = 0
 			y = y + h
 			
