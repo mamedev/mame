@@ -129,7 +129,6 @@ end
 		"7z",
 		"lua",
 		"lsqlite3",
-		"jsoncpp",
 	}
 
 	if _OPTIONS["with-bundled-zlib"] then
