@@ -2378,7 +2378,7 @@ ROM_END
     ROM Board: 834-7597-04 (type 171-5873B)
     A/D BD NO. 837-7536
 
-A PCB was found with a Game BD: 833-7627-01-T GHOST HUNTER
+A PCB was found with a Game BD: 833-7627-01-T GHOST HUNTERS
 While the DATA matched the set below (lghostu), all roms were hand labeled and dated as follows:
 
 ROM0 E * A3AB @ A4
@@ -2406,7 +2406,7 @@ Sound 1 10/22 @ C6
 Sound 2 10/22 @ C5
 Sound 3 10/22 @ C4
 
-suggesting the original name for the game was Ghost Hunter and the roms dated 11/20-14 & 11/19-14
+suggesting the original name for the game was Ghost Hunters and the roms dated 11/20-14 & 11/19-14
 contain the data for name change to Laser Ghost
 */
 ROM_START( lghostu )
