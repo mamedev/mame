@@ -292,9 +292,9 @@ function osdmodulestargetconf()
 			}
 			links {
 				"qtmain",
-				"Qt5Core",
-				"Qt5Gui",
-				"Qt5Widgets",
+				"Qt5Core.dll",
+				"Qt5Gui.dll",
+				"Qt5Widgets.dll",
 			}
 		elseif _OPTIONS["targetos"]=="macosx" then
 			linkoptions {
