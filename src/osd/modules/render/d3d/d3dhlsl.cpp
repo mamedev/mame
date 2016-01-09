@@ -1797,6 +1797,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		int next_index = 0;
 
 		next_index = vector_buffer_pass(rt, next_index, poly, vertnum);
+		next_index = deconverge_pass(rt, next_index, poly, vertnum);
 		next_index = defocus_pass(rt, next_index, poly, vertnum); // 1st pass
 		next_index = defocus_pass(rt, next_index, poly, vertnum); // 2nd pass
 		next_index = phosphor_pass(rt, ct, next_index, poly, vertnum);
@@ -2424,13 +2425,13 @@ static INT32 slider_scanline_offset(running_machine &machine, void *arg, std::st
 static INT32 slider_defocus_x(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->defocus[0]), 0.5f, "%2.1f", str, newval);
+	return slider_set(&(((hlsl_options*)arg)->defocus[0]), 0.1f, "%2.1f", str, newval);
 }
 
 static INT32 slider_defocus_y(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->defocus[1]), 0.5f, "%2.1f", str, newval);
+	return slider_set(&(((hlsl_options*)arg)->defocus[1]), 0.1f, "%2.1f", str, newval);
 }
 
 static INT32 slider_red_converge_x(running_machine &machine, void *arg, std::string *str, INT32 newval)
@@ -2798,20 +2799,20 @@ shaders::slider_desc shaders::s_sliders[] =
 	{ "Scanline Brightness",                 0,    20,    40, 1, 5, slider_scanline_bright_scale },
 	{ "Scanline Brightness Overdrive",       0,     0,    20, 1, 5, slider_scanline_bright_offset },
 	{ "Scanline Jitter",                     0,     0,    40, 1, 5, slider_scanline_offset },
-	{ "Defocus X",                           0,     0,    20, 1, 7, slider_defocus_x },
-	{ "Defocus Y",                           0,     0,    20, 1, 7, slider_defocus_y },
-	{ "Red Position Offset X",           -1500,     0,  1500, 1, 7, slider_red_converge_x },
-	{ "Red Position Offset Y",           -1500,     0,  1500, 1, 7, slider_red_converge_y },
-	{ "Green Position Offset X",         -1500,     0,  1500, 1, 7, slider_green_converge_x },
-	{ "Green Position Offset Y",         -1500,     0,  1500, 1, 7, slider_green_converge_y },
-	{ "Blue Position Offset X",          -1500,     0,  1500, 1, 7, slider_blue_converge_x },
-	{ "Blue Position Offset Y",          -1500,     0,  1500, 1, 7, slider_blue_converge_y },
-	{ "Red Convergence X",               -1500,     0,  1500, 1, 7, slider_red_radial_converge_x },
-	{ "Red Convergence Y",               -1500,     0,  1500, 1, 7, slider_red_radial_converge_y },
-	{ "Green Convergence X",             -1500,     0,  1500, 1, 7, slider_green_radial_converge_x },
-	{ "Green Convergence Y",             -1500,     0,  1500, 1, 7, slider_green_radial_converge_y },
-	{ "Blue Convergence X",              -1500,     0,  1500, 1, 7, slider_blue_radial_converge_x },
-	{ "Blue Convergence Y",              -1500,     0,  1500, 1, 7, slider_blue_radial_converge_y },
+	{ "Defocus X",                           0,     0,   100, 1, 7, slider_defocus_x },
+	{ "Defocus Y",                           0,     0,   100, 1, 7, slider_defocus_y },
+	{ "Red Position Offset X",            -100,     0,   100, 1, 7, slider_red_converge_x },
+	{ "Red Position Offset Y",            -100,     0,   100, 1, 7, slider_red_converge_y },
+	{ "Green Position Offset X",          -100,     0,   100, 1, 7, slider_green_converge_x },
+	{ "Green Position Offset Y",          -100,     0,   100, 1, 7, slider_green_converge_y },
+	{ "Blue Position Offset X",           -100,     0,   100, 1, 7, slider_blue_converge_x },
+	{ "Blue Position Offset Y",           -100,     0,   100, 1, 7, slider_blue_converge_y },
+	{ "Red Convergence X",                -100,     0,   100, 1, 7, slider_red_radial_converge_x },
+	{ "Red Convergence Y",                -100,     0,   100, 1, 7, slider_red_radial_converge_y },
+	{ "Green Convergence X",              -100,     0,   100, 1, 7, slider_green_radial_converge_x },
+	{ "Green Convergence Y",              -100,     0,   100, 1, 7, slider_green_radial_converge_y },
+	{ "Blue Convergence X",               -100,     0,   100, 1, 7, slider_blue_radial_converge_x },
+	{ "Blue Convergence Y",               -100,     0,   100, 1, 7, slider_blue_radial_converge_y },
 	{ "Red Output from Red Input",        -400,     0,   400, 5, 7, slider_red_from_r },
 	{ "Red Output from Green Input",      -400,     0,   400, 5, 7, slider_red_from_g },
 	{ "Red Output from Blue Input",       -400,     0,   400, 5, 7, slider_red_from_b },
