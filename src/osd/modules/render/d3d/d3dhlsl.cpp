@@ -970,6 +970,7 @@ int shaders::create_resources(bool reset)
 	yiq_encode_effect->add_uniform("CCValue", uniform::UT_FLOAT, uniform::CU_NTSC_CCFREQ);
 	yiq_encode_effect->add_uniform("AValue", uniform::UT_FLOAT, uniform::CU_NTSC_A);
 	yiq_encode_effect->add_uniform("BValue", uniform::UT_FLOAT, uniform::CU_NTSC_B);
+	yiq_decode_effect->add_uniform("OValue", uniform::UT_FLOAT, uniform::CU_NTSC_O);
 	yiq_encode_effect->add_uniform("PValue", uniform::UT_FLOAT, uniform::CU_NTSC_P);
 	yiq_encode_effect->add_uniform("NotchHalfWidth", uniform::UT_FLOAT, uniform::CU_NTSC_NOTCH);
 	yiq_encode_effect->add_uniform("YFreqResponse", uniform::UT_FLOAT, uniform::CU_NTSC_YFREQ);
@@ -1244,10 +1245,15 @@ int shaders::ntsc_pass(render_target *rt, int source_index, poly_info *poly, int
 		return next_index;
 	}
 
+	float frame_offset = curr_texture->get_cur_frame() == 0
+		? 0.0f 
+		: (float)curr_texture->get_cur_frame();
+
 	// Convert our signal into YIQ
 	curr_effect = yiq_encode_effect;
 	curr_effect->update_uniforms();
-
+	curr_effect->set_float("FrameOffset", frame_offset);
+	
 	// initial "Diffuse"  texture is set in shaders::set_texture()
 
 	next_index = rt->next_index(next_index);
@@ -1258,7 +1264,8 @@ int shaders::ntsc_pass(render_target *rt, int source_index, poly_info *poly, int
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Composite", rt->native_texture[next_index]);
 	curr_effect->set_texture("Diffuse", curr_texture->get_finaltex());
-
+	curr_effect->set_float("FrameOffset", frame_offset);
+	
 	next_index = rt->next_index(next_index);
 	blit(rt->native_target[next_index], true, D3DPT_TRIANGLELIST, 0, 2);
 
