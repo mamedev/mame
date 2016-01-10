@@ -2,16 +2,16 @@
 // copyright-holders:Nicola Salmoria
 /*********************************************************************
 
-    generic.h
+    bookkeeping.h
 
-    Generic simple machine functions.
+    Bookkeeping simple machine functions.
 
 *********************************************************************/
 
 #pragma once
 
-#ifndef __MACHINE_GENERIC_H__
-#define __MACHINE_GENERIC_H__
+#ifndef __BOOKKEEPING_H__
+#define __BOOKKEEPING_H__
 
 
 
@@ -61,4 +61,4 @@ int coin_lockout_get_state(running_machine &machine, int num);
 /* enable/disable global coin lockout */
 void coin_lockout_global_w(running_machine &machine, int on);
 
-#endif  /* __MACHINE_GENERIC_H__ */
+#endif  /* __BOOKKEEPING_H__ */

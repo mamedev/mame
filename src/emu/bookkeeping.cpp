@@ -2,9 +2,9 @@
 // copyright-holders:Nicola Salmoria
 /*********************************************************************
 
-    generic.c
+    bookkeeping.c
 
-    Generic simple machine functions.
+    Bookkeeping simple machine functions.
 
 *********************************************************************/
 
