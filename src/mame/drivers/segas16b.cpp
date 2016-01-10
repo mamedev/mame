@@ -1600,9 +1600,9 @@ WRITE16_MEMBER( segas16b_state::hwchamp_custom_io_w )
 					// bit 4 is GONG
 			//      if (data & 0x10) popmessage("GONG");
 					// are the following really lamps?
-			//      space.output().set_led_value(1,data & 0x20);
-			//      space.output().set_led_value(2,data & 0x40);
-			//      space.output().set_led_value(3,data & 0x80);
+			//      output().set_led_value(1,data & 0x20);
+			//      output().set_led_value(2,data & 0x40);
+			//      output().set_led_value(3,data & 0x80);
 					break;
 			}
 			break;
