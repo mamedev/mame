@@ -217,20 +217,17 @@ bool c64_expansion_slot_device::call_softlist_load(software_list_device &swlist,
 //  get_default_card_software -
 //-------------------------------------------------
 
-void c64_expansion_slot_device::get_default_card_software(std::string &result)
+std::string c64_expansion_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
 		if (!core_stricmp(filetype(), "crt"))
-		{
-			cbm_crt_get_card(result, m_file);
-			return;
-		}
+			return cbm_crt_get_card(m_file);
 
 		clear();
 	}
 
-	software_get_default_slot(result, "standard");
+	return software_get_default_slot("standard");
 }
 
 

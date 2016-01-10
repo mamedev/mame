@@ -770,7 +770,6 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, UINT3
 	x86code *dst = base;
 
 	// generate code
-	std::string tempstring;
 	const char *blockname = nullptr;
 	for (int inum = 0; inum < numinst; inum++)
 	{
@@ -780,8 +779,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, UINT3
 		// add a comment
 		if (m_log != nullptr)
 		{
-			std::string dasm;
-			inst.disasm(dasm, &m_drcuml);
+			std::string dasm = inst.disasm(&m_drcuml);
 			x86log_add_comment(m_log, dst, "%s", dasm.c_str());
 		}
 
@@ -791,7 +789,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, UINT3
 			if (inst.opcode() == OP_HANDLE)
 				blockname = inst.param(0).handle().string();
 			else if (inst.opcode() == OP_HASH)
-				blockname = strformat(tempstring, "Code: mode=%d PC=%08X", (UINT32)inst.param(0).immediate(), (offs_t)inst.param(1).immediate()).c_str();
+				blockname = strformat("Code: mode=%d PC=%08X", (UINT32)inst.param(0).immediate(), (offs_t)inst.param(1).immediate()).c_str();
 		}
 
 		// generate code

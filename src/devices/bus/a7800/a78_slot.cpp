@@ -528,7 +528,7 @@ int a78_cart_slot_device::verify_header(char *header)
  get default card software
  -------------------------------------------------*/
 
-void a78_cart_slot_device::get_default_card_software(std::string &result)
+std::string a78_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -586,10 +586,10 @@ void a78_cart_slot_device::get_default_card_software(std::string &result)
 
 		clear();
 
-		result.assign(slot_string);
+		return std::string(slot_string);
 	}
 	else
-		software_get_default_slot(result, "a78_rom");
+		return software_get_default_slot("a78_rom");
 }
 
 

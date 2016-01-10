@@ -363,7 +363,7 @@ public:
 	virtual device_image_partialhash_func get_partial_hash() const override { return &nes_partialhash; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 	const char * get_default_card_ines(UINT8 *ROM, UINT32 len);
 	const char * get_default_card_unif(UINT8 *ROM, UINT32 len);
 	const char * nes_get_slot(int pcb_id);

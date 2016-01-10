@@ -494,7 +494,7 @@ void running_machine::schedule_soft_reset()
 //  software
 //-------------------------------------------------
 
-std::string running_machine::get_statename(const char *option)
+std::string running_machine::get_statename(const char *option) const
 {
 	std::string statename_str("");
 	if (option == nullptr || option[0] == 0)
@@ -1172,42 +1172,35 @@ void running_machine::postload_all_devices()
     NVRAM MANAGEMENT
 ***************************************************************************/
 
-const char *running_machine::image_parent_basename(device_t *device)
-{
-	device_t *dev = device;
-	while(dev != &root_device())
-	{
-		device_image_interface *intf = nullptr;
-		if (dev!=nullptr && dev->interface(intf))
-		{
-			return intf->basename_noext();
-		}
-		dev = dev->owner();
-	}
-	return nullptr;
-}
-
 /*-------------------------------------------------
     nvram_filename - returns filename of system's
     NVRAM depending of selected BIOS
 -------------------------------------------------*/
 
-std::string &running_machine::nvram_filename(std::string &result, device_t &device)
+std::string running_machine::nvram_filename(device_t &device) const
 {
 	// start with either basename or basename_biosnum
-	result.assign(basename());
+	std::string result(basename());
 	if (root_device().system_bios() != 0 && root_device().default_bios() != root_device().system_bios())
 		strcatprintf(result, "_%d", root_device().system_bios() - 1);
 
 	// device-based NVRAM gets its own name in a subdirectory
-	if (&device != &root_device())
+	if (device.owner() != nullptr)
 	{
 		// add per software nvrams into one folder
-		const char *software = image_parent_basename(&device);
-		if (software!=nullptr && strlen(software)>0)
+		const char *software = nullptr;
+		for (device_t *dev = &device; dev->owner() != nullptr; dev = dev->owner())
 		{
-			result.append(PATH_SEPARATOR).append(software);
+			device_image_interface *intf;
+			if (dev->interface(intf))
+			{
+				software = intf->basename_noext();
+				break;
+			}
 		}
+		if (software != nullptr && *software != '\0')
+			result.append(PATH_SEPARATOR).append(software);
+
 		std::string tag(device.tag());
 		tag.erase(0, 1);
 		strreplacechr(tag,':', '_');
@@ -1225,9 +1218,8 @@ void running_machine::nvram_load()
 	nvram_interface_iterator iter(root_device());
 	for (device_nvram_interface *nvram = iter.first(); nvram != nullptr; nvram = iter.next())
 	{
-		std::string filename;
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
-		if (file.open(nvram_filename(filename, nvram->device()).c_str()) == FILERR_NONE)
+		if (file.open(nvram_filename(nvram->device()).c_str()) == FILERR_NONE)
 		{
 			nvram->nvram_load(file);
 			file.close();
@@ -1247,9 +1239,8 @@ void running_machine::nvram_save()
 	nvram_interface_iterator iter(root_device());
 	for (device_nvram_interface *nvram = iter.first(); nvram != nullptr; nvram = iter.next())
 	{
-		std::string filename;
 		emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(nvram_filename(filename, nvram->device()).c_str()) == FILERR_NONE)
+		if (file.open(nvram_filename(nvram->device()).c_str()) == FILERR_NONE)
 		{
 			nvram->nvram_save(file);
 			file.close();

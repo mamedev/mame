@@ -456,7 +456,6 @@ void drcuml_block::optimize()
 void drcuml_block::disassemble()
 {
 	std::string comment;
-	std::string dasm;
 
 	// iterate over instructions and output
 	int firstcomment = -1;
@@ -483,7 +482,7 @@ void drcuml_block::disassemble()
 		// indent everything else with a tab
 		else
 		{
-			m_inst[instnum].disasm(dasm, &m_drcuml);
+			std::string dasm = m_inst[instnum].disasm(&m_drcuml);
 
 			// include the first accumulated comment with this line
 			if (firstcomment != -1)
@@ -1119,16 +1118,14 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 	// output the error if we have one
 	if (errend != errorbuf)
 	{
-		char disasm[256];
-
 		// disassemble the test instruction
-		testinst->disasm(disasm, drcuml);
+		std::string disasm = testinst->disasm(drcuml);
 
 		// output a description of what went wrong
 		printf("\n");
 		printf("----------------------------------------------\n");
 		printf("Backend validation error:\n");
-		printf("   %s\n", disasm);
+		printf("   %s\n", disasm.c_str());
 		printf("\n");
 		printf("Errors:\n");
 		printf("%s\n", errorbuf);

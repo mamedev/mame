@@ -28,7 +28,7 @@ private:
 	virtual int generate_lwc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) override;
 	virtual int generate_swc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) override;
 
-	virtual void state_string_export(const int index, std::string &str) override;
+	virtual void state_string_export(const int index, std::string &str) const override;
 
 	void cfunc_unimplemented_opcode() override;
 

@@ -474,9 +474,8 @@ static void handle_missing_file(romload_private *romdata, const rom_entry *romp,
 
 static void dump_wrong_and_correct_checksums(romload_private *romdata, const hash_collection &hashes, const hash_collection &acthashes)
 {
-	std::string tempstr;
-	strcatprintf(romdata->errorstring, "    EXPECTED: %s\n", hashes.macro_string(tempstr));
-	strcatprintf(romdata->errorstring, "       FOUND: %s\n", acthashes.macro_string(tempstr));
+	strcatprintf(romdata->errorstring, "    EXPECTED: %s\n", hashes.macro_string().c_str());
+	strcatprintf(romdata->errorstring, "       FOUND: %s\n", acthashes.macro_string().c_str());
 }
 
 
@@ -500,8 +499,7 @@ static void verify_length_and_hash(romload_private *romdata, const char *name, U
 	}
 
 	/* If there is no good dump known, write it */
-	std::string tempstr;
-	hash_collection &acthashes = romdata->file->hashes(hashes.hash_types(tempstr));
+	hash_collection &acthashes = romdata->file->hashes(hashes.hash_types().c_str());
 	if (hashes.flag(hash_collection::FLAG_NO_DUMP))
 	{
 		strcatprintf(romdata->errorstring, "%s NO GOOD DUMP KNOWN\n", name);
@@ -1538,17 +1536,16 @@ void rom_init(running_machine &machine)
 	device_iterator deviter(romdata->machine().config().root_device());
 	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next()) {
 		if (device->rom_region()) {
-			const char *specbios;
-			std::string temp;
-			if (strcmp(device->tag(),":")==0) {
-				specbios = romdata->machine().options().bios();
+			std::string specbios;
+			if (device->owner() == nullptr) {
+				specbios.assign(romdata->machine().options().bios());
 			} else {
-				specbios = romdata->machine().options().sub_value(temp,device->owner()->tag()+1,"bios");
-				if (strlen(specbios) == 0) {
-					specbios = device->default_bios_tag().c_str();
+				specbios = romdata->machine().options().sub_value(device->owner()->tag()+1,"bios");
+				if (specbios.empty()) {
+					specbios = device->default_bios_tag();
 				}
 			}
-			determine_bios_rom(romdata, device, specbios);
+			determine_bios_rom(romdata, device, specbios.c_str());
 		}
 	}
 

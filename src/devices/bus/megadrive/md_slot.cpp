@@ -900,7 +900,7 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-void base_md_cart_slot_device::get_default_card_software(std::string &result)
+std::string base_md_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -919,10 +919,10 @@ void base_md_cart_slot_device::get_default_card_software(std::string &result)
 
 		clear();
 
-		result.assign(slot_string);
+		return std::string(slot_string);
 	}
 	else
-		software_get_default_slot(result, "rom");
+		return software_get_default_slot("rom");
 }
 
 

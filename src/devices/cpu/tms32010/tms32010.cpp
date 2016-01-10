@@ -895,7 +895,7 @@ void tms32010_device::device_reset()
 }
 
 
-void tms32010_device::state_string_export(const device_state_entry &entry, std::string &str)
+void tms32010_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

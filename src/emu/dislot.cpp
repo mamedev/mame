@@ -63,17 +63,15 @@ device_slot_option *device_slot_interface::static_option(device_t &device, const
 
 device_t* device_slot_interface::get_card_device()
 {
-	const char *subtag;
+	std::string subtag;
 	device_t *dev = nullptr;
-	std::string temp;
-	if (!device().mconfig().options().exists(device().tag()+1)) {
-		subtag = m_default_option;
-	} else {
-		subtag = device().mconfig().options().main_value(temp,device().tag()+1);
-	}
-	if (subtag && *subtag != 0) {
+	if (device().mconfig().options().exists(device().tag()+1))
+		subtag = device().mconfig().options().main_value(device().tag()+1);
+	else if (m_default_option != nullptr)
+		subtag.assign(m_default_option);
+	if (!subtag.empty()) {
 		device_slot_card_interface *intf = nullptr;
-		dev = device().subdevice(subtag);
+		dev = device().subdevice(subtag.c_str());
 		if (dev!=nullptr && !dev->interface(intf))
 			throw emu_fatalerror("get_card_device called for device '%s' with no slot card interface", dev->tag());
 	}

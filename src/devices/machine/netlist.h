@@ -220,7 +220,7 @@ protected:
 
 	//  device_state_interface overrides
 
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override
 	{
 		if (entry.index() >= 0)
 		{

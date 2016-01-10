@@ -106,7 +106,7 @@ private:
 	static const char* s_statename[];
 	void    state_import(const device_state_entry &entry) override;
 	void    state_export(const device_state_entry &entry) override;
-	void    state_string_export(const device_state_entry &entry, std::string &str) override;
+	void    state_string_export(const device_state_entry &entry, std::string &str) const override;
 	UINT16  read_workspace_register_debug(int reg);
 	void    write_workspace_register_debug(int reg, UINT16 data);
 

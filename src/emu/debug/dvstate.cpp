@@ -276,7 +276,7 @@ void debug_view_state::view_update()
 				if (m_last_update != total_cycles)
 					curitem->m_lastval = curitem->m_currval;
 				curitem->m_currval = source.m_stateintf->state_int(curitem->m_index);
-				source.m_stateintf->state_string(curitem->m_index, valstr);
+				valstr = source.m_stateintf->state_string(curitem->m_index);
 			}
 
 			// see if we changed

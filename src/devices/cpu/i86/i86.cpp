@@ -314,12 +314,12 @@ i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, 
 	memset(m_sregs, 0x00, sizeof(m_sregs));
 }
 
-void i8086_common_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void i8086_common_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-			strprintf(str, "%08X", pc());
+			strprintf(str, "%08X", (m_sregs[CS] << 4) + m_ip);
 			break;
 
 		case STATE_GENFLAGS:

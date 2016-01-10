@@ -51,7 +51,7 @@ mn1020012a_device::mn1020012a_device(const machine_config &mconfig, const char *
 
 
 // disasm
-void mn10200_device::state_string_export(const device_state_entry &entry, std::string &str)
+void mn10200_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

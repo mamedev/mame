@@ -2583,7 +2583,7 @@ void sh2_device::device_start()
 }
 
 
-void sh2_device::state_string_export(const device_state_entry &entry, std::string &str)
+void sh2_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

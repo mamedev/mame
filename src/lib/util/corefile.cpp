@@ -909,7 +909,7 @@ file_error core_truncate(core_file *f, UINT64 offset)
     assumptions about path separators
 -------------------------------------------------*/
 
-std::string &core_filename_extract_base(std::string &result, const char *name, bool strip_extension)
+std::string core_filename_extract_base(const char *name, bool strip_extension)
 {
 	/* find the start of the name */
 	const char *start = name + strlen(name);
@@ -917,7 +917,7 @@ std::string &core_filename_extract_base(std::string &result, const char *name, b
 		start--;
 
 	/* copy the rest into an astring */
-	result.assign(start);
+	std::string result(start);
 
 	/* chop the extension if present */
 	if (strip_extension)

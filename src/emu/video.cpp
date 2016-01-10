@@ -258,9 +258,9 @@ void video_manager::frame_update(bool debug)
 //  into a string buffer
 //-------------------------------------------------
 
-std::string &video_manager::speed_text(std::string &str)
+std::string video_manager::speed_text()
 {
-	str.clear();
+	std::string str;
 
 	// if we're paused, just display Paused
 	bool paused = machine().paused();

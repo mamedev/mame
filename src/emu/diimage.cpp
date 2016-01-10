@@ -711,9 +711,8 @@ void device_image_interface::determine_open_plan(int is_create, UINT32 *open_pla
 
 static void dump_wrong_and_correct_checksums(const hash_collection &hashes, const hash_collection &acthashes)
 {
-	std::string tempstr;
-	osd_printf_error("    EXPECTED: %s\n", hashes.macro_string(tempstr));
-	osd_printf_error("       FOUND: %s\n", acthashes.macro_string(tempstr));
+	osd_printf_error("    EXPECTED: %s\n", hashes.macro_string().c_str());
+	osd_printf_error("       FOUND: %s\n", acthashes.macro_string().c_str());
 }
 
 /*-------------------------------------------------
@@ -735,8 +734,7 @@ static int verify_length_and_hash(emu_file *file, const char *name, UINT32 exple
 	}
 
 	/* If there is no good dump known, write it */
-	std::string tempstr;
-	hash_collection &acthashes = file->hashes(hashes.hash_types(tempstr));
+	hash_collection &acthashes = file->hashes(hashes.hash_types().c_str());
 	if (hashes.flag(hash_collection::FLAG_NO_DUMP))
 	{
 		osd_printf_error("%s NO GOOD DUMP KNOWN\n", name);
@@ -1209,7 +1207,7 @@ void device_image_interface::software_name_split(const char *swlist_swname, std:
 }
 
 
-software_part *device_image_interface::find_software_item(const char *path, bool restrict_to_interface)
+software_part *device_image_interface::find_software_item(const char *path, bool restrict_to_interface) const
 {
 	// split full software name into software list name and short software name
 	std::string swlist_name, swinfo_name, swpart_name;
@@ -1307,7 +1305,7 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 					{
 						const char *option = device().mconfig().options().value(req_image->brief_instance_name());
 						// mount only if not already mounted
-						if (strlen(option) == 0 && !req_image->filename())
+						if (*option == '\0' && !req_image->filename())
 						{
 							req_image->set_init_phase();
 							req_image->load(requirement);
@@ -1325,11 +1323,11 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 //  software_get_default_slot
 //-------------------------------------------------
 
-void device_image_interface::software_get_default_slot(std::string &result, const char *default_card_slot)
+std::string device_image_interface::software_get_default_slot(const char *default_card_slot) const
 {
 	const char *path = device().mconfig().options().value(instance_name());
-	result.clear();
-	if (strlen(path) > 0)
+	std::string result;
+	if (*path != '\0')
 	{
 		result.assign(default_card_slot);
 		software_part *swpart = find_software_item(path, true);
@@ -1340,6 +1338,7 @@ void device_image_interface::software_get_default_slot(std::string &result, cons
 				result.assign(slot);
 		}
 	}
+	return result;
 }
 
 /*-------------------------------------------------

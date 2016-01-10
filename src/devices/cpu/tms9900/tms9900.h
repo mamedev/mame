@@ -224,9 +224,9 @@ private:
 	// State / debug management
 	UINT16  m_state_any;
 	static const char* s_statename[];
-	void    state_import(const device_state_entry &entry) override;
-	void    state_export(const device_state_entry &entry) override;
-	void    state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// Interrupt handling
 	void service_interrupt();

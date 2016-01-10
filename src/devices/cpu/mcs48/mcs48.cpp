@@ -978,10 +978,8 @@ void mcs48_cpu_device::device_start()
 		state_add(MCS48_P1,        "P1",        m_p1);
 		state_add(MCS48_P2,        "P2",        m_p2);
 
-		std::string tempstr;
 		for (int regnum = 0; regnum < 8; regnum++) {
-			strprintf(tempstr, "R%d", regnum);
-			state_add(MCS48_R0 + regnum, tempstr.c_str(), m_rtemp).callimport().callexport();
+			state_add(MCS48_R0 + regnum, strformat("R%d", regnum).c_str(), m_rtemp).callimport().callexport();
 		}
 		state_add(MCS48_EA,        "EA",        m_ea).mask(0x1);
 
@@ -1298,7 +1296,7 @@ void mcs48_cpu_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void mcs48_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void mcs48_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

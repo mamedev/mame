@@ -368,8 +368,8 @@ public:
 	// FIXME: Couriersud: This should be in image_device_exit
 	void remove_device_options();
 
-	const char *main_value(std::string &buffer, const char *option) const;
-	const char *sub_value(std::string &buffer, const char *name, const char *subname) const;
+	std::string main_value(const char *option) const;
+	std::string sub_value(const char *name, const char *subname) const;
 	bool add_slot_options(bool isfirst);
 
 private:

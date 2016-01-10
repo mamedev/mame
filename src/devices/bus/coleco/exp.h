@@ -93,7 +93,7 @@ protected:
 	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 
 	device_colecovision_cartridge_interface *m_card;
 };

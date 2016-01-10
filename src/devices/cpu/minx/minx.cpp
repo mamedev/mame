@@ -121,7 +121,7 @@ void minx_cpu_device::device_start()
 }
 
 
-void minx_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void minx_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

@@ -905,7 +905,7 @@ const address_space_config *avr8_device::memory_space_config(address_spacenum sp
 //  for the debugger
 //-------------------------------------------------
 
-void avr8_device::state_string_export(const device_state_entry &entry, std::string &str)
+void avr8_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

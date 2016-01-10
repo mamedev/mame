@@ -143,10 +143,10 @@ bool nes_datach_slot_device::call_softlist_load(software_list_device &swlist, co
 	return TRUE;
 }
 
-void nes_datach_slot_device::get_default_card_software(std::string &result)
+std::string nes_datach_slot_device::get_default_card_software()
 {
 	// any way to detect the game with X24C01?
-	software_get_default_slot(result, "datach_rom");
+	return software_get_default_slot("datach_rom");
 }
 
 

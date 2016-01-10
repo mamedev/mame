@@ -353,9 +353,8 @@ void cosmac_device::device_start()
 	state_add(COSMAC_I,     "I",    m_i).mask(0xf);
 	state_add(COSMAC_N,     "N",    m_n).mask(0xf);
 
-	std::string tempstr;
 	for (int regnum = 0; regnum < 16; regnum++)
-		state_add(COSMAC_R0 + regnum, strformat(tempstr, "R%x", regnum).c_str(), m_r[regnum]);
+		state_add(COSMAC_R0 + regnum, strformat("R%x", regnum).c_str(), m_r[regnum]);
 
 	state_add(COSMAC_DF,    "DF",   m_df).mask(0x1).noshow();
 	state_add(COSMAC_IE,    "IE",   m_ie).mask(0x1).noshow();
@@ -469,7 +468,7 @@ void cosmac_device::state_export(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void cosmac_device::state_string_export(const device_state_entry &entry, std::string &str)
+void cosmac_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

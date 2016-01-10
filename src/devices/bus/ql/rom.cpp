@@ -114,9 +114,9 @@ bool ql_rom_cartridge_slot_t::call_softlist_load(software_list_device &swlist, c
 //  get_default_card_software -
 //-------------------------------------------------
 
-void ql_rom_cartridge_slot_t::get_default_card_software(std::string &result)
+std::string ql_rom_cartridge_slot_t::get_default_card_software()
 {
-	software_get_default_slot(result, "standard");
+	return software_get_default_slot("standard");
 }
 
 

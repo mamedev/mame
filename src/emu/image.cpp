@@ -141,8 +141,7 @@ static int write_config(emu_options &options, const char *filename, const game_d
 	file_error filerr = file.open(filename);
 	if (filerr == FILERR_NONE)
 	{
-		std::string inistring;
-		options.output_ini(inistring);
+		std::string inistring = options.output_ini();
 		file.puts(inistring.c_str());
 		retval = 0;
 	}

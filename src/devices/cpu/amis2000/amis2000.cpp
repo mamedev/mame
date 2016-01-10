@@ -70,7 +70,7 @@ amis2152_cpu_device::amis2152_cpu_device(const machine_config &mconfig, const ch
 
 
 // disasm
-void amis2000_base_device::state_string_export(const device_state_entry &entry, std::string &str)
+void amis2000_base_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

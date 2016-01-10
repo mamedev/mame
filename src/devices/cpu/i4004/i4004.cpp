@@ -419,15 +419,14 @@ void i4004_cpu_device::device_start()
 		state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).mask(0x0f).callimport().callexport().noshow().formatstr("%4s");
 		state_add(I4004_A,     "A",     m_A).mask(0x0f);
 
-		std::string tempstr;
 		for (int regnum = 0; regnum < 8; regnum++)
 		{
-			state_add(I4004_R01 + regnum, strformat(tempstr, "R%X%X", regnum * 2, regnum * 2 + 1).c_str(), m_R[regnum]);
+			state_add(I4004_R01 + regnum, strformat("R%X%X", regnum * 2, regnum * 2 + 1).c_str(), m_R[regnum]);
 		}
 
 		for (int addrnum = 0; addrnum < 4; addrnum++)
 		{
-			state_add(I4004_ADDR1 + addrnum, strformat(tempstr, "ADDR%d", addrnum + 1).c_str(), m_ADDR[addrnum].w.l).mask(0xfff);
+			state_add(I4004_ADDR1 + addrnum, strformat("ADDR%d", addrnum + 1).c_str(), m_ADDR[addrnum].w.l).mask(0xfff);
 		}
 
 		state_add(I4004_RAM,   "RAM",   m_RAM.w.l).mask(0x0fff);
@@ -507,7 +506,7 @@ void i4004_cpu_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void i4004_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void i4004_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
