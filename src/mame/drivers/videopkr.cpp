@@ -411,7 +411,7 @@ void videopkr_state::count_7dig(unsigned long data, UINT8 index)
 
 	for (i = 0; i < 7; i++)
 	{
-		machine().output().set_digit_value(index+i, dec_7seg((strn[6 - i] | 0x10) - 0x30));
+		output().set_digit_value(index+i, dec_7seg((strn[6 - i] | 0x10) - 0x30));
 	}
 }
 
@@ -665,14 +665,14 @@ WRITE8_MEMBER(videopkr_state::videopkr_io_w)
 
 		case 0xef:  /* Port 2.4 */
 		{
-			machine().output().set_lamp_value(0, (data & 1));           /* L_1 */
-			machine().output().set_lamp_value(1, ((data >> 1)& 1));     /* L_2 */
-			machine().output().set_lamp_value(2, ((data >> 2) & 1));    /* L_3 */
-			machine().output().set_lamp_value(3, ((data >> 3) & 1));    /* L_4 */
-			machine().output().set_lamp_value(4, ((data >> 4) & 1));    /* Coin */
-			machine().output().set_lamp_value(5, ((data >> 5) & 1));    /* Hopper_1 */
-			machine().output().set_lamp_value(6, ((data >> 6) & 1));    /* Hopper_2 */
-			machine().output().set_lamp_value(7, ((data >> 7) & 1));    /* Diverter */
+			output().set_lamp_value(0, (data & 1));           /* L_1 */
+			output().set_lamp_value(1, ((data >> 1)& 1));     /* L_2 */
+			output().set_lamp_value(2, ((data >> 2) & 1));    /* L_3 */
+			output().set_lamp_value(3, ((data >> 3) & 1));    /* L_4 */
+			output().set_lamp_value(4, ((data >> 4) & 1));    /* Coin */
+			output().set_lamp_value(5, ((data >> 5) & 1));    /* Hopper_1 */
+			output().set_lamp_value(6, ((data >> 6) & 1));    /* Hopper_2 */
+			output().set_lamp_value(7, ((data >> 7) & 1));    /* Diverter */
 			m_p24_data = data;
 			m_hp_1 = (~m_p24_data >> 6) & 1;
 			m_hp_2 = (~m_p24_data >> 5) & 1;
@@ -702,12 +702,12 @@ WRITE8_MEMBER(videopkr_state::videopkr_p1_data_w)
 {
 	m_p1 = data;
 
-	machine().output().set_lamp_value(8, (data & 1));           /* Aux_0 - Jackpot mech. counter (Baby Games)*/
-	machine().output().set_lamp_value(9, ((data >> 1) & 1));    /* Aux_1 - */
-	machine().output().set_lamp_value(10, ((data >> 2) & 1));   /* Aux_2 - */
-	machine().output().set_lamp_value(11, ((data >> 3) & 1));   /* Aux_3 - */
-	machine().output().set_lamp_value(12, ((data >> 4) & 1));   /* Aux_4 - Bell */
-	machine().output().set_lamp_value(13, ((data >> 5) & 1));   /* Aux_5 - /CIO */
+	output().set_lamp_value(8, (data & 1));           /* Aux_0 - Jackpot mech. counter (Baby Games)*/
+	output().set_lamp_value(9, ((data >> 1) & 1));    /* Aux_1 - */
+	output().set_lamp_value(10, ((data >> 2) & 1));   /* Aux_2 - */
+	output().set_lamp_value(11, ((data >> 3) & 1));   /* Aux_3 - */
+	output().set_lamp_value(12, ((data >> 4) & 1));   /* Aux_4 - Bell */
+	output().set_lamp_value(13, ((data >> 5) & 1));   /* Aux_5 - /CIO */
 
 	m_jckp = m_p1 & 1;
 
@@ -909,9 +909,9 @@ WRITE8_MEMBER(videopkr_state::baby_sound_p3_w)
 	m_sbp3 = data;
 	lmp_ports = m_sbp3 >> 1 & 0x07;
 
-	machine().output().set_value("TOP_1", (lmp_ports >> 0) & 1);
-	machine().output().set_value("TOP_2", (lmp_ports >> 1) & 1);
-	machine().output().set_value("TOP_3", (lmp_ports >> 2) & 1);
+	output().set_value("TOP_1", (lmp_ports >> 0) & 1);
+	output().set_value("TOP_2", (lmp_ports >> 1) & 1);
+	output().set_value("TOP_3", (lmp_ports >> 2) & 1);
 
 	if (!(m_sbp3 & 0x10))
 	{

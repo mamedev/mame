@@ -128,11 +128,11 @@ WRITE8_MEMBER(ultratnk_state::ultratnk_da_latch_w)
 
 WRITE8_MEMBER(ultratnk_state::ultratnk_led_1_w)
 {
-	machine().output().set_led_value(0, offset & 1); /* left player start */
+	output().set_led_value(0, offset & 1); /* left player start */
 }
 WRITE8_MEMBER(ultratnk_state::ultratnk_led_2_w)
 {
-	machine().output().set_led_value(1, offset & 1); /* right player start */
+	output().set_led_value(1, offset & 1); /* right player start */
 }
 
 

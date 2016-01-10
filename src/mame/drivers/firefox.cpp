@@ -483,7 +483,7 @@ WRITE8_MEMBER(firefox_state::self_reset_w)
 
 WRITE8_MEMBER(firefox_state::led_w)
 {
-	machine().output().set_led_value(offset, ( data & 0x80 ) == 0 );
+	output().set_led_value(offset, ( data & 0x80 ) == 0 );
 }
 
 WRITE8_MEMBER(firefox_state::firefox_coin_counter_w)

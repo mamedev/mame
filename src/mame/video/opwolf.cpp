@@ -24,11 +24,11 @@ WRITE16_MEMBER(opwolf_state::opwolf_spritectrl_w)
 		/* If data = 4, the Piston Motor is off, otherwise it's on. */
 		if (data == 4)
 		{
-			machine().output().set_value("Player1_Recoil_Piston", 0);
+			output().set_value("Player1_Recoil_Piston", 0);
 		}
 		else
 		{
-			machine().output().set_value("Player1_Recoil_Piston", 1);
+			output().set_value("Player1_Recoil_Piston", 1);
 		}
 	}
 }

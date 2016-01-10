@@ -299,13 +299,13 @@ WRITE16_MEMBER(mil4000_state::output_w)
 	for(i=0;i<3;i++)
 		machine().bookkeeping().coin_counter_w(i, data & 0x2000);
 
-	machine().output().set_lamp_value(0, (data) & 1);       /* HOLD1 */
-	machine().output().set_lamp_value(1, (data >> 1) & 1);  /* HOLD2 */
-	machine().output().set_lamp_value(2, (data >> 2) & 1);  /* HOLD3 */
-	machine().output().set_lamp_value(3, (data >> 3) & 1);  /* HOLD4 */
-	machine().output().set_lamp_value(4, (data >> 4) & 1);  /* HOLD5 */
-	machine().output().set_lamp_value(5, (data >> 5) & 1);  /* START */
-	machine().output().set_lamp_value(6, (data >> 6) & 1);  /* PREMIO */
+	output().set_lamp_value(0, (data) & 1);       /* HOLD1 */
+	output().set_lamp_value(1, (data >> 1) & 1);  /* HOLD2 */
+	output().set_lamp_value(2, (data >> 2) & 1);  /* HOLD3 */
+	output().set_lamp_value(3, (data >> 3) & 1);  /* HOLD4 */
+	output().set_lamp_value(4, (data >> 4) & 1);  /* HOLD5 */
+	output().set_lamp_value(5, (data >> 5) & 1);  /* START */
+	output().set_lamp_value(6, (data >> 6) & 1);  /* PREMIO */
 
 //  popmessage("%04x\n",data);
 }

@@ -158,10 +158,10 @@ READ8_MEMBER(bsktball_state::bsktball_in0_r)
 ***************************************************************************/
 WRITE8_MEMBER(bsktball_state::bsktball_led1_w)
 {
-	machine().output().set_led_value(0, offset & 0x01);
+	output().set_led_value(0, offset & 0x01);
 }
 
 WRITE8_MEMBER(bsktball_state::bsktball_led2_w)
 {
-	machine().output().set_led_value(1, offset & 0x01);
+	output().set_led_value(1, offset & 0x01);
 }

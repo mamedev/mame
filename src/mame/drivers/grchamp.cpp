@@ -179,7 +179,7 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 			/* bit 5:   Game Over lamp */
 			/* bit 6-7: n/c */
 			machine().bookkeeping().coin_lockout_global_w((data >> 4) & 1);
-			machine().output().set_value("led0", (~data >> 5) & 1);
+			output().set_value("led0", (~data >> 5) & 1);
 			break;
 
 		case 0x0a:  /* OUT10 */
@@ -228,7 +228,7 @@ WRITE8_MEMBER(grchamp_state::led_board_w)
 
 		case 0x0c:
 			m_ledram[m_ledaddr & 0x07] = m_ledlatch;
-			machine().output().set_digit_value(m_ledaddr & 0x07, ls247_map[m_ledram[m_ledaddr & 0x07] & 0x0f]);
+			output().set_digit_value(m_ledaddr & 0x07, ls247_map[m_ledram[m_ledaddr & 0x07] & 0x0f]);
 			/*
 			    ledram[0] & 0x0f = score LSD
 			    ledram[1] & 0x0f = score

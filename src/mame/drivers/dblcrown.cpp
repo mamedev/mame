@@ -322,14 +322,14 @@ WRITE8_MEMBER( dblcrown_state::lamps_w )
   -x-- ----  Hold 2
   x--- ----  Hold 1
 */
-	machine().output().set_lamp_value(0, (data) & 1);       /* Deal */
-	machine().output().set_lamp_value(1, (data >> 1) & 1);  /* Bet */
-	machine().output().set_lamp_value(2, (data >> 2) & 1);  /* Cancel */
-	machine().output().set_lamp_value(3, (data >> 3) & 1);  /* Hold 5 */
-	machine().output().set_lamp_value(4, (data >> 4) & 1);  /* Hold 4 */
-	machine().output().set_lamp_value(5, (data >> 5) & 1);  /* Hold 3 */
-	machine().output().set_lamp_value(6, (data >> 6) & 1);  /* Hold 2 */
-	machine().output().set_lamp_value(7, (data >> 7) & 1);  /* Hold 1 */
+	output().set_lamp_value(0, (data) & 1);       /* Deal */
+	output().set_lamp_value(1, (data >> 1) & 1);  /* Bet */
+	output().set_lamp_value(2, (data >> 2) & 1);  /* Cancel */
+	output().set_lamp_value(3, (data >> 3) & 1);  /* Hold 5 */
+	output().set_lamp_value(4, (data >> 4) & 1);  /* Hold 4 */
+	output().set_lamp_value(5, (data >> 5) & 1);  /* Hold 3 */
+	output().set_lamp_value(6, (data >> 6) & 1);  /* Hold 2 */
+	output().set_lamp_value(7, (data >> 7) & 1);  /* Hold 1 */
 
 	m_lamps_data = data;
 }

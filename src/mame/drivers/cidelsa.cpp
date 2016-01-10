@@ -113,9 +113,9 @@ WRITE8_MEMBER( cidelsa_state::altair_out1_w )
 	    7   CONT. M1
 	*/
 
-	machine().output().set_led_value(0, data & 0x08); // 1P
-	machine().output().set_led_value(1, data & 0x10); // 2P
-	machine().output().set_led_value(2, data & 0x20); // FIRE
+	output().set_led_value(0, data & 0x08); // 1P
+	output().set_led_value(1, data & 0x10); // 2P
+	output().set_led_value(2, data & 0x20); // FIRE
 }
 
 WRITE8_MEMBER( draco_state::out1_w )

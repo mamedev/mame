@@ -323,7 +323,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0d_out_cred_data_w)
 	if (m_credsel!=0xff)
 	{
 		UINT8 bf7segdata = BITSWAP8(data,7,0,1,2,3,4,5,6);
-		machine().output().set_digit_value(m_credsel+8, bf7segdata);
+		output().set_digit_value(m_credsel+8, bf7segdata);
 	}
 }
 
@@ -336,7 +336,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0f_out_bank_segdata_w)
 	if (m_banksel!=0xff)
 	{
 		UINT8 bf7segdata = BITSWAP8(data,7,0,1,2,3,4,5,6);
-		machine().output().set_digit_value(m_banksel, bf7segdata);
+		output().set_digit_value(m_banksel, bf7segdata);
 	}
 }
 

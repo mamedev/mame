@@ -36,10 +36,10 @@ public:
 
 WRITE8_MEMBER(tourtabl_state::tourtabl_led_w)
 {
-	machine().output().set_led_value(0, data & 0x40); /* start 1 */
-	machine().output().set_led_value(1, data & 0x20); /* start 2 */
-	machine().output().set_led_value(2, data & 0x10); /* start 4 */
-	machine().output().set_led_value(3, data & 0x80); /* select game */
+	output().set_led_value(0, data & 0x40); /* start 1 */
+	output().set_led_value(1, data & 0x20); /* start 2 */
+	output().set_led_value(2, data & 0x10); /* start 4 */
+	output().set_led_value(3, data & 0x80); /* select game */
 
 	machine().bookkeeping().coin_lockout_global_w(!(data & 0x80));
 }

@@ -130,7 +130,7 @@
 
 WRITE8_MEMBER(cloak_state::cloak_led_w)
 {
-	machine().output().set_led_value(1 - offset, ~data & 0x80);
+	output().set_led_value(1 - offset, ~data & 0x80);
 }
 
 WRITE8_MEMBER(cloak_state::cloak_coin_counter_w)

@@ -1624,8 +1624,8 @@ WRITE8_MEMBER(mappy_state::out_mux)
 
 WRITE8_MEMBER(mappy_state::out_lamps)
 {
-	machine().output().set_led_value(0, data & 1);
-	machine().output().set_led_value(1, data & 2);
+	output().set_led_value(0, data & 1);
+	output().set_led_value(1, data & 2);
 	machine().bookkeeping().coin_lockout_global_w(data & 4);
 	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }

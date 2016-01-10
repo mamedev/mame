@@ -254,12 +254,12 @@ WRITE16_MEMBER(umipoker_state::lamps_w)
   --x- ---- ---- ----  START lamp.
 
 */
-	machine().output().set_lamp_value(0, (data >> 5) & 1);      /* Lamp 0 - RIGHT */
-	machine().output().set_lamp_value(1, (data >> 9) & 1);      /* Lamp 1 - TAKE */
-	machine().output().set_lamp_value(2, (data >> 10) & 1);     /* Lamp 2 - D-UP */
-	machine().output().set_lamp_value(3, (data >> 11) & 1);     /* Lamp 3 - BET */
-	machine().output().set_lamp_value(4, (data >> 12) & 1);     /* Lamp 4 - LEFT/STOP */
-	machine().output().set_lamp_value(5, (data >> 13) & 1);     /* Lamp 5 - START */
+	output().set_lamp_value(0, (data >> 5) & 1);      /* Lamp 0 - RIGHT */
+	output().set_lamp_value(1, (data >> 9) & 1);      /* Lamp 1 - TAKE */
+	output().set_lamp_value(2, (data >> 10) & 1);     /* Lamp 2 - D-UP */
+	output().set_lamp_value(3, (data >> 11) & 1);     /* Lamp 3 - BET */
+	output().set_lamp_value(4, (data >> 12) & 1);     /* Lamp 4 - LEFT/STOP */
+	output().set_lamp_value(5, (data >> 13) & 1);     /* Lamp 5 - START */
 }
 
 WRITE16_MEMBER(umipoker_state::umi_counters_w)

@@ -1272,7 +1272,7 @@ WRITE8_MEMBER(mw8080bw_state::desertgu_audio_2_w)
 
 	m_discrete->write(space, DESERTGU_TRIGGER_CLICK_EN, (data >> 1) & 0x01);
 
-	machine().output().set_value("Player1_Gun_Recoil", (data >> 2) & 0x01);
+	output().set_value("Player1_Gun_Recoil", (data >> 2) & 0x01);
 
 	m_desertgun_controller_select = (data >> 3) & 0x01;
 
@@ -1581,14 +1581,14 @@ WRITE8_MEMBER(mw8080bw_state::gmissile_audio_1_w)
 	if (rising_bits & 0x10) m_samples2->start(0, 0);
 
 	/* if (data & 0x20)  enable LEFT EXPLOSION sound (goes to left speaker) */
-	machine().output().set_value("L_EXP_LIGHT", (data >> 5) & 0x01);
+	output().set_value("L_EXP_LIGHT", (data >> 5) & 0x01);
 	if (rising_bits & 0x20) m_samples1->start(0, 1);
 
 	/* if (data & 0x40)  enable LEFT MISSILE sound (goes to left speaker) */
 	if (rising_bits & 0x40) m_samples1->start(0, 0);
 
 	/* if (data & 0x80)  enable RIGHT EXPLOSION sound (goes to right speaker) */
-	machine().output().set_value("R_EXP_LIGHT", (data >> 7) & 0x01);
+	output().set_value("R_EXP_LIGHT", (data >> 7) & 0x01);
 	if (rising_bits & 0x80) m_samples2->start(0, 1);
 
 	m_port_1_last = data;
@@ -3242,7 +3242,7 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_audio_3_w)
 
 	m_spcenctr_strobe_state = (data >> 2) & 0x01;
 
-	machine().output().set_value("LAMP", (data >> 3) & 0x01);
+	output().set_value("LAMP", (data >> 3) & 0x01);
 
 	m_discrete->write(space, SPCENCTR_BONUS_EN, (data >> 4) & 0x01);
 
@@ -3309,7 +3309,7 @@ WRITE8_MEMBER(mw8080bw_state::phantom2_audio_2_w)
 	/* if (data & 0x08)  enable EXPLOSION sound */
 	if (rising_bits & 0x08) m_samples->start(1, 1);
 
-	machine().output().set_value("EXPLAMP", (data >> 4) & 0x01);
+	output().set_value("EXPLAMP", (data >> 4) & 0x01);
 
 	/* set JET SOUND FREQ((data >> 5) & 0x07)  0, if no jet sound */
 

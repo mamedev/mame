@@ -132,7 +132,7 @@ WRITE32_MEMBER(eolith_state::systemcontrol_w)
 {
 	m_buffer = (data & 0x80) >> 7;
 	machine().bookkeeping().coin_counter_w(0, data & m_coin_counter_bit);
-	machine().output().set_led_value(0, data & 1);
+	output().set_led_value(0, data & 1);
 
 	m_eepromoutport->write(data, 0xff);
 

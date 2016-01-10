@@ -120,8 +120,8 @@ WRITE16_MEMBER(quantum_state::led_w)
 		/* bit 3 = select second trackball for cocktail mode? */
 
 		/* bits 4 and 5 are LED controls */
-		machine().output().set_led_value(0, data & 0x10);
-		machine().output().set_led_value(1, data & 0x20);
+		output().set_led_value(0, data & 0x10);
+		output().set_led_value(1, data & 0x20);
 
 		/* bits 6 and 7 flip screen */
 		m_avg->set_flip_x (data & 0x40);

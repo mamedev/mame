@@ -157,7 +157,7 @@ void wackygtr_state::pmm8713_ck(int i, int state)
 		int alligator_state = m_motors_pos[i] / 10;
 		if (alligator_state > 5)    alligator_state = 5;
 		if (alligator_state < 0)    alligator_state = 0;
-		machine().output().set_indexed_value("alligator", i, alligator_state);
+		output().set_indexed_value("alligator", i, alligator_state);
 	}
 }
 
@@ -190,14 +190,14 @@ void wackygtr_state::machine_reset()
 void wackygtr_state::set_digits(int p, UINT8 value)
 {
 	static UINT8 bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 };  // not accurate
-	machine().output().set_digit_value(p + 0, bcd2hex[value & 0x0f]);
-	machine().output().set_digit_value(p + 1, bcd2hex[(value >> 4) & 0x0f]);
+	output().set_digit_value(p + 0, bcd2hex[value & 0x0f]);
+	output().set_digit_value(p + 1, bcd2hex[(value >> 4) & 0x0f]);
 }
 
 void wackygtr_state::set_lamps(int p, UINT8 value)
 {
 	for(int i=0; i<8; i++)
-		machine().output().set_lamp_value(p + i, BIT(value, i));
+		output().set_lamp_value(p + i, BIT(value, i));
 }
 
 static INPUT_PORTS_START( wackygtr )

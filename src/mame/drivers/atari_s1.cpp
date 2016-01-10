@@ -372,13 +372,13 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s1_state::nmi )
 		// Player number
 		char wordnum[8];
 		sprintf(wordnum,"text%d",m_out_offs>>2);
-		machine().output().set_value(wordnum, !BIT(patterns[m_p_ram[m_out_offs]&15], 6)); // uses 'g' segment
+		output().set_value(wordnum, !BIT(patterns[m_p_ram[m_out_offs]&15], 6)); // uses 'g' segment
 	}
 	else
 	{
 		// Digits
-		machine().output().set_digit_value(m_out_offs << 1, patterns[m_p_ram[m_out_offs]>>4]);
-		machine().output().set_digit_value((m_out_offs << 1)+1, patterns[m_p_ram[m_out_offs]&15]);
+		output().set_digit_value(m_out_offs << 1, patterns[m_p_ram[m_out_offs]>>4]);
+		output().set_digit_value((m_out_offs << 1)+1, patterns[m_p_ram[m_out_offs]&15]);
 	}
 }
 

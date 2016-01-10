@@ -658,13 +658,13 @@ WRITE_LINE_MEMBER(williams2_state::tshoot_maxvol_w)
 WRITE8_MEMBER(williams2_state::tshoot_lamp_w)
 {
 	/* set the grenade lamp */
-	machine().output().set_value("Grenade_lamp", (~data & 0x4)>>2 );
+	output().set_value("Grenade_lamp", (~data & 0x4)>>2 );
 	/* set the gun lamp */
-	machine().output().set_value("Gun_lamp", (~data & 0x8)>>3 );
+	output().set_value("Gun_lamp", (~data & 0x8)>>3 );
 	/* gun coil */
-	machine().output().set_value("Player1_Gun_Recoil", (data & 0x10)>>4 );
+	output().set_value("Player1_Gun_Recoil", (data & 0x10)>>4 );
 	/* feather coil */
-	machine().output().set_value("Feather_Blower", (data & 0x20)>>5 );
+	output().set_value("Feather_Blower", (data & 0x20)>>5 );
 }
 
 

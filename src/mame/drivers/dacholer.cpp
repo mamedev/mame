@@ -211,8 +211,8 @@ WRITE8_MEMBER(dacholer_state::coins_w)
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 
-	machine().output().set_led_value(0, data & 4);
-	machine().output().set_led_value(1, data & 8);
+	output().set_led_value(0, data & 4);
+	output().set_led_value(1, data & 8);
 }
 
 WRITE8_MEMBER(dacholer_state::snd_w)

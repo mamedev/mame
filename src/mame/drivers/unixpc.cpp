@@ -103,10 +103,10 @@ WRITE16_MEMBER( unixpc_state::misc_control_w )
 {
 	logerror("misc_control_w: %04x\n", data);
 
-	machine().output().set_value("led_0", !BIT(data,  8));
-	machine().output().set_value("led_1", !BIT(data,  9));
-	machine().output().set_value("led_2", !BIT(data, 10));
-	machine().output().set_value("led_3", !BIT(data, 11));
+	output().set_value("led_0", !BIT(data,  8));
+	output().set_value("led_1", !BIT(data,  9));
+	output().set_value("led_2", !BIT(data, 10));
+	output().set_value("led_3", !BIT(data, 11));
 }
 
 

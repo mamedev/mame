@@ -864,10 +864,10 @@ void segaxbd_state::generic_iochip0_lamps_w(UINT8 data)
 	// d6: danger lamp
 	// in clone aburner, lamps work only in testmode?
 
-	machine().output().set_lamp_value(0, (data >> 5) & 0x01);
-	machine().output().set_lamp_value(1, (data >> 6) & 0x01);
-	machine().output().set_lamp_value(2, (data >> 1) & 0x01);
-	machine().output().set_lamp_value(3, (data >> 2) & 0x01);
+	output().set_lamp_value(0, (data >> 5) & 0x01);
+	output().set_lamp_value(1, (data >> 6) & 0x01);
+	output().set_lamp_value(2, (data >> 1) & 0x01);
+	output().set_lamp_value(3, (data >> 2) & 0x01);
 }
 
 

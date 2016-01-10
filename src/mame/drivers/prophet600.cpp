@@ -124,11 +124,11 @@ WRITE8_MEMBER(prophet600_state::led_w)
 	}
 	else if (m_scanrow == 0x20)
 	{
-		machine().output().set_digit_value(0, data);
+		output().set_digit_value(0, data);
 	}
 	else if (m_scanrow == 0x40)
 	{
-		machine().output().set_digit_value(1, data);
+		output().set_digit_value(1, data);
 	}
 }
 

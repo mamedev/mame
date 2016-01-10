@@ -75,11 +75,11 @@ WRITE8_MEMBER(starwars_state::starwars_out_w)
 			break;
 
 		case 2:     /* LED 3 */
-			machine().output().set_led_value(2, ~data & 0x80);
+			output().set_led_value(2, ~data & 0x80);
 			break;
 
 		case 3:     /* LED 2 */
-			machine().output().set_led_value(1, ~data & 0x80);
+			output().set_led_value(1, ~data & 0x80);
 			break;
 
 		case 4:     /* bank switch */
@@ -91,7 +91,7 @@ WRITE8_MEMBER(starwars_state::starwars_out_w)
 			break;
 
 		case 6:     /* LED 1 */
-			machine().output().set_led_value(0, ~data & 0x80);
+			output().set_led_value(0, ~data & 0x80);
 			break;
 
 		case 7:     /* NVRAM array recall */

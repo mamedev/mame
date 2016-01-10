@@ -847,7 +847,7 @@ WRITE8_MEMBER(sigmab98_state::eeprom_w)
 // 10 led?
 WRITE8_MEMBER(sigmab98_state::c4_w)
 {
-	machine().output().set_led_value(0, (data & 0x10));
+	output().set_led_value(0, (data & 0x10));
 
 	m_c4 = data;
 	show_outputs();
@@ -868,8 +868,8 @@ WRITE8_MEMBER(sigmab98_state::c6_w)
 	if ((data & 0x08) && !(m_c6 & 0x08))
 		m_buffered_spriteram->copy();
 
-	machine().output().set_led_value(1,   data  & 0x10);
-	machine().output().set_led_value(2,   data  & 0x20);
+	output().set_led_value(1,   data  & 0x10);
+	output().set_led_value(2,   data  & 0x20);
 
 	m_c6 = data;
 	show_outputs();
@@ -1174,7 +1174,7 @@ WRITE8_MEMBER(sigmab98_state::sammymdl_coin_w)
 // Port 32
 WRITE8_MEMBER(sigmab98_state::sammymdl_leds_w)
 {
-	machine().output().set_led_value(0,    data & 0x01);   // button
+	output().set_led_value(0,    data & 0x01);   // button
 
 	m_out[1] = data;
 	show_3_outputs();
@@ -1434,14 +1434,14 @@ WRITE8_MEMBER(sigmab98_state::haekaka_b000_w)
 WRITE8_MEMBER(sigmab98_state::haekaka_leds_w)
 {
 	// All used
-	machine().output().set_led_value(0,    data & 0x01);
-	machine().output().set_led_value(1,    data & 0x02);
-	machine().output().set_led_value(2,    data & 0x04);
-	machine().output().set_led_value(3,    data & 0x08);
-	machine().output().set_led_value(4,    data & 0x10);
-	machine().output().set_led_value(5,    data & 0x20);
-	machine().output().set_led_value(6,    data & 0x40);
-	machine().output().set_led_value(7,    data & 0x80);
+	output().set_led_value(0,    data & 0x01);
+	output().set_led_value(1,    data & 0x02);
+	output().set_led_value(2,    data & 0x04);
+	output().set_led_value(3,    data & 0x08);
+	output().set_led_value(4,    data & 0x10);
+	output().set_led_value(5,    data & 0x20);
+	output().set_led_value(6,    data & 0x40);
+	output().set_led_value(7,    data & 0x80);
 
 	m_out[1] = data;
 	show_3_outputs();

@@ -161,7 +161,7 @@ void liberatr_state::machine_start()
 
 WRITE8_MEMBER( liberatr_state::led_w )
 {
-	machine().output().set_led_value(offset, ~data & 0x10);
+	output().set_led_value(offset, ~data & 0x10);
 }
 
 

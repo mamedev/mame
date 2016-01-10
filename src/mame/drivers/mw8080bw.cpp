@@ -300,7 +300,7 @@ WRITE8_MEMBER(mw8080bw_state::seawolf_explosion_lamp_w)
 	{
 		UINT8 bits_for_lamp = bits_for_lamps[i];
 
-		machine().output().set_value(lamp_names[i], (data & bits_for_lamp) == bits_for_lamp);
+		output().set_value(lamp_names[i], (data & bits_for_lamp) == bits_for_lamp);
 	}
 }
 
@@ -310,14 +310,14 @@ WRITE8_MEMBER(mw8080bw_state::seawolf_periscope_lamp_w)
 	/* the schematics and the connecting diagrams show the
 	   torpedo light order differently, but this order is
 	   confirmed by the software */
-	machine().output().set_value("TORP_LAMP_4", (data >> 0) & 0x01);
-	machine().output().set_value("TORP_LAMP_3", (data >> 1) & 0x01);
-	machine().output().set_value("TORP_LAMP_2", (data >> 2) & 0x01);
-	machine().output().set_value("TORP_LAMP_1", (data >> 3) & 0x01);
+	output().set_value("TORP_LAMP_4", (data >> 0) & 0x01);
+	output().set_value("TORP_LAMP_3", (data >> 1) & 0x01);
+	output().set_value("TORP_LAMP_2", (data >> 2) & 0x01);
+	output().set_value("TORP_LAMP_1", (data >> 3) & 0x01);
 
-	machine().output().set_value("READY_LAMP",  (data >> 4) & 0x01);
+	output().set_value("READY_LAMP",  (data >> 4) & 0x01);
 
-	machine().output().set_value("RELOAD_LAMP", (data >> 5) & 0x01);
+	output().set_value("RELOAD_LAMP", (data >> 5) & 0x01);
 }
 
 
@@ -2108,7 +2108,7 @@ MACHINE_CONFIG_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(mw8080bw_state::spcenctr_strobe_timer_callback)
 {
-	machine().output().set_value("STROBE", param && m_spcenctr_strobe_state);
+	output().set_value("STROBE", param && m_spcenctr_strobe_state);
 }
 
 
@@ -2369,35 +2369,35 @@ READ8_MEMBER(mw8080bw_state::bowler_shift_result_r)
 
 WRITE8_MEMBER(mw8080bw_state::bowler_lights_1_w)
 {
-	machine().output().set_value("200_LEFT_LIGHT",  (data >> 0) & 0x01);
+	output().set_value("200_LEFT_LIGHT",  (data >> 0) & 0x01);
 
-	machine().output().set_value("400_LEFT_LIGHT",  (data >> 1) & 0x01);
+	output().set_value("400_LEFT_LIGHT",  (data >> 1) & 0x01);
 
-	machine().output().set_value("500_LEFT_LIGHT",  (data >> 2) & 0x01);
+	output().set_value("500_LEFT_LIGHT",  (data >> 2) & 0x01);
 
-	machine().output().set_value("700_LIGHT",       (data >> 3) & 0x01);
+	output().set_value("700_LIGHT",       (data >> 3) & 0x01);
 
-	machine().output().set_value("500_RIGHT_LIGHT", (data >> 4) & 0x01);
+	output().set_value("500_RIGHT_LIGHT", (data >> 4) & 0x01);
 
-	machine().output().set_value("400_RIGHT_LIGHT", (data >> 5) & 0x01);
+	output().set_value("400_RIGHT_LIGHT", (data >> 5) & 0x01);
 
-	machine().output().set_value("200_RIGHT_LIGHT", (data >> 6) & 0x01);
+	output().set_value("200_RIGHT_LIGHT", (data >> 6) & 0x01);
 
-	machine().output().set_value("X_LEFT_LIGHT",    (data >> 7) & 0x01);
-	machine().output().set_value("X_RIGHT_LIGHT",   (data >> 7) & 0x01);
+	output().set_value("X_LEFT_LIGHT",    (data >> 7) & 0x01);
+	output().set_value("X_RIGHT_LIGHT",   (data >> 7) & 0x01);
 }
 
 
 WRITE8_MEMBER(mw8080bw_state::bowler_lights_2_w)
 {
-	machine().output().set_value("REGULATION_GAME_LIGHT", ( data >> 0) & 0x01);
-	machine().output().set_value("FLASH_GAME_LIGHT",      (~data >> 0) & 0x01);
+	output().set_value("REGULATION_GAME_LIGHT", ( data >> 0) & 0x01);
+	output().set_value("FLASH_GAME_LIGHT",      (~data >> 0) & 0x01);
 
-	machine().output().set_value("STRAIGHT_BALL_LIGHT",   ( data >> 1) & 0x01);
+	output().set_value("STRAIGHT_BALL_LIGHT",   ( data >> 1) & 0x01);
 
-	machine().output().set_value("HOOK_BALL_LIGHT",       ( data >> 2) & 0x01);
+	output().set_value("HOOK_BALL_LIGHT",       ( data >> 2) & 0x01);
 
-	machine().output().set_value("SELECT_GAME_LIGHT",     ( data >> 3) & 0x01);
+	output().set_value("SELECT_GAME_LIGHT",     ( data >> 3) & 0x01);
 
 	/* D4-D7 are not connected */
 }

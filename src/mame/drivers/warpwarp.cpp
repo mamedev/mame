@@ -197,13 +197,13 @@ WRITE8_MEMBER(warpwarp_state::geebee_out7_w)
 	switch (offset & 7)
 	{
 		case 0:
-			machine().output().set_led_value(0,data & 1);
+			output().set_led_value(0,data & 1);
 			break;
 		case 1:
-			machine().output().set_led_value(1,data & 1);
+			output().set_led_value(1,data & 1);
 			break;
 		case 2:
-			machine().output().set_led_value(2,data & 1);
+			output().set_led_value(2,data & 1);
 			break;
 		case 3:
 			machine().bookkeeping().coin_counter_w(0,data & 1);
@@ -284,13 +284,13 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_out3_w)
 	switch (offset & 7)
 	{
 		case 0:
-			machine().output().set_led_value(0,data & 1);
+			output().set_led_value(0,data & 1);
 			break;
 		case 1:
-			machine().output().set_led_value(1,data & 1);
+			output().set_led_value(1,data & 1);
 			break;
 		case 2:
-			machine().output().set_led_value(2,data & 1);
+			output().set_led_value(2,data & 1);
 			break;
 		case 3:
 			/* n.c. */

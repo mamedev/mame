@@ -305,13 +305,13 @@ WRITE8_MEMBER(dlair_state::dleuro_misc_w)
 
 WRITE8_MEMBER(dlair_state::led_den1_w)
 {
-	machine().output().set_digit_value(0 + (offset & 7), led_map[data & 0x0f]);
+	output().set_digit_value(0 + (offset & 7), led_map[data & 0x0f]);
 }
 
 
 WRITE8_MEMBER(dlair_state::led_den2_w)
 {
-	machine().output().set_digit_value(8 + (offset & 7), led_map[data & 0x0f]);
+	output().set_digit_value(8 + (offset & 7), led_map[data & 0x0f]);
 }
 
 

@@ -482,7 +482,7 @@ WRITE8_MEMBER( amigakbd_device::port_a_w )
 WRITE8_MEMBER( amigakbd_device::port_b_w )
 {
 	// caps lock led
-	machine().output().set_value("led0", BIT(data, 7));
+	output().set_value("led0", BIT(data, 7));
 }
 
 WRITE8_MEMBER( amigakbd_device::port_c_w )

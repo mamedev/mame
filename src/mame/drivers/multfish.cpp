@@ -854,14 +854,14 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps1_w)
     -X-- ---- Start Lamp 34A
     X--- ---- Bet/Double Lamp 29B
 */
-	machine().output().set_lamp_value(1, ((data) & 1));      /* Hold 1 Lamp */
-	machine().output().set_lamp_value(2, ((data >> 1) & 1)); /* Hold 2 Lamp */
-	machine().output().set_lamp_value(3, ((data >> 2) & 1)); /* Hold 3 Lamp */
-	machine().output().set_lamp_value(4, ((data >> 3) & 1)); /* Hold 4 Lamp */
-	machine().output().set_lamp_value(5, ((data >> 4) & 1)); /* Hold 5 Lamp */
-	machine().output().set_lamp_value(8, ((data >> 5) & 1)); /* Help Lamp */
-	machine().output().set_lamp_value(6, ((data >> 6) & 1)); /* Start Lamp */
-	machine().output().set_lamp_value(0, ((data >> 7) & 1)); /* Bet/Double Lamp */
+	output().set_lamp_value(1, ((data) & 1));      /* Hold 1 Lamp */
+	output().set_lamp_value(2, ((data >> 1) & 1)); /* Hold 2 Lamp */
+	output().set_lamp_value(3, ((data >> 2) & 1)); /* Hold 3 Lamp */
+	output().set_lamp_value(4, ((data >> 3) & 1)); /* Hold 4 Lamp */
+	output().set_lamp_value(5, ((data >> 4) & 1)); /* Hold 5 Lamp */
+	output().set_lamp_value(8, ((data >> 5) & 1)); /* Help Lamp */
+	output().set_lamp_value(6, ((data >> 6) & 1)); /* Start Lamp */
+	output().set_lamp_value(0, ((data >> 7) & 1)); /* Bet/Double Lamp */
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps2_w)
@@ -874,10 +874,10 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps2_w)
     ---- -X-- Maxbet Lamp 30B
     ---X ---- Upper Lamp Green 25B  (Demo Mode)
 */
-	machine().output().set_lamp_value(9, ((data) & 1));       /* Payout Lamp */
-	machine().output().set_lamp_value(12, ((data >> 1) & 1)); /* Upper Lamp Yellow */
-	machine().output().set_lamp_value(7, ((data >> 2) & 1));  /* Maxbet Lamp */
-	machine().output().set_lamp_value(10, ((data >> 4) & 1)); /* Upper Lamp Green */
+	output().set_lamp_value(9, ((data) & 1));       /* Payout Lamp */
+	output().set_lamp_value(12, ((data >> 1) & 1)); /* Upper Lamp Yellow */
+	output().set_lamp_value(7, ((data >> 2) & 1));  /* Maxbet Lamp */
+	output().set_lamp_value(10, ((data >> 4) & 1)); /* Upper Lamp Green */
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps3_w)
@@ -887,7 +887,7 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps3_w)
     7654 3210
     ---- --X- Upper Lamp Red 26B (Service Mode)
 */
-	machine().output().set_lamp_value(11, ((data >> 1) & 1)); /* Upper Lamp Red */
+	output().set_lamp_value(11, ((data >> 1) & 1)); /* Upper Lamp Red */
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_counters_w)

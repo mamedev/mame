@@ -110,7 +110,7 @@ READ8_MEMBER(segajw_state::lamps_r)
 WRITE8_MEMBER(segajw_state::lamps_w)
 {
 	for(int i=0; i<8; i++)
-		machine().output().set_lamp_value((offset * 8) + i, BIT(data, i));
+		output().set_lamp_value((offset * 8) + i, BIT(data, i));
 
 	m_lamps[offset] = data;
 }
@@ -126,7 +126,7 @@ WRITE16_MEMBER(segajw_state::coinlockout_w)
 	m_coin_lockout = data;
 
 	for(int i=0; i<3; i++)
-		machine().output().set_indexed_value("towerlamp", i, BIT(data, 3 + i));
+		output().set_indexed_value("towerlamp", i, BIT(data, 3 + i));
 }
 
 WRITE8_MEMBER(segajw_state::audiocpu_cmd_w)

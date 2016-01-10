@@ -617,7 +617,7 @@ WRITE8_MEMBER(bfm_sc2_state::mux_output_w)
 	int off = offset<<3;
 
 	for (i=0; i<8; i++)
-		machine().output().set_lamp_value(off+i, ((data & (1 << i)) != 0));
+		output().set_lamp_value(off+i, ((data & (1 << i)) != 0));
 
 }
 

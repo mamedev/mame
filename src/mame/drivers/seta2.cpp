@@ -402,13 +402,13 @@ WRITE16_MEMBER(seta2_state::reelquak_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().output().set_led_value(0, data & 0x0001 );  // start
-		machine().output().set_led_value(1, data & 0x0002 );  // small
-		machine().output().set_led_value(2, data & 0x0004 );  // bet
-		machine().output().set_led_value(3, data & 0x0008 );  // big
-		machine().output().set_led_value(4, data & 0x0010 );  // double up
-		machine().output().set_led_value(5, data & 0x0020 );  // collect
-		machine().output().set_led_value(6, data & 0x0040 );  // bet cancel
+		output().set_led_value(0, data & 0x0001 );  // start
+		output().set_led_value(1, data & 0x0002 );  // small
+		output().set_led_value(2, data & 0x0004 );  // bet
+		output().set_led_value(3, data & 0x0008 );  // big
+		output().set_led_value(4, data & 0x0010 );  // double up
+		output().set_led_value(5, data & 0x0020 );  // collect
+		output().set_led_value(6, data & 0x0040 );  // bet cancel
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -788,14 +788,14 @@ WRITE16_MEMBER(seta2_state::funcube_leds_w)
 {
 	*m_funcube_leds = data;
 
-	machine().output().set_led_value(0, (~data) & 0x01 ); // win lamp (red)
-	machine().output().set_led_value(1, (~data) & 0x02 ); // win lamp (green)
+	output().set_led_value(0, (~data) & 0x01 ); // win lamp (red)
+	output().set_led_value(1, (~data) & 0x02 ); // win lamp (green)
 
 	// Set in a moving pattern: 0111 -> 1011 -> 1101 -> 1110
-	machine().output().set_led_value(2, (~data) & 0x10 );
-	machine().output().set_led_value(3, (~data) & 0x20 );
-	machine().output().set_led_value(4, (~data) & 0x40 );
-	machine().output().set_led_value(5, (~data) & 0x80 );
+	output().set_led_value(2, (~data) & 0x10 );
+	output().set_led_value(3, (~data) & 0x20 );
+	output().set_led_value(4, (~data) & 0x40 );
+	output().set_led_value(5, (~data) & 0x80 );
 
 	funcube_debug_outputs();
 }
@@ -818,7 +818,7 @@ WRITE16_MEMBER(seta2_state::funcube_outputs_w)
 	// Bit 1: high on pay out
 
 	// Bit 3: low after coining up, blinks on pay out
-	machine().output().set_led_value(6, (~data) & 0x08 );
+	output().set_led_value(6, (~data) & 0x08 );
 
 	funcube_debug_outputs();
 }

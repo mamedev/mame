@@ -269,14 +269,14 @@ READ8_MEMBER(gridlee_state::random_num_r)
 
 WRITE8_MEMBER(gridlee_state::led_0_w)
 {
-	machine().output().set_led_value(0, data & 1);
+	output().set_led_value(0, data & 1);
 	logerror("LED 0 %s\n", (data & 1) ? "on" : "off");
 }
 
 
 WRITE8_MEMBER(gridlee_state::led_1_w)
 {
-	machine().output().set_led_value(1, data & 1);
+	output().set_led_value(1, data & 1);
 	logerror("LED 1 %s\n", (data & 1) ? "on" : "off");
 }
 

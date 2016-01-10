@@ -202,9 +202,9 @@ WRITE16_MEMBER(sderby_state::sderby_out_w)
     x--- ----  End of Race lamp.
 
 */
-	machine().output().set_lamp_value(1, (data & 1));           /* Lamp 1 - START */
-	machine().output().set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - BET */
-	machine().output().set_lamp_value(3, (data >> 15) & 1);     /* Lamp 3 - END OF RACE */
+	output().set_lamp_value(1, (data & 1));           /* Lamp 1 - START */
+	output().set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - BET */
+	output().set_lamp_value(3, (data >> 15) & 1);     /* Lamp 3 - END OF RACE */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x2000);
 }
@@ -247,13 +247,13 @@ WRITE16_MEMBER(sderby_state::scmatto_out_w)
     --x- ----  Coin counter.
 
 */
-	machine().output().set_lamp_value(1, (data & 1));           /* Lamp 1 - HOLD 1 */
-	machine().output().set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - HOLD 2 */
-	machine().output().set_lamp_value(3, (data >> 2) & 1);      /* Lamp 3 - HOLD 3 */
-	machine().output().set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
-	machine().output().set_lamp_value(5, (data >> 4) & 1);      /* Lamp 5 - HOLD 5 */
-	machine().output().set_lamp_value(6, (data >> 5) & 1);      /* Lamp 6 - START  */
-	machine().output().set_lamp_value(7, (data >> 6) & 1);      /* Lamp 7 - BET    */
+	output().set_lamp_value(1, (data & 1));           /* Lamp 1 - HOLD 1 */
+	output().set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - HOLD 2 */
+	output().set_lamp_value(3, (data >> 2) & 1);      /* Lamp 3 - HOLD 3 */
+	output().set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
+	output().set_lamp_value(5, (data >> 4) & 1);      /* Lamp 5 - HOLD 5 */
+	output().set_lamp_value(6, (data >> 5) & 1);      /* Lamp 6 - START  */
+	output().set_lamp_value(7, (data >> 6) & 1);      /* Lamp 7 - BET    */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x2000);
 }
@@ -283,8 +283,8 @@ WRITE16_MEMBER(sderby_state::roulette_out_w)
     ---- x---  Unknown (always activated).
 
 */
-	machine().output().set_lamp_value(1, (data & 1));           /* Lamp 1 - START */
-	machine().output().set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - BET   */
+	output().set_lamp_value(1, (data & 1));           /* Lamp 1 - START */
+	output().set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - BET   */
 }
 
 

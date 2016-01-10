@@ -776,9 +776,9 @@ WRITE16_MEMBER( cps_state::cps2_eeprom_port_w )
 		}
 
 		/*
-		machine().output().set_led_value(0, data & 0x01);
-		machine().output().set_led_value(1, data & 0x10);
-		machine().output().set_led_value(2, data & 0x20);
+		output().set_led_value(0, data & 0x01);
+		output().set_led_value(1, data & 0x10);
+		output().set_led_value(2, data & 0x20);
 		*/
 	}
 }

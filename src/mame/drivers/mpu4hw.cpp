@@ -296,7 +296,7 @@ void mpu4_state::lamp_extend_small(int data)
 	{
 		for (i = 0; i < 5; i++)
 		{
-			machine().output().set_lamp_value((8*column)+i+128,((lamp_ext_data  & (1 << i)) != 0));
+			output().set_lamp_value((8*column)+i+128,((lamp_ext_data  & (1 << i)) != 0));
 		}
 	}
 	m_lamp_strobe_ext_persistence ++;
@@ -328,7 +328,7 @@ void mpu4_state::lamp_extend_large(int data,int column,int active)
 			{
 				for (i = 0; i < 8; i++)
 				{//CHECK, this includes bit 7
-					machine().output().set_lamp_value((8*column)+i+128+lampbase ,(data  & (1 << i)) != 0);
+					output().set_lamp_value((8*column)+i+128+lampbase ,(data  & (1 << i)) != 0);
 				}
 				m_lamp_strobe_ext = column;
 			}
@@ -358,9 +358,9 @@ void mpu4_state::led_write_latch(int latch, int data, int column)
 	}
 	for(j=0; j<8; j++)
 	{
-		machine().output().set_indexed_value("mpu4led",(8*column)+j,(data & (1 << j)) !=0);
+		output().set_indexed_value("mpu4led",(8*column)+j,(data & (1 << j)) !=0);
 	}
-	machine().output().set_digit_value(column * 8, data);
+	output().set_digit_value(column * 8, data);
 
 	m_last_latch = diff;
 }
@@ -415,7 +415,7 @@ void mpu4_state::update_meters()
 		break;
 
 	case FLUTTERBOX: //The backbox fan assembly fits in a reel unit sized box, wired to the remote meter pin, so we can handle it here
-		machine().output().set_value("flutterbox", data & 0x80);
+		output().set_value("flutterbox", data & 0x80);
 		data &= ~0x80; //Strip flutterbox data from meter drives
 		break;
 	}
@@ -570,7 +570,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic3_porta_w)
 
 			for (i = 0; i < 8; i++)
 			{
-				machine().output().set_lamp_value((8*m_input_strobe)+i, ((data  & (1 << i)) !=0));
+				output().set_lamp_value((8*m_input_strobe)+i, ((data  & (1 << i)) !=0));
 			}
 			m_lamp_strobe = m_input_strobe;
 		}
@@ -588,7 +588,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic3_portb_w)
 		{
 			for (i = 0; i < 8; i++)
 			{
-				machine().output().set_lamp_value((8*m_input_strobe)+i+64, ((data  & (1 << i)) !=0));
+				output().set_lamp_value((8*m_input_strobe)+i+64, ((data  & (1 << i)) !=0));
 			}
 			m_lamp_strobe2 = m_input_strobe;
 		}
@@ -605,12 +605,12 @@ WRITE8_MEMBER(mpu4_state::pia_ic3_portb_w)
 
 			for (i = 0; i < 8; i++)
 			{
-				if (machine().output().get_lamp_value(lamps1[i])) pled_segs[0] |= (1 << i);
-				if (machine().output().get_lamp_value(lamps2[i])) pled_segs[1] |= (1 << i);
+				if (output().get_lamp_value(lamps1[i])) pled_segs[0] |= (1 << i);
+				if (output().get_lamp_value(lamps2[i])) pled_segs[1] |= (1 << i);
 			}
 
-			machine().output().set_digit_value(8,pled_segs[0]);
-			machine().output().set_digit_value(9,pled_segs[1]);
+			output().set_digit_value(8,pled_segs[0]);
+			output().set_digit_value(9,pled_segs[1]);
 		}
 	}
 }
@@ -717,9 +717,9 @@ WRITE8_MEMBER(mpu4_state::pia_ic4_porta_w)
 			{
 				for(i=0; i<8; i++)
 				{
-					machine().output().set_indexed_value("mpu4led",((7 - m_input_strobe) * 8) +i,(data & (1 << i)) !=0);
+					output().set_indexed_value("mpu4led",((7 - m_input_strobe) * 8) +i,(data & (1 << i)) !=0);
 				}
-				machine().output().set_digit_value(7 - m_input_strobe,data);
+				output().set_digit_value(7 - m_input_strobe,data);
 			}
 			m_led_strobe = m_input_strobe;
 		}
@@ -865,9 +865,9 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
 		{
 			for(i=0; i<8; i++)
 			{
-				machine().output().set_indexed_value("mpu4led",((m_input_strobe + 8) * 8) +i,(data & (1 << i)) !=0);
+				output().set_indexed_value("mpu4led",((m_input_strobe + 8) * 8) +i,(data & (1 << i)) !=0);
 			}
-			machine().output().set_digit_value((m_input_strobe+8),data);
+			output().set_digit_value((m_input_strobe+8),data);
 		}
 		break;
 
@@ -888,9 +888,9 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
 		{
 			for(i=0; i<8; i++)
 			{
-				machine().output().set_indexed_value("mpu4led",(((8*(m_last_b7 >>7))+ m_input_strobe) * 8) +i,(~data & (1 << i)) !=0);
+				output().set_indexed_value("mpu4led",(((8*(m_last_b7 >>7))+ m_input_strobe) * 8) +i,(~data & (1 << i)) !=0);
 			}
-			machine().output().set_digit_value(((8*(m_last_b7 >>7))+m_input_strobe),~data);
+			output().set_digit_value(((8*(m_last_b7 >>7))+m_input_strobe),~data);
 		}
 		break;
 
@@ -1280,7 +1280,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic8_portb_w)
 	LOG_IC8(("%s: IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", machine().describe_context(),data));
 	for (i = 0; i < 8; i++)
 	{
-		machine().output().set_indexed_value("triac", i, data & (1 << i));
+		output().set_indexed_value("triac", i, data & (1 << i));
 	}
 }
 

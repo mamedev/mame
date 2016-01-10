@@ -174,7 +174,7 @@ public:
 			{
 				int data = ((m_lamps[i] << bit)&0x8000)>>15;
 
-				machine().output().set_indexed_value("lamp", (i*16)+bit, data );
+				output().set_indexed_value("lamp", (i*16)+bit, data );
 			}
 		}
 
@@ -354,7 +354,7 @@ void ecoinf3_state::update_display()
 {
 	for (int i =0; i<14; i++)
 	{
-		machine().output().set_indexed_value("vfd", i, set_display(m_chars[i]) );
+		output().set_indexed_value("vfd", i, set_display(m_chars[i]) );
 	}
 }
 

@@ -137,6 +137,9 @@ public:
 	// memory helpers
 	address_space &generic_space() const { return space(AS_PROGRAM); }
 
+	// output heler
+	output_manager &output() const { return machine().output(); }
+
 	// generic interrupt generators
 	void generic_pulse_irq_line(device_execute_interface &exec, int irqline, int cycles);
 	void generic_pulse_irq_line_and_vector(device_execute_interface &exec, int irqline, int vector, int cycles);

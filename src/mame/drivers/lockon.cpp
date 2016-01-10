@@ -428,7 +428,7 @@ WRITE8_MEMBER(lockon_state::ym2203_out_b)
 	machine().bookkeeping().coin_counter_w(2, data & 0x20);
 
 	/* 'Lock-On' lamp */
-	machine().output().set_led_value(1, !(data & 0x10));
+	output().set_led_value(1, !(data & 0x10));
 }
 
 /*************************************

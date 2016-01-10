@@ -186,7 +186,7 @@ WRITE8_MEMBER(sprint4_state::sprint4_da_latch_w)
 
 WRITE8_MEMBER(sprint4_state::sprint4_lamp_w)
 {
-	machine().output().set_led_value((offset >> 1) & 3, offset & 1);
+	output().set_led_value((offset >> 1) & 3, offset & 1);
 }
 
 

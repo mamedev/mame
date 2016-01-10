@@ -112,10 +112,10 @@
 
 WRITE8_MEMBER(victory_state::lamp_control_w)
 {
-	machine().output().set_led_value(0, data & 0x80);
-	machine().output().set_led_value(1, data & 0x40);
-	machine().output().set_led_value(2, data & 0x20);
-	machine().output().set_led_value(3, data & 0x10);
+	output().set_led_value(0, data & 0x80);
+	output().set_led_value(1, data & 0x40);
+	output().set_led_value(2, data & 0x20);
+	output().set_led_value(3, data & 0x10);
 }
 
 

@@ -323,7 +323,7 @@ WRITE8_MEMBER(jackie_state::nmi_and_coins_w)
 	machine().bookkeeping().coin_counter_w(2,        data & 0x08);   // key in
 	machine().bookkeeping().coin_counter_w(3,        data & 0x10);   // coin m_out mech
 
-	machine().output().set_led_value(6,        data & 0x20);   // led for coin m_out / m_hopper active
+	output().set_led_value(6,        data & 0x20);   // led for coin m_out / m_hopper active
 
 	m_exp_bank   = (data & 0x02) ? 1 : 0;       // expram bank number
 	m_nmi_enable = data & 0x80;     // nmi enable?
@@ -345,12 +345,12 @@ WRITE8_MEMBER(jackie_state::lamps_w)
     ---- -x--  Hold5 lamp.
     ---- ---x  Start lamp.
 */
-	machine().output().set_lamp_value(1, (data >> 1) & 1);      /* Lamp 1 - HOLD 1 */
-	machine().output().set_lamp_value(2, (data >> 5) & 1);      /* Lamp 2 - HOLD 2  */
-	machine().output().set_lamp_value(3, (data >> 4) & 1);      /* Lamp 3 - HOLD 3 */
-	machine().output().set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
-	machine().output().set_lamp_value(5, (data >> 2) & 1);      /* Lamp 5 - HOLD 5 */
-	machine().output().set_lamp_value(6, (data & 1));           /* Lamp 6 - START */
+	output().set_lamp_value(1, (data >> 1) & 1);      /* Lamp 1 - HOLD 1 */
+	output().set_lamp_value(2, (data >> 5) & 1);      /* Lamp 2 - HOLD 2  */
+	output().set_lamp_value(3, (data >> 4) & 1);      /* Lamp 3 - HOLD 3 */
+	output().set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
+	output().set_lamp_value(5, (data >> 2) & 1);      /* Lamp 5 - HOLD 5 */
+	output().set_lamp_value(6, (data & 1));           /* Lamp 6 - START */
 
 	m_hopper            =   (~data)& 0x80;
 

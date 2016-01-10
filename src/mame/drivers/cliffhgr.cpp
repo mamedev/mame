@@ -128,7 +128,7 @@ public:
 
 WRITE8_MEMBER(cliffhgr_state::cliff_test_led_w)
 {
-	machine().output().set_led_value(0, offset ^ 1);
+	output().set_led_value(0, offset ^ 1);
 }
 
 WRITE8_MEMBER(cliffhgr_state::cliff_port_bank_w)

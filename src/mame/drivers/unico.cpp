@@ -92,8 +92,8 @@ WRITE16_MEMBER(unico_state::zeropnt_sound_bank_w)
 		memcpy(dst + 0x20000, src, 0x20000);
 
 		machine().bookkeeping().coin_counter_w(0,data & 0x1000);
-		machine().output().set_led_value(0,data & 0x0800); // Start 1
-		machine().output().set_led_value(1,data & 0x0400); // Start 2
+		output().set_led_value(0,data & 0x0800); // Start 1
+		output().set_led_value(1,data & 0x0400); // Start 2
 	}
 }
 
@@ -187,8 +187,8 @@ WRITE32_MEMBER(unico_state::zeropnt2_leds_w)
 	if (ACCESSING_BITS_16_23)
 	{
 		machine().bookkeeping().coin_counter_w(0,data & 0x00010000);
-		machine().output().set_led_value(0,data & 0x00800000); // Start 1
-		machine().output().set_led_value(1,data & 0x00400000); // Start 2
+		output().set_led_value(0,data & 0x00800000); // Start 1
+		output().set_led_value(1,data & 0x00400000); // Start 2
 	}
 }
 

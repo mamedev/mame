@@ -2430,7 +2430,7 @@ WRITE8_MEMBER(ddenlovr_state::mmpanic_blitter2_w)
 
 void ddenlovr_state::mmpanic_update_leds()
 {
-	machine().output().set_led_value(0, m_mmpanic_leds);
+	output().set_led_value(0, m_mmpanic_leds);
 }
 
 /* leds 1-8 */
@@ -2453,7 +2453,7 @@ WRITE8_MEMBER(ddenlovr_state::mmpanic_lockout_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, (~data) & 0x01);
 		machine().bookkeeping().coin_lockout_w(0, (~data) & 0x02);
-		machine().output().set_led_value(1, (~data) & 0x04);
+		output().set_led_value(1, (~data) & 0x04);
 	}
 }
 
@@ -3923,7 +3923,7 @@ WRITE8_MEMBER(ddenlovr_state::mjgnight_coincounter_w)
 {
 	m_prot_val = data;
 
-	machine().output().set_led_value(0, data & 0x01);  // led? 1 in-game, 0 in service mode / while booting
+	output().set_led_value(0, data & 0x01);  // led? 1 in-game, 0 in service mode / while booting
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);  // coin-out
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);  // coin-in

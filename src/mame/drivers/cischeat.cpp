@@ -384,15 +384,15 @@ WRITE16_MEMBER(cischeat_state::scudhamm_leds_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		machine().output().set_led_value(0, data & 0x0100);    // 3 buttons
-		machine().output().set_led_value(1, data & 0x0200);
-		machine().output().set_led_value(2, data & 0x0400);
+		output().set_led_value(0, data & 0x0100);    // 3 buttons
+		output().set_led_value(1, data & 0x0200);
+		output().set_led_value(2, data & 0x0400);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-//      machine().output().set_led_value(3, data & 0x0010);   // if we had more leds..
-//      machine().output().set_led_value(4, data & 0x0020);
+//      output().set_led_value(3, data & 0x0010);   // if we had more leds..
+//      output().set_led_value(4, data & 0x0020);
 	}
 }
 
@@ -483,10 +483,10 @@ WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		machine().output().set_led_value(0, data & 0x0100);
-		machine().output().set_led_value(1, data & 0x1000);
-		machine().output().set_led_value(2, data & 0x2000);
-		machine().output().set_led_value(3, data & 0x4000);
+		output().set_led_value(0, data & 0x0100);
+		output().set_led_value(1, data & 0x1000);
+		output().set_led_value(2, data & 0x2000);
+		output().set_led_value(3, data & 0x4000);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -526,9 +526,9 @@ WRITE16_MEMBER(cischeat_state::captflag_leds_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		machine().bookkeeping().coin_counter_w(1, data & 0x0100);    // coin 2
-		machine().output().set_led_value(0, data & 0x0200);    // decide
+		output().set_led_value(0, data & 0x0200);    // decide
 		machine().bookkeeping().coin_counter_w(0, data & 0x0400);    // coin 1
-		machine().output().set_led_value(1, data & 0x2000);    // select
+		output().set_led_value(1, data & 0x2000);    // select
 
 		int power = (data & 0x1000);
 		m_captflag_hopper->write(space, 0, power ? 0x80 : 0x00);    // prize motor
@@ -621,7 +621,7 @@ void cischeat_state::captflag_motor_move(int side, UINT16 data)
 		dev.reset();
 	}
 
-	machine().output().set_value((side == RIGHT) ? "right" : "left", pos);
+	output().set_value((side == RIGHT) ? "right" : "left", pos);
 }
 
 CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_pos_r)

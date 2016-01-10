@@ -59,8 +59,8 @@ READ8_MEMBER(skykid_state::inputport_r)
 
 WRITE8_MEMBER(skykid_state::skykid_led_w)
 {
-	machine().output().set_led_value(0,data & 0x08);
-	machine().output().set_led_value(1,data & 0x10);
+	output().set_led_value(0,data & 0x08);
+	output().set_led_value(1,data & 0x10);
 }
 
 WRITE8_MEMBER(skykid_state::skykid_subreset_w)

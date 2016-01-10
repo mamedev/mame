@@ -459,8 +459,8 @@ WRITE8_MEMBER(bfm_sc1_state::mux1latch_w)
 
 			for ( i = 0; i < 8; i++ )
 			{
-				machine().output().set_lamp_value(BFM_strcnv[offset  ], (m_mux1_datalo & pattern?1:0) );
-				machine().output().set_lamp_value(BFM_strcnv[offset+8], (m_mux1_datahi & pattern?1:0) );
+				output().set_lamp_value(BFM_strcnv[offset  ], (m_mux1_datalo & pattern?1:0) );
+				output().set_lamp_value(BFM_strcnv[offset+8], (m_mux1_datahi & pattern?1:0) );
 				pattern<<=1;
 				offset++;
 			}
@@ -532,8 +532,8 @@ WRITE8_MEMBER(bfm_sc1_state::mux2latch_w)
 
 			for ( i = 0; i < 8; i++ )
 			{
-				machine().output().set_lamp_value(BFM_strcnv[offset  ], (m_mux2_datalo & pattern?1:0) );
-				machine().output().set_lamp_value(BFM_strcnv[offset+8], (m_mux2_datahi & pattern?1:0) );
+				output().set_lamp_value(BFM_strcnv[offset  ], (m_mux2_datalo & pattern?1:0) );
+				output().set_lamp_value(BFM_strcnv[offset+8], (m_mux2_datahi & pattern?1:0) );
 				pattern<<=1;
 				offset++;
 			}

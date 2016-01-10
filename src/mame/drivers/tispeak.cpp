@@ -621,12 +621,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 
 	// try to get overlay code from artwork file(in decimal), otherwise pick the
 	// one that was selected in machine configuration
-	m_overlay = machine().output().get_value("overlay_code") & 0x1f;
+	m_overlay = output().get_value("overlay_code") & 0x1f;
 	if (m_overlay == 0)
 		m_overlay = m_inp_matrix[10]->read();
 
 	for (int i = 0; i < 5; i++)
-		machine().output().set_indexed_value("ol", i+1, m_overlay >> i & 1);
+		output().set_indexed_value("ol", i+1, m_overlay >> i & 1);
 }
 
 

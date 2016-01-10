@@ -113,7 +113,7 @@ READ8_MEMBER(kopunch_state::sensors2_r)
 
 WRITE8_MEMBER(kopunch_state::lamp_w)
 {
-	machine().output().set_led_value(0, ~data & 0x80);
+	output().set_led_value(0, ~data & 0x80);
 }
 
 WRITE8_MEMBER(kopunch_state::coin_w)

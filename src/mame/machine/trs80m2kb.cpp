@@ -362,8 +362,8 @@ WRITE8_MEMBER( trs80m2_keyboard_device::kb_p1_w )
 		m_clk = clk;
 	}
 
-	machine().output().set_led_value(LED_0, BIT(data, 2));
-	machine().output().set_led_value(LED_1, BIT(data, 4));
+	output().set_led_value(LED_0, BIT(data, 2));
+	output().set_led_value(LED_1, BIT(data, 4));
 }
 
 

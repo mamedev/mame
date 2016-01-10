@@ -988,21 +988,21 @@ WRITE8_MEMBER(subsino2_state::expcard_outputs_w)
 			break;
 
 		case 1: // C
-			machine().output().set_led_value(0,    data & 0x02);   // raise
+			output().set_led_value(0,    data & 0x02);   // raise
 			break;
 
 		case 2: // B
-			machine().output().set_led_value(1,    data & 0x04);   // hold 4 / small & hold 5 / big ?
-			machine().output().set_led_value(2,    data & 0x08);   // hold 1 / bet
-			machine().output().set_led_value(3,    data & 0x10);   // hold 2 / take ?
-			machine().output().set_led_value(4,    data & 0x20);   // hold 3 / double up ?
+			output().set_led_value(1,    data & 0x04);   // hold 4 / small & hold 5 / big ?
+			output().set_led_value(2,    data & 0x08);   // hold 1 / bet
+			output().set_led_value(3,    data & 0x10);   // hold 2 / take ?
+			output().set_led_value(4,    data & 0x20);   // hold 3 / double up ?
 			break;
 
 		case 3: // A
 			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
 			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
 
-			machine().output().set_led_value(5,    data & 0x10);   // start
+			output().set_led_value(5,    data & 0x10);   // start
 			break;
 	}
 
@@ -1027,11 +1027,11 @@ WRITE8_MEMBER(subsino2_state::mtrain_outputs_w)
 			break;
 
 		case 1:
-			machine().output().set_led_value(0,    data & 0x01);   // stop reel?
-			machine().output().set_led_value(1,    data & 0x02);   // stop reel? (double or take)
-			machine().output().set_led_value(2,    data & 0x04);   // start all
-			machine().output().set_led_value(3,    data & 0x08);   // bet / stop all
-			machine().output().set_led_value(4,    data & 0x20);   // stop reel? (double or take)
+			output().set_led_value(0,    data & 0x01);   // stop reel?
+			output().set_led_value(1,    data & 0x02);   // stop reel? (double or take)
+			output().set_led_value(2,    data & 0x04);   // start all
+			output().set_led_value(3,    data & 0x08);   // bet / stop all
+			output().set_led_value(4,    data & 0x20);   // stop reel? (double or take)
 			break;
 
 		case 2:
@@ -1234,22 +1234,22 @@ WRITE8_MEMBER(subsino2_state::xplan_outputs_w)
 			break;
 
 		case 1:
-			machine().output().set_led_value(0,    data & 0x02);   // raise
+			output().set_led_value(0,    data & 0x02);   // raise
 			break;
 
 		case 2: // B
-			machine().output().set_led_value(1,    data & 0x04);   // hold 1 / big ?
-			machine().output().set_led_value(2,    data & 0x08);   // hold 5 / bet
-			machine().output().set_led_value(3,    data & 0x10);   // hold 4 ?
-			machine().output().set_led_value(4,    data & 0x20);   // hold 2 / double up
-			machine().output().set_led_value(5,    data & 0x40);   // hold 3 / small ?
+			output().set_led_value(1,    data & 0x04);   // hold 1 / big ?
+			output().set_led_value(2,    data & 0x08);   // hold 5 / bet
+			output().set_led_value(3,    data & 0x10);   // hold 4 ?
+			output().set_led_value(4,    data & 0x20);   // hold 2 / double up
+			output().set_led_value(5,    data & 0x40);   // hold 3 / small ?
 			break;
 
 		case 3: // A
 			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );
 			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );
 
-			machine().output().set_led_value(6,    data & 0x10);   // start / take
+			output().set_led_value(6,    data & 0x10);   // start / take
 			break;
 	}
 
@@ -1333,23 +1333,23 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 			break;
 
 		case 1: // C
-			machine().output().set_led_value(0,    data & 0x02);   // re-double
-			machine().output().set_led_value(1,    data & 0x04);   // half double
+			output().set_led_value(0,    data & 0x02);   // re-double
+			output().set_led_value(1,    data & 0x04);   // half double
 			break;
 
 		case 2: // B
-			machine().output().set_led_value(2,    data & 0x02);   // hold 3 / small
-			machine().output().set_led_value(3,    data & 0x04);   // hold 2 / big
-			machine().output().set_led_value(4,    data & 0x08);   // bet
-			machine().output().set_led_value(5,    data & 0x10);   // hold1 / take
-			machine().output().set_led_value(6,    data & 0x20);   // double up
+			output().set_led_value(2,    data & 0x02);   // hold 3 / small
+			output().set_led_value(3,    data & 0x04);   // hold 2 / big
+			output().set_led_value(4,    data & 0x08);   // bet
+			output().set_led_value(5,    data & 0x10);   // hold1 / take
+			output().set_led_value(6,    data & 0x20);   // double up
 			break;
 
 		case 3: // A
 			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
 			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
 
-			machine().output().set_led_value(7,    data & 0x10);   // start
+			output().set_led_value(7,    data & 0x10);   // start
 			break;
 	}
 

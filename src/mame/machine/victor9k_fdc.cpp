@@ -867,10 +867,10 @@ WRITE8_MEMBER( victor_9000_fdc_t::via6_pa_w )
 	*/
 
 	// LED, drive A
-	machine().output().set_led_value(LED_A, BIT(data, 0));
+	output().set_led_value(LED_A, BIT(data, 0));
 
 	// LED, drive B
-	machine().output().set_led_value(LED_B, BIT(data, 2));
+	output().set_led_value(LED_B, BIT(data, 2));
 
 	bool sync = false;
 

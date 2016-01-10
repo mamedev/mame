@@ -390,7 +390,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_nwr_w )
 	{
 		case 0: /* CR2 */
 		case 1: /* CR1 */
-			space.machine().output().set_led_value(offset, data);
+			space.output().set_led_value(offset, data);
 			break;
 		case 2: /* LC1 */
 			break;

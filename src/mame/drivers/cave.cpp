@@ -640,10 +640,10 @@ WRITE16_MEMBER(cave_state::korokoro_leds_w)
 {
 	COMBINE_DATA(&m_leds[0]);
 
-	machine().output().set_led_value(0, data & 0x8000);
-	machine().output().set_led_value(1, data & 0x4000);
-	machine().output().set_led_value(2, data & 0x1000);    // square button
-	machine().output().set_led_value(3, data & 0x0800);    // round  button
+	output().set_led_value(0, data & 0x8000);
+	output().set_led_value(1, data & 0x4000);
+	output().set_led_value(2, data & 0x1000);    // square button
+	output().set_led_value(3, data & 0x0800);    // round  button
 //  machine().bookkeeping().coin_lockout_w(1, ~data & 0x0200);   // coin lockouts?
 //  machine().bookkeeping().coin_lockout_w(0, ~data & 0x0100);
 
@@ -651,10 +651,10 @@ WRITE16_MEMBER(cave_state::korokoro_leds_w)
 //  machine().bookkeeping().coin_counter_w(1, data & 0x0020);
 	machine().bookkeeping().coin_counter_w(0, data & 0x0010);
 
-	machine().output().set_led_value(5, data & 0x0008);
-	machine().output().set_led_value(6, data & 0x0004);
-	machine().output().set_led_value(7, data & 0x0002);
-	machine().output().set_led_value(8, data & 0x0001);
+	output().set_led_value(5, data & 0x0008);
+	output().set_led_value(6, data & 0x0004);
+	output().set_led_value(7, data & 0x0002);
+	output().set_led_value(8, data & 0x0001);
 
 	show_leds();
 }
@@ -845,17 +845,17 @@ WRITE16_MEMBER(cave_state::ppsatan_out_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
 
-		machine().output().set_led_value(0, data & 0x0010);
-		machine().output().set_led_value(1, data & 0x0020);
-		machine().output().set_led_value(2, data & 0x0040);
-		machine().output().set_led_value(3, data & 0x0080);
+		output().set_led_value(0, data & 0x0010);
+		output().set_led_value(1, data & 0x0020);
+		output().set_led_value(2, data & 0x0040);
+		output().set_led_value(3, data & 0x0080);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		machine().output().set_led_value(4, data & 0x0100);
-		machine().output().set_led_value(5, data & 0x0200);
-		machine().output().set_led_value(6, data & 0x0400);    // not tested in service mode
-		machine().output().set_led_value(7, data & 0x0800);    // not tested in service mode
+		output().set_led_value(4, data & 0x0100);
+		output().set_led_value(5, data & 0x0200);
+		output().set_led_value(6, data & 0x0400);    // not tested in service mode
+		output().set_led_value(7, data & 0x0800);    // not tested in service mode
 
 		m_oki->set_bank_base((data & 0x8000) ? 0x40000 : 0);
 	}
@@ -1027,14 +1027,14 @@ WRITE16_MEMBER(cave_state::tjumpman_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().output().set_led_value(0,    data & 0x0001); // suru
-		machine().output().set_led_value(1,    data & 0x0002); // shinai
-		machine().output().set_led_value(2,    data & 0x0004); // payout
-		machine().output().set_led_value(3,    data & 0x0008); // go
-		machine().output().set_led_value(4,    data & 0x0010); // 1 bet
-		machine().output().set_led_value(5,    data & 0x0020); // medal
+		output().set_led_value(0,    data & 0x0001); // suru
+		output().set_led_value(1,    data & 0x0002); // shinai
+		output().set_led_value(2,    data & 0x0004); // payout
+		output().set_led_value(3,    data & 0x0008); // go
+		output().set_led_value(4,    data & 0x0010); // 1 bet
+		output().set_led_value(5,    data & 0x0020); // medal
 		m_hopper    =                   data & 0x0040;  // hopper
-		machine().output().set_led_value(6,    data & 0x0080); // 3 bet
+		output().set_led_value(6,    data & 0x0080); // 3 bet
 	}
 
 //  popmessage("led %04X", data);
@@ -1073,12 +1073,12 @@ WRITE16_MEMBER(cave_state::pacslot_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().output().set_led_value(0,    data & 0x0001); // pac-man
-		machine().output().set_led_value(1,    data & 0x0002); // ms. pac-man
-		machine().output().set_led_value(2,    data & 0x0004); // payout
-		machine().output().set_led_value(3,    data & 0x0008); // start
-		machine().output().set_led_value(4,    data & 0x0010); // bet
-		machine().output().set_led_value(5,    data & 0x0020); // medal
+		output().set_led_value(0,    data & 0x0001); // pac-man
+		output().set_led_value(1,    data & 0x0002); // ms. pac-man
+		output().set_led_value(2,    data & 0x0004); // payout
+		output().set_led_value(3,    data & 0x0008); // start
+		output().set_led_value(4,    data & 0x0010); // bet
+		output().set_led_value(5,    data & 0x0020); // medal
 		m_hopper    =                   data & 0x0040;  // hopper
 	}
 

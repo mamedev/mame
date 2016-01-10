@@ -152,14 +152,14 @@ WRITE8_MEMBER(thedealr_state::iox_w)
 		{
 			case 0x20:  // leds
 				m_iox_leds = data;
-				machine().output().set_led_value(0, data & 0x01);  // bet
-				machine().output().set_led_value(1, data & 0x02);  // deal
-				machine().output().set_led_value(2, data & 0x04);
-				machine().output().set_led_value(3, data & 0x08);
-				machine().output().set_led_value(4, data & 0x10);  // hold 1-5?
-				machine().output().set_led_value(5, data & 0x20);
-				machine().output().set_led_value(6, data & 0x40);
-				machine().output().set_led_value(7, data & 0x80);
+				output().set_led_value(0, data & 0x01);  // bet
+				output().set_led_value(1, data & 0x02);  // deal
+				output().set_led_value(2, data & 0x04);
+				output().set_led_value(3, data & 0x08);
+				output().set_led_value(4, data & 0x10);  // hold 1-5?
+				output().set_led_value(5, data & 0x20);
+				output().set_led_value(6, data & 0x40);
+				output().set_led_value(7, data & 0x80);
 				break;
 
 			case 0x40:  // coin counters

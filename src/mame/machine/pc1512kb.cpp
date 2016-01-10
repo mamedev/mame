@@ -473,10 +473,10 @@ WRITE8_MEMBER( pc1512_keyboard_device::kb_p2_w )
 	m_write_clock(BIT(data, 1));
 
 	// CAPS LOCK
-	machine().output().set_led_value(LED_CAPS, BIT(data, 2));
+	output().set_led_value(LED_CAPS, BIT(data, 2));
 
 	// NUM LOCK
-	machine().output().set_led_value(LED_NUM, BIT(data, 3));
+	output().set_led_value(LED_NUM, BIT(data, 3));
 
 	// keyboard row
 	m_kb_y = (((data >> 4) & 0x07) << 8) | (m_kb_y & 0xff);

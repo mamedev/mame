@@ -45,11 +45,11 @@ WRITE8_MEMBER(usgames_state::rombank_w)
 WRITE8_MEMBER(usgames_state::lamps1_w)
 {
 	/* button lamps */
-	machine().output().set_led_value(0,data & 0x01);
-	machine().output().set_led_value(1,data & 0x02);
-	machine().output().set_led_value(2,data & 0x04);
-	machine().output().set_led_value(3,data & 0x08);
-	machine().output().set_led_value(4,data & 0x10);
+	output().set_led_value(0,data & 0x01);
+	output().set_led_value(1,data & 0x02);
+	output().set_led_value(2,data & 0x04);
+	output().set_led_value(3,data & 0x08);
+	output().set_led_value(4,data & 0x10);
 
 	/* bit 5 toggles all the time - extra lamp? */
 }

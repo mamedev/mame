@@ -255,10 +255,10 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output_w)
 	int off = offset<<3;
 
 	for (i=0; i<8; i++)
-		machine().output().set_lamp_value(off+i, ((data & (1 << i)) != 0));
+		output().set_lamp_value(off+i, ((data & (1 << i)) != 0));
 
 
-	machine().output().set_indexed_value("matrix", off+i, ((data & (1 << i)) != 0));
+	output().set_indexed_value("matrix", off+i, ((data & (1 << i)) != 0));
 }
 
 WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
@@ -269,14 +269,14 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
 	// some games use this as a matrix port (luckb etc.)
 	for (i=0; i<8; i++)
 	{
-		machine().output().set_indexed_value("matrix", off+i, ((data & (1 << i)) != 0));
+		output().set_indexed_value("matrix", off+i, ((data & (1 << i)) != 0));
 	}
 
 	// others drive 7-segs with it..  so rendering it there as well in our debug layouts
 
 	// todo: reorder properly!
 	UINT8 bf7segdata = BITSWAP8(data,7,6,5,4,3,2,1,0);
-	machine().output().set_digit_value(offset, bf7segdata);
+	output().set_digit_value(offset, bf7segdata);
 }
 
 WRITE16_MEMBER(sc4_state::sc4_mem_w)

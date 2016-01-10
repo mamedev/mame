@@ -170,13 +170,13 @@ WRITE8_MEMBER(astrocde_state::seawolf2_lamps_w)
 	/* ------x- torpedo 3 available */
 	/* -------x torpedo 4 available */
 
-	machine().output().set_lamp_value((offset ^ 1) * 7 + 0, ( data >> 5) & 1);  /* 0/7  = hit lamp */
-	machine().output().set_lamp_value((offset ^ 1) * 7 + 1, (~data >> 4) & 1);  /* 1/8  = reload lamp */
-	machine().output().set_lamp_value((offset ^ 1) * 7 + 2, ( data >> 4) & 1);  /* 2/9  = ready lamp */
-	machine().output().set_lamp_value((offset ^ 1) * 7 + 3, ( data >> 3) & 1);  /* 3/10 = torpedo 1 lamp */
-	machine().output().set_lamp_value((offset ^ 1) * 7 + 4, ( data >> 2) & 1);  /* 4/11 = torpedo 2 lamp */
-	machine().output().set_lamp_value((offset ^ 1) * 7 + 5, ( data >> 1) & 1);  /* 5/12 = torpedo 3 lamp */
-	machine().output().set_lamp_value((offset ^ 1) * 7 + 6, ( data >> 0) & 1);  /* 6/13 = torpedo 4 lamp */
+	output().set_lamp_value((offset ^ 1) * 7 + 0, ( data >> 5) & 1);  /* 0/7  = hit lamp */
+	output().set_lamp_value((offset ^ 1) * 7 + 1, (~data >> 4) & 1);  /* 1/8  = reload lamp */
+	output().set_lamp_value((offset ^ 1) * 7 + 2, ( data >> 4) & 1);  /* 2/9  = ready lamp */
+	output().set_lamp_value((offset ^ 1) * 7 + 3, ( data >> 3) & 1);  /* 3/10 = torpedo 1 lamp */
+	output().set_lamp_value((offset ^ 1) * 7 + 4, ( data >> 2) & 1);  /* 4/11 = torpedo 2 lamp */
+	output().set_lamp_value((offset ^ 1) * 7 + 5, ( data >> 1) & 1);  /* 5/12 = torpedo 3 lamp */
+	output().set_lamp_value((offset ^ 1) * 7 + 6, ( data >> 0) & 1);  /* 6/13 = torpedo 4 lamp */
 }
 
 
@@ -330,12 +330,12 @@ READ8_MEMBER(astrocde_state::gorf_io_2_r)
 
 	switch ((offset >> 9) & 7)
 	{
-		case 0: machine().output().set_lamp_value(0, data); break;
-		case 1: machine().output().set_lamp_value(1, data); break;
-		case 2: machine().output().set_lamp_value(2, data); break;
-		case 3: machine().output().set_lamp_value(3, data); break;
-		case 4: machine().output().set_lamp_value(4, data); break;
-		case 5: machine().output().set_lamp_value(5, data); break;
+		case 0: output().set_lamp_value(0, data); break;
+		case 1: output().set_lamp_value(1, data); break;
+		case 2: output().set_lamp_value(2, data); break;
+		case 3: output().set_lamp_value(3, data); break;
+		case 4: output().set_lamp_value(4, data); break;
+		case 5: output().set_lamp_value(5, data); break;
 		case 6: /* n/c */                       break;
 		case 7: osd_printf_debug("io_2:%d\n", data); break;
 	}
@@ -359,8 +359,8 @@ READ8_MEMBER(astrocde_state::robby_io_r)
 		case 0: machine().bookkeeping().coin_counter_w(0, data); break;
 		case 1: machine().bookkeeping().coin_counter_w(1, data); break;
 		case 2: machine().bookkeeping().coin_counter_w(2, data); break;
-		case 6: machine().output().set_led_value(0, data); break;
-		case 7: machine().output().set_led_value(1, data); break;
+		case 6: output().set_led_value(0, data); break;
+		case 7: output().set_led_value(1, data); break;
 	}
 	return 0xff;
 }
@@ -377,20 +377,20 @@ READ8_MEMBER(astrocde_state::profpac_io_1_r)
 {
 	machine().bookkeeping().coin_counter_w(0, (offset >> 8) & 1);
 	machine().bookkeeping().coin_counter_w(1, (offset >> 9) & 1);
-	machine().output().set_led_value(0, (offset >> 10) & 1);
-	machine().output().set_led_value(1, (offset >> 11) & 1);
+	output().set_led_value(0, (offset >> 10) & 1);
+	output().set_led_value(1, (offset >> 11) & 1);
 	return 0xff;
 }
 
 
 READ8_MEMBER(astrocde_state::profpac_io_2_r)
 {
-	machine().output().set_lamp_value(0, (offset >> 8) & 1);    /* left lamp A */
-	machine().output().set_lamp_value(1, (offset >> 9) & 1);    /* left lamp B */
-	machine().output().set_lamp_value(2, (offset >> 10) & 1);   /* left lamp C */
-	machine().output().set_lamp_value(3, (offset >> 12) & 1);   /* right lamp A */
-	machine().output().set_lamp_value(4, (offset >> 13) & 1);   /* right lamp B */
-	machine().output().set_lamp_value(5, (offset >> 14) & 1);   /* right lamp C */
+	output().set_lamp_value(0, (offset >> 8) & 1);    /* left lamp A */
+	output().set_lamp_value(1, (offset >> 9) & 1);    /* left lamp B */
+	output().set_lamp_value(2, (offset >> 10) & 1);   /* left lamp C */
+	output().set_lamp_value(3, (offset >> 12) & 1);   /* right lamp A */
+	output().set_lamp_value(4, (offset >> 13) & 1);   /* right lamp B */
+	output().set_lamp_value(5, (offset >> 14) & 1);   /* right lamp C */
 	return 0xff;
 }
 
@@ -431,8 +431,8 @@ READ8_MEMBER(astrocde_state::demndrgn_io_r)
 {
 	machine().bookkeeping().coin_counter_w(0, (offset >> 8) & 1);
 	machine().bookkeeping().coin_counter_w(1, (offset >> 9) & 1);
-	machine().output().set_led_value(0, (offset >> 10) & 1);
-	machine().output().set_led_value(1, (offset >> 11) & 1);
+	output().set_led_value(0, (offset >> 10) & 1);
+	output().set_led_value(1, (offset >> 11) & 1);
 	m_input_select = (offset >> 12) & 1;
 	return 0xff;
 }
@@ -472,19 +472,19 @@ WRITE8_MEMBER(astrocde_state::tenpindx_lamp_w)
 	/* lamps */
 	if (offset == 0)
 	{
-		machine().output().set_lamp_value(0, (data >> 2) & 1);
-		machine().output().set_lamp_value(1, (data >> 3) & 1);
-		machine().output().set_lamp_value(2, (data >> 4) & 1);
-		machine().output().set_lamp_value(3, (data >> 5) & 1);
-		machine().output().set_lamp_value(4, (data >> 6) & 1);
-		machine().output().set_lamp_value(5, (data >> 7) & 1);
+		output().set_lamp_value(0, (data >> 2) & 1);
+		output().set_lamp_value(1, (data >> 3) & 1);
+		output().set_lamp_value(2, (data >> 4) & 1);
+		output().set_lamp_value(3, (data >> 5) & 1);
+		output().set_lamp_value(4, (data >> 6) & 1);
+		output().set_lamp_value(5, (data >> 7) & 1);
 	}
 	else
 	{
-		machine().output().set_lamp_value(6, (data >> 0) & 1);
-		machine().output().set_lamp_value(7, (data >> 1) & 1);
-		machine().output().set_lamp_value(8, (data >> 2) & 1);
-		machine().output().set_lamp_value(9, (data >> 3) & 1);
+		output().set_lamp_value(6, (data >> 0) & 1);
+		output().set_lamp_value(7, (data >> 1) & 1);
+		output().set_lamp_value(8, (data >> 2) & 1);
+		output().set_lamp_value(9, (data >> 3) & 1);
 	}
 }
 
@@ -501,15 +501,15 @@ WRITE8_MEMBER(astrocde_state::tenpindx_lights_w)
 	/* "flashlights" */
 	int which = data >> 4;
 
-	machine().output().set_lamp_value(10, (which == 1));
-	machine().output().set_lamp_value(11, (which == 2));
-	machine().output().set_lamp_value(12, (which == 3));
-	machine().output().set_lamp_value(13, (which == 4));
-	machine().output().set_lamp_value(14, (which == 5));
-	machine().output().set_lamp_value(15, (which == 6));
-	machine().output().set_lamp_value(16, (which == 7));
-	machine().output().set_lamp_value(17, (which == 8));
-	machine().output().set_lamp_value(18, (which == 9));
+	output().set_lamp_value(10, (which == 1));
+	output().set_lamp_value(11, (which == 2));
+	output().set_lamp_value(12, (which == 3));
+	output().set_lamp_value(13, (which == 4));
+	output().set_lamp_value(14, (which == 5));
+	output().set_lamp_value(15, (which == 6));
+	output().set_lamp_value(16, (which == 7));
+	output().set_lamp_value(17, (which == 8));
+	output().set_lamp_value(18, (which == 9));
 }
 
 

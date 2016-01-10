@@ -224,17 +224,17 @@ WRITE16_MEMBER(astrocorp_state::showhand_outputs_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().bookkeeping().coin_counter_w(0,    (data & 0x0004));   // coin counter
-		machine().output().set_led_value(0,    (data & 0x0008));   // you win
+		output().set_led_value(0,    (data & 0x0008));   // you win
 		if ((data & 0x0010)) machine().bookkeeping().increment_dispensed_tickets(1); // coin out
-		machine().output().set_led_value(1,    (data & 0x0020));   // coin/hopper jam
+		output().set_led_value(1,    (data & 0x0020));   // coin/hopper jam
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		machine().output().set_led_value(2,    (data & 0x0100));   // bet
-		machine().output().set_led_value(3,    (data & 0x0800));   // start
-		machine().output().set_led_value(4,    (data & 0x1000));   // ? select/choose
-		machine().output().set_led_value(5,    (data & 0x2000));   // ? select/choose
-		machine().output().set_led_value(6,    (data & 0x4000));   // look
+		output().set_led_value(2,    (data & 0x0100));   // bet
+		output().set_led_value(3,    (data & 0x0800));   // start
+		output().set_led_value(4,    (data & 0x1000));   // ? select/choose
+		output().set_led_value(5,    (data & 0x2000));   // ? select/choose
+		output().set_led_value(6,    (data & 0x4000));   // look
 	}
 //  popmessage("%04X",data);
 }
@@ -264,18 +264,18 @@ WRITE16_MEMBER(astrocorp_state::skilldrp_outputs_w)
 		machine().bookkeeping().coin_counter_w(1,    (data & 0x0004));   // key out |
 		machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x0008)<<4);   // hopper motor?
 		//                                  (data & 0x0010)     // hopper?
-		machine().output().set_led_value(0,    (data & 0x0020));   // error lamp (coin/hopper jam: "call attendant")
+		output().set_led_value(0,    (data & 0x0020));   // error lamp (coin/hopper jam: "call attendant")
 		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, data & 0x0080);    // ticket motor?
 	}
 	if (ACCESSING_BITS_8_15)
 	{
 		// lamps:
-		machine().output().set_led_value(1,    (data & 0x0100));   // select
-		machine().output().set_led_value(2,    (data & 0x0400));   // take
-		machine().output().set_led_value(3,    (data & 0x0800));   // bet
-		machine().output().set_led_value(4,    (data & 0x1000));   // start
-		machine().output().set_led_value(5,    (data & 0x4000));   // win / test
-		machine().output().set_led_value(6,    (data & 0x8000));   // ticket?
+		output().set_led_value(1,    (data & 0x0100));   // select
+		output().set_led_value(2,    (data & 0x0400));   // take
+		output().set_led_value(3,    (data & 0x0800));   // bet
+		output().set_led_value(4,    (data & 0x1000));   // start
+		output().set_led_value(5,    (data & 0x4000));   // win / test
+		output().set_led_value(6,    (data & 0x8000));   // ticket?
 	}
 
 //  popmessage("%04X",data);

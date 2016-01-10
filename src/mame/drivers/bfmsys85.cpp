@@ -312,7 +312,7 @@ WRITE8_MEMBER(bfmsys85_state::mux_data_w)
 
 	for ( i = 0; i < 8; i++ )
 	{
-		machine().output().set_lamp_value(off, (data & pattern ? 1 : 0));
+		output().set_lamp_value(off, (data & pattern ? 1 : 0));
 		pattern <<= 1;
 		off++;
 	}

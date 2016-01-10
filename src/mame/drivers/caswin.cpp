@@ -179,11 +179,11 @@ WRITE8_MEMBER(caswin_state::vvillage_lamps_w)
 	---- --x- lamp button 2
 	---- ---x lamp button 1
 	*/
-	machine().output().set_led_value(0, data & 0x01);
-	machine().output().set_led_value(1, data & 0x02);
-	machine().output().set_led_value(2, data & 0x04);
-	machine().output().set_led_value(3, data & 0x08);
-	machine().output().set_led_value(4, data & 0x10);
+	output().set_led_value(0, data & 0x01);
+	output().set_led_value(1, data & 0x02);
+	output().set_led_value(2, data & 0x04);
+	output().set_led_value(3, data & 0x08);
+	output().set_led_value(4, data & 0x10);
 }
 
 static ADDRESS_MAP_START( vvillage_mem, AS_PROGRAM, 8, caswin_state )

@@ -70,7 +70,7 @@ public:
 			{
 				int data = ((m_lamps[i] << bit)&0x8000)>>15;
 
-				machine().output().set_indexed_value("lamp", (i*16)+bit, data );
+				output().set_indexed_value("lamp", (i*16)+bit, data );
 			}
 		}
 	}
@@ -82,7 +82,7 @@ public:
 			{
 				int data = ((m_leds[i] << bit)&0x8000)>>15;
 
-				machine().output().set_digit_value((i*16)+bit, data );
+				output().set_digit_value((i*16)+bit, data );
 			}
 		}
 	}
@@ -181,8 +181,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_b_payouts)
 	{
 		//TODO: Fix up payout enables - all available bits enable one slide each
-		machine().output().set_value("coinlamp0", data&0x40 );
-		machine().output().set_value("coinlamp1", data&0x80 );
+		output().set_value("coinlamp0", data&0x40 );
+		output().set_value("coinlamp1", data&0x80 );
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_c_inhibits)

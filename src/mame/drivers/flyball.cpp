@@ -276,7 +276,7 @@ WRITE8_MEMBER(flyball_state::misc_w)
 	switch (offset)
 	{
 	case 0:
-		machine().output().set_led_value(0, bit);
+		output().set_led_value(0, bit);
 		break;
 	case 1:
 		/* crowd very loud */

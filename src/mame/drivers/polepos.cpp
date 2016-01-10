@@ -351,8 +351,8 @@ CUSTOM_INPUT_MEMBER(polepos_state::auto_start_r)
 WRITE8_MEMBER(polepos_state::out_0)
 {
 // no start lamps in pole position
-//  machine().output().set_led_value(1,data & 1);
-//  machine().output().set_led_value(0,data & 2);
+//  output().set_led_value(1,data & 1);
+//  output().set_led_value(0,data & 2);
 	machine().bookkeeping().coin_counter_w(1,~data & 4);
 	machine().bookkeeping().coin_counter_w(0,~data & 8);
 }

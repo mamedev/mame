@@ -398,10 +398,10 @@ WRITE32_MEMBER(undrfire_state::motor_control_w)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		machine().output().set_value("P1_lamp_start", (data >> 12) & 1 ); //p1 start
-		machine().output().set_value("P2_lamp_start", (data >> 13) & 1 ); //p2 start
-		machine().output().set_value("P1_gun_recoil", (data >> 14) & 1 ); //p1 recoil
-		machine().output().set_value("P2_gun_recoil", (data >> 15) & 1 ); //p2 recoil
+		output().set_value("P1_lamp_start", (data >> 12) & 1 ); //p1 start
+		output().set_value("P2_lamp_start", (data >> 13) & 1 ); //p2 start
+		output().set_value("P1_gun_recoil", (data >> 14) & 1 ); //p1 recoil
+		output().set_value("P2_gun_recoil", (data >> 15) & 1 ); //p2 recoil
 	}
 }
 
@@ -411,13 +411,13 @@ WRITE32_MEMBER(undrfire_state::cbombers_cpua_ctrl_w)
     ........ ..xxxxxx   Lamp 1-6 enables
     ........ .x......   Vibration
 */
-	machine().output().set_value("Lamp_1", data & 1 );
-	machine().output().set_value("Lamp_2", (data >> 1) & 1 );
-	machine().output().set_value("Lamp_3", (data >> 2) & 1 );
-	machine().output().set_value("Lamp_4", (data >> 3) & 1 );
-	machine().output().set_value("Lamp_5", (data >> 4) & 1 );
-	machine().output().set_value("Lamp_6", (data >> 5) & 1 );
-	machine().output().set_value("Wheel_vibration", (data >> 6) & 1 );
+	output().set_value("Lamp_1", data & 1 );
+	output().set_value("Lamp_2", (data >> 1) & 1 );
+	output().set_value("Lamp_3", (data >> 2) & 1 );
+	output().set_value("Lamp_4", (data >> 3) & 1 );
+	output().set_value("Lamp_5", (data >> 4) & 1 );
+	output().set_value("Lamp_6", (data >> 5) & 1 );
+	output().set_value("Wheel_vibration", (data >> 6) & 1 );
 
 	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
 }

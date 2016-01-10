@@ -285,7 +285,7 @@ WRITE8_MEMBER(seabattl_state::seabattl_control_w)
 	// bit 4: lamp
 	// bit 5: enable wave
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
-	machine().output().set_lamp_value(0, BIT(data,4));
+	output().set_lamp_value(0, BIT(data,4));
 	m_waveenable = BIT(data, 5);
 }
 

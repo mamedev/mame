@@ -68,10 +68,10 @@ WRITE8_MEMBER(mainevt_state::mainevt_coin_w)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
-	machine().output().set_led_value(0, data & 0x01);
-	machine().output().set_led_value(1, data & 0x02);
-	machine().output().set_led_value(2, data & 0x04);
-	machine().output().set_led_value(3, data & 0x08);
+	output().set_led_value(0, data & 0x01);
+	output().set_led_value(1, data & 0x02);
+	output().set_led_value(2, data & 0x04);
+	output().set_led_value(3, data & 0x08);
 }
 
 WRITE8_MEMBER(mainevt_state::mainevt_sh_irqtrigger_w)

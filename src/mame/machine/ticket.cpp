@@ -141,7 +141,7 @@ WRITE8_MEMBER( ticket_dispenser_device::write )
 		{
 			LOG(("%s: Ticket Power Off\n", machine().describe_context()));
 			m_timer->adjust(attotime::never);
-			machine().output().set_led_value(2,0);
+			output().set_led_value(2,0);
 			m_power = 0;
 		}
 	}
@@ -197,7 +197,7 @@ void ticket_dispenser_device::device_timer(emu_timer &timer, device_timer_id id,
 	}
 
 	// update LED status (fixme: should map to an output)
-	machine().output().set_led_value(2, (m_status == m_ticketdispensed));
+	output().set_led_value(2, (m_status == m_ticketdispensed));
 
 	// if we just dispensed, increment global count
 	if (m_status == m_ticketdispensed)

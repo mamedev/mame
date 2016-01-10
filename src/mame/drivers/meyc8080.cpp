@@ -179,11 +179,11 @@ WRITE8_MEMBER(meyc8080_state::lights_1_w)
   xxxx ----   Seems unused...
 
 */
-	machine().output().set_lamp_value(0, (data) & 1);       /* Lamp 0 */
-	machine().output().set_lamp_value(1, (data >> 1) & 1);  /* Lamp 1 */
-	machine().output().set_lamp_value(2, (data >> 2) & 1);  /* Lamp 2 */
-	machine().output().set_lamp_value(3, (data >> 3) & 1);  /* Lamp 3 */
-	machine().output().set_lamp_value(4, (data >> 4) & 1);  /* Lamp 4 */
+	output().set_lamp_value(0, (data) & 1);       /* Lamp 0 */
+	output().set_lamp_value(1, (data >> 1) & 1);  /* Lamp 1 */
+	output().set_lamp_value(2, (data >> 2) & 1);  /* Lamp 2 */
+	output().set_lamp_value(3, (data >> 3) & 1);  /* Lamp 3 */
+	output().set_lamp_value(4, (data >> 4) & 1);  /* Lamp 4 */
 
 	logerror("lights 1: %02x\n", data);
 }
@@ -226,13 +226,13 @@ WRITE8_MEMBER(meyc8080_state::lights_2_w)
   xxx- ----   Unknown.
 
 */
-	machine().output().set_lamp_value(5, (data) & 1);       /* Lamp 5 */
-	machine().output().set_lamp_value(6, (data >> 1) & 1);  /* Lamp 6 */
-	machine().output().set_lamp_value(7, (data >> 2) & 1);  /* Lamp 7 */
-	machine().output().set_lamp_value(8, (data >> 3) & 1);  /* Lamp 8 */
-	machine().output().set_lamp_value(9, (data >> 4) & 1);  /* Lamp 9 */
+	output().set_lamp_value(5, (data) & 1);       /* Lamp 5 */
+	output().set_lamp_value(6, (data >> 1) & 1);  /* Lamp 6 */
+	output().set_lamp_value(7, (data >> 2) & 1);  /* Lamp 7 */
+	output().set_lamp_value(8, (data >> 3) & 1);  /* Lamp 8 */
+	output().set_lamp_value(9, (data >> 4) & 1);  /* Lamp 9 */
 
-	machine().output().set_lamp_value(10, (data >> 5) & 1); /* Lamp 10 (Game-Over) */
+	output().set_lamp_value(10, (data >> 5) & 1); /* Lamp 10 (Game-Over) */
 
 	logerror("lights 2: %02x\n", data);
 }

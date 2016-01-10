@@ -146,13 +146,13 @@ WRITE8_MEMBER(videopin_state::led_w)
 		{ "LED19", "LED14", "LED12", "-" }
 	};
 
-	machine().output().set_value(matrix[i][0], (data >> 0) & 1);
-	machine().output().set_value(matrix[i][1], (data >> 1) & 1);
-	machine().output().set_value(matrix[i][2], (data >> 2) & 1);
-	machine().output().set_value(matrix[i][3], (data >> 3) & 1);
+	output().set_value(matrix[i][0], (data >> 0) & 1);
+	output().set_value(matrix[i][1], (data >> 1) & 1);
+	output().set_value(matrix[i][2], (data >> 2) & 1);
+	output().set_value(matrix[i][3], (data >> 3) & 1);
 
 	if (i == 7)
-		machine().output().set_led_value(0, data & 8);   /* start button */
+		output().set_led_value(0, data & 8);   /* start button */
 
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }

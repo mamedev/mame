@@ -510,7 +510,7 @@ void jpmimpct_state::jpm_draw_lamps(int data, int lamp_strobe)
 	for (i=0; i<16; i++)
 	{
 		m_Lamps[16*(m_lamp_strobe+i)] = data & 1;
-		machine().output().set_lamp_value((16*lamp_strobe)+i, (m_Lamps[(16*lamp_strobe)+i]));
+		output().set_lamp_value((16*lamp_strobe)+i, (m_Lamps[(16*lamp_strobe)+i]));
 		data = data >> 1;
 	}
 }
@@ -562,7 +562,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmio_w)
 
 		case 0x0b:
 		{
-			machine().output().set_digit_value(m_lamp_strobe,data);
+			output().set_digit_value(m_lamp_strobe,data);
 			break;
 		}
 		case 0x0f:
@@ -1076,8 +1076,8 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 	{
 		case 0x00:
 		{
-			machine().output().set_value("PWRLED",!(data&0x100));
-			machine().output().set_value("STATLED",!(data&0x200));
+			output().set_value("PWRLED",!(data&0x100));
+			output().set_value("STATLED",!(data&0x200));
 			break;
 		}
 
@@ -1156,7 +1156,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 
 		case 0x0b:
 		{
-			machine().output().set_digit_value(m_lamp_strobe,data);
+			output().set_digit_value(m_lamp_strobe,data);
 			break;
 		}
 		case 0x0f:

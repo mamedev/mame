@@ -981,7 +981,7 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 // cabinet lamps for type 1 games
 WRITE32_MEMBER(konamigx_state::type1_cablamps_w)
 {
-	machine().output().set_led_value(0, (data>>24)&1);
+	output().set_led_value(0, (data>>24)&1);
 }
 
 /**********************************************************************************/

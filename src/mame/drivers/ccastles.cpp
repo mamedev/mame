@@ -249,7 +249,7 @@ WRITE8_MEMBER(ccastles_state::irq_ack_w)
 
 WRITE8_MEMBER(ccastles_state::led_w)
 {
-	machine().output().set_led_value(offset, ~data & 1);
+	output().set_led_value(offset, ~data & 1);
 }
 
 

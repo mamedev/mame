@@ -198,10 +198,10 @@ void barata_state::fpga_send(unsigned char cmd)
 				if (erase_all){
 //                  logerror("LED: ERASE ALL\n");
 					for (int i=0; i<16; i++){
-						machine().output().set_led_value(i, 1);
+						output().set_led_value(i, 1);
 					}
 				} else {
-					machine().output().set_led_value(lamp_index, state ? 0 : 1);
+					output().set_led_value(lamp_index, state ? 0 : 1);
 				}
 			default:
 				mode = FPGA_WAITING_FOR_NEW_CMD;
@@ -229,11 +229,11 @@ void barata_state::fpga_send(unsigned char cmd)
 				counter_data = (counter_data << 3) | cmd;
 
 				if (counter_state){
-					machine().output().set_digit_value(2*counter_bank, 0);
-					machine().output().set_digit_value(2*counter_bank+1, 0);
+					output().set_digit_value(2*counter_bank, 0);
+					output().set_digit_value(2*counter_bank+1, 0);
 				} else {
-					machine().output().set_digit_value(2*counter_bank, dec_7seg(counter_data/10));
-					machine().output().set_digit_value(2*counter_bank+1, dec_7seg(counter_data%10));
+					output().set_digit_value(2*counter_bank, dec_7seg(counter_data/10));
+					output().set_digit_value(2*counter_bank+1, dec_7seg(counter_data%10));
 				}
 			default:
 				mode = FPGA_WAITING_FOR_NEW_CMD;

@@ -318,21 +318,21 @@ WRITE_LINE_MEMBER(merit_state::vsync_changed)
 WRITE8_MEMBER(merit_state::led1_w)
 {
 	/* 5 button lamps player 1 */
-	machine().output().set_led_value(0,~data & 0x01);
-	machine().output().set_led_value(1,~data & 0x02);
-	machine().output().set_led_value(2,~data & 0x04);
-	machine().output().set_led_value(3,~data & 0x08);
-	machine().output().set_led_value(4,~data & 0x10);
+	output().set_led_value(0,~data & 0x01);
+	output().set_led_value(1,~data & 0x02);
+	output().set_led_value(2,~data & 0x04);
+	output().set_led_value(3,~data & 0x08);
+	output().set_led_value(4,~data & 0x10);
 }
 
 WRITE8_MEMBER(merit_state::led2_w)
 {
 	/* 5 button lamps player 2 */
-	machine().output().set_led_value(5,~data & 0x01);
-	machine().output().set_led_value(6,~data & 0x02);
-	machine().output().set_led_value(7,~data & 0x04);
-	machine().output().set_led_value(8,~data & 0x08);
-	machine().output().set_led_value(9,~data & 0x10);
+	output().set_led_value(5,~data & 0x01);
+	output().set_led_value(6,~data & 0x02);
+	output().set_led_value(7,~data & 0x04);
+	output().set_led_value(8,~data & 0x08);
+	output().set_led_value(9,~data & 0x10);
 
 	/* coin counter */
 	machine().bookkeeping().coin_counter_w(0,0x80-(data & 0x80));

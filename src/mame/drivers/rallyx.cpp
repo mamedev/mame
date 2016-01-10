@@ -245,11 +245,11 @@ WRITE8_MEMBER(rallyx_state::rallyx_latch_w)
 			break;
 
 		case 0x04:
-			machine().output().set_led_value(0, bit);
+			output().set_led_value(0, bit);
 			break;
 
 		case 0x05:
-			machine().output().set_led_value(1, bit);
+			output().set_led_value(1, bit);
 			break;
 
 		case 0x06:

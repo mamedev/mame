@@ -159,7 +159,7 @@ WRITE8_MEMBER(cabaret_state::cabaret_nmi_and_coins_w)
 	machine().bookkeeping().coin_counter_w(2,        data & 0x08);   // key in
 	machine().bookkeeping().coin_counter_w(3,        data & 0x10);   // coin m_out mech
 
-	machine().output().set_led_value(6,        data & 0x40);   // led for coin m_out / hopper active
+	output().set_led_value(6,        data & 0x40);   // led for coin m_out / hopper active
 
 	m_nmi_enable = data;    //  data & 0x80     // nmi enable?
 

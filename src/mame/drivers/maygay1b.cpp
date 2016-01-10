@@ -159,7 +159,7 @@ WRITE8_MEMBER(maygay1b_state::m1_pia_portb_w)
 	{
 		if ( data & (1 << i) )
 		{
-			machine().output().set_indexed_value("triac", i, data & (1 << i));
+			output().set_indexed_value("triac", i, data & (1 << i));
 		}
 	}
 }
@@ -550,7 +550,7 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_w )
 
 		for (int i = 0; i < 8; i++)
 		{
-			machine().output().set_lamp_value((8*m_lamp_strobe)+i, ((data  & (1 << i)) !=0));
+			output().set_lamp_value((8*m_lamp_strobe)+i, ((data  & (1 << i)) !=0));
 		}
 		m_old_lamp_strobe = m_lamp_strobe;
 	}
@@ -575,7 +575,7 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
 
 		for (int i = 0; i < 8; i++)
 		{
-			machine().output().set_lamp_value((8*m_lamp_strobe)+i+128, ((data  & (1 << i)) !=0));
+			output().set_lamp_value((8*m_lamp_strobe)+i+128, ((data  & (1 << i)) !=0));
 		}
 		m_old_lamp_strobe2 = m_lamp_strobe2;
 	}

@@ -109,7 +109,7 @@ WRITE8_MEMBER(galaxold_state::galaxold_coin_counter_2_w)
 
 WRITE8_MEMBER(galaxold_state::galaxold_leds_w)
 {
-	machine().output().set_led_value(offset,data & 1);
+	output().set_led_value(offset,data & 1);
 }
 
 READ8_MEMBER(galaxold_state::scramblb_protection_1_r)

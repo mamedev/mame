@@ -78,7 +78,7 @@ WRITE8_MEMBER(starcrus_state::ship_parm_1_w)
 WRITE8_MEMBER(starcrus_state::ship_parm_2_w)
 {
 	m_s2_sprite = data&0x1f;
-	machine().output().set_led_value(2,~data & 0x80);          /* game over lamp */
+	output().set_led_value(2,~data & 0x80);          /* game over lamp */
 	machine().bookkeeping().coin_counter_w(0, ((data&0x40)>>6)^0x01);    /* coin counter */
 	m_engine2_on = ((data&0x20)>>5)^0x01;
 

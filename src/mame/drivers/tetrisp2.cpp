@@ -337,10 +337,10 @@ WRITE16_MEMBER(tetrisp2_state::nndmseal_coincounter_w)
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		machine().output().set_led_value(0, data & 0x1000 );  // +
-		machine().output().set_led_value(1, data & 0x2000 );  // -
-		machine().output().set_led_value(2, data & 0x4000 );  // Cancel
-		machine().output().set_led_value(3, data & 0x8000 );  // OK
+		output().set_led_value(0, data & 0x1000 );  // +
+		output().set_led_value(1, data & 0x2000 );  // -
+		output().set_led_value(2, data & 0x4000 );  // Cancel
+		output().set_led_value(3, data & 0x8000 );  // OK
 	}
 //  popmessage("%04x",data);
 }
@@ -575,21 +575,21 @@ WRITE16_MEMBER(stepstag_state::stepstag_leds_w)
 //  data = COMBINE_DATA()
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().output().set_led_value( 0,   data & 0x0001); // P2 Front-Left
-		machine().output().set_led_value( 1,   data & 0x0002); // P2 Front-Right
-		machine().output().set_led_value( 2,   data & 0x0004); // P2 Left
-		machine().output().set_led_value( 3,   data & 0x0008); // P2 Right
-		machine().output().set_led_value( 4,   data & 0x0010); // P2 Back-Left
-		machine().output().set_led_value( 5,   data & 0x0020); // P2 Back-Right
+		output().set_led_value( 0,   data & 0x0001); // P2 Front-Left
+		output().set_led_value( 1,   data & 0x0002); // P2 Front-Right
+		output().set_led_value( 2,   data & 0x0004); // P2 Left
+		output().set_led_value( 3,   data & 0x0008); // P2 Right
+		output().set_led_value( 4,   data & 0x0010); // P2 Back-Left
+		output().set_led_value( 5,   data & 0x0020); // P2 Back-Right
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		machine().output().set_led_value( 6,   data & 0x0100); // P1 Front-Left
-		machine().output().set_led_value( 7,   data & 0x0200); // P1 Front-Right
-		machine().output().set_led_value( 8,   data & 0x0400); // P1 Left
-		machine().output().set_led_value( 9,   data & 0x0800); // P1 Right
-		machine().output().set_led_value(10,   data & 0x1000); // P1 Back-Left
-		machine().output().set_led_value(11,   data & 0x2000); // P1 Back-Right
+		output().set_led_value( 6,   data & 0x0100); // P1 Front-Left
+		output().set_led_value( 7,   data & 0x0200); // P1 Front-Right
+		output().set_led_value( 8,   data & 0x0400); // P1 Left
+		output().set_led_value( 9,   data & 0x0800); // P1 Right
+		output().set_led_value(10,   data & 0x1000); // P1 Back-Left
+		output().set_led_value(11,   data & 0x2000); // P1 Back-Right
 	}
 
 //  popmessage("FEET %02x",data);

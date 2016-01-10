@@ -524,7 +524,7 @@ WRITE8_MEMBER( wangpc_keyboard_device::kb_p1_w )
 
 	for (int i = 0; i < 6; i++)
 	{
-		machine().output().set_led_value(i, !BIT(data, i));
+		output().set_led_value(i, !BIT(data, i));
 	}
 
 	if (LOG) logerror("P1 %02x\n", data);
