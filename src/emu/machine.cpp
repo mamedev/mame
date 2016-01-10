@@ -269,7 +269,7 @@ void running_machine::start()
 	image_init(*this);
 	m_tilemap = std::make_unique<tilemap_manager>(*this);
 	crosshair_init(*this);
-	network_init(*this);
+	m_network = std::make_unique<network_manager>(*this);
 
 	// initialize the debugger
 	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)

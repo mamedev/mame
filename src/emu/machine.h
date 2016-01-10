@@ -85,6 +85,7 @@ class video_manager;
 class ui_manager;
 class tilemap_manager;
 class debug_view_manager;
+class network_manager;
 class osd_interface;
 
 struct romload_private;
@@ -163,6 +164,7 @@ public:
 	input_manager &input() const { assert(m_input != nullptr); return *m_input; }
 	sound_manager &sound() const { assert(m_sound != nullptr); return *m_sound; }
 	video_manager &video() const { assert(m_video != nullptr); return *m_video; }
+	network_manager &network() const { assert(m_network != nullptr); return *m_network; }
 	ui_manager &ui() const { assert(m_ui != nullptr); return *m_ui; }
 	tilemap_manager &tilemap() const { assert(m_tilemap != nullptr); return *m_tilemap; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != nullptr); return *m_debug_view; }
@@ -279,6 +281,7 @@ private:
 	std::unique_ptr<ui_manager> m_ui;                  // internal data from ui.c
 	std::unique_ptr<tilemap_manager> m_tilemap;        // internal data from tilemap.c
 	std::unique_ptr<debug_view_manager> m_debug_view;  // internal data from debugvw.c
+	std::unique_ptr<network_manager> m_network;        // internal data from network.c
 
 	// system state
 	machine_phase           m_current_phase;        // current execution phase
