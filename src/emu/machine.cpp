@@ -119,7 +119,6 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		primary_screen(nullptr),
 		debug_flags(0),
 		romload_data(nullptr),
-		ui_input_data(nullptr),
 		debugcpu_data(nullptr),
 		m_config(_config),
 		m_system(_config.gamedrv()),
@@ -243,7 +242,7 @@ void running_machine::start()
 		m_base_time = newbase;
 
 	// intialize UI input
-	ui_input_init(*this);
+	m_ui_input = std::make_unique<ui_input_manager>(*this);
 
 	// initialize the streams engine before the sound devices start
 	m_sound = std::make_unique<sound_manager>(*this);

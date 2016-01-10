@@ -1463,7 +1463,7 @@ static void handle_mouse(running_machine &machine)
 	if (menu != nullptr)
 		return;
 
-	mouse_target = ui_input_find_mouse(machine, &x, &y, &button);
+	mouse_target = machine.ui_input().find_mouse(&x, &y, &button);
 
 	if (mouse_target == nullptr)
 		return;
@@ -1671,7 +1671,7 @@ static void handle_editor(running_machine &machine)
 		ui_event event;
 
 		/* loop while we have interesting events */
-		while (ui_input_pop_event(machine, &event))
+		while (machine.ui_input().pop_event(&event))
 		{
 			switch (event.event_type)
 			{
@@ -1702,13 +1702,13 @@ static void handle_editor(running_machine &machine)
 		if (cur_editor != nullptr)
 		{
 			render_editor(cur_editor);
-			if (ui_input_pressed(machine, IPT_UI_SELECT))
+			if (machine.ui_input().pressed(IPT_UI_SELECT))
 			{
 				process_string(focus_view, focus_view->editor.str.c_str());
 				focus_view->editor.str = "";
 				cur_editor = nullptr;
 			}
-			if (ui_input_pressed(machine, IPT_UI_CANCEL))
+			if (machine.ui_input().pressed(IPT_UI_CANCEL))
 				cur_editor = nullptr;
 		}
 	}
@@ -1725,7 +1725,7 @@ static void handle_menus(running_machine &machine)
 	const ui_menu_event *event;
 
 	machine.render().ui_container().empty();
-	ui_input_frame_update(machine);
+	machine.ui_input().frame_update();
 	if (menu != nullptr)
 	{
 		/* process the menu */
@@ -1738,7 +1738,7 @@ static void handle_menus(running_machine &machine)
 			//ui_menu_stack_push(ui_menu_alloc(machine, menu->container, (ui_menu_handler_func)event->itemref,nullptr));
 			CreateMainMenu(machine);
 		}
-		else if (ui_input_pressed(machine, IPT_UI_CONFIGURE))
+		else if (machine.ui_input().pressed(IPT_UI_CONFIGURE))
 		{
 			menu_sel = menu->get_selection();
 			global_free(menu);
@@ -1748,7 +1748,7 @@ static void handle_menus(running_machine &machine)
 	else
 	{
 		/* turn on menus if requested */
-		if (ui_input_pressed(machine, IPT_UI_CONFIGURE))
+		if (machine.ui_input().pressed(IPT_UI_CONFIGURE))
 			CreateMainMenu(machine);
 		/* turn on editor if requested */
 		//if (ui_input_pressed(machine, IPT_UI_UP) && focus_view->editor.active)
@@ -1848,7 +1848,7 @@ void debug_internal::wait_for_debugger(device_t &device, bool firststop)
 	if(firststop)
 	{
 		debug_show_all();
-		ui_input_reset(device.machine());
+		device.machine().ui_input().reset();
 	}
 	//ui_update_and_render(device.machine(), device.machine().render().ui_container()());
 	update_views();

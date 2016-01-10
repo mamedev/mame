@@ -94,7 +94,7 @@ void ui_menu_select_game::build_driver_list()
 void ui_menu_select_game::handle()
 {
 	// ignore pause keys by swallowing them before we process the menu
-	ui_input_pressed(machine(), IPT_UI_PAUSE);
+	machine().ui_input().pressed(IPT_UI_PAUSE);
 
 	// process the menu
 	const ui_menu_event *menu_event = process(0);

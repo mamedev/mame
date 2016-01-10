@@ -89,11 +89,11 @@ class network_manager;
 class bookkeeping_manager;
 class configuration_manager;
 class output_manager;
+class ui_input_manager;
 class osd_interface;
 enum class config_type;
 
 struct romload_private;
-struct ui_input_private;
 struct debugcpu_private;
 
 
@@ -172,6 +172,7 @@ public:
 	configuration_manager  &configuration() const { assert(m_configuration != nullptr); return *m_configuration; }
 	output_manager  &output() const { assert(m_output != nullptr); return *m_output; }
 	ui_manager &ui() const { assert(m_ui != nullptr); return *m_ui; }
+	ui_input_manager &ui_input() const { assert(m_ui_input != nullptr); return *m_ui_input; }
 	tilemap_manager &tilemap() const { assert(m_tilemap != nullptr); return *m_tilemap; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != nullptr); return *m_debug_view; }
 	driver_device *driver_data() const { return &downcast<driver_device &>(root_device()); }
@@ -244,7 +245,6 @@ public:
 
 	// internal core information
 	romload_private *       romload_data;       // internal data from romload.c
-	ui_input_private *      ui_input_data;      // internal data from uiinput.c
 	debugcpu_private *      debugcpu_data;      // internal data from debugcpu.c
 
 private:
@@ -284,6 +284,7 @@ private:
 	std::unique_ptr<sound_manager> m_sound;            // internal data from sound.c
 	std::unique_ptr<video_manager> m_video;            // internal data from video.c
 	std::unique_ptr<ui_manager> m_ui;                  // internal data from ui.c
+	std::unique_ptr<ui_input_manager> m_ui_input;      // internal data from uiinput.c
 	std::unique_ptr<tilemap_manager> m_tilemap;        // internal data from tilemap.c
 	std::unique_ptr<debug_view_manager> m_debug_view;  // internal data from debugvw.c
 	std::unique_ptr<network_manager> m_network;        // internal data from network.c

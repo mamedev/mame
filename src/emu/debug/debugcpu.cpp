@@ -1754,7 +1754,7 @@ void device_debug::start_hook(const attotime &endtime)
 			}
 		}
 		// check for debug keypresses
-		if (ui_input_pressed(m_device.machine(), IPT_UI_DEBUG_BREAK))
+		if (m_device.machine().ui_input().pressed(IPT_UI_DEBUG_BREAK))
 			global->visiblecpu->debug()->halt_on_next_instruction("User-initiated break\n");
 	}
 

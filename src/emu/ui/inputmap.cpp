@@ -266,7 +266,7 @@ void ui_menu_input::handle()
 		input_item_data *item = pollingitem;
 
 		/* if UI_CANCEL is pressed, abort */
-		if (ui_input_pressed(machine(), IPT_UI_CANCEL))
+		if (machine().ui_input().pressed(IPT_UI_CANCEL))
 		{
 			pollingitem = nullptr;
 			record_next = false;
