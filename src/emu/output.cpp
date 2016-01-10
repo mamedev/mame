@@ -368,3 +368,17 @@ const char *output_id_to_name(UINT32 id)
 	/* nothing found, return NULL */
 	return nullptr;
 }
+
+/***************************************************************************
+LED CODE
+***************************************************************************/
+
+/*-------------------------------------------------
+set_led_status - set the state of a given LED
+-------------------------------------------------*/
+
+void set_led_status(running_machine &machine, int num, int on)
+{
+	output_set_led_value(num, on);
+}
+

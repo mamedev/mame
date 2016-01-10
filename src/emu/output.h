@@ -56,6 +56,8 @@ UINT32 output_name_to_id(const char *outname);
 /* map a unique ID back to a name */
 const char *output_id_to_name(UINT32 id);
 
+/* set the status of an LED */
+void set_led_status(running_machine &machine, int num, int value);
 
 
 /***************************************************************************

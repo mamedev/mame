@@ -253,37 +253,3 @@ void coin_lockout_global_w(running_machine &machine, int on)
 	for (i = 0; i < ARRAY_LENGTH(state->coinlockedout); i++)
 		coin_lockout_w(machine, i, on);
 }
-
-
-/***************************************************************************
-    LED CODE
-***************************************************************************/
-
-/*-------------------------------------------------
-    set_led_status - set the state of a given LED
--------------------------------------------------*/
-
-void set_led_status(running_machine &machine, int num, int on)
-{
-	output_set_led_value(num, on);
-}
-
-
-
-
-/***************************************************************************
-    PORT READING HELPERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    custom_port_read - act like input_port_read
-    but it is a custom port, it is useful for
-    e.g. input ports which expect the same port
-    repeated both in the upper and lower half
--------------------------------------------------*/
-
-CUSTOM_INPUT_MEMBER( driver_device::custom_port_read )
-{
-	const char *tag = (const char *)param;
-	return ioport(tag)->read();
-}

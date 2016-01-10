@@ -61,9 +61,4 @@ int coin_lockout_get_state(running_machine &machine, int num);
 /* enable/disable global coin lockout */
 void coin_lockout_global_w(running_machine &machine, int on);
 
-/* ----- miscellaneous bits & pieces ----- */
-
-/* set the status of an LED */
-void set_led_status(running_machine &machine, int num, int value);
-
 #endif  /* __MACHINE_GENERIC_H__ */
