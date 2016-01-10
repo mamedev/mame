@@ -52,7 +52,7 @@ typedef int running_machine;
 
 // note you need to compile as a console app to have any of
 // these printfs show up
-#define DEBUG_VERSION       1
+#define DEBUG_VERSION       0
 
 #if DEBUG_VERSION
 #define DEBUG_PRINTF(x)     printf x
