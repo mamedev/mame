@@ -119,6 +119,9 @@ dcdev    // 1998 Sega HKT-0120 Sega Dreamcast Development Box
 
 svmu     // 1998 Sega Visual Memory Unit
 
+// Sequential Circuits
+prpht600	// 1983 Sequential Circuits
+
 // Sony
 psj    // 1994 Sony PlayStation (Japan)
 psu    // 1995 Sony PlayStation (USA)
