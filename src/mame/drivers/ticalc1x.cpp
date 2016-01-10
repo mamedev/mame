@@ -13,6 +13,8 @@
 
   TODO:
   - MCU clocks are unknown where noted
+  - fake-press ON button when emulation starts for calculators that have
+    it on the button matrix (doesn't look like any relies on it though)
 
 ***************************************************************************/
 

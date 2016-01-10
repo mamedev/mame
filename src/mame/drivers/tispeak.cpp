@@ -1153,6 +1153,8 @@ static MACHINE_CONFIG_START( snspellc, tispeak_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspellc_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, snspellc_write_r))
 
+	/* no visual feedback! */
+
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
 
