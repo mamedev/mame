@@ -6375,8 +6375,9 @@ avengrgs        // MCG (c) 1995 Data East Corporation (World)
 avengrgsj       // MCG (c) 1995 Data East Corporation (Japan)
 skullfng        // MCH (c) 1996 Data East Corporation (World)
 skullfngj       // MCH (c) 1996 Data East Corporation (Japan)
-stadhr96        // MCM (c) 1996 Data East
-stadhr96j       // MCM (c) 1996 Data East
+stadhr96        // MCM (c) 1996 Data East Corporation (World)
+stadhr96u       // MCM (c) 1996 Data East Corporation (USA)
+stadhr96j       // MCM (c) 1996 Data East Corporation (Japan)
 
 // SemiCom games on Tumble Pop based hardware
 metlsavr        // (c) 1994 First Amusements
