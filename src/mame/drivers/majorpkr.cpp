@@ -663,13 +663,13 @@ WRITE8_MEMBER(majorpkr_state::lamps_a_w)
     -x-- ----   Small lamp.
     x--- ----   Unknown.
 */
-	output_set_lamp_value(0, (data) & 1);       /* Lamp 0: Hold 1 */
-	output_set_lamp_value(1, (data >> 1) & 1);  /* Lamp 1: Hold 2 */
-	output_set_lamp_value(2, (data >> 2) & 1);  /* Lamp 2: Hold 3 */
-	output_set_lamp_value(3, (data >> 3) & 1);  /* Lamp 3: Hold 4 */
-	output_set_lamp_value(4, (data >> 4) & 1);  /* Lamp 4: Hold 5 */
-	output_set_lamp_value(5, (data >> 5) & 1);  /* Lamp 5: Big or Small (need identification) */
-	output_set_lamp_value(6, (data >> 6) & 1);  /* Lamp 6: Big or Small (need identification) */
+	machine().output().set_lamp_value(0, (data) & 1);       /* Lamp 0: Hold 1 */
+	machine().output().set_lamp_value(1, (data >> 1) & 1);  /* Lamp 1: Hold 2 */
+	machine().output().set_lamp_value(2, (data >> 2) & 1);  /* Lamp 2: Hold 3 */
+	machine().output().set_lamp_value(3, (data >> 3) & 1);  /* Lamp 3: Hold 4 */
+	machine().output().set_lamp_value(4, (data >> 4) & 1);  /* Lamp 4: Hold 5 */
+	machine().output().set_lamp_value(5, (data >> 5) & 1);  /* Lamp 5: Big or Small (need identification) */
+	machine().output().set_lamp_value(6, (data >> 6) & 1);  /* Lamp 6: Big or Small (need identification) */
 
 	if (data & 0x80)
 		logerror("Lamps A: Write to 13h: %02x\n", data);
@@ -689,12 +689,12 @@ WRITE8_MEMBER(majorpkr_state::lamps_b_w)
     --x- ----   Fever lamp.
     xx-- ----   Unknown.
 */
-	output_set_lamp_value(7, (data) & 1);       /* Lamp 7: Bet */
-	output_set_lamp_value(8, (data >> 1) & 1);  /* Lamp 8: Draw */
-	output_set_lamp_value(9, (data >> 2) & 1);  /* Lamp 9: Cancel */
-	output_set_lamp_value(10, (data >> 3) & 1); /* Lamp 10: Take */
-	output_set_lamp_value(11, (data >> 4) & 1); /* Lamp 11: D-UP */
-	output_set_lamp_value(12, (data >> 5) & 1); /* Lamp 12: Fever */
+	machine().output().set_lamp_value(7, (data) & 1);       /* Lamp 7: Bet */
+	machine().output().set_lamp_value(8, (data >> 1) & 1);  /* Lamp 8: Draw */
+	machine().output().set_lamp_value(9, (data >> 2) & 1);  /* Lamp 9: Cancel */
+	machine().output().set_lamp_value(10, (data >> 3) & 1); /* Lamp 10: Take */
+	machine().output().set_lamp_value(11, (data >> 4) & 1); /* Lamp 11: D-UP */
+	machine().output().set_lamp_value(12, (data >> 5) & 1); /* Lamp 12: Fever */
 
 	if (data & 0xc0)
 		logerror("Lamps B: Write to 14h: %02x\n", data);

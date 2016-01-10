@@ -617,7 +617,7 @@ READ8_MEMBER(centiped_state::bullsdrt_data_port_r)
 
 WRITE8_MEMBER(centiped_state::led_w)
 {
-	set_led_status(machine(), offset, ~data & 0x80);
+	machine().output().set_led_value(offset, ~data & 0x80);
 }
 
 

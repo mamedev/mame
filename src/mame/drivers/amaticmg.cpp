@@ -594,10 +594,10 @@ WRITE8_MEMBER(amaticmg_state::out_a_w)
     -x-- ----  HOLD4
 */
 
-	output_set_lamp_value(0, (data >> 3) & 1);  /* START */
-	output_set_lamp_value(1, (data >> 4) & 1);  /* BET */
-	output_set_lamp_value(2, (data >> 5) & 1);  /* HOLD3 */
-	output_set_lamp_value(3, (data >> 6) & 1);  /* HOLD4 */
+	machine().output().set_lamp_value(0, (data >> 3) & 1);  /* START */
+	machine().output().set_lamp_value(1, (data >> 4) & 1);  /* BET */
+	machine().output().set_lamp_value(2, (data >> 5) & 1);  /* HOLD3 */
+	machine().output().set_lamp_value(3, (data >> 6) & 1);  /* HOLD4 */
 
 	logerror("port A: %2X\n", data);
 }
@@ -615,9 +615,9 @@ WRITE8_MEMBER(amaticmg_state::out_c_w)
     x--- ----  Hopper motor
     --x- x---  (unknown)
 */
-	output_set_lamp_value(4, (data >> 1) & 1);  /* HOLD1 */
-	output_set_lamp_value(5, (data >> 4) & 1);  /* HOLD2 */
-	output_set_lamp_value(6, (data >> 6) & 1);  /* CANCEL */
+	machine().output().set_lamp_value(4, (data >> 1) & 1);  /* HOLD1 */
+	machine().output().set_lamp_value(5, (data >> 4) & 1);  /* HOLD2 */
+	machine().output().set_lamp_value(6, (data >> 6) & 1);  /* CANCEL */
 
 //  machine().bookkeeping().coin_counter_w(0, data & 0x04);  /* Coin In */
 //  machine().bookkeeping().coin_counter_w(1, data & 0x01);  /* Coin Out */

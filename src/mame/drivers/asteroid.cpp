@@ -226,7 +226,7 @@ WRITE8_MEMBER(asteroid_state::llander_led_w)
 	};
 
 	for (int i = 0; i < 5; i++)
-		output_set_value(lampname[i], (data >> (4 - i)) & 1);
+		machine().output().set_value(lampname[i], (data >> (4 - i)) & 1);
 }
 
 

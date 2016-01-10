@@ -407,8 +407,8 @@ WRITE8_MEMBER( tandy2k_keyboard_device::kb_p2_w )
 	m_keylatch = ((data & 0x0f) << 8) | (m_keylatch & 0xff);
 
 	// led output
-	output_set_led_value(LED_2, !BIT(data, 4));
-	output_set_led_value(LED_1, !BIT(data, 5));
+	machine().output().set_led_value(LED_2, !BIT(data, 4));
+	machine().output().set_led_value(LED_1, !BIT(data, 5));
 
 	// keyboard clock
 	int clock = BIT(data, 6);

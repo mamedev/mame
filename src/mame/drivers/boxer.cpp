@@ -322,8 +322,8 @@ WRITE8_MEMBER(boxer_state::boxer_crowd_w)
 
 WRITE8_MEMBER(boxer_state::boxer_led_w)
 {
-	set_led_status(machine(), 1, !(data & 1));
-	set_led_status(machine(), 0, !(data & 2));
+	machine().output().set_led_value(1, !(data & 1));
+	machine().output().set_led_value(0, !(data & 2));
 }
 
 

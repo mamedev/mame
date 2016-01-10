@@ -111,7 +111,7 @@ WRITE8_MEMBER(wolfpack_state::wolfpack_attract_w)
 
 WRITE8_MEMBER(wolfpack_state::wolfpack_credit_w)
 {
-	set_led_status(machine(), 0, !(data & 1));
+	machine().output().set_led_value(0, !(data & 1));
 }
 
 

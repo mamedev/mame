@@ -509,8 +509,8 @@ WRITE8_MEMBER(corona_state::ball_w)
 {
 	m_lamp = data;
 
-	output_set_lamp_value(data, 1);
-	output_set_lamp_value(m_lamp_old, 0);
+	machine().output().set_lamp_value(data, 1);
+	machine().output().set_lamp_value(m_lamp_old, 0);
 	m_lamp_old = m_lamp;
 }
 

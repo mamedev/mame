@@ -247,10 +247,10 @@ WRITE8_MEMBER(destroyr_state::output_w)
 	else switch (offset & 7)
 	{
 	case 0:
-		set_led_status(machine(), 0, data & 1);
+		machine().output().set_led_value(0, data & 1);
 		break;
 	case 1:
-		set_led_status(machine(), 1, data & 1); /* no second LED present on cab */
+		machine().output().set_led_value(1, data & 1); /* no second LED present on cab */
 		break;
 	case 2:
 		/* bit 0 => songate */

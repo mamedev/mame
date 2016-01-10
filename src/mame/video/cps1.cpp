@@ -1821,9 +1821,9 @@ WRITE16_MEMBER(cps_state::cps1_cps_b_w)
 			if (m_game_config->cpsb_value == 0x0402)    // Mercs (CN2 connector)
 			{
 				machine().bookkeeping().coin_lockout_w(2, ~data & 0x01);
-				set_led_status(machine(), 0, data & 0x02);
-				set_led_status(machine(), 1, data & 0x04);
-				set_led_status(machine(), 2, data & 0x08);
+				machine().output().set_led_value(0, data & 0x02);
+				machine().output().set_led_value(1, data & 0x04);
+				machine().output().set_led_value(2, data & 0x08);
 			}
 			else    // kod, captcomm, knights
 			{

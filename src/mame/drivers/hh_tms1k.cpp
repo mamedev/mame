@@ -211,7 +211,7 @@ void hh_tms1k_state::display_update()
 		if (m_display_cache[y] != active_state[y])
 		{
 			if (m_display_segmask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
+				machine().output().set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x <= m_display_maxx; x++)
@@ -231,8 +231,8 @@ void hh_tms1k_state::display_update()
 					sprintf(buf1, "lamp%d", y * mul + x);
 					sprintf(buf2, "%d.%d", y, x);
 				}
-				output_set_value(buf1, state);
-				output_set_value(buf2, state);
+				machine().output().set_value(buf1, state);
+				machine().output().set_value(buf2, state);
 			}
 		}
 
@@ -242,7 +242,7 @@ void hh_tms1k_state::display_update()
 	if (m_power_led != m_power_on)
 	{
 		m_power_led = m_power_on;
-		output_set_value("power_led", m_power_led ? 1 : 0);
+		machine().output().set_value("power_led", m_power_led ? 1 : 0);
 	}
 }
 
@@ -3247,11 +3247,11 @@ WRITE16_MEMBER(bigtrak_state::write_o)
 	// O4: right motor reverse
 	// O5: ext out
 	// O6: N/C
-	output_set_value("left_motor_forward", data >> 1 & 1);
-	output_set_value("left_motor_reverse", data >> 2 & 1);
-	output_set_value("right_motor_forward", data >> 3 & 1);
-	output_set_value("right_motor_reverse", data >> 4 & 1);
-	output_set_value("ext_out", data >> 5 & 1);
+	machine().output().set_value("left_motor_forward", data >> 1 & 1);
+	machine().output().set_value("left_motor_reverse", data >> 2 & 1);
+	machine().output().set_value("right_motor_forward", data >> 3 & 1);
+	machine().output().set_value("right_motor_reverse", data >> 4 & 1);
+	machine().output().set_value("ext_out", data >> 5 & 1);
 
 	// O0,O7(,R10)(tied together): speaker out
 	m_speaker->level_w((data & 1) | (data >> 6 & 2) | (m_r >> 8 & 4));
@@ -4460,7 +4460,7 @@ INPUT_CHANGED_MEMBER(phpball_state::flipper_button)
 {
 	// rectangular LEDs under LEDs D,F and E,G are directly connected
 	// to the left and right flipper buttons - output them to lamp90 and 91
-	output_set_lamp_value(90 + (int)(FPTR)param, newval);
+	machine().output().set_lamp_value(90 + (int)(FPTR)param, newval);
 }
 
 

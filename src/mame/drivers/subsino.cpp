@@ -666,14 +666,14 @@ WRITE8_MEMBER(subsino_state::subsino_out_a_w)
 
 */
 
-	output_set_lamp_value(8, (data) & 1);       /* Lamp 8 */
-	output_set_lamp_value(9, (data >> 1) & 1);  /* Lamp 9 */
-	output_set_lamp_value(10, (data >> 2) & 1); /* Lamp 10 */
-	output_set_lamp_value(11, (data >> 3) & 1); /* Lamp 11 */
-	output_set_lamp_value(12, (data >> 4) & 1); /* Lamp 12 */
-	output_set_lamp_value(13, (data >> 5) & 1); /* Lamp 13 */
-	output_set_lamp_value(14, (data >> 6) & 1); /* Lamp 14 */
-	output_set_lamp_value(15, (data >> 7) & 1); /* Lamp 15 */
+	machine().output().set_lamp_value(8, (data) & 1);       /* Lamp 8 */
+	machine().output().set_lamp_value(9, (data >> 1) & 1);  /* Lamp 9 */
+	machine().output().set_lamp_value(10, (data >> 2) & 1); /* Lamp 10 */
+	machine().output().set_lamp_value(11, (data >> 3) & 1); /* Lamp 11 */
+	machine().output().set_lamp_value(12, (data >> 4) & 1); /* Lamp 12 */
+	machine().output().set_lamp_value(13, (data >> 5) & 1); /* Lamp 13 */
+	machine().output().set_lamp_value(14, (data >> 6) & 1); /* Lamp 14 */
+	machine().output().set_lamp_value(15, (data >> 7) & 1); /* Lamp 15 */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x01 );    /* coin / keyin */
 	machine().bookkeeping().coin_counter_w(1, data & 0x02 );    /* keyin / coin */
@@ -808,14 +808,14 @@ WRITE8_MEMBER(subsino_state::subsino_out_b_w)
 
 */
 
-	output_set_lamp_value(0, (data) & 1);       /* Lamp 0 */
-	output_set_lamp_value(1, (data >> 1) & 1);  /* Lamp 1 */
-	output_set_lamp_value(2, (data >> 2) & 1);  /* Lamp 2 */
-	output_set_lamp_value(3, (data >> 3) & 1);  /* Lamp 3 */
-	output_set_lamp_value(4, (data >> 4) & 1);  /* Lamp 4 */
-	output_set_lamp_value(5, (data >> 5) & 1);  /* Lamp 5 */
-	output_set_lamp_value(6, (data >> 6) & 1);  /* Lamp 6 */
-	output_set_lamp_value(7, (data >> 7) & 1);  /* Lamp 7 */
+	machine().output().set_lamp_value(0, (data) & 1);       /* Lamp 0 */
+	machine().output().set_lamp_value(1, (data >> 1) & 1);  /* Lamp 1 */
+	machine().output().set_lamp_value(2, (data >> 2) & 1);  /* Lamp 2 */
+	machine().output().set_lamp_value(3, (data >> 3) & 1);  /* Lamp 3 */
+	machine().output().set_lamp_value(4, (data >> 4) & 1);  /* Lamp 4 */
+	machine().output().set_lamp_value(5, (data >> 5) & 1);  /* Lamp 5 */
+	machine().output().set_lamp_value(6, (data >> 6) & 1);  /* Lamp 6 */
+	machine().output().set_lamp_value(7, (data >> 7) & 1);  /* Lamp 7 */
 
 //  popmessage("Out B %02x",data);
 }

@@ -266,28 +266,28 @@ WRITE8_MEMBER(goldstar_state::p1_lamps_w)
   skill98 is like schery97 but doesn't activate bit 0 for stop
   nfb96, roypok96 and nc96 sets are like schery97 but they don't activate bit 2 for select
 */
-	output_set_lamp_value(0, (data >> 0) & 1);
-	output_set_lamp_value(1, (data >> 1) & 1);
-	output_set_lamp_value(2, (data >> 2) & 1);
-	output_set_lamp_value(3, (data >> 3) & 1);
-	output_set_lamp_value(4, (data >> 4) & 1);
-	output_set_lamp_value(5, (data >> 5) & 1);
-	output_set_lamp_value(6, (data >> 6) & 1);
-	output_set_lamp_value(7, (data >> 7) & 1);
+	machine().output().set_lamp_value(0, (data >> 0) & 1);
+	machine().output().set_lamp_value(1, (data >> 1) & 1);
+	machine().output().set_lamp_value(2, (data >> 2) & 1);
+	machine().output().set_lamp_value(3, (data >> 3) & 1);
+	machine().output().set_lamp_value(4, (data >> 4) & 1);
+	machine().output().set_lamp_value(5, (data >> 5) & 1);
+	machine().output().set_lamp_value(6, (data >> 6) & 1);
+	machine().output().set_lamp_value(7, (data >> 7) & 1);
 
 //  popmessage("p1 lamps: %02X", data);
 }
 
 WRITE8_MEMBER(goldstar_state::p2_lamps_w)
 {
-	output_set_lamp_value(8 + 0, (data >> 0) & 1);
-	output_set_lamp_value(8 + 1, (data >> 1) & 1);
-	output_set_lamp_value(8 + 2, (data >> 2) & 1);
-	output_set_lamp_value(8 + 3, (data >> 3) & 1);
-	output_set_lamp_value(8 + 4, (data >> 4) & 1);
-	output_set_lamp_value(8 + 5, (data >> 5) & 1);
-	output_set_lamp_value(8 + 6, (data >> 6) & 1);
-	output_set_lamp_value(8 + 7, (data >> 7) & 1);
+	machine().output().set_lamp_value(8 + 0, (data >> 0) & 1);
+	machine().output().set_lamp_value(8 + 1, (data >> 1) & 1);
+	machine().output().set_lamp_value(8 + 2, (data >> 2) & 1);
+	machine().output().set_lamp_value(8 + 3, (data >> 3) & 1);
+	machine().output().set_lamp_value(8 + 4, (data >> 4) & 1);
+	machine().output().set_lamp_value(8 + 5, (data >> 5) & 1);
+	machine().output().set_lamp_value(8 + 6, (data >> 6) & 1);
+	machine().output().set_lamp_value(8 + 7, (data >> 7) & 1);
 
 //  popmessage("p2 lamps: %02X", data);
 }
@@ -1053,12 +1053,12 @@ WRITE8_MEMBER(unkch_state::unkcm_0x02_w)
 
 	m_vblank_irq_enable = data & 0x80;
 
-	output_set_lamp_value(0, (data >> 0) & 1);  /* Bet-A / Stop 2 */
-	output_set_lamp_value(1, (data >> 1) & 1);  /* Start / Stop All */
-	output_set_lamp_value(2, (data >> 2) & 1);  /* Info / Small / Stop 3 */
-	output_set_lamp_value(3, (data >> 3) & 1);  /* Big */
-	output_set_lamp_value(4, (data >> 4) & 1);  /* Bet-B / D-Up */
-	output_set_lamp_value(5, (data >> 5) & 1);  /* Take / Stop 1 */
+	machine().output().set_lamp_value(0, (data >> 0) & 1);  /* Bet-A / Stop 2 */
+	machine().output().set_lamp_value(1, (data >> 1) & 1);  /* Start / Stop All */
+	machine().output().set_lamp_value(2, (data >> 2) & 1);  /* Info / Small / Stop 3 */
+	machine().output().set_lamp_value(3, (data >> 3) & 1);  /* Big */
+	machine().output().set_lamp_value(4, (data >> 4) & 1);  /* Bet-B / D-Up */
+	machine().output().set_lamp_value(5, (data >> 5) & 1);  /* Take / Stop 1 */
 }
 
 WRITE8_MEMBER(unkch_state::unkcm_0x03_w)

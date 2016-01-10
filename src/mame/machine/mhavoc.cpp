@@ -266,17 +266,17 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_out_0_w)
 	}
 
 	/* Bit 0 = Roller light (Blinks on fatal errors) */
-	set_led_status(machine(), 0, data & 0x01);
+	machine().output().set_led_value(0, data & 0x01);
 }
 
 
 WRITE8_MEMBER(mhavoc_state::alphaone_out_0_w)
 {
 	/* Bit 5 = P2 lamp */
-	set_led_status(machine(), 0, ~data & 0x20);
+	machine().output().set_led_value(0, ~data & 0x20);
 
 	/* Bit 4 = P1 lamp */
-	set_led_status(machine(), 1, ~data & 0x10);
+	machine().output().set_led_value(1, ~data & 0x10);
 
 	/* Bit 1 = right coin counter */
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);

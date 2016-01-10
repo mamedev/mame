@@ -1130,8 +1130,8 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 			m_sprites->set_flip(data & 0x40);
 			if (!m_disable_screen_blanking)
 				m_segaic16vid->set_display_enable(data & 0x20);
-			set_led_status(machine(), 1, data & 0x08);
-			set_led_status(machine(), 0, data & 0x04);
+			machine().output().set_led_value(1, data & 0x08);
+			machine().output().set_led_value(0, data & 0x04);
 			machine().bookkeeping().coin_counter_w(1, data & 0x02);
 			machine().bookkeeping().coin_counter_w(0, data & 0x01);
 			return;
@@ -1600,9 +1600,9 @@ WRITE16_MEMBER( segas16b_state::hwchamp_custom_io_w )
 					// bit 4 is GONG
 			//      if (data & 0x10) popmessage("GONG");
 					// are the following really lamps?
-			//      set_led_status(space.machine(), 1,data & 0x20);
-			//      set_led_status(space.machine(), 2,data & 0x40);
-			//      set_led_status(space.machine(), 3,data & 0x80);
+			//      space.machine().output().set_led_value(1,data & 0x20);
+			//      space.machine().output().set_led_value(2,data & 0x40);
+			//      space.machine().output().set_led_value(3,data & 0x80);
 					break;
 			}
 			break;

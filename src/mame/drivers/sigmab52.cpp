@@ -260,17 +260,17 @@ WRITE8_MEMBER(sigmab52_state::hopper_w)
 
 WRITE8_MEMBER(sigmab52_state::lamps1_w)
 {
-	output_set_lamp_value(offset, data & 1);
+	machine().output().set_lamp_value(offset, data & 1);
 }
 
 WRITE8_MEMBER(sigmab52_state::lamps2_w)
 {
-	output_set_lamp_value(6 + offset, data & 1);
+	machine().output().set_lamp_value(6 + offset, data & 1);
 }
 
 WRITE8_MEMBER(sigmab52_state::tower_lamps_w)
 {
-	output_set_indexed_value("towerlamp", offset, data & 1);
+	machine().output().set_indexed_value("towerlamp", offset, data & 1);
 }
 
 WRITE8_MEMBER(sigmab52_state::coin_enable_w)

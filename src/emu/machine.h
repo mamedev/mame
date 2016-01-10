@@ -88,6 +88,7 @@ class debug_view_manager;
 class network_manager;
 class bookkeeping_manager;
 class configuration_manager;
+class output_manager;
 class osd_interface;
 enum class config_type;
 
@@ -169,6 +170,7 @@ public:
 	network_manager &network() const { assert(m_network != nullptr); return *m_network; }
 	bookkeeping_manager &bookkeeping() const { assert(m_network != nullptr); return *m_bookkeeping; }
 	configuration_manager  &configuration() const { assert(m_configuration != nullptr); return *m_configuration; }
+	output_manager  &output() const { assert(m_output != nullptr); return *m_output; }
 	ui_manager &ui() const { assert(m_ui != nullptr); return *m_ui; }
 	tilemap_manager &tilemap() const { assert(m_tilemap != nullptr); return *m_tilemap; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != nullptr); return *m_debug_view; }
@@ -287,6 +289,7 @@ private:
 	std::unique_ptr<network_manager> m_network;        // internal data from network.c
 	std::unique_ptr<bookkeeping_manager> m_bookkeeping;// internal data from bookkeeping.c
 	std::unique_ptr<configuration_manager> m_configuration; // internal data from config.c
+	std::unique_ptr<output_manager> m_output;		   // internal data from output.c
 
 	// system state
 	machine_phase           m_current_phase;        // current execution phase

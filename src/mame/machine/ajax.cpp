@@ -79,14 +79,14 @@ WRITE8_MEMBER(ajax_state::ajax_bankswitch_w)
 
 WRITE8_MEMBER(ajax_state::ajax_lamps_w)
 {
-	set_led_status(machine(), 1, data & 0x02);  /* super weapon lamp */
-	set_led_status(machine(), 2, data & 0x04);  /* power up lamps */
-	set_led_status(machine(), 5, data & 0x04);  /* power up lamps */
-	set_led_status(machine(), 0, data & 0x20);  /* start lamp */
-	set_led_status(machine(), 3, data & 0x40);  /* game over lamps */
-	set_led_status(machine(), 6, data & 0x40);  /* game over lamps */
-	set_led_status(machine(), 4, data & 0x80);  /* game over lamps */
-	set_led_status(machine(), 7, data & 0x80);  /* game over lamps */
+	machine().output().set_led_value(1, data & 0x02);  /* super weapon lamp */
+	machine().output().set_led_value(2, data & 0x04);  /* power up lamps */
+	machine().output().set_led_value(5, data & 0x04);  /* power up lamps */
+	machine().output().set_led_value(0, data & 0x20);  /* start lamp */
+	machine().output().set_led_value(3, data & 0x40);  /* game over lamps */
+	machine().output().set_led_value(6, data & 0x40);  /* game over lamps */
+	machine().output().set_led_value(4, data & 0x80);  /* game over lamps */
+	machine().output().set_led_value(7, data & 0x80);  /* game over lamps */
 }
 
 /*  ajax_ls138_f10:

@@ -503,7 +503,7 @@ WRITE8_MEMBER(pacman_state::nmouse_interrupt_vector_w)
 
 WRITE8_MEMBER(pacman_state::pacman_leds_w)
 {
-	set_led_status(machine(), offset,data & 1);
+	machine().output().set_led_value(offset,data & 1);
 }
 
 

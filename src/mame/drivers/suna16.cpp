@@ -54,10 +54,10 @@ WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		set_led_status(machine(), 0, data & 0x01);
-		set_led_status(machine(), 1, data & 0x02);
-		set_led_status(machine(), 2, data & 0x04);
-		set_led_status(machine(), 3, data & 0x08);
+		machine().output().set_led_value(0, data & 0x01);
+		machine().output().set_led_value(1, data & 0x02);
+		machine().output().set_led_value(2, data & 0x04);
+		machine().output().set_led_value(3, data & 0x08);
 		machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	}
 	if (data & ~0x1f)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
@@ -69,8 +69,8 @@ WRITE16_MEMBER(suna16_state::uballoon_leds_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		set_led_status(machine(), 0, data & 0x02);
-		set_led_status(machine(), 1, data & 0x04);
+		machine().output().set_led_value(0, data & 0x02);
+		machine().output().set_led_value(1, data & 0x04);
 	}
 	if (data & ~0x07)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
 }

@@ -122,9 +122,9 @@ WRITE32_MEMBER(gunbustr_state::motor_control_w)
 {
 	// Standard value poked into MSW is 0x3c00
 	// (0x2000 and zero are written at startup)
-	output_set_value("Player1_Gun_Recoil", (data & 0x1000000) ? 1 : 0);
-	output_set_value("Player2_Gun_Recoil", (data & 0x10000) ? 1 : 0);
-	output_set_value("Hit_lamp", (data & 0x40000) ? 1 : 0);
+	machine().output().set_value("Player1_Gun_Recoil", (data & 0x1000000) ? 1 : 0);
+	machine().output().set_value("Player2_Gun_Recoil", (data & 0x10000) ? 1 : 0);
+	machine().output().set_value("Hit_lamp", (data & 0x40000) ? 1 : 0);
 }
 
 

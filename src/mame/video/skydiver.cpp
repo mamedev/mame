@@ -22,10 +22,10 @@ void skydiver_state::machine_reset()
 	lamp_k_w(space, 0, 0);
 	lamp_y_w(space, 0, 0);
 	lamp_d_w(space, 0, 0);
-	output_set_value("lampi", 0);
-	output_set_value("lampv", 0);
-	output_set_value("lampe", 0);
-	output_set_value("lampr", 0);
+	machine().output().set_value("lampi", 0);
+	machine().output().set_value("lampv", 0);
+	machine().output().set_value("lampe", 0);
+	machine().output().set_value("lampr", 0);
 	width_w(space, 0, 0);
 	coin_lockout_w(space, 0, 0);
 }
@@ -98,33 +98,33 @@ WRITE8_MEMBER(skydiver_state::coin_lockout_w)
 
 WRITE8_MEMBER(skydiver_state::start_lamp_1_w)
 {
-	set_led_status(machine(), 0, offset);
+	machine().output().set_led_value(0, offset);
 }
 
 WRITE8_MEMBER(skydiver_state::start_lamp_2_w)
 {
-	set_led_status(machine(), 1, offset);
+	machine().output().set_led_value(1, offset);
 }
 
 
 WRITE8_MEMBER(skydiver_state::lamp_s_w)
 {
-	output_set_value("lamps", offset);
+	machine().output().set_value("lamps", offset);
 }
 
 WRITE8_MEMBER(skydiver_state::lamp_k_w)
 {
-	output_set_value("lampk", offset);
+	machine().output().set_value("lampk", offset);
 }
 
 WRITE8_MEMBER(skydiver_state::lamp_y_w)
 {
-	output_set_value("lampy", offset);
+	machine().output().set_value("lampy", offset);
 }
 
 WRITE8_MEMBER(skydiver_state::lamp_d_w)
 {
-	output_set_value("lampd", offset);
+	machine().output().set_value("lampd", offset);
 }
 
 WRITE8_MEMBER(skydiver_state::_2000_201F_w)
@@ -136,16 +136,16 @@ WRITE8_MEMBER(skydiver_state::_2000_201F_w)
 	switch (offset & 0x0e)
 	{
 		case (0x02):
-			output_set_value("lampi", bit);
+			machine().output().set_value("lampi", bit);
 			break;
 		case (0x04):
-			output_set_value("lampv", bit);
+			machine().output().set_value("lampv", bit);
 			break;
 		case (0x06):
-			output_set_value("lampe", bit);
+			machine().output().set_value("lampe", bit);
 			break;
 		case (0x08):
-			output_set_value("lampr", bit);
+			machine().output().set_value("lampr", bit);
 			break;
 		case (0x0a):
 			m_discrete->write(space, SKYDIVER_OCT1_EN, bit);

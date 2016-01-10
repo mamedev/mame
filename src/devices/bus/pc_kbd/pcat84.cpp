@@ -580,9 +580,9 @@ WRITE8_MEMBER( ibm_pc_at_84_keyboard_device::p2_w )
 
 	*/
 
-	output_set_led_value(LED_SCROLL, BIT(data, 0));
-	output_set_led_value(LED_NUM, BIT(data, 1));
-	output_set_led_value(LED_CAPS, BIT(data, 2));
+	machine().output().set_led_value(LED_SCROLL, BIT(data, 0));
+	machine().output().set_led_value(LED_NUM, BIT(data, 1));
+	machine().output().set_led_value(LED_CAPS, BIT(data, 2));
 
 	m_pc_kbdc->data_write_from_kb(!BIT(data, 7));
 	m_pc_kbdc->clock_write_from_kb(!BIT(data, 6));

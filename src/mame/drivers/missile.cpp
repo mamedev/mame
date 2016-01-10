@@ -731,8 +731,8 @@ WRITE8_MEMBER(missile_state::missile_w)
 		machine().bookkeeping().coin_counter_w(0, data & 0x20);
 		machine().bookkeeping().coin_counter_w(1, data & 0x10);
 		machine().bookkeeping().coin_counter_w(2, data & 0x08);
-		set_led_status(machine(), 1, ~data & 0x04);
-		set_led_status(machine(), 0, ~data & 0x02);
+		machine().output().set_led_value(1, ~data & 0x04);
+		machine().output().set_led_value(0, ~data & 0x02);
 		m_ctrld = data & 1;
 	}
 

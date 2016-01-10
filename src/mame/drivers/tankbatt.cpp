@@ -72,7 +72,7 @@ void tankbatt_state::machine_start()
 
 WRITE8_MEMBER(tankbatt_state::led_w)
 {
-	set_led_status(machine(), offset,data & 1);
+	machine().output().set_led_value(offset,data & 1);
 }
 
 READ8_MEMBER(tankbatt_state::in0_r)

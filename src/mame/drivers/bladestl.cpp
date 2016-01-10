@@ -69,8 +69,8 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
 	/* bits 2 & 3 = lamps */
-	set_led_status(machine(), 0,data & 0x04);
-	set_led_status(machine(), 1,data & 0x08);
+	machine().output().set_led_value(0,data & 0x04);
+	machine().output().set_led_value(1,data & 0x08);
 
 	/* bit 4 = relay (???) */
 

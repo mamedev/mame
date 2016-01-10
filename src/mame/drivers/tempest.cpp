@@ -399,8 +399,8 @@ READ8_MEMBER(tempest_state::input_port_2_bit_r)
 
 WRITE8_MEMBER(tempest_state::tempest_led_w)
 {
-	set_led_status(machine(), 0, ~data & 0x02);
-	set_led_status(machine(), 1, ~data & 0x01);
+	machine().output().set_led_value(0, ~data & 0x02);
+	machine().output().set_led_value(1, ~data & 0x01);
 	/* FLIP is bit 0x04 */
 	m_player_select = data & 0x04;
 }

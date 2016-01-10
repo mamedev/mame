@@ -597,7 +597,7 @@ WRITE8_MEMBER( nb1413m3_device::outcoin_w )
 			break;
 	}
 
-	set_led_status(space.machine(), 2, m_outcoin_flag);      // out coin
+	space.machine().output().set_led_value(2, m_outcoin_flag);      // out coin
 }
 
 WRITE8_MEMBER( nb1413m3_device::vcrctrl_w )
@@ -605,11 +605,11 @@ WRITE8_MEMBER( nb1413m3_device::vcrctrl_w )
 	if (data & 0x08)
 	{
 		popmessage(" ** VCR CONTROL ** ");
-		set_led_status(space.machine(), 2, 1);
+		space.machine().output().set_led_value(2, 1);
 	}
 	else
 	{
-		set_led_status(space.machine(), 2, 0);
+		space.machine().output().set_led_value(2, 0);
 	}
 }
 

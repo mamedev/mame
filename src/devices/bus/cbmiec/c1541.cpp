@@ -722,7 +722,7 @@ WRITE8_MEMBER( c1541_base_t::via1_pb_w )
 	m_ga->stp_w(data & 0x03);
 
 	// activity LED
-	output_set_led_value(LED_ACT, BIT(data, 3));
+	machine().output().set_led_value(LED_ACT, BIT(data, 3));
 
 	// density select
 	m_ga->ds_w((data >> 5) & 0x03);

@@ -190,14 +190,14 @@ public:
 		{
 			char temp[32];
 			sprintf(temp, "molea_%d", i);
-			output_set_value(temp, mole_state_a[i]);
+			machine().output().set_value(temp, mole_state_a[i]);
 		}
 
 		for (int i = 0; i < 6; i++)
 		{
 			char temp[32];
 			sprintf(temp, "moleb_%d", i);
-			output_set_value(temp, mole_state_b[i]);
+			machine().output().set_value(temp, mole_state_b[i]);
 		}
 	}
 
@@ -260,7 +260,7 @@ public:
 void kenseim_state::set_leds(UINT32 ledstates)
 {
 	for (int i=0; i<20; i++)
-		output_set_lamp_value(i+1, ((ledstates & (1 << i)) != 0));
+		machine().output().set_lamp_value(i+1, ((ledstates & (1 << i)) != 0));
 }
 
 // could be wrong
@@ -354,8 +354,8 @@ WRITE8_MEMBER(kenseim_state::cpu_portc_w)
 	// d7: right start button lamp
 	machine().bookkeeping().coin_lockout_w(0, (data & 0x10) ? 0 : 1); // toggles if you attempt to insert a coin when there are already 15 coins inserted
 	machine().bookkeeping().coin_counter_w(0, (data & 0x20) ? 0 : 1);
-	output_set_value("startlamp1", (data & 0x80) ? 0 : 1);
-	output_set_value("startlamp2", (data & 0x40) ? 0 : 1);
+	machine().output().set_value("startlamp1", (data & 0x80) ? 0 : 1);
+	machine().output().set_value("startlamp2", (data & 0x40) ? 0 : 1);
 }
 
 

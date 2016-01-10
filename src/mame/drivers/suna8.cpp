@@ -708,8 +708,8 @@ WRITE8_MEMBER(suna8_state::brickzn_rombank_w)
 */
 WRITE8_MEMBER(suna8_state::brickzn_leds_w)
 {
-	set_led_status(machine(), 0, data & 0x01);
-	set_led_status(machine(), 1, data & 0x02);
+	machine().output().set_led_value(0, data & 0x01);
+	machine().output().set_led_value(1, data & 0x02);
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 
 	logerror("CPU #0 - PC %04X: leds = %02X\n",space.device().safe_pc(),data);
@@ -918,8 +918,8 @@ WRITE8_MEMBER(suna8_state::hardhea2_flipscreen_w)
 
 WRITE8_MEMBER(suna8_state::hardhea2_leds_w)
 {
-	set_led_status(machine(), 0, data & 0x01);
-	set_led_status(machine(), 1, data & 0x02);
+	machine().output().set_led_value(0, data & 0x01);
+	machine().output().set_led_value(1, data & 0x02);
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 	if (data & ~0x07)   logerror("CPU #0 - PC %04X: unknown leds bits: %02X\n",space.device().safe_pc(),data);
 }
@@ -1074,8 +1074,8 @@ WRITE8_MEMBER(suna8_state::starfigh_spritebank_w)
 */
 WRITE8_MEMBER(suna8_state::starfigh_leds_w)
 {
-	set_led_status(machine(), 0,     data & 0x01);
-	set_led_status(machine(), 1,     data & 0x02);
+	machine().output().set_led_value(0,     data & 0x01);
+	machine().output().set_led_value(1,     data & 0x02);
 	machine().bookkeeping().coin_counter_w(0,     data & 0x04);
 	m_gfxbank       =               (data & 0x08) ? 4 : 0;
 	if (data & ~0x0f)   logerror("CPU #0 - PC %04X: unknown leds bits: %02X\n",space.device().safe_pc(),data);
@@ -1188,8 +1188,8 @@ WRITE8_MEMBER(suna8_state::suna8_wram_w)
 */
 WRITE8_MEMBER(suna8_state::sparkman_rombank_w)
 {
-	set_led_status(machine(), 0,     data & 0x01);
-	set_led_status(machine(), 1,     data & 0x02);
+	machine().output().set_led_value(0,     data & 0x01);
+	machine().output().set_led_value(1,     data & 0x02);
 
 	if (data & ~0x03)   logerror("CPU #0 - PC %04X: unknown leds bits: %02X\n",space.device().safe_pc(),data);
 

@@ -418,9 +418,9 @@ WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
 
 WRITE8_MEMBER( segas18_state::lghost_gun_recoil_w )
 {
-	output_set_value("P1_Gun_Recoil", (~data & 0x01));
-	output_set_value("P2_Gun_Recoil", (~data & 0x02)>>1);
-	output_set_value("P3_Gun_Recoil", (~data & 0x04)>>2);
+	machine().output().set_value("P1_Gun_Recoil", (~data & 0x01));
+	machine().output().set_value("P2_Gun_Recoil", (~data & 0x02)>>1);
+	machine().output().set_value("P3_Gun_Recoil", (~data & 0x04)>>2);
 }
 
 

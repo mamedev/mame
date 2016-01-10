@@ -124,20 +124,20 @@ WRITE8_MEMBER(kungfur_state::kungfur_output_w)
 	{
 		int offs = i << 3 | (data & 7);
 		if (lut_digits[offs])
-			output_set_digit_value(lut_digits[offs] - 1, m_latch[i]);
+			machine().output().set_digit_value(lut_digits[offs] - 1, m_latch[i]);
 	}
 
 	// 2.6 goes to level lamps
 	if ((data & 7) == 6)
 	{
 		for (int i = 0; i < 5; i++)
-			output_set_lamp_value(i, m_latch[2] >> i & 1);
+			machine().output().set_lamp_value(i, m_latch[2] >> i & 1);
 	}
 
 	// d7: game-over lamp, d3-d4: marquee lamps
-	output_set_lamp_value(5, data >> 7 & 1);
-	output_set_lamp_value(6, data >> 3 & 1);
-	output_set_lamp_value(7, data >> 4 & 1);
+	machine().output().set_lamp_value(5, data >> 7 & 1);
+	machine().output().set_lamp_value(6, data >> 3 & 1);
+	machine().output().set_lamp_value(7, data >> 4 & 1);
 
 	// d5: N/C?
 	// d6: coincounter

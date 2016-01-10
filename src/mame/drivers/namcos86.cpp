@@ -280,8 +280,8 @@ WRITE8_MEMBER(namcos86_state::coin_w)
 
 WRITE8_MEMBER(namcos86_state::led_w)
 {
-	set_led_status(machine(), 0,data & 0x08);
-	set_led_status(machine(), 1,data & 0x10);
+	machine().output().set_led_value(0,data & 0x08);
+	machine().output().set_led_value(1,data & 0x10);
 }
 
 

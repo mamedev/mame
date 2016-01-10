@@ -209,17 +209,17 @@ public:
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(serve_cb)
 	{
-		output_set_value("serve_led", (data < 3.5) ? 1 : 0);
+		machine().output().set_value("serve_led", (data < 3.5) ? 1 : 0);
 	}
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(credit1_cb)
 	{
-		output_set_value("lamp_credit1", (data < 2.0) ? 0 : 1);
+		machine().output().set_value("lamp_credit1", (data < 2.0) ? 0 : 1);
 	}
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(credit2_cb)
 	{
-		output_set_value("lamp_credit2", (data < 2.0) ? 0 : 1);
+		machine().output().set_value("lamp_credit2", (data < 2.0) ? 0 : 1);
 	}
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(coin_counter_cb)

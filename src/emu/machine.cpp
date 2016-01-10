@@ -218,7 +218,7 @@ void running_machine::start()
 	// initialize basic can't-fail systems here
 	m_configuration = std::make_unique<configuration_manager>(*this);
 	m_input = std::make_unique<input_manager>(*this);
-	output_init(*this);
+	m_output = std::make_unique<output_manager>(*this);
 	m_render = std::make_unique<render_manager>(*this);
 	m_bookkeeping = std::make_unique<bookkeeping_manager>(*this);
 

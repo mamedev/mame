@@ -158,7 +158,7 @@ WRITE8_MEMBER(starshp1_state::starshp1_misc_w)
 		m_mux = data;
 		break;
 	case 7:
-		set_led_status(machine(), 0, !data);
+		machine().output().set_led_value(0, !data);
 		break;
 	}
 }

@@ -164,7 +164,7 @@ video_manager::video_manager(running_machine &machine)
 	{
 		m_screenless_frame_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(video_manager::screenless_update_callback), this));
 		m_screenless_frame_timer->adjust(screen_device::DEFAULT_FRAME_PERIOD, 0, screen_device::DEFAULT_FRAME_PERIOD);
-		output_set_notifier(nullptr, video_notifier_callback, this);
+		machine.output().set_notifier(nullptr, video_notifier_callback, this);
 	}
 }
 

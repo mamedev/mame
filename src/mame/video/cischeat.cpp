@@ -331,8 +331,8 @@ WRITE16_MEMBER(cischeat_state::bigrun_vregs_w)
 			{
 				machine().bookkeeping().coin_counter_w(0,new_data & 0x01);
 				machine().bookkeeping().coin_counter_w(1,new_data & 0x02);
-				set_led_status(machine(), 0,new_data & 0x10);   // start button
-				set_led_status(machine(), 1,new_data & 0x20);   // ?
+				machine().output().set_led_value(0,new_data & 0x10);   // start button
+				machine().output().set_led_value(1,new_data & 0x20);   // ?
 			}
 			break;
 
@@ -341,7 +341,7 @@ WRITE16_MEMBER(cischeat_state::bigrun_vregs_w)
 
 		case 0x0004/2   :   // motor (seat?)
 			if (ACCESSING_BITS_0_7)
-				set_led_status(machine(), 2, (new_data != old_data) ? 1 : 0);
+				machine().output().set_led_value(2, (new_data != old_data) ? 1 : 0);
 			break;
 
 		case 0x0006/2   :   // motor (wheel?)
@@ -424,8 +424,8 @@ WRITE16_MEMBER(cischeat_state::cischeat_vregs_w)
 			{
 				machine().bookkeeping().coin_counter_w(0,new_data & 0x01);
 				machine().bookkeeping().coin_counter_w(1,new_data & 0x02);
-				set_led_status(machine(), 0,new_data & 0x10);   // start button
-				set_led_status(machine(), 1,new_data & 0x20);   // ?
+				machine().output().set_led_value(0,new_data & 0x10);   // start button
+				machine().output().set_led_value(1,new_data & 0x20);   // ?
 			}
 			break;
 
@@ -434,7 +434,7 @@ WRITE16_MEMBER(cischeat_state::cischeat_vregs_w)
 
 		case 0x0004/2   :   // motor (seat?)
 			if (ACCESSING_BITS_0_7)
-				set_led_status(machine(), 2, (new_data != old_data) ? 1 : 0);
+				machine().output().set_led_value(2, (new_data != old_data) ? 1 : 0);
 			break;
 
 		case 0x0006/2   :   // motor (wheel?)
@@ -565,10 +565,10 @@ CPU #0 PC 00235C : Warning, vreg 0006 <- 0000
 			{
 				machine().bookkeeping().coin_counter_w(0,new_data & 0x01);
 				machine().bookkeeping().coin_counter_w(1,new_data & 0x02);
-				set_led_status(machine(), 0,new_data & 0x04);   // start button
-				set_led_status(machine(), 1,new_data & 0x20);   // ?
+				machine().output().set_led_value(0,new_data & 0x04);   // start button
+				machine().output().set_led_value(1,new_data & 0x20);   // ?
 				// wheel | seat motor
-				set_led_status(machine(), 2, ((new_data >> 3) | (new_data >> 4)) & 1 );
+				machine().output().set_led_value(2, ((new_data >> 3) | (new_data >> 4)) & 1 );
 			}
 			break;
 		case 0x0014/2   :   break;

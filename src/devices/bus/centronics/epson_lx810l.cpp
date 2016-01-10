@@ -502,7 +502,7 @@ WRITE8_MEMBER( epson_lx810l_t::portc_w )
 	m_eeprom->clk_write(m_93c06_clk ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->cs_write (m_93c06_cs  ? ASSERT_LINE : CLEAR_LINE);
 
-	output_set_value("online_led", !BIT(data, 2));
+	machine().output().set_value("online_led", !BIT(data, 2));
 }
 
 

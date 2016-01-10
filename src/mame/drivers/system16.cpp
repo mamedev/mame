@@ -165,8 +165,8 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_coinctrl_w)
 	{
 		m_coinctrl = data & 0xff;
 		m_refreshenable = m_coinctrl & 0x20;
-		set_led_status(machine(), 1, m_coinctrl & 0x08);
-		set_led_status(machine(), 0, m_coinctrl & 0x04);
+		machine().output().set_led_value(1, m_coinctrl & 0x08);
+		machine().output().set_led_value(0, m_coinctrl & 0x04);
 		machine().bookkeeping().coin_counter_w(1, m_coinctrl & 0x02);
 		machine().bookkeeping().coin_counter_w(0, m_coinctrl & 0x01);
 		/* bit 6 is also used (1 most of the time; 0 in dduxbl, sdi, wb3;

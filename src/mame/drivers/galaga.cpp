@@ -783,8 +783,8 @@ CUSTOM_INPUT_MEMBER(digdug_state::shifted_port_r){ return ioport((const char *)p
 
 WRITE8_MEMBER(galaga_state::out_0)
 {
-	set_led_status(machine(), 1,data & 1);
-	set_led_status(machine(), 0,data & 2);
+	machine().output().set_led_value(1,data & 1);
+	machine().output().set_led_value(0,data & 2);
 	machine().bookkeeping().coin_counter_w(1,~data & 4);
 	machine().bookkeeping().coin_counter_w(0,~data & 8);
 }

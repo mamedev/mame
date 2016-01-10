@@ -536,17 +536,17 @@ WRITE8_MEMBER( gp_2_state::porta_w )
 	else
 	if (m_u14 == 7)
 	{
-		output_set_digit_value(m_digit, patterns[m_segment[7]]);
-		output_set_digit_value(m_digit+8, patterns[m_segment[8]]);
-		output_set_digit_value(m_digit+16, patterns[m_segment[9]]);
-		output_set_digit_value(m_digit+24, patterns[m_segment[10]]);
-		output_set_digit_value(m_digit+32, patterns[m_segment[11]]);
+		machine().output().set_digit_value(m_digit, patterns[m_segment[7]]);
+		machine().output().set_digit_value(m_digit+8, patterns[m_segment[8]]);
+		machine().output().set_digit_value(m_digit+16, patterns[m_segment[9]]);
+		machine().output().set_digit_value(m_digit+24, patterns[m_segment[10]]);
+		machine().output().set_digit_value(m_digit+32, patterns[m_segment[11]]);
 	}
 }
 
 WRITE8_MEMBER( gp_2_state::portc_w )
 {
-	output_set_value("led0", !BIT(data, 3));
+	machine().output().set_value("led0", !BIT(data, 3));
 	m_digit = data & 7;
 }
 

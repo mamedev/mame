@@ -179,7 +179,7 @@ void esqvfd_t::update_display()
 					segdata |= 0x0008;
 				}
 
-				output_set_indexed_value("vfd", (row*m_cols) + col, segdata);
+				machine().output().set_indexed_value("vfd", (row*m_cols) + col, segdata);
 
 				m_dirty[row][col] = 0;
 			}

@@ -197,7 +197,7 @@ void rocvfd_t::update_display()
 	for (int i =0; i<16; i++)
 	{
 		m_outputs[i] = set_display(m_chars[i]);
-		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
+		machine().output().set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
 	}
 }
 

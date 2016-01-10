@@ -717,7 +717,7 @@ WRITE8_MEMBER(galaxian_state::start_lamp_w)
 {
 	/* offset 0 = 1P START LAMP */
 	/* offset 1 = 2P START LAMP */
-	set_led_status(machine(), offset, data & 1);
+	machine().output().set_led_value(offset, data & 1);
 }
 
 

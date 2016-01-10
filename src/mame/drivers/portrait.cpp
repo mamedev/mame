@@ -100,11 +100,11 @@ WRITE8_MEMBER(portrait_state::ctrl_w)
 	machine().bookkeeping().coin_counter_w(2, data & 0x04);
 
 	/* the 2 lamps near the camera */
-	set_led_status(machine(), 0, data & 0x08);
-	set_led_status(machine(), 1, data & 0x40);
+	machine().output().set_led_value(0, data & 0x08);
+	machine().output().set_led_value(1, data & 0x40);
 
 	/* shows the black and white photo from the camera */
-	output_set_value("photo", (data >> 7) & 1);
+	machine().output().set_value("photo", (data >> 7) & 1);
 }
 
 WRITE8_MEMBER(portrait_state::positive_scroll_w)

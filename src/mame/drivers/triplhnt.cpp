@@ -60,7 +60,7 @@ void triplhnt_state::triplhnt_update_misc(address_space &space, int offset)
 	m_sprite_zoom = (m_misc_flags >> 4) & 1;
 	m_sprite_bank = (m_misc_flags >> 7) & 1;
 
-	set_led_status(machine(), 0, m_misc_flags & 0x02);
+	machine().output().set_led_value(0, m_misc_flags & 0x02);
 
 	machine().bookkeeping().coin_lockout_w(0, !(m_misc_flags & 0x08));
 	machine().bookkeeping().coin_lockout_w(1, !(m_misc_flags & 0x08));

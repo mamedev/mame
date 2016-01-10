@@ -968,7 +968,7 @@ READ8_MEMBER(dynax_state::jantouki_blitter_busy_r)
 WRITE8_MEMBER(dynax_state::jantouki_rombank_w)
 {
 	membank("bank1")->set_entry(data & 0x0f);
-	set_led_status(machine(), 0, data & 0x10);  // maybe
+	machine().output().set_led_value(0, data & 0x10);  // maybe
 }
 
 static ADDRESS_MAP_START( jantouki_io_map, AS_IO, 8, dynax_state )

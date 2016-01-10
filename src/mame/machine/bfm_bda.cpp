@@ -153,7 +153,7 @@ void bfm_bda_t::device_post_load()
 {
 	for (int i =0; i<16; i++)
 	{
-		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
+		machine().output().set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
 	}
 }
 
@@ -169,7 +169,7 @@ void bfm_bda_t::update_display()
 		{
 			m_outputs[i] = 0;
 		}
-		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
+		machine().output().set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
 	}
 }
 ///////////////////////////////////////////////////////////////////////////

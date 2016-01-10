@@ -397,7 +397,7 @@ WRITE8_MEMBER(igs009_state::nmi_and_coins_w)
 	machine().bookkeeping().coin_counter_w(2,        data & 0x08);   // key in
 	machine().bookkeeping().coin_counter_w(3,        data & 0x10);   // coin m_out mech
 
-	set_led_status(machine(), 6,        data & 0x40);   // led for coin m_out / m_hopper active
+	machine().output().set_led_value(6,        data & 0x40);   // led for coin m_out / m_hopper active
 
 	m_nmi_enable = data;    //  data & 0x80     // nmi enable?
 
@@ -407,8 +407,8 @@ WRITE8_MEMBER(igs009_state::nmi_and_coins_w)
 
 WRITE8_MEMBER(igs009_state::video_and_leds_w)
 {
-	set_led_status(machine(), 4,      data & 0x01); // start?
-	set_led_status(machine(), 5,      data & 0x04); // l_bet?
+	machine().output().set_led_value(4,      data & 0x01); // start?
+	machine().output().set_led_value(5,      data & 0x04); // l_bet?
 
 	m_video_enable  =     data & 0x40;
 	m_hopper            =   (~data)& 0x80;
@@ -419,10 +419,10 @@ WRITE8_MEMBER(igs009_state::video_and_leds_w)
 
 WRITE8_MEMBER(igs009_state::leds_w)
 {
-	set_led_status(machine(), 0, data & 0x01);  // stop_1
-	set_led_status(machine(), 1, data & 0x02);  // stop_2
-	set_led_status(machine(), 2, data & 0x04);  // stop_3
-	set_led_status(machine(), 3, data & 0x08);  // stop
+	machine().output().set_led_value(0, data & 0x01);  // stop_1
+	machine().output().set_led_value(1, data & 0x02);  // stop_2
+	machine().output().set_led_value(2, data & 0x04);  // stop_3
+	machine().output().set_led_value(3, data & 0x08);  // stop
 	// data & 0x10?
 
 	m_out[2] = data;
