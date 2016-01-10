@@ -335,7 +335,7 @@ WRITE8_MEMBER(merit_state::led2_w)
 	set_led_status(machine(), 9,~data & 0x10);
 
 	/* coin counter */
-	coin_counter_w(machine(),0,0x80-(data & 0x80));
+	machine().bookkeeping().coin_counter_w(0,0x80-(data & 0x80));
 }
 
 WRITE8_MEMBER(merit_state::misc_w)

@@ -345,8 +345,8 @@ WRITE8_MEMBER(kas89_state::control_w)
 
 	m_main_nmi_enable = data & 0x40;
 
-	coin_counter_w(machine(), 0, (data ^ 0xff) & 0x01); /* Credits In counter */
-	coin_counter_w(machine(), 1, (data ^ 0xff) & 0x02); /* Credits Out counter */
+	machine().bookkeeping().coin_counter_w(0, (data ^ 0xff) & 0x01); /* Credits In counter */
+	machine().bookkeeping().coin_counter_w(1, (data ^ 0xff) & 0x02); /* Credits Out counter */
 }
 
 WRITE8_MEMBER(kas89_state::sound_comm_w)

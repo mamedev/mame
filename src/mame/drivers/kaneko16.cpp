@@ -139,10 +139,10 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_coin_lockout_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0,   data  & 0x0100);
-		coin_counter_w(machine(), 1,   data  & 0x0200);
-		coin_lockout_w(machine(), 0, (~data) & 0x0400 );
-		coin_lockout_w(machine(), 1, (~data) & 0x0800 );
+		machine().bookkeeping().coin_counter_w(0,   data  & 0x0100);
+		machine().bookkeeping().coin_counter_w(1,   data  & 0x0200);
+		machine().bookkeeping().coin_lockout_w(0, (~data) & 0x0400 );
+		machine().bookkeeping().coin_lockout_w(1, (~data) & 0x0800 );
 	}
 }
 
@@ -218,10 +218,10 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_eeprom_w)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x0100);
-		coin_counter_w(machine(), 1, data & 0x0200);
-		coin_lockout_w(machine(), 0, data & 0x8000);
-		coin_lockout_w(machine(), 1, data & 0x8000);
+		machine().bookkeeping().coin_counter_w(0, data & 0x0100);
+		machine().bookkeeping().coin_counter_w(1, data & 0x0200);
+		machine().bookkeeping().coin_lockout_w(0, data & 0x8000);
+		machine().bookkeeping().coin_lockout_w(1, data & 0x8000);
 	}
 }
 
@@ -418,10 +418,10 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_coin_lockout_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x0100);
-		coin_counter_w(machine(), 1, data & 0x0200);
-		coin_lockout_w(machine(), 0, data & 0x8000);
-		coin_lockout_w(machine(), 1, data & 0x8000);
+		machine().bookkeeping().coin_counter_w(0, data & 0x0100);
+		machine().bookkeeping().coin_counter_w(1, data & 0x0200);
+		machine().bookkeeping().coin_lockout_w(0, data & 0x8000);
+		machine().bookkeeping().coin_lockout_w(1, data & 0x8000);
 	}
 }
 

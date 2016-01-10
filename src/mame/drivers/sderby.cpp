@@ -206,7 +206,7 @@ WRITE16_MEMBER(sderby_state::sderby_out_w)
 	output_set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - BET */
 	output_set_lamp_value(3, (data >> 15) & 1);     /* Lamp 3 - END OF RACE */
 
-	coin_counter_w(machine(), 0, data & 0x2000);
+	machine().bookkeeping().coin_counter_w(0, data & 0x2000);
 }
 
 
@@ -255,7 +255,7 @@ WRITE16_MEMBER(sderby_state::scmatto_out_w)
 	output_set_lamp_value(6, (data >> 5) & 1);      /* Lamp 6 - START  */
 	output_set_lamp_value(7, (data >> 6) & 1);      /* Lamp 7 - BET    */
 
-	coin_counter_w(machine(), 0, data & 0x2000);
+	machine().bookkeeping().coin_counter_w(0, data & 0x2000);
 }
 
 

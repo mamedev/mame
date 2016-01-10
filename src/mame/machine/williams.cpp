@@ -628,7 +628,7 @@ WRITE8_MEMBER(blaster_state::blaster_snd_cmd_w)
 
 WRITE_LINE_MEMBER(williams_state::lottofun_coin_lock_w)
 {
-	coin_lockout_global_w(machine(), state & 1); /* bit 5 of PIC control port A */
+	machine().bookkeeping().coin_lockout_global_w(state & 1); /* bit 5 of PIC control port A */
 }
 
 

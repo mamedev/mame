@@ -87,23 +87,23 @@ MACHINE_RESET_MEMBER(galaxold_state,hunchbkg)
 
 WRITE8_MEMBER(galaxold_state::galaxold_coin_lockout_w)
 {
-	coin_lockout_global_w(machine(), ~data & 1);
+	machine().bookkeeping().coin_lockout_global_w(~data & 1);
 }
 
 
 WRITE8_MEMBER(galaxold_state::galaxold_coin_counter_w)
 {
-	coin_counter_w(machine(), offset, data & 0x01);
+	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 }
 
 WRITE8_MEMBER(galaxold_state::galaxold_coin_counter_1_w)
 {
-	coin_counter_w(machine(), 1, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x01);
 }
 
 WRITE8_MEMBER(galaxold_state::galaxold_coin_counter_2_w)
 {
-	coin_counter_w(machine(), 2, data & 0x01);
+	machine().bookkeeping().coin_counter_w(2, data & 0x01);
 }
 
 

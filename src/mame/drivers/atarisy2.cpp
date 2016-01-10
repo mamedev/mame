@@ -736,8 +736,8 @@ WRITE8_MEMBER(atarisy2_state::tms5220_strobe_w)
 
 WRITE8_MEMBER(atarisy2_state::coincount_w)
 {
-	coin_counter_w(machine(), 0, (data >> 0) & 1);
-	coin_counter_w(machine(), 1, (data >> 1) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
+	machine().bookkeeping().coin_counter_w(1, (data >> 1) & 1);
 }
 
 

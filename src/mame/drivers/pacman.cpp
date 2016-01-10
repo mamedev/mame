@@ -509,13 +509,13 @@ WRITE8_MEMBER(pacman_state::pacman_leds_w)
 
 WRITE8_MEMBER(pacman_state::pacman_coin_counter_w)
 {
-	coin_counter_w(machine(), offset,data & 1);
+	machine().bookkeeping().coin_counter_w(offset,data & 1);
 }
 
 
 WRITE8_MEMBER(pacman_state::pacman_coin_lockout_global_w)
 {
-	coin_lockout_global_w(machine(), ~data & 0x01);
+	machine().bookkeeping().coin_lockout_global_w(~data & 0x01);
 }
 
 

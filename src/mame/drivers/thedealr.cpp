@@ -164,10 +164,10 @@ WRITE8_MEMBER(thedealr_state::iox_w)
 
 			case 0x40:  // coin counters
 				m_iox_coins = data;
-				coin_counter_w(machine(), 0, (~data) & 0x02); // coin1 or service coin
-				coin_counter_w(machine(), 1, (~data) & 0x04); // coupon
-				coin_counter_w(machine(), 2, (~data) & 0x08); // service coin
-				coin_counter_w(machine(), 3, (~data) & 0x10); // coin-out
+				machine().bookkeeping().coin_counter_w(0, (~data) & 0x02); // coin1 or service coin
+				machine().bookkeeping().coin_counter_w(1, (~data) & 0x04); // coupon
+				machine().bookkeeping().coin_counter_w(2, (~data) & 0x08); // service coin
+				machine().bookkeeping().coin_counter_w(3, (~data) & 0x10); // coin-out
 				if ((~data) & 0xe1)
 					logerror("%s: unknown bits written to command %02X: %02X\n", machine().describe_context(), m_iox_cmd, data);
 				break;

@@ -95,9 +95,9 @@ WRITE8_MEMBER(portrait_state::ctrl_w)
 {
 	/* bits 4 and 5 are unknown */
 
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
-	coin_counter_w(machine(), 2, data & 0x04);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(2, data & 0x04);
 
 	/* the 2 lamps near the camera */
 	set_led_status(machine(), 0, data & 0x08);

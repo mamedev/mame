@@ -180,12 +180,12 @@ READ8_MEMBER(ojankohs_state::ccasino_dipsw4_r)
 
 WRITE8_MEMBER(ojankohs_state::ojankoy_coinctr_w)
 {
-	coin_counter_w(machine(), 0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
 WRITE8_MEMBER(ojankohs_state::ccasino_coinctr_w)
 {
-	coin_counter_w(machine(), 0, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
 }
 
 

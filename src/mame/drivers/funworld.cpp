@@ -1022,8 +1022,8 @@ WRITE8_MEMBER(funworld_state::funworld_lamp_a_w)
 	output_set_lamp_value(3, (data >> 7) & 1);      /* Hold4 / High */
 	output_set_lamp_value(5, 1-((data >> 5) & 1));  /* Cancel / Collect (inverted) */
 
-	coin_counter_w(machine(), 0, data & 0x01);  /* Credit In counter */
-	coin_counter_w(machine(), 7, data & 0x04);  /* Credit Out counter, mapped as coin 8 */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);  /* Credit In counter */
+	machine().bookkeeping().coin_counter_w(7, data & 0x04);  /* Credit Out counter, mapped as coin 8 */
 
 	output_set_lamp_value(7, 1-((data >> 6) & 1));      /* Hopper Motor (inverted) */
 

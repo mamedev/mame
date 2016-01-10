@@ -491,8 +491,8 @@ WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x0040);
-		coin_counter_w(machine(), 1, data & 0x0080);
+		machine().bookkeeping().coin_counter_w(0, data & 0x0040);
+		machine().bookkeeping().coin_counter_w(1, data & 0x0080);
 	}
 }
 
@@ -525,9 +525,9 @@ WRITE16_MEMBER(cischeat_state::captflag_leds_w)
 	COMBINE_DATA( &m_captflag_leds );
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 1, data & 0x0100);    // coin 2
+		machine().bookkeeping().coin_counter_w(1, data & 0x0100);    // coin 2
 		set_led_status(machine(), 0, data & 0x0200);    // decide
-		coin_counter_w(machine(), 0, data & 0x0400);    // coin 1
+		machine().bookkeeping().coin_counter_w(0, data & 0x0400);    // coin 1
 		set_led_status(machine(), 1, data & 0x2000);    // select
 
 		int power = (data & 0x1000);

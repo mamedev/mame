@@ -223,9 +223,9 @@ WRITE16_MEMBER(astrocorp_state::showhand_outputs_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0,    (data & 0x0004));   // coin counter
+		machine().bookkeeping().coin_counter_w(0,    (data & 0x0004));   // coin counter
 		set_led_status(machine(), 0,    (data & 0x0008));   // you win
-		if ((data & 0x0010)) increment_dispensed_tickets(machine(), 1); // coin out
+		if ((data & 0x0010)) machine().bookkeeping().increment_dispensed_tickets(1); // coin out
 		set_led_status(machine(), 1,    (data & 0x0020));   // coin/hopper jam
 	}
 	if (ACCESSING_BITS_8_15)
@@ -259,9 +259,9 @@ WRITE16_MEMBER(astrocorp_state::skilldrp_outputs_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0,    (data & 0x0001));   // key in  |
-		coin_counter_w(machine(), 0,    (data & 0x0002));   // coin in |- manual shows 1 in- and 1 out- counter
-		coin_counter_w(machine(), 1,    (data & 0x0004));   // key out |
+		machine().bookkeeping().coin_counter_w(0,    (data & 0x0001));   // key in  |
+		machine().bookkeeping().coin_counter_w(0,    (data & 0x0002));   // coin in |- manual shows 1 in- and 1 out- counter
+		machine().bookkeeping().coin_counter_w(1,    (data & 0x0004));   // key out |
 		machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x0008)<<4);   // hopper motor?
 		//                                  (data & 0x0010)     // hopper?
 		set_led_status(machine(), 0,    (data & 0x0020));   // error lamp (coin/hopper jam: "call attendant")

@@ -409,7 +409,7 @@ WRITE8_MEMBER(thayers_state::laserdsc_control_w)
 
 	*/
 
-	coin_counter_w(machine(), 0, BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
 
 	if (BIT(data, 5))
 	{

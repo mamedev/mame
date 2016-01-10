@@ -86,12 +86,12 @@ class ui_manager;
 class tilemap_manager;
 class debug_view_manager;
 class network_manager;
+class bookkeeping_manager;
 class osd_interface;
 
 struct romload_private;
 struct ui_input_private;
 struct debugcpu_private;
-struct generic_machine_private;
 
 
 // ======================> system_time
@@ -165,6 +165,7 @@ public:
 	sound_manager &sound() const { assert(m_sound != nullptr); return *m_sound; }
 	video_manager &video() const { assert(m_video != nullptr); return *m_video; }
 	network_manager &network() const { assert(m_network != nullptr); return *m_network; }
+	bookkeeping_manager &bookkeeping() const { assert(m_network != nullptr); return *m_bookkeeping; }
 	ui_manager &ui() const { assert(m_ui != nullptr); return *m_ui; }
 	tilemap_manager &tilemap() const { assert(m_tilemap != nullptr); return *m_tilemap; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != nullptr); return *m_debug_view; }
@@ -240,7 +241,6 @@ public:
 	romload_private *       romload_data;       // internal data from romload.c
 	ui_input_private *      ui_input_data;      // internal data from uiinput.c
 	debugcpu_private *      debugcpu_data;      // internal data from debugcpu.c
-	generic_machine_private *generic_machine_data; // internal data from machine/generic.c
 
 private:
 	// internal helpers
@@ -282,6 +282,7 @@ private:
 	std::unique_ptr<tilemap_manager> m_tilemap;        // internal data from tilemap.c
 	std::unique_ptr<debug_view_manager> m_debug_view;  // internal data from debugvw.c
 	std::unique_ptr<network_manager> m_network;        // internal data from network.c
+	std::unique_ptr<bookkeeping_manager> m_bookkeeping;// internal data from bookkeeping.c
 
 	// system state
 	machine_phase           m_current_phase;        // current execution phase

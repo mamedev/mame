@@ -231,7 +231,7 @@ ui_menu_bookkeeping::~ui_menu_bookkeeping()
 
 void ui_menu_bookkeeping::populate()
 {
-	int tickets = get_dispensed_tickets(machine());
+	int tickets = machine().bookkeeping().get_dispensed_tickets();
 	std::string tempstring;
 	int ctrnum;
 
@@ -248,7 +248,7 @@ void ui_menu_bookkeeping::populate()
 	/* loop over coin counters */
 	for (ctrnum = 0; ctrnum < COIN_COUNTERS; ctrnum++)
 	{
-		int count = coin_counter_get_count(machine(), ctrnum);
+		int count = machine().bookkeeping().coin_counter_get_count(ctrnum);
 
 		/* display the coin counter number */
 		strcatprintf(tempstring,"Coin %c: ", ctrnum + 'A');
@@ -260,7 +260,7 @@ void ui_menu_bookkeeping::populate()
 			strcatprintf(tempstring, "%d", count);
 
 		/* display whether or not we are locked out */
-		if (coin_lockout_get_state(machine(), ctrnum))
+		if (machine().bookkeeping().coin_lockout_get_state(ctrnum))
 			tempstring.append(" (locked)");
 		tempstring.append("\n");
 	}

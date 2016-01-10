@@ -713,10 +713,10 @@ WRITE8_MEMBER(majorpkr_state::pulses_w)
     ---x ----   Watchdog? (constant writes).
     xxx- ----   Unknown.
 */
-	coin_counter_w(machine(), 3, data & 0x01);      /* Credits Out (all) */
-	coin_counter_w(machine(), 2, data & 0x02);      /* Credits 3 */
-	coin_counter_w(machine(), 0, data & 0x04);      /* Credits 1 */
-	coin_counter_w(machine(), 1, data & 0x08);      /* Credits 2 */
+	machine().bookkeeping().coin_counter_w(3, data & 0x01);      /* Credits Out (all) */
+	machine().bookkeeping().coin_counter_w(2, data & 0x02);      /* Credits 3 */
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);      /* Credits 1 */
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);      /* Credits 2 */
 
 	if (data & 0xe0)
 		logerror("Pulse: Write to 10h: %02x\n", data);

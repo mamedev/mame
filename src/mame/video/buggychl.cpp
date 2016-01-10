@@ -63,7 +63,7 @@ WRITE8_MEMBER(buggychl_state::buggychl_ctrl_w)
 
 	m_sprite_color_base = (data & 0x10) ? 1 * 16 : 3 * 16;
 
-	coin_lockout_global_w(machine(), (~data & 0x40) >> 6);
+	machine().bookkeeping().coin_lockout_global_w((~data & 0x40) >> 6);
 	set_led_status(machine(), 0, ~data & 0x80);
 }
 

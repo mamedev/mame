@@ -193,7 +193,7 @@ WRITE8_MEMBER(sprint4_state::sprint4_lamp_w)
 #ifdef UNUSED_FUNCTION
 WRITE8_MEMBER(sprint4_state::sprint4_lockout_w)
 {
-	coin_lockout_global_w(machine(), ~offset & 1);
+	machine().bookkeeping().coin_lockout_global_w(~offset & 1);
 }
 #endif
 

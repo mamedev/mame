@@ -854,7 +854,7 @@ void segaxbd_state::generic_iochip0_lamps_w(UINT8 data)
 	// d4: coin counter
 	// d7: mute audio (always handled above)
 	// other bits: lamps
-	coin_counter_w(machine(), 0, (data >> 4) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 4) & 0x01);
 
 	//
 	//    aburner2:

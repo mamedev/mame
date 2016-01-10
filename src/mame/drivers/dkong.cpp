@@ -578,7 +578,7 @@ WRITE8_MEMBER(dkong_state::p8257_ctl_w)
 
 WRITE8_MEMBER(dkong_state::dkong3_coin_counter_w)
 {
-	coin_counter_w(machine(), offset, data & 0x01);
+	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 }
 
 WRITE8_MEMBER(dkong_state::p8257_drq_w)
@@ -596,7 +596,7 @@ READ8_MEMBER(dkong_state::dkong_in2_r)
 	UINT8 r;
 
 	r = (ioport("IN2")->read() & 0xBF) | (mcustatus << 6);
-	coin_counter_w(machine(), offset, r >> 7);
+	machine().bookkeeping().coin_counter_w(offset, r >> 7);
 	if (r & 0x10)
 		r = (r & ~0x10) | 0x80; /* service ==> coin */
 	return r;
@@ -609,7 +609,7 @@ READ8_MEMBER(dkong_state::dkongjr_in2_r)
 	UINT8 r;
 
 	r = (ioport("IN2")->read() & 0xBF) | 0x40;
-	coin_counter_w(machine(), offset, r >> 7);
+	machine().bookkeeping().coin_counter_w(offset, r >> 7);
 	if (r & 0x10)
 		r = (r & ~0x10) | 0x80; /* service ==> coin */
 	return r;

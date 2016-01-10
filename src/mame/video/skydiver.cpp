@@ -92,7 +92,7 @@ WRITE8_MEMBER(skydiver_state::width_w)
 
 WRITE8_MEMBER(skydiver_state::coin_lockout_w)
 {
-	coin_lockout_global_w(machine(), !offset);
+	machine().bookkeeping().coin_lockout_global_w(!offset);
 }
 
 

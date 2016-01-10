@@ -208,8 +208,8 @@ WRITE8_MEMBER(galivan_state::galivan_videoram_w)
 WRITE8_MEMBER(galivan_state::galivan_gfxbank_w)
 {
 	/* bits 0 and 1 coin counters */
-	coin_counter_w(machine(), 0,data & 1);
-	coin_counter_w(machine(), 1,data & 2);
+	machine().bookkeeping().coin_counter_w(0,data & 1);
+	machine().bookkeeping().coin_counter_w(1,data & 2);
 
 	/* bit 2 flip screen */
 	flip_screen_set(data & 0x04);
@@ -223,8 +223,8 @@ WRITE8_MEMBER(galivan_state::galivan_gfxbank_w)
 WRITE8_MEMBER(galivan_state::ninjemak_gfxbank_w)
 {
 	/* bits 0 and 1 coin counters */
-	coin_counter_w(machine(), 0,data & 1);
-	coin_counter_w(machine(), 1,data & 2);
+	machine().bookkeeping().coin_counter_w(0,data & 1);
+	machine().bookkeeping().coin_counter_w(1,data & 2);
 
 	/* bit 2 flip screen */
 	flip_screen_set(data & 0x04);

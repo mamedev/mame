@@ -483,7 +483,7 @@ WRITE8_MEMBER(mgames_state::outport5_w)
 
 WRITE8_MEMBER(mgames_state::outport6_w)
 {
-	coin_counter_w(machine(), 1, data & 0x02);  /* Payout pulse */
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);  /* Payout pulse */
 
 	m_output[6] = data;
 	popmessage("outport6 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -503,7 +503,7 @@ WRITE8_MEMBER(mgames_state::outport6_w)
 
 WRITE8_MEMBER(mgames_state::outport7_w)
 {
-	coin_counter_w(machine(), 0, data & 0x02);  /* Coin pulse */
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);  /* Coin pulse */
 
 	m_output[7] = data;
 	popmessage("outport7 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);

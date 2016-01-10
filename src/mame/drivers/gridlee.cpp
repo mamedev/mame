@@ -283,7 +283,7 @@ WRITE8_MEMBER(gridlee_state::led_1_w)
 
 WRITE8_MEMBER(gridlee_state::gridlee_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 	logerror("coin counter %s\n", (data & 1) ? "on" : "off");
 }
 

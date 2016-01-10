@@ -1965,7 +1965,7 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 	}
 
 	// skip locked-out coin inputs
-	if (curstate && m_type >= IPT_COIN1 && m_type <= IPT_COIN12 && coin_lockout_get_state(machine(), m_type - IPT_COIN1))
+	if (curstate && m_type >= IPT_COIN1 && m_type <= IPT_COIN12 && machine().bookkeeping().coin_lockout_get_state(m_type - IPT_COIN1))
 	{
 		bool verbose = machine().options().verbose();
 #ifdef MAME_DEBUG

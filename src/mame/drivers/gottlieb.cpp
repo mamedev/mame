@@ -311,7 +311,7 @@ WRITE8_MEMBER(gottlieb_state::general_output_w)
 		gottlieb_laserdisc_video_control_w(space, offset, data);
 
 	/* bit 4 normally controls the coin meter */
-	coin_counter_w(machine(), 0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 
 	/* bit 5 doesn't have a generic function */
 	/* bit 6 controls "COIN1"; it appears that no games used this */

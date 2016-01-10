@@ -165,7 +165,7 @@ WRITE8_MEMBER(cliffhgr_state::cliff_phillips_clear_w)
 
 WRITE8_MEMBER(cliffhgr_state::cliff_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, (data & 0x40) ? 1 : 0 );
+	machine().bookkeeping().coin_counter_w(0, (data & 0x40) ? 1 : 0 );
 }
 
 READ8_MEMBER(cliffhgr_state::cliff_irq_ack_r)

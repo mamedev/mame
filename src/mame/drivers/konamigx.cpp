@@ -475,8 +475,8 @@ WRITE32_MEMBER(konamigx_state::eeprom_w)
 
 		m_eepromout->write(odata, 0xff);
 
-		coin_counter_w(machine(), 0, odata & 0x08);
-		coin_counter_w(machine(), 1, odata & 0x10);
+		machine().bookkeeping().coin_counter_w(0, odata & 0x08);
+		machine().bookkeeping().coin_counter_w(1, odata & 0x10);
 
 		m_gx_wrport1_0 = odata;
 	}

@@ -295,8 +295,8 @@ WRITE8_MEMBER(turbo_state::subroc3d_ppi0b_w)
 	/* bit 2 = STLA (START LAMP) */
 	/* bit 3 = NOUSE (n/c) */
 	/* bit 4 = FLIP (not really flip, just offset) */
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	set_led_status(machine(), 0, data & 0x04);
 	m_subroc3d_flip = (data >> 4) & 1;
 }
@@ -342,8 +342,8 @@ WRITE8_MEMBER(turbo_state::buckrog_ppi1c_w)
 	/* bit   6 = STLA (START LAMP) */
 	/* bit   7 = NOUSE (BODY SONIC) */
 	m_buckrog_obch = data & 0x07;
-	coin_counter_w(machine(), 0, data & 0x10);
-	coin_counter_w(machine(), 1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 	set_led_status(machine(), 0, data & 0x40);
 }
 
@@ -405,10 +405,10 @@ WRITE8_MEMBER(turbo_state::turbo_coin_and_lamp_w)
 	switch (offset & 7)
 	{
 		case 0:
-			coin_counter_w(machine(), 0, data & 1);
+			machine().bookkeeping().coin_counter_w(0, data & 1);
 			break;
 		case 1:
-			coin_counter_w(machine(), 1, data & 1);
+			machine().bookkeeping().coin_counter_w(1, data & 1);
 			break;
 		case 3:
 			set_led_status(machine(), 0, data & 1);

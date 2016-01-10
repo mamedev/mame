@@ -650,10 +650,10 @@ WRITE8_MEMBER(_5clown_state::counters_w)
     -x-- ----   Unknown (increments at start).
     x--- ----   Unknown (increments at start).
 */
-	coin_counter_w(machine(), 0, data & 0x10);  /* Key In */
-	coin_counter_w(machine(), 1, data & 0x20);  /* Payout */
-	coin_counter_w(machine(), 2, data & 0x40);  /* unknown */
-	coin_counter_w(machine(), 3, data & 0x80);  /* unknown */
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);  /* Key In */
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);  /* Payout */
+	machine().bookkeeping().coin_counter_w(2, data & 0x40);  /* unknown */
+	machine().bookkeeping().coin_counter_w(3, data & 0x80);  /* unknown */
 
 }
 

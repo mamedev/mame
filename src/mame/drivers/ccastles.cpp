@@ -255,7 +255,7 @@ WRITE8_MEMBER(ccastles_state::led_w)
 
 WRITE8_MEMBER(ccastles_state::ccounter_w)
 {
-	coin_counter_w(machine(), offset, data & 1);
+	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
 
 

@@ -155,8 +155,8 @@ WRITE16_MEMBER(gcpinbal_state::ioc_w)
 //          return;
 //
 //      case 0x88/2:    /* coin control (+ others) ??? */
-//          coin_lockout_w(machine(), 0, ~data & 0x01);
-//          coin_lockout_w(machine(), 1, ~data & 0x02);
+//          machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+//          machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
 //popmessage(" address %04x value %04x", offset, data);
 //  }
 

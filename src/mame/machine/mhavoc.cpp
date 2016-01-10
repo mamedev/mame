@@ -279,10 +279,10 @@ WRITE8_MEMBER(mhavoc_state::alphaone_out_0_w)
 	set_led_status(machine(), 1, ~data & 0x10);
 
 	/* Bit 1 = right coin counter */
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 	/* Bit 0 = left coin counter */
-	coin_counter_w(machine(), 0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 
 logerror("alphaone_out_0_w(%02X)\n", data);
 }
@@ -291,10 +291,10 @@ logerror("alphaone_out_0_w(%02X)\n", data);
 WRITE8_MEMBER(mhavoc_state::mhavoc_out_1_w)
 {
 	/* Bit 1 = left coin counter */
-	coin_counter_w(machine(), 0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 
 	/* Bit 0 = right coin counter */
-	coin_counter_w(machine(), 1, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x01);
 }
 
 /*************************************

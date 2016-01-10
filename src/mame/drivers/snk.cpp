@@ -750,29 +750,29 @@ CUSTOM_INPUT_MEMBER(snk_state::gwarb_rotary)
 
 WRITE8_MEMBER(snk_state::athena_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, ~data & 2);
-	coin_counter_w(machine(), 1, ~data & 1);
+	machine().bookkeeping().coin_counter_w(0, ~data & 2);
+	machine().bookkeeping().coin_counter_w(1, ~data & 1);
 }
 
 WRITE8_MEMBER(snk_state::ikari_coin_counter_w)
 {
 	if (~data & 0x80)
 	{
-		coin_counter_w(machine(), 0, 1);
-		coin_counter_w(machine(), 0, 0);
+		machine().bookkeeping().coin_counter_w(0, 1);
+		machine().bookkeeping().coin_counter_w(0, 0);
 	}
 
 	if (~data & 0x40)
 	{
-		coin_counter_w(machine(), 1, 1);
-		coin_counter_w(machine(), 1, 0);
+		machine().bookkeeping().coin_counter_w(1, 1);
+		machine().bookkeeping().coin_counter_w(1, 0);
 	}
 }
 
 WRITE8_MEMBER(snk_state::tdfever_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
 WRITE8_MEMBER(snk_state::countryc_trackball_w)

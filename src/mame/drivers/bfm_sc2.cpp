@@ -845,7 +845,7 @@ WRITE8_MEMBER(bfm_sc2_state::coininhib_w)
 	{
 		if ( changed & p )
 		{ // this inhibit line has changed
-			coin_lockout_w(machine(), i, (~data & p) ); // update lockouts
+			machine().bookkeeping().coin_lockout_w(i, (~data & p) ); // update lockouts
 			changed &= ~p;
 		}
 

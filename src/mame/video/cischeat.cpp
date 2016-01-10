@@ -329,8 +329,8 @@ WRITE16_MEMBER(cischeat_state::bigrun_vregs_w)
 		case 0x0000/2   :   // leds
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(machine(), 0,new_data & 0x01);
-				coin_counter_w(machine(), 1,new_data & 0x02);
+				machine().bookkeeping().coin_counter_w(0,new_data & 0x01);
+				machine().bookkeeping().coin_counter_w(1,new_data & 0x02);
 				set_led_status(machine(), 0,new_data & 0x10);   // start button
 				set_led_status(machine(), 1,new_data & 0x20);   // ?
 			}
@@ -422,8 +422,8 @@ WRITE16_MEMBER(cischeat_state::cischeat_vregs_w)
 		case 0x0000/2   :   // leds
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(machine(), 0,new_data & 0x01);
-				coin_counter_w(machine(), 1,new_data & 0x02);
+				machine().bookkeeping().coin_counter_w(0,new_data & 0x01);
+				machine().bookkeeping().coin_counter_w(1,new_data & 0x02);
 				set_led_status(machine(), 0,new_data & 0x10);   // start button
 				set_led_status(machine(), 1,new_data & 0x20);   // ?
 			}
@@ -563,8 +563,8 @@ CPU #0 PC 00235C : Warning, vreg 0006 <- 0000
 		case 0x0004/2   :
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(machine(), 0,new_data & 0x01);
-				coin_counter_w(machine(), 1,new_data & 0x02);
+				machine().bookkeeping().coin_counter_w(0,new_data & 0x01);
+				machine().bookkeeping().coin_counter_w(1,new_data & 0x02);
 				set_led_status(machine(), 0,new_data & 0x04);   // start button
 				set_led_status(machine(), 1,new_data & 0x20);   // ?
 				// wheel | seat motor

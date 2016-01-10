@@ -275,10 +275,10 @@ WRITE8_MEMBER( icecold_state::ay8910_1_b_w )
 	if (m_motenbl == 0)
 	{
 		output_set_value("start", BIT(data, 0));
-		coin_counter_w(machine(), 1, BIT(data, 1));     // hopper counter
-		coin_counter_w(machine(), 2, BIT(data, 2));     // good game counter
-		coin_lockout_w(machine(), 0, BIT(data, 3));     // not used ??
-		coin_counter_w(machine(), 0, BIT(data, 4));     // coin counter
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));     // hopper counter
+		machine().bookkeeping().coin_counter_w(2, BIT(data, 2));     // good game counter
+		machine().bookkeeping().coin_lockout_w(0, BIT(data, 3));     // not used ??
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 4));     // coin counter
 		// BIT 5 errant ball solenoid
 		// BIT 7 hopper motor
 	}

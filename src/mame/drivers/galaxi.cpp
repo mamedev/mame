@@ -268,7 +268,7 @@ WRITE16_MEMBER(galaxi_state::galaxi_500004_w)
 	{
 		m_ticket = data & 0x0100;
 		m_hopper = data & 0x1000;
-		coin_counter_w(machine(), 0, data & 0x2000);    // coins
+		machine().bookkeeping().coin_counter_w(0, data & 0x2000);    // coins
 	}
 
 	COMBINE_DATA(&m_out[2]);

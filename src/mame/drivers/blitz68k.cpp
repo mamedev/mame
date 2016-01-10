@@ -842,7 +842,7 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds1_w)
 	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x0100);    // coin in
+		machine().bookkeeping().coin_counter_w(0, data & 0x0100);    // coin in
 		set_led_status(machine(), 0, data & 0x0200);    // win???
 //                                     1  data & 0x0400     // win???
 		set_led_status(machine(), 2, data & 0x0800);    // small
@@ -982,7 +982,7 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds1_w)
 	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x0100);    // coin in
+		machine().bookkeeping().coin_counter_w(0, data & 0x0100);    // coin in
 		set_led_status(machine(), 0, data & 0x0200);    // win???
 //                                     1  data & 0x0400     // win???
 		set_led_status(machine(), 2, data & 0x0800);    // small
@@ -1172,7 +1172,7 @@ WRITE16_MEMBER(blitz68k_state::hermit_leds1_w)
 	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x0100);    // coin in
+		machine().bookkeeping().coin_counter_w(0, data & 0x0100);    // coin in
 		show_leds12();
 	}
 }

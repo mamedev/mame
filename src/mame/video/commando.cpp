@@ -51,8 +51,8 @@ WRITE8_MEMBER(commando_state::commando_scrolly_w)
 WRITE8_MEMBER(commando_state::commando_c804_w)
 {
 	// bits 0 and 1 are coin counters
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 	// bit 4 resets the sound CPU
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);

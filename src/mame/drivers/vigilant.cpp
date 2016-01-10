@@ -49,8 +49,8 @@ WRITE8_MEMBER(vigilant_state::vigilant_out2_w)
 	/* D2 = COB1 = Coin Counter B? */
 
 	/* The hardware has both coin counters hooked up to a single meter. */
-	coin_counter_w(machine(), 0,data & 0x02);
-	coin_counter_w(machine(), 1,data & 0x04);
+	machine().bookkeeping().coin_counter_w(0,data & 0x02);
+	machine().bookkeeping().coin_counter_w(1,data & 0x04);
 
 //  data & 0x01 cocktail mode
 }
@@ -62,8 +62,8 @@ WRITE8_MEMBER(vigilant_state::kikcubic_coin_w)
 	/* bit 1 is used but unknown */
 
 	/* bits 4/5 are coin counters */
-	coin_counter_w(machine(), 0,data & 0x10);
-	coin_counter_w(machine(), 1,data & 0x20);
+	machine().bookkeeping().coin_counter_w(0,data & 0x10);
+	machine().bookkeeping().coin_counter_w(1,data & 0x20);
 }
 
 

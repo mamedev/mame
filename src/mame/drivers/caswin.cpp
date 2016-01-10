@@ -163,11 +163,11 @@ READ8_MEMBER(caswin_state::vvillage_rng_r)
 
 WRITE8_MEMBER(caswin_state::vvillage_output_w)
 {
-	coin_counter_w(machine(), 0,data & 1);
-	coin_counter_w(machine(), 1,data & 1);
+	machine().bookkeeping().coin_counter_w(0,data & 1);
+	machine().bookkeeping().coin_counter_w(1,data & 1);
 	// data & 4 payout counter
-	coin_lockout_w(machine(), 0,data & 0x20);
-	coin_lockout_w(machine(), 1,data & 0x20);
+	machine().bookkeeping().coin_lockout_w(0,data & 0x20);
+	machine().bookkeeping().coin_lockout_w(1,data & 0x20);
 }
 
 WRITE8_MEMBER(caswin_state::vvillage_lamps_w)

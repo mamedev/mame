@@ -121,8 +121,8 @@ WRITE8_MEMBER(jackal_state::jackal_rambank_w)
 	if (data & 0x04)
 		popmessage("jackal_rambank_w %02x", data);
 
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 	m_spritebank = &rgn[((data & 0x08) << 13)];
 	m_rambank = &rgn[((data & 0x10) << 12)];

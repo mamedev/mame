@@ -107,7 +107,7 @@ WRITE8_MEMBER(chexx_state::via_b_out)
 
 	digitalker_set_bank(data & 3);
 	m_digitalker->set_output_gain(0, BIT(data,2) ? 1.0f : 0.0f); // bit 2 controls the Digitalker output
-	coin_counter_w(machine(), 0, BIT(~data,3));
+	machine().bookkeeping().coin_counter_w(0, BIT(~data,3));
 	// bit 4 is EJECT
 	// bit 7 is related to speaker out
 

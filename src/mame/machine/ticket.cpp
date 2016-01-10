@@ -202,7 +202,7 @@ void ticket_dispenser_device::device_timer(emu_timer &timer, device_timer_id id,
 	// if we just dispensed, increment global count
 	if (m_status == m_ticketdispensed)
 	{
-		increment_dispensed_tickets(machine(), 1);
+		machine().bookkeeping().increment_dispensed_tickets(1);
 		LOG(("Ticket Dispensed\n"));
 	}
 }

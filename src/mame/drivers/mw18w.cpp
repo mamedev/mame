@@ -55,7 +55,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_sound0_w)
 	// d5: crash sound
 	// d6-d7: brake sound
 
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 WRITE8_MEMBER(mw18w_state::mw18w_sound1_w)

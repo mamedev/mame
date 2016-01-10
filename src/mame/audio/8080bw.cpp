@@ -719,7 +719,7 @@ WRITE8_MEMBER(_8080bw_state::polaris_sh_port_2_w)
 
 WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
 {
-	coin_lockout_global_w(machine(), data & 0x04);  /* SX8 */
+	machine().bookkeeping().coin_lockout_global_w(data & 0x04);  /* SX8 */
 
 	m_flip_screen = BIT(data, 5) & BIT(ioport("IN2")->read(), 2); /* SX11 */
 
@@ -925,7 +925,7 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_2_w)
 	m_discrete->write(space, SCHASER_SND_EN, BIT(data, 1));
 	machine().sound().system_enable(BIT(data, 1));
 
-	coin_lockout_global_w(machine(), BIT(data, 2));
+	machine().bookkeeping().coin_lockout_global_w(BIT(data, 2));
 
 	m_schaser_background_disable = BIT(data, 3);
 	m_schaser_background_select = BIT(data, 4);
@@ -1082,7 +1082,7 @@ WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_1_w)
 
 	//machine().sound().system_enable(data & 0x20);
 
-	//coin_lockout_global_w(machine(), data & 0x80);
+	//machine().bookkeeping().coin_lockout_global_w(data & 0x80);
 
 	m_port_1_last_extra = data;
 }

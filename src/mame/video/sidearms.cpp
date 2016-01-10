@@ -26,19 +26,19 @@ WRITE8_MEMBER(sidearms_state::colorram_w)
 WRITE8_MEMBER(sidearms_state::c804_w)
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 	/* bit 2 and 3 lock the coin chutes */
 	if (!m_gameid || m_gameid==3)
 	{
-		coin_lockout_w(machine(), 0, !(data & 0x04));
-		coin_lockout_w(machine(), 1, !(data & 0x08));
+		machine().bookkeeping().coin_lockout_w(0, !(data & 0x04));
+		machine().bookkeeping().coin_lockout_w(1, !(data & 0x08));
 	}
 	else
 	{
-		coin_lockout_w(machine(), 0, data & 0x04);
-		coin_lockout_w(machine(), 1, data & 0x08);
+		machine().bookkeeping().coin_lockout_w(0, data & 0x04);
+		machine().bookkeeping().coin_lockout_w(1, data & 0x08);
 	}
 
 	/* bit 4 resets the sound CPU */

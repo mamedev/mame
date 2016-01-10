@@ -79,8 +79,8 @@ void orbit_state::update_misc_flags(address_space &space, UINT8 val)
 	set_led_status(machine(), 0, BIT(m_misc_flags, 3));
 	set_led_status(machine(), 1, BIT(m_misc_flags, 6));
 
-	coin_lockout_w(machine(), 0, !BIT(m_misc_flags, 1));
-	coin_lockout_w(machine(), 1, !BIT(m_misc_flags, 1));
+	machine().bookkeeping().coin_lockout_w(0, !BIT(m_misc_flags, 1));
+	machine().bookkeeping().coin_lockout_w(1, !BIT(m_misc_flags, 1));
 }
 
 

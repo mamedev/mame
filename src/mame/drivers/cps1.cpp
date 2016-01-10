@@ -331,10 +331,10 @@ WRITE16_MEMBER(cps_state::cps1_coinctrl_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x0100);
-		coin_counter_w(machine(), 1, data & 0x0200);
-		coin_lockout_w(machine(), 0, ~data & 0x0400);
-		coin_lockout_w(machine(), 1, ~data & 0x0800);
+		machine().bookkeeping().coin_counter_w(0, data & 0x0100);
+		machine().bookkeeping().coin_counter_w(1, data & 0x0200);
+		machine().bookkeeping().coin_lockout_w(0, ~data & 0x0400);
+		machine().bookkeeping().coin_lockout_w(1, ~data & 0x0800);
 
 		// bit 15 = CPS-A custom reset?
 	}
@@ -344,10 +344,10 @@ WRITE16_MEMBER(cps_state::cpsq_coinctrl2_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 2, data & 0x01);
-		coin_lockout_w(machine(), 2, ~data & 0x02);
-		coin_counter_w(machine(), 3, data & 0x04);
-		coin_lockout_w(machine(), 3, ~data & 0x08);
+		machine().bookkeeping().coin_counter_w(2, data & 0x01);
+		machine().bookkeeping().coin_lockout_w(2, ~data & 0x02);
+		machine().bookkeeping().coin_counter_w(3, data & 0x04);
+		machine().bookkeeping().coin_lockout_w(3, ~data & 0x08);
 	}
 }
 

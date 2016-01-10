@@ -376,14 +376,14 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_hopper_w)
 
 
 	m_hopper_motor = data & 0x10;
-	coin_lockout_w(machine(), 0, data & 0x01);
-	coin_lockout_w(machine(), 1, data & 0x01);
-	coin_lockout_w(machine(), 2, data & 0x01);
-	coin_lockout_w(machine(), 3, data & 0x01);
-	coin_lockout_w(machine(), 4, data & 0x04);
-	coin_lockout_w(machine(), 5, data & 0x04);
-	coin_lockout_w(machine(), 6, data & 0x04);
-	coin_lockout_w(machine(), 7, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(0, data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, data & 0x01);
+	machine().bookkeeping().coin_lockout_w(2, data & 0x01);
+	machine().bookkeeping().coin_lockout_w(3, data & 0x01);
+	machine().bookkeeping().coin_lockout_w(4, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(5, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(6, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(7, data & 0x04);
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::rollfr_hopper_w)
@@ -394,14 +394,14 @@ WRITE8_MEMBER(igrosoft_gamble_state::rollfr_hopper_w)
 
 
 	m_hopper_motor = data & 0x10;
-	coin_lockout_w(machine(), 0,~data & 0x01);
-	coin_lockout_w(machine(), 1,~data & 0x01);
-	coin_lockout_w(machine(), 2,~data & 0x01);
-	coin_lockout_w(machine(), 3,~data & 0x01);
-	coin_lockout_w(machine(), 4, data & 0x04);
-	coin_lockout_w(machine(), 5, data & 0x04);
-	coin_lockout_w(machine(), 6, data & 0x04);
-	coin_lockout_w(machine(), 7, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(0,~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1,~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(2,~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(3,~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(4, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(5, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(6, data & 0x04);
+	machine().bookkeeping().coin_lockout_w(7, data & 0x04);
 }
 
 DRIVER_INIT_MEMBER(igrosoft_gamble_state,customl)
@@ -902,12 +902,12 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_counters_w)
     -X-- ---- Key Out Counter 27A
     X--- ---- Total Bet Counter 28B
 */
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x02);
-		coin_counter_w(machine(), 2, data & 0x04);
-		coin_counter_w(machine(), 3, data & 0x10);
-		coin_counter_w(machine(), 4, data & 0x40);
-		coin_counter_w(machine(), 5, data & 0x80);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(2, data & 0x04);
+		machine().bookkeeping().coin_counter_w(3, data & 0x10);
+		machine().bookkeeping().coin_counter_w(4, data & 0x40);
+		machine().bookkeeping().coin_counter_w(5, data & 0x80);
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_f3_w)

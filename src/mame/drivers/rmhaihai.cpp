@@ -192,8 +192,8 @@ WRITE8_MEMBER(rmhaihai_state::ctrl_w)
 
 	// (data & 0x02) is switched on and off in service mode
 
-	coin_lockout_w(machine(), 0, ~data & 0x04);
-	coin_counter_w(machine(), 0, data & 0x08);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x04);
+	machine().bookkeeping().coin_counter_w(0, data & 0x08);
 
 	// (data & 0x10) is medal in service mode
 

@@ -222,14 +222,14 @@ WRITE8_MEMBER(jankenmn_state::lamps3_w)
 	output_set_lamp_value(15, data >> 1 & 1);
 
 	// d2: payout (waits for hopper status)
-	coin_counter_w(machine(), 2, data & 0x04);
+	machine().bookkeeping().coin_counter_w(2, data & 0x04);
 
 	// d3: right multiplier lamp(2), d4: left multiplier lamp(1)
 	output_set_lamp_value(0, data >> 4 & 1);
 	output_set_lamp_value(1, data >> 3 & 1);
 
 	// d5: assume coin lockout
-	coin_lockout_global_w(machine(), ~data & 0x20);
+	machine().bookkeeping().coin_lockout_global_w(~data & 0x20);
 
 	// d0, d6, d7: N/C?
 	if (data & 0x04)

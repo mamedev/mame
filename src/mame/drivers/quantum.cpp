@@ -114,8 +114,8 @@ WRITE16_MEMBER(quantum_state::led_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bits 0 and 1 are coin counters */
-		coin_counter_w(machine(), 0, data & 2);
-		coin_counter_w(machine(), 1, data & 1);
+		machine().bookkeeping().coin_counter_w(0, data & 2);
+		machine().bookkeeping().coin_counter_w(1, data & 1);
 
 		/* bit 3 = select second trackball for cocktail mode? */
 

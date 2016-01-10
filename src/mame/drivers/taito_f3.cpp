@@ -77,10 +77,10 @@ WRITE32_MEMBER(taito_f3_state::f3_control_w)
 		case 0x01: /* Coin counters & lockouts */
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(machine(), 0,~data & 0x01000000);
-				coin_lockout_w(machine(), 1,~data & 0x02000000);
-				coin_counter_w(machine(), 0, data & 0x04000000);
-				coin_counter_w(machine(), 1, data & 0x08000000);
+				machine().bookkeeping().coin_lockout_w(0,~data & 0x01000000);
+				machine().bookkeeping().coin_lockout_w(1,~data & 0x02000000);
+				machine().bookkeeping().coin_counter_w(0, data & 0x04000000);
+				machine().bookkeeping().coin_counter_w(1, data & 0x08000000);
 				m_coin_word[0]=(data>>16)&0xffff;
 			}
 			return;
@@ -95,10 +95,10 @@ WRITE32_MEMBER(taito_f3_state::f3_control_w)
 		case 0x05:  /* Player 3 & 4 coin counters */
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(machine(), 2,~data & 0x01000000);
-				coin_lockout_w(machine(), 3,~data & 0x02000000);
-				coin_counter_w(machine(), 2, data & 0x04000000);
-				coin_counter_w(machine(), 3, data & 0x08000000);
+				machine().bookkeeping().coin_lockout_w(2,~data & 0x01000000);
+				machine().bookkeeping().coin_lockout_w(3,~data & 0x02000000);
+				machine().bookkeeping().coin_counter_w(2, data & 0x04000000);
+				machine().bookkeeping().coin_counter_w(3, data & 0x08000000);
 				m_coin_word[1]=(data>>16)&0xffff;
 			}
 			return;

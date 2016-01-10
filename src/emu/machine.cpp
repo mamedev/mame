@@ -121,7 +121,6 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		romload_data(nullptr),
 		ui_input_data(nullptr),
 		debugcpu_data(nullptr),
-		generic_machine_data(nullptr),
 		m_config(_config),
 		m_system(_config.gamedrv()),
 		m_manager(manager),
@@ -221,7 +220,7 @@ void running_machine::start()
 	m_input = std::make_unique<input_manager>(*this);
 	output_init(*this);
 	m_render = std::make_unique<render_manager>(*this);
-	generic_machine_init(*this);
+	m_bookkeeping = std::make_unique<bookkeeping_manager>(*this);
 
 	// allocate a soft_reset timer
 	m_soft_reset_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::soft_reset), this));

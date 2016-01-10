@@ -56,8 +56,8 @@ WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
 WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 {
 	/* bits 0 & 1 = coin counters */
-	coin_counter_w(machine(), 1, data & 0x01);
-	coin_counter_w(machine(), 0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(1, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 
 	/* bit 4 = enable rom reading through K051316 #1 & #2 */
 	m_k051316_readroms = (data & 0x10);

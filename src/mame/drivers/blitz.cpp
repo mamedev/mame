@@ -426,9 +426,9 @@ WRITE8_MEMBER(blitz_state::lamps_a_w)
 //  output_set_lamp_value(4, 1 - ((data >> 4) & 1));    /* Lamp 4 */
 
 //  popmessage("written : %02X", data);
-//  coin_counter_w(machine(), 0, data & 0x40);    /* counter1 */
-//  coin_counter_w(machine(), 1, data & 0x80);    /* counter2 */
-//  coin_counter_w(machine(), 2, data & 0x20);    /* counter3 */
+//  machine().bookkeeping().coin_counter_w(0, data & 0x40);    /* counter1 */
+//  machine().bookkeeping().coin_counter_w(1, data & 0x80);    /* counter2 */
+//  machine().bookkeeping().coin_counter_w(2, data & 0x20);    /* counter3 */
 }
 
 

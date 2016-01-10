@@ -253,11 +253,11 @@ WRITE8_MEMBER(rallyx_state::rallyx_latch_w)
 			break;
 
 		case 0x06:
-			coin_lockout_w(machine(), 0, !bit);
+			machine().bookkeeping().coin_lockout_w(0, !bit);
 			break;
 
 		case 0x07:
-			coin_counter_w(machine(), 0, bit);
+			machine().bookkeeping().coin_counter_w(0, bit);
 			break;
 	}
 }
@@ -286,14 +286,14 @@ WRITE8_MEMBER(rallyx_state::locomotn_latch_w)
 			break;
 
 		case 0x04:  /* OUT1 */
-			coin_counter_w(machine(), 0, bit);
+			machine().bookkeeping().coin_counter_w(0, bit);
 			break;
 
 		case 0x05:  /* OUT2 */
 			break;
 
 		case 0x06:  /* OUT3 */
-			coin_counter_w(machine(), 1,bit);
+			machine().bookkeeping().coin_counter_w(1,bit);
 			break;
 
 		case 0x07:  /* STARSON */

@@ -896,8 +896,8 @@ MACHINE_START_MEMBER(mw8080bw_state,maze)
 WRITE8_MEMBER(mw8080bw_state::maze_coin_counter_w)
 {
 	/* the data is not used, just pulse the counter */
-	coin_counter_w(machine(), 0, 0);
-	coin_counter_w(machine(), 0, 1);
+	machine().bookkeeping().coin_counter_w(0, 0);
+	machine().bookkeeping().coin_counter_w(0, 1);
 }
 
 
@@ -2505,7 +2505,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_coin_input_r)
 {
 	UINT32 ret = ioport(INVADERS_COIN_INPUT_PORT_TAG)->read();
 
-	coin_counter_w(machine(), 0, !ret);
+	machine().bookkeeping().coin_counter_w(0, !ret);
 
 	return ret;
 }
@@ -2712,7 +2712,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::blueshrk_coin_input_r)
 {
 	UINT32 ret = ioport(BLUESHRK_COIN_INPUT_PORT_TAG)->read();
 
-	coin_counter_w(machine(), 0, !ret);
+	machine().bookkeeping().coin_counter_w(0, !ret);
 
 	return ret;
 }

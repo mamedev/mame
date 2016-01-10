@@ -314,9 +314,9 @@ WRITE8_MEMBER(mcr_state::mcr_control_port_w)
 	        D0 = coin meter 1
 	*/
 
-	coin_counter_w(machine(), 0, (data >> 0) & 1);
-	coin_counter_w(machine(), 1, (data >> 1) & 1);
-	coin_counter_w(machine(), 2, (data >> 2) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
+	machine().bookkeeping().coin_counter_w(1, (data >> 1) & 1);
+	machine().bookkeeping().coin_counter_w(2, (data >> 2) & 1);
 	mcr_cocktail_flip = (data >> 6) & 1;
 }
 
@@ -384,7 +384,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::dpoker_hopper_callback)
 		dpoker_coin_status &= ~8;
 	}
 
-	coin_counter_w(machine(), 3, dpoker_coin_status & 8);
+	machine().bookkeeping().coin_counter_w(3, dpoker_coin_status & 8);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::dpoker_coin_in_callback)

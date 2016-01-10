@@ -785,13 +785,13 @@ WRITE8_MEMBER(galaga_state::out_0)
 {
 	set_led_status(machine(), 1,data & 1);
 	set_led_status(machine(), 0,data & 2);
-	coin_counter_w(machine(), 1,~data & 4);
-	coin_counter_w(machine(), 0,~data & 8);
+	machine().bookkeeping().coin_counter_w(1,~data & 4);
+	machine().bookkeeping().coin_counter_w(0,~data & 8);
 }
 
 WRITE8_MEMBER(galaga_state::out_1)
 {
-	coin_lockout_global_w(machine(), data & 1);
+	machine().bookkeeping().coin_lockout_global_w(data & 1);
 }
 
 READ8_MEMBER(galaga_state::namco_52xx_rom_r)

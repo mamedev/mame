@@ -174,7 +174,7 @@ WRITE8_MEMBER(videopin_state::out1_w)
 	if (m_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-	coin_lockout_global_w(machine(), ~data & 0x08);
+	machine().bookkeeping().coin_lockout_global_w(~data & 0x08);
 
 	/* Convert octave data to divide value and write to sound */
 	m_discrete->write(space, VIDEOPIN_OCTAVE_DATA, (0x01 << (~data & 0x07)) & 0xfe);
@@ -192,7 +192,7 @@ WRITE8_MEMBER(videopin_state::out2_w)
 	/* D6 => BELL      */
 	/* D7 => ATTRACT   */
 
-	coin_counter_w(machine(), 0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 
 	m_discrete->write(space, VIDEOPIN_BELL_EN, data & 0x40); // Bell
 	m_discrete->write(space, VIDEOPIN_BONG_EN, data & 0x20); // Bong

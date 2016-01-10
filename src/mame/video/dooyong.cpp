@@ -87,8 +87,8 @@ WRITE8_MEMBER(dooyong_z80_state::txvideoram_w)
 WRITE8_MEMBER(dooyong_z80_ym2203_state::lastday_ctrl_w)
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 	/* bit 3 is used but unknown */
 
@@ -107,8 +107,8 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 	flip_screen_set(data & 0x01);
 
 	/* bits 6 and 7 are coin counters */
-	coin_counter_w(machine(), 0, data & 0x80);
-	coin_counter_w(machine(), 1, data & 0x40);
+	machine().bookkeeping().coin_counter_w(0, data & 0x80);
+	machine().bookkeeping().coin_counter_w(1, data & 0x40);
 
 	/* bit 1 is used but unknown - palette banking (both write and display based on pollux bombs) */
 	int last_palbank = m_palette_bank;

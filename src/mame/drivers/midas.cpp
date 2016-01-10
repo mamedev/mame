@@ -178,7 +178,7 @@ WRITE16_MEMBER(midas_state::livequiz_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x0001);
+		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
 	}
 #ifdef MAME_DEBUG
 //  popmessage("coin %04X", data);
@@ -234,8 +234,8 @@ WRITE16_MEMBER(midas_state::hammer_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x0001);
-		coin_counter_w(machine(), 1, data & 0x0002);
+		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
+		machine().bookkeeping().coin_counter_w(1, data & 0x0002);
 	}
 #ifdef MAME_DEBUG
 //  popmessage("coin %04X", data);

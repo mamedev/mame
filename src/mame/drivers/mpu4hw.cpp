@@ -1033,10 +1033,10 @@ READ8_MEMBER(mpu4_state::pia_ic5_portb_r)
 	}
 
 	LOG(("%s: IC5 PIA Read of Port B (coin input AUX2)\n",machine().describe_context()));
-	coin_lockout_w(machine(), 0, (m_pia5->b_output() & 0x01) );
-	coin_lockout_w(machine(), 1, (m_pia5->b_output() & 0x02) );
-	coin_lockout_w(machine(), 2, (m_pia5->b_output() & 0x04) );
-	coin_lockout_w(machine(), 3, (m_pia5->b_output() & 0x08) );
+	machine().bookkeeping().coin_lockout_w(0, (m_pia5->b_output() & 0x01) );
+	machine().bookkeeping().coin_lockout_w(1, (m_pia5->b_output() & 0x02) );
+	machine().bookkeeping().coin_lockout_w(2, (m_pia5->b_output() & 0x04) );
+	machine().bookkeeping().coin_lockout_w(3, (m_pia5->b_output() & 0x08) );
 	return m_aux2_port->read() | m_aux2_input;
 }
 

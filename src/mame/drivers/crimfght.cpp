@@ -23,8 +23,8 @@
 
 WRITE8_MEMBER(crimfght_state::crimfght_coin_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
 READ8_MEMBER(crimfght_state::k052109_051960_r)

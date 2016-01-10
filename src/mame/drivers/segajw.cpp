@@ -122,7 +122,7 @@ READ16_MEMBER(segajw_state::coinlockout_r)
 
 WRITE16_MEMBER(segajw_state::coinlockout_w)
 {
-	coin_lockout_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_lockout_w(0, data & 1);
 	m_coin_lockout = data;
 
 	for(int i=0; i<3; i++)

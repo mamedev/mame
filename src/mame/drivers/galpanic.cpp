@@ -117,11 +117,11 @@ WRITE16_MEMBER(galpanic_state::galpanic_coin_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x100);
-		coin_counter_w(machine(), 1, data & 0x200);
+		machine().bookkeeping().coin_counter_w(0, data & 0x100);
+		machine().bookkeeping().coin_counter_w(1, data & 0x200);
 
-		coin_lockout_w(machine(), 0, ~data & 0x400);
-		coin_lockout_w(machine(), 1, ~data & 0x800);
+		machine().bookkeeping().coin_lockout_w(0, ~data & 0x400);
+		machine().bookkeeping().coin_lockout_w(1, ~data & 0x800);
 	}
 }
 

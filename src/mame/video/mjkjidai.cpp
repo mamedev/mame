@@ -59,7 +59,7 @@ WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
 	m_display_enable = data & 0x04;
 
 	/* bit 5 = coin counter */
-	coin_counter_w(machine(), 0,data & 0x20);
+	machine().bookkeeping().coin_counter_w(0,data & 0x20);
 
 	/* bits 6-7 select ROM bank */
 	membank("bank1")->set_entry(data >> 6);

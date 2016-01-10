@@ -12,63 +12,35 @@
 #include "config.h"
 
 
+//**************************************************************************
+//  BOOKKEEPING MANAGER
+//**************************************************************************
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+//-------------------------------------------------
+//  bookkeeping_manager - constructor
+//-------------------------------------------------
 
-static void counters_load(running_machine &machine, int config_type, xml_data_node *parentnode);
-static void counters_save(running_machine &machine, int config_type, xml_data_node *parentnode);
-
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct generic_machine_private
+bookkeeping_manager::bookkeeping_manager(running_machine &machine)
+	: m_machine(machine),
+	  m_dispensed_tickets(0)
 {
-	/* tickets and coin counters */
-	UINT32      dispensed_tickets;
-	UINT32      coin_count[COIN_COUNTERS];
-	UINT32      coinlockedout[COIN_COUNTERS];
-	UINT32      lastcoin[COIN_COUNTERS];
-};
-
-
-
-/***************************************************************************
-    INITIALIZATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    generic_machine_init - initialize globals and
-    register for save states
--------------------------------------------------*/
-
-void generic_machine_init(running_machine &machine)
-{
-	generic_machine_private *state;
-	int counternum;
-
-	/* allocate our state */
-	machine.generic_machine_data = auto_alloc_clear(machine, <generic_machine_private>());
-	state = machine.generic_machine_data;
 
 	/* reset coin counters */
-	for (counternum = 0; counternum < COIN_COUNTERS; counternum++)
+	for (int counternum = 0; counternum < COIN_COUNTERS; counternum++)
 	{
-		state->lastcoin[counternum] = 0;
-		state->coinlockedout[counternum] = 0;
+		m_lastcoin[counternum] = 0;
+		m_coinlockedout[counternum] = 0;
+		m_coin_count[counternum] = 0;
 	}
 
-	/* register coin save state */
-	machine.save().save_item(NAME(state->coin_count));
-	machine.save().save_item(NAME(state->coinlockedout));
-	machine.save().save_item(NAME(state->lastcoin));
+	// register coin save state 
+	machine.save().save_item(NAME(m_coin_count));
+	machine.save().save_item(NAME(m_coinlockedout));
+	machine.save().save_item(NAME(m_lastcoin));
+	machine.save().save_item(NAME(m_dispensed_tickets));
 
-	/* register for configuration */
-	config_register(machine, "counters", config_saveload_delegate(FUNC(counters_load), &machine), config_saveload_delegate(FUNC(counters_save), &machine));
+	// register for configuration
+	config_register(machine, "counters", config_saveload_delegate(FUNC(bookkeeping_manager::config_load), this), config_saveload_delegate(FUNC(bookkeeping_manager::config_save), this));
 }
 
 
@@ -82,10 +54,9 @@ void generic_machine_init(running_machine &machine)
     tickets dispensed
 -------------------------------------------------*/
 
-int get_dispensed_tickets(running_machine &machine)
+int bookkeeping_manager::get_dispensed_tickets() const
 {
-	generic_machine_private *state = machine.generic_machine_data;
-	return state->dispensed_tickets;
+	return m_dispensed_tickets;
 }
 
 
@@ -94,10 +65,9 @@ int get_dispensed_tickets(running_machine &machine)
     number of dispensed tickets
 -------------------------------------------------*/
 
-void increment_dispensed_tickets(running_machine &machine, int delta)
+void bookkeeping_manager::increment_dispensed_tickets(int delta)
 {
-	generic_machine_private *state = machine.generic_machine_data;
-	state->dispensed_tickets += delta;
+	m_dispensed_tickets += delta;
 }
 
 
@@ -107,20 +77,19 @@ void increment_dispensed_tickets(running_machine &machine, int delta)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    counters_load - load the state of the counters
+    config_load - load the state of the counters
     and tickets
 -------------------------------------------------*/
 
-static void counters_load(running_machine &machine, int config_type, xml_data_node *parentnode)
+void bookkeeping_manager::config_load(int config_type, xml_data_node *parentnode)
 {
-	generic_machine_private *state = machine.generic_machine_data;
 	xml_data_node *coinnode, *ticketnode;
 
 	/* on init, reset the counters */
 	if (config_type == CONFIG_TYPE_INIT)
 	{
-		memset(state->coin_count, 0, sizeof(state->coin_count));
-		state->dispensed_tickets = 0;
+		memset(m_coin_count, 0, sizeof(m_coin_count));
+		m_dispensed_tickets = 0;
 	}
 
 	/* only care about game-specific data */
@@ -136,24 +105,23 @@ static void counters_load(running_machine &machine, int config_type, xml_data_no
 	{
 		int index = xml_get_attribute_int(coinnode, "index", -1);
 		if (index >= 0 && index < COIN_COUNTERS)
-			state->coin_count[index] = xml_get_attribute_int(coinnode, "number", 0);
+			m_coin_count[index] = xml_get_attribute_int(coinnode, "number", 0);
 	}
 
 	/* get the single tickets node */
 	ticketnode = xml_get_sibling(parentnode->child, "tickets");
 	if (ticketnode != nullptr)
-		state->dispensed_tickets = xml_get_attribute_int(ticketnode, "number", 0);
+		m_dispensed_tickets = xml_get_attribute_int(ticketnode, "number", 0);
 }
 
 
 /*-------------------------------------------------
-    counters_save - save the state of the counters
+    config_save - save the state of the counters
     and tickets
 -------------------------------------------------*/
 
-static void counters_save(running_machine &machine, int config_type, xml_data_node *parentnode)
+void bookkeeping_manager::config_save(int config_type, xml_data_node *parentnode)
 {
-	generic_machine_private *state = machine.generic_machine_data;
 	int i;
 
 	/* only care about game-specific data */
@@ -162,22 +130,22 @@ static void counters_save(running_machine &machine, int config_type, xml_data_no
 
 	/* iterate over coin counters */
 	for (i = 0; i < COIN_COUNTERS; i++)
-		if (state->coin_count[i] != 0)
+		if (m_coin_count[i] != 0)
 		{
 			xml_data_node *coinnode = xml_add_child(parentnode, "coins", nullptr);
 			if (coinnode != nullptr)
 			{
 				xml_set_attribute_int(coinnode, "index", i);
-				xml_set_attribute_int(coinnode, "number", state->coin_count[i]);
+				xml_set_attribute_int(coinnode, "number", m_coin_count[i]);
 			}
 		}
 
 	/* output tickets */
-	if (state->dispensed_tickets != 0)
+	if (m_dispensed_tickets != 0)
 	{
 		xml_data_node *tickets = xml_add_child(parentnode, "tickets", nullptr);
 		if (tickets != nullptr)
-			xml_set_attribute_int(tickets, "number", state->dispensed_tickets);
+			xml_set_attribute_int(tickets, "number", m_dispensed_tickets);
 	}
 }
 
@@ -186,16 +154,15 @@ static void counters_save(running_machine &machine, int config_type, xml_data_no
     coin_counter_w - sets input for coin counter
 -------------------------------------------------*/
 
-void coin_counter_w(running_machine &machine, int num, int on)
+void bookkeeping_manager::coin_counter_w(int num, int on)
 {
-	generic_machine_private *state = machine.generic_machine_data;
-	if (num >= ARRAY_LENGTH(state->coin_count))
+	if (num >= ARRAY_LENGTH(m_coin_count))
 		return;
 
 	/* Count it only if the data has changed from 0 to non-zero */
-	if (on && (state->lastcoin[num] == 0))
-		state->coin_count[num]++;
-	state->lastcoin[num] = on;
+	if (on && (m_lastcoin[num] == 0))
+		m_coin_count[num]++;
+	m_lastcoin[num] = on;
 }
 
 
@@ -204,12 +171,11 @@ void coin_counter_w(running_machine &machine, int num, int on)
     for a given coin
 -------------------------------------------------*/
 
-int coin_counter_get_count(running_machine &machine, int num)
+int bookkeeping_manager::coin_counter_get_count(int num)
 {
-	generic_machine_private *state = machine.generic_machine_data;
-	if (num >= ARRAY_LENGTH(state->coin_count))
+	if (num >= ARRAY_LENGTH(m_coin_count))
 		return 0;
-	return state->coin_count[num];
+	return m_coin_count[num];
 }
 
 
@@ -217,12 +183,11 @@ int coin_counter_get_count(running_machine &machine, int num)
     coin_lockout_w - locks out one coin input
 -------------------------------------------------*/
 
-void coin_lockout_w(running_machine &machine, int num,int on)
+void bookkeeping_manager::coin_lockout_w(int num,int on)
 {
-	generic_machine_private *state = machine.generic_machine_data;
-	if (num >= ARRAY_LENGTH(state->coinlockedout))
+	if (num >= ARRAY_LENGTH(m_coinlockedout))
 		return;
-	state->coinlockedout[num] = on;
+	m_coinlockedout[num] = on;
 }
 
 
@@ -231,12 +196,11 @@ void coin_lockout_w(running_machine &machine, int num,int on)
     state for a particular coin
 -------------------------------------------------*/
 
-int coin_lockout_get_state(running_machine &machine, int num)
+int bookkeeping_manager::coin_lockout_get_state(int num)
 {
-	generic_machine_private *state = machine.generic_machine_data;
-	if (num >= ARRAY_LENGTH(state->coinlockedout))
+	if (num >= ARRAY_LENGTH(m_coinlockedout))
 		return FALSE;
-	return state->coinlockedout[num];
+	return m_coinlockedout[num];
 }
 
 
@@ -245,11 +209,8 @@ int coin_lockout_get_state(running_machine &machine, int num)
     inputs
 -------------------------------------------------*/
 
-void coin_lockout_global_w(running_machine &machine, int on)
+void bookkeeping_manager::coin_lockout_global_w(int on)
 {
-	generic_machine_private *state = machine.generic_machine_data;
-	int i;
-
-	for (i = 0; i < ARRAY_LENGTH(state->coinlockedout); i++)
-		coin_lockout_w(machine, i, on);
+	for (int i = 0; i < ARRAY_LENGTH(m_coinlockedout); i++)
+		coin_lockout_w(i, on);
 }

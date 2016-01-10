@@ -105,7 +105,7 @@ WRITE8_MEMBER(wolfpack_state::wolfpack_start_speech_w)
 
 WRITE8_MEMBER(wolfpack_state::wolfpack_attract_w)
 {
-	coin_lockout_global_w(machine(), !(data & 1));
+	machine().bookkeeping().coin_lockout_global_w(!(data & 1));
 }
 
 

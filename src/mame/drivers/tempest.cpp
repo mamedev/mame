@@ -408,9 +408,9 @@ WRITE8_MEMBER(tempest_state::tempest_led_w)
 
 WRITE8_MEMBER(tempest_state::tempest_coin_w)
 {
-	coin_counter_w(machine(), 0, (data & 0x01));
-	coin_counter_w(machine(), 1, (data & 0x02));
-	coin_counter_w(machine(), 2, (data & 0x04));
+	machine().bookkeeping().coin_counter_w(0, (data & 0x01));
+	machine().bookkeeping().coin_counter_w(1, (data & 0x02));
+	machine().bookkeeping().coin_counter_w(2, (data & 0x04));
 	m_avg->set_flip_x(data & 0x08);
 	m_avg->set_flip_y(data & 0x10);
 }

@@ -488,7 +488,7 @@ WRITE8_MEMBER(firefox_state::led_w)
 
 WRITE8_MEMBER(firefox_state::firefox_coin_counter_w)
 {
-	coin_counter_w( machine(), offset, data & 0x80 );
+	machine().bookkeeping().coin_counter_w(offset, data & 0x80 );
 }
 
 

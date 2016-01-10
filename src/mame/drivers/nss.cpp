@@ -599,8 +599,8 @@ WRITE8_MEMBER(nss_state::port_03_w)
 
 WRITE8_MEMBER(nss_state::port_04_w)
 {
-	coin_counter_w(machine(), 0, (data >> 0) & 1);
-	coin_counter_w(machine(), 1, (data >> 1) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
+	machine().bookkeeping().coin_counter_w(1, (data >> 1) & 1);
 }
 
 WRITE8_MEMBER(nss_state::port_07_w)

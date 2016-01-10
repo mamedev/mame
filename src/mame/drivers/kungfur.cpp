@@ -141,7 +141,7 @@ WRITE8_MEMBER(kungfur_state::kungfur_output_w)
 
 	// d5: N/C?
 	// d6: coincounter
-	coin_counter_w(machine(), 0, data & 0x40);
+	machine().bookkeeping().coin_counter_w(0, data & 0x40);
 }
 
 

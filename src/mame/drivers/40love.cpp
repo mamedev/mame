@@ -272,7 +272,7 @@ WRITE8_MEMBER(fortyl_state::nmi_enable_w)
 #if 0
 WRITE8_MEMBER(fortyl_state::fortyl_coin_counter_w)
 {
-	coin_counter_w(machine(), offset,data);
+	machine().bookkeeping().coin_counter_w(offset,data);
 }
 #endif
 

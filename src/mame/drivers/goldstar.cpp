@@ -376,11 +376,11 @@ WRITE8_MEMBER(sanghopm_state::coincount_w)
   x--- -xx-  Unknown.
 
 */
-	coin_counter_w(machine(), 0, data & 0x08);  /* counter1 coin a */
-	coin_counter_w(machine(), 1, data & 0x10);  /* counter2 coin b */
-	coin_counter_w(machine(), 2, data & 0x20);  /* counter3 key in */
-	coin_counter_w(machine(), 3, data & 0x40);  /* counter4 coin c */
-	coin_counter_w(machine(), 4, data & 0x01);  /* counter5 payout */
+	machine().bookkeeping().coin_counter_w(0, data & 0x08);  /* counter1 coin a */
+	machine().bookkeeping().coin_counter_w(1, data & 0x10);  /* counter2 coin b */
+	machine().bookkeeping().coin_counter_w(2, data & 0x20);  /* counter3 key in */
+	machine().bookkeeping().coin_counter_w(3, data & 0x40);  /* counter4 coin c */
+	machine().bookkeeping().coin_counter_w(4, data & 0x01);  /* counter5 payout */
 }
 
 WRITE8_MEMBER(sanghopm_state::enable_w)
@@ -749,11 +749,11 @@ WRITE8_MEMBER(goldstar_state::cm_coincount_w)
   interestingly there is no counter for coin B in the cm/cmaster games
 */
 
-	coin_counter_w(machine(), 0, data & 0x40);  /* Counter 1 Coin A */
-	coin_counter_w(machine(), 1, data & 0x20);  /* Counter 2 Key In */
-	coin_counter_w(machine(), 2, data & 0x10);  /* Counter 3 Coin C */
-	coin_counter_w(machine(), 3, data & 0x08);  /* Counter 4 Coin D */
-	coin_counter_w(machine(), 4, data & 0x01);  /* Counter 5 Payout */
+	machine().bookkeeping().coin_counter_w(0, data & 0x40);  /* Counter 1 Coin A */
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);  /* Counter 2 Key In */
+	machine().bookkeeping().coin_counter_w(2, data & 0x10);  /* Counter 3 Coin C */
+	machine().bookkeeping().coin_counter_w(3, data & 0x08);  /* Counter 4 Coin D */
+	machine().bookkeeping().coin_counter_w(4, data & 0x01);  /* Counter 5 Payout */
 
 	if (data & 0x86)
 		popmessage("counters: %02X", data);
@@ -1026,9 +1026,9 @@ WRITE8_MEMBER(unkch_state::coincount_w)
 
 	m_ticket_dispenser->write(space, offset, data & 0x80);
 
-	coin_counter_w(machine(), 0, data & 0x04);  /* Credit counter */
-	coin_counter_w(machine(), 1, data & 0x08);  /* Key In counter */
-	coin_counter_w(machine(), 2, data & 0x02);  /* payout counter */
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);  /* Credit counter */
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);  /* Key In counter */
+	machine().bookkeeping().coin_counter_w(2, data & 0x02);  /* payout counter */
 
 	//popmessage("coin counters: %02x", data);
 }

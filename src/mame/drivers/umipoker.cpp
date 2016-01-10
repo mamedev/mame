@@ -278,9 +278,9 @@ WRITE16_MEMBER(umipoker_state::umi_counters_w)
   xxxx xxxx x--x xxx-  Unknown / Not used.
 
 */
-	coin_counter_w(machine(), 0, data & 0x20);  /* COIN 1 */
-	coin_counter_w(machine(), 1, data & 0x40);  /* COIN 2 */
-	coin_counter_w(machine(), 2, data & 0x01);  /* PAYOUT */
+	machine().bookkeeping().coin_counter_w(0, data & 0x20);  /* COIN 1 */
+	machine().bookkeeping().coin_counter_w(1, data & 0x40);  /* COIN 2 */
+	machine().bookkeeping().coin_counter_w(2, data & 0x01);  /* PAYOUT */
 }
 
 WRITE16_MEMBER(umipoker_state::saiyu_counters_w)
@@ -300,9 +300,9 @@ WRITE16_MEMBER(umipoker_state::saiyu_counters_w)
   x--x xxx- xxxx xxxx  Unknown / Not used.
 
 */
-	coin_counter_w(machine(), 0, data & 0x2000);    /* COIN 1 */
-	coin_counter_w(machine(), 1, data & 0x4000);    /* COIN 2 */
-	coin_counter_w(machine(), 2, data & 0x0100);    /* PAYOUT */
+	machine().bookkeeping().coin_counter_w(0, data & 0x2000);    /* COIN 1 */
+	machine().bookkeeping().coin_counter_w(1, data & 0x4000);    /* COIN 2 */
+	machine().bookkeeping().coin_counter_w(2, data & 0x0100);    /* PAYOUT */
 }
 
 

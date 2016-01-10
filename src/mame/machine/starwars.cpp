@@ -67,11 +67,11 @@ WRITE8_MEMBER(starwars_state::starwars_out_w)
 	switch (offset & 7)
 	{
 		case 0:     /* Coin counter 1 */
-			coin_counter_w(machine(), 0, data);
+			machine().bookkeeping().coin_counter_w(0, data);
 			break;
 
 		case 1:     /* Coin counter 2 */
-			coin_counter_w(machine(), 1, data);
+			machine().bookkeeping().coin_counter_w(1, data);
 			break;
 
 		case 2:     /* LED 3 */

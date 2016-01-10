@@ -891,10 +891,10 @@ void segas32_state::common_io_chip_w(address_space &space, int which, offs_t off
 				m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 				m_eeprom->clk_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			}
-/*            coin_lockout_w(machine(), 1 + 2*which, data & 0x08);
-            coin_lockout_w(machine(), 0 + 2*which, data & 0x04);*/
-			coin_counter_w(machine(), 1 + 2*which, data & 0x02);
-			coin_counter_w(machine(), 0 + 2*which, data & 0x01);
+/*            machine().bookkeeping().coin_lockout_w(1 + 2*which, data & 0x08);
+            machine().bookkeeping().coin_lockout_w(0 + 2*which, data & 0x04);*/
+			machine().bookkeeping().coin_counter_w(1 + 2*which, data & 0x02);
+			machine().bookkeeping().coin_counter_w(0 + 2*which, data & 0x01);
 			break;
 
 		/* tile banking */

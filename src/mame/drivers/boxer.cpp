@@ -316,7 +316,7 @@ WRITE8_MEMBER(boxer_state::boxer_crowd_w)
 	/* BIT2 => CROWD-2 */
 	/* BIT3 => CROWD-3 */
 
-	coin_lockout_global_w(machine(), data & 1);
+	machine().bookkeeping().coin_lockout_global_w(data & 1);
 }
 
 

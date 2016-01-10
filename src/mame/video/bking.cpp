@@ -124,7 +124,7 @@ WRITE8_MEMBER(bking_state::bking_cont1_w)
 	/* D3 = Not Connected */
 	/* D4-D7 = CROW0-CROW3 (selects crow picture) */
 
-	coin_lockout_global_w(machine(), ~data & 0x01);
+	machine().bookkeeping().coin_lockout_global_w(~data & 0x01);
 
 	flip_screen_set(data & 0x04);
 

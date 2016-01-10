@@ -1626,8 +1626,8 @@ WRITE8_MEMBER(mappy_state::out_lamps)
 {
 	set_led_status(machine(), 0, data & 1);
 	set_led_status(machine(), 1, data & 2);
-	coin_lockout_global_w(machine(), data & 4);
-	coin_counter_w(machine(), 0, ~data & 8);
+	machine().bookkeeping().coin_lockout_global_w(data & 4);
+	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 
 MACHINE_START_MEMBER(mappy_state,mappy)

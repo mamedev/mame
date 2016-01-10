@@ -675,10 +675,10 @@ WRITE8_MEMBER(subsino_state::subsino_out_a_w)
 	output_set_lamp_value(14, (data >> 6) & 1); /* Lamp 14 */
 	output_set_lamp_value(15, (data >> 7) & 1); /* Lamp 15 */
 
-	coin_counter_w( machine(), 0, data & 0x01 );    /* coin / keyin */
-	coin_counter_w( machine(), 1, data & 0x02 );    /* keyin / coin */
-	coin_counter_w( machine(), 2, data & 0x10 );    /* keyout */
-	coin_counter_w( machine(), 3, data & 0x20 );    /* payout */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01 );    /* coin / keyin */
+	machine().bookkeeping().coin_counter_w(1, data & 0x02 );    /* keyin / coin */
+	machine().bookkeeping().coin_counter_w(2, data & 0x10 );    /* keyout */
+	machine().bookkeeping().coin_counter_w(3, data & 0x20 );    /* payout */
 
 	m_hopper->write(space, 0, (data & 0x0020) ? 0x80 : 0);   // hopper motor
 

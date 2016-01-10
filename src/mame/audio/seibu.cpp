@@ -276,8 +276,8 @@ WRITE8_MEMBER( seibu_sound_device::bank_w )
 
 WRITE8_MEMBER( seibu_sound_device::coin_w )
 {
-	coin_counter_w(space.machine(), 0, data & 1);
-	coin_counter_w(space.machine(), 1, data & 2);
+	space.machine().bookkeeping().coin_counter_w(0, data & 1);
+	space.machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
 READ8_MEMBER( seibu_sound_device::soundlatch_r )

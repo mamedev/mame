@@ -71,12 +71,12 @@ WRITE8_MEMBER(sonson_state::sonson_sh_irqtrigger_w)
 
 WRITE8_MEMBER(sonson_state::sonson_coin1_counter_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 WRITE8_MEMBER(sonson_state::sonson_coin2_counter_w)
 {
-	coin_counter_w(machine(), 1, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 1);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sonson_state )

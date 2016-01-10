@@ -255,7 +255,7 @@ WRITE_LINE_MEMBER(sg1000a_state::vdp_interrupt)
 
 WRITE8_MEMBER(sg1000a_state::sg1000a_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
 /*************************************

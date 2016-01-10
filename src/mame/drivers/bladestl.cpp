@@ -65,8 +65,8 @@ READ8_MEMBER(bladestl_state::trackball_r)
 WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 {
 	/* bits 0 & 1 = coin counters */
-	coin_counter_w(machine(), 0,data & 0x01);
-	coin_counter_w(machine(), 1,data & 0x02);
+	machine().bookkeeping().coin_counter_w(0,data & 0x01);
+	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
 	/* bits 2 & 3 = lamps */
 	set_led_status(machine(), 0,data & 0x04);

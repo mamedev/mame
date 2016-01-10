@@ -54,8 +54,8 @@ WRITE8_MEMBER(starshp1_state::starshp1_audio_w)
 		break;
 	}
 
-	coin_lockout_w(machine(), 0, !m_attract);
-	coin_lockout_w(machine(), 1, !m_attract);
+	machine().bookkeeping().coin_lockout_w(0, !m_attract);
+	machine().bookkeeping().coin_lockout_w(1, !m_attract);
 }
 
 

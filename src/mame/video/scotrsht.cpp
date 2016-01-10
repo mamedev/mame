@@ -67,8 +67,8 @@ WRITE8_MEMBER(scotrsht_state::palettebank_w)
 		m_bg_tilemap->mark_all_dirty();
 	}
 
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 
 	// data & 4 unknown
 }

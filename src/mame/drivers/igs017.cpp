@@ -1177,8 +1177,8 @@ void igs017_state::mgcs_igs029_run()
 		{
 			case 0x01:
 				m_oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
-				coin_counter_w(machine(), 0, (~data) & 0x20);   // coin in
-				coin_counter_w(machine(), 1, (~data) & 0x40);   // coin out
+				machine().bookkeeping().coin_counter_w(0, (~data) & 0x20);   // coin in
+				machine().bookkeeping().coin_counter_w(1, (~data) & 0x40);   // coin out
 
 //              popmessage("PORT1 %02X", data);
 
@@ -1456,7 +1456,7 @@ WRITE16_MEMBER(igs017_state::sdmg2_magic_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				m_input_select  =   data & 0x1f;
-				coin_counter_w(machine(), 0,    data & 0x20);
+				machine().bookkeeping().coin_counter_w(0,    data & 0x20);
 				//  coin out        data & 0x40
 				m_hopper            =   data & 0x80;
 			}
@@ -1537,7 +1537,7 @@ WRITE16_MEMBER(igs017_state::mgdha_magic_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				//  coin out     data & 0x40
-				coin_counter_w(machine(), 0, data & 0x80);
+				machine().bookkeeping().coin_counter_w(0, data & 0x80);
 			}
 
 			if ( data & ~0xc0 )
@@ -1628,13 +1628,13 @@ WRITE8_MEMBER(igs017_state::tjsb_output_w)
 	switch(m_input_select)
 	{
 		case 0x00:
-			coin_counter_w(machine(), 0,    data & 0x80);   // coin in
+			machine().bookkeeping().coin_counter_w(0,    data & 0x80);   // coin in
 			if (!(data & ~0x80))
 				return;
 			break;
 
 		case 0x01:
-			coin_counter_w(machine(), 1,    data & 0x01);   // coin out
+			machine().bookkeeping().coin_counter_w(1,    data & 0x01);   // coin out
 			if (!(data & ~0x01))
 				return;
 			break;
@@ -2101,8 +2101,8 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
 	{
 		m_input_select      =           data & 0x1f;    // keys
 		m_hopper            =           data & 0x20;    // hopper motor
-		coin_counter_w(machine(), 1,    data & 0x40);   // coin out counter
-		coin_counter_w(machine(), 0,    data & 0x80);   // coin in  counter
+		machine().bookkeeping().coin_counter_w(1,    data & 0x40);   // coin out counter
+		machine().bookkeeping().coin_counter_w(0,    data & 0x80);   // coin in  counter
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -2150,8 +2150,8 @@ WRITE16_MEMBER(igs017_state::slqz2_magic_w)
 				m_oki->set_bank_base((data & 0x01) ? 0x40000 : 0);
 
 //              m_hopper            =           data & 0x20;    // hopper motor
-//              coin_counter_w(machine(), 1,    data & 0x40);   // coin out counter
-				coin_counter_w(machine(), 0,    data & 0x80);   // coin in  counter
+//              machine().bookkeeping().coin_counter_w(1,    data & 0x40);   // coin out counter
+				machine().bookkeeping().coin_counter_w(0,    data & 0x80);   // coin in  counter
 
 				if ( data & 0x7e )
 					logerror("%s: warning, unknown bits written in oki bank = %04x\n", machine().describe_context(), data);

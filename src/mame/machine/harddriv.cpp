@@ -357,7 +357,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_wr0_write )
 
 		case 6: /* CC1 */
 		case 7: /* CC2 */
-			coin_counter_w(space.machine(), offset - 6, data);
+			space.machine().bookkeeping().coin_counter_w(offset - 6, data);
 			break;
 	}
 }

@@ -298,10 +298,10 @@ WRITE16_MEMBER(cave_state::cave_eeprom_msb_w)
 
 	if (ACCESSING_BITS_8_15)  // even address
 	{
-		coin_lockout_w(machine(), 1,~data & 0x8000);
-		coin_lockout_w(machine(), 0,~data & 0x4000);
-		coin_counter_w(machine(), 1, data & 0x2000);
-		coin_counter_w(machine(), 0, data & 0x1000);
+		machine().bookkeeping().coin_lockout_w(1,~data & 0x8000);
+		machine().bookkeeping().coin_lockout_w(0,~data & 0x4000);
+		machine().bookkeeping().coin_counter_w(1, data & 0x2000);
+		machine().bookkeeping().coin_counter_w(0, data & 0x1000);
 
 		// latch the bit
 		m_eeprom->di_write((data & 0x0800) >> 11);
@@ -363,10 +363,10 @@ WRITE16_MEMBER(cave_state::cave_eeprom_lsb_w)
 
 	if (ACCESSING_BITS_0_7)  // odd address
 	{
-		coin_lockout_w(machine(), 1, ~data & 0x0008);
-		coin_lockout_w(machine(), 0, ~data & 0x0004);
-		coin_counter_w(machine(), 1,  data & 0x0002);
-		coin_counter_w(machine(), 0,  data & 0x0001);
+		machine().bookkeeping().coin_lockout_w(1, ~data & 0x0008);
+		machine().bookkeeping().coin_lockout_w(0, ~data & 0x0004);
+		machine().bookkeeping().coin_counter_w(1,  data & 0x0002);
+		machine().bookkeeping().coin_counter_w(0,  data & 0x0001);
 
 		// latch the bit
 		m_eeprom->di_write((data & 0x80) >> 7);
@@ -384,8 +384,8 @@ WRITE16_MEMBER(cave_state::gaia_coin_lsb_w)
 {
 	if (ACCESSING_BITS_0_7)  // odd address
 	{
-		coin_counter_w(machine(), 1, data & 0x0002);
-		coin_counter_w(machine(), 0, data & 0x0001);
+		machine().bookkeeping().coin_counter_w(1, data & 0x0002);
+		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
 	}
 }
 
@@ -398,8 +398,8 @@ WRITE16_MEMBER(cave_state::metmqstr_eeprom_msb_w)
 
 	if (ACCESSING_BITS_8_15)  // even address
 	{
-		coin_counter_w(machine(), 1, data & 0x2000);
-		coin_counter_w(machine(), 0, data & 0x1000);
+		machine().bookkeeping().coin_counter_w(1, data & 0x2000);
+		machine().bookkeeping().coin_counter_w(0, data & 0x1000);
 
 		if (~data & 0x0100)
 		{
@@ -644,12 +644,12 @@ WRITE16_MEMBER(cave_state::korokoro_leds_w)
 	set_led_status(machine(), 1, data & 0x4000);
 	set_led_status(machine(), 2, data & 0x1000);    // square button
 	set_led_status(machine(), 3, data & 0x0800);    // round  button
-//  coin_lockout_w(machine(), 1, ~data & 0x0200);   // coin lockouts?
-//  coin_lockout_w(machine(), 0, ~data & 0x0100);
+//  machine().bookkeeping().coin_lockout_w(1, ~data & 0x0200);   // coin lockouts?
+//  machine().bookkeeping().coin_lockout_w(0, ~data & 0x0100);
 
-//  coin_counter_w(machine(), 2, data & 0x0080);
-//  coin_counter_w(machine(), 1, data & 0x0020);
-	coin_counter_w(machine(), 0, data & 0x0010);
+//  machine().bookkeeping().coin_counter_w(2, data & 0x0080);
+//  machine().bookkeeping().coin_counter_w(1, data & 0x0020);
+	machine().bookkeeping().coin_counter_w(0, data & 0x0010);
 
 	set_led_status(machine(), 5, data & 0x0008);
 	set_led_status(machine(), 6, data & 0x0004);
@@ -843,7 +843,7 @@ WRITE16_MEMBER(cave_state::ppsatan_out_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x0001);
+		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
 
 		set_led_status(machine(), 0, data & 0x0010);
 		set_led_status(machine(), 1, data & 0x0020);

@@ -619,8 +619,8 @@ WRITE8_MEMBER(amaticmg_state::out_c_w)
 	output_set_lamp_value(5, (data >> 4) & 1);  /* HOLD2 */
 	output_set_lamp_value(6, (data >> 6) & 1);  /* CANCEL */
 
-//  coin_counter_w(machine(), 0, data & 0x04);  /* Coin In */
-//  coin_counter_w(machine(), 1, data & 0x01);  /* Coin Out */
+//  machine().bookkeeping().coin_counter_w(0, data & 0x04);  /* Coin In */
+//  machine().bookkeeping().coin_counter_w(1, data & 0x01);  /* Coin Out */
 
 	logerror("port C: %2X\n", data);
 }

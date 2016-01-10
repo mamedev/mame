@@ -138,7 +138,7 @@ WRITE8_MEMBER(ultratnk_state::ultratnk_led_2_w)
 
 WRITE8_MEMBER(ultratnk_state::ultratnk_lockout_w)
 {
-	coin_lockout_global_w(machine(), ~offset & 1);
+	machine().bookkeeping().coin_lockout_global_w(~offset & 1);
 }
 
 

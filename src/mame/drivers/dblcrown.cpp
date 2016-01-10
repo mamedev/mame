@@ -298,8 +298,8 @@ WRITE8_MEMBER( dblcrown_state::output_w )
   x-x- --xx  unknown
 */
 
-	coin_counter_w(machine(), 0, data & 0x10);  /* Coin In counter pulse */
-	coin_counter_w(machine(), 1 ,data & 0x08);  /* Payout counter pulse */
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);  /* Coin In counter pulse */
+	machine().bookkeeping().coin_counter_w(1 ,data & 0x08);  /* Payout counter pulse */
 //  popmessage("out: %02x", data);
 }
 

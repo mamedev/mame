@@ -208,8 +208,8 @@ WRITE8_MEMBER(dacholer_state::bg_bank_w)
 
 WRITE8_MEMBER(dacholer_state::coins_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 
 	set_led_status(machine(), 0, data & 4);
 	set_led_status(machine(), 1, data & 8);

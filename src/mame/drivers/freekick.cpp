@@ -66,7 +66,7 @@ WRITE8_MEMBER(freekick_state::flipscreen_w)
 
 WRITE8_MEMBER(freekick_state::coin_w)
 {
-	coin_counter_w(machine(), offset, ~data & 1);
+	machine().bookkeeping().coin_counter_w(offset, ~data & 1);
 }
 
 WRITE8_MEMBER(freekick_state::spinner_select_w)

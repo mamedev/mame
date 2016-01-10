@@ -205,7 +205,7 @@ WRITE8_MEMBER(gei_state::lamps_w)
 WRITE8_MEMBER(gei_state::sound_w)
 {
 	/* bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes */
-	coin_lockout_global_w(machine(), ~data & 0x08);
+	machine().bookkeeping().coin_lockout_global_w(~data & 0x08);
 	set_led_status(machine(), 9,data & 0x08);
 
 	/* bit 5 - ticket out in trivia games */
@@ -222,8 +222,8 @@ WRITE8_MEMBER(gei_state::sound_w)
 WRITE8_MEMBER(gei_state::sound2_w)
 {
 	/* bit 3,6 - coin lockout, lamp10+11 in selection test mode */
-	coin_lockout_w(machine(), 0, ~data & 0x08);
-	coin_lockout_w(machine(), 1, ~data & 0x40);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x08);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x40);
 	set_led_status(machine(), 9,data & 0x08);
 	set_led_status(machine(), 10,data & 0x40);
 

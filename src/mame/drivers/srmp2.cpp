@@ -164,8 +164,8 @@ WRITE16_MEMBER(srmp2_state::srmp2_flags_w)
 */
 
 
-	coin_counter_w( machine(), 0, ((data & 0x01) >> 0) );
-	coin_lockout_w( machine(), 0, (((~data) & 0x10) >> 4) );
+	machine().bookkeeping().coin_counter_w(0, ((data & 0x01) >> 0) );
+	machine().bookkeeping().coin_lockout_w(0, (((~data) & 0x10) >> 4) );
 	m_adpcm_bank = ( (data & 0x20) >> 5 );
 	m_color_bank = ( (data & 0x80) >> 7 );
 }
@@ -178,8 +178,8 @@ WRITE16_MEMBER(srmp2_state::mjyuugi_flags_w)
     ---x ---- : Coin Lock Out
 */
 
-	coin_counter_w( machine(), 0, ((data & 0x01) >> 0) );
-	coin_lockout_w( machine(), 0, (((~data) & 0x10) >> 4) );
+	machine().bookkeeping().coin_counter_w(0, ((data & 0x01) >> 0) );
+	machine().bookkeeping().coin_lockout_w(0, (((~data) & 0x10) >> 4) );
 }
 
 
@@ -476,8 +476,8 @@ WRITE8_MEMBER(srmp2_state::srmp3_flags_w)
 */
 
 
-	coin_counter_w( machine(), 0, ((data & 0x01) >> 0) );
-	coin_lockout_w( machine(), 0, (((~data) & 0x10) >> 4) );
+	machine().bookkeeping().coin_counter_w(0, ((data & 0x01) >> 0) );
+	machine().bookkeeping().coin_lockout_w(0, (((~data) & 0x10) >> 4) );
 	m_gfx_bank = (data >> 6) & 0x03;
 }
 

@@ -698,9 +698,9 @@ WRITE8_MEMBER(norautp_state::counterlamps_w)
 	output_set_lamp_value(10, (data >> 0) & 1); /* HI lamp */
 	output_set_lamp_value(11, (data >> 1) & 1); /* LO lamp */
 
-	coin_counter_w(machine(), 0, data & 0x10);  /* Coin1/3 counter */
-	coin_counter_w(machine(), 1, data & 0x20);  /* Coin2 counter */
-	coin_counter_w(machine(), 2, data & 0x08);  /* Payout pulse */
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);  /* Coin1/3 counter */
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);  /* Coin2 counter */
+	machine().bookkeeping().coin_counter_w(2, data & 0x08);  /* Payout pulse */
 }
 
 

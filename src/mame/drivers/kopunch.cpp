@@ -118,8 +118,8 @@ WRITE8_MEMBER(kopunch_state::lamp_w)
 
 WRITE8_MEMBER(kopunch_state::coin_w)
 {
-	coin_counter_w(machine(), 0, ~data & 0x80);
-	coin_counter_w(machine(), 1, ~data & 0x40);
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x80);
+	machine().bookkeeping().coin_counter_w(1, ~data & 0x40);
 
 //  if ((data & 0x3f) != 0x3e)
 //      printf("port 34 = %02x   ",data);

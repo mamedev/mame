@@ -167,7 +167,7 @@ WRITE8_MEMBER( liberatr_state::led_w )
 
 WRITE8_MEMBER( liberatr_state::coin_counter_w )
 {
-	::coin_counter_w(machine(), offset ^ 0x01, data & 0x10);
+	machine().bookkeeping().coin_counter_w(offset ^ 0x01, data & 0x10);
 }
 
 

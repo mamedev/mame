@@ -97,9 +97,9 @@ WRITE16_MEMBER(twin16_state::CPUA_register_w)
 		if (rising_edge & 0x10)
 			m_subcpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 
-		coin_counter_w(machine(), 0, m_CPUA_register & 0x01);
-		coin_counter_w(machine(), 1, m_CPUA_register & 0x02);
-		coin_counter_w(machine(), 2, m_CPUA_register & 0x04);
+		machine().bookkeeping().coin_counter_w(0, m_CPUA_register & 0x01);
+		machine().bookkeeping().coin_counter_w(1, m_CPUA_register & 0x02);
+		machine().bookkeeping().coin_counter_w(2, m_CPUA_register & 0x04);
 	}
 }
 
@@ -139,8 +139,8 @@ WRITE16_MEMBER(fround_state::fround_CPU_register_w)
 		if ((old & 0x08) == 0 && (m_CPUA_register & 0x08))
 			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 
-		coin_counter_w(machine(), 0, m_CPUA_register & 0x01);
-		coin_counter_w(machine(), 1, m_CPUA_register & 0x02);
+		machine().bookkeeping().coin_counter_w(0, m_CPUA_register & 0x01);
+		machine().bookkeeping().coin_counter_w(1, m_CPUA_register & 0x02);
 	}
 }
 

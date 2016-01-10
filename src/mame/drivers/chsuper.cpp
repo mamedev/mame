@@ -137,9 +137,9 @@ WRITE8_MEMBER( chsuper_state::chsuper_vram_w )
 
 WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 {
-	coin_counter_w(machine(), 0, data & 0x01);  // Coin counter
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);  // Coin counter
 	output_set_lamp_value(0, (data >> 1) & 1);  // Hold 1 / Black (Nero) lamp.
-	coin_counter_w(machine(), 1, data & 0x04);  // Payout / Ticket Out pulse
+	machine().bookkeeping().coin_counter_w(1, data & 0x04);  // Payout / Ticket Out pulse
 	output_set_lamp_value(1, (data >> 3) & 1);  // Hold 2 / Low (Bassa) lamp.
 	// D4: unused...
 	output_set_lamp_value(5, (data >> 5) & 1);  // BET lamp

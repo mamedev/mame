@@ -44,10 +44,10 @@ WRITE16_MEMBER(wrally_state::okim6295_bankswitch_w)
 
 WRITE16_MEMBER(wrally_state::wrally_coin_counter_w)
 {
-	coin_counter_w( machine(), (offset >> 3) & 0x01, data & 0x01);
+	machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
 }
 
 WRITE16_MEMBER(wrally_state::wrally_coin_lockout_w)
 {
-	coin_lockout_w( machine(), (offset >> 3) & 0x01, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w((offset >> 3) & 0x01, ~data & 0x01);
 }

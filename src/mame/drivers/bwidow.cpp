@@ -335,8 +335,8 @@ WRITE8_MEMBER(bwidow_state::bwidow_misc_w)
 	if (data == m_lastdata) return;
 	set_led_status(machine(), 0,~data & 0x10);
 	set_led_status(machine(), 1,~data & 0x20);
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	m_lastdata = data;
 }
 
@@ -345,12 +345,12 @@ WRITE8_MEMBER(bwidow_state::spacduel_coin_counter_w)
 	if (data == m_lastdata) return;
 	set_led_status(machine(), 0, !BIT(data,5)); // start lamp
 	set_led_status(machine(), 1, !BIT(data,4)); // select lamp
-	coin_lockout_w(machine(), 0, !BIT(data,3));
-	coin_lockout_w(machine(), 1, !BIT(data,3));
-	coin_lockout_w(machine(), 2, !BIT(data,3));
-	coin_counter_w(machine(), 0, BIT(data,0));
-	coin_counter_w(machine(), 1, BIT(data,1));
-	coin_counter_w(machine(), 2, BIT(data,2));
+	machine().bookkeeping().coin_lockout_w(0, !BIT(data,3));
+	machine().bookkeeping().coin_lockout_w(1, !BIT(data,3));
+	machine().bookkeeping().coin_lockout_w(2, !BIT(data,3));
+	machine().bookkeeping().coin_counter_w(0, BIT(data,0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data,1));
+	machine().bookkeeping().coin_counter_w(2, BIT(data,2));
 	m_lastdata = data;
 }
 

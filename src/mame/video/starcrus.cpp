@@ -79,7 +79,7 @@ WRITE8_MEMBER(starcrus_state::ship_parm_2_w)
 {
 	m_s2_sprite = data&0x1f;
 	set_led_status(machine(), 2,~data & 0x80);          /* game over lamp */
-	coin_counter_w(machine(), 0, ((data&0x40)>>6)^0x01);    /* coin counter */
+	machine().bookkeeping().coin_counter_w(0, ((data&0x40)>>6)^0x01);    /* coin counter */
 	m_engine2_on = ((data&0x20)>>5)^0x01;
 
 	if (m_engine1_on || m_engine2_on)

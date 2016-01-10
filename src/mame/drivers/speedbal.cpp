@@ -44,8 +44,8 @@ void speedbal_state::machine_start()
 
 WRITE8_MEMBER(speedbal_state::coincounter_w)
 {
-	coin_counter_w(machine(), 0, data & 0x80);
-	coin_counter_w(machine(), 1, data & 0x40);
+	machine().bookkeeping().coin_counter_w(0, data & 0x80);
+	machine().bookkeeping().coin_counter_w(1, data & 0x40);
 	flip_screen_set(data & 8); // also changes data & 0x10 at the same time too (flipx and flipy?)
 	/* unknown: (data & 0x10) and (data & 4) */
 }

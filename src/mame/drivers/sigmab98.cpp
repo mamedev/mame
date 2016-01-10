@@ -861,9 +861,9 @@ WRITE8_MEMBER(sigmab98_state::c4_w)
 // 20 led? (starts blinking after coin in)
 WRITE8_MEMBER(sigmab98_state::c6_w)
 {
-	coin_lockout_w(machine(), 0, (~data) & 0x02);
+	machine().bookkeeping().coin_lockout_w(0, (~data) & 0x02);
 
-	coin_counter_w(machine(), 0,   data  & 0x04);
+	machine().bookkeeping().coin_counter_w(0,   data  & 0x04);
 
 	if ((data & 0x08) && !(m_c6 & 0x08))
 		m_buffered_spriteram->copy();
@@ -1159,13 +1159,13 @@ void sigmab98_state::show_3_outputs()
 // Port 31
 WRITE8_MEMBER(sigmab98_state::sammymdl_coin_w)
 {
-	coin_counter_w(machine(), 0,   data  & 0x01 );  // coin1 in
-	coin_counter_w(machine(), 1,   data  & 0x02 );  // coin2 in
-	coin_counter_w(machine(), 2,   data  & 0x04 );  // medal in
+	machine().bookkeeping().coin_counter_w(0,   data  & 0x01 );  // coin1 in
+	machine().bookkeeping().coin_counter_w(1,   data  & 0x02 );  // coin2 in
+	machine().bookkeeping().coin_counter_w(2,   data  & 0x04 );  // medal in
 
-//  coin_lockout_w(machine(), 1, (~data) & 0x08 ); // coin2 lockout?
-//  coin_lockout_w(machine(), 0, (~data) & 0x10 ); // coin1 lockout
-//  coin_lockout_w(machine(), 2, (~data) & 0x20 ); // medal lockout?
+//  machine().bookkeeping().coin_lockout_w(1, (~data) & 0x08 ); // coin2 lockout?
+//  machine().bookkeeping().coin_lockout_w(0, (~data) & 0x10 ); // coin1 lockout
+//  machine().bookkeeping().coin_lockout_w(2, (~data) & 0x20 ); // medal lockout?
 
 	m_out[0] = data;
 	show_3_outputs();
@@ -1449,7 +1449,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_leds_w)
 
 WRITE8_MEMBER(sigmab98_state::haekaka_coin_w)
 {
-	coin_counter_w(machine(), 0,   data & 0x01 );   // medal out
+	machine().bookkeeping().coin_counter_w(0,   data & 0x01 );   // medal out
 //                                 data & 0x02 ?
 //                                 data & 0x04 ?
 //                                 data & 0x10 ?

@@ -224,7 +224,7 @@ public:
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(coin_counter_cb)
 	{
-		coin_counter_w(machine(), 0, (data > 2.0) ? 0 : 1);
+		machine().bookkeeping().coin_counter_w(0, (data > 2.0) ? 0 : 1);
 	}
 
 	DECLARE_INPUT_CHANGED_MEMBER(cb_free_play)

@@ -66,8 +66,8 @@ WRITE8_MEMBER(mainevt_state::mainevt_bankswitch_w)
 
 WRITE8_MEMBER(mainevt_state::mainevt_coin_w)
 {
-	coin_counter_w(machine(), 0, data & 0x10);
-	coin_counter_w(machine(), 1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 	set_led_status(machine(), 0, data & 0x01);
 	set_led_status(machine(), 1, data & 0x02);
 	set_led_status(machine(), 2, data & 0x04);

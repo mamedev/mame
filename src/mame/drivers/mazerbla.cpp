@@ -891,7 +891,7 @@ WRITE8_MEMBER(mazerbla_state::zpu_lamps_w)
 WRITE8_MEMBER(mazerbla_state::zpu_coin_counter_w)
 {
 	/* bit 6 = coin counter */
-	coin_counter_w(machine(), offset, BIT(data, 6));
+	machine().bookkeeping().coin_counter_w(offset, BIT(data, 6));
 }
 
 WRITE8_MEMBER(mazerbla_state::cfb_led_w)

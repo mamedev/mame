@@ -86,8 +86,8 @@ WRITE8_MEMBER(arabian_state::ay8910_portb_w)
 	m_mcu->set_input_line(INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
 
 	/* clock the coin counters */
-	coin_counter_w(machine(), 1, ~data & 0x02);
-	coin_counter_w(machine(), 0, ~data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x01);
 }
 
 

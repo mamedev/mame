@@ -133,7 +133,7 @@ WRITE8_MEMBER(mcr3_state::mcrmono_control_port_w)
 	        D0 = coin meter 1
 	*/
 
-	coin_counter_w(machine(), 0, (data >> 0) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
 	mcr_cocktail_flip = (data >> 6) & 1;
 }
 

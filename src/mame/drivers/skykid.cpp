@@ -28,9 +28,9 @@ WRITE8_MEMBER(skykid_state::inputport_select_w)
 		m_inputport_selected = data & 0x07;
 	else if ((data & 0xe0) == 0xc0)
 	{
-		coin_lockout_global_w(machine(), ~data & 1);
-		coin_counter_w(machine(), 0,data & 2);
-		coin_counter_w(machine(), 1,data & 4);
+		machine().bookkeeping().coin_lockout_global_w(~data & 1);
+		machine().bookkeeping().coin_counter_w(0,data & 2);
+		machine().bookkeeping().coin_counter_w(1,data & 4);
 	}
 }
 

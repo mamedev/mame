@@ -403,8 +403,8 @@ WRITE16_MEMBER(highvdeo_state::nyj_write2_w)
     xxx- ----  Unknown.
 */
 //  popmessage("%04x",data);
-	coin_counter_w(machine(), 0, ~data & 0x0f); // Coins (all)
-	coin_counter_w(machine(), 1, ~data & 0x10); // Notes (all)
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x0f); // Coins (all)
+	machine().bookkeeping().coin_counter_w(1, ~data & 0x10); // Notes (all)
 }
 
 WRITE16_MEMBER(highvdeo_state::tv_tcf_bankselect_w)
@@ -470,8 +470,8 @@ WRITE16_MEMBER(highvdeo_state::write2_w)
 
 	for(i=0;i<4;i++)
 	{
-		coin_counter_w(machine(), i,data & 0x20);
-		coin_lockout_w(machine(), i,~data & 0x08);
+		machine().bookkeeping().coin_counter_w(i,data & 0x20);
+		machine().bookkeeping().coin_lockout_w(i,~data & 0x08);
 	}
 }
 
@@ -1559,8 +1559,8 @@ WRITE16_MEMBER(highvdeo_state::fashion_output_w)
 
 	for(i=0;i<4;i++)
 	{
-		coin_counter_w(machine(), i,data & 0x20);
-		coin_lockout_w(machine(), i,~data & 0x01);
+		machine().bookkeeping().coin_counter_w(i,data & 0x20);
+		machine().bookkeeping().coin_lockout_w(i,~data & 0x01);
 	}
 }
 

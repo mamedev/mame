@@ -131,7 +131,7 @@ READ32_MEMBER(eolith_state::eolith_custom_r)
 WRITE32_MEMBER(eolith_state::systemcontrol_w)
 {
 	m_buffer = (data & 0x80) >> 7;
-	coin_counter_w(machine(), 0, data & m_coin_counter_bit);
+	machine().bookkeeping().coin_counter_w(0, data & m_coin_counter_bit);
 	set_led_status(machine(), 0, data & 1);
 
 	m_eepromoutport->write(data, 0xff);

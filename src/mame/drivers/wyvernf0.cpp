@@ -321,8 +321,8 @@ WRITE8_MEMBER(wyvernf0_state::rambank_w)
 	flip_screen_x_set(data & 0x01);
 	flip_screen_y_set(data & 0x02);
 
-	coin_lockout_w(machine(), 0, !(data & 0x40));
-	coin_lockout_w(machine(), 1, !(data & 0x40));
+	machine().bookkeeping().coin_lockout_w(0, !(data & 0x40));
+	machine().bookkeeping().coin_lockout_w(1, !(data & 0x40));
 
 	m_rambank = data;
 	membank("rambank")->set_entry((data & 0x80) ? 1 : 0);

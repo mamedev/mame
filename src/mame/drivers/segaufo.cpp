@@ -318,8 +318,8 @@ WRITE8_MEMBER(ufo_state::ufo_lamps_w)
 
 	// d4,d5: ?
 	// d6,d7: coincounters
-	coin_counter_w(machine(), 0, data & 0x40); // 100 Y
-	coin_counter_w(machine(), 1, data & 0x80); // 500 Y
+	machine().bookkeeping().coin_counter_w(0, data & 0x40); // 100 Y
+	machine().bookkeeping().coin_counter_w(1, data & 0x80); // 500 Y
 }
 
 
@@ -385,7 +385,7 @@ WRITE8_MEMBER(ufo_state::ex_cp_lamps_w)
 
 	// d2,d3,d6,d7: p1/p2 coincounters
 	for (int i = 0; i < 4; i++)
-		coin_counter_w(machine(), i, data >> (2 + (i&1) + (i&2) * 2) & 1);
+		machine().bookkeeping().coin_counter_w(i, data >> (2 + (i&1) + (i&2) * 2) & 1);
 }
 
 WRITE8_MEMBER(ufo_state::ex_crane_xyz_w)

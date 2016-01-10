@@ -1132,8 +1132,8 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 				m_segaic16vid->set_display_enable(data & 0x20);
 			set_led_status(machine(), 1, data & 0x08);
 			set_led_status(machine(), 0, data & 0x04);
-			coin_counter_w(machine(), 1, data & 0x02);
-			coin_counter_w(machine(), 0, data & 0x01);
+			machine().bookkeeping().coin_counter_w(1, data & 0x02);
+			machine().bookkeeping().coin_counter_w(0, data & 0x01);
 			return;
 	}
 	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", space.device().safe_pc(), offset * 2, data, mem_mask);

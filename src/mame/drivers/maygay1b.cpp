@@ -402,7 +402,7 @@ WRITE8_MEMBER(maygay1b_state::m1_lockout_w)
 	int i;
 	for (i=0; i<6; i++)
 	{
-		coin_lockout_w(machine(), i, data & (1 << i) );
+		machine().bookkeeping().coin_lockout_w(i, data & (1 << i) );
 	}
 }
 

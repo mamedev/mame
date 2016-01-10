@@ -297,7 +297,7 @@ WRITE16_MEMBER(mil4000_state::output_w)
 	int i;
 
 	for(i=0;i<3;i++)
-		coin_counter_w(machine(), i, data & 0x2000);
+		machine().bookkeeping().coin_counter_w(i, data & 0x2000);
 
 	output_set_lamp_value(0, (data) & 1);       /* HOLD1 */
 	output_set_lamp_value(1, (data >> 1) & 1);  /* HOLD2 */

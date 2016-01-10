@@ -562,10 +562,10 @@ WRITE8_MEMBER(luckgrln_state::counters_w)
     xxxx ----  unused
 
 */
-	coin_counter_w(machine(), 0, data & 0x01);  /* COIN 1 */
-	coin_counter_w(machine(), 1, data & 0x04);  /* COIN 2 */
-	coin_counter_w(machine(), 2, data & 0x08);  /* COIN 3 */
-	coin_counter_w(machine(), 3, data & 0x02);  /* KEY IN */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);  /* COIN 1 */
+	machine().bookkeeping().coin_counter_w(1, data & 0x04);  /* COIN 2 */
+	machine().bookkeeping().coin_counter_w(2, data & 0x08);  /* COIN 3 */
+	machine().bookkeeping().coin_counter_w(3, data & 0x02);  /* KEY IN */
 }
 
 

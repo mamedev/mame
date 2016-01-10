@@ -705,9 +705,9 @@ WRITE8_MEMBER(snookr10_state::output_port_0_w)
 	output_set_lamp_value(5, m_bit3);   /* Lamp 5 - STOP4  */
 	output_set_lamp_value(6, m_bit4);   /* Lamp 6 - STOP5  */
 
-	coin_counter_w(machine(), 0, data & 0x01);  /* Coin in */
-	coin_counter_w(machine(), 1, data & 0x10);  /* Key in */
-	coin_counter_w(machine(), 2, data & 0x04);  /* Payout x10 */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);  /* Coin in */
+	machine().bookkeeping().coin_counter_w(1, data & 0x10);  /* Key in */
+	machine().bookkeeping().coin_counter_w(2, data & 0x04);  /* Payout x10 */
 
 //  logerror("high: %04x - low: %X \n", m_outporth, m_outportl);
 //  popmessage("written : %02X", data);

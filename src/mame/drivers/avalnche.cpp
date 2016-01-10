@@ -91,8 +91,8 @@ WRITE8_MEMBER(avalnche_state::avalance_video_invert_w)
 
 WRITE8_MEMBER(avalnche_state::catch_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
 WRITE8_MEMBER(avalnche_state::avalance_credit_1_lamp_w)

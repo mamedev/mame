@@ -479,7 +479,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_rombank_w)
 	membank("bank1")->set_entry(((data >> 2) & 0x7));
 
 	// COIN OUT:        data & 0x20
-	coin_counter_w(machine(), 0,    data & 0x40);
+	machine().bookkeeping().coin_counter_w(0,    data & 0x40);
 	m_hopper = data & 0x80;
 }
 

@@ -304,7 +304,7 @@ WRITE8_MEMBER(sbrkout_state::serve_2_led_w)
 
 WRITE8_MEMBER(sbrkout_state::coincount_w)
 {
-	coin_counter_w(machine(), 0, offset & 1);
+	machine().bookkeeping().coin_counter_w(0, offset & 1);
 }
 
 

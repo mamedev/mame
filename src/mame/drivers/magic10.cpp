@@ -279,7 +279,7 @@ WRITE16_MEMBER(magic10_state::magic10_out_w)
 	output_set_lamp_value(7, (data >> 6) & 1);      /* Lamp 7 - PLAY (BET/TAKE/CANCEL) */
 	output_set_lamp_value(8, (data >> 8) & 1);      /* Lamp 8 - PAYOUT/SUPERGAME */
 
-	coin_counter_w(machine(), 0, data & 0x400);
+	machine().bookkeeping().coin_counter_w(0, data & 0x400);
 }
 
 /***************************

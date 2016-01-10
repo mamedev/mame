@@ -58,7 +58,7 @@ void wpc_out_device::send_output(int sid, int state)
 	output_set_value(name, state);
 
 	if(sid == 41)
-		coin_counter_w(machine(), 0, state);
+		machine().bookkeeping().coin_counter_w(0, state);
 }
 
 WRITE8_MEMBER(wpc_out_device::out_w)

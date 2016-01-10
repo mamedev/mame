@@ -227,7 +227,7 @@ WRITE8_MEMBER(jedi_state::a2d_select_w)
 
 WRITE8_MEMBER(jedi_state::jedi_coin_counter_w)
 {
-	coin_counter_w(machine(), offset, data);
+	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
 

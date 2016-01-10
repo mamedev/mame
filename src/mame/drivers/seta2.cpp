@@ -151,8 +151,8 @@ WRITE16_MEMBER(seta2_state::grdians_lockout_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		// initially 0, then either $25 (coin 1) or $2a (coin 2)
-		coin_counter_w(machine(), 0,data & 0x01);   // or 0x04
-		coin_counter_w(machine(), 1,data & 0x02);   // or 0x08
+		machine().bookkeeping().coin_counter_w(0,data & 0x01);   // or 0x04
+		machine().bookkeeping().coin_counter_w(1,data & 0x02);   // or 0x08
 	}
 //  popmessage("%04X", data & 0xffff);
 }
@@ -344,8 +344,8 @@ WRITE16_MEMBER(seta2_state::pzlbowl_coin_counter_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0,data & 0x10);
-		coin_counter_w(machine(), 1,data & 0x20);
+		machine().bookkeeping().coin_counter_w(0,data & 0x10);
+		machine().bookkeeping().coin_counter_w(1,data & 0x20);
 	}
 }
 
@@ -422,10 +422,10 @@ WRITE16_MEMBER(seta2_state::reelquak_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x01);  // coin in
-		coin_counter_w(machine(), 1, data & 0x02);  // coin in
-		coin_counter_w(machine(), 2, data & 0x04);  // pay out
-		coin_counter_w(machine(), 3, data & 0x08);  // key in
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);  // coin in
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);  // coin in
+		machine().bookkeeping().coin_counter_w(2, data & 0x04);  // pay out
+		machine().bookkeeping().coin_counter_w(3, data & 0x08);  // key in
 		//                                data & 0x10); // Sound IRQ Ack.? 1->0
 		//                                data & 0x20); // Vblank IRQ.? 1
 	}
@@ -474,11 +474,11 @@ WRITE16_MEMBER(seta2_state::samshoot_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x10);
-		coin_counter_w(machine(), 1, data & 0x20);
+		machine().bookkeeping().coin_counter_w(0, data & 0x10);
+		machine().bookkeeping().coin_counter_w(1, data & 0x20);
 		// Are these connected? They are set in I/O test
-		coin_lockout_w(machine(), 0,~data & 0x40);
-		coin_lockout_w(machine(), 1,~data & 0x80);
+		machine().bookkeeping().coin_lockout_w(0,~data & 0x40);
+		machine().bookkeeping().coin_lockout_w(1,~data & 0x80);
 	}
 //  popmessage("%04x",data);
 }

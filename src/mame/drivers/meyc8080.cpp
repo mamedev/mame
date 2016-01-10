@@ -251,12 +251,12 @@ WRITE8_MEMBER(meyc8080_state::counters_w)
   xxxx ----   Seems unused...
 
 */
-	coin_counter_w(machine(), 0, ~data & 0x01); /* Coin1 */
-	coin_counter_w(machine(), 1, ~data & 0x04); /* Bets */
-	coin_counter_w(machine(), 2, ~data & 0x02); /* Payout */
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x01); /* Coin1 */
+	machine().bookkeeping().coin_counter_w(1, ~data & 0x04); /* Bets */
+	machine().bookkeeping().coin_counter_w(2, ~data & 0x02); /* Payout */
 
 	/* Only Draw Poker (2-11) (mdrawpkra) */
-	coin_counter_w(machine(), 3, ~data & 0x08); /* Manual Keyout */
+	machine().bookkeeping().coin_counter_w(3, ~data & 0x08); /* Manual Keyout */
 
 	logerror("counters: %02x\n", ~data);
 }

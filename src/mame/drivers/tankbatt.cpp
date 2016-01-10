@@ -149,14 +149,14 @@ WRITE8_MEMBER(tankbatt_state::irq_ack_w)
 
 WRITE8_MEMBER(tankbatt_state::coincounter_w)
 {
-	coin_counter_w(machine(), 0,data & 1);
-	coin_counter_w(machine(), 1,data & 1);
+	machine().bookkeeping().coin_counter_w(0,data & 1);
+	machine().bookkeeping().coin_counter_w(1,data & 1);
 }
 
 WRITE8_MEMBER(tankbatt_state::coinlockout_w)
 {
-	coin_lockout_w(machine(), 0,data & 1);
-	coin_lockout_w(machine(), 1,data & 1);
+	machine().bookkeeping().coin_lockout_w(0,data & 1);
+	machine().bookkeeping().coin_lockout_w(1,data & 1);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbatt_state )

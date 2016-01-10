@@ -281,7 +281,7 @@ WRITE16_MEMBER(tetrisp2_state::rocknms_sub2main_w)
 
 WRITE16_MEMBER(tetrisp2_state::tetrisp2_coincounter_w)
 {
-	coin_counter_w( machine(), 0, (data & 0x0001));
+	machine().bookkeeping().coin_counter_w(0, (data & 0x0001));
 }
 
 
@@ -331,9 +331,9 @@ WRITE16_MEMBER(tetrisp2_state::nndmseal_coincounter_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w( machine(), 0,  data  & 0x0001 );
+		machine().bookkeeping().coin_counter_w(0,  data  & 0x0001 );
 		//                  data  & 0x0004 ?
-		coin_lockout_w( machine(), 0,(~data) & 0x0008 );
+		machine().bookkeeping().coin_lockout_w(0,(~data) & 0x0008 );
 	}
 	if (ACCESSING_BITS_8_15)
 	{

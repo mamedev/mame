@@ -417,9 +417,9 @@ WRITE8_MEMBER(smsmfg_state::ppi0_b_w)
 	output_set_lamp_value(8, !BIT(data,7)); /* Stand Light */
 	output_set_lamp_value(9, !BIT(data,6)); /* Cancel Light */
 
-	coin_counter_w(machine(), 0, BIT(data,1));
-	coin_lockout_w(machine(), 0, BIT(data,5));
-	coin_lockout_w(machine(), 1, BIT(data,4));
+	machine().bookkeeping().coin_counter_w(0, BIT(data,1));
+	machine().bookkeeping().coin_lockout_w(0, BIT(data,5));
+	machine().bookkeeping().coin_lockout_w(1, BIT(data,4));
 }
 
 /*************************************

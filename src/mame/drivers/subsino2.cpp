@@ -916,7 +916,7 @@ WRITE16_MEMBER(subsino2_state::bishjan_outputs_w)
 			{
 				// coin out         data & 0x01;
 				machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x0002) ? 0x80 : 0);   // hopper
-				coin_counter_w(machine(), 0,    data & 0x0010 );
+				machine().bookkeeping().coin_counter_w(0,    data & 0x0010 );
 			}
 			break;
 	}
@@ -999,8 +999,8 @@ WRITE8_MEMBER(subsino2_state::expcard_outputs_w)
 			break;
 
 		case 3: // A
-			coin_counter_w(machine(), 0,    data & 0x01 );  // coin in
-			coin_counter_w(machine(), 1,    data & 0x02 );  // key in
+			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
+			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
 
 			set_led_status(machine(), 5,    data & 0x10);   // start
 			break;
@@ -1020,10 +1020,10 @@ WRITE8_MEMBER(subsino2_state::mtrain_outputs_w)
 	switch (offset)
 	{
 		case 0:
-			coin_counter_w(machine(), 0,    data & 0x01 );  // key in
-			coin_counter_w(machine(), 1,    data & 0x02 );  // coin in
-			coin_counter_w(machine(), 2,    data & 0x10 );  // pay out
-//          coin_counter_w(machine(), 3,   data & 0x20 );  // hopper motor
+			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // key in
+			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // coin in
+			machine().bookkeeping().coin_counter_w(2,    data & 0x10 );  // pay out
+//          machine().bookkeeping().coin_counter_w(3,   data & 0x20 );  // hopper motor
 			break;
 
 		case 1:
@@ -1150,8 +1150,8 @@ WRITE8_MEMBER(subsino2_state::saklove_outputs_w)
 	switch (offset)
 	{
 		case 0:
-			coin_counter_w(machine(), 0,    data & 0x01 );  // coin in
-			coin_counter_w(machine(), 1,    data & 0x02 );  // key in
+			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
+			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
 			break;
 
 		case 1:
@@ -1246,8 +1246,8 @@ WRITE8_MEMBER(subsino2_state::xplan_outputs_w)
 			break;
 
 		case 3: // A
-			coin_counter_w(machine(), 0,    data & 0x01 );
-			coin_counter_w(machine(), 1,    data & 0x02 );
+			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );
+			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );
 
 			set_led_status(machine(), 6,    data & 0x10);   // start / take
 			break;
@@ -1346,8 +1346,8 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 			break;
 
 		case 3: // A
-			coin_counter_w(machine(), 0,    data & 0x01 );  // coin in
-			coin_counter_w(machine(), 1,    data & 0x02 );  // key in
+			machine().bookkeeping().coin_counter_w(0,    data & 0x01 );  // coin in
+			machine().bookkeeping().coin_counter_w(1,    data & 0x02 );  // key in
 
 			set_led_status(machine(), 7,    data & 0x10);   // start
 			break;

@@ -716,7 +716,7 @@ WRITE8_MEMBER(itech32_state::drivedge_portb_out)
 	set_led_status(machine(), 2, data & 0x02);
 	set_led_status(machine(), 3, data & 0x04);
 	machine().device<ticket_dispenser_device>("ticket")->write(machine().driver_data()->generic_space(), 0, (data & 0x10) << 3);
-	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
+	machine().bookkeeping().coin_counter_w(0, (data & 0x20) >> 5);
 }
 
 
@@ -734,7 +734,7 @@ WRITE8_MEMBER(itech32_state::pia_portb_out)
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	machine().device<ticket_dispenser_device>("ticket")->write(machine().driver_data()->generic_space(), 0, (data & 0x10) << 3);
-	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
+	machine().bookkeeping().coin_counter_w(0, (data & 0x20) >> 5);
 }
 
 

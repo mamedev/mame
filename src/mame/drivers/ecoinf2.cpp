@@ -187,11 +187,11 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_c_inhibits)
 	{
-		coin_lockout_w(machine(), 0, (data & 0x01) );
-		coin_lockout_w(machine(), 1, (data & 0x02) );
-		coin_lockout_w(machine(), 2, (data & 0x04) );
-		coin_lockout_w(machine(), 3, (data & 0x08) );
-		coin_lockout_w(machine(), 4, (data & 0x10) );
+		machine().bookkeeping().coin_lockout_w(0, (data & 0x01) );
+		machine().bookkeeping().coin_lockout_w(1, (data & 0x02) );
+		machine().bookkeeping().coin_lockout_w(2, (data & 0x04) );
+		machine().bookkeeping().coin_lockout_w(3, (data & 0x08) );
+		machine().bookkeeping().coin_lockout_w(4, (data & 0x10) );
 
 		//int wdog = (data& 0x80);
 	}
