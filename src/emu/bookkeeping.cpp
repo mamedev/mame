@@ -40,7 +40,7 @@ bookkeeping_manager::bookkeeping_manager(running_machine &machine)
 	machine.save().save_item(NAME(m_dispensed_tickets));
 
 	// register for configuration
-	config_register(machine, "counters", config_saveload_delegate(FUNC(bookkeeping_manager::config_load), this), config_saveload_delegate(FUNC(bookkeeping_manager::config_save), this));
+	machine.configuration().config_register("counters", config_saveload_delegate(FUNC(bookkeeping_manager::config_load), this), config_saveload_delegate(FUNC(bookkeeping_manager::config_save), this));
 }
 
 
@@ -81,19 +81,19 @@ void bookkeeping_manager::increment_dispensed_tickets(int delta)
     and tickets
 -------------------------------------------------*/
 
-void bookkeeping_manager::config_load(int config_type, xml_data_node *parentnode)
+void bookkeeping_manager::config_load(config_type cfg_type, xml_data_node *parentnode)
 {
 	xml_data_node *coinnode, *ticketnode;
 
 	/* on init, reset the counters */
-	if (config_type == CONFIG_TYPE_INIT)
+	if (cfg_type == config_type::CONFIG_TYPE_INIT)
 	{
 		memset(m_coin_count, 0, sizeof(m_coin_count));
 		m_dispensed_tickets = 0;
 	}
 
 	/* only care about game-specific data */
-	if (config_type != CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::CONFIG_TYPE_GAME)
 		return;
 
 	/* might not have any data */
@@ -120,12 +120,12 @@ void bookkeeping_manager::config_load(int config_type, xml_data_node *parentnode
     and tickets
 -------------------------------------------------*/
 
-void bookkeeping_manager::config_save(int config_type, xml_data_node *parentnode)
+void bookkeeping_manager::config_save(config_type cfg_type, xml_data_node *parentnode)
 {
 	int i;
 
 	/* only care about game-specific data */
-	if (config_type != CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::CONFIG_TYPE_GAME)
 		return;
 
 	/* iterate over coin counters */

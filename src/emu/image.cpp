@@ -63,13 +63,13 @@ struct io_procs image_ioprocs =
     configuration items
 -------------------------------------------------*/
 
-static void image_dirs_load(running_machine &machine, int config_type, xml_data_node *parentnode)
+static void image_dirs_load(running_machine &machine, config_type cfg_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
 	const char *dev_instance;
 	const char *working_directory;
 
-	if ((config_type == CONFIG_TYPE_GAME) && (parentnode != nullptr))
+	if ((cfg_type == config_type::CONFIG_TYPE_GAME) && (parentnode != nullptr))
 	{
 		for (node = xml_get_sibling(parentnode->child, "device"); node; node = xml_get_sibling(node->next, "device"))
 		{
@@ -98,13 +98,13 @@ static void image_dirs_load(running_machine &machine, int config_type, xml_data_
     directories to the configuration file
 -------------------------------------------------*/
 
-static void image_dirs_save(running_machine &machine, int config_type, xml_data_node *parentnode)
+static void image_dirs_save(running_machine &machine, config_type cfg_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
 	const char *dev_instance;
 
 	/* only care about game-specific data */
-	if (config_type == CONFIG_TYPE_GAME)
+	if (cfg_type == config_type::CONFIG_TYPE_GAME)
 	{
 		image_interface_iterator iter(machine.root_device());
 		for (device_image_interface *image = iter.first(); image != nullptr; image = iter.next())
@@ -298,7 +298,7 @@ void image_postdevice_init(running_machine &machine)
 void image_init(running_machine &machine)
 {
 	image_device_init(machine);
-	config_register(machine, "image_directories", config_saveload_delegate(FUNC(image_dirs_load), &machine), config_saveload_delegate(FUNC(image_dirs_save), &machine));
+	machine.configuration().config_register("image_directories", config_saveload_delegate(FUNC(image_dirs_load), &machine), config_saveload_delegate(FUNC(image_dirs_save), &machine));
 }
 
 

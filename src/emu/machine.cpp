@@ -216,7 +216,7 @@ TIMER_CALLBACK_MEMBER(running_machine::autoboot_callback)
 void running_machine::start()
 {
 	// initialize basic can't-fail systems here
-	config_init(*this);
+	m_configuration = std::make_unique<configuration_manager>(*this);
 	m_input = std::make_unique<input_manager>(*this);
 	output_init(*this);
 	m_render = std::make_unique<render_manager>(*this);
@@ -334,7 +334,7 @@ int running_machine::run(bool firstrun)
 		start();
 
 		// load the configuration settings and NVRAM
-		config_load_settings(*this);
+		m_configuration->load_settings();
 
 		// disallow save state registrations starting here.
 		// Don't do it earlier, config load can create network
@@ -389,7 +389,7 @@ int running_machine::run(bool firstrun)
 		// save the NVRAM and configuration
 		sound().ui_mute(true);
 		nvram_save();
-		config_save_settings(*this);
+		m_configuration->save_settings();
 	}
 	catch (emu_fatalerror &fatal)
 	{

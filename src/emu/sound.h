@@ -222,8 +222,8 @@ private:
 	void reset();
 	void pause();
 	void resume();
-	void config_load(int config_type, xml_data_node *parentnode);
-	void config_save(int config_type, xml_data_node *parentnode);
+	void config_load(config_type cfg_type, xml_data_node *parentnode);
+	void config_save(config_type cfg_type, xml_data_node *parentnode);
 
 	void update(void *ptr = nullptr, INT32 param = 0);
 

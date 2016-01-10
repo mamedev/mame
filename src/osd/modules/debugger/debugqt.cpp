@@ -77,10 +77,10 @@ static MainWindow* mainQtWindow = NULL;
 std::vector<WindowQtConfig*> xmlConfigurations;
 
 
-static void xml_configuration_load(running_machine &machine, int config_type, xml_data_node *parentnode)
+static void xml_configuration_load(running_machine &machine, config_type cfg_type, xml_data_node *parentnode)
 {
 	// We only care about game files
-	if (config_type != CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::CONFIG_TYPE_GAME)
 		return;
 
 	// Might not have any data
@@ -112,10 +112,10 @@ static void xml_configuration_load(running_machine &machine, int config_type, xm
 }
 
 
-static void xml_configuration_save(running_machine &machine, int config_type, xml_data_node *parentnode)
+static void xml_configuration_save(running_machine &machine, config_type cfg_type, xml_data_node *parentnode)
 {
 	// We only write to game configurations
-	if (config_type != CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::CONFIG_TYPE_GAME)
 		return;
 
 	for (int i = 0; i < xmlConfigurations.size(); i++)
@@ -268,8 +268,7 @@ void debug_qt::init_debugger(running_machine &machine)
 
 	m_machine = &machine;
 	// Setup the configuration XML saving and loading
-	config_register(machine,
-					"debugger",
+	machine.configuration().config_register("debugger",
 					config_saveload_delegate(FUNC(xml_configuration_load), &machine),
 					config_saveload_delegate(FUNC(xml_configuration_save), &machine));
 }

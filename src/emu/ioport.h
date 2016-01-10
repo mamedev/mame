@@ -1353,6 +1353,8 @@ struct ioport_port_live
 };
 
 
+enum class config_type;
+
 // ======================> ioport_manager
 
 // private input port state
@@ -1411,12 +1413,12 @@ private:
 	input_seq_type token_to_seq_type(const char *string);
 	void update_defaults();
 
-	void load_config(int config_type, xml_data_node *parentnode);
+	void load_config(config_type cfg_type, xml_data_node *parentnode);
 	void load_remap_table(xml_data_node *parentnode);
 	bool load_default_config(xml_data_node *portnode, int type, int player, const input_seq *newseq);
 	bool load_game_config(xml_data_node *portnode, int type, int player, const input_seq *newseq);
 
-	void save_config(int config_type, xml_data_node *parentnode);
+	void save_config(config_type cfg_type, xml_data_node *parentnode);
 	void save_sequence(xml_data_node *parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq);
 	bool save_this_input_field_type(ioport_type type);
 	void save_default_inputs(xml_data_node *parentnode);

@@ -24,7 +24,7 @@
 network_manager::network_manager(running_machine &machine)
 	: m_machine(machine)
 {
-	config_register(machine, "network", config_saveload_delegate(FUNC(network_manager::config_load), this), config_saveload_delegate(FUNC(network_manager::config_save), this));
+	machine.configuration().config_register("network", config_saveload_delegate(FUNC(network_manager::config_load), this), config_saveload_delegate(FUNC(network_manager::config_save), this));
 }
 
 //-------------------------------------------------
@@ -32,10 +32,10 @@ network_manager::network_manager(running_machine &machine)
 //  configuration file
 //-------------------------------------------------
 
-void network_manager::config_load(int config_type, xml_data_node *parentnode)
+void network_manager::config_load(config_type cfg_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
-	if ((config_type == CONFIG_TYPE_GAME) && (parentnode != nullptr))
+	if ((cfg_type == config_type::CONFIG_TYPE_GAME) && (parentnode != nullptr))
 	{
 		for (node = xml_get_sibling(parentnode->child, "device"); node; node = xml_get_sibling(node->next, "device"))
 		{
@@ -69,12 +69,12 @@ void network_manager::config_load(int config_type, xml_data_node *parentnode)
 //  file
 //-------------------------------------------------
 
-void network_manager::config_save(int config_type, xml_data_node *parentnode)
+void network_manager::config_save(config_type cfg_type, xml_data_node *parentnode)
 {
 	xml_data_node *node;
 
 	/* only care about game-specific data */
-	if (config_type == CONFIG_TYPE_GAME)
+	if (cfg_type == config_type::CONFIG_TYPE_GAME)
 	{
 		network_interface_iterator iter(machine().root_device());
 		for (device_network_interface *network = iter.first(); network != nullptr; network = iter.next())

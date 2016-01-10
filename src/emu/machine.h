@@ -87,7 +87,9 @@ class tilemap_manager;
 class debug_view_manager;
 class network_manager;
 class bookkeeping_manager;
+class configuration_manager;
 class osd_interface;
+enum class config_type;
 
 struct romload_private;
 struct ui_input_private;
@@ -166,6 +168,7 @@ public:
 	video_manager &video() const { assert(m_video != nullptr); return *m_video; }
 	network_manager &network() const { assert(m_network != nullptr); return *m_network; }
 	bookkeeping_manager &bookkeeping() const { assert(m_network != nullptr); return *m_bookkeeping; }
+	configuration_manager  &configuration() const { assert(m_configuration != nullptr); return *m_configuration; }
 	ui_manager &ui() const { assert(m_ui != nullptr); return *m_ui; }
 	tilemap_manager &tilemap() const { assert(m_tilemap != nullptr); return *m_tilemap; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != nullptr); return *m_debug_view; }
@@ -217,7 +220,7 @@ public:
 	// watchdog control
 	void watchdog_reset();
 	void watchdog_enable(bool enable = true);
-	INT32 get_vblank_watchdog_counter() { return m_watchdog_counter; }
+	INT32 get_vblank_watchdog_counter() const { return m_watchdog_counter; }
 
 	// misc
 	void popmessage(const char *format, ...) const;
@@ -283,6 +286,7 @@ private:
 	std::unique_ptr<debug_view_manager> m_debug_view;  // internal data from debugvw.c
 	std::unique_ptr<network_manager> m_network;        // internal data from network.c
 	std::unique_ptr<bookkeeping_manager> m_bookkeeping;// internal data from bookkeeping.c
+	std::unique_ptr<configuration_manager> m_configuration; // internal data from config.c
 
 	// system state
 	machine_phase           m_current_phase;        // current execution phase

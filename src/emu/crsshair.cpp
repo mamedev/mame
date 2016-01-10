@@ -129,8 +129,8 @@ static const rgb_t crosshair_colors[] =
 ***************************************************************************/
 
 static void crosshair_exit(running_machine &machine);
-static void crosshair_load(running_machine &machine, int config_type, xml_data_node *parentnode);
-static void crosshair_save(running_machine &machine, int config_type, xml_data_node *parentnode);
+static void crosshair_load(running_machine &machine, config_type cfg_type, xml_data_node *parentnode);
+static void crosshair_save(running_machine &machine, config_type cfg_type, xml_data_node *parentnode);
 
 static void animate(running_machine &machine, screen_device &device, bool vblank_state);
 
@@ -240,7 +240,7 @@ void crosshair_init(running_machine &machine)
 
 	/* register callbacks for when we load/save configurations */
 	if (global.usage)
-		config_register(machine, "crosshairs", config_saveload_delegate(FUNC(crosshair_load), &machine), config_saveload_delegate(FUNC(crosshair_save), &machine));
+		machine.configuration().config_register("crosshairs", config_saveload_delegate(FUNC(crosshair_load), &machine), config_saveload_delegate(FUNC(crosshair_save), &machine));
 
 	/* register the animation callback */
 	if (machine.first_screen() != nullptr)
@@ -412,7 +412,7 @@ void crosshair_set_screen(running_machine &machine, int player, screen_device *s
     configuration file
 -------------------------------------------------*/
 
-static void crosshair_load(running_machine &machine, int config_type, xml_data_node *parentnode)
+static void crosshair_load(running_machine &machine, config_type cfg_type, xml_data_node *parentnode)
 {
 	/* Note: crosshair_load() is only registered if croshairs are used */
 
@@ -420,7 +420,7 @@ static void crosshair_load(running_machine &machine, int config_type, xml_data_n
 	int auto_time;
 
 	/* we only care about game files */
-	if (config_type != CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::CONFIG_TYPE_GAME)
 		return;
 
 	/* might not have any data */
@@ -471,7 +471,7 @@ static void crosshair_load(running_machine &machine, int config_type, xml_data_n
     configuration file
 -------------------------------------------------*/
 
-static void crosshair_save(running_machine &machine, int config_type, xml_data_node *parentnode)
+static void crosshair_save(running_machine &machine, config_type cfg_type, xml_data_node *parentnode)
 {
 	/* Note: crosshair_save() is only registered if crosshairs are used */
 
@@ -479,7 +479,7 @@ static void crosshair_save(running_machine &machine, int config_type, xml_data_n
 	int player;
 
 	/* we only care about game files */
-	if (config_type != CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::CONFIG_TYPE_GAME)
 		return;
 
 	for (player = 0; player < MAX_PLAYERS; player++)
