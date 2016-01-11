@@ -1370,13 +1370,13 @@ static void do_info(parameters_t &params)
 	sha1_t overall = input_chd.sha1();
 	if (overall != sha1_t::null)
 	{
-		printf("SHA1:         %s\n", overall.as_string(tempstr));
+		printf("SHA1:         %s\n", overall.as_string().c_str());
 		if (input_chd.version() >= 4)
-			printf("Data SHA1:    %s\n", input_chd.raw_sha1().as_string(tempstr));
+			printf("Data SHA1:    %s\n", input_chd.raw_sha1().as_string().c_str());
 	}
 	sha1_t parent = input_chd.parent_sha1();
 	if (parent != sha1_t::null)
-		printf("Parent SHA1:  %s\n", parent.as_string(tempstr));
+		printf("Parent SHA1:  %s\n", parent.as_string().c_str());
 
 	// print out metadata
 	dynamic_buffer buffer;
@@ -1526,9 +1526,8 @@ static void do_verify(parameters_t &params)
 	// finish up
 	if (raw_sha1 != computed_sha1)
 	{
-		std::string tempstr;
-		fprintf(stderr, "Error: Raw SHA1 in header = %s\n", raw_sha1.as_string(tempstr));
-		fprintf(stderr, "              actual SHA1 = %s\n", computed_sha1.as_string(tempstr));
+		fprintf(stderr, "Error: Raw SHA1 in header = %s\n", raw_sha1.as_string().c_str());
+		fprintf(stderr, "              actual SHA1 = %s\n", computed_sha1.as_string().c_str());
 
 		// fix it if requested; this also fixes the overall one so we don't need to do any more
 		if (params.find(OPTION_FIX) != params.end())
@@ -1549,9 +1548,8 @@ static void do_verify(parameters_t &params)
 				printf("Overall SHA1 verification successful!\n");
 			else
 			{
-				std::string tempstr;
-				fprintf(stderr, "Error: Overall SHA1 in header = %s\n", input_chd.sha1().as_string(tempstr));
-				fprintf(stderr, "                  actual SHA1 = %s\n", computed_overall_sha1.as_string(tempstr));
+				fprintf(stderr, "Error: Overall SHA1 in header = %s\n", input_chd.sha1().as_string().c_str());
+				fprintf(stderr, "                  actual SHA1 = %s\n", computed_overall_sha1.as_string().c_str());
 
 				// fix it if requested
 				if (params.find(OPTION_FIX) != params.end())
