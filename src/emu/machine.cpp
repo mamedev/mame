@@ -224,6 +224,9 @@ void running_machine::start()
 	// allocate a soft_reset timer
 	m_soft_reset_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::soft_reset), this));
 
+	// intialize UI input
+	m_ui_input = std::make_unique<ui_input_manager>(*this);
+
 	// init the osd layer
 	m_manager.osd().init(*this);
 
@@ -240,9 +243,6 @@ void running_machine::start()
 	time_t newbase = m_ioport.initialize();
 	if (newbase != 0)
 		m_base_time = newbase;
-
-	// intialize UI input
-	m_ui_input = std::make_unique<ui_input_manager>(*this);
 
 	// initialize the streams engine before the sound devices start
 	m_sound = std::make_unique<sound_manager>(*this);
