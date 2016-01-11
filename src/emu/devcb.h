@@ -295,8 +295,8 @@ class devcb_read_line : public devcb_read_base
 {
 public:
 	devcb_read_line(device_t &device) : devcb_read_base(device, 0xff) { }
-	int operator()() const { return (this->*m_adapter)(*m_space, 0, U64(0xff)) & 1; }
-	int operator()(address_space &space) const { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, 0, U64(0xff)) & 1; }
+	int operator()() { return (this->*m_adapter)(*m_space, 0, U64(0xff)) & 1; }
+	int operator()(address_space &space) { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, 0, U64(0xff)) & 1; }
 };
 
 
@@ -306,8 +306,8 @@ class devcb_read8 : public devcb_read_base
 {
 public:
 	devcb_read8(device_t &device) : devcb_read_base(device, 0xff) { }
-	UINT8 operator()(offs_t offset = 0, UINT8 mask = 0xff) const { return (this->*m_adapter)(*m_space, offset, mask) & mask; }
-	UINT8 operator()(address_space &space, offs_t offset = 0, UINT8 mask = 0xff) const { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, mask) & mask; }
+	UINT8 operator()(offs_t offset = 0, UINT8 mask = 0xff) { return (this->*m_adapter)(*m_space, offset, mask) & mask; }
+	UINT8 operator()(address_space &space, offs_t offset = 0, UINT8 mask = 0xff) { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, mask) & mask; }
 };
 
 
@@ -317,8 +317,8 @@ class devcb_read16 : public devcb_read_base
 {
 public:
 	devcb_read16(device_t &device) : devcb_read_base(device, 0xffff) { }
-	UINT16 operator()(offs_t offset = 0, UINT16 mask = 0xffff) const { return (this->*m_adapter)(*m_space, offset, mask) & mask; }
-	UINT16 operator()(address_space &space, offs_t offset = 0, UINT16 mask = 0xffff) const { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, mask) & mask; }
+	UINT16 operator()(offs_t offset = 0, UINT16 mask = 0xffff) { return (this->*m_adapter)(*m_space, offset, mask) & mask; }
+	UINT16 operator()(address_space &space, offs_t offset = 0, UINT16 mask = 0xffff) { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, mask) & mask; }
 };
 
 
@@ -328,8 +328,8 @@ class devcb_read32 : public devcb_read_base
 {
 public:
 	devcb_read32(device_t &device) : devcb_read_base(device, 0xffffffff) { }
-	UINT32 operator()(offs_t offset = 0, UINT32 mask = 0xffffffff) const { return (this->*m_adapter)(*m_space, offset, mask) & mask; }
-	UINT32 operator()(address_space &space, offs_t offset = 0, UINT32 mask = 0xffffffff) const { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, mask) & mask; }
+	UINT32 operator()(offs_t offset = 0, UINT32 mask = 0xffffffff) { return (this->*m_adapter)(*m_space, offset, mask) & mask; }
+	UINT32 operator()(address_space &space, offs_t offset = 0, UINT32 mask = 0xffffffff) { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, mask) & mask; }
 };
 
 
@@ -339,8 +339,8 @@ class devcb_read64 : public devcb_read_base
 {
 public:
 	devcb_read64(device_t &device) : devcb_read_base(device, U64(0xffffffffffffffff)) { }
-	UINT64 operator()(offs_t offset = 0, UINT64 mask = U64(0xffffffffffffffff)) const { return (this->*m_adapter)(*m_space, offset, mask) & mask; }
-	UINT64 operator()(address_space &space, offs_t offset = 0, UINT64 mask = U64(0xffffffffffffffff)) const { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, mask) & mask; }
+	UINT64 operator()(offs_t offset = 0, UINT64 mask = U64(0xffffffffffffffff)) { return (this->*m_adapter)(*m_space, offset, mask) & mask; }
+	UINT64 operator()(address_space &space, offs_t offset = 0, UINT64 mask = U64(0xffffffffffffffff)) { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, mask) & mask; }
 };
 
 
