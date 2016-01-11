@@ -266,7 +266,7 @@ void running_machine::start()
 	// initialize image devices
 	image_init(*this);
 	m_tilemap = std::make_unique<tilemap_manager>(*this);
-	crosshair_init(*this);
+	m_crosshair = make_unique_clear<crosshair_manager>(*this);
 	m_network = std::make_unique<network_manager>(*this);
 
 	// initialize the debugger

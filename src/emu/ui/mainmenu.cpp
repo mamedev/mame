@@ -125,7 +125,7 @@ void ui_menu_main::populate()
 	item_append("Video Options", nullptr, 0, (machine().render().target_by_index(1) != nullptr) ? (void *)VIDEO_TARGETS : (void *)VIDEO_OPTIONS);
 
 	/* add crosshair options menu */
-	if (crosshair_get_usage(machine()))
+	if (machine().crosshair().get_usage())
 		item_append("Crosshair Options", nullptr, 0, (void *)CROSSHAIR);
 
 	/* add cheat menu */

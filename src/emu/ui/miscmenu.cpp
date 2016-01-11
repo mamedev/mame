@@ -288,7 +288,7 @@ void ui_menu_crosshair::handle()
 		int newval = data->cur;
 
 		/* retreive the user settings */
-		crosshair_get_user_settings(machine(), data->player, &settings);
+		machine().crosshair().get_user_settings(data->player, &settings);
 
 		switch (menu_event->iptkey)
 		{
@@ -360,7 +360,7 @@ void ui_menu_crosshair::handle()
 		if (changed)
 		{
 			/* save the user settings */
-			crosshair_set_user_settings(machine(), data->player, &settings);
+			machine().crosshair().set_user_settings(data->player, &settings);
 
 			/* rebuild the menu */
 			reset(UI_MENU_RESET_REMEMBER_POSITION);
@@ -391,7 +391,7 @@ void ui_menu_crosshair::populate()
 	for (player = 0; player < MAX_PLAYERS; player++)
 	{
 		/* get the user settings */
-		crosshair_get_user_settings(machine(), player, &settings);
+		machine().crosshair().get_user_settings(player, &settings);
 
 		/* add menu items for usable crosshairs */
 		if (settings.used)
@@ -502,7 +502,7 @@ void ui_menu_crosshair::populate()
 	if (use_auto)
 	{
 		/* any player can be used to get the autotime */
-		crosshair_get_user_settings(machine(), 0, &settings);
+		machine().crosshair().get_user_settings(0, &settings);
 
 		/* CROSSHAIR_ITEM_AUTO_TIME - allocate a data item and fill it */
 		data = (crosshair_item_data *)m_pool_alloc(sizeof(*data));

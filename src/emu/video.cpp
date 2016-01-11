@@ -676,7 +676,7 @@ bool video_manager::finish_screen_updates()
 
 	// draw any crosshairs
 	for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
-		crosshair_render(*screen);
+		machine().crosshair().render(*screen);
 
 	return anything_changed;
 }
