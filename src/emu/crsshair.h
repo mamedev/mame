@@ -89,7 +89,7 @@ private:
 	UINT8               m_used[MAX_PLAYERS];      /* usage per player */
 	UINT8               m_mode[MAX_PLAYERS];      /* visibility mode per player */
 	UINT8               m_visible[MAX_PLAYERS];   /* visibility per player */
-	bitmap_argb32 *     m_bitmap[MAX_PLAYERS];    /* bitmap per player */
+	std::unique_ptr<bitmap_argb32>  m_bitmap[MAX_PLAYERS];    /* bitmap per player */
 	render_texture *    m_texture[MAX_PLAYERS];   /* texture per player */
 	screen_device *     m_screen[MAX_PLAYERS];    /* the screen on which this player's crosshair is drawn */
 	float               m_x[MAX_PLAYERS];         /* current X position */

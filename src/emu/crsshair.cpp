@@ -154,8 +154,6 @@ void crosshair_manager::exit()
 	{
 		machine().render().texture_free(m_texture[player]);
 		m_texture[player] = nullptr;
-
-		global_free(m_bitmap[player]);
 		m_bitmap[player] = nullptr;
 	}
 }
@@ -173,7 +171,7 @@ void crosshair_manager::create_bitmap(int player)
 
 	/* if we have a bitmap and texture for this player, kill it */
 	if (m_bitmap[player] == nullptr) {
-		m_bitmap[player] = global_alloc(bitmap_argb32);
+		m_bitmap[player] = std::make_unique<bitmap_argb32>();
 		m_texture[player] = machine().render().texture_alloc(render_texture::hq_scale);
 	}
 
