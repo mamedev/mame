@@ -1007,7 +1007,7 @@ void ppc_device::state_import(const device_state_entry &entry)
 }
 
 
-void ppc_device::state_string_export(const device_state_entry &entry, std::string &str) const
+void ppc_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
