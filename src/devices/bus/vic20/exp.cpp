@@ -167,9 +167,9 @@ bool vic20_expansion_slot_device::call_softlist_load(software_list_device &swlis
 //  get_default_card_software -
 //-------------------------------------------------
 
-void vic20_expansion_slot_device::get_default_card_software(std::string &result)
+std::string vic20_expansion_slot_device::get_default_card_software()
 {
-	software_get_default_slot(result, "standard");
+	return software_get_default_slot("standard");
 }
 
 

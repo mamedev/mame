@@ -370,7 +370,7 @@ bool kccart_slot_device::call_softlist_load(software_list_device &swlist, const 
     get default card software
 -------------------------------------------------*/
 
-void kccart_slot_device::get_default_card_software(std::string &result)
+std::string kccart_slot_device::get_default_card_software()
 {
-	software_get_default_slot(result, "standard");
+	return software_get_default_slot("standard");
 }

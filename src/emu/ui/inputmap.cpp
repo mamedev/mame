@@ -434,7 +434,7 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 		/* otherwise, generate the sequence name and invert it if different from the default */
 		else
 		{
-			machine().input().seq_name(subtext, item->seq);
+			subtext = machine().input().seq_name(item->seq);
 			flags |= (item->seq != *item->defseq) ? MENU_FLAG_INVERT : 0;
 		}
 

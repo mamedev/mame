@@ -92,7 +92,7 @@ protected:
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
-	void state_string_export(const device_state_entry &entry, std::string &str) override;
+	void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }

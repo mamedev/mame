@@ -3401,7 +3401,7 @@ cp1610_cpu_device::cp1610_cpu_device(const machine_config &mconfig, const char *
 }
 
 
-void cp1610_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void cp1610_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

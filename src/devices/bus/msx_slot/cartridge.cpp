@@ -278,7 +278,7 @@ int msx_slot_cartridge_device::get_cart_type(UINT8 *rom, UINT32 length)
 }
 
 
-void msx_slot_cartridge_device::get_default_card_software(std::string &result)
+std::string msx_slot_cartridge_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -337,10 +337,9 @@ void msx_slot_cartridge_device::get_default_card_software(std::string &result)
 			slot_string = msx_cart_get_slot_option(type);
 		}
 
-		result.assign(slot_string);
-		return;
+		return std::string(slot_string);
 	}
-	software_get_default_slot(result, "nomapper");
+	return software_get_default_slot("nomapper");
 }
 
 

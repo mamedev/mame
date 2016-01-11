@@ -1153,8 +1153,7 @@ std::string &ui_manager::warnings_string(std::string &str)
 std::string &ui_manager::game_info_astring(std::string &str)
 {
 	// print description, manufacturer, and CPU:
-	std::string tempstr;
-	strprintf(str, "%s\n%s %s\nDriver: %s\n\nCPU:\n", machine().system().description, machine().system().year, machine().system().manufacturer, core_filename_extract_base(tempstr, machine().system().source_file).c_str());
+	strprintf(str, "%s\n%s %s\nDriver: %s\n\nCPU:\n", machine().system().description, machine().system().year, machine().system().manufacturer, core_filename_extract_base(machine().system().source_file).c_str());
 
 	// loop over all CPUs
 	execute_interface_iterator execiter(machine().root_device());
@@ -1489,7 +1488,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	if (machine.ui().show_fps_counter())
 	{
 		std::string tempstring;
-		machine.ui().draw_text_full(container, machine.video().speed_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+		machine.ui().draw_text_full(container, machine.video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
 	}
 
@@ -1767,17 +1766,13 @@ void ui_manager::request_quit()
 UINT32 ui_manager::handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state)
 {
 	// get the text for 'UI Select'
-	std::string ui_select_text;
-	machine.input().seq_name(ui_select_text, machine.ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
+	std::string ui_select_text = machine.input().seq_name(machine.ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
 
 	// get the text for 'UI Cancel'
-	std::string ui_cancel_text;
-	machine.input().seq_name(ui_cancel_text, machine.ioport().type_seq(IPT_UI_CANCEL, 0, SEQ_TYPE_STANDARD));
+	std::string ui_cancel_text = machine.input().seq_name(machine.ioport().type_seq(IPT_UI_CANCEL, 0, SEQ_TYPE_STANDARD));
 
 	// assemble the quit message
-	std::string quit_message;
-	strprintf(quit_message,
-		"Are you sure you want to quit?\n\n"
+	std::string quit_message = strformat("Are you sure you want to quit?\n\n"
 		"Press ''%s'' to quit,\n"
 		"Press ''%s'' to return to emulation.",
 		ui_select_text.c_str(),

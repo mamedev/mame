@@ -87,7 +87,7 @@ public:
 	virtual const char *file_extensions() const override { return "bin,chf"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(std::string &result) override;
+	virtual std::string get_default_card_software() override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);

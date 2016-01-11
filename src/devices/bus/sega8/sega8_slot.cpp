@@ -603,7 +603,7 @@ int sega8_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-void sega8_cart_slot_device::get_default_card_software(std::string &result)
+std::string sega8_cart_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -623,11 +623,10 @@ void sega8_cart_slot_device::get_default_card_software(std::string &result)
 		//printf("type: %s\n", slot_string);
 		clear();
 
-		result.assign(slot_string);
-		return;
+		return std::string(slot_string);
 	}
 
-	software_get_default_slot(result, "rom");
+	return software_get_default_slot("rom");
 }
 
 

@@ -127,7 +127,7 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	virtual void interrupt(int int_num, int trap = 1);
 	bool common_op(UINT8 op);
@@ -192,7 +192,7 @@ protected:
 	inline void set_OFB_Add(UINT32 x,UINT32 y,UINT32 z);
 	inline void set_OFW_Sub(UINT32 x,UINT32 y,UINT32 z);
 	inline void set_OFB_Sub(UINT32 x,UINT32 y,UINT32 z);
-	inline UINT16 CompressFlags();
+	inline UINT16 CompressFlags() const;
 	inline void ExpandFlags(UINT16 f);
 
 	// rep instructions

@@ -257,9 +257,9 @@ protected:
 	void image_checkhash();
 	void update_names(const device_type device_type = nullptr, const char *inst = nullptr, const char *brief = nullptr);
 
-	software_part *find_software_item(const char *path, bool restrict_to_interface);
+	software_part *find_software_item(const char *path, bool restrict_to_interface) const;
 	bool load_software_part(const char *path, software_part *&swpart);
-	void software_get_default_slot(std::string &result, const char *default_card_slot);
+	std::string software_get_default_slot(const char *default_card_slot) const;
 
 	// derived class overrides
 

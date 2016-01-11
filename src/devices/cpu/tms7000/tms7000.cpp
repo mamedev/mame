@@ -257,7 +257,7 @@ void tms7000_device::device_start()
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%8s").noshow();
 }
 
-void tms7000_device::state_string_export(const device_state_entry &entry, std::string &str)
+void tms7000_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

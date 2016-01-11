@@ -275,7 +275,7 @@ UINT32 i386_device::i386_get_stack_ptr(UINT8 privilege)
 	return ret;
 }
 
-UINT32 i386_device::get_flags()
+UINT32 i386_device::get_flags() const
 {
 	UINT32 f = 0x2;
 	f |= m_CF;
@@ -3465,7 +3465,7 @@ void i386_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void i386_device::state_string_export(const device_state_entry &entry, std::string &str)
+void i386_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

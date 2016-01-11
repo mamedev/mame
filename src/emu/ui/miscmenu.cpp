@@ -124,9 +124,8 @@ void ui_menu_bios_selection::handle()
 				assert(error.empty());
 			} else {
 				std::string error;
-				std::string value;
-				std::string temp;
-				strprintf(value,"%s,bios=%d",machine().options().main_value(temp,dev->owner()->tag()+1),val-1);
+				std::string value = machine().options().main_value(dev->owner()->tag()+1);
+				strcatprintf(value,",bios=%d",val-1);
 				machine().options().set_value(dev->owner()->tag()+1, value.c_str(), OPTION_PRIORITY_CMDLINE, error);
 				assert(error.empty());
 			}

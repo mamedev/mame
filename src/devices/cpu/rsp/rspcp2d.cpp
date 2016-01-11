@@ -147,7 +147,7 @@ static void unimplemented_opcode(void *param)
 	((rsp_cop2 *)param)->cfunc_unimplemented_opcode();
 }
 
-void rsp_cop2_drc::state_string_export(const int index, std::string &str)
+void rsp_cop2_drc::state_string_export(const int index, std::string &str) const
 {
 	switch (index)
 	{

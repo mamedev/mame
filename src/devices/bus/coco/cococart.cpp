@@ -364,9 +364,9 @@ bool cococart_slot_device::call_softlist_load(software_list_device &swlist, cons
 //  get_default_card_software
 //-------------------------------------------------
 
-void cococart_slot_device::get_default_card_software(std::string &result)
+std::string cococart_slot_device::get_default_card_software()
 {
-	software_get_default_slot(result, "pak");
+	return software_get_default_slot("pak");
 }
 
 

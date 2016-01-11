@@ -81,7 +81,7 @@ public:
 	void frame_update(bool debug = false);
 
 	// current speed helpers
-	std::string &speed_text(std::string &str);
+	std::string speed_text();
 	double speed_percent() const { return m_speed_percent; }
 
 	// snapshots

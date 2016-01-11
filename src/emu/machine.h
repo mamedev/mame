@@ -251,13 +251,12 @@ private:
 	// internal helpers
 	void start();
 	void set_saveload_filename(const char *filename);
-	std::string get_statename(const char *statename_opt);
+	std::string get_statename(const char *statename_opt) const;
 	void handle_saveload();
 	void soft_reset(void *ptr = nullptr, INT32 param = 0);
 	void watchdog_fired(void *ptr = nullptr, INT32 param = 0);
 	void watchdog_vblank(screen_device &screen, bool vblank_state);
-	const char *image_parent_basename(device_t *device);
-	std::string &nvram_filename(std::string &result, device_t &device);
+	std::string nvram_filename(device_t &device) const;
 	void nvram_load();
 	void nvram_save();
 

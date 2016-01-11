@@ -59,7 +59,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
@@ -362,7 +362,7 @@ struct I386_CALL_GATE
 	void i386_load_segment_descriptor(int segment );
 	UINT32 i386_get_stack_segment(UINT8 privilege);
 	UINT32 i386_get_stack_ptr(UINT8 privilege);
-	UINT32 get_flags();
+	UINT32 get_flags() const;
 	void set_flags(UINT32 f );
 	void sib_byte(UINT8 mod, UINT32* out_ea, UINT8* out_segment);
 	void modrm_to_EA(UINT8 mod_rm, UINT32* out_ea, UINT8* out_segment);

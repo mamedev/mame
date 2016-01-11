@@ -160,7 +160,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;

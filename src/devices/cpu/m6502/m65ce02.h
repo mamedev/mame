@@ -34,7 +34,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	inline void dec_SP_ce() { if(P & F_E) SP = set_l(SP, SP-1); else SP--; }
 	inline void inc_SP_ce() { if(P & F_E) SP = set_l(SP, SP+1); else SP++; }

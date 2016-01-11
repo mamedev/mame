@@ -184,8 +184,7 @@ int cli_frontend::execute(int argc, char **argv)
 			osd_printf_error("Error in command line:\n%s\n", strtrimspace(option_errors).c_str());
 
 		// determine the base name of the EXE
-		std::string exename;
-		core_filename_extract_base(exename, argv[0], true);
+		std::string exename = core_filename_extract_base(argv[0], true);
 
 		// if we have a command, execute that
 		if (*(m_options.command()) != 0)
@@ -321,9 +320,8 @@ void cli_frontend::listsource(const char *gamename)
 		throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// iterate through drivers and output the info
-	std::string filename;
 	while (drivlist.next())
-		osd_printf_info("%-16s %s\n", drivlist.driver().name, core_filename_extract_base(filename, drivlist.driver().source_file).c_str());
+		osd_printf_info("%-16s %s\n", drivlist.driver().name, core_filename_extract_base(drivlist.driver().source_file).c_str());
 }
 
 
@@ -409,11 +407,10 @@ void cli_frontend::listbrothers(const char *gamename)
 
 	// output the entries found
 	drivlist.reset();
-	std::string filename;
 	while (drivlist.next())
 	{
 		int clone_of = drivlist.clone();
-		osd_printf_info("%-16s %-16s %-16s\n", core_filename_extract_base(filename, drivlist.driver().source_file).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
+		osd_printf_info("%-16s %-16s %-16s\n", core_filename_extract_base(drivlist.driver().source_file).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
 	}
 }
 
@@ -460,7 +457,6 @@ void cli_frontend::listroms(const char *gamename)
 		throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// iterate through matches
-	std::string tempstr;
 	bool first = true;
 	while (drivlist.next())
 	{
@@ -498,7 +494,7 @@ void cli_frontend::listroms(const char *gamename)
 					{
 						if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
 							osd_printf_info(" BAD");
-						osd_printf_info(" %s", hashes.macro_string(tempstr));
+						osd_printf_info(" %s", hashes.macro_string().c_str());
 					}
 					else
 						osd_printf_info(" NO GOOD DUMP KNOWN");
@@ -1174,8 +1170,6 @@ void cli_frontend::verifysamples(const char *gamename)
 
 void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlistdev)
 {
-	std::string tempstr;
-
 	fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlistdev.list_name(), xml_normalize_string(swlistdev.description()));
 	for (software_info *swinfo = swlistdev.first_software_info(); swinfo != nullptr; swinfo = swinfo->next())
 	{
@@ -1227,7 +1221,7 @@ void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlis
 						/* dump checksum information only if there is a known dump */
 						hash_collection hashes(ROM_GETHASHDATA(rom));
 						if ( !hashes.flag(hash_collection::FLAG_NO_DUMP) )
-							fprintf( out, " %s", hashes.attribute_string(tempstr) );
+							fprintf( out, " %s", hashes.attribute_string().c_str() );
 						else
 							fprintf( out, " status=\"nodump\"" );
 
@@ -1592,9 +1586,8 @@ void cli_frontend::execute_commands(const char *exename)
 	// showusage?
 	if (strcmp(m_options.command(), CLICOMMAND_SHOWUSAGE) == 0)
 	{
-		std::string helpstring;
 		emulator_info::printf_usage(exename, emulator_info::get_gamenoun());
-		osd_printf_info("\n\nOptions:\n%s", m_options.output_help(helpstring));
+		osd_printf_info("\n\nOptions:\n%s", m_options.output_help().c_str());
 		return;
 	}
 
@@ -1623,8 +1616,7 @@ void cli_frontend::execute_commands(const char *exename)
 			throw emu_fatalerror("Unable to create file %s.ini\n",emulator_info::get_configname());
 
 		// generate the updated INI
-		std::string initext;
-		file.puts(m_options.output_ini(initext));
+		file.puts(m_options.output_ini().c_str());
 		return;
 	}
 
@@ -1632,8 +1624,7 @@ void cli_frontend::execute_commands(const char *exename)
 	if (strcmp(m_options.command(), CLICOMMAND_SHOWCONFIG) == 0)
 	{
 		// print the INI text
-		std::string initext;
-		printf("%s\n", m_options.output_ini(initext));
+		printf("%s\n", m_options.output_ini().c_str());
 		return;
 	}
 
@@ -1834,8 +1825,7 @@ void media_identifier::identify_file(const char *name)
 	if (core_filename_ends_with(name, ".chd"))
 	{
 		// output the name
-		std::string basename;
-		osd_printf_info("%-20s", core_filename_extract_base(basename, name).c_str());
+		osd_printf_info("%-20s", core_filename_extract_base(name).c_str());
 		m_total++;
 
 		// attempt to open as a CHD; fail if not
@@ -1910,8 +1900,7 @@ void media_identifier::identify_data(const char *name, const UINT8 *data, int le
 
 	// output the name
 	m_total++;
-	std::string basename;
-	osd_printf_info("%-20s", core_filename_extract_base(basename, name).c_str());
+	osd_printf_info("%-20s", core_filename_extract_base(name).c_str());
 
 	// see if we can find a match in the ROMs
 	int found = find_by_hash(hashes, length);
