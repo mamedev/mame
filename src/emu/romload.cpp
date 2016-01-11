@@ -241,7 +241,7 @@ static void CLIB_DECL ATTR_PRINTF(1,2) debugload(const char *string, ...)
 
 chd_file *rom_load_manager::get_disk_handle(const char *region)
 {
-	for (open_chd *curdisk = m_chd_list.first(); curdisk != nullptr; curdisk = curdisk->next())
+	for (auto &curdisk : m_chd_list)
 		if (strcmp(curdisk->region(), region) == 0)
 			return &curdisk->chd();
 	return nullptr;
@@ -255,12 +255,10 @@ chd_file *rom_load_manager::get_disk_handle(const char *region)
 
 int rom_load_manager::set_disk_handle(const char *region, const char *fullpath)
 {
-	auto chd = global_alloc(open_chd(region));
-	chd_error err = chd->orig_chd().open(fullpath);
+	auto chd = std::make_unique<open_chd>(region);
+	auto err = chd->orig_chd().open(fullpath);
 	if (err == CHDERR_NONE)
-		m_chd_list.append(*chd);
-	else
-		global_free(chd);
+		m_chd_list.push_back(std::move(chd));
 	return err;
 }
 
@@ -1161,7 +1159,7 @@ void rom_load_manager::process_disk_entries(const char *regiontag, const rom_ent
 		/* handle files */
 		if (ROMENTRY_ISFILE(romp))
 		{
-			auto chd = global_alloc(open_chd(regiontag));
+			auto chd = std::make_unique<open_chd>(regiontag);
 
 			hash_collection hashes(ROM_GETHASHDATA(romp));
 			chd_error err;
@@ -1175,7 +1173,7 @@ void rom_load_manager::process_disk_entries(const char *regiontag, const rom_ent
 			if (err != CHDERR_NONE)
 			{
 				handle_missing_file(romp, std::string(), err);
-				global_free(chd);
+				chd = nullptr;
 				continue;
 			}
 
@@ -1205,14 +1203,14 @@ void rom_load_manager::process_disk_entries(const char *regiontag, const rom_ent
 				{
 					strcatprintf(m_errorstring, "%s DIFF CHD ERROR: %s\n", filename.c_str(), chd_file::error_string(err));
 					m_errors++;
-					global_free(chd);
+					chd = nullptr;
 					continue;
 				}
 			}
 
 			/* we're okay, add to the list of disks */
 			LOG(("Assigning to handle %d\n", DISK_GETINDEX(romp)));
-			m_chd_list.append(*chd);
+			m_chd_list.push_back(std::move(chd));
 		}
 	}
 }
@@ -1478,7 +1476,7 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 	count_roms();
 
 	/* reset the disk list */
-	m_chd_list.reset();
+	m_chd_list.clear();
 
 	/* process the ROM entries we were passed */
 	process_region_list();

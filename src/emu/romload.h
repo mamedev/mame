@@ -264,21 +264,16 @@ class rom_load_manager
 {
 	class open_chd
 	{
-		friend class simple_list<open_chd>;
-
 	public:
 		open_chd(const char *region)
-			: m_next(nullptr),
-			m_region(region) { }
+			: m_region(region) { }
 
-		open_chd *next() const { return m_next; }
 		const char *region() const { return m_region.c_str(); }
 		chd_file &chd() { return m_diffchd.opened() ? m_diffchd : m_origchd; }
 		chd_file &orig_chd() { return m_origchd; }
 		chd_file &diff_chd() { return m_diffchd; }
 
 	private:
-		open_chd *          m_next;                 /* pointer to next in the list */
 		std::string         m_region;               /* disk region we came from */
 		chd_file            m_origchd;              /* handle to the original CHD */
 		chd_file            m_diffchd;              /* handle to the diff CHD */
@@ -344,7 +339,7 @@ private:
 	UINT32          m_romstotalsize;      /* total size of ROMs to read */
 
 	emu_file *      m_file;               /* current file */
-	simple_list<open_chd> m_chd_list;     /* disks */
+	std::vector<std::unique_ptr<open_chd>> m_chd_list;     /* disks */
 
 	memory_region * m_region;             /* info about current region */
 
