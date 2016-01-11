@@ -105,8 +105,6 @@ private:
 	ui_event                    m_events[EVENT_QUEUE_SIZE];
 	int                         m_events_start;
 	int                         m_events_end;
-
-	bool						m_initialized;
 };
 
 #endif  /* __UIINPUT_H__ */
