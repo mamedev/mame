@@ -211,7 +211,7 @@ void driver_device::device_start()
 		(*m_system->driver_init)(machine());
 
 	// finish image devices init process
-	image_postdevice_init(machine());
+	machine().image().postdevice_init();
 
 	// start the various pieces
 	driver_start();

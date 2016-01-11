@@ -91,6 +91,7 @@ class configuration_manager;
 class output_manager;
 class ui_input_manager;
 class crosshair_manager;
+class image_manager;
 class osd_interface;
 enum class config_type;
 
@@ -175,6 +176,7 @@ public:
 	ui_manager &ui() const { assert(m_ui != nullptr); return *m_ui; }
 	ui_input_manager &ui_input() const { assert(m_ui_input != nullptr); return *m_ui_input; }
 	crosshair_manager &crosshair() const { assert(m_crosshair != nullptr); return *m_crosshair; }
+	image_manager &image() const { assert(m_image != nullptr); return *m_image; }
 	tilemap_manager &tilemap() const { assert(m_tilemap != nullptr); return *m_tilemap; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != nullptr); return *m_debug_view; }
 	driver_device *driver_data() const { return &downcast<driver_device &>(root_device()); }
@@ -293,6 +295,7 @@ private:
 	std::unique_ptr<configuration_manager> m_configuration; // internal data from config.c
 	std::unique_ptr<output_manager> m_output;		   // internal data from output.c
 	std::unique_ptr<crosshair_manager> m_crosshair;	   // internal data from crsshair.c
+	std::unique_ptr<image_manager> m_image;	           // internal data from image.c
 
 	// system state
 	machine_phase           m_current_phase;        // current execution phase

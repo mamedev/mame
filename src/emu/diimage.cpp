@@ -17,6 +17,7 @@
 #include "ui/imgcntrl.h"
 #include "softlist.h"
 #include "image.h"
+#include "formats/ioprocs.h"
 
 //**************************************************************************
 //  DEVICE CONFIG IMAGE INTERFACE
@@ -508,14 +509,39 @@ UINT32 device_image_interface::crc()
 -------------------------------------------------*/
 void device_image_interface::battery_load(void *buffer, int length, int fill)
 {
+	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+
+	file_error filerr;
+	int bytes_read = 0;
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
-	image_battery_load_by_name(device().machine().options(), fname.c_str(), buffer, length, fill);
+
+	/* try to open the battery file and read it in, if possible */
+	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_READ);
+	filerr = file.open(fname.c_str());
+	if (filerr == FILERR_NONE)
+		bytes_read = file.read(buffer, length);
+
+	/* fill remaining bytes (if necessary) */
+	memset(((char *)buffer) + bytes_read, fill, length - bytes_read);
 }
 
 void device_image_interface::battery_load(void *buffer, int length, void *def_buffer)
 {
+	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+
+	file_error filerr;
+	int bytes_read = 0;
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
-	image_battery_load_by_name(device().machine().options(), fname.c_str(), buffer, length, def_buffer);
+
+	/* try to open the battery file and read it in, if possible */
+	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_READ);
+	filerr = file.open(fname.c_str());
+	if (filerr == FILERR_NONE)
+		bytes_read = file.read(buffer, length);
+
+	/* if no file was present, copy the default battery */
+	if (bytes_read == 0 && def_buffer)
+		memcpy((char *)buffer, (char *)def_buffer, length);
 }
 
 /*-------------------------------------------------
@@ -526,9 +552,14 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 -------------------------------------------------*/
 void device_image_interface::battery_save(const void *buffer, int length)
 {
+	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");
 
-	image_battery_save_by_name(device().machine().options(), fname.c_str(), buffer, length);
+	/* try to open the battery file and write it out, if possible */
+	emu_file file(device().machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	file_error filerr = file.open(fname.c_str());
+	if (filerr == FILERR_NONE)
+		file.write(buffer, length);
 }
 
 //-------------------------------------------------
@@ -1350,3 +1381,41 @@ ui_menu *device_image_interface::get_selection_menu(running_machine &machine, re
 {
 	return auto_alloc_clear(machine, <ui_menu_control_device_image>(machine, container, this));
 }
+
+/* ----------------------------------------------------------------------- */
+
+static int image_fseek_thunk(void *file, INT64 offset, int whence)
+{
+	device_image_interface *image = (device_image_interface *) file;
+	return image->fseek(offset, whence);
+}
+
+static size_t image_fread_thunk(void *file, void *buffer, size_t length)
+{
+	device_image_interface *image = (device_image_interface *) file;
+	return image->fread(buffer, length);
+}
+
+static size_t image_fwrite_thunk(void *file, const void *buffer, size_t length)
+{
+	device_image_interface *image = (device_image_interface *) file;
+	return image->fwrite(buffer, length);
+}
+
+static UINT64 image_fsize_thunk(void *file)
+{
+	device_image_interface *image = (device_image_interface *) file;
+	return image->length();
+}
+
+/* ----------------------------------------------------------------------- */
+
+struct io_procs image_ioprocs =
+{
+	nullptr,
+	image_fseek_thunk,
+	image_fread_thunk,
+	image_fwrite_thunk,
+	image_fsize_thunk
+};
+

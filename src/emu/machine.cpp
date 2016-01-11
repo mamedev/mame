@@ -264,7 +264,7 @@ void running_machine::start()
 	save().save_item(NAME(m_rand_seed));
 
 	// initialize image devices
-	image_init(*this);
+	m_image = std::make_unique<image_manager>(*this);
 	m_tilemap = std::make_unique<tilemap_manager>(*this);
 	m_crosshair = make_unique_clear<crosshair_manager>(*this);
 	m_network = std::make_unique<network_manager>(*this);

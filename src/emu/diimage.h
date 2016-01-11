@@ -21,6 +21,8 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+extern struct io_procs image_ioprocs;
+
 class software_list;
 
 enum iodevice_t

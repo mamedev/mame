@@ -16,7 +16,6 @@
 #include "emu.h"
 #include "formats/imageutl.h"
 #include "flopdrv.h"
-#include "image.h"
 
 #define VERBOSE     0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
