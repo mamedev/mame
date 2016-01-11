@@ -28,7 +28,7 @@
     HELPERS (also used by diimage.cpp)
  ***************************************************************************/
 
-file_error common_process_file(emu_options &options, const char *location, const char *ext, const rom_entry *romp, emu_file &image_file)
+static file_error common_process_file(emu_options &options, const char *location, const char *ext, const rom_entry *romp, emu_file &image_file)
 {
 	file_error filerr;
 
@@ -40,22 +40,20 @@ file_error common_process_file(emu_options &options, const char *location, const
 	return filerr;
 }
 
-file_error common_process_file(emu_options &options, const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, emu_file **image_file)
+std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, file_error &filerr)
 {
-	*image_file = global_alloc(emu_file(options.media_path(), OPEN_FLAG_READ));
-	file_error filerr;
+	auto image_file = std::make_unique<emu_file>(options.media_path(), OPEN_FLAG_READ);
 
 	if (has_crc)
-		filerr = (*image_file)->open(location, PATH_SEPARATOR, ROM_GETNAME(romp), crc);
+		filerr = image_file->open(location, PATH_SEPARATOR, ROM_GETNAME(romp), crc);
 	else
-		filerr = (*image_file)->open(location, PATH_SEPARATOR, ROM_GETNAME(romp));
+		filerr = image_file->open(location, PATH_SEPARATOR, ROM_GETNAME(romp));
 
 	if (filerr != FILERR_NONE)
 	{
-		global_free(*image_file);
-		*image_file = nullptr;
+		image_file = nullptr;
 	}
-	return filerr;
+	return image_file;
 }
 
 /***************************************************************************
@@ -571,7 +569,7 @@ int rom_load_manager::open_rom_file(const char *regiontag, const rom_entry *romp
 		if (tried_file_names.length() != 0)
 			tried_file_names += " ";
 		tried_file_names += driver_list::driver(drv).name;
-		filerr = common_process_file(machine().options(), driver_list::driver(drv).name, has_crc, crc, romp, &m_file);
+		m_file = common_process_file(machine().options(), driver_list::driver(drv).name, has_crc, crc, romp, filerr);
 	}
 
 	/* if the region is load by name, load the ROM from there */
@@ -624,7 +622,7 @@ int rom_load_manager::open_rom_file(const char *regiontag, const rom_entry *romp
 		if (!is_list)
 		{
 			tried_file_names += " " + tag1;
-			filerr = common_process_file(machine().options(), tag1.c_str(), has_crc, crc, romp, &m_file);
+			m_file = common_process_file(machine().options(), tag1.c_str(), has_crc, crc, romp, filerr);
 		}
 		else
 		{
@@ -632,25 +630,25 @@ int rom_load_manager::open_rom_file(const char *regiontag, const rom_entry *romp
 			if ((m_file == nullptr) && (tag2.c_str() != nullptr))
 			{
 				tried_file_names += " " + tag2;
-				filerr = common_process_file(machine().options(), tag2.c_str(), has_crc, crc, romp, &m_file);
+				m_file = common_process_file(machine().options(), tag2.c_str(), has_crc, crc, romp, filerr);
 			}
 			// try to load from list/parentname
 			if ((m_file == nullptr) && has_parent && (tag3.c_str() != nullptr))
 			{
 				tried_file_names += " " + tag3;
-				filerr = common_process_file(machine().options(), tag3.c_str(), has_crc, crc, romp, &m_file);
+				m_file = common_process_file(machine().options(), tag3.c_str(), has_crc, crc, romp, filerr);
 			}
 			// try to load from setname
 			if ((m_file == nullptr) && (tag4.c_str() != nullptr))
 			{
 				tried_file_names += " " + tag4;
-				filerr = common_process_file(machine().options(), tag4.c_str(), has_crc, crc, romp, &m_file);
+				m_file = common_process_file(machine().options(), tag4.c_str(), has_crc, crc, romp, filerr);
 			}
 			// try to load from parentname
 			if ((m_file == nullptr) && has_parent && (tag5.c_str() != nullptr))
 			{
 				tried_file_names += " " + tag5;
-				filerr = common_process_file(machine().options(), tag5.c_str(), has_crc, crc, romp, &m_file);
+				m_file = common_process_file(machine().options(), tag5.c_str(), has_crc, crc, romp, filerr);
 			}
 		}
 	}
@@ -942,7 +940,6 @@ void rom_load_manager::process_rom_entries(const char *regiontag, const rom_entr
 			if (m_file != nullptr)
 			{
 				LOG(("Closing ROM file\n"));
-				global_free(m_file);
 				m_file = nullptr;
 			}
 		}

@@ -338,7 +338,7 @@ private:
 	UINT32          m_romsloadedsize;     /* total size of ROMs loaded so far */
 	UINT32          m_romstotalsize;      /* total size of ROMs to read */
 
-	emu_file *      m_file;               /* current file */
+	std::unique_ptr<emu_file>  m_file;               /* current file */
 	std::vector<std::unique_ptr<open_chd>> m_chd_list;     /* disks */
 
 	memory_region * m_region;             /* info about current region */
@@ -350,8 +350,7 @@ private:
 
 /* ----- Helpers ----- */
 
-file_error common_process_file(emu_options &options, const char *location, const char *ext, const rom_entry *romp, emu_file **image_file);
-file_error common_process_file(emu_options &options, const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, emu_file **image_file);
+std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, file_error &filerr);
 
 /* return pointer to the first ROM region within a source */
 const rom_entry *rom_first_region(const device_t &device);

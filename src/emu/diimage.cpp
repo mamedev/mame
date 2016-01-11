@@ -861,18 +861,18 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				// - if we are using lists, we have: list/clonename, list/parentname, clonename, parentname
 				// try to load from list/setname
 				if ((m_mame_file == nullptr) && (tag2.c_str() != nullptr))
-					filerr = common_process_file(device().machine().options(), tag2.c_str(), has_crc, crc, romp, &m_mame_file);
+					m_mame_file = common_process_file(device().machine().options(), tag2.c_str(), has_crc, crc, romp, filerr);
 				// try to load from list/parentname
 				if ((m_mame_file == nullptr) && (tag3.c_str() != nullptr))
-					filerr = common_process_file(device().machine().options(), tag3.c_str(), has_crc, crc, romp, &m_mame_file);
+					m_mame_file = common_process_file(device().machine().options(), tag3.c_str(), has_crc, crc, romp, filerr);
 				// try to load from setname
 				if ((m_mame_file == nullptr) && (tag4.c_str() != nullptr))
-					filerr = common_process_file(device().machine().options(), tag4.c_str(), has_crc, crc, romp, &m_mame_file);
+					m_mame_file = common_process_file(device().machine().options(), tag4.c_str(), has_crc, crc, romp, filerr);
 				// try to load from parentname
 				if ((m_mame_file == nullptr) && (tag5.c_str() != nullptr))
-					filerr = common_process_file(device().machine().options(), tag5.c_str(), has_crc, crc, romp, &m_mame_file);
+					m_mame_file = common_process_file(device().machine().options(), tag5.c_str(), has_crc, crc, romp, filerr);
 
-				warningcount += verify_length_and_hash(m_mame_file,ROM_GETNAME(romp),ROM_GETLENGTH(romp),hash_collection(ROM_GETHASHDATA(romp)));
+				warningcount += verify_length_and_hash(m_mame_file.get(),ROM_GETNAME(romp),ROM_GETLENGTH(romp),hash_collection(ROM_GETHASHDATA(romp)));
 
 				if (filerr == FILERR_NONE)
 				{
@@ -1119,7 +1119,6 @@ void device_image_interface::clear()
 {
 	if (m_mame_file)
 	{
-		global_free(m_mame_file);
 		m_mame_file = nullptr;
 		m_file = nullptr;
 	} else {

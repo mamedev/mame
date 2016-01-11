@@ -275,7 +275,7 @@ protected:
 
 	/* variables that are only non-zero when an image is mounted */
 	core_file *m_file;
-	emu_file *m_mame_file;
+	std::unique_ptr<emu_file> m_mame_file;
 	std::string m_image_name;
 	std::string m_basename;
 	std::string m_basename_noext;
