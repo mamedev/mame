@@ -20,12 +20,29 @@
     0xe000-0xe001: 6850 reads
  
     I/O map:
-    00-03:	8253 PIT
+    00-07:	8253 PIT
+    08: set row to scan for keyboard/panel input and LED / lamp output
+    09: read: analog comparitor, some value vs. the DAC.  write: output for LEDs/lamps
+    	comparitor bits:
+    	bit 1: FFFStatus
+    	bit 2: output of 8253 channel 2
+    	bit 3: ADCCompare: returns sign of if current value is > or < the DAC value
+	 
+	0a: read: keyboard/panel input scan bits, write: select a pot on the panel for the comparitor
+    0b: write: update all gate signals
+    0c: ???
+    0d: write: select which CV signal will be updated with the current DAC value
+    0e: write: mask, masks
+    	bit 0: FFFP -FF P
+    	bit 1: mask gate from 8253
+    	bit 3: FFFD FF D
+    	bit 4: FFFCL -FF CL
+ 
  
     Info:
     - Prophet 600 Technical Manual
  
-	- https://github.com/gligli/p600fw - GPLv3 licensed complete replacement firmware
+    - https://github.com/gligli/p600fw - GPLv3 licensed complete replacement firmware
     for the Prophet 600, but written in C and runs on an AVR that replaces the original
     Z80.
  
@@ -44,6 +61,17 @@
 #define PIT_TAG		"pit"
 #define UART_TAG	"uart"
 
+enum
+{
+	CV_CV_Osc1A = 0, CV_Osc2A, CV_Osc3A, CV_Osc4A, CV_Osc5A, CV_Osc6A,           
+	CV_Osc1B, CV_Osc2B, CV_Osc3B, CV_Osc4B, CV_Osc5B, CV_Osc6B,           
+	CV_Flt1, CV_Flt2, CV_Flt3, CV_Flt4, CV_Flt5, CV_Flt6,                
+	CV_Amp1, CV_Amp2, CV_Amp3, CV_Amp4, CV_Amp5, CV_Amp6,                
+	CV_PModOscB, CV_VolA, CV_VolB, CV_MasterVol, CV_APW, CV_ExtFilter, CV_Resonance, CV_BPW,
+
+	CV_MAX
+};
+
 class prophet600_state : public driver_device
 {
 public:
@@ -53,7 +81,8 @@ public:
 		m_acia(*this, UART_TAG),
 		m_dac(0),
 		m_scanrow(0),
-		m_comparitor(0)
+		m_comparitor(0),
+		m_nmi_gate(false)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -61,7 +90,8 @@ public:
 
 	DECLARE_DRIVER_INIT(prophet600);
 
-	DECLARE_WRITE_LINE_MEMBER( pit_tick_w );
+	DECLARE_WRITE_LINE_MEMBER( pit_ch0_tick_w );
+	DECLARE_WRITE_LINE_MEMBER( pit_ch2_tick_w );
 	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( acia_clock_w );
 
@@ -79,15 +109,33 @@ private:
 	UINT16 m_dac;
 	UINT8 m_scanrow;
 	UINT8 m_comparitor;
+
+	bool m_nmi_gate;
+
+	// gates
+	bool m_ASaw, m_ATri, m_Sync, m_BSaw, m_BTri, m_PModFA, m_PModFil;
+
+	// control voltages
+	UINT16 m_CVs[CV_MAX];
 };
 
-WRITE_LINE_MEMBER( prophet600_state::pit_tick_w )
+WRITE_LINE_MEMBER( prophet600_state::pit_ch0_tick_w )
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
+WRITE_LINE_MEMBER( prophet600_state::pit_ch2_tick_w )
+{
+	m_comparitor &= ~0x04;
+	m_comparitor |= (state == ASSERT_LINE) ? 0x04 : 0x00;
+}
+
 WRITE_LINE_MEMBER( prophet600_state::acia_irq_w )
 {
+	if (!m_nmi_gate)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, state);
+	}
 }
 
 WRITE_LINE_MEMBER( prophet600_state::acia_clock_w )
@@ -116,17 +164,17 @@ WRITE8_MEMBER(prophet600_state::scanrow_w)
 }
 
 // scanrow 0x10 = LEDs, 0x20 = 7-segment #1, 0x40 = 7-segment #2
-// LEDs in row 0x10 are Seq1=0, Seq2=1, ArpUD=2, ArpAssign=3, Preset=4, Record=5, ToTape=6, FromTape=7
 WRITE8_MEMBER(prophet600_state::led_w)
 {
-	if (m_scanrow == 0x10)
+	if (m_scanrow & 0x10)
 	{
+		// LEDs in row 0x10 are Seq1=0, Seq2=1, ArpUD=2, ArpAssign=3, Preset=4, Record=5, ToTape=6, FromTape=7
 	}
-	else if (m_scanrow == 0x20)
+	else if (m_scanrow & 0x20)
 	{
 		output().set_digit_value(0, data);
 	}
-	else if (m_scanrow == 0x40)
+	else if (m_scanrow & 0x40)
 	{
 		output().set_digit_value(1, data);
 	}
@@ -139,22 +187,38 @@ READ8_MEMBER(prophet600_state::scan_r)
 
 WRITE8_MEMBER(prophet600_state::mask_w)
 {
+	m_nmi_gate = (data & 0x02) ? true : false;
+	if (m_nmi_gate)	// gate is set, comparitor line is pulled up to Vcc
+	{
+		m_comparitor |= 0x04;
+	}
+	else
+	{
+		m_comparitor &= ~0x04;
+	}
+
+//	printf("8253 gate = %x\n", data & 0x02);
 }
 
-/*
-	CV destinations: 
-    Osc1A=0, Osc2A, Osc3A, Osc4A, Osc5A, Osc6A,           
-	Osc1B, Osc2B, Osc3B, Osc4B, Osc5B, Osc6B,           
-	Fil1, Fil2, Fil3, Fil4, Fil5, Fil6,                
-	Amp1, Amp2, Amp3, Amp4, Amp5, Amp6,                
-	PModOscB=24, VolA, VolB, MVol, APW, ExtFil, Resonance, BPW
-*/
 WRITE8_MEMBER(prophet600_state::cv_w)
 {
+	int cvnum = data & 7;
+
+	if (!(cvnum & 0x08)) m_CVs[cvnum] = m_dac;
+	if (!(cvnum & 0x10)) m_CVs[cvnum+8] = m_dac;
+	if (!(cvnum & 0x20)) m_CVs[cvnum+16] = m_dac;
+	if (!(cvnum & 0x40)) m_CVs[cvnum+24] = m_dac;
 }
 
 WRITE8_MEMBER(prophet600_state::gate_w)
 {
+	m_ASaw = (data & 0x01);
+	m_ATri = (data & 0x02);
+	m_Sync = (data & 0x04);
+	m_BSaw = (data & 0x08);
+	m_BTri = (data & 0x10);
+	m_PModFA = (data & 0x20);
+	m_PModFil = (data & 0x40);
 }
 
 /* Pots: Mixer=0,Cutoff=1,Resonance=2,FilEnvAmt=3,FilRel=4,FilSus=5,
@@ -168,7 +232,7 @@ WRITE8_MEMBER(prophet600_state::potmux_w)
 
 READ8_MEMBER(prophet600_state::comparitor_r)
 {
-	m_comparitor ^= 0x04;
+//	m_comparitor ^= 0x04;
 	return m_comparitor;
 }
 
@@ -184,7 +248,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, prophet600_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, prophet600_state )
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0xff00) AM_DEVREADWRITE(PIT_TAG, pit8253_device, read, write)
+	AM_RANGE(0x00, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE(PIT_TAG, pit8253_device, read, write)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_WRITE(scanrow_w)
 	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff00) AM_READWRITE(comparitor_r, led_w)
 	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xff00) AM_READWRITE(scan_r, potmux_w)
@@ -207,7 +271,10 @@ static MACHINE_CONFIG_START( prophet600, prophet600_state )
 
 	MCFG_DEVICE_ADD(PIT_TAG, PIT8253, XTAL_8MHz/4)
 	MCFG_PIT8253_CLK0(XTAL_8MHz/4)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(prophet600_state, pit_tick_w))
+	MCFG_PIT8253_CLK1(XTAL_8MHz/4)
+	MCFG_PIT8253_CLK2(XTAL_8MHz/4)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(prophet600_state, pit_ch0_tick_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(prophet600_state, pit_ch2_tick_w)) 
 
 	MCFG_DEVICE_ADD(UART_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
