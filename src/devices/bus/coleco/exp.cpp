@@ -102,7 +102,7 @@ bool colecovision_cartridge_slot_device::call_load()
 
 bool colecovision_cartridge_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 
 	return true;
 }

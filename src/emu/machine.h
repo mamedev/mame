@@ -92,10 +92,10 @@ class output_manager;
 class ui_input_manager;
 class crosshair_manager;
 class image_manager;
+class rom_load_manager;
 class osd_interface;
 enum class config_type;
 
-struct romload_private;
 struct debugcpu_private;
 
 
@@ -177,6 +177,7 @@ public:
 	ui_input_manager &ui_input() const { assert(m_ui_input != nullptr); return *m_ui_input; }
 	crosshair_manager &crosshair() const { assert(m_crosshair != nullptr); return *m_crosshair; }
 	image_manager &image() const { assert(m_image != nullptr); return *m_image; }
+	rom_load_manager &rom_load() const { assert(m_rom_load != nullptr); return *m_rom_load; }
 	tilemap_manager &tilemap() const { assert(m_tilemap != nullptr); return *m_tilemap; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != nullptr); return *m_debug_view; }
 	driver_device *driver_data() const { return &downcast<driver_device &>(root_device()); }
@@ -248,7 +249,6 @@ public:
 	UINT32                  debug_flags;        // the current debug flags
 
 	// internal core information
-	romload_private *       romload_data;       // internal data from romload.c
 	debugcpu_private *      debugcpu_data;      // internal data from debugcpu.c
 
 private:
@@ -281,21 +281,22 @@ private:
 	const game_driver &     m_system;               // reference to the definition of the game machine
 	machine_manager &       m_manager;              // reference to machine manager system
 	// managers
-	std::unique_ptr<cheat_manager> m_cheat;            // internal data from cheat.c
-	std::unique_ptr<render_manager> m_render;          // internal data from render.c
-	std::unique_ptr<input_manager> m_input;            // internal data from input.c
-	std::unique_ptr<sound_manager> m_sound;            // internal data from sound.c
-	std::unique_ptr<video_manager> m_video;            // internal data from video.c
-	std::unique_ptr<ui_manager> m_ui;                  // internal data from ui.c
-	std::unique_ptr<ui_input_manager> m_ui_input;      // internal data from uiinput.c
-	std::unique_ptr<tilemap_manager> m_tilemap;        // internal data from tilemap.c
-	std::unique_ptr<debug_view_manager> m_debug_view;  // internal data from debugvw.c
-	std::unique_ptr<network_manager> m_network;        // internal data from network.c
-	std::unique_ptr<bookkeeping_manager> m_bookkeeping;// internal data from bookkeeping.c
-	std::unique_ptr<configuration_manager> m_configuration; // internal data from config.c
-	std::unique_ptr<output_manager> m_output;		   // internal data from output.c
-	std::unique_ptr<crosshair_manager> m_crosshair;	   // internal data from crsshair.c
-	std::unique_ptr<image_manager> m_image;	           // internal data from image.c
+	std::unique_ptr<cheat_manager> m_cheat;            // internal data from cheat.cpp
+	std::unique_ptr<render_manager> m_render;          // internal data from render.cpp
+	std::unique_ptr<input_manager> m_input;            // internal data from input.cpp
+	std::unique_ptr<sound_manager> m_sound;            // internal data from sound.cpp
+	std::unique_ptr<video_manager> m_video;            // internal data from video.cpp
+	std::unique_ptr<ui_manager> m_ui;                  // internal data from ui.cpp
+	std::unique_ptr<ui_input_manager> m_ui_input;      // internal data from uiinput.cpp
+	std::unique_ptr<tilemap_manager> m_tilemap;        // internal data from tilemap.cpp
+	std::unique_ptr<debug_view_manager> m_debug_view;  // internal data from debugvw.cpp
+	std::unique_ptr<network_manager> m_network;        // internal data from network.cpp
+	std::unique_ptr<bookkeeping_manager> m_bookkeeping;// internal data from bookkeeping.cpp
+	std::unique_ptr<configuration_manager> m_configuration; // internal data from config.cpp
+	std::unique_ptr<output_manager> m_output;		   // internal data from output.cpp
+	std::unique_ptr<crosshair_manager> m_crosshair;	   // internal data from crsshair.cpp
+	std::unique_ptr<image_manager> m_image;	           // internal data from image.cpp
+	std::unique_ptr<rom_load_manager> m_rom_load;	   // internal data from romload.cpp
 
 	// system state
 	machine_phase           m_current_phase;        // current execution phase

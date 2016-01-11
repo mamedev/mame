@@ -118,7 +118,6 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 	: firstcpu(nullptr),
 		primary_screen(nullptr),
 		debug_flags(0),
-		romload_data(nullptr),
 		debugcpu_data(nullptr),
 		m_config(_config),
 		m_system(_config.gamedrv()),
@@ -249,7 +248,7 @@ void running_machine::start()
 
 	// first load ROMs, then populate memory, and finally initialize CPUs
 	// these operations must proceed in this order
-	rom_init(*this);
+	m_rom_load = make_unique_clear<rom_load_manager>(*this);
 	m_memory.initialize();
 
 	// initialize the watchdog

@@ -1024,11 +1024,11 @@ std::string &ui_manager::warnings_string(std::string &str)
 	str.clear();
 
 	// if no warnings, nothing to return
-	if (rom_load_warnings(machine()) == 0 && rom_load_knownbad(machine()) == 0 && !(machine().system().flags & WARNING_FLAGS) && software_load_warnings_message(machine()).length() == 0)
+	if (machine().rom_load().warnings() == 0 && machine().rom_load().knownbad() == 0 && !(machine().system().flags & WARNING_FLAGS) && machine().rom_load().software_load_warnings_message().length() == 0)
 		return str;
 
 	// add a warning if any ROMs were loaded with warnings
-	if (rom_load_warnings(machine()) > 0)
+	if (machine().rom_load().warnings() > 0)
 	{
 		str.append("One or more ROMs/CHDs for this ");
 		str.append(emulator_info::get_gamenoun());
@@ -1039,20 +1039,20 @@ std::string &ui_manager::warnings_string(std::string &str)
 			str.append("\n");
 	}
 
-	if (software_load_warnings_message(machine()).length()>0) {
-		str.append(software_load_warnings_message(machine()));
+	if (machine().rom_load().software_load_warnings_message().length()>0) {
+		str.append(machine().rom_load().software_load_warnings_message());
 		if (machine().system().flags & WARNING_FLAGS)
 			str.append("\n");
 	}
 	// if we have at least one warning flag, print the general header
-	if ((machine().system().flags & WARNING_FLAGS) || rom_load_knownbad(machine()) > 0)
+	if ((machine().system().flags & WARNING_FLAGS) || machine().rom_load().knownbad() > 0)
 	{
 		str.append("There are known problems with this ");
 		str.append(emulator_info::get_gamenoun());
 		str.append("\n\n");
 
 		// add a warning if any ROMs are flagged BAD_DUMP/NO_DUMP
-		if (rom_load_knownbad(machine()) > 0) {
+		if (machine().rom_load().knownbad() > 0) {
 			str.append("One or more ROMs/CHDs for this ");
 			str.append(emulator_info::get_gamenoun());
 			str.append(" have not been correctly dumped.\n");

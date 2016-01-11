@@ -1393,7 +1393,7 @@ void ti99_cartridge_device::set_slot(int i)
 bool ti99_cartridge_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
 	if (TRACE_CONFIG) logerror("%s: swlist = %s, swname = %s\n", tag(), swlist.list_name(), swname);
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 	m_softlist = true;
 	m_rpk = nullptr;
 	return true;

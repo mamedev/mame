@@ -99,7 +99,7 @@ void harddisk_image_device::device_start()
 	m_chd = nullptr;
 
 	// try to locate the CHD from a DISK_REGION
-	chd_file *handle = get_disk_handle(machine(), tag());
+	chd_file *handle = machine().rom_load().get_disk_handle(tag());
 	if (handle != nullptr)
 	{
 		m_hard_disk_handle = hard_disk_open(handle);
@@ -241,7 +241,7 @@ int harddisk_image_device::internal_load_hd()
 	/* open the CHD file */
 	if (software_entry() != nullptr)
 	{
-		m_chd = get_disk_handle(device().machine(), device().subtag("harddriv").c_str());
+		m_chd = machine().rom_load().get_disk_handle(device().subtag("harddriv").c_str());
 	}
 	else
 	{
