@@ -225,7 +225,7 @@ void running_machine::start()
 	m_soft_reset_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::soft_reset), this));
 
 	// intialize UI input
-	m_ui_input = std::make_unique<ui_input_manager>(*this);
+	m_ui_input = make_unique_clear<ui_input_manager>(*this);
 
 	// init the osd layer
 	m_manager.osd().init(*this);
