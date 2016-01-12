@@ -354,7 +354,7 @@ WRITE8_MEMBER( spc1500_state::psgb_w)
 		membank("bank1")->set_entry(m_ipl ? 0 : 1);
 	}
 	m_cass->set_state(BIT(data, 6) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED);
-	if (!m_motor && BIT(data, 7) &&  ATTOSECONDS_IN_MSEC((time - m_time).as_attoseconds()) > 1000)
+	if (!m_motor && BIT(data, 7) &&  ATTOSECONDS_IN_MSEC((time - m_time).as_attoseconds()) > 400)
 	{
 		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		m_time = time;
@@ -425,6 +425,7 @@ READ8_MEMBER( spc1500_state::pcg_r)
 void spc1500_state::get_pcg_addr()
 {
 	UINT16 vaddr = 0;
+	static int val = 0;
 	if(m_p_videoram[0x7ff] & 0x20) {
 		vaddr = 0x7ff;
 	} else if(m_p_videoram[0x3ff] & 0x20) {
@@ -439,6 +440,11 @@ void spc1500_state::get_pcg_addr()
 	m_pcg_char = m_p_videoram[0x1000 + vaddr];
 	m_pcg_attr = m_p_videoram[vaddr];
 	m_pcg_addr = m_pcg_char * (m_crtc_vreg[0x9]+1);
+	if (val != m_pcg_char)
+	{
+	//	printf("char=%d\n", m_pcg_char);
+		val = m_pcg_char;
+	}
 }
 WRITE8_MEMBER( spc1500_state::pcg_w)
 {
@@ -525,16 +531,25 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 			UINT16 wpixelb = (pixelb << 8) + (*(pp+1));
 			UINT16 wpixelr = (pixelr << 8) + (*(pp+0x4001));
 			UINT16 wpixelg = (pixelg << 8) + (*(pp+0x8001));
-			han2 = *(pv+0x1001);
-			h1 = (ascii>>2)&0x1f;
-			h2 = ((ascii<<3)|(han2>>5))&0x1f;
-			h3 = (han2)&0x1f;
-			pf = &m_font[0x2000+(h1 * 32) + (cho[h2] + (h3 != 0) -1) * 16 * 2 * 32 + n];
-			hfnt = (*pf << 8) | (*(pf+16));
-			pf = &m_font[0x4000+(h2 * 32) + (h3 == 0 ? 0 : 1) * 16 * 2 * 32 + n];
-			hfnt = hfnt & ((*pf << 8) | (*(pf+16)));
-			pf = &m_font[0x6000+(h3 * 32) + (jong[h2]-1) * 16 * 2 * 32 + n];
-			hfnt = hfnt & ((*pf << 8) | (*(pf+16)));
+			if (ascii != 0xfa)
+			{
+				han2 = *(pv+0x1001);
+				h1 = (ascii>>2)&0x1f;
+				h2 = ((ascii<<3)|(han2>>5))&0x1f;
+				h3 = (han2)&0x1f;
+				pf = &m_font[0x2000+(h1 * 32) + (cho[h2] + (h3 != 0) -1) * 16 * 2 * 32 + n];
+				hfnt = (*pf << 8) | (*(pf+16));
+				pf = &m_font[0x4000+(h2 * 32) + (h3 == 0 ? 0 : 1) * 16 * 2 * 32 + n];
+				hfnt = hfnt & ((*pf << 8) | (*(pf+16)));
+				pf = &m_font[0x6000+(h3 * 32) + (jong[h2]-1) * 16 * 2 * 32 + n];
+				hfnt = hfnt & ((*pf << 8) | (*(pf+16)));
+			}				
+			else
+			{
+				ascii = *(pv+0x1001);
+				pf = &m_font[0x6000+(ascii*32) + n];
+				hfnt = (*pf << 8) | (*(pf+16));
+			}
 			hfnt = (inv ? 0xffff - hfnt : hfnt);
 			//printf("0x%04x\n" , hfnt);
 			for (j = 0x8000; j > 0; j>>=1)
@@ -547,7 +562,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 		}
 		else if (attr & 0x20)
 		{
-			UINT8 *pa = &m_pcgram[(ascii<<hs)+n];
+			UINT8 *pa = &m_pcgram[(ascii*(m_crtc_vreg[0x9]+1))+n];
 			UINT8 b = *pa;
 			UINT8 r = *(pa+0x800);
 			UINT8 g = *(pa+0x1000);
