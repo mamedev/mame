@@ -166,7 +166,7 @@ void DasmWindow::toggleBreakpointAtCursor(bool changedTo)
 			debug_console_printf(*m_machine, "Breakpoint %X cleared\n", bpindex);
 		}
 		m_machine->debugger().view().update_all();
-		m_machine->debugger()refresh_display();
+		m_machine->debugger().refresh_display();
 	}
 
 	refreshAll();

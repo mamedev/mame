@@ -5,6 +5,7 @@
 #include <QtGui/QPainter>
 #include <QtGui/QKeyEvent>
 
+#include "debugger.h"
 #include "debuggerview.h"
 
 #include "modules/lib/osdobj_common.h"
