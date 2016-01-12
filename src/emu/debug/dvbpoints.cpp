@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "debugger.h"
 #include "dvbpoints.h"
 
 
@@ -178,7 +179,7 @@ void debug_view_breakpoints::view_click(const int button, const debug_view_xy& p
 		// Enable / disable
 		m_buffer[bpIndex]->setEnabled(!m_buffer[bpIndex]->enabled());
 
-		machine().debug_view().update_all(DVT_DISASSEMBLY);
+		machine().debugger().view().update_all(DVT_DISASSEMBLY);
 	}
 
 	begin_update();

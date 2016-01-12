@@ -33,27 +33,25 @@ static void debugger_exit(running_machine &machine);
 
 
 
-/***************************************************************************
-    CENTRAL INITIALIZATION POINT
-***************************************************************************/
+//**************************************************************************
+//  DEBUGGER MANAGER
+//**************************************************************************
 
-/*-------------------------------------------------
-    debugger_init - start up all subsections
--------------------------------------------------*/
+//-------------------------------------------------
+//  debugger_manager - constructor
+//-------------------------------------------------
 
-void debugger_init(running_machine &machine)
+debugger_manager::debugger_manager(running_machine &machine)
+	: m_machine(machine)
 {
 	/* only if debugging is enabled */
 	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		/* initialize the submodules */
-		machine.m_debug_view = std::make_unique<debug_view_manager>(machine);
+		m_debug_view = std::make_unique<debug_view_manager>(machine);
 		debug_cpu_init(machine);
 		debug_command_init(machine);
-		debug_console_init(machine);
 
-		/* allocate a new entry for our global list */
-		machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debugger_exit), &machine));
 		g_machine = &machine;
 
 		/* register an atexit handler if we haven't yet */
@@ -69,26 +67,32 @@ void debugger_init(running_machine &machine)
 	}
 }
 
+/*-------------------------------------------------
+//  debugger_manager - destructor
+-------------------------------------------------*/
+
+debugger_manager::~debugger_manager()
+{
+	g_machine = nullptr;
+}
+
+void debugger_manager::initialize()
+{
+	/* only if debugging is enabled */
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	{
+		debug_console_init(machine());
+	}
+}
 
 /*-------------------------------------------------
-    debugger_refresh_display - redraw the current
+    refresh_display - redraw the current
     video display
 -------------------------------------------------*/
 
-void debugger_refresh_display(running_machine &machine)
+void debugger_manager::refresh_display()
 {
-	machine.video().frame_update(true);
-}
-
-
-/*-------------------------------------------------
-    debugger_exit - remove ourself from the
-    global list of active machines for cleanup
--------------------------------------------------*/
-
-static void debugger_exit(running_machine &machine)
-{
-	g_machine = nullptr;
+	machine().video().frame_update(true);
 }
 
 

@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "debugger.h"
 #include "debugcmd.h"
 #include "debugcon.h"
 #include "debugcpu.h"
@@ -1157,7 +1158,7 @@ static void execute_comment(running_machine &machine, int ref, int params, const
 
 	/* Now try adding the comment */
 	cpu->debug()->comment_add(address, param[1], 0x00ff0000);
-	cpu->machine().debug_view().update_all(DVT_DISASSEMBLY);
+	cpu->machine().debugger().view().update_all(DVT_DISASSEMBLY);
 }
 
 
@@ -1181,7 +1182,7 @@ static void execute_comment_del(running_machine &machine, int ref, int params, c
 	/* If it's a number, it must be an address */
 	/* The bankoff and cbn will be pulled from what's currently active */
 	cpu->debug()->comment_remove(address);
-	cpu->machine().debug_view().update_all(DVT_DISASSEMBLY);
+	cpu->machine().debugger().view().update_all(DVT_DISASSEMBLY);
 }
 
 

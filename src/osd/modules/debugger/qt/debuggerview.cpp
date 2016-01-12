@@ -27,7 +27,7 @@ DebuggerView::DebuggerView(const debug_view_type& type,
 	viewFontRequest.setPointSize((selectedFontSize <= 0) ? 11 : selectedFontSize);
 	setFont(viewFontRequest);
 
-	m_view = m_machine->debug_view().alloc_view(type,
+	m_view = m_machine->debugger().view().alloc_view(type,
 												DebuggerView::debuggerViewUpdate,
 												this);
 
@@ -41,7 +41,7 @@ DebuggerView::DebuggerView(const debug_view_type& type,
 DebuggerView::~DebuggerView()
 {
 	if (m_machine && m_view)
-		m_machine->debug_view().free_view(*m_view);
+		m_machine->debugger().view().free_view(*m_view);
 }
 
 void DebuggerView::paintEvent(QPaintEvent* event)

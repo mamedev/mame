@@ -189,7 +189,7 @@ public:
 		this->target = target;
 		//dv->container = render_target_get_component_container(target, name, &pos);
 		this->container = target->debug_alloc();
-		this->view = machine.debug_view().alloc_view(type, dview_update, this);
+		this->view = machine.debugger().view().alloc_view(type, dview_update, this);
 		this->type = type;
 		this->m_machine = &machine;
 		this->state = flags | VIEW_STATE_NEEDS_UPDATE | VIEW_STATE_VISIBLE;
@@ -211,7 +211,7 @@ public:
 	~DView()
 	{
 		//this->target->debug_free(*this->container);
-		machine().debug_view().free_view(*this->view);
+		machine().debugger().view().free_view(*this->view);
 	}
 
 	running_machine &machine() const { assert(m_machine != nullptr); return *m_machine; }

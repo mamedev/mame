@@ -188,8 +188,8 @@
 		}
 
 		// fail to do this and the display doesn't update
-		machine->debug_view().update_all();
-		debugger_refresh_display(*machine);
+		machine->debugger().view().update_all();
+		machine->debugger().refresh_display();
 	}
 }
 
@@ -207,8 +207,8 @@
 								 "Breakpoint %X %s\n",
 								 (UINT32)bp->index(),
 								 bp->enabled() ? "enabled" : "disabled");
-			machine->debug_view().update_all();
-			debugger_refresh_display(*machine);
+			machine->debugger().view().update_all();
+			machine->debugger().refresh_display();
 		}
 	}
 }

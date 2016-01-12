@@ -674,8 +674,8 @@ void fd1094_regenerate_key(running_machine &machine)
 		(*key_changed)(machine);
 
 	/* force all memory and disassembly views to update */
-	machine.debug_view().update_all(DVT_MEMORY);
-	machine.debug_view().update_all(DVT_DISASSEMBLY);
+	machine.debugger().view().update_all(DVT_MEMORY);
+	machine.debugger().view().update_all(DVT_DISASSEMBLY);
 
 	/* reset keydirty */
 	keydirty = FALSE;
@@ -1008,8 +1008,8 @@ static void execute_fdstate(running_machine &machine, int ref, int params, const
 			return;
 		fd1094_set_state(keyregion, newstate);
 		fd1094_regenerate_key(machine);
-		machine.debug_view().update_all(DVT_MEMORY);
-		machine.debug_view().update_all(DVT_DISASSEMBLY);
+		machine.debugger().view().update_all(DVT_MEMORY);
+		machine.debugger().view().update_all(DVT_DISASSEMBLY);
 	}
 
 	/* 0 parameters displays the current state */

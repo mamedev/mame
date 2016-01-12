@@ -10,7 +10,7 @@
 
 #include "debugwininfo.h"
 #include "uimetrics.h"
-
+#include "debugger.h"
 #include "debug/debugcpu.h"
 
 #include "strconv.h"
@@ -63,7 +63,7 @@ debugview_info::debugview_info(debugger_windows_interface &debugger, debugwin_in
 		goto cleanup;
 
 	// create the debug view
-	m_view = machine().debug_view().alloc_view(type, &debugview_info::static_update, this);
+	m_view = machine().debugger().view().alloc_view(type, &debugview_info::static_update, this);
 	if (m_view == NULL)
 		goto cleanup;
 
@@ -80,7 +80,7 @@ cleanup:
 		DestroyWindow(m_wnd);
 	m_wnd = NULL;
 	if (m_view != NULL)
-		machine().debug_view().free_view(*m_view);
+		machine().debugger().view().free_view(*m_view);
 	m_view = NULL;
 }
 
@@ -90,7 +90,7 @@ debugview_info::~debugview_info()
 	if (m_wnd != NULL)
 		DestroyWindow(m_wnd);
 	if (m_view)
-		machine().debug_view().free_view(*m_view);
+		machine().debugger().view().free_view(*m_view);
 }
 
 
@@ -733,7 +733,7 @@ LRESULT debugview_info::view_proc(UINT message, WPARAM wparam, LPARAM lparam)
 			debug_view_xy topleft = m_view->visible_position();
 			topleft.x = process_scroll(LOWORD(wparam), (HWND)lparam);
 			m_view->set_visible_position(topleft);
-			machine().debug_view().flush_osd_updates();
+			machine().debugger().view().flush_osd_updates();
 			break;
 		}
 
@@ -743,7 +743,7 @@ LRESULT debugview_info::view_proc(UINT message, WPARAM wparam, LPARAM lparam)
 			debug_view_xy topleft = m_view->visible_position();
 			topleft.y = process_scroll(LOWORD(wparam), (HWND)lparam);
 			m_view->set_visible_position(topleft);
-			machine().debug_view().flush_osd_updates();
+			machine().debugger().view().flush_osd_updates();
 			break;
 		}
 

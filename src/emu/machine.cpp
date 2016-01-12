@@ -269,8 +269,8 @@ void running_machine::start()
 	m_network = std::make_unique<network_manager>(*this);
 
 	// initialize the debugger
-	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debugger_init(*this);
+	m_debugger = std::make_unique<debugger_manager>(*this);
+	m_debugger->initialize();
 
 	m_render->resolve_tags();
 
