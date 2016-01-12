@@ -190,7 +190,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						debug->breakpoint_clear(bpindex);
 						debug_console_printf(machine(), "Breakpoint %X cleared\n", bpindex);
 					}
-					machine().debugger().view().update_all();
+					machine().debug_view().update_all();
 					machine().debugger().refresh_display();
 				}
 				else if (dasmview->source_is_visible_cpu())
@@ -223,7 +223,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					{
 						debug->breakpoint_enable(bp->index(), !bp->enabled());
 						debug_console_printf(machine(), "Breakpoint %X %s\n", (UINT32)bp->index(), bp->enabled() ? "enabled" : "disabled");
-						machine().debugger().view().update_all();
+						machine().debug_view().update_all();
 						machine().debugger().refresh_display();
 					}
 					else if (dasmview->source_is_visible_cpu())

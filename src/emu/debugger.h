@@ -14,7 +14,6 @@
 
 #include "debug/debugcpu.h"
 
-class debug_view_manager;
 
 // ======================> debugger_manager
 
@@ -32,11 +31,9 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	debug_view_manager &view() const { assert(m_debug_view != nullptr); return *m_debug_view; }
 private:
 	// internal state
 	running_machine &   m_machine;                  // reference to our machine
-	std::unique_ptr<debug_view_manager> m_debug_view;  // internal data from debugvw.cpp
 };
 
 

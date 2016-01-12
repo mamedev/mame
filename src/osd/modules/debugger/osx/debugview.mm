@@ -8,7 +8,6 @@
 
 #import "debugview.h"
 
-#include "debugger.h"
 #include "debug/debugcpu.h"
 
 #include "modules/lib/osdobj_common.h"
@@ -229,7 +228,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		return nil;
 	type = t;
 	machine = &m;
-	view = machine->debugger().view().alloc_view((debug_view_type)type, debugwin_view_update, self);
+	view = machine->debug_view().alloc_view((debug_view_type)type, debugwin_view_update, self);
 	if (view == nil) {
 		[self release];
 		return nil;
@@ -261,7 +260,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 - (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	if (view != NULL) machine->debugger().view().free_view(*view);
+	if (view != NULL) machine->debug_view().free_view(*view);
 	if (font != nil) [font release];
 	if (text != nil) [text release];
 	[super dealloc];

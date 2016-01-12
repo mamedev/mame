@@ -34,27 +34,22 @@ static int g_atexit_registered = FALSE;
 debugger_manager::debugger_manager(running_machine &machine)
 	: m_machine(machine)
 {
-	/* only if debugging is enabled */
-	if (machine.debug_flags & DEBUG_FLAG_ENABLED)
-	{
-		/* initialize the submodules */
-		m_debug_view = std::make_unique<debug_view_manager>(machine);
-		debug_cpu_init(machine);
-		debug_command_init(machine);
+	/* initialize the submodules */
+	debug_cpu_init(machine);
+	debug_command_init(machine);
 
-		g_machine = &machine;
+	g_machine = &machine;
 
-		/* register an atexit handler if we haven't yet */
-		if (!g_atexit_registered)
-			atexit(debugger_flush_all_traces_on_abnormal_exit);
-		g_atexit_registered = TRUE;
+	/* register an atexit handler if we haven't yet */
+	if (!g_atexit_registered)
+		atexit(debugger_flush_all_traces_on_abnormal_exit);
+	g_atexit_registered = TRUE;
 
-		/* listen in on the errorlog */
-		machine.add_logerror_callback(debug_errorlog_write_line);
+	/* listen in on the errorlog */
+	machine.add_logerror_callback(debug_errorlog_write_line);
 
-		/* initialize osd debugger features */
-		machine.osd().init_debugger();
-	}
+	/* initialize osd debugger features */
+	machine.osd().init_debugger();
 }
 
 /*-------------------------------------------------

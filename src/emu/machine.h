@@ -84,6 +84,7 @@ class sound_manager;
 class video_manager;
 class ui_manager;
 class tilemap_manager;
+class debug_view_manager;
 class network_manager;
 class bookkeeping_manager;
 class configuration_manager;
@@ -178,6 +179,7 @@ public:
 	image_manager &image() const { assert(m_image != nullptr); return *m_image; }
 	rom_load_manager &rom_load() const { assert(m_rom_load != nullptr); return *m_rom_load; }
 	tilemap_manager &tilemap() const { assert(m_tilemap != nullptr); return *m_tilemap; }
+	debug_view_manager &debug_view() const { assert(m_debug_view != nullptr); return *m_debug_view; }
 	debugger_manager &debugger() const { assert(m_debugger != nullptr); return *m_debugger; }
 	driver_device *driver_data() const { return &downcast<driver_device &>(root_device()); }
 	template<class _DriverClass> _DriverClass *driver_data() const { return &downcast<_DriverClass &>(root_device()); }
@@ -288,6 +290,7 @@ private:
 	std::unique_ptr<ui_manager> m_ui;                  // internal data from ui.cpp
 	std::unique_ptr<ui_input_manager> m_ui_input;      // internal data from uiinput.cpp
 	std::unique_ptr<tilemap_manager> m_tilemap;        // internal data from tilemap.cpp
+	std::unique_ptr<debug_view_manager> m_debug_view;  // internal data from debugvw.cpp
 	std::unique_ptr<network_manager> m_network;        // internal data from network.cpp
 	std::unique_ptr<bookkeeping_manager> m_bookkeeping;// internal data from bookkeeping.cpp
 	std::unique_ptr<configuration_manager> m_configuration; // internal data from config.cpp
