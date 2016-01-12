@@ -249,6 +249,7 @@ public:
 		, m_pio(*this, "ppi8255")
 		, m_sound(*this, "ay8910")
 		, m_palette(*this, "palette")
+		, m_timer(nullptr)
 	{}
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	DECLARE_READ8_MEMBER(psga_r);	
@@ -287,7 +288,9 @@ private:
 	UINT8 m_paltbl[8];
 	UINT16 m_page;
 	UINT16 m_pcg_addr;
-	UINT8 m_pcg_char, m_pcg_attr;
+	UINT8 m_pcg_char, m_pcg_attr, m_char_change, m_pcg_char0;
+	UINT16 m_pcg_offset[3];
+	int m_char_count;
 	attotime m_time;
 	bool m_romsel;
 	bool m_double_mode;
@@ -312,7 +315,8 @@ private:
 	required_device<palette_device> m_palette;	
 	UINT8 *m_font;        
 	UINT8 m_priority;
-	void get_pcg_addr();
+	emu_timer *m_timer;
+	bool get_pcg_addr();
 };
 
 READ8_MEMBER( spc1500_state::keyboard_r )
@@ -347,17 +351,17 @@ WRITE8_MEMBER( spc1500_state::portb_w)
 
 WRITE8_MEMBER( spc1500_state::psgb_w)
 {
-	attotime time = machine().scheduler().time();
+	int elapsed_time = ATTOSECONDS_IN_USEC(m_timer->elapsed().as_attoseconds());
 	if (m_ipl != ((data>>1)&1))
 	{
 		m_ipl = ((data>>1)&1);
 		membank("bank1")->set_entry(m_ipl ? 0 : 1);
 	}
 	m_cass->set_state(BIT(data, 6) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED);
-	if (!m_motor && BIT(data, 7) &&  ATTOSECONDS_IN_MSEC((time - m_time).as_attoseconds()) > 400)
+	if (!m_motor && BIT(data, 7) && (elapsed_time > 1))
 	{
 		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		m_time = time;
+		m_timer->adjust(attotime::zero);
 	}
 	m_motor = BIT(data, 7);
 }
@@ -422,10 +426,9 @@ READ8_MEMBER( spc1500_state::pcg_r)
 	}
 	return 0;
 }
-void spc1500_state::get_pcg_addr()
+bool spc1500_state::get_pcg_addr()
 {
 	UINT16 vaddr = 0;
-	static int val = 0;
 	if(m_p_videoram[0x7ff] & 0x20) {
 		vaddr = 0x7ff;
 	} else if(m_p_videoram[0x3ff] & 0x20) {
@@ -437,21 +440,38 @@ void spc1500_state::get_pcg_addr()
 	} else {
 		vaddr = 0x3ff;
 	}
-	m_pcg_char = m_p_videoram[0x1000 + vaddr];
+	if (m_pcg_char0 != m_p_videoram[0x1000 + vaddr])
+	{
+		m_pcg_char = m_p_videoram[0x1000 + vaddr];
+		m_pcg_char0 = m_pcg_char;
+	}
 	m_pcg_attr = m_p_videoram[vaddr];
 	m_pcg_addr = m_pcg_char * (m_crtc_vreg[0x9]+1);
-	if (val != m_pcg_char)
-	{
-	//	printf("char=%d\n", m_pcg_char);
-		val = m_pcg_char;
-	}
+	return true;
 }
 WRITE8_MEMBER( spc1500_state::pcg_w)
 {
+	int reg = (offset>>8)-0x15;
 	get_pcg_addr();
-	m_pcg_addr=m_pcg_addr+(offset&0xf)+(((offset & 0x1f00) - 0x1500)<<3);
+	if (m_pcg_char != m_char_change)
+	{
+//		printf("changed\n");
+		m_char_change = m_pcg_char;
+		m_pcg_offset[0] = 0;
+		m_pcg_offset[1] = 0;
+		m_pcg_offset[2] = 0;
+	}
+		
+	m_pcg_addr=m_pcg_addr+m_pcg_offset[reg]+(reg*0x800);
 	m_pcgram[m_pcg_addr] = data;
-//	printf("pcgram:0x%04x 0x%02x\n",m_pcg_addr, data);
+	printf("%02x,%04x,%02x\n",m_pcg_char, m_pcg_addr, data);
+	if (m_pcg_offset[reg]++ > m_crtc_vreg[0x9]-1)
+		m_pcg_offset[reg] = 0;
+	if (m_char_count++ > (m_crtc_vreg[0x9] * 3 - 1))
+	{
+		m_char_count = 0;
+		m_pcg_char++;
+	}
 }
 
 WRITE8_MEMBER( spc1500_state::priority_w)
@@ -526,7 +546,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 		UINT8 pen = (nopalet ? color : m_paltbl[color]);
 		UINT8 pixelpen = 0;
 		UINT8 pixel = 0;
-		if (hs == 4 && ascii & 0x80)
+		if (hs == 4 && (ascii & 0x80))
 		{
 			UINT16 wpixelb = (pixelb << 8) + (*(pp+1));
 			UINT16 wpixelr = (pixelr << 8) + (*(pp+0x4001));
@@ -551,7 +571,6 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 				hfnt = (*pf << 8) | (*(pf+16));
 			}
 			hfnt = (inv ? 0xffff - hfnt : hfnt);
-			//printf("0x%04x\n" , hfnt);
 			for (j = 0x8000; j > 0; j>>=1)
 			{
 				pixel = ((wpixelg&j ? 4:0 )|(wpixelr&j? 2:0)|(wpixelb&j ? 1:0));
@@ -841,6 +860,8 @@ void spc1500_state::machine_start()
 	// intialize banks 2, 3, 4 (write banks)
 	membank("bank2")->set_base(m_p_ram);
 	membank("bank4")->set_base(m_p_ram + 0x8000);	
+	m_timer = timer_alloc(0);
+	m_timer->adjust(attotime::zero);
 }
 
 void spc1500_state::machine_reset()
@@ -849,6 +870,7 @@ void spc1500_state::machine_reset()
    	m_time = machine().scheduler().time();	
 	m_double_mode = false;
 	memset(&m_paltbl[0], 1, 8);
+	m_char_count = 0;
 }
 
 READ8_MEMBER(spc1500_state::mc6845_videoram_r)
