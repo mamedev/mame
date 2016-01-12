@@ -8,6 +8,7 @@
 
 #import "debugview.h"
 
+#include "debugger.h"
 #include "debug/debugcpu.h"
 
 #include "modules/lib/osdobj_common.h"
