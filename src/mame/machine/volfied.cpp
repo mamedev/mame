@@ -362,10 +362,10 @@ WRITE16_MEMBER(volfied_state::volfied_cchip_ram_w)
 		{
 			m_cc_port = data;
 
-			coin_lockout_w(machine(), 1, data & 0x80);
-			coin_lockout_w(machine(), 0, data & 0x40);
-			coin_counter_w(machine(), 1, data & 0x20);
-			coin_counter_w(machine(), 0, data & 0x10);
+			machine().bookkeeping().coin_lockout_w(1, data & 0x80);
+			machine().bookkeeping().coin_lockout_w(0, data & 0x40);
+			machine().bookkeeping().coin_counter_w(1, data & 0x20);
+			machine().bookkeeping().coin_counter_w(0, data & 0x10);
 		}
 
 		if (offset == 0x3fe)

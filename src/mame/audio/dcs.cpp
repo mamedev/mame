@@ -1006,7 +1006,7 @@ WRITE16_MEMBER( dcs_audio_device::dcs_data_bank_select_w )
 	/* bit 11 = sound board led */
 #if 0
 	if (m_rev != 15)
-		set_led_status(machine(), 2, data & 0x800);
+		output().set_led_value(2, data & 0x800);
 #endif
 }
 

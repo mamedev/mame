@@ -195,7 +195,7 @@ void cc40_state::update_lcd_indicator(UINT8 y, UINT8 x, int state)
 	// ---- raw lcd screen here ----
 	// under    |    ERROR   v      v      v      v      v      v    _LOW
 	// output#  |    60     61     62     63     50     51     52     53
-	output_set_lamp_value(y * 10 + x, state);
+	output().set_lamp_value(y * 10 + x, state);
 }
 
 static HD44780_PIXEL_UPDATE(cc40_pixel_update)

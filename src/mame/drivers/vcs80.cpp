@@ -179,7 +179,7 @@ WRITE8_MEMBER( vcs80_state::pio_pb_w )
 	/* skip middle digit */
 	if (digit > 3) digit++;
 
-	output_set_digit_value(8 - digit, led_data);
+	output().set_digit_value(8 - digit, led_data);
 }
 
 /* Z80 Daisy Chain */

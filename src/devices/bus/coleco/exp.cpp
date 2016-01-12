@@ -102,7 +102,7 @@ bool colecovision_cartridge_slot_device::call_load()
 
 bool colecovision_cartridge_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 
 	return true;
 }
@@ -112,18 +112,15 @@ bool colecovision_cartridge_slot_device::call_softlist_load(software_list_device
 //  get_default_card_software -
 //-------------------------------------------------
 
-void colecovision_cartridge_slot_device::get_default_card_software(std::string &result)
+std::string colecovision_cartridge_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
 		UINT32 length = core_fsize(m_file);
 		if (length == 0x100000 || length == 0x200000)
-		{
-			software_get_default_slot(result, "xin1");
-			return;
-		}
+			return software_get_default_slot("xin1");
 	}
-	software_get_default_slot(result, "standard");
+	return software_get_default_slot("standard");
 }
 
 

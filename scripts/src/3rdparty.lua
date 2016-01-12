@@ -493,32 +493,6 @@ project "lsqlite3"
 	}
 
 --------------------------------------------------
--- jsoncpp library objects
---------------------------------------------------
-
-project "jsoncpp"
-	uuid "ae023ff3-d712-4e54-adc5-3b56a148650f"
-	kind "StaticLib"
-
-	configuration { "vs2015" }
-		buildoptions {
-			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
-	}
-
-	configuration { }
-
-	includedirs {
-		MAME_DIR .. "3rdparty/jsoncpp/include",
-	}
-
-	files {
-		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/json_reader.cpp",
-		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/json_value.cpp",
-		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/json_writer.cpp",
-
-	}
-
---------------------------------------------------
 -- SQLite3 library objects
 --------------------------------------------------
 

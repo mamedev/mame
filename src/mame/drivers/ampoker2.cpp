@@ -479,10 +479,10 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_port31_w)
     BIT 4 = TWL_YELL      ;Tower Light YELLOW
 --------------------------------------------------*/
 {
-	output_set_lamp_value(1, ((data >> 1) & 1));    /* Lamp 1 - BET/RED */
-	output_set_lamp_value(6, ((data >> 2) & 1));    /* Lamp 6 - HOLD 4 */
-	output_set_lamp_value(4, ((data >> 3) & 1));    /* Lamp 4 - HOLD 2 */
-	output_set_lamp_value(8, ((data >> 4) & 1));    /* Lamp 8 - TWR.YELLOW */
+	output().set_lamp_value(1, ((data >> 1) & 1));    /* Lamp 1 - BET/RED */
+	output().set_lamp_value(6, ((data >> 2) & 1));    /* Lamp 6 - HOLD 4 */
+	output().set_lamp_value(4, ((data >> 3) & 1));    /* Lamp 4 - HOLD 2 */
+	output().set_lamp_value(8, ((data >> 4) & 1));    /* Lamp 8 - TWR.YELLOW */
 }
 
 
@@ -497,7 +497,7 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_port32_w)
     BIT 4 =
 --------------------------------------------------*/
 {
-	output_set_lamp_value(5, ((data >> 3) & 1));    /* Lamp 5 - HOLD 3 */
+	output().set_lamp_value(5, ((data >> 3) & 1));    /* Lamp 5 - HOLD 3 */
 }
 
 
@@ -526,7 +526,7 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_port34_w)
     BIT 4 = LAMP_2        ;Lamp 3  (BLACK)
 --------------------------------------------------*/
 {
-	output_set_lamp_value(2, ((data >> 4) & 1));    /* Lamp 2 - BLACK */
+	output().set_lamp_value(2, ((data >> 4) & 1));    /* Lamp 2 - BLACK */
 }
 
 
@@ -555,10 +555,10 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_port36_w)
     BIT 4 = LAMP_3        ;Lamp 3  (HOLD1)
 --------------------------------------------------*/
 {
-	output_set_lamp_value(9, (data & 1));           /* Lamp 9 - TWR.GREEN */
-	output_set_lamp_value(7, ((data >> 2) & 1));    /* Lamp 7 - HOLD 5 */
-	output_set_lamp_value(0, ((data >> 3) & 1));    /* Lamp 0 - DEAL */
-	output_set_lamp_value(3, ((data >> 4) & 1));    /* Lamp 3 - HOLD 1 */
+	output().set_lamp_value(9, (data & 1));           /* Lamp 9 - TWR.GREEN */
+	output().set_lamp_value(7, ((data >> 2) & 1));    /* Lamp 7 - HOLD 5 */
+	output().set_lamp_value(0, ((data >> 3) & 1));    /* Lamp 0 - DEAL */
+	output().set_lamp_value(3, ((data >> 4) & 1));    /* Lamp 3 - HOLD 1 */
 }
 
 

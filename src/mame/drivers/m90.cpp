@@ -41,8 +41,8 @@ WRITE16_MEMBER(m90_state::m90_coincounter_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 		if (data & 0xfc) logerror("Coin counter %02x\n",data);
 	}

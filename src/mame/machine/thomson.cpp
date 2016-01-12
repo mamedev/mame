@@ -338,7 +338,7 @@ void thomson_state::thom_irq_4( int state )
 
 void thomson_state::thom_set_caps_led( int led )
 {
-	output_set_value( "led0", led );
+	output().set_value( "led0", led );
 }
 
 /* ------------ 6850 defines ------------ */

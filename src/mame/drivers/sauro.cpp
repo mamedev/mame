@@ -144,14 +144,14 @@ READ8_MEMBER(sauro_state::sauro_sound_command_r)
 
 WRITE8_MEMBER(sauro_state::coin1_w)
 {
-	coin_counter_w(machine(), 0, data);
-	coin_counter_w(machine(), 0, 0); // to get the coin counter working in sauro, as it doesn't write 0
+	machine().bookkeeping().coin_counter_w(0, data);
+	machine().bookkeeping().coin_counter_w(0, 0); // to get the coin counter working in sauro, as it doesn't write 0
 }
 
 WRITE8_MEMBER(sauro_state::coin2_w)
 {
-	coin_counter_w(machine(), 1, data);
-	coin_counter_w(machine(), 1, 0); // to get the coin counter working in sauro, as it doesn't write 0
+	machine().bookkeeping().coin_counter_w(1, data);
+	machine().bookkeeping().coin_counter_w(1, 0); // to get the coin counter working in sauro, as it doesn't write 0
 }
 
 WRITE8_MEMBER(sauro_state::flip_screen_w)

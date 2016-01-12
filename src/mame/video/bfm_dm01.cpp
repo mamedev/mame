@@ -190,7 +190,7 @@ WRITE8_MEMBER( bfmdm01_device::mux_w )
 
 			for (int pos=0;pos<65;pos++)
 			{
-				output_set_indexed_value("dotmatrix", pos +(65*row), m_segbuffer[(pos)]);
+				machine().output().set_indexed_value("dotmatrix", pos +(65*row), m_segbuffer[(pos)]);
 			}
 		}
 	}

@@ -113,13 +113,13 @@ READ8_MEMBER(kopunch_state::sensors2_r)
 
 WRITE8_MEMBER(kopunch_state::lamp_w)
 {
-	set_led_status(machine(), 0, ~data & 0x80);
+	output().set_led_value(0, ~data & 0x80);
 }
 
 WRITE8_MEMBER(kopunch_state::coin_w)
 {
-	coin_counter_w(machine(), 0, ~data & 0x80);
-	coin_counter_w(machine(), 1, ~data & 0x40);
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x80);
+	machine().bookkeeping().coin_counter_w(1, ~data & 0x40);
 
 //  if ((data & 0x3f) != 0x3e)
 //      printf("port 34 = %02x   ",data);

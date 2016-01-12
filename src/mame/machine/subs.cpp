@@ -181,7 +181,7 @@ lamp1_w
 ***************************************************************************/
 WRITE8_MEMBER(subs_state::lamp1_w)
 {
-	set_led_status(machine(), 0,~offset & 1);
+	output().set_led_value(0,~offset & 1);
 }
 
 /***************************************************************************
@@ -189,5 +189,5 @@ lamp2_w
 ***************************************************************************/
 WRITE8_MEMBER(subs_state::lamp2_w)
 {
-	set_led_status(machine(), 1,~offset & 1);
+	output().set_led_value(1,~offset & 1);
 }

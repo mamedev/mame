@@ -292,8 +292,8 @@ WRITE8_MEMBER(stuntair_state::stuntair_nmienable_w)
 WRITE8_MEMBER(stuntair_state::stuntair_coin_w)
 {
 	// lower 2 bits are coin counters, excluding 1st coin(?)
-	coin_counter_w(machine(), 0, data >> 0 & 1);
-	coin_counter_w(machine(), 1, data >> 1 & 1);
+	machine().bookkeeping().coin_counter_w(0, data >> 0 & 1);
+	machine().bookkeeping().coin_counter_w(1, data >> 1 & 1);
 
 	// other bits: unknown
 	if (data & 0xfc)

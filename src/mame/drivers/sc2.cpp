@@ -120,29 +120,29 @@ void sc2_state::sc2_update_display()
 
 	if (!BIT(m_led_selected, 0))
 	{
-		output_set_digit_value(0, digit_data);
+		output().set_digit_value(0, digit_data);
 		m_led_7seg_data[0] = digit_data;
 
-		output_set_led_value(0, BIT(m_digit_data, 7));
+		output().set_led_value(0, BIT(m_digit_data, 7));
 	}
 
 	if (!BIT(m_led_selected, 1))
 	{
-		output_set_digit_value(1, digit_data);
+		output().set_digit_value(1, digit_data);
 		m_led_7seg_data[1] = digit_data;
 
-		output_set_led_value(1, BIT(m_digit_data, 7));
+		output().set_led_value(1, BIT(m_digit_data, 7));
 	}
 
 	if (!BIT(m_led_selected, 2))
 	{
-		output_set_digit_value(2, digit_data);
+		output().set_digit_value(2, digit_data);
 		m_led_7seg_data[2] = digit_data;
 	}
 
 	if (!BIT(m_led_selected, 3))
 	{
-		output_set_digit_value(3, digit_data);
+		output().set_digit_value(3, digit_data);
 		m_led_7seg_data[3] = digit_data;
 	}
 }

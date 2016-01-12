@@ -269,21 +269,21 @@ READ8_MEMBER(gridlee_state::random_num_r)
 
 WRITE8_MEMBER(gridlee_state::led_0_w)
 {
-	set_led_status(machine(), 0, data & 1);
+	output().set_led_value(0, data & 1);
 	logerror("LED 0 %s\n", (data & 1) ? "on" : "off");
 }
 
 
 WRITE8_MEMBER(gridlee_state::led_1_w)
 {
-	set_led_status(machine(), 1, data & 1);
+	output().set_led_value(1, data & 1);
 	logerror("LED 1 %s\n", (data & 1) ? "on" : "off");
 }
 
 
 WRITE8_MEMBER(gridlee_state::gridlee_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 	logerror("coin counter %s\n", (data & 1) ? "on" : "off");
 }
 

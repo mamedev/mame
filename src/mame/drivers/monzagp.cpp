@@ -355,7 +355,7 @@ WRITE8_MEMBER(monzagp_state::port_w)
 		{
 			// 74LS47 BCD-to-Seven-Segment Decoder
 			static UINT8 bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x49, 0x78, 0x00 };
-			output_set_digit_value(ram_offset >> 3, bcd2hex[data & 0x0f]);
+			output().set_digit_value(ram_offset >> 3, bcd2hex[data & 0x0f]);
 		}
 	}
 	if (!(m_p1 & 0x80))

@@ -139,10 +139,10 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_coin_lockout_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0,   data  & 0x0100);
-		coin_counter_w(machine(), 1,   data  & 0x0200);
-		coin_lockout_w(machine(), 0, (~data) & 0x0400 );
-		coin_lockout_w(machine(), 1, (~data) & 0x0800 );
+		machine().bookkeeping().coin_counter_w(0,   data  & 0x0100);
+		machine().bookkeeping().coin_counter_w(1,   data  & 0x0200);
+		machine().bookkeeping().coin_lockout_w(0, (~data) & 0x0400 );
+		machine().bookkeeping().coin_lockout_w(1, (~data) & 0x0800 );
 	}
 }
 
@@ -218,10 +218,10 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_eeprom_w)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x0100);
-		coin_counter_w(machine(), 1, data & 0x0200);
-		coin_lockout_w(machine(), 0, data & 0x8000);
-		coin_lockout_w(machine(), 1, data & 0x8000);
+		machine().bookkeeping().coin_counter_w(0, data & 0x0100);
+		machine().bookkeeping().coin_counter_w(1, data & 0x0200);
+		machine().bookkeeping().coin_lockout_w(0, data & 0x8000);
+		machine().bookkeeping().coin_lockout_w(1, data & 0x8000);
 	}
 }
 
@@ -418,10 +418,10 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_coin_lockout_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x0100);
-		coin_counter_w(machine(), 1, data & 0x0200);
-		coin_lockout_w(machine(), 0, data & 0x8000);
-		coin_lockout_w(machine(), 1, data & 0x8000);
+		machine().bookkeeping().coin_counter_w(0, data & 0x0100);
+		machine().bookkeeping().coin_counter_w(1, data & 0x0200);
+		machine().bookkeeping().coin_lockout_w(0, data & 0x8000);
+		machine().bookkeeping().coin_lockout_w(1, data & 0x8000);
 	}
 }
 
@@ -1090,6 +1090,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( wingforc )
 	PORT_START("DSW2_P1")       /* c00000.w */
+	// The game reads and stores these the same as Blaze On.
+	// However, none of them actually get used. Lives does work if you patch out the
+	// code that actively zeroes out the value it reads from here.
 	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW1:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "SW1:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "SW1:3" )
@@ -1109,14 +1112,18 @@ static INPUT_PORTS_START( wingforc )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 
 	PORT_START("DSW1_P2")       /* c00002.w */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	// In a similar story to DSW2, these are read and then forced to zero.
+	// These are credit selections with the same values as Blaze On.
+	// These work if you remove the code to force to zero, but they don't
+	// give any feedback unless the coin increases the credit counter.
+	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW2:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "SW2:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x0008, 0x0008, "SW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW2:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
@@ -2048,7 +2055,7 @@ static MACHINE_CONFIG_START( wingforc, kaneko16_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(59.1854)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1 -16)
@@ -2076,12 +2083,11 @@ static MACHINE_CONFIG_START( wingforc, kaneko16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", /*XTAL_16MHz/4*/3800000) // matches the video better (cut of the title screen tune)
+	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/8, OKIM6295_PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -4321,18 +4327,18 @@ DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 
 ***************************************************************************/
 
-GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, berlwallt,berlwall, berlwall, berlwallt,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall (bootleg ?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko", "The Berlin Wall", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, berlwallt,berlwall, berlwall, berlwallt,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko", "The Berlin Wall (bootleg?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, berlwallk,berlwall, berlwall, berlwallk,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, packbang, 0,        berlwall, packbang, kaneko16_berlwall_state, berlwall, ROT90, "Kaneko",                 "Pack'n Bang Bang (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
+GAME( 1994, packbang, 0,        berlwall, packbang, kaneko16_berlwall_state, berlwall, ROT90, "Kaneko", "Pack'n Bang Bang (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
 
 GAME( 1991, mgcrystl, 0,        mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mgcrystlo,mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mgcrystlj,mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, blazeon,  0,        blazeon,  blazeon,  kaneko16_state,          kaneko16, ROT0,  "Atlus",  "Blaze On (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, blazeon,  0,        blazeon,  blazeon,  kaneko16_state,          kaneko16, ROT0,  "A.I (Atlus license)",  "Blaze On (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, explbrkr, 0,        bakubrkr, bakubrkr, kaneko16_state,          kaneko16, ROT90, "Kaneko", "Explosive Breaker", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, bakubrkr, explbrkr, bakubrkr, bakubrkr, kaneko16_state,          kaneko16, ROT90, "Kaneko", "Bakuretsu Breaker", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, wingforc, 0,        wingforc, wingforc, kaneko16_state,          kaneko16, ROT270,"Atlus",  "Wing Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wingforc, 0,        wingforc, wingforc, kaneko16_state,          kaneko16, ROT270,"A.I (Atlus license)",  "Wing Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, bonkadv,  0,        bonkadv , bonkadv,  kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, bloodwar, 0,        bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Blood Warrior", MACHINE_SUPPORTS_SAVE )

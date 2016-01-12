@@ -115,7 +115,7 @@ WRITE8_MEMBER( sdk86_state::scanlines_w )
 WRITE8_MEMBER( sdk86_state::digit_w )
 {
 	if (m_digit < 8)
-		output_set_digit_value(m_digit, data);
+		output().set_digit_value(m_digit, data);
 }
 
 READ8_MEMBER( sdk86_state::kbd_r )

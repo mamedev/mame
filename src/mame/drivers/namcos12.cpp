@@ -1322,13 +1322,13 @@ WRITE16_MEMBER(namcos12_state::system11gun_w)
 		/* blowback 1 */
 		/* blowback 2 */
 		/* Note: output label has been changed for the Engrish Impaired ;-) */
-		output_set_value("Player1_Gun_Recoil", (~data & 0x02)>>1);
-		output_set_value("Player2_Gun_Recoil", (~data & 0x01));
+		output().set_value("Player1_Gun_Recoil", (~data & 0x02)>>1);
+		output().set_value("Player2_Gun_Recoil", (~data & 0x01));
 
 		/* start 1 */
-		output_set_value("P2_Start_lamp", (~data & 0x08)>>3);
+		output().set_value("P2_Start_lamp", (~data & 0x08)>>3);
 		/* start 2 */
-		output_set_value("P2_Start_lamp", (~data & 0x04)>>2);
+		output().set_value("P2_Start_lamp", (~data & 0x04)>>2);
 
 		verboselog(1, "system11gun_w: outputs (%08x %08x)\n", data, mem_mask );
 		break;

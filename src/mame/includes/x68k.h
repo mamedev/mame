@@ -113,8 +113,9 @@ public:
 	std::vector<UINT16> m_gvram;
 	std::vector<UINT16> m_spritereg;
 
-	std::unique_ptr<bitmap_ind16> m_pcgbitmap;
-	std::unique_ptr<bitmap_ind16> m_gfxbitmap;
+	bitmap_ind16 m_pcgbitmap;
+	bitmap_ind16 m_gfxbitmap;
+	bitmap_ind16 m_special;
 
 	void floppy_load_unload(bool load, floppy_image_device *dev);
 	int floppy_load(floppy_image_device *dev);

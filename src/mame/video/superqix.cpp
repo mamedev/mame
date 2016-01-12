@@ -131,8 +131,8 @@ WRITE8_MEMBER(superqix_state::pbillian_0410_w)
 	 --5-----  flip screen
 	*/
 
-	coin_counter_w(machine(), 0,data & 0x02);
-	coin_counter_w(machine(), 1,data & 0x04);
+	machine().bookkeeping().coin_counter_w(0,data & 0x02);
+	machine().bookkeeping().coin_counter_w(1,data & 0x04);
 
 	membank("bank1")->set_entry((data & 0x08) >> 3);
 

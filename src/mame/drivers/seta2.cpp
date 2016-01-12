@@ -151,8 +151,8 @@ WRITE16_MEMBER(seta2_state::grdians_lockout_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		// initially 0, then either $25 (coin 1) or $2a (coin 2)
-		coin_counter_w(machine(), 0,data & 0x01);   // or 0x04
-		coin_counter_w(machine(), 1,data & 0x02);   // or 0x08
+		machine().bookkeeping().coin_counter_w(0,data & 0x01);   // or 0x04
+		machine().bookkeeping().coin_counter_w(1,data & 0x02);   // or 0x08
 	}
 //  popmessage("%04X", data & 0xffff);
 }
@@ -344,8 +344,8 @@ WRITE16_MEMBER(seta2_state::pzlbowl_coin_counter_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0,data & 0x10);
-		coin_counter_w(machine(), 1,data & 0x20);
+		machine().bookkeeping().coin_counter_w(0,data & 0x10);
+		machine().bookkeeping().coin_counter_w(1,data & 0x20);
 	}
 }
 
@@ -402,13 +402,13 @@ WRITE16_MEMBER(seta2_state::reelquak_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		set_led_status( machine(), 0, data & 0x0001 );  // start
-		set_led_status( machine(), 1, data & 0x0002 );  // small
-		set_led_status( machine(), 2, data & 0x0004 );  // bet
-		set_led_status( machine(), 3, data & 0x0008 );  // big
-		set_led_status( machine(), 4, data & 0x0010 );  // double up
-		set_led_status( machine(), 5, data & 0x0020 );  // collect
-		set_led_status( machine(), 6, data & 0x0040 );  // bet cancel
+		output().set_led_value(0, data & 0x0001 );  // start
+		output().set_led_value(1, data & 0x0002 );  // small
+		output().set_led_value(2, data & 0x0004 );  // bet
+		output().set_led_value(3, data & 0x0008 );  // big
+		output().set_led_value(4, data & 0x0010 );  // double up
+		output().set_led_value(5, data & 0x0020 );  // collect
+		output().set_led_value(6, data & 0x0040 );  // bet cancel
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -422,10 +422,10 @@ WRITE16_MEMBER(seta2_state::reelquak_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x01);  // coin in
-		coin_counter_w(machine(), 1, data & 0x02);  // coin in
-		coin_counter_w(machine(), 2, data & 0x04);  // pay out
-		coin_counter_w(machine(), 3, data & 0x08);  // key in
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);  // coin in
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);  // coin in
+		machine().bookkeeping().coin_counter_w(2, data & 0x04);  // pay out
+		machine().bookkeeping().coin_counter_w(3, data & 0x08);  // key in
 		//                                data & 0x10); // Sound IRQ Ack.? 1->0
 		//                                data & 0x20); // Vblank IRQ.? 1
 	}
@@ -474,11 +474,11 @@ WRITE16_MEMBER(seta2_state::samshoot_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x10);
-		coin_counter_w(machine(), 1, data & 0x20);
+		machine().bookkeeping().coin_counter_w(0, data & 0x10);
+		machine().bookkeeping().coin_counter_w(1, data & 0x20);
 		// Are these connected? They are set in I/O test
-		coin_lockout_w(machine(), 0,~data & 0x40);
-		coin_lockout_w(machine(), 1,~data & 0x80);
+		machine().bookkeeping().coin_lockout_w(0,~data & 0x40);
+		machine().bookkeeping().coin_lockout_w(1,~data & 0x80);
 	}
 //  popmessage("%04x",data);
 }
@@ -788,14 +788,14 @@ WRITE16_MEMBER(seta2_state::funcube_leds_w)
 {
 	*m_funcube_leds = data;
 
-	set_led_status( machine(), 0, (~data) & 0x01 ); // win lamp (red)
-	set_led_status( machine(), 1, (~data) & 0x02 ); // win lamp (green)
+	output().set_led_value(0, (~data) & 0x01 ); // win lamp (red)
+	output().set_led_value(1, (~data) & 0x02 ); // win lamp (green)
 
 	// Set in a moving pattern: 0111 -> 1011 -> 1101 -> 1110
-	set_led_status( machine(), 2, (~data) & 0x10 );
-	set_led_status( machine(), 3, (~data) & 0x20 );
-	set_led_status( machine(), 4, (~data) & 0x40 );
-	set_led_status( machine(), 5, (~data) & 0x80 );
+	output().set_led_value(2, (~data) & 0x10 );
+	output().set_led_value(3, (~data) & 0x20 );
+	output().set_led_value(4, (~data) & 0x40 );
+	output().set_led_value(5, (~data) & 0x80 );
 
 	funcube_debug_outputs();
 }
@@ -818,7 +818,7 @@ WRITE16_MEMBER(seta2_state::funcube_outputs_w)
 	// Bit 1: high on pay out
 
 	// Bit 3: low after coining up, blinks on pay out
-	set_led_status( machine(), 6, (~data) & 0x08 );
+	output().set_led_value(6, (~data) & 0x08 );
 
 	funcube_debug_outputs();
 }

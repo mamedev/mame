@@ -380,7 +380,7 @@ CUSTOM_INPUT_MEMBER(zaxxon_state::razmataz_dial_r)
 
 WRITE8_MEMBER(zaxxon_state::zaxxon_coin_counter_w)
 {
-	coin_counter_w(machine(), offset, data & 0x01);
+	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 }
 
 

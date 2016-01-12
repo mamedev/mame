@@ -1502,15 +1502,15 @@ WRITE8_MEMBER(goldnpkr_state::lamps_a_w)
 */
 	data = data ^ 0xff;
 
-	output_set_lamp_value(0, (data) & 1);         /* Lamp 0 */
-	output_set_lamp_value(1, (data >> 1) & 1);    /* Lamp 1 */
-	output_set_lamp_value(2, (data >> 2) & 1);    /* Lamp 2 */
-	output_set_lamp_value(3, (data >> 3) & 1);    /* Lamp 3 */
-	output_set_lamp_value(4, (data >> 4) & 1);    /* Lamp 4 */
+	output().set_lamp_value(0, (data) & 1);         /* Lamp 0 */
+	output().set_lamp_value(1, (data >> 1) & 1);    /* Lamp 1 */
+	output().set_lamp_value(2, (data >> 2) & 1);    /* Lamp 2 */
+	output().set_lamp_value(3, (data >> 3) & 1);    /* Lamp 3 */
+	output().set_lamp_value(4, (data >> 4) & 1);    /* Lamp 4 */
 
-	coin_counter_w(machine(), 0, data & 0x40);  /* counter1 */
-	coin_counter_w(machine(), 1, data & 0x80);  /* counter2 */
-	coin_counter_w(machine(), 2, data & 0x20);  /* counter3 */
+	machine().bookkeeping().coin_counter_w(0, data & 0x40);  /* counter1 */
+	machine().bookkeeping().coin_counter_w(1, data & 0x80);  /* counter2 */
+	machine().bookkeeping().coin_counter_w(2, data & 0x20);  /* counter3 */
 }
 
 WRITE8_MEMBER(goldnpkr_state::sound_w)

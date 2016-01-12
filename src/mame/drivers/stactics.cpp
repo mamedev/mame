@@ -139,7 +139,7 @@ CUSTOM_INPUT_MEMBER(stactics_state::get_rng)
 
 WRITE8_MEMBER(stactics_state::coinlockout_w)
 {
-	coin_lockout_w(machine(), offset, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(offset, ~data & 0x01);
 }
 
 

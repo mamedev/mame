@@ -168,13 +168,13 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 	if (data & 1)   // bit 0 is the mux selector.
 
 	{
-		output_set_lamp_value(0, (data >> 1) & 1);  /* Lamp 0 - Small / Big */
-		output_set_lamp_value(1, (data >> 2) & 1);  /* Lamp 1 - Big / Small */
-		output_set_lamp_value(2, (data >> 3) & 1);  /* Lamp 2 - Hold 5 */
-		output_set_lamp_value(3, (data >> 4) & 1);  /* Lamp 3 - Hold 4 */
-		output_set_lamp_value(4, (data >> 5) & 1);  /* Lamp 4 - Hold 3 */
-		output_set_lamp_value(5, (data >> 6) & 1);  /* Lamp 5 - Hold 2 */
-		output_set_lamp_value(6, (data >> 7) & 1);  /* Lamp 6 - Hold 1 */
+		output().set_lamp_value(0, (data >> 1) & 1);  /* Lamp 0 - Small / Big */
+		output().set_lamp_value(1, (data >> 2) & 1);  /* Lamp 1 - Big / Small */
+		output().set_lamp_value(2, (data >> 3) & 1);  /* Lamp 2 - Hold 5 */
+		output().set_lamp_value(3, (data >> 4) & 1);  /* Lamp 3 - Hold 4 */
+		output().set_lamp_value(4, (data >> 5) & 1);  /* Lamp 4 - Hold 3 */
+		output().set_lamp_value(5, (data >> 6) & 1);  /* Lamp 5 - Hold 2 */
+		output().set_lamp_value(6, (data >> 7) & 1);  /* Lamp 6 - Hold 1 */
 
 		logerror("Lamps A: %02x\n", data);
 	}
@@ -182,12 +182,12 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 	else
 	{
 		// bit 1 is unknown...
-		output_set_lamp_value(7, (data >> 2) & 1);  /* Lamp 7 - Fever! */
-		output_set_lamp_value(8, (data >> 3) & 1);  /* Lamp 8 - Cancel */
-		output_set_lamp_value(9, (data >> 4) & 1);  /* Lamp 9 - D-Up / Take */
-		output_set_lamp_value(10, (data >> 5) & 1); /* Lamp 10 - Take / D-Up */
-		output_set_lamp_value(11, (data >> 6) & 1); /* Lamp 11 - Deal */
-		output_set_lamp_value(12, (data >> 7) & 1); /* Lamp 12 - Bet */
+		output().set_lamp_value(7, (data >> 2) & 1);  /* Lamp 7 - Fever! */
+		output().set_lamp_value(8, (data >> 3) & 1);  /* Lamp 8 - Cancel */
+		output().set_lamp_value(9, (data >> 4) & 1);  /* Lamp 9 - D-Up / Take */
+		output().set_lamp_value(10, (data >> 5) & 1); /* Lamp 10 - Take / D-Up */
+		output().set_lamp_value(11, (data >> 6) & 1); /* Lamp 11 - Deal */
+		output().set_lamp_value(12, (data >> 7) & 1); /* Lamp 12 - Bet */
 
 		logerror("Lamps B: %02x\n", data);
 	}

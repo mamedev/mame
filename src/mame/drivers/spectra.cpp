@@ -191,7 +191,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 	{
 		UINT8 data = m_p_ram[m_out_offs];
 		UINT8 segments = patterns[data&15] | (BIT(data, 4) ? 0x80 : 0);
-		output_set_digit_value(m_out_offs, segments);
+		output().set_digit_value(m_out_offs, segments);
 	}
 	else
 	if (m_out_offs < 0x6f)

@@ -141,7 +141,7 @@ void hh_pic16_state::display_update()
 		if (m_display_cache[y] != active_state[y])
 		{
 			if (m_display_segmask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
+				output().set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x <= m_display_maxx; x++)
@@ -161,8 +161,8 @@ void hh_pic16_state::display_update()
 					sprintf(buf1, "lamp%d", y * mul + x);
 					sprintf(buf2, "%d.%d", y, x);
 				}
-				output_set_value(buf1, state);
-				output_set_value(buf2, state);
+				output().set_value(buf1, state);
+				output().set_value(buf2, state);
 			}
 		}
 

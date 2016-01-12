@@ -211,8 +211,8 @@ WRITE8_MEMBER(bfmsys85_state::reel12_w)
 	m_reel0->update((data>>4)&0x0f);
 	m_reel1->update( data    &0x0f);
 
-	awp_draw_reel("reel1", m_reel0);
-	awp_draw_reel("reel2", m_reel1);
+	awp_draw_reel(machine(),"reel1", m_reel0);
+	awp_draw_reel(machine(),"reel2", m_reel1);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -222,8 +222,8 @@ WRITE8_MEMBER(bfmsys85_state::reel34_w)
 	m_reel2->update((data>>4)&0x0f);
 	m_reel3->update( data    &0x0f);
 
-	awp_draw_reel("reel3", m_reel2);
-	awp_draw_reel("reel4", m_reel3);
+	awp_draw_reel(machine(),"reel3", m_reel2);
+	awp_draw_reel(machine(),"reel4", m_reel3);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -312,7 +312,7 @@ WRITE8_MEMBER(bfmsys85_state::mux_data_w)
 
 	for ( i = 0; i < 8; i++ )
 	{
-		output_set_lamp_value(off, (data & pattern ? 1 : 0));
+		output().set_lamp_value(off, (data & pattern ? 1 : 0));
 		pattern <<= 1;
 		off++;
 	}

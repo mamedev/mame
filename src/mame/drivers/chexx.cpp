@@ -107,7 +107,7 @@ WRITE8_MEMBER(chexx_state::via_b_out)
 
 	digitalker_set_bank(data & 3);
 	m_digitalker->set_output_gain(0, BIT(data,2) ? 1.0f : 0.0f); // bit 2 controls the Digitalker output
-	coin_counter_w(machine(), 0, BIT(~data,3));
+	machine().bookkeeping().coin_counter_w(0, BIT(~data,3));
 	// bit 4 is EJECT
 	// bit 7 is related to speaker out
 
@@ -133,16 +133,16 @@ WRITE_LINE_MEMBER(chexx_state::via_cb2_out)
 	// 7segs (score)
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 
-	output_set_digit_value(0, patterns[(m_shift >> (16+4)) & 0xf]);
-	output_set_digit_value(1, patterns[(m_shift >> (16+0)) & 0xf]);
+	output().set_digit_value(0, patterns[(m_shift >> (16+4)) & 0xf]);
+	output().set_digit_value(1, patterns[(m_shift >> (16+0)) & 0xf]);
 
-	output_set_digit_value(2, patterns[(m_shift >>  (8+4)) & 0xf]);
-	output_set_digit_value(3, patterns[(m_shift >>  (8+0)) & 0xf]);
+	output().set_digit_value(2, patterns[(m_shift >>  (8+4)) & 0xf]);
+	output().set_digit_value(3, patterns[(m_shift >>  (8+0)) & 0xf]);
 
 	// Leds (period being played)
-	output_set_led_value(0, BIT(m_shift,2));
-	output_set_led_value(1, BIT(m_shift,1));
-	output_set_led_value(2, BIT(m_shift,0));
+	output().set_led_value(0, BIT(m_shift,2));
+	output().set_led_value(1, BIT(m_shift,1));
+	output().set_led_value(2, BIT(m_shift,0));
 
 //  logerror("%s: VIA write CB2 = %02X\n", machine().describe_context(), state);
 }
@@ -178,8 +178,8 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(chexx_state::lamp_w)
 {
 	m_lamp = data;
-	output_set_lamp_value(0, BIT(m_lamp,0));
-	output_set_lamp_value(1, BIT(m_lamp,1));
+	output().set_lamp_value(0, BIT(m_lamp,0));
+	output().set_lamp_value(1, BIT(m_lamp,1));
 }
 
 WRITE8_MEMBER(chexx_state::ay_w)

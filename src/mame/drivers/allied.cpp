@@ -408,34 +408,34 @@ WRITE8_MEMBER( allied_state::ic4_b_w )
 	{
 		if (!BIT(data, i+4))
 		{
-			output_set_digit_value(i*10, patterns[0]);
+			output().set_digit_value(i*10, patterns[0]);
 			segment = (m_player_score[i] >> 0) & 15;
-			output_set_digit_value(i*10+1, patterns[segment]);
+			output().set_digit_value(i*10+1, patterns[segment]);
 			segment = (m_player_score[i] >> 4) & 15;
-			output_set_digit_value(i*10+2, patterns[segment]);
+			output().set_digit_value(i*10+2, patterns[segment]);
 			segment = (m_player_score[i] >> 8) & 15;
-			output_set_digit_value(i*10+3, patterns[segment]);
+			output().set_digit_value(i*10+3, patterns[segment]);
 			segment = (m_player_score[i] >> 12) & 15;
-			output_set_digit_value(i*10+4, patterns[segment]);
+			output().set_digit_value(i*10+4, patterns[segment]);
 			segment = (m_player_score[i] >> 16) & 15;
-			output_set_digit_value(i*10+5, patterns[segment]);
+			output().set_digit_value(i*10+5, patterns[segment]);
 		}
 		else
 		{
-			output_set_digit_value(i*10, 0);
-			output_set_digit_value(i*10+1, 0);
-			output_set_digit_value(i*10+2, 0);
-			output_set_digit_value(i*10+3, 0);
-			output_set_digit_value(i*10+4, 0);
-			output_set_digit_value(i*10+5, 0);
+			output().set_digit_value(i*10, 0);
+			output().set_digit_value(i*10+1, 0);
+			output().set_digit_value(i*10+2, 0);
+			output().set_digit_value(i*10+3, 0);
+			output().set_digit_value(i*10+4, 0);
+			output().set_digit_value(i*10+5, 0);
 		}
 	}
 
 	// doesn't seem to be a strobe for the credits display
 	segment = (m_player_score[4] >> 0) & 15;
-	output_set_digit_value(40, patterns[segment]);
+	output().set_digit_value(40, patterns[segment]);
 	segment = (m_player_score[4] >> 4) & 15;
-	output_set_digit_value(41, patterns[segment]);
+	output().set_digit_value(41, patterns[segment]);
 
 // PB0-3 - player 1-4 LED - to do
 }
@@ -569,12 +569,12 @@ WRITE8_MEMBER( allied_state::ic8_a_w )
 // PB0-4 = ball 1-5 LED; PB5 = shoot again lamp
 WRITE8_MEMBER( allied_state::ic8_b_w )
 {
-	output_set_value("led1", !BIT(data, 0));
-	output_set_value("led2", !BIT(data, 1));
-	output_set_value("led3", !BIT(data, 2));
-	output_set_value("led4", !BIT(data, 3));
-	output_set_value("led5", !BIT(data, 4));
-	output_set_value("led6", !BIT(data, 5));
+	output().set_value("led1", !BIT(data, 0));
+	output().set_value("led2", !BIT(data, 1));
+	output().set_value("led3", !BIT(data, 2));
+	output().set_value("led4", !BIT(data, 3));
+	output().set_value("led5", !BIT(data, 4));
+	output().set_value("led6", !BIT(data, 5));
 }
 
 // this line not emulated in PinMAME, maybe it isn't needed
@@ -604,7 +604,7 @@ void allied_state::machine_reset()
 	m_ic6a2 = 0;
 	m_ic6b4 = 0;
 	m_ic6b7 = 0;
-	output_set_value("led0", 1);  //1=off
+	output().set_value("led0", 1);  //1=off
 }
 
 static MACHINE_CONFIG_START( allied, allied_state )

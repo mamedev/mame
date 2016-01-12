@@ -208,13 +208,13 @@ WRITE8_MEMBER(superqix_state::bootleg_mcu_p1_w)
 			// ???
 			break;
 		case 1:
-			coin_counter_w(machine(), 0,data & 1);
+			machine().bookkeeping().coin_counter_w(0,data & 1);
 			break;
 		case 2:
-			coin_counter_w(machine(), 1,data & 1);
+			machine().bookkeeping().coin_counter_w(1,data & 1);
 			break;
 		case 3:
-			coin_lockout_global_w(machine(), (data & 1) ^ m_invert_coin_lockout);
+			machine().bookkeeping().coin_lockout_global_w((data & 1) ^ m_invert_coin_lockout);
 			break;
 		case 4:
 			flip_screen_set(data & 1);
@@ -275,13 +275,13 @@ WRITE8_MEMBER(superqix_state::sqixu_mcu_p2_w)
 	// bit 0 = unknown (clocked often)
 
 	// bit 1 = coin cointer 1
-	coin_counter_w(machine(), 0,data & 2);
+	machine().bookkeeping().coin_counter_w(0,data & 2);
 
 	// bit 2 = coin counter 2
-	coin_counter_w(machine(), 1,data & 4);
+	machine().bookkeeping().coin_counter_w(1,data & 4);
 
 	// bit 3 = coin lockout
-	coin_lockout_global_w(machine(), ~data & 8);
+	machine().bookkeeping().coin_lockout_global_w(~data & 8);
 
 	// bit 4 = flip screen
 	flip_screen_set(data & 0x10);

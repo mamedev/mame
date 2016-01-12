@@ -70,7 +70,7 @@ public:
 			{
 				int data = ((m_lamps[i] << bit)&0x8000)>>15;
 
-				output_set_indexed_value("lamp", (i*16)+bit, data );
+				output().set_indexed_value("lamp", (i*16)+bit, data );
 			}
 		}
 	}
@@ -82,7 +82,7 @@ public:
 			{
 				int data = ((m_leds[i] << bit)&0x8000)>>15;
 
-				output_set_digit_value((i*16)+bit, data );
+				output().set_digit_value((i*16)+bit, data );
 			}
 		}
 	}
@@ -181,17 +181,17 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_b_payouts)
 	{
 		//TODO: Fix up payout enables - all available bits enable one slide each
-		output_set_value("coinlamp0", data&0x40 );
-		output_set_value("coinlamp1", data&0x80 );
+		output().set_value("coinlamp0", data&0x40 );
+		output().set_value("coinlamp1", data&0x80 );
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_c_inhibits)
 	{
-		coin_lockout_w(machine(), 0, (data & 0x01) );
-		coin_lockout_w(machine(), 1, (data & 0x02) );
-		coin_lockout_w(machine(), 2, (data & 0x04) );
-		coin_lockout_w(machine(), 3, (data & 0x08) );
-		coin_lockout_w(machine(), 4, (data & 0x10) );
+		machine().bookkeeping().coin_lockout_w(0, (data & 0x01) );
+		machine().bookkeeping().coin_lockout_w(1, (data & 0x02) );
+		machine().bookkeeping().coin_lockout_w(2, (data & 0x04) );
+		machine().bookkeeping().coin_lockout_w(3, (data & 0x08) );
+		machine().bookkeeping().coin_lockout_w(4, (data & 0x10) );
 
 		//int wdog = (data& 0x80);
 	}
@@ -204,8 +204,8 @@ public:
 		m_reel0->update( data    &0x0f);
 		m_reel1->update((data>>4)&0x0f);
 
-		awp_draw_reel("reel1", m_reel0);
-		awp_draw_reel("reel2", m_reel1);
+		awp_draw_reel(machine(),"reel1", m_reel0);
+		awp_draw_reel(machine(),"reel2", m_reel1);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic23_write_b_reel23)
@@ -213,8 +213,8 @@ public:
 		m_reel2->update( data    &0x0f);
 		m_reel3->update((data>>4)&0x0f);
 
-		awp_draw_reel("reel3", m_reel2);
-		awp_draw_reel("reel4", m_reel3);
+		awp_draw_reel(machine(),"reel3", m_reel2);
+		awp_draw_reel(machine(),"reel4", m_reel3);
 	}
 
 	DECLARE_READ8_MEMBER(ppi8255_ic23_read_c_key)

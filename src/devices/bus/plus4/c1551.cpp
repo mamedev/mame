@@ -108,7 +108,7 @@ WRITE8_MEMBER( c1551_t::port_w )
 	m_ga->mtr_w(BIT(data, 2));
 
 	// activity LED
-	output_set_led_value(LED_ACT, BIT(data, 3));
+	machine().output().set_led_value(LED_ACT, BIT(data, 3));
 
 	// density select
 	m_ga->ds_w((data >> 5) & 0x03);

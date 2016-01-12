@@ -541,14 +541,14 @@ UINT32 ie15_state::draw_scanline(UINT16 *p, UINT16 offset, UINT8 scanline)
 void ie15_state::update_leds()
 {
 	UINT8 data = m_io_keyboard->read();
-	output_set_value("lat_led", m_kb_ruslat ^ 1);
-	output_set_value("nr_led", BIT(m_kb_control, IE_KB_NR_BIT) ^ 1);
-	output_set_value("pch_led", BIT(data, IE_KB_PCH_BIT) ^ 1);
-	output_set_value("dup_led", BIT(data, IE_KB_DUP_BIT) ^ 1);
-	output_set_value("lin_led", BIT(data, IE_KB_LIN_BIT) ^ 1);
-	output_set_value("red_led", BIT(data, IE_KB_RED_BIT) ^ 1);
-	output_set_value("sdv_led", BIT(m_kb_control, IE_KB_SDV_BIT) ^ 1);
-	output_set_value("prd_led", 1); // XXX
+	output().set_value("lat_led", m_kb_ruslat ^ 1);
+	output().set_value("nr_led", BIT(m_kb_control, IE_KB_NR_BIT) ^ 1);
+	output().set_value("pch_led", BIT(data, IE_KB_PCH_BIT) ^ 1);
+	output().set_value("dup_led", BIT(data, IE_KB_DUP_BIT) ^ 1);
+	output().set_value("lin_led", BIT(data, IE_KB_LIN_BIT) ^ 1);
+	output().set_value("red_led", BIT(data, IE_KB_RED_BIT) ^ 1);
+	output().set_value("sdv_led", BIT(m_kb_control, IE_KB_SDV_BIT) ^ 1);
+	output().set_value("prd_led", 1); // XXX
 }
 
 /*

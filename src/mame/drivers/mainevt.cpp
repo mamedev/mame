@@ -66,12 +66,12 @@ WRITE8_MEMBER(mainevt_state::mainevt_bankswitch_w)
 
 WRITE8_MEMBER(mainevt_state::mainevt_coin_w)
 {
-	coin_counter_w(machine(), 0, data & 0x10);
-	coin_counter_w(machine(), 1, data & 0x20);
-	set_led_status(machine(), 0, data & 0x01);
-	set_led_status(machine(), 1, data & 0x02);
-	set_led_status(machine(), 2, data & 0x04);
-	set_led_status(machine(), 3, data & 0x08);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+	output().set_led_value(0, data & 0x01);
+	output().set_led_value(1, data & 0x02);
+	output().set_led_value(2, data & 0x04);
+	output().set_led_value(3, data & 0x08);
 }
 
 WRITE8_MEMBER(mainevt_state::mainevt_sh_irqtrigger_w)

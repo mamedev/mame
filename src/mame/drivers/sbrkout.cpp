@@ -282,29 +282,29 @@ WRITE8_MEMBER(sbrkout_state::pot_mask2_w)
 
 WRITE8_MEMBER(sbrkout_state::start_1_led_w)
 {
-	output_set_led_value(0, offset & 1);
+	output().set_led_value(0, offset & 1);
 }
 
 
 WRITE8_MEMBER(sbrkout_state::start_2_led_w)
 {
-	output_set_led_value(1, offset & 1);
+	output().set_led_value(1, offset & 1);
 }
 
 
 WRITE8_MEMBER(sbrkout_state::serve_led_w)
 {
-	output_set_led_value(0, ~offset & 1);
+	output().set_led_value(0, ~offset & 1);
 }
 
 WRITE8_MEMBER(sbrkout_state::serve_2_led_w)
 {
-	output_set_led_value(1, ~offset & 1);
+	output().set_led_value(1, ~offset & 1);
 }
 
 WRITE8_MEMBER(sbrkout_state::coincount_w)
 {
-	coin_counter_w(machine(), 0, offset & 1);
+	machine().bookkeeping().coin_counter_w(0, offset & 1);
 }
 
 

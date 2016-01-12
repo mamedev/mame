@@ -303,8 +303,8 @@ WRITE8_MEMBER(hvyunit_state::hu_scrolly_w)
 
 WRITE8_MEMBER(hvyunit_state::coin_count_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
 

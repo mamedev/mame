@@ -234,9 +234,9 @@ WRITE8_MEMBER(mpu5_state::asic_w8)
 		}
 		case 0x0b:
 		{
-			output_set_value("statuslamp1", ((data&0x10) != 0));
+			output().set_value("statuslamp1", ((data&0x10) != 0));
 
-			output_set_value("statuslamp2", ((data&0x20) != 0));
+			output().set_value("statuslamp2", ((data&0x20) != 0));
 
 			if (data & 0x40)
 			{

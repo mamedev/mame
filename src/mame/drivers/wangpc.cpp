@@ -313,7 +313,7 @@ READ8_MEMBER( wangpc_state::led_on_r )
 {
 	if (LOG) logerror("%s: Diagnostic LED on\n", machine().describe_context());
 
-	output_set_led_value(LED_DIAGNOSTIC, 1);
+	output().set_led_value(LED_DIAGNOSTIC, 1);
 
 	return 0xff;
 }
@@ -477,7 +477,7 @@ READ8_MEMBER( wangpc_state::led_off_r )
 {
 	if (LOG) logerror("%s: Diagnostic LED off\n", machine().describe_context());
 
-	output_set_led_value(LED_DIAGNOSTIC, 0);
+	output().set_led_value(LED_DIAGNOSTIC, 0);
 
 	return 0xff;
 }

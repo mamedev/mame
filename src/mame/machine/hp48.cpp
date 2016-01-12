@@ -262,12 +262,12 @@ void hp48_state::hp48_update_annunciators()
 	   bit 7: master enable
 	*/
 	int markers = HP48_IO_8(0xb);
-	output_set_value( "lshift0",   (markers & 0x81) == 0x81 );
-	output_set_value( "rshift0",   (markers & 0x82) == 0x82 );
-	output_set_value( "alpha0",    (markers & 0x84) == 0x84 );
-	output_set_value( "alert0",    (markers & 0x88) == 0x88 );
-	output_set_value( "busy0",     (markers & 0x90) == 0x90 );
-	output_set_value( "transmit0", (markers & 0xb0) == 0xb0 );
+	output().set_value( "lshift0",   (markers & 0x81) == 0x81 );
+	output().set_value( "rshift0",   (markers & 0x82) == 0x82 );
+	output().set_value( "alpha0",    (markers & 0x84) == 0x84 );
+	output().set_value( "alert0",    (markers & 0x88) == 0x88 );
+	output().set_value( "busy0",     (markers & 0x90) == 0x90 );
+	output().set_value( "transmit0", (markers & 0xb0) == 0xb0 );
 }
 
 

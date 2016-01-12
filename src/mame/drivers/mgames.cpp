@@ -361,8 +361,8 @@ READ8_MEMBER(mgames_state::mixport_r)
 
 WRITE8_MEMBER(mgames_state::outport0_w)
 {
-	output_set_lamp_value(1, (data & 1));           /* Lamp 1 - BET */
-	output_set_lamp_value(5, (data >> 1) & 1);      /* Lamp 5 - HOLD 1 */
+	output().set_lamp_value(1, (data & 1));           /* Lamp 1 - BET */
+	output().set_lamp_value(5, (data >> 1) & 1);      /* Lamp 5 - HOLD 1 */
 
 	m_output[0] = data;
 	popmessage("outport0 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -382,8 +382,8 @@ WRITE8_MEMBER(mgames_state::outport0_w)
 
 WRITE8_MEMBER(mgames_state::outport1_w)
 {
-	output_set_lamp_value(2, (data & 1));           /* Lamp 2 - DEAL */
-	output_set_lamp_value(6, (data >> 1) & 1);      /* Lamp 6 - HOLD 2 */
+	output().set_lamp_value(2, (data & 1));           /* Lamp 2 - DEAL */
+	output().set_lamp_value(6, (data >> 1) & 1);      /* Lamp 6 - HOLD 2 */
 
 	m_output[1] = data;
 	popmessage("outport1 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -403,8 +403,8 @@ WRITE8_MEMBER(mgames_state::outport1_w)
 
 WRITE8_MEMBER(mgames_state::outport2_w)
 {
-	output_set_lamp_value(3, (data & 1));           /* Lamp 3 - CANCEL */
-	output_set_lamp_value(7, (data >> 1) & 1);      /* Lamp 7 - HOLD 3 */
+	output().set_lamp_value(3, (data & 1));           /* Lamp 3 - CANCEL */
+	output().set_lamp_value(7, (data >> 1) & 1);      /* Lamp 7 - HOLD 3 */
 
 	m_output[2] = data;
 	popmessage("outport2 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -424,8 +424,8 @@ WRITE8_MEMBER(mgames_state::outport2_w)
 
 WRITE8_MEMBER(mgames_state::outport3_w)
 {
-	output_set_lamp_value(4, (data & 1));           /* Lamp 4 - STAND */
-	output_set_lamp_value(8, (data >> 1) & 1);      /* Lamp 8 - HOLD 4 */
+	output().set_lamp_value(4, (data & 1));           /* Lamp 4 - STAND */
+	output().set_lamp_value(8, (data >> 1) & 1);      /* Lamp 8 - HOLD 4 */
 
 	m_output[3] = data;
 	popmessage("outport3 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -445,7 +445,7 @@ WRITE8_MEMBER(mgames_state::outport3_w)
 
 WRITE8_MEMBER(mgames_state::outport4_w)
 {
-	output_set_lamp_value(9, (data >> 1) & 1);      /* Lamp 9 - HOLD 5 */
+	output().set_lamp_value(9, (data >> 1) & 1);      /* Lamp 9 - HOLD 5 */
 
 	m_output[4] = data;
 	popmessage("outport4 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -483,7 +483,7 @@ WRITE8_MEMBER(mgames_state::outport5_w)
 
 WRITE8_MEMBER(mgames_state::outport6_w)
 {
-	coin_counter_w(machine(), 1, data & 0x02);  /* Payout pulse */
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);  /* Payout pulse */
 
 	m_output[6] = data;
 	popmessage("outport6 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -503,7 +503,7 @@ WRITE8_MEMBER(mgames_state::outport6_w)
 
 WRITE8_MEMBER(mgames_state::outport7_w)
 {
-	coin_counter_w(machine(), 0, data & 0x02);  /* Coin pulse */
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);  /* Coin pulse */
 
 	m_output[7] = data;
 	popmessage("outport7 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);

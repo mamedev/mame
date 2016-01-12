@@ -116,8 +116,8 @@ WRITE8_MEMBER(qix_state::sync_sndpia1_porta_w)
 
 WRITE8_MEMBER(qix_state::slither_coinctl_w)
 {
-	coin_lockout_w(machine(), 0, (~data >> 6) & 1);
-	coin_counter_w(machine(), 0, (data >> 5) & 1);
+	machine().bookkeeping().coin_lockout_w(0, (~data >> 6) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 1);
 }
 
 

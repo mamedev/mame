@@ -290,9 +290,9 @@ WRITE8_MEMBER(jangou_state::output_w)
 	---- ---x coin counter
 	*/
 //  printf("%02x\n", data);
-	coin_counter_w(machine(), 0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 //  flip_screen_set(data & 0x04);
-//  coin_lockout_w(machine(), 0, ~data & 0x20);
+//  machine().bookkeeping().coin_lockout_w(0, ~data & 0x20);
 }
 
 READ8_MEMBER(jangou_state::input_mux_r)

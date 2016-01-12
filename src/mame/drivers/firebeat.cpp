@@ -736,14 +736,14 @@ WRITE32_MEMBER(firebeat_state::lamp_output_w )
 	// -------- -------- -------- xxxxxxxx   Status LEDs (active low)
 	if (ACCESSING_BITS_0_7)
 	{
-		output_set_value("status_led_0", (data & 0x01) ? 0 : 1);
-		output_set_value("status_led_1", (data & 0x02) ? 0 : 1);
-		output_set_value("status_led_2", (data & 0x04) ? 0 : 1);
-		output_set_value("status_led_3", (data & 0x08) ? 0 : 1);
-		output_set_value("status_led_4", (data & 0x10) ? 0 : 1);
-		output_set_value("status_led_5", (data & 0x20) ? 0 : 1);
-		output_set_value("status_led_6", (data & 0x40) ? 0 : 1);
-		output_set_value("status_led_7", (data & 0x80) ? 0 : 1);
+		output().set_value("status_led_0", (data & 0x01) ? 0 : 1);
+		output().set_value("status_led_1", (data & 0x02) ? 0 : 1);
+		output().set_value("status_led_2", (data & 0x04) ? 0 : 1);
+		output().set_value("status_led_3", (data & 0x08) ? 0 : 1);
+		output().set_value("status_led_4", (data & 0x10) ? 0 : 1);
+		output().set_value("status_led_5", (data & 0x20) ? 0 : 1);
+		output().set_value("status_led_6", (data & 0x40) ? 0 : 1);
+		output().set_value("status_led_7", (data & 0x80) ? 0 : 1);
 	}
 
 //  printf("lamp_output_w: %08X, %08X, %08X\n", data, offset, mem_mask);
@@ -755,16 +755,16 @@ WRITE32_MEMBER(firebeat_state::lamp_output_kbm_w )
 
 	if (ACCESSING_BITS_24_31)
 	{
-		output_set_value("door_lamp",   (data & 0x10000000) ? 1 : 0);
-		output_set_value("start1p",     (data & 0x01000000) ? 1 : 0);
-		output_set_value("start2p",     (data & 0x02000000) ? 1 : 0);
+		output().set_value("door_lamp",   (data & 0x10000000) ? 1 : 0);
+		output().set_value("start1p",     (data & 0x01000000) ? 1 : 0);
+		output().set_value("start2p",     (data & 0x02000000) ? 1 : 0);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		output_set_value("lamp1",       (data & 0x00000100) ? 1 : 0);
-		output_set_value("lamp2",       (data & 0x00000200) ? 1 : 0);
-		output_set_value("lamp3",       (data & 0x00000400) ? 1 : 0);
-		output_set_value("neon",        (data & 0x00000800) ? 1 : 0);
+		output().set_value("lamp1",       (data & 0x00000100) ? 1 : 0);
+		output().set_value("lamp2",       (data & 0x00000200) ? 1 : 0);
+		output().set_value("lamp3",       (data & 0x00000400) ? 1 : 0);
+		output().set_value("neon",        (data & 0x00000800) ? 1 : 0);
 	}
 }
 
@@ -788,25 +788,25 @@ WRITE32_MEMBER(firebeat_state::lamp_output_ppp_w )
 	// 0x00080000 Stage LED 7
 	if (ACCESSING_BITS_8_15)
 	{
-		output_set_value("left",            (data & 0x00000100) ? 1 : 0);
-		output_set_value("right",           (data & 0x00000200) ? 1 : 0);
-		output_set_value("door_lamp",       (data & 0x00000400) ? 1 : 0);
-		output_set_value("ok",              (data & 0x00000800) ? 1 : 0);
-		output_set_value("slim",            (data & 0x00008000) ? 1 : 0);
+		output().set_value("left",            (data & 0x00000100) ? 1 : 0);
+		output().set_value("right",           (data & 0x00000200) ? 1 : 0);
+		output().set_value("door_lamp",       (data & 0x00000400) ? 1 : 0);
+		output().set_value("ok",              (data & 0x00000800) ? 1 : 0);
+		output().set_value("slim",            (data & 0x00008000) ? 1 : 0);
 	}
 	if (ACCESSING_BITS_24_31)
 	{
-		output_set_value("stage_led_0",     (data & 0x01000000) ? 1 : 0);
-		output_set_value("stage_led_1",     (data & 0x02000000) ? 1 : 0);
-		output_set_value("stage_led_2",     (data & 0x04000000) ? 1 : 0);
-		output_set_value("stage_led_3",     (data & 0x08000000) ? 1 : 0);
+		output().set_value("stage_led_0",     (data & 0x01000000) ? 1 : 0);
+		output().set_value("stage_led_1",     (data & 0x02000000) ? 1 : 0);
+		output().set_value("stage_led_2",     (data & 0x04000000) ? 1 : 0);
+		output().set_value("stage_led_3",     (data & 0x08000000) ? 1 : 0);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		output_set_value("stage_led_4",     (data & 0x00010000) ? 1 : 0);
-		output_set_value("stage_led_5",     (data & 0x00020000) ? 1 : 0);
-		output_set_value("stage_led_6",     (data & 0x00040000) ? 1 : 0);
-		output_set_value("stage_led_7",     (data & 0x00080000) ? 1 : 0);
+		output().set_value("stage_led_4",     (data & 0x00010000) ? 1 : 0);
+		output().set_value("stage_led_5",     (data & 0x00020000) ? 1 : 0);
+		output().set_value("stage_led_6",     (data & 0x00040000) ? 1 : 0);
+		output().set_value("stage_led_7",     (data & 0x00080000) ? 1 : 0);
 	}
 }
 
@@ -830,17 +830,17 @@ WRITE32_MEMBER(firebeat_state::lamp_output2_ppp_w )
 	// 0x00000008 Top LED 7
 	if (ACCESSING_BITS_16_23)
 	{
-		output_set_value("top_led_0",       (data & 0x00010000) ? 1 : 0);
-		output_set_value("top_led_1",       (data & 0x00020000) ? 1 : 0);
-		output_set_value("top_led_2",       (data & 0x00040000) ? 1 : 0);
-		output_set_value("top_led_3",       (data & 0x00080000) ? 1 : 0);
+		output().set_value("top_led_0",       (data & 0x00010000) ? 1 : 0);
+		output().set_value("top_led_1",       (data & 0x00020000) ? 1 : 0);
+		output().set_value("top_led_2",       (data & 0x00040000) ? 1 : 0);
+		output().set_value("top_led_3",       (data & 0x00080000) ? 1 : 0);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		output_set_value("top_led_4",       (data & 0x00000001) ? 1 : 0);
-		output_set_value("top_led_5",       (data & 0x00000002) ? 1 : 0);
-		output_set_value("top_led_6",       (data & 0x00000004) ? 1 : 0);
-		output_set_value("top_led_7",       (data & 0x00000008) ? 1 : 0);
+		output().set_value("top_led_4",       (data & 0x00000001) ? 1 : 0);
+		output().set_value("top_led_5",       (data & 0x00000002) ? 1 : 0);
+		output().set_value("top_led_6",       (data & 0x00000004) ? 1 : 0);
+		output().set_value("top_led_7",       (data & 0x00000008) ? 1 : 0);
 	}
 }
 
@@ -860,10 +860,10 @@ WRITE32_MEMBER(firebeat_state::lamp_output3_ppp_w )
 	// 0x00400000 Lamp 3
 	if (ACCESSING_BITS_16_23)
 	{
-		output_set_value("lamp_0",          (data & 0x00010000) ? 1 : 0);
-		output_set_value("lamp_1",          (data & 0x00040000) ? 1 : 0);
-		output_set_value("lamp_2",          (data & 0x00100000) ? 1 : 0);
-		output_set_value("lamp_3",          (data & 0x00400000) ? 1 : 0);
+		output().set_value("lamp_0",          (data & 0x00010000) ? 1 : 0);
+		output().set_value("lamp_1",          (data & 0x00040000) ? 1 : 0);
+		output().set_value("lamp_2",          (data & 0x00100000) ? 1 : 0);
+		output().set_value("lamp_3",          (data & 0x00400000) ? 1 : 0);
 	}
 }
 

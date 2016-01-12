@@ -263,7 +263,7 @@ WRITE32_MEMBER( beathead_state::sound_reset_w )
 
 WRITE32_MEMBER( beathead_state::coin_count_w )
 {
-	coin_counter_w(machine(), 0, !offset);
+	machine().bookkeeping().coin_counter_w(0, !offset);
 }
 
 

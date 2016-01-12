@@ -137,12 +137,12 @@ WRITE8_MEMBER( chsuper_state::chsuper_vram_w )
 
 WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 {
-	coin_counter_w(machine(), 0, data & 0x01);  // Coin counter
-	output_set_lamp_value(0, (data >> 1) & 1);  // Hold 1 / Black (Nero) lamp.
-	coin_counter_w(machine(), 1, data & 0x04);  // Payout / Ticket Out pulse
-	output_set_lamp_value(1, (data >> 3) & 1);  // Hold 2 / Low (Bassa) lamp.
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);  // Coin counter
+	output().set_lamp_value(0, (data >> 1) & 1);  // Hold 1 / Black (Nero) lamp.
+	machine().bookkeeping().coin_counter_w(1, data & 0x04);  // Payout / Ticket Out pulse
+	output().set_lamp_value(1, (data >> 3) & 1);  // Hold 2 / Low (Bassa) lamp.
 	// D4: unused...
-	output_set_lamp_value(5, (data >> 5) & 1);  // BET lamp
+	output().set_lamp_value(5, (data >> 5) & 1);  // BET lamp
 	// D6: ticket motor...
 	// D7: unused...
 
@@ -153,11 +153,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 
 	if ((m_blacklamp == 1) & (m_redlamp == 1))  // if both are ON...
 	{
-		output_set_lamp_value(2, 1);            // HOLD 3 ON
+		output().set_lamp_value(2, 1);            // HOLD 3 ON
 	}
 	else
 	{
-		output_set_lamp_value(2, 0);            // otherwise HOLD 3 OFF
+		output().set_lamp_value(2, 0);            // otherwise HOLD 3 OFF
 	}
 }
 
@@ -165,11 +165,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 {
 	// D0: unknown...
 	// D1: unused...
-	output_set_lamp_value(3, (data >> 2) & 1);  // Hold 4 / High (Alta) lamp.
+	output().set_lamp_value(3, (data >> 2) & 1);  // Hold 4 / High (Alta) lamp.
 	// D3: unused...
 	// D4: unused...
-	output_set_lamp_value(4, (data >> 5) & 1);  // Hold 5 / Red (Rosso) / Gamble (Raddoppio) lamp.
-	output_set_lamp_value(6, (data >> 6) & 1);  // Start / Gamble (Raddoppio) lamp.
+	output().set_lamp_value(4, (data >> 5) & 1);  // Hold 5 / Red (Rosso) / Gamble (Raddoppio) lamp.
+	output().set_lamp_value(6, (data >> 6) & 1);  // Start / Gamble (Raddoppio) lamp.
 	// D7: unused...
 
 /*  Workaround to get the HOLD 3 lamp line active,
@@ -179,11 +179,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 
 	if ((m_blacklamp == 1) & (m_redlamp == 1))  // if both are ON...
 	{
-		output_set_lamp_value(2, 1);    // Hold 3 ON
+		output().set_lamp_value(2, 1);    // Hold 3 ON
 	}
 	else
 	{
-		output_set_lamp_value(2, 0);    // Hold 3 OFF
+		output().set_lamp_value(2, 0);    // Hold 3 OFF
 	}
 }
 

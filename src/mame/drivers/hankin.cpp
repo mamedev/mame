@@ -283,7 +283,7 @@ WRITE8_MEMBER( hankin_state::ic10_a_w )
 			{
 				seg1 = patterns[m_segment[i]];
 				seg2 = BITSWAP16(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
-				output_set_digit_value(i*10+m_digit, seg2);
+				output().set_digit_value(i*10+m_digit, seg2);
 			}
 		}
 	}
@@ -319,7 +319,7 @@ WRITE8_MEMBER( hankin_state::ic10_b_w )
 
 WRITE_LINE_MEMBER( hankin_state::ic10_ca2_w )
 {
-	output_set_value("led0", !state);
+	output().set_value("led0", !state);
 	// also sound strobe
 	m_ic2->ca1_w(state);
 }

@@ -5841,7 +5841,7 @@ voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, co
 		m_vblank(*this),
 		m_stall(*this)
 {
-	m_token = global_alloc_clear(voodoo_state);
+	m_token = global_alloc_clear<voodoo_state>();
 }
 
 voodoo_device::~voodoo_device()

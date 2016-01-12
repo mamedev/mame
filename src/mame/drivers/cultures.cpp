@@ -177,7 +177,7 @@ WRITE8_MEMBER(cultures_state::bg_bank_w)
 		m_bg2_bank = (data & 0xc) >> 2;
 		m_bg2_tilemap->mark_all_dirty();
 	}
-	coin_counter_w(machine(), 0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 }
 
 

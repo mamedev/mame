@@ -279,7 +279,7 @@ WRITE8_MEMBER(junofrst_state::flip_screen_w)
 
 WRITE8_MEMBER(junofrst_state::coincounter_w)
 {
-	coin_counter_w(machine(), offset, data);
+	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
 WRITE8_MEMBER(junofrst_state::irq_enable_w)

@@ -1000,15 +1000,15 @@ WRITE16_MEMBER(taitoz_state::chasehq_cpua_ctrl_w)
 {
 	cpua_ctrl_w(space, offset, data, mem_mask);
 
-	output_set_lamp_value(0, (m_cpua_ctrl & 0x20) ? 1 : 0);
-	output_set_lamp_value(1, (m_cpua_ctrl & 0x40) ? 1 : 0);
+	output().set_lamp_value(0, (m_cpua_ctrl & 0x20) ? 1 : 0);
+	output().set_lamp_value(1, (m_cpua_ctrl & 0x40) ? 1 : 0);
 }
 
 WRITE16_MEMBER(taitoz_state::dblaxle_cpua_ctrl_w)
 {
 	cpua_ctrl_w(space, offset, data, mem_mask);
 
-	output_set_value("Wheel_Vibration", (data & 0x04)>>2);
+	output().set_value("Wheel_Vibration", (data & 0x04)>>2);
 }
 
 
@@ -1286,8 +1286,8 @@ WRITE16_MEMBER(taitoz_state::spacegun_lightgun_w)
 
 WRITE16_MEMBER(taitoz_state::spacegun_gun_output_w)
 {
-	output_set_value("Player1_Gun_Recoil",(data & 0x01));
-	output_set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
+	output().set_value("Player1_Gun_Recoil",(data & 0x01));
+	output().set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
 }
 
 
@@ -1350,31 +1350,31 @@ WRITE16_MEMBER(taitoz_state::nightstr_motor_w)
 	switch (offset)
 	{
 	case 0:
-		output_set_value("Motor_1_Direction",0);
-		if (data & 1) output_set_value("Motor_1_Direction",1);
-		if (data & 2) output_set_value("Motor_1_Direction",2);
-		output_set_value("Motor_1_Speed",(data & 60)/4);
+		output().set_value("Motor_1_Direction",0);
+		if (data & 1) output().set_value("Motor_1_Direction",1);
+		if (data & 2) output().set_value("Motor_1_Direction",2);
+		output().set_value("Motor_1_Speed",(data & 60)/4);
 
 		break;
 
 	case 4:
-		output_set_value("Motor_2_Direction",0);
-		if (data & 1) output_set_value("Motor_2_Direction",1);
-		if (data & 2) output_set_value("Motor_2_Direction",2);
-		output_set_value("Motor_2_Speed",(data & 60)/4);
+		output().set_value("Motor_2_Direction",0);
+		if (data & 1) output().set_value("Motor_2_Direction",1);
+		if (data & 2) output().set_value("Motor_2_Direction",2);
+		output().set_value("Motor_2_Speed",(data & 60)/4);
 
 		break;
 
 	case 8:
-		output_set_value("Motor_3_Direction",0);
-		if (data & 1) output_set_value("Motor_3_Direction",1);
-		if (data & 2) output_set_value("Motor_3_Direction",2);
-		output_set_value("Motor_3_Speed",(data & 60)/4);
+		output().set_value("Motor_3_Direction",0);
+		if (data & 1) output().set_value("Motor_3_Direction",1);
+		if (data & 2) output().set_value("Motor_3_Direction",2);
+		output().set_value("Motor_3_Speed",(data & 60)/4);
 
 		break;
 
 	default:
-		output_set_value("motor_debug",data);
+		output().set_value("motor_debug",data);
 		break;
 	}
 

@@ -116,22 +116,22 @@ READ16_MEMBER(tomcat_state::tomcat_inputs_r)
 
 WRITE16_MEMBER(tomcat_state::tomcat_led1on_w)
 {
-	set_led_status(machine(), 1, 1);
+	output().set_led_value(1, 1);
 }
 
 WRITE16_MEMBER(tomcat_state::tomcat_led2on_w)
 {
-	set_led_status(machine(), 2, 1);
+	output().set_led_value(2, 1);
 }
 
 WRITE16_MEMBER(tomcat_state::tomcat_led2off_w)
 {
-	set_led_status(machine(), 2, 0);
+	output().set_led_value(2, 0);
 }
 
 WRITE16_MEMBER(tomcat_state::tomcat_led1off_w)
 {
-	set_led_status(machine(), 1, 0);
+	output().set_led_value(1, 0);
 }
 
 WRITE16_MEMBER(tomcat_state::tomcat_lnkmodel_w)

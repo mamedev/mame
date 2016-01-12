@@ -292,8 +292,8 @@ WRITE16_MEMBER(tmnt_state::tmnt_0a0000_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0/1 = coin counters */
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x02);  /* 2 players version */
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);  /* 2 players version */
 
 		/* bit 3 high then low triggers irq on sound CPU */
 		if (m_last == 0x08 && (data & 0x08) == 0)
@@ -316,7 +316,7 @@ WRITE16_MEMBER(tmnt_state::punkshot_0a0020_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = coin counter */
-		coin_counter_w(machine(), 0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
 
 		/* bit 2 = trigger irq on sound CPU */
 		if (m_last == 0x04 && (data & 0x04) == 0)
@@ -334,8 +334,8 @@ WRITE16_MEMBER(tmnt_state::lgtnfght_0a0018_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 		/* bit 2 = trigger irq on sound CPU */
 		if (m_last == 0x00 && (data & 0x04) == 0x04)
@@ -353,8 +353,8 @@ WRITE16_MEMBER(tmnt_state::blswhstl_700300_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
-		coin_counter_w(machine(), 0,data & 0x01);
-		coin_counter_w(machine(), 1,data & 0x02);
+		machine().bookkeeping().coin_counter_w(0,data & 0x01);
+		machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
 		/* bit 3 = enable char ROM reading through the video RAM */
 		m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
@@ -389,8 +389,8 @@ WRITE16_MEMBER(tmnt_state::glfgreat_122000_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 		/* bit 4 = enable char ROM reading through the video RAM */
 		m_k052109->set_rmrd_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
@@ -439,8 +439,8 @@ WRITE16_MEMBER(tmnt_state::ssriders_1c0300_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 		/* bit 3 = enable char ROM reading through the video RAM */
 		m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
@@ -455,8 +455,8 @@ WRITE16_MEMBER(tmnt_state::prmrsocr_122000_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 		/* bit 4 = enable char ROM reading through the video RAM */
 		m_k052109->set_rmrd_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);

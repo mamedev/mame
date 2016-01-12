@@ -30,8 +30,8 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_d008_w)
 	m_paddle_select = data & 0x04;
 
 	/* bit 3 is coin lockout (but not the service coin) */
-	coin_lockout_w(machine(), 0, !(data & 0x08));
-	coin_lockout_w(machine(), 1, !(data & 0x08));
+	machine().bookkeeping().coin_lockout_w(0, !(data & 0x08));
+	machine().bookkeeping().coin_lockout_w(1, !(data & 0x08));
 
 	/* bit 4 is unknown */
 
@@ -136,8 +136,8 @@ WRITE8_MEMBER(arkanoid_state::tetrsark_d008_w)
 	}
 
 	/* bit 7 is coin lockout (but not the service coin) */
-	coin_lockout_w(machine(), 0, !(data & 0x80));
-	coin_lockout_w(machine(), 1, !(data & 0x80));
+	machine().bookkeeping().coin_lockout_w(0, !(data & 0x80));
+	machine().bookkeeping().coin_lockout_w(1, !(data & 0x80));
 }
 
 

@@ -142,8 +142,8 @@ WRITE8_MEMBER(vulgus_state::bgvideoram_w)
 WRITE8_MEMBER(vulgus_state::c804_w)
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 	/* bit 7 flips screen */
 	flip_screen_set(data & 0x80);

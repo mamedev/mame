@@ -302,7 +302,7 @@ WRITE8_MEMBER( s7_state::dig0_w )
 	m_strobe = data & 15;
 	data ^= 0xf0; // inverted by ic33
 	m_data_ok = true;
-	output_set_digit_value(60, patterns[data>>4]); // diag digit
+	output().set_digit_value(60, patterns[data>>4]); // diag digit
 }
 
 WRITE8_MEMBER( s7_state::dig1_w )
@@ -310,8 +310,8 @@ WRITE8_MEMBER( s7_state::dig1_w )
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
 	if (m_data_ok)
 	{
-		output_set_digit_value(m_strobe+16, patterns[data&15]);
-		output_set_digit_value(m_strobe, patterns[data>>4]);
+		output().set_digit_value(m_strobe+16, patterns[data&15]);
+		output().set_digit_value(m_strobe, patterns[data>>4]);
 	}
 	m_data_ok = false;
 }

@@ -717,26 +717,26 @@ WRITE8_MEMBER(galaxian_state::start_lamp_w)
 {
 	/* offset 0 = 1P START LAMP */
 	/* offset 1 = 2P START LAMP */
-	set_led_status(machine(), offset, data & 1);
+	output().set_led_value(offset, data & 1);
 }
 
 
 WRITE8_MEMBER(galaxian_state::coin_lock_w)
 {
 	/* many variants and bootlegs don't have this */
-	coin_lockout_global_w(machine(), ~data & 1);
+	machine().bookkeeping().coin_lockout_global_w(~data & 1);
 }
 
 
 WRITE8_MEMBER(galaxian_state::coin_count_0_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 
 WRITE8_MEMBER(galaxian_state::coin_count_1_w)
 {
-	coin_counter_w(machine(), 1, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 1);
 }
 
 
@@ -883,7 +883,7 @@ WRITE8_MEMBER(galaxian_state::theend_ppi8255_w)
 
 WRITE8_MEMBER(galaxian_state::theend_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, data & 0x80);
+	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 }
 
 

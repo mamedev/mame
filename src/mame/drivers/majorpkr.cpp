@@ -663,13 +663,13 @@ WRITE8_MEMBER(majorpkr_state::lamps_a_w)
     -x-- ----   Small lamp.
     x--- ----   Unknown.
 */
-	output_set_lamp_value(0, (data) & 1);       /* Lamp 0: Hold 1 */
-	output_set_lamp_value(1, (data >> 1) & 1);  /* Lamp 1: Hold 2 */
-	output_set_lamp_value(2, (data >> 2) & 1);  /* Lamp 2: Hold 3 */
-	output_set_lamp_value(3, (data >> 3) & 1);  /* Lamp 3: Hold 4 */
-	output_set_lamp_value(4, (data >> 4) & 1);  /* Lamp 4: Hold 5 */
-	output_set_lamp_value(5, (data >> 5) & 1);  /* Lamp 5: Big or Small (need identification) */
-	output_set_lamp_value(6, (data >> 6) & 1);  /* Lamp 6: Big or Small (need identification) */
+	output().set_lamp_value(0, (data) & 1);       /* Lamp 0: Hold 1 */
+	output().set_lamp_value(1, (data >> 1) & 1);  /* Lamp 1: Hold 2 */
+	output().set_lamp_value(2, (data >> 2) & 1);  /* Lamp 2: Hold 3 */
+	output().set_lamp_value(3, (data >> 3) & 1);  /* Lamp 3: Hold 4 */
+	output().set_lamp_value(4, (data >> 4) & 1);  /* Lamp 4: Hold 5 */
+	output().set_lamp_value(5, (data >> 5) & 1);  /* Lamp 5: Big or Small (need identification) */
+	output().set_lamp_value(6, (data >> 6) & 1);  /* Lamp 6: Big or Small (need identification) */
 
 	if (data & 0x80)
 		logerror("Lamps A: Write to 13h: %02x\n", data);
@@ -689,12 +689,12 @@ WRITE8_MEMBER(majorpkr_state::lamps_b_w)
     --x- ----   Fever lamp.
     xx-- ----   Unknown.
 */
-	output_set_lamp_value(7, (data) & 1);       /* Lamp 7: Bet */
-	output_set_lamp_value(8, (data >> 1) & 1);  /* Lamp 8: Draw */
-	output_set_lamp_value(9, (data >> 2) & 1);  /* Lamp 9: Cancel */
-	output_set_lamp_value(10, (data >> 3) & 1); /* Lamp 10: Take */
-	output_set_lamp_value(11, (data >> 4) & 1); /* Lamp 11: D-UP */
-	output_set_lamp_value(12, (data >> 5) & 1); /* Lamp 12: Fever */
+	output().set_lamp_value(7, (data) & 1);       /* Lamp 7: Bet */
+	output().set_lamp_value(8, (data >> 1) & 1);  /* Lamp 8: Draw */
+	output().set_lamp_value(9, (data >> 2) & 1);  /* Lamp 9: Cancel */
+	output().set_lamp_value(10, (data >> 3) & 1); /* Lamp 10: Take */
+	output().set_lamp_value(11, (data >> 4) & 1); /* Lamp 11: D-UP */
+	output().set_lamp_value(12, (data >> 5) & 1); /* Lamp 12: Fever */
 
 	if (data & 0xc0)
 		logerror("Lamps B: Write to 14h: %02x\n", data);
@@ -713,10 +713,10 @@ WRITE8_MEMBER(majorpkr_state::pulses_w)
     ---x ----   Watchdog? (constant writes).
     xxx- ----   Unknown.
 */
-	coin_counter_w(machine(), 3, data & 0x01);      /* Credits Out (all) */
-	coin_counter_w(machine(), 2, data & 0x02);      /* Credits 3 */
-	coin_counter_w(machine(), 0, data & 0x04);      /* Credits 1 */
-	coin_counter_w(machine(), 1, data & 0x08);      /* Credits 2 */
+	machine().bookkeeping().coin_counter_w(3, data & 0x01);      /* Credits Out (all) */
+	machine().bookkeeping().coin_counter_w(2, data & 0x02);      /* Credits 3 */
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);      /* Credits 1 */
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);      /* Credits 2 */
 
 	if (data & 0xe0)
 		logerror("Pulse: Write to 10h: %02x\n", data);

@@ -94,9 +94,9 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
-	bool sysbus_width() { return BIT(m_sysbus, 0); }
-	bool remotebus_width() { return BIT(m_soc, 0); }
-	bool request_grant() { return BIT(m_soc, 1); }
+	bool sysbus_width() const { return BIT(m_sysbus, 0); }
+	bool remotebus_width() const { return BIT(m_soc, 0); }
+	bool request_grant() const { return BIT(m_soc, 1); }
 
 	UINT8 read_byte(bool space, offs_t address);
 	UINT16 read_word(bool space, offs_t address);

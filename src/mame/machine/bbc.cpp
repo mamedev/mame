@@ -951,7 +951,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b6_caps_lock_led = 1;
 				/* call caps lock led update */
-				output_set_value("capslock_led", m_b6_caps_lock_led);
+				output().set_value("capslock_led", m_b6_caps_lock_led);
 			}
 			break;
 		case 7:
@@ -959,7 +959,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b7_shift_lock_led = 1;
 				/* call shift lock led update */
-				output_set_value("shiftlock_led", m_b7_shift_lock_led);
+				output().set_value("shiftlock_led", m_b7_shift_lock_led);
 			}
 			break;
 		}
@@ -1036,7 +1036,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b6_caps_lock_led = 0;
 				/* call caps lock led update */
-				output_set_value("capslock_led", m_b6_caps_lock_led);
+				output().set_value("capslock_led", m_b6_caps_lock_led);
 			}
 			break;
 		case 7:
@@ -1044,7 +1044,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b7_shift_lock_led = 0;
 				/* call shift lock led update */
-				output_set_value("shiftlock_led", m_b7_shift_lock_led);
+				output().set_value("shiftlock_led", m_b7_shift_lock_led);
 			}
 			break;
 		}
@@ -1366,7 +1366,7 @@ void bbc_state::BBC_Cassette_motor(unsigned char status)
 		m_cass_out_phase = 0;
 		m_cass_out_samples_to_go = 4;
 	}
-	output_set_value("motor_led", !status);
+	output().set_value("motor_led", !status);
 }
 
 

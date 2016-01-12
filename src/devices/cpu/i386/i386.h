@@ -362,7 +362,7 @@ struct I386_CALL_GATE
 	void i386_load_segment_descriptor(int segment );
 	UINT32 i386_get_stack_segment(UINT8 privilege);
 	UINT32 i386_get_stack_ptr(UINT8 privilege);
-	UINT32 get_flags();
+	UINT32 get_flags() const;
 	void set_flags(UINT32 f );
 	void sib_byte(UINT8 mod, UINT32* out_ea, UINT8* out_segment);
 	void modrm_to_EA(UINT8 mod_rm, UINT32* out_ea, UINT8* out_segment);

@@ -1087,8 +1087,8 @@ WRITE8_MEMBER( amiga_state::cia_0_port_a_write )
 	m_overlay->set_bank(BIT(data, 0));
 
 	// bit 1, power led
-	set_led_status(space.machine(), 0, !BIT(data, 1));
-	output_set_value("power_led", !BIT(data, 1));
+	output().set_led_value(0, !BIT(data, 1));
+	output().set_value("power_led", !BIT(data, 1));
 }
 
 WRITE_LINE_MEMBER( amiga_state::cia_0_irq )

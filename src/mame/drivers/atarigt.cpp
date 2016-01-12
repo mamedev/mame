@@ -210,8 +210,8 @@ WRITE32_MEMBER(atarigt_state::latch_w)
 	if (ACCESSING_BITS_16_23)
 	{
 		//cage_reset_w(space, data & 0x00100000);
-		coin_counter_w(machine(), 0, data & 0x00080000);
-		coin_counter_w(machine(), 1, data & 0x00010000);
+		machine().bookkeeping().coin_counter_w(0, data & 0x00080000);
+		machine().bookkeeping().coin_counter_w(1, data & 0x00010000);
 	}
 }
 

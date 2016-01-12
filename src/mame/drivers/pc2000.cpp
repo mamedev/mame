@@ -255,10 +255,10 @@ SED1520_UPDATE_CB(gl3000s_screen_update_left)
 				else if ((x == 75 || x == 77 || x == 79) && yi == 5)    points[y][dpos] |= (state << 4);
 				else if ((x == 75 || x == 77 || x == 79) && yi == 6)    points[y][dpos] |= (state << 3);
 
-				else if (y == 1 && x >= 65 && x <= 68 && yi == 7)       output_set_indexed_value("LEV", x - 64, state);
-				else if (x >= 59  && x <= 60 && yi == 7)                output_set_indexed_value("TRY", x - 58 + (y ? 0 : 1), state);
-				else if (y == 1 && x >= 61 && x <= 64 && yi == 7)       output_set_indexed_value("TICK", x - 59, state);
-				else if (y == 0 && x >= 61 && x <= 64 && yi == 7)       output_set_indexed_value("TICK", 62 - x + (x >= 63 ? 8 : 0), state);
+				else if (y == 1 && x >= 65 && x <= 68 && yi == 7)       device.machine().output().set_indexed_value("LEV", x - 64, state);
+				else if (x >= 59  && x <= 60 && yi == 7)                device.machine().output().set_indexed_value("TRY", x - 58 + (y ? 0 : 1), state);
+				else if (y == 1 && x >= 61 && x <= 64 && yi == 7)       device.machine().output().set_indexed_value("TICK", x - 59, state);
+				else if (y == 0 && x >= 61 && x <= 64 && yi == 7)       device.machine().output().set_indexed_value("TICK", 62 - x + (x >= 63 ? 8 : 0), state);
 
 				else if (x < 74 && yi < 7)
 				{
@@ -270,9 +270,9 @@ SED1520_UPDATE_CB(gl3000s_screen_update_left)
 
 	for(int i=0; i < 3; i++)
 	{
-		output_set_indexed_value("TIME", i, sec[i]);
-		output_set_indexed_value("P1", i, points[1][i]);
-		output_set_indexed_value("P2", i, points[0][i]);
+		device.machine().output().set_indexed_value("TIME", i, sec[i]);
+		device.machine().output().set_indexed_value("P1", i, points[1][i]);
+		device.machine().output().set_indexed_value("P2", i, points[0][i]);
 	}
 
 	return gl3000s_sed1520_screen_update(device, bitmap, cliprect, vram, start_line, adc, 58);

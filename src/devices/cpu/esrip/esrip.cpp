@@ -408,13 +408,13 @@ offs_t esrip_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
     PRIVATE FUNCTIONS
 ***************************************************************************/
 
-int esrip_device::get_hblank()
+int esrip_device::get_hblank() const
 {
 	return machine().first_screen()->hblank();
 }
 
 /* Return the state of the LBRM line (Y-scaling related) */
-int esrip_device::get_lbrm()
+int esrip_device::get_lbrm() const
 {
 	int addr = ((m_y_scale & 0x3f) << 3) | ((m_line_latch >> 3) & 7);
 	int sel = (m_line_latch & 7);
@@ -424,7 +424,7 @@ int esrip_device::get_lbrm()
 	return (val >> sel) & 1;
 }
 
-int esrip_device::check_jmp(UINT8 jmp_ctrl)
+int esrip_device::check_jmp(UINT8 jmp_ctrl) const
 {
 	int ret = 0;
 

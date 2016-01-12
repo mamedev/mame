@@ -53,6 +53,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port0_w);
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_READ8_MEMBER(port2_r);
+	void fpga_send(unsigned char cmd);
+	
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
 private:
@@ -153,26 +155,27 @@ const char* mode_strings[] = {
 "Set counter values"
 };
 
-static void fpga_send(device_t *device, unsigned char cmd){
+void barata_state::fpga_send(unsigned char cmd)
+{
 	static unsigned char byte = 0;
 	static unsigned char mode = FPGA_WAITING_FOR_NEW_CMD;
 	static unsigned char lamp_data = 0;
 
-	device->logerror("FPGA CMD: %d\n", cmd);
+	logerror("FPGA CMD: %d\n", cmd);
 
 	if (mode == FPGA_WAITING_FOR_NEW_CMD){
 		if (cmd < FPGA_WAITING_FOR_NEW_CMD){
 			mode = cmd;
 			byte=1;
-			device->logerror("SET FPGA MODE: %s\n", mode_strings[mode]);
+			logerror("SET FPGA MODE: %s\n", mode_strings[mode]);
 
 			if (mode == FPGA_PLAY_BGM){
-				device->logerror("PLAY_BGM.\n");
+				logerror("PLAY_BGM.\n");
 				mode = FPGA_WAITING_FOR_NEW_CMD;
 			}
 
 			if (mode == FPGA_STOP_BGM){
-				device->logerror("STOP_BGM.\n");
+				logerror("STOP_BGM.\n");
 				mode = FPGA_WAITING_FOR_NEW_CMD;
 			}
 		}
@@ -195,10 +198,10 @@ static void fpga_send(device_t *device, unsigned char cmd){
 				if (erase_all){
 //                  logerror("LED: ERASE ALL\n");
 					for (int i=0; i<16; i++){
-						output_set_led_value(i, 1);
+						output().set_led_value(i, 1);
 					}
 				} else {
-					output_set_led_value(lamp_index, state ? 0 : 1);
+					output().set_led_value(lamp_index, state ? 0 : 1);
 				}
 			default:
 				mode = FPGA_WAITING_FOR_NEW_CMD;
@@ -226,11 +229,11 @@ static void fpga_send(device_t *device, unsigned char cmd){
 				counter_data = (counter_data << 3) | cmd;
 
 				if (counter_state){
-					output_set_digit_value(2*counter_bank, 0);
-					output_set_digit_value(2*counter_bank+1, 0);
+					output().set_digit_value(2*counter_bank, 0);
+					output().set_digit_value(2*counter_bank+1, 0);
 				} else {
-					output_set_digit_value(2*counter_bank, dec_7seg(counter_data/10));
-					output_set_digit_value(2*counter_bank+1, dec_7seg(counter_data%10));
+					output().set_digit_value(2*counter_bank, dec_7seg(counter_data/10));
+					output().set_digit_value(2*counter_bank+1, dec_7seg(counter_data%10));
 				}
 			default:
 				mode = FPGA_WAITING_FOR_NEW_CMD;
@@ -248,7 +251,7 @@ static void fpga_send(device_t *device, unsigned char cmd){
 				break;
 			case 2:
 				sample_index = (sample_index << 3) | cmd;
-				device->logerror("PLAY_SAMPLE #%d.\n", sample_index);
+				logerror("PLAY_SAMPLE #%d.\n", sample_index);
 			default:
 				mode = FPGA_WAITING_FOR_NEW_CMD;
 				break;
@@ -263,7 +266,7 @@ WRITE8_MEMBER(barata_state::fpga_w)
 	static unsigned char old_data = 0;
 	if (!BIT(old_data, 5) && BIT(data, 5)){
 		//process the command sent to the FPGA
-		fpga_send(this, (data >> 2) & 7);
+		fpga_send((data >> 2) & 7);
 	}
 	old_data = data;
 }

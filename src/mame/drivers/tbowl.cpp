@@ -24,7 +24,7 @@ Might be some priority glitches
 
 WRITE8_MEMBER(tbowl_state::coincounter_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 /*** Banking

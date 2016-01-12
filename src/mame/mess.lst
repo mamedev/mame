@@ -119,6 +119,9 @@ dcdev    // 1998 Sega HKT-0120 Sega Dreamcast Development Box
 
 svmu     // 1998 Sega Visual Memory Unit
 
+// Sequential Circuits
+prpht600	// 1983 Sequential Circuits
+
 // Sony
 psj    // 1994 Sony PlayStation (Japan)
 psu    // 1995 Sony PlayStation (USA)
@@ -2005,8 +2008,9 @@ pcm   // PC/M Mugler
 pecom32
 pecom64
 
-// Samsung SPC-1000
+// Samsung Electronics
 spc1000
+spc1500
 
 // PolyMorphic Systems
 poly88
@@ -2278,11 +2282,13 @@ mbdtower    // Milton Bradley
 // hh_tms1k ticalc1x.cpp
 tisr16
 tisr16ii
+ti1250
+ti125076
 ti1270
 ti1000
 ti30
 tiprog
-tibusan1
+tibusan
 wizatron
 lilprof
 lilprof78
@@ -2291,13 +2297,16 @@ dataman
 // hh_tms1k tispeak.cpp
 snspell
 snspellp
-snspella
-snspellb
+snspellua
+snspellub
 snspelluk
 snspelluka
 snspelljp
 snspellfr
 snspellit
+snspellc
+snspellca
+snspellcuk
 snmath
 snmathp
 snread

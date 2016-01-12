@@ -363,6 +363,11 @@ public:
 	DECLARE_READ16_MEMBER( namcos2_68k_key_r );
 	DECLARE_WRITE16_MEMBER( namcos2_68k_key_w );
 	DECLARE_READ16_MEMBER( namcos2_finallap_prot_r );
+	void GollyGhostUpdateLED_c4( int data );
+	void GollyGhostUpdateLED_c6( int data );
+	void GollyGhostUpdateLED_c8( int data );
+	void GollyGhostUpdateLED_ca( int data );
+	void GollyGhostUpdateDiorama_c0( int data );
 
 };
 

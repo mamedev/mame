@@ -279,7 +279,7 @@ static void model2_3d_init( running_machine &machine, UINT16 *texture_rom )
 {
 	model2_state *state = machine.driver_data<model2_state>();
 
-	state->m_raster = auto_alloc_clear( machine, raster_state );
+	state->m_raster = auto_alloc_clear( machine, <raster_state>() );
 
 	state->m_raster->texture_rom = texture_rom;
 }
@@ -1197,7 +1197,7 @@ struct geo_state
 static void geo_init( running_machine &machine, UINT32 *polygon_rom )
 {
 	model2_state *state = machine.driver_data<model2_state>();
-	state->m_geo = auto_alloc_clear(machine, geo_state);
+	state->m_geo = auto_alloc_clear(machine, <geo_state>());
 	state->m_geo->state = state;
 
 	state->m_geo->raster = state->m_raster;

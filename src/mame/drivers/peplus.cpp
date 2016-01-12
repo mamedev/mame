@@ -456,14 +456,14 @@ WRITE8_MEMBER(peplus_state::peplus_cmos_w)
 
 WRITE8_MEMBER(peplus_state::peplus_output_bank_a_w)
 {
-	output_set_value("pe_bnka0",(data >> 0) & 1); /* Coin Lockout */
-	output_set_value("pe_bnka1",(data >> 1) & 1); /* Diverter */
-	output_set_value("pe_bnka2",(data >> 2) & 1); /* Bell */
-	output_set_value("pe_bnka3",(data >> 3) & 1); /* N/A */
-	output_set_value("pe_bnka4",(data >> 4) & 1); /* Hopper 1 */
-	output_set_value("pe_bnka5",(data >> 5) & 1); /* Hopper 2 */
-	output_set_value("pe_bnka6",(data >> 6) & 1); /* specific to a kind of machine */
-	output_set_value("pe_bnka7",(data >> 7) & 1); /* specific to a kind of machine */
+	output().set_value("pe_bnka0",(data >> 0) & 1); /* Coin Lockout */
+	output().set_value("pe_bnka1",(data >> 1) & 1); /* Diverter */
+	output().set_value("pe_bnka2",(data >> 2) & 1); /* Bell */
+	output().set_value("pe_bnka3",(data >> 3) & 1); /* N/A */
+	output().set_value("pe_bnka4",(data >> 4) & 1); /* Hopper 1 */
+	output().set_value("pe_bnka5",(data >> 5) & 1); /* Hopper 2 */
+	output().set_value("pe_bnka6",(data >> 6) & 1); /* specific to a kind of machine */
+	output().set_value("pe_bnka7",(data >> 7) & 1); /* specific to a kind of machine */
 
 	m_coin_out_state = 0;
 	if(((data >> 4) & 1) || ((data >> 5) & 1))
@@ -472,26 +472,26 @@ WRITE8_MEMBER(peplus_state::peplus_output_bank_a_w)
 
 WRITE8_MEMBER(peplus_state::peplus_output_bank_b_w)
 {
-	output_set_value("pe_bnkb0",(data >> 0) & 1); /* specific to a kind of machine */
-	output_set_value("pe_bnkb1",(data >> 1) & 1); /* Deal Spin Start */
-	output_set_value("pe_bnkb2",(data >> 2) & 1); /* Cash Out */
-	output_set_value("pe_bnkb3",(data >> 3) & 1); /* specific to a kind of machine */
-	output_set_value("pe_bnkb4",(data >> 4) & 1); /* Bet 1 / Bet Max */
-	output_set_value("pe_bnkb5",(data >> 5) & 1); /* Change Request */
-	output_set_value("pe_bnkb6",(data >> 6) & 1); /* Door Open */
-	output_set_value("pe_bnkb7",(data >> 7) & 1); /* specific to a kind of machine */
+	output().set_value("pe_bnkb0",(data >> 0) & 1); /* specific to a kind of machine */
+	output().set_value("pe_bnkb1",(data >> 1) & 1); /* Deal Spin Start */
+	output().set_value("pe_bnkb2",(data >> 2) & 1); /* Cash Out */
+	output().set_value("pe_bnkb3",(data >> 3) & 1); /* specific to a kind of machine */
+	output().set_value("pe_bnkb4",(data >> 4) & 1); /* Bet 1 / Bet Max */
+	output().set_value("pe_bnkb5",(data >> 5) & 1); /* Change Request */
+	output().set_value("pe_bnkb6",(data >> 6) & 1); /* Door Open */
+	output().set_value("pe_bnkb7",(data >> 7) & 1); /* specific to a kind of machine */
 }
 
 WRITE8_MEMBER(peplus_state::peplus_output_bank_c_w)
 {
-	output_set_value("pe_bnkc0",(data >> 0) & 1); /* Coin In Meter */
-	output_set_value("pe_bnkc1",(data >> 1) & 1); /* Coin Out Meter */
-	output_set_value("pe_bnkc2",(data >> 2) & 1); /* Coin Drop Meter */
-	output_set_value("pe_bnkc3",(data >> 3) & 1); /* Jackpot Meter */
-	output_set_value("pe_bnkc4",(data >> 4) & 1); /* Bill Acceptor Enabled */
-	output_set_value("pe_bnkc5",(data >> 5) & 1); /* SDS Out */
-	output_set_value("pe_bnkc6",(data >> 6) & 1); /* N/A */
-	output_set_value("pe_bnkc7",(data >> 7) & 1); /* Game Meter */
+	output().set_value("pe_bnkc0",(data >> 0) & 1); /* Coin In Meter */
+	output().set_value("pe_bnkc1",(data >> 1) & 1); /* Coin Out Meter */
+	output().set_value("pe_bnkc2",(data >> 2) & 1); /* Coin Drop Meter */
+	output().set_value("pe_bnkc3",(data >> 3) & 1); /* Jackpot Meter */
+	output().set_value("pe_bnkc4",(data >> 4) & 1); /* Bill Acceptor Enabled */
+	output().set_value("pe_bnkc5",(data >> 5) & 1); /* SDS Out */
+	output().set_value("pe_bnkc6",(data >> 6) & 1); /* N/A */
+	output().set_value("pe_bnkc7",(data >> 7) & 1); /* Game Meter */
 
 	m_bv_enable_state = (data >> 4) & 1;
 }

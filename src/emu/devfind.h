@@ -270,7 +270,7 @@ public:
 	{
 		for (int index = 0; index < _Count; index++)
 		{
-			strformat(m_tag[index], "%s.%d", basetag, index);
+			strprintf(m_tag[index], "%s.%d", basetag, index);
 			m_array[index] = std::make_unique<ioport_finder_type>(base, m_tag[index].c_str());
 		}
 	}
@@ -441,7 +441,7 @@ public:
 	{
 		for (int index = 0; index < _Count; index++)
 		{
-			strformat(m_tag[index],"%s.%d", basetag, index);
+			strprintf(m_tag[index],"%s.%d", basetag, index);
 			m_array[index] = std::make_unique<shared_ptr_type>(base, m_tag[index].c_str(), width);
 		}
 	}

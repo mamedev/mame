@@ -592,14 +592,13 @@ void tms340x0_device::device_start()
 		state_add(TMS34010_ST,     "ST",        m_st);
 		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_st).noshow().formatstr("%18s");
 
-		std::string tempstr;
 		for (int regnum = 0; regnum < 15; regnum++)
 		{
-			state_add(TMS34010_A0 + regnum, strformat(tempstr, "A%d", regnum).c_str(), m_regs[regnum].reg);
+			state_add(TMS34010_A0 + regnum, strformat("A%d", regnum).c_str(), m_regs[regnum].reg);
 		}
 		for (int regnum = 0; regnum < 15; regnum++)
 		{
-			state_add(TMS34010_B0 + regnum, strformat(tempstr, "B%d", regnum).c_str(), m_regs[30 - regnum].reg);
+			state_add(TMS34010_B0 + regnum, strformat("B%d", regnum).c_str(), m_regs[30 - regnum].reg);
 		}
 	}
 

@@ -1734,14 +1734,11 @@ void m68000_base_device::define_state(void)
 	if (cpu_type & MASK_020_OR_LATER)
 		state_add(M68K_MSP,    "MSP",       iotemp).callimport().callexport();
 
-	std::string tempstr;
 	for (int regnum = 0; regnum < 8; regnum++) {
-		strprintf(tempstr,"D%d", regnum);
-		state_add(M68K_D0 + regnum, tempstr.c_str(), dar[regnum]);
+		state_add(M68K_D0 + regnum, strformat("D%d", regnum).c_str(), dar[regnum]);
 	}
 	for (int regnum = 0; regnum < 8; regnum++) {
-		strprintf(tempstr,"A%d", regnum);
-		state_add(M68K_A0 + regnum, tempstr.c_str(), dar[8 + regnum]);
+		state_add(M68K_A0 + regnum, strformat("A%d", regnum).c_str(), dar[8 + regnum]);
 	}
 
 	state_add(M68K_PREF_ADDR,  "PREF_ADDR", pref_addr).mask(addrmask);
@@ -1763,8 +1760,7 @@ void m68000_base_device::define_state(void)
 	if (cpu_type & MASK_030_OR_LATER)
 	{
 		for (int regnum = 0; regnum < 8; regnum++) {
-			strprintf(tempstr,"FP%d", regnum);
-			state_add(M68K_FP0 + regnum, tempstr.c_str(), iotemp).callimport().callexport().formatstr("%10s");
+			state_add(M68K_FP0 + regnum, strformat("FP%d", regnum).c_str(), iotemp).callimport().callexport().formatstr("%10s");
 		}
 		state_add(M68K_FPSR, "FPSR", fpsr);
 		state_add(M68K_FPCR, "FPCR", fpcr);

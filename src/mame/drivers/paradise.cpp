@@ -120,7 +120,7 @@ WRITE8_MEMBER(paradise_state::paradise_okibank_w)
 
 WRITE8_MEMBER(paradise_state::torus_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, data ^ 0xff);
+	machine().bookkeeping().coin_counter_w(0, data ^ 0xff);
 }
 
 static ADDRESS_MAP_START( base_map, AS_PROGRAM, 8, paradise_state )

@@ -91,23 +91,23 @@ WRITE8_MEMBER(avalnche_state::avalance_video_invert_w)
 
 WRITE8_MEMBER(avalnche_state::catch_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
 WRITE8_MEMBER(avalnche_state::avalance_credit_1_lamp_w)
 {
-	set_led_status(machine(), 0, data & 1);
+	output().set_led_value(0, data & 1);
 }
 
 WRITE8_MEMBER(avalnche_state::avalance_credit_2_lamp_w)
 {
-	set_led_status(machine(), 1, data & 1);
+	output().set_led_value(1, data & 1);
 }
 
 WRITE8_MEMBER(avalnche_state::avalance_start_lamp_w)
 {
-	set_led_status(machine(), 2, data & 1);
+	output().set_led_value(2, data & 1);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, avalnche_state )

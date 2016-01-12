@@ -167,8 +167,8 @@ void vendetta_state::vendetta_video_banking( int select )
 WRITE8_MEMBER(vendetta_state::vendetta_5fe0_w)
 {
 	/* bit 0,1 coin counters */
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 	/* bit 2 = BRAMBK ?? */
 

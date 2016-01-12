@@ -43,9 +43,9 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_int_ack_w)
 
 WRITE8_MEMBER(sspeedr_state::sspeedr_lamp_w)
 {
-	output_set_value("lampGO", (data >> 0) & 1);
-	output_set_value("lampEP", (data >> 1) & 1);
-	coin_counter_w(machine(), 0, data & 8);
+	output().set_value("lampGO", (data >> 0) & 1);
+	output().set_value("lampEP", (data >> 1) & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 8);
 }
 
 
@@ -56,7 +56,7 @@ static const UINT8 ls48_map[16] =
 WRITE8_MEMBER(sspeedr_state::sspeedr_time_w)
 {
 	data = data & 15;
-	output_set_digit_value(0x18 + offset, ls48_map[data]);
+	output().set_digit_value(0x18 + offset, ls48_map[data]);
 	m_led_TIME[offset] = data;
 }
 
@@ -66,7 +66,7 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_score_w)
 	char buf[20];
 	sprintf(buf, "LED%02d", offset);
 	data = ~data & 15;
-	output_set_digit_value(offset, ls48_map[data]);
+	output().set_digit_value(offset, ls48_map[data]);
 	m_led_SCORE[offset] = data;
 }
 

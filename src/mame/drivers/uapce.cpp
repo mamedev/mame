@@ -153,7 +153,7 @@ WRITE8_MEMBER(uapce_state::jamma_if_control_latch_w)
 
    Pin 'z' is a normally ground connection, but on this board it is isolated from ground.
    The wiring harness also has the corresponding wire separate from the others. */
-	coin_counter_w(machine(), 0, BIT(data,5));
+	machine().bookkeeping().coin_counter_w(0, BIT(data,5));
 
 /* D4 : Connects the START1 switch input from the JAMMA connector to the
     "RUN" key input of the control pad multiplexer.

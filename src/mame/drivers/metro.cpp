@@ -450,8 +450,8 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_1word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      coin_lockout_w(machine(), 0, data & 1);
-//      coin_lockout_w(machine(), 1, data & 2);
+//      machine().bookkeeping().coin_lockout_w(0, data & 1);
+//      machine().bookkeeping().coin_lockout_w(1, data & 2);
 	}
 	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
 }
@@ -459,7 +459,7 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_1word_w)
 
 WRITE16_MEMBER(metro_state::metro_coin_lockout_4words_w)
 {
-//  coin_lockout_w(machine(), (offset >> 1) & 1, offset & 1);
+//  machine().bookkeeping().coin_lockout_w((offset >> 1) & 1, offset & 1);
 	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
 }
 
@@ -1879,10 +1879,10 @@ WRITE8_MEMBER(metro_state::vmetal_control_w)
 {
 	/* Lower nibble is the coin control bits shown in
 	   service mode, but in game mode they're different */
-	coin_counter_w(machine(), 0, data & 0x04);
-	coin_counter_w(machine(), 1, data & 0x08);  /* 2nd coin schute activates coin 0 counter in game mode?? */
-//  coin_lockout_w(machine(), 0, data & 0x01);  /* always on in game mode?? */
-	coin_lockout_w(machine(), 1, data & 0x02);  /* never activated in game mode?? */
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);  /* 2nd coin schute activates coin 0 counter in game mode?? */
+//  machine().bookkeeping().coin_lockout_w(0, data & 0x01);  /* always on in game mode?? */
+	machine().bookkeeping().coin_lockout_w(1, data & 0x02);  /* never activated in game mode?? */
 
 	if ((data & 0x40) == 0)
 		m_essnd->reset();

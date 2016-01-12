@@ -71,7 +71,7 @@ WRITE8_MEMBER(megazone_state::i8039_irqen_and_status_w)
 
 WRITE8_MEMBER(megazone_state::megazone_coin_counter_w)
 {
-	coin_counter_w(machine(), 1 - offset, data);        /* 1-offset, because coin counters are in reversed order */
+	machine().bookkeeping().coin_counter_w(1 - offset, data);        /* 1-offset, because coin counters are in reversed order */
 }
 
 WRITE8_MEMBER(megazone_state::irq_mask_w)

@@ -842,14 +842,14 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds1_w)
 	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x0100);    // coin in
-		set_led_status(machine(), 0, data & 0x0200);    // win???
+		machine().bookkeeping().coin_counter_w(0, data & 0x0100);    // coin in
+		output().set_led_value(0, data & 0x0200);    // win???
 //                                     1  data & 0x0400     // win???
-		set_led_status(machine(), 2, data & 0x0800);    // small
-		set_led_status(machine(), 3, data & 0x1000);    // big
-		set_led_status(machine(), 4, data & 0x2000);    // take
-		set_led_status(machine(), 5, data & 0x4000);    // double up
-		set_led_status(machine(), 6, data & 0x8000);    // cancel
+		output().set_led_value(2, data & 0x0800);    // small
+		output().set_led_value(3, data & 0x1000);    // big
+		output().set_led_value(4, data & 0x2000);    // take
+		output().set_led_value(5, data & 0x4000);    // double up
+		output().set_led_value(6, data & 0x8000);    // cancel
 		show_leds123();
 	}
 }
@@ -859,14 +859,14 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds2_w)
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(machine(),  7, data & 0x0100);   // start
-		set_led_status(machine(),  8, data & 0x0200);   // bet
-		set_led_status(machine(),  9, data & 0x0400);   // hold 5
-		set_led_status(machine(), 10, data & 0x0800);   // hold 4
-		set_led_status(machine(), 11, data & 0x1000);   // hold 3
-		set_led_status(machine(), 12, data & 0x2000);   // hold 2
-		set_led_status(machine(), 13, data & 0x4000);   // collect
-		set_led_status(machine(), 14, data & 0x8000);   // call attendant
+		output().set_led_value( 7, data & 0x0100);   // start
+		output().set_led_value( 8, data & 0x0200);   // bet
+		output().set_led_value( 9, data & 0x0400);   // hold 5
+		output().set_led_value(10, data & 0x0800);   // hold 4
+		output().set_led_value(11, data & 0x1000);   // hold 3
+		output().set_led_value(12, data & 0x2000);   // hold 2
+		output().set_led_value(13, data & 0x4000);   // collect
+		output().set_led_value(14, data & 0x8000);   // call attendant
 		show_leds123();
 	}
 }
@@ -876,8 +876,8 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
 	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(machine(), 15, data & 0x0100);   // hopper coins?
-		set_led_status(machine(), 16, data & 0x0400);   // coin out?
+		output().set_led_value(15, data & 0x0100);   // hopper coins?
+		output().set_led_value(16, data & 0x0400);   // coin out?
 		show_leds123();
 	}
 }
@@ -982,14 +982,14 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds1_w)
 	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x0100);    // coin in
-		set_led_status(machine(), 0, data & 0x0200);    // win???
+		machine().bookkeeping().coin_counter_w(0, data & 0x0100);    // coin in
+		output().set_led_value(0, data & 0x0200);    // win???
 //                                     1  data & 0x0400     // win???
-		set_led_status(machine(), 2, data & 0x0800);    // small
-		set_led_status(machine(), 3, data & 0x1000);    // big
-		set_led_status(machine(), 4, data & 0x2000);    // take
-		set_led_status(machine(), 5, data & 0x4000);    // double up
-		set_led_status(machine(), 6, data & 0x8000);    // cancel
+		output().set_led_value(2, data & 0x0800);    // small
+		output().set_led_value(3, data & 0x1000);    // big
+		output().set_led_value(4, data & 0x2000);    // take
+		output().set_led_value(5, data & 0x4000);    // double up
+		output().set_led_value(6, data & 0x8000);    // cancel
 		show_leds123();
 	}
 }
@@ -999,14 +999,14 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds2_w)
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(machine(),  7, data & 0x0100);   // start
-		set_led_status(machine(),  8, data & 0x0200);   // bet
-		set_led_status(machine(),  9, data & 0x0400);   // hold 5
-		set_led_status(machine(), 10, data & 0x0800);   // hold 4
-		set_led_status(machine(), 11, data & 0x1000);   // hold 3
-		set_led_status(machine(), 12, data & 0x2000);   // hold 2
-		set_led_status(machine(), 13, data & 0x4000);   // hold 1
-		set_led_status(machine(), 14, data & 0x8000);   // call attendant
+		output().set_led_value( 7, data & 0x0100);   // start
+		output().set_led_value( 8, data & 0x0200);   // bet
+		output().set_led_value( 9, data & 0x0400);   // hold 5
+		output().set_led_value(10, data & 0x0800);   // hold 4
+		output().set_led_value(11, data & 0x1000);   // hold 3
+		output().set_led_value(12, data & 0x2000);   // hold 2
+		output().set_led_value(13, data & 0x4000);   // hold 1
+		output().set_led_value(14, data & 0x8000);   // call attendant
 		show_leds123();
 	}
 }
@@ -1016,8 +1016,8 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds3_w)
 	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(machine(), 15, data & 0x0100);   // hopper coins?
-		set_led_status(machine(), 16, data & 0x0400);   // coin out?
+		output().set_led_value(15, data & 0x0100);   // hopper coins?
+		output().set_led_value(16, data & 0x0400);   // coin out?
 		show_leds123();
 	}
 }
@@ -1172,7 +1172,7 @@ WRITE16_MEMBER(blitz68k_state::hermit_leds1_w)
 	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(machine(), 0, data & 0x0100);    // coin in
+		machine().bookkeeping().coin_counter_w(0, data & 0x0100);    // coin in
 		show_leds12();
 	}
 }
@@ -1182,7 +1182,7 @@ WRITE16_MEMBER(blitz68k_state::hermit_leds2_w)
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(machine(),  7, data & 0x0100);   // button
+		output().set_led_value( 7, data & 0x0100);   // button
 		show_leds12();
 	}
 }

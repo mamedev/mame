@@ -29,8 +29,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::dragrace_frame_callback)
 			case 0x10: m_gear[i] = 0; break;
 		}
 	}
-	output_set_value("P1gear", m_gear[0]);
-	output_set_value("P2gear", m_gear[1]);
+	output().set_value("P1gear", m_gear[0]);
+	output().set_value("P2gear", m_gear[1]);
 
 	/* watchdog is disabled during service mode */
 	machine().watchdog_enable(ioport("IN0")->read() & 0x20);
@@ -70,8 +70,8 @@ void dragrace_state::dragrace_update_misc_flags( address_space &space )
 	 * 0x091f = set Player 2 Start Lamp 0x80000000
 	 * 0x0938 = clear 0x0918 - 0x091f
 	 */
-	set_led_status(machine(), 0, m_misc_flags & 0x00008000);
-	set_led_status(machine(), 1, m_misc_flags & 0x80000000);
+	output().set_led_value(0, m_misc_flags & 0x00008000);
+	output().set_led_value(1, m_misc_flags & 0x80000000);
 
 	m_discrete->write(space, DRAGRACE_MOTOR1_DATA,  ~m_misc_flags & 0x0000001f);       // Speed1 data*
 	m_discrete->write(space, DRAGRACE_EXPLODE1_EN, (m_misc_flags & 0x00000020) ? 1: 0);    // Explosion1 enable
@@ -90,8 +90,8 @@ void dragrace_state::dragrace_update_misc_flags( address_space &space )
 	m_discrete->write(space, DRAGRACE_HITONE_EN, (m_misc_flags & 0x20000000) ? 1: 0);  // HiTone enable
 
 	// the tachometers are driven from the same frequency generator that creates the engine sound
-	output_set_value("tachometer", ~m_misc_flags & 0x0000001f);
-	output_set_value("tachometer2", (~m_misc_flags & 0x001f0000) >> 0x10);
+	output().set_value("tachometer", ~m_misc_flags & 0x0000001f);
+	output().set_value("tachometer2", (~m_misc_flags & 0x001f0000) >> 0x10);
 }
 
 WRITE8_MEMBER(dragrace_state::dragrace_misc_w)

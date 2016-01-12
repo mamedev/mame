@@ -462,7 +462,7 @@ WRITE8_MEMBER(z80ne_state::lx383_w)
 	 */
 
 	if ( offset < 8 )
-		output_set_digit_value( offset, data ^ 0xff );
+		output().set_digit_value( offset, data ^ 0xff );
 	else
 	{
 		/* after writing to port 0xF8 and the first ~M1 cycles strike a NMI for single step execution */
@@ -672,8 +672,8 @@ WRITE8_MEMBER(z80ne_state::lx390_motor_w)
 	/* no drive selected, turn off all leds */
 	if (!m_wd17xx_state.drive)
 	{
-		output_set_value("drv0", 0);
-		output_set_value("drv1", 0);
+		output().set_value("drv0", 0);
+		output().set_value("drv1", 0);
 	}
 }
 
@@ -742,9 +742,9 @@ WRITE8_MEMBER(z80ne_state::lx390_fdc_w)
 		LOG(("lx390_fdc_w, WD17xx command: %02x\n", d));
 		m_wd1771->cmd_w(space, offset, d ^ 0xff);
 		if (m_wd17xx_state.drive & 1)
-			output_set_value("drv0", 2);
+			output().set_value("drv0", 2);
 		else if (m_wd17xx_state.drive & 2)
-			output_set_value("drv1", 2);
+			output().set_value("drv1", 2);
 		break;
 	case 1:
 		LOG(("lx390_fdc_w, WD17xx track:   %02x\n", d));

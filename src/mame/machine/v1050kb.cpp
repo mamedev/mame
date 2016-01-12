@@ -415,7 +415,7 @@ WRITE8_MEMBER( v1050_keyboard_device::kb_p2_w )
 	*/
 
 	// led output
-	output_set_led_value(0, BIT(data, 5));
+	machine().output().set_led_value(0, BIT(data, 5));
 
 	// speaker output
 	m_discrete->write(space, NODE_01, BIT(data, 6));

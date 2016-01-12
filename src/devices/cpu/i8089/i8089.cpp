@@ -160,7 +160,7 @@ offs_t i8089_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
 
 void i8089_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
-	i8089_channel *ch = m_ch1;
+	const i8089_channel *ch = m_ch1;
 
 	if (entry.index() >= CH2_GA && entry.index() <= CH2_PSW)
 		ch = m_ch2;

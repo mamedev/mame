@@ -431,10 +431,10 @@ WRITE8_MEMBER(segac2_state::io_portd_w)
 	 D1 : To CN1 pin J. (Coin meter 2)
 	 D0 : To CN1 pin 8. (Coin meter 1)
 	*/
-	//coin_lockout_w(space.machine(), 1, data & 0x08);
-	//coin_lockout_w(space.machine(), 0, data & 0x04);
-	coin_counter_w(space.machine(), 1, data & 0x02);
-	coin_counter_w(space.machine(), 0, data & 0x01);
+	//space.machine().bookkeeping().coin_lockout_w(1, data & 0x08);
+	//space.machine().bookkeeping().coin_lockout_w(0, data & 0x04);
+	space.machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
 WRITE8_MEMBER(segac2_state::io_porth_w)
@@ -569,8 +569,8 @@ WRITE8_MEMBER(segac2_state::counter_timer_w)
 			break;
 
 		case 0x10:  /* coin counter */
-//          coin_counter_w(space.machine(), 0,1);
-//          coin_counter_w(space.machine(), 0,0);
+//          space.machine().bookkeeping().coin_counter_w(0,1);
+//          space.machine().bookkeeping().coin_counter_w(0,0);
 			break;
 
 		case 0x12:  /* set coinage info -- followed by two 4-bit values */

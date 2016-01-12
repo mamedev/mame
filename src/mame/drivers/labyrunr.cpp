@@ -41,8 +41,8 @@ WRITE8_MEMBER(labyrunr_state::labyrunr_bankswitch_w)
 	membank("bank1")->set_entry(data & 0x07);   // shall we check if data&7 > #banks?
 
 	/* bits 3 and 4 are coin counters */
-	coin_counter_w(machine(), 0, data & 0x08);
-	coin_counter_w(machine(), 1, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, data & 0x08);
+	machine().bookkeeping().coin_counter_w(1, data & 0x10);
 }
 
 static ADDRESS_MAP_START( labyrunr_map, AS_PROGRAM, 8, labyrunr_state )

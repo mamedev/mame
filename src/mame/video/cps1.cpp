@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Leaman
 /***************************************************************************
 
@@ -463,7 +463,7 @@ The games seem to use them to mark platforms, kill zones and no-go areas.
 #define CPS_B_14     0x1e,0x0404,          __not_applicable__,          0x12,{0x14,0x16,0x18,0x1a},0x1c, {0x08,0x20,0x10,0x00,0x00}
 #define CPS_B_15     0x0e,0x0405,          __not_applicable__,          0x02,{0x04,0x06,0x08,0x0a},0x0c, {0x04,0x02,0x20,0x00,0x00}
 #define CPS_B_16     0x00,0x0406,          __not_applicable__,          0x0c,{0x0a,0x08,0x06,0x04},0x02, {0x10,0x0a,0x0a,0x00,0x00}
-#define CPS_B_17     0x08,0x0407,          __not_applicable__,          0x14,{0x12,0x10,0x0e,0x0c},0x0a, {0x08,0x10,0x02,0x00,0x00}
+#define CPS_B_17     0x08,0x0407,          __not_applicable__,          0x14,{0x12,0x10,0x0e,0x0c},0x0a, {0x08,0x14,0x02,0x00,0x00}   // the sf2 -> strider conversion needs 0x04 for the 2nd layer enable on one level, gfx confirmed to appear on the PCB, register at the time is 0x8e, so 0x10 is not set.
 #define CPS_B_18     0x10,0x0408,          __not_applicable__,          0x1c,{0x1a,0x18,0x16,0x14},0x12, {0x10,0x08,0x02,0x00,0x00}
 #define CPS_B_21_DEF 0x32,  -1,   0x00,0x02,0x04,0x06, 0x08, -1,  -1,   0x26,{0x28,0x2a,0x2c,0x2e},0x30, {0x02,0x04,0x08,0x30,0x30} // pang3 sets layer enable to 0x26 on startup
 #define CPS_B_21_BT1 0x32,0x0800, 0x0e,0x0c,0x0a,0x08, 0x06,0x04,0x02,  0x28,{0x26,0x24,0x22,0x20},0x30, {0x20,0x04,0x08,0x12,0x12}
@@ -1402,6 +1402,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"daimakair",   CPS_B_21_DEF, mapper_DAM63B },  // equivalent to DM620, also CPS_B_21_DEF is equivalent to CPS_B_01
 	{"strider",     CPS_B_01,     mapper_ST24M1 },
 	{"striderua",   CPS_B_01,     mapper_ST24M1 },  // wrong, this set uses ST24B2, still not dumped
+	{"strideruc",   CPS_B_17,     mapper_ST24M1 },  // wrong?
 	{"striderj",    CPS_B_01,     mapper_ST22B },   // equivalent to ST24M1
 	{"striderjr",   CPS_B_21_DEF, mapper_ST24M1 },  // wrong, this set uses STH63B, still not dumped
 	{"dynwar",      CPS_B_02,     mapper_TK22B },   // wrong, this set uses TK24B1, dumped but equations still not added
@@ -1819,15 +1820,15 @@ WRITE16_MEMBER(cps_state::cps1_cps_b_w)
 		{
 			if (m_game_config->cpsb_value == 0x0402)    // Mercs (CN2 connector)
 			{
-				coin_lockout_w(machine(), 2, ~data & 0x01);
-				set_led_status(machine(), 0, data & 0x02);
-				set_led_status(machine(), 1, data & 0x04);
-				set_led_status(machine(), 2, data & 0x08);
+				machine().bookkeeping().coin_lockout_w(2, ~data & 0x01);
+				output().set_led_value(0, data & 0x02);
+				output().set_led_value(1, data & 0x04);
+				output().set_led_value(2, data & 0x08);
 			}
 			else    // kod, captcomm, knights
 			{
-				coin_lockout_w(machine(), 2, ~data & 0x02);
-				coin_lockout_w(machine(), 3, ~data & 0x08);
+				machine().bookkeeping().coin_lockout_w(2, ~data & 0x02);
+				machine().bookkeeping().coin_lockout_w(3, ~data & 0x08);
 			}
 		}
 	}

@@ -152,13 +152,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(vt100_state::keyboard_callback)
 WRITE8_MEMBER( vt100_state::vt100_keyboard_w )
 {
 	m_speaker->set_frequency(786); // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
-	output_set_value("online_led",BIT(data, 5) ? 0 : 1);
-	output_set_value("local_led", BIT(data, 5));
-	output_set_value("locked_led",BIT(data, 4) ? 0 : 1);
-	output_set_value("l1_led", BIT(data, 3) ? 0 : 1);
-	output_set_value("l2_led", BIT(data, 2) ? 0 : 1);
-	output_set_value("l3_led", BIT(data, 1) ? 0 : 1);
-	output_set_value("l4_led", BIT(data, 0) ? 0 : 1);
+	output().set_value("online_led",BIT(data, 5) ? 0 : 1);
+	output().set_value("local_led", BIT(data, 5));
+	output().set_value("locked_led",BIT(data, 4) ? 0 : 1);
+	output().set_value("l1_led", BIT(data, 3) ? 0 : 1);
+	output().set_value("l2_led", BIT(data, 2) ? 0 : 1);
+	output().set_value("l3_led", BIT(data, 1) ? 0 : 1);
+	output().set_value("l4_led", BIT(data, 0) ? 0 : 1);
 	m_key_scan = BIT(data, 6);
 	m_speaker->set_state(BIT(data, 7));
 }
@@ -353,13 +353,13 @@ void vt100_state::machine_reset()
 	m_receiver_int = 0;
 	m_vertical_int = 0;
 	m_speaker->set_frequency(786); // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
-	output_set_value("online_led",1);
-	output_set_value("local_led", 0);
-	output_set_value("locked_led",1);
-	output_set_value("l1_led", 1);
-	output_set_value("l2_led", 1);
-	output_set_value("l3_led", 1);
-	output_set_value("l4_led", 1);
+	output().set_value("online_led",1);
+	output().set_value("local_led", 0);
+	output().set_value("locked_led",1);
+	output().set_value("l1_led", 1);
+	output().set_value("l2_led", 1);
+	output().set_value("l3_led", 1);
+	output().set_value("l4_led", 1);
 
 	m_key_scan = 0;
 }

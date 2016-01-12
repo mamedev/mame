@@ -1036,9 +1036,9 @@ WRITE8_MEMBER( px4_state::ioctlr_w )
 
 	// bit 3, cartridge reset
 
-	output_set_value("led_0", BIT(data, 4)); // caps lock
-	output_set_value("led_1", BIT(data, 5)); // num lock
-	output_set_value("led_2", BIT(data, 6)); // "led 2"
+	output().set_value("led_0", BIT(data, 4)); // caps lock
+	output().set_value("led_1", BIT(data, 5)); // num lock
+	output().set_value("led_2", BIT(data, 6)); // "led 2"
 
 	m_speaker->level_w(BIT(data, 7));
 }

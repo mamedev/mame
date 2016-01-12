@@ -725,8 +725,8 @@ void ksys573_state::driver_start()
 	m_atapi_timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( ksys573_state::atapi_xfer_end ),this ) );
 	m_atapi_timer->adjust( attotime::never );
 
-	m_available_cdroms[ 0 ] = cdrom_open( get_disk_handle( machine(), ":cdrom0" ) );
-	m_available_cdroms[ 1 ] = cdrom_open( get_disk_handle( machine(), ":cdrom1" ) );
+	m_available_cdroms[ 0 ] = cdrom_open(machine().rom_load().get_disk_handle(":cdrom0"));
+	m_available_cdroms[ 1 ] = cdrom_open(machine().rom_load().get_disk_handle(":cdrom1"));
 
 	m_n_security_control = 0;
 	m_control = 0;
@@ -880,11 +880,11 @@ WRITE16_MEMBER( ksys573_state::ge765pwbba_w )
 		break;
 
 	case 0x40:
-		output_set_value( "motor", data & 0xff );
+		output().set_value( "motor", data & 0xff );
 		break;
 
 	case 0x44:
-		output_set_value( "brake", data & 0xff );
+		output().set_value( "brake", data & 0xff );
 		break;
 
 	case 0x50:
@@ -1079,19 +1079,19 @@ WRITE8_MEMBER( ksys573_state::ddr_output_callback )
 	switch( offset )
 	{
 	case 0:
-		output_set_value( "foot 1p up", !data );
+		output().set_value( "foot 1p up", !data );
 		break;
 
 	case 1:
-		output_set_value( "foot 1p left", !data );
+		output().set_value( "foot 1p left", !data );
 		break;
 
 	case 2:
-		output_set_value( "foot 1p right", !data );
+		output().set_value( "foot 1p right", !data );
 		break;
 
 	case 3:
-		output_set_value( "foot 1p down", !data );
+		output().set_value( "foot 1p down", !data );
 		break;
 
 	case 4:
@@ -1103,19 +1103,19 @@ WRITE8_MEMBER( ksys573_state::ddr_output_callback )
 		break;
 
 	case 8:
-		output_set_value( "foot 2p up", !data );
+		output().set_value( "foot 2p up", !data );
 		break;
 
 	case 9:
-		output_set_value( "foot 2p left", !data );
+		output().set_value( "foot 2p left", !data );
 		break;
 
 	case 10:
-		output_set_value( "foot 2p right", !data );
+		output().set_value( "foot 2p right", !data );
 		break;
 
 	case 11:
-		output_set_value( "foot 2p down", !data );
+		output().set_value( "foot 2p down", !data );
 		break;
 
 	case 12:
@@ -1127,32 +1127,32 @@ WRITE8_MEMBER( ksys573_state::ddr_output_callback )
 		break;
 
 	case 17:
-		output_set_led_value( 0, !data ); // start 1
+		output().set_led_value( 0, !data ); // start 1
 		break;
 
 	case 18:
-		output_set_led_value( 1, !data ); // start 2
+		output().set_led_value( 1, !data ); // start 2
 		break;
 
 	case 20:
-		output_set_value( "body right low", !data );
+		output().set_value( "body right low", !data );
 		break;
 
 	case 21:
-		output_set_value( "body left low", !data );
+		output().set_value( "body left low", !data );
 		break;
 
 	case 22:
-		output_set_value( "body left high", !data );
+		output().set_value( "body left high", !data );
 		break;
 
 	case 23:
-		output_set_value( "body right high", !data );
+		output().set_value( "body right high", !data );
 		break;
 
 	case 28: // digital
 	case 30: // analogue
-		output_set_value( "speaker", !data );
+		output().set_value( "speaker", !data );
 		break;
 
 	default:
@@ -1173,22 +1173,22 @@ DRIVER_INIT_MEMBER( ksys573_state, ddr )
 
 WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b7 )
 {
-	output_set_value( "spot left", state );
+	output().set_value( "spot left", state );
 }
 
 WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b6 )
 {
-	output_set_value( "spot right", state );
+	output().set_value( "spot right", state );
 }
 
 WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b5 )
 {
-	output_set_led_value( 0, state ); // start left
+	output().set_led_value( 0, state ); // start left
 }
 
 WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b4 )
 {
-	output_set_led_value( 1, state ); // start right
+	output().set_led_value( 1, state ); // start right
 }
 
 /* ddr solo */
@@ -1205,39 +1205,39 @@ WRITE8_MEMBER( ksys573_state::ddrsolo_output_callback )
 		break;
 
 	case 8:
-		output_set_value( "extra 4", !data );
+		output().set_value( "extra 4", !data );
 		break;
 
 	case 9:
-		output_set_value( "extra 2", !data );
+		output().set_value( "extra 2", !data );
 		break;
 
 	case 10:
-		output_set_value( "extra 1", !data );
+		output().set_value( "extra 1", !data );
 		break;
 
 	case 11:
-		output_set_value( "extra 3", !data );
+		output().set_value( "extra 3", !data );
 		break;
 
 	case 16:
-		output_set_value( "speaker", !data );
+		output().set_value( "speaker", !data );
 		break;
 
 	case 20:
-		output_set_led_value( 0, !data ); // start
+		output().set_led_value( 0, !data ); // start
 		break;
 
 	case 21:
-		output_set_value( "body center", !data );
+		output().set_value( "body center", !data );
 		break;
 
 	case 22:
-		output_set_value( "body right", !data );
+		output().set_value( "body right", !data );
 		break;
 
 	case 23:
-		output_set_value( "body left", !data );
+		output().set_value( "body left", !data );
 		break;
 
 	default:
@@ -1254,52 +1254,52 @@ WRITE8_MEMBER( ksys573_state::drmn_output_callback )
 	{
 	case 0: // drmn2+
 	case 16: // drmn
-		output_set_value( "hi-hat", !data );
+		output().set_value( "hi-hat", !data );
 		break;
 
 	case 1: // drmn2+
 	case 17: // drmn
-		output_set_value( "high tom", !data );
+		output().set_value( "high tom", !data );
 		break;
 
 	case 2: // drmn2+
 	case 18: // drmn
-		output_set_value( "low tom", !data );
+		output().set_value( "low tom", !data );
 		break;
 
 	case 3: // drmn2+
 	case 19: // drmn
-		output_set_value( "snare", !data );
+		output().set_value( "snare", !data );
 		break;
 
 	case 8: // drmn2+
 	case 30: // drmn
-		output_set_value( "spot left & right", !data );
+		output().set_value( "spot left & right", !data );
 		break;
 
 	case 9: // drmn2+
 	case 31: // drmn
-		output_set_value( "neon top", data );
+		output().set_value( "neon top", data );
 		break;
 
 	case 11: // drmn2+
 	case 27: // drmn
-		output_set_value( "neon woofer", data );
+		output().set_value( "neon woofer", data );
 		break;
 
 	case 12: // drmn2+
 	case 20: // drmn
-		output_set_value( "cymbal", !data );
+		output().set_value( "cymbal", !data );
 		break;
 
 	case 13: // drmn2+
 	case 21: // drmn
-		output_set_led_value( 0, data ); // start
+		output().set_led_value( 0, data ); // start
 		break;
 
 	case 14: // drmn2+
 	case 22: // drmn
-		output_set_value( "select button", data );
+		output().set_value( "select button", data );
 		break;
 
 	case 23: // drmn
@@ -1324,111 +1324,111 @@ WRITE8_MEMBER( ksys573_state::dmx_output_callback )
 	switch( offset )
 	{
 	case 0:
-		output_set_value( "blue io 8", !data );
+		output().set_value( "blue io 8", !data );
 		break;
 
 	case 1:
-		output_set_value( "blue io 9", !data );
+		output().set_value( "blue io 9", !data );
 		break;
 
 	case 2:
-		output_set_value( "red io 9", !data );
+		output().set_value( "red io 9", !data );
 		break;
 
 	case 3:
-		output_set_value( "red io 8", !data );
+		output().set_value( "red io 8", !data );
 		break;
 
 	case 4:
-		output_set_value( "blue io 6", !data );
+		output().set_value( "blue io 6", !data );
 		break;
 
 	case 5:
-		output_set_value( "blue io 7", !data );
+		output().set_value( "blue io 7", !data );
 		break;
 
 	case 6:
-		output_set_value( "red io 7", !data );
+		output().set_value( "red io 7", !data );
 		break;
 
 	case 7:
-		output_set_value( "red io 6", !data );
+		output().set_value( "red io 6", !data );
 		break;
 
 	case 8:
-		output_set_value( "blue io 4", !data );
+		output().set_value( "blue io 4", !data );
 		break;
 
 	case 9:
-		output_set_value( "blue io 5", !data );
+		output().set_value( "blue io 5", !data );
 		break;
 
 	case 10:
-		output_set_value( "red io 5", !data );
+		output().set_value( "red io 5", !data );
 		break;
 
 	case 11:
-		output_set_value( "red io 4", !data );
+		output().set_value( "red io 4", !data );
 		break;
 
 	case 12:
-		output_set_value( "blue io 10", !data );
+		output().set_value( "blue io 10", !data );
 		break;
 
 	case 13:
-		output_set_value( "blue io 11", !data );
+		output().set_value( "blue io 11", !data );
 		break;
 
 	case 14:
-		output_set_value( "red io 11", !data );
+		output().set_value( "red io 11", !data );
 		break;
 
 	case 15:
-		output_set_value( "red io 10", !data );
+		output().set_value( "red io 10", !data );
 		break;
 
 	case 16:
-		output_set_value( "blue io 0", !data );
+		output().set_value( "blue io 0", !data );
 		break;
 
 	case 17:
-		output_set_value( "blue io 1", !data );
+		output().set_value( "blue io 1", !data );
 		break;
 
 	case 18:
-		output_set_value( "red io 1", !data );
+		output().set_value( "red io 1", !data );
 		break;
 
 	case 19:
-		output_set_value( "red io 0", !data );
+		output().set_value( "red io 0", !data );
 		break;
 
 	case 20:
-		output_set_value( "blue io 2", !data );
+		output().set_value( "blue io 2", !data );
 		break;
 
 	case 21:
-		output_set_value( "blue io 3", !data );
+		output().set_value( "blue io 3", !data );
 		break;
 
 	case 22:
-		output_set_value( "red io 3", !data );
+		output().set_value( "red io 3", !data );
 		break;
 
 	case 23:
-		output_set_value( "red io 2", !data );
+		output().set_value( "red io 2", !data );
 		break;
 
 	case 28:
-		output_set_value( "yellow spot light", !data );
+		output().set_value( "yellow spot light", !data );
 		break;
 
 	case 29:
-		output_set_value( "blue spot light", !data );
+		output().set_value( "blue spot light", !data );
 		break;
 
 	case 31:
-		output_set_value( "pink spot light", !data );
+		output().set_value( "pink spot light", !data );
 		break;
 
 	default:
@@ -1439,32 +1439,32 @@ WRITE8_MEMBER( ksys573_state::dmx_output_callback )
 
 WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b0 )
 {
-	output_set_value( "left 2p", state );
+	output().set_value( "left 2p", state );
 }
 
 WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b1 )
 {
-	output_set_led_value( 1, state ); // start 1p
+	output().set_led_value( 1, state ); // start 1p
 }
 
 WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b2 )
 {
-	output_set_value( "right 2p", state );
+	output().set_value( "right 2p", state );
 }
 
 WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b3 )
 {
-	output_set_value( "left 1p", state );
+	output().set_value( "left 1p", state );
 }
 
 WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b4 )
 {
-	output_set_led_value( 0, state ); // start 2p
+	output().set_led_value( 0, state ); // start 2p
 }
 
 WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b5 )
 {
-	output_set_value( "right 1p", state );
+	output().set_value( "right 1p", state );
 }
 
 /* salary man champ */
@@ -1499,13 +1499,13 @@ WRITE_LINE_MEMBER( ksys573_state::salarymc_lamp_clk )
 				verboselog( 0, "unknown bits in salarymc_lamp_shift %08x\n", m_salarymc_lamp_shift & ~0xe38 );
 			}
 
-			output_set_value( "player 1 red", ( m_salarymc_lamp_shift >> 11 ) & 1 );
-			output_set_value( "player 1 green", ( m_salarymc_lamp_shift >> 10 ) & 1 );
-			output_set_value( "player 1 blue", ( m_salarymc_lamp_shift >> 9 ) & 1 );
+			output().set_value( "player 1 red", ( m_salarymc_lamp_shift >> 11 ) & 1 );
+			output().set_value( "player 1 green", ( m_salarymc_lamp_shift >> 10 ) & 1 );
+			output().set_value( "player 1 blue", ( m_salarymc_lamp_shift >> 9 ) & 1 );
 
-			output_set_value( "player 2 red", ( m_salarymc_lamp_shift >> 5 ) & 1 );
-			output_set_value( "player 2 green", ( m_salarymc_lamp_shift >> 4 ) & 1 );
-			output_set_value( "player 2 blue", ( m_salarymc_lamp_shift >> 3 ) & 1 );
+			output().set_value( "player 2 red", ( m_salarymc_lamp_shift >> 5 ) & 1 );
+			output().set_value( "player 2 green", ( m_salarymc_lamp_shift >> 4 ) & 1 );
+			output().set_value( "player 2 blue", ( m_salarymc_lamp_shift >> 3 ) & 1 );
 
 			m_salarymc_lamp_bits = 0;
 			m_salarymc_lamp_shift = 0;
@@ -1561,10 +1561,10 @@ WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_strobe1 )
 {
 	if( state && !m_hyperbbc_lamp_strobe1 )
 	{
-		output_set_value( "player 1 red", m_hyperbbc_lamp_red );
-		output_set_value( "player 1 green", m_hyperbbc_lamp_green );
-		output_set_value( "player 1 blue", m_hyperbbc_lamp_blue );
-		output_set_value( "player 1 start", m_hyperbbc_lamp_start );
+		output().set_value( "player 1 red", m_hyperbbc_lamp_red );
+		output().set_value( "player 1 green", m_hyperbbc_lamp_green );
+		output().set_value( "player 1 blue", m_hyperbbc_lamp_blue );
+		output().set_value( "player 1 start", m_hyperbbc_lamp_start );
 	}
 
 	m_hyperbbc_lamp_strobe1 = state;
@@ -1574,10 +1574,10 @@ WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_strobe2 )
 {
 	if( state && !m_hyperbbc_lamp_strobe2 )
 	{
-		output_set_value( "player 2 red", m_hyperbbc_lamp_red );
-		output_set_value( "player 2 green", m_hyperbbc_lamp_green );
-		output_set_value( "player 2 blue", m_hyperbbc_lamp_blue );
-		output_set_value( "player 2 start", m_hyperbbc_lamp_start );
+		output().set_value( "player 2 red", m_hyperbbc_lamp_red );
+		output().set_value( "player 2 green", m_hyperbbc_lamp_green );
+		output().set_value( "player 2 blue", m_hyperbbc_lamp_blue );
+		output().set_value( "player 2 start", m_hyperbbc_lamp_start );
 	}
 
 	m_hyperbbc_lamp_strobe2 = state;
@@ -1587,10 +1587,10 @@ WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_strobe3 )
 {
 	if( state && !m_hyperbbc_lamp_strobe3 )
 	{
-		output_set_value( "player 3 red", m_hyperbbc_lamp_red );
-		output_set_value( "player 3 green", m_hyperbbc_lamp_green );
-		output_set_value( "player 3 blue", m_hyperbbc_lamp_blue );
-		output_set_value( "player 3 start", m_hyperbbc_lamp_start );
+		output().set_value( "player 3 red", m_hyperbbc_lamp_red );
+		output().set_value( "player 3 green", m_hyperbbc_lamp_green );
+		output().set_value( "player 3 blue", m_hyperbbc_lamp_blue );
+		output().set_value( "player 3 start", m_hyperbbc_lamp_start );
 	}
 
 	m_hyperbbc_lamp_strobe3 = state;
@@ -1642,42 +1642,42 @@ WRITE8_MEMBER( ksys573_state::mamboagg_output_callback )
 	switch( offset )
 	{
 	case 4:
-		output_set_value( "fire lamp left", !data );
+		output().set_value( "fire lamp left", !data );
 		break;
 	case 5:
-		output_set_value( "fire fan left", !data );
+		output().set_value( "fire fan left", !data );
 		break;
 	case 6:
-		output_set_value( "fire fan right", !data );
+		output().set_value( "fire fan right", !data );
 		break;
 	case 7:
-		output_set_value( "fire lamp right", !data );
+		output().set_value( "fire lamp right", !data );
 		break;
 	case 28:
-		output_set_value( "conga left", !data );
+		output().set_value( "conga left", !data );
 		break;
 	case 29:
-		output_set_value( "conga right", !data );
+		output().set_value( "conga right", !data );
 		break;
 	case 31:
-		output_set_value( "conga centre", !data );
+		output().set_value( "conga centre", !data );
 		break;
 	}
 }
 
 WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b3 )
 {
-	output_set_led_value( 0, state ); // start 1p
+	output().set_led_value( 0, state ); // start 1p
 }
 
 WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b4 )
 {
-	output_set_value( "select right", state );
+	output().set_value( "select right", state );
 }
 
 WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b5 )
 {
-	output_set_value( "select left", state );
+	output().set_value( "select left", state );
 }
 
 
@@ -1736,34 +1736,34 @@ WRITE8_MEMBER( ksys573_state::punchmania_output_callback )
 	switch( offset )
 	{
 	case 8:
-		output_set_value( "select left right", !data );
+		output().set_value( "select left right", !data );
 		break;
 	case 9:
 		pad_light[ 2 ] = !data;
-		output_set_value( "left bottom lamp", !data );
+		output().set_value( "left bottom lamp", !data );
 		break;
 	case 10:
 		pad_light[ 1 ] = !data;
-		output_set_value( "left middle lamp", !data );
+		output().set_value( "left middle lamp", !data );
 		break;
 	case 11:
-		output_set_value( "start lamp", !data );
+		output().set_value( "start lamp", !data );
 		break;
 	case 12:
 		pad_light[ 0 ] = !data;
-		output_set_value( "left top lamp", !data );
+		output().set_value( "left top lamp", !data );
 		break;
 	case 13:
 		pad_light[ 4 ] = !data;
-		output_set_value( "right middle lamp", !data );
+		output().set_value( "right middle lamp", !data );
 		break;
 	case 14:
 		pad_light[ 3 ] = !data;
-		output_set_value( "right top lamp", !data );
+		output().set_value( "right top lamp", !data );
 		break;
 	case 15:
 		pad_light[ 5 ] = !data;
-		output_set_value( "right bottom lamp", !data );
+		output().set_value( "right bottom lamp", !data );
 		break;
 	case 16:
 		if( data )

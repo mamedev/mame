@@ -117,7 +117,7 @@ WRITE32_MEMBER(ultrsprt_state::eeprom_w)
 			m_cpu_vram_page = vram_page;
 		}
 
-		coin_counter_w(machine(), 0, data & 0x10000000);
+		machine().bookkeeping().coin_counter_w(0, data & 0x10000000);
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, data & 0x80000000 ? CLEAR_LINE : ASSERT_LINE);
 	}
 }

@@ -112,7 +112,7 @@ private:
 	UINT32 serial_out1_state, serial_out2_state;
 
 	bool afm_led_handler(int sid, bool state);
-	static void sc_aux_lamps_handler_update(UINT32 &out, UINT32 mask, bool state, int id);
+	void sc_aux_lamps_handler_update(UINT32 &out, UINT32 mask, bool state, int id);
 	bool sc_aux_lamps_handler(int sid, bool state);
 };
 
@@ -302,7 +302,7 @@ bool wpc_95_state::afm_led_handler(int sid, bool state)
 			if(prev_state != serial_data1_state) {
 				char buffer[32];
 				sprintf(buffer, "l:Saucer led %d", serial_clock_counter);
-				output_set_value(buffer, serial_data1_state);
+				output().set_value(buffer, serial_data1_state);
 				if(serial_data1_state)
 					serial_out1_state |= mask;
 				else
@@ -324,7 +324,7 @@ void wpc_95_state::sc_aux_lamps_handler_update(UINT32 &out, UINT32 mask, bool st
 {
 	bool prev_state = out & mask;
 	if(prev_state != state) {
-		output_set_value(lamps_sc_extra[id], state);
+		output().set_value(lamps_sc_extra[id], state);
 		if(state)
 			out |= mask;
 		else

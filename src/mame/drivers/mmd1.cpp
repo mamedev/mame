@@ -180,38 +180,38 @@ public:
 
 WRITE8_MEMBER( mmd1_state::mmd1_port0_w )
 {
-	output_set_value("p0_7", BIT(data,7) ? 0 : 1);
-	output_set_value("p0_6", BIT(data,6) ? 0 : 1);
-	output_set_value("p0_5", BIT(data,5) ? 0 : 1);
-	output_set_value("p0_4", BIT(data,4) ? 0 : 1);
-	output_set_value("p0_3", BIT(data,3) ? 0 : 1);
-	output_set_value("p0_2", BIT(data,2) ? 0 : 1);
-	output_set_value("p0_1", BIT(data,1) ? 0 : 1);
-	output_set_value("p0_0", BIT(data,0) ? 0 : 1);
+	output().set_value("p0_7", BIT(data,7) ? 0 : 1);
+	output().set_value("p0_6", BIT(data,6) ? 0 : 1);
+	output().set_value("p0_5", BIT(data,5) ? 0 : 1);
+	output().set_value("p0_4", BIT(data,4) ? 0 : 1);
+	output().set_value("p0_3", BIT(data,3) ? 0 : 1);
+	output().set_value("p0_2", BIT(data,2) ? 0 : 1);
+	output().set_value("p0_1", BIT(data,1) ? 0 : 1);
+	output().set_value("p0_0", BIT(data,0) ? 0 : 1);
 }
 
 WRITE8_MEMBER( mmd1_state::mmd1_port1_w )
 {
-	output_set_value("p1_7", BIT(data,7) ? 0 : 1);
-	output_set_value("p1_6", BIT(data,6) ? 0 : 1);
-	output_set_value("p1_5", BIT(data,5) ? 0 : 1);
-	output_set_value("p1_4", BIT(data,4) ? 0 : 1);
-	output_set_value("p1_3", BIT(data,3) ? 0 : 1);
-	output_set_value("p1_2", BIT(data,2) ? 0 : 1);
-	output_set_value("p1_1", BIT(data,1) ? 0 : 1);
-	output_set_value("p1_0", BIT(data,0) ? 0 : 1);
+	output().set_value("p1_7", BIT(data,7) ? 0 : 1);
+	output().set_value("p1_6", BIT(data,6) ? 0 : 1);
+	output().set_value("p1_5", BIT(data,5) ? 0 : 1);
+	output().set_value("p1_4", BIT(data,4) ? 0 : 1);
+	output().set_value("p1_3", BIT(data,3) ? 0 : 1);
+	output().set_value("p1_2", BIT(data,2) ? 0 : 1);
+	output().set_value("p1_1", BIT(data,1) ? 0 : 1);
+	output().set_value("p1_0", BIT(data,0) ? 0 : 1);
 }
 
 WRITE8_MEMBER( mmd1_state::mmd1_port2_w )
 {
-	output_set_value("p2_7", BIT(data,7) ? 0 : 1);
-	output_set_value("p2_6", BIT(data,6) ? 0 : 1);
-	output_set_value("p2_5", BIT(data,5) ? 0 : 1);
-	output_set_value("p2_4", BIT(data,4) ? 0 : 1);
-	output_set_value("p2_3", BIT(data,3) ? 0 : 1);
-	output_set_value("p2_2", BIT(data,2) ? 0 : 1);
-	output_set_value("p2_1", BIT(data,1) ? 0 : 1);
-	output_set_value("p2_0", BIT(data,0) ? 0 : 1);
+	output().set_value("p2_7", BIT(data,7) ? 0 : 1);
+	output().set_value("p2_6", BIT(data,6) ? 0 : 1);
+	output().set_value("p2_5", BIT(data,5) ? 0 : 1);
+	output().set_value("p2_4", BIT(data,4) ? 0 : 1);
+	output().set_value("p2_3", BIT(data,3) ? 0 : 1);
+	output().set_value("p2_2", BIT(data,2) ? 0 : 1);
+	output().set_value("p2_1", BIT(data,1) ? 0 : 1);
+	output().set_value("p2_0", BIT(data,0) ? 0 : 1);
 }
 
 // keyboard has a keydown and a keyup code. Keyup = last keydown + bit 7 set
@@ -394,7 +394,7 @@ WRITE8_MEMBER( mmd1_state::mmd2_scanlines_w )
 WRITE8_MEMBER( mmd1_state::mmd2_digit_w )
 {
 	if (m_digit < 9)
-		output_set_digit_value(m_digit, data);
+		output().set_digit_value(m_digit, data);
 }
 
 READ8_MEMBER( mmd1_state::mmd2_kbd_r )
@@ -413,16 +413,16 @@ READ8_MEMBER( mmd1_state::mmd2_kbd_r )
 WRITE8_MEMBER( mmd1_state::mmd2_status_callback )
 {
 	// operate the HALT LED
-	output_set_value("led_halt", ~data & I8085_STATUS_HLTA);
+	output().set_value("led_halt", ~data & I8085_STATUS_HLTA);
 	// operate the HOLD LED - this should connect to the HLDA pin,
 	// but it isn't emulated, using WO instead (whatever that does).
-	output_set_value("led_hold", data & I8085_STATUS_WO);
+	output().set_value("led_hold", data & I8085_STATUS_WO);
 }
 
 WRITE_LINE_MEMBER( mmd1_state::mmd2_inte_callback )
 {
 	// operate the INTE LED
-	output_set_value("led_inte", state);
+	output().set_value("led_inte", state);
 }
 
 MACHINE_RESET_MEMBER(mmd1_state,mmd1)

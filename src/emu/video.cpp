@@ -164,7 +164,7 @@ video_manager::video_manager(running_machine &machine)
 	{
 		m_screenless_frame_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(video_manager::screenless_update_callback), this));
 		m_screenless_frame_timer->adjust(screen_device::DEFAULT_FRAME_PERIOD, 0, screen_device::DEFAULT_FRAME_PERIOD);
-		output_set_notifier(nullptr, video_notifier_callback, this);
+		machine.output().set_notifier(nullptr, video_notifier_callback, this);
 	}
 }
 
@@ -258,9 +258,9 @@ void video_manager::frame_update(bool debug)
 //  into a string buffer
 //-------------------------------------------------
 
-std::string &video_manager::speed_text(std::string &str)
+std::string video_manager::speed_text()
 {
-	str.clear();
+	std::string str;
 
 	// if we're paused, just display Paused
 	bool paused = machine().paused();
@@ -676,7 +676,7 @@ bool video_manager::finish_screen_updates()
 
 	// draw any crosshairs
 	for (screen_device *screen = iter.first(); screen != nullptr; screen = iter.next())
-		crosshair_render(*screen);
+		machine().crosshair().render(*screen);
 
 	return anything_changed;
 }

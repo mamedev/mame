@@ -168,11 +168,11 @@ WRITE8_MEMBER(foodf_state::digital_w)
 	if (!(data & 0x08))
 		video_int_ack_w(space,0,0);
 
-	output_set_led_value(0, (data >> 4) & 1);
-	output_set_led_value(1, (data >> 5) & 1);
+	output().set_led_value(0, (data >> 4) & 1);
+	output().set_led_value(1, (data >> 5) & 1);
 
-	coin_counter_w(machine(), 0, (data >> 6) & 1);
-	coin_counter_w(machine(), 1, (data >> 7) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 6) & 1);
+	machine().bookkeeping().coin_counter_w(1, (data >> 7) & 1);
 }
 
 

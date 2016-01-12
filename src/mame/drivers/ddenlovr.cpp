@@ -1701,12 +1701,12 @@ CUSTOM_INPUT_MEMBER(ddenlovr_state::ddenlovr_blitter_irq_r)
 WRITE16_MEMBER(ddenlovr_state::ddenlovr_coincounter_0_w)
 {
 	if (ACCESSING_BITS_0_7)
-		coin_counter_w(machine(), 0, data & 1);
+		machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 WRITE16_MEMBER(ddenlovr_state::ddenlovr_coincounter_1_w)
 {
 	if (ACCESSING_BITS_0_7)
-		coin_counter_w(machine(), 1, data & 1);
+		machine().bookkeeping().coin_counter_w(1, data & 1);
 }
 
 
@@ -1936,8 +1936,8 @@ WRITE16_MEMBER(ddenlovr_state::quiz365_coincounter_w)
 	{
 		if (m_input_sel == 0x1c)
 		{
-			coin_counter_w(machine(), 0, ~data & 1);
-			coin_counter_w(machine(), 1, ~data & 4);
+			machine().bookkeeping().coin_counter_w(0, ~data & 1);
+			machine().bookkeeping().coin_counter_w(1, ~data & 4);
 		}
 	}
 }
@@ -2012,8 +2012,8 @@ WRITE16_MEMBER(ddenlovr_state::ddenlovj_coincounter_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x04);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x04);
 		//                data & 0x80 ?
 	}
 }
@@ -2186,8 +2186,8 @@ WRITE16_MEMBER(ddenlovr_state::nettoqc_coincounter_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0, data & 0x01);
-		coin_counter_w(machine(), 1, data & 0x04);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x04);
 		//                data & 0x80 ?
 	}
 }
@@ -2430,7 +2430,7 @@ WRITE8_MEMBER(ddenlovr_state::mmpanic_blitter2_w)
 
 void ddenlovr_state::mmpanic_update_leds()
 {
-	set_led_status(machine(), 0, m_mmpanic_leds);
+	output().set_led_value(0, m_mmpanic_leds);
 }
 
 /* leds 1-8 */
@@ -2451,9 +2451,9 @@ WRITE8_MEMBER(ddenlovr_state::mmpanic_lockout_w)
 {
 	if (m_dsw_sel == 0x0c)
 	{
-		coin_counter_w(machine(), 0, (~data) & 0x01);
-		coin_lockout_w(machine(), 0, (~data) & 0x02);
-		set_led_status(machine(), 1, (~data) & 0x04);
+		machine().bookkeeping().coin_counter_w(0, (~data) & 0x01);
+		machine().bookkeeping().coin_lockout_w(0, (~data) & 0x02);
+		output().set_led_value(1, (~data) & 0x04);
 	}
 }
 
@@ -2609,8 +2609,8 @@ WRITE8_MEMBER(ddenlovr_state::funkyfig_lockout_w)
 	{
 		case 0x2c:
 			m_funkyfig_lockout = data;
-			coin_counter_w(machine(), 0,   data  & 0x01);
-			coin_lockout_w(machine(), 0, (~data) & 0x02);
+			machine().bookkeeping().coin_counter_w(0,   data  & 0x01);
+			machine().bookkeeping().coin_lockout_w(0, (~data) & 0x02);
 			if (data & ~0x03)
 				logerror("%06x: warning, unknown bits written, lockout = %02x\n", space.device().safe_pc(), data);
 			break;
@@ -2757,8 +2757,8 @@ WRITE8_MEMBER(ddenlovr_state::hanakanz_coincounter_w)
 	// bit 2 = hopper (if bet on)
 	// bit 3 = 1 if bet off
 
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 
 	if (data & 0xf0)
 		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
@@ -3001,8 +3001,8 @@ WRITE8_MEMBER(ddenlovr_state::mjchuuka_coincounter_w)
 	// bit 3 = lockout
 	// bit 8?
 
-	coin_counter_w(machine(), 0,  data   & 0x01);
-	coin_lockout_w(machine(), 0, (~data) & 0x08);
+	machine().bookkeeping().coin_counter_w(0,  data   & 0x01);
+	machine().bookkeeping().coin_lockout_w(0, (~data) & 0x08);
 
 	if (data & 0x74)
 		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
@@ -3180,8 +3180,8 @@ WRITE8_MEMBER(ddenlovr_state::mjmyster_coincounter_w)
 	switch (m_input_sel)
 	{
 		case 0x0c:
-			coin_counter_w(machine(), 0, (~data) & 0x01);   // coin in
-			coin_counter_w(machine(), 0, (~data) & 0x02);   // coin out actually
+			machine().bookkeeping().coin_counter_w(0, (~data) & 0x01);   // coin in
+			machine().bookkeeping().coin_counter_w(0, (~data) & 0x02);   // coin out actually
 			#ifdef MAME_DEBUG
 //              popmessage("cc: %02x",data);
 			#endif
@@ -3304,8 +3304,8 @@ WRITE8_MEMBER(ddenlovr_state::hginga_coins_w)
 			// bit 2 = hopper (if bet on)
 			// bit 3 = 1 if bet on
 			// bit 7?
-			coin_counter_w(machine(), 0, data & 1);
-			coin_counter_w(machine(), 1, data & 2);
+			machine().bookkeeping().coin_counter_w(0, data & 1);
+			machine().bookkeeping().coin_counter_w(1, data & 2);
 #ifdef MAME_DEBUG
 //          popmessage("COINS %02x", data);
 #endif
@@ -3439,8 +3439,8 @@ WRITE8_MEMBER(ddenlovr_state::hgokou_input_w)
 			// bit 1 = out counter
 			// bit 2 = hopper
 			// bit 7 = ?
-			coin_counter_w(machine(), 0, data & 1);
-			coin_counter_w(machine(), 1, data & 2);
+			machine().bookkeeping().coin_counter_w(0, data & 1);
+			machine().bookkeeping().coin_counter_w(1, data & 2);
 			m_hopper = data & 0x04;
 #ifdef MAME_DEBUG
 //          popmessage("COINS %02x",data);
@@ -3607,7 +3607,7 @@ WRITE8_MEMBER(ddenlovr_state::hparadis_coin_w)
 {
 	switch (m_input_sel)
 	{
-		case 0x0c:  coin_counter_w(machine(), 0, data & 1); break;
+		case 0x0c:  machine().bookkeeping().coin_counter_w(0, data & 1); break;
 		case 0x0d:  break;
 		default:
 			logerror("%04x: coins_w with select = %02x, data = %02x\n",space.device().safe_pc(), m_input_sel, data);
@@ -3836,7 +3836,7 @@ WRITE8_MEMBER(ddenlovr_state::mjflove_blitter_w)
 WRITE8_MEMBER(ddenlovr_state::mjflove_coincounter_w)
 {
 	// bit 0 = in counter
-	coin_counter_w(machine(), 0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 
 	if (data & 0xfe)
 	{
@@ -3923,10 +3923,10 @@ WRITE8_MEMBER(ddenlovr_state::mjgnight_coincounter_w)
 {
 	m_prot_val = data;
 
-	set_led_status(machine(), 0, data & 0x01);  // led? 1 in-game, 0 in service mode / while booting
+	output().set_led_value(0, data & 0x01);  // led? 1 in-game, 0 in service mode / while booting
 
-	coin_counter_w(machine(), 0, data & 0x04);  // coin-out
-	coin_counter_w(machine(), 1, data & 0x08);  // coin-in
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);  // coin-out
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);  // coin-in
 
 	if (data & 0xf2)
 		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
@@ -4008,8 +4008,8 @@ WRITE8_MEMBER(ddenlovr_state::sryudens_coincounter_w)
 	// bit 4 = ? on except during boot or test mode
 	// bit 7 = ? mostly on
 
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 	m_hopper = data & 0x04;
 
 	if (data & 0x68)
@@ -4069,8 +4069,8 @@ WRITE8_MEMBER(ddenlovr_state::janshinp_coincounter_w)
 	// bit 3 = ? on except during boot or test mode
 	// bit 7 = ? mostly on
 
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 
 	if (data & ~0x8b)
 		logerror("%04x: warning, coin counter = %02x\n", space.device().safe_pc(), data);
@@ -4272,7 +4272,7 @@ WRITE8_MEMBER(ddenlovr_state::htengoku_coin_w)
 			// bit 0 = coin counter
 			// bit 1 = out counter
 			// bit 2 = hopper
-			coin_counter_w(machine(), 0, data & 1);
+			machine().bookkeeping().coin_counter_w(0, data & 1);
 			m_hopper = data & 0x04;
 #ifdef MAME_DEBUG
 //          popmessage("COINS %02x",data);

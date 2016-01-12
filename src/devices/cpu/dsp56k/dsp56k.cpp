@@ -342,7 +342,7 @@ void dsp56k_device::device_start()
 
 void dsp56k_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
-	dsp56k_core *cpustate = &m_dsp56k_core;
+	const dsp56k_core *cpustate = &m_dsp56k_core;
 
 	switch (entry.index())
 	{

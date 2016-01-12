@@ -623,7 +623,7 @@ WRITE8_MEMBER( st_state::ikbd_port3_w )
 	*/
 
 	// caps lock led
-	set_led_status(machine(), 1, BIT(data, 0));
+	output().set_led_value(1, BIT(data, 0));
 
 	// keyboard row select
 	m_ikbd_keylatch = (m_ikbd_keylatch & 0xff00) | data;

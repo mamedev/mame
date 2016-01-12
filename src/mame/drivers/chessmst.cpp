@@ -170,25 +170,25 @@ WRITE8_MEMBER( chessmst_state::pio1_port_a_w )
 	for (int row=1; row<=8; row++)
 	{
 		if (m_led_sel & 0x01)
-			output_set_indexed_value("led_a", row, BIT(data, 8-row));
+			output().set_indexed_value("led_a", row, BIT(data, 8-row));
 		if (m_led_sel & 0x02)
-			output_set_indexed_value("led_b", row, BIT(data, 8-row));
+			output().set_indexed_value("led_b", row, BIT(data, 8-row));
 		if (m_led_sel & 0x04)
-			output_set_indexed_value("led_c", row, BIT(data, 8-row));
+			output().set_indexed_value("led_c", row, BIT(data, 8-row));
 		if (m_led_sel & 0x08)
-			output_set_indexed_value("led_d", row, BIT(data, 8-row));
+			output().set_indexed_value("led_d", row, BIT(data, 8-row));
 		if (m_led_sel & 0x10)
-			output_set_indexed_value("led_e", row, BIT(data, 8-row));
+			output().set_indexed_value("led_e", row, BIT(data, 8-row));
 		if (m_led_sel & 0x20)
-			output_set_indexed_value("led_f", row, BIT(data, 8-row));
+			output().set_indexed_value("led_f", row, BIT(data, 8-row));
 		if (m_led_sel & 0x40)
-			output_set_indexed_value("led_g", row, BIT(data, 8-row));
+			output().set_indexed_value("led_g", row, BIT(data, 8-row));
 		if (m_led_sel & 0x80)
-			output_set_indexed_value("led_h", row, BIT(data, 8-row));
+			output().set_indexed_value("led_h", row, BIT(data, 8-row));
 		if (m_led_sel & 0x100)
-			output_set_indexed_value("led_i", row, BIT(data, 8-row));
+			output().set_indexed_value("led_i", row, BIT(data, 8-row));
 		if (m_led_sel & 0x200)
-			output_set_indexed_value("led_j", row, BIT(data, 8-row));
+			output().set_indexed_value("led_j", row, BIT(data, 8-row));
 	}
 
 	m_led_sel = 0;

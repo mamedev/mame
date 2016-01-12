@@ -235,7 +235,7 @@ void mpu3_state::update_triacs()
 
 	for (i = 0; i < 8; i++)
 	{
-		output_set_indexed_value("triac", i, triacdata & (1 << i));
+		output().set_indexed_value("triac", i, triacdata & (1 << i));
 	}
 }
 
@@ -453,7 +453,7 @@ WRITE8_MEMBER(mpu3_state::pia_ic4_porta_w)
 			if(m_led_strobe != m_input_strobe)
 			{
 				swizzle = ((m_ic4_input_a & 0x01) << 2)+(m_ic4_input_a & 0x02)+((m_ic4_input_a & 0x4) >> 2)+(m_ic4_input_a & 0x08)+((m_ic4_input_a & 0x10) << 2)+(m_ic4_input_a & 0x20)+((m_ic4_input_a & 0x40) >> 2);
-				output_set_digit_value(7 - m_input_strobe,swizzle);
+				output().set_digit_value(7 - m_input_strobe,swizzle);
 			}
 			m_led_strobe = m_input_strobe;
 		}
@@ -488,7 +488,7 @@ WRITE8_MEMBER(mpu3_state::pia_ic4_portb_w)
 
 			for (i = 0; i < 8; i++)
 			{
-				output_set_lamp_value((8*m_input_strobe)+i, ((data  & (1 << i)) !=0));
+				output().set_lamp_value((8*m_input_strobe)+i, ((data  & (1 << i)) !=0));
 			}
 			m_lamp_strobe = m_input_strobe;
 		}
@@ -516,10 +516,10 @@ WRITE8_MEMBER(mpu3_state::pia_ic5_porta_w)
 	m_reel1->update((data>>2) & 0x03);
 	m_reel2->update((data>>4) & 0x03);
 	m_reel3->update((data>>6) & 0x03);
-	awp_draw_reel("reel1", m_reel0);
-	awp_draw_reel("reel2", m_reel1);
-	awp_draw_reel("reel3", m_reel2);
-	awp_draw_reel("reel4", m_reel3);
+	awp_draw_reel(machine(),"reel1", m_reel0);
+	awp_draw_reel(machine(),"reel2", m_reel1);
+	awp_draw_reel(machine(),"reel3", m_reel2);
+	awp_draw_reel(machine(),"reel4", m_reel3);
 }
 
 READ8_MEMBER(mpu3_state::pia_ic5_portb_r)

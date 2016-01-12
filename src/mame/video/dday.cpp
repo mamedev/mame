@@ -271,10 +271,10 @@ WRITE8_MEMBER(dday_state::dday_control_w)
 	//if (data & 0xac)  logerror("Control = %02X\n", data & 0xac);
 
 	/* bit 0 is coin counter 1 */
-	coin_counter_w(machine(), 0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 
 	/* bit 1 is coin counter 2 */
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
 	/* bit 4 is sound enable */
 	if (!(data & 0x10) && (m_control & 0x10))

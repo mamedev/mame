@@ -300,8 +300,8 @@ WRITE8_MEMBER(m62_state::m62_flipscreen_w)
 	else
 		machine().tilemap().set_flip_all(0);
 
-	coin_counter_w(machine(), 0, data & 2);
-	coin_counter_w(machine(), 1, data & 4);
+	machine().bookkeeping().coin_counter_w(0, data & 2);
+	machine().bookkeeping().coin_counter_w(1, data & 4);
 
 	/* Sound inhibit ... connected to D6 which is not present on any board */
 	if (m_audio->m_audio_SINH != NULL)

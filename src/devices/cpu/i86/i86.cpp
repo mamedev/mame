@@ -319,7 +319,7 @@ void i8086_common_cpu_device::state_string_export(const device_state_entry &entr
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-			strprintf(str, "%08X", pc());
+			strprintf(str, "%08X", (m_sregs[CS] << 4) + m_ip);
 			break;
 
 		case STATE_GENFLAGS:

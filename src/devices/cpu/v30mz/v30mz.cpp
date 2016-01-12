@@ -190,7 +190,7 @@ void v30mz_cpu_device::state_string_export(const device_state_entry &entry, std:
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-			strprintf(str, "%08X", pc());
+			strprintf(str, "%08X", ( m_sregs[CS] << 4 ) + m_ip);
 			break;
 
 		case STATE_GENFLAGS:
@@ -781,7 +781,7 @@ inline void v30mz_cpu_device::set_OFB_Sub(UINT32 x,UINT32 y,UINT32 z)
 }
 
 
-inline UINT16 v30mz_cpu_device::CompressFlags()
+inline UINT16 v30mz_cpu_device::CompressFlags() const
 {
 	return (CF ? 1 : 0)
 		| (PF ? 4 : 0)

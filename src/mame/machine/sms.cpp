@@ -1162,7 +1162,7 @@ VIDEO_START_MEMBER(sms_state,sms1)
 	save_item(NAME(m_frame_sscope_state));
 
 	// Allow sscope screens to have crosshair, useful for the game missil3d
-	crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_ALL);
+	machine().crosshair().set_screen(0, CROSSHAIR_SCREEN_ALL);
 }
 
 

@@ -510,7 +510,7 @@ void jpmimpct_state::jpm_draw_lamps(int data, int lamp_strobe)
 	for (i=0; i<16; i++)
 	{
 		m_Lamps[16*(m_lamp_strobe+i)] = data & 1;
-		output_set_lamp_value((16*lamp_strobe)+i, (m_Lamps[(16*lamp_strobe)+i]));
+		output().set_lamp_value((16*lamp_strobe)+i, (m_Lamps[(16*lamp_strobe)+i]));
 		data = data >> 1;
 	}
 }
@@ -562,7 +562,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmio_w)
 
 		case 0x0b:
 		{
-			output_set_digit_value(m_lamp_strobe,data);
+			output().set_digit_value(m_lamp_strobe,data);
 			break;
 		}
 		case 0x0f:
@@ -1076,8 +1076,8 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 	{
 		case 0x00:
 		{
-			output_set_value("PWRLED",!(data&0x100));
-			output_set_value("STATLED",!(data&0x200));
+			output().set_value("PWRLED",!(data&0x100));
+			output().set_value("STATLED",!(data&0x200));
 			break;
 		}
 
@@ -1088,18 +1088,18 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 			m_reel1->update((data >> 1)& 0x0F);
 			m_reel2->update((data >> 2)& 0x0F);
 			m_reel3->update((data >> 3)& 0x0F);
-			awp_draw_reel("reel1", m_reel0);
-			awp_draw_reel("reel2", m_reel1);
-			awp_draw_reel("reel3", m_reel2);
-			awp_draw_reel("reel4", m_reel3);
+			awp_draw_reel(machine(),"reel1", m_reel0);
+			awp_draw_reel(machine(),"reel2", m_reel1);
+			awp_draw_reel(machine(),"reel3", m_reel2);
+			awp_draw_reel(machine(),"reel4", m_reel3);
 			break;
 		}
 		case 0x04:
 		{
 			m_reel4->update((data >> 4)& 0x0F);
 			m_reel5->update((data >> 5)& 0x0F);
-			awp_draw_reel("reel5", m_reel4);
-			awp_draw_reel("reel6", m_reel5);
+			awp_draw_reel(machine(),"reel5", m_reel4);
+			awp_draw_reel(machine(),"reel6", m_reel5);
 			break;
 		}
 		case 0x06:
@@ -1156,7 +1156,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 
 		case 0x0b:
 		{
-			output_set_digit_value(m_lamp_strobe,data);
+			output().set_digit_value(m_lamp_strobe,data);
 			break;
 		}
 		case 0x0f:

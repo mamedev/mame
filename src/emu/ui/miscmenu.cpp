@@ -124,9 +124,8 @@ void ui_menu_bios_selection::handle()
 				assert(error.empty());
 			} else {
 				std::string error;
-				std::string value;
-				std::string temp;
-				strprintf(value,"%s,bios=%d",machine().options().main_value(temp,dev->owner()->tag()+1),val-1);
+				std::string value = machine().options().main_value(dev->owner()->tag()+1);
+				strcatprintf(value,",bios=%d",val-1);
 				machine().options().set_value(dev->owner()->tag()+1, value.c_str(), OPTION_PRIORITY_CMDLINE, error);
 				assert(error.empty());
 			}
@@ -231,7 +230,7 @@ ui_menu_bookkeeping::~ui_menu_bookkeeping()
 
 void ui_menu_bookkeeping::populate()
 {
-	int tickets = get_dispensed_tickets(machine());
+	int tickets = machine().bookkeeping().get_dispensed_tickets();
 	std::string tempstring;
 	int ctrnum;
 
@@ -248,7 +247,7 @@ void ui_menu_bookkeeping::populate()
 	/* loop over coin counters */
 	for (ctrnum = 0; ctrnum < COIN_COUNTERS; ctrnum++)
 	{
-		int count = coin_counter_get_count(machine(), ctrnum);
+		int count = machine().bookkeeping().coin_counter_get_count(ctrnum);
 
 		/* display the coin counter number */
 		strcatprintf(tempstring,"Coin %c: ", ctrnum + 'A');
@@ -260,7 +259,7 @@ void ui_menu_bookkeeping::populate()
 			strcatprintf(tempstring, "%d", count);
 
 		/* display whether or not we are locked out */
-		if (coin_lockout_get_state(machine(), ctrnum))
+		if (machine().bookkeeping().coin_lockout_get_state(ctrnum))
 			tempstring.append(" (locked)");
 		tempstring.append("\n");
 	}
@@ -289,7 +288,7 @@ void ui_menu_crosshair::handle()
 		int newval = data->cur;
 
 		/* retreive the user settings */
-		crosshair_get_user_settings(machine(), data->player, &settings);
+		machine().crosshair().get_user_settings(data->player, &settings);
 
 		switch (menu_event->iptkey)
 		{
@@ -361,7 +360,7 @@ void ui_menu_crosshair::handle()
 		if (changed)
 		{
 			/* save the user settings */
-			crosshair_set_user_settings(machine(), data->player, &settings);
+			machine().crosshair().set_user_settings(data->player, &settings);
 
 			/* rebuild the menu */
 			reset(UI_MENU_RESET_REMEMBER_POSITION);
@@ -392,7 +391,7 @@ void ui_menu_crosshair::populate()
 	for (player = 0; player < MAX_PLAYERS; player++)
 	{
 		/* get the user settings */
-		crosshair_get_user_settings(machine(), player, &settings);
+		machine().crosshair().get_user_settings(player, &settings);
 
 		/* add menu items for usable crosshairs */
 		if (settings.used)
@@ -503,7 +502,7 @@ void ui_menu_crosshair::populate()
 	if (use_auto)
 	{
 		/* any player can be used to get the autotime */
-		crosshair_get_user_settings(machine(), 0, &settings);
+		machine().crosshair().get_user_settings(0, &settings);
 
 		/* CROSSHAIR_ITEM_AUTO_TIME - allocate a data item and fill it */
 		data = (crosshair_item_data *)m_pool_alloc(sizeof(*data));

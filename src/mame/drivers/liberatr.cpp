@@ -161,13 +161,13 @@ void liberatr_state::machine_start()
 
 WRITE8_MEMBER( liberatr_state::led_w )
 {
-	set_led_status(machine(), offset, ~data & 0x10);
+	output().set_led_value(offset, ~data & 0x10);
 }
 
 
 WRITE8_MEMBER( liberatr_state::coin_counter_w )
 {
-	::coin_counter_w(machine(), offset ^ 0x01, data & 0x10);
+	machine().bookkeeping().coin_counter_w(offset ^ 0x01, data & 0x10);
 }
 
 

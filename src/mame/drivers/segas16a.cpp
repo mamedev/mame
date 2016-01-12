@@ -181,8 +181,8 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 	// bits 2 & 3: control the lamps, allowing for overrides
 	if (((m_video_control ^ data) & 0x0c) && !m_lamp_changed_w.isnull())
 		m_lamp_changed_w(m_video_control ^ data, data);
-	set_led_status(machine(), 1, data & 0x08);
-	set_led_status(machine(), 0, data & 0x04);
+	output().set_led_value(1, data & 0x08);
+	output().set_led_value(0, data & 0x04);
 
 	m_video_control = data;
 
@@ -198,8 +198,8 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 	m_segaic16vid->set_display_enable(data & 0x10);
 
 	// bits 0 & 1: update coin counters
-	coin_counter_w(machine(), 1, data & 0x02);
-	coin_counter_w(machine(), 0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
 

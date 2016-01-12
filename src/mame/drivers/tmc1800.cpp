@@ -541,7 +541,7 @@ WRITE_LINE_MEMBER( tmc2000_state::q_w )
 	m_cti->aoe_w(state);
 
 	/* set Q led status */
-	set_led_status(machine(), 1, state);
+	output().set_led_value(1, state);
 
 	/* tape output */
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -586,7 +586,7 @@ WRITE_LINE_MEMBER( nano_state::q_w )
 	m_cti->aoe_w(state);
 
 	/* set Q led status */
-	set_led_status(machine(), 1, state);
+	output().set_led_value(1, state);
 
 	/* tape output */
 	m_cassette->output(state ? 1.0 : -1.0);

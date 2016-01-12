@@ -202,7 +202,7 @@ WRITE8_MEMBER(dmv_state::leds_w)
 	*/
 
 	for(int i=0; i<8; i++)
-		output_set_led_value(8-i, BIT(data, i));
+		output().set_led_value(8-i, BIT(data, i));
 }
 
 READ8_MEMBER(dmv_state::ramsel_r)

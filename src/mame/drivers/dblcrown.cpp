@@ -298,8 +298,8 @@ WRITE8_MEMBER( dblcrown_state::output_w )
   x-x- --xx  unknown
 */
 
-	coin_counter_w(machine(), 0, data & 0x10);  /* Coin In counter pulse */
-	coin_counter_w(machine(), 1 ,data & 0x08);  /* Payout counter pulse */
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);  /* Coin In counter pulse */
+	machine().bookkeeping().coin_counter_w(1 ,data & 0x08);  /* Payout counter pulse */
 //  popmessage("out: %02x", data);
 }
 
@@ -322,14 +322,14 @@ WRITE8_MEMBER( dblcrown_state::lamps_w )
   -x-- ----  Hold 2
   x--- ----  Hold 1
 */
-	output_set_lamp_value(0, (data) & 1);       /* Deal */
-	output_set_lamp_value(1, (data >> 1) & 1);  /* Bet */
-	output_set_lamp_value(2, (data >> 2) & 1);  /* Cancel */
-	output_set_lamp_value(3, (data >> 3) & 1);  /* Hold 5 */
-	output_set_lamp_value(4, (data >> 4) & 1);  /* Hold 4 */
-	output_set_lamp_value(5, (data >> 5) & 1);  /* Hold 3 */
-	output_set_lamp_value(6, (data >> 6) & 1);  /* Hold 2 */
-	output_set_lamp_value(7, (data >> 7) & 1);  /* Hold 1 */
+	output().set_lamp_value(0, (data) & 1);       /* Deal */
+	output().set_lamp_value(1, (data >> 1) & 1);  /* Bet */
+	output().set_lamp_value(2, (data >> 2) & 1);  /* Cancel */
+	output().set_lamp_value(3, (data >> 3) & 1);  /* Hold 5 */
+	output().set_lamp_value(4, (data >> 4) & 1);  /* Hold 4 */
+	output().set_lamp_value(5, (data >> 5) & 1);  /* Hold 3 */
+	output().set_lamp_value(6, (data >> 6) & 1);  /* Hold 2 */
+	output().set_lamp_value(7, (data >> 7) & 1);  /* Hold 1 */
 
 	m_lamps_data = data;
 }

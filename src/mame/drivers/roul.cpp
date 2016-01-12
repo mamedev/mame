@@ -188,8 +188,8 @@ WRITE8_MEMBER(roul_state::ball_w)
 {
 	int lamp = data;
 
-	output_set_lamp_value(data, 1);
-	output_set_lamp_value(m_lamp_old, 0);
+	output().set_lamp_value(data, 1);
+	output().set_lamp_value(m_lamp_old, 0);
 	m_lamp_old = lamp;
 }
 

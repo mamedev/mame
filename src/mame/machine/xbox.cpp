@@ -7,7 +7,6 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/idectrl.h"
-#include "machine/idehd.h"
 #include "video/poly.h"
 #include "bitmap.h"
 #include "debug/debugcon.h"
@@ -17,6 +16,7 @@
 #include "includes/xbox.h"
 
 #define LOG_PCI
+//#define LOG_AUDIO
 //#define LOG_OHCI
 //#define USB_ENABLED
 
@@ -827,14 +827,17 @@ static USBStandardDeviceDscriptor devdesc = {18,1,0x201,0xff,0x34,0x56,64,0x100,
 ohci_function_device::ohci_function_device()
 {
 	address = 0;
-	controldir = 0;
+	newaddress = 0;
+	controldirection = 0;
 	remain = 0;
 	position = nullptr;
+	settingaddress = false;
 }
 
 void ohci_function_device::execute_reset()
 {
 	address = 0;
+	newaddress = 0;
 }
 
 int ohci_function_device::execute_transfer(int address, int endpoint, int pid, UINT8 *buffer, int size)
@@ -842,35 +845,69 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 	if (endpoint == 0) {
 		if (pid == SetupPid) {
 			struct USBSetupPacket *p=(struct USBSetupPacket *)buffer;
-			// define direction
-			controldir = p->bmRequestType & 128;
-			// case !=0, in data stage and out status stage
-			// case ==0, out data stage and in status stage
+			// define direction 0:host->device 1:device->host
+			controldirection = (p->bmRequestType & 128) >> 7;
+			// case ==1, IN data stage and OUT status stage
+			// case ==0, OUT data stage and IN status stage
+			// data stage is optional, IN status stage
+			controltype = (p->bmRequestType & 0x60) >> 5;
+			controlrecipient = p->bmRequestType & 0x1f;
 			position = nullptr;
 			remain = p->wLength;
-			if ((p->bmRequestType & 0x60) == 0) {
+			// if standard
+			if (controltype == 0) {
 				switch (p->bRequest) {
+				case GET_STATUS:
+				case CLEAR_FEATURE:
+				case SET_FEATURE:
+					break;
+				case SET_ADDRESS:
+					newaddress = p->wValue;
+					settingaddress = true;
+					break;
 				case GET_DESCRIPTOR:
-					if ((p->wValue >> 8) == 1) { // device descriptor
+					if ((p->wValue >> 8) == DEVICE) { // device descriptor
 						//p->wValue & 255;
 						position = (UINT8 *)&devdesc;
 						remain = sizeof(devdesc);
 					}
+					else if ((p->wValue >> 8) == CONFIGURATION) { // configuration descriptor
+						remain = 0;
+					}
+					if (remain > p->wLength)
+						remain = p->wLength;
 					break;
-				case SET_ADDRESS:
-					//p->wValue;
-					break;
+				case SET_DESCRIPTOR:
+				case GET_CONFIGURATION:
+				case SET_CONFIGURATION:
+				case GET_INTERFACE:
+				case SET_INTERFACE:
+				case SYNCH_FRAME:
 				default:
 					break;
 				}
 			}
 		}
 		else if (pid == InPid) {
-			// case !=0, give data
+			// if no data has been transferred (except for the setup stage)
+			// and the lenght of this IN transaction is 0
+			// assume this is the status stage
+			if (size == 0) {
+				if (settingaddress == true)
+				{
+					// set of address is active at end of status stage
+					address = newaddress;
+					settingaddress = false;
+				}
+				return 0;
+			}
+			// case ==1, give data
 			// case ==0, nothing
-			if (size > remain)
-				size = remain;
-			if (controldir != 0) {
+			// if device->host
+			if (controldirection == 1) {
+				// data stage
+				if (size > remain)
+					size = remain;
 				if (position != nullptr)
 					memcpy(buffer, position, size);
 				position = position + size;
@@ -878,11 +915,13 @@ int ohci_function_device::execute_transfer(int address, int endpoint, int pid, U
 			}
 		}
 		else if (pid == OutPid) {
-			// case !=0, nothing
+			// case ==1, nothing
 			// case ==0, give data
-			if (size > remain)
-				size = remain;
-			if (controldir == 0) {
+			// if host->device
+			if (controldirection == 0) {
+				// data stage
+				if (size > remain)
+					size = remain;
 				if (position != nullptr)
 					memcpy(position, buffer, size);
 				position = position + size;
@@ -966,11 +1005,14 @@ void xbox_base_state::usb_ohci_read_isochronous_transfer_descriptor(UINT32 addre
 	UINT32 w;
 
 	w = ohcist.space->read_dword(address);
+	ohcist.isochronous_transfer_descriptor.word0 = w;
 	ohcist.isochronous_transfer_descriptor.cc = (w >> 28) & 15;
 	ohcist.isochronous_transfer_descriptor.fc = (w >> 24) & 7;
 	ohcist.isochronous_transfer_descriptor.di = (w >> 21) & 7;
 	ohcist.isochronous_transfer_descriptor.sf = w & 0xffff;
-	ohcist.isochronous_transfer_descriptor.bp0 = ohcist.space->read_dword(address + 4) & 0xfffff000;
+	w = ohcist.space->read_dword(address + 4);
+	ohcist.isochronous_transfer_descriptor.word1 = w;
+	ohcist.isochronous_transfer_descriptor.bp0 = w & 0xfffff000;
 	ohcist.isochronous_transfer_descriptor.nexttd = ohcist.space->read_dword(address + 8);
 	ohcist.isochronous_transfer_descriptor.be = ohcist.space->read_dword(address + 12);
 	w = ohcist.space->read_dword(address + 16);
@@ -987,13 +1029,37 @@ void xbox_base_state::usb_ohci_read_isochronous_transfer_descriptor(UINT32 addre
 	ohcist.isochronous_transfer_descriptor.offset[7] = (w >> 16) & 0xffff;
 }
 
+void xbox_base_state::usb_ohci_writeback_isochronous_transfer_descriptor(UINT32 address)
+{
+	UINT32 w;
+
+	w = ohcist.isochronous_transfer_descriptor.word0 & 0x1f0000;
+	w = w | (ohcist.isochronous_transfer_descriptor.cc << 28) | (ohcist.isochronous_transfer_descriptor.fc << 24) | (ohcist.isochronous_transfer_descriptor.di << 21) | ohcist.isochronous_transfer_descriptor.sf;
+	ohcist.space->write_dword(address, w);
+	w = ohcist.isochronous_transfer_descriptor.word1 & 0xfff;
+	w = w | ohcist.isochronous_transfer_descriptor.bp0;
+	ohcist.space->write_dword(address + 4, w);
+	ohcist.space->write_dword(address + 8, ohcist.isochronous_transfer_descriptor.nexttd);
+	ohcist.space->write_dword(address + 12, ohcist.isochronous_transfer_descriptor.be);
+	w = (ohcist.isochronous_transfer_descriptor.offset[1] << 16) | ohcist.isochronous_transfer_descriptor.offset[0];
+	ohcist.space->write_dword(address + 16, w);
+	w = (ohcist.isochronous_transfer_descriptor.offset[3] << 16) | ohcist.isochronous_transfer_descriptor.offset[2];
+	ohcist.space->write_dword(address + 20, w);
+	w = (ohcist.isochronous_transfer_descriptor.offset[5] << 16) | ohcist.isochronous_transfer_descriptor.offset[4];
+	ohcist.space->write_dword(address + 24, w);
+	w = (ohcist.isochronous_transfer_descriptor.offset[7] << 16) | ohcist.isochronous_transfer_descriptor.offset[6];
+	ohcist.space->write_dword(address + 28, w);
+}
+
 /*
  * Audio
  */
 
 READ32_MEMBER(xbox_base_state::audio_apu_r)
 {
+#ifdef LOG_AUDIO
 	logerror("Audio_APU: read from %08X mask %08X\n", 0xfe800000 + offset * 4, mem_mask);
+#endif
 	if (offset == 0x20010 / 4) // some kind of internal counter or state value
 		return 0x20 + 4 + 8 + 0x48 + 0x80;
 	return apust.memory[offset];
@@ -1004,7 +1070,9 @@ WRITE32_MEMBER(xbox_base_state::audio_apu_w)
 	//UINT32 old;
 	UINT32 v;
 
+#ifdef LOG_AUDIO
 	logerror("Audio_APU: write at %08X mask %08X value %08X\n", 0xfe800000 + offset * 4, mem_mask, data);
+#endif
 	//old = apust.memory[offset];
 	apust.memory[offset] = data;
 	if (offset == 0x02040 / 4) // address of memory area with scatter-gather info (gpdsp scratch dma)
@@ -1110,7 +1178,9 @@ READ32_MEMBER(xbox_base_state::audio_ac93_r)
 {
 	UINT32 ret = 0;
 
+#ifdef LOG_AUDIO
 	logerror("Audio_AC3: read from %08X mask %08X\n", 0xfec00000 + offset * 4, mem_mask);
+#endif
 	if (offset < 0x80 / 4)
 	{
 		ret = ac97st.mixer_regs[offset];
@@ -1137,7 +1207,9 @@ READ32_MEMBER(xbox_base_state::audio_ac93_r)
 
 WRITE32_MEMBER(xbox_base_state::audio_ac93_w)
 {
+#ifdef LOG_AUDIO
 	logerror("Audio_AC3: write at %08X mask %08X value %08X\n", 0xfec00000 + offset * 4, mem_mask, data);
+#endif
 	if (offset < 0x80 / 4)
 	{
 		COMBINE_DATA(ac97st.mixer_regs + offset);
@@ -1421,6 +1493,76 @@ WRITE32_MEMBER(xbox_base_state::smbus_w)
 		smbusst.command = data;
 }
 
+/*
+ * SuperIO
+ */
+READ8_MEMBER(xbox_base_state::superio_read)
+{
+	if (superiost.configuration_mode == false)
+		return 0;
+	if (offset == 0) // index port 0x2e
+		return superiost.index;
+	if (offset == 1)
+	{
+		// data port 0x2f
+		if (superiost.index < 0x30)
+			return superiost.registers[0][superiost.index];
+		return superiost.registers[superiost.selected][superiost.index];
+	}
+	return 0;
+}
+
+WRITE8_MEMBER(xbox_base_state::superio_write)
+{
+	if (superiost.configuration_mode == false)
+	{
+		// config port 0x2e
+		if ((offset == 0) && (data == 0x55))
+			superiost.configuration_mode = true;
+		return;
+	}
+	if ((offset == 0) && (data == 0xaa)) 
+	{
+		// config port 0x2e
+		superiost.configuration_mode = false;
+		return;
+	}
+	if (offset == 0)
+	{
+		// index port 0x2e
+		superiost.index = data;
+	}
+	if (offset == 1)
+	{
+		// data port 0x2f
+		if (superiost.index < 0x30)
+		{
+			superiost.registers[0][superiost.index] = data;
+			superiost.selected = superiost.registers[0][7];
+		} else
+		{
+			superiost.registers[superiost.selected][superiost.index] = data;
+			//if ((superiost.selected == 4) && (superiost.index == 0x30) && (data != 0))
+			//	; // add handlers 0x3f8- +7
+		}
+	}
+}
+
+READ8_MEMBER(xbox_base_state::superiors232_read)
+{
+	if (offset == 5)
+		return 0x20;
+	return 0;
+}
+
+WRITE8_MEMBER(xbox_base_state::superiors232_write)
+{
+	if (offset == 0)
+	{
+		printf("%c", data);
+	}
+}
+
 ADDRESS_MAP_START(xbox_base_map, AS_PROGRAM, 32, xbox_base_state)
 	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM AM_SHARE("nv2a_share") // 128 megabytes
 	AM_RANGE(0xf0000000, 0xf7ffffff) AM_RAM AM_SHARE("nv2a_share") // 3d accelerator wants this
@@ -1433,9 +1575,11 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START(xbox_base_map_io, AS_IO, 32, xbox_base_state)
 	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
+	AM_RANGE(0x002c, 0x002f) AM_READWRITE8(superio_read, superio_write, 0xffff0000)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00a3) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, read_cs0, write_cs0)
+	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE8(superiors232_read, superiors232_write, 0xffffffff)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(dummy_r, dummy_w)
 	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(smbus_r, smbus_w)
@@ -1472,11 +1616,11 @@ void xbox_base_state::machine_start()
 	pic16lc_buffer[0x1d] = 0x0d;
 	pic16lc_buffer[0x1e] = 0x0e;
 	pic16lc_buffer[0x1f] = 0x0f;
-#ifdef USB_ENABLED
 	ohcist.hc_regs[HcRevision] = 0x10;
 	ohcist.hc_regs[HcFmInterval] = 0x2edf;
 	ohcist.hc_regs[HcLSThreshold] = 0x628;
 	ohcist.hc_regs[HcRhDescriptorA] = 4;
+#ifdef USB_ENABLED
 	ohcist.interruptbulkratio = 1;
 	ohcist.writebackdonehadcounter = 7;
 	ohcist.space = &m_maincpu->space();
@@ -1484,6 +1628,9 @@ void xbox_base_state::machine_start()
 	ohcist.timer->enable(false);
 	usb_ohci_plug(1, new ohci_function_device()); // test connect
 #endif
+	memset(&superiost, 0, sizeof(superiost));
+	superiost.configuration_mode = false;
+	superiost.registers[0][0x26] = 0x2e; // Configuration port address byte 0
 	// savestates
 	save_item(NAME(debug_irq_active));
 	save_item(NAME(debug_irq_number));

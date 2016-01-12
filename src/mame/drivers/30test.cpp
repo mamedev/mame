@@ -80,21 +80,21 @@ static const UINT8 led_map[16] =
 
 WRITE8_MEMBER(namco_30test_state::namco_30test_led_w)
 {
-	output_set_digit_value(0 + offset * 2, led_map[(data & 0xf0) >> 4]);
-	output_set_digit_value(1 + offset * 2, led_map[(data & 0x0f) >> 0]);
+	output().set_digit_value(0 + offset * 2, led_map[(data & 0xf0) >> 4]);
+	output().set_digit_value(1 + offset * 2, led_map[(data & 0x0f) >> 0]);
 }
 
 WRITE8_MEMBER(namco_30test_state::namco_30test_led_rank_w)
 {
-	output_set_digit_value(64 + offset * 2, led_map[(data & 0xf0) >> 4]);
-	output_set_digit_value(65 + offset * 2, led_map[(data & 0x0f) >> 0]);
+	output().set_digit_value(64 + offset * 2, led_map[(data & 0xf0) >> 4]);
+	output().set_digit_value(65 + offset * 2, led_map[(data & 0x0f) >> 0]);
 }
 
 WRITE8_MEMBER(namco_30test_state::namco_30test_lamps_w)
 {
 	// d0-d5: ranking, d6: game over, d7: assume marquee lamp
 	for (int i = 0; i < 8; i++)
-		output_set_lamp_value(i, data >> i & 1);
+		output().set_lamp_value(i, data >> i & 1);
 }
 
 READ8_MEMBER(namco_30test_state::namco_30test_mux_r)

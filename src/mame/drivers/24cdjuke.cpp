@@ -118,7 +118,7 @@ WRITE8_MEMBER(midcoin24cdjuke_state::digit_w)
 
 	char_data = BITSWAP16(char_data, 13,11,9,15,14,10,12,8,7,6,5,4,3,2,1,0);
 
-	output_set_digit_value(offset, char_data ^ 0xffff);
+	output().set_digit_value(offset, char_data ^ 0xffff);
 }
 
 

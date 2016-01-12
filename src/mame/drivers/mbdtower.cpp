@@ -107,7 +107,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mbdtower_state::motor_sim_tick)
 
 	// on change, output info
 	if (m_motor_pos != m_motor_pos_prev)
-		output_set_value("motor_pos", 100 * (m_motor_pos / (float)0x80));
+		output().set_value("motor_pos", 100 * (m_motor_pos / (float)0x80));
 
 	/* 3 display cards per hole, like this:
 
@@ -119,7 +119,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mbdtower_state::motor_sim_tick)
 	*/
 	int card_pos = m_motor_pos >> 4 & 7;
 	if (card_pos != (m_motor_pos_prev >> 4 & 7))
-		output_set_value("card_pos", card_pos);
+		output().set_value("card_pos", card_pos);
 
 	m_motor_pos_prev = m_motor_pos;
 }
@@ -139,7 +139,7 @@ WRITE16_MEMBER(mbdtower_state::write_r)
 
 	// R9: motor on
 	if ((m_r ^ data) & 0x200)
-		output_set_value("motor_on", data >> 9 & 1);
+		output().set_value("motor_on", data >> 9 & 1);
 	if (data & 0x200)
 		m_motor_on = true;
 

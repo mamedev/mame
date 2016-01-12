@@ -617,9 +617,9 @@ WRITE8_MEMBER( tek4051_state::kb_pia_pb_w )
 	*/
 
 	// lamps
-	output_set_led_value(1, !BIT(data, 5));
-	output_set_led_value(2, !BIT(data, 6));
-	output_set_led_value(3, !BIT(data, 7));
+	output().set_led_value(1, !BIT(data, 5));
+	output().set_led_value(2, !BIT(data, 6));
+	output().set_led_value(3, !BIT(data, 7));
 
 	// end or identify
 	m_gpib->eoi_w(!BIT(data, 4));

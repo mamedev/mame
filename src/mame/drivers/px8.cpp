@@ -322,9 +322,9 @@ WRITE8_MEMBER( px8_state::gah40m_w )
 
 		*/
 
-		output_set_value("led_0", BIT(data, 0));
-		output_set_value("led_1", BIT(data, 1));
-		output_set_value("led_2", BIT(data, 2));
+		output().set_value("led_0", BIT(data, 0));
+		output().set_value("led_1", BIT(data, 1));
+		output().set_value("led_2", BIT(data, 2));
 		break;
 
 	case GAH40M_IER:

@@ -295,8 +295,7 @@ void validity_checker::validate_one(const game_driver &driver)
 	// if we had warnings or errors, output
 	if (m_errors > start_errors || m_warnings > start_warnings || !m_verbose_text.empty())
 	{
-		std::string tempstr;
-		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): %d errors, %d warnings\n", driver.name, core_filename_extract_base(tempstr, driver.source_file).c_str(), m_errors - start_errors, m_warnings - start_warnings);
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): %d errors, %d warnings\n", driver.name, core_filename_extract_base(driver.source_file).c_str(), m_errors - start_errors, m_warnings - start_warnings);
 		if (m_errors > start_errors)
 			output_indented_errors(m_error_text, "Errors");
 		if (m_warnings > start_warnings)
@@ -524,18 +523,17 @@ void validity_checker::validate_inlines()
 void validity_checker::validate_driver()
 {
 	// check for duplicate names
-	std::string tempstr;
 	if (!m_names_map.insert(std::make_pair(m_current_driver->name, m_current_driver)).second)
 	{
 		const game_driver *match = m_names_map.find(m_current_driver->name)->second;
-		osd_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(tempstr, match->source_file).c_str(), match->name);
+		osd_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(match->source_file).c_str(), match->name);
 	}
 
 	// check for duplicate descriptions
 	if (!m_descriptions_map.insert(std::make_pair(m_current_driver->description, m_current_driver)).second)
 	{
 		const game_driver *match = m_descriptions_map.find(m_current_driver->description)->second;
-		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(tempstr, match->source_file).c_str(), match->name);
+		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(match->source_file).c_str(), match->name);
 	}
 
 	// determine if we are a clone

@@ -17,7 +17,6 @@
 #include "corealloc.h"
 
 #include <vector>
-#include <memory>
 
 #if defined(_MSC_VER) && (_MSC_VER < 1900)
 #include <yvals.h>
@@ -32,34 +31,6 @@
 
 
 typedef std::vector<UINT8> dynamic_buffer;
-
-template<typename T>
-inline std::unique_ptr<T> make_unique_clear(std::size_t size)
-{
-	auto ptr = std::make_unique<T>(size);
-	static_assert(std::is_array<T>::value, "Type must be array");
-	memset(ptr.get(), 0, sizeof(std::remove_extent<T>) * size);
-	return ptr;
-}
-
-template<typename T,unsigned char F>
-inline std::unique_ptr<T> make_unique_clear(std::size_t size)
-{
-	auto ptr = std::make_unique<T>(size);
-	static_assert(std::is_array<T>::value, "Type must be array");
-	memset(ptr.get(), F, sizeof(std::remove_extent<T>) * size);
-	return ptr;
-}
-
-
-template<typename T>
-inline std::unique_ptr<T> make_unique_clear()
-{
-	auto ptr = std::make_unique<T>();
-	static_assert(std::is_pod<T>::value, "Type must be plain old data type");
-	memset(ptr.get(), 0, sizeof(T));
-	return ptr;
-}
 
 
 // ======================> simple_list

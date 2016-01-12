@@ -311,7 +311,7 @@ WRITE32_MEMBER(midzeus_state::crusnexo_leds_w)
 
 		case 1: /* controls lamps */
 			for (bit = 0; bit < 8; bit++)
-				output_set_lamp_value(bit, (data >> bit) & 1);
+				output().set_lamp_value(bit, (data >> bit) & 1);
 			break;
 
 		case 2: /* sets state of selected LEDs */
@@ -319,13 +319,13 @@ WRITE32_MEMBER(midzeus_state::crusnexo_leds_w)
 			/* selection bits 4-6 select the 3 7-segment LEDs */
 			for (bit = 4; bit < 7; bit++)
 				if ((crusnexo_leds_select & (1 << bit)) == 0)
-					output_set_digit_value(bit, ~data & 0xff);
+					output().set_digit_value(bit, ~data & 0xff);
 
 			/* selection bits 0-2 select the tachometer LEDs */
 			for (bit = 0; bit < 3; bit++)
 				if ((crusnexo_leds_select & (1 << bit)) == 0)
 					for (led = 0; led < 8; led++)
-						output_set_led_value(bit * 8 + led, (~data >> led) & 1);
+						output().set_led_value(bit * 8 + led, (~data >> led) & 1);
 			break;
 
 		case 3: /* selects which set of LEDs we are addressing */

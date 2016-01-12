@@ -286,12 +286,12 @@ WRITE16_MEMBER(highvdeo_state::write1_w)
     ---x ----  Hold5 lamp.
     --x- ----  Start lamp.
 */
-	output_set_lamp_value(1, (data & 1));           /* Lamp 1 - HOLD 1 */
-	output_set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - HOLD 2 */
-	output_set_lamp_value(3, (data >> 2) & 1);      /* Lamp 3 - HOLD 3 */
-	output_set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
-	output_set_lamp_value(5, (data >> 4) & 1);      /* Lamp 5 - HOLD 5 */
-	output_set_lamp_value(6, (data >> 5) & 1);      /* Lamp 6 - START  */
+	output().set_lamp_value(1, (data & 1));           /* Lamp 1 - HOLD 1 */
+	output().set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - HOLD 2 */
+	output().set_lamp_value(3, (data >> 2) & 1);      /* Lamp 3 - HOLD 3 */
+	output().set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
+	output().set_lamp_value(5, (data >> 4) & 1);      /* Lamp 5 - HOLD 5 */
+	output().set_lamp_value(6, (data >> 5) & 1);      /* Lamp 6 - START  */
 
 //  popmessage("%04x %04x",t1,t3);
 }
@@ -403,8 +403,8 @@ WRITE16_MEMBER(highvdeo_state::nyj_write2_w)
     xxx- ----  Unknown.
 */
 //  popmessage("%04x",data);
-	coin_counter_w(machine(), 0, ~data & 0x0f); // Coins (all)
-	coin_counter_w(machine(), 1, ~data & 0x10); // Notes (all)
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x0f); // Coins (all)
+	machine().bookkeeping().coin_counter_w(1, ~data & 0x10); // Notes (all)
 }
 
 WRITE16_MEMBER(highvdeo_state::tv_tcf_bankselect_w)
@@ -470,8 +470,8 @@ WRITE16_MEMBER(highvdeo_state::write2_w)
 
 	for(i=0;i<4;i++)
 	{
-		coin_counter_w(machine(), i,data & 0x20);
-		coin_lockout_w(machine(), i,~data & 0x08);
+		machine().bookkeeping().coin_counter_w(i,data & 0x20);
+		machine().bookkeeping().coin_lockout_w(i,~data & 0x08);
 	}
 }
 
@@ -1559,8 +1559,8 @@ WRITE16_MEMBER(highvdeo_state::fashion_output_w)
 
 	for(i=0;i<4;i++)
 	{
-		coin_counter_w(machine(), i,data & 0x20);
-		coin_lockout_w(machine(), i,~data & 0x01);
+		machine().bookkeeping().coin_counter_w(i,data & 0x20);
+		machine().bookkeeping().coin_lockout_w(i,~data & 0x01);
 	}
 }
 

@@ -257,18 +257,18 @@ WRITE16_MEMBER(galaxi_state::galaxi_500004_w)
 	    -x-- ----  Payout.
 
 	*/
-		output_set_lamp_value(1, (data & 1));           /* Lamp 1 - HOLD 1 */
-		output_set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - HOLD 2 */
-		output_set_lamp_value(3, (data >> 2) & 1);      /* Lamp 3 - HOLD 3 */
-		output_set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
-		output_set_lamp_value(5, (data >> 4) & 1);      /* Lamp 5 - HOLD 5 */
-		output_set_lamp_value(6, (data >> 5) & 1);      /* Lamp 6 - START  */
+		output().set_lamp_value(1, (data & 1));           /* Lamp 1 - HOLD 1 */
+		output().set_lamp_value(2, (data >> 1) & 1);      /* Lamp 2 - HOLD 2 */
+		output().set_lamp_value(3, (data >> 2) & 1);      /* Lamp 3 - HOLD 3 */
+		output().set_lamp_value(4, (data >> 3) & 1);      /* Lamp 4 - HOLD 4 */
+		output().set_lamp_value(5, (data >> 4) & 1);      /* Lamp 5 - HOLD 5 */
+		output().set_lamp_value(6, (data >> 5) & 1);      /* Lamp 6 - START  */
 	}
 	if (ACCESSING_BITS_8_15)
 	{
 		m_ticket = data & 0x0100;
 		m_hopper = data & 0x1000;
-		coin_counter_w(machine(), 0, data & 0x2000);    // coins
+		machine().bookkeeping().coin_counter_w(0, data & 0x2000);    // coins
 	}
 
 	COMBINE_DATA(&m_out[2]);

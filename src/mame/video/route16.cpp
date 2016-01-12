@@ -28,7 +28,7 @@ WRITE8_MEMBER(route16_state::out0_w)
 {
 	m_palette_1 = data & 0x1f;
 
-	coin_counter_w(machine(), 0, (data >> 5) & 0x01);
+	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 0x01);
 }
 
 

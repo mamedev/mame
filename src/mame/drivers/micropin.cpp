@@ -189,8 +189,8 @@ WRITE8_MEMBER( micropin_state::p50a_w )
 	if (m_counter == 1)
 	{
 		static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7448
-		output_set_digit_value(m_row, patterns[data&15]);
-		output_set_digit_value(m_row+20, patterns[data>>4]);
+		output().set_digit_value(m_row, patterns[data&15]);
+		output().set_digit_value(m_row+20, patterns[data>>4]);
 	}
 }
 
@@ -200,8 +200,8 @@ WRITE8_MEMBER( micropin_state::p50b_w )
 	if (m_counter == 2)
 	{
 		static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7448
-		output_set_digit_value(m_row+40, patterns[data&15]);
-		output_set_digit_value(m_row+60, patterns[data>>4]);
+		output().set_digit_value(m_row+40, patterns[data&15]);
+		output().set_digit_value(m_row+60, patterns[data>>4]);
 	}
 }
 
@@ -213,7 +213,7 @@ WRITE_LINE_MEMBER( micropin_state::p50ca2_w )
 		char wordnum[8];
 		sprintf(wordnum,"led%d", m_row);
 		m_led_time[m_row] = 48; // 12 gives blinking leds; they blink in pinmame but is it correct?
-		output_set_value(wordnum, 0); // turn on
+		output().set_value(wordnum, 0); // turn on
 	}
 }
 
@@ -259,7 +259,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( micropin_state::timer_a )
 			if (m_led_time[i] == 0)
 			{
 				sprintf(wordnum,"led%d", i);
-				output_set_value(wordnum, 1); // turn off
+				output().set_value(wordnum, 1); // turn off
 			}
 		}
 	}

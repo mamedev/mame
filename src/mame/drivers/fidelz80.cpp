@@ -612,23 +612,23 @@ void fidelz80_state::update_display()
 
 	if (m_led_selected&0x04)
 	{
-		output_set_digit_value(0, out_digit);
+		output().set_digit_value(0, out_digit);
 
-		output_set_led_value(1, m_led_data);
+		output().set_led_value(1, m_led_data);
 	}
 	if (m_led_selected&0x08)
 	{
-		output_set_digit_value(1, out_digit);
+		output().set_digit_value(1, out_digit);
 
-		output_set_led_value(0, m_led_data);
+		output().set_led_value(0, m_led_data);
 	}
 	if (m_led_selected&0x10)
 	{
-		output_set_digit_value(2, out_digit);
+		output().set_digit_value(2, out_digit);
 	}
 	if (m_led_selected&0x20)
 	{
-		output_set_digit_value(3, out_digit);
+		output().set_digit_value(3, out_digit);
 	}
 }
 
@@ -710,22 +710,22 @@ WRITE8_MEMBER(fidelz80_state::vsc_porta_w)
 
 	if (m_kp_matrix & 0x01)
 	{
-		output_set_digit_value(0, out_digit & 0x7f);
-		output_set_value("pm_led", BIT(out_digit, 7));
+		output().set_digit_value(0, out_digit & 0x7f);
+		output().set_value("pm_led", BIT(out_digit, 7));
 	}
 	if (m_kp_matrix & 0x02)
 	{
-		output_set_digit_value(1, out_digit & 0x7f);
+		output().set_digit_value(1, out_digit & 0x7f);
 	}
 	if (m_kp_matrix & 0x04)
 	{
-		output_set_digit_value(2, out_digit & 0x7f);
-		output_set_value("up_dot", BIT(out_digit, 7));
+		output().set_digit_value(2, out_digit & 0x7f);
+		output().set_value("up_dot", BIT(out_digit, 7));
 	}
 	if (m_kp_matrix & 0x08)
 	{
-		output_set_digit_value(3, out_digit & 0x7f);
-		output_set_value("low_dot", BIT(out_digit, 7));
+		output().set_digit_value(3, out_digit & 0x7f);
+		output().set_value("low_dot", BIT(out_digit, 7));
 	}
 
 	m_speech->reg_w(data & 0x3f);
@@ -736,21 +736,21 @@ WRITE8_MEMBER(fidelz80_state::vsc_portb_w)
 	for (int row = 1; row <= 8; row++)
 	{
 		if (m_kp_matrix & 0x01)
-			output_set_indexed_value("led_a", row, BIT(data, 8-row));
+			output().set_indexed_value("led_a", row, BIT(data, 8-row));
 		if (m_kp_matrix & 0x02)
-			output_set_indexed_value("led_b", row, BIT(data, 8-row));
+			output().set_indexed_value("led_b", row, BIT(data, 8-row));
 		if (m_kp_matrix & 0x04)
-			output_set_indexed_value("led_c", row, BIT(data, 8-row));
+			output().set_indexed_value("led_c", row, BIT(data, 8-row));
 		if (m_kp_matrix & 0x08)
-			output_set_indexed_value("led_d", row, BIT(data, 8-row));
+			output().set_indexed_value("led_d", row, BIT(data, 8-row));
 		if (m_kp_matrix & 0x10)
-			output_set_indexed_value("led_e", row, BIT(data, 8-row));
+			output().set_indexed_value("led_e", row, BIT(data, 8-row));
 		if (m_kp_matrix & 0x20)
-			output_set_indexed_value("led_f", row, BIT(data, 8-row));
+			output().set_indexed_value("led_f", row, BIT(data, 8-row));
 		if (m_kp_matrix & 0x40)
-			output_set_indexed_value("led_g", row, BIT(data, 8-row));
+			output().set_indexed_value("led_g", row, BIT(data, 8-row));
 		if (m_kp_matrix & 0x80)
-			output_set_indexed_value("led_h", row, BIT(data, 8-row));
+			output().set_indexed_value("led_h", row, BIT(data, 8-row));
 	}
 }
 
@@ -822,43 +822,43 @@ WRITE8_MEMBER(fidelz80_state::kp_matrix_w)
 	// output the digit before update the matrix
 	if (m_kp_matrix & 0x01)
 	{
-		output_set_digit_value(1, out_digit);
-		output_set_led_value(8, out_led);
+		output().set_digit_value(1, out_digit);
+		output().set_led_value(8, out_led);
 	}
 	if (m_kp_matrix & 0x02)
 	{
-		output_set_digit_value(2, out_digit);
-		output_set_led_value(7, out_led);
+		output().set_digit_value(2, out_digit);
+		output().set_led_value(7, out_led);
 	}
 	if (m_kp_matrix & 0x04)
 	{
-		output_set_digit_value(3, out_digit);
-		output_set_led_value(6, out_led);
+		output().set_digit_value(3, out_digit);
+		output().set_led_value(6, out_led);
 	}
 	if (m_kp_matrix & 0x08)
 	{
-		output_set_digit_value(4, out_digit);
-		output_set_led_value(5, out_led);
+		output().set_digit_value(4, out_digit);
+		output().set_led_value(5, out_led);
 	}
 	if (m_kp_matrix & 0x10)
 	{
-		output_set_digit_value(5, out_digit);
-		output_set_led_value(4, out_led);
+		output().set_digit_value(5, out_digit);
+		output().set_led_value(4, out_led);
 	}
 	if (m_kp_matrix & 0x20)
 	{
-		output_set_digit_value(6, out_digit);
-		output_set_led_value(3, out_led);
+		output().set_digit_value(6, out_digit);
+		output().set_led_value(3, out_led);
 	}
 	if (m_kp_matrix & 0x40)
 	{
-		output_set_digit_value(7, out_digit);
-		output_set_led_value(2, out_led);
+		output().set_digit_value(7, out_digit);
+		output().set_led_value(2, out_led);
 	}
 	if (m_kp_matrix & 0x80)
 	{
-		output_set_digit_value(8, out_digit);
-		output_set_led_value(1, out_led);
+		output().set_digit_value(8, out_digit);
+		output().set_led_value(1, out_led);
 	}
 
 	memset(m_digit_line_status, 0, sizeof(m_digit_line_status));

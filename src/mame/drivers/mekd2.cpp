@@ -282,7 +282,7 @@ WRITE8_MEMBER( mekd2_state::mekd2_digit_w )
 		for (i = 0; i < 6; i++)
 		{
 			if (BIT(data, i))
-				output_set_digit_value(i, ~m_segment & 0x7f);
+				output().set_digit_value(i, ~m_segment & 0x7f);
 		}
 	}
 	m_digit = data;

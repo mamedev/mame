@@ -350,7 +350,7 @@ WRITE8_MEMBER( atari_s2_state::display_w )
 	{
 		data &= 7;
 		for (UINT8 i = 0; i < 7; i++)
-			output_set_digit_value(i * 10 + data, m_segment[i]);
+			output().set_digit_value(i * 10 + data, m_segment[i]);
 	}
 }
 

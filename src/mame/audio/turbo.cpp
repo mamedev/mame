@@ -129,7 +129,7 @@ WRITE8_MEMBER(turbo_state::turbo_sound_b_w)
 
 	/* ACC0-ACC5 */
 	m_turbo_accel = data & 0x3f;
-	output_set_value("tachometer", m_turbo_accel);
+	output().set_value("tachometer", m_turbo_accel);
 
 	/* /AMBU: channel 4 */
 	if ((diff & 0x40) && !(data & 0x40) && !m_samples->playing(4)) m_samples->start(4, 8, true);
@@ -152,7 +152,7 @@ WRITE8_MEMBER(turbo_state::turbo_sound_c_w)
 	m_turbo_bsel = (data >> 2) & 3;
 
 	/* SPEED0-3 */
-	output_set_value("speed", (data >> 4) & 0x0f);
+	output().set_value("speed", (data >> 4) & 0x0f);
 
 	/* update any samples */
 	turbo_update_samples();

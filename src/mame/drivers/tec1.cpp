@@ -233,12 +233,12 @@ TIMER_CALLBACK_MEMBER(tec1_state::tec1_kbd_callback)
 		if (BIT(m_digit, i))
 		{
 			m_refresh[i] = 1;
-			output_set_digit_value(i, m_segment);
+			output().set_digit_value(i, m_segment);
 		}
 		else
 		if (m_refresh[i] == 0x80)
 		{
-			output_set_digit_value(i, 0);
+			output().set_digit_value(i, 0);
 			m_refresh[i] = 0;
 		}
 		else

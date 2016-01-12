@@ -80,16 +80,14 @@ void score7_cpu_device::device_start()
 	// register state for debugger
 	state_add(SCORE_PC  , "PC"  , m_pc).callimport().callexport().formatstr("%08X");
 
-	std::string tmp_string;
+	for(int i=0; i<0x20; i++)
+		state_add(SCORE_GPR + i, strformat("r%d", i).c_str(), m_gpr[i]).callimport().callexport().formatstr("%08X");
 
 	for(int i=0; i<0x20; i++)
-		state_add(SCORE_GPR + i, strformat(tmp_string, "r%d", i).c_str(), m_gpr[i]).callimport().callexport().formatstr("%08X");
-
-	for(int i=0; i<0x20; i++)
-		state_add(SCORE_CR + i, strformat(tmp_string, "cr%d", i).c_str(), m_cr[i]).callimport().callexport().formatstr("%08X");
+		state_add(SCORE_CR + i, strformat("cr%d", i).c_str(), m_cr[i]).callimport().callexport().formatstr("%08X");
 
 	for(int i=0; i<3; i++)
-		state_add(SCORE_SR + i, strformat(tmp_string, "sr%d", i).c_str(), m_sr[i]).callimport().callexport().formatstr("%08X");
+		state_add(SCORE_SR + i, strformat("sr%d", i).c_str(), m_sr[i]).callimport().callexport().formatstr("%08X");
 
 	state_add(SCORE_CEH, "ceh", REG_CEH).callimport().callexport().formatstr("%08X");
 	state_add(SCORE_CEL, "cel", REG_CEL).callimport().callexport().formatstr("%08X");

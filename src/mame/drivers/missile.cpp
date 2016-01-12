@@ -728,11 +728,11 @@ WRITE8_MEMBER(missile_state::missile_w)
 	else if (offset < 0x4900)
 	{
 		m_flipscreen = ~data & 0x40;
-		coin_counter_w(machine(), 0, data & 0x20);
-		coin_counter_w(machine(), 1, data & 0x10);
-		coin_counter_w(machine(), 2, data & 0x08);
-		set_led_status(machine(), 1, ~data & 0x04);
-		set_led_status(machine(), 0, ~data & 0x02);
+		machine().bookkeeping().coin_counter_w(0, data & 0x20);
+		machine().bookkeeping().coin_counter_w(1, data & 0x10);
+		machine().bookkeeping().coin_counter_w(2, data & 0x08);
+		output().set_led_value(1, ~data & 0x04);
+		output().set_led_value(0, ~data & 0x02);
 		m_ctrld = data & 1;
 	}
 

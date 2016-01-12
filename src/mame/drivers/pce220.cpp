@@ -163,24 +163,24 @@ UINT32 pce220_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		memset(lcd_symbols, 0, sizeof(lcd_symbols));
 	}
 
-	output_set_value("BUSY" , (lcd_symbols[0] & 0x01) ? 1 : 0);
-	output_set_value("CAPS" , (lcd_symbols[0] & 0x02) ? 1 : 0);
-	output_set_value("KANA" , (lcd_symbols[0] & 0x04) ? 1 : 0);
-	output_set_value("SYO"  , (lcd_symbols[0] & 0x08) ? 1 : 0);
-	output_set_value("2ndF" , (lcd_symbols[0] & 0x10) ? 1 : 0);
-	output_set_value("TEXT" , (lcd_symbols[1] & 0x08) ? 1 : 0);
-	output_set_value("CASL" , (lcd_symbols[1] & 0x10) ? 1 : 0);
-	output_set_value("PRO"  , (lcd_symbols[1] & 0x20) ? 1 : 0);
-	output_set_value("RUN"  , (lcd_symbols[1] & 0x40) ? 1 : 0);
-	output_set_value("BATT" , (lcd_symbols[2] & 0x01) ? 1 : 0);
-	output_set_value("E"    , (lcd_symbols[2] & 0x02) ? 1 : 0);
-	output_set_value("M"    , (lcd_symbols[2] & 0x04) ? 1 : 0);
-	output_set_value("CONST", (lcd_symbols[2] & 0x08) ? 1 : 0);
-	output_set_value("RAD"  , (lcd_symbols[2] & 0x10) ? 1 : 0);
-	output_set_value("G"    , (lcd_symbols[2] & 0x20) ? 1 : 0);
-	output_set_value("DE"   , (lcd_symbols[2] & 0x40) ? 1 : 0);
-	output_set_value("STAT" , (lcd_symbols[3] & 0x20) ? 1 : 0);
-	output_set_value("PRINT", (lcd_symbols[3] & 0x40) ? 1 : 0);
+	output().set_value("BUSY" , (lcd_symbols[0] & 0x01) ? 1 : 0);
+	output().set_value("CAPS" , (lcd_symbols[0] & 0x02) ? 1 : 0);
+	output().set_value("KANA" , (lcd_symbols[0] & 0x04) ? 1 : 0);
+	output().set_value("SYO"  , (lcd_symbols[0] & 0x08) ? 1 : 0);
+	output().set_value("2ndF" , (lcd_symbols[0] & 0x10) ? 1 : 0);
+	output().set_value("TEXT" , (lcd_symbols[1] & 0x08) ? 1 : 0);
+	output().set_value("CASL" , (lcd_symbols[1] & 0x10) ? 1 : 0);
+	output().set_value("PRO"  , (lcd_symbols[1] & 0x20) ? 1 : 0);
+	output().set_value("RUN"  , (lcd_symbols[1] & 0x40) ? 1 : 0);
+	output().set_value("BATT" , (lcd_symbols[2] & 0x01) ? 1 : 0);
+	output().set_value("E"    , (lcd_symbols[2] & 0x02) ? 1 : 0);
+	output().set_value("M"    , (lcd_symbols[2] & 0x04) ? 1 : 0);
+	output().set_value("CONST", (lcd_symbols[2] & 0x08) ? 1 : 0);
+	output().set_value("RAD"  , (lcd_symbols[2] & 0x10) ? 1 : 0);
+	output().set_value("G"    , (lcd_symbols[2] & 0x20) ? 1 : 0);
+	output().set_value("DE"   , (lcd_symbols[2] & 0x40) ? 1 : 0);
+	output().set_value("STAT" , (lcd_symbols[3] & 0x20) ? 1 : 0);
+	output().set_value("PRINT", (lcd_symbols[3] & 0x40) ? 1 : 0);
 
 	return 0;
 }
@@ -245,23 +245,23 @@ UINT32 pcg850v_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		memset(lcd_symbols, 0, sizeof(lcd_symbols));
 	}
 
-	output_set_value("RUN"  , (lcd_symbols[0] & 0x02) ? 1 : 0);
-	output_set_value("PRO"  , (lcd_symbols[0] & 0x08) ? 1 : 0);
-	output_set_value("TEXT" , (lcd_symbols[0] & 0x40) ? 1 : 0);
-	output_set_value("CASL" , (lcd_symbols[1] & 0x08) ? 1 : 0);
-	output_set_value("STAT" , (lcd_symbols[2] & 0x01) ? 1 : 0);
-	output_set_value("2ndF" , (lcd_symbols[2] & 0x20) ? 1 : 0);
-	output_set_value("M"    , (lcd_symbols[2] & 0x80) ? 1 : 0);
-	output_set_value("CAPS" , (lcd_symbols[3] & 0x04) ? 1 : 0);
-	output_set_value("KANA" , (lcd_symbols[3] & 0x80) ? 1 : 0);
-	output_set_value("SYO"  , (lcd_symbols[4] & 0x02) ? 1 : 0);
-	output_set_value("DE"   , (lcd_symbols[4] & 0x10) ? 1 : 0);
-	output_set_value("G"    , (lcd_symbols[4] & 0x40) ? 1 : 0);
-	output_set_value("RAD"  , (lcd_symbols[5] & 0x01) ? 1 : 0);
-	output_set_value("CONST", (lcd_symbols[5] & 0x04) ? 1 : 0);
-	output_set_value("PRINT", (lcd_symbols[5] & 0x10) ? 1 : 0);
-	output_set_value("BUSY" , (lcd_symbols[5] & 0x40) ? 1 : 0);
-	output_set_value("BATT" , (lcd_symbols[5] & 0x80) ? 1 : 0);
+	output().set_value("RUN"  , (lcd_symbols[0] & 0x02) ? 1 : 0);
+	output().set_value("PRO"  , (lcd_symbols[0] & 0x08) ? 1 : 0);
+	output().set_value("TEXT" , (lcd_symbols[0] & 0x40) ? 1 : 0);
+	output().set_value("CASL" , (lcd_symbols[1] & 0x08) ? 1 : 0);
+	output().set_value("STAT" , (lcd_symbols[2] & 0x01) ? 1 : 0);
+	output().set_value("2ndF" , (lcd_symbols[2] & 0x20) ? 1 : 0);
+	output().set_value("M"    , (lcd_symbols[2] & 0x80) ? 1 : 0);
+	output().set_value("CAPS" , (lcd_symbols[3] & 0x04) ? 1 : 0);
+	output().set_value("KANA" , (lcd_symbols[3] & 0x80) ? 1 : 0);
+	output().set_value("SYO"  , (lcd_symbols[4] & 0x02) ? 1 : 0);
+	output().set_value("DE"   , (lcd_symbols[4] & 0x10) ? 1 : 0);
+	output().set_value("G"    , (lcd_symbols[4] & 0x40) ? 1 : 0);
+	output().set_value("RAD"  , (lcd_symbols[5] & 0x01) ? 1 : 0);
+	output().set_value("CONST", (lcd_symbols[5] & 0x04) ? 1 : 0);
+	output().set_value("PRINT", (lcd_symbols[5] & 0x10) ? 1 : 0);
+	output().set_value("BUSY" , (lcd_symbols[5] & 0x40) ? 1 : 0);
+	output().set_value("BATT" , (lcd_symbols[5] & 0x80) ? 1 : 0);
 
 	return 0;
 }

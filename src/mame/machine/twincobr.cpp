@@ -256,14 +256,14 @@ void twincobr_state::toaplan0_coin_dsp_w(address_space &space, int offset, int d
 	if (data > 1)
 		LOG(("%s:Writing %08x to %08x.\n",machine().describe_context(),data,toaplan_port_type[m_toaplan_main_cpu] - offset));
 	switch (data) {
-		case 0x08: coin_counter_w(machine(), 0,0); break;
-		case 0x09: coin_counter_w(machine(), 0,1); break;
-		case 0x0a: coin_counter_w(machine(), 1,0); break;
-		case 0x0b: coin_counter_w(machine(), 1,1); break;
-		case 0x0c: coin_lockout_w(machine(), 0,1); break;
-		case 0x0d: coin_lockout_w(machine(), 0,0); break;
-		case 0x0e: coin_lockout_w(machine(), 1,1); break;
-		case 0x0f: coin_lockout_w(machine(), 1,0); break;
+		case 0x08: machine().bookkeeping().coin_counter_w(0,0); break;
+		case 0x09: machine().bookkeeping().coin_counter_w(0,1); break;
+		case 0x0a: machine().bookkeeping().coin_counter_w(1,0); break;
+		case 0x0b: machine().bookkeeping().coin_counter_w(1,1); break;
+		case 0x0c: machine().bookkeeping().coin_lockout_w(0,1); break;
+		case 0x0d: machine().bookkeeping().coin_lockout_w(0,0); break;
+		case 0x0e: machine().bookkeeping().coin_lockout_w(1,1); break;
+		case 0x0f: machine().bookkeeping().coin_lockout_w(1,0); break;
 		/****** The following apply to Flying Shark/Wardner only ******/
 		case 0x00:  /* This means assert the INT line to the DSP */
 					LOG(("Turning DSP on and main CPU off\n"));

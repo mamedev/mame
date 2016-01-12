@@ -358,7 +358,7 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 				break;
 
 			case 3:
-				if (show_mandatory_fileman && image_mandatory_scan(machine(), messagebox_text).length() > 0)
+				if (show_mandatory_fileman && machine().image().mandatory_scan(messagebox_text).length() > 0)
 				{
 					std::string warning;
 					warning.assign("This driver requires images to be loaded in the following device(s): ").append(messagebox_text.substr(0, messagebox_text.length() - 2));
@@ -451,7 +451,7 @@ void ui_manager::update_and_render(render_container *container)
 	{
 		INT32 mouse_target_x, mouse_target_y;
 		bool mouse_button;
-		render_target *mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
+		render_target *mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
 
 		if (mouse_target != nullptr)
 		{
@@ -1024,11 +1024,11 @@ std::string &ui_manager::warnings_string(std::string &str)
 	str.clear();
 
 	// if no warnings, nothing to return
-	if (rom_load_warnings(machine()) == 0 && rom_load_knownbad(machine()) == 0 && !(machine().system().flags & WARNING_FLAGS) && software_load_warnings_message(machine()).length() == 0)
+	if (machine().rom_load().warnings() == 0 && machine().rom_load().knownbad() == 0 && !(machine().system().flags & WARNING_FLAGS) && machine().rom_load().software_load_warnings_message().length() == 0)
 		return str;
 
 	// add a warning if any ROMs were loaded with warnings
-	if (rom_load_warnings(machine()) > 0)
+	if (machine().rom_load().warnings() > 0)
 	{
 		str.append("One or more ROMs/CHDs for this ");
 		str.append(emulator_info::get_gamenoun());
@@ -1039,20 +1039,20 @@ std::string &ui_manager::warnings_string(std::string &str)
 			str.append("\n");
 	}
 
-	if (software_load_warnings_message(machine()).length()>0) {
-		str.append(software_load_warnings_message(machine()));
+	if (machine().rom_load().software_load_warnings_message().length()>0) {
+		str.append(machine().rom_load().software_load_warnings_message());
 		if (machine().system().flags & WARNING_FLAGS)
 			str.append("\n");
 	}
 	// if we have at least one warning flag, print the general header
-	if ((machine().system().flags & WARNING_FLAGS) || rom_load_knownbad(machine()) > 0)
+	if ((machine().system().flags & WARNING_FLAGS) || machine().rom_load().knownbad() > 0)
 	{
 		str.append("There are known problems with this ");
 		str.append(emulator_info::get_gamenoun());
 		str.append("\n\n");
 
 		// add a warning if any ROMs are flagged BAD_DUMP/NO_DUMP
-		if (rom_load_knownbad(machine()) > 0) {
+		if (machine().rom_load().knownbad() > 0) {
 			str.append("One or more ROMs/CHDs for this ");
 			str.append(emulator_info::get_gamenoun());
 			str.append(" have not been correctly dumped.\n");
@@ -1153,8 +1153,7 @@ std::string &ui_manager::warnings_string(std::string &str)
 std::string &ui_manager::game_info_astring(std::string &str)
 {
 	// print description, manufacturer, and CPU:
-	std::string tempstr;
-	strprintf(str, "%s\n%s %s\nDriver: %s\n\nCPU:\n", machine().system().description, machine().system().year, machine().system().manufacturer, core_filename_extract_base(tempstr, machine().system().source_file).c_str());
+	strprintf(str, "%s\n%s %s\nDriver: %s\n\nCPU:\n", machine().system().description, machine().system().year, machine().system().manufacturer, core_filename_extract_base(machine().system().source_file).c_str());
 
 	// loop over all CPUs
 	execute_interface_iterator execiter(machine().root_device());
@@ -1289,15 +1288,15 @@ UINT32 ui_manager::handler_messagebox_ok(running_machine &machine, render_contai
 	machine.ui().draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	// an 'O' or left joystick kicks us to the next state
-	if (state == 0 && (machine.input().code_pressed_once(KEYCODE_O) || ui_input_pressed(machine, IPT_UI_LEFT)))
+	if (state == 0 && (machine.input().code_pressed_once(KEYCODE_O) || machine.ui_input().pressed(IPT_UI_LEFT)))
 		state++;
 
 	// a 'K' or right joystick exits the state
-	else if (state == 1 && (machine.input().code_pressed_once(KEYCODE_K) || ui_input_pressed(machine, IPT_UI_RIGHT)))
+	else if (state == 1 && (machine.input().code_pressed_once(KEYCODE_K) || machine.ui_input().pressed(IPT_UI_RIGHT)))
 		state = UI_HANDLER_CANCEL;
 
 	// if the user cancels, exit out completely
-	else if (ui_input_pressed(machine, IPT_UI_CANCEL))
+	else if (machine.ui_input().pressed(IPT_UI_CANCEL))
 	{
 		machine.schedule_exit();
 		state = UI_HANDLER_CANCEL;
@@ -1319,7 +1318,7 @@ UINT32 ui_manager::handler_messagebox_anykey(running_machine &machine, render_co
 	machine.ui().draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	// if the user cancels, exit out completely
-	if (ui_input_pressed(machine, IPT_UI_CANCEL))
+	if (machine.ui_input().pressed(IPT_UI_CANCEL))
 	{
 		machine.schedule_exit();
 		state = UI_HANDLER_CANCEL;
@@ -1348,7 +1347,7 @@ void ui_manager::process_natural_keyboard()
 	UINT8 key_down_mask;
 
 	// loop while we have interesting events
-	while (ui_input_pop_event(machine(), &event))
+	while (machine().ui_input().pop_event(&event))
 	{
 		// if this was a UI_EVENT_CHAR event, post it
 		if (event.event_type == UI_EVENT_CHAR)
@@ -1489,7 +1488,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	if (machine.ui().show_fps_counter())
 	{
 		std::string tempstring;
-		machine.ui().draw_text_full(container, machine.video().speed_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
+		machine.ui().draw_text_full(container, machine.video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, nullptr, nullptr);
 	}
 
@@ -1514,7 +1513,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	if (machine.ioport().has_keyboard())
 	{
 		// are we toggling the UI with ScrLk?
-		if (ui_input_pressed(machine, IPT_UI_TOGGLE_UI))
+		if (machine.ui_input().pressed(IPT_UI_TOGGLE_UI))
 		{
 			// toggle the UI
 			machine.set_ui_active(!machine.ui_active());
@@ -1550,7 +1549,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	if (!ui_disabled)
 	{
 		// paste command
-		if (ui_input_pressed(machine, IPT_UI_PASTE))
+		if (machine.ui_input().pressed(IPT_UI_PASTE))
 			machine.ui().paste();
 	}
 
@@ -1558,28 +1557,28 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 
 	if (ui_disabled) return ui_disabled;
 
-	if (ui_input_pressed(machine, IPT_UI_CANCEL))
+	if (machine.ui_input().pressed(IPT_UI_CANCEL))
 	{
 		machine.ui().request_quit();
 		return 0;
 	}
 
 	// turn on menus if requested
-	if (ui_input_pressed(machine, IPT_UI_CONFIGURE))
+	if (machine.ui_input().pressed(IPT_UI_CONFIGURE))
 		return machine.ui().set_handler(ui_menu::ui_handler, 0);
 
 	// if the on-screen display isn't up and the user has toggled it, turn it on
-	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0 && ui_input_pressed(machine, IPT_UI_ON_SCREEN_DISPLAY))
+	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0 && machine.ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
 		return machine.ui().set_handler(ui_menu_sliders::ui_handler, 1);
 
 	// handle a reset request
-	if (ui_input_pressed(machine, IPT_UI_RESET_MACHINE))
+	if (machine.ui_input().pressed(IPT_UI_RESET_MACHINE))
 		machine.schedule_hard_reset();
-	if (ui_input_pressed(machine, IPT_UI_SOFT_RESET))
+	if (machine.ui_input().pressed(IPT_UI_SOFT_RESET))
 		machine.schedule_soft_reset();
 
 	// handle a request to display graphics/palette
-	if (ui_input_pressed(machine, IPT_UI_SHOW_GFX))
+	if (machine.ui_input().pressed(IPT_UI_SHOW_GFX))
 	{
 		if (!is_paused)
 			machine.pause();
@@ -1587,7 +1586,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	}
 
 	// handle a tape control key
-	if (ui_input_pressed(machine, IPT_UI_TAPE_START))
+	if (machine.ui_input().pressed(IPT_UI_TAPE_START))
 	{
 		cassette_device_iterator cassiter(machine.root_device());
 		for (cassette_image_device *cass = cassiter.first(); cass != nullptr; cass = cassiter.next())
@@ -1596,7 +1595,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 			return 0;
 		}
 	}
-	if (ui_input_pressed(machine, IPT_UI_TAPE_STOP))
+	if (machine.ui_input().pressed(IPT_UI_TAPE_STOP))
 	{
 		cassette_device_iterator cassiter(machine.root_device());
 		for (cassette_image_device *cass = cassiter.first(); cass != nullptr; cass = cassiter.next())
@@ -1607,25 +1606,25 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	}
 
 	// handle a save state request
-	if (ui_input_pressed(machine, IPT_UI_SAVE_STATE))
+	if (machine.ui_input().pressed(IPT_UI_SAVE_STATE))
 	{
 		machine.pause();
 		return machine.ui().set_handler(handler_load_save, LOADSAVE_SAVE);
 	}
 
 	// handle a load state request
-	if (ui_input_pressed(machine, IPT_UI_LOAD_STATE))
+	if (machine.ui_input().pressed(IPT_UI_LOAD_STATE))
 	{
 		machine.pause();
 		return machine.ui().set_handler(handler_load_save, LOADSAVE_LOAD);
 	}
 
 	// handle a save snapshot request
-	if (ui_input_pressed(machine, IPT_UI_SNAPSHOT))
+	if (machine.ui_input().pressed(IPT_UI_SNAPSHOT))
 		machine.video().save_active_screen_snapshots();
 
 	// toggle pause
-	if (ui_input_pressed(machine, IPT_UI_PAUSE))
+	if (machine.ui_input().pressed(IPT_UI_PAUSE))
 	{
 		// with a shift key, it is single step
 		if (is_paused && (machine.input().code_pressed(KEYCODE_LSHIFT) || machine.input().code_pressed(KEYCODE_RSHIFT)))
@@ -1638,31 +1637,31 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	}
 
 	// handle a toggle cheats request
-	if (ui_input_pressed(machine, IPT_UI_TOGGLE_CHEAT))
+	if (machine.ui_input().pressed(IPT_UI_TOGGLE_CHEAT))
 		machine.cheat().set_enable(!machine.cheat().enabled());
 
 	// toggle movie recording
-	if (ui_input_pressed(machine, IPT_UI_RECORD_MOVIE))
+	if (machine.ui_input().pressed(IPT_UI_RECORD_MOVIE))
 		machine.video().toggle_record_movie();
 
 	// toggle profiler display
-	if (ui_input_pressed(machine, IPT_UI_SHOW_PROFILER))
+	if (machine.ui_input().pressed(IPT_UI_SHOW_PROFILER))
 		machine.ui().set_show_profiler(!machine.ui().show_profiler());
 
 	// toggle FPS display
-	if (ui_input_pressed(machine, IPT_UI_SHOW_FPS))
+	if (machine.ui_input().pressed(IPT_UI_SHOW_FPS))
 		machine.ui().set_show_fps(!machine.ui().show_fps());
 
 	// increment frameskip?
-	if (ui_input_pressed(machine, IPT_UI_FRAMESKIP_INC))
+	if (machine.ui_input().pressed(IPT_UI_FRAMESKIP_INC))
 		machine.ui().increase_frameskip();
 
 	// decrement frameskip?
-	if (ui_input_pressed(machine, IPT_UI_FRAMESKIP_DEC))
+	if (machine.ui_input().pressed(IPT_UI_FRAMESKIP_DEC))
 		machine.ui().decrease_frameskip();
 
 	// toggle throttle?
-	if (ui_input_pressed(machine, IPT_UI_THROTTLE))
+	if (machine.ui_input().pressed(IPT_UI_THROTTLE))
 		machine.video().toggle_throttle();
 
 	// check for fast forward
@@ -1699,7 +1698,7 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 		machine.ui().draw_message_window(container, "Select position to load from");
 
 	// check for cancel key
-	if (ui_input_pressed(machine, IPT_UI_CANCEL))
+	if (machine.ui_input().pressed(IPT_UI_CANCEL))
 	{
 		// display a popup indicating things were cancelled
 		if (state == LOADSAVE_SAVE)
@@ -1767,17 +1766,13 @@ void ui_manager::request_quit()
 UINT32 ui_manager::handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state)
 {
 	// get the text for 'UI Select'
-	std::string ui_select_text;
-	machine.input().seq_name(ui_select_text, machine.ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
+	std::string ui_select_text = machine.input().seq_name(machine.ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
 
 	// get the text for 'UI Cancel'
-	std::string ui_cancel_text;
-	machine.input().seq_name(ui_cancel_text, machine.ioport().type_seq(IPT_UI_CANCEL, 0, SEQ_TYPE_STANDARD));
+	std::string ui_cancel_text = machine.input().seq_name(machine.ioport().type_seq(IPT_UI_CANCEL, 0, SEQ_TYPE_STANDARD));
 
 	// assemble the quit message
-	std::string quit_message;
-	strprintf(quit_message,
-		"Are you sure you want to quit?\n\n"
+	std::string quit_message = strformat("Are you sure you want to quit?\n\n"
 		"Press ''%s'' to quit,\n"
 		"Press ''%s'' to return to emulation.",
 		ui_select_text.c_str(),
@@ -1787,11 +1782,11 @@ UINT32 ui_manager::handler_confirm_quit(running_machine &machine, render_contain
 	machine.pause();
 
 	// if the user press ENTER, quit the game
-	if (ui_input_pressed(machine, IPT_UI_SELECT))
+	if (machine.ui_input().pressed(IPT_UI_SELECT))
 		machine.schedule_exit();
 
 	// if the user press ESC, just continue
-	else if (ui_input_pressed(machine, IPT_UI_CANCEL))
+	else if (machine.ui_input().pressed(IPT_UI_CANCEL))
 	{
 		machine.resume();
 		state = UI_HANDLER_CANCEL;

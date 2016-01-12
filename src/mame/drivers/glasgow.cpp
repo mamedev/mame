@@ -100,7 +100,7 @@ WRITE16_MEMBER( glasgow_state::glasgow_lcd_w )
 	UINT8 lcd_data = data >> 8;
 
 	if (m_led7 == 0)
-		output_set_digit_value(m_lcd_shift_counter, lcd_data);
+		output().set_digit_value(m_lcd_shift_counter, lcd_data);
 
 	m_lcd_shift_counter--;
 	m_lcd_shift_counter &= 3;
@@ -146,7 +146,7 @@ WRITE16_MEMBER( glasgow_state::write_lcd )
 {
 	UINT8 lcd_data = data >> 8;
 
-	output_set_digit_value(m_lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
+	output().set_digit_value(m_lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
 	m_lcd_shift_counter--;
 	m_lcd_shift_counter &= 3;
 	logerror("LCD Offset = %d Data low = %x \n", offset, lcd_data);
@@ -218,7 +218,7 @@ WRITE32_MEMBER( glasgow_state::write_lcd32 )
 {
 	UINT8 lcd_data = data >> 8;
 
-	output_set_digit_value(m_lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
+	output().set_digit_value(m_lcd_shift_counter, mboard_lcd_invert & 1 ? lcd_data^0xff : lcd_data);
 	m_lcd_shift_counter--;
 	m_lcd_shift_counter &= 3;
 	//logerror("LCD Offset = %d Data   = %x \n  ", offset, lcd_data);

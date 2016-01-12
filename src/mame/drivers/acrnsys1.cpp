@@ -151,7 +151,7 @@ WRITE8_MEMBER( acrnsys1_state::acrnsys1_led_segment_w )
 {
 	UINT8 key_line = m_ttl74145->read();
 
-	output_set_digit_value(key_line, data);
+	output().set_digit_value(key_line, data);
 }
 
 

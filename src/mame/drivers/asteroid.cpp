@@ -207,7 +207,7 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 
 WRITE8_MEMBER(asteroid_state::astdelux_coin_counter_w)
 {
-	coin_counter_w(machine(), offset,data);
+	machine().bookkeeping().coin_counter_w(offset,data);
 }
 
 
@@ -226,7 +226,7 @@ WRITE8_MEMBER(asteroid_state::llander_led_w)
 	};
 
 	for (int i = 0; i < 5; i++)
-		output_set_value(lampname[i], (data >> (4 - i)) & 1);
+		output().set_value(lampname[i], (data >> (4 - i)) & 1);
 }
 
 

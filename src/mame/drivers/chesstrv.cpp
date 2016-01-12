@@ -66,13 +66,13 @@ WRITE8_MEMBER( chesstrv_state::display_w )
 	UINT8 seg_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
 
 	if(!(m_matrix & 0x01))
-		output_set_digit_value( 3, seg_data );
+		output().set_digit_value( 3, seg_data );
 	if(!(m_matrix & 0x02))
-		output_set_digit_value( 2, seg_data );
+		output().set_digit_value( 2, seg_data );
 	if(!(m_matrix & 0x04))
-		output_set_digit_value( 1, seg_data );
+		output().set_digit_value( 1, seg_data );
 	if(!(m_matrix & 0x08))
-		output_set_digit_value( 0, seg_data );
+		output().set_digit_value( 0, seg_data );
 }
 
 WRITE8_MEMBER( chesstrv_state::matrix_w )
@@ -98,7 +98,7 @@ READ8_MEMBER( chesstrv_state::keypad_r )
 
 WRITE8_MEMBER( chesstrv_state::diplomat_display_w )
 {
-	output_set_digit_value( m_matrix & 7, data ^ 0xff );
+	output().set_digit_value( m_matrix & 7, data ^ 0xff );
 }
 
 READ8_MEMBER( chesstrv_state::diplomat_keypad_r )

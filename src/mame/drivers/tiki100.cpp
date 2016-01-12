@@ -287,10 +287,10 @@ WRITE8_MEMBER( tiki100_state::system_w )
 	if (floppy) floppy->mon_w(!BIT(data, 6));
 
 	/* GRAFIKK key led */
-	set_led_status(machine(), 1, BIT(data, 5));
+	output().set_led_value(1, BIT(data, 5));
 
 	/* LOCK key led */
-	set_led_status(machine(), 2, BIT(data, 7));
+	output().set_led_value(2, BIT(data, 7));
 
 	/* bankswitch */
 	m_rome = BIT(data, 2);

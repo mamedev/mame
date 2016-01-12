@@ -45,7 +45,7 @@ public:
 WRITE16_MEMBER(eolith16_state::eeprom_w)
 {
 	m_vbuffer = (data & 0x80) >> 7;
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 
 	m_eepromoutport->write(data, 0xff);
 

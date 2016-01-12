@@ -357,9 +357,9 @@ void pc_keyboard_device::device_reset()
 	m_numlock = 0;
 	m_on = true;
 	/* set default led state */
-	set_led_status(machine(), 2, 0);
-	set_led_status(machine(), 0, 0);
-	set_led_status(machine(), 1, 0);
+	machine().output().set_led_value(2, 0);
+	machine().output().set_led_value(0, 0);
+	machine().output().set_led_value(1, 0);
 
 	m_head = m_tail = 0;
 	queue_insert(0xaa);
@@ -832,9 +832,9 @@ WRITE8_MEMBER(at_keyboard_device::write)
 
 				/* led's in same order as my keyboard leds. */
 				/* num lock, caps lock, scroll lock */
-				set_led_status(machine(), 2, (data & 0x01));
-				set_led_status(machine(), 0, ((data & 0x02)>>1));
-				set_led_status(machine(), 1, ((data & 0x04)>>2));
+				machine().output().set_led_value(2, (data & 0x01));
+				machine().output().set_led_value(0, ((data & 0x02)>>1));
+				machine().output().set_led_value(1, ((data & 0x04)>>2));
 
 			}
 			break;

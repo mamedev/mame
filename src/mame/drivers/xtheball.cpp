@@ -156,7 +156,7 @@ WRITE16_MEMBER(xtheball_state::bit_controls_w)
 					break;
 
 				case 8:
-					set_led_status(machine(), 0, data & 1);
+					output().set_led_value(0, data & 1);
 					break;
 			}
 		}

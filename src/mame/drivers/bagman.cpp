@@ -120,7 +120,7 @@ WRITE8_MEMBER(bagman_state::ls259_w)
 
 WRITE8_MEMBER(bagman_state::coincounter_w)
 {
-	coin_counter_w(machine(), offset,data);
+	machine().bookkeeping().coin_counter_w(offset,data);
 }
 
 WRITE8_MEMBER(bagman_state::irq_mask_w)

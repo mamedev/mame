@@ -1440,7 +1440,7 @@ WRITE16_MEMBER(igs011_state::drgnwrld_igs003_w)
 	{
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
-				coin_counter_w(machine(), 0,data & 2);
+				machine().bookkeeping().coin_counter_w(0,data & 2);
 
 			if (data & ~0x2)
 				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", space.device().safe_pc(), data);
@@ -1504,7 +1504,7 @@ WRITE16_MEMBER(igs011_state::lhb_inputs_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(machine(), 0,    data & 0x20 );
+		machine().bookkeeping().coin_counter_w(0,    data & 0x20 );
 		//  coin out        data & 0x40
 		m_igs_hopper        =   data & 0x80;
 	}
@@ -1549,7 +1549,7 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(machine(), 0,    data & 0x20);
+				machine().bookkeeping().coin_counter_w(0,    data & 0x20);
 				//  coin out        data & 0x40
 				m_igs_hopper        =   data & 0x80;
 			}
@@ -1696,7 +1696,7 @@ WRITE16_MEMBER(igs011_state::wlcc_igs003_w)
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(machine(), 0,    data & 0x01);
+				machine().bookkeeping().coin_counter_w(0,    data & 0x01);
 				//  coin out        data & 0x02
 
 				m_oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
@@ -1764,7 +1764,7 @@ WRITE16_MEMBER(igs011_state::xymg_igs003_w)
 
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(machine(), 0,    data & 0x20);
+				machine().bookkeeping().coin_counter_w(0,    data & 0x20);
 				//  coin out        data & 0x40
 				m_igs_hopper        =   data & 0x80;
 			}
@@ -1837,8 +1837,8 @@ WRITE16_MEMBER(igs011_state::vbowl_igs003_w)
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(machine(), 0, data & 1);
-				coin_counter_w(machine(), 1, data & 2);
+				machine().bookkeeping().coin_counter_w(0, data & 1);
+				machine().bookkeeping().coin_counter_w(1, data & 2);
 			}
 
 			if (data & ~0x3)

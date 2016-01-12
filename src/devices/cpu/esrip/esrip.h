@@ -223,9 +223,9 @@ protected:
 	static const ophandler s_opcodetable[24];
 
 private:
-	int get_hblank();
-	int get_lbrm();
-	int check_jmp(UINT8 jmp_ctrl);
+	int get_hblank() const;
+	int get_lbrm() const;
+	int check_jmp(UINT8 jmp_ctrl) const;
 
 	// flags
 	void calc_z_flag(UINT16 res);

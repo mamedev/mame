@@ -249,13 +249,13 @@ WRITE8_MEMBER(ccastles_state::irq_ack_w)
 
 WRITE8_MEMBER(ccastles_state::led_w)
 {
-	set_led_status(machine(), offset, ~data & 1);
+	output().set_led_value(offset, ~data & 1);
 }
 
 
 WRITE8_MEMBER(ccastles_state::ccounter_w)
 {
-	coin_counter_w(machine(), offset, data & 1);
+	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
 
 

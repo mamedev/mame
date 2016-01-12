@@ -192,7 +192,7 @@ protected:
 	inline void set_OFB_Add(UINT32 x,UINT32 y,UINT32 z);
 	inline void set_OFW_Sub(UINT32 x,UINT32 y,UINT32 z);
 	inline void set_OFB_Sub(UINT32 x,UINT32 y,UINT32 z);
-	inline UINT16 CompressFlags();
+	inline UINT16 CompressFlags() const;
 	inline void ExpandFlags(UINT16 f);
 
 	// rep instructions

@@ -211,7 +211,7 @@ void driver_device::device_start()
 		(*m_system->driver_init)(machine());
 
 	// finish image devices init process
-	image_postdevice_init(machine());
+	machine().image().postdevice_init();
 
 	// start the various pieces
 	driver_start();
@@ -564,6 +564,23 @@ void driver_device::flip_screen_y_set(UINT32 on)
 	}
 }
 
+
+/***************************************************************************
+PORT READING HELPERS
+***************************************************************************/
+
+/*-------------------------------------------------
+custom_port_read - act like input_port_read
+but it is a custom port, it is useful for
+e.g. input ports which expect the same port
+repeated both in the upper and lower half
+-------------------------------------------------*/
+
+CUSTOM_INPUT_MEMBER(driver_device::custom_port_read)
+{
+	const char *tag = (const char *)param;
+	return ioport(tag)->read();
+}
 
 
 //**************************************************************************

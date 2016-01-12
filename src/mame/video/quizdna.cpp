@@ -110,7 +110,7 @@ WRITE8_MEMBER(quizdna_state::screen_ctrl_w)
 	int tmp = (data & 0x10) >> 4;
 	m_video_enable = data & 0x20;
 
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 
 	if (m_flipscreen == tmp)
 		return;

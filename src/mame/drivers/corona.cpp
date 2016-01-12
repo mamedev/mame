@@ -509,8 +509,8 @@ WRITE8_MEMBER(corona_state::ball_w)
 {
 	m_lamp = data;
 
-	output_set_lamp_value(data, 1);
-	output_set_lamp_value(m_lamp_old, 0);
+	output().set_lamp_value(data, 1);
+	output().set_lamp_value(m_lamp_old, 0);
 	m_lamp_old = m_lamp;
 }
 
@@ -545,8 +545,8 @@ WRITE8_MEMBER(corona_state::mux_port_w)
 */
 	m_input_selector = (data ^ 0xff) & 0x3f;    /* Input Selector,  */
 
-	coin_counter_w(machine(), 0, (data ^ 0xff) & 0x40); /* Credits In (mechanical meters) */
-	coin_counter_w(machine(), 1, (data ^ 0xff) & 0x80); /* Credits Out (mechanical meters) */
+	machine().bookkeeping().coin_counter_w(0, (data ^ 0xff) & 0x40); /* Credits In (mechanical meters) */
+	machine().bookkeeping().coin_counter_w(1, (data ^ 0xff) & 0x80); /* Credits Out (mechanical meters) */
 
 //  logerror("muxsel: %02x \n", m_input_selector);
 }
@@ -564,9 +564,9 @@ WRITE8_MEMBER(corona_state::wc_meters_w)
    Data is written inverted.
 
 */
-	coin_counter_w(machine(), 0, (data ^ 0xff) & 0x01); /* Credits In */
-	coin_counter_w(machine(), 1, (data ^ 0xff) & 0x02); /* Credits In (through Coin 3) */
-	coin_counter_w(machine(), 2, (data ^ 0xff) & 0x04); /* Credits Out */
+	machine().bookkeeping().coin_counter_w(0, (data ^ 0xff) & 0x01); /* Credits In */
+	machine().bookkeeping().coin_counter_w(1, (data ^ 0xff) & 0x02); /* Credits In (through Coin 3) */
+	machine().bookkeeping().coin_counter_w(2, (data ^ 0xff) & 0x04); /* Credits Out */
 
 //  popmessage("meters: %02x", (data ^ 0xff));
 }

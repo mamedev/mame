@@ -186,7 +186,7 @@ READ8_MEMBER( by6803_state::port2_r )
 WRITE8_MEMBER( by6803_state::port2_w )
 {
 	m_port2 = data;
-	output_set_value("led0", BIT(data, 2)); // P22 drives LED
+	output().set_value("led0", BIT(data, 2)); // P22 drives LED
 }
 
 // display latch strobes; display blanking
@@ -222,19 +222,19 @@ WRITE8_MEMBER( by6803_state::pia0_a_w )
 	switch (m_pia0_a)
 	{
 		case 0x10: // wrong
-			output_set_digit_value(m_digit, m_segment);
+			output().set_digit_value(m_digit, m_segment);
 			break;
 		case 0x1d:
-			output_set_digit_value(8+m_digit, m_segment);
+			output().set_digit_value(8+m_digit, m_segment);
 			break;
 		case 0x1b:
-			output_set_digit_value(16+m_digit, m_segment);
+			output().set_digit_value(16+m_digit, m_segment);
 			break;
 		case 0x07:
-			output_set_digit_value(24+m_digit, m_segment);
+			output().set_digit_value(24+m_digit, m_segment);
 			break;
 		case 0x0f:
-			output_set_digit_value(32+m_digit, m_segment);
+			output().set_digit_value(32+m_digit, m_segment);
 			break;
 		default:
 			break;

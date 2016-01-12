@@ -115,7 +115,7 @@ READ8_MEMBER(gameplan_state::io_port_r)
 
 WRITE_LINE_MEMBER(gameplan_state::coin_w)
 {
-	coin_counter_w(machine(), 0, ~state & 1);
+	machine().bookkeeping().coin_counter_w(0, ~state & 1);
 }
 
 

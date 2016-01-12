@@ -133,8 +133,8 @@ WRITE8_MEMBER(mystston_state::mystston_video_control_w)
 	/* D3 - unused */
 
 	/* D4-D5 - coin counters in flipped order */
-	coin_counter_w(machine(), 0, data & 0x20);
-	coin_counter_w(machine(), 1, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, data & 0x20);
+	machine().bookkeeping().coin_counter_w(1, data & 0x10);
 
 	/* D6 - unused */
 	/* D7 - screen flip */

@@ -406,7 +406,7 @@ WRITE8_MEMBER(skylncr_state::reelscroll4_w)
 
 WRITE8_MEMBER(skylncr_state::skylncr_coin_w)
 {
-	coin_counter_w(machine(), 0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 }
 
 READ8_MEMBER(skylncr_state::ret_ff)

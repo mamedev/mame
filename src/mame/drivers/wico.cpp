@@ -301,14 +301,14 @@ INPUT_PORTS_END
 WRITE8_MEMBER( wico_state::dled0_w )
 {
 	m_diag_on = 0;
-	output_set_digit_value(9, 0);
+	output().set_digit_value(9, 0);
 }
 
 // diagnostic display on
 WRITE8_MEMBER( wico_state::dled1_w )
 {
 	m_diag_on = 1;
-	output_set_digit_value(9, m_diag_segments);
+	output().set_digit_value(9, m_diag_segments);
 }
 
 WRITE8_MEMBER( wico_state::csols_w )
@@ -327,9 +327,9 @@ WRITE8_MEMBER( wico_state::muxen_w )
 	m_diag_segments = patterns[data>>4];
 
 	if (m_diag_on)
-		output_set_digit_value(9, m_diag_segments);
+		output().set_digit_value(9, m_diag_segments);
 	else
-		output_set_digit_value(9, 0);
+		output().set_digit_value(9, 0);
 
 	m_disp_on = BIT(data, 0);
 }
@@ -380,7 +380,7 @@ READ8_MEMBER( wico_state::lampst_r )
 			j = m_shared_ram[0x7f9 + i];
 		else
 			j = 0;
-		output_set_digit_value(i * 10 + (m_shared_ram[0x96] & 7), BITSWAP16(j, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(i * 10 + (m_shared_ram[0x96] & 7), BITSWAP16(j, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0));
 	}
 	return 0xff;
 }

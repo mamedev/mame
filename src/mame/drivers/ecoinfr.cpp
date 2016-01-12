@@ -167,7 +167,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port00_out_w)
 
 	m_reel0->update(data&0x0f);
 
-	awp_draw_reel("reel1", m_reel0);
+	awp_draw_reel(machine(),"reel1", m_reel0);
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port01_out_w)
@@ -179,7 +179,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port01_out_w)
 
 	m_reel1->update(data&0x0f);
 
-	awp_draw_reel("reel2", m_reel1);
+	awp_draw_reel(machine(),"reel2", m_reel1);
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
@@ -191,7 +191,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
 
 	m_reel2->update(data&0x0f);
 
-	awp_draw_reel("reel3", m_reel2);
+	awp_draw_reel(machine(),"reel3", m_reel2);
 }
 
 
@@ -323,7 +323,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0d_out_cred_data_w)
 	if (m_credsel!=0xff)
 	{
 		UINT8 bf7segdata = BITSWAP8(data,7,0,1,2,3,4,5,6);
-		output_set_digit_value(m_credsel+8, bf7segdata);
+		output().set_digit_value(m_credsel+8, bf7segdata);
 	}
 }
 
@@ -336,7 +336,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0f_out_bank_segdata_w)
 	if (m_banksel!=0xff)
 	{
 		UINT8 bf7segdata = BITSWAP8(data,7,0,1,2,3,4,5,6);
-		output_set_digit_value(m_banksel, bf7segdata);
+		output().set_digit_value(m_banksel, bf7segdata);
 	}
 }
 

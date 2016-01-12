@@ -98,7 +98,7 @@ WRITE8_MEMBER( sdk85_state::scanlines_w )
 WRITE8_MEMBER( sdk85_state::digit_w )
 {
 	if (m_digit < 6)
-		output_set_digit_value(m_digit, BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4)^0xff);
+		output().set_digit_value(m_digit, BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4)^0xff);
 }
 
 READ8_MEMBER( sdk85_state::kbd_r )

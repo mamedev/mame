@@ -202,7 +202,7 @@ READ8_MEMBER(svi318_state::psg_port_a_r)
 WRITE8_MEMBER(svi318_state::psg_port_b_w)
 {
 	if ((m_bank_switch ^ data) & 0x20)
-		set_led_status(machine(), 0, !(data & 0x20));
+		output().set_led_value(0, !(data & 0x20));
 
 	m_bank_switch = data;
 	set_banks();

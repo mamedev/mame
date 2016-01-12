@@ -79,7 +79,7 @@ typedef device_t *(*device_type)(const machine_config &mconfig, const char *tag,
 template<class _DeviceClass>
 device_t *device_creator(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 {
-	return global_alloc(_DeviceClass(mconfig, tag, owner, clock));
+	return global_alloc_clear<_DeviceClass>(mconfig, tag, owner, clock);
 }
 
 

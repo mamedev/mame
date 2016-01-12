@@ -402,24 +402,24 @@ READ8_MEMBER(smsmfg_state::ppi0_c_r)
 WRITE8_MEMBER(smsmfg_state::ppi0_a_w)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1) );
-	output_set_lamp_value(0, !BIT(data,7)); /* Display Light 1 */
-	output_set_lamp_value(1, !BIT(data,6)); /* Display Light 2 */
-	output_set_lamp_value(2, !BIT(data,5)); /* Display Light 3 */
-	output_set_lamp_value(3, !BIT(data,4)); /* Display Light 4 */
-	output_set_lamp_value(4, !BIT(data,3)); /* Display Light 5 */
-	output_set_lamp_value(5, !BIT(data,2)); /* Bet Light */
-	output_set_lamp_value(6, !BIT(data,1)); /* Deal Light */
-	output_set_lamp_value(7, !BIT(data,0)); /* Draw Light */
+	output().set_lamp_value(0, !BIT(data,7)); /* Display Light 1 */
+	output().set_lamp_value(1, !BIT(data,6)); /* Display Light 2 */
+	output().set_lamp_value(2, !BIT(data,5)); /* Display Light 3 */
+	output().set_lamp_value(3, !BIT(data,4)); /* Display Light 4 */
+	output().set_lamp_value(4, !BIT(data,3)); /* Display Light 5 */
+	output().set_lamp_value(5, !BIT(data,2)); /* Bet Light */
+	output().set_lamp_value(6, !BIT(data,1)); /* Deal Light */
+	output().set_lamp_value(7, !BIT(data,0)); /* Draw Light */
 }
 
 WRITE8_MEMBER(smsmfg_state::ppi0_b_w)
 {
-	output_set_lamp_value(8, !BIT(data,7)); /* Stand Light */
-	output_set_lamp_value(9, !BIT(data,6)); /* Cancel Light */
+	output().set_lamp_value(8, !BIT(data,7)); /* Stand Light */
+	output().set_lamp_value(9, !BIT(data,6)); /* Cancel Light */
 
-	coin_counter_w(machine(), 0, BIT(data,1));
-	coin_lockout_w(machine(), 0, BIT(data,5));
-	coin_lockout_w(machine(), 1, BIT(data,4));
+	machine().bookkeeping().coin_counter_w(0, BIT(data,1));
+	machine().bookkeeping().coin_lockout_w(0, BIT(data,5));
+	machine().bookkeeping().coin_lockout_w(1, BIT(data,4));
 }
 
 /*************************************

@@ -669,8 +669,8 @@ WRITE8_MEMBER(taitojc_state::dendego_speedmeter_w)
 	if (m_speed_meter != dendego_odometer_table[data])
 	{
 		m_speed_meter = dendego_odometer_table[data];
-		output_set_value("counter2", m_speed_meter / 10);
-		output_set_value("counter3", m_speed_meter % 10);
+		output().set_value("counter2", m_speed_meter / 10);
+		output().set_value("counter3", m_speed_meter % 10);
 	}
 }
 
@@ -679,7 +679,7 @@ WRITE8_MEMBER(taitojc_state::dendego_brakemeter_w)
 	if (m_brake_meter != dendego_pressure_table[data])
 	{
 		m_brake_meter = dendego_pressure_table[data];
-		output_set_value("counter4", m_brake_meter);
+		output().set_value("counter4", m_brake_meter);
 	}
 }
 
@@ -747,7 +747,7 @@ WRITE8_MEMBER(taitojc_state::hc11_output_w)
     ?
 */
 	for (int i = 0; i < 8; i++)
-		output_set_lamp_value(i, data >> i & 1);
+		output().set_lamp_value(i, data >> i & 1);
 
 	m_mcu_output = data;
 }

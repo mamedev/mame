@@ -897,8 +897,7 @@ void natural_keyboard::post(unicode_char ch)
 	if (LOG_NATURAL_KEYBOARD)
 	{
 		const keycode_map_entry *code = find_code(ch);
-		std::string tempstr;
-		machine().logerror("natural_keyboard::post(): code=%i (%s) field->name='%s'\n", int(ch), unicode_to_string(tempstr, ch), (code != nullptr && code->field[0] != nullptr) ? code->field[0]->name() : "<null>");
+		machine().logerror("natural_keyboard::post(): code=%i (%s) field->name='%s'\n", int(ch), unicode_to_string(ch).c_str(), (code != nullptr && code->field[0] != nullptr) ? code->field[0]->name() : "<null>");
 	}
 
 	// can we post this key in the queue directly?
@@ -1101,8 +1100,7 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 
 							if (LOG_NATURAL_KEYBOARD)
 							{
-								std::string tempstr;
-								machine().logerror("natural_keyboard: code=%i (%s) port=%p field->name='%s'\n", int(code), unicode_to_string(tempstr, code), (void *)port, field->name());
+								machine().logerror("natural_keyboard: code=%i (%s) port=%p field->name='%s'\n", int(code), unicode_to_string(code).c_str(), (void *)port, field->name());
 							}
 						}
 					}
@@ -1234,9 +1232,9 @@ void natural_keyboard::timer(void *ptr, int param)
 //  logging and debugging
 //-------------------------------------------------
 
-const char *natural_keyboard::unicode_to_string(std::string &buffer, unicode_char ch)
+std::string natural_keyboard::unicode_to_string(unicode_char ch)
 {
-	buffer.clear();
+	std::string buffer;
 	switch (ch)
 	{
 		// check some magic values
@@ -1256,15 +1254,15 @@ const char *natural_keyboard::unicode_to_string(std::string &buffer, unicode_cha
 			{
 				// try to obtain a codename with code_name(); this can result in an empty string
 				input_code code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(ch - UCHAR_MAMEKEY_BEGIN));
-				machine().input().code_name(buffer, code);
+				buffer = machine().input().code_name(code);
 			}
 
 			// did we fail to resolve? if so, we have a last resort
-			if (buffer.length() == 0)
+			if (buffer.empty())
 				strprintf(buffer,"U+%04X", unsigned(ch));
 			break;
 	}
-	return buffer.c_str();
+	return buffer;
 }
 
 
@@ -1307,8 +1305,10 @@ void natural_keyboard::frame_update(ioport_port &port, ioport_value &digital)
 //  key_name - returns the name of a specific key
 //-------------------------------------------------
 
-const char *natural_keyboard::key_name(std::string &str, unicode_char ch)
+std::string natural_keyboard::key_name(unicode_char ch) const
 {
+	std::string str;
+
 	// attempt to get the string from the character info table
 	const char_info *ci = char_info::find(ch);
 	const char *result = (ci != nullptr) ? ci->name : nullptr;
@@ -1327,7 +1327,7 @@ const char *natural_keyboard::key_name(std::string &str, unicode_char ch)
 	// otherwise, opt for question marks
 	else
 		str.assign("???");
-	return str.c_str();
+	return str;
 }
 
 
@@ -1337,7 +1337,7 @@ const char *natural_keyboard::key_name(std::string &str, unicode_char ch)
 
 std::string natural_keyboard::dump()
 {
-	std::string buffer, tempstr;
+	std::string buffer;
 	const size_t left_column_width = 24;
 
 	// loop through all codes
@@ -1345,7 +1345,7 @@ std::string natural_keyboard::dump()
 	{
 		// describe the character code
 
-		strcatprintf(buffer,"%08X (%s) ", code.ch, unicode_to_string(tempstr, code.ch));
+		strcatprintf(buffer,"%08X (%s) ", code.ch, unicode_to_string(code.ch).c_str());
 
 		// pad with spaces
 		while (buffer.length() < left_column_width)
@@ -1965,7 +1965,7 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 	}
 
 	// skip locked-out coin inputs
-	if (curstate && m_type >= IPT_COIN1 && m_type <= IPT_COIN12 && coin_lockout_get_state(machine(), m_type - IPT_COIN1))
+	if (curstate && m_type >= IPT_COIN1 && m_type <= IPT_COIN12 && machine().bookkeeping().coin_lockout_get_state(m_type - IPT_COIN1))
 	{
 		bool verbose = machine().options().verbose();
 #ifdef MAME_DEBUG
@@ -2173,20 +2173,19 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 	if (field.type_class() == INPUT_CLASS_KEYBOARD && field.specific_name() == nullptr)
 	{
 		// loop through each character on the field
-		std::string tempstr;
 		for (int which = 0; ; which++)
 		{
 			unicode_char ch = field.keyboard_code(which);
 			if (ch == 0)
 				break;
-			strcatprintf(name, "%-*s ", MAX(SPACE_COUNT - 1, 0), field.manager().natkeyboard().key_name(tempstr, ch));
+			strcatprintf(name, "%-*s ", MAX(SPACE_COUNT - 1, 0), field.manager().natkeyboard().key_name(ch).c_str());
 		}
 
 		// trim extra spaces
 		strtrimspace(name);
 
 		// special case
-		if (name.length() == 0)
+		if (name.empty())
 			name.assign("Unnamed Key");
 	}
 }
@@ -2535,7 +2534,7 @@ time_t ioport_manager::initialize()
 
 	m_natkeyboard.initialize();
 	// register callbacks for when we load configurations
-	config_register(machine(), "input", config_saveload_delegate(FUNC(ioport_manager::load_config), this), config_saveload_delegate(FUNC(ioport_manager::save_config), this));
+	machine().configuration().config_register("input", config_saveload_delegate(FUNC(ioport_manager::load_config), this), config_saveload_delegate(FUNC(ioport_manager::save_config), this));
 
 	// calculate "has..." values
 	{
@@ -2900,7 +2899,7 @@ g_profiler.start(PROFILER_INPUT);
 	// perform mouse hit testing
 	INT32 mouse_target_x, mouse_target_y;
 	bool mouse_button;
-	render_target *mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
+	render_target *mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
 
 	// if the button is pressed, map the point and determine what was hit
 	ioport_field *mouse_field = nullptr;
@@ -2958,10 +2957,10 @@ INT32 ioport_manager::frame_interpolate(INT32 oldval, INT32 newval)
 //  data from the XML nodes
 //-------------------------------------------------
 
-void ioport_manager::load_config(int config_type, xml_data_node *parentnode)
+void ioport_manager::load_config(config_type cfg_type, xml_data_node *parentnode)
 {
 	// in the completion phase, we finish the initialization with the final ports
-	if (config_type == CONFIG_TYPE_FINAL)
+	if (cfg_type == config_type::CONFIG_TYPE_FINAL)
 	{
 		m_safe_to_read = true;
 		frame_update();
@@ -2972,7 +2971,7 @@ void ioport_manager::load_config(int config_type, xml_data_node *parentnode)
 		return;
 
 	// iterate over all the remap nodes for controller configs only
-	if (config_type == CONFIG_TYPE_CONTROLLER)
+	if (cfg_type == config_type::CONFIG_TYPE_CONTROLLER)
 		load_remap_table(parentnode);
 
 	// iterate over all the port nodes
@@ -3002,7 +3001,7 @@ void ioport_manager::load_config(int config_type, xml_data_node *parentnode)
 		}
 
 		// if we're loading default ports, apply to the defaults
-		if (config_type != CONFIG_TYPE_GAME)
+		if (cfg_type != config_type::CONFIG_TYPE_GAME)
 			load_default_config(portnode, type, player, newseq);
 		else
 			load_game_config(portnode, type, player, newseq);
@@ -3010,7 +3009,7 @@ void ioport_manager::load_config(int config_type, xml_data_node *parentnode)
 
 	// after applying the controller config, push that back into the backup, since that is
 	// what we will diff against
-	if (config_type == CONFIG_TYPE_CONTROLLER)
+	if (cfg_type == config_type::CONFIG_TYPE_CONTROLLER)
 		for (input_type_entry *entry = m_typelist.first(); entry != nullptr; entry = entry->next())
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				entry->defseq(seqtype) = entry->seq(seqtype);
@@ -3149,14 +3148,14 @@ bool ioport_manager::load_game_config(xml_data_node *portnode, int type, int pla
 //  port configuration
 //-------------------------------------------------
 
-void ioport_manager::save_config(int config_type, xml_data_node *parentnode)
+void ioport_manager::save_config(config_type cfg_type, xml_data_node *parentnode)
 {
 	// if no parentnode, ignore
 	if (parentnode == nullptr)
 		return;
 
 	// default ports save differently
-	if (config_type == CONFIG_TYPE_DEFAULT)
+	if (cfg_type == config_type::CONFIG_TYPE_DEFAULT)
 		save_default_inputs(parentnode);
 	else
 		save_game_inputs(parentnode);
@@ -3175,7 +3174,7 @@ void ioport_manager::save_sequence(xml_data_node *parentnode, input_seq_type typ
 	if (seq.length() == 0)
 		seqstring.assign("NONE");
 	else
-		machine().input().seq_to_tokens(seqstring, seq);
+		seqstring = machine().input().seq_to_tokens(seq);
 
 	// add the new node
 	xml_data_node *seqnode = xml_add_child(parentnode, "newseq", seqstring.c_str());
@@ -3233,8 +3232,7 @@ void ioport_manager::save_default_inputs(xml_data_node *parentnode)
 				if (portnode != nullptr)
 				{
 					// add the port information and attributes
-					std::string tempstr;
-					xml_set_attribute(portnode, "type", input_type_to_token(tempstr, entry->type(), entry->player()));
+					xml_set_attribute(portnode, "type", input_type_to_token(entry->type(), entry->player()).c_str());
 
 					// add only the sequences that have changed from the defaults
 					for (input_seq_type type = SEQ_TYPE_STANDARD; type < SEQ_TYPE_TOTAL; ++type)
@@ -3288,9 +3286,8 @@ void ioport_manager::save_game_inputs(xml_data_node *parentnode)
 					if (portnode != nullptr)
 					{
 						// add the identifying information and attributes
-						std::string tempstr;
 						xml_set_attribute(portnode, "tag", port->tag());
-						xml_set_attribute(portnode, "type", input_type_to_token(tempstr, field->type(), field->player()));
+						xml_set_attribute(portnode, "type", input_type_to_token(field->type(), field->player()).c_str());
 						xml_set_attribute_int(portnode, "mask", field->mask());
 						xml_set_attribute_int(portnode, "defvalue", field->defvalue() & field->mask());
 
@@ -4399,15 +4396,15 @@ ioport_type ioport_manager::token_to_input_type(const char *string, int &player)
 //  type and player to a string token
 //-------------------------------------------------
 
-const char *ioport_manager::input_type_to_token(std::string &str, ioport_type type, int player)
+std::string ioport_manager::input_type_to_token(ioport_type type, int player)
 {
 	// look up the port and return the token
 	input_type_entry *entry = m_type_to_entry[type][player];
 	if (entry != nullptr)
-		return str.assign(entry->token()).c_str();
+		return std::string(entry->token());
 
 	// if that fails, carry on
-	return strformat(str, "TYPE_OTHER(%d,%d)", type, player).c_str();
+	return strformat("TYPE_OTHER(%d,%d)", type, player);
 }
 
 

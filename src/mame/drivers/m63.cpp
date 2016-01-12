@@ -384,7 +384,7 @@ UINT32 m63_state::screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap,
 
 WRITE8_MEMBER(m63_state::coin_w)
 {
-	coin_counter_w(machine(), offset, data & 0x01);
+	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 }
 
 WRITE8_MEMBER(m63_state::snd_irq_w)

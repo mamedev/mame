@@ -295,7 +295,7 @@ WRITE8_MEMBER( epson_lx800_t::portc_w )
 	logerror("%s: lx800_portc_w(%02x): %02x\n", machine().describe_context(), offset, data);
 	logerror("--> err: %d, ack: %d, fire: %d, buzzer: %d\n", BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
 
-	output_set_value("online_led", !BIT(data, 2));
+	machine().output().set_value("online_led", !BIT(data, 2));
 	m_beep->set_state(!BIT(data, 7));
 }
 
@@ -348,7 +348,7 @@ WRITE_LINE_MEMBER( epson_lx800_t::centronics_pe_w )
 WRITE_LINE_MEMBER( epson_lx800_t::paperempty_led_w )
 {
 	logerror("setting paperout led: %d\n", state);
-	output_set_value("paperout_led", state);
+	machine().output().set_value("paperout_led", state);
 }
 
 WRITE_LINE_MEMBER( epson_lx800_t::reset_w )

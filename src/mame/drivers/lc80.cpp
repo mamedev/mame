@@ -141,7 +141,7 @@ void lc80_state::update_display()
 
 	for (i = 0; i < 6; i++)
 	{
-		if (!BIT(m_digit, i)) output_set_digit_value(5 - i, m_segment);
+		if (!BIT(m_digit, i)) output().set_digit_value(5 - i, m_segment);
 	}
 }
 
@@ -211,7 +211,7 @@ WRITE8_MEMBER( lc80_state::pio1_pb_w )
 	m_speaker->level_w(!BIT(data, 1));
 
 	/* OUT led */
-	output_set_led_value(0, !BIT(data, 1));
+	output().set_led_value(0, !BIT(data, 1));
 
 	/* keyboard */
 	m_digit = data >> 2;

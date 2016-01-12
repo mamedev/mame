@@ -2298,6 +2298,7 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destinati
 {
 	vertex_nv vert[4];
 	int m, u;
+	float t[4],v[4];
 
 	// take each vertex with its attributes and obtain data for drawing
 	// should use either the vertex program or transformation matrices
@@ -2305,15 +2306,33 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destinati
 		// transformation matrices
 		// it is not implemented, so we pretend its always using screen coordinates
 		for (m = 0; m < count; m++) {
-			destination[m].x = source[m].attribute[0].fv[0];
-			destination[m].y = source[m].attribute[0].fv[1];
+			for (int i = 0; i < 4; i++) {
+				t[i] = 0;
+				for (int j = 0; j < 4; j++)
+					t[i] += matrix.modelview[i][j] * source[m].attribute[0].fv[j];
+			};
+			for (int i = 0; i < 4; i++) {
+				v[i] = 0;
+				for (int j = 0; j < 4; j++)
+					v[i] += matrix.projection[i][j] * t[j];
+			};
+			/*
+			for (int i = 0; i < 4; i++) {
+				v[i] *= matrix.scale[i];
+			}
+			for (int i = 0; i < 4; i++) {
+				v[i] += matrix.translate[i];
+			}
+			*/
+			destination[m].x = v[0] / v[3]; // source[m].attribute[0].fv[0];
+			destination[m].y = v[1] / v[3]; // source[m].attribute[0].fv[1];
 			for (u = (int)VERTEX_PARAMETER::PARAM_COLOR_B; u <= (int)VERTEX_PARAMETER::PARAM_COLOR_A; u++) // 0=b 1=g 2=r 3=a
 				destination[m].p[u] = source[m].attribute[3].fv[u];
 			for (u = 0; u < 4; u++) {
 				destination[m].p[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + u * 2] = source[m].attribute[9 + u].fv[0];
 				destination[m].p[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + u * 2] = source[m].attribute[9 + u].fv[1];
 			}
-			destination[m].p[(int)VERTEX_PARAMETER::PARAM_Z] = 0xffffff;
+			destination[m].p[(int)VERTEX_PARAMETER::PARAM_Z] = v[2] / v[3];
 		}
 	}
 	else {
@@ -3314,19 +3333,19 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 	// modelview matrix
 	if ((maddress >= 0x0480) && (maddress < 0x04c0)) {
 		maddress = (maddress - 0x0480) / 4;
-		*(UINT32 *)(&matrix.modelview[maddress]) = data;
+		*(UINT32 *)(&matrix.modelview[maddress >> 2][maddress & 3]) = data;
 		countlen--;
 	}
 	// inverse modelview matrix
 	if ((maddress >= 0x0580) && (maddress < 0x05c0)) {
 		maddress = (maddress - 0x0580) / 4;
-		*(UINT32 *)(&matrix.modelview_inverse[maddress]) = data;
+		*(UINT32 *)(&matrix.modelview_inverse[maddress >> 2][maddress & 3]) = data;
 		countlen--;
 	}
 	// projection matrix
 	if ((maddress >= 0x0680) && (maddress < 0x06c0)) {
 		maddress = (maddress - 0x0680) / 4;
-		*(UINT32 *)(&matrix.projection[maddress]) = data;
+		*(UINT32 *)(&matrix.projection[maddress >> 2][maddress & 3]) = data;
 		countlen--;
 	}
 	// viewport translate

@@ -115,7 +115,7 @@ WRITE16_MEMBER( cesclassic_state::outputs_w )
 	---- --x- coin counter
 	*/
 	m_oki->set_bank_base((data & 0x40) ? 0x40000 : 0);
-	coin_counter_w(machine(), 0, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 2);
 	if(data & ~0x62)
 	logerror("Output: %02x\n",data);
 }

@@ -47,7 +47,7 @@ public:
 
 WRITE8_MEMBER(ggconnie_state::lamp_w)
 {
-	output_set_value("lamp", !BIT(data,0));
+	output().set_value("lamp", !BIT(data,0));
 }
 
 WRITE8_MEMBER(ggconnie_state::output_w)

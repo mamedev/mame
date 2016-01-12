@@ -185,12 +185,12 @@ WRITE8_MEMBER(cp1_state::i8155_porta_w)
 
 	if (m_7seg)
 	{
-		if (!(m_matrix & 0x01))     output_set_digit_value(5, data);
-		if (!(m_matrix & 0x02))     output_set_digit_value(4, data);
-		if (!(m_matrix & 0x04))     output_set_digit_value(3, data);
-		if (!(m_matrix & 0x08))     output_set_digit_value(2, data | 0x80);     // this digit has always the dot active
-		if (!(m_matrix & 0x10))     output_set_digit_value(1, data);
-		if (!(m_matrix & 0x20))     output_set_digit_value(0, data);
+		if (!(m_matrix & 0x01))     output().set_digit_value(5, data);
+		if (!(m_matrix & 0x02))     output().set_digit_value(4, data);
+		if (!(m_matrix & 0x04))     output().set_digit_value(3, data);
+		if (!(m_matrix & 0x08))     output().set_digit_value(2, data | 0x80);     // this digit has always the dot active
+		if (!(m_matrix & 0x10))     output().set_digit_value(1, data);
+		if (!(m_matrix & 0x20))     output().set_digit_value(0, data);
 	}
 
 	m_7seg ^= 0x01;

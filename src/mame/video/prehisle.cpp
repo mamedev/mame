@@ -50,8 +50,8 @@ WRITE16_MEMBER(prehisle_state::control_w)
 	case 0x10: m_bg_tilemap->set_scrolly(0, scroll); break;
 	case 0x18: m_bg_tilemap->set_scrollx(0, scroll); break;
 	case 0x23: m_invert_controls = data ? 0x00ff : 0x0000; break;
-	case 0x28: coin_counter_w(machine(), 0, data & 1); break;
-	case 0x29: coin_counter_w(machine(), 1, data & 1); break;
+	case 0x28: machine().bookkeeping().coin_counter_w(0, data & 1); break;
+	case 0x29: machine().bookkeeping().coin_counter_w(1, data & 1); break;
 	case 0x30: flip_screen_set(data & 0x01); break;
 	}
 }

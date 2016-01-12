@@ -93,7 +93,7 @@ WRITE8_MEMBER(ettrivia_state::ettrivia_control_w)
 
 	m_question_bank = (data >> 3) & 3;
 
-	coin_counter_w(machine(), 0, data & 0x80);
+	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 
 	flip_screen_set(data & 1);
 }

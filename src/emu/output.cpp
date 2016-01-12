@@ -10,93 +10,33 @@
 #include "emu.h"
 #include "coreutil.h"
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  OUTPUT MANAGER
+//**************************************************************************
 
-#define HASH_SIZE       53
+//-------------------------------------------------
+//  output_manager - constructor
+//-------------------------------------------------
 
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-class output_notify
+output_manager::output_manager(running_machine &machine)
+	: m_machine(machine),
+	  m_uniqueid(12345)
 {
-public:
-	output_notify(output_notifier_func callback, void *param)
-		: m_next(nullptr),
-			m_notifier(callback),
-			m_param(param) { }
-
-	output_notify *next() const { return m_next; }
-
-	output_notify *         m_next;           /* link to next item */
-	output_notifier_func    m_notifier;       /* callback to call */
-	void *                  m_param;          /* parameter to pass the callback */
-};
-
-
-struct output_item
-{
-	output_item *       next;           /* next item in list */
-	std::string         name;           /* string name of the item */
-	UINT32              hash;           /* hash for this item name */
-	UINT32              id;             /* unique ID for this item */
-	INT32               value;          /* current value */
-	simple_list<output_notify> notifylist;     /* list of notifier callbacks */
-};
-
-
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-static output_item *itemtable[HASH_SIZE];
-static simple_list<output_notify> global_notifylist;
-static UINT32 uniqueid = 12345;
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-static void output_pause(running_machine &machine);
-static void output_resume(running_machine &machine);
-static void output_exit(running_machine &machine);
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    get_hash - return the hash of an output value
--------------------------------------------------*/
-
-static inline UINT32 get_hash(const char *string)
-{
-	return core_crc32(0, (UINT8 *)string, (UINT32)strlen(string));
+	/* add pause callback */
+	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(output_manager::pause), this));
+	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(output_manager::resume), this));
 }
-
 
 /*-------------------------------------------------
     find_item - find an item based on a string
 -------------------------------------------------*/
 
-static inline output_item *find_item(const char *string)
+output_manager::output_item* output_manager::find_item(const char *string)
 {
-	UINT32 hash = get_hash(string);
-	output_item *item;
-
 	/* use the hash as a starting point and find an entry */
-	for (item = itemtable[hash % HASH_SIZE]; item != nullptr; item = item->next)
-		if (item->hash == hash && strcmp(string, item->name.c_str()) == 0)
-			return item;
+	for (auto &item : m_itemtable)
+		if (strcmp(string, item.second.name.c_str()) == 0)
+			return &item.second;
 
 	return nullptr;
 }
@@ -106,85 +46,32 @@ static inline output_item *find_item(const char *string)
     create_new_item - create a new item
 -------------------------------------------------*/
 
-static inline output_item *create_new_item(const char *outname, INT32 value)
+output_manager::output_item *output_manager::create_new_item(const char *outname, INT32 value)
 {
-	auto item = global_alloc(output_item);
-	UINT32 hash = get_hash(outname);
-
+	output_item item;
+	
 	/* fill in the data */
-	item->next = itemtable[hash % HASH_SIZE];
-	item->name.assign(outname);
-	item->hash = hash;
-	item->id = uniqueid++;
-	item->value = value;
+	item.name = outname;
+	item.id = m_uniqueid++;
+	item.value = value;
 
 	/* add us to the hash table */
-	itemtable[hash % HASH_SIZE] = item;
-	return item;
+	m_itemtable.insert(std::pair<std::string, output_item>(outname, item));
+	return &m_itemtable.find(outname)->second;
 }
-
-
-
-/***************************************************************************
-    CORE IMPLEMENTATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    output_init - initialize everything
--------------------------------------------------*/
-
-void output_init(running_machine &machine)
-{
-	/* add pause callback */
-	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(output_pause), &machine));
-	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(output_resume), &machine));
-
-	/* get a callback when done */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(output_exit), &machine));
-
-	/* reset the lists */
-	memset(itemtable, 0, sizeof(itemtable));
-	global_notifylist.reset();
-}
-
 
 /*-------------------------------------------------
     output_pause - send pause message
 -------------------------------------------------*/
 
-static void output_pause(running_machine &machine)
+void output_manager::pause()
 {
-	output_set_value("pause", 1);
+	set_value("pause", 1);
 }
 
-static void output_resume(running_machine &machine)
+void output_manager::resume()
 {
-	output_set_value("pause", 0);
-}
-
-
-/*-------------------------------------------------
-    output_exit - cleanup on exit
--------------------------------------------------*/
-
-static void output_exit(running_machine &machine)
-{
-	output_item *item;
-	int hash;
-
-	/* remove all items */
-	for (hash = 0; hash < HASH_SIZE; hash++)
-		for (item = itemtable[hash]; item != nullptr; )
-		{
-			output_item *next = item->next;
-
-			/* free the name and the item */
-			global_free(item);
-			item = next;
-		}
-
-	/* remove all global notifiers */
-	global_notifylist.reset();
+	set_value("pause", 0);
 }
 
 
@@ -192,7 +79,7 @@ static void output_exit(running_machine &machine)
     output_set_value - set the value of an output
 -------------------------------------------------*/
 
-void output_set_value(const char *outname, INT32 value)
+void output_manager::set_value(const char *outname, INT32 value)
 {
 	output_item *item = find_item(outname);
 	INT32 oldval;
@@ -215,12 +102,12 @@ void output_set_value(const char *outname, INT32 value)
 	if (oldval != value)
 	{
 		/* call the local notifiers first */
-		for (output_notify *notify = item->notifylist.first(); notify != nullptr; notify = notify->next())
-			(*notify->m_notifier)(outname, value, notify->m_param);
+		for (auto notify : item->notifylist)
+			(*notify.m_notifier)(outname, value, notify.m_param);
 
 		/* call the global notifiers next */
-		for (output_notify *notify = global_notifylist.first(); notify != nullptr; notify = notify->next())
-			(*notify->m_notifier)(outname, value, notify->m_param);
+		for (auto notify : m_global_notifylist)
+			(*notify.m_notifier)(outname, value, notify.m_param);
 	}
 }
 
@@ -230,7 +117,7 @@ void output_set_value(const char *outname, INT32 value)
     indexed output
 -------------------------------------------------*/
 
-void output_set_indexed_value(const char *basename, int index, int value)
+void output_manager::set_indexed_value(const char *basename, int index, int value)
 {
 	char buffer[100];
 	char *dest = buffer;
@@ -247,7 +134,7 @@ void output_set_indexed_value(const char *basename, int index, int value)
 	*dest++ = 0;
 
 	/* set the value */
-	output_set_value(buffer, value);
+	set_value(buffer, value);
 }
 
 
@@ -256,7 +143,7 @@ void output_set_indexed_value(const char *basename, int index, int value)
     output
 -------------------------------------------------*/
 
-INT32 output_get_value(const char *outname)
+INT32 output_manager::get_value(const char *outname)
 {
 	output_item *item = find_item(outname);
 
@@ -272,7 +159,7 @@ INT32 output_get_value(const char *outname)
     indexed output
 -------------------------------------------------*/
 
-INT32 output_get_indexed_value(const char *basename, int index)
+INT32 output_manager::get_indexed_value(const char *basename, int index)
 {
 	char buffer[100];
 	char *dest = buffer;
@@ -289,7 +176,7 @@ INT32 output_get_indexed_value(const char *basename, int index)
 	*dest++ = 0;
 
 	/* set the value */
-	return output_get_value(buffer);
+	return get_value(buffer);
 }
 
 
@@ -299,8 +186,9 @@ INT32 output_get_indexed_value(const char *basename, int index)
     if NULL is specified
 -------------------------------------------------*/
 
-void output_set_notifier(const char *outname, output_notifier_func callback, void *param)
+void output_manager::set_notifier(const char *outname, output_notifier_func callback, void *param)
 {
+	output_notify notify(callback, param);
 	/* if an item is specified, find it */
 	if (outname != nullptr)
 	{
@@ -309,10 +197,11 @@ void output_set_notifier(const char *outname, output_notifier_func callback, voi
 		/* if no item of that name, create a new one */
 		if (item == nullptr)
 			item = create_new_item(outname, 0);
-		item->notifylist.append(*global_alloc(output_notify(callback, param)));
+		
+		item->notifylist.push_back(notify);
 	}
 	else
-		global_notifylist.append(*global_alloc(output_notify(callback, param)));
+		m_global_notifylist.push_back(notify);
 }
 
 
@@ -321,15 +210,10 @@ void output_set_notifier(const char *outname, output_notifier_func callback, voi
     notifier for all outputs
 -------------------------------------------------*/
 
-void output_notify_all(output_notifier_func callback, void *param)
+void output_manager::notify_all(output_notifier_func callback, void *param)
 {
-	output_item *item;
-	int hash;
-
-	/* remove all items */
-	for (hash = 0; hash < HASH_SIZE; hash++)
-		for (item = itemtable[hash]; item != nullptr; item = item->next)
-			(*callback)(item->name.c_str(), item->value, param);
+	for (auto &item : m_itemtable)
+		(*callback)(item.second.name.c_str(), item.second.value, param);
 }
 
 
@@ -338,7 +222,7 @@ void output_notify_all(output_notifier_func callback, void *param)
     a given name
 -------------------------------------------------*/
 
-UINT32 output_name_to_id(const char *outname)
+UINT32 output_manager::name_to_id(const char *outname)
 {
 	output_item *item = find_item(outname);
 
@@ -354,17 +238,12 @@ UINT32 output_name_to_id(const char *outname)
     to a given unique ID
 -------------------------------------------------*/
 
-const char *output_id_to_name(UINT32 id)
+const char *output_manager::id_to_name(UINT32 id)
 {
-	output_item *item;
-	int hash;
+	for (auto &item : m_itemtable)
+		if (item.second.id == id)
+			return item.second.name.c_str();
 
-	/* remove all items */
-	for (hash = 0; hash < HASH_SIZE; hash++)
-		for (item = itemtable[hash]; item != nullptr; item = item->next)
-			if (item->id == id)
-				return item->name.c_str();
-
-	/* nothing found, return NULL */
+	/* nothing found, return nullptr */
 	return nullptr;
 }

@@ -147,7 +147,7 @@ bool plus4_expansion_slot_device::call_load()
 
 bool plus4_expansion_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(*this, swlist, swname, start_entry);
+	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
 
 	return true;
 }
@@ -157,9 +157,9 @@ bool plus4_expansion_slot_device::call_softlist_load(software_list_device &swlis
 //  get_default_card_software -
 //-------------------------------------------------
 
-void plus4_expansion_slot_device::get_default_card_software(std::string &result)
+std::string plus4_expansion_slot_device::get_default_card_software()
 {
-	software_get_default_slot(result, "standard");
+	return software_get_default_slot("standard");
 }
 
 

@@ -247,14 +247,14 @@ WRITE8_MEMBER(splus_state::splus_serial_w)
 			}
 			m_bank10 = data;
 
-			output_set_value("s_bnk10",(data >> 0) & 1); // Coin Drop Meter
-			output_set_value("s_bnk11",(data >> 1) & 1); // Coin Out Meter
-			output_set_value("s_bnk12",(data >> 2) & 1); // Coin In Meter
-			output_set_value("s_bnk13",(data >> 3) & 1); // B Switch for SDS
-			output_set_value("s_bnk14",(data >> 4) & 1); // Hopper Drive 2
-			output_set_value("s_bnk15",(data >> 5) & 1); // Stepper Motor Direction
-			output_set_value("s_bnk16",(data >> 6) & 1); // Mechanical Bell
-			output_set_value("s_bnk17",(data >> 7) & 1); // Cancelled Credits Meter
+			output().set_value("s_bnk10",(data >> 0) & 1); // Coin Drop Meter
+			output().set_value("s_bnk11",(data >> 1) & 1); // Coin Out Meter
+			output().set_value("s_bnk12",(data >> 2) & 1); // Coin In Meter
+			output().set_value("s_bnk13",(data >> 3) & 1); // B Switch for SDS
+			output().set_value("s_bnk14",(data >> 4) & 1); // Hopper Drive 2
+			output().set_value("s_bnk15",(data >> 5) & 1); // Stepper Motor Direction
+			output().set_value("s_bnk16",(data >> 6) & 1); // Mechanical Bell
+			output().set_value("s_bnk17",(data >> 7) & 1); // Cancelled Credits Meter
 			break;
 		case 0x01: // Bank 20
 			if (((m_bank20 >> 5) & 1) != ((data >> 5) & 1)) {
@@ -274,14 +274,14 @@ WRITE8_MEMBER(splus_state::splus_serial_w)
 			}
 			m_bank20 = data;
 
-			output_set_value("s_bnk20",(data >> 0) & 1); // Payline Lamp 3
-			output_set_value("s_bnk21",(data >> 1) & 1); // Payline Lamp 4
-			output_set_value("s_bnk22",(data >> 2) & 1); // Payline Lamp 5
-			output_set_value("s_bnk23",(data >> 3) & 1); // Payline Lamp 6
-			output_set_value("s_bnk24",(data >> 4) & 1); // Door Optics Transmitter
-			output_set_value("s_bnk25",(data >> 5) & 1); // Games Played Meter
-			output_set_value("s_bnk26",(data >> 6) & 1); // Bill Acceptor Enable
-			output_set_value("s_bnk27",(data >> 7) & 1); // Jackpots Meter
+			output().set_value("s_bnk20",(data >> 0) & 1); // Payline Lamp 3
+			output().set_value("s_bnk21",(data >> 1) & 1); // Payline Lamp 4
+			output().set_value("s_bnk22",(data >> 2) & 1); // Payline Lamp 5
+			output().set_value("s_bnk23",(data >> 3) & 1); // Payline Lamp 6
+			output().set_value("s_bnk24",(data >> 4) & 1); // Door Optics Transmitter
+			output().set_value("s_bnk25",(data >> 5) & 1); // Games Played Meter
+			output().set_value("s_bnk26",(data >> 6) & 1); // Bill Acceptor Enable
+			output().set_value("s_bnk27",(data >> 7) & 1); // Jackpots Meter
 			break;
 		case 0x02: // Bank 30
 			if (((m_bank30 >> 2) & 1) != ((data >> 2) & 1)) {
@@ -306,14 +306,14 @@ WRITE8_MEMBER(splus_state::splus_serial_w)
 			}
 			m_bank30 = data;
 
-			output_set_value("s_bnk30",(data >> 0) & 1); // Change Candle Lamp Bottom
-			output_set_value("s_bnk31",(data >> 1) & 1); // Change Candle Lamp Top
-			output_set_value("s_bnk32",(data >> 2) & 1); // Handle Release
-			output_set_value("s_bnk33",(data >> 3) & 1); // Diverter
-			output_set_value("s_bnk34",(data >> 4) & 1); // Coin Lockout
-			output_set_value("s_bnk35",(data >> 5) & 1); // Hopper Drive 1
-			output_set_value("s_bnk36",(data >> 6) & 1); // Payline Lamp 1
-			output_set_value("s_bnk37",(data >> 7) & 1); // Payline Lamp 2
+			output().set_value("s_bnk30",(data >> 0) & 1); // Change Candle Lamp Bottom
+			output().set_value("s_bnk31",(data >> 1) & 1); // Change Candle Lamp Top
+			output().set_value("s_bnk32",(data >> 2) & 1); // Handle Release
+			output().set_value("s_bnk33",(data >> 3) & 1); // Diverter
+			output().set_value("s_bnk34",(data >> 4) & 1); // Coin Lockout
+			output().set_value("s_bnk35",(data >> 5) & 1); // Hopper Drive 1
+			output().set_value("s_bnk36",(data >> 6) & 1); // Payline Lamp 1
+			output().set_value("s_bnk37",(data >> 7) & 1); // Payline Lamp 2
 			break;
 		case 0x04: // Bank 40
 			if (((m_bank40 >> 0) & 1) != ((data >> 0) & 1)) {
@@ -328,14 +328,14 @@ WRITE8_MEMBER(splus_state::splus_serial_w)
 			}
 			m_bank40 = data;
 
-			output_set_value("s_bnk40",(data >> 0) & 1); // Stepper Motor Power Supply
-			output_set_value("s_bnk41",(data >> 1) & 1); // Insert Coin Lamp
-			output_set_value("s_bnk42",(data >> 2) & 1); // Coin Accepted Lamp
-			output_set_value("s_bnk43",(data >> 3) & 1); // Jackpot/Hand Pay Lamp
-			output_set_value("s_bnk44",(data >> 4) & 1); // Play Max Credits Lamp
-			output_set_value("s_bnk45",(data >> 5) & 1); // Bet One Credit Lamp
-			output_set_value("s_bnk46",(data >> 6) & 1); // Cashout Credit Lamp
-			output_set_value("s_bnk47",(data >> 7) & 1); // Spin Button Lamp
+			output().set_value("s_bnk40",(data >> 0) & 1); // Stepper Motor Power Supply
+			output().set_value("s_bnk41",(data >> 1) & 1); // Insert Coin Lamp
+			output().set_value("s_bnk42",(data >> 2) & 1); // Coin Accepted Lamp
+			output().set_value("s_bnk43",(data >> 3) & 1); // Jackpot/Hand Pay Lamp
+			output().set_value("s_bnk44",(data >> 4) & 1); // Play Max Credits Lamp
+			output().set_value("s_bnk45",(data >> 5) & 1); // Bet One Credit Lamp
+			output().set_value("s_bnk46",(data >> 6) & 1); // Cashout Credit Lamp
+			output().set_value("s_bnk47",(data >> 7) & 1); // Spin Button Lamp
 			break;
 	}
 }
@@ -352,7 +352,7 @@ WRITE8_MEMBER(splus_state::splus_7seg_w)
 
 	// Need to add ~m_io_port[1]-1 to seg value
 	if (seg < 0x0a && (m_io_port[1] & 0xe0) == 0xe0)
-		output_set_digit_value(seg, ls48_map[val]);
+		output().set_digit_value(seg, ls48_map[val]);
 }
 
 WRITE8_MEMBER(splus_state::splus_duart_w)

@@ -563,18 +563,18 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_pia_w )
 		case 0x60:
 
 			// these 4 are direct-connect
-			output_set_value("pr8210_audio1", (data & 0x01) != 0);
-			output_set_value("pr8210_audio2", (data & 0x02) != 0);
-			output_set_value("pr8210_clv", (data & 0x04) != 0);
-			output_set_value("pr8210_cav", (data & 0x08) != 0);
+			machine().output().set_value("pr8210_audio1", (data & 0x01) != 0);
+			machine().output().set_value("pr8210_audio2", (data & 0x02) != 0);
+			machine().output().set_value("pr8210_clv", (data & 0x04) != 0);
+			machine().output().set_value("pr8210_cav", (data & 0x08) != 0);
 
 			// remaining 3 bits select one of 5 LEDs via a mux
 			value = ((data & 0x40) >> 6) | ((data & 0x20) >> 4) | ((data & 0x10) >> 2);
-			output_set_value("pr8210_srev", (value == 0));
-			output_set_value("pr8210_sfwd", (value == 1));
-			output_set_value("pr8210_play", (value == 2));
-			output_set_value("pr8210_step", (value == 3));
-			output_set_value("pr8210_pause", (value == 4));
+			machine().output().set_value("pr8210_srev", (value == 0));
+			machine().output().set_value("pr8210_sfwd", (value == 1));
+			machine().output().set_value("pr8210_play", (value == 2));
+			machine().output().set_value("pr8210_step", (value == 3));
+			machine().output().set_value("pr8210_pause", (value == 4));
 
 			m_pia.portb = data;
 			update_audio_squelch();
@@ -724,7 +724,7 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_port2_w )
 	m_i8049_cpu->set_input_line(MCS48_INPUT_IRQ, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	// standby LED is set accordingl to bit 4
-	output_set_value("pr8210_standby", (data & 0x10) != 0);
+	machine().output().set_value("pr8210_standby", (data & 0x10) != 0);
 }
 
 

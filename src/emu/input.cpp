@@ -529,9 +529,10 @@ bool joystick_map::parse(const char *mapstring)
 //  friendly display
 //-------------------------------------------------
 
-const char *joystick_map::to_string(std::string &str) const
+std::string joystick_map::to_string() const
 {
-	strprintf(str, "%s\n", m_origstring.c_str());
+	std::string str(m_origstring);
+	str.append("\n");
 	for (auto & elem : m_map)
 	{
 		str.append("  ");
@@ -553,7 +554,7 @@ const char *joystick_map::to_string(std::string &str) const
 
 		str.append("\n");
 	}
-	return str.c_str();
+	return str;
 }
 
 
@@ -808,14 +809,13 @@ input_device::input_device(input_class &_class, int devindex, const char *name, 
 			mapstring = joystick_map_8way;
 
 		// parse it
-		std::string tempstr;
 		if (!m_joymap.parse(mapstring))
 		{
 			osd_printf_error("Invalid joystick map: %s\n", mapstring);
 			m_joymap.parse(joystick_map_8way);
 		}
 		else if (mapstring != joystick_map_8way)
-			osd_printf_verbose("Input: Default joystick map = %s\n", m_joymap.to_string(tempstr));
+			osd_printf_verbose("Input: Default joystick map = %s\n", m_joymap.to_string().c_str());
 	}
 }
 
@@ -1460,21 +1460,18 @@ input_code input_manager::code_from_itemid(input_item_id itemid) const
 //  friendly name
 //-------------------------------------------------
 
-const char *input_manager::code_name(std::string &str, input_code code) const
+std::string input_manager::code_name(input_code code) const
 {
-	str.clear();
-
 	// if nothing there, return an empty string
 	input_device_item *item = item_from_code(code);
 	if (item == nullptr)
-		return str.c_str();
+		return std::string();
 
 	// determine the devclass part
 	const char *devclass = (*devclass_string_table)[code.device_class()];
 
 	// determine the devindex part
-	std::string devindex;
-	strprintf(devindex, "%d", code.device_index() + 1);
+	std::string devindex = strformat("%d", code.device_index() + 1);
 
 	// if we're unifying all devices, don't display a number
 	if (!m_class[code.device_class()]->multi())
@@ -1500,7 +1497,7 @@ const char *input_manager::code_name(std::string &str, input_code code) const
 			devcode = "";
 
 	// concatenate the strings
-	str.assign(devclass);
+	std::string str(devclass);
 	if (!devindex.empty())
 		str.append(" ").append(devindex);
 	if (devcode[0] != 0)
@@ -1510,7 +1507,7 @@ const char *input_manager::code_name(std::string &str, input_code code) const
 
 	// delete any leading spaces
 	strtrimspace(str);
-	return str.c_str();
+	return str;
 }
 
 
@@ -1518,14 +1515,13 @@ const char *input_manager::code_name(std::string &str, input_code code) const
 //  code_to_token - create a token for a given code
 //-------------------------------------------------
 
-const char *input_manager::code_to_token(std::string &str, input_code code) const
+std::string input_manager::code_to_token(input_code code) const
 {
 	// determine the devclass part
 	const char *devclass = (*devclass_token_table)[code.device_class()];
 
 	// determine the devindex part; keyboard 0 doesn't show an index
-	std::string devindex;
-	strprintf(devindex, "%d", code.device_index() + 1);
+	std::string devindex = strformat("%d", code.device_index() + 1);
 	if (code.device_class() == DEVICE_CLASS_KEYBOARD && code.device_index() == 0)
 		devindex.clear();
 
@@ -1542,7 +1538,7 @@ const char *input_manager::code_to_token(std::string &str, input_code code) cons
 		itemclass = (*itemclass_token_table)[code.item_class()];
 
 	// concatenate the strings
-	str.assign(devclass);
+	std::string str(devclass);
 	if (!devindex.empty())
 		str.append("_").append(devindex);
 	if (devcode[0] != 0)
@@ -1551,7 +1547,7 @@ const char *input_manager::code_to_token(std::string &str, input_code code) cons
 		str.append("_").append(modifier);
 	if (itemclass[0] != 0)
 		str.append("_").append(itemclass);
-	return str.c_str();
+	return str;
 }
 
 
@@ -1925,17 +1921,16 @@ bool input_manager::seq_poll()
 //  sequence
 //-------------------------------------------------
 
-const char *input_manager::seq_name(std::string &str, const input_seq &seq) const
+std::string input_manager::seq_name(const input_seq &seq) const
 {
 	// make a copy of our sequence, removing any invalid bits
 	input_code clean_codes[sizeof(seq) / sizeof(input_code)];
 	int clean_index = 0;
-	std::string codestr;
 	for (int codenum = 0; seq[codenum] != input_seq::end_code; codenum++)
 	{
 		// if this is a code item which is not valid, don't copy it and remove any preceding ORs/NOTs
 		input_code code = seq[codenum];
-		if (!code.internal() && *(code_name(codestr, code)) == 0)
+		if (!code.internal() && code_name(code).empty())
 		{
 			while (clean_index > 0 && clean_codes[clean_index - 1].internal())
 				clean_index--;
@@ -1946,10 +1941,10 @@ const char *input_manager::seq_name(std::string &str, const input_seq &seq) cons
 
 	// special case: empty
 	if (clean_index == 0)
-		return str.assign((seq.length() == 0) ? "None" : "n/a").c_str();
+		return std::string((seq.length() == 0) ? "None" : "n/a");
 
 	// start with an empty buffer
-	str.clear();
+	std::string str;
 
 	// loop until we hit the end
 	for (int codenum = 0; codenum < clean_index; codenum++)
@@ -1967,9 +1962,9 @@ const char *input_manager::seq_name(std::string &str, const input_seq &seq) cons
 
 		// otherwise, assume it is an input code and ask the input system to generate it
 		else
-			str.append(code_name(codestr, code));
+			str.append(code_name(code));
 	}
-	return str.c_str();
+	return str;
 }
 
 
@@ -1978,13 +1973,12 @@ const char *input_manager::seq_name(std::string &str, const input_seq &seq) cons
 //  a sequence
 //-------------------------------------------------
 
-const char *input_manager::seq_to_tokens(std::string &str, const input_seq &seq) const
+std::string input_manager::seq_to_tokens(const input_seq &seq) const
 {
 	// start with an empty buffer
-	str.clear();
+	std::string str;
 
 	// loop until we hit the end
-	std::string codestr;
 	for (int codenum = 0; seq[codenum] != input_seq::end_code; codenum++)
 	{
 		// append a space if not the first code
@@ -2002,9 +1996,9 @@ const char *input_manager::seq_to_tokens(std::string &str, const input_seq &seq)
 
 		// otherwise, assume it is an input code and ask the input system to generate it
 		else
-			str.append(code_to_token(codestr, code));
+			str.append(code_to_token(code));
 	}
-	return str.c_str();
+	return str;
 }
 
 
@@ -2072,8 +2066,7 @@ bool input_manager::set_global_joystick_map(const char *mapstring)
 	if (!map.parse(mapstring))
 		return false;
 
-	std::string tempstr;
-	osd_printf_verbose("Input: Changing default joystick map = %s\n", map.to_string(tempstr));
+	osd_printf_verbose("Input: Changing default joystick map = %s\n", map.to_string().c_str());
 
 	// iterate over joysticks and set the map
 	for (int joynum = 0; joynum <= m_joystick_class.maxindex(); joynum++)

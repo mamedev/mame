@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Paul Leaman
 /***************************************************************************
 
@@ -85,8 +85,8 @@ WRITE8_MEMBER(lwings_state::lwings_bankswitch_w)
 	m_nmi_mask = data & 8;
 
 	/* bits 6 and 7 are coin counters */
-	coin_counter_w(machine(), 1, data & 0x40);
-	coin_counter_w(machine(), 0, data & 0x80);
+	machine().bookkeeping().coin_counter_w(1, data & 0x40);
+	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 }
 
 INTERRUPT_GEN_MEMBER(lwings_state::lwings_interrupt)

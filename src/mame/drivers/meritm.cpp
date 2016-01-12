@@ -864,13 +864,13 @@ READ8_MEMBER(meritm_state::meritm_8255_port_c_r)
 WRITE8_MEMBER(meritm_state::meritm_crt250_port_b_w)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,0), BIT(data,1), BIT(data,2), BIT(data,3), BIT(data,4), BIT(data,5), BIT(data,6) );
-	output_set_value("P1 DISC 1 LAMP", !BIT(data,0));
-	output_set_value("P1 DISC 2 LAMP", !BIT(data,1));
-	output_set_value("P1 DISC 3 LAMP", !BIT(data,2));
-	output_set_value("P1 DISC 4 LAMP", !BIT(data,3));
-	output_set_value("P1 DISC 5 LAMP", !BIT(data,4));
-	output_set_value("P1 PLAY LAMP", !BIT(data,5));
-	output_set_value("P1 CANCEL LAMP", !BIT(data,6));
+	output().set_value("P1 DISC 1 LAMP", !BIT(data,0));
+	output().set_value("P1 DISC 2 LAMP", !BIT(data,1));
+	output().set_value("P1 DISC 3 LAMP", !BIT(data,2));
+	output().set_value("P1 DISC 4 LAMP", !BIT(data,3));
+	output().set_value("P1 DISC 5 LAMP", !BIT(data,4));
+	output().set_value("P1 PLAY LAMP", !BIT(data,5));
+	output().set_value("P1 CANCEL LAMP", !BIT(data,6));
 }
 
 /*************************************

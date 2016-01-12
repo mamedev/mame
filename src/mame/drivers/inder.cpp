@@ -1187,7 +1187,7 @@ WRITE8_MEMBER( inder_state::disp_w )
 	{
 		offset = (offset >> 3) & 7;
 		for (i = 0; i < 5; i++)
-			output_set_digit_value(i*10+offset, m_segment[i]);
+			output().set_digit_value(i*10+offset, m_segment[i]);
 	}
 }
 
@@ -1219,7 +1219,7 @@ WRITE8_MEMBER( inder_state::ppi64c_w )
 		{
 			if ((m_game==1) && (i == 4))  // mundial,clown,250cc,atleta have credit and ball displays swapped
 				data ^= 4;
-			output_set_digit_value(i*10+data, m_segment[i]);
+			output().set_digit_value(i*10+data, m_segment[i]);
 		}
 	}
 }

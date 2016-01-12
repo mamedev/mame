@@ -115,7 +115,7 @@ public:
 
 WRITE8_MEMBER(pengo_state::pengo_coin_counter_w)
 {
-	coin_counter_w(machine(), offset, data & 1);
+	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
 
 WRITE8_MEMBER(pengo_state::irq_mask_w)

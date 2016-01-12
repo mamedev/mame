@@ -16,7 +16,7 @@
 #ifndef __ROMLOAD_H__
 #define __ROMLOAD_H__
 
-
+#include "chd.h"
 
 /***************************************************************************
     CONSTANTS
@@ -254,31 +254,103 @@ struct rom_entry
 #define DISK_IMAGE_READONLY_OPTIONAL(name,idx,hash) ROMX_LOAD(name, idx, 0, hash, DISK_READONLY | ROM_OPTIONAL)
 
 
-
 /***************************************************************************
-    FUNCTION PROTOTYPES
+TYPE DEFINITIONS
 ***************************************************************************/
 
+// ======================> rom_load_manager
 
-/* ----- ROM processing ----- */
+class rom_load_manager
+{
+	class open_chd
+	{
+	public:
+		open_chd(const char *region)
+			: m_region(region) { }
 
-/* load the ROMs and open the disk images associated with the given machine */
-void rom_init(running_machine &machine);
+		const char *region() const { return m_region.c_str(); }
+		chd_file &chd() { return m_diffchd.opened() ? m_diffchd : m_origchd; }
+		chd_file &orig_chd() { return m_origchd; }
+		chd_file &diff_chd() { return m_diffchd; }
 
-/* return the number of warnings we generated */
-int rom_load_warnings(running_machine &machine);
-std::string& software_load_warnings_message(running_machine &machine);
+	private:
+		std::string         m_region;               /* disk region we came from */
+		chd_file            m_origchd;              /* handle to the original CHD */
+		chd_file            m_diffchd;              /* handle to the diff CHD */
+	};
 
-/* return the number of BAD_DUMP/NO_DUMP warnings we generated */
-int rom_load_knownbad(running_machine &machine);
+public:
+	// construction/destruction
+	rom_load_manager(running_machine &machine);
+
+	// getters
+	running_machine &machine() const { return m_machine; }
+
+	/* return the number of warnings we generated */
+	int warnings() const { return m_warnings; }
+
+	std::string& software_load_warnings_message() { return m_softwarningstring; }
+
+	/* return the number of BAD_DUMP/NO_DUMP warnings we generated */
+	int knownbad() const { return m_knownbad; }
+
+	/* ----- disk handling ----- */
+
+	/* return a pointer to the CHD file associated with the given region */
+	chd_file *get_disk_handle(const char *region);
+
+	/* set a pointer to the CHD file associated with the given region */
+	int set_disk_handle(const char *region, const char *fullpath);
+
+	void load_software_part_region(device_t &device, software_list_device &swlist, const char *swname, const rom_entry *start_region);
+
+private:
+	void determine_bios_rom(device_t *device, const char *specbios);
+	void count_roms();
+	void fill_random(UINT8 *base, UINT32 length);
+	void handle_missing_file(const rom_entry *romp, std::string tried_file_names, chd_error chderr);
+	void dump_wrong_and_correct_checksums(const hash_collection &hashes, const hash_collection &acthashes);
+	void verify_length_and_hash(const char *name, UINT32 explength, const hash_collection &hashes);
+	void display_loading_rom_message(const char *name, bool from_list);
+	void display_rom_load_results(bool from_list);
+	void region_post_process(const char *rgntag, bool invert);
+	int open_rom_file(const char *regiontag, const rom_entry *romp, std::string &tried_file_names, bool from_list);
+	int rom_fread(UINT8 *buffer, int length, const rom_entry *parent_region);
+	int read_rom_data(const rom_entry *parent_region, const rom_entry *romp);
+	void fill_rom_data(const rom_entry *romp);
+	void copy_rom_data(const rom_entry *romp);
+	void process_rom_entries(const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, device_t *device, bool from_list);
+	chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd_file &source, chd_file &diff_chd);
+	void process_disk_entries(const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, const char *locationtag);
+	void normalize_flags_for_device(running_machine &machine, const char *rgntag, UINT8 &width, endianness_t &endian);
+	void process_region_list();
+
+
+	// internal state
+	running_machine &   m_machine;                  // reference to our machine
+
+	int             m_warnings;           /* warning count during processing */
+	int             m_knownbad;           /* BAD_DUMP/NO_DUMP count during processing */
+	int             m_errors;             /* error count during processing */
+
+	int             m_romsloaded;         /* current ROMs loaded count */
+	int             m_romstotal;          /* total number of ROMs to read */
+	UINT32          m_romsloadedsize;     /* total size of ROMs loaded so far */
+	UINT32          m_romstotalsize;      /* total size of ROMs to read */
+
+	std::unique_ptr<emu_file>  m_file;               /* current file */
+	std::vector<std::unique_ptr<open_chd>> m_chd_list;     /* disks */
+
+	memory_region * m_region;             /* info about current region */
+
+	std::string     m_errorstring;        /* error string */
+	std::string     m_softwarningstring;  /* software warning string */
+};
+
 
 /* ----- Helpers ----- */
 
-file_error common_process_file(emu_options &options, const char *location, const char *ext, const rom_entry *romp, emu_file **image_file);
-file_error common_process_file(emu_options &options, const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, emu_file **image_file);
-
-
-/* ----- ROM iteration ----- */
+std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, file_error &filerr);
 
 /* return pointer to the first ROM region within a source */
 const rom_entry *rom_first_region(const device_t &device);
@@ -311,17 +383,7 @@ std::string rom_parameter_name(const device_t &device, const rom_entry *romp);
 std::string rom_parameter_value(const rom_entry *romp);
 
 
-/* ----- disk handling ----- */
-
 /* open a disk image, searching up the parent and loading by checksum */
 int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_entry *romp, chd_file &image_chd, const char *locationtag);
-
-/* return a pointer to the CHD file associated with the given region */
-chd_file *get_disk_handle(running_machine &machine, const char *region);
-
-/* set a pointer to the CHD file associated with the given region */
-int set_disk_handle(running_machine &machine, const char *region, const char *fullpath);
-
-void load_software_part_region(device_t &device, software_list_device &swlist, const char *swname, const rom_entry *start_region);
 
 #endif  /* __ROMLOAD_H__ */

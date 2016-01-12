@@ -278,14 +278,14 @@ WRITE16_MEMBER(apollo_state::apollo_csr_control_register_w)
 
 	cpu_control_register = (cpu_control_register & ~mem_mask) | (data & mem_mask);
 
-	output_set_value("internal_led_1", (cpu_control_register >> 15) & 1);
-	output_set_value("internal_led_2", (cpu_control_register >> 14) & 1);
-	output_set_value("internal_led_3", (cpu_control_register >> 13) & 1);
-	output_set_value("internal_led_4", (cpu_control_register >> 12) & 1);
-	output_set_value("external_led_a", (cpu_control_register >> 11) & 1);
-	output_set_value("external_led_b", (cpu_control_register >> 10) & 1);
-	output_set_value("external_led_c", (cpu_control_register >> 9) & 1);
-	output_set_value("external_led_d", (cpu_control_register >> 8) & 1);
+	output().set_value("internal_led_1", (cpu_control_register >> 15) & 1);
+	output().set_value("internal_led_2", (cpu_control_register >> 14) & 1);
+	output().set_value("internal_led_3", (cpu_control_register >> 13) & 1);
+	output().set_value("internal_led_4", (cpu_control_register >> 12) & 1);
+	output().set_value("external_led_a", (cpu_control_register >> 11) & 1);
+	output().set_value("external_led_b", (cpu_control_register >> 10) & 1);
+	output().set_value("external_led_c", (cpu_control_register >> 9) & 1);
+	output().set_value("external_led_d", (cpu_control_register >> 8) & 1);
 
 	leds = ((cpu_control_register >> 8) & 0xff) ^ 0xff;
 

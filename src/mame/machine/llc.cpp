@@ -81,7 +81,7 @@ WRITE8_MEMBER(llc_state::llc1_port1_b_w)
 		count++;
 
 	if (count == 1)
-		output_set_digit_value(digit, data & 0x7f);
+		output().set_digit_value(digit, data & 0x7f);
 	else
 	if (count == 3)
 	{

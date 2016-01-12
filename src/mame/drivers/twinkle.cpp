@@ -493,24 +493,24 @@ WRITE8_MEMBER(twinkle_state::twinkle_io_w)
 			case 0x6f:
 			case 0x77:
 			case 0x7f:
-				output_set_indexed_value( "led", ( m_io_offset - 7 ) / 8, asciicharset[ ( data ^ 0xff ) & 0x7f ] );
+				output().set_indexed_value( "led", ( m_io_offset - 7 ) / 8, asciicharset[ ( data ^ 0xff ) & 0x7f ] );
 				break;
 
 			case 0x87:
-				output_set_indexed_value( "spotlight", 0, ( ~data >> 3 ) & 1 );
-				output_set_indexed_value( "spotlight", 1, ( ~data >> 2 ) & 1 );
-				output_set_indexed_value( "spotlight", 2, ( ~data >> 1 ) & 1 );
-				output_set_indexed_value( "spotlight", 3, ( ~data >> 0 ) & 1 );
-				output_set_indexed_value( "spotlight", 4, ( ~data >> 4 ) & 1 );
-				output_set_indexed_value( "spotlight", 5, ( ~data >> 5 ) & 1 );
-				output_set_indexed_value( "spotlight", 6, ( ~data >> 6 ) & 1 );
-				output_set_indexed_value( "spotlight", 7, ( ~data >> 7 ) & 1 );
+				output().set_indexed_value( "spotlight", 0, ( ~data >> 3 ) & 1 );
+				output().set_indexed_value( "spotlight", 1, ( ~data >> 2 ) & 1 );
+				output().set_indexed_value( "spotlight", 2, ( ~data >> 1 ) & 1 );
+				output().set_indexed_value( "spotlight", 3, ( ~data >> 0 ) & 1 );
+				output().set_indexed_value( "spotlight", 4, ( ~data >> 4 ) & 1 );
+				output().set_indexed_value( "spotlight", 5, ( ~data >> 5 ) & 1 );
+				output().set_indexed_value( "spotlight", 6, ( ~data >> 6 ) & 1 );
+				output().set_indexed_value( "spotlight", 7, ( ~data >> 7 ) & 1 );
 				break;
 
 			case 0x8f:
-				output_set_value( "neonlamp", ( ~data >> 0 ) & 1 );
-				output_set_value( "unknown1", ( ~data >> 1 ) & 1 );
-				output_set_value( "unknown2", ( ~data >> 2 ) & 1 );
+				output().set_value( "neonlamp", ( ~data >> 0 ) & 1 );
+				output().set_value( "unknown1", ( ~data >> 1 ) & 1 );
+				output().set_value( "unknown2", ( ~data >> 2 ) & 1 );
 
 				if( ( data & 0xf8 ) != 0xf8 )
 				{

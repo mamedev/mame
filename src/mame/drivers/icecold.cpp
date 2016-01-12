@@ -201,7 +201,7 @@ WRITE8_MEMBER( icecold_state::scanlines_w )
 
 WRITE8_MEMBER( icecold_state::digit_w )
 {
-	output_set_digit_value(m_digit, data & 0x7f);
+	output().set_digit_value(m_digit, data & 0x7f);
 }
 
 READ8_MEMBER( icecold_state::kbd_r )
@@ -248,25 +248,25 @@ READ8_MEMBER( icecold_state::ay_r )
 
 WRITE8_MEMBER( icecold_state::ay8910_0_b_w )
 {
-	output_set_lamp_value(1, BIT(data, 0));
-	output_set_lamp_value(2, BIT(data, 1));
-	output_set_lamp_value(3, BIT(data, 2));
-	output_set_lamp_value(4, BIT(data, 3));
-	output_set_lamp_value(5, BIT(data, 4));
-	output_set_value("in_play", BIT(data, 5));
-	output_set_value("good_game", BIT(data, 6));
+	output().set_lamp_value(1, BIT(data, 0));
+	output().set_lamp_value(2, BIT(data, 1));
+	output().set_lamp_value(3, BIT(data, 2));
+	output().set_lamp_value(4, BIT(data, 3));
+	output().set_lamp_value(5, BIT(data, 4));
+	output().set_value("in_play", BIT(data, 5));
+	output().set_value("good_game", BIT(data, 6));
 	m_motenbl = BIT(data, 7);
 }
 
 WRITE8_MEMBER( icecold_state::ay8910_1_a_w )
 {
-	output_set_lamp_value(6, BIT(data, 0));
-	output_set_lamp_value(7, BIT(data, 1));
-	output_set_lamp_value(8, BIT(data, 2));
-	output_set_lamp_value(9, BIT(data, 3));
-	output_set_lamp_value(10, BIT(data, 4));
-	output_set_value("game_over", BIT(data, 5));
-	output_set_value("tilt", BIT(data, 6));
+	output().set_lamp_value(6, BIT(data, 0));
+	output().set_lamp_value(7, BIT(data, 1));
+	output().set_lamp_value(8, BIT(data, 2));
+	output().set_lamp_value(9, BIT(data, 3));
+	output().set_lamp_value(10, BIT(data, 4));
+	output().set_value("game_over", BIT(data, 5));
+	output().set_value("tilt", BIT(data, 6));
 	// BIT 7 watchdog reset
 }
 
@@ -274,11 +274,11 @@ WRITE8_MEMBER( icecold_state::ay8910_1_b_w )
 {
 	if (m_motenbl == 0)
 	{
-		output_set_value("start", BIT(data, 0));
-		coin_counter_w(machine(), 1, BIT(data, 1));     // hopper counter
-		coin_counter_w(machine(), 2, BIT(data, 2));     // good game counter
-		coin_lockout_w(machine(), 0, BIT(data, 3));     // not used ??
-		coin_counter_w(machine(), 0, BIT(data, 4));     // coin counter
+		output().set_value("start", BIT(data, 0));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));     // hopper counter
+		machine().bookkeeping().coin_counter_w(2, BIT(data, 2));     // good game counter
+		machine().bookkeeping().coin_lockout_w(0, BIT(data, 3));     // not used ??
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 4));     // coin counter
 		// BIT 5 errant ball solenoid
 		// BIT 7 hopper motor
 	}
@@ -317,8 +317,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
 
 		if (lmotor_dir != 0 || rmotor_dir != 0)
 		{
-			output_set_value("lmotor", m_lmotor);
-			output_set_value("rmotor", m_rmotor);
+			output().set_value("lmotor", m_lmotor);
+			output().set_value("rmotor", m_rmotor);
 
 			popmessage("Left Motor   Right Motor\n%-4s         %-4s\n%02d\\100       %02d\\100",
 						(lmotor_dir > 0) ? " up" : ((lmotor_dir < 0) ? "down" : "off"),

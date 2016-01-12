@@ -34,7 +34,7 @@ READ8_MEMBER(tank8_state::collision_r)
 
 WRITE8_MEMBER(tank8_state::lockout_w)
 {
-	coin_lockout_w(machine(), offset, ~data & 1);
+	machine().bookkeeping().coin_lockout_w(offset, ~data & 1);
 }
 
 

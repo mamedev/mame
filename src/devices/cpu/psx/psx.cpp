@@ -2026,7 +2026,7 @@ void psxcpu_device::state_import( const device_state_entry &entry )
 //  for the debugger
 //-------------------------------------------------
 
-void psxcpu_device::state_string_export( const device_state_entry &entry, std::string &str )
+void psxcpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch( entry.index() )
 	{

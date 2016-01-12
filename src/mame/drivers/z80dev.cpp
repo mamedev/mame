@@ -44,7 +44,7 @@ WRITE8_MEMBER( z80dev_state::display_w )
 	// xxxx ---- ???
 	static const UINT8 hex_7seg[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71};
 
-	output_set_digit_value(offset, hex_7seg[data&0x0f]);
+	output().set_digit_value(offset, hex_7seg[data&0x0f]);
 }
 
 READ8_MEMBER( z80dev_state::test_r )

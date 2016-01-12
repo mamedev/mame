@@ -92,9 +92,8 @@ void i8008_device::device_start()
 	state_add(I8008_H,        "H",        m_H);
 	state_add(I8008_L,        "L",        m_L);
 
-	std::string tempstr;
 	for (int addrnum = 0; addrnum < 8; addrnum++)
-		state_add(I8008_ADDR1 + addrnum, strformat(tempstr, "ADDR%d", addrnum + 1).c_str(), m_ADDR[addrnum].w.l).mask(0xfff);
+		state_add(I8008_ADDR1 + addrnum, strformat("ADDR%d", addrnum + 1).c_str(), m_ADDR[addrnum].w.l).mask(0xfff);
 
 	init_tables();
 }

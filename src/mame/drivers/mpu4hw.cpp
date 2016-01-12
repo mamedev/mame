@@ -296,7 +296,7 @@ void mpu4_state::lamp_extend_small(int data)
 	{
 		for (i = 0; i < 5; i++)
 		{
-			output_set_lamp_value((8*column)+i+128,((lamp_ext_data  & (1 << i)) != 0));
+			output().set_lamp_value((8*column)+i+128,((lamp_ext_data  & (1 << i)) != 0));
 		}
 	}
 	m_lamp_strobe_ext_persistence ++;
@@ -328,7 +328,7 @@ void mpu4_state::lamp_extend_large(int data,int column,int active)
 			{
 				for (i = 0; i < 8; i++)
 				{//CHECK, this includes bit 7
-					output_set_lamp_value((8*column)+i+128+lampbase ,(data  & (1 << i)) != 0);
+					output().set_lamp_value((8*column)+i+128+lampbase ,(data  & (1 << i)) != 0);
 				}
 				m_lamp_strobe_ext = column;
 			}
@@ -358,9 +358,9 @@ void mpu4_state::led_write_latch(int latch, int data, int column)
 	}
 	for(j=0; j<8; j++)
 	{
-		output_set_indexed_value("mpu4led",(8*column)+j,(data & (1 << j)) !=0);
+		output().set_indexed_value("mpu4led",(8*column)+j,(data & (1 << j)) !=0);
 	}
-	output_set_digit_value(column * 8, data);
+	output().set_digit_value(column * 8, data);
 
 	m_last_latch = diff;
 }
@@ -379,43 +379,43 @@ void mpu4_state::update_meters()
 	case FIVE_REEL_5TO8:
 		m_reel4->update(((data >> 4) & 0x0f));
 		data = (data & 0x0F); //Strip reel data from meter drives, leaving active elements
-		awp_draw_reel("reel5", m_reel4);
+		awp_draw_reel(machine(),"reel5", m_reel4);
 		break;
 
 	case FIVE_REEL_8TO5:
 		m_reel4->update((((data & 0x01) + ((data & 0x08) >> 2) + ((data & 0x20) >> 3) + ((data & 0x80) >> 4)) & 0x0f)) ;
 		data = 0x00; //Strip all reel data from meter drives, nothing is connected
-		awp_draw_reel("reel5", m_reel4);
+		awp_draw_reel(machine(),"reel5", m_reel4);
 		break;
 
 	case FIVE_REEL_3TO6:
 		m_reel4->update(((data >> 2) & 0x0f));
 		data = 0x00; //Strip all reel data from meter drives
-		awp_draw_reel("reel5", m_reel4);
+		awp_draw_reel(machine(),"reel5", m_reel4);
 		break;
 
 	case SIX_REEL_1TO8:
 		m_reel4->update( data       & 0x0f);
 		m_reel5->update((data >> 4) & 0x0f);
 		data = 0x00; //Strip all reel data from meter drives
-		awp_draw_reel("reel5", m_reel4);
-		awp_draw_reel("reel6", m_reel5);
+		awp_draw_reel(machine(),"reel5", m_reel4);
+		awp_draw_reel(machine(),"reel6", m_reel5);
 		break;
 
 	case SIX_REEL_5TO8:
 		m_reel4->update(((data >> 4) & 0x0f));
 		data = 0x00; //Strip all reel data from meter drives
-		awp_draw_reel("reel5", m_reel4);
+		awp_draw_reel(machine(),"reel5", m_reel4);
 		break;
 
 	case SEVEN_REEL:
 		m_reel0->update((((data & 0x01) + ((data & 0x08) >> 2) + ((data & 0x20) >> 3) + ((data & 0x80) >> 4)) & 0x0f)) ;
 		data = 0x00; //Strip all reel data from meter drives
-		awp_draw_reel("reel1", m_reel0);
+		awp_draw_reel(machine(),"reel1", m_reel0);
 		break;
 
 	case FLUTTERBOX: //The backbox fan assembly fits in a reel unit sized box, wired to the remote meter pin, so we can handle it here
-		output_set_value("flutterbox", data & 0x80);
+		output().set_value("flutterbox", data & 0x80);
 		data &= ~0x80; //Strip flutterbox data from meter drives
 		break;
 	}
@@ -570,7 +570,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic3_porta_w)
 
 			for (i = 0; i < 8; i++)
 			{
-				output_set_lamp_value((8*m_input_strobe)+i, ((data  & (1 << i)) !=0));
+				output().set_lamp_value((8*m_input_strobe)+i, ((data  & (1 << i)) !=0));
 			}
 			m_lamp_strobe = m_input_strobe;
 		}
@@ -588,7 +588,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic3_portb_w)
 		{
 			for (i = 0; i < 8; i++)
 			{
-				output_set_lamp_value((8*m_input_strobe)+i+64, ((data  & (1 << i)) !=0));
+				output().set_lamp_value((8*m_input_strobe)+i+64, ((data  & (1 << i)) !=0));
 			}
 			m_lamp_strobe2 = m_input_strobe;
 		}
@@ -605,12 +605,12 @@ WRITE8_MEMBER(mpu4_state::pia_ic3_portb_w)
 
 			for (i = 0; i < 8; i++)
 			{
-				if (output_get_lamp_value(lamps1[i])) pled_segs[0] |= (1 << i);
-				if (output_get_lamp_value(lamps2[i])) pled_segs[1] |= (1 << i);
+				if (output().get_lamp_value(lamps1[i])) pled_segs[0] |= (1 << i);
+				if (output().get_lamp_value(lamps2[i])) pled_segs[1] |= (1 << i);
 			}
 
-			output_set_digit_value(8,pled_segs[0]);
-			output_set_digit_value(9,pled_segs[1]);
+			output().set_digit_value(8,pled_segs[0]);
+			output().set_digit_value(9,pled_segs[1]);
 		}
 	}
 }
@@ -717,9 +717,9 @@ WRITE8_MEMBER(mpu4_state::pia_ic4_porta_w)
 			{
 				for(i=0; i<8; i++)
 				{
-					output_set_indexed_value("mpu4led",((7 - m_input_strobe) * 8) +i,(data & (1 << i)) !=0);
+					output().set_indexed_value("mpu4led",((7 - m_input_strobe) * 8) +i,(data & (1 << i)) !=0);
 				}
-				output_set_digit_value(7 - m_input_strobe,data);
+				output().set_digit_value(7 - m_input_strobe,data);
 			}
 			m_led_strobe = m_input_strobe;
 		}
@@ -865,9 +865,9 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
 		{
 			for(i=0; i<8; i++)
 			{
-				output_set_indexed_value("mpu4led",((m_input_strobe + 8) * 8) +i,(data & (1 << i)) !=0);
+				output().set_indexed_value("mpu4led",((m_input_strobe + 8) * 8) +i,(data & (1 << i)) !=0);
 			}
-			output_set_digit_value((m_input_strobe+8),data);
+			output().set_digit_value((m_input_strobe+8),data);
 		}
 		break;
 
@@ -888,9 +888,9 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
 		{
 			for(i=0; i<8; i++)
 			{
-				output_set_indexed_value("mpu4led",(((8*(m_last_b7 >>7))+ m_input_strobe) * 8) +i,(~data & (1 << i)) !=0);
+				output().set_indexed_value("mpu4led",(((8*(m_last_b7 >>7))+ m_input_strobe) * 8) +i,(~data & (1 << i)) !=0);
 			}
-			output_set_digit_value(((8*(m_last_b7 >>7))+m_input_strobe),~data);
+			output().set_digit_value(((8*(m_last_b7 >>7))+m_input_strobe),~data);
 		}
 		break;
 
@@ -902,16 +902,16 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
 	{
 		m_reel4->update( data      &0x0F);
 		m_reel5->update((data >> 4)&0x0F);
-		awp_draw_reel("reel5", m_reel4);
-		awp_draw_reel("reel6", m_reel5);
+		awp_draw_reel(machine(),"reel5", m_reel4);
+		awp_draw_reel(machine(),"reel6", m_reel5);
 	}
 	else
 	if (m_reel_mux == SEVEN_REEL)
 	{
 		m_reel1->update( data      &0x0F);
 		m_reel2->update((data >> 4)&0x0F);
-		awp_draw_reel("reel2", m_reel1);
-		awp_draw_reel("reel3", m_reel2);
+		awp_draw_reel(machine(),"reel2", m_reel1);
+		awp_draw_reel(machine(),"reel3", m_reel2);
 	}
 
 	if (core_stricmp(machine().system().name, "m4gambal") == 0)
@@ -1033,10 +1033,10 @@ READ8_MEMBER(mpu4_state::pia_ic5_portb_r)
 	}
 
 	LOG(("%s: IC5 PIA Read of Port B (coin input AUX2)\n",machine().describe_context()));
-	coin_lockout_w(machine(), 0, (m_pia5->b_output() & 0x01) );
-	coin_lockout_w(machine(), 1, (m_pia5->b_output() & 0x02) );
-	coin_lockout_w(machine(), 2, (m_pia5->b_output() & 0x04) );
-	coin_lockout_w(machine(), 3, (m_pia5->b_output() & 0x08) );
+	machine().bookkeeping().coin_lockout_w(0, (m_pia5->b_output() & 0x01) );
+	machine().bookkeeping().coin_lockout_w(1, (m_pia5->b_output() & 0x02) );
+	machine().bookkeeping().coin_lockout_w(2, (m_pia5->b_output() & 0x04) );
+	machine().bookkeeping().coin_lockout_w(3, (m_pia5->b_output() & 0x08) );
 	return m_aux2_port->read() | m_aux2_input;
 }
 
@@ -1126,15 +1126,15 @@ WRITE8_MEMBER(mpu4_state::pia_ic6_portb_w)
 	{
 		m_reel3->update( data      &0x0F);
 		m_reel4->update((data >> 4)&0x0F);
-		awp_draw_reel("reel4", m_reel3);
-		awp_draw_reel("reel5", m_reel4);
+		awp_draw_reel(machine(),"reel4", m_reel3);
+		awp_draw_reel(machine(),"reel5", m_reel4);
 	}
 	else if (m_reels)
 	{
 		m_reel0->update( data      &0x0F);
 		m_reel1->update((data >> 4)&0x0F);
-		awp_draw_reel("reel1", m_reel0);
-		awp_draw_reel("reel2", m_reel1);
+		awp_draw_reel(machine(),"reel1", m_reel0);
+		awp_draw_reel(machine(),"reel2", m_reel1);
 	}
 }
 
@@ -1182,15 +1182,15 @@ WRITE8_MEMBER(mpu4_state::pia_ic7_porta_w)
 	{
 		m_reel5->update( data      &0x0F);
 		m_reel6->update((data >> 4)&0x0F);
-		awp_draw_reel("reel6", m_reel5);
-		awp_draw_reel("reel7", m_reel7);
+		awp_draw_reel(machine(),"reel6", m_reel5);
+		awp_draw_reel(machine(),"reel7", m_reel7);
 	}
 	else if (m_reels)
 	{
 		m_reel2->update( data      &0x0F);
 		m_reel3->update((data >> 4)&0x0F);
-		awp_draw_reel("reel3", m_reel2);
-		awp_draw_reel("reel4", m_reel3);
+		awp_draw_reel(machine(),"reel3", m_reel2);
+		awp_draw_reel(machine(),"reel4", m_reel3);
 	}
 }
 
@@ -1280,7 +1280,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic8_portb_w)
 	LOG_IC8(("%s: IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", machine().describe_context(),data));
 	for (i = 0; i < 8; i++)
 	{
-		output_set_indexed_value("triac", i, data & (1 << i));
+		output().set_indexed_value("triac", i, data & (1 << i));
 	}
 }
 

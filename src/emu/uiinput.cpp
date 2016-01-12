@@ -16,8 +16,6 @@
     CONSTANTS
 ***************************************************************************/
 
-#define EVENT_QUEUE_SIZE        128
-
 enum
 {
 	SEQ_PRESSED_FALSE = 0,      /* not pressed */
@@ -26,58 +24,27 @@ enum
 };
 
 
+//**************************************************************************
+//  NETWORK MANAGER
+//**************************************************************************
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//-------------------------------------------------
+//  network_manager - constructor
+//-------------------------------------------------
 
-/* private input port state */
-struct ui_input_private
-{
-	/* pressed states; retrieved with ui_input_pressed() */
-	osd_ticks_t                 next_repeat[IPT_COUNT];
-	UINT8                       seqpressed[IPT_COUNT];
-
-	/* mouse position/info */
-	render_target *             current_mouse_target;
-	INT32                       current_mouse_x;
-	INT32                       current_mouse_y;
-	bool                        current_mouse_down;
-
-	/* popped states; ring buffer of ui_events */
-	ui_event                    events[EVENT_QUEUE_SIZE];
-	int                         events_start;
-	int                         events_end;
-};
-
-
-
-/***************************************************************************
-    FUNCTION PROTOYPES
-***************************************************************************/
-
-//static void ui_input_frame_update(running_machine &machine);
-
-
-
-/***************************************************************************
-    INITIALIZATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    ui_input_init - initializes the UI input
-    system
--------------------------------------------------*/
-
-void ui_input_init(running_machine &machine)
+ui_input_manager::ui_input_manager(running_machine &machine)
+	: m_machine(machine), 
+	  m_current_mouse_target(nullptr), 
+	  m_current_mouse_down(false), 
+	  m_events_start(0), 
+	  m_events_end(0)
 {
 	/* create the private data */
-	machine.ui_input_data = auto_alloc_clear(machine, ui_input_private);
-	machine.ui_input_data->current_mouse_x = -1;
-	machine.ui_input_data->current_mouse_y = -1;
+	m_current_mouse_x = -1;
+	m_current_mouse_y = -1;
 
 	/* add a frame callback to poll inputs */
-	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(ui_input_frame_update), &machine));
+	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(ui_input_manager::frame_update), this));
 }
 
 
@@ -87,62 +54,55 @@ void ui_input_init(running_machine &machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    ui_input_frame_update - looks through pressed
+    frame_update - looks through pressed
     input as per events pushed our way and posts
     corresponding IPT_UI_* events
 -------------------------------------------------*/
 
-void ui_input_frame_update(running_machine &machine)
+void ui_input_manager::frame_update()
 {
-	ui_input_private *uidata = machine.ui_input_data;
-
 	/* update the state of all the UI keys */
 	for (ioport_type code = ioport_type(IPT_UI_FIRST + 1); code < IPT_UI_LAST; ++code)
 	{
-		bool pressed = machine.ioport().type_pressed(code);
-		if (!pressed || uidata->seqpressed[code] != SEQ_PRESSED_RESET)
-			uidata->seqpressed[code] = pressed;
+		bool pressed = machine().ioport().type_pressed(code);
+		if (!pressed || m_seqpressed[code] != SEQ_PRESSED_RESET)
+			m_seqpressed[code] = pressed;
 	}
 }
 
 
 /*-------------------------------------------------
-    ui_input_push_event - pushes a single event
+    push_event - pushes a single event
     onto the queue
 -------------------------------------------------*/
 
-bool ui_input_push_event(running_machine &machine, ui_event evt)
+bool ui_input_manager::push_event(ui_event evt)
 {
-	ui_input_private *uidata = machine.ui_input_data;
-
-	/* we may be called before the UI is initialized */
-	if (uidata == nullptr)
-		return false;
 
 	/* some pre-processing (this is an icky place to do this stuff!) */
 	switch (evt.event_type)
 	{
 		case UI_EVENT_MOUSE_MOVE:
-			uidata->current_mouse_target = evt.target;
-			uidata->current_mouse_x = evt.mouse_x;
-			uidata->current_mouse_y = evt.mouse_y;
+			m_current_mouse_target = evt.target;
+			m_current_mouse_x = evt.mouse_x;
+			m_current_mouse_y = evt.mouse_y;
 			break;
 
 		case UI_EVENT_MOUSE_LEAVE:
-			if (uidata->current_mouse_target == evt.target)
+			if (m_current_mouse_target == evt.target)
 			{
-				uidata->current_mouse_target = nullptr;
-				uidata->current_mouse_x = -1;
-				uidata->current_mouse_y = -1;
+				m_current_mouse_target = nullptr;
+				m_current_mouse_x = -1;
+				m_current_mouse_y = -1;
 			}
 			break;
 
 		case UI_EVENT_MOUSE_DOWN:
-			uidata->current_mouse_down = true;
+			m_current_mouse_down = true;
 			break;
 
 		case UI_EVENT_MOUSE_UP:
-			uidata->current_mouse_down = false;
+			m_current_mouse_down = false;
 			break;
 
 		default:
@@ -151,28 +111,27 @@ bool ui_input_push_event(running_machine &machine, ui_event evt)
 	}
 
 	/* is the queue filled up? */
-	if ((uidata->events_end + 1) % ARRAY_LENGTH(uidata->events) == uidata->events_start)
+	if ((m_events_end + 1) % ARRAY_LENGTH(m_events) == m_events_start)
 		return false;
 
-	uidata->events[uidata->events_end++] = evt;
-	uidata->events_end %= ARRAY_LENGTH(uidata->events);
+	m_events[m_events_end++] = evt;
+	m_events_end %= ARRAY_LENGTH(m_events);
 	return true;
 }
 
 
 /*-------------------------------------------------
-    ui_input_pop_event - pops an event off of the queue
+    pop_event - pops an event off of the queue
 -------------------------------------------------*/
 
-bool ui_input_pop_event(running_machine &machine, ui_event *evt)
+bool ui_input_manager::pop_event(ui_event *evt)
 {
-	ui_input_private *uidata = machine.ui_input_data;
 	bool result;
 
-	if (uidata->events_start != uidata->events_end)
+	if (m_events_start != m_events_end)
 	{
-		*evt = uidata->events[uidata->events_start++];
-		uidata->events_start %= ARRAY_LENGTH(uidata->events);
+		*evt = m_events[m_events_start++];
+		m_events_start %= ARRAY_LENGTH(m_events);
 		result = true;
 	}
 	else
@@ -185,40 +144,38 @@ bool ui_input_pop_event(running_machine &machine, ui_event *evt)
 
 
 /*-------------------------------------------------
-    ui_input_reset - clears all outstanding events
+    reset - clears all outstanding events
     and resets the sequence states
 -------------------------------------------------*/
 
-void ui_input_reset(running_machine &machine)
+void ui_input_manager::reset()
 {
-	ui_input_private *uidata = machine.ui_input_data;
 	int code;
 
-	uidata->events_start = 0;
-	uidata->events_end = 0;
+	m_events_start = 0;
+	m_events_end = 0;
 	for (code = IPT_UI_FIRST + 1; code < IPT_UI_LAST; code++)
 	{
-		uidata->seqpressed[code] = SEQ_PRESSED_RESET;
-		uidata->next_repeat[code] = 0;
+		m_seqpressed[code] = SEQ_PRESSED_RESET;
+		m_next_repeat[code] = 0;
 	}
 }
 
 
 /*-------------------------------------------------
-    ui_input_find_mouse - retrieves the current
+    find_mouse - retrieves the current
     location of the mouse
 -------------------------------------------------*/
 
-render_target *ui_input_find_mouse(running_machine &machine, INT32 *x, INT32 *y, bool *button)
+render_target *ui_input_manager::find_mouse(INT32 *x, INT32 *y, bool *button)
 {
-	ui_input_private *uidata = machine.ui_input_data;
 	if (x != nullptr)
-		*x = uidata->current_mouse_x;
+		*x = m_current_mouse_x;
 	if (y != nullptr)
-		*y = uidata->current_mouse_y;
+		*y = m_current_mouse_y;
 	if (button != nullptr)
-		*button = uidata->current_mouse_down;
-	return uidata->current_mouse_target;
+		*button = m_current_mouse_down;
+	return m_current_mouse_target;
 }
 
 
@@ -228,34 +185,33 @@ render_target *ui_input_find_mouse(running_machine &machine, INT32 *x, INT32 *y,
 ***************************************************************************/
 
 /*-------------------------------------------------
-    ui_input_pressed - return TRUE if a key down
+    pressed - return TRUE if a key down
     for the given user interface sequence is
     detected
 -------------------------------------------------*/
 
-bool ui_input_pressed(running_machine &machine, int code)
+bool ui_input_manager::pressed(int code)
 {
-	return ui_input_pressed_repeat(machine, code, 0);
+	return pressed_repeat(code, 0);
 }
 
 
 /*-------------------------------------------------
-    ui_input_pressed_repeat - return TRUE if a key
+    pressed_repeat - return TRUE if a key
     down for the given user interface sequence is
     detected, or if autorepeat at the given speed
     is triggered
 -------------------------------------------------*/
 
-bool ui_input_pressed_repeat(running_machine &machine, int code, int speed)
+bool ui_input_manager::pressed_repeat(int code, int speed)
 {
-	ui_input_private *uidata = machine.ui_input_data;
 	int pressed;
 
 g_profiler.start(PROFILER_INPUT);
 
 	/* get the status of this key (assumed to be only in the defaults) */
 	assert(code >= IPT_UI_CONFIGURE && code <= IPT_OSD_16);
-	pressed = (uidata->seqpressed[code] == SEQ_PRESSED_TRUE);
+	pressed = (m_seqpressed[code] == SEQ_PRESSED_TRUE);
 
 	/* if down, handle it specially */
 	if (pressed)
@@ -263,12 +219,12 @@ g_profiler.start(PROFILER_INPUT);
 		osd_ticks_t tps = osd_ticks_per_second();
 
 		/* if this is the first press, set a 3x delay and leave pressed = 1 */
-		if (uidata->next_repeat[code] == 0)
-			uidata->next_repeat[code] = osd_ticks() + 3 * speed * tps / 60;
+		if (m_next_repeat[code] == 0)
+			m_next_repeat[code] = osd_ticks() + 3 * speed * tps / 60;
 
 		/* if this is an autorepeat case, set a 1x delay and leave pressed = 1 */
-		else if (speed > 0 && (osd_ticks() + tps - uidata->next_repeat[code]) >= tps)
-			uidata->next_repeat[code] += 1 * speed * tps / 60;
+		else if (speed > 0 && (osd_ticks() + tps - m_next_repeat[code]) >= tps)
+			m_next_repeat[code] += 1 * speed * tps / 60;
 
 		/* otherwise, reset pressed = 0 */
 		else
@@ -277,9 +233,95 @@ g_profiler.start(PROFILER_INPUT);
 
 	/* if we're not pressed, reset the memory field */
 	else
-		uidata->next_repeat[code] = 0;
+		m_next_repeat[code] = 0;
 
 g_profiler.stop();
 
 	return pressed;
+}
+
+/*-------------------------------------------------
+	push_mouse_move_event - pushes a mouse
+	move event to the specified render_target
+-------------------------------------------------*/
+
+void ui_input_manager::push_mouse_move_event(render_target* target, INT32 x, INT32 y)
+{
+	ui_event event = { UI_EVENT_NONE };
+	event.event_type = UI_EVENT_MOUSE_MOVE;
+	event.target = target;
+	event.mouse_x = x;
+	event.mouse_y = y;
+	push_event(event);
+}
+
+/*-------------------------------------------------
+	push_mouse_leave_event - pushes a
+	mouse leave event to the specified render_target
+-------------------------------------------------*/
+
+void ui_input_manager::push_mouse_leave_event(render_target* target)
+{
+	ui_event event = { UI_EVENT_NONE };
+	event.event_type = UI_EVENT_MOUSE_LEAVE;
+	event.target = target;
+	push_event(event);
+}
+
+/*-------------------------------------------------
+	push_mouse_down_event - pushes a mouse
+	down event to the specified render_target
+-------------------------------------------------*/
+
+void ui_input_manager::push_mouse_down_event(render_target* target, INT32 x, INT32 y)
+{
+	ui_event event = { UI_EVENT_NONE };
+	event.event_type = UI_EVENT_MOUSE_DOWN;
+	event.target = target;
+	event.mouse_x = x;
+	event.mouse_y = y;
+	push_event(event);
+}
+
+/*-------------------------------------------------
+	push_mouse_down_event - pushes a mouse
+	down event to the specified render_target
+-------------------------------------------------*/
+
+void ui_input_manager::push_mouse_up_event(render_target* target, INT32 x, INT32 y)
+{
+	ui_event event = { UI_EVENT_NONE };
+	event.event_type = UI_EVENT_MOUSE_UP;
+	event.target = target;
+	event.mouse_x = x;
+	event.mouse_y = y;
+	push_event(event);
+}
+
+/*-------------------------------------------------
+	push_mouse_double_click_event - pushes
+	a mouse double-click event to the specified
+	render_target
+-------------------------------------------------*/
+void ui_input_manager::push_mouse_double_click_event(render_target* target, INT32 x, INT32 y)
+{
+	ui_event event = { UI_EVENT_NONE };
+	event.event_type = UI_EVENT_MOUSE_DOUBLE_CLICK;
+	event.target = target;
+	event.mouse_x = x;
+	event.mouse_y = y;
+	push_event(event);
+}
+
+/*-------------------------------------------------
+	push_char_event - pushes a char event
+	to the specified render_target
+-------------------------------------------------*/
+void ui_input_manager::push_char_event(render_target* target, unicode_char ch)
+{
+	ui_event event = { UI_EVENT_NONE };
+	event.event_type = UI_EVENT_CHAR;
+	event.target = target;
+	event.ch = ch;
+	push_event(event);
 }

@@ -540,8 +540,8 @@ READ8_MEMBER(aristmk4_state::u3_p2)
 	int u3_p2_ret= ioport("5002")->read();
 	int u3_p3_ret= ioport("5003")->read();
 
-	output_set_lamp_value(19, (u3_p2_ret >> 4) & 1); //auditkey light
-	output_set_lamp_value(20, (u3_p3_ret >> 2) & 1); //jackpotkey light
+	output().set_lamp_value(19, (u3_p2_ret >> 4) & 1); //auditkey light
+	output().set_lamp_value(20, (u3_p3_ret >> 2) & 1); //jackpotkey light
 
 	if (m_u3_p0_w&0x20) // DOPTE on
 	{
@@ -695,10 +695,10 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
 			switch(i+1)
 			{
 				case 4:
-					output_set_value("creditspendmeter", emet[i]);
+					output().set_value("creditspendmeter", emet[i]);
 					break;
 				case 5:
-					output_set_value("creditoutmeter", emet[i]);
+					output().set_value("creditoutmeter", emet[i]);
 					break;
 				default:
 					printf("Unhandled Mechanical meter %d pulse: %02d\n",i+1, emet[i]);
@@ -713,10 +713,10 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
 			switch(i+1)
 			{
 				case 4:
-					output_set_value("creditspendmeter", 0);
+					output().set_value("creditspendmeter", 0);
 					break;
 				case 5:
-					output_set_value("creditoutmeter", 0);
+					output().set_value("creditoutmeter", 0);
 					break;
 				default:
 					break;
@@ -748,7 +748,7 @@ TIMER_CALLBACK_MEMBER(aristmk4_state::coin_input_reset)
 TIMER_CALLBACK_MEMBER(aristmk4_state::hopper_reset)
 {
 	m_hopper_motor = 0x01;
-	output_set_value("hopper_motor", m_hopper_motor);
+	output().set_value("hopper_motor", m_hopper_motor);
 }
 
 // Port A read (SW1)
@@ -808,7 +808,7 @@ READ8_MEMBER(aristmk4_state::via_b_r)
 		ret=ret^0x40;
 		machine().scheduler().timer_set(attotime::from_msec(175), timer_expired_delegate(FUNC(aristmk4_state::hopper_reset),this));
 		m_hopper_motor=0x02;
-		output_set_value("hopper_motor", m_hopper_motor);
+		output().set_value("hopper_motor", m_hopper_motor);
 		break;
 	case 0x01:
 		break; //default
@@ -918,42 +918,42 @@ WRITE_LINE_MEMBER(aristmk4_state::via_cb2_w)
 	else if (m_hopper_motor<0x02)
 		m_hopper_motor=state;
 
-	output_set_value("hopper_motor", m_hopper_motor); // stop motor
+	output().set_value("hopper_motor", m_hopper_motor); // stop motor
 }
 
 // Lamp output
 
 WRITE8_MEMBER(aristmk4_state::pblp_out)
 {
-	output_set_lamp_value(1, (data) & 1);
-	output_set_lamp_value(5, (data >> 1) & 1);
-	output_set_lamp_value(9, (data >> 2) & 1);
-	output_set_lamp_value(11,(data >> 3) & 1);
-	output_set_lamp_value(3, (data >> 4) & 1);
-	output_set_lamp_value(4, (data >> 5) & 1);
-	output_set_lamp_value(2, (data >> 6) & 1);
-	output_set_lamp_value(10,(data >> 7) & 1);
+	output().set_lamp_value(1, (data) & 1);
+	output().set_lamp_value(5, (data >> 1) & 1);
+	output().set_lamp_value(9, (data >> 2) & 1);
+	output().set_lamp_value(11,(data >> 3) & 1);
+	output().set_lamp_value(3, (data >> 4) & 1);
+	output().set_lamp_value(4, (data >> 5) & 1);
+	output().set_lamp_value(2, (data >> 6) & 1);
+	output().set_lamp_value(10,(data >> 7) & 1);
 	//logerror("Lights port A %02X\n",data);
 }
 
 WRITE8_MEMBER(aristmk4_state::pbltlp_out)
 {
-	output_set_lamp_value(8,  (data) & 1);
-	output_set_lamp_value(12, (data >> 1) & 1);
-	output_set_lamp_value(6,  (data >> 2) & 1);
-	output_set_lamp_value(7,  (data >> 3) & 1);
-	output_set_lamp_value(14, (data >> 4) & 1); // light tower
-	output_set_lamp_value(15, (data >> 5) & 1); // light tower
-	output_set_lamp_value(16, (data >> 6) & 1); // light tower
-	output_set_lamp_value(17, (data >> 7) & 1); // light tower
+	output().set_lamp_value(8,  (data) & 1);
+	output().set_lamp_value(12, (data >> 1) & 1);
+	output().set_lamp_value(6,  (data >> 2) & 1);
+	output().set_lamp_value(7,  (data >> 3) & 1);
+	output().set_lamp_value(14, (data >> 4) & 1); // light tower
+	output().set_lamp_value(15, (data >> 5) & 1); // light tower
+	output().set_lamp_value(16, (data >> 6) & 1); // light tower
+	output().set_lamp_value(17, (data >> 7) & 1); // light tower
 	//logerror("Lights port B: %02X\n",data);
 }
 
 WRITE8_MEMBER(aristmk4_state::mlamps)
 {
 	/* TAKE WIN AND GAMBLE LAMPS */
-	output_set_lamp_value(18, (data >> 5) & 1);
-	output_set_lamp_value(13, (data >> 6) & 1);
+	output().set_lamp_value(18, (data >> 5) & 1);
+	output().set_lamp_value(13, (data >> 6) & 1);
 }
 
 WRITE8_MEMBER(aristmk4_state::zn434_w)

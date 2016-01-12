@@ -618,13 +618,13 @@ UINT16 hp_hybrid_cpu_device::execute_one_sub(UINT16 opcode)
 
 void hp_hybrid_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
-				if (entry.index() == STATE_GENFLAGS) {
-								strprintf(str, "%s %s %c %c",
-														BIT(m_flags , HPHYBRID_DB_BIT) ? "Db":"..",
-														BIT(m_flags , HPHYBRID_CB_BIT) ? "Cb":"..",
-														BIT(m_flags , HPHYBRID_O_BIT) ? 'O':'.',
-														BIT(m_flags , HPHYBRID_C_BIT) ? 'E':'.');
-				}
+	if (entry.index() == STATE_GENFLAGS) {
+		strprintf(str, "%s %s %c %c",
+					BIT(m_flags , HPHYBRID_DB_BIT) ? "Db":"..",
+					BIT(m_flags , HPHYBRID_CB_BIT) ? "Cb":"..",
+					BIT(m_flags , HPHYBRID_O_BIT) ? 'O':'.',
+					BIT(m_flags , HPHYBRID_C_BIT) ? 'E':'.');
+	}
 }
 
 offs_t hp_hybrid_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)

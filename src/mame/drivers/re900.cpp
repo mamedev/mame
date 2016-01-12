@@ -127,12 +127,12 @@ READ8_MEMBER(re900_state::re_psg_portA_r)
 {
 	if ((ioport("IN0")->read() & 0x01) == 0)
 	{
-		output_set_lamp_value(0,1);     // Operator Key ON
+		output().set_lamp_value(0,1);     // Operator Key ON
 	}
 
 	else
 	{
-		output_set_lamp_value(0,0);     // Operator Key OFF
+		output().set_lamp_value(0,0);     // Operator Key OFF
 	}
 
 	return ioport("IN0")->read();
@@ -144,18 +144,18 @@ READ8_MEMBER(re900_state::re_psg_portB_r)
 	logerror("llamada a re_psg_portB_r\n");
 	/* This is a hack to select the active player due to Keyboard size restrictions  */
 
-	output_set_lamp_value(m_player,1);
+	output().set_lamp_value(m_player,1);
 
 	if (ioport("IN_S")->read())
 	{
 		if (!m_stat_a)
 		{
-			output_set_lamp_value(1, 0);
-			output_set_lamp_value(2, 0);
-			output_set_lamp_value(3, 0);
-			output_set_lamp_value(4, 0);
-			output_set_lamp_value(5, 0);
-			output_set_lamp_value(6, 0);
+			output().set_lamp_value(1, 0);
+			output().set_lamp_value(2, 0);
+			output().set_lamp_value(3, 0);
+			output().set_lamp_value(4, 0);
+			output().set_lamp_value(5, 0);
+			output().set_lamp_value(6, 0);
 			m_player++;
 
 			if (m_player == 7)
@@ -163,7 +163,7 @@ READ8_MEMBER(re900_state::re_psg_portB_r)
 				m_player = 1;
 			}
 
-			output_set_lamp_value(m_player, 1); /* It shows active player via layout buttons   */
+			output().set_lamp_value(m_player, 1); /* It shows active player via layout buttons   */
 			m_stat_a = 1;
 		}
 	}
@@ -212,11 +212,11 @@ WRITE8_MEMBER(re900_state::re_mux_port_B_w)
 
 	if (data == 0x7f)
 	{
-		output_set_lamp_value(20 + led, 1);
+		output().set_lamp_value(20 + led, 1);
 
 		if (led != m_ledant)
 		{
-			output_set_lamp_value(20 + m_ledant, 0);
+			output().set_lamp_value(20 + m_ledant, 0);
 			m_ledant = led;
 		}
 	}
@@ -224,8 +224,8 @@ WRITE8_MEMBER(re900_state::re_mux_port_B_w)
 
 WRITE8_MEMBER(re900_state::cpu_port_0_w)
 {
-//  output_set_lamp_value(7,1 ^ ( (data >> 4) & 1)); /* Cont. Sal */
-//  output_set_lamp_value(8,1 ^ ( (data >> 5) & 1)); /* Cont. Ent */
+//  output().set_lamp_value(7,1 ^ ( (data >> 4) & 1)); /* Cont. Sal */
+//  output().set_lamp_value(8,1 ^ ( (data >> 5) & 1)); /* Cont. Ent */
 }
 
 WRITE8_MEMBER(re900_state::watchdog_reset_w)

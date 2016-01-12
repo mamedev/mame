@@ -154,8 +154,8 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_1800_w)
 	m_pixcolor = ((data & 0x01) << 1) | ((data & 0x02) >> 1);
 
 	/* bits 4 and 5 are coin counters */
-	coin_counter_w(machine(), 0, data & 0x10);
-	coin_counter_w(machine(), 1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 
 	/* bit 7 is screen flip */
 	flip_screen_set(data & 0x80);

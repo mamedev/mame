@@ -73,19 +73,19 @@ WRITE8_MEMBER( csc_state::pia0_pa_w )
 	switch (m_selector)
 	{
 	case 0:
-		output_set_digit_value(0, out_digit & 0x7f);
-		output_set_value("pm_led", BIT(out_digit, 7));
+		output().set_digit_value(0, out_digit & 0x7f);
+		output().set_value("pm_led", BIT(out_digit, 7));
 		break;
 	case 1:
-		output_set_digit_value(1, out_digit & 0x7f);
+		output().set_digit_value(1, out_digit & 0x7f);
 		break;
 	case 2:
-		output_set_digit_value(2, out_digit & 0x7f);
-		output_set_value("up_dot", BIT(out_digit, 7));
+		output().set_digit_value(2, out_digit & 0x7f);
+		output().set_value("up_dot", BIT(out_digit, 7));
 		break;
 	case 3:
-		output_set_digit_value(3, out_digit & 0x7f);
-		output_set_value("low_dot", BIT(out_digit, 7));
+		output().set_digit_value(3, out_digit & 0x7f);
+		output().set_value("low_dot", BIT(out_digit, 7));
 		break;
 	}
 
@@ -134,7 +134,7 @@ WRITE8_MEMBER( csc_state::pia1_pb_w )
 
 	if (m_selector < 8)
 		for (int i=0; i<8; i++)
-			output_set_indexed_value(row_tag[m_selector], i+1, BIT(data, 7-i));
+			output().set_indexed_value(row_tag[m_selector], i+1, BIT(data, 7-i));
 }
 
 READ8_MEMBER( csc_state::pia1_pa_r )

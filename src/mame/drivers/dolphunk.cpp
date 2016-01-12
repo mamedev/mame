@@ -127,7 +127,7 @@ WRITE_LINE_MEMBER( dauphin_state::cass_w )
 
 WRITE8_MEMBER( dauphin_state::port00_w )
 {
-	output_set_digit_value(offset, data);
+	output().set_digit_value(offset, data);
 }
 
 WRITE8_MEMBER( dauphin_state::port06_w )

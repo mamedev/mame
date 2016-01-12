@@ -410,13 +410,13 @@ WRITE8_MEMBER( c8050_t::riot1_pb_w )
 	*/
 
 	// activity led 1
-	output_set_led_value(LED_ACT1, BIT(data, 3));
+	machine().output().set_led_value(LED_ACT1, BIT(data, 3));
 
 	// activity led 0
-	output_set_led_value(LED_ACT0, BIT(data, 4));
+	machine().output().set_led_value(LED_ACT0, BIT(data, 4));
 
 	// error led
-	output_set_led_value(LED_ERR, BIT(data, 5));
+	machine().output().set_led_value(LED_ERR, BIT(data, 5));
 }
 
 WRITE8_MEMBER( c8050_t::via_pb_w )

@@ -178,7 +178,7 @@ WRITE8_MEMBER(lordgun_state::lordgun_eeprom_w)
 		logerror("%s: Unknown EEPROM bit written %02X\n",machine().describe_context(),data);
 	}
 
-	coin_counter_w(machine(), 0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 
 	// Update light guns positions
 	for (i = 0; i < 2; i++)
@@ -210,8 +210,8 @@ WRITE8_MEMBER(lordgun_state::aliencha_eeprom_w)
 	// bit 1? cleared during screen transitions
 	m_whitescreen = !(data & 0x02);
 
-	coin_counter_w(machine(), 0, data & 0x08);
-	coin_counter_w(machine(), 1, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, data & 0x08);
+	machine().bookkeeping().coin_counter_w(1, data & 0x10);
 
 	// latch the bit
 	m_eeprom->di_write((data & 0x80) >> 7);

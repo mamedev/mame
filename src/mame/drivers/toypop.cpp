@@ -488,13 +488,13 @@ READ8_MEMBER(toypop_state::dipB_h){ return ioport("DSW2")->read() >> 4; }       
 
 WRITE8_MEMBER(toypop_state::out_coin0)
 {
-	coin_lockout_global_w(machine(), data & 4);
-	coin_counter_w(machine(), 0, ~data & 8);
+	machine().bookkeeping().coin_lockout_global_w(data & 4);
+	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 
 WRITE8_MEMBER(toypop_state::out_coin1)
 {
-	coin_counter_w(machine(), 1, ~data & 1);
+	machine().bookkeeping().coin_counter_w(1, ~data & 1);
 }
 
 WRITE8_MEMBER(toypop_state::flip)

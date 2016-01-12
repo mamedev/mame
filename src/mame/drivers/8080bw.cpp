@@ -2309,7 +2309,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(_8080bw_state::steelwkr_sh_port_3_w)
 {
-	coin_lockout_global_w(machine(), !(~data & 0x03));      /* possibly */
+	machine().bookkeeping().coin_lockout_global_w(!(~data & 0x03));      /* possibly */
 }
 
 static ADDRESS_MAP_START( steelwkr_io_map, AS_IO, 8, _8080bw_state )

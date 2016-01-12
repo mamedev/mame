@@ -286,7 +286,7 @@ WRITE8_MEMBER(msx_state::msx_psg_port_b_w)
 {
 	/* Arabic or kana mode led */
 	if ( (data ^ m_psg_b) & 0x80)
-		set_led_status (machine(), 2, !(data & 0x80) );
+		output().set_led_value(2, !(data & 0x80) );
 
 	if ( (m_psg_b ^ data) & 0x10)
 	{
@@ -340,7 +340,7 @@ WRITE8_MEMBER( msx_state::msx_ppi_port_c_w )
 
 	/* caps lock */
 	if ( BIT(m_port_c_old ^ data, 6) )
-		set_led_status (machine(), 1, !BIT(data, 6) );
+		output().set_led_value(1, !BIT(data, 6) );
 
 	/* key click */
 	if ( BIT(m_port_c_old ^ data, 7) )

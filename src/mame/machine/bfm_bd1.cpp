@@ -184,7 +184,7 @@ void bfm_bd1_t::update_display()
 		{
 			m_outputs[i] = 0;
 		}
-		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
+		machine().output().set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
 	}
 }
 ///////////////////////////////////////////////////////////////////////////

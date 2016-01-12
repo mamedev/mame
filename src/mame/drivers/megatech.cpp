@@ -478,11 +478,11 @@ WRITE8_MEMBER(mtech_state::bios_ctrl_w )
 {
 	if (offset == 1)
 	{
-		output_set_value("Alarm_sound", BIT(data, 7));
+		output().set_value("Alarm_sound", BIT(data, 7));
 		m_bios_ctrl_inputs = data & 0x04;  // Genesis/SMS input ports disable bit
 	}
 	else if (offset == 2)
-		output_set_value("Flash_screen", BIT(data, 1));
+		output().set_value("Flash_screen", BIT(data, 1));
 
 	m_bios_ctrl[offset] = data;
 }

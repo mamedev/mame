@@ -838,7 +838,7 @@ sound_manager::sound_manager(running_machine &machine)
 		m_wavfile = wav_open(wavfile, machine.sample_rate(), 2);
 
 	// register callbacks
-	config_register(machine, "mixer", config_saveload_delegate(FUNC(sound_manager::config_load), this), config_saveload_delegate(FUNC(sound_manager::config_save), this));
+	machine.configuration().config_register("mixer", config_saveload_delegate(FUNC(sound_manager::config_load), this), config_saveload_delegate(FUNC(sound_manager::config_save), this));
 	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(sound_manager::pause), this));
 	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(sound_manager::resume), this));
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(sound_manager::reset), this));
@@ -967,10 +967,10 @@ void sound_manager::resume()
 //  configuration file
 //-------------------------------------------------
 
-void sound_manager::config_load(int config_type, xml_data_node *parentnode)
+void sound_manager::config_load(config_type cfg_type, xml_data_node *parentnode)
 {
 	// we only care about game files
-	if (config_type != CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::CONFIG_TYPE_GAME)
 		return;
 
 	// might not have any data
@@ -997,10 +997,10 @@ void sound_manager::config_load(int config_type, xml_data_node *parentnode)
 //  file
 //-------------------------------------------------
 
-void sound_manager::config_save(int config_type, xml_data_node *parentnode)
+void sound_manager::config_save(config_type cfg_type, xml_data_node *parentnode)
 {
 	// we only care about game files
-	if (config_type != CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::CONFIG_TYPE_GAME)
 		return;
 
 	// iterate over mixer channels

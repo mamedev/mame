@@ -133,7 +133,7 @@ WRITE8_MEMBER(mcr3_state::mcrmono_control_port_w)
 	        D0 = coin meter 1
 	*/
 
-	coin_counter_w(machine(), 0, (data >> 0) & 1);
+	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
 	mcr_cocktail_flip = (data >> 6) & 1;
 }
 
@@ -321,9 +321,9 @@ WRITE8_MEMBER(mcr3_state::powerdrv_op5_w)
 	/* bit 3 -> J1-10 = lamp 1 */
 	/* bit 2 -> J1-8 = lamp 2 */
 	/* bit 1 -> J1-6 = lamp 3 */
-	set_led_status(machine(), 0, (data >> 3) & 1);
-	set_led_status(machine(), 1, (data >> 2) & 1);
-	set_led_status(machine(), 2, (data >> 1) & 1);
+	output().set_led_value(0, (data >> 3) & 1);
+	output().set_led_value(1, (data >> 2) & 1);
+	output().set_led_value(2, (data >> 1) & 1);
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);
@@ -364,9 +364,9 @@ WRITE8_MEMBER(mcr3_state::stargrds_op5_w)
 	/* bit 2 controls light #0 */
 	/* bit 3 controls light #1 */
 	/* bit 4 controls light #2 */
-	set_led_status(machine(), 0, (data >> 2) & 1);
-	set_led_status(machine(), 1, (data >> 3) & 1);
-	set_led_status(machine(), 2, (data >> 4) & 1);
+	output().set_led_value(0, (data >> 2) & 1);
+	output().set_led_value(1, (data >> 3) & 1);
+	output().set_led_value(2, (data >> 4) & 1);
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);
@@ -431,7 +431,7 @@ WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 		/* bit 2 -> J1-11 (A2) */
 		/* bit 1 -> J1-10 (A1) */
 		/* bit 0 -> J1-12 (A0) */
-		output_set_value(lampname[data & 7], (data >> 3) & 1);
+		output().set_value(lampname[data & 7], (data >> 3) & 1);
 	}
 	m_last_op4 = data;
 

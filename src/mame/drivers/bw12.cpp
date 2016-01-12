@@ -123,7 +123,7 @@ void bw12_state::ls259_w(int address, int data)
 		break;
 
 	case 4: /* CAP LOCK */
-		output_set_led_value(0, data);
+		output().set_led_value(0, data);
 		break;
 
 	case 5: /* MOTOR 0 */

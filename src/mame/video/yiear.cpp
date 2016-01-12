@@ -84,8 +84,8 @@ WRITE8_MEMBER(yiear_state::yiear_control_w)
 	m_yiear_irq_enable = data & 0x04;
 
 	/* bits 3 and 4 are coin counters */
-	coin_counter_w(machine(), 0, data & 0x08);
-	coin_counter_w(machine(), 1, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, data & 0x08);
+	machine().bookkeeping().coin_counter_w(1, data & 0x10);
 }
 
 TILE_GET_INFO_MEMBER(yiear_state::get_bg_tile_info)

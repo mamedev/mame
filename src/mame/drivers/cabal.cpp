@@ -175,8 +175,8 @@ READ8_MEMBER(cabal_state::cabalbl_snd1_r)
 
 WRITE8_MEMBER(cabal_state::cabalbl_coin_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
-	coin_counter_w(machine(), 1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 
 	//data & 0x40? video enable?
 }

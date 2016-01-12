@@ -550,8 +550,8 @@ WRITE8_MEMBER(suna8_state::hardhead_bankswitch_w)
 WRITE8_MEMBER(suna8_state::hardhead_flipscreen_w)
 {
 	flip_screen_set(data & 0x04);
-	coin_lockout_w ( machine(), 0,  data & 0x08);
-	coin_lockout_w ( machine(), 1,  data & 0x10);
+	machine().bookkeeping().coin_lockout_w(0, data & 0x08);
+	machine().bookkeeping().coin_lockout_w(1, data & 0x10);
 }
 
 static ADDRESS_MAP_START( hardhead_map, AS_PROGRAM, 8, suna8_state )
@@ -596,8 +596,8 @@ WRITE8_MEMBER(suna8_state::rranger_bankswitch_w)
 	m_bank1->set_entry(bank);
 
 	flip_screen_set(data & 0x20);
-	coin_lockout_w ( machine(), 0,  data & 0x40);
-	coin_lockout_w ( machine(), 1,  data & 0x80);
+	machine().bookkeeping().coin_lockout_w(0, data & 0x40);
+	machine().bookkeeping().coin_lockout_w(1, data & 0x80);
 }
 
 /*
@@ -708,9 +708,9 @@ WRITE8_MEMBER(suna8_state::brickzn_rombank_w)
 */
 WRITE8_MEMBER(suna8_state::brickzn_leds_w)
 {
-	set_led_status(machine(), 0, data & 0x01);
-	set_led_status(machine(), 1, data & 0x02);
-	coin_counter_w(machine(), 0, data & 0x04);
+	output().set_led_value(0, data & 0x01);
+	output().set_led_value(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 
 	logerror("CPU #0 - PC %04X: leds = %02X\n",space.device().safe_pc(),data);
 	if (data & ~0x07)   logerror("CPU #0 - PC %04X: unknown leds bits: %02X\n",space.device().safe_pc(),data);
@@ -918,9 +918,9 @@ WRITE8_MEMBER(suna8_state::hardhea2_flipscreen_w)
 
 WRITE8_MEMBER(suna8_state::hardhea2_leds_w)
 {
-	set_led_status(machine(), 0, data & 0x01);
-	set_led_status(machine(), 1, data & 0x02);
-	coin_counter_w(machine(), 0, data & 0x04);
+	output().set_led_value(0, data & 0x01);
+	output().set_led_value(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 	if (data & ~0x07)   logerror("CPU #0 - PC %04X: unknown leds bits: %02X\n",space.device().safe_pc(),data);
 }
 
@@ -1074,9 +1074,9 @@ WRITE8_MEMBER(suna8_state::starfigh_spritebank_w)
 */
 WRITE8_MEMBER(suna8_state::starfigh_leds_w)
 {
-	set_led_status(machine(), 0,     data & 0x01);
-	set_led_status(machine(), 1,     data & 0x02);
-	coin_counter_w(machine(), 0,     data & 0x04);
+	output().set_led_value(0,     data & 0x01);
+	output().set_led_value(1,     data & 0x02);
+	machine().bookkeeping().coin_counter_w(0,     data & 0x04);
 	m_gfxbank       =               (data & 0x08) ? 4 : 0;
 	if (data & ~0x0f)   logerror("CPU #0 - PC %04X: unknown leds bits: %02X\n",space.device().safe_pc(),data);
 
@@ -1188,8 +1188,8 @@ WRITE8_MEMBER(suna8_state::suna8_wram_w)
 */
 WRITE8_MEMBER(suna8_state::sparkman_rombank_w)
 {
-	set_led_status(machine(), 0,     data & 0x01);
-	set_led_status(machine(), 1,     data & 0x02);
+	output().set_led_value(0,     data & 0x01);
+	output().set_led_value(1,     data & 0x02);
 
 	if (data & ~0x03)   logerror("CPU #0 - PC %04X: unknown leds bits: %02X\n",space.device().safe_pc(),data);
 
@@ -1209,7 +1209,7 @@ WRITE8_MEMBER(suna8_state::sparkman_rombank_w)
 */
 WRITE8_MEMBER(suna8_state::sparkman_coin_counter_w)
 {
-	coin_counter_w(machine(), 0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
 // To do: implement this, affects the duration of copyright screen

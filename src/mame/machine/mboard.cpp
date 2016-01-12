@@ -158,7 +158,7 @@ data:  10 0001 0000 Line E
 */
 
 	for (i=0; i < 64; i++)                          /* all  LED's off */
-		output_set_led_value(i, 0);
+		output().set_led_value(i, 0);
 
 	if (Line18_LED)
 	{
@@ -170,9 +170,9 @@ data:  10 0001 0000 Line E
 				{
 					LED = (i_18*8 + 8-i_AH-1);
 					if (!(Line18_LED & (1 << i_18)))    /* cleared bit */
-						output_set_led_value(LED, 1);
+						output().set_led_value(LED, 1);
 					//else
-					//  output_set_led_value(LED, 0);
+					//  output().set_led_value(LED, 0);
 				}
 			}
 		}
@@ -295,14 +295,14 @@ void mboard_state::set_artwork()
 {
 	int i;
 	for (i=0;i<64;i++)
-		output_set_indexed_value("P", i, m_board[i]);
+		output().set_indexed_value("P", i, m_board[i]);
 }
 
 void mboard_state::mboard_set_border_pieces()
 {
 	int i;
 	for (i=0;i<12;i++)
-		output_set_indexed_value("Q", i, border_pieces[i]);
+		output().set_indexed_value("Q", i, border_pieces[i]);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mboard_state::mboard_update_artwork )

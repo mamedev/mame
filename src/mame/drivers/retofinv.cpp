@@ -110,12 +110,12 @@ WRITE8_MEMBER(retofinv_state::irq1_ack_w)
 
 WRITE8_MEMBER(retofinv_state::coincounter_w)
 {
-	coin_counter_w(machine(), 0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
 WRITE8_MEMBER(retofinv_state::coinlockout_w)
 {
-	coin_lockout_w(machine(), 0,~data & 1);
+	machine().bookkeeping().coin_lockout_w(0,~data & 1);
 }
 
 

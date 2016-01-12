@@ -67,19 +67,19 @@ WRITE8_MEMBER(starwars_state::starwars_out_w)
 	switch (offset & 7)
 	{
 		case 0:     /* Coin counter 1 */
-			coin_counter_w(machine(), 0, data);
+			machine().bookkeeping().coin_counter_w(0, data);
 			break;
 
 		case 1:     /* Coin counter 2 */
-			coin_counter_w(machine(), 1, data);
+			machine().bookkeeping().coin_counter_w(1, data);
 			break;
 
 		case 2:     /* LED 3 */
-			set_led_status(machine(), 2, ~data & 0x80);
+			output().set_led_value(2, ~data & 0x80);
 			break;
 
 		case 3:     /* LED 2 */
-			set_led_status(machine(), 1, ~data & 0x80);
+			output().set_led_value(1, ~data & 0x80);
 			break;
 
 		case 4:     /* bank switch */
@@ -91,7 +91,7 @@ WRITE8_MEMBER(starwars_state::starwars_out_w)
 			break;
 
 		case 6:     /* LED 1 */
-			set_led_status(machine(), 0, ~data & 0x80);
+			output().set_led_value(0, ~data & 0x80);
 			break;
 
 		case 7:     /* NVRAM array recall */

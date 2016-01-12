@@ -507,7 +507,7 @@ WRITE_LINE_MEMBER( st_mp100_state::u10_cb2_w )
 
 WRITE_LINE_MEMBER( st_mp100_state::u11_ca2_w )
 {
-	output_set_value("led0", !state);
+	output().set_value("led0", !state);
 }
 
 WRITE_LINE_MEMBER( st_mp100_state::u11_cb2_w )
@@ -616,11 +616,11 @@ WRITE8_MEMBER( st_mp100_state::u11_a_w )
 		if (BIT(data, 0) && (m_counter > 8))
 		{
 			static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
-			output_set_digit_value(m_digit, patterns[m_segment[0]]);
-			output_set_digit_value(10+m_digit, patterns[m_segment[1]]);
-			output_set_digit_value(20+m_digit, patterns[m_segment[2]]);
-			output_set_digit_value(30+m_digit, patterns[m_segment[3]]);
-			output_set_digit_value(40+m_digit, patterns[m_segment[4]]);
+			output().set_digit_value(m_digit, patterns[m_segment[0]]);
+			output().set_digit_value(10+m_digit, patterns[m_segment[1]]);
+			output().set_digit_value(20+m_digit, patterns[m_segment[2]]);
+			output().set_digit_value(30+m_digit, patterns[m_segment[3]]);
+			output().set_digit_value(40+m_digit, patterns[m_segment[4]]);
 		}
 	}
 }

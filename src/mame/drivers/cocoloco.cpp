@@ -367,7 +367,7 @@ WRITE8_MEMBER( cocoloco_state::coincounter_w )
     They explain in a sheet that the coin in for 50 pesetas
     behaves like 2x 25 pesetas (1 duro) coins, so has sense.
 */
-	coin_counter_w(machine(), 0, data & 0x08);
+	machine().bookkeeping().coin_counter_w(0, data & 0x08);
 }
 
 

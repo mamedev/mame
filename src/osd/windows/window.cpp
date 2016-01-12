@@ -1292,17 +1292,17 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 
 		// input events
 		case WM_MOUSEMOVE:
-			ui_input_push_mouse_move_event(window->machine(), window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			window->machine().ui_input().push_mouse_move_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 			break;
 
 		case WM_MOUSELEAVE:
-			ui_input_push_mouse_leave_event(window->machine(), window->m_target);
+			window->machine().ui_input().push_mouse_leave_event(window->m_target);
 			break;
 
 		case WM_LBUTTONDOWN:
 		{
 			DWORD ticks = GetTickCount();
-			ui_input_push_mouse_down_event(window->machine(), window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			window->machine().ui_input().push_mouse_down_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 
 			// check for a double-click
 			if (ticks - window->m_lastclicktime < GetDoubleClickTime() &&
@@ -1310,7 +1310,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 				GET_Y_LPARAM(lparam) >= window->m_lastclicky - 4 && GET_Y_LPARAM(lparam) <= window->m_lastclicky + 4)
 			{
 				window->m_lastclicktime = 0;
-				ui_input_push_mouse_double_click_event(window->machine(), window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+				window->machine().ui_input().push_mouse_double_click_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 			}
 			else
 			{
@@ -1322,11 +1322,11 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		}
 
 		case WM_LBUTTONUP:
-			ui_input_push_mouse_up_event(window->machine(), window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			window->machine().ui_input().push_mouse_up_event(window->m_target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 			break;
 
 		case WM_CHAR:
-			ui_input_push_char_event(window->machine(), window->m_target, (unicode_char) wparam);
+			window->machine().ui_input().push_char_event(window->m_target, (unicode_char) wparam);
 			break;
 
 		// pause the system when we start a menu or resize

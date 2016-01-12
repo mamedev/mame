@@ -523,7 +523,7 @@ WRITE8_MEMBER( maygayv1_state::lamp_data_w )
 
 		for (int i = 0; i < 8; i++)
 		{
-			output_set_lamp_value((8*m_lamp_strobe)+i, ((data  & (1 << i)) !=0));
+			output().set_lamp_value((8*m_lamp_strobe)+i, ((data  & (1 << i)) !=0));
 		}
 		m_old_lamp_strobe = m_lamp_strobe;
 	}

@@ -137,10 +137,10 @@ WRITE8_MEMBER( tc0220ioc_device::write )
 
 		case 0x04:  /* coin counters and lockout, hi nibble irrelevant */
 
-			coin_lockout_w(machine(), 0, ~data & 0x01);
-			coin_lockout_w(machine(), 1, ~data & 0x02);
-			coin_counter_w(machine(), 0, data & 0x04);
-			coin_counter_w(machine(), 1, data & 0x08);
+			machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+			machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+			machine().bookkeeping().coin_counter_w(0, data & 0x04);
+			machine().bookkeeping().coin_counter_w(1, data & 0x08);
 
 //if (data & 0xf0)
 //logerror("PC %06x: warning - write %02x to TC0220IOC address %02x\n",space.device().safe_pc(),data,offset);
@@ -260,10 +260,10 @@ WRITE8_MEMBER( tc0510nio_device::write )
 			break;
 
 		case 0x04:  /* coin counters and lockout */
-			coin_lockout_w(machine(), 0, ~data & 0x01);
-			coin_lockout_w(machine(), 1, ~data & 0x02);
-			coin_counter_w(machine(), 0, data & 0x04);
-			coin_counter_w(machine(), 1, data & 0x08);
+			machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+			machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+			machine().bookkeeping().coin_counter_w(0, data & 0x04);
+			machine().bookkeeping().coin_counter_w(1, data & 0x08);
 			break;
 
 		default:
@@ -387,10 +387,10 @@ WRITE8_MEMBER( tc0640fio_device::write )
 			break;
 
 		case 0x04:  /* coin counters and lockout */
-			coin_lockout_w(machine(), 0, ~data & 0x01);
-			coin_lockout_w(machine(), 1, ~data & 0x02);
-			coin_counter_w(machine(), 0, data & 0x04);
-			coin_counter_w(machine(), 1, data & 0x08);
+			machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+			machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+			machine().bookkeeping().coin_counter_w(0, data & 0x04);
+			machine().bookkeeping().coin_counter_w(1, data & 0x08);
 			break;
 
 		default:

@@ -186,14 +186,14 @@ WRITE8_MEMBER(sprint4_state::sprint4_da_latch_w)
 
 WRITE8_MEMBER(sprint4_state::sprint4_lamp_w)
 {
-	set_led_status(machine(), (offset >> 1) & 3, offset & 1);
+	output().set_led_value((offset >> 1) & 3, offset & 1);
 }
 
 
 #ifdef UNUSED_FUNCTION
 WRITE8_MEMBER(sprint4_state::sprint4_lockout_w)
 {
-	coin_lockout_global_w(machine(), ~offset & 1);
+	machine().bookkeeping().coin_lockout_global_w(~offset & 1);
 }
 #endif
 

@@ -78,10 +78,10 @@ WRITE8_MEMBER(cbasebal_state::bankedram_w)
 
 WRITE8_MEMBER(cbasebal_state::cbasebal_coinctrl_w)
 {
-	coin_lockout_w(machine(), 0, ~data & 0x04);
-	coin_lockout_w(machine(), 1, ~data & 0x08);
-	coin_counter_w(machine(), 0, data & 0x01);
-	coin_counter_w(machine(), 1, data & 0x02);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x04);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x08);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 }
 
 

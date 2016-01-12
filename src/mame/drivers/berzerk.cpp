@@ -124,7 +124,7 @@ static const UINT8 nmi_trigger_v256s [NMIS_PER_FRAME] = { 0x00, 0x00, 0x00, 0x00
 
 READ8_MEMBER(berzerk_state::led_on_r)
 {
-	set_led_status(machine(), 0, 1);
+	output().set_led_value(0, 1);
 
 	return 0;
 }
@@ -132,13 +132,13 @@ READ8_MEMBER(berzerk_state::led_on_r)
 
 WRITE8_MEMBER(berzerk_state::led_on_w)
 {
-	set_led_status(machine(), 0, 1);
+	output().set_led_value(0, 1);
 }
 
 
 READ8_MEMBER(berzerk_state::led_off_r)
 {
-	set_led_status(machine(), 0, 0);
+	output().set_led_value(0, 0);
 
 	return 0;
 }
@@ -146,7 +146,7 @@ READ8_MEMBER(berzerk_state::led_off_r)
 
 WRITE8_MEMBER(berzerk_state::led_off_w)
 {
-	set_led_status(machine(), 0, 0);
+	output().set_led_value(0, 0);
 }
 
 
@@ -355,7 +355,7 @@ void berzerk_state::machine_reset()
 {
 	m_irq_enabled = 0;
 	m_nmi_enabled = 0;
-	set_led_status(machine(), 0, 0);
+	output().set_led_value(0, 0);
 	m_magicram_control = 0;
 
 	start_irq_timer();

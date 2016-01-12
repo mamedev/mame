@@ -168,7 +168,7 @@ void ti74_state::update_lcd_indicator(UINT8 y, UINT8 x, int state)
 	// above    | _LOW _ERROR  2nd  INV  ALPHA  LC  INS  DEGRAD  HEX  OCT  I/O
 	// screen-  | _P{70} <{71}                                             RUN{3}
 	//   area   .                                                          SYS{4}
-	output_set_lamp_value(y * 10 + x, state);
+	output().set_lamp_value(y * 10 + x, state);
 }
 
 static HD44780_PIXEL_UPDATE(ti74_pixel_update)

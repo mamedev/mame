@@ -91,8 +91,8 @@ WRITE8_MEMBER(hexion_state::coincntr_w)
 //logerror("%04x: coincntr_w %02x\n",space.device().safe_pc(),data);
 
 	/* bits 0/1 = coin counters */
-	coin_counter_w(machine(), 0,data & 0x01);
-	coin_counter_w(machine(), 1,data & 0x02);
+	machine().bookkeeping().coin_counter_w(0,data & 0x01);
+	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
 	/* bit 5 = flip screen */
 	flip_screen_set(data & 0x20);

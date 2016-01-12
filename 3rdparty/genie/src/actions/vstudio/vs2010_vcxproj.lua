@@ -723,7 +723,7 @@
 			t = ' DefaultTargets="' .. targets .. '"'
 		end
 
-		_p('<Project%s ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">', t)
+		_p('<Project%s ToolsVersion="%s" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">', t, action.vstudio.toolsVersion)
 	end
 
 

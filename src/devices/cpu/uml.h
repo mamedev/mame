@@ -409,7 +409,7 @@ namespace uml
 		void set_mapvar(int paramnum, UINT32 value) { assert(paramnum < m_numparams); assert(m_param[paramnum].is_mapvar()); m_param[paramnum] = value; }
 
 		// misc
-		const char *disasm(std::string &str, drcuml_state *drcuml = nullptr) const;
+		std::string disasm(drcuml_state *drcuml = nullptr) const;
 		UINT8 input_flags() const;
 		UINT8 output_flags() const;
 		UINT8 modified_flags() const;

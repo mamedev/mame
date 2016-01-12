@@ -129,11 +129,11 @@ WRITE8_MEMBER( vd_state::col_w )
 	if (data != 0x3f)
 	{
 		data &= 7;
-		output_set_digit_value(data + 11, segment[0]);
-		output_set_digit_value(data + 21, segment[1]);
-		output_set_digit_value(data + 31, segment[2]);
-		output_set_digit_value(data + 41, segment[3]);
-		output_set_digit_value(data + 51, segment[4]);
+		output().set_digit_value(data + 11, segment[0]);
+		output().set_digit_value(data + 21, segment[1]);
+		output().set_digit_value(data + 31, segment[2]);
+		output().set_digit_value(data + 41, segment[3]);
+		output().set_digit_value(data + 51, segment[4]);
 	}
 }
 

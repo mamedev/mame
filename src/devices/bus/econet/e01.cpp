@@ -563,7 +563,7 @@ WRITE8_MEMBER( e01_device::floppy_w )
 	// TODO floppy test
 
 	// mode LED
-	output_set_value("led_0", BIT(data, 7));
+	machine().output().set_value("led_0", BIT(data, 7));
 }
 
 

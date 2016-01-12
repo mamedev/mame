@@ -254,12 +254,12 @@ WRITE16_MEMBER(umipoker_state::lamps_w)
   --x- ---- ---- ----  START lamp.
 
 */
-	output_set_lamp_value(0, (data >> 5) & 1);      /* Lamp 0 - RIGHT */
-	output_set_lamp_value(1, (data >> 9) & 1);      /* Lamp 1 - TAKE */
-	output_set_lamp_value(2, (data >> 10) & 1);     /* Lamp 2 - D-UP */
-	output_set_lamp_value(3, (data >> 11) & 1);     /* Lamp 3 - BET */
-	output_set_lamp_value(4, (data >> 12) & 1);     /* Lamp 4 - LEFT/STOP */
-	output_set_lamp_value(5, (data >> 13) & 1);     /* Lamp 5 - START */
+	output().set_lamp_value(0, (data >> 5) & 1);      /* Lamp 0 - RIGHT */
+	output().set_lamp_value(1, (data >> 9) & 1);      /* Lamp 1 - TAKE */
+	output().set_lamp_value(2, (data >> 10) & 1);     /* Lamp 2 - D-UP */
+	output().set_lamp_value(3, (data >> 11) & 1);     /* Lamp 3 - BET */
+	output().set_lamp_value(4, (data >> 12) & 1);     /* Lamp 4 - LEFT/STOP */
+	output().set_lamp_value(5, (data >> 13) & 1);     /* Lamp 5 - START */
 }
 
 WRITE16_MEMBER(umipoker_state::umi_counters_w)
@@ -278,9 +278,9 @@ WRITE16_MEMBER(umipoker_state::umi_counters_w)
   xxxx xxxx x--x xxx-  Unknown / Not used.
 
 */
-	coin_counter_w(machine(), 0, data & 0x20);  /* COIN 1 */
-	coin_counter_w(machine(), 1, data & 0x40);  /* COIN 2 */
-	coin_counter_w(machine(), 2, data & 0x01);  /* PAYOUT */
+	machine().bookkeeping().coin_counter_w(0, data & 0x20);  /* COIN 1 */
+	machine().bookkeeping().coin_counter_w(1, data & 0x40);  /* COIN 2 */
+	machine().bookkeeping().coin_counter_w(2, data & 0x01);  /* PAYOUT */
 }
 
 WRITE16_MEMBER(umipoker_state::saiyu_counters_w)
@@ -300,9 +300,9 @@ WRITE16_MEMBER(umipoker_state::saiyu_counters_w)
   x--x xxx- xxxx xxxx  Unknown / Not used.
 
 */
-	coin_counter_w(machine(), 0, data & 0x2000);    /* COIN 1 */
-	coin_counter_w(machine(), 1, data & 0x4000);    /* COIN 2 */
-	coin_counter_w(machine(), 2, data & 0x0100);    /* PAYOUT */
+	machine().bookkeeping().coin_counter_w(0, data & 0x2000);    /* COIN 1 */
+	machine().bookkeeping().coin_counter_w(1, data & 0x4000);    /* COIN 2 */
+	machine().bookkeeping().coin_counter_w(2, data & 0x0100);    /* PAYOUT */
 }
 
 

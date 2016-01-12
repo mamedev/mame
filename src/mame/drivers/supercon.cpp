@@ -180,7 +180,7 @@ void supercon_state::set_pieces()
 {
 	int i;
 	for (i=0;i<64;i++)
-		output_set_indexed_value("P", i, m_board[i]);
+		output().set_indexed_value("P", i, m_board[i]);
 }
 
 void supercon_state::set_border_pieces()
@@ -188,7 +188,7 @@ void supercon_state::set_border_pieces()
 	UINT8 i;
 
 	for (i=0;i<12;i++)
-		output_set_indexed_value("Q", i, m_border_pieces[i]);
+		output().set_indexed_value("Q", i, m_border_pieces[i]);
 }
 
 void supercon_state::clear_pieces()
@@ -196,7 +196,7 @@ void supercon_state::clear_pieces()
 	int i;
 	for (i=0;i<64;i++)
 	{
-		output_set_indexed_value("P", i, EM);
+		output().set_indexed_value("P", i, EM);
 		m_board[i]=EM;
 	}
 }
@@ -231,19 +231,19 @@ void supercon_state::update_leds()
 	for (i = 0; i < 8; i++)
 	{
 		if (BIT(m_LED_18, i))
-			output_set_led_value(i + 1, 1);
+			output().set_led_value(i + 1, 1);
 		else
-			output_set_led_value(i + 1, 0);
+			output().set_led_value(i + 1, 0);
 
 		if (BIT(m_LED_AH, i))
-			output_set_led_value(i + 9, 1);
+			output().set_led_value(i + 9, 1);
 		else
-			output_set_led_value(i + 9, 0);
+			output().set_led_value(i + 9, 0);
 
 		if (BIT(m_LED_ST, i))
-			output_set_led_value(i + 17, 1);
+			output().set_led_value(i + 17, 1);
 		else
-			output_set_led_value(i + 17, 0);
+			output().set_led_value(i + 17, 0);
 	}
 }
 
@@ -259,7 +259,7 @@ void supercon_state::mouse_update()
 	{
 		i = get_first_bit(port_input);
 		m_moving_piece = m_border_pieces[i];
-		output_set_value("MOVING", m_moving_piece);
+		output().set_value("MOVING", m_moving_piece);
 		return;
 	}
 
@@ -269,7 +269,7 @@ void supercon_state::mouse_update()
 	{
 		i = get_first_bit(port_input);
 		m_moving_piece = m_border_pieces[6+i];
-		output_set_value("MOVING", m_moving_piece);
+		output().set_value("MOVING", m_moving_piece);
 		return;
 	}
 
@@ -280,7 +280,7 @@ void supercon_state::mouse_update()
 		if (m_moving_piece)
 		{
 			m_moving_piece=0;
-			output_set_value("MOVING", m_moving_piece);
+			output().set_value("MOVING", m_moving_piece);
 			return;
 		}
 	}
@@ -439,7 +439,7 @@ READ8_MEMBER( supercon_state::supercon_port4_r )
 	else
 	{
 		set_pieces();
-		output_set_value("MOVING",m_moving_piece);
+		output().set_value("MOVING",m_moving_piece);
 	}
 
 	switch ( i_18 )

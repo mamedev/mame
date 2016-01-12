@@ -222,8 +222,8 @@ WRITE8_MEMBER(destroyr_state::misc_w)
 	m_wavemod = data & 0x10;
 	m_potmask[1] = data & 0x20;
 
-	coin_lockout_w(machine(), 0, !m_attract);
-	coin_lockout_w(machine(), 1, !m_attract);
+	machine().bookkeeping().coin_lockout_w(0, !m_attract);
+	machine().bookkeeping().coin_lockout_w(1, !m_attract);
 }
 
 
@@ -247,10 +247,10 @@ WRITE8_MEMBER(destroyr_state::output_w)
 	else switch (offset & 7)
 	{
 	case 0:
-		set_led_status(machine(), 0, data & 1);
+		output().set_led_value(0, data & 1);
 		break;
 	case 1:
-		set_led_status(machine(), 1, data & 1); /* no second LED present on cab */
+		output().set_led_value(1, data & 1); /* no second LED present on cab */
 		break;
 	case 2:
 		/* bit 0 => songate */

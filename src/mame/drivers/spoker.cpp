@@ -154,12 +154,12 @@ WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
 //      popmessage("%02x",data);
 	}
 
-	coin_counter_w(machine(), 0,        data & 0x01);   // coin_a
-	coin_counter_w(machine(), 1,        data & 0x04);   // coin_c
-	coin_counter_w(machine(), 2,        data & 0x08);   // key in
-	coin_counter_w(machine(), 3,        data & 0x10);   // coin out mech
+	machine().bookkeeping().coin_counter_w(0,        data & 0x01);   // coin_a
+	machine().bookkeeping().coin_counter_w(1,        data & 0x04);   // coin_c
+	machine().bookkeeping().coin_counter_w(2,        data & 0x08);   // key in
+	machine().bookkeeping().coin_counter_w(3,        data & 0x10);   // coin out mech
 
-	set_led_status(machine(), 6,        data & 0x40);   // led for coin out / hopper active
+	output().set_led_value(6,        data & 0x40);   // led for coin out / hopper active
 
 	if(((m_nmi_ack & 0x80) == 0) && data & 0x80)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -172,8 +172,8 @@ WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
 
 WRITE8_MEMBER(spoker_state::video_and_leds_w)
 {
-	set_led_status(machine(), 4,      data & 0x01); // start?
-	set_led_status(machine(), 5,      data & 0x04); // l_bet?
+	output().set_led_value(4,      data & 0x01); // start?
+	output().set_led_value(5,      data & 0x04); // l_bet?
 
 	m_video_enable  =     data & 0x40;
 	m_hopper            =   (~data)& 0x80;
@@ -184,10 +184,10 @@ WRITE8_MEMBER(spoker_state::video_and_leds_w)
 
 WRITE8_MEMBER(spoker_state::leds_w)
 {
-	set_led_status(machine(), 0, data & 0x01);  // stop_1
-	set_led_status(machine(), 1, data & 0x02);  // stop_2
-	set_led_status(machine(), 2, data & 0x04);  // stop_3
-	set_led_status(machine(), 3, data & 0x08);  // stop
+	output().set_led_value(0, data & 0x01);  // stop_1
+	output().set_led_value(1, data & 0x02);  // stop_2
+	output().set_led_value(2, data & 0x04);  // stop_3
+	output().set_led_value(3, data & 0x08);  // stop
 	// data & 0x10?
 
 	m_out[2] = data;

@@ -165,10 +165,10 @@ WRITE8_MEMBER(maxaflex_state::mcu_portB_w)
 	/* latch for lamps */
 	if ((diff & 0x40) && !(data & 0x40))
 	{
-		output_set_lamp_value(0, (m_portC_out >> 0) & 1);
-		output_set_lamp_value(1, (m_portC_out >> 1) & 1);
-		output_set_lamp_value(2, (m_portC_out >> 2) & 1);
-		output_set_lamp_value(3, (m_portC_out >> 3) & 1);
+		output().set_lamp_value(0, (m_portC_out >> 0) & 1);
+		output().set_lamp_value(1, (m_portC_out >> 1) & 1);
+		output().set_lamp_value(2, (m_portC_out >> 2) & 1);
+		output().set_lamp_value(3, (m_portC_out >> 3) & 1);
 	}
 }
 
@@ -194,9 +194,9 @@ WRITE8_MEMBER(maxaflex_state::mcu_portC_w)
 	/* displays */
 	switch( m_portB_out & 0x3 )
 	{
-		case 0x0: output_set_digit_value(0, ls48_map[m_portC_out]); break;
-		case 0x1: output_set_digit_value(1, ls48_map[m_portC_out]); break;
-		case 0x2: output_set_digit_value(2, ls48_map[m_portC_out]); break;
+		case 0x0: output().set_digit_value(0, ls48_map[m_portC_out]); break;
+		case 0x1: output().set_digit_value(1, ls48_map[m_portC_out]); break;
+		case 0x2: output().set_digit_value(2, ls48_map[m_portC_out]); break;
 		case 0x3: break;
 	}
 }
@@ -410,13 +410,13 @@ void maxaflex_state::machine_reset()
 	m_tdr = m_tcr = 0;
 	m_mcu_timer = machine().device<timer_device>("mcu_timer");
 
-	output_set_lamp_value(0, 0);
-	output_set_lamp_value(1, 0);
-	output_set_lamp_value(2, 0);
-	output_set_lamp_value(3, 0);
-	output_set_digit_value(0, 0x00);
-	output_set_digit_value(1, 0x00);
-	output_set_digit_value(2, 0x00);
+	output().set_lamp_value(0, 0);
+	output().set_lamp_value(1, 0);
+	output().set_lamp_value(2, 0);
+	output().set_lamp_value(3, 0);
+	output().set_digit_value(0, 0x00);
+	output().set_digit_value(1, 0x00);
+	output().set_digit_value(2, 0x00);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( maxaflex_state::mf_interrupt )

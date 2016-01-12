@@ -297,8 +297,8 @@ WRITE8_MEMBER(bfm_sc1_state::reel12_w)
 		m_reel0->update((data>>4)&0x0f);
 		m_reel1->update( data    &0x0f);
 	}
-	awp_draw_reel("reel1", m_reel0);
-	awp_draw_reel("reel2", m_reel1);
+	awp_draw_reel(machine(),"reel1", m_reel0);
+	awp_draw_reel(machine(),"reel2", m_reel1);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -314,8 +314,8 @@ WRITE8_MEMBER(bfm_sc1_state::reel34_w)
 		m_reel2->update((data>>4)&0x0f);
 		m_reel3->update( data    &0x0f);
 	}
-	awp_draw_reel("reel3", m_reel2);
-	awp_draw_reel("reel4", m_reel3);
+	awp_draw_reel(machine(),"reel3", m_reel2);
+	awp_draw_reel(machine(),"reel4", m_reel3);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -325,8 +325,8 @@ WRITE8_MEMBER(bfm_sc1_state::reel56_w)
 	m_reel4->update((data>>4)&0x0f);
 	m_reel5->update( data    &0x0f);
 
-	awp_draw_reel("reel5", m_reel4);
-	awp_draw_reel("reel6", m_reel5);
+	awp_draw_reel(machine(),"reel5", m_reel4);
+	awp_draw_reel(machine(),"reel6", m_reel5);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -459,8 +459,8 @@ WRITE8_MEMBER(bfm_sc1_state::mux1latch_w)
 
 			for ( i = 0; i < 8; i++ )
 			{
-				output_set_lamp_value(BFM_strcnv[offset  ], (m_mux1_datalo & pattern?1:0) );
-				output_set_lamp_value(BFM_strcnv[offset+8], (m_mux1_datahi & pattern?1:0) );
+				output().set_lamp_value(BFM_strcnv[offset  ], (m_mux1_datalo & pattern?1:0) );
+				output().set_lamp_value(BFM_strcnv[offset+8], (m_mux1_datahi & pattern?1:0) );
 				pattern<<=1;
 				offset++;
 			}
@@ -532,8 +532,8 @@ WRITE8_MEMBER(bfm_sc1_state::mux2latch_w)
 
 			for ( i = 0; i < 8; i++ )
 			{
-				output_set_lamp_value(BFM_strcnv[offset  ], (m_mux2_datalo & pattern?1:0) );
-				output_set_lamp_value(BFM_strcnv[offset+8], (m_mux2_datahi & pattern?1:0) );
+				output().set_lamp_value(BFM_strcnv[offset  ], (m_mux2_datalo & pattern?1:0) );
+				output().set_lamp_value(BFM_strcnv[offset+8], (m_mux2_datahi & pattern?1:0) );
 				pattern<<=1;
 				offset++;
 			}

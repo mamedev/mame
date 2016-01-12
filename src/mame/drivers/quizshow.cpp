@@ -133,7 +133,7 @@ WRITE8_MEMBER(quizshow_state::quizshow_lamps1_w)
 {
 	// d0-d3: P1 answer button lamps
 	for (int i = 0; i < 4; i++)
-		output_set_lamp_value(i, data >> i & 1);
+		output().set_lamp_value(i, data >> i & 1);
 
 	// d4-d7: N/C
 }
@@ -142,7 +142,7 @@ WRITE8_MEMBER(quizshow_state::quizshow_lamps2_w)
 {
 	// d0-d3: P2 answer button lamps
 	for (int i = 0; i < 4; i++)
-		output_set_lamp_value(i + 4, data >> i & 1);
+		output().set_lamp_value(i + 4, data >> i & 1);
 
 	// d4-d7: N/C
 }
@@ -150,8 +150,8 @@ WRITE8_MEMBER(quizshow_state::quizshow_lamps2_w)
 WRITE8_MEMBER(quizshow_state::quizshow_lamps3_w)
 {
 	// d0-d1: start button lamps
-	output_set_lamp_value(8, data >> 0 & 1);
-	output_set_lamp_value(9, data >> 1 & 1);
+	output().set_lamp_value(8, data >> 0 & 1);
+	output().set_lamp_value(9, data >> 1 & 1);
 
 	// d2-d3: unused? (chip is shared with quizshow_tape_control_w)
 	// d4-d7: N/C
@@ -160,7 +160,7 @@ WRITE8_MEMBER(quizshow_state::quizshow_lamps3_w)
 WRITE8_MEMBER(quizshow_state::quizshow_tape_control_w)
 {
 	// d2: enable user category select (changes tape head position)
-	output_set_lamp_value(10, data >> 2 & 1);
+	output().set_lamp_value(10, data >> 2 & 1);
 	m_category_enable = (data & 0xc) == 0xc;
 
 	// d3: tape motor

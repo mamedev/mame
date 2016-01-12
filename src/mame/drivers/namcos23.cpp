@@ -2766,7 +2766,7 @@ WRITE16_MEMBER(namcos23_state::ctl_w)
 		if(m_ctl_led != (data & 0xff)) {
 			m_ctl_led = data & 0xff;
 			for(int i = 0; i < 8; i++)
-				output_set_lamp_value(i, (~data<<i & 0x80) ? 0 : 1);
+				output().set_lamp_value(i, (~data<<i & 0x80) ? 0 : 1);
 		}
 		break;
 
