@@ -93,6 +93,7 @@ class ui_input_manager;
 class crosshair_manager;
 class image_manager;
 class rom_load_manager;
+class debugger_manager;
 class osd_interface;
 enum class config_type;
 
@@ -139,7 +140,6 @@ class running_machine
 {
 	DISABLE_COPYING(running_machine);
 
-	friend void debugger_init(running_machine &machine);
 	friend class sound_manager;
 
 	typedef void (*logerror_callback)(const running_machine &machine, const char *string);
@@ -180,6 +180,7 @@ public:
 	rom_load_manager &rom_load() const { assert(m_rom_load != nullptr); return *m_rom_load; }
 	tilemap_manager &tilemap() const { assert(m_tilemap != nullptr); return *m_tilemap; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != nullptr); return *m_debug_view; }
+	debugger_manager &debugger() const { assert(m_debugger != nullptr); return *m_debugger; }
 	driver_device *driver_data() const { return &downcast<driver_device &>(root_device()); }
 	template<class _DriverClass> _DriverClass *driver_data() const { return &downcast<_DriverClass &>(root_device()); }
 	machine_phase phase() const { return m_current_phase; }
@@ -297,6 +298,7 @@ private:
 	std::unique_ptr<crosshair_manager> m_crosshair;	   // internal data from crsshair.cpp
 	std::unique_ptr<image_manager> m_image;	           // internal data from image.cpp
 	std::unique_ptr<rom_load_manager> m_rom_load;	   // internal data from romload.cpp
+	std::unique_ptr<debugger_manager> m_debugger;	   // internal data from debugger.cpp
 
 	// system state
 	machine_phase           m_current_phase;        // current execution phase

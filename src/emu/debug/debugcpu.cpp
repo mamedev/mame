@@ -1871,7 +1871,7 @@ void device_debug::instruction_hook(offs_t curpc)
 			{
 				machine.debug_view().update_all();
 				machine.debug_view().flush_osd_updates();
-				debugger_refresh_display(machine);
+				machine.debugger().refresh_display();
 			}
 		}
 	}
@@ -1919,7 +1919,7 @@ void device_debug::instruction_hook(offs_t curpc)
 
 		// update all views
 		machine.debug_view().update_all();
-		debugger_refresh_display(m_device.machine());
+		machine.debugger().refresh_display();
 
 		// wait for the debugger; during this time, disable sound output
 		m_device.machine().sound().debugger_mute(true);
@@ -1938,7 +1938,7 @@ void device_debug::instruction_hook(offs_t curpc)
 			if (global->memory_modified)
 			{
 				machine.debug_view().update_all(DVT_DISASSEMBLY);
-				debugger_refresh_display(m_device.machine());
+				machine.debugger().refresh_display();
 			}
 
 			// check for commands in the source file

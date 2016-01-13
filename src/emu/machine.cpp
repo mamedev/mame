@@ -270,7 +270,11 @@ void running_machine::start()
 
 	// initialize the debugger
 	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debugger_init(*this);
+	{
+		m_debug_view = std::make_unique<debug_view_manager>(*this);
+		m_debugger = std::make_unique<debugger_manager>(*this);
+		m_debugger->initialize();
+	}
 
 	m_render->resolve_tags();
 

@@ -15,17 +15,31 @@
 #include "debug/debugcpu.h"
 
 
+// ======================> debugger_manager
+
+class debugger_manager
+{
+public:
+	// construction/destruction
+	debugger_manager(running_machine &machine);
+	~debugger_manager();
+
+	void initialize();
+
+	/* redraw the current video display */
+	void refresh_display();
+
+	// getters
+	running_machine &machine() const { return m_machine; }
+private:
+	// internal state
+	running_machine &   m_machine;                  // reference to our machine
+};
+
+
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-/* ----- core debugger functions ----- */
-
-/* initialize the debugger */
-void debugger_init(running_machine &machine);
-
-/* redraw the current video display */
-void debugger_refresh_display(running_machine &machine);
 
 /* OSD can call this to safely flush all traces in the event of a crash */
 void debugger_flush_all_traces_on_abnormal_exit(void);
