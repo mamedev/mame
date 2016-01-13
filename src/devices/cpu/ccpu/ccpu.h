@@ -113,6 +113,7 @@ protected:
 
 	UINT8               m_waiting;
 	UINT8               m_watchdog;
+	UINT8               m_extinput;
 
 	int                 m_icount;
 
