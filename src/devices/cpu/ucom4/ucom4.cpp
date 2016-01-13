@@ -76,7 +76,7 @@ upd552_cpu_device::upd552_cpu_device(const machine_config &mconfig, const char *
 
 
 // disasm
-void ucom4_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void ucom4_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

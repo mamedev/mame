@@ -158,7 +158,7 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;

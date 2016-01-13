@@ -226,7 +226,7 @@ private:
 	static const char* s_statename[];
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// Interrupt handling
 	void service_interrupt();

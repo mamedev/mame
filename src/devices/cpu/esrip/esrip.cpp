@@ -350,7 +350,7 @@ const address_space_config *esrip_device::memory_space_config(address_spacenum s
 //  for the debugger
 //-------------------------------------------------
 
-void esrip_device::state_string_export(const device_state_entry &entry, std::string &str)
+void esrip_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

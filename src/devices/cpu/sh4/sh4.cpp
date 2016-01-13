@@ -4447,7 +4447,7 @@ void sh34_base_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void sh34_base_device::state_string_export(const device_state_entry &entry, std::string &str)
+void sh34_base_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 #ifdef LSB_FIRST
 	UINT8 fpu_xor = m_fpu_pr;

@@ -138,7 +138,7 @@ protected:
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 1; }
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	void next_pc();
 

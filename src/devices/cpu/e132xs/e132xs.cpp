@@ -1848,7 +1848,7 @@ const address_space_config *hyperstone_device::memory_space_config(address_space
 //  for the debugger
 //-------------------------------------------------
 
-void hyperstone_device::state_string_export(const device_state_entry &entry, std::string &str)
+void hyperstone_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

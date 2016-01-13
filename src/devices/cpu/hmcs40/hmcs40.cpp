@@ -133,7 +133,7 @@ hd44828_device::hd44828_device(const machine_config &mconfig, const char *tag, d
 
 
 // disasm
-void hmcs40_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void hmcs40_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
