@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo, Stefan Jokisch
 /*
  *  The schematics don't seem to make a lot of sense when it
