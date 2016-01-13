@@ -1,5 +1,5 @@
-// license:LGPL-2.1+
-// copyright-holders:Dirk Verwiebe, Robbbert, Cowering
+// license:???
+// copyright-holders:Dirk Verwiebe, Robbbert, Cowering, Ralf Schaefer
 /***************************************************************************
 Mephisto Glasgow 3 S chess computer
 Dirk V.
@@ -60,14 +60,17 @@ class glasgow_state : public mboard_state
 public:
 	glasgow_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mboard_state(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_beep(*this, "beeper"),
-	m_line0(*this, "LINE0"),
-	m_line1(*this, "LINE1")
+		m_maincpu(*this, "maincpu"),
+		m_beep(*this, "beeper"),
+		m_line0(*this, "LINE0"),
+		m_line1(*this, "LINE1")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;
+	required_ioport m_line0;
+	required_ioport m_line1;
+
 	DECLARE_WRITE16_MEMBER(glasgow_lcd_w);
 	DECLARE_WRITE16_MEMBER(glasgow_lcd_flag_w);
 	DECLARE_READ16_MEMBER(glasgow_keys_r);
@@ -80,17 +83,18 @@ public:
 	DECLARE_WRITE32_MEMBER(write_lcd_flag32);
 	DECLARE_READ32_MEMBER(read_newkeys32);
 	DECLARE_WRITE32_MEMBER(write_beeper32);
+
 	UINT8 m_lcd_shift_counter;
 	UINT8 m_led7;
 	UINT8 m_irq_flag;
 	UINT16 m_beeper;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+
 	DECLARE_MACHINE_START(dallas32);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi32);
-	required_ioport m_line0;
-	required_ioport m_line1;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 
