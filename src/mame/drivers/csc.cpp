@@ -4,7 +4,7 @@
 
     Fidelity Champion Chess Challenger (model CSC)
 
-    See fidelz80.c for hardware description
+    See drivers/fidelz80.cpp for hardware description
 
     TODO:
     - speech doesn't work
@@ -27,10 +27,11 @@ class csc_state : public driver_device
 public:
 	csc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_speech(*this, "speech")
-		,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_speech(*this, "speech")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<s14001a_device> m_speech;
 
 	virtual void machine_start() override;
@@ -50,7 +51,6 @@ public:
 
 	UINT8 m_selector;
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
-	required_device<cpu_device> m_maincpu;
 };
 
 

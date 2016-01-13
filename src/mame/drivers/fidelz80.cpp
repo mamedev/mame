@@ -293,7 +293,7 @@ A detailed description of the hardware can be found also in the patent 4,373,719
 
 ******************************************************************************
 
-Sensory Chess Challenger champion (6502 based, needs its own driver .c file)
+Sensory Chess Challenger champion (6502 based, implementation is in drivers/csc.cpp)
 ---------------------------------
 
 Memory map:
@@ -582,22 +582,19 @@ expect that the software reads these once on startup only.
 
 ******************************************************************************/
 
-
-/* Core includes */
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8255.h"
 #include "machine/i8243.h"
 #include "machine/z80pio.h"
-#include "sound/beep.h"
-#include "sound/s14001a.h"
 #include "includes/fidelz80.h"
+
+// internal artwork
 #include "fidelz80.lh"
 #include "vsc.lh"
 #include "bridgec3.lh"
 
-//#include "debugger.h"
 
 /* Devices */
 
@@ -1353,7 +1350,7 @@ static MACHINE_CONFIG_START( bridgec, fidelz80_state )
 	MCFG_CPU_ADD("mcu", I8041, XTAL_5MHz) // 5MHz
 	MCFG_CPU_IO_MAP(bridgec_mcu_io)
 
-	MCFG_I8243_ADD("i8243", NOOP, WRITE8(fidelz80_state,digit_w))
+	MCFG_I8243_ADD("i8243", NOOP, WRITE8(fidelz80_state, digit_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1368,65 +1365,69 @@ MACHINE_CONFIG_END
 
 ROM_START( cc10 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cc10.bin",   0x0000, 0x1000, CRC(bb9e6055) SHA1(18276e57cf56465a6352239781a828c5f3d5ba63))
+	ROM_LOAD( "cc10.bin",   0x0000, 0x1000, CRC(bb9e6055) SHA1(18276e57cf56465a6352239781a828c5f3d5ba63) )
 ROM_END
 
-ROM_START(vcc)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5)) // 32014.VCC??? at location b3?
-	ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(f33095e7) SHA1(692fcab1b88c910b74d04fe4d0660367aee3f4f0)) // at location a2?
-	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6)) // at location a1?
 
-	ROM_REGION(0x2000, "speech", 0)
-	ROM_LOAD("vcc-engl.bin", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d)) // at location c4?
+ROM_START( vcc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-32103.bin", 0x0000, 0x1000, CRC(257bb5ab) SHA1(f7589225bb8e5f3eac55f23e2bd526be780b38b5) ) // 32014.VCC??? at location b3?
+	ROM_LOAD("vcc2.bin", 0x1000, 0x1000, CRC(f33095e7) SHA1(692fcab1b88c910b74d04fe4d0660367aee3f4f0) ) // at location a2?
+	ROM_LOAD("vcc3.bin", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) ) // at location a1?
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("vcc-engl.bin", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // at location c4?
 ROM_END
 
-ROM_START(uvc)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("101-64017.b3", 0x0000, 0x2000, CRC(f1133abf) SHA1(09dd85051c4e7d364d43507c1cfea5c2d08d37f4)) // "MOS // 101-64017 // 3880"
-	ROM_LOAD("101-32010.a1", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6)) // "NEC P9Z021 // D2332C 228 // 101-32010", == vcc3.bin on vcc
+ROM_START( uvc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-64017.b3", 0x0000, 0x2000, CRC(f1133abf) SHA1(09dd85051c4e7d364d43507c1cfea5c2d08d37f4) ) // "MOS // 101-64017 // 3880"
+	ROM_LOAD("101-32010.a1", 0x2000, 0x1000, CRC(624f0cd5) SHA1(7c1a4f4497fe5882904de1d6fecf510c07ee6fc6) ) // "NEC P9Z021 // D2332C 228 // 101-32010", == vcc3.bin on vcc
 
-	ROM_REGION(0x2000, "speech", 0)
-	ROM_LOAD("101-32107.c4", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d)) // "NEC P9Y019 // D2332C 229 // 101-32107", == vcc-engl.bin on vcc
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-32107.c4", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // "NEC P9Y019 // D2332C 229 // 101-32107", == vcc-engl.bin on vcc
 ROM_END
 
-ROM_START(vsc)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("101-64108.bin", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626))
-	ROM_LOAD("101-64109.bin", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341))
-	ROM_LOAD("101-32024.bin", 0x4000, 0x1000, CRC(2a078676) SHA1(db2f0aba7e8ac0f84a17bae7155210cdf0813afb))
 
-	ROM_REGION(0x2000, "speech", 0)
-	ROM_LOAD("101-32107.bin", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d))
-ROM_END
-
-ROM_START(vbrc) // AKA model 7002
-	ROM_REGION(0x10000, "maincpu", 0)
+ROM_START( vbrc ) // AKA model 7002
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	// nec 2364 mask roms; pin 27 (PGM, probably NC here due to mask roms) goes to the pcb
-	ROM_LOAD("101-64108.g3", 0x0000, 0x2000, CRC(08472223) SHA1(859865b13c908dbb474333263dc60f6a32461141))
-	ROM_LOAD("101-64109.f3", 0x2000, 0x2000, CRC(320afa0f) SHA1(90edfe0ac19b108d232cda376b03a3a24befad4c))
-	ROM_LOAD("101-64110.e3", 0x4000, 0x2000, CRC(3040d0bd) SHA1(caa55fc8d9196e408fb41e7171a68e5099519813))
+	ROM_LOAD("101-64108.g3", 0x0000, 0x2000, CRC(08472223) SHA1(859865b13c908dbb474333263dc60f6a32461141) )
+	ROM_LOAD("101-64109.f3", 0x2000, 0x2000, CRC(320afa0f) SHA1(90edfe0ac19b108d232cda376b03a3a24befad4c) )
+	ROM_LOAD("101-64110.e3", 0x4000, 0x2000, CRC(3040d0bd) SHA1(caa55fc8d9196e408fb41e7171a68e5099519813) )
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD("100-1009.a3", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a))
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD("100-1009.a3", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a) )
 
-	ROM_REGION(0x2000, "speech", 0)
-	ROM_LOAD("101-32118.i2", 0x0000, 0x1000, CRC(a0b8bb8f) SHA1(f56852108928d5c6caccfc8166fa347d6760a740))
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-32118.i2", 0x0000, 0x1000, CRC(a0b8bb8f) SHA1(f56852108928d5c6caccfc8166fa347d6760a740) )
 ROM_END
 
-ROM_START(bridgec3) // 510-1016 Rev.1 PCB has neither locations nor ic labels, so I declare the big heatsink is at C1, numbers count on the shorter length of pcb
-	ROM_REGION(0x10000, "maincpu", 0)
+ROM_START( bridgec3 ) // 510-1016 Rev.1 PCB has neither locations nor ic labels, so I declare the big heatsink is at C1, numbers count on the shorter length of pcb
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	// TMM2764AD-20 EPROMS with tiny hole-punch sized colored stickers (mostly) covering the quartz windows. pin 27 (PGM) is tied to vcc with small rework wires and does not connect to pcb.
-	ROM_LOAD("7014_white.g3", 0x0000, 0x2000, CRC(eb1620ef) SHA1(987a9abc8c685f1a68678ea4ee65ec4a99419179)) // white sticker
-	ROM_LOAD("7014_red.f3", 0x2000, 0x2000, CRC(74af0019) SHA1(8dc05950c254ca050b95b93e5d0cf48f913a6d49)) // red sticker
-	ROM_LOAD("7014_blue.e3", 0x4000, 0x2000, CRC(341d9ca6) SHA1(370876573bb9408e75f4fc797304b6c64af0590a)) // blue sticker
+	ROM_LOAD("7014_white.g3", 0x0000, 0x2000, CRC(eb1620ef) SHA1(987a9abc8c685f1a68678ea4ee65ec4a99419179) ) // white sticker
+	ROM_LOAD("7014_red.f3", 0x2000, 0x2000, CRC(74af0019) SHA1(8dc05950c254ca050b95b93e5d0cf48f913a6d49) ) // red sticker
+	ROM_LOAD("7014_blue.e3", 0x4000, 0x2000, CRC(341d9ca6) SHA1(370876573bb9408e75f4fc797304b6c64af0590a) ) // blue sticker
 
-	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD("100-1009.a3", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a)) // "NEC P07021-027 || D8041C 563 100-1009"
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD("100-1009.a3", 0x0000, 0x0400, CRC(60eb343f) SHA1(8a63e95ebd62e123bdecc330c0484a47c354bd1a) ) // "NEC P07021-027 || D8041C 563 100-1009"
 
-	ROM_REGION(0x2000, "speech", 0)
-	ROM_LOAD("101-32118.i2", 0x0000, 0x1000, CRC(a0b8bb8f) SHA1(f56852108928d5c6caccfc8166fa347d6760a740)) // "ea 101-32118 || (C) 1980 || EA 8332A247-4 || 8034"
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-32118.i2", 0x0000, 0x1000, CRC(a0b8bb8f) SHA1(f56852108928d5c6caccfc8166fa347d6760a740) ) // "ea 101-32118 || (C) 1980 || EA 8332A247-4 || 8034"
 ROM_END
+
+
+ROM_START( vsc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("101-64108.bin", 0x0000, 0x2000, CRC(c9c98490) SHA1(e6db883df088d60463e75db51433a4b01a3e7626) )
+	ROM_LOAD("101-64109.bin", 0x2000, 0x2000, CRC(08a3577c) SHA1(69fe379d21a9d4b57c84c3832d7b3e7431eec341) )
+	ROM_LOAD("101-32024.bin", 0x4000, 0x1000, CRC(2a078676) SHA1(db2f0aba7e8ac0f84a17bae7155210cdf0813afb) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-32107.bin", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) )
+ROM_END
+
 
 /******************************************************************************
  Drivers
@@ -1435,7 +1436,7 @@ ROM_END
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
 COMP( 1978, cc10,     0,      0,      cc10,    fidelz80, driver_device, 0, "Fidelity Electronics", "Chess Challenger 10 (Model CC10/BCC)", MACHINE_NOT_WORKING )
 COMP( 1979, vcc,      0,      0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Talking Chess Challenger (model VCC)", MACHINE_NOT_WORKING )
-COMP( 1979, vbrc,     0,      0,      bridgec, bridgec,  driver_device, 0, "Fidelity Electronics", "Bridge Challenger (model VBRC/7002)",  MACHINE_NOT_WORKING )
 COMP( 1980, uvc,      vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Advanced Talking Chess Challenger (model UVC)", MACHINE_NOT_WORKING )
+COMP( 1979, vbrc,     0,      0,      bridgec, bridgec,  driver_device, 0, "Fidelity Electronics", "Bridge Challenger (model VBRC/7002)",  MACHINE_NOT_WORKING )
 COMP( 1980, bridgec3, vbrc,   0,      bridgec, bridgec,  driver_device, 0, "Fidelity Electronics", "Bridge Challenger 3 (model 7014)", MACHINE_NOT_WORKING )
 COMP( 1980, vsc,      0,      0,      vsc,     vsc,      driver_device, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (model VSC)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
