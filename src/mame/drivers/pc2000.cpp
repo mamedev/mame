@@ -855,6 +855,8 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "genius_cart")
 	MCFG_GENERIC_LOAD(pc2000_state, pc2000_cart)
+
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc1000_cart", "pc1000")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gl2000, pc2000 )
@@ -931,6 +933,12 @@ static MACHINE_CONFIG_DERIVED_CLASS( misterx, pc2000, pc1000_state )
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "misterx")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( pc1000, misterx )
+	MCFG_SOFTWARE_LIST_REMOVE("cart_list")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "pc1000")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -1023,9 +1031,9 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1988, pc1000,   0,       0,     misterx,   pc1000, driver_device,   0,  "Video Technology", "PreComputer 1000", MACHINE_NOT_WORKING)
+COMP( 1988, pc1000,   0,       0,     pc1000,    pc1000, driver_device,   0,  "Video Technology", "PreComputer 1000", MACHINE_NOT_WORKING)
 COMP( 1988, misterx,  0,       0,     misterx,   pc1000, driver_device,   0,  "Video Technology / Yeno", "MisterX", MACHINE_NOT_WORKING)
-COMP( 1988, ordisava, 0,       0,     misterx,   pc1000, driver_device,   0,  "Video Technology", "Ordisavant (France)", MACHINE_NOT_WORKING)
+COMP( 1988, ordisava, 0,       0,     pc1000,    pc1000, driver_device,   0,  "Video Technology", "Ordisavant (France)", MACHINE_NOT_WORKING)
 COMP( 1993, pc2000,   0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "PreComputer 2000", MACHINE_NOT_WORKING)
 COMP( 1993, gl2000,   0,       0,     gl2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 2000", MACHINE_NOT_WORKING)
 COMP( 1994, gl2000c,  gl2000,  0,     gl2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 2000 Compact", MACHINE_NOT_WORKING)
