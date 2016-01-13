@@ -3054,6 +3054,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/d6800.cpp",
 	MAME_DIR .. "src/mame/drivers/d6809.cpp",
 	MAME_DIR .. "src/mame/drivers/daruma.cpp",
+	MAME_DIR .. "src/mame/drivers/didact.cpp",
 	MAME_DIR .. "src/mame/drivers/digel804.cpp",
 	MAME_DIR .. "src/mame/drivers/dim68k.cpp",
 	MAME_DIR .. "src/mame/drivers/dm7000.cpp",
