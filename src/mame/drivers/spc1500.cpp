@@ -13,10 +13,11 @@ Samsung SPC-1500 driver by Miso Kim
   2016-01-05 detection of color palette initialization 
   2016-01-06 80x16 mode graphic mode support
   2016-01-10 double character support
-  2106-01-12 PCG adressing improved
+  2016-01-12 PCG adressing improved
+  2016-01-13 Cassette tape motor improved
 	
 TODO:
-  - Verify PCG ram read
+  - Verify PCG ram read for Korean character (english character is fine)
   - Support floppy disk drive with SD-1500A controller card
 	
 ****************************************************************************/
@@ -485,13 +486,10 @@ WRITE8_MEMBER( spc1500_state::priority_w)
 WRITE8_MEMBER( spc1500_state::palet_w)
 {
 	m_palet[(offset>>8)&0x0f] = data;
-//	printf("palet:");
 	for(int i=1, j=0; i < 0x100; i<<=1, j++)
 	{
 		m_paltbl[j] = (m_palet[0]&i?1:0)|(m_palet[1]&i?2:0)|(m_palet[2]&i?4:0);
-//		printf("%d,", m_paltbl[j]);
 	}
-//	printf("\n");
 }
 
 PALETTE_INIT_MEMBER(spc1500_state,spc)
@@ -599,7 +597,6 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 		}
 		else
 		{
-			//printf("%c", ascii);
 			UINT8 fnt = m_font[(hs == 4 ? 0x1000 : (attr & (1<<6) ? 0x80<<4 : 0)) + (ascii<<4) + n];
 			if (ascii == 0 && (attr & 0x08) && inv)
 			{
@@ -913,7 +910,6 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0,640-1,0,400-1)
-	//MCFG_MC6845_VISAREA_ADJUST(50,50,640-50,400-50)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update )
 	MCFG_PALETTE_ADD("palette", 8)	
 	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)

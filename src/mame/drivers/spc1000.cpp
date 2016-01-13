@@ -15,7 +15,7 @@ NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
                   disk. Since it is not to our coding standards, it is
                   commented out with #if 0/#endif and 3 slashes (///).
                   It is planned to be converted when time permits. The
-                  author is Meeso Kim.
+                  author is Miso Kim.
 
                   Hardware details of the fdc: Intelligent device, Z80 CPU,
                   XTAL_8MHz, PPI 8255, FDC uPD765C, 2 RAM chips, 28 other
@@ -26,12 +26,7 @@ NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
 
 2015-06-19: Added code for the centronics printer port
 
-IMPORTANT NOTE for tape usage: you *FIRST* press PLAY on the tape drive
-  (e.g. by pressing F2 in partial emulated keyboard mode) and *THEN* you
-  type LOAD on the BASIC prompt!
-  Otherwise, the system turns the tape motor ON but it does not receive any
-  data from tape, and it turns it OFF before the user can press PLAY.
-
+2016-01-14: Casstte tape motor fixed for working perperly and ROM file changed for CP/M disk loading
 
 ****************************************************************************/
 /*
