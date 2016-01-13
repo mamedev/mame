@@ -298,7 +298,7 @@ READ8_MEMBER( mp68a_state::pia2_kbB_r )
 	{
 		pb |= 0x80;	  // Set shift bit (PB7)
 		m_shift = 0;  // Reset flip flop
-		set_led_status(machine(), 0, m_shift);
+		output().set_led_value(0, m_shift);
 		LOG( ("SHIFT is released\n") );
 	}
 
@@ -412,7 +412,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mp68a_state::scan_artwork)
 	{
 		LOG( ("RESET is pressed, resetting the CPU\n") );
 		m_shift = 0;
-		set_led_status(machine(), 0, m_shift);
+		output().set_led_value(0, m_shift);
 		m_maincpu->reset();
 		
 	}
@@ -422,7 +422,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mp68a_state::scan_artwork)
 	{
 		LOG( ("SHIFT is set\n") );
 		m_shift = 1;
-		set_led_status(machine(), 0, m_shift);
+		output().set_led_value(0, m_shift);
 	}
 }
 
