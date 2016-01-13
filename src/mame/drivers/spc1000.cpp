@@ -224,7 +224,7 @@ WRITE8_MEMBER( spc1000_state::cass_w )
 {
 	attotime time = machine().scheduler().time();
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
-	if (BIT(data, 1) && ATTOSECONDS_IN_MSEC((time - m_time).as_attoseconds()) > 500) {
+	if (BIT(data, 1) && (time - m_time).as_attoseconds()/ATTOSECONDS_PER_MICROSECOND > 100) {
 		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		m_time = time;
 	}
@@ -438,7 +438,7 @@ READ8_MEMBER( spc1000_state::porta_r )
 {
 	UINT8 data = 0x3f;
 	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;
-	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) && ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED)  ? 0x00 : 0x40;
+	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED || ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED)) ? 0x40 : 0;
 	data &= ~(m_io_joy->read() & 0x3f);
 	data &= ~((m_centronics_busy == 0)<< 5);
 	return data;
@@ -521,4 +521,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 1982, spc1000,  0,      0,       spc1000,   spc1000, driver_device,  0,   "Samsung", "SPC-1000", MACHINE_NOT_WORKING )
+COMP( 1982, spc1000,  0,      0,       spc1000,   spc1000, driver_device,  0,   "Samsung", "SPC-1000", 0 )

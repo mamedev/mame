@@ -289,10 +289,6 @@ private:
 	UINT8 m_palet[3];
 	UINT8 m_paltbl[8];
 	UINT16 m_page;
-<<<<<<< HEAD
-	UINT16 m_pcg_addr;
-=======
->>>>>>> c7fbd14e5c5d31357c5adcc3397e21f8be9b4bb0
 	UINT8 m_pcg_char, m_pcg_attr, m_char_change, m_pcg_char0;
 	UINT16 m_pcg_offset[3];
 	int m_char_count;
@@ -322,11 +318,7 @@ private:
 	UINT8 *m_font;        
 	UINT8 m_priority;
 	emu_timer *m_timer;
-<<<<<<< HEAD
-	bool get_pcg_addr();
-=======
 	void get_pcg_addr();
->>>>>>> c7fbd14e5c5d31357c5adcc3397e21f8be9b4bb0
 };
 
 READ8_MEMBER( spc1500_state::keyboard_r )
@@ -361,41 +353,18 @@ WRITE8_MEMBER( spc1500_state::portb_w)
 
 WRITE8_MEMBER( spc1500_state::psgb_w)
 {
-<<<<<<< HEAD
-	int elapsed_time = ATTOSECONDS_IN_USEC(m_timer->elapsed().as_attoseconds());
-=======
-//	int elapsed_time = ATTOSECONDS_IN_USEC(m_timer->elapsed().as_attotime());
-	int elapsed_time = m_timer->elapsed().as_double();
-	static int d = 0;
->>>>>>> c7fbd14e5c5d31357c5adcc3397e21f8be9b4bb0
+	int elapsed_time = m_timer->elapsed().as_attoseconds()/ATTOSECONDS_PER_MICROSECOND;
 	if (m_ipl != ((data>>1)&1))
 	{
 		m_ipl = ((data>>1)&1);
 		membank("bank1")->set_entry(m_ipl ? 0 : 1);
 	}
 	m_cass->set_state(BIT(data, 6) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED);
-<<<<<<< HEAD
-	if (!m_motor && BIT(data, 7) && (elapsed_time > 1))
+	if (m_motor && !BIT(data, 7) && (elapsed_time > 100))
 	{
 		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		m_timer->adjust(attotime::zero);
-=======
-	if (!m_motor && BIT(data, 7))
-	{
-		if ( elapsed_time || d > 7)
-		{
-			m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-			m_timer->reset();
-			d = 0;
-		}
-		else
-		d++;
-//		printf("%d", d);
-//		m_motor_toggle = true;
->>>>>>> c7fbd14e5c5d31357c5adcc3397e21f8be9b4bb0
+		m_timer->reset();
 	}
-//	if (!m_motor)
-//		printf("Elapsed:%d, %s, %d\n", elapsed_time, m_cass->get_state() & CASSETTE_MOTOR_DISABLED ? "Disabled" : "Enabled", m_motor);
 	m_motor = BIT(data, 7);
 }
 
@@ -406,14 +375,12 @@ WRITE8_MEMBER( spc1500_state::portc_w)
 	m_double_mode = (!m_p5bit && BIT(data, 5)); // double access I/O mode
 	m_p5bit = BIT(data, 5);
 	m_vdg->set_clock(VDP_CLOCK/(BIT(data, 2) ? 48 : 24));
-
 }
 
 READ8_MEMBER( spc1500_state::portb_r)
 {
 	UINT8 data = 0;
- 	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) && ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED)  ? 0x0 : 0x1;
-// 	data |= !((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY);
+ 	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED || ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED));
  	data |= (m_dipsw->read() & 1) << 4;
  	data |= (m_cass->input() > 0.0038)<<1;
  	data |= m_vdg->vsync_r()<<7;
@@ -454,32 +421,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(spc1500_state::timer)
 	}
 }
 
-READ8_MEMBER( spc1500_state::pcg_r)
-{
-	int reg = (offset>>8)-0x15;
-	UINT8 data = 0;
-	get_pcg_addr();
-	if (m_pcg_char != m_char_change)
-	{
-		m_char_change = m_pcg_char;
-		m_pcg_offset[0] = 0;
-		m_pcg_offset[1] = 0;
-		m_pcg_offset[2] = 0;
-	}	
-	if (reg < 0) reg = 2;
-	if (BIT(m_pcg_attr,5)) // PCG font
-	{
-		data = m_pcgram[m_pcg_char * 8 + m_pcg_offset[reg]+(reg*0x800)];
-	}
-	else // ROM font
-	{
-		data = m_font[(m_crtc_vreg[0x9]==15?0x1000:0)+(m_pcg_char * 16)+m_pcg_offset[reg]];
-	}
-	if (m_pcg_offset[reg]++ > m_crtc_vreg[0x9]-1)
-		m_pcg_offset[reg] = 0;
-	return data;
-}
-bool spc1500_state::get_pcg_addr()
+void spc1500_state::get_pcg_addr()
 {
 	UINT16 vaddr = 0;
 	if(m_p_videoram[0x7ff] & 0x20) {
@@ -493,59 +435,46 @@ bool spc1500_state::get_pcg_addr()
 	} else {
 		vaddr = 0x3ff;
 	}
-<<<<<<< HEAD
-	if (m_pcg_char0 != m_p_videoram[0x1000 + vaddr])
-	{
-		m_pcg_char = m_p_videoram[0x1000 + vaddr];
-		m_pcg_char0 = m_pcg_char;
-	}
-	m_pcg_attr = m_p_videoram[vaddr];
-	m_pcg_addr = m_pcg_char * (m_crtc_vreg[0x9]+1);
-	return true;
-=======
 	m_pcg_char = m_p_videoram[0x1000 + vaddr];
 	m_pcg_attr = m_p_videoram[vaddr];
->>>>>>> c7fbd14e5c5d31357c5adcc3397e21f8be9b4bb0
-}
-
-WRITE8_MEMBER( spc1500_state::pcg_w)
-{
-<<<<<<< HEAD
-=======
-	
->>>>>>> c7fbd14e5c5d31357c5adcc3397e21f8be9b4bb0
-	int reg = (offset>>8)-0x15;
-	get_pcg_addr();
 	if (m_pcg_char != m_char_change)
 	{
-<<<<<<< HEAD
-//		printf("changed\n");
-=======
->>>>>>> c7fbd14e5c5d31357c5adcc3397e21f8be9b4bb0
 		m_char_change = m_pcg_char;
 		m_pcg_offset[0] = 0;
 		m_pcg_offset[1] = 0;
 		m_pcg_offset[2] = 0;
-	}
-		
-<<<<<<< HEAD
-	m_pcg_addr=m_pcg_addr+m_pcg_offset[reg]+(reg*0x800);
-	m_pcgram[m_pcg_addr] = data;
-	printf("%02x,%04x,%02x\n",m_pcg_char, m_pcg_addr, data);
-	if (m_pcg_offset[reg]++ > m_crtc_vreg[0x9]-1)
-		m_pcg_offset[reg] = 0;
-	if (m_char_count++ > (m_crtc_vreg[0x9] * 3 - 1))
-	{
-		m_char_count = 0;
-		m_pcg_char++;
-	}
-=======
+	}	
+}
+
+WRITE8_MEMBER( spc1500_state::pcg_w)
+{
+	int reg = (offset>>8)-0x15;
+	get_pcg_addr();
+
 	m_pcgram[m_pcg_char * 8 + m_pcg_offset[reg] + (reg*0x800)] = data;
 	if (m_pcg_offset[reg] == 7)
 		m_pcg_offset[reg] = 0;
 	else
 		m_pcg_offset[reg]++;
->>>>>>> c7fbd14e5c5d31357c5adcc3397e21f8be9b4bb0
+}
+
+READ8_MEMBER( spc1500_state::pcg_r)
+{
+	int reg = (offset>>8)-0x15;
+	UINT8 data = 0;
+	get_pcg_addr();
+	if (reg < 0) reg = 2;
+	if (BIT(m_pcg_attr,5)) // PCG font
+	{
+		data = m_pcgram[m_pcg_char * 8 + m_pcg_offset[reg]+(reg*0x800)];
+	}
+	else // ROM font
+	{
+		data = m_font[(m_crtc_vreg[0x9]==15?0x1000:0)+(m_pcg_char * 16)+m_pcg_offset[reg]];
+	}
+	if (m_pcg_offset[reg]++ > m_crtc_vreg[0x9]-1)
+		m_pcg_offset[reg] = 0;
+	return data;
 }
 
 WRITE8_MEMBER( spc1500_state::priority_w)
