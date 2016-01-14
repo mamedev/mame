@@ -42,7 +42,8 @@ public:
 	bitmap_ind16    *m_pixel_bitmap1;
 	bitmap_ind16    *m_pixel_bitmap2;
 	int         m_pixram_sel;
-
+	bool		m_color_bank;
+	
 	/* sound-related */
 	int         m_sound_nmi_enable;
 	int         m_pending_nmi;

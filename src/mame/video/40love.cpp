@@ -78,7 +78,7 @@ TILE_GET_INFO_MEMBER(fortyl_state::get_bg_tile_info)
 
 	SET_TILE_INFO_MEMBER(0,
 			code,
-			tile_attrib & 0x07,
+			(tile_attrib & 0x07) | ((m_color_bank == true) ? 0x20 : 0),
 			0);
 }
 
@@ -153,9 +153,17 @@ WRITE8_MEMBER(fortyl_state::fortyl_pixram_sel_w)
 {
 	int offs;
 	int f = data & 0x01;
-
+	bool col_bank = bool(data & 8);
+	
 	m_pixram_sel = (data & 0x04) >> 2;
-
+	// data & 0x20: unknown, set by Undoukai
+	
+	if(col_bank != m_color_bank)
+	{
+		m_color_bank = col_bank;
+		redraw_pixels();
+	}
+	
 	if (m_flipscreen != f)
 	{
 		m_flipscreen = f;
@@ -197,9 +205,9 @@ void fortyl_state::fortyl_plot_pix( int offset )
 	{
 		c = ((d2 >> i) & 1) + ((d1 >> i) & 1) * 2;
 		if (m_pixram_sel)
-			m_tmp_bitmap2->pix16(y, x + i) = m_pix_color[c];
+			m_tmp_bitmap2->pix16(y, x + i) = m_pix_color[c] | ((m_color_bank == true) ? 0x200 : 0);
 		else
-			m_tmp_bitmap1->pix16(y, x + i) = m_pix_color[c];
+			m_tmp_bitmap1->pix16(y, x + i) = m_pix_color[c] | ((m_color_bank == true) ? 0x200 : 0);
 	}
 }
 
@@ -287,7 +295,7 @@ void fortyl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		code = (spriteram[offs + 1] & 0x3f) + ((spriteram[offs + 2] & 0x18) << 3);
 		flipx = ((spriteram[offs + 1] & 0x40) >> 6) ^ m_flipscreen;
 		flipy = ((spriteram[offs + 1] & 0x80) >> 7) ^ m_flipscreen;
-		color = (spriteram[offs + 2] & 0x07) + 0x08;
+		color = (spriteram[offs + 2] & 0x07) + 0x08; // TODO: color bank here too? Check Undoukai
 
 		if (spriteram[offs + 2] & 0xe0)
 			color = machine().rand() & 0xf;
