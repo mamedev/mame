@@ -961,6 +961,7 @@ MACHINE_START_MEMBER(fortyl_state,40love)
 	save_item(NAME(m_pix1));
 	save_item(NAME(m_pix2));
 	save_item(NAME(m_color_bank));
+	save_item(NAME(m_screen_disable));
 	/* sound */
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));

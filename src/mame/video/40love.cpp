@@ -156,7 +156,7 @@ WRITE8_MEMBER(fortyl_state::fortyl_pixram_sel_w)
 	bool col_bank = bool(data & 8);
 	
 	m_pixram_sel = (data & 0x04) >> 2;
-	// data & 0x20: unknown, set by Undoukai
+	m_screen_disable = bool(data & 0x20); // Undoukai
 	
 	if(col_bank != m_color_bank)
 	{
@@ -357,6 +357,12 @@ void fortyl_state::draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect 
 
 UINT32 fortyl_state::screen_update_fortyl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	if(m_screen_disable == true)
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
+		return 0;
+	}
+	
 	draw_pixram(bitmap, cliprect);
 
 	m_bg_tilemap->set_scrolldy(- m_video_ctrl[1] + 1, - m_video_ctrl[1] - 1 );
