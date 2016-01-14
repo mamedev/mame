@@ -89,7 +89,7 @@ protected:
 	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
 	virtual UINT32 disasm_max_opcode_bytes() const override { return 1; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;

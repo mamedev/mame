@@ -616,7 +616,7 @@ UINT16 hp_hybrid_cpu_device::execute_one_sub(UINT16 opcode)
 				return m_reg_P + 1;
 }
 
-void hp_hybrid_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void hp_hybrid_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	if (entry.index() == STATE_GENFLAGS) {
 		strprintf(str, "%s %s %c %c",

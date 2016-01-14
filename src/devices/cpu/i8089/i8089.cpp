@@ -158,7 +158,7 @@ offs_t i8089_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
 //  for the debugger
 //-------------------------------------------------
 
-void i8089_device::state_string_export(const device_state_entry &entry, std::string &str)
+void i8089_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	const i8089_channel *ch = m_ch1;
 

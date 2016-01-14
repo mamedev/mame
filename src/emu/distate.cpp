@@ -436,7 +436,7 @@ UINT64 device_state_interface::state_int(int index)
 //  pieces of indexed state as a string
 //-------------------------------------------------
 
-std::string device_state_interface::state_string(int index)
+std::string device_state_interface::state_string(int index) const
 {
 	// NULL or out-of-range entry returns bogus string
 	const device_state_entry *entry = state_find_entry(index);
@@ -590,7 +590,7 @@ void device_state_interface::state_string_import(const device_state_entry &entry
 //  written to perform any post-processing
 //-------------------------------------------------
 
-void device_state_interface::state_string_export(const device_state_entry &entry, std::string &str)
+void device_state_interface::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	// do nothing by default
 }

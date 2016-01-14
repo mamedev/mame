@@ -291,7 +291,7 @@ void t11_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void t11_device::state_string_export(const device_state_entry &entry, std::string &str)
+void t11_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -310,7 +310,7 @@ void t11_device::state_string_export(const device_state_entry &entry, std::strin
 	}
 }
 
-void k1801vm2_device::state_string_export(const device_state_entry &entry, std::string &str)
+void k1801vm2_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

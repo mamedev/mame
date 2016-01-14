@@ -128,7 +128,7 @@ public:
 
 	// state getters
 	UINT64 state_int(int index);
-	std::string state_string(int index);
+	std::string state_string(int index) const;
 	int state_string_max_length(int index);
 	offs_t pc() { return state_int(STATE_GENPC); }
 	offs_t pcbase() { return state_int(STATE_GENPCBASE); }
@@ -163,7 +163,7 @@ protected:
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
 	virtual void state_string_import(const device_state_entry &entry, std::string &str);
-	virtual void state_string_export(const device_state_entry &entry, std::string &str);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const;
 
 	// internal operation overrides
 	virtual void interface_post_start() override;

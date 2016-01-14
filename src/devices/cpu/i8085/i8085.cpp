@@ -1048,7 +1048,7 @@ void i8085a_cpu_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void i8085a_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
+void i8085a_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{

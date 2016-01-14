@@ -28,4 +28,48 @@
 		</part>
 	</software>
 
+	<software name="angelmt">
+		<!-- cartridge also include a LCD-Game -->
+		<description>Angel Mail Town</description>
+		<year>1999</year>
+		<publisher>Bandai</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="SNCVC-MAIL.IC3" size="0x80000" crc="a3246a56" sha1="616b060cab85076571c47edf30f312535196e41a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="catdog">
+		<description>Cats and Dogs</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x40000">
+				<rom name="SNC-PET1.IC1" size="0x40000" crc="1ba10001" sha1="6ab6e9d79d6f60dc07c951ec94369e6059351744" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conan3">
+		<description>Detective Conan 3</description>
+		<year>1999</year>
+		<publisher>Bandai</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="SNC-CONAN3.IC1" size="0x80000" crc="f93d6149" sha1="b624db8fd47cae79357de4d60d41d88ebe1f089d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="notepadn">
+		<description>Notepad</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x40000">
+				<rom name="BANDAIP1.IC1" size="0x40000" crc="dc8bd361" sha1="d88498321c3038afd6b917005860bd118fe31aa2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

@@ -302,7 +302,7 @@ const address_space_config *m6809_base_device::memory_space_config(address_space
 //  for the debugger
 //-------------------------------------------------
 
-void m6809_base_device::state_string_export(const device_state_entry &entry, std::string &str)
+void m6809_base_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
