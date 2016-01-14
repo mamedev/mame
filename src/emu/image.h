@@ -20,8 +20,8 @@ class image_manager
 public:
 	// construction/destruction
 	image_manager(running_machine &machine);
-	~image_manager();
-
+		
+	void unload_all();
 	void postdevice_init();
 	std::string &mandatory_scan(std::string &mandatory);
 

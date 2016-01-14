@@ -51,6 +51,9 @@ image_manager::image_manager(running_machine &machine)
 				std::string image_err = std::string(image->error());
 				std::string image_basename(image_name);
 
+				/* unload all images */
+				unload_all();
+
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
 					image->device().name(),
 					image_basename.c_str(),
@@ -63,9 +66,10 @@ image_manager::image_manager(running_machine &machine)
 }
 
 //-------------------------------------------------
-//  image_manager - destructor
+//  unload_all - unload all images and
+//  extract options
 //-------------------------------------------------
-image_manager::~image_manager()
+void image_manager::unload_all()
 {
 	// extract the options
 	options_extract();
@@ -227,11 +231,16 @@ void image_manager::postdevice_init()
 			{
 				/* retrieve image error message */
 				std::string image_err = std::string(image->error());
+				
+				/* unload all images */
+				unload_all();
 
 				fatalerror_exitcode(machine(), MAMERR_DEVICE, "Device %s load failed: %s",
 					image->device().name(),
 					image_err.c_str());
 			}
 	}
+	/* add a callback for when we shut down */
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(image_manager::unload_all), this));
 }
 
