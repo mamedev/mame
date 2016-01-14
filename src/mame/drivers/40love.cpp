@@ -11,14 +11,11 @@
 /*
     TO DO:
     - sprites graphics decoding could be changed to only use
-      color codes 8-15 (now it decodes all 64 colors). Perhaps the same
-      applies to character graphics (colors 0-7 only),
+      color codes 8-15 (now it decodes all 64 colors).
 
     - sprite memory needs to be buffered ?
 
     - controls may be wrong (BUTTON 3 - not used ?)
-
-    - palette has 1024 colors, but only first 256 are used at the moment
 
     - pixel layer needs priority ?
 */
