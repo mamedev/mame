@@ -594,6 +594,7 @@ expect that the software reads these once on startup only.
 
 // internal artwork
 #include "fidel_cc.lh"
+#include "fidel_vcc.lh"
 #include "fidel_vsc.lh"
 #include "fidel_vbrc.lh"
 
@@ -1475,7 +1476,7 @@ static MACHINE_CONFIG_START( vcc, fidelz80_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vcc_ppi_portc_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_cc)
+	MCFG_DEFAULT_LAYOUT(layout_fidel_vcc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
