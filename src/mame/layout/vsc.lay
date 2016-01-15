@@ -27,215 +27,215 @@
 		</bezel>
 
 		<!-- Column A -->
-		<bezel name="led_a1" element="led" inputtag="COL_A" inputmask="0x80">
+		<bezel name="led7" element="led" inputtag="IN.0" inputmask="0x80">
 			<bounds x="5" y="15" width="2" height="2" />
 		</bezel>
-		<bezel name="led_a2" element="led" inputtag="COL_A" inputmask="0x40">
+		<bezel name="led6" element="led" inputtag="IN.0" inputmask="0x40">
 			<bounds x="5" y="25" width="2" height="2" />
 		</bezel>
-		<bezel name="led_a3" element="led" inputtag="COL_A" inputmask="0x20">
+		<bezel name="led5" element="led" inputtag="IN.0" inputmask="0x20">
 			<bounds x="5" y="35" width="2" height="2" />
 		</bezel>
-		<bezel name="led_a4" element="led" inputtag="COL_A" inputmask="0x10">
+		<bezel name="led4" element="led" inputtag="IN.0" inputmask="0x10">
 			<bounds x="5" y="45" width="2" height="2" />
 		</bezel>
-		<bezel name="led_a5" element="led" inputtag="COL_A" inputmask="0x08">
+		<bezel name="led3" element="led" inputtag="IN.0" inputmask="0x08">
 			<bounds x="5" y="55" width="2" height="2" />
 		</bezel>
-		<bezel name="led_a6" element="led" inputtag="COL_A" inputmask="0x04">
+		<bezel name="led2" element="led" inputtag="IN.0" inputmask="0x04">
 			<bounds x="5" y="65" width="2" height="2" />
 		</bezel>
-		<bezel name="led_a7" element="led" inputtag="COL_A" inputmask="0x02">
+		<bezel name="led1" element="led" inputtag="IN.0" inputmask="0x02">
 			<bounds x="5" y="75" width="2" height="2" />
 		</bezel>
-		<bezel name="led_a8" element="led" inputtag="COL_A" inputmask="0x01">
+		<bezel name="led0" element="led" inputtag="IN.0" inputmask="0x01">
 			<bounds x="5" y="85" width="2" height="2" />
 		</bezel>
 
 		<!-- Column B -->
-		<bezel name="led_b1" element="led" inputtag="COL_B" inputmask="0x80">
+		<bezel name="led17" element="led" inputtag="IN.1" inputmask="0x80">
 			<bounds x="15" y="15" width="2" height="2" />
 		</bezel>
-		<bezel name="led_b2" element="led" inputtag="COL_B" inputmask="0x40">
+		<bezel name="led16" element="led" inputtag="IN.1" inputmask="0x40">
 			<bounds x="15" y="25" width="2" height="2" />
 		</bezel>
-		<bezel name="led_b3" element="led" inputtag="COL_B" inputmask="0x20">
+		<bezel name="led15" element="led" inputtag="IN.1" inputmask="0x20">
 			<bounds x="15" y="35" width="2" height="2" />
 		</bezel>
-		<bezel name="led_b4" element="led" inputtag="COL_B" inputmask="0x10">
+		<bezel name="led14" element="led" inputtag="IN.1" inputmask="0x10">
 			<bounds x="15" y="45" width="2" height="2" />
 		</bezel>
-		<bezel name="led_b5" element="led" inputtag="COL_B" inputmask="0x08">
+		<bezel name="led13" element="led" inputtag="IN.1" inputmask="0x08">
 			<bounds x="15" y="55" width="2" height="2" />
 		</bezel>
-		<bezel name="led_b6" element="led" inputtag="COL_B" inputmask="0x04">
+		<bezel name="led12" element="led" inputtag="IN.1" inputmask="0x04">
 			<bounds x="15" y="65" width="2" height="2" />
 		</bezel>
-		<bezel name="led_b7" element="led" inputtag="COL_B" inputmask="0x02">
+		<bezel name="led11" element="led" inputtag="IN.1" inputmask="0x02">
 			<bounds x="15" y="75" width="2" height="2" />
 		</bezel>
-		<bezel name="led_b8" element="led" inputtag="COL_B" inputmask="0x01">
+		<bezel name="led10" element="led" inputtag="IN.1" inputmask="0x01">
 			<bounds x="15" y="85" width="2" height="2" />
 		</bezel>
 
 		<!-- Column C -->
-		<bezel name="led_c1" element="led" inputtag="COL_C" inputmask="0x80">
+		<bezel name="led27" element="led" inputtag="IN.2" inputmask="0x80">
 			<bounds x="25" y="15" width="2" height="2" />
 		</bezel>
-		<bezel name="led_c2" element="led" inputtag="COL_C" inputmask="0x40">
+		<bezel name="led26" element="led" inputtag="IN.2" inputmask="0x40">
 			<bounds x="25" y="25" width="2" height="2" />
 		</bezel>
-		<bezel name="led_c3" element="led" inputtag="COL_C" inputmask="0x20">
+		<bezel name="led25" element="led" inputtag="IN.2" inputmask="0x20">
 			<bounds x="25" y="35" width="2" height="2" />
 		</bezel>
-		<bezel name="led_c4" element="led" inputtag="COL_C" inputmask="0x10">
+		<bezel name="led24" element="led" inputtag="IN.2" inputmask="0x10">
 			<bounds x="25" y="45" width="2" height="2" />
 		</bezel>
-		<bezel name="led_c5" element="led" inputtag="COL_C" inputmask="0x08">
+		<bezel name="led23" element="led" inputtag="IN.2" inputmask="0x08">
 			<bounds x="25" y="55" width="2" height="2" />
 		</bezel>
-		<bezel name="led_c6" element="led" inputtag="COL_C" inputmask="0x04">
+		<bezel name="led22" element="led" inputtag="IN.2" inputmask="0x04">
 			<bounds x="25" y="65" width="2" height="2" />
 		</bezel>
-		<bezel name="led_c7" element="led" inputtag="COL_C" inputmask="0x02">
+		<bezel name="led21" element="led" inputtag="IN.2" inputmask="0x02">
 			<bounds x="25" y="75" width="2" height="2" />
 		</bezel>
-		<bezel name="led_c8" element="led" inputtag="COL_C" inputmask="0x01">
+		<bezel name="led20" element="led" inputtag="IN.2" inputmask="0x01">
 			<bounds x="25" y="85" width="2" height="2" />
 		</bezel>
 
 		<!-- Column D -->
-		<bezel name="led_d1" element="led" inputtag="COL_D" inputmask="0x80">
+		<bezel name="led37" element="led" inputtag="IN.3" inputmask="0x80">
 			<bounds x="35" y="15" width="2" height="2" />
 		</bezel>
-		<bezel name="led_d2" element="led" inputtag="COL_D" inputmask="0x40">
+		<bezel name="led36" element="led" inputtag="IN.3" inputmask="0x40">
 			<bounds x="35" y="25" width="2" height="2" />
 		</bezel>
-		<bezel name="led_d3" element="led" inputtag="COL_D" inputmask="0x20">
+		<bezel name="led35" element="led" inputtag="IN.3" inputmask="0x20">
 			<bounds x="35" y="35" width="2" height="2" />
 		</bezel>
-		<bezel name="led_d4" element="led" inputtag="COL_D" inputmask="0x10">
+		<bezel name="led34" element="led" inputtag="IN.3" inputmask="0x10">
 			<bounds x="35" y="45" width="2" height="2" />
 		</bezel>
-		<bezel name="led_d5" element="led" inputtag="COL_D" inputmask="0x08">
+		<bezel name="led33" element="led" inputtag="IN.3" inputmask="0x08">
 			<bounds x="35" y="55" width="2" height="2" />
 		</bezel>
-		<bezel name="led_d6" element="led" inputtag="COL_D" inputmask="0x04">
+		<bezel name="led32" element="led" inputtag="IN.3" inputmask="0x04">
 			<bounds x="35" y="65" width="2" height="2" />
 		</bezel>
-		<bezel name="led_d7" element="led" inputtag="COL_D" inputmask="0x02">
+		<bezel name="led31" element="led" inputtag="IN.3" inputmask="0x02">
 			<bounds x="35" y="75" width="2" height="2" />
 		</bezel>
-		<bezel name="led_d8" element="led" inputtag="COL_D" inputmask="0x01">
+		<bezel name="led30" element="led" inputtag="IN.3" inputmask="0x01">
 			<bounds x="35" y="85" width="2" height="2" />
 		</bezel>
 
 		<!-- Column E -->
-		<bezel name="led_e1" element="led" inputtag="COL_E" inputmask="0x80">
+		<bezel name="led47" element="led" inputtag="IN.4" inputmask="0x80">
 			<bounds x="45" y="15" width="2" height="2" />
 		</bezel>
-		<bezel name="led_e2" element="led" inputtag="COL_E" inputmask="0x40">
+		<bezel name="led46" element="led" inputtag="IN.4" inputmask="0x40">
 			<bounds x="45" y="25" width="2" height="2" />
 		</bezel>
-		<bezel name="led_e3" element="led" inputtag="COL_E" inputmask="0x20">
+		<bezel name="led45" element="led" inputtag="IN.4" inputmask="0x20">
 			<bounds x="45" y="35" width="2" height="2" />
 		</bezel>
-		<bezel name="led_e4" element="led" inputtag="COL_E" inputmask="0x10">
+		<bezel name="led44" element="led" inputtag="IN.4" inputmask="0x10">
 			<bounds x="45" y="45" width="2" height="2" />
 		</bezel>
-		<bezel name="led_e5" element="led" inputtag="COL_E" inputmask="0x08">
+		<bezel name="led43" element="led" inputtag="IN.4" inputmask="0x08">
 			<bounds x="45" y="55" width="2" height="2" />
 		</bezel>
-		<bezel name="led_e6" element="led" inputtag="COL_E" inputmask="0x04">
+		<bezel name="led42" element="led" inputtag="IN.4" inputmask="0x04">
 			<bounds x="45" y="65" width="2" height="2" />
 		</bezel>
-		<bezel name="led_e7" element="led" inputtag="COL_E" inputmask="0x02">
+		<bezel name="led41" element="led" inputtag="IN.4" inputmask="0x02">
 			<bounds x="45" y="75" width="2" height="2" />
 		</bezel>
-		<bezel name="led_e8" element="led" inputtag="COL_E" inputmask="0x01">
+		<bezel name="led40" element="led" inputtag="IN.4" inputmask="0x01">
 			<bounds x="45" y="85" width="2" height="2" />
 		</bezel>
 
 		<!-- Column F -->
-		<bezel name="led_f1" element="led" inputtag="COL_F" inputmask="0x80">
+		<bezel name="led57" element="led" inputtag="IN.5" inputmask="0x80">
 			<bounds x="55" y="15" width="2" height="2" />
 		</bezel>
-		<bezel name="led_f2" element="led" inputtag="COL_F" inputmask="0x40">
+		<bezel name="led56" element="led" inputtag="IN.5" inputmask="0x40">
 			<bounds x="55" y="25" width="2" height="2" />
 		</bezel>
-		<bezel name="led_f3" element="led" inputtag="COL_F" inputmask="0x20">
+		<bezel name="led55" element="led" inputtag="IN.5" inputmask="0x20">
 			<bounds x="55" y="35" width="2" height="2" />
 		</bezel>
-		<bezel name="led_f4" element="led" inputtag="COL_F" inputmask="0x10">
+		<bezel name="led54" element="led" inputtag="IN.5" inputmask="0x10">
 			<bounds x="55" y="45" width="2" height="2" />
 		</bezel>
-		<bezel name="led_f5" element="led" inputtag="COL_F" inputmask="0x08">
+		<bezel name="led53" element="led" inputtag="IN.5" inputmask="0x08">
 			<bounds x="55" y="55" width="2" height="2" />
 		</bezel>
-		<bezel name="led_f6" element="led" inputtag="COL_F" inputmask="0x04">
+		<bezel name="led52" element="led" inputtag="IN.5" inputmask="0x04">
 			<bounds x="55" y="65" width="2" height="2" />
 		</bezel>
-		<bezel name="led_f7" element="led" inputtag="COL_F" inputmask="0x02">
+		<bezel name="led51" element="led" inputtag="IN.5" inputmask="0x02">
 			<bounds x="55" y="75" width="2" height="2" />
 		</bezel>
-		<bezel name="led_f8" element="led" inputtag="COL_F" inputmask="0x01">
+		<bezel name="led50" element="led" inputtag="IN.5" inputmask="0x01">
 			<bounds x="55" y="85" width="2" height="2" />
 		</bezel>
 
 		<!-- Column G -->
-		<bezel name="led_g1" element="led" inputtag="COL_G" inputmask="0x80">
+		<bezel name="led67" element="led" inputtag="IN.6" inputmask="0x80">
 			<bounds x="65" y="15" width="2" height="2" />
 		</bezel>
-		<bezel name="led_g2" element="led" inputtag="COL_G" inputmask="0x40">
+		<bezel name="led66" element="led" inputtag="IN.6" inputmask="0x40">
 			<bounds x="65" y="25" width="2" height="2" />
 		</bezel>
-		<bezel name="led_g3" element="led" inputtag="COL_G" inputmask="0x20">
+		<bezel name="led65" element="led" inputtag="IN.6" inputmask="0x20">
 			<bounds x="65" y="35" width="2" height="2" />
 		</bezel>
-		<bezel name="led_g4" element="led" inputtag="COL_G" inputmask="0x10">
+		<bezel name="led64" element="led" inputtag="IN.6" inputmask="0x10">
 			<bounds x="65" y="45" width="2" height="2" />
 		</bezel>
-		<bezel name="led_g5" element="led" inputtag="COL_G" inputmask="0x08">
+		<bezel name="led63" element="led" inputtag="IN.6" inputmask="0x08">
 			<bounds x="65" y="55" width="2" height="2" />
 		</bezel>
-		<bezel name="led_g6" element="led" inputtag="COL_G" inputmask="0x04">
+		<bezel name="led62" element="led" inputtag="IN.6" inputmask="0x04">
 			<bounds x="65" y="65" width="2" height="2" />
 		</bezel>
-		<bezel name="led_g7" element="led" inputtag="COL_G" inputmask="0x02">
+		<bezel name="led61" element="led" inputtag="IN.6" inputmask="0x02">
 			<bounds x="65" y="75" width="2" height="2" />
 		</bezel>
-		<bezel name="led_g8" element="led" inputtag="COL_G" inputmask="0x01">
+		<bezel name="led60" element="led" inputtag="IN.6" inputmask="0x01">
 			<bounds x="65" y="85" width="2" height="2" />
 		</bezel>
 
 		<!-- Column H -->
-		<bezel name="led_h1" element="led" inputtag="COL_H" inputmask="0x80">
+		<bezel name="led77" element="led" inputtag="IN.7" inputmask="0x80">
 			<bounds x="75" y="15" width="2" height="2" />
 		</bezel>
-		<bezel name="led_h2" element="led" inputtag="COL_H" inputmask="0x40">
+		<bezel name="led76" element="led" inputtag="IN.7" inputmask="0x40">
 			<bounds x="75" y="25" width="2" height="2" />
 		</bezel>
-		<bezel name="led_h3" element="led" inputtag="COL_H" inputmask="0x20">
+		<bezel name="led75" element="led" inputtag="IN.7" inputmask="0x20">
 			<bounds x="75" y="35" width="2" height="2" />
 		</bezel>
-		<bezel name="led_h4" element="led" inputtag="COL_H" inputmask="0x10">
+		<bezel name="led74" element="led" inputtag="IN.7" inputmask="0x10">
 			<bounds x="75" y="45" width="2" height="2" />
 		</bezel>
-		<bezel name="led_h5" element="led" inputtag="COL_H" inputmask="0x08">
+		<bezel name="led73" element="led" inputtag="IN.7" inputmask="0x08">
 			<bounds x="75" y="55" width="2" height="2" />
 		</bezel>
-		<bezel name="led_h6" element="led" inputtag="COL_H" inputmask="0x04">
+		<bezel name="led72" element="led" inputtag="IN.7" inputmask="0x04">
 			<bounds x="75" y="65" width="2" height="2" />
 		</bezel>
-		<bezel name="led_h7" element="led" inputtag="COL_H" inputmask="0x02">
+		<bezel name="led71" element="led" inputtag="IN.7" inputmask="0x02">
 			<bounds x="75" y="75" width="2" height="2" />
 		</bezel>
-		<bezel name="led_h8" element="led" inputtag="COL_H" inputmask="0x01">
+		<bezel name="led70" element="led" inputtag="IN.7" inputmask="0x01">
 			<bounds x="75" y="85" width="2" height="2" />
 		</bezel>
 
 		<!-- Problem mode LED -->
-		<bezel name="pm_led" element="led">
+		<bezel name="led80" element="led">
 			<bounds x="69" y="5" width="2" height="2" />
 		</bezel>
 
@@ -246,10 +246,10 @@
 		<bezel name="digit2" element="digit">
 			<bounds x="36" y="2" width="4" height="8" />
 		</bezel>
-		<bezel name="up_dot" element="led">
+		<bezel name="led82" element="led">
 			<bounds x="42" y="3" width="1" height="1" />
 		</bezel>
-		<bezel name="low_dot" element="led">
+		<bezel name="led83" element="led">
 			<bounds x="42" y="8" width="1" height="1" />
 		</bezel>
 		<bezel name="digit1" element="digit">
