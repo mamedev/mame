@@ -12,18 +12,19 @@
     Here are the versions we have:
 
     arkanoid    The earlier revisions. They each differ in the country byte. These
-    arkanoiduo    versions work fine with the current MCU rom which needs to be
-    arkanoidjb    verified against a genuine decapped A75-06.IC16 M68705 MCU.
+    arkanoiduo    versions work fine both the bootleg a75-06 MCU rom and the
+    arkanoidjb    genuine decapped Taito A75-06.IC16 M68705 MCU.
     arkanoidu   USA version. A later revision, code has been inserted NOT patched.
                 The 68705 code for this one was not available; I made it up from
                 the current A75-06.IC16 changing the level data pointer table.
     arkanoidj   Japanese version.  Final revision, MCU code not dumped.
     arkanoidja  Japanese version. A later revision with level selector.
-                The 68705 code for this one was not available; I made it up from
-                the current A75-06.IC16 changing the level data pointer table.
+                  The 68705 code for this one was not available; I made it up from
+                  the current A75-06.IC16 changing the level data pointer table.
     arkanoidjbl Bootleg of the early Japanese version. The only difference is
-                that the warning text has been replaced by "WAIT"
-                This version works fine with the current A75-06.IC16 MCU ROM
+                  that the warning text has been replaced by "WAIT"
+                  This version came with its own 68705p3 MCU ROM which is based on
+                  the original Taito one.
     arkatayt    Another bootleg of the early Japanese one, more heavily modified
     arkblock    Another bootleg of the early Japanese one, more heavily modified
     arkbloc2    Another bootleg
