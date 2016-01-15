@@ -531,6 +531,6 @@ ROM_START( mp68a ) // ROM image from http://elektronikforumet.com/forum/viewtopi
 ROM_END
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   CLASS            INIT        COMPANY             FULLNAME           FLAGS
-COMP( 1979, mp68a,	    0,          0,      mp68a,      mp68a,  driver_device,   0,          "Didact AB",        "mp68a",           0 )
+COMP( 1979, mp68a,	    0,          0,      mp68a,      mp68a,  driver_device,   0,          "Didact AB",        "mp68a",           MACHINE_NO_SOUND_HW )
 COMP( 1982, e100,	    0,          0,      e100,       e100,   driver_device,   0,          "Didact AB",        "Esselte 100",     MACHINE_IS_SKELETON )
 COMP( 1983, md6802,	    0,          0,      md6802,     md6802, driver_device,   0,          "Didact AB",        "Mikrodator 6802", MACHINE_IS_SKELETON )
