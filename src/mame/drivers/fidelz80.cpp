@@ -632,7 +632,6 @@ public:
 	UINT16 m_led_select;             // 5 bit selects for 7 seg leds and for common other leds, bits are (7seg leds are 0 1 2 3, common other leds are C) 0bxx3210xc
 	UINT16 m_7seg_data;            // data for seg leds
 	UINT16 m_led_data;
-	UINT8 m_digit_line_status[4];   // prevent overwrite of m_7seg_data
 
 	UINT16 read_inputs(int columns);
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
@@ -671,7 +670,6 @@ public:
 	DECLARE_READ8_MEMBER(vsc_pio_porta_r);
 	DECLARE_READ8_MEMBER(vsc_pio_portb_r);
 	DECLARE_WRITE8_MEMBER(vsc_pio_portb_w);
-	DECLARE_INPUT_CHANGED_MEMBER(fidelz80_trigger_reset);
 
 	// model 7014 and VBC
 	DECLARE_WRITE8_MEMBER(bridgec_speech_w);
@@ -684,7 +682,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_command_w);
 	DECLARE_READ8_MEMBER(mcu_data_r);
 	DECLARE_READ8_MEMBER(mcu_status_r);
-	DECLARE_INPUT_CHANGED_MEMBER(bridgec_trigger_reset);
 	DECLARE_WRITE8_MEMBER(digit_w);
 
 protected:
@@ -707,7 +704,6 @@ void fidelz80_state::machine_start()
 	m_led_select = 0;
 	m_led_data = 0;
 	m_7seg_data = 0;
-	memset(m_digit_line_status, 0, sizeof(m_digit_line_status));
 
 	// register for savestates
 	save_item(NAME(m_display_maxy));
@@ -723,7 +719,6 @@ void fidelz80_state::machine_start()
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_7seg_data));
-	save_item(NAME(m_digit_line_status));
 }
 
 void fidelz80_state::machine_reset()
@@ -912,8 +907,8 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_portc_w)
 
 WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
 {
-	// d0-d6: digit segment data
-	m_7seg_data = data;
+	// d0-d6: digit segment data (same as VCC)
+	m_7seg_data = BITSWAP8(data,7,0,1,2,3,4,5,6) & 0x7f;
 	vcc_prepare_display();
 
 	// d7: beeper output
@@ -970,7 +965,7 @@ WRITE8_MEMBER(fidelz80_state::vsc_ppi_portc_w)
 
 
 /******************************************************************************
-    PIO Device, for VSC
+    Z80 PIO Device, for VSC
 ******************************************************************************/
 
 READ8_MEMBER(fidelz80_state::vsc_pio_porta_r)
@@ -1000,6 +995,35 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 	// d6: TSI START line
 	m_speech->set_volume(15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
 	m_speech->rst_w(data >> 6 & 1);
+}
+
+
+/******************************************************************************
+    I8243 I/O Expander Device, for VBRC
+******************************************************************************/
+
+WRITE8_MEMBER(fidelz80_state::digit_w)
+{
+//	if (m_digit_line_status[offset])
+//		return;
+
+//	m_digit_line_status[offset&3] = 1;
+
+	switch (offset)
+	{
+	case 0:
+		m_7seg_data = (m_7seg_data&(~0x000f)) | ((data<<0)&0x000f);
+		break;
+	case 1:
+		m_7seg_data = (m_7seg_data&(~0x00f0)) | ((data<<4)&0x00f0);
+		break;
+	case 2:
+		m_7seg_data = (m_7seg_data&(~0x0f00)) | ((data<<8)&0x0f00);
+		break;
+	case 3:
+		m_7seg_data = (m_7seg_data&(~0xf000)) | ((data<<12)&0xf000);
+		break;
+	}
 }
 
 
@@ -1055,7 +1079,7 @@ WRITE8_MEMBER(fidelz80_state::kp_matrix_w)
 		output().set_led_value(1, out_led);
 	}
 
-	memset(m_digit_line_status, 0, sizeof(m_digit_line_status));
+//	memset(m_digit_line_status, 0, sizeof(m_digit_line_status));
 
 	m_inp_mux = data;
 }
@@ -1085,34 +1109,6 @@ READ8_MEMBER(fidelz80_state::unknown_r)
 READ8_MEMBER(fidelz80_state::unknown2_r)
 {
 	return machine().rand();
-}
-
-/******************************************************************************
-    I8243 expander
-******************************************************************************/
-
-WRITE8_MEMBER(fidelz80_state::digit_w)
-{
-	if (m_digit_line_status[offset])
-		return;
-
-	m_digit_line_status[offset&3] = 1;
-
-	switch (offset)
-	{
-	case 0:
-		m_7seg_data = (m_7seg_data&(~0x000f)) | ((data<<0)&0x000f);
-		break;
-	case 1:
-		m_7seg_data = (m_7seg_data&(~0x00f0)) | ((data<<4)&0x00f0);
-		break;
-	case 2:
-		m_7seg_data = (m_7seg_data&(~0x0f00)) | ((data<<8)&0x0f00);
-		break;
-	case 3:
-		m_7seg_data = (m_7seg_data&(~0xf000)) | ((data<<12)&0xf000);
-		break;
-	}
 }
 
 /******************************************************************************
