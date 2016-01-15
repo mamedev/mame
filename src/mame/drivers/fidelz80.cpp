@@ -610,7 +610,10 @@ public:
 		m_i8243(*this, "i8243"),
 		m_inp_matrix(*this, "IN"),
 		m_speech(*this, "speech"),
-		m_speaker(*this, "speaker")
+		m_speaker(*this, "speaker"),
+		m_display_wait(33),
+		m_display_maxy(1),
+		m_display_maxx(0)
 	{ }
 
 	// devices/pointers
@@ -623,13 +626,39 @@ public:
 	optional_device<s14001a_device> m_speech;
 	optional_device<speaker_sound_device> m_speaker;
 
-	UINT16 m_kp_mux;                // multiplexed keypad/leds mask
+
+
+
+	// misc common
+	UINT16 m_inp_mux;                   // multiplexed keypad/leds mask
+
 	UINT8 m_led_select;             // 5 bit selects for 7 seg leds and for common other leds, bits are (7seg leds are 0 1 2 3, common other leds are C) 0bxx3210xc
 	UINT16 m_digit_data;            // data for seg leds
 	UINT8 m_digit_line_status[4];   // prevent overwrite of m_digit_data
 
+	//UINT16 read_inputs(int columns);
+	//DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+	// display common
+	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;                 // display matrix number of rows
+	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
+
+	UINT32 m_grid;                      // VFD current row data
+	UINT32 m_plate;                     // VFD current column data
+
+	UINT32 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
+	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
+	UINT32 m_display_cache[0x20];       // (internal use)
+	UINT8 m_display_decay[0x20][0x20];  // (internal use)
+
+	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	void display_update();
+	void set_display_size(int maxx, int maxy);
+	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
+
 	// model VCC/UVC
-	void vcc_update_display();
+	void vcc_prepare_display();
 	DECLARE_WRITE8_MEMBER(vcc_ppi_porta_w);
 	DECLARE_READ8_MEMBER(vcc_ppi_portb_r);
 	DECLARE_WRITE8_MEMBER(vcc_ppi_portb_w);
@@ -638,7 +667,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cc10_ppi_porta_w);
 
 	// model VSC
-	void vsc_update_display();
+	void vsc_prepare_display();
 	DECLARE_READ8_MEMBER(vsc_io_trampoline_r);
 	DECLARE_WRITE8_MEMBER(vsc_io_trampoline_w);
 	DECLARE_WRITE8_MEMBER(vsc_ppi_porta_w);
@@ -663,7 +692,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(bridgec_trigger_reset);
 	DECLARE_WRITE8_MEMBER(digit_w);
 
+protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 };
 
 
@@ -672,18 +703,150 @@ public:
 void fidelz80_state::machine_start()
 {
 	// zerofill
+	memset(m_display_state, 0, sizeof(m_display_state));
+	memset(m_display_cache, ~0, sizeof(m_display_cache));
+	memset(m_display_decay, 0, sizeof(m_display_decay));
+	memset(m_display_segmask, 0, sizeof(m_display_segmask));
+
+	m_inp_mux = 0;
 	m_led_select = 0;
-	m_kp_mux = 0;
 	m_digit_data = 0;
 	memset(m_digit_line_status, 0, sizeof(m_digit_line_status));
 
 	// register for savestates
+	save_item(NAME(m_display_maxy));
+	save_item(NAME(m_display_maxx));
+	save_item(NAME(m_display_wait));
+
+	save_item(NAME(m_display_state));
+	/* save_item(NAME(m_display_cache)); */ // don't save!
+	save_item(NAME(m_display_decay));
+	save_item(NAME(m_display_segmask));
+
+	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
-	save_item(NAME(m_kp_mux));
 	save_item(NAME(m_digit_data));
 	save_item(NAME(m_digit_line_status));
 }
 
+void fidelz80_state::machine_reset()
+{
+}
+
+
+
+/***************************************************************************
+
+  Helper Functions
+
+***************************************************************************/
+
+// The device may strobe the outputs very fast, it is unnoticeable to the user.
+// To prevent flickering here, we need to simulate a decay.
+
+void fidelz80_state::display_update()
+{
+	UINT32 active_state[0x20];
+
+	for (int y = 0; y < m_display_maxy; y++)
+	{
+		active_state[y] = 0;
+
+		for (int x = 0; x <= m_display_maxx; x++)
+		{
+			// turn on powered segments
+			if (m_display_state[y] >> x & 1)
+				m_display_decay[y][x] = m_display_wait;
+
+			// determine active state
+			UINT32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			active_state[y] |= (ds << x);
+		}
+	}
+
+	// on difference, send to output
+	for (int y = 0; y < m_display_maxy; y++)
+		if (m_display_cache[y] != active_state[y])
+		{
+			if (m_display_segmask[y] != 0)
+				output().set_digit_value(y, active_state[y] & m_display_segmask[y]);
+
+			const int mul = (m_display_maxx <= 10) ? 10 : 100;
+			for (int x = 0; x <= m_display_maxx; x++)
+			{
+				int state = active_state[y] >> x & 1;
+				char buf1[0x10]; // lampyx
+				char buf2[0x10]; // y.x
+
+				if (x == m_display_maxx)
+				{
+					// always-on if selected
+					sprintf(buf1, "lamp%da", y);
+					sprintf(buf2, "%d.a", y);
+				}
+				else
+				{
+					sprintf(buf1, "lamp%d", y * mul + x);
+					sprintf(buf2, "%d.%d", y, x);
+				}
+				output().set_value(buf1, state);
+				output().set_value(buf2, state);
+			}
+		}
+
+	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(fidelz80_state::display_decay_tick)
+{
+	// slowly turn off unpowered segments
+	for (int y = 0; y < m_display_maxy; y++)
+		for (int x = 0; x <= m_display_maxx; x++)
+			if (m_display_decay[y][x] != 0)
+				m_display_decay[y][x]--;
+
+	display_update();
+}
+
+void fidelz80_state::set_display_size(int maxx, int maxy)
+{
+	m_display_maxx = maxx;
+	m_display_maxy = maxy;
+}
+
+void fidelz80_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+{
+	set_display_size(maxx, maxy);
+
+	// update current state
+	UINT32 mask = (1 << maxx) - 1;
+	for (int y = 0; y < maxy; y++)
+		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
+
+	display_update();
+}
+
+
+// generic input handlers
+
+#if 0
+UINT8 fidelz80_state::read_inputs(int columns)
+{
+	UINT8 ret = 0;
+
+	// read selected input rows
+	for (int i = 0; i < columns; i++)
+		if (m_inp_mux >> i & 1)
+			ret |= m_inp_matrix[i]->read();
+
+	return ret;
+}
+
+INPUT_CHANGED_MEMBER(fidelz80_state::reset_button)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+#endif
 
 
 // Devices, I/O
@@ -692,28 +855,21 @@ void fidelz80_state::machine_start()
     I8255 Device, for VCC/UVC
 ******************************************************************************/
 
-void fidelz80_state::vcc_update_display()
+void fidelz80_state::vcc_prepare_display()
 {
-	// data for the 4x 7seg leds, bits are 0bxABCDEFG
-	UINT8 out_digit = BITSWAP8(m_digit_data,7,0,1,2,3,4,5,6) & 0x7f;
-
+	// 4 7seg leds
 	for (int i = 0; i < 4; i++)
-		if (m_led_select >> (i+2) & 1)
-		{
-			// digit select from PPI port B d2-d5
-			output().set_digit_value(i, out_digit);
-			
-			// first 2 digit also selects the 2 leds (d0 is leds commons)
-			if (i < 2)
-				output().set_led_value(i, m_led_select & 1);
-		}
+		m_display_segmask[i] = 0x7f;
+	
+	// note: d0 for extra leds
+	display_matrix(8, 4, m_digit_data | (m_led_select << 7 & 0x80), m_led_select >> 2 & 0xf);
 }
 
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 {
-	// d0-d6: digit segment data
-	m_digit_data = data;
-	vcc_update_display();
+	// data for the 4 7seg leds, bits are xABCDEFG
+	m_digit_data = BITSWAP8(data,7,0,1,2,3,4,5,6) & 0x7f;
+	vcc_prepare_display();
 	
 	// d0-d5: TSI A0-A5
 	// d7: TSI START line
@@ -735,7 +891,7 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_portb_w)
 {
 	// d0,d2-d5: digit/led select
 	m_led_select = data;
-	vcc_update_display();
+	vcc_prepare_display();
 
 	// _d6: enable language switches (TODO)
 }
@@ -746,7 +902,7 @@ READ8_MEMBER(fidelz80_state::vcc_ppi_portc_r)
 	
 	// d0-d3: multiplexed inputs (invert)
 	for (int i = 0; i < 4; i++)
-		if (~m_kp_mux >> i & 1)
+		if (~m_inp_mux >> i & 1)
 			inp &= m_inp_matrix[i]->read();
 
 	return inp;
@@ -755,7 +911,7 @@ READ8_MEMBER(fidelz80_state::vcc_ppi_portc_r)
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_portc_w)
 {
 	// d4-d7: keypad mux
-	m_kp_mux = data >> 4 & 0xf;
+	m_inp_mux = data >> 4 & 0xf;
 }
 
 // CC10-specific (no speech roms, 1-bit beeper instead)
@@ -764,7 +920,7 @@ WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
 {
 	// d0-d6: digit segment data
 	m_digit_data = data;
-	vcc_update_display();
+	vcc_prepare_display();
 
 	// d7: beeper output
 	m_speaker->level_w(~data >> 7 & 1);
@@ -775,26 +931,21 @@ WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
     I8255 Device, for VSC
 ******************************************************************************/
 
-void fidelz80_state::vsc_update_display()
+void fidelz80_state::vsc_prepare_display()
 {
-	// data for the 4x 7seg leds, bits are HGCBAFED (H is extra leds)
-	UINT8 out_digit = BITSWAP8(m_digit_data,7,6,2,1,0,5,4,3);
-
+	// 4 7seg leds
+	for (int i = 0; i < 4; i++)
+	{
+		m_display_segmask[i] = 0x7f;
+		m_display_state[i] = (m_inp_mux >> i & 1) ? m_digit_data : 0;
+	}
+	
+	// 8*8 chessboard leds
 	for (int i = 0; i < 8; i++)
-		if (m_kp_mux >> i & 1)
-		{
-			// chessboard leds from PPI ports B and C
-			// note: led0=a8, led1=a7..led7=a1, led10=b8..led77=h1
-			for (int j = 0; j < 8; j++)
-				output().set_led_value(i*10 + j, m_led_select >> j & 1);
-			
-			// PPI port C d0-d3 also selects digit/extra led
-			if (i < 4)
-			{
-				output().set_digit_value(i, out_digit & 0x7f);
-				output().set_led_value(80+i, out_digit >> 7 & 1);
-			}
-		}
+		m_display_state[i+4] = (m_inp_mux >> i & 1) ? m_led_select : 0;
+
+	set_display_size(8, 12);
+	display_update();
 }
 
 WRITE8_MEMBER(fidelz80_state::vsc_ppi_porta_w)
@@ -802,23 +953,23 @@ WRITE8_MEMBER(fidelz80_state::vsc_ppi_porta_w)
 	// d0-d5: TSI A0-A5
 	m_speech->reg_w(data & 0x3f);
 
-	// 7seg data
-	m_digit_data = data;
-	vsc_update_display();
+	// data for the 4 7seg leds, bits are HGCBAFED (H is extra led)
+	m_digit_data = BITSWAP8(data,7,6,2,1,0,5,4,3);
+	vsc_prepare_display();
 }
 
 WRITE8_MEMBER(fidelz80_state::vsc_ppi_portb_w)
 {
 	// led row data
 	m_led_select = data;
-	vsc_update_display();
+	vsc_prepare_display();
 }
 
 WRITE8_MEMBER(fidelz80_state::vsc_ppi_portc_w)
 {
 	// led column/digit select data, keypad mux
-	m_kp_mux = (m_kp_mux & 0x100) | data;
-	vsc_update_display();
+	m_inp_mux = (m_inp_mux & 0x300) | data;
+	vsc_prepare_display();
 }
 
 
@@ -832,7 +983,7 @@ READ8_MEMBER(fidelz80_state::vsc_pio_porta_r)
 
 	// multiplexed inputs
 	for (int i = 0; i < 10; i++)
-		if (m_kp_mux >> i & 1)
+		if (m_inp_mux >> i & 1)
 			inp |= m_inp_matrix[i]->read();
 
 	return inp;
@@ -851,7 +1002,7 @@ READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
 WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 {
 	// d0,d1: keypad mux highest bits
-	m_kp_mux = (m_kp_mux & 0xff) | (data << 8 & 0x300);
+	m_inp_mux = (m_inp_mux & 0xff) | (data << 8 & 0x300);
 
 	// d2: tone line
 	m_speaker->level_w(~data >> 2 & 1);
@@ -873,42 +1024,42 @@ WRITE8_MEMBER(fidelz80_state::kp_matrix_w)
 	UINT8 out_led = BIT(out_data, 15) ? 0 : 1;
 
 	// output the digit before update the matrix
-	if (m_kp_mux & 0x01)
+	if (m_inp_mux & 0x01)
 	{
 		output().set_digit_value(1, out_digit);
 		output().set_led_value(8, out_led);
 	}
-	if (m_kp_mux & 0x02)
+	if (m_inp_mux & 0x02)
 	{
 		output().set_digit_value(2, out_digit);
 		output().set_led_value(7, out_led);
 	}
-	if (m_kp_mux & 0x04)
+	if (m_inp_mux & 0x04)
 	{
 		output().set_digit_value(3, out_digit);
 		output().set_led_value(6, out_led);
 	}
-	if (m_kp_mux & 0x08)
+	if (m_inp_mux & 0x08)
 	{
 		output().set_digit_value(4, out_digit);
 		output().set_led_value(5, out_led);
 	}
-	if (m_kp_mux & 0x10)
+	if (m_inp_mux & 0x10)
 	{
 		output().set_digit_value(5, out_digit);
 		output().set_led_value(4, out_led);
 	}
-	if (m_kp_mux & 0x20)
+	if (m_inp_mux & 0x20)
 	{
 		output().set_digit_value(6, out_digit);
 		output().set_led_value(3, out_led);
 	}
-	if (m_kp_mux & 0x40)
+	if (m_inp_mux & 0x40)
 	{
 		output().set_digit_value(7, out_digit);
 		output().set_led_value(2, out_led);
 	}
-	if (m_kp_mux & 0x80)
+	if (m_inp_mux & 0x80)
 	{
 		output().set_digit_value(8, out_digit);
 		output().set_led_value(1, out_led);
@@ -916,7 +1067,7 @@ WRITE8_MEMBER(fidelz80_state::kp_matrix_w)
 
 	memset(m_digit_line_status, 0, sizeof(m_digit_line_status));
 
-	m_kp_mux = data;
+	m_inp_mux = data;
 }
 
 READ8_MEMBER(fidelz80_state::exp_i8243_p2_r)
@@ -924,7 +1075,7 @@ READ8_MEMBER(fidelz80_state::exp_i8243_p2_r)
 	UINT8 inp = 0xff;
 
 	for (int i = 0; i < 4; i++)
-		if (m_kp_mux >> i & 1)
+		if (m_inp_mux >> i & 1)
 			inp &= m_inp_matrix[i]->read();
 
 	return (m_i8243->i8243_p2_r(space, offset)&0x0f) | (inp<<4&0xf0);
@@ -1318,6 +1469,7 @@ static MACHINE_CONFIG_START( cc10, fidelz80_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(fidelz80_state, vcc_ppi_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vcc_ppi_portc_w))
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidelz80)
 
 	/* sound hardware */
@@ -1340,6 +1492,7 @@ static MACHINE_CONFIG_START( vcc, fidelz80_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(fidelz80_state, vcc_ppi_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vcc_ppi_portc_w))
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidelz80)
 
 	/* sound hardware */
@@ -1366,6 +1519,7 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 	MCFG_Z80PIO_IN_PB_CB(READ8(fidelz80_state, vsc_pio_portb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(fidelz80_state, vsc_pio_portb_w))
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_vsc)
 
 	/* sound hardware */
@@ -1390,6 +1544,7 @@ static MACHINE_CONFIG_START( bridgec, fidelz80_state )
 
 	MCFG_I8243_ADD("i8243", NOOP, WRITE8(fidelz80_state, digit_w))
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_bridgec3)
 
 	/* sound hardware */

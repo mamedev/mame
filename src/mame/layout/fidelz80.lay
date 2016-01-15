@@ -46,10 +46,10 @@
 		<bezel name="digit3" element="digit">
 			<bounds x="190" y="15" width="50" height="80" />
 		</bezel>
-		<bezel name="led1" element="led">
+		<bezel name="1.7" element="led">
 			<bounds x="10" y="00" width="10" height="10" />
 		</bezel>
-		<bezel name="led0" element="led">
+		<bezel name="0.7" element="led">
 			<bounds x="130" y="00" width="10" height="10" />
 		</bezel>
 		<bezel name="check_str" element="check">

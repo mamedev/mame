@@ -235,7 +235,7 @@
 		</bezel>
 
 		<!-- Problem mode LED -->
-		<bezel name="led80" element="led">
+		<bezel name="0.7" element="led">
 			<bounds x="69" y="5" width="2" height="2" />
 		</bezel>
 
@@ -246,10 +246,10 @@
 		<bezel name="digit2" element="digit">
 			<bounds x="36" y="2" width="4" height="8" />
 		</bezel>
-		<bezel name="led82" element="led">
+		<bezel name="2.7" element="led">
 			<bounds x="42" y="3" width="1" height="1" />
 		</bezel>
-		<bezel name="led83" element="led">
+		<bezel name="3.7" element="led">
 			<bounds x="42" y="8" width="1" height="1" />
 		</bezel>
 		<bezel name="digit1" element="digit">
