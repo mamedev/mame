@@ -489,8 +489,8 @@ Decoding isn't performed using a selector, but instead address lines are used.
 A2 connects to /CE on the 8255
 A3 connects to /CE on the Z80A PIO
 
-A1 connects to control/data select on PIO & A0 of 8255
-A0 connects to port A/B select on PIO & A1 of 8255
+A0 connects to port A/B select on PIO & A0 of 8255
+A1 connects to control/data select on PIO & A1 of 8255
 
 So to enable only the 8255, you'd write/read to 08-0Bh for example
 To enable only the PIO, you'd write/read to 04-07h for example.
@@ -626,26 +626,20 @@ public:
 	optional_device<s14001a_device> m_speech;
 	optional_device<speaker_sound_device> m_speaker;
 
-
-
-
 	// misc common
 	UINT16 m_inp_mux;                   // multiplexed keypad/leds mask
+	UINT16 m_led_select;             // 5 bit selects for 7 seg leds and for common other leds, bits are (7seg leds are 0 1 2 3, common other leds are C) 0bxx3210xc
+	UINT16 m_7seg_data;            // data for seg leds
+	UINT16 m_led_data;
+	UINT8 m_digit_line_status[4];   // prevent overwrite of m_7seg_data
 
-	UINT8 m_led_select;             // 5 bit selects for 7 seg leds and for common other leds, bits are (7seg leds are 0 1 2 3, common other leds are C) 0bxx3210xc
-	UINT16 m_digit_data;            // data for seg leds
-	UINT8 m_digit_line_status[4];   // prevent overwrite of m_digit_data
-
-	//UINT16 read_inputs(int columns);
-	//DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	UINT16 read_inputs(int columns);
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
-
-	UINT32 m_grid;                      // VFD current row data
-	UINT32 m_plate;                     // VFD current column data
 
 	UINT32 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
 	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
@@ -710,7 +704,8 @@ void fidelz80_state::machine_start()
 
 	m_inp_mux = 0;
 	m_led_select = 0;
-	m_digit_data = 0;
+	m_led_data = 0;
+	m_7seg_data = 0;
 	memset(m_digit_line_status, 0, sizeof(m_digit_line_status));
 
 	// register for savestates
@@ -725,7 +720,8 @@ void fidelz80_state::machine_start()
 
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
-	save_item(NAME(m_digit_data));
+	save_item(NAME(m_led_data));
+	save_item(NAME(m_7seg_data));
 	save_item(NAME(m_digit_line_status));
 }
 
@@ -829,10 +825,9 @@ void fidelz80_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 
 // generic input handlers
 
-#if 0
-UINT8 fidelz80_state::read_inputs(int columns)
+UINT16 fidelz80_state::read_inputs(int columns)
 {
-	UINT8 ret = 0;
+	UINT16 ret = 0;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
@@ -844,9 +839,13 @@ UINT8 fidelz80_state::read_inputs(int columns)
 
 INPUT_CHANGED_MEMBER(fidelz80_state::reset_button)
 {
+	// when RE button is directly wired to RESET pin(s)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	
+	if (m_mcu)
+		m_mcu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
-#endif
+
 
 
 // Devices, I/O
@@ -862,13 +861,13 @@ void fidelz80_state::vcc_prepare_display()
 		m_display_segmask[i] = 0x7f;
 	
 	// note: d0 for extra leds
-	display_matrix(8, 4, m_digit_data | (m_led_select << 7 & 0x80), m_led_select >> 2 & 0xf);
+	display_matrix(8, 4, m_7seg_data | (m_led_select << 7 & 0x80), m_led_select >> 2 & 0xf);
 }
 
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 {
 	// data for the 4 7seg leds, bits are xABCDEFG
-	m_digit_data = BITSWAP8(data,7,0,1,2,3,4,5,6) & 0x7f;
+	m_7seg_data = BITSWAP8(data,7,0,1,2,3,4,5,6) & 0x7f;
 	vcc_prepare_display();
 	
 	// d0-d5: TSI A0-A5
@@ -898,20 +897,14 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_portb_w)
 
 READ8_MEMBER(fidelz80_state::vcc_ppi_portc_r)
 {
-	UINT8 inp = 0xff;
-	
-	// d0-d3: multiplexed inputs (invert)
-	for (int i = 0; i < 4; i++)
-		if (~m_inp_mux >> i & 1)
-			inp &= m_inp_matrix[i]->read();
-
-	return inp;
+	// d0-d3: multiplexed inputs (inverted)
+	return ~read_inputs(4) & 0xf;
 }
 
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_portc_w)
 {
-	// d4-d7: keypad mux
-	m_inp_mux = data >> 4 & 0xf;
+	// d4-d7: input mux (inverted)
+	m_inp_mux = ~data >> 4 & 0xf;
 }
 
 // CC10-specific (no speech roms, 1-bit beeper instead)
@@ -919,11 +912,11 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_portc_w)
 WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
 {
 	// d0-d6: digit segment data
-	m_digit_data = data;
+	m_7seg_data = data;
 	vcc_prepare_display();
 
 	// d7: beeper output
-	m_speaker->level_w(~data >> 7 & 1);
+	m_speaker->level_w(data >> 7 & 1);
 }
 
 
@@ -933,16 +926,16 @@ WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
 
 void fidelz80_state::vsc_prepare_display()
 {
-	// 4 7seg leds
+	// 4 7seg leds + H
 	for (int i = 0; i < 4; i++)
 	{
 		m_display_segmask[i] = 0x7f;
-		m_display_state[i] = (m_inp_mux >> i & 1) ? m_digit_data : 0;
+		m_display_state[i] = (m_led_select >> i & 1) ? m_7seg_data : 0;
 	}
 	
 	// 8*8 chessboard leds
 	for (int i = 0; i < 8; i++)
-		m_display_state[i+4] = (m_inp_mux >> i & 1) ? m_led_select : 0;
+		m_display_state[i+4] = (m_led_select >> i & 1) ? m_led_data : 0;
 
 	set_display_size(8, 12);
 	display_update();
@@ -953,22 +946,24 @@ WRITE8_MEMBER(fidelz80_state::vsc_ppi_porta_w)
 	// d0-d5: TSI A0-A5
 	m_speech->reg_w(data & 0x3f);
 
-	// data for the 4 7seg leds, bits are HGCBAFED (H is extra led)
-	m_digit_data = BITSWAP8(data,7,6,2,1,0,5,4,3);
+	// d0-d7: data for the 4 7seg leds, bits are HGCBAFED (H is extra led)
+	m_7seg_data = BITSWAP8(data,7,6,2,1,0,5,4,3);
 	vsc_prepare_display();
 }
 
 WRITE8_MEMBER(fidelz80_state::vsc_ppi_portb_w)
 {
-	// led row data
-	m_led_select = data;
+	// d0-d7: led row data
+	m_led_data = data;
 	vsc_prepare_display();
 }
 
 WRITE8_MEMBER(fidelz80_state::vsc_ppi_portc_w)
 {
-	// led column/digit select data, keypad mux
+	// d0-d3: select digits
+	// d0-d7: select leds, input mux low bits
 	m_inp_mux = (m_inp_mux & 0x300) | data;
+	m_led_select = data;
 	vsc_prepare_display();
 }
 
@@ -979,14 +974,8 @@ WRITE8_MEMBER(fidelz80_state::vsc_ppi_portc_w)
 
 READ8_MEMBER(fidelz80_state::vsc_pio_porta_r)
 {
-	UINT8 inp = 0;
-
 	// multiplexed inputs
-	for (int i = 0; i < 10; i++)
-		if (m_inp_mux >> i & 1)
-			inp |= m_inp_matrix[i]->read();
-
-	return inp;
+	return read_inputs(10);
 }
 
 READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
@@ -1001,11 +990,11 @@ READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
 
 WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 {
-	// d0,d1: keypad mux highest bits
+	// d0,d1: input mux highest bits
 	m_inp_mux = (m_inp_mux & 0xff) | (data << 8 & 0x300);
 
 	// d2: tone line
-	m_speaker->level_w(~data >> 2 & 1);
+	m_speaker->level_w(data >> 2 & 1);
 
 	// d6: TSI START line
 	m_speech->set_volume(15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
@@ -1019,7 +1008,7 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 
 WRITE8_MEMBER(fidelz80_state::kp_matrix_w)
 {
-	UINT16 out_data = BITSWAP16(m_digit_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
+	UINT16 out_data = BITSWAP16(m_7seg_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
 	UINT16 out_digit = out_data & 0x3fff;
 	UINT8 out_led = BIT(out_data, 15) ? 0 : 1;
 
@@ -1111,16 +1100,16 @@ WRITE8_MEMBER(fidelz80_state::digit_w)
 	switch (offset)
 	{
 	case 0:
-		m_digit_data = (m_digit_data&(~0x000f)) | ((data<<0)&0x000f);
+		m_7seg_data = (m_7seg_data&(~0x000f)) | ((data<<0)&0x000f);
 		break;
 	case 1:
-		m_digit_data = (m_digit_data&(~0x00f0)) | ((data<<4)&0x00f0);
+		m_7seg_data = (m_7seg_data&(~0x00f0)) | ((data<<4)&0x00f0);
 		break;
 	case 2:
-		m_digit_data = (m_digit_data&(~0x0f00)) | ((data<<8)&0x0f00);
+		m_7seg_data = (m_7seg_data&(~0x0f00)) | ((data<<8)&0x0f00);
 		break;
 	case 3:
-		m_digit_data = (m_digit_data&(~0xf000)) | ((data<<12)&0xf000);
+		m_7seg_data = (m_7seg_data&(~0xf000)) | ((data<<12)&0xf000);
 		break;
 	}
 }
@@ -1199,7 +1188,7 @@ READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
 {
 	UINT8 ret = 0xff; // open bus
 	if (~offset & 4)
-		ret &= m_ppi8255->read(space, (offset << 1 & 2) | (offset >> 1 & 1));
+		ret &= m_ppi8255->read(space, offset & 3);
 	if (~offset & 8)
 		ret &= m_z80pio->read(space, offset & 3);
 	
@@ -1209,7 +1198,7 @@ READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
 WRITE8_MEMBER(fidelz80_state::vsc_io_trampoline_w)
 {
 	if (~offset & 4)
-		m_ppi8255->write(space, (offset << 1 & 2) | (offset >> 1 & 1), data);
+		m_ppi8255->write(space, offset & 3, data);
 	if (~offset & 8)
 		m_z80pio->write(space, offset & 3, data);
 }
@@ -1253,43 +1242,33 @@ ADDRESS_MAP_END
     Input Ports
 ******************************************************************************/
 
-INPUT_CHANGED_MEMBER(fidelz80_state::fidelz80_trigger_reset)
-{
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
-}
-
-INPUT_CHANGED_MEMBER(fidelz80_state::bridgec_trigger_reset)
-{
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
-	m_mcu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
-}
-
 static INPUT_PORTS_START( fidelz80 )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelz80_state, fidelz80_trigger_reset, 0)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_V)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("E5") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("E5") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_E)
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("CB") PORT_CODE(KEYCODE_Z)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("DM") PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("B2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("F6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CB") PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM") PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("B2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F)
 
 	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PB") PORT_CODE(KEYCODE_P)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("C3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("G7") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PB") PORT_CODE(KEYCODE_P)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("C3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("G7") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_G)
 
 	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_O)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("D4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("D4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_H)
 
-//	PORT_START("RESET")
+	PORT_START("RESET") // is not on matrix IN.0 d0
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelz80_state, reset_button, 0)
 
 	PORT_START("LEVEL") // cc10 only
 	PORT_CONFNAME( 0x80, 0x00, "Number of levels" )
@@ -1299,84 +1278,84 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( vsc )
 	PORT_START("IN.0")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
 
 	PORT_START("IN.1")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
 
 	PORT_START("IN.2")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
 
 	PORT_START("IN.3")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
 
 	PORT_START("IN.4")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
 
 	PORT_START("IN.5")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
 
 	PORT_START("IN.6")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
 
 	PORT_START("IN.7")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_TOGGLE
 
 	PORT_START("IN.8") // buttons on the right
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Pawn") PORT_CODE(KEYCODE_1)
@@ -1401,52 +1380,55 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( bridgec )
 	PORT_START("IN.0")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("10") PORT_CODE(KEYCODE_0)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("10") PORT_CODE(KEYCODE_0)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
 
 	PORT_START("IN.1")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
 
 	PORT_START("IN.2")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("P") PORT_CODE(KEYCODE_Z)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("P") PORT_CODE(KEYCODE_Z)
 
 	PORT_START("IN.3")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("J") PORT_CODE(KEYCODE_J)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("NT") PORT_CODE(KEYCODE_N)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("J") PORT_CODE(KEYCODE_J)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("NT") PORT_CODE(KEYCODE_N)
 
 	PORT_START("IN.4")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_E)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("SC") PORT_CODE(KEYCODE_S)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PL") PORT_CODE(KEYCODE_X)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Spades") PORT_CODE(KEYCODE_1_PAD)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_E)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("SC") PORT_CODE(KEYCODE_S)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PL") PORT_CODE(KEYCODE_X)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Spades") PORT_CODE(KEYCODE_1_PAD)
 
 	PORT_START("IN.5")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_C)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("DB") PORT_CODE(KEYCODE_D)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("VL") PORT_CODE(KEYCODE_V)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Hearts") PORT_CODE(KEYCODE_2_PAD)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_C)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DB") PORT_CODE(KEYCODE_D)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("VL") PORT_CODE(KEYCODE_V)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Hearts") PORT_CODE(KEYCODE_2_PAD)
 
 	PORT_START("IN.6")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Beep on/off") PORT_CODE(KEYCODE_SPACE)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("PB") PORT_CODE(KEYCODE_B)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("CV") PORT_CODE(KEYCODE_G)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Diamonds") PORT_CODE(KEYCODE_3_PAD)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Beep on/off") PORT_CODE(KEYCODE_SPACE)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PB") PORT_CODE(KEYCODE_B)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CV") PORT_CODE(KEYCODE_G)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Diamonds") PORT_CODE(KEYCODE_3_PAD)
 
 	PORT_START("IN.7")
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelz80_state, bridgec_trigger_reset, 0)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("BR") PORT_CODE(KEYCODE_T)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("DL") PORT_CODE(KEYCODE_L)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Clubs") PORT_CODE(KEYCODE_4_PAD)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("BR") PORT_CODE(KEYCODE_T)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DL") PORT_CODE(KEYCODE_L)
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Clubs") PORT_CODE(KEYCODE_4_PAD)
+
+	PORT_START("RESET") // is not on matrix IN.7 d0
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelz80_state, reset_button, 0)
 INPUT_PORTS_END
 
 
@@ -1632,7 +1614,7 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1978, cc10,     0,      0,      cc10,    fidelz80, driver_device, 0, "Fidelity Electronics", "Chess Challenger 10 (Model CC10/BCC)", MACHINE_NOT_WORKING )
+COMP( 1978, cc10,     0,      0,      cc10,    fidelz80, driver_device, 0, "Fidelity Electronics", "Chess Challenger 10/3 (Model CC10/BCC)", MACHINE_NOT_WORKING )
 COMP( 1979, vcc,      0,      0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Talking Chess Challenger (model VCC)", MACHINE_NOT_WORKING )
 COMP( 1980, uvc,      vcc,    0,      vcc,     fidelz80, driver_device, 0, "Fidelity Electronics", "Advanced Talking Chess Challenger (model UVC)", MACHINE_NOT_WORKING )
 
