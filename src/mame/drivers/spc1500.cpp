@@ -231,6 +231,7 @@ TODO:
 #include "imagedev/cassette.h"
 #include "formats/spc1000_cas.h"
 #include "bus/centronics/ctronics.h"
+#include "machine/upd765.h"
 #define VDP_CLOCK  XTAL_42_9545MHz
 #include "softlist.h"
 
@@ -252,6 +253,7 @@ public:
 		, m_pio(*this, "ppi8255")
 		, m_sound(*this, "ay8910")
 		, m_palette(*this, "palette")
+		, m_fdc(*this, "upd765")
 		, m_timer(nullptr)
 	{}
 	DECLARE_READ8_MEMBER(psga_r);	
@@ -279,6 +281,10 @@ public:
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(double_w);
 	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(fdc_w);
+	DECLARE_READ8_MEMBER(fdc_r);
+	DECLARE_WRITE8_MEMBER(fdcx_w);
+	DECLARE_READ8_MEMBER(fdcx_r);
 	DECLARE_PALETTE_INIT(spc);
 	DECLARE_VIDEO_START(spc);
 	MC6845_UPDATE_ROW(crtc_update_row); 
@@ -316,6 +322,8 @@ private:
 	required_device<i8255_device> m_pio;
 	required_device<ay8910_device> m_sound;
 	required_device<palette_device> m_palette;	
+	required_device<upd765a_device> m_fdc;
+	floppy_image_device *m_fd0;
 	UINT8 *m_font;        
 	UINT8 m_priority;
 	emu_timer *m_timer;
@@ -616,6 +624,63 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	}
 }
 
+WRITE8_MEMBER( spc1500_state::fdc_w )
+{
+	if (m_fd0)
+	{
+		if (BIT(data, 0))
+			m_fdc->set_floppy(m_fd0);
+		m_fd0->mon_w(BIT(data, 2));
+	}
+	printf("fdc_w(0x%02x, 0x%02x)\n", offset & 0xff, data); 
+}
+
+READ8_MEMBER( spc1500_state::fdc_r )
+{
+	UINT8 data = 0;
+	UINT8 off = offset & 0xff;
+	switch (off)
+	{
+		case 0:
+			m_fdc->tc_w(true);
+			data = 0xff;
+			break;
+	}
+	printf("fdc_r(0x%02x, 0x%02x)\n", offset & 0xff, data); 
+	return data;
+}
+
+
+WRITE8_MEMBER( spc1500_state::fdcx_w )
+{
+	UINT8 off = offset & 0xff;
+	switch (off)
+	{
+		case 0:
+			break;
+		case 1:
+			m_fdc->fifo_w(space, off, data);
+	}
+	printf("fdcx_w(0x%02x, 0x%02x)\n", offset & 0xff, data); 
+}
+
+READ8_MEMBER( spc1500_state::fdcx_r )
+{
+	UINT8 data = 0;
+	UINT8 off = offset & 0xff;
+	switch (off)
+	{
+		case 0:
+			data = m_fdc->msr_r(space, off, 0xff);
+			break;
+		case 1:
+			data = m_fdc->fifo_r(space, off, 0xff);
+			break;
+	}
+	printf("fdcx_r(0x%02x, 0x%02x)\n", off, data); 
+	return data;
+}
+
 WRITE8_MEMBER( spc1500_state::double_w)
 {
 	if (m_double_mode)
@@ -627,6 +692,10 @@ WRITE8_MEMBER( spc1500_state::double_w)
 	}
 	else
 	{
+		if (offset < 0x800)  {} else
+		if (offset < 0x900)  { return fdcx_w(space, offset, data); } else
+		if (offset < 0xc00)  {} else
+		if (offset < 0xd00)  { return fdc_w(space, offset, data); } else
 		if (offset < 0x1000) {} else
 		if (offset < 0x1300) { palet_w(space, offset, data); } else
 		if (offset < 0x1400) { priority_w(space, offset, data); } else
@@ -655,6 +724,10 @@ WRITE8_MEMBER( spc1500_state::double_w)
 READ8_MEMBER( spc1500_state::io_r)
 {
 	m_double_mode = false;
+	if (offset < 0x800)  {} else
+	if (offset < 0x900)  { return fdcx_r(space, offset); } else
+	if (offset < 0xc00)  {} else
+	if (offset < 0xd00)  { return fdc_r(space, offset); } else
 	if (offset < 0x1000) {} else 
 	if (offset < 0x1400) {} else
 	if (offset < 0x1800) { return pcg_r(space, offset); } else
@@ -862,6 +935,8 @@ void spc1500_state::machine_start()
 	membank("bank4")->set_base(m_p_ram + 0x8000);	
 	m_timer = timer_alloc(0);
 	m_timer->adjust(attotime::zero);
+	m_fd0 = subdevice<floppy_connector>("upd765:0")->get_device();
+
 }
 
 void spc1500_state::machine_reset()
@@ -894,6 +969,10 @@ READ8_MEMBER( spc1500_state::porta_r )
 	data &= ~((m_centronics_busy == 0)<< 5);
 	return data;
 }
+
+static SLOT_INTERFACE_START( spc1500_floppies )
+	SLOT_INTERFACE("dd", FLOPPY_525_DD)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	/* basic machine hardware */
@@ -941,7 +1020,14 @@ static MACHINE_CONFIG_START( spc1500, spc1500_state )
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(spc1500_state, centronics_busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	
+	// floppy disk controller
+	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
+	// floppy drives
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", spc1500_floppies, "dd", floppy_image_device::default_floppy_formats)
+	
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(spc1000_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_DISABLED)
