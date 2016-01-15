@@ -593,9 +593,9 @@ expect that the software reads these once on startup only.
 #include "sound/s14001a.h"
 
 // internal artwork
-#include "fidelz80.lh"
-#include "vsc.lh"
-#include "bridgec3.lh"
+#include "fidel_cc.lh"
+#include "fidel_vsc.lh"
+#include "fidel_vbrc.lh"
 
 
 class fidelz80_state : public driver_device
@@ -1452,7 +1452,7 @@ static MACHINE_CONFIG_START( cc10, fidelz80_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vcc_ppi_portc_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidelz80)
+	MCFG_DEFAULT_LAYOUT(layout_fidel_cc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1475,7 +1475,7 @@ static MACHINE_CONFIG_START( vcc, fidelz80_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vcc_ppi_portc_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidelz80)
+	MCFG_DEFAULT_LAYOUT(layout_fidel_cc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1502,7 +1502,7 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(fidelz80_state, vsc_pio_portb_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_vsc)
+	MCFG_DEFAULT_LAYOUT(layout_fidel_vsc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1527,7 +1527,7 @@ static MACHINE_CONFIG_START( bridgec, fidelz80_state )
 	MCFG_I8243_ADD("i8243", NOOP, WRITE8(fidelz80_state, digit_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_bridgec3)
+	MCFG_DEFAULT_LAYOUT(layout_fidel_vbrc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

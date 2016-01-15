@@ -2,6 +2,11 @@
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco
 /******************************************************************************
 
+WIP: plan to move to main fidelity chess driver
+
+
+
+
     Fidelity Champion Chess Challenger (model CSC)
 
     See drivers/fidelz80.cpp for hardware description
@@ -18,7 +23,7 @@
 #include "sound/s14001a.h"
 
 // same layout of Sensory Chess Challenger
-extern const char layout_vsc[];
+//extern const char layout_vsc[];
 
 class csc_state : public driver_device
 {
@@ -299,7 +304,7 @@ static MACHINE_CONFIG_START( csc, csc_state )
 	MCFG_CPU_ADD("maincpu", M6502, 3900000/2)
 	MCFG_CPU_PROGRAM_MAP(csc_mem)
 
-	MCFG_DEFAULT_LAYOUT(layout_vsc)
+	//MCFG_DEFAULT_LAYOUT(layout_vsc)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", csc_state, irq_timer, attotime::from_hz(38400/64))
 
