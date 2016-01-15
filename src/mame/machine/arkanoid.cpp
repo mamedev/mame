@@ -81,12 +81,16 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_68705_tcr_w)
 	// Note this hack is incorrect; the timer pin actually does connect somewhere (vblank or maybe one of the V counter bits?), but the game never actually uses the timer pin in external clock mode, so the TIMER connection must be left over from development. We can apparently safely ignore it.
 	if ((m_tcr^data)&0x20)// check if TIN state changed
 	{
-		logerror("timer enable state changed!\n");
+		/* logerror("timer enable state changed!\n"); */
 		if (data&0x20) timer_set(attotime::never, TIMER_68705_PRESCALER_EXPIRED);
 		else timer_set(attotime::from_hz(((XTAL_12MHz/4)/4)/(1<<(data&0x7))), TIMER_68705_PRESCALER_EXPIRED);
 	}
 	// prescaler check: if timer prescaler has changed, or the PSC bit is set, adjust the timer length for the prescaler expired timer, but only if the timer would be running
-	if ( (((m_tcr&0x07)!=(data&0x07))||(data&0x08)) && ((data&0x20)==0) ) { logerror("timer reset due to PSC or prescaler change!\n"); timer_set(attotime::from_hz(((XTAL_12MHz/4)/4)/(1<<(data&0x7))), TIMER_68705_PRESCALER_EXPIRED); }
+	if ( (((m_tcr&0x07)!=(data&0x07))||(data&0x08)) && ((data&0x20)==0) )
+	{
+		/* logerror("timer reset due to PSC or prescaler change!\n"); */
+		timer_set(attotime::from_hz(((XTAL_12MHz/4)/4)/(1<<(data&0x7))), TIMER_68705_PRESCALER_EXPIRED);
+	}
 	m_tcr = data;
 	// if int state is set, and TIM is unmasked, assert an interrupt. otherwise clear it.
 	if ((m_tcr&0xC0) == 0x80)
