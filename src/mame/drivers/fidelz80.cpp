@@ -589,7 +589,7 @@ expect that the software reads these once on startup only.
 #include "machine/i8255.h"
 #include "machine/i8243.h"
 #include "machine/z80pio.h"
-#include "sound/beep.h"
+#include "sound/speaker.h"
 #include "sound/s14001a.h"
 
 // internal artwork
@@ -610,7 +610,7 @@ public:
 		m_i8243(*this, "i8243"),
 		m_inp_matrix(*this, "IN"),
 		m_speech(*this, "speech"),
-		m_beep(*this, "beeper")
+		m_speaker(*this, "speaker")
 	{ }
 
 	// devices/pointers
@@ -621,7 +621,7 @@ public:
 	optional_device<i8243_device> m_i8243;
 	optional_ioport_array<10> m_inp_matrix; // max 10
 	optional_device<s14001a_device> m_speech;
-	optional_device<beep_device> m_beep;
+	optional_device<speaker_sound_device> m_speaker;
 
 	UINT16 m_kp_mux;                // multiplexed keypad/leds mask
 	UINT8 m_led_select;             // 5 bit selects for 7 seg leds and for common other leds, bits are (7seg leds are 0 1 2 3, common other leds are C) 0bxx3210xc
@@ -767,7 +767,7 @@ WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
 	vcc_update_display();
 
 	// d7: beeper output
-	m_beep->set_state((data & 0x80) ? 0 : 1);
+	m_speaker->level_w(~data >> 7 & 1);
 }
 
 
@@ -852,6 +852,9 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 {
 	// d0,d1: keypad mux highest bits
 	m_kp_mux = (m_kp_mux & 0xff) | (data << 8 & 0x300);
+
+	// d2: tone line
+	m_speaker->level_w(~data >> 2 & 1);
 
 	// d6: TSI START line
 	m_speech->set_volume(15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
@@ -1319,8 +1322,8 @@ static MACHINE_CONFIG_START( cc10, fidelz80_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( vcc, fidelz80_state )
@@ -1368,6 +1371,9 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
