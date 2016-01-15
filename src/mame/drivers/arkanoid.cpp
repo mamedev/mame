@@ -197,7 +197,7 @@ controller or home-made spinner built from a PC mouse will work but the player m
 slowly and the game is unplayable. The Taito geared spinner moves the optical wheel *very*
 fast to ensure the player moves fast enough to follow and return the ball easily. The ratio of
 the control knob rotation to the optical wheel rotation is 1:20 so for one rotation of the
-control knob the optical wheel rotates 20 times.
+control knob the optical wheel rotates 20 times. The optical quadrature wheel has 24 slots.
 Generally a half-turn of the control knob is enough to move the player across the full screen.
 
 The spinner connections are....
