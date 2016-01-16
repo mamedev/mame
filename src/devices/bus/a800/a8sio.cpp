@@ -54,7 +54,7 @@ a8sio_slot_device::a8sio_slot_device(const machine_config &mconfig, std::string 
 {
 }
 
-a8sio_slot_device::a8sio_slot_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a8sio_slot_device::a8sio_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_slot_interface(mconfig, *this)
 {
@@ -106,7 +106,7 @@ a8sio_device::a8sio_device(const machine_config &mconfig, std::string tag, devic
 {
 }
 
-a8sio_device::a8sio_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+a8sio_device::a8sio_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_out_clock_in_cb(*this)
 	, m_out_data_in_cb(*this)

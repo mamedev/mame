@@ -73,7 +73,7 @@ extern const device_type MSX_SLOT_DISK6;
 class msx_slot_disk_device : public msx_slot_rom_device
 {
 public:
-	msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	msx_slot_disk_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	virtual void device_start() override;
 
@@ -102,7 +102,7 @@ protected:
 class msx_slot_wd_disk_device : public msx_slot_disk_device
 {
 public:
-	msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	virtual void device_start() override;
 
@@ -114,7 +114,7 @@ protected:
 class msx_slot_tc8566_disk_device : public msx_slot_disk_device
 {
 public:
-	msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	virtual void device_start() override;
 

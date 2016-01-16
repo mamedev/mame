@@ -18,7 +18,7 @@ h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconf
 	chain_tag.clear();
 }
 
-h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+h8_timer16_channel_device::h8_timer16_channel_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	cpu(*this, "^^"), chained_timer(nullptr), intc(nullptr), tier_mask(0), tgr_count(0), tbr_count(0), tgr_clearing(0), tcr(0), tier(0), ier(0), isr(0), clock_type(0),
 	clock_divider(0), tcnt(0), last_clock_update(0), event_time(0), phase(0), counter_cycle(0), counter_incrementing(false), channel_active(false)

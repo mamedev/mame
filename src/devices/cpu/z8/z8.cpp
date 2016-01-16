@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( program_4kb, AS_PROGRAM, 8, z8_device )
 ADDRESS_MAP_END
 
 
-z8_device::z8_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int size)
+z8_device::z8_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int size)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, ( size == 4 ) ? ADDRESS_MAP_NAME(program_4kb) : ADDRESS_MAP_NAME(program_2kb))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0)

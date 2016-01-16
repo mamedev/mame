@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "i8xc196.h"
 
-i8xc196_device::i8xc196_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+i8xc196_device::i8xc196_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	mcs96_device(mconfig, type, name, tag, owner, clock, 16, shortname, source)
 {
 }

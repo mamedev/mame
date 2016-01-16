@@ -73,7 +73,7 @@ class necdsp_device : public cpu_device
 {
 protected:
 	// construction/destruction
-	necdsp_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name, const char *shortname, const char *source);
+	necdsp_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name, std::string shortname, std::string source);
 
 public:
 

@@ -44,7 +44,7 @@ class tms99xx_device : public cpu_device
 public:
 	tms99xx_device(const machine_config &mconfig, device_type type,  const char *name,
 				std::string tag, int databus_width, int prg_addr_bits, int cru_addr_bits,
-				device_t *owner, UINT32 clock, const char *shortname, const char *source);
+				device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	~tms99xx_device();
 

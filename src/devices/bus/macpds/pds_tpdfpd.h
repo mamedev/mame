@@ -22,7 +22,7 @@ class macpds_sedisplay_device :
 public:
 		// construction/destruction
 		macpds_sedisplay_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-		macpds_sedisplay_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		macpds_sedisplay_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;

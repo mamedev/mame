@@ -103,7 +103,7 @@ lynx_sound_device::lynx_sound_device(const machine_config &mconfig, std::string 
 	m_timer_delegate = lynx_sound_timer_delegate();
 }
 
-lynx_sound_device::lynx_sound_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+lynx_sound_device::lynx_sound_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sound_interface(mconfig, *this)
 {

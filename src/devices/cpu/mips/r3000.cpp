@@ -124,7 +124,7 @@ const device_type R3081 = &device_creator<r3081_device>;
 //  r3000_device - constructor
 //-------------------------------------------------
 
-r3000_device::r3000_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, chip_type chiptype, const char *shortname, const char *source)
+r3000_device::r3000_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, chip_type chiptype, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config_be("program", ENDIANNESS_BIG, 32, 29),
 		m_program_config_le("program", ENDIANNESS_LITTLE, 32, 29),

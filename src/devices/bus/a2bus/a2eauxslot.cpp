@@ -32,7 +32,7 @@ a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, st
 {
 }
 
-a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2eauxslot_slot_device::a2eauxslot_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_slot_interface(mconfig, *this)
 {
@@ -83,7 +83,7 @@ a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, std::string 
 {
 }
 
-a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2eauxslot_device::a2eauxslot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr),
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this), m_device(nullptr)

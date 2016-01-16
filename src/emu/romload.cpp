@@ -1420,7 +1420,7 @@ void rom_load_manager::process_region_list()
 #endif
 
 				/* now process the entries in the region */
-				process_rom_entries(device->shortname(), region, region + 1, device, FALSE);
+				process_rom_entries(device->shortname().c_str(), region, region + 1, device, FALSE);
 			}
 			else if (ROMREGION_ISDISKDATA(region))
 				process_disk_entries(regiontag.c_str(), region, region + 1, nullptr);

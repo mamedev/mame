@@ -60,7 +60,7 @@ const device_type MD_EEPROM_NHLPA = &device_creator<md_eeprom_nhlpa_device>;
 const device_type MD_EEPROM_BLARA = &device_creator<md_eeprom_blara_device>;
 
 
-md_std_eeprom_device::md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+md_std_eeprom_device::md_std_eeprom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_md_cart_interface( mconfig, *this ),
 					m_i2cmem(*this, "i2cmem"), m_i2c_mem(0), m_i2c_clk(0)

@@ -21,7 +21,7 @@ class iq151_rom_device :
 {
 public:
 	// construction/destruction
-	iq151_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	iq151_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const override;

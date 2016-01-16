@@ -42,7 +42,7 @@ class at45db041_device : public device_t,
 {
 public:
 	at45db041_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	at45db041_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	at45db041_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	DECLARE_WRITE_LINE_MEMBER(cs_w);
 	DECLARE_WRITE_LINE_MEMBER(sck_w);

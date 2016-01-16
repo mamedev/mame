@@ -7,7 +7,7 @@ const device_type H83006 = &device_creator<h83006_device>;
 const device_type H83007 = &device_creator<h83007_device>;
 
 
-h83006_device::h83006_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+h83006_device::h83006_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	h8h_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h83006_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),

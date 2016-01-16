@@ -17,7 +17,7 @@ class ym2610_device : public ay8910_device
 {
 public:
 	ym2610_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	ym2610_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ym2610_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ym2610_device &>(device).m_irq_handler.set_callback(object); }

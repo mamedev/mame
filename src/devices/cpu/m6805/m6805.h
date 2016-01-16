@@ -26,7 +26,7 @@ class m6805_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	m6805_base_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, const device_type type, const char *name, UINT32 addr_width, const char *shortname, const char *source);
+	m6805_base_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock, const device_type type, const char *name, UINT32 addr_width, std::string shortname, std::string source);
 
 protected:
 	// device-level overrides

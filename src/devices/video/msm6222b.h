@@ -22,7 +22,7 @@
 class msm6222b_device : public device_t {
 public:
 	msm6222b_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	msm6222b_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	msm6222b_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	void control_w(UINT8 data);
 	UINT8 control_r();

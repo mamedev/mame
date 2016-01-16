@@ -42,7 +42,7 @@ const device_type A78_ROM_P450_SG_RAM = &device_creator<a78_rom_p450_sg_ram_devi
 const device_type A78_ROM_P450_SG9 = &device_creator<a78_rom_p450_sg9_device>;
 
 
-a78_rom_device::a78_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+a78_rom_device::a78_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_a78_cart_interface( mconfig, *this )
 {
@@ -54,7 +54,7 @@ a78_rom_device::a78_rom_device(const machine_config &mconfig, std::string tag, d
 {
 }
 
-a78_rom_pokey_device::a78_rom_pokey_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+a78_rom_pokey_device::a78_rom_pokey_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: a78_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
 						m_pokey(*this, "pokey")
 {
@@ -67,7 +67,7 @@ a78_rom_pokey_device::a78_rom_pokey_device(const machine_config &mconfig, std::s
 }
 
 
-a78_rom_sg_device::a78_rom_sg_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+a78_rom_sg_device::a78_rom_sg_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: a78_rom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_bank(0)
 				{
 }
@@ -84,7 +84,7 @@ a78_rom_sg_pokey_device::a78_rom_sg_pokey_device(const machine_config &mconfig, 
 }
 
 
-a78_rom_sg_ram_device::a78_rom_sg_ram_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+a78_rom_sg_ram_device::a78_rom_sg_ram_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: a78_rom_sg_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -95,7 +95,7 @@ a78_rom_sg_ram_device::a78_rom_sg_ram_device(const machine_config &mconfig, std:
 }
 
 
-a78_rom_sg9_device::a78_rom_sg9_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+a78_rom_sg9_device::a78_rom_sg9_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: a78_rom_sg_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

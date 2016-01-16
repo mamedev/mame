@@ -198,7 +198,7 @@ const device_type VC4000_ROM_RAM1K = &device_creator<vc4000_ram1k_device>;
 const device_type VC4000_ROM_CHESS2 = &device_creator<vc4000_chess2_device>;
 
 
-vc4000_rom_device::vc4000_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+vc4000_rom_device::vc4000_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_vc4000_cart_interface( mconfig, *this )
 {

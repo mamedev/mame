@@ -523,7 +523,7 @@ class z80scc_device :  public device_t
 
 public:
 	// construction/destruction
-	z80scc_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
+	z80scc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source);
 	z80scc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_out_txda_callback(device_t &device, _Object object) { return downcast<z80scc_device &>(device).m_out_txda_cb.set_callback(object); }

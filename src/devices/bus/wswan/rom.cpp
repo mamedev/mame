@@ -26,7 +26,7 @@ const device_type WS_ROM_SRAM = &device_creator<ws_rom_sram_device>;
 const device_type WS_ROM_EEPROM = &device_creator<ws_rom_eeprom_device>;
 
 
-ws_rom_device::ws_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+ws_rom_device::ws_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_ws_cart_interface(mconfig, *this),
 	m_base20(0),

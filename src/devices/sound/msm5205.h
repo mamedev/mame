@@ -44,7 +44,7 @@ class msm5205_device : public device_t,
 {
 public:
 	msm5205_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	msm5205_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	msm5205_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~msm5205_device() {}
 
 	static void set_prescaler_selector(device_t &device, int select) { downcast<msm5205_device &>(device).m_select = select; }

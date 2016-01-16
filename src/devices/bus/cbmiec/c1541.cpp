@@ -999,7 +999,7 @@ inline void c1541_base_t::set_iec_data()
 //  c1541_base_t - constructor
 //-------------------------------------------------
 
-c1541_base_t:: c1541_base_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+c1541_base_t:: c1541_base_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_cbm_iec_interface(mconfig, *this),
 	device_c64_floppy_parallel_interface(mconfig, *this),

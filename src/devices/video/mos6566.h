@@ -211,7 +211,7 @@ class mos6566_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mos6566_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
+	mos6566_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source);
 	mos6566_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	static void static_set_cpu_tag(device_t &device, std::string tag) { downcast<mos6566_device &>(device).m_cpu.set_tag(tag); }
@@ -375,7 +375,7 @@ class mos6567_device :  public mos6566_device
 public:
 	// construction/destruction
 	mos6567_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	mos6567_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
+	mos6567_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source);
 };
 
 
@@ -410,7 +410,7 @@ class mos6569_device :  public mos6566_device
 public:
 	// construction/destruction
 	mos6569_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	mos6569_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
+	mos6569_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void execute_run() override;

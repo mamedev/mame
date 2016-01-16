@@ -120,7 +120,7 @@ void ppu2c0x_device::device_config_complete()
 	m_vidaccess_callback_proc = ppu2c0x_vidaccess_delegate();
 }
 
-ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 				: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_memory_interface(mconfig, *this),
 					device_video_interface(mconfig, *this),

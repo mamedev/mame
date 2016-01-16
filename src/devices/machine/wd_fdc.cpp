@@ -65,7 +65,7 @@ const device_type WD1773 = &device_creator<wd1773_t>;
 // Show state machine
 #define TRACE_STATE 0
 
-wd_fdc_t::wd_fdc_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+wd_fdc_t::wd_fdc_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	intrq_cb(*this),
 	drq_cb(*this),
@@ -2125,7 +2125,7 @@ int wd_fdc_t::settle_time() const
 	return 60000;
 }
 
-wd_fdc_analog_t::wd_fdc_analog_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+wd_fdc_analog_t::wd_fdc_analog_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	wd_fdc_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	clock_ratio = 1;
@@ -2177,7 +2177,7 @@ bool wd_fdc_analog_t::pll_write_next_bit(bool bit, attotime &tm, floppy_image_de
 	return cur_pll.write_next_bit(bit, tm, floppy, limit);
 }
 
-wd_fdc_digital_t::wd_fdc_digital_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+wd_fdc_digital_t::wd_fdc_digital_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	wd_fdc_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	clock_ratio = 4;

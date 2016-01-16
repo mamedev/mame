@@ -46,7 +46,7 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 
 // temporary hack until romload is update: get the driver path and support it for
 // all searches
-const char *driverpath = m_enumerator.config().root_device().searchpath();
+const char *driverpath = m_enumerator.config().root_device().searchpath().c_str();
 
 	int found = 0;
 	int required = 0;
@@ -58,14 +58,14 @@ const char *driverpath = m_enumerator.config().root_device().searchpath();
 	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
 	{
 		// determine the search path for this source and iterate through the regions
-		m_searchpath = device->searchpath();
+		m_searchpath = device->searchpath().c_str();
 
 		// now iterate over regions and ROMs within
 		for (const rom_entry *region = rom_first_region(*device); region != nullptr; region = rom_next_region(region))
 		{
 // temporary hack: add the driver path & region name
 std::string combinedpath = std::string(device->searchpath()).append(";").append(driverpath);
-if (device->shortname())
+if (!device->shortname().empty())
 	combinedpath.append(";").append(device->shortname());
 m_searchpath = combinedpath.c_str();
 
@@ -131,7 +131,7 @@ media_auditor::summary media_auditor::audit_device(device_t *device, const char 
 
 	// store validation for later
 	m_validation = validation;
-	m_searchpath = device->shortname();
+	m_searchpath = device->shortname().c_str();
 
 	int found = 0;
 	int required = 0;
@@ -173,7 +173,7 @@ media_auditor::summary media_auditor::audit_device(device_t *device, const char 
 	}
 
 	// return a summary
-	return summarize(device->shortname());
+	return summarize(device->shortname().c_str());
 }
 
 
@@ -386,7 +386,7 @@ media_auditor::summary media_auditor::summarize(const char *name, std::string *o
 					if (shared_device == nullptr)
 						strcatprintf(*output,"NOT FOUND\n");
 					else
-						strcatprintf(*output,"NOT FOUND (%s)\n", shared_device->shortname());
+						strcatprintf(*output,"NOT FOUND (%s)\n", shared_device->shortname().c_str());
 				}
 				best_new_status = NOTFOUND;
 				break;

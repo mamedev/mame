@@ -106,7 +106,7 @@ i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, std::string ta
 	m_fetch_xor = BYTE_XOR_LE(0);
 }
 
-i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int data_bus_size)
+i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int data_bus_size)
 	: i8086_common_cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, data_bus_size, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, data_bus_size, 16, 0)
@@ -272,7 +272,7 @@ void i8086_cpu_device::device_start()
 	state_add(STATE_GENPC, "curpc", m_pc).callimport().callexport().formatstr("%05X");
 }
 
-i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_ip(0)
 	, m_TF(0)

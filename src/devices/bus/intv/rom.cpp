@@ -23,7 +23,7 @@ const device_type INTV_ROM_GFACT = &device_creator<intv_gfact_device>;
 const device_type INTV_ROM_WSMLB = &device_creator<intv_wsmlb_device>;
 
 
-intv_rom_device::intv_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+intv_rom_device::intv_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_intv_cart_interface( mconfig, *this )
 {

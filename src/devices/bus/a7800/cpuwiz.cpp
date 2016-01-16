@@ -40,7 +40,7 @@ const device_type A78_ROM_MEGACART = &device_creator<a78_megacart_device>;
 const device_type A78_ROM_P450_VB = &device_creator<a78_rom_p450_vb_device>;
 
 
-a78_versaboard_device::a78_versaboard_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+a78_versaboard_device::a78_versaboard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: a78_rom_sg_device(mconfig, type, name, tag, owner, clock, shortname, source), m_ram_bank(0)
 				{
 }

@@ -13,7 +13,7 @@ class a26_rom_2k_device : public device_t,
 {
 public:
 	// construction/destruction
-	a26_rom_2k_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a26_rom_2k_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	a26_rom_2k_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
@@ -46,7 +46,7 @@ class a26_rom_f6_device : public a26_rom_2k_device
 {
 public:
 	// construction/destruction
-	a26_rom_f6_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a26_rom_f6_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	a26_rom_f6_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
@@ -86,7 +86,7 @@ class a26_rom_f8_device : public a26_rom_f6_device
 {
 public:
 	// construction/destruction
-	a26_rom_f8_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a26_rom_f8_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	a26_rom_f8_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// reading and writing

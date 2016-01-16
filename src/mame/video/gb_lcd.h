@@ -33,7 +33,7 @@ class gb_lcd_device :   public device_t,
 						public device_video_interface
 {
 public:
-	gb_lcd_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	gb_lcd_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	gb_lcd_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 

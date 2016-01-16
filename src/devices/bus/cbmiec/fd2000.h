@@ -40,7 +40,7 @@ class fd2000_device :  public device_t,
 public:
 	// construction/destruction
 	fd2000_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	fd2000_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
+	fd2000_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source);
 
 	enum
 	{

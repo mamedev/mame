@@ -409,7 +409,7 @@ upd7810_device::upd7810_device(const machine_config &mconfig, std::string tag, d
 	m_op74 = s_op74;
 }
 
-upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_to_func(*this)
 	, m_co0_func(*this)
@@ -468,7 +468,7 @@ upd78c05_device::upd78c05_device(const machine_config &mconfig, std::string tag,
 	m_opXX = s_opXX_78c05;
 }
 
-upd78c05_device::upd78c05_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+upd78c05_device::upd78c05_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: upd7810_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

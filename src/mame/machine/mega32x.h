@@ -31,7 +31,7 @@
 class sega_32x_device : public device_t
 {
 public:
-	sega_32x_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	sega_32x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	required_device<sh2_device> m_master_cpu;
 	required_device<sh2_device> m_slave_cpu;

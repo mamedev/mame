@@ -979,18 +979,18 @@ void validity_checker::validate_devices()
 		m_current_device = device;
 
 		// validate the device tag
-		validate_tag(device->basetag());
+		validate_tag(device->basetag().c_str());
 
 		// look for duplicates
 		if (!device_map.insert(device->tag()).second)
 			osd_printf_error("Multiple devices with the same tag '%s' defined\n", device->tag().c_str());
 
 		// all devices must have a shortname
-		if (strcmp(device->shortname(), "") == 0)
+		if (device->shortname().empty())
 			osd_printf_error("Device does not have short name defined\n");
 
 		// all devices must have a source file defined
-		if (strcmp(device->source(), "") == 0)
+		if (device->source().empty())
 			osd_printf_error("Device does not have source file location defined\n");
 
 		// check for device-specific validity check
@@ -1017,9 +1017,9 @@ void validity_checker::validate_devices()
 				if (!device->configured())
 					device->config_complete();
 
-			if (strcmp(dev->shortname(), "") == 0) {
+			if (dev->shortname().empty()) {
 				if (slot_device_map.insert(dev->name()).second)
-					osd_printf_error("Device '%s' is slot cart device but does not have short name defined\n",dev->name());
+					osd_printf_error("Device '%s' is slot cart device but does not have short name defined\n",dev->name().c_str());
 			}
 
 			const_cast<machine_config &>(*m_current_config).device_remove(&m_current_config->root_device(), temptag.c_str());

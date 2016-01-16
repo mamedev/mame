@@ -20,7 +20,7 @@ class snapshot_image_device :   public device_t,
 public:
 	// construction/destruction
 	snapshot_image_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	snapshot_image_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	snapshot_image_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	virtual ~snapshot_image_device();
 
 	static void static_set_interface(device_t &device, const char *_interface) { downcast<snapshot_image_device &>(device).m_interface = _interface; }

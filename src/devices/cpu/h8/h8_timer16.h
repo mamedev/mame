@@ -74,7 +74,7 @@ public:
 
 
 	h8_timer16_channel_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	h8_timer16_channel_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	h8_timer16_channel_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	void set_info(int tgr_count, int tbr_count, std::string intc, int irq_base);
 

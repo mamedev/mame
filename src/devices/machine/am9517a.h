@@ -48,7 +48,7 @@ class am9517a_device :  public device_t,
 {
 public:
 	// construction/destruction
-	am9517a_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname);
+	am9517a_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname);
 	am9517a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_out_hreq_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_hreq_cb.set_callback(object); }

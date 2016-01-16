@@ -71,7 +71,7 @@ void voodoo_set_init_enable(device_t *device, UINT32 newval);
 class voodoo_device : public device_t
 {
 public:
-	voodoo_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	voodoo_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~voodoo_device();
 
 
@@ -133,7 +133,7 @@ class voodoo_banshee_device : public voodoo_device
 {
 public:
 	voodoo_banshee_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	voodoo_banshee_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	DECLARE_READ32_MEMBER( banshee_r );
 	DECLARE_WRITE32_MEMBER( banshee_w );

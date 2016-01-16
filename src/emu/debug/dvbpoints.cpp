@@ -134,7 +134,7 @@ void debug_view_breakpoints::enumerate_sources()
 	for (device_disasm_interface *dasm = iter.first(); dasm != nullptr; dasm = iter.next())
 	{
 		std::string name;
-		strprintf(name, "%s '%s'", dasm->device().name(), dasm->device().tag().c_str());
+		strprintf(name, "%s '%s'", dasm->device().name().c_str(), dasm->device().tag().c_str());
 		m_source_list.append(*global_alloc(debug_view_source(name.c_str(), &dasm->device())));
 	}
 

@@ -116,7 +116,7 @@ class hmcs40_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, int family, UINT16 polarity, int stack_levels, int pcwidth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	hmcs40_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, int family, UINT16 polarity, int stack_levels, int pcwidth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, std::string shortname, std::string source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program)
 		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
@@ -349,7 +349,7 @@ protected:
 class hmcs43_cpu_device : public hmcs40_cpu_device
 {
 public:
-	hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname);
+	hmcs43_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname);
 
 protected:
 	// overrides
@@ -386,7 +386,7 @@ public:
 class hmcs44_cpu_device : public hmcs40_cpu_device
 {
 public:
-	hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname);
+	hmcs44_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname);
 
 protected:
 	// overrides
@@ -422,7 +422,7 @@ public:
 class hmcs45_cpu_device : public hmcs40_cpu_device
 {
 public:
-	hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname);
+	hmcs45_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname);
 
 protected:
 	// overrides

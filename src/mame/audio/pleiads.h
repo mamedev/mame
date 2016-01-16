@@ -45,7 +45,7 @@ class pleiads_sound_device : public device_t,
 {
 public:
 	pleiads_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	pleiads_sound_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	pleiads_sound_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~pleiads_sound_device() {}
 
 	DECLARE_WRITE8_MEMBER( control_a_w );

@@ -45,7 +45,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, pc_fdc_at_device)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
 ADDRESS_MAP_END
 
-pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	pc_fdc_interface(mconfig, type, name, tag, owner, clock, shortname, source), fdc(*this, "upd765"),
 	intrq_cb(*this),
 	drq_cb(*this)

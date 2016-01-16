@@ -65,7 +65,7 @@ class decocpu_type1_device : public device_t
 {
 public:
 	decocpu_type1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	decocpu_type1_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	decocpu_type1_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	required_device<cpu_device> m_cpu;
 	required_device<pia6821_device> m_pia21;
 	required_device<pia6821_device> m_pia24;
@@ -135,7 +135,7 @@ class decocpu_type2_device : public decocpu_type1_device
 {
 public:
 	decocpu_type2_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	decocpu_type2_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	decocpu_type2_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 protected:
 	// overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -146,7 +146,7 @@ class decocpu_type3_device : public decocpu_type2_device
 {
 public:
 	decocpu_type3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	decocpu_type3_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	decocpu_type3_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 protected:
 	// overrides

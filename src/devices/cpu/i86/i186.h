@@ -14,7 +14,7 @@ class i80186_cpu_device : public i8086_common_cpu_device
 public:
 	// construction/destruction
 	i80186_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	i80186_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int data_bus_size);
+	i80186_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int data_bus_size);
 
 	template<class _Object> static devcb_base &static_set_read_slave_ack_callback(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_read_slave_ack_func.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_chip_select_callback(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_out_chip_select_func.set_callback(object); }

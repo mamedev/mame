@@ -341,7 +341,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 
 	// start to output info
 	fprintf(m_output, "\t<%s", emulator_info::get_xml_top());
-	fprintf(m_output, " name=\"%s\"", xml_normalize_string(device.shortname()));
+	fprintf(m_output, " name=\"%s\"", xml_normalize_string(device.shortname().c_str()));
 	std::string src(device.source());
 	strreplace(src,"../", "");
 	fprintf(m_output, " sourcefile=\"%s\"", xml_normalize_string(src.c_str()));
@@ -349,7 +349,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	fprintf(m_output, " runnable=\"no\"");
 	output_sampleof();
 	fprintf(m_output, ">\n");
-	fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(device.name()));
+	fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(device.name().c_str()));
 
 	output_rom(device);
 
@@ -394,7 +394,7 @@ void info_xml_creator::output_devices()
 		device_iterator deviter(m_drivlist.config().root_device());
 		for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
 		{
-			if (device->owner() != nullptr && device->shortname()!= nullptr && device->shortname()[0]!='\0')
+			if (device->owner() != nullptr && !device->shortname().empty())
 			{
 				if (shortnames.insert(device->shortname()).second)
 					output_one_device(*device, device->tag().c_str());
@@ -424,7 +424,7 @@ void info_xml_creator::output_devices()
 				device_iterator deviter2(*dev);
 				for (device_t *device = deviter2.first(); device != nullptr; device = deviter2.next())
 				{
-					if (device->owner() == dev && device->shortname()!= nullptr && device->shortname()[0]!='\0')
+					if (device->owner() == dev && !device->shortname().empty())
 					{
 						if (shortnames.insert(device->shortname()).second)
 							output_one_device(*device, device->tag().c_str());
@@ -447,8 +447,8 @@ void info_xml_creator::output_device_roms()
 {
 	device_iterator deviter(m_drivlist.config().root_device());
 	for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
-		if (device->owner() != nullptr && device->shortname()!= nullptr && device->shortname()[0]!='\0')
-			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", xml_normalize_string(device->shortname()));
+		if (device->owner() != nullptr && !device->shortname().empty())
+			fprintf(m_output, "\t\t<device_ref name=\"%s\"/>\n", xml_normalize_string(device->shortname().c_str()));
 }
 
 
@@ -648,7 +648,7 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 			fprintf(m_output, "\t\t<chip");
 			fprintf(m_output, " type=\"cpu\"");
 			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
-			fprintf(m_output, " name=\"%s\"", xml_normalize_string(exec->device().name()));
+			fprintf(m_output, " name=\"%s\"", xml_normalize_string(exec->device().name().c_str()));
 			fprintf(m_output, " clock=\"%d\"", exec->device().clock());
 			fprintf(m_output, "/>\n");
 		}
@@ -666,7 +666,7 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 			fprintf(m_output, "\t\t<chip");
 			fprintf(m_output, " type=\"audio\"");
 			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
-			fprintf(m_output, " name=\"%s\"", xml_normalize_string(sound->device().name()));
+			fprintf(m_output, " name=\"%s\"", xml_normalize_string(sound->device().name().c_str()));
 			if (sound->device().clock() != 0)
 				fprintf(m_output, " clock=\"%d\"", sound->device().clock());
 			fprintf(m_output, "/>\n");
@@ -1304,7 +1304,7 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 
 					fprintf(m_output, "\t\t\t<slotoption");
 					fprintf(m_output, " name=\"%s\"", xml_normalize_string(option->name()));
-					fprintf(m_output, " devname=\"%s\"", xml_normalize_string(dev->shortname()));
+					fprintf(m_output, " devname=\"%s\"", xml_normalize_string(dev->shortname().c_str()));
 					if (slot->default_option() != nullptr && strcmp(slot->default_option(),option->name())==0)
 						fprintf(m_output, " default=\"yes\"");
 					fprintf(m_output, "/>\n");

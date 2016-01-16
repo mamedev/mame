@@ -61,7 +61,7 @@ public:
 
 protected:
 	// construction/destruction
-	tia_video_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, std::string tag, device_t *owner, UINT32 clock);
+	tia_video_device(const machine_config &mconfig, device_type type, std::string name, const char *shortname, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

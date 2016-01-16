@@ -483,7 +483,7 @@ inline void d9060_base_t::update_ieee_signals()
 //  d9060_base_t - constructor
 //-------------------------------------------------
 
-d9060_base_t::d9060_base_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+d9060_base_t::d9060_base_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_ieee488_interface(mconfig, *this),
 		m_maincpu(*this, M6502_DOS_TAG),

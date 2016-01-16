@@ -1726,7 +1726,7 @@ apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,std::stri
 {
 }
 
-apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,std::string tag, device_t *owner, UINT32 clock, device_type type,const char *name, const char *shortname, const char *source) :
+apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,std::string tag, device_t *owner, UINT32 clock, device_type type,const char *name, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_lut_fifo(nullptr),
 	m_bt458(nullptr)

@@ -43,7 +43,7 @@ const device_type SEGA8_ROM_KOREAN_NB = &device_creator<sega8_korean_nb_device>;
 
 
 
-sega8_rom_device::sega8_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+sega8_rom_device::sega8_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sega8_cart_interface( mconfig, *this ), m_ram_base(0), m_ram_enabled(0)
 				{
@@ -126,7 +126,7 @@ sega8_4pak_device::sega8_4pak_device(const machine_config &mconfig, std::string 
 }
 
 
-sega8_zemina_device::sega8_zemina_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+sega8_zemina_device::sega8_zemina_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sega8_cart_interface( mconfig, *this ), m_ram_base(0), m_ram_enabled(0)
 				{

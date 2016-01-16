@@ -24,7 +24,7 @@
 const device_type UPD7725 = &device_creator<upd7725_device>;
 const device_type UPD96050 = &device_creator<upd96050_device>;
 
-necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name, const char *shortname, const char *source)
+necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, std::string tag, device_t *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_BIG, 32, abits, -2), // data bus width, address bus width, -2 means DWORD-addressable
 		m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1), m_icount(0),   // -1 for WORD-addressable

@@ -914,7 +914,7 @@ void myarc_hfdc_device::device_reset()
 	for (int i=0; i < 4; i++)
 	{
 		if (m_floppy_unit[i] != nullptr)
-			logerror("%s: FD connector %d with %s\n", tag().c_str(), i+1, m_floppy_unit[i]->name());
+			logerror("%s: FD connector %d with %s\n", tag().c_str(), i+1, m_floppy_unit[i]->name().c_str());
 		else
 			logerror("%s: FD connector %d has no floppy attached\n", tag().c_str(), i+1);
 	}
@@ -922,7 +922,7 @@ void myarc_hfdc_device::device_reset()
 	for (int i=0; i < 3; i++)
 	{
 		if (m_harddisk_unit[i] != nullptr)
-			logerror("%s: HD connector %d with %s\n", tag().c_str(), i+1, m_harddisk_unit[i]->name());
+			logerror("%s: HD connector %d with %s\n", tag().c_str(), i+1, m_harddisk_unit[i]->name().c_str());
 		else
 			logerror("%s: HD connector %d has no drive attached\n", tag().c_str(), i+1);
 	}

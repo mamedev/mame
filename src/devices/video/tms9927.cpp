@@ -44,7 +44,7 @@ tms9927_device::tms9927_device(const machine_config &mconfig, std::string tag, d
 	memset(m_reg, 0x00, sizeof(m_reg));
 }
 
-tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 				: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_video_interface(mconfig, *this),
 					m_write_vsyn(*this),

@@ -63,7 +63,7 @@ nes_sunsoft_3_device::nes_sunsoft_3_device(const machine_config &mconfig, std::s
 				{
 }
 
-nes_sunsoft_4_device::nes_sunsoft_4_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+nes_sunsoft_4_device::nes_sunsoft_4_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_reg(0), m_latch1(0), m_latch2(0), m_wram_enable(0)
 				{
 }
@@ -73,7 +73,7 @@ nes_sunsoft_4_device::nes_sunsoft_4_device(const machine_config &mconfig, std::s
 				{
 }
 
-nes_sunsoft_fme7_device::nes_sunsoft_fme7_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+nes_sunsoft_fme7_device::nes_sunsoft_fme7_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0), m_wram_bank(0)
 				{
 }

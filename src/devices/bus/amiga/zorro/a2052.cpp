@@ -74,7 +74,7 @@ void a2052_device::device_start()
 void a2052_device::autoconfig_base_address(offs_t address)
 {
 	if (VERBOSE)
-		logerror("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname(), basetag(), address);
+		logerror("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname().c_str(), basetag().c_str(), address);
 
 	if (VERBOSE)
 		logerror("-> installing a2052\n");
@@ -92,7 +92,7 @@ void a2052_device::autoconfig_base_address(offs_t address)
 WRITE_LINE_MEMBER( a2052_device::cfgin_w )
 {
 	if (VERBOSE)
-		logerror("%s('%s'): configin_w (%d)\n", shortname(), basetag(), state);
+		logerror("%s('%s'): configin_w (%d)\n", shortname().c_str(), basetag().c_str(), state);
 
 	if (state == 0)
 	{

@@ -47,7 +47,7 @@ const device_type NES_X1_005 = &device_creator<nes_x1_005_device>;
 const device_type NES_X1_017 = &device_creator<nes_x1_017_device>;
 
 
-nes_tc0190fmc_device::nes_tc0190fmc_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+nes_tc0190fmc_device::nes_tc0190fmc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

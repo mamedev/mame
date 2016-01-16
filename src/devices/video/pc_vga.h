@@ -40,7 +40,7 @@ class vga_device :  public device_t
 public:
 	// construction/destruction
 	vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	vga_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	vga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	virtual void zero();
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -243,7 +243,7 @@ class svga_device :  public vga_device
 {
 public:
 	// construction/destruction
-	svga_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	svga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	virtual void zero() override;
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
@@ -272,7 +272,7 @@ protected:
 class ibm8514a_device :  public device_t
 {
 public:
-	ibm8514a_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ibm8514a_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	ibm8514a_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	void set_vga(std::string tag) { m_vga_tag.assign(tag); }
@@ -411,7 +411,7 @@ extern const device_type IBM8514A;
 class mach8_device :  public ibm8514a_device
 {
 public:
-	mach8_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	mach8_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	mach8_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	READ16_MEMBER(mach8_ec0_r);
@@ -516,7 +516,7 @@ class ati_vga_device :  public svga_device
 public:
 	// construction/destruction
 	ati_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	ati_vga_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ati_vga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	virtual READ8_MEMBER(mem_r) override;
 	virtual WRITE8_MEMBER(mem_w) override;
@@ -554,7 +554,7 @@ class s3_vga_device :  public ati_vga_device
 public:
 	// construction/destruction
 	s3_vga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	s3_vga_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	s3_vga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	virtual READ8_MEMBER(port_03b0_r) override;
 	virtual WRITE8_MEMBER(port_03b0_w) override;

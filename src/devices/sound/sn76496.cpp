@@ -132,7 +132,7 @@
 
 sn76496_base_device::sn76496_base_device(const machine_config &mconfig, device_type type,  const char *name,
 	std::string tag, int feedbackmask, int noisetap1, int noisetap2, bool negate, bool stereo, int clockdivider, int sega,
-	device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	device_t *owner, UINT32 clock, std::string shortname, std::string source)
 
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_sound_interface(mconfig, *this),

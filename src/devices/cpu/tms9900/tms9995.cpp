@@ -198,7 +198,7 @@ tms9995_device::tms9995_device(const machine_config &mconfig, std::string tag, d
 /*
     Called from subclass.
 */
-tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 		: cpu_device(mconfig, TMS9995, name, tag, owner, clock, shortname, source),
 		m_state_any(0),
 		PC(0),

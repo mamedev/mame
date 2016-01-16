@@ -65,7 +65,7 @@ class nes_jf17_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_jf17_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	nes_jf17_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	nes_jf17_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
@@ -101,7 +101,7 @@ class nes_jf19_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_jf19_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	nes_jf19_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	nes_jf19_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
@@ -134,7 +134,7 @@ class nes_ss88006_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_ss88006_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	nes_ss88006_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	nes_ss88006_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
@@ -166,7 +166,7 @@ class nes_ss88006_adpcm_device : public nes_ss88006_device
 {
 public:
 	// construction/destruction
-	nes_ss88006_adpcm_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	nes_ss88006_adpcm_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
 	void ss88006_adpcm_write(address_space &space, offs_t offset, UINT8 data, samples_device *dev);

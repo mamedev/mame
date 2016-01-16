@@ -36,7 +36,7 @@ public:
 	};
 
 	h8_timer8_channel_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	h8_timer8_channel_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	void set_info(std::string intc, int irq_ca, int irq_cb, int irq_v, int div1, int div2, int div3, int div4, int div5, int div6);
 

@@ -22,7 +22,7 @@ const device_type APF_ROM_BASIC = &device_creator<apf_basic_device>;
 const device_type APF_ROM_SPACEDST = &device_creator<apf_spacedst_device>;
 
 
-apf_rom_device::apf_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+apf_rom_device::apf_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_apf_cart_interface( mconfig, *this )
 {

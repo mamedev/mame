@@ -525,7 +525,7 @@ WRITE8_MEMBER(msx_cart_synthesizer::write_cart)
 
 
 
-msx_cart_konami_sound::msx_cart_konami_sound(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+msx_cart_konami_sound::msx_cart_konami_sound(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, msx_cart_interface(mconfig, *this)
 	, m_k052539(*this, "k052539")

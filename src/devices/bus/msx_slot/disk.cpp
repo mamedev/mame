@@ -43,7 +43,7 @@ const device_type MSX_SLOT_DISK5 = &device_creator<msx_slot_disk5_device>;
 const device_type MSX_SLOT_DISK6 = &device_creator<msx_slot_disk6_device>;
 
 
-msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: msx_slot_rom_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_floppy0(nullptr)
 	, m_floppy1(nullptr)
@@ -75,7 +75,7 @@ void msx_slot_disk_device::device_start()
 }
 
 
-msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: msx_slot_disk_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_fdc(nullptr)
 {
@@ -95,7 +95,7 @@ void msx_slot_wd_disk_device::device_start()
 }
 
 
-msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: msx_slot_disk_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_fdc(nullptr)
 {

@@ -251,7 +251,7 @@ void tms3203x_device::tmsreg::from_double(double val)
 //  tms3203x_device - constructor
 //-------------------------------------------------
 
-tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map, const char *shortname, const char *source)
+tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 24, -2, internal_map),
 		m_chip_type(chiptype),

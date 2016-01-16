@@ -22,7 +22,7 @@ const device_type O2_ROM_12K = &device_creator<o2_rom12_device>;
 const device_type O2_ROM_16K = &device_creator<o2_rom16_device>;
 
 
-o2_rom_device::o2_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+o2_rom_device::o2_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_o2_cart_interface(mconfig, *this),
 		m_bank_base(0)

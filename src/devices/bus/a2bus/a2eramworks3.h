@@ -25,7 +25,7 @@ class a2eaux_ramworks3_device:
 public:
 	// construction/destruction
 	a2eaux_ramworks3_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	a2eaux_ramworks3_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a2eaux_ramworks3_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 protected:
 	virtual void device_start() override;

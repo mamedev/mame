@@ -194,7 +194,7 @@ alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, std::s
 }
 
 
-alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 10, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 6, 0)

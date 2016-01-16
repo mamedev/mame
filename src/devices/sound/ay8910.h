@@ -101,8 +101,8 @@ public:
 
 	// construction/destruction
 	ay8910_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	ay8910_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner,
-					UINT32 clock, psg_type_t psg_type, int streams, int ioports, const char *shortname, const char *source);
+	ay8910_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner,
+					UINT32 clock, psg_type_t psg_type, int streams, int ioports, std::string shortname, std::string source);
 
 	// static configuration helpers
 	static void set_flags(device_t &device, int flags) { downcast<ay8910_device &>(device).m_flags = flags; }

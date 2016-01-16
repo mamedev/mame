@@ -64,7 +64,7 @@ class pic16c5x_device : public cpu_device
 {
 public:
 	// construction/destruction
-	pic16c5x_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, int picmodel);
+	pic16c5x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int program_width, int data_width, int picmodel);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_read_a_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_a.set_callback(object); }

@@ -55,7 +55,7 @@ class pit8253_device : public device_t
 {
 public:
 	pit8253_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	pit8253_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	pit8253_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~pit8253_device() {}
 
 	// static configuration helpers

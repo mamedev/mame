@@ -26,7 +26,7 @@ const device_type CRVISION_ROM_16K = &device_creator<crvision_rom16k_device>;
 const device_type CRVISION_ROM_18K = &device_creator<crvision_rom18k_device>;
 
 
-crvision_rom_device::crvision_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+crvision_rom_device::crvision_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_crvision_cart_interface(mconfig, *this)
 {

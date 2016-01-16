@@ -21,7 +21,7 @@ public:
 		P0, P1, P2
 	};
 
-	i8x9x_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	i8x9x_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	void serial_w(UINT8 val);
 

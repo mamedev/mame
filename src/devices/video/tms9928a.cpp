@@ -54,7 +54,7 @@ static ADDRESS_MAP_START(memmap, AS_DATA, 8, tms9928a_device)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
-tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva, bool is_99, const char *shortname, const char *source)
+tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva, bool is_99, std::string shortname, std::string source)
 	: device_t( mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),

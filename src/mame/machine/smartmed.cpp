@@ -88,7 +88,7 @@ nand_device::nand_device(const machine_config &mconfig, std::string tag, device_
 	memset(m_id, 0, sizeof(m_id));
 }
 
-nand_device::nand_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+nand_device::nand_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_page_data_size(0),
 		m_page_total_size(0),

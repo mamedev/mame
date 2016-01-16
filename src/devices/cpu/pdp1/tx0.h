@@ -38,7 +38,7 @@ class tx0_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tx0_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int addr_bits, int address_mask, int ir_mask);
+	tx0_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int addr_bits, int address_mask, int ir_mask);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_cpy_cb(device_t &device, _Object object) { return downcast<tx0_device &>(device).m_cpy_handler.set_callback(object); }

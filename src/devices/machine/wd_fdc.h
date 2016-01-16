@@ -133,7 +133,7 @@
 
 class wd_fdc_t : public device_t {
 public:
-	wd_fdc_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	wd_fdc_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).intrq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).drq_cb.set_callback(object); }
@@ -446,7 +446,7 @@ private:
 
 class wd_fdc_analog_t : public wd_fdc_t {
 public:
-	wd_fdc_analog_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	wd_fdc_analog_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 protected:
 	virtual void pll_reset(bool fm, bool enmf, const attotime &when) override;
@@ -464,7 +464,7 @@ private:
 
 class wd_fdc_digital_t : public wd_fdc_t {
 public:
-	wd_fdc_digital_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	wd_fdc_digital_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 protected:
 	static const int wd_digital_step_times[4];

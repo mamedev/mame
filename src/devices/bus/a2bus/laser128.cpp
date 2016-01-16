@@ -42,7 +42,7 @@ machine_config_constructor a2bus_laser128_device::device_mconfig_additions() con
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_laser128_device::a2bus_laser128_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_laser128_device::a2bus_laser128_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this), m_rom(nullptr), m_slot7_bank(0), m_slot7_ram_bank(0)
 

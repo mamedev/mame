@@ -14,7 +14,7 @@
 ***************************************************************************/
 
 
-ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_io_kbd0(*this, "TERM_LINE0")
 	, m_io_kbd1(*this, "TERM_LINE1")

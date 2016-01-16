@@ -48,7 +48,7 @@ kc_m011_device::kc_m011_device(const machine_config &mconfig, std::string tag, d
 	{
 }
 
-kc_m011_device::kc_m011_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+kc_m011_device::kc_m011_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_kcexp_interface( mconfig, *this ), m_slot(nullptr), m_mei(0), m_ram(nullptr), m_enabled(0), m_write_enabled(0), m_base(0), m_segment(0)
 {

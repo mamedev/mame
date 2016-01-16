@@ -830,7 +830,7 @@ ioport_constructor c1571_t::device_input_ports() const
 //  c1571_t - constructor
 //-------------------------------------------------
 
-c1571_t::c1571_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+c1571_t::c1571_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cbm_iec_interface(mconfig, *this),
 		device_c64_floppy_parallel_interface(mconfig, *this),

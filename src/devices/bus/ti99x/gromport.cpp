@@ -294,7 +294,7 @@ const device_type GROMPORT_SINGLE = &device_creator<single_conn_device>;
 const device_type GROMPORT_MULTI = &device_creator<multi_conn_device>;
 const device_type GROMPORT_GK = &device_creator<gkracker_device>;
 
-ti99_cartridge_connector_device::ti99_cartridge_connector_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+ti99_cartridge_connector_device::ti99_cartridge_connector_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_gromport(nullptr)
 {

@@ -56,7 +56,7 @@ const device_type A78_XBOARD = &device_creator<a78_xboard_device>;
 const device_type A78_XM = &device_creator<a78_xm_device>;
 
 
-a78_xboard_device::a78_xboard_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+a78_xboard_device::a78_xboard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: a78_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
 						m_xbslot(*this, "xb_slot"),
 						m_pokey(*this, "xb_pokey"), m_reg(0), m_ram_bank(0)

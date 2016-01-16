@@ -13,7 +13,7 @@ class a78_versaboard_device : public a78_rom_sg_device
 {
 public:
 	// construction/destruction
-	a78_versaboard_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a78_versaboard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	a78_versaboard_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides

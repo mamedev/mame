@@ -65,7 +65,7 @@ class mb88_cpu_device : public cpu_device
 public:
 	// construction/destruction
 	mb88_cpu_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	mb88_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int program_width, int data_width);
+	mb88_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int program_width, int data_width);
 
 	// static configuration helpers
 	static void set_pla(device_t &device, UINT8 *pla) { downcast<mb88_cpu_device &>(device).m_PLA = pla; }

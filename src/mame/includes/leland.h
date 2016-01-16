@@ -211,7 +211,7 @@ class leland_80186_sound_device : public device_t
 {
 public:
 	leland_80186_sound_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	leland_80186_sound_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_WRITE16_MEMBER(peripheral_ctrl);

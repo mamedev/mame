@@ -38,7 +38,7 @@ class isa8_aga_device :
 public:
 	// construction/destruction
 	isa8_aga_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	isa8_aga_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	isa8_aga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	// device-level overrides
 	virtual void device_start() override;
 	// optional information overrides

@@ -62,7 +62,7 @@ class ay31015_device : public device_t
 {
 public:
 	ay31015_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	ay31015_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ay31015_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	~ay31015_device() {}
 
 	static void set_tx_clock(device_t &device, double tx_clock) { downcast<ay31015_device &>(device).m_tx_clock = tx_clock; }

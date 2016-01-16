@@ -595,7 +595,7 @@ mos6566_device::mos6566_device(const machine_config &mconfig, std::string tag, d
 {
 }
 
-mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
@@ -618,7 +618,7 @@ mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, 
 mos6567_device::mos6567_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:mos6566_device(mconfig, MOS6567, "MOS6567", tag, owner, clock, TYPE_6567, "mos6567", __FILE__) { }
 
-mos6567_device::mos6567_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+mos6567_device::mos6567_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
 	:mos6566_device(mconfig, type, name, tag, owner, clock, variant, shortname, source) { }
 
 mos8562_device::mos8562_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
@@ -630,7 +630,7 @@ mos8564_device::mos8564_device(const machine_config &mconfig, std::string tag, d
 mos6569_device::mos6569_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)
 	:mos6566_device(mconfig, MOS6566, "MOS6569", tag, owner, clock, TYPE_6569, "mos6569", __FILE__) { }
 
-mos6569_device::mos6569_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+mos6569_device::mos6569_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
 	:mos6566_device(mconfig, type, name, tag, owner, clock, variant, shortname, source) { }
 
 mos8565_device::mos8565_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock)

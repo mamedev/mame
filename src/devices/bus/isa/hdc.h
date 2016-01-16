@@ -32,7 +32,7 @@ class xt_hdc_device :
 public:
 	// construction/destruction
 	xt_hdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	xt_hdc_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	xt_hdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<xt_hdc_device &>(device).m_irq_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_handler(device_t &device, _Object object) { return downcast<xt_hdc_device &>(device).m_drq_handler.set_callback(object); }
@@ -143,7 +143,7 @@ class isa8_hdc_device :
 public:
 		// construction/destruction
 		isa8_hdc_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-		isa8_hdc_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		isa8_hdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 		DECLARE_READ8_MEMBER(pc_hdc_r);
 		DECLARE_WRITE8_MEMBER(pc_hdc_w);

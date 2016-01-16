@@ -211,7 +211,7 @@ protected:
 
 public:
 	// construction/destruction
-	ppc_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, int address_bits, int data_bits, powerpc_flavor flavor, UINT32 cap, UINT32 tb_divisor, address_map_constructor internal_map);
+	ppc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, int address_bits, int data_bits, powerpc_flavor flavor, UINT32 cap, UINT32 tb_divisor, address_map_constructor internal_map);
 
 	static void set_bus_frequency(device_t &device, UINT32 bus_frequency) { downcast<ppc_device &>(device).c_bus_frequency = bus_frequency; }
 
@@ -750,7 +750,7 @@ public:
 class ppc4xx_device : public ppc_device
 {
 public:
-	ppc4xx_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, powerpc_flavor flavor, UINT32 cap, UINT32 tb_divisor);
+	ppc4xx_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, powerpc_flavor flavor, UINT32 cap, UINT32 tb_divisor);
 
 	void ppc4xx_spu_set_tx_handler(write8_delegate callback);
 	void ppc4xx_spu_receive_byte(UINT8 byteval);

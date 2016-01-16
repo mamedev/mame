@@ -1395,7 +1395,7 @@ void avgdvg_device::static_set_vector_tag(device_t &device, std::string tag)
 	downcast<avgdvg_device &>(device).m_vector.set_tag(tag);
 }
 
-avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_vector(*this)
 {
@@ -1461,7 +1461,7 @@ avg_device::avg_device(const machine_config &mconfig, std::string tag, device_t 
 {
 }
 
-avg_device::avg_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+avg_device::avg_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		avgdvg_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

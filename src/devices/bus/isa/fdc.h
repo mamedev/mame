@@ -26,7 +26,7 @@ class isa8_fdc_device :
 {
 public:
 	// construction/destruction
-	isa8_fdc_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	isa8_fdc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	required_device<pc_fdc_interface> fdc;
 

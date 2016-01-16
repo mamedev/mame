@@ -149,7 +149,7 @@ machine_config_constructor cbm8000_hsg_b_t::device_mconfig_additions() const
 //  cbm8000_hsg_t - constructor
 //-------------------------------------------------
 
-cbm8000_hsg_t::cbm8000_hsg_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+cbm8000_hsg_t::cbm8000_hsg_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_pet_expansion_card_interface(mconfig, *this),
 	m_gdc(*this, EF9365_TAG),

@@ -632,7 +632,7 @@ atmega2560_device::atmega2560_device(const machine_config &mconfig, std::string 
 //  avr8_device - constructor
 //-------------------------------------------------
 
-avr8_device::avr8_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock, const device_type type, UINT32 addr_mask, address_map_constructor internal_map, UINT8 cpu_type, const char *shortname, const char *source)
+avr8_device::avr8_device(const machine_config &mconfig, const char *name, std::string tag, device_t *owner, UINT32 clock, const device_type type, UINT32 addr_mask, address_map_constructor internal_map, UINT8 cpu_type, std::string shortname, std::string source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_shifted_pc(0),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 22),

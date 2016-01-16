@@ -30,7 +30,7 @@ tms1024_device::tms1024_device(const machine_config &mconfig, std::string tag, d
 {
 }
 
-tms1024_device::tms1024_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+tms1024_device::tms1024_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_h(0), m_s(0), m_std(0),
 	m_write_port1(*this), m_write_port2(*this), m_write_port3(*this), m_write_port4(*this), m_write_port5(*this), m_write_port6(*this), m_write_port7(*this)
 {

@@ -47,7 +47,7 @@ void ui_menu_device_config::populate()
 
 	dev = const_cast<machine_config &>(machine().config()).device_add(&machine().config().root_device(), m_option->name(), m_option->devtype(), 0);
 
-	strcatprintf(str,"Device: %s\n", dev->name());
+	strcatprintf(str,"Device: %s\n", dev->name().c_str());
 	if (!m_mounted)
 		str.append("\nIf you select this option, the following items will be enabled:\n");
 	else
@@ -69,11 +69,11 @@ void ui_menu_device_config::populate()
 
 			// count how many identical CPUs we have
 			int count = 1;
-			const char *name = exec->device().name();
+			std::string name = exec->device().name();
 			execute_interface_iterator execinneriter(*dev);
 			for (device_execute_interface *scan = execinneriter.first(); scan != nullptr; scan = execinneriter.next())
 			{
-				if (exec->device().type() == scan->device().type() && strcmp(name, scan->device().name()) == 0 && exec->device().clock() == scan->device().clock())
+				if (exec->device().type() == scan->device().type() && name==scan->device().name() && exec->device().clock() == scan->device().clock())
 					if (exectags.insert(scan->device().tag()).second)
 						count++;
 			}
@@ -83,7 +83,7 @@ void ui_menu_device_config::populate()
 				strcatprintf(str,"  %d" UTF8_MULTIPLY, count);
 			else
 				str.append("  ");
-			str.append(name);
+			str += name;
 
 			// display clock in kHz or MHz
 			if (clock >= 1000000)

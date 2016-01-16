@@ -127,7 +127,7 @@ static const int roc10937poslut[]=
 
 const device_type ROC10937 = &device_creator<roc10937_t>;
 
-rocvfd_t::rocvfd_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+rocvfd_t::rocvfd_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	m_port_val=0;

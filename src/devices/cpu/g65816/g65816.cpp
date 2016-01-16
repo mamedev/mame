@@ -105,7 +105,7 @@ g65816_device::g65816_device(const machine_config &mconfig, std::string tag, dev
 }
 
 
-g65816_device::g65816_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal)
+g65816_device::g65816_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int cpu_type, address_map_constructor internal)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 24, 0, internal)
 	, m_cpu_type(cpu_type)

@@ -67,7 +67,7 @@ void netlist_mame_analog_input_t::device_start()
 	m_param = dynamic_cast<netlist::param_double_t *>(p);
 	if (m_param == nullptr)
 	{
-		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
+		fatalerror("device %s wrong parameter type for %s\n", basetag().c_str(), m_param_name.cstr());
 	}
 	if (m_mult != 1.0 || m_offset != 0.0)
 	{
@@ -142,7 +142,7 @@ void netlist_mame_logic_input_t::device_start()
 	m_param = dynamic_cast<netlist::param_int_t *>(p);
 	if (m_param == nullptr)
 	{
-		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
+		fatalerror("device %s wrong parameter type for %s\n", basetag().c_str(), m_param_name.cstr());
 	}
 }
 
@@ -272,8 +272,8 @@ netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, std:
 {
 }
 
-netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *file)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, file),
+netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_icount(0),
 		m_old(netlist::netlist_time::zero),
 		m_netlist(nullptr),

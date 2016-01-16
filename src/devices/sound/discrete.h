@@ -4284,7 +4284,7 @@ class discrete_device : public device_t
 
 protected:
 	// construction/destruction
-	discrete_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock);
+	discrete_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock);
 
 public:
 	// inline configuration helpers

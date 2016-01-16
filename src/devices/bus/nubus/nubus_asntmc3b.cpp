@@ -76,7 +76,7 @@ const rom_entry *nubus_appleenet_device::device_rom_region() const
 //  nubus_mac8390_device - constructor
 //-------------------------------------------------
 
-nubus_mac8390_device::nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+nubus_mac8390_device::nubus_mac8390_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 		device_t(mconfig, NUBUS_ASNTMC3NB, name, tag, owner, clock, shortname, source),
 		device_nubus_card_interface(mconfig, *this),
 		m_dp83902(*this, MAC8390_839X)

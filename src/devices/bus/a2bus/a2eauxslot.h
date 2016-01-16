@@ -48,7 +48,7 @@ class a2eauxslot_slot_device : public device_t,
 public:
 	// construction/destruction
 	a2eauxslot_slot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	a2eauxslot_slot_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a2eauxslot_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -73,7 +73,7 @@ class a2eauxslot_device : public device_t
 public:
 	// construction/destruction
 	a2eauxslot_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	a2eauxslot_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a2eauxslot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// inline configuration
 	static void static_set_cputag(device_t &device, std::string tag);

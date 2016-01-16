@@ -37,13 +37,13 @@ const device_type GB_ROM_ROCKMAN8 = &device_creator<gb_rom_rockman8_device>;
 const device_type GB_ROM_SM3SP = &device_creator<gb_rom_sm3sp_device>;
 
 
-gb_rom_mbc_device::gb_rom_mbc_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+gb_rom_mbc_device::gb_rom_mbc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_gb_cart_interface( mconfig, *this ), m_ram_enable(0)
 				{
 }
 
-gb_rom_mbc1_device::gb_rom_mbc1_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+gb_rom_mbc1_device::gb_rom_mbc1_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: gb_rom_mbc_device(mconfig, type, name, tag, owner, clock, shortname, source), m_mode(0),
 						m_mask(0x1f),
 						m_shift(0)
@@ -67,7 +67,7 @@ gb_rom_mbc3_device::gb_rom_mbc3_device(const machine_config &mconfig, std::strin
 {
 }
 
-gb_rom_mbc5_device::gb_rom_mbc5_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+gb_rom_mbc5_device::gb_rom_mbc5_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: gb_rom_mbc_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -102,7 +102,7 @@ gb_rom_sachen_mmc1_device::gb_rom_sachen_mmc1_device(const machine_config &mconf
 				{
 }
 
-gb_rom_sachen_mmc1_device::gb_rom_sachen_mmc1_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+gb_rom_sachen_mmc1_device::gb_rom_sachen_mmc1_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: gb_rom_mbc_device(mconfig, type, name, tag, owner, clock, shortname, source), m_base_bank(0), m_mask(0), m_mode(0), m_unlock_cnt(0)
 				{
 }

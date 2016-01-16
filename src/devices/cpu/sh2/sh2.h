@@ -93,7 +93,7 @@ class sh2_device : public cpu_device
 public:
 	// construction/destruction
 	sh2_device(const machine_config &mconfig, std::string _tag, device_t *_owner, UINT32 _clock);
-	sh2_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type,address_map_constructor internal_map, int addrlines);
+	sh2_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int cpu_type,address_map_constructor internal_map, int addrlines);
 
 	static void set_is_slave(device_t &device, int slave) { downcast<sh2_device &>(device).m_is_slave = slave; }
 	static void set_dma_kludge_callback(device_t &device, sh2_dma_kludge_delegate callback) { downcast<sh2_device &>(device).m_dma_kludge_cb = callback; }

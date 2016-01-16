@@ -26,7 +26,7 @@ const device_type PIT68230 = &device_creator<pit68230_device>;
 //-------------------------------------------------
 //  pit68230_device - constructors
 //-------------------------------------------------
-pit68230_device::pit68230_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+pit68230_device::pit68230_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, UINT32 variant, std::string shortname, std::string source)
 		: device_t (mconfig, type, name, tag, owner, clock, shortname, source),
 		device_execute_interface (mconfig, *this)
 		, m_icount (0)

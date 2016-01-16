@@ -200,7 +200,7 @@ public:
 	void set_disable_rom_berr(bool mode);
 
 protected:
-	psxcpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	psxcpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void device_start() override;

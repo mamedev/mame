@@ -13,7 +13,7 @@ class gb_rom_mbc_device : public device_t,
 {
 public:
 	// construction/destruction
-	gb_rom_mbc_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	gb_rom_mbc_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void device_start() override { shared_start(); };
@@ -42,7 +42,7 @@ public:
 	};
 
 	// construction/destruction
-	gb_rom_mbc1_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	gb_rom_mbc1_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	gb_rom_mbc1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
@@ -102,7 +102,7 @@ class gb_rom_mbc5_device : public gb_rom_mbc_device
 {
 public:
 	// construction/destruction
-	gb_rom_mbc5_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	gb_rom_mbc5_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 	gb_rom_mbc5_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
@@ -204,7 +204,7 @@ public:
 
 	// construction/destruction
 	gb_rom_sachen_mmc1_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	gb_rom_sachen_mmc1_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	gb_rom_sachen_mmc1_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void device_start() override;

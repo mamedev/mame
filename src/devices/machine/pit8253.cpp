@@ -57,7 +57,7 @@ pit8253_device::pit8253_device(const machine_config &mconfig, std::string tag, d
 {
 }
 
-pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_clk0(0),
 	m_clk1(0),

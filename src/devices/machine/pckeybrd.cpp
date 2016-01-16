@@ -292,7 +292,7 @@ pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, std::strin
 {
 }
 
-pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_ioport_0(*this, ":pc_keyboard_0"),
 	m_ioport_1(*this, ":pc_keyboard_1"),

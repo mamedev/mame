@@ -26,7 +26,7 @@ const device_type ESQPANEL2x40_SQ1 = &device_creator<esqpanel2x40_sq1_device>;
 //  esqpanel_device - constructor
 //-------------------------------------------------
 
-esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_serial_interface(mconfig, *this),
 	m_write_tx(*this),

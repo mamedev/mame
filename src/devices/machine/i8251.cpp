@@ -37,7 +37,7 @@ const device_type V53_SCU = &device_creator<v53_scu_device>;
 //  i8251_device - constructor
 //-------------------------------------------------
 
-i8251_device::i8251_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname)
+i8251_device::i8251_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_txd_handler(*this),

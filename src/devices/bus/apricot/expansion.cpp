@@ -25,8 +25,8 @@ apricot_expansion_slot_device::apricot_expansion_slot_device(const machine_confi
 {
 }
 
-apricot_expansion_slot_device::apricot_expansion_slot_device(const machine_config &mconfig, device_type type, const char *name,
-	std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+apricot_expansion_slot_device::apricot_expansion_slot_device(const machine_config &mconfig, device_type type, std::string name,
+	std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_slot_interface(mconfig, *this)
 {

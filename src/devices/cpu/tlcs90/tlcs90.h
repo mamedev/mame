@@ -25,7 +25,7 @@ class tlcs90_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tlcs90_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, address_map_constructor program_map);
+	tlcs90_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, address_map_constructor program_map);
 
 	DECLARE_READ8_MEMBER( t90_internal_registers_r );
 	DECLARE_WRITE8_MEMBER( t90_internal_registers_w );

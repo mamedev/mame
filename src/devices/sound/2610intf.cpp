@@ -212,7 +212,7 @@ ym2610_device::ym2610_device(const machine_config &mconfig, std::string tag, dev
 {
 }
 
-ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: ay8910_device(mconfig, type, name, tag, owner, clock, PSG_TYPE_YM, 1, 0, shortname, source),
 		m_irq_handler(*this)
 {

@@ -18,7 +18,7 @@
 const device_type NEOGEO_SMA_CART = &device_creator<neogeo_sma_cart>;
 
 
-neogeo_sma_cart::neogeo_sma_cart(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT16 clock, const char *shortname, const char *source)
+neogeo_sma_cart::neogeo_sma_cart(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT16 clock, std::string shortname, std::string source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_neogeo_cart_interface(mconfig, *this),
 	m_banked_cart(*this, "banked_cart"),

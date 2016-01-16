@@ -137,7 +137,7 @@ void device_gb_cart_interface::ram_map_setup(UINT8 banks)
 //-------------------------------------------------
 //  base_gb_cart_slot_device - constructor
 //-------------------------------------------------
-base_gb_cart_slot_device::base_gb_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+base_gb_cart_slot_device::base_gb_cart_slot_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source) :
 						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),

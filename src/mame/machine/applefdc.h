@@ -81,7 +81,7 @@ protected:
 	};
 
 	// constructor
-	applefdc_base_device(applefdc_t fdc_type, const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	applefdc_base_device(applefdc_t fdc_type, const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void device_start() override;

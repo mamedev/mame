@@ -50,7 +50,7 @@ i386_device::i386_device(const machine_config &mconfig, std::string tag, device_
 }
 
 
-i386_device::i386_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int program_data_width, int program_addr_width, int io_data_width)
+i386_device::i386_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source, int program_data_width, int program_addr_width, int io_data_width)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
@@ -75,7 +75,7 @@ pentium_device::pentium_device(const machine_config &mconfig, std::string tag, d
 {
 }
 
-pentium_device::pentium_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+pentium_device::pentium_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: i386_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

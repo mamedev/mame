@@ -29,7 +29,7 @@ mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, std::str
 {
 }
 
-mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: mach8_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_chip_ID(0),
 	m_membounds(0)
@@ -44,7 +44,7 @@ mach32_device::mach32_device(const machine_config &mconfig, std::string tag, dev
 {
 }
 
-mach32_device::mach32_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+mach32_device::mach32_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: ati_vga_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_8514a(*this,"8514a")
 {
@@ -100,7 +100,7 @@ mach64_8514a_device::mach64_8514a_device(const machine_config &mconfig, std::str
 {
 }
 
-mach64_8514a_device::mach64_8514a_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+mach64_8514a_device::mach64_8514a_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: mach32_8514a_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -113,7 +113,7 @@ mach64_device::mach64_device(const machine_config &mconfig, std::string tag, dev
 {
 }
 
-mach64_device::mach64_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+mach64_device::mach64_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: mach32_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_8514a(*this,"8514a")
 {

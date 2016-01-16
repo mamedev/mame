@@ -109,7 +109,7 @@ WRITE_LINE_MEMBER(hp_hybrid_cpu_device::flag_w)
 		}
 }
 
-hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname , UINT8 addrwidth)
+hp_hybrid_cpu_device::hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname , UINT8 addrwidth)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 			m_pa_changed_func(*this),
 			m_program_config("program", ENDIANNESS_BIG, 16, addrwidth, -1),

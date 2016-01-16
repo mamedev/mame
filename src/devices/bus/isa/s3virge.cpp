@@ -25,7 +25,7 @@ s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, std::strin
 {
 }
 
-s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: s3_vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -35,7 +35,7 @@ s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, std::s
 {
 }
 
-s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: s3virge_vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

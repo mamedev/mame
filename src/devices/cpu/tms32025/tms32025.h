@@ -74,7 +74,7 @@ class tms32025_device : public cpu_device
 public:
 	// construction/destruction
 	tms32025_device(const machine_config &mconfig, std::string tag, device_t *owner, UINT32 clock);
-	tms32025_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	tms32025_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 protected:
 	// device-level overrides

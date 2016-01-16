@@ -119,7 +119,7 @@ dmv_k801_device::dmv_k801_device(const machine_config &mconfig, std::string tag,
 	{
 }
 
-dmv_k801_device::dmv_k801_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+dmv_k801_device::dmv_k801_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_dmvslot_interface( mconfig, *this ),
 		m_epci(*this, "epci"),
@@ -137,7 +137,7 @@ dmv_k211_device::dmv_k211_device(const machine_config &mconfig, std::string tag,
 }
 
 
-dmv_k211_device::dmv_k211_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+dmv_k211_device::dmv_k211_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 		: dmv_k801_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }

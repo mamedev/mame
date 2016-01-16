@@ -120,7 +120,7 @@ class msx_cart_konami_sound : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_konami_sound(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	msx_cart_konami_sound(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void device_start() override;

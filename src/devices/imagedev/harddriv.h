@@ -53,7 +53,7 @@ public:
 	chd_file *get_chd_file();
 
 protected:
-	harddisk_image_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	harddisk_image_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source);
 
 	// device-level overrides
 	virtual void device_config_complete() override;

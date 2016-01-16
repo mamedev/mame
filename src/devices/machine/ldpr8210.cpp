@@ -195,7 +195,7 @@ pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, std:
 {
 }
 
-pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 	: laserdisc_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_control(0),
 		m_lastcommand(0),

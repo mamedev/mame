@@ -31,7 +31,7 @@ const device_type CHANF_ROM_MULTI_OLD = &device_creator<chanf_multi_old_device>;
 const device_type CHANF_ROM_MULTI_FINAL = &device_creator<chanf_multi_final_device>;
 
 
-chanf_rom_device::chanf_rom_device(const machine_config &mconfig, device_type type, const char *name, std::string tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+chanf_rom_device::chanf_rom_device(const machine_config &mconfig, device_type type, std::string name, std::string tag, device_t *owner, UINT32 clock, std::string shortname, std::string source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_channelf_cart_interface( mconfig, *this ), m_addr_latch(0), m_addr(0), m_read_write(0), m_data0(0)
 				{
