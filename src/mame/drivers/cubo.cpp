@@ -1051,6 +1051,7 @@ static MACHINE_CONFIG_START( cubo, cubo_state )
 	MCFG_FRAGMENT_ADD(pal_video)
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
+	MCFG_SCREEN_NO_PALETTE
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 

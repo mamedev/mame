@@ -187,7 +187,7 @@ protected:
 	optional_device<sega_315_5250_compare_timer_device> m_cmptimer_1;
 	optional_device<sega_315_5250_compare_timer_device> m_cmptimer_2;
 	required_device<nvram_device> m_nvram;
-	required_device<sega_sys16b_sprite_device> m_sprites;
+	optional_device<sega_sys16b_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 
 	// memory pointers
